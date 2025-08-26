@@ -28,14 +28,11 @@ internal class GeneralViewRebarPerpAnnotCreator : ViewAnnotationCreator {
 
             // Определяем с какой стороны строить вертикальную размерную цепочку по пластинам
             var plateDimensionOffsetType = GetPlateDimensionOffsetType(rebarFinder);
-            // Создаем размерную цепочку по пластинам
-            dimensionService.TryCreatePlateDimensions(skeletonParentRebar, plateDimensionOffsetType, 
-                                                      dimensionBaseService);
             // Если Г-образный стержень только с одной стороны, то его нужно образмерить
             // В противном случае (оба Г-образные) это произойдет ранее
             if(!SheetInfo.RebarInfo.AllRebarAreL && SheetInfo.RebarInfo.HasLRebar) {
-                var rebarDimensionOffsetType = plateDimensionOffsetType == 
-                    DimensionOffsetType.Left ? DimensionOffsetType.Right : DimensionOffsetType.Left;
+                var rebarDimensionOffsetType = plateDimensionOffsetType == DimensionOffsetType.Left 
+                    ? DimensionOffsetType.Right : DimensionOffsetType.Left;
                 dimensionService.TryCreateLRebarDimension(skeletonParentRebar, rebarDimensionOffsetType, 
                                                           dimensionBaseService);
             }

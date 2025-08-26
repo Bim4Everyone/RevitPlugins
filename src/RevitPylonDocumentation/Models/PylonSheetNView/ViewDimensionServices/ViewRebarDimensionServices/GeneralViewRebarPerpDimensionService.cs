@@ -4,8 +4,6 @@ using System.Linq;
 
 using Autodesk.Revit.DB;
 
-using dosymep.Revit;
-
 using RevitPylonDocumentation.ViewModels;
 
 namespace RevitPylonDocumentation.Models.PylonSheetNView.ViewDimensionServices.ViewRebarDimensionServices;
@@ -57,67 +55,6 @@ internal class GeneralViewRebarPerpDimensionService {
                                                     ViewModel.SelectedDimensionType);
         } catch(Exception) { }
     }
-
-    /// <summary>
-    /// Создание размерной цепочки по пластинам сбоку
-    /// </summary>
-    internal void TryCreatePlateDimensions(FamilyInstance skeletonParentRebar,
-                                           DimensionOffsetType dimensionOffsetType, 
-                                           DimensionBaseService dimensionBaseService) {
-        var view = ViewOfPylon.ViewElement;
-        try {
-
-            List<Element> platesArray = ViewModel.RebarFinder.GetSimpleRebars(view, SheetInfo.ProjectSection, 2001);
-            ReferenceArray refArraySide;
-            if(SheetInfo.RebarInfo.AllRebarAreL) {
-                // #1_горизонт_Г-стержень
-                refArraySide = dimensionBaseService.GetDimensionRefs(skeletonParentRebar, '#', '/', 
-                                                                     ["горизонт", "Г-стержень"]);
-            } else {
-                // #1_горизонт_выпуск
-                refArraySide = dimensionBaseService.GetDimensionRefs(skeletonParentRebar, '#', '/', 
-                                                                     ["горизонт", "выпуск"]);
-            }
-            // #_1_горизонт_край_низ
-            refArraySide = dimensionBaseService.GetDimensionRefs(skeletonParentRebar, '#', '/', 
-                                                                 ["горизонт", "край", "низ"], oldRefArray: refArraySide);
-            var dimensionLineLeftFirst = dimensionBaseService.GetDimensionLine(skeletonParentRebar, 
-                                                                               dimensionOffsetType, 1.3);
-            var dimensionRebarSideFirst = Repository.Document.Create.NewDimension(view, dimensionLineLeftFirst, 
-                                                                                  refArraySide, 
-                                                                                  ViewModel.SelectedDimensionType);
-            double lengthTemp = 0.0;
-            Element neededPlates = default;
-            foreach(var plates in platesArray) {
-                var length = plates.GetParamValue<double>("мод_Длина");
-                if(length > lengthTemp) {
-                    lengthTemp = length;
-                    neededPlates = plates;
-                }
-            }
-            var viewOptions = new Options {
-                View = view,
-                ComputeReferences = true,
-                IncludeNonVisibleObjects = false
-            };
-            var plateRefs = neededPlates.get_Geometry(viewOptions)?
-                .OfType<GeometryInstance>()
-                .SelectMany(ge => ge.GetSymbolGeometry())
-                .OfType<Solid>()
-                .Where(solid => solid?.Volume > 0)
-                .SelectMany(solid => solid.Faces.OfType<PlanarFace>())
-                .Where(face => Math.Abs(face.FaceNormal.Z + 1) < 0.001)
-                .ToList();
-            foreach(var plateRef in plateRefs) {
-                refArraySide.Append(plateRef.Reference);
-            }
-            var dimensionLineLeftSecond = dimensionBaseService.GetDimensionLine(skeletonParentRebar, 
-                                                                                dimensionOffsetType, 0.7);
-            Repository.Document.Create.NewDimension(view, dimensionLineLeftSecond,
-                                                    refArraySide, ViewModel.SelectedDimensionType);
-        } catch(Exception) { }
-    }
-
 
     /// <summary>
     /// Создание размера сбоку между низом арматурного каркаса и Г-образным стержнем
