@@ -428,11 +428,6 @@ internal class MainViewModel : BaseViewModel {
 
 
     /// <summary>
-    /// Эталонная спецификация арматуры
-    /// </summary>
-    public ViewSchedule ReferenceRebarSchedule { get; set; }
-
-    /// <summary>
     /// Эталонная спецификация материалов
     /// </summary>
     public ViewSchedule ReferenceMaterialSchedule { get; set; }
@@ -593,7 +588,6 @@ internal class MainViewModel : BaseViewModel {
         SelectionSettings.NeedWorkWithTransverseViewFirst = false;
         SelectionSettings.NeedWorkWithTransverseViewSecond = false;
         SelectionSettings.NeedWorkWithTransverseViewThird = false;
-        SelectionSettings.NeedWorkWithRebarSchedule = false;
         SelectionSettings.NeedWorkWithMaterialSchedule = false;
         SelectionSettings.NeedWorkWithSystemPartsSchedule = false;
         SelectionSettings.NeedWorkWithIfcPartsSchedule = false;
@@ -763,9 +757,6 @@ internal class MainViewModel : BaseViewModel {
     /// Ищет эталонные спецификации по указанным именам. На основе эталонных спек создаются спеки для пилонов путем копирования
     /// </summary>
     private void FindReferenceSchedules() {
-        ReferenceRebarSchedule =
-            _revitRepository.AllScheduleViews.FirstOrDefault(sch =>
-                sch.Name.Equals(SchedulesSettings.RebarScheduleName));
         ReferenceMaterialSchedule =
             _revitRepository.AllScheduleViews.FirstOrDefault(sch =>
                 sch.Name.Equals(SchedulesSettings.MaterialScheduleName));
@@ -1071,7 +1062,6 @@ internal class MainViewModel : BaseViewModel {
         SelectionSettings.NeedWorkWithTransverseViewFirst = true;
         SelectionSettings.NeedWorkWithTransverseViewSecond = true;
         SelectionSettings.NeedWorkWithTransverseViewThird = true;
-        SelectionSettings.NeedWorkWithRebarSchedule = true;
         SelectionSettings.NeedWorkWithMaterialSchedule = true;
         SelectionSettings.NeedWorkWithSystemPartsSchedule = true;
         SelectionSettings.NeedWorkWithIfcPartsSchedule = true;
@@ -1096,7 +1086,6 @@ internal class MainViewModel : BaseViewModel {
         SelectionSettings.NeedWorkWithTransverseViewFirst = false;
         SelectionSettings.NeedWorkWithTransverseViewSecond = false;
         SelectionSettings.NeedWorkWithTransverseViewThird = false;
-        SelectionSettings.NeedWorkWithRebarSchedule = false;
         SelectionSettings.NeedWorkWithMaterialSchedule = false;
         SelectionSettings.NeedWorkWithSystemPartsSchedule = false;
         SelectionSettings.NeedWorkWithIfcPartsSchedule = false;
@@ -1121,7 +1110,6 @@ internal class MainViewModel : BaseViewModel {
         SelectionSettings.NeedWorkWithTransverseViewFirst = !SelectionSettings.NeedWorkWithTransverseViewFirst;
         SelectionSettings.NeedWorkWithTransverseViewSecond = !SelectionSettings.NeedWorkWithTransverseViewSecond;
         SelectionSettings.NeedWorkWithTransverseViewThird = !SelectionSettings.NeedWorkWithTransverseViewThird;
-        SelectionSettings.NeedWorkWithRebarSchedule = !SelectionSettings.NeedWorkWithRebarSchedule;
         SelectionSettings.NeedWorkWithMaterialSchedule = !SelectionSettings.NeedWorkWithMaterialSchedule;
         SelectionSettings.NeedWorkWithSystemPartsSchedule = !SelectionSettings.NeedWorkWithSystemPartsSchedule;
         SelectionSettings.NeedWorkWithIfcPartsSchedule = !SelectionSettings.NeedWorkWithIfcPartsSchedule;

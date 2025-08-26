@@ -66,43 +66,6 @@ public class PylonViewSchedulePlacer {
     }
 
 
-    internal bool PlaceRebarSchedule() {
-        // Проверяем вдруг спека не создалась
-        if(SheetInfo.RebarSchedule.ViewElement == null) {
-            return false;
-        } else {
-            // Заполняем данные для задания
-            SheetInfo.RebarSchedule.ViewportName =
-                ViewModel.SchedulesSettings.RebarSchedulePrefix
-                    + SheetInfo.PylonKeyName
-                    + ViewModel.SchedulesSettings.RebarScheduleSuffix;
-        }
-
-        // Передаем спеку армирования в метод по созданию видовых экранов в (0.0.0)
-        if(!PlaceScheduleViewport(SheetInfo.PylonViewSheet, SheetInfo.RebarSchedule)) {
-            return false;
-        }
-
-        // Рассчитываем и задаем корректную точку вставки спецификации материалов пилона
-        var newCenter = new XYZ(
-            -SheetInfo.RebarSchedule.ViewportHalfWidth * 2 - _titleBlockFrameRightOffset,
-            SheetInfo.TitleBlockHeight - _titleBlockFrameTopOffset,
-            0);
-
-        if(SheetInfo.SkeletonSchedule.ViewportElement != null) {
-            newCenter = new XYZ(
-                -SheetInfo.RebarSchedule.ViewportHalfWidth * 2 - _titleBlockFrameRightOffset,
-                SheetInfo.SkeletonSchedule.ViewportCenter.Y - SheetInfo.SkeletonSchedule.ViewportHalfHeight * 2
-                + _scheduleTopOffsetSmall,
-                0);
-        }
-        (SheetInfo.RebarSchedule.ViewportElement as ScheduleSheetInstance).Point = newCenter;
-
-        SheetInfo.RebarSchedule.ViewportCenter = newCenter;
-        return true;
-    }
-
-
     internal bool PlaceMaterialSchedule() {
         // Проверяем вдруг спека не создалась
         if(SheetInfo.MaterialSchedule.ViewElement == null) {
@@ -126,10 +89,10 @@ public class PylonViewSchedulePlacer {
                 _defaultSchedulePositionY,
                 0);
 
-        if(SheetInfo.RebarSchedule.ViewportElement != null) {
+        if(SheetInfo.SkeletonSchedule.ViewportElement != null) {
             newCenter = new XYZ(
                 -SheetInfo.MaterialSchedule.ViewportHalfWidth * 2 - _titleBlockFrameRightOffset,
-                SheetInfo.RebarSchedule.ViewportCenter.Y - SheetInfo.RebarSchedule.ViewportHalfHeight * 2
+                SheetInfo.SkeletonSchedule.ViewportCenter.Y - SheetInfo.SkeletonSchedule.ViewportHalfHeight * 2
                 + _scheduleTopOffsetSmall,
                 0);
         }

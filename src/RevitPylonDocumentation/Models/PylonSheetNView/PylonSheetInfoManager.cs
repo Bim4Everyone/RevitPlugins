@@ -157,18 +157,6 @@ internal class PylonSheetInfoManager {
             // Тут точно получили вид
         }
 
-        // СПЕЦИФИКАЦИЯ АРМАТУРЫ
-        if(selectionSettings.NeedWorkWithRebarSchedule) {
-            // Здесь может быть два варианта: 1) найден и вид, и видовой экран; 2) не найдено ничего
-            if(SheetInfo.RebarSchedule.ViewElement is null) {
-                // Если вид не найден, то сначала пытаемся создать вид, а потом, если создание не успешно - будем искать в проекте
-                if(!SheetInfo.RebarSchedule.ViewScheduleCreator.TryCreateRebarSchedule()) {
-                    Repository.FindViewScheduleInPj(SheetInfo.RebarSchedule);
-                }
-            }
-            // Тут точно получили вид
-        }
-
         // СПЕЦИФИКАЦИЯ КАРКАСОВ
         if(selectionSettings.NeedWorkWithSkeletonSchedule) {
             // Здесь может быть два варианта: 1) найден и вид, и видовой экран; 2) не найдено ничего
@@ -234,7 +222,6 @@ internal class PylonSheetInfoManager {
 
         // Принудительно регеним документ, иначе запрашиваемые габариты видовых экранов будут некорректны
         Repository.Document.Regenerate();
-
 
 
 
@@ -384,12 +371,6 @@ internal class PylonSheetInfoManager {
             // Если видовой экран на листе не найден, то размещаем
             if(SheetInfo.SkeletonSchedule.ViewportElement is null) {
                 SheetInfo.SkeletonSchedule.ViewSchedulePlacer.PlaceSkeletonSchedule();
-            }
-        }
-        if(selectionSettings.NeedWorkWithRebarSchedule) {
-            // Если видовой экран на листе не найден, то размещаем
-            if(SheetInfo.RebarSchedule.ViewportElement is null) {
-                SheetInfo.RebarSchedule.ViewSchedulePlacer.PlaceRebarSchedule();
             }
         }
         if(selectionSettings.NeedWorkWithMaterialSchedule) {

@@ -37,7 +37,6 @@ internal class PylonSheetInfo : BaseViewModel {
         TransverseViewFirstRebar = new PylonView(ViewModel, Repository, this, AnnotationCreatorFactories.TransverseRebarFirst);
         TransverseViewSecondRebar = new PylonView(ViewModel, Repository, this, AnnotationCreatorFactories.TransverseRebarSecond);
 
-        RebarSchedule = new PylonView(ViewModel, Repository, this);
         SkeletonSchedule = new PylonView(ViewModel, Repository, this);
         SkeletonByElemsSchedule = new PylonView(ViewModel, Repository, this);
         MaterialSchedule = new PylonView(ViewModel, Repository, this);
@@ -94,7 +93,6 @@ internal class PylonSheetInfo : BaseViewModel {
 
 
     // Видовые экраны спецификаций
-    public PylonView RebarSchedule { get; set; }
     public PylonView MaterialSchedule { get; set; }
     public PylonView SystemPartsSchedule { get; set; }
     public PylonView IfcPartsSchedule { get; set; }
@@ -207,7 +205,6 @@ internal class PylonSheetInfo : BaseViewModel {
         TransverseViewSecond.ViewName = ViewModel.ViewSectionSettings.TransverseViewSecondPrefix + PylonKeyName + ViewModel.ViewSectionSettings.TransverseViewSecondSuffix;
         TransverseViewThird.ViewName = ViewModel.ViewSectionSettings.TransverseViewThirdPrefix + PylonKeyName + ViewModel.ViewSectionSettings.TransverseViewThirdSuffix;
 
-        RebarSchedule.ViewName = ViewModel.SchedulesSettings.RebarSchedulePrefix + PylonKeyName + ViewModel.SchedulesSettings.RebarScheduleSuffix;
         MaterialSchedule.ViewName = ViewModel.SchedulesSettings.MaterialSchedulePrefix + PylonKeyName + ViewModel.SchedulesSettings.MaterialScheduleSuffix;
         SystemPartsSchedule.ViewName = ViewModel.SchedulesSettings.SystemPartsSchedulePrefix + PylonKeyName + ViewModel.SchedulesSettings.SystemPartsScheduleSuffix;
         IfcPartsSchedule.ViewName = ViewModel.SchedulesSettings.IfcPartsSchedulePrefix + PylonKeyName + ViewModel.SchedulesSettings.IfcPartsScheduleSuffix;
@@ -385,16 +382,6 @@ internal class PylonSheetInfo : BaseViewModel {
             if(viewSchedule is null) { continue; }
 
             // Если вид не находили до этого в этом цикле и его имя равно нужному, то сохраняем
-            // RebarSchedule
-            if(RebarSchedule.ViewElement is null && viewSchedule.Name.Equals(RebarSchedule.ViewName)) {
-                RebarSchedule.ViewElement = viewSchedule;
-                RebarSchedule.ViewportElement = viewport;
-
-                // Получение центра и габаритов видового экрана
-                GetInfoAboutScheduleSheetInstance(RebarSchedule, viewport);
-                continue;
-            }
-
             // MaterialSchedule
             if(MaterialSchedule.ViewElement is null && viewSchedule.Name.Equals(MaterialSchedule.ViewName)) {
                 MaterialSchedule.ViewElement = viewSchedule;

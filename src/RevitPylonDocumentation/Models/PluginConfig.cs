@@ -35,7 +35,6 @@ internal class PluginConfig : ProjectConfig<PluginSettings> {
         selectionSettings.NeedWorkWithTransverseViewFirst = settings.NeedWorkWithTransverseViewFirst;
         selectionSettings.NeedWorkWithTransverseViewSecond = settings.NeedWorkWithTransverseViewSecond;
         selectionSettings.NeedWorkWithTransverseViewThird = settings.NeedWorkWithTransverseViewThird;
-        selectionSettings.NeedWorkWithRebarSchedule = settings.NeedWorkWithRebarSchedule;
         selectionSettings.NeedWorkWithMaterialSchedule = settings.NeedWorkWithMaterialSchedule;
         selectionSettings.NeedWorkWithSystemPartsSchedule = settings.NeedWorkWithSystemPartsSchedule;
         selectionSettings.NeedWorkWithIfcPartsSchedule = settings.NeedWorkWithIfcPartsSchedule;
@@ -188,11 +187,6 @@ internal class PluginConfig : ProjectConfig<PluginSettings> {
         viewSectionSettings.ViewFamilyTypeName = settings.ViewFamilyTypeName;
         viewSectionSettings.ViewFamilyTypeNameTemp = settings.ViewFamilyTypeName;
 
-        schedulesSettings.RebarSchedulePrefix = settings.RebarSchedulePrefix;
-        schedulesSettings.RebarSchedulePrefixTemp = settings.RebarSchedulePrefix;
-        schedulesSettings.RebarScheduleSuffix = settings.RebarScheduleSuffix;
-        schedulesSettings.RebarScheduleSuffixTemp = settings.RebarScheduleSuffix;
-
         schedulesSettings.SkeletonSchedulePrefix = settings.SkeletonSchedulePrefix;
         schedulesSettings.SkeletonSchedulePrefixTemp = settings.SkeletonSchedulePrefix;
         schedulesSettings.SkeletonScheduleSuffix = settings.SkeletonScheduleSuffix;
@@ -217,9 +211,6 @@ internal class PluginConfig : ProjectConfig<PluginSettings> {
         schedulesSettings.IfcPartsScheduleSuffix = settings.IfcPartsScheduleSuffix;
         schedulesSettings.IfcPartsScheduleSuffixTemp = settings.IfcPartsScheduleSuffix;
 
-        schedulesSettings.RebarScheduleName = settings.RebarScheduleName;
-        schedulesSettings.RebarScheduleNameTemp = settings.RebarScheduleName;
-
         schedulesSettings.SkeletonScheduleName = settings.SkeletonScheduleName;
         schedulesSettings.SkeletonScheduleNameTemp = settings.SkeletonScheduleName;
         schedulesSettings.SkeletonByElemsScheduleName = settings.SkeletonByElemsScheduleName;
@@ -232,9 +223,6 @@ internal class PluginConfig : ProjectConfig<PluginSettings> {
         schedulesSettings.IfcPartsScheduleName = settings.IfcPartsScheduleName;
         schedulesSettings.IfcPartsScheduleNameTemp = settings.IfcPartsScheduleName;
 
-        schedulesSettings.RebarScheduleDisp1 = settings.RebarScheduleDisp1;
-        schedulesSettings.RebarScheduleDisp1Temp = settings.RebarScheduleDisp1;
-
         schedulesSettings.SkeletonScheduleDisp1 = settings.SkeletonScheduleDisp1;
         schedulesSettings.SkeletonScheduleDisp1Temp = settings.SkeletonScheduleDisp1;
         schedulesSettings.SkeletonByElemsScheduleDisp1 = settings.SkeletonByElemsScheduleDisp1;
@@ -246,8 +234,6 @@ internal class PluginConfig : ProjectConfig<PluginSettings> {
         schedulesSettings.SystemPartsScheduleDisp1Temp = settings.SystemPartsScheduleDisp1;
         schedulesSettings.IfcPartsScheduleDisp1 = settings.IfcPartsScheduleDisp1;
         schedulesSettings.IfcPartsScheduleDisp1Temp = settings.IfcPartsScheduleDisp1;
-        schedulesSettings.RebarScheduleDisp2 = settings.RebarScheduleDisp2;
-        schedulesSettings.RebarScheduleDisp2Temp = settings.RebarScheduleDisp2;
 
         schedulesSettings.SkeletonScheduleDisp2 = settings.SkeletonScheduleDisp2;
         schedulesSettings.SkeletonScheduleDisp2Temp = settings.SkeletonScheduleDisp2;
@@ -276,7 +262,6 @@ internal class PluginConfig : ProjectConfig<PluginSettings> {
         settings.NeedWorkWithTransverseViewFirst = selectionSettings.NeedWorkWithTransverseViewFirst;
         settings.NeedWorkWithTransverseViewSecond = selectionSettings.NeedWorkWithTransverseViewSecond;
         settings.NeedWorkWithTransverseViewThird = selectionSettings.NeedWorkWithTransverseViewThird;
-        settings.NeedWorkWithRebarSchedule = selectionSettings.NeedWorkWithRebarSchedule;
         settings.NeedWorkWithMaterialSchedule = selectionSettings.NeedWorkWithMaterialSchedule;
         settings.NeedWorkWithSystemPartsSchedule = selectionSettings.NeedWorkWithSystemPartsSchedule;
         settings.NeedWorkWithIfcPartsSchedule = selectionSettings.NeedWorkWithIfcPartsSchedule;
@@ -364,9 +349,6 @@ internal class PluginConfig : ProjectConfig<PluginSettings> {
 
         settings.ViewFamilyTypeName = viewSectionSettings.ViewFamilyTypeName;
 
-        settings.RebarSchedulePrefix = schedulesSettings.RebarSchedulePrefix;
-        settings.RebarScheduleSuffix = schedulesSettings.RebarScheduleSuffix;
-
         settings.SkeletonSchedulePrefix = schedulesSettings.SkeletonSchedulePrefix;
         settings.SkeletonScheduleSuffix = schedulesSettings.SkeletonScheduleSuffix;
         settings.SkeletonByElemsSchedulePrefix = schedulesSettings.SkeletonByElemsSchedulePrefix;
@@ -381,8 +363,6 @@ internal class PluginConfig : ProjectConfig<PluginSettings> {
         settings.IfcPartsSchedulePrefix = schedulesSettings.IfcPartsSchedulePrefix;
         settings.IfcPartsScheduleSuffix = schedulesSettings.IfcPartsScheduleSuffix;
 
-        settings.RebarScheduleName = schedulesSettings.RebarScheduleName;
-
         settings.SkeletonScheduleName = schedulesSettings.SkeletonScheduleName;
         settings.SkeletonByElemsScheduleName = schedulesSettings.SkeletonByElemsScheduleName;
 
@@ -390,15 +370,12 @@ internal class PluginConfig : ProjectConfig<PluginSettings> {
         settings.SystemPartsScheduleName = schedulesSettings.SystemPartsScheduleName;
         settings.IfcPartsScheduleName = schedulesSettings.IfcPartsScheduleName;
 
-        settings.RebarScheduleDisp1 = schedulesSettings.RebarScheduleDisp1;
-
         settings.SkeletonScheduleDisp1 = schedulesSettings.SkeletonScheduleDisp1;
         settings.SkeletonByElemsScheduleDisp1 = schedulesSettings.SkeletonByElemsScheduleDisp1;
 
         settings.MaterialScheduleDisp1 = schedulesSettings.MaterialScheduleDisp1;
         settings.SystemPartsScheduleDisp1 = schedulesSettings.SystemPartsScheduleDisp1;
         settings.IfcPartsScheduleDisp1 = schedulesSettings.IfcPartsScheduleDisp1;
-        settings.RebarScheduleDisp2 = schedulesSettings.RebarScheduleDisp2;
 
         settings.SkeletonScheduleDisp2 = schedulesSettings.SkeletonScheduleDisp2;
         settings.SkeletonByElemsScheduleDisp2 = schedulesSettings.SkeletonByElemsScheduleDisp2;
@@ -419,7 +396,6 @@ internal class PluginSettings : ProjectSettings {
     public bool NeedWorkWithTransverseViewFirst { get; set; }
     public bool NeedWorkWithTransverseViewSecond { get; set; }
     public bool NeedWorkWithTransverseViewThird { get; set; }
-    public bool NeedWorkWithRebarSchedule { get; set; }
     public bool NeedWorkWithMaterialSchedule { get; set; }
     public bool NeedWorkWithSystemPartsSchedule { get; set; }
     public bool NeedWorkWithIfcPartsSchedule { get; set; }
@@ -492,8 +468,6 @@ internal class PluginSettings : ProjectSettings {
     public string TransverseViewXOffset { get; set; }
     public string TransverseViewYOffset { get; set; }
     public string ViewFamilyTypeName { get; set; }
-    public string RebarSchedulePrefix { get; set; }
-    public string RebarScheduleSuffix { get; set; }
 
     public string SkeletonSchedulePrefix { get; set; }
     public string SkeletonScheduleSuffix { get; set; }
@@ -510,7 +484,6 @@ internal class PluginSettings : ProjectSettings {
     public string SystemPartsScheduleSuffix { get; set; }
     public string IfcPartsSchedulePrefix { get; set; }
     public string IfcPartsScheduleSuffix { get; set; }
-    public string RebarScheduleName { get; set; }
 
     public string SkeletonScheduleName { get; set; }
     public string SkeletonByElemsScheduleName { get; set; }
@@ -518,7 +491,6 @@ internal class PluginSettings : ProjectSettings {
     public string MaterialScheduleName { get; set; }
     public string SystemPartsScheduleName { get; set; }
     public string IfcPartsScheduleName { get; set; }
-    public string RebarScheduleDisp1 { get; set; }
 
     public string SkeletonScheduleDisp1 { get; set; }
     public string SkeletonByElemsScheduleDisp1 { get; set; }
@@ -526,7 +498,6 @@ internal class PluginSettings : ProjectSettings {
     public string MaterialScheduleDisp1 { get; set; }
     public string SystemPartsScheduleDisp1 { get; set; }
     public string IfcPartsScheduleDisp1 { get; set; }
-    public string RebarScheduleDisp2 { get; set; }
 
     public string SkeletonScheduleDisp2 { get; set; }
     public string SkeletonByElemsScheduleDisp2 { get; set; }

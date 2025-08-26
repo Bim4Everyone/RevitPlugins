@@ -19,46 +19,6 @@ public class PylonViewScheduleCreator {
     internal PylonSheetInfo SheetInfo { get; set; }
 
 
-    public bool TryCreateRebarSchedule() {
-        if(ViewModel.ReferenceRebarSchedule is null || !ViewModel.ReferenceRebarSchedule.CanViewBeDuplicated(ViewDuplicateOption.Duplicate)) {
-            return false;
-        }
-
-        ElementId scheduleId = null;
-        ViewSchedule viewSchedule;
-        try {
-            scheduleId = ViewModel.ReferenceRebarSchedule.Duplicate(ViewDuplicateOption.Duplicate);
-            viewSchedule = Repository.Document.GetElement(scheduleId) as ViewSchedule;
-            if(viewSchedule != null) {
-                viewSchedule.Name =
-                    ViewModel.SchedulesSettings.RebarSchedulePrefix
-                    + SheetInfo.PylonKeyName
-                    + ViewModel.SchedulesSettings.RebarScheduleSuffix;
-
-                // Задаем сортировку
-                SetScheduleDispatcherParameter(
-                    viewSchedule,
-                    ViewModel.ProjectSettings.DispatcherGroupingFirst,
-                    ViewModel.SchedulesSettings.RebarScheduleDisp1);
-                SetScheduleDispatcherParameter(
-                    viewSchedule,
-                    ViewModel.ProjectSettings.DispatcherGroupingSecond,
-                    ViewModel.SchedulesSettings.RebarScheduleDisp2);
-
-                // Задаем фильтры спецификации
-                SetScheduleFilters(viewSchedule);
-            }
-        } catch(Exception) {
-            if(scheduleId != null) {
-                Repository.Document.Delete(scheduleId);
-            }
-            return false;
-        }
-
-        SheetInfo.RebarSchedule.ViewElement = viewSchedule;
-        return true;
-    }
-
     public bool TryCreateSkeletonSchedule() {
         if(ViewModel.ReferenceSkeletonSchedule is null || !ViewModel.ReferenceSkeletonSchedule.CanViewBeDuplicated(ViewDuplicateOption.Duplicate)) {
             return false;

@@ -8,7 +8,6 @@ internal class UserSelectionSettings : BaseViewModel {
     private bool _needWorkWithTransverseViewSecond = false;
     private bool _needWorkWithTransverseViewThird = false;
 
-    private bool _needWorkWithRebarSchedule = false;
     private bool _needWorkWithMaterialSchedule = false;
     private bool _needWorkWithSystemPartsSchedule = false;
     private bool _needWorkWithIfcPartsSchedule = false;
@@ -45,11 +44,6 @@ internal class UserSelectionSettings : BaseViewModel {
     public bool NeedWorkWithTransverseViewThird {
         get => _needWorkWithTransverseViewThird;
         set => RaiseAndSetIfChanged(ref _needWorkWithTransverseViewThird, value);
-    }
-
-    public bool NeedWorkWithRebarSchedule {
-        get => _needWorkWithRebarSchedule;
-        set => RaiseAndSetIfChanged(ref _needWorkWithRebarSchedule, value);
     }
 
     public bool NeedWorkWithMaterialSchedule {

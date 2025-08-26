@@ -14,8 +14,6 @@ internal class UserSchedulesSettings : BaseViewModel {
     public MainViewModel ViewModel { get; set; }
 
     // Префиксы и суффиксы для поиска и новых спек
-    private string _rebarSchedulePrefixTemp = "КЖ..._СА_";
-    private string _rebarScheduleSuffixTemp = "";
     private string _materialSchedulePrefixTemp = "КЖ..._СМ_";
     private string _materialScheduleSuffixTemp = "";
     private string _systemPartsSchedulePrefixTemp = "КЖ..._ВД_";
@@ -28,7 +26,6 @@ internal class UserSchedulesSettings : BaseViewModel {
     private string _skeletonByElemsScheduleSuffixTemp = "_Изделия_Поэлементная";
 
     // Названия эталонных спек
-    private string _rebarScheduleNameTemp = "01_(КЖ...)_СА_Базовая_(Марка пилона)";
     private string _materialScheduleNameTemp = "01_(КЖ...)_СМ_Базовая_(Марка пилона)_Одноэтажный";
     private string _systemPartsScheduleNameTemp = "01_(КЖ...)_ВД_(Марка пилона)_Системная";
     private string _ifcPartsScheduleNameTemp = "01_(КЖ...)_ВД_(Марка пилона)_IFC";
@@ -36,8 +33,6 @@ internal class UserSchedulesSettings : BaseViewModel {
     private string _skeletonByElemsScheduleNameTemp = "01_(КЖ...)_Изделия_(Марка)_Поэлементная";
 
     // Заполнение параметров диспетчера
-    private string _rebarScheduleDisp1Temp = "обр_ФОП_Раздел проекта";
-    private string _rebarScheduleDisp2Temp = "СА_Пилоны";
     private string _materialScheduleDisp1Temp = "обр_ФОП_Раздел проекта";
     private string _materialScheduleDisp2Temp = "СМ_Пилоны";
     private string _systemPartsScheduleDisp1Temp = "обр_ФОП_Раздел проекта";
@@ -61,19 +56,6 @@ internal class UserSchedulesSettings : BaseViewModel {
         new ScheduleFilterParamHelper("обр_Метка основы", "Марка"),
         new ScheduleFilterParamHelper("Марка", "Марка")
     ];
-
-    public string RebarSchedulePrefix { get; set; }
-    public string RebarSchedulePrefixTemp {
-        get => _rebarSchedulePrefixTemp;
-        set => RaiseAndSetIfChanged(ref _rebarSchedulePrefixTemp, value);
-    }
-
-    public string RebarScheduleSuffix { get; set; }
-    public string RebarScheduleSuffixTemp {
-        get => _rebarScheduleSuffixTemp;
-        set => RaiseAndSetIfChanged(ref _rebarScheduleSuffixTemp, value);
-    }
-
 
     public string MaterialSchedulePrefix { get; set; }
     public string MaterialSchedulePrefixTemp {
@@ -134,12 +116,6 @@ internal class UserSchedulesSettings : BaseViewModel {
         set => RaiseAndSetIfChanged(ref _skeletonByElemsScheduleSuffixTemp, value);
     }
 
-    public string RebarScheduleName { get; set; }
-    public string RebarScheduleNameTemp {
-        get => _rebarScheduleNameTemp;
-        set => RaiseAndSetIfChanged(ref _rebarScheduleNameTemp, value);
-    }
-
     public string SkeletonScheduleName { get; set; }
     public string SkeletonScheduleNameTemp {
         get => _skeletonScheduleNameTemp;
@@ -169,12 +145,6 @@ internal class UserSchedulesSettings : BaseViewModel {
         set => RaiseAndSetIfChanged(ref _ifcPartsScheduleNameTemp, value);
     }
 
-    public string RebarScheduleDisp1 { get; set; }
-    public string RebarScheduleDisp1Temp {
-        get => _rebarScheduleDisp1Temp;
-        set => RaiseAndSetIfChanged(ref _rebarScheduleDisp1Temp, value);
-    }
-
     public string MaterialScheduleDisp1 { get; set; }
     public string MaterialScheduleDisp1Temp {
         get => _materialScheduleDisp1Temp;
@@ -200,12 +170,6 @@ internal class UserSchedulesSettings : BaseViewModel {
     public string SkeletonByElemsScheduleDisp1Temp {
         get => _skeletonByElemsScheduleDisp1Temp;
         set => RaiseAndSetIfChanged(ref _skeletonByElemsScheduleDisp1Temp, value);
-    }
-
-    public string RebarScheduleDisp2 { get; set; }
-    public string RebarScheduleDisp2Temp {
-        get => _rebarScheduleDisp2Temp;
-        set => RaiseAndSetIfChanged(ref _rebarScheduleDisp2Temp, value);
     }
 
     public string MaterialScheduleDisp2 { get; set; }
@@ -244,9 +208,6 @@ internal class UserSchedulesSettings : BaseViewModel {
 
 
     public void ApplySchedulesSettings() {
-        RebarSchedulePrefix = RebarSchedulePrefixTemp;
-        RebarScheduleSuffix = RebarScheduleSuffixTemp;
-
         MaterialSchedulePrefix = MaterialSchedulePrefixTemp;
         MaterialScheduleSuffix = MaterialScheduleSuffixTemp;
 
@@ -261,21 +222,18 @@ internal class UserSchedulesSettings : BaseViewModel {
         SkeletonByElemsSchedulePrefix = SkeletonByElemsSchedulePrefixTemp;
         SkeletonByElemsScheduleSuffix = SkeletonByElemsScheduleSuffixTemp;
 
-        RebarScheduleName = RebarScheduleNameTemp;
         MaterialScheduleName = MaterialScheduleNameTemp;
         SystemPartsScheduleName = SystemPartsScheduleNameTemp;
         IfcPartsScheduleName = IfcPartsScheduleNameTemp;
         SkeletonScheduleName = SkeletonScheduleNameTemp;
         SkeletonByElemsScheduleName = SkeletonByElemsScheduleNameTemp;
 
-        RebarScheduleDisp1 = RebarScheduleDisp1Temp;
         MaterialScheduleDisp1 = MaterialScheduleDisp1Temp;
         SystemPartsScheduleDisp1 = SystemPartsScheduleDisp1Temp;
         IfcPartsScheduleDisp1 = IfcPartsScheduleDisp1Temp;
         SkeletonScheduleDisp1 = SkeletonScheduleDisp1Temp;
         SkeletonByElemsScheduleDisp1 = SkeletonByElemsScheduleDisp1Temp;
 
-        RebarScheduleDisp2 = RebarScheduleDisp2Temp;
         MaterialScheduleDisp2 = MaterialScheduleDisp2Temp;
         SystemPartsScheduleDisp2 = SystemPartsScheduleDisp2Temp;
         IfcPartsScheduleDisp2 = IfcPartsScheduleDisp2Temp;
