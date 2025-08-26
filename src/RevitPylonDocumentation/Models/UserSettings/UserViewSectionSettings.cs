@@ -19,7 +19,7 @@ internal class UserViewSectionSettings : BaseViewModel {
     private string _generalViewYTopOffsetTemp = "300";
     private string _generalViewYBottomOffsetTemp = "500";
 
-    private string _generalViewPerpXOffsetTemp = "100";
+    private string _generalViewPerpXOffsetTemp = "240";
     private string _generalViewPerpYTopOffsetTemp = "300";
     private string _generalViewPerpYBottomOffsetTemp = "500";
 

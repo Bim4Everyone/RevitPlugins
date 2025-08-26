@@ -158,7 +158,8 @@ public class PylonViewSectionCreator {
         t.BasisZ = viewDir;
 
         double hostLength = SheetInfo.ElemsInfo.ElemsBoundingBoxLength;
-        double hostWidth = SheetInfo.ElemsInfo.ElemsBoundingBoxWidth;
+        double hostWidthToMax = SheetInfo.ElemsInfo.ElemsBoundingBoxWidthToMax;
+        double hostWidthToMin = SheetInfo.ElemsInfo.ElemsBoundingBoxWidthToMin;
         double minZ = SheetInfo.ElemsInfo.ElemsBoundingBoxMinZ;
         double maxZ = SheetInfo.ElemsInfo.ElemsBoundingBoxMaxZ;
 
@@ -169,12 +170,13 @@ public class PylonViewSectionCreator {
         double generalViewPerpYBottomOffset = UnitUtilsHelper.ConvertToInternalValue(
                                                 int.Parse(ViewModel.ViewSectionSettings.GeneralViewPerpYBottomOffset));
 
-        double coordinateX = hostWidth * 0.5 + generalViewPerpXOffset;
+        double coordinateXToMax = hostWidthToMin + generalViewPerpXOffset;
+        double coordinateXToMin = hostWidthToMax + generalViewPerpXOffset;
         double coordinateYTop = maxZ - originPoint.Z + generalViewPerpYTopOffset;
         double coordinateYBottom = minZ - originPoint.Z - generalViewPerpYBottomOffset;
 
-        var sectionBoxMax = new XYZ(coordinateX, coordinateYTop, hostLength * 0.49);
-        var sectionBoxMin = new XYZ(-coordinateX, coordinateYBottom, 0);
+        var sectionBoxMax = new XYZ(coordinateXToMax, coordinateYTop, hostLength * 0.49);
+        var sectionBoxMin = new XYZ(-coordinateXToMin, coordinateYBottom, 0);
 
         var sectionBox = new BoundingBoxXYZ {
             Transform = t,
@@ -220,19 +222,25 @@ public class PylonViewSectionCreator {
         t.BasisZ = viewDir;
 
         double hostLength = SheetInfo.ElemsInfo.ElemsBoundingBoxLength;
-        double hostWidth = SheetInfo.ElemsInfo.ElemsBoundingBoxWidth;
+        double hostWidthToMax = SheetInfo.ElemsInfo.ElemsBoundingBoxWidthToMax;
+        double hostWidthToMin = SheetInfo.ElemsInfo.ElemsBoundingBoxWidthToMin;
         double minZ = SheetInfo.ElemsInfo.ElemsBoundingBoxMinZ;
         double maxZ = SheetInfo.ElemsInfo.ElemsBoundingBoxMaxZ;
 
-        double coordinateX = hostWidth * 0.5
-            + UnitUtilsHelper.ConvertToInternalValue(int.Parse(ViewModel.ViewSectionSettings.GeneralViewPerpXOffset));
-        double coordinateYTop = maxZ - originPoint.Z
-            + UnitUtilsHelper.ConvertToInternalValue(int.Parse(ViewModel.ViewSectionSettings.GeneralViewPerpYTopOffset));
-        double coordinateYBottom = minZ - originPoint.Z
-            - UnitUtilsHelper.ConvertToInternalValue(int.Parse(ViewModel.ViewSectionSettings.GeneralViewPerpYBottomOffset));
+        double generalViewPerpXOffset = UnitUtilsHelper.ConvertToInternalValue(
+                                    int.Parse(ViewModel.ViewSectionSettings.GeneralViewPerpXOffset));
+        double generalViewPerpYTopOffset = UnitUtilsHelper.ConvertToInternalValue(
+                                                int.Parse(ViewModel.ViewSectionSettings.GeneralViewPerpYTopOffset));
+        double generalViewPerpYBottomOffset = UnitUtilsHelper.ConvertToInternalValue(
+                                                int.Parse(ViewModel.ViewSectionSettings.GeneralViewPerpYBottomOffset));
 
-        var sectionBoxMax = new XYZ(coordinateX, coordinateYTop, hostLength * 0.49);
-        var sectionBoxMin = new XYZ(-coordinateX, coordinateYBottom, 0.2);
+        double coordinateXToMax = hostWidthToMin + generalViewPerpXOffset;
+        double coordinateXToMin = hostWidthToMax + generalViewPerpXOffset;
+        double coordinateYTop = maxZ - originPoint.Z + generalViewPerpYTopOffset;
+        double coordinateYBottom = minZ - originPoint.Z - generalViewPerpYBottomOffset;
+
+        var sectionBoxMax = new XYZ(coordinateXToMax, coordinateYTop, hostLength * 0.49);
+        var sectionBoxMin = new XYZ(-coordinateXToMin, coordinateYBottom, 0.2);
 
         var sectionBox = new BoundingBoxXYZ {
             Transform = t,
