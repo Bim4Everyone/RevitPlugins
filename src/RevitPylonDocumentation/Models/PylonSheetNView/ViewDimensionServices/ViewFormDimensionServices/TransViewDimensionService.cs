@@ -99,8 +99,28 @@ internal class TransViewDimensionService {
             var refArrayFormworkSide = dimensionBaseService.GetDimensionRefs(pylon as FamilyInstance,
                                                                              '#', '/', ["торец", "край"]);
             // Размер по ТОРЦУ опалубка + армирование (положение справа ближнее)
-            CreateDimension(skeletonParentRebar, pylon, DimensionOffsetType.Right, 0.5,
-                            [rebarPart, "торец"], view, dimensionBaseService, refArrayFormworkSide, false);
+            ReferenceArray refArraySide = default;
+            // Если первый ряд - Гэшки, то берем по нижней плоскости
+            if(SheetInfo.RebarInfo.FirstLRebarParamValue) {
+                refArraySide = dimensionBaseService.GetDimensionRefs(skeletonParentRebar, '#', '/',
+                                                                     ["низ", "торец", "ряд1"], 
+                                                                     oldRefArray: refArrayFormworkSide);
+            } else {
+                refArraySide = dimensionBaseService.GetDimensionRefs(skeletonParentRebar, '#', '/',
+                                                                     [rebarPart, "торец", "ряд1"],
+                                                                     oldRefArray: refArrayFormworkSide);
+            }
+            // Если второй ряд - Гэшки, то берем по нижней плоскости
+            if(SheetInfo.RebarInfo.SecondLRebarParamValue) {
+                refArraySide = dimensionBaseService.GetDimensionRefs(skeletonParentRebar, '#', '/',
+                                                                     ["низ", "торец", "ряд2"],
+                                                                     oldRefArray: refArraySide);
+            } else {
+                refArraySide = dimensionBaseService.GetDimensionRefs(skeletonParentRebar, '#', '/',
+                                                                     [rebarPart, "торец", "ряд2"],
+                                                                     oldRefArray: refArraySide);
+            }
+            CreateDimension(refArraySide, pylon, DimensionOffsetType.Right, 0.5, view, dimensionBaseService, false);
 
             // Размер по ТОРЦУ опалубка (положение справа дальнее)
             CreateDimension(refArrayFormworkSide, pylon, DimensionOffsetType.Right, 1, view, dimensionBaseService);
