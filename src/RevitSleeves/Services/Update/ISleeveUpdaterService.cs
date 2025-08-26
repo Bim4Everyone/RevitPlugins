@@ -6,7 +6,7 @@ using RevitSleeves.Models.Placing;
 
 namespace RevitSleeves.Services.Update;
 internal interface ISleeveUpdaterService {
-    ICollection<SleeveModel> UpdateSleeves(
+    void UpdateSleeves(
         ICollection<SleeveModel> sleeves,
         IProgress<int> progress,
         CancellationToken ct);

@@ -24,7 +24,7 @@ internal class SleevePlacementSettingsConfig : ProjectConfig {
     public string Name { get; set; } = "default";
 
     [JsonIgnore]
-    public const BuiltInCategory SleeveCategory = BuiltInCategory.OST_PipeFitting;
+    public const BuiltInCategory SleeveCategory = BuiltInCategory.OST_PipeAccessory;
 
     public static SleevePlacementSettingsConfig GetPluginConfig(IConfigSerializer configSerializer) {
         try {

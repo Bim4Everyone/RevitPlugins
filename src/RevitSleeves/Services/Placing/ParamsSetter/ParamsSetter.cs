@@ -32,4 +32,8 @@ internal abstract class ParamsSetter {
     protected void SetDiameter(FamilyInstance sleeve, double diameter) {
         sleeve.SetParamValue(NamesProvider.ParameterSleeveDiameter, diameter);
     }
+
+    protected void SetThickness(FamilyInstance sleeve, double thickness) {
+        sleeve.SetParamValue(NamesProvider.ParameterSleeveThickness, thickness);
+    }
 }

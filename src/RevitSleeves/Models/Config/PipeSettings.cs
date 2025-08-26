@@ -14,27 +14,32 @@ internal class PipeSettings : MepCategorySettings {
                 new DiameterRange() {
                     StartMepSize = 0,
                     EndMepSize = 25,
-                    SleeveDiameter = 50
+                    SleeveDiameter = 50,
+                    SleeveThickness = 4,
                 },
                 new DiameterRange() {
                     StartMepSize = 25,
                     EndMepSize = 50,
-                    SleeveDiameter = 100
+                    SleeveDiameter = 100,
+                    SleeveThickness = 4
                 },
                 new DiameterRange() {
                     StartMepSize = 50,
                     EndMepSize = 100,
-                    SleeveDiameter = 150
+                    SleeveDiameter = 150,
+                    SleeveThickness = 4
                 },
                 new DiameterRange() {
                     StartMepSize = 100,
                     EndMepSize = 150,
-                    SleeveDiameter = 200
+                    SleeveDiameter = 200,
+                    SleeveThickness = 4
                 },
                 new DiameterRange() {
                     StartMepSize = 150,
                     EndMepSize = 200,
-                    SleeveDiameter = 250
+                    SleeveDiameter = 250,
+                    SleeveThickness = 4
                 }];
         }
     }

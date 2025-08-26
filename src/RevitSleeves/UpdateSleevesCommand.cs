@@ -63,6 +63,9 @@ internal class UpdateSleevesCommand : BasePluginCommand {
         kernel.Bind<IDocumentChecker>()
             .To<DocumentChecker>()
             .InSingletonScope();
+        kernel.Bind<IMepElementsProvider>()
+            .To<AllMepElementsProvider>()
+            .InSingletonScope();
 
         kernel.Bind<SleevePlacementSettingsConfig>()
             .ToMethod(c => SleevePlacementSettingsConfig.GetPluginConfig(

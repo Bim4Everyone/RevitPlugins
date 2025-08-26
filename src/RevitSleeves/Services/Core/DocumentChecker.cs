@@ -8,6 +8,7 @@ using dosymep.Bim4Everyone.SharedParams;
 using dosymep.SimpleServices;
 
 using RevitSleeves.Models;
+using RevitSleeves.Models.Config;
 using RevitSleeves.Services.Placing.FamilySymbolFinder;
 
 namespace RevitSleeves.Services.Core;
@@ -35,7 +36,10 @@ internal class DocumentChecker : IDocumentChecker {
             sleeveSymbol = _familySymbolFinder.GetFamilySymbol();
         } catch(InvalidOperationException) {
             ShowError(_localization.GetLocalizedString(
-                "Exceptions.SleeveFamilyNotFound", NamesProvider.FamilyNameSleeve, NamesProvider.SleeveSymbolName));
+                "Exceptions.SleeveFamilyNotFound",
+                NamesProvider.FamilyNameSleeve,
+                NamesProvider.SleeveSymbolName,
+                Category.GetCategory(_revitRepository.Document, SleevePlacementSettingsConfig.SleeveCategory).Name));
         }
 
         var family = sleeveSymbol.Family;

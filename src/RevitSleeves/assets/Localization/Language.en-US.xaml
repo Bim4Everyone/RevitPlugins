@@ -248,7 +248,8 @@
         xml:space="preserve"
         x:Key="Exceptions.SleeveFamilyNotFound">
 Sleeve family is missing: '{0}'
-family type name: '{1}'</system:String>
+family type name: '{1}'
+of category: '{2}'</system:String>
     <system:String
         xml:space="preserve"
         x:Key="Exceptions.SleeveFamilyMissingParameters">
@@ -256,6 +257,13 @@ Missing parameters in sleeve family:
 {0}
 
 Continue?</system:String>
+
+    <system:String
+        x:Key="UpdateErrors.SleeveNotIntersectPipe">Sleeve doesn't intersect any pipe</system:String>
+    <system:String
+        x:Key="UpdateErrors.SleeveIntersectsManyPipes">Sleeve intersects 2 or more pipes</system:String>
+    <system:String
+        x:Key="UpdateErrors.SleeveDiameterRangeNotFound">Unable to find the diameter of the tube sleeve</system:String>
 
     <system:String
         x:Key="Transaction.SleevesPlacing">Sleeve placing</system:String>

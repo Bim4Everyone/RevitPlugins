@@ -248,7 +248,8 @@
         xml:space="preserve"
         x:Key="Exceptions.SleeveFamilyNotFound">
 Не обнаружено семейство гильзы '{0}'
-с типоразмером '{1}'</system:String>
+с типоразмером '{1}'
+категории '{2}'</system:String>
     <system:String
         xml:space="preserve"
         x:Key="Exceptions.SleeveFamilyMissingParameters">
@@ -256,6 +257,13 @@
 {0}
 
 Хотите продолжить?</system:String>
+
+    <system:String
+        x:Key="UpdateErrors.SleeveNotIntersectPipe">Гильза не пересекается ни с одной трубой</system:String>
+    <system:String
+        x:Key="UpdateErrors.SleeveIntersectsManyPipes">Гильза пересекается с 2 или более трубами</system:String>
+    <system:String
+        x:Key="UpdateErrors.SleeveDiameterRangeNotFound">Не найден диапазон диаметров гильзы для трубы</system:String>
 
     <system:String
         x:Key="Transaction.SleevesPlacing">Расстановка гильз</system:String>

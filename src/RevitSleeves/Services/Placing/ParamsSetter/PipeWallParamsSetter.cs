@@ -5,6 +5,7 @@ using Autodesk.Revit.DB.Plumbing;
 
 using dosymep.Revit;
 
+using RevitSleeves.Exceptions;
 using RevitSleeves.Models;
 using RevitSleeves.Models.Config;
 using RevitSleeves.Models.Placing;
@@ -31,10 +32,17 @@ internal class PipeWallParamsSetter : PipeParamsSetter, IParamsSetter<ClashModel
     public void SetParamValues(FamilyInstance sleeve) {
         SetElevation(sleeve, _pointFinder.GetPoint(_clash));
         SetInclineAngle(sleeve, _clash.MepElement.GetParamValue<double>(BuiltInParameter.RBS_PIPE_SLOPE));
-        double diameter = GetSleeveDiameter(_clash.MepElement);
+        var diameterRange = GetSleeveDiameterRange(_clash.MepElement);
+        if(diameterRange is null) {
+            _errorsService.AddError([_clash.MepElement], "Exceptions.CannotFindDiameterRange");
+            throw new CannotCreateSleeveException();
+        }
+        double diameter = GetSleeveDiameter(diameterRange);
         SetDiameter(sleeve, diameter);
+        SetThickness(sleeve, GetSleeveThickness(diameterRange));
         double length = GetLength(diameter);
         SetLength(sleeve, length);
+        SetStringParameters(sleeve, _clash.MepElement);
     }
 
     private double GetLength(double sleeveDiameter) {
