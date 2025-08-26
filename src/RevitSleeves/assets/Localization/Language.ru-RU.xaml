@@ -265,9 +265,12 @@
         xml:space="preserve"
         x:Key="Exceptions.SleeveFamilyMissingParameters">
 В семействе гильзы отсутствуют параметры:
-{0}
-
-Хотите продолжить?</system:String>
+{0}</system:String>
+    <system:String
+        xml:space="preserve"
+        x:Key="Exceptions.CategoryMissingParameters">
+У категории '{0}' отсутствуют параметры:
+{1}</system:String>
 
     <system:String
         x:Key="UpdateErrors.SleeveNotIntersectPipe">Гильза не пересекается ни с одной трубой</system:String>

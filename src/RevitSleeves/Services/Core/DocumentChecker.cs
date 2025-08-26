@@ -5,6 +5,7 @@ using System.Linq;
 using Autodesk.Revit.DB;
 
 using dosymep.Bim4Everyone.SharedParams;
+using dosymep.Revit;
 using dosymep.SimpleServices;
 
 using RevitSleeves.Models;
@@ -43,10 +44,18 @@ internal class DocumentChecker : IDocumentChecker {
         }
 
         var family = sleeveSymbol.Family;
-        var missingParameters = GetMissingParameters(family);
-        if(missingParameters.Count > 0) {
-            ShowWarning(_localization.GetLocalizedString("Exceptions.SleeveFamilyMissingParameters",
-                string.Join("\n", missingParameters)));
+        var missingSleeveParameters = GetMissingParameters(family);
+        if(missingSleeveParameters.Count > 0) {
+            ShowError(_localization.GetLocalizedString("Exceptions.SleeveFamilyMissingParameters",
+                string.Join("\n", missingSleeveParameters)));
+        }
+
+        var pipeCategory = Category.GetCategory(_revitRepository.Document, BuiltInCategory.OST_PipeCurves);
+        var missingPipeParameters = GetMissingParameters(pipeCategory);
+        if(missingPipeParameters.Count > 0) {
+            ShowError(_localization.GetLocalizedString("Exceptions.CategoryMissingParameters",
+                pipeCategory.Name,
+                string.Join("\n", missingPipeParameters)));
         }
     }
 
@@ -57,16 +66,6 @@ internal class DocumentChecker : IDocumentChecker {
             System.Windows.MessageBoxButton.OK,
             System.Windows.MessageBoxImage.Error);
         throw new OperationCanceledException();
-    }
-
-    private void ShowWarning(string msg) {
-        if(_messageBoxService.Show(
-            msg,
-            _localization.GetLocalizedString("Warning"),
-            System.Windows.MessageBoxButton.YesNo,
-            System.Windows.MessageBoxImage.Warning) == System.Windows.MessageBoxResult.No) {
-            throw new OperationCanceledException();
-        }
     }
 
     private ICollection<string> GetFamilyParameterNames(RevitRepository revitRepository, Family family) {
@@ -92,5 +91,22 @@ internal class DocumentChecker : IDocumentChecker {
             NamesProvider.ParameterSleeveSystem.Name
         ];
         return [.. requiredParameters.Except(existingParameters)];
+    }
+
+    private ICollection<string> GetMissingParameters(Category category) {
+        string[] existingSharedParameters = _revitRepository.Document.GetParameterBindings()
+            .Where(item => item.Binding is InstanceBinding)
+            .Where(item =>
+                ((InstanceBinding) item.Binding).Categories
+                .OfType<Category>()
+                .Any(c => c.Id == category.Id))
+            .Select(item => item.Definition.Name)
+            .ToArray();
+        var paramConfig = SharedParamsConfig.Instance;
+        string[] requiredParameters = [
+            NamesProvider.ParameterSleeveEconomic.Name,
+            NamesProvider.ParameterSleeveSystem.Name
+        ];
+        return [.. requiredParameters.Except(existingSharedParameters)];
     }
 }

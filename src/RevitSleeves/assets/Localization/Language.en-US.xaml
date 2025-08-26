@@ -265,9 +265,12 @@ of category: '{2}'</system:String>
         xml:space="preserve"
         x:Key="Exceptions.SleeveFamilyMissingParameters">
 Missing parameters in sleeve family:
-{0}
-
-Continue?</system:String>
+{0}</system:String>
+    <system:String
+        xml:space="preserve"
+        x:Key="Exceptions.CategoryMissingParameters">
+Category '{0}' doesn't have parameters:
+{1}</system:String>
 
     <system:String
         x:Key="UpdateErrors.SleeveNotIntersectPipe">Sleeve doesn't intersect any pipe</system:String>
