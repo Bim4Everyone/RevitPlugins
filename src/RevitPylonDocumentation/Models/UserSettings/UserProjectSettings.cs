@@ -28,10 +28,6 @@ internal class UserProjectSettings : BaseViewModel {
     private string _legendXOffsetTemp = "-100";
     private string _legendYOffsetTemp = "130";
 
-    private string _rebarNodeNameTemp = "КЖ_Узел ПК пилонов";
-    private string _rebarNodeXOffsetTemp = "-150";
-    private string _rebarNodeYOffsetTemp = "210";
-
     private string _pylonLengthParamNameTemp = "ФОП_РАЗМ_Длина";
     private string _pylonWidthParamNameTemp = "ФОП_РАЗМ_Ширина";
 
@@ -139,24 +135,6 @@ internal class UserProjectSettings : BaseViewModel {
         set => RaiseAndSetIfChanged(ref _legendYOffsetTemp, value);
     }
 
-    public string RebarNodeName { get; set; }
-    public string RebarNodeNameTemp {
-        get => _rebarNodeNameTemp;
-        set => RaiseAndSetIfChanged(ref _rebarNodeNameTemp, value);
-    }
-
-    public string RebarNodeXOffset { get; set; }
-    public string RebarNodeXOffsetTemp {
-        get => _rebarNodeXOffsetTemp;
-        set => RaiseAndSetIfChanged(ref _rebarNodeXOffsetTemp, value);
-    }
-
-    public string RebarNodeYOffset { get; set; }
-    public string RebarNodeYOffsetTemp {
-        get => _rebarNodeYOffsetTemp;
-        set => RaiseAndSetIfChanged(ref _rebarNodeYOffsetTemp, value);
-    }
-
     public string PylonLengthParamName { get; set; }
     public string PylonLengthParamNameTemp {
         get => _pylonLengthParamNameTemp;
@@ -242,10 +220,6 @@ internal class UserProjectSettings : BaseViewModel {
         LegendXOffset = LegendXOffsetTemp;
         LegendYOffset = LegendYOffsetTemp;
 
-        RebarNodeName = RebarNodeNameTemp;
-        RebarNodeXOffset = RebarNodeXOffsetTemp;
-        RebarNodeYOffset = RebarNodeYOffsetTemp;
-
         PylonLengthParamName = PylonLengthParamNameTemp;
         PylonWidthParamName = PylonWidthParamNameTemp;
 
@@ -281,11 +255,6 @@ internal class UserProjectSettings : BaseViewModel {
         // Проверяем, чтоб были заданы офсеты видового экрана легенды
         if(LegendXOffset is null || LegendYOffset is null) {
             ViewModel.ErrorText = "Не заданы отступы на листе для легенды примечений";
-        }
-
-        // Проверяем, чтоб были заданы офсеты видового экрана узла армирования
-        if(RebarNodeXOffset is null || RebarNodeYOffset is null) {
-            ViewModel.ErrorText = "Не заданы отступы на листе для узла армирования";
         }
 
         using(var transaction = Repository.Document.StartTransaction("Проверка параметров на листе")) {

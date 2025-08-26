@@ -45,7 +45,6 @@ internal class MainViewModel : BaseViewModel {
     private View _selectedTransverseViewTemplate;
     private View _selectedTransverseRebarViewTemplate;
     private View _selectedLegend;
-    private View _selectedRebarNode;
     private FamilySymbol _selectedTitleBlock;
     private List<PylonSheetInfo> _selectedHostsInfo = [];
 
@@ -212,17 +211,6 @@ internal class MainViewModel : BaseViewModel {
         set {
             RaiseAndSetIfChanged(ref _selectedLegend, value);
             ProjectSettings.LegendNameTemp = value?.Name;
-        }
-    }
-
-    /// <summary>
-    /// Выбранная пользователем легенда
-    /// </summary>
-    public View SelectedRebarNode {
-        get => _selectedRebarNode;
-        set {
-            RaiseAndSetIfChanged(ref _selectedRebarNode, value);
-            ProjectSettings.RebarNodeNameTemp = value?.Name;
         }
     }
 
@@ -598,7 +586,6 @@ internal class MainViewModel : BaseViewModel {
         SelectionSettings.NeedWorkWithTransverseRebarViewSecond = false;
         SelectionSettings.NeedWorkWithSkeletonSchedule = false;
         SelectionSettings.NeedWorkWithSkeletonByElemsSchedule = false;
-        SelectionSettings.NeedWorkWithRebarNode = false;
 
         var mainWindow = new MainWindow {
             DataContext = this
@@ -639,7 +626,6 @@ internal class MainViewModel : BaseViewModel {
         FindBreakLineType();
         FindConcretingJointType();
         FindLegend();
-        FindRebarNode();
         FindTitleBlock();
 
         _settingsEdited = false;
@@ -678,11 +664,6 @@ internal class MainViewModel : BaseViewModel {
 
         if(SelectedLegend is null) {
             ErrorText = "Не выбрана легенда примечаний";
-            return;
-        }
-
-        if(SelectedRebarNode is null) {
-            ErrorText = "Не выбран узел армирования";
             return;
         }
 
@@ -926,16 +907,6 @@ internal class MainViewModel : BaseViewModel {
     }
 
     /// <summary>
-    /// Получает легенду узла армирования по имени
-    /// </summary>
-    public void FindRebarNode() {
-        if(ProjectSettings.RebarNodeName != string.Empty) {
-            SelectedRebarNode = Legends
-                .FirstOrDefault(view => view.Name.Contains(ProjectSettings.RebarNodeName));
-        }
-    }
-
-    /// <summary>
     /// Получает типоразмер рамки листа по имени типа
     /// </summary>
     public void FindTitleBlock() {
@@ -1072,7 +1043,6 @@ internal class MainViewModel : BaseViewModel {
         SelectionSettings.NeedWorkWithTransverseRebarViewSecond = true;
         SelectionSettings.NeedWorkWithSkeletonSchedule = true;
         SelectionSettings.NeedWorkWithSkeletonByElemsSchedule = true;
-        SelectionSettings.NeedWorkWithRebarNode = true;
     }
 
 
@@ -1096,7 +1066,6 @@ internal class MainViewModel : BaseViewModel {
         SelectionSettings.NeedWorkWithTransverseRebarViewSecond = false;
         SelectionSettings.NeedWorkWithSkeletonSchedule = false;
         SelectionSettings.NeedWorkWithSkeletonByElemsSchedule = false;
-        SelectionSettings.NeedWorkWithRebarNode = false;
     }
 
 
@@ -1120,6 +1089,5 @@ internal class MainViewModel : BaseViewModel {
         SelectionSettings.NeedWorkWithTransverseRebarViewSecond = !SelectionSettings.NeedWorkWithTransverseRebarViewSecond;
         SelectionSettings.NeedWorkWithSkeletonSchedule = !SelectionSettings.NeedWorkWithSkeletonSchedule;
         SelectionSettings.NeedWorkWithSkeletonByElemsSchedule = !SelectionSettings.NeedWorkWithSkeletonByElemsSchedule;
-        SelectionSettings.NeedWorkWithRebarNode = !SelectionSettings.NeedWorkWithRebarNode;
     }
 }

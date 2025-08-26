@@ -19,7 +19,6 @@ internal class UserSelectionSettings : BaseViewModel {
     private bool _needWorkWithTransverseRebarViewSecond = false;
     private bool _needWorkWithSkeletonSchedule = false;
     private bool _needWorkWithSkeletonByElemsSchedule = false;
-    private bool _needWorkWithRebarNode = false;
 
 
     public bool NeedWorkWithGeneralView {
@@ -94,10 +93,5 @@ internal class UserSelectionSettings : BaseViewModel {
     public bool NeedWorkWithSkeletonByElemsSchedule {
         get => _needWorkWithSkeletonByElemsSchedule;
         set => RaiseAndSetIfChanged(ref _needWorkWithSkeletonByElemsSchedule, value);
-    }
-
-    public bool NeedWorkWithRebarNode {
-        get => _needWorkWithRebarNode;
-        set => RaiseAndSetIfChanged(ref _needWorkWithRebarNode, value);
     }
 }

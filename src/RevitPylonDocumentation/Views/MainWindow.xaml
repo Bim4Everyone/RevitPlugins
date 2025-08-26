@@ -2698,150 +2698,6 @@
                                     </StackPanel>
                                 </GroupBox>
 
-                                <!-- Легенда узла армирования -->
-                                <GroupBox
-                                    Margin="5 0 5 10">
-                                    <GroupBox.Header>
-                                        <TextBlock
-                                            Style="{StaticResource TextBlockWithTooltipStyle}"
-                                            Grid.Row="0"
-                                            Margin="5 10 0 0"
-                                            FontSize="14"
-                                            Text="Правила размещения легенды узла армирования"
-                                            ToolTip="Правила, по которым будут размещаться на листах легенды узлов армирования для пилонов" />
-                                    </GroupBox.Header>
-
-                                    <StackPanel>
-
-                                        <TextBlock
-                                            Style="{StaticResource TextBlockWithTooltipStyle}"
-                                            Margin="10 10 0 5"
-                                            Text="Выберите легенду узла армирования:">
-                                            <TextBlock.ToolTip>
-                                                <ToolTip>
-                                                    <TextBlock
-                                                        Style="{StaticResource LegendNameStyle}" />
-                                                </ToolTip>
-                                            </TextBlock.ToolTip>
-                                        </TextBlock>
-
-                                        <ComboBox
-                                            Style="{StaticResource ComboBoxWithTooltipStyle}"
-                                            Margin="10 0 10 10"
-                                            Width="460"
-                                            Height="25"
-                                            HorizontalAlignment="Left"
-                                            ItemsSource="{Binding Path=Legends}"
-                                            SelectedItem="{Binding Path=SelectedRebarNode}">
-
-                                            <ComboBox.ToolTip>
-                                                <ToolTip>
-                                                    <TextBlock
-                                                        Style="{StaticResource LegendNameStyle}" />
-                                                </ToolTip>
-                                            </ComboBox.ToolTip>
-
-                                            <ComboBox.ItemTemplate>
-                                                <DataTemplate>
-                                                    <TextBlock>
-                                                        <TextBlock.Text>
-                                                            <Binding
-                                                                Path="Name" />
-                                                        </TextBlock.Text>
-                                                    </TextBlock>
-                                                </DataTemplate>
-                                            </ComboBox.ItemTemplate>
-
-                                            <i:Interaction.Triggers>
-                                                <i:EventTrigger
-                                                    EventName="SelectionChanged">
-                                                    <i:InvokeCommandAction
-                                                        Command="{Binding DataContext.SettingsChangedCommand, 
-                                                            RelativeSource={RelativeSource AncestorType={x:Type Window}}}" />
-                                                </i:EventTrigger>
-                                            </i:Interaction.Triggers>
-                                        </ComboBox>
-
-                                        <TextBlock
-                                            Style="{StaticResource TextBlockWithTooltipStyle}"
-                                            Margin="10 10 0 5"
-                                            Text="Смещение по X от нижнего правого угла рамки">
-                                            <TextBlock.ToolTip>
-                                                <ToolTip>
-                                                    <TextBlock
-                                                        Style="{StaticResource LegendXOffsetStyle}" />
-                                                </ToolTip>
-                                            </TextBlock.ToolTip>
-                                        </TextBlock>
-
-                                        <TextBox
-                                            Style="{StaticResource TextBoxWithTooltipStyle}"
-                                            HorizontalAlignment="Left"
-                                            Margin="10 0 10 10"
-                                            Text="{Binding Path=ProjectSettings.RebarNodeXOffsetTemp,
-                                                UpdateSourceTrigger=PropertyChanged}"
-                                            Width="460"
-                                            Height="25"
-                                            VerticalContentAlignment="Center">
-
-                                            <TextBox.ToolTip>
-                                                <ToolTip>
-                                                    <TextBlock
-                                                        Style="{StaticResource LegendXOffsetStyle}" />
-                                                </ToolTip>
-                                            </TextBox.ToolTip>
-
-                                            <i:Interaction.Triggers>
-                                                <i:EventTrigger
-                                                    EventName="TextChanged">
-                                                    <i:InvokeCommandAction
-                                                        Command="{Binding DataContext.SettingsChangedCommand, 
-                                            RelativeSource={RelativeSource AncestorType={x:Type Window}}}" />
-                                                </i:EventTrigger>
-                                            </i:Interaction.Triggers>
-                                        </TextBox>
-
-                                        <TextBlock
-                                            Style="{StaticResource TextBlockWithTooltipStyle}"
-                                            Margin="10 10 0 5"
-                                            Text="Смещение по Y от нижнего правого угла рамки">
-                                            <TextBlock.ToolTip>
-                                                <ToolTip>
-                                                    <TextBlock
-                                                        Style="{StaticResource LegendYOffsetStyle}" />
-                                                </ToolTip>
-                                            </TextBlock.ToolTip>
-                                        </TextBlock>
-
-                                        <TextBox
-                                            Style="{StaticResource TextBoxWithTooltipStyle}"
-                                            HorizontalAlignment="Left"
-                                            Margin="10 0 10 10"
-                                            Text="{Binding Path=ProjectSettings.RebarNodeYOffsetTemp,
-                                                UpdateSourceTrigger=PropertyChanged}"
-                                            Width="460"
-                                            Height="25"
-                                            VerticalContentAlignment="Center">
-
-                                            <TextBox.ToolTip>
-                                                <ToolTip>
-                                                    <TextBlock
-                                                        Style="{StaticResource LegendYOffsetStyle}" />
-                                                </ToolTip>
-                                            </TextBox.ToolTip>
-
-                                            <i:Interaction.Triggers>
-                                                <i:EventTrigger
-                                                    EventName="TextChanged">
-                                                    <i:InvokeCommandAction
-                                                        Command="{Binding DataContext.SettingsChangedCommand, 
-                                            RelativeSource={RelativeSource AncestorType={x:Type Window}}}" />
-                                                </i:EventTrigger>
-                                            </i:Interaction.Triggers>
-                                        </TextBox>
-                                    </StackPanel>
-                                </GroupBox>
-
                                 <!-- Спека материалов -->
                                 <GroupBox
                                     Margin="5 0 5 10">
@@ -4379,10 +4235,6 @@
                                 Height="*" />
                             <RowDefinition
                                 Height="*" />
-                            <RowDefinition
-                                Height="*" />
-                            <RowDefinition
-                                Height="*" />
                         </Grid.RowDefinitions>
 
                         <CheckBox
@@ -4511,7 +4363,7 @@
                         </TextBlock>
 
                         <CheckBox
-                            Grid.Row="6"
+                            Grid.Row="5"
                             Grid.Column="0"
                             Style="{DynamicResource ToggleButtonWithTooltipStyle}"
                             IsChecked="{Binding Path=SelectionSettings.NeedWorkWithMaterialSchedule}">
@@ -4523,7 +4375,7 @@
                             </CheckBox.ToolTip>
                         </CheckBox>
                         <TextBlock
-                            Grid.Row="6"
+                            Grid.Row="5"
                             Grid.Column="1"
                             Style="{StaticResource TextBlockWithTooltipStyle}"
                             Text="Спецификация материалов">
@@ -4536,7 +4388,7 @@
                         </TextBlock>
 
                         <CheckBox
-                            Grid.Row="7"
+                            Grid.Row="6"
                             Grid.Column="0"
                             Style="{DynamicResource ToggleButtonWithTooltipStyle}"
                             IsChecked="{Binding Path=SelectionSettings.NeedWorkWithSystemPartsSchedule}">
@@ -4548,7 +4400,7 @@
                             </CheckBox.ToolTip>
                         </CheckBox>
                         <TextBlock
-                            Grid.Row="7"
+                            Grid.Row="6"
                             Grid.Column="1"
                             Style="{StaticResource TextBlockWithTooltipStyle}"
                             Text="Ведомость системных деталей">
@@ -4561,7 +4413,7 @@
                         </TextBlock>
 
                         <CheckBox
-                            Grid.Row="8"
+                            Grid.Row="7"
                             Grid.Column="0"
                             Style="{DynamicResource ToggleButtonWithTooltipStyle}"
                             IsChecked="{Binding Path=SelectionSettings.NeedWorkWithIfcPartsSchedule}">
@@ -4573,7 +4425,7 @@
                             </CheckBox.ToolTip>
                         </CheckBox>
                         <TextBlock
-                            Grid.Row="8"
+                            Grid.Row="7"
                             Grid.Column="1"
                             Style="{StaticResource TextBlockWithTooltipStyle}"
                             Text="Ведомость IFC деталей">
@@ -4586,7 +4438,7 @@
                         </TextBlock>
 
                         <CheckBox
-                            Grid.Row="9"
+                            Grid.Row="8"
                             Grid.Column="0"
                             Style="{DynamicResource ToggleButtonWithTooltipStyle}"
                             IsChecked="{Binding Path=SelectionSettings.NeedWorkWithLegend}">
@@ -4598,7 +4450,7 @@
                             </CheckBox.ToolTip>
                         </CheckBox>
                         <TextBlock
-                            Grid.Row="9"
+                            Grid.Row="8"
                             Grid.Column="1"
                             Style="{StaticResource TextBlockWithTooltipStyle}"
                             Text="Легенда примечаний">
@@ -4611,7 +4463,7 @@
                         </TextBlock>
 
                         <CheckBox
-                            Grid.Row="10"
+                            Grid.Row="9"
                             Grid.Column="0"
                             Style="{DynamicResource ToggleButtonWithTooltipStyle}"
                             IsChecked="{Binding Path=SelectionSettings.NeedWorkWithGeneralRebarView}">
@@ -4623,7 +4475,7 @@
                             </CheckBox.ToolTip>
                         </CheckBox>
                         <TextBlock
-                            Grid.Row="10"
+                            Grid.Row="9"
                             Grid.Column="1"
                             Style="{StaticResource TextBlockWithTooltipStyle}"
                             Text="Основной вид каркаса">
@@ -4636,7 +4488,7 @@
                         </TextBlock>
 
                         <CheckBox
-                            Grid.Row="11"
+                            Grid.Row="10"
                             Grid.Column="0"
                             Style="{DynamicResource ToggleButtonWithTooltipStyle}"
                             IsChecked="{Binding Path=SelectionSettings.NeedWorkWithGeneralPerpendicularRebarView}">
@@ -4648,7 +4500,7 @@
                             </CheckBox.ToolTip>
                         </CheckBox>
                         <TextBlock
-                            Grid.Row="11"
+                            Grid.Row="10"
                             Grid.Column="1"
                             Style="{StaticResource TextBlockWithTooltipStyle}"
                             Text="Боковой вид каркаса">
@@ -4661,7 +4513,7 @@
                         </TextBlock>
 
                         <CheckBox
-                            Grid.Row="12"
+                            Grid.Row="11"
                             Grid.Column="0"
                             Style="{DynamicResource ToggleButtonWithTooltipStyle}"
                             IsChecked="{Binding Path=SelectionSettings.NeedWorkWithTransverseRebarViewFirst}">
@@ -4673,7 +4525,7 @@
                             </CheckBox.ToolTip>
                         </CheckBox>
                         <TextBlock
-                            Grid.Row="12"
+                            Grid.Row="11"
                             Grid.Column="1"
                             Style="{StaticResource TextBlockWithTooltipStyle}"
                             Text="Первый горизонтальный каркаса">
@@ -4686,7 +4538,7 @@
                         </TextBlock>
 
                         <CheckBox
-                            Grid.Row="13"
+                            Grid.Row="12"
                             Grid.Column="0"
                             Style="{DynamicResource ToggleButtonWithTooltipStyle}"
                             IsChecked="{Binding Path=SelectionSettings.NeedWorkWithTransverseRebarViewSecond}">
@@ -4698,7 +4550,7 @@
                             </CheckBox.ToolTip>
                         </CheckBox>
                         <TextBlock
-                            Grid.Row="13"
+                            Grid.Row="12"
                             Grid.Column="1"
                             Style="{StaticResource TextBlockWithTooltipStyle}"
                             Text="Второй горизонтальный каркаса">
@@ -4711,7 +4563,7 @@
                         </TextBlock>
                         
                         <CheckBox
-                            Grid.Row="14"
+                            Grid.Row="13"
                             Grid.Column="0"
                             Style="{DynamicResource ToggleButtonWithTooltipStyle}"
                             IsChecked="{Binding Path=SelectionSettings.NeedWorkWithSkeletonSchedule}">
@@ -4723,7 +4575,7 @@
                             </CheckBox.ToolTip>
                         </CheckBox>
                         <TextBlock
-                            Grid.Row="14"
+                            Grid.Row="13"
                             Grid.Column="1"
                             Style="{StaticResource TextBlockWithTooltipStyle}"
                             Text="Спецификация каркаса">
@@ -4736,7 +4588,7 @@
                         </TextBlock>
 
                         <CheckBox
-                            Grid.Row="15"
+                            Grid.Row="14"
                             Grid.Column="0"
                             Style="{DynamicResource ToggleButtonWithTooltipStyle}"
                             IsChecked="{Binding Path=SelectionSettings.NeedWorkWithSkeletonByElemsSchedule}">
@@ -4748,7 +4600,7 @@
                             </CheckBox.ToolTip>
                         </CheckBox>
                         <TextBlock
-                            Grid.Row="15"
+                            Grid.Row="14"
                             Grid.Column="1"
                             Style="{StaticResource TextBlockWithTooltipStyle}"
                             Text="Спецификация элементов каркаса">
@@ -4756,31 +4608,6 @@
                                 <ToolTip>
                                     <TextBlock
                                         Style="{StaticResource SkeletonByElemsScheduleStyle}" />
-                                </ToolTip>
-                            </TextBlock.ToolTip>
-                        </TextBlock>
-
-                        <CheckBox
-                            Grid.Row="16"
-                            Grid.Column="0"
-                            Style="{DynamicResource ToggleButtonWithTooltipStyle}"
-                            IsChecked="{Binding Path=SelectionSettings.NeedWorkWithRebarNode}">
-                            <CheckBox.ToolTip>
-                                <ToolTip>
-                                    <TextBlock
-                                        Style="{StaticResource RebarNodeStyle}" />
-                                </ToolTip>
-                            </CheckBox.ToolTip>
-                        </CheckBox>
-                        <TextBlock
-                            Grid.Row="16"
-                            Grid.Column="1"
-                            Style="{StaticResource TextBlockWithTooltipStyle}"
-                            Text="Узел армирования">
-                            <TextBlock.ToolTip>
-                                <ToolTip>
-                                    <TextBlock
-                                        Style="{StaticResource RebarNodeStyle}" />
                                 </ToolTip>
                             </TextBlock.ToolTip>
                         </TextBlock>

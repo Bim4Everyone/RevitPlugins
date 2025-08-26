@@ -792,15 +792,5 @@
             Property="Text"
             Value="Передвиньте тумблер вправо, если хотите, чтобы плагин создал и разместил на листах у выбранных пилонов поэлементную спецификацию каркаса" />
     </Style>
-    
-    <Style
-        x:Key="RebarNodeStyle"
-        TargetType="{x:Type TextBlock}"
-        BasedOn="{StaticResource SettingsTooltipStyle}">
-
-        <Setter
-            Property="Text"
-            Value="Передвиньте тумблер вправо, если хотите, чтобы плагин разместил на листах у выбранных пилонов узел армирования" />
-    </Style>
 
 </ResourceDictionary>
