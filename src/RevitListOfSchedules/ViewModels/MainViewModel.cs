@@ -1,8 +1,10 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Linq;
+using System.Windows;
 using System.Windows.Input;
 
 using dosymep.Bim4Everyone.SimpleServices;
@@ -46,9 +48,6 @@ internal class MainViewModel : BaseViewModel {
         _localizationService = localizationService;
         _familyLoadOptions = familyLoadOptions;
         _paramFactory = paramFactory;
-        IsCreateScheduleChecked = false;
-        IsScheduleToSheetChecked = true;
-        IsRevisionVisibleChecked = true;
 
         LoadViewCommand = RelayCommand.Create(LoadView);
         ReloadLinksCommand = RelayCommand.Create(ReloadLinks, CanReloadLinks);
@@ -148,6 +147,10 @@ internal class MainViewModel : BaseViewModel {
         }
         string selectedGroupParameterId = setting?.GroupParameter ?? GroupParameters.First().Id;
         SelectedGroupParameter = GroupParameters.First(param => param.Id == selectedGroupParameterId);
+
+        IsCreateScheduleChecked = setting?.IsCreateScheduleChecked ?? false;
+        IsRevisionVisibleChecked = setting?.IsRevisionVisibleChecked ?? true;
+        IsScheduleToSheetChecked = setting?.IsScheduleToSheetChecked ?? true;
     }
 
     // Метод подписанный на событие изменения выделенных связанных файлов
@@ -298,6 +301,9 @@ internal class MainViewModel : BaseViewModel {
     // Основной метод
     private void AcceptView() {
         SaveConfig();
+        if(_isCreateScheduleChecked) {
+            LoadDefaultSchedule();
+        }
         SheetProcessing();
     }
 
@@ -321,6 +327,9 @@ internal class MainViewModel : BaseViewModel {
             .Select(link => link.Id)
             .ToList();
         setting.GroupParameter = SelectedGroupParameter.Id;
+        setting.IsRevisionVisibleChecked = IsRevisionVisibleChecked;
+        setting.IsCreateScheduleChecked = IsCreateScheduleChecked;
+        setting.IsScheduleToSheetChecked = IsScheduleToSheetChecked;
         _pluginConfig.SaveProjectConfig();
     }
 
@@ -336,12 +345,12 @@ internal class MainViewModel : BaseViewModel {
 
         string transactionName = _localizationService.GetLocalizedString("MainViewModel.TransactionName");
         using var t = _revitRepository.Document.StartTransaction(transactionName);
-        var groupedSheets = SelectedSheets.GroupBy(sheet => sheet.AlbumName);
+        var albums = SelectedSheets.GroupBy(sheet => sheet.AlbumName);
         int i = 0;
-        foreach(var group in groupedSheets) {
-            string legalName = PathCharValidator.LegalizeString(group.Key);
-            var viewDraft = _revitRepository.GetViewDrafting(legalName);
-            var tempDoc = new TempFamilyDocument(_localizationService, _revitRepository, _familyLoadOptions, legalName);
+        foreach(var album in albums) {
+            string albumName = PathCharValidator.LegalizeString(album.Key);
+            var viewDraft = _revitRepository.GetViewDrafting(albumName);
+            var tempDoc = new TempFamilyDocument(_localizationService, _revitRepository, _familyLoadOptions, albumName);
 
             _revitRepository.DeleteFamilyInstances(viewDraft);
 
@@ -352,10 +361,10 @@ internal class MainViewModel : BaseViewModel {
                 Progress = progress,
                 CancellationToken = ct
             };
-            CreateInstances(group, createInstanceOptions);
+            CreateInstances(album, createInstanceOptions);
 
             if(_isCreateScheduleChecked) {
-                _revitRepository.CheckSchedule(legalName);
+                _revitRepository.CreateSchedule(albumName);
             }
         }
         t.Commit();
@@ -381,6 +390,18 @@ internal class MainViewModel : BaseViewModel {
                 createInstanceOptions.TempDoc.PlaceFamilyInstances(
                     view, sheet.Number, GetRevisionNumber(sheet), schedules);
             }
+        }
+    }
+
+    private void LoadDefaultSchedule() {
+        // Копирование эталонной спецификации
+        bool isScheduleChecked = new CheckSchedule(_revitRepository.UIApplication)
+            .ReplaceSchedule();
+        if(!isScheduleChecked) {
+            string stringMessegeBody = _localizationService.GetLocalizedString("MainViewModel.MessegeBody");
+            string stringMessegeTitle = _localizationService.GetLocalizedString("MainViewModel.MessegeTitle");
+            MessageBox.Show(stringMessegeBody, stringMessegeTitle);
+            throw new OperationCanceledException();
         }
     }
 

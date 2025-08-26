@@ -66,6 +66,12 @@
     <system:String
         x:Key="MainViewModel.ProgressTitleSheets">Обработка листов... [{0}]\[{1}]</system:String>    
     <system:String
+        x:Key="MainViewModel.MessegeBody">Пожалуйста, закройте текущую спецификацию</system:String>    
+    <system:String
+        x:Key="MainViewModel.MessegeTitle">Ошибка загрузки спецификации</system:String>
+    <system:String
+        x:Key="MainViewModel.DeleteSchedule">Удаление эталонной спецификации</system:String>
+    <system:String
         x:Key="GroupParameter.NoParameter">Нет параметра группировки</system:String>
     <system:String
         x:Key="GroupValue.NoValue">Нет значения</system:String>

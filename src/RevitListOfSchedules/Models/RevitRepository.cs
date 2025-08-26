@@ -12,6 +12,7 @@ using dosymep.SimpleServices;
 namespace RevitListOfSchedules.Models;
 
 internal class RevitRepository {
+    private const string _defaultScheduleName = "ВС_Ведомость спецификаций";
     private readonly ILocalizationService _localizationService;
     private readonly ParamFactory _paramFactory;
 
@@ -119,22 +120,23 @@ internal class RevitRepository {
         }
     }
 
-    // Метод проверки наличия нужной спецификации в проекте и создания при ее отсутствии
-    public void CheckSchedule(string scheduleName) {
-        var schedule = GetSchedule(scheduleName);
-        if(schedule == null) {
-            CreateSchedule(scheduleName);
+    // Метод создания новой спецификации
+    public void CreateSchedule(string newScheduleName) {
+        if(!CheckSchedule(newScheduleName)) {
+            _ = new ScheduleElement(this, _defaultScheduleName, newScheduleName);
         }
-    }
-
-    public void CreateSchedule(string scheduleName) {
-        _ = new ScheduleElement(this, scheduleName);
     }
 
     // Метод поиска и получения спецификации по имени
     public ViewSchedule GetSchedule(string scheduleName) {
         var cache = new ViewScheduleCache(Document);
         return cache.ExistViewSchedule(scheduleName);
+    }
+
+    // Метод проверки наличия нужной спецификации в проекте
+    private bool CheckSchedule(string scheduleName) {
+        var schedule = GetSchedule(scheduleName);
+        return schedule != null;
     }
 
     // Метод создания нового чертежного вида

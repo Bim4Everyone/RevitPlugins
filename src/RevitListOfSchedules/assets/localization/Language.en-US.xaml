@@ -64,7 +64,13 @@
     <system:String
         x:Key="MainViewModel.ProgressTitleLinks">Reload links... [{0}]\[{1}]</system:String>
     <system:String
-        x:Key="MainViewModel.ProgressTitleSheets">Processing sheets... [{0}]\[{1}]</system:String>    
+        x:Key="MainViewModel.ProgressTitleSheets">Processing sheets... [{0}]\[{1}]</system:String>        
+    <system:String
+        x:Key="MainViewModel.MessegeBody">Please, close the current schedule</system:String>
+    <system:String
+        x:Key="MainViewModel.MessegeTitle">Download schedule error</system:String>
+    <system:String
+        x:Key="MainViewModel.DeleteSchedule">Delete default schedule</system:String>
     <system:String
         x:Key="GroupParameter.NoParameter">No group parameter</system:String>
     <system:String

@@ -85,23 +85,18 @@ public class RevitListOfSchedulesCommand : BasePluginCommand {
         var localizationService = kernel.Get<ILocalizationService>();
 
         // Загрузка параметров проекта
-        bool isScheduleChecked = new CheckSchedule(uiApplication)
-            .ReplaceSchedule()
-            .GetIsChecked();
-
-        // Загрузка параметров проекта
         bool isParamChecked = new CheckProjectParams(uiApplication)
             .CopyProjectParams()
             .GetIsChecked();
 
-        if(!isScheduleChecked) {
-            string stringMessegeBody = "Закрой спеку";
-            string stringMessegeTitle = "Сообщение";
+        if(!isParamChecked) {
+            string stringMessegeBody = localizationService.GetLocalizedString("Command.MessegeBody2");
+            string stringMessegeTitle = localizationService.GetLocalizedString("Command.MessegeTitle");
             messageBoxService.Show(stringMessegeBody, stringMessegeTitle, MessageBoxButton.OK, MessageBoxImage.Exclamation);
             throw new OperationCanceledException();
         }
 
-        // Вызывает стандартное уведомление
+        //Вызывает стандартное уведомление
         Notification(kernel.Get<MainWindow>());
     }
 }

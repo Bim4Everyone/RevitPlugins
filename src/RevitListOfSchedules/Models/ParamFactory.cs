@@ -12,11 +12,12 @@ using dosymep.Revit;
 namespace RevitListOfSchedules.Models;
 internal class ParamFactory {
 
-    public const string FamilyParamNumber = "Номер листа";
-    public const string FamilyParamName = "Наименование спецификации";
-    public const string FamilyParamRevision = "Примечание";
     public const string ScheduleName = "Ведомость спецификаций и ведомостей";
-
+    public const string ListOfSchedulesSheetName = "ВС_Номер листа";
+    public const string ListOfSchedulesRevNumber = "ВС_Номер изменения";
+    public const string ListOfSchedulesNotes = "ВС_Примечания";
+    public const string ListOfSchedulesGroup = "ВС_Группировка";
+    public const string ListOfSchedulesListName = "ВС_Наименование спецификации";
     private readonly SharedParamsConfig _sharedParamsConfig = SharedParamsConfig.Instance;
 
     public ParamFactory() {

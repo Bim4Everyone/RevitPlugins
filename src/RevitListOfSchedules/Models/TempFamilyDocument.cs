@@ -66,7 +66,8 @@ internal class TempFamilyDocument : IFamilyDocument {
     public FamilyInstance CreateInstance(View view, string name, string number, string revisionNumber) {
         var xyz = XYZ.Zero;
         var familyInstance = _revitRepository.Document.Create.NewFamilyInstance(xyz, FamilySymbol, view);
-        //familyInstance.SetParamValue(ParamFactory.FamilyParamNumber, number);
+
+        familyInstance.SetParamValue(ParamFactory.ListOfSchedulesSheetName, number);
         //familyInstance.SetParamValue(ParamFactory.FamilyParamName, name);
         //familyInstance.SetParamValue(ParamFactory.FamilyParamRevision, revisionNumber);
         return familyInstance;

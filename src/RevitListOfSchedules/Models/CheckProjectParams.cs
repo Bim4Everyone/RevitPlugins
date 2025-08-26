@@ -9,7 +9,6 @@ namespace RevitListOfSchedules.Models;
 internal class CheckProjectParams {
     private readonly UIApplication _uiApplication;
     private readonly ProjectParameters _projectParameters;
-
     private readonly bool _isChecked = true;
 
     public CheckProjectParams(UIApplication uiApplication) {
@@ -23,11 +22,11 @@ internal class CheckProjectParams {
 
     public CheckProjectParams CopyProjectParams() {
         _projectParameters.SetupRevitParams(_uiApplication.ActiveUIDocument.Document,
-                ProjectParamsConfig.Instance.IsRoomNumberFix,
-                ProjectParamsConfig.Instance.IsRoomLevelFix,
-                ProjectParamsConfig.Instance.NumberingOrder,
-                ProjectParamsConfig.Instance.IsRoomMainLevel,
-                ProjectParamsConfig.Instance.RoomGroupName);
+                ProjectParamsConfig.Instance.ListOfSchedulesSheetName,
+                ProjectParamsConfig.Instance.ListOfSchedulesRevNumber,
+                ProjectParamsConfig.Instance.ListOfSchedulesNotes,
+                ProjectParamsConfig.Instance.ListOfSchedulesGroup,
+                ProjectParamsConfig.Instance.ListOfSchedulesListName);
         return this;
     }
 }

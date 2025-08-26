@@ -4,18 +4,19 @@ using Autodesk.Revit.DB;
 
 namespace RevitListOfSchedules.Models;
 internal class ScheduleElement {
-    private const string _defaultScheduleName = "КВГ_(Проверка) Без группы";
     private readonly RevitRepository _revitRepository;
+    private readonly string _defaultScheduleName;
     private readonly string _scheduleName;
 
-    public ScheduleElement(RevitRepository revitRepository, string scheduleName) {
+    public ScheduleElement(RevitRepository revitRepository, string defaultScheduleName, string scheduleName) {
         _revitRepository = revitRepository;
+        _defaultScheduleName = defaultScheduleName;
         _scheduleName = scheduleName;
         ConfigureSchedule();
     }
 
     private void ConfigureSchedule() {
-        var newSchedule = CreateNewSchedule();
+        var newSchedule = DuplicateDefaultSchedule();
         var defenition = newSchedule.Definition;
         var filter = defenition.GetFilters().FirstOrDefault();
         filter?.SetValue(newSchedule.Name);
@@ -23,7 +24,7 @@ internal class ScheduleElement {
         ConfigureScheduleHeader(newSchedule);
     }
 
-    private ViewSchedule CreateNewSchedule() {
+    private ViewSchedule DuplicateDefaultSchedule() {
         var defaultSchedule = _revitRepository.GetSchedule(_defaultScheduleName);
         var newScheduleId = defaultSchedule.Duplicate(ViewDuplicateOption.Duplicate);
         var newSchedule = _revitRepository.Document.GetElement(newScheduleId) as ViewSchedule;
