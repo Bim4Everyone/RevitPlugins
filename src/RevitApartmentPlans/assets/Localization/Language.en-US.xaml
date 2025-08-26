@@ -1,0 +1,20 @@
+﻿<ResourceDictionary
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:system="clr-namespace:System;assembly=mscorlib">
+
+    <system:String
+        x:Key="Errors.ActiveViewMustBePlan">Active view must be a plan</system:String>
+
+    <system:String
+        x:Key="MainWindow.Title">Apartment plans</system:String>
+
+    <system:String
+        x:Key="ViewTemplateAdditionWindow.Title">Add view template</system:String>
+
+    <system:String
+        x:Key="OK">OK</system:String>
+    <system:String
+        x:Key="Cancel">Cancel</system:String>
+
+</ResourceDictionary>

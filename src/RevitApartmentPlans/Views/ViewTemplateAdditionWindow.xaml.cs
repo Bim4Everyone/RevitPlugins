@@ -1,8 +1,20 @@
 using System.Windows;
 
+using dosymep.SimpleServices;
+
 namespace RevitApartmentPlans.Views;
 public partial class ViewTemplateAdditionWindow {
-    public ViewTemplateAdditionWindow() {
+    public ViewTemplateAdditionWindow(
+    ILoggerService loggerService,
+    ISerializationService serializationService,
+    ILanguageService languageService,
+    ILocalizationService localizationService,
+    IUIThemeService uiThemeService,
+    IUIThemeUpdaterService themeUpdaterService)
+    : base(loggerService,
+        serializationService,
+        languageService, localizationService,
+        uiThemeService, themeUpdaterService) {
         InitializeComponent();
     }
 
