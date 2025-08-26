@@ -8,7 +8,7 @@
 
     <system:String
         x:Key="MainWindow.Title">Планы квартир</system:String>
-    
+
     <system:String
         x:Key="ViewTemplateAdditionWindow.Title">Добавление шаблона вида</system:String>
 
@@ -16,5 +16,43 @@
         x:Key="OK">ОК</system:String>
     <system:String
         x:Key="Cancel">Отмена</system:String>
+
+    <system:String
+        x:Key="Transactions.PlansCreation">Создание планов квартир</system:String>
+
+    <system:String
+        x:Key="Warning">Предупреждение</system:String>
+
+    <system:String
+        x:Key="Progress.Title">Обработка квартир... [{0}]\[{1}]</system:String>
+
+    <system:String
+        x:Key="MainWindow.Validation.OffsetLessThan">Отступ не должен быть меньше {0} мм.</system:String>
+    <system:String
+        x:Key="MainWindow.Validation.OffsetGreaterThan">Отступ не должен быть больше {0} мм.</system:String>
+    <system:String
+        x:Key="MainWindow.Validation.ParameterNotSet">Выберите параметр для группировки.</system:String>
+    <system:String
+        x:Key="MainWindow.Validation.AddViewTemplate">Добавьте шаблоны видов.</system:String>
+    <system:String
+        x:Key="MainWindow.Validation.SelectApartments">Выберите квартиры.</system:String>
+
+    <system:String
+        x:Key="ViewTemplates.Validation.SelectViewTemplate">Выберите шаблон</system:String>
+
+    <system:String
+        xml:space="preserve"
+        x:Key="Warnings.Revit2022">
+В 2022 версии Revit обработка помещений из связей поддерживается не полностью:
+- могут учитываться лишние помещения
+(устранено в 2024 версии Revit)
+- при выделении квартиры не будут подсвечиваться помещения из связей
+(устранено в 2023 версии Revit)</system:String>
+    <system:String
+        xml:space="preserve"
+        x:Key="Warnings.Revit2023">
+В 2023 версии Revit при включенной обработке связей
+могут учитываться лишние помещения
+(устранено в 2024 версии Revit)</system:String>
 
 </ResourceDictionary>

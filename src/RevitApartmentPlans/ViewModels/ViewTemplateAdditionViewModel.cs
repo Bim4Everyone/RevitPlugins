@@ -6,6 +6,7 @@ using System.Windows.Input;
 
 using Autodesk.Revit.DB;
 
+using dosymep.SimpleServices;
 using dosymep.WPF.Commands;
 using dosymep.WPF.ViewModels;
 
@@ -17,6 +18,8 @@ namespace RevitApartmentPlans.ViewModels;
 /// </summary>
 internal class ViewTemplateAdditionViewModel : BaseViewModel {
     private readonly RevitRepository _revitRepository;
+    private readonly ILocalizationService _localization;
+
     /// <summary>
     /// Все шаблоны видов в активном документе
     /// </summary>
@@ -26,9 +29,9 @@ internal class ViewTemplateAdditionViewModel : BaseViewModel {
     /// </summary>
     private readonly HashSet<ViewTemplateViewModel> _addedViewTemplates;
 
-    public ViewTemplateAdditionViewModel(RevitRepository revitRepository) {
+    public ViewTemplateAdditionViewModel(RevitRepository revitRepository, ILocalizationService localization) {
         _revitRepository = revitRepository ?? throw new System.ArgumentNullException(nameof(revitRepository));
-
+        _localization = localization ?? throw new ArgumentNullException(nameof(localization));
         _allViewTemplatesFromDoc = [.. _revitRepository.GetViewTemplates()
             .Select(t => new ViewTemplateViewModel(t))];
         _addedViewTemplates = [];
@@ -101,7 +104,7 @@ internal class ViewTemplateAdditionViewModel : BaseViewModel {
 
     private bool CanAcceptView() {
         if(SelectedViewTemplate is null) {
-            ErrorText = "Выберите шаблон";
+            ErrorText = _localization.GetLocalizedString("ViewTemplates.Validation.SelectViewTemplate");
             return false;
         }
 

@@ -6,7 +6,6 @@ using Autodesk.Revit.ApplicationServices;
 using Autodesk.Revit.DB;
 using Autodesk.Revit.DB.Architecture;
 using Autodesk.Revit.UI;
-using Autodesk.Revit.UI.Selection;
 
 using dosymep.Revit;
 using dosymep.Revit.Geometry;
@@ -147,42 +146,6 @@ internal class RevitRepository {
     }
 
     /// <summary>
-    /// Метод для отладки. Создает квартиру из выбранных помещений
-    /// </summary>
-    public Apartment GetDebugApartment() {
-        var rooms = PickRooms();
-        return new Apartment(PickRooms(), "test", rooms.First().Room.Level);
-    }
-
-    /// <summary>
-    /// Метод для отладки. Возвращает все шаблоны видов в активном документе
-    /// </summary>
-    public ICollection<ViewPlan> GetDebugTemplates() {
-        var enabledViewTypes = GetAllUsedViewTypes();
-        return new FilteredElementCollector(Document)
-            .OfClass(typeof(ViewPlan))
-            .Cast<ViewPlan>()
-            .Where(plan => plan.IsTemplate && enabledViewTypes.Any(vt => vt == plan.ViewType))
-            .ToArray();
-    }
-
-    /// <summary>
-    /// Метод для отладки. Создает линии модели из заданного контура
-    /// </summary>
-    public void CreateDebugLines(CurveLoop curveLoop) {
-        //using(Transaction t = Document.StartTransaction("Создание тестового контура")) {
-        var geomPlane = Plane.CreateByNormalAndOrigin(XYZ.BasisZ, curveLoop.First().GetEndPoint(0));
-        var sketch = SketchPlane.Create(Document, geomPlane);
-
-        foreach(var item in curveLoop) {
-            Document.Create.NewModelCurve(item, sketch);
-        }
-
-        //    t.Commit();
-        //}
-    }
-
-    /// <summary>
     /// Копирует вид с детализацией.
     /// </summary>
     /// <param name="view">Вид для копирования</param>
@@ -193,18 +156,14 @@ internal class RevitRepository {
         if(view is null) {
             throw new ArgumentNullException(nameof(view));
         }
-        // при копировании видов, с которыми работает плагин, проблем быть не должно,
-        // но пусть будут исключения на всякий случай
         const ViewDuplicateOption opts = ViewDuplicateOption.WithDetailing;
         if(view.CanViewBeDuplicated(opts)) {
             var id = view.Duplicate(opts);
             if(id.IsNotNull()) {
-                return Document.GetElement(id) as ViewPlan
-                    ?? throw new InvalidOperationException(
-                        $"Пустой id скопированного вида {view.Name} с детализацией");
+                return (ViewPlan) Document.GetElement(id);
             }
         }
-        throw new InvalidOperationException($"Не удалось скопировать вид {view.Name} с детализацией");
+        throw new InvalidOperationException(view.Name);
     }
 
     /// <summary>
@@ -216,8 +175,7 @@ internal class RevitRepository {
         return template.ViewType switch {
             ViewType.FloorPlan => GetViewFamilyTypeId(ViewFamily.FloorPlan),
             ViewType.CeilingPlan => GetViewFamilyTypeId(ViewFamily.CeilingPlan),
-            _ => throw new NotSupportedException($"Тип шаблона {template.ViewType} не поддерживается. " +
-                                    $"Название шаблона: \'{template.Name}\'"),
+            _ => throw new NotSupportedException(template.Name)
         };
     }
 
@@ -231,10 +189,8 @@ internal class RevitRepository {
     /// <summary>
     /// Возвращает активный вид (план)
     /// </summary>
-    /// <exception cref="InvalidOperationException">Исключение, если активынй вид не является планом</exception>
     public ViewPlan GetActiveViewPlan() {
-        return Document.ActiveView as ViewPlan
-            ?? throw new InvalidOperationException("Активный вид не является планом");
+        return (ViewPlan) Document.ActiveView;
     }
 
     public void ShowApartment(Apartment apartment) {
@@ -286,10 +242,8 @@ internal class RevitRepository {
     /// <summary>
     /// Возвращает уровень, привязанный к активному виду, который должен быть планом
     /// </summary>
-    /// <exception cref="InvalidOperationException">Исключение, если активный вид - не план</exception>
     private Level GetLevelOfActivePlan() {
-        var view = GetActiveViewPlan();
-        return view is null ? throw new InvalidOperationException("Активный вид не является планом") : view.GenLevel;
+        return GetActiveViewPlan().GenLevel;
     }
 
     private ElementId GetViewFamilyTypeId(ViewFamily viewFamily) {
@@ -299,24 +253,5 @@ internal class RevitRepository {
             .Where(v => v.ViewFamily == viewFamily)
             .First()
             .Id;
-    }
-
-    /// <summary>
-    /// Метод для отладки. Возвращает помещения, выбранные в GUI Revit
-    /// </summary>
-    private ICollection<RoomElement> PickRooms() {
-        ISelectionFilter filter = new SelectionFilterRooms(Document);
-        var references = ActiveUIDocument.Selection.PickObjects(
-            ObjectType.Element,
-            filter,
-            "Выберите помещения");
-
-        List<RoomElement> rooms = [];
-        foreach(var reference in references) {
-            if((reference != null) && (Document.GetElement(reference) is Room room) && (room.Area > 0)) {
-                rooms.Add(new RoomElement(room));
-            }
-        }
-        return rooms;
     }
 }

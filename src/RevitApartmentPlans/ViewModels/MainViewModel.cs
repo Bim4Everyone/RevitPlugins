@@ -14,6 +14,7 @@ internal class MainViewModel : BaseViewModel {
     private readonly RevitRepository _revitRepository;
     private readonly IViewPlanCreationService _viewPlanCreationService;
     private readonly ILengthConverter _lengthConverter;
+    private readonly ILocalizationService _localization;
 
     /// <summary>
     /// Минимальное значение отступа подрезки контура квартиры в мм
@@ -38,8 +39,8 @@ internal class MainViewModel : BaseViewModel {
         ApartmentsViewModel apartmentsViewModel,
         IViewPlanCreationService viewPlanCreationService,
         ILengthConverter lengthConverter,
-        IProgressDialogFactory progressDialogFactory
-        ) {
+        IProgressDialogFactory progressDialogFactory,
+        ILocalizationService localization) {
 
         _pluginConfig = pluginConfig
             ?? throw new System.ArgumentNullException(nameof(pluginConfig));
@@ -55,6 +56,8 @@ internal class MainViewModel : BaseViewModel {
             ?? throw new System.ArgumentNullException(nameof(lengthConverter));
         ProgressDialogFactory = progressDialogFactory
             ?? throw new System.ArgumentNullException(nameof(progressDialogFactory));
+        _localization = localization
+            ?? throw new System.ArgumentNullException(nameof(localization));
         LoadViewCommand = RelayCommand.Create(LoadView);
         AcceptViewCommand = RelayCommand.Create(AcceptView, CanAcceptView);
     }
@@ -103,7 +106,7 @@ internal class MainViewModel : BaseViewModel {
                 .ToArray();
         using var progressDialogService = ProgressDialogFactory.CreateDialog();
         progressDialogService.StepValue = 1;
-        progressDialogService.DisplayTitleFormat = "Обработка квартир... [{0}]\\[{1}]";
+        progressDialogService.DisplayTitleFormat = _localization.GetLocalizedString("Progress.Title");
         var progress = progressDialogService.CreateProgress();
         progressDialogService.MaxValue = selectedApartments.Length;
         var ct = progressDialogService.CreateCancellationToken();
@@ -130,23 +133,23 @@ internal class MainViewModel : BaseViewModel {
 
     private bool CanAcceptView() {
         if(OffsetMm < _minOffsetMm) {
-            ErrorText = $"Отступ не должен быть меньше {_minOffsetMm} мм.";
+            ErrorText = _localization.GetLocalizedString("MainWindow.Validation.OffsetLessThan", _minOffsetMm);
             return false;
         }
         if(OffsetMm > _maxOffsetMm) {
-            ErrorText = $"Отступ не может быть больше {_maxOffsetMm} мм.";
+            ErrorText = _localization.GetLocalizedString("MainWindow.Validation.OffsetGreaterThan", _maxOffsetMm);
             return false;
         }
         if(ApartmentsViewModel?.SelectedParam is null) {
-            ErrorText = "Выберите параметр для группировки.";
+            ErrorText = _localization.GetLocalizedString("MainWindow.Validation.ParameterNotSet");
             return false;
         }
         if(ViewTemplatesViewModel?.ViewTemplates?.Count() == 0) {
-            ErrorText = "Добавьте шаблоны видов.";
+            ErrorText = _localization.GetLocalizedString("MainWindow.Validation.AddViewTemplate");
             return false;
         }
         if(ApartmentsViewModel?.Apartments?.Where(a => a.IsSelected).Count() == 0) {
-            ErrorText = "Выберите квартиры.";
+            ErrorText = _localization.GetLocalizedString("MainWindow.Validation.SelectApartments");
             return false;
         }
 
