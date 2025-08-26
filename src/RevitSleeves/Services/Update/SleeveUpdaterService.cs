@@ -13,21 +13,18 @@ using RevitSleeves.Models;
 using RevitSleeves.Models.Config;
 using RevitSleeves.Models.Placing;
 using RevitSleeves.Services.Core;
-using RevitSleeves.Services.Placing.ParamsSetter;
 
 namespace RevitSleeves.Services.Update;
 internal class SleeveUpdaterService : ISleeveUpdaterService {
     private readonly RevitRepository _repository;
     private readonly SleevePlacementSettingsConfig _config;
     private readonly IErrorsService _errorsService;
-    private readonly IParamsSetter _paramsSetter;
     private readonly IMepElementsProvider _mepElementsProvider;
 
     public SleeveUpdaterService(
         RevitRepository repository,
         SleevePlacementSettingsConfig config,
         IErrorsService errorsService,
-        IParamsSetter paramsSetter,
         IMepElementsProvider mepElementsProvider) {
 
         _repository = repository
@@ -36,8 +33,6 @@ internal class SleeveUpdaterService : ISleeveUpdaterService {
             ?? throw new ArgumentNullException(nameof(config));
         _errorsService = errorsService
             ?? throw new ArgumentNullException(nameof(errorsService));
-        _paramsSetter = paramsSetter
-            ?? throw new ArgumentNullException(nameof(paramsSetter));
         _mepElementsProvider = mepElementsProvider
             ?? throw new ArgumentNullException(nameof(mepElementsProvider));
     }
