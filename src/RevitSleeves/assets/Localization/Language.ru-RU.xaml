@@ -13,7 +13,7 @@
     <system:String
         x:Key="SleevePlacementSettingsWindow.ShowPlacingErrors">Выводить ошибки расстановки</system:String>
     <system:String
-        x:Key="SleevePlacementSettingsWindow.StructureFiltration">Фильтрация конструкций</system:String>
+        x:Key="SleevePlacementSettingsWindow.Filtration">Фильтрация</system:String>
     <system:String
         x:Key="SleevePlacementSettingsWindow.DiameterRanges">Диапазоны диаметров, мм</system:String>
     <system:String
@@ -40,6 +40,15 @@
     
     <system:String
         x:Key="LinksSelectorWindow.Validation.SelectAnyLink">Выберите связи для обработки</system:String>
+
+    <system:String
+        x:Key="SleevePlacementSettings.ToolTip.StartPipeDiameter">Начальный диаметр трубы</system:String>
+    <system:String
+        x:Key="SleevePlacementSettings.ToolTip.EndPipeDiameter">Конечный диаметр трубы</system:String>
+    <system:String
+        x:Key="SleevePlacementSettings.ToolTip.SleeveDiameter">Диаметр гильзы</system:String>
+    <system:String
+        x:Key="SleevePlacementSettings.ToolTip.SleeveThickness">Толщина стенки гильзы</system:String>
 
     <system:String
         x:Key="SleevePlacementSettings.Validation.SetName">Укажите название настроек.</system:String>
@@ -69,6 +78,8 @@
         x:Key="SleevePlacementSettings.Validation.ParamValueMustBeDouble">Значение параметра '{0}' должно быть вещественным числом</system:String>
     <system:String
         x:Key="SleevePlacementSettings.Validation.ParamHasNoDataType">У параметра {0} не определен тип данных</system:String>
+    <system:String
+        x:Key="SleevePlacementSettings.Validation.ThicknessMustBeGreaterThanZero">Толщина гильзы должна быть больше 0</system:String>
 
     <system:String
         x:Key="FilterWindow.Title">Проверка фильтра</system:String>

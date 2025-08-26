@@ -13,7 +13,7 @@
     <system:String
         x:Key="SleevePlacementSettingsWindow.ShowPlacingErrors">Show placing errors</system:String>
     <system:String
-        x:Key="SleevePlacementSettingsWindow.StructureFiltration">Structure filtration</system:String>
+        x:Key="SleevePlacementSettingsWindow.Filtration">Filtration</system:String>
     <system:String
         x:Key="SleevePlacementSettingsWindow.DiameterRanges">Diameter ranges, mm</system:String>
     <system:String
@@ -40,6 +40,15 @@
 
     <system:String
         x:Key="LinksSelectorWindow.Validation.SelectAnyLink">Select any link</system:String>
+
+    <system:String
+        x:Key="SleevePlacementSettings.ToolTip.StartPipeDiameter">Start pipe diameter</system:String>
+    <system:String
+        x:Key="SleevePlacementSettings.ToolTip.EndPipeDiameter">End pipe diameter</system:String>
+    <system:String
+        x:Key="SleevePlacementSettings.ToolTip.SleeveDiameter">Sleeve diameter</system:String>
+    <system:String
+        x:Key="SleevePlacementSettings.ToolTip.SleeveThickness">Sleeve thickness</system:String>
 
     <system:String
         x:Key="SleevePlacementSettings.Validation.SetName">Set settings name.</system:String>
@@ -69,6 +78,8 @@
         x:Key="SleevePlacementSettings.Validation.ParamValueMustBeDouble">The value of the '{0}' parameter must be a real number</system:String>
     <system:String
         x:Key="SleevePlacementSettings.Validation.ParamHasNoDataType">The {0} parameter has no data type defined</system:String>
+    <system:String
+        x:Key="SleevePlacementSettings.Validation.ThicknessMustBeGreaterThanZero">Sleeve thickness must be greater than 0</system:String>
 
     <system:String
         x:Key="FilterWindow.Title">Filter checking</system:String>

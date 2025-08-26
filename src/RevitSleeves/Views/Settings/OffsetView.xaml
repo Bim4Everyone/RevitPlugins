@@ -20,22 +20,22 @@
             </ResourceDictionary.MergedDictionaries>
         </ResourceDictionary>
     </UserControl.Resources>
-    <StackPanel>
+    <DockPanel>
         <ui:TextBlock
-            Margin="0 0 0 2"
-            MaxWidth="250"
+            Margin="0 0 5 0"
+            Width="450"
+            DockPanel.Dock="Left"
+            TextAlignment="Left"
             Style="{StaticResource CustomTextBlockAsLabel}"
             Text="{Binding Name}" />
-        <DockPanel
-            HorizontalAlignment="Center">
-            <ui:TextBox
-                MinWidth="50"
-                MaxWidth="50"
-                Text="{Binding Value, UpdateSourceTrigger=PropertyChanged}"
-                Style="{StaticResource CustomSmallTextBox}" />
-            <Label
-                Style="{StaticResource CustomLabel}"
-                Content="{Binding UnitName}" />
-        </DockPanel>
-    </StackPanel>
+        <ui:TextBox
+            MinWidth="50"
+            MaxWidth="50"
+            Height="Auto"
+            Text="{Binding Value, UpdateSourceTrigger=PropertyChanged}"
+            Style="{StaticResource CustomSmallTextBox}" />
+        <Label
+            Style="{StaticResource CustomLabel}"
+            Content="{Binding UnitName}" />
+    </DockPanel>
 </UserControl>
