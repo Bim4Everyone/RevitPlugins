@@ -11,7 +11,6 @@ internal class GeneralViewRebarPerpAnnotCreator : ViewAnnotationCreator {
         : base(mvm, repository, pylonSheetInfo, pylonView) {
     }
 
-
     public override void TryCreateViewAnnotations() {
         var dimensionService = new GeneralViewRebarPerpDimensionService(ViewModel, Repository, SheetInfo, ViewOfPylon);
         var dimensionBaseService = new DimensionBaseService(ViewOfPylon.ViewElement, ViewModel.ParamValService);
@@ -49,7 +48,7 @@ internal class GeneralViewRebarPerpAnnotCreator : ViewAnnotationCreator {
         try {
             var markService = new GeneralViewRebarPerpMarkService(ViewModel, Repository, SheetInfo, ViewOfPylon);
             markService.TryCreateVerticalBarMarks();
-            markService.TryCreateWeldingUnitMarks();
+            markService.TryCreateClampMarks(false);
         } catch(Exception) { }
     }
 

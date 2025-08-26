@@ -44,7 +44,6 @@ internal class GeneralViewPerpAnnotCreator : ViewAnnotationCreator {
             var markService = new GeneralViewMarkService(ViewModel, Repository, SheetInfo, ViewOfPylon);
             markService.TryCreatePylonElevMark(SheetInfo.HostElems, dimensionBaseService);
             markService.TryCreateSkeletonMark();
-            markService.TryCreateClampMarks(false);
             markService.TryCreateAdditionalMark();
             markService.TryCreateLowerBreakLines();
             markService.TryCreateUpperBreakLines();
