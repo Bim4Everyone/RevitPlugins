@@ -55,31 +55,31 @@ internal class TransViewDimensionService {
                 // Когда все Гэшки
                 if(SheetInfo.RebarInfo.AllRebarAreL) {
                     CreateDimension(skeletonParentRebar, dimensionLineHostRef, DimensionOffsetType.Bottom, 0.5,
-                                    ["низ", "фронт"], view, dimensionBaseService, refArrayFormworkFront);
+                                    ["низ", "фронт", "край"], view, dimensionBaseService, refArrayFormworkFront, false);
                     longGridsWillBeNeeded = true;
                 } else if(SheetInfo.RebarInfo.HasLRebar) {
                     // Когда Гэшки с одной стороны
                     if(rebarFinder.DirectionHasLRebar(view, SheetInfo.ProjectSection, DirectionType.Top)) {
                         CreateDimension(skeletonParentRebar, dimensionLineHostRef, DimensionOffsetType.Top, 0.5,
-                                        ["низ", "фронт"], view, dimensionBaseService, refArrayFormworkFront);
+                                        ["низ", "фронт", "край"], view, dimensionBaseService, refArrayFormworkFront, false);
                         CreateDimension(skeletonParentRebar, dimensionLineHostRef, DimensionOffsetType.Bottom, 0.5,
-                                        ["верх", "фронт"], view, dimensionBaseService, refArrayFormworkFront);
+                                        ["верх", "фронт", "край"], view, dimensionBaseService, refArrayFormworkFront, false);
                     } else {
                         CreateDimension(skeletonParentRebar, dimensionLineHostRef, DimensionOffsetType.Top, 0.5,
-                                        ["верх", "фронт"], view, dimensionBaseService, refArrayFormworkFront);
+                                        ["верх", "фронт", "край"], view, dimensionBaseService, refArrayFormworkFront, false);
                         CreateDimension(skeletonParentRebar, dimensionLineHostRef, DimensionOffsetType.Bottom, 0.5,
-                                        ["низ", "фронт"], view, dimensionBaseService, refArrayFormworkFront);
+                                        ["низ", "фронт", "край"], view, dimensionBaseService, refArrayFormworkFront, false);
                         longGridsWillBeNeeded = true;
                     }
                 }
                 // Когда Гэшек нет вообще
                 if(!SheetInfo.RebarInfo.HasLRebar) {
                     CreateDimension(skeletonParentRebar, dimensionLineHostRef, DimensionOffsetType.Bottom, 0.5,
-                                    ["верх", "фронт"], view, dimensionBaseService, refArrayFormworkFront);
+                                    ["верх", "фронт", "край"], view, dimensionBaseService, refArrayFormworkFront, false);
                 }
             } else {
                 CreateDimension(skeletonParentRebar, dimensionLineHostRef, DimensionOffsetType.Bottom, 0.5,
-                                ["низ", "фронт"], view, dimensionBaseService, refArrayFormworkFront);
+                                ["низ", "фронт", "край"], view, dimensionBaseService, refArrayFormworkFront, false);
             }
             // Размер по ФРОНТУ опалубка (положение снизу 1)
             CreateDimension(refArrayFormworkFront, dimensionLineHostRef, DimensionOffsetType.Bottom, 1, view, 

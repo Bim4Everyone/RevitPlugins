@@ -8,22 +8,21 @@ using dosymep.Revit;
 using RevitPylonDocumentation.ViewModels;
 
 namespace RevitPylonDocumentation.Models.PylonSheetNView.ViewMarkServices.ViewRebarMarkServices;
-internal class TransViewRebarMarkService {
-    private readonly string _commentParamName = "Комментарии";
-    
-    private readonly int _formNumberForSkeletonPlatesMax = 2999;
-    private readonly int _formNumberForSkeletonPlatesMin = 2001;
-
+internal class TransViewRebarMarkService {  
     private readonly int _formNumberForVerticalRebarMax = 1499;
     private readonly int _formNumberForVerticalRebarMin = 1101;
+
+    private readonly int _formNumberForClampsMax = 1599;
+    private readonly int _formNumberForClampsMin = 1500;
+
+    private readonly int _formNumberForCBarMin = 1202;
 
     private readonly ViewPointsAnalyzer _viewPointsAnalyzer;
     private readonly AnnotationService _annotationService;
 
     private readonly FamilySymbol _tagSymbolWithComment;
-    private readonly FamilySymbol _gostTagSymbol;
-
-    private readonly string _weldingGostText = "ГОСТ 14098-2014-Н1-Рш";
+    private readonly FamilySymbol _tagSymbolWithSerif;
+    private readonly FamilySymbol _tagSymbolWithStep;
 
     internal TransViewRebarMarkService(MainViewModel mvm, RevitRepository repository, PylonSheetInfo pylonSheetInfo, 
                                        PylonView pylonView) {
@@ -38,8 +37,10 @@ internal class TransViewRebarMarkService {
         // Находим типоразмер марки несущей арматуры для обозначения позиции, диаметра и комментариев арматуры
         // Без засечки на конце
         _tagSymbolWithComment = mvm.SelectedRebarTagTypeWithComment;
-        // Находим типоразмер типовой аннотации для метки ГОСТа сварки
-        _gostTagSymbol = Repository.FindSymbol(BuiltInCategory.OST_GenericAnnotation, "Без засечки");
+        // Без засечки на конце
+        _tagSymbolWithStep = mvm.SelectedRebarTagTypeWithStep;
+        // С засечкой на конце
+        _tagSymbolWithSerif = mvm.SelectedRebarTagTypeWithSerif;
     }
 
     internal MainViewModel ViewModel { get; set; }
@@ -52,65 +53,50 @@ internal class TransViewRebarMarkService {
     /// </summary>
     internal void TryCreateBarMarks() {
         try {
+            // Марка по вертикальным стержням
             var simpleRebars = ViewModel.RebarFinder.GetSimpleRebars(ViewOfPylon.ViewElement, SheetInfo.ProjectSection,
-                                                         _formNumberForVerticalRebarMin,
-                                                         _formNumberForVerticalRebarMax);
+                                                                     _formNumberForVerticalRebarMin,
+                                                                     _formNumberForVerticalRebarMax,
+                                                                     _formNumberForCBarMin, _formNumberForCBarMin);
             // Если у нас есть Г-образные стержни или стержни разной длины, то нужно ставить две разные марки
             // Если нет - то допускается поставить одну марку, которая будет характеризовать все стрежни (они одинаковые)
             if(SheetInfo.RebarInfo.FirstLRebarParamValue
                 || SheetInfo.RebarInfo.SecondLRebarParamValue
                 || SheetInfo.RebarInfo.DifferentRebarParamValue) {
-                // ЛЕВЫЙ НИЖНИЙ УГОЛ
-                CreateLeftBottomMark(simpleRebars, true);
+                // ПРАВЫЙ НИЖНИЙ УГОЛ
+                CreateRightBottomMark(simpleRebars, true);
 
                 // ЛЕВЫЙ ВЕРХНИЙ УГОЛ
                 CreateLeftTopMark(simpleRebars);
             } else {
-                // ЛЕВЫЙ НИЖНИЙ УГОЛ
-                CreateLeftBottomMark(simpleRebars, false);
+                // ПРАВЫЙ НИЖНИЙ УГОЛ
+                CreateRightBottomMark(simpleRebars, false);
             }
-            // ПРАВЫЙ НИЖНИЙ УГОЛ
-            CreateRightBottomMark(simpleRebars);
+            // Марка по хомутам
+            var simpleClamps = ViewModel.RebarFinder.GetSimpleRebars(ViewOfPylon.ViewElement, SheetInfo.ProjectSection,
+                                                                     _formNumberForClampsMin, _formNumberForClampsMax);
+            if(simpleClamps != null) {
+                CreateLeftBottomMark(simpleClamps, simpleRebars);
+                CreateRightTopMark(simpleClamps, simpleRebars);
+            }
+            // Марка по шпилькам
+            var simpleCBars = ViewModel.RebarFinder.GetSimpleRebars(ViewOfPylon.ViewElement, SheetInfo.ProjectSection,
+                                                                    _formNumberForCBarMin);
+            if(simpleCBars != null) {
+                CreateLeftMark(simpleCBars, simpleRebars);
+            }
         } catch(Exception) { }
     }
 
-    internal void TryCreatePlateMarks() {
-        try {
-            var simplePlates = ViewModel.RebarFinder.GetSimpleRebars(ViewOfPylon.ViewElement, SheetInfo.ProjectSection,
-                                                                     _formNumberForSkeletonPlatesMin,
-                                                                     _formNumberForSkeletonPlatesMax);
-            if(simplePlates.Count == 0) {
-                return;
-            }
-            CreateTopMark(simplePlates);
-            CreateBottomMark(simplePlates);
-            CreateLeftMark(simplePlates);
-            CreateRightMark(simplePlates);
-        } catch(Exception) { }
-    }
-
-    private void CreateLeftBottomMark(List<Element> simpleRebars, bool hasLRebar) {
-        // Получаем референс-элемент
-        var leftBottomElement = _viewPointsAnalyzer.GetElementByDirection(simpleRebars, DirectionType.LeftBottom, false);
-
-        // Устанавливаем значение комментария у арматуры, к которой привяжем марку
-        string commentValue = hasLRebar ? $"{simpleRebars.Count / 2} шт." : $"{simpleRebars.Count} шт.";
-        leftBottomElement.SetParamValue(_commentParamName, commentValue);
-
-        // Получаем точку в которую нужно поставить аннотацию
-        var pylonPoint = _viewPointsAnalyzer.GetPylonPointByDirection(SheetInfo, DirectionType.LeftBottom);
-        var pointLeftBottom = _viewPointsAnalyzer.GetPointByDirection(pylonPoint, DirectionType.LeftBottom, 0.7, 0.25);
-        
-        // Создаем марку арматуры
-        _annotationService.CreateRebarTag(pointLeftBottom, _tagSymbolWithComment, leftBottomElement);
-    }
-
+    /// <summary>
+    /// Создание марки по вертикальному армированию слева сверху
+    /// </summary>
     private void CreateLeftTopMark(List<Element> simpleRebars) {
         // Получаем референс-элемент
         var leftTopElement = _viewPointsAnalyzer.GetElementByDirection(simpleRebars, DirectionType.LeftTop, false);
 
         // Устанавливаем значение комментария у арматуры, к которой привяжем марку
-        leftTopElement.SetParamValue(_commentParamName, $"{simpleRebars.Count / 2} шт.");
+        leftTopElement.SetParamValue(BuiltInParameter.ALL_MODEL_INSTANCE_COMMENTS, $"{simpleRebars.Count / 2} шт.");
 
         // Получаем точку в которую нужно поставить аннотацию
         var pylonPoint = _viewPointsAnalyzer.GetPylonPointByDirection(SheetInfo, DirectionType.LeftTop);
@@ -120,85 +106,92 @@ internal class TransViewRebarMarkService {
         _annotationService.CreateRebarTag(pointLeftTop, _tagSymbolWithComment, leftTopElement);
     }
 
-    private void CreateRightBottomMark(List<Element> simpleRebars) {
+    /// <summary>
+    /// Создание марки по вертикальному армированию справа снизу
+    /// </summary>
+    private void CreateRightBottomMark(List<Element> simpleRebars, bool hasLRebar) {
         // Получаем референс-элемент
-        var rightBottomElement = _viewPointsAnalyzer.GetElementByDirection(simpleRebars, DirectionType.RightBottom, 
-                                                                           false);
+        var rightBottomElement = _viewPointsAnalyzer.GetElementByDirection(simpleRebars, DirectionType.RightBottom, false);
+
+        // Устанавливаем значение комментария у арматуры, к которой привяжем марку
+        string commentValue = hasLRebar ? $"{simpleRebars.Count / 2} шт." : $"{simpleRebars.Count} шт.";
+        rightBottomElement.SetParamValue(BuiltInParameter.ALL_MODEL_INSTANCE_COMMENTS, commentValue);
+
         // Получаем точку в которую нужно поставить аннотацию
         var pylonPoint = _viewPointsAnalyzer.GetPylonPointByDirection(SheetInfo, DirectionType.RightBottom);
-        var pointForTag = _viewPointsAnalyzer.GetPointByDirection(pylonPoint, DirectionType.RightBottom, 1.5, 0.4);
-        var pointForLeader = _viewPointsAnalyzer.GetPointByDirection(pylonPoint, DirectionType.LeftTop, 0.13, 0.13);
-
-        // Создаем типовую аннотацию для обозначения ГОСТа
-        _annotationService.CreateUniversalTag(pointForTag, _gostTagSymbol, rightBottomElement, 
-                                              UnitUtilsHelper.ConvertToInternalValue(40), _weldingGostText,
-                                              leaderPoint: pointForLeader);
-    }
-
-    private void CreateTopMark(List<Element> simplePlates) {
-
-        // Получаем референс-элемент
-        var topPlate = _viewPointsAnalyzer.GetElementByDirection(simplePlates, DirectionType.Top, true);
-
-        // Получаем точку в которую нужно поставить аннотацию
-        var pointTopPlateLeader = _viewPointsAnalyzer.GetPointByDirection(topPlate, DirectionType.Right, 0.2, 0, true);
-        var pointTopPlate = _viewPointsAnalyzer.GetPointByDirection(topPlate, DirectionType.LeftBottom, 0.5, 0.4, true);
+        var pointRightBottom = _viewPointsAnalyzer.GetPointByDirection(pylonPoint, DirectionType.RightBottom, 0.7, 0.25);
 
         // Создаем марку арматуры
-        var topPlateTag = _annotationService.CreateRebarTag(pointTopPlate, _tagSymbolWithComment, topPlate);
-        topPlateTag.LeaderEndCondition = LeaderEndCondition.Free;
+        _annotationService.CreateRebarTag(pointRightBottom, _tagSymbolWithComment, rightBottomElement);
+    }
+
+    /// <summary>
+    /// Создание марки по хомутам слева сверху
+    /// </summary>
+    private void CreateLeftBottomMark(List<Element> simpleClamps, List<Element> simpleRebars) {
+        // Получаем референс-элемент
+        var leftClamp = _viewPointsAnalyzer.GetElementByDirection(simpleClamps, DirectionType.Left, false);
+
+        // Получаем точку в которую нужно поставить аннотацию
+        var pylonPoint = _viewPointsAnalyzer.GetPylonPointByDirection(SheetInfo, DirectionType.LeftBottom);
+        var pointLeftBottom = _viewPointsAnalyzer.GetPointByDirection(pylonPoint, DirectionType.LeftBottom, 0.7, 0.25);
+        // Создаем марку арматуры
+        var leftBottomTag = _annotationService.CreateRebarTag(pointLeftBottom, _tagSymbolWithStep, leftClamp);
+
 #if REVIT_2022_OR_GREATER
-        topPlateTag.SetLeaderEnd(new Reference(topPlate), pointTopPlateLeader);
+        leftBottomTag.LeaderEndCondition = LeaderEndCondition.Free;
+        var leftBottomClampRef = new Reference(leftClamp);
+
+        var tagLeaderEnd = leftBottomTag.GetLeaderEnd(leftBottomClampRef);
+        tagLeaderEnd = _viewPointsAnalyzer.GetPointByDirection(tagLeaderEnd, DirectionType.Bottom, 0, 0.3);
+        leftBottomTag.SetLeaderEnd(leftBottomClampRef, tagLeaderEnd);
 #endif
     }
 
-    private void CreateBottomMark(List<Element> simplePlates) {
+    /// <summary>
+    /// Создание марки по хомутам справа сверху
+    /// </summary>
+    private void CreateRightTopMark(List<Element> simpleClamps, List<Element> simpleRebars) {
         // Получаем референс-элемент
-        var bottomPlate = _viewPointsAnalyzer.GetElementByDirection(simplePlates, DirectionType.Bottom, true);
+        var rightClamp = _viewPointsAnalyzer.GetElementByDirection(simpleClamps, DirectionType.Right, true);
 
         // Получаем точку в которую нужно поставить аннотацию
-        var pointBottomPlateLeader = _viewPointsAnalyzer.GetPointByDirection(bottomPlate, DirectionType.Left, 
-                                                                             0.3, 0, true);
-        var pointBottomPlate = _viewPointsAnalyzer.GetPointByDirection(bottomPlate, DirectionType.RightTop, 
-                                                                       0.35, 0.3, true);
+        var pylonPoint = _viewPointsAnalyzer.GetPylonPointByDirection(SheetInfo, DirectionType.RightTop);
+        var pointRightTop = _viewPointsAnalyzer.GetPointByDirection(pylonPoint, DirectionType.RightTop, 0.8, 0.4);
         // Создаем марку арматуры
-        var bottomPlateTag = _annotationService.CreateRebarTag(pointBottomPlate, _tagSymbolWithComment, bottomPlate);
-        bottomPlateTag.LeaderEndCondition = LeaderEndCondition.Free;
+        var rightTopTag = _annotationService.CreateRebarTag(pointRightTop, _tagSymbolWithStep, rightClamp);
+
 #if REVIT_2022_OR_GREATER
-        bottomPlateTag.SetLeaderEnd(new Reference(bottomPlate), pointBottomPlateLeader);
+        rightTopTag.LeaderEndCondition = LeaderEndCondition.Free;
+        var rightTopClampRef = new Reference(rightClamp);
+
+        var tagLeaderEnd = rightTopTag.GetLeaderEnd(rightTopClampRef);
+        tagLeaderEnd = _viewPointsAnalyzer.GetPointByDirection(tagLeaderEnd, DirectionType.Top, 0, 0.2);
+        rightTopTag.SetLeaderEnd(rightTopClampRef, tagLeaderEnd);
 #endif
     }
 
-    private void CreateLeftMark(List<Element> simplePlates) {
+    /// <summary>
+    /// Создание марки по шпилькам
+    /// </summary>
+    private void CreateLeftMark(List<Element> simpleCBars, List<Element> simpleRebars) {
         // Получаем референс-элемент
-        var leftPlate = _viewPointsAnalyzer.GetElementByDirection(simplePlates, DirectionType.Left, true);
+        var leftCBar = _viewPointsAnalyzer.GetElementByDirection(simpleCBars, DirectionType.Left, true);
 
         // Получаем точку в которую нужно поставить аннотацию
-        var pointLeftPlateLeader = _viewPointsAnalyzer.GetPointByDirection(leftPlate, DirectionType.Bottom, 
-                                                                           0.4, 0, true);
-        var pointLeftPlate = _viewPointsAnalyzer.GetPointByDirection(leftPlate, DirectionType.LeftBottom, 
-                                                                     0.8, 0.3, true);
-        // Создаем марку арматуры
-        var leftPlateTag = _annotationService.CreateRebarTag(pointLeftPlate, _tagSymbolWithComment, leftPlate);
-        leftPlateTag.LeaderEndCondition = LeaderEndCondition.Free;
-#if REVIT_2022_OR_GREATER
-        leftPlateTag.SetLeaderEnd(new Reference(leftPlate), pointLeftPlateLeader);
-#endif
-    }
-
-    private void CreateRightMark(List<Element> simplePlates) {
-        // Получаем референс-элемент
-        var rightPlate = _viewPointsAnalyzer.GetElementByDirection(simplePlates, DirectionType.Right, true);
-
-        // Получаем точку в которую нужно поставить аннотацию
-        var pointRightPlateLeader = _viewPointsAnalyzer.GetPointByDirection(rightPlate, DirectionType.Top, 0.4, 0, true);
-        var pointRightPlate = _viewPointsAnalyzer.GetPointByDirection(rightPlate, DirectionType.RightTop, 0.8, 0.6, true);
+        var pointLeft = _viewPointsAnalyzer.GetPointByDirection(leftCBar, DirectionType.LeftBottom, 1.5, 0.1, true);
 
         // Создаем марку арматуры
-        var rightPlateTag = _annotationService.CreateRebarTag(pointRightPlate, _tagSymbolWithComment, rightPlate);
-        rightPlateTag.LeaderEndCondition = LeaderEndCondition.Free;
+        var leftTag = _annotationService.CreateRebarTag(pointLeft, _tagSymbolWithSerif, simpleCBars);
+        leftTag.LeaderEndCondition = LeaderEndCondition.Free;
+
 #if REVIT_2022_OR_GREATER
-        rightPlateTag.SetLeaderEnd(new Reference(rightPlate), pointRightPlateLeader);
+        foreach(var simpleCBar in simpleCBars) {
+            var simpleCBarRef = new Reference(simpleCBar);
+            var tagLeaderEndPoint = _viewPointsAnalyzer.GetPointByDirection(simpleCBar, DirectionType.LeftBottom,
+                                                                            0, 0.1, true);
+            leftTag.SetLeaderEnd(simpleCBarRef, tagLeaderEndPoint);
+        }
 #endif
     }
 }
