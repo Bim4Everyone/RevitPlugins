@@ -9,7 +9,6 @@
     <system:String x:Key="MainWindow.RoomDepartments">Room Departments:</system:String>
     <system:String x:Key="MainWindow.RoomLevels">Room Levels:</system:String>
 
-
     <system:String x:Key="MainWindow.CheckAll">Select all</system:String>
     <system:String x:Key="MainWindow.UnCheckAll">Unselect all</system:String>
     <system:String x:Key="MainWindow.InvertAll">Invert</system:String>
@@ -24,6 +23,11 @@
 
     <system:String x:Key="ErrorsWindow.Title">Calculate finishing</system:String>
 
+    <system:String x:Key="ErrorsWindow.Walls">Walls</system:String>
+    <system:String x:Key="ErrorsWindow.Floors">Floors</system:String>
+    <system:String x:Key="ErrorsWindow.Baseboards">Baseboards</system:String>
+    <system:String x:Key="ErrorsWindow.Ceilings">Ceilings</system:String>
+
     <system:String x:Key="ErrorsWindow.ErrorTypeColumn">Type</system:String>
     <system:String x:Key="ErrorsWindow.ErrorDescriptionColumn">Description</system:String>
     <system:String x:Key="ErrorsWindow.IdColumn">Id</system:String>
@@ -34,6 +38,7 @@
 
     <system:String x:Key="ErrorsWindow.WithoutValue">&lt;No value&gt;</system:String>
     <system:String x:Key="ErrorsWindow.WithoutLevel">&lt;No level&gt;</system:String>
+    <system:String x:Key="ErrorsWindow.WithoutId">&lt;No Id&gt;</system:String>
 
     <system:String x:Key="ErrorsWindow.ListErrorType">Error</system:String>
     <system:String x:Key="ErrorsWindow.ListWarningType">Warning</system:String>
@@ -51,8 +56,10 @@
     <system:String x:Key="ErrorsWindow.ErrorInfoTitle">Calculation not completed!</system:String>
     <system:String x:Key="ErrorsWindow.ErrorInfo">Check these errors:</system:String>
     <system:String x:Key="ErrorsWindow.WarningInfoTitle">Calculation completed!</system:String>
-    <system:String x:Key="ErrorsWindow.WarningInfo">But you have to check these warnings:</system:String>
+    <system:String x:Key="ErrorsWindow.WarningInfo">
+        But you have to check these warnings:
+    </system:String>
     <system:String x:Key="ErrorsWindow.UnusedFinishingTypes">
-        For finishing types some finishing materials were founded
+        For finishing styles some finishing types were not founded
     </system:String>
 </ResourceDictionary>
