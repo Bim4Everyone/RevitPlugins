@@ -65,7 +65,6 @@
         <Compile Include="..\dosymep\RelayCommand.T.cs" Link="dosymep\BaseCommands\RelayCommand.T.cs"/>
         <Compile Include="..\dosymep\AsyncRelayCommand.cs" Link="dosymep\BaseCommands\AsyncRelayCommand.cs"/>
         <Compile Include="..\dosymep\AsyncRelayCommand.T.cs" Link="dosymep\BaseCommands\AsyncRelayCommand.T.cs"/>
-        <Compile Include="..\dosymep\RevitViewTypeConverter.cs" Link="dosymep\Converters\RevitViewTypeConverter.cs"/>
     </ItemGroup>
 
     <ItemGroup Condition="$(RevitVersion) != ''">
