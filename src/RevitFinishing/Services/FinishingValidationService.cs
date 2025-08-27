@@ -20,46 +20,46 @@ internal class FinishingValidationService {
         _localizationService = localizationService;
     }
 
-    public IList<NoticeElementViewModel> CheckPhaseContainsFinishing(FinishingInProject finishings, 
+    public IList<WarningElementViewModel> CheckPhaseContainsFinishing(FinishingInProject finishings, 
                                                                      Phase phase) {
         return !finishings.AllFinishing.Any()
-            ? [ new NoticeElementViewModel(phase, phase.Name, _localizationService) ]
+            ? [ new WarningElementViewModel(phase, phase.Name, _localizationService) ]
             : [];
     }
 
-    public IList<NoticeElementViewModel> CheckFinishingByRoomBounding(FinishingInProject finishings, 
+    public IList<WarningElementViewModel> CheckFinishingByRoomBounding(FinishingInProject finishings, 
                                                                       Phase phase) {
         return finishings
             .AllFinishing
             .Where(x => x.RevitElement.GetParamValueOrDefault(BuiltInParameter.WALL_ATTR_ROOM_BOUNDING, 0) == 1)
-            .Select(x => new NoticeElementViewModel(x.RevitElement, phase.Name, _localizationService))
+            .Select(x => new WarningElementViewModel(x.RevitElement, phase.Name, _localizationService))
             .ToList();
     }
 
-    public IList<NoticeElementViewModel> CheckRoomsByKeyParameter(IEnumerable<Element> rooms,
+    public IList<WarningElementViewModel> CheckRoomsByKeyParameter(IEnumerable<Element> rooms,
                                                                   ProjectParam projectParam, 
                                                                   Phase phase) {
         return rooms
             .Where(x => !x.IsExistsParamValue(projectParam))
-            .Select(x => new NoticeElementViewModel(x, phase.Name, _localizationService))
+            .Select(x => new WarningElementViewModel(x, phase.Name, _localizationService))
             .ToList();
     }
 
-    public IList<NoticeElementViewModel> CheckRoomsByParameter(IEnumerable<Element> rooms,
+    public IList<WarningElementViewModel> CheckRoomsByParameter(IEnumerable<Element> rooms,
                                                                SystemParam systemParam, 
                                                                Phase phase) {
         return rooms
             .Where(x => !x.IsExistsParamValue(systemParam))
-            .Select(x => new NoticeElementViewModel(x, phase.Name, _localizationService))
+            .Select(x => new WarningElementViewModel(x, phase.Name, _localizationService))
             .ToList();
     }
 
-    public IList<NoticeElementViewModel> CheckFinishingByRoom(IEnumerable<FinishingElement> finishings, 
+    public IList<WarningElementViewModel> CheckFinishingByRoom(IEnumerable<FinishingElement> finishings, 
                                                               Phase phase) {
         return finishings
             .Where(x => !x.CheckFinishingTypes())
             .Select(x => x.RevitElement)
-            .Select(x => new NoticeElementViewModel(x, phase.Name, _localizationService))
+            .Select(x => new WarningElementViewModel(x, phase.Name, _localizationService))
             .ToList();
     }
 }

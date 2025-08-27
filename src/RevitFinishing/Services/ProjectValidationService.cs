@@ -92,7 +92,7 @@ internal class ProjectValidationService {
             Description = _localizationService.GetLocalizedString("ErrorsWindow.CustomFamilies"),
             ErrorElements = [.. finishingElements
                 .Where(x => x.IsCustomFamily)
-                .Select(x => new NoticeElementViewModel(x.RevitElement, phase.Name, _localizationService))]
+                .Select(x => new WarningElementViewModel(x.RevitElement, phase.Name, _localizationService))]
         };
     }
 
@@ -108,20 +108,28 @@ internal class ProjectValidationService {
         foreach(var keyFinishingType in keys) {
             if(roomsByFinishingType.TryGetValue(keyFinishingType.Name, out FinishingType finishingType)) {
                 if(finishingType.WallTypesNumber != keyFinishingType.NumberOfWalls) {
+                    string categoryName = _localizationService.GetLocalizedString("ErrorsWindow.Walls");
                     warningList.ErrorElements.Add(
-                        new NoticeElementViewModel(keyFinishingType.Element, phase.Name, _localizationService));                
+                        new WarningScheduleKeyVM(
+                            keyFinishingType.Element, phase.Name, categoryName, _localizationService));                
                 }
                 if(finishingType.FloorTypesNumber != keyFinishingType.NumberOfFloors) {
+                    string categoryName = _localizationService.GetLocalizedString("ErrorsWindow.Floors");
                     warningList.ErrorElements.Add(
-                        new NoticeElementViewModel(keyFinishingType.Element, phase.Name, _localizationService));
+                        new WarningScheduleKeyVM(
+                            keyFinishingType.Element, phase.Name, categoryName, _localizationService));
                 }
                 if(finishingType.BaseboardTypesNumber != keyFinishingType.NumberOfBaseboards) {
+                    string categoryName = _localizationService.GetLocalizedString("ErrorsWindow.Baseboards");
                     warningList.ErrorElements.Add(
-                        new NoticeElementViewModel(keyFinishingType.Element, phase.Name, _localizationService));
+                        new WarningScheduleKeyVM(
+                            keyFinishingType.Element, phase.Name, categoryName, _localizationService));
                 }
                 if(finishingType.CeilingTypesNumber != keyFinishingType.NumberOfCeilings) {
+                    string categoryName = _localizationService.GetLocalizedString("ErrorsWindow.Ceilings");
                     warningList.ErrorElements.Add(
-                        new NoticeElementViewModel(keyFinishingType.Element, phase.Name, _localizationService));
+                        new WarningScheduleKeyVM(
+                            keyFinishingType.Element, phase.Name, categoryName, _localizationService));
                 }
             }
         }

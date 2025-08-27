@@ -21,7 +21,7 @@
     MinHeight="700"
     MinWidth="1200"
     
-    d:DataContext="{d:DesignInstance vms:NoticeElementViewModel, IsDesignTimeCreatable=False}">
+    d:DataContext="{d:DesignInstance vms:WarningElementViewModel, IsDesignTimeCreatable=False}">
 
     <core:WpfUIPlatformWindow.Resources>
         <ResourceDictionary>
@@ -123,11 +123,11 @@
                                 <GridViewColumn
                                     Header="{me:LocalizationSource ErrorsWindow.IdColumn}"
                                     Width="100"
-                                    DisplayMemberBinding="{Binding ElementId}"/>
+                                    DisplayMemberBinding="{Binding ElementIdInfo}"/>
                                 <GridViewColumn
                                     Header="{me:LocalizationSource ErrorsWindow.CategoryColumn}"
                                     Width="100"
-                                    DisplayMemberBinding="{Binding CategoryName}"/>
+                                    DisplayMemberBinding="{Binding CategoryInfo}"/>
                                 <GridViewColumn
                                     Header="{me:LocalizationSource ErrorsWindow.NameColumn}"
                                     Width="200"
