@@ -115,8 +115,7 @@ internal class RevitRepository {
     public IList<KeyFinishingType> GetKeyFinishingTypes() {
         Element schedule = new FilteredElementCollector(Document)
             .OfClass(typeof(ViewSchedule))
-            .Where(x => x.Name == KeySchedulesConfig.Instance.RoomsFinishing.ScheduleName)
-            .First();
+            .FirstOrDefault(x => x.Name == KeySchedulesConfig.Instance.RoomsFinishing.ScheduleName);
 
        return new FilteredElementCollector(Document, schedule.Id)
             .ToElements()

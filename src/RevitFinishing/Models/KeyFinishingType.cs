@@ -71,5 +71,4 @@ internal class KeyFinishingType {
     public int NumberOfFloors => _numberOfFloors;
     public int NumberOfBaseboards => _numberOfBaseboards;
     public int NumberOfCeilings => _numberOCeilings;
-
 }

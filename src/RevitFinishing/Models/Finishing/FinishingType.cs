@@ -40,7 +40,6 @@ internal class FinishingType {
     public int CeilingTypesNumber => _ceilingTypesByOrder.Count;
     public int BaseboardTypesNumber => _baseboardTypesByOrder.Count;
 
-
     public int GetWallOrder(string typeName) {
         return _wallTypesByOrder.IndexOf(typeName) + 1;
     }

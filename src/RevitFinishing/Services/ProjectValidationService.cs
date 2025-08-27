@@ -30,8 +30,8 @@ internal class ProjectValidationService {
     }
 
     public ErrorsViewModel CheckMainErrors(FinishingInProject allFinishing,
-                                            IEnumerable<Room> selectedRooms,
-                                            Phase phase) {
+                                           IEnumerable<Room> selectedRooms,
+                                           Phase phase) {
         var mainErrors = new ErrorsViewModel(_localizationService);
 
         mainErrors.AddElements(new ErrorsListViewModel(_localizationService) {
@@ -65,7 +65,8 @@ internal class ProjectValidationService {
     }
 
     public WarningsListViewModel CheckNumberParam(IEnumerable<Room> selectedRooms, Phase phase) {
-        var numberParam = SystemParamsConfig.Instance.CreateRevitParam(_document, BuiltInParameter.ROOM_NUMBER);
+        var numberParam = SystemParamsConfig.Instance
+            .CreateRevitParam(_document, BuiltInParameter.ROOM_NUMBER);
 
         return new WarningsListViewModel(_localizationService) {
             Description =
@@ -76,7 +77,8 @@ internal class ProjectValidationService {
     }
 
     public WarningsListViewModel CheckNameParam(IEnumerable<Room> selectedRooms, Phase phase) {
-        var nameParam = SystemParamsConfig.Instance.CreateRevitParam(_document, BuiltInParameter.ROOM_NUMBER);
+        var nameParam = SystemParamsConfig.Instance
+            .CreateRevitParam(_document, BuiltInParameter.ROOM_NUMBER);
 
         return new WarningsListViewModel(_localizationService) {
             Description =
@@ -87,7 +89,7 @@ internal class ProjectValidationService {
     }
 
     public WarningsListViewModel CheckCustomFamilies(IEnumerable<FinishingElement> finishingElements,
-                                                             Phase phase) {
+                                                     Phase phase) {
         return new WarningsListViewModel(_localizationService) {
             Description = _localizationService.GetLocalizedString("ErrorsWindow.CustomFamilies"),
             ErrorElements = [.. finishingElements
@@ -133,7 +135,6 @@ internal class ProjectValidationService {
                 }
             }
         }
-
 
         return warningList;
     }
