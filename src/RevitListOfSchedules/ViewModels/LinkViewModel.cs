@@ -20,7 +20,9 @@ internal class LinkViewModel : BaseViewModel {
         SetStatus();
         _statusString = GetStringStatus();
     }
+
     public ElementId Id => _linkElement.Id;
+
     public string Name => _linkElement.Name;
 
     public bool IsChecked {

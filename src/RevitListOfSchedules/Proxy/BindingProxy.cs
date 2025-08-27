@@ -1,7 +1,6 @@
 using System.Windows;
 
 namespace RevitListOfSchedules.Proxy;
-
 public class BindingProxy : Freezable {
     // Реализация Freezable (требуется для работы в XAML)
     protected override Freezable CreateInstanceCore() {

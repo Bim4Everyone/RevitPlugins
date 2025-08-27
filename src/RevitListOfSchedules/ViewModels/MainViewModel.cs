@@ -369,6 +369,7 @@ internal class MainViewModel : BaseViewModel {
         }
         t.Commit();
     }
+
     // Метод копирования эталонной спецификации в проект
     private void LoadDefaultSchedule() {
         bool isScheduleChecked = new CheckSchedule(_revitRepository.UIApplication)

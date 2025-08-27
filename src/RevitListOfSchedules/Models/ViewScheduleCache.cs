@@ -5,7 +5,6 @@ using System.Linq;
 using Autodesk.Revit.DB;
 
 namespace RevitListOfSchedules.Models;
-
 public class ViewScheduleCache {
     private readonly Document _document;
     private readonly Dictionary<string, ViewSchedule> _viewExistenceCache = new(StringComparer.OrdinalIgnoreCase);

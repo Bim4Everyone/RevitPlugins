@@ -11,11 +11,9 @@ namespace RevitListOfSchedules.Models;
 internal class TempFamilyDocument {
     private const string _extension = ".rfa";
     private const int _diameterArc = 5; // Диаметр окружности для семейства. Выбрано 5 чтобы его было видно на виде.
-
     private readonly ILocalizationService _localizationService;
     private readonly RevitRepository _revitRepository;
     private readonly FamilyLoadOptions _familyLoadOptions;
-
     private readonly string _familyTemplatePath;
     private readonly string _familyPath;
     private readonly string _tempDirectory = Path.GetTempPath();

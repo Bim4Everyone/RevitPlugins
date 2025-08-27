@@ -16,7 +16,6 @@ internal class InstancesAssembly {
     private readonly ViewDrafting _viewDrafting;
     private readonly FamilySymbol _familySymbol;
 
-
     public InstancesAssembly(
         ILocalizationService localizationService,
         RevitRepository revitRepository,
@@ -53,7 +52,6 @@ internal class InstancesAssembly {
         familyInstance.SetParamValue(ParamFactory.ListOfSchedulesGroup, $"{ParamFactory.DefaultScheduleName}_{_albumName}");
     }
 
-    // Метод удаления экземпляров семейства с вида
     private void DeleteFamilyInstances(View view) {
         var instances = new FilteredElementCollector(_revitRepository.Document, view.Id)
             .OfType<FamilyInstance>()
