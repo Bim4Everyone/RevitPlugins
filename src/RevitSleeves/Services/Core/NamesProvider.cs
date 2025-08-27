@@ -1,11 +1,13 @@
 using System.Collections.Generic;
 
+using dosymep.Bim4Everyone.SharedParams;
+
 namespace RevitSleeves.Services.Core;
 /// <summary>
-/// Класс для хранения строковых констант
+/// Класс для хранения констант
 /// </summary>
 internal static class NamesProvider {
-    public const string FamilyNameSleeve = "ТрСд_Авт_Гильза";
+    public const string FamilyNameSleeve = "АрмТр_Авт_Гильза";
     public const string SleeveSymbolName = FamilyNameSleeve;
 
     public const string FamilyNameOpeningArRectangleInFloor = "Окн_Отв_Прямоуг_Перекрытие";
@@ -42,6 +44,11 @@ internal static class NamesProvider {
 
     public const string BIM = "BIM";
 
+
+    public static readonly SharedParam ParameterSleeveSystem = SharedParamsConfig.Instance.VISSystemNameForced;
+    public static readonly SharedParam ParameterSleeveEconomic = SharedParamsConfig.Instance.VISHvacSystemForcedFunction;
+    public const string ParameterSleeveThickness = "ФОП_ВИС_Толщина стенки";
+    public const string ParameterSleeveDescription = "ФОП_Описание";
 
     public static readonly IReadOnlyCollection<string> FamilyNamesAllOpenings = [
         FamilyNameOpeningArRectangleInFloor,

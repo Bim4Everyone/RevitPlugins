@@ -36,10 +36,10 @@ using RevitSleeves.Services.Placing.ParamsSetterFinder;
 using RevitSleeves.Services.Placing.PlacingOptsProvider;
 using RevitSleeves.Services.Placing.PointFinder;
 using RevitSleeves.Services.Placing.RotationFinder;
+using RevitSleeves.ViewModels.Core;
 using RevitSleeves.ViewModels.Filtration;
-using RevitSleeves.ViewModels.Placing;
+using RevitSleeves.Views.Core;
 using RevitSleeves.Views.Filtration;
-using RevitSleeves.Views.Placing;
 
 namespace RevitSleeves;
 [Transaction(TransactionMode.Manual)]
@@ -86,6 +86,8 @@ internal class PlaceAllSleevesCommand : BasePluginCommand {
     }
 
     private void Run(IKernel kernel) {
+        kernel.Get<IDocumentChecker>().CheckDocument();
+
         var repo = kernel.Get<RevitRepository>();
         var oldSleeves = repo.GetSleeves();
 
@@ -96,8 +98,8 @@ internal class PlaceAllSleevesCommand : BasePluginCommand {
         MergeSleeves(kernel, cleanedSleeves);
 
         if(kernel.Get<SleevePlacementSettingsConfig>().ShowPlacingErrors
-            && kernel.Get<IPlacingErrorsService>().ContainsErrors()) {
-            kernel.Get<PlacingErrorsWindow>().Show();
+            && kernel.Get<IErrorsService>().ContainsErrors()) {
+            kernel.Get<ErrorsWindow>().Show();
         }
     }
 
@@ -197,7 +199,7 @@ internal class PlaceAllSleevesCommand : BasePluginCommand {
     }
 
     private void BindWindows(IKernel kernel) {
-        kernel.BindOtherWindow<PlacingErrorsViewModel, PlacingErrorsWindow>();
+        kernel.BindOtherWindow<ErrorsViewModel, ErrorsWindow>();
     }
 
     private void BindCoreServices(IKernel kernel) {
@@ -213,8 +215,8 @@ internal class PlaceAllSleevesCommand : BasePluginCommand {
         kernel.Bind<ISleeveMergeService>()
             .To<SleeveMergeService>()
             .InSingletonScope();
-        kernel.Bind<IPlacingErrorsService>()
-            .To<PlacingErrorsService>()
+        kernel.Bind<IErrorsService>()
+            .To<ErrorsService>()
             .InSingletonScope();
         kernel.Bind<IOpeningGeometryProvider>()
             .To<OpeningGeometryProvider>()
@@ -224,6 +226,9 @@ internal class PlaceAllSleevesCommand : BasePluginCommand {
             .InSingletonScope();
         kernel.Bind<IView3DProvider>()
             .To<SleeveView3dProvider>()
+            .InSingletonScope();
+        kernel.Bind<IDocumentChecker>()
+            .To<DocumentChecker>()
             .InSingletonScope();
     }
 
@@ -238,14 +243,8 @@ internal class PlaceAllSleevesCommand : BasePluginCommand {
     }
 
     private void BindFamilySymbolFinders(IKernel kernel) {
-        kernel.Bind<IFamilySymbolFinder<SleeveMergeModel>>()
-            .To<MergeModelFamilySymbolFinder>()
-            .InSingletonScope();
-        kernel.Bind<IFamilySymbolFinder<ClashModel<Pipe, Floor>>>()
-            .To<PipeFloorFamilySymbolFinder>()
-            .InSingletonScope();
-        kernel.Bind<IFamilySymbolFinder<ClashModel<Pipe, Wall>>>()
-            .To<PipeWallFamilySymbolFinder>()
+        kernel.Bind<IFamilySymbolFinder>()
+            .To<FamilySymbolFinder>()
             .InSingletonScope();
     }
 

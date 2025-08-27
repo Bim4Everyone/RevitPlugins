@@ -12,7 +12,7 @@ using RevitSleeves.Services.Placing.RotationFinder;
 namespace RevitSleeves.Services.Placing.PlacingOptsProvider;
 internal class MergeModelPlacingOptsProvider : PlacingOptsProvider<SleeveMergeModel> {
     public MergeModelPlacingOptsProvider(
-        IFamilySymbolFinder<SleeveMergeModel> symbolFinder,
+        IFamilySymbolFinder symbolFinder,
         ILevelFinder<SleeveMergeModel> levelFinder,
         IPointFinder<SleeveMergeModel> pointFinder,
         IRotationFinder<SleeveMergeModel> rotationFinder,

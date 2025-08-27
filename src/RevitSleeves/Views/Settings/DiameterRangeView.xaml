@@ -28,6 +28,7 @@
             Content="{Binding From}" />
         <ui:TextBox
             Width="50"
+            ToolTip="{Binding ToolTipStartPipeDiameter}"
             Text="{Binding StartMepSize, UpdateSourceTrigger=PropertyChanged}"
             Style="{StaticResource CustomSmallTextBox}" />
         <Label
@@ -35,12 +36,31 @@
             Content="{Binding To}" />
         <ui:TextBox
             Width="50"
+            ToolTip="{Binding ToolTipEndPipeDiameter}"
             Text="{Binding EndMepSize, UpdateSourceTrigger=PropertyChanged}"
             Style="{StaticResource CustomSmallTextBox}" />
-        <ui:TextBox
+        <Label
             Margin="14 0 0 0"
+            Style="{StaticResource CustomLabel}"
+            Content="ø" />
+        <ui:TextBox
+            Margin="2 0 0 0"
             Width="50"
+            ToolTip="{Binding ToolTipSleeveDiameter}"
             Text="{Binding SleeveDiameter, UpdateSourceTrigger=PropertyChanged}"
+            Style="{StaticResource CustomSmallTextBox}" />
+        <Label
+            Style="{StaticResource CustomLabel}"
+            Content="{Binding UnitName}" />
+        <Label
+            Margin="14 0 0 0"
+            Style="{StaticResource CustomLabel}"
+            Content="{ui:SymbolIcon Symbol=ArrowMinimizeVertical20}" />
+        <ui:TextBox
+            Margin="2 0 0 0"
+            Width="50"
+            ToolTip="{Binding ToolTipSleeveThickness}"
+            Text="{Binding SleeveThickness, UpdateSourceTrigger=PropertyChanged}"
             Style="{StaticResource CustomSmallTextBox}" />
         <Label
             Style="{StaticResource CustomLabel}"

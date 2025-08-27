@@ -7,15 +7,16 @@ using Autodesk.Revit.DB;
 using RevitSleeves.Exceptions;
 using RevitSleeves.Models;
 using RevitSleeves.Models.Placing;
+using RevitSleeves.Services.Core;
 
 namespace RevitSleeves.Services.Placing;
 internal class SleevePlacerService : ISleevePlacerService {
     private readonly RevitRepository _revitRepository;
-    private readonly IPlacingErrorsService _errorsService;
+    private readonly IErrorsService _errorsService;
 
     public SleevePlacerService(
         RevitRepository revitRepository,
-        IPlacingErrorsService errorsService) {
+        IErrorsService errorsService) {
 
         _revitRepository = revitRepository ?? throw new ArgumentNullException(nameof(revitRepository));
         _errorsService = errorsService ?? throw new ArgumentNullException(nameof(errorsService));

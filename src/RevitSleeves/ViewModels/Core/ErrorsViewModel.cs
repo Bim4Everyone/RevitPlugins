@@ -11,16 +11,16 @@ using dosymep.WPF.ViewModels;
 using RevitClashDetective.Models.Clashes;
 
 using RevitSleeves.Models;
-using RevitSleeves.Services.Placing;
+using RevitSleeves.Services.Core;
 
-namespace RevitSleeves.ViewModels.Placing;
-internal class PlacingErrorsViewModel : BaseViewModel {
+namespace RevitSleeves.ViewModels.Core;
+internal class ErrorsViewModel : BaseViewModel {
     private readonly RevitRepository _revitRepository;
-    private readonly IPlacingErrorsService _placingErrorsService;
+    private readonly IErrorsService _placingErrorsService;
 
-    public PlacingErrorsViewModel(
+    public ErrorsViewModel(
         RevitRepository revitRepository,
-        IPlacingErrorsService placingErrorsService) {
+        IErrorsService placingErrorsService) {
         _revitRepository = revitRepository ?? throw new ArgumentNullException(nameof(revitRepository));
         _placingErrorsService = placingErrorsService ?? throw new ArgumentNullException(nameof(placingErrorsService));
 

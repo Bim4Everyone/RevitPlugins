@@ -8,18 +8,19 @@ using Autodesk.Revit.DB;
 using RevitSleeves.Exceptions;
 using RevitSleeves.Models;
 using RevitSleeves.Models.Placing;
+using RevitSleeves.Services.Core;
 using RevitSleeves.Services.Placing.PlacingOptsProvider;
 
 namespace RevitSleeves.Services.Placing;
 internal class SleeveMergeService : ISleeveMergeService {
     private readonly RevitRepository _revitRepository;
     private readonly IPlacingOptsProvider<SleeveMergeModel> _optsProvider;
-    private readonly IPlacingErrorsService _errorsService;
+    private readonly IErrorsService _errorsService;
 
     public SleeveMergeService(
         RevitRepository revitRepository,
         IPlacingOptsProvider<SleeveMergeModel> optsProvider,
-        IPlacingErrorsService errorsService) {
+        IErrorsService errorsService) {
 
         _revitRepository = revitRepository ?? throw new ArgumentNullException(nameof(revitRepository));
         _optsProvider = optsProvider ?? throw new ArgumentNullException(nameof(optsProvider));

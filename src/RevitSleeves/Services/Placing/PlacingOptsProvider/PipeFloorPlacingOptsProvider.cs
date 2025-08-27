@@ -11,7 +11,7 @@ using RevitSleeves.Services.Placing.RotationFinder;
 namespace RevitSleeves.Services.Placing.PlacingOptsProvider;
 internal class PipeFloorPlacingOptsProvider : PlacingOptsProvider<ClashModel<Pipe, Floor>> {
     public PipeFloorPlacingOptsProvider(
-        IFamilySymbolFinder<ClashModel<Pipe, Floor>> symbolFinder,
+        IFamilySymbolFinder symbolFinder,
         ILevelFinder<ClashModel<Pipe, Floor>> levelFinder,
         IPointFinder<ClashModel<Pipe, Floor>> pointFinder,
         IRotationFinder<ClashModel<Pipe, Floor>> rotationFinder,

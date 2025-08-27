@@ -11,4 +11,6 @@ internal class DiameterRange {
     public double EndMepSize { get; set; }
 
     public double SleeveDiameter { get; set; }
+
+    public double SleeveThickness { get; set; }
 }

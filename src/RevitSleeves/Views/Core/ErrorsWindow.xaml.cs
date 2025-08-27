@@ -1,8 +1,8 @@
 using dosymep.SimpleServices;
 
-namespace RevitSleeves.Views.Placing;
-public partial class PlacingErrorsWindow {
-    public PlacingErrorsWindow(
+namespace RevitSleeves.Views.Core;
+public partial class ErrorsWindow {
+    public ErrorsWindow(
         ILoggerService loggerService,
         ISerializationService serializationService,
         ILanguageService languageService, ILocalizationService localizationService,
@@ -16,5 +16,5 @@ public partial class PlacingErrorsWindow {
 
     public override string PluginName => nameof(RevitSleeves);
 
-    public override string ProjectConfigName => nameof(PlacingErrorsWindow);
+    public override string ProjectConfigName => nameof(ErrorsWindow);
 }

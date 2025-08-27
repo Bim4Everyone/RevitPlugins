@@ -1,18 +1,18 @@
 ﻿<core:WpfUIPlatformWindow
-    x:Class="RevitSleeves.Views.Placing.PlacingErrorsWindow"
+    x:Class="RevitSleeves.Views.Core.ErrorsWindow"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-    xmlns:local="clr-namespace:RevitSleeves.Views.Placing"
+    xmlns:local="clr-namespace:RevitSleeves.Views.Core"
     mc:Ignorable="d"
     xmlns:core="clr-namespace:dosymep.WpfUI.Core"
     xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
     xmlns:me="clr-namespace:dosymep.WpfCore.MarkupExtensions;assembly=dosymep.WpfCore"
-    xmlns:vm="clr-namespace:RevitSleeves.ViewModels.Placing"
+    xmlns:vm="clr-namespace:RevitSleeves.ViewModels.Core"
     Height="450"
     Width="800"
-    d:DataContext="{d:DesignInstance vm:PlacingErrorsViewModel, IsDesignTimeCreatable=False}">
+    d:DataContext="{d:DesignInstance vm:ErrorsViewModel, IsDesignTimeCreatable=False}">
     <Window.Resources>
         <ResourceDictionary>
             <CollectionViewSource
