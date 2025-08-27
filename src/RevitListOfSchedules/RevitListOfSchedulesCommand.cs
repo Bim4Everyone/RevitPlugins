@@ -90,8 +90,8 @@ public class RevitListOfSchedulesCommand : BasePluginCommand {
             .GetIsChecked();
 
         if(!isParamChecked) {
-            string stringMessegeBody = localizationService.GetLocalizedString("Command.MessegeBody2");
-            string stringMessegeTitle = localizationService.GetLocalizedString("Command.MessegeTitle");
+            string stringMessegeBody = localizationService.GetLocalizedString("Common.MessageBody_2");
+            string stringMessegeTitle = localizationService.GetLocalizedString("Common.MessageTitle");
             messageBoxService.Show(stringMessegeBody, stringMessegeTitle, MessageBoxButton.OK, MessageBoxImage.Exclamation);
             throw new OperationCanceledException();
         }

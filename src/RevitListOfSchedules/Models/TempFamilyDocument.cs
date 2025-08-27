@@ -1,5 +1,4 @@
 using System;
-using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 
@@ -8,31 +7,27 @@ using Autodesk.Revit.DB;
 using dosymep.Revit;
 using dosymep.SimpleServices;
 
-using RevitListOfSchedules.Interfaces;
-
-
 namespace RevitListOfSchedules.Models;
-internal class TempFamilyDocument : IFamilyDocument {
+internal class TempFamilyDocument {
     private const string _extension = ".rfa";
     private const int _diameterArc = 5; // Диаметр окружности для семейства. Выбрано 5 чтобы его было видно на виде.
+
     private readonly ILocalizationService _localizationService;
     private readonly RevitRepository _revitRepository;
     private readonly FamilyLoadOptions _familyLoadOptions;
+
     private readonly string _familyTemplatePath;
     private readonly string _familyPath;
     private readonly string _tempDirectory = Path.GetTempPath();
-    private readonly string _albumName;
 
     public TempFamilyDocument(
         ILocalizationService localizationService,
         RevitRepository revitRepository,
         FamilyLoadOptions familyLoadOptions,
         string albumName) {
-
         _localizationService = localizationService;
         _revitRepository = revitRepository;
         _familyLoadOptions = familyLoadOptions;
-        _albumName = albumName;
 
         string familyTemplatePath = _revitRepository.Application.FamilyTemplatePath;
 
@@ -48,31 +43,6 @@ internal class TempFamilyDocument : IFamilyDocument {
 
     public FamilySymbol FamilySymbol { get; }
 
-    public IList<FamilyInstance> PlaceFamilyInstances(
-        View view, string number, string revisionNumber, IList<ViewSchedule> viewSchedules) {
-        IList<FamilyInstance> familyInstanceList = [];
-        foreach(var schedule in viewSchedules) {
-            var table_data = schedule.GetTableData();
-            var head_data = table_data.GetSectionData(SectionType.Header);
-            string result = head_data == null
-                ? schedule.Name
-                : head_data.GetCellText(0, 0);
-            var familyInstance = CreateInstance(view, result, number, revisionNumber);
-            familyInstanceList.Add(familyInstance);
-        }
-        return familyInstanceList;
-    }
-
-    public FamilyInstance CreateInstance(View view, string name, string number, string revisionNumber) {
-        var xyz = XYZ.Zero;
-        var familyInstance = _revitRepository.Document.Create.NewFamilyInstance(xyz, FamilySymbol, view);
-
-        familyInstance.SetParamValue(ParamFactory.ListOfSchedulesSheetName, number);
-        //familyInstance.SetParamValue(ParamFactory.FamilyParamName, name);
-        //familyInstance.SetParamValue(ParamFactory.FamilyParamRevision, revisionNumber);
-        return familyInstance;
-    }
-
     private Document CreateDocument() {
         var document = _revitRepository.Application.NewFamilyDocument(_familyTemplatePath);
         string transactionName = _localizationService.GetLocalizedString("TempFamilyDocument.TransactionName");
@@ -80,7 +50,6 @@ internal class TempFamilyDocument : IFamilyDocument {
             CreateCircle(document);
             t.Commit();
         }
-
         var opt = new SaveAsOptions {
             OverwriteExistingFile = true
         };

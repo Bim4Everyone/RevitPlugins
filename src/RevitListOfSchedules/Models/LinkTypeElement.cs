@@ -11,7 +11,6 @@ internal class LinkTypeElement {
     public RevitLinkType RevitLink { get; }
     public ElementId Id { get; }
     public string Name { get; }
-    public string FullName { get; }
 
     public void Reload() {
         RevitLink.Reload();

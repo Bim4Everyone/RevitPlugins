@@ -32,9 +32,7 @@
     <system:String
         x:Key="MainWindow.StatusTextUnloaded">Unloaded</system:String>
     <system:String
-        x:Key="MainWindow.LinkName">Link name</system:String>
-    <system:String
-        x:Key="MainWindow.LinkFullName">Link full name</system:String>
+        x:Key="MainWindow.LinkName">Link name</system:String>    
     <system:String
         x:Key="MainWindow.LinkStatus">Link status</system:String>    
     <system:String
@@ -52,7 +50,7 @@
     <system:String
         x:Key="TempFamilyDocument.FamilyName">{0}List_Of_Schedules_{1}{2}</system:String>
     <system:String
-        x:Key="TempFamilyDocument.TransactionName">Parameters, circle</system:String>       
+        x:Key="TempFamilyDocument.TransactionName">Create circle</system:String>       
     <system:String
         x:Key="RevitRepository.ViewName">List_Of_Schedules_{0}</system:String>    
     <system:String
@@ -66,11 +64,11 @@
     <system:String
         x:Key="MainViewModel.ProgressTitleSheets">Processing sheets... [{0}]\[{1}]</system:String>        
     <system:String
-        x:Key="MainViewModel.MessegeBody">Please, close the current schedule</system:String>
+        x:Key="Common.MessageBody">Please, close the current schedule</system:String>
     <system:String
-        x:Key="MainViewModel.MessegeTitle">Download schedule error</system:String>
+        x:Key="Common.MessageBody_2">Error copying parameters</system:String>
     <system:String
-        x:Key="MainViewModel.DeleteSchedule">Delete default schedule</system:String>
+        x:Key="Common.MessageTitle">Plug-in configuration error</system:String>    
     <system:String
         x:Key="GroupParameter.NoParameter">No group parameter</system:String>
     <system:String

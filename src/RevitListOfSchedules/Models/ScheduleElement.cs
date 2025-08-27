@@ -5,12 +5,10 @@ using Autodesk.Revit.DB;
 namespace RevitListOfSchedules.Models;
 internal class ScheduleElement {
     private readonly RevitRepository _revitRepository;
-    private readonly string _defaultScheduleName;
     private readonly string _scheduleName;
 
-    public ScheduleElement(RevitRepository revitRepository, string defaultScheduleName, string scheduleName) {
+    public ScheduleElement(RevitRepository revitRepository, string scheduleName) {
         _revitRepository = revitRepository;
-        _defaultScheduleName = defaultScheduleName;
         _scheduleName = scheduleName;
         ConfigureSchedule();
     }
@@ -25,10 +23,10 @@ internal class ScheduleElement {
     }
 
     private ViewSchedule DuplicateDefaultSchedule() {
-        var defaultSchedule = _revitRepository.GetSchedule(_defaultScheduleName);
+        var defaultSchedule = _revitRepository.GetSchedule(ParamFactory.DefaultScheduleName);
         var newScheduleId = defaultSchedule.Duplicate(ViewDuplicateOption.Duplicate);
         var newSchedule = _revitRepository.Document.GetElement(newScheduleId) as ViewSchedule;
-        newSchedule.Name = $"{_defaultScheduleName}_{_scheduleName}";
+        newSchedule.Name = _scheduleName;
         return newSchedule;
     }
 
@@ -36,6 +34,6 @@ internal class ScheduleElement {
         var tableData = schedule.GetTableData();
         var appearanceSection = tableData.GetSectionData(SectionType.Header);
         appearanceSection.ClearCell(0, 0);
-        appearanceSection.SetCellText(0, 0, $"{ParamFactory.ScheduleName} {_scheduleName}");
+        appearanceSection.SetCellText(0, 0, ParamFactory.ScheduleName);
     }
 }

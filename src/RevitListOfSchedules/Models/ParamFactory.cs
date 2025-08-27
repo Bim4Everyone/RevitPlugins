@@ -13,6 +13,7 @@ namespace RevitListOfSchedules.Models;
 internal class ParamFactory {
 
     public const string ScheduleName = "Ведомость спецификаций и ведомостей";
+    public const string DefaultScheduleName = "ВС_Ведомость спецификаций";
     public const string ListOfSchedulesSheetName = "ВС_Номер листа";
     public const string ListOfSchedulesRevNumber = "ВС_Номер изменения";
     public const string ListOfSchedulesNotes = "ВС_Примечания";

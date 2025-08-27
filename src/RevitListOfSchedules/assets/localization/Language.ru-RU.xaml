@@ -32,9 +32,7 @@
     <system:String
         x:Key="MainWindow.StatusTextUnloaded">Не загружена</system:String>
     <system:String
-        x:Key="MainWindow.LinkName">Наименование связи</system:String>
-    <system:String
-        x:Key="MainWindow.LinkFullName">Полное наименование связи</system:String>
+        x:Key="MainWindow.LinkName">Наименование связи</system:String>    
     <system:String
         x:Key="MainWindow.LinkStatus">Статус связи</system:String>
     <system:String
@@ -52,7 +50,7 @@
     <system:String
         x:Key="TempFamilyDocument.FamilyName">{0}Ведомость_Спецификаций_{1}{2}</system:String>
     <system:String
-        x:Key="TempFamilyDocument.TransactionName">Параметры, окружность</system:String>          
+        x:Key="TempFamilyDocument.TransactionName">Создание окружности</system:String>          
     <system:String
         x:Key="RevitRepository.ViewName">Ведомость_Cпецификаций_{0}</system:String>    
     <system:String
@@ -66,11 +64,11 @@
     <system:String
         x:Key="MainViewModel.ProgressTitleSheets">Обработка листов... [{0}]\[{1}]</system:String>    
     <system:String
-        x:Key="MainViewModel.MessegeBody">Пожалуйста, закройте текущую спецификацию</system:String>    
+        x:Key="Common.MessageBody">Пожалуйста, закройте текущую спецификацию</system:String>
     <system:String
-        x:Key="MainViewModel.MessegeTitle">Ошибка загрузки спецификации</system:String>
+        x:Key="Common.MessageBody_2">Ошибка загрузки параметров</system:String>
     <system:String
-        x:Key="MainViewModel.DeleteSchedule">Удаление эталонной спецификации</system:String>
+        x:Key="Common.MessageTitle">Ошибка настройки плагина</system:String>    
     <system:String
         x:Key="GroupParameter.NoParameter">Нет параметра группировки</system:String>
     <system:String

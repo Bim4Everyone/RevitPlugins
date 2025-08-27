@@ -1,9 +1,6 @@
-using System.Windows.Input;
-
 using Autodesk.Revit.DB;
 
 using dosymep.SimpleServices;
-using dosymep.WPF.Commands;
 using dosymep.WPF.ViewModels;
 
 using RevitListOfSchedules.Models;
@@ -22,13 +19,9 @@ internal class LinkViewModel : BaseViewModel {
         _localizationService = localizationService;
         SetStatus();
         _statusString = GetStringStatus();
-
-        ReloadCommand = RelayCommand.Create(ReloadLinkType, CanReloadLinkType);
     }
-    public ICommand ReloadCommand { get; set; }
     public ElementId Id => _linkElement.Id;
     public string Name => _linkElement.Name;
-    public string FullName => _linkElement.FullName;
 
     public bool IsChecked {
         get => _isChecked;
@@ -39,6 +32,7 @@ internal class LinkViewModel : BaseViewModel {
         get => _isLoaded;
         set => RaiseAndSetIfChanged(ref _isLoaded, value, nameof(IsLoaded));
     }
+
     public string StatusString {
         get => _statusString;
         set => RaiseAndSetIfChanged(ref _statusString, value, nameof(StatusString));

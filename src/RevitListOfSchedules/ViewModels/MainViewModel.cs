@@ -7,6 +7,8 @@ using System.Linq;
 using System.Windows;
 using System.Windows.Input;
 
+using Autodesk.Revit.DB;
+
 using dosymep.Bim4Everyone.SimpleServices;
 using dosymep.Revit;
 using dosymep.SimpleServices;
@@ -99,10 +101,12 @@ internal class MainViewModel : BaseViewModel {
         get => _selectedGroupParameter;
         set => RaiseAndSetIfChanged(ref _selectedGroupParameter, value);
     }
+
     public bool IsCreateScheduleChecked {
         get => _isCreateScheduleChecked;
         set => RaiseAndSetIfChanged(ref _isCreateScheduleChecked, value);
     }
+
     public bool IsScheduleToSheetChecked {
         get => _isScheduleToSheetChecked;
         set => RaiseAndSetIfChanged(ref _isScheduleToSheetChecked, value);
@@ -117,12 +121,9 @@ internal class MainViewModel : BaseViewModel {
     private void LoadView() {
         Links = new ObservableCollection<LinkViewModel>(GetLinks());
         SelectedLinks = [];
-
         GroupParameters = new ObservableCollection<GroupParameterViewModel>(GetGroupParameters());
         SelectedGroupParameter = GroupParameters.First();
-
         Sheets = new ObservableCollection<SheetViewModel>(GetSheets());
-
         SelectedSheets = [];
 
         // Подписка на события для обновления Sheets
@@ -147,7 +148,6 @@ internal class MainViewModel : BaseViewModel {
         }
         string selectedGroupParameterId = setting?.GroupParameter ?? GroupParameters.First().Id;
         SelectedGroupParameter = GroupParameters.First(param => param.Id == selectedGroupParameterId);
-
         IsCreateScheduleChecked = setting?.IsCreateScheduleChecked ?? false;
         IsRevisionVisibleChecked = setting?.IsRevisionVisibleChecked ?? true;
         IsScheduleToSheetChecked = setting?.IsScheduleToSheetChecked ?? true;
@@ -272,7 +272,6 @@ internal class MainViewModel : BaseViewModel {
             var progress = progressDialogService.CreateProgress();
             var ct = progressDialogService.CreateCancellationToken();
             progressDialogService.Show();
-
             int i = 0;
             foreach(var selectedLink in _selectedLinks) {
                 ct.ThrowIfCancellationRequested();
@@ -289,7 +288,6 @@ internal class MainViewModel : BaseViewModel {
         if(SelectedLinks == null || SelectedLinks.Count == 0) {
             return false;
         }
-
         if(SelectedLinks.Any(link => !link.CanReloadLinkType())) {
             ErrorLinkText = _localizationService.GetLocalizedString("MainViewModel.ErrorLinkText");
             return false;
@@ -345,68 +343,53 @@ internal class MainViewModel : BaseViewModel {
 
         string transactionName = _localizationService.GetLocalizedString("MainViewModel.TransactionName");
         using var t = _revitRepository.Document.StartTransaction(transactionName);
+
         var albums = SelectedSheets.GroupBy(sheet => sheet.AlbumName);
-        int i = 0;
+        int counter = 0;
         foreach(var album in albums) {
             string albumName = PathCharValidator.LegalizeString(album.Key);
-            var viewDraft = _revitRepository.GetViewDrafting(albumName);
-            var tempDoc = new TempFamilyDocument(_localizationService, _revitRepository, _familyLoadOptions, albumName);
+            var instancesAssembly = new InstancesAssembly(_localizationService, _revitRepository, _familyLoadOptions, albumName);
 
-            _revitRepository.DeleteFamilyInstances(viewDraft);
-
-            var createInstanceOptions = new CreateInstanceOptions() {
-                TempDoc = tempDoc,
-                ViewDraft = viewDraft,
-                Counter = i,
-                Progress = progress,
-                CancellationToken = ct
-            };
-            CreateInstances(album, createInstanceOptions);
-
+            if(_isScheduleToSheetChecked) {
+                var firstSheet = album.First();
+                instancesAssembly.PlaceFamilyInstance(firstSheet.Number, GetRevisionNumber(firstSheet), ParamFactory.ScheduleName);
+            }
+            foreach(var sheet in album) {
+                ct.ThrowIfCancellationRequested();
+                progress.Report(counter++);
+                var schedules = _revitRepository.GetScheduleInstances(GetDocument(sheet), sheet.ViewSheet);
+                if(schedules != null) {
+                    instancesAssembly.PlaceFamilyInstances(sheet.Number, GetRevisionNumber(sheet), schedules);
+                }
+            }
             if(_isCreateScheduleChecked) {
-                _revitRepository.CreateSchedule(albumName);
+                _revitRepository.CreateSchedule($"{ParamFactory.DefaultScheduleName}_{albumName}");
+                _revitRepository.ActiveUIDocument.GetActiveUIView().Close();
             }
         }
         t.Commit();
     }
-
-    // Метод создания экземпляров семейства
-    private void CreateInstances(
-        IGrouping<string, SheetViewModel> group, CreateInstanceOptions createInstanceOptions) {
-        var view = createInstanceOptions.ViewDraft;
-        var firstSheet = group.First();
-        if(_isScheduleToSheetChecked) {
-            createInstanceOptions.TempDoc.CreateInstance(
-                view, _localizationService.GetLocalizedString("MainViewModel.Title"), firstSheet.Number, GetRevisionNumber(firstSheet));
-        }
-        foreach(var sheet in group) {
-            createInstanceOptions.CancellationToken.ThrowIfCancellationRequested();
-            createInstanceOptions.Progress.Report(createInstanceOptions.Counter++);
-            var doc = sheet.LinkViewModel == null
-                ? _revitRepository.Document
-                : _revitRepository.GetLinkDocument(sheet.LinkViewModel.Id);
-            var schedules = _revitRepository.GetScheduleInstances(doc, sheet.ViewSheet);
-            if(schedules != null) {
-                createInstanceOptions.TempDoc.PlaceFamilyInstances(
-                    view, sheet.Number, GetRevisionNumber(sheet), schedules);
-            }
-        }
-    }
-
+    // Метод копирования эталонной спецификации в проект
     private void LoadDefaultSchedule() {
-        // Копирование эталонной спецификации
         bool isScheduleChecked = new CheckSchedule(_revitRepository.UIApplication)
             .ReplaceSchedule();
         if(!isScheduleChecked) {
-            string stringMessegeBody = _localizationService.GetLocalizedString("MainViewModel.MessegeBody");
-            string stringMessegeTitle = _localizationService.GetLocalizedString("MainViewModel.MessegeTitle");
+            string stringMessegeBody = _localizationService.GetLocalizedString("Common.MessageBody");
+            string stringMessegeTitle = _localizationService.GetLocalizedString("Common.MessageTitle");
             MessageBox.Show(stringMessegeBody, stringMessegeTitle);
             throw new OperationCanceledException();
         }
     }
 
-    // Метод получения номера изменения
+    // Метод получения номера изменения SheetViewModel
     private string GetRevisionNumber(SheetViewModel sheet) {
         return _isRevisionVisibleChecked ? sheet.RevisionNumber : string.Empty;
+    }
+
+    // Метод получения номера документа. Либо основной, либо из связанного файла
+    private Document GetDocument(SheetViewModel sheet) {
+        return sheet.LinkViewModel == null
+            ? _revitRepository.Document
+            : _revitRepository.GetLinkDocument(sheet.LinkViewModel.Id);
     }
 }
