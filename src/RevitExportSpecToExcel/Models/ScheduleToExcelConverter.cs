@@ -119,7 +119,7 @@ public class ScheduleToExcelConverter {
 
         switch(cellType) {
             case CellType.Text:
-#if REVIT_2023_OR_GREATER
+#if REVIT_2024_OR_GREATER
             case CellType.CustomField:
 #endif
                 SetTextValue(excelCell, scheduleCell.Value);
