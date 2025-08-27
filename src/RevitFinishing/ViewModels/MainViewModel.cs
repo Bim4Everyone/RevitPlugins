@@ -150,14 +150,20 @@ internal class MainViewModel : BaseViewModel {
         string transactionName = _localizationService.GetLocalizedString("MainWindow.TransactionName");
         using(Transaction t = _revitRepository.Document.StartTransaction(transactionName)) {
             foreach(FinishingElement element in finishingElements) {
+                element.ClearFinishingParameters();
                 element.UpdateFinishingParameters(calculator);
                 element.UpdateCategoryParameters(calculator);
             }
             t.Commit();
         }
 
-        WarningsViewModel parameterErrors = _projectValidationService
-            .CheckWarnings(selectedRooms, finishingElements, _selectedPhase, _revitRepository.Document);
+        WarningsViewModel parameterErrors = new WarningsViewModel(_localizationService);
+
+        parameterErrors.AddElements(_projectValidationService.CheckNumberParam(selectedRooms, _selectedPhase));
+        parameterErrors.AddElements(_projectValidationService.CheckNameParam(selectedRooms, _selectedPhase));
+        parameterErrors.AddElements(_projectValidationService.CheckCustomFamilies(finishingElements, _selectedPhase));
+        parameterErrors.AddElements(_projectValidationService.CheckUnusedFinishing(calculator, _selectedPhase));
+
         _errorWindowService.ShowNoticeWindow(parameterErrors);
 
         SaveConfig();

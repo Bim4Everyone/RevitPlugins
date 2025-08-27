@@ -22,6 +22,11 @@
     <system:String x:Key="MainWindow.TransactionName">Заполнить параметры отделки</system:String>
 
     <system:String x:Key="ErrorsWindow.Title">Рассчитать отделку</system:String>
+    
+    <system:String x:Key="ErrorsWindow.Walls">Стены</system:String>
+    <system:String x:Key="ErrorsWindow.Floors">Полы</system:String>
+    <system:String x:Key="ErrorsWindow.Baseboards">Плинтусы</system:String>
+    <system:String x:Key="ErrorsWindow.Ceilings">Потолки</system:String>
 
     <system:String x:Key="ErrorsWindow.ErrorTypeColumn">Тип</system:String>
     <system:String x:Key="ErrorsWindow.ErrorDescriptionColumn">Описание</system:String>
@@ -33,6 +38,7 @@
     
     <system:String x:Key="ErrorsWindow.WithoutValue">&lt;Без значения&gt;</system:String>
     <system:String x:Key="ErrorsWindow.WithoutLevel">&lt;Без уровня&gt;</system:String>
+    <system:String x:Key="ErrorsWindow.WithoutId">&lt;Без Id&gt;</system:String>
 
     <system:String x:Key="ErrorsWindow.ListErrorType">Ошибка</system:String> 
     <system:String x:Key="ErrorsWindow.ListWarningType">Предупреждение</system:String>
@@ -52,5 +58,8 @@
     <system:String x:Key="ErrorsWindow.WarningInfoTitle">Расчет отделки завершен!</system:String>
     <system:String x:Key="ErrorsWindow.WarningInfo">
         При этом были обнаружены следующие предупреждения, которые могли повлиять на корректность расчета:
+    </system:String>
+    <system:String x:Key="ErrorsWindow.UnusedFinishingTypes">
+        Для стилей отделки найдены неиспользуемые типы отделки
     </system:String>
 </ResourceDictionary>

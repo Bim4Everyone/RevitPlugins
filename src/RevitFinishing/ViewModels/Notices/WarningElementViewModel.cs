@@ -4,13 +4,13 @@ using dosymep.SimpleServices;
 using dosymep.WPF.ViewModels;
 
 namespace RevitFinishing.ViewModels.Notices;
-internal class NoticeElementViewModel : BaseViewModel {
+internal class WarningElementViewModel : BaseViewModel, IWarningItemViewModel {
     private readonly Element _element;
     private readonly string _phaseName;
     private readonly string _levelName;
     private readonly ILocalizationService _localizationService;
 
-    public NoticeElementViewModel(Element element,
+    public WarningElementViewModel(Element element,
                                   string phaseName,
                                   ILocalizationService localizationService) {
         _element = element;
@@ -23,9 +23,9 @@ internal class NoticeElementViewModel : BaseViewModel {
             : _localizationService.GetLocalizedString("ErrorsWindow.WithoutLevel");
     }
 
-    public ElementId ElementId => _element.Id;
+    public string ElementIdInfo => _element.Id.ToString();
     public string ElementName => _element.Name;
-    public string CategoryName => _element.Category.Name;
+    public string CategoryInfo => _element.Category.Name;
     public string PhaseName => _phaseName;
     public string LevelName => _levelName;
 }

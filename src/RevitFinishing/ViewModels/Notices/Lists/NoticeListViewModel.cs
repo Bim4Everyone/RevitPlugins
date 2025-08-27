@@ -16,5 +16,5 @@ internal class NoticeListViewModel : BaseViewModel {
         set => RaiseAndSetIfChanged(ref _description, value);
     }
 
-    public ObservableCollection<NoticeElementViewModel> ErrorElements { get; set; }
+    public ObservableCollection<IWarningItemViewModel> ErrorElements { get; set; }
 }

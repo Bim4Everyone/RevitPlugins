@@ -7,6 +7,7 @@ using Autodesk.Revit.DB.Architecture;
 using Autodesk.Revit.UI;
 
 using dosymep.Bim4Everyone;
+using dosymep.Bim4Everyone.KeySchedules;
 using dosymep.Revit;
 
 using RevitFinishing.Models.Finishing;
@@ -68,7 +69,8 @@ internal class RevitRepository {
             .OfCategory(BuiltInCategory.OST_Rooms)
             .WherePasses(parameterFilter)
             .OfType<Room>()
-            .Select(x => x.UpperLimit)
+            .Select(x => x.Level)
+            .Where(x => x != null)
             .GroupBy(x => new { x.Id, x.Name })
             .Select(g => g.First());
     }
@@ -107,6 +109,17 @@ internal class RevitRepository {
             .OfCategory(BuiltInCategory.OST_Rooms)
             .WherePasses(finalFilter)
             .OfType<Room>()
+            .ToList();
+    }
+
+    public IList<KeyFinishingType> GetKeyFinishingTypes() {
+        Element schedule = new FilteredElementCollector(Document)
+            .OfClass(typeof(ViewSchedule))
+            .FirstOrDefault(x => x.Name == KeySchedulesConfig.Instance.RoomsFinishing.ScheduleName);
+
+       return new FilteredElementCollector(Document, schedule.Id)
+            .ToElements()
+            .Select(x => new KeyFinishingType(x))
             .ToList();
     }
 }

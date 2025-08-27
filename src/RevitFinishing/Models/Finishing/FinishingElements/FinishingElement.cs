@@ -148,4 +148,11 @@ internal abstract class FinishingElement {
     /// Заполнение параметров отделки, уникальных для определенного типа отделки.
     /// </summary>
     public abstract void UpdateCategoryParameters(FinishingCalculator calculator);
+
+    public void ClearFinishingParameters() {
+        _revitElement.RemoveParamValue(_paramConfig.FloorFinishingOrder);
+        _revitElement.RemoveParamValue(_paramConfig.CeilingFinishingOrder);
+        _revitElement.RemoveParamValue(_paramConfig.WallFinishingOrder);
+        _revitElement.RemoveParamValue(_paramConfig.BaseboardFinishingOrder);
+    }
 }

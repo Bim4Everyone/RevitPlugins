@@ -35,7 +35,10 @@ internal class FinishingType {
     }
 
     public IEnumerable<RoomElement> Rooms => _rooms;
-
+    public int WallTypesNumber => _wallTypesByOrder.Count;
+    public int FloorTypesNumber => _floorTypesByOrder.Count;
+    public int CeilingTypesNumber => _ceilingTypesByOrder.Count;
+    public int BaseboardTypesNumber => _baseboardTypesByOrder.Count;
 
     public int GetWallOrder(string typeName) {
         return _wallTypesByOrder.IndexOf(typeName) + 1;
