@@ -1,0 +1,131 @@
+﻿<ResourceDictionary
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:system="clr-namespace:System;assembly=mscorlib">
+
+    <system:String
+        x:Key="Errors.ActiveViewMustBePlan">Активный вид должен быть планом</system:String>
+
+    <system:String
+        x:Key="MainWindow.Title">Планы квартир</system:String>
+    <system:String
+        x:Key="MainWindow.Label.Offset">Отступ, мм:</system:String>
+    <system:String
+        x:Key="MainWindow.Label.Parameter">Параметр для группировки:</system:String>
+    <system:String
+        x:Key="MainWindow.Label.Apartments">Квартиры</system:String>
+    <system:String
+        x:Key="MainWindow.Label.ViewTemplates">Шаблоны видов</system:String>
+    <system:String
+        x:Key="MainWindow.Header.Number">Номер</system:String>
+    <system:String
+        x:Key="MainWindow.Header.Level">Этаж</system:String>
+    <system:String
+        x:Key="MainWindow.Header.Select">Выбрать</system:String>
+    <system:String
+        x:Key="MainWindow.Header.ViewType">Тип</system:String>
+    <system:String
+        x:Key="MainWindow.Header.Name">Название</system:String>
+    <system:String
+        x:Key="MainWindow.CopyDetail">Копировать с детализацией</system:String>
+    <system:String
+        x:Key="MainWindow.ProcessLinks">Обрабатывать связи</system:String>
+
+    <system:String
+        x:Key="ViewTemplateAdditionWindow.Title">Добавление шаблона вида</system:String>
+
+    <system:String
+        x:Key="OK">ОК</system:String>
+    <system:String
+        x:Key="Cancel">Отмена</system:String>
+
+    <system:String
+        x:Key="Transactions.PlansCreation">Создание планов квартир</system:String>
+
+    <system:String
+        x:Key="Warning">Предупреждение</system:String>
+
+    <system:String
+        x:Key="Progress.Title">Обработка квартир... [{0}]\[{1}]</system:String>
+
+    <system:String
+        x:Key="MainWindow.Validation.OffsetLessThan">Отступ не должен быть меньше {0} мм.</system:String>
+    <system:String
+        x:Key="MainWindow.Validation.OffsetGreaterThan">Отступ не должен быть больше {0} мм.</system:String>
+    <system:String
+        x:Key="MainWindow.Validation.ParameterNotSet">Выберите параметр для группировки.</system:String>
+    <system:String
+        x:Key="MainWindow.Validation.AddViewTemplate">Добавьте шаблоны видов.</system:String>
+    <system:String
+        x:Key="MainWindow.Validation.SelectApartments">Выберите квартиры.</system:String>
+
+    <system:String
+        x:Key="ViewTemplates.Validation.SelectViewTemplate">Выберите шаблон</system:String>
+
+    <system:String
+        xml:space="preserve"
+        x:Key="Warnings.Revit2022">
+В 2022 версии Revit обработка помещений из связей поддерживается не полностью:
+- могут учитываться лишние помещения
+(устранено в 2024 версии Revit)
+- при выделении квартиры не будут подсвечиваться помещения из связей
+(устранено в 2023 версии Revit)</system:String>
+    <system:String
+        xml:space="preserve"
+        x:Key="Warnings.Revit2023">
+В 2023 версии Revit при включенной обработке связей
+могут учитываться лишние помещения
+(устранено в 2024 версии Revit)</system:String>
+
+    <system:String
+        x:Key="ViewType.Undefined">Не определен</system:String>
+    <system:String
+        x:Key="ViewType.FloorPlan">План этажа</system:String>
+    <system:String
+        x:Key="ViewType.EngineeringPlan">План несущих конструкций</system:String>
+    <system:String
+        x:Key="ViewType.AreaPlan">План зонирования</system:String>
+    <system:String
+        x:Key="ViewType.CeilingPlan">План потолка</system:String>
+    <system:String
+        x:Key="ViewType.Elevation">Фасад</system:String>
+    <system:String
+        x:Key="ViewType.Section">Разрез</system:String>
+    <system:String
+        x:Key="ViewType.Detail">Вид узла</system:String>
+    <system:String
+        x:Key="ViewType.ThreeD">3D вид</system:String>
+    <system:String
+        x:Key="ViewType.Schedule">Спецификация</system:String>
+    <system:String
+        x:Key="ViewType.DraftingView">Чертежный вид</system:String>
+    <system:String
+        x:Key="ViewType.DrawingSheet">Лист</system:String>
+    <system:String
+        x:Key="ViewType.Legend">Легенда</system:String>
+    <system:String
+        x:Key="ViewType.Report">Отчет</system:String>
+    <system:String
+        x:Key="ViewType.ProjectBrowser">Диспетчер проекта</system:String>
+    <system:String
+        x:Key="ViewType.SystemBrowser">Диспетчер инженерных систем</system:String>
+    <system:String
+        x:Key="ViewType.CostReport">Отчет о стоимости</system:String>
+    <system:String
+        x:Key="ViewType.LoadsReport">Отчет о нагрузках</system:String>
+    <system:String
+        x:Key="ViewType.PresureLossReport">Отчет о потерях давления</system:String>
+    <system:String
+        x:Key="ViewType.PanelSchedule">Принципиальная схема щита/панели</system:String>
+    <system:String
+        x:Key="ViewType.ColumnSchedule">Графическая спецификация колонн</system:String>
+    <system:String
+        x:Key="ViewType.Walkthrough">Обход</system:String>
+    <system:String
+        x:Key="ViewType.Rendering">Визуализация</system:String>
+    <system:String
+        x:Key="ViewType.SystemsAnalysisReport">Отчет по результатам анализа</system:String>
+    <system:String
+        x:Key="ViewType.Internal">Внутренний вид Revit</system:String>
+
+</ResourceDictionary>

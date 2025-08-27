@@ -13,16 +13,19 @@ namespace RevitApartmentPlans.ViewModels;
 internal class ApartmentsViewModel : BaseViewModel {
     private readonly PluginConfig _pluginConfig;
     private readonly RevitRepository _revitRepository;
+    private readonly ILocalizationService _localization;
 
     public ApartmentsViewModel(
         PluginConfig pluginConfig,
         RevitRepository revitRepository,
-        IMessageBoxService messageBoxService) {
+        IMessageBoxService messageBoxService,
+        ILocalizationService localization) {
 
         _pluginConfig = pluginConfig ?? throw new System.ArgumentNullException(nameof(pluginConfig));
         _revitRepository = revitRepository ?? throw new System.ArgumentNullException(nameof(revitRepository));
         MessageBoxService = messageBoxService ?? throw new ArgumentNullException(nameof(messageBoxService));
-
+        _localization = localization
+            ?? throw new ArgumentNullException(nameof(localization));
         ShowApartmentCommand = RelayCommand.Create<ApartmentViewModel>(ShowApartment, CanShowApartment);
         ShowWarningCommand = RelayCommand.Create(ShowWarning);
         Apartments = [];
@@ -109,20 +112,15 @@ internal class ApartmentsViewModel : BaseViewModel {
     private void ShowWarning() {
         string msg;
 #if REVIT_2022_OR_LESS
-        msg = "В 2022 версии Revit обработка помещений из связей поддерживается не полностью: " +
-            "\n- могут учитываться лишние помещения " +
-            "(устранено в 2024 версии Revit)" +
-            "\n- при выделении квартиры не будут подсвечиваться помещения из связей " +
-            "(устранено в 2023 версии Revit).";
+        msg = _localization.GetLocalizedString("Warnings.Revit2022");
 #elif REVIT_2023
-        msg = "В 2023 версии Revit при включенной обработке связей могут учитываться лишние помещения " +
-            "(устранено в 2024 версии Revit).";
+        msg = _localization.GetLocalizedString("Warnings.Revit2023");
 #else
         msg = string.Empty;
 #endif
         if(!string.IsNullOrWhiteSpace(msg)) {
             MessageBoxService.Show(msg,
-                "Предупреждение",
+                _localization.GetLocalizedString("Warning"),
                 System.Windows.MessageBoxButton.OK,
                 System.Windows.MessageBoxImage.Warning);
         }

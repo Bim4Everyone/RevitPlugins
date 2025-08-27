@@ -4,8 +4,7 @@ using System.Collections.ObjectModel;
 using System.Linq;
 using System.Windows.Input;
 
-using Autodesk.Revit.DB;
-
+using dosymep.SimpleServices;
 using dosymep.WPF.Commands;
 using dosymep.WPF.ViewModels;
 
@@ -17,6 +16,8 @@ namespace RevitApartmentPlans.ViewModels;
 /// </summary>
 internal class ViewTemplateAdditionViewModel : BaseViewModel {
     private readonly RevitRepository _revitRepository;
+    private readonly ILocalizationService _localization;
+
     /// <summary>
     /// Все шаблоны видов в активном документе
     /// </summary>
@@ -26,14 +27,15 @@ internal class ViewTemplateAdditionViewModel : BaseViewModel {
     /// </summary>
     private readonly HashSet<ViewTemplateViewModel> _addedViewTemplates;
 
-    public ViewTemplateAdditionViewModel(RevitRepository revitRepository) {
+    public ViewTemplateAdditionViewModel(RevitRepository revitRepository, ILocalizationService localization) {
         _revitRepository = revitRepository ?? throw new System.ArgumentNullException(nameof(revitRepository));
-
+        _localization = localization ?? throw new ArgumentNullException(nameof(localization));
         _allViewTemplatesFromDoc = [.. _revitRepository.GetViewTemplates()
-            .Select(t => new ViewTemplateViewModel(t))];
+            .Select(t => new ViewTemplateViewModel(t, _localization))];
         _addedViewTemplates = [];
         EnabledViewTemplates = [];
-        EnabledViewTypes = new ObservableCollection<ViewType>(_revitRepository.GetAllUsedViewTypes());
+        EnabledViewTypes = new ObservableCollection<ViewTypeViewModel>(
+            _revitRepository.GetAllUsedViewTypes().Select(v => new ViewTypeViewModel(v, _localization)));
         SelectedViewType = EnabledViewTypes.First();
         AcceptViewCommand = RelayCommand.Create(AcceptView, CanAcceptView);
     }
@@ -50,13 +52,13 @@ internal class ViewTemplateAdditionViewModel : BaseViewModel {
     /// <summary>
     /// Типы шаблонов видов, которые можно добавить: план этажа/потолка
     /// </summary>
-    public ObservableCollection<ViewType> EnabledViewTypes { get; }
+    public ObservableCollection<ViewTypeViewModel> EnabledViewTypes { get; }
 
-    private ViewType _selectedViewType;
+    private ViewTypeViewModel _selectedViewType;
     /// <summary>
     /// Выбранный тип шаблона вида для добавления: план этажа/потолка
     /// </summary>
-    public ViewType SelectedViewType {
+    public ViewTypeViewModel SelectedViewType {
         get => _selectedViewType;
         set {
             RaiseAndSetIfChanged(ref _selectedViewType, value);
@@ -101,7 +103,7 @@ internal class ViewTemplateAdditionViewModel : BaseViewModel {
 
     private bool CanAcceptView() {
         if(SelectedViewTemplate is null) {
-            ErrorText = "Выберите шаблон";
+            ErrorText = _localization.GetLocalizedString("ViewTemplates.Validation.SelectViewTemplate");
             return false;
         }
 
@@ -112,7 +114,7 @@ internal class ViewTemplateAdditionViewModel : BaseViewModel {
     private void UpdateEnabledViewTemplates() {
         EnabledViewTemplates.Clear();
         var viewTemplatesToAdd = _allViewTemplatesFromDoc
-            .Where(t => t.ViewTemplateType == _selectedViewType)
+            .Where(t => t.ViewTemplateType == _selectedViewType.ViewType)
             .Except(_addedViewTemplates)
             .OrderBy(t => t.Name);
         foreach(var viewTemplate in viewTemplatesToAdd) {

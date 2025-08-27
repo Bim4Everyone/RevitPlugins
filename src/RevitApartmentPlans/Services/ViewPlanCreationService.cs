@@ -6,6 +6,7 @@ using System.Threading;
 using Autodesk.Revit.DB;
 
 using dosymep.Revit;
+using dosymep.SimpleServices;
 
 using RevitApartmentPlans.Models;
 
@@ -14,11 +15,13 @@ internal class ViewPlanCreationService : IViewPlanCreationService {
     private readonly RevitRepository _revitRepository;
     private readonly IBoundsCalculationService _boundsCalculateService;
     private readonly IRectangleLoopProvider _rectangleLoopProvider;
+    private readonly ILocalizationService _localizationService;
 
     public ViewPlanCreationService(
         RevitRepository revitRepository,
         IBoundsCalculationService boundsCalculateService,
-        IRectangleLoopProvider rectangleLoopProvider) {
+        IRectangleLoopProvider rectangleLoopProvider,
+        ILocalizationService localizationService) {
 
         _revitRepository = revitRepository
             ?? throw new ArgumentNullException(nameof(revitRepository));
@@ -26,6 +29,8 @@ internal class ViewPlanCreationService : IViewPlanCreationService {
             ?? throw new ArgumentNullException(nameof(boundsCalculateService));
         _rectangleLoopProvider = rectangleLoopProvider
             ?? throw new ArgumentNullException(nameof(rectangleLoopProvider));
+        _localizationService = localizationService
+            ?? throw new ArgumentNullException(nameof(localizationService));
     }
 
 
@@ -37,7 +42,8 @@ internal class ViewPlanCreationService : IViewPlanCreationService {
         CancellationToken ct = default) {
 
         List<ViewPlan> views = [];
-        using(var t = _revitRepository.Document.StartTransaction("Создание планов квартир")) {
+        string msg = _localizationService.GetLocalizedString("Transactions.PlansCreation");
+        using(var t = _revitRepository.Document.StartTransaction(msg)) {
             int i = 0;
             foreach(var apartment in apartments) {
                 ct.ThrowIfCancellationRequested();
@@ -61,7 +67,8 @@ internal class ViewPlanCreationService : IViewPlanCreationService {
         CancellationToken ct = default) {
 
         List<ViewPlan> views = [];
-        using(var t = _revitRepository.Document.StartTransaction("Создание планов квартир")) {
+        string msg = _localizationService.GetLocalizedString("Transactions.PlansCreation");
+        using(var t = _revitRepository.Document.StartTransaction(msg)) {
             int i = 0;
             foreach(var apartment in apartments) {
                 ct.ThrowIfCancellationRequested();
