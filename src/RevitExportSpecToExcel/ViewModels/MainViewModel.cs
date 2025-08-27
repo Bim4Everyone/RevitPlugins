@@ -22,8 +22,8 @@ internal class MainViewModel : BaseViewModel {
     private readonly ExcelExporter _excelExporter;
     private readonly ILocalizationService _localizationService;
 
-    private IList<ScheduleViewModel> _schedules;
-    private IList<ScheduleViewModel> _filteredSchedules;
+    private ObservableCollection<ScheduleViewModel> _schedules = new();
+    private ObservableCollection<ScheduleViewModel> _filteredSchedules;
     private bool _saveAsOneFile;
     private string _searchText;
     private string _errorText;
@@ -45,30 +45,23 @@ internal class MainViewModel : BaseViewModel {
         _excelExporter = excelExporter;
         _localizationService = localizationService;
         
-        _schedules = _revitRepository
-            .GetSchedulesVM()
-            .ToList();
-        FilteredSchedules = new ObservableCollection<ScheduleViewModel>(_schedules);
-
-        if(_revitRepository.Document.ActiveView is not ViewSchedule) {
-            LoadConfig();
-        } 
-
-        ExportSchedulesCommand = RelayCommand.Create(ExportSchedules, CanAcceptView);
+        LoadViewCommand = RelayCommand.Create(LoadView);
         SearchCommand = RelayCommand.Create(ApplySearch);
+        ExportSchedulesCommand = RelayCommand.Create(ExportSchedules, CanAcceptView);
     }
 
+    public ICommand LoadViewCommand { get; }
     public ICommand ExportSchedulesCommand { get; }
     public ICommand SearchCommand { get; }
 
 
-    public IList<ScheduleViewModel> Schedules {
+    public ObservableCollection<ScheduleViewModel> Schedules {
         get => _schedules;
         set => RaiseAndSetIfChanged(ref _schedules, value);
     }
 
-    public IList<ScheduleViewModel> FilteredSchedules {
-        get => _filteredSchedules.OrderBy(x => x.OpenStatus).ToList();
+    public ObservableCollection<ScheduleViewModel> FilteredSchedules {
+        get => new(_filteredSchedules.OrderBy(x => x.OpenStatus));
         set => RaiseAndSetIfChanged(ref _filteredSchedules, value);
     }
     
@@ -97,6 +90,17 @@ internal class MainViewModel : BaseViewModel {
         }
 
         return string.Empty;
+    }
+
+    private void LoadView() {
+        Schedules = new(_revitRepository
+            .GetSchedulesVM()
+            .ToList());
+        FilteredSchedules = new ObservableCollection<ScheduleViewModel>(Schedules);
+
+        if(_revitRepository.Document.ActiveView is not ViewSchedule) {
+            LoadConfig();
+        }
     }
 
     private void ExportSchedules() {

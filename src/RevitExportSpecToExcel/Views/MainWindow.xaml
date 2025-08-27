@@ -4,6 +4,8 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:b="http://schemas.microsoft.com/xaml/behaviors"
+
     xmlns:base="clr-namespace:dosymep.WPF.Views"
     xmlns:local="clr-namespace:RevitExportSpecToExcel.Views"
     xmlns:vms="clr-namespace:RevitExportSpecToExcel.ViewModels"
@@ -30,6 +32,14 @@
             </ResourceDictionary.MergedDictionaries>
         </ResourceDictionary>
     </core:WpfUIPlatformWindow.Resources>
+
+    <b:Interaction.Triggers>
+        <b:EventTrigger
+            EventName="Loaded">
+            <b:InvokeCommandAction
+                Command="{Binding LoadViewCommand}" />
+        </b:EventTrigger>
+    </b:Interaction.Triggers>
 
     <Grid>
         <Grid.RowDefinitions>
@@ -75,7 +85,7 @@
                     Style="{StaticResource  CustomResizableDataGridStyle}">
                     <DataGrid.Columns>
                         <DataGridCheckBoxColumn
-                            Binding="{Binding Path=IsChecked, Mode=TwoWay}"
+                            Binding="{Binding Path=IsChecked, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
                             Header="Check" />
                         <DataGridTextColumn
                             Binding="{Binding Path=Name}"
