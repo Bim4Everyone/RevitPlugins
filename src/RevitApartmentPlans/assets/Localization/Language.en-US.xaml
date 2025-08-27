@@ -77,4 +77,55 @@ In Revit 2023, when link processing is enabled
 extra rooms may be counted
 (fixed in Revit 2024)</system:String>
 
+    <system:String
+        x:Key="ViewType.Undefined">Undefined</system:String>
+    <system:String
+        x:Key="ViewType.FloorPlan">Floor Plan</system:String>
+    <system:String
+        x:Key="ViewType.EngineeringPlan">Structural Plan</system:String>
+    <system:String
+        x:Key="ViewType.AreaPlan">Area Plan</system:String>
+    <system:String
+        x:Key="ViewType.CeilingPlan">Ceiling Plan</system:String>
+    <system:String
+        x:Key="ViewType.Elevation">Elevation</system:String>
+    <system:String
+        x:Key="ViewType.Section">Section</system:String>
+    <system:String
+        x:Key="ViewType.Detail">Detail View</system:String>
+    <system:String
+        x:Key="ViewType.ThreeD">3D View</system:String>
+    <system:String
+        x:Key="ViewType.Schedule">Schedule</system:String>
+    <system:String
+        x:Key="ViewType.DraftingView">Drafting View</system:String>
+    <system:String
+        x:Key="ViewType.DrawingSheet">Sheet</system:String>
+    <system:String
+        x:Key="ViewType.Legend">Legend</system:String>
+    <system:String
+        x:Key="ViewType.Report">Report</system:String>
+    <system:String
+        x:Key="ViewType.ProjectBrowser">Project Browser</system:String>
+    <system:String
+        x:Key="ViewType.SystemBrowser">System Browser</system:String>
+    <system:String
+        x:Key="ViewType.CostReport">Cost Report</system:String>
+    <system:String
+        x:Key="ViewType.LoadsReport">Loads Report</system:String>
+    <system:String
+        x:Key="ViewType.PresureLossReport">Pressure Loss Report</system:String>
+    <system:String
+        x:Key="ViewType.PanelSchedule">Panel Schedule</system:String>
+    <system:String
+        x:Key="ViewType.ColumnSchedule">Column Graphic Schedule</system:String>
+    <system:String
+        x:Key="ViewType.Walkthrough">Walkthrough</system:String>
+    <system:String
+        x:Key="ViewType.Rendering">Rendering</system:String>
+    <system:String
+        x:Key="ViewType.SystemsAnalysisReport">Systems Analysis Report</system:String>
+    <system:String
+        x:Key="ViewType.Internal">Internal Revit View</system:String>
+
 </ResourceDictionary>

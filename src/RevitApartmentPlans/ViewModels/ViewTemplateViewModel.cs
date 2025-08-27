@@ -3,20 +3,26 @@ using System.Collections.Generic;
 
 using Autodesk.Revit.DB;
 
+using dosymep.SimpleServices;
 using dosymep.WPF.ViewModels;
 
 namespace RevitApartmentPlans.ViewModels;
 internal class ViewTemplateViewModel : BaseViewModel, IEquatable<ViewTemplateViewModel> {
     private readonly ViewPlan _template;
+    private readonly ILocalizationService _localization;
 
-    public ViewTemplateViewModel(ViewPlan template) {
+    public ViewTemplateViewModel(ViewPlan template, ILocalizationService localization) {
         _template = template ?? throw new ArgumentNullException(nameof(template));
+        _localization = localization ?? throw new ArgumentNullException(nameof(localization));
+        ViewTemplateTypeName = _localization.GetLocalizedString($"{nameof(ViewType)}.{_template.ViewType}");
     }
 
 
     public string Name => _template.Name;
 
     public ViewType ViewTemplateType => _template.ViewType;
+
+    public string ViewTemplateTypeName { get; }
 
 
     public bool Equals(ViewTemplateViewModel other) {

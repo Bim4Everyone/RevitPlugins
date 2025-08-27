@@ -19,10 +19,6 @@
     d:DataContext="{d:DesignInstance vms:ViewTemplateAdditionViewModel, IsDesignTimeCreatable=False}"
     ResizeMode="NoResize"
     WindowStartupLocation="CenterOwner">
-    <Window.Resources>
-        <converters:RevitViewTypeConverter
-            x:Key="RevitViewTypeConverter" />
-    </Window.Resources>
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition
@@ -51,7 +47,7 @@
                 <ComboBox.ItemTemplate>
                     <DataTemplate>
                         <TextBlock
-                            Text="{Binding Converter={StaticResource RevitViewTypeConverter}}" />
+                            Text="{Binding Name}" />
                     </DataTemplate>
                 </ComboBox.ItemTemplate>
             </ComboBox >

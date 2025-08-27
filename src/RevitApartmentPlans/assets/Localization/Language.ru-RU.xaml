@@ -77,4 +77,55 @@
 могут учитываться лишние помещения
 (устранено в 2024 версии Revit)</system:String>
 
+    <system:String
+        x:Key="ViewType.Undefined">Не определен</system:String>
+    <system:String
+        x:Key="ViewType.FloorPlan">План этажа</system:String>
+    <system:String
+        x:Key="ViewType.EngineeringPlan">План несущих конструкций</system:String>
+    <system:String
+        x:Key="ViewType.AreaPlan">План зонирования</system:String>
+    <system:String
+        x:Key="ViewType.CeilingPlan">План потолка</system:String>
+    <system:String
+        x:Key="ViewType.Elevation">Фасад</system:String>
+    <system:String
+        x:Key="ViewType.Section">Разрез</system:String>
+    <system:String
+        x:Key="ViewType.Detail">Вид узла</system:String>
+    <system:String
+        x:Key="ViewType.ThreeD">3D вид</system:String>
+    <system:String
+        x:Key="ViewType.Schedule">Спецификация</system:String>
+    <system:String
+        x:Key="ViewType.DraftingView">Чертежный вид</system:String>
+    <system:String
+        x:Key="ViewType.DrawingSheet">Лист</system:String>
+    <system:String
+        x:Key="ViewType.Legend">Легенда</system:String>
+    <system:String
+        x:Key="ViewType.Report">Отчет</system:String>
+    <system:String
+        x:Key="ViewType.ProjectBrowser">Диспетчер проекта</system:String>
+    <system:String
+        x:Key="ViewType.SystemBrowser">Диспетчер инженерных систем</system:String>
+    <system:String
+        x:Key="ViewType.CostReport">Отчет о стоимости</system:String>
+    <system:String
+        x:Key="ViewType.LoadsReport">Отчет о нагрузках</system:String>
+    <system:String
+        x:Key="ViewType.PresureLossReport">Отчет о потерях давления</system:String>
+    <system:String
+        x:Key="ViewType.PanelSchedule">Принципиальная схема щита/панели</system:String>
+    <system:String
+        x:Key="ViewType.ColumnSchedule">Графическая спецификация колонн</system:String>
+    <system:String
+        x:Key="ViewType.Walkthrough">Обход</system:String>
+    <system:String
+        x:Key="ViewType.Rendering">Визуализация</system:String>
+    <system:String
+        x:Key="ViewType.SystemsAnalysisReport">Отчет по результатам анализа</system:String>
+    <system:String
+        x:Key="ViewType.Internal">Внутренний вид Revit</system:String>
+
 </ResourceDictionary>

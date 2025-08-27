@@ -4,6 +4,7 @@ using System.Windows.Input;
 
 using Autodesk.Revit.DB;
 
+using dosymep.SimpleServices;
 using dosymep.WPF.Commands;
 using dosymep.WPF.ViewModels;
 
@@ -19,12 +20,14 @@ internal class ViewTemplatesViewModel : BaseViewModel {
     private readonly RevitRepository _revitRepository;
     private readonly ViewTemplateAdditionViewModel _viewTemplateAdditionViewModel;
     private readonly IResolutionRoot _container;
+    private readonly ILocalizationService _localization;
 
     public ViewTemplatesViewModel(
         PluginConfig pluginConfig,
         RevitRepository revitRepository,
         ViewTemplateAdditionViewModel viewTemplateAdditionViewModel,
-        IResolutionRoot container) {
+        IResolutionRoot container,
+        ILocalizationService localization) {
 
         _pluginConfig = pluginConfig
             ?? throw new ArgumentNullException(nameof(pluginConfig));
@@ -33,6 +36,8 @@ internal class ViewTemplatesViewModel : BaseViewModel {
         _viewTemplateAdditionViewModel = viewTemplateAdditionViewModel
             ?? throw new ArgumentNullException(nameof(viewTemplateAdditionViewModel));
         _container = container ?? throw new ArgumentNullException(nameof(container));
+        _localization = localization
+            ?? throw new ArgumentNullException(nameof(localization));
         AddViewTemplateCommand = RelayCommand.Create(AddViewTemplate);
         RemoveViewTemplateCommand
             = RelayCommand.Create<ViewTemplateViewModel>(RemoveViewTemplate, CanRemoveViewTemplate);
@@ -74,7 +79,7 @@ internal class ViewTemplatesViewModel : BaseViewModel {
             ?? Array.Empty<ElementId>();
         var templates = _revitRepository.GetViewTemplates(templatesIds);
         foreach(var template in templates) {
-            ViewTemplates.Add(new ViewTemplateViewModel(template));
+            ViewTemplates.Add(new ViewTemplateViewModel(template, _localization));
         }
     }
 }

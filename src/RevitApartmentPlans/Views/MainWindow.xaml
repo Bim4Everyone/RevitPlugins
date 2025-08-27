@@ -43,8 +43,6 @@
                 <ResourceDictionary
                     Source="pack://application:,,,/Wpf.Ui;component/Controls/Button/Button.xaml" />
             </ResourceDictionary.MergedDictionaries>
-            <converters:RevitViewTypeConverter
-                x:Key="RevitViewTypeConverter" />
             <ui:TextBlock
                 x:Key="HeaderNumber"
                 Text="{me:LocalizationSource MainWindow.Header.Number}" />
@@ -242,7 +240,7 @@
                             Width="1*"
                             IsReadOnly="True"
                             Header="{StaticResource HeaderViewType}"
-                            Binding="{Binding ViewTemplateType, Converter={StaticResource RevitViewTypeConverter}}" />
+                            Binding="{Binding ViewTemplateTypeName}" />
                         <DataGridTextColumn
                             Width="3*"
                             Header="{StaticResource HeaderName}"
