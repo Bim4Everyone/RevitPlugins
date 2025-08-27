@@ -8,6 +8,28 @@
 
     <system:String
         x:Key="MainWindow.Title">Планы квартир</system:String>
+    <system:String
+        x:Key="MainWindow.Label.Offset">Отступ, мм:</system:String>
+    <system:String
+        x:Key="MainWindow.Label.Parameter">Параметр для группировки:</system:String>
+    <system:String
+        x:Key="MainWindow.Label.Apartments">Квартиры</system:String>
+    <system:String
+        x:Key="MainWindow.Label.ViewTemplates">Шаблоны видов</system:String>
+    <system:String
+        x:Key="MainWindow.Header.Number">Номер</system:String>
+    <system:String
+        x:Key="MainWindow.Header.Level">Этаж</system:String>
+    <system:String
+        x:Key="MainWindow.Header.Select">Выбрать</system:String>
+    <system:String
+        x:Key="MainWindow.Header.ViewType">Тип</system:String>
+    <system:String
+        x:Key="MainWindow.Header.Name">Название</system:String>
+    <system:String
+        x:Key="MainWindow.CopyDetail">Копировать с детализацией</system:String>
+    <system:String
+        x:Key="MainWindow.ProcessLinks">Обрабатывать связи</system:String>
 
     <system:String
         x:Key="ViewTemplateAdditionWindow.Title">Добавление шаблона вида</system:String>

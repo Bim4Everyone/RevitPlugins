@@ -14,9 +14,10 @@
     xmlns:converters="clr-namespace:dosymep.WPF.Converters"
     mc:Ignorable="d"
     WindowStartupLocation="CenterOwner"
-    Title="MainWindow"
     Height="450"
     Width="800"
+    MinWidth="900"
+    MinHeight="500"
     d:DataContext="{d:DesignInstance vms:MainViewModel, IsDesignTimeCreatable=False}">
 
     <i:Interaction.Behaviors>
@@ -44,6 +45,21 @@
             </ResourceDictionary.MergedDictionaries>
             <converters:RevitViewTypeConverter
                 x:Key="RevitViewTypeConverter" />
+            <ui:TextBlock
+                x:Key="HeaderNumber"
+                Text="{me:LocalizationSource MainWindow.Header.Number}" />
+            <ui:TextBlock
+                x:Key="HeaderLevel"
+                Text="{me:LocalizationSource MainWindow.Header.Level}" />
+            <ui:TextBlock
+                x:Key="HeaderSelect"
+                Text="{me:LocalizationSource MainWindow.Header.Select}" />
+            <ui:TextBlock
+                x:Key="HeaderViewType"
+                Text="{me:LocalizationSource MainWindow.Header.ViewType}" />
+            <ui:TextBlock
+                x:Key="HeaderName"
+                Text="{me:LocalizationSource MainWindow.Header.Name}" />
         </ResourceDictionary>
     </Window.Resources>
 
@@ -81,7 +97,7 @@
                     HorizontalAlignment="Left">
                     <Label
                         Margin="2 0 0 0"
-                        Content="Отступ, мм:" />
+                        Content="{me:LocalizationSource MainWindow.Label.Offset}" />
                     <ui:TextBox
                         Width="90"
                         Margin="0 0 5 0"
@@ -94,7 +110,7 @@
                     HorizontalAlignment="Left">
                     <Label
                         Margin="2 0 0 0"
-                        Content="Параметр для группировки:" />
+                        Content="{me:LocalizationSource MainWindow.Label.Parameter}" />
                     <ComboBox
                         Margin="0 0 5 0"
                         Width="240"
@@ -108,14 +124,14 @@
                     Height="35"
                     VerticalAlignment="Bottom"
                     IsChecked="{Binding CopyDetail}"
-                    Content="Копировать с детализацией" />
+                    Content="{me:LocalizationSource MainWindow.CopyDetail}" />
                 <DockPanel
                     Height="35"
                     VerticalAlignment="Bottom"
                     Margin="10 0 0 0">
                     <ui:ToggleSwitch
                         IsChecked="{Binding ApartmentsViewModel.ProcessLinks}"
-                        Content="Обрабатывать связи" />
+                        Content="{me:LocalizationSource MainWindow.ProcessLinks}" />
                     <ui:Button
                         Margin="5 0 0 0"
                         Width="Auto"
@@ -153,7 +169,7 @@
                 LastChildFill="True">
                 <Label
                     DockPanel.Dock="Top"
-                    Content="Квартиры" />
+                    Content="{me:LocalizationSource MainWindow.Label.Apartments}" />
                 <ui:DataGrid
                     AutoGenerateColumns="False"
                     VerticalScrollBarVisibility="Auto"
@@ -177,17 +193,17 @@
                         </DataGridTemplateColumn>
                         <DataGridTextColumn
                             Width="1*"
-                            Header="Номер"
+                            Header="{StaticResource HeaderNumber}"
                             Binding="{Binding Name}"
                             IsReadOnly="True" />
                         <DataGridTextColumn
                             Width="1*"
-                            Header="Этаж"
+                            Header="{StaticResource HeaderLevel}"
                             Binding="{Binding LevelName}"
                             IsReadOnly="True" />
                         <DataGridCheckBoxColumn
                             Width="Auto"
-                            Header="Выбрать"
+                            Header="{StaticResource HeaderSelect}"
                             Binding="{Binding IsSelected, UpdateSourceTrigger=PropertyChanged}"
                             CanUserResize="False" />
                     </ui:DataGrid.Columns>
@@ -205,7 +221,7 @@
                     DockPanel.Dock="Top">
                     <Label
                         DockPanel.Dock="Left"
-                        Content="Шаблоны видов"
+                        Content="{me:LocalizationSource MainWindow.Label.ViewTemplates}"
                         VerticalAlignment="Center" />
                     <ui:Button
                         Margin="5 0"
@@ -225,11 +241,11 @@
                         <DataGridTextColumn
                             Width="1*"
                             IsReadOnly="True"
-                            Header="Тип"
+                            Header="{StaticResource HeaderViewType}"
                             Binding="{Binding ViewTemplateType, Converter={StaticResource RevitViewTypeConverter}}" />
                         <DataGridTextColumn
                             Width="3*"
-                            Header="Название"
+                            Header="{StaticResource HeaderName}"
                             Binding="{Binding Name}"
                             IsReadOnly="True" />
                         <DataGridTemplateColumn

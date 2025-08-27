@@ -4,10 +4,32 @@
     xmlns:system="clr-namespace:System;assembly=mscorlib">
 
     <system:String
-        x:Key="Errors.ActiveViewMustBePlan">Active view must be a plan</system:String>
+        x:Key="Errors.ActiveViewMustBePlan">Active view must be a floor plan</system:String>
 
     <system:String
-        x:Key="MainWindow.Title">Apartment plans</system:String>
+        x:Key="MainWindow.Title">Apartment Plans</system:String>
+    <system:String
+        x:Key="MainWindow.Label.Offset">Offset, mm:</system:String>
+    <system:String
+        x:Key="MainWindow.Label.Parameter">Grouping parameter:</system:String>
+    <system:String
+        x:Key="MainWindow.Label.Apartments">Apartments</system:String>
+    <system:String
+        x:Key="MainWindow.Label.ViewTemplates">View Templates</system:String>
+    <system:String
+        x:Key="MainWindow.Header.Number">Number</system:String>
+    <system:String
+        x:Key="MainWindow.Header.Level">Level</system:String>
+    <system:String
+        x:Key="MainWindow.Header.Select">Select</system:String>
+    <system:String
+        x:Key="MainWindow.Header.ViewType">View type</system:String>
+    <system:String
+        x:Key="MainWindow.Header.Name">Name</system:String>
+    <system:String
+        x:Key="MainWindow.CopyDetail">Copy with detail</system:String>
+    <system:String
+        x:Key="MainWindow.ProcessLinks">Process links</system:String>
 
     <system:String
         x:Key="ViewTemplateAdditionWindow.Title">Add view template</system:String>
@@ -16,5 +38,43 @@
         x:Key="OK">OK</system:String>
     <system:String
         x:Key="Cancel">Cancel</system:String>
+
+    <system:String
+        x:Key="Transactions.PlansCreation">Apartment plans creation</system:String>
+
+    <system:String
+        x:Key="Warning">Warning</system:String>
+
+    <system:String
+        x:Key="Progress.Title">Processing apartments... [{0}]\[{1}]</system:String>
+
+    <system:String
+        x:Key="MainWindow.Validation.OffsetLessThan">Offset must not be less than {0} mm.</system:String>
+    <system:String
+        x:Key="MainWindow.Validation.OffsetGreaterThan">Offset must not be greater than {0} mm.</system:String>
+    <system:String
+        x:Key="MainWindow.Validation.ParameterNotSet">Select a parameter for grouping.</system:String>
+    <system:String
+        x:Key="MainWindow.Validation.AddViewTemplate">Add view templates.</system:String>
+    <system:String
+        x:Key="MainWindow.Validation.SelectApartments">Select apartments.</system:String>
+
+    <system:String
+        x:Key="ViewTemplates.Validation.SelectViewTemplate">Select a template</system:String>
+
+    <system:String
+        xml:space="preserve"
+        x:Key="Warnings.Revit2022">
+In Revit 2022, processing rooms from links is not fully supported:
+- extra rooms may be counted
+(fixed in Revit 2024)
+- when selecting an apartment, rooms from links will not be highlighted
+(fixed in Revit 2023)</system:String>
+    <system:String
+        xml:space="preserve"
+        x:Key="Warnings.Revit2023">
+In Revit 2023, when link processing is enabled
+extra rooms may be counted
+(fixed in Revit 2024)</system:String>
 
 </ResourceDictionary>
