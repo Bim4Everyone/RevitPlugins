@@ -10,7 +10,6 @@ using Autodesk.Revit.UI;
 using dosymep.SimpleServices;
 
 namespace RevitListOfSchedules.Models;
-
 internal class RevitRepository {
     private readonly ILocalizationService _localizationService;
     private readonly ParamFactory _paramFactory;
@@ -72,13 +71,14 @@ internal class RevitRepository {
     public ViewDrafting GetViewDrafting(string familyName) {
         string nameView = string.Format(
             _localizationService.GetLocalizedString("RevitRepository.ViewName"), familyName);
-        ViewDrafting view = new FilteredElementCollector(Document)
+        var view = new FilteredElementCollector(Document)
             .OfClass(typeof(ViewDrafting))
             .Where(v => v.Name.Equals(nameView, StringComparison.OrdinalIgnoreCase))
             .Cast<ViewDrafting>()
             .FirstOrDefault();
         return view ?? CreateViewDrafting(nameView);
     }
+
     public IList<ViewSchedule> GetScheduleInstances(Document document, ViewSheet viewSheet) {
         if(document == null || viewSheet == null) {
             return null;
@@ -110,13 +110,13 @@ internal class RevitRepository {
             .OfType<FamilyInstance>()
             .Select(instance => instance.Id)
             .ToList();
-        foreach(ElementId instance in instances) {
+        foreach(var instance in instances) {
             Document.Delete(instance);
         }
     }
 
     public void CreateSchedule(TempFamilyDocument tempDoc, FamilyInstance familyInstance) {
-        FamilySymbol familySymbol = tempDoc.FamilySymbol;
+        var familySymbol = tempDoc.FamilySymbol;
         var cache = new ViewScheduleCache(Document);
         if(!cache.IsViewScheduleExist(familySymbol.Name)) {
             _ = new ScheduleElement(this, familySymbol, familyInstance);
@@ -125,10 +125,10 @@ internal class RevitRepository {
 
     // Метод создания нового чертежного вида
     private ViewDrafting CreateViewDrafting(string nameView) {
-        IEnumerable<ViewFamilyType> viewTypes = new FilteredElementCollector(Document)
+        var viewTypes = new FilteredElementCollector(Document)
             .OfClass(typeof(ViewFamilyType))
             .Cast<ViewFamilyType>();
-        ViewFamilyType viewFamilyType = viewTypes
+        var viewFamilyType = viewTypes
             .Where(vt => vt.ViewFamily == ViewFamily.Drafting)
             .First();
 
