@@ -2133,7 +2133,7 @@
                                         <TextBlock
                                             Style="{StaticResource TextBlockWithTooltipStyle}"
                                             Margin="10 10 0 5"
-                                            Text="Отступ снизу до второго горизонтального вида">
+                                            Text="Отступ сверху до второго горизонтального вида">
                                             <TextBlock.ToolTip>
                                                 <ToolTip>
                                                     <TextBlock

@@ -316,12 +316,12 @@ public class PylonViewSectionCreator {
             sectionBoxMin = new XYZ(-coordinateX, -coordinateYToMin, -(minZ + elevationOffset - originPoint.Z));
             sectionBoxMax = new XYZ(coordinateX, coordinateYToMax, -(minZ + elevationOffset - viewDepth - originPoint.Z));
         } else if(transverseViewNum == 2) {
-            // Располагаем сечение на высоте 2000 мм от низа BoundingBox (или по значению указанному пользователем)
+            // Располагаем сечение на высоте -1500 мм от верха BoundingBox (или по значению указанному пользователем)
             double elevationOffset = UnitUtilsHelper.ConvertToInternalValue(
-            double.Parse(ViewModel.ViewSectionSettings.TransverseViewSecondElevation));
+                                    double.Parse(ViewModel.ViewSectionSettings.TransverseViewSecondElevation));
 
-            sectionBoxMin = new XYZ(-coordinateX, -coordinateYToMin, -(minZ + elevationOffset - originPoint.Z));
-            sectionBoxMax = new XYZ(coordinateX, coordinateYToMax, -(minZ + elevationOffset - viewDepth - originPoint.Z));
+            sectionBoxMin = new XYZ(-coordinateX, -coordinateYToMin, -(maxZ - elevationOffset - originPoint.Z));
+            sectionBoxMax = new XYZ(coordinateX, coordinateYToMax, -(maxZ - elevationOffset - viewDepth - originPoint.Z));
         } else if(transverseViewNum == 3) {
             // Располагаем сечение на высоте -300 мм от верха BoundingBox (или по значению указанному пользователем)
             double elevationOffset = UnitUtilsHelper.ConvertToInternalValue(

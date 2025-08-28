@@ -29,7 +29,7 @@ internal class UserViewSectionSettings : BaseViewModel {
     private string _transverseViewFirstElevationTemp = "1000";
     private string _transverseViewSecondPrefixTemp = "";
     private string _transverseViewSecondSuffixTemp = "_Сеч.2-2";
-    private string _transverseViewSecondElevationTemp = "2000";
+    private string _transverseViewSecondElevationTemp = "3000";
     private string _transverseViewThirdPrefixTemp = "";
     private string _transverseViewThirdSuffixTemp = "_Сеч.3-3";
     private string _transverseViewThirdElevationTemp = "400";
