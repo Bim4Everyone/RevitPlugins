@@ -9,7 +9,6 @@ using RevitPylonDocumentation.ViewModels;
 namespace RevitPylonDocumentation.Models.PylonSheetNView.ViewMarkServices.ViewFormMarkServices;
 internal class GeneralViewMarkService {
     private readonly FamilySymbol _tagSkeletonSymbol;
-    private readonly FamilySymbol _tagSymbolWithStep;
     private readonly FamilySymbol _universalTagType;
     private readonly FamilySymbol _breakLineSymbol;
     private readonly FamilySymbol _concretingSeamSymbol;
@@ -18,9 +17,9 @@ internal class GeneralViewMarkService {
     private readonly AnnotationService _annotationService;
 
     // Отступы для формирования линий обрыва
-    private readonly double _breakLinesOffsetX = 0.55;
-    private readonly double _breakLinesOffsetTopY = 4;
-    private readonly double _breakLinesOffsetBottomY = 1.2;
+    private readonly double _breakLinesOffsetX = 0.3;
+    private readonly double _breakLinesOffsetYSmall = 0.1;
+    private readonly double _breakLinesOffsetYBig = 0.3;
 
     internal GeneralViewMarkService(MainViewModel mvm, RevitRepository repository, PylonSheetInfo pylonSheetInfo, 
                                     PylonView pylonView) {
@@ -36,8 +35,6 @@ internal class GeneralViewMarkService {
         _tagSkeletonSymbol = mvm.SelectedSkeletonTagType;
 
         // Находим типоразмер марки несущей арматуры для обозначения позиции, диаметра и комментариев арматуры
-        // Без засечки на конце
-        _tagSymbolWithStep = mvm.SelectedRebarTagTypeWithStep;
         // Находим типоразмер типовой аннотации для метки ГОСТа сварки
         _universalTagType = mvm.SelectedUniversalTagType;
 
@@ -116,25 +113,24 @@ internal class GeneralViewMarkService {
         } catch(Exception) { }
     }
 
-    internal void TryCreateAdditionalMark() {
+    internal void TryCreateAdditionalMark(bool isForPerpView) {
         try {
             var view = ViewOfPylon.ViewElement;
-            
-            // Получаем референс-элемент
-            var bottomElement = SheetInfo.HostElems.First();
 
-            // Получаем спроецированные на плоскость вида граничные точки
-            var bbMin = bottomElement.get_BoundingBox(view).Min;
-            bbMin = _viewPointsAnalyzer.ProjectPointToViewFront(bbMin);
-            var bbMax = bottomElement.get_BoundingBox(view).Max;
-            bbMax = _viewPointsAnalyzer.ProjectPointToViewFront(bbMax);
-            var bottomRightPt = new XYZ(bbMax.X, bbMax.Y, bbMin.Z);
-
-            // Получаем точки со смещением относительно граничных точек опалубки для размещения аннотаций
-            var annotPoint = _viewPointsAnalyzer.GetPointByDirection(bottomRightPt, DirectionType.RightBottom,
-                                                                     2, 1.1);
-            var leaderPoint = _viewPointsAnalyzer.GetPointByDirection(bottomRightPt, DirectionType.LeftBottom,
-                                                                      0.4, 0.4);
+            // Определяем отступ от пилона по горизонтали
+            double horizOriginOffset = isForPerpView 
+                                            ? SheetInfo.ElemsInfo.HostWidth * 0.5
+                                            : SheetInfo.ElemsInfo.HostLength * 0.5;
+            var origin = SheetInfo.ElemsInfo.HostOrigin;
+            // Получаем спроецированную на плоскость вида граничную точку пилона
+            var pylonRightMinPoint = _viewPointsAnalyzer.GetPointByDirection(origin, DirectionType.Right,
+                                                                             horizOriginOffset, 0);
+            pylonRightMinPoint = _viewPointsAnalyzer.ProjectPointToViewFront(pylonRightMinPoint);
+            // Определяем точки аннотации
+            var leaderPoint = _viewPointsAnalyzer.GetPointByDirection(pylonRightMinPoint, DirectionType.LeftBottom,
+                                                                      0.2, 0.6);
+            var annotPoint = _viewPointsAnalyzer.GetPointByDirection(pylonRightMinPoint, DirectionType.RightBottom,
+                                                                     1.8, 1.3);
             // Создаем типовую аннотацию для обозначения ГОСТа
             _annotationService.CreateUniversalTag(annotPoint, _universalTagType, leaderPoint,
                                                   UnitUtilsHelper.ConvertToInternalValue(40),
@@ -145,29 +141,42 @@ internal class GeneralViewMarkService {
     /// <summary>
     /// Создаем линии обрыва ниже первого опалубочного элемента
     /// </summary>
-    internal void TryCreateLowerBreakLines() {
+    internal void TryCreateLowerBreakLines(bool isForPerpView) {
         if(_breakLineSymbol is null) { return; }
         var view = ViewOfPylon.ViewElement;
         try {
-            // Т.к. линии обрыва будут снизу, то берем первый элемент пилона
-            var bottomElement = SheetInfo.HostElems.First();
+            // Определяем отступ от пилона по горизонтали
+            double horizOriginOffset = isForPerpView
+                ? SheetInfo.ElemsInfo.HostWidth * 0.5 + _breakLinesOffsetYBig
+                : SheetInfo.ElemsInfo.HostLength * 0.5 + _breakLinesOffsetYBig;
+            var origin = SheetInfo.ElemsInfo.HostOrigin;
+            // Получаем спроецированную на плоскость вида левую граничную точку пилона
+            var pylonLeftMinPoint = _viewPointsAnalyzer.GetPointByDirection(origin, DirectionType.Left, 
+                                                                            horizOriginOffset, 0);
+            pylonLeftMinPoint = _viewPointsAnalyzer.ProjectPointToViewFront(pylonLeftMinPoint);
+            // Получаем спроецированную на плоскость вида правую граничную точку пилона
+            var pylonRightMinPoint = _viewPointsAnalyzer.GetPointByDirection(origin, DirectionType.Right, 
+                                                                            horizOriginOffset, 0);
+            pylonRightMinPoint = _viewPointsAnalyzer.ProjectPointToViewFront(pylonRightMinPoint);
 
-            // Получаем спроецированные на плоскость вида граничные точки
-            var bbMin = bottomElement.get_BoundingBox(view).Min;
-            bbMin = _viewPointsAnalyzer.ProjectPointToViewFront(bbMin);
-            var bbMax = bottomElement.get_BoundingBox(view).Max;
-            bbMax = _viewPointsAnalyzer.ProjectPointToViewFront(bbMax);
-            var bottomRightPt = new XYZ(bbMax.X, bbMax.Y, bbMin.Z);
+            // Получаем координаты точки min рамки подрезки вида в координатах проекта
+            var viewMin = _viewPointsAnalyzer.ProjectPointToViewFront(
+                view.CropBox.Transform.OfPoint(view.CropBox.Min));
 
             // Получаем точки со смещением относительно граничных точек опалубки для размещения аннотаций
-            var point1 = _viewPointsAnalyzer.GetPointByDirection(bbMin, DirectionType.LeftTop,
-                                                                 _breakLinesOffsetX, 0.1);
-            var point2 = _viewPointsAnalyzer.GetPointByDirection(bbMin, DirectionType.LeftBottom,
-                                                                 _breakLinesOffsetX, _breakLinesOffsetBottomY);
-            var point3 = _viewPointsAnalyzer.GetPointByDirection(bottomRightPt, DirectionType.RightBottom,
-                                                                 _breakLinesOffsetX, _breakLinesOffsetBottomY);
-            var point4 = _viewPointsAnalyzer.GetPointByDirection(bottomRightPt, DirectionType.RightTop,
-                                                                 _breakLinesOffsetX, 0.1);
+            // Чтобы их не срезало рамкой подрезки
+            var point1 = _viewPointsAnalyzer.GetPointByDirection(pylonLeftMinPoint,
+                                                                 DirectionType.Top, 0, _breakLinesOffsetYSmall);
+            var point2 = _viewPointsAnalyzer.GetPointByDirection(new XYZ(pylonLeftMinPoint.X, 
+                                                                         pylonLeftMinPoint.Y, 
+                                                                         viewMin.Z),
+                                                                 DirectionType.Top, 0, _breakLinesOffsetYBig);
+            var point3 = _viewPointsAnalyzer.GetPointByDirection(new XYZ(pylonRightMinPoint.X, 
+                                                                         pylonRightMinPoint.Y, 
+                                                                         viewMin.Z),
+                                                                 DirectionType.Top, 0, _breakLinesOffsetYBig);
+            var point4 = _viewPointsAnalyzer.GetPointByDirection(pylonRightMinPoint,
+                                                                 DirectionType.Top, 0, _breakLinesOffsetYSmall);
             // Линии обрыва - это 2D-аннотационные семейства на основе линии
             var line1 = Line.CreateBound(point1, point2);
             var line2 = Line.CreateBound(point2, point3);
@@ -187,23 +196,30 @@ internal class GeneralViewMarkService {
         try {
             // Т.к. линии обрыва будут сверху, то берем последний элемент пилона
             var topElement = SheetInfo.HostElems.Last();
+            // Отметка Z точки максимума верхнего пилона
+            var pylonMaxZ = _viewPointsAnalyzer.ProjectPointToViewFront(
+                topElement.get_BoundingBox(view).Max).Z;
 
-            // Получаем спроецированные на плоскость вида граничные точки
-            var bbMin = topElement.get_BoundingBox(view).Min;
-            bbMin = _viewPointsAnalyzer.ProjectPointToViewFront(bbMin);
-            var bbMax = topElement.get_BoundingBox(view).Max;
-            bbMax = _viewPointsAnalyzer.ProjectPointToViewFront(bbMax);
-            var topLeftPt = new XYZ(bbMin.X, bbMin.Y, bbMax.Z);
+            // Получаем координаты точек max и min рамки подрезки вида в координатах проекта
+            var viewMax = _viewPointsAnalyzer.ProjectPointToViewFront(
+                view.CropBox.Transform.OfPoint(view.CropBox.Max));
+            var viewMin = _viewPointsAnalyzer.ProjectPointToViewFront(
+                view.CropBox.Transform.OfPoint(view.CropBox.Min));
 
             // Получаем точки со смещением относительно граничных точек опалубки для размещения аннотаций
-            var point1 = _viewPointsAnalyzer.GetPointByDirection(bbMax, DirectionType.RightBottom,
-                                                                 _breakLinesOffsetX, 0.1);
-            var point2 = _viewPointsAnalyzer.GetPointByDirection(bbMax, DirectionType.RightTop,
-                                                                 _breakLinesOffsetX, _breakLinesOffsetTopY);
-            var point3 = _viewPointsAnalyzer.GetPointByDirection(topLeftPt, DirectionType.LeftTop,
-                                                                 _breakLinesOffsetX, _breakLinesOffsetTopY);
-            var point4 = _viewPointsAnalyzer.GetPointByDirection(topLeftPt, DirectionType.LeftBottom,
-                                                                 _breakLinesOffsetX, 0.1);
+            var point1 = _viewPointsAnalyzer
+                        .GetPointByDirection(new XYZ(viewMax.X, viewMax.Y, pylonMaxZ),
+                                             DirectionType.LeftBottom, _breakLinesOffsetX, _breakLinesOffsetYSmall);
+            var point2 = _viewPointsAnalyzer
+                .GetPointByDirection(viewMax,
+                                     DirectionType.LeftBottom, _breakLinesOffsetX, _breakLinesOffsetYBig);
+            var point3 = _viewPointsAnalyzer
+                .GetPointByDirection(new XYZ(viewMin.X, viewMin.Y, viewMax.Z),
+                                     DirectionType.RightBottom, _breakLinesOffsetX, _breakLinesOffsetYBig);
+            var point4 = _viewPointsAnalyzer
+                .GetPointByDirection(new XYZ(viewMin.X, viewMin.Y, pylonMaxZ),
+                                     DirectionType.RightBottom, _breakLinesOffsetX, _breakLinesOffsetYSmall);
+
             // Линии обрыва - это 2D-аннотационные семейства на основе линии
             var line1 = Line.CreateBound(point1, point2);
             var line2 = Line.CreateBound(point2, point3);
@@ -217,39 +233,45 @@ internal class GeneralViewMarkService {
     /// <summary>
     /// Создаем линии обрыва между опалубочными элементами, если их несколько
     /// </summary>
-    internal void TryCreateMiddleBreakLines() {
+    internal void TryCreateMiddleBreakLines(bool isForPerpView) {
         if(SheetInfo.HostElems.Count == 1 || _breakLineSymbol is null) {
             return;
         }
         var view = ViewOfPylon.ViewElement;
-        var previousElement = SheetInfo.HostElems.First();
         try {
+            // Определяем отступы от пилона по горизонтали
+            double horizOriginOffset = isForPerpView 
+                                            ? SheetInfo.ElemsInfo.HostWidth * 0.5 + _breakLinesOffsetYBig
+                                            : SheetInfo.ElemsInfo.HostLength * 0.5 + _breakLinesOffsetYBig;
+
+            var origin = SheetInfo.ElemsInfo.HostOrigin;
+            // Получаем спроецированную на плоскость вида левую граничную точку пилона
+            var pylonLeftMinPoint = _viewPointsAnalyzer.GetPointByDirection(origin, DirectionType.Left,
+                                                                            horizOriginOffset, 0);
+            pylonLeftMinPoint = _viewPointsAnalyzer.ProjectPointToViewFront(pylonLeftMinPoint);
+            // Получаем спроецированную на плоскость вида правую граничную точку пилона
+            var pylonRightMinPoint = _viewPointsAnalyzer.GetPointByDirection(origin, DirectionType.Right,
+                                                                             horizOriginOffset, 0);
+            pylonRightMinPoint = _viewPointsAnalyzer.ProjectPointToViewFront(pylonRightMinPoint);
+
+            var previousElement = SheetInfo.HostElems.First();
             for(int i = 1; i < SheetInfo.HostElems.Count; i++) {
                 var currentElement = SheetInfo.HostElems[i];
 
-                // Получаем спроецированные на плоскость вида граничные точки
-                var currentBbMax = currentElement.get_BoundingBox(view).Max;
-                var currentBbMin = currentElement.get_BoundingBox(view).Min;
-                var previousBbMax = previousElement.get_BoundingBox(view).Max;
-                var previousBbMin = previousElement.get_BoundingBox(view).Min;
-
-                currentBbMax = _viewPointsAnalyzer.ProjectPointToViewFront(currentBbMax);
-                currentBbMin = _viewPointsAnalyzer.ProjectPointToViewFront(currentBbMin);
-                previousBbMax = _viewPointsAnalyzer.ProjectPointToViewFront(previousBbMax);
-                previousBbMin = _viewPointsAnalyzer.ProjectPointToViewFront(previousBbMin);
-
-                var currentBottomRightPt = new XYZ(currentBbMax.X, currentBbMax.Y, currentBbMin.Z);
-                var previousTopLeftPt = new XYZ(previousBbMin.X, previousBbMin.Y, previousBbMax.Z);
+                // Получаем спроецированные на плоскость вида граничные точки вида
+                var currentBbMinZ = currentElement.get_BoundingBox(view).Min.Z;
+                var previousBbMaxZ = previousElement.get_BoundingBox(view).Max.Z;
 
                 // Получаем точки со смещением относительно граничных точек опалубки для размещения аннотаций
-                var point1 = _viewPointsAnalyzer.GetPointByDirection(previousBbMax, DirectionType.RightBottom,
-                                                                     _breakLinesOffsetX, 0.1);
-                var point2 = _viewPointsAnalyzer.GetPointByDirection(currentBottomRightPt, DirectionType.RightTop,
-                                                                     _breakLinesOffsetX, 0.1);
-                var point3 = _viewPointsAnalyzer.GetPointByDirection(currentBbMin, DirectionType.LeftTop,
-                                                                     _breakLinesOffsetX, 0.1);
-                var point4 = _viewPointsAnalyzer.GetPointByDirection(previousTopLeftPt, DirectionType.LeftBottom,
-                                                                     _breakLinesOffsetX, 0.1);
+                var point1 = new XYZ(pylonLeftMinPoint.X, pylonLeftMinPoint.Y, currentBbMinZ);
+                var point2 = new XYZ(pylonLeftMinPoint.X, pylonLeftMinPoint.Y, previousBbMaxZ);
+                var point3 = new XYZ(pylonRightMinPoint.X, pylonRightMinPoint.Y, previousBbMaxZ);
+                var point4 = new XYZ(pylonRightMinPoint.X, pylonRightMinPoint.Y, currentBbMinZ);
+                
+                point1 = _viewPointsAnalyzer.GetPointByDirection(point1, DirectionType.Top, 0, _breakLinesOffsetYSmall);
+                point2 = _viewPointsAnalyzer.GetPointByDirection(point2, DirectionType.Bottom, 0, _breakLinesOffsetYSmall);
+                point3 = _viewPointsAnalyzer.GetPointByDirection(point3, DirectionType.Bottom, 0, _breakLinesOffsetYSmall);
+                point4 = _viewPointsAnalyzer.GetPointByDirection(point4, DirectionType.Top, 0, _breakLinesOffsetYSmall);
                 // Линии обрыва - это 2D-аннотационные семейства на основе линии
                 var line1 = Line.CreateBound(point1, point2);
                 var line2 = Line.CreateBound(point3, point4);
@@ -261,6 +283,9 @@ internal class GeneralViewMarkService {
         } catch(Exception) { }
     }
 
+    /// <summary>
+    /// Создание аннотации рабочего шва бетонирования
+    /// </summary>
     internal void TryCreateConcretingSeams() {
         var view = ViewOfPylon.ViewElement;
         if(_concretingSeamSymbol is null) { return; }
