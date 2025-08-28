@@ -1,9 +1,8 @@
-namespace RevitRefreshLinks.Models {
-    internal interface IFileModel : IFileSystemInfoModel {
-        IDirectoryModel Directory { get; }
+namespace RevitRefreshLinks.Models;
+internal interface IFileModel : IFileSystemInfoModel {
+    IDirectoryModel Directory { get; }
 
-        string DirectoryName { get; }
+    string DirectoryName { get; }
 
-        long Length { get; }
-    }
+    long Length { get; }
 }

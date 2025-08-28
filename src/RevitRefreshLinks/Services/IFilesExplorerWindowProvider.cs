@@ -1,7 +1,6 @@
 using RevitRefreshLinks.Views;
 
-namespace RevitRefreshLinks.Services {
-    internal interface IFilesExplorerWindowProvider {
-        FilesExplorerWindow GetFilesExplorerWindow();
-    }
+namespace RevitRefreshLinks.Services;
+internal interface IFilesExplorerWindowProvider {
+    FilesExplorerWindow GetFilesExplorerWindow();
 }
