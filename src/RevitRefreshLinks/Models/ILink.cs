@@ -1,9 +1,8 @@
-namespace RevitRefreshLinks.Models {
-    internal interface ILink {
-        string Name { get; }
+namespace RevitRefreshLinks.Models;
+internal interface ILink {
+    string Name { get; }
 
-        string NameWithExtension { get; }
+    string NameWithExtension { get; }
 
-        string FullPath { get; }
-    }
+    string FullPath { get; }
 }

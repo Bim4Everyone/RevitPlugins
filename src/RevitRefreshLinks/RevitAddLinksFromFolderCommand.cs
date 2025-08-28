@@ -15,54 +15,52 @@ using RevitRefreshLinks.Models;
 using RevitRefreshLinks.Services;
 using RevitRefreshLinks.ViewModels;
 
-namespace RevitRefreshLinks {
-    [Transaction(TransactionMode.Manual)]
-    public class RevitAddLinksFromFolderCommand : BasePluginCommand {
-        public RevitAddLinksFromFolderCommand() {
-            PluginName = "Добавить связанные файлы из папки";
-        }
+namespace RevitRefreshLinks;
+[Transaction(TransactionMode.Manual)]
+public class RevitAddLinksFromFolderCommand : BasePluginCommand {
+    public RevitAddLinksFromFolderCommand() {
+        PluginName = "Добавить связанные файлы из папки";
+    }
 
-        protected override void Execute(UIApplication uiApplication) {
-            using(IKernel kernel = uiApplication.CreatePlatformServices()) {
-                kernel.Bind<RevitRepository>()
-                    .ToSelf()
-                    .InSingletonScope();
-                kernel.Bind<ILocalSourceLinksProvider>()
-                    .To<FolderLinksProvider>()
-                    .InSingletonScope();
-                kernel.Bind<ILinksLoader>()
-                    .To<LinksLoader>()
-                    .InSingletonScope();
-                kernel.Bind<AddLocalLinksViewModel>()
-                    .ToSelf()
-                    .InSingletonScope();
-                kernel.Bind<IConfigProvider>()
-                    .To<ConfigProvider>()
-                    .InSingletonScope();
+    protected override void Execute(UIApplication uiApplication) {
+        using var kernel = uiApplication.CreatePlatformServices();
+        kernel.Bind<RevitRepository>()
+            .ToSelf()
+            .InSingletonScope();
+        kernel.Bind<ILocalSourceLinksProvider>()
+            .To<FolderLinksProvider>()
+            .InSingletonScope();
+        kernel.Bind<ILinksLoader>()
+            .To<LinksLoader>()
+            .InSingletonScope();
+        kernel.Bind<AddLocalLinksViewModel>()
+            .ToSelf()
+            .InSingletonScope();
+        kernel.Bind<IConfigProvider>()
+            .To<ConfigProvider>()
+            .InSingletonScope();
 
-                kernel.Bind<AddLinksFromFolderConfig>()
-                    .ToMethod(c => AddLinksFromFolderConfig.GetPluginConfig())
-                    .InTransientScope();
+        kernel.Bind<AddLinksFromFolderConfig>()
+            .ToMethod(c => AddLinksFromFolderConfig.GetPluginConfig())
+            .InTransientScope();
 
-                string assemblyName = Assembly.GetExecutingAssembly().GetName().Name;
-                kernel.UseXtraLocalization(
-                    $"/{assemblyName};component/Localization/Language.xaml",
-                    CultureInfo.GetCultureInfo("ru-RU"));
-                var localizationService = kernel.Get<ILocalizationService>();
-                kernel.UseXtraOpenFileDialog<FolderLinksProvider>(
-                    title: localizationService.GetLocalizedString("SelectLinksFromFolderDialog.Title"),
-                    filter: localizationService.GetLocalizedString("SelectLinksFromFolderDialog.Filter"),
-                    initialDirectory: GetInitialFolder(kernel),
-                    multiSelect: true);
+        string assemblyName = Assembly.GetExecutingAssembly().GetName().Name;
+        kernel.UseXtraLocalization(
+            $"/{assemblyName};component/Localization/Language.xaml",
+            CultureInfo.GetCultureInfo("ru-RU"));
+        var localizationService = kernel.Get<ILocalizationService>();
+        kernel.UseXtraOpenFileDialog<FolderLinksProvider>(
+            title: localizationService.GetLocalizedString("SelectLinksFromFolderDialog.Title"),
+            filter: localizationService.GetLocalizedString("SelectLinksFromFolderDialog.Filter"),
+            initialDirectory: GetInitialFolder(kernel),
+            multiSelect: true);
 
-                Notification(kernel.Get<AddLocalLinksViewModel>().ShowWindow());
-            }
-        }
+        Notification(kernel.Get<AddLocalLinksViewModel>().ShowWindow());
+    }
 
-        private string GetInitialFolder(IKernel kernel) {
-            return kernel.Get<AddLinksFromFolderConfig>()
-                .GetSettings(kernel.Get<UIApplication>().ActiveUIDocument.Document)
-                ?.InitialFolderPath ?? string.Empty;
-        }
+    private string GetInitialFolder(IKernel kernel) {
+        return kernel.Get<AddLinksFromFolderConfig>()
+            .GetSettings(kernel.Get<UIApplication>().ActiveUIDocument.Document)
+            ?.InitialFolderPath ?? string.Empty;
     }
 }
