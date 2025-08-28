@@ -76,9 +76,15 @@ internal class PylonElemsInfo {
             HostOrigin = wallLineStart + 0.5 * VectorByLength;
         } else {
             var column = bottomHost as FamilyInstance;
-
             var locationPoint = column.Location as LocationPoint;
             HostOrigin = locationPoint.Point;
+            
+            // В случае FamilyInstance этого недостаточно, т.к. отметка по высоте будет на уровне 0
+            // Поэтому берем высотную отметку уровня элемента, смещение элемента от этого уровня и складываем для Z
+            var level = Repository.Document.GetElement(column.LevelId) as Level;
+            var levelElevation = level.Elevation;
+            var levelOffset = column.GetParamValue<double>(BuiltInParameter.FAMILY_BASE_LEVEL_OFFSET_PARAM);
+            HostOrigin = new XYZ(HostOrigin.X, HostOrigin.Y, HostOrigin.Z + levelElevation + levelOffset);
         }
     }
 
