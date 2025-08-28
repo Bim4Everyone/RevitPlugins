@@ -67,4 +67,7 @@ internal class RevitSettings : ProjectSettings {
     /// </summary>
     public IList<ElementId> SelectedLinks { get; set; }
     public string GroupParameter { get; set; }
+    public bool IsCreateScheduleChecked { get; set; }
+    public bool IsScheduleToSheetChecked { get; set; }
+    public bool IsRevisionVisibleChecked { get; set; }
 }

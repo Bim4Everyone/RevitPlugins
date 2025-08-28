@@ -1,38 +1,61 @@
-<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-                    xmlns:system="clr-namespace:System;assembly=mscorlib">
-    <system:String 
-        x:Key="MainWindow.Title">Ведомость спецификаций</system:String>    
+<ResourceDictionary
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:system="clr-namespace:System;assembly=mscorlib">
+    <system:String
+        x:Key="MainWindow.Title">Ведомость спецификаций</system:String>
     <system:String
         x:Key="MainWindow.ReloadButton">Обновить связь</system:String>
     <system:String
-        x:Key="MainWindow.GroupParametersLabel">Параметр группировки:</system:String>    
+        x:Key="MainWindow.Settings">Настройки</system:String>
+    <system:String
+        x:Key="MainWindow.GroupParameters">Параметр группировки:</system:String>
+    <system:String
+        x:Key="MainWindow.GroupParametersTooltip">Параметр, используемый в группировке листов</system:String>
+    <system:String
+        x:Key="MainWindow.CreateList">Создать ведомость</system:String>
+    <system:String
+        x:Key="MainWindow.CreateListTooltip">Будет создана новая ведомость, если такой еще нет в проекте</system:String>
+    <system:String
+        x:Key="MainWindow.AddListToSheet">Добавить ведомость на лист</system:String>
+    <system:String
+        x:Key="MainWindow.AddListToSheetTooltip">Созданная ведомость добавится в ведомость спецификаций на 1 лист</system:String>
+    <system:String
+        x:Key="MainWindow.ConsiderRevision">Учитывать изменения листа</system:String>
+    <system:String
+        x:Key="MainWindow.ConsiderRevisionTooltip">Добавить в ведомость информацию об изменениях листа</system:String>
+    <system:String
+        x:Key="MainWindow.OnContent">Включено</system:String>
+    <system:String
+        x:Key="MainWindow.OffContent">Выключено</system:String>
+    <system:String
+        x:Key="MainWindow.StatusTextLoaded">Загружена</system:String>
+    <system:String
+        x:Key="MainWindow.StatusTextUnloaded">Не загружена</system:String>
     <system:String
         x:Key="MainWindow.LinkName">Наименование связи</system:String>
     <system:String
-        x:Key="MainWindow.LinkFullName">Полное наименование связи</system:String>
-    <system:String
-        x:Key="MainWindow.Reload">Обновить</system:String>
+        x:Key="MainWindow.LinkStatus">Статус связи</system:String>
     <system:String
         x:Key="MainWindow.SheetNumber">Номер листа</system:String>
     <system:String
         x:Key="MainWindow.SheetName">Наименование листа</system:String>
     <system:String
         x:Key="MainWindow.SheetRevisionNumber">Номер изменения</system:String>
-    <system:String 
+    <system:String
         x:Key="MainWindow.ButtonOk">Создать</system:String>
-    <system:String 
+    <system:String
         x:Key="MainWindow.ButtonCancel">Отмена</system:String>
     <system:String
-        x:Key="TempFamilyDocument.TemplateFamilyName">{0}\Аннотации\Метрическая система, типовая аннотация.rft</system:String>
+        x:Key="TempFamilyDocument.TemplateFamilyName">{0}\Метрическая система, элементы узлов.rft</system:String>
     <system:String
         x:Key="TempFamilyDocument.FamilyName">{0}Ведомость_Спецификаций_{1}{2}</system:String>
     <system:String
-        x:Key="TempFamilyDocument.TransactionName">Параметры, окружность</system:String>          
+        x:Key="TempFamilyDocument.TransactionName">Создание окружности</system:String>
     <system:String
-        x:Key="RevitRepository.ViewName">Ведомость_Cпецификаций_{0}</system:String>    
+        x:Key="RevitRepository.ViewName">Ведомость_Cпецификаций_{0}</system:String>
     <system:String
-        x:Key="MainViewModel.ErrorText">Выберите листы для создания ведомости спецификаций</system:String>   
+        x:Key="MainViewModel.ErrorText">Выберите листы для создания ведомости спецификаций</system:String>
     <system:String
         x:Key="MainViewModel.ErrorLinkText">Связи находятся в закрытых рабочих наборах</system:String>
     <system:String
@@ -40,7 +63,13 @@
     <system:String
         x:Key="MainViewModel.ProgressTitleLinks">Обновление связанных файлов... [{0}]\[{1}]</system:String>
     <system:String
-        x:Key="MainViewModel.ProgressTitleSheets">Обработка листов... [{0}]\[{1}]</system:String>    
+        x:Key="MainViewModel.ProgressTitleSheets">Обработка листов... [{0}]\[{1}]</system:String>
+    <system:String
+        x:Key="Common.MessageBody">Пожалуйста, закройте текущую спецификацию</system:String>
+    <system:String
+        x:Key="Common.MessageBody_2">Ошибка загрузки параметров</system:String>
+    <system:String
+        x:Key="Common.MessageTitle">Ошибка настройки плагина</system:String>
     <system:String
         x:Key="GroupParameter.NoParameter">Нет параметра группировки</system:String>
     <system:String
