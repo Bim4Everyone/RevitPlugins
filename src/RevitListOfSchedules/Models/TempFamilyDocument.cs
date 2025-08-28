@@ -1,5 +1,4 @@
 using System;
-using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 
@@ -8,11 +7,8 @@ using Autodesk.Revit.DB;
 using dosymep.Revit;
 using dosymep.SimpleServices;
 
-using RevitListOfSchedules.Interfaces;
-
-
 namespace RevitListOfSchedules.Models;
-internal class TempFamilyDocument : IFamilyDocument {
+internal class TempFamilyDocument {
     private const string _extension = ".rfa";
     private const int _diameterArc = 5; // Диаметр окружности для семейства. Выбрано 5 чтобы его было видно на виде.
     private readonly ILocalizationService _localizationService;
@@ -21,7 +17,6 @@ internal class TempFamilyDocument : IFamilyDocument {
     private readonly string _familyTemplatePath;
     private readonly string _familyPath;
     private readonly string _tempDirectory = Path.GetTempPath();
-    private readonly string _albumName;
 
     public TempFamilyDocument(
         ILocalizationService localizationService,
@@ -31,15 +26,14 @@ internal class TempFamilyDocument : IFamilyDocument {
         _localizationService = localizationService;
         _revitRepository = revitRepository;
         _familyLoadOptions = familyLoadOptions;
-        _albumName = albumName;
 
         string familyTemplatePath = _revitRepository.Application.FamilyTemplatePath;
 
         _familyTemplatePath = _localizationService.GetLocalizedString(
             "TempFamilyDocument.TemplateFamilyName", familyTemplatePath);
-
         _familyPath = _localizationService.GetLocalizedString(
             "TempFamilyDocument.FamilyName", _tempDirectory, albumName, _extension);
+
         CreateDocument();
 
         FamilySymbol = LoadFamilySymbol();
@@ -47,50 +41,11 @@ internal class TempFamilyDocument : IFamilyDocument {
 
     public FamilySymbol FamilySymbol { get; }
 
-    public List<FamilyInstance> GetFamilyInstances(
-        Document document, ViewSheet viewSheet, string number, string revisionNumber, ViewDrafting viewDrafting) {
-
-        List<FamilyInstance> familyInstanceList = [];
-        var schedules = _revitRepository.GetScheduleInstances(document, viewSheet);
-
-        if(schedules != null) {
-            var instances = PlaceFamilyInstances(viewDrafting, number, revisionNumber, schedules);
-            familyInstanceList.AddRange(instances);
-        }
-        return familyInstanceList;
-    }
-
-    public FamilyInstance CreateInstance(View view, string name, string number, string revisionNumber) {
-        var xyz = XYZ.Zero;
-        var familyInstance = _revitRepository.Document.Create.NewFamilyInstance(xyz, FamilySymbol, view);
-        familyInstance.SetParamValue(ParamFactory.FamilyParamNumber, number);
-        familyInstance.SetParamValue(ParamFactory.FamilyParamName, name);
-        familyInstance.SetParamValue(ParamFactory.FamilyParamRevision, revisionNumber);
-        return familyInstance;
-    }
-
-    private IList<FamilyInstance> PlaceFamilyInstances(
-        View view, string number, string revisionNumber, IList<ViewSchedule> viewSchedules) {
-        IList<FamilyInstance> familyInstanceList = [];
-        foreach(var schedule in viewSchedules) {
-            var table_data = schedule.GetTableData();
-            var head_data = table_data.GetSectionData(SectionType.Header);
-            string result = head_data == null
-                ? schedule.Name
-                : head_data.GetCellText(0, 0);
-            var familyInstance = CreateInstance(view, result, number, revisionNumber);
-            familyInstanceList.Add(familyInstance);
-        }
-        return familyInstanceList;
-    }
-
     private Document CreateDocument() {
         var document = _revitRepository.Application.NewFamilyDocument(_familyTemplatePath);
         string transactionName = _localizationService.GetLocalizedString("TempFamilyDocument.TransactionName");
         using(var t = document.StartTransaction(transactionName)) {
-            CreateParameters(document);
             CreateCircle(document);
-            ModifyDefaultText(document, _albumName);
             t.Commit();
         }
         var opt = new SaveAsOptions {
@@ -101,31 +56,16 @@ internal class TempFamilyDocument : IFamilyDocument {
         return document;
     }
 
-    private void CreateParameters(Document document) {
-        var familyManager = document.FamilyManager;
-        familyManager.AddParameter(ParamFactory.FamilyParamNumber, GroupTypeId.Text, SpecTypeId.String.Text, true);
-        familyManager.AddParameter(ParamFactory.FamilyParamName, GroupTypeId.Text, SpecTypeId.String.Text, true);
-        familyManager.AddParameter(ParamFactory.FamilyParamRevision, GroupTypeId.Text, SpecTypeId.String.Text, true);
-    }
-
     private void CreateCircle(Document document) {
         var viewPlan = new FilteredElementCollector(document)
-            .OfClass(typeof(ViewSheet))
-            .Cast<ViewSheet>()
+            .OfClass(typeof(ViewPlan))
+            .Cast<ViewPlan>()
             .First();
         var familyCreator = document.FamilyCreate;
         double diameterArc = UnitUtils.ConvertToInternalUnits(_diameterArc, UnitTypeId.Millimeters);
         var plane = Plane.CreateByNormalAndOrigin(XYZ.BasisZ, XYZ.Zero);
         var circle = Arc.Create(plane, diameterArc / 2, 0, 2 * Math.PI);
         familyCreator.NewDetailCurve(viewPlan, circle);
-    }
-
-    private void ModifyDefaultText(Document document, string text) {
-        var textNote = new FilteredElementCollector(document)
-            .OfClass(typeof(TextNote))
-            .Cast<TextNote>()
-            .First();
-        textNote.Text = text;
     }
 
     private FamilySymbol LoadFamilySymbol() {

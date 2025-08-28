@@ -79,6 +79,7 @@ internal class RevitRepository {
         return view ?? CreateViewDrafting(nameView);
     }
 
+    // Метод получения экземпляров спецификация с листа
     public IList<ViewSchedule> GetScheduleInstances(Document document, ViewSheet viewSheet) {
         if(document == null || viewSheet == null) {
             return null;
@@ -97,6 +98,7 @@ internal class RevitRepository {
             .ToList();
     }
 
+    // Метод получения типа семейства
     public FamilySymbol GetFamilySymbol(Family family) {
         ElementFilter filter = new FamilySymbolFilter(family.Id);
         return new FilteredElementCollector(Document)
@@ -105,22 +107,23 @@ internal class RevitRepository {
             .First();
     }
 
-    public void DeleteFamilyInstances(View view) {
-        var instances = new FilteredElementCollector(Document, view.Id)
-            .OfType<FamilyInstance>()
-            .Select(instance => instance.Id)
-            .ToList();
-        foreach(var instance in instances) {
-            Document.Delete(instance);
+    // Метод создания новой спецификации
+    public void CreateSchedule(string newScheduleName) {
+        if(CheckSchedule(newScheduleName)) {
+            _ = new ScheduleElement(this, newScheduleName);
         }
     }
 
-    public void CreateSchedule(TempFamilyDocument tempDoc, FamilyInstance familyInstance) {
-        var familySymbol = tempDoc.FamilySymbol;
+    // Метод поиска и получения спецификации по имени
+    public ViewSchedule GetSchedule(string scheduleName) {
         var cache = new ViewScheduleCache(Document);
-        if(!cache.IsViewScheduleExist(familySymbol.Name)) {
-            _ = new ScheduleElement(this, familySymbol, familyInstance);
-        }
+        return cache.ExistViewSchedule(scheduleName);
+    }
+
+    // Метод проверки наличия нужной спецификации в проекте
+    private bool CheckSchedule(string scheduleName) {
+        var schedule = GetSchedule(scheduleName);
+        return schedule == null;
     }
 
     // Метод создания нового чертежного вида

@@ -7,10 +7,10 @@
     xmlns:b="http://schemas.microsoft.com/xaml/behaviors"
     xmlns:base="clr-namespace:dosymep.WPF.Views"
     xmlns:vms="clr-namespace:RevitListOfSchedules.ViewModels"
-    xmlns:converters="clr-namespace:dosymep.WpfCore.Converters;assembly=dosymep.WpfCore"
     xmlns:core="clr-namespace:dosymep.WpfUI.Core"
     xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
     xmlns:me="clr-namespace:dosymep.WpfCore.MarkupExtensions;assembly=dosymep.WpfCore"
+    xmlns:controls="clr-namespace:RevitListOfSchedules.Views"
     WindowStartupLocation="CenterOwner"
     Width="1600"
     Height="700"
@@ -26,45 +26,6 @@
                 <ResourceDictionary
                     Source="CustomStyles.xaml" />
             </ResourceDictionary.MergedDictionaries>
-            
-            <ui:SymbolRegular
-                x:Key="StatusLoaded">arrowDownload16</ui:SymbolRegular>
-            
-            <ui:SymbolRegular
-                x:Key="StatusUnloaded">dismiss16</ui:SymbolRegular>
-            
-            <converters:BoolToObjectConverter
-                x:Key="StatusConverter"
-                TrueValue="{StaticResource StatusLoaded}"
-                FalseValue="{StaticResource StatusUnloaded}"
-                DefaultValue="{StaticResource StatusUnloaded}"/>
-
-            <CollectionViewSource
-                x:Key="GroupedAlbums"
-                Source="{Binding Sheets}">
-                <CollectionViewSource.GroupDescriptions>
-                    <PropertyGroupDescription
-                        PropertyName="AlbumName" />
-                </CollectionViewSource.GroupDescriptions>
-            </CollectionViewSource>
-            <ui:TextBlock
-                x:Key="LinkName"
-                Text="{me:LocalizationSource MainWindow.LinkName}" />
-            <ui:TextBlock
-                x:Key="LinkFullName"
-                Text="{me:LocalizationSource MainWindow.LinkFullName}" />
-            <ui:TextBlock
-                x:Key="Reload"
-                Text="{me:LocalizationSource MainWindow.Reload}" />
-            <ui:TextBlock
-                x:Key="SheetNumber"
-                Text="{me:LocalizationSource MainWindow.SheetNumber}" />
-            <ui:TextBlock
-                x:Key="SheetName"
-                Text="{me:LocalizationSource MainWindow.SheetName}" />
-            <ui:TextBlock
-                x:Key="SheetRevisionNumber"
-                Text="{me:LocalizationSource MainWindow.SheetRevisionNumber}" />
         </ResourceDictionary>
     </Window.Resources>
 
@@ -81,7 +42,7 @@
             <RowDefinition
                 Height="Auto" />
             <RowDefinition
-                Height="70" />
+                Height="55" />
             <RowDefinition />
             <RowDefinition
                 Height="Auto" />
@@ -89,7 +50,7 @@
 
         <Grid.ColumnDefinitions>
             <ColumnDefinition
-                Width="800" />
+                Width="560" />
             <ColumnDefinition
                 Width="Auto" />
             <ColumnDefinition />
@@ -98,6 +59,8 @@
         <ui:TitleBar
             Grid.Row="0"
             Grid.ColumnSpan="3"
+            FontWeight="Bold"
+            FontSize="14"
             Title="{me:LocalizationSource MainWindow.Title}" />
 
         <GridSplitter
@@ -105,188 +68,98 @@
             Grid.Row="1"
             Grid.RowSpan="2"
             Width="2"
-            BorderBrush="DarkGray"
+            Background="Transparent"
             HorizontalAlignment="Center">
         </GridSplitter>
 
         <ui:Button
             Grid.Row="1"
-            Width="200"
-            Margin="20"
-            Appearance="Info"
-            VerticalAlignment="Center"
-            HorizontalAlignment="Left"
+            Grid.Column="0"
+            Style="{StaticResource CustomContentBigButton}"
             Content="{me:LocalizationSource MainWindow.ReloadButton}"
             Command="{Binding ReloadLinksCommand, UpdateSourceTrigger=PropertyChanged}" />
 
-        <StackPanel
+        <Canvas
+            Margin="0,0,10,0"
             Grid.Row="1"
             Grid.Column="2"
-            Orientation="Horizontal">
-            <Label
-                Margin="15,5,10,0"
-                VerticalAlignment="Center"
-                Content="{me:LocalizationSource MainWindow.GroupParametersLabel}" />
-            <ComboBox
-                Margin="10"
-                MinWidth="250"
-                VerticalAlignment="Center"
-                HorizontalAlignment="Left"
-                DisplayMemberPath="Name"
-                ItemsSource="{Binding GroupParameters}"
-                SelectedItem="{Binding SelectedGroupParameter}" />
-        </StackPanel>
+            Panel.ZIndex="1"
+            HorizontalAlignment="Right"
+            Width="{Binding ActualWidth, ElementName=Expander}">
+            <Expander
+                x:Name="Expander"
+                IsExpanded="False"
+                HorizontalAlignment="Right">
+                <Expander.Header>
+                    <StackPanel
+                        Margin="10,0,10,0"
+                        Orientation="Horizontal"
+                        HorizontalAlignment="Right"
+                        VerticalAlignment="Top">
+                        <ui:TextBlock
+                            Margin="10,0,5,0"
+                            VerticalAlignment="Center"
+                            FontWeight="Bold"
+                            Text="{me:LocalizationSource MainWindow.Settings}" />
+                        <ui:SymbolIcon
+                            Margin="5,0,10,0"
+                            VerticalAlignment="Center"
+                            Width="21"
+                            Height="21"
+                            Symbol="Settings20" />
+                    </StackPanel>
+                </Expander.Header>
+                <controls:SettingsControl
+                    HorizontalAlignment="Left"
+                    VerticalAlignment="Top" />
+            </Expander>
+        </Canvas>
 
-        <ui:DataGrid
-            x:Name="FirstDataGrid"
+        <Border
             Grid.Row="2"
             Grid.Column="0"
-            ItemsSource="{Binding Links}"
-            Style="{StaticResource CustomResizableDataGridStyle}">
-            <DataGrid.Columns>
-                <DataGridTemplateColumn
-                    Width="60"
-                    CanUserResize="False">
-                    <DataGridTemplateColumn.CellTemplate>
-                        <DataTemplate>
-                            <CheckBox
-                                HorizontalAlignment="Center"
-                                VerticalAlignment="Center"
-                                IsChecked="{Binding IsChecked, UpdateSourceTrigger=PropertyChanged}" />
-                        </DataTemplate>
-                    </DataGridTemplateColumn.CellTemplate>
-                </DataGridTemplateColumn>
-                <DataGridTemplateColumn
-                    Width="30"
-                    CanUserResize="False">
-                    <DataGridTemplateColumn.CellTemplate>
-                        <DataTemplate>
-                            <ui:SymbolIcon
-                                Width="20"
-                                Height="20"
-                                Symbol="{Binding IsLoaded, Converter={StaticResource StatusConverter}}">
-                            </ui:SymbolIcon>
-                        </DataTemplate>
-                    </DataGridTemplateColumn.CellTemplate>
-                </DataGridTemplateColumn>
-                <DataGridTextColumn
-                    Width="200"
-                    Header="{StaticResource LinkName}"
-                    Binding="{Binding Name}" />
-                <DataGridTextColumn
-                    Width="300"
-                    Header="{StaticResource LinkFullName}"
-                    Binding="{Binding FullName}" />
-                <DataGridTemplateColumn
-                    Width="*"
-                    Header="{StaticResource Reload}">
-                    <DataGridTemplateColumn.CellTemplate>
-                        <DataTemplate>
-                            <Button
-                                HorizontalAlignment="Stretch"
-                                Content="{DynamicResource MainWindow.Reload}"
-                                Command="{Binding ReloadCommand, UpdateSourceTrigger=PropertyChanged}" />
-                        </DataTemplate>
-                    </DataGridTemplateColumn.CellTemplate>
-                </DataGridTemplateColumn>
-            </DataGrid.Columns>
-        </ui:DataGrid>
+            Margin="10,0,5,0"
+            Style="{StaticResource CustomBorder}">
+            <controls:LinksControl />
+        </Border>
+
         <StackPanel
             Grid.Row="3"
             Grid.Column="0"
             Orientation="Horizontal"
             HorizontalAlignment="Right">
-            <TextBlock
-                Margin="10"
-                Foreground="Orange"
-                VerticalAlignment="Center"
+            <ui:TextBlock
+                Style="{StaticResource CustomErrorText}"
                 Text="{Binding ErrorLinkText, UpdateSourceTrigger=PropertyChanged}" />
         </StackPanel>
 
-        <ui:DataGrid
-            x:Name="SecondDataGrid"
+        <Border
+            Margin="5,0,10,0"
             Grid.Row="2"
             Grid.Column="2"
-            ItemsSource="{Binding Source={StaticResource GroupedAlbums}}"
-            Style="{StaticResource CustomResizableDataGridStyle}">
-            <b:Interaction.Triggers>
-                <b:EventTrigger
-                    EventName="SelectionChanged">
-                    <b:InvokeCommandAction
-                        Command="{Binding UpdateSelectedSheetsCommand}"
-                        CommandParameter="{Binding SelectedItems, RelativeSource={RelativeSource AncestorType=DataGrid}}" />
-                </b:EventTrigger>
-            </b:Interaction.Triggers>
+            Style="{StaticResource CustomBorder}">
+            <controls:SheetsControl />
+        </Border>
 
-            <DataGrid.Columns>
-                <DataGridTextColumn
-                    Width="150"
-                    Header="{StaticResource SheetNumber}"
-                    Binding="{Binding Number}" />
-                <DataGridTextColumn
-                    Width="400"
-                    Header="{StaticResource SheetName}"
-                    Binding="{Binding Name}" />
-                <DataGridTextColumn
-                    Width="*"
-                    Header="{StaticResource SheetRevisionNumber}"
-                    Binding="{Binding RevisionNumber}" />
-            </DataGrid.Columns>
-            <DataGrid.GroupStyle>
-                <GroupStyle>
-                    <GroupStyle.ContainerStyle>
-                        <Style
-                            TargetType="{x:Type GroupItem}">
-                            <Setter
-                                Property="Template">
-                                <Setter.Value>
-                                    <ControlTemplate
-                                        TargetType="{x:Type GroupItem}">
-                                        <Grid>
-                                            <Expander
-                                                IsExpanded="True">
-                                                <Expander.Header>
-                                                    <StackPanel
-                                                        Orientation="Horizontal">
-                                                        <TextBlock
-                                                            Margin="10"
-                                                            FontWeight="Bold"
-                                                            Text="{Binding Name}" />
-                                                    </StackPanel>
-                                                </Expander.Header>
-                                                <ItemsPresenter />
-                                            </Expander>
-                                        </Grid>
-                                    </ControlTemplate>
-                                </Setter.Value>
-                            </Setter>
-                        </Style>
-                    </GroupStyle.ContainerStyle>
-                </GroupStyle>
-            </DataGrid.GroupStyle>
-        </ui:DataGrid>
         <StackPanel
             Grid.Row="3"
             Grid.Column="2"
             Orientation="Horizontal"
             HorizontalAlignment="Right">
             <ui:TextBlock
-                Margin="10"
-                Foreground="Orange"
                 VerticalAlignment="Center"
+                Style="{StaticResource CustomErrorText}"
                 Text="{Binding ErrorText, UpdateSourceTrigger=PropertyChanged}" />
             <ui:Button
-                Width="80"
-                Margin="10"
-                Appearance="Info"
                 Click="ButtonOk_Click"
+                Style="{StaticResource CustomContentButton}"
                 Content="{me:LocalizationSource MainWindow.ButtonOk}"
                 Command="{Binding AcceptViewCommand, UpdateSourceTrigger=PropertyChanged}" />
             <ui:Button
-                Width="80"
-                Margin="10"
                 IsCancel="True"
+                Appearance="Transparent"
                 Click="ButtonCancel_Click"
+                Style="{StaticResource CustomContentButton}"
                 Content="{me:LocalizationSource MainWindow.ButtonCancel}" />
         </StackPanel>
     </Grid>

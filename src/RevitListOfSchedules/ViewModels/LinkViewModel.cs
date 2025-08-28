@@ -1,37 +1,40 @@
-using System.Windows.Input;
-
 using Autodesk.Revit.DB;
 
-using dosymep.WPF.Commands;
+using dosymep.SimpleServices;
 using dosymep.WPF.ViewModels;
 
 using RevitListOfSchedules.Models;
 
 namespace RevitListOfSchedules.ViewModels;
 internal class LinkViewModel : BaseViewModel {
+
     private readonly LinkTypeElement _linkElement;
+    private readonly ILocalizationService _localizationService;
     private bool _isChecked;
     private bool _isLoaded;
+    private string _statusString;
 
-    public LinkViewModel(LinkTypeElement linkElement) {
+    public LinkViewModel(LinkTypeElement linkElement, ILocalizationService localizationService) {
         _linkElement = linkElement;
+        _localizationService = localizationService;
         SetStatus();
-        ReloadCommand = RelayCommand.Create(ReloadLinkType, CanReloadLinkType);
+        _statusString = GetStringStatus();
     }
 
-    public ICommand ReloadCommand { get; set; }
     public ElementId Id => _linkElement.Id;
     public string Name => _linkElement.Name;
-    public string FullName => _linkElement.FullName;
-
-    public bool IsLoaded {
-        get => _isLoaded;
-        set => RaiseAndSetIfChanged(ref _isLoaded, value, nameof(IsLoaded));
-    }
 
     public bool IsChecked {
         get => _isChecked;
         set => RaiseAndSetIfChanged(ref _isChecked, value, nameof(IsChecked));
+    }
+    public bool IsLoaded {
+        get => _isLoaded;
+        set => RaiseAndSetIfChanged(ref _isLoaded, value, nameof(IsLoaded));
+    }
+    public string StatusString {
+        get => _statusString;
+        set => RaiseAndSetIfChanged(ref _statusString, value, nameof(StatusString));
     }
 
     public void ReloadLinkType() {
@@ -45,5 +48,11 @@ internal class LinkViewModel : BaseViewModel {
 
     private void SetStatus() {
         IsLoaded = _linkElement.RevitLink.GetLinkedFileStatus() is LinkedFileStatus.Loaded;
+        StatusString = GetStringStatus();
+    }
+
+    private string GetStringStatus() {
+        return _isLoaded ? _localizationService.GetLocalizedString("MainWindow.StatusTextLoaded")
+            : _localizationService.GetLocalizedString("MainWindow.StatusTextUnloaded");
     }
 }

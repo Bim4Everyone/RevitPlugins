@@ -1,5 +1,7 @@
+using System;
 using System.Globalization;
 using System.Reflection;
+using System.Windows;
 
 using Autodesk.Revit.Attributes;
 using Autodesk.Revit.UI;
@@ -7,6 +9,7 @@ using Autodesk.Revit.UI;
 using dosymep.Bim4Everyone;
 using dosymep.Bim4Everyone.ProjectConfigs;
 using dosymep.Bim4Everyone.SimpleServices;
+using dosymep.SimpleServices;
 using dosymep.WpfCore.Ninject;
 using dosymep.WpfUI.Core.Ninject;
 
@@ -15,6 +18,8 @@ using Ninject;
 using RevitListOfSchedules.Models;
 using RevitListOfSchedules.ViewModels;
 using RevitListOfSchedules.Views;
+
+
 
 namespace RevitListOfSchedules;
 
@@ -76,7 +81,22 @@ public class RevitListOfSchedulesCommand : BasePluginCommand {
             $"/{assemblyName};component/assets/localization/Language.xaml",
             CultureInfo.GetCultureInfo("ru-RU"));
 
-        // Вызывает стандартное уведомление
+        var messageBoxService = kernel.Get<IMessageBoxService>();
+        var localizationService = kernel.Get<ILocalizationService>();
+
+        // Загрузка параметров проекта
+        bool isParamChecked = new CheckProjectParams(uiApplication)
+            .CopyProjectParams()
+            .GetIsChecked();
+
+        if(!isParamChecked) {
+            string stringMessegeBody = localizationService.GetLocalizedString("Common.MessageBody_2");
+            string stringMessegeTitle = localizationService.GetLocalizedString("Common.MessageTitle");
+            messageBoxService.Show(stringMessegeBody, stringMessegeTitle, MessageBoxButton.OK, MessageBoxImage.Exclamation);
+            throw new OperationCanceledException();
+        }
+
+        //Вызывает стандартное уведомление
         Notification(kernel.Get<MainWindow>());
     }
 }
