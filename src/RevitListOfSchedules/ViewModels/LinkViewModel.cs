@@ -9,7 +9,6 @@ using RevitListOfSchedules.Models;
 
 namespace RevitListOfSchedules.ViewModels;
 internal class LinkViewModel : BaseViewModel {
-
     private readonly LinkTypeElement _linkElement;
     private bool _isChecked;
     private bool _isLoaded;
@@ -19,6 +18,7 @@ internal class LinkViewModel : BaseViewModel {
         SetStatus();
         ReloadCommand = RelayCommand.Create(ReloadLinkType, CanReloadLinkType);
     }
+
     public ICommand ReloadCommand { get; set; }
     public ElementId Id => _linkElement.Id;
     public string Name => _linkElement.Name;

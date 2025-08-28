@@ -16,8 +16,6 @@ using RevitListOfSchedules.Models;
 using RevitListOfSchedules.ViewModels;
 using RevitListOfSchedules.Views;
 
-
-
 namespace RevitListOfSchedules;
 
 /// <summary>
