@@ -2,6 +2,7 @@ using System;
 
 using RevitPylonDocumentation.Models.PylonSheetNView.ViewDimensionServices.ViewRebarDimensionServices;
 using RevitPylonDocumentation.Models.PylonSheetNView.ViewMarkServices.ViewRebarMarkServices;
+using RevitPylonDocumentation.Models.Services;
 using RevitPylonDocumentation.ViewModels;
 
 namespace RevitPylonDocumentation.Models.PylonSheetNView.ViewAnnotationCreators;
@@ -27,13 +28,13 @@ internal class GeneralViewRebarPerpAnnotCreator : ViewAnnotationCreator {
             dimensionService.TryCreateBottomEdgeRebarDimensions(skeletonParentRebar, dimensionBaseService);
 
             // Определяем с какой стороны строить вертикальную размерную цепочку по пластинам
-            var plateDimensionOffsetType = GetPlateDimensionOffsetType(rebarFinder);
+            var plateDirectionType = GetPlateDirectionType(rebarFinder);
             // Если Г-образный стержень только с одной стороны, то его нужно образмерить
             // В противном случае (оба Г-образные) это произойдет ранее
             if(!SheetInfo.RebarInfo.AllRebarAreL && SheetInfo.RebarInfo.HasLRebar) {
-                var rebarDimensionOffsetType = plateDimensionOffsetType == DimensionOffsetType.Left 
-                    ? DimensionOffsetType.Right : DimensionOffsetType.Left;
-                dimensionService.TryCreateLRebarDimension(skeletonParentRebar, rebarDimensionOffsetType, 
+                var rebarDirectionType = plateDirectionType == DirectionType.Left 
+                    ? DirectionType.Right : DirectionType.Left;
+                dimensionService.TryCreateLRebarDimension(skeletonParentRebar, rebarDirectionType, 
                                                           dimensionBaseService);
             }
             dimensionService.TryCreateLRebarDimension(skeletonParentRebar, dimensionBaseService);
@@ -49,14 +50,14 @@ internal class GeneralViewRebarPerpAnnotCreator : ViewAnnotationCreator {
         } catch(Exception) { }
     }
 
-    private DimensionOffsetType GetPlateDimensionOffsetType(RebarFinderService rebarFinder) {
+    private DirectionType GetPlateDirectionType(RebarFinderService rebarFinder) {
         // Будем ставить размерную цепочку по дефолту справа
-        var plateDimensionOffsetType = DimensionOffsetType.Right;
+        var plateDirectionType = DirectionType.Right;
         // Слева будем ставить только если есть Г-образный стержень (но не все) и он справа
         if(SheetInfo.RebarInfo.HasLRebar 
             && rebarFinder.DirectionHasLRebar(ViewOfPylon.ViewElement, SheetInfo.ProjectSection, DirectionType.Right)) {
-            plateDimensionOffsetType = DimensionOffsetType.Left;
+            plateDirectionType = DirectionType.Left;
         }
-        return plateDimensionOffsetType;
+        return plateDirectionType;
     }
 }

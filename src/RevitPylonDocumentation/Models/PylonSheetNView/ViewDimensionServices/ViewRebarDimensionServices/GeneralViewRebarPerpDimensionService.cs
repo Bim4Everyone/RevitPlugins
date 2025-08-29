@@ -4,6 +4,7 @@ using System.Linq;
 
 using Autodesk.Revit.DB;
 
+using RevitPylonDocumentation.Models.Services;
 using RevitPylonDocumentation.ViewModels;
 
 namespace RevitPylonDocumentation.Models.PylonSheetNView.ViewDimensionServices.ViewRebarDimensionServices;
@@ -34,7 +35,7 @@ internal class GeneralViewRebarPerpDimensionService {
             // Если хотя бы один из стержней - Г-образный,тогда нет смысле ставить этот размер
             // Ставится только когда обе бутылки
             if(SheetInfo.RebarInfo.HasLRebar) { return; }
-            var dimensionLineTop = dimensionBaseService.GetDimensionLine(skeletonParentRebar, DimensionOffsetType.Top, 1);
+            var dimensionLineTop = dimensionBaseService.GetDimensionLine(skeletonParentRebar, DirectionType.Top, 1);
             var refArrayTop = dimensionBaseService.GetDimensionRefs(skeletonParentRebar, '#', '/', ["верх", "торец"]);
             Repository.Document.Create.NewDimension(ViewOfPylon.ViewElement, dimensionLineTop, refArrayTop, 
                                                     ViewModel.SelectedDimensionType);
@@ -47,8 +48,8 @@ internal class GeneralViewRebarPerpDimensionService {
     internal void TryCreateBottomEdgeRebarDimensions(FamilyInstance skeletonParentRebar, 
                                                   DimensionBaseService dimensionBaseService) {
         try {
-            var dimensionLineBottom = dimensionBaseService.GetDimensionLine(skeletonParentRebar, 
-                                                                            DimensionOffsetType.Bottom, 1);
+            var dimensionLineBottom = dimensionBaseService.GetDimensionLine(skeletonParentRebar,
+                                                                            DirectionType.Bottom, 1);
             var refArrayBottom = dimensionBaseService.GetDimensionRefs(skeletonParentRebar, '#', '/', 
                                                                        ["низ", "торец"]);
             Repository.Document.Create.NewDimension(ViewOfPylon.ViewElement, dimensionLineBottom, refArrayBottom, 
@@ -59,7 +60,7 @@ internal class GeneralViewRebarPerpDimensionService {
     /// <summary>
     /// Создание размера сбоку между низом арматурного каркаса и Г-образным стержнем
     /// </summary>
-    internal void TryCreateLRebarDimension(FamilyInstance skeletonParentRebar, DimensionOffsetType dimensionOffsetType, 
+    internal void TryCreateLRebarDimension(FamilyInstance skeletonParentRebar, DirectionType directionType, 
                                            DimensionBaseService dimensionBaseService) {
         try {
             // #1_горизонт_Г-стержень
@@ -70,7 +71,7 @@ internal class GeneralViewRebarPerpDimensionService {
                                                                  ["горизонт", "край", "низ"],
                                                                  oldRefArray: refArraySide);
             var dimensionLineLeftFirst = dimensionBaseService.GetDimensionLine(skeletonParentRebar, 
-                                                                               dimensionOffsetType, 1.3);
+                                                                               directionType, 1.3);
             var dimensionRebarSideFirst = Repository.Document.Create.NewDimension(ViewOfPylon.ViewElement,
                                                                                   dimensionLineLeftFirst, refArraySide,
                                                                                   ViewModel.SelectedDimensionType);
@@ -87,7 +88,7 @@ internal class GeneralViewRebarPerpDimensionService {
             // Г-образный стержень
             var lRebar = ViewModel.RebarFinder.GetSimpleRebars(ViewOfPylon.ViewElement, SheetInfo.ProjectSection, 1101)
                                               .FirstOrDefault();
-            var dimensionLine = dimensionBaseService.GetDimensionLine(lRebar, DimensionOffsetType.Top, 0.5);
+            var dimensionLine = dimensionBaseService.GetDimensionLine(lRebar, DirectionType.Top, 0.5);
             //"#1_торец_Г_нутрь"
             //"#1_торец_Г_край"
             if(SheetInfo.RebarInfo.AllRebarAreL) {
@@ -123,7 +124,7 @@ internal class GeneralViewRebarPerpDimensionService {
             var doc = Repository.Document;
             var view = ViewOfPylon.ViewElement;
             // Создаем размеры по изгибам бутылок
-            var dimensionLineTop = dimensionBaseService.GetDimensionLine(skeletonParentRebar, DimensionOffsetType.Top, -2.3);
+            var dimensionLineTop = dimensionBaseService.GetDimensionLine(skeletonParentRebar, DirectionType.Top, -2.3);
 
             var refArrayTop1 = dimensionBaseService.GetDimensionRefs(skeletonParentRebar, '#', '/', ["1_торец"], ["Г"]);
             var dimensionTop1 = doc.Create.NewDimension(view, dimensionLineTop, refArrayTop1,

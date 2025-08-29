@@ -1,12 +1,8 @@
-using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Windows.Controls;
 
 using Autodesk.Revit.DB;
 
-using dosymep.Bim4Everyone;
-using dosymep.Revit;
 using dosymep.WPF.ViewModels;
 
 using RevitPylonDocumentation.Models.PylonSheetNView.ViewAnnotationCreatorFactories;

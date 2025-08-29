@@ -1,6 +1,6 @@
 using Autodesk.Revit.DB;
 
-namespace RevitPylonDocumentation.Models;
+namespace RevitPylonDocumentation.Models.PluginOptions;
 internal class DimensionSegmentOption {
     public DimensionSegmentOption(bool modificationNeeded) {
         ModificationNeeded = modificationNeeded;

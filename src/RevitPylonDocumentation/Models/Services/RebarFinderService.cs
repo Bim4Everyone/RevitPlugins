@@ -7,7 +7,7 @@ using dosymep.Revit;
 
 using RevitPylonDocumentation.ViewModels;
 
-namespace RevitPylonDocumentation.Models;
+namespace RevitPylonDocumentation.Models.Services;
 public class RebarFinderService {
     private readonly ParamValueService _paramValueService;
     private readonly string _formNumberParamName = "обр_ФОП_Форма_номер";
@@ -173,7 +173,6 @@ public class RebarFinderService {
         }
         return simpleRebars;
     }
-
 
 
     public List<Element> GetSimpleRebars(View view, string projectSection, int neededFormNumber) {

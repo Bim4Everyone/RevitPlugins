@@ -4,6 +4,7 @@ using System.Linq;
 
 using Autodesk.Revit.DB;
 
+using RevitPylonDocumentation.Models.Services;
 using RevitPylonDocumentation.ViewModels;
 
 namespace RevitPylonDocumentation.Models.PylonSheetNView.ViewMarkServices.ViewFormMarkServices;
@@ -60,7 +61,7 @@ internal class GeneralViewMarkService {
     internal void TryCreatePylonElevMark(List<Element> hostElems, DimensionBaseService dimensionBaseService) {
         try {
             var location = dimensionBaseService.GetDimensionLine(hostElems.First() as FamilyInstance, 
-                                                                 DimensionOffsetType.Left, 2).Origin;
+                                                                 DirectionType.Left, 2).Origin;
             foreach(var item in hostElems) {
                 if(item is not FamilyInstance hostElem) { return; }
 

@@ -1,5 +1,4 @@
-
-namespace RevitPylonDocumentation.Models;
+namespace RevitPylonDocumentation.Models.PluginOptions;
 internal class OffsetOption {
     public double LeftOffset { get; set; }
     public double TopOffset { get; set; }

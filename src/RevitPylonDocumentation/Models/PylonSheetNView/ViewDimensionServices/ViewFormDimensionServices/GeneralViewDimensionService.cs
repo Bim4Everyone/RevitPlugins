@@ -4,6 +4,8 @@ using System.Linq;
 
 using Autodesk.Revit.DB;
 
+using RevitPylonDocumentation.Models.PluginOptions;
+using RevitPylonDocumentation.Models.Services;
 using RevitPylonDocumentation.ViewModels;
 
 namespace RevitPylonDocumentation.Models.PylonSheetNView.ViewDimensionServices.ViewFormDimensionServices;
@@ -35,7 +37,7 @@ internal class GeneralViewDimensionService {
             // Размер по ФРОНТУ опалубка (положение снизу 1)
             var side = isFrontView ? "фронт" : "торец";
             var dimensionLineBottomFirst = dimensionBaseService.GetDimensionLine(skeletonParentRebar,
-                                                                                 DimensionOffsetType.Bottom, 2.3);
+                                                                                 DirectionType.Bottom, 2.3);
             var refArrayFormworkFront = dimensionBaseService.GetDimensionRefs(SheetInfo.HostElems.First() as FamilyInstance,
                                                                               '#', '/', [side, "край"]);
             Repository.Document.Create.NewDimension(view, dimensionLineBottomFirst, refArrayFormworkFront,
@@ -43,7 +45,7 @@ internal class GeneralViewDimensionService {
             if(grids.Count > 0) {
                 // Размер по ФРОНТУ опалубка + оси (положение снизу 2)
                 var dimensionLineBottomSecond = dimensionBaseService.GetDimensionLine(skeletonParentRebar,
-                                                                                      DimensionOffsetType.Bottom, 1.8);
+                                                                                      DirectionType.Bottom, 1.8);
                 var refArrayFormworkGridFront = dimensionBaseService.GetDimensionRefs(grids, view, new XYZ(0, 0, 1),
                                                                                       refArrayFormworkFront);
                 Repository.Document.Create.NewDimension(view, dimensionLineBottomSecond, refArrayFormworkGridFront,
@@ -76,11 +78,11 @@ internal class GeneralViewDimensionService {
 
                 var curve = grid.GetCurvesInView(DatumExtentType.ViewSpecific, view).First();
 
-                var offsetLine1 = dimensionBaseService.GetDimensionLine(rebar, DimensionOffsetType.Left,
+                var offsetLine1 = dimensionBaseService.GetDimensionLine(rebar, DirectionType.Left,
                                                                         offsetOption.LeftOffset);
                 var pt1 = curve.Project(offsetLine1.Origin).XYZPoint;
 
-                var offsetLine2 = dimensionBaseService.GetDimensionLine(rebar, DimensionOffsetType.Right,
+                var offsetLine2 = dimensionBaseService.GetDimensionLine(rebar, DirectionType.Right,
                                                                         offsetOption.RightOffset);
                 var pt2 = curve.Project(offsetLine2.Origin).XYZPoint;
 
@@ -90,11 +92,11 @@ internal class GeneralViewDimensionService {
             } else {
                 var curve = grid.GetCurvesInView(DatumExtentType.ViewSpecific, view).First();
 
-                var offsetLine1 = dimensionBaseService.GetDimensionLine(rebar, DimensionOffsetType.Bottom,
+                var offsetLine1 = dimensionBaseService.GetDimensionLine(rebar, DirectionType.Bottom,
                                                                         offsetOption.BottomOffset);
                 var pt1 = curve.Project(offsetLine1.Origin).XYZPoint;
 
-                var offsetLine2 = dimensionBaseService.GetDimensionLine(rebar, DimensionOffsetType.Top,
+                var offsetLine2 = dimensionBaseService.GetDimensionLine(rebar, DirectionType.Top,
                                                                         offsetOption.TopOffset);
                 var pt2 = curve.Project(offsetLine2.Origin).XYZPoint;
 
@@ -113,7 +115,7 @@ internal class GeneralViewDimensionService {
     internal void TryCreatePylonDimensions(List<Element> hostElems, DimensionBaseService dimensionBaseService) {
         try {
             var dimensionLineLeft = dimensionBaseService.GetDimensionLine(hostElems.First() as FamilyInstance,
-                                                                          DimensionOffsetType.Left, 1.6);
+                                                                          DirectionType.Left, 1.6);
             ReferenceArray refArraySide = default;
             foreach(var item in hostElems) {
                 if(item is not FamilyInstance hostElem) { return; }
@@ -155,7 +157,7 @@ internal class GeneralViewDimensionService {
                                          && ViewModel.RebarFinder.DirectionHasLRebar(ViewOfPylon.ViewElement,
                                                                                      SheetInfo.ProjectSection,
                                                                                      DirectionType.Left)
-                                         ? DimensionOffsetType.Right : DimensionOffsetType.Left;
+                                         ? DirectionType.Right : DirectionType.Left;
             // Определяем размерную линию
             var dimensionLineLeft = dimensionBaseService.GetDimensionLine(SheetInfo.HostElems.First() as FamilyInstance,
                                                                           dimensionLineDirection, 1.1);
@@ -239,7 +241,7 @@ internal class GeneralViewDimensionService {
                                                                  oldRefArray: refArray);
 
                 var dimensionLineLeft = dimensionBaseService.GetDimensionLine(SheetInfo.HostElems.First() as FamilyInstance,
-                                                              DimensionOffsetType.Left, 1.1);
+                                                                              DirectionType.Left, 1.1);
                 var dimensionRebarSide =
                     Repository.Document.Create.NewDimension(ViewOfPylon.ViewElement, dimensionLineLeft, refArray,
                                                             ViewModel.SelectedDimensionType);

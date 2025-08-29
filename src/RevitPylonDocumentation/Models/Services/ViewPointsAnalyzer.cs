@@ -4,7 +4,7 @@ using Autodesk.Revit.DB;
 
 using RevitPylonDocumentation.Models.PylonSheetNView;
 
-namespace RevitPylonDocumentation.Models;
+namespace RevitPylonDocumentation.Models.Services;
 public class ViewPointsAnalyzer {
     private readonly PylonView _viewOfPylon;
     private bool _checked;
@@ -232,11 +232,11 @@ public class ViewPointsAnalyzer {
     /// Возвращает точку спроецированную на плоскость вида
     /// </summary>
     public XYZ ProjectPointToViewFront(XYZ point) {
-        XYZ origin = _viewOfPylon.ViewElement.Origin;
-        XYZ normal = _viewOfPylon.ViewElement.ViewDirection.Normalize();
+        var origin = _viewOfPylon.ViewElement.Origin;
+        var normal = _viewOfPylon.ViewElement.ViewDirection.Normalize();
 
         // Вычисляем вектор от точки на плоскости к целевой точке
-        XYZ vector = point - origin;
+        var vector = point - origin;
 
         // Находим расстояние вдоль нормали (скалярное произведение)
         double distance = normal.DotProduct(vector);

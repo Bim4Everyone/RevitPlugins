@@ -6,6 +6,8 @@ using Autodesk.Revit.DB;
 
 using dosymep.Revit;
 
+using RevitPylonDocumentation.Models.PluginOptions;
+using RevitPylonDocumentation.Models.Services;
 using RevitPylonDocumentation.ViewModels;
 
 namespace RevitPylonDocumentation.Models.PylonSheetNView.ViewDimensionServices.ViewRebarDimensionServices;
@@ -42,7 +44,7 @@ internal class GeneralViewRebarDimensionService {
                                                     DimensionBaseService dimensionBaseService) {
         try {
             var dimensionLineBottom = dimensionBaseService.GetDimensionLine(skeletonParentRebar, 
-                                                                            DimensionOffsetType.Bottom, 1);
+                                                                            DirectionType.Bottom, 1);
             var refArrayBottom = dimensionBaseService.GetDimensionRefs(skeletonParentRebar, '#', '/', ["низ", "фронт"]);
             var dimension = Repository.Document.Create.NewDimension(ViewOfPylon.ViewElement, dimensionLineBottom, refArrayBottom,
                                                     ViewModel.SelectedDimensionType);
@@ -58,7 +60,7 @@ internal class GeneralViewRebarDimensionService {
         try {
             // Если все стержни Г-образные,тогда нет смысле ставить этот размер
             if(SheetInfo.RebarInfo.AllRebarAreL) { return; }
-            var dimensionLineTop = dimensionBaseService.GetDimensionLine(skeletonParentRebar, DimensionOffsetType.Top, 1);
+            var dimensionLineTop = dimensionBaseService.GetDimensionLine(skeletonParentRebar, DirectionType.Top, 1);
             var refArrayTop = dimensionBaseService.GetDimensionRefs(skeletonParentRebar, '#', '/', ["верх", "фронт"]);
             var dimension = Repository.Document.Create.NewDimension(ViewOfPylon.ViewElement, dimensionLineTop, refArrayTop,
                                                     ViewModel.SelectedDimensionType);
@@ -73,7 +75,7 @@ internal class GeneralViewRebarDimensionService {
                                                DimensionBaseService dimensionBaseService) {
         try {
             var dimensionLineBottomEdges = dimensionBaseService.GetDimensionLine(skeletonParentRebar,
-                                                                     DimensionOffsetType.Bottom, 1.5);
+                                                                     DirectionType.Bottom, 1.5);
             var refArrayBottomEdges = dimensionBaseService.GetDimensionRefs(skeletonParentRebar, '#', '/',
                                                                             ["низ", "фронт", "край"]);
             Repository.Document.Create.NewDimension(ViewOfPylon.ViewElement, dimensionLineBottomEdges,
@@ -113,7 +115,7 @@ internal class GeneralViewRebarDimensionService {
             dimSegmentOpts.Add(new DimensionSegmentOption(false));
 
             var dimensionLineLeft = dimensionBaseService.GetDimensionLine(SheetInfo.HostElems.First() as FamilyInstance,
-                                                                          DimensionOffsetType.Left, 1.1);
+                                                                          DirectionType.Left, 1.1);
             var dimensionRebarSide =
                 Repository.Document.Create.NewDimension(ViewOfPylon.ViewElement, dimensionLineLeft, refArraySide,
                                                         ViewModel.SelectedDimensionType);

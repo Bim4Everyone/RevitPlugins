@@ -15,6 +15,7 @@ using dosymep.WPF.ViewModels;
 
 using RevitPylonDocumentation.Models;
 using RevitPylonDocumentation.Models.PylonSheetNView;
+using RevitPylonDocumentation.Models.Services;
 using RevitPylonDocumentation.Models.UserSettings;
 using RevitPylonDocumentation.Views;
 

@@ -4,7 +4,7 @@ using System.Linq;
 
 using Autodesk.Revit.DB;
 
-namespace RevitPylonDocumentation.Models;
+namespace RevitPylonDocumentation.Models.Services;
 
 /// <summary>
 /// Сервис для получения элементов, на которых основывается размер - ссылках на опорные плоскости и линии размещения
@@ -30,10 +30,18 @@ internal class DimensionBaseService {
     }
 
 
-    public Line GetDimensionLine(Element rebar, DimensionOffsetType dimensionOffsetType, double offsetCoefficient) {
+    public Line GetDimensionLine(Element rebar, DirectionType directionType, double offsetCoefficient) {
         // Задаем дефолтные точки на случай, если не сработает получение
         var pt1 = new XYZ(0, 0, 0);
         var pt2 = new XYZ(0, 100, 0);
+
+        directionType = directionType switch {
+            DirectionType.LeftTop => DirectionType.Left,
+            DirectionType.LeftBottom => DirectionType.Left,
+            DirectionType.RightTop => DirectionType.Right,
+            DirectionType.RightBottom => DirectionType.Right,
+            _ => directionType
+        };
 
         // Если взять краевую точку рамки подрезки вида, то она будет в локальных координатах вида
         // Для перевода в глобальные координаты получим объект Transform
@@ -62,36 +70,36 @@ internal class DimensionBaseService {
         var cropBoxMinGlobal = transform.OfPoint(cropBoxMin);
 
         var bbox = rebar.get_BoundingBox(_view);
-        switch(dimensionOffsetType) {
-            case DimensionOffsetType.Top:
+        switch(directionType) {
+            case DirectionType.Top:
                 // Получаем единичный вектор вида направления вверх
                 var upDirectionNormalized = _viewUpDirection.Normalize();
                 // Получаем отступ для более корректного размещения размера относительно арматуры
                 var offsetTop = upDirectionNormalized.Multiply(offsetCoefficient);
 
                 // Получаем первую точку размерной линии по BoundingBox каркаса армирования + отступ
-                if(xUpDirectionRounded == -1 || (yUpDirectionRounded == -1)) {
+                if(xUpDirectionRounded == -1 || yUpDirectionRounded == -1) {
                     pt1 = bbox.Min + offsetTop;
                 } else {
                     pt1 = bbox.Max + offsetTop;
                 }
                 pt2 = pt1 + _viewRightDirection;
                 break;
-            case DimensionOffsetType.Bottom:
+            case DirectionType.Bottom:
                 // Получаем единичный вектор вида направления вниз
                 var downDirectionNormalized = _viewUpDirection.Normalize().Negate();
                 // Получаем отступ для более корректного размещения размера относительно арматуры
                 var offsetBottom = downDirectionNormalized.Multiply(offsetCoefficient);
 
                 // Получаем первую точку размерной линии по BoundingBox каркаса армирования + отступ
-                if(xUpDirectionRounded == -1 || (yUpDirectionRounded == -1)) {
+                if(xUpDirectionRounded == -1 || yUpDirectionRounded == -1) {
                     pt1 = bbox.Max + offsetBottom;
                 } else {
                     pt1 = bbox.Min + offsetBottom;
                 }
                 pt2 = pt1 + _viewRightDirection;
                 break;
-            case DimensionOffsetType.Left:
+            case DirectionType.Left:
                 // Получаем единичный вектор вида направления вверх
                 var leftDirectionNormalized = _viewRightDirection.Normalize().Negate();
                 // Получаем отступ для более корректного размещения размера относительно арматуры
@@ -115,7 +123,7 @@ internal class DimensionBaseService {
                 }
                 pt2 = pt1 + _viewUpDirection;
                 break;
-            case DimensionOffsetType.Right:
+            case DirectionType.Right:
                 // Получаем единичный вектор вида направления вверх
                 var rightDirectionNormalized = _viewRightDirection.Normalize();
                 // Получаем отступ для более корректного размещения размера относительно арматуры
@@ -131,7 +139,7 @@ internal class DimensionBaseService {
                     }
                 } else {
                     // Горизонтальное сечение
-                    if(xUpDirectionRounded == 1 || (yUpDirectionRounded == -1)) {
+                    if(xUpDirectionRounded == 1 || yUpDirectionRounded == -1) {
                         pt1 = bbox.Min + offsetRight;
                     } else {
                         pt1 = bbox.Max + offsetRight;

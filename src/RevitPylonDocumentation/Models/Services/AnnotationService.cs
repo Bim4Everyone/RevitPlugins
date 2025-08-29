@@ -7,7 +7,7 @@ using dosymep.Revit;
 
 using RevitPylonDocumentation.Models.PylonSheetNView;
 
-namespace RevitPylonDocumentation.Models;
+namespace RevitPylonDocumentation.Models.Services;
 internal class AnnotationService {
     private readonly PylonView _pylonView;
 
@@ -58,7 +58,7 @@ internal class AnnotationService {
         var annotationInstance = CreateAnnotationSymbol(bodyPoint, annotationSymbol, tagLength, topText, bottomText);
         // Добавляем и устанавливаем точку привязки выноски
         annotationInstance.addLeader();
-        Leader leader = annotationInstance.GetLeaders().FirstOrDefault();
+        var leader = annotationInstance.GetLeaders().FirstOrDefault();
         if(leader != null) {
             if(leaderPoint is null) {
                 var loc = element.Location as LocationPoint;
@@ -74,7 +74,7 @@ internal class AnnotationService {
         var annotationInstance = CreateAnnotationSymbol(bodyPoint, annotationSymbol, tagLength, topText, bottomText);
         // Добавляем и устанавливаем точку привязки выноски
         annotationInstance.addLeader();
-        Leader leader = annotationInstance.GetLeaders().FirstOrDefault();
+        var leader = annotationInstance.GetLeaders().FirstOrDefault();
         if(leader != null) {
             leader.End = leaderPoint; // Точка на элементе
         }

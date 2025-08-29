@@ -5,10 +5,9 @@ using Autodesk.Revit.DB;
 
 using dosymep.Revit;
 
-using RevitPylonDocumentation.Models.PylonSheetNView;
 using RevitPylonDocumentation.ViewModels;
 
-namespace RevitPylonDocumentation.Models;
+namespace RevitPylonDocumentation.Models.PylonSheetNView;
 internal class PylonElemsInfo {
     internal PylonElemsInfo(MainViewModel mvm, RevitRepository revitRepository, PylonSheetInfo pylonSheetInfo) {
         ViewModel = mvm;
@@ -130,7 +129,7 @@ internal class PylonElemsInfo {
         var angleToY = Math.Round(hostDir.AngleTo(XYZ.BasisY) * (180.0 / Math.PI));
 
         // Определяем нужно ли инвертировать вектор в зависимости от его положения в системе координат проекта
-        bool shouldInvert = (angleToX <= 45 || angleToX >= 135) ? (angleToX <= 45) : (angleToY <= 45);
+        bool shouldInvert = angleToX <= 45 || angleToX >= 135 ? angleToX <= 45 : angleToY <= 45;
         return shouldInvert ? hostDir.Negate() : hostDir;
     }
 
@@ -261,7 +260,7 @@ internal class PylonElemsInfo {
         normal = normal.Normalize();
 
         // Вычисляем вектор от точки на плоскости к целевой точке
-        XYZ vector = point - origin;
+        var vector = point - origin;
 
         // Находим расстояние вдоль нормали (скалярное произведение)
         double distance = normal.DotProduct(vector);

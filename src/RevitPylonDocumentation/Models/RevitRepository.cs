@@ -1,6 +1,5 @@
 using System.Collections.Generic;
 using System.Linq;
-using System.Windows.Media;
 
 using Autodesk.Revit.ApplicationServices;
 using Autodesk.Revit.DB;
@@ -272,7 +271,6 @@ internal class RevitRepository {
             }
         }
     }
-
 
 
     /// <summary>
