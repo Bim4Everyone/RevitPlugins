@@ -130,7 +130,8 @@ internal class GeneralViewDimensionService {
         } catch(Exception) { }
     }
 
-    internal void TryCreateTopAdditionalDimensions(FamilyInstance rebar, DimensionBaseService dimensionBaseService) {
+    internal void TryCreateTopAdditionalDimensions(FamilyInstance rebar, DimensionBaseService dimensionBaseService,
+                                                   bool isForPerpView) {
         try {
             if(SheetInfo.RebarInfo.AllRebarAreL) {
                 return;
@@ -147,8 +148,17 @@ internal class GeneralViewDimensionService {
             var lastFloorTopFace = GetTopFloorFace(lastFloor, viewOptions);
             var lastFloorBottomFace = GetBottomFloorFace(lastFloor, viewOptions);
 
+            // Если этот размер для перпендикулярного вида и Гэшка только слева, то размер нужно ставить справа
+            var dimensionLineDirection = isForPerpView
+                                         && !SheetInfo.RebarInfo.AllRebarAreL
+                                         && SheetInfo.RebarInfo.HasLRebar
+                                         && ViewModel.RebarFinder.DirectionHasLRebar(ViewOfPylon.ViewElement,
+                                                                                     SheetInfo.ProjectSection,
+                                                                                     DirectionType.Left)
+                                         ? DimensionOffsetType.Right : DimensionOffsetType.Left;
+            // Определяем размерную линию
             var dimensionLineLeft = dimensionBaseService.GetDimensionLine(SheetInfo.HostElems.First() as FamilyInstance,
-                                                                          DimensionOffsetType.Left, 1.1);
+                                                                          dimensionLineDirection, 1.1);
             // #1_горизонт_выпуск
             var refArray = dimensionBaseService.GetDimensionRefs(rebar, '#', '/', ["горизонт", "выпуск"]);
             refArray.Append(lastFloorTopFace.Reference);

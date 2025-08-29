@@ -36,7 +36,7 @@ internal class GeneralViewPerpAnnotCreator : ViewAnnotationCreator {
             dimensionService.TryCreatePylonDimensions(skeletonParentRebar, grids, dimensionBaseService, false);
             //ГОРИЗОНТАЛЬНЫЕ РАЗМЕРЫ
             dimensionService.TryCreatePylonDimensions(SheetInfo.HostElems, dimensionBaseService);
-            dimensionService.TryCreateTopAdditionalDimensions(skeletonParentRebar, dimensionBaseService);
+            dimensionService.TryCreateTopAdditionalDimensions(skeletonParentRebar, dimensionBaseService, true);
             dimensionService.TryCreateClampsDimensions(clampsParentRebars, dimensionBaseService, true);
             dimensionService.TryCreateClampsDimensions(clampsParentRebars, dimensionBaseService, false);
         } catch(Exception) { }
