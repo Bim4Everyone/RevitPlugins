@@ -27,8 +27,7 @@ internal class GeneralViewRebarPerpAnnotCreator : ViewAnnotationCreator {
             dimensionService.TryCreateTopEdgeRebarDimensions(skeletonParentRebar, dimensionBaseService);
             dimensionService.TryCreateBottomEdgeRebarDimensions(skeletonParentRebar, dimensionBaseService);
 
-            // Если Г-образный стержень только с одной стороны, то его нужно образмерить
-            // В противном случае (оба Г-образные) это произойдет ранее
+            // Размер по Гэшке сбоку
             dimensionService.TryCreateVertLRebarDimension(skeletonParentRebar, dimensionBaseService);
             // Размер по Гэшке сверху
             dimensionService.TryCreateHorizLRebarDimension(skeletonParentRebar, dimensionBaseService);

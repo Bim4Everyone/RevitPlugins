@@ -105,21 +105,21 @@ internal class TransViewDimensionService {
             // Если первый ряд - Гэшки, то берем по нижней плоскости
             if(SheetInfo.RebarInfo.FirstLRebarParamValue) {
                 refArraySide = dimensionBaseService.GetDimensionRefs(skeletonParentRebar, '#', '/',
-                                                                     ["низ", "торец", "ряд1"], 
+                                                                     ["низ", "торец", "_1_"], 
                                                                      oldRefArray: refArrayFormworkSide);
             } else {
                 refArraySide = dimensionBaseService.GetDimensionRefs(skeletonParentRebar, '#', '/',
-                                                                     [rebarPart, "торец", "ряд1"],
+                                                                     [rebarPart, "торец", "_1_"],
                                                                      oldRefArray: refArrayFormworkSide);
             }
             // Если второй ряд - Гэшки, то берем по нижней плоскости
             if(SheetInfo.RebarInfo.SecondLRebarParamValue) {
                 refArraySide = dimensionBaseService.GetDimensionRefs(skeletonParentRebar, '#', '/',
-                                                                     ["низ", "торец", "ряд2"],
+                                                                     ["низ", "торец", "_2_"],
                                                                      oldRefArray: refArraySide);
             } else {
                 refArraySide = dimensionBaseService.GetDimensionRefs(skeletonParentRebar, '#', '/',
-                                                                     [rebarPart, "торец", "ряд2"],
+                                                                     [rebarPart, "торец", "_2_"],
                                                                      oldRefArray: refArraySide);
             }
             CreateDimension(refArraySide, pylon, DirectionType.Right, 0.5, view, dimensionBaseService, false);
