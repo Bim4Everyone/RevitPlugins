@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 
 using Autodesk.Revit.DB;
 
@@ -10,7 +11,6 @@ internal class GeneralViewRebarMarkService {
     private readonly ViewPointsAnalyzer _viewPointsAnalyzer;
     private readonly AnnotationService _annotationService;
     private readonly FamilySymbol _tagSymbolWithStep;
-    private readonly FamilySymbol _universalTagType;
 
     private readonly int _formNumberForClampsMax = 1599;
     private readonly int _formNumberForClampsMin = 1500;
@@ -28,14 +28,41 @@ internal class GeneralViewRebarMarkService {
         // Находим типоразмер марки несущей арматуры для обозначения позиции, диаметра и комментариев арматуры
         // Без засечки на конце
         _tagSymbolWithStep = mvm.SelectedRebarTagTypeWithStep;
-        // Находим типоразмер типовой аннотации для метки ГОСТа сварки
-        _universalTagType = mvm.SelectedUniversalTagType;
     }
 
     internal MainViewModel ViewModel { get; set; }
     internal RevitRepository Repository { get; set; }
     internal PylonSheetInfo SheetInfo { get; set; }
     internal PylonView ViewOfPylon { get; set; }
+
+    internal void TryCreateVerticalBarMarks() {
+        try {
+            var simpleRebars = SheetInfo.RebarInfo.SimpleVerticalRebars;
+            if(simpleRebars.Count == 0) { return; }
+            var simpleRebarsInView = ViewModel.RebarFinder.GetRebarsFromView(simpleRebars, ViewOfPylon.ViewElement);
+            if(simpleRebarsInView.Count == 0) { return; }
+
+            TryCreateVerticalBarMark(simpleRebarsInView, DirectionType.RightTop);
+            TryCreateVerticalBarMark(simpleRebarsInView, DirectionType.LeftTop);
+        } catch(Exception) { }
+    }
+
+    /// <summary>
+    /// Создает марку по арматурному стержню, расположенному в зависимости от переданного направления на виде
+    /// </summary>
+    private void TryCreateVerticalBarMark(List<Element> rebars, DirectionType directionType) {
+        try {
+            // Получаем референс-элемент
+            var verticalBar = _viewPointsAnalyzer.GetElementByDirection(rebars, directionType, false);
+            // Получаем точку в которую нужно поставить аннотацию
+            var point = _viewPointsAnalyzer.GetPointByDirection(verticalBar, directionType, 0, 0, true);
+            // Корректируем положение точки, куда будет установлена марка (текст)
+            point = _viewPointsAnalyzer.GetPointByDirection(point, directionType, 0.6, 0.3);
+            // Создаем марку арматуры
+            var tag = _annotationService.CreateRebarTag(point, _tagSymbolWithStep, verticalBar);
+            tag.LeaderEndCondition = LeaderEndCondition.Free;
+        } catch(Exception) { }
+    }
 
     /// <summary>
     /// Создает марки хомутов на основном виде опалубки в зависимости от положения на виде

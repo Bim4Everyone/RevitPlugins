@@ -27,37 +27,20 @@ internal class GeneralViewRebarPerpAnnotCreator : ViewAnnotationCreator {
             dimensionService.TryCreateTopEdgeRebarDimensions(skeletonParentRebar, dimensionBaseService);
             dimensionService.TryCreateBottomEdgeRebarDimensions(skeletonParentRebar, dimensionBaseService);
 
-            // Определяем с какой стороны строить вертикальную размерную цепочку по пластинам
-            var plateDirectionType = GetPlateDirectionType(rebarFinder);
             // Если Г-образный стержень только с одной стороны, то его нужно образмерить
             // В противном случае (оба Г-образные) это произойдет ранее
-            if(!SheetInfo.RebarInfo.AllRebarAreL && SheetInfo.RebarInfo.HasLRebar) {
-                var rebarDirectionType = plateDirectionType == DirectionType.Left 
-                    ? DirectionType.Right : DirectionType.Left;
-                dimensionService.TryCreateLRebarDimension(skeletonParentRebar, rebarDirectionType, 
-                                                          dimensionBaseService);
-            }
-            dimensionService.TryCreateLRebarDimension(skeletonParentRebar, dimensionBaseService);
+            dimensionService.TryCreateVertLRebarDimension(skeletonParentRebar, dimensionBaseService);
+            // Размер по Гэшке сверху
+            dimensionService.TryCreateHorizLRebarDimension(skeletonParentRebar, dimensionBaseService);
             // Создаем размеры по изгибам вертикальных стержней-бутылок
             dimensionService.TryCreateAdditionalDimensions(skeletonParentRebar, dimensionBaseService);
         } catch(Exception) { }
 
         // Пытаемся создать марки на виде
         try {
-            var markService = new GeneralViewRebarPerpMarkService(ViewModel, Repository, SheetInfo, ViewOfPylon);
+            var markService = new GeneralViewRebarMarkService(ViewModel, Repository, SheetInfo, ViewOfPylon);
             markService.TryCreateVerticalBarMarks();
             markService.TryCreateClampMarks(false);
         } catch(Exception) { }
-    }
-
-    private DirectionType GetPlateDirectionType(RebarFinderService rebarFinder) {
-        // Будем ставить размерную цепочку по дефолту справа
-        var plateDirectionType = DirectionType.Right;
-        // Слева будем ставить только если есть Г-образный стержень (но не все) и он справа
-        if(SheetInfo.RebarInfo.HasLRebar 
-            && rebarFinder.DirectionHasLRebar(ViewOfPylon.ViewElement, SheetInfo.ProjectSection, DirectionType.Right)) {
-            plateDirectionType = DirectionType.Left;
-        }
-        return plateDirectionType;
     }
 }

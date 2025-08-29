@@ -60,30 +60,29 @@ internal class GeneralViewRebarPerpDimensionService {
     /// <summary>
     /// Создание размера сбоку между низом арматурного каркаса и Г-образным стержнем
     /// </summary>
-    internal void TryCreateLRebarDimension(FamilyInstance skeletonParentRebar, DirectionType directionType, 
-                                           DimensionBaseService dimensionBaseService) {
+    internal void TryCreateVertLRebarDimension(FamilyInstance skeletonParentRebar, 
+                                               DimensionBaseService dimensionBaseService) {
         try {
-            // #1_горизонт_Г-стержень
-            var refArraySide = dimensionBaseService.GetDimensionRefs(skeletonParentRebar, '#', '/',
-                                                                     ["горизонт", "Г-стержень"]);
-            // #_1_горизонт_край_низ
-            refArraySide = dimensionBaseService.GetDimensionRefs(skeletonParentRebar, '#', '/', 
-                                                                 ["горизонт", "край", "низ"],
-                                                                 oldRefArray: refArraySide);
-            var dimensionLineLeftFirst = dimensionBaseService.GetDimensionLine(skeletonParentRebar, 
-                                                                               directionType, 1.3);
-            var dimensionRebarSideFirst = Repository.Document.Create.NewDimension(ViewOfPylon.ViewElement,
-                                                                                  dimensionLineLeftFirst, refArraySide,
-                                                                                  ViewModel.SelectedDimensionType);
+            if(!SheetInfo.RebarInfo.HasLRebar) { return; }
+            var refArraySideBottom = dimensionBaseService.GetDimensionRefs(skeletonParentRebar, '#', '/',
+                                                                           ["горизонт", "край", "низ"]);
+            var refArraySideRight = dimensionBaseService.GetDimensionRefs(skeletonParentRebar, '#', '/',
+                                                                          ["горизонт", "Г-стержень"],
+                                                                             oldRefArray: refArraySideBottom);
+            var dimensionLineRight = dimensionBaseService.GetDimensionLine(skeletonParentRebar,
+                                                                           DirectionType.Right, 0.7);
+            var dimensionRebarSideRight =
+                Repository.Document.Create.NewDimension(ViewOfPylon.ViewElement, dimensionLineRight,
+                                                        refArraySideRight, ViewModel.SelectedDimensionType);
         } catch(Exception) { }
     }
 
     /// <summary>
-    /// Создание размера сбоку между низом арматурного каркаса и Г-образным стержнем
+    /// Создание размера сверху по Г-образному стержню
     /// </summary>
-    internal void TryCreateLRebarDimension(FamilyInstance skeletonParentRebar, DimensionBaseService dimensionBaseService) {
+    internal void TryCreateHorizLRebarDimension(FamilyInstance skeletonParentRebar, 
+                                                DimensionBaseService dimensionBaseService) {
         try {
-            //ВЕРТИКАЛЬНЫЕ РАЗМЕРЫ
             if(!SheetInfo.RebarInfo.HasLRebar) { return; }
             // Г-образный стержень
             var lRebar = ViewModel.RebarFinder.GetSimpleRebars(ViewOfPylon.ViewElement, SheetInfo.ProjectSection, 1101)
