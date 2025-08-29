@@ -1,5 +1,7 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
+using System.Windows.Controls;
 
 using Autodesk.Revit.DB;
 
@@ -73,13 +75,41 @@ internal class GeneralViewRebarMarkService {
                                                                      _formNumberForClampsMin, _formNumberForClampsMax);
 
             var pointForCompare = _viewPointsAnalyzer.GetTransformedPoint(SheetInfo.RebarInfo.SkeletonParentRebar, true);
+
+            List<IndependentTag> tags = new List<IndependentTag>();
+            List<IndependentTag> tagsToDelete = new List<IndependentTag>();
             foreach(var simpleClamp in simpleClamps) {
                 var clampPoint = _viewPointsAnalyzer.GetTransformedPoint(simpleClamp, true);
+                IndependentTag tag = default;
                 if(!isFrontView || clampPoint.X > pointForCompare.X) {
-                    TryCreateClampMark(simpleClamp, DirectionType.RightTop, isFrontView);
+                    tag = TryCreateClampMark(simpleClamp, DirectionType.RightTop, isFrontView);
                 } else {
-                    TryCreateClampMark(simpleClamp, DirectionType.LeftTop, isFrontView);
+                    tag = TryCreateClampMark(simpleClamp, DirectionType.LeftTop, isFrontView);
                 }
+                tags.Add(tag);
+            }
+            // Удаление марок, если они стоят слишком близко. Это возможно при ситуации, когда вид на пилон сбоку и
+            // в сечении два хомута, соответственно две марки, а достаточно одной
+            double maxDistance = 4;
+            for(int i = 0; i < tags.Count; i++) {
+                IndependentTag currentTag = tags[i];
+                XYZ currentTagPosition = currentTag.TagHeadPosition;
+
+                for(int j = i + 1; j < tags.Count; j++) {
+                    IndependentTag tagForCompare = tags[j];
+                    XYZ tagForComparePosition = tagForCompare.TagHeadPosition;
+
+                    double distance = currentTagPosition.DistanceTo(tagForComparePosition);
+                    if(distance < maxDistance) {
+                        // Добавляем одну из марок в список для удаления
+                        if(!tagsToDelete.Contains(tagForCompare)) {
+                            tagsToDelete.Add(tagForCompare);
+                        }
+                    }
+                }
+            }
+            foreach(var tag in tagsToDelete) {
+                Repository.Document.Delete(tag.Id);
             }
         } catch(Exception) { }
     }
@@ -87,7 +117,7 @@ internal class GeneralViewRebarMarkService {
     /// <summary>
     /// Создает марку хомута на основном виде опалубки
     /// </summary>
-    private void TryCreateClampMark(Element simpleClamp, DirectionType directionType, bool isFrontView) {
+    private IndependentTag TryCreateClampMark(Element simpleClamp, DirectionType directionType, bool isFrontView) {
         try {
             var xOffset = isFrontView ? 2.4 : 1;
             // Получаем точку в которую нужно поставить аннотацию
@@ -98,6 +128,8 @@ internal class GeneralViewRebarMarkService {
             // Создаем марку арматуры
             var clampTag = _annotationService.CreateRebarTag(annotPoint, _tagSymbolWithStep, simpleClamp);
             clampTag.LeaderEndCondition = LeaderEndCondition.Free;
+            return clampTag;
         } catch(Exception) { }
+        return null;
     }
 }
