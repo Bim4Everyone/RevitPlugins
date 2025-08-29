@@ -25,9 +25,9 @@ internal class TransViewDimensionService {
     internal PylonSheetInfo SheetInfo { get; set; }
 
 
-    internal void TryCreateDimensions(View view, bool onTopOfRebar) {
+    internal void TryCreateDimensions(View view, bool refsForTop, bool pylonFromTop) {
         var doc = Repository.Document;
-        string rebarPart = onTopOfRebar ? "верх" : "низ";
+        string rebarPart = refsForTop ? "верх" : "низ";
         var dimensionBaseService = new DimensionBaseService(view, ViewModel.ParamValService);
         
         try {
@@ -42,8 +42,8 @@ internal class TransViewDimensionService {
                 .ToList();
 
             // Определяем относительно чего нужно строить размерные линии - каркаса или пилона
-            var pylon = onTopOfRebar ?  SheetInfo.HostElems.Last() : SheetInfo.HostElems.First();
-            var dimensionLineHostRef = onTopOfRebar ? skeletonParentRebar : pylon;
+            var pylon = pylonFromTop ?  SheetInfo.HostElems.Last() : SheetInfo.HostElems.First();
+            var dimensionLineHostRef = refsForTop ? skeletonParentRebar : pylon;
 
 
             var refArrayFormworkFront = dimensionBaseService.GetDimensionRefs(pylon as FamilyInstance,
@@ -51,7 +51,7 @@ internal class TransViewDimensionService {
             //ВЕРТИКАЛЬНЫЕ РАЗМЕРЫ
             // Указывает нужно ли будет делать длинные оси снизу (сделано здесь, чтобы не выполнять запрос дважды)
             var longGridsWillBeNeeded = false;
-            if(onTopOfRebar) {
+            if(refsForTop) {
                 // Когда все Гэшки
                 if(SheetInfo.RebarInfo.AllRebarAreL) {
                     CreateDimension(skeletonParentRebar, dimensionLineHostRef, DimensionOffsetType.Bottom, 0.5,
@@ -87,7 +87,7 @@ internal class TransViewDimensionService {
 
             if(grids.Count > 0) {
                 double gridDimensionLineOffset =
-                    onTopOfRebar && !SheetInfo.RebarInfo.AllRebarAreL && SheetInfo.RebarInfo.HasLRebar ? 1 : 0.5;
+                    refsForTop && !SheetInfo.RebarInfo.AllRebarAreL && SheetInfo.RebarInfo.HasLRebar ? 1 : 0.5;
 
                 // Размер по ФРОНТУ опалубка + оси (положение сверху 1)
                 CreateDimension(grids, dimensionLineHostRef, DimensionOffsetType.Top, gridDimensionLineOffset, 

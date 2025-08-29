@@ -15,7 +15,7 @@ internal class TransViewFirstAnnotCreator : ViewAnnotationCreator {
         // Пытаемся создать размеры на виде
         try {
             var dimensionService = new TransViewDimensionService(ViewModel, Repository, SheetInfo);
-            dimensionService.TryCreateDimensions(ViewOfPylon.ViewElement, false);
+            dimensionService.TryCreateDimensions(ViewOfPylon.ViewElement, false, false);
         } catch(Exception) { }
 
         // Пытаемся создать марки на виде
