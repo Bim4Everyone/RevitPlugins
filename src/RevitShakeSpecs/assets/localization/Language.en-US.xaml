@@ -1,0 +1,65 @@
+﻿<ResourceDictionary
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:system="clr-namespace:System;assembly=mscorlib">
+
+    <system:String x:Key="MainWindow.Title">Color by parameter</system:String>
+    <system:String
+        x:Key="MainWindow.ButtonOk">Ok</system:String>
+    <system:String x:Key="MainWindow.ButtonCancel">Cancel</system:String>
+    
+    <system:String x:Key="MainWindow.OverrideColor">Override color</system:String>
+    <system:String x:Key="MainWindow.OverrideColorToolTip">The graphics will be redefined by setting the color.</system:String>
+    
+    <system:String x:Key="MainWindow.OverrideHatching">Override hatching</system:String>
+    <system:String x:Key="MainWindow.OverrideHatchingToolTip">The graphics will be redefined by specifying the hatching</system:String>
+    
+    <system:String x:Key="MainWindow.SelectCategory">Select categories of elements in the view:</system:String>
+    <system:String
+        x:Key="MainWindow.SelectCategoryToolTip">A list of categories of elements visible in the current view (including those from linked files) 
+        that have parameters for filtering. Select one or more categories, and then the plugin will select parameters by which you can filter simultaneously 
+        across all selected categories. If this list is empty, then none of the elements from the categories by which filtering 
+        is available are visible in the view.</system:String>
+    
+    <system:String x:Key="MainWindow.WriteForCategoryFilter">Write to filter the list of categories</system:String>
+    <system:String x:Key="MainWindow.SelectAllCategories">Click to select all categories displayed in the list below</system:String>
+    <system:String x:Key="MainWindow.UnselectAllCategories">Click to deselect all categories displayed in the list below</system:String>
+    
+    <system:String x:Key="MainWindow.SelectParam">Select a parameter to filter:</system:String>
+    <system:String x:Key="MainWindow.SelectParamToolTip">List of parameters by which filtering is possible among the selected categories. 
+        Select a parameter for filtering, and then the plugin will select values by this parameter among the elements of the selected categories. 
+        The filters created by the plugin will work by the parameter selected here if the &quot;Override color&quot; checkbox is checked. If this list is empty, 
+        then no category is selected (see above).</system:String>
+    
+    <system:String x:Key="MainWindow.WriteForParamFilter">Write to filter the list of parameters</system:String>
+
+    <system:String x:Key="MainWindow.SelectValues">Select values to recolor:</system:String>
+    <system:String
+        x:Key="MainWindow.SelectValuesToolTip">A list of possible values for the selected parameter among the elements of the selected categories. 
+        Select one or more values, and then the plugin will recolor the elements with the selected values. If the &quot;Override color&quot; checkbox is checked, 
+        the plugin will create a filter for each of the selected values. If this list is empty, then the parameter for filtering is not selected (see above) 
+        or the elements of the selected categories do not have values in the selected parameter for filtering.</system:String>
+    
+    <system:String x:Key="MainWindow.WriteForValuesFilter">Write to filter the list of possible values</system:String>
+    <system:String x:Key="MainWindow.SelectAllValues">Click to select all values displayed in the list below.</system:String>
+    <system:String x:Key="MainWindow.UnselectAllValues">Click to deselect all values displayed in the list below.</system:String>
+
+    <system:String x:Key="MainWindow.Settings">Settings</system:String>
+    <system:String
+        x:Key="MainWindow.SettingsToolTip">List of plugin settings. In the &quot;Colors for overriding graphics&quot; block, 
+        you can specify the list and sequence of colors that will be assigned to filters or used when overriding element graphics 
+        if the &quot;Override color&quot; checkbox is checked. For example, if the &quot;Override color&quot; checkbox is checked and the first color 
+        in &quot;Colors for overriding graphics&quot; is red and the second is blue, then the first filter created that will be added to the view 
+        will be set to red, and the second to blue. Similarly, in the "Hatches for overriding graphics" block, you can specify the list and 
+        sequence of hatches that will be set if the &quot;Override hatching&quot; checkbox is checked.</system:String>
+    
+    <system:String x:Key="MainWindow.OverrideWay">Method to redefine graphics:</system:String>
+    <system:String x:Key="MainWindow.CreatingFilters">Creating filters on a view</system:String>
+    <system:String x:Key="MainWindow.OverrideElementGraphics">Redefining Element Graphics</system:String>
+    
+    <system:String x:Key="MainWindow.OverrideColors">Colors to override graphics:</system:String>
+    <system:String x:Key="MainWindow.OverrideHatchingList">Hatching to redefine graphics:</system:String>
+    <system:String x:Key="MainWindow.Edit">Edit</system:String>
+    <system:String x:Key="MainWindow.Add">Add</system:String>
+    <system:String x:Key="MainWindow.Delete">Delete</system:String>
+</ResourceDictionary>
