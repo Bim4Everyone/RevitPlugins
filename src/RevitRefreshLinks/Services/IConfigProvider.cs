@@ -1,11 +1,10 @@
 using RevitRefreshLinks.Models;
 
-namespace RevitRefreshLinks.Services {
-    internal interface IConfigProvider {
-        AddLinksFromFolderConfig GetAddLinksFromFolderConfig();
+namespace RevitRefreshLinks.Services;
+internal interface IConfigProvider {
+    AddLinksFromFolderConfig GetAddLinksFromFolderConfig();
 
-        AddLinksFromServerConfig GetAddLinksFromServerConfig();
+    AddLinksFromServerConfig GetAddLinksFromServerConfig();
 
-        UpdateLinksConfig GetUpdateLinksConfig();
-    }
+    UpdateLinksConfig GetUpdateLinksConfig();
 }
