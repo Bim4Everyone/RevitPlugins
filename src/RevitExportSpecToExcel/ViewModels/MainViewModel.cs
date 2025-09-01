@@ -23,7 +23,7 @@ internal class MainViewModel : BaseViewModel {
     private readonly ILocalizationService _localizationService;
 
     private ObservableCollection<ScheduleViewModel> _schedules = new();
-    private ObservableCollection<ScheduleViewModel> _filteredSchedules;
+    private ObservableCollection<ScheduleViewModel> _filteredSchedules = new();
     private bool _saveAsOneFile;
     private string _searchText;
     private string _errorText;
@@ -131,8 +131,7 @@ internal class MainViewModel : BaseViewModel {
             FilteredSchedules = new ObservableCollection<ScheduleViewModel>(_schedules);
         } else {
             FilteredSchedules = new ObservableCollection<ScheduleViewModel>(
-                Schedules
-                    .Where(item => item.Name
+                Schedules.Where(item => item.Name
                         .IndexOf(SearchText, StringComparison.OrdinalIgnoreCase) >= 0));
         }
     }

@@ -46,7 +46,9 @@ internal class RevitRepository {
 
         foreach(var schedule in schedulesRevit) {
             if(schedule.Id == activeViewId) {
-                schedules.Add(new ScheduleViewModel(schedule, activeViewStatus));
+                schedules.Add(new ScheduleViewModel(schedule, activeViewStatus) {
+                    IsChecked = true
+                });
             } else if(openedViewIds.Contains(schedule.Id)) {
                 schedules.Add(new ScheduleViewModel(schedule, openedViewStatus));
             } else {
