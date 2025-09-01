@@ -1,4 +1,5 @@
 using Autodesk.Revit.DB;
+using Autodesk.Revit.UI;
 
 using ClosedXML.Excel;
 
@@ -125,16 +126,16 @@ public class ScheduleToExcelConverter {
                 SetTextValue(excelCell, scheduleCell.Value);
                 break;
             case CellType.Graphic:
-                SetTextValue(excelCell, "");
+                SetTextValue(excelCell, string.Empty);
                 break;
             case CellType.Parameter:
-            case CellType.ParameterText:
                 SetCellFromParameter(excelCell, scheduleCell);
                 break;
             case CellType.Inherited:
+            case CellType.ParameterText:
             case CellType.CombinedParameter:
             case CellType.CalculatedValue:
-                SetDoubleValue(excelCell, scheduleCell.Value);
+                SetUnknownValue(excelCell, scheduleCell.Value);
                 break;
             default:
                 SetTextValue(excelCell, scheduleCell.Value);
@@ -148,19 +149,25 @@ public class ScheduleToExcelConverter {
         var paramStorageType = parameter.StorageType;
 
         if(paramStorageType == StorageType.Double || paramStorageType == StorageType.Integer) {
-            SetDoubleValue(excelCell, scheduleCell.Value);
+            SetUnknownValue(excelCell, scheduleCell.Value);
         } else {
-            excelCell.Value = scheduleCell.Value;
+            SetTextValue(excelCell, scheduleCell.Value);
         }
     }
 
-    private void SetDoubleValue(IXLCell cell, string text) {
+    private void SetUnknownValue(IXLCell cell, string text) {
+        // Некоторые значения могут быть числовыми, но за счет дополнительного текста
+        // (например единиц измерения) не могут быть преобразованы в число.
         if(double.TryParse(text,out double result)) {
-            cell.Value = result;
-            cell.Style.NumberFormat.Format = "0";
+            SetDoubleValue(cell, result);
         } else {
-            cell.Value = text;
+            SetTextValue(cell, text);
         }
+    }
+
+    private void SetDoubleValue(IXLCell cell, double value) {
+        cell.Value = value;
+        cell.Style.NumberFormat.Format = "0";
     }
 
     private void SetTextValue(IXLCell cell, string text) {
