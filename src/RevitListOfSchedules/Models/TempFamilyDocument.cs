@@ -33,15 +33,26 @@ internal class TempFamilyDocument {
             "TempFamilyDocument.TemplateFamilyName", familyTemplatePath);
         _familyPath = _localizationService.GetLocalizedString(
             "TempFamilyDocument.FamilyName", _tempDirectory, albumName, _extension);
-
-        CreateDocument();
-
-        FamilySymbol = LoadFamilySymbol();
     }
 
-    public FamilySymbol FamilySymbol { get; }
+    public FamilySymbol FamilySymbol => LoadFamilySymbol();
 
-    private Document CreateDocument() {
+    private FamilySymbol LoadFamilySymbol() {
+        CreateDocument();
+        FamilySymbol familySymbol = null;
+        _revitRepository.Document.LoadFamily(_familyPath, _familyLoadOptions, out var family);
+        familySymbol = _revitRepository.GetFamilySymbol(family);
+
+        if(familySymbol != null) {
+            if(!familySymbol.IsActive) {
+                familySymbol.Activate();
+            }
+        }
+        DeleteFamilySymbol();
+        return familySymbol;
+    }
+
+    private void CreateDocument() {
         var document = _revitRepository.Application.NewFamilyDocument(_familyTemplatePath);
         string transactionName = _localizationService.GetLocalizedString("TempFamilyDocument.TransactionName");
         using(var t = document.StartTransaction(transactionName)) {
@@ -53,7 +64,6 @@ internal class TempFamilyDocument {
         };
         document.SaveAs(_familyPath, opt);
         document.Close(false);
-        return document;
     }
 
     private void CreateCircle(Document document) {
@@ -66,21 +76,6 @@ internal class TempFamilyDocument {
         var plane = Plane.CreateByNormalAndOrigin(XYZ.BasisZ, XYZ.Zero);
         var circle = Arc.Create(plane, diameterArc / 2, 0, 2 * Math.PI);
         familyCreator.NewDetailCurve(viewPlan, circle);
-    }
-
-    private FamilySymbol LoadFamilySymbol() {
-        FamilySymbol familySymbol = null;
-
-        _revitRepository.Document.LoadFamily(_familyPath, _familyLoadOptions, out var family);
-        familySymbol = _revitRepository.GetFamilySymbol(family);
-
-        if(familySymbol != null) {
-            if(!familySymbol.IsActive) {
-                familySymbol.Activate();
-            }
-        }
-        DeleteFamilySymbol();
-        return familySymbol;
     }
 
     private void DeleteFamilySymbol() {

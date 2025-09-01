@@ -65,11 +65,11 @@
     <system:String
         x:Key="MainViewModel.ProgressTitleSheets">Обработка листов... [{0}]\[{1}]</system:String>
     <system:String
-        x:Key="Common.MessageBody">Пожалуйста, закройте текущую спецификацию</system:String>
+        x:Key="Common.ScheduleErrorMessageBody">Пожалуйста, закройте текущую спецификацию</system:String>
     <system:String
-        x:Key="Common.MessageBody_2">Ошибка загрузки параметров</system:String>
+        x:Key="Common.ParamErrorMessageBody">Ошибка загрузки параметров</system:String>
     <system:String
-        x:Key="Common.MessageTitle">Ошибка настройки плагина</system:String>
+        x:Key="Common.ConfigErrorMessageTitle">Ошибка настройки плагина</system:String>
     <system:String
         x:Key="GroupParameter.NoParameter">Нет параметра группировки</system:String>
     <system:String

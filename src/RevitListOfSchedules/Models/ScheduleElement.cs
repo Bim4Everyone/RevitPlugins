@@ -10,10 +10,9 @@ internal class ScheduleElement {
     public ScheduleElement(RevitRepository revitRepository, string scheduleName) {
         _revitRepository = revitRepository;
         _scheduleName = scheduleName;
-        ConfigureSchedule();
     }
 
-    private void ConfigureSchedule() {
+    public void ConfigureSchedule() {
         var newSchedule = DuplicateDefaultSchedule();
         var defenition = newSchedule.Definition;
         var filter = defenition.GetFilters().FirstOrDefault();

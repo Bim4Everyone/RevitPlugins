@@ -84,15 +84,15 @@ public class RevitListOfSchedulesCommand : BasePluginCommand {
         var messageBoxService = kernel.Get<IMessageBoxService>();
         var localizationService = kernel.Get<ILocalizationService>();
 
-        // Загрузка параметров проекта
-        bool isParamChecked = new CheckProjectParams(uiApplication)
+        // Загрузка параметров проекта        
+        bool isParamChecked = new CheckProjectParams(uiApplication.Application, uiApplication.ActiveUIDocument.Document)
             .CopyProjectParams()
             .GetIsChecked();
 
         if(!isParamChecked) {
-            string stringMessegeBody = localizationService.GetLocalizedString("Common.MessageBody_2");
-            string stringMessegeTitle = localizationService.GetLocalizedString("Common.MessageTitle");
-            messageBoxService.Show(stringMessegeBody, stringMessegeTitle, MessageBoxButton.OK, MessageBoxImage.Exclamation);
+            string stringMessageBody = localizationService.GetLocalizedString("Common.ParamErrorMessageBody");
+            string stringMessageTitle = localizationService.GetLocalizedString("Common.ConfigErrorMessageTitle");
+            messageBoxService.Show(stringMessageBody, stringMessageTitle, MessageBoxButton.OK, MessageBoxImage.Exclamation);
             throw new OperationCanceledException();
         }
 

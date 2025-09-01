@@ -110,7 +110,8 @@ internal class RevitRepository {
     // Метод создания новой спецификации
     public void CreateSchedule(string newScheduleName) {
         if(CheckSchedule(newScheduleName)) {
-            _ = new ScheduleElement(this, newScheduleName);
+            var schedule = new ScheduleElement(this, newScheduleName);
+            schedule.ConfigureSchedule();
         }
     }
 

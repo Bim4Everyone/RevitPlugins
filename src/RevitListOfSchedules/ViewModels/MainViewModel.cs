@@ -337,7 +337,11 @@ internal class MainViewModel : BaseViewModel {
         int counter = 0;
         foreach(var album in albums) {
             string albumName = PathCharValidator.LegalizeString(album.Key);
-            var instancesAssembly = new InstancesAssembly(_localizationService, _revitRepository, _familyLoadOptions, albumName);
+            var viewDrafting = _revitRepository.GetViewDrafting(albumName);
+            var tempDoc = new TempFamilyDocument(_localizationService, _revitRepository, _familyLoadOptions, albumName);
+            var instancesAssembly = new InstancesAssembly(_revitRepository, viewDrafting, tempDoc.FamilySymbol, albumName);
+
+            instancesAssembly.DeleteFamilyInstances();
 
             if(_isScheduleToSheetChecked) {
                 var firstSheet = album.First();
@@ -361,12 +365,12 @@ internal class MainViewModel : BaseViewModel {
 
     // Метод копирования эталонной спецификации в проект
     private void LoadDefaultSchedule() {
-        bool isScheduleChecked = new CheckSchedule(_revitRepository.UIApplication)
+        bool isScheduleChecked = new CheckSchedule(_revitRepository.Application, _revitRepository.ActiveUIDocument)
             .ReplaceSchedule();
         if(!isScheduleChecked) {
-            string stringMessegeBody = _localizationService.GetLocalizedString("Common.MessageBody");
-            string stringMessegeTitle = _localizationService.GetLocalizedString("Common.MessageTitle");
-            MessageBox.Show(stringMessegeBody, stringMessegeTitle);
+            string stringMessageBody = _localizationService.GetLocalizedString("Common.ScheduleErrorMessageBody");
+            string stringMessageTitle = _localizationService.GetLocalizedString("Common.ConfigErrorMessageTitle");
+            MessageBox.Show(stringMessageBody, stringMessageTitle);
             throw new OperationCanceledException();
         }
     }

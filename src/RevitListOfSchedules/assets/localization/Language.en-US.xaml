@@ -65,11 +65,11 @@
     <system:String
         x:Key="MainViewModel.ProgressTitleSheets">Processing sheets... [{0}]\[{1}]</system:String>
     <system:String
-        x:Key="Common.MessageBody">Please, close the current schedule</system:String>
+        x:Key="Common.ScheduleErrorMessageBody">Please, close the current schedule</system:String>
     <system:String
-        x:Key="Common.MessageBody_2">Error copying parameters</system:String>
+        x:Key="Common.ParamErrorMessageBody">Error copying parameters</system:String>
     <system:String
-        x:Key="Common.MessageTitle">Plug-in configuration error</system:String>
+        x:Key="Common.ConfigErrorMessageTitle">Plug-in configuration error</system:String>
     <system:String
         x:Key="GroupParameter.NoParameter">No group parameter</system:String>
     <system:String

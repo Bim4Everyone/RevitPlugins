@@ -5,32 +5,23 @@ using Autodesk.Revit.DB;
 
 using dosymep.Bim4Everyone;
 using dosymep.Revit;
-using dosymep.SimpleServices;
 
 namespace RevitListOfSchedules.Models;
 internal class InstancesAssembly {
-    private readonly ILocalizationService _localizationService;
     private readonly RevitRepository _revitRepository;
-    private readonly FamilyLoadOptions _familyLoadOptions;
-    private readonly string _albumName;
     private readonly ViewDrafting _viewDrafting;
     private readonly FamilySymbol _familySymbol;
+    private readonly string _albumName;
 
     public InstancesAssembly(
-        ILocalizationService localizationService,
         RevitRepository revitRepository,
-        FamilyLoadOptions familyLoadOptions,
+        ViewDrafting viewDrafting,
+        FamilySymbol familySymbol,
         string albumName) {
-        _localizationService = localizationService;
         _revitRepository = revitRepository;
-        _familyLoadOptions = familyLoadOptions;
+        _viewDrafting = viewDrafting;
+        _familySymbol = familySymbol;
         _albumName = albumName;
-        _viewDrafting = _revitRepository.GetViewDrafting(_albumName);
-
-        var tempDoc = new TempFamilyDocument(_localizationService, _revitRepository, _familyLoadOptions, albumName);
-        _familySymbol = tempDoc.FamilySymbol;
-
-        DeleteFamilyInstances(_viewDrafting);
     }
 
     public void PlaceFamilyInstances(string sheetNumber, string sheetRevNumber, IList<ViewSchedule> listOfSchedules) {
@@ -52,8 +43,8 @@ internal class InstancesAssembly {
         familyInstance.SetParamValue(ParamFactory.ListOfSchedulesGroup, $"{ParamFactory.DefaultScheduleName}_{_albumName}");
     }
 
-    private void DeleteFamilyInstances(View view) {
-        var instances = new FilteredElementCollector(_revitRepository.Document, view.Id)
+    public void DeleteFamilyInstances() {
+        var instances = new FilteredElementCollector(_revitRepository.Document, _viewDrafting.Id)
             .OfType<FamilyInstance>()
             .Select(instance => instance.Id)
             .ToList();
