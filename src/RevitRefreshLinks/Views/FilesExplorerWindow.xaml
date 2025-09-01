@@ -1,18 +1,18 @@
-﻿<base:PlatformWindow
+﻿<core:WpfUIPlatformWindow
     x:Class="RevitRefreshLinks.Views.FilesExplorerWindow"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-    xmlns:base="clr-namespace:dosymep.WPF.Views"
+    xmlns:core="clr-namespace:dosymep.WpfUI.Core"
+    xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
+    xmlns:me="clr-namespace:dosymep.WpfCore.MarkupExtensions;assembly=dosymep.WpfCore"
     xmlns:local="clr-namespace:RevitRefreshLinks.Views"
     xmlns:res="clr-namespace:RevitRefreshLinks.Resources"
     xmlns:vms="clr-namespace:RevitRefreshLinks.ViewModels"
     xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
     mc:Ignorable="d"
     WindowStartupLocation="CenterOwner"
-    Title="{Binding Title}"
-    x:Name="_this"
     Height="450"
     Width="800"
     MinHeight="300"
@@ -26,140 +26,102 @@
         </i:EventTrigger>
     </i:Interaction.Triggers>
     <Window.Resources>
-        <res:BoolToSelectionModeConverter
-            x:Key="BoolToSelectionModeConverter" />
-        <res:PathInfoImageConverter
-            x:Key="PathInfoImageConverter" />
-        <res:FileSizeConverter
-            x:Key="FileSizeConverter" />
-        <ObjectDataProvider
-            x:Key="HomeImg"
-            ObjectInstance="{x:Static res:IconResources.HomeImg}" />
-        <ObjectDataProvider
-            x:Key="ArrowLeftImg"
-            ObjectInstance="{x:Static res:IconResources.ArrowLeftImg}" />
-        <ObjectDataProvider
-            x:Key="ArrowRightImg"
-            ObjectInstance="{x:Static res:IconResources.ArrowRightImg}" />
-        <ObjectDataProvider
-            x:Key="ArrowUpImg"
-            ObjectInstance="{x:Static res:IconResources.ArrowUpImg}" />
-        <ObjectDataProvider
-            x:Key="UpdateImg"
-            ObjectInstance="{x:Static res:IconResources.UpdateImg}" />
-        <Style
-            TargetType="{x:Type GridViewColumnHeader}">
-            <Setter
-                Property="HorizontalContentAlignment"
-                Value="Left" />
-        </Style>
-        <Style
-            TargetType="DockPanel"
-            x:Key="ProgressPanel">
-            <Style.Triggers>
-                <DataTrigger
-                    Binding="{Binding DataContext.AnyCmdIsExecuting, ElementName=_this}"
-                    Value="True">
-                    <Setter
-                        Property="Visibility"
-                        Value="Visible" />
-                </DataTrigger>
-            </Style.Triggers>
-            <Setter
-                Property="Visibility"
-                Value="Hidden" />
-        </Style>
-        <Style
-            TargetType="DockPanel"
-            x:Key="ListViewPanel">
-            <Style.Triggers>
-                <DataTrigger
-                    Binding="{Binding DataContext.AnyCmdIsExecuting, ElementName=_this}"
-                    Value="True">
-                    <Setter
-                        Property="Visibility"
-                        Value="Hidden" />
-                </DataTrigger>
-            </Style.Triggers>
-            <Setter
-                Property="Visibility"
-                Value="Visible" />
-        </Style>
-        <Style
-            TargetType="Button"
-            x:Key="BarButton">
-            <Setter
-                Property="Width"
-                Value="25" />
-            <Setter
-                Property="BorderThickness"
-                Value="0" />
-        </Style>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary
+                    Source="Styles.xaml" />
+            </ResourceDictionary.MergedDictionaries>
+            <res:BoolToSelectionModeConverter
+                x:Key="BoolToSelectionModeConverter" />
+            <res:PathInfoImageConverter
+                x:Key="PathInfoImageConverter" />
+            <res:FileSizeConverter
+                x:Key="FileSizeConverter" />
+            <Style
+                TargetType="DockPanel"
+                x:Key="ProgressPanel">
+                <Style.Triggers>
+                    <DataTrigger
+                        Binding="{Binding DataContext.AnyCmdIsExecuting,
+                        RelativeSource={RelativeSource AncestorType=Window}}"
+                        Value="True">
+                        <Setter
+                            Property="Visibility"
+                            Value="Visible" />
+                    </DataTrigger>
+                </Style.Triggers>
+                <Setter
+                    Property="Visibility"
+                    Value="Hidden" />
+            </Style>
+            <Style
+                TargetType="Border"
+                x:Key="HiddenOnExecutingBorder"
+                BasedOn="{StaticResource CustomBorder}">
+                <Style.Triggers>
+                    <DataTrigger
+                        Binding="{Binding DataContext.AnyCmdIsExecuting,
+                        RelativeSource={RelativeSource AncestorType=Window}}"
+                        Value="True">
+                        <Setter
+                            Property="Visibility"
+                            Value="Hidden" />
+                    </DataTrigger>
+                </Style.Triggers>
+                <Setter
+                    Property="Visibility"
+                    Value="Visible" />
+            </Style>
+        </ResourceDictionary>
     </Window.Resources>
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition
                 Height="Auto" />
             <RowDefinition
+                Height="Auto" />
+            <RowDefinition
                 Height="*" />
             <RowDefinition
-                Height="45" />
+                Height="Auto" />
         </Grid.RowDefinitions>
 
-        <DockPanel
+        <ui:TitleBar
             Grid.Row="0"
-            HorizontalAlignment="Stretch">
-            <Button
-                Style="{StaticResource BarButton}"
-                Command="{Binding OpenPreviousFolderCommand}">
-                <Button.Content>
-                    <Image
-                        Source="{Binding Source={StaticResource ArrowLeftImg}}" />
-                </Button.Content>
-            </Button>
-            <Button
-                Style="{StaticResource BarButton}"
-                Command="{Binding OpenNextFolderCommand}">
-                <Button.Content>
-                    <Image
-                        Source="{Binding Source={StaticResource ArrowRightImg}}" />
-                </Button.Content>
-            </Button>
-            <Button
-                Style="{StaticResource BarButton}"
-                Command="{Binding OpenParentFolderCommand}">
-                <Button.Content>
-                    <Image
-                        Source="{Binding Source={StaticResource ArrowUpImg}}" />
-                </Button.Content>
-            </Button>
-            <Button
-                Style="{StaticResource BarButton}"
-                Command="{Binding OpenRootFolderCommand}">
-                <Button.Content>
-                    <Image
-                        Source="{Binding Source={StaticResource HomeImg}}" />
-                </Button.Content>
-            </Button>
-            <DockPanel
-                LastChildFill="True">
+            Title="{Binding Title}" />
+
+        <Border
+            Grid.Row="1"
+            Style="{StaticResource CustomBorder}">
+            <DockPanel>
+                <ui:Button
+                    CornerRadius="4 0 0 4"
+                    Content="{ui:SymbolIcon Symbol=ArrowLeft20}"
+                    Command="{Binding OpenPreviousFolderCommand}" />
+                <ui:Button
+                    CornerRadius="0"
+                    Content="{ui:SymbolIcon Symbol=ArrowRight20}"
+                    Command="{Binding OpenNextFolderCommand}" />
+                <ui:Button
+                    CornerRadius="0"
+                    Content="{ui:SymbolIcon Symbol=ArrowUp20}"
+                    Command="{Binding OpenParentFolderCommand}" />
+                <ui:Button
+                    CornerRadius="0 4 4 0"
+                    Content="{ui:SymbolIcon Symbol=Home20}"
+                    Command="{Binding OpenRootFolderCommand}" />
                 <DockPanel
-                    HorizontalAlignment="Right"
-                    DockPanel.Dock="Right">
-                    <Button
-                        DockPanel.Dock="Right"
-                        Style="{StaticResource BarButton}"
-                        Command="{Binding UpdateViewCommand}">
-                        <Button.Content>
-                            <Image
-                                Source="{Binding Source={StaticResource UpdateImg}}" />
-                        </Button.Content>
-                    </Button>
-                </DockPanel>
-                <DockPanel
-                    Background="#F4F4F4">
-                    <TextBlock
-                        Margin="5 0 0 0 "
+                    LastChildFill="True">
+                    <DockPanel
+                        HorizontalAlignment="Right"
+                        DockPanel.Dock="Right">
+                        <ui:Button
+                            DockPanel.Dock="Right"
+                            Content="{ui:SymbolIcon Symbol=ArrowSync20}"
+                            Command="{Binding UpdateViewCommand}" />
+                    </DockPanel>
+                    <ui:TextBlock
+                        Margin="5 0 0 0"
                         VerticalAlignment="Center"
                         TextAlignment="Left"
                         HorizontalAlignment="Left"
@@ -167,35 +129,29 @@
                         Text="{Binding ActiveDirectory.FullName}" />
                 </DockPanel>
             </DockPanel>
-        </DockPanel>
-        <Border
-            Grid.Row="1"
-            BorderBrush="Gray"
-            BorderThickness="1">
-            <DockPanel
-                Style="{StaticResource ProgressPanel}"
-                VerticalAlignment="Center"
-                HorizontalAlignment="Center">
-                <ProgressBar
-                    Height="2"
-                    Width="250"
-                    Foreground="Gray"
-                    IsIndeterminate="True">
-                </ProgressBar>
-            </DockPanel>
         </Border>
+
         <DockPanel
-            Style="{StaticResource ListViewPanel}"
-            Grid.Row="1"
-            VerticalAlignment="Stretch">
+            Grid.Row="2"
+            Style="{StaticResource ProgressPanel}"
+            VerticalAlignment="Center"
+            HorizontalAlignment="Center">
+            <ProgressBar
+                IsIndeterminate="True">
+            </ProgressBar>
+        </DockPanel>
+
+        <Border
+            Grid.Row="2"
+            Style="{StaticResource HiddenOnExecutingBorder}">
             <ListView
+                VerticalAlignment="Stretch"
+                ScrollViewer.VerticalScrollBarVisibility="Auto"
+                ScrollViewer.HorizontalScrollBarVisibility="Auto"
                 ItemsSource="{Binding ActiveDirectory.Content}"
                 SelectionMode="{Binding MultiSelect, Converter={StaticResource BoolToSelectionModeConverter}}"
                 res:ListViewAttachedProperties.SelectedItems="{Binding SelectedItems}"
-                SelectedItem="{Binding SelectedItem}"
-                ScrollViewer.VerticalScrollBarVisibility="Auto"
-                ScrollViewer.HorizontalScrollBarVisibility="Auto"
-                VerticalAlignment="Stretch">
+                SelectedItem="{Binding SelectedItem}">
                 <i:Interaction.Behaviors>
                     <res:ListViewDoubleClickBehavior
                         Command="{Binding OpenFolderCommand}" />
@@ -213,8 +169,8 @@
                             </GridViewColumn.CellTemplate>
                         </GridViewColumn>
                         <GridViewColumn
-                            Header="{DynamicResource RsOpenFileWindow.List.Name}"
                             Width="600"
+                            Header="{DynamicResource RsOpenFileWindow.List.Name}"
                             DisplayMemberBinding="{Binding Name}" />
                         <GridViewColumn
                             Width="100"
@@ -223,32 +179,32 @@
                     </GridView>
                 </ListView.View>
             </ListView>
-        </DockPanel>
+        </Border>
 
         <StackPanel
-            Grid.Row="2"
+            Grid.Row="3"
             Orientation="Horizontal"
             HorizontalAlignment="Right">
 
-            <TextBlock
+            <ui:TextBlock
                 Margin="10"
-                Foreground="Orange"
-                VerticalAlignment="Center"
+                Style="{StaticResource CustomErrorText}"
                 Text="{Binding ErrorText}" />
 
-            <Button
+            <ui:Button
                 Width="80"
                 Margin="10"
-                Content="{DynamicResource AllWindow.Ok}"
+                Appearance="Info"
                 Click="ButtonOk_Click"
+                Content="{DynamicResource AllWindow.Ok}"
                 Command="{Binding AcceptViewCommand}" />
 
-            <Button
+            <ui:Button
                 Width="80"
                 Margin="10"
-                Content="{DynamicResource AllWindow.Cancel}"
                 IsCancel="True"
-                Click="ButtonCancel_Click" />
+                Click="ButtonCancel_Click"
+                Content="{DynamicResource AllWindow.Cancel}" />
         </StackPanel>
     </Grid>
-</base:PlatformWindow>
+</core:WpfUIPlatformWindow>

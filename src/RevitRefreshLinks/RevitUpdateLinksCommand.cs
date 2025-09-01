@@ -1,6 +1,5 @@
 using System.Globalization;
 using System.Reflection;
-using System.Windows;
 
 using Autodesk.Revit.Attributes;
 using Autodesk.Revit.DB;
@@ -9,7 +8,8 @@ using Autodesk.Revit.UI;
 using dosymep.Bim4Everyone;
 using dosymep.Bim4Everyone.SimpleServices;
 using dosymep.SimpleServices;
-using dosymep.WPF.Views;
+using dosymep.WpfCore.Ninject;
+using dosymep.WpfUI.Core.Ninject;
 using dosymep.Xpf.Core.Ninject;
 
 using Ninject;
@@ -45,26 +45,19 @@ public class RevitUpdateLinksCommand : BasePluginCommand {
         kernel.Bind<UpdateLinksConfig>()
             .ToMethod(c => UpdateLinksConfig.GetPluginConfig());
 
-        kernel.Bind<UpdateLinksViewModel>()
-            .ToSelf()
-            .InSingletonScope();
-        kernel.Bind<UpdateLinksWindow>()
-            .ToSelf()
-            .WithPropertyValue(nameof(Window.DataContext),
-                c => c.Kernel.Get<UpdateLinksViewModel>())
-            .WithPropertyValue(nameof(PlatformWindow.LocalizationService),
-                c => c.Kernel.Get<ILocalizationService>());
+        kernel.BindMainWindow<UpdateLinksViewModel, UpdateLinksWindow>();
+
+        kernel.UseWpfUIThemeUpdater();
 
         string assemblyName = Assembly.GetExecutingAssembly().GetName().Name;
-        kernel.UseXtraLocalization(
-            $"/{assemblyName};component/Localization/Language.xaml",
+        kernel.UseWpfLocalization($"/{assemblyName};component/Localization/Language.xaml",
             CultureInfo.GetCultureInfo("ru-RU"));
         var localizationService = kernel.Get<ILocalizationService>();
         kernel.UseXtraOpenFolderDialog<TwoSourcesLinksProvider>(
             title: localizationService.GetLocalizedString("SelectLocalFoldersDialog.Title"),
             initialDirectory: GetInitialLocalFolder(kernel),
             multiSelect: false);
-        kernel.UseXtraProgressDialog(
+        kernel.UseWpfUIProgressDialog<UpdateLinksViewModel>(
             stepValue: 1,
             displayTitleFormat: localizationService.GetLocalizedString("UpdateLinksWindow.Progress.Title"));
         kernel.UseRsOpenFolderDialog(

@@ -9,6 +9,7 @@ using RevitRefreshLinks.ViewModels;
 
 namespace RevitRefreshLinks.Resources;
 internal class PathInfoImageConverter : IValueConverter {
+    // TODO переделать на WPF UI
     private static readonly string _iconsFolderPath =
         $"pack://application:,,,/RevitRefreshLinks_{ModuleEnvironment.RevitVersion};component/Resources/Icons/";
 

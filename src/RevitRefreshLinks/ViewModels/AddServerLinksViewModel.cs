@@ -15,11 +15,13 @@ internal class AddServerLinksViewModel : BaseViewModel {
     private readonly IServerSourceLinksProvider _linksProvider;
     private readonly ILocalizationService _localizationService;
     private readonly ILinksLoader _linksLoader;
+    private readonly IProgressDialogFactory _progressFactory;
 
     public AddServerLinksViewModel(
         IServerSourceLinksProvider linksProvider,
         ILocalizationService localizationService,
-        ILinksLoader linksLoader) {
+        ILinksLoader linksLoader,
+        IProgressDialogFactory progressFactory) {
 
         _linksProvider = linksProvider
             ?? throw new System.ArgumentNullException(nameof(linksProvider));
@@ -27,7 +29,8 @@ internal class AddServerLinksViewModel : BaseViewModel {
             ?? throw new System.ArgumentNullException(nameof(localizationService));
         _linksLoader = linksLoader
             ?? throw new System.ArgumentNullException(nameof(linksLoader));
-
+        _progressFactory = progressFactory
+            ?? throw new System.ArgumentNullException(nameof(progressFactory));
         AddLinksCommand = RelayCommand.CreateAsync(AddLinks);
     }
 
@@ -36,7 +39,7 @@ internal class AddServerLinksViewModel : BaseViewModel {
     public async Task AddLinks() {
         var linksFromSource = await _linksProvider.GetServerLinksAsync();
         ICollection<(ILink Link, string Error)> errors;
-        using(var progressDialogService = GetPlatformService<IProgressDialogService>()) {
+        using(var progressDialogService = _progressFactory.CreateDialog()) {
             var progress = progressDialogService.CreateProgress();
             progressDialogService.MaxValue = linksFromSource.Links.Count;
             var ct = progressDialogService.CreateCancellationToken();

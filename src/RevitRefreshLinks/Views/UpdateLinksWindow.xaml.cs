@@ -1,8 +1,20 @@
 using System.Windows;
 
+using dosymep.SimpleServices;
+
 namespace RevitRefreshLinks.Views;
 public partial class UpdateLinksWindow {
-    public UpdateLinksWindow() {
+    public UpdateLinksWindow(
+        ILoggerService loggerService,
+        ISerializationService serializationService,
+        ILanguageService languageService,
+        ILocalizationService localizationService,
+        IUIThemeService uiThemeService,
+        IUIThemeUpdaterService themeUpdaterService)
+        : base(loggerService,
+            serializationService,
+            languageService, localizationService,
+            uiThemeService, themeUpdaterService) {
         InitializeComponent();
     }
 

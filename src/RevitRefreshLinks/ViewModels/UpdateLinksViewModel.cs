@@ -29,12 +29,14 @@ internal class UpdateLinksViewModel : BaseViewModel {
         RevitRepository revitRepository,
         ILocalizationService localizationService,
         ITwoSourceLinksProvider linksProvider,
-        ILinksLoader linksLoader) {
+        ILinksLoader linksLoader,
+        IProgressDialogFactory progressFactory) {
 
         _revitRepository = revitRepository ?? throw new ArgumentNullException(nameof(revitRepository));
         _localizationService = localizationService ?? throw new ArgumentNullException(nameof(localizationService));
         _linksProvider = linksProvider ?? throw new ArgumentNullException(nameof(linksProvider));
         _linksLoader = linksLoader ?? throw new ArgumentNullException(nameof(linksLoader));
+        ProgressDialogFactory = progressFactory ?? throw new ArgumentNullException(nameof(progressFactory));
         LinksToUpdate = [];
         SourceLocalLinks = [];
         SourceServerLinks = [];
@@ -48,6 +50,8 @@ internal class UpdateLinksViewModel : BaseViewModel {
         InvertSelectedLinksCommand = RelayCommand.Create(InvertSelectedLinks, CanSelectAny);
     }
 
+
+    public IProgressDialogFactory ProgressDialogFactory { get; }
 
     public ICommand LoadViewCommand { get; }
 
@@ -104,7 +108,7 @@ internal class UpdateLinksViewModel : BaseViewModel {
             .Select(t => new LinkPair(t.GetLinkType(), t.GetSourceLinks().First()))
             .ToArray();
         ICollection<(ILink Link, string Error)> errors;
-        using(var pb = GetPlatformService<IProgressDialogService>()) {
+        using(var pb = ProgressDialogFactory.CreateDialog()) {
             pb.MaxValue = linkPairs.Length;
             var progress = pb.CreateProgress();
             var ct = pb.CreateCancellationToken();
