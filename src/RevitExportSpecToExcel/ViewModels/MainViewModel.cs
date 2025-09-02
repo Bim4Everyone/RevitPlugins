@@ -34,11 +34,10 @@ internal class MainViewModel : BaseViewModel {
     /// <param name="pluginConfig">Настройки плагина.</param>
     /// <param name="revitRepository">Класс доступа к интерфейсу Revit.</param>
     /// <param name="localizationService">Интерфейс доступа к сервису локализации.</param>
-    public MainViewModel(
-        PluginConfig pluginConfig,
-        RevitRepository revitRepository,
-        ExcelExporter excelExporter,
-        ILocalizationService localizationService) {
+    public MainViewModel(PluginConfig pluginConfig,
+                         RevitRepository revitRepository,
+                         ExcelExporter excelExporter,
+                         ILocalizationService localizationService) {
         
         _pluginConfig = pluginConfig;
         _revitRepository = revitRepository;
@@ -94,7 +93,7 @@ internal class MainViewModel : BaseViewModel {
 
     private void LoadView() {
         Schedules = new(_revitRepository
-            .GetSchedulesVM()
+            .GetSchedulesVM(_localizationService)
             .ToList());
         FilteredSchedules = new ObservableCollection<ScheduleViewModel>(Schedules);
 

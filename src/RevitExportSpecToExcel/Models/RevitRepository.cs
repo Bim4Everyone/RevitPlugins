@@ -5,6 +5,8 @@ using Autodesk.Revit.ApplicationServices;
 using Autodesk.Revit.DB;
 using Autodesk.Revit.UI;
 
+using dosymep.SimpleServices;
+
 using RevitExportSpecToExcel.ViewModels;
 
 namespace RevitExportSpecToExcel.Models;
@@ -30,29 +32,27 @@ internal class RevitRepository {
             .ToList();
     }
 
-    public IList<ScheduleViewModel> GetSchedulesVM() {
+    public IList<ScheduleViewModel> GetSchedulesVM(ILocalizationService localizationService) {
         IList<ViewSchedule> schedulesRevit = GetSchedules();
-        List<ScheduleViewModel> schedules = [];
+        IList<ScheduleViewModel> schedules = [];
 
         ElementId activeViewId = Document.ActiveView.Id;
         IList<ElementId> openedViewIds = ActiveUIDocument
             .GetOpenUIViews()
             .Select(x => x.ViewId)
-            .ToList();
+        .ToList();
 
-        OpenStatus activeViewStatus = new OpenStatus("Активный вид", 1);
-        OpenStatus openedViewStatus = new OpenStatus("Открытый вид", 2);
-        OpenStatus otherViewStatus = new OpenStatus("Прочий вид", 3);
+        ViewStatuses statuses = new(localizationService);
 
         foreach(var schedule in schedulesRevit) {
             if(schedule.Id == activeViewId) {
-                schedules.Add(new ScheduleViewModel(schedule, activeViewStatus) {
+                schedules.Add(new ScheduleViewModel(schedule, statuses.ActiveViewStatus) {
                     IsChecked = true
                 });
             } else if(openedViewIds.Contains(schedule.Id)) {
-                schedules.Add(new ScheduleViewModel(schedule, openedViewStatus));
+                schedules.Add(new ScheduleViewModel(schedule, statuses.OpenedViewStatus));
             } else {
-                schedules.Add(new ScheduleViewModel(schedule, otherViewStatus));
+                schedules.Add(new ScheduleViewModel(schedule, statuses.ClosedViewStatus));
             }
         }
 
