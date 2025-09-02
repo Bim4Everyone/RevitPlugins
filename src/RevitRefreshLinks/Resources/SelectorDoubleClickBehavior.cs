@@ -1,17 +1,17 @@
 using System;
 using System.Windows;
-using System.Windows.Controls;
+using System.Windows.Controls.Primitives;
 using System.Windows.Input;
 
 using Microsoft.Xaml.Behaviors;
 
 namespace RevitRefreshLinks.Resources;
-internal class ListViewDoubleClickBehavior : Behavior<ListView> {
+internal class SelectorDoubleClickBehavior : Behavior<Selector> {
     public static readonly DependencyProperty CommandProperty =
         DependencyProperty.Register(
             "Command",
             typeof(ICommand),
-            typeof(ListViewDoubleClickBehavior));
+            typeof(SelectorDoubleClickBehavior));
 
     public ICommand Command {
         get => (ICommand) GetValue(CommandProperty);
@@ -29,7 +29,7 @@ internal class ListViewDoubleClickBehavior : Behavior<ListView> {
     }
 
     private void OnMouseDoubleClick(object sender, MouseButtonEventArgs e) {
-        if(sender is ListView && e.OriginalSource is FrameworkElement originalSource) {
+        if(sender is Selector && e.OriginalSource is FrameworkElement originalSource) {
             object clickedItem = originalSource.DataContext;
             try {
                 if(clickedItem != null && Command != null && Command.CanExecute(clickedItem)) {
