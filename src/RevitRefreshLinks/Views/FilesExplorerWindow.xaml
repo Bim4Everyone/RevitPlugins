@@ -11,6 +11,7 @@
     xmlns:res="clr-namespace:RevitRefreshLinks.Resources"
     xmlns:vms="clr-namespace:RevitRefreshLinks.ViewModels"
     xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
+    xmlns:converters="clr-namespace:dosymep.WpfCore.Converters;assembly=dosymep.WpfCore"
     mc:Ignorable="d"
     WindowStartupLocation="CenterOwner"
     Height="450"
@@ -31,10 +32,16 @@
                 <ResourceDictionary
                     Source="Styles.xaml" />
             </ResourceDictionary.MergedDictionaries>
+            <ui:SymbolRegular
+                x:Key="DirectoryIcon">Folder24</ui:SymbolRegular>
+            <ui:SymbolRegular
+                x:Key="FileIcon">Building24</ui:SymbolRegular>
+            <converters:BoolToObjectConverter
+                x:Key="IsDirectoryToIconConverter"
+                TrueValue="{StaticResource DirectoryIcon}"
+                FalseValue="{StaticResource FileIcon}" />
             <res:BoolToSelectionModeConverter
                 x:Key="BoolToSelectionModeConverter" />
-            <res:PathInfoImageConverter
-                x:Key="PathInfoImageConverter" />
             <res:FileSizeConverter
                 x:Key="FileSizeConverter" />
             <Style
@@ -167,7 +174,7 @@
                             <GridViewColumn.CellTemplate>
                                 <DataTemplate>
                                     <ui:SymbolIcon
-                                        Symbol="{Binding Converter={StaticResource PathInfoImageConverter}}" />
+                                        Symbol="{Binding IsDirectory, Converter={StaticResource IsDirectoryToIconConverter}}" />
                                 </DataTemplate>
                             </GridViewColumn.CellTemplate>
                         </GridViewColumn>
