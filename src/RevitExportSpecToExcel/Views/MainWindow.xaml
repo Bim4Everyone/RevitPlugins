@@ -58,7 +58,7 @@
             Margin="10,5"
             Style="{StaticResource CustomBorder}">
             <CheckBox
-                Content="Create one file"
+                Content="{me:LocalizationSource MainWindow.SaveAsOneFile}"
                 IsChecked="{Binding SaveAsOneFile}"/>
         </Border>
 
@@ -72,7 +72,7 @@
                     DockPanel.Dock="Top"
                     Icon="{ui:SymbolIcon Search24}"
                     Text="{Binding SearchText, Mode=TwoWay}"
-                    PlaceholderText="Search by name">
+                    PlaceholderText="{me:LocalizationSource MainWindow.SearchText}">
                     <i:Interaction.Triggers>
                         <i:EventTrigger EventName="TextChanged">
                             <i:InvokeCommandAction
@@ -86,15 +86,15 @@
                     <DataGrid.Columns>
                         <DataGridCheckBoxColumn
                             Binding="{Binding Path=IsChecked, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
-                            Header="Check" />
+                            Header="{me:LocalizationSource MainWindow.HeaderCheck}" />
                         <DataGridTextColumn
                             Binding="{Binding Path=Name}"
-                            Header="Name"
+                            Header="{me:LocalizationSource MainWindow.HeaderName}"
                             Width="530"
                             IsReadOnly="True"/>
                         <DataGridTextColumn
                             Binding="{Binding Path=OpenStatus.Name}"
-                            Header="Status"
+                            Header="{me:LocalizationSource MainWindow.HeaderStatus}"
                             IsReadOnly="True"/>
                     </DataGrid.Columns>
                 </ui:DataGrid>

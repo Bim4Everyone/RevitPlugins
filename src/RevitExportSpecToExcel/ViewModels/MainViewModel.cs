@@ -1,5 +1,4 @@
 using System;
-using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Windows.Input;
@@ -117,7 +116,7 @@ internal class MainViewModel : BaseViewModel {
 
     private bool CanAcceptView() {
         if(!_schedules.Any(x => x.IsChecked)) {
-            ErrorText = "Не выбраны спецификации";
+            ErrorText = _localizationService.GetLocalizedString("MainWindow.NoSelection");
             return false;
         }
 

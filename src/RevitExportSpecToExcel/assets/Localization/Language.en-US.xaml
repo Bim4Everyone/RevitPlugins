@@ -2,11 +2,19 @@
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
                     xmlns:system="clr-namespace:System;assembly=mscorlib">
 
-    <!-- Пример перевода на английский американский язык (google translate) -->
+    <system:String x:Key="MainWindow.Title">Schedule export</system:String>
 
-    <system:String x:Key="MainWindow.Title">Sample command</system:String>
-    <system:String x:Key="MainWindow.Hello">Hello Revit!</system:String>
-    <system:String x:Key="MainWindow.HelloCheck">Enter a value for the property to save.</system:String>
+    <system:String x:Key="MainWindow.ActiveViewStatus">Active view</system:String>
+    <system:String x:Key="MainWindow.OpenedViewStatus">Opened view</system:String>
+    <system:String x:Key="MainWindow.ClosedViewStatus">Closed view</system:String>
+
+    <system:String x:Key="MainWindow.NoSelection">Schedules are not selected</system:String>
+
+    <system:String x:Key="MainWindow.SearchText">Search by name</system:String>
+    <system:String x:Key="MainWindow.SaveAsOneFile">Save as one file</system:String>
+    <system:String x:Key="MainWindow.HeaderCheck">Check</system:String>
+    <system:String x:Key="MainWindow.HeaderName">Schedule name</system:String>
+    <system:String x:Key="MainWindow.HeaderStatus">Status</system:String>
 
     <system:String x:Key="MainWindow.ButtonOk">OK</system:String>
     <system:String x:Key="MainWindow.ButtonCancel">Cancel</system:String>

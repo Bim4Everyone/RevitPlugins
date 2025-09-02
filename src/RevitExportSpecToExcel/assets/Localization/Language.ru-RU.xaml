@@ -2,11 +2,19 @@
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
                     xmlns:system="clr-namespace:System;assembly=mscorlib">
 
-    <!-- Пример перевода на русский язык (google translate) -->
+    <system:String x:Key="MainWindow.Title">Экспорт спецификаций</system:String>
 
-    <system:String x:Key="MainWindow.Title">Пример команды</system:String>
-    <system:String x:Key="MainWindow.Hello">Привет, Revit!</system:String>
-    <system:String x:Key="MainWindow.HelloCheck">Введите значение сохраняемого свойства.</system:String>
+    <system:String x:Key="MainWindow.ActiveViewStatus">Активный вид</system:String>
+    <system:String x:Key="MainWindow.OpenedViewStatus">Открытый вид</system:String>
+    <system:String x:Key="MainWindow.ClosedViewStatus">Прочий вид</system:String>
+
+    <system:String x:Key="MainWindow.NoSelection">Не выбраны спецификации</system:String>
+
+    <system:String x:Key="MainWindow.SearchText">Поиск по имени спецификации</system:String>
+    <system:String x:Key="MainWindow.SaveAsOneFile">Сохранить как один файл</system:String>
+    <system:String x:Key="MainWindow.HeaderCheck">Выбрать</system:String>
+    <system:String x:Key="MainWindow.HeaderName">Имя спецификации</system:String>
+    <system:String x:Key="MainWindow.HeaderStatus">Статус</system:String>
 
     <system:String x:Key="MainWindow.ButtonOk">ОК</system:String>
     <system:String x:Key="MainWindow.ButtonCancel">Отмена</system:String>
