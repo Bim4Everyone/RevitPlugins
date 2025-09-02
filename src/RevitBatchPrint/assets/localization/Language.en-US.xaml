@@ -5,6 +5,9 @@
     <system:String x:Key="MainWindow.Title">Revit batch print</system:String>
 
     <system:String x:Key="MainWindow.AlbumHintText">Choose the grouping parameter name</system:String>
+    <system:String x:Key="MainWindow.PrintHintText">Choose print from a list</system:String>
+    <system:String x:Key="MainWindow.FilePathHintText">Choose the path to export a PDF file</system:String>
+    
     <system:String x:Key="MainWindow.SearchHintText">Search</system:String>
     <system:String x:Key="MainWindow.EmptyAlbumNameParam">Noname</system:String>
     <system:String x:Key="MainWindow.ChooseFileName">Choose the path to save the file</system:String>
@@ -14,7 +17,10 @@
     <system:String x:Key="MainWindow.ExportMode">Export Mode</system:String>
 
     <system:String x:Key="MainWindow.PrintCommandName">Print</system:String>
+    <system:String x:Key="MainWindow.PrintCommandTooltip">Prints sheets in the context view</system:String>
+    
     <system:String x:Key="MainWindow.ExportCommandName">Export</system:String>
+    <system:String x:Key="MainWindow.ExportCommandTooltip">Exports sheets in the context view</system:String>
 
     <system:String x:Key="MainWindow.ButtonOk">OK</system:String>
     <system:String x:Key="MainWindow.ButtonCancel">Cancel</system:String>

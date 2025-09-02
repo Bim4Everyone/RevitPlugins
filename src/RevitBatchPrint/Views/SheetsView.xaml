@@ -46,6 +46,7 @@
                 Margin="14,8,14,8"
                 Icon="{ui:SymbolIcon TextAlignJustify24}"
                 Text="{Binding AlbumParamName, Mode=TwoWay}"
+                ToolTip="{me:LocalizationSource MainWindow.AlbumHintText}"
                 PlaceholderText="{me:LocalizationSource MainWindow.AlbumHintText}"
                 OriginalItemsSource="{Binding AlbumParamNames}"
                 UpdateTextOnSelect="True"
@@ -73,6 +74,7 @@
                 Margin="14,8,14,8"
                 IsEnabled="True"
                 IsReadOnly="False"
+                ToolTip="{me:LocalizationSource MainWindow.PrintHintText}"
                 ItemsSource="{Binding Path=PrintOptions.PrinterNames, Mode=OneWay}"
                 SelectedValue="{Binding Path=PrintOptions.PrinterName, Mode=TwoWay}" />
         </Border>
@@ -101,6 +103,7 @@
                     Height="36.5"
                     Margin="14,8,0,8"
                     Icon="{ui:SymbolIcon DocumentPdf24}"
+                    ToolTip="{me:LocalizationSource MainWindow.FilePathHintText}"
                     Text="{Binding Path=PrintOptions.FilePath, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
             </DockPanel>
 

@@ -161,6 +161,7 @@
                 <ui:Button
                     Icon="{ui:SymbolIcon Print24}"
                     Style="{StaticResource TreeItemButtonStyle}"
+                    ToolTip="{DynamicResource MainWindow.PrintCommandTooltip}"
                     Command="{Binding PrintCommand}"
                     Visibility="{Binding DataContext.ShowPrint,
                         RelativeSource={RelativeSource AncestorType=Window},
@@ -170,6 +171,7 @@
                     Margin="8 0 8 0"
                     Icon="{ui:SymbolIcon DocumentArrowDown20}"
                     Style="{StaticResource TreeItemButtonStyle}"
+                    ToolTip="{DynamicResource MainWindow.ExportCommandTooltip}"
                     Command="{Binding ExportCommand}"
                     Visibility="{Binding DataContext.ShowExport,
                         RelativeSource={RelativeSource AncestorType=Window},

@@ -5,6 +5,9 @@
     <system:String x:Key="MainWindow.Title">Пакетная печать</system:String>
 
     <system:String x:Key="MainWindow.AlbumHintText">Выберите параметр группировки листов</system:String>
+    <system:String x:Key="MainWindow.PrintHintText">Выберите принтер из списка</system:String>
+    <system:String x:Key="MainWindow.FilePathHintText">Выберите путь для экспорта PDF-файла</system:String>
+    
     <system:String x:Key="MainWindow.SearchHintText">Поиск</system:String>
     <system:String x:Key="MainWindow.EmptyAlbumNameParam">Без имени</system:String>
     <system:String x:Key="MainWindow.ChooseFileName">Выберите файл для сохранения</system:String>
@@ -14,7 +17,10 @@
     <system:String x:Key="MainWindow.ExportMode">Режим экспорта</system:String>
 
     <system:String x:Key="MainWindow.PrintCommandName">Печать</system:String>
+    <system:String x:Key="MainWindow.PrintCommandTooltip">Печатает листы в контексте отображения</system:String>
+    
     <system:String x:Key="MainWindow.ExportCommandName">Экспорт</system:String>
+    <system:String x:Key="MainWindow.ExportCommandTooltip">Экспорт листов в контексте отображения</system:String>
 
     <system:String x:Key="MainWindow.ButtonOk">ОК</system:String>
     <system:String x:Key="MainWindow.ButtonCancel">Отмена</system:String>
