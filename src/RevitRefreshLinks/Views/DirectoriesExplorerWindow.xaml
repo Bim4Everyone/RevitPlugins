@@ -140,23 +140,26 @@
             Grid.Row="2"
             VerticalAlignment="Stretch"
             Style="{StaticResource HiddenOnExecutingBorder}">
-            <ListView
+            <ui:ListView
                 VerticalAlignment="Stretch"
                 ScrollViewer.VerticalScrollBarVisibility="Auto"
                 ScrollViewer.HorizontalScrollBarVisibility="Auto"
+                BorderThickness="0"
                 ItemsSource="{Binding ActiveDirectory.Content}"
                 SelectionMode="{Binding MultiSelect, Converter={StaticResource BoolToSelectionModeConverter}}"
                 res:ListViewAttachedProperties.SelectedItems="{Binding SelectedDirectories}"
                 SelectedItem="{Binding SelectedDirectory}">
                 <i:Interaction.Behaviors>
-                    <res:ListViewDoubleClickBehavior
+                    <res:SelectorDoubleClickBehavior
                         Command="{Binding OpenFolderCommand}" />
                     <res:ListViewHorizontalScrollBehavior />
                 </i:Interaction.Behaviors>
-                <ListView.View>
-                    <GridView>
+                <ui:ListView.View>
+                    <GridView
+                        ColumnHeaderContainerStyle="{StaticResource UiGridViewColumnHeaderStyle}">
                         <GridViewColumn
-                            Width="32">
+                            Width="32"
+                            HeaderContainerStyle="{StaticResource CustomNoResizableColumnHeader}">
                             <GridViewColumn.CellTemplate>
                                 <DataTemplate>
                                     <ui:SymbolIcon
@@ -169,8 +172,8 @@
                             Header="{DynamicResource RsOpenFileWindow.List.Name}"
                             DisplayMemberBinding="{Binding Name}" />
                     </GridView>
-                </ListView.View>
-            </ListView>
+                </ui:ListView.View>
+            </ui:ListView>
         </Border>
 
         <StackPanel

@@ -91,4 +91,13 @@
             </Trigger>
         </Style.Triggers>
     </Style>
+
+    <Style
+        TargetType="GridViewColumnHeader"
+        x:Key="CustomNoResizableColumnHeader"
+        BasedOn="{StaticResource UiGridViewColumnHeaderStyle}">
+        <Setter
+            Property="IsHitTestVisible"
+            Value="False" />
+    </Style>
 </ResourceDictionary>
