@@ -17,12 +17,14 @@ using dosymep.WPF.ViewModels;
 using RevitBatchPrint.Models;
 using RevitBatchPrint.Services;
 
+using IExportContext = RevitBatchPrint.Models.IExportContext;
+
 namespace RevitBatchPrint.ViewModels;
 
 /// <summary>
 /// Основная ViewModel главного окна плагина.
 /// </summary>
-internal class MainViewModel : BaseViewModel, IPrintContext {
+internal class MainViewModel : BaseViewModel, IPrintContext, IExportContext {
     private readonly PluginConfig _pluginConfig;
     private readonly RevitRepository _revitRepository;
 
@@ -38,7 +40,6 @@ internal class MainViewModel : BaseViewModel, IPrintContext {
 
     private bool _showPrint;
     private bool _showExport;
-    private IRevitPrint _currentPrintExport;
 
     private string _albumParamName;
     private PrintOptionsViewModel _printOptions;
@@ -68,30 +69,28 @@ internal class MainViewModel : BaseViewModel, IPrintContext {
         MessageBoxService = messageBoxService;
 
         LoadViewCommand = RelayCommand.Create(LoadView);
-        AcceptVewCommand = RelayCommand.Create<Window>(AcceptView, CanAcceptView);
-
-        ChangeModeCommand = RelayCommand.Create(ChangeMode);
         ChooseSaveFileCommand = RelayCommand.Create(ChooseSaveFile);
+
+        PrintCommand = RelayCommand.Create<Window>(Print, CanPrint);
+        ExportCommand = RelayCommand.Create<Window>(Export, CanExport);
 
         SearchCommand = RelayCommand.Create(ApplySearch);
         ChangeAlbumNameCommand = RelayCommand.Create(ChangeAlbumName);
-        
+
 #if REVIT_2021_OR_LESS
         ShowPrint = true;
         ShowExport = false;
-        _currentPrintExport = _revitPrint;
 #else
-        ShowPrint = false;
+        ShowPrint = true;
         ShowExport = true;
-        _currentPrintExport = _revitExport;
 #endif
     }
 
     public ICommand LoadViewCommand { get; }
-    public ICommand AcceptVewCommand { get; }
-
-    public ICommand ChangeModeCommand { get; }
     public ICommand ChooseSaveFileCommand { get; }
+
+    public ICommand PrintCommand { get; }
+    public ICommand ExportCommand { get; }
 
     public ICommand SearchCommand { get; set; }
     public ICommand ChangeAlbumNameCommand { get; set; }
@@ -153,17 +152,6 @@ internal class MainViewModel : BaseViewModel, IPrintContext {
         CreateAlbumCollection();
     }
 
-    private void ChangeMode() {
-        ShowPrint = !ShowPrint;
-        ShowExport = !ShowExport;
-
-        if(ShowPrint) {
-            _currentPrintExport = _revitPrint;
-        } else if(ShowExport) {
-            _currentPrintExport = _revitExport;
-        }
-    }
-
     private void ChooseSaveFile() {
         string fileName = string.IsNullOrEmpty(PrintOptions.FilePath)
             ? $"{_revitRepository.Document.Title}.pdf"
@@ -178,9 +166,53 @@ internal class MainViewModel : BaseViewModel, IPrintContext {
         }
     }
 
-    private void AcceptView(Window window) {
+    private void Print(Window window) {
         SaveConfig();
+        Print(GetSheets());
 
+        window.DialogResult = true;
+    }
+
+    private bool CanPrint(Window window) {
+        return CanAcceptView(true);
+    }
+
+    private void Export(Window window) {
+        SaveConfig();
+        Export(GetSheets());
+
+        window.DialogResult = true;
+    }
+
+    private bool CanExport(Window window) {
+        return CanAcceptView(true);
+    }
+
+    public void Print(IEnumerable<SheetViewModel> sheets) {
+        SheetElement[] sheetElements = sheets
+            .Select(item => item.CreateSheetElement())
+            .ToArray();
+
+        _revitPrint.Execute(sheetElements, PrintOptions.CreatePrintOptions());
+    }
+
+    public bool CanPrint(IEnumerable<SheetViewModel> sheets) {
+        return CanAcceptView(false);
+    }
+
+    public void Export(IEnumerable<SheetViewModel> sheets) {
+        SheetElement[] sheetElements = sheets
+            .Select(item => item.CreateSheetElement())
+            .ToArray();
+
+        _revitExport.Execute(sheetElements, PrintOptions.CreatePrintOptions());
+    }
+
+    public bool CanExport(IEnumerable<SheetViewModel> sheets) {
+        return CanAcceptView(false);
+    }
+
+    private IEnumerable<SheetViewModel> GetSheets() {
         IEnumerable<SheetViewModel> sheets = MainAlbums
             .SelectMany(item => item.MainSheets)
             .Where(item => item.IsSelected)
@@ -198,24 +230,7 @@ internal class MainViewModel : BaseViewModel, IPrintContext {
             }
         }
 
-        ExecutePrintExport(sheets);
-        window.DialogResult = true;
-    }
-
-    public void ExecutePrintExport(IEnumerable<SheetViewModel> sheets) {
-        SheetElement[] sheetElements = sheets
-            .Select(item => item.CreateSheetElement())
-            .ToArray();
-
-        _currentPrintExport.Execute(sheetElements, PrintOptions.CreatePrintOptions());
-    }
-
-    public bool CanExecutePrintExport(IEnumerable<SheetViewModel> sheets) {
-        return CanAcceptView(false);
-    }
-
-    private bool CanAcceptView(Window window) {
-        return CanAcceptView(true);
+        return sheets;
     }
 
     private bool CanAcceptView(bool checkSelected) {
@@ -275,7 +290,12 @@ internal class MainViewModel : BaseViewModel, IPrintContext {
     private AlbumViewModel CreateAlbum(
         string albumName,
         IEnumerable<(ViewSheet ViewSheet, FamilyInstance TitleBlock, Viewport[] Viewports)> sheetsInfo) {
-        var viewModel = new AlbumViewModel(albumName, this, MessageBoxService, _localizationService);
+        var viewModel = new AlbumViewModel(
+            albumName,
+            this,
+            this,
+            MessageBoxService,
+            _localizationService);
 
         SheetViewModel[] sheets = CreateSheetCollection(viewModel, sheetsInfo);
         viewModel.MainSheets = new ObservableCollection<SheetViewModel>(sheets);
@@ -293,7 +313,6 @@ internal class MainViewModel : BaseViewModel, IPrintContext {
     private SheetViewModel[] CreateSheetCollection(
         AlbumViewModel album,
         IEnumerable<(ViewSheet ViewSheet, FamilyInstance TitleBlock, Viewport[] Viewports)> sheetsInfo) {
-
         LogicalStringComparer comparer = new();
         return sheetsInfo
             .Select(item => CreateSheet(album, item))
@@ -304,7 +323,13 @@ internal class MainViewModel : BaseViewModel, IPrintContext {
     private SheetViewModel CreateSheet(
         AlbumViewModel album,
         (ViewSheet ViewSheet, FamilyInstance TitleBlock, Viewport[] Viewports) sheetsInfo) {
-        return new SheetViewModel(sheetsInfo.ViewSheet, album, this, MessageBoxService, _localizationService) {
+        return new SheetViewModel(
+            sheetsInfo.ViewSheet,
+            album,
+            this,
+            this,
+            MessageBoxService,
+            _localizationService) {
             PrintSheetSettings = _revitRepository.GetPrintSettings(sheetsInfo.TitleBlock),
             ViewsWithoutCrop = new ObservableCollection<string>(sheetsInfo.Viewports?.Select(item => item.Name) ?? [])
         };

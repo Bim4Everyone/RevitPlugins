@@ -32,6 +32,7 @@
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />
             <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
             <RowDefinition Height="*" />
         </Grid.RowDefinitions>
 
@@ -77,7 +78,7 @@
         </Border>
 
         <Border
-            Grid.Row="1"
+            Grid.Row="2"
             Margin="8 0 8 8"
             Padding="0"
             Background="{DynamicResource CardBackground}"
@@ -100,13 +101,13 @@
                     Height="36.5"
                     Margin="14,8,0,8"
                     Icon="{ui:SymbolIcon DocumentPdf24}"
-                    Text="{Binding Path=PrintOptions.FilePath, Mode=TwoWay}" />
+                    Text="{Binding Path=PrintOptions.FilePath, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
             </DockPanel>
 
         </Border>
 
         <Border
-            Grid.Row="2"
+            Grid.Row="3"
             Margin="8 0 8 8"
             Background="{DynamicResource CardBackground}"
             CornerRadius="{DynamicResource ControlCornerRadius}">

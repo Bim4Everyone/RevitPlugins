@@ -12,11 +12,14 @@ using dosymep.WPF.ViewModels;
 
 using RevitBatchPrint.Models;
 
+using IExportContext = RevitBatchPrint.Models.IExportContext;
+
 namespace RevitBatchPrint.ViewModels;
 
 internal sealed class SheetViewModel : BaseViewModel {
     private readonly ViewSheet _viewSheet;
     private readonly IPrintContext _printContext;
+    private readonly IExportContext _exportContext;
     private readonly IMessageBoxService _messageBoxService;
     private readonly ILocalizationService _localizationService;
 
@@ -29,26 +32,32 @@ internal sealed class SheetViewModel : BaseViewModel {
         ViewSheet viewSheet,
         AlbumViewModel album,
         IPrintContext printContext,
+        IExportContext exportContext,
         IMessageBoxService messageBoxService,
         ILocalizationService localizationService) {
         _viewSheet = viewSheet;
         _printContext = printContext;
+        _exportContext = exportContext;
+
         _messageBoxService = messageBoxService;
         _localizationService = localizationService;
 
         Name = _viewSheet.Name;
         SheetNumber = _viewSheet.SheetNumber;
-        
+
         Album = album;
         CheckCommand = Album.CheckUpdateCommand;
-        PrintExportCommand = RelayCommand.Create(ExecutePrintExport, CanExecutePrintExport);
+        PrintCommand = RelayCommand.Create(Print, CanPrint);
+        ExportCommand = RelayCommand.Create(Export, CanExport);
     }
 
     public string Name { get; }
     public string SheetNumber { get; }
     public AlbumViewModel Album { get; }
     public ICommand CheckCommand { get; }
-    public ICommand PrintExportCommand { get; }
+
+    public ICommand PrintCommand { get; }
+    public ICommand ExportCommand { get; }
 
     public string ErrorText {
         get => _errorText;
@@ -74,30 +83,47 @@ internal sealed class SheetViewModel : BaseViewModel {
         ViewsWithoutCrop.Count == 0
             ? null
             : _localizationService.GetLocalizedString("TreeView.ViewsWithoutCropToolTip")
-              + Environment.NewLine + " - "
+              + Environment.NewLine
+              + " - "
               + string.Join(Environment.NewLine + " - ", ViewsWithoutCrop.Take(5))
               + (ViewsWithoutCrop.Count > 5 ? "..." : null);
-    
+
     public SheetElement CreateSheetElement() {
-        return new SheetElement() {ViewSheet = _viewSheet, PrintSheetSettings = PrintSheetSettings};
+        return new SheetElement() {
+            ViewSheet = _viewSheet,
+            PrintSheetSettings = PrintSheetSettings
+        };
+    }
+
+    private void Print() {
+        ShowWarning();
+        _printContext.Print([this]);
+    }
+
+    private bool CanPrint() {
+        return _printContext.CanPrint([this]);
     }
     
-    private void ExecutePrintExport() {
+    private void Export() {
+        ShowWarning();
+        _exportContext.Export([this]);
+    }
+
+    private bool CanExport() {
+        return _exportContext.CanExport([this]);
+    }
+
+    private void ShowWarning() {
         if(ViewsWithoutCrop.Count > 0) {
             var messageBoxResult = _messageBoxService.Show(
-                _localizationService.GetLocalizedString("MainWindow.ViewsWithoutCropMessage"), 
+                _localizationService.GetLocalizedString("MainWindow.ViewsWithoutCropMessage"),
                 _localizationService.GetLocalizedString("MainWindow.Title"),
-                MessageBoxButton.YesNo, MessageBoxImage.Warning);
+                MessageBoxButton.YesNo,
+                MessageBoxImage.Warning);
 
             if(messageBoxResult == MessageBoxResult.No) {
                 throw new OperationCanceledException();
             }
         }
-        
-        _printContext.ExecutePrintExport([this]);
-    }
-    
-    private bool CanExecutePrintExport() {
-        return _printContext.CanExecutePrintExport([this]);
     }
 }

@@ -14,10 +14,13 @@ using dosymep.WPF.ViewModels;
 
 using RevitBatchPrint.Models;
 
+using IExportContext = RevitBatchPrint.Models.IExportContext;
+
 namespace RevitBatchPrint.ViewModels;
 
 internal sealed class AlbumViewModel : BaseViewModel {
     private readonly IPrintContext _printContext;
+    private readonly IExportContext _exportContext;
     private readonly IMessageBoxService _messageBoxService;
     private readonly ILocalizationService _localizationService;
 
@@ -29,9 +32,12 @@ internal sealed class AlbumViewModel : BaseViewModel {
     public AlbumViewModel(
         string albumName,
         IPrintContext printContext,
+        IExportContext exportContext,
         IMessageBoxService messageBoxService,
         ILocalizationService localizationService) {
         _printContext = printContext;
+        _exportContext = exportContext;
+
         _messageBoxService = messageBoxService;
         _localizationService = localizationService;
 
@@ -43,12 +49,16 @@ internal sealed class AlbumViewModel : BaseViewModel {
 
         CheckCommand = RelayCommand.Create(Check);
         CheckUpdateCommand = RelayCommand.Create(CheckUpdate);
-        PrintExportCommand = RelayCommand.Create(ExecutePrintExport, CanExecutePrintExport);
+
+        PrintCommand = RelayCommand.Create(Print, CanPrint);
+        ExportCommand = RelayCommand.Create(Export, CanExport);
     }
 
     public ICommand CheckCommand { get; }
     public ICommand CheckUpdateCommand { get; }
-    public ICommand PrintExportCommand { get; }
+
+    public ICommand PrintCommand { get; }
+    public ICommand ExportCommand { get; }
 
     public string Name { get; }
 
@@ -76,7 +86,8 @@ internal sealed class AlbumViewModel : BaseViewModel {
         ViewsWithoutCrop.Count == 0
             ? null
             : _localizationService.GetLocalizedString("TreeView.SheetsWithoutCropToolTip")
-              + Environment.NewLine + " - "
+              + Environment.NewLine
+              + " - "
               + string.Join(Environment.NewLine + " - ", ViewsWithoutCrop.Take(5))
               + (ViewsWithoutCrop.Count > 5 ? "..." : null);
 
@@ -118,22 +129,35 @@ internal sealed class AlbumViewModel : BaseViewModel {
         }
     }
 
-    private void ExecutePrintExport() {
+    private void Print() {
+        ShowWarning();
+        _printContext.Print(MainSheets);
+    }
+
+    private bool CanPrint() {
+        return _printContext.CanPrint(MainSheets);
+    }
+
+    private void Export() {
+        ShowWarning();
+        _exportContext.Export(MainSheets);
+    }
+
+    private bool CanExport() {
+        return _exportContext.CanExport(MainSheets);
+    }
+
+    private void ShowWarning() {
         if(MainSheets.Any(item => item.ViewsWithoutCrop.Count > 0)) {
             var messageBoxResult = _messageBoxService.Show(
-                _localizationService.GetLocalizedString("MainWindow.SheetsWithoutCropMessage"), 
+                _localizationService.GetLocalizedString("MainWindow.SheetsWithoutCropMessage"),
                 _localizationService.GetLocalizedString("MainWindow.Title"),
-                MessageBoxButton.YesNo, MessageBoxImage.Warning);
+                MessageBoxButton.YesNo,
+                MessageBoxImage.Warning);
 
             if(messageBoxResult == MessageBoxResult.No) {
                 throw new OperationCanceledException();
             }
         }
-        
-        _printContext.ExecutePrintExport(MainSheets);
-    }
-
-    private bool CanExecutePrintExport() {
-        return _printContext.CanExecutePrintExport(MainSheets);
     }
 }
