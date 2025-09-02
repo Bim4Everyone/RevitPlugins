@@ -15,8 +15,8 @@
     WindowStartupLocation="CenterOwner"
     Height="450"
     Width="800"
-    MinHeight="300"
-    MinWidth="500"
+    MinHeight="400"
+    MinWidth="600"
     d:DataContext="{d:DesignInstance vms:UpdateLinksViewModel, IsDesignTimeCreatable=False}">
 
     <i:Interaction.Behaviors>
@@ -206,6 +206,7 @@
                 <ui:DataGrid
                     Margin="0 5 0 0"
                     AutoGenerateColumns="False"
+                    HorizontalScrollBarVisibility="Auto"
                     ItemsSource="{Binding LinksToUpdate}">
                     <ui:DataGrid.Columns>
                         <DataGridCheckBoxColumn
@@ -245,6 +246,7 @@
                         <DataGridTextColumn
                             IsReadOnly="True"
                             Width="*"
+                            CellStyle="{StaticResource CustomDataGridCell}"
                             Binding="{Binding NameWithExtension}"
                             Header="{StaticResource NameColumnHeader}" />
                         <DataGridTextColumn
