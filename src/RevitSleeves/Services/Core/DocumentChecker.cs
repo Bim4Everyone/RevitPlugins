@@ -84,9 +84,9 @@ internal class DocumentChecker : IDocumentChecker {
         string[] requiredParameters = [
             NamesProvider.ParameterSleeveDiameter,
             NamesProvider.ParameterSleeveLength,
-            NamesProvider.ParameterSleeveIncline,
-            NamesProvider.ParameterSleeveThickness,
-            NamesProvider.ParameterSleeveDescription,
+            NamesProvider.ParameterSleeveIncline.Name,
+            NamesProvider.ParameterSleeveThickness.Name,
+            NamesProvider.ParameterSleeveDescription.Name,
             NamesProvider.ParameterSleeveEconomic.Name,
             NamesProvider.ParameterSleeveSystem.Name
         ];

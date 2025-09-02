@@ -1,5 +1,6 @@
 using Autodesk.Revit.DB;
 
+using dosymep.Bim4Everyone;
 using dosymep.Revit;
 
 using RevitSleeves.Services.Core;
@@ -22,7 +23,7 @@ internal abstract class ParamsSetter {
     /// <param name="sleeve">Гильза</param>
     /// <param name="inclineAngle">Угол в радианах</param>
     protected void SetInclineAngle(FamilyInstance sleeve, double inclineAngle) {
-        sleeve.SetSharedParamValue(NamesProvider.ParameterSleeveIncline, inclineAngle);
+        sleeve.SetParamValue(NamesProvider.ParameterSleeveIncline, inclineAngle);
     }
 
     protected void SetLength(FamilyInstance sleeve, double length) {
