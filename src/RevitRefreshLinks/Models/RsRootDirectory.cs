@@ -45,7 +45,7 @@ internal class RsRootDirectory : IDirectoryModel {
                 return contents.Select(f => new RsDirectoryModel(f, _serverClient)).ToArray();
             }
             default:
-                throw new InvalidOperationException($"Не поддерживаемая опция {searchOption}");
+                throw new InvalidOperationException($"{searchOption}");
         }
     }
 
@@ -67,7 +67,7 @@ internal class RsRootDirectory : IDirectoryModel {
                     .ToArray();
             }
             default:
-                throw new InvalidOperationException($"Не поддерживаемая опция выбора файлов {searchOption}");
+                throw new InvalidOperationException($"{searchOption}");
         }
     }
 
