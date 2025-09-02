@@ -1,0 +1,16 @@
+﻿<ResourceDictionary
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:system="clr-namespace:System;assembly=mscorlib">
+
+    <system:String x:Key="MainWindow.Title">Встряхнуть спецификации</system:String>
+    <system:String x:Key="MainWindow.Option1">Вариант 1</system:String>
+    <system:String x:Key="MainWindow.Option2">Вариант 2</system:String>
+    <system:String x:Key="MainWindow.ButtonCancel">Отмена</system:String>
+    
+    <system:String x:Key="MainWindow.SelectGroupingParam">Параметр для группировки листов:</system:String>
+    <system:String x:Key="MainWindow.SelectDocPackage">Выберите нужный комплект документации:</system:String>
+
+    <system:String x:Key="MainWindow.Option1Tooltip">Встряска спецификаций путем принудительной регенерации документа</system:String>
+    <system:String x:Key="MainWindow.Option2Tooltip">Встряска спецификаций путем передвижения спецификаций</system:String>
+</ResourceDictionary>
