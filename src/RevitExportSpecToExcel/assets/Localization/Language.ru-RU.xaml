@@ -6,7 +6,7 @@
 
     <system:String x:Key="MainWindow.ActiveViewStatus">Активный вид</system:String>
     <system:String x:Key="MainWindow.OpenedViewStatus">Открытый вид</system:String>
-    <system:String x:Key="MainWindow.ClosedViewStatus">Прочий вид</system:String>
+    <system:String x:Key="MainWindow.ClosedViewStatus">Закрытый вид</system:String>
 
     <system:String x:Key="MainWindow.NoSelection">Не выбраны спецификации</system:String>
 
