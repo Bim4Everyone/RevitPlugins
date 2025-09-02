@@ -14,7 +14,6 @@ using dosymep.Revit;
 using dosymep.SimpleServices;
 using dosymep.WPF.Commands;
 using dosymep.WPF.ViewModels;
-using dosymep.WpfUI.Core.SimpleServices;
 
 using RevitListOfSchedules.Comparators;
 using RevitListOfSchedules.Models;
@@ -26,7 +25,6 @@ internal class MainViewModel : BaseViewModel {
     private readonly ILocalizationService _localizationService;
     private readonly FamilyLoadOptions _familyLoadOptions;
     private readonly ParamFactory _paramFactory;
-    private readonly WpfUIMessageBoxService _wpfUIMessageBoxService;
     private string _errorText;
     private string _errorLinkText;
     private ObservableCollection<LinkViewModel> _links;
@@ -45,14 +43,14 @@ internal class MainViewModel : BaseViewModel {
         ILocalizationService localizationService,
         FamilyLoadOptions familyLoadOptions,
         ParamFactory paramFactory,
-        WpfUIMessageBoxService wpfUIMessageBoxService) {
+        IMessageBoxService messageBoxService) {
 
         _pluginConfig = pluginConfig;
         _revitRepository = revitRepository;
         _localizationService = localizationService;
         _familyLoadOptions = familyLoadOptions;
         _paramFactory = paramFactory;
-        _wpfUIMessageBoxService = wpfUIMessageBoxService;
+        MessageBoxService = messageBoxService;
 
         LoadViewCommand = RelayCommand.Create(LoadView);
         ReloadLinksCommand = RelayCommand.Create(ReloadLinks, CanReloadLinks);
@@ -64,6 +62,8 @@ internal class MainViewModel : BaseViewModel {
     public ICommand ReloadLinksCommand { get; }
     public ICommand UpdateSelectedSheetsCommand { get; }
     public ICommand AcceptViewCommand { get; }
+
+    public IMessageBoxService MessageBoxService { get; }
 
     public string ErrorText {
         get => _errorText;
@@ -373,9 +373,11 @@ internal class MainViewModel : BaseViewModel {
         bool isScheduleChecked = new CheckSchedule(_revitRepository.Application, _revitRepository.ActiveUIDocument)
             .ReplaceSchedule();
         if(!isScheduleChecked) {
-            string stringMessageBody = _localizationService.GetLocalizedString("Common.ScheduleErrorMessageBody");
-            string stringMessageTitle = _localizationService.GetLocalizedString("Common.ConfigErrorMessageTitle");
-            _wpfUIMessageBoxService.Show(stringMessageBody, stringMessageTitle, MessageBoxButton.OK, MessageBoxImage.Exclamation);
+            MessageBoxService.Show(
+                _localizationService.GetLocalizedString("Common.ScheduleErrorMessageBody"),
+                _localizationService.GetLocalizedString("Common.ConfigErrorMessageTitle"),
+                MessageBoxButton.OK,
+                MessageBoxImage.Exclamation);
             throw new OperationCanceledException();
         }
     }

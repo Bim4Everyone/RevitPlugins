@@ -12,7 +12,6 @@ using dosymep.Bim4Everyone.SimpleServices;
 using dosymep.SimpleServices;
 using dosymep.WpfCore.Ninject;
 using dosymep.WpfUI.Core.Ninject;
-using dosymep.WpfUI.Core.SimpleServices;
 
 using Ninject;
 
@@ -64,9 +63,6 @@ public class RevitListOfSchedulesCommand : BasePluginCommand {
         kernel.Bind<FamilyLoadOptions>()
             .ToSelf()
             .InSingletonScope();
-        kernel.Bind<WpfUIMessageBoxService>()
-            .ToSelf()
-            .InSingletonScope();
 
         // Настройка конфигурации плагина
         kernel.Bind<PluginConfig>()
@@ -74,6 +70,9 @@ public class RevitListOfSchedulesCommand : BasePluginCommand {
 
         // Настройка запуска окна
         kernel.BindMainWindow<MainViewModel, MainWindow>();
+
+        // Настройка сервиса окошек сообщений
+        kernel.UseWpfUIMessageBox<MainViewModel>();
 
         // Настройка локализации,
         // получение имени сборки откуда брать текст
@@ -85,7 +84,7 @@ public class RevitListOfSchedulesCommand : BasePluginCommand {
             $"/{assemblyName};component/assets/localization/Language.xaml",
             CultureInfo.GetCultureInfo("ru-RU"));
 
-        var wpfUIMessageBoxService = kernel.Get<WpfUIMessageBoxService>();
+        var messageBoxService = kernel.Get<IMessageBoxService>();
         var localizationService = kernel.Get<ILocalizationService>();
 
         // Загрузка параметров проекта        
@@ -94,9 +93,11 @@ public class RevitListOfSchedulesCommand : BasePluginCommand {
             .GetIsChecked();
 
         if(!isParamChecked) {
-            string stringMessageBody = localizationService.GetLocalizedString("Common.ParamErrorMessageBody");
-            string stringMessageTitle = localizationService.GetLocalizedString("Common.ConfigErrorMessageTitle");
-            wpfUIMessageBoxService.Show(stringMessageBody, stringMessageTitle, MessageBoxButton.OK, MessageBoxImage.Exclamation);
+            messageBoxService.Show(
+                localizationService.GetLocalizedString("Common.ParamErrorMessageBody"),
+                localizationService.GetLocalizedString("Common.ConfigErrorMessageTitle"),
+                MessageBoxButton.OK,
+                MessageBoxImage.Exclamation);
             throw new OperationCanceledException();
         }
 

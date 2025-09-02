@@ -11,6 +11,7 @@
     xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
     xmlns:me="clr-namespace:dosymep.WpfCore.MarkupExtensions;assembly=dosymep.WpfCore"
     xmlns:controls="clr-namespace:RevitListOfSchedules.Views"
+    xmlns:behaviors="clr-namespace:dosymep.WpfCore.Behaviors;assembly=dosymep.WpfCore"
     WindowStartupLocation="CenterOwner"
     Width="1600"
     Height="700"
@@ -28,6 +29,11 @@
             </ResourceDictionary.MergedDictionaries>
         </ResourceDictionary>
     </Window.Resources>
+
+    <b:Interaction.Behaviors>
+        <behaviors:WpfAttachServiceBehavior
+            AttachableService="{Binding MessageBoxService}" />
+    </b:Interaction.Behaviors>
 
     <b:Interaction.Triggers>
         <b:EventTrigger
