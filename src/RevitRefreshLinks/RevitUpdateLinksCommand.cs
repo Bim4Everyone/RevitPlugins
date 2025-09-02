@@ -6,6 +6,7 @@ using Autodesk.Revit.DB;
 using Autodesk.Revit.UI;
 
 using dosymep.Bim4Everyone;
+using dosymep.Bim4Everyone.ProjectConfigs;
 using dosymep.Bim4Everyone.SimpleServices;
 using dosymep.SimpleServices;
 using dosymep.WpfCore.Ninject;
@@ -43,7 +44,7 @@ public class RevitUpdateLinksCommand : BasePluginCommand {
             .InSingletonScope();
 
         kernel.Bind<UpdateLinksConfig>()
-            .ToMethod(c => UpdateLinksConfig.GetPluginConfig());
+            .ToMethod(c => UpdateLinksConfig.GetPluginConfig(c.Kernel.Get<IConfigSerializer>()));
 
         kernel.BindMainWindow<UpdateLinksViewModel, UpdateLinksWindow>();
 
