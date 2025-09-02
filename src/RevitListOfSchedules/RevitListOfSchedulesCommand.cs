@@ -12,6 +12,7 @@ using dosymep.Bim4Everyone.SimpleServices;
 using dosymep.SimpleServices;
 using dosymep.WpfCore.Ninject;
 using dosymep.WpfUI.Core.Ninject;
+using dosymep.WpfUI.Core.SimpleServices;
 
 using Ninject;
 
@@ -63,6 +64,9 @@ public class RevitListOfSchedulesCommand : BasePluginCommand {
         kernel.Bind<FamilyLoadOptions>()
             .ToSelf()
             .InSingletonScope();
+        kernel.Bind<WpfUIMessageBoxService>()
+            .ToSelf()
+            .InSingletonScope();
 
         // Настройка конфигурации плагина
         kernel.Bind<PluginConfig>()
@@ -81,7 +85,7 @@ public class RevitListOfSchedulesCommand : BasePluginCommand {
             $"/{assemblyName};component/assets/localization/Language.xaml",
             CultureInfo.GetCultureInfo("ru-RU"));
 
-        var messageBoxService = kernel.Get<IMessageBoxService>();
+        var wpfUIMessageBoxService = kernel.Get<WpfUIMessageBoxService>();
         var localizationService = kernel.Get<ILocalizationService>();
 
         // Загрузка параметров проекта        
@@ -92,7 +96,7 @@ public class RevitListOfSchedulesCommand : BasePluginCommand {
         if(!isParamChecked) {
             string stringMessageBody = localizationService.GetLocalizedString("Common.ParamErrorMessageBody");
             string stringMessageTitle = localizationService.GetLocalizedString("Common.ConfigErrorMessageTitle");
-            messageBoxService.Show(stringMessageBody, stringMessageTitle, MessageBoxButton.OK, MessageBoxImage.Exclamation);
+            wpfUIMessageBoxService.Show(stringMessageBody, stringMessageTitle, MessageBoxButton.OK, MessageBoxImage.Exclamation);
             throw new OperationCanceledException();
         }
 

@@ -14,10 +14,10 @@ internal class ScheduleElement {
 
     public void ConfigureSchedule() {
         var newSchedule = DuplicateDefaultSchedule();
-        var defenition = newSchedule.Definition;
-        var filter = defenition.GetFilters().FirstOrDefault();
+        var definition = newSchedule.Definition;
+        var filter = definition.GetFilters().FirstOrDefault();
         filter?.SetValue(newSchedule.Name);
-        defenition.SetFilter(0, filter);
+        definition.SetFilter(0, filter);
         ConfigureScheduleHeader(newSchedule);
     }
 

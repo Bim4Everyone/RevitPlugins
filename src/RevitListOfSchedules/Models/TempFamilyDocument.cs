@@ -35,35 +35,47 @@ internal class TempFamilyDocument {
             "TempFamilyDocument.FamilyName", _tempDirectory, albumName, _extension);
     }
 
-    public FamilySymbol FamilySymbol => LoadFamilySymbol();
+    public FamilySymbol GetFamilySymbol() {
+        try {
+            CreateFile();
+            FamilySymbol familySymbol = null;
+            bool loadSuccess = _revitRepository.Document.LoadFamily(_familyPath, _familyLoadOptions, out var family);
+            familySymbol = _revitRepository.GetFamilySymbol(family);
 
-    private FamilySymbol LoadFamilySymbol() {
-        CreateDocument();
-        FamilySymbol familySymbol = null;
-        _revitRepository.Document.LoadFamily(_familyPath, _familyLoadOptions, out var family);
-        familySymbol = _revitRepository.GetFamilySymbol(family);
-
-        if(familySymbol != null) {
-            if(!familySymbol.IsActive) {
-                familySymbol.Activate();
+            if(!loadSuccess || family == null) {
+                DeleteFile();
+                return null;
             }
+            if(familySymbol != null) {
+                if(!familySymbol.IsActive) {
+                    familySymbol.Activate();
+                }
+            }
+            DeleteFile();
+            return familySymbol;
+
+        } finally {
+            DeleteFile();
         }
-        DeleteFamilySymbol();
-        return familySymbol;
     }
 
-    private void CreateDocument() {
-        var document = _revitRepository.Application.NewFamilyDocument(_familyTemplatePath);
-        string transactionName = _localizationService.GetLocalizedString("TempFamilyDocument.TransactionName");
-        using(var t = document.StartTransaction(transactionName)) {
-            CreateCircle(document);
-            t.Commit();
+    private void CreateFile() {
+        Document document = null;
+        try {
+            document = _revitRepository.Application.NewFamilyDocument(_familyTemplatePath);
+            string transactionName = _localizationService.GetLocalizedString("TempFamilyDocument.TransactionName");
+            using(var t = document.StartTransaction(transactionName)) {
+                CreateCircle(document);
+                t.Commit();
+            }
+            var opt = new SaveAsOptions {
+                OverwriteExistingFile = true
+            };
+            document.SaveAs(_familyPath, opt);
+
+        } finally {
+            document?.Close(false);
         }
-        var opt = new SaveAsOptions {
-            OverwriteExistingFile = true
-        };
-        document.SaveAs(_familyPath, opt);
-        document.Close(false);
     }
 
     private void CreateCircle(Document document) {
@@ -78,7 +90,7 @@ internal class TempFamilyDocument {
         familyCreator.NewDetailCurve(viewPlan, circle);
     }
 
-    private void DeleteFamilySymbol() {
+    private void DeleteFile() {
         try {
             if(File.Exists(_familyPath)) {
                 File.Delete(_familyPath);

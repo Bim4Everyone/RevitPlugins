@@ -14,6 +14,7 @@ using dosymep.Revit;
 using dosymep.SimpleServices;
 using dosymep.WPF.Commands;
 using dosymep.WPF.ViewModels;
+using dosymep.WpfUI.Core.SimpleServices;
 
 using RevitListOfSchedules.Comparators;
 using RevitListOfSchedules.Models;
@@ -25,6 +26,7 @@ internal class MainViewModel : BaseViewModel {
     private readonly ILocalizationService _localizationService;
     private readonly FamilyLoadOptions _familyLoadOptions;
     private readonly ParamFactory _paramFactory;
+    private readonly WpfUIMessageBoxService _wpfUIMessageBoxService;
     private string _errorText;
     private string _errorLinkText;
     private ObservableCollection<LinkViewModel> _links;
@@ -42,13 +44,15 @@ internal class MainViewModel : BaseViewModel {
         RevitRepository revitRepository,
         ILocalizationService localizationService,
         FamilyLoadOptions familyLoadOptions,
-        ParamFactory paramFactory) {
+        ParamFactory paramFactory,
+        WpfUIMessageBoxService wpfUIMessageBoxService) {
 
         _pluginConfig = pluginConfig;
         _revitRepository = revitRepository;
         _localizationService = localizationService;
         _familyLoadOptions = familyLoadOptions;
         _paramFactory = paramFactory;
+        _wpfUIMessageBoxService = wpfUIMessageBoxService;
 
         LoadViewCommand = RelayCommand.Create(LoadView);
         ReloadLinksCommand = RelayCommand.Create(ReloadLinks, CanReloadLinks);
@@ -339,7 +343,8 @@ internal class MainViewModel : BaseViewModel {
             string albumName = PathCharValidator.LegalizeString(album.Key);
             var viewDrafting = _revitRepository.GetViewDrafting(albumName);
             var tempDoc = new TempFamilyDocument(_localizationService, _revitRepository, _familyLoadOptions, albumName);
-            var instancesAssembly = new InstancesAssembly(_revitRepository, viewDrafting, tempDoc.FamilySymbol, albumName);
+            var famSymbol = tempDoc.GetFamilySymbol();
+            var instancesAssembly = new InstancesAssembly(_revitRepository, viewDrafting, famSymbol, albumName);
 
             instancesAssembly.DeleteFamilyInstances();
 
@@ -370,7 +375,7 @@ internal class MainViewModel : BaseViewModel {
         if(!isScheduleChecked) {
             string stringMessageBody = _localizationService.GetLocalizedString("Common.ScheduleErrorMessageBody");
             string stringMessageTitle = _localizationService.GetLocalizedString("Common.ConfigErrorMessageTitle");
-            MessageBox.Show(stringMessageBody, stringMessageTitle);
+            _wpfUIMessageBoxService.Show(stringMessageBody, stringMessageTitle, MessageBoxButton.OK, MessageBoxImage.Exclamation);
             throw new OperationCanceledException();
         }
     }
