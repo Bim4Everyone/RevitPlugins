@@ -1,5 +1,5 @@
-# RevitExportSpecToExcel (to_delete)
-Описание проекта 
+# RevitExportSpecToExcel (Спеки в XLSX)
+Плагин для экспорта спецификаций в Excel.
 
 # Сборка проекта
 ```
