@@ -13,13 +13,11 @@ internal class AddLocalLinksViewModel : BaseViewModel {
     private readonly ILocalSourceLinksProvider _linksProvider;
     private readonly ILocalizationService _localizationService;
     private readonly ILinksLoader _linksLoader;
-    private readonly IProgressDialogFactory _progressFactory;
 
     public AddLocalLinksViewModel(
         ILocalSourceLinksProvider linksProvider,
         ILocalizationService localizationService,
-        ILinksLoader linksLoader,
-        IProgressDialogFactory progressFactory) {
+        ILinksLoader linksLoader) {
 
         _linksProvider = linksProvider
             ?? throw new System.ArgumentNullException(nameof(linksProvider));
@@ -27,15 +25,13 @@ internal class AddLocalLinksViewModel : BaseViewModel {
             ?? throw new System.ArgumentNullException(nameof(localizationService));
         _linksLoader = linksLoader
             ?? throw new System.ArgumentNullException(nameof(linksLoader));
-        _progressFactory = progressFactory
-            ?? throw new System.ArgumentNullException(nameof(progressFactory));
     }
 
 
     public bool ShowWindow() {
         var linksFromSource = _linksProvider.GetLocalLinks();
         ICollection<(ILink Link, string Error)> errors;
-        using(var progressDialogService = _progressFactory.CreateDialog()) {
+        using(var progressDialogService = GetPlatformService<IProgressDialogService>()) {
             var progress = progressDialogService.CreateProgress();
             progressDialogService.MaxValue = linksFromSource.Links.Count;
             var ct = progressDialogService.CreateCancellationToken();

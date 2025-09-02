@@ -47,8 +47,6 @@ public class RevitAddLinksFromFolderCommand : BasePluginCommand {
             .ToMethod(c => AddLinksFromFolderConfig.GetPluginConfig(c.Kernel.Get<IConfigSerializer>()))
             .InTransientScope();
 
-        kernel.UseWpfUIProgressDialog<AddLocalLinksViewModel>();
-
         kernel.UseWpfUIThemeUpdater();
 
         string assemblyName = Assembly.GetExecutingAssembly().GetName().Name;
