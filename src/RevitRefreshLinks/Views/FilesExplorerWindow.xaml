@@ -163,8 +163,8 @@
                             Width="32">
                             <GridViewColumn.CellTemplate>
                                 <DataTemplate>
-                                    <Image
-                                        Source="{Binding Converter={StaticResource PathInfoImageConverter}}" />
+                                    <ui:SymbolIcon
+                                        Symbol="{Binding Converter={StaticResource PathInfoImageConverter}}" />
                                 </DataTemplate>
                             </GridViewColumn.CellTemplate>
                         </GridViewColumn>

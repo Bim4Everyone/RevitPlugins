@@ -3,16 +3,4 @@
 		<UseWpfUI>true</UseWpfUI>
 		<LangVersion>12</LangVersion>
 	</PropertyGroup>
-	<ItemGroup>
-		<Resource Include="Resources\Icons\file.dark.png" />
-		<Resource Include="Resources\Icons\file.png" />
-		<Resource Include="Resources\Icons\folder.dark.png" />
-		<Resource Include="Resources\Icons\folder.empty.dark.png" />
-		<Resource Include="Resources\Icons\folder.empty.png" />
-		<Resource Include="Resources\Icons\folder.png" />
-		<Resource Include="Resources\Icons\preview.dark.png" />
-		<Resource Include="Resources\Icons\preview.png" />
-		<Resource Include="Resources\Icons\server.dark.png" />
-		<Resource Include="Resources\Icons\server.png" />
-	</ItemGroup>
 </Project>
