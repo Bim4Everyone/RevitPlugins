@@ -13,12 +13,12 @@ namespace RevitSleeves.Services.Placing.PointFinder;
 internal class PipeWallPointFinder : IPointFinder<ClashModel<Pipe, Wall>> {
     private readonly RevitRepository _revitRepository;
     private readonly IGeometryUtils _geometryUtils;
-    private readonly IPlacingErrorsService _errorsService;
+    private readonly IErrorsService _errorsService;
 
     public PipeWallPointFinder(
         RevitRepository revitRepository,
         IGeometryUtils geometryUtils,
-        IPlacingErrorsService errorsService) {
+        IErrorsService errorsService) {
 
         _revitRepository = revitRepository ?? throw new ArgumentNullException(nameof(revitRepository));
         _geometryUtils = geometryUtils ?? throw new ArgumentNullException(nameof(geometryUtils));

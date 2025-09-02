@@ -13,7 +13,7 @@
     <system:String
         x:Key="SleevePlacementSettingsWindow.ShowPlacingErrors">Show placing errors</system:String>
     <system:String
-        x:Key="SleevePlacementSettingsWindow.StructureFiltration">Structure filtration</system:String>
+        x:Key="SleevePlacementSettingsWindow.Filtration">Filtration</system:String>
     <system:String
         x:Key="SleevePlacementSettingsWindow.DiameterRanges">Diameter ranges, mm</system:String>
     <system:String
@@ -40,6 +40,15 @@
 
     <system:String
         x:Key="LinksSelectorWindow.Validation.SelectAnyLink">Select any link</system:String>
+
+    <system:String
+        x:Key="SleevePlacementSettings.ToolTip.StartPipeDiameter">Start pipe diameter</system:String>
+    <system:String
+        x:Key="SleevePlacementSettings.ToolTip.EndPipeDiameter">End pipe diameter</system:String>
+    <system:String
+        x:Key="SleevePlacementSettings.ToolTip.SleeveDiameter">Sleeve diameter</system:String>
+    <system:String
+        x:Key="SleevePlacementSettings.ToolTip.SleeveThickness">Sleeve thickness</system:String>
 
     <system:String
         x:Key="SleevePlacementSettings.Validation.SetName">Set settings name.</system:String>
@@ -69,6 +78,8 @@
         x:Key="SleevePlacementSettings.Validation.ParamValueMustBeDouble">The value of the '{0}' parameter must be a real number</system:String>
     <system:String
         x:Key="SleevePlacementSettings.Validation.ParamHasNoDataType">The {0} parameter has no data type defined</system:String>
+    <system:String
+        x:Key="SleevePlacementSettings.Validation.ThicknessMustBeGreaterThanZero">Sleeve thickness must be greater than 0</system:String>
 
     <system:String
         x:Key="FilterWindow.Title">Filter checking</system:String>
@@ -244,6 +255,29 @@
         x:Key="Exceptions.SleevesNotFoundException">No sleeves placed in the document</system:String>
     <system:String
         x:Key="Exceptions.StructureLinksNotFoundException">No structural links found</system:String>
+    <system:String
+        xml:space="preserve"
+        x:Key="Exceptions.SleeveFamilyNotFound">
+Sleeve family is missing: '{0}'
+family type name: '{1}'
+of category: '{2}'</system:String>
+    <system:String
+        xml:space="preserve"
+        x:Key="Exceptions.SleeveFamilyMissingParameters">
+Missing parameters in sleeve family:
+{0}</system:String>
+    <system:String
+        xml:space="preserve"
+        x:Key="Exceptions.CategoryMissingParameters">
+Category '{0}' doesn't have parameters:
+{1}</system:String>
+
+    <system:String
+        x:Key="UpdateErrors.SleeveNotIntersectPipe">Sleeve doesn't intersect any pipe</system:String>
+    <system:String
+        x:Key="UpdateErrors.SleeveIntersectsManyPipes">Sleeve intersects 2 or more pipes</system:String>
+    <system:String
+        x:Key="UpdateErrors.SleeveDiameterRangeNotFound">Unable to find the diameter of the tube sleeve</system:String>
 
     <system:String
         x:Key="Transaction.SleevesPlacing">Sleeve placing</system:String>
@@ -253,4 +287,6 @@
         x:Key="Transaction.SleevesMerging">Sleeve merging</system:String>
     <system:String
         x:Key="Transaction.CreateFilter">Create filter</system:String>
+    <system:String
+        x:Key="Transaction.SleevesUpdating">Sleeve updating</system:String>
 </ResourceDictionary>

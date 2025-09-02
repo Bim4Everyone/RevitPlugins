@@ -2,6 +2,8 @@ using System;
 
 using Autodesk.Revit.DB;
 
+using dosymep.Bim4Everyone;
+using dosymep.Bim4Everyone.SharedParams;
 using dosymep.Revit;
 
 namespace RevitSleeves.Services.Core;
@@ -64,18 +66,18 @@ internal class OpeningGeometryProvider : IOpeningGeometryProvider {
     /// </summary>
     /// <returns>Параллелепипед, построенный в соответствии с семейством.</returns>
     private Solid GetWallRectangleSolid(FamilyInstance opening,
-        string widthName,
-        string heightName,
-        string thicknessName) {
+        SharedParam widthParam,
+        SharedParam heightParam,
+        SharedParam thicknessParam) {
 
-        if(opening.IsExistsSharedParam(widthName)
-            && opening.IsExistsSharedParam(heightName)
-            && opening.IsExistsSharedParam(thicknessName)) {
+        if(opening.IsExistsParam(widthParam)
+            && opening.IsExistsParam(heightParam)
+            && opening.IsExistsParam(thicknessParam)) {
 
             (var frontNormal, var upDir, var leftDir) = GetOrientationVectors(opening);
-            double width = opening.GetSharedParamValue<double>(widthName);
-            double height = opening.GetSharedParamValue<double>(heightName);
-            double thickness = opening.GetSharedParamValue<double>(thicknessName);
+            double width = opening.GetParamValue<double>(widthParam);
+            double height = opening.GetParamValue<double>(heightParam);
+            double thickness = opening.GetParamValue<double>(thicknessParam);
             var loopLeftUpperCorner = ((LocationPoint) opening.Location).Point
                 - frontNormal * thickness / 2
                 + leftDir * width / 2
@@ -101,13 +103,13 @@ internal class OpeningGeometryProvider : IOpeningGeometryProvider {
     /// Точка вставки экземпляра семейства - геометрический центр цилиндра.
     /// </summary>
     /// <returns>Горизонтальный цилиндр, построенный в соответствии с семейством.</returns>
-    private Solid GetWallRoundSolid(FamilyInstance opening, string diameterName, string thicknessName) {
-        if(opening.IsExistsSharedParam(diameterName)
-            && opening.IsExistsSharedParam(thicknessName)) {
+    private Solid GetWallRoundSolid(FamilyInstance opening, SharedParam diameterParam, SharedParam thicknessParam) {
+        if(opening.IsExistsParam(diameterParam)
+            && opening.IsExistsParam(thicknessParam)) {
 
             (var frontNormal, var upDir, var leftDir) = GetOrientationVectors(opening);
-            double diameter = opening.GetSharedParamValue<double>(diameterName);
-            double thickness = opening.GetSharedParamValue<double>(thicknessName);
+            double diameter = opening.GetParamValue<double>(diameterParam);
+            double thickness = opening.GetParamValue<double>(thicknessParam);
 
             var circleOrigin = ((LocationPoint) opening.Location).Point - frontNormal * thickness / 2;
             var leftPoint = circleOrigin + leftDir * diameter / 2;
@@ -132,18 +134,18 @@ internal class OpeningGeometryProvider : IOpeningGeometryProvider {
     /// <returns>Параллелепипед, построенный в соответствии с семейством.</returns>
     private Solid GetFloorRectangleSolid(
         FamilyInstance opening,
-        string widthName,
-        string heightName,
-        string thicknessName) {
+        SharedParam widthParam,
+        SharedParam heightParam,
+        SharedParam thicknessParam) {
 
-        if(opening.IsExistsSharedParam(widthName)
-            && opening.IsExistsSharedParam(heightName)
-            && opening.IsExistsSharedParam(thicknessName)) {
+        if(opening.IsExistsParam(widthParam)
+            && opening.IsExistsParam(heightParam)
+            && opening.IsExistsParam(thicknessParam)) {
 
             (var frontDir, var upDir, var leftDir) = GetOrientationVectors(opening);
-            double width = opening.GetSharedParamValue<double>(widthName);
-            double height = opening.GetSharedParamValue<double>(heightName);
-            double thickness = opening.GetSharedParamValue<double>(thicknessName);
+            double width = opening.GetParamValue<double>(widthParam);
+            double height = opening.GetParamValue<double>(heightParam);
+            double thickness = opening.GetParamValue<double>(thicknessParam);
             var loopLeftUpperCorner = ((LocationPoint) opening.Location).Point
                 + leftDir * width / 2
                 + frontDir * height / 2;
@@ -168,13 +170,13 @@ internal class OpeningGeometryProvider : IOpeningGeometryProvider {
     /// Точка вставки экземпляра семейства - центр верхней грани цилиндра.
     /// </summary>
     /// <returns>Вертикальный цилиндр, построенный в соответствии с семейством.</returns>
-    private Solid GetFloorRoundSolid(FamilyInstance opening, string diameterName, string thicknessName) {
-        if(opening.IsExistsSharedParam(diameterName)
-            && opening.IsExistsSharedParam(thicknessName)) {
+    private Solid GetFloorRoundSolid(FamilyInstance opening, SharedParam diameterParam, SharedParam thicknessParam) {
+        if(opening.IsExistsParam(diameterParam)
+            && opening.IsExistsParam(thicknessParam)) {
 
             (var frontDir, var upDir, var leftDir) = GetOrientationVectors(opening);
-            double diameter = opening.GetSharedParamValue<double>(diameterName);
-            double thickness = opening.GetSharedParamValue<double>(thicknessName);
+            double diameter = opening.GetParamValue<double>(diameterParam);
+            double thickness = opening.GetParamValue<double>(thicknessParam);
 
             var circleOrigin = ((LocationPoint) opening.Location).Point;
             var leftPoint = circleOrigin + leftDir * diameter / 2;

@@ -13,7 +13,7 @@
     <system:String
         x:Key="SleevePlacementSettingsWindow.ShowPlacingErrors">Выводить ошибки расстановки</system:String>
     <system:String
-        x:Key="SleevePlacementSettingsWindow.StructureFiltration">Фильтрация конструкций</system:String>
+        x:Key="SleevePlacementSettingsWindow.Filtration">Фильтрация</system:String>
     <system:String
         x:Key="SleevePlacementSettingsWindow.DiameterRanges">Диапазоны диаметров, мм</system:String>
     <system:String
@@ -40,6 +40,15 @@
     
     <system:String
         x:Key="LinksSelectorWindow.Validation.SelectAnyLink">Выберите связи для обработки</system:String>
+
+    <system:String
+        x:Key="SleevePlacementSettings.ToolTip.StartPipeDiameter">Начальный диаметр трубы</system:String>
+    <system:String
+        x:Key="SleevePlacementSettings.ToolTip.EndPipeDiameter">Конечный диаметр трубы</system:String>
+    <system:String
+        x:Key="SleevePlacementSettings.ToolTip.SleeveDiameter">Диаметр гильзы</system:String>
+    <system:String
+        x:Key="SleevePlacementSettings.ToolTip.SleeveThickness">Толщина стенки гильзы</system:String>
 
     <system:String
         x:Key="SleevePlacementSettings.Validation.SetName">Укажите название настроек.</system:String>
@@ -69,6 +78,8 @@
         x:Key="SleevePlacementSettings.Validation.ParamValueMustBeDouble">Значение параметра '{0}' должно быть вещественным числом</system:String>
     <system:String
         x:Key="SleevePlacementSettings.Validation.ParamHasNoDataType">У параметра {0} не определен тип данных</system:String>
+    <system:String
+        x:Key="SleevePlacementSettings.Validation.ThicknessMustBeGreaterThanZero">Толщина гильзы должна быть больше 0</system:String>
 
     <system:String
         x:Key="FilterWindow.Title">Проверка фильтра</system:String>
@@ -244,6 +255,29 @@
         x:Key="Exceptions.SleevesNotFoundException">В документе отсутствуют размещенные гильзы</system:String>
     <system:String
         x:Key="Exceptions.StructureLinksNotFoundException">Не обнаружено ни одной связи с конструкциями</system:String>
+    <system:String
+        xml:space="preserve"
+        x:Key="Exceptions.SleeveFamilyNotFound">
+Не обнаружено семейство гильзы '{0}'
+с типоразмером '{1}'
+категории '{2}'</system:String>
+    <system:String
+        xml:space="preserve"
+        x:Key="Exceptions.SleeveFamilyMissingParameters">
+В семействе гильзы отсутствуют параметры:
+{0}</system:String>
+    <system:String
+        xml:space="preserve"
+        x:Key="Exceptions.CategoryMissingParameters">
+У категории '{0}' отсутствуют параметры:
+{1}</system:String>
+
+    <system:String
+        x:Key="UpdateErrors.SleeveNotIntersectPipe">Гильза не пересекается ни с одной трубой</system:String>
+    <system:String
+        x:Key="UpdateErrors.SleeveIntersectsManyPipes">Гильза пересекается с 2 или более трубами</system:String>
+    <system:String
+        x:Key="UpdateErrors.SleeveDiameterRangeNotFound">Не найден диапазон диаметров гильзы для трубы</system:String>
 
     <system:String
         x:Key="Transaction.SleevesPlacing">Расстановка гильз</system:String>
@@ -253,4 +287,6 @@
         x:Key="Transaction.SleevesMerging">Объединение гильз</system:String>
     <system:String
         x:Key="Transaction.CreateFilter">Создание фильтра</system:String>
+    <system:String
+        x:Key="Transaction.SleevesUpdating">Обновление гильз</system:String>
 </ResourceDictionary>

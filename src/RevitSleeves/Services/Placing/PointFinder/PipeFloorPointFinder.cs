@@ -16,13 +16,13 @@ using RevitSleeves.Services.Core;
 namespace RevitSleeves.Services.Placing.PointFinder;
 internal class PipeFloorPointFinder : IPointFinder<ClashModel<Pipe, Floor>> {
     private readonly RevitRepository _revitRepository;
-    private readonly IPlacingErrorsService _errorsService;
+    private readonly IErrorsService _errorsService;
     private readonly IGeometryUtils _geometryUtils;
     private readonly SleevePlacementSettingsConfig _config;
 
     public PipeFloorPointFinder(
         RevitRepository revitRepository,
-        IPlacingErrorsService errorsService,
+        IErrorsService errorsService,
         IGeometryUtils geometryUtils,
         SleevePlacementSettingsConfig config) {
 

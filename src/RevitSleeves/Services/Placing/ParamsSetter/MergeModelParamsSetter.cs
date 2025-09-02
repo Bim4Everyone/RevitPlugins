@@ -5,17 +5,18 @@ using Autodesk.Revit.DB;
 using dosymep.SimpleServices;
 
 using RevitSleeves.Models.Placing;
+using RevitSleeves.Services.Core;
 using RevitSleeves.Services.Placing.PointFinder;
 
 namespace RevitSleeves.Services.Placing.ParamsSetter;
 internal class MergeModelParamsSetter : ParamsSetter, IParamsSetter<SleeveMergeModel> {
-    private readonly IPlacingErrorsService _errorsService;
+    private readonly IErrorsService _errorsService;
     private readonly ILocalizationService _localizationService;
     private readonly IPointFinder<SleeveMergeModel> _pointFinder;
     private readonly SleeveMergeModel _sleeveModel;
 
     public MergeModelParamsSetter(
-        IPlacingErrorsService errorsService,
+        IErrorsService errorsService,
         ILocalizationService localizationService,
         IPointFinder<SleeveMergeModel> pointFinder,
         SleeveMergeModel sleeveModel) {

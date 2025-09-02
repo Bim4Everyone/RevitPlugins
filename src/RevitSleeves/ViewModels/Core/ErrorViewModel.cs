@@ -3,9 +3,9 @@ using System.Linq;
 using dosymep.Revit;
 using dosymep.WPF.ViewModels;
 
-using RevitSleeves.Models.Placing;
+using RevitSleeves.Models;
 
-namespace RevitSleeves.ViewModels.Placing;
+namespace RevitSleeves.ViewModels.Core;
 internal class ErrorViewModel : BaseViewModel {
     public ErrorViewModel(ErrorModel errorModel) {
         ErrorModel = errorModel ?? throw new System.ArgumentNullException(nameof(errorModel));

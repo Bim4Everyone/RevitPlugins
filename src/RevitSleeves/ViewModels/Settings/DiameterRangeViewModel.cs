@@ -10,6 +10,7 @@ internal class DiameterRangeViewModel : BaseViewModel {
     private readonly ILocalizationService _localizationService;
     private readonly DiameterRange _diameterRange;
     private double _sleeveDiameter;
+    private double _sleeveThickness;
     private double _startMepSize;
     private double _endMepSize;
 
@@ -20,9 +21,18 @@ internal class DiameterRangeViewModel : BaseViewModel {
         StartMepSize = _diameterRange.StartMepSize;
         EndMepSize = _diameterRange.EndMepSize;
         SleeveDiameter = _diameterRange.SleeveDiameter;
+        SleeveThickness = _diameterRange.SleeveThickness;
         From = _localizationService.GetLocalizedString("From");
         To = _localizationService.GetLocalizedString("To");
         UnitName = _localizationService.GetLocalizedString("Mm");
+        ToolTipStartPipeDiameter = _localizationService.GetLocalizedString(
+            "SleevePlacementSettings.ToolTip.StartPipeDiameter");
+        ToolTipEndPipeDiameter = _localizationService.GetLocalizedString(
+            "SleevePlacementSettings.ToolTip.EndPipeDiameter");
+        ToolTipSleeveDiameter = _localizationService.GetLocalizedString(
+            "SleevePlacementSettings.ToolTip.SleeveDiameter");
+        ToolTipSleeveThickness = _localizationService.GetLocalizedString(
+            "SleevePlacementSettings.ToolTip.SleeveThickness");
     }
 
 
@@ -31,6 +41,14 @@ internal class DiameterRangeViewModel : BaseViewModel {
     public string To { get; }
 
     public string UnitName { get; }
+
+    public string ToolTipStartPipeDiameter { get; }
+
+    public string ToolTipEndPipeDiameter { get; }
+
+    public string ToolTipSleeveDiameter { get; }
+
+    public string ToolTipSleeveThickness { get; }
 
     public double StartMepSize {
         get => _startMepSize;
@@ -47,12 +65,18 @@ internal class DiameterRangeViewModel : BaseViewModel {
         set => RaiseAndSetIfChanged(ref _sleeveDiameter, value);
     }
 
+    public double SleeveThickness {
+        get => _sleeveThickness;
+        set => RaiseAndSetIfChanged(ref _sleeveThickness, value);
+    }
+
 
     public DiameterRange GetDiameterRange() {
         return new DiameterRange() {
             StartMepSize = StartMepSize,
             EndMepSize = EndMepSize,
-            SleeveDiameter = SleeveDiameter
+            SleeveDiameter = SleeveDiameter,
+            SleeveThickness = SleeveThickness
         };
     }
 
@@ -72,6 +96,10 @@ internal class DiameterRangeViewModel : BaseViewModel {
         if(StartMepSize >= EndMepSize) {
             return _localizationService.GetLocalizedString(
                 "SleevePlacementSettings.Validation.StartMepSizeGreaterThanEnd");
+        }
+        if(SleeveThickness <= 0) {
+            return _localizationService.GetLocalizedString(
+                "SleevePlacementSettings.Validation.ThicknessMustBeGreaterThanZero");
         }
         return string.Empty;
     }

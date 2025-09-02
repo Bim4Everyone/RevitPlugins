@@ -3,20 +3,24 @@ using System.Linq;
 
 using Autodesk.Revit.DB;
 
+using RevitSleeves.Models;
 using RevitSleeves.Services.Core;
 
 namespace RevitSleeves.Services.Placing.FamilySymbolFinder;
 /// <summary>
 /// Провайдер типоразмеров семейств гильз из активного документа
 /// </summary>
-internal abstract class FamilySymbolFinder {
+internal class FamilySymbolFinder : IFamilySymbolFinder {
     private FamilySymbol _symbol;
+    private readonly RevitRepository _repository;
+
+    public FamilySymbolFinder(RevitRepository repository) {
+        _repository = repository ?? throw new ArgumentNullException(nameof(repository));
+    }
 
 
-    protected FamilySymbolFinder() { }
-
-
-    protected FamilySymbol GetSleeveFamilySymbol(Document document) {
+    public FamilySymbol GetFamilySymbol() {
+        var document = _repository.Document;
         return _symbol ??= (FamilySymbol) document.GetElement(
             GetFamilySymbol(document, NamesProvider.FamilyNameSleeve, NamesProvider.SleeveSymbolName));
     }
