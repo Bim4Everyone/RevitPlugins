@@ -48,8 +48,6 @@ public class RevitAddLinksFromServerCommand : BasePluginCommand {
             .ToSelf()
             .InSingletonScope();
 
-        kernel.UseWpfUIProgressDialog<AddServerLinksViewModel>();
-
         kernel.UseWpfUIThemeUpdater();
 
         string assemblyName = Assembly.GetExecutingAssembly().GetName().Name;
