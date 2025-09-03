@@ -88,15 +88,6 @@ namespace RevitClashDetective.ViewModels.Navigator {
 
         public ClashModel Clash { get; }
 
-        public IEnumerable<ElementId> GetElementIds(string docTitle) {
-            if(docTitle.Contains(FirstDocumentName)) {
-                yield return Clash.MainElement.Id;
-            }
-            if(docTitle.Contains(SecondDocumentName)) {
-                yield return Clash.OtherElement.Id;
-            }
-        }
-
 
         public ClashModel GetClashModel() {
             Clash.ClashStatus = ClashStatus;
@@ -137,7 +128,6 @@ namespace RevitClashDetective.ViewModels.Navigator {
                 && SecondDocumentName == other.SecondDocumentName
                 && SecondCategory == other.SecondCategory;
         }
-
 
         private void SetIntersectionData(ClashModel clashModel) {
             if(clashModel is null) {
