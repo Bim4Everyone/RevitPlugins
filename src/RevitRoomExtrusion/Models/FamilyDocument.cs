@@ -10,98 +10,97 @@ using dosymep.Revit;
 using dosymep.SimpleServices;
 
 
-namespace RevitRoomExtrusion.Models {
-    internal class FamilyDocument {
-        private readonly ILocalizationService _localizationService;
-        private readonly Application _application;
-        private readonly Document _familyDocument;
+namespace RevitRoomExtrusion.Models;
+internal class FamilyDocument {
+    private readonly ILocalizationService _localizationService;
+    private readonly Application _application;
+    private readonly Document _familyDocument;
 
-        private readonly double _location;
-        private readonly string _familyName;
-        private readonly int _normalDirection = 10;
+    private readonly double _location;
+    private readonly string _familyName;
+    private readonly int _normalDirection = 10;
 
-        public FamilyDocument(
-            ILocalizationService localizationService, Application application, double location, string familyName) {
-            _localizationService = localizationService;
-            _application = application;
-            _familyDocument = _application.NewFamilyDocument(GetTemplateFamilyPath());
-            _location = location;
-            _familyName = familyName;
+    public FamilyDocument(
+        ILocalizationService localizationService, Application application, double location, string familyName) {
+        _localizationService = localizationService;
+        _application = application;
+        _familyDocument = _application.NewFamilyDocument(GetTemplateFamilyPath());
+        _location = location;
+        _familyName = familyName;
 
-            SetFamilyNameAndPath();
-        }
+        SetFamilyNameAndPath();
+    }
 
-        public string FamilyDocumentName { get; private set; }
-        public string FamilyDocumentPath { get; private set; }
+    public string FamilyDocumentName { get; private set; }
+    public string FamilyDocumentPath { get; private set; }
 
-        public Document CreateDocument(List<RoomElement> roomList, double amount) {
-            Category familyCategory = Category.GetCategory(_familyDocument, BuiltInCategory.OST_Roads);
-            ElementId materialElementId = GetMaterialElementId();
+    public Document CreateDocument(List<RoomElement> roomList, double amount) {
+        var familyCategory = Category.GetCategory(_familyDocument, BuiltInCategory.OST_Roads);
+        var materialElementId = GetMaterialElementId();
 
-            string transactionName = _localizationService.GetLocalizedString("FamilyDocument.TransactionName");
-            using(Transaction t = _familyDocument.StartTransaction(transactionName)) {
+        string transactionName = _localizationService.GetLocalizedString("FamilyDocument.TransactionName");
+        using(var t = _familyDocument.StartTransaction(transactionName)) {
 
-                _familyDocument.OwnerFamily.FamilyCategory = familyCategory;
+            _familyDocument.OwnerFamily.FamilyCategory = familyCategory;
 
-                List<Extrusion> extrusionList = roomList
-                    .Select(roomElement => CreateExtrusion(roomElement.ArrArray, amount))
-                    .ToList();
+            var extrusionList = roomList
+                .Select(roomElement => CreateExtrusion(roomElement.ArrArray, amount))
+                .ToList();
 
-                if(materialElementId.IsNotNull()) {
-                    foreach(Extrusion extrusion in extrusionList) {
-                        extrusion.SetParamValue(BuiltInParameter.MATERIAL_ID_PARAM, materialElementId);
-                    }
+            if(materialElementId.IsNotNull()) {
+                foreach(var extrusion in extrusionList) {
+                    extrusion.SetParamValue(BuiltInParameter.MATERIAL_ID_PARAM, materialElementId);
                 }
-                t.Commit();
             }
-
-            SaveAsOptions opt = new SaveAsOptions {
-                OverwriteExistingFile = true
-            };
-            _familyDocument.SaveAs(FamilyDocumentPath, opt);
-            _familyDocument.Close(false);
-            return _familyDocument;
+            t.Commit();
         }
 
-        private ElementId GetMaterialElementId() {
-            string materialName = _localizationService.GetLocalizedString("FamilyDocument.MaterialName");
-            return new FilteredElementCollector(_familyDocument)
-                    .OfClass(typeof(Material))
-                    .WhereElementIsNotElementType()
-                    .Where(mat => mat.Name.Equals(materialName, StringComparison.OrdinalIgnoreCase))
-                    .FirstOrDefault()
-                    ?.Id;
-        }
+        var opt = new SaveAsOptions {
+            OverwriteExistingFile = true
+        };
+        _familyDocument.SaveAs(FamilyDocumentPath, opt);
+        _familyDocument.Close(false);
+        return _familyDocument;
+    }
 
-        private Extrusion CreateExtrusion(CurveArrArray curveArrArray, double amount) {
-            XYZ normal = new XYZ(0, 0, _normalDirection);
-            XYZ originPlane = new XYZ(0, 0, 0);
-            Plane plane = Plane.CreateByNormalAndOrigin(normal, originPlane);
-            SketchPlane sketchPlane = SketchPlane.Create(_familyDocument, plane);
+    private ElementId GetMaterialElementId() {
+        string materialName = _localizationService.GetLocalizedString("FamilyDocument.MaterialName");
+        return new FilteredElementCollector(_familyDocument)
+                .OfClass(typeof(Material))
+                .WhereElementIsNotElementType()
+                .Where(mat => mat.Name.Equals(materialName, StringComparison.OrdinalIgnoreCase))
+                .FirstOrDefault()
+                ?.Id;
+    }
 
-            Autodesk.Revit.Creation.FamilyItemFactory familyCreator = _familyDocument.FamilyCreate;
+    private Extrusion CreateExtrusion(CurveArrArray curveArrArray, double amount) {
+        var normal = new XYZ(0, 0, _normalDirection);
+        var originPlane = new XYZ(0, 0, 0);
+        var plane = Plane.CreateByNormalAndOrigin(normal, originPlane);
+        var sketchPlane = SketchPlane.Create(_familyDocument, plane);
 
-            double amountFt = UnitUtils.ConvertToInternalUnits(amount, UnitTypeId.Millimeters);
-            Extrusion extrusion = familyCreator.NewExtrusion(true, curveArrArray, sketchPlane, amountFt);
-            return extrusion;
-        }
+        var familyCreator = _familyDocument.FamilyCreate;
 
-        private void SetFamilyNameAndPath() {
-            string extension = ".rfa";
-            string tempDirectory = Path.GetTempPath();
-            string familyDocumentName = string.Format(
-                _localizationService.GetLocalizedString("FamilyDocument.FamilyName"), _familyName, _location);
-            string fileName = $"{familyDocumentName}{extension}";
-            string familyDocumentPath = Path.Combine(tempDirectory, fileName);
+        double amountFt = UnitUtils.ConvertToInternalUnits(amount, UnitTypeId.Millimeters);
+        var extrusion = familyCreator.NewExtrusion(true, curveArrArray, sketchPlane, amountFt);
+        return extrusion;
+    }
 
-            FamilyDocumentName = familyDocumentName;
-            FamilyDocumentPath = familyDocumentPath;
-        }
+    private void SetFamilyNameAndPath() {
+        string extension = ".rfa";
+        string tempDirectory = Path.GetTempPath();
+        string familyDocumentName = string.Format(
+            _localizationService.GetLocalizedString("FamilyDocument.FamilyName"), _familyName, _location);
+        string fileName = $"{familyDocumentName}{extension}";
+        string familyDocumentPath = Path.Combine(tempDirectory, fileName);
 
-        private string GetTemplateFamilyPath() {
-            string familyTemplatePath = _application.FamilyTemplatePath;
-            string localizedString = _localizationService.GetLocalizedString("FamilyDocument.TemplateFamilyName");
-            return $"{familyTemplatePath}{localizedString}";
-        }
+        FamilyDocumentName = familyDocumentName;
+        FamilyDocumentPath = familyDocumentPath;
+    }
+
+    private string GetTemplateFamilyPath() {
+        string familyTemplatePath = _application.FamilyTemplatePath;
+        string localizedString = _localizationService.GetLocalizedString("FamilyDocument.TemplateFamilyName");
+        return $"{familyTemplatePath}{localizedString}";
     }
 }
