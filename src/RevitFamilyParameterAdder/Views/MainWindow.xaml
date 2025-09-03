@@ -15,7 +15,10 @@
 
     mc:Ignorable="d"
     WindowStartupLocation="CenterOwner"
-    Height="550" Width="930"    
+    Height="550" 
+    Width="930"
+    MinHeight="550"
+    MinWidth="930"    
     d:DataContext="{d:DesignInstance vms:MainViewModel, IsDesignTimeCreatable=False}">
     <i:Interaction.Triggers>
         <i:EventTrigger EventName="Loaded">
@@ -23,6 +26,15 @@
                 Command="{Binding LoadViewCommand}"/>
         </i:EventTrigger>
     </i:Interaction.Triggers>
+
+    <Window.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary
+                    Source="CustomStyles.xaml" />
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
+    </Window.Resources>
 
     <Grid>
         <Grid.RowDefinitions>
@@ -123,11 +135,15 @@
 
         <ui:ListView
             Grid.Row="4"
+            Margin="10 5"
             ItemsSource="{Binding Path=Params}"
             Name="parameters"
-            SelectionMode="Extended">
+            SelectionMode="Extended"
+            Style="{StaticResource ListViewStyle}" 
+            BorderThickness="0">
             <ui:ListView.View>
-                <GridView>
+                <GridView
+                    ColumnHeaderContainerStyle="{StaticResource UiGridViewColumnHeaderStyle}">
                     <GridViewColumn
                         Header="Имя параметра"
                         Width="250"
@@ -144,11 +160,9 @@
                                 <ComboBox
                                     Name="parameters_ParamGroup"
                                     Width="250"
-                                    ItemsSource="{Binding Path=ParamGroupsInFM}"
                                     DisplayMemberPath="GroupName"
-                                    SelectedItem="{Binding SelectedParamGroupInFM}"
-                                    SelectedValuePath="GroupName"
-                                    SelectedValue="{Binding SelectedParamGroupInFM.GroupName}">
+                                    SelectedItem="{Binding Path=SelectedParamGroupInFM}"
+                                    ItemsSource="{Binding Path=ParamGroupsInFM}" >
                                 </ComboBox>
                             </DataTemplate>
                         </GridViewColumn.CellTemplate>
