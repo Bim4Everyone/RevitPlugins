@@ -124,8 +124,14 @@ namespace RevitClashDetective.ViewModels.Navigator {
         }
 
         private void SetIntersectionPercentage(ICollection<ClashViewModel> clashes) {
-            double firstTotalVolume = clashes.Select(c => c.ClashData.MainElementVolume).Sum();
-            double secondTotalVolume = clashes.Select(c => c.ClashData.OtherElementVolume).Sum();
+            double firstTotalVolume = clashes
+                .Select(c => new ElementViewModel(c.Clash.MainElement, c.ClashData.MainElementVolume))
+                .Distinct()
+                .Sum(e => e.ElementVolume);
+            double secondTotalVolume = clashes
+                .Select(c => new ElementViewModel(c.Clash.OtherElement, c.ClashData.OtherElementVolume))
+                .Distinct()
+                .Sum(e => e.ElementVolume);
             double collisionTotalVolume = clashes.Select(c => c.ClashData.ClashVolume).Sum();
 
             FirstIntersectionPercentage = Math.Round(collisionTotalVolume / firstTotalVolume * 100, 2);
