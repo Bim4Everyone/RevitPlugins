@@ -11,36 +11,35 @@ using dosymep.WPF.Commands;
 
 using RevitRoomExtrusion.Models;
 
-namespace RevitRoomExtrusion.ViewModels {
-    internal class ErrorViewModel {
-        private readonly ILocalizationService _localizationService;
-        private readonly RevitRepository _revitRepository;
-        private readonly RoomChecker _roomChecker;
+namespace RevitRoomExtrusion.ViewModels;
+internal class ErrorViewModel {
+    private readonly ILocalizationService _localizationService;
+    private readonly RevitRepository _revitRepository;
+    private readonly RoomChecker _roomChecker;
 
-        public ErrorViewModel(
-            ILocalizationService localizationService, RevitRepository revitRepository, RoomChecker roomChecker) {
-            _localizationService = localizationService;
-            _revitRepository = revitRepository;
-            _roomChecker = roomChecker;
+    public ErrorViewModel(
+        ILocalizationService localizationService, RevitRepository revitRepository, RoomChecker roomChecker) {
+        _localizationService = localizationService;
+        _revitRepository = revitRepository;
+        _roomChecker = roomChecker;
 
-            ErrorRooms = new ObservableCollection<RoomErrorViewModel>(
-                GetErrorRooms().Select(roomError => new RoomErrorViewModel(
-                    _localizationService, _roomChecker, roomError, ShowElementCommand)));
+        ErrorRooms = new ObservableCollection<RoomErrorViewModel>(
+            GetErrorRooms().Select(roomError => new RoomErrorViewModel(
+                _localizationService, _roomChecker, roomError, ShowElementCommand)));
 
-            ShowElementCommand = RelayCommand.Create<ElementId>(ShowElement);
-        }
+        ShowElementCommand = RelayCommand.Create<ElementId>(ShowElement);
+    }
 
-        public ICommand ShowElementCommand { get; }
-        public ObservableCollection<RoomErrorViewModel> ErrorRooms { get; set; }
+    public ICommand ShowElementCommand { get; }
+    public ObservableCollection<RoomErrorViewModel> ErrorRooms { get; set; }
 
-        private void ShowElement(ElementId elementId) {
-            _revitRepository.SetSelectedRoom(elementId);
-        }
+    private void ShowElement(ElementId elementId) {
+        _revitRepository.SetSelectedRoom(elementId);
+    }
 
-        private List<Room> GetErrorRooms() {
-            return _revitRepository.GetSelectedRooms()
-                .Where(room => _roomChecker.CheckInvalidRoom(room))
-                .ToList();
-        }
+    private List<Room> GetErrorRooms() {
+        return _revitRepository.GetSelectedRooms()
+            .Where(_roomChecker.CheckInvalidRoom)
+            .ToList();
     }
 }
