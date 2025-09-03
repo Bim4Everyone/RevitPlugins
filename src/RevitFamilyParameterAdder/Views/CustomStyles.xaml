@@ -6,21 +6,11 @@
     xmlns:controls="clr-namespace:Wpf.Ui.Controls;assembly=Wpf.Ui">
     <ResourceDictionary.MergedDictionaries>
         <ResourceDictionary
-            Source="pack://application:,,,/Wpf.Ui;component/Controls/DataGrid/DataGrid.xaml" />
-        <ResourceDictionary
-            Source="pack://application:,,,/Wpf.Ui;component/Controls/ComboBox/ComboBox.xaml" />
-        <ResourceDictionary
             Source="pack://application:,,,/Wpf.Ui;component/Controls/GridView/GridViewHeaderRowIndicator.xaml" />
         <ResourceDictionary
             Source="pack://application:,,,/Wpf.Ui;component/Controls/GridView/GridViewColumnHeader.xaml" />
         <ResourceDictionary
-            Source="pack://application:,,,/Wpf.Ui;component/Controls/Button/Button.xaml" />
-        <ResourceDictionary
-            Source="pack://application:,,,/Wpf.Ui;component/Controls/ListView/ListViewItem.xaml" />
-        <ResourceDictionary
             Source="pack://application:,,,/Wpf.Ui;component/Controls/ListView/ListView.xaml" />
-        <ResourceDictionary
-            Source="pack://application:,,,/Wpf.Ui;component/Controls/Expander/Expander.xaml" />
     </ResourceDictionary.MergedDictionaries>
 
     <Style

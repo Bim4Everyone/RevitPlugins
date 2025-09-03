@@ -10,6 +10,7 @@ using Autodesk.Revit.DB;
 using Autodesk.Revit.UI;
 
 using dosymep.Revit;
+using dosymep.SimpleServices;
 using dosymep.WPF.Commands;
 using dosymep.WPF.ViewModels;
 
@@ -19,10 +20,10 @@ namespace RevitFamilyParameterAdder.ViewModels;
 internal class MainViewModel : BaseViewModel {
     private readonly PluginConfig _pluginConfig;
     private readonly RevitRepository _revitRepository;
+    private readonly ILocalizationService _localizationService;
 
     private string _errorText;
-    private string _saveProperty;
-    private readonly string _allGroup = "<Выбрать все>";
+    private readonly string _allGroup = "";
     private string _selectedParamGroupName;
     private bool _isParamsForKR;
     private bool _writeFormulasInParamsForKR;
@@ -82,11 +83,15 @@ internal class MainViewModel : BaseViewModel {
     ];
 
 
-    public MainViewModel(PluginConfig pluginConfig, RevitRepository revitRepository) {
+    public MainViewModel(PluginConfig pluginConfig, RevitRepository revitRepository, 
+                         ILocalizationService localizationService) {
         _pluginConfig = pluginConfig;
         _revitRepository = revitRepository;
+        _localizationService = localizationService;
 
         FamilyManagerFm = _revitRepository.Document.FamilyManager;
+
+        _allGroup = _localizationService.GetLocalizedString("MainWindow.SelectAll");
 
         LoadViewCommand = RelayCommand.Create(LoadView);
         AcceptViewCommand = RelayCommand.Create(AcceptView, CanAcceptView);
@@ -140,11 +145,6 @@ internal class MainViewModel : BaseViewModel {
         set => RaiseAndSetIfChanged(ref _writeFormulasInParamsForKR, value);
     }
 
-
-    public string SaveProperty {
-        get => _saveProperty;
-        set => RaiseAndSetIfChanged(ref _saveProperty, value);
-    }
     public string ErrorText {
         get => _errorText;
         set => RaiseAndSetIfChanged(ref _errorText, value);
@@ -156,8 +156,8 @@ internal class MainViewModel : BaseViewModel {
     /// Метод для команды,отрабатывающей во время загрузки окна
     /// </summary>
     private void LoadView() {
-        IsParamsForKR = true;
-        WriteFormulasInParamsForKR = true;
+        IsParamsForKR = false;
+        WriteFormulasInParamsForKR = false;
 
         // Подгружаем сохраненные данные прошлого запуска
         LoadConfig();
@@ -184,23 +184,22 @@ internal class MainViewModel : BaseViewModel {
         if(SelectedParams.Count > 0) {
             foreach(SharedParam item in SelectedParams) {
                 if(item.SelectedParamGroupInFM is null) {
-                    ErrorText = "Назначьте группу всем выбранным параметрам";
+                    ErrorText = _localizationService.GetLocalizedString("MainWindow.SetGroupToAllSelectedParams");
                     return false;
                 }
             }
             ErrorText = string.Empty;
             return true;
         } else {
-            ErrorText = "Выберите параметры для добавления";
+            ErrorText = _localizationService.GetLocalizedString("MainWindow.SelectParamsForAdd");
             return false;
         }
     }
 
 
-
     private void Add() {
         using(var t = new Transaction(_revitRepository.Document)) {
-            t.Start("Добавление параметров");
+            t.Start(_localizationService.GetLocalizedString("MainWindow.SelectAll"));
 
             // Перебираем параметры в группе
             foreach(SharedParam param in SelectedParams) {
@@ -229,8 +228,6 @@ internal class MainViewModel : BaseViewModel {
                 }
             }
 
-
-
             // Сначала проверяем, есть ли типоразмеры в семействе, если нет явно создаем дефолтный с именем семейства
             // Без этого формулы не добавить
             FamilyTypeSet familyTypeSet = FamilyManagerFm.Types;
@@ -239,20 +236,17 @@ internal class MainViewModel : BaseViewModel {
                 FamilyType newFamilyType = FamilyManagerFm.NewType(_revitRepository.Document.Title);
             }
 
-
-
             // Назначаем добавленным параметрам формулы,если стоит соответствующая галка и есть формула
             foreach(SharedParam param in SelectedParams) {
                 if(WriteFormulasInParamsForKR == false || param.Formula == string.Empty) {
                     continue;
                 }
-
                 FamilyParameter familyParam = FamilyManagerFm.get_Parameter(param.ParamName);
-                // Если параметр найден в семействе и у него пустой блок заполнения формул и он общий и в него можно добавить формулу, добавляем
+                // Если параметр найден в семействе и у него пустой блок заполнения формул и он общий и в него можно
+                // добавить формулу, добавляем
                 if(familyParam == null || familyParam.IsShared == false || familyParam.CanAssignFormula == false) {
                     continue;
                 }
-
 
                 try {
                     FamilyManagerFm.SetFormula(familyParam, param.Formula);
@@ -262,26 +256,24 @@ internal class MainViewModel : BaseViewModel {
                 }
             }
             t.Commit();
-
         }
-
 
         if(_reportAdded.Length > 0) {
-            _reportAdded.Insert(0, "Добавлены параметры:" + Environment.NewLine);
-            TaskDialog.Show("Отчет", _reportAdded.ToString());
+            _reportAdded.Insert(0, _localizationService.GetLocalizedString("MainWindow.AddedParams") 
+                                   + Environment.NewLine);
+            TaskDialog.Show(_localizationService.GetLocalizedString("MainWindow.Report"), _reportAdded.ToString());
         }
         if(_reportAlreadyBeen.Length > 0) {
-            _reportAlreadyBeen.Insert(0, "Параметры уже были:" + Environment.NewLine);
-            TaskDialog.Show("Отчет", _reportAlreadyBeen.ToString());
+            _reportAlreadyBeen.Insert(0, _localizationService.GetLocalizedString("MainWindow.ParamsWereAlready") 
+                                         + Environment.NewLine);
+            TaskDialog.Show(_localizationService.GetLocalizedString("MainWindow.Report"), _reportAlreadyBeen.ToString());
         }
         if(_reportError.Length > 0) {
-            _reportError.Insert(0, "Произошла ошибка при добавлении параметров:" + Environment.NewLine);
-            TaskDialog.Show("Отчет", _reportError.ToString());
+            _reportError.Insert(0, _localizationService.GetLocalizedString("MainWindow.ErrorWithAddingParams") 
+                                   + Environment.NewLine);
+            TaskDialog.Show(_localizationService.GetLocalizedString("MainWindow.Report"), _reportError.ToString());
         }
     }
-
-
-
 
     /// <summary>
     /// Получение параметров из ФОП с переводом в оболочку SharedParam
@@ -290,12 +282,10 @@ internal class MainViewModel : BaseViewModel {
         Params.Clear();
         List<ExternalDefinition> paramsInShPF = _revitRepository.GetParamsInShPF();
         foreach(ExternalDefinition item in paramsInShPF) {
-            SharedParam sharedParam = new SharedParam(item, BINParameterGroups);
+            SharedParam sharedParam = new SharedParam(item, BINParameterGroups, _localizationService);
             Params.Add(sharedParam);
         }
     }
-
-
 
     /// <summary>
     /// Получение параметров из ФОП и применение фильтров по группе параметров ФОП и галочке "для КР"
@@ -308,7 +298,6 @@ internal class MainViewModel : BaseViewModel {
                     .Where(item => item.ParamGroupInShPF.Equals(SelectedParamGroupName))
                     .ToList());
         }
-
         if(IsParamsForKR) {
             foreach(SharedParam item in Params) {
                 foreach(DefaultParam defParam in _defaultParamsKR) {
@@ -319,7 +308,6 @@ internal class MainViewModel : BaseViewModel {
                     }
                 }
             }
-
             Params = new ObservableCollection<SharedParam>(
                     Params
                     .Where(item => item.IsDefaultParam));
@@ -343,7 +331,6 @@ internal class MainViewModel : BaseViewModel {
         }
     }
 
-
     /// <summary>
     /// Получение имен групп параметров в ФОП
     /// </summary>
@@ -351,7 +338,6 @@ internal class MainViewModel : BaseViewModel {
         ParamGroupNames = _revitRepository.GetParamGroupNames();
         ParamGroupNames.Insert(0, _allGroup);
     }
-
 
     /// <summary>
     /// Получение групп параметров семейства (для группировки параметров в списке параметров семейства)
@@ -377,10 +363,8 @@ internal class MainViewModel : BaseViewModel {
             }
         }
 #endif
-
         BINParameterGroups.Sort((x, y) => x.GroupName.CompareTo(y.GroupName));
     }
-
 
     /// <summary>
     /// Получение параметров, которые уже имеются в семействе
@@ -394,20 +378,14 @@ internal class MainViewModel : BaseViewModel {
         }
     }
 
-
-
     private void LoadConfig() {
         var setting = _pluginConfig.GetSettings(_revitRepository.Document);
-
-        SaveProperty = setting?.SaveProperty ?? "Привет Revit!";
     }
 
     private void SaveConfig() {
         var setting = _pluginConfig.GetSettings(_revitRepository.Document)
                       ?? _pluginConfig.AddSettings(_revitRepository.Document);
 
-        setting.SaveProperty = SaveProperty;
         _pluginConfig.SaveProjectConfig();
     }
-
 }

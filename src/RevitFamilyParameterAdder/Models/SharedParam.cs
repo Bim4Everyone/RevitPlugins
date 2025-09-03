@@ -2,10 +2,21 @@ using System.Collections.Generic;
 
 using Autodesk.Revit.DB;
 
+using dosymep.SimpleServices;
+
 namespace RevitFamilyParameterAdder.Models;
 
 internal class SharedParam {
-    public SharedParam(ExternalDefinition externalDefinition, List<ParameterGroupHelper> bINParameterGroups) {
+    private readonly ILocalizationService _localizationService;
+
+    public SharedParam(ExternalDefinition externalDefinition, List<ParameterGroupHelper> bINParameterGroups,
+                       ILocalizationService localizationService) {
+        _localizationService = localizationService;
+        LevelOfParam = new Dictionary<string, bool>() {
+            { _localizationService.GetLocalizedString("MainWindow.Instance"), true},
+            { _localizationService.GetLocalizedString("MainWindow.Type"), false}
+        };
+
         ParamName = externalDefinition.Name;
         ParamInShPF = externalDefinition;
         ParamGroupInShPF = externalDefinition.OwnerGroup.Name;
@@ -30,10 +41,7 @@ internal class SharedParam {
     /// Уровень размещения параметра - экземпляр/тип
     /// </summary>
     public bool IsInstanceParam { get; set; } = true;
-    public Dictionary<string, bool> LevelOfParam { get; set; } = new Dictionary<string, bool>() {
-        { "Экземпляр", true},
-        { "Типоразмер", false}
-    };
+    public Dictionary<string, bool> LevelOfParam { get; set; }
 
 
 

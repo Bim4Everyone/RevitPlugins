@@ -20,6 +20,5 @@ internal class PluginConfig : ProjectConfig<PluginSettings> {
 }
 
 internal class PluginSettings : ProjectSettings {
-    public string SaveProperty { get; set; }
     public override string ProjectName { get; set; }
 }
