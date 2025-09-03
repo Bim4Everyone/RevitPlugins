@@ -60,8 +60,6 @@ namespace RevitClashDetective.ViewModels.Navigator {
             set => RaiseAndSetIfChanged(ref _reports, value);
         }
 
-        public bool IsColumnVisible => Reports != null;
-
         public bool OpenFromClashDetector {
             get => _openFromClashDetector;
             set => RaiseAndSetIfChanged(ref _openFromClashDetector, value);
