@@ -196,7 +196,7 @@
                                 FieldName="SecondDocumentName" />
                 <dxg:GridColumn Style="{StaticResource ReadOnlyColumn}"
                                 Header="% пересечения 1"
-                                FieldName="MainElementIntersectionPercentage">
+                                FieldName="FirstElementIntersectionPercentage">
                     <dxg:GridColumn.EditSettings>
                         <dxe:TextEditSettings HorizontalContentAlignment="Left" />
                     </dxg:GridColumn.EditSettings>

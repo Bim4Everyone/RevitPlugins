@@ -9,7 +9,7 @@ using RevitClashDetective.Models;
 using RevitClashDetective.Models.Clashes;
 
 namespace RevitClashDetective.ViewModels.Navigator {
-    internal class ClashViewModel : BaseViewModel, IEquatable<ClashViewModel> {
+    internal class ClashViewModel : BaseViewModel, IClashViewModel, IEquatable<ClashViewModel> {
         private ClashStatus _clashStatus;
         private string _clashName;
         private readonly RevitRepository _revitRepository;
@@ -49,8 +49,6 @@ namespace RevitClashDetective.ViewModels.Navigator {
             set => RaiseAndSetIfChanged(ref _clashName, value);
         }
 
-        public ClashData ClashData { get; private set; }
-
         public string FirstTypeName { get; }
 
         public string FirstFamilyName { get; }
@@ -71,10 +69,13 @@ namespace RevitClashDetective.ViewModels.Navigator {
 
         public string SecondCategory { get; }
 
+        private ClashData ClashData { get; set; }
+
+
         /// <summary>
         /// Процент пересечения относительно объема первого элемента коллизии
         /// </summary>
-        public double MainElementIntersectionPercentage { get; private set; }
+        public double FirstElementIntersectionPercentage { get; private set; }
 
         /// <summary>
         /// Процент пересечения относительно объема второго элемента коллизии
@@ -87,6 +88,10 @@ namespace RevitClashDetective.ViewModels.Navigator {
         public double IntersectionVolume { get; private set; }
 
         public ClashModel Clash { get; }
+
+        public double FirstElementVolume { get; private set; }
+
+        public double SecondElementVolume { get; private set; }
 
 
         public ClashModel GetClashModel() {
@@ -138,8 +143,11 @@ namespace RevitClashDetective.ViewModels.Navigator {
                 .SetRevitRepository(_revitRepository)
                 .GetClashData();
 
+            FirstElementVolume = ClashData.MainElementVolume;
+            SecondElementVolume = ClashData.OtherElementVolume;
+
             IntersectionVolume = Math.Round(_revitRepository.ConvertToM3(ClashData.ClashVolume), 6);
-            MainElementIntersectionPercentage =
+            FirstElementIntersectionPercentage =
                 Math.Round(ClashData.ClashVolume / ClashData.MainElementVolume * 100, 2);
             SecondElementIntersectionPercentage =
                  Math.Round(ClashData.ClashVolume / ClashData.OtherElementVolume * 100, 2);
