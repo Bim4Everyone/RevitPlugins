@@ -5,9 +5,11 @@ using Autodesk.Revit.Attributes;
 using Autodesk.Revit.UI;
 
 using dosymep.Bim4Everyone;
+using dosymep.Bim4Everyone.ProjectConfigs;
 using dosymep.Bim4Everyone.SimpleServices;
 using dosymep.SimpleServices;
-using dosymep.Xpf.Core.Ninject;
+using dosymep.WpfCore.Ninject;
+using dosymep.WpfUI.Core.Ninject;
 
 using Ninject;
 
@@ -39,16 +41,17 @@ public class RevitAddLinksFromServerCommand : BasePluginCommand {
             .InSingletonScope();
 
         kernel.Bind<AddLinksFromServerConfig>()
-            .ToMethod(c => AddLinksFromServerConfig.GetPluginConfig())
+            .ToMethod(c => AddLinksFromServerConfig.GetPluginConfig(c.Kernel.Get<IConfigSerializer>()))
             .InTransientScope();
 
         kernel.Bind<AddServerLinksViewModel>()
             .ToSelf()
             .InSingletonScope();
 
+        kernel.UseWpfUIThemeUpdater();
+
         string assemblyName = Assembly.GetExecutingAssembly().GetName().Name;
-        kernel.UseXtraLocalization(
-            $"/{assemblyName};component/Localization/Language.xaml",
+        kernel.UseWpfLocalization($"/{assemblyName};component/Localization/Language.xaml",
             CultureInfo.GetCultureInfo("ru-RU"));
         var localizationService = kernel.Get<ILocalizationService>();
         kernel.UseRsOpenFileDialog(

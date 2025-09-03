@@ -5,8 +5,11 @@ using Autodesk.Revit.Attributes;
 using Autodesk.Revit.UI;
 
 using dosymep.Bim4Everyone;
+using dosymep.Bim4Everyone.ProjectConfigs;
 using dosymep.Bim4Everyone.SimpleServices;
 using dosymep.SimpleServices;
+using dosymep.WpfCore.Ninject;
+using dosymep.WpfUI.Core.Ninject;
 using dosymep.Xpf.Core.Ninject;
 
 using Ninject;
@@ -41,12 +44,13 @@ public class RevitAddLinksFromFolderCommand : BasePluginCommand {
             .InSingletonScope();
 
         kernel.Bind<AddLinksFromFolderConfig>()
-            .ToMethod(c => AddLinksFromFolderConfig.GetPluginConfig())
+            .ToMethod(c => AddLinksFromFolderConfig.GetPluginConfig(c.Kernel.Get<IConfigSerializer>()))
             .InTransientScope();
 
+        kernel.UseWpfUIThemeUpdater();
+
         string assemblyName = Assembly.GetExecutingAssembly().GetName().Name;
-        kernel.UseXtraLocalization(
-            $"/{assemblyName};component/Localization/Language.xaml",
+        kernel.UseWpfLocalization($"/{assemblyName};component/Localization/Language.xaml",
             CultureInfo.GetCultureInfo("ru-RU"));
         var localizationService = kernel.Get<ILocalizationService>();
         kernel.UseXtraOpenFileDialog<FolderLinksProvider>(

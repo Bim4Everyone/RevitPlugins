@@ -27,7 +27,6 @@ internal class AddServerLinksViewModel : BaseViewModel {
             ?? throw new System.ArgumentNullException(nameof(localizationService));
         _linksLoader = linksLoader
             ?? throw new System.ArgumentNullException(nameof(linksLoader));
-
         AddLinksCommand = RelayCommand.CreateAsync(AddLinks);
     }
 

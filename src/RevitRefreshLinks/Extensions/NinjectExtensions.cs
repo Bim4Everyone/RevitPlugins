@@ -5,8 +5,6 @@ using System.Windows;
 
 using dosymep.Bim4Everyone;
 using dosymep.Revit.ServerClient;
-using dosymep.SimpleServices;
-using dosymep.WPF.Views;
 
 using Ninject;
 
@@ -44,9 +42,7 @@ internal static class NinjectExtensions {
             .ToSelf()
             .InTransientScope()
             .WithPropertyValue(nameof(Window.DataContext),
-                c => c.Kernel.Get<DirectoriesExplorerViewModel>())
-            .WithPropertyValue(nameof(PlatformWindow.LocalizationService),
-                c => c.Kernel.Get<ILocalizationService>());
+                c => c.Kernel.Get<DirectoriesExplorerViewModel>());
         kernel.Bind<IDirectoriesExplorerWindowProvider>()
             .To<ExplorerWindowProvider>()
             .InSingletonScope();
@@ -98,9 +94,7 @@ internal static class NinjectExtensions {
             .ToSelf()
             .InTransientScope()
             .WithPropertyValue(nameof(Window.DataContext),
-                c => c.Kernel.Get<FilesExplorerViewModel>())
-            .WithPropertyValue(nameof(PlatformWindow.LocalizationService),
-                c => c.Kernel.Get<ILocalizationService>());
+                c => c.Kernel.Get<FilesExplorerViewModel>());
         kernel.Bind<IFilesExplorerWindowProvider>()
             .To<ExplorerWindowProvider>()
             .InSingletonScope();

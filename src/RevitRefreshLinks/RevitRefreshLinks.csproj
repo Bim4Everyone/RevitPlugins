@@ -1,29 +1,6 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 	<PropertyGroup>
+		<UseWpfUI>true</UseWpfUI>
 		<LangVersion>12</LangVersion>
 	</PropertyGroup>
-	<ItemGroup>
-		<Resource Include="Resources\Icons\arrow.left.dark.png" />
-		<Resource Include="Resources\Icons\arrow.left.png" />
-		<Resource Include="Resources\Icons\arrow.right.dark.png" />
-		<Resource Include="Resources\Icons\arrow.right.png" />
-		<Resource Include="Resources\Icons\arrow.up.dark.png" />
-		<Resource Include="Resources\Icons\arrow.up.png" />
-		<Resource Include="Resources\Icons\file.dark.png" />
-		<Resource Include="Resources\Icons\file.png" />
-		<Resource Include="Resources\Icons\folder.dark.png" />
-		<Resource Include="Resources\Icons\folder.empty.dark.png" />
-		<Resource Include="Resources\Icons\folder.empty.png" />
-		<Resource Include="Resources\Icons\folder.png" />
-		<Resource Include="Resources\Icons\home.dark.png" />
-		<Resource Include="Resources\Icons\home.png" />
-		<Resource Include="Resources\Icons\preview.dark.png" />
-		<Resource Include="Resources\Icons\preview.png" />
-		<Resource Include="Resources\Icons\search.dark.png" />
-		<Resource Include="Resources\Icons\search.png" />
-		<Resource Include="Resources\Icons\server.dark.png" />
-		<Resource Include="Resources\Icons\server.png" />
-		<Resource Include="Resources\Icons\update.dark.png" />
-		<Resource Include="Resources\Icons\update.png" />
-	</ItemGroup>
 </Project>

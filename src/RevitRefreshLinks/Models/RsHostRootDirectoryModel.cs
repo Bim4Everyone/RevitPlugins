@@ -65,7 +65,7 @@ internal class RsHostRootDirectoryModel : IDirectoryModel {
                 return list.ToArray();
             }
             default:
-                throw new InvalidOperationException($"Не поддерживаемая опция выбора файлов {searchOption}");
+                throw new InvalidOperationException($"{searchOption}");
         }
     }
 
