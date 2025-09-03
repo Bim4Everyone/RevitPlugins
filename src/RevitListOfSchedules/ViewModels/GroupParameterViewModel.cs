@@ -8,13 +8,11 @@ public class GroupParameterViewModel {
     public GroupParameterViewModel(ILocalizationService localizationService, RevitParam parameter = null) {
         _localizationService = localizationService;
         Parameter = parameter;
-        Name = GetParamName();
-        Id = GetId();
     }
 
     public RevitParam Parameter { get; }
-    public string Name { get; }
-    public string Id { get; }
+    public string Name => GetParamName();
+    public string Id => GetId();
 
     private string GetParamName() {
         return Parameter != null ? Parameter.Name : _localizationService.GetLocalizedString("GroupParameter.NoParameter");

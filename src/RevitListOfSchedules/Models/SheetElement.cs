@@ -9,19 +9,19 @@ namespace RevitListOfSchedules.Models;
 internal class SheetElement {
     private const string _revisionStartString = "Изм.1";
     private readonly ParamFactory _paramFactory;
+    private string _number;
+    private string _revisionNumber;
 
     public SheetElement(ParamFactory paramFactory, ViewSheet viewSheet) {
         _paramFactory = paramFactory;
         Sheet = viewSheet;
         Name = Sheet.Name;
-        Number = GetNumberParam();
-        RevisionNumber = GetRevisionString();
     }
 
     public ViewSheet Sheet { get; }
     public string Name { get; }
-    public string Number { get; }
-    public string RevisionNumber { get; }
+    public string Number => _number ??= GetNumberParam();
+    public string RevisionNumber => _revisionNumber ??= GetRevisionString();
 
     private string GetNumberParam() {
         return Sheet.GetParamValueOrDefault<string>(_paramFactory.SharedParamNumber);
