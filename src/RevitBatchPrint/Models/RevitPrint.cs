@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Drawing;
 using System.IO;
 using System.Linq;
+using System.Threading;
 
 using Autodesk.Revit.DB;
 
@@ -15,69 +16,74 @@ using RevitBatchPrint.Services;
 namespace RevitBatchPrint.Models {
     internal class RevitPrint : IRevitPrint {
         private readonly RevitRepository _revitRepository;
-        private readonly PrintManager _printManager;
         private readonly IPrinterService _printerService;
 
-        public RevitPrint(RevitRepository revitRepository, PrintManager printManager, IPrinterService printerService) {
+        public RevitPrint(RevitRepository revitRepository, IPrinterService printerService) {
             _revitRepository = revitRepository;
-            
-            _printManager = printManager;
             _printerService = printerService;
         }
 
         public void Execute(IReadOnlyCollection<SheetElement> sheets, PrintOptions printOptions) {
             IPrinterSettings printerSettings = _printerService.CreatePrinterSettings(printOptions.PrinterName);
 
-            // удаляем старые созданные форматы для принтера
-            // из-за того что отправка на печать асинхронная
-            // приходится созданные форматы оставлять
-            RemoveOldFormats(printerSettings);
+            // Создаем все форматы листов
+            CreateSheetFormats(printerSettings, sheets);
 
             foreach(SheetElement sheetElement in sheets) {
-                PrintSheetSettings printSheetSettings = sheetElement.PrintSheetSettings;
+                // устанавливаем нужный принтер в настройках
+                PrintManager printManager = SetPrintDevice(printOptions.PrinterName);
+                printManager.PrintToFileName = _revitRepository.GetFileName(sheetElement.ViewSheet);
+                
+                // чтобы не появлялась ошибка (файл существует)
+                if(File.Exists(printManager.PrintToFileName)) {
+                    File.Delete(printManager.PrintToFileName);
+                }
 
-                // создаем формат, если его не было
-                CreateFormatIfNotExists(printerSettings, printSheetSettings);
-
-                // перезагружаем в ревите принтер, чтобы появились изменения
-                _revitRepository.ReloadPrintSettings(printOptions.PrinterName);
+                var printSettings = printManager.PrintSetup.InSession;
+                printManager.PrintSetup.CurrentPrintSetting = printSettings;
 
                 using Transaction transaction = _revitRepository.Document.StartTransaction("PrintSettings");
 
-                _printManager.PrintSetup.CurrentPrintSetting = _printManager.PrintSetup.InSession;
+                PrintSheetSettings printSheetSettings = sheetElement.PrintSheetSettings;
+                
+                PaperSize paperSize = printManager.PaperSizes
+                    .OfType<PaperSize>()
+                    .FirstOrDefault(item => item.Name.Equals(printSheetSettings.SheetFormat.Name));
 
-                PaperSize paperSize = _revitRepository.GetPaperSizeByName(printSheetSettings.SheetFormat.Name);
                 if(paperSize is null) {
-                    throw new Exception($"Не были найдены форматы листа принтера.");
+                    throw new Exception("Не были найдены форматы листа принтера.");
                 }
 
-                PrintParameters printParameters = _printManager.PrintSetup.CurrentPrintSetting.PrintParameters;
+                PrintParameters printParameters = printSettings.PrintParameters;
 
                 printParameters.PaperSize = paperSize;
                 printParameters.PageOrientation = printSheetSettings.FormatOrientation;
 
-                printOptions.SetupPrintParams(printParameters);
+                printOptions.Apply(printParameters);
+                printManager.PrintSetup.SaveAs("PrintSettings");
 
-                _revitRepository.UpdatePrintFileName(sheetElement.ViewSheet);
-                _printManager.PrintSetup.SaveAs("SheetPrintSettings");
-
-                _printManager.Apply();
-                _printManager.SubmitPrint(sheetElement.ViewSheet);
+                printManager.Apply();
+                printManager.SubmitPrint(sheetElement.ViewSheet);
 
                 transaction.RollBack();
             }
+
+            // удаляем старые созданные форматы для принтера
+            RemoveOldFormats(printerSettings);
         }
 
-        private static void CreateFormatIfNotExists(
+        private static void CreateSheetFormats(
             IPrinterSettings printerSettings,
-            PrintSheetSettings printSheetSettings) {
-            if(printerSettings.HasFormat(printSheetSettings.SheetFormat.Name)) {
-                return;
-            }
+            IReadOnlyCollection<SheetElement> sheets) {
+            var sheetFormats = sheets
+                .Select(item => item.PrintSheetSettings.SheetFormat)
+                .Where(item => !printerSettings.HasFormat(item.Name));
 
-            // создаем новый формат в Windows, если не был найден подходящий
-            printerSettings.AddFormat(printSheetSettings.SheetFormat.Name,
-                new Size(printSheetSettings.SheetFormat.WidthMm, printSheetSettings.SheetFormat.HeightMm));
+            foreach(SheetFormat sheetFormat in sheetFormats) {
+                printerSettings.AddFormat(
+                    sheetFormat.Name,
+                    new Size(sheetFormat.WidthMm, sheetFormat.HeightMm));
+            }
         }
 
         private static void RemoveOldFormats(IPrinterSettings printerSettings) {
@@ -87,6 +93,23 @@ namespace RevitBatchPrint.Models {
             foreach(string format in formats) {
                 printerSettings.RemoveFormat(format);
             }
+        }
+
+        public PrintManager SetPrintDevice(string printerName) {
+            PrintManager printManager = _revitRepository.Document.PrintManager;
+
+            // После выбора принтера все настройки сбрасываются
+            printManager.SelectNewPrintDriver(printerName);
+            printManager.PrintToFile = true;
+            printManager.PrintOrderReverse = false;
+
+            // Должно быть установлено это значение,
+            // если установлено другое значение,
+            // имя файла устанавливается ревитом
+            printManager.PrintRange = PrintRange.Current;
+            printManager.PrintToFileName = _revitRepository.GetFileName(null);
+
+            return printManager;
         }
     }
 }

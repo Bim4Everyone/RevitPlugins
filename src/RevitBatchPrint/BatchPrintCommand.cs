@@ -34,10 +34,6 @@ public class BatchPrintCommand : BasePluginCommand {
             .ToSelf()
             .InSingletonScope();
 
-        kernel.Bind<PrintManager>()
-            .ToConstant(uiApplication.ActiveUIDocument.Document.PrintManager)
-            .InSingletonScope();
-
         // Настройка конфигурации плагина
         kernel.Bind<PluginConfig>()
             .ToMethod(c => PluginConfig.GetPluginConfig(c.Kernel.Get<IConfigSerializer>()));

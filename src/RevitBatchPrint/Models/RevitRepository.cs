@@ -10,41 +10,22 @@ using Autodesk.Revit.UI;
 using dosymep.Revit;
 using dosymep.SimpleServices;
 
-using InvalidOperationException = Autodesk.Revit.Exceptions.InvalidOperationException;
-
 namespace RevitBatchPrint.Models {
     internal class RevitRepository {
-        private readonly PrintManager _printManager;
         private readonly UIApplication _uiApplication;
         private readonly ILocalizationService _localizationService;
 
         public RevitRepository(
-            PrintManager printManager,
             UIApplication uiApplication,
             ILocalizationService localizationService) {
-            _printManager = printManager;
             _uiApplication = uiApplication;
             _localizationService = localizationService;
         }
 
         public Document Document => _uiApplication.ActiveUIDocument.Document;
+       
 
-        public void ReloadPrintSettings(string printerName) {
-            // После выбора принтера все настройки сбрасываются
-            _printManager.SelectNewPrintDriver(printerName);
-            _printManager.PrintToFile = true;
-            _printManager.PrintOrderReverse = false;
-
-            // Должно быть установлено это значение,
-            // если установлено другое значение,
-            // имя файла устанавливается ревитом
-            _printManager.PrintRange = PrintRange.Current;
-
-            _printManager.Apply();
-            UpdatePrintFileName(null);
-        }
-
-        public void UpdatePrintFileName(ViewSheet viewSheet) {
+        public string GetFileName(ViewSheet viewSheet) {
             string documentFileName = string.IsNullOrEmpty(Document.Title)
                 ? _localizationService.GetLocalizedString("Print.DefaultFileName")
                 : Document.Title;
@@ -54,12 +35,10 @@ namespace RevitBatchPrint.Models {
                 ? documentFileName
                 : $"{documentFileName} ({viewName} - {ReplaceInvalidChars(viewSheet?.Name)})";
 
-            _printManager.PrintToFileName =
+            string filePath =
                 Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), fileName + ".pdf");
 
-            if(File.Exists(_printManager.PrintToFileName)) {
-                File.Delete(_printManager.PrintToFileName);
-            }
+            return filePath;
         }
 
         public List<string> GetAlbumParamNames() {
@@ -146,14 +125,6 @@ namespace RevitBatchPrint.Models {
 
         private static PageOrientationType GetFormatOrientation(int width, int height) {
             return width > height ? PageOrientationType.Landscape : PageOrientationType.Portrait;
-        }
-
-        public PaperSize GetPaperSizeByName(string formatName) {
-            if(string.IsNullOrEmpty(formatName)) {
-                throw new ArgumentException($"'{nameof(formatName)}' cannot be null or empty.", nameof(formatName));
-            }
-
-            return _printManager.PaperSizes.OfType<PaperSize>().FirstOrDefault(item => item.Name.Equals(formatName));
         }
 
         private static string ReplaceInvalidChars(string filename) {
