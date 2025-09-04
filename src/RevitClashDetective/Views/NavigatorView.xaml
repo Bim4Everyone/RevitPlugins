@@ -149,8 +149,10 @@
                                AutoWidth="True"
                                DataNavigatorButtons="Navigation"
                                AllowMergedGrouping="True"
-                               ShowDataNavigator="True">
-                </dxg:TableView>
+                               ShowDataNavigator="True"
+                               VirtualizingPanel.IsVirtualizingWhenGrouping="True"
+                               VirtualizingPanel.VirtualizationMode="Recycling"
+                               VirtualizingPanel.IsVirtualizing="True" />
             </dxg:GridControl.View>
 
             <dxg:GridControl.Columns>
