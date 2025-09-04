@@ -21,7 +21,7 @@ namespace RevitExportSpecToExcel.Models
             _scheduleToExcelConverter = scheduleToExcelConverter;
         }
 
-        public void ExportSchedules(string folderPath, IList<ViewSchedule> schedules, bool asOneFile) {
+        public void ExportSchedules(string folderPath, string documentName, IList<ViewSchedule> schedules, bool asOneFile) {
             if(asOneFile) {
                 using var workbook = new XLWorkbook();
 
@@ -31,8 +31,8 @@ namespace RevitExportSpecToExcel.Models
 
                     _scheduleToExcelConverter.Convert(worksheet, schedule);
                 }
-
-                string fullPath = GenerateFullPath(folderPath, schedules.First().Name);
+                
+                string fullPath = GenerateFullPath(folderPath, documentName);
                 workbook.SaveAs(fullPath);
 
             } else {
@@ -44,7 +44,8 @@ namespace RevitExportSpecToExcel.Models
 
                     _scheduleToExcelConverter.Convert(worksheet, schedule);
 
-                    string fullPath = GenerateFullPath(folderPath, schedule.Name);
+                    string fileName = $"{documentName}_{schedule.Name}";
+                    string fullPath = GenerateFullPath(folderPath, fileName);
                     workbook.SaveAs(fullPath);
                 }
             }

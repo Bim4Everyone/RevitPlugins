@@ -109,7 +109,8 @@ internal class MainViewModel : BaseViewModel {
             .Select(x => x.Schedule)
             .ToList();
 
-        _excelExporter.ExportSchedules(path, schedulesToExport, SaveAsOneFile);
+        string documentName = _revitRepository.Document.Title;
+        _excelExporter.ExportSchedules(path, documentName, schedulesToExport, SaveAsOneFile);
 
         SaveConfig();
     }
