@@ -174,7 +174,7 @@ internal class MainViewModel : BaseViewModel, IPrintContext, IExportContext {
     }
 
     private bool CanPrint(Window window) {
-        return CanAcceptView(true);
+        return CanAcceptView(true, true, false);
     }
 
     private void Export(Window window) {
@@ -185,7 +185,7 @@ internal class MainViewModel : BaseViewModel, IPrintContext, IExportContext {
     }
 
     private bool CanExport(Window window) {
-        return CanAcceptView(true);
+        return CanAcceptView(true, false, true);
     }
 
     public void Print(IEnumerable<SheetViewModel> sheets) {
@@ -197,7 +197,7 @@ internal class MainViewModel : BaseViewModel, IPrintContext, IExportContext {
     }
 
     public bool CanPrint(IEnumerable<SheetViewModel> sheets) {
-        return CanAcceptView(false);
+        return CanAcceptView(false, true, false);
     }
 
     public void Export(IEnumerable<SheetViewModel> sheets) {
@@ -209,7 +209,7 @@ internal class MainViewModel : BaseViewModel, IPrintContext, IExportContext {
     }
 
     public bool CanExport(IEnumerable<SheetViewModel> sheets) {
-        return CanAcceptView(false);
+        return CanAcceptView(false, false, true);
     }
 
     private IEnumerable<SheetViewModel> GetSheets() {
@@ -233,13 +233,13 @@ internal class MainViewModel : BaseViewModel, IPrintContext, IExportContext {
         return sheets;
     }
 
-    private bool CanAcceptView(bool checkSelected) {
-        if(ShowPrint && string.IsNullOrEmpty(PrintOptions?.PrinterName)) {
+    private bool CanAcceptView(bool checkSelected, bool checkPrint, bool checkExport) {
+        if(checkPrint && ShowPrint && string.IsNullOrEmpty(PrintOptions?.PrinterName)) {
             ErrorText = _localizationService.GetLocalizedString("MainWindow.NotSelectedPrinter");
             return false;
         }
 
-        if(ShowExport && string.IsNullOrEmpty(PrintOptions?.FilePath)) {
+        if(checkExport && ShowExport && string.IsNullOrEmpty(PrintOptions?.FilePath)) {
             ErrorText = _localizationService.GetLocalizedString("MainWindow.NotSelectedFilePath");
             return false;
         }
