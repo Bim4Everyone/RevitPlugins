@@ -184,7 +184,7 @@ namespace RevitClashDetective.ViewModels.Navigator {
 
         private ElementViewModel GetSecondElementViewModel(IClashViewModel clash) {
             try {
-                return new ElementViewModel(clash.GetSecondElement(), clash.FirstElementVolume);
+                return new ElementViewModel(clash.GetSecondElement(), clash.SecondElementVolume);
             } catch(NotSupportedException) {
                 return null;
             }
