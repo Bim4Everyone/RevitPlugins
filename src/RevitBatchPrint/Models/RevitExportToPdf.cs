@@ -22,8 +22,11 @@ namespace RevitBatchPrint.Models {
         public void Execute(IReadOnlyCollection<SheetElement> sheets, PrintOptions printOptions) {
 #if REVIT_2022_OR_GREATER
             PDFExportOptions exportParams = printOptions.CreateExportParams();
+
+            string directoryName = Path.GetDirectoryName(printOptions.FilePath);
             
-            _document.Export(Path.GetDirectoryName(printOptions.FilePath),
+            Directory.CreateDirectory(directoryName!);
+            _document.Export(directoryName, 
                 sheets.Select(item => item.ViewSheet.Id).ToArray(), exportParams);
             
             Process.Start(printOptions.FilePath);
