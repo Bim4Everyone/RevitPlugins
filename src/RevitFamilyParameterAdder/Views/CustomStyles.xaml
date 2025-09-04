@@ -11,6 +11,8 @@
             Source="pack://application:,,,/Wpf.Ui;component/Controls/GridView/GridViewColumnHeader.xaml" />
         <ResourceDictionary
             Source="pack://application:,,,/Wpf.Ui;component/Controls/ListView/ListView.xaml" />
+        <ResourceDictionary
+            Source="pack://application:,,,/Wpf.Ui;component/Controls/ListView/ListViewItem.xaml" />
     </ResourceDictionary.MergedDictionaries>
 
     <Style

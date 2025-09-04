@@ -18,9 +18,9 @@
     WindowStartupLocation="CenterOwner"
     
     Height="550" 
-    Width="930"
+    Width="1010"
     MinHeight="550"
-    MinWidth="930"    
+    MinWidth="1010"    
     d:DataContext="{d:DesignInstance vms:MainViewModel, IsDesignTimeCreatable=False}">
     <i:Interaction.Triggers>
         <i:EventTrigger EventName="Loaded">
@@ -159,31 +159,35 @@
                         Height="*" />
                 </Grid.RowDefinitions>
 
-                <StackPanel
-                    Grid.Row="0"
-                    HorizontalAlignment="Left"
-                    Orientation="Horizontal">
-                    <Button
-                        Content="{me:LocalizationSource MainWindow.SelectAll}"
-                        Margin="5"
-                        Click="SelectAllParams" />
-
-                    <Button
-                        Content="{me:LocalizationSource MainWindow.UnselectAll}"
-                        Margin="5"
-                        Click="UnselectAllParams" />
-                </StackPanel>
-
+                
                 <ui:ListView
                     Grid.Row="1"
                     Name="parameters"
                     ItemsSource="{Binding Path=Params}"
-                    SelectionMode="Extended"
                     Style="{StaticResource ListViewStyle}"
-                    BorderThickness="0">
+                    BorderThickness="0"
+                    SelectionMode="Extended" >
                     <ui:ListView.View>
                         <GridView
                             ColumnHeaderContainerStyle="{StaticResource UiGridViewColumnHeaderStyle}">
+                            <GridViewColumn
+                                Width="60">
+                                <GridViewColumn.Header>
+                                    <CheckBox
+                                        IsChecked="{Binding Path=IsAllSelected, Mode=TwoWay}"
+                                        HorizontalAlignment="Center"
+                                        VerticalAlignment="Center" />
+                                </GridViewColumn.Header>
+                                <GridViewColumn.CellTemplate>
+                                    <DataTemplate>
+                                        <CheckBox
+                                            IsChecked="{Binding Path=IsSelected, Mode=TwoWay}"
+                                            HorizontalAlignment="Center"
+                                            VerticalAlignment="Center" />
+                                    </DataTemplate>
+                                </GridViewColumn.CellTemplate>
+                            </GridViewColumn>
+
                             <GridViewColumn
                                 Header="{me:LocalizationSource MainWindow.ParamName}"
                                 Width="250"

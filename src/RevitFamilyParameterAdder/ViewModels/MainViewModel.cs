@@ -83,6 +83,32 @@ internal class MainViewModel : BaseViewModel {
     ];
 
 
+
+
+
+    /// <summary>
+    /// Выделение/снятие выделения всех видимых элементов
+    /// </summary>
+    private void SelectAllVisibleItems(bool isSelected) {
+        foreach(var param in Params) {
+            param.IsSelected = isSelected;
+        }
+
+        // Обновляем SelectedParams
+        UpdateSelectedParams();
+    }
+
+    /// <summary>
+    /// Обновление списка выбранных параметров
+    /// </summary>
+    private void UpdateSelectedParams() {
+        SelectedParams.Clear();
+        foreach(var param in Params.Where(p => p.IsSelected)) {
+            SelectedParams.Add(param);
+        }
+    }
+
+
     public MainViewModel(PluginConfig pluginConfig, RevitRepository revitRepository, 
                          ILocalizationService localizationService) {
         _pluginConfig = pluginConfig;
@@ -106,6 +132,19 @@ internal class MainViewModel : BaseViewModel {
     public ICommand SelectionParamsCommand { get; }
 
 
+
+    private bool _isAllSelected;
+
+    public bool IsAllSelected {
+        get => _isAllSelected;
+        set {
+            if(_isAllSelected != value) {
+                _isAllSelected = value;
+                RaisePropertyChanged(nameof(IsAllSelected));
+                SelectAllVisibleItems(value);
+            }
+        }
+    }
 
     public FamilyManager FamilyManagerFm { get; set; }
 
@@ -181,8 +220,10 @@ internal class MainViewModel : BaseViewModel {
         SaveConfig();
     }
     private bool CanAcceptView() {
-        if(SelectedParams.Count > 0) {
-            foreach(SharedParam item in SelectedParams) {
+        var selectedParams = Params.Where(p => p.IsSelected).ToList();
+
+        if(selectedParams.Count > 0) {
+            foreach(SharedParam item in selectedParams) {
                 if(item.SelectedParamGroupInFM is null) {
                     ErrorText = _localizationService.GetLocalizedString("MainWindow.SetGroupToAllSelectedParams");
                     return false;
@@ -199,10 +240,10 @@ internal class MainViewModel : BaseViewModel {
 
     private void Add() {
         using(var t = new Transaction(_revitRepository.Document)) {
-            t.Start(_localizationService.GetLocalizedString("MainWindow.SelectAll"));
+            t.Start(_localizationService.GetLocalizedString("MainWindow.Title"));
 
-            // Перебираем параметры в группе
-            foreach(SharedParam param in SelectedParams) {
+            // Перебираем параметры с установленным флагом IsSelected
+            foreach(SharedParam param in Params.Where(p => p.IsSelected)) {
                 //Если семейство уже имеет параметр, пропускаем, идем дальше
                 if(_paramGUIDsInFM.Contains(param.ParamInShPF.GUID)) {
                     _reportAlreadyBeen.AppendLine(param.ParamName);
@@ -211,10 +252,10 @@ internal class MainViewModel : BaseViewModel {
 
                 try {
 #if REVIT_2023_OR_LESS
-                    FamilyParameter familyParam = FamilyManagerFm.AddParameter(
-                        param.ParamInShPF, 
-                        (BuiltInParameterGroup) param.SelectedParamGroupInFM.BuiltInParamGroup, 
-                        param.IsInstanceParam);
+                FamilyParameter familyParam = FamilyManagerFm.AddParameter(
+                    param.ParamInShPF, 
+                    (BuiltInParameterGroup) param.SelectedParamGroupInFM.BuiltInParamGroup, 
+                    param.IsInstanceParam);
 #else
                     FamilyParameter familyParam = FamilyManagerFm.AddParameter(
                         param.ParamInShPF,
@@ -311,8 +352,10 @@ internal class MainViewModel : BaseViewModel {
             Params = new ObservableCollection<SharedParam>(
                     Params
                     .Where(item => item.IsDefaultParam));
-
         }
+
+        // Сбрасываем выделение всех при изменении фильтра
+        IsAllSelected = false;
         OnPropertyChanged(nameof(Params));
     }
 
