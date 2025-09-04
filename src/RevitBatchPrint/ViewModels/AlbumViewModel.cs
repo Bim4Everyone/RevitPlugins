@@ -88,7 +88,7 @@ internal sealed class AlbumViewModel : BaseViewModel {
             : _localizationService.GetLocalizedString("TreeView.SheetsWithoutCropToolTip")
               + Environment.NewLine
               + " - "
-              + string.Join(Environment.NewLine + " - ", ViewsWithoutCrop.Take(5))
+              + string.Join(Environment.NewLine + " - ", ViewsWithoutCrop.Distinct().Take(5))
               + (ViewsWithoutCrop.Count > 5 ? "..." : null);
 
     public void FilterSheets(string searchText) {
