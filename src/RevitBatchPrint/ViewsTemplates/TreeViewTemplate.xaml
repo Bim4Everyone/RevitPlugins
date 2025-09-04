@@ -72,6 +72,7 @@
                 <ColumnDefinition Width="Auto" />
                 <ColumnDefinition Width="*" />
                 <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="Auto" />
             </Grid.ColumnDefinitions>
 
             <CheckBox
@@ -130,24 +131,6 @@
                     VerticalAlignment="Center"
                     Text="{Binding PrintSheetSettings.SheetFormat.Name}" />
 
-                <ui:SymbolIcon
-                    Symbol="Warning24"
-                    Margin="12 0 0 0"
-                    VerticalAlignment="Center"
-                    ToolTip="{Binding ViewsWithoutCropText, Mode=OneWay}">
-
-                    <ui:SymbolIcon.Style>
-                        <Style TargetType="ui:SymbolIcon">
-                            <Setter Property="Visibility" Value="Visible" />
-
-                            <Style.Triggers>
-                                <DataTrigger Binding="{Binding ViewsWithoutCrop.Count}" Value="0">
-                                    <Setter Property="Visibility" Value="Collapsed" />
-                                </DataTrigger>
-                            </Style.Triggers>
-                        </Style>
-                    </ui:SymbolIcon.Style>
-                </ui:SymbolIcon>
             </StackPanel>
 
             <StackPanel
@@ -177,6 +160,26 @@
                         RelativeSource={RelativeSource AncestorType=Window},
                         Converter={StaticResource ExportVisibilityConverter}}" />
             </StackPanel>
+
+            <ui:SymbolIcon
+                Grid.Column="4"
+                Symbol="Warning24"
+                Margin="0 0 8 0"
+                VerticalAlignment="Center"
+                ToolTip="{Binding ViewsWithoutCropText, Mode=OneWay}">
+
+                <ui:SymbolIcon.Style>
+                    <Style TargetType="ui:SymbolIcon">
+                        <Setter Property="Visibility" Value="Visible" />
+
+                        <Style.Triggers>
+                            <DataTrigger Binding="{Binding ViewsWithoutCrop.Count}" Value="0">
+                                <Setter Property="Visibility" Value="Collapsed" />
+                            </DataTrigger>
+                        </Style.Triggers>
+                    </Style>
+                </ui:SymbolIcon.Style>
+            </ui:SymbolIcon>
         </Grid>
 
         <HierarchicalDataTemplate.Triggers>
