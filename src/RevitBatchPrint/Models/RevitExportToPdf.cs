@@ -24,12 +24,23 @@ namespace RevitBatchPrint.Models {
             PDFExportOptions exportParams = printOptions.CreateExportParams();
 
             string directoryName = Path.GetDirectoryName(printOptions.FilePath);
-            
+
+            directoryName = Path.IsPathRooted(directoryName)
+                ? directoryName
+                : string.IsNullOrWhiteSpace(directoryName)
+                    ? Environment.GetFolderPath(Environment.SpecialFolder.Desktop)
+                    : Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.Desktop), directoryName);
+
             Directory.CreateDirectory(directoryName!);
-            _document.Export(directoryName, 
+
+            _document.Export(directoryName,
                 sheets.Select(item => item.ViewSheet.Id).ToArray(), exportParams);
-            
-            Process.Start(printOptions.FilePath);
+
+            string filePath = Path.Combine(
+                directoryName,
+                Path.ChangeExtension(exportParams.FileName, ".pdf"));
+
+            Process.Start(filePath);
 #endif
         }
     }

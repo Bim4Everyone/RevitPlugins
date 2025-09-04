@@ -28,6 +28,8 @@
     <system:String x:Key="MainWindow.NotSelectedAlbumParamName">Please select album param name</system:String>
     <system:String x:Key="MainWindow.NotSelectedPrinter">Please select printer name</system:String>
     <system:String x:Key="MainWindow.NotSelectedFilePath">Please select export file path</system:String>
+    <system:String x:Key="MainWindow.FilePathNotPdf">Please select a PDF file path for export (e.g., C:\Documents\file.pdf)</system:String>
+    <system:String x:Key="MainWindow.FilePathNotRooted">Please specify a full file path (e.g., C:\Documents\file.pdf)</system:String>
     <system:String x:Key="MainWindow.NotSelectedAlbumSheets">Please select sheets to print or export</system:String>
 
     <system:String x:Key="Settings.PrintSettings">Print Settings</system:String>

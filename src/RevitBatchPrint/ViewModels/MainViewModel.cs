@@ -243,6 +243,16 @@ internal class MainViewModel : BaseViewModel, IPrintContext, IExportContext {
             ErrorText = _localizationService.GetLocalizedString("MainWindow.NotSelectedFilePath");
             return false;
         }
+        
+        if(checkExport && ShowExport && !PrintOptions.FilePath.EndsWith(".pdf", StringComparison.OrdinalIgnoreCase)) {
+            ErrorText = _localizationService.GetLocalizedString("MainWindow.FilePathNotPdf");
+            return false;
+        }
+        
+        if(checkExport && ShowExport && !Path.IsPathRooted(PrintOptions.FilePath)) {
+            ErrorText = _localizationService.GetLocalizedString("MainWindow.FilePathNotRooted");
+            return false;
+        }
 
         if(checkSelected && !MainAlbums.Any(item => item.HasSelectedSheets())) {
             ErrorText = _localizationService.GetLocalizedString("MainWindow.NotSelectedAlbumSheets");
