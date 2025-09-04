@@ -29,7 +29,7 @@ namespace RevitExportSpecToExcel;
 [Transaction(TransactionMode.Manual)]
 public class RevitExportSpecToExcelCommand : BasePluginCommand {
     public RevitExportSpecToExcelCommand() {
-        PluginName = "RevitExportSpecToExcel";
+        PluginName = "Спеки в XLSX";
     }
 
     /// <summary>
