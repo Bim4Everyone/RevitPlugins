@@ -85,7 +85,6 @@ internal class ScheduleCell {
             int length = newValue.Split(',').Last().Length;
             cell.Value = doubleValue;
             cell.Style.NumberFormat.Format = "0." + new StringBuilder().Insert(0, "0", length);
-            ;
         } else {
             SetTextValue(cell, value);
         }
