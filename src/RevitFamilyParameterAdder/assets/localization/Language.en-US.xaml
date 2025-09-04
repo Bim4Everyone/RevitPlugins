@@ -8,8 +8,8 @@
     <system:String x:Key="MainWindow.ButtonCancel">Cancel</system:String>
 
     <system:String x:Key="MainWindow.SelectParam">Select parameters:</system:String>
-    <system:String x:Key="MainWindow.AddingParametersForFamilies">Adding parameters for families</system:String>
-    <system:String x:Key="MainWindow.AddingFormulasForParametersForFamilies">Adding formulas for parameters for families</system:String>
+    <system:String x:Key="MainWindow.AddingParametersForFamilies">Adding parameters for structural families</system:String>
+    <system:String x:Key="MainWindow.AddingFormulasForParametersForFamilies">Adding formulas for parameters for structural families</system:String>
 
     <system:String x:Key="MainWindow.GroupFilter">Group filter:</system:String>
 

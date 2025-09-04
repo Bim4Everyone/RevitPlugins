@@ -26,12 +26,4 @@ public partial class MainWindow {
     private void ButtonCancel_Click(object sender, RoutedEventArgs e) {
         DialogResult = false;
     }
-
-
-    private void SelectAllParams(object sender, RoutedEventArgs e) {
-        parameters.SelectAll();
-    }
-    private void UnselectAllParams(object sender, RoutedEventArgs e) {
-        parameters.UnselectAll();
-    }
 }

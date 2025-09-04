@@ -58,4 +58,14 @@
             Property="CornerRadius"
             Value="{DynamicResource ControlCornerRadius}" />
     </Style>
+
+    <Style
+        TargetType="ui:ListViewItem"
+        x:Key="CustomListViewItem"
+        BasedOn="{StaticResource ListViewItemStyle}">
+        <Setter
+            Property="IsSelected"
+            Value="{Binding IsSelected, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" />
+    </Style>
+
 </ResourceDictionary>

@@ -18,9 +18,9 @@
     WindowStartupLocation="CenterOwner"
     
     Height="550" 
-    Width="1010"
+    Width="1015"
     MinHeight="550"
-    MinWidth="1010"    
+    MinWidth="1015"    
     d:DataContext="{d:DesignInstance vms:MainViewModel, IsDesignTimeCreatable=False}">
     <i:Interaction.Triggers>
         <i:EventTrigger EventName="Loaded">
@@ -159,14 +159,13 @@
                         Height="*" />
                 </Grid.RowDefinitions>
 
-                
                 <ui:ListView
                     Grid.Row="1"
                     Name="parameters"
                     ItemsSource="{Binding Path=Params}"
                     Style="{StaticResource ListViewStyle}"
                     BorderThickness="0"
-                    SelectionMode="Extended" >
+                    ItemContainerStyle="{StaticResource CustomListViewItem}">
                     <ui:ListView.View>
                         <GridView
                             ColumnHeaderContainerStyle="{StaticResource UiGridViewColumnHeaderStyle}">
@@ -194,7 +193,7 @@
                                 DisplayMemberBinding="{Binding Path=ParamName}" />
                             <GridViewColumn
                                 Header="{me:LocalizationSource MainWindow.SPFGroupParam}"
-                                Width="200"
+                                Width="215"
                                 DisplayMemberBinding="{Binding Path=ParamGroupInShPF}" />
 
                             <GridViewColumn
