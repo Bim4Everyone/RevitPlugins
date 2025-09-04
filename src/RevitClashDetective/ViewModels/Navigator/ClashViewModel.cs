@@ -41,7 +41,11 @@ namespace RevitClashDetective.ViewModels.Navigator {
 
         public ClashStatus ClashStatus {
             get => _clashStatus;
-            set => RaiseAndSetIfChanged(ref _clashStatus, value);
+            set {
+                if(value != ClashStatus.Imaginary) {
+                    RaiseAndSetIfChanged(ref _clashStatus, value);
+                }
+            }
         }
 
         public string ClashName {
