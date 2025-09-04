@@ -174,6 +174,8 @@
                                 <GridViewColumn.Header>
                                     <CheckBox
                                         IsChecked="{Binding Path=IsAllSelected, Mode=TwoWay}"
+                                        Command="{Binding Path=SelectAllCommand}"
+                                        CommandParameter="{Binding IsChecked, RelativeSource={RelativeSource Self}}"
                                         HorizontalAlignment="Center"
                                         VerticalAlignment="Center" />
                                 </GridViewColumn.Header>
@@ -204,7 +206,9 @@
                                             Name="parameters_ParamGroup"
                                             Width="250"
                                             DisplayMemberPath="GroupName"
-                                            SelectedItem="{Binding Path=SelectedParamGroupInFM}"
+                                            SelectedItem="{Binding 
+                                                Path=SelectedParamGroupInFM, 
+                                                UpdateSourceTrigger=PropertyChanged}"
                                             ItemsSource="{Binding Path=ParamGroupsInFM}">
                                         </ComboBox>
                                     </DataTemplate>

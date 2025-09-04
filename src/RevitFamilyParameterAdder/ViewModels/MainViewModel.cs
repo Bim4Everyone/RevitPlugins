@@ -5,6 +5,7 @@ using System.Linq;
 using System.Reflection;
 using System.Text;
 using System.Windows.Input;
+using System.Windows.Threading;
 
 using Autodesk.Revit.DB;
 using Autodesk.Revit.UI;
@@ -22,6 +23,7 @@ internal class MainViewModel : BaseViewModel {
     private readonly RevitRepository _revitRepository;
     private readonly ILocalizationService _localizationService;
 
+    private bool _isAllSelected;
     private string _errorText;
     private readonly string _allGroup = "";
     private string _selectedParamGroupName;
@@ -83,32 +85,6 @@ internal class MainViewModel : BaseViewModel {
     ];
 
 
-
-
-
-    /// <summary>
-    /// Выделение/снятие выделения всех видимых элементов
-    /// </summary>
-    private void SelectAllVisibleItems(bool isSelected) {
-        foreach(var param in Params) {
-            param.IsSelected = isSelected;
-        }
-
-        // Обновляем SelectedParams
-        UpdateSelectedParams();
-    }
-
-    /// <summary>
-    /// Обновление списка выбранных параметров
-    /// </summary>
-    private void UpdateSelectedParams() {
-        SelectedParams.Clear();
-        foreach(var param in Params.Where(p => p.IsSelected)) {
-            SelectedParams.Add(param);
-        }
-    }
-
-
     public MainViewModel(PluginConfig pluginConfig, RevitRepository revitRepository, 
                          ILocalizationService localizationService) {
         _pluginConfig = pluginConfig;
@@ -123,6 +99,7 @@ internal class MainViewModel : BaseViewModel {
         AcceptViewCommand = RelayCommand.Create(AcceptView, CanAcceptView);
         GetParamsNSetParamFilterCommand = RelayCommand.Create(GetParamsNSetParamFilter);
         SelectionParamsCommand = RelayCommand.Create<object>(SelectionParams);
+        SelectAllCommand = RelayCommand.Create<bool>(SelectAllItems);
     }
 
 
@@ -130,23 +107,14 @@ internal class MainViewModel : BaseViewModel {
     public ICommand AcceptViewCommand { get; }
     public ICommand GetParamsNSetParamFilterCommand { get; }
     public ICommand SelectionParamsCommand { get; }
+    public ICommand SelectAllCommand { get; }
 
-
-
-    private bool _isAllSelected;
+    public FamilyManager FamilyManagerFm { get; set; }
 
     public bool IsAllSelected {
         get => _isAllSelected;
-        set {
-            if(_isAllSelected != value) {
-                _isAllSelected = value;
-                RaisePropertyChanged(nameof(IsAllSelected));
-                SelectAllVisibleItems(value);
-            }
-        }
+        set => RaiseAndSetIfChanged(ref _isAllSelected, value);
     }
-
-    public FamilyManager FamilyManagerFm { get; set; }
 
     public ObservableCollection<SharedParam> Params { get; set; } = [];
     public List<SharedParam> SelectedParams {
@@ -195,8 +163,8 @@ internal class MainViewModel : BaseViewModel {
     /// Метод для команды,отрабатывающей во время загрузки окна
     /// </summary>
     private void LoadView() {
-        IsParamsForKR = false;
-        WriteFormulasInParamsForKR = false;
+        IsParamsForKR = true;
+        WriteFormulasInParamsForKR = true;
 
         // Подгружаем сохраненные данные прошлого запуска
         LoadConfig();
@@ -345,15 +313,16 @@ internal class MainViewModel : BaseViewModel {
                     if(defParam.ParamName == item.ParamName) {
                         item.IsDefaultParam = true;
                         item.Formula = defParam.Formula;
-                        item.SelectedParamGroupInFM = defParam.BINParameterGroup;
+                        // Отложенная установка после привязки ItemsSource
+                        Dispatcher.CurrentDispatcher.BeginInvoke(new Action(() => {
+                            item.SelectedParamGroupInFM =
+                                item.ParamGroupsInFM.FirstOrDefault(e => e.GroupName == defParam.BINParameterGroup.GroupName);
+                        }), DispatcherPriority.Loaded);
                     }
                 }
             }
-            Params = new ObservableCollection<SharedParam>(
-                    Params
-                    .Where(item => item.IsDefaultParam));
+            Params = new ObservableCollection<SharedParam>(Params.Where(item => item.IsDefaultParam));
         }
-
         // Сбрасываем выделение всех при изменении фильтра
         IsAllSelected = false;
         OnPropertyChanged(nameof(Params));
@@ -430,5 +399,31 @@ internal class MainViewModel : BaseViewModel {
                       ?? _pluginConfig.AddSettings(_revitRepository.Document);
 
         _pluginConfig.SaveProjectConfig();
+    }
+
+    private void SelectAllItems(bool isSelected) {
+        SelectAllVisibleItems(isSelected);
+        IsAllSelected = isSelected;
+    }
+
+    /// <summary>
+    /// Выделение/снятие выделения всех видимых элементов
+    /// </summary>
+    private void SelectAllVisibleItems(bool isSelected) {
+        foreach(var param in Params) {
+            param.IsSelected = isSelected;
+        }
+        // Обновляем SelectedParams
+        UpdateSelectedParams();
+    }
+
+    /// <summary>
+    /// Обновление списка выбранных параметров
+    /// </summary>
+    private void UpdateSelectedParams() {
+        SelectedParams.Clear();
+        foreach(var param in Params.Where(p => p.IsSelected)) {
+            SelectedParams.Add(param);
+        }
     }
 }

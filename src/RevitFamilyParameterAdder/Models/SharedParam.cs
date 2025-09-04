@@ -27,7 +27,6 @@ internal class SharedParam : BaseViewModel {
             { _localizationService.GetLocalizedString("MainWindow.Instance"), true},
             { _localizationService.GetLocalizedString("MainWindow.Type"), false}
         };
-
         ParamName = externalDefinition.Name;
         ParamInShPF = externalDefinition;
         ParamGroupInShPF = externalDefinition.OwnerGroup.Name;
