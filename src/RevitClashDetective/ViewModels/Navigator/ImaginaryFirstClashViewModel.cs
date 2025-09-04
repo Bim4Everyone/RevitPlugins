@@ -56,14 +56,22 @@ internal class ImaginaryFirstClashViewModel
 
     public double IntersectionVolume => 0;
 
-    public ClashModel Clash => new ClashModel() {
-        ClashStatus = ClashStatus.Imaginary,
-        MainElement = _firstElement.Element
-    };
-
     public double FirstElementVolume { get; }
 
     public double SecondElementVolume => 0;
+
+
+    public ElementModel GetFirstElement() {
+        return _firstElement.Element;
+    }
+
+    public ElementModel GetSecondElement() {
+        throw new NotSupportedException();
+    }
+
+    public ICollection<ElementModel> GetElements() {
+        return [GetFirstElement()];
+    }
 
     public bool Equals(ImaginaryFirstClashViewModel other) {
         if(other is null) { return false; }
@@ -74,13 +82,6 @@ internal class ImaginaryFirstClashViewModel
 
     public override bool Equals(object obj) {
         return Equals(obj as ImaginaryFirstClashViewModel);
-    }
-
-    public ClashModel GetClashModel() {
-        return new ClashModel() {
-            ClashStatus = ClashStatus.Imaginary,
-            MainElement = _firstElement.Element
-        };
     }
 
     public override int GetHashCode() {

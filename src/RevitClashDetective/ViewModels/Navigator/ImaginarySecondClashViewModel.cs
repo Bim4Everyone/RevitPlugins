@@ -60,10 +60,18 @@ internal class ImaginarySecondClashViewModel
 
     public double SecondElementVolume { get; }
 
-    public ClashModel Clash => new ClashModel() {
-        ClashStatus = ClashStatus.Imaginary,
-        OtherElement = _secondElement.Element
-    };
+
+    public ElementModel GetFirstElement() {
+        throw new NotSupportedException();
+    }
+
+    public ElementModel GetSecondElement() {
+        return _secondElement.Element;
+    }
+
+    public ICollection<ElementModel> GetElements() {
+        return [GetSecondElement()];
+    }
 
     public bool Equals(ImaginarySecondClashViewModel other) {
         if(other is null) { return false; }
@@ -74,13 +82,6 @@ internal class ImaginarySecondClashViewModel
 
     public override bool Equals(object obj) {
         return Equals(obj as ImaginarySecondClashViewModel);
-    }
-
-    public ClashModel GetClashModel() {
-        return new ClashModel() {
-            ClashStatus = ClashStatus.Imaginary,
-            OtherElement = _secondElement.Element
-        };
     }
 
     public override int GetHashCode() {

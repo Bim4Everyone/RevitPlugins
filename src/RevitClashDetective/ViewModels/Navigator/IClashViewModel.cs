@@ -1,3 +1,5 @@
+using System.Collections.Generic;
+
 using RevitClashDetective.Models.Clashes;
 
 namespace RevitClashDetective.ViewModels.Navigator;
@@ -51,11 +53,21 @@ internal interface IClashViewModel {
     /// </summary>
     double SecondElementVolume { get; }
 
-    ClashModel Clash { get; }
+    /// <summary>
+    /// Первый элемент, участвующий в коллизии
+    /// </summary>
+    /// <exception cref="System.NotSupportedException">Исключение, если первого элемента нет</exception>
+    ElementModel GetFirstElement();
 
     /// <summary>
-    /// Возвращает обновленную модель коллизии
+    /// Второй элемент, участвующий в коллизии
+    /// </summary>
+    /// <exception cref="System.NotSupportedException">Исключение, если первого второго нет</exception>
+    ElementModel GetSecondElement();
+
+    /// <summary>
+    /// Возвращает все элементы, участвующие в коллизии
     /// </summary>
     /// <returns></returns>
-    ClashModel GetClashModel();
+    ICollection<ElementModel> GetElements();
 }

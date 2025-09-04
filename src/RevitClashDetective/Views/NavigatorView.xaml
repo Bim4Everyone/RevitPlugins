@@ -90,25 +90,41 @@
         </DockPanel>
 
         <DockPanel Grid.Row="1"
-                   Margin="0 5">
-            <TextBlock Text="Общее пересечение выборки 1: " />
+                   Margin="0 5"
+                   VerticalAlignment="Center">
+            <TextBlock Text="Общее пересечение выборки 1: " 
+                       VerticalAlignment="Center"/>
             <TextBlock FontWeight="Bold"
+                       VerticalAlignment="Center"
                        Text="{Binding SelectedReport.FirstIntersectionPercentage}" />
             <TextBlock Text="%"
                        FontWeight="Bold"
-                       Margin="3 0 20 0" />
-            <TextBlock Text="Общее пересечение выборки 2: " />
+                       Margin="3 0 20 0" 
+                       VerticalAlignment="Center"/>
+            <TextBlock Text="Общее пересечение выборки 2: "
+                       VerticalAlignment="Center" />
             <TextBlock FontWeight="Bold"
+                       VerticalAlignment="Center"
                        Text="{Binding SelectedReport.SecondIntersectionPercentage}" />
             <TextBlock Text="%"
                        FontWeight="Bold"
+                       VerticalAlignment="Center"
                        Margin="3 0 0 0" />
+            <dxe:CheckEdit Margin="20 0 0 0"
+                           EditValue="{Binding SelectedReport.ShowImaginaryClashes}"
+                           Content="Учитывать элементы, не участвующие в коллизиях"
+                           VerticalAlignment="Center">
+                <mvvm:Interaction.Triggers>
+                    <mvvm:EventToCommand EventName="EditValueChanged"
+                                         Command="{Binding SelectedReport.ShowImaginaryClashesChangedCommand}" />
+                </mvvm:Interaction.Triggers>
+            </dxe:CheckEdit>
         </DockPanel>
 
         <dxg:GridControl Name="_dg"
                          Grid.Row="2"
                          AllowCollectionView="False"
-                         ItemsSource="{Binding SelectedReport.Clashes}">
+                         ItemsSource="{Binding SelectedReport.GuiClashes}">
 
             <dxg:GridControl.GroupSummary>
                 <dxg:GridSummaryItem SummaryType="Count" />

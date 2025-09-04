@@ -10,19 +10,20 @@ using dosymep.SimpleServices;
 using RevitClashDetective.Models;
 using RevitClashDetective.Models.Clashes;
 using RevitClashDetective.Models.Interfaces;
+using RevitClashDetective.ViewModels.Navigator;
 
 namespace RevitClashDetective.Services.RevitViewSettings;
 
 internal class ClashIsolationViewSettings : IView3DSetting {
     private readonly RevitRepository _revitRepository;
     private readonly ILocalizationService _localizationService;
-    private readonly ClashModel _clashModel;
+    private readonly IClashViewModel _clashModel;
     private readonly SettingsConfig _config;
 
     public ClashIsolationViewSettings(
         RevitRepository revitRepository,
         ILocalizationService localizationService,
-        ClashModel clashModel,
+        IClashViewModel clashModel,
         SettingsConfig config) {
         _revitRepository = revitRepository ?? throw new ArgumentNullException(nameof(revitRepository));
         _localizationService = localizationService ?? throw new ArgumentNullException(nameof(localizationService));
@@ -32,16 +33,14 @@ internal class ClashIsolationViewSettings : IView3DSetting {
 
 
     public void Apply(View3D view3D) {
-        var bboxSettings = new BboxViewSettings(_revitRepository,
-            [_clashModel.MainElement, _clashModel.OtherElement],
-            10);
+        var bboxSettings = new BboxViewSettings(_revitRepository, _clashModel.GetElements(), 10);
         bboxSettings.Apply(view3D);
         IsolateClashElements(view3D, _clashModel);
         var colorSettings = new ColorClashViewSettings(_revitRepository, _localizationService, _clashModel, _config);
         colorSettings.Apply(view3D);
     }
 
-    private void IsolateClashElements(View3D view, ClashModel clash) {
+    private void IsolateClashElements(View3D view, IClashViewModel clash) {
         using(Transaction t = _revitRepository.Doc.StartTransaction(
             _localizationService.GetLocalizedString("Transactions.IsolateClashElements"))) {
             var filtersToHide = GetIsolationFilters(clash, view);
@@ -57,19 +56,18 @@ internal class ClashIsolationViewSettings : IView3DSetting {
         }
     }
 
+    private ICollection<ParameterFilterElement> GetIsolationFilters(IClashViewModel clash, View view) {
 
-
-    private ICollection<ParameterFilterElement> GetIsolationFilters(ClashModel clash, View view) {
         string username = _revitRepository.Doc.Application.Username;
         var filters = new List<ParameterFilterElement>() {
                 _revitRepository.ParameterFilterProvider.GetExceptCategoriesFilter(
                     _revitRepository.Doc,
                     view,
-                    GetClashCategories(clash),
+                    GetCategories(clash.GetElements()),
                     _localizationService.GetLocalizedString("Filters.NotCollisionCategories", username))
             };
-        var firstEl = clash.MainElement.GetElement(_revitRepository.DocInfos);
-        var secondEl = clash.OtherElement.GetElement(_revitRepository.DocInfos);
+        var firstEl = GetFirstElement(clash)?.GetElement(_revitRepository.DocInfos);
+        var secondEl = GetSecondElement(clash)?.GetElement(_revitRepository.DocInfos);
         if(firstEl?.Category.GetBuiltInCategory() == secondEl?.Category.GetBuiltInCategory()) {
             filters.Add(
                 _revitRepository.ParameterFilterProvider.GetHighlightFilter(
@@ -96,8 +94,23 @@ internal class ClashIsolationViewSettings : IView3DSetting {
         return filters;
     }
 
-    private ICollection<BuiltInCategory> GetClashCategories(ClashModel clash) {
-        var elements = new[] { clash.MainElement, clash.OtherElement };
+    private ElementModel GetFirstElement(IClashViewModel clash) {
+        try {
+            return clash.GetFirstElement();
+        } catch(NotSupportedException) {
+            return null;
+        }
+    }
+
+    private ElementModel GetSecondElement(IClashViewModel clash) {
+        try {
+            return clash.GetSecondElement();
+        } catch(NotSupportedException) {
+            return null;
+        }
+    }
+
+    private ICollection<BuiltInCategory> GetCategories(ICollection<ElementModel> elements) {
         return elements.Select(e => e.GetElement(_revitRepository.DocInfos))
             .Where(e => e != null)
             .Select(e => e.Category.GetBuiltInCategory())

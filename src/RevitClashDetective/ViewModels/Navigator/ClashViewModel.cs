@@ -100,6 +100,18 @@ namespace RevitClashDetective.ViewModels.Navigator {
             return Clash;
         }
 
+        public ElementModel GetFirstElement() {
+            return Clash.MainElement;
+        }
+
+        public ElementModel GetSecondElement() {
+            return Clash.OtherElement;
+        }
+
+        public ICollection<ElementModel> GetElements() {
+            return [GetFirstElement(), GetSecondElement()];
+        }
+
         public override bool Equals(object obj) {
             return Equals(obj as ClashViewModel);
         }

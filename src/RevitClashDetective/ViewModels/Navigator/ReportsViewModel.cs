@@ -44,7 +44,7 @@ namespace RevitClashDetective.ViewModels.Navigator {
             OpenClashDetectorCommand = RelayCommand.Create(OpenClashDetector, () => OpenFromClashDetector);
             LoadCommand = RelayCommand.Create(Load);
             DeleteCommand = RelayCommand.Create(Delete, CanDelete);
-            SelectClashCommand = RelayCommand.Create<ClashViewModel>(SelectClash, CanSelectClash);
+            SelectClashCommand = RelayCommand.Create<IClashViewModel>(SelectClash, CanSelectClash);
             SaveAllReportsCommand = RelayCommand.Create(SaveAllReports, CanSaveAllReports);
         }
 
@@ -152,18 +152,15 @@ namespace RevitClashDetective.ViewModels.Navigator {
             IView3DSetting settings;
             var config = SettingsConfig.GetSettingsConfig(GetPlatformService<IConfigSerializer>());
             if(ElementsIsolationEnabled) {
-                settings = new ClashIsolationViewSettings(_revitRepository, _localizationService, clash.Clash, config);
+                settings = new ClashIsolationViewSettings(_revitRepository, _localizationService, clash, config);
             } else {
-                settings = new ClashDefaultViewSettings(_revitRepository, _localizationService, clash.Clash, config);
+                settings = new ClashDefaultViewSettings(_revitRepository, _localizationService, clash, config);
             }
-            _revitRepository.SelectAndShowElement([clash.Clash.MainElement, clash.Clash.OtherElement], settings);
+            _revitRepository.SelectAndShowElement(clash.GetElements(), settings);
         }
 
         private bool CanSelectClash(IClashViewModel p) {
-            return p != null
-                && p.Clash != null
-                && p.Clash.MainElement != null
-                && p.Clash.OtherElement != null;
+            return p != null && p.GetElements().Count > 0;
         }
 
         private void SaveAllReports() {
