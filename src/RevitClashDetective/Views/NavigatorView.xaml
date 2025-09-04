@@ -168,9 +168,16 @@
                         </DataTemplate>
                     </dxg:GridColumn.CellTemplate>
                 </dxg:GridColumn>
-                
-                <dxg:GridColumn Header="Название"
-                                FieldName="ClashName"/>
+
+                <dxg:GridColumn Header="Название">
+                    <dxg:GridColumn.CellTemplate>
+                        <DataTemplate>
+                            <dxe:TextEdit ShowBorder="False"
+                                          EditValue="{Binding Row.ClashName, UpdateSourceTrigger=PropertyChanged}"
+                                          IsEnabled="{Binding Row.ClashStatus, Converter={StaticResource ClashStatusToBoolConverter}}" />
+                        </DataTemplate>
+                    </dxg:GridColumn.CellTemplate>
+                </dxg:GridColumn>
                 <dxg:GridColumn Header="Статус">
                     <dxg:GridColumn.CellTemplate>
                         <DataTemplate>
