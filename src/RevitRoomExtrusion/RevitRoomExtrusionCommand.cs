@@ -8,10 +8,11 @@ using Autodesk.Revit.DB;
 using Autodesk.Revit.UI;
 
 using dosymep.Bim4Everyone;
+using dosymep.Bim4Everyone.ProjectConfigs;
 using dosymep.Bim4Everyone.SimpleServices;
 using dosymep.SimpleServices;
-using dosymep.WPF.Views;
-using dosymep.Xpf.Core.Ninject;
+using dosymep.WpfCore.Ninject;
+using dosymep.WpfUI.Core.Ninject;
 
 using Ninject;
 
@@ -28,6 +29,10 @@ public class RevitRoomExtrusionCommand : BasePluginCommand {
 
     protected override void Execute(UIApplication uiApplication) {
         using var kernel = uiApplication.CreatePlatformServices();
+
+        // Используем сервис обновления тем для WinUI
+        kernel.UseWpfUIThemeUpdater();
+
         kernel.Bind<RevitRepository>()
             .ToSelf()
             .InSingletonScope();
@@ -44,27 +49,22 @@ public class RevitRoomExtrusionCommand : BasePluginCommand {
             .ToSelf()
             .InSingletonScope();
 
+        // Настройка конфигурации плагина
         kernel.Bind<PluginConfig>()
-            .ToMethod(c => PluginConfig.GetPluginConfig());
+            .ToMethod(c => PluginConfig.GetPluginConfig(c.Kernel.Get<IConfigSerializer>()));
 
-        kernel.Bind<MainViewModel>().ToSelf();
-        kernel.Bind<MainWindow>().ToSelf()
-            .WithPropertyValue(nameof(Window.DataContext),
-                c => c.Kernel.Get<MainViewModel>())
-            .WithPropertyValue(nameof(PlatformWindow.LocalizationService),
-                c => c.Kernel.Get<ILocalizationService>());
+        // Настройка запуска окон
+        kernel.BindMainWindow<MainViewModel, MainWindow>();
+        kernel.BindMainWindow<ErrorViewModel, ErrorWindow>();
 
-        kernel.Bind<ErrorViewModel>().ToSelf();
-        kernel.Bind<ErrorWindow>().ToSelf()
-            .WithPropertyValue(nameof(Window.DataContext),
-                c => c.Kernel.Get<ErrorViewModel>())
-            .WithPropertyValue(nameof(PlatformWindow.LocalizationService),
-                c => c.Kernel.Get<ILocalizationService>());
-
+        // Настройка локализации,
+        // получение имени сборки откуда брать текст
         string assemblyName = Assembly.GetExecutingAssembly().GetName().Name;
 
-        kernel.UseXtraLocalization(
-            $"/{assemblyName};component/Localization/Language.xaml",
+        // Настройка локализации,
+        // установка дефолтной локализации "ru-RU"
+        kernel.UseWpfLocalization(
+            $"/{assemblyName};component/assets/localization/Language.xaml",
             CultureInfo.GetCultureInfo("ru-RU"));
 
         var roomChecker = kernel.Get<RoomChecker>();
