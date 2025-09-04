@@ -15,8 +15,6 @@ internal class UserSelectionSettings : BaseViewModel {
 
     private bool _needWorkWithGeneralRebarView = false;
     private bool _needWorkWithGeneralPerpendicularRebarView = false;
-    private bool _needWorkWithTransverseRebarViewFirst = false;
-    private bool _needWorkWithTransverseRebarViewSecond = false;
     private bool _needWorkWithSkeletonSchedule = false;
     private bool _needWorkWithSkeletonByElemsSchedule = false;
 
@@ -73,16 +71,6 @@ internal class UserSelectionSettings : BaseViewModel {
     public bool NeedWorkWithGeneralPerpendicularRebarView {
         get => _needWorkWithGeneralPerpendicularRebarView;
         set => RaiseAndSetIfChanged(ref _needWorkWithGeneralPerpendicularRebarView, value);
-    }
-
-    public bool NeedWorkWithTransverseRebarViewFirst {
-        get => _needWorkWithTransverseRebarViewFirst;
-        set => RaiseAndSetIfChanged(ref _needWorkWithTransverseRebarViewFirst, value);
-    }
-
-    public bool NeedWorkWithTransverseRebarViewSecond {
-        get => _needWorkWithTransverseRebarViewSecond;
-        set => RaiseAndSetIfChanged(ref _needWorkWithTransverseRebarViewSecond, value);
     }
 
     public bool NeedWorkWithSkeletonSchedule {

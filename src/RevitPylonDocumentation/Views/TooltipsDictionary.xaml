@@ -386,6 +386,26 @@
     </Style>
 
     <Style
+        x:Key="TransRebarViewThirdPrefixStyle"
+        TargetType="{x:Type TextBlock}"
+        BasedOn="{StaticResource SettingsTooltipStyle}">
+
+        <Setter
+            Property="Text"
+            Value="Префикс - часть имени третьего горизонтального вида армирования пилона, которая должна идти перед указанием марки пилона.&#10;Например, в имени третьего горизонтального вида армирования пилона:&#10;&quot;Пилон 12.30.25-12⌀20-П1_Сеч.3-3&quot;,&#10;где &quot;12.30.25-12⌀20-П1&quot; - это марка пилона,&#10;&quot;Пилон &quot; - это префикс.&#10;Значит в этом окне вы должны записать: &quot;Пилон &quot;" />
+    </Style>
+
+    <Style
+        x:Key="TransRebarViewThirdSuffixStyle"
+        TargetType="{x:Type TextBlock}"
+        BasedOn="{StaticResource SettingsTooltipStyle}">
+
+        <Setter
+            Property="Text"
+            Value="Суффикс - часть имени третьего горизонтального вида армирования пилона, которая должна идти после указания марки пилона.&#10;Например, в имени третьего горизонтального вида армирования пилона:&#10;&quot;Пилон 12.30.25-12⌀20-П1_Сеч.3-3&quot;,&#10;где &quot;12.30.25-12⌀20-П1&quot; - это марка пилона,&#10;&quot;_Сеч.3-3&quot; - это суффикс.&#10;Значит в этом окне вы должны записать: &quot;_Сеч.3-3&quot;" />
+    </Style>
+
+    <Style
         x:Key="TransRebarViewSecondElevationStyle"
         TargetType="{x:Type TextBlock}"
         BasedOn="{StaticResource SettingsTooltipStyle}">

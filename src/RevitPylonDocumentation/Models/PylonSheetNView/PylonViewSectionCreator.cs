@@ -418,14 +418,21 @@ public class PylonViewSectionCreator {
         if(transverseRebarViewNum == 1) {
             // Располагаем сечение на высоте 1000 мм от низа BoundingBox (или по значению указанному пользователем)
             double elevationOffset = UnitUtilsHelper.ConvertToInternalValue(
-                                        double.Parse(ViewModel.ViewSectionSettings.TransverseRebarViewFirstElevation));
+                                        double.Parse(ViewModel.ViewSectionSettings.TransverseViewFirstElevation));
 
             sectionBoxMin = new XYZ(-coordinateX, -coordinateYToMin, -(minZ + elevationOffset - originPoint.Z));
             sectionBoxMax = new XYZ(coordinateX, coordinateYToMax, -(minZ + elevationOffset - viewDepth - originPoint.Z));
         } else if(transverseRebarViewNum == 2) {
+            // Располагаем сечение на высоте -1500 мм от верха BoundingBox (или по значению указанному пользователем)
+            double elevationOffset = UnitUtilsHelper.ConvertToInternalValue(
+                                    double.Parse(ViewModel.ViewSectionSettings.TransverseViewSecondElevation));
+
+            sectionBoxMin = new XYZ(-coordinateX, -coordinateYToMin, -(maxZ - elevationOffset - originPoint.Z));
+            sectionBoxMax = new XYZ(coordinateX, coordinateYToMax, -(maxZ - elevationOffset - viewDepth - originPoint.Z));
+        } else if(transverseRebarViewNum == 3) {
             // Располагаем сечение на высоте -300 мм от верха BoundingBox (или по значению указанному пользователем)
             double elevationOffset = UnitUtilsHelper.ConvertToInternalValue(
-                                    double.Parse(ViewModel.ViewSectionSettings.TransverseRebarViewSecondElevation));
+                                    double.Parse(ViewModel.ViewSectionSettings.TransverseViewThirdElevation));
 
             sectionBoxMin = new XYZ(-coordinateX, -coordinateYToMin, -(maxZ - elevationOffset - originPoint.Z));
             sectionBoxMax = new XYZ(coordinateX, coordinateYToMax, -(maxZ - elevationOffset - viewDepth - originPoint.Z));
@@ -463,6 +470,16 @@ public class PylonViewSectionCreator {
                         viewSection.ViewTemplateId = ViewModel.SelectedTransverseRebarViewTemplate.Id;
                     }
                     SheetInfo.TransverseViewSecondRebar.ViewElement = viewSection;
+
+                } else if(transverseRebarViewNum == 3) {
+                    viewSection.Name =
+                        ViewModel.ViewSectionSettings.TransverseRebarViewThirdPrefix
+                        + SheetInfo.PylonKeyName
+                        + ViewModel.ViewSectionSettings.TransverseRebarViewThirdSuffix;
+                    if(ViewModel.SelectedTransverseRebarViewTemplate != null) {
+                        viewSection.ViewTemplateId = ViewModel.SelectedTransverseRebarViewTemplate.Id;
+                    }
+                    SheetInfo.TransverseViewThirdRebar.ViewElement = viewSection;
                 }
             }
         } catch(Exception) {

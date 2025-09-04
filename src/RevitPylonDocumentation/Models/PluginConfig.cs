@@ -41,8 +41,6 @@ internal class PluginConfig : ProjectConfig<PluginSettings> {
         selectionSettings.NeedWorkWithLegend = settings.NeedWorkWithLegend;
         selectionSettings.NeedWorkWithGeneralRebarView = settings.NeedWorkWithGeneralRebarView;
         selectionSettings.NeedWorkWithGeneralPerpendicularRebarView = settings.NeedWorkWithGeneralPerpendicularRebarView;
-        selectionSettings.NeedWorkWithTransverseRebarViewFirst = settings.NeedWorkWithTransverseRebarViewFirst;
-        selectionSettings.NeedWorkWithTransverseRebarViewSecond = settings.NeedWorkWithTransverseRebarViewSecond;
         selectionSettings.NeedWorkWithSkeletonSchedule = settings.NeedWorkWithSkeletonSchedule;
         selectionSettings.NeedWorkWithSkeletonByElemsSchedule = settings.NeedWorkWithSkeletonByElemsSchedule;
 
@@ -159,14 +157,10 @@ internal class PluginConfig : ProjectConfig<PluginSettings> {
         viewSectionSettings.TransverseRebarViewFirstPrefixTemp = settings.TransverseRebarViewFirstPrefix;
         viewSectionSettings.TransverseRebarViewFirstSuffix = settings.TransverseRebarViewFirstSuffix;
         viewSectionSettings.TransverseRebarViewFirstSuffixTemp = settings.TransverseRebarViewFirstSuffix;
-        viewSectionSettings.TransverseRebarViewFirstElevation = settings.TransverseRebarViewFirstElevation;
-        viewSectionSettings.TransverseRebarViewFirstElevationTemp = settings.TransverseRebarViewFirstElevation;
         viewSectionSettings.TransverseRebarViewSecondPrefix = settings.TransverseRebarViewSecondPrefix;
         viewSectionSettings.TransverseRebarViewSecondPrefixTemp = settings.TransverseRebarViewSecondPrefix;
         viewSectionSettings.TransverseRebarViewSecondSuffix = settings.TransverseRebarViewSecondSuffix;
         viewSectionSettings.TransverseRebarViewSecondSuffixTemp = settings.TransverseRebarViewSecondSuffix;
-        viewSectionSettings.TransverseRebarViewSecondElevation = settings.TransverseRebarViewSecondElevation;
-        viewSectionSettings.TransverseRebarViewSecondElevationTemp = settings.TransverseRebarViewSecondElevation;
         viewSectionSettings.TransverseRebarViewTemplateName = settings.TransverseRebarViewTemplateName;
         viewSectionSettings.TransverseRebarViewTemplateNameTemp = settings.TransverseRebarViewTemplateName;
 
@@ -259,8 +253,6 @@ internal class PluginConfig : ProjectConfig<PluginSettings> {
         settings.NeedWorkWithLegend = selectionSettings.NeedWorkWithLegend;
         settings.NeedWorkWithGeneralRebarView = selectionSettings.NeedWorkWithGeneralRebarView;
         settings.NeedWorkWithGeneralPerpendicularRebarView = selectionSettings.NeedWorkWithGeneralPerpendicularRebarView;
-        settings.NeedWorkWithTransverseRebarViewFirst = selectionSettings.NeedWorkWithTransverseRebarViewFirst;
-        settings.NeedWorkWithTransverseRebarViewSecond = selectionSettings.NeedWorkWithTransverseRebarViewSecond;
         settings.NeedWorkWithSkeletonSchedule = selectionSettings.NeedWorkWithSkeletonSchedule;
         settings.NeedWorkWithSkeletonByElemsSchedule = selectionSettings.NeedWorkWithSkeletonByElemsSchedule;
 
@@ -322,10 +314,8 @@ internal class PluginConfig : ProjectConfig<PluginSettings> {
         settings.TransverseRebarViewDepth = viewSectionSettings.TransverseRebarViewDepth;
         settings.TransverseRebarViewFirstPrefix = viewSectionSettings.TransverseRebarViewFirstPrefix;
         settings.TransverseRebarViewFirstSuffix = viewSectionSettings.TransverseRebarViewFirstSuffix;
-        settings.TransverseRebarViewFirstElevation = viewSectionSettings.TransverseRebarViewFirstElevation;
         settings.TransverseRebarViewSecondPrefix = viewSectionSettings.TransverseRebarViewSecondPrefix;
         settings.TransverseRebarViewSecondSuffix = viewSectionSettings.TransverseRebarViewSecondSuffix;
-        settings.TransverseRebarViewSecondElevation = viewSectionSettings.TransverseRebarViewSecondElevation;
 
         settings.TransverseViewTemplateName = viewSectionSettings.TransverseViewTemplateName;
         settings.TransverseRebarViewTemplateName = viewSectionSettings.TransverseRebarViewTemplateName;
@@ -388,8 +378,6 @@ internal class PluginSettings : ProjectSettings {
     public bool NeedWorkWithLegend { get; set; }
     public bool NeedWorkWithGeneralRebarView { get; set; }
     public bool NeedWorkWithGeneralPerpendicularRebarView { get; set; }
-    public bool NeedWorkWithTransverseRebarViewFirst { get; set; }
-    public bool NeedWorkWithTransverseRebarViewSecond { get; set; }
     public bool NeedWorkWithSkeletonSchedule { get; set; }
     public bool NeedWorkWithSkeletonByElemsSchedule { get; set; }
 
@@ -443,10 +431,8 @@ internal class PluginSettings : ProjectSettings {
     public string TransverseRebarViewDepth { get; set; }
     public string TransverseRebarViewFirstPrefix { get; set; }
     public string TransverseRebarViewFirstSuffix { get; set; }
-    public string TransverseRebarViewFirstElevation { get; set; }
     public string TransverseRebarViewSecondPrefix { get; set; }
     public string TransverseRebarViewSecondSuffix { get; set; }
-    public string TransverseRebarViewSecondElevation { get; set; }
     public string TransverseViewTemplateName { get; set; }
     public string TransverseRebarViewTemplateName { get; set; }
     public string TransverseViewXOffset { get; set; }

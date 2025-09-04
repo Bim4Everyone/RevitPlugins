@@ -37,10 +37,10 @@ internal class UserViewSectionSettings : BaseViewModel {
     private string _transverseRebarViewDepthTemp = "1200";
     private string _transverseRebarViewFirstPrefixTemp = "Каркас ";
     private string _transverseRebarViewFirstSuffixTemp = "_Сеч.а-а";
-    private string _transverseRebarViewFirstElevationTemp = "1000";
     private string _transverseRebarViewSecondPrefixTemp = "Каркас ";
     private string _transverseRebarViewSecondSuffixTemp = "_Сеч.б-б";
-    private string _transverseRebarViewSecondElevationTemp = "600";
+    private string _transverseRebarViewThirdPrefixTemp = "Каркас ";
+    private string _transverseRebarViewThirdSuffixTemp = "_Сеч.в-в";
 
     private string _transverseViewTemplateNameTemp = "я_КЖ1.1_АРМ_РЗ_ГОР_Пилоны";
     private string _transverseRebarViewTemplateNameTemp = "я_КЖ1.1_АРМ_РЗ_ГОР_Пилоны_Каркас";
@@ -231,13 +231,6 @@ internal class UserViewSectionSettings : BaseViewModel {
         set => RaiseAndSetIfChanged(ref _transverseRebarViewFirstSuffixTemp, value);
     }
 
-    public string TransverseRebarViewFirstElevation { get; set; }
-    public string TransverseRebarViewFirstElevationTemp {
-        get => _transverseRebarViewFirstElevationTemp;
-        set => RaiseAndSetIfChanged(ref _transverseRebarViewFirstElevationTemp, value);
-    }
-
-
     public string TransverseRebarViewSecondPrefix { get; set; }
     public string TransverseRebarViewSecondPrefixTemp {
         get => _transverseRebarViewSecondPrefixTemp;
@@ -250,10 +243,16 @@ internal class UserViewSectionSettings : BaseViewModel {
         set => RaiseAndSetIfChanged(ref _transverseRebarViewSecondSuffixTemp, value);
     }
 
-    public string TransverseRebarViewSecondElevation { get; set; }
-    public string TransverseRebarViewSecondElevationTemp {
-        get => _transverseRebarViewSecondElevationTemp;
-        set => RaiseAndSetIfChanged(ref _transverseRebarViewSecondElevationTemp, value);
+    public string TransverseRebarViewThirdPrefix { get; set; }
+    public string TransverseRebarViewThirdPrefixTemp {
+        get => _transverseRebarViewThirdPrefixTemp;
+        set => RaiseAndSetIfChanged(ref _transverseRebarViewThirdPrefixTemp, value);
+    }
+
+    public string TransverseRebarViewThirdSuffix { get; set; }
+    public string TransverseRebarViewThirdSuffixTemp {
+        get => _transverseRebarViewThirdSuffixTemp;
+        set => RaiseAndSetIfChanged(ref _transverseRebarViewThirdSuffixTemp, value);
     }
 
     public string TransverseViewTemplateName { get; set; }
@@ -320,10 +319,10 @@ internal class UserViewSectionSettings : BaseViewModel {
         TransverseRebarViewDepth = TransverseRebarViewDepthTemp;
         TransverseRebarViewFirstPrefix = TransverseRebarViewFirstPrefixTemp;
         TransverseRebarViewFirstSuffix = TransverseRebarViewFirstSuffixTemp;
-        TransverseRebarViewFirstElevation = TransverseRebarViewFirstElevationTemp;
         TransverseRebarViewSecondPrefix = TransverseRebarViewSecondPrefixTemp;
         TransverseRebarViewSecondSuffix = TransverseRebarViewSecondSuffixTemp;
-        TransverseRebarViewSecondElevation = TransverseRebarViewSecondElevationTemp;
+        TransverseRebarViewThirdPrefix = TransverseRebarViewThirdPrefixTemp;
+        TransverseRebarViewThirdSuffix = TransverseRebarViewThirdSuffixTemp;
 
         TransverseViewTemplateName = TransverseViewTemplateNameTemp;
         TransverseRebarViewTemplateName = TransverseRebarViewTemplateNameTemp;
@@ -368,12 +367,6 @@ internal class UserViewSectionSettings : BaseViewModel {
         }
         if(!double.TryParse(ViewModel.ViewSectionSettings.TransverseViewThirdElevationTemp, out _)) {
             ViewModel.ErrorText = "Значение возвышения третьего горизонтального вида некорректно";
-        }
-        if(!double.TryParse(ViewModel.ViewSectionSettings.TransverseRebarViewFirstElevationTemp, out _)) {
-            ViewModel.ErrorText = "Значение возвышения первого горизонтального вида армирования некорректно";
-        }
-        if(!double.TryParse(ViewModel.ViewSectionSettings.TransverseRebarViewSecondElevationTemp, out _)) {
-            ViewModel.ErrorText = "Значение возвышения второго горизонтального вида армирования некорректно";
         }
     }
 }

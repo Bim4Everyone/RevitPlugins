@@ -32,6 +32,7 @@ internal class PylonSheetInfo : BaseViewModel {
         TransverseViewThird = new PylonView(ViewModel, Repository, this, AnnotationCreatorFactories.TransverseThird);
         TransverseViewFirstRebar = new PylonView(ViewModel, Repository, this, AnnotationCreatorFactories.TransverseRebarFirst);
         TransverseViewSecondRebar = new PylonView(ViewModel, Repository, this, AnnotationCreatorFactories.TransverseRebarSecond);
+        TransverseViewThirdRebar = new PylonView(ViewModel, Repository, this, AnnotationCreatorFactories.TransverseRebarSecond);
 
         SkeletonSchedule = new PylonView(ViewModel, Repository, this);
         SkeletonByElemsSchedule = new PylonView(ViewModel, Repository, this);
@@ -84,6 +85,7 @@ internal class PylonSheetInfo : BaseViewModel {
     public PylonView TransverseViewThird { get; set; }
     public PylonView TransverseViewFirstRebar { get; set; }
     public PylonView TransverseViewSecondRebar { get; set; }
+    public PylonView TransverseViewThirdRebar { get; set; }
 
 
 
@@ -204,6 +206,7 @@ internal class PylonSheetInfo : BaseViewModel {
         GeneralViewPerpendicularRebar.ViewName = ViewModel.ViewSectionSettings.GeneralRebarViewPerpendicularPrefix + PylonKeyName + ViewModel.ViewSectionSettings.GeneralRebarViewPerpendicularSuffix;
         TransverseViewFirstRebar.ViewName = ViewModel.ViewSectionSettings.TransverseRebarViewFirstPrefix + PylonKeyName + ViewModel.ViewSectionSettings.TransverseRebarViewFirstSuffix;
         TransverseViewSecondRebar.ViewName = ViewModel.ViewSectionSettings.TransverseRebarViewSecondPrefix + PylonKeyName + ViewModel.ViewSectionSettings.TransverseRebarViewSecondSuffix;
+        TransverseViewThirdRebar.ViewName = ViewModel.ViewSectionSettings.TransverseRebarViewThirdPrefix + PylonKeyName + ViewModel.ViewSectionSettings.TransverseRebarViewThirdSuffix;
 
         SkeletonSchedule.ViewName = ViewModel.SchedulesSettings.SkeletonSchedulePrefix + PylonKeyName + ViewModel.SchedulesSettings.SkeletonScheduleSuffix;
         SkeletonByElemsSchedule.ViewName = ViewModel.SchedulesSettings.SkeletonByElemsSchedulePrefix + PylonKeyName + ViewModel.SchedulesSettings.SkeletonByElemsScheduleSuffix;
@@ -309,6 +312,16 @@ internal class PylonSheetInfo : BaseViewModel {
 
                 // Получение центра и габаритов видового экрана
                 GetInfoAboutViewport(TransverseViewSecondRebar, viewport, true);
+                continue;
+            }
+
+            // TransverseRebarViewThird
+            if(TransverseViewThirdRebar.ViewElement is null && viewSection.Name.Equals(TransverseViewThirdRebar.ViewName)) {
+                TransverseViewThirdRebar.ViewElement = viewSection;
+                TransverseViewThirdRebar.ViewportElement = viewport;
+
+                // Получение центра и габаритов видового экрана
+                GetInfoAboutViewport(TransverseViewThirdRebar, viewport, true);
                 continue;
             }
         }

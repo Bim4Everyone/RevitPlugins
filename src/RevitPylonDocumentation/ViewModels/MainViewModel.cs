@@ -583,8 +583,6 @@ internal class MainViewModel : BaseViewModel {
         SelectionSettings.NeedWorkWithLegend = false;
         SelectionSettings.NeedWorkWithGeneralRebarView = false;
         SelectionSettings.NeedWorkWithGeneralPerpendicularRebarView = false;
-        SelectionSettings.NeedWorkWithTransverseRebarViewFirst = false;
-        SelectionSettings.NeedWorkWithTransverseRebarViewSecond = false;
         SelectionSettings.NeedWorkWithSkeletonSchedule = false;
         SelectionSettings.NeedWorkWithSkeletonByElemsSchedule = false;
 
@@ -1040,8 +1038,6 @@ internal class MainViewModel : BaseViewModel {
         SelectionSettings.NeedWorkWithLegend = true;
         SelectionSettings.NeedWorkWithGeneralRebarView = true;
         SelectionSettings.NeedWorkWithGeneralPerpendicularRebarView = true;
-        SelectionSettings.NeedWorkWithTransverseRebarViewFirst = true;
-        SelectionSettings.NeedWorkWithTransverseRebarViewSecond = true;
         SelectionSettings.NeedWorkWithSkeletonSchedule = true;
         SelectionSettings.NeedWorkWithSkeletonByElemsSchedule = true;
     }
@@ -1063,8 +1059,6 @@ internal class MainViewModel : BaseViewModel {
         SelectionSettings.NeedWorkWithLegend = false;
         SelectionSettings.NeedWorkWithGeneralRebarView = false;
         SelectionSettings.NeedWorkWithGeneralPerpendicularRebarView = false;
-        SelectionSettings.NeedWorkWithTransverseRebarViewFirst = false;
-        SelectionSettings.NeedWorkWithTransverseRebarViewSecond = false;
         SelectionSettings.NeedWorkWithSkeletonSchedule = false;
         SelectionSettings.NeedWorkWithSkeletonByElemsSchedule = false;
     }
@@ -1086,8 +1080,6 @@ internal class MainViewModel : BaseViewModel {
         SelectionSettings.NeedWorkWithLegend = !SelectionSettings.NeedWorkWithLegend;
         SelectionSettings.NeedWorkWithGeneralRebarView = !SelectionSettings.NeedWorkWithGeneralRebarView;
         SelectionSettings.NeedWorkWithGeneralPerpendicularRebarView = !SelectionSettings.NeedWorkWithGeneralPerpendicularRebarView;
-        SelectionSettings.NeedWorkWithTransverseRebarViewFirst = !SelectionSettings.NeedWorkWithTransverseRebarViewFirst;
-        SelectionSettings.NeedWorkWithTransverseRebarViewSecond = !SelectionSettings.NeedWorkWithTransverseRebarViewSecond;
         SelectionSettings.NeedWorkWithSkeletonSchedule = !SelectionSettings.NeedWorkWithSkeletonSchedule;
         SelectionSettings.NeedWorkWithSkeletonByElemsSchedule = !SelectionSettings.NeedWorkWithSkeletonByElemsSchedule;
     }
