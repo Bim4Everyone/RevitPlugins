@@ -34,7 +34,7 @@ internal class UserProjectSettings : BaseViewModel {
     private string _dimensionTypeNameTemp = "я_Основной_Плагин_2.5 мм";
     private string _spotDimensionTypeNameTemp = "Стрелка_Проектная_Верх";
 
-    private string _skeletonTagTypeNameTemp = "Изделие_Марка - Полка 20";
+    private string _skeletonTagTypeNameTemp = "Изделие_Марка - Полка 7";
     private string _rebarTagTypeWithSerifNameTemp = "Поз., Диаметр / Шаг - Полка 10, Засечка";
     private string _rebarTagTypeWithStepNameTemp = "Поз., Диаметр / Шаг - Полка 10";
     private string _rebarTagTypeWithCommentNameTemp = "Поз., Диаметр / Комментарий - Полка 10";
