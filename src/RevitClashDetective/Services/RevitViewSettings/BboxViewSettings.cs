@@ -21,8 +21,7 @@ internal class BboxViewSettings : IView3DSetting {
     /// </summary>
     /// <param name="revitRepository">Репозиторий</param>
     /// <param name="elements">Элементы, по которым надо сделать 3D подрезку</param>
-    /// <param name="additionalSize">Добавочный размер в футах, 
-    /// на который нужно увеличить бокс в каждом направлении: OX, OY, OZ</param>
+    /// <param name="config">Настройки</param>
     /// <exception cref="System.ArgumentNullException"></exception>
     /// <exception cref="System.ArgumentOutOfRangeException"></exception>
     public BboxViewSettings(
