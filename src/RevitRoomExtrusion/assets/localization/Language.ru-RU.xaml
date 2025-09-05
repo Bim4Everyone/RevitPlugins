@@ -35,6 +35,10 @@
     <system:String x:Key="MainWindow.ExtrusionHeightMmTooltip">Высота в миллиметрах, от чистого пола</system:String>
     <system:String x:Key="MainWindow.FamilyName">Введите имя семейства</system:String>
     <system:String x:Key="MainWindow.FamilyNameTooltip">Используется в наименовании загружаемого семейства</system:String>
+    <system:String x:Key="MainWindow.JoinExtrusion">Объединить выдавливания</system:String>
+    <system:String x:Key="MainWindow.JoinExtrusionTooltip">Соприкасающиеся выдавливания будут объединены</system:String>
+    <system:String x:Key="MainWindow.OnContent">Включено</system:String>
+    <system:String x:Key="MainWindow.OffContent">Выключено</system:String>
     <system:String x:Key="MainWindow.HeightError">Высота должна быть числом</system:String>
     <system:String x:Key="MainWindow.HeightErrorNegative">Высота должна быть положительной</system:String>
     <system:String x:Key="MainWindow.HeightErrorZero">Высота должна быть больше нуля</system:String>

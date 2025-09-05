@@ -13,9 +13,9 @@
     mc:Ignorable="d"
     WindowStartupLocation="CenterOwner"
     Title="{me:LocalizationSource MainWindow.Title}"
-    Height="280"
+    Height="360"
     Width="550"
-    MinHeight="280"
+    MinHeight="360"
     MinWidth="550">
     
     <Window.Resources>
@@ -109,6 +109,34 @@
                         Grid.Column="1"
                         Width="200"
                         Text="{Binding ExtrusionFamilyName, UpdateSourceTrigger=PropertyChanged}" />
+                </Grid>
+            </Border>
+            <Border
+                Style="{StaticResource CustomBorder}"
+                Height="65">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition
+                            Width="300" />
+                        <ColumnDefinition
+                            Width="Auto" />
+                    </Grid.ColumnDefinitions>
+                    <StackPanel
+                        Grid.Column="0">
+                        <Label
+                            VerticalAlignment="Center"
+                            Content="{me:LocalizationSource MainWindow.JoinExtrusion}" />
+                        <Label
+                            FontSize="10"
+                            VerticalAlignment="Center"
+                            Content="{me:LocalizationSource MainWindow.JoinExtrusionTooltip}" />
+                    </StackPanel>
+                    <ui:ToggleSwitch
+                        Grid.Column="1"
+                        HorizontalAlignment="Left"
+                        IsChecked="{Binding IsJoinExtrusionChecked, UpdateSourceTrigger=PropertyChanged}"
+                        OnContent="{me:LocalizationSource MainWindow.OnContent}"
+                        OffContent="{me:LocalizationSource MainWindow.OffContent}" />
                 </Grid>
             </Border>
         </StackPanel>
