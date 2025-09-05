@@ -20,6 +20,9 @@ public class PylonViewSectionPlacer {
     // Смещение по вертикали в дюймах снизу, для размещаемых компонентов листа требуемое, чтобы они попали на лист
     private readonly double _titleBlockFrameBottomOffset = UnitUtilsHelper.ConvertToInternalValue(15);
 
+    // Отступ между видовыми экранами в дюймах, для корректного взаимного размещения 
+    private readonly double _viewportOffset = UnitUtilsHelper.ConvertToInternalValue(10);
+
 
     internal PylonViewSectionPlacer(MainViewModel mvm, RevitRepository repository, PylonSheetInfo pylonSheetInfo) {
         ViewModel = mvm;
@@ -274,7 +277,6 @@ public class PylonViewSectionPlacer {
         return true;
     }
 
-
     internal bool PlaceTransverseSecondViewPort() {
         // Проверяем вдруг вид не создался
         if(SheetInfo.TransverseViewSecond.ViewElement == null) {
@@ -311,7 +313,8 @@ public class PylonViewSectionPlacer {
         if(refPylonView != null) {
             newCenterX = refPylonView.ViewportCenter.X;
             newCenterY = refPylonView.ViewportCenter.Y + refPylonView.ViewportHalfHeight
-                                                       + SheetInfo.TransverseViewSecond.ViewportHalfHeight;
+                                                       + SheetInfo.TransverseViewSecond.ViewportHalfHeight
+                                                       + _viewportOffset;
         }
         var newCenter = new XYZ(newCenterX, newCenterY, 0);
 
@@ -319,7 +322,6 @@ public class PylonViewSectionPlacer {
         SheetInfo.TransverseViewSecond.ViewportCenter = newCenter;
         return true;
     }
-
 
     internal bool PlaceTransverseThirdViewPort() {
         // Проверяем вдруг вид не создался
@@ -356,8 +358,9 @@ public class PylonViewSectionPlacer {
 
         if(refPylonView != null) {
             newCenterX = refPylonView.ViewportCenter.X + refPylonView.ViewportHalfWidth
-                                                       + SheetInfo.TransverseViewThird.ViewportHalfWidth;
-            newCenterY = refPylonView.ViewportCenter.Y;
+                                                       + SheetInfo.TransverseViewThird.ViewportHalfWidth
+                                                       + _viewportOffset;
+            newCenterY = SheetInfo.TransverseViewThird.ViewportHalfHeight + _titleBlockFrameBottomOffset;
         }
         var newCenter = new XYZ(newCenterX, newCenterY, 0);
 
@@ -413,7 +416,6 @@ public class PylonViewSectionPlacer {
         return true;
     }
 
-
     internal bool PlaceTransverseRebarSecondViewPort() {
         // Проверяем вдруг вид не создался
         if(SheetInfo.TransverseViewSecondRebar.ViewElement == null) {
@@ -452,7 +454,8 @@ public class PylonViewSectionPlacer {
         if(refPylonView != null) {
             newCenterX = refPylonView.ViewportCenter.X;
             newCenterY = refPylonView.ViewportCenter.Y + refPylonView.ViewportHalfHeight
-                                                       + SheetInfo.TransverseViewSecondRebar.ViewportHalfHeight;
+                                                       + SheetInfo.TransverseViewSecondRebar.ViewportHalfHeight
+                                                       + _viewportOffset;
         }
         var newCenter = new XYZ(newCenterX, newCenterY, 0);
 
@@ -500,8 +503,9 @@ public class PylonViewSectionPlacer {
 
         if(refPylonView != null) {
             newCenterX = refPylonView.ViewportCenter.X + refPylonView.ViewportHalfWidth 
-                                                       + SheetInfo.TransverseViewThirdRebar.ViewportHalfWidth;
-            newCenterY = refPylonView.ViewportCenter.Y;
+                                                       + SheetInfo.TransverseViewThirdRebar.ViewportHalfWidth
+                                                       + _viewportOffset;
+            newCenterY = SheetInfo.TransverseViewThirdRebar.ViewportHalfHeight + _titleBlockFrameBottomOffset;
         }
         var newCenter = new XYZ(newCenterX, newCenterY, 0);
 
