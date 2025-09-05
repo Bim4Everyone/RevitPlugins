@@ -28,7 +28,7 @@ internal class PrintOptions {
     public bool HideCropBoundaries { get; set; } = true;
     public bool ReplaceHalftoneWithThinLines { get; set; }
 
-    public void SetupPrintParams(PrintParameters printParameters) {
+    public void Apply(PrintParameters printParameters) {
         printParameters.ZoomType = ZoomType;
         if(ZoomType == ZoomType.Zoom) {
             printParameters.Zoom = Zoom;

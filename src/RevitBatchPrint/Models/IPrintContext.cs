@@ -5,6 +5,6 @@ using RevitBatchPrint.ViewModels;
 namespace RevitBatchPrint.Models;
 
 internal interface IPrintContext {
-    void ExecutePrintExport(IEnumerable<SheetViewModel> sheets);
-    bool CanExecutePrintExport(IEnumerable<SheetViewModel> sheets);
+    void Print(IEnumerable<SheetViewModel> sheets);
+    bool CanPrint(IEnumerable<SheetViewModel> sheets);
 }

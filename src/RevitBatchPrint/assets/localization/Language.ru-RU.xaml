@@ -5,6 +5,9 @@
     <system:String x:Key="MainWindow.Title">Пакетная печать</system:String>
 
     <system:String x:Key="MainWindow.AlbumHintText">Выберите параметр группировки листов</system:String>
+    <system:String x:Key="MainWindow.PrintHintText">Выберите принтер из списка</system:String>
+    <system:String x:Key="MainWindow.FilePathHintText">Выберите путь для экспорта PDF-файла</system:String>
+    
     <system:String x:Key="MainWindow.SearchHintText">Поиск</system:String>
     <system:String x:Key="MainWindow.EmptyAlbumNameParam">Без имени</system:String>
     <system:String x:Key="MainWindow.ChooseFileName">Выберите файл для сохранения</system:String>
@@ -14,7 +17,10 @@
     <system:String x:Key="MainWindow.ExportMode">Режим экспорта</system:String>
 
     <system:String x:Key="MainWindow.PrintCommandName">Печать</system:String>
+    <system:String x:Key="MainWindow.PrintCommandTooltip">Печатает листы в контексте отображения</system:String>
+    
     <system:String x:Key="MainWindow.ExportCommandName">Экспорт</system:String>
+    <system:String x:Key="MainWindow.ExportCommandTooltip">Экспорт листов в контексте отображения</system:String>
 
     <system:String x:Key="MainWindow.ButtonOk">ОК</system:String>
     <system:String x:Key="MainWindow.ButtonCancel">Отмена</system:String>
@@ -22,6 +28,8 @@
     <system:String x:Key="MainWindow.NotSelectedAlbumParamName">Выберите параметр группировки альбома</system:String>
     <system:String x:Key="MainWindow.NotSelectedPrinter">Выберите принтер для печати</system:String>
     <system:String x:Key="MainWindow.NotSelectedFilePath">Выберите путь до файла для экспорта</system:String>
+    <system:String x:Key="MainWindow.FilePathNotPdf">Пожалуйста, укажите путь к PDF файлу для экспорта (например, C:\Documents\file.pdf)</system:String>
+    <system:String x:Key="MainWindow.FilePathNotRooted">Пожалуйста, укажите полный путь к файлу (например, C:\Documents\file.pdf)</system:String>
     <system:String x:Key="MainWindow.NotSelectedAlbumSheets">Выберите листы для печати или экспорта</system:String>
 
     <system:String x:Key="Settings.PrintSettings">Настройки Печати</system:String>

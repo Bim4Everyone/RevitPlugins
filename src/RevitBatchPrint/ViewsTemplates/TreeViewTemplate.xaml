@@ -72,6 +72,7 @@
                 <ColumnDefinition Width="Auto" />
                 <ColumnDefinition Width="*" />
                 <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="Auto" />
             </Grid.ColumnDefinitions>
 
             <CheckBox
@@ -130,30 +131,12 @@
                     VerticalAlignment="Center"
                     Text="{Binding PrintSheetSettings.SheetFormat.Name}" />
 
-                <ui:SymbolIcon
-                    Symbol="Warning24"
-                    Margin="12 0 0 0"
-                    VerticalAlignment="Center"
-                    ToolTip="{Binding ViewsWithoutCropText, Mode=OneWay}">
-
-                    <ui:SymbolIcon.Style>
-                        <Style TargetType="ui:SymbolIcon">
-                            <Setter Property="Visibility" Value="Visible" />
-
-                            <Style.Triggers>
-                                <DataTrigger Binding="{Binding ViewsWithoutCrop.Count}" Value="0">
-                                    <Setter Property="Visibility" Value="Collapsed" />
-                                </DataTrigger>
-                            </Style.Triggers>
-                        </Style>
-                    </ui:SymbolIcon.Style>
-                </ui:SymbolIcon>
             </StackPanel>
 
             <StackPanel
                 Grid.Column="3"
                 x:Name="Buttons"
-                Margin="0 0 12 0"
+                Margin="0 0 8 0"
                 Orientation="Horizontal"
                 HorizontalAlignment="Right"
                 Style="{StaticResource ButtonStackPanel}">
@@ -161,19 +144,42 @@
                 <ui:Button
                     Icon="{ui:SymbolIcon Print24}"
                     Style="{StaticResource TreeItemButtonStyle}"
-                    Command="{Binding PrintExportCommand}"
+                    ToolTip="{DynamicResource MainWindow.PrintCommandTooltip}"
+                    Command="{Binding PrintCommand}"
                     Visibility="{Binding DataContext.ShowPrint,
                         RelativeSource={RelativeSource AncestorType=Window},
                         Converter={StaticResource ExportVisibilityConverter}}" />
 
                 <ui:Button
+                    Margin="8 0 8 0"
                     Icon="{ui:SymbolIcon DocumentArrowDown20}"
                     Style="{StaticResource TreeItemButtonStyle}"
-                    Command="{Binding PrintExportCommand}"
+                    ToolTip="{DynamicResource MainWindow.ExportCommandTooltip}"
+                    Command="{Binding ExportCommand}"
                     Visibility="{Binding DataContext.ShowExport,
                         RelativeSource={RelativeSource AncestorType=Window},
                         Converter={StaticResource ExportVisibilityConverter}}" />
             </StackPanel>
+
+            <ui:SymbolIcon
+                Grid.Column="4"
+                Symbol="Warning24"
+                Margin="0 0 8 0"
+                VerticalAlignment="Center"
+                ToolTip="{Binding ViewsWithoutCropText, Mode=OneWay}">
+
+                <ui:SymbolIcon.Style>
+                    <Style TargetType="ui:SymbolIcon">
+                        <Setter Property="Visibility" Value="Visible" />
+
+                        <Style.Triggers>
+                            <DataTrigger Binding="{Binding ViewsWithoutCrop.Count}" Value="0">
+                                <Setter Property="Visibility" Value="Collapsed" />
+                            </DataTrigger>
+                        </Style.Triggers>
+                    </Style>
+                </ui:SymbolIcon.Style>
+            </ui:SymbolIcon>
         </Grid>
 
         <HierarchicalDataTemplate.Triggers>
@@ -182,7 +188,7 @@
                 Binding="{Binding Path=IsMouseOver,
                     RelativeSource={RelativeSource AncestorType=TreeViewItem}}">
                 <Setter TargetName="Buttons" Property="Visibility" Value="Visible" />
-                <Setter TargetName="FormatName" Property="Margin" Value="0 0 58 0" />
+                <Setter TargetName="FormatName" Property="Margin" Value="0 0 115 0" />
             </DataTrigger>
         </HierarchicalDataTemplate.Triggers>
 

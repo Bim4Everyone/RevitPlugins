@@ -74,49 +74,15 @@
             Title="{me:LocalizationSource MainWindow.Title}">
 
             <ui:TitleBar.TrailingContent>
-                <StackPanel
+                <ui:ToggleSwitch
+                    x:Name="_settingsSwitch"
+                    IsChecked="False"
                     Margin="8,5"
                     VerticalAlignment="Top"
-                    Orientation="Horizontal">
-
-                    <ui:ToggleSwitch
-                        Margin="8 0"
-                        Style="{StaticResource CustomToggleSwitchStyle}"
-                        Visibility="{Binding SupportExport, 
-                            ElementName=_this,
-                            Converter={StaticResource BoolToVisibilityConverter}}">
-
-                        <ui:ToggleSwitch.OnContent>
-                            <ui:SymbolIcon
-                                FontSize="20"
-                                Symbol="DocumentArrowDown20"
-                                ToolTip="{me:LocalizationSource MainWindow.ExportMode}" />
-                        </ui:ToggleSwitch.OnContent>
-
-                        <ui:ToggleSwitch.OffContent>
-                            <ui:SymbolIcon
-                                FontSize="20"
-                                Symbol="Print48"
-                                ToolTip="{me:LocalizationSource MainWindow.PrintMode}" />
-                        </ui:ToggleSwitch.OffContent>
-
-                        <b:Interaction.Triggers>
-                            <b:EventTrigger
-                                EventName="Click">
-                                <b:InvokeCommandAction
-                                    Command="{Binding ChangeModeCommand}" />
-                            </b:EventTrigger>
-                        </b:Interaction.Triggers>
-                    </ui:ToggleSwitch>
-
-                    <ui:ToggleSwitch
-                        x:Name="_settingsSwitch"
-                        IsChecked="False"
-                        ToolTip="{me:LocalizationSource MainWindow.Settings}"
-                        OnContent="{ui:SymbolIcon Settings48, Filled=True, FontSize=20}"
-                        OffContent="{ui:SymbolIcon Settings48, Filled=False, FontSize=20}"
-                        Style="{StaticResource CustomToggleSwitchStyle}" />
-                </StackPanel>
+                    ToolTip="{me:LocalizationSource MainWindow.Settings}"
+                    OnContent="{ui:SymbolIcon Settings48, Filled=True, FontSize=20}"
+                    OffContent="{ui:SymbolIcon Settings48, Filled=False, FontSize=20}"
+                    Style="{StaticResource CustomToggleSwitchStyle}" />
             </ui:TitleBar.TrailingContent>
 
         </ui:TitleBar>
@@ -151,7 +117,7 @@
                 Width="80"
                 Appearance="Info"
                 Content="{me:LocalizationSource MainWindow.PrintCommandName}"
-                Command="{Binding AcceptVewCommand}"
+                Command="{Binding PrintCommand}"
                 CommandParameter="{Binding ElementName=_this}"
                 Visibility="{Binding ShowPrint,
                     Converter={StaticResource BoolToVisibilityConverter}}" />
@@ -161,7 +127,7 @@
                 Width="80"
                 Appearance="Info"
                 Content="{me:LocalizationSource MainWindow.ExportCommandName}"
-                Command="{Binding AcceptVewCommand}"
+                Command="{Binding ExportCommand}"
                 CommandParameter="{Binding ElementName=_this}"
                 Visibility="{Binding ShowExport,
                     Converter={StaticResource BoolToVisibilityConverter}}" />
