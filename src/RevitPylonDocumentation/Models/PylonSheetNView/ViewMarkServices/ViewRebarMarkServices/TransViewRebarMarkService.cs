@@ -95,7 +95,7 @@ internal class TransViewRebarMarkService {
     private void CreateLeftTopMark(List<Element> simpleRebars) {
         // Получаем референс-элемент
         var leftTopElement = _viewPointsAnalyzer.GetElementByDirection(simpleRebars, DirectionType.LeftTop, false);
-
+        var id = leftTopElement.Id;
         // Устанавливаем значение комментария у арматуры, к которой привяжем марку
         leftTopElement.SetParamValue(BuiltInParameter.ALL_MODEL_INSTANCE_COMMENTS, $"{simpleRebars.Count / 2} шт.");
 

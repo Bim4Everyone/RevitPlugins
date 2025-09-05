@@ -1,4 +1,6 @@
+using System;
 using System.Collections.Generic;
+using System.Windows.Media;
 
 using Autodesk.Revit.DB;
 
@@ -8,14 +10,15 @@ namespace RevitPylonDocumentation.Models.Services;
 public class ViewPointsAnalyzer {
     private readonly PylonView _viewOfPylon;
     private bool _checked;
-    private XYZ _cornerRightTopGlobal;
-    private XYZ _cornerLeftBottomGlobal;
-    private XYZ _cornerLeftTopGlobal;
-    private XYZ _cornerRightBottomGlobal;
-    private XYZ _quadrantTopGlobal;
-    private XYZ _quadrantRightGlobal;
-    private XYZ _quadrantBottomGlobal;
-    private XYZ _quadrantLeftGlobal;
+    private XYZ _cornerRightTopGlobalPlus;
+    private XYZ _cornerLeftBottomGlobalPlus;
+    private XYZ _cornerLeftTopGlobalPlus;
+    private XYZ _cornerRightBottomGlobalPlus;
+    private XYZ _center;
+    private XYZ _quadrantTopGlobalPlus;
+    private XYZ _quadrantRightGlobalPlus;
+    private XYZ _quadrantBottomGlobalPlus;
+    private XYZ _quadrantLeftGlobalPlus;
 
     public ViewPointsAnalyzer(PylonView pylonView) {
         _viewOfPylon = pylonView;
@@ -32,6 +35,8 @@ public class ViewPointsAnalyzer {
         var cornerLeftTopLocal = new XYZ(cornerLeftBottomLocal.X, cornerRightTopLocal.Y, 0);
         var cornerRightBottomLocal = new XYZ(cornerRightTopLocal.X, cornerLeftBottomLocal.Y, 0);
 
+        var center = (cornerRightTopLocal + cornerLeftBottomLocal) / 2;
+
         var quadrantTopLocal = (cornerLeftTopLocal + cornerRightTopLocal) / 2;
         var quadrantRightLocal = (cornerRightTopLocal + cornerRightBottomLocal) / 2;
         var quadrantBottomLocal = (cornerLeftBottomLocal + cornerRightBottomLocal) / 2;
@@ -39,19 +44,31 @@ public class ViewPointsAnalyzer {
 
         // Преобразуем точку в глобальные координаты
         var transform = cropBox.Transform;  // Преобразование из локальной системы вида в глобальную
-        _cornerRightTopGlobal = transform.OfPoint(cornerRightTopLocal);
-        _cornerLeftBottomGlobal = transform.OfPoint(cornerLeftBottomLocal);
-        _cornerLeftTopGlobal = transform.OfPoint(cornerLeftTopLocal);
-        _cornerRightBottomGlobal = transform.OfPoint(cornerRightBottomLocal);
+        _center = ProjectPointToViewFront(transform.OfPoint(center));
 
-        _quadrantTopGlobal = transform.OfPoint(quadrantTopLocal);
-        _quadrantRightGlobal = transform.OfPoint(quadrantRightLocal);
-        _quadrantBottomGlobal = transform.OfPoint(quadrantBottomLocal);
-        _quadrantLeftGlobal = transform.OfPoint(quadrantLeftLocal);
+        _cornerRightTopGlobalPlus = ProjectPointToViewFront(transform.OfPoint(cornerRightTopLocal));
+        _cornerLeftBottomGlobalPlus = ProjectPointToViewFront(transform.OfPoint(cornerLeftBottomLocal));
+        _cornerLeftTopGlobalPlus = ProjectPointToViewFront(transform.OfPoint(cornerLeftTopLocal));
+        _cornerRightBottomGlobalPlus = ProjectPointToViewFront(transform.OfPoint(cornerRightBottomLocal));
+
+        _quadrantTopGlobalPlus = ProjectPointToViewFront(transform.OfPoint(quadrantTopLocal));
+        _quadrantRightGlobalPlus = ProjectPointToViewFront(transform.OfPoint(quadrantRightLocal));
+        _quadrantBottomGlobalPlus = ProjectPointToViewFront(transform.OfPoint(quadrantBottomLocal));
+        _quadrantLeftGlobalPlus = ProjectPointToViewFront(transform.OfPoint(quadrantLeftLocal));
+
+        // Отдаляем точку от центра, чтобы аналитика работала точнее
+        _cornerRightTopGlobalPlus = _cornerRightTopGlobalPlus * 2 - _center;
+        _cornerLeftBottomGlobalPlus = _cornerLeftBottomGlobalPlus * 2 - _center;
+        _cornerLeftTopGlobalPlus = _cornerLeftTopGlobalPlus * 2 - _center;
+        _cornerRightBottomGlobalPlus = _cornerRightBottomGlobalPlus * 2 - _center;
+
+        _quadrantTopGlobalPlus = _quadrantTopGlobalPlus * 2 - _center;
+        _quadrantRightGlobalPlus = _quadrantRightGlobalPlus * 2 - _center;
+        _quadrantBottomGlobalPlus = _quadrantBottomGlobalPlus * 2 - _center;
+        _quadrantLeftGlobalPlus = _quadrantLeftGlobalPlus * 2 - _center;
 
         _checked = true;
     }
-
 
     public Element GetElementByDirection(List<Element> elements, DirectionType directionType, bool getByBoundingBox) {
         if(!_checked) {
@@ -61,29 +78,29 @@ public class ViewPointsAnalyzer {
         XYZ pointForCompare;
         switch(directionType) {
             case DirectionType.Top:
-                pointForCompare = _quadrantTopGlobal;
+                pointForCompare = _quadrantTopGlobalPlus;
                 break;
             case DirectionType.Right:
-                pointForCompare = _quadrantRightGlobal;
+                pointForCompare = _quadrantRightGlobalPlus;
                 break;
             case DirectionType.Bottom:
-                pointForCompare = _quadrantBottomGlobal;
+                pointForCompare = _quadrantBottomGlobalPlus;
                 break;
             case DirectionType.Left:
-                pointForCompare = _quadrantLeftGlobal;
+                pointForCompare = _quadrantLeftGlobalPlus;
                 break;
 
             case DirectionType.RightTop:
-                pointForCompare = _cornerRightTopGlobal;
+                pointForCompare = _cornerRightTopGlobalPlus;
                 break;
             case DirectionType.RightBottom:
-                pointForCompare = _cornerRightBottomGlobal;
+                pointForCompare = _cornerRightBottomGlobalPlus;
                 break;
             case DirectionType.LeftBottom:
-                pointForCompare = _cornerLeftBottomGlobal;
+                pointForCompare = _cornerLeftBottomGlobalPlus;
                 break;
             case DirectionType.LeftTop:
-                pointForCompare = _cornerLeftTopGlobal;
+                pointForCompare = _cornerLeftTopGlobalPlus;
                 break;
             default:
                 return null;
@@ -96,7 +113,7 @@ public class ViewPointsAnalyzer {
             if(getByBoundingBox) {
                 // Получаем середину BoundingBox объекта
                 var boundingBox = element.get_BoundingBox(_viewOfPylon.ViewElement);
-                var midleOfBoundingBox = (boundingBox.Max + boundingBox.Min) / 2;
+                var midleOfBoundingBox = ProjectPointToViewFront((boundingBox.Max + boundingBox.Min) / 2);
 
                 // Получаем и сравниваем расстояние от точки для сравнения до центра BoundingBox
                 double distance = midleOfBoundingBox.DistanceTo(pointForCompare);
@@ -105,7 +122,7 @@ public class ViewPointsAnalyzer {
                     neededElement = element;
                 }
             } else {
-                var elementPoint = (element.Location as LocationPoint).Point;
+                var elementPoint = ProjectPointToViewFront((element.Location as LocationPoint).Point);
                 double distance = elementPoint.DistanceTo(pointForCompare);
                 if(distance < minDistance) {
                     minDistance = distance;
@@ -164,7 +181,6 @@ public class ViewPointsAnalyzer {
         yOffset = yOffset.Multiply(yOffsetCoef);
         return (xOffset, yOffset);
     }
-
 
 
     public XYZ GetPointByDirection(Element element, DirectionType directionType,
