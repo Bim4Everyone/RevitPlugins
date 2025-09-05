@@ -21,9 +21,19 @@
     <system:String
         x:Key="SettingsWindow.Validation.TransparancyGreaterThanHundred">Transparency cannot be more than 100%</system:String>
     <system:String
+        x:Key="SettingsWindow.Validation.OffsetLessThanZero">Offset cannot be less than 0</system:String>
+    <system:String
+        x:Key="SettingsWindow.Validation.OffsetGreaterThan">Offset cannot be more than {0}</system:String>
+    <system:String
         x:Key="SettingsWindow.MainElementVisibilitySettings">Visibility settings for the first collision element</system:String>
     <system:String
         x:Key="SettingsWindow.SecondElementVisibilitySettings">Visibility settings for the second collision element</system:String>
+    <system:String
+        x:Key="SettingsWindow.SectionBoxSettings">Section box settings</system:String>
+    <system:String
+        x:Key="SettingsWindow.SectionBoxModeSettings">Section box mode:</system:String>
+    <system:String
+        x:Key="SettingsWindow.SectionBoxAdditionalSize">Offset, mm:</system:String>
 
     <system:String
         x:Key="Transactions.IsolateClashElements">Isolate clash elements</system:String>
@@ -44,4 +54,9 @@
         x:Key="Filters.NotElementsOfCollisionCategories">BIM_clashes_not_elements_of_clash_category_{0}</system:String>
     <system:String
         x:Key="Filters.NotCollisionCategories">BIM_clashes_not_clash_element_categories_{0}</system:String>
+
+    <system:String
+        x:Key="SectionBoxMode.AroundCollision">Around collision</system:String>
+    <system:String
+        x:Key="SectionBoxMode.AroundElements">Around elements</system:String>
 </ResourceDictionary>

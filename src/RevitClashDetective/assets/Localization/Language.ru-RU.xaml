@@ -21,9 +21,19 @@
     <system:String
         x:Key="SettingsWindow.Validation.TransparancyGreaterThanHundred">Прозрачность не может быть больше 100%</system:String>
     <system:String
+        x:Key="SettingsWindow.Validation.OffsetLessThanZero">Отступ не может быть меньше 0</system:String>
+    <system:String
+        x:Key="SettingsWindow.Validation.OffsetGreaterThan">Отступ не может быть больше {0}</system:String>
+    <system:String
         x:Key="SettingsWindow.MainElementVisibilitySettings">Настройки видимости первого элемента коллизии</system:String>
     <system:String
         x:Key="SettingsWindow.SecondElementVisibilitySettings">Настройки видимости второго элемента коллизии</system:String>
+    <system:String
+        x:Key="SettingsWindow.SectionBoxSettings">Настройки 3D подрезки</system:String>
+    <system:String
+        x:Key="SettingsWindow.SectionBoxModeSettings">Режим 3D подрезки:</system:String>
+    <system:String
+        x:Key="SettingsWindow.SectionBoxAdditionalSize">Отступ подрезки, мм:</system:String>
 
     <system:String
         x:Key="Transactions.IsolateClashElements">Изоляция элементов коллизии</system:String>
@@ -44,4 +54,9 @@
         x:Key="Filters.NotElementsOfCollisionCategories">BIM_коллизии_не_элементы_категории_коллизии_{0}</system:String>
     <system:String
         x:Key="Filters.NotCollisionCategories">BIM_коллизии_не_категории_элементов_коллизии_{0}</system:String>
+
+    <system:String
+        x:Key="SectionBoxMode.AroundCollision">По месту пересечения</system:String>
+    <system:String
+        x:Key="SectionBoxMode.AroundElements">По конфликтующим элементам</system:String>
 </ResourceDictionary>

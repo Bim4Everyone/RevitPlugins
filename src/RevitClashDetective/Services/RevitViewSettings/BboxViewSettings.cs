@@ -1,6 +1,9 @@
 using System.Collections.Generic;
+using System.Linq;
 
 using Autodesk.Revit.DB;
+
+using dosymep.Revit.Geometry;
 
 using RevitClashDetective.Models;
 using RevitClashDetective.Models.Clashes;
@@ -11,7 +14,7 @@ namespace RevitClashDetective.Services.RevitViewSettings;
 internal class BboxViewSettings : IView3DSetting {
     private readonly RevitRepository _revitRepository;
     private readonly ICollection<ElementModel> _elements;
-    private readonly double _additionalSize;
+    private readonly SettingsConfig _config;
 
     /// <summary>
     /// Конструктор класса для настроек 3D подрезки вида
@@ -25,11 +28,11 @@ internal class BboxViewSettings : IView3DSetting {
     public BboxViewSettings(
         RevitRepository revitRepository,
         ICollection<ElementModel> elements,
-        double additionalSize) {
+        SettingsConfig config) {
 
         _revitRepository = revitRepository ?? throw new System.ArgumentNullException(nameof(revitRepository));
         _elements = elements ?? throw new System.ArgumentNullException(nameof(elements));
-        _additionalSize = additionalSize;
+        _config = config ?? throw new System.ArgumentNullException(nameof(config));
         if(elements.Count == 0) {
             throw new System.ArgumentOutOfRangeException(nameof(elements));
         }
@@ -37,7 +40,15 @@ internal class BboxViewSettings : IView3DSetting {
 
 
     public void Apply(View3D view3D) {
-        var bbox = _revitRepository.GetCommonBoundingBox(_elements);
-        _revitRepository.SetSectionBox(bbox, view3D, _additionalSize);
+        BoundingBoxXYZ bbox;
+        if(_config.SectionBoxModeSettings == SectionBoxMode.AroundElements) {
+            bbox = _revitRepository.GetBoundingBoxes(_elements).CreateUnitedBoundingBox();
+        } else {
+            bbox = _revitRepository.GetBoundingBoxes(_elements).ToArray().CreateCommonBoundingBox();
+        }
+        _revitRepository.SetSectionBox(
+            bbox,
+            view3D,
+            _revitRepository.ConvertToInternal(_config.SectionBoxOffset));
     }
 }

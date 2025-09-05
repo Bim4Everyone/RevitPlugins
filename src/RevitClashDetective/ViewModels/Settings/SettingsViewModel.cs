@@ -1,4 +1,6 @@
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Windows.Input;
 
 using dosymep.SimpleServices;
@@ -13,6 +15,9 @@ internal class SettingsViewModel : BaseViewModel {
     private readonly SettingsConfig _config;
     private readonly ILocalizationService _localizationService;
     private string _errorText;
+    private SectionBoxModeViewModel _selectedSectionBoxMode;
+    private int _sectionBoxOffset;
+    private const int _maxSectionBoxOffset = 10000;
 
     public SettingsViewModel(RevitRepository revitRepository, SettingsConfig config, ILocalizationService localizationService) {
         _revitRepository = revitRepository ?? throw new ArgumentNullException(nameof(revitRepository));
@@ -21,6 +26,10 @@ internal class SettingsViewModel : BaseViewModel {
 
         MainElementVisibilitySettings = new(_localizationService);
         SecondElementVisibilitySettings = new(_localizationService);
+
+        SectionBoxModes = [.. Enum.GetValues(typeof(SectionBoxMode))
+                .Cast<SectionBoxMode>()
+                .Select(w => new SectionBoxModeViewModel(w, _localizationService))];
 
         LoadViewCommand = RelayCommand.Create(LoadView);
         AcceptViewCommand = RelayCommand.Create(AcceptView, CanAcceptView);
@@ -39,6 +48,18 @@ internal class SettingsViewModel : BaseViewModel {
     public ElementVisibilitySettingsViewModel MainElementVisibilitySettings { get; }
 
     public ElementVisibilitySettingsViewModel SecondElementVisibilitySettings { get; }
+
+    public IReadOnlyCollection<SectionBoxModeViewModel> SectionBoxModes { get; }
+
+    public SectionBoxModeViewModel SelectedSectionBoxMode {
+        get => _selectedSectionBoxMode;
+        set => RaiseAndSetIfChanged(ref _selectedSectionBoxMode, value);
+    }
+
+    public int SectionBoxOffset {
+        get => _sectionBoxOffset;
+        set => RaiseAndSetIfChanged(ref _sectionBoxOffset, value);
+    }
 
 
     private void LoadView() {
@@ -60,6 +81,16 @@ internal class SettingsViewModel : BaseViewModel {
                 "SettingsWindow.Validation.TransparancyGreaterThanHundred");
             return false;
         }
+        if(SectionBoxOffset < 0) {
+            ErrorText = _localizationService.GetLocalizedString(
+                "SettingsWindow.Validation.OffsetLessThanZero");
+            return false;
+        }
+        if(SectionBoxOffset > _maxSectionBoxOffset) {
+            ErrorText = _localizationService.GetLocalizedString(
+                "SettingsWindow.Validation.OffsetGreaterThan", _maxSectionBoxOffset);
+            return false;
+        }
 
         ErrorText = null;
         return true;
@@ -71,11 +102,16 @@ internal class SettingsViewModel : BaseViewModel {
 
         SecondElementVisibilitySettings.Color = _config.SecondElementVisibilitySettings.Color;
         SecondElementVisibilitySettings.Transparency = _config.SecondElementVisibilitySettings.Transparency;
+
+        SectionBoxOffset = _config.SectionBoxOffset;
+        SelectedSectionBoxMode = new SectionBoxModeViewModel(_config.SectionBoxModeSettings, _localizationService);
     }
 
     private void SaveConfig() {
         _config.MainElementVisibilitySettings = MainElementVisibilitySettings.GetSettings();
         _config.SecondElementVisibilitySettings = SecondElementVisibilitySettings.GetSettings();
+        _config.SectionBoxOffset = SectionBoxOffset;
+        _config.SectionBoxModeSettings = SelectedSectionBoxMode.Mode;
         _config.SaveProjectConfig();
     }
 }
