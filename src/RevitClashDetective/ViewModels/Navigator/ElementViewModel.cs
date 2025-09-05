@@ -7,9 +7,14 @@ using RevitClashDetective.Models.Clashes;
 
 namespace RevitClashDetective.ViewModels.Navigator;
 internal class ElementViewModel : BaseViewModel, IEquatable<ElementViewModel> {
-    public ElementViewModel(ElementModel element, double elementVolume) {
+    /// <summary>
+    /// Модель элемента
+    /// </summary>
+    /// <param name="element">Элемент</param>
+    /// <param name="elementVolumeM3">Объем элемента в м3</param>
+    public ElementViewModel(ElementModel element, double elementVolumeM3) {
         Element = element ?? throw new ArgumentNullException(nameof(element));
-        ElementVolume = elementVolume;
+        ElementVolume = elementVolumeM3;
     }
 
 
