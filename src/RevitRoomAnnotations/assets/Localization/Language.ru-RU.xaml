@@ -10,18 +10,20 @@
     <system:String x:Key="MainWindow.Loaded">Загружена</system:String>   
     <system:String x:Key="MainWindow.LinkedFiles">Связанные файлы</system:String>   
     <system:String x:Key="MainWindow.ToolTipNoLoaded">Связь не загружена. Загрузите связь.</system:String>
-    <system:String x:Key="MainWindow.GetRooms">Получение помещений: </system:String>
+    <system:String x:Key="MainWindow.GetRooms">Получение помещений [{0}/{1}] </system:String>
     <system:String x:Key="MainWindow.CreateRooms">Будет создано: </system:String>
     <system:String x:Key="MainWindow.DeleteRooms">Будет удалено: </system:String>
     <system:String x:Key="MainWindow.updateRooms">Обновить: </system:String>
     <system:String x:Key="MainWindow.DeleteOtherViews">Будет удалено с других видов: </system:String>
     <system:String x:Key="MainWindow.TitlePreview">Предварительный просмотр изменений</system:String>
-    <system:String x:Key="MainWindow.ProcessRooms">Обработка помещений и аннотаций </system:String>
-    <system:String x:Key="MainWindow.CreateEomView">Создать вид 'Помещения ЭОМ'</system:String>
-    <system:String x:Key="MainWindow.CreateRoomAnnotation">Создать аннотацию помещения</system:String>
-    <system:String x:Key="MainWindow.DeleteRoomAnnotations">Удалить аннотации помещений</system:String>
-
-    <system:String x:Key="GeneralSettings.ErrorAnnotationTypeNotFound">Не найден тип аннотации 'ТипАн_Помещение'. Загрузите семейство перед запуском плагина.</system:String>
+    <system:String x:Key="MainWindow.ProcessRooms">Обработка помещений и аннотаций [{0}/{1}] </system:String>
+    <system:String x:Key="MainWindow.CreateEomTransactionView">Создать вид 'Помещения ЭОМ'</system:String>
+    <system:String x:Key="MainWindow.CreateRoomTransactioAnnotation">Создать аннотацию помещения</system:String>
+    <system:String x:Key="MainWindow.DeleteRoomTransactioAnnotations">Удалить аннотации помещений</system:String>
+    <system:String x:Key="MainWindow.RoomEOM">!Помещения ЭОМ</system:String>
+    <system:String x:Key="MainWindow.SelectAtLeastOneLink">Выберите хотя бы одну загруженную связь.</system:String>
+    
+    <system:String x:Key="GeneralSettings.ErrorAnnotationTypeNotFound">Не найден тип аннотации «{0}». Загрузите семейство перед запуском плагина..</system:String>
     <system:String x:Key="GeneralSettings.ErrorNoLinkedFiles">В проекте нет связанных файлов</system:String>
-    <system:String x:Key="GeneralSettings.ErrorMessage">Ошибка</system:String>
+    <system:String x:Key="GeneralSettings.TitleErrorMessage">Ошибка</system:String>
 </ResourceDictionary>

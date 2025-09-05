@@ -89,7 +89,7 @@ public class RevitRoomAnnotationsCommand : BasePluginCommand {
         var linkedFiles = revitRepository.GetLinkedFiles();
 
         if(linkedFiles.Count == 0) {
-            string title = localizationService.GetLocalizedString("GeneralSettings.ErrorMessage");
+            string title = localizationService.GetLocalizedString("GeneralSettings.TitleErrorMessage");
             string message = localizationService.GetLocalizedString("GeneralSettings.ErrorNoSelectedElements");
 
             _ = TaskDialog.Show(title, message);
@@ -99,7 +99,7 @@ public class RevitRoomAnnotationsCommand : BasePluginCommand {
         var annotation = revitRepository.GetRoomAnnotationSymbol();
 
         if(annotation == null) {
-            string title = localizationService.GetLocalizedString("GeneralSettings.ErrorMessage");
+            string title = localizationService.GetLocalizedString("GeneralSettings.TitleErrorMessage");
             string message = localizationService.GetLocalizedString("GeneralSettings.ErrorAnnotationTypeNotFound");
 
             _ = TaskDialog.Show(title, message);

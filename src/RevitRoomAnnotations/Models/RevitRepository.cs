@@ -25,7 +25,6 @@ internal class RevitRepository {
     private readonly XYZ _defaultLocation = new(0, 0, 0);
 
     private const string _roomAnnotationName = "ТипАн_Помещение";
-    private const string _roomEOM = "!Помещения ЭОМ";
     private const string _viewsGroupParam = "_Группа Видов";
     private const string _viewsGroupValue = "02 АР-ЭОМ Задания входящие";
     private const string _projectStageParam = "_Стадия Проекта";
@@ -59,29 +58,31 @@ internal class RevitRepository {
     /// </summary>
     public Document Document => ActiveUIDocument.Document;
 
-    public List<LinkedFileViewModel> GetLinkedFiles() {
+    public List<LinkedFile> GetLinkedFiles() {
         return new FilteredElementCollector(Document)
             .OfClass(typeof(RevitLinkInstance))
             .Cast<RevitLinkInstance>()
-            .Select(linkInstance => new LinkedFileViewModel(linkInstance))
+            .Select(li => new LinkedFile(li, Document))
             .ToList();
     }
 
-    public List<Element> GetRoomsElementsFromLinks(IEnumerable<RevitLinkInstance> linkInstances) {
-        var allRooms = new List<Element>();
-        foreach(var linkInstance in linkInstances) {
-            var linkDoc = linkInstance.GetLinkDocument();
-            if(linkDoc == null) {
+    public List<RevitRoom> GetRoomsFromLinks(IEnumerable<RevitLinkInstance> linkInstances) {
+        var result = new List<RevitRoom>();
+        foreach(var link in linkInstances) {
+            var linkDoc = link.GetLinkDocument();
+            if(linkDoc == null)
                 continue;
-            }
 
-            allRooms.AddRange(
-                new FilteredElementCollector(linkDoc)
-                    .OfCategory(BuiltInCategory.OST_Rooms)
-                    .WhereElementIsNotElementType()
-            );
+            var rooms = new FilteredElementCollector(linkDoc)
+                .OfCategory(BuiltInCategory.OST_Rooms)
+                .WhereElementIsNotElementType()
+                .Cast<SpatialElement>()
+                .Select(r => new RevitRoom(r, link))
+                .ToList();
+
+            result.AddRange(rooms);
         }
-        return allRooms;
+        return result;
     }
 
     public IEnumerable<RevitAnnotation> GetAnnotations() {
@@ -95,10 +96,13 @@ internal class RevitRepository {
     }
 
     public View CreateOrGetViewDrafting() {
+        string roomEOM = _localizationService.GetLocalizedString("MainWindow.RoomEOM");
+        string createEOMView = _localizationService.GetLocalizedString("MainWindow.CreateEomTransactionView");
+
         var view = new FilteredElementCollector(Document)
             .OfClass(typeof(ViewDrafting))
             .Cast<ViewDrafting>()
-            .FirstOrDefault(v => v.Name == _roomEOM);
+            .FirstOrDefault(v => v.Name == roomEOM);
 
         if(view != null) {
             return view;
@@ -109,11 +113,10 @@ internal class RevitRepository {
             .Cast<ViewFamilyType>()
             .FirstOrDefault(vft => vft.ViewFamily == ViewFamily.Drafting);
 
-        string createEOMView = _localizationService.GetLocalizedString("MainWindow.CreateEomView");
-
+        
         using var t = Document.StartTransaction($"{createEOMView}");
         var newView = ViewDrafting.Create(Document, viewType.Id);
-        newView.Name = _roomEOM;
+        newView.Name = roomEOM;
 
         newView.SetParamValue(_viewsGroupParam, _viewsGroupValue);
         newView.SetParamValue(_projectStageParam, _projectStageValue);
@@ -135,7 +138,7 @@ internal class RevitRepository {
         var familySymbol = GetRoomAnnotationSymbol();
         var view = CreateOrGetViewDrafting();
 
-        string createRoomAnnotation = _localizationService.GetLocalizedString("MainWindow.CreateRoomAnnotation");
+        string createRoomAnnotation = _localizationService.GetLocalizedString("MainWindow.CreateRoomTransactionAnnotation");
         using var t = Document.StartTransaction($"{createRoomAnnotation}");
         var instance = Document.Create.NewFamilyInstance(_defaultLocation, familySymbol, view);
         UpdateAnnotation(instance, room);
@@ -145,22 +148,38 @@ internal class RevitRepository {
     }
 
     public void UpdateAnnotation(Element annotation, RevitRoom room) {
-        annotation.SetParamValue(SharedParamsConfig.Instance.FopId.Name, room.Id?.ToString() ?? "");
-        annotation.SetParamValue(SharedParamsConfig.Instance.ApartmentNumberExtra.Name, room.AdditionalNumber ?? "");
-        annotation.SetParamValue(SharedParamsConfig.Instance.ApartmentNameExtra.Name, room.AdditionalName ?? "");
-        annotation.SetParamValue(SharedParamsConfig.Instance.RoomArea.Name, room.Area.HasValue ? room.Area.Value : 0);
-        annotation.SetParamValue(SharedParamsConfig.Instance.RoomAreaWithRatio.Name, room.AreaWithCoefficient.HasValue ? room.AreaWithCoefficient.Value : 0);
-        annotation.SetParamValue(SharedParamsConfig.Instance.ApartmentGroupName.Name, room.GroupSortOrder ?? "");
-        annotation.SetParamValue(SharedParamsConfig.Instance.RoomFireCategory.Name, room.RoomCategory ?? "");
-        annotation.SetParamValue(SharedParamsConfig.Instance.FireCompartmentShortName.Name, room.FireZone ?? "");
-        annotation.SetParamValue(SharedParamsConfig.Instance.Level.Name, room.Level ?? "");
-        annotation.SetParamValue(SharedParamsConfig.Instance.RoomGroupShortName.Name, room.Group ?? "");
-        annotation.SetParamValue(SharedParamsConfig.Instance.RoomBuildingShortName.Name, room.Building ?? "");
-        annotation.SetParamValue(SharedParamsConfig.Instance.RoomSectionShortName.Name, room.Section ?? "");
+        SetOrRemove(annotation, SharedParamsConfig.Instance.FopId.Name, room.RoomId.ToString());
+        SetOrRemove(annotation, SharedParamsConfig.Instance.ApartmentNumberExtra.Name, room.AdditionalNumber);
+        SetOrRemove(annotation, SharedParamsConfig.Instance.ApartmentNameExtra.Name, room.AdditionalName);
+        SetOrRemove(annotation, SharedParamsConfig.Instance.RoomArea.Name, room.Area);
+        SetOrRemove(annotation, SharedParamsConfig.Instance.RoomAreaWithRatio.Name, room.AreaWithCoefficient);
+        SetOrRemove(annotation, SharedParamsConfig.Instance.ApartmentGroupName.Name, room.GroupSortOrder);
+        SetOrRemove(annotation, SharedParamsConfig.Instance.RoomFireCategory.Name, room.RoomCategory);
+        SetOrRemove(annotation, SharedParamsConfig.Instance.FireCompartmentShortName.Name, room.FireZone);
+        SetOrRemove(annotation, SharedParamsConfig.Instance.Level.Name, room.Level);
+        SetOrRemove(annotation, SharedParamsConfig.Instance.RoomGroupShortName.Name, room.Group);
+        SetOrRemove(annotation, SharedParamsConfig.Instance.RoomBuildingShortName.Name, room.Building);
+        SetOrRemove(annotation, SharedParamsConfig.Instance.RoomSectionShortName.Name, room.Section);
+    }
+
+    private void SetOrRemove(Element element, string paramName, string value) {
+        if(string.IsNullOrEmpty(value)) {
+            element.RemoveParamValue(paramName);
+        } else {
+            element.SetParamValue(paramName, value);
+        }
+    }
+
+    private void SetOrRemove(Element element, string paramName, double? value) {
+        if(value.HasValue) {
+            element.SetParamValue(paramName, value.Value);
+        } else {
+            element.RemoveParamValue(paramName);
+        }
     }
 
     public void DeleteElement(Element element) {
-        string deleteRoomAnnotations = _localizationService.GetLocalizedString("MainWindow.DeleteRoomAnnotations");
+        string deleteRoomAnnotations = _localizationService.GetLocalizedString("MainWindow.DeleteRoomTransactionAnnotations");
         using var t = Document.StartTransaction($"{deleteRoomAnnotations}");
         Document.Delete(element.Id);
         t.Commit();

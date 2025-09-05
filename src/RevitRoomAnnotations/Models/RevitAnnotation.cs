@@ -7,19 +7,15 @@ using dosymep.Revit;
 
 namespace RevitRoomAnnotations.Models;
 public class RevitAnnotation {
+    private readonly Element _annotation;
     public RevitAnnotation(Element annotation) {
-        Annotation = annotation ?? throw new ArgumentNullException(nameof(annotation));
-
-        Id = annotation.Id;
-
-        LinkId = annotation.GetParamValueOrDefault<string>(SharedParamsConfig.Instance.FopId.Name);
-
-        FileName = annotation.Name ?? string.Empty;
+        _annotation = annotation ?? throw new ArgumentNullException(nameof(annotation));
     }
 
-    public Element Annotation { get; }
-    public ElementId Id { get; }
-    public string LinkId { get; }
-    public string FileName { get; }
+    public Element Annotation => _annotation;
+    public ElementId Id => _annotation.Id;
+
+    public int RoomIdInAnnotation => _annotation.GetParamValueOrDefault<int>("ФОП_ID_Комнаты");
+    public int LinkInstIdInAnnotation => _annotation.GetParamValueOrDefault<int>("ФОП_ID_Связи");
 }
 

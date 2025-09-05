@@ -45,7 +45,6 @@ internal class MainViewModel : BaseViewModel {
 
         LoadViewCommand = RelayCommand.Create(LoadView);
         AcceptViewCommand = RelayCommand.Create(AcceptView, CanAcceptView);
-        _messageBoxService = messageBoxService;
     }
 
     /// <summary>
@@ -77,10 +76,14 @@ internal class MainViewModel : BaseViewModel {
     /// </summary>
     /// <remarks>В данном методе должна происходить загрузка настроек окна, а так же инициализация полей окна.</remarks>
     private void LoadView() {
-        LinkedFiles = _revitRepository
-           .GetLinkedFiles()
-           .OrderByDescending(x => x.IsLoaded)
-           .ToList();
+        var files = _revitRepository.GetLinkedFiles();
+
+        LinkedFiles = files
+            .Select(m => new LinkedFileViewModel(m))
+            .OrderByDescending(vm => vm.IsLoaded)
+            .ThenBy(vm => vm.Name)
+            .ToList();
+
     }
 
     /// <summary>
@@ -94,7 +97,7 @@ internal class MainViewModel : BaseViewModel {
         var targetView = _revitRepository.CreateOrGetViewDrafting();
 
         var annotationsNotOnView = GetAnnotationsNotOnView(targetView).ToList();
-        var allRoomElements = _revitRepository.GetRoomsElementsFromLinks(linkInstances);
+        var allRoomElements = _revitRepository.GetRoomsFromLinks(linkInstances);
         var rooms = BuildRoomsWithProgress(allRoomElements);
         var annotations = _revitRepository.GetAnnotations().ToList();
 
@@ -117,12 +120,11 @@ internal class MainViewModel : BaseViewModel {
         return _revitRepository.GetAnnotationsNotOnTargetView(_revitRepository.Document, targetView);
     }
 
-    private List<RevitRoom> BuildRoomsWithProgress(List<Element> allRoomElements) {
+    private List<RevitRoom> BuildRoomsWithProgress(List<RevitRoom> allRoomElements) {
         var rooms = new List<RevitRoom>(allRoomElements?.Count ?? 0);
 
         using(var window = GetPlatformService<IProgressDialogService>()) {
-            string getRooms = _localizationService.GetLocalizedString("MainWindow.GetRooms");
-            window.DisplayTitleFormat = $"{getRooms} [{0}/{1}]";
+            window.DisplayTitleFormat = _localizationService.GetLocalizedString("MainWindow.GetRoomsProgress");
             window.MaxValue = allRoomElements.Count;
             window.StepValue = 1;
             window.Show();
@@ -135,7 +137,7 @@ internal class MainViewModel : BaseViewModel {
                 progress.Report(i++);
                 ct.ThrowIfCancellationRequested();
 
-                rooms.Add(new RevitRoom(roomElem));
+                rooms.Add(roomElem);
             }
         }
 
@@ -185,7 +187,7 @@ internal class MainViewModel : BaseViewModel {
             maps.Count;
 
         using var window = GetPlatformService<IProgressDialogService>();
-        window.DisplayTitleFormat = $"{processRooms} [{0}/{1}]";
+        window.DisplayTitleFormat = processRooms;
         window.MaxValue = total;
         window.StepValue = 1;
         window.Show();
@@ -227,10 +229,13 @@ internal class MainViewModel : BaseViewModel {
     /// В методе проверяемые свойства окна должны быть отсортированы в таком же порядке как в окне (сверху-вниз)
     /// </remarks>
     private bool CanAcceptView() {
-        //if(string.IsNullOrEmpty(SaveProperty)) {
-        //    ErrorText = _localizationService.GetLocalizedString("MainWindow.HelloCheck");
-        //    return false;
-        //}
+        bool anySelectedLoaded = (LinkedFiles ?? Enumerable.Empty<LinkedFileViewModel>())
+          .Any(l => l.IsSelected && l.IsLoaded);
+
+        if(!anySelectedLoaded) {
+            ErrorText = _localizationService.GetLocalizedString("MainWindow.Validation.SelectAtLeastOneLink");
+            return false;
+        }
 
         ErrorText = null;
         return true;

@@ -6,40 +6,33 @@ using RevitRoomAnnotations.Models;
 namespace RevitRoomAnnotations.Services;
 public class RoomAnnotationMapService : IRoomAnnotationMapService {
     public IEnumerable<RoomAnnotationMap> GetRoomAnnotationMap(
-        IEnumerable<RevitRoom> revitRooms,
-        IEnumerable<RevitAnnotation> revitAnnotations) {
-        var annotationDict = revitAnnotations.ToDictionary(
-            x => $"{x.Id}_{x.LinkId}",
-            x => x);
+    IEnumerable<RevitRoom> rooms,
+    IEnumerable<RevitAnnotation> annotations) {
 
-        foreach(var room in revitRooms) {
-            string key = $"{room.Id}_{room.LinkId}";
-            yield return annotationDict.TryGetValue(key, out var ann)
-                ? new RoomAnnotationMap {
-                    RevitRoom = room,
-                    RevitAnnotation = ann,
-                    ToDelete = false,
-                    ToCreate = false
-                }
-                : new RoomAnnotationMap {
-                    RevitRoom = room,
-                    RevitAnnotation = null,
-                    ToDelete = false,
-                    ToCreate = true
-                };
+        string Key(int roomId, int linkInstId) => $"{roomId}_{linkInstId}";
+
+        var annDict = annotations.ToDictionary(
+            a => Key(a.RoomIdInAnnotation, a.LinkInstIdInAnnotation),
+            a => a);
+
+        var roomKeys = new HashSet<string>();
+        foreach(var room in rooms) {
+            var key = Key(room.RoomId.IntegerValue, room.SourceLinkInstanceId.IntegerValue);
+            roomKeys.Add(key);
+
+            if(annDict.TryGetValue(key, out var ann)) {
+                yield return new RoomAnnotationMap { RevitRoom = room, RevitAnnotation = ann, ToCreate = false, ToDelete = false };
+            } else {
+                yield return new RoomAnnotationMap { RevitRoom = room, RevitAnnotation = null, ToCreate = true, ToDelete = false };
+            }
         }
 
-        var roomKeys = new HashSet<string>(revitRooms.Select(r => $"{r.Id}_{r.LinkId}"));
-        foreach(var ann in revitAnnotations) {
-            string key = $"{ann.Id}_{ann.LinkId}";
+        foreach(var ann in annotations) {
+            var key = Key(ann.RoomIdInAnnotation, ann.LinkInstIdInAnnotation);
             if(!roomKeys.Contains(key)) {
-                yield return new RoomAnnotationMap {
-                    RevitRoom = null,
-                    RevitAnnotation = ann,
-                    ToDelete = true,
-                    ToCreate = false
-                };
+                yield return new RoomAnnotationMap { RevitRoom = null, RevitAnnotation = ann, ToCreate = false, ToDelete = true };
             }
         }
     }
+
 }

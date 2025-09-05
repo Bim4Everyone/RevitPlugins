@@ -4,25 +4,20 @@ using Autodesk.Revit.DB;
 
 using dosymep.WPF.ViewModels;
 
+using RevitRoomAnnotations.Models;
+
 namespace RevitRoomAnnotations.ViewModels;
 
 internal class LinkedFileViewModel : BaseViewModel {
-    private bool _isLoaded;
+    private bool _isSelected;
+    public LinkedFileViewModel(LinkedFile model) => Model = model ?? throw new ArgumentNullException(nameof(model));
+    public LinkedFile Model { get; }
+    public string Name => Model.Name;
+    public bool IsLoaded => Model.IsLoaded;
+    public RevitLinkInstance LinkInstance => Model.LinkInstance;
 
-    public LinkedFileViewModel(RevitLinkInstance linkInstance) {
-        LinkInstance = linkInstance ?? throw new ArgumentNullException(nameof(linkInstance));
-        IsLoaded = LinkInstance.GetLinkDocument() != null;
-        IsSelected = false;
-        Name = LinkInstance.Name;
+    public bool IsSelected {
+        get => _isSelected;
+        set => RaiseAndSetIfChanged(ref _isSelected, value);
     }
-
-    public RevitLinkInstance LinkInstance { get; }
-
-    public bool IsSelected { get; set; }
-    public bool IsLoaded {
-        get => _isLoaded;
-        set => RaiseAndSetIfChanged(ref _isLoaded, value);
-    }
-    public string Name { get; set; }
-
 }

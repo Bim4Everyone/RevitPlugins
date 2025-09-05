@@ -9,13 +9,17 @@ using dosymep.Revit;
 namespace RevitRoomAnnotations.Models;
 
 public class RevitRoom {
-    private readonly Element _room;
+    private readonly SpatialElement _room;
+    private readonly RevitLinkInstance _sourceLink;
 
-    public RevitRoom(Element room) {
+    public RevitRoom(SpatialElement room, RevitLinkInstance sourceLink) {
         _room = room ?? throw new ArgumentNullException(nameof(room));
+        _sourceLink = sourceLink ?? throw new ArgumentNullException(nameof(sourceLink));
 
-        Id = _room.Id;
-        LinkId = _room.GetParamValueOrDefault<string>(SharedParamsConfig.Instance.FopId.Name);
+        RoomId = _room.Id;
+        SourceLinkInstanceId = _sourceLink.Id;
+        SourceLinkName = _sourceLink.Name;
+
         FileName = _room.GetParamValueOrDefault<string>(SharedParamsConfig.Instance.FopId.Name);
         AdditionalNumber = _room.GetParamValueOrDefault<string>(SharedParamsConfig.Instance.ApartmentNumberExtra.Name);
         AdditionalName = _room.GetParamValueOrDefault<string>(SharedParamsConfig.Instance.ApartmentNameExtra.Name);
@@ -30,9 +34,11 @@ public class RevitRoom {
         Section = _room.GetParamValueOrDefault<string>(SharedParamsConfig.Instance.RoomSectionShortName.Name);
     }
 
-    public ElementId Id { get; }
-    public string LinkId { get; }
-    public string FileName { get; set; }
+    public ElementId RoomId { get; }
+    public ElementId SourceLinkInstanceId { get; }
+    public string SourceLinkName { get; }
+
+    public string FileName { get; }
     public string AdditionalNumber { get; }
     public string AdditionalName { get; }
     public double? Area { get; }
@@ -44,5 +50,4 @@ public class RevitRoom {
     public string Group { get; }
     public string Building { get; }
     public string Section { get; }
-
 }
