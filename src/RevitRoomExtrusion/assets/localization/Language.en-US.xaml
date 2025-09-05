@@ -32,14 +32,15 @@
     <system:String x:Key="MainWindow.ButtonOk">Extrude</system:String>
     <system:String x:Key="MainWindow.ButtonCancel">Cancel</system:String>
     <system:String x:Key="MainWindow.ExtrusionHeightMm">Enter extrusion height (in millimeters)</system:String>
+    <system:String x:Key="MainWindow.ExtrusionHeightMmTooltip">In millimeters, from finished floor</system:String>
     <system:String x:Key="MainWindow.FamilyName">Enter family name</system:String>
+    <system:String x:Key="MainWindow.FamilyNameTooltip">Used in the name of the loaded family</system:String>
     <system:String x:Key="MainWindow.HeightError">Height must be a number</system:String>
     <system:String x:Key="MainWindow.HeightErrorNegative">Height must be positive</system:String>
     <system:String x:Key="MainWindow.HeightErrorZero">Height must be greater than zero</system:String>
     <system:String x:Key="MainWindow.HeightErrorBig">Height cannot exceed 100 meters</system:String>
     <system:String x:Key="MainWindow.NameError">The name contains invalid characters</system:String>
-
     <system:String x:Key="Command.MessegeBody">Please, select rooms</system:String>
-    <system:String x:Key="Command.MessegeTitle">Error selection</system:String>
+    <system:String x:Key="Command.MessegeTitle">Error selection</system:String>  
 
 </ResourceDictionary>
