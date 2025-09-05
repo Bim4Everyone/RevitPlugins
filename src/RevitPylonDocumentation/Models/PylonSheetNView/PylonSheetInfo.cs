@@ -32,7 +32,7 @@ internal class PylonSheetInfo : BaseViewModel {
         TransverseViewThird = new PylonView(ViewModel, Repository, this, AnnotationCreatorFactories.TransverseThird);
         TransverseViewFirstRebar = new PylonView(ViewModel, Repository, this, AnnotationCreatorFactories.TransverseRebarFirst);
         TransverseViewSecondRebar = new PylonView(ViewModel, Repository, this, AnnotationCreatorFactories.TransverseRebarSecond);
-        TransverseViewThirdRebar = new PylonView(ViewModel, Repository, this, AnnotationCreatorFactories.TransverseRebarSecond);
+        TransverseViewThirdRebar = new PylonView(ViewModel, Repository, this, AnnotationCreatorFactories.TransverseRebarThird);
 
         SkeletonSchedule = new PylonView(ViewModel, Repository, this);
         SkeletonByElemsSchedule = new PylonView(ViewModel, Repository, this);

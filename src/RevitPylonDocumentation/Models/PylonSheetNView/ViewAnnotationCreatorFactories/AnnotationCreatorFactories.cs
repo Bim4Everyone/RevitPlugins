@@ -10,4 +10,5 @@ internal static class AnnotationCreatorFactories {
     internal static readonly IAnnotationCreatorFactory GeneralRebarPerp = new GeneralViewPerpRebarAnnotCreatorFactory();
     internal static readonly IAnnotationCreatorFactory TransverseRebarFirst = new TransViewFirstRebarAnnotCreatorFactory();
     internal static readonly IAnnotationCreatorFactory TransverseRebarSecond = new TransViewSecondRebarAnnotCreatorFactory();
+    internal static readonly IAnnotationCreatorFactory TransverseRebarThird = new TransViewSecondRebarAnnotCreatorFactory();
 }

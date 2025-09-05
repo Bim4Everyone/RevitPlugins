@@ -5,9 +5,9 @@ using RevitPylonDocumentation.Models.PylonSheetNView.ViewMarkServices.ViewRebarM
 using RevitPylonDocumentation.ViewModels;
 
 namespace RevitPylonDocumentation.Models.PylonSheetNView.ViewAnnotationCreators;
-internal class TransViewSecondRebarAnnotCreator : ViewAnnotationCreator {
-    public TransViewSecondRebarAnnotCreator(MainViewModel mvm, RevitRepository repository, PylonSheetInfo pylonSheetInfo, 
-                                            PylonView pylonView) 
+internal class TransViewThirdRebarAnnotCreator : ViewAnnotationCreator {
+    public TransViewThirdRebarAnnotCreator(MainViewModel mvm, RevitRepository repository, PylonSheetInfo pylonSheetInfo,
+                                            PylonView pylonView)
         : base(mvm, repository, pylonSheetInfo, pylonView) {
     }
 
@@ -15,8 +15,8 @@ internal class TransViewSecondRebarAnnotCreator : ViewAnnotationCreator {
         // Пытаемся создать размеры на виде
         try {
             var dimensionService = new TransViewRebarDimensionService(ViewModel, Repository, SheetInfo);
-            dimensionService.TryCreateTransViewRebarDimensions(ViewOfPylon.ViewElement, false);
-        } catch(Exception) { } 
+            dimensionService.TryCreateTransViewRebarDimensions(ViewOfPylon.ViewElement, true);
+        } catch(Exception) { }
 
         // Пытаемся создать марки на виде
         try {
