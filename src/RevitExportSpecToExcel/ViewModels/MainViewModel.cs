@@ -59,7 +59,7 @@ internal class MainViewModel : BaseViewModel {
     }
 
     public ObservableCollection<ScheduleViewModel> FilteredSchedules {
-        get => new(_filteredSchedules.OrderBy(x => x.OpenStatus));
+        get => _filteredSchedules;
         set => RaiseAndSetIfChanged(ref _filteredSchedules, value);
     }
     
@@ -94,7 +94,7 @@ internal class MainViewModel : BaseViewModel {
         Schedules = new(_revitRepository
             .GetSchedulesVM(_localizationService)
             .ToList());
-        FilteredSchedules = new ObservableCollection<ScheduleViewModel>(Schedules);
+        FilteredSchedules = new ObservableCollection<ScheduleViewModel>(Schedules.OrderBy(x => x.OpenStatus));
 
         if(_revitRepository.Document.ActiveView is not ViewSchedule) {
             LoadConfig();
@@ -127,11 +127,12 @@ internal class MainViewModel : BaseViewModel {
 
     private void ApplySearch() {
         if(string.IsNullOrEmpty(SearchText)) {
-            FilteredSchedules = new ObservableCollection<ScheduleViewModel>(_schedules);
+            FilteredSchedules = new ObservableCollection<ScheduleViewModel>(_schedules.OrderBy(x => x.OpenStatus));
         } else {
             FilteredSchedules = new ObservableCollection<ScheduleViewModel>(
                 Schedules.Where(item => item.Name
-                        .IndexOf(SearchText, StringComparison.OrdinalIgnoreCase) >= 0));
+                        .IndexOf(SearchText, StringComparison.OrdinalIgnoreCase) >= 0)
+                        .OrderBy(x => x.OpenStatus));
         }
     }
 
