@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.IO;
 
 namespace RevitExportSpecToExcel.Services;
 
@@ -15,8 +16,7 @@ internal class ConstantsProvider : IConstantsProvider {
 
     /// <summary>
     /// Символы, которые нельзя использовать в названии документа:
-    /// '\\', '/', '?', ':', '*', '[', ']', '\''
+    /// '\', '/', '|', '?', ':', '*', '<', '>', '"'
     /// </summary>
-    public IReadOnlyCollection<char> ProhibitedExcelChars { get; } = 
-        new ReadOnlyCollection<char>(new char[] { '\\', '/', '?', ':', '*', '[', ']', '\'' });
+    public IReadOnlyCollection<char> ProhibitedExcelChars { get; } = Path.GetInvalidFileNameChars();
 }
