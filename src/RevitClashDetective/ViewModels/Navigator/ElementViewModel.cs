@@ -15,6 +15,9 @@ internal class ElementViewModel : BaseViewModel, IEquatable<ElementViewModel> {
 
     public ElementModel Element { get; }
 
+    /// <summary>
+    /// Объем элемента в м3
+    /// </summary>
     public double ElementVolume { get; }
 
 

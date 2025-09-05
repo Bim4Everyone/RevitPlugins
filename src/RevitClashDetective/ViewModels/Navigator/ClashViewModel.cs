@@ -159,8 +159,8 @@ namespace RevitClashDetective.ViewModels.Navigator {
                 .SetRevitRepository(_revitRepository)
                 .GetClashData();
 
-            FirstElementVolume = ClashData.MainElementVolume;
-            SecondElementVolume = ClashData.OtherElementVolume;
+            FirstElementVolume = _revitRepository.ConvertToM3(ClashData.MainElementVolume);
+            SecondElementVolume = _revitRepository.ConvertToM3(ClashData.OtherElementVolume);
 
             IntersectionVolume = Math.Round(_revitRepository.ConvertToM3(ClashData.ClashVolume), 6);
             FirstElementIntersectionPercentage =

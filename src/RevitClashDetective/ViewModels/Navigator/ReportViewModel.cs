@@ -253,7 +253,7 @@ namespace RevitClashDetective.ViewModels.Navigator {
             return [.. provider.GetElements()
                 .Select(e => new ElementViewModel(
                     new ElementModel(e, provider.MainTransform),
-                    e.GetSolids().Sum(s => s.GetVolumeOrDefault(0) ?? 0)))];
+                    _revitRepository.ConvertToM3(e.GetSolids().Sum(s => s.GetVolumeOrDefault(0) ?? 0))))];
         }
 
         private void InitializeTimer() {
