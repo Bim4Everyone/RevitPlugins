@@ -17,9 +17,9 @@
     Width="450"
     Height="400"
     MinWidth="450"
-    MinHeight="400"
+    MinHeight="550"
     MaxWidth="450"
-    MaxHeight="400"
+    MaxHeight="550"
     ResizeMode="NoResize"
     d:DataContext="{d:DesignInstance vms:SettingsViewModel, IsDesignTimeCreatable=False}">
 
@@ -97,16 +97,8 @@
                     <Label
                         Margin="0 0 0 10"
                         Content="{me:LocalizationSource SettingsWindow.MainElementVisibilitySettings}" />
-                    <ContentControl
-                        Content="{Binding MainElementVisibilitySettings}">
-                        <ContentControl.ContentTemplate>
-                            <DataTemplate
-                                DataType="{x:Type vms:ElementVisibilitySettingsViewModel}">
-                                <local:ElementVisibilitySettingsView
-                                    DataContext="{Binding}" />
-                            </DataTemplate>
-                        </ContentControl.ContentTemplate>
-                    </ContentControl>
+                    <local:ElementVisibilitySettingsView
+                        DataContext="{Binding MainElementVisibilitySettings}" />
                 </StackPanel>
             </Border>
             <Border
@@ -116,18 +108,45 @@
                     <Label
                         Margin="0 0 0 10"
                         Content="{me:LocalizationSource SettingsWindow.SecondElementVisibilitySettings}" />
-                    <ContentControl
-                        Content="{Binding SecondElementVisibilitySettings}">
-                        <ContentControl.ContentTemplate>
-                            <DataTemplate
-                                DataType="{x:Type vms:ElementVisibilitySettingsViewModel}">
-                                <local:ElementVisibilitySettingsView
-                                    DataContext="{Binding}" />
-                            </DataTemplate>
-                        </ContentControl.ContentTemplate>
-                    </ContentControl>
+                    <local:ElementVisibilitySettingsView
+                        DataContext="{Binding SecondElementVisibilitySettings}" />
                 </StackPanel>
             </Border>
+            <Border
+                Margin="10 0 10 10"
+                Style="{StaticResource CustomBorder}">
+                <StackPanel>
+                    <Label
+                        Margin="0 0 0 10"
+                        Content="{me:LocalizationSource SettingsWindow.SectionBoxSettings}" />
+                    <StackPanel>
+                        <DockPanel
+                            Margin="0 0 0 5"
+                            VerticalAlignment="Center">
+                            <Label
+                                Width="150"
+                                VerticalAlignment="Center"
+                                VerticalContentAlignment="Center"
+                                Content="{me:LocalizationSource SettingsWindow.SectionBoxModeSettings}" />
+                            <ComboBox
+                                DisplayMemberPath="Name"
+                                SelectedItem="{Binding SelectedSectionBoxMode}"
+                                ItemsSource="{Binding SectionBoxModes}" />
+                        </DockPanel>
+                        <DockPanel
+                            VerticalAlignment="Center">
+                            <Label
+                                Width="150"
+                                VerticalAlignment="Center"
+                                VerticalContentAlignment="Center"
+                                Content="{me:LocalizationSource SettingsWindow.SectionBoxAdditionalSize}" />
+                            <ui:TextBox
+                                Text="{Binding SectionBoxOffset, UpdateSourceTrigger=PropertyChanged}" />
+                        </DockPanel>
+                    </StackPanel>
+                </StackPanel>
+            </Border>
+
         </StackPanel>
 
         <StackPanel

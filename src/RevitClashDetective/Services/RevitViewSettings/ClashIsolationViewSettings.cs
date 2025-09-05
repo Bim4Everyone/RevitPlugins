@@ -33,7 +33,7 @@ internal class ClashIsolationViewSettings : IView3DSetting {
 
 
     public void Apply(View3D view3D) {
-        var bboxSettings = new BboxViewSettings(_revitRepository, _clashModel.GetElements(), 10);
+        var bboxSettings = new BboxViewSettings(_revitRepository, _clashModel.GetElements(), _config);
         bboxSettings.Apply(view3D);
         IsolateClashElements(view3D, _clashModel);
         var colorSettings = new ColorClashViewSettings(_revitRepository, _localizationService, _clashModel, _config);

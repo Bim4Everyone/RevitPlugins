@@ -25,6 +25,13 @@ internal class SettingsConfig : ProjectConfig {
         Transparency = 40
     };
 
+    public SectionBoxMode SectionBoxModeSettings { get; set; } = SectionBoxMode.AroundCollision;
+
+    /// <summary>
+    /// Добавочный размер в мм для 3D подрезки суммарно вдоль оси
+    /// </summary>
+    public int SectionBoxOffset { get; set; } = 3000;
+
 
     public static SettingsConfig GetSettingsConfig(IConfigSerializer serializer) {
         return new dosymep.Bim4Everyone.ProjectConfigs.ProjectConfigBuilder()

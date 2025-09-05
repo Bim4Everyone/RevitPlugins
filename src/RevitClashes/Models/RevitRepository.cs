@@ -12,6 +12,7 @@ using dosymep.Bim4Everyone.ProjectParams;
 using dosymep.Bim4Everyone.SimpleServices;
 using dosymep.Bim4Everyone.SystemParams;
 using dosymep.Revit;
+using dosymep.Revit.Geometry;
 using dosymep.SimpleServices;
 
 using RevitClashDetective.Models.Clashes;
@@ -360,6 +361,19 @@ namespace RevitClashDetective.Models {
 #endif
         }
 
+        /// <summary>
+        /// Конвертирует мм в футы
+        /// </summary>
+        /// <param name="mmValue">мм</param>
+        /// <returns>футы</returns>
+        public double ConvertToInternal(double mmValue) {
+#if REVIT_2020_OR_LESS
+            return UnitUtils.ConvertToInternalUnits(mmValue, DisplayUnitType.DUT_MILLIMETERS);
+#else
+            return UnitUtils.ConvertToInternalUnits(mmValue, UnitTypeId.Millimeters);
+#endif
+        }
+
 
         /// <summary>
         /// Возвращает коллекцию фильтров по параметрам элементов, в которые попадают элементы, попадающие в фильтр по элементам,
@@ -497,6 +511,11 @@ namespace RevitClashDetective.Models {
         }
 
         public BoundingBoxXYZ GetCommonBoundingBox(IEnumerable<ElementModel> elements) {
+            return GetBoundingBoxes(elements)
+                .GetCommonBoundingBox();
+        }
+
+        public ICollection<BoundingBoxXYZ> GetBoundingBoxes(IEnumerable<ElementModel> elements) {
             return elements
                 .Select(item => new {
                     Bb = item.GetElement(DocInfos)?.get_BoundingBox(null),
@@ -504,7 +523,7 @@ namespace RevitClashDetective.Models {
                 })
                 .Where(item => item.Bb != null && item.Transform != null)
                 .Select(item => item.Bb.GetTransformedBoundingBox(item.Transform))
-                .GetCommonBoundingBox();
+                .ToArray();
         }
 
         private ParameterValueProvider GetParam(Document doc, Category category, ElementId elementId) {
