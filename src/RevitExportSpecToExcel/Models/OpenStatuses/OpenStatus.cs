@@ -3,8 +3,8 @@ using System;
 namespace RevitExportSpecToExcel.Models;
 
 internal class OpenStatus : IComparable<OpenStatus> {
-    private string _name;
-    private int _order;
+    private readonly string _name;
+    private readonly int _order;
 
     public OpenStatus(string name, int order) {
         _name = name;
