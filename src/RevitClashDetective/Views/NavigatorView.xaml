@@ -11,9 +11,10 @@
                            xmlns:dxg="http://schemas.devexpress.com/winfx/2008/xaml/grid"
                            xmlns:dx="http://schemas.devexpress.com/winfx/2008/xaml/core"
                            xmlns:base="clr-namespace:dosymep.WPF.Views"
-                           xmlns:converters="clr-namespace:dosymep.WPF.Converters"
+                           xmlns:converters="clr-namespace:dosymep.WpfCore.Converters;assembly=dosymep.WpfCore"
                            xmlns:b="http://schemas.microsoft.com/xaml/behaviors"
                            xmlns:c="clr-namespace:RevitClashDetective.Models.Clashes"
+                           xmlns:system="clr-namespace:System;assembly=mscorlib"
                            mc:Ignorable="d"
                            Title="Навигатор"
                            Height="450"
@@ -27,15 +28,28 @@
         </b:EventTrigger>
     </b:Interaction.Triggers>
     <base:ThemedPlatformWindow.Resources>
-        <converters:IndexConverter x:Key="IndexConverter" />
-        <mvvm:ObjectToObjectConverter x:Key="DxClashStatusToImageConverter">
-            <mvvm:MapItem Source="{x:Static c:ClashStatus.Active}"
+        <system:Boolean x:Key="True">True</system:Boolean>
+        <system:Boolean x:Key="False">False</system:Boolean>
+        <converters:ObjectToObjectConverter x:Key="ClashStatusToBoolConverter">
+            <converters:CoupleItem Source="{x:Static c:ClashStatus.Active}"
+                                   Target="{StaticResource True}" />
+            <converters:CoupleItem Source="{x:Static c:ClashStatus.Analized}"
+                                   Target="{StaticResource True}"  />
+            <converters:CoupleItem Source="{x:Static c:ClashStatus.Solved}"
+                                   Target="{StaticResource True}" />
+            <converters:CoupleItem Source="{x:Static c:ClashStatus.Imaginary}"
+                                   Target="{StaticResource False}" />
+        </converters:ObjectToObjectConverter>
+        <converters:ObjectToObjectConverter x:Key="ClashStatusToImageConverter">
+            <converters:CoupleItem Source="{x:Static c:ClashStatus.Active}"
                           Target="pack://application:,,,/DevExpress.Images.v21.2;component/Images/XAF/State_Priority_High.png" />
-            <mvvm:MapItem Source="{x:Static c:ClashStatus.Analized}"
+            <converters:CoupleItem Source="{x:Static c:ClashStatus.Analized}"
                           Target="pack://application:,,,/DevExpress.Images.v21.2;component/Images/XAF/State_Priority_Low.png" />
-            <mvvm:MapItem Source="{x:Static c:ClashStatus.Solved}"
+            <converters:CoupleItem Source="{x:Static c:ClashStatus.Solved}"
                           Target="pack://application:,,,/DevExpress.Images.v21.2;component/Images/XAF/State_Priority_Normal.png" />
-        </mvvm:ObjectToObjectConverter>
+            <converters:CoupleItem Source="{x:Static c:ClashStatus.Imaginary}"
+                          Target="pack://application:,,,/DevExpress.Images.v21.2;component/DevAV/Actions/Delete_32x32.png" />
+        </converters:ObjectToObjectConverter>
         <Style TargetType="dxg:GridColumn"
                x:Key="ReadOnlyColumn">
             <Setter Property="ReadOnly"
@@ -90,25 +104,41 @@
         </DockPanel>
 
         <DockPanel Grid.Row="1"
-                   Margin="0 5">
-            <TextBlock Text="Общее пересечение выборки 1: " />
+                   Margin="0 5"
+                   VerticalAlignment="Center">
+            <TextBlock Text="Общее пересечение выборки 1: " 
+                       VerticalAlignment="Center"/>
             <TextBlock FontWeight="Bold"
+                       VerticalAlignment="Center"
                        Text="{Binding SelectedReport.FirstIntersectionPercentage}" />
             <TextBlock Text="%"
                        FontWeight="Bold"
-                       Margin="3 0 20 0" />
-            <TextBlock Text="Общее пересечение выборки 2: " />
+                       Margin="3 0 20 0" 
+                       VerticalAlignment="Center"/>
+            <TextBlock Text="Общее пересечение выборки 2: "
+                       VerticalAlignment="Center" />
             <TextBlock FontWeight="Bold"
+                       VerticalAlignment="Center"
                        Text="{Binding SelectedReport.SecondIntersectionPercentage}" />
             <TextBlock Text="%"
                        FontWeight="Bold"
+                       VerticalAlignment="Center"
                        Margin="3 0 0 0" />
+            <dxe:CheckEdit Margin="20 0 0 0"
+                           EditValue="{Binding SelectedReport.ShowImaginaryClashes}"
+                           Content="Учитывать элементы, не участвующие в коллизиях"
+                           VerticalAlignment="Center">
+                <mvvm:Interaction.Triggers>
+                    <mvvm:EventToCommand EventName="EditValueChanged"
+                                         Command="{Binding SelectedReport.ShowImaginaryClashesChangedCommand}" />
+                </mvvm:Interaction.Triggers>
+            </dxe:CheckEdit>
         </DockPanel>
 
         <dxg:GridControl Name="_dg"
                          Grid.Row="2"
                          AllowCollectionView="False"
-                         ItemsSource="{Binding SelectedReport.Clashes}">
+                         ItemsSource="{Binding SelectedReport.GuiClashes}">
 
             <dxg:GridControl.GroupSummary>
                 <dxg:GridSummaryItem SummaryType="Count" />
@@ -119,8 +149,10 @@
                                AutoWidth="True"
                                DataNavigatorButtons="Navigation"
                                AllowMergedGrouping="True"
-                               ShowDataNavigator="True">
-                </dxg:TableView>
+                               ShowDataNavigator="True"
+                               VirtualizingPanel.IsVirtualizingWhenGrouping="True"
+                               VirtualizingPanel.VirtualizationMode="Recycling"
+                               VirtualizingPanel.IsVirtualizing="True" />
             </dxg:GridControl.View>
 
             <dxg:GridControl.Columns>
@@ -138,15 +170,23 @@
                         </DataTemplate>
                     </dxg:GridColumn.CellTemplate>
                 </dxg:GridColumn>
-                
-                <dxg:GridColumn Header="Название"
-                                FieldName="ClashName"/>
+
+                <dxg:GridColumn Header="Название">
+                    <dxg:GridColumn.CellTemplate>
+                        <DataTemplate>
+                            <dxe:TextEdit ShowBorder="False"
+                                          EditValue="{Binding Row.ClashName, UpdateSourceTrigger=PropertyChanged}"
+                                          IsEnabled="{Binding Row.ClashStatus, Converter={StaticResource ClashStatusToBoolConverter}}" />
+                        </DataTemplate>
+                    </dxg:GridColumn.CellTemplate>
+                </dxg:GridColumn>
                 <dxg:GridColumn Header="Статус">
                     <dxg:GridColumn.CellTemplate>
                         <DataTemplate>
                             <dxe:ComboBoxEdit ApplyItemTemplateToSelectedItem="True"
                                               IsTextEditable="False"
                                               EditMode="InplaceActive"
+                                              IsEnabled="{Binding Row.ClashStatus, Converter={StaticResource ClashStatusToBoolConverter}}"
                                               EditValue="{Binding Row.ClashStatus, UpdateSourceTrigger=PropertyChanged}"
                                               ItemsSource="{dxe:EnumItemsSource EnumType={x:Type m:ClashStatus}}">
                                 <dxe:ComboBoxEdit.ItemTemplate>
@@ -154,7 +194,7 @@
                                         <StackPanel Orientation="Horizontal">
                                             <Image Width="16"
                                                    Height="16"
-                                                   Source="{Binding Path=Id, Converter={StaticResource DxClashStatusToImageConverter}}"
+                                                   Source="{Binding Path=Id, Converter={StaticResource ClashStatusToImageConverter}}"
                                                    Margin="0 0 4 0" />
                                             <TextBlock Text="{Binding}" />
                                         </StackPanel>
@@ -196,7 +236,7 @@
                                 FieldName="SecondDocumentName" />
                 <dxg:GridColumn Style="{StaticResource ReadOnlyColumn}"
                                 Header="% пересечения 1"
-                                FieldName="MainElementIntersectionPercentage">
+                                FieldName="FirstElementIntersectionPercentage">
                     <dxg:GridColumn.EditSettings>
                         <dxe:TextEditSettings HorizontalContentAlignment="Left" />
                     </dxg:GridColumn.EditSettings>

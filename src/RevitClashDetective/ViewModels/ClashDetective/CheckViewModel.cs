@@ -83,11 +83,15 @@ namespace RevitClashDetective.ViewModels.ClashDetective {
             set => this.RaiseAndSetIfChanged(ref _secondSelection, value);
         }
 
-        private string ReportName => $"{_revitRepository.GetDocumentName()}_{Name}";
+        public string ReportName => $"{_revitRepository.GetDocumentName()}_{Name}";
 
-        public List<ClashModel> GetClashes() {
-            List<IProvider> mainProviders, otherProviders;
-
+        /// <summary>
+        /// Возвращает провайдеры для поиска коллизий. MainProviders - выборка 1 (слева), OtherProviders - выборка 2 (справа).
+        /// </summary>
+        /// <returns>Провайдер выборки 1 (слева) и провайдер выборки 2 (справа)</returns>
+        public (List<IProvider> MainProviders, List<IProvider> OtherProviders) GetProviders() {
+            List<IProvider> mainProviders;
+            List<IProvider> otherProviders;
             if(FirstSelection.SelectedFiles.Any(item => item.Name.Equals(_revitRepository.GetDocumentName()))) {
                 mainProviders = FirstSelection
                     .GetProviders()
@@ -103,6 +107,11 @@ namespace RevitClashDetective.ViewModels.ClashDetective {
                     .GetProviders()
                     .ToList();
             }
+            return (mainProviders, otherProviders);
+        }
+
+        public List<ClashModel> GetClashes() {
+            (var mainProviders, var otherProviders) = GetProviders();
 
             var clashDetector = new ClashDetector(_revitRepository, mainProviders, otherProviders);
             return clashDetector.FindClashes();

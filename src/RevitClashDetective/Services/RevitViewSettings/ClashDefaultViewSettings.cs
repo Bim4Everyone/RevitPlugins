@@ -5,20 +5,20 @@ using Autodesk.Revit.DB;
 using dosymep.SimpleServices;
 
 using RevitClashDetective.Models;
-using RevitClashDetective.Models.Clashes;
 using RevitClashDetective.Models.Interfaces;
+using RevitClashDetective.ViewModels.Navigator;
 
 namespace RevitClashDetective.Services.RevitViewSettings;
 
 internal class ClashDefaultViewSettings : IView3DSetting {
     private readonly RevitRepository _revitRepository;
     private readonly ILocalizationService _localizationService;
-    private readonly ClashModel _clashModel;
+    private readonly IClashViewModel _clashModel;
     private readonly SettingsConfig _config;
 
     public ClashDefaultViewSettings(RevitRepository revitRepository,
         ILocalizationService localizationService,
-        ClashModel clashModel,
+        IClashViewModel clashModel,
         SettingsConfig config) {
         _revitRepository = revitRepository ?? throw new ArgumentNullException(nameof(revitRepository));
         _localizationService = localizationService ?? throw new ArgumentNullException(nameof(localizationService));
@@ -28,9 +28,7 @@ internal class ClashDefaultViewSettings : IView3DSetting {
 
 
     public void Apply(View3D view3D) {
-        var bboxSettings = new BboxViewSettings(_revitRepository,
-            [_clashModel.MainElement, _clashModel.OtherElement],
-            10);
+        var bboxSettings = new BboxViewSettings(_revitRepository, _clashModel.GetElements(), 10);
         var filterSettings = new EmptyFiltersViewSettings(_revitRepository, _localizationService);
         var colorSettings = new ColorClashViewSettings(_revitRepository, _localizationService, _clashModel, _config);
         bboxSettings.Apply(view3D);

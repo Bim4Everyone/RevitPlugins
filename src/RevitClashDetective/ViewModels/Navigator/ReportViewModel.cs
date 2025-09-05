@@ -1,15 +1,21 @@
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.IO;
 using System.Linq;
 using System.Windows.Input;
 using System.Windows.Threading;
 
+using dosymep.Revit.Geometry;
+using dosymep.SimpleServices;
 using dosymep.WPF.Commands;
 using dosymep.WPF.ViewModels;
 
 using RevitClashDetective.Models;
 using RevitClashDetective.Models.Clashes;
+using RevitClashDetective.Models.FilterModel;
 using RevitClashDetective.Models.Interfaces;
+using RevitClashDetective.ViewModels.ClashDetective;
 using RevitClashDetective.ViewModels.Services;
 
 namespace RevitClashDetective.ViewModels.Navigator {
@@ -20,20 +26,33 @@ namespace RevitClashDetective.ViewModels.Navigator {
         private string _message;
         private DispatcherTimer _timer;
         private List<ClashViewModel> _allClashes;
-        private List<ClashViewModel> _clashes;
+        private ObservableCollection<ClashViewModel> _clashes;
+        private ObservableCollection<IClashViewModel> _guiClashes;
         private double _firstIntersectionPercentage;
         private double _secondIntersectionPercentage;
+        private bool _showImaginaryClashes;
+        private ImaginaryFirstClashViewModel[] _imaginaryFirstClashes;
+        private ImaginarySecondClashViewModel[] _imaginarySecondClashes;
+        private readonly ILocalizationService _localization;
 
-        public ReportViewModel(RevitRepository revitRepository, string name) {
+        public ReportViewModel(RevitRepository revitRepository, string name, ILocalizationService localization) {
             Initialize(revitRepository, name);
             InitializeClashesFromPluginFile();
+            _localization = localization ?? throw new ArgumentNullException(nameof(localization));
         }
 
-        public ReportViewModel(RevitRepository revitRepository, string name, ICollection<ClashModel> clashes) {
+        public ReportViewModel(
+            RevitRepository revitRepository,
+            string name,
+            ICollection<ClashModel> clashes,
+            ILocalizationService localization) {
+
             Initialize(revitRepository, name);
             if(clashes != null) {
                 InitializeClashes(clashes);
             }
+
+            _localization = localization ?? throw new ArgumentNullException(nameof(localization));
         }
 
         public string Name {
@@ -46,25 +65,38 @@ namespace RevitClashDetective.ViewModels.Navigator {
             set => this.RaiseAndSetIfChanged(ref _message, value);
         }
 
-        public List<ClashViewModel> Clashes {
+        private ObservableCollection<ClashViewModel> Clashes {
             get => _clashes;
             set => this.RaiseAndSetIfChanged(ref _clashes, value);
         }
 
+        public ObservableCollection<IClashViewModel> GuiClashes {
+            get => _guiClashes;
+            private set => RaiseAndSetIfChanged(ref _guiClashes, value);
+        }
+
         public double FirstIntersectionPercentage {
             get => _firstIntersectionPercentage;
-            set => RaiseAndSetIfChanged(ref _firstIntersectionPercentage, value);
+            private set => RaiseAndSetIfChanged(ref _firstIntersectionPercentage, value);
         }
 
         public double SecondIntersectionPercentage {
             get => _secondIntersectionPercentage;
-            set => RaiseAndSetIfChanged(ref _secondIntersectionPercentage, value);
+            private set => RaiseAndSetIfChanged(ref _secondIntersectionPercentage, value);
+        }
+
+        public bool ShowImaginaryClashes {
+            get => _showImaginaryClashes;
+            set => RaiseAndSetIfChanged(ref _showImaginaryClashes, value);
         }
 
 
         public ICommand SaveCommand { get; private set; }
 
         public ICommand SaveAsCommand { get; private set; }
+
+        public ICommand ShowImaginaryClashesChangedCommand { get; private set; }
+
 
         public ClashesConfig GetUpdatedConfig() {
             var config = ClashesConfig.GetClashesConfig(_revitRepository.GetObjectName(), Name);
@@ -87,6 +119,7 @@ namespace RevitClashDetective.ViewModels.Navigator {
 
             SaveCommand = RelayCommand.Create(Save);
             SaveAsCommand = RelayCommand.Create(SaveAs);
+            ShowImaginaryClashesChangedCommand = RelayCommand.Create(ShowImaginaryClashesChanged);
         }
 
         private void Save() {
@@ -114,22 +147,113 @@ namespace RevitClashDetective.ViewModels.Navigator {
             _allClashes = clashModels.Select(item => new ClashViewModel(_revitRepository, item))
                                      .ToList();
             var documentNames = _revitRepository.DocInfos.Select(item => item.Doc.Title).ToList();
-            Clashes = _allClashes.Where(item => IsValid(documentNames, item))
-                                 .ToList();
-            SetIntersectionPercentage(Clashes);
+            Clashes = new ObservableCollection<ClashViewModel>(_allClashes.Where(item => IsValid(documentNames, item)));
+
+            GuiClashes = new ObservableCollection<IClashViewModel>(Clashes);
+            SetIntersectionPercentage(GuiClashes);
         }
 
         private bool IsValid(List<string> documentNames, ClashViewModel clash) {
             return clash.Clash.IsValid(documentNames);
         }
 
-        private void SetIntersectionPercentage(ICollection<ClashViewModel> clashes) {
-            double firstTotalVolume = clashes.Select(c => c.ClashData.MainElementVolume).Sum();
-            double secondTotalVolume = clashes.Select(c => c.ClashData.OtherElementVolume).Sum();
-            double collisionTotalVolume = clashes.Select(c => c.ClashData.ClashVolume).Sum();
+        private void SetIntersectionPercentage(ICollection<IClashViewModel> clashes) {
+            double firstTotalVolume = clashes
+                .Select(GetFirstElementViewModel)
+                .Where(v => v is not null)
+                .Distinct()
+                .Sum(e => e.ElementVolume);
+            double secondTotalVolume = clashes
+                .Select(GetSecondElementViewModel)
+                .Where(v => v is not null)
+                .Distinct()
+                .Sum(e => e.ElementVolume);
+            double collisionTotalVolume = clashes.Select(c => c.IntersectionVolume).Sum();
 
             FirstIntersectionPercentage = Math.Round(collisionTotalVolume / firstTotalVolume * 100, 2);
             SecondIntersectionPercentage = Math.Round(collisionTotalVolume / secondTotalVolume * 100, 2);
+        }
+
+        private ElementViewModel GetFirstElementViewModel(IClashViewModel clash) {
+            try {
+                return new ElementViewModel(clash.GetFirstElement(), clash.FirstElementVolume);
+            } catch(NotSupportedException) {
+                return null;
+            }
+        }
+
+        private ElementViewModel GetSecondElementViewModel(IClashViewModel clash) {
+            try {
+                return new ElementViewModel(clash.GetSecondElement(), clash.SecondElementVolume);
+            } catch(NotSupportedException) {
+                return null;
+            }
+        }
+
+        private void ShowImaginaryClashesChanged() {
+            if(ShowImaginaryClashes) {
+                FindImaginaryClashes();
+                GuiClashes = new ObservableCollection<IClashViewModel>(
+                    [.. Clashes, .. _imaginaryFirstClashes, .. _imaginarySecondClashes]);
+            } else {
+                GuiClashes = new ObservableCollection<IClashViewModel>(Clashes);
+            }
+            SetIntersectionPercentage(GuiClashes);
+        }
+
+        private CheckViewModel GetCheckViewModel() {
+            string path = Path.Combine(_revitRepository.GetObjectName(), _revitRepository.GetDocumentName());
+            var checks = ChecksConfig.GetChecksConfig(path, _revitRepository.Doc);
+            var filters = FiltersConfig.GetFiltersConfig(path, _revitRepository.Doc);
+
+            return checks.Checks
+                .Select(c => new CheckViewModel(_revitRepository, _localization, filters, c))
+                .FirstOrDefault(c => c.ReportName.Equals(Name));
+        }
+
+        private void FindImaginaryClashes() {
+            if(_imaginaryFirstClashes is null || _imaginarySecondClashes is null) {
+                var checkViewModel = GetCheckViewModel();
+                if(checkViewModel is not null) {
+                    (var firstProviders, var secondProviders) = checkViewModel.GetProviders();
+                    _imaginaryFirstClashes = FilterElements(Clashes, GetElementViewModels(firstProviders))
+                        .Select(e => new ImaginaryFirstClashViewModel(e))
+                        .ToArray();
+                    _imaginarySecondClashes = FilterElements(Clashes, GetElementViewModels(secondProviders))
+                        .Select(e => new ImaginarySecondClashViewModel(e))
+                        .ToArray();
+                } else {
+                    _imaginaryFirstClashes = [];
+                    _imaginarySecondClashes = [];
+                }
+            }
+        }
+
+        /// <summary>
+        /// Находит элементы, которые не участвуют в коллизиях
+        /// </summary>
+        /// <param name="clashes">Коллизии</param>
+        /// <param name="elementsToFilter">Элементы для проверки</param>
+        /// <returns>Элементы из заданной коллекции, которые не участвуют в заданных коллизиях</returns>
+        private ICollection<ElementViewModel> FilterElements(
+            ICollection<ClashViewModel> clashes,
+            ICollection<ElementViewModel> elementsToFilter) {
+
+            var clashElements = clashes.SelectMany(c => new[] { c.Clash.MainElement, c.Clash.OtherElement })
+                .ToHashSet();
+
+            return [.. elementsToFilter.Where(e => !clashElements.Contains(e.Element))];
+        }
+
+        private ICollection<ElementViewModel> GetElementViewModels(ICollection<IProvider> providers) {
+            return [.. providers.SelectMany(GetElementViewModels)];
+        }
+
+        private ICollection<ElementViewModel> GetElementViewModels(IProvider provider) {
+            return [.. provider.GetElements()
+                .Select(e => new ElementViewModel(
+                    new ElementModel(e, provider.MainTransform),
+                    e.GetSolids().Sum(s => s.GetVolumeOrDefault(0) ?? 0)))];
         }
 
         private void InitializeTimer() {

@@ -44,7 +44,7 @@ namespace RevitClashDetective.ViewModels.Navigator {
             OpenClashDetectorCommand = RelayCommand.Create(OpenClashDetector, () => OpenFromClashDetector);
             LoadCommand = RelayCommand.Create(Load);
             DeleteCommand = RelayCommand.Create(Delete, CanDelete);
-            SelectClashCommand = RelayCommand.Create<ClashViewModel>(SelectClash, CanSelectClash);
+            SelectClashCommand = RelayCommand.Create<IClashViewModel>(SelectClash, CanSelectClash);
             SaveAllReportsCommand = RelayCommand.Create(SaveAllReports, CanSaveAllReports);
         }
 
@@ -59,8 +59,6 @@ namespace RevitClashDetective.ViewModels.Navigator {
             get => _reports;
             set => RaiseAndSetIfChanged(ref _reports, value);
         }
-
-        public bool IsColumnVisible => Reports != null;
 
         public bool OpenFromClashDetector {
             get => _openFromClashDetector;
@@ -81,7 +79,10 @@ namespace RevitClashDetective.ViewModels.Navigator {
         private void InitializeFiles(string selectedFile) {
             var profilePath = RevitRepository.LocalProfilePath;
             Reports = new ObservableCollection<ReportViewModel>(Directory.GetFiles(Path.Combine(profilePath, ModuleEnvironment.RevitVersion, nameof(RevitClashDetective), _revitRepository.GetObjectName()))
-                .Select(path => new ReportViewModel(_revitRepository, Path.GetFileNameWithoutExtension(path)))
+                .Select(path => new ReportViewModel(
+                    _revitRepository,
+                    Path.GetFileNameWithoutExtension(path),
+                    _localizationService))
                 .Where(item => item.Name.Equals(selectedFile, StringComparison.CurrentCultureIgnoreCase)));
             SelectedReport = Reports.FirstOrDefault();
         }
@@ -91,7 +92,10 @@ namespace RevitClashDetective.ViewModels.Navigator {
             var path = Path.Combine(profilePath, ModuleEnvironment.RevitVersion, nameof(RevitClashDetective), _revitRepository.GetObjectName());
             if(Directory.Exists(path)) {
                 Reports = new ObservableCollection<ReportViewModel>(Directory.GetFiles(path)
-                                   .Select(item => new ReportViewModel(_revitRepository, Path.GetFileNameWithoutExtension(item))));
+                    .Select(item => new ReportViewModel(
+                        _revitRepository,
+                        Path.GetFileNameWithoutExtension(item),
+                        _localizationService)));
                 SelectedReport = Reports.FirstOrDefault();
             }
         }
@@ -120,7 +124,7 @@ namespace RevitClashDetective.ViewModels.Navigator {
         private void InitializeClashes(string path) {
             var name = Path.GetFileNameWithoutExtension(path);
             var reports = ReportLoader.GetReports(_revitRepository, path)
-                .Select(r => new ReportViewModel(_revitRepository, r.Name, r.Clashes?.ToList()));
+                .Select(r => new ReportViewModel(_revitRepository, r.Name, r.Clashes?.ToList(), _localizationService));
 
             Reports = new ObservableCollection<ReportViewModel>(new NameResolver<ReportViewModel>(Reports, reports).GetCollection());
             SelectedReport = reports.First();
@@ -143,22 +147,20 @@ namespace RevitClashDetective.ViewModels.Navigator {
 
         private bool CanDelete() => SelectedReport != null;
 
-        private void SelectClash(ClashViewModel clash) {
+        private void SelectClash(IClashViewModel clash) {
+            // TODO добавить обработку мнимых коллизий
             IView3DSetting settings;
             var config = SettingsConfig.GetSettingsConfig(GetPlatformService<IConfigSerializer>());
             if(ElementsIsolationEnabled) {
-                settings = new ClashIsolationViewSettings(_revitRepository, _localizationService, clash.Clash, config);
+                settings = new ClashIsolationViewSettings(_revitRepository, _localizationService, clash, config);
             } else {
-                settings = new ClashDefaultViewSettings(_revitRepository, _localizationService, clash.Clash, config);
+                settings = new ClashDefaultViewSettings(_revitRepository, _localizationService, clash, config);
             }
-            _revitRepository.SelectAndShowElement([clash.Clash.MainElement, clash.Clash.OtherElement], settings);
+            _revitRepository.SelectAndShowElement(clash.GetElements(), settings);
         }
 
-        private bool CanSelectClash(ClashViewModel p) {
-            return p != null
-                && p.Clash != null
-                && p.Clash.MainElement != null
-                && p.Clash.OtherElement != null;
+        private bool CanSelectClash(IClashViewModel p) {
+            return p != null && p.GetElements().Count > 0;
         }
 
         private void SaveAllReports() {

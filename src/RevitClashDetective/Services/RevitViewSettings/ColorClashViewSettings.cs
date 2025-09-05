@@ -9,17 +9,18 @@ using dosymep.SimpleServices;
 using RevitClashDetective.Models;
 using RevitClashDetective.Models.Clashes;
 using RevitClashDetective.Models.Interfaces;
+using RevitClashDetective.ViewModels.Navigator;
 
 namespace RevitClashDetective.Services.RevitViewSettings;
 internal class ColorClashViewSettings : IView3DSetting {
     private readonly RevitRepository _revitRepository;
     private readonly ILocalizationService _localizationService;
-    private readonly ClashModel _clashModel;
+    private readonly IClashViewModel _clashModel;
     private readonly SettingsConfig _config;
 
     public ColorClashViewSettings(RevitRepository revitRepository,
         ILocalizationService localizationService,
-        ClashModel clashModel,
+        IClashViewModel clashModel,
         SettingsConfig config) {
         _revitRepository = revitRepository ?? throw new ArgumentNullException(nameof(revitRepository));
         _localizationService = localizationService ?? throw new ArgumentNullException(nameof(localizationService));
@@ -32,28 +33,54 @@ internal class ColorClashViewSettings : IView3DSetting {
         ColorClashElements(view3D, _clashModel);
     }
 
-    private void ColorClashElements(View3D view, ClashModel clash) {
-        var firstEl = clash.MainElement.GetElement(_revitRepository.DocInfos);
-        var secondEl = clash.OtherElement.GetElement(_revitRepository.DocInfos);
-        if(firstEl != null && secondEl != null) {
+    private void ColorClashElements(View3D view, IClashViewModel clash) {
+        var firstEl = GetFirstElement(clash)?.GetElement(_revitRepository.DocInfos);
+        var secondEl = GetSecondElement(clash)?.GetElement(_revitRepository.DocInfos);
+        if(firstEl != null || secondEl != null) {
             string username = _revitRepository.Doc.Application.Username;
-            using(Transaction t = _revitRepository.Doc.StartTransaction(
-                _localizationService.GetLocalizedString("Transactions.ClashGraphicSettings"))) {
-                var firstElFilter = _revitRepository.ParameterFilterProvider.GetSelectFilter(
-                    _revitRepository.Doc,
+            using var t = _revitRepository.Doc.StartTransaction(
+                _localizationService.GetLocalizedString("Transactions.ClashGraphicSettings"));
+            if(firstEl != null) {
+                SetViewColorSettings(view,
                     firstEl,
-                    _localizationService.GetLocalizedString("Filters.FirstElementFilter", username));
-                var secondElFilter = _revitRepository.ParameterFilterProvider.GetSelectFilter(
-                    _revitRepository.Doc,
-                    secondEl,
-                    _localizationService.GetLocalizedString("Filters.SecondElementFilter", username));
-
-                view.AddFilter(firstElFilter.Id);
-                view.SetFilterOverrides(firstElFilter.Id, GetGraphicSettings(_config.MainElementVisibilitySettings));
-                view.AddFilter(secondElFilter.Id);
-                view.SetFilterOverrides(secondElFilter.Id, GetGraphicSettings(_config.SecondElementVisibilitySettings));
-                t.Commit();
+                    _localizationService.GetLocalizedString("Filters.FirstElementFilter", username),
+                    GetGraphicSettings(_config.MainElementVisibilitySettings));
             }
+            if(secondEl != null) {
+                SetViewColorSettings(view,
+                    secondEl,
+                    _localizationService.GetLocalizedString("Filters.SecondElementFilter", username),
+                    GetGraphicSettings(_config.SecondElementVisibilitySettings));
+            }
+
+            t.Commit();
+        }
+    }
+
+    private void SetViewColorSettings(View3D view,
+        Element element,
+        string filterName,
+        OverrideGraphicSettings graphicSettings) {
+
+        var secondElFilter = _revitRepository.ParameterFilterProvider.GetSelectFilter(
+            _revitRepository.Doc, element, filterName);
+        view.AddFilter(secondElFilter.Id);
+        view.SetFilterOverrides(secondElFilter.Id, graphicSettings);
+    }
+
+    private ElementModel GetFirstElement(IClashViewModel clash) {
+        try {
+            return clash.GetFirstElement();
+        } catch(NotSupportedException) {
+            return null;
+        }
+    }
+
+    private ElementModel GetSecondElement(IClashViewModel clash) {
+        try {
+            return clash.GetSecondElement();
+        } catch(NotSupportedException) {
+            return null;
         }
     }
 

@@ -159,6 +159,8 @@ namespace RevitClashDetective.Models.Clashes {
         [Display(Name = "Проанализировано")]
         Analized,
         [Display(Name = "Исправлено")]
-        Solved
+        Solved,
+        [Display(Name = "Нет пересечения")]
+        Imaginary
     }
 }
