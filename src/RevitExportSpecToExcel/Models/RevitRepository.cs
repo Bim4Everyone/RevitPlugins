@@ -7,8 +7,6 @@ using Autodesk.Revit.UI;
 
 using dosymep.SimpleServices;
 
-using RevitExportSpecToExcel.ViewModels;
-
 namespace RevitExportSpecToExcel.Models;
 
 internal class RevitRepository {
@@ -30,32 +28,5 @@ internal class RevitRepository {
             .OfClass(typeof(ViewSchedule))
             .OfType<ViewSchedule>()
             .ToList();
-    }
-
-    public IList<ScheduleViewModel> GetSchedulesVM(ILocalizationService localizationService) {
-        IList<ViewSchedule> schedulesRevit = GetSchedules();
-        IList<ScheduleViewModel> schedules = [];
-
-        ElementId activeViewId = Document.ActiveView.Id;
-        IList<ElementId> openedViewIds = ActiveUIDocument
-            .GetOpenUIViews()
-            .Select(x => x.ViewId)
-        .ToList();
-
-        ViewStatuses statuses = new(localizationService);
-
-        foreach(var schedule in schedulesRevit) {
-            if(schedule.Id == activeViewId) {
-                schedules.Add(new ScheduleViewModel(schedule, statuses.ActiveViewStatus) {
-                    IsChecked = true
-                });
-            } else if(openedViewIds.Contains(schedule.Id)) {
-                schedules.Add(new ScheduleViewModel(schedule, statuses.OpenedViewStatus));
-            } else {
-                schedules.Add(new ScheduleViewModel(schedule, statuses.ClosedViewStatus));
-            }
-        }
-
-        return schedules;
     }
 }

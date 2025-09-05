@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Windows.Input;
@@ -91,8 +92,7 @@ internal class MainViewModel : BaseViewModel {
     }
 
     private void LoadView() {
-        Schedules = new(_revitRepository
-            .GetSchedulesVM(_localizationService)
+        Schedules = new(GetSchedulesVM(_localizationService)
             .ToList());
         FilteredSchedules = new ObservableCollection<ScheduleViewModel>(Schedules.OrderBy(x => x.OpenStatus));
 
@@ -113,6 +113,33 @@ internal class MainViewModel : BaseViewModel {
         _excelExporter.ExportSchedules(path, documentName, schedulesToExport, SaveAsOneFile);
 
         SaveConfig();
+    }
+
+    public IList<ScheduleViewModel> GetSchedulesVM(ILocalizationService localizationService) {
+        IList<ViewSchedule> schedulesRevit = _revitRepository.GetSchedules();
+        IList<ScheduleViewModel> schedules = [];
+
+        ElementId activeViewId = _revitRepository.Document.ActiveView.Id;
+        IList<ElementId> openedViewIds = _revitRepository.ActiveUIDocument
+            .GetOpenUIViews()
+            .Select(x => x.ViewId)
+            .ToList();
+
+        ViewStatuses statuses = new(localizationService);
+
+        foreach(var schedule in schedulesRevit) {
+            if(schedule.Id == activeViewId) {
+                schedules.Add(new ScheduleViewModel(schedule, statuses.ActiveViewStatus) {
+                    IsChecked = true
+                });
+            } else if(openedViewIds.Contains(schedule.Id)) {
+                schedules.Add(new ScheduleViewModel(schedule, statuses.OpenedViewStatus));
+            } else {
+                schedules.Add(new ScheduleViewModel(schedule, statuses.ClosedViewStatus));
+            }
+        }
+
+        return schedules;
     }
 
     private bool CanAcceptView() {
