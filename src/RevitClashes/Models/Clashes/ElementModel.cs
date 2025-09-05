@@ -5,10 +5,10 @@ using System.Linq;
 using Autodesk.Revit.DB;
 
 using dosymep.Revit;
+using dosymep.Revit.Geometry;
 
 using pyRevitLabs.Json;
 
-using RevitClashDetective.Models.Extensions;
 
 namespace RevitClashDetective.Models.Clashes {
     internal class ElementModel : IEquatable<ElementModel> {
@@ -89,7 +89,7 @@ namespace RevitClashDetective.Models.Clashes {
         }
 
         public IList<Solid> GetSolids(IEnumerable<DocInfo> documents) {
-            return GetElement(documents)?.GetSolids()
+            return GetElement(documents)?.GetSolids().ToArray()
                 ?? throw new ArgumentException($"Элемент с Id={Id} не найден в заданных документах");
         }
 
