@@ -33,40 +33,65 @@ internal class TransViewRebarDimensionService {
             // Определяем относительно чего нужно строить размерные линии - каркаса или пилона
             var pylon = SheetInfo.HostElems.First();
             var dimensionLineHostRef = onTopOfRebar ? skeletonParentRebar : pylon;
-
+            // Получаем ссылки на опорные плоскости для размеров бутылок
+            var edgeBottomRefArray = dimensionBaseService.GetDimensionRefs(skeletonParentRebar, '#', '/',
+                                                                           ["низ", "фронт", "край"]);
             //ВЕРТИКАЛЬНЫЕ РАЗМЕРЫ
             if(onTopOfRebar) {
                 if(SheetInfo.RebarInfo.AllRebarAreL) {
                     // Когда все Гэшки
                     CreateDimension(skeletonParentRebar, dimensionLineHostRef, DirectionType.Bottom, 0.5,
                                     ["низ", "фронт"], view, dimensionBaseService);
+                    // Размер по ФРОНТУ каркас края (положение снизу дальнее)
+                    CreateDimension(skeletonParentRebar, dimensionLineHostRef, DirectionType.Bottom, 1,
+                                    ["низ", "фронт", "край"], view, dimensionBaseService);
                 } else if(SheetInfo.RebarInfo.HasLRebar) {
                     // Когда Гэшки с одной стороны
                     if(rebarFinder.DirectionHasLRebar(view, SheetInfo.ProjectSection, DirectionType.Top)) {
+                        // Верхняя зона
                         CreateDimension(skeletonParentRebar, dimensionLineHostRef, DirectionType.Top, 0.5,
                                         ["низ", "фронт"], view, dimensionBaseService);
+                        // Размер по ФРОНТУ каркас края (положение сверху дальнее)
+                        CreateDimension(skeletonParentRebar, dimensionLineHostRef, DirectionType.Top, 1,
+                                        ["низ", "фронт", "край"], view, dimensionBaseService);
+
+                        // Нижняя зона
                         CreateDimension(skeletonParentRebar, dimensionLineHostRef, DirectionType.Bottom, 0.5,
-                                        ["верх", "фронт"], view, dimensionBaseService);
+                                        ["верх", "фронт"], view, dimensionBaseService, edgeBottomRefArray);
+                        // Размер по ФРОНТУ каркас края (положение снизу дальнее)
+                        CreateDimension(skeletonParentRebar, dimensionLineHostRef, DirectionType.Bottom, 1,
+                                        ["верх", "фронт", "край"], view, dimensionBaseService);
                     } else {
+                        // Верхняя зона
                         CreateDimension(skeletonParentRebar, dimensionLineHostRef, DirectionType.Top, 0.5,
-                                        ["верх", "фронт"], view, dimensionBaseService);
+                                        ["верх", "фронт"], view, dimensionBaseService, edgeBottomRefArray);
+                        // Размер по ФРОНТУ каркас края (положение сверху дальнее)
+                        CreateDimension(skeletonParentRebar, dimensionLineHostRef, DirectionType.Top, 1,
+                                        ["верх", "фронт", "край"], view, dimensionBaseService);
+
+                        // Нижняя зона
                         CreateDimension(skeletonParentRebar, dimensionLineHostRef, DirectionType.Bottom, 0.5,
                                         ["низ", "фронт"], view, dimensionBaseService);
+                        // Размер по ФРОНТУ каркас края (положение снизу дальнее)
+                        CreateDimension(skeletonParentRebar, dimensionLineHostRef, DirectionType.Bottom, 1,
+                                        ["низ", "фронт", "край"], view, dimensionBaseService);
                     }
                 } else {
                     // Размер по ФРОНТУ каркас (положение снизу ближнее)
                     CreateDimension(skeletonParentRebar, dimensionLineHostRef, DirectionType.Bottom, 0.5,
-                                    ["верх", "фронт"], view, dimensionBaseService);
+                                    ["верх", "фронт"], view, dimensionBaseService, edgeBottomRefArray);
+                    // Размер по ФРОНТУ каркас края (положение снизу дальнее)
+                    CreateDimension(skeletonParentRebar, dimensionLineHostRef, DirectionType.Bottom, 1,
+                                    ["низ", "фронт", "край"], view, dimensionBaseService);
                 }
             } else {
                 // Размер по ФРОНТУ каркас (положение снизу ближнее)
                 CreateDimension(skeletonParentRebar, dimensionLineHostRef, DirectionType.Bottom, 0.5,
                                 ["низ", "фронт"], view, dimensionBaseService);
+                // Размер по ФРОНТУ каркас края (положение снизу дальнее)
+                CreateDimension(skeletonParentRebar, dimensionLineHostRef, DirectionType.Bottom, 1,
+                                ["низ", "фронт", "край"], view, dimensionBaseService);
             }
-            
-            // Размер по ФРОНТУ каркас края (положение снизу дальнее)
-            CreateDimension(skeletonParentRebar, dimensionLineHostRef, DirectionType.Bottom, 1,
-                            ["низ", "фронт", "край"], view, dimensionBaseService);
 
             //ГОРИЗОНТАЛЬНЫЕ РАЗМЕРЫ
             // Размер по ТОРЦУ армирование (положение справа ближнее)
