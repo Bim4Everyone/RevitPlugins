@@ -21,6 +21,7 @@ internal class GeneralViewMarkService {
     private readonly double _breakLinesOffsetX = 0.3;
     private readonly double _breakLinesOffsetYSmall = 0.1;
     private readonly double _breakLinesOffsetYBig = 0.3;
+    private readonly double _breakLinesOffsetYBottomBig = 1;
 
     internal GeneralViewMarkService(MainViewModel mvm, RevitRepository repository, PylonSheetInfo pylonSheetInfo, 
                                     PylonView pylonView) {
@@ -99,7 +100,7 @@ internal class GeneralViewMarkService {
             var pointRight = _viewPointsAnalyzer.GetPointByDirection(rightVerticalBar, DirectionType.Right,
                                                                      0, 0, true);
             // Корректируем положение точки, куда будет установлена марка (текст)
-            pointRight = _viewPointsAnalyzer.GetPointByDirection(pointRight, DirectionType.RightBottom, 1.5, 3.5);
+            pointRight = _viewPointsAnalyzer.GetPointByDirection(pointRight, DirectionType.RightBottom, 0.8, 3.2);
             // Создаем марку арматуры
             var rightTag = _annotationService.CreateRebarTag(pointRight, _tagSkeletonSymbol, rightVerticalBar);
 
@@ -171,11 +172,11 @@ internal class GeneralViewMarkService {
             var point2 = _viewPointsAnalyzer.GetPointByDirection(new XYZ(pylonLeftMinPoint.X, 
                                                                          pylonLeftMinPoint.Y, 
                                                                          viewMin.Z),
-                                                                 DirectionType.Top, 0, _breakLinesOffsetYBig);
+                                                                 DirectionType.Top, 0, _breakLinesOffsetYBottomBig);
             var point3 = _viewPointsAnalyzer.GetPointByDirection(new XYZ(pylonRightMinPoint.X, 
                                                                          pylonRightMinPoint.Y, 
                                                                          viewMin.Z),
-                                                                 DirectionType.Top, 0, _breakLinesOffsetYBig);
+                                                                 DirectionType.Top, 0, _breakLinesOffsetYBottomBig);
             var point4 = _viewPointsAnalyzer.GetPointByDirection(pylonRightMinPoint,
                                                                  DirectionType.Top, 0, _breakLinesOffsetYSmall);
             // Линии обрыва - это 2D-аннотационные семейства на основе линии

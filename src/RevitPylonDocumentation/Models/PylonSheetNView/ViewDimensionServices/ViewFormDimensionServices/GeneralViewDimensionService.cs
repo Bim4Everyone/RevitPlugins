@@ -34,20 +34,25 @@ internal class GeneralViewDimensionService {
                                            DimensionBaseService dimensionBaseService, bool isFrontView) {
         var view = ViewOfPylon.ViewElement;
         try {
-            // Размер по ФРОНТУ опалубка (положение снизу 1)
             var side = isFrontView ? "фронт" : "торец";
+            // Ссылки на опорные плоскости - крайние пилона
+            var refArrayFormwork = dimensionBaseService.GetDimensionRefs(SheetInfo.HostElems.First() as FamilyInstance,
+                                                                         '#', '/', [side, "край"]);
+            // Размер по ФРОНТУ опалубка + армирование (положение снизу 1)
             var dimensionLineBottomFirst = dimensionBaseService.GetDimensionLine(skeletonParentRebar,
-                                                                                 DirectionType.Bottom, 2.3);
-            var refArrayFormworkFront = dimensionBaseService.GetDimensionRefs(SheetInfo.HostElems.First() as FamilyInstance,
-                                                                              '#', '/', [side, "край"]);
-            Repository.Document.Create.NewDimension(view, dimensionLineBottomFirst, refArrayFormworkFront,
+                                                                                 DirectionType.Bottom, 1.3);
+            var refArrayFormworkRebarFront = 
+                dimensionBaseService.GetDimensionRefs(skeletonParentRebar, '#', '/', 
+                                                      ["низ", side, "край"], oldRefArray: refArrayFormwork);
+            Repository.Document.Create.NewDimension(view, dimensionLineBottomFirst, refArrayFormworkRebarFront,
                                                     ViewModel.SelectedDimensionType);
+
             if(grids.Count > 0) {
                 // Размер по ФРОНТУ опалубка + оси (положение снизу 2)
                 var dimensionLineBottomSecond = dimensionBaseService.GetDimensionLine(skeletonParentRebar,
                                                                                       DirectionType.Bottom, 1.8);
                 var refArrayFormworkGridFront = dimensionBaseService.GetDimensionRefs(grids, view, new XYZ(0, 0, 1),
-                                                                                      refArrayFormworkFront);
+                                                                                      refArrayFormwork);
                 Repository.Document.Create.NewDimension(view, dimensionLineBottomSecond, refArrayFormworkGridFront,
                                                         ViewModel.SelectedDimensionType);
 
@@ -61,6 +66,12 @@ internal class GeneralViewDimensionService {
                 };
                 EditGridEnds(view, SheetInfo.HostElems.First(), grids, transverseViewGridOffsets, dimensionBaseService);
             }
+
+            // Размер по ФРОНТУ опалубка (положение снизу 3)
+            var dimensionLineBottomThird = dimensionBaseService.GetDimensionLine(skeletonParentRebar,
+                                                                                 DirectionType.Bottom, 2.3);
+            Repository.Document.Create.NewDimension(view, dimensionLineBottomThird, refArrayFormwork,
+                                                    ViewModel.SelectedDimensionType);
         } catch(Exception) { }
     }
 
