@@ -4,23 +4,20 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-
     xmlns:base="clr-namespace:dosymep.WPF.Views"
     xmlns:vms="clr-namespace:RevitServerFolders.ViewModels.Rs"
-
     xmlns:dxmvvm="http://schemas.devexpress.com/winfx/2008/xaml/mvvm"
     xmlns:dx="http://schemas.devexpress.com/winfx/2008/xaml/core"
     xmlns:converters="clr-namespace:RevitServerFolders.Converters"
     xmlns:dxg="http://schemas.devexpress.com/winfx/2008/xaml/grid"
-
     mc:Ignorable="d"
     WindowStartupLocation="CenterOwner"
-
     x:Name="_this"
     Title="MainWindow"
-    Height="450" Width="800"
-    MinHeight="450" MinWidth="800"
-
+    Height="450"
+    Width="800"
+    MinHeight="450"
+    MinWidth="800"
     d:DataContext="{d:DesignInstance vms:MainViewModel, IsDesignTimeCreatable=False}">
 
     <dxmvvm:Interaction.Behaviors>
@@ -76,9 +73,12 @@
 
     <Grid>
         <Grid.RowDefinitions>
-            <RowDefinition Height="Auto" />
-            <RowDefinition Height="*" />
-            <RowDefinition Height="Auto" />
+            <RowDefinition
+                Height="Auto" />
+            <RowDefinition
+                Height="*" />
+            <RowDefinition
+                Height="Auto" />
         </Grid.RowDefinitions>
 
         <DockPanel
@@ -98,9 +98,15 @@
             SelectedItem="{Binding SelectedItem, Mode=TwoWay}">
 
             <dxg:TreeListControl.Columns>
-                <dxg:TreeListColumn FieldName="Name" Header="Наименование" />
-                <dxg:TreeListColumn FieldName="FullName" Header="Полное наименование" />
-                <dxg:TreeListColumn FieldName="Size" Header="Размер" />
+                <dxg:TreeListColumn
+                    FieldName="Name"
+                    Header="Наименование" />
+                <dxg:TreeListColumn
+                    FieldName="FullName"
+                    Header="Полное наименование" />
+                <dxg:TreeListColumn
+                    FieldName="Size"
+                    Header="Размер" />
             </dxg:TreeListControl.Columns>
 
             <dxg:TreeListControl.View>
@@ -109,13 +115,10 @@
                     AutoWidth="True"
                     AllowEditing="False"
                     AllowChildNodeSourceUpdates="True"
-
                     ShowNodeImages="True"
                     NodeImageSelector="{StaticResource RsNodeImageSelector}"
-
                     ShowCheckboxes="False"
                     ExpandStateFieldName="IsExpanded"
-
                     NavigationStyle="Row"
                     ChildNodesPath="Children"
                     TreeDerivationMode="ChildNodesSelector" />

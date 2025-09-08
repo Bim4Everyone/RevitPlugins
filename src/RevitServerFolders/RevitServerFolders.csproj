@@ -1,8 +1,9 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
-    <PropertyGroup>
-        <UseDevExpress>true</UseDevExpress>
-    </PropertyGroup>
-    <ItemGroup>
-      <Resource Include="Resources\Revit.png" />
-    </ItemGroup>
+	<PropertyGroup>
+		<UseDevExpress>true</UseDevExpress>
+		<LangVersion>12</LangVersion>
+	</PropertyGroup>
+	<ItemGroup>
+		<Resource Include="Resources\Revit.png" />
+	</ItemGroup>
 </Project>
