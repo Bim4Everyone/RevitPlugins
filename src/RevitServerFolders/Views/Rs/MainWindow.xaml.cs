@@ -1,20 +1,19 @@
-﻿using System.Windows;
+using System.Windows;
 
-namespace RevitServerFolders.Views.Rs {
-    public partial class MainWindow {
-        public MainWindow() {
-            InitializeComponent();
-        }
+namespace RevitServerFolders.Views.Rs;
+public partial class MainWindow {
+    public MainWindow() {
+        InitializeComponent();
+    }
 
-        public override string PluginName => nameof(RevitServerFolders);
-        public override string ProjectConfigName => "Rs." + nameof(MainWindow);
+    public override string PluginName => nameof(RevitServerFolders);
+    public override string ProjectConfigName => "Rs." + nameof(MainWindow);
 
-        private void ButtonOk_Click(object sender, RoutedEventArgs e) {
-            DialogResult = true;
-        }
+    private void ButtonOk_Click(object sender, RoutedEventArgs e) {
+        DialogResult = true;
+    }
 
-        private void ButtonCancel_Click(object sender, RoutedEventArgs e) {
-            DialogResult = false;
-        }
+    private void ButtonCancel_Click(object sender, RoutedEventArgs e) {
+        DialogResult = false;
     }
 }
