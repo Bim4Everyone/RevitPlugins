@@ -4,11 +4,9 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-
     xmlns:base="clr-namespace:dosymep.WPF.Views"
     xmlns:local="clr-namespace:RevitServerFolders.Views"
     xmlns:vms="clr-namespace:RevitServerFolders.ViewModels"
-
     xmlns:dxmvvm="http://schemas.devexpress.com/winfx/2008/xaml/mvvm"
     xmlns:dx="http://schemas.devexpress.com/winfx/2008/xaml/core"
     xmlns:dxe="http://schemas.devexpress.com/winfx/2008/xaml/editors"
@@ -16,15 +14,14 @@
     xmlns:services="clr-namespace:dosymep.Xpf.Core.SimpleServices;assembly=dosymep.Xpf.Core"
     xmlns:converters="clr-namespace:RevitServerFolders.Converters"
     xmlns:dosymepConverters="clr-namespace:dosymep.WPF.Converters"
-
     mc:Ignorable="d"
     x:Name="_this"
     WindowStartupLocation="CenterOwner"
-
     Title="MainWindow"
-    Height="450" Width="800"
-    MinHeight="450" MinWidth="800"
-
+    Height="450"
+    Width="800"
+    MinHeight="450"
+    MinWidth="800"
     d:DataContext="{d:DesignInstance vms:MainViewModel, IsDesignTimeCreatable=False}">
 
     <dxmvvm:Interaction.Behaviors>
@@ -80,7 +77,8 @@
                 Value="False" />
         </Style>
         <Style
-            TargetType="dxe:ButtonEdit" x:Key="SourceFolderEditStyle">
+            TargetType="dxe:ButtonEdit"
+            x:Key="SourceFolderEditStyle">
             <Style.Triggers>
                 <DataTrigger
                     Binding="{Binding DataContext.OpenFromFoldersCommand.IsExecuting, ElementName=_this}"
@@ -105,12 +103,18 @@
 
     <Grid>
         <Grid.RowDefinitions>
-            <RowDefinition Height="Auto" />
-            <RowDefinition Height="Auto" />
-            <RowDefinition Height="Auto" />
-            <RowDefinition Height="Auto" />
-            <RowDefinition Height="*" />
-            <RowDefinition Height="Auto" />
+            <RowDefinition
+                Height="Auto" />
+            <RowDefinition
+                Height="Auto" />
+            <RowDefinition
+                Height="Auto" />
+            <RowDefinition
+                Height="Auto" />
+            <RowDefinition
+                Height="*" />
+            <RowDefinition
+                Height="Auto" />
         </Grid.RowDefinitions>
 
         <Label
@@ -124,10 +128,12 @@
             AllowDefaultButton="False"
             EditValue="{Binding TargetFolder, UpdateSourceTrigger=PropertyChanged}">
             <dxe:ButtonEdit.Buttons>
-                <dxe:ButtonInfo Command="{Binding OpenFolderDialogCommand}">
+                <dxe:ButtonInfo
+                    Command="{Binding OpenFolderDialogCommand}">
                     <dxe:ButtonInfo.ContentTemplate>
                         <DataTemplate>
-                            <dx:DXImage Source="{dx:DXImage 'Office2013/Actions/Open_16x16.png'}" />
+                            <dx:DXImage
+                                Source="{dx:DXImage 'Office2013/Actions/Open_16x16.png'}" />
                         </DataTemplate>
                     </dxe:ButtonInfo.ContentTemplate>
                 </dxe:ButtonInfo>
@@ -168,7 +174,8 @@
                         Converter={StaticResource InverseBooleanConverter}}">
                     <dxe:ButtonInfo.ContentTemplate>
                         <DataTemplate>
-                            <dx:DXImage Source="{dx:DXImage 'Office2013/Actions/Open_16x16.png'}" />
+                            <dx:DXImage
+                                Source="{dx:DXImage 'Office2013/Actions/Open_16x16.png'}" />
                         </DataTemplate>
                     </dxe:ButtonInfo.ContentTemplate>
                 </dxe:ButtonInfo>
@@ -182,17 +189,21 @@
             SelectedItem="{Binding SelectedObject}">
 
             <dxg:GridControl.View>
-                <dxg:TableView AutoWidth="True"
-                               AllowEditing="False"
-                               AllowGrouping="False"
-                               ShowGroupPanel="False">
+                <dxg:TableView
+                    AutoWidth="True"
+                    AllowEditing="False"
+                    AllowGrouping="False"
+                    ShowGroupPanel="False">
                     <dxg:TableView.RowStyle>
-                        <Style TargetType="dxg:RowControl">
+                        <Style
+                            TargetType="dxg:RowControl">
                             <Style.Triggers>
                                 <DataTrigger
                                     Value="True"
                                     Binding="{Binding Row.SkipObject}">
-                                    <Setter Property="Foreground" Value="DarkGray" />
+                                    <Setter
+                                        Property="Foreground"
+                                        Value="DarkGray" />
                                 </DataTrigger>
                             </Style.Triggers>
                         </Style>
@@ -241,7 +252,8 @@
                 Header="">
 
                 <dxg:GridColumn.CellTemplate>
-                    <DataTemplate DataType="{x:Type dxg:EditGridCellData}">
+                    <DataTemplate
+                        DataType="{x:Type dxg:EditGridCellData}">
                         <Image
                             Source="{Binding RowData.Row, 
                                 Converter={StaticResource CellImageConverter}}" />
