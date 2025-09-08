@@ -120,7 +120,7 @@ internal class TransViewRebarMarkService {
 
         // Получаем точку в которую нужно поставить аннотацию
         var pylonPoint = _viewPointsAnalyzer.GetPylonPointByDirection(SheetInfo, DirectionType.RightBottom);
-        var pointRightBottom = _viewPointsAnalyzer.GetPointByDirection(pylonPoint, DirectionType.RightBottom, 0.7, 0.25);
+        var pointRightBottom = _viewPointsAnalyzer.GetPointByDirection(pylonPoint, DirectionType.RightBottom, 0.7, 0.5);
 
         // Создаем марку арматуры
         _annotationService.CreateRebarTag(pointRightBottom, _tagSymbolWithComment, rightBottomElement);
