@@ -47,7 +47,6 @@ internal class TransViewDimensionService {
             var pylon = pylonFromTop ?  SheetInfo.HostElems.Last() : SheetInfo.HostElems.First();
             var dimensionLineHostRef = refsForTop ? skeletonParentRebar : pylon;
 
-
             var refArrayFormworkFront = dimensionBaseService.GetDimensionRefs(pylon as FamilyInstance,
                                                                               '#', '/', ["фронт", "край"]);
             //ВЕРТИКАЛЬНЫЕ РАЗМЕРЫ
@@ -83,18 +82,20 @@ internal class TransViewDimensionService {
                 CreateDimension(skeletonParentRebar, dimensionLineHostRef, DirectionType.Bottom, 0.5,
                                 ["низ", "фронт", "край"], view, dimensionBaseService, refArrayFormworkFront, false);
             }
-            // Размер по ФРОНТУ опалубка (положение снизу 1)
-            CreateDimension(refArrayFormworkFront, dimensionLineHostRef, DirectionType.Bottom, 1, view, 
-                            dimensionBaseService);
-
-            if(grids.Count > 0) {
-                double gridDimensionLineOffset =
-                    refsForTop && !SheetInfo.RebarInfo.AllRebarAreL && SheetInfo.RebarInfo.HasLRebar ? 1 : 0.5;
-
+            // Определим отступ для размерной линии общего размера по опалубке (если есть верт оси, то будет дальше)
+            var formworkFrontDimensionLineOffset = 1.0;
+            // Размеры по осям
+            if(grids.Count > 0 && dimensionBaseService.GetDimensionRefs(grids, view, XYZ.BasisY).Size > 0) {
                 // Размер по ФРОНТУ опалубка + оси (положение сверху 1)
-                CreateDimension(grids, dimensionLineHostRef, DirectionType.Top, gridDimensionLineOffset, 
+                CreateDimension(grids, dimensionLineHostRef, DirectionType.Bottom, 1, 
                                 XYZ.BasisY, view, dimensionBaseService, refArrayFormworkFront);
+
+                formworkFrontDimensionLineOffset = 1.5;
             }
+
+            // Размер по ФРОНТУ опалубка (положение снизу 1.5)
+            CreateDimension(refArrayFormworkFront, dimensionLineHostRef, DirectionType.Bottom,
+                            formworkFrontDimensionLineOffset, view, dimensionBaseService);
 
             //ГОРИЗОНТАЛЬНЫЕ РАЗМЕРЫ
             // Получаем референсы для размеров по крайним плоскостям пилона
@@ -139,13 +140,14 @@ internal class TransViewDimensionService {
                 // видового экрана
                 var transverseViewGridOffsets = new OffsetOption() {
                     LeftOffset = 1.5,
-                    RightOffset = 0.5,
-                    TopOffset = 0.6,
-                    BottomOffset = 1.1
+                    RightOffset = 0.3,
+                    TopOffset = 0.2,
+                    BottomOffset = 1.6
                 };
+                
                 // В случае, если на виде вниз будут смотреть Гэшки, то нужно оставить больше места
                 if(longGridsWillBeNeeded) {
-                    transverseViewGridOffsets.BottomOffset = 2.6;
+                    transverseViewGridOffsets.BottomOffset = 3.0;
                 }
                 EditGridEnds(view, pylon, grids, transverseViewGridOffsets,
                              dimensionBaseService);
