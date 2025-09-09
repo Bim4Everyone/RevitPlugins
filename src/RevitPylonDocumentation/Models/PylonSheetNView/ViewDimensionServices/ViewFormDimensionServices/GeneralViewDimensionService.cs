@@ -27,10 +27,14 @@ internal class GeneralViewDimensionService {
     internal PylonSheetInfo SheetInfo { get; set; }
     internal PylonView ViewOfPylon { get; set; }
 
-    // Смещение для размерного сегмента с маленьким текстом
-    private XYZ VertDimSmallTextOffset { get; set; }
-    // Смещение для размерного сегмента с маленьким текстом инвертированное (зависит от положения в размерной цепочке)
-    private XYZ VertDimSmallTextOffsetInverted { get; set; }
+    // Смещение для размерного сегмента с маленьким текстом вверх
+    private XYZ VertDimSmallUpTextOffset { get; set; }
+    // Смещение для размерного сегмента с маленьким текстом вверх инвертированное (зависит от положения в размерной цепочке)
+    private XYZ VertDimSmallUpTextOffsetInverted { get; set; }
+    // Смещение для размерного сегмента с маленьким текстом вниз
+    private XYZ VertDimSmallDownTextOffset { get; set; }
+    // Смещение для размерного сегмента с маленьким текстом вниз инвертированное (зависит от положения в размерной цепочке)
+    private XYZ VertDimSmallDownTextOffsetInverted { get; set; }
 
     internal void TryCreatePylonDimensions(FamilyInstance skeletonParentRebar, List<Grid> grids,
                                            DimensionBaseService dimensionBaseService, bool isFrontView) {
@@ -138,7 +142,7 @@ internal class GeneralViewDimensionService {
                                          ? DirectionType.Right : DirectionType.Left;
 
             var dimensionLineLeft = dimensionBaseService.GetDimensionLine(hostElems.First() as FamilyInstance,
-                                                                          dimensionLineDirection, 1.6);
+                                                                          dimensionLineDirection, 1.7);
             ReferenceArray refArray = default;
             foreach(var item in hostElems) {
                 if(item is not FamilyInstance hostElem) { return; }
@@ -241,12 +245,31 @@ internal class GeneralViewDimensionService {
                                             DimensionBaseService dimensionBaseService,
                                             bool isForPerpView) {
         try {
+            if(clampsParentRebars is null || clampsParentRebars.Count == 0) { return; }
             ReferenceArray refArray = null;
             // #_1_горизонт_край_низ, #_1_горизонт_край_верх
             foreach(var host in SheetInfo.HostElems) {
                 refArray = dimensionBaseService.GetDimensionRefs(host as FamilyInstance, '#', '/', 
                                                                  ["горизонт", "край"], oldRefArray: refArray);
             }
+
+            var dimensionLineDirection = DirectionType.Left;
+            var textOffset = VertDimSmallUpTextOffset;
+            var textOffsetInverted = VertDimSmallUpTextOffsetInverted;
+            // Если этот размер для перпендикулярного вида и Гэшка только справа, то размер нужно ставить слева
+            if(isForPerpView && !SheetInfo.RebarInfo.AllRebarAreL 
+                             && SheetInfo.RebarInfo.HasLRebar
+                             && ViewModel.RebarFinder.DirectionHasLRebar(ViewOfPylon.ViewElement,
+                                                                         SheetInfo.ProjectSection,
+                                                                         DirectionType.Left)) {
+                dimensionLineDirection = DirectionType.Right;
+                textOffset = VertDimSmallDownTextOffset;
+                textOffsetInverted = VertDimSmallDownTextOffsetInverted;
+            }
+
+            // Создаем коллекцию опций изменений будущего размера
+            var dimSegmentOpts = new List<DimensionSegmentOption>();
+
             foreach(var clampsParentRebar in clampsParentRebars) {
                 // В связи с особенностями семейства, нельзя задать именем опорной плоскости правила чтобы 
                 // забирать именно крайнюю плоскость, т.к. плоскости смещаются и накладываются
@@ -286,22 +309,36 @@ internal class GeneralViewDimensionService {
                     refArray = dimensionBaseService.GetDimensionRefs(clampsParentRebar, '#', '/', ["горизонт", "верх"],
                                                                      ["доборные", "край"], refArray);
                 }
+                // Добавляем запись про размер низ пилона - низ хомутов
+                dimSegmentOpts.Add(new DimensionSegmentOption(true, "", textOffset));
+                // Добавляем запись про размер низ хомутов - верх хомутов
+                dimSegmentOpts.Add(new DimensionSegmentOption(false));
+                // Добавляем запись про размер верх хомутов - верх пилона
+                dimSegmentOpts.Add(new DimensionSegmentOption(true, "", textOffsetInverted));
+                // Добавляем запись про размер промежуточная плита
+                dimSegmentOpts.Add(new DimensionSegmentOption(false));
             }
 
-            // Если этот размер для перпендикулярного вида и Гэшка только слева, то размер нужно ставить справа
-            var dimensionLineDirection = isForPerpView
-                                         && !SheetInfo.RebarInfo.AllRebarAreL
-                                         && SheetInfo.RebarInfo.HasLRebar
-                                         && ViewModel.RebarFinder.DirectionHasLRebar(ViewOfPylon.ViewElement,
-                                                                                     SheetInfo.ProjectSection,
-                                                                                     DirectionType.Left)
-                                         ? DirectionType.Right : DirectionType.Left;
             // Определяем размерную линию
             var dimensionLineLeft = dimensionBaseService.GetDimensionLine(SheetInfo.HostElems.First() as FamilyInstance,
                                                                           dimensionLineDirection, 1.1);
             var dimensionRebarSide =
                 Repository.Document.Create.NewDimension(ViewOfPylon.ViewElement, dimensionLineLeft, refArray,
                                                         ViewModel.SelectedDimensionType);
+
+            // Применяем опции изменений сегментов размера
+            var dimensionSegments = dimensionRebarSide.Segments;
+            for(int i = 0; i < dimensionSegments.Size; i++) {
+                var dimSegmentMod = dimSegmentOpts[i];
+
+                if(dimSegmentMod.ModificationNeeded) {
+                    var segment = dimensionSegments.get_Item(i);
+                    segment.Prefix = dimSegmentMod.Prefix;
+
+                    var oldTextPosition = segment.TextPosition;
+                    segment.TextPosition = oldTextPosition + dimSegmentMod.TextOffset;
+                }
+            }
         } catch(Exception) { }
     }
 
@@ -312,18 +349,24 @@ internal class GeneralViewDimensionService {
     private void FindDimensionTextOffsets() {
         // Текст в сегментах размера нужно ставить со смещением от стандартного положения на размерной линии
         // Чтобы он не перекрывал соседние сегменты
-        double offsetXYZero = 0;
-        double offsetZSmall = 0.4;
+        double offsetXY = -0.3;
+        double offsetZSmall = 0.2;
 
         // Т.к. смещение будет зависеть от направления вида, на котором расположен размер, то берем за основу:
         var rightDirection = ViewOfPylon.ViewElement.RightDirection;
         // В зависимости от направления вида рассчитываем смещения
         if(Math.Abs(ViewOfPylon.ViewElement.RightDirection.Y) == 1) {
-            VertDimSmallTextOffset = new XYZ(rightDirection.X, rightDirection.Y * offsetXYZero, offsetZSmall);
-            VertDimSmallTextOffsetInverted = new XYZ(rightDirection.X, rightDirection.Y * offsetXYZero, -offsetZSmall);
+            VertDimSmallUpTextOffset = new XYZ(rightDirection.X, rightDirection.Y * offsetXY, offsetZSmall);
+            VertDimSmallUpTextOffsetInverted = new XYZ(rightDirection.X, rightDirection.Y * offsetXY, -offsetZSmall);
+
+            VertDimSmallDownTextOffset = new XYZ(rightDirection.X, -rightDirection.Y * offsetXY, offsetZSmall);
+            VertDimSmallDownTextOffsetInverted = new XYZ(rightDirection.X, -rightDirection.Y * offsetXY, -offsetZSmall);
         } else {
-            VertDimSmallTextOffset = new XYZ(rightDirection.X * offsetXYZero, rightDirection.Y, offsetZSmall);
-            VertDimSmallTextOffsetInverted = new XYZ(rightDirection.X * offsetXYZero, rightDirection.Y, -offsetZSmall);
+            VertDimSmallUpTextOffset = new XYZ(rightDirection.X * offsetXY, rightDirection.Y, offsetZSmall);
+            VertDimSmallUpTextOffsetInverted = new XYZ(rightDirection.X * offsetXY, rightDirection.Y, -offsetZSmall);
+
+            VertDimSmallDownTextOffset = new XYZ(-rightDirection.X * offsetXY, rightDirection.Y, offsetZSmall);
+            VertDimSmallDownTextOffsetInverted = new XYZ(-rightDirection.X * offsetXY, rightDirection.Y, -offsetZSmall);
         }
     }
 }
