@@ -136,7 +136,7 @@ public class PylonViewSectionPlacer {
         //// Рассчитываем и задаем корректную точку вставки основного вида армирования пилона, если есть другие виды
         var newCenter = new XYZ(
                 newCenterX,
-                SheetInfo.TitleBlockHeight - SheetInfo.GeneralViewRebar.ViewportHalfHeight - _titleBlockFrameTopOffset,
+                SheetInfo.TitleBlockHeight - SheetInfo.GeneralViewRebar.ViewportHalfHeight - _titleBlockFrameTopOffset * 2,
                 0);
 
         (SheetInfo.GeneralViewRebar.ViewportElement as Viewport).SetBoxCenter(newCenter);
@@ -234,7 +234,7 @@ public class PylonViewSectionPlacer {
         }
         var newCenter = new XYZ(newCenterX,
                                 SheetInfo.TitleBlockHeight - SheetInfo.GeneralViewPerpendicularRebar.ViewportHalfHeight 
-                                                           - _titleBlockFrameTopOffset,
+                                                           - _titleBlockFrameTopOffset * 2,
                                 0);
 
         (SheetInfo.GeneralViewPerpendicularRebar.ViewportElement as Viewport).SetBoxCenter(newCenter);

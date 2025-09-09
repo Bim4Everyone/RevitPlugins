@@ -14,7 +14,7 @@ internal class TransViewSecondAnnotCreator : ViewAnnotationCreator {
     public override void TryCreateViewAnnotations() {
         // Пытаемся создать размеры на виде
         try {
-            var dimensionService = new TransViewDimensionService(ViewModel, Repository, SheetInfo);
+            var dimensionService = new TransViewDimensionService(ViewModel, Repository, SheetInfo, ViewOfPylon);
             dimensionService.TryCreateDimensions(ViewOfPylon.ViewElement, false, true);
         } catch(Exception) { }
 

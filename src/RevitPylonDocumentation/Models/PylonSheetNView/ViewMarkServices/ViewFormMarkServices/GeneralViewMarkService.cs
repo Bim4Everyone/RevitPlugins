@@ -139,7 +139,7 @@ internal class GeneralViewMarkService {
             pylonRightMinPoint = _viewPointsAnalyzer.ProjectPointToViewFront(pylonRightMinPoint);
             // Определяем точки аннотации
             var leaderPoint = _viewPointsAnalyzer.GetPointByDirection(pylonRightMinPoint, DirectionType.LeftBottom,
-                                                                      0.2, 0.6);
+                                                                      0.2, 0.5);
             var annotPoint = _viewPointsAnalyzer.GetPointByDirection(pylonRightMinPoint, DirectionType.RightBottom,
                                                                      1.8, 1.1);
             // Создаем типовую аннотацию для обозначения ГОСТа

@@ -16,15 +16,27 @@ using Grid = Autodesk.Revit.DB.Grid;
 namespace RevitPylonDocumentation.Models.PylonSheetNView.ViewDimensionServices.ViewFormDimensionServices;
 internal class TransViewDimensionService {
 
-    internal TransViewDimensionService(MainViewModel mvm, RevitRepository repository, PylonSheetInfo pylonSheetInfo) {
+    internal TransViewDimensionService(MainViewModel mvm, RevitRepository repository, PylonSheetInfo pylonSheetInfo, 
+                                       PylonView pylonView) {
         ViewModel = mvm;
         Repository = repository;
         SheetInfo = pylonSheetInfo;
+        ViewOfPylon = pylonView;
+
+        FindDimensionTextOffsets();
     }
 
     internal MainViewModel ViewModel { get; set; }
     internal RevitRepository Repository { get; set; }
     internal PylonSheetInfo SheetInfo { get; set; }
+    internal PylonView ViewOfPylon { get; set; }
+
+    // Смещение для размерного сегмента с маленьким текстом
+    private XYZ HorizDimTextOffset { get; set; }
+    private XYZ VertDimTextOffset { get; set; }
+    // Смещение для размерного сегмента с маленьким текстом инвертированное (зависит от положения в размерной цепочке)
+    private XYZ HorizDimTextOffsetInverted { get; set; }
+    private XYZ VertDimTextOffsetInverted { get; set; }
 
 
     internal void TryCreateDimensions(View view, bool refsForTop, bool pylonFromTop) {
@@ -123,7 +135,32 @@ internal class TransViewDimensionService {
                                                                      [rebarPart, "торец", "_2_"],
                                                                      oldRefArray: refArraySide);
             }
-            CreateDimension(refArraySide, pylon, DirectionType.Right, 0.5, view, dimensionBaseService, false);
+            var formworkRebarDimensionSide = CreateDimension(refArraySide, pylon, DirectionType.Right, 0.5, 
+                                                             view, dimensionBaseService, false);
+            // Размер привязывается к двум противоположным граням пилона и боковым опорным плоскостям армирования
+            // В этом случае в размере будет создано 3 размерных сегмента (между 4-мя плоскостями)
+            if(formworkRebarDimensionSide.NumberOfSegments == 3) {
+                // Создаем коллекцию опций изменений размера
+                var dimSegmentOpts = new List<DimensionSegmentOption> {
+                    new(true, "", HorizDimTextOffset),
+                    new(false),
+                    new(true, "", HorizDimTextOffsetInverted)
+                };
+                // Применяем опции изменений сегментов размера
+                var dimensionSegments = formworkRebarDimensionSide.Segments;
+                for(int i = 0; i < dimensionSegments.Size; i++) {
+                    var dimSegmentMod = dimSegmentOpts[i];
+
+                    if(dimSegmentMod.ModificationNeeded) {
+                        var segment = dimensionSegments.get_Item(i);
+                        segment.Prefix = dimSegmentMod.Prefix;
+
+                        var oldTextPosition = segment.TextPosition;
+                        segment.TextPosition = oldTextPosition + dimSegmentMod.TextOffset;
+                    }
+                }
+            }
+
 
             // Размер по ТОРЦУ опалубка (положение справа дальнее)
             CreateDimension(refArrayFormworkSide, pylon, DirectionType.Right, 1, view, dimensionBaseService);
@@ -174,7 +211,7 @@ internal class TransViewDimensionService {
     }
 
 
-    private void CreateDimension(ReferenceArray oldRefArray, Element elemForOffset,
+    private Dimension CreateDimension(ReferenceArray oldRefArray, Element elemForOffset,
                                  DirectionType directionType, double offsetCoefficient, View view,
                                  DimensionBaseService dimensionBaseService, bool needEqualityFormula = true) {
         
@@ -184,6 +221,7 @@ internal class TransViewDimensionService {
         if(needEqualityFormula) {
             dimension.SetParamValue(BuiltInParameter.DIM_DISPLAY_EQ, 2);
         }
+        return dimension;
     }
 
 
@@ -241,6 +279,37 @@ internal class TransViewDimensionService {
                 var newLine = Line.CreateBound(pt1, pt2);
                 grid.SetCurveInView(DatumExtentType.ViewSpecific, view, newLine);
             }
+        }
+    }
+
+
+    /// <summary>
+    /// Определяем смещения, которые будут использованы для текста размеров с учетом системы координат вида
+    /// </summary>
+    private void FindDimensionTextOffsets() {
+        // Текст в сегментах размера нужно ставить со смещением от стандартного положения на размерной линии
+        // Чтобы он не перекрывал соседние сегменты
+        double offsetXY = -0.23;
+
+        // Т.к. смещение будет зависеть от направления вида, на котором расположен размер, то берем за основу:
+        var upDirection = ViewOfPylon.ViewElement.UpDirection;
+        // В зависимости от направления вида рассчитываем смещения
+        if(Math.Abs(upDirection.Y) == 1) {
+            HorizDimTextOffset = new XYZ(upDirection.X, upDirection.Y * offsetXY, 0);
+            HorizDimTextOffsetInverted = new XYZ(upDirection.X, -upDirection.Y * offsetXY, 0);
+        } else {
+            HorizDimTextOffset = new XYZ(upDirection.X * offsetXY, upDirection.Y, 0);
+            HorizDimTextOffsetInverted = new XYZ(-upDirection.X * offsetXY, upDirection.Y, 0);
+        }
+
+        var rightDirection = ViewOfPylon.ViewElement.RightDirection;
+        // В зависимости от направления вида рассчитываем смещения
+        if(Math.Abs(rightDirection.Y) == 1) {
+            VertDimTextOffset = new XYZ(rightDirection.X, rightDirection.Y * offsetXY, 0);
+            VertDimTextOffsetInverted = new XYZ(rightDirection.X, -rightDirection.Y * offsetXY, 0);
+        } else {
+            VertDimTextOffset = new XYZ(rightDirection.X * offsetXY, rightDirection.Y, 0);
+            VertDimTextOffsetInverted = new XYZ(-rightDirection.X * offsetXY, rightDirection.Y, 0);
         }
     }
 }
