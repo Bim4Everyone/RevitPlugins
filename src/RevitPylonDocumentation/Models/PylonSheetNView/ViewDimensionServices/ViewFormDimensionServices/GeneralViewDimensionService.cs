@@ -4,6 +4,8 @@ using System.Linq;
 
 using Autodesk.Revit.DB;
 
+using dosymep.Revit;
+
 using RevitPylonDocumentation.Models.PluginOptions;
 using RevitPylonDocumentation.Models.Services;
 using RevitPylonDocumentation.ViewModels;
@@ -212,58 +214,66 @@ internal class GeneralViewDimensionService {
             .FirstOrDefault();
     }
 
+
     /// <summary>
-    /// Создает размеры между нижней плоскостью хомутов и нижней плоскостью пилона
+    /// Создает размеры между нижней и верхней плоскостью пилона и нижней и верхней плоскостью хомутов
     /// </summary>
-    internal void TryCreateClampsDimensions(List<FamilyInstance> clampsParentRebars, 
-                                            DimensionBaseService dimensionBaseService, bool isForTop = false) {
+    internal void TryCreateClampsDimensions(List<FamilyInstance> clampsParentRebars, DimensionBaseService dimensionBaseService) {
         try {
-            clampsParentRebars = clampsParentRebars
-                .Where(e => e.Location is LocationPoint)
-                .OrderBy(e => ((LocationPoint) e.Location).Point.Z)
-                .ToList();
+            ReferenceArray refArray = null;
+            // #_1_горизонт_край_низ, #_1_горизонт_край_верх
+            foreach(var host in SheetInfo.HostElems) {
+                refArray = dimensionBaseService.GetDimensionRefs(host as FamilyInstance, '#', '/', 
+                                                                 ["горизонт", "край"], oldRefArray: refArray);
+            }
+            foreach(var clampsParentRebar in clampsParentRebars) {
+                // В связи с особенностями семейства, нельзя задать именем опорной плоскости правила чтобы 
+                // забирать именно крайнюю плоскость, т.к. плоскости смещаются и накладываются
+                // Всегда отсеивать (они накладываются на #1_горизонт_доборные_низ_край): 
+                // #2_горизонт_доборные_низ
+                // #5_горизонт_доборные_верх
+                bool additionalFirst = clampsParentRebar.GetParamValue<int>("мод_ФОП_Доборный 1") == 1;
+                bool additionalFirstArray = clampsParentRebar.GetParamValue<int>("мод_ФОП_Доборный 1_Массив") == 1;
 
-            var maxNum = clampsParentRebars.Count > SheetInfo.HostElems.Count
-                ? SheetInfo.HostElems.Count
-                : clampsParentRebars.Count;
-
-            var clampsPart = isForTop ? "верх" : "низ";
-            var offset = isForTop ? VertDimSmallTextOffsetInverted : VertDimSmallTextOffset;
-            for(int i = 0; i < maxNum; i++) {
-                var clamps = clampsParentRebars[i];
-                var pylon = SheetInfo.HostElems[i] as FamilyInstance;
-                // Проблема в том, что у семейства хомутов 3 нижние плоскости
-                // Обращаться напрямую к параметрам не будем, т.к. они прописаны в именах опорных плоскостей
-                // Когда есть доборные и больше 1
-                var refArray = dimensionBaseService.GetDimensionRefs(clamps, '#', '/', 
-                                                                     ["горизонт", "доборные", clampsPart, "край"]);
-                if(refArray.IsEmpty) {
-                    // Когда есть доборные и только 1
-                    refArray = dimensionBaseService.GetDimensionRefs(clamps, '#', '/',
-                                                                     ["горизонт", "доборные", clampsPart], ["край"]);
+                bool additionalSecond = clampsParentRebar.GetParamValue<int>("мод_ФОП_Доборный 2") == 1;
+                bool additionalSecondArray = clampsParentRebar.GetParamValue<int>("мод_ФОП_Доборный 2_Массив") == 1;
+                // #3_горизонт_низ
+                // мод_ФОП_Доборный 1#2_горизонт_доборные_низ
+                // мод_ФОП_Доборный 1/мод_ФОП_Доборный 1_Массив#1_горизонт_доборные_низ_край
+                if(additionalFirst && additionalFirstArray) {
+                    refArray = dimensionBaseService.GetDimensionRefs(clampsParentRebar, '#', '/',
+                                                                     ["горизонт", "доборные", "низ", "край"],
+                                                                     oldRefArray: refArray);
+                } else if(additionalFirst) {
+                    refArray = dimensionBaseService.GetDimensionRefs(clampsParentRebar, '#', '/',
+                                                                     ["горизонт", "доборные", "низ"], ["край"],
+                                                                     oldRefArray: refArray);
+                } else {
+                    refArray = dimensionBaseService.GetDimensionRefs(clampsParentRebar, '#', '/', ["горизонт", "низ"],
+                                                                     ["доборные", "край"], refArray);
                 }
-                if(refArray.IsEmpty) {
-                    // Когда нет доборных
-                    refArray = dimensionBaseService.GetDimensionRefs(clamps, '#', '/',
-                                                                     ["горизонт", clampsPart], ["доборные", "край"]);
-                }
-                // У пилона - "#_1_горизонт_край_низ"
-                refArray = dimensionBaseService.GetDimensionRefs(pylon, '#', '/', ["горизонт", "край", clampsPart],
-                                                                 oldRefArray: refArray);
 
-                var dimensionLineLeft = dimensionBaseService.GetDimensionLine(SheetInfo.HostElems.First() as FamilyInstance,
-                                                                              DirectionType.Left, 1.1);
-                var dimensionRebarSide =
-                    Repository.Document.Create.NewDimension(ViewOfPylon.ViewElement, dimensionLineLeft, refArray,
-                                                            ViewModel.SelectedDimensionType);
-                // Смещаем текст размера, чтобы стоял корректнее
-                if(dimensionRebarSide.NumberOfSegments == 0) {
-                    var oldTextPosition = dimensionRebarSide.TextPosition;
-                    dimensionRebarSide.TextPosition = oldTextPosition + offset;
+                if(additionalSecond && additionalSecondArray) {
+                    refArray = dimensionBaseService.GetDimensionRefs(clampsParentRebar, '#', '/',
+                                                                     ["горизонт", "доборные", "верх", "край"],
+                                                                     oldRefArray: refArray);
+                } else if(additionalSecond) {
+                    refArray = dimensionBaseService.GetDimensionRefs(clampsParentRebar, '#', '/',
+                                                                     ["горизонт", "доборные", "верх"], ["край"],
+                                                                     oldRefArray: refArray);
+                } else {
+                    refArray = dimensionBaseService.GetDimensionRefs(clampsParentRebar, '#', '/', ["горизонт", "верх"],
+                                                                     ["доборные", "край"], refArray);
                 }
             }
+            var dimensionLineLeft = dimensionBaseService.GetDimensionLine(SheetInfo.HostElems.First() as FamilyInstance,
+                                                                          DirectionType.Left, 1.1);
+            var dimensionRebarSide =
+                Repository.Document.Create.NewDimension(ViewOfPylon.ViewElement, dimensionLineLeft, refArray,
+                                                        ViewModel.SelectedDimensionType);
         } catch(Exception) { }
     }
+
 
     /// <summary>
     /// Определяем смещения, которые будут использованы для текста размеров с учетом системы координат вида
