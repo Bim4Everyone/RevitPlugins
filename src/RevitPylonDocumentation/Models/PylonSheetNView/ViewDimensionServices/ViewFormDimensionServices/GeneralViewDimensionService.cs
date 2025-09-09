@@ -129,17 +129,26 @@ internal class GeneralViewDimensionService {
         try {
             var dimensionLineLeft = dimensionBaseService.GetDimensionLine(hostElems.First() as FamilyInstance,
                                                                           DirectionType.Left, 1.6);
-            ReferenceArray refArraySide = default;
+            ReferenceArray refArray = default;
             foreach(var item in hostElems) {
                 if(item is not FamilyInstance hostElem) { return; }
                 // Собираем опорные плоскости по опалубке, например:
                 // #_1_горизонт_край_низ
-                // #_1_горизонт_край_верх
-                refArraySide = dimensionBaseService.GetDimensionRefs(hostElem, '#', '/', ["горизонт", "край"], 
-                                                                     oldRefArray: refArraySide);
+                refArray = dimensionBaseService.GetDimensionRefs(hostElem, '#', '/', ["горизонт", "край", "низ"], 
+                                                                     oldRefArray: refArray);
             }
-            if(refArraySide != default) {
-                Repository.Document.Create.NewDimension(ViewOfPylon.ViewElement, dimensionLineLeft, refArraySide,
+            if(refArray != default) {
+                var lastFloor = GetLastFloor();
+                if(lastFloor != null) {
+                    var viewOptions = new Options {
+                        View = ViewOfPylon.ViewElement,
+                        ComputeReferences = true,
+                        IncludeNonVisibleObjects = false
+                    };
+                    var lastFloorTopFace = GetTopFloorFace(lastFloor, viewOptions);
+                    refArray.Append(lastFloorTopFace.Reference);
+                }
+                Repository.Document.Create.NewDimension(ViewOfPylon.ViewElement, dimensionLineLeft, refArray,
                                                         ViewModel.SelectedDimensionType);
             }
         } catch(Exception) { }
