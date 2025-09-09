@@ -260,4 +260,20 @@ public class ViewPointsAnalyzer {
         // Проецируем точку на плоскость
         return point - distance * normal;
     }
+
+    /// <summary>
+    /// Возвращает точку спроецированную на горизонтальную плоскость
+    /// </summary>
+    public XYZ ProjectPointToHorizontalPlane(XYZ planePoint, XYZ pointForProject) {
+        var normal = XYZ.BasisZ;
+
+        // Вычисляем вектор от точки на плоскости к целевой точке
+        var vector = pointForProject - planePoint;
+
+        // Находим расстояние вдоль нормали (скалярное произведение)
+        double distance = normal.DotProduct(vector);
+
+        // Проецируем точку на плоскость
+        return pointForProject - distance * normal;
+    }
 }

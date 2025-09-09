@@ -1,7 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Windows.Controls;
 
 using Autodesk.Revit.DB;
 
@@ -60,6 +58,21 @@ internal class GeneralViewRebarMarkService {
             var point = _viewPointsAnalyzer.GetPointByDirection(verticalBar, directionType, 0, 0, true);
             // Корректируем положение точки, куда будет установлена марка (текст)
             point = _viewPointsAnalyzer.GetPointByDirection(point, directionType, 0.6, 0.3);
+
+#if REVIT_2022_OR_GREATER
+            var hostOrigin = SheetInfo.ElemsInfo.HostOrigin;
+            var hostOriginProjected = _viewPointsAnalyzer.ProjectPointToViewFront(hostOrigin);
+
+            var pointProjected = _viewPointsAnalyzer.ProjectPointToViewFront(point);
+            pointProjected = _viewPointsAnalyzer.ProjectPointToHorizontalPlane(hostOriginProjected, pointProjected);
+            var dist = pointProjected.DistanceTo(hostOriginProjected);
+
+            var hostWidth = SheetInfo.ElemsInfo.HostWidth;
+            if(dist > hostWidth) {
+                point = _viewPointsAnalyzer.GetPointByDirection(
+                    new XYZ(hostOriginProjected.X, hostOriginProjected.Y, point.Z), directionType, hostWidth, 0);
+            }
+#endif
             // Создаем марку арматуры
             var tag = _annotationService.CreateRebarTag(point, _tagSymbolWithStep, verticalBar);
             tag.LeaderEndCondition = LeaderEndCondition.Free;
