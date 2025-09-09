@@ -155,12 +155,14 @@
             Title="{Binding Title}" />
 
         <Border
+            Margin="10 0 10 5"
             Grid.Row="1"
             Style="{StaticResource CustomBorder}">
             <StackPanel>
                 <DockPanel>
-                    <Label
-                        Content="{me:LocalizationSource MainWindow.LabelTarget}" />
+                    <ui:TextBlock
+                        Width="130"
+                        Text="{me:LocalizationSource MainWindow.LabelTarget}" />
                     <ui:ToggleSwitch
                         Margin="5 0"
                         IsChecked="{Binding ClearTargetFolder}"
@@ -170,18 +172,22 @@
                         Content="{me:LocalizationSource MainWindow.OpenTargetWhenFinish}" />
                 </DockPanel>
                 <DockPanel
-                    Margin="3 0"
+                    Margin="0 5"
                     LastChildFill="True">
                     <ui:Button
                         DockPanel.Dock="Right"
+                        Height="36"
+                        Margin="5 0 0 0"
                         Content="{ui:SymbolIcon Symbol=Folder20}"
                         Command="{Binding OpenFolderDialogCommand}" />
                     <ui:TextBox
                         Text="{Binding TargetFolder, UpdateSourceTrigger=PropertyChanged}" />
                 </DockPanel>
-                <DockPanel>
-                    <Label
-                        Content="{me:LocalizationSource MainWindow.LabelSource}" />
+                <DockPanel
+                    Margin="0 5 0 0">
+                    <ui:TextBlock
+                        Width="130"
+                        Text="{me:LocalizationSource MainWindow.LabelSource}" />
                     <ui:ToggleSwitch
                         Margin="5 0"
                         Content="{me:LocalizationSource MainWindow.ExportRooms}"
@@ -190,11 +196,13 @@
                     Converter={StaticResource BooleanToVisibilityConverter}}" />
                 </DockPanel>
                 <DockPanel
-                    Margin="3 0 0 0"
+                    Margin="0 5 0 0"
                     LastChildFill="True">
                     <ui:Button
                         DockPanel.Dock="Right"
                         x:Name="_sourceFolderEdit"
+                        Height="36"
+                        Margin="5 0 0 0"
                         Content="{ui:SymbolIcon Symbol=Folder20}"
                         IsEnabled="{Binding SourceFolderChangedCommand.IsExecuting,
                         Converter={StaticResource InverseBooleanConverter}}"
@@ -207,6 +215,7 @@
         </Border>
 
         <Border
+            Margin="10 5 10 0"
             Grid.Row="2"
             Style="{StaticResource CustomBorder}">
 
@@ -253,6 +262,7 @@
                         </DataGridTemplateColumn.CellTemplate>
                     </DataGridTemplateColumn>
                     <DataGridTextColumn
+                        Width="200"
                         IsReadOnly="True"
                         Binding="{Binding Name}"
                         Header="{StaticResource NameHeader}" />
