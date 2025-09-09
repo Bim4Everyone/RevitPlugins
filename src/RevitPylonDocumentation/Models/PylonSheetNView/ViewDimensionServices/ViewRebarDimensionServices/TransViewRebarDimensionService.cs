@@ -94,6 +94,8 @@ internal class TransViewRebarDimensionService {
             }
 
             //ГОРИЗОНТАЛЬНЫЕ РАЗМЕРЫ
+            // Отступ размерной линии для размера по опалубке
+            var formDimensionLineOffset = 0.5;
             // Размер по ТОРЦУ армирование + по бутылкам (положение справа ближнее)
             if(onTopOfRebar && !SheetInfo.RebarInfo.AllRebarAreL) {
                 // Получаем ссылки на опорные плоскости для размеров бутылок
@@ -120,11 +122,13 @@ internal class TransViewRebarDimensionService {
                 }
                 CreateDimension(skeletonParentRebar, pylon, DirectionType.Right, 0.5, edgeBottomSideRefArray, view,
                                 dimensionBaseService, false);
+                // Т.к. мы поставили размер опалубка + армирование, поэтому размер только по опалубке будет стоять дальше
+                formDimensionLineOffset = 1;
             }
 
             // Размер по ТОРЦУ армирование (положение справа дальнее)
-            CreateDimension(skeletonParentRebar, pylon, DirectionType.Right, 1, ["низ", "торец", "край"], view,
-                            dimensionBaseService);
+            CreateDimension(skeletonParentRebar, pylon, DirectionType.Right, formDimensionLineOffset, 
+                            ["низ", "торец", "край"], view, dimensionBaseService);
         } catch(Exception) { }
     }
 

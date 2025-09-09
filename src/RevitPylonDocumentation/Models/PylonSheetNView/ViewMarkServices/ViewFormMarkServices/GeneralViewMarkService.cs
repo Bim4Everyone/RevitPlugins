@@ -141,7 +141,7 @@ internal class GeneralViewMarkService {
             var leaderPoint = _viewPointsAnalyzer.GetPointByDirection(pylonRightMinPoint, DirectionType.LeftBottom,
                                                                       0.2, 0.6);
             var annotPoint = _viewPointsAnalyzer.GetPointByDirection(pylonRightMinPoint, DirectionType.RightBottom,
-                                                                     1.8, 1.3);
+                                                                     1.8, 1.1);
             // Создаем типовую аннотацию для обозначения ГОСТа
             _annotationService.CreateUniversalTag(annotPoint, _universalTagType, leaderPoint,
                                                   UnitUtilsHelper.ConvertToInternalValue(40),
