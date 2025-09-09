@@ -125,10 +125,20 @@ internal class GeneralViewDimensionService {
     /// <param name="view">Вид, на котором нужно создать размеры</param>
     /// <param name="clampsParentRebars">Список экземпляров семейств пилонов</param>
     /// <param name="dimensionBaseService">Сервис по анализу основ размеров</param>
-    internal void TryCreatePylonDimensions(List<Element> hostElems, DimensionBaseService dimensionBaseService) {
+    internal void TryCreatePylonDimensions(List<Element> hostElems, DimensionBaseService dimensionBaseService,
+                                           bool isForPerpView) {
         try {
+            // Если этот размер для перпендикулярного вида и Гэшка только слева, то размер нужно ставить справа
+            var dimensionLineDirection = isForPerpView
+                                         && !SheetInfo.RebarInfo.AllRebarAreL
+                                         && SheetInfo.RebarInfo.HasLRebar
+                                         && ViewModel.RebarFinder.DirectionHasLRebar(ViewOfPylon.ViewElement,
+                                                                                     SheetInfo.ProjectSection,
+                                                                                     DirectionType.Left)
+                                         ? DirectionType.Right : DirectionType.Left;
+
             var dimensionLineLeft = dimensionBaseService.GetDimensionLine(hostElems.First() as FamilyInstance,
-                                                                          DirectionType.Left, 1.6);
+                                                                          dimensionLineDirection, 1.6);
             ReferenceArray refArray = default;
             foreach(var item in hostElems) {
                 if(item is not FamilyInstance hostElem) { return; }
@@ -227,7 +237,9 @@ internal class GeneralViewDimensionService {
     /// <summary>
     /// Создает размеры между нижней и верхней плоскостью пилона и нижней и верхней плоскостью хомутов
     /// </summary>
-    internal void TryCreateClampsDimensions(List<FamilyInstance> clampsParentRebars, DimensionBaseService dimensionBaseService) {
+    internal void TryCreateClampsDimensions(List<FamilyInstance> clampsParentRebars, 
+                                            DimensionBaseService dimensionBaseService,
+                                            bool isForPerpView) {
         try {
             ReferenceArray refArray = null;
             // #_1_горизонт_край_низ, #_1_горизонт_край_верх
@@ -275,8 +287,18 @@ internal class GeneralViewDimensionService {
                                                                      ["доборные", "край"], refArray);
                 }
             }
+
+            // Если этот размер для перпендикулярного вида и Гэшка только слева, то размер нужно ставить справа
+            var dimensionLineDirection = isForPerpView
+                                         && !SheetInfo.RebarInfo.AllRebarAreL
+                                         && SheetInfo.RebarInfo.HasLRebar
+                                         && ViewModel.RebarFinder.DirectionHasLRebar(ViewOfPylon.ViewElement,
+                                                                                     SheetInfo.ProjectSection,
+                                                                                     DirectionType.Left)
+                                         ? DirectionType.Right : DirectionType.Left;
+            // Определяем размерную линию
             var dimensionLineLeft = dimensionBaseService.GetDimensionLine(SheetInfo.HostElems.First() as FamilyInstance,
-                                                                          DirectionType.Left, 1.1);
+                                                                          dimensionLineDirection, 1.1);
             var dimensionRebarSide =
                 Repository.Document.Create.NewDimension(ViewOfPylon.ViewElement, dimensionLineLeft, refArray,
                                                         ViewModel.SelectedDimensionType);
