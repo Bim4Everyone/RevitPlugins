@@ -4,6 +4,8 @@ using System.Linq;
 
 using Autodesk.Revit.DB;
 
+using dosymep.Revit;
+
 using RevitPylonDocumentation.Models.Services;
 using RevitPylonDocumentation.ViewModels;
 
@@ -18,10 +20,17 @@ internal class GeneralViewMarkService {
     private readonly AnnotationService _annotationService;
 
     // Отступы для формирования линий обрыва
-    private readonly double _breakLinesOffsetX = 0.3;
-    private readonly double _breakLinesOffsetYSmall = 0.1;
-    private readonly double _breakLinesOffsetYBig = 0.3;
-    private readonly double _breakLinesOffsetYBottomBig = 1;
+    private readonly double _breakLinesOffsetX = 0.5;
+    private readonly double _breakLinesOffsetY = 0.3;
+    private readonly double _breakLinesOffsetYBottom = 1;
+
+    // Отступы области скрытия линии обрыва
+    private readonly string _breakLineDepthParamName = "Глубина маскировки";
+    private readonly double _breakLineDepthParamValue = 1500;
+    private readonly string _breakLineLengthLeftParamName = "Длина маскировки_влево";
+    private readonly double _breakLineLengthLeftParamValue = 100;
+    private readonly string _breakLineLengthRightParamName = "Длина маскировки_право";
+    private readonly double _breakLineLengthRightParamValue = 100;
 
     internal GeneralViewMarkService(MainViewModel mvm, RevitRepository repository, PylonSheetInfo pylonSheetInfo, 
                                     PylonView pylonView) {
@@ -149,8 +158,8 @@ internal class GeneralViewMarkService {
         try {
             // Определяем отступ от пилона по горизонтали
             double horizOriginOffset = isForPerpView
-                ? SheetInfo.ElemsInfo.HostWidth * 0.5 + _breakLinesOffsetYBig
-                : SheetInfo.ElemsInfo.HostLength * 0.5 + _breakLinesOffsetYBig;
+                ? SheetInfo.ElemsInfo.HostWidth * 0.5 + _breakLinesOffsetY
+                : SheetInfo.ElemsInfo.HostLength * 0.5 + _breakLinesOffsetY;
             var origin = SheetInfo.ElemsInfo.HostOrigin;
             // Получаем спроецированную на плоскость вида левую граничную точку пилона
             var pylonLeftMinPoint = _viewPointsAnalyzer.GetPointByDirection(origin, DirectionType.Left, 
@@ -167,25 +176,27 @@ internal class GeneralViewMarkService {
 
             // Получаем точки со смещением относительно граничных точек опалубки для размещения аннотаций
             // Чтобы их не срезало рамкой подрезки
-            var point1 = _viewPointsAnalyzer.GetPointByDirection(pylonLeftMinPoint,
-                                                                 DirectionType.Top, 0, _breakLinesOffsetYSmall);
+            var point1 = pylonLeftMinPoint;
             var point2 = _viewPointsAnalyzer.GetPointByDirection(new XYZ(pylonLeftMinPoint.X, 
                                                                          pylonLeftMinPoint.Y, 
                                                                          viewMin.Z),
-                                                                 DirectionType.Top, 0, _breakLinesOffsetYBottomBig);
+                                                                 DirectionType.Top, 0, _breakLinesOffsetYBottom);
             var point3 = _viewPointsAnalyzer.GetPointByDirection(new XYZ(pylonRightMinPoint.X, 
                                                                          pylonRightMinPoint.Y, 
                                                                          viewMin.Z),
-                                                                 DirectionType.Top, 0, _breakLinesOffsetYBottomBig);
-            var point4 = _viewPointsAnalyzer.GetPointByDirection(pylonRightMinPoint,
-                                                                 DirectionType.Top, 0, _breakLinesOffsetYSmall);
+                                                                 DirectionType.Top, 0, _breakLinesOffsetYBottom);
+            var point4 = pylonRightMinPoint;
             // Линии обрыва - это 2D-аннотационные семейства на основе линии
             var line1 = Line.CreateBound(point1, point2);
             var line2 = Line.CreateBound(point2, point3);
             var line3 = Line.CreateBound(point3, point4);
-            Repository.Document.Create.NewFamilyInstance(line1, _breakLineSymbol, view);
-            Repository.Document.Create.NewFamilyInstance(line2, _breakLineSymbol, view);
-            Repository.Document.Create.NewFamilyInstance(line3, _breakLineSymbol, view);
+            var breakLine1 = Repository.Document.Create.NewFamilyInstance(line1, _breakLineSymbol, view);
+            var breakLine2 = Repository.Document.Create.NewFamilyInstance(line2, _breakLineSymbol, view);
+            var breakLine3 = Repository.Document.Create.NewFamilyInstance(line3, _breakLineSymbol, view);
+
+            TrySetBreakLineOffsets(breakLine1);
+            TrySetBreakLineOffsets(breakLine2);
+            TrySetBreakLineOffsets(breakLine3);
         } catch(Exception) { }
     }
 
@@ -208,27 +219,40 @@ internal class GeneralViewMarkService {
             var viewMin = _viewPointsAnalyzer.ProjectPointToViewFront(
                 view.CropBox.Transform.OfPoint(view.CropBox.Min));
 
+            // Ищем толщину последней плиты
+            // В качестве значения по умолчанию задаем 200 мм как наиболее часто встречающуюся толщину плиты
+            var lastFloorDepth = UnitUtilsHelper.ConvertToInternalValue(200);
+            var lastFloor = GetLastFloor();
+            if(lastFloor != null) {
+                lastFloorDepth = lastFloor.GetParamValue<double>(BuiltInParameter.FLOOR_ATTR_THICKNESS_PARAM);
+            }
+
             // Получаем точки со смещением относительно граничных точек опалубки для размещения аннотаций
+            // Правая нижняя точка
             var point1 = _viewPointsAnalyzer
                         .GetPointByDirection(new XYZ(viewMax.X, viewMax.Y, pylonMaxZ),
-                                             DirectionType.LeftBottom, _breakLinesOffsetX, _breakLinesOffsetYSmall);
+                                             DirectionType.LeftBottom, _breakLinesOffsetX, 0);
+            // Правая верхняя точка
             var point2 = _viewPointsAnalyzer
-                .GetPointByDirection(viewMax,
-                                     DirectionType.LeftBottom, _breakLinesOffsetX, _breakLinesOffsetYBig);
-            var point3 = _viewPointsAnalyzer
-                .GetPointByDirection(new XYZ(viewMin.X, viewMin.Y, viewMax.Z),
-                                     DirectionType.RightBottom, _breakLinesOffsetX, _breakLinesOffsetYBig);
+                .GetPointByDirection(point1,
+                                     DirectionType.Top, 0, lastFloorDepth);
+            // Левая нижняя точка
             var point4 = _viewPointsAnalyzer
                 .GetPointByDirection(new XYZ(viewMin.X, viewMin.Y, pylonMaxZ),
-                                     DirectionType.RightBottom, _breakLinesOffsetX, _breakLinesOffsetYSmall);
+                                     DirectionType.RightBottom, _breakLinesOffsetX, 0);
+            // Левая верхняя точка
+            var point3 = _viewPointsAnalyzer
+                .GetPointByDirection(point4,
+                                     DirectionType.Top, 0, lastFloorDepth);
 
             // Линии обрыва - это 2D-аннотационные семейства на основе линии
             var line1 = Line.CreateBound(point1, point2);
-            var line2 = Line.CreateBound(point2, point3);
-            var line3 = Line.CreateBound(point3, point4);
-            Repository.Document.Create.NewFamilyInstance(line1, _breakLineSymbol, view);
-            Repository.Document.Create.NewFamilyInstance(line2, _breakLineSymbol, view);
-            Repository.Document.Create.NewFamilyInstance(line3, _breakLineSymbol, view);
+            var line2 = Line.CreateBound(point3, point4);
+            var breakLine1 = Repository.Document.Create.NewFamilyInstance(line1, _breakLineSymbol, view);
+            var breakLine2 = Repository.Document.Create.NewFamilyInstance(line2, _breakLineSymbol, view);
+
+            TrySetBreakLineOffsets(breakLine1);
+            TrySetBreakLineOffsets(breakLine2);
         } catch(Exception) { }
     }
 
@@ -243,8 +267,8 @@ internal class GeneralViewMarkService {
         try {
             // Определяем отступы от пилона по горизонтали
             double horizOriginOffset = isForPerpView 
-                                            ? SheetInfo.ElemsInfo.HostWidth * 0.5 + _breakLinesOffsetYBig
-                                            : SheetInfo.ElemsInfo.HostLength * 0.5 + _breakLinesOffsetYBig;
+                                            ? SheetInfo.ElemsInfo.HostWidth * 0.5 + _breakLinesOffsetY
+                                            : SheetInfo.ElemsInfo.HostLength * 0.5 + _breakLinesOffsetY;
 
             var origin = SheetInfo.ElemsInfo.HostOrigin;
             // Получаем спроецированную на плоскость вида левую граничную точку пилона
@@ -270,19 +294,54 @@ internal class GeneralViewMarkService {
                 var point3 = new XYZ(pylonRightMinPoint.X, pylonRightMinPoint.Y, previousBbMaxZ);
                 var point4 = new XYZ(pylonRightMinPoint.X, pylonRightMinPoint.Y, currentBbMinZ);
                 
-                point1 = _viewPointsAnalyzer.GetPointByDirection(point1, DirectionType.Top, 0, _breakLinesOffsetYSmall);
-                point2 = _viewPointsAnalyzer.GetPointByDirection(point2, DirectionType.Bottom, 0, _breakLinesOffsetYSmall);
-                point3 = _viewPointsAnalyzer.GetPointByDirection(point3, DirectionType.Bottom, 0, _breakLinesOffsetYSmall);
-                point4 = _viewPointsAnalyzer.GetPointByDirection(point4, DirectionType.Top, 0, _breakLinesOffsetYSmall);
                 // Линии обрыва - это 2D-аннотационные семейства на основе линии
                 var line1 = Line.CreateBound(point1, point2);
                 var line2 = Line.CreateBound(point3, point4);
-                Repository.Document.Create.NewFamilyInstance(line1, _breakLineSymbol, view);
-                Repository.Document.Create.NewFamilyInstance(line2, _breakLineSymbol, view);
+                var breakLine1 = Repository.Document.Create.NewFamilyInstance(line1, _breakLineSymbol, view);
+                var breakLine2 = Repository.Document.Create.NewFamilyInstance(line2, _breakLineSymbol, view);
+
+                TrySetBreakLineOffsets(breakLine1);
+                TrySetBreakLineOffsets(breakLine2);
 
                 previousElement = currentElement;
             }
         } catch(Exception) { }
+    }
+
+    /// <summary>
+    /// Задает отступы области маскировки у линии обрыва
+    /// </summary>
+    private void TrySetBreakLineOffsets(Element breakLine) {
+        if(breakLine.IsExistsParam(_breakLineDepthParamName)) {
+            breakLine.SetParamValue(_breakLineDepthParamName, 
+                                    UnitUtilsHelper.ConvertToInternalValue(_breakLineDepthParamValue));
+        }
+        if(breakLine.IsExistsParam(_breakLineLengthLeftParamName)) {
+            breakLine.SetParamValue(_breakLineLengthLeftParamName,
+                                    UnitUtilsHelper.ConvertToInternalValue(_breakLineLengthLeftParamValue));
+        }
+        if(breakLine.IsExistsParam(_breakLineLengthRightParamName)) {
+            breakLine.SetParamValue(_breakLineLengthRightParamName, 
+                                    UnitUtilsHelper.ConvertToInternalValue(_breakLineLengthRightParamValue));
+        }
+    }
+
+    private Element GetLastFloor() {
+        var lastPylon = SheetInfo.HostElems.Last();
+        var bbox = lastPylon.get_BoundingBox(null);
+
+        // Готовим фильтр для сбор плит в области вокруг верхней точки пилона
+        var outline = new Outline(
+            bbox.Max - new XYZ(10, 10, 5),
+            bbox.Max + new XYZ(10, 10, 5)
+        );
+        var filter = new BoundingBoxIntersectsFilter(outline);
+
+        return new FilteredElementCollector(Repository.Document)
+            .OfCategory(BuiltInCategory.OST_Floors)
+            .WherePasses(filter)
+            .WhereElementIsNotElementType()
+            .FirstOrDefault();
     }
 
     /// <summary>
