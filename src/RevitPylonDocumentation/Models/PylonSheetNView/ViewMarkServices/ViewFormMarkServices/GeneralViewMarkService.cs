@@ -104,7 +104,7 @@ internal class GeneralViewMarkService {
         try {
             // Получаем референс-элемент
             var rightVerticalBar = _viewPointsAnalyzer.GetElementByDirection(simpleRebars, DirectionType.Right,
-                                                                                 false);
+                                                                             false);
             // Получаем точку в которую нужно поставить аннотацию
             var pointRight = _viewPointsAnalyzer.GetPointByDirection(rightVerticalBar, DirectionType.Right,
                                                                      0, 0, true);

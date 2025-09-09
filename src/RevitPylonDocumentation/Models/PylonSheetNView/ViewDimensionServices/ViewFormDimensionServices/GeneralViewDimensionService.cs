@@ -12,6 +12,8 @@ using RevitPylonDocumentation.ViewModels;
 
 namespace RevitPylonDocumentation.Models.PylonSheetNView.ViewDimensionServices.ViewFormDimensionServices;
 internal class GeneralViewDimensionService {
+    private readonly ViewPointsAnalyzer _viewPointsAnalyzer;
+
     internal GeneralViewDimensionService(MainViewModel mvm, RevitRepository repository, PylonSheetInfo pylonSheetInfo, 
                                          PylonView pylonView) {
         ViewModel = mvm;
@@ -19,6 +21,7 @@ internal class GeneralViewDimensionService {
         SheetInfo = pylonSheetInfo;
         ViewOfPylon = pylonView;
 
+        _viewPointsAnalyzer = new ViewPointsAnalyzer(ViewOfPylon);
         FindDimensionTextOffsets();
     }
 
@@ -26,6 +29,7 @@ internal class GeneralViewDimensionService {
     internal RevitRepository Repository { get; set; }
     internal PylonSheetInfo SheetInfo { get; set; }
     internal PylonView ViewOfPylon { get; set; }
+
 
     // Смещение для размерного сегмента с маленьким текстом вверх
     private XYZ VertDimSmallUpTextOffset { get; set; }
@@ -367,6 +371,73 @@ internal class GeneralViewDimensionService {
 
             VertDimSmallDownTextOffset = new XYZ(-rightDirection.X * offsetXY, rightDirection.Y, offsetZSmall);
             VertDimSmallDownTextOffsetInverted = new XYZ(-rightDirection.X * offsetXY, rightDirection.Y, -offsetZSmall);
+        }
+    }
+
+    /// <summary>
+    /// Создание размера сверху по Г-образному стержню от его конца до ближайшей грани пилона
+    /// </summary>
+    internal void TryCreateHorizLRebarDimension(DimensionBaseService dimensionBaseService) {
+        try {
+            if(!SheetInfo.RebarInfo.HasLRebar) { return; }
+            var skeletonParentRebar = SheetInfo.RebarInfo.SkeletonParentRebar;
+
+            // Проблематично найти ближайшую боковую грань пилона, поэтому просто создадим два размера 
+            // от конца Гэшки до одной грани и до другой, и удалим больший
+            var lastPylon = SheetInfo.HostElems.Last();
+            var lastPylonRefArrayFirst = dimensionBaseService.GetDimensionRefs(lastPylon as FamilyInstance, '#', '/',
+                                                                               ["1", "торец", "край"]);
+            var lastPylonRefArraySecond = dimensionBaseService.GetDimensionRefs(lastPylon as FamilyInstance, '#', '/',
+                                                                                ["2", "торец", "край"]);
+            
+            // Получаем позицию для размерной линии по Г-образному стержню
+            var lRebar = ViewModel.RebarFinder.GetSimpleRebars(ViewOfPylon.ViewElement, SheetInfo.ProjectSection, 1101)
+                                              .FirstOrDefault();
+            var dimensionLine = dimensionBaseService.GetDimensionLine(lRebar, DirectionType.Top, 0.5);
+            
+            //"#1_торец_Г_нутрь"
+            //"#1_торец_Г_край"
+            if(SheetInfo.RebarInfo.AllRebarAreL) {
+                CreateLRebarToPylonDimension(skeletonParentRebar, dimensionLine, dimensionBaseService, 
+                                             ["1_торец", "Г", "край"], lastPylonRefArrayFirst, lastPylonRefArraySecond);
+                CreateLRebarToPylonDimension(skeletonParentRebar, dimensionLine, dimensionBaseService, 
+                                             ["2_торец", "Г", "край"], lastPylonRefArrayFirst, lastPylonRefArraySecond);
+            } else if(SheetInfo.RebarInfo.HasLRebar) {
+                if(ViewModel.RebarFinder.DirectionHasLRebar(ViewOfPylon.ViewElement, 
+                                                            SheetInfo.ProjectSection,  
+                                                            DirectionType.Right)
+                    && SheetInfo.RebarInfo.SecondLRebarParamValue) {
+                    CreateLRebarToPylonDimension(skeletonParentRebar, dimensionLine, dimensionBaseService, 
+                                                 ["2_торец", "Г", "край"], 
+                                                 lastPylonRefArrayFirst, lastPylonRefArraySecond);
+                } else {
+                    CreateLRebarToPylonDimension(skeletonParentRebar, dimensionLine, dimensionBaseService, 
+                                                 ["1_торец", "Г", "край"], 
+                                                 lastPylonRefArrayFirst, lastPylonRefArraySecond);
+                }
+            }
+        } catch(Exception) { }
+    }
+
+    private void CreateLRebarToPylonDimension(FamilyInstance skeletonParentRebar, Line dimensionLine,
+                                       DimensionBaseService dimensionBaseService,
+                                       List<string> importantRefNameParts,
+                                       ReferenceArray pylonRefArrayFirst,
+                                       ReferenceArray pylonRefArraySecond) {
+        var refArrayFirst = dimensionBaseService.GetDimensionRefs(skeletonParentRebar, '#', '/', importantRefNameParts,
+                                                                  oldRefArray: pylonRefArrayFirst);
+        var refArraySecond = dimensionBaseService.GetDimensionRefs(skeletonParentRebar, '#', '/', importantRefNameParts,
+                                                                  oldRefArray: pylonRefArraySecond);
+
+        var dimensionFirst = Repository.Document.Create.NewDimension(ViewOfPylon.ViewElement, dimensionLine, 
+                                                                     refArrayFirst, ViewModel.SelectedDimensionType);
+        var dimensionSecond = Repository.Document.Create.NewDimension(ViewOfPylon.ViewElement, dimensionLine, 
+                                                                      refArraySecond, ViewModel.SelectedDimensionType);
+
+        if(dimensionFirst.Value > dimensionSecond.Value) {
+            Repository.Document.Delete(dimensionFirst.Id);
+        } else {
+            Repository.Document.Delete(dimensionSecond.Id);
         }
     }
 }
