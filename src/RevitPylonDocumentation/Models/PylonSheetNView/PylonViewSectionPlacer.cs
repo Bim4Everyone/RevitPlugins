@@ -78,6 +78,16 @@ public class PylonViewSectionPlacer {
             refPylonView = SheetInfo.GeneralViewRebar;
         }
 
+        // В связи с тем, что мы в первую очередь здесь привязываемся к боковому виду армирования, а он может быть узкий
+        // то поперечные виды могут начать накладываться. Чтобы этого не происходило, проверим есть ли поперечный вид
+        // армирования 3. Если есть и его Х правее, то X координату видового экрана нужно взять у него
+        if(refPylonView != null
+            && refPylonView.ViewportElement != null
+            && SheetInfo.TransverseViewThirdRebar.ViewportElement != null
+            && refPylonView.ViewportCenter.X < SheetInfo.TransverseViewThirdRebar.ViewportCenter.X) {
+            refPylonView = SheetInfo.TransverseViewThirdRebar;
+        }
+
         if(refPylonView != null) {
             newCenterX = refPylonView.ViewportCenter.X + refPylonView.ViewportHalfWidth
                                                        + SheetInfo.GeneralView.ViewportHalfWidth;
@@ -121,7 +131,7 @@ public class PylonViewSectionPlacer {
         }
 
         double newCenterX = -SheetInfo.TitleBlockWidth + SheetInfo.GeneralViewRebar.ViewportHalfWidth
-                                                       + _titleBlockFrameLeftOffset;
+                                                       + _titleBlockFrameLeftOffset * 2;
 
         //// Рассчитываем и задаем корректную точку вставки основного вида армирования пилона, если есть другие виды
         var newCenter = new XYZ(
