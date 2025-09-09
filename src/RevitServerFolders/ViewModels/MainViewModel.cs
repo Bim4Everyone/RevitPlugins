@@ -17,7 +17,7 @@ namespace RevitServerFolders.ViewModels;
 internal class MainViewModel : BaseViewModel {
     private readonly PluginConfig _pluginConfig;
     private readonly IModelObjectService _objectService;
-    private readonly object _locker = new();
+    protected readonly ILocalizationService _localization;
 
     private string _errorText;
     private string _targetFolder;
@@ -29,16 +29,22 @@ internal class MainViewModel : BaseViewModel {
     private bool _isExportRooms;
     private bool _isExportRoomsVisible;
     private bool _clearTargetFolder;
+    private bool _openTargetWhenFinish;
 
     public MainViewModel(PluginConfig pluginConfig,
         IModelObjectService objectService,
         IOpenFolderDialogService openFolderDialogService,
-        IProgressDialogFactory progressDialogFactory) {
+        IProgressDialogFactory progressDialogFactory,
+        ILocalizationService localization) {
         _pluginConfig = pluginConfig;
         _objectService = objectService;
 
-        OpenFolderDialogService = openFolderDialogService;
-        ProgressDialogFactory = progressDialogFactory;
+        OpenFolderDialogService = openFolderDialogService
+            ?? throw new ArgumentNullException(nameof(openFolderDialogService));
+        ProgressDialogFactory = progressDialogFactory
+            ?? throw new ArgumentNullException(nameof(progressDialogFactory));
+        _localization = localization
+            ?? throw new ArgumentNullException(nameof(localization));
         ModelObjects = [];
 
         LoadViewCommand = RelayCommand.Create(LoadView);
@@ -48,6 +54,8 @@ internal class MainViewModel : BaseViewModel {
         OpenFolderDialogCommand = RelayCommand.Create(OpenFolderDialog);
         SourceFolderChangedCommand = RelayCommand.CreateAsync(SourceFolderChanged);
     }
+
+    public string Title { get; protected set; }
 
     public ICommand LoadViewCommand { get; }
     public ICommand AcceptViewCommand { get; }
@@ -72,6 +80,12 @@ internal class MainViewModel : BaseViewModel {
     public bool ClearTargetFolder {
         get => _clearTargetFolder;
         set => RaiseAndSetIfChanged(ref _clearTargetFolder, value);
+    }
+
+    // TODO
+    public bool OpenTargetWhenFinish {
+        get => _openTargetWhenFinish;
+        set => RaiseAndSetIfChanged(ref _openTargetWhenFinish, value);
     }
 
     public string SourceFolder {

@@ -15,11 +15,14 @@ internal sealed class FileSystemViewModel : MainViewModel {
         IModelObjectService objectService,
         IModelsExportService exportService,
         IOpenFolderDialogService openFolderDialogService,
-        IProgressDialogFactory progressDialogFactory)
-        : base(pluginConfig, objectService, openFolderDialogService, progressDialogFactory) {
-        _pluginConfig = pluginConfig;
-        _exportService = exportService;
+        IProgressDialogFactory progressDialogFactory,
+        ILocalizationService localization)
+        : base(pluginConfig, objectService, openFolderDialogService, progressDialogFactory, localization) {
+
+        _pluginConfig = pluginConfig ?? throw new System.ArgumentNullException(nameof(pluginConfig));
+        _exportService = exportService ?? throw new System.ArgumentNullException(nameof(exportService));
         IsExportRoomsVisible = true;
+        Title = _localization.GetLocalizedString("NwcFromRvtWindow.Title");
     }
 
     protected override void LoadConfigImpl() {

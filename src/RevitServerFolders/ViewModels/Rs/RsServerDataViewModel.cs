@@ -2,8 +2,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-using DevExpress.Mvvm.Native;
-
 using dosymep.Revit.ServerClient;
 
 using RevitServerFolders.Utils;

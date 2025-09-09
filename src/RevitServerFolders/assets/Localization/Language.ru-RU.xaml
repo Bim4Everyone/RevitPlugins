@@ -1,0 +1,42 @@
+﻿<ResourceDictionary
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:system="clr-namespace:System;assembly=mscorlib">
+
+    <system:String
+        x:Key="RvtFromRsWindow.Title">Экспорт RVT файлов из RS</system:String>
+    <system:String
+        x:Key="NwcFromRvtWindow.Title">Экспорт вида Navisworks</system:String>
+    
+    <system:String
+        x:Key="MainWindow.LabelTarget">Папка назначения</system:String>
+    <system:String
+        x:Key="MainWindow.LabelSource">Папка источника</system:String>
+    <system:String
+        x:Key="MainWindow.ClearTarget">Очищать папку назначения</system:String>
+    <system:String
+        x:Key="MainWindow.ExportRooms">Выгружать помещения</system:String>
+    <system:String
+        x:Key="MainWindow.OpenTargetWhenFinish">Открыть папку назначения после завершения</system:String>
+    <system:String
+        x:Key="MainWindow.NameHeader">Наименование</system:String>
+    <system:String
+        x:Key="MainWindow.FullNameHeader">Полное наименование</system:String>
+    <system:String
+        x:Key="MainWindow.TargetsHeader">Настройки экспорта</system:String>
+
+    <system:String
+        x:Key="RsBrowser.RefreshNode">Обновить узел</system:String>
+    <system:String
+        x:Key="RsBrowser.Title">Выберите папку</system:String>
+    <system:String
+        x:Key="RsBrowser.NameHeader">Имя</system:String>
+    <system:String
+        x:Key="RsBrowser.SizeHeader">Размер</system:String>
+
+    <system:String
+        x:Key="Ok">ОК</system:String>
+    <system:String
+        x:Key="Cancel">Отмена</system:String>
+
+</ResourceDictionary>

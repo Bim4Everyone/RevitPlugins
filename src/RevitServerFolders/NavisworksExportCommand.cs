@@ -1,13 +1,17 @@
 using System;
-using System.Windows;
+using System.Globalization;
+using System.Reflection;
 
 using Autodesk.Revit.Attributes;
 using Autodesk.Revit.DB;
 using Autodesk.Revit.UI;
 
 using dosymep.Bim4Everyone;
+using dosymep.Bim4Everyone.ProjectConfigs;
 using dosymep.Bim4Everyone.SimpleServices;
 using dosymep.SimpleServices;
+using dosymep.WpfCore.Ninject;
+using dosymep.WpfUI.Core.Ninject;
 using dosymep.Xpf.Core.Ninject;
 
 using Ninject;
@@ -34,10 +38,10 @@ internal sealed class NavisworksExportCommand : BasePluginCommand {
             .ToSelf()
             .InSingletonScope();
 
-        kernel.UseXtraProgressDialog<FileSystemViewModel>();
+        kernel.UseWpfUIProgressDialog<FileSystemViewModel>();
 
         kernel.Bind<FileModelObjectConfig>()
-            .ToMethod(c => FileModelObjectConfig.GetPluginConfig());
+            .ToMethod(c => FileModelObjectConfig.GetPluginConfig(c.Kernel.Get<IConfigSerializer>()));
 
         kernel.Bind<IModelObjectService>()
             .To<FileSystemModelObjectService>();
@@ -51,11 +55,14 @@ internal sealed class NavisworksExportCommand : BasePluginCommand {
         kernel.UseXtraOpenFolderDialog<MainWindow>(
             initialDirectory: Environment.GetFolderPath(Environment.SpecialFolder.Desktop));
 
-        kernel.Bind<FileSystemViewModel>().ToSelf();
-        kernel.Bind<MainWindow>().ToSelf()
-            .WithPropertyValue(nameof(Window.Title), PluginName)
-            .WithPropertyValue(nameof(Window.DataContext),
-                c => c.Kernel.Get<FileSystemViewModel>());
+        kernel.BindMainWindow<FileSystemViewModel, MainWindow>();
+
+        kernel.UseWpfUIThemeUpdater();
+
+        string assemblyName = Assembly.GetExecutingAssembly().GetName().Name;
+
+        kernel.UseWpfLocalization($"/{assemblyName};component/assets/Localization/Language.xaml",
+            CultureInfo.GetCultureInfo("ru-RU"));
 
         Notification(kernel.Get<MainWindow>());
     }

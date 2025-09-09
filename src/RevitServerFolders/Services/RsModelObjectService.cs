@@ -6,6 +6,9 @@ using System.Threading.Tasks;
 
 using dosymep.Revit.ServerClient;
 
+using Ninject;
+using Ninject.Syntax;
+
 using RevitServerFolders.Models;
 using RevitServerFolders.Models.Rs;
 using RevitServerFolders.ViewModels.Rs;
@@ -13,10 +16,14 @@ using RevitServerFolders.Views.Rs;
 
 namespace RevitServerFolders.Services;
 internal sealed class RsModelObjectService : IModelObjectService {
+    private readonly IResolutionRoot _resolutionRoot;
     private readonly MainViewModel _mainViewModel;
     private readonly IReadOnlyCollection<IServerClient> _serverClients;
 
-    public RsModelObjectService(MainViewModel mainViewModel, IReadOnlyCollection<IServerClient> serverClients) {
+    public RsModelObjectService(IResolutionRoot resolutionRoot,
+        MainViewModel mainViewModel,
+        IReadOnlyCollection<IServerClient> serverClients) {
+        _resolutionRoot = resolutionRoot;
         _mainViewModel = mainViewModel;
         _serverClients = serverClients;
     }
@@ -27,7 +34,8 @@ internal sealed class RsModelObjectService : IModelObjectService {
 
     public Task<ModelObject> SelectModelObjectDialog(string rootFolder) {
         _mainViewModel.RemoveCancellation();
-        var window = new MainWindow() { DataContext = _mainViewModel, Title = "Выберите папку" };
+        var window = _resolutionRoot.Get<MainWindow>();
+        window.DataContext = _mainViewModel;
         if(window.ShowDialog() == true) {
             return Task.FromResult(_mainViewModel.SelectedItem.GetModelObject());
         }

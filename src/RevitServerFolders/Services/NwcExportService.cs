@@ -7,6 +7,7 @@ using Autodesk.Revit.DB;
 using Autodesk.Revit.DB.Events;
 using Autodesk.Revit.UI.Events;
 
+using dosymep.Bim4Everyone.ProjectConfigs;
 using dosymep.Revit;
 using dosymep.Revit.Geometry;
 using dosymep.SimpleServices;
@@ -23,10 +24,15 @@ internal class NwcExportService : IModelsExportService {
     private const string _transactionName = "Смена площадки";
     private readonly RevitRepository _revitRepository;
     private readonly ILoggerService _loggerService;
+    private readonly IConfigSerializer _configSerializer;
 
-    public NwcExportService(RevitRepository revitRepository, ILoggerService loggerService) {
+    public NwcExportService(
+        RevitRepository revitRepository,
+        ILoggerService loggerService,
+        IConfigSerializer configSerializer) {
         _revitRepository = revitRepository ?? throw new ArgumentNullException(nameof(revitRepository));
         _loggerService = loggerService ?? throw new ArgumentNullException(nameof(loggerService));
+        _configSerializer = configSerializer ?? throw new ArgumentNullException(nameof(configSerializer));
     }
 
 
@@ -57,7 +63,7 @@ internal class NwcExportService : IModelsExportService {
             progress?.Report(i);
             ct.ThrowIfCancellationRequested();
 
-            var config = FileModelObjectConfig.GetPluginConfig();
+            var config = FileModelObjectConfig.GetPluginConfig(_configSerializer);
             try {
                 ExportDocument(modelFiles[i], targetFolder, config.IsExportRooms);
             } catch(Exception ex) {

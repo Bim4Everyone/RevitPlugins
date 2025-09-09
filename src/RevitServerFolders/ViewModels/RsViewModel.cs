@@ -14,11 +14,14 @@ internal sealed class RsViewModel : MainViewModel {
         IModelObjectService objectService,
         IModelsExportService exportService,
         IOpenFolderDialogService openFolderDialogService,
-        IProgressDialogFactory progressDialogFactory)
-        : base(pluginConfig, objectService, openFolderDialogService, progressDialogFactory) {
+        IProgressDialogFactory progressDialogFactory,
+        ILocalizationService localization)
+        : base(pluginConfig, objectService, openFolderDialogService, progressDialogFactory, localization) {
+
         _pluginConfig = pluginConfig;
         _exportService = exportService;
         IsExportRoomsVisible = false;
+        Title = _localization.GetLocalizedString("RvtFromRsWindow.Title");
     }
 
     protected override void AcceptViewImpl() {

@@ -1,6 +1,5 @@
 using dosymep.Bim4Everyone;
 using dosymep.Bim4Everyone.ProjectConfigs;
-using dosymep.Serializers;
 
 using pyRevitLabs.Json;
 
@@ -19,9 +18,9 @@ internal abstract class PluginConfig : ProjectConfig {
 internal class FileModelObjectConfig : PluginConfig {
     public bool IsExportRooms { get; set; }
 
-    public static FileModelObjectConfig GetPluginConfig() {
+    public static FileModelObjectConfig GetPluginConfig(IConfigSerializer configSerializer) {
         return new ProjectConfigBuilder()
-            .SetSerializer(new ConfigSerializer())
+            .SetSerializer(configSerializer)
             .SetPluginName(nameof(RevitServerFolders))
             .SetRevitVersion(ModuleEnvironment.RevitVersion)
             .SetProjectConfigName(nameof(FileModelObjectConfig) + ".json")
@@ -30,9 +29,9 @@ internal class FileModelObjectConfig : PluginConfig {
 }
 
 internal class RsModelObjectConfig : PluginConfig {
-    public static RsModelObjectConfig GetPluginConfig() {
+    public static RsModelObjectConfig GetPluginConfig(IConfigSerializer configSerializer) {
         return new ProjectConfigBuilder()
-            .SetSerializer(new ConfigSerializer())
+            .SetSerializer(configSerializer)
             .SetPluginName(nameof(RevitServerFolders))
             .SetRevitVersion(ModuleEnvironment.RevitVersion)
             .SetProjectConfigName(nameof(RsModelObjectConfig) + ".json")
