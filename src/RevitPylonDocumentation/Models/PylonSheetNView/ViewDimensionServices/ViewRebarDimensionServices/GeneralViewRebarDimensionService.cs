@@ -109,9 +109,18 @@ internal class GeneralViewRebarDimensionService {
                 // У промежуточного сегмента между массивами хомутов не будет изменений
                 dimSegmentOpts.Add(new DimensionSegmentOption(false));
             }
-            // Дополняем плоскостью на выпусках от вертикальных стержней "#1_горизонт_выпуск"
-            refArraySide = dimensionBaseService.GetDimensionRefs(skeletonParentRebar, '#', '/', ["горизонт", "выпуск"], 
-                                                                 oldRefArray: refArraySide);
+
+            if(SheetInfo.RebarInfo.AllRebarAreL) {
+                // Дополняем плоскостью на Гэшках вертикальных стержней "#1_горизонт_Г-стержень"
+                refArraySide = dimensionBaseService.GetDimensionRefs(skeletonParentRebar, '#', '/', 
+                                                                     ["горизонт", "Г-стержень"],
+                                                                     oldRefArray: refArraySide);
+            } else {
+                // Дополняем плоскостью на выпусках от вертикальных стержней "#1_горизонт_выпуск"
+                refArraySide = dimensionBaseService.GetDimensionRefs(skeletonParentRebar, '#', '/', 
+                                                                     ["горизонт", "выпуск"],
+                                                                     oldRefArray: refArraySide);
+            }
             dimSegmentOpts.Add(new DimensionSegmentOption(false));
 
             var dimensionLineLeft = dimensionBaseService.GetDimensionLine(SheetInfo.HostElems.First() as FamilyInstance,
