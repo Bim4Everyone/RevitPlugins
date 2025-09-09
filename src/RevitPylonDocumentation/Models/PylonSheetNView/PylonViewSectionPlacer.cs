@@ -278,7 +278,7 @@ public class PylonViewSectionPlacer {
 
         if(refPylonView != null) {
             newCenterX = refPylonView.ViewportCenter.X;
-            newCenterY = SheetInfo.TransverseViewFirst.ViewportHalfHeight + _titleBlockFrameBottomOffset;
+            newCenterY = SheetInfo.TransverseViewFirst.ViewportHalfHeight;
         }
         var newCenter = new XYZ(newCenterX, newCenterY, 0);
 
