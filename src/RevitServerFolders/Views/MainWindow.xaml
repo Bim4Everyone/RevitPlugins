@@ -33,6 +33,8 @@
             EventName="Loaded">
             <i:InvokeCommandAction
                 Command="{Binding LoadViewCommand}" />
+            <i:InvokeCommandAction
+                Command="{Binding SourceFolderChangedCommand}" />
         </i:EventTrigger>
         <i:EventTrigger
             SourceName="_sourceFolderEdit"
@@ -215,7 +217,6 @@
                     LastChildFill="True">
                     <ui:Button
                         DockPanel.Dock="Right"
-                        x:Name="_sourceFolderEdit"
                         Height="36"
                         Margin="5 0 0 0"
                         Content="{ui:SymbolIcon Symbol=Folder20}"
@@ -223,6 +224,7 @@
                         Converter={StaticResource InverseBooleanConverter}}"
                         Command="{Binding OpenFromFoldersCommand}" />
                     <ui:TextBox
+                        x:Name="_sourceFolderEdit"
                         Style="{StaticResource SourceFolderEditStyle}"
                         Text="{Binding SourceFolder, UpdateSourceTrigger=PropertyChanged}" />
                 </DockPanel>
@@ -270,7 +272,7 @@
                         </DataGridTemplateColumn.CellTemplate>
                     </DataGridTemplateColumn>
                     <DataGridTextColumn
-                        Width="300"
+                        Width="250"
                         IsReadOnly="True"
                         ElementStyle="{StaticResource CustomDataGridTextDisabledStyle}"
                         Binding="{Binding Name}"
