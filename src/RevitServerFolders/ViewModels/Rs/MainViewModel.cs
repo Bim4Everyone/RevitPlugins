@@ -22,15 +22,11 @@ internal sealed class MainViewModel : BaseViewModel {
         LoadViewCommand = RelayCommand.CreateAsync(LoadView);
         AcceptViewCommand = RelayCommand.CreateAsync(AcceptView, CanAcceptView);
 
-        // TODO
-        //LoadChildrenCommand = RelayCommand.CreateAsync<TreeListNodeEventArgs>(LoadChildren, CanLoadChildren);
         ReloadChildrenCommand = RelayCommand.CreateAsync(ReloadChildren, CanReloadChildren);
     }
 
     public IAsyncCommand LoadViewCommand { get; }
     public IAsyncCommand AcceptViewCommand { get; }
-
-    //public IAsyncCommand LoadChildrenCommand { get; }
     public IAsyncCommand ReloadChildrenCommand { get; }
 
     public string ErrorText {
@@ -85,17 +81,6 @@ internal sealed class MainViewModel : BaseViewModel {
         ErrorText = null;
         return true;
     }
-
-    //private async Task LoadChildren(TreeListNodeEventArgs args) {
-    //    if(args.Row is RsModelObjectViewModel rsModelObject) {
-    //        await rsModelObject.LoadChildrenCommand.ExecuteAsync(default);
-    //    }
-    //}
-
-    //private bool CanLoadChildren(TreeListNodeEventArgs args) {
-    //    return args.Row is RsModelObjectViewModel rsModelObject
-    //           && rsModelObject.LoadChildrenCommand.CanExecute(default);
-    //}
 
     private async Task ReloadChildren() {
         await SelectedItem.ReloadChildrenCommand.ExecuteAsync(default);
