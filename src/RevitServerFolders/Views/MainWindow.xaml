@@ -246,11 +246,18 @@
                     <DataGridCheckBoxColumn
                         CanUserReorder="False"
                         CanUserResize="False"
+                        CanUserSort="False"
                         Width="Auto"
-                        Binding="{Binding SkipObject, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource InverseBooleanConverter}}" />
+                        Binding="{Binding SkipObject, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource InverseBooleanConverter}}">
+                        <DataGridCheckBoxColumn.Header>
+                            <CheckBox
+                                IsChecked="{Binding DataContext.SkipAll, RelativeSource={RelativeSource AncestorType=ui:DataGrid}, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource InverseBooleanConverter}}" />
+                        </DataGridCheckBoxColumn.Header>
+                    </DataGridCheckBoxColumn>
                     <DataGridTemplateColumn
                         CanUserReorder="False"
                         CanUserResize="False"
+                        CanUserSort="False"
                         Width="Auto">
                         <DataGridTemplateColumn.CellTemplate>
                             <DataTemplate>
