@@ -1,3 +1,5 @@
+using System.Diagnostics;
+using System.IO;
 using System.Linq;
 
 using dosymep.SimpleServices;
@@ -47,5 +49,9 @@ internal sealed class FileSystemViewModel : MainViewModel {
         dialog.Show();
 
         _exportService.ExportModelObjects(TargetFolder, modelFiles, ClearTargetFolder, progress, ct);
+
+        if(OpenTargetWhenFinish) {
+            Process.Start(Path.GetFullPath(TargetFolder));
+        }
     }
 }
