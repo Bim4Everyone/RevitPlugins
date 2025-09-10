@@ -223,6 +223,7 @@
                 Grid.Row="5"
                 Margin="5"
                 Style="{StaticResource CustomResizableDataGridStyle}"
+                CellStyle="{StaticResource CustomDataGridCell}"
                 ItemsSource="{Binding ModelObjects}"
                 SelectedItem="{Binding SelectedObject}">
 
