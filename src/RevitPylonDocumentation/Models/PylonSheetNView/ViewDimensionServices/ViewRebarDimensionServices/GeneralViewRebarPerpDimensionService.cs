@@ -30,7 +30,7 @@ internal class GeneralViewRebarPerpDimensionService {
     /// Создание размерной цепочки по крайним вертикальным стержням арматурного каркаса сверху
     /// </summary>
     internal void TryCreateTopEdgeRebarDimensions(FamilyInstance skeletonParentRebar, 
-                                               DimensionBaseService dimensionBaseService) {
+                                                  DimensionBaseService dimensionBaseService) {
         try {
             // Если хотя бы один из стержней - Г-образный,тогда нет смысле ставить этот размер
             // Ставится только когда обе бутылки
@@ -46,10 +46,10 @@ internal class GeneralViewRebarPerpDimensionService {
     /// Создание размерной цепочки по крайним вертикальным стержням арматурного каркаса снизу
     /// </summary>
     internal void TryCreateBottomEdgeRebarDimensions(FamilyInstance skeletonParentRebar, 
-                                                  DimensionBaseService dimensionBaseService) {
+                                                     DimensionBaseService dimensionBaseService) {
         try {
             var dimensionLineBottom = dimensionBaseService.GetDimensionLine(skeletonParentRebar,
-                                                                            DirectionType.Bottom, 1);
+                                                                            DirectionType.Bottom, 0.6);
             var refArrayBottom = dimensionBaseService.GetDimensionRefs(skeletonParentRebar, '#', '/', 
                                                                        ["низ", "торец"]);
             Repository.Document.Create.NewDimension(ViewOfPylon.ViewElement, dimensionLineBottom, refArrayBottom, 

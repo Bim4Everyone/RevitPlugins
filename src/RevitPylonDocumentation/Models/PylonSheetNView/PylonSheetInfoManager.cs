@@ -42,7 +42,7 @@ internal class PylonSheetInfoManager {
         SheetInfo.ElemsInfo.FindElemsBoundingBox();
         SheetInfo.ElemsInfo.FindElemsBoundingBoxProps();
 
-
+        SheetInfo.RebarInfo.TrySetSimpleRebarMarks();
 
         // ОСНОВНОЙ ВИД
         if(selectionSettings.NeedWorkWithGeneralView) {
