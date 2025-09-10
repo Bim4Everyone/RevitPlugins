@@ -30,6 +30,7 @@ internal class MainViewModel : BaseViewModel {
     private bool _isExportRoomsVisible;
     private bool _clearTargetFolder;
     private bool _openTargetWhenFinish;
+    private bool _skipAll;
 
     public MainViewModel(PluginConfig pluginConfig,
         IModelObjectService objectService,
@@ -101,6 +102,18 @@ internal class MainViewModel : BaseViewModel {
     public ObservableCollection<ModelObjectViewModel> ModelObjects {
         get => _modelObjects;
         set => RaiseAndSetIfChanged(ref _modelObjects, value);
+    }
+
+    public bool SkipAll {
+        get => _skipAll;
+        set {
+            if(_skipAll != value) {
+                RaiseAndSetIfChanged(ref _skipAll, value);
+                foreach(var item in ModelObjects) {
+                    item.SkipObject = value;
+                }
+            }
+        }
     }
 
     public bool IsExportRooms {

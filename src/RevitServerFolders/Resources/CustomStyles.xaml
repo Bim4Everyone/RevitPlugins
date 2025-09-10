@@ -34,9 +34,6 @@
             Property="ColumnHeaderStyle"
             Value="{DynamicResource CustomDataGridColumnHeaderStyle}" />
         <Setter
-            Property="RowStyle"
-            Value="{DynamicResource CustomDataGridRowStyle}" />
-        <Setter
             Property="AutoGenerateColumns"
             Value="False" />
         <Setter
@@ -57,14 +54,6 @@
         <Setter
             Property="CanUserResizeColumns"
             Value="True" />
-    </Style>
-    <Style
-        x:Key="CustomDataGridRowStyle"
-        TargetType="{x:Type DataGridRow}"
-        BasedOn="{StaticResource DefaultDataGridRowStyle}">
-        <Setter
-            Property="Margin"
-            Value="0 5" />
     </Style>
     <Style
         x:Key="CustomColumnHeaderGripperStyle"

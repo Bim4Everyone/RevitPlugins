@@ -74,6 +74,21 @@
                 Text="{me:LocalizationSource MainWindow.FullNameHeader}" />
 
             <Style
+                x:Key="CustomDataGridTextDisabledStyle"
+                TargetType="TextBlock"
+                BasedOn="{StaticResource DefaultDataGridTextElementStyle}">
+                <Style.Triggers>
+                    <DataTrigger
+                        Value="True"
+                        Binding="{Binding Path=SkipObject}">
+                        <Setter
+                            Property="Foreground"
+                            Value="{DynamicResource TextFillColorDisabledBrush}" />
+                    </DataTrigger>
+                </Style.Triggers>
+            </Style>
+
+            <Style
                 TargetType="DockPanel"
                 x:Key="VisibleOnExecutingPanel">
                 <Style.Triggers>
@@ -227,22 +242,6 @@
                 ItemsSource="{Binding ModelObjects}"
                 SelectedItem="{Binding SelectedObject}">
 
-                <ui:DataGrid.Resources>
-                    <Style
-                        TargetType="DataGridRow"
-                        BasedOn="{StaticResource DefaultDataGridRowStyle}">
-                        <Style.Triggers>
-                            <DataTrigger
-                                Value="True"
-                                Binding="{Binding SkipObject}">
-                                <Setter
-                                    Property="Opacity"
-                                    Value="30" />
-                            </DataTrigger>
-                        </Style.Triggers>
-                    </Style>
-                </ui:DataGrid.Resources>
-
                 <ui:DataGrid.Columns>
                     <DataGridCheckBoxColumn
                         CanUserReorder="False"
@@ -272,10 +271,12 @@
                     <DataGridTextColumn
                         Width="200"
                         IsReadOnly="True"
+                        ElementStyle="{StaticResource CustomDataGridTextDisabledStyle}"
                         Binding="{Binding Name}"
                         Header="{StaticResource NameHeader}" />
                     <DataGridTextColumn
                         IsReadOnly="True"
+                        ElementStyle="{StaticResource CustomDataGridTextDisabledStyle}"
                         Binding="{Binding FullName}"
                         Header="{StaticResource FullNameHeader}" />
                 </ui:DataGrid.Columns>
