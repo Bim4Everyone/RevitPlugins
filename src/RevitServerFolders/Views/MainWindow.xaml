@@ -62,11 +62,14 @@
             <ui:SymbolRegular
                 x:Key="FolderIcon">Folder20</ui:SymbolRegular>
 
+            <ui:SymbolRegular
+                x:Key="BuildingIcon">Building20</ui:SymbolRegular>
+
             <pluginConverters:CellImageConverter
                 x:Key="CellImageConverter"
-                Empty="{ui:SymbolIcon Symbol=Document20}"
-                Model="..\Resources\Revit.png"
-                Folder="{ui:SymbolIcon Symbol=Folder20}" />
+                Empty="{StaticResource DocumentIcon}"
+                Model="{StaticResource BuildingIcon}"
+                Folder="{StaticResource FolderIcon}" />
 
             <ui:TextBlock
                 x:Key="NameHeader"
@@ -261,13 +264,11 @@
                         CanUserReorder="False"
                         CanUserResize="False"
                         CanUserSort="False"
-                        Width="50">
+                        Width="Auto">
                         <DataGridTemplateColumn.CellTemplate>
                             <DataTemplate>
-                                <Image
-                                    Width="20"
-                                    Height="20"
-                                    Source="{Binding ., Converter={StaticResource CellImageConverter}}" />
+                                <ui:SymbolIcon
+                                    Symbol="{Binding ., Converter={StaticResource CellImageConverter}}" />
                             </DataTemplate>
                         </DataGridTemplateColumn.CellTemplate>
                     </DataGridTemplateColumn>

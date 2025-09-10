@@ -35,12 +35,22 @@
                 <ResourceDictionary
                     Source="../../ViewTemplates/TreeViewItemTemplate.xaml" />
             </ResourceDictionary.MergedDictionaries>
+
+            <ui:SymbolRegular
+                x:Key="EmptyIcon">Document20</ui:SymbolRegular>
+            <ui:SymbolRegular
+                x:Key="ServerIcon">Database20</ui:SymbolRegular>
+            <ui:SymbolRegular
+                x:Key="FolderIcon">Folder20</ui:SymbolRegular>
+            <ui:SymbolRegular
+                x:Key="OpenedFolderIcon">FolderOpen20</ui:SymbolRegular>
+            
             <converters:RsNodeImageConverter
                 x:Key="RsNodeImageConverter"
-                Empty="{ui:SymbolIcon Symbol=Document20}"
-                Server="{ui:SymbolIcon Symbol=Database20}"
-                Folder="{ui:SymbolIcon Symbol=Folder20}"
-                OpenedFolder="{ui:SymbolIcon Symbol=FolderOpen20}" />
+                Empty="{StaticResource EmptyIcon}"
+                Server="{StaticResource ServerIcon}"
+                Folder="{StaticResource FolderIcon}"
+                OpenedFolder="{StaticResource OpenedFolderIcon}" />
         </ResourceDictionary>
     </Window.Resources>
 
@@ -118,10 +128,9 @@
 
                                 <DockPanel
                                     Grid.Column="0">
-                                    <Image
-                                        Width="20"
-                                        Height="20"
-                                        Source="{Binding ., Converter={StaticResource RsNodeImageConverter}}" />
+                                    <ui:SymbolIcon
+                                        Margin="0 0 5 0"
+                                        Symbol="{Binding ., Converter={StaticResource RsNodeImageConverter}}" />
                                     <ui:TextBlock
                                         Text="{Binding Name}" />
                                 </DockPanel>

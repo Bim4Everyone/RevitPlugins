@@ -3,7 +3,4 @@
 		<UseWpfUI>true</UseWpfUI>
 		<LangVersion>12</LangVersion>
 	</PropertyGroup>
-	<ItemGroup>
-		<Resource Include="Resources\Revit.png" />
-	</ItemGroup>
 </Project>
