@@ -237,6 +237,7 @@
             <ui:DataGrid
                 Grid.Row="5"
                 Margin="5"
+                RowHeight="33"
                 Style="{StaticResource CustomResizableDataGridStyle}"
                 CellStyle="{StaticResource CustomDataGridCell}"
                 ItemsSource="{Binding ModelObjects}"
@@ -258,7 +259,7 @@
                         CanUserReorder="False"
                         CanUserResize="False"
                         CanUserSort="False"
-                        Width="Auto">
+                        Width="50">
                         <DataGridTemplateColumn.CellTemplate>
                             <DataTemplate>
                                 <Image
@@ -269,7 +270,7 @@
                         </DataGridTemplateColumn.CellTemplate>
                     </DataGridTemplateColumn>
                     <DataGridTextColumn
-                        Width="200"
+                        Width="300"
                         IsReadOnly="True"
                         ElementStyle="{StaticResource CustomDataGridTextDisabledStyle}"
                         Binding="{Binding Name}"
