@@ -83,7 +83,6 @@ internal class MainViewModel : BaseViewModel {
         set => RaiseAndSetIfChanged(ref _clearTargetFolder, value);
     }
 
-    // TODO
     public bool OpenTargetWhenFinish {
         get => _openTargetWhenFinish;
         set => RaiseAndSetIfChanged(ref _openTargetWhenFinish, value);
