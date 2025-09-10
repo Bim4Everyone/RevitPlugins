@@ -32,6 +32,8 @@
             <ResourceDictionary.MergedDictionaries>
                 <ResourceDictionary
                     Source="../../Resources/CustomStyles.xaml" />
+                <ResourceDictionary
+                    Source="../../ViewTemplates/TreeViewItemTemplate.xaml" />
             </ResourceDictionary.MergedDictionaries>
             <converters:RsNodeImageConverter
                 x:Key="RsNodeImageConverter"
@@ -78,18 +80,23 @@
                     DockPanel.Dock="Top"
                     LastChildFill="True">
                     <Label
-                        Width="50"
+                        Width="105"
                         DockPanel.Dock="Right"
                         Content="{me:LocalizationSource RsBrowser.SizeHeader}" />
                     <Label
+                        Margin="55 0 0 0"
                         Content="{me:LocalizationSource RsBrowser.NameHeader}" />
                 </DockPanel>
                 <TreeView
-                    ItemsSource="{Binding Items}"
-                    SelectedValuePath="{Binding SelectedItem}">
+                    ItemsSource="{Binding Items}">
+                    <i:Interaction.Behaviors>
+                        <pluginBehaviors:SelectedItemTreeViewBehavior
+                            SelectedItem="{Binding SelectedItem, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                    </i:Interaction.Behaviors>
                     <TreeView.ItemContainerStyle>
                         <Style
-                            TargetType="TreeViewItem">
+                            TargetType="TreeViewItem"
+                            BasedOn="{StaticResource CustomTreeViewItemStyle}">
                             <Setter
                                 Property="pluginBehaviors:ExpandedTreeViewItemsBehavior.ExpandedCommand"
                                 Value="{Binding LoadChildrenCommand}" />
@@ -106,7 +113,7 @@
                                     <ColumnDefinition
                                         Width="*" />
                                     <ColumnDefinition
-                                        Width="Auto" />
+                                        Width="100" />
                                 </Grid.ColumnDefinitions>
 
                                 <DockPanel
@@ -119,7 +126,7 @@
                                         Text="{Binding Name}" />
                                 </DockPanel>
                                 <ui:TextBlock
-                                    HorizontalAlignment="Right"
+                                    HorizontalAlignment="Left"
                                     Grid.Column="1"
                                     Text="{Binding Size}" />
                             </Grid>
