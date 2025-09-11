@@ -201,7 +201,11 @@ internal class MainViewModel : BaseViewModel {
     private async Task SourceFolderChanged() {
         try {
             if(!OpenFromFoldersCommand.IsExecuting) {
-                await AddModelObjects(await _objectService.GetFromString(SourceFolder));
+                if(!string.IsNullOrWhiteSpace(SourceFolder)) {
+                    await AddModelObjects(await _objectService.GetFromString(SourceFolder));
+                } else {
+                    AddModelObjects([], []);
+                }
             }
         } catch {
             // pass
