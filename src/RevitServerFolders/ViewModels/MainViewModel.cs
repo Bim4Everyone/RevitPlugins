@@ -149,6 +149,11 @@ internal class MainViewModel<T> : BaseViewModel where T : ExportSettings {
         if(errorSettings is not null) {
             ErrorText = _localization.GetLocalizedString(
                 "MainWindow.ErrorTextPattern", errorSettings.Index, errorSettings.Error);
+            return false;
+        }
+        if(SettingsCollection.All(s => !s.IsSelected)) {
+            ErrorText = _localization.GetLocalizedString("MainWindow.Validation.AllSettingsOff");
+            return false;
         }
 
         ErrorText = null;
@@ -158,6 +163,9 @@ internal class MainViewModel<T> : BaseViewModel where T : ExportSettings {
     private void LoadConfig() {
         LoadConfigImpl();
         SelectedSettings = SettingsCollection.FirstOrDefault();
+        if(SelectedSettings is not null) {
+            SelectedSettings.IsSelected = true;
+        }
         UpdateIndexes();
     }
 
@@ -178,6 +186,6 @@ internal class MainViewModel<T> : BaseViewModel where T : ExportSettings {
     }
 
     private bool CanRemoveSettings(ExportSettingsViewModel<T> settings) {
-        return settings is not null;
+        return settings is not null && SettingsCollection.Count > 1;
     }
 }

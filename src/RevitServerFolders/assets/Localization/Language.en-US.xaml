@@ -32,6 +32,8 @@
         x:Key="MainWindow.Validation.Wait">Wait for the loading to finish</system:String>
     <system:String
         x:Key="MainWindow.Validation.ModelsDuplicated">The source folder contains duplicates "{0}".</system:String>
+    <system:String
+        x:Key="MainWindow.Validation.AllSettingsOff">No settings selected</system:String>
 
     <system:String
         x:Key="RsBrowser.Validation.SelectFolder">Select a folder with models</system:String>

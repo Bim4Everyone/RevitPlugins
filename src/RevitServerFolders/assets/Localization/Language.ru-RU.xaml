@@ -32,6 +32,8 @@
         x:Key="MainWindow.Validation.Wait">Дождитесь завершения загрузки</system:String>
     <system:String
         x:Key="MainWindow.Validation.ModelsDuplicated">Папка источника содержит дубликаты "{0}".</system:String>
+    <system:String
+        x:Key="MainWindow.Validation.AllSettingsOff">Не выбрана ни одна настройка</system:String>
 
     <system:String
         x:Key="RsBrowser.Validation.SelectFolder">Выберите папку с моделями</system:String>
