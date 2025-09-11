@@ -1,5 +1,4 @@
-using System.Diagnostics;
-using System.IO;
+using System;
 using System.Linq;
 
 using dosymep.SimpleServices;
@@ -8,41 +7,53 @@ using RevitServerFolders.Models;
 using RevitServerFolders.Services;
 
 namespace RevitServerFolders.ViewModels;
-internal sealed class RsViewModel : MainViewModel {
-    private readonly RsModelObjectConfig _pluginConfig;
-    private readonly IModelsExportService _exportService;
-
+internal sealed class RsViewModel : MainViewModel<RsModelObjectExportSettings> {
     public RsViewModel(RsModelObjectConfig pluginConfig,
         IModelObjectService objectService,
-        IModelsExportService exportService,
+        IModelsExportService<RsModelObjectExportSettings> exportService,
         IOpenFolderDialogService openFolderDialogService,
         IProgressDialogFactory progressDialogFactory,
         ILocalizationService localization)
-        : base(pluginConfig, objectService, openFolderDialogService, progressDialogFactory, localization) {
+        : base(pluginConfig,
+            exportService,
+            objectService,
+            openFolderDialogService,
+            progressDialogFactory,
+            localization) {
 
-        _pluginConfig = pluginConfig;
-        _exportService = exportService;
-        IsExportRoomsVisible = false;
         Title = _localization.GetLocalizedString("RvtFromRsWindow.Title");
     }
 
-    protected override void AcceptViewImpl() {
-        string[] modelFiles = ModelObjects
-            .Where(item => !item.SkipObject)
-            .Select(item => item.FullName)
-            .ToArray();
 
-        using var dialog = ProgressDialogFactory.CreateDialog();
-        dialog.StepValue = 1;
-        dialog.MaxValue = modelFiles.Length;
-        var progress = dialog.CreateProgress();
-        var ct = dialog.CreateCancellationToken();
-        dialog.Show();
-
-        _exportService.ExportModelObjects(TargetFolder, modelFiles, ClearTargetFolder, progress, ct);
-
-        if(OpenTargetWhenFinish) {
-            Process.Start(Path.GetFullPath(TargetFolder));
+    protected override void AddSettingsImpl() {
+        var newSetting = CreateSetting();
+        if(OpenFolderDialogService.ShowDialog()) {
+            newSetting.TargetFolder = OpenFolderDialogService.Folder.FullName;
+        } else {
+            throw new OperationCanceledException();
         }
+        SettingsCollection.Add(newSetting);
+        SelectedSettings = newSetting;
+    }
+
+    protected override void LoadConfigImpl() {
+        var settings = _pluginConfig.ExportSettings
+        .Select(s => new RsModelObjectExportSettingsViewModel(s,
+            _objectService,
+            OpenFolderDialogService,
+            _localization))
+        .ToArray();
+        if(settings.Length == 0) {
+            SettingsCollection.Add(CreateSetting());
+        } else {
+            foreach(var setting in settings) {
+                SettingsCollection.Add(setting);
+            }
+        }
+    }
+
+    private RsModelObjectExportSettingsViewModel CreateSetting() {
+        return new RsModelObjectExportSettingsViewModel(
+            new RsModelObjectExportSettings(), _objectService, OpenFolderDialogService, _localization);
     }
 }

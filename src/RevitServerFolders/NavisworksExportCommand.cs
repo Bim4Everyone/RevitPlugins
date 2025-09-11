@@ -45,7 +45,7 @@ internal sealed class NavisworksExportCommand : BasePluginCommand {
 
         kernel.Bind<IModelObjectService>()
             .To<FileSystemModelObjectService>();
-        kernel.Bind<IModelsExportService>()
+        kernel.Bind<IModelsExportService<FileModelObjectExportSettings>>()
             .To<NwcExportService>()
             .InSingletonScope();
         kernel.Bind<ILoggerService>()

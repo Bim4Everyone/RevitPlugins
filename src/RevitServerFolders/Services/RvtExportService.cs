@@ -6,11 +6,13 @@ using System.Threading;
 using dosymep.Bim4Everyone;
 using dosymep.SimpleServices;
 
+using RevitServerFolders.Models;
+
 namespace RevitServerFolders.Services;
 /// <summary>
 /// Экспортирует файлы с Revit-server в заданную директорию
 /// </summary>
-internal class RvtExportService : IModelsExportService {
+internal class RvtExportService : IModelsExportService<RsModelObjectExportSettings> {
     private const string _revitServerToolPath
         = @"C:\Program Files\Autodesk\Revit {0}\RevitServerToolCommand\RevitServerTool.exe";
     private const string _revitServerToolArgs = @"createLocalRvt ""{0}"" -s ""{1}"" -d ""{2}/"" -o";
@@ -23,22 +25,21 @@ internal class RvtExportService : IModelsExportService {
 
 
     public void ExportModelObjects(
-        string targetFolder,
         string[] modelFiles,
-        bool clearTargetFolder = false,
+        RsModelObjectExportSettings settings,
         IProgress<int> progress = null,
         CancellationToken ct = default) {
-        if(string.IsNullOrWhiteSpace(targetFolder)) {
-            throw new ArgumentException(nameof(targetFolder));
+        if(settings is null) {
+            throw new ArgumentException(nameof(settings));
         }
         if(modelFiles is null) {
             throw new ArgumentNullException(nameof(modelFiles));
         }
 
-        Directory.CreateDirectory(targetFolder);
+        Directory.CreateDirectory(settings.TargetFolder);
 
-        if(clearTargetFolder) {
-            string[] revitFiles = Directory.GetFiles(targetFolder, _rvtSearchPattern);
+        if(settings.ClearTargetFolder) {
+            string[] revitFiles = Directory.GetFiles(settings.TargetFolder, _rvtSearchPattern);
             foreach(string revitFile in revitFiles) {
                 File.SetAttributes(revitFile, FileAttributes.Normal);
                 File.Delete(revitFile);
@@ -50,8 +51,9 @@ internal class RvtExportService : IModelsExportService {
             ct.ThrowIfCancellationRequested();
 
             try {
-                ExportDocument(modelFiles[i], targetFolder);
-                dosymep.Revit.DocumentExtensions.UnloadAllLinks(Directory.GetFiles(targetFolder, _rvtSearchPattern));
+                ExportDocument(modelFiles[i], settings.TargetFolder);
+                dosymep.Revit.DocumentExtensions.UnloadAllLinks(
+                    Directory.GetFiles(settings.TargetFolder, _rvtSearchPattern));
             } catch(Exception ex) {
                 _loggerService.Warning(ex, $"Ошибка экспорта в rvt в файле: {modelFiles[i]}");
             }

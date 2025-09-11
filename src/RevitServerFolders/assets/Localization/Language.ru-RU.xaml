@@ -24,6 +24,13 @@
         x:Key="MainWindow.FullNameHeader">Полное наименование</system:String>
     <system:String
         x:Key="MainWindow.TargetsHeader">Настройки экспорта</system:String>
+    <system:String
+        x:Key="MainWindow.TargetsFrom">Откуда:</system:String>
+    <system:String
+        x:Key="MainWindow.TargetsTo">Куда:</system:String>
+
+    <system:String
+        x:Key="MainWindow.ErrorTextPattern">Ошибка в настройке {0}: {1}</system:String>
 
     <system:String
         x:Key="RsBrowser.RefreshNode">Обновить узел</system:String>

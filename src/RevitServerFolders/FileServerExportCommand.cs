@@ -47,7 +47,7 @@ internal sealed class FileServerExportCommand : BasePluginCommand {
 
         kernel.Bind<IModelObjectService>()
             .To<RsModelObjectService>();
-        kernel.Bind<IModelsExportService>()
+        kernel.Bind<IModelsExportService<RsModelObjectExportSettings>>()
             .To<RvtExportService>()
             .InSingletonScope();
         kernel.Bind<ILoggerService>()

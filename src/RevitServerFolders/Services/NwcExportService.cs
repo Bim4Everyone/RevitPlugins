@@ -7,7 +7,6 @@ using Autodesk.Revit.DB;
 using Autodesk.Revit.DB.Events;
 using Autodesk.Revit.UI.Events;
 
-using dosymep.Bim4Everyone.ProjectConfigs;
 using dosymep.Revit;
 using dosymep.Revit.Geometry;
 using dosymep.SimpleServices;
@@ -18,41 +17,37 @@ namespace RevitServerFolders.Services;
 /// <summary>
 /// Экспортирует rvt файлы в nwc в заданную директорию
 /// </summary>
-internal class NwcExportService : IModelsExportService {
+internal class NwcExportService : IModelsExportService<FileModelObjectExportSettings> {
     private const string _nwcSearchPattern = "*.nwc";
     private const string _navisworksViewName = "Navisworks";
     private const string _transactionName = "Смена площадки";
     private readonly RevitRepository _revitRepository;
     private readonly ILoggerService _loggerService;
-    private readonly IConfigSerializer _configSerializer;
 
     public NwcExportService(
         RevitRepository revitRepository,
-        ILoggerService loggerService,
-        IConfigSerializer configSerializer) {
+        ILoggerService loggerService) {
         _revitRepository = revitRepository ?? throw new ArgumentNullException(nameof(revitRepository));
         _loggerService = loggerService ?? throw new ArgumentNullException(nameof(loggerService));
-        _configSerializer = configSerializer ?? throw new ArgumentNullException(nameof(configSerializer));
     }
 
 
     public void ExportModelObjects(
-        string targetFolder,
         string[] modelFiles,
-        bool clearTargetFolder = false,
+        FileModelObjectExportSettings settings,
         IProgress<int> progress = null,
         CancellationToken ct = default) {
-        if(string.IsNullOrWhiteSpace(targetFolder)) {
-            throw new ArgumentException(nameof(targetFolder));
+        if(settings is null) {
+            throw new ArgumentException(nameof(settings));
         }
         if(modelFiles is null) {
             throw new ArgumentNullException(nameof(modelFiles));
         }
 
-        Directory.CreateDirectory(targetFolder);
+        Directory.CreateDirectory(settings.TargetFolder);
 
-        if(clearTargetFolder) {
-            string[] navisFiles = Directory.GetFiles(targetFolder, _nwcSearchPattern);
+        if(settings.ClearTargetFolder) {
+            string[] navisFiles = Directory.GetFiles(settings.TargetFolder, _nwcSearchPattern);
             foreach(string navisFile in navisFiles) {
                 File.SetAttributes(navisFile, FileAttributes.Normal);
                 File.Delete(navisFile);
@@ -63,9 +58,8 @@ internal class NwcExportService : IModelsExportService {
             progress?.Report(i);
             ct.ThrowIfCancellationRequested();
 
-            var config = FileModelObjectConfig.GetPluginConfig(_configSerializer);
             try {
-                ExportDocument(modelFiles[i], targetFolder, config.IsExportRooms);
+                ExportDocument(modelFiles[i], settings.TargetFolder, settings.IsExportRooms);
             } catch(Exception ex) {
                 _loggerService.Warning(ex, "Ошибка экспорта в nwc в файле: {@DocPath}", modelFiles[i]);
             }

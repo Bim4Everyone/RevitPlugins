@@ -17,9 +17,9 @@
     mc:Ignorable="d"
     WindowStartupLocation="CenterOwner"
     Height="450"
-    Width="800"
+    Width="1010"
     MinHeight="450"
-    MinWidth="800"
+    MinWidth="1010"
     d:DataContext="{d:DesignInstance vms:MainViewModel, IsDesignTimeCreatable=False}">
 
     <i:Interaction.Behaviors>
@@ -77,6 +77,9 @@
             <ui:TextBlock
                 x:Key="FullNameHeader"
                 Text="{me:LocalizationSource MainWindow.FullNameHeader}" />
+            <ui:TextBlock
+                x:Key="TargetsHeader"
+                Text="{me:LocalizationSource MainWindow.TargetsHeader}" />
 
             <Style
                 x:Key="CustomDataGridTextDisabledStyle"
@@ -98,7 +101,7 @@
                 x:Key="VisibleOnExecutingPanel">
                 <Style.Triggers>
                     <DataTrigger
-                        Binding="{Binding DataContext.OpenFromFoldersCommand.IsExecuting,
+                        Binding="{Binding DataContext.SelectedSettings.OpenFromFoldersCommand.IsExecuting,
                         RelativeSource={RelativeSource AncestorType=Window}}"
                         Value="True">
                         <Setter
@@ -116,34 +119,7 @@
                 BasedOn="{StaticResource CustomBorder}">
                 <Style.Triggers>
                     <DataTrigger
-                        Binding="{Binding DataContext.OpenFromFoldersCommand.IsExecuting,
-                        RelativeSource={RelativeSource AncestorType=Window}}"
-                        Value="True">
-                        <Setter
-                            Property="IsEnabled"
-                            Value="False" />
-                    </DataTrigger>
-                </Style.Triggers>
-                <Setter
-                    Property="IsEnabled"
-                    Value="True" />
-            </Style>
-
-            <Style
-                TargetType="ui:TextBox"
-                x:Key="SourceFolderEditStyle"
-                BasedOn="{StaticResource DefaultUiTextBoxStyle}">
-                <Style.Triggers>
-                    <DataTrigger
-                        Binding="{Binding DataContext.OpenFromFoldersCommand.IsExecuting,
-                        RelativeSource={RelativeSource AncestorType=Window}}"
-                        Value="True">
-                        <Setter
-                            Property="IsEnabled"
-                            Value="False" />
-                    </DataTrigger>
-                    <DataTrigger
-                        Binding="{Binding DataContext.SourceFolderChangedCommand.IsExecuting,
+                        Binding="{Binding DataContext.SelectedSettings.OpenFromFoldersCommand.IsExecuting,
                         RelativeSource={RelativeSource AncestorType=Window}}"
                         Value="True">
                         <Setter
@@ -170,21 +146,142 @@
                 Height="Auto" />
         </Grid.RowDefinitions>
 
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition
+                Width="200"
+                MinWidth="200" />
+            <ColumnDefinition
+                Width="Auto" />
+            <ColumnDefinition
+                MinWidth="800" />
+        </Grid.ColumnDefinitions>
+
         <ui:TitleBar
             Grid.Row="0"
+            Grid.Column="0"
+            Grid.ColumnSpan="3"
             Title="{Binding Title}" />
 
         <DockPanel
             Grid.Row="1"
             Grid.RowSpan="2"
+            Grid.Column="0"
+            Grid.ColumnSpan="3"
             Style="{StaticResource VisibleOnExecutingPanel}">
             <ui:ProgressRing
                 IsIndeterminate="True" />
         </DockPanel>
 
         <Border
-            Margin="10 0 10 5"
             Grid.Row="1"
+            Grid.RowSpan="2"
+            Grid.Column="0"
+            Margin="10 0 0 0"
+            Style="{StaticResource DisabledOnExecutingBorder}">
+            <DockPanel
+                LastChildFill="True">
+                <ui:Button
+                    Margin="0 0 0 10"
+                    DockPanel.Dock="Top"
+                    Content="{ui:SymbolIcon Symbol=Add20}"
+                    Command="{Binding AddSettingsCommand}" />
+                <ui:DataGrid
+                    Grid.Row="5"
+                    Margin="5"
+                    Style="{StaticResource CustomResizableDataGridStyle}"
+                    ItemsSource="{Binding SettingsCollection}"
+                    SelectedItem="{Binding SelectedSettings}">
+                    <ui:DataGrid.Columns>
+                        <DataGridTextColumn
+                            Width="Auto"
+                            IsReadOnly="True"
+                            CanUserReorder="False"
+                            CanUserResize="False"
+                            CanUserSort="True"
+                            Header="№"
+                            Binding="{Binding Index}" />
+                        <DataGridCheckBoxColumn
+                            CanUserReorder="False"
+                            CanUserResize="False"
+                            CanUserSort="False"
+                            Width="Auto"
+                            Binding="{Binding IsSelected}">
+                            <DataGridCheckBoxColumn.Header>
+                                <CheckBox
+                                    IsChecked="{Binding DataContext.AllSelected, RelativeSource={RelativeSource AncestorType=ui:DataGrid}, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                            </DataGridCheckBoxColumn.Header>
+                        </DataGridCheckBoxColumn>
+                        <DataGridTemplateColumn
+                            Width="200"
+                            Header="{StaticResource TargetsHeader}">
+                            <DataGridTemplateColumn.CellTemplate>
+                                <DataTemplate>
+                                    <StackPanel
+                                        Height="50"
+                                        Margin="5 2">
+                                        <DockPanel
+                                            Margin="0 0 0 5">
+                                            <ui:TextBlock
+                                                Width="55"
+                                                Margin="0 0 5 0"
+                                                Foreground="{DynamicResource LabelForeground}"
+                                                Text="{Binding TargetFromLabel}" />
+                                            <Label
+                                                Margin="0"
+                                                ToolTip="{Binding TargetFolder}"
+                                                Content="{Binding TargetFolder}" />
+                                        </DockPanel>
+                                        <DockPanel>
+                                            <ui:TextBlock
+                                                Width="55"
+                                                Margin="0 0 5 0"
+                                                Foreground="{DynamicResource LabelForeground}"
+                                                Text="{Binding TargetToLabel}" />
+                                            <Label
+                                                Margin="0"
+                                                ToolTip="{Binding SourceFolder}"
+                                                Content="{Binding SourceFolder}" />
+                                        </DockPanel>
+                                    </StackPanel>
+                                </DataTemplate>
+                            </DataGridTemplateColumn.CellTemplate>
+                        </DataGridTemplateColumn>
+                        <DataGridTemplateColumn
+                            CanUserReorder="False"
+                            CanUserResize="False"
+                            CanUserSort="False"
+                            Width="Auto">
+                            <DataGridTemplateColumn.CellTemplate>
+                                <DataTemplate>
+                                    <ui:Button
+                                        Appearance="Danger"
+                                        Content="{ui:SymbolIcon Symbol=Delete20}"
+                                        Command="{Binding DataContext.RemoveSettingsCommand,
+                        RelativeSource={RelativeSource AncestorType=Window}}"
+                                        CommandParameter="{Binding}" />
+                                </DataTemplate>
+                            </DataGridTemplateColumn.CellTemplate>
+                        </DataGridTemplateColumn>
+                    </ui:DataGrid.Columns>
+                </ui:DataGrid>
+            </DockPanel>
+        </Border>
+
+        <GridSplitter
+            Grid.Column="1"
+            Grid.Row="1"
+            Grid.RowSpan="2"
+            Width="10"
+            Background="{DynamicResource CardBackground}"
+            BorderBrush="{DynamicResource CardBorderBrush}"
+            BorderThickness="{DynamicResource CardControlBorderThemeThickness}"
+            HorizontalAlignment="Center"
+            VerticalAlignment="Stretch" />
+
+        <Border
+            Margin="0 0 10 5"
+            Grid.Row="1"
+            Grid.Column="2"
             Style="{StaticResource DisabledOnExecutingBorder}">
             <StackPanel>
                 <DockPanel>
@@ -193,10 +290,10 @@
                         Text="{me:LocalizationSource MainWindow.LabelTarget}" />
                     <ui:ToggleSwitch
                         Margin="5 0"
-                        IsChecked="{Binding ClearTargetFolder}"
+                        IsChecked="{Binding SelectedSettings.ClearTargetFolder}"
                         Content="{me:LocalizationSource MainWindow.ClearTarget}" />
                     <ui:ToggleSwitch
-                        IsChecked="{Binding OpenTargetWhenFinish}"
+                        IsChecked="{Binding SelectedSettings.OpenTargetWhenFinish}"
                         Content="{me:LocalizationSource MainWindow.OpenTargetWhenFinish}" />
                 </DockPanel>
                 <DockPanel
@@ -207,9 +304,9 @@
                         Height="36"
                         Margin="5 0 0 0"
                         Content="{ui:SymbolIcon Symbol=Folder20}"
-                        Command="{Binding OpenFolderDialogCommand}" />
+                        Command="{Binding SelectedSettings.OpenFolderDialogCommand}" />
                     <ui:TextBox
-                        Text="{Binding TargetFolder, UpdateSourceTrigger=PropertyChanged}" />
+                        Text="{Binding SelectedSettings.TargetFolder, UpdateSourceTrigger=PropertyChanged}" />
                 </DockPanel>
                 <DockPanel
                     Margin="0 5 0 0">
@@ -219,8 +316,8 @@
                     <ui:ToggleSwitch
                         Margin="5 0"
                         Content="{me:LocalizationSource MainWindow.ExportRooms}"
-                        IsChecked="{Binding IsExportRooms}"
-                        Visibility="{Binding IsExportRoomsVisible, 
+                        IsChecked="{Binding SelectedSettings.IsExportRooms}"
+                        Visibility="{Binding SelectedSettings.IsExportRoomsVisible, 
                     Converter={StaticResource BooleanToVisibilityConverter}}" />
                 </DockPanel>
                 <DockPanel
@@ -231,20 +328,20 @@
                         Height="36"
                         Margin="5 0 0 0"
                         Content="{ui:SymbolIcon Symbol=Folder20}"
-                        IsEnabled="{Binding SourceFolderChangedCommand.IsExecuting,
+                        IsEnabled="{Binding SelectedSettings.SourceFolderChangedCommand.IsExecuting,
                         Converter={StaticResource InverseBooleanConverter}}"
-                        Command="{Binding OpenFromFoldersCommand}" />
+                        Command="{Binding SelectedSettings.OpenFromFoldersCommand}" />
                     <ui:TextBox
                         x:Name="_sourceFolderEdit"
-                        Style="{StaticResource SourceFolderEditStyle}"
-                        Text="{Binding SourceFolder, UpdateSourceTrigger=PropertyChanged}" />
+                        Text="{Binding SelectedSettings.SourceFolder, UpdateSourceTrigger=PropertyChanged}" />
                 </DockPanel>
             </StackPanel>
         </Border>
 
         <Border
-            Margin="10 5 10 0"
+            Margin="0 5 10 0"
             Grid.Row="2"
+            Grid.Column="2"
             Style="{StaticResource DisabledOnExecutingBorder}">
 
             <ui:DataGrid
@@ -253,8 +350,8 @@
                 RowHeight="33"
                 Style="{StaticResource CustomResizableDataGridStyle}"
                 CellStyle="{StaticResource CustomDataGridCell}"
-                ItemsSource="{Binding ModelObjects}"
-                SelectedItem="{Binding SelectedObject}">
+                ItemsSource="{Binding SelectedSettings.ModelObjects}"
+                SelectedItem="{Binding SelectedSettings.SelectedObject}">
 
                 <ui:DataGrid.Columns>
                     <DataGridCheckBoxColumn
@@ -265,7 +362,7 @@
                         Binding="{Binding SkipObject, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource InverseBooleanConverter}}">
                         <DataGridCheckBoxColumn.Header>
                             <CheckBox
-                                IsChecked="{Binding DataContext.SkipAll, RelativeSource={RelativeSource AncestorType=ui:DataGrid}, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource InverseBooleanConverter}}" />
+                                IsChecked="{Binding DataContext.SelectedSettings.SkipAll, RelativeSource={RelativeSource AncestorType=ui:DataGrid}, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource InverseBooleanConverter}}" />
                         </DataGridCheckBoxColumn.Header>
                     </DataGridCheckBoxColumn>
                     <DataGridTemplateColumn
@@ -283,11 +380,13 @@
                     <DataGridTextColumn
                         Width="250"
                         IsReadOnly="True"
+                        MinWidth="100"
                         ElementStyle="{StaticResource CustomDataGridTextDisabledStyle}"
                         Binding="{Binding Name}"
                         Header="{StaticResource NameHeader}" />
                     <DataGridTextColumn
                         IsReadOnly="True"
+                        MinWidth="100"
                         ElementStyle="{StaticResource CustomDataGridTextDisabledStyle}"
                         Binding="{Binding FullName}"
                         Header="{StaticResource FullNameHeader}" />
@@ -297,6 +396,8 @@
 
         <StackPanel
             Grid.Row="3"
+            Grid.Column="0"
+            Grid.ColumnSpan="3"
             Orientation="Horizontal"
             HorizontalAlignment="Right">
             <ui:TextBlock
