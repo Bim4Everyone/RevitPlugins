@@ -152,6 +152,8 @@ namespace RevitClashDetective.Models.RevitClashReport {
             if(elements.Length == 2) {
                 clash.MainElement = elements[0];
                 clash.OtherElement = elements[1];
+            } else {
+                throw new InvalidOperationException($"В коллизии \'{name}\' не 2 элемента");
             }
             return clash.SetRevitRepository(_revitRepository);
         }
