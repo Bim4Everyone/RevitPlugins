@@ -98,20 +98,40 @@ internal class GeneralViewMarkService {
     /// <summary>
     /// Создает марку арматурного каркаса на основном виде опалубки
     /// </summary>
-    internal void TryCreateSkeletonMark() {
+    internal void TryCreateSkeletonMark(bool isForPerpView) {
         var simpleRebars = SheetInfo.RebarInfo.SimpleVerticalRebars;
         if(simpleRebars.Count == 0) { return; }
+        var simpleRebarsInView = ViewModel.RebarFinder.GetRebarsFromView(simpleRebars, ViewOfPylon.ViewElement);
+        if(simpleRebarsInView.Count == 0) { return; }
+
         try {
             // Получаем референс-элемент
-            var rightVerticalBar = _viewPointsAnalyzer.GetElementByDirection(simpleRebars, DirectionType.Right,
+            var rightVerticalBar = _viewPointsAnalyzer.GetElementByDirection(simpleRebarsInView, DirectionType.Right,
                                                                              false);
             // Получаем точку в которую нужно поставить аннотацию
-            var pointRight = _viewPointsAnalyzer.GetPointByDirection(rightVerticalBar, DirectionType.Right,
-                                                                     0, 0, true);
+            var point = _viewPointsAnalyzer.GetPointByDirection(rightVerticalBar, DirectionType.Right, 0, 0, true);
             // Корректируем положение точки, куда будет установлена марка (текст)
-            pointRight = _viewPointsAnalyzer.GetPointByDirection(pointRight, DirectionType.RightBottom, 0.8, 3.2);
+            point = _viewPointsAnalyzer.GetPointByDirection(point, DirectionType.RightBottom, 0.8, 3.2);
+            // Корректируем положение точки, если она слишком удалена от пилона (из-за семейства Гэшки)
+            if(isForPerpView) {
+#if REVIT_2022_OR_GREATER
+                var hostOrigin = SheetInfo.ElemsInfo.HostOrigin;
+                var hostOriginProjected = _viewPointsAnalyzer.ProjectPointToViewFront(hostOrigin);
+
+                var pointProjected = _viewPointsAnalyzer.ProjectPointToViewFront(point);
+                pointProjected = _viewPointsAnalyzer.ProjectPointToHorizontalPlane(hostOriginProjected, pointProjected);
+                var dist = pointProjected.DistanceTo(hostOriginProjected);
+
+                var hostWidth = SheetInfo.ElemsInfo.HostWidth;
+                if(dist > hostWidth) {
+                    point = _viewPointsAnalyzer.GetPointByDirection(
+                        new XYZ(hostOriginProjected.X, hostOriginProjected.Y, point.Z), DirectionType.Right, hostWidth, 0);
+                }
+#endif
+            }
             // Создаем марку арматуры
-            var rightTag = _annotationService.CreateRebarTag(pointRight, _tagSkeletonSymbol, rightVerticalBar);
+            var rightTag = _annotationService.CreateRebarTag(point, _tagSkeletonSymbol, rightVerticalBar);
+            rightTag.LeaderEndCondition = LeaderEndCondition.Free;
 
 #if REVIT_2022_OR_GREATER
             rightTag.LeaderEndCondition = LeaderEndCondition.Free;
