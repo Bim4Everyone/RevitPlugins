@@ -138,27 +138,27 @@ internal class ExportSettingsViewModel<T> : BaseViewModel where T : ExportSettin
 
     public string GetErrorText() {
         if(string.IsNullOrEmpty(TargetFolder)) {
-            return "Выберите папку назначения.";
+            return _localization.GetLocalizedString("MainWindow.Validation.SelectTargetFolder");
         }
 
         if(!Directory.Exists(TargetFolder)) {
-            return "Выберите существующую папку назначения.";
+            return _localization.GetLocalizedString("MainWindow.Validation.TargetFolderNotExist");
         }
 
         if(SourceFolder == null) {
-            return "Выберите папку источника.";
+            return _localization.GetLocalizedString("MainWindow.Validation.SelectSourceFolder");
         }
 
         if(ModelObjects.Count == 0) {
-            return "Выберите папку источника c моделями.";
+            return _localization.GetLocalizedString("MainWindow.Validation.SourceFolderEmpty");
         }
 
         if(!ModelObjects.Any(item => !item.SkipObject)) {
-            return "Все модели помечены признаком пропустить.";
+            return _localization.GetLocalizedString("MainWindow.Validation.AllModelsSkiped");
         }
 
         if(OpenFromFoldersCommand.IsExecuting || SourceFolderChangedCommand.IsExecuting) {
-            return "Дождитесь завершения загрузки";
+            return _localization.GetLocalizedString("MainWindow.Validation.Wait");
         }
 
         string duplicateModelObject = ModelObjects
@@ -169,7 +169,7 @@ internal class ExportSettingsViewModel<T> : BaseViewModel where T : ExportSettin
             .FirstOrDefault();
 
         if(!string.IsNullOrEmpty(duplicateModelObject)) {
-            return $"Папка источника содержит дубликаты \"{duplicateModelObject}\".";
+            return _localization.GetLocalizedString("MainWindow.Validation.ModelsDuplicated", duplicateModelObject);
         }
 
         return string.Empty;

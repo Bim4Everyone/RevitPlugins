@@ -5,20 +5,22 @@ using System.Threading.Tasks;
 
 
 using dosymep.Revit.ServerClient;
+using dosymep.SimpleServices;
 using dosymep.WPF.Commands;
 using dosymep.WPF.ViewModels;
 
 namespace RevitServerFolders.ViewModels.Rs;
 internal sealed class MainViewModel : BaseViewModel {
     private readonly IReadOnlyCollection<IServerClient> _serverClients;
-
+    private readonly ILocalizationService _localization;
     private RsModelObjectViewModel _selectedItem;
     private ObservableCollection<RsModelObjectViewModel> _items;
 
     private string _errorText;
 
-    public MainViewModel(IReadOnlyCollection<IServerClient> serverClients) {
+    public MainViewModel(IReadOnlyCollection<IServerClient> serverClients, ILocalizationService localization) {
         _serverClients = serverClients;
+        _localization = localization;
         LoadViewCommand = RelayCommand.CreateAsync(LoadView);
         AcceptViewCommand = RelayCommand.CreateAsync(AcceptView, CanAcceptView);
 
@@ -76,7 +78,7 @@ internal sealed class MainViewModel : BaseViewModel {
 
     private bool CanAcceptView() {
         if(SelectedItem is not RsFolderDataViewModel) {
-            ErrorText = "Выберите папку с моделями";
+            ErrorText = _localization.GetLocalizedString("RsBrowser.Validation.SelectFolder");
             return false;
         }
 

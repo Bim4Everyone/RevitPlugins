@@ -7,7 +7,35 @@
         x:Key="RvtFromRsWindow.Title">Экспорт RVT файлов из RS</system:String>
     <system:String
         x:Key="NwcFromRvtWindow.Title">Экспорт вида Navisworks</system:String>
-    
+    <system:String
+        x:Key="NwcFromRvtWindow.PluginNotInstalled">Отсутствует плагин Navisworks NWC Export Utility. Необходимо установить его.</system:String>
+
+    <system:String
+        x:Key="Transaction.ChangeSite">Смена площадки</system:String>
+
+    <system:String
+        x:Key="Exceptions.ServerNotFound">Не был найден сервер "{0}".</system:String>
+    <system:String
+        x:Key="Exceptions.FolderNotFound">Не была найдена папка "{0}".</system:String>
+
+    <system:String
+        x:Key="MainWindow.Validation.SelectTargetFolder">Выберите папку назначения.</system:String>
+    <system:String
+        x:Key="MainWindow.Validation.TargetFolderNotExist">Выберите существующую папку назначения.</system:String>
+    <system:String
+        x:Key="MainWindow.Validation.SelectSourceFolder">Выберите папку источника.</system:String>
+    <system:String
+        x:Key="MainWindow.Validation.SourceFolderEmpty">Выберите папку источника c моделями.</system:String>
+    <system:String
+        x:Key="MainWindow.Validation.AllModelsSkiped">Все модели помечены признаком пропустить.</system:String>
+    <system:String
+        x:Key="MainWindow.Validation.Wait">Дождитесь завершения загрузки</system:String>
+    <system:String
+        x:Key="MainWindow.Validation.ModelsDuplicated">Папка источника содержит дубликаты "{0}".</system:String>
+
+    <system:String
+        x:Key="RsBrowser.Validation.SelectFolder">Выберите папку с моделями</system:String>
+
     <system:String
         x:Key="MainWindow.LabelTarget">Папка назначения</system:String>
     <system:String

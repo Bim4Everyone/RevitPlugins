@@ -5,6 +5,7 @@ using System.Linq;
 using System.Threading.Tasks;
 
 using dosymep.Revit.ServerClient;
+using dosymep.SimpleServices;
 
 using Ninject;
 using Ninject.Syntax;
@@ -19,13 +20,16 @@ internal sealed class RsModelObjectService : IModelObjectService {
     private readonly IResolutionRoot _resolutionRoot;
     private readonly MainViewModel _mainViewModel;
     private readonly IReadOnlyCollection<IServerClient> _serverClients;
+    private readonly ILocalizationService _localization;
 
     public RsModelObjectService(IResolutionRoot resolutionRoot,
         MainViewModel mainViewModel,
-        IReadOnlyCollection<IServerClient> serverClients) {
+        IReadOnlyCollection<IServerClient> serverClients,
+        ILocalizationService localization) {
         _resolutionRoot = resolutionRoot;
         _mainViewModel = mainViewModel;
         _serverClients = serverClients;
+        _localization = localization;
     }
 
     public Task<ModelObject> SelectModelObjectDialog() {
@@ -49,7 +53,8 @@ internal sealed class RsModelObjectService : IModelObjectService {
         var serverClient = _serverClients.FirstOrDefault(
             item => item.ServerName.Equals(uri.Host, StringComparison.OrdinalIgnoreCase));
         if(serverClient == null) {
-            throw new InvalidOperationException($"Не был найден сервер \"{uri.Host}\".");
+            throw new InvalidOperationException(
+                _localization.GetLocalizedString("Exceptions.ServerNotFound", uri.Host));
         }
 
         string parent = Path.GetDirectoryName(uri.LocalPath);
@@ -63,7 +68,8 @@ internal sealed class RsModelObjectService : IModelObjectService {
             .FirstOrDefault(item => item.Name.Equals(currentFolder));
 
         return folderData == null
-            ? throw new InvalidOperationException($"Не была найдена папка \"{uri.LocalPath.Trim('\\').Trim('/')}\".")
+            ? throw new InvalidOperationException(
+                _localization.GetLocalizedString("Exceptions.FolderNotFound", uri.LocalPath.Trim('\\').Trim('/')))
             : (ModelObject) new RsFolderModel(folderData, folderContents, serverClient);
     }
 }

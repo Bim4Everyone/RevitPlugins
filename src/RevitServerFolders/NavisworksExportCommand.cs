@@ -29,10 +29,6 @@ internal sealed class NavisworksExportCommand : BasePluginCommand {
     }
 
     protected override void Execute(UIApplication uiApplication) {
-        if(!OptionalFunctionalityUtils.IsNavisworksExporterAvailable()) {
-            throw new InvalidOperationException(
-                "Отсутствует плагин Navisworks NWC Export Utility. Необходимо установить его.");
-        }
         using var kernel = uiApplication.CreatePlatformServices();
         kernel.Bind<RevitRepository>()
             .ToSelf()
@@ -63,6 +59,11 @@ internal sealed class NavisworksExportCommand : BasePluginCommand {
 
         kernel.UseWpfLocalization($"/{assemblyName};component/assets/Localization/Language.xaml",
             CultureInfo.GetCultureInfo("ru-RU"));
+
+        if(!OptionalFunctionalityUtils.IsNavisworksExporterAvailable()) {
+            throw new InvalidOperationException(
+                kernel.Get<ILocalizationService>().GetLocalizedString("NwcFromRvtWindow.PluginNotInstalled"));
+        }
 
         Notification(kernel.Get<MainWindow>());
     }

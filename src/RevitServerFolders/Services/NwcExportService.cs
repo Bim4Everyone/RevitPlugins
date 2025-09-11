@@ -20,15 +20,17 @@ namespace RevitServerFolders.Services;
 internal class NwcExportService : IModelsExportService<FileModelObjectExportSettings> {
     private const string _nwcSearchPattern = "*.nwc";
     private const string _navisworksViewName = "Navisworks";
-    private const string _transactionName = "Смена площадки";
     private readonly RevitRepository _revitRepository;
     private readonly ILoggerService _loggerService;
+    private readonly ILocalizationService _localization;
 
     public NwcExportService(
         RevitRepository revitRepository,
-        ILoggerService loggerService) {
+        ILoggerService loggerService,
+        ILocalizationService localization) {
         _revitRepository = revitRepository ?? throw new ArgumentNullException(nameof(revitRepository));
         _loggerService = loggerService ?? throw new ArgumentNullException(nameof(loggerService));
+        _localization = localization ?? throw new ArgumentNullException(nameof(localization));
     }
 
 
@@ -114,7 +116,8 @@ internal class NwcExportService : IModelsExportService<FileModelObjectExportSett
                     ExportDocument(fileName, navisView, document, targetFolder, isExportRooms);
                 } else if(projectLocations.Length > 1) {
                     foreach(var projectLocation in projectLocations) {
-                        using(var transaction = document.StartTransaction(_transactionName)) {
+                        using(var transaction = document.StartTransaction(
+                            _localization.GetLocalizedString("Transaction.ChangeSite"))) {
                             document.ActiveProjectLocation = projectLocation;
                             transaction.Commit();
                         }

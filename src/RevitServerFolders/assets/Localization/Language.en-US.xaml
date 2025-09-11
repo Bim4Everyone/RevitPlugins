@@ -4,6 +4,72 @@
     xmlns:system="clr-namespace:System;assembly=mscorlib">
 
     <system:String
+        x:Key="RvtFromRsWindow.Title">Export RVT files from RS</system:String>
+    <system:String
+        x:Key="NwcFromRvtWindow.Title">Export Navisworks View</system:String>
+    <system:String
+        x:Key="NwcFromRvtWindow.PluginNotInstalled">Navisworks NWC Export Utility plugin is missing. You need to install it.</system:String>
+
+    <system:String
+        x:Key="Transaction.ChangeSite">Change site</system:String>
+
+    <system:String
+        x:Key="Exceptions.ServerNotFound">Server "{0}" was not found.</system:String>
+    <system:String
+        x:Key="Exceptions.FolderNotFound">Folder "{0}" was not found.</system:String>
+
+    <system:String
+        x:Key="MainWindow.Validation.SelectTargetFolder">Select a target folder.</system:String>
+    <system:String
+        x:Key="MainWindow.Validation.TargetFolderNotExist">Select an existing target folder.</system:String>
+    <system:String
+        x:Key="MainWindow.Validation.SelectSourceFolder">Select a source folder.</system:String>
+    <system:String
+        x:Key="MainWindow.Validation.SourceFolderEmpty">Select a source folder with models.</system:String>
+    <system:String
+        x:Key="MainWindow.Validation.AllModelsSkiped">All models are marked as skipped.</system:String>
+    <system:String
+        x:Key="MainWindow.Validation.Wait">Wait for the loading to finish</system:String>
+    <system:String
+        x:Key="MainWindow.Validation.ModelsDuplicated">The source folder contains duplicates "{0}".</system:String>
+
+    <system:String
+        x:Key="RsBrowser.Validation.SelectFolder">Select a folder with models</system:String>
+
+    <system:String
+        x:Key="MainWindow.LabelTarget">Target folder</system:String>
+    <system:String
+        x:Key="MainWindow.LabelSource">Source folder</system:String>
+    <system:String
+        x:Key="MainWindow.ClearTarget">Clear target folder</system:String>
+    <system:String
+        x:Key="MainWindow.ExportRooms">Export rooms</system:String>
+    <system:String
+        x:Key="MainWindow.OpenTargetWhenFinish">Open target folder after completion</system:String>
+    <system:String
+        x:Key="MainWindow.NameHeader">Name</system:String>
+    <system:String
+        x:Key="MainWindow.FullNameHeader">Full name</system:String>
+    <system:String
+        x:Key="MainWindow.TargetsHeader">Export settings</system:String>
+    <system:String
+        x:Key="MainWindow.TargetsFrom">From:</system:String>
+    <system:String
+        x:Key="MainWindow.TargetsTo">To:</system:String>
+
+    <system:String
+        x:Key="MainWindow.ErrorTextPattern">Error in setting {0}: {1}</system:String>
+
+    <system:String
+        x:Key="RsBrowser.RefreshNode">Refresh node</system:String>
+    <system:String
+        x:Key="RsBrowser.Title">Select folder</system:String>
+    <system:String
+        x:Key="RsBrowser.NameHeader">Name</system:String>
+    <system:String
+        x:Key="RsBrowser.SizeHeader">Size</system:String>
+
+    <system:String
         x:Key="Ok">OK</system:String>
     <system:String
         x:Key="Cancel">Cancel</system:String>
