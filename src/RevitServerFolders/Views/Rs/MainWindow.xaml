@@ -44,13 +44,81 @@
                 x:Key="FolderIcon">Folder20</ui:SymbolRegular>
             <ui:SymbolRegular
                 x:Key="OpenedFolderIcon">FolderOpen20</ui:SymbolRegular>
-            
+
             <converters:RsNodeImageConverter
                 x:Key="RsNodeImageConverter"
                 Empty="{StaticResource EmptyIcon}"
                 Server="{StaticResource ServerIcon}"
                 Folder="{StaticResource FolderIcon}"
                 OpenedFolder="{StaticResource OpenedFolderIcon}" />
+
+            <Style
+                TargetType="DockPanel"
+                x:Key="VisibleOnExecutingPanel">
+                <Style.Triggers>
+                    <DataTrigger
+                        Binding="{Binding DataContext.LoadViewCommand.IsExecuting,
+                        RelativeSource={RelativeSource AncestorType=Window}}"
+                        Value="True">
+                        <Setter
+                            Property="Visibility"
+                            Value="Visible" />
+                    </DataTrigger>
+                    <DataTrigger
+                        Binding="{Binding DataContext.LoadChildrenCommand.IsExecuting,
+                        RelativeSource={RelativeSource AncestorType=Window}}"
+                        Value="True">
+                        <Setter
+                            Property="Visibility"
+                            Value="Visible" />
+                    </DataTrigger>
+                    <DataTrigger
+                        Binding="{Binding DataContext.ReloadChildrenCommand.IsExecuting,
+                        RelativeSource={RelativeSource AncestorType=Window}}"
+                        Value="True">
+                        <Setter
+                            Property="Visibility"
+                            Value="Visible" />
+                    </DataTrigger>
+                </Style.Triggers>
+                <Setter
+                    Property="Visibility"
+                    Value="Hidden" />
+            </Style>
+            <Style
+                TargetType="Border"
+                x:Key="DisabledOnExecutingBorder"
+                BasedOn="{StaticResource CustomBorder}">
+                <Style.Triggers>
+                    <DataTrigger
+                        Binding="{Binding DataContext.LoadViewCommand.IsExecuting,
+                        RelativeSource={RelativeSource AncestorType=Window}}"
+                        Value="True">
+                        <Setter
+                            Property="IsEnabled"
+                            Value="False" />
+                    </DataTrigger>
+                    <DataTrigger
+                        Binding="{Binding DataContext.LoadChildrenCommand.IsExecuting,
+                        RelativeSource={RelativeSource AncestorType=Window}}"
+                        Value="True">
+                        <Setter
+                            Property="IsEnabled"
+                            Value="False" />
+                    </DataTrigger>
+                    <DataTrigger
+                        Binding="{Binding DataContext.ReloadChildrenCommand.IsExecuting,
+                        RelativeSource={RelativeSource AncestorType=Window}}"
+                        Value="True">
+                        <Setter
+                            Property="IsEnabled"
+                            Value="False" />
+                    </DataTrigger>
+                </Style.Triggers>
+                <Setter
+                    Property="IsEnabled"
+                    Value="True" />
+            </Style>
         </ResourceDictionary>
     </Window.Resources>
 
@@ -72,6 +140,14 @@
 
         <DockPanel
             Grid.Row="1"
+            Grid.RowSpan="2"
+            Style="{StaticResource VisibleOnExecutingPanel}">
+            <ui:ProgressRing
+                IsIndeterminate="True" />
+        </DockPanel>
+
+        <DockPanel
+            Grid.Row="1"
             Margin="5"
             LastChildFill="False">
             <ui:Button
@@ -83,7 +159,7 @@
         <Border
             Grid.Row="2"
             Margin="5"
-            Style="{StaticResource CustomBorder}">
+            Style="{StaticResource DisabledOnExecutingBorder}">
             <DockPanel
                 LastChildFill="True">
                 <DockPanel
@@ -109,7 +185,7 @@
                             BasedOn="{StaticResource CustomTreeViewItemStyle}">
                             <Setter
                                 Property="pluginBehaviors:ExpandedTreeViewItemsBehavior.ExpandedCommand"
-                                Value="{Binding LoadChildrenCommand}" />
+                                Value="{Binding DataContext.LoadChildrenCommand, RelativeSource={RelativeSource AncestorType=Window}}" />
                             <Setter
                                 Property="pluginBehaviors:ExpandedTreeViewItemsBehavior.ExpandedCommandParameter"
                                 Value="{Binding}" />

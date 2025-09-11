@@ -22,12 +22,14 @@ internal sealed class MainViewModel : BaseViewModel {
         LoadViewCommand = RelayCommand.CreateAsync(LoadView);
         AcceptViewCommand = RelayCommand.CreateAsync(AcceptView, CanAcceptView);
 
+        LoadChildrenCommand = RelayCommand.CreateAsync<RsModelObjectViewModel>(LoadChildren, CanLoadChildren);
         ReloadChildrenCommand = RelayCommand.CreateAsync(ReloadChildren, CanReloadChildren);
     }
 
     public IAsyncCommand LoadViewCommand { get; }
     public IAsyncCommand AcceptViewCommand { get; }
     public IAsyncCommand ReloadChildrenCommand { get; }
+    public IAsyncCommand LoadChildrenCommand { get; }
 
     public string ErrorText {
         get => _errorText;
@@ -88,5 +90,13 @@ internal sealed class MainViewModel : BaseViewModel {
 
     private bool CanReloadChildren() {
         return SelectedItem != null && SelectedItem.ReloadChildrenCommand.CanExecute(default);
+    }
+
+    private async Task LoadChildren(RsModelObjectViewModel model) {
+        await model.LoadChildrenCommand.ExecuteAsync(default);
+    }
+
+    private bool CanLoadChildren(RsModelObjectViewModel model) {
+        return model is not null && model.LoadChildrenCommand.CanExecute(default);
     }
 }

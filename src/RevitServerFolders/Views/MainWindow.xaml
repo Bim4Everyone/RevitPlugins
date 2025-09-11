@@ -112,7 +112,7 @@
             </Style>
             <Style
                 TargetType="Border"
-                x:Key="HiddenOnExecutingBorder"
+                x:Key="DisabledOnExecutingBorder"
                 BasedOn="{StaticResource CustomBorder}">
                 <Style.Triggers>
                     <DataTrigger
@@ -120,13 +120,13 @@
                         RelativeSource={RelativeSource AncestorType=Window}}"
                         Value="True">
                         <Setter
-                            Property="Visibility"
-                            Value="Hidden" />
+                            Property="IsEnabled"
+                            Value="False" />
                     </DataTrigger>
                 </Style.Triggers>
                 <Setter
-                    Property="Visibility"
-                    Value="Visible" />
+                    Property="IsEnabled"
+                    Value="True" />
             </Style>
 
             <Style
@@ -174,10 +174,18 @@
             Grid.Row="0"
             Title="{Binding Title}" />
 
+        <DockPanel
+            Grid.Row="1"
+            Grid.RowSpan="2"
+            Style="{StaticResource VisibleOnExecutingPanel}">
+            <ui:ProgressRing
+                IsIndeterminate="True" />
+        </DockPanel>
+
         <Border
             Margin="10 0 10 5"
             Grid.Row="1"
-            Style="{StaticResource CustomBorder}">
+            Style="{StaticResource DisabledOnExecutingBorder}">
             <StackPanel>
                 <DockPanel>
                     <ui:TextBlock
@@ -237,7 +245,7 @@
         <Border
             Margin="10 5 10 0"
             Grid.Row="2"
-            Style="{StaticResource CustomBorder}">
+            Style="{StaticResource DisabledOnExecutingBorder}">
 
             <ui:DataGrid
                 Grid.Row="5"
