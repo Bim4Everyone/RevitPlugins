@@ -28,7 +28,8 @@ internal class RvtExportService : IModelsExportService<RsModelObjectExportSettin
         string[] modelFiles,
         RsModelObjectExportSettings settings,
         IProgress<int> progress = null,
-        CancellationToken ct = default) {
+        CancellationToken ct = default,
+        int startProcess = 0) {
         if(settings is null) {
             throw new ArgumentException(nameof(settings));
         }
@@ -46,16 +47,16 @@ internal class RvtExportService : IModelsExportService<RsModelObjectExportSettin
             }
         }
 
-        for(int i = 0; i < modelFiles.Length; i++) {
-            progress?.Report(i);
+        foreach(string modelFile in modelFiles) {
+            progress?.Report(startProcess++);
             ct.ThrowIfCancellationRequested();
 
             try {
-                ExportDocument(modelFiles[i], settings.TargetFolder);
+                ExportDocument(modelFile, settings.TargetFolder);
                 dosymep.Revit.DocumentExtensions.UnloadAllLinks(
                     Directory.GetFiles(settings.TargetFolder, _rvtSearchPattern));
             } catch(Exception ex) {
-                _loggerService.Warning(ex, $"Ошибка экспорта в rvt в файле: {modelFiles[i]}");
+                _loggerService.Warning(ex, $"Ошибка экспорта в rvt в файле: {modelFile}");
             }
         }
     }

@@ -4,6 +4,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Threading;
+using System.Threading.Tasks;
 using System.Windows.Input;
 
 using dosymep.SimpleServices;
@@ -44,7 +45,7 @@ internal class MainViewModel<T> : BaseViewModel where T : ExportSettings {
             ?? throw new ArgumentNullException(nameof(localization));
         SettingsCollection = [];
 
-        LoadViewCommand = RelayCommand.Create(LoadView);
+        LoadViewCommand = RelayCommand.CreateAsync(LoadView);
         AcceptViewCommand = RelayCommand.Create(AcceptView, CanAcceptView);
         AddSettingsCommand = RelayCommand.Create(AddSettings);
         RemoveSettingsCommand = RelayCommand.Create<ExportSettingsViewModel<T>>(RemoveSettings, CanRemoveSettings);
@@ -52,7 +53,7 @@ internal class MainViewModel<T> : BaseViewModel where T : ExportSettings {
 
     public string Title { get; protected set; }
 
-    public ICommand LoadViewCommand { get; }
+    public IAsyncCommand LoadViewCommand { get; }
 
     public ICommand AcceptViewCommand { get; }
 
@@ -100,8 +101,11 @@ internal class MainViewModel<T> : BaseViewModel where T : ExportSettings {
         }
     }
 
-    private void LoadView() {
+    private async Task LoadView() {
         LoadConfig();
+        foreach(var setting in SettingsCollection) {
+            await setting.SourceFolderChangedCommand.ExecuteAsync(default);
+        }
     }
 
     private void AcceptView() {
@@ -113,33 +117,38 @@ internal class MainViewModel<T> : BaseViewModel where T : ExportSettings {
         using var dialog = ProgressDialogFactory.CreateDialog();
         dialog.StepValue = 1;
         dialog.MaxValue = selectedSettings
-            .SelectMany(s => s.ModelObjects)
-            .Where(m => !m.SkipObject)
-            .ToArray()
-            .Length;
+            .SelectMany(GetModelObjects)
+            .Count();
         var progress = dialog.CreateProgress();
         var ct = dialog.CreateCancellationToken();
         dialog.Show();
 
+        int startProcess = 0;
         foreach(var item in selectedSettings) {
-            ExportModelObjects(item, progress, ct);
+            ExportModelObjects(item, progress, ct, startProcess);
+            startProcess += GetModelObjects(item).Length;
         }
     }
 
     private void ExportModelObjects(ExportSettingsViewModel<T> settingsViewModel,
         IProgress<int> progress,
-        CancellationToken ct = default) {
+        CancellationToken ct = default,
+        int processStart = 0) {
 
-        string[] modelFiles = settingsViewModel.ModelObjects
-            .Where(item => !item.SkipObject)
-            .Select(item => item.FullName)
-            .ToArray();
+        string[] modelFiles = GetModelObjects(settingsViewModel);
 
-        _exportService.ExportModelObjects(modelFiles, settingsViewModel.GetSettings(), progress, ct);
+        _exportService.ExportModelObjects(modelFiles, settingsViewModel.GetSettings(), progress, ct, processStart);
 
         if(settingsViewModel.OpenTargetWhenFinish) {
             Process.Start(Path.GetFullPath(settingsViewModel.TargetFolder));
         }
+    }
+
+    private string[] GetModelObjects(ExportSettingsViewModel<T> settings) {
+        return settings.ModelObjects
+            .Where(item => !item.SkipObject)
+            .Select(item => item.FullName)
+            .ToArray();
     }
 
     private bool CanAcceptView() {

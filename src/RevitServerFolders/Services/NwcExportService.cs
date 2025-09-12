@@ -38,7 +38,8 @@ internal class NwcExportService : IModelsExportService<FileModelObjectExportSett
         string[] modelFiles,
         FileModelObjectExportSettings settings,
         IProgress<int> progress = null,
-        CancellationToken ct = default) {
+        CancellationToken ct = default,
+        int processStart = 0) {
         if(settings is null) {
             throw new ArgumentException(nameof(settings));
         }
@@ -56,14 +57,14 @@ internal class NwcExportService : IModelsExportService<FileModelObjectExportSett
             }
         }
 
-        for(int i = 0; i < modelFiles.Length; i++) {
-            progress?.Report(i);
+        foreach(string modelFile in modelFiles) {
+            progress?.Report(processStart++);
             ct.ThrowIfCancellationRequested();
 
             try {
-                ExportDocument(modelFiles[i], settings.TargetFolder, settings.IsExportRooms);
+                ExportDocument(modelFile, settings.TargetFolder, settings.IsExportRooms);
             } catch(Exception ex) {
-                _loggerService.Warning(ex, "Ошибка экспорта в nwc в файле: {@DocPath}", modelFiles[i]);
+                _loggerService.Warning(ex, "Ошибка экспорта в nwc в файле: {@DocPath}", modelFile);
             }
         }
     }

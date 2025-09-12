@@ -14,12 +14,13 @@
     xmlns:converters="clr-namespace:dosymep.WpfCore.Converters;assembly=dosymep.WpfCore"
     xmlns:dosymepConverters="clr-namespace:dosymep.WPF.Converters"
     xmlns:pluginConverters="clr-namespace:RevitServerFolders.Converters"
+    xmlns:pluginBehaviors="clr-namespace:RevitServerFolders.Behaviors"
     mc:Ignorable="d"
     WindowStartupLocation="CenterOwner"
     Height="450"
-    Width="1010"
+    Width="1230"
     MinHeight="450"
-    MinWidth="1010"
+    MinWidth="1230"
     d:DataContext="{d:DesignInstance vms:MainViewModel, IsDesignTimeCreatable=False}">
 
     <i:Interaction.Behaviors>
@@ -33,14 +34,6 @@
             EventName="Loaded">
             <i:InvokeCommandAction
                 Command="{Binding LoadViewCommand}" />
-            <i:InvokeCommandAction
-                Command="{Binding SourceFolderChangedCommand}" />
-        </i:EventTrigger>
-        <i:EventTrigger
-            SourceName="_sourceFolderEdit"
-            EventName="TextChanged">
-            <i:InvokeCommandAction
-                Command="{Binding SourceFolderChangedCommand}" />
         </i:EventTrigger>
     </i:Interaction.Triggers>
 
@@ -50,21 +43,20 @@
                 <ResourceDictionary
                     Source="../Resources/CustomStyles.xaml" />
             </ResourceDictionary.MergedDictionaries>
-            <dosymepConverters:InverseBooleanConverter
-                x:Key="InverseBooleanConverter" />
-
-            <converters:BoolToVisibilityConverter
-                x:Key="BooleanToVisibilityConverter" />
 
             <ui:SymbolRegular
                 x:Key="DocumentIcon">Document20</ui:SymbolRegular>
-
             <ui:SymbolRegular
                 x:Key="FolderIcon">Folder20</ui:SymbolRegular>
-
             <ui:SymbolRegular
                 x:Key="BuildingIcon">Building20</ui:SymbolRegular>
 
+            <dosymepConverters:InverseBooleanConverter
+                x:Key="InverseBooleanConverter" />
+            <converters:BoolToVisibilityConverter
+                x:Key="BooleanToVisibilityConverter" />
+            <pluginConverters:MiddleEllipsisConverter
+                x:Key="MiddleEllipsisConverter" />
             <pluginConverters:CellImageConverter
                 x:Key="CellImageConverter"
                 Empty="{StaticResource DocumentIcon}"
@@ -95,7 +87,6 @@
                     </DataTrigger>
                 </Style.Triggers>
             </Style>
-
             <Style
                 TargetType="DockPanel"
                 x:Key="VisibleOnExecutingPanel">
@@ -148,11 +139,12 @@
 
         <Grid.ColumnDefinitions>
             <ColumnDefinition
-                Width="200"
-                MinWidth="200" />
+                Width="1*"
+                MinWidth="400" />
             <ColumnDefinition
                 Width="Auto" />
             <ColumnDefinition
+                Width="2*"
                 MinWidth="800" />
         </Grid.ColumnDefinitions>
 
@@ -205,14 +197,15 @@
                             CanUserResize="False"
                             CanUserSort="False"
                             Width="Auto"
-                            Binding="{Binding IsSelected}">
+                            Binding="{Binding IsSelected, UpdateSourceTrigger=PropertyChanged}">
                             <DataGridCheckBoxColumn.Header>
                                 <CheckBox
                                     IsChecked="{Binding DataContext.AllSelected, RelativeSource={RelativeSource AncestorType=ui:DataGrid}, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
                             </DataGridCheckBoxColumn.Header>
                         </DataGridCheckBoxColumn>
                         <DataGridTemplateColumn
-                            Width="200"
+                            Width="180"
+                            MinWidth="180"
                             Header="{StaticResource TargetsHeader}">
                             <DataGridTemplateColumn.CellTemplate>
                                 <DataTemplate>
@@ -226,10 +219,25 @@
                                                 Margin="0 0 5 0"
                                                 Foreground="{DynamicResource LabelForeground}"
                                                 Text="{Binding TargetFromLabel}" />
-                                            <Label
-                                                Margin="0"
-                                                ToolTip="{Binding TargetFolder}"
-                                                Content="{Binding TargetFolder}" />
+                                            <ui:TextBlock
+                                                Foreground="{DynamicResource LabelForeground}"
+                                                ToolTip="{Binding TargetFolder}">
+                                                <i:Interaction.Behaviors>
+                                                    <pluginBehaviors:TextBlockResizeHelper />
+                                                </i:Interaction.Behaviors>
+                                                <ui:TextBlock.Text>
+                                                    <MultiBinding
+                                                        Converter="{StaticResource MiddleEllipsisConverter}">
+                                                        <Binding
+                                                            Path="TargetFolder" />
+                                                        <Binding
+                                                            RelativeSource="{RelativeSource Self}" />
+                                                        <Binding
+                                                            RelativeSource="{RelativeSource Self}"
+                                                            Path="ActualWidth" />
+                                                    </MultiBinding>
+                                                </ui:TextBlock.Text>
+                                            </ui:TextBlock>
                                         </DockPanel>
                                         <DockPanel>
                                             <ui:TextBlock
@@ -237,10 +245,25 @@
                                                 Margin="0 0 5 0"
                                                 Foreground="{DynamicResource LabelForeground}"
                                                 Text="{Binding TargetToLabel}" />
-                                            <Label
-                                                Margin="0"
-                                                ToolTip="{Binding SourceFolder}"
-                                                Content="{Binding SourceFolder}" />
+                                            <ui:TextBlock
+                                                Foreground="{DynamicResource LabelForeground}"
+                                                ToolTip="{Binding SourceFolder}">
+                                                <i:Interaction.Behaviors>
+                                                    <pluginBehaviors:TextBlockResizeHelper />
+                                                </i:Interaction.Behaviors>
+                                                <ui:TextBlock.Text>
+                                                    <MultiBinding
+                                                        Converter="{StaticResource MiddleEllipsisConverter}">
+                                                        <Binding
+                                                            Path="SourceFolder" />
+                                                        <Binding
+                                                            RelativeSource="{RelativeSource Self}" />
+                                                        <Binding
+                                                            RelativeSource="{RelativeSource Self}"
+                                                            Path="ActualWidth" />
+                                                    </MultiBinding>
+                                                </ui:TextBlock.Text>
+                                            </ui:TextBlock>
                                         </DockPanel>
                                     </StackPanel>
                                 </DataTemplate>
@@ -332,8 +355,15 @@
                         Converter={StaticResource InverseBooleanConverter}}"
                         Command="{Binding SelectedSettings.OpenFromFoldersCommand}" />
                     <ui:TextBox
-                        x:Name="_sourceFolderEdit"
-                        Text="{Binding SelectedSettings.SourceFolder, UpdateSourceTrigger=PropertyChanged}" />
+                        Text="{Binding SelectedSettings.SourceFolder, UpdateSourceTrigger=PropertyChanged}">
+                        <i:Interaction.Triggers>
+                            <i:EventTrigger
+                                EventName="TextChanged">
+                                <i:InvokeCommandAction
+                                    Command="{Binding SelectedSettings.SourceFolderChangedCommand}" />
+                            </i:EventTrigger>
+                        </i:Interaction.Triggers>
+                    </ui:TextBox>
                 </DockPanel>
             </StackPanel>
         </Border>

@@ -45,6 +45,10 @@ internal class ExportSettingsViewModel<T> : BaseViewModel where T : ExportSettin
         _localization = localization
             ?? throw new ArgumentNullException(nameof(localization));
         ModelObjects = [];
+        TargetFolder = _settings.TargetFolder;
+        SourceFolder = _settings.SourceFolder;
+        ClearTargetFolder = _settings.ClearTargetFolder;
+        OpenTargetWhenFinish = _settings.OpenTargetWhenFinish;
         TargetFromLabel = _localization.GetLocalizedString("MainWindow.TargetsFrom");
         TargetToLabel = _localization.GetLocalizedString("MainWindow.TargetsTo");
 
@@ -54,11 +58,11 @@ internal class ExportSettingsViewModel<T> : BaseViewModel where T : ExportSettin
     }
 
 
-    public IAsyncCommand OpenFromFoldersCommand { get; }
+    public AsyncRelayCommand OpenFromFoldersCommand { get; }
 
     public ICommand OpenFolderDialogCommand { get; }
 
-    public IAsyncCommand SourceFolderChangedCommand { get; }
+    public AsyncRelayCommand SourceFolderChangedCommand { get; }
 
     public IOpenFolderDialogService OpenFolderDialogService { get; }
 
@@ -129,6 +133,7 @@ internal class ExportSettingsViewModel<T> : BaseViewModel where T : ExportSettin
         _settings.TargetFolder = TargetFolder;
         _settings.SourceFolder = SourceFolder;
         _settings.ClearTargetFolder = ClearTargetFolder;
+        _settings.OpenTargetWhenFinish = OpenTargetWhenFinish;
         _settings.SkippedObjects = ModelObjects
             .Where(item => item.SkipObject)
             .Select(item => item.FullName)

@@ -19,5 +19,6 @@ internal interface IModelsExportService<T> where T : ExportSettings {
         string[] modelFiles,
         T settings,
         IProgress<int> progress = null,
-        CancellationToken ct = default);
+        CancellationToken ct = default,
+        int startProgress = 0);
 }
