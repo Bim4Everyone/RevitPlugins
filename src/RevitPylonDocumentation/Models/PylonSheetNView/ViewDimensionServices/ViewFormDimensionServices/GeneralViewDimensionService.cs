@@ -325,10 +325,10 @@ internal class GeneralViewDimensionService {
                 // #2_горизонт_доборные_низ
                 // #5_горизонт_доборные_верх
                 bool additionalFirst = clampsParentRebar.GetParamValue<int>("мод_ФОП_Доборный 1") == 1;
-                bool additionalFirstArray = clampsParentRebar.GetParamValue<int>("мод_ФОП_Доборный 1_Массив") == 1;
+                bool additionalFirstArray = clampsParentRebar.GetParamValue<int>("b4e_Доборный 1_Массив") == 1;
 
                 bool additionalSecond = clampsParentRebar.GetParamValue<int>("мод_ФОП_Доборный 2") == 1;
-                bool additionalSecondArray = clampsParentRebar.GetParamValue<int>("мод_ФОП_Доборный 2_Массив") == 1;
+                bool additionalSecondArray = clampsParentRebar.GetParamValue<int>("b4e_Доборный 2_Массив") == 1;
                 // #3_горизонт_низ
                 // мод_ФОП_Доборный 1#2_горизонт_доборные_низ
                 // мод_ФОП_Доборный 1/мод_ФОП_Доборный 1_Массив#1_горизонт_доборные_низ_край
