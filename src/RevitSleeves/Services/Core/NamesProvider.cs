@@ -15,6 +15,9 @@ internal static class NamesProvider {
     public const string FamilyNameOpeningArRoundInFloor = "Окн_Отв_Круг_Перекрытие";
     public const string FamilyNameOpeningArRoundInWall = "Окн_Отв_Круг_Стена";
 
+    public static readonly SharedParam ParameterMepSystem = SharedParamsConfig.Instance.VISSystemName;
+    public static readonly SharedParam ParameterMepEconomic = SharedParamsConfig.Instance.VISEconomicFunction;
+
     public static readonly SharedParam ParameterOpeningArDiameter = SharedParamsConfig.Instance.SizeDiameter;
     public static readonly SharedParam ParameterOpeningArWidth = SharedParamsConfig.Instance.SizeOpeningWidth;
     public static readonly SharedParam ParameterOpeningArHeight = SharedParamsConfig.Instance.SizeOpeningHeight;

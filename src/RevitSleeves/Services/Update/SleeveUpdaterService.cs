@@ -84,9 +84,9 @@ internal class SleeveUpdaterService : ISleeveUpdaterService {
             _errorsService.AddError([famInst, pipe], "UpdateErrors.SleeveDiameterRangeNotFound");
         }
         famInst.SetParamValue(NamesProvider.ParameterSleeveSystem,
-            pipe.GetParamValue<string>(NamesProvider.ParameterSleeveSystem));
+            pipe.GetParamValue<string>(NamesProvider.ParameterMepSystem));
         famInst.SetParamValue(NamesProvider.ParameterSleeveEconomic,
-            pipe.GetParamValue<string>(NamesProvider.ParameterSleeveEconomic));
+            pipe.GetParamValue<string>(NamesProvider.ParameterMepEconomic));
         famInst.SetParamValue(NamesProvider.ParameterSleeveDescription,
             pipe.Name);
     }

@@ -4,7 +4,6 @@ using System.Linq;
 
 using Autodesk.Revit.DB;
 
-using dosymep.Bim4Everyone.SharedParams;
 using dosymep.Revit;
 using dosymep.SimpleServices;
 
@@ -80,7 +79,6 @@ internal class DocumentChecker : IDocumentChecker {
 
     private ICollection<string> GetMissingParameters(Family family) {
         var existingParameters = GetFamilyParameterNames(_revitRepository, family);
-        var paramConfig = SharedParamsConfig.Instance;
         string[] requiredParameters = [
             NamesProvider.ParameterSleeveDiameter,
             NamesProvider.ParameterSleeveLength,
@@ -102,10 +100,9 @@ internal class DocumentChecker : IDocumentChecker {
                 .Any(c => c.Id == category.Id))
             .Select(item => item.Definition.Name)
             .ToArray();
-        var paramConfig = SharedParamsConfig.Instance;
         string[] requiredParameters = [
-            NamesProvider.ParameterSleeveEconomic.Name,
-            NamesProvider.ParameterSleeveSystem.Name
+            NamesProvider.ParameterMepEconomic.Name,
+            NamesProvider.ParameterMepSystem.Name
         ];
         return [.. requiredParameters.Except(existingSharedParameters)];
     }

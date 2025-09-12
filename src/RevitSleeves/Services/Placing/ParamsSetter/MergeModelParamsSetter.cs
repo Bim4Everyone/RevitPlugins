@@ -1,7 +1,9 @@
 using System;
+using System.Linq;
 
 using Autodesk.Revit.DB;
 
+using dosymep.Bim4Everyone;
 using dosymep.SimpleServices;
 
 using RevitSleeves.Models.Placing;
@@ -37,5 +39,16 @@ internal class MergeModelParamsSetter : ParamsSetter, IParamsSetter<SleeveMergeM
         (var start, var end) = _sleeveModel.GetEndPoints();
         double length = (end - start).GetLength();
         SetLength(sleeve, length);
+        SetStringParameters(sleeve, _sleeveModel);
+    }
+
+    protected void SetStringParameters(FamilyInstance sleeve, SleeveMergeModel mergeModel) {
+        var firstMergeSleeve = mergeModel.GetSleeves().First().GetFamilyInstance();
+        sleeve.SetParamValue(NamesProvider.ParameterSleeveSystem,
+            firstMergeSleeve.GetParamValue<string>(NamesProvider.ParameterSleeveSystem));
+        sleeve.SetParamValue(NamesProvider.ParameterSleeveEconomic,
+            firstMergeSleeve.GetParamValue<string>(NamesProvider.ParameterSleeveEconomic));
+        sleeve.SetParamValue(NamesProvider.ParameterSleeveDescription,
+            firstMergeSleeve.GetParamValue<string>(NamesProvider.ParameterSleeveDescription));
     }
 }

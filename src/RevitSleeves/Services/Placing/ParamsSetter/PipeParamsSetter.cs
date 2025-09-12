@@ -45,9 +45,9 @@ internal abstract class PipeParamsSetter : ParamsSetter {
 
     protected void SetStringParameters(FamilyInstance sleeve, Pipe pipe) {
         sleeve.SetParamValue(NamesProvider.ParameterSleeveSystem,
-            pipe.GetParamValue<string>(NamesProvider.ParameterSleeveSystem));
+            pipe.GetParamValue<string>(NamesProvider.ParameterMepSystem));
         sleeve.SetParamValue(NamesProvider.ParameterSleeveEconomic,
-            pipe.GetParamValue<string>(NamesProvider.ParameterSleeveEconomic));
+            pipe.GetParamValue<string>(NamesProvider.ParameterMepEconomic));
         sleeve.SetParamValue(NamesProvider.ParameterSleeveDescription,
             pipe.Name);
     }
