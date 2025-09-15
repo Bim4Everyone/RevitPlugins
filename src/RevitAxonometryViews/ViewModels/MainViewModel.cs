@@ -47,7 +47,7 @@ namespace RevitAxonometryViews.ViewModels {
             _selectedCriteria = _axonometryConfig.SystemName;
 
             _filterValue = string.Empty;
-            _selectedCriteria = _axonometryConfig.SystemName;
+            _selectedCriteria = _axonometryConfig.SharedVisSystemName;
             _filterCriterion = new List<string>() {
                 _axonometryConfig.SystemName,
                 _axonometryConfig.SharedVisSystemName
@@ -132,11 +132,47 @@ namespace RevitAxonometryViews.ViewModels {
         /// </summary>
         private void UpdateFilteredView() {
             FilteredView.Clear();
-            var systems = _hvacSystems.Where(x =>
-                (x.SystemName.Contains(FilterValue) || x.SharedName.Contains(FilterValue)))
-                    .OrderBy(x => x.SystemName);
-            foreach(var system in systems) {
-                FilteredView.Add(system);
+
+            IEnumerable<IGrouping<string, HvacSystemViewModel>> grouped;
+
+            // группировка по выбранному критерию
+            if(SelectedCriteria == _axonometryConfig.SystemName) {
+                grouped = _hvacSystems
+                    .Where(x => x.SystemName?.IndexOf(FilterValue, StringComparison.Ordinal) >= 0)
+                    .GroupBy(x => x.SystemName);
+            } else {
+                grouped = _hvacSystems
+                    .Where(x => x.SharedName?.IndexOf(FilterValue, StringComparison.Ordinal) >= 0)
+                    .GroupBy(x => x.SharedName);
+            }
+
+            foreach(var group in grouped.OrderBy(g => g.Key)) {
+                if(SelectedCriteria == _axonometryConfig.SystemName) {
+                    string systemName = group.Key;
+                    // Убираем из списка имен дубликаты, если больше одного имени - заменяем на <Варианты>
+                    string sharedName = group.Select(x => x.SharedName).Distinct().Count() == 1
+                        ? group.First().SharedName
+                        : "<Варианты>";
+
+                    foreach(var item in group) {
+                        item.DisplaySystemName = systemName;
+                        item.DisplaySharedName = sharedName;
+                    }
+                } else {
+                    string sharedName = group.Key;
+                    string systemName = group.Select(x => x.SystemName).Distinct().Count() == 1
+                        ? group.First().SystemName
+                        : "<Варианты>";
+
+                    foreach(var item in group) {
+                        item.DisplaySharedName = sharedName;
+                        item.DisplaySystemName = systemName;
+                    }
+                }
+
+                // Добавляем только один элемент в итоговый список. Для сгруппированных элементов 
+                // это поможет избежать ситуаций, где создается 50 видов и 50 фильтров
+                FilteredView.Add(group.First());
             }
         }
 
