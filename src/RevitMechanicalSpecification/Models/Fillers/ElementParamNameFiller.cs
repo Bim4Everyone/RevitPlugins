@@ -7,6 +7,7 @@ using System.Windows;
 using System.Xml.Linq;
 
 using Autodesk.Revit.DB;
+using Autodesk.Revit.DB.Mechanical;
 
 using dosymep.Revit;
 
@@ -115,11 +116,24 @@ namespace RevitMechanicalSpecification.Models.Fillers {
         }
 
         /// <summary>
+        /// Проверяем существует ли bbox у элемента. Необходимо для того чтобы вычленять в спецификации позиции с сломанной геометрией.
+        /// </summary>
+        /// <param name="element"></param>
+        /// <returns></returns>
+        private bool IsBboxNotExists(Element element) {
+            return element.GetBoundingBox() == null;
+        }
+
+        /// <summary>
         /// Возвращает имя воздуховода
         /// </summary>
         /// <param name="specificationElement"></param>
         /// <returns></returns>
         private string GetDuctName(SpecificationElement specificationElement) {
+            if(IsBboxNotExists(specificationElement.Element)) {
+                return "НЕКОРРЕКТНАЯ ГЕОМЕТРИЯ";
+            }
+
             return
             $"{_name}" +
             $"{_calculator.GetDuctName(specificationElement.Element, specificationElement.ElementType)} " +
@@ -156,6 +170,10 @@ namespace RevitMechanicalSpecification.Models.Fillers {
         private string GetPipeName(Element pipe, Element elemType) {
             string name = pipe.GetTypeOrInstanceParamStringValue(elemType, Config.OriginalParamNameName);
             string nameAddon = pipe.GetTypeOrInstanceParamStringValue(elemType, Config.NameAddition);
+
+            if(IsBboxNotExists(pipe)) {
+                return "НЕКОРРЕКТНАЯ ГЕОМЕТРИЯ";
+            }
 
             if(string.IsNullOrEmpty(name)) {
                 name = "ЗАПОЛНИТЕ НАИМЕНОВАНИЕ";
