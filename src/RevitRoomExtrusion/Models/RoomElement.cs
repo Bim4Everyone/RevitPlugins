@@ -10,28 +10,28 @@ internal class RoomElement {
     private readonly Room _room;
     private readonly View3D _view3D;
     private readonly double _normalDirection = -100000;
+    private readonly SpatialElementBoundaryOptions _options = new();
 
     private static readonly ElementMulticategoryFilter _multiCategoryFilter = new(
-        new BuiltInCategory[] {
+        [
             BuiltInCategory.OST_StructuralFoundation,
             BuiltInCategory.OST_Floors
-        });
+        ]);
 
     public RoomElement(RevitRepository revitRepository, Room room, View3D view3D) {
         _revitRepository = revitRepository;
         _room = room;
         _view3D = view3D;
-        var locationPoint = room.Location as LocationPoint;
-        LocationRoom = locationPoint.Point.Z;
-        LocationSlab = CalculateLocation();
-        ArrArray = GetArrArray();
     }
 
-    public double LocationRoom { get; private set; }
-    public int LocationSlab { get; private set; }
-    public CurveArrArray ArrArray { get; private set; }
+    // Метод получения точки размещения помещения
+    public double GetOriginalLocationPoint() {
+        var locationPoint = _room.Location as LocationPoint;
+        return locationPoint.Point.Z;
+    }
 
-    private int CalculateLocation() {
+    // Метод получения отметки чистого пола, над которым размещено помещение
+    public int GetCleanFloorLocationPoint() {
         var boundingBox = _room.get_BoundingBox(null);
         var pointCenter = (boundingBox.Max + boundingBox.Min) / 2;
         var pointDirection = new XYZ(pointCenter.X, pointCenter.Y, _normalDirection);
@@ -49,24 +49,25 @@ internal class RoomElement {
         return Convert.ToInt32(Math.Round(convertedFoundElementLocation));
     }
 
-    private CurveArrArray GetArrArray() {
-        var options = new SpatialElementBoundaryOptions();
-        var listListSegments = _room.GetBoundarySegments(options);
-
-        var curveArrArray = new CurveArrArray();
-        foreach(var listSegments in listListSegments) {
-            var curveArray = new CurveArray();
-            foreach(var boundarySegment in listSegments) {
-                curveArray.Append(boundarySegment.GetCurve());
-            }
-            curveArrArray.Append(curveArray);
-        }
-        return curveArrArray;
-    }
-
+    // Метод получения объекта ReferenceWithContext
     private ReferenceWithContext GetReferenceWithContext(XYZ pointCenter, XYZ pointDirection) {
         var refIntersec = new ReferenceIntersector(
             _multiCategoryFilter, FindReferenceTarget.Element, _view3D);
         return refIntersec.FindNearest(pointCenter, pointDirection);
+    }
+
+    // Метод получения границ помещения в виде массива кривых
+    public CurveArrArray GetBoundaryArrArray() {
+        var listListSegments = _room.GetBoundarySegments(_options);
+        var curveArrArray = new CurveArrArray();
+        foreach(var listSegments in listListSegments) {
+            var curveArray = new CurveArray();
+            foreach(var boundarySegment in listSegments) {
+                var curve = boundarySegment.GetCurve();
+                curveArray.Append(curve);
+            }
+            curveArrArray.Append(curveArray);
+        }
+        return curveArrArray;
     }
 }

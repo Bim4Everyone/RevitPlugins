@@ -4,13 +4,11 @@
 
     <system:String x:Key="FamilyDocument.TransactionName">Категория, выдавливание, материал</system:String>
     <system:String x:Key="FamilyDocument.MaterialName">стекло</system:String>
-    <system:String x:Key="FamilyDocument.FamilyName">Држ_Проверка_{0}_Отм.{1}</system:String>
-    <system:String x:Key="FamilyDocument.TemplateFamilyName">\Метрическая система, типовая модель.rft</system:String>
+    <system:String x:Key="FamilyDocument.FamilyName">{0}Држ_Проверка_{1}_Отм.{2}{3}</system:String>
+    <system:String x:Key="FamilyDocument.TemplateFamilyName">{0}\Метрическая система, типовая модель.rft</system:String>
 
-    <system:String x:Key="FamilyLoader.TransactionNameLoad">Загрузка семейства дорожек</system:String>
-    <system:String x:Key="FamilyLoader.TransactionNamePlace">Размещение семейства дорожек</system:String>
-    
-    <system:String x:Key="RevitRepository.TransactionNameCreate">Создание 3D вида для проверки дорожек</system:String>
+    <system:String x:Key="InstanceManager.TransactionName">Выдавливание помещений</system:String>   
+
     <system:String x:Key="RevitRepository.ViewName">${0}/{1}/Проверка дорожек</system:String>
 
     <system:String x:Key="MainViewModel.DefaultFamilyName">Машино-места</system:String>

@@ -10,62 +10,57 @@ using dosymep.SimpleServices;
 
 using RevitRoomExtrusion.Models;
 
+
 namespace RevitRoomExtrusion.ViewModels;
 internal class RoomErrorViewModel {
     private readonly ILocalizationService _localizationService;
     private readonly RoomChecker _roomChecker;
+    private readonly Room _room;
 
     public RoomErrorViewModel(
         ILocalizationService localizationService, RoomChecker roomChecker, Room room, ICommand showElementCommand) {
-        _roomChecker = roomChecker;
         _localizationService = localizationService;
-        ElementId = room.Id;
-        LevelName = room.Level.Name;
-        ErrorDescription = GetErrorDescription(room);
+        _roomChecker = roomChecker;
+        _room = room;
+
         ShowElementCommand = showElementCommand;
-        SetParamNumber(room);
-        SetParamName(room);
     }
 
     public ICommand ShowElementCommand { get; set; }
-    public ElementId ElementId { get; private set; }
-    public string RoomName { get; set; }
-    public string RoomNumber { get; set; }
-    public string LevelName { get; set; }
-    public string ErrorDescription { get; set; }
+    public ElementId ElementId => _room.Id;
+    public string LevelName => _room.Level.Name;
+    public string RoomName => GetRoomName(_room);
+    public string RoomNumber => GetRoomNumber(_room);
+    public string ErrorDescription => GetRoomErrorDescription(_room);
 
-    private string GetErrorDescription(Room room) {
-        string errorDescription = null;
-        if(room.IsRedundant()) {
-            errorDescription = _localizationService.GetLocalizedString("RoomErrorViewModel.RedundantError");
-        } else if(room.IsNotEnclosed()) {
-            errorDescription = _localizationService.GetLocalizedString("RoomErrorViewModel.NotEnclosed");
-        } else if(room.IsSelfCrossBoundaries() || _roomChecker.CheckIntersectBoundary(room)) {
-            errorDescription = _localizationService.GetLocalizedString("RoomErrorViewModel.IntersectBoundary");
-        }
-        return errorDescription;
+    // Метод получения имени помещения
+    private string GetRoomName(Room room) {
+        string defaultValue = _localizationService.GetLocalizedString("RoomErrorViewModel.NoName");
+        return room.GetParamValueOrDefault(BuiltInParameter.ROOM_NAME, defaultValue);
     }
 
-    private void SetParamNumber(Room room) {
-        string roomGroupShortName = null;
-        var shortNameParam = SharedParamsConfig.Instance.RoomGroupShortName;
-        if(room.IsExistsParam(shortNameParam)) {
-            if(room.IsExistsParamValue(shortNameParam)) {
-                roomGroupShortName = $"{room.GetParamValueOrDefault<string>(shortNameParam)}-";
-            }
-        }
-        if(room.IsExistsParam(BuiltInParameter.ROOM_NUMBER)) {
-            string defaultValue = _localizationService.GetLocalizedString("RoomErrorViewModel.NoNumber");
-            RoomNumber = $"{roomGroupShortName}" +
-                $"{room.GetParamValueOrDefault<string>(BuiltInParameter.ROOM_NUMBER, defaultValue)}";
-        }
+    // Метод получения номера помещения
+    private string GetRoomNumber(Room room) {
+        string number = room.GetParamValueOrDefault<string>(
+            BuiltInParameter.ROOM_NUMBER,
+            _localizationService.GetLocalizedString("RoomErrorViewModel.NoNumber"));
+        string prefix = GetRoomNumberPrefix(room);
+        return string.IsNullOrEmpty(prefix) ? number : $"{prefix}-" + $"{number}";
     }
 
-    private void SetParamName(Room room) {
-        if(room.IsExistsParam(BuiltInParameter.ROOM_NAME)) {
-            string defaultValue = _localizationService.GetLocalizedString("RoomErrorViewModel.NoName");
-            RoomName = room.GetParamValueOrDefault<string>(BuiltInParameter.ROOM_NAME, defaultValue);
-        }
+    // Метод получения префикса номера помещения
+    private string GetRoomNumberPrefix(Room room) {
+        return room.GetParamValueOrDefault<string>(SharedParamsConfig.Instance.RoomGroupShortName);
+    }
 
+    // Метод типа ошибки помещения
+    private string GetRoomErrorDescription(Room room) {
+        return room.IsRedundant()
+            ? _localizationService.GetLocalizedString("RoomErrorViewModel.RedundantError")
+            : room.IsNotEnclosed()
+            ? _localizationService.GetLocalizedString("RoomErrorViewModel.NotEnclosed")
+            : (room.IsSelfCrossBoundaries() || _roomChecker.CheckEqualBoundary(room))
+            ? _localizationService.GetLocalizedString("RoomErrorViewModel.IntersectBoundary")
+            : null;
     }
 }

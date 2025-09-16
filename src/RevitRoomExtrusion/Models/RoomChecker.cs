@@ -1,4 +1,3 @@
-using System.Collections.Generic;
 using System.Linq;
 
 using Autodesk.Revit.DB;
@@ -10,50 +9,38 @@ using dosymep.Revit;
 namespace RevitRoomExtrusion.Models;
 internal class RoomChecker {
     private readonly RevitRepository _revitRepository;
+    private readonly SpatialElementBoundaryOptions _options = new();
 
     public RoomChecker(RevitRepository revitRepository) {
         _revitRepository = revitRepository;
     }
 
+    // Метод проверки выделено ли что-то в проекте
     public bool CheckSelection() {
         return _revitRepository.GetSelectedRooms()
             .Count() > 0;
     }
 
+    // Метод проверки неправильных помещений
     public bool CheckRooms() {
         return _revitRepository.GetSelectedRooms()
             .All(room => !CheckInvalidRoom(room));
     }
 
+    // Метод проверки пересекающихся, избыточных и неокруженных помещений
     public bool CheckInvalidRoom(Room room) {
         return room.IsNotEnclosed()
             || room.IsRedundant()
-            || CheckIntersectBoundary(room);
+            || CheckEqualBoundary(room);
     }
 
-    public bool CheckIntersectBoundary(Room room) {
-        var options = new SpatialElementBoundaryOptions();
-        return room.GetBoundarySegments(options)
-            .Any(CheckIntersectCurve);
+    // Метод выявления пересекающихся помещений
+    public bool CheckEqualBoundary(Room room) {
+        return _revitRepository.GetEqualCurves(
+            room.GetBoundarySegments(_options)
+                .SelectMany(segments => segments)
+                .Select(segment => segment.GetCurve())
+                .ToList())
+            .Any();
     }
-
-    private bool CheckIntersectCurve(IList<BoundarySegment> segments) {
-        List<Curve> curves = [];
-        foreach(var segment in segments) {
-            curves.Add(segment.GetCurve());
-        }
-        for(int i = 0; i < curves.Count; i++) {
-            var curve1 = curves[i];
-            for(int j = i + 1; j < curves.Count; j++) {
-                var curve2 = curves[j];
-                var result = curve1.Intersect(curve2, out var results);
-                if(result == SetComparisonResult.Equal) {
-                    return true;
-                }
-            }
-        }
-        return false;
-    }
-
-
 }

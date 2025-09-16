@@ -4,13 +4,11 @@
     
     <system:String x:Key="FamilyDocument.TransactionName">Category, extrusion, material</system:String>    
     <system:String x:Key="FamilyDocument.MaterialName">glass</system:String>
-    <system:String x:Key="FamilyDocument.FamilyName">Road_Check_{0}_Elev.{1}</system:String>
-    <system:String x:Key="FamilyDocument.TemplateFamilyName">\English\Metric Generic Model.rft</system:String>
+    <system:String x:Key="FamilyDocument.FamilyName">{0}Road_Check_{1}_Elev.{2}{3}</system:String>
+    <system:String x:Key="FamilyDocument.TemplateFamilyName">{0}\English\Metric Generic Model.rft</system:String>
 
-    <system:String x:Key="FamilyLoader.TransactionNameLoad">Loading a family of roads</system:String>
-    <system:String x:Key="FamilyLoader.TransactionNamePlace">Placing a family of roads</system:String>
+    <system:String x:Key="InstanceManager.TransactionName">Room extrusion</system:String>
 
-    <system:String x:Key="RevitRepository.TransactionNameCreate">Creating a 3D View for check roads</system:String>
     <system:String x:Key="RevitRepository.ViewName">${0}/{1}/Check roads</system:String>
 
     <system:String x:Key="MainViewModel.DefaultFamilyName">Parking spaces</system:String>

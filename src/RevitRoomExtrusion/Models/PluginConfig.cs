@@ -23,4 +23,5 @@ internal class RevitSettings : ProjectSettings {
     public override string ProjectName { get; set; }
     public string ExtrusionHeightMm { get; set; }
     public string ExtrusionFamilyName { get; set; }
+    public bool IsJoinExtrusionChecked { get; set; }
 }

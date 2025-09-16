@@ -20,6 +20,7 @@ using RevitRoomExtrusion.Models;
 using RevitRoomExtrusion.ViewModels;
 using RevitRoomExtrusion.Views;
 
+
 namespace RevitRoomExtrusion;
 [Transaction(TransactionMode.Manual)]
 public class RevitRoomExtrusionCommand : BasePluginCommand {
@@ -37,12 +38,6 @@ public class RevitRoomExtrusionCommand : BasePluginCommand {
             .ToSelf()
             .InSingletonScope();
         kernel.Bind<RoomChecker>()
-            .ToSelf()
-            .InSingletonScope();
-        kernel.Bind<FamilyLoader>()
-            .ToSelf()
-            .InSingletonScope();
-        kernel.Bind<FamilyCreator>()
             .ToSelf()
             .InSingletonScope();
         kernel.Bind<FamilyLoadOptions>()
