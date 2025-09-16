@@ -65,12 +65,15 @@ internal class GeometryUtils : IGeometryUtils {
     }
 
     private CurveLoop GetWallLoop(Wall wall) {
-        var line = (Line) ((LocationCurve) wall.Location).Curve;
+        var wallLine = (Line) ((LocationCurve) wall.Location).Curve;
+        var wallLineStart = wallLine.GetEndPoint(0);
+        var wallLineEnd = wallLine.GetEndPoint(1);
+        double wallBottomZ = wall.GetBoundingBox().Min.Z;
+        var lineStart = new XYZ(wallLineStart.X, wallLineStart.Y, wallBottomZ);
+        var lineEnd = new XYZ(wallLineEnd.X, wallLineEnd.Y, wallBottomZ);
+
         double width = wall.Width;
         var wallNormal = wall.Orientation;
-        var lineStart = line.GetEndPoint(0);
-        var lineEnd = line.GetEndPoint(1);
-
         var offsetVector = wallNormal * width / 2;
         var leftTop = lineStart + offsetVector;
         var rightTop = lineEnd + offsetVector;
