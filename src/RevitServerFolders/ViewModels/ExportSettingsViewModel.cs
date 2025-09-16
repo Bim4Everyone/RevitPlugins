@@ -58,11 +58,11 @@ internal class ExportSettingsViewModel<T> : BaseViewModel where T : ExportSettin
     }
 
 
-    public AsyncRelayCommand OpenFromFoldersCommand { get; }
+    public IAsyncCommand OpenFromFoldersCommand { get; }
 
     public ICommand OpenFolderDialogCommand { get; }
 
-    public AsyncRelayCommand SourceFolderChangedCommand { get; }
+    public IAsyncCommand<object> SourceFolderChangedCommand { get; }
 
     public IOpenFolderDialogService OpenFolderDialogService { get; }
 
@@ -185,6 +185,7 @@ internal class ExportSettingsViewModel<T> : BaseViewModel where T : ExportSettin
         var modelObject = await _objectService.SelectModelObjectDialog(SourceFolder);
         SourceFolder = modelObject.FullName;
         await AddModelObjects(modelObject);
+        CommandManager.InvalidateRequerySuggested();
     }
 
     private void OpenFolderDialog() {
@@ -205,6 +206,7 @@ internal class ExportSettingsViewModel<T> : BaseViewModel where T : ExportSettin
         } catch {
             // pass
         }
+        CommandManager.InvalidateRequerySuggested();
     }
 
     private async Task AddModelObjects(ModelObject modelObject) {

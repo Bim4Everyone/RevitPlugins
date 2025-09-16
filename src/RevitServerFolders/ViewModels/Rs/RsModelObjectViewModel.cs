@@ -30,8 +30,8 @@ internal class RsModelObjectViewModel : BaseViewModel {
         ReloadChildrenCommand = RelayCommand.CreateAsync(ReLoadChildrenObjects, CanReLoadChildrenObjects);
     }
 
-    public AsyncRelayCommand LoadChildrenCommand { get; }
-    public AsyncRelayCommand ReloadChildrenCommand { get; }
+    public IAsyncCommand<object> LoadChildrenCommand { get; }
+    public IAsyncCommand<object> ReloadChildrenCommand { get; }
 
     protected CancellationTokenSource CancellationTokenSource { get; private set; }
 
