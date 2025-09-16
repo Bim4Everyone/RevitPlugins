@@ -8,6 +8,7 @@ public class ScheduleToExcelConverter {
     private IXLWorksheet _worksheet;
     private ViewSchedule _schedule;
     private TableData _tableData;
+    private Document _document;
 
     private int _currentColumn;
     private int _currentRow;
@@ -15,6 +16,7 @@ public class ScheduleToExcelConverter {
     public void Convert(IXLWorksheet worksheet, ViewSchedule schedule) {
         _worksheet = worksheet;
         _schedule = schedule;
+        _document = _schedule.Document;
 
         _tableData = _schedule.GetTableData();
 
@@ -43,7 +45,7 @@ public class ScheduleToExcelConverter {
 
                 if(mergedCells.Top == row && mergedCells.Left == column) {
                     string cellValue = _schedule.GetCellText(sectionType, row, column);
-                    ScheduleCell scheduleCell = new ScheduleCell(sectionData, row, column, cellValue);
+                    ScheduleCell scheduleCell = new ScheduleCell(_document, sectionData, row, column, cellValue);
                     IXLCell excelCell = _worksheet.Cell(_currentRow, _currentColumn);
 
                     scheduleCell.ExportCell(excelCell);

@@ -1,3 +1,4 @@
+using System.Globalization;
 using System.Linq;
 using System.Text;
 
@@ -9,11 +10,13 @@ namespace RevitExportSpecToExcel.Models;
 
 internal class ScheduleCell {
     private readonly TableSectionData _sectionData;
+    private readonly Document _doc;
     private readonly int _row;
     private readonly int _column;
     private readonly string _value;
 
-    public ScheduleCell(TableSectionData sectionData, int row, int column, string value) {
+    public ScheduleCell(Document document, TableSectionData sectionData, int row, int column, string value) {
+        _doc = document;
         _sectionData = sectionData;
         _row = row;
         _column = column;
@@ -75,15 +78,24 @@ internal class ScheduleCell {
                 break;
         }
     }
-    
+
     private void SetValue(IXLCell cell, string value) {
         // Некоторые значения могут быть числовыми, но за счет дополнительного текста
         // (например единиц измерения) не могут быть преобразованы в число.
         // Также числовые значения могут быть разделены ".", из-за чего не будут корректно преобразованы.
-        string newValue = value.Replace(".", ",");
-        if(double.TryParse(newValue, out double doubleValue)) {
-            int length = newValue.Split(',').Last().Length;
+        var decimalSymbol = _doc.GetUnits().DecimalSymbol;
+
+        NumberFormatInfo formatInfo;
+        if(decimalSymbol == DecimalSymbol.Dot) {
+            formatInfo = CultureInfo.InvariantCulture.NumberFormat;
+        } else {
+            formatInfo = new CultureInfo("ru-RU").NumberFormat;
+        }
+
+        if(double.TryParse(value, NumberStyles.Any, formatInfo, out double doubleValue)) {
             cell.Value = doubleValue;
+
+            int length = value.Split(formatInfo.CurrencyDecimalSeparator[0]).Last().Length;
             cell.Style.NumberFormat.Format = "0.".PadLeft(length, '0');
         } else {
             SetTextValue(cell, value);
