@@ -7,6 +7,7 @@ using Autodesk.Revit.DB.Plumbing;
 using dosymep.Revit;
 using dosymep.Revit.Geometry;
 
+using RevitSleeves.Exceptions;
 using RevitSleeves.Models;
 using RevitSleeves.Models.Config;
 using RevitSleeves.Models.Navigator;
@@ -102,6 +103,8 @@ internal class SleeveStatusFinder : ISleeveStatusFinder {
             }
             return SleeveStatus.Correct;
 
+        } catch(WallNotLineException) {
+            return SleeveStatus.Invalid;
         } catch(Autodesk.Revit.Exceptions.ApplicationException) {
             return SleeveStatus.Invalid;
         }

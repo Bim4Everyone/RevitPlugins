@@ -4,6 +4,7 @@ using Autodesk.Revit.DB;
 
 using dosymep.Revit;
 
+using RevitSleeves.Exceptions;
 using RevitSleeves.Models;
 
 namespace RevitSleeves.Services.Core;
@@ -65,7 +66,12 @@ internal class GeometryUtils : IGeometryUtils {
     }
 
     private CurveLoop GetWallLoop(Wall wall) {
-        var wallLine = (Line) ((LocationCurve) wall.Location).Curve;
+        Line wallLine;
+        try {
+            wallLine = (Line) ((LocationCurve) wall.Location).Curve;
+        } catch(System.InvalidCastException) {
+            throw new WallNotLineException();
+        }
         var wallLineStart = wallLine.GetEndPoint(0);
         var wallLineEnd = wallLine.GetEndPoint(1);
         double wallBottomZ = wall.GetBoundingBox().Min.Z;
