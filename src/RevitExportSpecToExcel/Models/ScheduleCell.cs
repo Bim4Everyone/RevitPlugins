@@ -91,12 +91,17 @@ internal class ScheduleCell {
         } else {
             formatInfo = new CultureInfo("ru-RU").NumberFormat;
         }
+        char separator = formatInfo.CurrencyDecimalSeparator[0];
 
         if(double.TryParse(value, NumberStyles.Any, formatInfo, out double doubleValue)) {
             cell.Value = doubleValue;
 
-            int length = value.Split(formatInfo.CurrencyDecimalSeparator[0]).Last().Length;
-            cell.Style.NumberFormat.Format = "0.".PadLeft(length, '0');
+            if(value.Contains(separator)) {
+                int length = value.Split(separator).Last().Length;
+                int fullLength = length + 2;
+                cell.Style.NumberFormat.Format = "0.".PadRight(fullLength, '0');
+            }
+
         } else {
             SetTextValue(cell, value);
         }
