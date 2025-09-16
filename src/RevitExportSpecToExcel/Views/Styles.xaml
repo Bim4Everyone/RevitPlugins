@@ -52,15 +52,6 @@
             Value="{DynamicResource ControlCornerRadius}" />
     </Style>
 
-    <Style
-        TargetType="Border"
-        x:Key="CustomBorderNoPadding"
-        BasedOn="{StaticResource CustomBorder}">
-        <Setter
-            Property="Padding"
-            Value="0" />
-    </Style>
-
     <Style 
         TargetType="{x:Type GridViewColumnHeader}">
         <Setter 
@@ -104,7 +95,7 @@
             Value="True" />
         <Setter
             Property="GridLinesVisibility"
-            Value="All" />
+            Value="All" />        
     </Style>
 
     <Style
