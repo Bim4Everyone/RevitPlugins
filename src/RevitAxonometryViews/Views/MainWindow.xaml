@@ -103,12 +103,12 @@
                     x:Name="col1"
                     Header="Имя системы"
                     Width="*"
-                    Binding="{Binding Path=SystemName}"/>
+                    Binding="{Binding Path=DisplaySystemName}"/>
 
                 <DataGridTextColumn
                     Header="_ФОП_ВИС_Имя системы"
                     Width="*"
-                    Binding="{Binding Path=SharedName}"/>
+                    Binding="{Binding Path=DisplaySharedName}"/>
             </DataGrid.Columns>
         </DataGrid>
         
