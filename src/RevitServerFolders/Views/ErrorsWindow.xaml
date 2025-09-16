@@ -1,0 +1,90 @@
+﻿<core:WpfUIPlatformWindow
+    x:Class="RevitServerFolders.Views.ErrorsWindow"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:local="clr-namespace:RevitServerFolders.Views"
+    mc:Ignorable="d"
+    xmlns:core="clr-namespace:dosymep.WpfUI.Core"
+    xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
+    xmlns:me="clr-namespace:dosymep.WpfCore.MarkupExtensions;assembly=dosymep.WpfCore"
+    xmlns:vm="clr-namespace:RevitServerFolders.ViewModels"
+    MinHeight="400"
+    MinWidth="600"
+    Height="400"
+    Width="600"
+    d:DataContext="{d:DesignInstance vm:ErrorsViewModel, IsDesignTimeCreatable=False}">
+    <Window.Resources>
+        <ResourceDictionary>
+            <CollectionViewSource
+                x:Key="groupedErrors"
+                Source="{Binding Errors}">
+                <CollectionViewSource.GroupDescriptions>
+                    <PropertyGroupDescription
+                        PropertyName="GroupHeader" />
+                </CollectionViewSource.GroupDescriptions>
+            </CollectionViewSource>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary
+                    Source="../Resources/CustomStyles.xaml" />
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
+    </Window.Resources>
+    <DockPanel
+        LastChildFill="True">
+        <ui:TitleBar
+            DockPanel.Dock="Top"
+            Title="{me:LocalizationSource ErrorsWindow.Title}" />
+        <Border
+            Style="{StaticResource CustomBorder}">
+            <ui:ListView
+                HorizontalContentAlignment="Stretch"
+                ScrollViewer.HorizontalScrollBarVisibility="Disabled"
+                ItemsSource="{Binding Source={StaticResource groupedErrors}}">
+                <ui:ListView.GroupStyle>
+                    <GroupStyle
+                        ContainerStyle="{StaticResource CustomGroupHeaderStyle}" />
+                </ui:ListView.GroupStyle>
+                <ui:ListView.ItemContainerStyle>
+                    <Style
+                        BasedOn="{StaticResource ListViewItemStyle}"
+                        TargetType="ui:ListViewItem">
+                        <Setter
+                            Property="HorizontalContentAlignment"
+                            Value="Stretch" />
+                    </Style>
+                </ui:ListView.ItemContainerStyle>
+                <ui:ListView.ItemTemplate>
+                    <DataTemplate>
+                        <Border
+                            HorizontalAlignment="Stretch"
+                            Style="{StaticResource CustomBorder}">
+                            <Grid
+                                HorizontalAlignment="Stretch">
+                                <Grid.RowDefinitions>
+                                    <RowDefinition
+                                        Height="Auto" />
+                                    <RowDefinition
+                                        Height="*" />
+                                </Grid.RowDefinitions>
+
+                                <TextBlock
+                                    Grid.Row="0"
+                                    FontSize="14"
+                                    Style="{StaticResource TitleTextBlockStyle}"
+                                    Text="{Binding ModelName}" />
+
+                                <TextBlock
+                                    Grid.Row="1"
+                                    TextWrapping="Wrap"
+                                    Style="{StaticResource BodyTextBlockStyle}"
+                                    Text="{Binding ErrorDescription}" />
+                            </Grid>
+                        </Border>
+                    </DataTemplate>
+                </ui:ListView.ItemTemplate>
+            </ui:ListView>
+        </Border>
+    </DockPanel>
+</core:WpfUIPlatformWindow>

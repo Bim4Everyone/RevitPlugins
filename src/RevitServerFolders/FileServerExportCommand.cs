@@ -53,6 +53,9 @@ internal sealed class FileServerExportCommand : BasePluginCommand {
         kernel.Bind<ILoggerService>()
             .ToMethod(c => PluginLoggerService)
             .InSingletonScope();
+        kernel.Bind<IErrorsService>()
+            .To<ErrorsService>()
+            .InSingletonScope();
 
         kernel.UseXtraOpenFolderDialog<MainWindow>(
             initialDirectory: Environment.GetFolderPath(Environment.SpecialFolder.Desktop));
@@ -68,6 +71,7 @@ internal sealed class FileServerExportCommand : BasePluginCommand {
 
         kernel.Bind<ViewModels.Rs.MainViewModel>().ToSelf();
         kernel.BindMainWindow<RsViewModel, MainWindow>();
+        kernel.BindOtherWindow<ErrorsViewModel, ErrorsWindow>();
 
         kernel.UseWpfUIThemeUpdater();
 
@@ -77,5 +81,8 @@ internal sealed class FileServerExportCommand : BasePluginCommand {
             CultureInfo.GetCultureInfo("ru-RU"));
 
         Notification(kernel.Get<MainWindow>());
+        if(kernel.Get<IErrorsService>().ContainsErrors()) {
+            kernel.Get<ErrorsWindow>().ShowDialog();
+        }
     }
 }

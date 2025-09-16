@@ -130,6 +130,7 @@ internal class ExportSettingsViewModel<T> : BaseViewModel where T : ExportSettin
     }
 
     public virtual T GetSettings() {
+        _settings.Index = Index;
         _settings.TargetFolder = TargetFolder;
         _settings.SourceFolder = SourceFolder;
         _settings.ClearTargetFolder = ClearTargetFolder;

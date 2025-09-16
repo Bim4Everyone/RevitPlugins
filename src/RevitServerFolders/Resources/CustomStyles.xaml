@@ -20,6 +20,8 @@
             Source="pack://application:,,,/Wpf.Ui;component/Resources/Typography.xaml" />
         <ResourceDictionary
             Source="pack://application:,,,/Wpf.Ui;component/Controls/TreeView/TreeViewItem.xaml" />
+        <ResourceDictionary
+            Source="pack://application:,,,/Wpf.Ui;component/Controls/ListView/ListViewItem.xaml" />
     </ResourceDictionary.MergedDictionaries>
     <!--
     У стандартного стиля DefaultUiDataGridStyle с включенным CanUserResizeColumns не работает изменение ширины столбцов. 
@@ -365,6 +367,38 @@
         <Setter
             Property="ToolTip"
             Value="{Binding RelativeSource={RelativeSource Self}, Path=Content.Text}">
+        </Setter>
+    </Style>
+    <Style
+        x:Key="CustomGroupHeaderStyle"
+        TargetType="{x:Type GroupItem}">
+        <Setter
+            Property="Template">
+            <Setter.Value>
+                <ControlTemplate
+                    TargetType="{x:Type GroupItem}">
+                    <ui:CardExpander
+                        Margin="0 0 0 8"
+                        IsExpanded="True">
+                        <ui:CardExpander.Header>
+                            <DockPanel
+                                Margin="0 0 14 0"
+                                HorizontalAlignment="Stretch">
+                                <TextBlock
+                                    Text="{Binding Path=Name}" />
+                                <DockPanel
+                                    HorizontalAlignment="Right">
+                                    <TextBlock
+                                        Text="{Binding Path=ItemCount}" />
+                                </DockPanel>
+                            </DockPanel>
+                        </ui:CardExpander.Header>
+                        <ui:CardExpander.Content>
+                            <ItemsPresenter />
+                        </ui:CardExpander.Content>
+                    </ui:CardExpander>
+                </ControlTemplate>
+            </Setter.Value>
         </Setter>
     </Style>
 </ResourceDictionary>

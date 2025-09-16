@@ -18,9 +18,15 @@ internal class RvtExportService : IModelsExportService<RsModelObjectExportSettin
     private const string _revitServerToolArgs = @"createLocalRvt ""{0}"" -s ""{1}"" -d ""{2}/"" -o";
     private const string _rvtSearchPattern = "*.rvt";
     private readonly ILoggerService _loggerService;
+    private readonly ILocalizationService _localization;
+    private readonly IErrorsService _errorsService;
 
-    public RvtExportService(ILoggerService loggerService) {
+    public RvtExportService(ILoggerService loggerService,
+        ILocalizationService localization,
+        IErrorsService errorsService) {
         _loggerService = loggerService ?? throw new ArgumentNullException(nameof(loggerService));
+        _localization = localization ?? throw new ArgumentNullException(nameof(localization));
+        _errorsService = errorsService ?? throw new ArgumentNullException(nameof(errorsService));
     }
 
 
@@ -57,6 +63,9 @@ internal class RvtExportService : IModelsExportService<RsModelObjectExportSettin
                     Directory.GetFiles(settings.TargetFolder, _rvtSearchPattern));
             } catch(Exception ex) {
                 _loggerService.Warning(ex, $"Ошибка экспорта в rvt в файле: {modelFile}");
+                _errorsService.AddError(modelFile,
+                    _localization.GetLocalizedString("Exceptions.RvtExportError"),
+                    settings);
             }
         }
     }

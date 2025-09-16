@@ -23,14 +23,17 @@ internal class NwcExportService : IModelsExportService<FileModelObjectExportSett
     private readonly RevitRepository _revitRepository;
     private readonly ILoggerService _loggerService;
     private readonly ILocalizationService _localization;
+    private readonly IErrorsService _errorsService;
 
     public NwcExportService(
         RevitRepository revitRepository,
         ILoggerService loggerService,
-        ILocalizationService localization) {
+        ILocalizationService localization,
+        IErrorsService errorsService) {
         _revitRepository = revitRepository ?? throw new ArgumentNullException(nameof(revitRepository));
         _loggerService = loggerService ?? throw new ArgumentNullException(nameof(loggerService));
         _localization = localization ?? throw new ArgumentNullException(nameof(localization));
+        _errorsService = errorsService ?? throw new ArgumentNullException(nameof(errorsService));
     }
 
 
@@ -62,17 +65,23 @@ internal class NwcExportService : IModelsExportService<FileModelObjectExportSett
             ct.ThrowIfCancellationRequested();
 
             try {
-                ExportDocument(modelFile, settings.TargetFolder, settings.IsExportRooms);
+                ExportDocument(modelFile, settings);
             } catch(Exception ex) {
                 _loggerService.Warning(ex, "Ошибка экспорта в nwc в файле: {@DocPath}", modelFile);
+                _errorsService.AddError(modelFile,
+                    _localization.GetLocalizedString("Exceptions.NwcExportError"),
+                    settings);
             }
         }
     }
 
 
-    private void ExportDocument(string fileName, string targetFolder, bool isExportRooms) {
+    private void ExportDocument(string fileName, FileModelObjectExportSettings settings) {
         _revitRepository.Application.FailuresProcessing += ApplicationOnFailuresProcessing;
         _revitRepository.UIApplication.DialogBoxShowing += UIApplicationOnDialogBoxShowing;
+
+        string targetFolder = settings.TargetFolder;
+        bool isExportRooms = settings.IsExportRooms;
 
         try {
             DocumentExtensions.UnloadAllLinks(fileName);
@@ -89,6 +98,9 @@ internal class NwcExportService : IModelsExportService<FileModelObjectExportSett
                     _loggerService.Warning(
                         "Файл {@FileName} не содержит вид {@NavisView}.",
                         fileName, _navisworksViewName);
+                    _errorsService.AddError(fileName,
+                        _localization.GetLocalizedString("Exceptions.ViewNotFound", _navisworksViewName),
+                        settings);
                     return;
                 }
 
@@ -106,6 +118,9 @@ internal class NwcExportService : IModelsExportService<FileModelObjectExportSett
                     _loggerService.Warning(
                         "Вид {@NavisView} в файле {@FileName} не содержит элементы.",
                          navisView.Name, fileName);
+                    _errorsService.AddError(fileName,
+                        _localization.GetLocalizedString("Exceptions.ViewWithoutElements", navisView.Name),
+                        settings);
                     return;
                 }
 

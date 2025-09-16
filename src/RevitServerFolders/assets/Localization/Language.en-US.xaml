@@ -17,6 +17,19 @@
         x:Key="Exceptions.ServerNotFound">Server "{0}" was not found.</system:String>
     <system:String
         x:Key="Exceptions.FolderNotFound">Folder "{0}" was not found.</system:String>
+    <system:String
+        x:Key="Exceptions.ViewWithoutElements">Вид "{0}" не содержит элементы.</system:String>
+    <system:String
+        x:Key="Exceptions.ViewNotFound">Не найден вид "{0}".</system:String>
+    <system:String
+        x:Key="Exceptions.NwcExportError">Ошибка экспорта в NWC.</system:String>
+    <system:String
+        x:Key="Exceptions.RvtExportError">Ошибка экспорта в RVT.</system:String>
+
+    <system:String
+        x:Key="ErrorsWindow.ErrorGroupHeader">Экспорт {0}</system:String>
+    <system:String
+        x:Key="ErrorsWindow.Title">Ошибки экспорта</system:String>
 
     <system:String
         x:Key="MainWindow.Validation.SelectTargetFolder">Select a target folder.</system:String>

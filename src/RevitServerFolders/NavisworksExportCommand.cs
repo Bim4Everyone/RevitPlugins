@@ -47,11 +47,15 @@ internal sealed class NavisworksExportCommand : BasePluginCommand {
         kernel.Bind<ILoggerService>()
             .ToMethod(c => PluginLoggerService)
             .InSingletonScope();
+        kernel.Bind<IErrorsService>()
+            .To<ErrorsService>()
+            .InSingletonScope();
 
         kernel.UseXtraOpenFolderDialog<MainWindow>(
             initialDirectory: Environment.GetFolderPath(Environment.SpecialFolder.Desktop));
 
         kernel.BindMainWindow<FileSystemViewModel, MainWindow>();
+        kernel.BindOtherWindow<ErrorsViewModel, ErrorsWindow>();
 
         kernel.UseWpfUIThemeUpdater();
 
@@ -66,5 +70,8 @@ internal sealed class NavisworksExportCommand : BasePluginCommand {
         }
 
         Notification(kernel.Get<MainWindow>());
+        if(kernel.Get<IErrorsService>().ContainsErrors()) {
+            kernel.Get<ErrorsWindow>().ShowDialog();
+        }
     }
 }
