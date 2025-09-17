@@ -6,15 +6,17 @@ using Autodesk.Revit.DB;
 
 using dosymep.SimpleServices;
 using dosymep.WPF.Commands;
+using dosymep.WPF.ViewModels;
 
 using RevitRoomExtrusion.Models;
 
 
 namespace RevitRoomExtrusion.ViewModels;
-internal class ErrorViewModel {
+internal class ErrorViewModel : BaseViewModel {
     private readonly ILocalizationService _localizationService;
     private readonly RevitRepository _revitRepository;
     private readonly RoomChecker _roomChecker;
+    private ObservableCollection<RoomErrorViewModel> _errorRooms;
 
     public ErrorViewModel(
         ILocalizationService localizationService, RevitRepository revitRepository, RoomChecker roomChecker) {
@@ -22,11 +24,22 @@ internal class ErrorViewModel {
         _revitRepository = revitRepository;
         _roomChecker = roomChecker;
 
+        LoadViewCommand = RelayCommand.Create(LoadView);
         ShowElementCommand = RelayCommand.Create<ElementId>(ShowElement);
     }
 
+    public ICommand LoadViewCommand { get; }
     public ICommand ShowElementCommand { get; }
-    public ObservableCollection<RoomErrorViewModel> ErrorRooms => GetErrorRooms();
+
+    public ObservableCollection<RoomErrorViewModel> ErrorRooms {
+        get => _errorRooms;
+        set => RaiseAndSetIfChanged(ref _errorRooms, value);
+    }
+
+    // Метод загрузки ошибок
+    private void LoadView() {
+        ErrorRooms = GetErrorRooms();
+    }
 
     // Метод выделения помещения
     private void ShowElement(ElementId elementId) {

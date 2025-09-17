@@ -49,7 +49,6 @@ internal class TempFamilyDocument {
             familySymbol = _revitRepository.GetFamilySymbol(family);
 
             if(!loadSuccess || family == null) {
-                DeleteFile();
                 return null;
             }
             if(familySymbol != null) {
@@ -57,7 +56,6 @@ internal class TempFamilyDocument {
                     familySymbol.Activate();
                 }
             }
-            DeleteFile();
             return familySymbol;
 
         } finally {
@@ -106,7 +104,7 @@ internal class TempFamilyDocument {
             }
         } else {
             var extrusionsList = GetExtrusionsList(document, roomList, extrusionHeight);
-            var newArrArray = _revitRepository.GetUnionArrArray(extrusionsList);
+            var newArrArray = _revitRepository.GetUnitedArrArray(extrusionsList);
             SetMaterial(document, CreateExtrusion(document, newArrArray, extrusionHeight));
             foreach(var extrusion in extrusionsList) {
                 document.Delete(extrusion.Id);

@@ -8,6 +8,7 @@ using Autodesk.Revit.DB.Architecture;
 using Autodesk.Revit.UI;
 
 using dosymep.Revit;
+using dosymep.Revit.Geometry;
 using dosymep.SimpleServices;
 
 
@@ -66,8 +67,8 @@ internal class RevitRepository {
     }
 
     // Метод получения объединенного массива кривых
-    public CurveArrArray GetUnionArrArray(List<Extrusion> extrusions) {
-        var solid = GetUnionSolid(extrusions);
+    public CurveArrArray GetUnitedArrArray(List<Extrusion> extrusions) {
+        var solid = GetUnitedSolid(extrusions);
         var bottomEdgeArrArray = solid.Faces
             .OfType<Face>()
             .ElementAtOrDefault(1)?
@@ -109,16 +110,12 @@ internal class RevitRepository {
     }
 
     // Метод получения объединенного солида
-    private Solid GetUnionSolid(List<Extrusion> extrusions) {
-        var options = new Options {
-            ComputeReferences = true
-        };
-        return extrusions
-            .SelectMany(extrusion => extrusion.get_Geometry(options))
-            .OfType<Solid>()
+    private Solid GetUnitedSolid(List<Extrusion> extrusions) {
+        var solids = extrusions
+            .SelectMany(extrusion => extrusion.GetSolids())
             .Where(solid => solid.Volume > 0)
-            .Aggregate((result, solid) =>
-                BooleanOperationsUtils.ExecuteBooleanOperation(result, solid, BooleanOperationsType.Union));
+            .ToList();
+        return SolidExtensions.CreateUnitedSolids(solids).First();
     }
 
     // Метод получения пересекающихся пар
