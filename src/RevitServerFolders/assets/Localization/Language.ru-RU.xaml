@@ -22,9 +22,11 @@
     <system:String
         x:Key="Exceptions.ViewNotFound">Не найден вид "{0}".</system:String>
     <system:String
-        x:Key="Exceptions.NwcExportError">Ошибка экспорта в NWC.</system:String>
+        x:Key="Exceptions.NwcExportError">Ошибка экспорта в NWC. Информация об ошибке: {0}.</system:String>
     <system:String
-        x:Key="Exceptions.RvtExportError">Ошибка экспорта в RVT.</system:String>
+        x:Key="Exceptions.RvtExportError">Ошибка экспорта в RVT. Информация об ошибке: {0}.</system:String>
+    <system:String
+        x:Key="Exceptions.ElementsNotDeleted">Не удалось удалить элементы, вызывающие ошибки. Информация об ошибке: {0}.</system:String>
 
     <system:String
         x:Key="ErrorsWindow.ErrorGroupHeader">Экспорт {0}</system:String>

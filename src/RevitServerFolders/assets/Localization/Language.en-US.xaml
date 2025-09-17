@@ -22,9 +22,11 @@
     <system:String
         x:Key="Exceptions.ViewNotFound">View not found "{0}".</system:String>
     <system:String
-        x:Key="Exceptions.NwcExportError">NWC export error.</system:String>
+        x:Key="Exceptions.NwcExportError">NWC export error. Error message: {0}.</system:String>
     <system:String
-        x:Key="Exceptions.RvtExportError">RVT export error.</system:String>
+        x:Key="Exceptions.RvtExportError">RVT export error. Error message: {0}.</system:String>
+    <system:String
+        x:Key="Exceptions.ElementsNotDeleted">Cannot delete error elements. Error message: {0}.</system:String>
 
     <system:String
         x:Key="ErrorsWindow.ErrorGroupHeader">Export {0}</system:String>

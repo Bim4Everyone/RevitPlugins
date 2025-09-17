@@ -24,6 +24,7 @@ internal class NwcExportService : IModelsExportService<FileModelObjectExportSett
     private readonly ILoggerService _loggerService;
     private readonly ILocalizationService _localization;
     private readonly IErrorsService _errorsService;
+    private FileModelObjectExportSettings _currentSettings;
 
     public NwcExportService(
         RevitRepository revitRepository,
@@ -34,6 +35,7 @@ internal class NwcExportService : IModelsExportService<FileModelObjectExportSett
         _loggerService = loggerService ?? throw new ArgumentNullException(nameof(loggerService));
         _localization = localization ?? throw new ArgumentNullException(nameof(localization));
         _errorsService = errorsService ?? throw new ArgumentNullException(nameof(errorsService));
+        _currentSettings = null;
     }
 
 
@@ -49,6 +51,7 @@ internal class NwcExportService : IModelsExportService<FileModelObjectExportSett
         if(modelFiles is null) {
             throw new ArgumentNullException(nameof(modelFiles));
         }
+        _currentSettings = settings;
 
         Directory.CreateDirectory(settings.TargetFolder);
 
@@ -69,10 +72,11 @@ internal class NwcExportService : IModelsExportService<FileModelObjectExportSett
             } catch(Exception ex) {
                 _loggerService.Warning(ex, "Ошибка экспорта в nwc в файле: {@DocPath}", modelFile);
                 _errorsService.AddError(modelFile,
-                    _localization.GetLocalizedString("Exceptions.NwcExportError"),
+                    _localization.GetLocalizedString("Exceptions.NwcExportError", ex.Message),
                     settings);
             }
         }
+        _currentSettings = null;
     }
 
 
@@ -220,6 +224,11 @@ internal class NwcExportService : IModelsExportService<FileModelObjectExportSett
             } catch(Exception ex) {
                 _loggerService.Warning(ex, $"Не удалось удалить элементы, вызывающие ошибки");
                 e.SetProcessingResult(FailureProcessingResult.ProceedWithRollBack);
+                if(_currentSettings is not null) {
+                    _errorsService.AddError(accessor.GetDocument().Title,
+                        _localization.GetLocalizedString("Exceptions.ElementsNotDeleted", ex.Message),
+                        _currentSettings);
+                }
                 return;
             }
             e.SetProcessingResult(FailureProcessingResult.ProceedWithCommit);

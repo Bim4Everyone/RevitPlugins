@@ -64,7 +64,7 @@ internal class RvtExportService : IModelsExportService<RsModelObjectExportSettin
             } catch(Exception ex) {
                 _loggerService.Warning(ex, $"Ошибка экспорта в rvt в файле: {modelFile}");
                 _errorsService.AddError(modelFile,
-                    _localization.GetLocalizedString("Exceptions.RvtExportError"),
+                    _localization.GetLocalizedString("Exceptions.RvtExportError", ex.Message),
                     settings);
             }
         }
