@@ -7,7 +7,7 @@ using dosymep.Revit.ServerClient.DataContracts;
 namespace RevitServerFolders.Utils;
 internal static class Extensions {
     private const int Size = 1024;
-    private static readonly string[] _units = { "б", "Кб", "Мб", "Гб", "Тб", "Пб", "Еб" };
+    private static readonly string[] _units = { "B", "KB", "MB", "GB", "TB", "PB", "EB" };
 
     public static string BytesToString(long size) {
         if(size == 0) {

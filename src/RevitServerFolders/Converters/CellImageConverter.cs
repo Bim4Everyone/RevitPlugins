@@ -1,16 +1,15 @@
 using System;
 using System.Globalization;
 using System.Windows.Data;
-using System.Windows.Media;
 
 using RevitServerFolders.ViewModels;
 
 namespace RevitServerFolders.Converters;
-[ValueConversion(typeof(ModelObjectViewModel), typeof(ImageSource))]
+[ValueConversion(typeof(ModelObjectViewModel), typeof(object))]
 internal sealed class CellImageConverter : IValueConverter {
-    public ImageSource Empty { get; set; }
-    public ImageSource Model { get; set; }
-    public ImageSource Folder { get; set; }
+    public object Empty { get; set; }
+    public object Model { get; set; }
+    public object Folder { get; set; }
 
     public object Convert(object value, Type targetType, object parameter, CultureInfo culture) {
         if(value is ModelObjectViewModel modelObjectViewModel) {

@@ -1,112 +1,132 @@
-﻿<base:ThemedPlatformWindow
+﻿<core:WpfUIPlatformWindow
     x:Class="RevitServerFolders.Views.MainWindow"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-    xmlns:base="clr-namespace:dosymep.WPF.Views"
     xmlns:local="clr-namespace:RevitServerFolders.Views"
     xmlns:vms="clr-namespace:RevitServerFolders.ViewModels"
-    xmlns:dxmvvm="http://schemas.devexpress.com/winfx/2008/xaml/mvvm"
-    xmlns:dx="http://schemas.devexpress.com/winfx/2008/xaml/core"
-    xmlns:dxe="http://schemas.devexpress.com/winfx/2008/xaml/editors"
-    xmlns:dxg="http://schemas.devexpress.com/winfx/2008/xaml/grid"
-    xmlns:services="clr-namespace:dosymep.Xpf.Core.SimpleServices;assembly=dosymep.Xpf.Core"
-    xmlns:converters="clr-namespace:RevitServerFolders.Converters"
+    xmlns:core="clr-namespace:dosymep.WpfUI.Core"
+    xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
+    xmlns:me="clr-namespace:dosymep.WpfCore.MarkupExtensions;assembly=dosymep.WpfCore"
+    xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
+    xmlns:wpfbehaviors="clr-namespace:dosymep.WpfCore.Behaviors;assembly=dosymep.WpfCore"
+    xmlns:converters="clr-namespace:dosymep.WpfCore.Converters;assembly=dosymep.WpfCore"
     xmlns:dosymepConverters="clr-namespace:dosymep.WPF.Converters"
+    xmlns:pluginConverters="clr-namespace:RevitServerFolders.Converters"
+    xmlns:pluginBehaviors="clr-namespace:RevitServerFolders.Behaviors"
     mc:Ignorable="d"
-    x:Name="_this"
     WindowStartupLocation="CenterOwner"
-    Title="MainWindow"
     Height="450"
-    Width="800"
+    Width="1230"
     MinHeight="450"
-    MinWidth="800"
+    MinWidth="1230"
     d:DataContext="{d:DesignInstance vms:MainViewModel, IsDesignTimeCreatable=False}">
 
-    <dxmvvm:Interaction.Behaviors>
-        <services:AttachServiceBehavior
+    <i:Interaction.Behaviors>
+        <wpfbehaviors:WpfAttachServiceBehavior
             AttachableService="{Binding ProgressDialogFactory}" />
-
-        <services:AttachServiceBehavior
+        <wpfbehaviors:WpfAttachServiceBehavior
             AttachableService="{Binding OpenFolderDialogService}" />
-
-        <dxmvvm:EventToCommand
-            EventName="Loaded"
-            Command="{Binding LoadViewCommand}" />
-
-        <dxmvvm:EventToCommand
-            SourceName="_sourceFolderEdit"
-            EventName="EditValueChanged"
-            Command="{Binding SourceFolderChangedCommand}" />
-    </dxmvvm:Interaction.Behaviors>
+    </i:Interaction.Behaviors>
+    <i:Interaction.Triggers>
+        <i:EventTrigger
+            EventName="Loaded">
+            <i:InvokeCommandAction
+                Command="{Binding LoadViewCommand}" />
+        </i:EventTrigger>
+    </i:Interaction.Triggers>
 
     <Window.Resources>
-        <dosymepConverters:InverseBooleanConverter
-            x:Key="InverseBooleanConverter" />
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary
+                    Source="../Resources/CustomStyles.xaml" />
+            </ResourceDictionary.MergedDictionaries>
 
-        <BooleanToVisibilityConverter
-            x:Key="BooleanToVisibilityConverter" />
+            <ui:SymbolRegular
+                x:Key="DocumentIcon">Document20</ui:SymbolRegular>
+            <ui:SymbolRegular
+                x:Key="FolderIcon">Folder20</ui:SymbolRegular>
+            <ui:SymbolRegular
+                x:Key="BuildingIcon">Building20</ui:SymbolRegular>
 
-        <converters:CellImageConverter
-            x:Key="CellImageConverter"
-            Empty="{dx:DXImage 'Office2013/Actions/New_16x16.png'}"
-            Model="..\Resources\Revit.png"
-            Folder="{dx:DXImage 'Office2013/Support/Article_16x16.png'}" />
+            <dosymepConverters:InverseBooleanConverter
+                x:Key="InverseBooleanConverter" />
+            <converters:BoolToVisibilityConverter
+                x:Key="BooleanToVisibilityConverter" />
+            <pluginConverters:MiddleEllipsisConverter
+                x:Key="MiddleEllipsisConverter" />
+            <pluginConverters:CellImageConverter
+                x:Key="CellImageConverter"
+                Empty="{StaticResource DocumentIcon}"
+                Model="{StaticResource BuildingIcon}"
+                Folder="{StaticResource FolderIcon}" />
 
-        <Style
-            TargetType="dxg:GridControl">
-            <Style.Triggers>
-                <DataTrigger
-                    Binding="{Binding DataContext.OpenFromFoldersCommand.IsExecuting, ElementName=_this}"
-                    Value="True">
-                    <Setter
-                        Property="ShowLoadingPanel"
-                        Value="True" />
-                </DataTrigger>
-                <DataTrigger
-                    Binding="{Binding DataContext.SourceFolderChangedCommand.IsExecuting, ElementName=_this}"
-                    Value="True">
-                    <Setter
-                        Property="ShowLoadingPanel"
-                        Value="True" />
-                </DataTrigger>
-            </Style.Triggers>
-            <Setter
-                Property="ShowLoadingPanel"
-                Value="False" />
-        </Style>
-        <Style
-            TargetType="dxe:ButtonEdit"
-            x:Key="SourceFolderEditStyle">
-            <Style.Triggers>
-                <DataTrigger
-                    Binding="{Binding DataContext.OpenFromFoldersCommand.IsExecuting, ElementName=_this}"
-                    Value="True">
-                    <Setter
-                        Property="IsEnabled"
-                        Value="False" />
-                </DataTrigger>
-                <DataTrigger
-                    Binding="{Binding DataContext.SourceFolderChangedCommand.IsExecuting, ElementName=_this}"
-                    Value="True">
-                    <Setter
-                        Property="IsEnabled"
-                        Value="False" />
-                </DataTrigger>
-            </Style.Triggers>
-            <Setter
-                Property="IsEnabled"
-                Value="True" />
-        </Style>
+            <ui:TextBlock
+                x:Key="NameHeader"
+                Text="{me:LocalizationSource MainWindow.NameHeader}" />
+            <ui:TextBlock
+                x:Key="FullNameHeader"
+                Text="{me:LocalizationSource MainWindow.FullNameHeader}" />
+            <ui:TextBlock
+                x:Key="TargetsHeader"
+                Text="{me:LocalizationSource MainWindow.TargetsHeader}" />
+
+            <Style
+                x:Key="CustomDataGridTextDisabledStyle"
+                TargetType="TextBlock"
+                BasedOn="{StaticResource DefaultDataGridTextElementStyle}">
+                <Style.Triggers>
+                    <DataTrigger
+                        Value="True"
+                        Binding="{Binding Path=SkipObject}">
+                        <Setter
+                            Property="Foreground"
+                            Value="{DynamicResource TextFillColorDisabledBrush}" />
+                    </DataTrigger>
+                </Style.Triggers>
+            </Style>
+            <Style
+                TargetType="DockPanel"
+                x:Key="VisibleOnExecutingPanel">
+                <Style.Triggers>
+                    <DataTrigger
+                        Binding="{Binding DataContext.SelectedSettings.OpenFromFoldersCommand.IsExecuting,
+                        RelativeSource={RelativeSource AncestorType=Window}}"
+                        Value="True">
+                        <Setter
+                            Property="Visibility"
+                            Value="Visible" />
+                    </DataTrigger>
+                </Style.Triggers>
+                <Setter
+                    Property="Visibility"
+                    Value="Hidden" />
+            </Style>
+            <Style
+                TargetType="Border"
+                x:Key="DisabledOnExecutingBorder"
+                BasedOn="{StaticResource CustomBorder}">
+                <Style.Triggers>
+                    <DataTrigger
+                        Binding="{Binding DataContext.SelectedSettings.OpenFromFoldersCommand.IsExecuting,
+                        RelativeSource={RelativeSource AncestorType=Window}}"
+                        Value="True">
+                        <Setter
+                            Property="IsEnabled"
+                            Value="False" />
+                    </DataTrigger>
+                </Style.Triggers>
+                <Setter
+                    Property="IsEnabled"
+                    Value="True" />
+            </Style>
+        </ResourceDictionary>
     </Window.Resources>
 
     <Grid>
         <Grid.RowDefinitions>
-            <RowDefinition
-                Height="Auto" />
-            <RowDefinition
-                Height="Auto" />
             <RowDefinition
                 Height="Auto" />
             <RowDefinition
@@ -117,183 +137,319 @@
                 Height="Auto" />
         </Grid.RowDefinitions>
 
-        <Label
-            Grid.Row="0"
-            Margin="5 5 5 0 "
-            Content="Папка назначения" />
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition
+                Width="1*"
+                MinWidth="400" />
+            <ColumnDefinition
+                Width="Auto" />
+            <ColumnDefinition
+                Width="2*"
+                MinWidth="800" />
+        </Grid.ColumnDefinitions>
 
-        <dxe:ButtonEdit
-            Grid.Row="1"
-            Margin="5"
-            AllowDefaultButton="False"
-            EditValue="{Binding TargetFolder, UpdateSourceTrigger=PropertyChanged}">
-            <dxe:ButtonEdit.Buttons>
-                <dxe:ButtonInfo
-                    Command="{Binding OpenFolderDialogCommand}">
-                    <dxe:ButtonInfo.ContentTemplate>
-                        <DataTemplate>
-                            <dx:DXImage
-                                Source="{dx:DXImage 'Office2013/Actions/Open_16x16.png'}" />
-                        </DataTemplate>
-                    </dxe:ButtonInfo.ContentTemplate>
-                </dxe:ButtonInfo>
-            </dxe:ButtonEdit.Buttons>
-        </dxe:ButtonEdit>
+        <ui:TitleBar
+            Grid.Row="0"
+            Grid.Column="0"
+            Grid.ColumnSpan="3"
+            Title="{Binding Title}" />
 
         <DockPanel
-            Grid.Row="2"
-            Margin="5 0 5 0">
-            <Label
-                Margin="0 0 5 0"
-                Content="Папка источника" />
-
-            <dxe:CheckEdit
-                Content="Выгрузка помещений"
-                EditValue="{Binding IsExportRooms}"
-                Visibility="{Binding IsExportRoomsVisible, 
-                    Converter={StaticResource BooleanToVisibilityConverter}}" />
-            <dxe:CheckEdit
-                Margin="5 0"
-                Content="Очищать папку назначения"
-                EditValue="{Binding ClearTargetFolder}" />
+            Grid.Row="1"
+            Grid.RowSpan="2"
+            Grid.Column="0"
+            Grid.ColumnSpan="3"
+            Style="{StaticResource VisibleOnExecutingPanel}">
+            <ui:ProgressRing
+                IsIndeterminate="True" />
         </DockPanel>
 
-        <dxe:ButtonEdit
-            Grid.Row="3"
-            x:Name="_sourceFolderEdit"
-            Margin="5"
-            Style="{StaticResource SourceFolderEditStyle}"
-            AllowDefaultButton="False"
-            EditValuePostDelay="250"
-            EditValuePostMode="Delayed"
-            EditValue="{Binding SourceFolder, UpdateSourceTrigger=PropertyChanged}">
-            <dxe:ButtonEdit.Buttons>
-                <dxe:ButtonInfo
-                    Command="{Binding OpenFromFoldersCommand}"
-                    IsEnabled="{Binding SourceFolderChangedCommand.IsExecuting,
-                        Converter={StaticResource InverseBooleanConverter}}">
-                    <dxe:ButtonInfo.ContentTemplate>
-                        <DataTemplate>
-                            <dx:DXImage
-                                Source="{dx:DXImage 'Office2013/Actions/Open_16x16.png'}" />
-                        </DataTemplate>
-                    </dxe:ButtonInfo.ContentTemplate>
-                </dxe:ButtonInfo>
-            </dxe:ButtonEdit.Buttons>
-        </dxe:ButtonEdit>
+        <Border
+            Grid.Row="1"
+            Grid.RowSpan="2"
+            Grid.Column="0"
+            Margin="10 0 0 0"
+            Style="{StaticResource DisabledOnExecutingBorder}">
+            <DockPanel
+                LastChildFill="True">
+                <ui:Button
+                    Margin="0 0 0 10"
+                    DockPanel.Dock="Top"
+                    Content="{ui:SymbolIcon Symbol=Add20}"
+                    Command="{Binding AddSettingsCommand}" />
+                <ui:DataGrid
+                    Grid.Row="5"
+                    Margin="5"
+                    Style="{StaticResource CustomResizableDataGridStyle}"
+                    ItemsSource="{Binding SettingsCollection}"
+                    SelectedItem="{Binding SelectedSettings}">
+                    <ui:DataGrid.Columns>
+                        <DataGridTextColumn
+                            Width="Auto"
+                            IsReadOnly="True"
+                            CanUserReorder="False"
+                            CanUserResize="False"
+                            CanUserSort="True"
+                            Header="№"
+                            Binding="{Binding Index}" />
+                        <DataGridCheckBoxColumn
+                            CanUserReorder="False"
+                            CanUserResize="False"
+                            CanUserSort="False"
+                            Width="Auto"
+                            Binding="{Binding IsSelected, UpdateSourceTrigger=PropertyChanged}">
+                            <DataGridCheckBoxColumn.Header>
+                                <CheckBox
+                                    IsChecked="{Binding DataContext.AllSelected, RelativeSource={RelativeSource AncestorType=ui:DataGrid}, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                            </DataGridCheckBoxColumn.Header>
+                        </DataGridCheckBoxColumn>
+                        <DataGridTemplateColumn
+                            Width="180"
+                            MinWidth="180"
+                            Header="{StaticResource TargetsHeader}">
+                            <DataGridTemplateColumn.CellTemplate>
+                                <DataTemplate>
+                                    <StackPanel
+                                        Height="50"
+                                        Margin="5 2">
+                                        <DockPanel
+                                            Margin="0 0 0 5">
+                                            <ui:TextBlock
+                                                Width="55"
+                                                Margin="0 0 5 0"
+                                                Foreground="{DynamicResource LabelForeground}"
+                                                Text="{Binding TargetFromLabel}" />
+                                            <ui:TextBlock
+                                                Foreground="{DynamicResource LabelForeground}"
+                                                ToolTip="{Binding TargetFolder}">
+                                                <i:Interaction.Behaviors>
+                                                    <pluginBehaviors:TextBlockResizeHelper />
+                                                </i:Interaction.Behaviors>
+                                                <ui:TextBlock.Text>
+                                                    <MultiBinding
+                                                        Converter="{StaticResource MiddleEllipsisConverter}">
+                                                        <Binding
+                                                            Path="TargetFolder" />
+                                                        <Binding
+                                                            RelativeSource="{RelativeSource Self}" />
+                                                        <Binding
+                                                            RelativeSource="{RelativeSource Self}"
+                                                            Path="ActualWidth" />
+                                                    </MultiBinding>
+                                                </ui:TextBlock.Text>
+                                            </ui:TextBlock>
+                                        </DockPanel>
+                                        <DockPanel>
+                                            <ui:TextBlock
+                                                Width="55"
+                                                Margin="0 0 5 0"
+                                                Foreground="{DynamicResource LabelForeground}"
+                                                Text="{Binding TargetToLabel}" />
+                                            <ui:TextBlock
+                                                Foreground="{DynamicResource LabelForeground}"
+                                                ToolTip="{Binding SourceFolder}">
+                                                <i:Interaction.Behaviors>
+                                                    <pluginBehaviors:TextBlockResizeHelper />
+                                                </i:Interaction.Behaviors>
+                                                <ui:TextBlock.Text>
+                                                    <MultiBinding
+                                                        Converter="{StaticResource MiddleEllipsisConverter}">
+                                                        <Binding
+                                                            Path="SourceFolder" />
+                                                        <Binding
+                                                            RelativeSource="{RelativeSource Self}" />
+                                                        <Binding
+                                                            RelativeSource="{RelativeSource Self}"
+                                                            Path="ActualWidth" />
+                                                    </MultiBinding>
+                                                </ui:TextBlock.Text>
+                                            </ui:TextBlock>
+                                        </DockPanel>
+                                    </StackPanel>
+                                </DataTemplate>
+                            </DataGridTemplateColumn.CellTemplate>
+                        </DataGridTemplateColumn>
+                        <DataGridTemplateColumn
+                            CanUserReorder="False"
+                            CanUserResize="False"
+                            CanUserSort="False"
+                            Width="Auto">
+                            <DataGridTemplateColumn.CellTemplate>
+                                <DataTemplate>
+                                    <ui:Button
+                                        Appearance="Danger"
+                                        Content="{ui:SymbolIcon Symbol=Delete20}"
+                                        Command="{Binding DataContext.RemoveSettingsCommand,
+                        RelativeSource={RelativeSource AncestorType=Window}}"
+                                        CommandParameter="{Binding}" />
+                                </DataTemplate>
+                            </DataGridTemplateColumn.CellTemplate>
+                        </DataGridTemplateColumn>
+                    </ui:DataGrid.Columns>
+                </ui:DataGrid>
+            </DockPanel>
+        </Border>
 
-        <dxg:GridControl
-            Grid.Row="4"
-            Margin="5"
-            ItemsSource="{Binding ModelObjects}"
-            SelectedItem="{Binding SelectedObject}">
+        <GridSplitter
+            Grid.Column="1"
+            Grid.Row="1"
+            Grid.RowSpan="2"
+            Width="10"
+            Background="{DynamicResource CardBackground}"
+            BorderBrush="{DynamicResource CardBorderBrush}"
+            BorderThickness="{DynamicResource CardControlBorderThemeThickness}"
+            HorizontalAlignment="Center"
+            VerticalAlignment="Stretch" />
 
-            <dxg:GridControl.View>
-                <dxg:TableView
-                    AutoWidth="True"
-                    AllowEditing="False"
-                    AllowGrouping="False"
-                    ShowGroupPanel="False">
-                    <dxg:TableView.RowStyle>
-                        <Style
-                            TargetType="dxg:RowControl">
-                            <Style.Triggers>
-                                <DataTrigger
-                                    Value="True"
-                                    Binding="{Binding Row.SkipObject}">
-                                    <Setter
-                                        Property="Foreground"
-                                        Value="DarkGray" />
-                                </DataTrigger>
-                            </Style.Triggers>
-                        </Style>
-                    </dxg:TableView.RowStyle>
-                </dxg:TableView>
-            </dxg:GridControl.View>
+        <Border
+            Margin="0 0 10 5"
+            Grid.Row="1"
+            Grid.Column="2"
+            Style="{StaticResource DisabledOnExecutingBorder}">
+            <StackPanel>
+                <DockPanel>
+                    <ui:TextBlock
+                        Width="130"
+                        Text="{me:LocalizationSource MainWindow.LabelTarget}" />
+                    <ui:ToggleSwitch
+                        Margin="5 0"
+                        IsChecked="{Binding SelectedSettings.ClearTargetFolder}"
+                        Content="{me:LocalizationSource MainWindow.ClearTarget}" />
+                    <ui:ToggleSwitch
+                        IsChecked="{Binding SelectedSettings.OpenTargetWhenFinish}"
+                        Content="{me:LocalizationSource MainWindow.OpenTargetWhenFinish}" />
+                </DockPanel>
+                <DockPanel
+                    Margin="0 5"
+                    LastChildFill="True">
+                    <ui:Button
+                        DockPanel.Dock="Right"
+                        Height="36"
+                        Margin="5 0 0 0"
+                        Content="{ui:SymbolIcon Symbol=Folder20}"
+                        Command="{Binding SelectedSettings.OpenFolderDialogCommand}" />
+                    <ui:TextBox
+                        Text="{Binding SelectedSettings.TargetFolder, UpdateSourceTrigger=PropertyChanged}" />
+                </DockPanel>
+                <DockPanel
+                    Margin="0 5 0 0">
+                    <ui:TextBlock
+                        Width="130"
+                        Text="{me:LocalizationSource MainWindow.LabelSource}" />
+                    <ui:ToggleSwitch
+                        Margin="5 0"
+                        Content="{me:LocalizationSource MainWindow.ExportRooms}"
+                        IsChecked="{Binding SelectedSettings.IsExportRooms}"
+                        Visibility="{Binding SelectedSettings.IsExportRoomsVisible, 
+                    Converter={StaticResource BooleanToVisibilityConverter}}" />
+                </DockPanel>
+                <DockPanel
+                    Margin="0 5 0 0"
+                    LastChildFill="True">
+                    <ui:Button
+                        DockPanel.Dock="Right"
+                        Height="36"
+                        Margin="5 0 0 0"
+                        Content="{ui:SymbolIcon Symbol=Folder20}"
+                        IsEnabled="{Binding SelectedSettings.SourceFolderChangedCommand.IsExecuting,
+                        Converter={StaticResource InverseBooleanConverter}}"
+                        Command="{Binding SelectedSettings.OpenFromFoldersCommand}" />
+                    <ui:TextBox
+                        Text="{Binding SelectedSettings.SourceFolder, UpdateSourceTrigger=PropertyChanged}">
+                        <i:Interaction.Triggers>
+                            <i:EventTrigger
+                                EventName="TextChanged">
+                                <i:InvokeCommandAction
+                                    Command="{Binding SelectedSettings.SourceFolderChangedCommand}" />
+                            </i:EventTrigger>
+                        </i:Interaction.Triggers>
+                    </ui:TextBox>
+                </DockPanel>
+            </StackPanel>
+        </Border>
 
-            <dxg:GridColumn
-                Binding="{Binding SkipObject, Mode=TwoWay, 
-                    UpdateSourceTrigger=PropertyChanged, Converter={StaticResource InverseBooleanConverter}}"
-                Header=""
-                AllowEditing="True"
-                AllowMoving="False"
-                AllowResizing="False"
-                AllowSorting="False"
-                AllowGrouping="False"
-                AllowAutoFilter="False"
-                AllowColumnFiltering="False"
-                Width="43"
-                MinWidth="43"
-                MaxWidth="43"
-                ShowCheckBoxInHeader="True">
+        <Border
+            Margin="0 5 10 0"
+            Grid.Row="2"
+            Grid.Column="2"
+            Style="{StaticResource DisabledOnExecutingBorder}">
 
-                <dxg:GridColumn.CellTemplate>
-                    <DataTemplate>
-                        <dxe:CheckEdit
-                            x:Name="PART_Editor"
-                            EditValue="{Binding RowData.Row.SkipObject, 
-                        UpdateSourceTrigger=PropertyChanged, Converter={StaticResource InverseBooleanConverter}}"
-                            VerticalAlignment="Center"
-                            HorizontalAlignment="Center" />
-                    </DataTemplate>
-                </dxg:GridColumn.CellTemplate>
+            <ui:DataGrid
+                Grid.Row="5"
+                Margin="5"
+                RowHeight="33"
+                Style="{StaticResource CustomResizableDataGridStyle}"
+                CellStyle="{StaticResource CustomDataGridCell}"
+                ItemsSource="{Binding SelectedSettings.ModelObjects}"
+                SelectedItem="{Binding SelectedSettings.SelectedObject}">
 
-            </dxg:GridColumn>
-
-            <dxg:GridColumn
-                Width="25"
-                MinWidth="25"
-                MaxWidth="25"
-                AllowMoving="False"
-                AllowSorting="False"
-                AllowResizing="False"
-                AllowGrouping="False"
-                UnboundType="Object"
-                Header="">
-
-                <dxg:GridColumn.CellTemplate>
-                    <DataTemplate
-                        DataType="{x:Type dxg:EditGridCellData}">
-                        <Image
-                            Source="{Binding RowData.Row, 
-                                Converter={StaticResource CellImageConverter}}" />
-                    </DataTemplate>
-                </dxg:GridColumn.CellTemplate>
-
-            </dxg:GridColumn>
-
-            <dxg:GridColumn
-                FieldName="Name"
-                Header="Наименование" />
-            <dxg:GridColumn
-                FieldName="FullName"
-                Header="Полное наименование" />
-        </dxg:GridControl>
+                <ui:DataGrid.Columns>
+                    <DataGridCheckBoxColumn
+                        CanUserReorder="False"
+                        CanUserResize="False"
+                        CanUserSort="False"
+                        Width="Auto"
+                        Binding="{Binding SkipObject, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource InverseBooleanConverter}}">
+                        <DataGridCheckBoxColumn.Header>
+                            <CheckBox
+                                IsChecked="{Binding DataContext.SelectedSettings.SkipAll, RelativeSource={RelativeSource AncestorType=ui:DataGrid}, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource InverseBooleanConverter}}" />
+                        </DataGridCheckBoxColumn.Header>
+                    </DataGridCheckBoxColumn>
+                    <DataGridTemplateColumn
+                        CanUserReorder="False"
+                        CanUserResize="False"
+                        CanUserSort="False"
+                        Width="Auto">
+                        <DataGridTemplateColumn.CellTemplate>
+                            <DataTemplate>
+                                <ui:SymbolIcon
+                                    Symbol="{Binding ., Converter={StaticResource CellImageConverter}}" />
+                            </DataTemplate>
+                        </DataGridTemplateColumn.CellTemplate>
+                    </DataGridTemplateColumn>
+                    <DataGridTextColumn
+                        Width="250"
+                        IsReadOnly="True"
+                        MinWidth="100"
+                        ElementStyle="{StaticResource CustomDataGridTextDisabledStyle}"
+                        Binding="{Binding Name}"
+                        Header="{StaticResource NameHeader}" />
+                    <DataGridTextColumn
+                        IsReadOnly="True"
+                        MinWidth="100"
+                        ElementStyle="{StaticResource CustomDataGridTextDisabledStyle}"
+                        Binding="{Binding FullName}"
+                        Header="{StaticResource FullNameHeader}" />
+                </ui:DataGrid.Columns>
+            </ui:DataGrid>
+        </Border>
 
         <StackPanel
-            Grid.Row="5"
+            Grid.Row="3"
+            Grid.Column="0"
+            Grid.ColumnSpan="3"
             Orientation="Horizontal"
             HorizontalAlignment="Right">
-            <TextBlock
+            <ui:TextBlock
                 Margin="10"
-                Foreground="Orange"
-                VerticalAlignment="Center"
+                Style="{StaticResource CustomErrorText}"
                 Text="{Binding ErrorText}" />
 
-            <dx:SimpleButton
+            <ui:Button
                 Margin="10"
                 Width="80"
-                Content="ОК"
+                Appearance="Info"
                 IsDefault="True"
                 Click="ButtonOk_Click"
+                Content="{me:LocalizationSource Ok}"
                 Command="{Binding AcceptViewCommand}" />
 
-            <dx:SimpleButton
+            <ui:Button
                 Margin="10"
                 Width="80"
-                Content="Отмена"
                 IsCancel="True"
-                Click="ButtonCancel_Click" />
+                Click="ButtonCancel_Click"
+                Content="{me:LocalizationSource Cancel}" />
         </StackPanel>
     </Grid>
-</base:ThemedPlatformWindow>
+</core:WpfUIPlatformWindow>

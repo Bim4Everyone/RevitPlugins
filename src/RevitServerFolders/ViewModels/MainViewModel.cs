@@ -1,8 +1,9 @@
 using System;
-using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Input;
 
@@ -14,49 +15,54 @@ using RevitServerFolders.Models;
 using RevitServerFolders.Services;
 
 namespace RevitServerFolders.ViewModels;
-internal class MainViewModel : BaseViewModel {
-    private readonly PluginConfig _pluginConfig;
-    private readonly IModelObjectService _objectService;
-    private readonly object _locker = new();
+internal class MainViewModel<T> : BaseViewModel where T : ExportSettings {
+    private readonly IModelsExportService<T> _exportService;
+    protected readonly PluginConfig<T> _pluginConfig;
+    protected readonly IModelObjectService _objectService;
+    protected readonly ILocalizationService _localization;
 
     private string _errorText;
-    private string _targetFolder;
-    private string _sourceFolder;
+    private ExportSettingsViewModel<T> _selectedSettings;
+    private bool _allSelected;
 
-    private ModelObjectViewModel _selectedObject;
-    private ObservableCollection<ModelObjectViewModel> _modelObjects;
-
-    private bool _isExportRooms;
-    private bool _isExportRoomsVisible;
-    private bool _clearTargetFolder;
-
-    public MainViewModel(PluginConfig pluginConfig,
+    public MainViewModel(PluginConfig<T> pluginConfig,
+        IModelsExportService<T> exportService,
         IModelObjectService objectService,
         IOpenFolderDialogService openFolderDialogService,
-        IProgressDialogFactory progressDialogFactory) {
-        _pluginConfig = pluginConfig;
-        _objectService = objectService;
+        IProgressDialogFactory progressDialogFactory,
+        ILocalizationService localization) {
+        _pluginConfig = pluginConfig
+            ?? throw new ArgumentNullException(nameof(pluginConfig));
+        _exportService = exportService
+            ?? throw new ArgumentNullException(nameof(exportService));
+        _objectService = objectService
+            ?? throw new ArgumentNullException(nameof(objectService));
+        OpenFolderDialogService = openFolderDialogService
+            ?? throw new ArgumentNullException(nameof(openFolderDialogService));
+        ProgressDialogFactory = progressDialogFactory
+            ?? throw new ArgumentNullException(nameof(progressDialogFactory));
+        _localization = localization
+            ?? throw new ArgumentNullException(nameof(localization));
+        SettingsCollection = [];
 
-        OpenFolderDialogService = openFolderDialogService;
-        ProgressDialogFactory = progressDialogFactory;
-        ModelObjects = [];
-
-        LoadViewCommand = RelayCommand.Create(LoadView);
+        LoadViewCommand = RelayCommand.CreateAsync(LoadView);
         AcceptViewCommand = RelayCommand.Create(AcceptView, CanAcceptView);
-
-        OpenFromFoldersCommand = RelayCommand.CreateAsync(OpenFromFolder);
-        OpenFolderDialogCommand = RelayCommand.Create(OpenFolderDialog);
-        SourceFolderChangedCommand = RelayCommand.CreateAsync(SourceFolderChanged);
+        AddSettingsCommand = RelayCommand.Create(AddSettings);
+        RemoveSettingsCommand = RelayCommand.Create<ExportSettingsViewModel<T>>(RemoveSettings, CanRemoveSettings);
     }
 
-    public ICommand LoadViewCommand { get; }
+    public string Title { get; protected set; }
+
+    public IAsyncCommand LoadViewCommand { get; }
+
     public ICommand AcceptViewCommand { get; }
 
-    public IAsyncCommand OpenFromFoldersCommand { get; }
-    public ICommand OpenFolderDialogCommand { get; }
-    public IAsyncCommand SourceFolderChangedCommand { get; }
+    public ICommand AddSettingsCommand { get; }
+
+    public ICommand RemoveSettingsCommand { get; }
 
     public IOpenFolderDialogService OpenFolderDialogService { get; }
+
     public IProgressDialogFactory ProgressDialogFactory { get; }
 
     public string ErrorText {
@@ -64,95 +70,98 @@ internal class MainViewModel : BaseViewModel {
         set => RaiseAndSetIfChanged(ref _errorText, value);
     }
 
-    public string TargetFolder {
-        get => _targetFolder;
-        set => RaiseAndSetIfChanged(ref _targetFolder, value);
+    public ExportSettingsViewModel<T> SelectedSettings {
+        get => _selectedSettings;
+        set => RaiseAndSetIfChanged(ref _selectedSettings, value);
     }
 
-    public bool ClearTargetFolder {
-        get => _clearTargetFolder;
-        set => RaiseAndSetIfChanged(ref _clearTargetFolder, value);
+    public bool AllSelected {
+        get => _allSelected;
+        set {
+            if(_allSelected != value) {
+                RaiseAndSetIfChanged(ref _allSelected, value);
+                foreach(var item in SettingsCollection) {
+                    item.IsSelected = value;
+                }
+            }
+        }
     }
 
-    public string SourceFolder {
-        get => _sourceFolder;
-        set => RaiseAndSetIfChanged(ref _sourceFolder, value);
-    }
+    public ObservableCollection<ExportSettingsViewModel<T>> SettingsCollection { get; }
 
-    public ModelObjectViewModel SelectedObject {
-        get => _selectedObject;
-        set => RaiseAndSetIfChanged(ref _selectedObject, value);
-    }
-
-    public ObservableCollection<ModelObjectViewModel> ModelObjects {
-        get => _modelObjects;
-        set => RaiseAndSetIfChanged(ref _modelObjects, value);
-    }
-
-    public bool IsExportRooms {
-        get => _isExportRooms;
-        set => RaiseAndSetIfChanged(ref _isExportRooms, value);
-    }
-
-    public bool IsExportRoomsVisible {
-        get => _isExportRoomsVisible;
-        set => RaiseAndSetIfChanged(ref _isExportRoomsVisible, value);
-    }
 
     protected virtual void LoadConfigImpl() { }
-    protected virtual void SaveConfigImpl() { }
-    protected virtual void AcceptViewImpl() { }
 
-    private void LoadView() {
+    protected virtual void AddSettingsImpl() { }
+
+    private void UpdateIndexes() {
+        int index = 1;
+        foreach(var item in SettingsCollection) {
+            item.Index = index++;
+        }
+    }
+
+    private async Task LoadView() {
         LoadConfig();
+        foreach(var setting in SettingsCollection) {
+            await setting.SourceFolderChangedCommand.ExecuteAsync(default);
+        }
     }
 
     private void AcceptView() {
         SaveConfig();
-        AcceptViewImpl();
+        var selectedSettings = SettingsCollection
+            .Where(s => s.IsSelected)
+            .ToArray();
+
+        using var dialog = ProgressDialogFactory.CreateDialog();
+        dialog.StepValue = 1;
+        dialog.MaxValue = selectedSettings
+            .SelectMany(GetModelObjects)
+            .Count();
+        var progress = dialog.CreateProgress();
+        var ct = dialog.CreateCancellationToken();
+        dialog.Show();
+
+        int startProcess = 0;
+        foreach(var item in selectedSettings) {
+            ExportModelObjects(item, progress, ct, startProcess);
+            startProcess += GetModelObjects(item).Length;
+        }
+    }
+
+    private void ExportModelObjects(ExportSettingsViewModel<T> settingsViewModel,
+        IProgress<int> progress,
+        CancellationToken ct = default,
+        int processStart = 0) {
+
+        string[] modelFiles = GetModelObjects(settingsViewModel);
+
+        _exportService.ExportModelObjects(modelFiles, settingsViewModel.GetSettings(), progress, ct, processStart);
+
+        if(settingsViewModel.OpenTargetWhenFinish) {
+            Process.Start(Path.GetFullPath(settingsViewModel.TargetFolder));
+        }
+    }
+
+    private string[] GetModelObjects(ExportSettingsViewModel<T> settings) {
+        return settings.ModelObjects
+            .Where(item => !item.SkipObject)
+            .Select(item => item.FullName)
+            .ToArray();
     }
 
     private bool CanAcceptView() {
-        if(string.IsNullOrEmpty(TargetFolder)) {
-            ErrorText = "Выберите папку назначения.";
+        var errorSettings = SettingsCollection
+            .Select(s => new { Index = s.Index, Error = s.GetErrorText() })
+            .FirstOrDefault(a => !string.IsNullOrWhiteSpace(a.Error));
+        if(errorSettings is not null) {
+            ErrorText = _localization.GetLocalizedString(
+                "MainWindow.ErrorTextPattern", errorSettings.Index, errorSettings.Error);
             return false;
         }
-
-        if(!Directory.Exists(TargetFolder)) {
-            ErrorText = "Выберите существующую папку назначения.";
-            return false;
-        }
-
-        if(SourceFolder == null) {
-            ErrorText = "Выберите папку источника.";
-            return false;
-        }
-
-        if(ModelObjects.Count == 0) {
-            ErrorText = "Выберите папку источника c моделями.";
-            return false;
-        }
-
-        if(!ModelObjects
-               .Any(item => !item.SkipObject)) {
-            ErrorText = "Все модели помечены признаком пропустить.";
-            return false;
-        }
-
-        if(OpenFromFoldersCommand.IsExecuting || SourceFolderChangedCommand.IsExecuting) {
-            ErrorText = "Дождитесь завершения загрузки";
-            return false;
-        }
-
-        string duplicateModelObject = ModelObjects
-            .Where(item => !item.SkipObject)
-            .GroupBy(item => item.Name)
-            .Where(item => item.Count() > 1)
-            .Select(item => item.Key)
-            .FirstOrDefault();
-
-        if(!string.IsNullOrEmpty(duplicateModelObject)) {
-            ErrorText = $"Папка источника содержит дубликаты \"{duplicateModelObject}\".";
+        if(SettingsCollection.All(s => !s.IsSelected)) {
+            ErrorText = _localization.GetLocalizedString("MainWindow.Validation.AllSettingsOff");
             return false;
         }
 
@@ -160,71 +169,32 @@ internal class MainViewModel : BaseViewModel {
         return true;
     }
 
-    private async Task OpenFromFolder() {
-        var modelObject = await _objectService.SelectModelObjectDialog(SourceFolder);
-        SourceFolder = modelObject.FullName;
-        await AddModelObjects(modelObject);
-    }
-
-    private void OpenFolderDialog() {
-        if(OpenFolderDialogService.ShowDialog(TargetFolder)) {
-            TargetFolder = OpenFolderDialogService.Folder.FullName;
-        }
-    }
-
-    private async Task SourceFolderChanged() {
-        try {
-            if(!OpenFromFoldersCommand.IsExecuting) {
-                await AddModelObjects(await _objectService.GetFromString(SourceFolder));
-            }
-        } catch {
-            // pass
-        }
-    }
-
     private void LoadConfig() {
-        TargetFolder = _pluginConfig.TargetFolder;
-        SourceFolder = _pluginConfig.SourceFolder;
-        ClearTargetFolder = _pluginConfig.ClearTargetFolder;
-
         LoadConfigImpl();
+        SelectedSettings = SettingsCollection.FirstOrDefault();
+        if(SelectedSettings is not null) {
+            SelectedSettings.IsSelected = true;
+        }
+        UpdateIndexes();
     }
 
     private void SaveConfig() {
-        _pluginConfig.TargetFolder = TargetFolder;
-        _pluginConfig.SourceFolder = SourceFolder;
-        _pluginConfig.ClearTargetFolder = ClearTargetFolder;
-        _pluginConfig.SkippedObjects = ModelObjects
-            .Where(item => item.SkipObject)
-            .Select(item => item.FullName)
-            .ToArray();
-
-
-        SaveConfigImpl();
+        _pluginConfig.ExportSettings = [.. SettingsCollection.Select(s => s.GetSettings())];
         _pluginConfig.SaveProjectConfig();
     }
 
-    private async Task AddModelObjects(ModelObject modelObject) {
-        if(modelObject != null) {
-            var modelObjects = await modelObject.GetChildrenObjects();
-
-            AddModelObjects(modelObjects, _pluginConfig.SkippedObjects);
-        }
+    private void AddSettings() {
+        AddSettingsImpl();
+        UpdateIndexes();
     }
 
-    private void AddModelObjects(IEnumerable<ModelObject> modelObjects, string[] skippedObjects) {
-        ModelObjects.Clear();
+    private void RemoveSettings(ExportSettingsViewModel<T> settings) {
+        SettingsCollection.Remove(settings);
+        UpdateIndexes();
+        SelectedSettings = SettingsCollection.FirstOrDefault();
+    }
 
-        modelObjects = modelObjects
-            .OrderBy(item => item.Name);
-
-        foreach(var child in modelObjects) {
-            ModelObjects.Add(new ModelObjectViewModel(child));
-        }
-
-        foreach(var modelObjectViewModel in ModelObjects) {
-            modelObjectViewModel.SkipObject = skippedObjects?
-                .Contains(modelObjectViewModel.FullName, StringComparer.OrdinalIgnoreCase) == true;
-        }
+    private bool CanRemoveSettings(ExportSettingsViewModel<T> settings) {
+        return settings is not null && SettingsCollection.Count > 1;
     }
 }

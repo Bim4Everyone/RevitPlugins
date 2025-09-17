@@ -3,35 +3,35 @@ using System.Collections.ObjectModel;
 using System.Linq;
 using System.Threading.Tasks;
 
-using DevExpress.Xpf.Grid.TreeList;
 
 using dosymep.Revit.ServerClient;
+using dosymep.SimpleServices;
 using dosymep.WPF.Commands;
 using dosymep.WPF.ViewModels;
 
 namespace RevitServerFolders.ViewModels.Rs;
 internal sealed class MainViewModel : BaseViewModel {
     private readonly IReadOnlyCollection<IServerClient> _serverClients;
-
+    private readonly ILocalizationService _localization;
     private RsModelObjectViewModel _selectedItem;
     private ObservableCollection<RsModelObjectViewModel> _items;
 
     private string _errorText;
 
-    public MainViewModel(IReadOnlyCollection<IServerClient> serverClients) {
+    public MainViewModel(IReadOnlyCollection<IServerClient> serverClients, ILocalizationService localization) {
         _serverClients = serverClients;
+        _localization = localization;
         LoadViewCommand = RelayCommand.CreateAsync(LoadView);
         AcceptViewCommand = RelayCommand.CreateAsync(AcceptView, CanAcceptView);
 
-        LoadChildrenCommand = RelayCommand.CreateAsync<TreeListNodeEventArgs>(LoadChildren, CanLoadChildren);
+        LoadChildrenCommand = RelayCommand.CreateAsync<RsModelObjectViewModel>(LoadChildren, CanLoadChildren);
         ReloadChildrenCommand = RelayCommand.CreateAsync(ReloadChildren, CanReloadChildren);
     }
 
     public IAsyncCommand LoadViewCommand { get; }
     public IAsyncCommand AcceptViewCommand { get; }
-
-    public IAsyncCommand LoadChildrenCommand { get; }
     public IAsyncCommand ReloadChildrenCommand { get; }
+    public IAsyncCommand LoadChildrenCommand { get; }
 
     public string ErrorText {
         get => _errorText;
@@ -78,23 +78,12 @@ internal sealed class MainViewModel : BaseViewModel {
 
     private bool CanAcceptView() {
         if(SelectedItem is not RsFolderDataViewModel) {
-            ErrorText = "Выберите папку с моделями";
+            ErrorText = _localization.GetLocalizedString("RsBrowser.Validation.SelectFolder");
             return false;
         }
 
         ErrorText = null;
         return true;
-    }
-
-    private async Task LoadChildren(TreeListNodeEventArgs args) {
-        if(args.Row is RsModelObjectViewModel rsModelObject) {
-            await rsModelObject.LoadChildrenCommand.ExecuteAsync(default);
-        }
-    }
-
-    private bool CanLoadChildren(TreeListNodeEventArgs args) {
-        return args.Row is RsModelObjectViewModel rsModelObject
-               && rsModelObject.LoadChildrenCommand.CanExecute(default);
     }
 
     private async Task ReloadChildren() {
@@ -103,5 +92,13 @@ internal sealed class MainViewModel : BaseViewModel {
 
     private bool CanReloadChildren() {
         return SelectedItem != null && SelectedItem.ReloadChildrenCommand.CanExecute(default);
+    }
+
+    private async Task LoadChildren(RsModelObjectViewModel model) {
+        await model.LoadChildrenCommand.ExecuteAsync(default);
+    }
+
+    private bool CanLoadChildren(RsModelObjectViewModel model) {
+        return model is not null && model.LoadChildrenCommand.CanExecute(default);
     }
 }

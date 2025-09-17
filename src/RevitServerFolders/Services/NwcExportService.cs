@@ -17,59 +17,75 @@ namespace RevitServerFolders.Services;
 /// <summary>
 /// Экспортирует rvt файлы в nwc в заданную директорию
 /// </summary>
-internal class NwcExportService : IModelsExportService {
+internal class NwcExportService : IModelsExportService<FileModelObjectExportSettings> {
     private const string _nwcSearchPattern = "*.nwc";
     private const string _navisworksViewName = "Navisworks";
-    private const string _transactionName = "Смена площадки";
     private readonly RevitRepository _revitRepository;
     private readonly ILoggerService _loggerService;
+    private readonly ILocalizationService _localization;
+    private readonly IErrorsService _errorsService;
+    private FileModelObjectExportSettings _currentSettings;
 
-    public NwcExportService(RevitRepository revitRepository, ILoggerService loggerService) {
+    public NwcExportService(
+        RevitRepository revitRepository,
+        ILoggerService loggerService,
+        ILocalizationService localization,
+        IErrorsService errorsService) {
         _revitRepository = revitRepository ?? throw new ArgumentNullException(nameof(revitRepository));
         _loggerService = loggerService ?? throw new ArgumentNullException(nameof(loggerService));
+        _localization = localization ?? throw new ArgumentNullException(nameof(localization));
+        _errorsService = errorsService ?? throw new ArgumentNullException(nameof(errorsService));
+        _currentSettings = null;
     }
 
 
     public void ExportModelObjects(
-        string targetFolder,
         string[] modelFiles,
-        bool clearTargetFolder = false,
+        FileModelObjectExportSettings settings,
         IProgress<int> progress = null,
-        CancellationToken ct = default) {
-        if(string.IsNullOrWhiteSpace(targetFolder)) {
-            throw new ArgumentException(nameof(targetFolder));
+        CancellationToken ct = default,
+        int processStart = 0) {
+        if(settings is null) {
+            throw new ArgumentException(nameof(settings));
         }
         if(modelFiles is null) {
             throw new ArgumentNullException(nameof(modelFiles));
         }
+        _currentSettings = settings;
 
-        Directory.CreateDirectory(targetFolder);
+        Directory.CreateDirectory(settings.TargetFolder);
 
-        if(clearTargetFolder) {
-            string[] navisFiles = Directory.GetFiles(targetFolder, _nwcSearchPattern);
+        if(settings.ClearTargetFolder) {
+            string[] navisFiles = Directory.GetFiles(settings.TargetFolder, _nwcSearchPattern);
             foreach(string navisFile in navisFiles) {
                 File.SetAttributes(navisFile, FileAttributes.Normal);
                 File.Delete(navisFile);
             }
         }
 
-        for(int i = 0; i < modelFiles.Length; i++) {
-            progress?.Report(i);
+        foreach(string modelFile in modelFiles) {
+            progress?.Report(processStart++);
             ct.ThrowIfCancellationRequested();
 
-            var config = FileModelObjectConfig.GetPluginConfig();
             try {
-                ExportDocument(modelFiles[i], targetFolder, config.IsExportRooms);
+                ExportDocument(modelFile, settings);
             } catch(Exception ex) {
-                _loggerService.Warning(ex, "Ошибка экспорта в nwc в файле: {@DocPath}", modelFiles[i]);
+                _loggerService.Warning(ex, "Ошибка экспорта в nwc в файле: {@DocPath}", modelFile);
+                _errorsService.AddError(modelFile,
+                    _localization.GetLocalizedString("Exceptions.NwcExportError", ex.Message),
+                    settings);
             }
         }
+        _currentSettings = null;
     }
 
 
-    private void ExportDocument(string fileName, string targetFolder, bool isExportRooms) {
+    private void ExportDocument(string fileName, FileModelObjectExportSettings settings) {
         _revitRepository.Application.FailuresProcessing += ApplicationOnFailuresProcessing;
         _revitRepository.UIApplication.DialogBoxShowing += UIApplicationOnDialogBoxShowing;
+
+        string targetFolder = settings.TargetFolder;
+        bool isExportRooms = settings.IsExportRooms;
 
         try {
             DocumentExtensions.UnloadAllLinks(fileName);
@@ -86,6 +102,9 @@ internal class NwcExportService : IModelsExportService {
                     _loggerService.Warning(
                         "Файл {@FileName} не содержит вид {@NavisView}.",
                         fileName, _navisworksViewName);
+                    _errorsService.AddError(fileName,
+                        _localization.GetLocalizedString("Exceptions.ViewNotFound", _navisworksViewName),
+                        settings);
                     return;
                 }
 
@@ -103,6 +122,9 @@ internal class NwcExportService : IModelsExportService {
                     _loggerService.Warning(
                         "Вид {@NavisView} в файле {@FileName} не содержит элементы.",
                          navisView.Name, fileName);
+                    _errorsService.AddError(fileName,
+                        _localization.GetLocalizedString("Exceptions.ViewWithoutElements", navisView.Name),
+                        settings);
                     return;
                 }
 
@@ -114,7 +136,8 @@ internal class NwcExportService : IModelsExportService {
                     ExportDocument(fileName, navisView, document, targetFolder, isExportRooms);
                 } else if(projectLocations.Length > 1) {
                     foreach(var projectLocation in projectLocations) {
-                        using(var transaction = document.StartTransaction(_transactionName)) {
+                        using(var transaction = document.StartTransaction(
+                            _localization.GetLocalizedString("Transaction.ChangeSite"))) {
                             document.ActiveProjectLocation = projectLocation;
                             transaction.Commit();
                         }
@@ -201,6 +224,11 @@ internal class NwcExportService : IModelsExportService {
             } catch(Exception ex) {
                 _loggerService.Warning(ex, $"Не удалось удалить элементы, вызывающие ошибки");
                 e.SetProcessingResult(FailureProcessingResult.ProceedWithRollBack);
+                if(_currentSettings is not null) {
+                    _errorsService.AddError(accessor.GetDocument().Title,
+                        _localization.GetLocalizedString("Exceptions.ElementsNotDeleted", ex.Message),
+                        _currentSettings);
+                }
                 return;
             }
             e.SetProcessingResult(FailureProcessingResult.ProceedWithCommit);

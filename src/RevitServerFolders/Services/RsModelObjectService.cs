@@ -5,6 +5,10 @@ using System.Linq;
 using System.Threading.Tasks;
 
 using dosymep.Revit.ServerClient;
+using dosymep.SimpleServices;
+
+using Ninject;
+using Ninject.Syntax;
 
 using RevitServerFolders.Models;
 using RevitServerFolders.Models.Rs;
@@ -13,12 +17,19 @@ using RevitServerFolders.Views.Rs;
 
 namespace RevitServerFolders.Services;
 internal sealed class RsModelObjectService : IModelObjectService {
+    private readonly IResolutionRoot _resolutionRoot;
     private readonly MainViewModel _mainViewModel;
     private readonly IReadOnlyCollection<IServerClient> _serverClients;
+    private readonly ILocalizationService _localization;
 
-    public RsModelObjectService(MainViewModel mainViewModel, IReadOnlyCollection<IServerClient> serverClients) {
+    public RsModelObjectService(IResolutionRoot resolutionRoot,
+        MainViewModel mainViewModel,
+        IReadOnlyCollection<IServerClient> serverClients,
+        ILocalizationService localization) {
+        _resolutionRoot = resolutionRoot;
         _mainViewModel = mainViewModel;
         _serverClients = serverClients;
+        _localization = localization;
     }
 
     public Task<ModelObject> SelectModelObjectDialog() {
@@ -27,7 +38,8 @@ internal sealed class RsModelObjectService : IModelObjectService {
 
     public Task<ModelObject> SelectModelObjectDialog(string rootFolder) {
         _mainViewModel.RemoveCancellation();
-        var window = new MainWindow() { DataContext = _mainViewModel, Title = "Выберите папку" };
+        var window = _resolutionRoot.Get<MainWindow>();
+        window.DataContext = _mainViewModel;
         if(window.ShowDialog() == true) {
             return Task.FromResult(_mainViewModel.SelectedItem.GetModelObject());
         }
@@ -41,7 +53,8 @@ internal sealed class RsModelObjectService : IModelObjectService {
         var serverClient = _serverClients.FirstOrDefault(
             item => item.ServerName.Equals(uri.Host, StringComparison.OrdinalIgnoreCase));
         if(serverClient == null) {
-            throw new InvalidOperationException($"Не был найден сервер \"{uri.Host}\".");
+            throw new InvalidOperationException(
+                _localization.GetLocalizedString("Exceptions.ServerNotFound", uri.Host));
         }
 
         string parent = Path.GetDirectoryName(uri.LocalPath);
@@ -55,7 +68,8 @@ internal sealed class RsModelObjectService : IModelObjectService {
             .FirstOrDefault(item => item.Name.Equals(currentFolder));
 
         return folderData == null
-            ? throw new InvalidOperationException($"Не была найдена папка \"{uri.LocalPath.Trim('\\').Trim('/')}\".")
+            ? throw new InvalidOperationException(
+                _localization.GetLocalizedString("Exceptions.FolderNotFound", uri.LocalPath.Trim('\\').Trim('/')))
             : (ModelObject) new RsFolderModel(folderData, folderContents, serverClient);
     }
 }

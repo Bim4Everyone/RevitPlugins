@@ -1,16 +1,20 @@
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
-using System.Windows;
+using System.Reflection;
 
 using Autodesk.Revit.Attributes;
 using Autodesk.Revit.DB;
 using Autodesk.Revit.UI;
 
 using dosymep.Bim4Everyone;
+using dosymep.Bim4Everyone.ProjectConfigs;
 using dosymep.Bim4Everyone.SimpleServices;
 using dosymep.Revit.ServerClient;
 using dosymep.SimpleServices;
+using dosymep.WpfCore.Ninject;
+using dosymep.WpfUI.Core.Ninject;
 using dosymep.Xpf.Core.Ninject;
 
 using Ninject;
@@ -35,19 +39,22 @@ internal sealed class FileServerExportCommand : BasePluginCommand {
             .ToSelf()
             .InSingletonScope();
 
-        kernel.UseXtraProgressDialog<RsViewModel>();
-        kernel.UseXtraProgressDialog<FileSystemViewModel>();
+        kernel.UseWpfUIProgressDialog<RsViewModel>();
+        kernel.UseWpfUIProgressDialog<FileSystemViewModel>();
 
         kernel.Bind<RsModelObjectConfig>()
-            .ToMethod(c => RsModelObjectConfig.GetPluginConfig());
+            .ToMethod(c => RsModelObjectConfig.GetPluginConfig(c.Kernel.Get<IConfigSerializer>()));
 
         kernel.Bind<IModelObjectService>()
             .To<RsModelObjectService>();
-        kernel.Bind<IModelsExportService>()
+        kernel.Bind<IModelsExportService<RsModelObjectExportSettings>>()
             .To<RvtExportService>()
             .InSingletonScope();
         kernel.Bind<ILoggerService>()
             .ToMethod(c => PluginLoggerService)
+            .InSingletonScope();
+        kernel.Bind<IErrorsService>()
+            .To<ErrorsService>()
             .InSingletonScope();
 
         kernel.UseXtraOpenFolderDialog<MainWindow>(
@@ -63,13 +70,19 @@ internal sealed class FileServerExportCommand : BasePluginCommand {
                 .ToArray());
 
         kernel.Bind<ViewModels.Rs.MainViewModel>().ToSelf();
+        kernel.BindMainWindow<RsViewModel, MainWindow>();
+        kernel.BindOtherWindow<ErrorsViewModel, ErrorsWindow>();
 
-        kernel.Bind<RsViewModel>().ToSelf();
-        kernel.Bind<MainWindow>().ToSelf()
-            .WithPropertyValue(nameof(Window.Title), PluginName)
-            .WithPropertyValue(nameof(Window.DataContext),
-                c => c.Kernel.Get<RsViewModel>());
+        kernel.UseWpfUIThemeUpdater();
+
+        string assemblyName = Assembly.GetExecutingAssembly().GetName().Name;
+
+        kernel.UseWpfLocalization($"/{assemblyName};component/assets/Localization/Language.xaml",
+            CultureInfo.GetCultureInfo("ru-RU"));
 
         Notification(kernel.Get<MainWindow>());
+        if(kernel.Get<IErrorsService>().ContainsErrors()) {
+            kernel.Get<ErrorsWindow>().ShowDialog();
+        }
     }
 }

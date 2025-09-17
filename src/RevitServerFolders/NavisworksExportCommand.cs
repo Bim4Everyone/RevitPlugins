@@ -1,13 +1,17 @@
 using System;
-using System.Windows;
+using System.Globalization;
+using System.Reflection;
 
 using Autodesk.Revit.Attributes;
 using Autodesk.Revit.DB;
 using Autodesk.Revit.UI;
 
 using dosymep.Bim4Everyone;
+using dosymep.Bim4Everyone.ProjectConfigs;
 using dosymep.Bim4Everyone.SimpleServices;
 using dosymep.SimpleServices;
+using dosymep.WpfCore.Ninject;
+using dosymep.WpfUI.Core.Ninject;
 using dosymep.Xpf.Core.Ninject;
 
 using Ninject;
@@ -25,38 +29,49 @@ internal sealed class NavisworksExportCommand : BasePluginCommand {
     }
 
     protected override void Execute(UIApplication uiApplication) {
-        if(!OptionalFunctionalityUtils.IsNavisworksExporterAvailable()) {
-            throw new InvalidOperationException(
-                "Отсутствует плагин Navisworks NWC Export Utility. Необходимо установить его.");
-        }
         using var kernel = uiApplication.CreatePlatformServices();
         kernel.Bind<RevitRepository>()
             .ToSelf()
             .InSingletonScope();
 
-        kernel.UseXtraProgressDialog<FileSystemViewModel>();
+        kernel.UseWpfUIProgressDialog<FileSystemViewModel>();
 
         kernel.Bind<FileModelObjectConfig>()
-            .ToMethod(c => FileModelObjectConfig.GetPluginConfig());
+            .ToMethod(c => FileModelObjectConfig.GetPluginConfig(c.Kernel.Get<IConfigSerializer>()));
 
         kernel.Bind<IModelObjectService>()
             .To<FileSystemModelObjectService>();
-        kernel.Bind<IModelsExportService>()
+        kernel.Bind<IModelsExportService<FileModelObjectExportSettings>>()
             .To<NwcExportService>()
             .InSingletonScope();
         kernel.Bind<ILoggerService>()
             .ToMethod(c => PluginLoggerService)
             .InSingletonScope();
+        kernel.Bind<IErrorsService>()
+            .To<ErrorsService>()
+            .InSingletonScope();
 
         kernel.UseXtraOpenFolderDialog<MainWindow>(
             initialDirectory: Environment.GetFolderPath(Environment.SpecialFolder.Desktop));
 
-        kernel.Bind<FileSystemViewModel>().ToSelf();
-        kernel.Bind<MainWindow>().ToSelf()
-            .WithPropertyValue(nameof(Window.Title), PluginName)
-            .WithPropertyValue(nameof(Window.DataContext),
-                c => c.Kernel.Get<FileSystemViewModel>());
+        kernel.BindMainWindow<FileSystemViewModel, MainWindow>();
+        kernel.BindOtherWindow<ErrorsViewModel, ErrorsWindow>();
+
+        kernel.UseWpfUIThemeUpdater();
+
+        string assemblyName = Assembly.GetExecutingAssembly().GetName().Name;
+
+        kernel.UseWpfLocalization($"/{assemblyName};component/assets/Localization/Language.xaml",
+            CultureInfo.GetCultureInfo("ru-RU"));
+
+        if(!OptionalFunctionalityUtils.IsNavisworksExporterAvailable()) {
+            throw new InvalidOperationException(
+                kernel.Get<ILocalizationService>().GetLocalizedString("NwcFromRvtWindow.PluginNotInstalled"));
+        }
 
         Notification(kernel.Get<MainWindow>());
+        if(kernel.Get<IErrorsService>().ContainsErrors()) {
+            kernel.Get<ErrorsWindow>().ShowDialog();
+        }
     }
 }
