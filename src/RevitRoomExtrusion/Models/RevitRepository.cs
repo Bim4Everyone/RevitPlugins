@@ -8,6 +8,7 @@ using Autodesk.Revit.DB.Architecture;
 using Autodesk.Revit.UI;
 
 using dosymep.Revit;
+using dosymep.Revit.Geometry;
 using dosymep.SimpleServices;
 
 
@@ -25,31 +26,32 @@ internal class RevitRepository {
     public Application Application => UIApplication.Application;
     public Document Document => ActiveUIDocument.Document;
 
+    // Метод получения 3Д-вида
     public View3D GetView3D(string familyName) {
         string name3Dview = string.Format(
             _localizationService.GetLocalizedString("RevitRepository.ViewName"), Application.Username, familyName);
-
         var view = new FilteredElementCollector(Document)
             .OfClass(typeof(View3D))
             .Where(v => v.Name.Equals(name3Dview, StringComparison.OrdinalIgnoreCase))
             .Cast<View3D>()
             .FirstOrDefault();
-
         return view ?? CreateView3D(name3Dview);
     }
 
+    // Метод получения выделенных помещений в Ревит 
     public List<Room> GetSelectedRooms() {
         return ActiveUIDocument.GetSelectedElements()
             .OfType<Room>()
             .ToList();
     }
 
+    // Метод выделения помещений в Ревит 
     public void SetSelectedRoom(ElementId elementId) {
-        List<ElementId> listRoomElements = [
-            elementId ];
+        List<ElementId> listRoomElements = [elementId];
         ActiveUIDocument.SetSelectedElements(listRoomElements);
     }
 
+    // Метод получения типа семейства
     public FamilySymbol GetFamilySymbol(Family family) {
         ElementFilter filter = new FamilySymbolFilter(family.Id);
         return new FilteredElementCollector(Document)
@@ -58,6 +60,43 @@ internal class RevitRepository {
             .First();
     }
 
+    // Метод получения базовой точки проекта
+    public double GetBasePointLocation() {
+        var basePoint = BasePoint.GetProjectBasePoint(Document);
+        return basePoint.Position.Z;
+    }
+
+    // Метод получения объединенного массива кривых
+    public CurveArrArray GetUnitedArrArray(List<Extrusion> extrusions) {
+        var solid = GetUnitedSolid(extrusions);
+        var bottomEdgeArrArray = solid.Faces
+            .OfType<Face>()
+            .ElementAtOrDefault(1)?
+            .EdgeLoops;
+        var curveArrArray = new CurveArrArray();
+        foreach(EdgeArray bottomEdgeArray in bottomEdgeArrArray) {
+            var curveArray = new CurveArray();
+            foreach(Edge bottomEdge in bottomEdgeArray) {
+                curveArray.Append(bottomEdge.AsCurve());
+            }
+            curveArrArray.Append(curveArray);
+        }
+        return curveArrArray;
+    }
+
+    // Метод получения списка всех пересекающихся пар
+    public IEnumerable<Curve> GetEqualCurves(List<Curve> curves) {
+        var curvesIntersect = new List<Curve>();
+        foreach(var (first, second) in GetPairs(curves)) {
+            if(IntersectOptions.IsEqual(first, second)) {
+                curvesIntersect.Add(first);
+                curvesIntersect.Add(second);
+            }
+        }
+        return curvesIntersect;
+    }
+
+    // Метод создания 3Д-вида
     private View3D CreateView3D(string name3Dview) {
         var viewTypes = new FilteredElementCollector(Document)
             .OfClass(typeof(ViewFamilyType))
@@ -65,16 +104,26 @@ internal class RevitRepository {
         var viewTypes3D = viewTypes
             .Where(vt => vt.ViewFamily == ViewFamily.ThreeDimensional)
             .First();
-        string transactionName = _localizationService.GetLocalizedString("RevitRepository.TransactionNameCreate");
-        using var t = Document.StartTransaction(transactionName);
         var view3D = View3D.CreateIsometric(Document, viewTypes3D.Id);
         view3D.Name = name3Dview;
-        t.Commit();
         return view3D;
     }
 
-    public double GetBasePointLocation() {
-        var basePoint = BasePoint.GetProjectBasePoint(Document);
-        return basePoint.Position.Z;
+    // Метод получения объединенного солида
+    private Solid GetUnitedSolid(List<Extrusion> extrusions) {
+        var solids = extrusions
+            .SelectMany(extrusion => extrusion.GetSolids())
+            .Where(solid => solid.Volume > 0)
+            .ToList();
+        return SolidExtensions.CreateUnitedSolids(solids).First();
+    }
+
+    // Метод получения пересекающихся пар
+    private IEnumerable<(Curve First, Curve Second)> GetPairs(List<Curve> curves) {
+        for(int i = 0; i < curves.Count; i++) {
+            for(int j = i + 1; j < curves.Count; j++) {
+                yield return (curves[i], curves[j]);
+            }
+        }
     }
 }

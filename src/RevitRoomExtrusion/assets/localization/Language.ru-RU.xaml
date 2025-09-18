@@ -4,13 +4,11 @@
 
     <system:String x:Key="FamilyDocument.TransactionName">Категория, выдавливание, материал</system:String>
     <system:String x:Key="FamilyDocument.MaterialName">стекло</system:String>
-    <system:String x:Key="FamilyDocument.FamilyName">Држ_Проверка_{0}_Отм.{1}</system:String>
-    <system:String x:Key="FamilyDocument.TemplateFamilyName">\Метрическая система, типовая модель.rft</system:String>
+    <system:String x:Key="FamilyDocument.FamilyName">{0}Држ_Проверка_{1}_Отм.{2}{3}</system:String>
+    <system:String x:Key="FamilyDocument.TemplateFamilyName">{0}\Метрическая система, типовая модель.rft</system:String>
 
-    <system:String x:Key="FamilyLoader.TransactionNameLoad">Загрузка семейства дорожек</system:String>
-    <system:String x:Key="FamilyLoader.TransactionNamePlace">Размещение семейства дорожек</system:String>
-    
-    <system:String x:Key="RevitRepository.TransactionNameCreate">Создание 3D вида для проверки дорожек</system:String>
+    <system:String x:Key="InstanceManager.TransactionName">Выдавливание помещений</system:String>   
+
     <system:String x:Key="RevitRepository.ViewName">${0}/{1}/Проверка дорожек</system:String>
 
     <system:String x:Key="MainViewModel.DefaultFamilyName">Машино-места</system:String>
@@ -35,6 +33,10 @@
     <system:String x:Key="MainWindow.ExtrusionHeightMmTooltip">Высота в миллиметрах, от чистого пола</system:String>
     <system:String x:Key="MainWindow.FamilyName">Введите имя семейства</system:String>
     <system:String x:Key="MainWindow.FamilyNameTooltip">Используется в наименовании загружаемого семейства</system:String>
+    <system:String x:Key="MainWindow.JoinExtrusion">Объединить выдавливания</system:String>
+    <system:String x:Key="MainWindow.JoinExtrusionTooltip">Соприкасающиеся выдавливания будут объединены</system:String>
+    <system:String x:Key="MainWindow.OnContent">Включено</system:String>
+    <system:String x:Key="MainWindow.OffContent">Выключено</system:String>
     <system:String x:Key="MainWindow.HeightError">Высота должна быть числом</system:String>
     <system:String x:Key="MainWindow.HeightErrorNegative">Высота должна быть положительной</system:String>
     <system:String x:Key="MainWindow.HeightErrorZero">Высота должна быть больше нуля</system:String>

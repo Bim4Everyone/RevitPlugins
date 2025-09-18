@@ -4,13 +4,11 @@
     
     <system:String x:Key="FamilyDocument.TransactionName">Category, extrusion, material</system:String>    
     <system:String x:Key="FamilyDocument.MaterialName">glass</system:String>
-    <system:String x:Key="FamilyDocument.FamilyName">Road_Check_{0}_Elev.{1}</system:String>
-    <system:String x:Key="FamilyDocument.TemplateFamilyName">\English\Metric Generic Model.rft</system:String>
+    <system:String x:Key="FamilyDocument.FamilyName">{0}Road_Check_{1}_Elev.{2}{3}</system:String>
+    <system:String x:Key="FamilyDocument.TemplateFamilyName">{0}\English\Metric Generic Model.rft</system:String>
 
-    <system:String x:Key="FamilyLoader.TransactionNameLoad">Loading a family of roads</system:String>
-    <system:String x:Key="FamilyLoader.TransactionNamePlace">Placing a family of roads</system:String>
+    <system:String x:Key="InstanceManager.TransactionName">Room extrusion</system:String>
 
-    <system:String x:Key="RevitRepository.TransactionNameCreate">Creating a 3D View for check roads</system:String>
     <system:String x:Key="RevitRepository.ViewName">${0}/{1}/Check roads</system:String>
 
     <system:String x:Key="MainViewModel.DefaultFamilyName">Parking spaces</system:String>
@@ -31,10 +29,14 @@
     <system:String x:Key="MainWindow.Title">Extruding rooms</system:String>
     <system:String x:Key="MainWindow.ButtonOk">Extrude</system:String>
     <system:String x:Key="MainWindow.ButtonCancel">Cancel</system:String>
-    <system:String x:Key="MainWindow.ExtrusionHeightMm">Enter extrusion height (in millimeters)</system:String>
+    <system:String x:Key="MainWindow.ExtrusionHeightMm">Enter extrusion height</system:String>
     <system:String x:Key="MainWindow.ExtrusionHeightMmTooltip">In millimeters, from finished floor</system:String>
     <system:String x:Key="MainWindow.FamilyName">Enter family name</system:String>
     <system:String x:Key="MainWindow.FamilyNameTooltip">Used in the name of the loaded family</system:String>
+    <system:String x:Key="MainWindow.JoinExtrusion">Join extrusion</system:String>
+    <system:String x:Key="MainWindow.JoinExtrusionTooltip">Touching extrusions will be joined</system:String>
+    <system:String x:Key="MainWindow.OnContent">Enable</system:String>
+    <system:String x:Key="MainWindow.OffContent">Disable</system:String>
     <system:String x:Key="MainWindow.HeightError">Height must be a number</system:String>
     <system:String x:Key="MainWindow.HeightErrorNegative">Height must be positive</system:String>
     <system:String x:Key="MainWindow.HeightErrorZero">Height must be greater than zero</system:String>
