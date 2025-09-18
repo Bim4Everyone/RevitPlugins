@@ -134,7 +134,7 @@ namespace RevitClashDetective.Models.RevitClashReport {
         private ICollection<ClashModel> GetClashModels(XElement clashTest) {
             return clashTest.Descendants("clashresult")
                 .Select(c => GetClashModel(c))
-                .Where(c => c.MainElement.Id.IsNotNull() && c.OtherElement.Id.IsNotNull())
+                .Where(c => (c.MainElement?.Id.IsNotNull() ?? false) && (c.OtherElement?.Id.IsNotNull() ?? false))
                 .ToArray();
         }
 
@@ -152,6 +152,8 @@ namespace RevitClashDetective.Models.RevitClashReport {
             if(elements.Length == 2) {
                 clash.MainElement = elements[0];
                 clash.OtherElement = elements[1];
+            } else {
+                throw new InvalidOperationException($"В коллизии \'{name}\' не 2 элемента");
             }
             return clash.SetRevitRepository(_revitRepository);
         }
