@@ -465,20 +465,13 @@
                                         </DataTemplate>
                                     </DataGridTemplateColumn.CellTemplate>
                                 </DataGridTemplateColumn>
-                                <DataGridTemplateColumn
+                                <DataGridTextColumn
                                     CanUserResize="False"
-                                    SortMemberPath="IsPlaced"
                                     Width="Auto"
+                                    IsReadOnly="True"
+                                    Binding="{Binding IsPlacedStatus}"
                                     Header="{StaticResource SheetStatusHeader}">
-                                    <DataGridTemplateColumn.CellTemplate>
-                                        <DataTemplate>
-                                            <ui:TextBlock
-                                                HorizontalAlignment="Center"
-                                                Text="{Binding IsPlacedStatus}">
-                                            </ui:TextBlock>
-                                        </DataTemplate>
-                                    </DataGridTemplateColumn.CellTemplate>
-                                </DataGridTemplateColumn>
+                                </DataGridTextColumn>
                                 <DataGridTemplateColumn
                                     CanUserResize="False">
                                     <DataGridTemplateColumn.CellTemplate>
