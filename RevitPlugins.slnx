@@ -88,6 +88,9 @@
   <Project Path="src/RevitExamplePlugin/RevitExamplePlugin.csproj">
     <Platform Project="x64" />
   </Project>
+  <Project Path="src/RevitExportSpecToExcel/RevitExportSpecToExcel.csproj">
+    <Platform Project="x64" />
+  </Project>
   <Project Path="src/RevitFamilyExplorer/RevitFamilyExplorer.csproj">
     <Platform Project="x64" />
   </Project>
