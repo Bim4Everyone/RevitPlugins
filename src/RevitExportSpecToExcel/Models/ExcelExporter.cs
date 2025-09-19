@@ -66,7 +66,12 @@ namespace RevitExportSpecToExcel.Models
 
         private string GenerateSheetName(string name) {
             var charsToRemove = _constantsProvider.ProhibitedExcelChars;
-            string trimName = new string(name.Trim().Take(_constantsProvider.DocNameMaxLength).ToArray()).Trim();
+
+            string trimName = name.Trim();
+            if(trimName.Length > _constantsProvider.DocNameMaxLength) {
+                trimName = trimName.Substring(0, _constantsProvider.DocNameMaxLength - 1);
+            }
+
             foreach(char charToRemove in charsToRemove) {
                 trimName = trimName.Replace(charToRemove, '_');
             }
