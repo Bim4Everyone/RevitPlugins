@@ -1,0 +1,16 @@
+<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:system="clr-namespace:System;assembly=mscorlib">
+
+    <system:String x:Key="MainWindow.Title">Создать схемы</system:String>
+
+    <system:String x:Key="MainWindow.CriterionBy">Схемы по:</system:String>
+    <system:String x:Key="MainWindow.CriterionText">Поиск системы:</system:String>
+    <system:String x:Key="MainWindow.SystemName">Имя системы</system:String>
+    <system:String x:Key="MainWindow.SharedSystemName">ФОП_ВИС_Имя системы</system:String>
+    <system:String x:Key="MainWindow.CombineViewsCheckBox">Все выделенное на один вид</system:String>
+    <system:String x:Key="MainWindow.OkButton">Ок</system:String>
+    <system:String x:Key="MainWindow.CancelButton">Отмена</system:String>
+    <system:String x:Key="MainWindow.ErrorMessage">Не выделены системы</system:String>
+   
+</ResourceDictionary>

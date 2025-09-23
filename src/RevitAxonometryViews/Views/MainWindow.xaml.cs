@@ -1,15 +1,29 @@
 using System.Windows;
 using System.Windows.Data;
 
+using dosymep.SimpleServices;
+
 using RevitAxonometryViews.ViewModels;
 
 namespace RevitAxonometryViews.Views;
 public partial class MainWindow {
     protected CollectionViewSource SystemsCollection;
 
-    public MainWindow() {
+    /// <summary>
+    /// Иницализирует главное окно плагина.
+    /// </summary>
+    public MainWindow(
+        ILoggerService loggerService,
+        ISerializationService serializationService,
+        ILanguageService languageService, ILocalizationService localizationService,
+        IUIThemeService uiThemeService, IUIThemeUpdaterService themeUpdaterService)
+        : base(loggerService,
+            serializationService,
+            languageService, localizationService,
+            uiThemeService, themeUpdaterService) {
         InitializeComponent();
     }
+
 
     // override-ы нужны потому что мы удалили конфиг, в котором переопределяются эти вещи
     public override string PluginName => nameof(RevitAxonometryViews);
