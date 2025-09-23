@@ -7,35 +7,34 @@ using dosymep.Revit;
 
 namespace RevitRoomAnnotations.Models;
 public class RevitRoom {
-    private readonly ElementId _roomId;
+    private const string _roomNumber = "Номер";
+    private const string _roomName = "Имя";
+    private readonly SpatialElement _room;
     private readonly ElementId _linkInstanceId;
 
     public RevitRoom(SpatialElement room, LinkInstanceElement linkInstanceElement) {
-        _roomId = room.Id;
+        _room = room;
         _linkInstanceId = linkInstanceElement.Id;
-        AdditionalNumber = room.GetParamValueOrDefault<string>(SharedParamsConfig.Instance.ApartmentNumberExtra.Name);
-        AdditionalName = room.GetParamValueOrDefault<string>(SharedParamsConfig.Instance.ApartmentNameExtra.Name);
-        Area = room.GetParamValue<double>(SharedParamsConfig.Instance.RoomArea.Name);
-        AreaWithCoefficient = room.GetParamValue<double>(SharedParamsConfig.Instance.RoomAreaWithRatio.Name);
-        GroupSortOrder = room.GetParamValueOrDefault<string>(SharedParamsConfig.Instance.ApartmentGroupName.Name);
-        RoomCategory = room.GetParamValueOrDefault<string>(SharedParamsConfig.Instance.RoomFireCategory.Name);
-        FireZone = room.GetParamValueOrDefault<string>(SharedParamsConfig.Instance.FireCompartmentShortName.Name);
-        Level = room.GetParamValueOrDefault<string>(SharedParamsConfig.Instance.Level.Name);
-        Group = room.GetParamValueOrDefault<string>(SharedParamsConfig.Instance.RoomGroupShortName.Name);
-        Building = room.GetParamValueOrDefault<string>(SharedParamsConfig.Instance.RoomBuildingShortName.Name);
-        Section = room.GetParamValueOrDefault<string>(SharedParamsConfig.Instance.RoomSectionShortName.Name);
     }
 
-    public string CombinedId => $"{_roomId}_{_linkInstanceId}";
-    public string AdditionalNumber { get; }
-    public string AdditionalName { get; }
-    public double? Area { get; }
-    public double? AreaWithCoefficient { get; }
-    public string GroupSortOrder { get; }
-    public string RoomCategory { get; }
-    public string FireZone { get; }
-    public string Level { get; }
-    public string Group { get; }
-    public string Building { get; }
-    public string Section { get; }
+    public string CombinedId => GetCombinedId();
+    public string AdditionalNumber => GetParamValue<string>(_room, _roomNumber);
+    public string AdditionalName => GetParamValue<string>(_room, _roomName);
+    public double? Area => GetParamValue<double>(_room, SharedParamsConfig.Instance.RoomAreaWithRatio.Name);
+    public double? AreaWithCoefficient => GetParamValue<double>(_room, SharedParamsConfig.Instance.ApartmentGroupName.Name);
+    public string GroupSortOrder => GetParamValue<string>(_room, SharedParamsConfig.Instance.ApartmentGroupName.Name);
+    public string RoomCategory => GetParamValue<string>(_room, SharedParamsConfig.Instance.RoomFireCategory.Name);
+    public string FireZone => GetParamValue<string>(_room, SharedParamsConfig.Instance.FireCompartmentShortName.Name);
+    public string Level => GetParamValue<string>(_room, SharedParamsConfig.Instance.Level.Name);
+    public string Group => GetParamValue<string>(_room, SharedParamsConfig.Instance.RoomGroupShortName.Name);
+    public string Building => GetParamValue<string>(_room, SharedParamsConfig.Instance.RoomBuildingShortName.Name);
+    public string Section => GetParamValue<string>(_room, SharedParamsConfig.Instance.RoomSectionShortName.Name);
+
+    private T GetParamValue<T>(SpatialElement room, string paramName) {
+        return room.GetParamValueOrDefault<T>(paramName);
+    }
+
+    private string GetCombinedId() {
+        return $"LinkId: {_linkInstanceId}";
+    }
 }
