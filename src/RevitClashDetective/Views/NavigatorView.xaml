@@ -224,7 +224,6 @@
                                     Width="Auto"
                                     MinWidth="20"
                                     HorizontalAlignment="Right"
-                                    MouseDown="PickElementsButtonDown"
                                     Focusable="False"
                                     Glyph="{dx:DXImage 'Images/RichEdit/Select_16x16.png'}"
                                     Command="{Binding ElementName=_dg, Path=DataContext.SelectedReport.PickFirstElementsCommand}" />
