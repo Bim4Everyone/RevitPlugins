@@ -11,8 +11,11 @@ namespace RevitClashDetective.Resources;
 /// Кастомный грид, в котором можно делать кнопки в ячейках, которые не будут менять SelectedItems, когда их больше 1
 /// </summary>
 internal class CustomGridControl : GridControl {
+    public bool PreventSelectedItemsResetByCellButton { get; set; }
+
     protected override void OnPreviewMouseLeftButtonDown(MouseButtonEventArgs e) {
-        if(SelectedItems.Count > 1
+        if(PreventSelectedItemsResetByCellButton
+            && SelectedItems.Count > 1
             && LayoutTreeHelper.GetVisualParents((DependencyObject) e.OriginalSource)
             .OfType<Button>()
             .FirstOrDefault() != null) {

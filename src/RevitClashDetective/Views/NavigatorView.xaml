@@ -137,12 +137,13 @@
         </DockPanel>
 
         <res:CustomGridControl x:Name="_dg"
-                         Grid.Row="2"
-                         AllowCollectionView="False"
-                         SelectionMode="Row"
-                         SelectedItem="{Binding SelectedReport.SelectedGuiClash}"
-                         SelectedItems="{Binding SelectedReport.SelectedGuiClashes}"
-                         ItemsSource="{Binding SelectedReport.GuiClashes}">
+                               Grid.Row="2"
+                               AllowCollectionView="False"
+                               SelectionMode="Row"
+                               PreventSelectedItemsResetByCellButton="True"
+                               SelectedItem="{Binding SelectedReport.SelectedGuiClash}"
+                               SelectedItems="{Binding SelectedReport.SelectedGuiClashes}"
+                               ItemsSource="{Binding SelectedReport.GuiClashes}">
 
             <res:CustomGridControl.GroupSummary>
                 <dxg:GridSummaryItem SummaryType="Count" />
