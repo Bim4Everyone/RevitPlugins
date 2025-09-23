@@ -273,24 +273,43 @@ namespace RevitClashDetective.Models {
             SelectAndShowElement(elements.Select(item => item.GetElement(DocInfos)), bbox, additionalSize, view);
         }
 
+
+#if REVIT_2023_OR_LESS
         public void SelectElements(ICollection<ElementModel> elementModels) {
             var elements = elementModels.Select(e => e.GetElement(DocInfos))
                 .Where(e => e != null)
+                .Where(e => e.IsFromDocument(_document))
+                .Select(e => e.Id)
                 .ToArray();
             if(elements.Length == 0) {
                 return;
             }
-#if REVIT_2023_OR_LESS
-            var elementsFromActiveDoc = elements.Where(item => item.IsFromDocument(_document))
-                .Select(item => item.Id)
-                .ToArray();
-            if(elementsFromActiveDoc.Length > 0) {
-                _uiDocument.Selection.SetElementIds(elementsFromActiveDoc);
-            }
-#else
-            _uiDocument.Selection.SetReferences(elements.Select(e => new Reference(e)).ToArray());
-#endif
+            _uiDocument.Selection.SetElementIds(elements);
         }
+#else
+        public void SelectElements(ICollection<ElementModel> elementModels) {
+            var links = GetRevitLinkInstances();
+            var elementsInfo = elementModels.Select(e => new {
+                DocInfo = e.GetDocInfo(DocInfos),
+                Element = e.GetElement(DocInfos)
+            })
+                .Where(item => item.DocInfo != null && item.Element != null)
+                .ToArray();
+            var references = new List<Reference>();
+            foreach(var elInfo in elementsInfo) {
+                if(elInfo.Element.IsFromDocument(Doc)) {
+                    references.Add(new Reference(elInfo.Element));
+                } else {
+                    var link = links.FirstOrDefault(l => l.GetLinkDocument().Equals(elInfo.DocInfo.Doc)
+                        && l.GetTransform().AlmostEqual(elInfo.DocInfo.Transform));
+                    if(link != null) {
+                        references.Add(new Reference(elInfo.Element).CreateLinkReference(link));
+                    }
+                }
+            }
+            _uiDocument.Selection.SetReferences(references);
+        }
+#endif
 
         public void SelectAndShowElement(ICollection<ElementModel> elements, IView3DSetting viewSettings) {
             if(elements is null) {
