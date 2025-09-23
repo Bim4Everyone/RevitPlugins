@@ -9,8 +9,10 @@
     <system:String x:Key="MainWindow.SystemName">Systems name</system:String>
     <system:String x:Key="MainWindow.SharedSystemName">Shared system name</system:String>
     <system:String x:Key="MainWindow.CombineViewsCheckBox">All selected in one view</system:String>
-    <system:String x:Key="MainWindow.OkButton">Ok</system:String>
-    <system:String x:Key="MainWindow.CancelButton">Cancel</system:String>
+    <system:String x:Key="MainWindow.ButtonOk">Ok</system:String>
+    <system:String x:Key="MainWindow.ButtonCancel">Cancel</system:String>
     <system:String x:Key="MainWindow.ErrorMessage">Systems are not selected</system:String>
+    <system:String x:Key="MainWindow.SearchHint">Type system name...</system:String>
+    <system:String x:Key="MainWindow.ComboHint">The name of the parameter by which filtering will be performed</system:String>
    
 </ResourceDictionary>

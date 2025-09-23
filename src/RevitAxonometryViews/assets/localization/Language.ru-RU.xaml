@@ -9,8 +9,10 @@
     <system:String x:Key="MainWindow.SystemName">Имя системы</system:String>
     <system:String x:Key="MainWindow.SharedSystemName">ФОП_ВИС_Имя системы</system:String>
     <system:String x:Key="MainWindow.CombineViewsCheckBox">Все выделенное на один вид</system:String>
-    <system:String x:Key="MainWindow.OkButton">Ок</system:String>
-    <system:String x:Key="MainWindow.CancelButton">Отмена</system:String>
-    <system:String x:Key="MainWindow.ErrorMessage">Не выделены системы</system:String>
-   
+    <system:String x:Key="MainWindow.ButtonOk">Ок</system:String>
+    <system:String x:Key="MainWindow.ButtonCancel">Отмена</system:String>
+    <system:String x:Key="MainWindow.ErrorText">Не выделены системы</system:String>
+    <system:String x:Key="MainWindow.SearchHint">Введите имя системы...</system:String>
+    <system:String x:Key="MainWindow.ComboHint">Имя параметра, по которому будет вестись фильтрация</system:String>
+
 </ResourceDictionary>

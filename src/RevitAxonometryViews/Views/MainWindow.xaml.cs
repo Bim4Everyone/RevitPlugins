@@ -7,7 +7,7 @@ using RevitAxonometryViews.ViewModels;
 
 namespace RevitAxonometryViews.Views;
 public partial class MainWindow {
-    protected CollectionViewSource SystemsCollection;
+    protected CollectionViewSource _systemsCollection;
 
     /// <summary>
     /// Иницализирует главное окно плагина.

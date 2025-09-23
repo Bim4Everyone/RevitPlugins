@@ -43,13 +43,6 @@ public class RevitAxonometryViewsCommand : BasePluginCommand {
         kernel.UseWpfUIThemeUpdater();
 
         kernel.BindMainWindow<MainViewModel, MainWindow>();
-        //kernel.Bind<MainViewModel>().ToSelf()
-        //    .InSingletonScope();
-        //kernel.Bind<MainWindow>().ToSelf()
-        //    .WithPropertyValue(nameof(Window.DataContext),
-        //        c => c.Kernel.Get<MainViewModel>())
-        //    .WithPropertyValue(nameof(Window.Title), PluginName);
-
 
         kernel.Bind<CollectorOperator>().ToSelf()
             .InSingletonScope();
@@ -67,7 +60,7 @@ public class RevitAxonometryViewsCommand : BasePluginCommand {
         // Настройка локализации,
         // установка дефолтной локализации "ru-RU"
         kernel.UseWpfLocalization(
-            $"/{assemblyName};component/Localization/Language.xaml",
+            $"/{assemblyName};component/assets/Localization/Language.xaml",
             CultureInfo.GetCultureInfo("ru-RU"));
 
         Notification(kernel.Get<MainWindow>());
