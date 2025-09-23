@@ -98,7 +98,6 @@ internal class CreatesLinesForFinishing {
         var currentDirection = currentLine.LineForFinishing.Direction.Normalize();
 
         double correctOffset = currentLine.Offset * (currentLine.LayerNumber + 1);
-        //double correctOffset = currentLine.Offset;
         var currentExtendedLine = ExtendLine(currentLine.LineForFinishing, correctOffset);
         IList<XYZ> intersectionPoints = [];
         foreach(var line in groupedLines) {

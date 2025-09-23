@@ -95,8 +95,12 @@ internal class RevitWallHandler {
     }
 
     public Line GetWallLineFromSolid() {
-        var centroidSolidWallPoint = GetWallSolidCentroidPoint();
-        double zPoint = centroidSolidWallPoint.Z;
+        var bb = _wallElement.get_BoundingBox(null);
+        double zMin = bb.Min.Z;
+        double zMax = bb.Max.Z;
+
+        // Центр по Z
+        double zPoint = (zMin + zMax) / 2.0;
 
         var wallLine = _wallElement.Location as LocationCurve;
         var wallCurve = _revitRepository.TransformCurveToExactZ(wallLine.Curve, zPoint);
@@ -145,11 +149,11 @@ internal class RevitWallHandler {
         }
     }
 
-    public XYZ GetWallSolidCentroidPoint() {
-        var wallSolid = GetWallSolid();
-        var wallCentroidPoint = wallSolid.ComputeCentroid();
-        return wallCentroidPoint;
-    }
+    //public XYZ GetWallSolidCentroidPoint() {
+    //    var wallSolid = GetWallSolid();
+    //    var wallCentroidPoint = wallSolid.ComputeCentroid();
+    //    return wallCentroidPoint;
+    //}
 
     /// <summary>
     /// Возвращает направление вектора внутрь помещения

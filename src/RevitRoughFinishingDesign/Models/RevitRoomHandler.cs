@@ -182,10 +182,4 @@ internal class RevitRoomHandler {
         }
     }
 
-    //public WallDesignData GetWallDesignData(Element wall) {
-    //    double zPoint = _revitRepository.GetVerticalPointFromActiveView();
-    //    LocationCurve wallLine = wall.Location as LocationCurve;
-    //    Curve wallCurve = TransformCurveToExactZ(wallLine.Curve, zPoint);
-
-    //}
 }
