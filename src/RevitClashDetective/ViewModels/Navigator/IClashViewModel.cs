@@ -1,12 +1,19 @@
 using System.Collections.Generic;
+using System.ComponentModel;
 
 using RevitClashDetective.Models.Clashes;
 
 namespace RevitClashDetective.ViewModels.Navigator;
-internal interface IClashViewModel {
+internal interface IClashViewModel : INotifyPropertyChanged {
     ClashStatus ClashStatus { get; set; }
 
     string ClashName { get; set; }
+
+#if REVIT_2023_OR_LESS
+    int FirstId { get; }
+#else
+    long FirstId { get; }
+#endif
 
     string FirstTypeName { get; }
 
@@ -17,6 +24,12 @@ internal interface IClashViewModel {
     string FirstLevel { get; }
 
     string FirstCategory { get; }
+
+#if REVIT_2023_OR_LESS
+    int SecondId { get; }
+#else
+    long SecondId { get; }
+#endif
 
     string SecondTypeName { get; }
 
