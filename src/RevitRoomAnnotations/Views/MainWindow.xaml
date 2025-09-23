@@ -7,29 +7,55 @@
     xmlns:base="clr-namespace:dosymep.WPF.Views"
     xmlns:local="clr-namespace:RevitRoomAnnotations.Views"
     xmlns:vms="clr-namespace:RevitRoomAnnotations.ViewModels"
-    xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
+    xmlns:b="http://schemas.microsoft.com/xaml/behaviors"
     xmlns:core="clr-namespace:dosymep.WpfUI.Core"
     xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
     xmlns:me="clr-namespace:dosymep.WpfCore.MarkupExtensions;assembly=dosymep.WpfCore"
-    
-    mc:Ignorable="d"
-    Title="{me:LocalizationSource MainWindow.Title}"
-    
+    xmlns:converters="clr-namespace:dosymep.WpfCore.Converters;assembly=dosymep.WpfCore"
+    xmlns:behaviors="clr-namespace:dosymep.WpfCore.Behaviors;assembly=dosymep.WpfCore"
+    mc:Ignorable="d" 
     Height="500"
-    Width="700"
-    
+    Width="700"    
     MinHeight="500"
     MinWidth="700"
-    
+    Title="{me:LocalizationSource MainWindow.Title}"
     d:DataContext="{d:DesignInstance vms:MainViewModel, IsDesignTimeCreatable=False}">
 
-    <i:Interaction.Triggers>
-        <i:EventTrigger
+    <Window.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary
+                    Source="CustomStyles.xaml" />
+            </ResourceDictionary.MergedDictionaries>
+            <ui:SymbolRegular
+                x:Key="StatusLoaded">arrowDownload16</ui:SymbolRegular>
+            <ui:SymbolRegular
+                x:Key="StatusUnloaded">dismiss16</ui:SymbolRegular>
+            <ui:TextBlock
+                x:Key="LinkName"
+                Text="{me:LocalizationSource MainWindow.LinkName}" />
+            <ui:TextBlock
+                x:Key="LinkStatus"
+                Text="{me:LocalizationSource MainWindow.LinkStatus}" />
+            <converters:BoolToObjectConverter
+                x:Key="StatusIconConverter"
+                TrueValue="{StaticResource StatusLoaded}"
+                FalseValue="{StaticResource StatusUnloaded}" />
+        </ResourceDictionary>
+    </Window.Resources>
+
+    <b:Interaction.Behaviors>
+        <behaviors:WpfAttachServiceBehavior
+            AttachableService="{Binding MessageBoxService}" />
+    </b:Interaction.Behaviors>
+
+    <b:Interaction.Triggers>
+        <b:EventTrigger
             EventName="Loaded">
-            <i:InvokeCommandAction
+            <b:InvokeCommandAction
                 Command="{Binding LoadViewCommand}" />
-        </i:EventTrigger>
-    </i:Interaction.Triggers>
+        </b:EventTrigger>
+    </b:Interaction.Triggers>
 
     <Grid>
         <Grid.RowDefinitions>
@@ -44,128 +70,74 @@
         <ui:TitleBar
             Grid.Row="0"
             Title="{me:LocalizationSource MainWindow.Title}" />
-        
+
         <Border
             Grid.Row="1"
-            CornerRadius="8"
-            Padding="5"
-            Margin="10,0,10,0"
-            Background="{DynamicResource CardBackground}">
-
-            <DataGrid
-                AutoGenerateColumns="False"
-                CanUserAddRows="False"
-                CanUserDeleteRows="False"
-                IsReadOnly="False"
-                Grid.Row="1"
-                Margin="16"
-                HeadersVisibility="Column"
-                SelectionMode="Single"
-                SelectionUnit="FullRow"
-                GridLinesVisibility="All"
-                ItemsSource="{Binding LinkedFiles}">
-                
+            Grid.Column="0"
+            Margin="10,0,5,0"
+            Style="{StaticResource CustomBorder}">
+            <ui:DataGrid                
+                ItemsSource="{Binding Links}"
+                Style="{StaticResource CustomResizableDataGridStyle}">
                 <DataGrid.Columns>
                     <DataGridTemplateColumn
-                        Width="90">
-
-                        <DataGridTemplateColumn.Header>
-                            <TextBlock
-                                Text="{me:LocalizationSource MainWindow.Select}" />
-
-                        </DataGridTemplateColumn.Header>
-                        <DataGridTemplateColumn.CellTemplate>
-                            <DataTemplate>
-                                <Grid
-                                    ToolTipService.ShowOnDisabled="True">
-                                    <Grid.Style>
-                                        <Style
-                                            TargetType="Grid">
-                                            <Setter
-                                                Property="ToolTip"
-                                                Value="{x:Null}" />
-                                            <Style.Triggers>
-                                                <DataTrigger
-                                                    Value="False"
-                                                    Binding="{Binding IsLoaded}">
-                                                    <Setter
-                                                        Property="ToolTip"
-                                                        Value="{DynamicResource MainWindow.ToolTipNoLoaded}" />
-                                                </DataTrigger>
-                                            </Style.Triggers>
-                                        </Style>
-                                    </Grid.Style>
-
-                                    <CheckBox
-                                        HorizontalAlignment="Center"
-                                        VerticalAlignment="Center"
-                                        IsChecked="{Binding IsSelected, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-                                        IsEnabled="{Binding IsLoaded}"/>
-                                </Grid>
-                            </DataTemplate>
-
-                        </DataGridTemplateColumn.CellTemplate>
-                    </DataGridTemplateColumn>
-
-                    <DataGridTemplateColumn
-                        Width="90">
-                        
-                        <DataGridTemplateColumn.Header>
-                            <TextBlock
-                                Text="{me:LocalizationSource MainWindow.Loaded}" />
-
-                        </DataGridTemplateColumn.Header>
+                        Width="60"
+                        CanUserResize="False">
                         <DataGridTemplateColumn.CellTemplate>
                             <DataTemplate>
                                 <CheckBox
-                                    IsEnabled="False"
                                     HorizontalAlignment="Center"
                                     VerticalAlignment="Center"
-                                    IsChecked="{Binding IsLoaded}" />
+                                    IsChecked="{Binding IsChecked, UpdateSourceTrigger=PropertyChanged}" />
                             </DataTemplate>
                         </DataGridTemplateColumn.CellTemplate>
                     </DataGridTemplateColumn>
-
                     <DataGridTextColumn
-                        IsReadOnly="True"
+                        Width="420"
+                        Header="{StaticResource LinkName}"
+                        Binding="{Binding Name}" />
+                    <DataGridTemplateColumn
                         Width="*"
-                        Binding="{Binding Name}">
-                        
-                        <DataGridTextColumn.Header>
-                            <TextBlock
-                                Text="{me:LocalizationSource MainWindow.LinkedFiles}" />
-
-                        </DataGridTextColumn.Header>
-                    </DataGridTextColumn>
+                        Header="{StaticResource LinkStatus}">
+                        <DataGridTemplateColumn.CellTemplate>
+                            <DataTemplate>
+                                <StackPanel
+                                    Orientation="Horizontal">
+                                    <ui:SymbolIcon
+                                        Width="20"
+                                        Height="20"
+                                        Symbol="{Binding IsLoaded, Converter={StaticResource StatusIconConverter}}" />
+                                    <ui:TextBlock
+                                        Margin="10,0,5,0"
+                                        VerticalAlignment="Center"
+                                        Text="{Binding StatusString, UpdateSourceTrigger=PropertyChanged}" />
+                                </StackPanel>
+                            </DataTemplate>
+                        </DataGridTemplateColumn.CellTemplate>
+                    </DataGridTemplateColumn>
                 </DataGrid.Columns>
-            </DataGrid>
-        </Border>
+            </ui:DataGrid>
+        </Border>        
         <StackPanel
-            Grid.Row="2"
+            Grid.Row="3"
+            Grid.Column="2"
             Orientation="Horizontal"
             HorizontalAlignment="Right">
-
             <ui:TextBlock
-                Margin="10"
-                Foreground="Orange"
                 VerticalAlignment="Center"
-                Text="{Binding ErrorText}" />
-
+                Style="{StaticResource CustomErrorText}"
+                Text="{Binding ErrorText, UpdateSourceTrigger=PropertyChanged}" />
             <ui:Button
-                Margin="10"
-                Width="80"
-                Appearance="Info"
                 Click="ButtonOk_Click"
+                Style="{StaticResource CustomContentButton}"
                 Content="{me:LocalizationSource MainWindow.ButtonOk}"
-                Command="{Binding AcceptViewCommand}" />
-
+                Command="{Binding AcceptViewCommand, UpdateSourceTrigger=PropertyChanged}" />
             <ui:Button
                 IsCancel="True"
-                Margin="10"
-                Width="80"
+                Appearance="Transparent"
                 Click="ButtonCancel_Click"
+                Style="{StaticResource CustomContentButton}"
                 Content="{me:LocalizationSource MainWindow.ButtonCancel}" />
-            
         </StackPanel>
     </Grid>
 </core:WpfUIPlatformWindow>

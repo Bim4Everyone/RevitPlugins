@@ -1,6 +1,7 @@
 using System;
 using System.Globalization;
 using System.Reflection;
+using System.Windows;
 
 using Autodesk.Revit.Attributes;
 using Autodesk.Revit.UI;
@@ -19,31 +20,16 @@ using RevitRoomAnnotations.Services;
 using RevitRoomAnnotations.ViewModels;
 using RevitRoomAnnotations.Views;
 
+
 namespace RevitRoomAnnotations;
 
-/// <summary>
-/// Класс команды Revit плагина.
-/// </summary>
-/// <remarks>
-/// В данном классе должна быть инициализация контейнера плагина и указание названия команды.
-/// </remarks>
 [Transaction(TransactionMode.Manual)]
 public class RevitRoomAnnotationsCommand : BasePluginCommand {
-    /// <summary>
-    /// Инициализирует команду плагина.
-    /// </summary>
+
     public RevitRoomAnnotationsCommand() {
         PluginName = "Обновить помещения в ЭОМ";
     }
 
-    /// <summary>
-    /// Метод выполнения основного кода плагина.
-    /// </summary>
-    /// <param name="uiApplication">Интерфейс взаимодействия с Revit.</param>
-    /// <remarks>
-    /// В случаях, когда не используется конфигурация
-    /// или локализация требуется удалять их использование полностью во всем проекте.
-    /// </remarks>
     protected override void Execute(UIApplication uiApplication) {
         // Создание контейнера зависимостей плагина с сервисами из платформы
         using var kernel = uiApplication.CreatePlatformServices();
@@ -63,6 +49,9 @@ public class RevitRoomAnnotationsCommand : BasePluginCommand {
         // Настройка запуска окна
         kernel.BindMainWindow<MainViewModel, MainWindow>();
 
+        // Настройка сервиса окошек сообщений
+        kernel.UseWpfUIMessageBox<MainViewModel>();
+
         kernel.Bind<IRoomAnnotationMapService>()
             .To<RoomAnnotationMapService>()
             .InSingletonScope();
@@ -77,33 +66,35 @@ public class RevitRoomAnnotationsCommand : BasePluginCommand {
             $"/{assemblyName};component/assets/localization/language.xaml",
             CultureInfo.GetCultureInfo("ru-RU"));
 
-        Validation(kernel);
+        var localizationService = kernel.Get<ILocalizationService>();
+        var messageBoxService = kernel.Get<IMessageBoxService>();
+        var revitRepository = kernel.Get<RevitRepository>();
+
+        // Загрузка параметров проекта        
+        bool isParamChecked = new CheckProjectParams(uiApplication.Application, uiApplication.ActiveUIDocument.Document)
+            .CopyProjectParams()
+            .GetIsChecked();
+
+        if(!isParamChecked) {
+            messageBoxService.Show(
+                localizationService.GetLocalizedString("Command.ParamErrorMessageBody"),
+                localizationService.GetLocalizedString("Command.TitleErrorMessage"),
+                MessageBoxButton.OK,
+                MessageBoxImage.Error);
+            throw new OperationCanceledException();
+        }
+
+        // Проверка загрузки основного семейства
+        if(revitRepository.GetRoomAnnotationSymbol() == null) {
+            messageBoxService.Show(
+                localizationService.GetLocalizedString("Command.ErrorAnnotationTypeNotFound", RevitRepository.RoomAnnotationName),
+                localizationService.GetLocalizedString("Command.TitleErrorMessage"),
+                MessageBoxButton.OK,
+                MessageBoxImage.Error);
+            throw new OperationCanceledException();
+        }
+
         // Вызывает стандартное уведомление
         Notification(kernel.Get<MainWindow>());
-    }
-
-    private void Validation(IKernel kernel) {
-        var revitRepository = kernel.Get<RevitRepository>();
-        var localizationService = kernel.Get<ILocalizationService>();
-
-        var linkedFiles = revitRepository.GetLinkedFiles();
-
-        if(linkedFiles.Count == 0) {
-            string title = localizationService.GetLocalizedString("GeneralSettings.TitleErrorMessage");
-            string message = localizationService.GetLocalizedString("GeneralSettings.ErrorNoSelectedElements");
-
-            _ = TaskDialog.Show(title, message);
-            throw new OperationCanceledException();
-        }
-
-        var annotation = revitRepository.GetRoomAnnotationSymbol();
-
-        if(annotation == null) {
-            string title = localizationService.GetLocalizedString("GeneralSettings.TitleErrorMessage");
-            string message = localizationService.GetLocalizedString("GeneralSettings.ErrorAnnotationTypeNotFound");
-
-            _ = TaskDialog.Show(title, message);
-            throw new OperationCanceledException();
-        }
     }
 }

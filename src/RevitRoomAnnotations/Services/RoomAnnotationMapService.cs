@@ -3,36 +3,34 @@ using System.Linq;
 
 using RevitRoomAnnotations.Models;
 
+
 namespace RevitRoomAnnotations.Services;
 public class RoomAnnotationMapService : IRoomAnnotationMapService {
     public IEnumerable<RoomAnnotationMap> GetRoomAnnotationMap(
     IEnumerable<RevitRoom> rooms,
     IEnumerable<RevitAnnotation> annotations) {
 
-        string Key(int roomId, int linkInstId) => $"{roomId}_{linkInstId}";
+        static string Key(string id) => id ?? string.Empty;
 
-        var annDict = annotations.ToDictionary(
-            a => Key(a.RoomIdInAnnotation, a.LinkInstIdInAnnotation),
-            a => a);
+        var annDict = annotations
+         .GroupBy(a => Key(a.CombinedID))
+         .ToDictionary(g => g.Key, g => g.First());
 
         var roomKeys = new HashSet<string>();
         foreach(var room in rooms) {
-            var key = Key(room.RoomId.IntegerValue, room.SourceLinkInstanceId.IntegerValue);
+            string key = Key(room.CombinedId);
             roomKeys.Add(key);
 
-            if(annDict.TryGetValue(key, out var ann)) {
-                yield return new RoomAnnotationMap { RevitRoom = room, RevitAnnotation = ann, ToCreate = false, ToDelete = false };
-            } else {
-                yield return new RoomAnnotationMap { RevitRoom = room, RevitAnnotation = null, ToCreate = true, ToDelete = false };
-            }
+            yield return annDict.TryGetValue(key, out var ann)
+                ? new RoomAnnotationMap { RevitRoom = room, RevitAnnotation = ann, ToCreate = false, ToDelete = false }
+                : new RoomAnnotationMap { RevitRoom = room, RevitAnnotation = null, ToCreate = true, ToDelete = false };
         }
 
         foreach(var ann in annotations) {
-            var key = Key(ann.RoomIdInAnnotation, ann.LinkInstIdInAnnotation);
+            string key = Key(ann.CombinedID);
             if(!roomKeys.Contains(key)) {
                 yield return new RoomAnnotationMap { RevitRoom = null, RevitAnnotation = ann, ToCreate = false, ToDelete = true };
             }
         }
     }
-
 }

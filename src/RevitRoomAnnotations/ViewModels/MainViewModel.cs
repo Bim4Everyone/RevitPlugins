@@ -1,10 +1,14 @@
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.ComponentModel;
 using System.Linq;
+using System.Text;
 using System.Windows;
 using System.Windows.Input;
 
 using Autodesk.Revit.DB;
 
+using dosymep.Revit;
 using dosymep.SimpleServices;
 using dosymep.WPF.Commands;
 using dosymep.WPF.ViewModels;
@@ -12,121 +16,155 @@ using dosymep.WPF.ViewModels;
 using RevitRoomAnnotations.Models;
 using RevitRoomAnnotations.Services;
 
+
 namespace RevitRoomAnnotations.ViewModels;
 
-/// <summary>
-/// Основная ViewModel главного окна плагина.
-/// </summary>
 internal class MainViewModel : BaseViewModel {
+    private readonly PluginConfig _pluginConfig;
     private readonly RevitRepository _revitRepository;
     private readonly ILocalizationService _localizationService;
     private readonly IRoomAnnotationMapService _roomAnnotationMapService;
-    private readonly IMessageBoxService _messageBoxService;
 
-    private List<LinkedFileViewModel> _linkedFiles;
+    private ObservableCollection<LinkViewModel> _links;
+    private ObservableCollection<LinkViewModel> _selectedLinks;
     private string _errorText;
 
-    /// <summary>
-    /// Создает экземпляр основной ViewModel главного окна.
-    /// </summary>
-    /// <param name="pluginConfig">Настройки плагина.</param>
-    /// <param name="revitRepository">Класс доступа к интерфейсу Revit.</param>
-    /// <param name="localizationService">Интерфейс доступа к сервису локализации.</param>
     public MainViewModel(
+        PluginConfig pluginConfig,
         RevitRepository revitRepository,
         ILocalizationService localizationService,
         IRoomAnnotationMapService roomAnnotationMapService,
         IMessageBoxService messageBoxService) {
 
+        _pluginConfig = pluginConfig;
         _revitRepository = revitRepository;
         _localizationService = localizationService;
         _roomAnnotationMapService = roomAnnotationMapService;
-        _messageBoxService = messageBoxService;
+        MessageBoxService = messageBoxService;
 
         LoadViewCommand = RelayCommand.Create(LoadView);
         AcceptViewCommand = RelayCommand.Create(AcceptView, CanAcceptView);
     }
 
-    /// <summary>
-    /// Команда загрузки главного окна.
-    /// </summary>
     public ICommand LoadViewCommand { get; }
-
-    /// <summary>
-    /// Команда применения настроек главного окна. (запуск плагина)
-    /// </summary>
-    /// <remarks>В случаях, когда используется немодальное окно, требуется данную команду удалять.</remarks>
     public ICommand AcceptViewCommand { get; }
 
-    public List<LinkedFileViewModel> LinkedFiles {
-        get => _linkedFiles;
-        set => RaiseAndSetIfChanged(ref _linkedFiles, value);
+    public IMessageBoxService MessageBoxService { get; }
+
+    public ObservableCollection<LinkViewModel> Links {
+        get => _links;
+        set => RaiseAndSetIfChanged(ref _links, value);
     }
 
-    /// <summary>
-    /// Текст ошибки, который отображается при неверном вводе пользователя.
-    /// </summary>
+    public ObservableCollection<LinkViewModel> SelectedLinks {
+        get => _selectedLinks;
+        set => RaiseAndSetIfChanged(ref _selectedLinks, value);
+    }
+
     public string ErrorText {
         get => _errorText;
         set => RaiseAndSetIfChanged(ref _errorText, value);
     }
 
-    /// <summary>
-    /// Метод загрузки главного окна.
-    /// </summary>
-    /// <remarks>В данном методе должна происходить загрузка настроек окна, а так же инициализация полей окна.</remarks>
+    // Метод загрузки конфигурации окна
     private void LoadView() {
-        var files = _revitRepository.GetLinkedFiles();
-
-        LinkedFiles = files
-            .Select(m => new LinkedFileViewModel(m))
-            .OrderByDescending(vm => vm.IsLoaded)
-            .ThenBy(vm => vm.Name)
-            .ToList();
-
+        Links = new ObservableCollection<LinkViewModel>(GetLinks());
+        SelectedLinks = [];
+        // Подписка на события для обновления Links        
+        foreach(var link in Links) {
+            link.PropertyChanged += OnLinkChanged;
+        }
+        LoadConfig();
     }
 
-    /// <summary>
-    /// Метод применения настроек главного окна. (выполнение плагина)
-    /// </summary>
-    /// <remarks>
-    /// В данном методе должны браться настройки пользователя и сохраняться в конфиг, а так же быть основной код плагина.
-    /// </remarks>
-    private void AcceptView() {
-        var linkInstances = GetSelectedLinkInstances();
-        var targetView = _revitRepository.CreateOrGetViewDrafting();
+    // Метод загрузки конфигурации пользователя
+    private void LoadConfig() {
+        var setting = _pluginConfig.GetSettings(_revitRepository.Document);
+        var selectedLinkIds = setting?.SelectedLinks ?? [];
+        foreach(var linkId in selectedLinkIds) {
+            LinkViewModel link = Links.FirstOrDefault(link => link.Id == linkId);
+            if(link != null) {
+                link.IsChecked = true;
+            }
+        }
+    }
 
-        var annotationsNotOnView = GetAnnotationsNotOnView(targetView).ToList();
-        var allRoomElements = _revitRepository.GetRoomsFromLinks(linkInstances);
+    // Метод сохранения конфигурации пользователя
+    private void SaveConfig() {
+        var setting = _pluginConfig.GetSettings(_revitRepository.Document)
+            ?? _pluginConfig.AddSettings(_revitRepository.Document);
+        setting.SelectedLinks = SelectedLinks
+            .Select(link => link.Id)
+            .ToList();
+        _pluginConfig.SaveProjectConfig();
+    }
+
+    // Метод подписанный на событие изменения выделенных связанных файлов
+    private void OnLinkChanged(object sender, PropertyChangedEventArgs e) {
+        if(e.PropertyName == "IsChecked" && sender is LinkViewModel link) {
+            if(link.IsChecked) {
+                SelectedLinks.Add(link);
+            } else {
+                SelectedLinks.Remove(link);
+            }
+        }
+    }
+
+    // Метод загрузки с основного документа всех связанных файлов через _revitRepository
+    private IEnumerable<LinkViewModel> GetLinks() {
+        return _revitRepository.GetLinkInstanceElements()
+            .Select(item => new LinkViewModel(item, _localizationService))
+            .OrderBy(item => item.Name);
+    }
+
+    // Основной метод
+    private void AcceptView() {
+        SaveConfig();
+        string transactionName = _localizationService.GetLocalizedString("MainViewModel.TransactionName");
+        using var t = _revitRepository.Document.StartTransaction(transactionName);
+
+        var linkInstanceElements = SelectedLinks.Select(link => link.LinkInstanceElement);
+        var allRoomElements = _revitRepository.GetRevitRoomsFromLinks(linkInstanceElements);
         var rooms = BuildRoomsWithProgress(allRoomElements);
-        var annotations = _revitRepository.GetAnnotations().ToList();
+
+        var targetView = _revitRepository.GetViewDrafting();
+        var annotations = _revitRepository.GetRevitAnnotations(targetView, true);
 
         var maps = BuildAnnotationMaps(rooms, annotations).ToList();
+        var annotationsNotOnView = _revitRepository.GetRevitAnnotations(targetView, false).ToList();
 
         if(!ShowPreview(maps, annotationsNotOnView)) {
             return;
         }
+        ProcessChangesWithProgress(maps, annotationsNotOnView, targetView);
 
-        ProcessChangesWithProgress(maps, annotationsNotOnView);
+        t.Commit();
     }
 
-    private IEnumerable<RevitLinkInstance> GetSelectedLinkInstances() {
-        return (LinkedFiles ?? Enumerable.Empty<LinkedFileViewModel>())
-            .Where(x => x.IsSelected && x.IsLoaded)
-            .Select(x => x.LinkInstance);
+    // Проверка возможности выполнения основного метода
+    private bool CanAcceptView() {
+        if(SelectedLinks != null) {
+            if(SelectedLinks.Count == 0) {
+                ErrorText = _localizationService.GetLocalizedString("MainViewModel.ErrorTextNoSelection");
+                return false;
+            }
+            if(SelectedLinks.Select(link => link).Where(link => !link.IsLoaded).Any()) {
+                ErrorText = _localizationService.GetLocalizedString("MainViewModel.ErrorTextWrongSelection");
+                return false;
+            }
+        }
+        ErrorText = null;
+        return true;
     }
 
-    private IEnumerable<RevitAnnotation> GetAnnotationsNotOnView(View targetView) {
-        return _revitRepository.GetAnnotationsNotOnTargetView(_revitRepository.Document, targetView);
-    }
-
+    // Метод получения списка помещений 
     private List<RevitRoom> BuildRoomsWithProgress(List<RevitRoom> allRoomElements) {
         var rooms = new List<RevitRoom>(allRoomElements?.Count ?? 0);
 
         using(var window = GetPlatformService<IProgressDialogService>()) {
-            window.DisplayTitleFormat = _localizationService.GetLocalizedString("MainWindow.GetRoomsProgress");
+            window.DisplayTitleFormat = _localizationService.GetLocalizedString("MainViewModel.ProcessRooms");
             window.MaxValue = allRoomElements.Count;
-            window.StepValue = 1;
+            window.StepValue = window.MaxValue / 10;
             window.Show();
 
             var progress = window.CreateProgress();
@@ -140,16 +178,17 @@ internal class MainViewModel : BaseViewModel {
                 rooms.Add(roomElem);
             }
         }
-
         return rooms;
     }
 
+    // Метод получения списка соответствий помещений и аннотаций
     private IEnumerable<RoomAnnotationMap> BuildAnnotationMaps(
         IEnumerable<RevitRoom> rooms,
         IEnumerable<RevitAnnotation> annotations) {
         return _roomAnnotationMapService.GetRoomAnnotationMap(rooms, annotations);
     }
 
+    // Метод показа предварительного расчёта
     private bool ShowPreview(
         IList<RoomAnnotationMap> maps,
         IList<RevitAnnotation> annotationsNotOnView) {
@@ -158,34 +197,29 @@ internal class MainViewModel : BaseViewModel {
         int toUpdate = maps.Count(x => !x.ToCreate && !x.ToDelete);
         int toDeleteOtherViews = annotationsNotOnView.Count;
 
-        string createRooms = _localizationService.GetLocalizedString("MainWindow.CreateRooms");
-        string deleteRooms = _localizationService.GetLocalizedString("MainWindow.DeleteRooms");
-        string updateRooms = _localizationService.GetLocalizedString("MainWindow.UpdateRooms");
-        string deleteOtherViews = _localizationService.GetLocalizedString("MainWindow.DeleteOtherViews");
-        string titlePreview = _localizationService.GetLocalizedString("MainWindow.TitlePreview");
+        string annToCreate = _localizationService.GetLocalizedString("MainViewModel.Message.AnnotationsToCreate", toCreate);
+        string annToDelete = _localizationService.GetLocalizedString("MainViewModel.Message.AnnotationsToDelete", toDelete);
+        string annToDeleteOtherViews = _localizationService.GetLocalizedString("MainViewModel.Message.AnnotationsToDeleteOtherViews", toDeleteOtherViews);
+        string annToUpdate = _localizationService.GetLocalizedString("MainViewModel.Message.AnnotationsToUpdate", toUpdate);
+        string title = _localizationService.GetLocalizedString("MainViewModel.Message.Title");
 
-        var deletedIds = maps.Where(x => x.ToDelete && x.RevitAnnotation != null)
-                             .Select(x => x.RevitAnnotation.Id)
-                             .ToList();
+        var stringBuilder = new StringBuilder();
+        string message = stringBuilder.Append($"{annToCreate}\n")
+                                      .Append($"{annToDelete}\n")
+                                      .Append($"{annToDeleteOtherViews}\n")
+                                      .Append($"{annToUpdate}")
+                                      .ToString();
 
-        string previewMsg =
-            $"{createRooms}: {toCreate}\n" +
-            $"{deleteRooms}: {toDelete} (ID: {string.Join(", ", deletedIds)})\n" +
-            $"{deleteOtherViews}: {toDeleteOtherViews}\n" +
-            $"{updateRooms}: {toUpdate}";
-
-        return ShowPreviewDialog(titlePreview, previewMsg);
+        return MessageBoxService.Show(message, title, MessageBoxButton.OKCancel, MessageBoxImage.Information) == MessageBoxResult.OK;
     }
 
+    // Основной метод копирования, удаления или обновления аннотаций
     private void ProcessChangesWithProgress(
         IList<RoomAnnotationMap> maps,
-        IList<RevitAnnotation> annotationsNotOnView) {
-        string processRooms = _localizationService.GetLocalizedString("MainWindow.ProcessRooms");
-
-        int total =
-            annotationsNotOnView.Count +
-            maps.Count;
-
+        IList<RevitAnnotation> annotationsNotOnView,
+        View view) {
+        string processRooms = _localizationService.GetLocalizedString("MainViewModel.ProcessRooms");
+        int total = annotationsNotOnView.Count + maps.Count;
         using var window = GetPlatformService<IProgressDialogService>();
         window.DisplayTitleFormat = processRooms;
         window.MaxValue = total;
@@ -206,7 +240,7 @@ internal class MainViewModel : BaseViewModel {
             ct.ThrowIfCancellationRequested();
 
             if(map.ToCreate) {
-                _revitRepository.CreateAnnotation(map.RevitRoom);
+                _revitRepository.CreateAnnotation(map.RevitRoom, view);
             } else if(map.ToDelete) {
                 _revitRepository.DeleteElement(map.RevitAnnotation.Annotation);
             } else {
@@ -214,30 +248,5 @@ internal class MainViewModel : BaseViewModel {
             }
             progress.Report(++done);
         }
-    }
-
-    private bool ShowPreviewDialog(string title, string msg) {
-        return _messageBoxService.Show(msg, title, MessageBoxButton.OKCancel, MessageBoxImage.Information) == MessageBoxResult.OK;
-    }
-
-    /// <summary>
-    /// Метод проверки возможности выполнения команды применения настроек.
-    /// </summary>
-    /// <returns>В случае когда true - команда может выполниться, в случае false - нет.</returns>
-    /// <remarks>
-    /// В данном методе происходит валидация ввода пользователя и уведомление его о неверных значениях.
-    /// В методе проверяемые свойства окна должны быть отсортированы в таком же порядке как в окне (сверху-вниз)
-    /// </remarks>
-    private bool CanAcceptView() {
-        bool anySelectedLoaded = (LinkedFiles ?? Enumerable.Empty<LinkedFileViewModel>())
-          .Any(l => l.IsSelected && l.IsLoaded);
-
-        if(!anySelectedLoaded) {
-            ErrorText = _localizationService.GetLocalizedString("MainWindow.Validation.SelectAtLeastOneLink");
-            return false;
-        }
-
-        ErrorText = null;
-        return true;
     }
 }

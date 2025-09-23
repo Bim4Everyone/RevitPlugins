@@ -2,28 +2,44 @@
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
                     xmlns:system="clr-namespace:System;assembly=mscorlib">
 
-    <!-- Пример перевода на русский язык (google translate) -->
-    <system:String x:Key="MainWindow.Title">Помещение в ЭОМ</system:String>
-    <system:String x:Key="MainWindow.ButtonOk">ОК</system:String>
-    <system:String x:Key="MainWindow.ButtonCancel">Отмена</system:String>
-    <system:String x:Key="MainWindow.Select">Выбрать</system:String>   
-    <system:String x:Key="MainWindow.Loaded">Загружена</system:String>   
-    <system:String x:Key="MainWindow.LinkedFiles">Связанные файлы</system:String>   
-    <system:String x:Key="MainWindow.ToolTipNoLoaded">Связь не загружена. Загрузите связь.</system:String>
-    <system:String x:Key="MainWindow.GetRooms">Получение помещений [{0}/{1}] </system:String>
-    <system:String x:Key="MainWindow.CreateRooms">Будет создано: </system:String>
-    <system:String x:Key="MainWindow.DeleteRooms">Будет удалено: </system:String>
-    <system:String x:Key="MainWindow.updateRooms">Обновить: </system:String>
-    <system:String x:Key="MainWindow.DeleteOtherViews">Будет удалено с других видов: </system:String>
-    <system:String x:Key="MainWindow.TitlePreview">Предварительный просмотр изменений</system:String>
-    <system:String x:Key="MainWindow.ProcessRooms">Обработка помещений и аннотаций [{0}/{1}] </system:String>
-    <system:String x:Key="MainWindow.CreateEomTransactionView">Создать вид 'Помещения ЭОМ'</system:String>
-    <system:String x:Key="MainWindow.CreateRoomTransactioAnnotation">Создать аннотацию помещения</system:String>
-    <system:String x:Key="MainWindow.DeleteRoomTransactioAnnotations">Удалить аннотации помещений</system:String>
-    <system:String x:Key="MainWindow.RoomEOM">!Помещения ЭОМ</system:String>
-    <system:String x:Key="MainWindow.SelectAtLeastOneLink">Выберите хотя бы одну загруженную связь.</system:String>
-    
-    <system:String x:Key="GeneralSettings.ErrorAnnotationTypeNotFound">Не найден тип аннотации «{0}». Загрузите семейство перед запуском плагина..</system:String>
-    <system:String x:Key="GeneralSettings.ErrorNoLinkedFiles">В проекте нет связанных файлов</system:String>
-    <system:String x:Key="GeneralSettings.TitleErrorMessage">Ошибка</system:String>
+    <system:String
+        x:Key="MainWindow.Title">Обновить помещения в файле ЭОМ</system:String>
+    <system:String
+        x:Key="MainWindow.LinkName">Наименование связи</system:String>
+    <system:String
+        x:Key="MainWindow.LinkStatus">Статус связи</system:String>
+    <system:String
+        x:Key="MainWindow.ButtonOk">Обработать</system:String>
+    <system:String
+        x:Key="MainWindow.ButtonCancel">Отмена</system:String>
+    <system:String
+        x:Key="MainWindow.StatusTextLoaded">Загружена</system:String>
+    <system:String
+        x:Key="MainWindow.StatusTextUnloaded">Не загружена</system:String>    
+    <system:String
+        x:Key="MainViewModel.ErrorTextNoSelection">Связанные файлы не выбраны</system:String>
+    <system:String
+        x:Key="MainViewModel.ErrorTextWrongSelection">Некоторые выбранные связи не загружены</system:String>
+    <system:String
+        x:Key="MainViewModel.TransactionName">Обработка помещений</system:String>    
+    <system:String
+        x:Key="MainViewModel.Message.AnnotationsToCreate">Будет создано аннотаций: {0}</system:String>
+    <system:String
+        x:Key="MainViewModel.Message.AnnotationsToDelete">Будет удалено аннотаций: {0}</system:String>
+    <system:String
+        x:Key="MainViewModel.Message.AnnotationsToDeleteOtherViews">Будет удалено аннотаций с других видов: {0}</system:String>
+    <system:String
+        x:Key="MainViewModel.Message.AnnotationsToUpdate">Будет обновлено аннотаций: {0}</system:String>
+    <system:String
+        x:Key="MainViewModel.Message.Title">Предварительный просмотр изменений</system:String>
+    <system:String
+        x:Key="MainViewModel.ProcessRooms">Обработка помещений и аннотаций [{0}/{1}]</system:String>    
+    <system:String
+        x:Key="RevitRepository.ViewName">!Помещения ЭОМ</system:String>    
+    <system:String
+        x:Key="Command.ErrorAnnotationTypeNotFound">Не найден тип аннотации «{0}». Загрузите семейство перед запуском плагина</system:String>
+    <system:String
+        x:Key="Command.ParamErrorMessageBody">Ошибка загрузки параметров</system:String>
+    <system:String
+        x:Key="Command.TitleErrorMessage">Ошибка плагина</system:String>
 </ResourceDictionary>

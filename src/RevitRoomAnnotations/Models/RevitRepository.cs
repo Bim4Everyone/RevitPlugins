@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -10,145 +11,108 @@ using dosymep.Bim4Everyone.SharedParams;
 using dosymep.Revit;
 using dosymep.SimpleServices;
 
-using RevitRoomAnnotations.ViewModels;
 
 namespace RevitRoomAnnotations.Models;
-
-/// <summary>
-/// Класс доступа к документу и приложению Revit.
-/// </summary>
-/// <remarks>
-/// В случае если данный класс разрастается, рекомендуется его разделить на несколько.
-/// </remarks>
 internal class RevitRepository {
-    private readonly ILocalizationService _localizationService;
-    private readonly XYZ _defaultLocation = new(0, 0, 0);
-
-    private const string _roomAnnotationName = "ТипАн_Помещение";
+    public const string RoomAnnotationName = "ТипАн_Помещение";
     private const string _viewsGroupParam = "_Группа Видов";
     private const string _viewsGroupValue = "02 АР-ЭОМ Задания входящие";
     private const string _projectStageParam = "_Стадия Проекта";
     private const string _projectStageValue = "Все стадии";
-    /// <summary>
-    /// Создает экземпляр репозитория.
-    /// </summary>
-    /// <param name="uiApplication">Класс доступа к интерфейсу Revit.</param>
+    private readonly ILocalizationService _localizationService;
+
     public RevitRepository(UIApplication uiApplication, ILocalizationService localizationService) {
         UIApplication = uiApplication;
         _localizationService = localizationService;
     }
 
-    /// <summary>
-    /// Класс доступа к интерфейсу Revit.
-    /// </summary>
     public UIApplication UIApplication { get; }
-
-    /// <summary>
-    /// Класс доступа к интерфейсу документа Revit.
-    /// </summary>
     public UIDocument ActiveUIDocument => UIApplication.ActiveUIDocument;
-
-    /// <summary>
-    /// Класс доступа к приложению Revit.
-    /// </summary>
     public Application Application => UIApplication.Application;
-
-    /// <summary>
-    /// Класс доступа к документу Revit.
-    /// </summary>
     public Document Document => ActiveUIDocument.Document;
 
-    public List<LinkedFile> GetLinkedFiles() {
+
+    // Метод получения списка LinkInstanceElement
+    public List<LinkInstanceElement> GetLinkInstanceElements() {
         return new FilteredElementCollector(Document)
-            .OfClass(typeof(RevitLinkInstance))
-            .Cast<RevitLinkInstance>()
-            .Select(li => new LinkedFile(li, Document))
-            .ToList();
+        .OfCategory(BuiltInCategory.OST_RvtLinks)
+        .OfClass(typeof(RevitLinkInstance))
+        .Cast<RevitLinkInstance>()
+        .Select(linkInstance => new LinkInstanceElement(linkInstance, Document))
+        .Where(linkInstanceElement => !linkInstanceElement.IsNestedLink)
+        .ToList();
     }
 
-    public List<RevitRoom> GetRoomsFromLinks(IEnumerable<RevitLinkInstance> linkInstances) {
+    // Метод получения списка RevitRoom из связанных файлов
+    public List<RevitRoom> GetRevitRoomsFromLinks(IEnumerable<LinkInstanceElement> linkInstanceElements) {
         var result = new List<RevitRoom>();
-        foreach(var link in linkInstances) {
-            var linkDoc = link.GetLinkDocument();
-            if(linkDoc == null)
+        foreach(var linkInstanceElement in linkInstanceElements) {
+            var linkDoc = linkInstanceElement.GetLinkDocument();
+            if(linkDoc == null) {
                 continue;
-
+            }
             var rooms = new FilteredElementCollector(linkDoc)
                 .OfCategory(BuiltInCategory.OST_Rooms)
                 .WhereElementIsNotElementType()
                 .Cast<SpatialElement>()
-                .Select(r => new RevitRoom(r, link))
+                .Select(room => new RevitRoom(room, linkInstanceElement))
                 .ToList();
-
             result.AddRange(rooms);
         }
         return result;
     }
 
-    public IEnumerable<RevitAnnotation> GetAnnotations() {
-        var view = CreateOrGetViewDrafting();
-
-        return new FilteredElementCollector(Document, view.Id)
+    // Метод получения списка RevitAnnotation
+    public IEnumerable<RevitAnnotation> GetRevitAnnotations(View targetView, bool searchOnTargetView) {
+        return new FilteredElementCollector(Document, targetView.Id)
             .OfCategory(BuiltInCategory.OST_GenericAnnotation)
             .WhereElementIsNotElementType()
             .Cast<Element>()
-            .Select(el => new RevitAnnotation(el));
+            .Where(element => searchOnTargetView
+                ? element.OwnerViewId == targetView.Id
+                : element.OwnerViewId != targetView.Id)
+            .Select(el => new RevitAnnotation(el) {
+                CombinedID = el.GetParamValueOrDefault<string>(SharedParamsConfig.Instance.FopId.Name)
+            });
     }
 
-    public View CreateOrGetViewDrafting() {
-        string roomEOM = _localizationService.GetLocalizedString("MainWindow.RoomEOM");
-        string createEOMView = _localizationService.GetLocalizedString("MainWindow.CreateEomTransactionView");
-
-        var view = new FilteredElementCollector(Document)
-            .OfClass(typeof(ViewDrafting))
-            .Cast<ViewDrafting>()
-            .FirstOrDefault(v => v.Name == roomEOM);
-
-        if(view != null) {
-            return view;
-        }
-
-        var viewType = new FilteredElementCollector(Document)
-            .OfClass(typeof(ViewFamilyType))
-            .Cast<ViewFamilyType>()
-            .FirstOrDefault(vft => vft.ViewFamily == ViewFamily.Drafting);
-
-        
-        using var t = Document.StartTransaction($"{createEOMView}");
-        var newView = ViewDrafting.Create(Document, viewType.Id);
-        newView.Name = roomEOM;
-
-        newView.SetParamValue(_viewsGroupParam, _viewsGroupValue);
-        newView.SetParamValue(_projectStageParam, _projectStageValue);
-
-        t.Commit();
-        return newView;
+    // Метод создания RevitAnnotation
+    public RevitAnnotation CreateAnnotation(RevitRoom room, View view) {
+        var familySymbol = GetRoomAnnotationSymbol();
+        var instance = Document.Create.NewFamilyInstance(XYZ.Zero, familySymbol, view);
+        UpdateAnnotation(instance, room);
+        return new RevitAnnotation(instance) {
+            CombinedID = room.CombinedId
+        };
     }
 
+    // Метод получения типоразмера семейства
     public FamilySymbol GetRoomAnnotationSymbol() {
-        var symbol = new FilteredElementCollector(Document)
+        return new FilteredElementCollector(Document)
             .OfClass(typeof(FamilySymbol))
             .Cast<FamilySymbol>()
-            .FirstOrDefault(fs => fs.Name == _roomAnnotationName);
-
-        return symbol is null ? null : symbol;
+            .FirstOrDefault(familySymbol => familySymbol.Name == RoomAnnotationName);
     }
 
-    public RevitAnnotation CreateAnnotation(RevitRoom room) {
-        var familySymbol = GetRoomAnnotationSymbol();
-        var view = CreateOrGetViewDrafting();
-
-        string createRoomAnnotation = _localizationService.GetLocalizedString("MainWindow.CreateRoomTransactionAnnotation");
-        using var t = Document.StartTransaction($"{createRoomAnnotation}");
-        var instance = Document.Create.NewFamilyInstance(_defaultLocation, familySymbol, view);
-        UpdateAnnotation(instance, room);
-
-        t.Commit();
-        return new RevitAnnotation(instance);
+    // Метод получения чертежного вида, существующего или создание нового
+    public ViewDrafting GetViewDrafting() {
+        string nameView = _localizationService.GetLocalizedString("RevitRepository.ViewName");
+        var view = new FilteredElementCollector(Document)
+            .OfClass(typeof(ViewDrafting))
+            .Where(v => v.Name.Equals(nameView, StringComparison.OrdinalIgnoreCase))
+            .Cast<ViewDrafting>()
+            .FirstOrDefault();
+        return view ?? CreateViewDrafting(nameView);
     }
 
+    // Метод удаления элементов
+    public void DeleteElement(Element element) {
+        Document.Delete(element.Id);
+    }
+
+    // Метод обновления параметров RevitRoom
     public void UpdateAnnotation(Element annotation, RevitRoom room) {
-        SetOrRemove(annotation, SharedParamsConfig.Instance.FopId.Name, room.RoomId.ToString());
+        SetOrRemove(annotation, SharedParamsConfig.Instance.FopId.Name, room.CombinedId);
         SetOrRemove(annotation, SharedParamsConfig.Instance.ApartmentNumberExtra.Name, room.AdditionalNumber);
         SetOrRemove(annotation, SharedParamsConfig.Instance.ApartmentNameExtra.Name, room.AdditionalName);
         SetOrRemove(annotation, SharedParamsConfig.Instance.RoomArea.Name, room.Area);
@@ -162,6 +126,22 @@ internal class RevitRepository {
         SetOrRemove(annotation, SharedParamsConfig.Instance.RoomSectionShortName.Name, room.Section);
     }
 
+    // Метод создания нового чертежного вида
+    private ViewDrafting CreateViewDrafting(string nameView) {
+        var viewTypes = new FilteredElementCollector(Document)
+            .OfClass(typeof(ViewFamilyType))
+            .Cast<ViewFamilyType>();
+        var viewFamilyType = viewTypes
+            .Where(vt => vt.ViewFamily == ViewFamily.Drafting)
+            .First();
+        var view = ViewDrafting.Create(Document, viewFamilyType.Id);
+        view.Name = nameView;
+        view.SetParamValue(_viewsGroupParam, _viewsGroupValue);
+        view.SetParamValue(_projectStageParam, _projectStageValue);
+        return view;
+    }
+
+    // Методы назначения или удаления параметров
     private void SetOrRemove(Element element, string paramName, string value) {
         if(string.IsNullOrEmpty(value)) {
             element.RemoveParamValue(paramName);
@@ -169,28 +149,11 @@ internal class RevitRepository {
             element.SetParamValue(paramName, value);
         }
     }
-
     private void SetOrRemove(Element element, string paramName, double? value) {
         if(value.HasValue) {
             element.SetParamValue(paramName, value.Value);
         } else {
             element.RemoveParamValue(paramName);
         }
-    }
-
-    public void DeleteElement(Element element) {
-        string deleteRoomAnnotations = _localizationService.GetLocalizedString("MainWindow.DeleteRoomTransactionAnnotations");
-        using var t = Document.StartTransaction($"{deleteRoomAnnotations}");
-        Document.Delete(element.Id);
-        t.Commit();
-    }
-
-    public IEnumerable<RevitAnnotation> GetAnnotationsNotOnTargetView(Document doc, View targetView) {
-        return new FilteredElementCollector(doc)
-            .OfCategory(BuiltInCategory.OST_GenericAnnotation)
-            .WhereElementIsNotElementType()
-            .Cast<FamilyInstance>()
-            .Where(fi => fi.Symbol.Name == _roomAnnotationName && fi.OwnerViewId != targetView.Id)
-            .Select(fi => new RevitAnnotation(fi));
     }
 }
