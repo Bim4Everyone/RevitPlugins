@@ -31,6 +31,16 @@ public class RevitAxonometryViewsCommand : BasePluginCommand {
         // Например Kernel.Get<MainViewModel>() требует на вход RevitRepository. Kernel самостоятельно ищет его по биндингам и подает в конструктор
         using IKernel kernel = uiApplication.CreatePlatformServices();
 
+        // Настройка локализации,
+        // получение имени сборки откуда брать текст
+        string assemblyName = Assembly.GetExecutingAssembly().GetName().Name;
+
+        // Настройка локализации,
+        // установка дефолтной локализации "ru-RU"
+        kernel.UseWpfLocalization(
+            $"/{assemblyName};component/assets/Localization/Language.xaml",
+            CultureInfo.GetCultureInfo("ru-RU"));
+
         // Настройка доступа к Revit
         kernel.Bind<RevitRepository>()
             .ToSelf()
@@ -52,16 +62,6 @@ public class RevitAxonometryViewsCommand : BasePluginCommand {
         CheckDocument(uiApplication.ActiveUIDocument.Document, servise);
 
         var revitRepository = kernel.Get<RevitRepository>();
-
-        // Настройка локализации,
-        // получение имени сборки откуда брать текст
-        string assemblyName = Assembly.GetExecutingAssembly().GetName().Name;
-
-        // Настройка локализации,
-        // установка дефолтной локализации "ru-RU"
-        kernel.UseWpfLocalization(
-            $"/{assemblyName};component/assets/Localization/Language.xaml",
-            CultureInfo.GetCultureInfo("ru-RU"));
 
         Notification(kernel.Get<MainWindow>());
     }

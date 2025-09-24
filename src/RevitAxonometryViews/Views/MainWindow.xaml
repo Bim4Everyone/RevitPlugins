@@ -17,10 +17,10 @@
     WindowStartupLocation="CenterScreen"
     Title="{me:LocalizationSource MainWindow.Title}"
     
-    MinHeight="450"
-    MinWidth="500"
-    Height="450"
-    Width="500"
+    MinHeight="800"
+    MinWidth="900"
+    Height="800"
+    Width="900"
     
     d:DataContext="{d:DesignInstance vms:MainViewModel, IsDesignTimeCreatable=False}">
 
@@ -149,13 +149,12 @@
                 Margin="10"
                 Foreground="Orange"
                 VerticalAlignment="Center"
-                Text="{me:LocalizationSource MainWindow.ErrorText}" />
+                Text="{Binding ErrorText}" />
 
             <ui:Button
                 Width="80"
                 Margin="10"
                 Appearance="Info"
-                Style="{StaticResource CustomContentButton}"
                 Content="{me:LocalizationSource MainWindow.ButtonOk}"
                 Click="Button_Click_Ok"
                 IsDefault="True"
@@ -164,7 +163,6 @@
             <ui:Button
                 Width="80"
                 Margin="10"
-                Style="{StaticResource CustomContentButton}"
                 Content="{me:LocalizationSource MainWindow.ButtonCancel}"
                 IsCancel="True"
                 Click="ButtonCancel_Click" />

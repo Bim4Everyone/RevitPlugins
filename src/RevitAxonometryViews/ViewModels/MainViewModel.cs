@@ -6,6 +6,7 @@ using System.Windows.Input;
 
 using Autodesk.Revit.DB;
 
+using dosymep.SimpleServices;
 using dosymep.WPF.Commands;
 using dosymep.WPF.ViewModels;
 
@@ -19,6 +20,7 @@ internal class MainViewModel : BaseViewModel {
     private readonly AxonometryConfig _axonometryConfig;
 
     private readonly IReadOnlyCollection<HvacSystemViewModel> _hvacSystems;
+    private readonly ILocalizationService _localizationService;
     private string _filterValue;
     private string _selectedCriteria;
     private string _errorText;
@@ -27,13 +29,15 @@ internal class MainViewModel : BaseViewModel {
     public MainViewModel(
         RevitRepository revitRepository,
         ViewFactory viewFactory,
-        CollectorOperator collectorOperator) {
+        CollectorOperator collectorOperator,
+        ILocalizationService localizationService) {
         _revitRepository = revitRepository;
         _viewFactory = viewFactory;
         _collectorOperator = collectorOperator;
         _axonometryConfig = _revitRepository.AxonometryConfig;
         _hvacSystems = GetHvacSystems();
         _selectedCriteria = _axonometryConfig.SystemName;
+        _localizationService = localizationService;
 
         _filterValue = string.Empty;
         _selectedCriteria = _axonometryConfig.SharedVisSystemName;
@@ -138,7 +142,7 @@ internal class MainViewModel : BaseViewModel {
                 // Убираем из списка имен дубликаты, если больше одного имени - заменяем на <Варианты>
                 string sharedName = group.Select(x => x.SharedName).Distinct().Count() == 1
                     ? group.First().SharedName
-                    : "<Варианты>";
+                    : _localizationService.GetLocalizedString("MainWindow.VariantsString");
 
                 foreach(var item in group) {
                     item.DisplaySystemName = systemName;
@@ -148,7 +152,8 @@ internal class MainViewModel : BaseViewModel {
                 string sharedName = group.Key;
                 string systemName = group.Select(x => x.SystemName).Distinct().Count() == 1
                     ? group.First().SystemName
-                    : "<Варианты>";
+                    : _localizationService.GetLocalizedString("MainWindow.VariantsString");
+                
 
                 foreach(var item in group) {
                     item.DisplaySharedName = sharedName;
@@ -191,7 +196,7 @@ internal class MainViewModel : BaseViewModel {
         var selectedItems = _hvacSystems.Where(item => item.IsSelected).ToList();
 
         if(selectedItems.Count == 0) {
-            ErrorText = "Не выделены системы";
+            ErrorText = _localizationService.GetLocalizedString("MainWindow.ErrorText");
             return false;
         }
 

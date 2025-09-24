@@ -14,5 +14,7 @@
     <system:String x:Key="MainWindow.ErrorText">Не выделены системы</system:String>
     <system:String x:Key="MainWindow.SearchHint">Введите имя системы...</system:String>
     <system:String x:Key="MainWindow.ComboHint">Имя параметра, по которому будет вестись фильтрация</system:String>
+    <system:String x:Key="MainWindow.VariantsString">&lt;Варианты&gt;</system:String>
+    <system:String x:Key="MainWindow.EmptyName">Нет системы</system:String>
 
 </ResourceDictionary>
