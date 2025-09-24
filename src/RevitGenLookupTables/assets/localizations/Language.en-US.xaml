@@ -16,6 +16,7 @@
     <system:String x:Key="MainWindow.UpFamilyParamToolTip">Up selected family parameters</system:String>
     <system:String x:Key="MainWindow.DownFamilyParam">Down selected family parameters</system:String>
     <system:String x:Key="MainWindow.DownFamilyParamToolTip">Down selected family parameters</system:String>
+    <system:String x:Key="MainViewModel.EmptyChosenList">Please select family parameters</system:String>
     
     <system:String x:Key="FamilyParamsView.NameColumn">Name</system:String>
     <system:String x:Key="FamilyParamsView.StorageTypeColumn">Storage type</system:String>
@@ -28,4 +29,29 @@
     
     <system:String x:Key="Startup.NotFamilyTitle">Warning</system:String>
     <system:String x:Key="Startup.NotFamilyMessage">Please open a family document!</system:String>
+    
+    <system:String x:Key="FamilyValuesView.StartLabel">Min:</system:String>
+    <system:String x:Key="FamilyValuesView.StopLabel">Max:</system:String>
+    <system:String x:Key="FamilyValuesView.StepLabel">Step:</system:String>
+    <system:String x:Key="FamilyValuesView.GenCommand">Generate</system:String>
+    
+    <system:String x:Key="StorageType.None">None</system:String>
+    <system:String x:Key="StorageType.Integer">Integer</system:String>
+    <system:String x:Key="StorageType.Double">Double</system:String>
+    <system:String x:Key="StorageType.String">String</system:String>
+    <system:String x:Key="StorageType.ElementId">ElementId</system:String>
+    
+    <system:String x:Key="MainViewModel.ExcelFilter">Excel Worksheets|*.csv</system:String>
+    <system:String x:Key="FamilyValueViewModel.AllIntError">All values must be integer</system:String>
+    <system:String x:Key="FamilyValueViewModel.AllDoubleError">All values must be double</system:String>
+    
+    <system:String x:Key="FamilyValueViewModel.GenNotAllowedOnString">Generation isn't allowed on string values</system:String>
+    <system:String x:Key="FamilyValueViewModel.MinValueIsEmpty">Please fill min value</system:String>
+    <system:String x:Key="FamilyValueViewModel.MaxValueIsEmpty">Please fill max value</system:String>
+    <system:String x:Key="FamilyValueViewModel.StepValueIsEmpty">Please fill step value</system:String>
+    <system:String x:Key="FamilyValueViewModel.StepValueIsNegative">Step value must be positive</system:String>
+    <system:String x:Key="FamilyValueViewModel.MinValueBiggerMaxValue">Min value must be less max value</system:String>
+    <system:String x:Key="FamilyValueViewModel.MinValueIsDouble">Min value must be integer</system:String>
+    <system:String x:Key="FamilyValueViewModel.MaxValueIsDouble">Max value must be integer</system:String>
+    <system:String x:Key="FamilyValueViewModel.StepValueIsDouble">Step value must be integer</system:String>
 </ResourceDictionary>

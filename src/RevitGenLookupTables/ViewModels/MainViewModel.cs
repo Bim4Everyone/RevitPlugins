@@ -133,7 +133,7 @@ internal class MainViewModel : BaseViewModel {
     ///     В данном методе должны браться настройки пользователя и сохраняться в конфиг, а так же быть основной код плагина.
     /// </remarks>
     private void AcceptView() {
-        SaveFileDialogService.Filter = "Excel Worksheets|*.csv";
+        SaveFileDialogService.Filter = _localizationService.GetLocalizedString("MainViewModel.ExcelFilter");
         SaveFileDialogService.CheckFileExists = false;
         SaveFileDialogService.RestoreDirectory = true;
         SaveFileDialogService.InitialDirectory = Environment.GetFolderPath(Environment.SpecialFolder.Desktop);
@@ -182,6 +182,19 @@ internal class MainViewModel : BaseViewModel {
     ///     В методе проверяемые свойства окна должны быть отсортированы в таком же порядке как в окне (сверху-вниз)
     /// </remarks>
     private bool CanAcceptView() {
+        if(ChosenFamilyParams.Count == 0) {
+            ErrorText = _localizationService.GetLocalizedString("MainViewModel.EmptyChosenList");
+            return false;       
+        }
+        
+        var familyParam = ChosenFamilyParams
+            .FirstOrDefault(item => !string.IsNullOrEmpty(item.FamilyParamValues.GetValueErrors()));
+        
+        if(familyParam != null) {
+            ErrorText = familyParam.Name + ": " + familyParam.FamilyParamValues.GetValueErrors();
+            return false;
+        }
+        
         ErrorText = null;
         return true;
     }

@@ -87,10 +87,10 @@ internal class FamilyParamValuesViewModel : BaseViewModel {
         return _storageType switch {
             StorageType.Integer => AllValuesInt(values)
                 ? null
-                : "Значение параметров должны быть целочисленными.",
+                : _localizationService.GetLocalizedString("FamilyValueViewModel.AllIntError"),
             StorageType.Double => AllValuesDouble(values)
                 ? null
-                : "Значение параметров должны быть вещественными.",
+                : _localizationService.GetLocalizedString("FamilyValueViewModel.AllDoubleError"),
             _ => null
         };
     }
@@ -109,50 +109,50 @@ internal class FamilyParamValuesViewModel : BaseViewModel {
 
     private bool CanGenerate() {
         if(_storageType == StorageType.String) {
-            ErrorText = "Генерация значений не доступна для строковых параметров.";
+            ErrorText = _localizationService.GetLocalizedString("FamilyValueViewModel.GenNotAllowedOnString");
             return false;
         }
 
         if(_storageType is StorageType.Integer or StorageType.Double) {
             if(MinValue == null) {
-                ErrorText = "Заполните минимальное значение.";
+                ErrorText = _localizationService.GetLocalizedString("FamilyValueViewModel.MinValueIsEmpty");
                 return false;
             }
 
             if(MaxValue == null) {
-                ErrorText = "Заполните максимальное значение.";
+                ErrorText = _localizationService.GetLocalizedString("FamilyValueViewModel.MaxValueIsEmpty");
                 return false;
             }
 
             if(StepValue == null) {
-                ErrorText = "Заполните значение шага.";
+                ErrorText = _localizationService.GetLocalizedString("FamilyValueViewModel.StepValueIsEmpty");
                 return false;
             }
 
             if(StepValue <= 0) {
-                ErrorText = "Значение шага должно быть неотрицательным.";
+                ErrorText = _localizationService.GetLocalizedString("FamilyValueViewModel.StepValueIsNegative");
                 return false;
             }
 
             if(MinValue > MaxValue) {
-                ErrorText = "Минимальное значение должно быть меньше максимального.";
+                ErrorText = _localizationService.GetLocalizedString("FamilyValueViewModel.MinValueBiggerMaxValue");
                 return false;
             }
         }
 
-        if(_storageType == StorageType.Integer) {
+        if(_storageType is StorageType.Integer or StorageType.ElementId) {
             if(!IsWholeNumber(MinValue)) {
-                ErrorText = "Минимальное значение должно быть целым.";
+                ErrorText = _localizationService.GetLocalizedString("FamilyValueViewModel.MinValueIsDouble");
                 return false;
             }
 
             if(!IsWholeNumber(MaxValue)) {
-                ErrorText = "Максимальное значение должно быть целым.";
+                ErrorText = _localizationService.GetLocalizedString("FamilyValueViewModel.MaxValueIsDouble");
                 return false;
             }
 
             if(!IsWholeNumber(StepValue)) {
-                ErrorText = "Значение шага должно быть целым.";
+                ErrorText = _localizationService.GetLocalizedString("FamilyValueViewModel.StepValueIsDouble");
                 return false;
             }
         }
