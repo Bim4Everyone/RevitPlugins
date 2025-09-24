@@ -9,7 +9,7 @@
     xmlns:dx="http://schemas.devexpress.com/winfx/2008/xaml/core"
     xmlns:dxg="http://schemas.devexpress.com/winfx/2008/xaml/grid"
     xmlns:dxe="http://schemas.devexpress.com/winfx/2008/xaml/editors"
-    xmlns:converter="clr-namespace:RevitGenLookupTables.Converters" 
+    xmlns:converter="clr-namespace:RevitGenLookupTables.Converters"
     xmlns:dxdo="http://schemas.devexpress.com/winfx/2008/xaml/docking"
     xmlns:vms="clr-namespace:RevitGenLookupTables.ViewModels"
 
@@ -21,18 +21,18 @@
 
     x:Name="_this"
     d:DataContext="{d:DesignInstance vms:FamilyViewModel, IsDesignTimeCreatable=False}">
-    
+
     <Window.Resources>
         <converter:StorageTypeConverter x:Key="StorageTypeConverter" />
     </Window.Resources>
-    
+
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />
             <RowDefinition Height="*" />
             <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
-        
+
         <StackPanel Grid.Row="0" Margin="0 5 0 0" Orientation="Horizontal">
             <dx:SimpleButton Height="25" Width="25" Margin="11 0 5 0" Command="{Binding UpFamilyParamCommand}"
                              Glyph="{dx:DXImage 'SvgImages/Arrows/MoveUp.svg'}" GlyphHeight="16" />
@@ -48,27 +48,28 @@
             <dxdo:LayoutGroup x:Name="layoutRoot" AllowSplitters="True">
                 <dxdo:LayoutControlItem>
                     <dxg:GridControl
-                            MaxHeight="2000"
-                            SelectedItem="{Binding SelectedFamilyParam}"
-                            ItemsSource="{Binding SelectedFamilyParams}"
-                            SelectedItems="{Binding GridSelectedFamilyParams}"
-                            SelectionMode="Row">
+                        MaxHeight="2000"
+                        SelectedItem="{Binding SelectedFamilyParam}"
+                        ItemsSource="{Binding SelectedFamilyParams}"
+                        SelectedItems="{Binding GridSelectedFamilyParams}"
+                        SelectionMode="Row">
                         <dxg:GridControl.View>
-                            <dxg:TableView x:Name="_gridView" AutoWidth="True" ShowSearchPanelMode="Always" ShowGroupPanel="False"/>
+                            <dxg:TableView x:Name="_gridView" AutoWidth="True" ShowSearchPanelMode="Always"
+                                           ShowGroupPanel="False" />
                         </dxg:GridControl.View>
 
                         <dxg:GridColumn AllowSorting="False" AllowEditing="False" AllowColumnFiltering="False"
-                            Header="Наименование" FieldName="Name" />
+                                        Header="Наименование" FieldName="Name" />
                         <dxg:GridColumn AllowSorting="False" AllowEditing="False" AllowColumnFiltering="False"
-                            Header="Метаданные колонки" FieldName="ColumnMetaData" />
+                                        Header="Метаданные колонки" FieldName="ColumnMetaData" />
                         <dxg:GridColumn AllowSorting="False" AllowEditing="False" AllowColumnFiltering="False"
-                            Header="Тип данных параметра"
-                            Binding="{Binding StorageType, Converter={StaticResource StorageTypeConverter}}" />
+                                        Header="Тип данных параметра"
+                                        Binding="{Binding StorageType, Converter={StaticResource StorageTypeConverter}}" />
                     </dxg:GridControl>
                 </dxdo:LayoutControlItem>
                 <dxdo:LayoutControlItem>
-                    <local:ParamValuesView Grid.Row="0" Grid.Column="2" Grid.RowSpan="2"
-                               DataContext="{Binding SelectedFamilyParam.FamilyParamValues}" />
+                    <local:FamilyParamValuesView
+                        DataContext="{Binding SelectedFamilyParam.FamilyParamValues}" />
                 </dxdo:LayoutControlItem>
             </dxdo:LayoutGroup>
         </dxdo:DockLayoutManager>

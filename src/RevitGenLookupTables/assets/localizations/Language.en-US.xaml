@@ -1,0 +1,19 @@
+<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:system="clr-namespace:System;assembly=mscorlib">
+
+    <!-- Пример перевода на английский американский язык (google translate) -->
+
+    <system:String x:Key="MainWindow.Title">Generate lookup table</system:String>
+    <system:String x:Key="MainWindow.ButtonOk">OK</system:String>
+    <system:String x:Key="MainWindow.ButtonCancel">Cancel</system:String>
+    
+    <system:String x:Key="FamilyParamsView.NameColumn">Name</system:String>
+    <system:String x:Key="FamilyParamsView.StorageTypeColumn">Storage type</system:String>
+    <system:String x:Key="FamilyParamsView.ColumnMetadataColumn">Metadata</system:String>
+    <system:String x:Key="FamilyParamsView.FamilyParamsHint">Search</system:String>
+    
+    <system:String x:Key="FamilyParamsDialog.Title">Please select family parameters</system:String>
+    <system:String x:Key="FamilyParamsDialog.CloseButton">Close</system:String>
+    <system:String x:Key="FamilyParamsDialog.SelectButton">Select</system:String>
+</ResourceDictionary>
