@@ -276,6 +276,9 @@ namespace RevitClashDetective.Models {
 
 #if REVIT_2023_OR_LESS
         public void SelectElements(ICollection<ElementModel> elementModels) {
+            if(elementModels is null) {
+                throw new ArgumentNullException(nameof(elementModels));
+            }
             var elements = elementModels.Select(e => e.GetElement(DocInfos))
                 .Where(e => e != null)
                 .Where(e => e.IsFromDocument(_document))
@@ -288,6 +291,10 @@ namespace RevitClashDetective.Models {
         }
 #else
         public void SelectElements(ICollection<ElementModel> elementModels) {
+            if(elementModels is null) {
+                throw new ArgumentNullException(nameof(elementModels));
+            }
+
             var links = GetRevitLinkInstances();
             var elementsInfo = elementModels.Select(e => new {
                 DocInfo = e.GetDocInfo(DocInfos),
