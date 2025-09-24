@@ -13,6 +13,7 @@ namespace RevitClashDetective.Resources;
 internal class CustomGridControl : GridControl {
     public bool PreventSelectedItemsResetByCellButton { get; set; }
 
+    // https://supportcenter.devexpress.com/ticket/details/t410340/disable-select-unselect-row-when-clicking-on-button-in-a-column
     protected override void OnPreviewMouseLeftButtonDown(MouseButtonEventArgs e) {
         if(PreventSelectedItemsResetByCellButton
             && SelectedItems.Count > 1
