@@ -37,6 +37,7 @@
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
             <RowDefinition Height="*" />
             <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
@@ -52,16 +53,42 @@
             Grid.Column="0"
             Grid.ColumnSpan="3"
             Title="{me:LocalizationSource MainWindow.Title}" />
-        
-        <ContentPresenter
-            Grid.Row="0"
-            Grid.Column="0"
-            Grid.RowSpan="3"
-            Grid.ColumnSpan="3"
-            x:Name="_rootContentDialog" />
 
         <Border
             Grid.Row="1"
+            Grid.Column="0"
+            Grid.ColumnSpan="3"
+            Margin="14 0 14 8"
+            Padding="14 0"
+            Background="{DynamicResource CardBackground}"
+            CornerRadius="{DynamicResource ControlCornerRadius}">
+
+            <Menu>
+                <ui:MenuItem
+                    Icon="{ui:SymbolIcon Add24}"
+                    ToolTip="{me:LocalizationSource MainWindow.AddFamilyParamToolTip}"
+                    Command="{Binding AddFamilyParamCommand}" />
+
+                <ui:MenuItem
+                    Icon="{ui:SymbolIcon TrayItemRemove24}"
+                    ToolTip="{me:LocalizationSource MainWindow.RemoveFamilyParamToolTip}"
+                    Command="{Binding RemoveFamilyParamCommand}" />
+
+                <ui:MenuItem
+                    Icon="{ui:SymbolIcon ArrowAutofitUp24}"
+                    ToolTip="{me:LocalizationSource MainWindow.UpFamilyParamToolTip}"
+                    Command="{Binding UpFamilyParamCommand}" />
+
+                <ui:MenuItem
+                    Icon="{ui:SymbolIcon ArrowAutofitDown24}"
+                    ToolTip="{me:LocalizationSource MainWindow.DownFamilyParamToolTip}"
+                    Command="{Binding DownFamilyParamCommand}" />
+            </Menu>
+
+        </Border>
+
+        <Border
+            Grid.Row="2"
             Grid.Column="0"
             Margin="14 0 0 0"
             Padding="14 8"
@@ -71,7 +98,7 @@
         </Border>
 
         <GridSplitter
-            Grid.Row="1"
+            Grid.Row="2"
             Grid.Column="1"
             Width="8"
             VerticalAlignment="Stretch"
@@ -80,39 +107,28 @@
             BorderBrush="Transparent" />
 
         <Border
-            Grid.Row="1"
+            Grid.Row="2"
             Grid.Column="2"
             Margin="0 0 14 0"
             Padding="14 8"
             Background="{DynamicResource CardBackground}"
             CornerRadius="{DynamicResource ControlCornerRadius}">
-            <StackPanel>
 
-                <ui:Button
-                    Content="Add"
-                    Command="{Binding AddFamilyParamCommand}" />
 
-                <ui:Button
-                    Content="Remove"
-                    Command="{Binding RemoveFamilyParamCommand}" />
-
-                <ui:Button
-                    Content="Up"
-                    Command="{Binding UpFamilyParamCommand}" />
-
-                <ui:Button
-                    Content="Down"
-                    Command="{Binding DownFamilyParamCommand}" />
-
-            </StackPanel>
+            <!-- <views:FamilyParamValuesView -->
+            <!--     Grid.Row="1" -->
+            <!--     Grid.Column="2" /> -->
         </Border>
-        
-        <!-- <views:FamilyParamValuesView -->
-        <!--     Grid.Row="1" -->
-        <!--     Grid.Column="2" /> -->
 
+        <ContentPresenter
+            Grid.Row="0"
+            Grid.Column="0"
+            Grid.RowSpan="4"
+            Grid.ColumnSpan="3"
+            x:Name="_rootContentDialog" />
+        
         <StackPanel
-            Grid.Row="2"
+            Grid.Row="3"
             Grid.Column="0"
             Grid.ColumnSpan="3"
             Orientation="Horizontal"

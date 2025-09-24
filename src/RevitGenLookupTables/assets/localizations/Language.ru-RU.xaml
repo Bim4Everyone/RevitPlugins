@@ -8,6 +8,15 @@
     <system:String x:Key="MainWindow.ButtonOk">ОК</system:String>
     <system:String x:Key="MainWindow.ButtonCancel">Отмена</system:String>
     
+    <system:String x:Key="MainWindow.AddFamilyParam">Добавить параметр семейства</system:String>
+    <system:String x:Key="MainWindow.AddFamilyParamToolTip">Добавить параметр семейства</system:String>
+    <system:String x:Key="MainWindow.RemoveFamilyParam">Удалить парамер семейства</system:String>
+    <system:String x:Key="MainWindow.RemoveFamilyParamToolTip">Удалить парамер семейства</system:String>
+    <system:String x:Key="MainWindow.UpFamilyParam">Переместить выбранные параметры семейства вверх</system:String>
+    <system:String x:Key="MainWindow.UpFamilyParamToolTip">Переместить выбранные параметры семейства вверх</system:String>
+    <system:String x:Key="MainWindow.DownFamilyParam">Переместить выбранные параметры семейства вниз</system:String>
+    <system:String x:Key="MainWindow.DownFamilyParamToolTip">Переместить выбранные параметры семейства вниз</system:String>
+    
     <system:String x:Key="FamilyParamsView.NameColumn">Имя</system:String>
     <system:String x:Key="FamilyParamsView.StorageTypeColumn">Тип</system:String>
     <system:String x:Key="FamilyParamsView.ColumnMetadataColumn">Данные</system:String>

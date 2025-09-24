@@ -8,6 +8,15 @@
     <system:String x:Key="MainWindow.ButtonOk">OK</system:String>
     <system:String x:Key="MainWindow.ButtonCancel">Cancel</system:String>
     
+    <system:String x:Key="MainWindow.AddFamilyParam">Add family parameters</system:String>
+    <system:String x:Key="MainWindow.AddFamilyParamToolTip">Add family parameters</system:String>
+    <system:String x:Key="MainWindow.RemoveFamilyParam">Remove family parameters</system:String>
+    <system:String x:Key="MainWindow.RemoveFamilyParamToolTip">Remove family parameters</system:String>
+    <system:String x:Key="MainWindow.UpFamilyParam">Up selected family parameters</system:String>
+    <system:String x:Key="MainWindow.UpFamilyParamToolTip">Up selected family parameters</system:String>
+    <system:String x:Key="MainWindow.DownFamilyParam">Down selected family parameters</system:String>
+    <system:String x:Key="MainWindow.DownFamilyParamToolTip">Down selected family parameters</system:String>
+    
     <system:String x:Key="FamilyParamsView.NameColumn">Name</system:String>
     <system:String x:Key="FamilyParamsView.StorageTypeColumn">Storage type</system:String>
     <system:String x:Key="FamilyParamsView.ColumnMetadataColumn">Metadata</system:String>
