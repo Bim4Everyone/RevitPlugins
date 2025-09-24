@@ -307,6 +307,9 @@ namespace RevitClashDetective.Models {
                     }
                 }
             }
+            if(references.Count == 0) {
+                return;
+            }
             _uiDocument.Selection.SetReferences(references);
         }
 #endif
