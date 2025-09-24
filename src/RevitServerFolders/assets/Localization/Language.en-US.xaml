@@ -40,7 +40,7 @@
     <system:String
         x:Key="MainWindow.Validation.SelectSourceFolder">Select a source folder.</system:String>
     <system:String
-        x:Key="MainWindow.Validation.SourceFolderEmpty">Select a source folder with models.</system:String>
+        x:Key="MainWindow.Validation.SourceFolderEmpty">No models in the source folder.</system:String>
     <system:String
         x:Key="MainWindow.Validation.AllModelsSkiped">All models are marked as skipped.</system:String>
     <system:String

@@ -40,7 +40,7 @@
     <system:String
         x:Key="MainWindow.Validation.SelectSourceFolder">Выберите папку источника.</system:String>
     <system:String
-        x:Key="MainWindow.Validation.SourceFolderEmpty">Выберите папку источника c моделями.</system:String>
+        x:Key="MainWindow.Validation.SourceFolderEmpty">Нет моделей в выбранной папке.</system:String>
     <system:String
         x:Key="MainWindow.Validation.AllModelsSkiped">Все модели помечены признаком пропустить.</system:String>
     <system:String
