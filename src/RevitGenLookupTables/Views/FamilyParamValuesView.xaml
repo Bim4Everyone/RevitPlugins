@@ -4,12 +4,10 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-    xmlns:dxe="http://schemas.devexpress.com/winfx/2008/xaml/editors"
-    xmlns:dx="http://schemas.devexpress.com/winfx/2008/xaml/core"
     xmlns:vms="clr-namespace:RevitGenLookupTables.ViewModels"
+    xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
 
     mc:Ignorable="d"
-    Height="450" Width="800"
 
     x:Name="_this"
     d:DataContext="{d:DesignInstance vms:FamilyParamValuesViewModel, IsDesignTimeCreatable=False}">
@@ -29,49 +27,43 @@
             <RowDefinition Height="*" />
         </Grid.RowDefinitions>
 
-        <dxe:TextEdit
+        <ui:TextBlock
             Grid.Row="0"
             Grid.Column="0"
-            IsReadOnly="True"
-            EditValue="Старт"
-            EditMode="InplaceActive"
+            Text="Старт"
             Margin="0,0,3,10" />
 
-        <dxe:TextEdit
+        <TextBox
             Grid.Row="0"
             Grid.Column="1"
             Margin="0,0,0,10"
-            EditValue="{Binding MinValueEdit, UpdateSourceTrigger=PropertyChanged}" />
+            Text="{Binding MinValueEdit, UpdateSourceTrigger=PropertyChanged}" />
 
-        <dxe:TextEdit
+        <ui:TextBlock
             Grid.Row="0"
             Grid.Column="2"
-            IsReadOnly="True"
-            EditValue="Стоп"
-            EditMode="InplaceActive"
+            Text="Стоп"
             Margin="0,0,3,10" />
 
-        <dxe:TextEdit
+        <TextBox
             Grid.Row="0"
             Grid.Column="3"
             Margin="0,0,0,10"
-            EditValue="{Binding MaxValueEdit, UpdateSourceTrigger=PropertyChanged}" />
+            Text="{Binding MaxValueEdit, UpdateSourceTrigger=PropertyChanged}" />
 
-        <dxe:TextEdit
+        <ui:TextBlock
             Grid.Row="0"
             Grid.Column="4"
-            IsReadOnly="True"
-            EditValue="Шаг"
-            EditMode="InplaceActive"
+            Text="Шаг"
             Margin="0,0,3,10" />
 
-        <dxe:TextEdit
+        <TextBox
             Grid.Row="0"
             Grid.Column="5"
             Margin="0,0,0,10"
-            EditValue="{Binding StepValueEdit, UpdateSourceTrigger=PropertyChanged}" Mask="##,####" />
+            Text="{Binding StepValueEdit, UpdateSourceTrigger=PropertyChanged}" />
 
-        <dx:SimpleButton
+        <ui:Button
             Grid.Row="0"
             Grid.Column="6"
             Margin="10,0,0,10"
@@ -80,7 +72,7 @@
             Command="{Binding GenerateCommand}"
             ToolTip="{Binding ErrorText}" />
 
-        <dxe:TextEdit
+        <TextBox
             Grid.Column="0"
             Grid.Row="1"
             Grid.ColumnSpan="7"
@@ -88,6 +80,6 @@
             VerticalContentAlignment="Top"
             VerticalScrollBarVisibility="Visible"
             HorizontalScrollBarVisibility="Visible"
-            EditValue="{Binding ParamValues, UpdateSourceTrigger=PropertyChanged}" />
+            Text="{Binding ParamValues, UpdateSourceTrigger=PropertyChanged}" />
     </Grid>
 </UserControl>

@@ -1,15 +1,6 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
     <PropertyGroup>
-        <UseDevExpress>true</UseDevExpress>
         <UseWpfUI>true</UseWpfUI>
         <LangVersion>12</LangVersion>
     </PropertyGroup>
-    <ItemGroup>
-      <Compile Remove="ViewModels\FamilyViewModel.cs" />
-      <None Include="ViewModels\FamilyViewModel.cs" />
-      <Page Remove="Views\LookupTablesWindow.xaml" />
-      <None Include="Views\LookupTablesWindow.xaml" />
-      <Compile Remove="Views\LookupTablesWindow.xaml.cs" />
-      <None Include="Views\LookupTablesWindow.xaml.cs" />
-    </ItemGroup>
 </Project>

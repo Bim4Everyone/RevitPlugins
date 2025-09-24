@@ -5,7 +5,7 @@ namespace RevitGenLookupTables.Views;
 /// <summary>
 ///     Interaction logic for ParamValuesView.xaml
 /// </summary>
-public partial class FamilyParamValuesView : UserControl {
+public partial class FamilyParamValuesView {
     public FamilyParamValuesView() {
         InitializeComponent();
     }

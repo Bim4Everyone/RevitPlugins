@@ -113,11 +113,7 @@
             Padding="14 8"
             Background="{DynamicResource CardBackground}"
             CornerRadius="{DynamicResource ControlCornerRadius}">
-
-
-            <!-- <views:FamilyParamValuesView -->
-            <!--     Grid.Row="1" -->
-            <!--     Grid.Column="2" /> -->
+            <views:FamilyParamValuesView DataContext="{Binding ChosenFamilyParam.FamilyParamValues}" />
         </Border>
 
         <ContentPresenter
@@ -126,7 +122,7 @@
             Grid.RowSpan="4"
             Grid.ColumnSpan="3"
             x:Name="_rootContentDialog" />
-        
+
         <StackPanel
             Grid.Row="3"
             Grid.Column="0"
