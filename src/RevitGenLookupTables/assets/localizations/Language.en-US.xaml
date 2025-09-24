@@ -25,4 +25,7 @@
     <system:String x:Key="FamilyParamsDialog.Title">Please select family parameters</system:String>
     <system:String x:Key="FamilyParamsDialog.CloseButton">Close</system:String>
     <system:String x:Key="FamilyParamsDialog.SelectButton">Select</system:String>
+    
+    <system:String x:Key="Startup.NotFamilyTitle">Warning</system:String>
+    <system:String x:Key="Startup.NotFamilyMessage">Please open a family document!</system:String>
 </ResourceDictionary>

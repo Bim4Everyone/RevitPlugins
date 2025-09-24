@@ -25,4 +25,7 @@
     <system:String x:Key="FamilyParamsDialog.Title">Выберите парамеры семейства</system:String>
     <system:String x:Key="FamilyParamsDialog.CloseButton">Закрыть</system:String>
     <system:String x:Key="FamilyParamsDialog.SelectButton">Выбрать</system:String>
+    
+    <system:String x:Key="Startup.NotFamilyTitle">Предупреждение</system:String>
+    <system:String x:Key="Startup.NotFamilyMessage">Плагин работатет только с семейством</system:String>
 </ResourceDictionary>
