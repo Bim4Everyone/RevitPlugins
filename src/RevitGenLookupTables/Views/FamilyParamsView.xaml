@@ -31,18 +31,7 @@
     </UserControl.Resources>
 
     <Grid>
-        <Grid.RowDefinitions>
-            <RowDefinition Height="Auto" />
-            <RowDefinition Height="*" />
-        </Grid.RowDefinitions>
-
-        <ui:AutoSuggestBox
-            Grid.Row="0"
-            Margin="0 0 0 8"
-            PlaceholderText="{me:LocalizationSource FamilyParamsView.FamilyParamsHint}" />
-
         <DataGrid
-            Grid.Row="1"
             IsReadOnly="True"
             SelectionMode="Extended"
             AutoGenerateColumns="False"
