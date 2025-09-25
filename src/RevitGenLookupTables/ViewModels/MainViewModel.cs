@@ -184,17 +184,17 @@ internal class MainViewModel : BaseViewModel {
     private bool CanAcceptView() {
         if(ChosenFamilyParams.Count == 0) {
             ErrorText = _localizationService.GetLocalizedString("MainViewModel.EmptyChosenList");
-            return false;       
+            return false;
         }
-        
+
         var familyParam = ChosenFamilyParams
             .FirstOrDefault(item => !string.IsNullOrEmpty(item.FamilyParamValues.GetValueErrors()));
-        
+
         if(familyParam != null) {
             ErrorText = familyParam.Name + ": " + familyParam.FamilyParamValues.GetValueErrors();
             return false;
         }
-        
+
         ErrorText = null;
         return true;
     }
@@ -226,19 +226,17 @@ internal class MainViewModel : BaseViewModel {
     }
 
     private void UpFamilyParam() {
-        var sortedParams = SelectedFamilyParams
-            .Select(item => new {
-                Param = item,
-                Index = ChosenFamilyParams.IndexOf(item)
-            })
-            .OrderBy(item => item.Index);
+        var indexes = SelectedFamilyParams
+            .Select(item => ChosenFamilyParams.IndexOf(item))
+            .OrderBy(item => item);
 
-        foreach(var sortedParam in sortedParams) {
-            if(sortedParam.Index == 0) {
-                break;
+        int count = 0;
+        foreach(int index in indexes) {
+            if(index == count++) {
+                continue;
             }
 
-            ChosenFamilyParams.Move(sortedParam.Index, sortedParam.Index - 1);
+            ChosenFamilyParams.Move(index, index - 1);
         }
     }
 
@@ -247,19 +245,17 @@ internal class MainViewModel : BaseViewModel {
     }
 
     private void DownFamilyParam() {
-        var sortedParams = SelectedFamilyParams
-            .Select(item => new {
-                Param = item,
-                Index = ChosenFamilyParams.IndexOf(item)
-            })
-            .OrderByDescending(item => item.Index);
+        var indexes = SelectedFamilyParams
+            .Select(item => ChosenFamilyParams.IndexOf(item))
+            .OrderByDescending(item => item);
 
-        foreach(var sortedParam in sortedParams) {
-            if(sortedParam.Index == SelectedFamilyParams.Count - 1) {
-                break;
+        int count = 0;
+        foreach(int index in indexes) {
+            if(index == ChosenFamilyParams.Count - ++count) {
+                continue;
             }
-
-            ChosenFamilyParams.Move(sortedParam.Index, sortedParam.Index + 1);
+        
+            ChosenFamilyParams.Move(index, index + 1);
         }
     }
 
