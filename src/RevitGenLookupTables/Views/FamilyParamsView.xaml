@@ -38,6 +38,7 @@
 
         <ui:AutoSuggestBox
             Grid.Row="0"
+            Margin="0 0 0 8"
             PlaceholderText="{me:LocalizationSource FamilyParamsView.FamilyParamsHint}" />
 
         <DataGrid

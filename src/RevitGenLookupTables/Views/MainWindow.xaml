@@ -70,7 +70,7 @@
                     Command="{Binding AddFamilyParamCommand}" />
 
                 <ui:MenuItem
-                    Icon="{ui:SymbolIcon TrayItemRemove24}"
+                    Icon="{ui:SymbolIcon Delete24}"
                     ToolTip="{me:LocalizationSource MainWindow.RemoveFamilyParamToolTip}"
                     Command="{Binding RemoveFamilyParamCommand}" />
 
