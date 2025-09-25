@@ -1,48 +1,56 @@
 ﻿<UserControl x:Class="RevitLintelPlacement.Views.RulesToolBar"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
-             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
-             xmlns:behaviors="clr-namespace:RevitLintelPlacement.Behaviors"
-             xmlns:local="clr-namespace:RevitLintelPlacement.Views"
-             xmlns:i="http://schemas.microsoft.com/expression/2010/interactivity"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:vm="clr-namespace:RevitLintelPlacement.ViewModels"
-             xmlns:dxe="http://schemas.devexpress.com/winfx/2008/xaml/editors" 
-             xmlns:dxmvvm="http://schemas.devexpress.com/winfx/2008/xaml/mvvm" 
+             xmlns:dxe="http://schemas.devexpress.com/winfx/2008/xaml/editors"
              xmlns:dx="http://schemas.devexpress.com/winfx/2008/xaml/core"
-             mc:Ignorable="d" 
+             mc:Ignorable="d"
              d:DesignHeight="450" d:DesignWidth="1100"
              d:DataContext="{d:DesignInstance vm:GroupedRuleCollectionViewModel, IsDesignTimeCreatable=False}">
     <UserControl.Resources>
         <Style TargetType="Button">
-            <Setter Property="BorderBrush" Value="Transparent"></Setter>
-            <Setter Property="Background" Value="Transparent"></Setter>
+            <Setter Property="BorderBrush" Value="Transparent" />
+            <Setter Property="Background" Value="Transparent" />
         </Style>
         <Style x:Key="_enabledButton" TargetType="dx:SimpleButton">
             <Style.Triggers>
                 <DataTrigger Binding="{Binding SelectedRule}" Value="{x:Null}">
-                    <Setter Property="IsEnabled" Value="False"/>
+                    <Setter Property="IsEnabled" Value="False" />
                 </DataTrigger>
             </Style.Triggers>
         </Style>
     </UserControl.Resources>
     <Grid>
         <Grid.RowDefinitions>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
         <StackPanel Grid.Row="0" Height="28" Margin="0 5 0 0" Orientation="Horizontal">
-            <dx:SimpleButton Width="28" ToolTip="Создать новые правила" Command="{Binding CreateNewRuleCommand}" Glyph="{dx:DXImage 'Office2013/Actions/AddItem_16x16.png'}"/>
-            <dx:SimpleButton Width="28" Margin="5 0 0 0" ToolTip="Загрузить правила" Command="{Binding LoadCommand}" Glyph="{dx:DXImage 'Office2013/Actions/Download_16x16.png'}" />
-            <dx:SimpleButton Width="28" Margin="5 0 0 0" ToolTip="Сохранить" Style="{StaticResource _enabledButton}" Command="{Binding SelectedRule.SaveCommand}" Glyph="{dx:DXImage 'DevAV/Actions/Save_16x16.png'}"/>
-            <dx:SimpleButton Width="28" Margin="5 0 0 0" ToolTip="Сохранить как" Style="{StaticResource _enabledButton}" Command="{Binding SelectedRule.SaveAsCommand}" Glyph="{dx:DXImage 'DevAV/Actions/SaveAs_16x16.png'}"/>
-            <dx:SimpleButton Width="28" Margin="5 0 0 0" ToolTip="Переименовать" Style="{StaticResource _enabledButton}" Command="{Binding SelectedRule.RenameCommand}" Glyph="{dx:DXImage 'Office2013/Edit/Edit_16x16.png'}"
-                             CommandParameter="{Binding Rules}"/>
-            <dx:SimpleButton Width="28" Margin="5 0 0 0" ToolTip="Копировать" Style="{StaticResource _enabledButton}" Command="{Binding CopyCommand}" Glyph="{dx:DXImage 'Office2013/Edit/Copy_16x16.png'}"/>
-            <dx:SimpleButton Width="28" Margin="5 0 0 0" ToolTip="Удалить" Style="{StaticResource _enabledButton}" Command="{Binding DeleteCommand}" Glyph="{dx:DXImage 'Office2013/Reports/DeleteGroupHeader_16x16.png'}"/>
+            <dx:SimpleButton Width="28" ToolTip="Создать новые правила" Command="{Binding CreateNewRuleCommand}"
+                             Glyph="{dx:DXImage 'Office2013/Actions/AddItem_16x16.png'}" />
+            <dx:SimpleButton Width="28" Margin="5 0 0 0" ToolTip="Загрузить правила" Command="{Binding LoadCommand}"
+                             Glyph="{dx:DXImage 'Office2013/Actions/Download_16x16.png'}" />
+            <dx:SimpleButton Width="28" Margin="5 0 0 0" ToolTip="Сохранить" Style="{StaticResource _enabledButton}"
+                             Command="{Binding SelectedRule.SaveCommand}"
+                             Glyph="{dx:DXImage 'DevAV/Actions/Save_16x16.png'}" />
+            <dx:SimpleButton Width="28" Margin="5 0 0 0" ToolTip="Сохранить как"
+                             Style="{StaticResource _enabledButton}" Command="{Binding SelectedRule.SaveAsCommand}"
+                             Glyph="{dx:DXImage 'DevAV/Actions/SaveAs_16x16.png'}" />
+            <dx:SimpleButton Width="28" Margin="5 0 0 0" ToolTip="Переименовать"
+                             Style="{StaticResource _enabledButton}" Command="{Binding SelectedRule.RenameCommand}"
+                             Glyph="{dx:DXImage 'Office2013/Edit/Edit_16x16.png'}"
+                             CommandParameter="{Binding Rules}" />
+            <dx:SimpleButton Width="28" Margin="5 0 0 0" ToolTip="Копировать" Style="{StaticResource _enabledButton}"
+                             Command="{Binding CopyCommand}" Glyph="{dx:DXImage 'Office2013/Edit/Copy_16x16.png'}" />
+            <dx:SimpleButton Width="28" Margin="5 0 0 0" ToolTip="Удалить" Style="{StaticResource _enabledButton}"
+                             Command="{Binding DeleteCommand}"
+                             Glyph="{dx:DXImage 'Office2013/Reports/DeleteGroupHeader_16x16.png'}" />
         </StackPanel>
         <StackPanel Grid.Row="1" Margin="0 10" Orientation="Vertical" HorizontalAlignment="Left">
-            <dxe:ComboBoxEdit Width="300" Height="25" FontSize="14" IsTextEditable="False" ItemsSource="{Binding Rules}" DisplayMember="Name" SelectedItem="{Binding SelectedRule}"/>
+            <dxe:ComboBoxEdit Width="300" Height="25" FontSize="14" IsTextEditable="False"
+                              ItemsSource="{Binding Rules}" DisplayMember="Name" SelectedItem="{Binding SelectedRule}" />
         </StackPanel>
     </Grid>
 </UserControl>

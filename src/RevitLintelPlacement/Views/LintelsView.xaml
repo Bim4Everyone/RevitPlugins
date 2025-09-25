@@ -5,14 +5,11 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-    xmlns:local="clr-namespace:RevitLintelPlacement.Views"
-    xmlns:extensions="clr-namespace:RevitLintelPlacement.Extensions"
     xmlns:vm="clr-namespace:RevitLintelPlacement.ViewModels"
-    xmlns:i="http://schemas.microsoft.com/expression/2010/interactivity"
-    xmlns:converters="clr-namespace:RevitLintelPlacement.Converters" 
-    xmlns:dxe="http://schemas.devexpress.com/winfx/2008/xaml/editors" 
-    xmlns:dxmvvm="http://schemas.devexpress.com/winfx/2008/xaml/mvvm" 
-    xmlns:dxg="http://schemas.devexpress.com/winfx/2008/xaml/grid" xmlns:dx="http://schemas.devexpress.com/winfx/2008/xaml/core"
+    xmlns:dxe="http://schemas.devexpress.com/winfx/2008/xaml/editors"
+    xmlns:dxmvvm="http://schemas.devexpress.com/winfx/2008/xaml/mvvm"
+    xmlns:dxg="http://schemas.devexpress.com/winfx/2008/xaml/grid"
+    xmlns:dx="http://schemas.devexpress.com/winfx/2008/xaml/core"
     mc:Ignorable="d"
     Height="650" Width="1150"
     MinHeight="650" MinWidth="1150"
@@ -21,7 +18,7 @@
     Title="Навигатор"
     d:DataContext="{d:DesignInstance vm:LintelCollectionViewModel, IsDesignTimeCreatable=False}">
     <dxmvvm:Interaction.Behaviors>
-        <dxmvvm:EventToCommand EventName="Closing" Command="{Binding CloseCommand}"/>
+        <dxmvvm:EventToCommand EventName="Closing" Command="{Binding CloseCommand}" />
     </dxmvvm:Interaction.Behaviors>
     <Grid Margin="5 0">
         <Grid.RowDefinitions>
@@ -31,39 +28,40 @@
             <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
 
-        <dxe:ComboBoxEdit 
-                Grid.Row="0" Margin="0 10"
-                HorizontalAlignment="Stretch"
-                Background="Transparent"
-                IsTextEditable="False"
-                ItemsSource="{Binding SampleModes}"
-                DisplayMember="Name"
-                EditValue="{Binding SelectedSampleMode, UpdateSourceTrigger=PropertyChanged}" >
+        <dxe:ComboBoxEdit
+            Grid.Row="0" Margin="0 10"
+            HorizontalAlignment="Stretch"
+            Background="Transparent"
+            IsTextEditable="False"
+            ItemsSource="{Binding SampleModes}"
+            DisplayMember="Name"
+            EditValue="{Binding SelectedSampleMode, UpdateSourceTrigger=PropertyChanged}">
             <dxmvvm:Interaction.Behaviors>
-                <dxmvvm:EventToCommand EventName="EditValueChanged" Command="{Binding SampleModeChangedCommand}"/>
+                <dxmvvm:EventToCommand EventName="EditValueChanged" Command="{Binding SampleModeChangedCommand}" />
             </dxmvvm:Interaction.Behaviors>
         </dxe:ComboBoxEdit>
 
-        <dxe:ListBoxEdit 
-                 Grid.Row="1"
-                 SelectionMode="Single"      
-                 EditValue="{Binding SelectedElementKind, UpdateSourceTrigger=PropertyChanged}" >
+        <dxe:ListBoxEdit
+            Grid.Row="1"
+            SelectionMode="Single"
+            EditValue="{Binding SelectedElementKind, UpdateSourceTrigger=PropertyChanged}">
             <dxe:ListBoxEdit.StyleSettings>
-                <dxe:RadioListBoxEditStyleSettings/>
+                <dxe:RadioListBoxEditStyleSettings />
             </dxe:ListBoxEdit.StyleSettings>
             <dxmvvm:Interaction.Behaviors>
-                <dxmvvm:EventToCommand EventName="EditValueChanged" Command="{Binding SelectionElementKindChangedCommand}"/>
-                <dxmvvm:EnumItemsSourceBehavior EnumType="{x:Type vm:ElementInWallKind}"/>
+                <dxmvvm:EventToCommand EventName="EditValueChanged"
+                                       Command="{Binding SelectionElementKindChangedCommand}" />
+                <dxmvvm:EnumItemsSourceBehavior EnumType="{x:Type vm:ElementInWallKind}" />
             </dxmvvm:Interaction.Behaviors>
             <dxe:ListBoxEdit.ItemsPanel>
                 <ItemsPanelTemplate>
-                    <StackPanel Orientation="Horizontal"></StackPanel>
+                    <StackPanel Orientation="Horizontal" />
                 </ItemsPanelTemplate>
             </dxe:ListBoxEdit.ItemsPanel>
         </dxe:ListBoxEdit>
 
         <dxg:GridControl Grid.Row="2" x:Name="_gridControl" SelectionMode="Row" AutoExpandAllGroups="True"
-             ItemsSource="{Binding LintelsViewSource.View, UpdateSourceTrigger=PropertyChanged, Mode=OneWay}"
+                         ItemsSource="{Binding LintelsViewSource.View, UpdateSourceTrigger=PropertyChanged, Mode=OneWay}"
                          SelectedItem="{Binding LintelsViewSource.View.CurrentItem, Mode=OneWay}">
             <dxg:GridControl.View>
                 <dxg:TableView x:Name="_gridView" AutoWidth="True" />
@@ -74,38 +72,39 @@
             <dxg:GridColumn Width="25" MaxWidth="25" MinWidth="25">
                 <dxg:GridColumn.CellTemplate>
                     <DataTemplate DataType="{x:Type vm:LintelInfoViewModel}">
-                        <dx:SimpleButton Name="PART_Editor" 
-                                         Command="{Binding Row.RotateLintelCommand}" 
-                                         CommandParameter="{Binding Row.LintelId}" 
-                                         Glyph="{dx:DXImage 'Office2013/Actions/Refresh_16x16.png'}" GlyphWidth="16"/>
+                        <dx:SimpleButton Name="PART_Editor"
+                                         Command="{Binding Row.RotateLintelCommand}"
+                                         CommandParameter="{Binding Row.LintelId}"
+                                         Glyph="{dx:DXImage 'Office2013/Actions/Refresh_16x16.png'}" GlyphWidth="16" />
                     </DataTemplate>
                 </dxg:GridColumn.CellTemplate>
             </dxg:GridColumn>
             <dxg:GridColumn Header="Перемычка" Width="Auto">
                 <dxg:GridColumn.CellTemplate>
                     <DataTemplate DataType="{x:Type vm:LintelInfoViewModel}">
-                        <dx:SimpleButton Name="PART_Editor" 
-                                         Content="{Binding Row.LintelId}" 
-                                         Command="{Binding ElementName=LintelView, Path=DataContext.SelectAndShowElementCommand}" 
+                        <dx:SimpleButton Name="PART_Editor"
+                                         Content="{Binding Row.LintelId}"
+                                         Command="{Binding ElementName=LintelView, Path=DataContext.SelectAndShowElementCommand}"
                                          CommandParameter="{Binding Row.LintelId}" />
                     </DataTemplate>
                 </dxg:GridColumn.CellTemplate>
             </dxg:GridColumn>
             <dxg:GridColumn Header="Проем" Width="Auto">
-                <dxg:GridColumn.CellTemplate >
+                <dxg:GridColumn.CellTemplate>
                     <DataTemplate DataType="{x:Type vm:LintelInfoViewModel}">
-                        <dx:SimpleButton Name="PART_Editor" 
-                                         Content="{Binding Row.ElementInWallId}" 
-                                         Command="{Binding ElementName=LintelView, Path=DataContext.SelectAndShowElementCommand}" 
+                        <dx:SimpleButton Name="PART_Editor"
+                                         Content="{Binding Row.ElementInWallId}"
+                                         Command="{Binding ElementName=LintelView, Path=DataContext.SelectAndShowElementCommand}"
                                          CommandParameter="{Binding Row.ElementInWallId}" />
                     </DataTemplate>
                 </dxg:GridColumn.CellTemplate>
             </dxg:GridColumn>
-            <dxg:GridColumn Header="Семейство проема: типоразмер" FieldName="ElementInWallName" AllowEditing="False"  ReadOnly="True"/>
-            <dxg:GridColumn Header="Типоразмер основы" FieldName="WallTypeName"  AllowEditing="False" ReadOnly="True"/>
-            <dxg:GridColumn Header="Уровень" FieldName="Level" AllowEditing="False" ReadOnly="True"/>
+            <dxg:GridColumn Header="Семейство проема: типоразмер" FieldName="ElementInWallName" AllowEditing="False"
+                            ReadOnly="True" />
+            <dxg:GridColumn Header="Типоразмер основы" FieldName="WallTypeName" AllowEditing="False" ReadOnly="True" />
+            <dxg:GridColumn Header="Уровень" FieldName="Level" AllowEditing="False" ReadOnly="True" />
         </dxg:GridControl>
-        
+
         <Grid Grid.Row="3" Height="30">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition />
@@ -113,19 +112,21 @@
                 <ColumnDefinition />
             </Grid.ColumnDefinitions>
             <dx:SimpleButton Grid.Column="0" Width="70" BorderBrush="Transparent" Background="Transparent"
-                    HorizontalAlignment="Right" Command="{Binding SelectPreviousCommand}"
-                             Glyph="{dx:DXImage 'Office2013/Arrows/Prev_16x16.png'}"/>
-            
-            <dxe:TextEdit Grid.Column="1" Width="80" Margin="25 0 0 0" IsReadOnly="True" EditMode="InplaceActive" VerticalAlignment="Center"
-                       EditValue="{Binding LintelsViewSource.View.CurrentItem.LintelId}" />
-            
+                             HorizontalAlignment="Right" Command="{Binding SelectPreviousCommand}"
+                             Glyph="{dx:DXImage 'Office2013/Arrows/Prev_16x16.png'}" />
+
+            <dxe:TextEdit Grid.Column="1" Width="80" Margin="25 0 0 0" IsReadOnly="True" EditMode="InplaceActive"
+                          VerticalAlignment="Center"
+                          EditValue="{Binding LintelsViewSource.View.CurrentItem.LintelId}" />
+
             <DockPanel Grid.Column="2" LastChildFill="False">
                 <dx:SimpleButton DockPanel.Dock="Left" Width="70" BorderBrush="Transparent"
-                        Background="Transparent" Command="{Binding SelectNextCommand}"
-                                 Glyph="{dx:DXImage 'Office2013/Arrows/Next_16x16.png'}"/>
+                                 Background="Transparent" Command="{Binding SelectNextCommand}"
+                                 Glyph="{dx:DXImage 'Office2013/Arrows/Next_16x16.png'}" />
 
-                <dxe:TextEdit DockPanel.Dock="Right" Margin="2 0 30 0" VerticalAlignment="Center" IsReadOnly="True" EditMode="InplaceActive"
-                           EditValue="{DXBinding Expr='LintelsViewSource.View.CurrentPosition + 1 + `/` + CountLintelInView', Mode=OneWay}"/>
+                <dxe:TextEdit DockPanel.Dock="Right" Margin="2 0 30 0" VerticalAlignment="Center" IsReadOnly="True"
+                              EditMode="InplaceActive"
+                              EditValue="{DXBinding Expr='LintelsViewSource.View.CurrentPosition + 1 + `/` + CountLintelInView', Mode=OneWay}" />
 
             </DockPanel>
         </Grid>

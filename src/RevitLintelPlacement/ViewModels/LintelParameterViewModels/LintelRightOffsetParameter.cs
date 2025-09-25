@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-using Autodesk.Revit.DB;
+﻿using Autodesk.Revit.DB;
 
 using dosymep.Revit;
 using dosymep.WPF.ViewModels;
@@ -12,27 +6,27 @@ using dosymep.WPF.ViewModels;
 using RevitLintelPlacement.Models;
 using RevitLintelPlacement.ViewModels.Interfaces;
 
-namespace RevitLintelPlacement.ViewModels.LintelParameterViewModels {
-    internal class LintelRightOffsetParameter : BaseViewModel, ILintelParameterViewModel {
-        private readonly RevitRepository _revitRepository;
-        private double _rightOffset;
+namespace RevitLintelPlacement.ViewModels.LintelParameterViewModels;
 
-        public LintelRightOffsetParameter(RevitRepository revitRepository) {
-            this._revitRepository = revitRepository;
-        }
+internal class LintelRightOffsetParameter : BaseViewModel, ILintelParameterViewModel {
+    private readonly RevitRepository _revitRepository;
+    private double _rightOffset;
 
-        public double RightOffset {
-            get => _rightOffset;
-            set => this.RaiseAndSetIfChanged(ref _rightOffset, value);
-        }
+    public LintelRightOffsetParameter(RevitRepository revitRepository) {
+        _revitRepository = revitRepository;
+    }
+
+    public double RightOffset {
+        get => _rightOffset;
+        set => RaiseAndSetIfChanged(ref _rightOffset, value);
+    }
 #if REVIT_2020_OR_LESS
         public double RightOffsetInternal => UnitUtils.ConvertToInternalUnits(RightOffset, DisplayUnitType.DUT_MILLIMETERS);
 #else
-        public double RightOffsetInternal => UnitUtils.ConvertToInternalUnits(RightOffset, UnitTypeId.Millimeters);
+    public double RightOffsetInternal => UnitUtils.ConvertToInternalUnits(RightOffset, UnitTypeId.Millimeters);
 #endif
 
-        public void SetTo(FamilyInstance lintel, FamilyInstance elementInWall) {
-            lintel.SetParamValue(_revitRepository.LintelsCommonConfig.LintelRightOffset, RightOffsetInternal);
-        }
+    public void SetTo(FamilyInstance lintel, FamilyInstance elementInWall) {
+        lintel.SetParamValue(_revitRepository.LintelsCommonConfig.LintelRightOffset, RightOffsetInternal);
     }
 }

@@ -1,23 +1,19 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Collections.Generic;
 
 using Autodesk.Revit.DB;
 
 using RevitLintelPlacement.Models.Interfaces;
-using RevitLintelPlacement.ViewModels;
 
-namespace RevitLintelPlacement.Models.LintelsProviders {
-    internal class AllLintelsProvider : ILintelsProvider {
-        private readonly RevitRepository _revitRepository;
+namespace RevitLintelPlacement.Models.LintelsProviders;
 
-        public AllLintelsProvider(RevitRepository revitRepository) {
-            _revitRepository = revitRepository;
-        }
+internal class AllLintelsProvider : ILintelsProvider {
+    private readonly RevitRepository _revitRepository;
 
-        public ICollection<FamilyInstance> GetLintels() {
-            return _revitRepository.GetLintels(_revitRepository.GetAllElementsCollector());
-        }
+    public AllLintelsProvider(RevitRepository revitRepository) {
+        _revitRepository = revitRepository;
+    }
+
+    public ICollection<FamilyInstance> GetLintels() {
+        return _revitRepository.GetLintels(_revitRepository.GetAllElementsCollector());
     }
 }
