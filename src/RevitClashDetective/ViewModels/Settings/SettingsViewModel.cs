@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 using System.Windows.Input;
 
@@ -17,6 +18,7 @@ internal class SettingsViewModel : BaseViewModel {
     private string _errorText;
     private SectionBoxModeViewModel _selectedSectionBoxMode;
     private int _sectionBoxOffset;
+    private ParamViewModel _selectedParam;
     private const int _maxSectionBoxOffset = 10000;
 
     public SettingsViewModel(RevitRepository revitRepository, SettingsConfig config, ILocalizationService localizationService) {
@@ -30,15 +32,28 @@ internal class SettingsViewModel : BaseViewModel {
         SectionBoxModes = [.. Enum.GetValues(typeof(SectionBoxMode))
                 .Cast<SectionBoxMode>()
                 .Select(w => new SectionBoxModeViewModel(w, _localizationService))];
+        Params = [];
 
         LoadViewCommand = RelayCommand.Create(LoadView);
         AcceptViewCommand = RelayCommand.Create(AcceptView, CanAcceptView);
+        AddParamCommand = RelayCommand.Create(AddParam);
+        RemoveParamCommand = RelayCommand.Create<ParamViewModel>(RemoveParam, CanRemoveParam);
+        MoveParamUpCommand = RelayCommand.Create<ParamViewModel>(MoveParamUp, CanMoveParamUp);
+        MoveParamDownCommand = RelayCommand.Create<ParamViewModel>(MoveParamDown, CanMoveParamDown);
     }
 
 
     public ICommand LoadViewCommand { get; }
 
     public ICommand AcceptViewCommand { get; }
+
+    public ICommand MoveParamUpCommand { get; }
+
+    public ICommand MoveParamDownCommand { get; }
+
+    public ICommand AddParamCommand { get; }
+
+    public ICommand RemoveParamCommand { get; }
 
     public string ErrorText {
         get => _errorText;
@@ -50,6 +65,13 @@ internal class SettingsViewModel : BaseViewModel {
     public ElementVisibilitySettingsViewModel SecondElementVisibilitySettings { get; }
 
     public IReadOnlyCollection<SectionBoxModeViewModel> SectionBoxModes { get; }
+
+    public ObservableCollection<ParamViewModel> Params { get; }
+
+    public ParamViewModel SelectedParam {
+        get => _selectedParam;
+        set => RaiseAndSetIfChanged(ref _selectedParam, value);
+    }
 
     public SectionBoxModeViewModel SelectedSectionBoxMode {
         get => _selectedSectionBoxMode;
@@ -113,5 +135,44 @@ internal class SettingsViewModel : BaseViewModel {
         _config.SectionBoxOffset = SectionBoxOffset;
         _config.SectionBoxModeSettings = SelectedSectionBoxMode.Mode;
         _config.SaveProjectConfig();
+    }
+
+    private void MoveParamUp(ParamViewModel param) {
+        int indexFrom = Params.IndexOf(param);
+        int indexTo = indexFrom - 1;
+        (Params[indexFrom], Params[indexTo]) = (Params[indexTo], Params[indexFrom]);
+        SelectedParam = Params[indexTo];
+    }
+
+    private bool CanMoveParamUp(ParamViewModel param) {
+        return param is not null
+            && Params.IndexOf(param) > 0;
+    }
+
+    private void MoveParamDown(ParamViewModel param) {
+        int indexFrom = Params.IndexOf(param);
+        int indexTo = indexFrom + 1;
+        (Params[indexFrom], Params[indexTo]) = (Params[indexTo], Params[indexFrom]);
+        SelectedParam = Params[indexTo];
+    }
+
+    private bool CanMoveParamDown(ParamViewModel param) {
+        return param is not null
+            && (Params.IndexOf(param) < (Params.Count - 1));
+    }
+
+    private void AddParam() {
+        var p = new ParamViewModel();
+        SelectedParam = p;
+        Params.Add(p);
+    }
+
+    private void RemoveParam(ParamViewModel param) {
+        Params.Remove(param);
+        SelectedParam = Params.FirstOrDefault();
+    }
+
+    private bool CanRemoveParam(ParamViewModel param) {
+        return param is not null;
     }
 }

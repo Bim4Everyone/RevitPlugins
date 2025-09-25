@@ -34,6 +34,18 @@
         x:Key="SettingsWindow.SectionBoxModeSettings">Режим 3D подрезки:</system:String>
     <system:String
         x:Key="SettingsWindow.SectionBoxAdditionalSize">Отступ подрезки, мм:</system:String>
+    <system:String
+        x:Key="SettingsWindow.ParamsLabel">Параметры для навигатора</system:String>
+    <system:String
+        x:Key="SettingsWindow.ParamsTooltip">Параметры будут отображаться в столбцах навигатора для каждого элемента коллизии слева направо после зафиксированных столбцов. Верхний параметр будет слева.</system:String>
+    <system:String
+        x:Key="SettingsWindow.AddParamTooltip">Добавить параметр</system:String>
+    <system:String
+        x:Key="SettingsWindow.RemoveParamTooltip">Удалить параметр</system:String>
+    <system:String
+        x:Key="SettingsWindow.MoveParamUpTooltip">Переместить параметр вверх</system:String>
+    <system:String
+        x:Key="SettingsWindow.MoveParamDownTooltip">Переместить параметр вниз</system:String>
 
     <system:String
         x:Key="Transactions.IsolateClashElements">Изоляция элементов коллизии</system:String>

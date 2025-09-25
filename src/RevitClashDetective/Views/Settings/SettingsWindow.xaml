@@ -16,11 +16,8 @@
     Title="{me:LocalizationSource SettingsWindow.Title}"
     Width="450"
     Height="400"
-    MinWidth="450"
+    MinWidth="650"
     MinHeight="550"
-    MaxWidth="450"
-    MaxHeight="550"
-    ResizeMode="NoResize"
     d:DataContext="{d:DesignInstance vms:SettingsViewModel, IsDesignTimeCreatable=False}">
 
     <Window.Resources>
@@ -64,6 +61,9 @@
                 Property="CornerRadius"
                 Value="{DynamicResource ControlCornerRadius}" />
         </Style>
+        <ui:TextBlock
+            x:Key="RemoveParamTooltip"
+            Text="{me:LocalizationSource SettingsWindow.RemoveParamTooltip}" />
     </Window.Resources>
     <b:Interaction.Triggers>
         <b:EventTrigger
@@ -83,8 +83,14 @@
                 Height="Auto" />
         </Grid.RowDefinitions>
 
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition />
+            <ColumnDefinition />
+        </Grid.ColumnDefinitions>
+
         <ui:TitleBar
             Grid.Row="0"
+            Grid.ColumnSpan="2"
             ShowMaximize="False"
             Title="{me:LocalizationSource SettingsWindow.Title}" />
 
@@ -149,8 +155,76 @@
 
         </StackPanel>
 
+        <Border
+            Grid.Row="1"
+            Grid.Column="1"
+            Style="{StaticResource CustomBorder}">
+            <DockPanel
+                LastChildFill="True">
+                <Label
+                    DockPanel.Dock="Top"
+                    Content="{me:LocalizationSource SettingsWindow.ParamsLabel}" />
+                <DockPanel
+                    DockPanel.Dock="Top"
+                    HorizontalAlignment="Left">
+                    <ui:Button
+                        Width="Auto"
+                        ToolTip="{me:LocalizationSource SettingsWindow.AddParamTooltip}"
+                        Content="{ui:SymbolIcon Symbol=Add20}"
+                        Command="{Binding AddParamCommand}" />
+                    <ui:Button
+                        Width="Auto"
+                        Margin="5 0 0 0"
+                        ToolTip="{me:LocalizationSource SettingsWindow.RemoveParamTooltip}"
+                        Content="{ui:SymbolIcon Symbol=Delete20}"
+                        Command="{Binding RemoveParamCommand}"
+                        CommandParameter="{Binding SelectedParam}" />
+                    <ui:Button
+                        Margin="5 0"
+                        Width="Auto"
+                        ToolTip="{me:LocalizationSource SettingsWindow.MoveParamUpTooltip}"
+                        Content="{ui:SymbolIcon Symbol=ArrowUp20}"
+                        Command="{Binding MoveParamUpCommand}"
+                        CommandParameter="{Binding SelectedParam}" />
+                    <ui:Button
+                        Width="Auto"
+                        ToolTip="{me:LocalizationSource SettingsWindow.MoveParamDownTooltip}"
+                        Content="{ui:SymbolIcon Symbol=ArrowDown20}"
+                        Command="{Binding MoveParamDownCommand}"
+                        CommandParameter="{Binding SelectedParam}" />
+                </DockPanel>
+                <ui:ListView
+                    SelectionMode="Single"
+                    ItemsSource="{Binding Params}"
+                    SelectedItem="{Binding SelectedParam}">
+                    <ListView.ItemTemplate>
+                        <DataTemplate>
+                            <Border
+                                Style="{StaticResource CustomBorder}">
+                                <DockPanel
+                                    LastChildFill="True">
+                                    <ui:Button
+                                        Margin="5 0 0 0"
+                                        Width="Auto"
+                                        DockPanel.Dock="Right"
+                                        HorizontalAlignment="Right"
+                                        ToolTip="{StaticResource RemoveParamTooltip}"
+                                        Content="{ui:SymbolIcon Symbol=Delete20}"
+                                        Command="{Binding DataContext.RemoveParamCommand, RelativeSource={RelativeSource AncestorType=Window}}"
+                                        CommandParameter="{Binding}" />
+                                    <ui:TextBox
+                                        Text="{Binding Name, UpdateSourceTrigger=PropertyChanged}" />
+                                </DockPanel>
+                            </Border>
+                        </DataTemplate>
+                    </ListView.ItemTemplate>
+                </ui:ListView>
+            </DockPanel>
+        </Border>
+
         <StackPanel
             Grid.Row="2"
+            Grid.ColumnSpan="2"
             Orientation="Horizontal"
             HorizontalAlignment="Right">
 
