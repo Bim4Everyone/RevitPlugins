@@ -1,33 +1,32 @@
 ﻿<UserControl x:Class="RevitLintelPlacement.Views.GroupedRulesView"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
-             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
-             xmlns:converter="clr-namespace:RevitLintelPlacement.Converters"
-             xmlns:vm="clr-namespace:RevitLintelPlacement.ViewModels.RuleViewModels" 
-             xmlns:vm1="clr-namespace:RevitLintelPlacement.ViewModels" 
-             xmlns:dxg="http://schemas.devexpress.com/winfx/2008/xaml/grid" 
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:vm="clr-namespace:RevitLintelPlacement.ViewModels.RuleViewModels"
+             xmlns:vm1="clr-namespace:RevitLintelPlacement.ViewModels"
+             xmlns:dxg="http://schemas.devexpress.com/winfx/2008/xaml/grid"
              xmlns:dxe="http://schemas.devexpress.com/winfx/2008/xaml/editors"
              xmlns:sys="clr-namespace:System;assembly=mscorlib"
              xmlns:lc="http://schemas.devexpress.com/winfx/2008/xaml/layoutcontrol"
-             xmlns:dx="http://schemas.devexpress.com/winfx/2008/xaml/core" 
+             xmlns:dx="http://schemas.devexpress.com/winfx/2008/xaml/core"
              mc:Ignorable="d"
              d:DesignHeight="450" d:DesignWidth="1100"
              d:DataContext="{d:DesignInstance vm:RulesViewModel, IsDesignTimeCreatable=False}"
              Name="ucRules">
     <UserControl.Resources>
-        <converter:WidthConverter x:Key="WidthConverter"/>
         <Style TargetType="{x:Type dx:SimpleButton}">
-            <Setter Property="BorderBrush" Value="Transparent"></Setter>
-            <Setter Property="Background" Value="Transparent"></Setter>
+            <Setter Property="BorderBrush" Value="Transparent" />
+            <Setter Property="Background" Value="Transparent" />
         </Style>
         <Style x:Key="_lbStyle" TargetType="{x:Type dxe:ListBoxEditItem}">
             <Style.Setters>
-                <Setter Property="IsSelected" Value="{Binding Content.IsSelected, Mode=TwoWay, RelativeSource={RelativeSource Self}}"/>
+                <Setter Property="IsSelected"
+                        Value="{Binding Content.IsSelected, Mode=TwoWay, RelativeSource={RelativeSource Self}}" />
                 <Setter Property="Template">
                     <Setter.Value>
                         <ControlTemplate TargetType="{x:Type dxe:ListBoxEditItem}">
-                            <ContentPresenter/>
+                            <ContentPresenter />
                         </ControlTemplate>
                     </Setter.Value>
                 </Setter>
@@ -37,42 +36,43 @@
             <DockPanel>
                 <Grid DockPanel.Dock="Left">
                     <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="*"/>
-                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="Auto" />
                     </Grid.ColumnDefinitions>
                     <Grid.RowDefinitions>
-                        <RowDefinition/>
-                        <RowDefinition Height="Auto"/>
+                        <RowDefinition />
+                        <RowDefinition Height="Auto" />
                     </Grid.RowDefinitions>
                     <lc:GroupBox x:Name="groupBox1" MinimizeElementVisibility="Visible" Width="1025" Margin="0 4 0 0">
                         <lc:GroupBox.Header>
                             <StackPanel Orientation="Horizontal" HorizontalAlignment="Stretch">
-                                <dxe:TextEdit VerticalAlignment="Center" IsReadOnly="True" EditMode="InplaceActive" EditValue="Правило:"/>
-                                <dxe:TextEdit MinWidth="150" 
-                                              VerticalContentAlignment="Center" 
-                                              HorizontalAlignment="Stretch" 
-                                              TextWrapping="Wrap" 
-                                              EditValue="{Binding Name, UpdateSourceTrigger=PropertyChanged}"/>
+                                <dxe:TextEdit VerticalAlignment="Center" IsReadOnly="True" EditMode="InplaceActive"
+                                              EditValue="Правило:" />
+                                <dxe:TextEdit MinWidth="150"
+                                              VerticalContentAlignment="Center"
+                                              HorizontalAlignment="Stretch"
+                                              TextWrapping="Wrap"
+                                              EditValue="{Binding Name, UpdateSourceTrigger=PropertyChanged}" />
                             </StackPanel>
                         </lc:GroupBox.Header>
                         <Grid>
                             <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="540"/>
-                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="540" />
+                                <ColumnDefinition Width="*" />
                             </Grid.ColumnDefinitions>
                             <Grid.RowDefinitions>
-                                <RowDefinition Height="Auto"/>
-                                <RowDefinition/>
-                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="Auto" />
+                                <RowDefinition />
+                                <RowDefinition Height="Auto" />
                             </Grid.RowDefinitions>
-                            <dxe:SearchControl x:Name="searchControl" 
-                                            Grid.Row="0" 
-                                            Margin="0 2 0 0" 
-                                            HorizontalAlignment="Stretch" 
-                                            VerticalAlignment="Center" 
-                                            FilterCondition="Like"
-                                            FilterByColumnsMode="Custom"
-                                            NullText="Фильтр">
+                            <dxe:SearchControl x:Name="searchControl"
+                                               Grid.Row="0"
+                                               Margin="0 2 0 0"
+                                               HorizontalAlignment="Stretch"
+                                               VerticalAlignment="Center"
+                                               FilterCondition="Like"
+                                               FilterByColumnsMode="Custom"
+                                               NullText="Фильтр">
                                 <dxe:SearchControl.ColumnProvider>
                                     <dxe:SelectorEditColumnProvider>
                                         <dxe:SelectorEditColumnProvider.CustomColumns>
@@ -81,9 +81,9 @@
                                     </dxe:SelectorEditColumnProvider>
                                 </dxe:SearchControl.ColumnProvider>
                             </dxe:SearchControl>
-                            <dxe:ListBoxEdit Grid.Column="0" 
-                                             Grid.Row="1" 
-                                             MaxHeight="200" 
+                            <dxe:ListBoxEdit Grid.Column="0"
+                                             Grid.Row="1"
+                                             MaxHeight="200"
                                              Margin="0 5 0 0"
                                              ItemsSource="{Binding WallTypesViewSource.View}"
                                              BorderThickness="0"
@@ -95,116 +95,128 @@
                                 </dxe:ListBoxEdit.StyleSettings>
                                 <dxe:ListBoxEdit.ItemTemplate>
                                     <DataTemplate DataType="{x:Type dxe:ListBoxEditItem}">
-                                        <dxe:CheckEdit Name="PART_Editor" HorizontalAlignment="Center" Margin="0 -3 0 -3"
-                                               EditValue="{Binding IsChecked, UpdateSourceTrigger=PropertyChanged}">
-                                            <dxe:TextEdit IsReadOnly="True" EditMode="InplaceActive" EditValue="{Binding Name}"/>
+                                        <dxe:CheckEdit Name="PART_Editor" HorizontalAlignment="Center"
+                                                       Margin="0 -3 0 -3"
+                                                       EditValue="{Binding IsChecked, UpdateSourceTrigger=PropertyChanged}">
+                                            <dxe:TextEdit IsReadOnly="True" EditMode="InplaceActive"
+                                                          EditValue="{Binding Name}" />
                                         </dxe:CheckEdit>
                                     </DataTemplate>
                                 </dxe:ListBoxEdit.ItemTemplate>
                             </dxe:ListBoxEdit>
                             <Grid Grid.Column="1" Grid.Row="0" Grid.RowSpan="2">
                                 <Grid.RowDefinitions>
-                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="Auto" />
                                     <RowDefinition />
                                 </Grid.RowDefinitions>
-                                <dxe:ListBoxEdit Grid.Row="0" 
-                                                MinWidth="400" 
-                                                BorderThickness="0" 
-                                                Focusable="False" 
-                                                BorderBrush="Transparent"
-                                                ItemsSource="{Binding Rules}"/>
+                                <dxe:ListBoxEdit Grid.Row="0"
+                                                 MinWidth="400"
+                                                 BorderThickness="0"
+                                                 Focusable="False"
+                                                 BorderBrush="Transparent"
+                                                 ItemsSource="{Binding Rules}" />
                                 <StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Center">
-                                    <dx:SimpleButton Width="30" 
-                                                     Height="20" 
-                                                     Margin="2 3" 
-                                                     VerticalAlignment="Top" 
-                                                     Command="{Binding AddRuleCommand}" 
-                                                     Glyph="{dx:DXImage 'SvgImages/Icon Builder/Actions_Add.svg'}"/>
-                                    <dx:SimpleButton Width="30" 
-                                                     Height="20" 
-                                                     Margin="2 3" 
-                                                     VerticalAlignment="Top" 
-                                                     Command="{Binding RemoveRuleCommand}" 
-                                                     Glyph="{dx:DXImage 'SvgImages/Icon Builder/Actions_Remove.svg'}"/>
+                                    <dx:SimpleButton Width="30"
+                                                     Height="20"
+                                                     Margin="2 3"
+                                                     VerticalAlignment="Top"
+                                                     Command="{Binding AddRuleCommand}"
+                                                     Glyph="{dx:DXImage 'SvgImages/Icon Builder/Actions_Add.svg'}" />
+                                    <dx:SimpleButton Width="30"
+                                                     Height="20"
+                                                     Margin="2 3"
+                                                     VerticalAlignment="Top"
+                                                     Command="{Binding RemoveRuleCommand}"
+                                                     Glyph="{dx:DXImage 'SvgImages/Icon Builder/Actions_Remove.svg'}" />
                                 </StackPanel>
                             </Grid>
-                            <dxe:TextEdit Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="2" HorizontalAlignment="Center" VerticalAlignment="Center" Foreground="Orange" IsReadOnly="True" EditMode="InplaceActive" EditValue="{Binding ErrorText}"/>
+                            <dxe:TextEdit Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="2" HorizontalAlignment="Center"
+                                          VerticalAlignment="Center" Foreground="Orange" IsReadOnly="True"
+                                          EditMode="InplaceActive" EditValue="{Binding ErrorText}" />
                         </Grid>
                     </lc:GroupBox>
                 </Grid>
-                <dx:SimpleButton DockPanel.Dock="Left" 
-                                 Margin="5 0" 
-                                 Width="30" 
-                                 Height="30" 
-                                 Name="bDelete" 
-                                 Command="{Binding ElementName=ucRules, Path=DataContext.RemoveGroupedRuleCommand}" 
-                                 CommandParameter="{Binding ElementName=bDelete, Path=DataContext}" 
-                                 Glyph="{dx:DXImage 'SvgImages/Icon Builder/Actions_Remove.svg'}"/>
+                <dx:SimpleButton DockPanel.Dock="Left"
+                                 Margin="5 0"
+                                 Width="30"
+                                 Height="30"
+                                 Name="bDelete"
+                                 Command="{Binding ElementName=ucRules, Path=DataContext.RemoveGroupedRuleCommand}"
+                                 CommandParameter="{Binding ElementName=bDelete, Path=DataContext}"
+                                 Glyph="{dx:DXImage 'SvgImages/Icon Builder/Actions_Remove.svg'}" />
             </DockPanel>
         </DataTemplate>
         <DataTemplate DataType="{x:Type vm1:ConcreteRuleViewModel}">
             <StackPanel Orientation="Horizontal">
                 <StackPanel Orientation="Horizontal" Margin="0 0 5 0">
-                    <dxe:TextEdit Width="81" Margin="1,0" EditValue="{Binding OpeningWidthCondition.MinWidth, UpdateSourceTrigger=PropertyChanged}"></dxe:TextEdit>
-                    <dxe:TextEdit Width="81" Margin="1,0" EditValue="{Binding OpeningWidthCondition.MaxWidth, UpdateSourceTrigger=PropertyChanged}"></dxe:TextEdit>
+                    <dxe:TextEdit Width="81" Margin="1,0"
+                                  EditValue="{Binding OpeningWidthCondition.MinWidth, UpdateSourceTrigger=PropertyChanged}" />
+                    <dxe:TextEdit Width="81" Margin="1,0"
+                                  EditValue="{Binding OpeningWidthCondition.MaxWidth, UpdateSourceTrigger=PropertyChanged}" />
                 </StackPanel>
                 <StackPanel Orientation="Horizontal">
-                    <dxe:TextEdit Width="81" Margin="1,0" EditValue="{Binding LintelLeftOffsetParameter.LeftOffset, UpdateSourceTrigger=PropertyChanged}"></dxe:TextEdit>
-                    <dxe:ComboBoxEdit MinWidth="190" 
-                                  Margin="1,0" 
-                                  IsTextEditable="False" 
-                                  ItemsSource="{Binding LintelTypes}" 
-                                  EditValue="{Binding SelectedLintelType}"/>
+                    <dxe:TextEdit Width="81" Margin="1,0"
+                                  EditValue="{Binding LintelLeftOffsetParameter.LeftOffset, UpdateSourceTrigger=PropertyChanged}" />
+                    <dxe:ComboBoxEdit MinWidth="190"
+                                      Margin="1,0"
+                                      IsTextEditable="False"
+                                      ItemsSource="{Binding LintelTypes}"
+                                      EditValue="{Binding SelectedLintelType}" />
                 </StackPanel>
             </StackPanel>
         </DataTemplate>
     </UserControl.Resources>
     <Grid>
         <Grid.RowDefinitions>
-            <RowDefinition Height="23"/>
-            <RowDefinition/>
+            <RowDefinition Height="23" />
+            <RowDefinition />
         </Grid.RowDefinitions>
         <dxg:GridControl Grid.Row="0" Margin="-13 0 0 0" ShowBorder="False">
             <dxg:GridControl.View>
-                <dxg:TableView  
+                <dxg:TableView
                     AllowGrouping="False"
                     AllowResizing="False"
                     AllowSorting="False"
                     ShowGroupPanel="False"
                     AllowDragDrop="False"
-                    AllowMoving="False"/>
+                    AllowMoving="False" />
             </dxg:GridControl.View>
-            <dxg:GridColumn AllowMoving="False" AllowEditing="False" AllowColumnFiltering="False" Width="552" Header="Типоразмеры стен"/>
-            <dxg:GridColumn AllowMoving="False" AllowEditing="False" AllowColumnFiltering="False" Width="172" Header="Размеры проема"/>
-            <dxg:GridColumn AllowMoving="False" AllowEditing="False" AllowColumnFiltering="False" Width="85" Header="Опирание"/>
-            <dxg:GridColumn AllowMoving="False" AllowEditing="False" AllowColumnFiltering="False" Width="210" Header="Типоразмер перемычки"/>
+            <dxg:GridColumn AllowMoving="False" AllowEditing="False" AllowColumnFiltering="False" Width="552"
+                            Header="Типоразмеры стен" />
+            <dxg:GridColumn AllowMoving="False" AllowEditing="False" AllowColumnFiltering="False" Width="172"
+                            Header="Размеры проема" />
+            <dxg:GridColumn AllowMoving="False" AllowEditing="False" AllowColumnFiltering="False" Width="85"
+                            Header="Опирание" />
+            <dxg:GridColumn AllowMoving="False" AllowEditing="False" AllowColumnFiltering="False" Width="210"
+                            Header="Типоразмер перемычки" />
         </dxg:GridControl>
-        <ScrollViewer Grid.Row="1" MaxHeight="{Binding ElementName=ucRules, Path=ActualHeight}" CanContentScroll="False" HorizontalScrollBarVisibility="Auto">
+        <ScrollViewer Grid.Row="1" MaxHeight="{Binding ElementName=ucRules, Path=ActualHeight}"
+                      CanContentScroll="False" HorizontalScrollBarVisibility="Auto">
             <Grid>
                 <Grid.ColumnDefinitions>
-                    <ColumnDefinition/>
-                    <ColumnDefinition/>
+                    <ColumnDefinition />
+                    <ColumnDefinition />
                 </Grid.ColumnDefinitions>
                 <Grid.RowDefinitions>
-                    <RowDefinition Height="Auto"/>
-                    <RowDefinition Height="Auto"/>
-                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
                 </Grid.RowDefinitions>
-                <dxe:ListBoxEdit Grid.Row="1" 
-                                 Grid.Column="0" 
-                                 Focusable="False" 
-                                 IsTabStop="False" 
+                <dxe:ListBoxEdit Grid.Row="1"
+                                 Grid.Column="0"
+                                 Focusable="False"
+                                 IsTabStop="False"
                                  BorderThickness="0"
                                  BorderBrush="Transparent"
                                  x:Name="lbGroupedRules"
                                  ItemContainerStyle="{StaticResource _lbStyle}"
-                                 ItemsSource="{Binding Rules}"/>
+                                 ItemsSource="{Binding Rules}" />
                 <StackPanel Grid.Row="2" Grid.Column="0" Orientation="Horizontal" HorizontalAlignment="Center">
                     <dx:SimpleButton Width="30"
                                      Height="30"
-                                     Margin="3" 
+                                     Margin="3"
                                      Command="{Binding AddGroupedRuleCommand}"
-                                     Glyph="{dx:DXImage 'SvgImages/Icon Builder/Actions_Add.svg'}"/>
+                                     Glyph="{dx:DXImage 'SvgImages/Icon Builder/Actions_Add.svg'}" />
                 </StackPanel>
             </Grid>
         </ScrollViewer>

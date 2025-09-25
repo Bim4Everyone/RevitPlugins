@@ -8,10 +8,10 @@
     xmlns:local="clr-namespace:RevitLintelPlacement.Views"
     xmlns:vm="clr-namespace:RevitLintelPlacement.ViewModels"
     xmlns:converter="clr-namespace:RevitLintelPlacement.Converters"
-    xmlns:extensions="clr-namespace:RevitLintelPlacement.Extensions"
     xmlns:dxe="http://schemas.devexpress.com/winfx/2008/xaml/editors"
     xmlns:dxmvvm="http://schemas.devexpress.com/winfx/2008/xaml/mvvm"
-    xmlns:dx="http://schemas.devexpress.com/winfx/2008/xaml/core" xmlns:lc="http://schemas.devexpress.com/winfx/2008/xaml/layoutcontrol"
+    xmlns:dx="http://schemas.devexpress.com/winfx/2008/xaml/core"
+    xmlns:lc="http://schemas.devexpress.com/winfx/2008/xaml/layoutcontrol"
     mc:Ignorable="d"
     Title="Перемычки" Height="770" Width="1150"
     MinHeight="770" MinWidth="1150"
@@ -32,7 +32,7 @@
             <RowDefinition Height="*" />
             <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
-        <local:RulesToolBar Grid.Row="0" DataContext="{Binding GroupedRules}"></local:RulesToolBar>
+        <local:RulesToolBar Grid.Row="0" DataContext="{Binding GroupedRules}" />
         <StackPanel Grid.Row="1" Margin="0 0 0 10" Orientation="Horizontal">
             <dxe:ComboBoxEdit Width="300"
                               FontSize="14"
@@ -40,10 +40,10 @@
                               IsTextEditable="False"
                               ItemsSource="{Binding SampleModes}"
                               DisplayMember="Name"
-                              EditValue="{Binding SelectedSampleMode, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" >
-            </dxe:ComboBoxEdit>
+                              EditValue="{Binding SelectedSampleMode, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" />
         </StackPanel>
-        <lc:GroupBox Grid.Row="2" Margin="0 5 0 10" HorizontalAlignment="Stretch" Header="Связанные файлы" FontSize="14">
+        <lc:GroupBox Grid.Row="2" Margin="0 5 0 10" HorizontalAlignment="Stretch" Header="Связанные файлы"
+                     FontSize="14">
             <dxe:ListBoxEdit MaxHeight="100"
                              BorderThickness="0"
                              ToolTip="Выберите связанные файлы, содержащие конструктивные элементы"
@@ -57,23 +57,24 @@
             </dxe:ListBoxEdit>
         </lc:GroupBox>
         <local:GroupedRulesView Grid.Row="3" DataContext="{Binding GroupedRules.SelectedRule}" />
-        <StackPanel Grid.Row="4" Margin="0 10 0 0" HorizontalAlignment="Right" Orientation="Horizontal" VerticalAlignment="Center">
+        <StackPanel Grid.Row="4" Margin="0 10 0 0" HorizontalAlignment="Right" Orientation="Horizontal"
+                    VerticalAlignment="Center">
             <dxe:TextEdit IsReadOnly="True" EditMode="InplaceActive" VerticalAlignment="Center" Foreground="Green"
-                              EditValue="{Binding GroupedRules.SelectedRule.Message}" Width="Auto"/>
+                          EditValue="{Binding GroupedRules.SelectedRule.Message}" Width="Auto" />
 
             <dxe:TextEdit IsReadOnly="True" EditMode="InplaceActive" VerticalAlignment="Center" Foreground="Orange"
-                              TextWrapping="Wrap"
-                              MaxHeight="20"
-                              MaxWidth="{Binding RelativeSource={RelativeSource Mode=FindAncestor, 
+                          TextWrapping="Wrap"
+                          MaxHeight="20"
+                          MaxWidth="{Binding RelativeSource={RelativeSource Mode=FindAncestor, 
                               AncestorType=Grid}, Path=ActualWidth, Converter={StaticResource WidthConverter}, ConverterParameter=115}"
-                              EditValue="{Binding ErrorText}" Width="Auto"/>
+                          EditValue="{Binding ErrorText}" Width="Auto" />
             <dx:SimpleButton
                 Margin="10 0"
                 Content="ОК"
                 Width="80"
                 Height="25"
                 Command="{Binding PlaceLintelCommand}"
-                Click="SimpleButtonOK_Click"/>
+                Click="SimpleButtonOK_Click" />
             <dx:SimpleButton
                 Content="Отмена"
                 Width="80"

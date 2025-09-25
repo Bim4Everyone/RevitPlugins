@@ -4,16 +4,17 @@ using Autodesk.Revit.DB;
 
 using RevitLintelPlacement.Models.Interfaces;
 
-namespace RevitLintelPlacement.Models.LintelsProviders {
-    internal class CurrentViewLintelsProvider : ILintelsProvider {
-        private readonly RevitRepository _revitRepository;
+namespace RevitLintelPlacement.Models.LintelsProviders;
 
-        public CurrentViewLintelsProvider(RevitRepository revitRepository) {
-            _revitRepository = revitRepository;
-        }
+internal class CurrentViewLintelsProvider : ILintelsProvider {
+    private readonly RevitRepository _revitRepository;
 
-        public ICollection<FamilyInstance> GetLintels() {
-            return _revitRepository.GetLintels(_revitRepository.GetViewElementCollector(_revitRepository.GetCurrentView()));
-        }
+    public CurrentViewLintelsProvider(RevitRepository revitRepository) {
+        _revitRepository = revitRepository;
+    }
+
+    public ICollection<FamilyInstance> GetLintels() {
+        return _revitRepository.GetLintels(
+            _revitRepository.GetViewElementCollector(_revitRepository.GetCurrentView()));
     }
 }
