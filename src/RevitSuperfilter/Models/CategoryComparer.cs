@@ -2,22 +2,24 @@
 
 using Autodesk.Revit.DB;
 
-namespace RevitSuperfilter.Models {
-    internal class CategoryComparer : IEqualityComparer<Category> {
-        public bool Equals(Category x, Category y) {
-            if(x == null && y == null) {
-                return true;
-            }
+namespace RevitSuperfilter.Models;
 
-            if(x == null || y == null) {
-                return false;
-            }
-
-            return x.Id == y.Id;
+internal class CategoryComparer : IEqualityComparer<Category> {
+    public bool Equals(Category x, Category y) {
+        if(x == null
+           && y == null) {
+            return true;
         }
 
-        public int GetHashCode(Category obj) {
-            return obj?.Id.GetHashCode() ?? 0;
+        if(x == null
+           || y == null) {
+            return false;
         }
+
+        return x.Id == y.Id;
+    }
+
+    public int GetHashCode(Category obj) {
+        return obj?.Id.GetHashCode() ?? 0;
     }
 }

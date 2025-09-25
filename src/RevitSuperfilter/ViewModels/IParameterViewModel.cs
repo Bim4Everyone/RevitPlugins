@@ -6,11 +6,11 @@ using Autodesk.Revit.DB;
 
 using dosymep.WPF.ViewModels;
 
-namespace RevitSuperfilter.ViewModels {
-    internal interface IParameterViewModel : ISelectableElement, INotifyPropertyChanged {
-        int Count { get; }
-        ObservableCollection<Element> Elements { get; }
+namespace RevitSuperfilter.ViewModels;
 
-        IEnumerable<Element> GetSelectedElements();
-    }
+internal interface IParameterViewModel : ISelectableElement, INotifyPropertyChanged {
+    int Count { get; }
+    ObservableCollection<Element> Elements { get; }
+
+    IEnumerable<Element> GetSelectedElements();
 }
