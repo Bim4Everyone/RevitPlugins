@@ -8,7 +8,8 @@
     xmlns:base="clr-namespace:dosymep.WPF.Views"
     xmlns:vms="clr-namespace:RevitSuperfilter.ViewModels"
     xmlns:dx="http://schemas.devexpress.com/winfx/2008/xaml/core"
-    xmlns:dxe="http://schemas.devexpress.com/winfx/2008/xaml/editors" xmlns:dxdo="http://schemas.devexpress.com/winfx/2008/xaml/docking"
+    xmlns:dxe="http://schemas.devexpress.com/winfx/2008/xaml/editors"
+    xmlns:dxdo="http://schemas.devexpress.com/winfx/2008/xaml/docking"
     mc:Ignorable="d"
     Height="800" Width="800" WindowStartupLocation="CenterOwner" Title="Суперфильтр"
     d:DataContext="{d:DesignInstance vms:RevitViewModel, IsDesignTimeCreatable=False}">
@@ -52,7 +53,7 @@
                 <dxe:ComboBoxEdit.ItemTemplate>
                     <DataTemplate>
                         <DockPanel>
-                            <TextBlock Text="{Binding Name, Mode=OneWay}"/>
+                            <TextBlock Text="{Binding Name, Mode=OneWay}" />
                             <TextBlock Margin="10 0 0 0" Text="{Binding Count, Mode=OneWay}" />
                         </DockPanel>
                     </DataTemplate>
@@ -67,7 +68,7 @@
                 Content="ОК"
                 Width="80"
                 Height="25"
-                Click="ButtonOK_Click" 
+                Click="ButtonOK_Click"
                 Command="{Binding RevitViewModel.SelectElements}" />
             <dx:SimpleButton
                 Content="Отмена"

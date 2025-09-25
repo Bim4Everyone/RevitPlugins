@@ -7,36 +7,37 @@ using Autodesk.Revit.DB;
 
 using dosymep.WPF.ViewModels;
 
-namespace RevitSuperfilter.ViewModels {
-    internal class ParameterFamilyNameViewModel : SelectableObjectViewModel<ElementType>, IParameterViewModel, IEquatable<ParameterFamilyNameViewModel> {
-        public ParameterFamilyNameViewModel(ElementType objectData, IEnumerable<Element> elements)
-            : base(objectData) {
-            Elements = new ObservableCollection<Element>(elements);
+namespace RevitSuperfilter.ViewModels;
+
+internal class ParameterFamilyNameViewModel : SelectableObjectViewModel<ElementType>, IParameterViewModel,
+    IEquatable<ParameterFamilyNameViewModel> {
+    public ParameterFamilyNameViewModel(ElementType objectData, IEnumerable<Element> elements)
+        : base(objectData) {
+        Elements = new ObservableCollection<Element>(elements);
+    }
+
+    public override string DisplayData => ObjectData.FamilyName;
+
+    public bool Equals(ParameterFamilyNameViewModel other) {
+        return other != null && DisplayData == other.DisplayData;
+    }
+
+    public int Count => Elements.Count;
+    public ObservableCollection<Element> Elements { get; }
+
+    public IEnumerable<Element> GetSelectedElements() {
+        if(IsSelected == true) {
+            return Elements;
         }
 
-        public int Count => Elements.Count;
-        public override string DisplayData => ObjectData.FamilyName;
-        public ObservableCollection<Element> Elements { get; }
+        return Enumerable.Empty<Element>();
+    }
 
-        public override bool Equals(object obj) {
-            return Equals(obj as ParameterFamilyNameViewModel);
-        }
+    public override bool Equals(object obj) {
+        return Equals(obj as ParameterFamilyNameViewModel);
+    }
 
-        public bool Equals(ParameterFamilyNameViewModel other) {
-            return other != null &&
-                   DisplayData == other.DisplayData;
-        }
-
-        public override int GetHashCode() {
-            return -1258489443 + EqualityComparer<string>.Default.GetHashCode(DisplayData);
-        }
-
-        public IEnumerable<Element> GetSelectedElements() {
-            if(IsSelected == true) {
-                return Elements;
-            }
-
-            return Enumerable.Empty<Element>();
-        }
+    public override int GetHashCode() {
+        return -1258489443 + EqualityComparer<string>.Default.GetHashCode(DisplayData);
     }
 }
