@@ -211,7 +211,7 @@ internal class MainViewModel : BaseViewModel {
     }
 
     private bool CanAddFamilyParam() {
-        return true;
+        return MainFamilyParams.Count > 0;
     }
 
     private void RemoveFamilyParam() {
@@ -222,7 +222,7 @@ internal class MainViewModel : BaseViewModel {
     }
 
     private bool CanRemoveFamilyParam() {
-        return true;
+        return ChosenFamilyParams.Count > 0;
     }
 
     private void UpFamilyParam() {
@@ -241,7 +241,7 @@ internal class MainViewModel : BaseViewModel {
     }
 
     private bool CanUpFamilyParam() {
-        return true;
+        return SelectedFamilyParams.Count > 0;
     }
 
     private void DownFamilyParam() {
@@ -254,12 +254,12 @@ internal class MainViewModel : BaseViewModel {
             if(index == ChosenFamilyParams.Count - ++count) {
                 continue;
             }
-        
+
             ChosenFamilyParams.Move(index, index + 1);
         }
     }
 
     private bool CanDownFamilyParam() {
-        return true;
+        return SelectedFamilyParams.Count > 0;
     }
 }
