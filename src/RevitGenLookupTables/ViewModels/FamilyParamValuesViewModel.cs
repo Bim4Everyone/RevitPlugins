@@ -1,202 +1,200 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.Globalization;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Input;
 
 using Autodesk.Revit.DB;
 
+using dosymep.SimpleServices;
 using dosymep.WPF.Commands;
 using dosymep.WPF.ViewModels;
 
 using RevitGenLookupTables.Models;
 
-namespace RevitGenLookupTables.ViewModels {
-    internal class FamilyParamValuesViewModel : BaseViewModel {
-        private readonly RevitRepository _revitRepository;
-        private readonly StorageType _storageType;
+namespace RevitGenLookupTables.ViewModels;
 
-        private string _minValue;
-        private string _maxValue;
-        private string _stepValue;
-        private string _paramValues;
-        private string _errorText;
+internal class FamilyParamValuesViewModel : BaseViewModel {
+    private readonly StorageType _storageType;
+    private readonly ILocalizationService _localizationService;
 
-        public FamilyParamValuesViewModel(RevitRepository revitRepository, StorageType storageType) {
-            _revitRepository = revitRepository;
-            _storageType = storageType;
+    private string _errorText;
+    private string _maxValue;
 
-            GenerateCommand = new RelayCommand(Generate, CanGenerate);
+    private string _minValue;
+    private string _paramValues;
+    private string _stepValue;
 
-            MinValueEdit = "0";
-            MaxValueEdit = "10";
-            StepValueEdit = "1";
+    public FamilyParamValuesViewModel(StorageType storageType, ILocalizationService localizationService) {
+        _storageType = storageType;
+        _localizationService = localizationService;
 
-            CultureInfo = (CultureInfo) CultureInfo.GetCultureInfo("ru-ru").Clone();
-            CultureInfo.NumberFormat.NumberDecimalSeparator = ".";
-        }
+        MinValueEdit = "0";
+        MaxValueEdit = "10";
+        StepValueEdit = "1";
 
-        public string MinValueEdit {
-            get => _minValue;
-            set => this.RaiseAndSetIfChanged(ref _minValue, value);
-        }
+        CultureInfo = (CultureInfo) CultureInfo.GetCultureInfo("ru-RU").Clone();
+        CultureInfo.NumberFormat.NumberDecimalSeparator = ".";
+        
+        GenerateCommand = RelayCommand.Create(Generate, CanGenerate);
+    }
 
-        public string MaxValueEdit {
-            get => _maxValue;
-            set => this.RaiseAndSetIfChanged(ref _maxValue, value);
-        }
+    public string MinValueEdit {
+        get => _minValue;
+        set => RaiseAndSetIfChanged(ref _minValue, value);
+    }
 
-        public string StepValueEdit {
-            get => _stepValue;
-            set => this.RaiseAndSetIfChanged(ref _stepValue, value);
-        }
-        public CultureInfo CultureInfo { get; }
+    public string MaxValueEdit {
+        get => _maxValue;
+        set => RaiseAndSetIfChanged(ref _maxValue, value);
+    }
 
-        public double? MinValue => GetDouble(MinValueEdit);
+    public string StepValueEdit {
+        get => _stepValue;
+        set => RaiseAndSetIfChanged(ref _stepValue, value);
+    }
 
-        public double? MaxValue => GetDouble(MaxValueEdit);
+    public CultureInfo CultureInfo { get; }
 
-        public double? StepValue => GetDouble(StepValueEdit);
+    public double? MinValue => GetDouble(MinValueEdit);
 
-        public string ParamValues {
-            get => _paramValues;
-            set => this.RaiseAndSetIfChanged(ref _paramValues, value);
-        }
+    public double? MaxValue => GetDouble(MaxValueEdit);
 
-        public string ErrorText {
-            get => _errorText;
-            set => this.RaiseAndSetIfChanged(ref _errorText, value);
-        }
+    public double? StepValue => GetDouble(StepValueEdit);
 
-        public ICommand GenerateCommand { get; }
+    public string ParamValues {
+        get => _paramValues;
+        set => RaiseAndSetIfChanged(ref _paramValues, value);
+    }
 
-        public IEnumerable<string> GetParamValues() {
-            return ParamValues?.Split(new[] { Environment.NewLine }, StringSplitOptions.None) ?? Enumerable.Empty<string>();
-        }
+    public string ErrorText {
+        get => _errorText;
+        set => RaiseAndSetIfChanged(ref _errorText, value);
+    }
 
-        public string GetValueErrors() {
-            string[] values = GetParamValues().ToArray();
-            if(values.Length > 0) {
-                if(_storageType == StorageType.Integer) {
-                    bool result = values.All(item => int.TryParse(item, out _));
-                    if(!result) {
-                        return "Значение параметров должны быть целочисленными.";
-                    }
-                }
+    public ICommand GenerateCommand { get; }
 
-                if(_storageType == StorageType.Double) {
-                    bool result = values.All(item => double.TryParse(item, out _) || double.TryParse(item, NumberStyles.Float, CultureInfo.InvariantCulture, out _));
-                    if(!result) {
-                        return "Значение параметров должны быть вещественными.";
-                    }
-                }
-            }
+    public IEnumerable<string> GetParamValues() {
+        return ParamValues?.Split([Environment.NewLine], StringSplitOptions.None) ?? Enumerable.Empty<string>();
+    }
 
+    public string GetValueErrors() {
+        string[] values = GetParamValues().ToArray();
+        if(values.Length == 0) {
             return null;
         }
 
-        private void Generate(object param) {
-            if(MinValue == null
-               || MaxValue == null
-               || StepValue == null) {
-                return;
-            }
+        return _storageType switch {
+            StorageType.Integer => AllValuesInt(values)
+                ? null
+                : _localizationService.GetLocalizedString("FamilyValueViewModel.AllIntError"),
+            StorageType.Double => AllValuesDouble(values)
+                ? null
+                : _localizationService.GetLocalizedString("FamilyValueViewModel.AllDoubleError"),
+            _ => null
+        };
+    }
 
-            ParamValues = string.Join(Environment.NewLine, RangedEnumeration(MinValue.Value, MaxValue.Value, StepValue.Value)
-                .Select(item => ConvertValue(item)));
+    private void Generate() {
+        if(MinValue == null
+           || MaxValue == null
+           || StepValue == null) {
+            return;
         }
 
-        private bool CanGenerate(object param) {
-            if(_storageType == StorageType.String) {
-                ErrorText = "Генерация значений не доступна для строковых параметров.";
+        ParamValues = string.Join(
+            Environment.NewLine,
+            RangedEnumeration(MinValue.Value, MaxValue.Value, StepValue.Value).Select(ConvertValue));
+    }
+
+    private bool CanGenerate() {
+        if(_storageType == StorageType.String) {
+            ErrorText = _localizationService.GetLocalizedString("FamilyValueViewModel.GenNotAllowedOnString");
+            return false;
+        }
+
+        if(_storageType is StorageType.Integer or StorageType.Double) {
+            if(MinValue == null) {
+                ErrorText = _localizationService.GetLocalizedString("FamilyValueViewModel.MinValueIsEmpty");
                 return false;
             }
 
-            if(_storageType == StorageType.Integer
-                || _storageType == StorageType.Double) {
-                
-                if(MinValue == null) {
-                    ErrorText = "Заполните минимальное значение.";
-                    return false;
-                }
-
-                if(MaxValue == null) {
-                    ErrorText = "Заполните максимальное значение.";
-                    return false;
-                }
-
-                if(StepValue == null) {
-                    ErrorText = "Заполните значение шага.";
-                    return false;
-                }
-
-                if(StepValue <= 0) {
-                    ErrorText = "Значение шага должно быть неотрицательным.";
-                    return false;
-                }
-
-                if(MinValue > MaxValue) {
-                    ErrorText = "Минимальное значение должно быть меньше максимального.";
-                    return false;
-                }
-            }
-
-            if(_storageType == StorageType.Integer) {
-                if(!IsWholeNumber(MinValue)) {
-                    ErrorText = "Минимальное значение должно быть целым.";
-                    return false;
-                }
-
-                if(!IsWholeNumber(MaxValue)) {
-                    ErrorText = "Максимальное значение должно быть целым.";
-                    return false;
-                }
-
-                if(!IsWholeNumber(StepValue)) {
-                    ErrorText = "Значение шага должно быть целым.";
-                    return false;
-                }
-            }
-
-            ErrorText = null;
-            return true;
-        }
-
-        private string ConvertValue(double value) {
-            if(_storageType == StorageType.Integer) {
-                return ((int) Math.Ceiling(value)).ToString();
-            }
-
-            return value.ToString(CultureInfo.InvariantCulture);
-        }
-
-        private static IEnumerable<double> RangedEnumeration(double min, double max, double step) {
-            double i = min;
-            for(; i < max; i += step) {
-                yield return i;
-            }
-
-            if(i <= max) {
-                yield return max;
-            }
-        }
-
-        private static bool IsWholeNumber(double? x) {
-            if(x == null) {
+            if(MaxValue == null) {
+                ErrorText = _localizationService.GetLocalizedString("FamilyValueViewModel.MaxValueIsEmpty");
                 return false;
             }
-            
-            return Math.Abs(x.Value % 1) <= (double.Epsilon * 100);
+
+            if(StepValue == null) {
+                ErrorText = _localizationService.GetLocalizedString("FamilyValueViewModel.StepValueIsEmpty");
+                return false;
+            }
+
+            if(StepValue <= 0) {
+                ErrorText = _localizationService.GetLocalizedString("FamilyValueViewModel.StepValueIsNegative");
+                return false;
+            }
+
+            if(MinValue > MaxValue) {
+                ErrorText = _localizationService.GetLocalizedString("FamilyValueViewModel.MinValueBiggerMaxValue");
+                return false;
+            }
         }
 
-        private double? GetDouble(string value) {
-            if(double.TryParse(value, out double result)) {
-                return result;
+        if(_storageType is StorageType.Integer or StorageType.ElementId) {
+            if(!IsWholeNumber(MinValue)) {
+                ErrorText = _localizationService.GetLocalizedString("FamilyValueViewModel.MinValueIsDouble");
+                return false;
             }
-            return double.TryParse(value, NumberStyles.Number, CultureInfo, out result) ? result : (double?) null;
+
+            if(!IsWholeNumber(MaxValue)) {
+                ErrorText = _localizationService.GetLocalizedString("FamilyValueViewModel.MaxValueIsDouble");
+                return false;
+            }
+
+            if(!IsWholeNumber(StepValue)) {
+                ErrorText = _localizationService.GetLocalizedString("FamilyValueViewModel.StepValueIsDouble");
+                return false;
+            }
         }
+
+        ErrorText = null;
+        return true;
+    }
+
+    private string ConvertValue(double value) {
+        return _storageType == StorageType.Integer
+            ? ((int) Math.Ceiling(value)).ToString()
+            : value.ToString(CultureInfo);
+    }
+
+    private static IEnumerable<double> RangedEnumeration(double min, double max, double step) {
+        double i = min;
+        for(; i < max; i += step) {
+            yield return i;
+        }
+
+        if(i <= max) {
+            yield return max;
+        }
+    }
+
+    private static bool IsWholeNumber(double? x) {
+        if(x == null) {
+            return false;
+        }
+
+        return Math.Abs(x.Value % 1) <= double.Epsilon * 100;
+    }
+    
+    private bool AllValuesInt(string[] values) {
+        return values.All(item => int.TryParse(item, out _));
+    }
+
+    private bool AllValuesDouble(string[] values) {
+        return values.All(item => double.TryParse(item, NumberStyles.Number, CultureInfo, out _));
+    }
+
+    private double? GetDouble(string value) {
+        return double.TryParse(value, NumberStyles.Number, CultureInfo, out double result) ? result : null;
     }
 }

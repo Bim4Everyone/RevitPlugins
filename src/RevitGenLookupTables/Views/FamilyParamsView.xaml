@@ -1,88 +1,61 @@
-﻿<base:ThemedPlatformWindow
-    xmlns:base="clr-namespace:dosymep.WPF.Views"
+﻿<UserControl
     x:Class="RevitGenLookupTables.Views.FamilyParamsView"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:local="clr-namespace:RevitGenLookupTables.Views"
-    xmlns:converter="clr-namespace:RevitGenLookupTables.Converters"
-    xmlns:dxg="http://schemas.devexpress.com/winfx/2008/xaml/grid"
-    xmlns:dxe="http://schemas.devexpress.com/winfx/2008/xaml/editors"
-    xmlns:dx="http://schemas.devexpress.com/winfx/2008/xaml/core"
+    xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
+    xmlns:me="clr-namespace:dosymep.WpfCore.MarkupExtensions;assembly=dosymep.WpfCore"
     xmlns:vms="clr-namespace:RevitGenLookupTables.ViewModels"
+    xmlns:behaviors="clr-namespace:RevitGenLookupTables.Behaviors"
 
     mc:Ignorable="d"
-    WindowStartupLocation="CenterOwner"
+    d:DataContext="{d:DesignInstance vms:MainViewModel, IsDesignTimeCreatable=False}">
 
-    Title="Параметры семейства"
-    Height="450" Width="800"
+    <UserControl.Resources>
+        <TextBlock
+            x:Key="NameColumnHeader"
+            TextWrapping="Wrap"
+            Text="{me:LocalizationSource FamilyParamsView.NameColumn}" />
 
-    x:Name="_this"
-    d:DataContext="{d:DesignInstance vms:SelectFamilyParamsViewModel, IsDesignTimeCreatable=False}">
+        <TextBlock
+            x:Key="StorageTypeColumnHeader"
+            TextWrapping="Wrap"
+            Text="{me:LocalizationSource FamilyParamsView.StorageTypeColumn}" />
 
-    <Window.Resources>
-        <converter:StorageTypeConverter x:Key="StorageTypeConverter" />
-    </Window.Resources>
+        <TextBlock
+            x:Key="ColumnMetadataColumnHeader"
+            TextWrapping="Wrap"
+            Text="{me:LocalizationSource FamilyParamsView.ColumnMetadataColumn}" />
+    </UserControl.Resources>
 
     <Grid>
-        <Grid.RowDefinitions>
-            <RowDefinition Height="*" />
-            <RowDefinition Height="Auto" />
-        </Grid.RowDefinitions>
+        <DataGrid
+            IsReadOnly="True"
+            SelectionMode="Extended"
+            AutoGenerateColumns="False"
+            CanUserResizeRows="False"
+            CanUserSortColumns="False"
+            CanUserReorderColumns="False"
+            SelectedItem="{Binding ChosenFamilyParam}"
+            ItemsSource="{Binding ChosenFamilyParams}"
+            behaviors:DataGridSelectedItems.SelectedItems="{Binding SelectedFamilyParams}">
 
-        <dxg:GridControl
-            Grid.Row="0"
-            Margin="10"
-            ItemsSource="{Binding FamilyParams}" SelectionMode="Row"
-            SelectedItems="{Binding SelectedFamilyParams, UpdateSourceTrigger=PropertyChanged}"
-            SelectedItem="{Binding SelectedFamilyParam, UpdateSourceTrigger=PropertyChanged}">
+            <DataGrid.Columns>
+                <DataGridTextColumn
+                    Header="{StaticResource NameColumnHeader}"
+                    Binding="{Binding Path=Name}" />
 
-            <dxg:GridControl.View>
-                <dxg:TableView x:Name="_gridView" AutoWidth="True" ShowSearchPanelMode="Always" ShowGroupPanel="False" />
-            </dxg:GridControl.View>
+                <DataGridTextColumn
+                    Header="{StaticResource StorageTypeColumnHeader}"
+                    Binding="{Binding Path=StorageType}" />
 
-            <dxg:GridColumn
-                AllowSorting="False"
-                AllowEditing="False"
-                AllowColumnFiltering="False"
-                Header="Наименование" FieldName="Name" />
-            
-            <dxg:GridColumn
-                AllowSorting="False"
-                AllowEditing="False"
-                AllowColumnFiltering="False"
-                Header="Метаданные колонки" FieldName="ColumnMetaData" />
-            
-            <dxg:GridColumn
-                AllowSorting="False"
-                AllowEditing="False"
-                AllowColumnFiltering="False"
-                Header="Тип данных параметра"
-                Binding="{Binding StorageType, Converter={StaticResource StorageTypeConverter}}" />
+                <DataGridTextColumn
+                    Header="{StaticResource ColumnMetadataColumnHeader}"
+                    Binding="{Binding Path=ColumnMetadata}" />
+            </DataGrid.Columns>
+        </DataGrid>
 
-        </dxg:GridControl>
-        
-        <StackPanel
-            Grid.Row="1" 
-            Grid.ColumnSpan="3" 
-            Orientation="Horizontal" HorizontalAlignment="Right" Height="45">
-
-            <TextBlock
-                Margin="10"
-                Foreground="Orange"
-                VerticalAlignment="Center"
-                Text="{Binding ErrorText}" />
-
-            <dx:SimpleButton
-                Content="ОК" Margin="10" Width="80"
-                Command="{Binding SaveTableCommand}"
-                Click="ButtonOK_Click" />
-
-            <dx:SimpleButton
-                Content="Отмена" Margin="10" Width="80"
-                IsCancel="True"
-                Click="ButtonCancel_Click" />
-        </StackPanel>
     </Grid>
-</base:ThemedPlatformWindow>
+</UserControl>

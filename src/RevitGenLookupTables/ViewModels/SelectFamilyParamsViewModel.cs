@@ -1,14 +1,26 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Collections.ObjectModel;
 
-namespace RevitGenLookupTables.ViewModels {
-    internal class SelectFamilyParamsViewModel {
-        public FamilyParamViewModel SelectedFamilyParam { get; set; }
-        public ObservableCollection<FamilyParamViewModel> FamilyParams { get; set; }
-        public ObservableCollection<FamilyParamViewModel> SelectedFamilyParams { get; set; } = new ObservableCollection<FamilyParamViewModel>();
+using dosymep.WPF.ViewModels;
+
+namespace RevitGenLookupTables.ViewModels;
+
+internal class SelectFamilyParamsViewModel : BaseViewModel {
+    private FamilyParamViewModel _chosenFamilyParam;
+    private ObservableCollection<FamilyParamViewModel> _chosenFamilyParams;
+    private ObservableCollection<FamilyParamViewModel> _selectedFamilyParams = [];
+
+    public FamilyParamViewModel ChosenFamilyParam {
+        get => _chosenFamilyParam;
+        set => this.RaiseAndSetIfChanged(ref _chosenFamilyParam, value);
+    }
+
+    public ObservableCollection<FamilyParamViewModel> ChosenFamilyParams {
+        get => _chosenFamilyParams;
+        set => this.RaiseAndSetIfChanged(ref _chosenFamilyParams, value);
+    }
+
+    public ObservableCollection<FamilyParamViewModel> SelectedFamilyParams {
+        get => _selectedFamilyParams;
+        set => this.RaiseAndSetIfChanged(ref _selectedFamilyParams, value);
     }
 }

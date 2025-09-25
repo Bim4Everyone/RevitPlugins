@@ -1,0 +1,41 @@
+<ui:ContentDialog
+    x:Class="RevitGenLookupTables.Views.Dialogs.FamilyParamsDialog"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
+    xmlns:me="clr-namespace:dosymep.WpfCore.MarkupExtensions;assembly=dosymep.WpfCore"
+    xmlns:local="clr-namespace:RevitGenLookupTables.Views.Dialogs"
+    xmlns:views="clr-namespace:RevitGenLookupTables.Views"
+
+    Title="{me:LocalizationSource FamilyParamsDialog.Title}"
+
+    x:ClassModifier="internal"
+    
+    IsPrimaryButtonEnabled="True"
+    PrimaryButtonAppearance="Primary"
+
+    DialogMaxWidth="650"
+    CloseButtonText="{me:LocalizationSource FamilyParamsDialog.CloseButton}"
+    PrimaryButtonText="{me:LocalizationSource FamilyParamsDialog.SelectButton}"
+
+    ui:Design.Background="{DynamicResource ApplicationBackgroundBrush}"
+    ui:Design.Foreground="{DynamicResource TextFillColorPrimaryBrush}">
+
+    <ui:ContentDialog.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary
+                    Source="pack://application:,,,/Wpf.Ui;component/Controls/ContentDialog/ContentDialog.xaml" />
+            </ResourceDictionary.MergedDictionaries>
+            <Style
+                BasedOn="{StaticResource {x:Type ui:ContentDialog}}"
+                TargetType="{x:Type local:FamilyParamsDialog}" />
+        </ResourceDictionary>
+    </ui:ContentDialog.Resources>
+
+    <Grid>
+        <views:FamilyParamsView />
+    </Grid>
+</ui:ContentDialog>

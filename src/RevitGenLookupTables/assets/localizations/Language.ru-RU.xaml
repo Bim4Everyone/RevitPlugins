@@ -1,0 +1,57 @@
+<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:system="clr-namespace:System;assembly=mscorlib">
+
+    <!-- Пример перевода на русский язык (google translate) -->
+
+    <system:String x:Key="MainWindow.Title">Создать таблицу выбора</system:String>
+    <system:String x:Key="MainWindow.ButtonOk">ОК</system:String>
+    <system:String x:Key="MainWindow.ButtonCancel">Отмена</system:String>
+    
+    <system:String x:Key="MainWindow.AddFamilyParam">Добавить параметр семейства</system:String>
+    <system:String x:Key="MainWindow.AddFamilyParamToolTip">Добавить параметр семейства</system:String>
+    <system:String x:Key="MainWindow.RemoveFamilyParam">Удалить парамер семейства</system:String>
+    <system:String x:Key="MainWindow.RemoveFamilyParamToolTip">Удалить парамер семейства</system:String>
+    <system:String x:Key="MainWindow.UpFamilyParam">Переместить выбранные параметры семейства вверх</system:String>
+    <system:String x:Key="MainWindow.UpFamilyParamToolTip">Переместить выбранные параметры семейства вверх</system:String>
+    <system:String x:Key="MainWindow.DownFamilyParam">Переместить выбранные параметры семейства вниз</system:String>
+    <system:String x:Key="MainWindow.DownFamilyParamToolTip">Переместить выбранные параметры семейства вниз</system:String>
+    <system:String x:Key="MainViewModel.EmptyChosenList">Выберите хоть один параметр семейства</system:String>
+    
+    <system:String x:Key="FamilyParamsView.NameColumn">Имя</system:String>
+    <system:String x:Key="FamilyParamsView.StorageTypeColumn">Тип</system:String>
+    <system:String x:Key="FamilyParamsView.ColumnMetadataColumn">Данные</system:String>
+    <system:String x:Key="FamilyParamsView.FamilyParamsHint">Поиск</system:String>
+    
+    <system:String x:Key="FamilyParamsDialog.Title">Выберите парамеры семейства</system:String>
+    <system:String x:Key="FamilyParamsDialog.CloseButton">Закрыть</system:String>
+    <system:String x:Key="FamilyParamsDialog.SelectButton">Выбрать</system:String>
+    
+    <system:String x:Key="Startup.NotFamilyTitle">Предупреждение</system:String>
+    <system:String x:Key="Startup.NotFamilyMessage">Плагин работает только с семейством</system:String>
+    
+    <system:String x:Key="FamilyValuesView.StartLabel">Мин:</system:String>
+    <system:String x:Key="FamilyValuesView.StopLabel">Макс:</system:String>
+    <system:String x:Key="FamilyValuesView.StepLabel">Шаг:</system:String>
+    <system:String x:Key="FamilyValuesView.GenCommand">Генерировать</system:String>
+    
+    <system:String x:Key="StorageType.None">Ничего</system:String>
+    <system:String x:Key="StorageType.Integer">Целое</system:String>
+    <system:String x:Key="StorageType.Double">Вещественное</system:String>
+    <system:String x:Key="StorageType.String">Строкове</system:String>
+    <system:String x:Key="StorageType.ElementId">Идентификатор элемента</system:String>
+    
+    <system:String x:Key="MainViewModel.ExcelFilter">Excel таблица|*.csv</system:String>
+    <system:String x:Key="FamilyValueViewModel.AllIntError">Значение параметров должны быть целочисленными</system:String>
+    <system:String x:Key="FamilyValueViewModel.AllDoubleError">Значение параметров должны быть вещественными</system:String>
+    
+    <system:String x:Key="FamilyValueViewModel.GenNotAllowedOnString">Генерация значений не доступна для строковых параметров</system:String>
+    <system:String x:Key="FamilyValueViewModel.MinValueIsEmpty">Заполните минимальное значение</system:String>
+    <system:String x:Key="FamilyValueViewModel.MaxValueIsEmpty">Заполните максимальное значение</system:String>
+    <system:String x:Key="FamilyValueViewModel.StepValueIsEmpty">Заполните значение шага</system:String>
+    <system:String x:Key="FamilyValueViewModel.StepValueIsNegative">Значение шага должно быть неотрицательным</system:String>
+    <system:String x:Key="FamilyValueViewModel.MinValueBiggerMaxValue">Минимальное значение должно быть меньше максимального</system:String>
+    <system:String x:Key="FamilyValueViewModel.MinValueIsDouble">Минимальное значение должно быть целым</system:String>
+    <system:String x:Key="FamilyValueViewModel.MaxValueIsDouble">Максимальное значение должно быть целым</system:String>
+    <system:String x:Key="FamilyValueViewModel.StepValueIsDouble">Значение шага должно быть целым</system:String>
+</ResourceDictionary>
