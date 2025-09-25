@@ -1,23 +1,18 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Collections.ObjectModel;
 
 using dosymep.WPF.ViewModels;
 
-namespace RevitMarkPlacement.ViewModels {
-    internal class InfoElementsViewModel : BaseViewModel {
-        private ObservableCollection<InfoElementViewModel> _infoElements;
+namespace RevitMarkPlacement.ViewModels;
 
-        public InfoElementsViewModel() {
-            InfoElements = new ObservableCollection<InfoElementViewModel>();
-        }
+internal class InfoElementsViewModel : BaseViewModel {
+    private ObservableCollection<InfoElementViewModel> _infoElements;
 
-        public ObservableCollection<InfoElementViewModel> InfoElements { 
-            get => _infoElements; 
-            set => this.RaiseAndSetIfChanged(ref _infoElements, value); 
-        }
+    public InfoElementsViewModel() {
+        InfoElements = new ObservableCollection<InfoElementViewModel>();
+    }
+
+    public ObservableCollection<InfoElementViewModel> InfoElements {
+        get => _infoElements;
+        set => RaiseAndSetIfChanged(ref _infoElements, value);
     }
 }
