@@ -16,12 +16,12 @@ public partial class NavigatorView {
         int startSecond = 14;
         for(int i = 0; i < paramNames.Length; i++, startFirst++, startSecond += 2) {
             var firstElementColumn = new GridColumn() {
-                Header = paramNames[i],
+                Header = $"{paramNames[i]} (1)",
                 VisibleIndex = startFirst,
                 FieldName = $"{nameof(IClashViewModel.FirstElementParams)}.{ClashViewModel.ElementParamFieldName}{i}"
             };
             var secondElementColumn = new GridColumn() {
-                Header = paramNames[i],
+                Header = $"{paramNames[i]} (2)",
                 VisibleIndex = startSecond,
                 FieldName = $"{nameof(IClashViewModel.SecondElementParams)}.{ClashViewModel.ElementParamFieldName}{i}"
             };
