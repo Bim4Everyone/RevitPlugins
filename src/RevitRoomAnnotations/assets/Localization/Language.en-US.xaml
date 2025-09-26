@@ -1,0 +1,45 @@
+<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:system="clr-namespace:System;assembly=mscorlib">
+
+    <system:String 
+        x:Key="MainWindow.Title">Update rooms in EOM file</system:String>    
+    <system:String
+        x:Key="MainWindow.LinkName">Link name</system:String>
+    <system:String
+        x:Key="MainWindow.LinkStatus">Link status</system:String>
+    <system:String
+        x:Key="MainWindow.ButtonOk">Process</system:String>
+    <system:String
+        x:Key="MainWindow.ButtonCancel">Cancel</system:String>
+    <system:String
+        x:Key="MainWindow.StatusTextLoaded">Loaded</system:String>
+    <system:String
+        x:Key="MainWindow.StatusTextUnloaded">Unloaded</system:String>    
+    <system:String
+        x:Key="MainViewModel.ErrorTextNoSelection">Links non selected</system:String>
+    <system:String
+        x:Key="MainViewModel.ErrorTextWrongSelection">Some links is not loaded</system:String>
+    <system:String
+        x:Key="MainViewModel.TransactionName">Room processing</system:String>
+    <system:String
+        x:Key="MainViewModel.Message.AnnotationsToCreate">Annotations will be created: {0}</system:String>
+    <system:String
+        x:Key="MainViewModel.Message.AnnotationsToDelete">Annotations will be deleted: {0}</system:String>
+    <system:String
+        x:Key="MainViewModel.Message.AnnotationsToDeleteOtherViews">Annotations will be deleted from other views: {0}</system:String>
+    <system:String
+        x:Key="MainViewModel.Message.AnnotationsToUpdate">Annotations will be updated: {0}</system:String>
+    <system:String
+        x:Key="MainViewModel.Message.Title">Preview changes</system:String>
+    <system:String
+        x:Key="MainViewModel.ProcessRooms">Processing rooms and annotations [{0}/{1}]</system:String>
+    <system:String
+        x:Key="RevitRepository.ViewName">!EOM Rooms</system:String>    
+    <system:String
+        x:Key="Command.ErrorAnnotationTypeNotFound">Annotation type “{0}” was not found. Load the family before running the plug-in.</system:String>
+    <system:String
+        x:Key="Command.ParamErrorMessageBody">Error copying parameters</system:String>
+    <system:String
+        x:Key="Command.TitleErrorMessage">Plug-in error</system:String>
+</ResourceDictionary>

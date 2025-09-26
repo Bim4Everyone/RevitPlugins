@@ -163,6 +163,9 @@
   <Project Path="src/RevitRemoveRoomTags/RevitRemoveRoomTags.csproj">
     <Platform Project="x64" />
   </Project>
+  <Project Path="src/RevitRoomAnnotations/RevitRoomAnnotations.csproj">
+    <Platform Project="x64" />
+  </Project>
   <Project Path="src/RevitRoomExtrusion/RevitRoomExtrusion.csproj">
     <Platform Project="x64" />
   </Project>
