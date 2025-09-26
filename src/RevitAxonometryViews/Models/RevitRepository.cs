@@ -1,17 +1,25 @@
+using System.Windows;
+
 using Autodesk.Revit.DB;
 using Autodesk.Revit.DB.Mechanical;
 using Autodesk.Revit.DB.Plumbing;
 using Autodesk.Revit.UI;
 
 using dosymep.Revit;
+using dosymep.SimpleServices;
 
 using Application = Autodesk.Revit.ApplicationServices.Application;
 
 namespace RevitAxonometryViews.Models;
 internal class RevitRepository {
-    public RevitRepository(UIApplication uiApplication) {
+    private readonly ILocalizationService _localizationService;
+    private readonly string _emptyName;
+
+    public RevitRepository(UIApplication uiApplication, ILocalizationService localizationService) {
         UIApplication = uiApplication;
         AxonometryConfig = new AxonometryConfig(Document);
+        _localizationService = localizationService;
+        _emptyName = _localizationService.GetLocalizedString("MainWindow.EmptyName");
     }
     public UIApplication UIApplication { get; }
     public UIDocument ActiveUIDocument => UIApplication.ActiveUIDocument;
@@ -43,6 +51,7 @@ internal class RevitRepository {
                 }
             }
         }
-        return "Нет имени";
+
+        return _emptyName;
     }
 }
