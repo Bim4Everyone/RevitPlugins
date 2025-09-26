@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.ComponentModel;
 using System.IO;
 using System.Linq;
 using System.Windows.Input;
@@ -27,7 +28,9 @@ namespace RevitClashDetective.ViewModels.Navigator {
         private DispatcherTimer _timer;
         private List<ClashViewModel> _allClashes;
         private ObservableCollection<ClashViewModel> _clashes;
+        private IClashViewModel _selectedGuiClash;
         private ObservableCollection<IClashViewModel> _guiClashes;
+        private ObservableCollection<IClashViewModel> _selectedGuiClashes = [];
         private double _firstIntersectionPercentage;
         private double _secondIntersectionPercentage;
         private bool _showImaginaryClashes;
@@ -65,14 +68,29 @@ namespace RevitClashDetective.ViewModels.Navigator {
             set => this.RaiseAndSetIfChanged(ref _message, value);
         }
 
-        private ObservableCollection<ClashViewModel> Clashes {
-            get => _clashes;
-            set => this.RaiseAndSetIfChanged(ref _clashes, value);
+        public IClashViewModel SelectedGuiClash {
+            get => _selectedGuiClash;
+            set {
+                if(!(_selectedGuiClash?.Equals(value) ?? false)) {
+                    if(_selectedGuiClash is not null) {
+                        _selectedGuiClash.PropertyChanged -= OnSelectedGuiClashChanged;
+                    }
+                    RaiseAndSetIfChanged(ref _selectedGuiClash, value);
+                    if(_selectedGuiClash is not null) {
+                        _selectedGuiClash.PropertyChanged += OnSelectedGuiClashChanged;
+                    }
+                }
+            }
         }
 
         public ObservableCollection<IClashViewModel> GuiClashes {
             get => _guiClashes;
             private set => RaiseAndSetIfChanged(ref _guiClashes, value);
+        }
+
+        public ObservableCollection<IClashViewModel> SelectedGuiClashes {
+            get => _selectedGuiClashes;
+            set => RaiseAndSetIfChanged(ref _selectedGuiClashes, value);
         }
 
         public double FirstIntersectionPercentage {
@@ -90,13 +108,20 @@ namespace RevitClashDetective.ViewModels.Navigator {
             set => RaiseAndSetIfChanged(ref _showImaginaryClashes, value);
         }
 
-
         public ICommand SaveCommand { get; private set; }
 
         public ICommand SaveAsCommand { get; private set; }
 
         public ICommand ShowImaginaryClashesChangedCommand { get; private set; }
 
+        public ICommand PickFirstElementsCommand { get; private set; }
+
+        public ICommand PickSecondElementsCommand { get; private set; }
+
+        private ObservableCollection<ClashViewModel> Clashes {
+            get => _clashes;
+            set => this.RaiseAndSetIfChanged(ref _clashes, value);
+        }
 
         public ClashesConfig GetUpdatedConfig() {
             var config = ClashesConfig.GetClashesConfig(_revitRepository.GetObjectName(), Name);
@@ -111,6 +136,21 @@ namespace RevitClashDetective.ViewModels.Navigator {
             return config;
         }
 
+        public override bool Equals(object obj) {
+            return Equals(obj as ReportViewModel);
+        }
+
+        public override int GetHashCode() {
+            int hashCode = 1681366416;
+            hashCode = hashCode * -1521134295 + EqualityComparer<string>.Default.GetHashCode(Name);
+            return hashCode;
+        }
+
+        public bool Equals(ReportViewModel other) {
+            return other != null
+                && Name == other.Name;
+        }
+
         private void Initialize(RevitRepository revitRepository, string name) {
             _revitRepository = revitRepository;
             Name = name;
@@ -120,6 +160,10 @@ namespace RevitClashDetective.ViewModels.Navigator {
             SaveCommand = RelayCommand.Create(Save);
             SaveAsCommand = RelayCommand.Create(SaveAs);
             ShowImaginaryClashesChangedCommand = RelayCommand.Create(ShowImaginaryClashesChanged);
+            PickFirstElementsCommand = RelayCommand.Create(
+                PickFirstElements, CanPickElements);
+            PickSecondElementsCommand = RelayCommand.Create(
+                PickSecondElements, CanPickElements);
         }
 
         private void Save() {
@@ -267,19 +311,53 @@ namespace RevitClashDetective.ViewModels.Navigator {
             _timer.Start();
         }
 
-        public override bool Equals(object obj) {
-            return Equals(obj as ReportViewModel);
+        private void OnSelectedGuiClashChanged(object sender, PropertyChangedEventArgs e) {
+            if(string.IsNullOrWhiteSpace(e.PropertyName)) {
+                return;
+            }
+            var prop = typeof(IClashViewModel).GetProperty(e.PropertyName);
+            if(prop is null) {
+                return;
+            }
+            if(prop.Name == nameof(IClashViewModel.ClashStatus)) {
+                // мультиредактирование только для статуса коллизии
+                object newValue = prop.GetValue(SelectedGuiClash);
+
+                IClashViewModel[] sheets = [.. SelectedGuiClashes];
+                foreach(var item in sheets) {
+                    if(!item.Equals(SelectedGuiClash)) {
+                        prop.SetValue(item, newValue);
+                    }
+                }
+            }
         }
 
-        public override int GetHashCode() {
-            int hashCode = 1681366416;
-            hashCode = hashCode * -1521134295 + EqualityComparer<string>.Default.GetHashCode(Name);
-            return hashCode;
+        private void PickFirstElements() {
+            List<ElementModel> elements = [];
+            foreach(var clash in SelectedGuiClashes) {
+                try {
+                    elements.Add(clash.GetFirstElement());
+                } catch(NotSupportedException) {
+                    continue;
+                }
+            }
+            _revitRepository.SelectElements(elements);
         }
 
-        public bool Equals(ReportViewModel other) {
-            return other != null
-                && Name == other.Name;
+        private void PickSecondElements() {
+            List<ElementModel> elements = [];
+            foreach(var clash in SelectedGuiClashes) {
+                try {
+                    elements.Add(clash.GetSecondElement());
+                } catch(NotSupportedException) {
+                    continue;
+                }
+            }
+            _revitRepository.SelectElements(elements);
+        }
+
+        private bool CanPickElements() {
+            return SelectedGuiClashes?.Count > 0;
         }
     }
 }

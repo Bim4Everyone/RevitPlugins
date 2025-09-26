@@ -148,7 +148,6 @@ namespace RevitClashDetective.ViewModels.Navigator {
         private bool CanDelete() => SelectedReport != null;
 
         private void SelectClash(IClashViewModel clash) {
-            // TODO добавить обработку мнимых коллизий
             IView3DSetting settings;
             var config = SettingsConfig.GetSettingsConfig(GetPlatformService<IConfigSerializer>());
             if(ElementsIsolationEnabled) {
