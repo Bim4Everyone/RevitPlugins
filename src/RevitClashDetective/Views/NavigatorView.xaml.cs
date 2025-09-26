@@ -13,7 +13,7 @@ public partial class NavigatorView {
         InitializeComponent();
         string[] paramNames = SettingsConfig.GetSettingsConfig(GetPlatformService<IConfigSerializer>()).ParamNames;
         int startFirst = 8;
-        int startSecond = 13;
+        int startSecond = 14;
         for(int i = 0; i < paramNames.Length; i++, startFirst++, startSecond += 2) {
             var firstElementColumn = new GridColumn() {
                 Header = paramNames[i],

@@ -205,20 +205,23 @@
                     </dxg:GridColumn.CellTemplate>
                 </dxg:GridColumn>
                 <dxg:GridColumn Style="{StaticResource ReadOnlyColumn}"
+                                Header="Файла 1"
+                                FieldName="FirstDocumentName" />
+                <dxg:GridColumn Style="{StaticResource ReadOnlyColumn}"
                                 Header="Уровень 1"
                                 FieldName="FirstLevel" />
                 <dxg:GridColumn Style="{StaticResource ReadOnlyColumn}"
                                 Header="Категория 1"
                                 FieldName="FirstCategory" />
                 <dxg:GridColumn Style="{StaticResource ReadOnlyColumn}"
-                                Header="Имя типа 1"
-                                FieldName="FirstTypeName" />
-                <dxg:GridColumn Style="{StaticResource ReadOnlyColumn}"
-                                Header="Имя семейства 1"
+                                Header="Семейство 1"
                                 FieldName="FirstFamilyName" />
                 <dxg:GridColumn Style="{StaticResource ReadOnlyColumn}"
-                                Header="Имя файла 1"
-                                FieldName="FirstDocumentName" />
+                                Header="Тип 1"
+                                FieldName="FirstTypeName" />
+                <dxg:GridColumn Style="{StaticResource ReadOnlyColumn}"
+                                Header="Файла 2"
+                                FieldName="SecondDocumentName" />
                 <dxg:GridColumn Style="{StaticResource ReadOnlyColumn}"
                                 Header="Уровень 2"
                                 FieldName="SecondLevel" />
@@ -226,14 +229,11 @@
                                 Header="Категория 2"
                                 FieldName="SecondCategory" />
                 <dxg:GridColumn Style="{StaticResource ReadOnlyColumn}"
-                                Header="Имя типа 2"
-                                FieldName="SecondTypeName" />
-                <dxg:GridColumn Style="{StaticResource ReadOnlyColumn}"
-                                Header="Имя семейства 2"
+                                Header="Семейство 2"
                                 FieldName="SecondFamilyName" />
                 <dxg:GridColumn Style="{StaticResource ReadOnlyColumn}"
-                                Header="Имя файла 2"
-                                FieldName="SecondDocumentName" />
+                                Header="Тип 2"
+                                FieldName="SecondTypeName" />
                 <dxg:GridColumn Style="{StaticResource ReadOnlyColumn}"
                                 Header="% пересечения 1"
                                 FieldName="FirstElementIntersectionPercentage">
