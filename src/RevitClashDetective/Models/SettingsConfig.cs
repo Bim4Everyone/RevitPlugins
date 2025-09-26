@@ -32,6 +32,8 @@ internal class SettingsConfig : ProjectConfig {
     /// </summary>
     public int SectionBoxOffset { get; set; } = 3000;
 
+    public string[] ParamNames { get; set; } = [];
+
 
     public static SettingsConfig GetSettingsConfig(IConfigSerializer serializer) {
         return new dosymep.Bim4Everyone.ProjectConfigs.ProjectConfigBuilder()

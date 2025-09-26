@@ -25,6 +25,10 @@
     <system:String
         x:Key="SettingsWindow.Validation.OffsetGreaterThan">Отступ не может быть больше {0}</system:String>
     <system:String
+        x:Key="SettingsWindow.Validation.ParamIsEmpty">Укажите названия всех параметров</system:String>
+    <system:String
+        x:Key="SettingsWindow.Validation.LongParam">Слишком длинное название {0}</system:String>
+    <system:String
         x:Key="SettingsWindow.MainElementVisibilitySettings">Настройки видимости первого элемента коллизии</system:String>
     <system:String
         x:Key="SettingsWindow.SecondElementVisibilitySettings">Настройки видимости второго элемента коллизии</system:String>
@@ -37,7 +41,7 @@
     <system:String
         x:Key="SettingsWindow.ParamsLabel">Параметры для навигатора</system:String>
     <system:String
-        x:Key="SettingsWindow.ParamsTooltip">Параметры будут отображаться в столбцах навигатора для каждого элемента коллизии слева направо после зафиксированных столбцов. Верхний параметр будет слева.</system:String>
+        x:Key="SettingsWindow.ParamsTooltip">Дополнительные параметры будут отображаться в столбцах навигатора для каждого элемента коллизии слева направо после зафиксированных столбцов. Верхний параметр будет слева.</system:String>
     <system:String
         x:Key="SettingsWindow.AddParamTooltip">Добавить параметр</system:String>
     <system:String

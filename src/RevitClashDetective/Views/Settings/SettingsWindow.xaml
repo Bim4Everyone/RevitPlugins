@@ -14,10 +14,10 @@
     mc:Ignorable="d"
     WindowStartupLocation="CenterOwner"
     Title="{me:LocalizationSource SettingsWindow.Title}"
-    Width="450"
-    Height="400"
-    MinWidth="650"
-    MinHeight="550"
+    Width="550"
+    Height="550"
+    MinWidth="830"
+    MinHeight="500"
     d:DataContext="{d:DesignInstance vms:SettingsViewModel, IsDesignTimeCreatable=False}">
 
     <Window.Resources>
@@ -26,7 +26,7 @@
             x:Key="CustomBorder">
             <Setter
                 Property="Padding"
-                Value="20" />
+                Value="14 8" />
             <Setter
                 Property="VerticalAlignment"
                 Value="Stretch" />
@@ -91,7 +91,6 @@
         <ui:TitleBar
             Grid.Row="0"
             Grid.ColumnSpan="2"
-            ShowMaximize="False"
             Title="{me:LocalizationSource SettingsWindow.Title}" />
 
         <StackPanel
@@ -158,6 +157,8 @@
         <Border
             Grid.Row="1"
             Grid.Column="1"
+            Margin="0 10 10 10"
+            ToolTip="{me:LocalizationSource SettingsWindow.ParamsTooltip}"
             Style="{StaticResource CustomBorder}">
             <DockPanel
                 LastChildFill="True">
@@ -169,12 +170,13 @@
                     HorizontalAlignment="Left">
                     <ui:Button
                         Width="Auto"
+                        Margin="5 0"
                         ToolTip="{me:LocalizationSource SettingsWindow.AddParamTooltip}"
                         Content="{ui:SymbolIcon Symbol=Add20}"
                         Command="{Binding AddParamCommand}" />
                     <ui:Button
                         Width="Auto"
-                        Margin="5 0 0 0"
+                        Margin="0"
                         ToolTip="{me:LocalizationSource SettingsWindow.RemoveParamTooltip}"
                         Content="{ui:SymbolIcon Symbol=Delete20}"
                         Command="{Binding RemoveParamCommand}"
@@ -206,6 +208,7 @@
                                     <ui:Button
                                         Margin="5 0 0 0"
                                         Width="Auto"
+                                        Height="36"
                                         DockPanel.Dock="Right"
                                         HorizontalAlignment="Right"
                                         ToolTip="{StaticResource RemoveParamTooltip}"
@@ -213,7 +216,8 @@
                                         Command="{Binding DataContext.RemoveParamCommand, RelativeSource={RelativeSource AncestorType=Window}}"
                                         CommandParameter="{Binding}" />
                                     <ui:TextBox
-                                        Text="{Binding Name, UpdateSourceTrigger=PropertyChanged}" />
+                                        Text="{Binding Name, UpdateSourceTrigger=PropertyChanged}"
+                                        ToolTip="{Binding Name}" />
                                 </DockPanel>
                             </Border>
                         </DataTemplate>

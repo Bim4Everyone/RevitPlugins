@@ -20,6 +20,7 @@ internal class SettingsViewModel : BaseViewModel {
     private int _sectionBoxOffset;
     private ParamViewModel _selectedParam;
     private const int _maxSectionBoxOffset = 10000;
+    private const int _maxParamNameLength = 128;
 
     public SettingsViewModel(RevitRepository revitRepository, SettingsConfig config, ILocalizationService localizationService) {
         _revitRepository = revitRepository ?? throw new ArgumentNullException(nameof(revitRepository));
@@ -113,6 +114,17 @@ internal class SettingsViewModel : BaseViewModel {
                 "SettingsWindow.Validation.OffsetGreaterThan", _maxSectionBoxOffset);
             return false;
         }
+        if(Params.Any(p => string.IsNullOrWhiteSpace(p.Name))) {
+            ErrorText = _localizationService.GetLocalizedString(
+                "SettingsWindow.Validation.ParamIsEmpty");
+            return false;
+        }
+        var longParam = Params.FirstOrDefault(p => p.Name.Length > _maxParamNameLength);
+        if(longParam is not null) {
+            ErrorText = _localizationService.GetLocalizedString(
+                "SettingsWindow.Validation.LongParam", longParam.Name.Substring(0, 16) + "...");
+            return false;
+        }
 
         ErrorText = null;
         return true;
@@ -127,6 +139,8 @@ internal class SettingsViewModel : BaseViewModel {
 
         SectionBoxOffset = _config.SectionBoxOffset;
         SelectedSectionBoxMode = new SectionBoxModeViewModel(_config.SectionBoxModeSettings, _localizationService);
+
+        Array.ForEach(_config.ParamNames, p => Params.Add(new ParamViewModel() { Name = p }));
     }
 
     private void SaveConfig() {
@@ -134,6 +148,7 @@ internal class SettingsViewModel : BaseViewModel {
         _config.SecondElementVisibilitySettings = SecondElementVisibilitySettings.GetSettings();
         _config.SectionBoxOffset = SectionBoxOffset;
         _config.SectionBoxModeSettings = SelectedSectionBoxMode.Mode;
+        _config.ParamNames = [.. Params.Select(p => p.Name.Trim())];
         _config.SaveProjectConfig();
     }
 

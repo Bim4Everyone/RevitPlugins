@@ -25,6 +25,10 @@
     <system:String
         x:Key="SettingsWindow.Validation.OffsetGreaterThan">Offset cannot be more than {0}</system:String>
     <system:String
+        x:Key="SettingsWindow.Validation.ParamIsEmpty">Set all parameter names</system:String>
+    <system:String
+        x:Key="SettingsWindow.Validation.LongParam">Too long parameter name {0}</system:String>
+    <system:String
         x:Key="SettingsWindow.MainElementVisibilitySettings">Visibility settings for the first collision element</system:String>
     <system:String
         x:Key="SettingsWindow.SecondElementVisibilitySettings">Visibility settings for the second collision element</system:String>
@@ -34,6 +38,18 @@
         x:Key="SettingsWindow.SectionBoxModeSettings">Section box mode:</system:String>
     <system:String
         x:Key="SettingsWindow.SectionBoxAdditionalSize">Offset, mm:</system:String>
+    <system:String
+        x:Key="SettingsWindow.ParamsLabel">Parameters for navigator</system:String>
+    <system:String
+        x:Key="SettingsWindow.ParamsTooltip">The additional parameters will be displayed in the navigator columns for each collision element, from left to right, following the fixed columns. The top parameter will be on the left.</system:String>
+    <system:String
+        x:Key="SettingsWindow.AddParamTooltip">Add parameter</system:String>
+    <system:String
+        x:Key="SettingsWindow.RemoveParamTooltip">Remove parameter</system:String>
+    <system:String
+        x:Key="SettingsWindow.MoveParamUpTooltip">Move parameter up</system:String>
+    <system:String
+        x:Key="SettingsWindow.MoveParamDownTooltip">Move parameter down</system:String>
 
     <system:String
         x:Key="Transactions.IsolateClashElements">Isolate clash elements</system:String>
