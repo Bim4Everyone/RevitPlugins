@@ -32,6 +32,9 @@ internal class SettingsConfig : ProjectConfig {
     /// </summary>
     public int SectionBoxOffset { get; set; } = 3000;
 
+    /// <summary>
+    /// Названия дополнительных параметров обоих элементов коллизий для отображения в навигаторе
+    /// </summary>
     public string[] ParamNames { get; set; } = [];
 
 

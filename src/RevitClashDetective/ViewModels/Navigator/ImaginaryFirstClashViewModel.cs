@@ -1,9 +1,12 @@
 using System;
 using System.Collections.Generic;
+using System.Dynamic;
 
 using dosymep.WPF.ViewModels;
 
+using RevitClashDetective.Models;
 using RevitClashDetective.Models.Clashes;
+using RevitClashDetective.Models.Extensions;
 
 namespace RevitClashDetective.ViewModels.Navigator;
 
@@ -12,9 +15,11 @@ namespace RevitClashDetective.ViewModels.Navigator;
 /// </summary>
 internal class ImaginaryFirstClashViewModel
     : BaseViewModel, IClashViewModel, IEquatable<ImaginaryFirstClashViewModel> {
+    private readonly RevitRepository _revitRepository;
     private readonly ElementViewModel _firstElement;
 
-    public ImaginaryFirstClashViewModel(ElementViewModel firstElement) {
+    public ImaginaryFirstClashViewModel(RevitRepository revitRepository, ElementViewModel firstElement) {
+        _revitRepository = revitRepository ?? throw new ArgumentNullException(nameof(revitRepository));
         _firstElement = firstElement ?? throw new ArgumentNullException(nameof(firstElement));
         FirstElementVolume = firstElement.ElementVolume;
 
@@ -23,6 +28,8 @@ internal class ImaginaryFirstClashViewModel
         FirstFamilyName = _firstElement.Element.FamilyName;
         FirstDocumentName = _firstElement.Element.DocumentName;
         FirstLevel = _firstElement.Element.Level;
+        FirstElementParams = new ExpandoObject();
+        SecondElementParams = new ExpandoObject();
     }
 
 
@@ -39,6 +46,10 @@ internal class ImaginaryFirstClashViewModel
     public string FirstLevel { get; }
 
     public string FirstCategory { get; }
+
+    public ExpandoObject FirstElementParams { get; }
+
+    public ExpandoObject SecondElementParams { get; }
 
     public string SecondTypeName => string.Empty;
 
@@ -86,5 +97,19 @@ internal class ImaginaryFirstClashViewModel
 
     public override int GetHashCode() {
         return 1531809236 + EqualityComparer<ElementViewModel>.Default.GetHashCode(_firstElement);
+    }
+
+    public void SetElementParams(string[] paramNames) {
+        ((IDictionary<string, object>) SecondElementParams).Clear();
+        var firstElementParams = (IDictionary<string, object>) FirstElementParams;
+        firstElementParams.Clear();
+
+        var firstElement = GetFirstElement().GetElement(_revitRepository.DocInfos);
+        if(firstElement is not null) {
+            for(int i = 0; i < paramNames.Length; i++) {
+                firstElementParams.Add($"{ClashViewModel.ElementParamFieldName}{i}",
+                    firstElement.GetParamValueAsString(paramNames[i]));
+            }
+        }
     }
 }
