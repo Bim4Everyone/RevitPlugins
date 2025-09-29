@@ -251,9 +251,6 @@
                                 Header="Файл 2"
                                 FieldName="SecondDocumentName" />
                 <dxg:GridColumn Style="{StaticResource ReadOnlyColumn}"
-                                Header="Имя файла 1"
-                                FieldName="FirstDocumentName" />
-                <dxg:GridColumn Style="{StaticResource ReadOnlyColumn}"
                                 Header="Уровень 2"
                                 FieldName="SecondLevel" />
                 <dxg:GridColumn Style="{StaticResource ReadOnlyColumn}"
