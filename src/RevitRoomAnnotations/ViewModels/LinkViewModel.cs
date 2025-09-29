@@ -18,7 +18,6 @@ internal class LinkViewModel : BaseViewModel {
 
     public LinkInstanceElement LinkInstanceElement { get; }
     public string Name => LinkInstanceElement.Name;
-    public ElementId Id => LinkInstanceElement.Id;
 
     public bool IsChecked {
         get => _isChecked;
@@ -34,7 +33,8 @@ internal class LinkViewModel : BaseViewModel {
 
     // Метод установки текстового статуса 
     private string GetStringStatus() {
-        return IsLoaded ? _localizationService.GetLocalizedString("MainWindow.StatusTextLoaded")
+        return IsLoaded
+            ? _localizationService.GetLocalizedString("MainWindow.StatusTextLoaded")
             : _localizationService.GetLocalizedString("MainWindow.StatusTextUnloaded");
     }
 }

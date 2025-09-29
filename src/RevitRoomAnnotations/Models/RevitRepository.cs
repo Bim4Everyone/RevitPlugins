@@ -38,7 +38,7 @@ internal class RevitRepository {
         .OfCategory(BuiltInCategory.OST_RvtLinks)
         .OfClass(typeof(RevitLinkInstance))
         .Cast<RevitLinkInstance>()
-        .Select(linkInstance => new LinkInstanceElement(linkInstance, Document))
+        .Select(linkInstance => new LinkInstanceElement(Document, linkInstance))
         .ToList();
     }
 
@@ -71,7 +71,7 @@ internal class RevitRepository {
                 ? element.OwnerViewId == targetView.Id
                 : element.OwnerViewId != targetView.Id)
             .Select(el => new RevitAnnotation(el) {
-                CombinedID = el.GetParamValueOrDefault<string>(SharedParamsConfig.Instance.FopId.Name)
+                LinkName = el.GetParamValueOrDefault<string>(SharedParamsConfig.Instance.FopId.Name)
             });
     }
 
@@ -81,7 +81,7 @@ internal class RevitRepository {
         var instance = Document.Create.NewFamilyInstance(XYZ.Zero, familySymbol, view);
         UpdateAnnotation(instance, room);
         return new RevitAnnotation(instance) {
-            CombinedID = room.CombinedId
+            LinkName = room.LinkName
         };
     }
 
@@ -111,7 +111,7 @@ internal class RevitRepository {
 
     // Метод обновления параметров RevitRoom
     public void UpdateAnnotation(Element annotation, RevitRoom room) {
-        SetOrRemove(annotation, SharedParamsConfig.Instance.FopId.Name, room.CombinedId);
+        SetOrRemove(annotation, SharedParamsConfig.Instance.FopId.Name, room.LinkName);
         SetOrRemove(annotation, SharedParamsConfig.Instance.ApartmentNumberExtra.Name, room.AdditionalNumber);
         SetOrRemove(annotation, SharedParamsConfig.Instance.ApartmentNameExtra.Name, room.AdditionalName);
         SetOrRemove(annotation, SharedParamsConfig.Instance.RoomArea.Name, room.Area);

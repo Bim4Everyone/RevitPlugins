@@ -9,16 +9,16 @@ using dosymep.Revit;
 namespace RevitRoomAnnotations.Models;
 public class RevitRoom {
     private readonly SpatialElement _room;
-    private readonly ElementId _linkInstanceId;
+    private readonly string _linkInstanceName;
     private readonly Document _document;
 
     public RevitRoom(SpatialElement room, LinkInstanceElement linkInstanceElement, Document document) {
         _room = room;
-        _linkInstanceId = linkInstanceElement.Id;
+        _linkInstanceName = linkInstanceElement.Name;
         _document = document;
     }
 
-    public string CombinedId => GetCombinedId();
+    public string LinkName => GetLinkName();
     public string AdditionalNumber => GetParamValue<string>(_room, SystemParamsConfig.Instance.CreateRevitParam(_document, BuiltInParameter.ROOM_NUMBER));
     public string AdditionalName => GetParamValue<string>(_room, SystemParamsConfig.Instance.CreateRevitParam(_document, BuiltInParameter.ROOM_NAME));
     public double? Area => GetParamValue<double>(_room, SharedParamsConfig.Instance.RoomArea);
@@ -35,7 +35,7 @@ public class RevitRoom {
         return room.GetParamValueOrDefault<T>(revitParam.Name);
     }
 
-    private string GetCombinedId() {
-        return $"LinkId: {_linkInstanceId}";
+    private string GetLinkName() {
+        return $"LinkName: {_linkInstanceName}";
     }
 }

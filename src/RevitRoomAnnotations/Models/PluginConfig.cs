@@ -1,7 +1,5 @@
 using System.Collections.Generic;
 
-using Autodesk.Revit.DB;
-
 using dosymep.Bim4Everyone;
 using dosymep.Bim4Everyone.ProjectConfigs;
 
@@ -29,5 +27,5 @@ internal class PluginConfig : ProjectConfig<RevitSettings> {
 
 internal class RevitSettings : ProjectSettings {
     public override string ProjectName { get; set; }
-    public IList<ElementId> SelectedLinks { get; set; }
+    public IList<string> SelectedLinks { get; set; }
 }

@@ -10,6 +10,6 @@ public class RevitAnnotation {
     }
 
     public Element Annotation { get; }
-    public string CombinedID { get; set; }
+    public string LinkName { get; set; }
 }
 

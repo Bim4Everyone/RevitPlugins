@@ -80,9 +80,9 @@ internal class MainViewModel : BaseViewModel {
     // Метод загрузки конфигурации пользователя
     private void LoadConfig() {
         var setting = _pluginConfig.GetSettings(_revitRepository.Document);
-        var selectedLinkIds = setting?.SelectedLinks ?? [];
-        foreach(var linkId in selectedLinkIds) {
-            LinkViewModel link = Links.FirstOrDefault(link => link.Id == linkId);
+        var selectedLinkNames = setting?.SelectedLinks ?? [];
+        foreach(string linkName in selectedLinkNames) {
+            LinkViewModel link = Links.FirstOrDefault(link => link.Name == linkName);
             if(link != null) {
                 link.IsChecked = true;
             }
@@ -94,7 +94,7 @@ internal class MainViewModel : BaseViewModel {
         var setting = _pluginConfig.GetSettings(_revitRepository.Document)
             ?? _pluginConfig.AddSettings(_revitRepository.Document);
         setting.SelectedLinks = SelectedLinks
-            .Select(link => link.Id)
+            .Select(link => link.Name)
             .ToList();
         _pluginConfig.SaveProjectConfig();
     }

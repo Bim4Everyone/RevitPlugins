@@ -13,12 +13,12 @@ public class RoomAnnotationMapService : IRoomAnnotationMapService {
         static string Key(string id) => id ?? string.Empty;
 
         var annDict = annotations
-         .GroupBy(a => Key(a.CombinedID))
+         .GroupBy(a => Key(a.LinkName))
          .ToDictionary(g => g.Key, g => g.First());
 
         var roomKeys = new HashSet<string>();
         foreach(var room in rooms) {
-            string key = Key(room.CombinedId);
+            string key = Key(room.LinkName);
             roomKeys.Add(key);
 
             yield return annDict.TryGetValue(key, out var ann)
@@ -27,7 +27,7 @@ public class RoomAnnotationMapService : IRoomAnnotationMapService {
         }
 
         foreach(var ann in annotations) {
-            string key = Key(ann.CombinedID);
+            string key = Key(ann.LinkName);
             if(!roomKeys.Contains(key)) {
                 yield return new RoomAnnotationMap { RevitRoom = null, RevitAnnotation = ann, ToCreate = false, ToDelete = true };
             }
