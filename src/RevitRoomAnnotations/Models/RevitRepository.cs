@@ -39,7 +39,6 @@ internal class RevitRepository {
         .OfClass(typeof(RevitLinkInstance))
         .Cast<RevitLinkInstance>()
         .Select(linkInstance => new LinkInstanceElement(linkInstance, Document))
-        .Where(linkInstanceElement => !linkInstanceElement.IsNestedLink)
         .ToList();
     }
 

@@ -13,7 +13,6 @@ public class LinkInstanceElement {
 
     public string Name => _revitLinkInstance.Name;
     public ElementId Id => _revitLinkInstance.Id;
-    public bool IsNestedLink => _revitLinkType.IsNestedLink;
     public LinkedFileStatus LinkedFileStatus => _revitLinkType.GetLinkedFileStatus();
 
     public Document GetLinkDocument() {
