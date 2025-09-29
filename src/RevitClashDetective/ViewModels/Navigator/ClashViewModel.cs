@@ -22,21 +22,21 @@ internal class ClashViewModel : BaseViewModel, IClashViewModel, IEquatable<Clash
 
         ClashName = clash.Name;
 
-            FirstId = clash.MainElement.Id;
-            FirstCategory = clash.MainElement.Category;
-            FirstTypeName = clash.MainElement.Name;
-            FirstFamilyName = clash.MainElement.FamilyName;
-            FirstDocumentName = clash.MainElement.DocumentName;
-            FirstLevel = clash.MainElement.Level;
-            FirstElementParams = new ExpandoObject();
+        FirstId = clash.MainElement.Id;
+        FirstCategory = clash.MainElement.Category;
+        FirstTypeName = clash.MainElement.Name;
+        FirstFamilyName = clash.MainElement.FamilyName;
+        FirstDocumentName = clash.MainElement.DocumentName;
+        FirstLevel = clash.MainElement.Level;
+        FirstElementParams = new ExpandoObject();
 
-            SecondId = clash.OtherElement.Id;
-            SecondCategory = clash.OtherElement.Category;
-            SecondTypeName = clash.OtherElement.Name;
-            SecondFamilyName = clash.OtherElement.FamilyName;
-            SecondLevel = clash.OtherElement.Level;
-            SecondDocumentName = clash.OtherElement.DocumentName;
-            SecondElementParams = new ExpandoObject();
+        SecondId = clash.OtherElement.Id;
+        SecondCategory = clash.OtherElement.Category;
+        SecondTypeName = clash.OtherElement.Name;
+        SecondFamilyName = clash.OtherElement.FamilyName;
+        SecondLevel = clash.OtherElement.Level;
+        SecondDocumentName = clash.OtherElement.DocumentName;
+        SecondElementParams = new ExpandoObject();
 
         SetIntersectionData(clash);
 
