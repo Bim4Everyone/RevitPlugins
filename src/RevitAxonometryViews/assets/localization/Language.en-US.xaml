@@ -3,17 +3,12 @@
                     xmlns:system="clr-namespace:System;assembly=mscorlib">
 
     <system:String x:Key="MainWindow.Title">Create 3D-Views</system:String>
-
-    <system:String x:Key="MainWindow.CriterionBy">Views by:</system:String>
-    <system:String x:Key="MainWindow.CriterionText">System search:</system:String>
-    <system:String x:Key="MainWindow.SystemName">Systems name</system:String>
-    <system:String x:Key="MainWindow.SharedSystemName">Shared system name</system:String>
     <system:String x:Key="MainWindow.CombineViewsCheckBox">All selected in one view</system:String>
     <system:String x:Key="MainWindow.ButtonOk">Ok</system:String>
     <system:String x:Key="MainWindow.ButtonCancel">Cancel</system:String>
     <system:String x:Key="MainWindow.ErrorText">Systems are not selected</system:String>
     <system:String x:Key="MainWindow.SearchHint">Type system name...</system:String>
-    <system:String x:Key="MainWindow.ComboHint">The name of the parameter by which filtering will be performed</system:String>
+    <system:String x:Key="MainWindow.FilterParameterTooltip">The name of the parameter by which filtering will be performed</system:String>
     <system:String x:Key="MainWindow.VariantsString">&lt;Variants&gt;</system:String>
     <system:String x:Key="MainWindow.EmptyName">System name empty</system:String>
    

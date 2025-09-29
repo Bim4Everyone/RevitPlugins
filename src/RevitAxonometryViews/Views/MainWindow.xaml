@@ -30,17 +30,9 @@
                 <ResourceDictionary
                     Source="CustomStyles.xaml" />
             </ResourceDictionary.MergedDictionaries>
-
-            <ui:TextBlock
-                x:Key="SystemHeader"
-                Text="{me:LocalizationSource MainWindow.SystemName}" />
-            
-            <ui:TextBlock
-                x:Key="SharedHeader"
-                Text="{me:LocalizationSource MainWindow.SharedSystemName}" />
-
         </ResourceDictionary>
     </Window.Resources>
+    
 
     <b:Interaction.Triggers>
         <b:EventTrigger
@@ -82,7 +74,7 @@
                 Name="FilterCriterion"
                 ItemsSource="{Binding FilterCriterion}"
                 SelectedItem="{Binding SelectedCriteria}"
-                ToolTip="{me:LocalizationSource MainWindow.ComboHint}"
+                ToolTip="{me:LocalizationSource MainWindow.FilterParameterTooltip}"
                 
                 Margin="10,5,10,10"
                 Grid.Column="0"></ComboBox>
@@ -118,18 +110,43 @@
                         </DataGridTemplateColumn.CellTemplate>
                     </DataGridTemplateColumn>
 
-                    <DataGridTextColumn
-                        x:Name="col1"
-                        Header="{StaticResource SystemHeader}"
+                    <DataGridTemplateColumn
                         Width="*"
-                        Binding="{Binding Path=DisplaySystemName}" />
-                    <DataGridTextColumn
-                        Header="{StaticResource SharedHeader}"
-                        Width="*"
-                        Binding="{Binding Path=DisplaySharedName}" />
+                        x:Name="col1">
+                        <DataGridTemplateColumn.HeaderTemplate>
+                            <DataTemplate>
+                                <TextBlock
+                                    Text="{Binding DataContext.SystemName, RelativeSource={RelativeSource AncestorType=Window}}" />
+                            </DataTemplate>
+                        </DataGridTemplateColumn.HeaderTemplate>
+
+                        <DataGridTemplateColumn.CellTemplate>
+                            <DataTemplate>
+                                <TextBlock
+                                    Text="{Binding DisplaySystemName}" />
+                            </DataTemplate>
+                        </DataGridTemplateColumn.CellTemplate>
+                    </DataGridTemplateColumn>
+
+                    <DataGridTemplateColumn
+                        Width="*">
+                        <DataGridTemplateColumn.HeaderTemplate>
+                            <DataTemplate>
+                                <TextBlock
+                                    Text="{Binding DataContext.SharedSystemName, RelativeSource={RelativeSource AncestorType=Window}}" />
+                            </DataTemplate>
+                        </DataGridTemplateColumn.HeaderTemplate>
+
+                        <DataGridTemplateColumn.CellTemplate>
+                            <DataTemplate>
+                                <TextBlock
+                                    Text="{Binding DisplaySharedName}" />
+                            </DataTemplate>
+                        </DataGridTemplateColumn.CellTemplate>
+                    </DataGridTemplateColumn>
+                    
                 </ui:DataGrid.Columns>
             </ui:DataGrid>
-  
         </Border>
 
         

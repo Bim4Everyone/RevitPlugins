@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
+using System.Windows;
 using System.Windows.Input;
 
 using Autodesk.Revit.DB;
@@ -41,10 +42,14 @@ internal class MainViewModel : BaseViewModel {
 
         _filterValue = string.Empty;
         _selectedCriteria = _axonometryConfig.SharedVisSystemName;
+        SystemName = _axonometryConfig.SystemName;
+        SharedSystemName = _axonometryConfig.SharedVisSystemName;
+
         FilterCriterion = [
-            _axonometryConfig.SystemName,
-            _axonometryConfig.SharedVisSystemName
+            SystemName,
+            SharedSystemName
         ];
+
 
         FilteredView = new ObservableCollection<HvacSystemViewModel>(_hvacSystems);
         LoadViewCommand = RelayCommand.Create(LoadView);
@@ -73,6 +78,9 @@ internal class MainViewModel : BaseViewModel {
     /// Список критериев для фильтрации
     /// </summary>
     public IReadOnlyCollection<string> FilterCriterion { get; }
+
+    public string SystemName { get; }
+    public string SharedSystemName { get; }
 
     /// <summary>
     /// Текст, который подаестся в свойство фильтра для вида.

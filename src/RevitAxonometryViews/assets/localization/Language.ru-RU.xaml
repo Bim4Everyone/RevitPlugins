@@ -3,17 +3,12 @@
                     xmlns:system="clr-namespace:System;assembly=mscorlib">
 
     <system:String x:Key="MainWindow.Title">Создать схемы</system:String>
-
-    <system:String x:Key="MainWindow.CriterionBy">Схемы по:</system:String>
-    <system:String x:Key="MainWindow.CriterionText">Поиск системы:</system:String>
-    <system:String x:Key="MainWindow.SystemName">Имя системы</system:String>
-    <system:String x:Key="MainWindow.SharedSystemName">ФОП_ВИС_Имя системы</system:String>
     <system:String x:Key="MainWindow.CombineViewsCheckBox">Все выделенное на один вид</system:String>
     <system:String x:Key="MainWindow.ButtonOk">Ок</system:String>
     <system:String x:Key="MainWindow.ButtonCancel">Отмена</system:String>
     <system:String x:Key="MainWindow.ErrorText">Не выделены системы</system:String>
     <system:String x:Key="MainWindow.SearchHint">Введите имя системы...</system:String>
-    <system:String x:Key="MainWindow.ComboHint">Имя параметра, по которому будет вестись фильтрация</system:String>
+    <system:String x:Key="MainWindow.FilterParameterTooltip">Имя параметра, по которому будет выполняться фильтрация.</system:String>
     <system:String x:Key="MainWindow.VariantsString">&lt;Варианты&gt;</system:String>
     <system:String x:Key="MainWindow.EmptyName">Нет системы</system:String>
 
