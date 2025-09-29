@@ -19,12 +19,14 @@ namespace RevitClashDetective.ViewModels.Navigator {
 
             ClashName = clash.Name;
 
+            FirstId = clash.MainElement.Id;
             FirstCategory = clash.MainElement.Category;
             FirstTypeName = clash.MainElement.Name;
             FirstFamilyName = clash.MainElement.FamilyName;
             FirstDocumentName = clash.MainElement.DocumentName;
             FirstLevel = clash.MainElement.Level;
 
+            SecondId = clash.OtherElement.Id;
             SecondCategory = clash.OtherElement.Category;
             SecondTypeName = clash.OtherElement.Name;
             SecondFamilyName = clash.OtherElement.FamilyName;
@@ -53,6 +55,8 @@ namespace RevitClashDetective.ViewModels.Navigator {
             set => RaiseAndSetIfChanged(ref _clashName, value);
         }
 
+        public ElementId FirstId { get; }
+
         public string FirstTypeName { get; }
 
         public string FirstFamilyName { get; }
@@ -62,6 +66,8 @@ namespace RevitClashDetective.ViewModels.Navigator {
         public string FirstLevel { get; }
 
         public string FirstCategory { get; }
+
+        public ElementId SecondId { get; }
 
         public string SecondTypeName { get; }
 

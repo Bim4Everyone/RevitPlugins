@@ -1,6 +1,8 @@
 using System;
 using System.Collections.Generic;
 
+using Autodesk.Revit.DB;
+
 using dosymep.WPF.ViewModels;
 
 using RevitClashDetective.Models.Clashes;
@@ -18,6 +20,7 @@ internal class ImaginarySecondClashViewModel
         _secondElement = secondElement ?? throw new ArgumentNullException(nameof(secondElement));
         SecondElementVolume = secondElement.ElementVolume;
 
+        SecondId = _secondElement.Element.Id;
         SecondCategory = _secondElement.Element.Category;
         SecondTypeName = _secondElement.Element.Name;
         SecondFamilyName = _secondElement.Element.FamilyName;
@@ -30,6 +33,8 @@ internal class ImaginarySecondClashViewModel
 
     public string ClashName { get => string.Empty; set { return; } }
 
+    public ElementId FirstId => ElementId.InvalidElementId;
+
     public string FirstTypeName => string.Empty;
 
     public string FirstFamilyName => string.Empty;
@@ -39,6 +44,8 @@ internal class ImaginarySecondClashViewModel
     public string FirstLevel => string.Empty;
 
     public string FirstCategory => string.Empty;
+
+    public ElementId SecondId { get; }
 
     public string SecondTypeName { get; }
 

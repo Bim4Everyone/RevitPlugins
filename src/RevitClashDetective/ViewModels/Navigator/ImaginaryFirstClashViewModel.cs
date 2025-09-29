@@ -1,6 +1,8 @@
 using System;
 using System.Collections.Generic;
 
+using Autodesk.Revit.DB;
+
 using dosymep.WPF.ViewModels;
 
 using RevitClashDetective.Models.Clashes;
@@ -18,6 +20,7 @@ internal class ImaginaryFirstClashViewModel
         _firstElement = firstElement ?? throw new ArgumentNullException(nameof(firstElement));
         FirstElementVolume = firstElement.ElementVolume;
 
+        FirstId = _firstElement.Element.Id;
         FirstCategory = _firstElement.Element.Category;
         FirstTypeName = _firstElement.Element.Name;
         FirstFamilyName = _firstElement.Element.FamilyName;
@@ -30,6 +33,8 @@ internal class ImaginaryFirstClashViewModel
 
     public string ClashName { get => string.Empty; set { return; } }
 
+    public ElementId FirstId { get; }
+
     public string FirstTypeName { get; }
 
     public string FirstFamilyName { get; }
@@ -39,6 +44,8 @@ internal class ImaginaryFirstClashViewModel
     public string FirstLevel { get; }
 
     public string FirstCategory { get; }
+
+    public ElementId SecondId => ElementId.InvalidElementId;
 
     public string SecondTypeName => string.Empty;
 

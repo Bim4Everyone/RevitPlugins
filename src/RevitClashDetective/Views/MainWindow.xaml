@@ -104,7 +104,7 @@
 
             <dxg:GridColumn Header="Наименование" FieldName="Name" Width="Auto" SortOrder="Ascending" SortIndex="0"/>
 
-            <dxg:GridColumn Header="Выбор А" Width="*">
+            <dxg:GridColumn Header="Выбор 1" Width="*">
                 <dxg:GridColumn.CellTemplate>
                     <DataTemplate>
                         <local:ProviderComboBox
@@ -113,7 +113,7 @@
                 </dxg:GridColumn.CellTemplate>
             </dxg:GridColumn>
 
-            <dxg:GridColumn Header="Выбор В" Width="*">
+            <dxg:GridColumn Header="Выбор 2" Width="*">
                 <dxg:GridColumn.CellTemplate>
                     <DataTemplate DataType="{x:Type clashDetective:CheckViewModel}">
                         <local:ProviderComboBox
