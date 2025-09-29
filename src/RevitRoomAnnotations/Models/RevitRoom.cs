@@ -2,36 +2,37 @@ using Autodesk.Revit.DB;
 
 using dosymep.Bim4Everyone;
 using dosymep.Bim4Everyone.SharedParams;
+using dosymep.Bim4Everyone.SystemParams;
 using dosymep.Revit;
 
 
 namespace RevitRoomAnnotations.Models;
 public class RevitRoom {
-    private const string _roomNumber = "Номер";
-    private const string _roomName = "Имя";
     private readonly SpatialElement _room;
     private readonly ElementId _linkInstanceId;
+    private readonly Document _document;
 
-    public RevitRoom(SpatialElement room, LinkInstanceElement linkInstanceElement) {
+    public RevitRoom(SpatialElement room, LinkInstanceElement linkInstanceElement, Document document) {
         _room = room;
         _linkInstanceId = linkInstanceElement.Id;
+        _document = document;
     }
 
     public string CombinedId => GetCombinedId();
-    public string AdditionalNumber => GetParamValue<string>(_room, _roomNumber);
-    public string AdditionalName => GetParamValue<string>(_room, _roomName);
-    public double? Area => GetParamValue<double>(_room, SharedParamsConfig.Instance.RoomAreaWithRatio.Name);
-    public double? AreaWithCoefficient => GetParamValue<double>(_room, SharedParamsConfig.Instance.ApartmentGroupName.Name);
-    public string GroupSortOrder => GetParamValue<string>(_room, SharedParamsConfig.Instance.ApartmentGroupName.Name);
-    public string RoomCategory => GetParamValue<string>(_room, SharedParamsConfig.Instance.RoomFireCategory.Name);
-    public string FireZone => GetParamValue<string>(_room, SharedParamsConfig.Instance.FireCompartmentShortName.Name);
-    public string Level => GetParamValue<string>(_room, SharedParamsConfig.Instance.Level.Name);
-    public string Group => GetParamValue<string>(_room, SharedParamsConfig.Instance.RoomGroupShortName.Name);
-    public string Building => GetParamValue<string>(_room, SharedParamsConfig.Instance.RoomBuildingShortName.Name);
-    public string Section => GetParamValue<string>(_room, SharedParamsConfig.Instance.RoomSectionShortName.Name);
+    public string AdditionalNumber => GetParamValue<string>(_room, SystemParamsConfig.Instance.CreateRevitParam(_document, BuiltInParameter.ROOM_NUMBER));
+    public string AdditionalName => GetParamValue<string>(_room, SystemParamsConfig.Instance.CreateRevitParam(_document, BuiltInParameter.ROOM_NAME));
+    public double? Area => GetParamValue<double>(_room, SharedParamsConfig.Instance.RoomArea);
+    public double? AreaWithCoefficient => GetParamValue<double>(_room, SharedParamsConfig.Instance.RoomAreaWithRatio);
+    public string GroupSortOrder => GetParamValue<string>(_room, SharedParamsConfig.Instance.ApartmentGroupName);
+    public string RoomCategory => GetParamValue<string>(_room, SharedParamsConfig.Instance.RoomFireCategory);
+    public string FireZone => GetParamValue<string>(_room, SharedParamsConfig.Instance.FireCompartmentShortName);
+    public string Level => GetParamValue<string>(_room, SharedParamsConfig.Instance.Level);
+    public string Group => GetParamValue<string>(_room, SharedParamsConfig.Instance.RoomGroupShortName);
+    public string Building => GetParamValue<string>(_room, SharedParamsConfig.Instance.RoomBuildingShortName);
+    public string Section => GetParamValue<string>(_room, SharedParamsConfig.Instance.RoomSectionShortName);
 
-    private T GetParamValue<T>(SpatialElement room, string paramName) {
-        return room.GetParamValueOrDefault<T>(paramName);
+    private T GetParamValue<T>(SpatialElement room, RevitParam revitParam) {
+        return room.GetParamValueOrDefault<T>(revitParam.Name);
     }
 
     private string GetCombinedId() {
