@@ -22,19 +22,21 @@ internal class ClashViewModel : BaseViewModel, IClashViewModel, IEquatable<Clash
 
         ClashName = clash.Name;
 
-        FirstCategory = clash.MainElement.Category;
-        FirstTypeName = clash.MainElement.Name;
-        FirstFamilyName = clash.MainElement.FamilyName;
-        FirstDocumentName = clash.MainElement.DocumentName;
-        FirstLevel = clash.MainElement.Level;
-        FirstElementParams = new ExpandoObject();
+            FirstId = clash.MainElement.Id;
+            FirstCategory = clash.MainElement.Category;
+            FirstTypeName = clash.MainElement.Name;
+            FirstFamilyName = clash.MainElement.FamilyName;
+            FirstDocumentName = clash.MainElement.DocumentName;
+            FirstLevel = clash.MainElement.Level;
+            FirstElementParams = new ExpandoObject();
 
-        SecondCategory = clash.OtherElement.Category;
-        SecondTypeName = clash.OtherElement.Name;
-        SecondFamilyName = clash.OtherElement.FamilyName;
-        SecondLevel = clash.OtherElement.Level;
-        SecondDocumentName = clash.OtherElement.DocumentName;
-        SecondElementParams = new ExpandoObject();
+            SecondId = clash.OtherElement.Id;
+            SecondCategory = clash.OtherElement.Category;
+            SecondTypeName = clash.OtherElement.Name;
+            SecondFamilyName = clash.OtherElement.FamilyName;
+            SecondLevel = clash.OtherElement.Level;
+            SecondDocumentName = clash.OtherElement.DocumentName;
+            SecondElementParams = new ExpandoObject();
 
         SetIntersectionData(clash);
 
@@ -58,6 +60,8 @@ internal class ClashViewModel : BaseViewModel, IClashViewModel, IEquatable<Clash
         set => RaiseAndSetIfChanged(ref _clashName, value);
     }
 
+    public ElementId FirstId { get; }
+
     public string FirstTypeName { get; }
 
     public string FirstFamilyName { get; }
@@ -67,6 +71,8 @@ internal class ClashViewModel : BaseViewModel, IClashViewModel, IEquatable<Clash
     public string FirstLevel { get; }
 
     public string FirstCategory { get; }
+
+    public ElementId SecondId { get; }
 
     public string SecondTypeName { get; }
 

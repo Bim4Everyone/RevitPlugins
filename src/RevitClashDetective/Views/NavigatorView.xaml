@@ -13,6 +13,7 @@
                            xmlns:base="clr-namespace:dosymep.WPF.Views"
                            xmlns:converters="clr-namespace:dosymep.WpfCore.Converters;assembly=dosymep.WpfCore"
                            xmlns:b="http://schemas.microsoft.com/xaml/behaviors"
+                           xmlns:res="clr-namespace:RevitClashDetective.Resources"
                            xmlns:c="clr-namespace:RevitClashDetective.Models.Clashes"
                            xmlns:system="clr-namespace:System;assembly=mscorlib"
                            mc:Ignorable="d"
@@ -135,16 +136,20 @@
             </dxe:CheckEdit>
         </DockPanel>
 
-        <dxg:GridControl Name="_dg"
-                         Grid.Row="2"
-                         AllowCollectionView="False"
-                         ItemsSource="{Binding SelectedReport.GuiClashes}">
+        <res:CustomGridControl x:Name="_dg"
+                               Grid.Row="2"
+                               AllowCollectionView="False"
+                               SelectionMode="Row"
+                               PreventSelectedItemsResetByCellButton="True"
+                               SelectedItem="{Binding SelectedReport.SelectedGuiClash}"
+                               SelectedItems="{Binding SelectedReport.SelectedGuiClashes}"
+                               ItemsSource="{Binding SelectedReport.GuiClashes}">
 
-            <dxg:GridControl.GroupSummary>
+            <res:CustomGridControl.GroupSummary>
                 <dxg:GridSummaryItem SummaryType="Count" />
-            </dxg:GridControl.GroupSummary>
+            </res:CustomGridControl.GroupSummary>
 
-            <dxg:GridControl.View>
+            <res:CustomGridControl.View>
                 <dxg:TableView Name="_gridView"
                                AutoWidth="True"
                                DataNavigatorButtons="Navigation"
@@ -153,9 +158,9 @@
                                VirtualizingPanel.IsVirtualizingWhenGrouping="True"
                                VirtualizingPanel.VirtualizationMode="Recycling"
                                VirtualizingPanel.IsVirtualizing="True" />
-            </dxg:GridControl.View>
+            </res:CustomGridControl.View>
 
-            <dxg:GridControl.Columns>
+            <res:CustomGridControl.Columns>
 
                 <dxg:GridColumn ReadOnly="True"
                                 Width="70"
@@ -204,8 +209,9 @@
                         </DataTemplate>
                     </dxg:GridColumn.CellTemplate>
                 </dxg:GridColumn>
+
                 <dxg:GridColumn Style="{StaticResource ReadOnlyColumn}"
-                                Header="Файла 1"
+                                Header="Файл 1"
                                 FieldName="FirstDocumentName" />
                 <dxg:GridColumn Style="{StaticResource ReadOnlyColumn}"
                                 Header="Уровень 1"
@@ -219,9 +225,34 @@
                 <dxg:GridColumn Style="{StaticResource ReadOnlyColumn}"
                                 Header="Тип 1"
                                 FieldName="FirstTypeName" />
+                <dxg:GridColumn ReadOnly="True"
+                                MinWidth="30"
+                                AllowResizing="True"
+                                FieldName="FirstId"
+                                Header="Id 1">
+                    <dxg:GridColumn.CellTemplate>
+                        <DataTemplate>
+                            <DockPanel>
+                                <TextBlock VerticalAlignment="Center"
+                                           Margin="4 0 0 0"
+                                           TextTrimming="CharacterEllipsis"
+                                           Text="{Binding Row.FirstId}" />
+                                <dx:SimpleButton Width="Auto"
+                                                 MinWidth="20"
+                                                 HorizontalAlignment="Right"
+                                                 Focusable="False"
+                                                 Glyph="{dx:DXImage 'Images/RichEdit/Select_16x16.png'}"
+                                                 Command="{Binding ElementName=_dg, Path=DataContext.SelectedReport.PickFirstElementsCommand}" />
+                            </DockPanel>
+                        </DataTemplate>
+                    </dxg:GridColumn.CellTemplate>
+                </dxg:GridColumn>
                 <dxg:GridColumn Style="{StaticResource ReadOnlyColumn}"
-                                Header="Файла 2"
+                                Header="Файл 2"
                                 FieldName="SecondDocumentName" />
+                <dxg:GridColumn Style="{StaticResource ReadOnlyColumn}"
+                                Header="Имя файла 1"
+                                FieldName="FirstDocumentName" />
                 <dxg:GridColumn Style="{StaticResource ReadOnlyColumn}"
                                 Header="Уровень 2"
                                 FieldName="SecondLevel" />
@@ -234,6 +265,29 @@
                 <dxg:GridColumn Style="{StaticResource ReadOnlyColumn}"
                                 Header="Тип 2"
                                 FieldName="SecondTypeName" />
+                <dxg:GridColumn ReadOnly="True"
+                                MinWidth="30"
+                                AllowResizing="True"
+                                FieldName="SecondId"
+                                Header="Id 2">
+                    <dxg:GridColumn.CellTemplate>
+                        <DataTemplate>
+                            <DockPanel>
+                                <TextBlock VerticalAlignment="Center"
+                                           TextAlignment="Left"
+                                           Margin="4 0 0 0"
+                                           TextTrimming="CharacterEllipsis"
+                                           Text="{Binding Row.SecondId}" />
+                                <dx:SimpleButton Width="Auto"
+                                                 MinWidth="20"
+                                                 HorizontalAlignment="Right"
+                                                 Focusable="False"
+                                                 Glyph="{dx:DXImage 'Images/RichEdit/Select_16x16.png'}"
+                                                 Command="{Binding ElementName=_dg, Path=DataContext.SelectedReport.PickSecondElementsCommand}" />
+                            </DockPanel>
+                        </DataTemplate>
+                    </dxg:GridColumn.CellTemplate>
+                </dxg:GridColumn>
                 <dxg:GridColumn Style="{StaticResource ReadOnlyColumn}"
                                 Header="% пересечения 1"
                                 FieldName="FirstElementIntersectionPercentage">
@@ -255,8 +309,8 @@
                         <dxe:TextEditSettings HorizontalContentAlignment="Left" />
                     </dxg:GridColumn.EditSettings>
                 </dxg:GridColumn>
-            </dxg:GridControl.Columns>
-        </dxg:GridControl>
+            </res:CustomGridControl.Columns>
+        </res:CustomGridControl>
 
         <DockPanel Grid.Row="3"
                    Margin="0 10 0 0">

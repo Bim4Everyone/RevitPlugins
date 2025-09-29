@@ -2,40 +2,44 @@
 
 using Autodesk.Revit.DB;
 
-namespace RevitSuperfilter.Models {
-    internal class ElementComparer : IEqualityComparer<Element> {
-        public bool Equals(Element x, Element y) {
-            if(x == null && y == null) {
-                return true;
-            }
+namespace RevitSuperfilter.Models;
 
-            if(x == null || y == null) {
-                return false;
-            }
-
-            return x.Id == y.Id;
+internal class ElementComparer : IEqualityComparer<Element> {
+    public bool Equals(Element x, Element y) {
+        if(x == null
+           && y == null) {
+            return true;
         }
 
-        public int GetHashCode(Element obj) {
-            return obj?.Id.GetHashCode() ?? 0;
+        if(x == null
+           || y == null) {
+            return false;
         }
+
+        return x.Id == y.Id;
     }
 
-    internal class ElementNameComparer : IEqualityComparer<Element> {
-        public bool Equals(Element x, Element y) {
-            if(x == null && y == null) {
-                return true;
-            }
+    public int GetHashCode(Element obj) {
+        return obj?.Id.GetHashCode() ?? 0;
+    }
+}
 
-            if(x == null || y == null) {
-                return false;
-            }
-
-            return x.Name.Equals(y.Name);
+internal class ElementNameComparer : IEqualityComparer<Element> {
+    public bool Equals(Element x, Element y) {
+        if(x == null
+           && y == null) {
+            return true;
         }
 
-        public int GetHashCode(Element obj) {
-            return obj?.Name.GetHashCode() ?? 0;
+        if(x == null
+           || y == null) {
+            return false;
         }
+
+        return x.Name.Equals(y.Name);
+    }
+
+    public int GetHashCode(Element obj) {
+        return obj?.Name.GetHashCode() ?? 0;
     }
 }
