@@ -3,7 +3,6 @@ using System.Collections.Generic;
 
 using Autodesk.Revit.DB;
 
-using dosymep.Revit;
 using dosymep.WPF.ViewModels;
 
 using RevitClashDetective.Models;
@@ -20,14 +19,14 @@ namespace RevitClashDetective.ViewModels.Navigator {
 
             ClashName = clash.Name;
 
-            FirstId = clash.MainElement.Id.GetIdValue();
+            FirstId = clash.MainElement.Id;
             FirstCategory = clash.MainElement.Category;
             FirstTypeName = clash.MainElement.Name;
             FirstFamilyName = clash.MainElement.FamilyName;
             FirstDocumentName = clash.MainElement.DocumentName;
             FirstLevel = clash.MainElement.Level;
 
-            SecondId = clash.OtherElement.Id.GetIdValue();
+            SecondId = clash.OtherElement.Id;
             SecondCategory = clash.OtherElement.Category;
             SecondTypeName = clash.OtherElement.Name;
             SecondFamilyName = clash.OtherElement.FamilyName;
@@ -56,11 +55,7 @@ namespace RevitClashDetective.ViewModels.Navigator {
             set => RaiseAndSetIfChanged(ref _clashName, value);
         }
 
-#if REVIT_2023_OR_LESS
-        public int FirstId { get; }
-#else
-        public long FirstId { get; }
-#endif
+        public ElementId FirstId { get; }
 
         public string FirstTypeName { get; }
 
@@ -72,11 +67,7 @@ namespace RevitClashDetective.ViewModels.Navigator {
 
         public string FirstCategory { get; }
 
-#if REVIT_2023_OR_LESS
-        public int SecondId { get; }
-#else
-        public long SecondId { get; }
-#endif
+        public ElementId SecondId { get; }
 
         public string SecondTypeName { get; }
 

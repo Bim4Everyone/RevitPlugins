@@ -1,7 +1,8 @@
 using System;
 using System.Collections.Generic;
 
-using dosymep.Revit;
+using Autodesk.Revit.DB;
+
 using dosymep.WPF.ViewModels;
 
 using RevitClashDetective.Models.Clashes;
@@ -19,7 +20,7 @@ internal class ImaginaryFirstClashViewModel
         _firstElement = firstElement ?? throw new ArgumentNullException(nameof(firstElement));
         FirstElementVolume = firstElement.ElementVolume;
 
-        FirstId = _firstElement.Element.Id.GetIdValue();
+        FirstId = _firstElement.Element.Id;
         FirstCategory = _firstElement.Element.Category;
         FirstTypeName = _firstElement.Element.Name;
         FirstFamilyName = _firstElement.Element.FamilyName;
@@ -32,11 +33,7 @@ internal class ImaginaryFirstClashViewModel
 
     public string ClashName { get => string.Empty; set { return; } }
 
-#if REVIT_2023_OR_LESS
-    public int FirstId { get; }
-#else
-    public long FirstId { get; }
-#endif
+    public ElementId FirstId { get; }
 
     public string FirstTypeName { get; }
 
@@ -48,11 +45,7 @@ internal class ImaginaryFirstClashViewModel
 
     public string FirstCategory { get; }
 
-#if REVIT_2023_OR_LESS
-    public int SecondId => -1;
-#else
-    public long SecondId => -1;
-#endif
+    public ElementId SecondId => ElementId.InvalidElementId;
 
     public string SecondTypeName => string.Empty;
 
