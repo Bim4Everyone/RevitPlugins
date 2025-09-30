@@ -2,7 +2,6 @@ using Autodesk.Revit.DB;
 
 using dosymep.Bim4Everyone;
 using dosymep.Bim4Everyone.SharedParams;
-using dosymep.Bim4Everyone.SystemParams;
 using dosymep.Revit;
 
 
@@ -10,17 +9,15 @@ namespace RevitRoomAnnotations.Models;
 public class RevitRoom {
     private readonly SpatialElement _room;
     private readonly string _linkInstanceName;
-    private readonly Document _document;
 
-    public RevitRoom(SpatialElement room, LinkInstanceElement linkInstanceElement, Document document) {
+    public RevitRoom(SpatialElement room, LinkInstanceElement linkInstanceElement) {
         _room = room;
         _linkInstanceName = linkInstanceElement.Name;
-        _document = document;
     }
 
     public string LinkName => GetLinkName();
-    public string AdditionalNumber => GetParamValue<string>(_room, SystemParamsConfig.Instance.CreateRevitParam(_document, BuiltInParameter.ROOM_NUMBER));
-    public string AdditionalName => GetParamValue<string>(_room, SystemParamsConfig.Instance.CreateRevitParam(_document, BuiltInParameter.ROOM_NAME));
+    public string AdditionalNumber => _room.GetParamValueOrDefault<string>(BuiltInParameter.ROOM_NUMBER);
+    public string AdditionalName => _room.GetParamValueOrDefault<string>(BuiltInParameter.ROOM_NAME);
     public double? Area => GetParamValue<double>(_room, SharedParamsConfig.Instance.RoomArea);
     public double? AreaWithCoefficient => GetParamValue<double>(_room, SharedParamsConfig.Instance.RoomAreaWithRatio);
     public string GroupSortOrder => GetParamValue<string>(_room, SharedParamsConfig.Instance.ApartmentGroupName);

@@ -54,7 +54,7 @@ internal class RevitRepository {
                 .OfCategory(BuiltInCategory.OST_Rooms)
                 .WhereElementIsNotElementType()
                 .Cast<SpatialElement>()
-                .Select(room => new RevitRoom(room, linkInstanceElement, Document))
+                .Select(room => new RevitRoom(room, linkInstanceElement))
                 .ToList();
             result.AddRange(rooms);
         }
