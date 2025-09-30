@@ -39,6 +39,7 @@ internal class PylonSheetInfoManager {
         SheetInfo.ElemsInfo.FindPylonHostVectors();
         SheetInfo.ElemsInfo.FindPylonHostOrigin();
         SheetInfo.ElemsInfo.FindHostDimensions();
+        SheetInfo.ElemsInfo.FindHostMaxMinByZ();
         SheetInfo.ElemsInfo.FindElemsBoundingBox();
         SheetInfo.ElemsInfo.FindElemsBoundingBoxProps();
 

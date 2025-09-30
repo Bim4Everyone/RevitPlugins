@@ -5,6 +5,7 @@ using Autodesk.Revit.DB;
 
 using dosymep.Revit;
 
+using RevitPylonDocumentation.Models.Services;
 using RevitPylonDocumentation.ViewModels;
 
 namespace RevitPylonDocumentation.Models.PylonSheetNView;
@@ -33,6 +34,8 @@ internal class PylonElemsInfo {
     public double ElemsBoundingBoxWidthToMin { get; set; }
     public double ElemsBoundingBoxMinZ { get; set; }
     public double ElemsBoundingBoxMaxZ { get; set; }
+    public double LastPylonMinZ { get; set; }
+    public double LastPylonMaxZ { get; set; }
 
 
     /// <summary>
@@ -114,6 +117,19 @@ internal class PylonElemsInfo {
             HostWidth = ViewModel.ParamValService
                             .GetParamValueAnywhere<double>(column, ViewModel.ProjectSettings.PylonWidthParamName);
         }
+    }
+
+    /// <summary>
+    /// Получает максимум и минимум пилонов по высоте
+    /// </summary>
+    public void FindHostMaxMinByZ() {
+        // Отметка Z точки максимума верхнего пилона
+        var topElement = SheetInfo.HostElems.Last();
+        LastPylonMaxZ = topElement.get_BoundingBox(null).Max.Z;
+
+        // Отметка Z точки минимума нижнего пилона
+        var bottomElement = SheetInfo.HostElems.First();
+        LastPylonMinZ = bottomElement.get_BoundingBox(null).Min.Z;
     }
 
     /// <summary>

@@ -26,13 +26,13 @@ internal class UserViewSectionSettings : BaseViewModel {
     private string _transverseViewDepthTemp = "900";
     private string _transverseViewFirstPrefixTemp = "";
     private string _transverseViewFirstSuffixTemp = "_Сеч.1-1";
-    private string _transverseViewFirstElevationTemp = "1000";
+    private string _transverseViewFirstElevationTemp = "800";
     private string _transverseViewSecondPrefixTemp = "";
     private string _transverseViewSecondSuffixTemp = "_Сеч.2-2";
-    private string _transverseViewSecondElevationTemp = "3000";
+    private string _transverseViewSecondElevationTemp = "2000";
     private string _transverseViewThirdPrefixTemp = "";
     private string _transverseViewThirdSuffixTemp = "_Сеч.3-3";
-    private string _transverseViewThirdElevationTemp = "400";
+    private string _transverseViewThirdElevationTemp = "600";
 
     private string _transverseRebarViewDepthTemp = "1200";
     private string _transverseRebarViewFirstPrefixTemp = "Каркас ";
