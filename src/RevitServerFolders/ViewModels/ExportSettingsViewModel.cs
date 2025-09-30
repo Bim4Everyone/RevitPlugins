@@ -49,6 +49,7 @@ internal class ExportSettingsViewModel<T> : BaseViewModel where T : ExportSettin
         SourceFolder = _settings.SourceFolder;
         ClearTargetFolder = _settings.ClearTargetFolder;
         OpenTargetWhenFinish = _settings.OpenTargetWhenFinish;
+        IsSelected = true;
         TargetFromLabel = _localization.GetLocalizedString("MainWindow.TargetsFrom");
         TargetToLabel = _localization.GetLocalizedString("MainWindow.TargetsTo");
 
