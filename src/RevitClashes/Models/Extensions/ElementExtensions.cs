@@ -3,6 +3,8 @@ using System.Linq;
 
 using Autodesk.Revit.DB;
 
+using dosymep.Revit;
+
 namespace RevitClashDetective.Models.Extensions {
     internal static class ElementExtensions {
         public static bool IsFromDocument(this Element element, Document doc) {
@@ -15,6 +17,14 @@ namespace RevitClashDetective.Models.Extensions {
                 .SelectMany(item => item.GetSolids())
                 .GetUnitedSolids()
                 .ToList();
+        }
+
+        public static object GetParamValueAsString(this Element element, string paramName) {
+            object value = element.GetParamValueOrDefault(paramName, default);
+            if(value is ElementId id) {
+                value = id.IsNotNull() ? element.Document.GetElement(id).Name : string.Empty;
+            }
+            return value;
         }
 
         public static IEnumerable<Solid> GetSolids(this GeometryObject geometryObject) {

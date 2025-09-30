@@ -7,6 +7,7 @@ using System.Linq;
 using System.Windows.Input;
 using System.Windows.Threading;
 
+using dosymep.Bim4Everyone.ProjectConfigs;
 using dosymep.Revit.Geometry;
 using dosymep.SimpleServices;
 using dosymep.WPF.Commands;
@@ -194,6 +195,7 @@ namespace RevitClashDetective.ViewModels.Navigator {
             Clashes = new ObservableCollection<ClashViewModel>(_allClashes.Where(item => IsValid(documentNames, item)));
 
             GuiClashes = new ObservableCollection<IClashViewModel>(Clashes);
+            SetAdditionalParamValues(GuiClashes);
             SetIntersectionPercentage(GuiClashes);
         }
 
@@ -216,6 +218,15 @@ namespace RevitClashDetective.ViewModels.Navigator {
 
             FirstIntersectionPercentage = Math.Round(collisionTotalVolume / firstTotalVolume * 100, 2);
             SecondIntersectionPercentage = Math.Round(collisionTotalVolume / secondTotalVolume * 100, 2);
+        }
+
+        private void SetAdditionalParamValues(ICollection<IClashViewModel> clashes) {
+            string[] paramsNames = SettingsConfig.GetSettingsConfig(GetPlatformService<IConfigSerializer>()).ParamNames;
+            if(paramsNames.Length > 0) {
+                foreach(var clash in clashes) {
+                    clash.SetElementParams(paramsNames);
+                }
+            }
         }
 
         private ElementViewModel GetFirstElementViewModel(IClashViewModel clash) {
@@ -261,11 +272,13 @@ namespace RevitClashDetective.ViewModels.Navigator {
                 if(checkViewModel is not null) {
                     (var firstProviders, var secondProviders) = checkViewModel.GetProviders();
                     _imaginaryFirstClashes = FilterElements(Clashes, GetElementViewModels(firstProviders))
-                        .Select(e => new ImaginaryFirstClashViewModel(e))
+                        .Select(e => new ImaginaryFirstClashViewModel(_revitRepository, e))
                         .ToArray();
                     _imaginarySecondClashes = FilterElements(Clashes, GetElementViewModels(secondProviders))
-                        .Select(e => new ImaginarySecondClashViewModel(e))
+                        .Select(e => new ImaginarySecondClashViewModel(_revitRepository, e))
                         .ToArray();
+                    SetAdditionalParamValues(_imaginaryFirstClashes);
+                    SetAdditionalParamValues(_imaginarySecondClashes);
                 } else {
                     _imaginaryFirstClashes = [];
                     _imaginarySecondClashes = [];

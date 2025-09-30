@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Dynamic;
 
 using Autodesk.Revit.DB;
 
@@ -7,9 +8,11 @@ using dosymep.WPF.ViewModels;
 
 using RevitClashDetective.Models;
 using RevitClashDetective.Models.Clashes;
+using RevitClashDetective.Models.Extensions;
 
 namespace RevitClashDetective.ViewModels.Navigator {
     internal class ClashViewModel : BaseViewModel, IClashViewModel, IEquatable<ClashViewModel> {
+        public const string ElementParamFieldName = "Field";
         private ClashStatus _clashStatus;
         private string _clashName;
         private readonly RevitRepository _revitRepository;
@@ -25,6 +28,7 @@ namespace RevitClashDetective.ViewModels.Navigator {
             FirstFamilyName = clash.MainElement.FamilyName;
             FirstDocumentName = clash.MainElement.DocumentName;
             FirstLevel = clash.MainElement.Level;
+            FirstElementParams = new ExpandoObject();
 
             SecondId = clash.OtherElement.Id;
             SecondCategory = clash.OtherElement.Category;
@@ -32,6 +36,7 @@ namespace RevitClashDetective.ViewModels.Navigator {
             SecondFamilyName = clash.OtherElement.FamilyName;
             SecondLevel = clash.OtherElement.Level;
             SecondDocumentName = clash.OtherElement.DocumentName;
+            SecondElementParams = new ExpandoObject();
 
             SetIntersectionData(clash);
 
@@ -78,6 +83,10 @@ namespace RevitClashDetective.ViewModels.Navigator {
         public string SecondDocumentName { get; }
 
         public string SecondCategory { get; }
+
+        public ExpandoObject FirstElementParams { get; }
+
+        public ExpandoObject SecondElementParams { get; }
 
         private ClashData ClashData { get; set; }
 
@@ -173,6 +182,24 @@ namespace RevitClashDetective.ViewModels.Navigator {
                 Math.Round(ClashData.ClashVolume / ClashData.MainElementVolume * 100, 2);
             SecondElementIntersectionPercentage =
                  Math.Round(ClashData.ClashVolume / ClashData.OtherElementVolume * 100, 2);
+        }
+
+        public void SetElementParams(string[] paramNames) {
+            var firstElement = GetFirstElement().GetElement(_revitRepository.DocInfos);
+            if(firstElement is not null) {
+                SetElementParams(FirstElementParams, firstElement, paramNames);
+            }
+            var secondElement = GetSecondElement().GetElement(_revitRepository.DocInfos);
+            if(secondElement is not null) {
+                SetElementParams(SecondElementParams, secondElement, paramNames);
+            }
+        }
+
+        private void SetElementParams(IDictionary<string, object> elementParams, Element element, string[] paramNames) {
+            elementParams.Clear();
+            for(int i = 0; i < paramNames.Length; i++) {
+                elementParams.Add($"{ElementParamFieldName}{i}", element.GetParamValueAsString(paramNames[i]));
+            }
         }
     }
 }

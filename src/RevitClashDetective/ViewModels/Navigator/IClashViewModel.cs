@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Dynamic;
 
 using Autodesk.Revit.DB;
 
@@ -61,6 +62,18 @@ internal interface IClashViewModel : INotifyPropertyChanged {
     double SecondElementVolume { get; }
 
     /// <summary>
+    /// Значения дополнительных параметров первого элемента коллизии.
+    /// Названия генерируемых свойств должны быть в формате Field0, Field1 и так далее.
+    /// </summary>
+    ExpandoObject FirstElementParams { get; }
+
+    /// <summary>
+    /// Значения дополнительных параметров второго элемента коллизии.
+    /// Названия генерируемых свойств должны быть в формате Field0, Field1 и так далее.
+    /// </summary>
+    ExpandoObject SecondElementParams { get; }
+
+    /// <summary>
     /// Первый элемент, участвующий в коллизии
     /// </summary>
     /// <exception cref="System.NotSupportedException">Исключение, если первого элемента нет</exception>
@@ -77,4 +90,11 @@ internal interface IClashViewModel : INotifyPropertyChanged {
     /// </summary>
     /// <returns></returns>
     ICollection<ElementModel> GetElements();
+
+    /// <summary>
+    /// Назначает значения дополнительных параметров <see cref="FirstElementParams"/> и <see cref="SecondElementParams"/>.
+    /// Названия генерируемых свойств в объектах должны быть в формате Field0, Field1 и так далее.
+    /// </summary>
+    /// <param name="paramNames">Названия параметров</param>
+    void SetElementParams(string[] paramNames);
 }

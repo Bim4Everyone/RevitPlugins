@@ -209,6 +209,22 @@
                         </DataTemplate>
                     </dxg:GridColumn.CellTemplate>
                 </dxg:GridColumn>
+
+                <dxg:GridColumn Style="{StaticResource ReadOnlyColumn}"
+                                Header="Файл 1"
+                                FieldName="FirstDocumentName" />
+                <dxg:GridColumn Style="{StaticResource ReadOnlyColumn}"
+                                Header="Уровень 1"
+                                FieldName="FirstLevel" />
+                <dxg:GridColumn Style="{StaticResource ReadOnlyColumn}"
+                                Header="Категория 1"
+                                FieldName="FirstCategory" />
+                <dxg:GridColumn Style="{StaticResource ReadOnlyColumn}"
+                                Header="Семейство 1"
+                                FieldName="FirstFamilyName" />
+                <dxg:GridColumn Style="{StaticResource ReadOnlyColumn}"
+                                Header="Тип 1"
+                                FieldName="FirstTypeName" />
                 <dxg:GridColumn ReadOnly="True"
                                 MinWidth="30"
                                 AllowResizing="True"
@@ -221,33 +237,31 @@
                                            Margin="4 0 0 0"
                                            TextTrimming="CharacterEllipsis"
                                            Text="{Binding Row.FirstId}" />
-                                <dx:SimpleButton
-                                    Width="Auto"
-                                    MinWidth="20"
-                                    HorizontalAlignment="Right"
-                                    Focusable="False"
-                                    Glyph="{dx:DXImage 'Images/RichEdit/Select_16x16.png'}"
-                                    Command="{Binding ElementName=_dg, Path=DataContext.SelectedReport.PickFirstElementsCommand}" />
-
+                                <dx:SimpleButton Width="Auto"
+                                                 MinWidth="20"
+                                                 HorizontalAlignment="Right"
+                                                 Focusable="False"
+                                                 Glyph="{dx:DXImage 'Images/RichEdit/Select_16x16.png'}"
+                                                 Command="{Binding ElementName=_dg, Path=DataContext.SelectedReport.PickFirstElementsCommand}" />
                             </DockPanel>
                         </DataTemplate>
                     </dxg:GridColumn.CellTemplate>
                 </dxg:GridColumn>
                 <dxg:GridColumn Style="{StaticResource ReadOnlyColumn}"
-                                Header="Уровень 1"
-                                FieldName="FirstLevel" />
+                                Header="Файл 2"
+                                FieldName="SecondDocumentName" />
                 <dxg:GridColumn Style="{StaticResource ReadOnlyColumn}"
-                                Header="Категория 1"
-                                FieldName="FirstCategory" />
+                                Header="Уровень 2"
+                                FieldName="SecondLevel" />
                 <dxg:GridColumn Style="{StaticResource ReadOnlyColumn}"
-                                Header="Имя типа 1"
-                                FieldName="FirstTypeName" />
+                                Header="Категория 2"
+                                FieldName="SecondCategory" />
                 <dxg:GridColumn Style="{StaticResource ReadOnlyColumn}"
-                                Header="Имя семейства 1"
-                                FieldName="FirstFamilyName" />
+                                Header="Семейство 2"
+                                FieldName="SecondFamilyName" />
                 <dxg:GridColumn Style="{StaticResource ReadOnlyColumn}"
-                                Header="Имя файла 1"
-                                FieldName="FirstDocumentName" />
+                                Header="Тип 2"
+                                FieldName="SecondTypeName" />
                 <dxg:GridColumn ReadOnly="True"
                                 MinWidth="30"
                                 AllowResizing="True"
@@ -261,33 +275,16 @@
                                            Margin="4 0 0 0"
                                            TextTrimming="CharacterEllipsis"
                                            Text="{Binding Row.SecondId}" />
-                                <dx:SimpleButton
-                                    Width="Auto"
-                                    MinWidth="20"
-                                    HorizontalAlignment="Right"
-                                    Focusable="False"
-                                    Glyph="{dx:DXImage 'Images/RichEdit/Select_16x16.png'}"
-                                    Command="{Binding ElementName=_dg, Path=DataContext.SelectedReport.PickSecondElementsCommand}" />
-
+                                <dx:SimpleButton Width="Auto"
+                                                 MinWidth="20"
+                                                 HorizontalAlignment="Right"
+                                                 Focusable="False"
+                                                 Glyph="{dx:DXImage 'Images/RichEdit/Select_16x16.png'}"
+                                                 Command="{Binding ElementName=_dg, Path=DataContext.SelectedReport.PickSecondElementsCommand}" />
                             </DockPanel>
                         </DataTemplate>
                     </dxg:GridColumn.CellTemplate>
                 </dxg:GridColumn>
-                <dxg:GridColumn Style="{StaticResource ReadOnlyColumn}"
-                                Header="Уровень 2"
-                                FieldName="SecondLevel" />
-                <dxg:GridColumn Style="{StaticResource ReadOnlyColumn}"
-                                Header="Категория 2"
-                                FieldName="SecondCategory" />
-                <dxg:GridColumn Style="{StaticResource ReadOnlyColumn}"
-                                Header="Имя типа 2"
-                                FieldName="SecondTypeName" />
-                <dxg:GridColumn Style="{StaticResource ReadOnlyColumn}"
-                                Header="Имя семейства 2"
-                                FieldName="SecondFamilyName" />
-                <dxg:GridColumn Style="{StaticResource ReadOnlyColumn}"
-                                Header="Имя файла 2"
-                                FieldName="SecondDocumentName" />
                 <dxg:GridColumn Style="{StaticResource ReadOnlyColumn}"
                                 Header="% пересечения 1"
                                 FieldName="FirstElementIntersectionPercentage">

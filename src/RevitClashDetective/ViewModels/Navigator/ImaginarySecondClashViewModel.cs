@@ -1,11 +1,14 @@
 using System;
 using System.Collections.Generic;
+using System.Dynamic;
 
 using Autodesk.Revit.DB;
 
 using dosymep.WPF.ViewModels;
 
+using RevitClashDetective.Models;
 using RevitClashDetective.Models.Clashes;
+using RevitClashDetective.Models.Extensions;
 
 namespace RevitClashDetective.ViewModels.Navigator;
 
@@ -14,9 +17,11 @@ namespace RevitClashDetective.ViewModels.Navigator;
 /// </summary>
 internal class ImaginarySecondClashViewModel
     : BaseViewModel, IClashViewModel, IEquatable<ImaginarySecondClashViewModel> {
+    private readonly RevitRepository _revitRepository;
     private readonly ElementViewModel _secondElement;
 
-    public ImaginarySecondClashViewModel(ElementViewModel secondElement) {
+    public ImaginarySecondClashViewModel(RevitRepository revitRepository, ElementViewModel secondElement) {
+        _revitRepository = revitRepository ?? throw new ArgumentNullException(nameof(revitRepository));
         _secondElement = secondElement ?? throw new ArgumentNullException(nameof(secondElement));
         SecondElementVolume = secondElement.ElementVolume;
 
@@ -26,6 +31,8 @@ internal class ImaginarySecondClashViewModel
         SecondFamilyName = _secondElement.Element.FamilyName;
         SecondDocumentName = _secondElement.Element.DocumentName;
         SecondLevel = _secondElement.Element.Level;
+        FirstElementParams = new ExpandoObject();
+        SecondElementParams = new ExpandoObject();
     }
 
 
@@ -40,6 +47,10 @@ internal class ImaginarySecondClashViewModel
     public string FirstFamilyName => string.Empty;
 
     public string FirstDocumentName => string.Empty;
+
+    public ExpandoObject FirstElementParams { get; }
+
+    public ExpandoObject SecondElementParams { get; }
 
     public string FirstLevel => string.Empty;
 
@@ -93,5 +104,19 @@ internal class ImaginarySecondClashViewModel
 
     public override int GetHashCode() {
         return -701136702 + EqualityComparer<ElementViewModel>.Default.GetHashCode(_secondElement);
+    }
+
+    public void SetElementParams(string[] paramNames) {
+        ((IDictionary<string, object>) FirstElementParams).Clear();
+        var secondElementParams = (IDictionary<string, object>) SecondElementParams;
+        secondElementParams.Clear();
+
+        var secondElement = GetSecondElement().GetElement(_revitRepository.DocInfos);
+        if(secondElement is not null) {
+            for(int i = 0; i < paramNames.Length; i++) {
+                secondElementParams.Add($"{ClashViewModel.ElementParamFieldName}{i}",
+                    secondElement.GetParamValueAsString(paramNames[i]));
+            }
+        }
     }
 }
