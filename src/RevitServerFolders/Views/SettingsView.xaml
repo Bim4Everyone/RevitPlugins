@@ -1,0 +1,202 @@
+﻿<core:WpfUIPlatformUserControl
+    x:Class="RevitServerFolders.Views.SettingsView"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:local="clr-namespace:RevitServerFolders.Views"
+    mc:Ignorable="d"
+    xmlns:vms="clr-namespace:RevitServerFolders.ViewModels"
+    xmlns:core="clr-namespace:dosymep.WpfUI.Core"
+    xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
+    xmlns:me="clr-namespace:dosymep.WpfCore.MarkupExtensions;assembly=dosymep.WpfCore"
+    xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
+    xmlns:wpfbehaviors="clr-namespace:dosymep.WpfCore.Behaviors;assembly=dosymep.WpfCore"
+    xmlns:converters="clr-namespace:dosymep.WpfCore.Converters;assembly=dosymep.WpfCore"
+    xmlns:dosymepConverters="clr-namespace:dosymep.WPF.Converters"
+    xmlns:pluginConverters="clr-namespace:RevitServerFolders.Converters"
+    xmlns:pluginBehaviors="clr-namespace:RevitServerFolders.Behaviors"
+    d:DesignHeight="450"
+    d:DesignWidth="800"
+    d:DataContext="{d:DesignInstance vms:ExportSettingsViewModel, IsDesignTimeCreatable=False}">
+    <core:WpfUIPlatformUserControl.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary
+                    Source="../Resources/CustomStyles.xaml" />
+            </ResourceDictionary.MergedDictionaries>
+
+            <ui:SymbolRegular
+                x:Key="DocumentIcon">Document20</ui:SymbolRegular>
+            <ui:SymbolRegular
+                x:Key="FolderIcon">Folder20</ui:SymbolRegular>
+            <ui:SymbolRegular
+                x:Key="BuildingIcon">Building20</ui:SymbolRegular>
+
+            <dosymepConverters:InverseBooleanConverter
+                x:Key="InverseBooleanConverter" />
+            <converters:BoolToVisibilityConverter
+                x:Key="BooleanToVisibilityConverter" />
+            <pluginConverters:MiddleEllipsisConverter
+                x:Key="MiddleEllipsisConverter" />
+            <pluginConverters:CellImageConverter
+                x:Key="CellImageConverter"
+                Empty="{StaticResource DocumentIcon}"
+                Model="{StaticResource BuildingIcon}"
+                Folder="{StaticResource FolderIcon}" />
+
+            <ui:TextBlock
+                x:Key="NameHeader"
+                Text="{me:LocalizationSource MainWindow.NameHeader}" />
+            <ui:TextBlock
+                x:Key="FullNameHeader"
+                Text="{me:LocalizationSource MainWindow.FullNameHeader}" />
+            <ui:TextBlock
+                x:Key="TargetsHeader"
+                Text="{me:LocalizationSource MainWindow.TargetsHeader}" />
+
+            <Style
+                x:Key="CustomDataGridTextDisabledStyle"
+                TargetType="TextBlock"
+                BasedOn="{StaticResource DefaultDataGridTextElementStyle}">
+                <Style.Triggers>
+                    <DataTrigger
+                        Value="True"
+                        Binding="{Binding Path=SkipObject}">
+                        <Setter
+                            Property="Foreground"
+                            Value="{DynamicResource TextFillColorDisabledBrush}" />
+                    </DataTrigger>
+                </Style.Triggers>
+            </Style>
+        </ResourceDictionary>
+    </core:WpfUIPlatformUserControl.Resources>
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition
+                Height="Auto" />
+            <RowDefinition
+                Height="*" />
+        </Grid.RowDefinitions>
+        <Border
+            Margin="0 0 10 5"
+            Grid.Row="0"
+            Style="{StaticResource CustomBorder}">
+            <StackPanel>
+                <DockPanel>
+                    <ui:TextBlock
+                        Width="130"
+                        Text="{me:LocalizationSource MainWindow.LabelTarget}" />
+                    <ui:ToggleSwitch
+                        Margin="5 0"
+                        IsChecked="{Binding ClearTargetFolder}"
+                        Content="{me:LocalizationSource MainWindow.ClearTarget}" />
+                    <ui:ToggleSwitch
+                        IsChecked="{Binding OpenTargetWhenFinish}"
+                        Content="{me:LocalizationSource MainWindow.OpenTargetWhenFinish}" />
+                </DockPanel>
+                <DockPanel
+                    Margin="0 5"
+                    LastChildFill="True">
+                    <ui:Button
+                        DockPanel.Dock="Right"
+                        Height="36"
+                        Margin="5 0 0 0"
+                        Content="{ui:SymbolIcon Symbol=Folder20}"
+                        Command="{Binding OpenFolderDialogCommand}" />
+                    <ui:TextBox
+                        Text="{Binding TargetFolder, UpdateSourceTrigger=PropertyChanged}" />
+                </DockPanel>
+                <DockPanel
+                    Margin="0 5 0 0">
+                    <ui:TextBlock
+                        Width="130"
+                        Text="{me:LocalizationSource MainWindow.LabelSource}" />
+                    <ui:ToggleSwitch
+                        Margin="5 0"
+                        Content="{me:LocalizationSource MainWindow.ExportRooms}"
+                        IsChecked="{Binding IsExportRooms}"
+                        Visibility="{Binding IsExportRoomsVisible, 
+            Converter={StaticResource BooleanToVisibilityConverter}}" />
+                </DockPanel>
+                <DockPanel
+                    Margin="0 5 0 0"
+                    LastChildFill="True">
+                    <ui:Button
+                        DockPanel.Dock="Right"
+                        Height="36"
+                        Margin="5 0 0 0"
+                        Content="{ui:SymbolIcon Symbol=Folder20}"
+                        IsEnabled="{Binding SourceFolderChangedCommand.IsExecuting,
+                Converter={StaticResource InverseBooleanConverter}}"
+                        Command="{Binding OpenFromFoldersCommand}" />
+                    <ui:TextBox
+                        Text="{Binding SourceFolder, UpdateSourceTrigger=PropertyChanged}">
+                        <i:Interaction.Triggers>
+                            <i:EventTrigger
+                                EventName="TextChanged">
+                                <i:InvokeCommandAction
+                                    Command="{Binding SourceFolderChangedCommand}" />
+                            </i:EventTrigger>
+                        </i:Interaction.Triggers>
+                    </ui:TextBox>
+                </DockPanel>
+            </StackPanel>
+        </Border>
+
+        <Border
+            Margin="0 5 10 0"
+            Grid.Row="1"
+            Style="{StaticResource CustomBorder}">
+
+            <ui:DataGrid
+                Grid.Row="5"
+                Margin="5"
+                RowHeight="33"
+                Style="{StaticResource CustomResizableDataGridStyle}"
+                CellStyle="{StaticResource CustomDataGridCell}"
+                ItemsSource="{Binding ModelObjects}"
+                SelectedItem="{Binding SelectedObject}">
+
+                <ui:DataGrid.Columns>
+                    <DataGridCheckBoxColumn
+                        CanUserReorder="False"
+                        CanUserResize="False"
+                        CanUserSort="False"
+                        Width="Auto"
+                        Binding="{Binding SkipObject, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource InverseBooleanConverter}}">
+                        <DataGridCheckBoxColumn.Header>
+                            <CheckBox
+                                IsChecked="{Binding DataContext.SkipAll, RelativeSource={RelativeSource AncestorType=ui:DataGrid}, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource InverseBooleanConverter}}" />
+                        </DataGridCheckBoxColumn.Header>
+                    </DataGridCheckBoxColumn>
+                    <DataGridTemplateColumn
+                        CanUserReorder="False"
+                        CanUserResize="False"
+                        CanUserSort="False"
+                        Width="Auto">
+                        <DataGridTemplateColumn.CellTemplate>
+                            <DataTemplate>
+                                <ui:SymbolIcon
+                                    Symbol="{Binding ., Converter={StaticResource CellImageConverter}}" />
+                            </DataTemplate>
+                        </DataGridTemplateColumn.CellTemplate>
+                    </DataGridTemplateColumn>
+                    <DataGridTextColumn
+                        Width="250"
+                        IsReadOnly="True"
+                        MinWidth="100"
+                        ElementStyle="{StaticResource CustomDataGridTextDisabledStyle}"
+                        Binding="{Binding Name}"
+                        Header="{StaticResource NameHeader}" />
+                    <DataGridTextColumn
+                        IsReadOnly="True"
+                        MinWidth="100"
+                        ElementStyle="{StaticResource CustomDataGridTextDisabledStyle}"
+                        Binding="{Binding FullName}"
+                        Header="{StaticResource FullNameHeader}" />
+                </ui:DataGrid.Columns>
+            </ui:DataGrid>
+        </Border>
+    </Grid>
+</core:WpfUIPlatformUserControl>
