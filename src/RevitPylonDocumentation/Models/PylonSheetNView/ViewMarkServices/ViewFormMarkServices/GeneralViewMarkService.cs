@@ -147,8 +147,11 @@ internal class GeneralViewMarkService {
 
     internal void TryCreateAdditionalMark(bool isForPerpView) {
         try {
+            // Если в пилоне есть семейство при помощи которого армируются пилоны паркинга, то выпусков снизу не будет
+            // А это значит, что и данная марка не нужна
+            if(SheetInfo.RebarInfo.SkeletonParentRebarForParking) { return; }
+            
             var view = ViewOfPylon.ViewElement;
-
             // Определяем отступ от пилона по горизонтали
             double horizOriginOffset = isForPerpView 
                                             ? SheetInfo.ElemsInfo.HostWidth * 0.5

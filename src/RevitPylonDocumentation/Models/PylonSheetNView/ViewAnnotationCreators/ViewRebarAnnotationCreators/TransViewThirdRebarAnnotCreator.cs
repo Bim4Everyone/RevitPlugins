@@ -15,7 +15,8 @@ internal class TransViewThirdRebarAnnotCreator : ViewAnnotationCreator {
         // Пытаемся создать размеры на виде
         try {
             var dimensionService = new TransViewRebarDimensionService(ViewModel, Repository, SheetInfo);
-            dimensionService.TryCreateTransViewRebarDimensions(ViewOfPylon.ViewElement, true);
+            bool refsForTop = SheetInfo.RebarInfo.SkeletonParentRebarForParking ? false : true;
+            dimensionService.TryCreateTransViewRebarDimensions(ViewOfPylon.ViewElement, refsForTop);
         } catch(Exception) { }
 
         // Пытаемся создать марки на виде

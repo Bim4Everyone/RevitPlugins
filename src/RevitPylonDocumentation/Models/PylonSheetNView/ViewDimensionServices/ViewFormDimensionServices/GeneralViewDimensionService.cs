@@ -247,6 +247,7 @@ internal class GeneralViewDimensionService {
                                                                           dimensionLineDirection, 1.1);
             // #1_горизонт_выпуск
             var refArray = dimensionBaseService.GetDimensionRefs(rebar, '#', '/', ["горизонт", "выпуск"]);
+            if(refArray.Size == 0) { return; }
             refArray.Append(lastFloorTopFace.Reference);
             refArray.Append(lastFloorBottomFace.Reference);
             Repository.Document.Create.NewDimension(ViewOfPylon.ViewElement, dimensionLineLeft, refArray,
