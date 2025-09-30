@@ -51,6 +51,8 @@ internal class PylonRebarInfo {
     internal bool DifferentRebarParamValue { get; set; } = false;
     internal bool AllRebarAreL { get; set; } = false;
     internal bool HasLRebar { get; set; } = false;
+    internal bool SkeletonParentRebarForParking { get; set; }
+
 
 
     private void GetInfo() {
@@ -66,6 +68,8 @@ internal class PylonRebarInfo {
 
         AllRebarAreL = FirstLRebarParamValue && SecondLRebarParamValue;
         HasLRebar = FirstLRebarParamValue || SecondLRebarParamValue;
+
+        SkeletonParentRebarForParking = SkeletonParentRebar.Symbol.FamilyName.Contains("Паркинг");
     }
 
     /// <summary>

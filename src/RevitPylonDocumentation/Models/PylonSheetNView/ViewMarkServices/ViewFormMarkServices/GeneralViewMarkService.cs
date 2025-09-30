@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Windows.Controls;
 
 using Autodesk.Revit.DB;
 
@@ -176,36 +177,62 @@ internal class GeneralViewMarkService {
         if(_breakLineSymbol is null) { return; }
         var view = ViewOfPylon.ViewElement;
         try {
-            // Определяем отступ от пилона по горизонтали
-            double horizOriginOffset = isForPerpView
-                ? SheetInfo.ElemsInfo.HostWidth * 0.5 + _breakLinesOffsetY
-                : SheetInfo.ElemsInfo.HostLength * 0.5 + _breakLinesOffsetY;
             var origin = SheetInfo.ElemsInfo.HostOrigin;
-            // Получаем спроецированную на плоскость вида левую граничную точку пилона
-            var pylonLeftMinPoint = _viewPointsAnalyzer.GetPointByDirection(origin, DirectionType.Left, 
-                                                                            horizOriginOffset, 0);
-            pylonLeftMinPoint = _viewPointsAnalyzer.ProjectPointToViewFront(pylonLeftMinPoint);
-            // Получаем спроецированную на плоскость вида правую граничную точку пилона
-            var pylonRightMinPoint = _viewPointsAnalyzer.GetPointByDirection(origin, DirectionType.Right, 
-                                                                            horizOriginOffset, 0);
-            pylonRightMinPoint = _viewPointsAnalyzer.ProjectPointToViewFront(pylonRightMinPoint);
 
-            // Получаем координаты точки min рамки подрезки вида в координатах проекта
+            // Получаем координаты точек max и min рамки подрезки вида в координатах проекта
+            // Проецируем их на плоскость вида, чтобы корректно размещать аннотации
+            var viewMax = _viewPointsAnalyzer.ProjectPointToViewFront(
+                view.CropBox.Transform.OfPoint(view.CropBox.Max));
             var viewMin = _viewPointsAnalyzer.ProjectPointToViewFront(
                 view.CropBox.Transform.OfPoint(view.CropBox.Min));
 
+            XYZ leftPoint;
+            XYZ rightPoint;
+            if(isForPerpView && SheetInfo.RebarInfo.SkeletonParentRebarForParking) {
+                // Если условие выполняется, то нужно боковые точки брать не относительно габарита пилона
+                // а от рамки подрезки вида, т.к. она учитывает выпуски вертикального армирования в плиту
+                // Т.к. точки CropBox, уже спроецированы на плоскость вида, то задаем отступ
+                rightPoint = _viewPointsAnalyzer.GetPointByDirection(viewMax, DirectionType.Left, 
+                                                                     _breakLinesOffsetX, 0);
+                leftPoint = _viewPointsAnalyzer.GetPointByDirection(viewMin, DirectionType.Right, 
+                                                                    _breakLinesOffsetX, 0);
+                // Проецируем на плоскость низа пилона (по Origin)
+                rightPoint = _viewPointsAnalyzer.ProjectPointToHorizontalPlane(origin, rightPoint);
+                leftPoint = _viewPointsAnalyzer.ProjectPointToHorizontalPlane(origin, leftPoint);
+            } else {
+                // В этом случае боковые точки будут получены относительно габаритов пилона
+                // Определяем отступ от пилона по горизонтали в зависимости от типа вида
+                double horizOriginOffset = isForPerpView
+                    ? SheetInfo.ElemsInfo.HostWidth * 0.5 + _breakLinesOffsetY
+                    : SheetInfo.ElemsInfo.HostLength * 0.5 + _breakLinesOffsetY;
+
+                // Получаем спроецированную на плоскость вида правую граничную точку пилона с учетом отступа
+                var pylonRightMinPoint = _viewPointsAnalyzer.GetPointByDirection(origin, DirectionType.Right,
+                                                                                 horizOriginOffset, 0);
+                rightPoint = _viewPointsAnalyzer.ProjectPointToViewFront(pylonRightMinPoint);
+                // Получаем спроецированную на плоскость вида левую граничную точку пилона с учетом отступа
+                var pylonLeftMinPoint = _viewPointsAnalyzer.GetPointByDirection(origin, DirectionType.Left,
+                                                                                horizOriginOffset, 0);
+                leftPoint = _viewPointsAnalyzer.ProjectPointToViewFront(pylonLeftMinPoint);
+            }
+
             // Получаем точки со смещением относительно граничных точек опалубки для размещения аннотаций
             // Чтобы их не срезало рамкой подрезки
-            var point1 = pylonLeftMinPoint;
-            var point2 = _viewPointsAnalyzer.GetPointByDirection(new XYZ(pylonLeftMinPoint.X, 
-                                                                         pylonLeftMinPoint.Y, 
+            // Левая верхняя точка
+            var point1 = leftPoint;
+            // Левая нижняя точка
+            var point2 = _viewPointsAnalyzer.GetPointByDirection(new XYZ(leftPoint.X,
+                                                                         leftPoint.Y, 
                                                                          viewMin.Z),
                                                                  DirectionType.Top, 0, _breakLinesOffsetYBottom);
-            var point3 = _viewPointsAnalyzer.GetPointByDirection(new XYZ(pylonRightMinPoint.X, 
-                                                                         pylonRightMinPoint.Y, 
+            // Правая нижняя точка
+            var point3 = _viewPointsAnalyzer.GetPointByDirection(new XYZ(rightPoint.X,
+                                                                         rightPoint.Y, 
                                                                          viewMin.Z),
                                                                  DirectionType.Top, 0, _breakLinesOffsetYBottom);
-            var point4 = pylonRightMinPoint;
+            // Правая верхняя точка
+            var point4 = rightPoint;
+            
             // Линии обрыва - это 2D-аннотационные семейства на основе линии
             var line1 = Line.CreateBound(point1, point2);
             var line2 = Line.CreateBound(point2, point3);
