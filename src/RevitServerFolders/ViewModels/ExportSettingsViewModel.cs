@@ -50,7 +50,7 @@ internal class ExportSettingsViewModel<T> : BaseViewModel where T : ExportSettin
         SourceFolder = _settings.SourceFolder;
         ClearTargetFolder = _settings.ClearTargetFolder;
         OpenTargetWhenFinish = _settings.OpenTargetWhenFinish;
-        IsSelected = true;
+        IsSelected = _settings.IsSelected;
         TargetFromLabel = _localization.GetLocalizedString("MainWindow.TargetsFrom");
         TargetToLabel = _localization.GetLocalizedString("MainWindow.TargetsTo");
 
@@ -139,6 +139,7 @@ internal class ExportSettingsViewModel<T> : BaseViewModel where T : ExportSettin
         _settings.SourceFolder = SourceFolder;
         _settings.ClearTargetFolder = ClearTargetFolder;
         _settings.OpenTargetWhenFinish = OpenTargetWhenFinish;
+        _settings.IsSelected = IsSelected;
         _settings.SkippedObjects = ModelObjects
             .Where(item => item.SkipObject)
             .Select(item => item.FullName)
