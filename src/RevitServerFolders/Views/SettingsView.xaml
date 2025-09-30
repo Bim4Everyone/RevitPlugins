@@ -131,15 +131,8 @@
                 Converter={StaticResource InverseBooleanConverter}}"
                         Command="{Binding OpenFromFoldersCommand}" />
                     <ui:TextBox
-                        Text="{Binding SourceFolder, UpdateSourceTrigger=PropertyChanged}">
-                        <i:Interaction.Triggers>
-                            <i:EventTrigger
-                                EventName="TextChanged">
-                                <i:InvokeCommandAction
-                                    Command="{Binding SourceFolderChangedCommand}" />
-                            </i:EventTrigger>
-                        </i:Interaction.Triggers>
-                    </ui:TextBox>
+                        Text="{Binding SourceFolder, UpdateSourceTrigger=PropertyChanged}" />
+
                 </DockPanel>
             </StackPanel>
         </Border>

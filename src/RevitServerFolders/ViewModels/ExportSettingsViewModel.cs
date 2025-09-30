@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.ComponentModel;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
@@ -56,6 +57,8 @@ internal class ExportSettingsViewModel<T> : BaseViewModel where T : ExportSettin
         OpenFromFoldersCommand = RelayCommand.CreateAsync(OpenFromFolder);
         OpenFolderDialogCommand = RelayCommand.Create(OpenFolderDialog);
         SourceFolderChangedCommand = RelayCommand.CreateAsync(SourceFolderChanged);
+
+        PropertyChanged += OnSourceFolderChanged;
     }
 
 
@@ -208,6 +211,13 @@ internal class ExportSettingsViewModel<T> : BaseViewModel where T : ExportSettin
             // pass
         }
         CommandManager.InvalidateRequerySuggested();
+    }
+
+    private async void OnSourceFolderChanged(object sender, PropertyChangedEventArgs e) {
+        if(e.PropertyName == nameof(SourceFolder)) {
+            await Task.Delay(250);
+            await SourceFolderChanged();
+        }
     }
 
     private async Task AddModelObjects(ModelObject modelObject) {
