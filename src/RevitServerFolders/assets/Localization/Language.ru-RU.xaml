@@ -18,7 +18,7 @@
     <system:String
         x:Key="Exceptions.FolderNotFound">Не была найдена папка "{0}".</system:String>
     <system:String
-        x:Key="Exceptions.ViewWithoutElements">Вид "{0}" не содержит элементы.</system:String>
+        x:Key="Exceptions.ViewWithoutElements">Вид "{0}" не содержит элементы. Возможно в документе выгружены все связи и на этом виде нет элементов из этого документа.</system:String>
     <system:String
         x:Key="Exceptions.ViewNotFound">Не найден вид "{0}".</system:String>
     <system:String

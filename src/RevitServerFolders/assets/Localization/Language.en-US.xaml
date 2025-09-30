@@ -18,7 +18,7 @@
     <system:String
         x:Key="Exceptions.FolderNotFound">Folder "{0}" was not found.</system:String>
     <system:String
-        x:Key="Exceptions.ViewWithoutElements">View "{0}" without elements.</system:String>
+        x:Key="Exceptions.ViewWithoutElements">View "{0}" without elements. It's possible that all links are unloaded and there are no elements from this document in this view.</system:String>
     <system:String
         x:Key="Exceptions.ViewNotFound">View not found "{0}".</system:String>
     <system:String
