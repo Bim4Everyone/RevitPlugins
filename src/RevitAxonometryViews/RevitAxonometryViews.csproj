@@ -1,6 +1,14 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
     <PropertyGroup>
-        <UseDevExpress>false</UseDevExpress>
+		<UseWpfUI>true</UseWpfUI>
 		<LangVersion>12</LangVersion>
     </PropertyGroup>
+    <ItemGroup>
+      <Page Remove="Views\CustomStyles.xaml" />
+    </ItemGroup>
+    <ItemGroup>
+      <Resource Include="Views\CustomStyles.xaml">
+        <Generator>MSBuild:Compile</Generator>
+      </Resource>
+    </ItemGroup>
 </Project>

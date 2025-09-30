@@ -1,0 +1,15 @@
+<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:system="clr-namespace:System;assembly=mscorlib">
+
+    <system:String x:Key="MainWindow.Title">Create 3D-Views</system:String>
+    <system:String x:Key="MainWindow.CombineViewsCheckBox">All selected in one view</system:String>
+    <system:String x:Key="MainWindow.ButtonOk">Ok</system:String>
+    <system:String x:Key="MainWindow.ButtonCancel">Cancel</system:String>
+    <system:String x:Key="MainWindow.ErrorText">Systems are not selected</system:String>
+    <system:String x:Key="MainWindow.SearchHint">Type system name...</system:String>
+    <system:String x:Key="MainWindow.FilterParameterTooltip">The name of the parameter by which filtering will be performed</system:String>
+    <system:String x:Key="MainWindow.VariantsString">&lt;Variants&gt;</system:String>
+    <system:String x:Key="MainWindow.EmptyName">System name empty</system:String>
+   
+</ResourceDictionary>
