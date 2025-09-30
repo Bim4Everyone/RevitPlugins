@@ -4,9 +4,9 @@
     xmlns:system="clr-namespace:System;assembly=mscorlib">
 
     <system:String
-        x:Key="Ok">OK</system:String>
+        x:Key="Ok">ОК</system:String>
     <system:String
-        x:Key="Cancel">Cancel</system:String>
+        x:Key="Cancel">Отмена</system:String>
 
     <system:String
         x:Key="SettingsWindow.Title">Настройки</system:String>
