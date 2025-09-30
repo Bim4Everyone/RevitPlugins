@@ -172,10 +172,7 @@ internal class MainViewModel<T> : BaseViewModel where T : ExportSettings {
 
     private void LoadConfig() {
         LoadConfigImpl();
-        SelectedSettings = SettingsCollection.FirstOrDefault();
-        if(SelectedSettings is not null) {
-            SelectedSettings.IsSelected = true;
-        }
+        SelectedSettings = SettingsCollection.FirstOrDefault(s => s.IsSelected) ?? SettingsCollection.First();
         UpdateIndexes();
     }
 
