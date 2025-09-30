@@ -153,6 +153,7 @@ internal class MainViewModel<T> : BaseViewModel where T : ExportSettings {
 
     private bool CanAcceptView() {
         var errorSettings = SettingsCollection
+            .Where(s => s.IsSelected)
             .Select(s => new { Index = s.Index, Error = s.GetErrorText() })
             .FirstOrDefault(a => !string.IsNullOrWhiteSpace(a.Error));
         if(errorSettings is not null) {
