@@ -81,8 +81,7 @@ internal class GeneralViewMarkService {
                 // Собираем опорные плоскости по опалубке, например:
                 // #_1_горизонт_край_низ
                 // #_1_горизонт_край_верх
-                var refArraySide = _dimensionBaseService.GetDimensionRefs(hostElem, '#', '/', 
-                                                                                    ["горизонт", "край"]);
+                var refArraySide = _dimensionBaseService.GetDimensionRefs(hostElem, ["горизонт", "край"]);
                 foreach(Reference reference in refArraySide) {
                     var spotElevation = Repository.Document.Create.NewSpotElevation(
                         ViewOfPylon.ViewElement,

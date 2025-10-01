@@ -57,7 +57,7 @@ internal class TransViewDimensionService {
             var dimensionLineHostRef = refsForTop ? skeletonParentRebar : pylon;
 
             var refArrayFormworkFront = _dimensionBaseService.GetDimensionRefs(pylon as FamilyInstance,
-                                                                              '#', '/', ["фронт", "край"]);
+                                                                               ["фронт", "край"]);
             //ВЕРТИКАЛЬНЫЕ РАЗМЕРЫ
             // Указывает нужно ли будет делать длинные оси снизу (сделано здесь, чтобы не выполнять запрос дважды)
             var vertDimensionsForEdit = new List<Dimension>();
@@ -67,7 +67,7 @@ internal class TransViewDimensionService {
                 if(_sheetInfo.RebarInfo.AllRebarAreL) {
                     vertDimensionsForEdit.Add(
                         CreateDimension(skeletonParentRebar, dimensionLineHostRef, DirectionType.Bottom, 0.5,
-                                        ["низ", "фронт", "край"], view, 
+                                        ["низ", "фронт", "край"], 
                                         refArrayFormworkFront, false));
                     longGridsWillBeNeeded = true;
                 } else if(_sheetInfo.RebarInfo.HasLRebar) {
@@ -75,20 +75,20 @@ internal class TransViewDimensionService {
                     if(rebarFinder.DirectionHasLRebar(view, _sheetInfo.ProjectSection, DirectionType.Top)) {
                         vertDimensionsForEdit.Add(
                             CreateDimension(skeletonParentRebar, dimensionLineHostRef, DirectionType.Top, 0.5,
-                                            ["низ", "фронт", "край"], view, 
+                                            ["низ", "фронт", "край"],
                                             refArrayFormworkFront, false));
                         vertDimensionsForEdit.Add(
                             CreateDimension(skeletonParentRebar, dimensionLineHostRef, DirectionType.Bottom, 0.5,
-                                            ["верх", "фронт", "край"], view, 
+                                            ["верх", "фронт", "край"],
                                             refArrayFormworkFront, false));
                     } else {
                         vertDimensionsForEdit.Add(
                             CreateDimension(skeletonParentRebar, dimensionLineHostRef, DirectionType.Top, 0.5,
-                                            ["верх", "фронт", "край"], view, 
+                                            ["верх", "фронт", "край"], 
                                             refArrayFormworkFront, false));
                         vertDimensionsForEdit.Add(
                             CreateDimension(skeletonParentRebar, dimensionLineHostRef, DirectionType.Bottom, 0.5,
-                                            ["низ", "фронт", "край"], view, 
+                                            ["низ", "фронт", "край"],
                                             refArrayFormworkFront, false));
                         longGridsWillBeNeeded = true;
                     }
@@ -97,13 +97,13 @@ internal class TransViewDimensionService {
                 if(!_sheetInfo.RebarInfo.HasLRebar) {
                     vertDimensionsForEdit.Add(
                         CreateDimension(skeletonParentRebar, dimensionLineHostRef, DirectionType.Bottom, 0.5,
-                                        ["верх", "фронт", "край"], view, 
+                                        ["верх", "фронт", "край"], 
                                         refArrayFormworkFront, false));
                 }
             } else {
                 vertDimensionsForEdit.Add(
                     CreateDimension(skeletonParentRebar, dimensionLineHostRef, DirectionType.Bottom, 0.5,
-                                    ["низ", "фронт", "край"], view, refArrayFormworkFront, false));
+                                    ["низ", "фронт", "край"], refArrayFormworkFront, false));
             }
 
             // Изменяем размер, передвигая текст у крайних сегментов для корректного отображения
@@ -118,10 +118,10 @@ internal class TransViewDimensionService {
             // Определим отступ для размерной линии общего размера по опалубке (если есть верт оси, то будет дальше)
             var formworkFrontDimensionLineOffset = 1.0;
             // Размеры по осям
-            if(grids.Count > 0 && _dimensionBaseService.GetDimensionRefs(grids, view, XYZ.BasisY).Size > 0) {
+            if(grids.Count > 0 && _dimensionBaseService.GetDimensionRefs(grids, XYZ.BasisY).Size > 0) {
                 // Размер по ФРОНТУ опалубка + оси (положение сверху 1)
                 CreateDimension(grids, dimensionLineHostRef, DirectionType.Bottom, 1, 
-                                XYZ.BasisY, view, refArrayFormworkFront);
+                                XYZ.BasisY, refArrayFormworkFront);
 
                 formworkFrontDimensionLineOffset = 1.5;
             }
@@ -133,28 +133,28 @@ internal class TransViewDimensionService {
             //ГОРИЗОНТАЛЬНЫЕ РАЗМЕРЫ
             // Получаем референсы для размеров по крайним плоскостям пилона
             var refArrayFormworkSide = _dimensionBaseService.GetDimensionRefs(pylon as FamilyInstance,
-                                                                             '#', '/', ["торец", "край"]);
+                                                                              ["торец", "край"]);
             // Размер по ТОРЦУ опалубка + армирование (положение справа ближнее)
             ReferenceArray refArraySide = default;
             // Если первый ряд - Гэшки, то берем по нижней плоскости
             if(_sheetInfo.RebarInfo.FirstLRebarParamValue) {
-                refArraySide = _dimensionBaseService.GetDimensionRefs(skeletonParentRebar, '#', '/',
-                                                                     ["низ", "торец", "_1_"], 
-                                                                     oldRefArray: refArrayFormworkSide);
+                refArraySide = _dimensionBaseService.GetDimensionRefs(skeletonParentRebar, 
+                                                                      ["низ", "торец", "_1_"], 
+                                                                      oldRefArray: refArrayFormworkSide);
             } else {
-                refArraySide = _dimensionBaseService.GetDimensionRefs(skeletonParentRebar, '#', '/',
-                                                                     [rebarPart, "торец", "_1_"],
-                                                                     oldRefArray: refArrayFormworkSide);
+                refArraySide = _dimensionBaseService.GetDimensionRefs(skeletonParentRebar, 
+                                                                      [rebarPart, "торец", "_1_"],
+                                                                      oldRefArray: refArrayFormworkSide);
             }
             // Если второй ряд - Гэшки, то берем по нижней плоскости
             if(_sheetInfo.RebarInfo.SecondLRebarParamValue) {
-                refArraySide = _dimensionBaseService.GetDimensionRefs(skeletonParentRebar, '#', '/',
-                                                                     ["низ", "торец", "_2_"],
-                                                                     oldRefArray: refArraySide);
+                refArraySide = _dimensionBaseService.GetDimensionRefs(skeletonParentRebar, 
+                                                                      ["низ", "торец", "_2_"],
+                                                                      oldRefArray: refArraySide);
             } else {
-                refArraySide = _dimensionBaseService.GetDimensionRefs(skeletonParentRebar, '#', '/',
-                                                                     [rebarPart, "торец", "_2_"],
-                                                                     oldRefArray: refArraySide);
+                refArraySide = _dimensionBaseService.GetDimensionRefs(skeletonParentRebar, 
+                                                                      [rebarPart, "торец", "_2_"],
+                                                                      oldRefArray: refArraySide);
             }
             var formworkRebarDimensionSide = CreateDimension(refArraySide, pylon, DirectionType.Right, 0.6, 
                                                              view, false);
@@ -169,7 +169,7 @@ internal class TransViewDimensionService {
             // Если на виде есть оси, то создаем размер
             if(grids.Count > 0) {
                 // Размер по ТОРЦУ опалубка + оси (положение слева дальнее)
-                CreateDimension(grids, pylon, DirectionType.Left, 1, XYZ.BasisX, view, refArrayFormworkSide);
+                CreateDimension(grids, pylon, DirectionType.Left, 1, XYZ.BasisX, refArrayFormworkSide);
             }
 
             if(grids.Count > 0) {
@@ -192,15 +192,16 @@ internal class TransViewDimensionService {
     }
 
     private Dimension CreateDimension(Element dimensioningElement, Element elemForOffset,
-                                 DirectionType directionType, double offsetCoefficient,
-                                 List<string> importantRefNameParts, View view, ReferenceArray oldRefArray = null, 
-                                 bool needEqualityFormula = true) {
+                                      DirectionType directionType, double offsetCoefficient,
+                                      List<string> importantRefNameParts, ReferenceArray oldRefArray = null, 
+                                      bool needEqualityFormula = true) {
 
         if(dimensioningElement is null || (importantRefNameParts?.Count ?? 0) == 0) { return null; }
         var dimensionLine = _dimensionBaseService.GetDimensionLine(elemForOffset, directionType, offsetCoefficient);
-        ReferenceArray refArray = _dimensionBaseService.GetDimensionRefs(dimensioningElement as FamilyInstance, '#', '/',
-                                                                        importantRefNameParts, oldRefArray: oldRefArray);
-        var dimension = _repository.Document.Create.NewDimension(view, dimensionLine, refArray, 
+        ReferenceArray refArray = _dimensionBaseService.GetDimensionRefs(dimensioningElement as FamilyInstance, 
+                                                                         importantRefNameParts, 
+                                                                         oldRefArray: oldRefArray);
+        var dimension = _repository.Document.Create.NewDimension(_viewOfPylon.ViewElement, dimensionLine, refArray, 
                                                                 _viewModel.SelectedDimensionType);
         if(needEqualityFormula) {
             dimension.SetParamValue(BuiltInParameter.DIM_DISPLAY_EQ, 2);
@@ -210,8 +211,8 @@ internal class TransViewDimensionService {
 
 
     private Dimension CreateDimension(ReferenceArray oldRefArray, Element elemForOffset,
-                                 DirectionType directionType, double offsetCoefficient, View view,
-                                 bool needEqualityFormula = true) {
+                                      DirectionType directionType, double offsetCoefficient, View view,
+                                      bool needEqualityFormula = true) {
         
         var dimensionLine = _dimensionBaseService.GetDimensionLine(elemForOffset, directionType, offsetCoefficient);
         var dimension = _repository.Document.Create.NewDimension(view, dimensionLine, oldRefArray,
@@ -224,13 +225,13 @@ internal class TransViewDimensionService {
 
 
     private void CreateDimension(List<Grid> grids, Element elemForOffset, DirectionType directionType, 
-                                 double offsetCoefficient, XYZ gridsDirection, View view,
+                                 double offsetCoefficient, XYZ gridsDirection,
                                  ReferenceArray oldRefArray = null) {
         if((grids?.Count ?? 0) == 0) { return; }
+        var view = _viewOfPylon.ViewElement;
         var dimensionLineLeft = _dimensionBaseService.GetDimensionLine(elemForOffset, directionType, 
                                                                       offsetCoefficient);
-        var refArrayFormworkGridSide = _dimensionBaseService.GetDimensionRefs(grids, view, gridsDirection,
-                                                                             oldRefArray);
+        var refArrayFormworkGridSide = _dimensionBaseService.GetDimensionRefs(grids, gridsDirection, oldRefArray);
         if(refArrayFormworkGridSide.Size != oldRefArray.Size) {
             _repository.Document.Create.NewDimension(view, dimensionLineLeft, refArrayFormworkGridSide,
                                                     _viewModel.SelectedDimensionType);

@@ -154,8 +154,22 @@ internal class DimensionBaseService {
     }
 
 
-    public ReferenceArray GetDimensionRefs(FamilyInstance elem, char keyRefNamePart, char refNameParamsSeparator,
-                                           List<string> importantRefNameParts, List<string> unimportantRefNameParts = null, 
+    /// <summary>
+    /// Возвращает массив опорных плоскостей, взятых с элемента и отфильтрованных по имени.
+    /// Имя опорной плоскости задается по маске: "ПарамФильтр1/ПарамФильтр2#_КлючСлово1_КлючСлово2",
+    /// где параметров фильтрации и ключевых слов может быть сколько угодно.
+    /// </summary>
+    /// <param name="elem">Элемент,у которого необходимо получить опорные плоскости</param>
+    /// <param name="keyRefNamePart">Символ-разделитель имени опорной плоскости между частью с информацией 
+    /// о фильтрующих параметрах и частью с ключевыми словами</param>
+    /// <param name="refNameParamsSeparator">Символ-разделитель имени опорной плоскости между фильтрующими параметрами</param>
+    /// <param name="importantRefNameParts">Список ключевых слов, которые должны быть в имени опорной плоскости</param>
+    /// <param name="unimportantRefNameParts">Список ключевых слов, которые НЕ должны быть в имени опорной плоскости</param>
+    /// <param name="oldRefArray">Предыдущий массив опорных плоскостей, в который можно дописать новые плоскости</param>
+    /// <returns></returns>
+    public ReferenceArray GetDimensionRefs(FamilyInstance elem, List<string> importantRefNameParts, 
+                                           List<string> unimportantRefNameParts = null,
+                                           char keyRefNamePart = '#', char refNameParamsSeparator = '/',
                                            ReferenceArray oldRefArray = null) {
         var references = new List<Reference>();
         foreach(FamilyInstanceReferenceType referenceType in Enum.GetValues(typeof(FamilyInstanceReferenceType))) {
@@ -206,7 +220,7 @@ internal class DimensionBaseService {
     }
 
 
-    public ReferenceArray GetDimensionRefs(List<Grid> grids, View view, XYZ direction, ReferenceArray oldRefArray = null) {
+    public ReferenceArray GetDimensionRefs(List<Grid> grids, XYZ direction, ReferenceArray oldRefArray = null) {
         // Создаем матрицу трансформации
         var transform = Transform.Identity;
         transform.Origin = _viewOrigin;
@@ -232,7 +246,7 @@ internal class DimensionBaseService {
                 // Оси могут быть проложены в двух направлениях
                 // В случае, если это вертикальный вид, то нужно привязываться к осям всегда
                 // В случае, если это горизонтальный вид, то нужно привязываться в зависимости от направления вида
-                if(view.UpDirection.IsAlmostEqualTo(XYZ.BasisZ)
+                if(_view.UpDirection.IsAlmostEqualTo(XYZ.BasisZ)
                     || lineDirectionByView.IsAlmostEqualTo(normalizedDirection, 0.01)
                     || lineDirectionByView.IsAlmostEqualTo(normalizedDirection.Negate(), 0.01)) {
                     var gridRef = new Reference(grid);
