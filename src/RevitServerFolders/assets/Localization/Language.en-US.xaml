@@ -42,7 +42,7 @@
     <system:String
         x:Key="MainWindow.Validation.SourceFolderEmpty">No models in the source folder.</system:String>
     <system:String
-        x:Key="MainWindow.Validation.AllModelsSkiped">All models are marked as skipped.</system:String>
+        x:Key="MainWindow.Validation.AllModelsSkipped">All models are marked as skipped.</system:String>
     <system:String
         x:Key="MainWindow.Validation.Wait">Wait for the loading to finish</system:String>
     <system:String

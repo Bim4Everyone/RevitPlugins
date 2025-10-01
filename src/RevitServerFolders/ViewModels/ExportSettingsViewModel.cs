@@ -165,7 +165,7 @@ internal class ExportSettingsViewModel<T> : BaseViewModel where T : ExportSettin
         }
 
         if(!ModelObjects.Any(item => !item.SkipObject)) {
-            return _localization.GetLocalizedString("MainWindow.Validation.AllModelsSkiped");
+            return _localization.GetLocalizedString("MainWindow.Validation.AllModelsSkipped");
         }
 
         if(OpenFromFoldersCommand.IsExecuting || SourceFolderChangedCommand.IsExecuting) {
