@@ -9,26 +9,30 @@
     xmlns:dxe="http://schemas.devexpress.com/winfx/2008/xaml/editors"
     xmlns:dxmvvm="http://schemas.devexpress.com/winfx/2008/xaml/mvvm"
     xmlns:dxg="http://schemas.devexpress.com/winfx/2008/xaml/grid"
-    
     mc:Ignorable="d"
     d:DataContext="{d:DesignInstance {x:Type vm:FilterViewModel}, IsDesignTimeCreatable=False}">
     <UserControl.Resources>
-        <s:Boolean x:Key="True">True</s:Boolean>
-        <s:Boolean x:Key="False">False</s:Boolean>
+        <s:Boolean
+            x:Key="True">True</s:Boolean>
+        <s:Boolean
+            x:Key="False">False</s:Boolean>
     </UserControl.Resources>
     <Grid>
         <Grid>
             <Grid.RowDefinitions>
-                <RowDefinition Height="Auto" />
-                <RowDefinition Height="Auto" />
+                <RowDefinition
+                    Height="Auto" />
+                <RowDefinition
+                    Height="Auto" />
                 <RowDefinition />
             </Grid.RowDefinitions>
 
-            <dxe:CheckEdit Name="_che"
-                           Grid.Row="1"
-                           Content="Скрыть неотмеченные категории"
-                           Checked="_che_Checked"
-                           Unchecked="_che_Checked">
+            <dxe:CheckEdit
+                Name="_che"
+                Grid.Row="1"
+                Content="Скрыть неотмеченные категории"
+                Checked="_che_Checked"
+                Unchecked="_che_Checked">
             </dxe:CheckEdit>
 
             <dxg:GridControl
@@ -48,19 +52,24 @@
                     </dxg:TableView>
                 </dxg:GridControl.View>
                 <dxg:GridControl.Columns>
-                    <dxg:GridColumn x:Name="_checkColumn"
-                                    FieldName="IsSelected"
-                                    Width="43"
-                                    MaxWidth="43"
-                                    MinWidth="43"
-                                    AllowResizing="False"
-                                    AllowSorting="False"
-                                    Header=""
-                                    ShowCheckBoxInHeader="True">
+                    <dxg:GridColumn
+                        x:Name="_checkColumn"
+                        FieldName="IsSelected"
+                        Width="43"
+                        MaxWidth="43"
+                        MinWidth="43"
+                        AllowResizing="False"
+                        AllowSorting="False"
+                        Header=""
+                        ShowCheckBoxInHeader="True">
                         <dxg:GridColumn.CellTemplate>
-                            <DataTemplate DataType="{x:Type vm:CategoryViewModel}">
-                                <dxe:CheckEdit Name="PART_Editor" HorizontalAlignment="Center" Margin="0 -3 0 -3"
-                                               EditValue="{Binding Row.IsSelected, UpdateSourceTrigger=PropertyChanged}">
+                            <DataTemplate
+                                DataType="{x:Type vm:CategoryViewModel}">
+                                <dxe:CheckEdit
+                                    Name="PART_Editor"
+                                    HorizontalAlignment="Center"
+                                    Margin="0 -3 0 -3"
+                                    EditValue="{Binding Row.IsSelected, UpdateSourceTrigger=PropertyChanged}">
                                     <!--<dxmvvm:Interaction.Behaviors>
                                         <dxmvvm:EventToCommand EventName="EditValueChanged" 
                                                        Command="{Binding RelativeSource={RelativeSource AncestorType={x:Type dxg:GridControl}}, Path=DataContext.SelectedCategoriesChangedCommand}"
@@ -70,11 +79,15 @@
                             </DataTemplate>
                         </dxg:GridColumn.CellTemplate>
                     </dxg:GridColumn>
-                    <dxg:GridColumn ReadOnly="True" Header="Наименование" FieldName="Name" />
+                    <dxg:GridColumn
+                        ReadOnly="True"
+                        Header="Наименование"
+                        FieldName="Name" />
                 </dxg:GridControl.Columns>
                 <dxmvvm:Interaction.Behaviors>
-                    <dxmvvm:ReadOnlyDependencyPropertyBindingBehavior Property="VisibleItems"
-                                                                      Binding="{Binding VisibleItems, Mode=OneWayToSource}" />
+                    <dxmvvm:ReadOnlyDependencyPropertyBindingBehavior
+                        Property="VisibleItems"
+                        Binding="{Binding VisibleItems, Mode=OneWayToSource}" />
                 </dxmvvm:Interaction.Behaviors>
             </dxg:GridControl>
 

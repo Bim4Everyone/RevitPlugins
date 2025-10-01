@@ -6,7 +6,6 @@
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:vm="clr-namespace:RevitClashDetective.ViewModels.ClashDetective"
     xmlns:dxe="http://schemas.devexpress.com/winfx/2008/xaml/editors"
-
     mc:Ignorable="d"
     Name="_this"
     MinWidth="100"
@@ -16,28 +15,30 @@
             <ColumnDefinition />
             <ColumnDefinition />
         </Grid.ColumnDefinitions>
-        <dxe:ComboBoxEdit Grid.Column="0"
-                          NullText="Выберите файлы"
-                          SeparatorString=", "
-                          IsTextEditable="False"
-                          TextWrapping="Wrap"
-                          DisplayMember="Name"
-                          AllowUpdateTwoWayBoundPropertiesOnSynchronization="False"
-                          ItemsSource="{Binding Files}"
-                          EditValue="{Binding SelectedFileObjects, UpdateSourceTrigger=PropertyChanged}">
+        <dxe:ComboBoxEdit
+            Grid.Column="0"
+            NullText="Выберите файлы"
+            SeparatorString=", "
+            IsTextEditable="False"
+            TextWrapping="Wrap"
+            DisplayMember="Name"
+            AllowUpdateTwoWayBoundPropertiesOnSynchronization="False"
+            ItemsSource="{Binding Files}"
+            EditValue="{Binding SelectedFileObjects, UpdateSourceTrigger=PropertyChanged}">
             <dxe:ComboBoxEdit.StyleSettings>
                 <dxe:CheckedComboBoxStyleSettings />
             </dxe:ComboBoxEdit.StyleSettings>
         </dxe:ComboBoxEdit>
-        <dxe:ComboBoxEdit Grid.Column="1"
-                          NullText="Выберите поисковые наборы"
-                          SeparatorString=", "
-                          IsTextEditable="False"
-                          TextWrapping="Wrap"
-                          DisplayMember="Name"
-                          AllowUpdateTwoWayBoundPropertiesOnSynchronization="False"
-                          ItemsSource="{Binding Providers}"
-                          EditValue="{Binding SelectedProvidersObjects, UpdateSourceTrigger=PropertyChanged}">
+        <dxe:ComboBoxEdit
+            Grid.Column="1"
+            NullText="Выберите поисковые наборы"
+            SeparatorString=", "
+            IsTextEditable="False"
+            TextWrapping="Wrap"
+            DisplayMember="Name"
+            AllowUpdateTwoWayBoundPropertiesOnSynchronization="False"
+            ItemsSource="{Binding Providers}"
+            EditValue="{Binding SelectedProvidersObjects, UpdateSourceTrigger=PropertyChanged}">
             <dxe:ComboBoxEdit.StyleSettings>
                 <dxe:CheckedComboBoxStyleSettings />
             </dxe:ComboBoxEdit.StyleSettings>

@@ -93,9 +93,7 @@ internal class ImaginarySecondClashViewModel
 
     public bool Equals(ImaginarySecondClashViewModel other) {
         if(other is null) { return false; }
-        if(ReferenceEquals(this, other)) { return true; }
-
-        return _secondElement.Equals(other._secondElement);
+        return ReferenceEquals(this, other) || _secondElement.Equals(other._secondElement);
     }
 
     public override bool Equals(object obj) {

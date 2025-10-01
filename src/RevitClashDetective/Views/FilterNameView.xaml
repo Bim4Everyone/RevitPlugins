@@ -8,32 +8,62 @@
     xmlns:dxe="http://schemas.devexpress.com/winfx/2008/xaml/editors"
     xmlns:dx="http://schemas.devexpress.com/winfx/2008/xaml/core"
     xmlns:base="clr-namespace:dosymep.WPF.Views"
-   
     mc:Ignorable="d"
-    Title="Имя поискового набора" Height="120" Width="520"
+    Title="Имя поискового набора"
+    Height="120"
+    Width="520"
     WindowStartupLocation="CenterOwner"
     d:DataContext="{d:DesignInstance vm:FilterNameViewModel, IsDesignTimeCreatable=False}">
-    <Grid Margin="10">
+    <Grid
+        Margin="10">
         <Grid.RowDefinitions>
-            <RowDefinition Height="Auto" />
+            <RowDefinition
+                Height="Auto" />
             <RowDefinition />
         </Grid.RowDefinitions>
-        <DockPanel Grid.Row="0" LastChildFill="True">
-            <dxe:TextEdit DockPanel.Dock="Left" EditValue="Имя: " IsReadOnly="True" EditMode="InplaceActive"
-                          VerticalAlignment="Center" Margin="10 0 0 0" />
-            <dxe:TextEdit DockPanel.Dock="Right" Margin="10 0 0 0" HorizontalAlignment="Stretch"
-                          VerticalContentAlignment="Center"
-                          EditValue="{Binding Name, UpdateSourceTrigger=PropertyChanged}" />
+        <DockPanel
+            Grid.Row="0"
+            LastChildFill="True">
+            <dxe:TextEdit
+                DockPanel.Dock="Left"
+                EditValue="Имя: "
+                IsReadOnly="True"
+                EditMode="InplaceActive"
+                VerticalAlignment="Center"
+                Margin="10 0 0 0" />
+            <dxe:TextEdit
+                DockPanel.Dock="Right"
+                Margin="10 0 0 0"
+                HorizontalAlignment="Stretch"
+                VerticalContentAlignment="Center"
+                EditValue="{Binding Name, UpdateSourceTrigger=PropertyChanged}" />
         </DockPanel>
 
-        <StackPanel Grid.Row="1" Margin="0 10 0 0" Orientation="Horizontal"
-                    HorizontalAlignment="Right">
-            <dxe:TextEdit Margin="10 0" IsReadOnly="True" EditMode="InplaceActive" EditValue="{Binding ErrorText}"
-                          Foreground="Orange" />
-            <dx:SimpleButton Content="ОК" Height="25" Width="80" Margin="10 0" IsDefault="True"
-                             Command="{Binding Create}" Click="ButtonOk_Click" />
-            <dx:SimpleButton Content="Отмена" Height="25" Width="80" IsCancel="true"
-                             Click="ButtonCancel_Click" />
+        <StackPanel
+            Grid.Row="1"
+            Margin="0 10 0 0"
+            Orientation="Horizontal"
+            HorizontalAlignment="Right">
+            <dxe:TextEdit
+                Margin="10 0"
+                IsReadOnly="True"
+                EditMode="InplaceActive"
+                EditValue="{Binding ErrorText}"
+                Foreground="Orange" />
+            <dx:SimpleButton
+                Content="ОК"
+                Height="25"
+                Width="80"
+                Margin="10 0"
+                IsDefault="True"
+                Command="{Binding Create}"
+                Click="ButtonOk_Click" />
+            <dx:SimpleButton
+                Content="Отмена"
+                Height="25"
+                Width="80"
+                IsCancel="true"
+                Click="ButtonCancel_Click" />
         </StackPanel>
     </Grid>
 </base:ThemedPlatformWindow>

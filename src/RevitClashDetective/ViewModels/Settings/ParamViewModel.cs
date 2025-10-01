@@ -23,11 +23,7 @@ internal class ParamViewModel : BaseViewModel, IEquatable<ParamViewModel> {
 
     public bool Equals(ParamViewModel other) {
         if(other is null) { return false; }
-        if(ReferenceEquals(this, other)) {
-            return true;
-        }
-
-        return Guid == other.Guid;
+        return ReferenceEquals(this, other) || Guid == other.Guid;
     }
 
     public override int GetHashCode() {

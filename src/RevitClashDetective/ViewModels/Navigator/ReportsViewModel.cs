@@ -17,159 +17,158 @@ using RevitClashDetective.Models.Interfaces;
 using RevitClashDetective.Models.RevitClashReport;
 using RevitClashDetective.Services.RevitViewSettings;
 
-namespace RevitClashDetective.ViewModels.Navigator {
+namespace RevitClashDetective.ViewModels.Navigator;
 
-    internal class ReportsViewModel : BaseViewModel {
-        private readonly RevitRepository _revitRepository;
-        private readonly ILocalizationService _localizationService;
-        private bool _elementsIsolationEnabled = true;
-        private bool _openFromClashDetector;
-        private ReportViewModel _selectedFile;
-        private ObservableCollection<ReportViewModel> _reports;
+internal class ReportsViewModel : BaseViewModel {
+    private readonly RevitRepository _revitRepository;
+    private readonly ILocalizationService _localizationService;
+    private bool _elementsIsolationEnabled = true;
+    private bool _openFromClashDetector;
+    private ReportViewModel _selectedFile;
+    private ObservableCollection<ReportViewModel> _reports;
 
-        public ReportsViewModel(RevitRepository revitRepository,
-            ILocalizationService localizationService,
-            string selectedFile = null) {
+    public ReportsViewModel(RevitRepository revitRepository,
+        ILocalizationService localizationService,
+        string selectedFile = null) {
 
-            _revitRepository = revitRepository ?? throw new ArgumentNullException(nameof(revitRepository));
-            _localizationService = localizationService ?? throw new ArgumentNullException(nameof(localizationService));
-            Reports = new ObservableCollection<ReportViewModel>();
+        _revitRepository = revitRepository ?? throw new ArgumentNullException(nameof(revitRepository));
+        _localizationService = localizationService ?? throw new ArgumentNullException(nameof(localizationService));
+        Reports = [];
 
-            if(selectedFile == null) {
-                InitializeFiles();
-            } else {
-                InitializeFiles(selectedFile);
-            }
-
-            OpenClashDetectorCommand = RelayCommand.Create(OpenClashDetector, () => OpenFromClashDetector);
-            LoadCommand = RelayCommand.Create(Load);
-            DeleteCommand = RelayCommand.Create(Delete, CanDelete);
-            SelectClashCommand = RelayCommand.Create<IClashViewModel>(SelectClash, CanSelectClash);
-            SaveAllReportsCommand = RelayCommand.Create(SaveAllReports, CanSaveAllReports);
+        if(selectedFile == null) {
+            InitializeFiles();
+        } else {
+            InitializeFiles(selectedFile);
         }
 
-
-        public ICommand SelectClashCommand { get; }
-        public ICommand OpenClashDetectorCommand { get; }
-        public ICommand LoadCommand { get; }
-        public ICommand DeleteCommand { get; }
-        public ICommand SaveAllReportsCommand { get; }
-
-        public ObservableCollection<ReportViewModel> Reports {
-            get => _reports;
-            set => RaiseAndSetIfChanged(ref _reports, value);
-        }
-
-        public bool OpenFromClashDetector {
-            get => _openFromClashDetector;
-            set => RaiseAndSetIfChanged(ref _openFromClashDetector, value);
-        }
-
-        public ReportViewModel SelectedReport {
-            get => _selectedFile;
-            set => RaiseAndSetIfChanged(ref _selectedFile, value);
-        }
-
-        public bool ElementsIsolationEnabled {
-            get => _elementsIsolationEnabled;
-            set => RaiseAndSetIfChanged(ref _elementsIsolationEnabled, value);
-        }
+        OpenClashDetectorCommand = RelayCommand.Create(OpenClashDetector, () => OpenFromClashDetector);
+        LoadCommand = RelayCommand.Create(Load);
+        DeleteCommand = RelayCommand.Create(Delete, CanDelete);
+        SelectClashCommand = RelayCommand.Create<IClashViewModel>(SelectClash, CanSelectClash);
+        SaveAllReportsCommand = RelayCommand.Create(SaveAllReports, CanSaveAllReports);
+    }
 
 
-        private void InitializeFiles(string selectedFile) {
-            var profilePath = RevitRepository.LocalProfilePath;
-            Reports = new ObservableCollection<ReportViewModel>(Directory.GetFiles(Path.Combine(profilePath, ModuleEnvironment.RevitVersion, nameof(RevitClashDetective), _revitRepository.GetObjectName()))
-                .Select(path => new ReportViewModel(
+    public ICommand SelectClashCommand { get; }
+    public ICommand OpenClashDetectorCommand { get; }
+    public ICommand LoadCommand { get; }
+    public ICommand DeleteCommand { get; }
+    public ICommand SaveAllReportsCommand { get; }
+
+    public ObservableCollection<ReportViewModel> Reports {
+        get => _reports;
+        set => RaiseAndSetIfChanged(ref _reports, value);
+    }
+
+    public bool OpenFromClashDetector {
+        get => _openFromClashDetector;
+        set => RaiseAndSetIfChanged(ref _openFromClashDetector, value);
+    }
+
+    public ReportViewModel SelectedReport {
+        get => _selectedFile;
+        set => RaiseAndSetIfChanged(ref _selectedFile, value);
+    }
+
+    public bool ElementsIsolationEnabled {
+        get => _elementsIsolationEnabled;
+        set => RaiseAndSetIfChanged(ref _elementsIsolationEnabled, value);
+    }
+
+
+    private void InitializeFiles(string selectedFile) {
+        string profilePath = RevitRepository.LocalProfilePath;
+        Reports = new ObservableCollection<ReportViewModel>(Directory.GetFiles(Path.Combine(profilePath, ModuleEnvironment.RevitVersion, nameof(RevitClashDetective), _revitRepository.GetObjectName()))
+            .Select(path => new ReportViewModel(
+                _revitRepository,
+                Path.GetFileNameWithoutExtension(path),
+                _localizationService))
+            .Where(item => item.Name.Equals(selectedFile, StringComparison.CurrentCultureIgnoreCase)));
+        SelectedReport = Reports.FirstOrDefault();
+    }
+
+    private void InitializeFiles() {
+        string profilePath = RevitRepository.LocalProfilePath;
+        string path = Path.Combine(profilePath, ModuleEnvironment.RevitVersion, nameof(RevitClashDetective), _revitRepository.GetObjectName());
+        if(Directory.Exists(path)) {
+            Reports = new ObservableCollection<ReportViewModel>(Directory.GetFiles(path)
+                .Select(item => new ReportViewModel(
                     _revitRepository,
-                    Path.GetFileNameWithoutExtension(path),
-                    _localizationService))
-                .Where(item => item.Name.Equals(selectedFile, StringComparison.CurrentCultureIgnoreCase)));
+                    Path.GetFileNameWithoutExtension(item),
+                    _localizationService)));
             SelectedReport = Reports.FirstOrDefault();
         }
+    }
 
-        private void InitializeFiles() {
-            var profilePath = RevitRepository.LocalProfilePath;
-            var path = Path.Combine(profilePath, ModuleEnvironment.RevitVersion, nameof(RevitClashDetective), _revitRepository.GetObjectName());
-            if(Directory.Exists(path)) {
-                Reports = new ObservableCollection<ReportViewModel>(Directory.GetFiles(path)
-                    .Select(item => new ReportViewModel(
-                        _revitRepository,
-                        Path.GetFileNameWithoutExtension(item),
-                        _localizationService)));
-                SelectedReport = Reports.FirstOrDefault();
-            }
+    private void OpenClashDetector() {
+        _revitRepository.DoAction(() => {
+            var command = new DetectiveClashesCommand();
+            command.ExecuteCommand(_revitRepository.UiApplication);
+        });
+    }
+
+
+    private void Load() {
+        var openWindow = GetPlatformService<IOpenFileDialogService>();
+        openWindow.Filter = "NavisClashReport (*.xml)|*.xml|PluginClashReport (*.json)|*.json";
+
+        if(!openWindow.ShowDialog(_revitRepository.GetFileDialogPath())) {
+            throw new OperationCanceledException();
         }
 
-        private void OpenClashDetector() {
-            _revitRepository.DoAction(() => {
-                var command = new DetectiveClashesCommand();
-                command.ExecuteCommand(_revitRepository.UiApplication);
-            });
+        InitializeClashes(openWindow.File.FullName);
+        _revitRepository.CommonConfig.LastRunPath = openWindow.File.DirectoryName;
+        _revitRepository.CommonConfig.SaveProjectConfig();
+    }
+
+    private void InitializeClashes(string path) {
+        string name = Path.GetFileNameWithoutExtension(path);
+        var reports = ReportLoader.GetReports(_revitRepository, path)
+            .Select(r => new ReportViewModel(_revitRepository, r.Name, r.Clashes?.ToList(), _localizationService));
+
+        Reports = new ObservableCollection<ReportViewModel>(new NameResolver<ReportViewModel>(Reports, reports).GetCollection());
+        SelectedReport = reports.First();
+    }
+
+    private void Delete() {
+        var mb = GetPlatformService<IMessageBoxService>();
+        if(mb.Show("Вы уверены, что хотите удалить файл?", "BIM", MessageBoxButton.YesNo, MessageBoxImage.Warning, MessageBoxResult.Cancel) == MessageBoxResult.Yes) {
+            DeleteConfig(SelectedReport.GetUpdatedConfig());
+            Reports.Remove(SelectedReport);
+            SelectedReport = Reports.FirstOrDefault();
         }
+    }
 
-
-        private void Load() {
-            var openWindow = GetPlatformService<IOpenFileDialogService>();
-            openWindow.Filter = "NavisClashReport (*.xml)|*.xml|PluginClashReport (*.json)|*.json";
-
-            if(!openWindow.ShowDialog(_revitRepository.GetFileDialogPath())) {
-                throw new OperationCanceledException();
-            }
-
-            InitializeClashes(openWindow.File.FullName);
-            _revitRepository.CommonConfig.LastRunPath = openWindow.File.DirectoryName;
-            _revitRepository.CommonConfig.SaveProjectConfig();
+    private void DeleteConfig(ClashesConfig config) {
+        if(File.Exists(config.ProjectConfigPath) && config.ProjectConfigPath.EndsWith(".json", StringComparison.CurrentCultureIgnoreCase)) {
+            File.Delete(config.ProjectConfigPath);
         }
+    }
 
-        private void InitializeClashes(string path) {
-            var name = Path.GetFileNameWithoutExtension(path);
-            var reports = ReportLoader.GetReports(_revitRepository, path)
-                .Select(r => new ReportViewModel(_revitRepository, r.Name, r.Clashes?.ToList(), _localizationService));
+    private bool CanDelete() {
+        return SelectedReport != null;
+    }
 
-            Reports = new ObservableCollection<ReportViewModel>(new NameResolver<ReportViewModel>(Reports, reports).GetCollection());
-            SelectedReport = reports.First();
+    private void SelectClash(IClashViewModel clash) {
+        IView3DSetting settings;
+        var config = SettingsConfig.GetSettingsConfig(GetPlatformService<IConfigSerializer>());
+        settings = ElementsIsolationEnabled
+            ? new ClashIsolationViewSettings(_revitRepository, _localizationService, clash, config)
+            : new ClashDefaultViewSettings(_revitRepository, _localizationService, clash, config);
+        _revitRepository.SelectAndShowElement(clash.GetElements(), settings);
+    }
+
+    private bool CanSelectClash(IClashViewModel p) {
+        return p != null && p.GetElements().Count > 0;
+    }
+
+    private void SaveAllReports() {
+        foreach(var report in Reports) {
+            report.SaveCommand.Execute(default);
         }
+    }
 
-        private void Delete() {
-            var mb = GetPlatformService<IMessageBoxService>();
-            if(mb.Show("Вы уверены, что хотите удалить файл?", "BIM", MessageBoxButton.YesNo, MessageBoxImage.Warning, MessageBoxResult.Cancel) == MessageBoxResult.Yes) {
-                DeleteConfig(SelectedReport.GetUpdatedConfig());
-                Reports.Remove(SelectedReport);
-                SelectedReport = Reports.FirstOrDefault();
-            }
-        }
-
-        private void DeleteConfig(ClashesConfig config) {
-            if(File.Exists(config.ProjectConfigPath) && config.ProjectConfigPath.EndsWith(".json", StringComparison.CurrentCultureIgnoreCase)) {
-                File.Delete(config.ProjectConfigPath);
-            }
-        }
-
-        private bool CanDelete() => SelectedReport != null;
-
-        private void SelectClash(IClashViewModel clash) {
-            IView3DSetting settings;
-            var config = SettingsConfig.GetSettingsConfig(GetPlatformService<IConfigSerializer>());
-            if(ElementsIsolationEnabled) {
-                settings = new ClashIsolationViewSettings(_revitRepository, _localizationService, clash, config);
-            } else {
-                settings = new ClashDefaultViewSettings(_revitRepository, _localizationService, clash, config);
-            }
-            _revitRepository.SelectAndShowElement(clash.GetElements(), settings);
-        }
-
-        private bool CanSelectClash(IClashViewModel p) {
-            return p != null && p.GetElements().Count > 0;
-        }
-
-        private void SaveAllReports() {
-            foreach(var report in Reports) {
-                report.SaveCommand.Execute(default);
-            }
-        }
-
-        private bool CanSaveAllReports() {
-            return Reports.Count > 0;
-        }
+    private bool CanSaveAllReports() {
+        return Reports.Count > 0;
     }
 }

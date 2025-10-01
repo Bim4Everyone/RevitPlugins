@@ -11,21 +11,28 @@
     xmlns:lc="http://schemas.devexpress.com/winfx/2008/xaml/layoutcontrol"
     xmlns:mvvm="http://schemas.devexpress.com/winfx/2008/xaml/mvvm"
     xmlns:base="clr-namespace:dosymep.WPF.Views"
-    
     mc:Ignorable="d"
-    Title="Поисковые наборы" Height="450" Width="1000"
+    Title="Поисковые наборы"
+    Height="450"
+    Width="1000"
     MinHeight="300"
     MinWidth="500"
     x:Name="ViewFilterCreator"
     d:DataContext="{d:DesignInstance vm:FiltersViewModel, IsDesignTimeCreatable=False}">
-    <Grid Margin="10">
+    <Grid
+        Margin="10">
         <Grid.RowDefinitions>
-            <RowDefinition Height="Auto" />
-            <RowDefinition Height="*" />
-            <RowDefinition Height="Auto" />
+            <RowDefinition
+                Height="Auto" />
+            <RowDefinition
+                Height="*" />
+            <RowDefinition
+                Height="Auto" />
         </Grid.RowDefinitions>
 
-        <StackPanel Grid.Row="0" Orientation="Horizontal">
+        <StackPanel
+            Grid.Row="0"
+            Orientation="Horizontal">
             <dx:SimpleButton
                 Height="32"
                 Width="32"
@@ -52,18 +59,27 @@
 
         </StackPanel>
 
-        <dxdo:DockLayoutManager Grid.Row="1">
-            <dxdo:LayoutGroup x:Name="layoutRoot" AllowSplitters="True">
+        <dxdo:DockLayoutManager
+            Grid.Row="1">
+            <dxdo:LayoutGroup
+                x:Name="layoutRoot"
+                AllowSplitters="True">
 
-                <dxdo:LayoutControlItem ItemWidth="0.27*" Margin="-11 0">
-                    <lc:GroupBox Header="Поисковые наборы">
+                <dxdo:LayoutControlItem
+                    ItemWidth="0.27*"
+                    Margin="-11 0">
+                    <lc:GroupBox
+                        Header="Поисковые наборы">
                         <Grid>
                             <Grid.RowDefinitions>
-                                <RowDefinition Height="Auto" />
+                                <RowDefinition
+                                    Height="Auto" />
                                 <RowDefinition />
                             </Grid.RowDefinitions>
 
-                            <StackPanel Orientation="Horizontal" Grid.Row="0">
+                            <StackPanel
+                                Orientation="Horizontal"
+                                Grid.Row="0">
                                 <dx:SimpleButton
                                     MinHeight="20"
                                     Margin="0 0 3 3"
@@ -92,8 +108,9 @@
                                 EditValue="{Binding SelectedFilter, UpdateSourceTrigger=PropertyChanged}"
                                 DisplayMember="Name">
                                 <mvvm:Interaction.Behaviors>
-                                    <mvvm:EventToCommand EventName="EditValueChanged"
-                                                         Command="{Binding SelectedFilterChangedCommand}" />
+                                    <mvvm:EventToCommand
+                                        EventName="EditValueChanged"
+                                        Command="{Binding SelectedFilterChangedCommand}" />
                                 </mvvm:Interaction.Behaviors>
                             </dxe:ListBoxEdit>
 
@@ -101,19 +118,31 @@
                     </lc:GroupBox>
                 </dxdo:LayoutControlItem>
 
-                <dxdo:LayoutControlItem ItemWidth="0.4*">
-                    <lc:GroupBox Grid.Column="2" Grid.Row="1" Header="Категории" MinWidth="200">
-                        <ContentControl DataContext="{Binding SelectedFilter}"
-                                        DataContextChanged="CategoryControl_DataContextChanged" />
+                <dxdo:LayoutControlItem
+                    ItemWidth="0.4*">
+                    <lc:GroupBox
+                        Grid.Column="2"
+                        Grid.Row="1"
+                        Header="Категории"
+                        MinWidth="200">
+                        <ContentControl
+                            DataContext="{Binding SelectedFilter}"
+                            DataContextChanged="CategoryControl_DataContextChanged" />
                     </lc:GroupBox>
                 </dxdo:LayoutControlItem>
 
-                <dxdo:LayoutControlItem Margin="-11 0">
-                    <lc:GroupBox Grid.Column="4" Grid.Row="1" Header="Критерии фильтрации"
-                                 HorizontalAlignment="Stretch" VerticalContentAlignment="Top">
+                <dxdo:LayoutControlItem
+                    Margin="-11 0">
+                    <lc:GroupBox
+                        Grid.Column="4"
+                        Grid.Row="1"
+                        Header="Критерии фильтрации"
+                        HorizontalAlignment="Stretch"
+                        VerticalContentAlignment="Top">
                         <ScrollViewer>
-                            <ContentControl DataContext="{Binding SelectedFilter.Set}"
-                                            DataContextChanged="CriterionControl_DataContextChanged" />
+                            <ContentControl
+                                DataContext="{Binding SelectedFilter.Set}"
+                                DataContextChanged="CriterionControl_DataContextChanged" />
                         </ScrollViewer>
                     </lc:GroupBox>
                 </dxdo:LayoutControlItem>
@@ -121,17 +150,37 @@
             </dxdo:LayoutGroup>
         </dxdo:DockLayoutManager>
 
-        <StackPanel Grid.Row="2" Orientation="Horizontal"
-                    HorizontalAlignment="Right">
-            <dxe:TextEdit Margin="10 0" IsReadOnly="True" EditMode="InplaceActive" EditValue="{Binding ErrorText}"
-                          Foreground="Orange" />
-            <dxe:TextEdit Margin="10 0" IsReadOnly="True" EditMode="InplaceActive" EditValue="{Binding MessageText}"
-                          Foreground="Green" />
-            <dx:SimpleButton Content="Проверка" Height="25" Width="80" Margin="10 0" IsDefault="True"
-                             ToolTip="Проверить поисковый набор"
-                             Command="{Binding CheckSearchSetCommand}" Click="ButtonOk_Click" />
-            <dx:SimpleButton Content="Отмена" Height="25" Width="80" IsCancel="true"
-                             Click="ButtonCancel_Click" />
+        <StackPanel
+            Grid.Row="2"
+            Orientation="Horizontal"
+            HorizontalAlignment="Right">
+            <dxe:TextEdit
+                Margin="10 0"
+                IsReadOnly="True"
+                EditMode="InplaceActive"
+                EditValue="{Binding ErrorText}"
+                Foreground="Orange" />
+            <dxe:TextEdit
+                Margin="10 0"
+                IsReadOnly="True"
+                EditMode="InplaceActive"
+                EditValue="{Binding MessageText}"
+                Foreground="Green" />
+            <dx:SimpleButton
+                Content="Проверка"
+                Height="25"
+                Width="80"
+                Margin="10 0"
+                IsDefault="True"
+                ToolTip="Проверить поисковый набор"
+                Command="{Binding CheckSearchSetCommand}"
+                Click="ButtonOk_Click" />
+            <dx:SimpleButton
+                Content="Отмена"
+                Height="25"
+                Width="80"
+                IsCancel="true"
+                Click="ButtonCancel_Click" />
         </StackPanel>
 
     </Grid>

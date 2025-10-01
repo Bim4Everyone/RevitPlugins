@@ -1,4 +1,4 @@
-﻿using Autodesk.Revit.DB;
+using Autodesk.Revit.DB;
 
 using dosymep.WPF.ViewModels;
 
@@ -8,27 +8,26 @@ using RevitClashDetective.Models.FilterModel;
 using RevitClashDetective.Models.Interfaces;
 using RevitClashDetective.ViewModels.ClashDetective.Interfaces;
 
-namespace RevitClashDetective.ViewModels.ClashDetective {
-    internal class FilterProviderViewModel : BaseViewModel, IProviderViewModel {
-        private readonly RevitRepository _revitRepository;
-        private readonly Filter _filter;
-        private string _name;
+namespace RevitClashDetective.ViewModels.ClashDetective;
+internal class FilterProviderViewModel : BaseViewModel, IProviderViewModel {
+    private readonly RevitRepository _revitRepository;
+    private readonly Filter _filter;
+    private string _name;
 
-        public FilterProviderViewModel() { }
+    public FilterProviderViewModel() { }
 
-        public FilterProviderViewModel(RevitRepository revitRepository, Filter filter) {
-            _revitRepository = revitRepository;
-            _filter = filter;
-            Name = filter.Name;
-        }
+    public FilterProviderViewModel(RevitRepository revitRepository, Filter filter) {
+        _revitRepository = revitRepository;
+        _filter = filter;
+        Name = filter.Name;
+    }
 
-        public string Name {
-            get => _name;
-            set => this.RaiseAndSetIfChanged(ref _name, value);
-        }
+    public string Name {
+        get => _name;
+        set => RaiseAndSetIfChanged(ref _name, value);
+    }
 
-        public IProvider GetProvider(Document doc, Transform transform) {
-            return new FilterProvider(doc, _filter, transform);
-        }
+    public IProvider GetProvider(Document doc, Transform transform) {
+        return new FilterProvider(doc, _filter, transform);
     }
 }

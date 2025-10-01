@@ -39,12 +39,9 @@ internal class BboxViewSettings : IView3DSetting {
 
 
     public void Apply(View3D view3D) {
-        BoundingBoxXYZ bbox;
-        if(_config.SectionBoxModeSettings == SectionBoxMode.AroundElements) {
-            bbox = _revitRepository.GetBoundingBoxes(_elements).CreateUnitedBoundingBox();
-        } else {
-            bbox = _revitRepository.GetBoundingBoxes(_elements).ToArray().CreateCommonBoundingBox();
-        }
+        var bbox = _config.SectionBoxModeSettings == SectionBoxMode.AroundElements
+            ? _revitRepository.GetBoundingBoxes(_elements).CreateUnitedBoundingBox()
+            : _revitRepository.GetBoundingBoxes(_elements).ToArray().CreateCommonBoundingBox();
         _revitRepository.SetSectionBox(
             bbox,
             view3D,

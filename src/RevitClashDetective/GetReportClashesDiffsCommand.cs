@@ -19,48 +19,46 @@ using RevitClashDetective.Models.RevitClashReport;
 using RevitClashDetective.ViewModels.Navigator;
 using RevitClashDetective.Views;
 
-namespace RevitClashDetective {
-    //TODO эта команда для дебага и отладки логики выполнения плагина
-    [Transaction(TransactionMode.Manual)]
-    public class GetReportClashesDiffsCommand : BasePluginCommand {
-        public GetReportClashesDiffsCommand() {
-            PluginName = "Различия в отчетах о коллизиях";
-        }
+namespace RevitClashDetective;
+//TODO эта команда для дебага и отладки логики выполнения плагина
+[Transaction(TransactionMode.Manual)]
+public class GetReportClashesDiffsCommand : BasePluginCommand {
+    public GetReportClashesDiffsCommand() {
+        PluginName = "Различия в отчетах о коллизиях";
+    }
 
-        protected override void Execute(UIApplication uiApplication) {
-            using(IKernel kernel = uiApplication.CreatePlatformServices()) {
-                kernel.Bind<RevitRepository>()
-                    .ToSelf()
-                    .InSingletonScope();
-                kernel.Bind<RevitEventHandler>()
-                    .ToSelf()
-                    .InSingletonScope();
-                kernel.Bind<ParameterFilterProvider>()
-                    .ToSelf()
-                    .InSingletonScope();
+    protected override void Execute(UIApplication uiApplication) {
+        using var kernel = uiApplication.CreatePlatformServices();
+        kernel.Bind<RevitRepository>()
+            .ToSelf()
+            .InSingletonScope();
+        kernel.Bind<RevitEventHandler>()
+            .ToSelf()
+            .InSingletonScope();
+        kernel.Bind<ParameterFilterProvider>()
+            .ToSelf()
+            .InSingletonScope();
 
-                string assemblyName = Assembly.GetExecutingAssembly().GetName().Name;
-                kernel.UseWpfLocalization(
-                    $"/{assemblyName};component/assets/Localization/Language.xaml",
-                    CultureInfo.GetCultureInfo("ru-RU"));
+        string assemblyName = Assembly.GetExecutingAssembly().GetName().Name;
+        kernel.UseWpfLocalization(
+            $"/{assemblyName};component/assets/Localization/Language.xaml",
+            CultureInfo.GetCultureInfo("ru-RU"));
 
 
-                var revitRepository = kernel.Get<RevitRepository>();
+        var revitRepository = kernel.Get<RevitRepository>();
 
-                var pluginClashPath = @"";
-                var pluginClashes = ReportLoader.GetReports(revitRepository, pluginClashPath);
+        string pluginClashPath = @"";
+        var pluginClashes = ReportLoader.GetReports(revitRepository, pluginClashPath);
 
-                var revitFilePath = @"";
-                var revitClashes = ReportLoader.GetReports(revitRepository, revitFilePath);
+        string revitFilePath = @"";
+        var revitClashes = ReportLoader.GetReports(revitRepository, revitFilePath);
 
-                var navisFilePath = @"";
-                var navisClashes = ReportLoader.GetReports(revitRepository, navisFilePath);
+        string navisFilePath = @"";
+        var navisClashes = ReportLoader.GetReports(revitRepository, navisFilePath);
 
-                var mainViewModlel = new ClashReportDiffViewModel(revitRepository, revitClashes.First().Clashes, pluginClashes.First().Clashes);
+        var mainViewModlel = new ClashReportDiffViewModel(revitRepository, revitClashes.First().Clashes, pluginClashes.First().Clashes);
 
-                var window = new ClashReportDiffView() { DataContext = mainViewModlel };
-                window.Show();
-            }
-        }
+        var window = new ClashReportDiffView() { DataContext = mainViewModlel };
+        window.Show();
     }
 }
