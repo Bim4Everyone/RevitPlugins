@@ -1,4 +1,3 @@
-﻿namespace RevitClashDetective.Models.Interfaces {
-    interface IFilter {
-    }
+namespace RevitClashDetective.Models.Interfaces;
+internal interface IFilter {
 }

@@ -4,44 +4,43 @@ using System.Linq;
 using RevitClashDetective.Models.Clashes;
 using RevitClashDetective.Models.Interfaces;
 
-namespace RevitClashDetective.Models.ClashDetection {
-    internal class ClashDetector {
-        private readonly RevitRepository _revitRepository;
-        private readonly IEnumerable<IProvider> _mainDocProviders;
-        private readonly IEnumerable<IProvider> _otherProviders;
+namespace RevitClashDetective.Models.ClashDetection;
+internal class ClashDetector {
+    private readonly RevitRepository _revitRepository;
+    private readonly IEnumerable<IProvider> _mainDocProviders;
+    private readonly IEnumerable<IProvider> _otherProviders;
 
-        public ClashDetector(RevitRepository revitRepository, IEnumerable<IProvider> mainDocProviders, IEnumerable<IProvider> otherProviders) {
-            _revitRepository = revitRepository;
-            _mainDocProviders = mainDocProviders;
-            _otherProviders = otherProviders;
-        }
-
-        public List<ClashModel> FindClashes() {
-            List<ClashModel> clashes = new List<ClashModel>();
-            foreach(var mainProvider in _mainDocProviders) {
-                foreach(var provider in _otherProviders) {
-                    var providerClashDetector = new ProvidersClashDetector(_revitRepository, mainProvider, provider);
-                    clashes.AddRange(providerClashDetector.GetClashes());
-                }
-            }
-            for(int i = 0; i < clashes.Count; i++) {
-                clashes[i].Name = $"Конфликт{i + 1}";
-            }
-
-            return clashes;
-        }
+    public ClashDetector(RevitRepository revitRepository, IEnumerable<IProvider> mainDocProviders, IEnumerable<IProvider> otherProviders) {
+        _revitRepository = revitRepository;
+        _mainDocProviders = mainDocProviders;
+        _otherProviders = otherProviders;
     }
 
-    internal class ClashesMarker {
-        public static IEnumerable<ClashModel> MarkSolvedClashes(IEnumerable<ClashModel> newClashes, IEnumerable<ClashModel> oldClashes) {
-            foreach(var newClash in newClashes) {
-                var oldClashe = oldClashes.FirstOrDefault(item => item.Equals(newClash));
-                if(oldClashe != null) {
-                    newClash.ClashStatus = oldClashe.ClashStatus;
-                    newClash.Name = string.IsNullOrWhiteSpace(oldClashe.Name) ? newClash.Name : oldClashe.Name;
-                }
-                yield return newClash;
+    public List<ClashModel> FindClashes() {
+        List<ClashModel> clashes = [];
+        foreach(var mainProvider in _mainDocProviders) {
+            foreach(var provider in _otherProviders) {
+                var providerClashDetector = new ProvidersClashDetector(_revitRepository, mainProvider, provider);
+                clashes.AddRange(providerClashDetector.GetClashes());
             }
+        }
+        for(int i = 0; i < clashes.Count; i++) {
+            clashes[i].Name = $"Конфликт{i + 1}";
+        }
+
+        return clashes;
+    }
+}
+
+internal class ClashesMarker {
+    public static IEnumerable<ClashModel> MarkSolvedClashes(IEnumerable<ClashModel> newClashes, IEnumerable<ClashModel> oldClashes) {
+        foreach(var newClash in newClashes) {
+            var oldClashe = oldClashes.FirstOrDefault(item => item.Equals(newClash));
+            if(oldClashe != null) {
+                newClash.ClashStatus = oldClashe.ClashStatus;
+                newClash.Name = string.IsNullOrWhiteSpace(oldClashe.Name) ? newClash.Name : oldClashe.Name;
+            }
+            yield return newClash;
         }
     }
 }
