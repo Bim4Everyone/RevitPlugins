@@ -15,36 +15,35 @@ using Grid = Autodesk.Revit.DB.Grid;
 
 namespace RevitPylonDocumentation.Models.PylonSheetNView.ViewDimensionServices.ViewFormDimensionServices;
 internal class TransViewDimensionService {
+    private readonly MainViewModel _viewModel;
+    private readonly RevitRepository _repository;
+    private readonly PylonSheetInfo _sheetInfo;
+    private readonly PylonView _viewOfPylon;
+
     private readonly DimensionBaseService _dimensionBaseService;
     private readonly DimensionSegmentsService _dimSegmentsService;
     private readonly GridEndsService _gridEndsService;
 
     internal TransViewDimensionService(MainViewModel mvm, RevitRepository repository, PylonSheetInfo pylonSheetInfo, 
                                        PylonView pylonView, DimensionBaseService dimensionBaseService) {
-        ViewModel = mvm;
-        Repository = repository;
-        SheetInfo = pylonSheetInfo;
-        ViewOfPylon = pylonView;
-        _dimensionBaseService = dimensionBaseService;
+        _viewModel = mvm;
+        _repository = repository;
+        _sheetInfo = pylonSheetInfo;
+        _viewOfPylon = pylonView;
 
+        _dimensionBaseService = dimensionBaseService;
         _dimSegmentsService = new DimensionSegmentsService(pylonView.ViewElement);
-        _gridEndsService = new GridEndsService(ViewOfPylon.ViewElement, dimensionBaseService);
+        _gridEndsService = new GridEndsService(_viewOfPylon.ViewElement, dimensionBaseService);
     }
 
-    internal MainViewModel ViewModel { get; set; }
-    internal RevitRepository Repository { get; set; }
-    internal PylonSheetInfo SheetInfo { get; set; }
-    internal PylonView ViewOfPylon { get; set; }
-
-
     internal void TryCreateDimensions(bool refsForTop, bool pylonFromTop) {
-        var doc = Repository.Document;
-        var view = ViewOfPylon.ViewElement;
+        var doc = _repository.Document;
+        var view = _viewOfPylon.ViewElement;
         string rebarPart = refsForTop ? "верх" : "низ";
         
         try {
-            var rebarFinder = ViewModel.RebarFinder;
-            var skeletonParentRebar = SheetInfo.RebarInfo.SkeletonParentRebar;
+            var rebarFinder = _viewModel.RebarFinder;
+            var skeletonParentRebar = _sheetInfo.RebarInfo.SkeletonParentRebar;
             if(skeletonParentRebar is null) {
                 return;
             }
@@ -54,7 +53,7 @@ internal class TransViewDimensionService {
                 .ToList();
 
             // Определяем относительно чего нужно строить размерные линии - каркаса или пилона
-            var pylon = pylonFromTop ?  SheetInfo.HostElems.Last() : SheetInfo.HostElems.First();
+            var pylon = pylonFromTop ?  _sheetInfo.HostElems.Last() : _sheetInfo.HostElems.First();
             var dimensionLineHostRef = refsForTop ? skeletonParentRebar : pylon;
 
             var refArrayFormworkFront = _dimensionBaseService.GetDimensionRefs(pylon as FamilyInstance,
@@ -65,15 +64,15 @@ internal class TransViewDimensionService {
             var longGridsWillBeNeeded = false;
             if(refsForTop) {
                 // Когда все Гэшки
-                if(SheetInfo.RebarInfo.AllRebarAreL) {
+                if(_sheetInfo.RebarInfo.AllRebarAreL) {
                     vertDimensionsForEdit.Add(
                         CreateDimension(skeletonParentRebar, dimensionLineHostRef, DirectionType.Bottom, 0.5,
                                         ["низ", "фронт", "край"], view, 
                                         refArrayFormworkFront, false));
                     longGridsWillBeNeeded = true;
-                } else if(SheetInfo.RebarInfo.HasLRebar) {
+                } else if(_sheetInfo.RebarInfo.HasLRebar) {
                     // Когда Гэшки с одной стороны
-                    if(rebarFinder.DirectionHasLRebar(view, SheetInfo.ProjectSection, DirectionType.Top)) {
+                    if(rebarFinder.DirectionHasLRebar(view, _sheetInfo.ProjectSection, DirectionType.Top)) {
                         vertDimensionsForEdit.Add(
                             CreateDimension(skeletonParentRebar, dimensionLineHostRef, DirectionType.Top, 0.5,
                                             ["низ", "фронт", "край"], view, 
@@ -95,7 +94,7 @@ internal class TransViewDimensionService {
                     }
                 }
                 // Когда Гэшек нет вообще
-                if(!SheetInfo.RebarInfo.HasLRebar) {
+                if(!_sheetInfo.RebarInfo.HasLRebar) {
                     vertDimensionsForEdit.Add(
                         CreateDimension(skeletonParentRebar, dimensionLineHostRef, DirectionType.Bottom, 0.5,
                                         ["верх", "фронт", "край"], view, 
@@ -138,7 +137,7 @@ internal class TransViewDimensionService {
             // Размер по ТОРЦУ опалубка + армирование (положение справа ближнее)
             ReferenceArray refArraySide = default;
             // Если первый ряд - Гэшки, то берем по нижней плоскости
-            if(SheetInfo.RebarInfo.FirstLRebarParamValue) {
+            if(_sheetInfo.RebarInfo.FirstLRebarParamValue) {
                 refArraySide = _dimensionBaseService.GetDimensionRefs(skeletonParentRebar, '#', '/',
                                                                      ["низ", "торец", "_1_"], 
                                                                      oldRefArray: refArrayFormworkSide);
@@ -148,7 +147,7 @@ internal class TransViewDimensionService {
                                                                      oldRefArray: refArrayFormworkSide);
             }
             // Если второй ряд - Гэшки, то берем по нижней плоскости
-            if(SheetInfo.RebarInfo.SecondLRebarParamValue) {
+            if(_sheetInfo.RebarInfo.SecondLRebarParamValue) {
                 refArraySide = _dimensionBaseService.GetDimensionRefs(skeletonParentRebar, '#', '/',
                                                                      ["низ", "торец", "_2_"],
                                                                      oldRefArray: refArraySide);
@@ -201,8 +200,8 @@ internal class TransViewDimensionService {
         var dimensionLine = _dimensionBaseService.GetDimensionLine(elemForOffset, directionType, offsetCoefficient);
         ReferenceArray refArray = _dimensionBaseService.GetDimensionRefs(dimensioningElement as FamilyInstance, '#', '/',
                                                                         importantRefNameParts, oldRefArray: oldRefArray);
-        var dimension = Repository.Document.Create.NewDimension(view, dimensionLine, refArray, 
-                                                                ViewModel.SelectedDimensionType);
+        var dimension = _repository.Document.Create.NewDimension(view, dimensionLine, refArray, 
+                                                                _viewModel.SelectedDimensionType);
         if(needEqualityFormula) {
             dimension.SetParamValue(BuiltInParameter.DIM_DISPLAY_EQ, 2);
         }
@@ -215,8 +214,8 @@ internal class TransViewDimensionService {
                                  bool needEqualityFormula = true) {
         
         var dimensionLine = _dimensionBaseService.GetDimensionLine(elemForOffset, directionType, offsetCoefficient);
-        var dimension = Repository.Document.Create.NewDimension(view, dimensionLine, oldRefArray,
-                                                                ViewModel.SelectedDimensionType);
+        var dimension = _repository.Document.Create.NewDimension(view, dimensionLine, oldRefArray,
+                                                                _viewModel.SelectedDimensionType);
         if(needEqualityFormula) {
             dimension.SetParamValue(BuiltInParameter.DIM_DISPLAY_EQ, 2);
         }
@@ -233,8 +232,8 @@ internal class TransViewDimensionService {
         var refArrayFormworkGridSide = _dimensionBaseService.GetDimensionRefs(grids, view, gridsDirection,
                                                                              oldRefArray);
         if(refArrayFormworkGridSide.Size != oldRefArray.Size) {
-            Repository.Document.Create.NewDimension(view, dimensionLineLeft, refArrayFormworkGridSide,
-                                                    ViewModel.SelectedDimensionType);
+            _repository.Document.Create.NewDimension(view, dimensionLineLeft, refArrayFormworkGridSide,
+                                                    _viewModel.SelectedDimensionType);
         }
     }
 }
