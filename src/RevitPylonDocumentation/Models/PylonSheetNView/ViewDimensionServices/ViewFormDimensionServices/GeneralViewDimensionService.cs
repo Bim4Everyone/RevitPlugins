@@ -12,7 +12,7 @@ using RevitPylonDocumentation.ViewModels;
 
 namespace RevitPylonDocumentation.Models.PylonSheetNView.ViewDimensionServices.ViewFormDimensionServices;
 internal class GeneralViewDimensionService {
-    private readonly ViewPointsAnalyzer _viewPointsAnalyzer;
+    private readonly DimensionSegmentsService _dimensionSegmentsService;
 
     internal GeneralViewDimensionService(MainViewModel mvm, RevitRepository repository, PylonSheetInfo pylonSheetInfo, 
                                          PylonView pylonView) {
@@ -21,31 +21,13 @@ internal class GeneralViewDimensionService {
         SheetInfo = pylonSheetInfo;
         ViewOfPylon = pylonView;
 
-        _viewPointsAnalyzer = new ViewPointsAnalyzer(ViewOfPylon);
-        FindDimensionTextOffsets();
+        _dimensionSegmentsService = new DimensionSegmentsService(ViewOfPylon.ViewElement);
     }
 
     internal MainViewModel ViewModel { get; set; }
     internal RevitRepository Repository { get; set; }
     internal PylonSheetInfo SheetInfo { get; set; }
     internal PylonView ViewOfPylon { get; set; }
-
-
-    // Смещение для размерного сегмента горизонтального размера с маленьким текстом вверх
-    private XYZ HorizDimSmallUpTextOffset { get; set; }
-    // Смещение для размерного сегмента горизонтального размера с маленьким текстом вверх инвертированное
-    // (зависит от положения в размерной цепочке)
-    private XYZ HorizDimSmallUpTextOffsetInverted { get; set; }
-    // Смещение для размерного сегмента горизонтального размера с маленьким текстом вниз
-    private XYZ HorizDimSmallDownTextOffset { get; set; }
-    // Смещение для размерного сегмента горизонтального размера с маленьким текстом вниз инвертированное
-    // (зависит от положения в размерной цепочке)
-    private XYZ HorizDimSmallDownTextOffsetInverted { get; set; }
-    // Смещение для размерного сегмента вертикального размера с маленьким текстом
-    private XYZ VertDimTextOffset { get; set; }
-    // Смещение для размерного сегмента вертикального размера с маленьким текстом
-    // (зависит от положения в размерной цепочке)
-    private XYZ VertDimTextOffsetInverted { get; set; }
 
 
     internal void TryCreatePylonDimensions(FamilyInstance skeletonParentRebar, List<Grid> grids,
@@ -110,9 +92,9 @@ internal class GeneralViewDimensionService {
         // В этом случае в размере будет создано 3 размерных сегмента (между 4-мя плоскостями)
         // Создаем коллекцию опций изменений размера
         var dimSegmentOpts = new List<DimensionSegmentOption> {
-            new(true, "", VertDimTextOffset),
+            new(true, "", _dimensionSegmentsService.VertSmallUpDirectDimTextOffset),
             new(false),
-            new(true, "", VertDimTextOffsetInverted)
+            new(true, "", _dimensionSegmentsService.VertSmallUpInvertedDimTextOffset)
         };
         // Применяем опции изменений сегментов размера
         var dimensionSegments = dimension.Segments;
@@ -303,8 +285,8 @@ internal class GeneralViewDimensionService {
             }
 
             var dimensionLineDirection = DirectionType.Left;
-            var textOffset = HorizDimSmallUpTextOffset;
-            var textOffsetInverted = HorizDimSmallUpTextOffsetInverted;
+            var textOffset = _dimensionSegmentsService.HorizSmallUpDirectDimTextOffset;
+            var textOffsetInverted = _dimensionSegmentsService.HorizSmallUpInvertedDimTextOffset;
             // Если этот размер для перпендикулярного вида и Гэшка только справа, то размер нужно ставить слева
             if(isForPerpView && !SheetInfo.RebarInfo.AllRebarAreL 
                              && SheetInfo.RebarInfo.HasLRebar
@@ -312,8 +294,8 @@ internal class GeneralViewDimensionService {
                                                                          SheetInfo.ProjectSection,
                                                                          DirectionType.Left)) {
                 dimensionLineDirection = DirectionType.Right;
-                textOffset = HorizDimSmallDownTextOffset;
-                textOffsetInverted = HorizDimSmallDownTextOffsetInverted;
+                textOffset = _dimensionSegmentsService.HorizSmallDownDirectDimText;
+                textOffsetInverted = _dimensionSegmentsService.HorizSmallDownInvertedDimTextOffset;
             }
 
             // Создаем коллекцию опций изменений будущего размера
@@ -456,40 +438,6 @@ internal class GeneralViewDimensionService {
             Repository.Document.Delete(dimensionFirst.Id);
         } else {
             Repository.Document.Delete(dimensionSecond.Id);
-        }
-    }
-
-
-    /// <summary>
-    /// Определяем смещения, которые будут использованы для текста размеров с учетом системы координат вида
-    /// </summary>
-    private void FindDimensionTextOffsets() {
-        // Текст в сегментах размера нужно ставить со смещением от стандартного положения на размерной линии
-        // Чтобы он не перекрывал соседние сегменты
-        double offsetXY = -0.3;
-        double offsetZSmall = 0.2;
-
-        // Т.к. смещение будет зависеть от направления вида, на котором расположен размер, то берем за основу:
-        var rightDirection = ViewOfPylon.ViewElement.RightDirection;
-        // В зависимости от направления вида рассчитываем смещения
-        if(Math.Abs(rightDirection.Y) == 1) {
-            HorizDimSmallUpTextOffset = new XYZ(rightDirection.X, rightDirection.Y * offsetXY, offsetZSmall);
-            HorizDimSmallUpTextOffsetInverted = new XYZ(rightDirection.X, rightDirection.Y * offsetXY, -offsetZSmall);
-
-            HorizDimSmallDownTextOffset = new XYZ(rightDirection.X, -rightDirection.Y * offsetXY, offsetZSmall);
-            HorizDimSmallDownTextOffsetInverted = new XYZ(rightDirection.X, -rightDirection.Y * offsetXY, -offsetZSmall);
-
-            VertDimTextOffset = new XYZ(rightDirection.X, rightDirection.Y * offsetXY, 0);
-            VertDimTextOffsetInverted = new XYZ(rightDirection.X, -rightDirection.Y * offsetXY, 0);
-        } else {
-            HorizDimSmallUpTextOffset = new XYZ(rightDirection.X * offsetXY, rightDirection.Y, offsetZSmall);
-            HorizDimSmallUpTextOffsetInverted = new XYZ(rightDirection.X * offsetXY, rightDirection.Y, -offsetZSmall);
-
-            HorizDimSmallDownTextOffset = new XYZ(-rightDirection.X * offsetXY, rightDirection.Y, offsetZSmall);
-            HorizDimSmallDownTextOffsetInverted = new XYZ(-rightDirection.X * offsetXY, rightDirection.Y, -offsetZSmall);
-
-            VertDimTextOffset = new XYZ(rightDirection.X * offsetXY, rightDirection.Y, 0);
-            VertDimTextOffsetInverted = new XYZ(-rightDirection.X * offsetXY, rightDirection.Y, 0);
         }
     }
 }

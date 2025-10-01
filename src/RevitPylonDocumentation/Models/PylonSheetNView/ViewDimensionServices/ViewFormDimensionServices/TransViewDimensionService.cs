@@ -16,6 +16,8 @@ using Grid = Autodesk.Revit.DB.Grid;
 namespace RevitPylonDocumentation.Models.PylonSheetNView.ViewDimensionServices.ViewFormDimensionServices;
 internal class TransViewDimensionService {
 
+    private readonly DimensionSegmentsService _dimensionSegmentsService;
+
     internal TransViewDimensionService(MainViewModel mvm, RevitRepository repository, PylonSheetInfo pylonSheetInfo, 
                                        PylonView pylonView) {
         ViewModel = mvm;
@@ -23,21 +25,13 @@ internal class TransViewDimensionService {
         SheetInfo = pylonSheetInfo;
         ViewOfPylon = pylonView;
 
-        FindDimensionTextOffsets();
+        _dimensionSegmentsService = new DimensionSegmentsService(pylonView.ViewElement);
     }
 
     internal MainViewModel ViewModel { get; set; }
     internal RevitRepository Repository { get; set; }
     internal PylonSheetInfo SheetInfo { get; set; }
     internal PylonView ViewOfPylon { get; set; }
-
-    // Смещение для размерного сегмента с маленьким текстом
-    private XYZ HorizDimTextOffset { get; set; }
-    private XYZ VertDimTextOffset { get; set; }
-    // Смещение для размерного сегмента с маленьким текстом инвертированное (зависит от положения в размерной цепочке)
-    private XYZ HorizDimTextOffsetInverted { get; set; }
-    private XYZ VertDimTextOffsetInverted { get; set; }
-
 
     internal void TryCreateDimensions(View view, bool refsForTop, bool pylonFromTop) {
         var doc = Repository.Document;
@@ -197,11 +191,11 @@ internal class TransViewDimensionService {
         if(dimension.NumberOfSegments != 3) { return; }
 
         // Определяем как смотрит размер
-        var dimTextOffset = HorizDimTextOffset;
-        var dimTextOffsetInverted = HorizDimTextOffsetInverted;
+        var dimTextOffset = _dimensionSegmentsService.HorizSmallUpDirectDimTextOffset;
+        var dimTextOffsetInverted = _dimensionSegmentsService.HorizSmallUpInvertedDimTextOffset;
         if(isForVert) {
-            dimTextOffset = VertDimTextOffset;
-            dimTextOffsetInverted = VertDimTextOffsetInverted;
+            dimTextOffset = _dimensionSegmentsService.VertSmallUpDirectDimTextOffset;
+            dimTextOffsetInverted = _dimensionSegmentsService.VertSmallUpInvertedDimTextOffset;
         }
 
         // Размер привязывается к двум противоположным граням пилона и боковым опорным плоскостям армирования
@@ -315,37 +309,6 @@ internal class TransViewDimensionService {
                 var newLine = Line.CreateBound(pt1, pt2);
                 grid.SetCurveInView(DatumExtentType.ViewSpecific, view, newLine);
             }
-        }
-    }
-
-
-    /// <summary>
-    /// Определяем смещения, которые будут использованы для текста размеров с учетом системы координат вида
-    /// </summary>
-    private void FindDimensionTextOffsets() {
-        // Текст в сегментах размера нужно ставить со смещением от стандартного положения на размерной линии
-        // Чтобы он не перекрывал соседние сегменты
-        double offsetXY = -0.3;
-
-        // Т.к. смещение будет зависеть от направления вида, на котором расположен размер, то берем за основу:
-        var upDirection = ViewOfPylon.ViewElement.UpDirection;
-        // В зависимости от направления вида рассчитываем смещения
-        if(Math.Abs(upDirection.Y) == 1) {
-            HorizDimTextOffset = new XYZ(upDirection.X, upDirection.Y * offsetXY, 0);
-            HorizDimTextOffsetInverted = new XYZ(upDirection.X, -upDirection.Y * offsetXY, 0);
-        } else {
-            HorizDimTextOffset = new XYZ(upDirection.X * offsetXY, upDirection.Y, 0);
-            HorizDimTextOffsetInverted = new XYZ(-upDirection.X * offsetXY, upDirection.Y, 0);
-        }
-
-        var rightDirection = ViewOfPylon.ViewElement.RightDirection;
-        // В зависимости от направления вида рассчитываем смещения
-        if(Math.Abs(rightDirection.Y) == 1) {
-            VertDimTextOffset = new XYZ(rightDirection.X, rightDirection.Y * offsetXY, 0);
-            VertDimTextOffsetInverted = new XYZ(rightDirection.X, -rightDirection.Y * offsetXY, 0);
-        } else {
-            VertDimTextOffset = new XYZ(rightDirection.X * offsetXY, rightDirection.Y, 0);
-            VertDimTextOffsetInverted = new XYZ(-rightDirection.X * offsetXY, rightDirection.Y, 0);
         }
     }
 }

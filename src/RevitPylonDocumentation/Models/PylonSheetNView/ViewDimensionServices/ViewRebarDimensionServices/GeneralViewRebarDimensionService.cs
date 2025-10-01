@@ -12,6 +12,8 @@ using RevitPylonDocumentation.ViewModels;
 
 namespace RevitPylonDocumentation.Models.PylonSheetNView.ViewDimensionServices.ViewRebarDimensionServices;
 internal class GeneralViewRebarDimensionService {
+    private readonly DimensionSegmentsService _dimensionSegmentsService;
+    
     internal GeneralViewRebarDimensionService(MainViewModel mvm, RevitRepository repository, 
                                               PylonSheetInfo pylonSheetInfo, PylonView pylonView) {
         ViewModel = mvm;
@@ -19,7 +21,7 @@ internal class GeneralViewRebarDimensionService {
         SheetInfo = pylonSheetInfo;
         ViewOfPylon = pylonView;
 
-        FindDimensionTextOffsets();
+        _dimensionSegmentsService = new DimensionSegmentsService(pylonView.ViewElement);
     }
 
     internal MainViewModel ViewModel { get; set; }
@@ -27,14 +29,6 @@ internal class GeneralViewRebarDimensionService {
     internal PylonSheetInfo SheetInfo { get; set; }
     internal PylonView ViewOfPylon { get; set; }
 
-    // Смещение для размерного сегмента с маленьким текстом
-    private XYZ VertDimSmallTextOffset { get; set; }
-    // Смещение для размерного сегмента с маленьким текстом инвертированное (зависит от положения в размерной цепочке)
-    private XYZ VertDimSmallTextOffsetInverted { get; set; }
-    // Смещение для размерного сегмента с большим текстом
-    private XYZ VertDimBigTextOffset { get; set; }
-    // Смещение для размерного сегмента с большим текстом инвертированное (зависит от положения в размерной цепочке)
-    private XYZ VertDimBigTextOffsetInverted { get; set; }
 
     /// <summary>
     /// Создание размерной цепочки по всем вертикальным стержням арматурного каркаса сверху
@@ -97,7 +91,7 @@ internal class GeneralViewRebarDimensionService {
                 dimensionBaseService.GetDimensionRefs(skeletonParentRebar, '#', '/', ["горизонт", "край", "низ"]);
             // Создаем коллекцию опций изменений будущего размера и добавляем запись про "#_1_горизонт_край_низ"
             var dimSegmentOpts = new List<DimensionSegmentOption> {
-                new DimensionSegmentOption(true, "", VertDimSmallTextOffset)
+                new DimensionSegmentOption(true, "", _dimensionSegmentsService.HorizSmallUpDirectDimTextOffset)
             };
             foreach(var clampsParentRebar in clampsParentRebars) {
                 refArraySide = dimensionBaseService.GetDimensionRefs(clampsParentRebar, '#', '/', ["горизонт"],
@@ -193,12 +187,11 @@ internal class GeneralViewRebarDimensionService {
         // - восьмой сегмент: никак не меняем
 
         // Формируем опцию смещения сегментов размера для семейства хомутов
-        //dimSegmentOpts.Add(new DimensionSegmentOption(true, "", vertDimSmallTextOffset));
         if(additional1 == 1) {
             if(additional1Count > 1) {
                 dimSegmentOpts.Add(new DimensionSegmentOption(true,
                                                               $"{additional1Count - 1}х{additional1Step}=",
-                                                              VertDimBigTextOffset));
+                                                              _dimensionSegmentsService.HorizBigUpDirectDimTextOffset));
             }
             dimSegmentOpts.Add(new DimensionSegmentOption(false));
         }
@@ -210,40 +203,9 @@ internal class GeneralViewRebarDimensionService {
             if(additional2Count > 1) {
                 dimSegmentOpts.Add(new DimensionSegmentOption(true,
                                                               $"{additional2Count - 1}х{additional2Step}=",
-                                                              VertDimBigTextOffsetInverted));
+                                                              _dimensionSegmentsService.HorizBigUpInvertedDimTextOffset));
             }
         }
-        //dimSegmentOpts.Add(new DimensionSegmentOption(true, "", vertDimSmallTextOffsetInverted));
-        //dimSegmentOpts.Add(new DimensionSegmentOption(false));
-
         return dimSegmentOpts;
-    }
-
-    /// <summary>
-    /// Определяем смещения, которые будут использованы для текста размеров с учетом системы координат вида
-    /// </summary>
-    private void FindDimensionTextOffsets() {
-        // Текст в сегментах размера нужно ставить со смещением от стандартного положения на размерной линии
-        // Чтобы он не перекрывал соседние сегменты
-        double offsetXY = -0.3;
-        double offsetZSmall = 0.2;
-        double offsetZBig = 0.6;
-
-        // Т.к. смещение будет зависеть от направления вида, на котором расположен размер, то берем за основу:
-        var rightDirection = ViewOfPylon.ViewElement.RightDirection;
-        // В зависимости от направления вида рассчитываем смещения
-        if(Math.Abs(ViewOfPylon.ViewElement.RightDirection.Y) == 1) {
-            VertDimSmallTextOffset = new XYZ(rightDirection.X, rightDirection.Y * offsetXY, offsetZSmall);
-            VertDimSmallTextOffsetInverted = new XYZ(rightDirection.X, rightDirection.Y * offsetXY, -offsetZSmall);
-
-            VertDimBigTextOffset = new XYZ(rightDirection.X, rightDirection.Y * offsetXY, offsetZBig);
-            VertDimBigTextOffsetInverted = new XYZ(rightDirection.X, rightDirection.Y * offsetXY, -offsetZBig);
-        } else {
-            VertDimSmallTextOffset = new XYZ(rightDirection.X * offsetXY, rightDirection.Y, offsetZSmall);
-            VertDimSmallTextOffsetInverted = new XYZ(rightDirection.X * offsetXY, rightDirection.Y, -offsetZSmall);
-
-            VertDimBigTextOffset = new XYZ(rightDirection.X * offsetXY, rightDirection.Y, offsetZBig);
-            VertDimBigTextOffsetInverted = new XYZ(rightDirection.X * offsetXY, rightDirection.Y, -offsetZBig);
-        }
     }
 }
