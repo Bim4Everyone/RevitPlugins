@@ -12,7 +12,7 @@ using RevitPylonDocumentation.ViewModels;
 
 namespace RevitPylonDocumentation.Models.PylonSheetNView.ViewDimensionServices.ViewFormDimensionServices;
 internal class GeneralViewDimensionService {
-    private readonly DimensionSegmentsService _dimensionSegmentsService;
+    private readonly DimensionSegmentsService _dimSegmentsService;
 
     internal GeneralViewDimensionService(MainViewModel mvm, RevitRepository repository, PylonSheetInfo pylonSheetInfo, 
                                          PylonView pylonView) {
@@ -21,7 +21,7 @@ internal class GeneralViewDimensionService {
         SheetInfo = pylonSheetInfo;
         ViewOfPylon = pylonView;
 
-        _dimensionSegmentsService = new DimensionSegmentsService(ViewOfPylon.ViewElement);
+        _dimSegmentsService = new DimensionSegmentsService(ViewOfPylon.ViewElement);
     }
 
     internal MainViewModel ViewModel { get; set; }
@@ -47,7 +47,9 @@ internal class GeneralViewDimensionService {
             var formRebarDimension = Repository.Document.Create.NewDimension(view, dimensionLineBottomFirst, 
                                                                              refArrayFormworkRebarFront,
                                                                              ViewModel.SelectedDimensionType);
-            EditThreeSegmentsDimension(formRebarDimension);
+            _dimSegmentsService.EditEdgeDimensionSegments(formRebarDimension,
+                                                          _dimSegmentsService.VertSmallUpDirectDimTextOffset,
+                                                          _dimSegmentsService.VertSmallUpInvertedDimTextOffset);
 
             // Смещение для размерной линии для размера положение снизу 3
             var dimensionLineBottomThirdOffset = 1.8;
@@ -82,34 +84,6 @@ internal class GeneralViewDimensionService {
         } catch(Exception) { }
     }
 
-    /// <summary>
-    /// Метод по изменению сегментов размеров (перемещение текста для корректного расположения на виде)
-    /// </summary>
-    private void EditThreeSegmentsDimension(Dimension dimension) {
-        if(dimension.NumberOfSegments != 3) { return; }
-
-        // Размер привязывается к двум противоположным граням пилона и боковым опорным плоскостям армирования
-        // В этом случае в размере будет создано 3 размерных сегмента (между 4-мя плоскостями)
-        // Создаем коллекцию опций изменений размера
-        var dimSegmentOpts = new List<DimensionSegmentOption> {
-            new(true, "", _dimensionSegmentsService.VertSmallUpDirectDimTextOffset),
-            new(false),
-            new(true, "", _dimensionSegmentsService.VertSmallUpInvertedDimTextOffset)
-        };
-        // Применяем опции изменений сегментов размера
-        var dimensionSegments = dimension.Segments;
-        for(int i = 0; i < dimensionSegments.Size; i++) {
-            var dimSegmentMod = dimSegmentOpts[i];
-
-            if(dimSegmentMod.ModificationNeeded) {
-                var segment = dimensionSegments.get_Item(i);
-                segment.Prefix = dimSegmentMod.Prefix;
-
-                var oldTextPosition = segment.TextPosition;
-                segment.TextPosition = oldTextPosition + dimSegmentMod.TextOffset;
-            }
-        }
-    }
 
     private void EditGridEnds(View view, Element rebar, List<Grid> grids, OffsetOption offsetOption,
                               DimensionBaseService dimensionBaseService) {
@@ -285,8 +259,8 @@ internal class GeneralViewDimensionService {
             }
 
             var dimensionLineDirection = DirectionType.Left;
-            var textOffset = _dimensionSegmentsService.HorizSmallUpDirectDimTextOffset;
-            var textOffsetInverted = _dimensionSegmentsService.HorizSmallUpInvertedDimTextOffset;
+            var textOffset = _dimSegmentsService.HorizSmallUpDirectDimTextOffset;
+            var textOffsetInverted = _dimSegmentsService.HorizSmallUpInvertedDimTextOffset;
             // Если этот размер для перпендикулярного вида и Гэшка только справа, то размер нужно ставить слева
             if(isForPerpView && !SheetInfo.RebarInfo.AllRebarAreL 
                              && SheetInfo.RebarInfo.HasLRebar
@@ -294,8 +268,8 @@ internal class GeneralViewDimensionService {
                                                                          SheetInfo.ProjectSection,
                                                                          DirectionType.Left)) {
                 dimensionLineDirection = DirectionType.Right;
-                textOffset = _dimensionSegmentsService.HorizSmallDownDirectDimText;
-                textOffsetInverted = _dimensionSegmentsService.HorizSmallDownInvertedDimTextOffset;
+                textOffset = _dimSegmentsService.HorizSmallDownDirectDimText;
+                textOffsetInverted = _dimSegmentsService.HorizSmallDownInvertedDimTextOffset;
             }
 
             // Создаем коллекцию опций изменений будущего размера
@@ -358,18 +332,7 @@ internal class GeneralViewDimensionService {
                                                         ViewModel.SelectedDimensionType);
 
             // Применяем опции изменений сегментов размера
-            var dimensionSegments = dimensionRebarSide.Segments;
-            for(int i = 0; i < dimensionSegments.Size; i++) {
-                var dimSegmentMod = dimSegmentOpts[i];
-
-                if(dimSegmentMod.ModificationNeeded) {
-                    var segment = dimensionSegments.get_Item(i);
-                    segment.Prefix = dimSegmentMod.Prefix;
-
-                    var oldTextPosition = segment.TextPosition;
-                    segment.TextPosition = oldTextPosition + dimSegmentMod.TextOffset;
-                }
-            }
+            _dimSegmentsService.ApplySegmentsModification(dimensionRebarSide, dimSegmentOpts);
         } catch(Exception) { }
     }
 

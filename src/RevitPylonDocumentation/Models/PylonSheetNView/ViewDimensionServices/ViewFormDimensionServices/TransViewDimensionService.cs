@@ -16,7 +16,7 @@ using Grid = Autodesk.Revit.DB.Grid;
 namespace RevitPylonDocumentation.Models.PylonSheetNView.ViewDimensionServices.ViewFormDimensionServices;
 internal class TransViewDimensionService {
 
-    private readonly DimensionSegmentsService _dimensionSegmentsService;
+    private readonly DimensionSegmentsService _dimSegmentsService;
 
     internal TransViewDimensionService(MainViewModel mvm, RevitRepository repository, PylonSheetInfo pylonSheetInfo, 
                                        PylonView pylonView) {
@@ -25,7 +25,7 @@ internal class TransViewDimensionService {
         SheetInfo = pylonSheetInfo;
         ViewOfPylon = pylonView;
 
-        _dimensionSegmentsService = new DimensionSegmentsService(pylonView.ViewElement);
+        _dimSegmentsService = new DimensionSegmentsService(pylonView.ViewElement);
     }
 
     internal MainViewModel ViewModel { get; set; }
@@ -105,7 +105,11 @@ internal class TransViewDimensionService {
 
             // Изменяем размер, передвигая текст у крайних сегментов для корректного отображения
             foreach(var dimension in vertDimensionsForEdit) {
-                EditThreeSegmentsDimension(dimension, true);
+                //EditThreeSegmentsDimension(dimension, true);
+
+                _dimSegmentsService.EditEdgeDimensionSegments(dimension,
+                                                              _dimSegmentsService.VertSmallUpDirectDimTextOffset,
+                                                              _dimSegmentsService.VertSmallUpInvertedDimTextOffset);
             }
 
             // Определим отступ для размерной линии общего размера по опалубке (если есть верт оси, то будет дальше)
@@ -152,7 +156,9 @@ internal class TransViewDimensionService {
             var formworkRebarDimensionSide = CreateDimension(refArraySide, pylon, DirectionType.Right, 0.6, 
                                                              view, dimensionBaseService, false);
             // Изменяем размер, передвигая текст у крайних сегментов для корректного отображения
-            EditThreeSegmentsDimension(formworkRebarDimensionSide, false);
+            _dimSegmentsService.EditEdgeDimensionSegments(formworkRebarDimensionSide,
+                                                          _dimSegmentsService.HorizSmallUpDirectDimTextOffset,
+                                                          _dimSegmentsService.HorizSmallUpInvertedDimTextOffset);
 
             // Размер по ТОРЦУ опалубка (положение справа дальнее)
             CreateDimension(refArrayFormworkSide, pylon, DirectionType.Right, 1, view, dimensionBaseService);
@@ -183,44 +189,6 @@ internal class TransViewDimensionService {
             }
         } catch(Exception) { }
     }
-
-    /// <summary>
-    /// Метод по изменению сегментов размеров (перемещение текста для корректного расположения на виде)
-    /// </summary>
-    private void EditThreeSegmentsDimension(Dimension dimension, bool isForVert) {
-        if(dimension.NumberOfSegments != 3) { return; }
-
-        // Определяем как смотрит размер
-        var dimTextOffset = _dimensionSegmentsService.HorizSmallUpDirectDimTextOffset;
-        var dimTextOffsetInverted = _dimensionSegmentsService.HorizSmallUpInvertedDimTextOffset;
-        if(isForVert) {
-            dimTextOffset = _dimensionSegmentsService.VertSmallUpDirectDimTextOffset;
-            dimTextOffsetInverted = _dimensionSegmentsService.VertSmallUpInvertedDimTextOffset;
-        }
-
-        // Размер привязывается к двум противоположным граням пилона и боковым опорным плоскостям армирования
-        // В этом случае в размере будет создано 3 размерных сегмента (между 4-мя плоскостями)
-        // Создаем коллекцию опций изменений размера
-        var dimSegmentOpts = new List<DimensionSegmentOption> {
-            new(true, "", dimTextOffset),
-            new(false),
-            new(true, "", dimTextOffsetInverted)
-        };
-        // Применяем опции изменений сегментов размера
-        var dimensionSegments = dimension.Segments;
-        for(int i = 0; i < dimensionSegments.Size; i++) {
-            var dimSegmentMod = dimSegmentOpts[i];
-
-            if(dimSegmentMod.ModificationNeeded) {
-                var segment = dimensionSegments.get_Item(i);
-                segment.Prefix = dimSegmentMod.Prefix;
-
-                var oldTextPosition = segment.TextPosition;
-                segment.TextPosition = oldTextPosition + dimSegmentMod.TextOffset;
-            }
-        }
-    }
-
 
     private Dimension CreateDimension(Element dimensioningElement, Element elemForOffset,
                                  DirectionType directionType, double offsetCoefficient,

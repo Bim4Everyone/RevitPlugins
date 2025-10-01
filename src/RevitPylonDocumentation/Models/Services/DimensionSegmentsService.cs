@@ -1,6 +1,10 @@
 using System;
+using System.Collections.Generic;
+using System.Linq;
 
 using Autodesk.Revit.DB;
+
+using RevitPylonDocumentation.Models.PluginOptions;
 
 namespace RevitPylonDocumentation.Models.Services;
 internal class DimensionSegmentsService {
@@ -69,6 +73,43 @@ internal class DimensionSegmentsService {
             } else {
                 HorizSmallUpDirectDimTextOffset = new XYZ(upDirection.X * _offsetXY, upDirection.Y, 0);
                 HorizSmallUpInvertedDimTextOffset = new XYZ(-upDirection.X * _offsetXY, upDirection.Y, 0);
+            }
+        }
+    }
+
+
+    /// <summary>
+    /// Изменяет крайние сегменты размера
+    /// </summary>
+    public void EditEdgeDimensionSegments(Dimension dimension, XYZ leftDimTextOffset, XYZ rightDimTextOffset) {
+        if(dimension.NumberOfSegments < 3) { return; }
+
+        // Создаем коллекцию опций изменений размера
+        var defOption = new DimensionSegmentOption(false);
+
+        var dimSegmentOpts = new List<DimensionSegmentOption>();
+        dimSegmentOpts.Add(new(true, "", leftDimTextOffset));
+        dimSegmentOpts.AddRange(Enumerable.Repeat(defOption, dimension.NumberOfSegments - 2));
+        dimSegmentOpts.Add(new(true, "", rightDimTextOffset));
+        // Применяем изменения
+        ApplySegmentsModification(dimension, dimSegmentOpts);
+    }
+
+
+    public void ApplySegmentsModification(Dimension dimension, List<DimensionSegmentOption> dimSegmentOpts) {
+        if(dimension.NumberOfSegments < dimSegmentOpts.Count) { return; }
+
+        // Применяем опции изменений сегментов размера
+        var dimensionSegments = dimension.Segments;
+        for(int i = 0; i < dimensionSegments.Size; i++) {
+            var dimSegmentMod = dimSegmentOpts[i];
+
+            if(dimSegmentMod.ModificationNeeded) {
+                var segment = dimensionSegments.get_Item(i);
+                segment.Prefix = dimSegmentMod.Prefix;
+
+                var oldTextPosition = segment.TextPosition;
+                segment.TextPosition = oldTextPosition + dimSegmentMod.TextOffset;
             }
         }
     }

@@ -12,7 +12,7 @@ using RevitPylonDocumentation.ViewModels;
 
 namespace RevitPylonDocumentation.Models.PylonSheetNView.ViewDimensionServices.ViewRebarDimensionServices;
 internal class GeneralViewRebarDimensionService {
-    private readonly DimensionSegmentsService _dimensionSegmentsService;
+    private readonly DimensionSegmentsService _dimSegmentsService;
     
     internal GeneralViewRebarDimensionService(MainViewModel mvm, RevitRepository repository, 
                                               PylonSheetInfo pylonSheetInfo, PylonView pylonView) {
@@ -21,7 +21,7 @@ internal class GeneralViewRebarDimensionService {
         SheetInfo = pylonSheetInfo;
         ViewOfPylon = pylonView;
 
-        _dimensionSegmentsService = new DimensionSegmentsService(pylonView.ViewElement);
+        _dimSegmentsService = new DimensionSegmentsService(pylonView.ViewElement);
     }
 
     internal MainViewModel ViewModel { get; set; }
@@ -91,7 +91,7 @@ internal class GeneralViewRebarDimensionService {
                 dimensionBaseService.GetDimensionRefs(skeletonParentRebar, '#', '/', ["горизонт", "край", "низ"]);
             // Создаем коллекцию опций изменений будущего размера и добавляем запись про "#_1_горизонт_край_низ"
             var dimSegmentOpts = new List<DimensionSegmentOption> {
-                new DimensionSegmentOption(true, "", _dimensionSegmentsService.HorizSmallUpDirectDimTextOffset)
+                new DimensionSegmentOption(true, "", _dimSegmentsService.HorizSmallUpDirectDimTextOffset)
             };
             foreach(var clampsParentRebar in clampsParentRebars) {
                 refArraySide = dimensionBaseService.GetDimensionRefs(clampsParentRebar, '#', '/', ["горизонт"],
@@ -122,18 +122,7 @@ internal class GeneralViewRebarDimensionService {
                 Repository.Document.Create.NewDimension(ViewOfPylon.ViewElement, dimensionLineLeft, refArraySide,
                                                         ViewModel.SelectedDimensionType);
             // Применяем опции изменений сегментов размера
-            var dimensionSegments = dimensionRebarSide.Segments;
-            for(int i = 0; i < dimensionSegments.Size; i++) {
-                var dimSegmentMod = dimSegmentOpts[i];
-
-                if(dimSegmentMod.ModificationNeeded) {
-                    var segment = dimensionSegments.get_Item(i);
-                    segment.Prefix = dimSegmentMod.Prefix;
-
-                    var oldTextPosition = segment.TextPosition;
-                    segment.TextPosition = oldTextPosition + dimSegmentMod.TextOffset;
-                }
-            }
+            _dimSegmentsService.ApplySegmentsModification(dimensionRebarSide, dimSegmentOpts);
         } catch(Exception) { }
     }
 
@@ -191,7 +180,7 @@ internal class GeneralViewRebarDimensionService {
             if(additional1Count > 1) {
                 dimSegmentOpts.Add(new DimensionSegmentOption(true,
                                                               $"{additional1Count - 1}х{additional1Step}=",
-                                                              _dimensionSegmentsService.HorizBigUpDirectDimTextOffset));
+                                                              _dimSegmentsService.HorizBigUpDirectDimTextOffset));
             }
             dimSegmentOpts.Add(new DimensionSegmentOption(false));
         }
@@ -203,7 +192,7 @@ internal class GeneralViewRebarDimensionService {
             if(additional2Count > 1) {
                 dimSegmentOpts.Add(new DimensionSegmentOption(true,
                                                               $"{additional2Count - 1}х{additional2Step}=",
-                                                              _dimensionSegmentsService.HorizBigUpInvertedDimTextOffset));
+                                                              _dimSegmentsService.HorizBigUpInvertedDimTextOffset));
             }
         }
         return dimSegmentOpts;
