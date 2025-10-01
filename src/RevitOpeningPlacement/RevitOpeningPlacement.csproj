@@ -2,6 +2,7 @@
 	<PropertyGroup>
 		<UseDevExpress>true</UseDevExpress>
 		<UseRevitClashes>true</UseRevitClashes>
+		<LangVersion>12</LangVersion>
 	</PropertyGroup>
 	
 	<ItemGroup>

@@ -8,87 +8,68 @@ using dosymep.Bim4Everyone.SimpleServices;
 
 using RevitOpeningPlacement.Models;
 
-namespace RevitOpeningPlacement.Services {
-    internal class DocTypesHandler : IDocTypesHandler {
-        private readonly IBimModelPartsService _bimModelPartsService;
+namespace RevitOpeningPlacement.Services;
+internal class DocTypesHandler : IDocTypesHandler {
+    private readonly IBimModelPartsService _bimModelPartsService;
 
-        public DocTypesHandler(IBimModelPartsService bimModelPartsService) {
-            _bimModelPartsService = bimModelPartsService
-                ?? throw new ArgumentNullException(nameof(bimModelPartsService));
+    public DocTypesHandler(IBimModelPartsService bimModelPartsService) {
+        _bimModelPartsService = bimModelPartsService
+            ?? throw new ArgumentNullException(nameof(bimModelPartsService));
+    }
+
+
+    public ICollection<BimModelPart> GetBimModelParts(DocTypeEnum docType) {
+        return docType switch {
+            DocTypeEnum.AR => new BimModelPart[] { BimModelPart.ARPart },
+            DocTypeEnum.KR => new BimModelPart[] { BimModelPart.KRPart, BimModelPart.KMPart },
+            DocTypeEnum.MEP => new BimModelPart[] {
+                    BimModelPart.OVPart,
+                    BimModelPart.ITPPart,
+                    BimModelPart.HCPart,
+                    BimModelPart.VKPart,
+                    BimModelPart.EOMPart,
+                    BimModelPart.EGPart,
+                    BimModelPart.SSPart,
+                    BimModelPart.VNPart,
+                    BimModelPart.KVPart,
+                    BimModelPart.OTPart,
+                    BimModelPart.DUPart,
+                    BimModelPart.VSPart,
+                    BimModelPart.KNPart,
+                    BimModelPart.PTPart,
+                    BimModelPart.EOPart,
+                    BimModelPart.EMPart },
+            DocTypeEnum.KOORD => new BimModelPart[] { BimModelPart.KOORDPart },
+            DocTypeEnum.NotDefined => Array.Empty<BimModelPart>(),
+            _ => throw new InvalidOperationException(),
+        };
+    }
+
+    public DocTypeEnum GetDocType(RevitLinkType linkType) {
+        return linkType is null ? throw new ArgumentNullException(nameof(linkType)) : GetDocType(linkType.Name);
+    }
+
+    public DocTypeEnum GetDocType(Document document) {
+        return document is null ? throw new ArgumentNullException(nameof(document)) : GetDocType(document.Title);
+    }
+
+    private DocTypeEnum GetDocType(string documentName) {
+        if(string.IsNullOrWhiteSpace(documentName)) {
+            throw new ArgumentException(nameof(documentName));
         }
 
-
-        public ICollection<BimModelPart> GetBimModelParts(DocTypeEnum docType) {
-            switch(docType) {
-                case DocTypeEnum.AR:
-                    return new BimModelPart[] { BimModelPart.ARPart };
-                case DocTypeEnum.KR:
-                    return new BimModelPart[] { BimModelPart.KRPart, BimModelPart.KMPart };
-                case DocTypeEnum.MEP:
-                    return new BimModelPart[] {
-                        BimModelPart.OVPart,
-                        BimModelPart.ITPPart,
-                        BimModelPart.HCPart,
-                        BimModelPart.VKPart,
-                        BimModelPart.EOMPart,
-                        BimModelPart.EGPart,
-                        BimModelPart.SSPart,
-                        BimModelPart.VNPart,
-                        BimModelPart.KVPart,
-                        BimModelPart.OTPart,
-                        BimModelPart.DUPart,
-                        BimModelPart.VSPart,
-                        BimModelPart.KNPart,
-                        BimModelPart.PTPart,
-                        BimModelPart.EOPart,
-                        BimModelPart.EMPart };
-                case DocTypeEnum.KOORD:
-                    return new BimModelPart[] { BimModelPart.KOORDPart };
-                case DocTypeEnum.NotDefined:
-                    return Array.Empty<BimModelPart>();
-                default:
-                    throw new InvalidOperationException();
-            }
+        if(_bimModelPartsService.InAnyBimModelParts(documentName, GetBimModelParts(DocTypeEnum.AR))) {
+            return DocTypeEnum.AR;
         }
 
-        public DocTypeEnum GetDocType(RevitLinkType linkType) {
-            if(linkType is null) {
-                throw new ArgumentNullException(nameof(linkType));
-            }
-
-            return GetDocType(linkType.Name);
+        if(_bimModelPartsService.InAnyBimModelParts(documentName, GetBimModelParts(DocTypeEnum.KR))) {
+            return DocTypeEnum.KR;
         }
 
-        public DocTypeEnum GetDocType(Document document) {
-            if(document is null) {
-                throw new ArgumentNullException(nameof(document));
-            }
-
-            return GetDocType(document.Title);
-        }
-
-        private DocTypeEnum GetDocType(string documentName) {
-            if(string.IsNullOrWhiteSpace(documentName)) {
-                throw new ArgumentException(nameof(documentName));
-            }
-
-            if(_bimModelPartsService.InAnyBimModelParts(documentName, GetBimModelParts(DocTypeEnum.AR))) {
-                return DocTypeEnum.AR;
-            }
-
-            if(_bimModelPartsService.InAnyBimModelParts(documentName, GetBimModelParts(DocTypeEnum.KR))) {
-                return DocTypeEnum.KR;
-            }
-
-            if(_bimModelPartsService.InAnyBimModelParts(documentName, GetBimModelParts(DocTypeEnum.MEP))) {
-                return DocTypeEnum.MEP;
-            }
-
-            if(_bimModelPartsService.InAnyBimModelParts(documentName, GetBimModelParts(DocTypeEnum.KOORD))) {
-                return DocTypeEnum.KOORD;
-            }
-
-            return DocTypeEnum.NotDefined;
-        }
+        return _bimModelPartsService.InAnyBimModelParts(documentName, GetBimModelParts(DocTypeEnum.MEP))
+            ? DocTypeEnum.MEP
+            : _bimModelPartsService.InAnyBimModelParts(documentName, GetBimModelParts(DocTypeEnum.KOORD))
+            ? DocTypeEnum.KOORD
+            : DocTypeEnum.NotDefined;
     }
 }

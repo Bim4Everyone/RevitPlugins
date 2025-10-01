@@ -1,18 +1,17 @@
 using Autodesk.Revit.DB;
 
-namespace RevitOpeningPlacement.Models.Interfaces {
+namespace RevitOpeningPlacement.Models.Interfaces;
+/// <summary>
+/// Хост задания на отверстие или хост чистового отверстия
+/// </summary>
+internal interface IOpeningHost {
     /// <summary>
-    /// Хост задания на отверстие или хост чистового отверстия
+    /// Название хоста
     /// </summary>
-    internal interface IOpeningHost {
-        /// <summary>
-        /// Название хоста
-        /// </summary>
-        string Name { get; }
+    string Name { get; }
 
-        /// <summary>
-        /// Id хоста
-        /// </summary>
-        ElementId Id { get; }
-    }
+    /// <summary>
+    /// Id хоста
+    /// </summary>
+    ElementId Id { get; }
 }

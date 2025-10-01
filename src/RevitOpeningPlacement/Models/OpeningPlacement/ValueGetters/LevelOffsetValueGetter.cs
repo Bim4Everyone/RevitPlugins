@@ -4,20 +4,19 @@ using RevitClashDetective.Models.Value;
 
 using RevitOpeningPlacement.Models.Interfaces;
 
-namespace RevitOpeningPlacement.Models.OpeningPlacement.ValueGetters {
-    internal class LevelOffsetValueGetter : IValueGetter<DoubleParamValue> {
-        private readonly ILevelFinder _levelFinder;
+namespace RevitOpeningPlacement.Models.OpeningPlacement.ValueGetters;
+internal class LevelOffsetValueGetter : IValueGetter<DoubleParamValue> {
+    private readonly ILevelFinder _levelFinder;
 
-        /// <summary>
-        /// Класс, предоставляющий значение отметки уровня, на котором размещается отверстие, в единицах Revit
-        /// </summary>
-        /// <exception cref="ArgumentNullException">Исключение, если обязательный параметр null</exception>
-        public LevelOffsetValueGetter(ILevelFinder levelFinder) {
-            _levelFinder = levelFinder ?? throw new ArgumentNullException(nameof(levelFinder));
-        }
+    /// <summary>
+    /// Класс, предоставляющий значение отметки уровня, на котором размещается отверстие, в единицах Revit
+    /// </summary>
+    /// <exception cref="ArgumentNullException">Исключение, если обязательный параметр null</exception>
+    public LevelOffsetValueGetter(ILevelFinder levelFinder) {
+        _levelFinder = levelFinder ?? throw new ArgumentNullException(nameof(levelFinder));
+    }
 
-        public DoubleParamValue GetValue() {
-            return new DoubleParamValue(_levelFinder.GetLevel().Elevation);
-        }
+    public DoubleParamValue GetValue() {
+        return new DoubleParamValue(_levelFinder.GetLevel().Elevation);
     }
 }

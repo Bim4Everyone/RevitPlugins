@@ -16,46 +16,44 @@ using RevitOpeningPlacement.Models.Configs;
 using RevitOpeningPlacement.ViewModels.OpeningConfig;
 using RevitOpeningPlacement.Views;
 
-namespace RevitOpeningPlacement {
-    /// <summary>
-    /// Команда для задания настроек расстановки чистовых отверстий в файле КР
-    /// </summary>
-    [Transaction(TransactionMode.Manual)]
-    internal class SetOpeningRealsKrPlacementConfigCmd : BasePluginCommand {
-        public SetOpeningRealsKrPlacementConfigCmd() {
-            PluginName = "Настройки расстановки отверстий КР";
-        }
+namespace RevitOpeningPlacement;
+/// <summary>
+/// Команда для задания настроек расстановки чистовых отверстий в файле КР
+/// </summary>
+[Transaction(TransactionMode.Manual)]
+internal class SetOpeningRealsKrPlacementConfigCmd : BasePluginCommand {
+    public SetOpeningRealsKrPlacementConfigCmd() {
+        PluginName = "Настройки расстановки отверстий КР";
+    }
 
 
-        public void ExecuteCommand(UIApplication uiApplication) {
-            Execute(uiApplication);
-        }
+    public void ExecuteCommand(UIApplication uiApplication) {
+        Execute(uiApplication);
+    }
 
 
-        protected override void Execute(UIApplication uiApplication) {
-            using(IKernel kernel = uiApplication.CreatePlatformServices()) {
-                kernel.Bind<RevitRepository>()
-                    .ToSelf()
-                    .InSingletonScope();
-                kernel.Bind<RevitClashDetective.Models.RevitRepository>()
-                    .ToSelf()
-                    .InSingletonScope();
-                kernel.Bind<RevitEventHandler>()
-                    .ToSelf()
-                    .InSingletonScope();
-                kernel.Bind<ParameterFilterProvider>()
-                    .ToSelf()
-                    .InSingletonScope();
+    protected override void Execute(UIApplication uiApplication) {
+        using var kernel = uiApplication.CreatePlatformServices();
+        kernel.Bind<RevitRepository>()
+            .ToSelf()
+            .InSingletonScope();
+        kernel.Bind<RevitClashDetective.Models.RevitRepository>()
+            .ToSelf()
+            .InSingletonScope();
+        kernel.Bind<RevitEventHandler>()
+            .ToSelf()
+            .InSingletonScope();
+        kernel.Bind<ParameterFilterProvider>()
+            .ToSelf()
+            .InSingletonScope();
 
-                var revitRepository = kernel.Get<RevitRepository>();
-                var openingConfig = OpeningRealsKrConfig.GetOpeningConfig(revitRepository.Doc);
-                var viewModel = new OpeningRealsKrConfigViewModel(revitRepository, openingConfig);
+        var revitRepository = kernel.Get<RevitRepository>();
+        var openingConfig = OpeningRealsKrConfig.GetOpeningConfig(revitRepository.Doc);
+        var viewModel = new OpeningRealsKrConfigViewModel(revitRepository, openingConfig);
 
-                var window = new OpeningRealsKrSettingsView() { Title = PluginName, DataContext = viewModel };
-                var helper = new WindowInteropHelper(window) { Owner = uiApplication.MainWindowHandle };
+        var window = new OpeningRealsKrSettingsView() { Title = PluginName, DataContext = viewModel };
+        var helper = new WindowInteropHelper(window) { Owner = uiApplication.MainWindowHandle };
 
-                window.ShowDialog();
-            }
-        }
+        window.ShowDialog();
     }
 }

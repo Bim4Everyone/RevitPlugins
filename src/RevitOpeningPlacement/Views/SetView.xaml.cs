@@ -1,9 +1,8 @@
-﻿using System.Windows.Controls;
+using System.Windows.Controls;
 
-namespace RevitOpeningPlacement.Views {
-    public partial class SetView : UserControl {
-        public SetView() {
-            InitializeComponent();
-        }
+namespace RevitOpeningPlacement.Views;
+public partial class SetView : UserControl {
+    public SetView() {
+        InitializeComponent();
     }
 }

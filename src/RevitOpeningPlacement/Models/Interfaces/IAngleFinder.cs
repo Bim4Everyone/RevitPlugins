@@ -1,7 +1,6 @@
-﻿using RevitOpeningPlacement.Models.OpeningPlacement.AngleFinders;
+using RevitOpeningPlacement.Models.OpeningPlacement.AngleFinders;
 
-namespace RevitOpeningPlacement.Models.Interfaces {
-    internal interface IAngleFinder {
-        Rotates GetAngle();
-    }
+namespace RevitOpeningPlacement.Models.Interfaces;
+internal interface IAngleFinder {
+    Rotates GetAngle();
 }

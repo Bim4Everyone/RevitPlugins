@@ -1,20 +1,19 @@
-﻿using RevitClashDetective.Models.Value;
+using RevitClashDetective.Models.Value;
 
 using RevitOpeningPlacement.Models.Interfaces;
 
-namespace RevitOpeningPlacement.Models.OpeningPlacement.ValueGetters {
+namespace RevitOpeningPlacement.Models.OpeningPlacement.ValueGetters;
+/// <summary>
+/// Класс, предоставляющий значение параметра <see cref="RevitRepository.OpeningIsManuallyPlaced"/>
+/// </summary>
+internal class IsManuallyPlacedValueGetter : IValueGetter<IntParamValue> {
     /// <summary>
-    /// Класс, предоставляющий значение параметра <see cref="RevitRepository.OpeningIsManuallyPlaced"/>
+    /// Конструктор класса, предоставляющего значение параметра <see cref="RevitRepository.OpeningIsManuallyPlaced"/>
     /// </summary>
-    internal class IsManuallyPlacedValueGetter : IValueGetter<IntParamValue> {
-        /// <summary>
-        /// Конструктор класса, предоставляющего значение параметра <see cref="RevitRepository.OpeningIsManuallyPlaced"/>
-        /// </summary>
-        public IsManuallyPlacedValueGetter() { }
+    public IsManuallyPlacedValueGetter() { }
 
 
-        public IntParamValue GetValue() {
-            return new IntParamValue(0);
-        }
+    public IntParamValue GetValue() {
+        return new IntParamValue(0);
     }
 }
