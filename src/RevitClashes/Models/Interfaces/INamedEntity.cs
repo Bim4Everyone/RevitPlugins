@@ -1,5 +1,4 @@
-﻿namespace RevitClashDetective.Models.Interfaces {
-    internal interface INamedEntity {
-        string Name { get; set; }
-    }
+namespace RevitClashDetective.Models.Interfaces;
+internal interface INamedEntity {
+    string Name { get; set; }
 }

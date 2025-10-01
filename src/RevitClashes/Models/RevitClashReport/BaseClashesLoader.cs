@@ -2,32 +2,27 @@ using System.Text.RegularExpressions;
 
 using Autodesk.Revit.DB;
 
-namespace RevitClashDetective.Models.RevitClashReport {
-    internal abstract class BaseClashesLoader {
-        protected BaseClashesLoader() { }
+namespace RevitClashDetective.Models.RevitClashReport;
+internal abstract class BaseClashesLoader {
+    protected BaseClashesLoader() { }
 
 
-        /// <summary>
-        /// Возвращает Id или InvalidElementId, если не удалось преобразовать строку
-        /// </summary>
-        private protected ElementId GetId(string idString) {
-            if(string.IsNullOrWhiteSpace(idString)) { return ElementId.InvalidElementId; }
+    /// <summary>
+    /// Р’РѕР·РІСЂР°С‰Р°РµС‚ Id РёР»Рё InvalidElementId, РµСЃР»Рё РЅРµ СѓРґР°Р»РѕСЃСЊ РїСЂРµРѕР±СЂР°Р·РѕРІР°С‚СЊ СЃС‚СЂРѕРєСѓ
+    /// </summary>
+    private protected ElementId GetId(string idString) {
+        if(string.IsNullOrWhiteSpace(idString)) { return ElementId.InvalidElementId; }
 
-            var match = Regex.Match(idString, @"(?'id'\d+)");
-            if(match.Success) {
-                string stringId = match.Groups["id"].Value;
+        var match = Regex.Match(idString, @"(?'id'\d+)");
+        if(match.Success) {
+            string stringId = match.Groups["id"].Value;
 #if REVIT_2023_OR_LESS
-                bool successParse = int.TryParse(stringId, out int numericId);
+            bool successParse = int.TryParse(stringId, out int numericId);
 #else
-                bool successParse = long.TryParse(stringId, out long numericId);
+            bool successParse = long.TryParse(stringId, out long numericId);
 #endif
-                if(successParse) {
-                    return new ElementId(numericId);
-                } else {
-                    return ElementId.InvalidElementId;
-                }
-            }
-            return ElementId.InvalidElementId;
+            return successParse ? new ElementId(numericId) : ElementId.InvalidElementId;
         }
+        return ElementId.InvalidElementId;
     }
 }

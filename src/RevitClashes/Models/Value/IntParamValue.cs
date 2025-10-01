@@ -1,4 +1,4 @@
-﻿
+
 using Autodesk.Revit.DB;
 
 using dosymep.Bim4Everyone;
@@ -6,31 +6,28 @@ using dosymep.Revit;
 
 using RevitClashDetective.Models.Interfaces;
 
-namespace RevitClashDetective.Models.Value {
-    internal class IntParamValue : ParamValue<int> {
-        public IntParamValue() {
+namespace RevitClashDetective.Models.Value;
+internal class IntParamValue : ParamValue<int> {
+    public IntParamValue() {
 
-        }
+    }
 
-        public IntParamValue(int value, string stringValue) : base(value, stringValue) {
+    public IntParamValue(int value, string stringValue) : base(value, stringValue) {
 
-        }
+    }
 
-        public IntParamValue(int value) : base(value) {
+    public IntParamValue(int value) : base(value) {
 
-        }
+    }
 
-        public override FilterRule GetFilterRule(IVisiter visiter, Document doc, RevitParam param) {
-            var paramId = GetParamId(doc, param);
-            if(paramId == ElementId.InvalidElementId)
-                return null;
-            return visiter.Create(paramId, TValue);
-        }
+    public override FilterRule GetFilterRule(IVisiter visiter, Document doc, RevitParam param) {
+        var paramId = GetParamId(doc, param);
+        return paramId == ElementId.InvalidElementId ? null : visiter.Create(paramId, TValue);
+    }
 
-        public override void SetParamValue(Element element, string paramName) {
-            if(element.IsExistsParam(paramName)) {
-                element.SetParamValue(paramName, TValue);
-            }
+    public override void SetParamValue(Element element, string paramName) {
+        if(element.IsExistsParam(paramName)) {
+            element.SetParamValue(paramName, TValue);
         }
     }
 }

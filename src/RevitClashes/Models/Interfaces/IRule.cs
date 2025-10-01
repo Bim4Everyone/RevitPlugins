@@ -1,4 +1,3 @@
-﻿namespace RevitClashDetective.Models.Interfaces {
-    interface IRule {
-    }
+namespace RevitClashDetective.Models.Interfaces;
+internal interface IRule {
 }
