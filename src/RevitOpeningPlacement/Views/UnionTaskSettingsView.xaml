@@ -72,7 +72,7 @@
                 Width="80"
                 Margin="0 0 10 0"
                 IsDefault="True"
-                Click="ButtonOk_Click"/>
+                Click="ButtonOk_Click" />
             <dx:SimpleButton
                 Content="Отмена"
                 Height="25"

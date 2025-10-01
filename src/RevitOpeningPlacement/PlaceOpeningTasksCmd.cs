@@ -32,303 +32,297 @@ using RevitOpeningPlacement.ViewModels.Links;
 using RevitOpeningPlacement.ViewModels.ReportViewModel;
 using RevitOpeningPlacement.Views;
 
-namespace RevitOpeningPlacement {
+namespace RevitOpeningPlacement;
+/// <summary>
+/// Команда для размещения заданий на отверстия в файле ВИС.
+/// </summary>
+[Transaction(TransactionMode.Manual)]
+public class PlaceOpeningTasksCmd : BasePluginCommand {
+    private readonly int _progressBarStepValue = 25;
+
     /// <summary>
-    /// Команда для размещения заданий на отверстия в файле ВИС.
+    /// Id элементов которые выдают предупреждение дублирования в Revit и которые нужно удалить
     /// </summary>
-    [Transaction(TransactionMode.Manual)]
-    public class PlaceOpeningTasksCmd : BasePluginCommand {
-        private readonly int _progressBarStepValue = 25;
-
-        /// <summary>
-        /// Id элементов которые выдают предупреждение дублирования в Revit и которые нужно удалить
-        /// </summary>
-        private readonly HashSet<ElementId> _duplicatedInstancesToRemoveIds = new HashSet<ElementId>();
+    private readonly HashSet<ElementId> _duplicatedInstancesToRemoveIds = [];
 
 
-        public PlaceOpeningTasksCmd() {
-            PluginName = "Расстановка заданий на отверстия";
+    public PlaceOpeningTasksCmd() {
+        PluginName = "Расстановка заданий на отверстия";
+    }
+
+
+    protected override void Execute(UIApplication uiApplication) {
+        using var kernel = uiApplication.CreatePlatformServices();
+        kernel.Bind<IDocTypesProvider>()
+            .ToMethod(c => {
+                return new DocTypesProvider(new DocTypeEnum[] { DocTypeEnum.AR, DocTypeEnum.KR });
+            })
+            .InSingletonScope();
+        kernel.Bind<IRevitLinkTypesSetter>()
+            .To<UserSelectedLinksSetter>()
+            .InTransientScope();
+        kernel.Bind<IDocTypesHandler>()
+            .To<DocTypesHandler>()
+            .InSingletonScope();
+        kernel.Bind<RevitRepository>()
+            .ToSelf()
+            .InSingletonScope();
+        kernel.Bind<RevitClashDetective.Models.RevitRepository>()
+            .ToSelf()
+            .InSingletonScope();
+        kernel.Bind<RevitEventHandler>()
+            .ToSelf()
+            .InSingletonScope();
+        kernel.Bind<ParameterFilterProvider>()
+            .ToSelf()
+            .InSingletonScope();
+        kernel.Bind<LinksSelectorViewModel>()
+            .ToSelf()
+            .InTransientScope();
+        kernel.Bind<LinksSelectorWindow>()
+            .ToSelf()
+            .InTransientScope()
+            .WithPropertyValue(nameof(Window.DataContext),
+                c => c.Kernel.Get<LinksSelectorViewModel>());
+
+        kernel.Get<IRevitLinkTypesSetter>().SetRevitLinkTypes();
+
+        var revitRepository = kernel.Get<RevitRepository>();
+        PlaceOpeningTasks(uiApplication, revitRepository, Array.Empty<ElementId>());
+    }
+
+    private protected void PlaceOpeningTasks(
+        UIApplication uiApplication,
+        RevitRepository revitRepository,
+        ElementId[] mepElements) {
+
+        _duplicatedInstancesToRemoveIds.Clear();
+        if(!ModelCorrect(revitRepository)) {
+            throw new OperationCanceledException();
+        }
+        if(!revitRepository.ContinueIfTaskFamiliesNotLatest()) {
+            throw new OperationCanceledException();
+        }
+        var openingConfig = OpeningConfig.GetOpeningConfig(revitRepository.Doc);
+        if(openingConfig.Categories.Count > 0) {
+            var placementConfigurator = new PlacementConfigurator(revitRepository, openingConfig.Categories);
+            var placers = placementConfigurator.GetPlacersMepOutcomingTasks(mepElements)
+                                               .ToList();
+            uiApplication.Application.FailuresProcessing += FailureProcessor;
+            try {
+                var unplacedClashes = InitializePlacing(revitRepository, placers, openingConfig)
+                    .Concat(placementConfigurator.GetUnplacedClashes());
+                if(openingConfig.ShowPlacingErrors) {
+                    InitializeReport(revitRepository, unplacedClashes);
+                }
+            } finally {
+                uiApplication.Application.FailuresProcessing -= FailureProcessor;
+            }
+        }
+        _duplicatedInstancesToRemoveIds.Clear();
+    }
+
+    private bool ModelCorrect(RevitRepository revitRepository) {
+        var checker = new Checkers(revitRepository);
+        var errors = checker.GetErrorTexts();
+        if(errors == null || errors.Count == 0) {
+            return true;
         }
 
+        TaskDialog.Show("BIM", $"{string.Join($"{Environment.NewLine}", errors)}");
+        return false;
+    }
 
-        protected override void Execute(UIApplication uiApplication) {
-            using(IKernel kernel = uiApplication.CreatePlatformServices()) {
-                kernel.Bind<IDocTypesProvider>()
-                    .ToMethod(c => {
-                        return new DocTypesProvider(new DocTypeEnum[] { DocTypeEnum.AR, DocTypeEnum.KR });
-                    })
-                    .InSingletonScope();
-                kernel.Bind<IRevitLinkTypesSetter>()
-                    .To<UserSelectedLinksSetter>()
-                    .InTransientScope();
-                kernel.Bind<IDocTypesHandler>()
-                    .To<DocTypesHandler>()
-                    .InSingletonScope();
-                kernel.Bind<RevitRepository>()
-                    .ToSelf()
-                    .InSingletonScope();
-                kernel.Bind<RevitClashDetective.Models.RevitRepository>()
-                    .ToSelf()
-                    .InSingletonScope();
-                kernel.Bind<RevitEventHandler>()
-                    .ToSelf()
-                    .InSingletonScope();
-                kernel.Bind<ParameterFilterProvider>()
-                    .ToSelf()
-                    .InSingletonScope();
-                kernel.Bind<LinksSelectorViewModel>()
-                    .ToSelf()
-                    .InTransientScope();
-                kernel.Bind<LinksSelectorWindow>()
-                    .ToSelf()
-                    .InTransientScope()
-                    .WithPropertyValue(nameof(Window.DataContext),
-                        c => c.Kernel.Get<LinksSelectorViewModel>());
-
-                kernel.Get<IRevitLinkTypesSetter>().SetRevitLinkTypes();
-
-                var revitRepository = kernel.Get<RevitRepository>();
-                PlaceOpeningTasks(uiApplication, revitRepository, Array.Empty<ElementId>());
-            }
+    private IList<UnplacedClashModel> InitializePlacing(RevitRepository revitRepository, IEnumerable<OpeningPlacer> placers, OpeningConfig config) {
+        if(placers.Count() == 0) {
+            return [];
         }
+        using var pb = GetPlatformService<IProgressDialogService>();
+        pb.StepValue = _progressBarStepValue;
+        pb.DisplayTitleFormat = "Расстановка отверстий... [{0}\\{1}]";
+        var progress = pb.CreateProgress();
+        pb.MaxValue = placers.Count();
+        var ct = pb.CreateCancellationToken();
+        pb.Show();
 
-        private protected void PlaceOpeningTasks(
-            UIApplication uiApplication,
-            RevitRepository revitRepository,
-            ElementId[] mepElements) {
+        return PlaceOpenings(progress, ct, revitRepository, placers, config);
+    }
 
-            _duplicatedInstancesToRemoveIds.Clear();
-            if(!ModelCorrect(revitRepository)) {
-                throw new OperationCanceledException();
-            }
-            if(!revitRepository.ContinueIfTaskFamiliesNotLatest()) {
-                throw new OperationCanceledException();
-            }
-            var openingConfig = OpeningConfig.GetOpeningConfig(revitRepository.Doc);
-            if(openingConfig.Categories.Count > 0) {
-                var placementConfigurator = new PlacementConfigurator(revitRepository, openingConfig.Categories);
-                var placers = placementConfigurator.GetPlacersMepOutcomingTasks(mepElements)
-                                                   .ToList();
-                uiApplication.Application.FailuresProcessing += FailureProcessor;
+    private IList<UnplacedClashModel> PlaceOpenings(IProgress<int> progress, CancellationToken ct, RevitRepository revitRepository, IEnumerable<OpeningPlacer> placers, OpeningConfig config) {
+        var placedOpeningTasks = revitRepository.GetPlacedOutcomingTasks();
+        HashSet<FamilyInstance> placedFamInstances = [];
+        List<UnplacedClashModel> unplacedClashes = [];
+
+        using(var t = revitRepository.GetTransaction("Расстановка заданий")) {
+            int count = 0;
+            foreach(var p in placers) {
+                ct.ThrowIfCancellationRequested();
+                progress.Report(count);
                 try {
-                    var unplacedClashes = InitializePlacing(revitRepository, placers, openingConfig)
-                        .Concat(placementConfigurator.GetUnplacedClashes());
-                    if(openingConfig.ShowPlacingErrors) {
-                        InitializeReport(revitRepository, unplacedClashes);
+                    var newOpening = p.Place();
+                    placedFamInstances.Add(newOpening);
+                } catch(OpeningNotPlacedException e) {
+                    var clashModel = p.ClashModel;
+                    if(clashModel is not null) {
+                        unplacedClashes.Add(new UnplacedClashModel() { Message = e.Message, Clash = clashModel });
                     }
-                } finally {
-                    uiApplication.Application.FailuresProcessing -= FailureProcessor;
                 }
+                count++;
             }
-            _duplicatedInstancesToRemoveIds.Clear();
+            var options = t.GetFailureHandlingOptions()
+                .SetForcedModalHandling(false)
+                .SetDelayedMiniWarnings(true);
+            t.Commit(options);
         }
+        // создание экземпляров классов OpeningMepTaskOutcoming после коммита транзакции,
+        // потому что параметры экземпляров семейств до коммита еще не сохранены в модели и не могут быть получены конструктором OpeningMepTaskOutcoming
+        var newOpenings = placedFamInstances.Select(famInst => new OpeningMepTaskOutcoming(famInst)).ToHashSet();
 
-        private bool ModelCorrect(RevitRepository revitRepository) {
-            var checker = new Checkers(revitRepository);
-            var errors = checker.GetErrorTexts();
-            if(errors == null || errors.Count == 0) {
-                return true;
+        //Удаление дублирующих заданий на отверстия нужно начинать в отдельной транзакции после завершения транзакции создания заданий на отверстия,
+        //т.к. свойство Location у элемента FamilyInstance, созданного внутри транзакции, может быть не актуально (установлено в (0,0,0) несмотря на реальное расположение),
+        //а после завершения транзакции актуализируется
+        if(placedOpeningTasks.Count > 0) {
+            var newOpeningsNotDeleted = InitializeRemoving(revitRepository, newOpenings, placedOpeningTasks);
+            if(newOpeningsNotDeleted.Count > 1) {
+                InitializeUnion(revitRepository, newOpeningsNotDeleted, config);
             }
-
-            TaskDialog.Show("BIM", $"{string.Join($"{Environment.NewLine}", errors)}");
-            return false;
+        } else {
+            // инициализация удаления дубликатов только что созданных заданий на отверстия здесь не запускается,
+            // потому что дубликаты будут объединены в одно задание
+            InitializeUnion(revitRepository, newOpenings, config);
         }
+        return unplacedClashes;
+    }
 
-        private IList<UnplacedClashModel> InitializePlacing(RevitRepository revitRepository, IEnumerable<OpeningPlacer> placers, OpeningConfig config) {
-            if(placers.Count() == 0) {
-                return new List<UnplacedClashModel>();
-            }
-            using(var pb = GetPlatformService<IProgressDialogService>()) {
-                pb.StepValue = _progressBarStepValue;
-                pb.DisplayTitleFormat = "Расстановка отверстий... [{0}\\{1}]";
-                var progress = pb.CreateProgress();
-                pb.MaxValue = placers.Count();
-                var ct = pb.CreateCancellationToken();
-                pb.Show();
+    private ICollection<OpeningMepTaskOutcoming> InitializeRemoving(
+        RevitRepository revitRepository,
+        ICollection<OpeningMepTaskOutcoming> newOpenings,
+        ICollection<OpeningMepTaskOutcoming> alreadyPlacedOpenings) {
+        using var pb = GetPlatformService<IProgressDialogService>();
+        pb.StepValue = _progressBarStepValue;
+        pb.DisplayTitleFormat = "Проверка дублей... [{0}\\{1}]";
+        var progressRemove = pb.CreateProgress();
+        pb.MaxValue = newOpenings.Count;
+        var ctRemove = pb.CreateCancellationToken();
+        pb.Show();
 
-                return PlaceOpenings(progress, ct, revitRepository, placers, config);
-            }
-        }
+        return RemoveAlreadyPlacedOpenings(
+            revitRepository,
+            newOpenings,
+            alreadyPlacedOpenings,
+            progressRemove,
+            ctRemove);
+    }
 
-        private IList<UnplacedClashModel> PlaceOpenings(IProgress<int> progress, CancellationToken ct, RevitRepository revitRepository, IEnumerable<OpeningPlacer> placers, OpeningConfig config) {
-            var placedOpeningTasks = revitRepository.GetPlacedOutcomingTasks();
-            HashSet<FamilyInstance> placedFamInstances = new HashSet<FamilyInstance>();
-            List<UnplacedClashModel> unplacedClashes = new List<UnplacedClashModel>();
+    private ICollection<OpeningMepTaskOutcoming> RemoveAlreadyPlacedOpenings(
+        RevitRepository revitRepository,
+        ICollection<OpeningMepTaskOutcoming> newOpenings,
+        ICollection<OpeningMepTaskOutcoming> alreadyPlacedOpenings,
+        IProgress<int> progress,
+        CancellationToken ct) {
 
-            using(var t = revitRepository.GetTransaction("Расстановка заданий")) {
+        HashSet<OpeningMepTaskOutcoming> newOpeningsNotDeleted = [];
+        if(alreadyPlacedOpenings.Count > 0) {
+            using(var t = revitRepository.GetTransaction("Удаление дублирующих заданий")) {
                 int count = 0;
-                foreach(var p in placers) {
+                foreach(var newOpening in newOpenings) {
                     ct.ThrowIfCancellationRequested();
                     progress.Report(count);
-                    try {
-                        var newOpening = p.Place();
-                        placedFamInstances.Add(newOpening);
-                    } catch(OpeningNotPlacedException e) {
-                        var clashModel = p.ClashModel;
-                        if(!(clashModel is null)) {
-                            unplacedClashes.Add(new UnplacedClashModel() { Message = e.Message, Clash = clashModel });
-                        }
+                    bool deleteNewOpening = _duplicatedInstancesToRemoveIds.Contains(newOpening.Id) || newOpening.IsAlreadyPlaced(alreadyPlacedOpenings);
+                    if(deleteNewOpening) {
+                        revitRepository.DeleteElement(newOpening.Id);
+                    } else {
+                        newOpeningsNotDeleted.Add(newOpening);
                     }
                     count++;
                 }
-                var options = t.GetFailureHandlingOptions()
-                    .SetForcedModalHandling(false)
-                    .SetDelayedMiniWarnings(true);
-                t.Commit(options);
-            }
-            // создание экземпляров классов OpeningMepTaskOutcoming после коммита транзакции,
-            // потому что параметры экземпляров семейств до коммита еще не сохранены в модели и не могут быть получены конструктором OpeningMepTaskOutcoming
-            HashSet<OpeningMepTaskOutcoming> newOpenings = placedFamInstances.Select(famInst => new OpeningMepTaskOutcoming(famInst)).ToHashSet();
-
-            //Удаление дублирующих заданий на отверстия нужно начинать в отдельной транзакции после завершения транзакции создания заданий на отверстия,
-            //т.к. свойство Location у элемента FamilyInstance, созданного внутри транзакции, может быть не актуально (установлено в (0,0,0) несмотря на реальное расположение),
-            //а после завершения транзакции актуализируется
-            if(placedOpeningTasks.Count > 0) {
-                var newOpeningsNotDeleted = InitializeRemoving(revitRepository, newOpenings, placedOpeningTasks);
-                if(newOpeningsNotDeleted.Count > 1) {
-                    InitializeUnion(revitRepository, newOpeningsNotDeleted, config);
-                }
-            } else {
-                // инициализация удаления дубликатов только что созданных заданий на отверстия здесь не запускается,
-                // потому что дубликаты будут объединены в одно задание
-                InitializeUnion(revitRepository, newOpenings, config);
-            }
-            return unplacedClashes;
-        }
-
-        private ICollection<OpeningMepTaskOutcoming> InitializeRemoving(
-            RevitRepository revitRepository,
-            ICollection<OpeningMepTaskOutcoming> newOpenings,
-            ICollection<OpeningMepTaskOutcoming> alreadyPlacedOpenings) {
-            using(var pb = GetPlatformService<IProgressDialogService>()) {
-                pb.StepValue = _progressBarStepValue;
-                pb.DisplayTitleFormat = "Проверка дублей... [{0}\\{1}]";
-                var progressRemove = pb.CreateProgress();
-                pb.MaxValue = newOpenings.Count;
-                var ctRemove = pb.CreateCancellationToken();
-                pb.Show();
-
-                return RemoveAlreadyPlacedOpenings(
-                    revitRepository,
-                    newOpenings,
-                    alreadyPlacedOpenings,
-                    progressRemove,
-                    ctRemove);
-            }
-        }
-
-        private ICollection<OpeningMepTaskOutcoming> RemoveAlreadyPlacedOpenings(
-            RevitRepository revitRepository,
-            ICollection<OpeningMepTaskOutcoming> newOpenings,
-            ICollection<OpeningMepTaskOutcoming> alreadyPlacedOpenings,
-            IProgress<int> progress,
-            CancellationToken ct) {
-
-            HashSet<OpeningMepTaskOutcoming> newOpeningsNotDeleted = new HashSet<OpeningMepTaskOutcoming>();
-            if(alreadyPlacedOpenings.Count > 0) {
-                using(var t = revitRepository.GetTransaction("Удаление дублирующих заданий")) {
-                    int count = 0;
-                    foreach(var newOpening in newOpenings) {
-                        ct.ThrowIfCancellationRequested();
-                        progress.Report(count);
-                        bool deleteNewOpening = _duplicatedInstancesToRemoveIds.Contains(newOpening.Id) || newOpening.IsAlreadyPlaced(alreadyPlacedOpenings);
-                        if(deleteNewOpening) {
-                            revitRepository.DeleteElement(newOpening.Id);
-                        } else {
-                            newOpeningsNotDeleted.Add(newOpening);
-                        }
-                        count++;
-                    }
-                    t.Commit();
-                }
-                return newOpeningsNotDeleted;
-            } else {
-                newOpeningsNotDeleted.UnionWith(newOpenings);
-                return newOpeningsNotDeleted;
-            }
-        }
-
-        private void InitializeUnion(
-            RevitRepository revitRepository,
-            ICollection<OpeningMepTaskOutcoming> newOpeningsForUnion,
-            OpeningConfig config
-            ) {
-            using(var pb = GetPlatformService<IProgressDialogService>()) {
-                pb.StepValue = _progressBarStepValue;
-                pb.DisplayTitleFormat = "Объединение касающихся... [{0}\\{1}]";
-                var progressUnite = pb.CreateProgress();
-                pb.MaxValue = newOpeningsForUnion.Count;
-                var ctUnite = pb.CreateCancellationToken();
-                pb.Show();
-
-                UniteTouchingOpenings(progressUnite, ctUnite, revitRepository, newOpeningsForUnion, config);
-            }
-        }
-
-        private void UniteTouchingOpenings(IProgress<int> progress, CancellationToken ct, RevitRepository revitRepository, ICollection<OpeningMepTaskOutcoming> newOpeningsForUnion, OpeningConfig config) {
-            ICollection<OpeningsGroup> groups = new MultilayerOpeningsGroupsProvider(revitRepository).GetOpeningsGroups(newOpeningsForUnion);
-            using(var t = revitRepository.GetTransaction("Объединение многослойных заданий")) {
-
-                int count = 0;
-                foreach(OpeningsGroup group in groups) {
-                    ct.ThrowIfCancellationRequested();
-                    progress.Report(count);
-                    try {
-                        OpeningPlacer placer = group.GetOpeningPlacer(revitRepository, config);
-                        FamilyInstance unitedOpening = placer.Place();
-
-                        if(unitedOpening != null) {
-                            foreach(OpeningMepTaskOutcoming openingTask in group.Elements) {
-                                revitRepository.DeleteElement(openingTask.Id);
-                            }
-                        }
-
-                    } catch(ArgumentOutOfRangeException) {
-                        continue;
-                    } catch(InvalidOperationException) {
-                        continue;
-                    } catch(OpeningNotPlacedException) {
-                        continue;
-                    }
-                    count++;
-                }
-
                 t.Commit();
             }
+            return newOpeningsNotDeleted;
+        } else {
+            newOpeningsNotDeleted.UnionWith(newOpenings);
+            return newOpeningsNotDeleted;
         }
+    }
 
-        /// <summary>
-        /// Метод для подписки на событие <see cref="UIApplication.Application.FailuresProcessing"/>
-        /// Используется для запоминания расставленных экземпляров семейств заданий на отверстия, которые дают дублирование с уже размещенными
-        /// </summary>
-        private void FailureProcessor(object sender, FailuresProcessingEventArgs e) {
-            FailuresAccessor fas = e.GetFailuresAccessor();
+    private void InitializeUnion(
+        RevitRepository revitRepository,
+        ICollection<OpeningMepTaskOutcoming> newOpeningsForUnion,
+        OpeningConfig config
+        ) {
+        using var pb = GetPlatformService<IProgressDialogService>();
+        pb.StepValue = _progressBarStepValue;
+        pb.DisplayTitleFormat = "Объединение касающихся... [{0}\\{1}]";
+        var progressUnite = pb.CreateProgress();
+        pb.MaxValue = newOpeningsForUnion.Count;
+        var ctUnite = pb.CreateCancellationToken();
+        pb.Show();
 
-            List<FailureMessageAccessor> fmas = fas.GetFailureMessages().ToList();
+        UniteTouchingOpenings(progressUnite, ctUnite, revitRepository, newOpeningsForUnion, config);
+    }
 
-            foreach(FailureMessageAccessor fma in fmas) {
-                var definition = fma.GetFailureDefinitionId();
-                if(definition == BuiltInFailures.OverlapFailures.DuplicateInstances) {
-                    // в дубликаты заносить все элементы, кроме самого старого, у которого значение Id наименьшее
-                    var ids = fma.GetFailingElementIds().OrderBy(elId => elId.GetIdValue()).Skip(1);
-                    foreach(var id in ids) {
-                        _duplicatedInstancesToRemoveIds.Add(id);
+    private void UniteTouchingOpenings(IProgress<int> progress, CancellationToken ct, RevitRepository revitRepository, ICollection<OpeningMepTaskOutcoming> newOpeningsForUnion, OpeningConfig config) {
+        var groups = new MultilayerOpeningsGroupsProvider(revitRepository).GetOpeningsGroups(newOpeningsForUnion);
+        using var t = revitRepository.GetTransaction("Объединение многослойных заданий");
+
+        int count = 0;
+        foreach(var group in groups) {
+            ct.ThrowIfCancellationRequested();
+            progress.Report(count);
+            try {
+                var placer = group.GetOpeningPlacer(revitRepository, config);
+                var unitedOpening = placer.Place();
+
+                if(unitedOpening != null) {
+                    foreach(var openingTask in group.Elements) {
+                        revitRepository.DeleteElement(openingTask.Id);
                     }
                 }
-                ;
+
+            } catch(ArgumentOutOfRangeException) {
+                continue;
+            } catch(InvalidOperationException) {
+                continue;
+            } catch(OpeningNotPlacedException) {
+                continue;
             }
+            count++;
         }
 
+        t.Commit();
+    }
 
-        private void InitializeReport(RevitRepository revitRepository, IEnumerable<UnplacedClashModel> clashes) {
-            if(!clashes.Any()) {
-                return;
+    /// <summary>
+    /// Метод для подписки на событие <see cref="UIApplication.Application.FailuresProcessing"/>
+    /// Используется для запоминания расставленных экземпляров семейств заданий на отверстия, которые дают дублирование с уже размещенными
+    /// </summary>
+    private void FailureProcessor(object sender, FailuresProcessingEventArgs e) {
+        var fas = e.GetFailuresAccessor();
+
+        var fmas = fas.GetFailureMessages().ToList();
+
+        foreach(var fma in fmas) {
+            var definition = fma.GetFailureDefinitionId();
+            if(definition == BuiltInFailures.OverlapFailures.DuplicateInstances) {
+                // в дубликаты заносить все элементы, кроме самого старого, у которого значение Id наименьшее
+                var ids = fma.GetFailingElementIds().OrderBy(elId => elId.GetIdValue()).Skip(1);
+                foreach(var id in ids) {
+                    _duplicatedInstancesToRemoveIds.Add(id);
+                }
             }
-            var viewModel = new ClashesViewModel(revitRepository, clashes);
-            var window = new ReportView() { DataContext = viewModel };
-            var helper = new WindowInteropHelper(window) { Owner = revitRepository.UIApplication.MainWindowHandle };
-
-            window.Show();
+            ;
         }
+    }
+
+
+    private void InitializeReport(RevitRepository revitRepository, IEnumerable<UnplacedClashModel> clashes) {
+        if(!clashes.Any()) {
+            return;
+        }
+        var viewModel = new ClashesViewModel(revitRepository, clashes);
+        var window = new ReportView() { DataContext = viewModel };
+        var helper = new WindowInteropHelper(window) { Owner = revitRepository.UIApplication.MainWindowHandle };
+
+        window.Show();
     }
 }

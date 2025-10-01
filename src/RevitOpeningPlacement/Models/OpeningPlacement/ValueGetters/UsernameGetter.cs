@@ -4,24 +4,23 @@ using RevitClashDetective.Models.Value;
 
 using RevitOpeningPlacement.Models.Interfaces;
 
-namespace RevitOpeningPlacement.Models.OpeningPlacement.ValueGetters {
+namespace RevitOpeningPlacement.Models.OpeningPlacement.ValueGetters;
+/// <summary>
+/// Класс для получения значения логина пользователя, запустившего плагин
+/// </summary>
+internal class UsernameGetter : IValueGetter<StringParamValue> {
+    private readonly Application _app;
+
+
     /// <summary>
-    /// Класс для получения значения логина пользователя, запустившего плагин
+    /// Конструктор класса, предоставляющего имя пользователя, запустившего плагин
     /// </summary>
-    internal class UsernameGetter : IValueGetter<StringParamValue> {
-        private readonly Application _app;
+    /// <exception cref="System.ArgumentNullException">Исключение, если обязательный параметр null</exception>
+    public UsernameGetter(Application app) {
+        _app = app ?? throw new System.ArgumentNullException(nameof(app));
+    }
 
-
-        /// <summary>
-        /// Конструктор класса, предоставляющего имя пользователя, запустившего плагин
-        /// </summary>
-        /// <exception cref="System.ArgumentNullException">Исключение, если обязательный параметр null</exception>
-        public UsernameGetter(Application app) {
-            _app = app ?? throw new System.ArgumentNullException(nameof(app));
-        }
-
-        public StringParamValue GetValue() {
-            return new StringParamValue(_app.Username);
-        }
+    public StringParamValue GetValue() {
+        return new StringParamValue(_app.Username);
     }
 }

@@ -1,15 +1,14 @@
-namespace RevitOpeningPlacement.Models.Configs {
+namespace RevitOpeningPlacement.Models.Configs;
+/// <summary>
+/// Типы расстановки чистовых отверстий КР
+/// </summary>
+internal enum OpeningRealKrPlacementType {
     /// <summary>
-    /// Типы расстановки чистовых отверстий КР
+    /// Расстановка на основе входящих заданий от ВИС
     /// </summary>
-    internal enum OpeningRealKrPlacementType {
-        /// <summary>
-        /// Расстановка на основе входящих заданий от ВИС
-        /// </summary>
-        PlaceByMep,
-        /// <summary>
-        /// Расстановка на основе входящих заданий от АР
-        /// </summary>
-        PlaceByAr
-    }
+    PlaceByMep,
+    /// <summary>
+    /// Расстановка на основе входящих заданий от АР
+    /// </summary>
+    PlaceByAr
 }

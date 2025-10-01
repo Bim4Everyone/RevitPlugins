@@ -16,72 +16,70 @@ using RevitOpeningPlacement.Models.RealOpeningKrPlacement;
 using RevitOpeningPlacement.Models.RealOpeningKrPlacement.Checkers;
 using RevitOpeningPlacement.Services;
 
-namespace RevitOpeningPlacement {
-    /// <summary>
-    /// Команда для размещения чистовых отверстий АР в одной выбранной конструкции в местах пересечения с выбранными заданиями на отверстия.
-    /// При этом для каждого задания создается отдельное чистовое отверстие, то есть объединения не происходит.
-    /// </summary>
-    [Transaction(TransactionMode.Manual)]
-    public class PlaceManyOpeningRealsByManyTasksInOneHostCmd : OpeningRealPlacerCmd {
-        public PlaceManyOpeningRealsByManyTasksInOneHostCmd() : base("Принять несколько заданий без объединения") { }
+namespace RevitOpeningPlacement;
+/// <summary>
+/// Команда для размещения чистовых отверстий АР в одной выбранной конструкции в местах пересечения с выбранными заданиями на отверстия.
+/// При этом для каждого задания создается отдельное чистовое отверстие, то есть объединения не происходит.
+/// </summary>
+[Transaction(TransactionMode.Manual)]
+public class PlaceManyOpeningRealsByManyTasksInOneHostCmd : OpeningRealPlacerCmd {
+    public PlaceManyOpeningRealsByManyTasksInOneHostCmd() : base("Принять несколько заданий без объединения") { }
 
 
-        public void ExecuteCommand(UIApplication uiApplication) {
-            Execute(uiApplication);
-        }
+    public void ExecuteCommand(UIApplication uiApplication) {
+        Execute(uiApplication);
+    }
 
 
-        protected override void Execute(UIApplication uiApplication) {
-            using(IKernel kernel = uiApplication.CreatePlatformServices()) {
-                kernel.Bind<UIApplication>()
-                    .ToSelf()
-                    .InSingletonScope();
-                kernel.Bind<IDocTypesHandler>()
-                    .To<DocTypesHandler>()
-                    .InSingletonScope();
-                kernel.Bind<RevitRepository>()
-                    .ToSelf()
-                    .InSingletonScope();
-                kernel.Bind<RevitClashDetective.Models.RevitRepository>()
-                    .ToSelf()
-                    .InSingletonScope();
-                kernel.Bind<RevitEventHandler>()
-                    .ToSelf()
-                    .InSingletonScope();
-                kernel.Bind<ParameterFilterProvider>()
-                    .ToSelf()
-                    .InSingletonScope();
+    protected override void Execute(UIApplication uiApplication) {
+        using var kernel = uiApplication.CreatePlatformServices();
+        kernel.Bind<UIApplication>()
+            .ToSelf()
+            .InSingletonScope();
+        kernel.Bind<IDocTypesHandler>()
+            .To<DocTypesHandler>()
+            .InSingletonScope();
+        kernel.Bind<RevitRepository>()
+            .ToSelf()
+            .InSingletonScope();
+        kernel.Bind<RevitClashDetective.Models.RevitRepository>()
+            .ToSelf()
+            .InSingletonScope();
+        kernel.Bind<RevitEventHandler>()
+            .ToSelf()
+            .InSingletonScope();
+        kernel.Bind<ParameterFilterProvider>()
+            .ToSelf()
+            .InSingletonScope();
 
-                var revitRepository = kernel.Get<RevitRepository>();
-                var bimPartsHandler = kernel.Get<IDocTypesHandler>();
-                var docType = bimPartsHandler.GetDocType(revitRepository.Doc);
-                switch(docType) {
-                    case DocTypeEnum.AR: {
-                        if(!ModelCorrect(new RealOpeningsArChecker(revitRepository))) {
-                            return;
-                        }
-                        var placer = new RealOpeningArPlacer(revitRepository);
-                        placer.PlaceSingleOpeningsInOneHost();
-                        break;
-                    }
-
-                    case DocTypeEnum.KR: {
-                        if(!ModelCorrect(new RealOpeningsKrChecker(revitRepository))) {
-                            return;
-                        }
-                        var config = OpeningRealsKrConfig.GetOpeningConfig(revitRepository.Doc);
-                        var placer = new RealOpeningKrPlacer(revitRepository, config);
-                        placer.PlaceSingleOpeningsInOneHost();
-                        break;
-                    }
-
-                    default: {
-                        revitRepository.ShowErrorMessage(
-                            "Команда предназначена только для АР/КР." +
-                            "\nПроверьте наименование файла на соответствие BIM-стандарту A101 или откройте другой файл.");
-                        break;
-                    }
+        var revitRepository = kernel.Get<RevitRepository>();
+        var bimPartsHandler = kernel.Get<IDocTypesHandler>();
+        var docType = bimPartsHandler.GetDocType(revitRepository.Doc);
+        switch(docType) {
+            case DocTypeEnum.AR: {
+                if(!ModelCorrect(new RealOpeningsArChecker(revitRepository))) {
+                    return;
                 }
+                var placer = new RealOpeningArPlacer(revitRepository);
+                placer.PlaceSingleOpeningsInOneHost();
+                break;
+            }
+
+            case DocTypeEnum.KR: {
+                if(!ModelCorrect(new RealOpeningsKrChecker(revitRepository))) {
+                    return;
+                }
+                var config = OpeningRealsKrConfig.GetOpeningConfig(revitRepository.Doc);
+                var placer = new RealOpeningKrPlacer(revitRepository, config);
+                placer.PlaceSingleOpeningsInOneHost();
+                break;
+            }
+
+            default: {
+                revitRepository.ShowErrorMessage(
+                    "Команда предназначена только для АР/КР." +
+                    "\nПроверьте наименование файла на соответствие BIM-стандарту A101 или откройте другой файл.");
+                break;
             }
         }
     }

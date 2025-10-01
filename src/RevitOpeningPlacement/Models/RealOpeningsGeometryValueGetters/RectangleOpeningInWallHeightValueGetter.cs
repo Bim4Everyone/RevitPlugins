@@ -5,62 +5,61 @@ using RevitClashDetective.Models.Value;
 
 using RevitOpeningPlacement.Models.Interfaces;
 
-namespace RevitOpeningPlacement.Models.RealOpeningsGeometryValueGetters {
+namespace RevitOpeningPlacement.Models.RealOpeningsGeometryValueGetters;
+/// <summary>
+/// Класс, предоставляющий значение высоты чистового прямоугольного отверстия АР/КР в стене в единицах Revit
+/// </summary>
+internal class RectangleOpeningInWallHeightValueGetter : RealOpeningSizeValueGetter, IValueGetter<DoubleParamValue> {
+    private readonly ICollection<IOpeningTaskIncoming> _incomingTasks;
+    private readonly IPointFinder _pointFinder;
+
+
     /// <summary>
-    /// Класс, предоставляющий значение высоты чистового прямоугольного отверстия АР/КР в стене в единицах Revit
+    /// Конструктор класса, предоставляющего значение высоты чистового прямоугольного отверстия АР/КР в стене в единицах Revit
     /// </summary>
-    internal class RectangleOpeningInWallHeightValueGetter : RealOpeningSizeValueGetter, IValueGetter<DoubleParamValue> {
-        private readonly ICollection<IOpeningTaskIncoming> _incomingTasks;
-        private readonly IPointFinder _pointFinder;
+    /// <param name="incomingTask">Входящее задание на отверстие</param>
+    /// <param name="pointFinder">Провайдер точки вставки чистового отверстия АР/КР</param>
+    /// <param name="rounding">Округление размеров отверстия в мм</param>
+    /// <exception cref="ArgumentNullException">Исключение, если обязательный параметр null</exception>
+    public RectangleOpeningInWallHeightValueGetter(IOpeningTaskIncoming incomingTask, IPointFinder pointFinder, int rounding)
+        : base(rounding, rounding, rounding) {
+        if(incomingTask == null) { throw new ArgumentNullException(nameof(incomingTask)); }
+        _pointFinder = pointFinder ?? throw new ArgumentNullException(nameof(pointFinder));
+        _incomingTasks = new IOpeningTaskIncoming[] { incomingTask };
+    }
 
-
-        /// <summary>
-        /// Конструктор класса, предоставляющего значение высоты чистового прямоугольного отверстия АР/КР в стене в единицах Revit
-        /// </summary>
-        /// <param name="incomingTask">Входящее задание на отверстие</param>
-        /// <param name="pointFinder">Провайдер точки вставки чистового отверстия АР/КР</param>
-        /// <param name="rounding">Округление размеров отверстия в мм</param>
-        /// <exception cref="ArgumentNullException">Исключение, если обязательный параметр null</exception>
-        public RectangleOpeningInWallHeightValueGetter(IOpeningTaskIncoming incomingTask, IPointFinder pointFinder, int rounding)
-            : base(rounding, rounding, rounding) {
-            if(incomingTask == null) { throw new ArgumentNullException(nameof(incomingTask)); }
-            _pointFinder = pointFinder ?? throw new ArgumentNullException(nameof(pointFinder));
-            _incomingTasks = new IOpeningTaskIncoming[] { incomingTask };
+    /// <summary>
+    /// Конструктор класса, предоставляющего значение высоты чистового прямоугольного отверстия АР/КР в стене в единицах Revit
+    /// </summary>
+    /// <param name="incomingTasks">Входящие задания на отверстия</param>
+    /// <param name="pointFinder">Провайдер точки вставки чистового отверстия АР/КР</param>
+    /// <param name="rounding">Округление размеров отверстия в мм</param>
+    /// <exception cref="ArgumentNullException">Исключение, если обязательный параметр null</exception>
+    /// <exception cref="ArgumentOutOfRangeException">Исключение, если количество элементов в коллекции меньше 1</exception>
+    public RectangleOpeningInWallHeightValueGetter(ICollection<IOpeningTaskIncoming> incomingTasks, IPointFinder pointFinder, int rounding)
+        : base(rounding, rounding, rounding) {
+        if(incomingTasks is null) {
+            throw new ArgumentNullException(nameof(incomingTasks));
         }
-
-        /// <summary>
-        /// Конструктор класса, предоставляющего значение высоты чистового прямоугольного отверстия АР/КР в стене в единицах Revit
-        /// </summary>
-        /// <param name="incomingTasks">Входящие задания на отверстия</param>
-        /// <param name="pointFinder">Провайдер точки вставки чистового отверстия АР/КР</param>
-        /// <param name="rounding">Округление размеров отверстия в мм</param>
-        /// <exception cref="ArgumentNullException">Исключение, если обязательный параметр null</exception>
-        /// <exception cref="ArgumentOutOfRangeException">Исключение, если количество элементов в коллекции меньше 1</exception>
-        public RectangleOpeningInWallHeightValueGetter(ICollection<IOpeningTaskIncoming> incomingTasks, IPointFinder pointFinder, int rounding)
-            : base(rounding, rounding, rounding) {
-            if(incomingTasks is null) {
-                throw new ArgumentNullException(nameof(incomingTasks));
-            }
-            if(incomingTasks.Count < 1) {
-                throw new ArgumentOutOfRangeException(nameof(incomingTasks));
-            }
-            _pointFinder = pointFinder ?? throw new ArgumentNullException(nameof(pointFinder));
-            _incomingTasks = incomingTasks;
+        if(incomingTasks.Count < 1) {
+            throw new ArgumentOutOfRangeException(nameof(incomingTasks));
         }
+        _pointFinder = pointFinder ?? throw new ArgumentNullException(nameof(pointFinder));
+        _incomingTasks = incomingTasks;
+    }
 
 
-        public DoubleParamValue GetValue() {
-            double heightFeet = GetHeight(_incomingTasks, _pointFinder);
-            double roundHeightFeet = RoundToCeilingFeetToMillimeters(heightFeet, _heightRound);
-            return new DoubleParamValue(roundHeightFeet);
-        }
+    public DoubleParamValue GetValue() {
+        double heightFeet = GetHeight(_incomingTasks, _pointFinder);
+        double roundHeightFeet = RoundToCeilingFeetToMillimeters(heightFeet, _heightRound);
+        return new DoubleParamValue(roundHeightFeet);
+    }
 
 
-        private double GetHeight(ICollection<IOpeningTaskIncoming> incomingTasks, IPointFinder pointFinder) {
-            var box = GetUnitedBox(incomingTasks);
-            double zOffset = Math.Abs(box.Min.Z - pointFinder.GetPoint().Z);
-            double height = box.Max.Z - box.Min.Z + zOffset;
-            return height;
-        }
+    private double GetHeight(ICollection<IOpeningTaskIncoming> incomingTasks, IPointFinder pointFinder) {
+        var box = GetUnitedBox(incomingTasks);
+        double zOffset = Math.Abs(box.Min.Z - pointFinder.GetPoint().Z);
+        double height = box.Max.Z - box.Min.Z + zOffset;
+        return height;
     }
 }

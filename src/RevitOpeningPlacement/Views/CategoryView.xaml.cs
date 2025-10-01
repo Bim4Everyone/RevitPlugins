@@ -1,9 +1,8 @@
-﻿using System.Windows.Controls;
+using System.Windows.Controls;
 
-namespace RevitOpeningPlacement.Views {
-    public partial class CategoryView : UserControl {
-        public CategoryView() {
-            InitializeComponent();
-        }
+namespace RevitOpeningPlacement.Views;
+public partial class CategoryView : UserControl {
+    public CategoryView() {
+        InitializeComponent();
     }
 }

@@ -3,15 +3,14 @@ using System.Collections.Generic;
 using RevitOpeningPlacement.Models.OpeningUnion;
 using RevitOpeningPlacement.OpeningModels;
 
-namespace RevitOpeningPlacement.Models.Interfaces {
+namespace RevitOpeningPlacement.Models.Interfaces;
+/// <summary>
+/// Интерфейс, предоставляющий коллекцию групп заданий на отверстия.
+/// </summary>
+internal interface IOpeningsGroupsProvider {
     /// <summary>
-    /// Интерфейс, предоставляющий коллекцию групп заданий на отверстия.
+    /// Создает коллекцию групп исходящих заданий на отверстия из коллекции исходящих заданий на отверстия
     /// </summary>
-    internal interface IOpeningsGroupsProvider {
-        /// <summary>
-        /// Создает коллекцию групп исходящих заданий на отверстия из коллекции исходящих заданий на отверстия
-        /// </summary>
-        /// <param name="openingTasks">Коллекция исходящих заданий на отверстия из активного документа</param>
-        ICollection<OpeningsGroup> GetOpeningsGroups(ICollection<OpeningMepTaskOutcoming> openingTasks);
-    }
+    /// <param name="openingTasks">Коллекция исходящих заданий на отверстия из активного документа</param>
+    ICollection<OpeningsGroup> GetOpeningsGroups(ICollection<OpeningMepTaskOutcoming> openingTasks);
 }

@@ -1,11 +1,10 @@
-namespace RevitOpeningPlacement.Models.Interfaces {
+namespace RevitOpeningPlacement.Models.Interfaces;
+/// <summary>
+/// Интерфейс, предоставляющий типоразмер семейства задания на отверстие
+/// </summary>
+internal interface IOpeningTaskTypeProvider {
     /// <summary>
-    /// Интерфейс, предоставляющий типоразмер семейства задания на отверстие
+    /// Возвращает тип проема задания на отверстие
     /// </summary>
-    internal interface IOpeningTaskTypeProvider {
-        /// <summary>
-        /// Возвращает тип проема задания на отверстие
-        /// </summary>
-        OpeningType GetOpeningTaskType();
-    }
+    OpeningType GetOpeningTaskType();
 }

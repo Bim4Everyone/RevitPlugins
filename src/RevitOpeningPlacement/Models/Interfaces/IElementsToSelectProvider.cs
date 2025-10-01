@@ -2,14 +2,13 @@ using System.Collections.Generic;
 
 using RevitClashDetective.Models.Clashes;
 
-namespace RevitOpeningPlacement.Models.Interfaces {
+namespace RevitOpeningPlacement.Models.Interfaces;
+/// <summary>
+/// Интерфейс предоставляющий коллекцию элементов, которые надо выделить на виде
+/// </summary>
+internal interface IElementsToSelectProvider {
     /// <summary>
-    /// Интерфейс предоставляющий коллекцию элементов, которые надо выделить на виде
+    /// Возвращает коллекцию элементов, которые надо выделить на виде
     /// </summary>
-    internal interface IElementsToSelectProvider {
-        /// <summary>
-        /// Возвращает коллекцию элементов, которые надо выделить на виде
-        /// </summary>
-        ICollection<ElementModel> GetElementsToSelect();
-    }
+    ICollection<ElementModel> GetElementsToSelect();
 }
