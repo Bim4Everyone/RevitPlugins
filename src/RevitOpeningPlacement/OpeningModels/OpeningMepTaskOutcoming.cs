@@ -191,7 +191,7 @@ internal class OpeningMepTaskOutcoming : ISolidProvider, IEquatable<OpeningMepTa
     }
 
     public override int GetHashCode() {
-        return Id.GetIdValue();
+        return (int) Id.GetIdValue();
     }
 
     public bool Equals(OpeningMepTaskOutcoming other) {

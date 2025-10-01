@@ -134,7 +134,7 @@ internal class OpeningMepTaskIncomingViewModel : BaseViewModel, IOpeningTaskInco
     }
 
     public override int GetHashCode() {
-        return OpeningId.GetIdValue() + FileName.GetHashCode();
+        return (int) (OpeningId.GetIdValue() + FileName.GetHashCode());
     }
 
     public bool Equals(OpeningMepTaskIncomingViewModel other) {

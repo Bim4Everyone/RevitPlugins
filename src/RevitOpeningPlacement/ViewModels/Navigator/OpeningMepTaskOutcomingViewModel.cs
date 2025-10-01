@@ -95,7 +95,7 @@ internal class OpeningMepTaskOutcomingViewModel : BaseViewModel, ISelectorAndHig
     }
 
     public override int GetHashCode() {
-        return _openingTask.Id.GetIdValue();
+        return (int) _openingTask.Id.GetIdValue();
     }
 
     public bool Equals(OpeningMepTaskOutcomingViewModel other) {

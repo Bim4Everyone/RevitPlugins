@@ -95,7 +95,7 @@ internal class OpeningRealKrViewModel : BaseViewModel, ISelectorAndHighlighter, 
     }
 
     public override int GetHashCode() {
-        return OpeningId.GetIdValue();
+        return (int) OpeningId.GetIdValue();
     }
 
     public bool Equals(OpeningRealKrViewModel other) {

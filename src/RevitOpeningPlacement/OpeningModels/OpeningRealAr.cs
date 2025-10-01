@@ -66,7 +66,7 @@ internal class OpeningRealAr : OpeningRealByMep, IEquatable<OpeningRealAr> {
     }
 
     public override int GetHashCode() {
-        return Id.GetIdValue();
+        return (int) Id.GetIdValue();
     }
 
     public bool Equals(OpeningRealAr other) {

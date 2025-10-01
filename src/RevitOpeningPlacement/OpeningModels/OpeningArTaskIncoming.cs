@@ -129,7 +129,7 @@ internal class OpeningArTaskIncoming : OpeningRealBase, IEquatable<OpeningArTask
     }
 
     public override int GetHashCode() {
-        return Id.GetIdValue() + FileName.GetHashCode();
+        return (int) (Id.GetIdValue() + FileName.GetHashCode());
     }
 
     public bool Equals(OpeningArTaskIncoming other) {

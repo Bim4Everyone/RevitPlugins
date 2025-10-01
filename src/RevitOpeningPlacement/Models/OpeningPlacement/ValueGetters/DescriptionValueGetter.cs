@@ -34,10 +34,10 @@ internal class DescriptionValueGetter : IValueGetter<StringParamValue> {
         } else {
             string firstElementFile = _element1.Document.Title;
             string firstElementName = _element1.Name;
-            int firstElementId = _element1.Id.GetIdValue();
+            int firstElementId = (int) _element1.Id.GetIdValue();
             string secondElementFile = _element2.Document.Title;
             string secondElementName = _element2.Name;
-            int secondElementId = _element2.Id.GetIdValue();
+            int secondElementId = (int) _element2.Id.GetIdValue();
 
             string description =
                 $"{firstElementFile}: {firstElementName}: {firstElementId}; " +

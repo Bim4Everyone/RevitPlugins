@@ -95,7 +95,7 @@ internal class OpeningRealArViewModel : BaseViewModel, ISelectorAndHighlighter, 
     }
 
     public override int GetHashCode() {
-        return OpeningId.GetIdValue();
+        return (int) OpeningId.GetIdValue();
     }
 
     /// <summary>

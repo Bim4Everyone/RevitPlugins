@@ -92,7 +92,7 @@ internal class OpeningArTaskIncomingViewModel : BaseViewModel, IOpeningTaskIncom
     }
 
     public override int GetHashCode() {
-        return OpeningId.GetIdValue() + FileName.GetHashCode();
+        return (int) (OpeningId.GetIdValue() + FileName.GetHashCode());
     }
 
     public bool Equals(OpeningArTaskIncomingViewModel other) {

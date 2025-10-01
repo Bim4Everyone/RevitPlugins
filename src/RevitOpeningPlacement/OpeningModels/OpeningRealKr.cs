@@ -65,7 +65,7 @@ internal class OpeningRealKr : OpeningRealByMep, IEquatable<OpeningRealKr> {
     }
 
     public override int GetHashCode() {
-        return Id.GetIdValue();
+        return (int) Id.GetIdValue();
     }
 
     public bool Equals(OpeningRealKr other) {

@@ -199,7 +199,7 @@ internal class OpeningMepTaskIncoming : IOpeningTaskIncoming, IEquatable<Opening
     }
 
     public override int GetHashCode() {
-        return Id.GetIdValue() + FileName.GetHashCode();
+        return (int) (Id.GetIdValue() + FileName.GetHashCode());
     }
 
     public bool Equals(OpeningMepTaskIncoming other) {
