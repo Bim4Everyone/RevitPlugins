@@ -10,6 +10,7 @@ using RevitClashDetective.Models.FilterModel;
 
 using RevitOpeningPlacement.Models.Configs;
 using RevitOpeningPlacement.Models.Interfaces;
+using RevitOpeningPlacement.Models.OpeningPlacement.Checkers.ClashCheckers;
 using RevitOpeningPlacement.Models.OpeningPlacement.PlacerInitializers;
 
 namespace RevitOpeningPlacement.Models.OpeningPlacement;

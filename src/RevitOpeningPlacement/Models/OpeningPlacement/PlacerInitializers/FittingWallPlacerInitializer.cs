@@ -9,6 +9,7 @@ using RevitOpeningPlacement.Models.Configs;
 using RevitOpeningPlacement.Models.Interfaces;
 using RevitOpeningPlacement.Models.OpeningPlacement.AngleFinders;
 using RevitOpeningPlacement.Models.OpeningPlacement.LevelFinders;
+using RevitOpeningPlacement.Models.OpeningPlacement.ParameterGetters.ParametersGetters;
 using RevitOpeningPlacement.Models.OpeningPlacement.PointFinders;
 using RevitOpeningPlacement.Models.OpeningPlacement.SolidProviders;
 using RevitOpeningPlacement.Models.OpeningPlacement.ValueGetters;
