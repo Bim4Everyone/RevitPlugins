@@ -13,8 +13,9 @@ internal class GeneralViewRebarPerpAnnotCreator : ViewAnnotationCreator {
     }
 
     public override void TryCreateViewAnnotations() {
-        var dimensionService = new GeneralViewRebarPerpDimensionService(ViewModel, Repository, SheetInfo, ViewOfPylon);
         var dimensionBaseService = new DimensionBaseService(ViewOfPylon.ViewElement, ViewModel.ParamValService);
+        var dimensionService = new GeneralViewRebarPerpDimensionService(ViewModel, Repository, SheetInfo, ViewOfPylon, 
+                                                                        dimensionBaseService);
 
         // Пытаемся создать размеры на виде
         try {
@@ -24,15 +25,15 @@ internal class GeneralViewRebarPerpAnnotCreator : ViewAnnotationCreator {
                 return;
             }
             // Создаем размеры по вертикальным стержням снизу и сверху (если нужно)
-            dimensionService.TryCreateTopEdgeRebarDimensions(skeletonParentRebar, dimensionBaseService);
-            dimensionService.TryCreateBottomEdgeRebarDimensions(skeletonParentRebar, dimensionBaseService);
+            dimensionService.TryCreateTopEdgeRebarDimensions(skeletonParentRebar);
+            dimensionService.TryCreateBottomEdgeRebarDimensions(skeletonParentRebar);
 
             // Размер по Гэшке сбоку
-            dimensionService.TryCreateVertLRebarDimension(skeletonParentRebar, dimensionBaseService);
+            dimensionService.TryCreateVertLRebarDimension(skeletonParentRebar);
             // Размер по Гэшке сверху
-            dimensionService.TryCreateHorizLRebarDimension(skeletonParentRebar, dimensionBaseService);
+            dimensionService.TryCreateHorizLRebarDimension(skeletonParentRebar);
             // Создаем размеры по изгибам вертикальных стержней-бутылок
-            dimensionService.TryCreateAdditionalDimensions(skeletonParentRebar, dimensionBaseService);
+            dimensionService.TryCreateAdditionalDimensions(skeletonParentRebar);
         } catch(Exception) { }
 
         // Пытаемся создать марки на виде

@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Windows.Controls;
 
 using Autodesk.Revit.DB;
 
@@ -19,6 +18,7 @@ internal class GeneralViewMarkService {
 
     private readonly ViewPointsAnalyzer _viewPointsAnalyzer;
     private readonly AnnotationService _annotationService;
+    private readonly DimensionBaseService _dimensionBaseService;
 
     // Отступы для формирования линий обрыва
     private readonly double _breakLinesOffsetX = 0.5;
@@ -34,11 +34,12 @@ internal class GeneralViewMarkService {
     private readonly double _breakLineLengthRightParamValue = 100;
 
     internal GeneralViewMarkService(MainViewModel mvm, RevitRepository repository, PylonSheetInfo pylonSheetInfo, 
-                                    PylonView pylonView) {
+                                    PylonView pylonView, DimensionBaseService dimensionBaseService) {
         ViewModel = mvm;
         Repository = repository;
         SheetInfo = pylonSheetInfo;
         ViewOfPylon = pylonView;
+        _dimensionBaseService = dimensionBaseService;
 
         _viewPointsAnalyzer = new ViewPointsAnalyzer(ViewOfPylon);
         _annotationService = new AnnotationService(ViewOfPylon);
@@ -63,15 +64,16 @@ internal class GeneralViewMarkService {
     internal PylonView ViewOfPylon { get; set; }
 
 
+
     /// <summary>
     /// Метод по созданию размеров по опалубке пилонов
     /// </summary>
     /// <param name="view">Вид, на котором нужно создать размеры</param>
     /// <param name="clampsParentRebars">Список экземпляров семейств пилонов</param>
     /// <param name="dimensionBaseService">Сервис по анализу основ размеров</param>
-    internal void TryCreatePylonElevMark(List<Element> hostElems, DimensionBaseService dimensionBaseService) {
+    internal void TryCreatePylonElevMark(List<Element> hostElems) {
         try {
-            var location = dimensionBaseService.GetDimensionLine(hostElems.First() as FamilyInstance, 
+            var location = _dimensionBaseService.GetDimensionLine(hostElems.First() as FamilyInstance, 
                                                                  DirectionType.Left, 2).Origin;
             foreach(var item in hostElems) {
                 if(item is not FamilyInstance hostElem) { return; }
@@ -79,7 +81,7 @@ internal class GeneralViewMarkService {
                 // Собираем опорные плоскости по опалубке, например:
                 // #_1_горизонт_край_низ
                 // #_1_горизонт_край_верх
-                var refArraySide = dimensionBaseService.GetDimensionRefs(hostElem, '#', '/', 
+                var refArraySide = _dimensionBaseService.GetDimensionRefs(hostElem, '#', '/', 
                                                                                     ["горизонт", "край"]);
                 foreach(Reference reference in refArraySide) {
                     var spotElevation = Repository.Document.Create.NewSpotElevation(

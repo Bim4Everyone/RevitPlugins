@@ -2,6 +2,7 @@ using System;
 
 using RevitPylonDocumentation.Models.PylonSheetNView.ViewDimensionServices.ViewFormDimensionServices;
 using RevitPylonDocumentation.Models.PylonSheetNView.ViewMarkServices.ViewFormMarkServices;
+using RevitPylonDocumentation.Models.Services;
 using RevitPylonDocumentation.ViewModels;
 
 namespace RevitPylonDocumentation.Models.PylonSheetNView.ViewAnnotationCreators;
@@ -14,8 +15,10 @@ internal class TransViewSecondAnnotCreator : ViewAnnotationCreator {
     public override void TryCreateViewAnnotations() {
         // Пытаемся создать размеры на виде
         try {
-            var dimensionService = new TransViewDimensionService(ViewModel, Repository, SheetInfo, ViewOfPylon);
-            dimensionService.TryCreateDimensions(ViewOfPylon.ViewElement, false, true);
+            var dimensionBaseService = new DimensionBaseService(ViewOfPylon.ViewElement, ViewModel.ParamValService);
+            var dimensionService = new TransViewDimensionService(ViewModel, Repository, SheetInfo, ViewOfPylon, 
+                                                                 dimensionBaseService);
+            dimensionService.TryCreateDimensions(false, true);
         } catch(Exception) { }
 
         // Пытаемся создать марки на виде

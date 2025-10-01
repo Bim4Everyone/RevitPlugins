@@ -97,7 +97,7 @@ internal class DimensionSegmentsService {
 
 
     public void ApplySegmentsModification(Dimension dimension, List<DimensionSegmentOption> dimSegmentOpts) {
-        if(dimension.NumberOfSegments < dimSegmentOpts.Count) { return; }
+        if(dimension.NumberOfSegments > dimSegmentOpts.Count) { return; }
 
         // Применяем опции изменений сегментов размера
         var dimensionSegments = dimension.Segments;

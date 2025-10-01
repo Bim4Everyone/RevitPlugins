@@ -32,20 +32,22 @@ internal class GeneralViewPerpAnnotCreator : ViewAnnotationCreator {
             // Получаем оси на виде
             var grids = Repository.GridsInView(view);
 
-            var dimensionService = new GeneralViewDimensionService(ViewModel, Repository, SheetInfo, ViewOfPylon);
+            var dimensionService = new GeneralViewDimensionService(ViewModel, Repository, SheetInfo, ViewOfPylon, 
+                                                                   dimensionBaseService);
             //ВЕРТИКАЛЬНЫЕ РАЗМЕРЫ
-            dimensionService.TryCreatePylonDimensions(skeletonParentRebar, grids, dimensionBaseService, false);
+            dimensionService.TryCreatePylonDimensions(skeletonParentRebar, grids, false);
             //ГОРИЗОНТАЛЬНЫЕ РАЗМЕРЫ
-            dimensionService.TryCreatePylonDimensions(SheetInfo.HostElems, dimensionBaseService, true);
-            dimensionService.TryCreateTopAdditionalDimensions(skeletonParentRebar, dimensionBaseService, true);
-            dimensionService.TryCreateClampsDimensions(clampsParentRebars, dimensionBaseService, true);
-            dimensionService.TryCreateHorizLRebarDimension(dimensionBaseService);
+            dimensionService.TryCreatePylonDimensions(SheetInfo.HostElems, true);
+            dimensionService.TryCreateTopAdditionalDimensions(skeletonParentRebar, true);
+            dimensionService.TryCreateClampsDimensions(clampsParentRebars, true);
+            dimensionService.TryCreateHorizLRebarDimension();
         } catch(Exception) { }
 
         // Пытаемся создать марки на виде
         try {
-            var markService = new GeneralViewMarkService(ViewModel, Repository, SheetInfo, ViewOfPylon);
-            markService.TryCreatePylonElevMark(SheetInfo.HostElems, dimensionBaseService);
+            var markService = new GeneralViewMarkService(ViewModel, Repository, SheetInfo, ViewOfPylon, 
+                                                         dimensionBaseService);
+            markService.TryCreatePylonElevMark(SheetInfo.HostElems);
             markService.TryCreateSkeletonMark(true);
             markService.TryCreateAdditionalMark(true);
             markService.TryCreateLowerBreakLines(true);

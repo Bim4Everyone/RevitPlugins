@@ -29,14 +29,15 @@ internal class GeneralViewRebarAnnotCreator : ViewAnnotationCreator {
                 return;
             }
 
-            var dimensionService = new GeneralViewRebarDimensionService(ViewModel, Repository, SheetInfo, ViewOfPylon);
+            var dimensionService = new GeneralViewRebarDimensionService(ViewModel, Repository, SheetInfo, ViewOfPylon, 
+                                                                        dimensionBaseService);
             //ВЕРТИКАЛЬНЫЕ РАЗМЕРЫ
-            dimensionService.TryCreateAllTopRebarDimensions(skeletonParentRebar, dimensionBaseService);
-            dimensionService.TryCreateAllBottomRebarDimensions(skeletonParentRebar, dimensionBaseService);
-            dimensionService.TryCreateEdgeRebarDimensions(skeletonParentRebar, dimensionBaseService);
+            dimensionService.TryCreateAllTopRebarDimensions(skeletonParentRebar);
+            dimensionService.TryCreateAllBottomRebarDimensions(skeletonParentRebar);
+            dimensionService.TryCreateEdgeRebarDimensions(skeletonParentRebar);
 
             //ГОРИЗОНТАЛЬНЫЕ РАЗМЕРЫ
-            dimensionService.TryCreateClampsDimensions(clampsParentRebars, skeletonParentRebar, dimensionBaseService);
+            dimensionService.TryCreateClampsDimensions(clampsParentRebars, skeletonParentRebar);
         } catch(Exception) { }
 
         // Пытаемся создать марки на виде

@@ -32,19 +32,20 @@ internal class GeneralViewAnnotCreator : ViewAnnotationCreator {
             // Получаем оси на виде
             var grids = Repository.GridsInView(view);
 
-            var dimensionService = new GeneralViewDimensionService(ViewModel, Repository, SheetInfo, ViewOfPylon);
+            var dimensionService = new GeneralViewDimensionService(ViewModel, Repository, SheetInfo, ViewOfPylon, 
+                                                                   dimensionBaseService);
             //ВЕРТИКАЛЬНЫЕ РАЗМЕРЫ
-            dimensionService.TryCreatePylonDimensions(skeletonParentRebar, grids, dimensionBaseService, true);
+            dimensionService.TryCreatePylonDimensions(skeletonParentRebar, grids, true);
             //ГОРИЗОНТАЛЬНЫЕ РАЗМЕРЫ
-            dimensionService.TryCreatePylonDimensions(SheetInfo.HostElems, dimensionBaseService, false);
-            dimensionService.TryCreateTopAdditionalDimensions(skeletonParentRebar, dimensionBaseService, false);
-            dimensionService.TryCreateClampsDimensions(clampsParentRebars, dimensionBaseService, false);
+            dimensionService.TryCreatePylonDimensions(SheetInfo.HostElems, false);
+            dimensionService.TryCreateTopAdditionalDimensions(skeletonParentRebar, false);
+            dimensionService.TryCreateClampsDimensions(clampsParentRebars, false);
         } catch(Exception) { }
 
         // Пытаемся создать марки на виде
         try {
-            var markService = new GeneralViewMarkService(ViewModel, Repository, SheetInfo, ViewOfPylon);
-            markService.TryCreatePylonElevMark(SheetInfo.HostElems, dimensionBaseService);
+            var markService = new GeneralViewMarkService(ViewModel, Repository, SheetInfo, ViewOfPylon, dimensionBaseService);
+            markService.TryCreatePylonElevMark(SheetInfo.HostElems);
             markService.TryCreateSkeletonMark(false);
             markService.TryCreateAdditionalMark(false);
             markService.TryCreateLowerBreakLines(false);
