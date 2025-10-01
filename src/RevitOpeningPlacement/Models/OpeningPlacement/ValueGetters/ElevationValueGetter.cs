@@ -1,4 +1,7 @@
 using System;
+#if REVIT_2020_OR_LESS
+using System.Linq;
+#endif
 
 using Autodesk.Revit.DB;
 
