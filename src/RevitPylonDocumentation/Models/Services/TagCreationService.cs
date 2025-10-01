@@ -8,18 +8,16 @@ using dosymep.Revit;
 using RevitPylonDocumentation.Models.PylonSheetNView;
 
 namespace RevitPylonDocumentation.Models.Services;
-internal class AnnotationService {
+internal class TagCreationService {
     private readonly PylonView _pylonView;
 
     private readonly string _annotationTagTopTextParamName = "Текст верх";
     private readonly string _annotationTagBottomTextParamName = "Текст низ";
     private readonly string _annotationTagLengthParamName = "Ширина полки";
 
-
-    public AnnotationService(PylonView pylonView) {
+    public TagCreationService(PylonView pylonView) {
         _pylonView = pylonView;
     }
-
 
     public IndependentTag CreateRebarTag(XYZ bodyPoint, FamilySymbol tagSymbol, Element element) {
         var view = _pylonView.ViewElement;
@@ -52,17 +50,16 @@ internal class AnnotationService {
         return annotationInstance;
     }
 
-
     public void CreateUniversalTag(XYZ bodyPoint, FamilySymbol annotationSymbol, Element element, double tagLength,
                                    string topText = null, string bottomText = null, XYZ leaderPoint = null) {
-        var annotationInstance = CreateAnnotationSymbol(bodyPoint, annotationSymbol, tagLength, topText, bottomText);
+        var annotationInstance = CreateAnnotationTag(bodyPoint, annotationSymbol, tagLength, topText, bottomText);
         // Добавляем и устанавливаем точку привязки выноски
         annotationInstance.addLeader();
         var leader = annotationInstance.GetLeaders().FirstOrDefault();
         if(leader != null) {
             if(leaderPoint is null) {
                 var loc = element.Location as LocationPoint;
-                leader.End = loc.Point; // Точка на элементе
+                leader.End = loc.Point; 
             } else {
                 leader.End = leaderPoint;
             }
@@ -71,7 +68,7 @@ internal class AnnotationService {
 
     public void CreateUniversalTag(XYZ bodyPoint, FamilySymbol annotationSymbol, XYZ leaderPoint, double tagLength,
                                    string topText = null, string bottomText = null) {
-        var annotationInstance = CreateAnnotationSymbol(bodyPoint, annotationSymbol, tagLength, topText, bottomText);
+        var annotationInstance = CreateAnnotationTag(bodyPoint, annotationSymbol, tagLength, topText, bottomText);
         // Добавляем и устанавливаем точку привязки выноски
         annotationInstance.addLeader();
         var leader = annotationInstance.GetLeaders().FirstOrDefault();
@@ -80,7 +77,7 @@ internal class AnnotationService {
         }
     }
 
-    public AnnotationSymbol CreateAnnotationSymbol(XYZ bodyPoint, FamilySymbol annotationSymbol, double tagLength,
+    public AnnotationSymbol CreateAnnotationTag(XYZ bodyPoint, FamilySymbol annotationSymbol, double tagLength,
                                                    string topText = null, string bottomText = null) {
         var view = _pylonView.ViewElement;
         var doc = view.Document;

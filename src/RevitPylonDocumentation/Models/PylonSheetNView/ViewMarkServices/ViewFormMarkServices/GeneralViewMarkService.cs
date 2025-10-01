@@ -17,7 +17,7 @@ internal class GeneralViewMarkService {
     private readonly FamilySymbol _concretingSeamSymbol;
 
     private readonly ViewPointsAnalyzer _viewPointsAnalyzer;
-    private readonly AnnotationService _annotationService;
+    private readonly TagCreationService _annotationService;
     private readonly DimensionBaseService _dimensionBaseService;
 
     // Отступы для формирования линий обрыва
@@ -42,7 +42,7 @@ internal class GeneralViewMarkService {
         _dimensionBaseService = dimensionBaseService;
 
         _viewPointsAnalyzer = new ViewPointsAnalyzer(ViewOfPylon);
-        _annotationService = new AnnotationService(ViewOfPylon);
+        _annotationService = new TagCreationService(ViewOfPylon);
 
         // Находим типоразмер марки несущей арматуры для обозначения марки изделия
         _tagSkeletonSymbol = mvm.SelectedSkeletonTagType;

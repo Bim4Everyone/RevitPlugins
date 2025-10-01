@@ -116,10 +116,10 @@ internal class GeneralViewRebarDimensionService {
             dimSegmentOpts.Add(new DimensionSegmentOption(false));
 
             var dimensionLineLeft = _dimensionBaseService.GetDimensionLine(_sheetInfo.HostElems.First() as FamilyInstance,
-                                                                          DirectionType.Left, 1.1);
+                                                                           DirectionType.Left, 1.1);
             var dimensionRebarSide =
                 _repository.Document.Create.NewDimension(_viewOfPylon.ViewElement, dimensionLineLeft, refArraySide,
-                                                        _viewModel.SelectedDimensionType);
+                                                         _viewModel.SelectedDimensionType);
             // Применяем опции изменений сегментов размера
             _dimSegmentsService.ApplySegmentsModification(dimensionRebarSide, dimSegmentOpts);
         } catch(Exception) { }

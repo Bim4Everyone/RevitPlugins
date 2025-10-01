@@ -35,6 +35,7 @@ internal class FloorAnalyzerService {
         var bbox = lastPylon.get_BoundingBox(null);
 
         // Готовим фильтр для сбор плит в области вокруг верхней точки пилона
+        // Для поиска берется просто ближайшая область
         var outline = new Outline(
             bbox.Max - new XYZ(10, 10, 5),
             bbox.Max + new XYZ(10, 10, 5)

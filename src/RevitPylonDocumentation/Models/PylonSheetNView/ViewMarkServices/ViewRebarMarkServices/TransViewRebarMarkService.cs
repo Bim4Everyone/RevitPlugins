@@ -19,7 +19,7 @@ internal class TransViewRebarMarkService {
     private readonly int _formNumberForCBarMin = 1202;
 
     private readonly ViewPointsAnalyzer _viewPointsAnalyzer;
-    private readonly AnnotationService _annotationService;
+    private readonly TagCreationService _annotationService;
 
     private readonly FamilySymbol _tagSymbolWithComment;
     private readonly FamilySymbol _tagSymbolWithSerif;
@@ -33,7 +33,7 @@ internal class TransViewRebarMarkService {
         ViewOfPylon = pylonView;
 
         _viewPointsAnalyzer = new ViewPointsAnalyzer(pylonView);
-        _annotationService = new AnnotationService(pylonView);
+        _annotationService = new TagCreationService(pylonView);
 
         // Находим типоразмер марки несущей арматуры для обозначения позиции, диаметра и комментариев арматуры
         // Без засечки на конце
