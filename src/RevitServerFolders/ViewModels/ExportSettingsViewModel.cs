@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.ComponentModel;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
@@ -49,12 +50,15 @@ internal class ExportSettingsViewModel<T> : BaseViewModel where T : ExportSettin
         SourceFolder = _settings.SourceFolder;
         ClearTargetFolder = _settings.ClearTargetFolder;
         OpenTargetWhenFinish = _settings.OpenTargetWhenFinish;
+        IsSelected = _settings.IsSelected;
         TargetFromLabel = _localization.GetLocalizedString("MainWindow.TargetsFrom");
         TargetToLabel = _localization.GetLocalizedString("MainWindow.TargetsTo");
 
         OpenFromFoldersCommand = RelayCommand.CreateAsync(OpenFromFolder);
         OpenFolderDialogCommand = RelayCommand.Create(OpenFolderDialog);
         SourceFolderChangedCommand = RelayCommand.CreateAsync(SourceFolderChanged);
+
+        PropertyChanged += OnSourceFolderChanged;
     }
 
 
@@ -135,6 +139,7 @@ internal class ExportSettingsViewModel<T> : BaseViewModel where T : ExportSettin
         _settings.SourceFolder = SourceFolder;
         _settings.ClearTargetFolder = ClearTargetFolder;
         _settings.OpenTargetWhenFinish = OpenTargetWhenFinish;
+        _settings.IsSelected = IsSelected;
         _settings.SkippedObjects = ModelObjects
             .Where(item => item.SkipObject)
             .Select(item => item.FullName)
@@ -160,7 +165,7 @@ internal class ExportSettingsViewModel<T> : BaseViewModel where T : ExportSettin
         }
 
         if(!ModelObjects.Any(item => !item.SkipObject)) {
-            return _localization.GetLocalizedString("MainWindow.Validation.AllModelsSkiped");
+            return _localization.GetLocalizedString("MainWindow.Validation.AllModelsSkipped");
         }
 
         if(OpenFromFoldersCommand.IsExecuting || SourceFolderChangedCommand.IsExecuting) {
@@ -207,6 +212,13 @@ internal class ExportSettingsViewModel<T> : BaseViewModel where T : ExportSettin
             // pass
         }
         CommandManager.InvalidateRequerySuggested();
+    }
+
+    private async void OnSourceFolderChanged(object sender, PropertyChangedEventArgs e) {
+        if(e.PropertyName == nameof(SourceFolder)) {
+            await Task.Delay(250);
+            await SourceFolderChanged();
+        }
     }
 
     private async Task AddModelObjects(ModelObject modelObject) {

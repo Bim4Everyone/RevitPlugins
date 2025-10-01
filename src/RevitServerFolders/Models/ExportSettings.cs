@@ -10,4 +10,5 @@ internal abstract class ExportSettings {
     public bool ClearTargetFolder { get; set; } = false;
     public bool OpenTargetWhenFinish { get; set; } = true;
     public string[] SkippedObjects { get; set; }
+    public bool IsSelected { get; set; } = true;
 }

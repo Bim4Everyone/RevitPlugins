@@ -18,15 +18,17 @@
     <system:String
         x:Key="Exceptions.FolderNotFound">Folder "{0}" was not found.</system:String>
     <system:String
-        x:Key="Exceptions.ViewWithoutElements">View "{0}" without elements.</system:String>
+        x:Key="Exceptions.ViewWithoutElements">View "{0}" does not contain any elements with geometry. It's possible that all relationships have been unloaded from the document. It's recommended to open the exported rvt file with all open workspaces and verify that the view contains elements from the active file.</system:String>
     <system:String
         x:Key="Exceptions.ViewNotFound">View not found "{0}".</system:String>
     <system:String
         x:Key="Exceptions.NwcExportError">NWC export error. Error message: {0}.</system:String>
     <system:String
+        x:Key="Exceptions.NwcExportCancel">Revit canceled NWC export.</system:String>
+    <system:String
         x:Key="Exceptions.RvtExportError">RVT export error. Error message: {0}.</system:String>
     <system:String
-        x:Key="Exceptions.ElementsNotDeleted">Cannot delete error elements. Error message: {0}.</system:String>
+        x:Key="Exceptions.ElementsNotDeleted">While opening the document, elements causing errors were detected. These could not be automatically removed due to insufficient permissions to delete them. Revit canceled the export operation. The IDs of the elements causing the errors are: {0}. Error information: {1}.</system:String>
 
     <system:String
         x:Key="ErrorsWindow.ErrorGroupHeader">Export {0}</system:String>
@@ -42,7 +44,7 @@
     <system:String
         x:Key="MainWindow.Validation.SourceFolderEmpty">No models in the source folder.</system:String>
     <system:String
-        x:Key="MainWindow.Validation.AllModelsSkiped">All models are marked as skipped.</system:String>
+        x:Key="MainWindow.Validation.AllModelsSkipped">All models are marked as skipped.</system:String>
     <system:String
         x:Key="MainWindow.Validation.Wait">Wait for the loading to finish</system:String>
     <system:String

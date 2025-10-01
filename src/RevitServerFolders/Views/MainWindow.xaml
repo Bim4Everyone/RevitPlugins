@@ -122,13 +122,28 @@
                     Property="IsEnabled"
                     Value="True" />
             </Style>
+            <Style
+                TargetType="core:WpfUIPlatformUserControl"
+                x:Key="DisabledOnExecutingControl">
+                <Style.Triggers>
+                    <DataTrigger
+                        Binding="{Binding DataContext.SelectedSettings.OpenFromFoldersCommand.IsExecuting,
+                        RelativeSource={RelativeSource AncestorType=Window}}"
+                        Value="True">
+                        <Setter
+                            Property="IsEnabled"
+                            Value="False" />
+                    </DataTrigger>
+                </Style.Triggers>
+                <Setter
+                    Property="IsEnabled"
+                    Value="True" />
+            </Style>
         </ResourceDictionary>
     </Window.Resources>
 
     <Grid>
         <Grid.RowDefinitions>
-            <RowDefinition
-                Height="Auto" />
             <RowDefinition
                 Height="Auto" />
             <RowDefinition
@@ -156,7 +171,6 @@
 
         <DockPanel
             Grid.Row="1"
-            Grid.RowSpan="2"
             Grid.Column="0"
             Grid.ColumnSpan="3"
             Style="{StaticResource VisibleOnExecutingPanel}">
@@ -166,7 +180,6 @@
 
         <Border
             Grid.Row="1"
-            Grid.RowSpan="2"
             Grid.Column="0"
             Margin="10 0 0 0"
             Style="{StaticResource DisabledOnExecutingBorder}">
@@ -293,7 +306,6 @@
         <GridSplitter
             Grid.Column="1"
             Grid.Row="1"
-            Grid.RowSpan="2"
             Width="10"
             Background="{DynamicResource CardBackground}"
             BorderBrush="{DynamicResource CardBorderBrush}"
@@ -301,131 +313,14 @@
             HorizontalAlignment="Center"
             VerticalAlignment="Stretch" />
 
-        <Border
-            Margin="0 0 10 5"
+        <local:SettingsView
             Grid.Row="1"
             Grid.Column="2"
-            Style="{StaticResource DisabledOnExecutingBorder}">
-            <StackPanel>
-                <DockPanel>
-                    <ui:TextBlock
-                        Width="130"
-                        Text="{me:LocalizationSource MainWindow.LabelTarget}" />
-                    <ui:ToggleSwitch
-                        Margin="5 0"
-                        IsChecked="{Binding SelectedSettings.ClearTargetFolder}"
-                        Content="{me:LocalizationSource MainWindow.ClearTarget}" />
-                    <ui:ToggleSwitch
-                        IsChecked="{Binding SelectedSettings.OpenTargetWhenFinish}"
-                        Content="{me:LocalizationSource MainWindow.OpenTargetWhenFinish}" />
-                </DockPanel>
-                <DockPanel
-                    Margin="0 5"
-                    LastChildFill="True">
-                    <ui:Button
-                        DockPanel.Dock="Right"
-                        Height="36"
-                        Margin="5 0 0 0"
-                        Content="{ui:SymbolIcon Symbol=Folder20}"
-                        Command="{Binding SelectedSettings.OpenFolderDialogCommand}" />
-                    <ui:TextBox
-                        Text="{Binding SelectedSettings.TargetFolder, UpdateSourceTrigger=PropertyChanged}" />
-                </DockPanel>
-                <DockPanel
-                    Margin="0 5 0 0">
-                    <ui:TextBlock
-                        Width="130"
-                        Text="{me:LocalizationSource MainWindow.LabelSource}" />
-                    <ui:ToggleSwitch
-                        Margin="5 0"
-                        Content="{me:LocalizationSource MainWindow.ExportRooms}"
-                        IsChecked="{Binding SelectedSettings.IsExportRooms}"
-                        Visibility="{Binding SelectedSettings.IsExportRoomsVisible, 
-                    Converter={StaticResource BooleanToVisibilityConverter}}" />
-                </DockPanel>
-                <DockPanel
-                    Margin="0 5 0 0"
-                    LastChildFill="True">
-                    <ui:Button
-                        DockPanel.Dock="Right"
-                        Height="36"
-                        Margin="5 0 0 0"
-                        Content="{ui:SymbolIcon Symbol=Folder20}"
-                        IsEnabled="{Binding SelectedSettings.SourceFolderChangedCommand.IsExecuting,
-                        Converter={StaticResource InverseBooleanConverter}}"
-                        Command="{Binding SelectedSettings.OpenFromFoldersCommand}" />
-                    <ui:TextBox
-                        Text="{Binding SelectedSettings.SourceFolder, UpdateSourceTrigger=PropertyChanged}">
-                        <i:Interaction.Triggers>
-                            <i:EventTrigger
-                                EventName="TextChanged">
-                                <i:InvokeCommandAction
-                                    Command="{Binding SelectedSettings.SourceFolderChangedCommand}" />
-                            </i:EventTrigger>
-                        </i:Interaction.Triggers>
-                    </ui:TextBox>
-                </DockPanel>
-            </StackPanel>
-        </Border>
-
-        <Border
-            Margin="0 5 10 0"
-            Grid.Row="2"
-            Grid.Column="2"
-            Style="{StaticResource DisabledOnExecutingBorder}">
-
-            <ui:DataGrid
-                Grid.Row="5"
-                Margin="5"
-                RowHeight="33"
-                Style="{StaticResource CustomResizableDataGridStyle}"
-                CellStyle="{StaticResource CustomDataGridCell}"
-                ItemsSource="{Binding SelectedSettings.ModelObjects}"
-                SelectedItem="{Binding SelectedSettings.SelectedObject}">
-
-                <ui:DataGrid.Columns>
-                    <DataGridCheckBoxColumn
-                        CanUserReorder="False"
-                        CanUserResize="False"
-                        CanUserSort="False"
-                        Width="Auto"
-                        Binding="{Binding SkipObject, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource InverseBooleanConverter}}">
-                        <DataGridCheckBoxColumn.Header>
-                            <CheckBox
-                                IsChecked="{Binding DataContext.SelectedSettings.SkipAll, RelativeSource={RelativeSource AncestorType=ui:DataGrid}, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource InverseBooleanConverter}}" />
-                        </DataGridCheckBoxColumn.Header>
-                    </DataGridCheckBoxColumn>
-                    <DataGridTemplateColumn
-                        CanUserReorder="False"
-                        CanUserResize="False"
-                        CanUserSort="False"
-                        Width="Auto">
-                        <DataGridTemplateColumn.CellTemplate>
-                            <DataTemplate>
-                                <ui:SymbolIcon
-                                    Symbol="{Binding ., Converter={StaticResource CellImageConverter}}" />
-                            </DataTemplate>
-                        </DataGridTemplateColumn.CellTemplate>
-                    </DataGridTemplateColumn>
-                    <DataGridTextColumn
-                        Width="250"
-                        IsReadOnly="True"
-                        MinWidth="100"
-                        ElementStyle="{StaticResource CustomDataGridTextDisabledStyle}"
-                        Binding="{Binding Name}"
-                        Header="{StaticResource NameHeader}" />
-                    <DataGridTextColumn
-                        IsReadOnly="True"
-                        MinWidth="100"
-                        ElementStyle="{StaticResource CustomDataGridTextDisabledStyle}"
-                        Binding="{Binding FullName}"
-                        Header="{StaticResource FullNameHeader}" />
-                </ui:DataGrid.Columns>
-            </ui:DataGrid>
-        </Border>
+            DataContext="{Binding SelectedSettings}"
+            Style="{StaticResource DisabledOnExecutingControl}" />
 
         <StackPanel
-            Grid.Row="3"
+            Grid.Row="2"
             Grid.Column="0"
             Grid.ColumnSpan="3"
             Orientation="Horizontal"
