@@ -18,15 +18,17 @@
     <system:String
         x:Key="Exceptions.FolderNotFound">Folder "{0}" was not found.</system:String>
     <system:String
-        x:Key="Exceptions.ViewWithoutElements">View "{0}" without elements. It's possible that all links are unloaded and there are no elements from this document in this view.</system:String>
+        x:Key="Exceptions.ViewWithoutElements">View "{0}" does not contain any elements with geometry. It's possible that all relationships have been unloaded from the document. It's recommended to open the exported rvt file with all open workspaces and verify that the view contains elements from the active file.</system:String>
     <system:String
         x:Key="Exceptions.ViewNotFound">View not found "{0}".</system:String>
     <system:String
         x:Key="Exceptions.NwcExportError">NWC export error. Error message: {0}.</system:String>
     <system:String
+        x:Key="Exceptions.NwcExportCancel">Revit canceled NWC export.</system:String>
+    <system:String
         x:Key="Exceptions.RvtExportError">RVT export error. Error message: {0}.</system:String>
     <system:String
-        x:Key="Exceptions.ElementsNotDeleted">Cannot delete error elements. Error message: {0}.</system:String>
+        x:Key="Exceptions.ElementsNotDeleted">While opening the document, elements causing errors were detected. These could not be automatically removed due to insufficient permissions to delete them. Revit canceled the export operation. The IDs of the elements causing the errors are: {0}. Error information: {1}.</system:String>
 
     <system:String
         x:Key="ErrorsWindow.ErrorGroupHeader">Export {0}</system:String>

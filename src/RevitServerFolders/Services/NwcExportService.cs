@@ -69,6 +69,11 @@ internal class NwcExportService : IModelsExportService<FileModelObjectExportSett
 
             try {
                 ExportDocument(modelFile, settings);
+            } catch(Autodesk.Revit.Exceptions.OperationCanceledException exCancel) {
+                _loggerService.Warning(exCancel, "Отмена экспорта в nwc в файле: {@DocPath}", modelFile);
+                _errorsService.AddError(modelFile,
+                    _localization.GetLocalizedString("Exceptions.NwcExportCancel"),
+                    settings);
             } catch(Exception ex) {
                 _loggerService.Warning(ex, "Ошибка экспорта в nwc в файле: {@DocPath}", modelFile);
                 _errorsService.AddError(modelFile,
@@ -225,8 +230,10 @@ internal class NwcExportService : IModelsExportService<FileModelObjectExportSett
                 _loggerService.Warning(ex, $"Не удалось удалить элементы, вызывающие ошибки");
                 e.SetProcessingResult(FailureProcessingResult.ProceedWithRollBack);
                 if(_currentSettings is not null) {
+                    string[] ids = [.. elementIds.Select(id => id.ToString())];
                     _errorsService.AddError(accessor.GetDocument().Title,
-                        _localization.GetLocalizedString("Exceptions.ElementsNotDeleted", ex.Message),
+                        _localization.GetLocalizedString(
+                            "Exceptions.ElementsNotDeleted", string.Join(", ", ids), ex.Message),
                         _currentSettings);
                 }
                 return;

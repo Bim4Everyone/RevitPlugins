@@ -18,15 +18,17 @@
     <system:String
         x:Key="Exceptions.FolderNotFound">Не была найдена папка "{0}".</system:String>
     <system:String
-        x:Key="Exceptions.ViewWithoutElements">Вид "{0}" не содержит элементы. Возможно в документе выгружены все связи и на этом виде нет элементов из этого документа.</system:String>
+        x:Key="Exceptions.ViewWithoutElements">Вид "{0}" не содержит элементы с геометрией. Возможно, из документа выгружены все связи. Рекомендуется открыть экспортируемый rvt файл со всеми открытыми рабочими наборами и проверить, что на виде есть элементы из активного файла.</system:String>
     <system:String
         x:Key="Exceptions.ViewNotFound">Не найден вид "{0}".</system:String>
     <system:String
         x:Key="Exceptions.NwcExportError">Ошибка экспорта в NWC. Информация об ошибке: {0}.</system:String>
     <system:String
+        x:Key="Exceptions.NwcExportCancel">Revit отменил экспорт в NWC.</system:String>
+    <system:String
         x:Key="Exceptions.RvtExportError">Ошибка экспорта в RVT. Информация об ошибке: {0}.</system:String>
     <system:String
-        x:Key="Exceptions.ElementsNotDeleted">Не удалось удалить элементы, вызывающие ошибки. Информация об ошибке: {0}.</system:String>
+        x:Key="Exceptions.ElementsNotDeleted">В процессе открытия документа были обнаружены элементы, вызывающие ошибки. Автоматически удалить их не удалось из-за отсутствия прав на их удаление, Revit отменил операцию экспорта. Id элементов, вызвавших ошибки: {0}. Информация об ошибке: {1}.</system:String>
 
     <system:String
         x:Key="ErrorsWindow.ErrorGroupHeader">Экспорт {0}</system:String>
