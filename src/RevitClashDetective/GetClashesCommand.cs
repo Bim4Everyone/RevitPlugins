@@ -17,40 +17,38 @@ using RevitClashDetective.Models.Handlers;
 using RevitClashDetective.ViewModels.Navigator;
 using RevitClashDetective.Views;
 
-namespace RevitClashDetective {
-    [Transaction(TransactionMode.Manual)]
-    public class GetClashesCommand : BasePluginCommand {
-        public GetClashesCommand() {
-            PluginName = "Навигатор";
-        }
+namespace RevitClashDetective;
+[Transaction(TransactionMode.Manual)]
+public class GetClashesCommand : BasePluginCommand {
+    public GetClashesCommand() {
+        PluginName = "Навигатор";
+    }
 
-        protected override void Execute(UIApplication uiApplication) {
-            using(IKernel kernel = uiApplication.CreatePlatformServices()) {
-                kernel.Bind<RevitRepository>()
-                    .ToSelf()
-                    .InSingletonScope();
-                kernel.Bind<RevitEventHandler>()
-                    .ToSelf()
-                    .InSingletonScope();
-                kernel.Bind<ParameterFilterProvider>()
-                    .ToSelf()
-                    .InSingletonScope();
-                kernel.Bind<ReportsViewModel>()
-                    .ToSelf()
-                    .InSingletonScope()
-                    .WithConstructorArgument("selectedFile", (string) null);
-                kernel.Bind<NavigatorView>()
-                    .ToSelf()
-                    .InSingletonScope()
-                    .WithPropertyValue(nameof(Window.DataContext), c => c.Kernel.Get<ReportsViewModel>());
+    protected override void Execute(UIApplication uiApplication) {
+        using var kernel = uiApplication.CreatePlatformServices();
+        kernel.Bind<RevitRepository>()
+            .ToSelf()
+            .InSingletonScope();
+        kernel.Bind<RevitEventHandler>()
+            .ToSelf()
+            .InSingletonScope();
+        kernel.Bind<ParameterFilterProvider>()
+            .ToSelf()
+            .InSingletonScope();
+        kernel.Bind<ReportsViewModel>()
+            .ToSelf()
+            .InSingletonScope()
+            .WithConstructorArgument("selectedFile", (string) null);
+        kernel.Bind<NavigatorView>()
+            .ToSelf()
+            .InSingletonScope()
+            .WithPropertyValue(nameof(Window.DataContext), c => c.Kernel.Get<ReportsViewModel>());
 
-                string assemblyName = Assembly.GetExecutingAssembly().GetName().Name;
-                kernel.UseWpfLocalization(
-                    $"/{assemblyName};component/assets/Localization/Language.xaml",
-                    CultureInfo.GetCultureInfo("ru-RU"));
+        string assemblyName = Assembly.GetExecutingAssembly().GetName().Name;
+        kernel.UseWpfLocalization(
+            $"/{assemblyName};component/assets/Localization/Language.xaml",
+            CultureInfo.GetCultureInfo("ru-RU"));
 
-                kernel.Get<NavigatorView>().Show();
-            }
-        }
+        kernel.Get<NavigatorView>().Show();
     }
 }

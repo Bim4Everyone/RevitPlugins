@@ -23,9 +23,7 @@ internal class SectionBoxModeViewModel : BaseViewModel, IEquatable<SectionBoxMod
 
     public bool Equals(SectionBoxModeViewModel other) {
         if(other is null) { return false; }
-        if(ReferenceEquals(this, other)) { return true; }
-
-        return Mode == other.Mode;
+        return ReferenceEquals(this, other) || Mode == other.Mode;
     }
 
     public override int GetHashCode() {

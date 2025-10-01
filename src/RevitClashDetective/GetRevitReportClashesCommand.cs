@@ -16,37 +16,35 @@ using RevitClashDetective.Models.Handlers;
 using RevitClashDetective.ViewModels.Navigator;
 using RevitClashDetective.Views;
 
-namespace RevitClashDetective {
-    //TODO эта команда для дебага и отладки логики выполнения плагина
-    [Transaction(TransactionMode.Manual)]
-    public class GetRevitReportClashesCommand : BasePluginCommand {
-        public GetRevitReportClashesCommand() {
-            PluginName = "Отчет Revit-а о пересечениях";
-        }
+namespace RevitClashDetective;
+//TODO эта команда для дебага и отладки логики выполнения плагина
+[Transaction(TransactionMode.Manual)]
+public class GetRevitReportClashesCommand : BasePluginCommand {
+    public GetRevitReportClashesCommand() {
+        PluginName = "Отчет Revit-а о пересечениях";
+    }
 
-        protected override void Execute(UIApplication uiApplication) {
-            using(IKernel kernel = uiApplication.CreatePlatformServices()) {
-                kernel.Bind<RevitRepository>()
-                    .ToSelf()
-                    .InSingletonScope();
-                kernel.Bind<RevitEventHandler>()
-                    .ToSelf()
-                    .InSingletonScope();
-                kernel.Bind<ParameterFilterProvider>()
-                    .ToSelf()
-                    .InSingletonScope();
+    protected override void Execute(UIApplication uiApplication) {
+        using var kernel = uiApplication.CreatePlatformServices();
+        kernel.Bind<RevitRepository>()
+            .ToSelf()
+            .InSingletonScope();
+        kernel.Bind<RevitEventHandler>()
+            .ToSelf()
+            .InSingletonScope();
+        kernel.Bind<ParameterFilterProvider>()
+            .ToSelf()
+            .InSingletonScope();
 
-                string assemblyName = Assembly.GetExecutingAssembly().GetName().Name;
-                kernel.UseWpfLocalization(
-                    $"/{assemblyName};component/assets/Localization/Language.xaml",
-                    CultureInfo.GetCultureInfo("ru-RU"));
+        string assemblyName = Assembly.GetExecutingAssembly().GetName().Name;
+        kernel.UseWpfLocalization(
+            $"/{assemblyName};component/assets/Localization/Language.xaml",
+            CultureInfo.GetCultureInfo("ru-RU"));
 
-                var repo = kernel.Get<RevitRepository>();
-                var revitRepository = repo;
-                var mainViewModlel = new RevitReportClashesViewModel(revitRepository);
-                var window = new RevitReportClashNavigator() { DataContext = mainViewModlel };
-                window.Show();
-            }
-        }
+        var repo = kernel.Get<RevitRepository>();
+        var revitRepository = repo;
+        var mainViewModlel = new RevitReportClashesViewModel(revitRepository);
+        var window = new RevitReportClashNavigator() { DataContext = mainViewModlel };
+        window.Show();
     }
 }

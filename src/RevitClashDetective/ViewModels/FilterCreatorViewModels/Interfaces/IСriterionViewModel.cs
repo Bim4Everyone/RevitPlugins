@@ -1,11 +1,10 @@
-﻿using RevitClashDetective.Models.FilterModel;
+using RevitClashDetective.Models.FilterModel;
 
-namespace RevitClashDetective.ViewModels.FilterCreatorViewModels.Interfaces {
-    interface IСriterionViewModel {
-        void Renew();
-        bool IsEmpty();
-        string GetErrorText();
-        void Initialize();
-        Criterion GetCriterion();
-    }
+namespace RevitClashDetective.ViewModels.FilterCreatorViewModels.Interfaces;
+internal interface IСriterionViewModel {
+    void Renew();
+    bool IsEmpty();
+    string GetErrorText();
+    void Initialize();
+    Criterion GetCriterion();
 }

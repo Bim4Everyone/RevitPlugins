@@ -28,9 +28,7 @@ internal class ElementViewModel : BaseViewModel, IEquatable<ElementViewModel> {
 
     public bool Equals(ElementViewModel other) {
         if(other is null) { return false; }
-        if(ReferenceEquals(this, other)) { return true; }
-
-        return Element.Equals(other.Element);
+        return ReferenceEquals(this, other) || Element.Equals(other.Element);
     }
 
     public override int GetHashCode() {

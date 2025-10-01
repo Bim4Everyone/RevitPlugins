@@ -19,61 +19,59 @@ using RevitClashDetective.Models.Handlers;
 using RevitClashDetective.ViewModels.ClashDetective;
 using RevitClashDetective.Views;
 
-namespace RevitClashDetective {
+namespace RevitClashDetective;
 
-    [Transaction(TransactionMode.Manual)]
-    public class DetectiveClashesCommand : BasePluginCommand {
-        public DetectiveClashesCommand() {
-            PluginName = "Поиск коллизий";
-        }
+[Transaction(TransactionMode.Manual)]
+public class DetectiveClashesCommand : BasePluginCommand {
+    public DetectiveClashesCommand() {
+        PluginName = "Поиск коллизий";
+    }
 
-        protected override void Execute(UIApplication uiApplication) {
-            ExecuteCommand(uiApplication);
-        }
+    protected override void Execute(UIApplication uiApplication) {
+        ExecuteCommand(uiApplication);
+    }
 
-        public void ExecuteCommand(UIApplication uiApplication) {
-            using(IKernel kernel = uiApplication.CreatePlatformServices()) {
-                kernel.Bind<RevitRepository>()
-                    .ToSelf()
-                    .InSingletonScope();
-                kernel.Bind<RevitEventHandler>()
-                    .ToSelf()
-                    .InSingletonScope();
-                kernel.Bind<ParameterFilterProvider>()
-                    .ToSelf()
-                    .InSingletonScope();
-                kernel.Bind<FiltersConfig>()
-                    .ToMethod(c => {
-                        var repo = c.Kernel.Get<RevitRepository>();
-                        var path = GetConfigPath(repo);
-                        return FiltersConfig.GetFiltersConfig(path, repo.Doc);
-                    });
-                kernel.Bind<ChecksConfig>()
-                    .ToMethod(c => {
-                        var repo = c.Kernel.Get<RevitRepository>();
-                        var path = GetConfigPath(repo);
-                        return ChecksConfig.GetChecksConfig(path, repo.Doc);
-                    });
+    public void ExecuteCommand(UIApplication uiApplication) {
+        using var kernel = uiApplication.CreatePlatformServices();
+        kernel.Bind<RevitRepository>()
+            .ToSelf()
+            .InSingletonScope();
+        kernel.Bind<RevitEventHandler>()
+            .ToSelf()
+            .InSingletonScope();
+        kernel.Bind<ParameterFilterProvider>()
+            .ToSelf()
+            .InSingletonScope();
+        kernel.Bind<FiltersConfig>()
+            .ToMethod(c => {
+                var repo = c.Kernel.Get<RevitRepository>();
+                string path = GetConfigPath(repo);
+                return FiltersConfig.GetFiltersConfig(path, repo.Doc);
+            });
+        kernel.Bind<ChecksConfig>()
+            .ToMethod(c => {
+                var repo = c.Kernel.Get<RevitRepository>();
+                string path = GetConfigPath(repo);
+                return ChecksConfig.GetChecksConfig(path, repo.Doc);
+            });
 
-                kernel.Bind<MainViewModel>()
-                    .ToSelf()
-                    .InSingletonScope();
-                kernel.Bind<MainWindow>()
-                    .ToSelf()
-                    .InSingletonScope()
-                    .WithPropertyValue(nameof(Window.DataContext), c => c.Kernel.Get<MainViewModel>());
+        kernel.Bind<MainViewModel>()
+            .ToSelf()
+            .InSingletonScope();
+        kernel.Bind<MainWindow>()
+            .ToSelf()
+            .InSingletonScope()
+            .WithPropertyValue(nameof(Window.DataContext), c => c.Kernel.Get<MainViewModel>());
 
-                string assemblyName = Assembly.GetExecutingAssembly().GetName().Name;
-                kernel.UseWpfLocalization(
-                    $"/{assemblyName};component/assets/Localization/Language.xaml",
-                    CultureInfo.GetCultureInfo("ru-RU"));
+        string assemblyName = Assembly.GetExecutingAssembly().GetName().Name;
+        kernel.UseWpfLocalization(
+            $"/{assemblyName};component/assets/Localization/Language.xaml",
+            CultureInfo.GetCultureInfo("ru-RU"));
 
-                Notification(kernel.Get<MainWindow>());
-            }
-        }
+        Notification(kernel.Get<MainWindow>());
+    }
 
-        private string GetConfigPath(RevitRepository revitRepository) {
-            return Path.Combine(revitRepository.GetObjectName(), revitRepository.GetDocumentName());
-        }
+    private string GetConfigPath(RevitRepository revitRepository) {
+        return Path.Combine(revitRepository.GetObjectName(), revitRepository.GetDocumentName());
     }
 }

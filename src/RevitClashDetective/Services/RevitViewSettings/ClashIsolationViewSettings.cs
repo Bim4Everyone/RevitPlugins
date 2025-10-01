@@ -41,19 +41,18 @@ internal class ClashIsolationViewSettings : IView3DSetting {
     }
 
     private void IsolateClashElements(View3D view, IClashViewModel clash) {
-        using(Transaction t = _revitRepository.Doc.StartTransaction(
-            _localizationService.GetLocalizedString("Transactions.IsolateClashElements"))) {
-            var filtersToHide = GetIsolationFilters(clash, view);
-            view = _revitRepository.RemoveFilters(view);
-            foreach(var filter in filtersToHide) {
-                view.AddFilter(filter.Id);
-                view.SetFilterVisibility(filter.Id, false);
-            }
-            foreach(var category in _revitRepository.GetLineCategoriesToHide()) {
-                view.SetCategoryHidden(category, true);
-            }
-            t.Commit();
+        using var t = _revitRepository.Doc.StartTransaction(
+            _localizationService.GetLocalizedString("Transactions.IsolateClashElements"));
+        var filtersToHide = GetIsolationFilters(clash, view);
+        view = _revitRepository.RemoveFilters(view);
+        foreach(var filter in filtersToHide) {
+            view.AddFilter(filter.Id);
+            view.SetFilterVisibility(filter.Id, false);
         }
+        foreach(var category in _revitRepository.GetLineCategoriesToHide()) {
+            view.SetCategoryHidden(category, true);
+        }
+        t.Commit();
     }
 
     private ICollection<ParameterFilterElement> GetIsolationFilters(IClashViewModel clash, View view) {
