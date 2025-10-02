@@ -4,6 +4,8 @@ using System.Linq;
 
 using Autodesk.Revit.DB;
 
+using RevitPylonDocumentation.Models.PluginOptions;
+
 namespace RevitPylonDocumentation.Models.Services;
 
 /// <summary>

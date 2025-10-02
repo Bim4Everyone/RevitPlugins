@@ -23,7 +23,7 @@ internal class TagCreationService {
         var view = _pylonView.ViewElement;
         var doc = view.Document;
         var annotationInstance = IndependentTag.Create(doc, tagSymbol.Id, view.Id, new Reference(element),
-                          true, TagOrientation.Horizontal, bodyPoint);
+                                                       true, TagOrientation.Horizontal, bodyPoint);
         annotationInstance.TagHeadPosition = bodyPoint;
         return annotationInstance;
     }
@@ -78,7 +78,7 @@ internal class TagCreationService {
     }
 
     public AnnotationSymbol CreateAnnotationTag(XYZ bodyPoint, FamilySymbol annotationSymbol, double tagLength,
-                                                   string topText = null, string bottomText = null) {
+                                                string topText = null, string bottomText = null) {
         var view = _pylonView.ViewElement;
         var doc = view.Document;
         // Создаем экземпляр типовой аннотации для указания ГОСТа

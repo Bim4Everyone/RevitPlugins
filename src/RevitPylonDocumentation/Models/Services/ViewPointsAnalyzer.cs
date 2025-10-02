@@ -1,9 +1,8 @@
-using System;
 using System.Collections.Generic;
-using System.Windows.Media;
 
 using Autodesk.Revit.DB;
 
+using RevitPylonDocumentation.Models.PluginOptions;
 using RevitPylonDocumentation.Models.PylonSheetNView;
 
 namespace RevitPylonDocumentation.Models.Services;

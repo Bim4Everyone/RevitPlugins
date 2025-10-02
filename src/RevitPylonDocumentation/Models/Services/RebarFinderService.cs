@@ -5,6 +5,7 @@ using Autodesk.Revit.DB;
 
 using dosymep.Revit;
 
+using RevitPylonDocumentation.Models.PluginOptions;
 using RevitPylonDocumentation.ViewModels;
 
 namespace RevitPylonDocumentation.Models.Services;
@@ -66,7 +67,7 @@ public class RebarFinderService {
 
     /// <summary>
     /// Получение арматурных стержней с параметры по пилону (комплект, марка, фильтрация 1) с нужными номерами форм.
-    /// Номера арматурных форм подаются граничными значениеями диапазонов
+    /// Номера арматурных форм подаются граничными значениями диапазонов
     /// </summary>
     /// <param name="projectSection">Комплект документации</param>
     /// <param name="pylonKeyName">Марка пилона</param>

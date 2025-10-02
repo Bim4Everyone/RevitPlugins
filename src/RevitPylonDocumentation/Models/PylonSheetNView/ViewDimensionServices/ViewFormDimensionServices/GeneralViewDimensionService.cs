@@ -45,14 +45,16 @@ internal class GeneralViewDimensionService {
                                                                           [side, "край"]);
             // Размер по ФРОНТУ опалубка + армирование (положение снизу 1)
             var dimensionLineBottomFirst = _dimensionBaseService.GetDimensionLine(skeletonParentRebar,
-                                                                                 DirectionType.Bottom, 1.3);
+                                                                                  DirectionType.Bottom, 
+                                                                                  1.3);
             var refArrayFormworkRebarFront =
                 _dimensionBaseService.GetDimensionRefs(skeletonParentRebar, 
                                                        ["низ", side, "край"], 
                                                        oldRefArray: refArrayFormwork);
-            var formRebarDimension = _repository.Document.Create.NewDimension(view, dimensionLineBottomFirst, 
-                                                                             refArrayFormworkRebarFront,
-                                                                             _viewModel.SelectedDimensionType);
+            var formRebarDimension = _repository.Document.Create.NewDimension(view, 
+                                                                              dimensionLineBottomFirst, 
+                                                                              refArrayFormworkRebarFront,
+                                                                              _viewModel.SelectedDimensionType);
             _dimSegmentsService.EditEdgeDimensionSegments(formRebarDimension,
                                                           _dimSegmentsService.VertSmallUpDirectDimTextOffset,
                                                           _dimSegmentsService.VertSmallUpInvertedDimTextOffset);
@@ -62,11 +64,13 @@ internal class GeneralViewDimensionService {
             if(grids.Count > 0) {
                 // Размер по ФРОНТУ опалубка + оси (положение снизу 2)
                 var dimensionLineBottomSecond = _dimensionBaseService.GetDimensionLine(skeletonParentRebar,
-                                                                                      DirectionType.Bottom, 1.8);
-                var refArrayFormworkGridFront = _dimensionBaseService.GetDimensionRefs(grids, new XYZ(0, 0, 1),
+                                                                                       DirectionType.Bottom, 
+                                                                                       1.8);
+                var refArrayFormworkGridFront = _dimensionBaseService.GetDimensionRefs(grids, 
+                                                                                       new XYZ(0, 0, 1),
                                                                                        refArrayFormwork);
                 _repository.Document.Create.NewDimension(view, dimensionLineBottomSecond, refArrayFormworkGridFront,
-                                                        _viewModel.SelectedDimensionType);
+                                                         _viewModel.SelectedDimensionType);
 
                 // Корректируем концы осей, приближая их на виде к опалубке пилона, чтобы сократить габариты
                 // видового экрана
@@ -83,10 +87,10 @@ internal class GeneralViewDimensionService {
 
             // Размер по ФРОНТУ опалубка (положение снизу 3)
             var dimensionLineBottomThird = _dimensionBaseService.GetDimensionLine(skeletonParentRebar,
-                                                                                 DirectionType.Bottom, 
-                                                                                 dimensionLineBottomThirdOffset);
+                                                                                  DirectionType.Bottom, 
+                                                                                  dimensionLineBottomThirdOffset);
             _repository.Document.Create.NewDimension(view, dimensionLineBottomThird, refArrayFormwork,
-                                                    _viewModel.SelectedDimensionType);
+                                                     _viewModel.SelectedDimensionType);
         } catch(Exception) { }
     }
     
@@ -104,8 +108,8 @@ internal class GeneralViewDimensionService {
                                          && !_sheetInfo.RebarInfo.AllRebarAreL
                                          && _sheetInfo.RebarInfo.HasLRebar
                                          && _viewModel.RebarFinder.DirectionHasLRebar(_viewOfPylon.ViewElement,
-                                                                                     _sheetInfo.ProjectSection,
-                                                                                     DirectionType.Left)
+                                                                                      _sheetInfo.ProjectSection,
+                                                                                      DirectionType.Left)
                                          ? DirectionType.Right : DirectionType.Left;
 
             var dimensionLineLeft = _dimensionBaseService.GetDimensionLine(hostElems.First() as FamilyInstance,
@@ -130,7 +134,7 @@ internal class GeneralViewDimensionService {
                     refArray.Append(lastFloorTopFace.Reference);
                 }
                 _repository.Document.Create.NewDimension(_viewOfPylon.ViewElement, dimensionLineLeft, refArray,
-                                                        _viewModel.SelectedDimensionType);
+                                                         _viewModel.SelectedDimensionType);
             }
         } catch(Exception) { }
     }
@@ -157,19 +161,20 @@ internal class GeneralViewDimensionService {
                                          && !_sheetInfo.RebarInfo.AllRebarAreL
                                          && _sheetInfo.RebarInfo.HasLRebar
                                          && _viewModel.RebarFinder.DirectionHasLRebar(_viewOfPylon.ViewElement,
-                                                                                     _sheetInfo.ProjectSection,
-                                                                                     DirectionType.Left)
+                                                                                      _sheetInfo.ProjectSection,
+                                                                                      DirectionType.Left)
                                          ? DirectionType.Right : DirectionType.Left;
             // Определяем размерную линию
             var dimensionLineLeft = _dimensionBaseService.GetDimensionLine(_sheetInfo.HostElems.First() as FamilyInstance,
-                                                                          dimensionLineDirection, 1.1);
+                                                                           dimensionLineDirection, 
+                                                                           1.1);
             // #1_горизонт_выпуск
             var refArray = _dimensionBaseService.GetDimensionRefs(rebar, ["горизонт", "выпуск"]);
             if(refArray.Size == 0) { return; }
             refArray.Append(lastFloorTopFace.Reference);
             refArray.Append(lastFloorBottomFace.Reference);
             _repository.Document.Create.NewDimension(_viewOfPylon.ViewElement, dimensionLineLeft, refArray,
-                                                    _viewModel.SelectedDimensionType);
+                                                     _viewModel.SelectedDimensionType);
         } catch(Exception) { }
     }
 
@@ -194,8 +199,8 @@ internal class GeneralViewDimensionService {
             if(isForPerpView && !_sheetInfo.RebarInfo.AllRebarAreL 
                              && _sheetInfo.RebarInfo.HasLRebar
                              && _viewModel.RebarFinder.DirectionHasLRebar(_viewOfPylon.ViewElement,
-                                                                         _sheetInfo.ProjectSection,
-                                                                         DirectionType.Left)) {
+                                                                          _sheetInfo.ProjectSection,
+                                                                          DirectionType.Left)) {
                 dimensionLineDirection = DirectionType.Right;
                 textOffset = _dimSegmentsService.HorizSmallDownDirectDimText;
                 textOffsetInverted = _dimSegmentsService.HorizSmallDownInvertedDimTextOffset;
@@ -261,10 +266,10 @@ internal class GeneralViewDimensionService {
 
             // Определяем размерную линию
             var dimensionLineLeft = _dimensionBaseService.GetDimensionLine(_sheetInfo.HostElems.First() as FamilyInstance,
-                                                                          dimensionLineDirection, 1.1);
+                                                                           dimensionLineDirection, 1.1);
             var dimensionRebarSide =
                 _repository.Document.Create.NewDimension(_viewOfPylon.ViewElement, dimensionLineLeft, refArray,
-                                                        _viewModel.SelectedDimensionType);
+                                                         _viewModel.SelectedDimensionType);
 
             // Применяем опции изменений сегментов размера
             _dimSegmentsService.ApplySegmentsModification(dimensionRebarSide, dimSegmentOpts);
@@ -290,7 +295,7 @@ internal class GeneralViewDimensionService {
             
             // Получаем позицию для размерной линии по Г-образному стержню
             var lRebar = _viewModel.RebarFinder.GetSimpleRebars(_viewOfPylon.ViewElement, _sheetInfo.ProjectSection, 1101)
-                                              .FirstOrDefault();
+                                               .FirstOrDefault();
             var dimensionLine = _dimensionBaseService.GetDimensionLine(lRebar, DirectionType.Top, 0.5);
             
             //"#1_торец_Г_нутрь"
@@ -302,8 +307,8 @@ internal class GeneralViewDimensionService {
                                              ["2_торец", "Г", "край"], lastPylonRefArrayFirst, lastPylonRefArraySecond);
             } else if(_sheetInfo.RebarInfo.HasLRebar) {
                 if(_viewModel.RebarFinder.DirectionHasLRebar(_viewOfPylon.ViewElement, 
-                                                            _sheetInfo.ProjectSection,  
-                                                            DirectionType.Right)
+                                                             _sheetInfo.ProjectSection,  
+                                                             DirectionType.Right)
                     && _sheetInfo.RebarInfo.SecondLRebarParamValue) {
                     CreateLRebarToPylonDimension(skeletonParentRebar, dimensionLine, 
                                                  ["2_торец", "Г", "край"], 
@@ -329,9 +334,9 @@ internal class GeneralViewDimensionService {
                                                                     oldRefArray: pylonRefArraySecond);
 
         var dimensionFirst = _repository.Document.Create.NewDimension(_viewOfPylon.ViewElement, dimensionLine, 
-                                                                     refArrayFirst, _viewModel.SelectedDimensionType);
+                                                                      refArrayFirst, _viewModel.SelectedDimensionType);
         var dimensionSecond = _repository.Document.Create.NewDimension(_viewOfPylon.ViewElement, dimensionLine, 
-                                                                      refArraySecond, _viewModel.SelectedDimensionType);
+                                                                       refArraySecond, _viewModel.SelectedDimensionType);
 
         if(dimensionFirst.Value > dimensionSecond.Value) {
             _repository.Document.Delete(dimensionFirst.Id);

@@ -1,6 +1,7 @@
 using System;
 using System.Linq;
 
+using RevitPylonDocumentation.Models.PluginOptions;
 using RevitPylonDocumentation.Models.Services;
 using RevitPylonDocumentation.ViewModels;
 
@@ -41,60 +42,58 @@ internal class TransViewRebarDimensionService {
             var edgeBottomFrontRefArray = _dimensionBaseService.GetDimensionRefs(skeletonParentRebar, 
                                                                                  ["низ", "фронт", "край"]);
             //ВЕРТИКАЛЬНЫЕ РАЗМЕРЫ
+            var topSmallOffset = new DimensionLineOffsetOption(dimensionLineHostRef, DirectionType.Top, 0.5);
+            var topBigOffset = new DimensionLineOffsetOption(dimensionLineHostRef, DirectionType.Top, 1);
+            var bottomSmallOffset = new DimensionLineOffsetOption(dimensionLineHostRef, DirectionType.Bottom, 0.5);
+            var bottomBigOffset = new DimensionLineOffsetOption(dimensionLineHostRef, DirectionType.Bottom, 1);
+            
             if(onTopOfRebar) {
                 if(_sheetInfo.RebarInfo.AllRebarAreL) {
                     // Когда все Гэшки
-                    _dimCreationService.CreateDimension(skeletonParentRebar, dimensionLineHostRef, DirectionType.Bottom, 0.5,
-                                    ["низ", "фронт"]);
+                    _dimCreationService.CreateDimension(skeletonParentRebar, bottomSmallOffset, ["низ", "фронт"]);
                     // Размер по ФРОНТУ каркас края (положение снизу дальнее)
-                    _dimCreationService.CreateDimension(skeletonParentRebar, dimensionLineHostRef, DirectionType.Bottom, 1,
-                                    ["низ", "фронт", "край"]);
+                    _dimCreationService.CreateDimension(skeletonParentRebar, bottomBigOffset, ["низ", "фронт", "край"]);
                 } else if(_sheetInfo.RebarInfo.HasLRebar) {
                     // Когда Гэшки с одной стороны
                     if(rebarFinder.DirectionHasLRebar(view, _sheetInfo.ProjectSection, DirectionType.Top)) {
                         // Верхняя зона
-                        _dimCreationService.CreateDimension(skeletonParentRebar, dimensionLineHostRef, DirectionType.Top, 0.5,
-                                        ["низ", "фронт"]);
+                        _dimCreationService.CreateDimension(skeletonParentRebar, topSmallOffset, ["низ", "фронт"]);
                         // Размер по ФРОНТУ каркас края (положение сверху дальнее)
-                        _dimCreationService.CreateDimension(skeletonParentRebar, dimensionLineHostRef, DirectionType.Top, 1,
-                                        ["низ", "фронт", "край"]);
+                        _dimCreationService.CreateDimension(skeletonParentRebar, topBigOffset, 
+                                                            ["низ", "фронт", "край"]);
 
                         // Нижняя зона
-                        _dimCreationService.CreateDimension(skeletonParentRebar, dimensionLineHostRef, DirectionType.Bottom, 0.5,
-                                        ["верх", "фронт"], edgeBottomFrontRefArray);
+                        _dimCreationService.CreateDimension(skeletonParentRebar, bottomSmallOffset, ["верх", "фронт"], 
+                                                            edgeBottomFrontRefArray);
                         // Размер по ФРОНТУ каркас края (положение снизу дальнее)
-                        _dimCreationService.CreateDimension(skeletonParentRebar, dimensionLineHostRef, DirectionType.Bottom, 1,
-                                        ["верх", "фронт", "край"]);
+                        _dimCreationService.CreateDimension(skeletonParentRebar, bottomBigOffset, 
+                                                            ["верх", "фронт", "край"]);
                     } else {
                         // Верхняя зона
-                        _dimCreationService.CreateDimension(skeletonParentRebar, dimensionLineHostRef, DirectionType.Top, 0.5,
-                                        ["верх", "фронт"], edgeBottomFrontRefArray);
+                        _dimCreationService.CreateDimension(skeletonParentRebar, topSmallOffset, ["верх", "фронт"], 
+                                                            edgeBottomFrontRefArray);
                         // Размер по ФРОНТУ каркас края (положение сверху дальнее)
-                        _dimCreationService.CreateDimension(skeletonParentRebar, dimensionLineHostRef, DirectionType.Top, 1,
-                                        ["верх", "фронт", "край"]);
+                        _dimCreationService.CreateDimension(skeletonParentRebar, topBigOffset, 
+                                                            ["верх", "фронт", "край"]);
 
                         // Нижняя зона
-                        _dimCreationService.CreateDimension(skeletonParentRebar, dimensionLineHostRef, DirectionType.Bottom, 0.5,
-                                        ["низ", "фронт"]);
+                        _dimCreationService.CreateDimension(skeletonParentRebar, bottomSmallOffset, ["низ", "фронт"]);
                         // Размер по ФРОНТУ каркас края (положение снизу дальнее)
-                        _dimCreationService.CreateDimension(skeletonParentRebar, dimensionLineHostRef, DirectionType.Bottom, 1,
-                                        ["низ", "фронт", "край"]);
+                        _dimCreationService.CreateDimension(skeletonParentRebar, bottomBigOffset, 
+                                                            ["низ", "фронт", "край"]);
                     }
                 } else {
                     // Размер по ФРОНТУ каркас (положение снизу ближнее)
-                    _dimCreationService.CreateDimension(skeletonParentRebar, dimensionLineHostRef, DirectionType.Bottom, 0.5,
-                                    ["верх", "фронт"], edgeBottomFrontRefArray);
+                    _dimCreationService.CreateDimension(skeletonParentRebar, bottomSmallOffset, ["верх", "фронт"], 
+                                                        edgeBottomFrontRefArray);
                     // Размер по ФРОНТУ каркас края (положение снизу дальнее)
-                    _dimCreationService.CreateDimension(skeletonParentRebar, dimensionLineHostRef, DirectionType.Bottom, 1,
-                                    ["низ", "фронт", "край"]);
+                    _dimCreationService.CreateDimension(skeletonParentRebar, bottomBigOffset, ["низ", "фронт", "край"]);
                 }
             } else {
                 // Размер по ФРОНТУ каркас (положение снизу ближнее)
-                _dimCreationService.CreateDimension(skeletonParentRebar, dimensionLineHostRef, DirectionType.Bottom, 0.5,
-                                ["низ", "фронт"]);
+                _dimCreationService.CreateDimension(skeletonParentRebar, bottomSmallOffset, ["низ", "фронт"]);
                 // Размер по ФРОНТУ каркас края (положение снизу дальнее)
-                _dimCreationService.CreateDimension(skeletonParentRebar, dimensionLineHostRef, DirectionType.Bottom, 1,
-                                ["низ", "фронт", "край"]);
+                _dimCreationService.CreateDimension(skeletonParentRebar, bottomBigOffset, ["низ", "фронт", "край"]);
             }
 
             //ГОРИЗОНТАЛЬНЫЕ РАЗМЕРЫ
@@ -124,15 +123,17 @@ internal class TransViewRebarDimensionService {
                                                                    ["верх", "торец", "край"],
                                                                    oldRefArray: edgeBottomSideRefArray);
                 }
-                _dimCreationService.CreateDimension(edgeBottomSideRefArray, pylon, DirectionType.Right, 0.5, false);
+
+                var edgeBottomSideOffset = new DimensionLineOffsetOption(pylon, DirectionType.Right, 0.5);
+                _dimCreationService.CreateDimension(edgeBottomSideRefArray, edgeBottomSideOffset, false);
 
                 // Т.к. мы поставили размер опалубка + армирование, поэтому размер только по опалубке будет стоять дальше
                 formDimensionLineOffset = 1;
             }
 
             // Размер по ТОРЦУ армирование (положение справа дальнее)
-            _dimCreationService.CreateDimension(skeletonParentRebar, pylon, DirectionType.Right, formDimensionLineOffset, 
-                            ["низ", "торец", "край"]);
+            var rebarSideOffset = new DimensionLineOffsetOption(pylon, DirectionType.Right, formDimensionLineOffset);
+            _dimCreationService.CreateDimension(skeletonParentRebar, rebarSideOffset, ["низ", "торец", "край"]);
         } catch(Exception) { }
     }
 }

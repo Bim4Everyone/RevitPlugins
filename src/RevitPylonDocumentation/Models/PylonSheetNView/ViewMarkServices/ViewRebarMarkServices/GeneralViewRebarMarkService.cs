@@ -3,6 +3,7 @@ using System.Collections.Generic;
 
 using Autodesk.Revit.DB;
 
+using RevitPylonDocumentation.Models.PluginOptions;
 using RevitPylonDocumentation.Models.Services;
 using RevitPylonDocumentation.ViewModels;
 

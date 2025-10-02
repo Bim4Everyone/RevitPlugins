@@ -47,60 +47,59 @@ internal class TransViewDimensionService {
         var view = _viewOfPylon.ViewElement;
 
 
-        var refArrayFormworkFront = _dimensionBaseService.GetDimensionRefs(pylon as FamilyInstance,
-                                                                           ["фронт", "край"]);
+        var refArrayFormworkFront = _dimensionBaseService.GetDimensionRefs(pylon as FamilyInstance, ["фронт", "край"]);
 
         // Указывает нужно ли будет делать длинные оси снизу (сделано здесь, чтобы не выполнять запрос дважды)
         var vertDimensionsForEdit = new List<Dimension>();
         var longGridsWillBeNeeded = false;
+
+        var topSmallOffset = new DimensionLineOffsetOption(dimensionLineHostRef, DirectionType.Top, 0.5);
+        var bottomSmallOffset = new DimensionLineOffsetOption(dimensionLineHostRef, DirectionType.Bottom, 0.5);
         if(refsForTop) {
             // Когда все Гэшки
             if(_sheetInfo.RebarInfo.AllRebarAreL) {
                 vertDimensionsForEdit.Add(
-                    _dimCreationService.CreateDimension(skeletonParentRebar, dimensionLineHostRef, DirectionType.Bottom, 0.5,
-                                    ["низ", "фронт", "край"],
-                                    refArrayFormworkFront, false));
+                    _dimCreationService.CreateDimension(skeletonParentRebar, bottomSmallOffset, ["низ", "фронт", "край"], 
+                                                        refArrayFormworkFront, false));
                 longGridsWillBeNeeded = true;
             } else if(_sheetInfo.RebarInfo.HasLRebar) {
                 // Когда Гэшки с одной стороны
                 if(rebarFinder.DirectionHasLRebar(view, _sheetInfo.ProjectSection, DirectionType.Top)) {
                     vertDimensionsForEdit.Add(
-                        _dimCreationService.CreateDimension(skeletonParentRebar, dimensionLineHostRef, DirectionType.Top, 0.5,
-                                        ["низ", "фронт", "край"],
-                                        refArrayFormworkFront, false));
+                        _dimCreationService.CreateDimension(skeletonParentRebar, topSmallOffset, 
+                                                            ["низ", "фронт", "край"],
+                                                            refArrayFormworkFront, false));
                     vertDimensionsForEdit.Add(
-                        _dimCreationService.CreateDimension(skeletonParentRebar, dimensionLineHostRef, DirectionType.Bottom, 0.5,
-                                        ["верх", "фронт", "край"],
-                                        refArrayFormworkFront, false));
+                        _dimCreationService.CreateDimension(skeletonParentRebar, bottomSmallOffset, 
+                                                            ["верх", "фронт", "край"],
+                                                            refArrayFormworkFront, false));
                 } else {
                     vertDimensionsForEdit.Add(
-                        _dimCreationService.CreateDimension(skeletonParentRebar, dimensionLineHostRef, DirectionType.Top, 0.5,
-                                        ["верх", "фронт", "край"],
-                                        refArrayFormworkFront, false));
+                        _dimCreationService.CreateDimension(skeletonParentRebar, topSmallOffset, 
+                                                            ["верх", "фронт", "край"],
+                                                            refArrayFormworkFront, false));
                     vertDimensionsForEdit.Add(
-                        _dimCreationService.CreateDimension(skeletonParentRebar, dimensionLineHostRef, DirectionType.Bottom, 0.5,
-                                        ["низ", "фронт", "край"],
-                                        refArrayFormworkFront, false));
+                        _dimCreationService.CreateDimension(skeletonParentRebar, bottomSmallOffset, 
+                                                            ["низ", "фронт", "край"],
+                                                            refArrayFormworkFront, false));
                     longGridsWillBeNeeded = true;
                 }
             }
             // Когда Гэшек нет вообще
             if(!_sheetInfo.RebarInfo.HasLRebar) {
                 vertDimensionsForEdit.Add(
-                    _dimCreationService.CreateDimension(skeletonParentRebar, dimensionLineHostRef, DirectionType.Bottom, 0.5,
-                                    ["верх", "фронт", "край"],
-                                    refArrayFormworkFront, false));
+                    _dimCreationService.CreateDimension(skeletonParentRebar, bottomSmallOffset, 
+                                                        ["верх", "фронт", "край"],
+                                                        refArrayFormworkFront, false));
             }
         } else {
             vertDimensionsForEdit.Add(
-                _dimCreationService.CreateDimension(skeletonParentRebar, dimensionLineHostRef, DirectionType.Bottom, 0.5,
-                                ["низ", "фронт", "край"], refArrayFormworkFront, false));
+                _dimCreationService.CreateDimension(skeletonParentRebar, bottomSmallOffset, ["низ", "фронт", "край"], 
+                                                    refArrayFormworkFront, false));
         }
 
         // Изменяем размер, передвигая текст у крайних сегментов для корректного отображения
         foreach(var dimension in vertDimensionsForEdit) {
-            //EditThreeSegmentsDimension(dimension, true);
-
             _dimSegmentsService.EditEdgeDimensionSegments(dimension,
                                                           _dimSegmentsService.VertSmallUpDirectDimTextOffset,
                                                           _dimSegmentsService.VertSmallUpInvertedDimTextOffset);
@@ -111,15 +110,17 @@ internal class TransViewDimensionService {
         // Размеры по осям
         if(grids.Count > 0 && _dimensionBaseService.GetDimensionRefs(grids, XYZ.BasisY).Size > 0) {
             // Размер по ФРОНТУ опалубка + оси (положение сверху 1)
-            _dimCreationService.CreateDimension(grids, dimensionLineHostRef, DirectionType.Bottom, 1,
-                            XYZ.BasisY, refArrayFormworkFront);
+
+            var offset = new DimensionLineOffsetOption(dimensionLineHostRef, DirectionType.Bottom, 1);
+            _dimCreationService.CreateDimension(grids, XYZ.BasisY, offset, refArrayFormworkFront);
 
             formworkFrontDimensionLineOffset = 1.5;
         }
 
         // Размер по ФРОНТУ опалубка (положение снизу 1.5)
-        _dimCreationService.CreateDimension(refArrayFormworkFront, dimensionLineHostRef, DirectionType.Bottom,
-                                            formworkFrontDimensionLineOffset);
+        var formworkFrontDimOffset = new DimensionLineOffsetOption(dimensionLineHostRef, DirectionType.Bottom,
+                                                                   formworkFrontDimensionLineOffset);
+        _dimCreationService.CreateDimension(refArrayFormworkFront, formworkFrontDimOffset);
 
         return longGridsWillBeNeeded;
     }
@@ -157,20 +158,22 @@ internal class TransViewDimensionService {
                                                                   [rebarPart, "торец", "_2_"],
                                                                   oldRefArray: refArraySide);
         }
-        var formworkRebarDimensionSide = _dimCreationService.CreateDimension(refArraySide, pylon, DirectionType.Right, 
-                                                                             0.6, false);
+        var formworkRebarDimOffset = new DimensionLineOffsetOption(pylon, DirectionType.Right, 0.6);
+        var formworkRebarDimSide = _dimCreationService.CreateDimension(refArraySide, formworkRebarDimOffset, false);
         // Изменяем размер, передвигая текст у крайних сегментов для корректного отображения
-        _dimSegmentsService.EditEdgeDimensionSegments(formworkRebarDimensionSide,
+        _dimSegmentsService.EditEdgeDimensionSegments(formworkRebarDimSide,
                                                       _dimSegmentsService.HorizSmallUpDirectDimTextOffset,
                                                       _dimSegmentsService.HorizSmallUpInvertedDimTextOffset);
 
         // Размер по ТОРЦУ опалубка (положение справа дальнее)
-        _dimCreationService.CreateDimension(refArrayFormworkSide, pylon, DirectionType.Right, 1);
+        var formworkSideDimOffset = new DimensionLineOffsetOption(pylon, DirectionType.Right, 1);
+        _dimCreationService.CreateDimension(refArrayFormworkSide, formworkSideDimOffset);
 
         // Если на виде есть оси, то создаем размер
         if(grids.Count > 0) {
             // Размер по ТОРЦУ опалубка + оси (положение слева дальнее)
-            _dimCreationService.CreateDimension(grids, pylon, DirectionType.Left, 1, XYZ.BasisX, refArrayFormworkSide);
+            var offset = new DimensionLineOffsetOption(pylon, DirectionType.Left, 1);
+            _dimCreationService.CreateDimension(grids, XYZ.BasisX, offset,  refArrayFormworkSide);
         }
 
         if(grids.Count > 0) {

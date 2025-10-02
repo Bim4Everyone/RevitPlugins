@@ -5,6 +5,7 @@ using Autodesk.Revit.DB;
 
 using dosymep.Revit;
 
+using RevitPylonDocumentation.Models.PluginOptions;
 using RevitPylonDocumentation.Models.Services;
 using RevitPylonDocumentation.ViewModels;
 
