@@ -16,5 +16,5 @@ internal class NwcExportViewSettings {
     /// <summary>
     /// Рабочие наборы, в названиях которых содержится подстрока из коллекции, должны быть скрыты на экспортируемом виде
     /// </summary>
-    public string[] WorksetHideTemplates { get; set; } = [];
+    public string[] WorksetHideTemplates { get; set; } = ["вспомогательные", "скрытые", "скрыть"];
 }

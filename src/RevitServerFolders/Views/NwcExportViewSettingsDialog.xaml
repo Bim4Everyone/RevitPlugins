@@ -10,13 +10,11 @@
     xmlns:vms="clr-namespace:RevitServerFolders.ViewModels"
     xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
     xmlns:wpfbehaviors="clr-namespace:dosymep.WpfCore.Behaviors;assembly=dosymep.WpfCore"
+    xmlns:converters="clr-namespace:dosymep.WpfCore.Converters;assembly=dosymep.WpfCore"
     mc:Ignorable="d"
     Title="{me:LocalizationSource NwcExportViewSettingsDialog.Title}"
     x:ClassModifier="internal"
-    DialogMaxHeight="700"
     DialogMaxWidth="650"
-    MinWidth="650"
-    MinHeight="700"
     PrimaryButtonAppearance="Primary"
     IsPrimaryButtonEnabled="{Binding CanSave}"
     CloseButtonText="{me:LocalizationSource NwcExportViewSettingsDialog.CloseButton}"
@@ -34,8 +32,12 @@
                 <ResourceDictionary
                     Source="pack://application:,,,/Wpf.Ui;component/Controls/ContentDialog/ContentDialog.xaml" />
                 <ResourceDictionary
+                    Source="pack://application:,,,/Wpf.Ui;component/Controls/ListView/ListView.xaml" />
+                <ResourceDictionary
                     Source="../Resources/CustomStyles.xaml" />
             </ResourceDictionary.MergedDictionaries>
+            <converters:StringToVisibilityConverter
+                x:Key="StringToVisibilityConverter" />
             <Style
                 BasedOn="{StaticResource {x:Type ui:ContentDialog}}"
                 TargetType="{x:Type local:NwcExportViewSettingsDialog}" />
@@ -79,7 +81,7 @@
                         HorizontalAlignment="Right"
                         ToolTip="{me:LocalizationSource NwcExportViewSettingsDialog.SelectRsRvtTooltip}"
                         Command="{Binding SelectRsFileCommand}"
-                        Content="{ui:SymbolIcon Symbol=Folder20}" />
+                        Content="{ui:SymbolIcon Symbol=FolderGlobe20}" />
                     <ui:TextBox
                         ToolTip="{Binding RvtFilePath}"
                         Text="{Binding RvtFilePath, UpdateSourceTrigger=PropertyChanged}" />
@@ -95,13 +97,11 @@
         <Border
             Grid.Row="1"
             Margin="0 10 0 0"
-            VerticalAlignment="Stretch"
             ToolTip="{me:LocalizationSource NwcExportViewSettingsDialog.WorksetsTooltip}"
             Style="{StaticResource CustomBorder}">
             <DockPanel
                 LastChildFill="True">
                 <DockPanel
-                    Margin="0 0 0 10"
                     DockPanel.Dock="Top">
                     <Label
                         VerticalAlignment="Center"
@@ -122,30 +122,29 @@
                         CommandParameter="{Binding SelectedWorksetHideTemplate}" />
                 </DockPanel>
                 <ui:ListView
+                    Margin="0 5 0 0"
+                    MaxHeight="300"
                     ScrollViewer.VerticalScrollBarVisibility="Auto"
                     ItemsSource="{Binding WorksetHideTemplates}"
                     SelectedItem="{Binding SelectedWorksetHideTemplate}">
                     <ui:ListView.ItemTemplate>
                         <DataTemplate>
-                            <Border
-                                Style="{StaticResource CustomBorder}">
-                                <DockPanel
-                                    LastChildFill="True">
-                                    <ui:Button
-                                        Margin="5 0 0 0"
-                                        Width="Auto"
-                                        Height="36"
-                                        DockPanel.Dock="Right"
-                                        HorizontalAlignment="Right"
-                                        ToolTip="{StaticResource RemoveTemplateTooltip}"
-                                        Content="{ui:SymbolIcon Symbol=Delete20}"
-                                        Command="{Binding DataContext.RemoveWorksetHideTemplateCommand, RelativeSource={RelativeSource AncestorType=ui:ContentDialog}}"
-                                        CommandParameter="{Binding}" />
-                                    <ui:TextBox
-                                        Text="{Binding Template, UpdateSourceTrigger=PropertyChanged}"
-                                        ToolTip="{Binding Template}" />
-                                </DockPanel>
-                            </Border>
+                            <DockPanel
+                                LastChildFill="True">
+                                <ui:Button
+                                    Margin="5 0 0 0"
+                                    Width="Auto"
+                                    Height="36"
+                                    DockPanel.Dock="Right"
+                                    HorizontalAlignment="Right"
+                                    ToolTip="{StaticResource RemoveTemplateTooltip}"
+                                    Content="{ui:SymbolIcon Symbol=Delete20}"
+                                    Command="{Binding DataContext.RemoveWorksetHideTemplateCommand, RelativeSource={RelativeSource AncestorType=ui:ContentDialog}}"
+                                    CommandParameter="{Binding}" />
+                                <ui:TextBox
+                                    Text="{Binding Template, UpdateSourceTrigger=PropertyChanged}"
+                                    ToolTip="{Binding Template}" />
+                            </DockPanel>
                         </DataTemplate>
                     </ui:ListView.ItemTemplate>
                 </ui:ListView>

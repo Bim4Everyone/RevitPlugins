@@ -89,7 +89,7 @@
     <system:String
         x:Key="NwcExportViewSettingsDialog.ViewTemplateNameLabel">Название шаблона вида</system:String>
     <system:String
-        x:Key="NwcExportViewSettingsDialog.RvtFilePathTooltip">В экспортируемом файле будет автоматически создан 3D вид для экспорта в NWC. У этого вида будет заданный шаблон, скопированный из заданного файла. Также на этом виде будет выключена видимость всех рабочих наборов, в названии которых содержатся строки, заданные ниже. Изменения, внесенные в rvt файл, сохранены не будут.</system:String>
+        x:Key="NwcExportViewSettingsDialog.RvtFilePathTooltip">В экспортируемом файле будет автоматически создан 3D вид для экспорта в NWC. У этого вида будет заданный шаблон, скопированный из заданного файла. Также на этом виде будет выключена видимость всех рабочих наборов, в названии которых содержатся строки, заданные ниже без учета регистра. Изменения, внесенные в rvt файл, сохранены не будут.</system:String>
     <system:String
         x:Key="NwcExportViewSettingsDialog.CloseButton">Закрыть</system:String>
     <system:String
@@ -101,7 +101,7 @@
     <system:String
         x:Key="NwcExportViewSettingsDialog.WorksetsLabel">Строки для скрытия рабочих наборов</system:String>
     <system:String
-        x:Key="NwcExportViewSettingsDialog.WorksetsTooltip">Рабочие наборы, в названии которых есть какая-то из заданных строк, будут скрыты на экспортируемом в NWC виде.</system:String>
+        x:Key="NwcExportViewSettingsDialog.WorksetsTooltip">Рабочие наборы, в названии которых есть какая-то из заданных строк без учета регистра, будут скрыты на экспортируемом в NWC виде.</system:String>
     <system:String
         x:Key="NwcExportViewSettingsDialog.Validation.RvtPathNotSet">Задайте путь к rvt файлу.</system:String>
     <system:String

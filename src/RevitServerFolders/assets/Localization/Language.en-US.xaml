@@ -89,7 +89,7 @@
     <system:String
         x:Key="NwcExportViewSettingsDialog.ViewTemplateNameLabel">View template name</system:String>
     <system:String
-        x:Key="NwcExportViewSettingsDialog.RvtFilePathTooltip">A 3D view will be automatically created in the exported file for NWC export. This view will have the specified template copied from the specified file. Also, visibility of all worksets whose names contain the strings specified below will be turned off on this view. Changes made to the rvt file will not be saved.</system:String>
+        x:Key="NwcExportViewSettingsDialog.RvtFilePathTooltip">A 3D view will be automatically created in the exported file for NWC export. This view will have the specified template copied from the specified file. Also, visibility of all worksets whose names contain the strings with ignore case specified below will be turned off on this view. Changes made to the rvt file will not be saved.</system:String>
     <system:String
         x:Key="NwcExportViewSettingsDialog.CloseButton">Close</system:String>
     <system:String
@@ -101,7 +101,7 @@
     <system:String
         x:Key="NwcExportViewSettingsDialog.WorksetsLabel">Strings for hiding worksets</system:String>
     <system:String
-        x:Key="NwcExportViewSettingsDialog.WorksetsTooltip">Worksets whose names contain any of the specified strings will be hidden on the view exported to NWC.</system:String>
+        x:Key="NwcExportViewSettingsDialog.WorksetsTooltip">Worksets whose names contain any of the specified strings with ignore case will be hidden on the view exported to NWC.</system:String>
     <system:String
         x:Key="NwcExportViewSettingsDialog.Validation.RvtPathNotSet">Specify the path to the rvt file.</system:String>
     <system:String
