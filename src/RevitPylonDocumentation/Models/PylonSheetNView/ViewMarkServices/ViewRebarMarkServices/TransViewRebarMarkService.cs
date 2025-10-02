@@ -105,7 +105,8 @@ internal class TransViewRebarMarkService {
         var pointLeftTop = _viewPointsAnalyzer.GetPointByDirection(pylonPoint, DirectionType.LeftTop, 0.7, 0.25);
 
         // Создаем марку арматуры
-        _annotationService.CreateRebarTag(pointLeftTop, _tagSymbolWithComment, leftTopElement);
+        var tagOption = new TagOption() { BodyPoint = pointLeftTop, TagSymbol = _tagSymbolWithComment};
+        _annotationService.CreateRebarTag(tagOption, leftTopElement);
     }
 
     /// <summary>
@@ -124,7 +125,8 @@ internal class TransViewRebarMarkService {
         var pointRightBottom = _viewPointsAnalyzer.GetPointByDirection(pylonPoint, DirectionType.RightBottom, 0.7, 0.5);
 
         // Создаем марку арматуры
-        _annotationService.CreateRebarTag(pointRightBottom, _tagSymbolWithComment, rightBottomElement);
+        var tagOption = new TagOption() { BodyPoint = pointRightBottom, TagSymbol = _tagSymbolWithComment };
+        _annotationService.CreateRebarTag(tagOption, rightBottomElement);
     }
 
     /// <summary>
@@ -138,7 +140,8 @@ internal class TransViewRebarMarkService {
         var pylonPoint = _viewPointsAnalyzer.GetPylonPointByDirection(SheetInfo, DirectionType.LeftBottom);
         var pointLeftBottom = _viewPointsAnalyzer.GetPointByDirection(pylonPoint, DirectionType.LeftBottom, 0.7, 0.25);
         // Создаем марку арматуры
-        var leftBottomTag = _annotationService.CreateRebarTag(pointLeftBottom, _tagSymbolWithStep, leftClamp);
+        var tagOption = new TagOption() { BodyPoint = pointLeftBottom, TagSymbol = _tagSymbolWithStep };
+        var leftBottomTag = _annotationService.CreateRebarTag(tagOption, leftClamp);
 
 #if REVIT_2022_OR_GREATER
         leftBottomTag.LeaderEndCondition = LeaderEndCondition.Free;
@@ -161,7 +164,8 @@ internal class TransViewRebarMarkService {
         var pylonPoint = _viewPointsAnalyzer.GetPylonPointByDirection(SheetInfo, DirectionType.RightTop);
         var pointRightTop = _viewPointsAnalyzer.GetPointByDirection(pylonPoint, DirectionType.RightTop, 0.8, 0.4);
         // Создаем марку арматуры
-        var rightTopTag = _annotationService.CreateRebarTag(pointRightTop, _tagSymbolWithStep, rightClamp);
+        var tagOption = new TagOption() { BodyPoint = pointRightTop, TagSymbol = _tagSymbolWithStep };
+        var rightTopTag = _annotationService.CreateRebarTag(tagOption, rightClamp);
 
 #if REVIT_2022_OR_GREATER
         rightTopTag.LeaderEndCondition = LeaderEndCondition.Free;
@@ -184,7 +188,8 @@ internal class TransViewRebarMarkService {
         var pointLeft = _viewPointsAnalyzer.GetPointByDirection(leftCBar, DirectionType.LeftBottom, 1.5, 0.1, true);
 
         // Создаем марку арматуры
-        var leftTag = _annotationService.CreateRebarTag(pointLeft, _tagSymbolWithSerif, simpleCBars);
+        var tagOption = new TagOption() { BodyPoint = pointLeft, TagSymbol = _tagSymbolWithSerif };
+        var leftTag = _annotationService.CreateRebarTag(tagOption, simpleCBars);
         leftTag.LeaderEndCondition = LeaderEndCondition.Free;
 
 #if REVIT_2022_OR_GREATER

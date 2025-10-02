@@ -5,6 +5,7 @@ using Autodesk.Revit.DB;
 
 using dosymep.Revit;
 
+using RevitPylonDocumentation.Models.PluginOptions;
 using RevitPylonDocumentation.Models.PylonSheetNView;
 
 namespace RevitPylonDocumentation.Models.Services;
@@ -19,16 +20,22 @@ internal class TagCreationService {
         _pylonView = pylonView;
     }
 
-    public IndependentTag CreateRebarTag(XYZ bodyPoint, FamilySymbol tagSymbol, Element element) {
+    public IndependentTag CreateRebarTag(TagOption tagOption, Element element) {
+        if(tagOption is null || tagOption.TagSymbol is null || tagOption.BodyPoint is null) {
+            return null;
+        }
         var view = _pylonView.ViewElement;
         var doc = view.Document;
-        var annotationInstance = IndependentTag.Create(doc, tagSymbol.Id, view.Id, new Reference(element),
-                                                       true, TagOrientation.Horizontal, bodyPoint);
-        annotationInstance.TagHeadPosition = bodyPoint;
+        var annotationInstance = IndependentTag.Create(doc, tagOption.TagSymbol.Id, view.Id, new Reference(element),
+                                                       true, TagOrientation.Horizontal, tagOption.BodyPoint);
+        annotationInstance.TagHeadPosition = tagOption.BodyPoint;
         return annotationInstance;
     }
 
-    public IndependentTag CreateRebarTag(XYZ bodyPoint, FamilySymbol tagSymbol, List<Element> elements) {
+    public IndependentTag CreateRebarTag(TagOption tagOption, List<Element> elements) {
+        if(tagOption is null || tagOption.TagSymbol is null || tagOption.BodyPoint is null) {
+            return null;
+        }
         if(elements is null || elements.Count == 0) {
             return null;
         }
@@ -37,9 +44,9 @@ internal class TagCreationService {
         var refs = elements.Select(e => new Reference(e)).ToList();
         var keyRef = refs.FirstOrDefault();
 
-        var annotationInstance = IndependentTag.Create(doc, tagSymbol.Id, view.Id, keyRef,
-                          true, TagOrientation.Horizontal, bodyPoint);
-        annotationInstance.TagHeadPosition = bodyPoint;
+        var annotationInstance = IndependentTag.Create(doc, tagOption.TagSymbol.Id, view.Id, keyRef,
+                                                       true, TagOrientation.Horizontal, tagOption.BodyPoint);
+        annotationInstance.TagHeadPosition = tagOption.BodyPoint;
 
 #if REVIT_2022_OR_GREATER
         if(refs.Count > 1) {
@@ -50,9 +57,11 @@ internal class TagCreationService {
         return annotationInstance;
     }
 
-    public void CreateUniversalTag(XYZ bodyPoint, FamilySymbol annotationSymbol, Element element, double tagLength,
-                                   string topText = null, string bottomText = null, XYZ leaderPoint = null) {
-        var annotationInstance = CreateAnnotationTag(bodyPoint, annotationSymbol, tagLength, topText, bottomText);
+    public void CreateUniversalTag(TagOption tagOption, Element element, XYZ leaderPoint = null) {
+        if(tagOption is null || tagOption.BodyPoint is null || tagOption.TagSymbol is null || tagOption.TagLength == 0) {
+            return;
+        }
+        var annotationInstance = CreateAnnotationTag(tagOption);
         // Добавляем и устанавливаем точку привязки выноски
         annotationInstance.addLeader();
         var leader = annotationInstance.GetLeaders().FirstOrDefault();
@@ -66,9 +75,11 @@ internal class TagCreationService {
         }
     }
 
-    public void CreateUniversalTag(XYZ bodyPoint, FamilySymbol annotationSymbol, XYZ leaderPoint, double tagLength,
-                                   string topText = null, string bottomText = null) {
-        var annotationInstance = CreateAnnotationTag(bodyPoint, annotationSymbol, tagLength, topText, bottomText);
+    public void CreateUniversalTag(TagOption tagOption, XYZ leaderPoint) {
+        if(tagOption is null || tagOption.BodyPoint is null || tagOption.TagSymbol is null || tagOption.TagLength == 0) {
+            return;
+        }
+        var annotationInstance = CreateAnnotationTag(tagOption);
         // Добавляем и устанавливаем точку привязки выноски
         annotationInstance.addLeader();
         var leader = annotationInstance.GetLeaders().FirstOrDefault();
@@ -77,23 +88,26 @@ internal class TagCreationService {
         }
     }
 
-    public AnnotationSymbol CreateAnnotationTag(XYZ bodyPoint, FamilySymbol annotationSymbol, double tagLength,
-                                                string topText = null, string bottomText = null) {
+    public AnnotationSymbol CreateAnnotationTag(TagOption tagOption) {
+        if(tagOption is null || tagOption.BodyPoint is null || tagOption.TagSymbol is null || tagOption.TagLength == 0) {
+            return null;
+        }
         var view = _pylonView.ViewElement;
         var doc = view.Document;
         // Создаем экземпляр типовой аннотации для указания ГОСТа
-        var annotationInstance = doc.Create.NewFamilyInstance(bodyPoint, annotationSymbol, view) as AnnotationSymbol;
+        var annotationInstance = 
+            doc.Create.NewFamilyInstance(tagOption.BodyPoint, tagOption.TagSymbol, view) as AnnotationSymbol;
 
         // Устанавливаем значение верхнего текста у выноски
-        if(topText != null) {
-            annotationInstance.SetParamValue(_annotationTagTopTextParamName, topText);
+        if(tagOption.TopText != null) {
+            annotationInstance.SetParamValue(_annotationTagTopTextParamName, tagOption.TopText);
         }
         // Устанавливаем значение нижнего текста у выноски
-        if(bottomText != null) {
-            annotationInstance.SetParamValue(_annotationTagBottomTextParamName, bottomText);
+        if(tagOption.BottomText != null) {
+            annotationInstance.SetParamValue(_annotationTagBottomTextParamName, tagOption.BottomText);
         }
         // Устанавливаем значение длины полки под текстом, чтобы текст влез
-        annotationInstance.SetParamValue(_annotationTagLengthParamName, tagLength);
+        annotationInstance.SetParamValue(_annotationTagLengthParamName, tagOption.TagLength);
         return annotationInstance;
     }
 }

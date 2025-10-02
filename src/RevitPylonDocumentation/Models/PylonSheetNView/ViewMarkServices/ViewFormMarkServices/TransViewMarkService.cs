@@ -52,7 +52,9 @@ internal class TransViewMarkService {
         var pointLeftBottom = _viewPointsAnalyzer.GetPointByDirection(pylonPoint, DirectionType.LeftBottom, 0.95, 0.55);
 
         // Создаем марку арматуры
-        _annotationService.CreateRebarTag(pointLeftBottom, _tagSkeletonSymbol, leftBottomVerticalBar);
+
+        var tagOption = new TagOption() { BodyPoint = pointLeftBottom, TagSymbol = _tagSkeletonSymbol };
+        _annotationService.CreateRebarTag(tagOption, leftBottomVerticalBar);
     }
 }
 

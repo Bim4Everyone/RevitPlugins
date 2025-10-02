@@ -133,7 +133,8 @@ internal class GeneralViewMarkService {
 #endif
             }
             // Создаем марку арматуры
-            var rightTag = _annotationService.CreateRebarTag(point, _tagSkeletonSymbol, rightVerticalBar);
+            var tagOption = new TagOption() { BodyPoint = point, TagSymbol = _tagSkeletonSymbol };
+            var rightTag = _annotationService.CreateRebarTag(tagOption, rightVerticalBar);
             rightTag.LeaderEndCondition = LeaderEndCondition.Free;
 
 #if REVIT_2022_OR_GREATER
@@ -169,9 +170,14 @@ internal class GeneralViewMarkService {
             var annotPoint = _viewPointsAnalyzer.GetPointByDirection(pylonRightMinPoint, DirectionType.RightBottom,
                                                                      1.8, 1.1);
             // Создаем типовую аннотацию для обозначения ГОСТа
-            _annotationService.CreateUniversalTag(annotPoint, _universalTagType, leaderPoint,
-                                                  UnitUtilsHelper.ConvertToInternalValue(40),
-                                                  "Арматурные выпуски", "нижнего пилона");
+            var tagOption = new TagOption() { 
+                BodyPoint = annotPoint, 
+                TagSymbol = _universalTagType,
+                TagLength = UnitUtilsHelper.ConvertToInternalValue(40),
+                TopText = "Арматурные выпуски",
+                BottomText = "нижнего пилона"
+            };
+            _annotationService.CreateUniversalTag(tagOption, leaderPoint);
         } catch(Exception) { }
     }
 

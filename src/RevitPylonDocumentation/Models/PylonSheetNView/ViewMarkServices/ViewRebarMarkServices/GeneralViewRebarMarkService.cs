@@ -75,7 +75,11 @@ internal class GeneralViewRebarMarkService {
             }
 #endif
             // Создаем марку арматуры
-            var tag = _annotationService.CreateRebarTag(point, _tagSymbolWithStep, verticalBar);
+            var tagOption = new TagOption() {
+                BodyPoint = point,
+                TagSymbol = _tagSymbolWithStep
+            };
+            var tag = _annotationService.CreateRebarTag(tagOption, verticalBar);
             tag.LeaderEndCondition = LeaderEndCondition.Free;
         } catch(Exception) { }
     }
@@ -140,7 +144,8 @@ internal class GeneralViewRebarMarkService {
             annotPoint = _viewPointsAnalyzer.GetPointByDirection(annotPoint, directionType, xOffset, 0.3);
 
             // Создаем марку арматуры
-            var clampTag = _annotationService.CreateRebarTag(annotPoint, _tagSymbolWithStep, simpleClamp);
+            var tagOption = new TagOption() { BodyPoint = annotPoint, TagSymbol = _tagSymbolWithStep };
+            var clampTag = _annotationService.CreateRebarTag(tagOption, simpleClamp);
             clampTag.LeaderEndCondition = LeaderEndCondition.Free;
             return clampTag;
         } catch(Exception) { }
