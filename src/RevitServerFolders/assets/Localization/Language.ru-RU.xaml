@@ -51,6 +51,8 @@
         x:Key="MainWindow.Validation.ModelsDuplicated">Папка источника содержит дубликаты "{0}".</system:String>
     <system:String
         x:Key="MainWindow.Validation.AllSettingsOff">Не выбрана ни одна настройка</system:String>
+    <system:String
+        x:Key="NwcMainWindow.Validation.SetNwcViewSettings">Задайте настройки вида для экспорта в NWC.</system:String>
 
     <system:String
         x:Key="RsBrowser.Validation.SelectFolder">Выберите папку с моделями</system:String>
@@ -75,6 +77,39 @@
         x:Key="MainWindow.TargetsFrom">Откуда:</system:String>
     <system:String
         x:Key="MainWindow.TargetsTo">Куда:</system:String>
+
+    <system:String
+        x:Key="NwcExportViewSettingsDialog.Title">Настройки вида для экспорта в NWC</system:String>
+    <system:String
+        x:Key="NwcExportViewSettingsDialog.RvtFilePathLabel">Путь к rvt файлу с шаблоном вида</system:String>
+    <system:String
+        x:Key="NwcExportViewSettingsDialog.SelectLocalRvtTooltip">Выбрать локальный rvt файл</system:String>
+    <system:String
+        x:Key="NwcExportViewSettingsDialog.SelectRsRvtTooltip">Выбрать rvt файл с revit server</system:String>
+    <system:String
+        x:Key="NwcExportViewSettingsDialog.ViewTemplateNameLabel">Название шаблона вида</system:String>
+    <system:String
+        x:Key="NwcExportViewSettingsDialog.RvtFilePathTooltip">В экспортируемом файле будет автоматически создан 3D вид для экспорта в NWC. У этого вида будет заданный шаблон, скопированный из заданного файла. Также на этом виде будет выключена видимость всех рабочих наборов, в названии которых содержатся строки, заданные ниже. Изменения, внесенные в rvt файл, сохранены не будут.</system:String>
+    <system:String
+        x:Key="NwcExportViewSettingsDialog.CloseButton">Закрыть</system:String>
+    <system:String
+        x:Key="NwcExportViewSettingsDialog.SaveButton">Сохранить</system:String>
+    <system:String
+        x:Key="NwcExportViewSettingsDialog.RemoveTemplateTooltip">Удалить строку</system:String>
+    <system:String
+        x:Key="NwcExportViewSettingsDialog.AddTemplateTooltip">Добавить строку</system:String>
+    <system:String
+        x:Key="NwcExportViewSettingsDialog.WorksetsLabel">Строки для скрытия рабочих наборов</system:String>
+    <system:String
+        x:Key="NwcExportViewSettingsDialog.WorksetsTooltip">Рабочие наборы, в названии которых есть какая-то из заданных строк, будут скрыты на экспортируемом в NWC виде.</system:String>
+    <system:String
+        x:Key="NwcExportViewSettingsDialog.Validation.RvtPathNotSet">Задайте путь к rvt файлу.</system:String>
+    <system:String
+        x:Key="NwcExportViewSettingsDialog.Validation.ViewNameNotSet">Задайте название шаблона вида.</system:String>
+    <system:String
+        x:Key="NwcExportViewSettingsDialog.Validation.WorksetTemplateEmpty">Пустые строки недопустимы.</system:String>
+    <system:String
+        x:Key="NwcExportViewSettingsDialog.Validation.WorksetTemplatesDuplicated">Строки дублируются: "{0}".</system:String>
 
     <system:String
         x:Key="MainWindow.ErrorTextPattern">Ошибка в настройке {0}: {1}</system:String>

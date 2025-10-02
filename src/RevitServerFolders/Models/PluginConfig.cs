@@ -15,6 +15,8 @@ internal abstract class PluginConfig<T> : PluginConfig where T : ExportSettings 
 }
 
 internal class FileModelObjectConfig : PluginConfig<FileModelObjectExportSettings> {
+    public NwcExportViewSettings NwcExportViewSettings { get; set; } = new();
+
     public static FileModelObjectConfig GetPluginConfig(IConfigSerializer configSerializer) {
         return new ProjectConfigBuilder()
             .SetSerializer(configSerializer)

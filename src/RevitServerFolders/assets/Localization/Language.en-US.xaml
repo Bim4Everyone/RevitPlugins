@@ -51,6 +51,8 @@
         x:Key="MainWindow.Validation.ModelsDuplicated">The source folder contains duplicates "{0}".</system:String>
     <system:String
         x:Key="MainWindow.Validation.AllSettingsOff">No settings selected</system:String>
+    <system:String
+        x:Key="NwcMainWindow.Validation.SetNwcViewSettings">Set view settings for NWC export.</system:String>
 
     <system:String
         x:Key="RsBrowser.Validation.SelectFolder">Select a folder with models</system:String>
@@ -75,6 +77,39 @@
         x:Key="MainWindow.TargetsFrom">From:</system:String>
     <system:String
         x:Key="MainWindow.TargetsTo">To:</system:String>
+
+    <system:String
+        x:Key="NwcExportViewSettingsDialog.Title">View Settings for NWC Export</system:String>
+    <system:String
+        x:Key="NwcExportViewSettingsDialog.RvtFilePathLabel">Path to rvt file with view template</system:String>
+    <system:String
+        x:Key="NwcExportViewSettingsDialog.SelectLocalRvtTooltip">Select local rvt file</system:String>
+    <system:String
+        x:Key="NwcExportViewSettingsDialog.SelectRsRvtTooltip">Select rvt file from revit server</system:String>
+    <system:String
+        x:Key="NwcExportViewSettingsDialog.ViewTemplateNameLabel">View template name</system:String>
+    <system:String
+        x:Key="NwcExportViewSettingsDialog.RvtFilePathTooltip">A 3D view will be automatically created in the exported file for NWC export. This view will have the specified template copied from the specified file. Also, visibility of all worksets whose names contain the strings specified below will be turned off on this view. Changes made to the rvt file will not be saved.</system:String>
+    <system:String
+        x:Key="NwcExportViewSettingsDialog.CloseButton">Close</system:String>
+    <system:String
+        x:Key="NwcExportViewSettingsDialog.SaveButton">Save</system:String>
+    <system:String
+        x:Key="NwcExportViewSettingsDialog.RemoveTemplateTooltip">Remove string</system:String>
+    <system:String
+        x:Key="NwcExportViewSettingsDialog.AddTemplateTooltip">Add string</system:String>
+    <system:String
+        x:Key="NwcExportViewSettingsDialog.WorksetsLabel">Strings for hiding worksets</system:String>
+    <system:String
+        x:Key="NwcExportViewSettingsDialog.WorksetsTooltip">Worksets whose names contain any of the specified strings will be hidden on the view exported to NWC.</system:String>
+    <system:String
+        x:Key="NwcExportViewSettingsDialog.Validation.RvtPathNotSet">Specify the path to the rvt file.</system:String>
+    <system:String
+        x:Key="NwcExportViewSettingsDialog.Validation.ViewNameNotSet">Specify the view template name.</system:String>
+    <system:String
+        x:Key="NwcExportViewSettingsDialog.Validation.WorksetTemplateEmpty">Empty strings are not allowed.</system:String>
+    <system:String
+        x:Key="NwcExportViewSettingsDialog.Validation.WorksetTemplatesDuplicated">Strings are duplicated: "{0}".</system:String>
 
     <system:String
         x:Key="MainWindow.ErrorTextPattern">Error in setting {0}: {1}</system:String>
