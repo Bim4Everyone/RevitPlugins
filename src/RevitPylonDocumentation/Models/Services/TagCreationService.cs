@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -21,9 +22,10 @@ internal class TagCreationService {
     }
 
     public IndependentTag CreateRebarTag(TagOption tagOption, Element element) {
-        if(tagOption is null || tagOption.TagSymbol is null || tagOption.BodyPoint is null) {
-            return null;
-        }
+        if(tagOption is null)               throw new ArgumentNullException(nameof(tagOption));
+        if(tagOption.TagSymbol is null)     throw new ArgumentNullException(nameof(tagOption.TagSymbol));
+        if(tagOption.BodyPoint is null)     throw new ArgumentNullException(nameof(tagOption.BodyPoint));
+
         var view = _pylonView.ViewElement;
         var doc = view.Document;
         var annotationInstance = IndependentTag.Create(doc, tagOption.TagSymbol.Id, view.Id, new Reference(element),
@@ -33,12 +35,13 @@ internal class TagCreationService {
     }
 
     public IndependentTag CreateRebarTag(TagOption tagOption, List<Element> elements) {
-        if(tagOption is null || tagOption.TagSymbol is null || tagOption.BodyPoint is null) {
-            return null;
-        }
-        if(elements is null || elements.Count == 0) {
-            return null;
-        }
+        if(tagOption is null)               throw new ArgumentNullException(nameof(tagOption));
+        if(tagOption.TagSymbol is null)     throw new ArgumentNullException(nameof(tagOption.TagSymbol));
+        if(tagOption.BodyPoint is null)     throw new ArgumentNullException(nameof(tagOption.BodyPoint));
+        
+        if(elements is null)                throw new ArgumentNullException(nameof(elements));
+        if(elements.Count == 0)             throw new ArgumentException(nameof(elements.Count));
+        
         var view = _pylonView.ViewElement;
         var doc = view.Document;
         var refs = elements.Select(e => new Reference(e)).ToList();
@@ -58,9 +61,11 @@ internal class TagCreationService {
     }
 
     public void CreateUniversalTag(TagOption tagOption, Element element, XYZ leaderPoint = null) {
-        if(tagOption is null || tagOption.BodyPoint is null || tagOption.TagSymbol is null || tagOption.TagLength == 0) {
-            return;
-        }
+        if(tagOption is null)               throw new ArgumentNullException(nameof(tagOption));
+        if(tagOption.TagSymbol is null)     throw new ArgumentNullException(nameof(tagOption.TagSymbol));
+        if(tagOption.BodyPoint is null)     throw new ArgumentNullException(nameof(tagOption.BodyPoint));
+        if(tagOption.TagLength == 0)        throw new ArgumentNullException(nameof(tagOption.TagLength));
+
         var annotationInstance = CreateAnnotationTag(tagOption);
         // Добавляем и устанавливаем точку привязки выноски
         annotationInstance.addLeader();
@@ -76,9 +81,11 @@ internal class TagCreationService {
     }
 
     public void CreateUniversalTag(TagOption tagOption, XYZ leaderPoint) {
-        if(tagOption is null || tagOption.BodyPoint is null || tagOption.TagSymbol is null || tagOption.TagLength == 0) {
-            return;
-        }
+        if(tagOption is null)               throw new ArgumentNullException(nameof(tagOption));
+        if(tagOption.TagSymbol is null)     throw new ArgumentNullException(nameof(tagOption.TagSymbol));
+        if(tagOption.BodyPoint is null)     throw new ArgumentNullException(nameof(tagOption.BodyPoint));
+        if(tagOption.TagLength == 0)        throw new ArgumentNullException(nameof(tagOption.TagLength));
+
         var annotationInstance = CreateAnnotationTag(tagOption);
         // Добавляем и устанавливаем точку привязки выноски
         annotationInstance.addLeader();
@@ -89,9 +96,11 @@ internal class TagCreationService {
     }
 
     public AnnotationSymbol CreateAnnotationTag(TagOption tagOption) {
-        if(tagOption is null || tagOption.BodyPoint is null || tagOption.TagSymbol is null || tagOption.TagLength == 0) {
-            return null;
-        }
+        if(tagOption is null)               throw new ArgumentNullException(nameof(tagOption));
+        if(tagOption.TagSymbol is null)     throw new ArgumentNullException(nameof(tagOption.TagSymbol));
+        if(tagOption.BodyPoint is null)     throw new ArgumentNullException(nameof(tagOption.BodyPoint));
+        if(tagOption.TagLength == 0)        throw new ArgumentNullException(nameof(tagOption.TagLength));
+
         var view = _pylonView.ViewElement;
         var doc = view.Document;
         // Создаем экземпляр типовой аннотации для указания ГОСТа

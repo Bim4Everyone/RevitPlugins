@@ -148,7 +148,6 @@ internal class GeneralViewRebarMarkService {
             var clampTag = _annotationService.CreateRebarTag(tagOption, simpleClamp);
             clampTag.LeaderEndCondition = LeaderEndCondition.Free;
             return clampTag;
-        } catch(Exception) { }
-        return null;
+        } catch(Exception) { return null; }
     }
 }

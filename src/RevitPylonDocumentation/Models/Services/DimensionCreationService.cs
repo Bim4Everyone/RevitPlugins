@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 
 using Autodesk.Revit.DB;
@@ -66,8 +67,10 @@ internal class DimensionCreationService {
     internal Dimension CreateDimension(Element dimensioningElement, DimensionLineOffsetOption dimLineOffsetOption,
                                        List<string> importantRefNameParts, ReferenceArray oldRefArray = null,
                                        bool needEqualityFormula = true) {
+        
+        if(dimensioningElement is null)         throw new ArgumentNullException(nameof(dimensioningElement));
+        if(importantRefNameParts.Count == 0)    throw new ArgumentException(nameof(dimensioningElement));
 
-        if(dimensioningElement is null || (importantRefNameParts?.Count ?? 0) == 0) { return null; }
         var dimensionLine = _dimensionBaseService.GetDimensionLine(dimLineOffsetOption.ElemForOffset, 
                                                                    dimLineOffsetOption.OffsetDirectionType,
                                                                    dimLineOffsetOption.OffsetCoefficient);
