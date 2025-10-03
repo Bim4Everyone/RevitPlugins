@@ -276,7 +276,7 @@ internal class NwcExportService : IModelsExportService<FileModelObjectExportSett
         view.ViewTemplateId = viewTemplate.Id;
         view.SetParamValue(BuiltInParameter.VIEW_PHASE, GetLatestPhaseId(destinationDocument));
 
-        var worksets = new FilteredWorksetCollector(destinationDocument).ToWorksets();
+        var worksets = new FilteredWorksetCollector(destinationDocument).OfKind(WorksetKind.UserWorkset).ToWorksets();
         foreach(var workset in worksets) {
             var visibility = hideWorksets.Any(p => workset.Name.IndexOf(p, StringComparison.OrdinalIgnoreCase) >= 0)
                 ? WorksetVisibility.Hidden
