@@ -78,8 +78,20 @@ internal class NwcExportService : IModelsExportService<FileModelObjectExportSett
                 settings);
             return;
         }
+        View3D sourceViewTemplate;
         try {
-            var sourceViewTemplate = GetView3dTemplate(viewTemplateDoc, viewSettings.ViewTemplateName);
+            sourceViewTemplate = GetView3dTemplate(viewTemplateDoc, viewSettings.ViewTemplateName);
+        } catch(InvalidOperationException ex) {
+            _loggerService.Warning(ex, "Не найден шаблон вида. Настройки генерации 3D вида: {@Settings}.",
+                viewSettings);
+            _errorsService.AddError(viewSettings.RvtFilePath,
+                _localization.GetLocalizedString("Exceptions.CannotFindView3dTemplate",
+                viewSettings.RvtFilePath,
+                viewSettings.ViewTemplateName),
+                settings);
+            return;
+        }
+        try {
             foreach(string modelFile in modelFiles) {
                 progress?.Report(processStart++);
                 ct.ThrowIfCancellationRequested();
@@ -109,7 +121,7 @@ internal class NwcExportService : IModelsExportService<FileModelObjectExportSett
                 }
             }
         } finally {
-            viewTemplateDoc.Close(false);
+            viewTemplateDoc?.Close(false);
             viewTemplateDoc?.Dispose();
         }
         _currentSettings = null;

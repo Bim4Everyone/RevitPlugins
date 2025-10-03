@@ -32,7 +32,7 @@
     <system:String
         x:Key="Exceptions.CannotOpenView3dTemplateFile">Не удалось открыть файл с шаблоном вида. Полный путь к файлу: {0}. Информация об ошибке: {1}.</system:String>
     <system:String
-        x:Key="Exceptions.CannotFindView3dTemplate">Не удалось найти шаблон вида в файле с шаблоном.</system:String>
+        x:Key="Exceptions.CannotFindView3dTemplate">Не удалось найти шаблон вида в файле с шаблоном. Полный путь к файлу: {0}. Название шаблона: {1}.</system:String>
     <system:String
         x:Key="Exceptions.CannotCopyView3dTemplate">Не удалось скопировать шаблон вида в экспортируемый документ.</system:String>
     <system:String
