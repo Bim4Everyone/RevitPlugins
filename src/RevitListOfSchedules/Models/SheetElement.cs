@@ -7,7 +7,7 @@ using dosymep.Revit;
 
 namespace RevitListOfSchedules.Models;
 internal class SheetElement {
-    private const string _revisionStartString = "Изм.1";
+    private const string _revisionStartString = "Изм.";
     private readonly ParamFactory _paramFactory;
     private string _number;
     private string _revisionNumber;
@@ -34,11 +34,10 @@ internal class SheetElement {
                 string paramValue = Sheet.GetParamValue<string>(_paramFactory.SharedParamsRevision[i]);
                 string paramValueRevision = Sheet.GetParamValue<string>(_paramFactory.SharedParamsRevisionValue[i]);
 
-                sb.Append(_revisionStartString)
-                  .Append(paramValue)
+                sb.Append(paramValue)
                   .Append($"({paramValueRevision}); ");
             }
         }
-        return sb.ToString();
+        return sb.Length > 0 ? sb.Insert(0, _revisionStartString).Remove(sb.Length - 2, 1).ToString() : string.Empty;
     }
 }
