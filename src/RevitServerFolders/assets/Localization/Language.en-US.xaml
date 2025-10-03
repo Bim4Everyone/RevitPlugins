@@ -12,13 +12,15 @@
 
     <system:String
         x:Key="Transaction.ChangeSite">Change site</system:String>
+    <system:String
+        x:Key="Transaction.CreateExportView">Create export View3D</system:String>
 
     <system:String
         x:Key="Exceptions.ServerNotFound">Server "{0}" was not found.</system:String>
     <system:String
         x:Key="Exceptions.FolderNotFound">Folder "{0}" was not found.</system:String>
     <system:String
-        x:Key="Exceptions.ViewWithoutElements">View "{0}" does not contain any elements with geometry. It's possible that all relationships have been unloaded from the document. It's recommended to open the exported rvt file with all open workspaces and verify that the view contains elements from the active file.</system:String>
+        x:Key="Exceptions.ViewWithoutElements">The exported view does not contain any geometric elements. The path to the view template file is "{0}", the name of the copied view template is "{1}", and the lines for hiding workspaces are "{2}". Please also note that all relationships may be unloaded from the exported document.</system:String>
     <system:String
         x:Key="Exceptions.ViewNotFound">View not found "{0}".</system:String>
     <system:String
@@ -27,6 +29,16 @@
         x:Key="Exceptions.NwcExportCancel">Revit canceled NWC export.</system:String>
     <system:String
         x:Key="Exceptions.RvtExportError">RVT export error. Error message: {0}.</system:String>
+    <system:String
+        x:Key="Exceptions.CannotOpenView3dTemplateFile">Could not open view template file. Full file path: {0}. Error information: {1}.</system:String>
+    <system:String
+        x:Key="Exceptions.CannotFindView3dTemplate">Could not find view template in the template file.</system:String>
+    <system:String
+        x:Key="Exceptions.CannotCopyView3dTemplate">Could not copy view template to the exported document.</system:String>
+    <system:String
+        x:Key="Exceptions.CannotFind3dFamilyType">3D view family is missing in the exported document.</system:String>
+    <system:String
+        x:Key="Exceptions.ExportViewError">Error generating 3D view for NWC export. Path to view template file: "{0}", copied view template name: "{1}", strings for hiding worksets: "{2}". Error information: {3}.</system:String>
     <system:String
         x:Key="Exceptions.ElementsNotDeleted">While opening the document, elements causing errors were detected. These could not be automatically removed due to insufficient permissions to delete them. Revit canceled the export operation. The IDs of the elements causing the errors are: {0}. Error information: {1}.</system:String>
 

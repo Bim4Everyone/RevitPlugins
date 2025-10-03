@@ -12,13 +12,15 @@
 
     <system:String
         x:Key="Transaction.ChangeSite">Смена площадки</system:String>
+    <system:String
+        x:Key="Transaction.CreateExportView">Создание 3D вида для экспорта</system:String>
 
     <system:String
         x:Key="Exceptions.ServerNotFound">Не был найден сервер "{0}".</system:String>
     <system:String
         x:Key="Exceptions.FolderNotFound">Не была найдена папка "{0}".</system:String>
     <system:String
-        x:Key="Exceptions.ViewWithoutElements">Вид "{0}" не содержит элементы с геометрией. Возможно, из документа выгружены все связи. Рекомендуется открыть экспортируемый rvt файл со всеми открытыми рабочими наборами и проверить, что на виде есть элементы из активного файла.</system:String>
+        x:Key="Exceptions.ViewWithoutElements">Экспортируемый вид не содержит элементы с геометрией. Путь к файлу с шаблоном вида: "{0}", название копируемого шаблона вида: "{1}", строки для скрытия рабочих наборов: "{2}". Также учтите, что из экспортируемого документа могут быть выгружены все связи.</system:String>
     <system:String
         x:Key="Exceptions.ViewNotFound">Не найден вид "{0}".</system:String>
     <system:String
@@ -27,6 +29,16 @@
         x:Key="Exceptions.NwcExportCancel">Revit отменил экспорт в NWC.</system:String>
     <system:String
         x:Key="Exceptions.RvtExportError">Ошибка экспорта в RVT. Информация об ошибке: {0}.</system:String>
+    <system:String
+        x:Key="Exceptions.CannotOpenView3dTemplateFile">Не удалось открыть файл с шаблоном вида. Полный путь к файлу: {0}. Информация об ошибке: {1}.</system:String>
+    <system:String
+        x:Key="Exceptions.CannotFindView3dTemplate">Не удалось найти шаблон вида в файле с шаблоном.</system:String>
+    <system:String
+        x:Key="Exceptions.CannotCopyView3dTemplate">Не удалось скопировать шаблон вида в экспортируемый документ.</system:String>
+    <system:String
+        x:Key="Exceptions.CannotFind3dFamilyType">В экспортируемом документе отсутствует семейство 3D вида.</system:String>
+    <system:String
+        x:Key="Exceptions.ExportViewError">Ошибка генерации 3D вида для экспорта в NWC. Путь к файлу с шаблоном вида: "{0}", название копируемого шаблона вида: "{1}", строки для скрытия рабочих наборов: "{2}". Информация об ошибке: {3}.</system:String>
     <system:String
         x:Key="Exceptions.ElementsNotDeleted">В процессе открытия документа были обнаружены элементы, вызывающие ошибки. Автоматически удалить их не удалось из-за отсутствия прав на их удаление, Revit отменил операцию экспорта. Id элементов, вызвавших ошибки: {0}. Информация об ошибке: {1}.</system:String>
 
