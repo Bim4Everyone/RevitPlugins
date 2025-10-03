@@ -68,6 +68,8 @@
 
     <system:String
         x:Key="RsBrowser.Validation.SelectFolder">Выберите папку с моделями</system:String>
+    <system:String
+        x:Key="RsBrowser.Validation.SelectFile">Выберите модель</system:String>
 
     <system:String
         x:Key="MainWindow.LabelTarget">Папка назначения</system:String>

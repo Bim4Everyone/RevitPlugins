@@ -119,7 +119,7 @@ internal class NwcExportViewSettingsViewModel : BaseViewModel {
 
     private async Task SelectRsFileAsync() {
         var modelObject = await _rsOpenFileDialog.SelectModelObjectDialog();
-        RvtFilePath = "TODO some server path";
+        RvtFilePath = modelObject.FullName;
         CommandManager.InvalidateRequerySuggested();
     }
 

@@ -44,13 +44,16 @@
                 x:Key="FolderIcon">Folder20</ui:SymbolRegular>
             <ui:SymbolRegular
                 x:Key="OpenedFolderIcon">FolderOpen20</ui:SymbolRegular>
+            <ui:SymbolRegular
+                x:Key="BuildingIcon">Building20</ui:SymbolRegular>
 
             <converters:RsNodeImageConverter
                 x:Key="RsNodeImageConverter"
                 Empty="{StaticResource EmptyIcon}"
                 Server="{StaticResource ServerIcon}"
                 Folder="{StaticResource FolderIcon}"
-                OpenedFolder="{StaticResource OpenedFolderIcon}" />
+                OpenedFolder="{StaticResource OpenedFolderIcon}" 
+                File="{StaticResource BuildingIcon}"/>
 
             <Style
                 TargetType="DockPanel"

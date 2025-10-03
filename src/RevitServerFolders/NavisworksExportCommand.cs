@@ -80,7 +80,9 @@ internal sealed class NavisworksExportCommand : BasePluginCommand {
                     .SetServerVersion(ModuleEnvironment.RevitVersion)
                     .Build())
                 .ToArray());
-        kernel.Bind<ViewModels.Rs.MainViewModel>().ToSelf();
+        kernel.Bind<ViewModels.Rs.MainViewModel>()
+            .ToSelf()
+            .WithPropertyValue(nameof(ViewModels.Rs.MainViewModel.CanSelectFiles), true);
 
         kernel.UseXtraOpenFolderDialog<FileSystemViewModel>(
             initialDirectory: Environment.GetFolderPath(Environment.SpecialFolder.Desktop));

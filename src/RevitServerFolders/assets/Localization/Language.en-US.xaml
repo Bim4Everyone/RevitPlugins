@@ -68,6 +68,8 @@
 
     <system:String
         x:Key="RsBrowser.Validation.SelectFolder">Select a folder with models</system:String>
+    <system:String
+        x:Key="RsBrowser.Validation.SelectFile">Select model</system:String>
 
     <system:String
         x:Key="MainWindow.LabelTarget">Target folder</system:String>
