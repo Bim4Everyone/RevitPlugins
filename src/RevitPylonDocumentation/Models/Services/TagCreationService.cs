@@ -22,9 +22,15 @@ internal class TagCreationService {
     }
 
     public IndependentTag CreateRebarTag(TagOption tagOption, Element element) {
-        if(tagOption is null)               throw new ArgumentNullException(nameof(tagOption));
-        if(tagOption.TagSymbol is null)     throw new ArgumentNullException(nameof(tagOption.TagSymbol));
-        if(tagOption.BodyPoint is null)     throw new ArgumentNullException(nameof(tagOption.BodyPoint));
+        if(tagOption is null) {
+            throw new ArgumentNullException(nameof(tagOption));
+        }
+        if(tagOption.TagSymbol is null) {
+            throw new ArgumentNullException(nameof(tagOption.TagSymbol));
+        }
+        if(tagOption.BodyPoint is null) {
+            throw new ArgumentNullException(nameof(tagOption.BodyPoint));
+        }
 
         var view = _pylonView.ViewElement;
         var doc = view.Document;
@@ -35,13 +41,23 @@ internal class TagCreationService {
     }
 
     public IndependentTag CreateRebarTag(TagOption tagOption, List<Element> elements) {
-        if(tagOption is null)               throw new ArgumentNullException(nameof(tagOption));
-        if(tagOption.TagSymbol is null)     throw new ArgumentNullException(nameof(tagOption.TagSymbol));
-        if(tagOption.BodyPoint is null)     throw new ArgumentNullException(nameof(tagOption.BodyPoint));
-        
-        if(elements is null)                throw new ArgumentNullException(nameof(elements));
-        if(elements.Count == 0)             throw new ArgumentException(nameof(elements.Count));
-        
+        if(tagOption is null) {
+            throw new ArgumentNullException(nameof(tagOption));
+        }
+        if(tagOption.TagSymbol is null) {
+            throw new ArgumentNullException(nameof(tagOption.TagSymbol));
+        }
+        if(tagOption.BodyPoint is null) {
+            throw new ArgumentNullException(nameof(tagOption.BodyPoint));
+        }
+
+        if(elements is null) {
+            throw new ArgumentNullException(nameof(elements));
+        }
+        if(elements.Count == 0) {
+            throw new ArgumentException(nameof(elements.Count));
+        }
+
         var view = _pylonView.ViewElement;
         var doc = view.Document;
         var refs = elements.Select(e => new Reference(e)).ToList();
@@ -61,10 +77,21 @@ internal class TagCreationService {
     }
 
     public void CreateUniversalTag(TagOption tagOption, Element element, XYZ leaderPoint = null) {
-        if(tagOption is null)               throw new ArgumentNullException(nameof(tagOption));
-        if(tagOption.TagSymbol is null)     throw new ArgumentNullException(nameof(tagOption.TagSymbol));
-        if(tagOption.BodyPoint is null)     throw new ArgumentNullException(nameof(tagOption.BodyPoint));
-        if(tagOption.TagLength == 0)        throw new ArgumentNullException(nameof(tagOption.TagLength));
+        if(tagOption is null) {
+            throw new ArgumentNullException(nameof(tagOption));
+        }
+        if(tagOption.TagSymbol is null) {
+            throw new ArgumentNullException(nameof(tagOption.TagSymbol));
+        }
+        if(tagOption.BodyPoint is null) {
+            throw new ArgumentNullException(nameof(tagOption.BodyPoint));
+        }
+        if(tagOption.TagLength == 0) {
+            throw new ArgumentException(nameof(tagOption.TagLength));
+        }
+        if(element is null) {
+            throw new ArgumentException(nameof(element));
+        }
 
         var annotationInstance = CreateAnnotationTag(tagOption);
         // Добавляем и устанавливаем точку привязки выноски
@@ -81,25 +108,42 @@ internal class TagCreationService {
     }
 
     public void CreateUniversalTag(TagOption tagOption, XYZ leaderPoint) {
-        if(tagOption is null)               throw new ArgumentNullException(nameof(tagOption));
-        if(tagOption.TagSymbol is null)     throw new ArgumentNullException(nameof(tagOption.TagSymbol));
-        if(tagOption.BodyPoint is null)     throw new ArgumentNullException(nameof(tagOption.BodyPoint));
-        if(tagOption.TagLength == 0)        throw new ArgumentNullException(nameof(tagOption.TagLength));
+        if(tagOption is null) {
+            throw new ArgumentNullException(nameof(tagOption));
+        }
+        if(tagOption.TagSymbol is null) {
+            throw new ArgumentNullException(nameof(tagOption.TagSymbol));
+        }
+        if(tagOption.BodyPoint is null) {
+            throw new ArgumentNullException(nameof(tagOption.BodyPoint));
+        }
+        if(tagOption.TagLength == 0) {
+            throw new ArgumentException(nameof(tagOption.TagLength));
+        }
+        if(leaderPoint is null) {
+            throw new ArgumentNullException(nameof(leaderPoint));
+        }
 
         var annotationInstance = CreateAnnotationTag(tagOption);
         // Добавляем и устанавливаем точку привязки выноски
         annotationInstance.addLeader();
         var leader = annotationInstance.GetLeaders().FirstOrDefault();
-        if(leader != null) {
-            leader.End = leaderPoint; // Точка на элементе
-        }
+        leader.End = leaderPoint;
     }
 
     public AnnotationSymbol CreateAnnotationTag(TagOption tagOption) {
-        if(tagOption is null)               throw new ArgumentNullException(nameof(tagOption));
-        if(tagOption.TagSymbol is null)     throw new ArgumentNullException(nameof(tagOption.TagSymbol));
-        if(tagOption.BodyPoint is null)     throw new ArgumentNullException(nameof(tagOption.BodyPoint));
-        if(tagOption.TagLength == 0)        throw new ArgumentNullException(nameof(tagOption.TagLength));
+        if(tagOption is null) {
+            throw new ArgumentNullException(nameof(tagOption));
+        }
+        if(tagOption.TagSymbol is null) {
+            throw new ArgumentNullException(nameof(tagOption.TagSymbol));
+        }
+        if(tagOption.BodyPoint is null) {
+            throw new ArgumentNullException(nameof(tagOption.BodyPoint));
+        }
+        if(tagOption.TagLength == 0) {
+            throw new ArgumentException(nameof(tagOption.TagLength));
+        }
 
         var view = _pylonView.ViewElement;
         var doc = view.Document;

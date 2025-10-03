@@ -67,9 +67,12 @@ internal class DimensionCreationService {
     internal Dimension CreateDimension(Element dimensioningElement, DimensionLineOffsetOption dimLineOffsetOption,
                                        List<string> importantRefNameParts, ReferenceArray oldRefArray = null,
                                        bool needEqualityFormula = true) {
-        
-        if(dimensioningElement is null)         throw new ArgumentNullException(nameof(dimensioningElement));
-        if(importantRefNameParts.Count == 0)    throw new ArgumentException(nameof(dimensioningElement));
+        if(dimensioningElement is null) {
+            throw new ArgumentNullException(nameof(dimensioningElement));
+        }
+        if(importantRefNameParts.Count == 0) { 
+            throw new ArgumentException(nameof(dimensioningElement)); 
+        }
 
         var dimensionLine = _dimensionBaseService.GetDimensionLine(dimLineOffsetOption.ElemForOffset, 
                                                                    dimLineOffsetOption.OffsetDirectionType,
