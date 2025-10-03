@@ -13,6 +13,7 @@ namespace RevitServerFolders.ViewModels.Rs;
 internal sealed class RsFolderDataViewModel : RsModelObjectViewModel {
     private readonly FolderData _folderData;
     private readonly FolderContents _folderContents;
+    private bool _showFiles;
 
     public RsFolderDataViewModel(IServerClient serverClient, FolderData folderData, FolderContents folderContents) :
         base(serverClient) {
@@ -27,13 +28,22 @@ internal sealed class RsFolderDataViewModel : RsModelObjectViewModel {
 
     public override bool HasChildren => _folderData.HasContents;
 
+    public bool ShowFiles {
+        get => _showFiles;
+        set => RaiseAndSetIfChanged(ref _showFiles, value);
+    }
+
     protected override async Task<IEnumerable<RsModelObjectViewModel>> GetChildrenObjects() {
         string relativePath = _folderContents.GetRelativeModelPath(_folderData);
         var folderContents = await _serverClient.GetFolderContentsAsync(
             relativePath, CancellationTokenSource.Token);
-        return folderContents.Folders
-            .Select(item => new RsFolderDataViewModel(_serverClient, item, folderContents))
-            .ToArray();
+        List<RsModelObjectViewModel> content = [.. folderContents.Folders
+            .Select(item => new RsFolderDataViewModel(_serverClient, item, folderContents) { ShowFiles = ShowFiles })];
+        if(ShowFiles) {
+            content.AddRange(folderContents.Models
+                .Select(m => new RsModelDataViewModel(_serverClient, m, folderContents)));
+        }
+        return content;
     }
 
     public override ModelObject GetModelObject() {

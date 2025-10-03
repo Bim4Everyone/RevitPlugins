@@ -24,6 +24,8 @@ using RevitServerFolders.Services;
 using RevitServerFolders.ViewModels;
 using RevitServerFolders.Views;
 
+using Wpf.Ui;
+
 using Application = Autodesk.Revit.ApplicationServices.Application;
 
 namespace RevitServerFolders;
@@ -56,8 +58,11 @@ internal sealed class FileServerExportCommand : BasePluginCommand {
         kernel.Bind<IErrorsService>()
             .To<ErrorsService>()
             .InSingletonScope();
+        kernel.Bind<IContentDialogService>()
+            .To<ContentDialogService>()
+            .InSingletonScope();
 
-        kernel.UseXtraOpenFolderDialog<MainWindow>(
+        kernel.UseXtraOpenFolderDialog<RsViewModel>(
             initialDirectory: Environment.GetFolderPath(Environment.SpecialFolder.Desktop));
 
         kernel.Bind<IReadOnlyCollection<IServerClient>>()

@@ -8,6 +8,7 @@ using RevitServerFolders.Utils;
 
 namespace RevitServerFolders.ViewModels.Rs;
 internal sealed class RsServerDataViewModel : RsModelObjectViewModel {
+    private bool _showFiles;
 
     public RsServerDataViewModel(IServerClient serverClient) : base(serverClient) {
         Size = "Расчет размера";
@@ -22,11 +23,20 @@ internal sealed class RsServerDataViewModel : RsModelObjectViewModel {
 
     public override bool HasChildren => true;
 
+    public bool ShowFiles {
+        get => _showFiles;
+        set => RaiseAndSetIfChanged(ref _showFiles, value);
+    }
+
     protected override async Task<IEnumerable<RsModelObjectViewModel>> GetChildrenObjects() {
         var folderContents = await _serverClient.GetRootFolderContentsAsync(
             CancellationTokenSource.Token);
-        return folderContents.Folders
-            .Select(item => new RsFolderDataViewModel(_serverClient, item, folderContents))
-            .ToArray();
+        List<RsModelObjectViewModel> content = [.. folderContents.Folders
+            .Select(item => new RsFolderDataViewModel(_serverClient, item, folderContents) { ShowFiles = ShowFiles })];
+        if(ShowFiles) {
+            content.AddRange(folderContents.Models
+                .Select(m => new RsModelDataViewModel(_serverClient, m, folderContents)));
+        }
+        return content;
     }
 }

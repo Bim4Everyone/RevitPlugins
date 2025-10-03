@@ -13,6 +13,7 @@ namespace RevitServerFolders.ViewModels.Rs;
 internal sealed class MainViewModel : BaseViewModel {
     private readonly IReadOnlyCollection<IServerClient> _serverClients;
     private readonly ILocalizationService _localization;
+    private bool _canSelectFiles;
     private RsModelObjectViewModel _selectedItem;
     private ObservableCollection<RsModelObjectViewModel> _items;
 
@@ -36,6 +37,11 @@ internal sealed class MainViewModel : BaseViewModel {
     public string ErrorText {
         get => _errorText;
         set => RaiseAndSetIfChanged(ref _errorText, value);
+    }
+
+    public bool CanSelectFiles {
+        get => _canSelectFiles;
+        set => RaiseAndSetIfChanged(ref _canSelectFiles, value);
     }
 
     public RsModelObjectViewModel SelectedItem {
@@ -67,7 +73,7 @@ internal sealed class MainViewModel : BaseViewModel {
     private Task LoadView() {
         Items ??= new ObservableCollection<RsModelObjectViewModel>(
                 _serverClients
-                    .Select(item => new RsServerDataViewModel(item)));
+                    .Select(item => new RsServerDataViewModel(item) { ShowFiles = _canSelectFiles }));
 
         return Task.CompletedTask;
     }
@@ -77,7 +83,11 @@ internal sealed class MainViewModel : BaseViewModel {
     }
 
     private bool CanAcceptView() {
-        if(SelectedItem is not RsFolderDataViewModel) {
+        if(CanSelectFiles && SelectedItem is not RsModelDataViewModel) {
+            ErrorText = _localization.GetLocalizedString("RsBrowser.Validation.SelectFile");
+            return false;
+        }
+        if(!CanSelectFiles && SelectedItem is not RsFolderDataViewModel) {
             ErrorText = _localization.GetLocalizedString("RsBrowser.Validation.SelectFolder");
             return false;
         }
