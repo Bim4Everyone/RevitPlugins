@@ -15,8 +15,8 @@ internal class GridEndsService {
         _dimensionBaseService = dimensionBaseService;
     }
 
-    internal void EditGridEnds(Element rebar, List<Grid> grids, OffsetOption offsetOption) {
-        if(_view is null || rebar is null) { return; }
+    internal void EditGridEnds(Element elem, List<Grid> grids, OffsetOption offsetOption) {
+        if(_view is null || elem is null) { return; }
         var rightDirection = _view.RightDirection;
 
         foreach(var grid in grids) {
@@ -28,12 +28,12 @@ internal class GridEndsService {
 
                 var curve = grid.GetCurvesInView(DatumExtentType.ViewSpecific, _view).First();
 
-                var offsetLine1 = _dimensionBaseService.GetDimensionLine(rebar, DirectionType.Left,
-                                                                        offsetOption.LeftOffset);
+                var offsetLine1 = _dimensionBaseService.GetDimensionLine(elem, DirectionType.Left,
+                                                                         offsetOption.LeftOffset);
                 var pt1 = curve.Project(offsetLine1.Origin).XYZPoint;
 
-                var offsetLine2 = _dimensionBaseService.GetDimensionLine(rebar, DirectionType.Right,
-                                                                        offsetOption.RightOffset);
+                var offsetLine2 = _dimensionBaseService.GetDimensionLine(elem, DirectionType.Right,
+                                                                         offsetOption.RightOffset);
                 var pt2 = curve.Project(offsetLine2.Origin).XYZPoint;
 
                 var newLine = Line.CreateBound(pt1, pt2);
@@ -42,12 +42,12 @@ internal class GridEndsService {
             } else {
                 var curve = grid.GetCurvesInView(DatumExtentType.ViewSpecific, _view).First();
 
-                var offsetLine1 = _dimensionBaseService.GetDimensionLine(rebar, DirectionType.Bottom,
-                                                                        offsetOption.BottomOffset);
+                var offsetLine1 = _dimensionBaseService.GetDimensionLine(elem, DirectionType.Bottom,
+                                                                         offsetOption.BottomOffset);
                 var pt1 = curve.Project(offsetLine1.Origin).XYZPoint;
 
-                var offsetLine2 = _dimensionBaseService.GetDimensionLine(rebar, DirectionType.Top,
-                                                                        offsetOption.TopOffset);
+                var offsetLine2 = _dimensionBaseService.GetDimensionLine(elem, DirectionType.Top,
+                                                                         offsetOption.TopOffset);
                 var pt2 = curve.Project(offsetLine2.Origin).XYZPoint;
 
                 var newLine = Line.CreateBound(pt1, pt2);
