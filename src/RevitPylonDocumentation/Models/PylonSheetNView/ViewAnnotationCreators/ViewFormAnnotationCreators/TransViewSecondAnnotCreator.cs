@@ -1,10 +1,6 @@
 using System;
-using System.Collections.Generic;
 using System.Linq;
 
-using Autodesk.Revit.DB;
-
-using RevitPylonDocumentation.Models.PluginOptions;
 using RevitPylonDocumentation.Models.PylonSheetNView.ViewDimensionServices.ViewFormDimensionServices;
 using RevitPylonDocumentation.Models.PylonSheetNView.ViewMarkServices.ViewFormMarkServices;
 using RevitPylonDocumentation.Models.Services;
@@ -38,7 +34,8 @@ internal class TransViewSecondAnnotCreator : ViewAnnotationCreator {
             horizDimensionService.TryCreateDimensions(false, pylon, grids);
 
             // Настраиваем положения концов осей на виде
-            EditGridEnds(pylon, grids, longGridsWillBeNeeded, dimensionBaseService);
+            var gridEndsService = new GridEndsService(view, dimensionBaseService);
+            gridEndsService.EditTransViewGridEnds(pylon, grids, longGridsWillBeNeeded);
         } catch(Exception) { }
 
         // Пытаемся создать марки на виде
@@ -46,25 +43,5 @@ internal class TransViewSecondAnnotCreator : ViewAnnotationCreator {
             var markService = new TransViewMarkService(ViewModel, Repository, SheetInfo, ViewOfPylon);
             markService.TryCreateTransverseViewBarMarks();
         } catch(Exception) { }
-    }
-
-
-    /// <summary>
-    /// Редактирует положения концов осей на виде
-    /// </summary>
-    private void EditGridEnds(Element pylon, List<Grid> grids, bool longGridsWillBeNeeded,
-                              DimensionBaseService dimensionBaseService) {
-        var transverseViewGridOffsets = new OffsetOption {
-            LeftOffset = 1.5,
-            RightOffset = 0.3,
-            TopOffset = 0.2,
-            BottomOffset = 1.6
-        };
-
-        if(longGridsWillBeNeeded) {
-            transverseViewGridOffsets.BottomOffset = 3.0;
-        }
-        var gridEndsService = new GridEndsService(ViewOfPylon.ViewElement, dimensionBaseService);
-        gridEndsService.EditGridEnds(pylon, grids, transverseViewGridOffsets);
     }
 }
