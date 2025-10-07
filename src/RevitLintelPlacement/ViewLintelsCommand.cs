@@ -1,4 +1,7 @@
-﻿using Autodesk.Revit.Attributes;
+﻿using System;
+
+using Autodesk.Revit.Attributes;
+using Autodesk.Revit.DB;
 using Autodesk.Revit.UI;
 
 using dosymep.Bim4Everyone;
@@ -16,6 +19,13 @@ public class ViewLintelsCommand : BasePluginCommand {
     }
 
     protected override void Execute(UIApplication uiApplication) {
+        var activeView = uiApplication.ActiveUIDocument.ActiveGraphicalView;
+        if(!(activeView.ViewType == ViewType.ThreeD
+             || activeView.ViewType == ViewType.Schedule
+             || activeView.ViewType == ViewType.FloorPlan)) {
+            throw new Exception("Откройте 3Д вид, план этажа или спецификацию.");
+        }
+        
         var lintelsConfig = LintelsConfig.GetLintelsConfig();
         var revitRepository = new RevitRepository(
             uiApplication.Application,
