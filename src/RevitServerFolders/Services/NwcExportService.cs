@@ -19,7 +19,6 @@ namespace RevitServerFolders.Services;
 /// </summary>
 internal class NwcExportService : IModelsExportService<FileModelObjectExportSettings> {
     private const string _nwcSearchPattern = "*.nwc";
-    private const string _navisworksViewName = "Navisworks";
     private readonly RevitRepository _revitRepository;
     private readonly ILoggerService _loggerService;
     private readonly ILocalizationService _localization;
@@ -63,29 +62,72 @@ internal class NwcExportService : IModelsExportService<FileModelObjectExportSett
             }
         }
 
-        foreach(string modelFile in modelFiles) {
-            progress?.Report(processStart++);
-            ct.ThrowIfCancellationRequested();
+        var viewSettings = settings.GetNwcExportViewSettings();
+        Document viewTemplateDoc;
+        try {
+            viewTemplateDoc = _revitRepository.OpenDocumentFile(viewSettings.RvtFilePath);
+        } catch(Autodesk.Revit.Exceptions.ApplicationException ex) {
+            _loggerService.Warning(ex, "Не удалось открыть файл с шаблоном вида: {@Path}", viewSettings.RvtFilePath);
+            _errorsService.AddError(viewSettings.RvtFilePath,
+                _localization.GetLocalizedString("Exceptions.CannotOpenView3dTemplateFile",
+                    viewSettings.RvtFilePath, ex.Message),
+                settings);
+            return;
+        }
+        View3D sourceViewTemplate;
+        try {
+            sourceViewTemplate = GetView3dTemplate(viewTemplateDoc, viewSettings.ViewTemplateName);
+        } catch(InvalidOperationException ex) {
+            _loggerService.Warning(ex, "Не найден шаблон вида. Настройки генерации 3D вида: {@Settings}.",
+                viewSettings);
+            _errorsService.AddError(viewSettings.RvtFilePath,
+                _localization.GetLocalizedString("Exceptions.CannotFindView3dTemplate",
+                viewSettings.RvtFilePath,
+                viewSettings.ViewTemplateName),
+                settings);
+            return;
+        }
+        try {
+            foreach(string modelFile in modelFiles) {
+                progress?.Report(processStart++);
+                ct.ThrowIfCancellationRequested();
 
-            try {
-                ExportDocument(modelFile, settings);
-            } catch(Autodesk.Revit.Exceptions.OperationCanceledException exCancel) {
-                _loggerService.Warning(exCancel, "Отмена экспорта в nwc в файле: {@DocPath}", modelFile);
-                _errorsService.AddError(modelFile,
-                    _localization.GetLocalizedString("Exceptions.NwcExportCancel"),
-                    settings);
-            } catch(Exception ex) {
-                _loggerService.Warning(ex, "Ошибка экспорта в nwc в файле: {@DocPath}", modelFile);
-                _errorsService.AddError(modelFile,
-                    _localization.GetLocalizedString("Exceptions.NwcExportError", ex.Message),
-                    settings);
+                try {
+                    ExportDocument(modelFile, settings, viewSettings, sourceViewTemplate);
+                } catch(Autodesk.Revit.Exceptions.OperationCanceledException exCancel) {
+                    _loggerService.Warning(exCancel, "Отмена экспорта в nwc в файле: {@DocPath}", modelFile);
+                    _errorsService.AddError(modelFile,
+                        _localization.GetLocalizedString("Exceptions.NwcExportCancel"),
+                        settings);
+                } catch(InvalidOperationException exInv) {
+                    _loggerService.Warning(exInv, "Ошибка генерации 3D вида для экспорта в nwc в файле: {@DocPath}. " +
+                        "Настройки генерации 3D вида: {@Settings}", modelFile, viewSettings);
+                    _errorsService.AddError(modelFile,
+                        _localization.GetLocalizedString("Exceptions.ExportViewError",
+                        viewSettings.RvtFilePath,
+                        viewSettings.ViewTemplateName,
+                        viewSettings.WorksetHideTemplates,
+                        exInv.Message),
+                        settings);
+                } catch(Exception ex) {
+                    _loggerService.Warning(ex, "Ошибка экспорта в nwc в файле: {@DocPath}", modelFile);
+                    _errorsService.AddError(modelFile,
+                        _localization.GetLocalizedString("Exceptions.NwcExportError", ex.Message),
+                        settings);
+                }
             }
+        } finally {
+            viewTemplateDoc?.Close(false);
+            viewTemplateDoc?.Dispose();
         }
         _currentSettings = null;
     }
 
 
-    private void ExportDocument(string fileName, FileModelObjectExportSettings settings) {
+    private void ExportDocument(string fileName,
+        FileModelObjectExportSettings settings,
+        NwcExportViewSettings exportViewSettings,
+        View3D sourceTemplate) {
         _revitRepository.Application.FailuresProcessing += ApplicationOnFailuresProcessing;
         _revitRepository.UIApplication.DialogBoxShowing += UIApplicationOnDialogBoxShowing;
 
@@ -96,39 +138,27 @@ internal class NwcExportService : IModelsExportService<FileModelObjectExportSett
             DocumentExtensions.UnloadAllLinks(fileName);
             using var document = _revitRepository.OpenDocumentFile(fileName);
             try {
-                var navisView = new FilteredElementCollector(document)
-                    .OfClass(typeof(View3D))
-                    .OfType<View3D>()
-                    .Where(item => !item.IsTemplate)
-                    .FirstOrDefault(item =>
-                        item.Name.Equals(_navisworksViewName, StringComparison.OrdinalIgnoreCase));
+                var exportView = CreateExportView3d(document, sourceTemplate, exportViewSettings.WorksetHideTemplates);
 
-                if(navisView == null) {
-                    _loggerService.Warning(
-                        "Файл {@FileName} не содержит вид {@NavisView}.",
-                        fileName, _navisworksViewName);
-                    _errorsService.AddError(fileName,
-                        _localization.GetLocalizedString("Exceptions.ViewNotFound", _navisworksViewName),
-                        settings);
-                    return;
-                }
-
-                bool hasElements = new FilteredElementCollector(document, navisView.Id)
+                bool hasElements = new FilteredElementCollector(document, exportView.Id)
                         .WhereElementIsNotElementType()
 #if REVIT_2021_OR_LESS
                     .Where(item =>
-                        item.get_Geometry(new Options() {View = navisView})?.Any() == true)
+                        item.get_Geometry(new Options() { View = exportView })?.Any() == true)
 #else
-                        .WherePasses(new VisibleInViewFilter(document, navisView.Id))
+                        .WherePasses(new VisibleInViewFilter(document, exportView.Id))
 #endif
                         .Any(e => e.Category != null && ElementHasGeometry(e)); // Ищем геометрию на виде
 
                 if(!hasElements) {
                     _loggerService.Warning(
-                        "Вид {@NavisView} в файле {@FileName} не содержит элементы.",
-                         navisView.Name, fileName);
+                        "Экспортируемый вид в файле {@FileName} не содержит элементы. " +
+                        "Настройки генерации 3D вида: {@Settings}", fileName, exportViewSettings);
                     _errorsService.AddError(fileName,
-                        _localization.GetLocalizedString("Exceptions.ViewWithoutElements", navisView.Name),
+                        _localization.GetLocalizedString("Exceptions.ViewWithoutElements",
+                            exportViewSettings.RvtFilePath,
+                            exportViewSettings.ViewTemplateName,
+                            string.Join(", ", exportViewSettings.WorksetHideTemplates)),
                         settings);
                     return;
                 }
@@ -138,7 +168,7 @@ internal class NwcExportService : IModelsExportService<FileModelObjectExportSett
                     .ToArray();
 
                 if(projectLocations.Length == 1) {
-                    ExportDocument(fileName, navisView, document, targetFolder, isExportRooms);
+                    ExportDocument(fileName, exportView, document, targetFolder, isExportRooms);
                 } else if(projectLocations.Length > 1) {
                     foreach(var projectLocation in projectLocations) {
                         using(var transaction = document.StartTransaction(
@@ -147,7 +177,7 @@ internal class NwcExportService : IModelsExportService<FileModelObjectExportSett
                             transaction.Commit();
                         }
 
-                        ExportDocument(fileName, navisView, document, targetFolder, isExportRooms, projectLocation);
+                        ExportDocument(fileName, exportView, document, targetFolder, isExportRooms, projectLocation);
                     }
                 }
             } finally {
@@ -189,6 +219,77 @@ internal class NwcExportService : IModelsExportService<FileModelObjectExportSett
             : "_" + location.Name;
 
         document.Export(targetFolder, exportFileName, exportOptions);
+    }
+
+    private View3D GetView3dTemplate(Document viewTemplateDoc, string templateName) {
+        var view = new FilteredElementCollector(viewTemplateDoc)
+            .WhereElementIsNotElementType()
+            .OfClass(typeof(View3D))
+            .OfType<View3D>()
+            .FirstOrDefault(v => v.IsTemplate && v.Name.Equals(templateName, StringComparison.OrdinalIgnoreCase));
+        if(view is null) {
+            throw new InvalidOperationException(
+                _localization.GetLocalizedString("Exceptions.CannotFindView3dTemplate"));
+        }
+        return view;
+    }
+
+    private View3D CopyView3dTemplate(Document destinationDocument, View3D sourceView3dTemplate) {
+        var copyElements = ElementTransformUtils.CopyElements(
+            sourceView3dTemplate.Document,
+            [sourceView3dTemplate.Id],
+            destinationDocument,
+            Transform.Identity,
+            new CopyPasteOptions());
+        var copiedViewId = copyElements.FirstOrDefault();
+        if(copiedViewId.IsNull()) {
+            throw new InvalidOperationException(
+                _localization.GetLocalizedString("Exceptions.CannotCopyView3dTemplate"));
+        }
+        return (View3D) destinationDocument.GetElement(copiedViewId);
+    }
+
+    private View3D CreateDefaultView3d(Document document) {
+        var viewFamilyType = new FilteredElementCollector(document)
+            .OfClass(typeof(ViewFamilyType))
+            .OfType<ViewFamilyType>()
+            .FirstOrDefault(x => x.ViewFamily == ViewFamily.ThreeDimensional);
+
+        if(viewFamilyType is null) {
+            throw new InvalidOperationException(
+                _localization.GetLocalizedString("Exceptions.CannotFind3dFamilyType"));
+        }
+
+        return View3D.CreateIsometric(document, viewFamilyType.Id);
+    }
+
+    private View3D CreateExportView3d(Document destinationDocument, View3D sourceViewTemplate, string[] hideWorksets) {
+        using var t = destinationDocument.StartTransaction(
+            _localization.GetLocalizedString("Transaction.CreateExportView"));
+
+        var view = CreateDefaultView3d(destinationDocument);
+        var viewTemplate = CopyView3dTemplate(destinationDocument, sourceViewTemplate);
+        view.ViewTemplateId = viewTemplate.Id;
+        view.SetParamValue(BuiltInParameter.VIEW_PHASE, GetLatestPhaseId(destinationDocument));
+
+        var worksets = new FilteredWorksetCollector(destinationDocument).OfKind(WorksetKind.UserWorkset).ToWorksets();
+        foreach(var workset in worksets) {
+            var visibility = hideWorksets.Any(p => workset.Name.IndexOf(p, StringComparison.OrdinalIgnoreCase) >= 0)
+                ? WorksetVisibility.Hidden
+                : WorksetVisibility.Visible;
+            viewTemplate.SetWorksetVisibility(workset.Id, visibility);
+        }
+
+        t.Commit();
+        return view;
+    }
+
+    private ElementId GetLatestPhaseId(Document document) {
+        return new FilteredElementCollector(document)
+            .OfCategory(BuiltInCategory.OST_Phases)
+            .OfType<Phase>()
+            .OrderByDescending(item => item.GetParamValueOrDefault<int>(BuiltInParameter.PHASE_SEQUENCE_NUMBER, 0))
+            .FirstOrDefault()?.Id ?? ElementId.InvalidElementId;
     }
 
     private void UIApplicationOnDialogBoxShowing(object sender, DialogBoxShowingEventArgs e) {

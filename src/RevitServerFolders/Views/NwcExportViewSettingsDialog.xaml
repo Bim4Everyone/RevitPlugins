@@ -1,0 +1,168 @@
+﻿<ui:ContentDialog
+    x:Class="RevitServerFolders.Views.NwcExportViewSettingsDialog"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
+    xmlns:me="clr-namespace:dosymep.WpfCore.MarkupExtensions;assembly=dosymep.WpfCore"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:local="clr-namespace:RevitServerFolders.Views"
+    xmlns:vms="clr-namespace:RevitServerFolders.ViewModels"
+    xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
+    xmlns:wpfbehaviors="clr-namespace:dosymep.WpfCore.Behaviors;assembly=dosymep.WpfCore"
+    xmlns:converters="clr-namespace:dosymep.WpfCore.Converters;assembly=dosymep.WpfCore"
+    mc:Ignorable="d"
+    Title="{me:LocalizationSource NwcExportViewSettingsDialog.Title}"
+    x:ClassModifier="internal"
+    DialogMaxWidth="650"
+    PrimaryButtonAppearance="Primary"
+    IsPrimaryButtonEnabled="{Binding CanSave}"
+    CloseButtonText="{me:LocalizationSource NwcExportViewSettingsDialog.CloseButton}"
+    PrimaryButtonText="{me:LocalizationSource NwcExportViewSettingsDialog.SaveButton}"
+    ui:Design.Background="{DynamicResource ApplicationBackgroundBrush}"
+    ui:Design.Foreground="{DynamicResource TextFillColorPrimaryBrush}"
+    d:DataContext="{d:DesignInstance vms:NwcExportViewSettingsViewModel, IsDesignTimeCreatable=False}">
+    <i:Interaction.Behaviors>
+        <wpfbehaviors:WpfAttachServiceBehavior
+            AttachableService="{Binding OpenFileDialogService}" />
+    </i:Interaction.Behaviors>
+    <ui:ContentDialog.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary
+                    Source="pack://application:,,,/Wpf.Ui;component/Controls/ContentDialog/ContentDialog.xaml" />
+                <ResourceDictionary
+                    Source="pack://application:,,,/Wpf.Ui;component/Controls/ListView/ListView.xaml" />
+                <ResourceDictionary
+                    Source="../Resources/CustomStyles.xaml" />
+            </ResourceDictionary.MergedDictionaries>
+            <converters:StringToVisibilityConverter
+                x:Key="StringToVisibilityConverter" />
+            <Style
+                BasedOn="{StaticResource {x:Type ui:ContentDialog}}"
+                TargetType="{x:Type local:NwcExportViewSettingsDialog}" />
+            <ui:TextBlock
+                x:Key="RemoveTemplateTooltip"
+                Text="{me:LocalizationSource NwcExportViewSettingsDialog.RemoveTemplateTooltip}" />
+        </ResourceDictionary>
+    </ui:ContentDialog.Resources>
+    <Grid
+        d:Background="White">
+        <Grid.RowDefinitions>
+            <RowDefinition
+                Height="Auto" />
+            <RowDefinition
+                Height="*" />
+            <RowDefinition
+                Height="Auto" />
+        </Grid.RowDefinitions>
+        <Border
+            Grid.Row="0"
+            ToolTip="{me:LocalizationSource NwcExportViewSettingsDialog.RvtFilePathTooltip}"
+            Style="{StaticResource CustomBorder}">
+            <StackPanel>
+                <Label
+                    Content="{me:LocalizationSource NwcExportViewSettingsDialog.RvtFilePathLabel}" />
+                <DockPanel
+                    LastChildFill="True">
+                    <ui:Button
+                        Width="Auto"
+                        Height="36"
+                        DockPanel.Dock="Right"
+                        HorizontalAlignment="Right"
+                        ToolTip="{me:LocalizationSource NwcExportViewSettingsDialog.SelectLocalRvtTooltip}"
+                        Command="{Binding SelectLocalFileCommand}"
+                        Content="{ui:SymbolIcon Symbol=Folder20}" />
+                    <ui:Button
+                        Width="Auto"
+                        Height="36"
+                        Margin="10 0"
+                        DockPanel.Dock="Right"
+                        HorizontalAlignment="Right"
+                        ToolTip="{me:LocalizationSource NwcExportViewSettingsDialog.SelectRsRvtTooltip}"
+                        Command="{Binding SelectRsFileCommand}"
+                        Content="{ui:SymbolIcon Symbol=FolderGlobe20}" />
+                    <ui:TextBox
+                        ToolTip="{Binding RvtFilePath}"
+                        Text="{Binding RvtFilePath, UpdateSourceTrigger=PropertyChanged}" />
+                </DockPanel>
+                <Label
+                    Margin="0 10 0 0"
+                    Content="{me:LocalizationSource NwcExportViewSettingsDialog.ViewTemplateNameLabel}" />
+                <ui:TextBox
+                    Text="{Binding ViewTemplateName, UpdateSourceTrigger=PropertyChanged}" />
+            </StackPanel>
+        </Border>
+
+        <Border
+            Grid.Row="1"
+            Margin="0 10 0 0"
+            ToolTip="{me:LocalizationSource NwcExportViewSettingsDialog.WorksetsTooltip}"
+            Style="{StaticResource CustomBorder}">
+            <DockPanel
+                LastChildFill="True">
+                <DockPanel
+                    DockPanel.Dock="Top">
+                    <Label
+                        VerticalAlignment="Center"
+                        Content="{me:LocalizationSource NwcExportViewSettingsDialog.WorksetsLabel}" />
+                    <ui:Button
+                        HorizontalAlignment="Right"
+                        DockPanel.Dock="Right"
+                        ToolTip="{me:LocalizationSource NwcExportViewSettingsDialog.AddTemplateTooltip}"
+                        Content="{ui:SymbolIcon Symbol=Add20}"
+                        Command="{Binding AddWorksetHideTemplateCommand}" />
+                    <ui:Button
+                        Margin="10 0"
+                        HorizontalAlignment="Right"
+                        DockPanel.Dock="Right"
+                        ToolTip="{me:LocalizationSource NwcExportViewSettingsDialog.RemoveTemplateTooltip}"
+                        Content="{ui:SymbolIcon Symbol=Delete20}"
+                        Command="{Binding RemoveWorksetHideTemplateCommand}"
+                        CommandParameter="{Binding SelectedWorksetHideTemplate}" />
+                </DockPanel>
+                <ui:ListView
+                    Margin="0 5 0 0"
+                    Height="250"
+                    ScrollViewer.VerticalScrollBarVisibility="Auto"
+                    ItemsSource="{Binding WorksetHideTemplates}"
+                    SelectedItem="{Binding SelectedWorksetHideTemplate}">
+                    <ui:ListView.ItemTemplate>
+                        <DataTemplate>
+                            <DockPanel
+                                LastChildFill="True">
+                                <ui:Button
+                                    Margin="5 0 0 0"
+                                    Width="Auto"
+                                    Height="36"
+                                    DockPanel.Dock="Right"
+                                    HorizontalAlignment="Right"
+                                    ToolTip="{StaticResource RemoveTemplateTooltip}"
+                                    Content="{ui:SymbolIcon Symbol=Delete20}"
+                                    Command="{Binding DataContext.RemoveWorksetHideTemplateCommand, RelativeSource={RelativeSource AncestorType=ui:ContentDialog}}"
+                                    CommandParameter="{Binding}" />
+                                <ui:TextBox
+                                    Text="{Binding Template, UpdateSourceTrigger=PropertyChanged}"
+                                    ToolTip="{Binding Template}" />
+                            </DockPanel>
+                        </DataTemplate>
+                    </ui:ListView.ItemTemplate>
+                </ui:ListView>
+            </DockPanel>
+        </Border>
+        <DockPanel
+            Height="16"
+            Grid.Row="2"
+            VerticalAlignment="Center"
+            HorizontalAlignment="Right">
+            <ui:TextBlock
+                DockPanel.Dock="Right"
+                HorizontalAlignment="Right"
+                Style="{StaticResource CustomErrorText}"
+                Text="{Binding ErrorText}" />
+            <ui:Button
+                Visibility="Collapsed"
+                Command="{Binding HelperCommand}" />
+        </DockPanel>
+    </Grid>
+</ui:ContentDialog>

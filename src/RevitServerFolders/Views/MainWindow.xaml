@@ -178,130 +178,149 @@
                 IsIndeterminate="True" />
         </DockPanel>
 
-        <Border
+        <DockPanel
+            LastChildFill="True"
             Grid.Row="1"
             Grid.Column="0"
-            Margin="10 0 0 0"
-            Style="{StaticResource DisabledOnExecutingBorder}">
-            <DockPanel
-                LastChildFill="True">
-                <ui:Button
-                    Margin="0 0 0 10"
-                    DockPanel.Dock="Top"
-                    Content="{ui:SymbolIcon Symbol=Add20}"
-                    Command="{Binding AddSettingsCommand}" />
-                <ui:DataGrid
-                    Grid.Row="5"
-                    Margin="5"
-                    Style="{StaticResource CustomResizableDataGridStyle}"
-                    ItemsSource="{Binding SettingsCollection}"
-                    SelectedItem="{Binding SelectedSettings}">
-                    <ui:DataGrid.Columns>
-                        <DataGridTextColumn
-                            Width="Auto"
-                            IsReadOnly="True"
-                            CanUserReorder="False"
-                            CanUserResize="False"
-                            CanUserSort="True"
-                            Header="№"
-                            Binding="{Binding Index}" />
-                        <DataGridCheckBoxColumn
-                            CanUserReorder="False"
-                            CanUserResize="False"
-                            CanUserSort="False"
-                            Width="Auto"
-                            Binding="{Binding IsSelected, UpdateSourceTrigger=PropertyChanged}">
-                            <DataGridCheckBoxColumn.Header>
-                                <CheckBox
-                                    IsChecked="{Binding DataContext.AllSelected, RelativeSource={RelativeSource AncestorType=ui:DataGrid}, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
-                            </DataGridCheckBoxColumn.Header>
-                        </DataGridCheckBoxColumn>
-                        <DataGridTemplateColumn
-                            Width="180"
-                            MinWidth="180"
-                            Header="{StaticResource TargetsHeader}">
-                            <DataGridTemplateColumn.CellTemplate>
-                                <DataTemplate>
-                                    <StackPanel
-                                        Height="50"
-                                        Margin="5 2">
-                                        <DockPanel
-                                            Margin="0 0 0 5">
-                                            <ui:TextBlock
-                                                Width="55"
-                                                Margin="0 0 5 0"
-                                                Foreground="{DynamicResource LabelForeground}"
-                                                Text="{Binding TargetFromLabel}" />
-                                            <ui:TextBlock
-                                                Foreground="{DynamicResource LabelForeground}"
-                                                ToolTip="{Binding TargetFolder}">
-                                                <i:Interaction.Behaviors>
-                                                    <pluginBehaviors:TextBlockResizeHelper />
-                                                </i:Interaction.Behaviors>
-                                                <ui:TextBlock.Text>
-                                                    <MultiBinding
-                                                        Converter="{StaticResource MiddleEllipsisConverter}">
-                                                        <Binding
-                                                            Path="TargetFolder" />
-                                                        <Binding
-                                                            RelativeSource="{RelativeSource Self}" />
-                                                        <Binding
-                                                            RelativeSource="{RelativeSource Self}"
-                                                            Path="ActualWidth" />
-                                                    </MultiBinding>
-                                                </ui:TextBlock.Text>
-                                            </ui:TextBlock>
-                                        </DockPanel>
-                                        <DockPanel>
-                                            <ui:TextBlock
-                                                Width="55"
-                                                Margin="0 0 5 0"
-                                                Foreground="{DynamicResource LabelForeground}"
-                                                Text="{Binding TargetToLabel}" />
-                                            <ui:TextBlock
-                                                Foreground="{DynamicResource LabelForeground}"
-                                                ToolTip="{Binding SourceFolder}">
-                                                <i:Interaction.Behaviors>
-                                                    <pluginBehaviors:TextBlockResizeHelper />
-                                                </i:Interaction.Behaviors>
-                                                <ui:TextBlock.Text>
-                                                    <MultiBinding
-                                                        Converter="{StaticResource MiddleEllipsisConverter}">
-                                                        <Binding
-                                                            Path="SourceFolder" />
-                                                        <Binding
-                                                            RelativeSource="{RelativeSource Self}" />
-                                                        <Binding
-                                                            RelativeSource="{RelativeSource Self}"
-                                                            Path="ActualWidth" />
-                                                    </MultiBinding>
-                                                </ui:TextBlock.Text>
-                                            </ui:TextBlock>
-                                        </DockPanel>
-                                    </StackPanel>
-                                </DataTemplate>
-                            </DataGridTemplateColumn.CellTemplate>
-                        </DataGridTemplateColumn>
-                        <DataGridTemplateColumn
-                            CanUserReorder="False"
-                            CanUserResize="False"
-                            CanUserSort="False"
-                            Width="Auto">
-                            <DataGridTemplateColumn.CellTemplate>
-                                <DataTemplate>
-                                    <ui:Button
-                                        Appearance="Danger"
-                                        Content="{ui:SymbolIcon Symbol=Delete20}"
-                                        Command="{Binding DataContext.RemoveSettingsCommand,
+            Margin="10 0 0 0">
+            <Border
+                DockPanel.Dock="Bottom"
+                Visibility="{Binding SelectedSettings.IsExportRoomsVisible, Converter={StaticResource BooleanToVisibilityConverter}}"
+                Style="{StaticResource DisabledOnExecutingBorder}">
+                <DockPanel>
+                    <Label
+                        VerticalAlignment="Center"
+                        Content="{me:LocalizationSource NwcExportViewSettingsDialog.Title}" />
+                    <ui:Button
+                        DockPanel.Dock="Right"
+                        HorizontalAlignment="Right"
+                        Width="Auto"
+                        Content="{ui:SymbolIcon Symbol=Edit20}"
+                        Command="{Binding SetNwcExportViewSettingsCommand}" />
+                </DockPanel>
+            </Border>
+            <Border
+                Style="{StaticResource DisabledOnExecutingBorder}">
+                <DockPanel
+                    LastChildFill="True">
+                    <ui:Button
+                        Margin="0 0 0 10"
+                        DockPanel.Dock="Top"
+                        Content="{ui:SymbolIcon Symbol=Add20}"
+                        Command="{Binding AddSettingsCommand}" />
+                    <ui:DataGrid
+                        Grid.Row="5"
+                        Margin="5"
+                        Style="{StaticResource CustomResizableDataGridStyle}"
+                        ItemsSource="{Binding SettingsCollection}"
+                        SelectedItem="{Binding SelectedSettings}">
+                        <ui:DataGrid.Columns>
+                            <DataGridTextColumn
+                                Width="Auto"
+                                IsReadOnly="True"
+                                CanUserReorder="False"
+                                CanUserResize="False"
+                                CanUserSort="True"
+                                Header="№"
+                                Binding="{Binding Index}" />
+                            <DataGridCheckBoxColumn
+                                CanUserReorder="False"
+                                CanUserResize="False"
+                                CanUserSort="False"
+                                Width="Auto"
+                                Binding="{Binding IsSelected, UpdateSourceTrigger=PropertyChanged}">
+                                <DataGridCheckBoxColumn.Header>
+                                    <CheckBox
+                                        IsChecked="{Binding DataContext.AllSelected, RelativeSource={RelativeSource AncestorType=ui:DataGrid}, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                                </DataGridCheckBoxColumn.Header>
+                            </DataGridCheckBoxColumn>
+                            <DataGridTemplateColumn
+                                Width="180"
+                                MinWidth="180"
+                                Header="{StaticResource TargetsHeader}">
+                                <DataGridTemplateColumn.CellTemplate>
+                                    <DataTemplate>
+                                        <StackPanel
+                                            Height="50"
+                                            Margin="5 2">
+                                            <DockPanel
+                                                Margin="0 0 0 5">
+                                                <ui:TextBlock
+                                                    Width="55"
+                                                    Margin="0 0 5 0"
+                                                    Foreground="{DynamicResource LabelForeground}"
+                                                    Text="{Binding TargetFromLabel}" />
+                                                <ui:TextBlock
+                                                    Foreground="{DynamicResource LabelForeground}"
+                                                    ToolTip="{Binding TargetFolder}">
+                                                    <i:Interaction.Behaviors>
+                                                        <pluginBehaviors:TextBlockResizeHelper />
+                                                    </i:Interaction.Behaviors>
+                                                    <ui:TextBlock.Text>
+                                                        <MultiBinding
+                                                            Converter="{StaticResource MiddleEllipsisConverter}">
+                                                            <Binding
+                                                                Path="TargetFolder" />
+                                                            <Binding
+                                                                RelativeSource="{RelativeSource Self}" />
+                                                            <Binding
+                                                                RelativeSource="{RelativeSource Self}"
+                                                                Path="ActualWidth" />
+                                                        </MultiBinding>
+                                                    </ui:TextBlock.Text>
+                                                </ui:TextBlock>
+                                            </DockPanel>
+                                            <DockPanel>
+                                                <ui:TextBlock
+                                                    Width="55"
+                                                    Margin="0 0 5 0"
+                                                    Foreground="{DynamicResource LabelForeground}"
+                                                    Text="{Binding TargetToLabel}" />
+                                                <ui:TextBlock
+                                                    Foreground="{DynamicResource LabelForeground}"
+                                                    ToolTip="{Binding SourceFolder}">
+                                                    <i:Interaction.Behaviors>
+                                                        <pluginBehaviors:TextBlockResizeHelper />
+                                                    </i:Interaction.Behaviors>
+                                                    <ui:TextBlock.Text>
+                                                        <MultiBinding
+                                                            Converter="{StaticResource MiddleEllipsisConverter}">
+                                                            <Binding
+                                                                Path="SourceFolder" />
+                                                            <Binding
+                                                                RelativeSource="{RelativeSource Self}" />
+                                                            <Binding
+                                                                RelativeSource="{RelativeSource Self}"
+                                                                Path="ActualWidth" />
+                                                        </MultiBinding>
+                                                    </ui:TextBlock.Text>
+                                                </ui:TextBlock>
+                                            </DockPanel>
+                                        </StackPanel>
+                                    </DataTemplate>
+                                </DataGridTemplateColumn.CellTemplate>
+                            </DataGridTemplateColumn>
+                            <DataGridTemplateColumn
+                                CanUserReorder="False"
+                                CanUserResize="False"
+                                CanUserSort="False"
+                                Width="Auto">
+                                <DataGridTemplateColumn.CellTemplate>
+                                    <DataTemplate>
+                                        <ui:Button
+                                            Appearance="Danger"
+                                            Content="{ui:SymbolIcon Symbol=Delete20}"
+                                            Command="{Binding DataContext.RemoveSettingsCommand,
                         RelativeSource={RelativeSource AncestorType=Window}}"
-                                        CommandParameter="{Binding}" />
-                                </DataTemplate>
-                            </DataGridTemplateColumn.CellTemplate>
-                        </DataGridTemplateColumn>
-                    </ui:DataGrid.Columns>
-                </ui:DataGrid>
-            </DockPanel>
-        </Border>
+                                            CommandParameter="{Binding}" />
+                                    </DataTemplate>
+                                </DataGridTemplateColumn.CellTemplate>
+                            </DataGridTemplateColumn>
+                        </ui:DataGrid.Columns>
+                    </ui:DataGrid>
+                </DockPanel>
+            </Border>
+        </DockPanel>
 
         <GridSplitter
             Grid.Column="1"
@@ -318,6 +337,13 @@
             Grid.Column="2"
             DataContext="{Binding SelectedSettings}"
             Style="{StaticResource DisabledOnExecutingControl}" />
+
+        <ContentPresenter
+            Grid.Row="0"
+            Grid.Column="0"
+            Grid.RowSpan="3"
+            Grid.ColumnSpan="3"
+            x:Name="_rootContentDialog" />
 
         <StackPanel
             Grid.Row="2"

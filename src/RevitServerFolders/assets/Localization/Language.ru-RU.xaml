@@ -12,13 +12,15 @@
 
     <system:String
         x:Key="Transaction.ChangeSite">Смена площадки</system:String>
+    <system:String
+        x:Key="Transaction.CreateExportView">Создание 3D вида для экспорта</system:String>
 
     <system:String
         x:Key="Exceptions.ServerNotFound">Не был найден сервер "{0}".</system:String>
     <system:String
         x:Key="Exceptions.FolderNotFound">Не была найдена папка "{0}".</system:String>
     <system:String
-        x:Key="Exceptions.ViewWithoutElements">Вид "{0}" не содержит элементы с геометрией. Возможно, из документа выгружены все связи. Рекомендуется открыть экспортируемый rvt файл со всеми открытыми рабочими наборами и проверить, что на виде есть элементы из активного файла.</system:String>
+        x:Key="Exceptions.ViewWithoutElements">Экспортируемый вид не содержит элементы с геометрией. Путь к файлу с шаблоном вида: "{0}", название копируемого шаблона вида: "{1}", строки для скрытия рабочих наборов: "{2}". Также учтите, что из экспортируемого документа могут быть выгружены все связи.</system:String>
     <system:String
         x:Key="Exceptions.ViewNotFound">Не найден вид "{0}".</system:String>
     <system:String
@@ -27,6 +29,16 @@
         x:Key="Exceptions.NwcExportCancel">Revit отменил экспорт в NWC.</system:String>
     <system:String
         x:Key="Exceptions.RvtExportError">Ошибка экспорта в RVT. Информация об ошибке: {0}.</system:String>
+    <system:String
+        x:Key="Exceptions.CannotOpenView3dTemplateFile">Не удалось открыть файл с шаблоном вида. Полный путь к файлу: {0}. Информация об ошибке: {1}.</system:String>
+    <system:String
+        x:Key="Exceptions.CannotFindView3dTemplate">Не удалось найти шаблон вида в файле с шаблоном. Полный путь к файлу: {0}. Название шаблона: {1}.</system:String>
+    <system:String
+        x:Key="Exceptions.CannotCopyView3dTemplate">Не удалось скопировать шаблон вида в экспортируемый документ.</system:String>
+    <system:String
+        x:Key="Exceptions.CannotFind3dFamilyType">В экспортируемом документе отсутствует семейство 3D вида.</system:String>
+    <system:String
+        x:Key="Exceptions.ExportViewError">Ошибка генерации 3D вида для экспорта в NWC. Путь к файлу с шаблоном вида: "{0}", название копируемого шаблона вида: "{1}", строки для скрытия рабочих наборов: "{2}". Информация об ошибке: {3}.</system:String>
     <system:String
         x:Key="Exceptions.ElementsNotDeleted">В процессе открытия документа были обнаружены элементы, вызывающие ошибки. Автоматически удалить их не удалось из-за отсутствия прав на их удаление, Revit отменил операцию экспорта. Id элементов, вызвавших ошибки: {0}. Информация об ошибке: {1}.</system:String>
 
@@ -51,9 +63,13 @@
         x:Key="MainWindow.Validation.ModelsDuplicated">Папка источника содержит дубликаты "{0}".</system:String>
     <system:String
         x:Key="MainWindow.Validation.AllSettingsOff">Не выбрана ни одна настройка</system:String>
+    <system:String
+        x:Key="NwcMainWindow.Validation.SetNwcViewSettings">Задайте настройки вида для экспорта в NWC.</system:String>
 
     <system:String
         x:Key="RsBrowser.Validation.SelectFolder">Выберите папку с моделями</system:String>
+    <system:String
+        x:Key="RsBrowser.Validation.SelectFile">Выберите модель</system:String>
 
     <system:String
         x:Key="MainWindow.LabelTarget">Папка назначения</system:String>
@@ -75,6 +91,39 @@
         x:Key="MainWindow.TargetsFrom">Откуда:</system:String>
     <system:String
         x:Key="MainWindow.TargetsTo">Куда:</system:String>
+
+    <system:String
+        x:Key="NwcExportViewSettingsDialog.Title">Настройки вида для экспорта в NWC</system:String>
+    <system:String
+        x:Key="NwcExportViewSettingsDialog.RvtFilePathLabel">Путь к rvt файлу с шаблоном вида</system:String>
+    <system:String
+        x:Key="NwcExportViewSettingsDialog.SelectLocalRvtTooltip">Выбрать локальный rvt файл</system:String>
+    <system:String
+        x:Key="NwcExportViewSettingsDialog.SelectRsRvtTooltip">Выбрать rvt файл с revit server</system:String>
+    <system:String
+        x:Key="NwcExportViewSettingsDialog.ViewTemplateNameLabel">Название шаблона вида</system:String>
+    <system:String
+        x:Key="NwcExportViewSettingsDialog.RvtFilePathTooltip">В экспортируемом файле будет автоматически создан 3D вид для экспорта в NWC. У этого вида будет заданный шаблон, скопированный из заданного файла. Также на этом виде будет выключена видимость всех рабочих наборов, в названии которых содержатся строки, заданные ниже без учета регистра. Изменения, внесенные в rvt файл, сохранены не будут.</system:String>
+    <system:String
+        x:Key="NwcExportViewSettingsDialog.CloseButton">Закрыть</system:String>
+    <system:String
+        x:Key="NwcExportViewSettingsDialog.SaveButton">Сохранить</system:String>
+    <system:String
+        x:Key="NwcExportViewSettingsDialog.RemoveTemplateTooltip">Удалить строку</system:String>
+    <system:String
+        x:Key="NwcExportViewSettingsDialog.AddTemplateTooltip">Добавить строку</system:String>
+    <system:String
+        x:Key="NwcExportViewSettingsDialog.WorksetsLabel">Строки для скрытия рабочих наборов</system:String>
+    <system:String
+        x:Key="NwcExportViewSettingsDialog.WorksetsTooltip">Рабочие наборы, в названии которых есть какая-то из заданных строк без учета регистра, будут скрыты на экспортируемом в NWC виде.</system:String>
+    <system:String
+        x:Key="NwcExportViewSettingsDialog.Validation.RvtPathNotSet">Задайте путь к rvt файлу.</system:String>
+    <system:String
+        x:Key="NwcExportViewSettingsDialog.Validation.ViewNameNotSet">Задайте название шаблона вида.</system:String>
+    <system:String
+        x:Key="NwcExportViewSettingsDialog.Validation.WorksetTemplateEmpty">Пустые строки недопустимы.</system:String>
+    <system:String
+        x:Key="NwcExportViewSettingsDialog.Validation.WorksetTemplatesDuplicated">Строки дублируются: "{0}".</system:String>
 
     <system:String
         x:Key="MainWindow.ErrorTextPattern">Ошибка в настройке {0}: {1}</system:String>
