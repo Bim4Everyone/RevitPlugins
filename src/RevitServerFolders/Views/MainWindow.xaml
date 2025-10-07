@@ -185,7 +185,7 @@
             Margin="10 0 0 0">
             <Border
                 DockPanel.Dock="Bottom"
-                Visibility="{Binding SelectedSettings.IsExportRoomsVisible, Converter={StaticResource BooleanToVisibilityConverter}}"
+                Visibility="{Binding SelectedSettings.IsNwcExport, Converter={StaticResource BooleanToVisibilityConverter}}"
                 Style="{StaticResource DisabledOnExecutingBorder}">
                 <DockPanel>
                     <Label

@@ -116,7 +116,7 @@
                         Margin="5 0"
                         Content="{me:LocalizationSource MainWindow.ExportRooms}"
                         IsChecked="{Binding IsExportRooms}"
-                        Visibility="{Binding IsExportRoomsVisible, 
+                        Visibility="{Binding IsNwcExport, 
             Converter={StaticResource BooleanToVisibilityConverter}}" />
                 </DockPanel>
                 <DockPanel
