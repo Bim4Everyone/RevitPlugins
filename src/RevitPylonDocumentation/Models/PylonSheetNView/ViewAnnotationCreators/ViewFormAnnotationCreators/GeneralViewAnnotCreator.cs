@@ -44,14 +44,18 @@ internal class GeneralViewAnnotCreator : ViewAnnotationCreator {
 
         // Пытаемся создать марки на виде
         try {
-            var markService = new GeneralViewMarkService(ViewModel, Repository, SheetInfo, ViewOfPylon, dimensionBaseService);
+            var markService = new GeneralViewMarkService(ViewModel, Repository, SheetInfo, ViewOfPylon, 
+                                                         dimensionBaseService);
             markService.TryCreatePylonElevMark(SheetInfo.HostElems);
             markService.TryCreateSkeletonMark(false);
             markService.TryCreateAdditionalMark(false);
-            markService.TryCreateLowerBreakLines(false);
-            markService.TryCreateUpperBreakLines();
-            markService.TryCreateMiddleBreakLines(false);
             markService.TryCreateConcretingSeams();
+
+            var breakLineService = new GeneralViewBreakLineMarkService(ViewModel, Repository, SheetInfo, ViewOfPylon, 
+                                                                       dimensionBaseService);
+            breakLineService.TryCreateLowerBreakLines(false);
+            breakLineService.TryCreateUpperBreakLines();
+            breakLineService.TryCreateMiddleBreakLines(false);
         } catch(Exception) { }
     }
 }

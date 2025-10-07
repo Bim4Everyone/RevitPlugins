@@ -6,7 +6,7 @@ using RevitPylonDocumentation.Models.PluginOptions;
 using RevitPylonDocumentation.Models.PylonSheetNView;
 
 namespace RevitPylonDocumentation.Models.Services;
-public class ViewPointsAnalyzer {
+public class ViewPointsAnalyzerService {
     private readonly PylonView _viewOfPylon;
     private bool _checked;
     private XYZ _cornerRightTopGlobalPlus;
@@ -19,7 +19,7 @@ public class ViewPointsAnalyzer {
     private XYZ _quadrantBottomGlobalPlus;
     private XYZ _quadrantLeftGlobalPlus;
 
-    public ViewPointsAnalyzer(PylonView pylonView) {
+    public ViewPointsAnalyzerService(PylonView pylonView) {
         _viewOfPylon = pylonView;
         _checked = false;
     }

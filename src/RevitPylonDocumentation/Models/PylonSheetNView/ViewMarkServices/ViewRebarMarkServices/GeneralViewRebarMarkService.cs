@@ -9,7 +9,7 @@ using RevitPylonDocumentation.ViewModels;
 
 namespace RevitPylonDocumentation.Models.PylonSheetNView.ViewMarkServices.ViewRebarMarkServices;
 internal class GeneralViewRebarMarkService {
-    private readonly ViewPointsAnalyzer _viewPointsAnalyzer;
+    private readonly ViewPointsAnalyzerService _viewPointsAnalyzer;
     private readonly TagCreationService _annotationService;
     private readonly FamilySymbol _tagSymbolWithStep;
 
@@ -23,7 +23,7 @@ internal class GeneralViewRebarMarkService {
         SheetInfo = pylonSheetInfo;
         ViewOfPylon = pylonView;
 
-        _viewPointsAnalyzer = new ViewPointsAnalyzer(ViewOfPylon);
+        _viewPointsAnalyzer = new ViewPointsAnalyzerService(ViewOfPylon);
         _annotationService = new TagCreationService(ViewOfPylon);
 
         // Находим типоразмер марки несущей арматуры для обозначения позиции, диаметра и комментариев арматуры

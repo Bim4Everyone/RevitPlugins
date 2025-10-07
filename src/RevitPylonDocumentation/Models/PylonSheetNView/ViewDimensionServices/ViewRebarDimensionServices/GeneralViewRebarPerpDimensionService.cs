@@ -16,7 +16,7 @@ internal class GeneralViewRebarPerpDimensionService {
     private readonly PylonView _viewOfPylon;
 
     private readonly DimensionBaseService _dimensionBaseService;
-    private readonly ViewPointsAnalyzer _viewPointsAnalyzer;
+    private readonly ViewPointsAnalyzerService _viewPointsAnalyzer;
 
     internal GeneralViewRebarPerpDimensionService(MainViewModel mvm, RevitRepository repository, 
                                                   PylonSheetInfo pylonSheetInfo, PylonView pylonView, 
@@ -27,7 +27,7 @@ internal class GeneralViewRebarPerpDimensionService {
         _viewOfPylon = pylonView;
 
         _dimensionBaseService = dimensionBaseService;
-        _viewPointsAnalyzer = new ViewPointsAnalyzer(_viewOfPylon);
+        _viewPointsAnalyzer = new ViewPointsAnalyzerService(_viewOfPylon);
     }
 
 

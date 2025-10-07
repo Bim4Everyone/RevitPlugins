@@ -9,7 +9,7 @@ using RevitPylonDocumentation.ViewModels;
 
 namespace RevitPylonDocumentation.Models.PylonSheetNView.ViewMarkServices.ViewFormMarkServices;
 internal class TransViewMarkService {
-    private readonly ViewPointsAnalyzer _viewPointsAnalyzer;
+    private readonly ViewPointsAnalyzerService _viewPointsAnalyzer;
     private readonly TagCreationService _annotationService;
 
     private readonly FamilySymbol _tagSkeletonSymbol;
@@ -21,7 +21,7 @@ internal class TransViewMarkService {
         SheetInfo = pylonSheetInfo;
         ViewOfPylon = pylonView;
 
-        _viewPointsAnalyzer = new ViewPointsAnalyzer(pylonView);
+        _viewPointsAnalyzer = new ViewPointsAnalyzerService(pylonView);
         _annotationService = new TagCreationService(pylonView);
 
         // Находим типоразмер марки несущей арматуры для обозначения марки изделия
