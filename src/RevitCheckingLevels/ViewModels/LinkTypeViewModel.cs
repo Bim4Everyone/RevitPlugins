@@ -1,64 +1,57 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using System;
 using System.Windows.Input;
 
 using Autodesk.Revit.DB;
-using Autodesk.Revit.UI;
 
 using dosymep.WPF.Commands;
 using dosymep.WPF.ViewModels;
 
-namespace RevitCheckingLevels.ViewModels {
-    internal class LinkTypeViewModel : BaseViewModel {
-        private readonly RevitLinkType _linkType;
-        private readonly Workset _workset;
-        private string _linkLoadToolTip;
+namespace RevitCheckingLevels.ViewModels;
+internal class LinkTypeViewModel : BaseViewModel {
+    private readonly Workset _workset;
+    private string _linkLoadToolTip;
 
-        public LinkTypeViewModel(RevitLinkType linkType) {
-            _linkType = linkType;
-            _workset = _linkType.Document.GetWorksetTable().GetWorkset(_linkType.WorksetId);
+    public LinkTypeViewModel(RevitLinkType linkType) {
+        Element = linkType;
+        _workset = Element.Document.GetWorksetTable().GetWorkset(Element.WorksetId);
 
-            LinkLoadCommand = new RelayCommand(LinkLoad, CanLinkLoad);
+        LinkLoadCommand = new RelayCommand(LinkLoad, CanLinkLoad);
+    }
+
+    public RevitLinkType Element { get; }
+
+    public ElementId Id => Element.Id;
+    public string Name => Element.Name;
+    public bool IsLinkLoaded => Element.GetLinkedFileStatus() == LinkedFileStatus.Loaded;
+
+    public ICommand LinkLoadCommand { get; }
+
+    public string LinkLoadToolTip {
+        get => _linkLoadToolTip;
+        set => RaiseAndSetIfChanged(ref _linkLoadToolTip, value);
+    }
+
+    private void LinkLoad(object p) {
+        Element.Load();
+        OnPropertyChanged(nameof(IsLinkLoaded));
+    }
+
+    private bool CanLinkLoad(object p) {
+        if(IsLinkLoaded) {
+            LinkLoadToolTip = "Данная связь уже загружена.";
+            return false;
         }
 
-        public RevitLinkType Element => _linkType;
+        if(!_workset.IsOpen) {
+            LinkLoadToolTip = $"Откройте рабочий набор \"{_workset.Name}\"."
+                              + Environment.NewLine
+                              + "Загрузка связанного файла из закрытого рабочего набора не поддерживается!";
 
-        public ElementId Id => _linkType.Id;
-        public string Name => _linkType.Name;
-        public bool IsLinkLoaded => _linkType.GetLinkedFileStatus() == LinkedFileStatus.Loaded;
-
-        public ICommand LinkLoadCommand { get; }
-
-        public string LinkLoadToolTip {
-            get => _linkLoadToolTip;
-            set => this.RaiseAndSetIfChanged(ref _linkLoadToolTip, value);
+            return false;
         }
 
-        private void LinkLoad(object p) {
-            _linkType.Load();
-            OnPropertyChanged(nameof(IsLinkLoaded));
-        }
+        LinkLoadToolTip = "Загрузить координационный файл";
+        return true;
 
-        private bool CanLinkLoad(object p) {
-            if(IsLinkLoaded) {
-                LinkLoadToolTip = "Данная связь уже загружена.";
-                return false;
-            }
-
-            if(!_workset.IsOpen) {
-                LinkLoadToolTip = $"Откройте рабочий набор \"{_workset.Name}\"."
-                                  + Environment.NewLine
-                                  + "Загрузка связанного файла из закрытого рабочего набора не поддерживается!";
-
-                return false;
-            }
-
-            LinkLoadToolTip = "Загрузить координационный файл";
-            return true;
-
-        }
     }
 }

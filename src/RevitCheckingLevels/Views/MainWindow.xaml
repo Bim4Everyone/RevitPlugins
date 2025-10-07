@@ -4,25 +4,21 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-
     xmlns:base="clr-namespace:dosymep.WPF.Views"
     xmlns:local="clr-namespace:RevitCheckingLevels.Views"
     xmlns:vms="clr-namespace:RevitCheckingLevels.ViewModels"
     xmlns:dxe="http://schemas.devexpress.com/winfx/2008/xaml/editors"
-
     xmlns:dx="http://schemas.devexpress.com/winfx/2008/xaml/core"
     xmlns:dxmvvm="http://schemas.devexpress.com/winfx/2008/xaml/mvvm"
     xmlns:dxg="http://schemas.devexpress.com/winfx/2008/xaml/grid"
     xmlns:commands="clr-namespace:dosymep.WPF.Commands"
     xmlns:converters="clr-namespace:dosymep.WPF.Converters"
     xmlns:selectors="clr-namespace:RevitCheckingLevels.ViewTemplateSelectors"
-
     mc:Ignorable="d"
     WindowStartupLocation="CenterOwner"
-
     Title="MainWindow"
-    Height="450" Width="800"
-
+    Height="450"
+    Width="800"
     x:Name="_this"
     d:DataContext="{d:DesignInstance vms:MainViewModel, IsDesignTimeCreatable=False}">
 
@@ -33,16 +29,25 @@
                 DefaultTemplate="{StaticResource DefaultGroupRowTemplate}"
                 UpdateElevationTemplate="{StaticResource UpdateElevationGroupRowTemplate}" />
 
-            <commands:DisableCollapseGroupRowCommand x:Key="DisableCollapseGroupRowCommand" />
-            <dxmvvm:BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter" Inverse="True" />
+            <commands:DisableCollapseGroupRowCommand
+                x:Key="DisableCollapseGroupRowCommand" />
+            <dxmvvm:BooleanToVisibilityConverter
+                x:Key="BooleanToVisibilityConverter"
+                Inverse="True" />
 
-            <dxmvvm:NumericToVisibilityConverter x:Key="GridVisible" />
-            <dxmvvm:NumericToVisibilityConverter x:Key="HintVisible" Inverse="True" />
+            <dxmvvm:NumericToVisibilityConverter
+                x:Key="GridVisible" />
+            <dxmvvm:NumericToVisibilityConverter
+                x:Key="HintVisible"
+                Inverse="True" />
 
             <ResourceDictionary.MergedDictionaries>
-                <ResourceDictionary Source="../ViewTemplates/GridRowStyle.xaml" />
-                <ResourceDictionary Source="../ViewTemplates/DefaultGroupRowTemplate.xaml" />
-                <ResourceDictionary Source="../ViewTemplates/UpdateElevationGroupRowTemplate.xaml" />
+                <ResourceDictionary
+                    Source="../ViewTemplates/GridRowStyle.xaml" />
+                <ResourceDictionary
+                    Source="../ViewTemplates/DefaultGroupRowTemplate.xaml" />
+                <ResourceDictionary
+                    Source="../ViewTemplates/UpdateElevationGroupRowTemplate.xaml" />
             </ResourceDictionary.MergedDictionaries>
         </ResourceDictionary>
     </Window.Resources>
@@ -64,17 +69,23 @@
             Command="{Binding  
                 Source={StaticResource DisableCollapseGroupRowCommand}}" />
 
-        <dxmvvm:CompositeCommandBehavior x:Name="MultiCommand">
-            <dxmvvm:CommandItem Command="{Binding LinkType.LinkLoadCommand}" />
-            <dxmvvm:CommandItem Command="{Binding ViewLoadCommand}" />
+        <dxmvvm:CompositeCommandBehavior
+            x:Name="MultiCommand">
+            <dxmvvm:CommandItem
+                Command="{Binding LinkType.LinkLoadCommand}" />
+            <dxmvvm:CommandItem
+                Command="{Binding ViewLoadCommand}" />
         </dxmvvm:CompositeCommandBehavior>
     </dxmvvm:Interaction.Behaviors>
 
     <Grid>
         <Grid.RowDefinitions>
-            <RowDefinition Height="Auto" />
-            <RowDefinition Height="*" />
-            <RowDefinition Height="Auto" />
+            <RowDefinition
+                Height="Auto" />
+            <RowDefinition
+                Height="*" />
+            <RowDefinition
+                Height="Auto" />
         </Grid.RowDefinitions>
 
         <DockPanel
@@ -103,7 +114,6 @@
                 IsReadOnly="True"
                 IsTextEditable="False"
                 ShowPopupIfReadOnly="False"
-
                 DisplayMember="Name"
                 ItemsSource="{Binding Path=LinkTypes}"
                 SelectedItem="{Binding Path=LinkType}" />
@@ -138,14 +148,27 @@
                     GroupRowTemplateSelector="{StaticResource ErrorTypeGroupRowTemplateSelector}" />
             </dxg:GridControl.View>
 
-            <dxg:GridColumn FieldName="Name" Header="Имя" />
-            <dxg:GridColumn FieldName="MeterElevation" Header="Отметка (м)" />
-            <dxg:GridColumn FieldName="MillimeterElevation" Header="Отметка (мм)" />
+            <dxg:GridColumn
+                FieldName="Name"
+                Header="Имя" />
+            <dxg:GridColumn
+                FieldName="MeterElevation"
+                Header="Отметка (м)" />
+            <dxg:GridColumn
+                FieldName="MillimeterElevation"
+                Header="Отметка (мм)" />
 
-            <dxg:GridColumn FieldName="ErrorType" Header="Тип ошибки" GroupIndex="0" />
+            <dxg:GridColumn
+                FieldName="ErrorType"
+                Header="Тип ошибки"
+                GroupIndex="0" />
         </dxg:GridControl>
 
-        <StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Right" Height="45">
+        <StackPanel
+            Grid.Row="2"
+            Orientation="Horizontal"
+            HorizontalAlignment="Right"
+            Height="45">
             <TextBlock
                 Margin="10"
                 Foreground="Orange"
@@ -153,11 +176,15 @@
                 Text="{Binding ErrorText}" />
 
             <dx:SimpleButton
-                Content="ОК" Margin="10" Width="80"
+                Content="ОК"
+                Margin="10"
+                Width="80"
                 Click="ButtonOk_Click" />
 
             <dx:SimpleButton
-                Content="Отмена" Margin="10" Width="80"
+                Content="Отмена"
+                Margin="10"
+                Width="80"
                 IsCancel="True"
                 Click="ButtonCancel_Click" />
         </StackPanel>
