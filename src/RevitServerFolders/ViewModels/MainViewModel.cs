@@ -94,6 +94,12 @@ internal class MainViewModel<T> : BaseViewModel where T : ExportSettings {
 
     protected virtual void AddSettingsImpl() { }
 
+    protected virtual ExportSettingsViewModel<T>[] GetSettingsForExport() {
+        return SettingsCollection
+            .Where(s => s.IsSelected)
+            .ToArray();
+    }
+
     private void UpdateIndexes() {
         int index = 1;
         foreach(var item in SettingsCollection) {
@@ -110,9 +116,7 @@ internal class MainViewModel<T> : BaseViewModel where T : ExportSettings {
 
     private void AcceptView() {
         SaveConfig();
-        var selectedSettings = SettingsCollection
-            .Where(s => s.IsSelected)
-            .ToArray();
+        var selectedSettings = GetSettingsForExport();
 
         using var dialog = ProgressDialogFactory.CreateDialog();
         dialog.StepValue = 1;

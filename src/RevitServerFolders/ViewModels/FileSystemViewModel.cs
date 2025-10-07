@@ -80,6 +80,17 @@ internal sealed class FileSystemViewModel : MainViewModel<FileModelObjectExportS
         return base.CanAcceptView();
     }
 
+    protected override ExportSettingsViewModel<FileModelObjectExportSettings>[] GetSettingsForExport() {
+        var settings = base.GetSettingsForExport()
+            .Cast<FileModelObjectExportSettingsViewModel>()
+            .ToArray();
+        var config = (FileModelObjectConfig) _pluginConfig;
+        foreach(var setting in settings) {
+            setting.SetNwcExportViewSettings(config.NwcExportViewSettings);
+        }
+        return settings;
+    }
+
     private async Task SetNwcExportViewSettings() {
         var config = (FileModelObjectConfig) _pluginConfig;
         var currentSettings = config.NwcExportViewSettings;

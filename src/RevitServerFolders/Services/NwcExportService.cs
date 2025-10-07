@@ -7,7 +7,6 @@ using Autodesk.Revit.DB;
 using Autodesk.Revit.DB.Events;
 using Autodesk.Revit.UI.Events;
 
-using dosymep.Bim4Everyone.ProjectConfigs;
 using dosymep.Revit;
 using dosymep.Revit.Geometry;
 using dosymep.SimpleServices;
@@ -24,20 +23,17 @@ internal class NwcExportService : IModelsExportService<FileModelObjectExportSett
     private readonly ILoggerService _loggerService;
     private readonly ILocalizationService _localization;
     private readonly IErrorsService _errorsService;
-    private readonly IConfigSerializer _serializer;
     private FileModelObjectExportSettings _currentSettings;
 
     public NwcExportService(
         RevitRepository revitRepository,
         ILoggerService loggerService,
         ILocalizationService localization,
-        IErrorsService errorsService,
-        IConfigSerializer serializer) {
+        IErrorsService errorsService) {
         _revitRepository = revitRepository ?? throw new ArgumentNullException(nameof(revitRepository));
         _loggerService = loggerService ?? throw new ArgumentNullException(nameof(loggerService));
         _localization = localization ?? throw new ArgumentNullException(nameof(localization));
         _errorsService = errorsService ?? throw new ArgumentNullException(nameof(errorsService));
-        _serializer = serializer ?? throw new ArgumentNullException(nameof(serializer));
         _currentSettings = null;
     }
 
@@ -66,7 +62,7 @@ internal class NwcExportService : IModelsExportService<FileModelObjectExportSett
             }
         }
 
-        var viewSettings = FileModelObjectConfig.GetPluginConfig(_serializer).NwcExportViewSettings;
+        var viewSettings = settings.GetNwcExportViewSettings();
         Document viewTemplateDoc;
         try {
             viewTemplateDoc = _revitRepository.OpenDocumentFile(viewSettings.RvtFilePath);

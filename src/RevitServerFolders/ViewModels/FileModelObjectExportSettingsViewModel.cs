@@ -1,3 +1,5 @@
+using System;
+
 using dosymep.SimpleServices;
 
 using RevitServerFolders.Models;
@@ -16,6 +18,14 @@ internal class FileModelObjectExportSettingsViewModel : ExportSettingsViewModel<
         IsExportRoomsVisible = true;
     }
 
+
+    public void SetNwcExportViewSettings(NwcExportViewSettings viewSettings) {
+        if(viewSettings is null) {
+            throw new ArgumentNullException(nameof(viewSettings));
+        }
+
+        _settings.SetNwcExportViewSettings(viewSettings);
+    }
 
     public override FileModelObjectExportSettings GetSettings() {
         var settings = base.GetSettings();
