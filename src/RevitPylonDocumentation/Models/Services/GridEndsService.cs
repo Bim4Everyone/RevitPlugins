@@ -58,10 +58,10 @@ internal class GridEndsService {
 
 
     /// <summary>
-    /// Редактирует положения концов осей на виде
+    /// Редактирует положения концов осей на поперечном виде
     /// </summary>
     internal void EditTransViewGridEnds(Element elem, List<Grid> grids, bool longGridsWillBeNeeded) {
-        var transverseViewGridOffsets = new OffsetOption {
+        var offsetOption = new OffsetOption {
             LeftOffset = 1.5,
             RightOffset = 0.3,
             TopOffset = 0.2,
@@ -69,8 +69,22 @@ internal class GridEndsService {
         };
 
         if(longGridsWillBeNeeded) {
-            transverseViewGridOffsets.BottomOffset = 3.0;
+            offsetOption.BottomOffset = 3.0;
         }
-        EditGridEnds(elem, grids, transverseViewGridOffsets);
+        EditGridEnds(elem, grids, offsetOption);
+    }
+
+
+    /// <summary>
+    /// Редактирует положения концов осей на вертикальном виде
+    /// </summary>
+    internal void EditGeneralViewGridEnds(Element elem, List<Grid> grids) {
+        var offsetOption = new OffsetOption() {
+            LeftOffset = 1,
+            RightOffset = 1,
+            TopOffset = 1,
+            BottomOffset = 2.5
+        };
+        EditGridEnds(elem, grids, offsetOption);
     }
 }

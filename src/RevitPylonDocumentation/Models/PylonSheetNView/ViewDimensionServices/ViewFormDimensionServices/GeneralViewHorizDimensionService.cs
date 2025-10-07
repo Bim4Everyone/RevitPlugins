@@ -11,7 +11,7 @@ using RevitPylonDocumentation.Models.Services;
 using RevitPylonDocumentation.ViewModels;
 
 namespace RevitPylonDocumentation.Models.PylonSheetNView.ViewDimensionServices.ViewFormDimensionServices;
-internal class GeneralViewDimensionService {
+internal class GeneralViewHorizDimensionService {
     private readonly MainViewModel _viewModel;
     private readonly RevitRepository _repository;
     private readonly PylonSheetInfo _sheetInfo;
@@ -20,10 +20,10 @@ internal class GeneralViewDimensionService {
     private readonly DimensionBaseService _dimensionBaseService;
     private readonly DimensionSegmentsService _dimSegmentsService;
     private readonly FloorAnalyzerService _floorAnalyzerService;
-    private readonly GridEndsService _gridEndsService;
 
-    internal GeneralViewDimensionService(MainViewModel mvm, RevitRepository repository, PylonSheetInfo pylonSheetInfo, 
-                                         PylonView pylonView, DimensionBaseService dimensionBaseService) {
+    internal GeneralViewHorizDimensionService(MainViewModel mvm, RevitRepository repository, 
+                                              PylonSheetInfo pylonSheetInfo, PylonView pylonView, 
+                                              DimensionBaseService dimensionBaseService) {
         _viewModel = mvm;
         _repository = repository;
         _sheetInfo = pylonSheetInfo;
@@ -32,68 +32,7 @@ internal class GeneralViewDimensionService {
         _dimensionBaseService = dimensionBaseService;
         _dimSegmentsService = new DimensionSegmentsService(_viewOfPylon.ViewElement);
         _floorAnalyzerService = new FloorAnalyzerService(repository, pylonSheetInfo);
-        _gridEndsService = new GridEndsService(_viewOfPylon.ViewElement, dimensionBaseService);
     }
-
-
-    internal void TryCreatePylonDimensions(FamilyInstance skeletonParentRebar, List<Grid> grids, bool isFrontView) {
-        var view = _viewOfPylon.ViewElement;
-        try {
-            var side = isFrontView ? "фронт" : "торец";
-            // Ссылки на опорные плоскости - крайние пилона
-            var refArrayFormwork = _dimensionBaseService.GetDimensionRefs(_sheetInfo.HostElems.First() as FamilyInstance,
-                                                                          [side, "край"]);
-            // Размер по ФРОНТУ опалубка + армирование (положение снизу 1)
-            var dimensionLineBottomFirst = _dimensionBaseService.GetDimensionLine(skeletonParentRebar,
-                                                                                  DirectionType.Bottom, 
-                                                                                  1.3);
-            var refArrayFormworkRebarFront =
-                _dimensionBaseService.GetDimensionRefs(skeletonParentRebar, 
-                                                       ["низ", side, "край"], 
-                                                       oldRefArray: refArrayFormwork);
-            var formRebarDimension = _repository.Document.Create.NewDimension(view, 
-                                                                              dimensionLineBottomFirst, 
-                                                                              refArrayFormworkRebarFront,
-                                                                              _viewModel.SelectedDimensionType);
-            _dimSegmentsService.EditEdgeDimensionSegments(formRebarDimension,
-                                                          _dimSegmentsService.VertSmallUpDirectDimTextOffset,
-                                                          _dimSegmentsService.VertSmallUpInvertedDimTextOffset);
-
-            // Смещение для размерной линии для размера положение снизу 3
-            var dimensionLineBottomThirdOffset = 1.8;
-            if(grids.Count > 0) {
-                // Размер по ФРОНТУ опалубка + оси (положение снизу 2)
-                var dimensionLineBottomSecond = _dimensionBaseService.GetDimensionLine(skeletonParentRebar,
-                                                                                       DirectionType.Bottom, 
-                                                                                       1.8);
-                var refArrayFormworkGridFront = _dimensionBaseService.GetDimensionRefs(grids, 
-                                                                                       new XYZ(0, 0, 1),
-                                                                                       refArrayFormwork);
-                _repository.Document.Create.NewDimension(view, dimensionLineBottomSecond, refArrayFormworkGridFront,
-                                                         _viewModel.SelectedDimensionType);
-
-                // Корректируем концы осей, приближая их на виде к опалубке пилона, чтобы сократить габариты
-                // видового экрана
-                var transverseViewGridOffsets = new OffsetOption() {
-                    LeftOffset = 1,
-                    RightOffset = 1,
-                    TopOffset = 1,
-                    BottomOffset = 2.5
-                };
-                _gridEndsService.EditGridEnds(_sheetInfo.HostElems.First(), grids, transverseViewGridOffsets);
-                // Т.к. поставили размер по осям, то изменяем отступ для размера положение снизу 3
-                dimensionLineBottomThirdOffset = 2.3;
-            }
-
-            // Размер по ФРОНТУ опалубка (положение снизу 3)
-            var dimensionLineBottomThird = _dimensionBaseService.GetDimensionLine(skeletonParentRebar,
-                                                                                  DirectionType.Bottom, 
-                                                                                  dimensionLineBottomThirdOffset);
-            _repository.Document.Create.NewDimension(view, dimensionLineBottomThird, refArrayFormwork,
-                                                     _viewModel.SelectedDimensionType);
-        } catch(Exception) { }
-    }
-    
 
     /// <summary>
     /// Метод по созданию размеров по опалубке пилонов
@@ -101,7 +40,7 @@ internal class GeneralViewDimensionService {
     /// <param name="view">Вид, на котором нужно создать размеры</param>
     /// <param name="clampsParentRebars">Список экземпляров семейств пилонов</param>
     /// <param name="dimensionBaseService">Сервис по анализу основ размеров</param>
-    internal void TryCreatePylonDimensions(List<Element> hostElems, bool isForPerpView) {
+    private void TryCreatePylonDimensions(List<Element> hostElems, bool isForPerpView) {
         try {
             // Если этот размер для перпендикулярного вида и Гэшка только слева, то размер нужно ставить справа
             var dimensionLineDirection = isForPerpView
@@ -139,7 +78,10 @@ internal class GeneralViewDimensionService {
         } catch(Exception) { }
     }
 
-    internal void TryCreateTopAdditionalDimensions(FamilyInstance rebar, bool isForPerpView) {
+    /// <summary>
+    /// Создает размер по выпуску вертикального армирования, если оно есть
+    /// </summary>
+    private void TryCreateTopAdditionalDimensions(FamilyInstance rebar, bool isForPerpView) {
         try {
             if(_sheetInfo.RebarInfo.AllRebarAreL) {
                 return;
@@ -179,9 +121,9 @@ internal class GeneralViewDimensionService {
     }
 
     /// <summary>
-    /// Создает размеры между нижней и верхней плоскостью пилона и нижней и верхней плоскостью хомутов
+    /// Создает размеры между нижней и верхней плоскостью пилона, и нижней и верхней плоскостью хомутов
     /// </summary>
-    internal void TryCreateClampsDimensions(List<FamilyInstance> clampsParentRebars, bool isForPerpView) {
+    private void TryCreateClampsDimensions(List<FamilyInstance> clampsParentRebars, bool isForPerpView) {
         try {
             if(clampsParentRebars is null || clampsParentRebars.Count == 0) { return; }
             ReferenceArray refArray = null;
@@ -276,72 +218,19 @@ internal class GeneralViewDimensionService {
         } catch(Exception) { }
     }
 
+    internal void CreateDimensions(FamilyInstance skeletonParentRebar, bool isForPerpView) {
+        // Получаем родительское семейство хомутов на виде
+        var rebarFinder = _viewModel.RebarFinder;
+        var clampsParentRebars = rebarFinder.GetClampsParentRebars(_viewOfPylon.ViewElement, _sheetInfo.ProjectSection);
+        if(clampsParentRebars is null) { return; }
 
-    /// <summary>
-    /// Создание размера сверху по Г-образному стержню от его конца до ближайшей грани пилона
-    /// </summary>
-    internal void TryCreateHorizLRebarDimension() {
-        try {
-            if(!_sheetInfo.RebarInfo.HasLRebar) { return; }
-            var skeletonParentRebar = _sheetInfo.RebarInfo.SkeletonParentRebar;
+        // Размер по опалубке пилонов (положение слева/справа 1.7)
+        TryCreatePylonDimensions(_sheetInfo.HostElems, isForPerpView);
 
-            // Проблематично найти ближайшую боковую грань пилона, поэтому просто создадим два размера 
-            // от конца Гэшки до одной грани и до другой, и удалим больший
-            var lastPylon = _sheetInfo.HostElems.Last();
-            var lastPylonRefArrayFirst = _dimensionBaseService.GetDimensionRefs(lastPylon as FamilyInstance, 
-                                                                                ["1", "торец", "край"]);
-            var lastPylonRefArraySecond = _dimensionBaseService.GetDimensionRefs(lastPylon as FamilyInstance, 
-                                                                                 ["2", "торец", "край"]);
-            
-            // Получаем позицию для размерной линии по Г-образному стержню
-            var lRebar = _viewModel.RebarFinder.GetSimpleRebars(_viewOfPylon.ViewElement, _sheetInfo.ProjectSection, 1101)
-                                               .FirstOrDefault();
-            var dimensionLine = _dimensionBaseService.GetDimensionLine(lRebar, DirectionType.Top, 0.5);
-            
-            //"#1_торец_Г_нутрь"
-            //"#1_торец_Г_край"
-            if(_sheetInfo.RebarInfo.AllRebarAreL) {
-                CreateLRebarToPylonDimension(skeletonParentRebar, dimensionLine, 
-                                             ["1_торец", "Г", "край"], lastPylonRefArrayFirst, lastPylonRefArraySecond);
-                CreateLRebarToPylonDimension(skeletonParentRebar, dimensionLine, 
-                                             ["2_торец", "Г", "край"], lastPylonRefArrayFirst, lastPylonRefArraySecond);
-            } else if(_sheetInfo.RebarInfo.HasLRebar) {
-                if(_viewModel.RebarFinder.DirectionHasLRebar(_viewOfPylon.ViewElement, 
-                                                             _sheetInfo.ProjectSection,  
-                                                             DirectionType.Right)
-                    && _sheetInfo.RebarInfo.SecondLRebarParamValue) {
-                    CreateLRebarToPylonDimension(skeletonParentRebar, dimensionLine, 
-                                                 ["2_торец", "Г", "край"], 
-                                                 lastPylonRefArrayFirst, lastPylonRefArraySecond);
-                } else {
-                    CreateLRebarToPylonDimension(skeletonParentRebar, dimensionLine, 
-                                                 ["1_торец", "Г", "край"], 
-                                                 lastPylonRefArrayFirst, lastPylonRefArraySecond);
-                }
-            }
-        } catch(Exception) { }
-    }
+        // Размер по выпуску вертикального армирования (положение слева/справа 1.1)
+        TryCreateTopAdditionalDimensions(skeletonParentRebar, isForPerpView);
 
-    private void CreateLRebarToPylonDimension(FamilyInstance skeletonParentRebar, Line dimensionLine,
-                                              List<string> importantRefNameParts,
-                                              ReferenceArray pylonRefArrayFirst,
-                                              ReferenceArray pylonRefArraySecond) {
-        var refArrayFirst = _dimensionBaseService.GetDimensionRefs(skeletonParentRebar, 
-                                                                   importantRefNameParts,
-                                                                   oldRefArray: pylonRefArrayFirst);
-        var refArraySecond = _dimensionBaseService.GetDimensionRefs(skeletonParentRebar, 
-                                                                    importantRefNameParts,
-                                                                    oldRefArray: pylonRefArraySecond);
-
-        var dimensionFirst = _repository.Document.Create.NewDimension(_viewOfPylon.ViewElement, dimensionLine, 
-                                                                      refArrayFirst, _viewModel.SelectedDimensionType);
-        var dimensionSecond = _repository.Document.Create.NewDimension(_viewOfPylon.ViewElement, dimensionLine, 
-                                                                       refArraySecond, _viewModel.SelectedDimensionType);
-
-        if(dimensionFirst.Value > dimensionSecond.Value) {
-            _repository.Document.Delete(dimensionFirst.Id);
-        } else {
-            _repository.Document.Delete(dimensionSecond.Id);
-        }
+        // Размер по крайним хомутам (положение слева/справа 1.1)
+        TryCreateClampsDimensions(clampsParentRebars, isForPerpView);
     }
 }

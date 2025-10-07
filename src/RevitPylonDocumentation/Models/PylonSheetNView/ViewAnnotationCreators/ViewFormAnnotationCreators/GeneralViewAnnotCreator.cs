@@ -1,4 +1,5 @@
 using System;
+using System.Linq;
 
 using RevitPylonDocumentation.Models.PylonSheetNView.ViewDimensionServices.ViewFormDimensionServices;
 using RevitPylonDocumentation.Models.PylonSheetNView.ViewMarkServices.ViewFormMarkServices;
@@ -23,23 +24,22 @@ internal class GeneralViewAnnotCreator : ViewAnnotationCreator {
             if(skeletonParentRebar is null) {
                 return;
             }
-            // Получаем родительское семейство хомутов на виде
-            var rebarFinder = ViewModel.RebarFinder;
-            var clampsParentRebars = rebarFinder.GetClampsParentRebars(view, SheetInfo.ProjectSection);
-            if(clampsParentRebars is null) {
-                return;
-            }
             // Получаем оси на виде
             var grids = Repository.GridsInView(view);
 
-            var dimensionService = new GeneralViewDimensionService(ViewModel, Repository, SheetInfo, ViewOfPylon, 
-                                                                   dimensionBaseService);
             //ВЕРТИКАЛЬНЫЕ РАЗМЕРЫ
-            dimensionService.TryCreatePylonDimensions(skeletonParentRebar, grids, true);
+            var vertDimensionService = new GeneralViewVertDimensionService(ViewModel, Repository, SheetInfo,
+                                                                           ViewOfPylon, dimensionBaseService);
+            vertDimensionService.CreateDimensions(skeletonParentRebar, grids, false);
+            
             //ГОРИЗОНТАЛЬНЫЕ РАЗМЕРЫ
-            dimensionService.TryCreatePylonDimensions(SheetInfo.HostElems, false);
-            dimensionService.TryCreateTopAdditionalDimensions(skeletonParentRebar, false);
-            dimensionService.TryCreateClampsDimensions(clampsParentRebars, false);
+            var horizDimensionService = new GeneralViewHorizDimensionService(ViewModel, Repository, SheetInfo, 
+                                                                             ViewOfPylon, dimensionBaseService);
+            horizDimensionService.CreateDimensions(skeletonParentRebar, false);
+
+            // Настраиваем положения концов осей на виде
+            var gridEndsService = new GridEndsService(view, dimensionBaseService);
+            gridEndsService.EditGeneralViewGridEnds(SheetInfo.HostElems.First(), grids);
         } catch(Exception) { }
 
         // Пытаемся создать марки на виде
