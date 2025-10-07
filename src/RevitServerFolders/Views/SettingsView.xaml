@@ -37,6 +37,11 @@
                 x:Key="InverseBooleanConverter" />
             <converters:BoolToVisibilityConverter
                 x:Key="BooleanToVisibilityConverter" />
+            <converters:BoolToVisibilityConverter
+                x:Key="InverseBooleanToVisibilityConverter"
+                TrueValue="Collapsed"
+                FalseValue="Visible" 
+                DefaultValue="Collapsed"/>
             <pluginConverters:MiddleEllipsisConverter
                 x:Key="MiddleEllipsisConverter" />
             <pluginConverters:CellImageConverter
@@ -130,6 +135,13 @@
                         IsEnabled="{Binding SourceFolderChangedCommand.IsExecuting,
                 Converter={StaticResource InverseBooleanConverter}}"
                         Command="{Binding OpenFromFoldersCommand}" />
+                    <ui:Button
+                        DockPanel.Dock="Right"
+                        Height="36"
+                        Margin="5 0 0 0"
+                        Visibility="{Binding IsNwcExport, Converter={StaticResource InverseBooleanToVisibilityConverter}}"
+                        Content="{ui:SymbolIcon Symbol=ArrowSync20}"
+                        Command="{Binding SourceFolderChangedCommand}" />
                     <ui:TextBox
                         Text="{Binding SourceFolder, UpdateSourceTrigger=PropertyChanged}" />
 

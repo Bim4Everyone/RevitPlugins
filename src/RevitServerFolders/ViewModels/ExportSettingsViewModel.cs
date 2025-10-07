@@ -217,7 +217,7 @@ internal class ExportSettingsViewModel<T> : BaseViewModel where T : ExportSettin
     private async void OnSourceFolderChanged(object sender, PropertyChangedEventArgs e) {
         if(e.PropertyName == nameof(SourceFolder)) {
             await Task.Delay(250);
-            await SourceFolderChanged();
+            await SourceFolderChangedCommand.ExecuteAsync(default);
         }
     }
 

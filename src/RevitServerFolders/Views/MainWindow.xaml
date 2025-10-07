@@ -92,6 +92,14 @@
                 x:Key="VisibleOnExecutingPanel">
                 <Style.Triggers>
                     <DataTrigger
+                        Binding="{Binding DataContext.SelectedSettings.SourceFolderChangedCommand.IsExecuting,
+                        RelativeSource={RelativeSource AncestorType=Window}}"
+                        Value="True">
+                        <Setter
+                            Property="Visibility"
+                            Value="Visible" />
+                    </DataTrigger>
+                    <DataTrigger
                         Binding="{Binding DataContext.SelectedSettings.OpenFromFoldersCommand.IsExecuting,
                         RelativeSource={RelativeSource AncestorType=Window}}"
                         Value="True">
@@ -110,6 +118,14 @@
                 BasedOn="{StaticResource CustomBorder}">
                 <Style.Triggers>
                     <DataTrigger
+                        Binding="{Binding DataContext.SelectedSettings.SourceFolderChangedCommand.IsExecuting,
+                        RelativeSource={RelativeSource AncestorType=Window}}"
+                        Value="True">
+                        <Setter
+                            Property="IsEnabled"
+                            Value="False" />
+                    </DataTrigger>
+                    <DataTrigger
                         Binding="{Binding DataContext.SelectedSettings.OpenFromFoldersCommand.IsExecuting,
                         RelativeSource={RelativeSource AncestorType=Window}}"
                         Value="True">
@@ -126,6 +142,14 @@
                 TargetType="core:WpfUIPlatformUserControl"
                 x:Key="DisabledOnExecutingControl">
                 <Style.Triggers>
+                    <DataTrigger
+                        Binding="{Binding DataContext.SelectedSettings.SourceFolderChangedCommand.IsExecuting,
+                        RelativeSource={RelativeSource AncestorType=Window}}"
+                        Value="True">
+                        <Setter
+                            Property="IsEnabled"
+                            Value="False" />
+                    </DataTrigger>
                     <DataTrigger
                         Binding="{Binding DataContext.SelectedSettings.OpenFromFoldersCommand.IsExecuting,
                         RelativeSource={RelativeSource AncestorType=Window}}"
