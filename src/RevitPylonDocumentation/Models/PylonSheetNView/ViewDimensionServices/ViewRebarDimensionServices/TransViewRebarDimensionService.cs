@@ -27,7 +27,7 @@ internal class TransViewRebarDimensionService {
     }
 
 
-    internal void TryCreateTransViewRebarDimensions(bool onTopOfRebar) {
+    internal void TryCreateTransViewRebarDimensions(bool onTopOfRebar, bool dimensionLineFromPylon) {
         try {
             var view = _viewOfPylon.ViewElement;
             var rebarFinder = _viewModel.RebarFinder;
@@ -37,7 +37,7 @@ internal class TransViewRebarDimensionService {
             }
             // Определяем относительно чего нужно строить размерные линии - каркаса или пилона
             var pylon = _sheetInfo.HostElems.First();
-            var dimensionLineHostRef = onTopOfRebar ? skeletonParentRebar : pylon;
+            var dimensionLineHostRef = dimensionLineFromPylon ? pylon : skeletonParentRebar;
             // Получаем ссылки на опорные плоскости для размеров бутылок
             var edgeBottomFrontRefArray = _dimensionBaseService.GetDimensionRefs(skeletonParentRebar, 
                                                                                  ["низ", "фронт", "край"]);

@@ -149,13 +149,13 @@ internal class TransViewVertDimensionService {
     /// <summary>
     /// Создает размеры по вертикальным опорным плоскостям
     /// </summary>
-    internal bool TryCreateDimensions(bool refsForTop, Element pylon, List<Grid> grids) {
+    internal bool TryCreateDimensions(bool refsForTop, bool dimensionLineFromPylon, Element pylon, List<Grid> grids) {
         _longGridsWillBeNeeded = false;
 
         var skeletonParentRebar = _sheetInfo.RebarInfo.SkeletonParentRebar;
         if(skeletonParentRebar is null) { return _longGridsWillBeNeeded; }
 
-        var dimensionLineHostRef = refsForTop ? skeletonParentRebar : pylon;
+        var dimensionLineHostRef = dimensionLineFromPylon ? pylon : skeletonParentRebar;
         var refArrayFormworkFront = _dimensionBaseService.GetDimensionRefs(pylon as FamilyInstance, ["фронт", "край"]);
 
         // Размер по ФРОНТУ опалубка + армирование(положение сверху/снизу 0.5)

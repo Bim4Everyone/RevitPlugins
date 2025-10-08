@@ -288,13 +288,23 @@ public class PylonViewSectionCreator {
         t.BasisZ = viewDir;
 
         double hostLength = SheetInfo.ElemsInfo.ElemsBoundingBoxLength;
-        double hostWidthToMax = transverseViewNum < 3
-            ? SheetInfo.ElemsInfo.HostWidth / 2
-            : SheetInfo.ElemsInfo.ElemsBoundingBoxWidthToMax;
 
-        double hostWidthToMin = transverseViewNum < 3
-            ? SheetInfo.ElemsInfo.HostWidth / 2
-            : SheetInfo.ElemsInfo.ElemsBoundingBoxWidthToMin;
+        // Подрезка вида по всем элементам (с учетом выпусков армирования) нужна в случае:
+        // 1. Когда это третий поперечный вид
+        // 2. Когда это первый поперечный вид и используется армирование для паркинга
+        bool needElemsBoundingBox = transverseViewNum switch {
+            1 => SheetInfo.RebarInfo.SkeletonParentRebarForParking,
+            2 => false,
+            3 => true,
+            _ => false
+        };
+        double hostWidthToMax = needElemsBoundingBox
+            ? SheetInfo.ElemsInfo.ElemsBoundingBoxWidthToMax
+            : SheetInfo.ElemsInfo.HostWidth / 2;
+
+        double hostWidthToMin = needElemsBoundingBox
+            ? SheetInfo.ElemsInfo.ElemsBoundingBoxWidthToMin
+            : SheetInfo.ElemsInfo.HostWidth / 2;
 
         double minZ = SheetInfo.ElemsInfo.LastPylonMinZ;
         double maxZ = SheetInfo.ElemsInfo.LastPylonMaxZ;
@@ -408,13 +418,23 @@ public class PylonViewSectionCreator {
                                             int.Parse(ViewModel.ViewSectionSettings.TransverseViewYOffset));
 
         double hostLength = SheetInfo.ElemsInfo.ElemsBoundingBoxLength;
-        double hostWidthToMax = transverseRebarViewNum < 3 
-            ? SheetInfo.ElemsInfo.HostWidth / 2
-            : SheetInfo.ElemsInfo.ElemsBoundingBoxWidthToMax;
 
-        double hostWidthToMin = transverseRebarViewNum < 3 
-            ? SheetInfo.ElemsInfo.HostWidth / 2
-            : SheetInfo.ElemsInfo.ElemsBoundingBoxWidthToMin;
+        // Подрезка вида по всем элементам (с учетом выпусков армирования) нужна в случае:
+        // 1. Когда это третий поперечный вид
+        // 2. Когда это первый поперечный вид и используется армирование для паркинга
+        bool needElemsBoundingBox = transverseRebarViewNum switch {
+            1 => SheetInfo.RebarInfo.SkeletonParentRebarForParking,
+            2 => false,
+            3 => true,
+            _ => false
+        };
+        double hostWidthToMax = needElemsBoundingBox
+            ? SheetInfo.ElemsInfo.ElemsBoundingBoxWidthToMax 
+            : SheetInfo.ElemsInfo.HostWidth / 2;
+
+        double hostWidthToMin = needElemsBoundingBox
+            ? SheetInfo.ElemsInfo.ElemsBoundingBoxWidthToMin 
+            : SheetInfo.ElemsInfo.HostWidth / 2;
 
         double coordinateX = hostLength * 0.5 + transverseViewXOffset;
         double coordinateYToMax = hostWidthToMax + transverseViewYOffset;

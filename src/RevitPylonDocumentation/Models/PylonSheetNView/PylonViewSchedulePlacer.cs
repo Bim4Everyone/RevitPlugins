@@ -128,7 +128,9 @@ public class PylonViewSchedulePlacer {
         if(SheetInfo.MaterialSchedule.ViewportElement != null) {
             newCenter = new XYZ(
                 -SheetInfo.SkeletonByElemsSchedule.ViewportHalfWidth * 2 - _titleBlockFrameRightOffset,
-                SheetInfo.MaterialSchedule.ViewportCenter.Y - SheetInfo.MaterialSchedule.ViewportHalfHeight * 2 - _scheduleTopOffsetBig,
+                SheetInfo.MaterialSchedule.ViewportCenter.Y 
+                    - SheetInfo.MaterialSchedule.ViewportHalfHeight * 2 
+                    - _scheduleTopOffsetBig,
                 0);
         }
         (SheetInfo.SkeletonByElemsSchedule.ViewportElement as ScheduleSheetInstance).Point = newCenter;
@@ -164,7 +166,9 @@ public class PylonViewSchedulePlacer {
         if(SheetInfo.SkeletonByElemsSchedule.ViewportElement != null) {
             newCenter = new XYZ(
                 _schedulePartsRightOffset - SheetInfo.SystemPartsSchedule.ViewportHalfWidth * 2,
-                SheetInfo.SkeletonByElemsSchedule.ViewportCenter.Y - SheetInfo.SkeletonByElemsSchedule.ViewportHalfHeight * 2 - _scheduleTopOffsetBig,
+                SheetInfo.SkeletonByElemsSchedule.ViewportCenter.Y 
+                    - SheetInfo.SkeletonByElemsSchedule.ViewportHalfHeight * 2 
+                    - _scheduleTopOffsetBig,
                 0);
         }
         (SheetInfo.SystemPartsSchedule.ViewportElement as ScheduleSheetInstance).Point = newCenter;
@@ -199,7 +203,9 @@ public class PylonViewSchedulePlacer {
         if(SheetInfo.SkeletonByElemsSchedule.ViewportElement != null) {
             newCenter = new XYZ(
                 _schedulePartsRightOffset - SheetInfo.IfcPartsSchedule.ViewportHalfWidth * 2,
-                SheetInfo.SkeletonByElemsSchedule.ViewportCenter.Y - SheetInfo.SkeletonByElemsSchedule.ViewportHalfHeight * 2 - _scheduleTopOffsetBig,
+                SheetInfo.SkeletonByElemsSchedule.ViewportCenter.Y 
+                    - SheetInfo.SkeletonByElemsSchedule.ViewportHalfHeight * 2 
+                    - _scheduleTopOffsetBig,
                 0);
         }
         (SheetInfo.IfcPartsSchedule.ViewportElement as ScheduleSheetInstance).Point = newCenter;
@@ -214,7 +220,8 @@ public class PylonViewSchedulePlacer {
         ScheduleSheetInstance scheduleSheetInstance;
         // Размещаем спеку пилона на листе
         try {
-            scheduleSheetInstance = ScheduleSheetInstance.Create(doc, viewSheet.Id, pylonView.ViewElement.Id, new XYZ(0, 0, 0));
+            scheduleSheetInstance = ScheduleSheetInstance.Create(doc, viewSheet.Id, pylonView.ViewElement.Id, 
+                                                                 new XYZ(0, 0, 0));
         } catch(Exception) {
             return false;
         }

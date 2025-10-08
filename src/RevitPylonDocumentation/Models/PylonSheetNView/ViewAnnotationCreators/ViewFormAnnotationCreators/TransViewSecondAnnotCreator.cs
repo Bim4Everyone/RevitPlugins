@@ -26,7 +26,7 @@ internal class TransViewSecondAnnotCreator : ViewAnnotationCreator {
             // Вертикальные размеры
             var vertDimensionService = new TransViewVertDimensionService(ViewModel, Repository, SheetInfo, ViewOfPylon,
                                                                          dimensionBaseService);
-            bool longGridsWillBeNeeded = vertDimensionService.TryCreateDimensions(false, pylon, grids);
+            bool longGridsWillBeNeeded = vertDimensionService.TryCreateDimensions(false, true, pylon, grids);
 
             // Горизонтальные размеры
             var horizDimensionService = new TransViewHorizDimensionService(ViewModel, Repository, SheetInfo, ViewOfPylon,

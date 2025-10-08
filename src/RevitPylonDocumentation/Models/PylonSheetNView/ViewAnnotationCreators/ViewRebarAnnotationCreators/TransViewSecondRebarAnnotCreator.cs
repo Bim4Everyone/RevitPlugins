@@ -18,7 +18,7 @@ internal class TransViewSecondRebarAnnotCreator : ViewAnnotationCreator {
             var dimensionBaseService = new DimensionBaseService(ViewOfPylon.ViewElement, ViewModel.ParamValService);
             var dimensionService = new TransViewRebarDimensionService(ViewModel, Repository, SheetInfo, ViewOfPylon,
                                                                       dimensionBaseService);
-            dimensionService.TryCreateTransViewRebarDimensions(false);
+            dimensionService.TryCreateTransViewRebarDimensions(false, true);
         } catch(Exception) { } 
 
         // Пытаемся создать марки на виде

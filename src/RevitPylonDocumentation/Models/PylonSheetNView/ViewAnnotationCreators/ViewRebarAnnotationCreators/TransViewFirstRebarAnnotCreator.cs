@@ -15,10 +15,13 @@ internal class TransViewFirstRebarAnnotCreator : ViewAnnotationCreator {
     public override void TryCreateViewAnnotations() {
         // Пытаемся создать размеры на виде
         try {
+            // Если используется армирование для паркинга, то нужно ставить от армирования, потому что есть выпуска вниз
+            bool dimensionLineFromPylon = SheetInfo.RebarInfo.SkeletonParentRebarForParking ? false : true;
+
             var dimensionBaseService = new DimensionBaseService(ViewOfPylon.ViewElement, ViewModel.ParamValService);
             var dimensionService = new TransViewRebarDimensionService(ViewModel, Repository, SheetInfo, ViewOfPylon,
                                                                       dimensionBaseService);
-            dimensionService.TryCreateTransViewRebarDimensions(false);
+            dimensionService.TryCreateTransViewRebarDimensions(false, dimensionLineFromPylon);
         } catch(Exception) { }
 
         // Пытаемся создать марки на виде

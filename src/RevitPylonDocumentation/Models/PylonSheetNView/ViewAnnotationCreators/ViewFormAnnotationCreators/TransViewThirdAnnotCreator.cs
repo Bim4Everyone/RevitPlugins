@@ -23,13 +23,13 @@ internal class TransViewThirdAnnotCreator : ViewAnnotationCreator {
             // Определяем относительно какого пилона нужны размеры - верхнего или нижнего 
             var pylon = SheetInfo.HostElems.Last();
 
-            // Если используется армирование для паркинга, то в нужно брать нижние опорные плоскости
+            // Если используется армирование для паркинга, то нужно брать нижние опорные плоскости
             bool refsForTop = SheetInfo.RebarInfo.SkeletonParentRebarForParking ? false : true;
 
             // Вертикальные размеры
             var vertDimensionService = new TransViewVertDimensionService(ViewModel, Repository, SheetInfo, ViewOfPylon,
                                                                          dimensionBaseService);
-            bool longGridsWillBeNeeded = vertDimensionService.TryCreateDimensions(refsForTop, pylon, grids);
+            bool longGridsWillBeNeeded = vertDimensionService.TryCreateDimensions(refsForTop, false, pylon, grids);
 
             // Горизонтальные размеры
             var horizDimensionService = new TransViewHorizDimensionService(ViewModel, Repository, SheetInfo, ViewOfPylon,

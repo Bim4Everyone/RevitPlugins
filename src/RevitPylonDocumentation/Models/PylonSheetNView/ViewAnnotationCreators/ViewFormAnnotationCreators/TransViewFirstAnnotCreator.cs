@@ -26,8 +26,12 @@ internal class TransViewFirstAnnotCreator : ViewAnnotationCreator {
             // Вертикальные размеры
             var vertDimensionService = new TransViewVertDimensionService(ViewModel, Repository, SheetInfo, ViewOfPylon, 
                                                                          dimensionBaseService);
-            bool longGridsWillBeNeeded = vertDimensionService.TryCreateDimensions(false, pylon, grids);
 
+            // Если используется армирование для паркинга, то нужно ставить от армирования, потому что есть выпуска вниз
+            bool dimensionLineFromPylon = SheetInfo.RebarInfo.SkeletonParentRebarForParking ? false : true;
+
+            bool longGridsWillBeNeeded = vertDimensionService.TryCreateDimensions(false, dimensionLineFromPylon,
+                                                                                  pylon, grids);
             // Горизонтальные размеры
             var horizDimensionService = new TransViewHorizDimensionService(ViewModel, Repository, SheetInfo, ViewOfPylon,
                                                                            dimensionBaseService);
