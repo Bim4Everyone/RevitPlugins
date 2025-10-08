@@ -27,7 +27,7 @@ internal class ExportSettingsViewModel<T> : BaseViewModel where T : ExportSettin
     private ModelObjectViewModel _selectedObject;
 
     private bool _isExportRooms;
-    private bool _isExportRoomsVisible;
+    private bool _isNwcExport;
     private bool _clearTargetFolder;
     private bool _openTargetWhenFinish;
     private bool _skipAll;
@@ -128,9 +128,9 @@ internal class ExportSettingsViewModel<T> : BaseViewModel where T : ExportSettin
         set => RaiseAndSetIfChanged(ref _isExportRooms, value);
     }
 
-    public bool IsExportRoomsVisible {
-        get => _isExportRoomsVisible;
-        set => RaiseAndSetIfChanged(ref _isExportRoomsVisible, value);
+    public bool IsNwcExport {
+        get => _isNwcExport;
+        set => RaiseAndSetIfChanged(ref _isNwcExport, value);
     }
 
     public virtual T GetSettings() {
@@ -217,7 +217,7 @@ internal class ExportSettingsViewModel<T> : BaseViewModel where T : ExportSettin
     private async void OnSourceFolderChanged(object sender, PropertyChangedEventArgs e) {
         if(e.PropertyName == nameof(SourceFolder)) {
             await Task.Delay(250);
-            await SourceFolderChanged();
+            await SourceFolderChangedCommand.ExecuteAsync(default);
         }
     }
 

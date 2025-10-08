@@ -15,7 +15,7 @@ internal class FileModelObjectExportSettingsViewModel : ExportSettingsViewModel<
         : base(settings, objectService, openFolderDialogService, localization) {
 
         IsExportRooms = _settings.IsExportRooms;
-        IsExportRoomsVisible = true;
+        IsNwcExport = true;
     }
 
 

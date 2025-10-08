@@ -12,6 +12,6 @@ internal class RsModelObjectExportSettingsViewModel : ExportSettingsViewModel<Rs
         ILocalizationService localization)
         : base(settings, objectService, openFolderDialogService, localization) {
 
-        IsExportRoomsVisible = false;
+        IsNwcExport = false;
     }
 }
