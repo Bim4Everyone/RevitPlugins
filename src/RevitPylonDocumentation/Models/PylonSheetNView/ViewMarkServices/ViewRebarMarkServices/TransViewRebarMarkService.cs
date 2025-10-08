@@ -50,45 +50,6 @@ internal class TransViewRebarMarkService {
     internal PylonSheetInfo SheetInfo { get; set; }
     internal PylonView ViewOfPylon { get; set; }
 
-    /// <summary>
-    /// Создает марки арматурных стержней
-    /// </summary>
-    internal void TryCreateBarMarks() {
-        try {
-            // Марка по вертикальным стержням
-            var simpleRebars = ViewModel.RebarFinder.GetSimpleRebars(ViewOfPylon.ViewElement, SheetInfo.ProjectSection,
-                                                                     _formNumberForVerticalRebarMin,
-                                                                     _formNumberForVerticalRebarMax,
-                                                                     _formNumberForCBarMin, _formNumberForCBarMin);
-            // Если у нас есть Г-образные стержни или стержни разной длины, то нужно ставить две разные марки
-            // Если нет - то допускается поставить одну марку, которая будет характеризовать все стрежни (они одинаковые)
-            if(SheetInfo.RebarInfo.FirstLRebarParamValue
-                || SheetInfo.RebarInfo.SecondLRebarParamValue
-                || SheetInfo.RebarInfo.DifferentRebarParamValue) {
-                // ПРАВЫЙ НИЖНИЙ УГОЛ
-                CreateRightBottomMark(simpleRebars, true);
-
-                // ЛЕВЫЙ ВЕРХНИЙ УГОЛ
-                CreateLeftTopMark(simpleRebars);
-            } else {
-                // ПРАВЫЙ НИЖНИЙ УГОЛ
-                CreateRightBottomMark(simpleRebars, false);
-            }
-            // Марка по хомутам
-            var simpleClamps = ViewModel.RebarFinder.GetSimpleRebars(ViewOfPylon.ViewElement, SheetInfo.ProjectSection,
-                                                                     _formNumberForClampsMin, _formNumberForClampsMax);
-            if(simpleClamps != null) {
-                CreateLeftBottomMark(simpleClamps, simpleRebars);
-                CreateRightTopMark(simpleClamps, simpleRebars);
-            }
-            // Марка по шпилькам
-            var simpleCBars = ViewModel.RebarFinder.GetSimpleRebars(ViewOfPylon.ViewElement, SheetInfo.ProjectSection,
-                                                                    _formNumberForCBarMin);
-            if(simpleCBars != null) {
-                CreateLeftMark(simpleCBars, simpleRebars);
-            }
-        } catch(Exception) { }
-    }
 
     /// <summary>
     /// Создание марки по вертикальному армированию слева сверху
@@ -200,5 +161,46 @@ internal class TransViewRebarMarkService {
             leftTag.SetLeaderEnd(simpleCBarRef, tagLeaderEndPoint);
         }
 #endif
+    }
+
+
+    /// <summary>
+    /// Создает марки арматурных стержней
+    /// </summary>
+    internal void TryCreateBarMarks() {
+        try {
+            // Марка по вертикальным стержням
+            var simpleRebars = ViewModel.RebarFinder.GetSimpleRebars(ViewOfPylon.ViewElement, SheetInfo.ProjectSection,
+                                                                     _formNumberForVerticalRebarMin,
+                                                                     _formNumberForVerticalRebarMax,
+                                                                     _formNumberForCBarMin, _formNumberForCBarMin);
+            // Если у нас есть Г-образные стержни или стержни разной длины, то нужно ставить две разные марки
+            // Если нет - то допускается поставить одну марку, которая будет характеризовать все стрежни (они одинаковые)
+            if(SheetInfo.RebarInfo.FirstLRebarParamValue
+                || SheetInfo.RebarInfo.SecondLRebarParamValue
+                || SheetInfo.RebarInfo.DifferentRebarParamValue) {
+                // ПРАВЫЙ НИЖНИЙ УГОЛ
+                CreateRightBottomMark(simpleRebars, true);
+
+                // ЛЕВЫЙ ВЕРХНИЙ УГОЛ
+                CreateLeftTopMark(simpleRebars);
+            } else {
+                // ПРАВЫЙ НИЖНИЙ УГОЛ
+                CreateRightBottomMark(simpleRebars, false);
+            }
+            // Марка по хомутам
+            var simpleClamps = ViewModel.RebarFinder.GetSimpleRebars(ViewOfPylon.ViewElement, SheetInfo.ProjectSection,
+                                                                     _formNumberForClampsMin, _formNumberForClampsMax);
+            if(simpleClamps != null) {
+                CreateLeftBottomMark(simpleClamps, simpleRebars);
+                CreateRightTopMark(simpleClamps, simpleRebars);
+            }
+            // Марка по шпилькам
+            var simpleCBars = ViewModel.RebarFinder.GetSimpleRebars(ViewOfPylon.ViewElement, SheetInfo.ProjectSection,
+                                                                    _formNumberForCBarMin);
+            if(simpleCBars != null) {
+                CreateLeftMark(simpleCBars, simpleRebars);
+            }
+        } catch(Exception) { }
     }
 }

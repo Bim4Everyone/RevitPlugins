@@ -34,7 +34,7 @@ internal class GeneralViewVertDimensionService {
     /// Вертикальный размер для вертикального вида по опалубка + армирование
     /// </summary>
     private Dimension TryCreateDimsForFormNRebar(FamilyInstance skeletonParentRebar, ReferenceArray refArrayFormwork, 
-                                              string side) {
+                                                 string side) {
         Dimension dimension = null;
         try {
             var dimensionLineBottomFirst = _dimensionBaseService.GetDimensionLine(skeletonParentRebar,
@@ -68,7 +68,7 @@ internal class GeneralViewVertDimensionService {
     /// Вертикальный размер для вертикального вида по опалубка + оси
     /// </summary>
     private double TryCreateDimensionByFormNGrids(List<Grid> grids, FamilyInstance skeletonParentRebar,
-                                               ReferenceArray refArrayFormwork) {
+                                                  ReferenceArray refArrayFormwork) {
         // Определим отступ для размерной линии общего размера по опалубке (если есть верт оси, то будет дальше)
         double formworkDimensionLineOffset = 1.8;
         try {

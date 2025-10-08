@@ -19,9 +19,16 @@ internal class TransViewFirstRebarAnnotCreator : ViewAnnotationCreator {
             bool dimensionLineFromPylon = SheetInfo.RebarInfo.SkeletonParentRebarForParking ? false : true;
 
             var dimensionBaseService = new DimensionBaseService(ViewOfPylon.ViewElement, ViewModel.ParamValService);
-            var dimensionService = new TransViewRebarDimensionService(ViewModel, Repository, SheetInfo, ViewOfPylon,
-                                                                      dimensionBaseService);
-            dimensionService.TryCreateTransViewRebarDimensions(false, dimensionLineFromPylon);
+
+            // Вертикальные размеры
+            var vertDimensionService = new TransViewRebarVertDimensionService(ViewModel, Repository, SheetInfo, 
+                                                                              ViewOfPylon, dimensionBaseService);
+            vertDimensionService.TryCreateDimensions(false, dimensionLineFromPylon);
+
+            // Горизонтальные размеры
+            var horizDimensionService = new TransViewRebarHorizDimensionService(ViewModel, Repository, SheetInfo, 
+                                                                                ViewOfPylon, dimensionBaseService);
+            horizDimensionService.TryCreateDimensions(false);
         } catch(Exception) { }
 
         // Пытаемся создать марки на виде
