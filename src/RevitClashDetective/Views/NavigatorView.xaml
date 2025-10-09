@@ -1,30 +1,31 @@
-﻿<base:ThemedPlatformWindow x:Class="RevitClashDetective.Views.NavigatorView"
-                           xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-                           xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-                           xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-                           xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-                           xmlns:vm="clr-namespace:RevitClashDetective.ViewModels.Navigator"
-                           xmlns:m="clr-namespace:RevitClashDetective.Models.Clashes"
-                           xmlns:i="http://schemas.microsoft.com/expression/2010/interactivity"
-                           xmlns:dxe="http://schemas.devexpress.com/winfx/2008/xaml/editors"
-                           xmlns:mvvm="http://schemas.devexpress.com/winfx/2008/xaml/mvvm"
-                           xmlns:dxg="http://schemas.devexpress.com/winfx/2008/xaml/grid"
-                           xmlns:dx="http://schemas.devexpress.com/winfx/2008/xaml/core"
-                           xmlns:base="clr-namespace:dosymep.WPF.Views"
-                           xmlns:converters="clr-namespace:dosymep.WpfCore.Converters;assembly=dosymep.WpfCore"
-                           xmlns:common="clr-namespace:dosymep.Xpf.Core.SimpleServices;assembly=dosymep.Xpf.Core"
-                           xmlns:b="http://schemas.microsoft.com/xaml/behaviors"
-                           xmlns:res="clr-namespace:RevitClashDetective.Resources"
-                           xmlns:c="clr-namespace:RevitClashDetective.Models.Clashes"
-                           xmlns:system="clr-namespace:System;assembly=mscorlib"
-                           mc:Ignorable="d"
-                           Title="Навигатор"
-                           Height="450"
-                           Width="800"
-                           MinHeight="300"
-                           MinWidth="500"
-                           x:ClassModifier="internal"
-                           d:DataContext="{d:DesignInstance vm:ReportsViewModel, IsDesignTimeCreatable=False}">
+﻿<base:ThemedPlatformWindow
+    x:Class="RevitClashDetective.Views.NavigatorView"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:vm="clr-namespace:RevitClashDetective.ViewModels.Navigator"
+    xmlns:m="clr-namespace:RevitClashDetective.Models.Clashes"
+    xmlns:i="http://schemas.microsoft.com/expression/2010/interactivity"
+    xmlns:dxe="http://schemas.devexpress.com/winfx/2008/xaml/editors"
+    xmlns:mvvm="http://schemas.devexpress.com/winfx/2008/xaml/mvvm"
+    xmlns:dxg="http://schemas.devexpress.com/winfx/2008/xaml/grid"
+    xmlns:dx="http://schemas.devexpress.com/winfx/2008/xaml/core"
+    xmlns:base="clr-namespace:dosymep.WPF.Views"
+    xmlns:converters="clr-namespace:dosymep.WpfCore.Converters;assembly=dosymep.WpfCore"
+    xmlns:common="clr-namespace:dosymep.Xpf.Core.SimpleServices;assembly=dosymep.Xpf.Core"
+    xmlns:b="http://schemas.microsoft.com/xaml/behaviors"
+    xmlns:res="clr-namespace:RevitClashDetective.Resources"
+    xmlns:c="clr-namespace:RevitClashDetective.Models.Clashes"
+    xmlns:system="clr-namespace:System;assembly=mscorlib"
+    mc:Ignorable="d"
+    Title="Навигатор"
+    Height="450"
+    Width="800"
+    MinHeight="300"
+    MinWidth="500"
+    x:ClassModifier="internal"
+    d:DataContext="{d:DesignInstance vm:ReportsViewModel, IsDesignTimeCreatable=False}">
     <mvvm:Interaction.Behaviors>
         <common:AttachServiceBehavior
             AttachableService="{Binding MessageBoxService}" />
@@ -34,184 +35,235 @@
             AttachableService="{Binding SaveFileDialogService}" />
     </mvvm:Interaction.Behaviors>
     <b:Interaction.Triggers>
-        <b:EventTrigger EventName="Closing">
-            <b:InvokeCommandAction Command="{Binding OpenClashDetectorCommand}" />
+        <b:EventTrigger
+            EventName="Closing">
+            <b:InvokeCommandAction
+                Command="{Binding OpenClashDetectorCommand}" />
         </b:EventTrigger>
     </b:Interaction.Triggers>
     <base:ThemedPlatformWindow.Resources>
-        <system:Boolean x:Key="True">True</system:Boolean>
-        <system:Boolean x:Key="False">False</system:Boolean>
-        <converters:ObjectToObjectConverter x:Key="ClashStatusToBoolConverter">
-            <converters:CoupleItem Source="{x:Static c:ClashStatus.Active}"
-                                   Target="{StaticResource True}" />
-            <converters:CoupleItem Source="{x:Static c:ClashStatus.Analized}"
-                                   Target="{StaticResource True}"  />
-            <converters:CoupleItem Source="{x:Static c:ClashStatus.Solved}"
-                                   Target="{StaticResource True}" />
-            <converters:CoupleItem Source="{x:Static c:ClashStatus.Imaginary}"
-                                   Target="{StaticResource False}" />
+        <system:Boolean
+            x:Key="True">True</system:Boolean>
+        <system:Boolean
+            x:Key="False">False</system:Boolean>
+        <converters:ObjectToObjectConverter
+            x:Key="ClashStatusToBoolConverter">
+            <converters:CoupleItem
+                Source="{x:Static c:ClashStatus.Active}"
+                Target="{StaticResource True}" />
+            <converters:CoupleItem
+                Source="{x:Static c:ClashStatus.Analized}"
+                Target="{StaticResource True}" />
+            <converters:CoupleItem
+                Source="{x:Static c:ClashStatus.Solved}"
+                Target="{StaticResource True}" />
+            <converters:CoupleItem
+                Source="{x:Static c:ClashStatus.Imaginary}"
+                Target="{StaticResource False}" />
         </converters:ObjectToObjectConverter>
-        <converters:ObjectToObjectConverter x:Key="ClashStatusToImageConverter">
-            <converters:CoupleItem Source="{x:Static c:ClashStatus.Active}"
-                          Target="pack://application:,,,/DevExpress.Images.v21.2;component/Images/XAF/State_Priority_High.png" />
-            <converters:CoupleItem Source="{x:Static c:ClashStatus.Analized}"
-                          Target="pack://application:,,,/DevExpress.Images.v21.2;component/Images/XAF/State_Priority_Low.png" />
-            <converters:CoupleItem Source="{x:Static c:ClashStatus.Solved}"
-                          Target="pack://application:,,,/DevExpress.Images.v21.2;component/Images/XAF/State_Priority_Normal.png" />
-            <converters:CoupleItem Source="{x:Static c:ClashStatus.Imaginary}"
-                          Target="pack://application:,,,/DevExpress.Images.v21.2;component/DevAV/Actions/Delete_32x32.png" />
+        <converters:ObjectToObjectConverter
+            x:Key="ClashStatusToImageConverter">
+            <converters:CoupleItem
+                Source="{x:Static c:ClashStatus.Active}"
+                Target="pack://application:,,,/DevExpress.Images.v21.2;component/Images/XAF/State_Priority_High.png" />
+            <converters:CoupleItem
+                Source="{x:Static c:ClashStatus.Analized}"
+                Target="pack://application:,,,/DevExpress.Images.v21.2;component/Images/XAF/State_Priority_Low.png" />
+            <converters:CoupleItem
+                Source="{x:Static c:ClashStatus.Solved}"
+                Target="pack://application:,,,/DevExpress.Images.v21.2;component/Images/XAF/State_Priority_Normal.png" />
+            <converters:CoupleItem
+                Source="{x:Static c:ClashStatus.Imaginary}"
+                Target="pack://application:,,,/DevExpress.Images.v21.2;component/DevAV/Actions/Delete_32x32.png" />
         </converters:ObjectToObjectConverter>
-        <Style TargetType="dxg:GridColumn"
-               x:Key="ReadOnlyColumn">
-            <Setter Property="ReadOnly"
-                    Value="True" />
-            <Setter Property="AllowEditing"
-                    Value="False" />
+        <Style
+            TargetType="dxg:GridColumn"
+            x:Key="ReadOnlyColumn">
+            <Setter
+                Property="ReadOnly"
+                Value="True" />
+            <Setter
+                Property="AllowEditing"
+                Value="False" />
         </Style>
     </base:ThemedPlatformWindow.Resources>
-    <Grid Margin="10">
+    <Grid
+        Margin="10">
 
         <Grid.RowDefinitions>
-            <RowDefinition Height="Auto" />
-            <RowDefinition Height="Auto" />
-            <RowDefinition Height="*" />
-            <RowDefinition Height="Auto" />
-            <RowDefinition Height="Auto" />
+            <RowDefinition
+                Height="Auto" />
+            <RowDefinition
+                Height="Auto" />
+            <RowDefinition
+                Height="*" />
+            <RowDefinition
+                Height="Auto" />
+            <RowDefinition
+                Height="Auto" />
         </Grid.RowDefinitions>
 
-        <DockPanel LastChildFill="True">
+        <DockPanel
+            LastChildFill="True">
 
-            <dx:SimpleButton DockPanel.Dock="Left"
-                             ToolTip="Загрузить проверки"
-                             Command="{Binding LoadCommand}"
-                             Glyph="{dx:DXImage 'Office2013/Actions/Download_32x32.png'}" />
-            <dx:SimpleButton DockPanel.Dock="Left"
-                             Margin="5 0 0 0"
-                             ToolTip="Сохранить все проверки"
-                             Command="{Binding SaveAllReportsCommand}"
-                             Glyph="{dx:DXImage 'Office2013/Save/SaveAll_32x32.png'}" />
-            <dx:SimpleButton DockPanel.Dock="Left"
-                             Margin="5 0 0 0"
-                             ToolTip="Сохранить активную проверку"
-                             Command="{Binding SelectedReport.SaveCommand }"
-                             Glyph="{dx:DXImage 'DevAV/Actions/Save_32x32.png'}" />
-            <dx:SimpleButton DockPanel.Dock="Left"
-                             Margin="5 0 0 0"
-                             ToolTip="Сохранить как активную проверку"
-                             Command="{Binding SelectedReport.SaveAsCommand}"
-                             Glyph="{dx:DXImage 'DevAV/Actions/SaveAs_32x32.png'}" />
-            <dx:SimpleButton DockPanel.Dock="Left"
-                             Margin="5 0 0 0"
-                             ToolTip="Удалить активную проверку"
-                             Command="{Binding DeleteCommand}"
-                             Glyph="{dx:DXImage 'Office2013/Reports/DeleteGroupHeader_32x32.png'}" />
-            <dxe:ComboBoxEdit IsTextEditable="False"
-                              Margin="5 0 0 0"
-                              ItemsSource="{Binding Reports}"
-                              DisplayMember="Name"
-                              SelectedItem="{Binding SelectedReport}">
+            <dx:SimpleButton
+                DockPanel.Dock="Left"
+                ToolTip="Загрузить проверки"
+                Command="{Binding LoadCommand}"
+                Glyph="{dx:DXImage 'Office2013/Actions/Download_32x32.png'}" />
+            <dx:SimpleButton
+                DockPanel.Dock="Left"
+                Margin="5 0 0 0"
+                ToolTip="Сохранить все проверки"
+                Command="{Binding SaveAllReportsCommand}"
+                Glyph="{dx:DXImage 'Office2013/Save/SaveAll_32x32.png'}" />
+            <dx:SimpleButton
+                DockPanel.Dock="Left"
+                Margin="5 0 0 0"
+                ToolTip="Сохранить активную проверку"
+                Command="{Binding SelectedReport.SaveCommand }"
+                Glyph="{dx:DXImage 'DevAV/Actions/Save_32x32.png'}" />
+            <dx:SimpleButton
+                DockPanel.Dock="Left"
+                Margin="5 0 0 0"
+                ToolTip="Сохранить как активную проверку"
+                Command="{Binding SelectedReport.SaveAsCommand}"
+                Glyph="{dx:DXImage 'DevAV/Actions/SaveAs_32x32.png'}" />
+            <dx:SimpleButton
+                DockPanel.Dock="Left"
+                Margin="5 0 0 0"
+                ToolTip="Удалить активную проверку"
+                Command="{Binding DeleteCommand}"
+                Glyph="{dx:DXImage 'Office2013/Reports/DeleteGroupHeader_32x32.png'}" />
+            <dxe:ComboBoxEdit
+                IsTextEditable="False"
+                Margin="5 0 0 0"
+                ItemsSource="{Binding Reports}"
+                DisplayMember="Name"
+                SelectedItem="{Binding SelectedReport}">
             </dxe:ComboBoxEdit>
 
         </DockPanel>
 
-        <DockPanel Grid.Row="1"
-                   Margin="0 5"
-                   VerticalAlignment="Center">
-            <TextBlock Text="Общее пересечение выборки 1: " 
-                       VerticalAlignment="Center"/>
-            <TextBlock FontWeight="Bold"
-                       VerticalAlignment="Center"
-                       Text="{Binding SelectedReport.FirstIntersectionPercentage}" />
-            <TextBlock Text="%"
-                       FontWeight="Bold"
-                       Margin="3 0 20 0" 
-                       VerticalAlignment="Center"/>
-            <TextBlock Text="Общее пересечение выборки 2: "
-                       VerticalAlignment="Center" />
-            <TextBlock FontWeight="Bold"
-                       VerticalAlignment="Center"
-                       Text="{Binding SelectedReport.SecondIntersectionPercentage}" />
-            <TextBlock Text="%"
-                       FontWeight="Bold"
-                       VerticalAlignment="Center"
-                       Margin="3 0 0 0" />
-            <dxe:CheckEdit Margin="20 0 0 0"
-                           EditValue="{Binding SelectedReport.ShowImaginaryClashes}"
-                           Content="Учитывать элементы, не участвующие в коллизиях"
-                           VerticalAlignment="Center">
+        <DockPanel
+            Grid.Row="1"
+            Margin="0 5"
+            VerticalAlignment="Center">
+            <TextBlock
+                Text="Общее пересечение выборки 1: "
+                VerticalAlignment="Center" />
+            <TextBlock
+                FontWeight="Bold"
+                VerticalAlignment="Center"
+                Text="{Binding SelectedReport.FirstIntersectionPercentage}" />
+            <TextBlock
+                Text="%"
+                FontWeight="Bold"
+                Margin="3 0 20 0"
+                VerticalAlignment="Center" />
+            <TextBlock
+                Text="Общее пересечение выборки 2: "
+                VerticalAlignment="Center" />
+            <TextBlock
+                FontWeight="Bold"
+                VerticalAlignment="Center"
+                Text="{Binding SelectedReport.SecondIntersectionPercentage}" />
+            <TextBlock
+                Text="%"
+                FontWeight="Bold"
+                VerticalAlignment="Center"
+                Margin="3 0 0 0" />
+            <dxe:CheckEdit
+                Margin="20 0 0 0"
+                EditValue="{Binding SelectedReport.ShowImaginaryClashes}"
+                Content="Учитывать элементы, не участвующие в коллизиях"
+                VerticalAlignment="Center">
                 <mvvm:Interaction.Triggers>
-                    <mvvm:EventToCommand EventName="EditValueChanged"
-                                         Command="{Binding SelectedReport.ShowImaginaryClashesChangedCommand}" />
+                    <mvvm:EventToCommand
+                        EventName="EditValueChanged"
+                        Command="{Binding SelectedReport.ShowImaginaryClashesChangedCommand}" />
                 </mvvm:Interaction.Triggers>
             </dxe:CheckEdit>
         </DockPanel>
 
-        <res:CustomGridControl x:Name="_dg"
-                               Grid.Row="2"
-                               AllowCollectionView="False"
-                               SelectionMode="Row"
-                               PreventSelectedItemsResetByCellButton="True"
-                               SelectedItem="{Binding SelectedReport.SelectedGuiClash}"
-                               SelectedItems="{Binding SelectedReport.SelectedGuiClashes}"
-                               ItemsSource="{Binding SelectedReport.GuiClashes}">
+        <res:CustomGridControl
+            x:Name="_dg"
+            Grid.Row="2"
+            AllowCollectionView="False"
+            SelectionMode="Row"
+            PreventSelectedItemsResetByCellButton="True"
+            SelectedItem="{Binding SelectedReport.SelectedGuiClash}"
+            SelectedItems="{Binding SelectedReport.SelectedGuiClashes}"
+            ItemsSource="{Binding SelectedReport.GuiClashes}">
 
             <res:CustomGridControl.GroupSummary>
-                <dxg:GridSummaryItem SummaryType="Count" />
+                <dxg:GridSummaryItem
+                    SummaryType="Count" />
             </res:CustomGridControl.GroupSummary>
 
             <res:CustomGridControl.View>
-                <dxg:TableView Name="_gridView"
-                               AutoWidth="True"
-                               DataNavigatorButtons="Navigation"
-                               AllowMergedGrouping="True"
-                               ShowDataNavigator="True"
-                               VirtualizingPanel.IsVirtualizingWhenGrouping="True"
-                               VirtualizingPanel.VirtualizationMode="Recycling"
-                               VirtualizingPanel.IsVirtualizing="True" />
+                <dxg:TableView
+                    Name="_gridView"
+                    AutoWidth="True"
+                    DataNavigatorButtons="Navigation"
+                    AllowMergedGrouping="True"
+                    ShowDataNavigator="True"
+                    VirtualizingPanel.IsVirtualizingWhenGrouping="True"
+                    VirtualizingPanel.VirtualizationMode="Recycling"
+                    VirtualizingPanel.IsVirtualizing="True" />
             </res:CustomGridControl.View>
 
             <res:CustomGridControl.Columns>
 
-                <dxg:GridColumn ReadOnly="True"
-                                Width="70"
-                                MinWidth="70"
-                                AllowResizing="False"
-                                Header="">
+                <dxg:GridColumn
+                    ReadOnly="True"
+                    Width="70"
+                    MinWidth="70"
+                    AllowResizing="False"
+                    Header="">
                     <dxg:GridColumn.CellTemplate>
                         <DataTemplate>
-                            <dx:SimpleButton Content="Выбрать"
-                                             Command="{Binding ElementName=_dg, Path=DataContext.SelectClashCommand}"
-                                             CommandParameter="{Binding Row}" />
+                            <dx:SimpleButton
+                                Content="Выбрать"
+                                Command="{Binding ElementName=_dg, Path=DataContext.SelectClashCommand}"
+                                CommandParameter="{Binding Row}" />
                         </DataTemplate>
                     </dxg:GridColumn.CellTemplate>
                 </dxg:GridColumn>
 
-                <dxg:GridColumn Header="Название">
+                <dxg:GridColumn
+                    Header="Название">
                     <dxg:GridColumn.CellTemplate>
                         <DataTemplate>
-                            <dxe:TextEdit ShowBorder="False"
-                                          EditValue="{Binding Row.ClashName, UpdateSourceTrigger=PropertyChanged}"
-                                          IsEnabled="{Binding Row.ClashStatus, Converter={StaticResource ClashStatusToBoolConverter}}" />
+                            <dxe:TextEdit
+                                ShowBorder="False"
+                                EditValue="{Binding Row.ClashName, UpdateSourceTrigger=PropertyChanged}"
+                                IsEnabled="{Binding Row.ClashStatus, Converter={StaticResource ClashStatusToBoolConverter}}" />
                         </DataTemplate>
                     </dxg:GridColumn.CellTemplate>
                 </dxg:GridColumn>
-                <dxg:GridColumn Header="Статус">
+                <dxg:GridColumn
+                    Header="Статус">
                     <dxg:GridColumn.CellTemplate>
                         <DataTemplate>
-                            <dxe:ComboBoxEdit ApplyItemTemplateToSelectedItem="True"
-                                              IsTextEditable="False"
-                                              EditMode="InplaceActive"
-                                              IsEnabled="{Binding Row.ClashStatus, Converter={StaticResource ClashStatusToBoolConverter}}"
-                                              EditValue="{Binding Row.ClashStatus, UpdateSourceTrigger=PropertyChanged}"
-                                              ItemsSource="{dxe:EnumItemsSource EnumType={x:Type m:ClashStatus}}">
+                            <dxe:ComboBoxEdit
+                                ApplyItemTemplateToSelectedItem="True"
+                                IsTextEditable="False"
+                                EditMode="InplaceActive"
+                                IsEnabled="{Binding Row.ClashStatus, Converter={StaticResource ClashStatusToBoolConverter}}"
+                                EditValue="{Binding Row.ClashStatus, UpdateSourceTrigger=PropertyChanged}"
+                                ItemsSource="{dxe:EnumItemsSource EnumType={x:Type m:ClashStatus}}">
                                 <dxe:ComboBoxEdit.ItemTemplate>
                                     <DataTemplate>
-                                        <StackPanel Orientation="Horizontal">
-                                            <Image Width="16"
-                                                   Height="16"
-                                                   Source="{Binding Path=Id, Converter={StaticResource ClashStatusToImageConverter}}"
-                                                   Margin="0 0 4 0" />
-                                            <TextBlock Text="{Binding}" />
+                                        <StackPanel
+                                            Orientation="Horizontal">
+                                            <Image
+                                                Width="16"
+                                                Height="16"
+                                                Source="{Binding Path=Id, Converter={StaticResource ClashStatusToImageConverter}}"
+                                                Margin="0 0 4 0" />
+                                            <TextBlock
+                                                Text="{Binding}" />
                                         </StackPanel>
                                     </DataTemplate>
                                 </dxe:ComboBoxEdit.ItemTemplate>
@@ -220,123 +272,150 @@
                     </dxg:GridColumn.CellTemplate>
                 </dxg:GridColumn>
 
-                <dxg:GridColumn Style="{StaticResource ReadOnlyColumn}"
-                                Header="Файл 1"
-                                FieldName="FirstDocumentName" />
-                <dxg:GridColumn Style="{StaticResource ReadOnlyColumn}"
-                                Header="Уровень 1"
-                                FieldName="FirstLevel" />
-                <dxg:GridColumn Style="{StaticResource ReadOnlyColumn}"
-                                Header="Категория 1"
-                                FieldName="FirstCategory" />
-                <dxg:GridColumn Style="{StaticResource ReadOnlyColumn}"
-                                Header="Семейство 1"
-                                FieldName="FirstFamilyName" />
-                <dxg:GridColumn Style="{StaticResource ReadOnlyColumn}"
-                                Header="Тип 1"
-                                FieldName="FirstTypeName" />
-                <dxg:GridColumn ReadOnly="True"
-                                MinWidth="30"
-                                AllowResizing="True"
-                                FieldName="FirstId"
-                                Header="Id 1">
+                <dxg:GridColumn
+                    Style="{StaticResource ReadOnlyColumn}"
+                    Header="Файл 1"
+                    FieldName="FirstDocumentName" />
+                <dxg:GridColumn
+                    Style="{StaticResource ReadOnlyColumn}"
+                    Header="Уровень 1"
+                    FieldName="FirstLevel" />
+                <dxg:GridColumn
+                    Style="{StaticResource ReadOnlyColumn}"
+                    Header="Категория 1"
+                    FieldName="FirstCategory" />
+                <dxg:GridColumn
+                    Style="{StaticResource ReadOnlyColumn}"
+                    Header="Семейство 1"
+                    FieldName="FirstFamilyName" />
+                <dxg:GridColumn
+                    Style="{StaticResource ReadOnlyColumn}"
+                    Header="Тип 1"
+                    FieldName="FirstTypeName" />
+                <dxg:GridColumn
+                    ReadOnly="True"
+                    MinWidth="30"
+                    AllowResizing="True"
+                    FieldName="FirstId"
+                    Header="Id 1">
                     <dxg:GridColumn.CellTemplate>
                         <DataTemplate>
                             <DockPanel>
-                                <TextBlock VerticalAlignment="Center"
-                                           Margin="4 0 0 0"
-                                           TextTrimming="CharacterEllipsis"
-                                           Text="{Binding Row.FirstId}" />
-                                <dx:SimpleButton Width="Auto"
-                                                 MinWidth="20"
-                                                 HorizontalAlignment="Right"
-                                                 Focusable="False"
-                                                 Glyph="{dx:DXImage 'Images/RichEdit/Select_16x16.png'}"
-                                                 Command="{Binding ElementName=_dg, Path=DataContext.SelectedReport.PickFirstElementsCommand}" />
+                                <TextBlock
+                                    VerticalAlignment="Center"
+                                    Margin="4 0 0 0"
+                                    TextTrimming="CharacterEllipsis"
+                                    Text="{Binding Row.FirstId}" />
+                                <dx:SimpleButton
+                                    Width="Auto"
+                                    MinWidth="20"
+                                    HorizontalAlignment="Right"
+                                    Focusable="False"
+                                    Glyph="{dx:DXImage 'Images/RichEdit/Select_16x16.png'}"
+                                    Command="{Binding ElementName=_dg, Path=DataContext.SelectedReport.PickFirstElementsCommand}" />
                             </DockPanel>
                         </DataTemplate>
                     </dxg:GridColumn.CellTemplate>
                 </dxg:GridColumn>
-                <dxg:GridColumn Style="{StaticResource ReadOnlyColumn}"
-                                Header="Файл 2"
-                                FieldName="SecondDocumentName" />
-                <dxg:GridColumn Style="{StaticResource ReadOnlyColumn}"
-                                Header="Уровень 2"
-                                FieldName="SecondLevel" />
-                <dxg:GridColumn Style="{StaticResource ReadOnlyColumn}"
-                                Header="Категория 2"
-                                FieldName="SecondCategory" />
-                <dxg:GridColumn Style="{StaticResource ReadOnlyColumn}"
-                                Header="Семейство 2"
-                                FieldName="SecondFamilyName" />
-                <dxg:GridColumn Style="{StaticResource ReadOnlyColumn}"
-                                Header="Тип 2"
-                                FieldName="SecondTypeName" />
-                <dxg:GridColumn ReadOnly="True"
-                                MinWidth="30"
-                                AllowResizing="True"
-                                FieldName="SecondId"
-                                Header="Id 2">
+                <dxg:GridColumn
+                    Style="{StaticResource ReadOnlyColumn}"
+                    Header="Файл 2"
+                    FieldName="SecondDocumentName" />
+                <dxg:GridColumn
+                    Style="{StaticResource ReadOnlyColumn}"
+                    Header="Уровень 2"
+                    FieldName="SecondLevel" />
+                <dxg:GridColumn
+                    Style="{StaticResource ReadOnlyColumn}"
+                    Header="Категория 2"
+                    FieldName="SecondCategory" />
+                <dxg:GridColumn
+                    Style="{StaticResource ReadOnlyColumn}"
+                    Header="Семейство 2"
+                    FieldName="SecondFamilyName" />
+                <dxg:GridColumn
+                    Style="{StaticResource ReadOnlyColumn}"
+                    Header="Тип 2"
+                    FieldName="SecondTypeName" />
+                <dxg:GridColumn
+                    ReadOnly="True"
+                    MinWidth="30"
+                    AllowResizing="True"
+                    FieldName="SecondId"
+                    Header="Id 2">
                     <dxg:GridColumn.CellTemplate>
                         <DataTemplate>
                             <DockPanel>
-                                <TextBlock VerticalAlignment="Center"
-                                           TextAlignment="Left"
-                                           Margin="4 0 0 0"
-                                           TextTrimming="CharacterEllipsis"
-                                           Text="{Binding Row.SecondId}" />
-                                <dx:SimpleButton Width="Auto"
-                                                 MinWidth="20"
-                                                 HorizontalAlignment="Right"
-                                                 Focusable="False"
-                                                 Glyph="{dx:DXImage 'Images/RichEdit/Select_16x16.png'}"
-                                                 Command="{Binding ElementName=_dg, Path=DataContext.SelectedReport.PickSecondElementsCommand}" />
+                                <TextBlock
+                                    VerticalAlignment="Center"
+                                    TextAlignment="Left"
+                                    Margin="4 0 0 0"
+                                    TextTrimming="CharacterEllipsis"
+                                    Text="{Binding Row.SecondId}" />
+                                <dx:SimpleButton
+                                    Width="Auto"
+                                    MinWidth="20"
+                                    HorizontalAlignment="Right"
+                                    Focusable="False"
+                                    Glyph="{dx:DXImage 'Images/RichEdit/Select_16x16.png'}"
+                                    Command="{Binding ElementName=_dg, Path=DataContext.SelectedReport.PickSecondElementsCommand}" />
                             </DockPanel>
                         </DataTemplate>
                     </dxg:GridColumn.CellTemplate>
                 </dxg:GridColumn>
-                <dxg:GridColumn Style="{StaticResource ReadOnlyColumn}"
-                                Header="% пересечения 1"
-                                FieldName="FirstElementIntersectionPercentage">
+                <dxg:GridColumn
+                    Style="{StaticResource ReadOnlyColumn}"
+                    Header="% пересечения 1"
+                    FieldName="FirstElementIntersectionPercentage">
                     <dxg:GridColumn.EditSettings>
-                        <dxe:TextEditSettings HorizontalContentAlignment="Left" />
+                        <dxe:TextEditSettings
+                            HorizontalContentAlignment="Left" />
                     </dxg:GridColumn.EditSettings>
                 </dxg:GridColumn>
-                <dxg:GridColumn Style="{StaticResource ReadOnlyColumn}"
-                                Header="% пересечения 2"
-                                FieldName="SecondElementIntersectionPercentage">
+                <dxg:GridColumn
+                    Style="{StaticResource ReadOnlyColumn}"
+                    Header="% пересечения 2"
+                    FieldName="SecondElementIntersectionPercentage">
                     <dxg:GridColumn.EditSettings>
-                        <dxe:TextEditSettings HorizontalContentAlignment="Left" />
+                        <dxe:TextEditSettings
+                            HorizontalContentAlignment="Left" />
                     </dxg:GridColumn.EditSettings>
                 </dxg:GridColumn>
-                <dxg:GridColumn Style="{StaticResource ReadOnlyColumn}"
-                                Header="V пересечения, м³"
-                                FieldName="IntersectionVolume">
+                <dxg:GridColumn
+                    Style="{StaticResource ReadOnlyColumn}"
+                    Header="V пересечения, м³"
+                    FieldName="IntersectionVolume">
                     <dxg:GridColumn.EditSettings>
-                        <dxe:TextEditSettings HorizontalContentAlignment="Left" />
+                        <dxe:TextEditSettings
+                            HorizontalContentAlignment="Left" />
                     </dxg:GridColumn.EditSettings>
                 </dxg:GridColumn>
             </res:CustomGridControl.Columns>
         </res:CustomGridControl>
 
-        <DockPanel Grid.Row="3"
-                   Margin="0 10 0 0">
+        <DockPanel
+            Grid.Row="3"
+            Margin="0 10 0 0">
             <DockPanel>
-                <dxe:CheckEdit EditValue="{Binding ElementsIsolationEnabled}"
-                               Content="Изолировать выделенные элементы" />
+                <dxe:CheckEdit
+                    EditValue="{Binding ElementsIsolationEnabled}"
+                    Content="Изолировать выделенные элементы" />
             </DockPanel>
 
-            <DockPanel HorizontalAlignment="Right">
-                <dxe:TextEdit Margin="10 0"
-                              IsReadOnly="True"
-                              EditMode="InplaceActive"
-                              EditValue="{Binding SelectedReport.Message}"
-                              Foreground="Green" />
-                <dx:SimpleButton Content="Отмена"
-                                 Height="25"
-                                 Width="80"
-                                 IsCancel="true"
-                                 Click="ButtonCancel_Click" />
+            <DockPanel
+                HorizontalAlignment="Right">
+                <dxe:TextEdit
+                    Margin="10 0"
+                    IsReadOnly="True"
+                    EditMode="InplaceActive"
+                    EditValue="{Binding SelectedReport.Message}"
+                    Foreground="Green" />
+                <dx:SimpleButton
+                    Content="Отмена"
+                    Height="25"
+                    Width="80"
+                    IsCancel="true"
+                    Click="ButtonCancel_Click" />
             </DockPanel>
 
         </DockPanel>

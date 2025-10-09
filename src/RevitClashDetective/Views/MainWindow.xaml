@@ -14,7 +14,9 @@
     xmlns:common="clr-namespace:dosymep.Xpf.Core.SimpleServices;assembly=dosymep.Xpf.Core"
     mc:Ignorable="d"
     x:Name="_this"
-    Title="Проверки на коллизии" Height="450" Width="800"
+    Title="Проверки на коллизии"
+    Height="450"
+    Width="800"
     MinHeight="300"
     MinWidth="500"
     d:DataContext="{d:DesignInstance clashDetective:MainViewModel, IsDesignTimeCreatable=False}">
@@ -26,15 +28,23 @@
         <common:AttachServiceBehavior
             AttachableService="{Binding SaveFileDialogService}" />
     </mvvm:Interaction.Behaviors>
-    <Grid Margin="10">
+    <Grid
+        Margin="10">
         <Grid.RowDefinitions>
-            <RowDefinition Height="Auto" />
-            <RowDefinition Height="Auto" />
-            <RowDefinition Height="*" />
-            <RowDefinition Height="Auto" />
+            <RowDefinition
+                Height="Auto" />
+            <RowDefinition
+                Height="Auto" />
+            <RowDefinition
+                Height="*" />
+            <RowDefinition
+                Height="Auto" />
         </Grid.RowDefinitions>
 
-        <StackPanel Grid.Row="0" Margin="0 0  0 10" Orientation="Horizontal">
+        <StackPanel
+            Grid.Row="0"
+            Margin="0 0  0 10"
+            Orientation="Horizontal">
             <dx:SimpleButton
                 Height="32"
                 Width="35"
@@ -77,31 +87,54 @@
 
         </StackPanel>
 
-        <StackPanel Grid.Row="1" Margin="0 0  0 10" Orientation="Horizontal">
+        <StackPanel
+            Grid.Row="1"
+            Margin="0 0  0 10"
+            Orientation="Horizontal">
 
         </StackPanel>
 
-        <dxg:GridControl x:Name="_dg"
-                         SelectionMode="Row"
-                         Grid.Row="2"
-                         ItemsSource="{Binding Checks}">
+        <dxg:GridControl
+            x:Name="_dg"
+            SelectionMode="Row"
+            Grid.Row="2"
+            ItemsSource="{Binding Checks}">
             <dxg:GridControl.View>
-                <dxg:TableView x:Name="_gridView" AutoWidth="True" ShowSearchPanelMode="Always" ShowGroupPanel="False"
-                               CellValueChanging="_gridView_CellValueChanging" />
+                <dxg:TableView
+                    x:Name="_gridView"
+                    AutoWidth="True"
+                    ShowSearchPanelMode="Always"
+                    ShowGroupPanel="False"
+                    CellValueChanging="_gridView_CellValueChanging" />
             </dxg:GridControl.View>
 
-            <dxg:GridColumn Header="" Width="Auto" FieldName="IsSelected" />
+            <dxg:GridColumn
+                Header=""
+                Width="Auto"
+                FieldName="IsSelected" />
 
-            <dxg:GridColumn Width="Auto">
+            <dxg:GridColumn
+                Width="Auto">
                 <dxg:GridColumn.CellTemplate>
                     <DataTemplate>
-                        <Image Width="16" Height="16" ToolTip="{Binding Row.ErrorText}" HorizontalAlignment="Center">
+                        <Image
+                            Width="16"
+                            Height="16"
+                            ToolTip="{Binding Row.ErrorText}"
+                            HorizontalAlignment="Center">
                             <Image.Style>
-                                <Style TargetType="{x:Type Image}">
-                                    <Setter Property="Source" Value="{dx:DXImage 'Images/Status/Warning_16x16.png'}" />
+                                <Style
+                                    TargetType="{x:Type Image}">
+                                    <Setter
+                                        Property="Source"
+                                        Value="{dx:DXImage 'Images/Status/Warning_16x16.png'}" />
                                     <Style.Triggers>
-                                        <DataTrigger Binding="{Binding Row.ErrorText}" Value="{x:Null}">
-                                            <Setter Property="Source" Value="{x:Null}" />
+                                        <DataTrigger
+                                            Binding="{Binding Row.ErrorText}"
+                                            Value="{x:Null}">
+                                            <Setter
+                                                Property="Source"
+                                                Value="{x:Null}" />
                                         </DataTrigger>
                                     </Style.Triggers>
                                 </Style>
@@ -111,9 +144,16 @@
                 </dxg:GridColumn.CellTemplate>
             </dxg:GridColumn>
 
-            <dxg:GridColumn Header="Наименование" FieldName="Name" Width="Auto" SortOrder="Ascending" SortIndex="0"/>
+            <dxg:GridColumn
+                Header="Наименование"
+                FieldName="Name"
+                Width="Auto"
+                SortOrder="Ascending"
+                SortIndex="0" />
 
-            <dxg:GridColumn Header="Выбор 1" Width="*">
+            <dxg:GridColumn
+                Header="Выбор 1"
+                Width="*">
                 <dxg:GridColumn.CellTemplate>
                     <DataTemplate>
                         <local:ProviderComboBox
@@ -122,21 +162,29 @@
                 </dxg:GridColumn.CellTemplate>
             </dxg:GridColumn>
 
-            <dxg:GridColumn Header="Выбор 2" Width="*">
+            <dxg:GridColumn
+                Header="Выбор 2"
+                Width="*">
                 <dxg:GridColumn.CellTemplate>
-                    <DataTemplate DataType="{x:Type clashDetective:CheckViewModel}">
+                    <DataTemplate
+                        DataType="{x:Type clashDetective:CheckViewModel}">
                         <local:ProviderComboBox
                             DataContext="{Binding Row.SecondSelection, UpdateSourceTrigger=PropertyChanged}" />
                     </DataTemplate>
                 </dxg:GridColumn.CellTemplate>
             </dxg:GridColumn>
 
-            <dxg:GridColumn Width="Auto">
+            <dxg:GridColumn
+                Width="Auto">
                 <dxg:GridColumn.CellTemplate>
-                    <DataTemplate DataType="{x:Type clashDetective:CheckViewModel}">
-                        <dx:SimpleButton Margin="3 0" Click="ButtonOk_Click" Command="{Binding Row.ShowClashesCommand}"
-                                         ToolTip="Показать отчет по коллизиям"
-                                         Glyph="pack://application:,,,/DevExpress.Images.v21.2;component/Office2013/Reports/Report_16x16.png" />
+                    <DataTemplate
+                        DataType="{x:Type clashDetective:CheckViewModel}">
+                        <dx:SimpleButton
+                            Margin="3 0"
+                            Click="ButtonOk_Click"
+                            Command="{Binding Row.ShowClashesCommand}"
+                            ToolTip="Показать отчет по коллизиям"
+                            Glyph="pack://application:,,,/DevExpress.Images.v21.2;component/Office2013/Reports/Report_16x16.png" />
 
                     </DataTemplate>
                 </dxg:GridColumn.CellTemplate>
@@ -144,16 +192,37 @@
 
         </dxg:GridControl>
 
-        <StackPanel Grid.Row="3" Margin="0 10 0 0" Orientation="Horizontal"
-                    HorizontalAlignment="Right">
-            <dxe:TextEdit Margin="10 0" IsReadOnly="True" EditMode="InplaceActive" EditValue="{Binding ErrorText}"
-                          Foreground="Orange" />
-            <dxe:TextEdit Margin="10 0" IsReadOnly="True" EditMode="InplaceActive" EditValue="{Binding MessageText}"
-                          Foreground="Green" />
-            <dx:SimpleButton Content="ОК" Height="25" Width="80" Margin="10 0" IsDefault="True"
-                             Command="{Binding FindClashesCommand}" CommandParameter="{Binding ElementName=_this}" />
-            <dx:SimpleButton Content="Отмена" Height="25" Width="80" IsCancel="true"
-                             Click="ButtonCancel_Click" />
+        <StackPanel
+            Grid.Row="3"
+            Margin="0 10 0 0"
+            Orientation="Horizontal"
+            HorizontalAlignment="Right">
+            <dxe:TextEdit
+                Margin="10 0"
+                IsReadOnly="True"
+                EditMode="InplaceActive"
+                EditValue="{Binding ErrorText}"
+                Foreground="Orange" />
+            <dxe:TextEdit
+                Margin="10 0"
+                IsReadOnly="True"
+                EditMode="InplaceActive"
+                EditValue="{Binding MessageText}"
+                Foreground="Green" />
+            <dx:SimpleButton
+                Content="ОК"
+                Height="25"
+                Width="80"
+                Margin="10 0"
+                IsDefault="True"
+                Command="{Binding FindClashesCommand}"
+                CommandParameter="{Binding ElementName=_this}" />
+            <dx:SimpleButton
+                Content="Отмена"
+                Height="25"
+                Width="80"
+                IsCancel="true"
+                Click="ButtonCancel_Click" />
         </StackPanel>
 
     </Grid>
