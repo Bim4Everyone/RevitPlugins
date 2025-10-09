@@ -1,10 +1,19 @@
 using System;
+using System.Globalization;
+using System.Reflection;
 
 using Autodesk.Revit.Attributes;
 using Autodesk.Revit.DB;
 using Autodesk.Revit.UI;
 
+using DevExpress.Xpf.CodeView.Margins;
+
 using dosymep.Bim4Everyone;
+using dosymep.Bim4Everyone.SimpleServices;
+using dosymep.WpfCore.Ninject;
+using dosymep.WpfUI.Core.Ninject;
+
+using Ninject;
 
 using RevitRooms.Models;
 using RevitRooms.ViewModels;
@@ -18,6 +27,13 @@ public class RoomsCommand : BasePluginCommand {
     }
 
     protected override void Execute(UIApplication uiApplication) {
+        using IKernel kernel = uiApplication.CreatePlatformServices();
+
+        // Настройка доступа к Revit
+        kernel.Bind<RevitRepository>()
+            .ToSelf()
+            .InSingletonScope();
+
         bool isChecked = new CheckProjectParams(uiApplication)
             .CopyProjectParams()
             .CopyKeySchedules()
@@ -28,8 +44,23 @@ public class RoomsCommand : BasePluginCommand {
             throw new OperationCanceledException();
         }
 
-        var viewModel = new RoomsViewModel(new RevitRepository(uiApplication));
-        var window = new RoomsWindow() { Title = PluginName, DataContext = viewModel };
-        Notification(window);
+        // Используем сервис обновления тем для WinUI
+        kernel.UseWpfUIThemeUpdater();
+
+        // Настройка запуска окна
+        kernel.BindMainWindow<RoomsViewModel, RoomsWindow>();
+
+        // Настройка локализации,
+        // получение имени сборки откуда брать текст
+        string assemblyName = Assembly.GetExecutingAssembly().GetName().Name;
+
+        // Настройка локализации,
+        // установка дефолтной локализации "ru-RU"
+        kernel.UseWpfLocalization(
+            $"/{assemblyName};component/assets/localization/language.xaml",
+            CultureInfo.GetCultureInfo("ru-RU"));
+
+        // Вызывает стандартное уведомление
+        Notification(kernel.Get<RoomsWindow>());
     }
 }
