@@ -3,26 +3,32 @@ using System;
 using Autodesk.Revit.DB;
 
 using dosymep.Bim4Everyone.ProjectConfigs;
-using dosymep.Bim4Everyone.SimpleServices;
 using dosymep.SimpleServices;
 
 using RevitClashDetective.Models;
 
 namespace RevitOpeningPlacement.ViewModels.Services;
 internal class ConfigLoaderService {
+    private readonly IOpenFileDialogService _openFileDialogService;
+    private readonly IMessageBoxService _messageBoxService;
+
+    public ConfigLoaderService(IOpenFileDialogService openFileDialogService, IMessageBoxService messageBoxService) {
+        _openFileDialogService = openFileDialogService ?? throw new ArgumentNullException(nameof(openFileDialogService));
+        _messageBoxService = messageBoxService ?? throw new ArgumentNullException(nameof(messageBoxService));
+    }
+
     public T Load<T>(Document document) where T : ProjectConfig, new() {
         if(document is null) { throw new ArgumentNullException(nameof(document)); }
 
-        var openWindow = GetPlatformService<IOpenFileDialogService>();
-        openWindow.Filter = "OpeningConfig |*.json";
-        if(!openWindow.ShowDialog(Environment.GetFolderPath(Environment.SpecialFolder.Desktop))) {
+        _openFileDialogService.Filter = "OpeningConfig |*.json";
+        if(!_openFileDialogService.ShowDialog(Environment.GetFolderPath(Environment.SpecialFolder.Desktop))) {
             throw new OperationCanceledException();
         }
 
         try {
             var configLoader = new ConfigLoader(document);
-            var config = configLoader.Load<T>(openWindow.File.FullName);
-            config.ProjectConfigPath = openWindow.File.FullName;
+            var config = configLoader.Load<T>(_openFileDialogService.File.FullName);
+            config.ProjectConfigPath = _openFileDialogService.File.FullName;
             return config;
         } catch(pyRevitLabs.Json.JsonSerializationException) {
             ShowError();
@@ -37,12 +43,11 @@ internal class ConfigLoaderService {
         }
     }
 
-    protected T GetPlatformService<T>() {
-        return ServicesProvider.GetPlatformService<T>();
-    }
-
     private void ShowError() {
-        var mb = GetPlatformService<IMessageBoxService>();
-        mb.Show("Неверный файл конфигурации.", "BIM", System.Windows.MessageBoxButton.OK, System.Windows.MessageBoxImage.Error, System.Windows.MessageBoxResult.OK);
+        _messageBoxService.Show("Неверный файл конфигурации.",
+            "BIM",
+            System.Windows.MessageBoxButton.OK,
+            System.Windows.MessageBoxImage.Error,
+            System.Windows.MessageBoxResult.OK);
     }
 }

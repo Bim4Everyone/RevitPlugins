@@ -7,6 +7,7 @@ using Autodesk.Revit.UI;
 
 using dosymep.Bim4Everyone;
 using dosymep.Bim4Everyone.SimpleServices;
+using dosymep.Xpf.Core.Ninject;
 
 using Ninject;
 
@@ -68,6 +69,9 @@ public class SetOpeningTasksPlacementConfigCmd : BasePluginCommand {
             .WithPropertyValue(nameof(Window.Title), PluginName)
             .WithPropertyValue(nameof(Window.DataContext),
                 c => c.Kernel.Get<MainViewModel>());
+        kernel.UseXtraMessageBox<MainViewModel>()
+            .UseXtraOpenFileDialog<MainViewModel>()
+            .UseXtraSaveFileDialog<MainViewModel>();
         kernel.Bind<WindowInteropHelper>()
             .ToConstructor(c => new WindowInteropHelper(kernel.Get<MainWindow>()))
             .WithPropertyValue(nameof(Window.Owner), uiApplication.MainWindowHandle);
