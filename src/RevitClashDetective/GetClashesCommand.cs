@@ -6,8 +6,10 @@ using Autodesk.Revit.Attributes;
 using Autodesk.Revit.UI;
 
 using dosymep.Bim4Everyone;
+using dosymep.Bim4Everyone.ProjectConfigs;
 using dosymep.Bim4Everyone.SimpleServices;
 using dosymep.WpfCore.Ninject;
+using dosymep.Xpf.Core.Ninject;
 
 using Ninject;
 
@@ -39,6 +41,12 @@ public class GetClashesCommand : BasePluginCommand {
             .ToSelf()
             .InSingletonScope()
             .WithConstructorArgument("selectedFile", (string) null);
+        kernel.Bind<SettingsConfig>()
+            .ToMethod(c => SettingsConfig.GetSettingsConfig(c.Kernel.Get<IConfigSerializer>()));
+        kernel.UseXtraOpenFileDialog<ReportsViewModel>(
+            filter: "NavisClashReport (*.xml)|*.xml|PluginClashReport (*.json)|*.json");
+        kernel.UseXtraSaveFileDialog<ReportsViewModel>();
+        kernel.UseXtraMessageBox<ReportsViewModel>();
         kernel.Bind<NavigatorView>()
             .ToSelf()
             .InSingletonScope()

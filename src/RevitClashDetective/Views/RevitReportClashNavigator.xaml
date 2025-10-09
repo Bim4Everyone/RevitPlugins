@@ -11,6 +11,7 @@
     xmlns:dxe="http://schemas.devexpress.com/winfx/2008/xaml/editors"
     xmlns:dxg="http://schemas.devexpress.com/winfx/2008/xaml/grid"
     xmlns:mvvm="http://schemas.devexpress.com/winfx/2008/xaml/mvvm"
+    xmlns:common="clr-namespace:dosymep.Xpf.Core.SimpleServices;assembly=dosymep.Xpf.Core"
     mc:Ignorable="d"
     Title="Навигатор"
     Height="450"
@@ -18,6 +19,10 @@
     MinHeight="300"
     MinWidth="500"
     d:DataContext="{d:DesignInstance vm:RevitReportClashesViewModel, IsDesignTimeCreatable=False}">
+    <mvvm:Interaction.Behaviors>
+        <common:AttachServiceBehavior
+            AttachableService="{Binding OpenFileDialogService}" />
+    </mvvm:Interaction.Behaviors>
     <Grid
         Margin="10">
         <Grid.RowDefinitions>

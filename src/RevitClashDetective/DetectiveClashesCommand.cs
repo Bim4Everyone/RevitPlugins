@@ -7,8 +7,10 @@ using Autodesk.Revit.Attributes;
 using Autodesk.Revit.UI;
 
 using dosymep.Bim4Everyone;
+using dosymep.Bim4Everyone.ProjectConfigs;
 using dosymep.Bim4Everyone.SimpleServices;
 using dosymep.WpfCore.Ninject;
+using dosymep.Xpf.Core.Ninject;
 
 using Ninject;
 
@@ -54,6 +56,8 @@ public class DetectiveClashesCommand : BasePluginCommand {
                 string path = GetConfigPath(repo);
                 return ChecksConfig.GetChecksConfig(path, repo.Doc);
             });
+        kernel.Bind<SettingsConfig>()
+            .ToMethod(c => SettingsConfig.GetSettingsConfig(c.Kernel.Get<IConfigSerializer>()));
 
         kernel.Bind<MainViewModel>()
             .ToSelf()
@@ -62,6 +66,10 @@ public class DetectiveClashesCommand : BasePluginCommand {
             .ToSelf()
             .InSingletonScope()
             .WithPropertyValue(nameof(Window.DataContext), c => c.Kernel.Get<MainViewModel>());
+        kernel.UseXtraOpenFileDialog<MainViewModel>()
+            .UseXtraSaveFileDialog<MainViewModel>()
+            .UseXtraMessageBox<MainViewModel>();
+
 
         string assemblyName = Assembly.GetExecutingAssembly().GetName().Name;
         kernel.UseWpfLocalization(

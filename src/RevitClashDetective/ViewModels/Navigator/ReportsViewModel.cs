@@ -6,7 +6,6 @@ using System.Windows;
 using System.Windows.Input;
 
 using dosymep.Bim4Everyone;
-using dosymep.Bim4Everyone.ProjectConfigs;
 using dosymep.SimpleServices;
 using dosymep.WPF.Commands;
 using dosymep.WPF.ViewModels;
@@ -22,17 +21,26 @@ namespace RevitClashDetective.ViewModels.Navigator;
 internal class ReportsViewModel : BaseViewModel {
     private readonly RevitRepository _revitRepository;
     private readonly ILocalizationService _localizationService;
+    private readonly SettingsConfig _settingsConfig;
     private bool _elementsIsolationEnabled = true;
     private bool _openFromClashDetector;
     private ReportViewModel _selectedFile;
     private ObservableCollection<ReportViewModel> _reports;
 
     public ReportsViewModel(RevitRepository revitRepository,
+        IOpenFileDialogService openFileDialogService,
+        ISaveFileDialogService saveFileDialogService,
+        IMessageBoxService messageBoxService,
         ILocalizationService localizationService,
+        SettingsConfig settingsConfig,
         string selectedFile = null) {
 
         _revitRepository = revitRepository ?? throw new ArgumentNullException(nameof(revitRepository));
+        OpenFileDialogService = openFileDialogService ?? throw new ArgumentNullException(nameof(openFileDialogService));
+        SaveFileDialogService = saveFileDialogService ?? throw new ArgumentNullException(nameof(saveFileDialogService));
+        MessageBoxService = messageBoxService ?? throw new ArgumentNullException(nameof(messageBoxService));
         _localizationService = localizationService ?? throw new ArgumentNullException(nameof(localizationService));
+        _settingsConfig = settingsConfig ?? throw new ArgumentNullException(nameof(settingsConfig));
         Reports = [];
 
         if(selectedFile == null) {
@@ -54,6 +62,9 @@ internal class ReportsViewModel : BaseViewModel {
     public ICommand LoadCommand { get; }
     public ICommand DeleteCommand { get; }
     public ICommand SaveAllReportsCommand { get; }
+    public IOpenFileDialogService OpenFileDialogService { get; }
+    public ISaveFileDialogService SaveFileDialogService { get; }
+    public IMessageBoxService MessageBoxService { get; }
 
     public ObservableCollection<ReportViewModel> Reports {
         get => _reports;
@@ -82,7 +93,11 @@ internal class ReportsViewModel : BaseViewModel {
             .Select(path => new ReportViewModel(
                 _revitRepository,
                 Path.GetFileNameWithoutExtension(path),
-                _localizationService))
+                _localizationService,
+                OpenFileDialogService,
+                SaveFileDialogService,
+                MessageBoxService,
+                _settingsConfig))
             .Where(item => item.Name.Equals(selectedFile, StringComparison.CurrentCultureIgnoreCase)));
         SelectedReport = Reports.FirstOrDefault();
     }
@@ -95,7 +110,11 @@ internal class ReportsViewModel : BaseViewModel {
                 .Select(item => new ReportViewModel(
                     _revitRepository,
                     Path.GetFileNameWithoutExtension(item),
-                    _localizationService)));
+                    _localizationService,
+                    OpenFileDialogService,
+                    SaveFileDialogService,
+                    MessageBoxService,
+                    _settingsConfig)));
             SelectedReport = Reports.FirstOrDefault();
         }
     }
@@ -109,30 +128,35 @@ internal class ReportsViewModel : BaseViewModel {
 
 
     private void Load() {
-        var openWindow = GetPlatformService<IOpenFileDialogService>();
-        openWindow.Filter = "NavisClashReport (*.xml)|*.xml|PluginClashReport (*.json)|*.json";
-
-        if(!openWindow.ShowDialog(_revitRepository.GetFileDialogPath())) {
+        if(!OpenFileDialogService.ShowDialog(_revitRepository.GetFileDialogPath())) {
             throw new OperationCanceledException();
         }
 
-        InitializeClashes(openWindow.File.FullName);
-        _revitRepository.CommonConfig.LastRunPath = openWindow.File.DirectoryName;
+        InitializeClashes(OpenFileDialogService.File.FullName);
+        _revitRepository.CommonConfig.LastRunPath = OpenFileDialogService.File.DirectoryName;
         _revitRepository.CommonConfig.SaveProjectConfig();
     }
 
     private void InitializeClashes(string path) {
         string name = Path.GetFileNameWithoutExtension(path);
         var reports = ReportLoader.GetReports(_revitRepository, path)
-            .Select(r => new ReportViewModel(_revitRepository, r.Name, r.Clashes?.ToList(), _localizationService));
+            .Select(r => new ReportViewModel(
+                _revitRepository,
+                r.Name,
+                _localizationService,
+                OpenFileDialogService,
+                SaveFileDialogService,
+                MessageBoxService,
+                _settingsConfig,
+                r.Clashes?.ToArray() ?? []));
 
         Reports = new ObservableCollection<ReportViewModel>(new NameResolver<ReportViewModel>(Reports, reports).GetCollection());
         SelectedReport = reports.First();
     }
 
     private void Delete() {
-        var mb = GetPlatformService<IMessageBoxService>();
-        if(mb.Show("Вы уверены, что хотите удалить файл?", "BIM", MessageBoxButton.YesNo, MessageBoxImage.Warning, MessageBoxResult.Cancel) == MessageBoxResult.Yes) {
+        if(MessageBoxService.Show("Вы уверены, что хотите удалить файл?", "BIM",
+            MessageBoxButton.YesNo, MessageBoxImage.Warning, MessageBoxResult.Cancel) == MessageBoxResult.Yes) {
             DeleteConfig(SelectedReport.GetUpdatedConfig());
             Reports.Remove(SelectedReport);
             SelectedReport = Reports.FirstOrDefault();
@@ -151,10 +175,9 @@ internal class ReportsViewModel : BaseViewModel {
 
     private void SelectClash(IClashViewModel clash) {
         IView3DSetting settings;
-        var config = SettingsConfig.GetSettingsConfig(GetPlatformService<IConfigSerializer>());
         settings = ElementsIsolationEnabled
-            ? new ClashIsolationViewSettings(_revitRepository, _localizationService, clash, config)
-            : new ClashDefaultViewSettings(_revitRepository, _localizationService, clash, config);
+            ? new ClashIsolationViewSettings(_revitRepository, _localizationService, clash, _settingsConfig)
+            : new ClashDefaultViewSettings(_revitRepository, _localizationService, clash, _settingsConfig);
         _revitRepository.SelectAndShowElement(clash.GetElements(), settings);
     }
 

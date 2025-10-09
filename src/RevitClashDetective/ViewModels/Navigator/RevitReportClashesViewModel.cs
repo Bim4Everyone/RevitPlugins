@@ -17,9 +17,12 @@ internal class RevitReportClashesViewModel : BaseViewModel {
     private string _name;
     private ObservableCollection<ClashViewModel> _clashes;
 
-    public RevitReportClashesViewModel(RevitRepository revitRepository, string path = null) {
-        _revitRepository = revitRepository;
+    public RevitReportClashesViewModel(RevitRepository revitRepository,
+        IOpenFileDialogService openFileDialogService,
+        string path = null) {
 
+        _revitRepository = revitRepository ?? throw new ArgumentNullException(nameof(revitRepository));
+        OpenFileDialogService = openFileDialogService ?? throw new ArgumentNullException(nameof(openFileDialogService));
         if(!string.IsNullOrEmpty(path)) {
             InitializeClashes(path);
         }
@@ -30,6 +33,7 @@ internal class RevitReportClashesViewModel : BaseViewModel {
 
     public ICommand LoadReportCommand { get; }
     public ICommand SelectClashCommand { get; }
+    public IOpenFileDialogService OpenFileDialogService { get; }
     public ObservableCollection<ClashViewModel> Clashes {
         get => _clashes;
         set => RaiseAndSetIfChanged(ref _clashes, value);
@@ -40,15 +44,12 @@ internal class RevitReportClashesViewModel : BaseViewModel {
     }
 
     private void LoadReport() {
-        var openWindow = GetPlatformService<IOpenFileDialogService>();
-        openWindow.Filter = "ClashReport |*.xml";
-
-        if(!openWindow.ShowDialog(_revitRepository.GetFileDialogPath())) {
+        if(!OpenFileDialogService.ShowDialog(_revitRepository.GetFileDialogPath())) {
             throw new OperationCanceledException();
         }
 
-        InitializeClashes(openWindow.File.FullName);
-        _revitRepository.CommonConfig.LastRunPath = openWindow.File.DirectoryName;
+        InitializeClashes(OpenFileDialogService.File.FullName);
+        _revitRepository.CommonConfig.LastRunPath = OpenFileDialogService.File.DirectoryName;
         _revitRepository.CommonConfig.SaveProjectConfig();
     }
 

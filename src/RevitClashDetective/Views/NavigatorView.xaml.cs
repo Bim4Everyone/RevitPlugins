@@ -1,17 +1,20 @@
+using System;
 using System.Windows;
 
 using DevExpress.Xpf.Grid;
-
-using dosymep.Bim4Everyone.ProjectConfigs;
 
 using RevitClashDetective.Models;
 using RevitClashDetective.ViewModels.Navigator;
 
 namespace RevitClashDetective.Views;
-public partial class NavigatorView {
-    public NavigatorView() {
+internal partial class NavigatorView {
+    public NavigatorView(SettingsConfig config) {
+        if(config is null) {
+            throw new ArgumentNullException(nameof(config));
+        }
+
         InitializeComponent();
-        string[] paramNames = SettingsConfig.GetSettingsConfig(GetPlatformService<IConfigSerializer>()).ParamNames;
+        string[] paramNames = config.ParamNames;
         int startFirst = 9;
         int startSecond = 16;
         for(int i = 0; i < paramNames.Length; i++, startFirst++, startSecond += 2) {

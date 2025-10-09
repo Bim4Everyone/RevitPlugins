@@ -7,7 +7,6 @@ using System.Linq;
 using System.Windows.Input;
 using System.Windows.Threading;
 
-using dosymep.Bim4Everyone.ProjectConfigs;
 using dosymep.Revit.Geometry;
 using dosymep.SimpleServices;
 using dosymep.WPF.Commands;
@@ -38,26 +37,31 @@ internal class ReportViewModel : BaseViewModel, INamedEntity, IEquatable<ReportV
     private ImaginaryFirstClashViewModel[] _imaginaryFirstClashes;
     private ImaginarySecondClashViewModel[] _imaginarySecondClashes;
     private readonly ILocalizationService _localization;
+    private readonly SettingsConfig _settingsConfig;
 
-    public ReportViewModel(RevitRepository revitRepository, string name, ILocalizationService localization) {
-        Initialize(revitRepository, name);
-        InitializeClashesFromPluginFile();
-        _localization = localization ?? throw new ArgumentNullException(nameof(localization));
-    }
-
-    public ReportViewModel(
-        RevitRepository revitRepository,
+    public ReportViewModel(RevitRepository revitRepository,
         string name,
-        ICollection<ClashModel> clashes,
-        ILocalizationService localization) {
-
-        Initialize(revitRepository, name);
-        if(clashes != null) {
-            InitializeClashes(clashes);
-        }
+        ILocalizationService localization,
+        IOpenFileDialogService openFileDialogService,
+        ISaveFileDialogService saveFileDialogService,
+        IMessageBoxService messageBoxService,
+        SettingsConfig settingsConfig,
+        ICollection<ClashModel> clashes = null) {
 
         _localization = localization ?? throw new ArgumentNullException(nameof(localization));
+        OpenFileDialogService = openFileDialogService ?? throw new ArgumentNullException(nameof(openFileDialogService));
+        SaveFileDialogService = saveFileDialogService ?? throw new ArgumentNullException(nameof(saveFileDialogService));
+        MessageBoxService = messageBoxService ?? throw new ArgumentNullException(nameof(messageBoxService));
+        _settingsConfig = settingsConfig ?? throw new ArgumentNullException(nameof(settingsConfig));
+
+        Initialize(revitRepository, name);
+        if(clashes is not null) {
+            InitializeClashes(clashes);
+        } else {
+            InitializeClashesFromPluginFile();
+        }
     }
+
 
     public string Name {
         get => _name;
@@ -119,6 +123,13 @@ internal class ReportViewModel : BaseViewModel, INamedEntity, IEquatable<ReportV
 
     public ICommand PickSecondElementsCommand { get; private set; }
 
+    public IOpenFileDialogService OpenFileDialogService { get; }
+
+    public ISaveFileDialogService SaveFileDialogService { get; }
+
+    public IMessageBoxService MessageBoxService { get; }
+
+
     private ObservableCollection<ClashViewModel> Clashes {
         get => _clashes;
         set => RaiseAndSetIfChanged(ref _clashes, value);
@@ -153,8 +164,8 @@ internal class ReportViewModel : BaseViewModel, INamedEntity, IEquatable<ReportV
     }
 
     private void Initialize(RevitRepository revitRepository, string name) {
-        _revitRepository = revitRepository;
-        Name = name;
+        _revitRepository = revitRepository ?? throw new ArgumentNullException(nameof(revitRepository));
+        Name = name ?? throw new ArgumentNullException(nameof(name));
 
         InitializeTimer();
 
@@ -175,7 +186,7 @@ internal class ReportViewModel : BaseViewModel, INamedEntity, IEquatable<ReportV
 
     private void SaveAs() {
         var config = GetUpdatedConfig();
-        var saver = new ConfigSaverService(_revitRepository);
+        var saver = new ConfigSaverService(_revitRepository, SaveFileDialogService);
         saver.Save(config);
         Message = "Файл успешно сохранен";
         RefreshMessage();
@@ -221,7 +232,7 @@ internal class ReportViewModel : BaseViewModel, INamedEntity, IEquatable<ReportV
     }
 
     private void SetAdditionalParamValues(ICollection<IClashViewModel> clashes) {
-        string[] paramsNames = SettingsConfig.GetSettingsConfig(GetPlatformService<IConfigSerializer>()).ParamNames;
+        string[] paramsNames = _settingsConfig.ParamNames;
         if(paramsNames.Length > 0) {
             foreach(var clash in clashes) {
                 clash.SetElementParams(paramsNames);
@@ -262,7 +273,14 @@ internal class ReportViewModel : BaseViewModel, INamedEntity, IEquatable<ReportV
         var filters = FiltersConfig.GetFiltersConfig(path, _revitRepository.Doc);
 
         return checks.Checks
-            .Select(c => new CheckViewModel(_revitRepository, _localization, filters, c))
+            .Select(c => new CheckViewModel(_revitRepository,
+            _localization,
+            OpenFileDialogService,
+            SaveFileDialogService,
+            MessageBoxService,
+            _settingsConfig,
+            filters,
+            c))
             .FirstOrDefault(c => c.ReportName.Equals(Name));
     }
 

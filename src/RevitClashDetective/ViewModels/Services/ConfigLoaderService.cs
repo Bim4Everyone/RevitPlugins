@@ -1,7 +1,6 @@
 using System;
 
 using dosymep.Bim4Everyone.ProjectConfigs;
-using dosymep.Bim4Everyone.SimpleServices;
 using dosymep.SimpleServices;
 
 using RevitClashDetective.Models;
@@ -11,25 +10,33 @@ namespace RevitClashDetective.ViewModels.Services;
 internal class ConfigLoaderService {
     private readonly RevitRepository _revitRepository;
 
-    public ConfigLoaderService(RevitRepository revitRepository) {
-        _revitRepository = revitRepository;
+
+    public ConfigLoaderService(RevitRepository revitRepository,
+        IOpenFileDialogService openFileDialogService,
+        IMessageBoxService messageBoxService) {
+        _revitRepository = revitRepository ?? throw new ArgumentNullException(nameof(revitRepository));
+        OpenFileDialogService = openFileDialogService ?? throw new ArgumentNullException(nameof(openFileDialogService));
+        MessageBoxService = messageBoxService ?? throw new ArgumentNullException(nameof(messageBoxService));
     }
 
+    public IOpenFileDialogService OpenFileDialogService { get; }
+    public IMessageBoxService MessageBoxService { get; }
+
+
     public T Load<T>() where T : ProjectConfig, new() {
-        var openWindow = GetPlatformService<IOpenFileDialogService>();
-        openWindow.Filter = "ClashConfig |*.json";
+        OpenFileDialogService.Filter = "ClashConfig |*.json";
 
 
-        if(!openWindow.ShowDialog(_revitRepository.GetFileDialogPath())) {
+        if(!OpenFileDialogService.ShowDialog(_revitRepository.GetFileDialogPath())) {
             throw new OperationCanceledException();
         }
 
-        _revitRepository.CommonConfig.LastRunPath = openWindow.File.DirectoryName;
+        _revitRepository.CommonConfig.LastRunPath = OpenFileDialogService.File.DirectoryName;
         _revitRepository.CommonConfig.SaveProjectConfig();
 
         try {
             var configLoader = new ConfigLoader(_revitRepository.Doc);
-            return configLoader.Load<T>(openWindow.File.FullName);
+            return configLoader.Load<T>(OpenFileDialogService.File.FullName);
         } catch(pyRevitLabs.Json.JsonSerializationException) {
             ShowError();
             throw new OperationCanceledException();
@@ -50,12 +57,11 @@ internal class ConfigLoaderService {
         }
     }
 
-    protected T GetPlatformService<T>() {
-        return ServicesProvider.GetPlatformService<T>();
-    }
-
     private void ShowError() {
-        var mb = GetPlatformService<IMessageBoxService>();
-        mb.Show("Неверный файл конфигурации.", "BIM", System.Windows.MessageBoxButton.OK, System.Windows.MessageBoxImage.Error, System.Windows.MessageBoxResult.OK);
+        MessageBoxService.Show("Неверный файл конфигурации.",
+            "BIM",
+            System.Windows.MessageBoxButton.OK,
+            System.Windows.MessageBoxImage.Error,
+            System.Windows.MessageBoxResult.OK);
     }
 }

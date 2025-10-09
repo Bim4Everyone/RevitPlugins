@@ -11,6 +11,7 @@ using Autodesk.Revit.UI;
 using dosymep.Bim4Everyone;
 using dosymep.Bim4Everyone.SimpleServices;
 using dosymep.WpfCore.Ninject;
+using dosymep.Xpf.Core.Ninject;
 
 using Ninject;
 
@@ -58,6 +59,9 @@ public class CreateFiltersCommand : BasePluginCommand {
             .ToSelf()
             .InSingletonScope()
             .WithPropertyValue(nameof(Window.DataContext), c => c.Kernel.Get<FiltersViewModel>());
+        kernel.UseXtraOpenFileDialog<FiltersViewModel>()
+            .UseXtraSaveFileDialog<FiltersViewModel>()
+            .UseXtraMessageBox<FiltersViewModel>();
 
         string assemblyName = Assembly.GetExecutingAssembly().GetName().Name;
         kernel.UseWpfLocalization(
