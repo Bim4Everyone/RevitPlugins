@@ -8,7 +8,7 @@ using RevitPylonDocumentation.ViewModels;
 
 namespace RevitPylonDocumentation.Models.PylonSheetNView.ViewAnnotationCreators;
 internal class GeneralViewPerpAnnotCreator : ViewAnnotationCreator {
-    internal GeneralViewPerpAnnotCreator(MainViewModel mvm, RevitRepository repository, PylonSheetInfo pylonSheetInfo, 
+    public GeneralViewPerpAnnotCreator(MainViewModel mvm, RevitRepository repository, PylonSheetInfo pylonSheetInfo, 
                                          PylonView pylonView) 
         : base(mvm, repository, pylonSheetInfo, pylonView) {
     }

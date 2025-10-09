@@ -7,7 +7,7 @@ using RevitPylonDocumentation.ViewModels;
 
 namespace RevitPylonDocumentation.Models.PylonSheetNView.ViewAnnotationCreators;
 internal class TransViewFirstRebarAnnotCreator : ViewAnnotationCreator {
-    internal TransViewFirstRebarAnnotCreator(MainViewModel mvm, RevitRepository repository, 
+    public TransViewFirstRebarAnnotCreator(MainViewModel mvm, RevitRepository repository, 
                                              PylonSheetInfo pylonSheetInfo, PylonView pylonView) 
         : base(mvm, repository, pylonSheetInfo, pylonView) {
     }
