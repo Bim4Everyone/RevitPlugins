@@ -1,5 +1,6 @@
 using System.Globalization;
 using System.Reflection;
+using System.Windows;
 
 using Autodesk.Revit.Attributes;
 using Autodesk.Revit.UI;
@@ -7,6 +8,7 @@ using Autodesk.Revit.UI;
 using dosymep.Bim4Everyone;
 using dosymep.Bim4Everyone.SimpleServices;
 using dosymep.WpfCore.Ninject;
+using dosymep.Xpf.Core.Ninject;
 
 using Ninject;
 
@@ -35,16 +37,20 @@ public class GetRevitReportClashesCommand : BasePluginCommand {
         kernel.Bind<ParameterFilterProvider>()
             .ToSelf()
             .InSingletonScope();
+        kernel.Bind<RevitReportClashesViewModel>()
+            .ToSelf()
+            .InSingletonScope();
+        kernel.UseXtraOpenFileDialog<RevitReportClashesViewModel>(filter: "ClashReport |*.xml");
+        kernel.Bind<RevitReportClashNavigator>()
+            .ToSelf()
+            .InSingletonScope()
+            .WithPropertyValue(nameof(Window.DataContext), c => c.Kernel.Get<RevitReportClashesViewModel>());
 
         string assemblyName = Assembly.GetExecutingAssembly().GetName().Name;
         kernel.UseWpfLocalization(
             $"/{assemblyName};component/assets/Localization/Language.xaml",
             CultureInfo.GetCultureInfo("ru-RU"));
 
-        var repo = kernel.Get<RevitRepository>();
-        var revitRepository = repo;
-        var mainViewModlel = new RevitReportClashesViewModel(revitRepository);
-        var window = new RevitReportClashNavigator() { DataContext = mainViewModlel };
-        window.Show();
+        kernel.Get<RevitReportClashNavigator>().Show();
     }
 }

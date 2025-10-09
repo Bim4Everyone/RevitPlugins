@@ -28,9 +28,18 @@ internal class FiltersViewModel : BaseViewModel {
     private DispatcherTimer _timer;
     private FilterViewModel _selectedFilter;
 
-    public FiltersViewModel(RevitRepository revitRepository, FiltersConfig config) {
-        _revitRepository = revitRepository;
-        _config = config;
+    public FiltersViewModel(
+        RevitRepository revitRepository,
+        IOpenFileDialogService openFileDialogService,
+        ISaveFileDialogService saveFileDialogService,
+        IMessageBoxService messageBoxService,
+        FiltersConfig config) {
+
+        _revitRepository = revitRepository ?? throw new ArgumentNullException(nameof(revitRepository));
+        OpenFileDialogService = openFileDialogService ?? throw new ArgumentNullException(nameof(openFileDialogService));
+        SaveFileDialogService = saveFileDialogService ?? throw new ArgumentNullException(nameof(saveFileDialogService));
+        MessageBoxService = messageBoxService ?? throw new ArgumentNullException(nameof(messageBoxService));
+        _config = config ?? throw new ArgumentNullException(nameof(config));
 
         InitializeFilters();
         InitializeTimer();
@@ -66,6 +75,9 @@ internal class FiltersViewModel : BaseViewModel {
     public ICommand SaveAsCommand { get; }
     public ICommand LoadCommand { get; }
     public ICommand CheckSearchSetCommand { get; }
+    public IOpenFileDialogService OpenFileDialogService { get; }
+    public ISaveFileDialogService SaveFileDialogService { get; }
+    public IMessageBoxService MessageBoxService { get; }
 
 
     public FilterViewModel SelectedFilter {
@@ -115,8 +127,11 @@ internal class FiltersViewModel : BaseViewModel {
     }
 
     private void Delete() {
-        var dialog = GetPlatformService<IMessageBoxService>();
-        if(dialog.Show($"Удалить фильтр \"{SelectedFilter.Name}\"?", "BIM", MessageBoxButton.YesNo, MessageBoxImage.Warning, MessageBoxResult.No) == MessageBoxResult.Yes) {
+        if(MessageBoxService.Show($"Удалить фильтр \"{SelectedFilter.Name}\"?",
+            "BIM",
+            MessageBoxButton.YesNo,
+            MessageBoxImage.Warning,
+            MessageBoxResult.No) == MessageBoxResult.Yes) {
             Filters.Remove(SelectedFilter);
             SelectedFilter = Filters.FirstOrDefault();
         }
@@ -156,7 +171,7 @@ internal class FiltersViewModel : BaseViewModel {
         filtersConfig.Filters = GetFilters().ToList();
         filtersConfig.RevitVersion = ModuleEnvironment.RevitVersion;
 
-        var cs = new ConfigSaverService(_revitRepository);
+        var cs = new ConfigSaverService(_revitRepository, SaveFileDialogService);
         cs.Save(filtersConfig);
         MessageText = "Поисковые наборы успешно сохранены";
         RefreshMessage();
@@ -177,7 +192,7 @@ internal class FiltersViewModel : BaseViewModel {
     }
 
     private void Load() {
-        var cl = new ConfigLoaderService(_revitRepository);
+        var cl = new ConfigLoaderService(_revitRepository, OpenFileDialogService, MessageBoxService);
         var config = cl.Load<FiltersConfig>();
         cl.CheckConfig(config);
 
@@ -191,7 +206,7 @@ internal class FiltersViewModel : BaseViewModel {
     private void CheckSearchSet() {
         Save();
         var filter = SelectedFilter.GetFilter();
-        var vm = new SearchSetsViewModel(_revitRepository, filter);
+        var vm = new SearchSetsViewModel(_revitRepository, filter, MessageBoxService);
         var view = new SearchSetView() { DataContext = vm };
         view.Show();
     }

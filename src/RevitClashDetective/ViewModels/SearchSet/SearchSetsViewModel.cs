@@ -18,16 +18,16 @@ internal class SearchSetsViewModel : BaseViewModel {
     private readonly SearchSetViewModel _invertedSearchSet;
     private SearchSetViewModel _searchSet;
 
-    public SearchSetsViewModel(RevitRepository revitRepository, Filter filter) {
-        _revitRepository = revitRepository;
+    public SearchSetsViewModel(RevitRepository revitRepository, Filter filter, IMessageBoxService messageBoxService) {
+        _revitRepository = revitRepository ?? throw new ArgumentNullException(nameof(revitRepository));
+        Filter = filter ?? throw new ArgumentNullException(nameof(filter));
+        MessageBoxService = messageBoxService ?? throw new ArgumentNullException(nameof(messageBoxService));
 
-        Filter = filter;
         _straightSearchSet = new SearchSetViewModel(_revitRepository, Filter, new StraightRevitFilterGenerator());
         _invertedSearchSet = new SearchSetViewModel(_revitRepository, Filter, new InvertedRevitFilterGenerator());
 
         SearchSet = _straightSearchSet;
         Name = filter.Name;
-        MessageBoxService = GetPlatformService<IMessageBoxService>();
 
         InversionChangedCommand = RelayCommand.Create(InversionChanged);
         ShowSetCommand = RelayCommand.Create(ShowSet);

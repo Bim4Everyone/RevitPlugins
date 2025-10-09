@@ -11,6 +11,7 @@
     xmlns:lc="http://schemas.devexpress.com/winfx/2008/xaml/layoutcontrol"
     xmlns:mvvm="http://schemas.devexpress.com/winfx/2008/xaml/mvvm"
     xmlns:base="clr-namespace:dosymep.WPF.Views"
+    xmlns:common="clr-namespace:dosymep.Xpf.Core.SimpleServices;assembly=dosymep.Xpf.Core"
     mc:Ignorable="d"
     Title="Поисковые наборы"
     Height="450"
@@ -19,6 +20,14 @@
     MinWidth="500"
     x:Name="ViewFilterCreator"
     d:DataContext="{d:DesignInstance vm:FiltersViewModel, IsDesignTimeCreatable=False}">
+    <mvvm:Interaction.Behaviors>
+        <common:AttachServiceBehavior
+            AttachableService="{Binding MessageBoxService}" />
+        <common:AttachServiceBehavior
+            AttachableService="{Binding OpenFileDialogService}" />
+        <common:AttachServiceBehavior
+            AttachableService="{Binding SaveFileDialogService}" />
+    </mvvm:Interaction.Behaviors>
     <Grid
         Margin="10">
         <Grid.RowDefinitions>

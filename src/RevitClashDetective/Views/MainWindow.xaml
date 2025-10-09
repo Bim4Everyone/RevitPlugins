@@ -10,13 +10,22 @@
     xmlns:dxg="http://schemas.devexpress.com/winfx/2008/xaml/grid"
     xmlns:clashDetective="clr-namespace:RevitClashDetective.ViewModels.ClashDetective"
     xmlns:base="clr-namespace:dosymep.WPF.Views"
-    
+    xmlns:mvvm="http://schemas.devexpress.com/winfx/2008/xaml/mvvm"
+    xmlns:common="clr-namespace:dosymep.Xpf.Core.SimpleServices;assembly=dosymep.Xpf.Core"
     mc:Ignorable="d"
     x:Name="_this"
     Title="Проверки на коллизии" Height="450" Width="800"
     MinHeight="300"
     MinWidth="500"
     d:DataContext="{d:DesignInstance clashDetective:MainViewModel, IsDesignTimeCreatable=False}">
+    <mvvm:Interaction.Behaviors>
+        <common:AttachServiceBehavior
+            AttachableService="{Binding MessageBoxService}" />
+        <common:AttachServiceBehavior
+            AttachableService="{Binding OpenFileDialogService}" />
+        <common:AttachServiceBehavior
+            AttachableService="{Binding SaveFileDialogService}" />
+    </mvvm:Interaction.Behaviors>
     <Grid Margin="10">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />

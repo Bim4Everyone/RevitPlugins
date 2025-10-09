@@ -22,6 +22,7 @@ internal class MainViewModel : BaseViewModel {
     private readonly FiltersConfig _filtersConfig;
     private readonly RevitRepository _revitRepository;
     private readonly ILocalizationService _localizationService;
+    private readonly SettingsConfig _settingsConfig;
     private bool _canCancel = true;
     private string _messageText;
     private ObservableCollection<CheckViewModel> _checks;
@@ -29,13 +30,21 @@ internal class MainViewModel : BaseViewModel {
     public MainViewModel(
         RevitRepository revitRepository,
         ILocalizationService localizationService,
+        IOpenFileDialogService openFileDialogService,
+        ISaveFileDialogService saveFileDialogService,
+        IMessageBoxService messageBoxService,
+        SettingsConfig settingsConfig,
         ChecksConfig checksConfig,
         FiltersConfig filtersConfig) {
 
         _filtersConfig = filtersConfig ?? throw new ArgumentNullException(nameof(filtersConfig));
         _revitRepository = revitRepository ?? throw new ArgumentNullException(nameof(revitRepository));
         _localizationService = localizationService ?? throw new ArgumentNullException(nameof(localizationService));
-        _checksConfig = checksConfig;
+        OpenFileDialogService = openFileDialogService ?? throw new ArgumentNullException(nameof(openFileDialogService));
+        SaveFileDialogService = saveFileDialogService ?? throw new ArgumentNullException(nameof(saveFileDialogService));
+        MessageBoxService = messageBoxService ?? throw new ArgumentNullException(nameof(messageBoxService));
+        _settingsConfig = settingsConfig ?? throw new ArgumentNullException(nameof(settingsConfig));
+        _checksConfig = checksConfig ?? throw new ArgumentNullException(nameof(checksConfig));
 
         if(_checksConfig != null && _checksConfig.Checks.Count > 0) {
             InitializeChecks();
@@ -72,6 +81,10 @@ internal class MainViewModel : BaseViewModel {
     public ICommand SaveAsClashesCommand { get; }
     public ICommand SaveClashesCommand { get; }
     public ICommand LoadClashCommand { get; }
+    public IOpenFileDialogService OpenFileDialogService { get; }
+    public ISaveFileDialogService SaveFileDialogService { get; }
+    public IMessageBoxService MessageBoxService { get; }
+
 
     public ObservableCollection<CheckViewModel> Checks {
         get => _checks;
@@ -84,18 +97,37 @@ internal class MainViewModel : BaseViewModel {
 
     private IEnumerable<CheckViewModel> InitializeChecks(ChecksConfig config) {
         foreach(var check in config.Checks) {
-            yield return new CheckViewModel(_revitRepository, _localizationService, _filtersConfig, check);
+            yield return new CheckViewModel(_revitRepository,
+                _localizationService,
+                OpenFileDialogService,
+                SaveFileDialogService,
+                MessageBoxService,
+                _settingsConfig,
+                _filtersConfig,
+                check);
         }
     }
 
     private void InitializeEmptyCheck() {
         Checks = [
-            new CheckViewModel(_revitRepository, _localizationService, _filtersConfig)
+            new CheckViewModel(_revitRepository,
+            _localizationService,
+            OpenFileDialogService,
+            SaveFileDialogService,
+            MessageBoxService,
+            _settingsConfig,
+            _filtersConfig)
         ];
     }
 
     private void AddCheck() {
-        Checks.Add(new CheckViewModel(_revitRepository, _localizationService, _filtersConfig));
+        Checks.Add(new CheckViewModel(_revitRepository,
+            _localizationService,
+            OpenFileDialogService,
+            SaveFileDialogService,
+            MessageBoxService,
+            _settingsConfig,
+            _filtersConfig));
     }
 
     private void RemoveCheck(CheckViewModel p) {
@@ -149,7 +181,7 @@ internal class MainViewModel : BaseViewModel {
 
     private void SaveAsConfig() {
         RenewConfig();
-        var s = new ConfigSaverService(_revitRepository);
+        var s = new ConfigSaverService(_revitRepository, SaveFileDialogService);
         s.Save(_checksConfig);
         MessageText = "Файл проверок успешно сохранен";
         Wait(() => { MessageText = null; });
@@ -157,7 +189,7 @@ internal class MainViewModel : BaseViewModel {
     }
 
     private void LoadConfig() {
-        var cl = new ConfigLoaderService(_revitRepository);
+        var cl = new ConfigLoaderService(_revitRepository, OpenFileDialogService, MessageBoxService);
         var config = cl.Load<ChecksConfig>();
         cl.CheckConfig(config);
 

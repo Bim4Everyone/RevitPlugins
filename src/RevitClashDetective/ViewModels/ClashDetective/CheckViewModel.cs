@@ -19,6 +19,7 @@ namespace RevitClashDetective.ViewModels.ClashDetective;
 internal class CheckViewModel : BaseViewModel, INamedEntity {
     private readonly RevitRepository _revitRepository;
     private readonly ILocalizationService _localizationService;
+    private readonly SettingsConfig _settingsConfig;
     private readonly FiltersConfig _filtersConfig;
     private string _name;
     private string _errorText;
@@ -29,14 +30,22 @@ internal class CheckViewModel : BaseViewModel, INamedEntity {
 
     public CheckViewModel(RevitRepository revitRepository,
         ILocalizationService localizationService,
+        IOpenFileDialogService openFileDialogService,
+        ISaveFileDialogService saveFileDialogService,
+        IMessageBoxService messageBoxService,
+        SettingsConfig settingsConfig,
         FiltersConfig filtersConfig,
         Check check = null) {
+
         _revitRepository = revitRepository ?? throw new ArgumentNullException(nameof(revitRepository));
         _localizationService = localizationService ?? throw new ArgumentNullException(nameof(localizationService));
+        OpenFileDialogService = openFileDialogService ?? throw new ArgumentNullException(nameof(openFileDialogService));
+        SaveFileDialogService = saveFileDialogService ?? throw new ArgumentNullException(nameof(saveFileDialogService));
+        MessageBoxService = messageBoxService ?? throw new ArgumentNullException(nameof(messageBoxService));
+        _settingsConfig = settingsConfig ?? throw new ArgumentNullException(nameof(settingsConfig));
         _filtersConfig = filtersConfig ?? throw new ArgumentNullException(nameof(filtersConfig));
 
         Name = check?.Name ?? "Без имени";
-
 
         if(check == null) {
             InitializeSelections();
@@ -84,6 +93,10 @@ internal class CheckViewModel : BaseViewModel, INamedEntity {
     }
 
     public string ReportName => $"{_revitRepository.GetDocumentName()}_{Name}";
+
+    public IOpenFileDialogService OpenFileDialogService { get; }
+    public ISaveFileDialogService SaveFileDialogService { get; }
+    public IMessageBoxService MessageBoxService { get; }
 
     /// <summary>
     /// Возвращает провайдеры для поиска коллизий. MainProviders - выборка 1 (слева), OtherProviders - выборка 2 (справа).
@@ -158,10 +171,14 @@ internal class CheckViewModel : BaseViewModel, INamedEntity {
     }
 
     private void ShowClashes() {
-        var view = new NavigatorView() {
+        var view = new NavigatorView(_settingsConfig) {
             DataContext = new ReportsViewModel(
             _revitRepository,
+            OpenFileDialogService,
+            SaveFileDialogService,
+            MessageBoxService,
             _localizationService,
+            _settingsConfig,
             ReportName) { OpenFromClashDetector = true }
         };
         view.Show();

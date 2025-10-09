@@ -1,7 +1,6 @@
 using System;
 
 using dosymep.Bim4Everyone.ProjectConfigs;
-using dosymep.Bim4Everyone.SimpleServices;
 using dosymep.SimpleServices;
 
 using RevitClashDetective.Models;
@@ -10,27 +9,25 @@ namespace RevitClashDetective.ViewModels.Services;
 internal class ConfigSaverService {
     private readonly RevitRepository _revitRepository;
 
-    public ConfigSaverService(RevitRepository revitRepository) {
-        _revitRepository = revitRepository;
+    public ConfigSaverService(RevitRepository revitRepository, ISaveFileDialogService saveFileDialogService) {
+        _revitRepository = revitRepository ?? throw new ArgumentNullException(nameof(revitRepository));
+        SaveFileDialogService = saveFileDialogService ?? throw new ArgumentNullException(nameof(saveFileDialogService));
     }
 
-    public void Save(ProjectConfig config) {
-        var saveWindow = GetPlatformService<ISaveFileDialogService>();
-        saveWindow.AddExtension = true;
-        saveWindow.Filter = "ClashConfig |*.json";
-        saveWindow.FilterIndex = 1;
+    public ISaveFileDialogService SaveFileDialogService { get; }
 
-        if(!saveWindow.ShowDialog(_revitRepository.GetFileDialogPath(), "config")) {
+    public void Save(ProjectConfig config) {
+        SaveFileDialogService.AddExtension = true;
+        SaveFileDialogService.Filter = "ClashConfig |*.json";
+        SaveFileDialogService.FilterIndex = 1;
+
+        if(!SaveFileDialogService.ShowDialog(_revitRepository.GetFileDialogPath(), "config")) {
             throw new OperationCanceledException();
         }
         var configSaver = new ConfigSaver(_revitRepository.Doc);
-        configSaver.Save(config, saveWindow.File.FullName);
+        configSaver.Save(config, SaveFileDialogService.File.FullName);
 
-        _revitRepository.CommonConfig.LastRunPath = saveWindow.File.DirectoryName;
+        _revitRepository.CommonConfig.LastRunPath = SaveFileDialogService.File.DirectoryName;
         _revitRepository.CommonConfig.SaveProjectConfig();
-    }
-
-    protected T GetPlatformService<T>() {
-        return ServicesProvider.GetPlatformService<T>();
     }
 }
