@@ -1,9 +1,18 @@
+using dosymep.SimpleServices;
+
 namespace RevitRooms.Views;
 /// <summary>
 /// Interaction logic for InfoElementsWindow.xaml
 /// </summary>
 public partial class InfoElementsWindow {
-    public InfoElementsWindow() {
+    public InfoElementsWindow(ILoggerService loggerService,
+                              ISerializationService serializationService,
+                              ILanguageService languageService, ILocalizationService localizationService,
+                              IUIThemeService uiThemeService, IUIThemeUpdaterService themeUpdaterService)
+                : base(loggerService,
+                       serializationService,
+                       languageService, localizationService,
+                       uiThemeService, themeUpdaterService) {
         InitializeComponent();
     }
 

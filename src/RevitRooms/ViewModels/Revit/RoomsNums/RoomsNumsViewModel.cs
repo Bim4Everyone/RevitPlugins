@@ -512,15 +512,15 @@ internal abstract class RoomsNumsViewModel : BaseViewModel, INumberingOrder {
 
     private bool ShowInfoElementsWindow(string title, ICollection<InfoElementViewModel> infoElements) {
         if(infoElements.Any()) {
-            var window = new InfoElementsWindow() {
-                Title = title,
-                DataContext = new InfoElementsViewModel() {
-                    InfoElement = infoElements.FirstOrDefault(),
-                    InfoElements = [.. infoElements]
-                }
-            };
+            //var window = new InfoElementsWindow() {
+            //    Title = title,
+            //    DataContext = new InfoElementsViewModel() {
+            //        InfoElement = infoElements.FirstOrDefault(),
+            //        InfoElements = [.. infoElements]
+            //    }
+            //};
 
-            window.Show();
+            //window.Show();
             return true;
         }
 

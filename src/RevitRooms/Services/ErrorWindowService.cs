@@ -27,7 +27,7 @@ internal class ErrorWindowService {
         }
 
         if(infoElements.Any()) {
-            InfoElementsWindow window = _resolutionRoot.Get<InfoElementsWindow>();
+            var window = _resolutionRoot.Get<InfoElementsWindow>();
             window.Title = title;
             window.DataContext = new InfoElementsViewModel() {
                 InfoElement = infoElements.FirstOrDefault(),
