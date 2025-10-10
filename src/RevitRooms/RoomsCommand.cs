@@ -35,16 +35,6 @@ public class RoomsCommand : BasePluginCommand {
             .ToSelf()
             .InSingletonScope();
 
-        bool isChecked = new CheckProjectParams(uiApplication)
-            .CopyProjectParams()
-            .CopyKeySchedules()
-            .CheckKeySchedules()
-            .GetIsChecked();
-
-        if(!isChecked) {
-            throw new OperationCanceledException();
-        }
-
         // Настройка конфигурации плагина
         kernel.Bind<RoomsConfig>()
             .ToMethod(c => RoomsConfig.GetRoomsConfig(c.Kernel.Get<IConfigSerializer>()));
