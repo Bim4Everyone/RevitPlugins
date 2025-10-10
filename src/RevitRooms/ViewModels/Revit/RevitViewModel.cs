@@ -14,6 +14,7 @@ using dosymep.WPF.ViewModels;
 
 using RevitRooms.Models;
 using RevitRooms.Models.Calculation;
+using RevitRooms.Services;
 using RevitRooms.Views;
 
 namespace RevitRooms.ViewModels;
@@ -21,14 +22,16 @@ internal abstract class RevitViewModel : BaseViewModel {
     public Guid _id;
     protected readonly RevitRepository _revitRepository;
     private readonly RoomsConfig _roomsConfig;
+    private readonly ErrorWindowService _errorWindowService;
 
     private string _errorText;
     private bool _isAllowSelectLevels;
     private bool _isFillLevel;
 
-    public RevitViewModel(RevitRepository revitRepository, RoomsConfig roomsConfig) {
+    public RevitViewModel(RevitRepository revitRepository, RoomsConfig roomsConfig, ErrorWindowService errorWindowService) {
         _revitRepository = revitRepository;
         _roomsConfig = roomsConfig;
+        _errorWindowService = errorWindowService;
 
         Levels = [.. GetLevelViewModels().OrderBy(item => item.Element.Elevation).Where(item => item.SpatialElements.Count > 0)];
         AdditionalPhases = [.. _revitRepository.GetAdditionalPhases().Select(item => new PhaseViewModel(item, _revitRepository))];
@@ -143,7 +146,7 @@ internal abstract class RevitViewModel : BaseViewModel {
 
         InfoElements = errorElements.Values.ToList();
         if(InfoElements.Count > 0) {
-            ShowInfoElementsWindow("Ошибки", InfoElements);
+            _errorWindowService.ShowNoticeWindow("Ошибки", NotShowWarnings, InfoElements);
             return;
         }
 
@@ -184,7 +187,7 @@ internal abstract class RevitViewModel : BaseViewModel {
         }
 
         InfoElements.AddRange(bigChangesRooms.Values);
-        if(!ShowInfoElementsWindow("Информация", InfoElements)) {
+        if(!_errorWindowService.ShowNoticeWindow("Информация", NotShowWarnings, InfoElements)) {
             TaskDialog.Show("Предупреждение!", "Расчет завершен!");
         }
     }
@@ -208,7 +211,7 @@ internal abstract class RevitViewModel : BaseViewModel {
         // Проверка всех элементов
         // на выделенных уровнях
         if(CheckElements(phases, levels)) {
-            ShowInfoElementsWindow("Ошибки", InfoElements);
+            _errorWindowService.ShowNoticeWindow("Ошибки", NotShowWarnings, InfoElements);
             return;
         }
 
@@ -440,7 +443,7 @@ internal abstract class RevitViewModel : BaseViewModel {
 
         transaction.Commit();
         InfoElements.AddRange(bigChangesRooms.Values);
-        if(!ShowInfoElementsWindow("Информация", InfoElements)) {
+        if(!_errorWindowService.ShowNoticeWindow("Информация", NotShowWarnings, InfoElements)) {
             TaskDialog.Show("Предупреждение!", "Расчет завершен!");
         }
     }
@@ -534,26 +537,26 @@ internal abstract class RevitViewModel : BaseViewModel {
         value.Elements.Add(new MessageElementViewModel() { Element = element, Description = message });
     }
 
-    private bool ShowInfoElementsWindow(string title, IEnumerable<InfoElementViewModel> infoElements) {
-        if(NotShowWarnings) {
-            infoElements = infoElements.Where(item => item.TypeInfo != TypeInfo.Warning);
-        }
+    //private bool ShowInfoElementsWindow(string title, IEnumerable<InfoElementViewModel> infoElements) {
+    //    if(NotShowWarnings) {
+    //        infoElements = infoElements.Where(item => item.TypeInfo != TypeInfo.Warning);
+    //    }
 
-        if(infoElements.Any()) {
-            var window = new InfoElementsWindow() {
-                Title = title,
-                DataContext = new InfoElementsViewModel() {
-                    InfoElement = infoElements.FirstOrDefault(),
-                    InfoElements = [.. infoElements]
-                }
-            };
+    //    if(infoElements.Any()) {
+    //        var window = new InfoElementsWindow() {
+    //            Title = title,
+    //            DataContext = new InfoElementsViewModel() {
+    //                InfoElement = infoElements.FirstOrDefault(),
+    //                InfoElements = [.. infoElements]
+    //            }
+    //        };
 
-            window.Show();
-            return true;
-        }
+    //        window.Show();
+    //        return true;
+    //    }
 
-        return false;
-    }
+    //    return false;
+    //}
 
     protected IEnumerable<SpatialElement> GetAdditionalElements(IList<SpatialElement> selectedElements) {
         var levelIds = selectedElements.Select(item => item.LevelId).Distinct().ToArray();

@@ -17,6 +17,7 @@ using dosymep.WpfUI.Core.Ninject;
 using Ninject;
 
 using RevitRooms.Models;
+using RevitRooms.Services;
 using RevitRooms.ViewModels;
 using RevitRooms.Views;
 
@@ -35,6 +36,10 @@ public class RoomsCommand : BasePluginCommand {
             .ToSelf()
             .InSingletonScope();
 
+        kernel.Bind<ErrorWindowService>()
+            .ToSelf()
+            .InSingletonScope();
+
         // Настройка конфигурации плагина
         kernel.Bind<RoomsConfig>()
             .ToMethod(c => RoomsConfig.GetRoomsConfig(c.Kernel.Get<IConfigSerializer>()));
@@ -44,6 +49,7 @@ public class RoomsCommand : BasePluginCommand {
 
         // Настройка запуска окна
         kernel.BindMainWindow<RoomsViewModel, RoomsWindow>();
+        kernel.BindOtherWindow<InfoElementsViewModel, InfoElementsWindow>();
 
         // Настройка локализации,
         // получение имени сборки откуда брать текст

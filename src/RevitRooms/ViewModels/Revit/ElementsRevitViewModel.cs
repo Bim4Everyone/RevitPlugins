@@ -3,11 +3,12 @@ using System.Collections.Generic;
 using System.Linq;
 
 using RevitRooms.Models;
+using RevitRooms.Services;
 
 namespace RevitRooms.ViewModels.Revit;
 internal class ElementsRevitViewModel : RevitViewModel {
-    public ElementsRevitViewModel(RevitRepository revitRepository, RoomsConfig roomsConfig)
-        : base(revitRepository, roomsConfig) {
+    public ElementsRevitViewModel(RevitRepository revitRepository, RoomsConfig roomsConfig, ErrorWindowService errorWindowService)
+        : base(revitRepository, roomsConfig, errorWindowService) {
         _id = new Guid("19723C2C-75ED-4B0A-8279-8493A949E52F");
         IsAllowSelectLevels = true;
     }

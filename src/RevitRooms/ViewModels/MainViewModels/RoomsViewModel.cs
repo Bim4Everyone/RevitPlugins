@@ -13,6 +13,7 @@ using dosymep.WPF.Commands;
 using dosymep.WPF.ViewModels;
 
 using RevitRooms.Models;
+using RevitRooms.Services;
 using RevitRooms.ViewModels.Revit;
 
 namespace RevitRooms.ViewModels;
@@ -20,16 +21,19 @@ internal class RoomsViewModel : BaseViewModel {
     private readonly RoomsConfig _roomsConfig;
     private readonly RevitRepository _revitRepository;
     private readonly ILocalizationService _localizationService;
+    private readonly ErrorWindowService _errorWindowService;
 
     private ObservableCollection<RevitViewModel> _revitViewModels;
     private RevitViewModel _revitViewModel;
 
     public RoomsViewModel(RoomsConfig roomsConfig,
                           RevitRepository revitRepository,
-                          ILocalizationService localizationService) {
+                          ILocalizationService localizationService,
+                          ErrorWindowService errorWindowService) {
         _roomsConfig = roomsConfig;
         _revitRepository = revitRepository;
         _localizationService = localizationService;
+        _errorWindowService = errorWindowService;
 
         LoadViewCommand = RelayCommand.Create(LoadView);
     }
@@ -60,13 +64,13 @@ internal class RoomsViewModel : BaseViewModel {
         }
 
         RevitViewModels = [
-            new ViewRevitViewModel(_revitRepository, _roomsConfig) {
+            new ViewRevitViewModel(_revitRepository, _roomsConfig, _errorWindowService) {
                 Name = _localizationService.GetLocalizedString("MainWindow.ViewRevitName")
             },
-            new ElementsRevitViewModel(_revitRepository, _roomsConfig) {
+            new ElementsRevitViewModel(_revitRepository, _roomsConfig, _errorWindowService) {
                 Name = _localizationService.GetLocalizedString("MainWindow.ElementsRevitName") 
             },
-            new SelectedRevitViewModel(_revitRepository, _roomsConfig) {
+            new SelectedRevitViewModel(_revitRepository, _roomsConfig, _errorWindowService) {
                 Name = _localizationService.GetLocalizedString("MainWindow.SelectedRevitName")
             },
         ];
