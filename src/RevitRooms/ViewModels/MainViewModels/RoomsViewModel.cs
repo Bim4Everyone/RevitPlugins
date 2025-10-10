@@ -61,20 +61,22 @@ internal class RoomsViewModel : BaseViewModel {
 
         RevitViewModels = [
             new ViewRevitViewModel(_revitRepository, _roomsConfig) {
-                Name = "Выборка по текущему виду"
-                //Name = _localizationService.GetLocalizedString("MainWindow.ViewRevitName")
+                Name = _localizationService.GetLocalizedString("MainWindow.ViewRevitName")
             },
             new ElementsRevitViewModel(_revitRepository, _roomsConfig) {
-                Name = "Выборка по всем элементам" },
+                Name = _localizationService.GetLocalizedString("MainWindow.ElementsRevitName") 
+            },
             new SelectedRevitViewModel(_revitRepository, _roomsConfig) {
-                Name = "Выборка по выделенным элементам" }
+                Name = _localizationService.GetLocalizedString("MainWindow.SelectedRevitName")
+            },
         ];
 
         RevitViewModel = RevitViewModels[1];
 
         var settings = _roomsConfig.GetSettings(_revitRepository.Document);
         if(settings != null) {
-            RevitViewModel = RevitViewModels.FirstOrDefault(item => item._id == settings.SelectedRoomId) ?? RevitViewModel;
+            RevitViewModel = RevitViewModels
+                .FirstOrDefault(item => item._id == settings.SelectedRoomId) ?? RevitViewModel;
         }
     }
 }

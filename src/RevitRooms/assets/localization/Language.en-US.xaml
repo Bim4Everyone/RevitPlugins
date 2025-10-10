@@ -3,4 +3,8 @@
                     xmlns:system="clr-namespace:System;assembly=mscorlib">
 
     <system:String x:Key="MainWindow.Title">Rooms</system:String>
+    
+    <system:String x:Key="MainWindow.ViewRevitName">Active view selection</system:String>
+    <system:String x:Key="MainWindow.ElementsRevitName">All elements selection</system:String>
+    <system:String x:Key="MainWindow.SelectedRevitName">Selected elements selection</system:String>
 </ResourceDictionary>

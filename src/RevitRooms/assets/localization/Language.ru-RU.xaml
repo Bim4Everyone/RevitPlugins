@@ -3,4 +3,8 @@
                     xmlns:system="clr-namespace:System;assembly=mscorlib">
 
     <system:String x:Key="MainWindow.Title">Квартирография</system:String>
+    
+    <system:String x:Key="MainWindow.ViewRevitName">Выборка по текущему виду</system:String>
+    <system:String x:Key="MainWindow.ElementsRevitName">Выборка по всем элементам</system:String>
+    <system:String x:Key="MainWindow.SelectedRevitName">Выборка по выделенным элементам</system:String>
 </ResourceDictionary>
