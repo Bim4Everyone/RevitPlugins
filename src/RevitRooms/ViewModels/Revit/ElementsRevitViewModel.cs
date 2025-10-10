@@ -6,8 +6,8 @@ using RevitRooms.Models;
 
 namespace RevitRooms.ViewModels.Revit;
 internal class ElementsRevitViewModel : RevitViewModel {
-    public ElementsRevitViewModel(RevitRepository revitRepository)
-        : base(revitRepository) {
+    public ElementsRevitViewModel(RevitRepository revitRepository, RoomsConfig roomsConfig)
+        : base(revitRepository, roomsConfig) {
         _id = new Guid("19723C2C-75ED-4B0A-8279-8493A949E52F");
         IsAllowSelectLevels = true;
     }

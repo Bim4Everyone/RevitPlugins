@@ -9,6 +9,7 @@ using Autodesk.Revit.UI;
 using DevExpress.Xpf.CodeView.Margins;
 
 using dosymep.Bim4Everyone;
+using dosymep.Bim4Everyone.ProjectConfigs;
 using dosymep.Bim4Everyone.SimpleServices;
 using dosymep.WpfCore.Ninject;
 using dosymep.WpfUI.Core.Ninject;
@@ -43,6 +44,10 @@ public class RoomsCommand : BasePluginCommand {
         if(!isChecked) {
             throw new OperationCanceledException();
         }
+
+        // Настройка конфигурации плагина
+        kernel.Bind<RoomsConfig>()
+            .ToMethod(c => RoomsConfig.GetRoomsConfig(c.Kernel.Get<IConfigSerializer>()));
 
         // Используем сервис обновления тем для WinUI
         kernel.UseWpfUIThemeUpdater();

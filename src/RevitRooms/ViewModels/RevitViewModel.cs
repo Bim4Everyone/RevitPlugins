@@ -20,13 +20,15 @@ namespace RevitRooms.ViewModels;
 internal abstract class RevitViewModel : BaseViewModel {
     public Guid _id;
     protected readonly RevitRepository _revitRepository;
+    private readonly RoomsConfig _roomsConfig;
 
     private string _errorText;
     private bool _isAllowSelectLevels;
     private bool _isFillLevel;
 
-    public RevitViewModel(RevitRepository revitRepository) {
+    public RevitViewModel(RevitRepository revitRepository, RoomsConfig roomsConfig) {
         _revitRepository = revitRepository;
+        _roomsConfig = roomsConfig;
 
         Levels = [.. GetLevelViewModels().OrderBy(item => item.Element.Elevation).Where(item => item.SpatialElements.Count > 0)];
         AdditionalPhases = [.. _revitRepository.GetAdditionalPhases().Select(item => new PhaseViewModel(item, _revitRepository))];
@@ -83,8 +85,7 @@ internal abstract class RevitViewModel : BaseViewModel {
     protected abstract IEnumerable<LevelViewModel> GetLevelViewModels();
 
     private void SetRoomsConfig() {
-        var roomsConfig = RoomsConfig.GetRoomsConfig();
-        var settings = roomsConfig.GetSettings(_revitRepository.Document);
+        var settings = _roomsConfig.GetSettings(_revitRepository.Document);
         if(settings == null) {
             return;
         }
@@ -111,9 +112,8 @@ internal abstract class RevitViewModel : BaseViewModel {
     }
 
     private void SaveRoomsConfig() {
-        var roomsConfig = RoomsConfig.GetRoomsConfig();
-        var settings = roomsConfig.GetSettings(_revitRepository.Document);
-        settings ??= roomsConfig.AddSettings(_revitRepository.Document);
+        var settings = _roomsConfig.GetSettings(_revitRepository.Document);
+        settings ??= _roomsConfig.AddSettings(_revitRepository.Document);
 
         settings.IsFillLevel = IsFillLevel;
         settings.NotShowWarnings = NotShowWarnings;
@@ -129,7 +129,7 @@ internal abstract class RevitViewModel : BaseViewModel {
 
         settings.Levels = Levels.Where(item => item.IsSelected).Select(item => item.ElementId).ToList();
 
-        roomsConfig.SaveProjectConfig();
+        _roomsConfig.SaveProjectConfig();
     }
 
     private void CalculateAreas(object p) {
