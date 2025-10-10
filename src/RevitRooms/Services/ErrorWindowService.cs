@@ -27,12 +27,11 @@ internal class ErrorWindowService {
         }
 
         if(infoElements.Any()) {
-            var window = new InfoElementsWindow() {
-                Title = title,
-                DataContext = new InfoElementsViewModel() {
-                    InfoElement = infoElements.FirstOrDefault(),
-                    InfoElements = [.. infoElements]
-                }
+            InfoElementsWindow window = _resolutionRoot.Get<InfoElementsWindow>();
+            window.Title = title;
+            window.DataContext = new InfoElementsViewModel() {
+                InfoElement = infoElements.FirstOrDefault(),
+                InfoElements = [.. infoElements]
             };
 
             window.Show();
