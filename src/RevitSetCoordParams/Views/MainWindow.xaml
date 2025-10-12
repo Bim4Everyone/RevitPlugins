@@ -6,6 +6,7 @@
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:base="clr-namespace:dosymep.WPF.Views"
     xmlns:local="clr-namespace:RevitSetCoordParams.Views"
+    xmlns:edits="clr-namespace:RevitSetCoordParams.Views.Edits"
     xmlns:vms="clr-namespace:RevitSetCoordParams.ViewModels"
     xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
     xmlns:core="clr-namespace:dosymep.WpfUI.Core"
@@ -15,11 +16,11 @@
     mc:Ignorable="d"
     Title="{me:LocalizationSource MainWindow.Title}"
     
-    Height="500"
-    Width="700"
+    Height="710"
+    Width="900"
     
-    MinHeight="500"
-    MinWidth="700"
+    MinHeight="710"
+    MinWidth="900"
    
     d:DataContext="{d:DesignInstance vms:MainViewModel, IsDesignTimeCreatable=False}">
 
@@ -40,12 +41,160 @@
             Grid.Row="0"
             Title="{me:LocalizationSource MainWindow.Title}" />
 
-        <ui:TextBox
+        <ScrollViewer
             Grid.Row="1"
-            Width="200"
-            VerticalAlignment="Center"
-            HorizontalAlignment="Center"
-            Text="{Binding SaveProperty, UpdateSourceTrigger=PropertyChanged}" />
+            VerticalScrollBarVisibility="Auto"
+            HorizontalScrollBarVisibility="Disabled">
+            
+            <StackPanel
+                Margin="10">
+
+                <edits:CustomEditControl
+                    Icon="{ui:SymbolIcon fullScreenMaximize24}"
+                    Header="{me:LocalizationSource MainWindow.RangeElements}"
+                    Description="{me:LocalizationSource MainWindow.RangeElementsDescription}">
+
+                    <ComboBox
+                        ItemsSource="{Binding RangeElements}"
+                        SelectedValue="{Binding SelectedRangeElement}" />
+                </edits:CustomEditControl>
+
+                <edits:CustomEditControl
+                    Icon="{ui:SymbolIcon mobileOptimized24}"
+                    Header="{me:LocalizationSource MainWindow.SourceFiles}"
+                    Description="{me:LocalizationSource MainWindow.SourceFilesDescription}">
+
+                    <ComboBox
+                        ItemsSource="{Binding SourceFiles}"
+                        SelectedValue="{Binding SelectedSourceFile}" />
+                </edits:CustomEditControl>
+
+                <edits:CustomEditControl
+                    Icon="{ui:SymbolIcon grid24}"
+                    Header="{me:LocalizationSource MainWindow.TypeModels}"
+                    Description="{me:LocalizationSource MainWindow.TypeModelsDescription}">
+
+                    <ComboBox
+                        ItemsSource="{Binding TypeModels}"
+                        SelectedValue="{Binding SelectedTypeModel}" />
+                </edits:CustomEditControl>
+
+                <edits:CustomEditControl
+                    Icon="{ui:SymbolIcon fullScreenMinimize24}"
+                    Header="{me:LocalizationSource MainWindow.Positions}"
+                    Description="{me:LocalizationSource MainWindow.PositionsDescription}">
+
+                    <ComboBox
+                        ItemsSource="{Binding Position}"
+                        SelectedValue="{Binding SelectedPosition}" />
+                </edits:CustomEditControl>
+
+                <edits:CustomGroupEditControl
+                    Icon="{ui:SymbolIcon clipboardTaskListLtr24}"
+                    Header="{me:LocalizationSource MainWindow.Parameters}"
+                    Description="{me:LocalizationSource MainWindow.ParametersDescription}">
+
+                    <edits:CustomGroupEditControl.EditControl>
+                        <ItemsControl
+                            ItemsSource="{Binding Parameters}">
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate
+                                    DataType="{x:Type vms:ParamViewModel}">
+                                    <edits:ParamControl
+                                        Header="{Binding Header}"
+                                        Description="{Binding Description}"
+                                        SwitchOnContent="{Binding SwitchOnContent}"
+                                        SwitchOffContent="{Binding SwitchOffContent}"
+                                        IsChecked="{Binding IsChecked, Mode=TwoWay}"
+                                        CommonParamHeader="{Binding CommonParamHeader}"
+                                        CommonParam="{Binding CommonParam, Mode=TwoWay}"
+                                        ElementParamHeader="{Binding ElementParamHeader}"
+                                        ElementParam="{Binding ElementParam, Mode=TwoWay}" />
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+
+                            
+                            <ItemsControl.ItemsPanel>
+                                <ItemsPanelTemplate>
+                                    <StackPanel />
+                                </ItemsPanelTemplate>
+                            </ItemsControl.ItemsPanel>
+                        </ItemsControl>
+                    </edits:CustomGroupEditControl.EditControl>
+
+                </edits:CustomGroupEditControl>
+
+                <edits:CustomGroupEditControl
+                    Icon="{ui:SymbolIcon form24}"                     
+                    Header="{me:LocalizationSource MainWindow.Categories}"
+                    Description="{me:LocalizationSource MainWindow.CategoriesDescription}"
+                    ExtraIconVisible="True">                    
+                    <edits:CustomGroupEditControl.ExtraIcon>
+                        <ui:SymbolIcon                            
+                            Symbol="Warning24"
+                            Foreground="OrangeRed"
+                            FontSize="24"
+                            ToolTip="{me:LocalizationSource MainWindow.CategoryWarningTooltip}"/>
+                    </edits:CustomGroupEditControl.ExtraIcon>
+
+                    <edits:CustomGroupEditControl.EditControl>
+                        <ItemsControl
+                            ItemsSource="{Binding Categories}">
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate
+                                    DataType="{x:Type vms:CategoryViewModel}">
+                                    <edits:CategoryControl
+                                        CategoryName="{Binding CategoryName}"
+                                        IsChecked="{Binding IsChecked, Mode=TwoWay}"
+                                        HasWarning="{Binding HasWarning, Mode=TwoWay}"
+                                        WarningDescription="{Binding WarningDescription}" />
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+
+                            <ItemsControl.ItemsPanel>
+                                <ItemsPanelTemplate>
+                                    <UniformGrid Columns="3" />
+                                </ItemsPanelTemplate>
+                            </ItemsControl.ItemsPanel>
+                        </ItemsControl>
+                    </edits:CustomGroupEditControl.EditControl>
+
+                </edits:CustomGroupEditControl>
+                
+                <edits:CustomGroupEditControl                    
+                    Icon="{ui:SymbolIcon search24}"
+                    Header="{me:LocalizationSource MainWindow.Search}"
+                    Description="{me:LocalizationSource MainWindow.SearchDescription}"                    
+                    ToggleSwitchVisible="True"
+                    SwitchOnContent="{me:LocalizationSource MainWindow.ToggleSwitch.On}"
+                    SwitchOffContent="{me:LocalizationSource MainWindow.ToggleSwitch.Off}">
+
+                    <StackPanel>
+                        <edits:CustomEditControl
+                            Icon="{ui:SymbolIcon addCircle24}"
+                            Header="{me:LocalizationSource MainWindow.MaxDiameterFindSphere}"
+                            Description="{me:LocalizationSource MainWindow.MaxDiameterFindSphereDescription}">
+
+                            <ui:TextBox
+                                Text="{Binding MaxDiameterFindingSphere, UpdateSourceTrigger=PropertyChanged}"
+                                ToolTip="{me:LocalizationSource MainWindow.FindSphereTooltip}"/>
+                        </edits:CustomEditControl>
+
+                        <edits:CustomEditControl
+                            Icon="{ui:SymbolIcon addSubtractCircle24}"
+                            Header="{me:LocalizationSource MainWindow.StepFindSphere}"
+                            Description="{me:LocalizationSource MainWindow.StepFindSphereDescription}">
+
+                            <ui:TextBox
+                                Text="{Binding StepDiameterFindingSphere, UpdateSourceTrigger=PropertyChanged}"                                
+                                ToolTip="{me:LocalizationSource MainWindow.StepFindSphereTooltip}" />
+                        </edits:CustomEditControl>
+                        
+                    </StackPanel>
+                    
+                </edits:CustomGroupEditControl>
+            </StackPanel>
+        </ScrollViewer>        
 
         <StackPanel
             Grid.Row="2"
@@ -60,7 +209,7 @@
 
             <ui:Button
                 Margin="10"
-                Width="80"
+                Width="110"
                 Appearance="Info"
                 Content="{me:LocalizationSource MainWindow.ButtonOk}"
                 Click="ButtonOk_Click"
@@ -68,7 +217,7 @@
 
             <ui:Button
                 Margin="10"
-                Width="80"
+                Width="110"
                 Content="{me:LocalizationSource MainWindow.ButtonCancel}"
                 IsCancel="True"
                 Click="ButtonCancel_Click" />

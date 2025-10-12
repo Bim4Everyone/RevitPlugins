@@ -1,3 +1,4 @@
+using System.Collections.ObjectModel;
 using System.Windows.Input;
 
 using dosymep.SimpleServices;
@@ -18,7 +19,7 @@ internal class MainViewModel : BaseViewModel {
 
     private string _errorText;
     private string _saveProperty;
-    
+
     /// <summary>
     /// Создает экземпляр основной ViewModel главного окна.
     /// </summary>
@@ -29,20 +30,207 @@ internal class MainViewModel : BaseViewModel {
         PluginConfig pluginConfig,
         RevitRepository revitRepository,
         ILocalizationService localizationService) {
-        
+
         _pluginConfig = pluginConfig;
         _revitRepository = revitRepository;
         _localizationService = localizationService;
 
         LoadViewCommand = RelayCommand.Create(LoadView);
         AcceptViewCommand = RelayCommand.Create(AcceptView, CanAcceptView);
+
+        Parameters.Add(new ParamViewModel {
+            Header = "Параметр 1",
+            Description = "Описание параметра 1",
+            CommonParamHeader = "Параметр донора",
+            CommonParam = "ФОП_Этаж СМР",
+            ElementParamHeader = "Параметр элемента",
+            ElementParam = "ФОП_Этаж СМР"
+        });
+
+        Parameters.Add(new ParamViewModel {
+            Header = "Параметр 2",
+            Description = "Описание параметра 2",
+            CommonParamHeader = "Параметр донора",
+            CommonParam = "ФОП_Секция СМР",
+            ElementParamHeader = "Параметр элемента",
+            ElementParam = "ФОП_Секция СМР"
+        });
+
+        Categories.Add(new CategoryViewModel {
+            CategoryName = "Стены",
+            IsChecked = true,
+            HasWarning = true,
+            WarningDescription = "Отсутствуют параметры: ФОП_Этаж СМР, ФОП_Секция СМР"
+        });
+
+        Categories.Add(new CategoryViewModel {
+            CategoryName = "Перекрытия",
+            IsChecked = true,
+            HasWarning = true,
+            WarningDescription = "Отсутствуют параметры: ФОП_Этаж СМР, ФОП_Секция СМР"
+        });
+
+        Categories.Add(new CategoryViewModel {
+            CategoryName = "Потолки",
+            IsChecked = true,
+            HasWarning = true,
+            WarningDescription = "Отсутствуют параметры: ФОП_Этаж СМР, ФОП_Секция СМР"
+        });
+
+        Categories.Add(new CategoryViewModel {
+            CategoryName = "Каркас несущий",
+            IsChecked = true,
+            HasWarning = true,
+            WarningDescription = "Отсутствуют параметры: ФОП_Этаж СМР, ФОП_Секция СМР"
+        });
+
+        Categories.Add(new CategoryViewModel {
+            CategoryName = "Фундаменты несущей конструкции",
+            IsChecked = true,
+            HasWarning = true,
+            WarningDescription = "Отсутствуют параметры: ФОП_Этаж СМР, ФОП_Секция СМР"
+        });
+
+        Categories.Add(new CategoryViewModel {
+            CategoryName = "Колонны",
+            IsChecked = true,
+            HasWarning = true,
+            WarningDescription = "Отсутствуют параметры: ФОП_Этаж СМР, ФОП_Секция СМР"
+        });
+
+        Categories.Add(new CategoryViewModel {
+            CategoryName = "Воздуховоды",
+            IsChecked = true,
+            HasWarning = true,
+            WarningDescription = "Отсутствуют параметры: ФОП_Этаж СМР, ФОП_Секция СМР"
+        });
+
+        Categories.Add(new CategoryViewModel {
+            CategoryName = "Стены",
+            IsChecked = true,
+            HasWarning = true,
+            WarningDescription = "Отсутствуют параметры: ФОП_Этаж СМР, ФОП_Секция СМР"
+        });
+
+
+        Categories.Add(new CategoryViewModel {
+            CategoryName = "Стены",
+            IsChecked = true,
+            HasWarning = true,
+            WarningDescription = "Отсутствуют параметры: ФОП_Этаж СМР, ФОП_Секция СМР"
+        });
+
+        Categories.Add(new CategoryViewModel {
+            CategoryName = "Перекрытия",
+            IsChecked = true,
+            HasWarning = true,
+            WarningDescription = "Отсутствуют параметры: ФОП_Этаж СМР, ФОП_Секция СМР"
+        });
+
+        Categories.Add(new CategoryViewModel {
+            CategoryName = "Потолки",
+            IsChecked = true,
+            HasWarning = true,
+            WarningDescription = "Отсутствуют параметры: ФОП_Этаж СМР, ФОП_Секция СМР"
+        });
+
+        Categories.Add(new CategoryViewModel {
+            CategoryName = "Каркас несущий",
+            IsChecked = true,
+            HasWarning = true,
+            WarningDescription = "Отсутствуют параметры: ФОП_Этаж СМР, ФОП_Секция СМР"
+        });
+
+        Categories.Add(new CategoryViewModel {
+            CategoryName = "Фундаменты несущей конструкции",
+            IsChecked = true,
+            HasWarning = true,
+            WarningDescription = "Отсутствуют параметры: ФОП_Этаж СМР, ФОП_Секция СМР"
+        });
+
+        Categories.Add(new CategoryViewModel {
+            CategoryName = "Колонны",
+            IsChecked = true,
+            HasWarning = true,
+            WarningDescription = "Отсутствуют параметры: ФОП_Этаж СМР, ФОП_Секция СМР"
+        });
+
+        Categories.Add(new CategoryViewModel {
+            CategoryName = "Воздуховоды",
+            IsChecked = true,
+            HasWarning = true,
+            WarningDescription = "Отсутствуют параметры: ФОП_Этаж СМР, ФОП_Секция СМР"
+        });
+
+        Categories.Add(new CategoryViewModel {
+            CategoryName = "Стены",
+            IsChecked = true,
+            HasWarning = true,
+            WarningDescription = "Отсутствуют параметры: ФОП_Этаж СМР, ФОП_Секция СМР"
+        });
+
+        Categories.Add(new CategoryViewModel {
+            CategoryName = "Стены",
+            IsChecked = true,
+            HasWarning = true,
+            WarningDescription = "Отсутствуют параметры: ФОП_Этаж СМР, ФОП_Секция СМР"
+        });
+
+        Categories.Add(new CategoryViewModel {
+            CategoryName = "Перекрытия",
+            IsChecked = true,
+            HasWarning = true,
+            WarningDescription = "Отсутствуют параметры: ФОП_Этаж СМР, ФОП_Секция СМР"
+        });
+
+        Categories.Add(new CategoryViewModel {
+            CategoryName = "Потолки",
+            IsChecked = true,
+            HasWarning = true,
+            WarningDescription = "Отсутствуют параметры: ФОП_Этаж СМР, ФОП_Секция СМР"
+        });
+
+        Categories.Add(new CategoryViewModel {
+            CategoryName = "Каркас несущий",
+            IsChecked = true,
+            HasWarning = true,
+            WarningDescription = "Отсутствуют параметры: ФОП_Этаж СМР, ФОП_Секция СМР"
+        });
+
+        Categories.Add(new CategoryViewModel {
+            CategoryName = "Фундаменты несущей конструкции",
+            IsChecked = true,
+            HasWarning = true,
+            WarningDescription = "Отсутствуют параметры: ФОП_Этаж СМР, ФОП_Секция СМР"
+        });
+
+        Categories.Add(new CategoryViewModel {
+            CategoryName = "Колонны",
+            IsChecked = true,
+            HasWarning = true,
+            WarningDescription = "Отсутствуют параметры: ФОП_Этаж СМР, ФОП_Секция СМР"
+        });
+
+        Categories.Add(new CategoryViewModel {
+            CategoryName = "Воздуховоды",
+            IsChecked = true,
+            HasWarning = true,
+            WarningDescription = "Отсутствуют параметры: ФОП_Этаж СМР, ФОП_Секция СМР"
+        });
+
+        Categories.Add(new CategoryViewModel {
+            CategoryName = "Стены",
+            IsChecked = true,
+            HasWarning = true,
+            WarningDescription = "Отсутствуют параметры: ФОП_Этаж СМР, ФОП_Секция СМР"
+        });
     }
 
     /// <summary>
     /// Команда загрузки главного окна.
     /// </summary>
     public ICommand LoadViewCommand { get; }
-    
+
     /// <summary>
     /// Команда применения настроек главного окна. (запуск плагина)
     /// </summary>
@@ -56,6 +244,10 @@ internal class MainViewModel : BaseViewModel {
         get => _errorText;
         set => RaiseAndSetIfChanged(ref _errorText, value);
     }
+
+    public ObservableCollection<ParamViewModel> Parameters { get; } = [];
+
+    public ObservableCollection<CategoryViewModel> Categories { get; } = [];
 
     /// <summary>
     /// Свойство для примера. (требуется удалить)
@@ -105,7 +297,7 @@ internal class MainViewModel : BaseViewModel {
     /// Загрузка настроек плагина.
     /// </summary>
     private void LoadConfig() {
-        RevitSettings setting = _pluginConfig.GetSettings(_revitRepository.Document);
+        var setting = _pluginConfig.GetSettings(_revitRepository.Document);
 
         SaveProperty = setting?.SaveProperty ?? _localizationService.GetLocalizedString("MainWindow.Hello");
     }
@@ -114,7 +306,7 @@ internal class MainViewModel : BaseViewModel {
     /// Сохранение настроек плагина.
     /// </summary>
     private void SaveConfig() {
-        RevitSettings setting = _pluginConfig.GetSettings(_revitRepository.Document)
+        var setting = _pluginConfig.GetSettings(_revitRepository.Document)
                                 ?? _pluginConfig.AddSettings(_revitRepository.Document);
 
         setting.SaveProperty = SaveProperty;

@@ -1,13 +1,29 @@
 <ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-                    xmlns:system="clr-namespace:System;assembly=mscorlib">
+                    xmlns:system="clr-namespace:System;assembly=mscorlib"> 
 
-    <!-- Пример перевода на английский американский язык (google translate) -->
+    <system:String x:Key="MainWindow.Title">Set parameters SMR</system:String>
+    <system:String x:Key="MainWindow.RangeElements">Model element processing range</system:String>
+    <system:String x:Key="MainWindow.RangeElementsDescription">Select how model elements will be processed</system:String>
+    <system:String x:Key="MainWindow.SourceFiles">File with common models</system:String>
+    <system:String x:Key="MainWindow.SourceFilesDescription">The file from which the data will be read</system:String>
+    <system:String x:Key="MainWindow.TypeModels">Type of common models</system:String>
+    <system:String x:Key="MainWindow.TypeModelsDescription">Value of the parameter "" of construction elements</system:String>
+    <system:String x:Key="MainWindow.Positions">Element position</system:String>
+    <system:String x:Key="MainWindow.PositionsDescription">Specifies relative position for element search</system:String>
 
-    <system:String x:Key="MainWindow.Title">Sample command</system:String>
-    <system:String x:Key="MainWindow.Hello">Hello Revit!</system:String>
-    <system:String x:Key="MainWindow.HelloCheck">Enter a value for the property to save.</system:String>
+    <system:String x:Key="MainWindow.Parameters">Parameters SMR</system:String>
+    <system:String x:Key="MainWindow.ParametersDescription">Select parameters SMR for reading and writing</system:String>
+    <system:String x:Key="MainWindow.Categories">Element categories</system:String>
+    <system:String x:Key="MainWindow.CategoriesDescription">Categories of elements where parameters will be written</system:String>
+    <system:String x:Key="MainWindow.Search">Search settings</system:String>
+    <system:String x:Key="MainWindow.SearchDescription">Choose search settings for missing elements</system:String>
 
-    <system:String x:Key="MainWindow.ButtonOk">OK</system:String>
+    <system:String x:Key="MainWindow.ToggleSwitch.On">Search</system:String>
+    <system:String x:Key="MainWindow.ToggleSwitch.Off">Don't search</system:String>
+
+    <system:String x:Key="MainWindow.CategoryWarningTooltip">There are errors in the categories</system:String>    
+
+    <system:String x:Key="MainWindow.ButtonOk">Set</system:String>
     <system:String x:Key="MainWindow.ButtonCancel">Cancel</system:String>
 </ResourceDictionary>

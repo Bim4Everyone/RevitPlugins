@@ -2,12 +2,35 @@
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
                     xmlns:system="clr-namespace:System;assembly=mscorlib">
 
-    <!-- Пример перевода на русский язык (google translate) -->
+    <system:String x:Key="MainWindow.Title">Заполнить параметры СМР</system:String>
+    <system:String x:Key="MainWindow.RangeElements">Диапазон обработки элементов модели</system:String>
+    <system:String x:Key="MainWindow.RangeElementsDescription">Выбор варианта обработки элементов модели</system:String>    
+    <system:String x:Key="MainWindow.SourceFiles">Файл с объемными элементами СМР</system:String>
+    <system:String x:Key="MainWindow.SourceFilesDescription">Файл, с которого будут считываться данные</system:String>
+    <system:String x:Key="MainWindow.TypeModels">Тип объемных элементов СМР</system:String>
+    <system:String x:Key="MainWindow.TypeModelsDescription">Значение параметра "ФОП_Зона" объемных элементов</system:String>
+    <system:String x:Key="MainWindow.Positions">Позиция элемента</system:String>
+    <system:String x:Key="MainWindow.PositionsDescription">Определяет, относительно какой точки искать элемент</system:String>
 
-    <system:String x:Key="MainWindow.Title">Пример команды</system:String>
-    <system:String x:Key="MainWindow.Hello">Привет, Revit!</system:String>
-    <system:String x:Key="MainWindow.HelloCheck">Введите значение сохраняемого свойства.</system:String>
+    <system:String x:Key="MainWindow.Parameters">Параметры СМР</system:String>
+    <system:String x:Key="MainWindow.ParametersDescription">Выбор параметров СМР для чтения и записи</system:String>
+    <system:String x:Key="MainWindow.Categories">Категории элементов</system:String>
+    <system:String x:Key="MainWindow.CategoriesDescription">Категории элементов, в которые будет производится запись параметров</system:String>
+    <system:String x:Key="MainWindow.Search">Настройки поиска</system:String>
+    <system:String x:Key="MainWindow.SearchDescription">Выбор настроек поиска для потерянных элементов</system:String>
 
-    <system:String x:Key="MainWindow.ButtonOk">ОК</system:String>
+    <system:String x:Key="MainWindow.MaxDiameterFindSphere">Максимальный диаметр поисковой сферы</system:String>
+    <system:String x:Key="MainWindow.MaxDiameterFindSphereDescription">Максимальное расстояние от элемента до объемного элемента</system:String>
+    <system:String x:Key="MainWindow.StepFindSphere">Шаг увеличения диаметра поисковой сферы</system:String>
+    <system:String x:Key="MainWindow.StepFindSphereDescription">Значение увеличения сферы при каждой итерации поиска</system:String>
+    <system:String x:Key="MainWindow.FindSphereTooltip">Влияет на производительность. Больше значение - меньше производительность</system:String>
+    <system:String x:Key="MainWindow.StepFindSphereTooltip">Влияет на производительность. Меньше значение - меньше производительность</system:String>
+
+    <system:String x:Key="MainWindow.ToggleSwitch.On">Искать элементы</system:String>
+    <system:String x:Key="MainWindow.ToggleSwitch.Off">Не искать элементы</system:String>
+
+    <system:String x:Key="MainWindow.CategoryWarningTooltip">В некоторых категориях есть ошибки</system:String>    
+
+    <system:String x:Key="MainWindow.ButtonOk">Заполнить</system:String>
     <system:String x:Key="MainWindow.ButtonCancel">Отмена</system:String>
 </ResourceDictionary>
