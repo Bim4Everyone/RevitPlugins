@@ -134,7 +134,7 @@ internal class NavisXmlClashesLoader : BaseClashesLoader, IClashesLoader {
     private ICollection<ClashModel> GetClashModels(XElement clashTest) {
         return clashTest.Descendants("clashresult")
             .Select(GetClashModel)
-            .Where(c => c.MainElement.Id.IsNotNull() && c.OtherElement.Id.IsNotNull())
+            .Where(c => (c.MainElement?.Id.IsNotNull() ?? false) && (c.OtherElement?.Id.IsNotNull() ?? false))
             .ToArray();
     }
 
