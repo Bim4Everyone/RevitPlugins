@@ -27,11 +27,11 @@ internal class StructureCategoryFilterViewModel : BaseViewModel {
     /// </summary>
     /// <param name="revitRepository">Репозиторий активного документа</param>
     /// <param name="structureElementsFilter">Фильтр для элементов конструкций</param>
-    public StructureCategoryFilterViewModel(RevitRepository revitRepository, Filter structureElementsFilter) {
-        _revitRepository = revitRepository;
-        MessageBoxService = GetPlatformService<IMessageBoxService>();
+    public StructureCategoryFilterViewModel(RevitRepository revitRepository, Filter structureElementsFilter, IMessageBoxService messageBoxService) {
+        _revitRepository = revitRepository ?? throw new ArgumentNullException(nameof(revitRepository));
+        MessageBoxService = messageBoxService ?? throw new ArgumentNullException(nameof(messageBoxService));
 
-        _elementsFilter = structureElementsFilter;
+        _elementsFilter = structureElementsFilter ?? throw new ArgumentNullException(nameof(structureElementsFilter));
         _straightSearchSetElements = new StructureLinksSearchSetViewModel(
             _revitRepository,
             _elementsFilter,

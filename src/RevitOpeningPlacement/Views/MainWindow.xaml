@@ -10,6 +10,8 @@
     xmlns:dxe="http://schemas.devexpress.com/winfx/2008/xaml/editors"
     xmlns:dx="http://schemas.devexpress.com/winfx/2008/xaml/core"
     xmlns:dxdo="http://schemas.devexpress.com/winfx/2008/xaml/docking"
+    xmlns:mvvm="http://schemas.devexpress.com/winfx/2008/xaml/mvvm"
+    xmlns:common="clr-namespace:dosymep.Xpf.Core.SimpleServices;assembly=dosymep.Xpf.Core"
     mc:Ignorable="d"
     WindowStartupLocation="CenterOwner"
     x:Name="_this"
@@ -18,6 +20,14 @@
     MinHeight="700"
     MinWidth="1250"
     d:DataContext="{d:DesignInstance vms:MainViewModel, IsDesignTimeCreatable=False}">
+    <mvvm:Interaction.Behaviors>
+        <common:AttachServiceBehavior
+            AttachableService="{Binding MessageBoxService}" />
+        <common:AttachServiceBehavior
+            AttachableService="{Binding OpenFileDialogService}" />
+        <common:AttachServiceBehavior
+            AttachableService="{Binding SaveFileDialogService}" />
+    </mvvm:Interaction.Behaviors>
     <Grid
         Margin="10">
         <Grid.RowDefinitions>

@@ -37,19 +37,19 @@ internal class MepCategoryFilterViewModel : BaseViewModel {
     /// <param name="revitRepository">Репозиторий активного документа, в котором находятся элементы инженерных систем</param>
     /// <param name="linearElementsFilter">Фильтр для линейных элементов инженерных систем (воздуховоды, трубы и т.п.)</param>
     /// <param name="nonLinearElementsFilter">Фильтр для нелинейных элементов инженерных систем (соединительные детали воздуховодов, соединительные детали трубопроводов и т.п.)</param>
-    public MepCategoryFilterViewModel(RevitRepository revitRepository, Filter linearElementsFilter, Filter nonLinearElementsFilter) {
-        _revitRepository = revitRepository;
-        MessageBoxService = GetPlatformService<IMessageBoxService>();
+    public MepCategoryFilterViewModel(RevitRepository revitRepository, Filter linearElementsFilter, Filter nonLinearElementsFilter, IMessageBoxService messageBoxService) {
+        _revitRepository = revitRepository ?? throw new ArgumentNullException(nameof(revitRepository));
+        MessageBoxService = messageBoxService ?? throw new ArgumentNullException(nameof(messageBoxService));
 
-        _linearElementsFilter = linearElementsFilter;
+        _linearElementsFilter = linearElementsFilter ?? throw new ArgumentNullException(nameof(linearElementsFilter));
         _straightSearchSetLinearElements = new ActiveDocSearchSetViewModel(_revitRepository, _linearElementsFilter, new StraightRevitFilterGenerator());
         _invertedSearchSetLinearElements = new ActiveDocSearchSetViewModel(_revitRepository, _linearElementsFilter, new InvertedRevitFilterGenerator());
-        LinearElementsSearchSet = _straightSearchSetLinearElements;
+        LinearElementsSearchSet = _straightSearchSetLinearElements ?? throw new ArgumentNullException(nameof(_straightSearchSetLinearElements));
 
-        _nonLinearElementsFilter = nonLinearElementsFilter;
+        _nonLinearElementsFilter = nonLinearElementsFilter ?? throw new ArgumentNullException(nameof(nonLinearElementsFilter));
         _straightSearchSetNonLinearElements = new ActiveDocSearchSetViewModel(_revitRepository, _nonLinearElementsFilter, new StraightRevitFilterGenerator());
         _invertedSearchSetNonLinearElements = new ActiveDocSearchSetViewModel(_revitRepository, _nonLinearElementsFilter, new InvertedRevitFilterGenerator());
-        NonLinearElementsSearchSet = _straightSearchSetNonLinearElements;
+        NonLinearElementsSearchSet = _straightSearchSetNonLinearElements ?? throw new ArgumentNullException(nameof(_straightSearchSetNonLinearElements));
 
         InversionChangedCommand = RelayCommand.Create(InversionChanged);
         CloseCommand = RelayCommand.Create(Close);
@@ -117,10 +117,10 @@ internal class MepCategoryFilterViewModel : BaseViewModel {
     }
 
     private void Close() {
-        void action() {
+        void Action() {
             var command = new SetOpeningTasksPlacementConfigCmd();
             command.ExecuteCommand(_revitRepository.UIApplication);
         }
-        _revitRepository.DoAction(action);
+        _revitRepository.DoAction(Action);
     }
 }

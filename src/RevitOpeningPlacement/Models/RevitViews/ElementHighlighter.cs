@@ -3,6 +3,7 @@ using System;
 using Autodesk.Revit.DB;
 
 using dosymep.Revit;
+using dosymep.SimpleServices;
 
 namespace RevitOpeningPlacement.Models.RevitViews;
 /// <summary>
@@ -12,6 +13,7 @@ internal class ElementHighlighter {
     private readonly Element _elementToHighlight;
     private readonly RevitRepository _revitRepository;
     private readonly View3D _view3D;
+    private readonly IMessageBoxService _messageBoxService;
 
     /// <summary>
     /// Конструктор класса для графического выделения заданного элемента (стены или перекрытия) на 3D виде
@@ -26,11 +28,18 @@ internal class ElementHighlighter {
     /// <param name="elementToHighlight">Элемент, который нужно выделить. Это должна быть стена или перекрытие</param>
     /// <exception cref="ArgumentNullException">Элемент должен быть стеной или перекрытием</exception>
     /// <exception cref="ArgumentException">Исключение, если класс элемента не поддерживается</exception>
-    public ElementHighlighter(RevitRepository revitRepository, View3D view3D, Element elementToHighlight) {
+    public ElementHighlighter(RevitRepository revitRepository,
+        View3D view3D,
+        Element elementToHighlight,
+        IMessageBoxService messageBoxService) {
+
         _revitRepository = revitRepository ?? throw new ArgumentNullException(nameof(revitRepository));
         _view3D = view3D ?? throw new ArgumentNullException(nameof(view3D));
+        _messageBoxService = messageBoxService ?? throw new ArgumentNullException(nameof(messageBoxService));
         var element = elementToHighlight ?? throw new ArgumentNullException(nameof(elementToHighlight));
-        _elementToHighlight = element is Wall or Floor ? element : throw new ArgumentException(nameof(elementToHighlight));
+        _elementToHighlight = element is Wall or Floor
+            ? element
+            : throw new ArgumentException(nameof(elementToHighlight));
 
     }
 
@@ -39,16 +48,14 @@ internal class ElementHighlighter {
             _revitRepository.DoAction(ApplyGraphicSettings);
 
         } catch(AccessViolationException) {
-            var dialog = _revitRepository.GetMessageBoxService();
-            dialog.Show(
+            _messageBoxService.Show(
                 $"Окно плагина было открыто в другом документе Revit, который был закрыт, нельзя показать элемент.",
                 $"BIM",
                 System.Windows.MessageBoxButton.OK,
                 System.Windows.MessageBoxImage.Error,
                 System.Windows.MessageBoxResult.OK);
         } catch(Autodesk.Revit.Exceptions.InvalidOperationException) {
-            var dialog = _revitRepository.GetMessageBoxService();
-            dialog.Show(
+            _messageBoxService.Show(
                 $"Окно плагина было открыто в другом документе Revit, который сейчас не активен, нельзя показать элемент.",
                 $"BIM",
                 System.Windows.MessageBoxButton.OK,

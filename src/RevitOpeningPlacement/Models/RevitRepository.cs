@@ -392,7 +392,7 @@ internal class RevitRepository {
         var elementToHighlight = selectorAndHighlighter.GetElementToHighlight();
         if(elementToHighlight != null) {
             try {
-                new ElementHighlighter(this, _view, elementToHighlight).HighlightElement();
+                new ElementHighlighter(this, _view, elementToHighlight, GetMessageBoxService()).HighlightElement();
             } catch(ArgumentException) {
                 // элемент для выделения не стена и не перекрытие
             }
@@ -680,13 +680,6 @@ internal class RevitRepository {
         } else {
             return true;
         }
-    }
-
-    /// <summary>
-    /// Возвращает сервис диалоговых окон
-    /// </summary>
-    public IMessageBoxService GetMessageBoxService() {
-        return GetPlatformService<IMessageBoxService>();
     }
 
     /// <summary>
@@ -1290,6 +1283,13 @@ internal class RevitRepository {
                 OpeningTaskTypeName[type]));
         }
         return elements;
+    }
+
+    /// <summary>
+    /// Возвращает сервис диалоговых окон
+    /// </summary>
+    private IMessageBoxService GetMessageBoxService() {
+        return GetPlatformService<IMessageBoxService>();
     }
 
     private static T GetPlatformService<T>() {

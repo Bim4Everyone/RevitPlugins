@@ -7,6 +7,7 @@ using System.Linq;
 using System.Windows.Input;
 using System.Windows.Threading;
 
+using dosymep.SimpleServices;
 using dosymep.WPF.Commands;
 using dosymep.WPF.ViewModels;
 
@@ -32,11 +33,16 @@ internal class MainViewModel : BaseViewModel {
     public MainViewModel(
         RevitRepository revitRepository,
         ConfigFileService configFileService,
-        Models.Configs.OpeningConfig openingConfig) {
+        Models.Configs.OpeningConfig openingConfig,
+        IOpenFileDialogService openFileDialogService,
+        ISaveFileDialogService saveFileDialogService,
+        IMessageBoxService messageBoxService) {
 
         _revitRepository = revitRepository ?? throw new ArgumentNullException(nameof(revitRepository));
         _configFileService = configFileService ?? throw new ArgumentNullException(nameof(configFileService));
-
+        OpenFileDialogService = openFileDialogService ?? throw new ArgumentNullException(nameof(openFileDialogService));
+        SaveFileDialogService = saveFileDialogService ?? throw new ArgumentNullException(nameof(saveFileDialogService));
+        MessageBoxService = messageBoxService ?? throw new ArgumentNullException(nameof(messageBoxService));
         if(openingConfig is null) {
             throw new ArgumentNullException(nameof(openingConfig));
         }
@@ -160,7 +166,9 @@ internal class MainViewModel : BaseViewModel {
 
     public ICommand OpenConfigFolderCommand { get; }
     public ICommand OpenUnionTaskSettingsCommand { get; }
-
+    public IOpenFileDialogService OpenFileDialogService { get; }
+    public ISaveFileDialogService SaveFileDialogService { get; }
+    public IMessageBoxService MessageBoxService { get; }
 
     private void InitializeTimer() {
         _timer = new DispatcherTimer {
@@ -182,7 +190,7 @@ internal class MainViewModel : BaseViewModel {
         var linearFilter = configurator.GetLinearFilter(mepCategory);
         var nonLinearFilter = configurator.GetFittingFilter(mepCategory);
 
-        var vm = new MepCategoryFilterViewModel(_revitRepository, linearFilter, nonLinearFilter);
+        var vm = new MepCategoryFilterViewModel(_revitRepository, linearFilter, nonLinearFilter, MessageBoxService);
         var view = new MepCategoryFilterView() { DataContext = vm };
         view.Show();
     }
@@ -199,7 +207,7 @@ internal class MainViewModel : BaseViewModel {
 
     private void ShowStructureFilter(StructureCategoryEnum structureCategory) {
         var filter = GetCurrentStructureFilter(structureCategory);
-        var vm = new StructureCategoryFilterViewModel(_revitRepository, filter);
+        var vm = new StructureCategoryFilterViewModel(_revitRepository, filter, MessageBoxService);
         var view = new StructureCategoryFilterView() { DataContext = vm };
         view.Show();
     }
@@ -237,7 +245,7 @@ internal class MainViewModel : BaseViewModel {
 
     private void SaveAsConfig() {
         var config = GetOpeningConfig();
-        var css = new ConfigSaverService();
+        var css = new ConfigSaverService(SaveFileDialogService);
         string path = css.Save(config, _revitRepository.Doc);
         UpdateOpeningConfigPath(path);
         MessageText = "Файл настроек успешно сохранен.";
@@ -245,7 +253,7 @@ internal class MainViewModel : BaseViewModel {
     }
 
     private void LoadConfig() {
-        var cls = new ConfigLoaderService();
+        var cls = new ConfigLoaderService(OpenFileDialogService, MessageBoxService);
         var config = cls.Load<Models.Configs.OpeningConfig>(_revitRepository.Doc);
         if(config != null) {
             ShowPlacingErrors = config.ShowPlacingErrors;
