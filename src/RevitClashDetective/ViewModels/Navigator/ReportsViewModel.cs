@@ -148,9 +148,12 @@ internal class ReportsViewModel : BaseViewModel {
                 SaveFileDialogService,
                 MessageBoxService,
                 _settingsConfig,
-                r.Clashes?.ToArray() ?? []));
+                r.Clashes?.ToArray() ?? []))
+            .ToArray();
 
-        Reports = new ObservableCollection<ReportViewModel>(new NameResolver<ReportViewModel>(Reports, reports).GetCollection());
+        Reports = new ObservableCollection<ReportViewModel>(new ReportsNameResolver(_localizationService)
+            .GetReports(Reports, reports));
+        SelectedReport = null;
         SelectedReport = Reports.FirstOrDefault();
     }
 

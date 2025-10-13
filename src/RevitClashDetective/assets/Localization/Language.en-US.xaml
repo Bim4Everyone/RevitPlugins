@@ -75,4 +75,17 @@
         x:Key="SectionBoxMode.AroundCollision">Around collision</system:String>
     <system:String
         x:Key="SectionBoxMode.AroundElements">Around elements</system:String>
+
+    <system:String
+        x:Key="ReportsResolver.Header">Import Reports</system:String>
+    <system:String
+        x:Key="ReportsResolver.Body">The loaded file contains reports with matching names: {0}.</system:String>
+    <system:String
+        x:Key="ReportsResolver.ReplaceAndKeepStatuses">Replace with status preservation</system:String>
+    <system:String
+        x:Key="ReportsResolver.Replace">Replace with status overwrite</system:String>
+    <system:String
+        x:Key="ReportsResolver.KeepOnlyOld">Keep only old</system:String>
+    <system:String
+        x:Key="ReportsResolver.CopyAndRename">Copy and rename</system:String>
 </ResourceDictionary>
