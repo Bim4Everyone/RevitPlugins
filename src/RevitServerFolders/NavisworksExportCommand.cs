@@ -16,7 +16,6 @@ using dosymep.Revit.ServerClient;
 using dosymep.SimpleServices;
 using dosymep.WpfCore.Ninject;
 using dosymep.WpfUI.Core.Ninject;
-using dosymep.Xpf.Core.Ninject;
 
 using Ninject;
 
@@ -84,9 +83,9 @@ internal sealed class NavisworksExportCommand : BasePluginCommand {
             .ToSelf()
             .WithPropertyValue(nameof(ViewModels.Rs.MainViewModel.CanSelectFiles), true);
 
-        kernel.UseXtraOpenFolderDialog<FileSystemViewModel>(
+        kernel.UseWpfOpenFolderDialog<FileSystemViewModel>(
             initialDirectory: Environment.GetFolderPath(Environment.SpecialFolder.Desktop));
-        kernel.UseXtraOpenFileDialog<NwcExportViewSettingsViewModel>(filter: "RVT (*.rvt)|*.rvt");
+        kernel.UseWpfOpenFileDialog<NwcExportViewSettingsViewModel>(filter: "RVT (*.rvt)|*.rvt");
 
         kernel.BindMainWindow<FileSystemViewModel, MainWindow>();
         kernel.BindOtherWindow<ErrorsViewModel, ErrorsWindow>();
