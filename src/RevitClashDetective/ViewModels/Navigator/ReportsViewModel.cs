@@ -151,7 +151,7 @@ internal class ReportsViewModel : BaseViewModel {
                 r.Clashes?.ToArray() ?? []));
 
         Reports = new ObservableCollection<ReportViewModel>(new NameResolver<ReportViewModel>(Reports, reports).GetCollection());
-        SelectedReport = reports.First();
+        SelectedReport = Reports.FirstOrDefault();
     }
 
     private void Delete() {
