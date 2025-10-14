@@ -85,7 +85,7 @@
     <system:String
         x:Key="ReportsResolver.Replace">Replace with status overwrite</system:String>
     <system:String
-        x:Key="ReportsResolver.KeepOnlyOld">Keep only old</system:String>
+        x:Key="ReportsResolver.KeepOnlyOld">Don't replace</system:String>
     <system:String
-        x:Key="ReportsResolver.CopyAndRename">Copy and rename</system:String>
+        x:Key="ReportsResolver.CopyAndRename">Load and rename</system:String>
 </ResourceDictionary>
