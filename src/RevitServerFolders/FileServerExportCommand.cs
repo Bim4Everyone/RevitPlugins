@@ -15,7 +15,6 @@ using dosymep.Revit.ServerClient;
 using dosymep.SimpleServices;
 using dosymep.WpfCore.Ninject;
 using dosymep.WpfUI.Core.Ninject;
-using dosymep.Xpf.Core.Ninject;
 
 using Ninject;
 
@@ -62,7 +61,7 @@ internal sealed class FileServerExportCommand : BasePluginCommand {
             .To<ContentDialogService>()
             .InSingletonScope();
 
-        kernel.UseXtraOpenFolderDialog<RsViewModel>(
+        kernel.UseWpfOpenFolderDialog<RsViewModel>(
             initialDirectory: Environment.GetFolderPath(Environment.SpecialFolder.Desktop));
 
         kernel.Bind<IReadOnlyCollection<IServerClient>>()

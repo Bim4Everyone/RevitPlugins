@@ -17,7 +17,6 @@ using RevitServerFolders.Services;
 namespace RevitServerFolders.ViewModels;
 
 internal class ExportSettingsViewModel<T> : BaseViewModel where T : ExportSettings {
-    private readonly IModelObjectService _objectService;
     protected readonly T _settings;
     protected readonly ILocalizationService _localization;
 
@@ -39,7 +38,7 @@ internal class ExportSettingsViewModel<T> : BaseViewModel where T : ExportSettin
         IOpenFolderDialogService openFolderDialogService,
         ILocalizationService localization) {
         _settings = settings;
-        _objectService = objectService;
+        ObjectService = objectService;
 
         OpenFolderDialogService = openFolderDialogService
             ?? throw new ArgumentNullException(nameof(openFolderDialogService));
@@ -61,6 +60,7 @@ internal class ExportSettingsViewModel<T> : BaseViewModel where T : ExportSettin
         PropertyChanged += OnSourceFolderChanged;
     }
 
+    public IModelObjectService ObjectService { get; }
 
     public IAsyncCommand OpenFromFoldersCommand { get; }
 
@@ -187,7 +187,7 @@ internal class ExportSettingsViewModel<T> : BaseViewModel where T : ExportSettin
     }
 
     private async Task OpenFromFolder() {
-        var modelObject = await _objectService.SelectModelObjectDialog(SourceFolder);
+        var modelObject = await ObjectService.SelectModelObjectDialog(SourceFolder);
         SourceFolder = modelObject.FullName;
         await AddModelObjects(modelObject);
         CommandManager.InvalidateRequerySuggested();
@@ -203,7 +203,7 @@ internal class ExportSettingsViewModel<T> : BaseViewModel where T : ExportSettin
         try {
             if(!OpenFromFoldersCommand.IsExecuting) {
                 if(!string.IsNullOrWhiteSpace(SourceFolder)) {
-                    await AddModelObjects(await _objectService.GetFromString(SourceFolder));
+                    await AddModelObjects(await ObjectService.GetFromString(SourceFolder));
                 } else {
                     AddModelObjects([], []);
                 }
