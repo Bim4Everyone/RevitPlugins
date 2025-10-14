@@ -86,24 +86,33 @@
                     Style="{StaticResource  CustomResizableDataGridStyle}">
                     <DataGrid.Columns>
                         <DataGridCheckBoxColumn
+                            HeaderStyle="{StaticResource CustomDataGridHeaderStyle}"
                             Binding="{Binding Path=IsChecked, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}">
                             <DataGridCheckBoxColumn.Header>
-                                <TextBlock Text="{me:LocalizationSource MainWindow.HeaderCheck}"/>
+                                <TextBlock
+                                    TextAlignment="Center"
+                                    Text="{me:LocalizationSource MainWindow.HeaderCheck}"/>
                             </DataGridCheckBoxColumn.Header>
                         </DataGridCheckBoxColumn>
                         <DataGridTextColumn
-                            Binding="{Binding Path=Name}"
                             Width="500"
+                            HeaderStyle="{StaticResource CustomDataGridHeaderStyle}"
+                            Binding="{Binding Path=Name}"
                             IsReadOnly="True">
                             <DataGridTextColumn.Header>
-                                <TextBlock Text="{me:LocalizationSource MainWindow.HeaderName}"/>
+                                <TextBlock
+                                    TextAlignment="Center"
+                                    Text="{me:LocalizationSource MainWindow.HeaderName}"/>
                             </DataGridTextColumn.Header>
                         </DataGridTextColumn>
                         <DataGridTextColumn
+                            HeaderStyle="{StaticResource CustomDataGridHeaderStyle}"
                             Binding="{Binding Path=OpenStatus.Name}"
                             IsReadOnly="True">
                             <DataGridTextColumn.Header>
-                                <TextBlock Text="{me:LocalizationSource MainWindow.HeaderStatus}"/>
+                                <TextBlock
+                                    TextAlignment="Center"
+                                    Text="{me:LocalizationSource MainWindow.HeaderStatus}"/>
                             </DataGridTextColumn.Header>
                         </DataGridTextColumn>
                     </DataGrid.Columns>
