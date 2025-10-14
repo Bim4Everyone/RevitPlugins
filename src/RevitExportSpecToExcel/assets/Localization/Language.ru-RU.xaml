@@ -4,9 +4,9 @@
 
     <system:String x:Key="MainWindow.Title">Экспорт спецификаций</system:String>
 
-    <system:String x:Key="MainWindow.ActiveViewStatus">Активный вид</system:String>
-    <system:String x:Key="MainWindow.OpenedViewStatus">Открытый вид</system:String>
-    <system:String x:Key="MainWindow.ClosedViewStatus">Закрытый вид</system:String>
+    <system:String x:Key="MainWindow.ActiveViewStatus">Активная</system:String>
+    <system:String x:Key="MainWindow.OpenedViewStatus">Открытая</system:String>
+    <system:String x:Key="MainWindow.ClosedViewStatus">Закрытая</system:String>
 
     <system:String x:Key="MainWindow.NoSelection">Не выбраны спецификации</system:String>
 

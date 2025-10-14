@@ -4,9 +4,9 @@
 
     <system:String x:Key="MainWindow.Title">Schedule export</system:String>
 
-    <system:String x:Key="MainWindow.ActiveViewStatus">Active view</system:String>
-    <system:String x:Key="MainWindow.OpenedViewStatus">Opened view</system:String>
-    <system:String x:Key="MainWindow.ClosedViewStatus">Closed view</system:String>
+    <system:String x:Key="MainWindow.ActiveViewStatus">Active</system:String>
+    <system:String x:Key="MainWindow.OpenedViewStatus">Opened</system:String>
+    <system:String x:Key="MainWindow.ClosedViewStatus">Closed</system:String>
 
     <system:String x:Key="MainWindow.NoSelection">Schedules are not selected</system:String>
 
