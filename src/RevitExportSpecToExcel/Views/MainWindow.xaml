@@ -125,6 +125,7 @@
                         <DataGridTextColumn
                             HeaderStyle="{StaticResource CustomDataGridHeaderStyle}"
                             Binding="{Binding Path=OpenStatus.Name}"
+                            SortMemberPath="OpenStatus.Order"
                             IsReadOnly="True">
                             <DataGridTextColumn.Header>
                                 <TextBlock
