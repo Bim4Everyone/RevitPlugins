@@ -13,16 +13,18 @@ using RevitServerFolders.Models.FileSystem;
 namespace RevitServerFolders.Services;
 internal sealed class FileSystemModelObjectService : IModelObjectService {
     private readonly IOpenFolderDialogService _openFolderDialogService;
+    private readonly IAttachableService _attachableService;
 
     public FileSystemModelObjectService(IOpenFolderDialogService openFolderDialogService) {
         _openFolderDialogService = openFolderDialogService;
+        _attachableService = _openFolderDialogService as IAttachableService;
     }
 
-    public bool IsAttached => (_openFolderDialogService as IAttachableService)?.IsAttached ?? false;
+    public bool IsAttached => _attachableService?.IsAttached ?? false;
 
-    public bool AllowAttach => (_openFolderDialogService as IAttachableService)?.AllowAttach ?? false;
+    public bool AllowAttach => _attachableService?.AllowAttach ?? false;
 
-    public DependencyObject AssociatedObject => (_openFolderDialogService as IAttachableService)?.AssociatedObject ?? default;
+    public DependencyObject AssociatedObject => _attachableService?.AssociatedObject ?? default;
 
 
     public Task<ModelObject> SelectModelObjectDialog() {
@@ -54,11 +56,11 @@ internal sealed class FileSystemModelObjectService : IModelObjectService {
     }
 
     public void Detach() {
-        (_openFolderDialogService as IAttachableService)?.Detach();
+        _attachableService?.Detach();
     }
 
     public void Attach(DependencyObject dependencyObject) {
-        (_openFolderDialogService as IAttachableService)?.Attach(dependencyObject);
+        _attachableService?.Attach(dependencyObject);
     }
 
     private Task<IEnumerable<ModelObject>> ShowDialog() {
