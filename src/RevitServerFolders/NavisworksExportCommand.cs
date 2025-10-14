@@ -83,6 +83,7 @@ internal sealed class NavisworksExportCommand : BasePluginCommand {
             .ToSelf()
             .WithPropertyValue(nameof(ViewModels.Rs.MainViewModel.CanSelectFiles), true);
 
+        kernel.UseWpfOpenFolderDialog<FileSystemModelObjectService>();
         kernel.UseWpfOpenFolderDialog<FileSystemViewModel>(
             initialDirectory: Environment.GetFolderPath(Environment.SpecialFolder.Desktop));
         kernel.UseWpfOpenFileDialog<NwcExportViewSettingsViewModel>(filter: "RVT (*.rvt)|*.rvt");

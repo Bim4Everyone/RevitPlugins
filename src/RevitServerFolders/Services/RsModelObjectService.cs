@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
+using System.Windows;
 
 using dosymep.Revit.ServerClient;
 using dosymep.SimpleServices;
@@ -31,6 +32,14 @@ internal sealed class RsModelObjectService : IModelObjectService {
         _serverClients = serverClients;
         _localization = localization;
     }
+
+
+    public bool IsAttached => false;
+
+    public bool AllowAttach => false;
+
+    public DependencyObject AssociatedObject => default;
+
 
     public Task<ModelObject> SelectModelObjectDialog() {
         return SelectModelObjectDialog(null);
@@ -71,5 +80,13 @@ internal sealed class RsModelObjectService : IModelObjectService {
             ? throw new InvalidOperationException(
                 _localization.GetLocalizedString("Exceptions.FolderNotFound", uri.LocalPath.Trim('\\').Trim('/')))
             : (ModelObject) new RsFolderModel(folderData, folderContents, serverClient);
+    }
+
+    public void Detach() {
+        // nothing
+    }
+
+    public void Attach(DependencyObject dependencyObject) {
+        // nothing
     }
 }

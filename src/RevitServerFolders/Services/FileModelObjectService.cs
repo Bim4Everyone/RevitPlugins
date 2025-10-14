@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
+using System.Windows;
 
 using dosymep.SimpleServices;
 
@@ -16,6 +17,13 @@ internal sealed class FileSystemModelObjectService : IModelObjectService {
     public FileSystemModelObjectService(IOpenFolderDialogService openFolderDialogService) {
         _openFolderDialogService = openFolderDialogService;
     }
+
+    public bool IsAttached => (_openFolderDialogService as IAttachableService)?.IsAttached ?? false;
+
+    public bool AllowAttach => (_openFolderDialogService as IAttachableService)?.AllowAttach ?? false;
+
+    public DependencyObject AssociatedObject => (_openFolderDialogService as IAttachableService)?.AssociatedObject ?? default;
+
 
     public Task<ModelObject> SelectModelObjectDialog() {
         return SelectModelObjectDialog(Environment.GetFolderPath(Environment.SpecialFolder.Desktop));
@@ -43,6 +51,14 @@ internal sealed class FileSystemModelObjectService : IModelObjectService {
         return Directory.Exists(folderName)
             ? Task.FromResult((ModelObject) new FileSystemFolderModel(new DirectoryInfo(folderName)))
             : throw new OperationCanceledException();
+    }
+
+    public void Detach() {
+        (_openFolderDialogService as IAttachableService)?.Detach();
+    }
+
+    public void Attach(DependencyObject dependencyObject) {
+        (_openFolderDialogService as IAttachableService)?.Attach(dependencyObject);
     }
 
     private Task<IEnumerable<ModelObject>> ShowDialog() {
