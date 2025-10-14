@@ -1,9 +1,11 @@
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Windows;
+using System.Windows.Interop;
 
 using dosymep.Revit.ServerClient;
 using dosymep.SimpleServices;
@@ -34,11 +36,11 @@ internal sealed class RsModelObjectService : IModelObjectService {
     }
 
 
-    public bool IsAttached => false;
+    public bool IsAttached => AssociatedObject != default;
 
-    public bool AllowAttach => false;
+    public bool AllowAttach => true;
 
-    public DependencyObject AssociatedObject => default;
+    public DependencyObject AssociatedObject { get; private set; }
 
 
     public Task<ModelObject> SelectModelObjectDialog() {
@@ -48,6 +50,7 @@ internal sealed class RsModelObjectService : IModelObjectService {
     public Task<ModelObject> SelectModelObjectDialog(string rootFolder) {
         _mainViewModel.RemoveCancellation();
         var window = _resolutionRoot.Get<MainWindow>();
+        SetAssociatedOwner(window);
         window.DataContext = _mainViewModel;
         if(window.ShowDialog() == true) {
             return Task.FromResult(_mainViewModel.SelectedItem.GetModelObject());
@@ -83,10 +86,33 @@ internal sealed class RsModelObjectService : IModelObjectService {
     }
 
     public void Detach() {
-        // nothing
+        if(AllowAttach) {
+            AssociatedObject = default;
+        }
     }
 
     public void Attach(DependencyObject dependencyObject) {
-        // nothing
+        if(AllowAttach) {
+            AssociatedObject = dependencyObject;
+        }
+    }
+
+    private Window GetAssociatedWindow() {
+        if(AssociatedObject is null) {
+            return default;
+        }
+
+        return AssociatedObject is Window window
+            ? window
+            : Window.GetWindow(AssociatedObject);
+    }
+
+    private void SetAssociatedOwner(Window window) {
+        var associatedWindow = GetAssociatedWindow();
+        if(associatedWindow is not null && associatedWindow.IsVisible) {
+            window.Owner = associatedWindow;
+        } else {
+            new WindowInteropHelper(window).Owner = Process.GetCurrentProcess().MainWindowHandle;
+        }
     }
 }
