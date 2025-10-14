@@ -41,7 +41,7 @@ internal class ReportsNameResolver {
                     return CopyAndRename(oldReports, addedReports);
                 }
                 default: {
-                    throw new NotSupportedException();
+                    return oldReports;
                 }
             }
         } else {
