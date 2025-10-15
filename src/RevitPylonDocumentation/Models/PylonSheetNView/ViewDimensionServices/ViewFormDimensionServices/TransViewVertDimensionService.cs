@@ -4,33 +4,31 @@ using Autodesk.Revit.DB;
 
 using RevitPylonDocumentation.Models.PluginOptions;
 using RevitPylonDocumentation.Models.Services;
-using RevitPylonDocumentation.ViewModels;
 
 using Grid = Autodesk.Revit.DB.Grid;
 
 namespace RevitPylonDocumentation.Models.PylonSheetNView.ViewDimensionServices.ViewFormDimensionServices;
 internal class TransViewVertDimensionService {
-    private readonly MainViewModel _viewModel;
-    private readonly RevitRepository _repository;
+    private readonly CreationSettings _settings;
+    private readonly Document _doc;
     private readonly PylonSheetInfo _sheetInfo;
     private readonly PylonView _viewOfPylon;
 
     private readonly DimensionBaseService _dimensionBaseService;
     private readonly DimensionSegmentsService _dimSegmentsService;
     private readonly DimensionCreationService _dimCreationService;
-
     private bool _longGridsWillBeNeeded;
 
-    internal TransViewVertDimensionService(MainViewModel mvm, RevitRepository repository, PylonSheetInfo pylonSheetInfo, 
+    internal TransViewVertDimensionService(CreationSettings settings, Document document, PylonSheetInfo pylonSheetInfo, 
                                            PylonView pylonView, DimensionBaseService dimensionBaseService) {
-        _viewModel = mvm;
-        _repository = repository;
+        _settings = settings;
+        _doc = document;
         _sheetInfo = pylonSheetInfo;
         _viewOfPylon = pylonView;
 
         _dimensionBaseService = dimensionBaseService;
         _dimSegmentsService = new DimensionSegmentsService(pylonView.ViewElement);
-        _dimCreationService = new DimensionCreationService(mvm, repository, pylonView, _dimensionBaseService);
+        _dimCreationService = new DimensionCreationService(_settings, _doc, pylonView, _dimensionBaseService);
     }
 
 
@@ -60,7 +58,7 @@ internal class TransViewVertDimensionService {
                 _longGridsWillBeNeeded = true;
             } else if(_sheetInfo.RebarInfo.HasLRebar) {
                 // Когда Гэшки с одной стороны
-                if(_viewModel.RebarFinder.DirectionHasLRebar(_viewOfPylon.ViewElement, _sheetInfo.ProjectSection,
+                if(_sheetInfo.RebarFinder.DirectionHasLRebar(_viewOfPylon.ViewElement, _sheetInfo.ProjectSection,
                                                              DirectionType.Top)) {
                     vertDimensionsForEdit.Add(
                         _dimCreationService.CreateDimension(skeletonParentRebar, topSmallOffset,

@@ -1,29 +1,31 @@
 using System;
 using System.Linq;
 
+using Autodesk.Revit.DB;
+
 using RevitPylonDocumentation.Models.PluginOptions;
 using RevitPylonDocumentation.Models.Services;
 using RevitPylonDocumentation.ViewModels;
 
 namespace RevitPylonDocumentation.Models.PylonSheetNView.ViewDimensionServices.ViewRebarDimensionServices;
 internal class TransViewRebarHorizDimensionService {
-    private readonly MainViewModel _viewModel;
-    private readonly RevitRepository _repository;
+    private readonly CreationSettings _settings;
+    private readonly Document _doc;
     private readonly PylonSheetInfo _sheetInfo;
     private readonly PylonView _viewOfPylon;
     private readonly DimensionBaseService _dimensionBaseService;
     private readonly DimensionCreationService _dimCreationService;
 
-    internal TransViewRebarHorizDimensionService(MainViewModel mvm, RevitRepository repository,
+    internal TransViewRebarHorizDimensionService(CreationSettings settings, Document document,
                                                  PylonSheetInfo pylonSheetInfo, PylonView pylonView,
                                                  DimensionBaseService dimensionBaseService) {
-        _viewModel = mvm;
-        _repository = repository;
+        _settings = settings;
+        _doc = document;
         _sheetInfo = pylonSheetInfo;
         _viewOfPylon = pylonView;
 
         _dimensionBaseService = dimensionBaseService;
-        _dimCreationService = new DimensionCreationService(mvm, repository, pylonView, _dimensionBaseService);
+        _dimCreationService = new DimensionCreationService(settings, document, pylonView, _dimensionBaseService);
     }
 
     internal void TryCreateDimensions(bool onTopOfRebar) {
@@ -40,7 +42,7 @@ internal class TransViewRebarHorizDimensionService {
                 var edgeBottomSideRefArray = _dimensionBaseService.GetDimensionRefs(skeletonParentRebar, 
                                                                                     ["низ", "торец", "край"]);
                 if(_sheetInfo.RebarInfo.HasLRebar) {
-                    var rebarFinder = _viewModel.RebarFinder;
+                    var rebarFinder = _sheetInfo.RebarFinder;
                     var view = _viewOfPylon.ViewElement;
                     if(rebarFinder.DirectionHasLRebar(view, _sheetInfo.ProjectSection, DirectionType.Top) 
                         && _sheetInfo.RebarInfo.SecondLRebarParamValue) {

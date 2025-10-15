@@ -6,22 +6,21 @@ using Autodesk.Revit.DB;
 
 using RevitPylonDocumentation.Models.PluginOptions;
 using RevitPylonDocumentation.Models.Services;
-using RevitPylonDocumentation.ViewModels;
 
 namespace RevitPylonDocumentation.Models.PylonSheetNView.ViewDimensionServices.ViewFormDimensionServices;
 internal class GeneralViewVertDimensionService {
-    private readonly MainViewModel _viewModel;
-    private readonly RevitRepository _repository;
+    private readonly DimensionType _selectedDimensionType;
+    private readonly Document _doc;
     private readonly PylonSheetInfo _sheetInfo;
     private readonly PylonView _viewOfPylon;
 
     private readonly DimensionBaseService _dimensionBaseService;
     private readonly DimensionSegmentsService _dimSegmentsService;
 
-    internal GeneralViewVertDimensionService(MainViewModel mvm, RevitRepository repository, PylonSheetInfo pylonSheetInfo,
+    internal GeneralViewVertDimensionService(CreationSettings settings, Document document, PylonSheetInfo pylonSheetInfo,
                                              PylonView pylonView, DimensionBaseService dimensionBaseService) {
-        _viewModel = mvm;
-        _repository = repository;
+        _selectedDimensionType = settings.TypesSettings.SelectedDimensionType;
+        _doc = document;
         _sheetInfo = pylonSheetInfo;
         _viewOfPylon = pylonView;
 
@@ -45,10 +44,10 @@ internal class GeneralViewVertDimensionService {
                                                        ["низ", side, "край"],
                                                        oldRefArray: refArrayFormwork);
 
-            dimension = _repository.Document.Create.NewDimension(_viewOfPylon.ViewElement,
+            dimension = _doc.Create.NewDimension(_viewOfPylon.ViewElement,
                                                                  dimensionLineBottomFirst,
                                                                  refArrayFormworkRebarFront,
-                                                                 _viewModel.SelectedDimensionType);
+                                                                 _selectedDimensionType);
         } catch(Exception) { }
         return dimension;
     }
@@ -80,10 +79,10 @@ internal class GeneralViewVertDimensionService {
                 var refArrayFormworkGridFront = _dimensionBaseService.GetDimensionRefs(grids,
                                                                                        new XYZ(0, 0, 1),
                                                                                        refArrayFormwork);
-                _repository.Document.Create.NewDimension(_viewOfPylon.ViewElement,
+                _doc.Create.NewDimension(_viewOfPylon.ViewElement,
                                                          dimensionLineBottomSecond,
                                                          refArrayFormworkGridFront,
-                                                         _viewModel.SelectedDimensionType);
+                                                         _selectedDimensionType);
 
                 // Т.к. поставили размер по осям, то изменяем отступ для размера положение снизу 3
                 formworkDimensionLineOffset = 2.3;
@@ -102,10 +101,10 @@ internal class GeneralViewVertDimensionService {
             var dimensionLineBottomThird = _dimensionBaseService.GetDimensionLine(skeletonParentRebar,
                                                                                   DirectionType.Bottom,
                                                                                   formworkDimensionLineOffset);
-            _repository.Document.Create.NewDimension(_viewOfPylon.ViewElement, 
+            _doc.Create.NewDimension(_viewOfPylon.ViewElement, 
                                                      dimensionLineBottomThird, 
                                                      refArrayFormwork,
-                                                     _viewModel.SelectedDimensionType);
+                                                     _selectedDimensionType);
         } catch(Exception) { }
     }
 
@@ -127,7 +126,7 @@ internal class GeneralViewVertDimensionService {
                                                                                  ["2", "торец", "край"]);
 
             // Получаем позицию для размерной линии по Г-образному стержню
-            var lRebar = _viewModel.RebarFinder.GetSimpleRebars(_viewOfPylon.ViewElement, _sheetInfo.ProjectSection, 1101)
+            var lRebar = _sheetInfo.RebarFinder.GetSimpleRebars(_viewOfPylon.ViewElement, _sheetInfo.ProjectSection, 1101)
                                                .FirstOrDefault();
             var dimensionLine = _dimensionBaseService.GetDimensionLine(lRebar, DirectionType.Top, 0.5);
 
@@ -139,7 +138,7 @@ internal class GeneralViewVertDimensionService {
                 CreateLRebarToPylonDimension(skeletonParentRebar, dimensionLine,
                                              ["2_торец", "Г", "край"], lastPylonRefArrayFirst, lastPylonRefArraySecond);
             } else if(_sheetInfo.RebarInfo.HasLRebar) {
-                if(_viewModel.RebarFinder.DirectionHasLRebar(_viewOfPylon.ViewElement,
+                if(_sheetInfo.RebarFinder.DirectionHasLRebar(_viewOfPylon.ViewElement,
                                                              _sheetInfo.ProjectSection,
                                                              DirectionType.Right)
                     && _sheetInfo.RebarInfo.SecondLRebarParamValue) {
@@ -166,15 +165,15 @@ internal class GeneralViewVertDimensionService {
                                                                     importantRefNameParts,
                                                                     oldRefArray: pylonRefArraySecond);
 
-        var dimensionFirst = _repository.Document.Create.NewDimension(_viewOfPylon.ViewElement, dimensionLine,
-                                                                      refArrayFirst, _viewModel.SelectedDimensionType);
-        var dimensionSecond = _repository.Document.Create.NewDimension(_viewOfPylon.ViewElement, dimensionLine,
-                                                                       refArraySecond, _viewModel.SelectedDimensionType);
+        var dimensionFirst = _doc.Create.NewDimension(_viewOfPylon.ViewElement, dimensionLine,
+                                                                      refArrayFirst, _selectedDimensionType);
+        var dimensionSecond = _doc.Create.NewDimension(_viewOfPylon.ViewElement, dimensionLine,
+                                                                       refArraySecond, _selectedDimensionType);
 
         if(dimensionFirst.Value > dimensionSecond.Value) {
-            _repository.Document.Delete(dimensionFirst.Id);
+            _doc.Delete(dimensionFirst.Id);
         } else {
-            _repository.Document.Delete(dimensionSecond.Id);
+            _doc.Delete(dimensionSecond.Id);
         }
     }
 

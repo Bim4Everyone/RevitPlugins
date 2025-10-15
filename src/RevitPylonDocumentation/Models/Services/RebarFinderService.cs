@@ -6,26 +6,31 @@ using Autodesk.Revit.DB;
 using dosymep.Revit;
 
 using RevitPylonDocumentation.Models.PluginOptions;
-using RevitPylonDocumentation.ViewModels;
 
 namespace RevitPylonDocumentation.Models.Services;
 public class RebarFinderService {
+    private readonly CreationSettings _settings;
+    private readonly RevitRepository _repository;
+
+    // Компаратор для сравнения элементов по Id
+    private readonly ElementComparer _comparerOfElements;
+
     private readonly ParamValueService _paramValueService;
     private readonly string _formNumberParamName = "обр_ФОП_Форма_номер";
     private readonly string _baseMarkParamName = "обр_ФОП_Метка основы IFC";
 
-    internal RebarFinderService(MainViewModel mvm, RevitRepository repository) {
-        ViewModel = mvm;
-        Repository = repository;
-        _paramValueService = new ParamValueService(repository);
+    internal RebarFinderService(CreationSettings settings, RevitRepository repository,
+                                ParamValueService paramValueService) {
+        _settings = settings;
+        _repository = repository;
+        _paramValueService = paramValueService;
+        _comparerOfElements = new ElementComparer();
     }
 
-    internal MainViewModel ViewModel { get; set; }
-    internal RevitRepository Repository { get; set; }
 
     private bool CheckRebarByBaseParams(Element rebar, string projectSection, string pylonKeyName) {
         // Фильтрация по комплекту документации
-        if(rebar.GetParamValue<string>(ViewModel.ProjectSettings.ProjectSection) != projectSection) {
+        if(rebar.GetParamValue<string>(_settings.ProjectSettings.ProjectSection) != projectSection) {
             return false;
         }
         // Фильтрация по марке пилона
@@ -33,8 +38,8 @@ public class RebarFinderService {
             return false;
         }
         // Фильтрация по обр_ФОП_Фильтрации 1
-        if(rebar.GetParamValue<string>(ViewModel.ProjectSettings.TypicalPylonFilterParameter) !=
-            ViewModel.ProjectSettings.TypicalPylonFilterValue) {
+        if(rebar.GetParamValue<string>(_settings.ProjectSettings.TypicalPylonFilterParameter) !=
+            _settings.ProjectSettings.TypicalPylonFilterValue) {
             return false;
         }
         return true;
@@ -44,7 +49,7 @@ public class RebarFinderService {
     /// Получение родительского элемента сварного арматурного каркаса (верт стержни + пластины)
     /// </summary>
     public FamilyInstance GetSkeletonParentRebar(string projectSection, string pylonKeyName) {
-        var rebars = new FilteredElementCollector(Repository.Document)
+        var rebars = new FilteredElementCollector(_repository.Document)
             .OfCategory(BuiltInCategory.OST_Rebar)
             .WhereElementIsNotElementType()
             .ToElements();
@@ -55,7 +60,7 @@ public class RebarFinderService {
                 continue;
             }
             // Фильтрация по имени семейства
-            if(Repository.Document.GetElement(rebar.GetTypeId()) is not FamilySymbol rebarType) {
+            if(_repository.Document.GetElement(rebar.GetTypeId()) is not FamilySymbol rebarType) {
                 continue;
             }
             if(rebarType.FamilyName.Equals("IFC_Пилон_Верт.Арм.") || rebarType.FamilyName.Contains("IFC_Каркас_Пилон")) {
@@ -80,7 +85,7 @@ public class RebarFinderService {
                                          int formNumberMin, int formNumberMax,
                                          int formNumberMinException = int.MinValue, 
                                          int formNumberMaxException = int.MinValue) {
-        var rebars = new FilteredElementCollector(Repository.Document)
+        var rebars = new FilteredElementCollector(_repository.Document)
             .OfCategory(BuiltInCategory.OST_Rebar)
             .WhereElementIsNotElementType()
             .ToElements();
@@ -114,7 +119,7 @@ public class RebarFinderService {
 
         foreach(var rebar in rebars) {
             // Фильтрация по комплекту документации
-            if(rebar.GetParamValue<string>(ViewModel.ProjectSettings.ProjectSection) != projectSection) {
+            if(rebar.GetParamValue<string>(_settings.ProjectSettings.ProjectSection) != projectSection) {
                 continue;
             }
             // Фильтрация по имени семейства
@@ -137,7 +142,7 @@ public class RebarFinderService {
         var simpleRebars = new List<Element>();
         foreach(var rebar in rebars) {
             // Фильтрация по комплекту документации
-            if(rebar.GetParamValue<string>(ViewModel.ProjectSettings.ProjectSection) != projectSection) {
+            if(rebar.GetParamValue<string>(_settings.ProjectSettings.ProjectSection) != projectSection) {
                 continue;
             }
             // Фильтрация по номеру формы - отсев вертикальных стержней армирования
@@ -160,7 +165,7 @@ public class RebarFinderService {
         var simpleRebars = new List<Element>();
         foreach(var rebar in rebars) {
             // Фильтрация по комплекту документации
-            if(rebar.GetParamValue<string>(ViewModel.ProjectSettings.ProjectSection) != projectSection) {
+            if(rebar.GetParamValue<string>(_settings.ProjectSettings.ProjectSection) != projectSection) {
                 continue;
             }
             // Фильтрация по номеру формы - отсев вертикальных стержней армирования
@@ -185,7 +190,7 @@ public class RebarFinderService {
         var simpleRebars = new List<Element>();
         foreach(var rebar in rebars) {
             // Фильтрация по комплекту документации
-            if(rebar.GetParamValue<string>(ViewModel.ProjectSettings.ProjectSection) != projectSection) {
+            if(rebar.GetParamValue<string>(_settings.ProjectSettings.ProjectSection) != projectSection) {
                 continue;
             }
             // Фильтрация по номеру формы - отсев вертикальных стержней армирования
@@ -202,10 +207,10 @@ public class RebarFinderService {
     /// Метод возвращает только те элементы, что видны на виде
     /// </summary>
     public List<Element> GetRebarsFromView(List<Element> rebars, View view) {
-        var collector = new FilteredElementCollector(Repository.Document, view.Id)
+        var collector = new FilteredElementCollector(_repository.Document, view.Id)
             .WhereElementIsViewIndependent()
             .ToElements();
-        return collector.Intersect(rebars, ViewModel.ComparerOfElements).ToList();
+        return collector.Intersect(rebars, _comparerOfElements).ToList();
     }
 
 
@@ -213,11 +218,10 @@ public class RebarFinderService {
     /// Определение с какой стороны относительно вида находится Г-образный стержень
     /// </summary>
     public bool DirectionHasLRebar(View view, string projectSection, DirectionType directionType) {
-        var rebarFinder = ViewModel.RebarFinder;
         // Г-образный стержень
-        var lRebar = rebarFinder.GetSimpleRebars(view, projectSection, 1101).FirstOrDefault();
+        var lRebar = GetSimpleRebars(view, projectSection, 1101).FirstOrDefault();
         // Бутылка
-        var bottleRebar = rebarFinder.GetSimpleRebars(view, projectSection, 1204).FirstOrDefault();
+        var bottleRebar = GetSimpleRebars(view, projectSection, 1204).FirstOrDefault();
 
         if(lRebar is null || bottleRebar is null) {
             return false;

@@ -8,14 +8,14 @@ using RevitPylonDocumentation.Models.PylonSheetNView;
 
 namespace RevitPylonDocumentation.Models.Services;
 internal class FloorAnalyzerService {
+    private readonly Document _doc;
+    private readonly PylonSheetInfo _sheetInfo;
 
-    public FloorAnalyzerService(RevitRepository repository, PylonSheetInfo pylonSheetInfo) {
-        Repository = repository;
-        SheetInfo = pylonSheetInfo;
+    public FloorAnalyzerService(Document document, PylonSheetInfo pylonSheetInfo) {
+        _doc = document;
+        _sheetInfo = pylonSheetInfo;
     }
 
-    internal RevitRepository Repository { get; set; }
-    internal PylonSheetInfo SheetInfo { get; set; }
 
     internal PlanarFace GetTopFloorFace(Element floor, Options options) => GetFloorFace(floor, options)
     .FirstOrDefault(face => Math.Abs(face.FaceNormal.Z - 1) < 0.001);
@@ -31,7 +31,7 @@ internal class FloorAnalyzerService {
 
 
     internal Element GetLastFloor() {
-        var lastPylon = SheetInfo.HostElems.Last();
+        var lastPylon = _sheetInfo.HostElems.Last();
         var bbox = lastPylon.get_BoundingBox(null);
 
         // Готовим фильтр для сбор плит в области вокруг верхней точки пилона
@@ -42,7 +42,7 @@ internal class FloorAnalyzerService {
         );
         var filter = new BoundingBoxIntersectsFilter(outline);
 
-        return new FilteredElementCollector(Repository.Document)
+        return new FilteredElementCollector(_doc)
             .OfCategory(BuiltInCategory.OST_Floors)
             .WherePasses(filter)
             .WhereElementIsNotElementType()

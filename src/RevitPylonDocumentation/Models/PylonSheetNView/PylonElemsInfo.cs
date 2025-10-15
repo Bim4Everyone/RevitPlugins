@@ -5,19 +5,17 @@ using Autodesk.Revit.DB;
 
 using dosymep.Revit;
 
-using RevitPylonDocumentation.ViewModels;
-
 namespace RevitPylonDocumentation.Models.PylonSheetNView;
 internal class PylonElemsInfo {
-    internal PylonElemsInfo(MainViewModel mvm, RevitRepository revitRepository, PylonSheetInfo pylonSheetInfo) {
-        ViewModel = mvm;
-        SheetInfo = pylonSheetInfo;
-        Repository = revitRepository;
-    }
+    private readonly CreationSettings _settings;
+    private readonly Document _doc;
+    private readonly PylonSheetInfo _sheetInfo;
 
-    internal MainViewModel ViewModel { get; set; }
-    internal PylonSheetInfo SheetInfo { get; set; }
-    internal RevitRepository Repository { get; set; }
+    internal PylonElemsInfo(CreationSettings settings, RevitRepository repository, PylonSheetInfo pylonSheetInfo) {
+        _settings = settings;
+        _doc = repository.Document;
+        _sheetInfo = pylonSheetInfo;
+    }
 
     public XYZ VectorByLength { get; set; }
     public XYZ VectorByWidth { get; set; }
@@ -41,7 +39,7 @@ internal class PylonElemsInfo {
     /// Определяет вектор направления основы пилона
     /// </summary>
     public void FindPylonHostVectors() {
-        var bottomHost = SheetInfo.HostElems.First();
+        var bottomHost = _sheetInfo.HostElems.First();
         // В зависимости от принадлежности к категории определяем вектор направления основы пилона
         if(bottomHost.Category.GetBuiltInCategory() == BuiltInCategory.OST_Walls) {
             var wall = bottomHost as Wall;
@@ -66,7 +64,7 @@ internal class PylonElemsInfo {
     /// Определяет точку вставки основы пилона
     /// </summary>
     public void FindPylonHostOrigin() {
-        var bottomHost = SheetInfo.HostElems.First();
+        var bottomHost = _sheetInfo.HostElems.First();
         // В зависимости от принадлежности к категории определяем точку вставки основы пилона
         if(bottomHost.Category.GetBuiltInCategory() == BuiltInCategory.OST_Walls) {
             var wall = bottomHost as Wall;
@@ -82,7 +80,7 @@ internal class PylonElemsInfo {
             
             // В случае FamilyInstance этого недостаточно, т.к. отметка по высоте будет на уровне 0
             // Поэтому берем высотную отметку уровня элемента, смещение элемента от этого уровня и складываем для Z
-            var level = Repository.Document.GetElement(column.LevelId) as Level;
+            var level = _doc.GetElement(column.LevelId) as Level;
             var levelElevation = level.Elevation;
             var levelOffset = column.GetParamValue<double>(BuiltInParameter.FAMILY_BASE_LEVEL_OFFSET_PARAM);
             HostOrigin = new XYZ(HostOrigin.X, HostOrigin.Y, HostOrigin.Z + levelElevation + levelOffset);
@@ -97,7 +95,7 @@ internal class PylonElemsInfo {
         HostLength = 6;
         HostWidth = 1;
 
-        var elemForWork = SheetInfo.HostElems.First();
+        var elemForWork = _sheetInfo.HostElems.First();
         if(elemForWork.Category.GetBuiltInCategory() == BuiltInCategory.OST_Walls) {
             if(elemForWork is not Wall wall) { return; }
             if(wall.Location is not LocationCurve locationCurve) { return; }
@@ -111,10 +109,10 @@ internal class PylonElemsInfo {
         } else {
             if(elemForWork is not FamilyInstance column) { return; }
 
-            HostLength = ViewModel.ParamValService
-                            .GetParamValueAnywhere<double>(column, ViewModel.ProjectSettings.PylonLengthParamName);
-            HostWidth = ViewModel.ParamValService
-                            .GetParamValueAnywhere<double>(column, ViewModel.ProjectSettings.PylonWidthParamName);
+            HostLength = _sheetInfo.ParamValService
+                            .GetParamValueAnywhere<double>(column, _settings.ProjectSettings.PylonLengthParamName);
+            HostWidth = _sheetInfo.ParamValService
+                            .GetParamValueAnywhere<double>(column, _settings.ProjectSettings.PylonWidthParamName);
         }
     }
 
@@ -123,11 +121,11 @@ internal class PylonElemsInfo {
     /// </summary>
     public void FindHostMaxMinByZ() {
         // Отметка Z точки максимума верхнего пилона
-        var topElement = SheetInfo.HostElems.Last();
+        var topElement = _sheetInfo.HostElems.Last();
         LastPylonMaxZ = topElement.get_BoundingBox(null).Max.Z;
 
         // Отметка Z точки минимума нижнего пилона
-        var bottomElement = SheetInfo.HostElems.First();
+        var bottomElement = _sheetInfo.HostElems.First();
         LastPylonMinZ = bottomElement.get_BoundingBox(null).Min.Z;
     }
 
@@ -167,20 +165,20 @@ internal class PylonElemsInfo {
             );
 
         // Получаем список элементов, которые относятся к пилону с учетом фильтра по категориям и заполненным параметрам
-        var elems = new FilteredElementCollector(Repository.Document)
+        var elems = new FilteredElementCollector(_doc)
             .WherePasses(multiCategoryFilter)
             .WhereElementIsNotElementType()
             .Where(e =>
-                ViewModel.ParamValService.GetParamValueAnywhere<string>(e, ViewModel.ProjectSettings.ProjectSection)
-                    == SheetInfo.ProjectSection)
+                _sheetInfo.ParamValService.GetParamValueAnywhere<string>(e, _settings.ProjectSettings.ProjectSection)
+                    == _sheetInfo.ProjectSection)
             .Where(e =>
-                ViewModel.ParamValService.GetParamValueAnywhere<string>(e, ViewModel.ProjectSettings.TypicalPylonFilterParameter)
-                    == ViewModel.ProjectSettings.TypicalPylonFilterValue)
+                _sheetInfo.ParamValService.GetParamValueAnywhere<string>(e, _settings.ProjectSettings.TypicalPylonFilterParameter)
+                    == _settings.ProjectSettings.TypicalPylonFilterValue)
             .Where(e => e.Category.GetBuiltInCategory().Equals(BuiltInCategory.OST_Rebar) ?
-                ViewModel.ParamValService.GetParamValueAnywhere<string>(e, "обр_ФОП_Метка основы IFC")
-                    == SheetInfo.PylonKeyName :
-                ViewModel.ParamValService.GetParamValueAnywhere<string>(e, ViewModel.ProjectSettings.Mark)
-                    == SheetInfo.PylonKeyName)
+                _sheetInfo.ParamValService.GetParamValueAnywhere<string>(e, "обр_ФОП_Метка основы IFC")
+                    == _sheetInfo.PylonKeyName :
+                _sheetInfo.ParamValService.GetParamValueAnywhere<string>(e, _settings.ProjectSettings.Mark)
+                    == _sheetInfo.PylonKeyName)
             .ToList();
 
         // Получаем суммарный BoundingBox по элементам, которые относятся к пилону 
@@ -250,7 +248,7 @@ internal class PylonElemsInfo {
     /// </summary>
     /// <param name="vector">Вектор, который будет являться нормалью к плоскости проекции</param>
     private (double toMax, double toMin) GetDistanceToProjectedMidPt(XYZ vector) {
-        var bb = SheetInfo.ElemsInfo.ElemsBoundingBox;
+        var bb = _sheetInfo.ElemsInfo.ElemsBoundingBox;
         var upDir = XYZ.BasisZ;
 
         // Получаем точку минимума BoundingBox, спроецированную на плоскость с нормалью по вектору и горизонталь

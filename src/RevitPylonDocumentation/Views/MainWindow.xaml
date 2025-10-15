@@ -193,7 +193,7 @@
                                                     EventName="TextChanged">
                                                     <i:InvokeCommandAction
                                                         Command="{Binding DataContext.SettingsChangedCommand, 
-                                                                            RelativeSource={RelativeSource AncestorType={x:Type Window}}}" />
+                                                                  RelativeSource={RelativeSource AncestorType={x:Type Window}}}" />
                                                 </i:EventTrigger>
                                             </i:Interaction.Triggers>
                                         </TextBox>
@@ -232,7 +232,7 @@
                                                     EventName="TextChanged">
                                                     <i:InvokeCommandAction
                                                         Command="{Binding DataContext.SettingsChangedCommand, 
-                                                                            RelativeSource={RelativeSource AncestorType={x:Type Window}}}" />
+                                                                  RelativeSource={RelativeSource AncestorType={x:Type Window}}}" />
                                                 </i:EventTrigger>
                                             </i:Interaction.Triggers>
                                         </TextBox>
@@ -271,7 +271,7 @@
                                                     EventName="TextChanged">
                                                     <i:InvokeCommandAction
                                                         Command="{Binding DataContext.SettingsChangedCommand, 
-                                                                            RelativeSource={RelativeSource AncestorType={x:Type Window}}}" />
+                                                                  RelativeSource={RelativeSource AncestorType={x:Type Window}}}" />
                                                 </i:EventTrigger>
                                             </i:Interaction.Triggers>
                                         </TextBox>
@@ -310,7 +310,7 @@
                                                     EventName="TextChanged">
                                                     <i:InvokeCommandAction
                                                         Command="{Binding DataContext.SettingsChangedCommand, 
-                                                                            RelativeSource={RelativeSource AncestorType={x:Type Window}}}" />
+                                                                  RelativeSource={RelativeSource AncestorType={x:Type Window}}}" />
                                                 </i:EventTrigger>
                                             </i:Interaction.Triggers>
                                         </TextBox>
@@ -349,7 +349,7 @@
                                                     EventName="TextChanged">
                                                     <i:InvokeCommandAction
                                                         Command="{Binding DataContext.SettingsChangedCommand, 
-                                                                            RelativeSource={RelativeSource AncestorType={x:Type Window}}}" />
+                                                                  RelativeSource={RelativeSource AncestorType={x:Type Window}}}" />
                                                 </i:EventTrigger>
                                             </i:Interaction.Triggers>
                                         </TextBox>
@@ -402,7 +402,7 @@
                                                     EventName="TextChanged">
                                                     <i:InvokeCommandAction
                                                         Command="{Binding DataContext.SettingsChangedCommand, 
-                                                                            RelativeSource={RelativeSource AncestorType={x:Type Window}}}" />
+                                                                  RelativeSource={RelativeSource AncestorType={x:Type Window}}}" />
                                                 </i:EventTrigger>
                                             </i:Interaction.Triggers>
                                         </TextBox>
@@ -441,7 +441,7 @@
                                                     EventName="TextChanged">
                                                     <i:InvokeCommandAction
                                                         Command="{Binding DataContext.SettingsChangedCommand, 
-                                                                            RelativeSource={RelativeSource AncestorType={x:Type Window}}}" />
+                                                                  RelativeSource={RelativeSource AncestorType={x:Type Window}}}" />
                                                 </i:EventTrigger>
                                             </i:Interaction.Triggers>
                                         </TextBox>
@@ -459,7 +459,7 @@
                                             Height="25"
                                             HorizontalAlignment="Left"
                                             ItemsSource="{Binding Path=DimensionTypes}"
-                                            SelectedItem="{Binding Path=SelectedDimensionType}">
+                                            SelectedItem="{Binding Path=TypesSettings.SelectedDimensionType}">
 
                                             <ComboBox.ItemTemplate>
                                                 <DataTemplate>
@@ -496,7 +496,7 @@
                                             Height="25"
                                             HorizontalAlignment="Left"
                                             ItemsSource="{Binding Path=SpotDimensionTypes}"
-                                            SelectedItem="{Binding Path=SelectedSpotDimensionType}">
+                                            SelectedItem="{Binding Path=TypesSettings.SelectedSpotDimensionType}">
 
                                             <ComboBox.ItemTemplate>
                                                 <DataTemplate>
@@ -532,7 +532,7 @@
                                             Height="25"
                                             HorizontalAlignment="Left"
                                             ItemsSource="{Binding Path=RebarTagTypes}"
-                                            SelectedItem="{Binding Path=SelectedSkeletonTagType}">
+                                            SelectedItem="{Binding Path=TypesSettings.SelectedSkeletonTagType}">
 
                                             <ComboBox.ItemTemplate>
                                                 <DataTemplate>
@@ -568,7 +568,7 @@
                                             Height="25"
                                             HorizontalAlignment="Left"
                                             ItemsSource="{Binding Path=RebarTagTypes}"
-                                            SelectedItem="{Binding Path=SelectedRebarTagTypeWithSerif}">
+                                            SelectedItem="{Binding Path=TypesSettings.SelectedRebarTagTypeWithSerif}">
 
                                             <ComboBox.ItemTemplate>
                                                 <DataTemplate>
@@ -604,7 +604,7 @@
                                             Height="25"
                                             HorizontalAlignment="Left"
                                             ItemsSource="{Binding Path=RebarTagTypes}"
-                                            SelectedItem="{Binding Path=SelectedRebarTagTypeWithStep}">
+                                            SelectedItem="{Binding Path=TypesSettings.SelectedRebarTagTypeWithStep}">
 
                                             <ComboBox.ItemTemplate>
                                                 <DataTemplate>
@@ -640,7 +640,7 @@
                                             Height="25"
                                             HorizontalAlignment="Left"
                                             ItemsSource="{Binding Path=RebarTagTypes}"
-                                            SelectedItem="{Binding Path=SelectedRebarTagTypeWithComment}">
+                                            SelectedItem="{Binding Path=TypesSettings.SelectedRebarTagTypeWithComment}">
 
                                             <ComboBox.ItemTemplate>
                                                 <DataTemplate>
@@ -676,7 +676,7 @@
                                             Height="25"
                                             HorizontalAlignment="Left"
                                             ItemsSource="{Binding Path=TypicalAnnotationsTypes}"
-                                            SelectedItem="{Binding Path=SelectedUniversalTagType}">
+                                            SelectedItem="{Binding Path=TypesSettings.SelectedUniversalTagType}">
 
                                             <ComboBox.ItemTemplate>
                                                 <DataTemplate>
@@ -712,7 +712,7 @@
                                             Height="25"
                                             HorizontalAlignment="Left"
                                             ItemsSource="{Binding Path=DetailComponentsTypes}"
-                                            SelectedItem="{Binding Path=SelectedBreakLineType}">
+                                            SelectedItem="{Binding Path=TypesSettings.SelectedBreakLineType}">
 
                                             <ComboBox.ItemTemplate>
                                                 <DataTemplate>
@@ -748,7 +748,7 @@
                                             Height="25"
                                             HorizontalAlignment="Left"
                                             ItemsSource="{Binding Path=DetailComponentsTypes}"
-                                            SelectedItem="{Binding Path=SelectedConcretingJointType}">
+                                            SelectedItem="{Binding Path=TypesSettings.SelectedConcretingJointType}">
 
                                             <ComboBox.ItemTemplate>
                                                 <DataTemplate>
@@ -823,7 +823,7 @@
                                                         EventName="TextChanged">
                                                         <i:InvokeCommandAction
                                                             Command="{Binding DataContext.SettingsChangedCommand, 
-                                                                            RelativeSource={RelativeSource AncestorType={x:Type Window}}}" />
+                                                                      RelativeSource={RelativeSource AncestorType={x:Type Window}}}" />
                                                     </i:EventTrigger>
                                                 </i:Interaction.Triggers>
                                             </TextBox>
@@ -854,7 +854,7 @@
                                                         EventName="TextChanged">
                                                         <i:InvokeCommandAction
                                                             Command="{Binding DataContext.SettingsChangedCommand, 
-                                                                            RelativeSource={RelativeSource AncestorType={x:Type Window}}}" />
+                                                                      RelativeSource={RelativeSource AncestorType={x:Type Window}}}" />
                                                     </i:EventTrigger>
                                                 </i:Interaction.Triggers>
                                             </TextBox>
@@ -879,7 +879,7 @@
                                             Height="25"
                                             HorizontalAlignment="Left"
                                             ItemsSource="{Binding Path=TitleBlocks}"
-                                            SelectedItem="{Binding Path=SelectedTitleBlock}">
+                                            SelectedItem="{Binding Path=TypesSettings.SelectedTitleBlock}">
 
                                             <ComboBox.ToolTip>
                                                 <ToolTip>
@@ -1316,7 +1316,7 @@
                                             Height="25"
                                             HorizontalAlignment="Left"
                                             ItemsSource="{Binding Path=ViewTemplatesInPj}"
-                                            SelectedItem="{Binding Path=SelectedGeneralViewTemplate}">
+                                            SelectedItem="{Binding Path=TypesSettings.SelectedGeneralViewTemplate}">
 
                                             <ComboBox.ToolTip>
                                                 <ToolTip>
@@ -1364,7 +1364,7 @@
                                             Height="25"
                                             HorizontalAlignment="Left"
                                             ItemsSource="{Binding Path=ViewTemplatesInPj}"
-                                            SelectedItem="{Binding Path=SelectedGeneralRebarViewTemplate}">
+                                            SelectedItem="{Binding Path=TypesSettings.SelectedGeneralRebarViewTemplate}">
 
                                             <ComboBox.ToolTip>
                                                 <ToolTip>
@@ -1412,7 +1412,7 @@
                                             Height="25"
                                             HorizontalAlignment="Left"
                                             ItemsSource="{Binding Path=ViewFamilyTypes}"
-                                            SelectedItem="{Binding Path=SelectedViewFamilyType}">
+                                            SelectedItem="{Binding Path=TypesSettings.SelectedViewFamilyType}">
 
                                             <ComboBox.ToolTip>
                                                 <ToolTip>
@@ -2000,7 +2000,7 @@
                                                 Style="{StaticResource TextBoxWithTooltipStyle}"
                                                 HorizontalAlignment="Left"
                                                 Margin="10 0 5 0"
-                                                Text="{Binding Path=ViewSectionSettings.TransverseRebarViewSecondPrefixTemp,         UpdateSourceTrigger=PropertyChanged}"
+                                                Text="{Binding Path=ViewSectionSettings.TransverseRebarViewSecondPrefixTemp, UpdateSourceTrigger=PropertyChanged}"
                                                 Width="174"
                                                 Height="25"
                                                 VerticalContentAlignment="Center">
@@ -2338,7 +2338,7 @@
                                             Height="25"
                                             HorizontalAlignment="Left"
                                             ItemsSource="{Binding Path=ViewTemplatesInPj}"
-                                            SelectedItem="{Binding Path=SelectedTransverseViewTemplate}">
+                                            SelectedItem="{Binding Path=TypesSettings.SelectedTransverseViewTemplate}">
 
                                             <ComboBox.ToolTip>
                                                 <ToolTip>
@@ -2387,7 +2387,7 @@
                                             Height="25"
                                             HorizontalAlignment="Left"
                                             ItemsSource="{Binding Path=ViewTemplatesInPj}"
-                                            SelectedItem="{Binding Path=SelectedTransverseRebarViewTemplate}">
+                                            SelectedItem="{Binding Path=TypesSettings.SelectedTransverseRebarViewTemplate}">
 
                                             <ComboBox.ToolTip>
                                                 <ToolTip>
@@ -2436,7 +2436,7 @@
                                             Height="25"
                                             HorizontalAlignment="Left"
                                             ItemsSource="{Binding Path=ViewFamilyTypes}"
-                                            SelectedItem="{Binding Path=SelectedViewFamilyType}">
+                                            SelectedItem="{Binding Path=TypesSettings.SelectedViewFamilyType}">
 
                                             <ComboBox.ToolTip>
                                                 <ToolTip>
@@ -2581,7 +2581,7 @@
                                             Height="25"
                                             HorizontalAlignment="Left"
                                             ItemsSource="{Binding Path=Legends}"
-                                            SelectedItem="{Binding Path=SelectedLegend}">
+                                            SelectedItem="{Binding Path=TypesSettings.SelectedLegend}">
 
                                             <ComboBox.ToolTip>
                                                 <ToolTip>
@@ -3948,7 +3948,7 @@
                         MinWidth="250"
                         Height="36"
                         ItemsSource="{Binding ProjectSections}"
-                        SelectedItem="{Binding SelectedProjectSection}">
+                        SelectedItem="{Binding Path=SelectionSettings.SelectedProjectSection}">
 
                         <ComboBox.ToolTip>
                             <ToolTip>

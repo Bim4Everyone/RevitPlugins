@@ -4,32 +4,32 @@ using System.Linq;
 using RevitPylonDocumentation.Models.PylonSheetNView.ViewDimensionServices.ViewFormDimensionServices;
 using RevitPylonDocumentation.Models.PylonSheetNView.ViewMarkServices.ViewFormMarkServices;
 using RevitPylonDocumentation.Models.Services;
-using RevitPylonDocumentation.ViewModels;
 
 namespace RevitPylonDocumentation.Models.PylonSheetNView.ViewAnnotationCreators;
 internal class TransViewSecondAnnotCreator : ViewAnnotationCreator {
-    public TransViewSecondAnnotCreator(MainViewModel mvm, RevitRepository repository, PylonSheetInfo pylonSheetInfo, 
+    public TransViewSecondAnnotCreator(CreationSettings settings, RevitRepository repository, PylonSheetInfo pylonSheetInfo, 
                                        PylonView pylonView) 
-        : base(mvm, repository, pylonSheetInfo, pylonView) {
+        : base(settings, repository, pylonSheetInfo, pylonView) {
     }
 
     public override void TryCreateViewAnnotations() {
+        var view = ViewOfPylon.ViewElement;
+        var doc = view.Document;
+        var dimensionBaseService = new DimensionBaseService(view, SheetInfo.ParamValService);
+        
         // Пытаемся создать размеры на виде
         try {
-            var view = ViewOfPylon.ViewElement;
             var grids = Repository.GridsInView(view);
-            var dimensionBaseService = new DimensionBaseService(view, ViewModel.ParamValService);
-
             // Определяем относительно какого пилона нужны размеры - верхнего или нижнего 
             var pylon = SheetInfo.HostElems.Last();
 
             // Вертикальные размеры
-            var vertDimensionService = new TransViewVertDimensionService(ViewModel, Repository, SheetInfo, ViewOfPylon,
+            var vertDimensionService = new TransViewVertDimensionService(Settings, doc, SheetInfo, ViewOfPylon,
                                                                          dimensionBaseService);
             bool longGridsWillBeNeeded = vertDimensionService.TryCreateDimensions(false, true, pylon, grids);
 
             // Горизонтальные размеры
-            var horizDimensionService = new TransViewHorizDimensionService(ViewModel, Repository, SheetInfo, ViewOfPylon,
+            var horizDimensionService = new TransViewHorizDimensionService(Settings, doc, SheetInfo, ViewOfPylon,
                                                                            dimensionBaseService);
             horizDimensionService.TryCreateDimensions(false, pylon, grids);
 
@@ -40,7 +40,7 @@ internal class TransViewSecondAnnotCreator : ViewAnnotationCreator {
 
         // Пытаемся создать марки на виде
         try {
-            var markService = new TransViewMarkService(ViewModel, Repository, SheetInfo, ViewOfPylon);
+            var markService = new TransViewMarkService(Settings, doc, SheetInfo, ViewOfPylon);
             markService.TryCreateTransverseViewBarMarks();
         } catch(Exception) { }
     }

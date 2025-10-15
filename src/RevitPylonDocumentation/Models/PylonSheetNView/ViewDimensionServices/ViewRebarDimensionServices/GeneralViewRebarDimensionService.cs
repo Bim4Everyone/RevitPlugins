@@ -8,23 +8,22 @@ using dosymep.Revit;
 
 using RevitPylonDocumentation.Models.PluginOptions;
 using RevitPylonDocumentation.Models.Services;
-using RevitPylonDocumentation.ViewModels;
 
 namespace RevitPylonDocumentation.Models.PylonSheetNView.ViewDimensionServices.ViewRebarDimensionServices;
 internal class GeneralViewRebarDimensionService {
-    private readonly MainViewModel _viewModel;
-    private readonly RevitRepository _repository;
+    private readonly DimensionType _selectedDimensionType;
+    private readonly Document _doc;
     private readonly PylonSheetInfo _sheetInfo;
     private readonly PylonView _viewOfPylon;
 
     private readonly DimensionBaseService _dimensionBaseService;
     private readonly DimensionSegmentsService _dimSegmentsService;
     
-    internal GeneralViewRebarDimensionService(MainViewModel mvm, RevitRepository repository, 
+    internal GeneralViewRebarDimensionService(CreationSettings settings, Document document, 
                                               PylonSheetInfo pylonSheetInfo, PylonView pylonView, 
                                               DimensionBaseService dimensionBaseService) {
-        _viewModel = mvm;
-        _repository = repository;
+        _selectedDimensionType = settings.TypesSettings.SelectedDimensionType;
+        _doc = document;
         _sheetInfo = pylonSheetInfo;
         _viewOfPylon = pylonView;
 
@@ -41,8 +40,8 @@ internal class GeneralViewRebarDimensionService {
             if(_sheetInfo.RebarInfo.AllRebarAreL) { return; }
             var dimensionLineTop = _dimensionBaseService.GetDimensionLine(skeletonParentRebar, DirectionType.Top, 0.5);
             var refArrayTop = _dimensionBaseService.GetDimensionRefs(skeletonParentRebar,  ["верх", "фронт"]);
-            var dimension = _repository.Document.Create.NewDimension(_viewOfPylon.ViewElement, dimensionLineTop, 
-                                                                     refArrayTop, _viewModel.SelectedDimensionType);
+            var dimension = _doc.Create.NewDimension(_viewOfPylon.ViewElement, dimensionLineTop, 
+                                                                     refArrayTop, _selectedDimensionType);
             dimension.SetParamValue(BuiltInParameter.DIM_DISPLAY_EQ, 2);
         } catch(Exception) { }
     }
@@ -55,8 +54,8 @@ internal class GeneralViewRebarDimensionService {
             var dimensionLineBottom = _dimensionBaseService.GetDimensionLine(skeletonParentRebar, 
                                                                              DirectionType.Bottom, 0.6);
             var refArrayBottom = _dimensionBaseService.GetDimensionRefs(skeletonParentRebar,  ["низ", "фронт"]);
-            var dimension = _repository.Document.Create.NewDimension(_viewOfPylon.ViewElement, dimensionLineBottom, 
-                                                                     refArrayBottom, _viewModel.SelectedDimensionType);
+            var dimension = _doc.Create.NewDimension(_viewOfPylon.ViewElement, dimensionLineBottom, 
+                                                                     refArrayBottom, _selectedDimensionType);
             dimension.SetParamValue(BuiltInParameter.DIM_DISPLAY_EQ, 2);
         } catch(Exception) { }
     }
@@ -70,8 +69,8 @@ internal class GeneralViewRebarDimensionService {
                                                                                   DirectionType.Bottom, 1.1);
             var refArrayBottomEdges = _dimensionBaseService.GetDimensionRefs(skeletonParentRebar, 
                                                                              ["низ", "фронт", "край"]);
-            _repository.Document.Create.NewDimension(_viewOfPylon.ViewElement, dimensionLineBottomEdges,
-                                                     refArrayBottomEdges, _viewModel.SelectedDimensionType);
+            _doc.Create.NewDimension(_viewOfPylon.ViewElement, dimensionLineBottomEdges,
+                                                     refArrayBottomEdges, _selectedDimensionType);
         } catch(Exception) { }
     }
 
@@ -118,8 +117,8 @@ internal class GeneralViewRebarDimensionService {
             var dimensionLineLeft = _dimensionBaseService.GetDimensionLine(_sheetInfo.HostElems.First() as FamilyInstance,
                                                                            DirectionType.Left, 1.1);
             var dimensionRebarSide =
-                _repository.Document.Create.NewDimension(_viewOfPylon.ViewElement, dimensionLineLeft, refArraySide,
-                                                         _viewModel.SelectedDimensionType);
+                _doc.Create.NewDimension(_viewOfPylon.ViewElement, dimensionLineLeft, refArraySide,
+                                                         _selectedDimensionType);
             // Применяем опции изменений сегментов размера
             _dimSegmentsService.ApplySegmentsModification(dimensionRebarSide, dimSegmentOpts);
         } catch(Exception) { }

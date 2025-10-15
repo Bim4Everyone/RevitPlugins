@@ -11,9 +11,8 @@ using Grid = Autodesk.Revit.DB.Grid;
 
 namespace RevitPylonDocumentation.Models.PylonSheetNView.ViewDimensionServices.ViewFormDimensionServices;
 internal class TransViewHorizDimensionService {
-
-    private readonly MainViewModel _viewModel;
-    private readonly RevitRepository _repository;
+    private readonly CreationSettings _settings;
+    private readonly Document _doc;
     private readonly PylonSheetInfo _sheetInfo;
     private readonly PylonView _viewOfPylon;
 
@@ -21,16 +20,16 @@ internal class TransViewHorizDimensionService {
     private readonly DimensionSegmentsService _dimSegmentsService;
     private readonly DimensionCreationService _dimCreationService;
 
-    internal TransViewHorizDimensionService(MainViewModel mvm, RevitRepository repository, PylonSheetInfo pylonSheetInfo,
-                                           PylonView pylonView, DimensionBaseService dimensionBaseService) {
-        _viewModel = mvm;
-        _repository = repository;
+    internal TransViewHorizDimensionService(CreationSettings settings, Document document, PylonSheetInfo pylonSheetInfo,
+                                            PylonView pylonView, DimensionBaseService dimensionBaseService) {
+        _settings = settings;
+        _doc = document;
         _sheetInfo = pylonSheetInfo;
         _viewOfPylon = pylonView;
 
         _dimensionBaseService = dimensionBaseService;
         _dimSegmentsService = new DimensionSegmentsService(pylonView.ViewElement);
-        _dimCreationService = new DimensionCreationService(mvm, repository, pylonView, _dimensionBaseService);
+        _dimCreationService = new DimensionCreationService(settings, document, pylonView, _dimensionBaseService);
     }
 
 

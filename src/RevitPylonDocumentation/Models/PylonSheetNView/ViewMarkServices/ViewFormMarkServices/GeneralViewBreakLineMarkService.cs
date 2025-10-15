@@ -4,13 +4,15 @@ using System.Collections.Generic;
 using Autodesk.Revit.DB;
 
 using RevitPylonDocumentation.Models.Services;
-using RevitPylonDocumentation.ViewModels;
 
 namespace RevitPylonDocumentation.Models.PylonSheetNView.ViewMarkServices.ViewFormMarkServices;
 
 internal class GeneralViewBreakLineMarkService {
+    private readonly Document _doc;
+    private readonly PylonSheetInfo _sheetInfo;
+    private readonly PylonView _viewOfPylon;
+
     private readonly FamilySymbol _breakLineSymbol;
-    private readonly DimensionBaseService _dimensionBaseService;
     private readonly BreakLinePointsService _breakLinePointsService;
     private readonly BreakLineParameterService _breakLineParameterService;
 
@@ -19,17 +21,14 @@ internal class GeneralViewBreakLineMarkService {
     private readonly double _breakLinesOffsetY = 0.3;
     private readonly double _breakLinesOffsetYBottom = 1;
 
-    internal GeneralViewBreakLineMarkService(MainViewModel mvm, RevitRepository repository, 
-                                             PylonSheetInfo pylonSheetInfo, PylonView pylonView,
-                                             DimensionBaseService dimensionBaseService) {
-        ViewModel = mvm;
-        Repository = repository;
-        SheetInfo = pylonSheetInfo;
-        ViewOfPylon = pylonView;
-        _dimensionBaseService = dimensionBaseService;
+    internal GeneralViewBreakLineMarkService(CreationSettings settings, Document document, 
+                                             PylonSheetInfo pylonSheetInfo, PylonView pylonView) {
+        _doc = document;
+        _sheetInfo = pylonSheetInfo;
+        _viewOfPylon = pylonView;
 
-        var viewPointsAnalyzer = new ViewPointsAnalyzerService(ViewOfPylon);
-        var floorAnalyzerService = new FloorAnalyzerService(repository, pylonSheetInfo);
+        var viewPointsAnalyzer = new ViewPointsAnalyzerService(_viewOfPylon);
+        var floorAnalyzerService = new FloorAnalyzerService(document, pylonSheetInfo);
 
         _breakLinePointsService = new BreakLinePointsService(
             viewPointsAnalyzer,
@@ -40,13 +39,9 @@ internal class GeneralViewBreakLineMarkService {
             _breakLinesOffsetYBottom);
 
         _breakLineParameterService = new BreakLineParameterService();
-        _breakLineSymbol = mvm.SelectedBreakLineType;
+        _breakLineSymbol = settings.TypesSettings.SelectedBreakLineType;
     }
 
-    internal MainViewModel ViewModel { get; set; }
-    internal RevitRepository Repository { get; set; }
-    internal PylonSheetInfo SheetInfo { get; set; }
-    internal PylonView ViewOfPylon { get; set; }
 
     /// <summary>
     /// Создаёт линии обрыва ниже первого опалубочного элемента
@@ -55,7 +50,7 @@ internal class GeneralViewBreakLineMarkService {
         if(_breakLineSymbol is null)
             return;
 
-        var view = ViewOfPylon.ViewElement;
+        var view = _viewOfPylon.ViewElement;
         try {
             var points = _breakLinePointsService.GetBreakLinePointsForLowerLines(view, isForPerpView);
             var lines = CreateLinesFromPoints(points, true);
@@ -70,7 +65,7 @@ internal class GeneralViewBreakLineMarkService {
         if(_breakLineSymbol is null)
             return;
 
-        var view = ViewOfPylon.ViewElement;
+        var view = _viewOfPylon.ViewElement;
         try {
             var points = _breakLinePointsService.GetBreakLinePointsForUpperLines(view);
             var lines = CreateLinesFromPoints(points, false);
@@ -82,10 +77,10 @@ internal class GeneralViewBreakLineMarkService {
     /// Создаёт линии обрыва между опалубочными элементами
     /// </summary>
     internal void TryCreateMiddleBreakLines(bool isForPerpView) {
-        if(SheetInfo.HostElems.Count == 1 || _breakLineSymbol is null)
+        if(_sheetInfo.HostElems.Count == 1 || _breakLineSymbol is null)
             return;
 
-        var view = ViewOfPylon.ViewElement;
+        var view = _viewOfPylon.ViewElement;
         try {
             var points = _breakLinePointsService.GetBreakLinePointsForMiddleLines(view, isForPerpView);
             var lines = CreateLinesFromPoints(points, false);
@@ -129,7 +124,7 @@ internal class GeneralViewBreakLineMarkService {
         
         foreach(var line in lines) {
             try {
-                var breakLine = Repository.Document.Create.NewFamilyInstance(line, _breakLineSymbol, view);
+                var breakLine = _doc.Create.NewFamilyInstance(line, _breakLineSymbol, view);
                 _breakLineParameterService.TrySetBreakLineOffsets(breakLine);
             } catch(Exception) { }
         }

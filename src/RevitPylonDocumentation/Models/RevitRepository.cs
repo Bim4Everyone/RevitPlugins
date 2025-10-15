@@ -238,7 +238,7 @@ internal class RevitRepository {
                 .FirstOrDefault();
 
             if(testPylonSheetInfo is null) {
-                var pylonSheetInfo = new PylonSheetInfo(mainViewModel, this, projectSection, hostMark);
+                var pylonSheetInfo = new PylonSheetInfo(projectSection, hostMark);
                 pylonSheetInfo.HostElems.Add(elem);
                 FindSheetInPj(mainViewModel, pylonSheetInfo);
 

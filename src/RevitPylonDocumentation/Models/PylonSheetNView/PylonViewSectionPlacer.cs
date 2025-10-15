@@ -2,7 +2,7 @@ using System;
 
 using Autodesk.Revit.DB;
 
-using RevitPylonDocumentation.ViewModels;
+using RevitPylonDocumentation.Models.UserSettings;
 
 namespace RevitPylonDocumentation.Models.PylonSheetNView;
 public class PylonViewSectionPlacer {
@@ -24,14 +24,16 @@ public class PylonViewSectionPlacer {
     private readonly double _viewportOffset = UnitUtilsHelper.ConvertToInternalValue(10);
 
 
-    internal PylonViewSectionPlacer(MainViewModel mvm, RevitRepository repository, PylonSheetInfo pylonSheetInfo) {
-        ViewModel = mvm;
-        Repository = repository;
+    internal PylonViewSectionPlacer(CreationSettings settings, Document document, PylonSheetInfo pylonSheetInfo) {
+        SectionSettings = settings.ViewSectionSettings;
+        SelectionSettings = settings.SelectionSettings;
+        Doc = document;
         SheetInfo = pylonSheetInfo;
     }
 
-    internal MainViewModel ViewModel { get; set; }
-    internal RevitRepository Repository { get; set; }
+    internal UserViewSectionSettings SectionSettings { get; set; }
+    internal UserSelectionSettings SelectionSettings { get; set; }
+    internal Document Doc { get; set; }
     internal PylonSheetInfo SheetInfo { get; set; }
 
 
@@ -48,9 +50,9 @@ public class PylonViewSectionPlacer {
             // номер не должен совпадать с номером основного вида армирования
             SheetInfo.GeneralView.ViewportNumber = "100";
             SheetInfo.GeneralView.ViewportName =
-                ViewModel.ViewSectionSettings.GeneralViewPrefix
+                SectionSettings.GeneralViewPrefix
                 + SheetInfo.PylonKeyName
-                + ViewModel.ViewSectionSettings.GeneralViewSuffix;
+                + SectionSettings.GeneralViewSuffix;
         }
 
         // Передаем основной вид пилона в метод по созданию видов в (0.0.0)
@@ -59,12 +61,12 @@ public class PylonViewSectionPlacer {
         }
 
         // Если пользователь выбрал создание основного или бокового вида каркаса, то нужна большая рамка А1
-        var sels = ViewModel.SelectionSettings;
+        var sels = SelectionSettings;
         if(sels.NeedWorkWithGeneralRebarView || sels.NeedWorkWithGeneralPerpendicularRebarView) {
-            SheetInfo.SetTitleBlockSize(Repository.Document, 1, 1);
+            SheetInfo.SetTitleBlockSize(Doc, 1, 1);
         } else if(SheetInfo.GeneralView.ViewportHalfHeight * 2 > SheetInfo.TitleBlockHeight) {
             // Если высота видового экрана основного вида больше, чем высота рамки, то он не поместится - меняем рамку
-            SheetInfo.SetTitleBlockSize(Repository.Document, 2, 1);
+            SheetInfo.SetTitleBlockSize(Doc, 2, 1);
         }
 
         double newCenterX = -SheetInfo.TitleBlockWidth + SheetInfo.GeneralView.ViewportHalfWidth 
@@ -115,9 +117,9 @@ public class PylonViewSectionPlacer {
             // номер не должен совпадать с номером основного вида опалубки
             SheetInfo.GeneralViewRebar.ViewportNumber = "101";
             SheetInfo.GeneralViewRebar.ViewportName =
-                ViewModel.ViewSectionSettings.GeneralRebarViewPrefix
+                SectionSettings.GeneralRebarViewPrefix
                 + SheetInfo.PylonKeyName
-                + ViewModel.ViewSectionSettings.GeneralRebarViewSuffix;
+                + SectionSettings.GeneralRebarViewSuffix;
         }
 
         // Передаем основной вид пилона в метод по созданию видов в (0.0.0)
@@ -127,7 +129,7 @@ public class PylonViewSectionPlacer {
 
         // Если высота видового экрана основного вида больше, чем высота рамки, то он не поместится - меняем рамку
         if(SheetInfo.GeneralViewRebar.ViewportHalfHeight * 2 > SheetInfo.TitleBlockHeight) {
-            SheetInfo.SetTitleBlockSize(Repository.Document, 2, 1);
+            SheetInfo.SetTitleBlockSize(Doc, 2, 1);
         }
 
         double newCenterX = -SheetInfo.TitleBlockWidth + SheetInfo.GeneralViewRebar.ViewportHalfWidth
@@ -156,9 +158,9 @@ public class PylonViewSectionPlacer {
             // Индекс перпендикулярного вида опалубки на листе
             SheetInfo.GeneralViewPerpendicular.ViewportNumber = "4";
             SheetInfo.GeneralViewPerpendicular.ViewportName =
-                ViewModel.ViewSectionSettings.GeneralViewPerpendicularPrefix
+                SectionSettings.GeneralViewPerpendicularPrefix
                 + SheetInfo.PylonKeyName
-                + ViewModel.ViewSectionSettings.GeneralViewPerpendicularSuffix;
+                + SectionSettings.GeneralViewPerpendicularSuffix;
         }
 
         // Передаем основной перпендикулярный вид пилона в метод по созданию видов в (0.0.0)
@@ -206,9 +208,9 @@ public class PylonViewSectionPlacer {
             // Индекс перпендикулярного вида армирования на листе
             SheetInfo.GeneralViewPerpendicularRebar.ViewportNumber = "г";
             SheetInfo.GeneralViewPerpendicularRebar.ViewportName =
-                ViewModel.ViewSectionSettings.GeneralRebarViewPerpendicularPrefix
+                SectionSettings.GeneralRebarViewPerpendicularPrefix
                 + SheetInfo.PylonKeyName
-                + ViewModel.ViewSectionSettings.GeneralRebarViewPerpendicularSuffix;
+                + SectionSettings.GeneralRebarViewPerpendicularSuffix;
         }
 
         // Передаем основной перпендикулярный вид пилона в метод по созданию видов в (0.0.0)
@@ -526,7 +528,7 @@ public class PylonViewSectionPlacer {
 
 
     internal bool PlacePylonViewport(ViewSheet viewSheet, PylonView pylonView, bool hideUnnecessaryCategories) {
-        var doc = Repository.Document;
+        var doc = Doc;
         // Проверяем можем ли разместить на листе видовой экран вида
         if(!Viewport.CanAddViewToSheet(doc, viewSheet.Id, pylonView.ViewElement.Id)) {
             return false;

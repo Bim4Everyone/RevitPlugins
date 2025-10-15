@@ -4,18 +4,18 @@ using System.Linq;
 using RevitPylonDocumentation.Models.PylonSheetNView.ViewDimensionServices.ViewFormDimensionServices;
 using RevitPylonDocumentation.Models.PylonSheetNView.ViewMarkServices.ViewFormMarkServices;
 using RevitPylonDocumentation.Models.Services;
-using RevitPylonDocumentation.ViewModels;
 
 namespace RevitPylonDocumentation.Models.PylonSheetNView.ViewAnnotationCreators;
 internal class GeneralViewAnnotCreator : ViewAnnotationCreator {
-    public GeneralViewAnnotCreator(MainViewModel mvm, RevitRepository repository, PylonSheetInfo pylonSheetInfo, 
+    public GeneralViewAnnotCreator(CreationSettings settings, RevitRepository repository, PylonSheetInfo pylonSheetInfo, 
                                    PylonView pylonView) 
-        : base(mvm, repository, pylonSheetInfo, pylonView) {
+        : base(settings, repository, pylonSheetInfo, pylonView) {
     }
 
     public override void TryCreateViewAnnotations() {
         var view = ViewOfPylon.ViewElement;
-        var dimensionBaseService = new DimensionBaseService(view, ViewModel.ParamValService);
+        var doc = view.Document;
+        var dimensionBaseService = new DimensionBaseService(view, SheetInfo.ParamValService);
 
         // Пытаемся создать размеры на виде
         try {
@@ -28,12 +28,12 @@ internal class GeneralViewAnnotCreator : ViewAnnotationCreator {
             var grids = Repository.GridsInView(view);
 
             //ВЕРТИКАЛЬНЫЕ РАЗМЕРЫ
-            var vertDimensionService = new GeneralViewVertDimensionService(ViewModel, Repository, SheetInfo,
+            var vertDimensionService = new GeneralViewVertDimensionService(Settings, doc, SheetInfo,
                                                                            ViewOfPylon, dimensionBaseService);
             vertDimensionService.CreateDimensions(skeletonParentRebar, grids, false);
             
             //ГОРИЗОНТАЛЬНЫЕ РАЗМЕРЫ
-            var horizDimensionService = new GeneralViewHorizDimensionService(ViewModel, Repository, SheetInfo, 
+            var horizDimensionService = new GeneralViewHorizDimensionService(Settings, doc, SheetInfo, 
                                                                              ViewOfPylon, dimensionBaseService);
             horizDimensionService.CreateDimensions(skeletonParentRebar, false);
 
@@ -44,15 +44,14 @@ internal class GeneralViewAnnotCreator : ViewAnnotationCreator {
 
         // Пытаемся создать марки на виде
         try {
-            var markService = new GeneralViewMarkService(ViewModel, Repository, SheetInfo, ViewOfPylon, 
+            var markService = new GeneralViewMarkService(Settings, doc, SheetInfo, ViewOfPylon, 
                                                          dimensionBaseService);
             markService.TryCreatePylonElevMark(SheetInfo.HostElems);
             markService.TryCreateSkeletonMark(false);
             markService.TryCreateAdditionalMark(false);
             markService.TryCreateConcretingSeams();
 
-            var breakLineService = new GeneralViewBreakLineMarkService(ViewModel, Repository, SheetInfo, ViewOfPylon, 
-                                                                       dimensionBaseService);
+            var breakLineService = new GeneralViewBreakLineMarkService(Settings, doc, SheetInfo, ViewOfPylon);
             breakLineService.TryCreateLowerBreakLines(false);
             breakLineService.TryCreateUpperBreakLines();
             breakLineService.TryCreateMiddleBreakLines(false);

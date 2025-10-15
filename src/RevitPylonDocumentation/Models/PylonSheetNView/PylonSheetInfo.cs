@@ -6,7 +6,7 @@ using Autodesk.Revit.DB;
 using dosymep.WPF.ViewModels;
 
 using RevitPylonDocumentation.Models.PylonSheetNView.ViewAnnotationCreatorFactories;
-using RevitPylonDocumentation.ViewModels;
+using RevitPylonDocumentation.Models.Services;
 
 using Document = Autodesk.Revit.DB.Document;
 using View = Autodesk.Revit.DB.View;
@@ -15,44 +15,18 @@ namespace RevitPylonDocumentation.Models.PylonSheetNView;
 internal class PylonSheetInfo : BaseViewModel {
     private bool _isCheck = false;
 
-    internal PylonSheetInfo(MainViewModel mvm, RevitRepository repository, string projectSection, string pylonKeyName) {
-        ViewModel = mvm;
-        Repository = repository;
+    internal PylonSheetInfo(string projectSection, string pylonKeyName) {
         PylonKeyName = pylonKeyName;
         ProjectSection = projectSection;
-
-        Manager = new PylonSheetInfoManager(ViewModel, Repository, this);
-
-        GeneralView = new PylonView(ViewModel, Repository, this, AnnotationCreatorFactories.General);
-        GeneralViewPerpendicular = new PylonView(ViewModel, Repository, this, AnnotationCreatorFactories.GeneralPerp);
-        GeneralViewRebar = new PylonView(ViewModel, Repository, this, AnnotationCreatorFactories.GeneralRebar);
-        GeneralViewPerpendicularRebar = new PylonView(ViewModel, Repository, this, AnnotationCreatorFactories.GeneralRebarPerp);
-        TransverseViewFirst = new PylonView(ViewModel, Repository, this, AnnotationCreatorFactories.TransverseFirst);
-        TransverseViewSecond = new PylonView(ViewModel, Repository, this, AnnotationCreatorFactories.TransverseSecond);
-        TransverseViewThird = new PylonView(ViewModel, Repository, this, AnnotationCreatorFactories.TransverseThird);
-        TransverseViewFirstRebar = new PylonView(ViewModel, Repository, this, AnnotationCreatorFactories.TransverseRebarFirst);
-        TransverseViewSecondRebar = new PylonView(ViewModel, Repository, this, AnnotationCreatorFactories.TransverseRebarSecond);
-        TransverseViewThirdRebar = new PylonView(ViewModel, Repository, this, AnnotationCreatorFactories.TransverseRebarThird);
-
-        SkeletonSchedule = new PylonView(ViewModel, Repository, this);
-        SkeletonByElemsSchedule = new PylonView(ViewModel, Repository, this);
-        MaterialSchedule = new PylonView(ViewModel, Repository, this);
-        SystemPartsSchedule = new PylonView(ViewModel, Repository, this);
-        IfcPartsSchedule = new PylonView(ViewModel, Repository, this);
-
-        LegendView = new PylonView(ViewModel, Repository, this);
-
-        ElemsInfo = new PylonElemsInfo(mvm, Repository, this);
-        RebarInfo = new PylonRebarInfo(mvm, Repository, this);
     }
 
-
-    internal MainViewModel ViewModel { get; set; }
+    internal CreationSettings Settings { get; set; }
     internal RevitRepository Repository { get; set; }
     internal PylonSheetInfoManager Manager { get; set; }
     internal PylonRebarInfo RebarInfo { get; set; }
     internal PylonElemsInfo ElemsInfo { get; set; }
-
+    public ParamValueService ParamValService { get; set; }
+    public RebarFinderService RebarFinder { get; set; }
 
     public bool IsCheck {
         get => _isCheck;
@@ -100,6 +74,46 @@ internal class PylonSheetInfo : BaseViewModel {
     // Легенда примечаний
     public PylonView LegendView { get; set; }
 
+    public void InitializeComponents(CreationSettings settings, ParamValueService paramValService, 
+                                     RebarFinderService rebarFinder) {
+        Settings = settings;
+        ParamValService = paramValService;
+        RebarFinder = rebarFinder;
+        Manager = new PylonSheetInfoManager(settings, Repository, this);
+
+        GeneralView = new PylonView(settings, Repository, this, 
+                                    AnnotationCreatorFactories.General);
+        GeneralViewPerpendicular = new PylonView(settings, Repository, this, 
+                                                 AnnotationCreatorFactories.GeneralPerp);
+        GeneralViewRebar = new PylonView(settings, Repository, this, 
+                                         AnnotationCreatorFactories.GeneralRebar);
+        GeneralViewPerpendicularRebar = new PylonView(settings, Repository, this, 
+                                                      AnnotationCreatorFactories.GeneralRebarPerp);
+        TransverseViewFirst = new PylonView(settings, Repository, this, 
+                                            AnnotationCreatorFactories.TransverseFirst);
+        TransverseViewSecond = new PylonView(settings, Repository, this, 
+                                             AnnotationCreatorFactories.TransverseSecond);
+        TransverseViewThird = new PylonView(settings, Repository, this, 
+                                            AnnotationCreatorFactories.TransverseThird);
+        TransverseViewFirstRebar = new PylonView(settings, Repository, this, 
+                                                 AnnotationCreatorFactories.TransverseRebarFirst);
+        TransverseViewSecondRebar = new PylonView(settings, Repository, this, 
+                                                  AnnotationCreatorFactories.TransverseRebarSecond);
+        TransverseViewThirdRebar = new PylonView(settings, Repository, this, 
+                                                 AnnotationCreatorFactories.TransverseRebarThird);
+
+        SkeletonSchedule = new PylonView(settings, Repository, this);
+        SkeletonByElemsSchedule = new PylonView(settings, Repository, this);
+        MaterialSchedule = new PylonView(settings, Repository, this);
+        SystemPartsSchedule = new PylonView(settings, Repository, this);
+        IfcPartsSchedule = new PylonView(settings, Repository, this);
+
+        LegendView = new PylonView(settings, Repository, this);
+
+        ElemsInfo = new PylonElemsInfo(settings, Repository, this);
+        RebarInfo = new PylonRebarInfo(settings, Repository, this);
+    }
+
 
     /// <summary>
     /// Создание листа, задание имени, поиск рамки и задание ей нужных габаритов
@@ -109,18 +123,18 @@ internal class PylonSheetInfo : BaseViewModel {
             return false;
         }
 
-        PylonViewSheet = ViewSheet.Create(Repository.Document, ViewModel.SelectedTitleBlock.Id);
-        PylonViewSheet.Name = ViewModel.ProjectSettings.SheetPrefix + PylonKeyName + ViewModel.ProjectSettings.SheetSuffix;
+        PylonViewSheet = ViewSheet.Create(Repository.Document, Settings.TypesSettings.SelectedTitleBlock.Id);
+        PylonViewSheet.Name = Settings.ProjectSettings.SheetPrefix + PylonKeyName + Settings.ProjectSettings.SheetSuffix;
 
-        var viewSheetGroupingParameter = PylonViewSheet.LookupParameter(ViewModel.ProjectSettings.DispatcherGroupingFirst);
+        var viewSheetGroupingParameter = PylonViewSheet.LookupParameter(Settings.ProjectSettings.DispatcherGroupingFirst);
         if(viewSheetGroupingParameter == null) {
         } else {
-            viewSheetGroupingParameter.Set(ViewModel.SelectedProjectSection);
+            viewSheetGroupingParameter.Set(ProjectSection);
         }
 
         FindTitleBlock();
         // Если пользователь выбрал создание основного или бокового вида каркаса, то нужна большая рамка А1
-        var sels = ViewModel.SelectionSettings;
+        var sels = Settings.SelectionSettings;
         if(sels.NeedWorkWithGeneralRebarView || sels.NeedWorkWithGeneralPerpendicularRebarView) {
             SetTitleBlockSize(Repository.Document, 1, 1);
         } else {
@@ -167,8 +181,8 @@ internal class PylonSheetInfo : BaseViewModel {
             return;
         }
         // Пытаемся задать габарит листа
-        var paramA = TitleBlock.LookupParameter(ViewModel.ProjectSettings.SheetSize);
-        var paramX = TitleBlock.LookupParameter(ViewModel.ProjectSettings.SheetCoefficient);
+        var paramA = TitleBlock.LookupParameter(Settings.ProjectSettings.SheetSize);
+        var paramX = TitleBlock.LookupParameter(Settings.ProjectSettings.SheetCoefficient);
 
         if(paramA != null && paramX != null) {
             paramA.Set(sheetSize);
@@ -192,24 +206,24 @@ internal class PylonSheetInfo : BaseViewModel {
     /// Получает и сохраняет имена видов в соответствии с префиксами/суффиксами, которые указал пользователь
     /// </summary>
     public void GetViewNamesForWork() {
-        GeneralView.ViewName = ViewModel.ViewSectionSettings.GeneralViewPrefix + PylonKeyName + ViewModel.ViewSectionSettings.GeneralViewSuffix;
-        GeneralViewPerpendicular.ViewName = ViewModel.ViewSectionSettings.GeneralViewPerpendicularPrefix + PylonKeyName + ViewModel.ViewSectionSettings.GeneralViewPerpendicularSuffix;
-        TransverseViewFirst.ViewName = ViewModel.ViewSectionSettings.TransverseViewFirstPrefix + PylonKeyName + ViewModel.ViewSectionSettings.TransverseViewFirstSuffix;
-        TransverseViewSecond.ViewName = ViewModel.ViewSectionSettings.TransverseViewSecondPrefix + PylonKeyName + ViewModel.ViewSectionSettings.TransverseViewSecondSuffix;
-        TransverseViewThird.ViewName = ViewModel.ViewSectionSettings.TransverseViewThirdPrefix + PylonKeyName + ViewModel.ViewSectionSettings.TransverseViewThirdSuffix;
+        GeneralView.ViewName = Settings.ViewSectionSettings.GeneralViewPrefix + PylonKeyName + Settings.ViewSectionSettings.GeneralViewSuffix;
+        GeneralViewPerpendicular.ViewName = Settings.ViewSectionSettings.GeneralViewPerpendicularPrefix + PylonKeyName + Settings.ViewSectionSettings.GeneralViewPerpendicularSuffix;
+        TransverseViewFirst.ViewName = Settings.ViewSectionSettings.TransverseViewFirstPrefix + PylonKeyName + Settings.ViewSectionSettings.TransverseViewFirstSuffix;
+        TransverseViewSecond.ViewName = Settings.ViewSectionSettings.TransverseViewSecondPrefix + PylonKeyName + Settings.ViewSectionSettings.TransverseViewSecondSuffix;
+        TransverseViewThird.ViewName = Settings.ViewSectionSettings.TransverseViewThirdPrefix + PylonKeyName + Settings.ViewSectionSettings.TransverseViewThirdSuffix;
 
-        MaterialSchedule.ViewName = ViewModel.SchedulesSettings.MaterialSchedulePrefix + PylonKeyName + ViewModel.SchedulesSettings.MaterialScheduleSuffix;
-        SystemPartsSchedule.ViewName = ViewModel.SchedulesSettings.SystemPartsSchedulePrefix + PylonKeyName + ViewModel.SchedulesSettings.SystemPartsScheduleSuffix;
-        IfcPartsSchedule.ViewName = ViewModel.SchedulesSettings.IfcPartsSchedulePrefix + PylonKeyName + ViewModel.SchedulesSettings.IfcPartsScheduleSuffix;
+        MaterialSchedule.ViewName = Settings.SchedulesSettings.MaterialSchedulePrefix + PylonKeyName + Settings.SchedulesSettings.MaterialScheduleSuffix;
+        SystemPartsSchedule.ViewName = Settings.SchedulesSettings.SystemPartsSchedulePrefix + PylonKeyName + Settings.SchedulesSettings.SystemPartsScheduleSuffix;
+        IfcPartsSchedule.ViewName = Settings.SchedulesSettings.IfcPartsSchedulePrefix + PylonKeyName + Settings.SchedulesSettings.IfcPartsScheduleSuffix;
 
-        GeneralViewRebar.ViewName = ViewModel.ViewSectionSettings.GeneralRebarViewPrefix + PylonKeyName + ViewModel.ViewSectionSettings.GeneralRebarViewSuffix;
-        GeneralViewPerpendicularRebar.ViewName = ViewModel.ViewSectionSettings.GeneralRebarViewPerpendicularPrefix + PylonKeyName + ViewModel.ViewSectionSettings.GeneralRebarViewPerpendicularSuffix;
-        TransverseViewFirstRebar.ViewName = ViewModel.ViewSectionSettings.TransverseRebarViewFirstPrefix + PylonKeyName + ViewModel.ViewSectionSettings.TransverseRebarViewFirstSuffix;
-        TransverseViewSecondRebar.ViewName = ViewModel.ViewSectionSettings.TransverseRebarViewSecondPrefix + PylonKeyName + ViewModel.ViewSectionSettings.TransverseRebarViewSecondSuffix;
-        TransverseViewThirdRebar.ViewName = ViewModel.ViewSectionSettings.TransverseRebarViewThirdPrefix + PylonKeyName + ViewModel.ViewSectionSettings.TransverseRebarViewThirdSuffix;
+        GeneralViewRebar.ViewName = Settings.ViewSectionSettings.GeneralRebarViewPrefix + PylonKeyName + Settings.ViewSectionSettings.GeneralRebarViewSuffix;
+        GeneralViewPerpendicularRebar.ViewName = Settings.ViewSectionSettings.GeneralRebarViewPerpendicularPrefix + PylonKeyName + Settings.ViewSectionSettings.GeneralRebarViewPerpendicularSuffix;
+        TransverseViewFirstRebar.ViewName = Settings.ViewSectionSettings.TransverseRebarViewFirstPrefix + PylonKeyName + Settings.ViewSectionSettings.TransverseRebarViewFirstSuffix;
+        TransverseViewSecondRebar.ViewName = Settings.ViewSectionSettings.TransverseRebarViewSecondPrefix + PylonKeyName + Settings.ViewSectionSettings.TransverseRebarViewSecondSuffix;
+        TransverseViewThirdRebar.ViewName = Settings.ViewSectionSettings.TransverseRebarViewThirdPrefix + PylonKeyName + Settings.ViewSectionSettings.TransverseRebarViewThirdSuffix;
 
-        SkeletonSchedule.ViewName = ViewModel.SchedulesSettings.SkeletonSchedulePrefix + PylonKeyName + ViewModel.SchedulesSettings.SkeletonScheduleSuffix;
-        SkeletonByElemsSchedule.ViewName = ViewModel.SchedulesSettings.SkeletonByElemsSchedulePrefix + PylonKeyName + ViewModel.SchedulesSettings.SkeletonByElemsScheduleSuffix;
+        SkeletonSchedule.ViewName = Settings.SchedulesSettings.SkeletonSchedulePrefix + PylonKeyName + Settings.SchedulesSettings.SkeletonScheduleSuffix;
+        SkeletonByElemsSchedule.ViewName = Settings.SchedulesSettings.SkeletonByElemsSchedulePrefix + PylonKeyName + Settings.SchedulesSettings.SkeletonByElemsScheduleSuffix;
     }
 
 
@@ -332,7 +346,7 @@ internal class PylonSheetInfo : BaseViewModel {
     /// Ищет и запоминает легенду, размещенную на листе
     /// </summary>
     public void FindNoteLegendOnSheet() {
-        if(ViewModel.SelectedLegend is null) {
+        if(Settings.TypesSettings.SelectedLegend is null) {
             return;
         }
         foreach(ElementId id in PylonViewSheet.GetAllViewports()) {
@@ -342,7 +356,7 @@ internal class PylonSheetInfo : BaseViewModel {
             View viewLegend = Repository.Document.GetElement(viewportLegend.ViewId) as View;
             if(viewLegend is null) { continue; }
 
-            if(LegendView.ViewElement is null && viewLegend.Name.Equals(ViewModel.SelectedLegend.Name)) {
+            if(LegendView.ViewElement is null && viewLegend.Name.Equals(Settings.TypesSettings.SelectedLegend.Name)) {
                 LegendView.ViewElement = viewLegend;
                 LegendView.ViewportElement = viewportLegend;
                 return;

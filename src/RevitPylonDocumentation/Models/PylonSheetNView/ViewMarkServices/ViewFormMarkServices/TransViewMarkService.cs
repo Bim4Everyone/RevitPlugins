@@ -5,37 +5,37 @@ using Autodesk.Revit.DB;
 
 using RevitPylonDocumentation.Models.PluginOptions;
 using RevitPylonDocumentation.Models.Services;
-using RevitPylonDocumentation.ViewModels;
 
 namespace RevitPylonDocumentation.Models.PylonSheetNView.ViewMarkServices.ViewFormMarkServices;
 internal class TransViewMarkService {
+    private readonly CreationSettings _settings;
+    private readonly Document _doc;
+    private readonly PylonSheetInfo _sheetInfo;
+    private readonly PylonView _viewOfPylon;
+
     private readonly ViewPointsAnalyzerService _viewPointsAnalyzer;
     private readonly TagCreationService _annotationService;
 
     private readonly FamilySymbol _tagSkeletonSymbol;
 
-    internal TransViewMarkService(MainViewModel mvm, RevitRepository repository, PylonSheetInfo pylonSheetInfo, 
+    internal TransViewMarkService(CreationSettings settings, Document document, PylonSheetInfo pylonSheetInfo, 
                                   PylonView pylonView) {
-        ViewModel = mvm;
-        Repository = repository;
-        SheetInfo = pylonSheetInfo;
-        ViewOfPylon = pylonView;
+        _settings = settings;
+        _doc = document;
+        _sheetInfo = pylonSheetInfo;
+        _viewOfPylon = pylonView;
 
         _viewPointsAnalyzer = new ViewPointsAnalyzerService(pylonView);
         _annotationService = new TagCreationService(pylonView);
 
         // Находим типоразмер марки несущей арматуры для обозначения марки изделия
-        _tagSkeletonSymbol = mvm.SelectedSkeletonTagType;
+        _tagSkeletonSymbol = _settings.TypesSettings.SelectedSkeletonTagType;
     }
 
-    internal MainViewModel ViewModel { get; set; }
-    internal RevitRepository Repository { get; set; }
-    internal PylonSheetInfo SheetInfo { get; set; }
-    internal PylonView ViewOfPylon { get; set; }
 
     internal void TryCreateTransverseViewBarMarks() {
         try {
-            var simpleRebars = SheetInfo.RebarInfo.SimpleVerticalRebars;
+            var simpleRebars = _sheetInfo.RebarInfo.SimpleVerticalRebars;
             if(simpleRebars.Count > 0) {
                 CreateLeftBottomMark(simpleRebars);
             }
@@ -48,7 +48,7 @@ internal class TransViewMarkService {
         var leftBottomVerticalBar = _viewPointsAnalyzer.GetElementByDirection(simpleRebars, DirectionType.LeftBottom, 
                                                                                   false);
         // Получаем точку в которую нужно поставить аннотацию
-        var pylonPoint = _viewPointsAnalyzer.GetPylonPointByDirection(SheetInfo, DirectionType.LeftBottom);
+        var pylonPoint = _viewPointsAnalyzer.GetPylonPointByDirection(_sheetInfo, DirectionType.LeftBottom);
         var pointLeftBottom = _viewPointsAnalyzer.GetPointByDirection(pylonPoint, DirectionType.LeftBottom, 0.95, 0.55);
 
         // Создаем марку арматуры

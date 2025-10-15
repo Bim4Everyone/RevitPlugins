@@ -5,10 +5,12 @@ using Autodesk.Revit.DB;
 
 using dosymep.Revit;
 
-using RevitPylonDocumentation.ViewModels;
-
 namespace RevitPylonDocumentation.Models.PylonSheetNView;
 internal class PylonRebarInfo {
+    private readonly CreationSettings _settings;
+    private readonly PylonSheetInfo _sheetInfo;
+    private readonly RevitRepository _repository; 
+    
     private readonly string _hasFirstLRebarParamName = "ст_Г_1_ВКЛ";
     private readonly string _hasSecondLRebarParamName = "ст_Г_2_ВКЛ";
     private readonly string _hasDifferentRebarParamName = "ст_РАЗНЫЕ";
@@ -22,26 +24,22 @@ internal class PylonRebarInfo {
     private readonly int _formNumberForClampsMin = 1500;
     private readonly int _formNumberForClampsMax = 1599;
 
-    internal PylonRebarInfo(MainViewModel mvm, RevitRepository revitRepository, PylonSheetInfo pylonSheetInfo) {
-        ViewModel = mvm;
-        SheetInfo = pylonSheetInfo;
-        Repository = revitRepository;
+    internal PylonRebarInfo(CreationSettings settings, RevitRepository repository, PylonSheetInfo pylonSheetInfo) {
+        _settings = settings;
+        _sheetInfo = pylonSheetInfo;
+        _repository = repository;
 
-        SkeletonParentRebar = ViewModel.RebarFinder.GetSkeletonParentRebar(SheetInfo.ProjectSection, SheetInfo.PylonKeyName);
+        SkeletonParentRebar = _sheetInfo.RebarFinder.GetSkeletonParentRebar(_sheetInfo.ProjectSection, _sheetInfo.PylonKeyName);
         GetInfo();
 
-        SimpleVerticalRebars = 
-            ViewModel.RebarFinder.GetSimpleRebars(SheetInfo.ProjectSection, SheetInfo.PylonKeyName,
+        SimpleVerticalRebars =
+            _sheetInfo.RebarFinder.GetSimpleRebars(_sheetInfo.ProjectSection, _sheetInfo.PylonKeyName,
                                                   _formNumberForVerticalRebarMin, _formNumberForVerticalRebarMax,
                                                   _formNumberForCBarMin, _formNumberForCBarMax);
 
-        SimpleClamps = ViewModel.RebarFinder.GetSimpleRebars(SheetInfo.ProjectSection, SheetInfo.PylonKeyName,
+        SimpleClamps = _sheetInfo.RebarFinder.GetSimpleRebars(_sheetInfo.ProjectSection, _sheetInfo.PylonKeyName,
                                                              _formNumberForClampsMin, _formNumberForClampsMax);
     }
-
-    internal MainViewModel ViewModel { get; set; }
-    internal PylonSheetInfo SheetInfo { get; set; }
-    internal RevitRepository Repository { get; set; }
 
     internal FamilyInstance SkeletonParentRebar { get; set; }
     internal List<Element> SimpleVerticalRebars { get; set; }
@@ -59,11 +57,11 @@ internal class PylonRebarInfo {
         if(SkeletonParentRebar is null) { return; }
         
         // Определяем наличие в каркасе Г-образных стержней
-        FirstLRebarParamValue = ViewModel.ParamValService
+        FirstLRebarParamValue = _sheetInfo.ParamValService
             .GetParamValueAnywhere<int>(SkeletonParentRebar, _hasFirstLRebarParamName) == 1;
-        SecondLRebarParamValue = ViewModel.ParamValService
+        SecondLRebarParamValue = _sheetInfo.ParamValService
             .GetParamValueAnywhere<int>(SkeletonParentRebar, _hasSecondLRebarParamName) == 1;
-        DifferentRebarParamValue = ViewModel.ParamValService
+        DifferentRebarParamValue = _sheetInfo.ParamValService
             .GetParamValueAnywhere<int>(SkeletonParentRebar, _hasDifferentRebarParamName) == 1;
 
         AllRebarAreL = FirstLRebarParamValue && SecondLRebarParamValue;
@@ -79,7 +77,7 @@ internal class PylonRebarInfo {
         try {
             // Получаем все стержни, которые с учетом заполненных параметров относятся к пилону
             var allSimpleRebars =
-                ViewModel.RebarFinder.GetSimpleRebars(SheetInfo.ProjectSection, SheetInfo.PylonKeyName,
+                _sheetInfo.RebarFinder.GetSimpleRebars(_sheetInfo.ProjectSection, _sheetInfo.PylonKeyName,
                                                       _formNumberForVerticalRebarMin, _formNumberForClampsMax);
             // Необходимо выполнить двухуровневую группировку - 
             // 1й уровень - по значению параметра "обр_ФОП_Форма_префикс"
@@ -92,13 +90,13 @@ internal class PylonRebarInfo {
             // -- Диаметр 1 | Длина 1 => Марка = 1
             // -- Диаметр 1 | Длина 2 => Марка = 2
             var query = allSimpleRebars
-                .GroupBy(r => ViewModel.ParamValService.GetParamValueAnywhere<string>(r, "обр_ФОП_Форма_префикс"))
+                .GroupBy(r => _sheetInfo.ParamValService.GetParamValueAnywhere<string>(r, "обр_ФОП_Форма_префикс"))
                 .Select(prefixGroup => new {
                     Prefix = prefixGroup.Key,
                     SubGroups = prefixGroup
                         .GroupBy(r => new {
-                            Diameter = ViewModel.ParamValService.GetParamValueAnywhere<double>(r, "мод_ФОП_Диаметр"),
-                            Length = ViewModel.ParamValService.GetParamValueAnywhere<double>(r, "обр_ФОП_Длина")
+                            Diameter = _sheetInfo.ParamValService.GetParamValueAnywhere<double>(r, "мод_ФОП_Диаметр"),
+                            Length = _sheetInfo.ParamValService.GetParamValueAnywhere<double>(r, "обр_ФОП_Длина")
                         })
                         .Select((group, index) => new {
                             Group = group,

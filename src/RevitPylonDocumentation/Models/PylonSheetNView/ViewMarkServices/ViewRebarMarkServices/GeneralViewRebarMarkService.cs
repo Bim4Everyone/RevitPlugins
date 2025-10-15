@@ -5,10 +5,14 @@ using Autodesk.Revit.DB;
 
 using RevitPylonDocumentation.Models.PluginOptions;
 using RevitPylonDocumentation.Models.Services;
-using RevitPylonDocumentation.ViewModels;
 
 namespace RevitPylonDocumentation.Models.PylonSheetNView.ViewMarkServices.ViewRebarMarkServices;
 internal class GeneralViewRebarMarkService {
+    private readonly CreationSettings _settings;
+    private readonly Document _doc;
+    private readonly PylonSheetInfo _sheetInfo;
+    private readonly PylonView _viewOfPylon;
+
     private readonly ViewPointsAnalyzerService _viewPointsAnalyzer;
     private readonly TagCreationService _annotationService;
     private readonly FamilySymbol _tagSymbolWithStep;
@@ -16,31 +20,27 @@ internal class GeneralViewRebarMarkService {
     private readonly int _formNumberForClampsMax = 1599;
     private readonly int _formNumberForClampsMin = 1500;
 
-    internal GeneralViewRebarMarkService(MainViewModel mvm, RevitRepository repository, PylonSheetInfo pylonSheetInfo,
-                                             PylonView pylonView) {
-        ViewModel = mvm;
-        Repository = repository;
-        SheetInfo = pylonSheetInfo;
-        ViewOfPylon = pylonView;
+    internal GeneralViewRebarMarkService(CreationSettings settings, Document document, PylonSheetInfo pylonSheetInfo,
+                                         PylonView pylonView) {
+        _settings = settings;
+        _doc = document;
+        _sheetInfo = pylonSheetInfo;
+        _viewOfPylon = pylonView;
 
-        _viewPointsAnalyzer = new ViewPointsAnalyzerService(ViewOfPylon);
-        _annotationService = new TagCreationService(ViewOfPylon);
+        _viewPointsAnalyzer = new ViewPointsAnalyzerService(_viewOfPylon);
+        _annotationService = new TagCreationService(_viewOfPylon);
 
         // Находим типоразмер марки несущей арматуры для обозначения позиции, диаметра и комментариев арматуры
         // Без засечки на конце
-        _tagSymbolWithStep = mvm.SelectedRebarTagTypeWithStep;
+        _tagSymbolWithStep = _settings.TypesSettings.SelectedRebarTagTypeWithStep;
     }
 
-    internal MainViewModel ViewModel { get; set; }
-    internal RevitRepository Repository { get; set; }
-    internal PylonSheetInfo SheetInfo { get; set; }
-    internal PylonView ViewOfPylon { get; set; }
 
     internal void TryCreateVerticalBarMarks() {
         try {
-            var simpleRebars = SheetInfo.RebarInfo.SimpleVerticalRebars;
+            var simpleRebars = _sheetInfo.RebarInfo.SimpleVerticalRebars;
             if(simpleRebars.Count == 0) { return; }
-            var simpleRebarsInView = ViewModel.RebarFinder.GetRebarsFromView(simpleRebars, ViewOfPylon.ViewElement);
+            var simpleRebarsInView = _sheetInfo.RebarFinder.GetRebarsFromView(simpleRebars, _viewOfPylon.ViewElement);
             if(simpleRebarsInView.Count == 0) { return; }
 
             TryCreateVerticalBarMark(simpleRebarsInView, DirectionType.RightTop);
@@ -61,14 +61,14 @@ internal class GeneralViewRebarMarkService {
             point = _viewPointsAnalyzer.GetPointByDirection(point, directionType, 0.6, 0.3);
 
 #if REVIT_2022_OR_GREATER
-            var hostOrigin = SheetInfo.ElemsInfo.HostOrigin;
+            var hostOrigin = _sheetInfo.ElemsInfo.HostOrigin;
             var hostOriginProjected = _viewPointsAnalyzer.ProjectPointToViewFront(hostOrigin);
 
             var pointProjected = _viewPointsAnalyzer.ProjectPointToViewFront(point);
             pointProjected = _viewPointsAnalyzer.ProjectPointToHorizontalPlane(hostOriginProjected, pointProjected);
             var dist = pointProjected.DistanceTo(hostOriginProjected);
 
-            var hostWidth = SheetInfo.ElemsInfo.HostWidth;
+            var hostWidth = _sheetInfo.ElemsInfo.HostWidth;
             if(dist > hostWidth) {
                 point = _viewPointsAnalyzer.GetPointByDirection(
                     new XYZ(hostOriginProjected.X, hostOriginProjected.Y, point.Z), directionType, hostWidth, 0);
@@ -89,10 +89,10 @@ internal class GeneralViewRebarMarkService {
     /// </summary>
     internal void TryCreateClampMarks(bool isFrontView) {
         try {
-            var simpleClamps = ViewModel.RebarFinder.GetSimpleRebars(ViewOfPylon.ViewElement, SheetInfo.ProjectSection,
+            var simpleClamps = _sheetInfo.RebarFinder.GetSimpleRebars(_viewOfPylon.ViewElement, _sheetInfo.ProjectSection,
                                                                      _formNumberForClampsMin, _formNumberForClampsMax);
 
-            var pointForCompare = _viewPointsAnalyzer.GetTransformedPoint(SheetInfo.RebarInfo.SkeletonParentRebar, true);
+            var pointForCompare = _viewPointsAnalyzer.GetTransformedPoint(_sheetInfo.RebarInfo.SkeletonParentRebar, true);
 
             List<IndependentTag> tags = new List<IndependentTag>();
             List<IndependentTag> tagsToDelete = new List<IndependentTag>();
@@ -127,7 +127,7 @@ internal class GeneralViewRebarMarkService {
                 }
             }
             foreach(var tag in tagsToDelete) {
-                Repository.Document.Delete(tag.Id);
+                _doc.Delete(tag.Id);
             }
         } catch(Exception) { }
     }

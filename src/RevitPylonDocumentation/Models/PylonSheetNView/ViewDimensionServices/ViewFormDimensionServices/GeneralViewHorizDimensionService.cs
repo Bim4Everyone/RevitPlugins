@@ -8,12 +8,11 @@ using dosymep.Revit;
 
 using RevitPylonDocumentation.Models.PluginOptions;
 using RevitPylonDocumentation.Models.Services;
-using RevitPylonDocumentation.ViewModels;
 
 namespace RevitPylonDocumentation.Models.PylonSheetNView.ViewDimensionServices.ViewFormDimensionServices;
 internal class GeneralViewHorizDimensionService {
-    private readonly MainViewModel _viewModel;
-    private readonly RevitRepository _repository;
+    private readonly DimensionType _selectedDimensionType;
+    private readonly Document _doc;
     private readonly PylonSheetInfo _sheetInfo;
     private readonly PylonView _viewOfPylon;
 
@@ -21,17 +20,17 @@ internal class GeneralViewHorizDimensionService {
     private readonly DimensionSegmentsService _dimSegmentsService;
     private readonly FloorAnalyzerService _floorAnalyzerService;
 
-    internal GeneralViewHorizDimensionService(MainViewModel mvm, RevitRepository repository, 
+    internal GeneralViewHorizDimensionService(CreationSettings settings, Document document, 
                                               PylonSheetInfo pylonSheetInfo, PylonView pylonView, 
                                               DimensionBaseService dimensionBaseService) {
-        _viewModel = mvm;
-        _repository = repository;
+        _selectedDimensionType = settings.TypesSettings.SelectedDimensionType;
+        _doc= document;
         _sheetInfo = pylonSheetInfo;
         _viewOfPylon = pylonView;
 
         _dimensionBaseService = dimensionBaseService;
         _dimSegmentsService = new DimensionSegmentsService(_viewOfPylon.ViewElement);
-        _floorAnalyzerService = new FloorAnalyzerService(repository, pylonSheetInfo);
+        _floorAnalyzerService = new FloorAnalyzerService(_doc, pylonSheetInfo);
     }
 
     /// <summary>
@@ -46,7 +45,7 @@ internal class GeneralViewHorizDimensionService {
             var dimensionLineDirection = isForPerpView
                                          && !_sheetInfo.RebarInfo.AllRebarAreL
                                          && _sheetInfo.RebarInfo.HasLRebar
-                                         && _viewModel.RebarFinder.DirectionHasLRebar(_viewOfPylon.ViewElement,
+                                         && _sheetInfo.RebarFinder.DirectionHasLRebar(_viewOfPylon.ViewElement,
                                                                                       _sheetInfo.ProjectSection,
                                                                                       DirectionType.Left)
                                          ? DirectionType.Right : DirectionType.Left;
@@ -72,8 +71,8 @@ internal class GeneralViewHorizDimensionService {
                     var lastFloorTopFace = _floorAnalyzerService.GetTopFloorFace(lastFloor, viewOptions);
                     refArray.Append(lastFloorTopFace.Reference);
                 }
-                _repository.Document.Create.NewDimension(_viewOfPylon.ViewElement, dimensionLineLeft, refArray,
-                                                         _viewModel.SelectedDimensionType);
+                _doc.Create.NewDimension(_viewOfPylon.ViewElement, dimensionLineLeft, refArray,
+                                                         _selectedDimensionType);
             }
         } catch(Exception) { }
     }
@@ -102,7 +101,7 @@ internal class GeneralViewHorizDimensionService {
             var dimensionLineDirection = isForPerpView
                                          && !_sheetInfo.RebarInfo.AllRebarAreL
                                          && _sheetInfo.RebarInfo.HasLRebar
-                                         && _viewModel.RebarFinder.DirectionHasLRebar(_viewOfPylon.ViewElement,
+                                         && _sheetInfo.RebarFinder.DirectionHasLRebar(_viewOfPylon.ViewElement,
                                                                                       _sheetInfo.ProjectSection,
                                                                                       DirectionType.Left)
                                          ? DirectionType.Right : DirectionType.Left;
@@ -115,8 +114,8 @@ internal class GeneralViewHorizDimensionService {
             if(refArray.Size == 0) { return; }
             refArray.Append(lastFloorTopFace.Reference);
             refArray.Append(lastFloorBottomFace.Reference);
-            _repository.Document.Create.NewDimension(_viewOfPylon.ViewElement, dimensionLineLeft, refArray,
-                                                     _viewModel.SelectedDimensionType);
+            _doc.Create.NewDimension(_viewOfPylon.ViewElement, dimensionLineLeft, refArray,
+                                                     _selectedDimensionType);
         } catch(Exception) { }
     }
 
@@ -140,7 +139,7 @@ internal class GeneralViewHorizDimensionService {
             // Если этот размер для перпендикулярного вида и Гэшка только справа, то размер нужно ставить слева
             if(isForPerpView && !_sheetInfo.RebarInfo.AllRebarAreL 
                              && _sheetInfo.RebarInfo.HasLRebar
-                             && _viewModel.RebarFinder.DirectionHasLRebar(_viewOfPylon.ViewElement,
+                             && _sheetInfo.RebarFinder.DirectionHasLRebar(_viewOfPylon.ViewElement,
                                                                           _sheetInfo.ProjectSection,
                                                                           DirectionType.Left)) {
                 dimensionLineDirection = DirectionType.Right;
@@ -210,8 +209,8 @@ internal class GeneralViewHorizDimensionService {
             var dimensionLineLeft = _dimensionBaseService.GetDimensionLine(_sheetInfo.HostElems.First() as FamilyInstance,
                                                                            dimensionLineDirection, 1.1);
             var dimensionRebarSide =
-                _repository.Document.Create.NewDimension(_viewOfPylon.ViewElement, dimensionLineLeft, refArray,
-                                                         _viewModel.SelectedDimensionType);
+                _doc.Create.NewDimension(_viewOfPylon.ViewElement, dimensionLineLeft, refArray,
+                                                         _selectedDimensionType);
 
             // Применяем опции изменений сегментов размера
             _dimSegmentsService.ApplySegmentsModification(dimensionRebarSide, dimSegmentOpts);
@@ -220,7 +219,7 @@ internal class GeneralViewHorizDimensionService {
 
     internal void CreateDimensions(FamilyInstance skeletonParentRebar, bool isForPerpView) {
         // Получаем родительское семейство хомутов на виде
-        var rebarFinder = _viewModel.RebarFinder;
+        var rebarFinder = _sheetInfo.RebarFinder;
         var clampsParentRebars = rebarFinder.GetClampsParentRebars(_viewOfPylon.ViewElement, _sheetInfo.ProjectSection);
         if(clampsParentRebars is null) { return; }
 

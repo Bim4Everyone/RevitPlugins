@@ -2,7 +2,7 @@ using System;
 
 using Autodesk.Revit.DB;
 
-using RevitPylonDocumentation.ViewModels;
+using RevitPylonDocumentation.Models.UserSettings;
 
 namespace RevitPylonDocumentation.Models.PylonSheetNView;
 public class PylonViewSchedulePlacer {
@@ -26,14 +26,14 @@ public class PylonViewSchedulePlacer {
     private readonly double _schedulePartsRightOffset = -UnitUtilsHelper.ConvertToInternalValue(2.9);
 
 
-    internal PylonViewSchedulePlacer(MainViewModel mvm, RevitRepository repository, PylonSheetInfo pylonSheetInfo) {
-        ViewModel = mvm;
-        Repository = repository;
+    internal PylonViewSchedulePlacer(CreationSettings settings, Document document, PylonSheetInfo pylonSheetInfo) {
+        SchedulesSettings = settings.SchedulesSettings;
+        Doc = document;
         SheetInfo = pylonSheetInfo;
     }
 
-    internal MainViewModel ViewModel { get; set; }
-    internal RevitRepository Repository { get; set; }
+    internal UserSchedulesSettings SchedulesSettings { get; set; }
+    internal Document Doc { get; set; }
     internal PylonSheetInfo SheetInfo { get; set; }
 
 
@@ -44,9 +44,9 @@ public class PylonViewSchedulePlacer {
         } else {
             // Заполняем данные для задания
             SheetInfo.SkeletonSchedule.ViewportName =
-                ViewModel.SchedulesSettings.SkeletonSchedulePrefix
+                SchedulesSettings.SkeletonSchedulePrefix
                     + SheetInfo.PylonKeyName
-                    + ViewModel.SchedulesSettings.SkeletonScheduleSuffix;
+                    + SchedulesSettings.SkeletonScheduleSuffix;
         }
 
         // Передаем спеку армирования в метод по созданию видовых экранов в (0.0.0)
@@ -73,9 +73,9 @@ public class PylonViewSchedulePlacer {
         } else {
             // Заполняем данные для задания
             SheetInfo.MaterialSchedule.ViewportName =
-                ViewModel.SchedulesSettings.MaterialSchedulePrefix
+                SchedulesSettings.MaterialSchedulePrefix
                     + SheetInfo.PylonKeyName
-                    + ViewModel.SchedulesSettings.MaterialScheduleSuffix;
+                    + SchedulesSettings.MaterialScheduleSuffix;
         }
 
         // Передаем спеку армирования в метод по созданию видовых экранов в (0.0.0)
@@ -109,9 +109,9 @@ public class PylonViewSchedulePlacer {
         } else {
             // Заполняем данные для задания
             SheetInfo.SkeletonByElemsSchedule.ViewportName =
-                ViewModel.SchedulesSettings.SkeletonByElemsSchedulePrefix
+                SchedulesSettings.SkeletonByElemsSchedulePrefix
                     + SheetInfo.PylonKeyName
-                    + ViewModel.SchedulesSettings.SkeletonByElemsScheduleSuffix;
+                    + SchedulesSettings.SkeletonByElemsScheduleSuffix;
         }
 
         // Передаем спеку армирования в метод по созданию видовых экранов в (0.0.0)
@@ -147,9 +147,9 @@ public class PylonViewSchedulePlacer {
         } else {
             // Заполняем данные для задания
             SheetInfo.SystemPartsSchedule.ViewportName =
-                ViewModel.SchedulesSettings.SystemPartsSchedulePrefix
+                SchedulesSettings.SystemPartsSchedulePrefix
                     + SheetInfo.PylonKeyName
-                    + ViewModel.SchedulesSettings.SystemPartsScheduleSuffix;
+                    + SchedulesSettings.SystemPartsScheduleSuffix;
         }
 
         // Передаем спеку армирования в метод по созданию видовых экранов в (0.0.0)
@@ -184,9 +184,9 @@ public class PylonViewSchedulePlacer {
         } else {
             // Заполняем данные для задания
             SheetInfo.IfcPartsSchedule.ViewportName =
-                ViewModel.SchedulesSettings.IfcPartsSchedulePrefix
+                SchedulesSettings.IfcPartsSchedulePrefix
                     + SheetInfo.PylonKeyName
-                    + ViewModel.SchedulesSettings.IfcPartsScheduleSuffix;
+                    + SchedulesSettings.IfcPartsScheduleSuffix;
         }
 
         // Передаем спеку армирования в метод по созданию видовых экранов в (0.0.0)
@@ -215,12 +215,10 @@ public class PylonViewSchedulePlacer {
 
 
     public bool PlaceScheduleViewport(ViewSheet viewSheet, PylonView pylonView) {
-        var doc = Repository.Document;
-
         ScheduleSheetInstance scheduleSheetInstance;
         // Размещаем спеку пилона на листе
         try {
-            scheduleSheetInstance = ScheduleSheetInstance.Create(doc, viewSheet.Id, pylonView.ViewElement.Id, 
+            scheduleSheetInstance = ScheduleSheetInstance.Create(Doc, viewSheet.Id, pylonView.ViewElement.Id, 
                                                                  new XYZ(0, 0, 0));
         } catch(Exception) {
             return false;

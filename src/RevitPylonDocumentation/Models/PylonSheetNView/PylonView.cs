@@ -2,28 +2,28 @@ using Autodesk.Revit.DB;
 
 using RevitPylonDocumentation.Models.PylonSheetNView.ViewAnnotationCreatorFactories;
 using RevitPylonDocumentation.Models.PylonSheetNView.ViewAnnotationCreators;
-using RevitPylonDocumentation.ViewModels;
 
 namespace RevitPylonDocumentation.Models.PylonSheetNView;
 public class PylonView {
 
-    internal PylonView(MainViewModel mvm, RevitRepository repository, PylonSheetInfo pylonSheetInfo,
+    internal PylonView(CreationSettings settings, RevitRepository repository, PylonSheetInfo pylonSheetInfo,
                        IAnnotationCreatorFactory annotationCreatorFactory = null) {
-        ViewModel = mvm;
+        Settings = settings;
         Repository = repository;
         SheetInfo = pylonSheetInfo;
+        var doc = repository.Document;
 
-        ViewSectionCreator = new PylonViewSectionCreator(mvm, repository, pylonSheetInfo);
-        ViewScheduleCreator = new PylonViewScheduleCreator(mvm, repository, pylonSheetInfo);
+        ViewSectionCreator = new PylonViewSectionCreator(settings, doc, pylonSheetInfo);
+        ViewScheduleCreator = new PylonViewScheduleCreator(settings, doc, pylonSheetInfo);
         
-        AnnotationCreator = annotationCreatorFactory?.CreateAnnotationCreator(mvm, repository, pylonSheetInfo, this);
+        AnnotationCreator = annotationCreatorFactory?.CreateAnnotationCreator(settings, repository, pylonSheetInfo, this);
 
-        ViewSectionPlacer = new PylonViewSectionPlacer(mvm, repository, pylonSheetInfo);
-        ViewSchedulePlacer = new PylonViewSchedulePlacer(mvm, repository, pylonSheetInfo);
-        LegendPlacer = new PylonViewLegendPlacer(mvm, repository, pylonSheetInfo);
+        ViewSectionPlacer = new PylonViewSectionPlacer(settings, doc, pylonSheetInfo);
+        ViewSchedulePlacer = new PylonViewSchedulePlacer(settings, doc, pylonSheetInfo);
+        LegendPlacer = new PylonViewLegendPlacer(settings, doc, pylonSheetInfo);
     }
 
-    internal MainViewModel ViewModel { get; set; }
+    internal CreationSettings Settings { get; set; }
     internal RevitRepository Repository { get; set; }
     internal PylonSheetInfo SheetInfo { get; set; }
 

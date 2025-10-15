@@ -3,22 +3,22 @@ using System;
 using RevitPylonDocumentation.Models.PylonSheetNView.ViewDimensionServices.ViewRebarDimensionServices;
 using RevitPylonDocumentation.Models.PylonSheetNView.ViewMarkServices.ViewRebarMarkServices;
 using RevitPylonDocumentation.Models.Services;
-using RevitPylonDocumentation.ViewModels;
 
 namespace RevitPylonDocumentation.Models.PylonSheetNView.ViewAnnotationCreators;
 internal class GeneralViewRebarAnnotCreator : ViewAnnotationCreator {
-    public GeneralViewRebarAnnotCreator(MainViewModel mvm, RevitRepository repository, PylonSheetInfo pylonSheetInfo, 
+    public GeneralViewRebarAnnotCreator(CreationSettings settings, RevitRepository repository, PylonSheetInfo pylonSheetInfo, 
                                           PylonView pylonView) 
-        : base(mvm, repository, pylonSheetInfo, pylonView) {
+        : base(settings, repository, pylonSheetInfo, pylonView) {
     }
 
     public override void TryCreateViewAnnotations() {
         var view = ViewOfPylon.ViewElement;
-        var dimensionBaseService = new DimensionBaseService(view, ViewModel.ParamValService);
+        var doc = view.Document;
+        var dimensionBaseService = new DimensionBaseService(view, SheetInfo.ParamValService);
 
         // Пытаемся создать размеры на виде
         try {
-            var rebarFinder = ViewModel.RebarFinder;
+            var rebarFinder = SheetInfo.RebarFinder;
             var skeletonParentRebar = SheetInfo.RebarInfo.SkeletonParentRebar;
             if(skeletonParentRebar is null) {
                 return;
@@ -29,7 +29,7 @@ internal class GeneralViewRebarAnnotCreator : ViewAnnotationCreator {
                 return;
             }
 
-            var dimensionService = new GeneralViewRebarDimensionService(ViewModel, Repository, SheetInfo, ViewOfPylon, 
+            var dimensionService = new GeneralViewRebarDimensionService(Settings, doc, SheetInfo, ViewOfPylon, 
                                                                         dimensionBaseService);
             //ВЕРТИКАЛЬНЫЕ РАЗМЕРЫ
             dimensionService.TryCreateAllTopRebarDimensions(skeletonParentRebar);
@@ -42,7 +42,7 @@ internal class GeneralViewRebarAnnotCreator : ViewAnnotationCreator {
 
         // Пытаемся создать марки на виде
         try {
-            var markService = new GeneralViewRebarMarkService(ViewModel, Repository, SheetInfo, ViewOfPylon);
+            var markService = new GeneralViewRebarMarkService(Settings, doc, SheetInfo, ViewOfPylon);
             markService.TryCreateClampMarks(true);
         } catch(Exception) { }
     }

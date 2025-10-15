@@ -1,26 +1,25 @@
-using RevitPylonDocumentation.ViewModels;
-
 namespace RevitPylonDocumentation.Models.PylonSheetNView;
 internal class PylonSheetInfoManager {
-    public PylonSheetInfoManager(MainViewModel mvm, RevitRepository repository, PylonSheetInfo pylonSheetInfo) {
-        ViewModel = mvm;
+    public PylonSheetInfoManager(CreationSettings settings, RevitRepository repository, PylonSheetInfo pylonSheetInfo) {
+        Settings = settings;
         Repository = repository;
         SheetInfo = pylonSheetInfo;
     }
 
-    internal MainViewModel ViewModel { get; set; }
+    internal CreationSettings Settings { get; set; }
     internal RevitRepository Repository { get; set; }
     internal PylonSheetInfo SheetInfo { get; set; }
 
     public void WorkWithCreation() {
-        var selectionSettings = ViewModel.SelectionSettings;
+        var selectionSettings = Settings.SelectionSettings;
 
         // Если текущий PylonSheetInfo не выбран для работы - continue
         if(!SheetInfo.IsCheck) { return; } else {
             SheetInfo.GetViewNamesForWork();
         }
 
-        // Если листы были в проекте (когда плагин запускают для создания/размещения видов), то мы об этом знаем из RevitRepository
+        // Если листы были в проекте (когда плагин запускают для создания/размещения видов),
+        // то мы об этом знаем из RevitRepository
         if(SheetInfo.PylonViewSheet is null) {
             SheetInfo.CreateSheet();
         } else {
@@ -49,8 +48,10 @@ internal class PylonSheetInfoManager {
         if(selectionSettings.NeedWorkWithGeneralView) {
             // Здесь может быть два варианта: 1) найден и вид, и видовой экран; 2) не найдено ничего
             if(SheetInfo.GeneralView.ViewElement is null) {
-                // Если вид не найден, то сначала пытаемся создать вид, а потом, если создание не успешно - будем искать в проекте
-                if(!SheetInfo.GeneralView.ViewSectionCreator.TryCreateGeneralView(ViewModel.SelectedViewFamilyType)) {
+                // Если вид не найден, то сначала пытаемся создать вид, а потом, если создание не успешно -
+                // будем искать в проекте
+                if(!SheetInfo.GeneralView.ViewSectionCreator.TryCreateGeneralView(
+                        Settings.TypesSettings.SelectedViewFamilyType)) {
                     Repository.FindViewSectionInPj(SheetInfo.GeneralView);
                 }
             }
@@ -62,8 +63,10 @@ internal class PylonSheetInfoManager {
         if(selectionSettings.NeedWorkWithGeneralRebarView) {
             // Здесь может быть два варианта: 1) найден и вид, и видовой экран; 2) не найдено ничего
             if(SheetInfo.GeneralViewRebar.ViewElement is null) {
-                // Если вид не найден, то сначала пытаемся создать вид, а потом, если создание не успешно - будем искать в проекте
-                if(!SheetInfo.GeneralViewRebar.ViewSectionCreator.TryCreateGeneralRebarView(ViewModel.SelectedViewFamilyType)) {
+                // Если вид не найден, то сначала пытаемся создать вид, а потом, если создание не успешно -
+                // будем искать в проекте
+                if(!SheetInfo.GeneralViewRebar.ViewSectionCreator.TryCreateGeneralRebarView(
+                        Settings.TypesSettings.SelectedViewFamilyType)) {
                     Repository.FindViewSectionInPj(SheetInfo.GeneralViewRebar);
                 }
             }
@@ -76,8 +79,10 @@ internal class PylonSheetInfoManager {
         if(selectionSettings.NeedWorkWithGeneralPerpendicularView) {
             // Здесь может быть два варианта: 1) найден и вид, и видовой экран; 2) не найдено ничего
             if(SheetInfo.GeneralViewPerpendicular.ViewElement is null) {
-                // Если вид не найден, то сначала пытаемся создать вид, а потом, если создание не успешно - будем искать в проекте
-                if(!SheetInfo.GeneralViewPerpendicular.ViewSectionCreator.TryCreateGeneralPerpendicularView(ViewModel.SelectedViewFamilyType)) {
+                // Если вид не найден, то сначала пытаемся создать вид, а потом, если создание не успешно -
+                // будем искать в проекте
+                if(!SheetInfo.GeneralViewPerpendicular.ViewSectionCreator.TryCreateGeneralPerpendicularView(
+                        Settings.TypesSettings.SelectedViewFamilyType)) {
                     Repository.FindViewSectionInPj(SheetInfo.GeneralViewPerpendicular);
                 }
             }
@@ -89,8 +94,10 @@ internal class PylonSheetInfoManager {
         if(selectionSettings.NeedWorkWithGeneralPerpendicularRebarView) {
             // Здесь может быть два варианта: 1) найден и вид, и видовой экран; 2) не найдено ничего
             if(SheetInfo.GeneralViewPerpendicularRebar.ViewElement is null) {
-                // Если вид не найден, то сначала пытаемся создать вид, а потом, если создание не успешно - будем искать в проекте
-                if(!SheetInfo.GeneralViewPerpendicularRebar.ViewSectionCreator.TryCreateGeneralRebarPerpendicularView(ViewModel.SelectedViewFamilyType)) {
+                // Если вид не найден, то сначала пытаемся создать вид, а потом, если создание не успешно -
+                // будем искать в проекте
+                if(!SheetInfo.GeneralViewPerpendicularRebar.ViewSectionCreator.TryCreateGeneralRebarPerpendicularView(
+                        Settings.TypesSettings.SelectedViewFamilyType)) {
                     Repository.FindViewSectionInPj(SheetInfo.GeneralViewPerpendicularRebar);
                 }
             }
@@ -101,8 +108,11 @@ internal class PylonSheetInfoManager {
         if(selectionSettings.NeedWorkWithTransverseViewFirst) {
             // Здесь может быть два варианта: 1) найден и вид, и видовой экран; 2) не найдено ничего
             if(SheetInfo.TransverseViewFirst.ViewElement is null) {
-                // Если вид не найден, то сначала пытаемся создать вид, а потом, если создание не успешно - будем искать в проекте
-                if(!SheetInfo.TransverseViewFirst.ViewSectionCreator.TryCreateTransverseView(ViewModel.SelectedViewFamilyType, 1)) {
+                // Если вид не найден, то сначала пытаемся создать вид, а потом, если создание не успешно -
+                // будем искать в проекте
+                if(!SheetInfo.TransverseViewFirst.ViewSectionCreator.TryCreateTransverseView(
+                        Settings.TypesSettings.SelectedViewFamilyType, 
+                        1)) {
                     Repository.FindViewSectionInPj(SheetInfo.TransverseViewFirst);
                 }
             }
@@ -113,8 +123,11 @@ internal class PylonSheetInfoManager {
         if(selectionSettings.NeedWorkWithTransverseViewSecond) {
             // Здесь может быть два варианта: 1) найден и вид, и видовой экран; 2) не найдено ничего
             if(SheetInfo.TransverseViewSecond.ViewElement is null) {
-                // Если вид не найден, то сначала пытаемся создать вид, а потом, если создание не успешно - будем искать в проекте
-                if(!SheetInfo.TransverseViewSecond.ViewSectionCreator.TryCreateTransverseView(ViewModel.SelectedViewFamilyType, 2)) {
+                // Если вид не найден, то сначала пытаемся создать вид, а потом, если создание не успешно -
+                // будем искать в проекте
+                if(!SheetInfo.TransverseViewSecond.ViewSectionCreator.TryCreateTransverseView(
+                        Settings.TypesSettings.SelectedViewFamilyType, 
+                        2)) {
                     Repository.FindViewSectionInPj(SheetInfo.TransverseViewSecond);
                 }
             }
@@ -125,8 +138,11 @@ internal class PylonSheetInfoManager {
         if(selectionSettings.NeedWorkWithTransverseViewThird) {
             // Здесь может быть два варианта: 1) найден и вид, и видовой экран; 2) не найдено ничего
             if(SheetInfo.TransverseViewThird.ViewElement is null) {
-                // Если вид не найден, то сначала пытаемся создать вид, а потом, если создание не успешно - будем искать в проекте
-                if(!SheetInfo.TransverseViewThird.ViewSectionCreator.TryCreateTransverseView(ViewModel.SelectedViewFamilyType, 3)) {
+                // Если вид не найден, то сначала пытаемся создать вид, а потом, если создание не успешно -
+                // будем искать в проекте
+                if(!SheetInfo.TransverseViewThird.ViewSectionCreator.TryCreateTransverseView(
+                        Settings.TypesSettings.SelectedViewFamilyType, 
+                        3)) {
                     Repository.FindViewSectionInPj(SheetInfo.TransverseViewThird);
                 }
             }
@@ -137,8 +153,11 @@ internal class PylonSheetInfoManager {
         if(selectionSettings.NeedWorkWithTransverseViewFirst) {
             // Здесь может быть два варианта: 1) найден и вид, и видовой экран; 2) не найдено ничего
             if(SheetInfo.TransverseViewFirstRebar.ViewElement is null) {
-                // Если вид не найден, то сначала пытаемся создать вид, а потом, если создание не успешно - будем искать в проекте
-                if(!SheetInfo.TransverseViewFirstRebar.ViewSectionCreator.TryCreateTransverseRebarView(ViewModel.SelectedViewFamilyType, 1)) {
+                // Если вид не найден, то сначала пытаемся создать вид, а потом, если создание не успешно -
+                // будем искать в проекте
+                if(!SheetInfo.TransverseViewFirstRebar.ViewSectionCreator.TryCreateTransverseRebarView(
+                        Settings.TypesSettings.SelectedViewFamilyType, 
+                        1)) {
                     Repository.FindViewSectionInPj(SheetInfo.TransverseViewFirstRebar);
                 }
             }
@@ -149,8 +168,11 @@ internal class PylonSheetInfoManager {
         if(selectionSettings.NeedWorkWithTransverseViewSecond) {
             // Здесь может быть два варианта: 1) найден и вид, и видовой экран; 2) не найдено ничего
             if(SheetInfo.TransverseViewSecondRebar.ViewElement is null) {
-                // Если вид не найден, то сначала пытаемся создать вид, а потом, если создание не успешно - будем искать в проекте
-                if(!SheetInfo.TransverseViewSecondRebar.ViewSectionCreator.TryCreateTransverseRebarView(ViewModel.SelectedViewFamilyType, 2)) {
+                // Если вид не найден, то сначала пытаемся создать вид, а потом, если создание не успешно -
+                // будем искать в проекте
+                if(!SheetInfo.TransverseViewSecondRebar.ViewSectionCreator.TryCreateTransverseRebarView(
+                        Settings.TypesSettings.SelectedViewFamilyType, 
+                        2)) {
                     Repository.FindViewSectionInPj(SheetInfo.TransverseViewSecondRebar);
                 }
             }
@@ -161,8 +183,11 @@ internal class PylonSheetInfoManager {
         if(selectionSettings.NeedWorkWithTransverseViewThird) {
             // Здесь может быть два варианта: 1) найден и вид, и видовой экран; 2) не найдено ничего
             if(SheetInfo.TransverseViewThirdRebar.ViewElement is null) {
-                // Если вид не найден, то сначала пытаемся создать вид, а потом, если создание не успешно - будем искать в проекте
-                if(!SheetInfo.TransverseViewThirdRebar.ViewSectionCreator.TryCreateTransverseRebarView(ViewModel.SelectedViewFamilyType, 3)) {
+                // Если вид не найден, то сначала пытаемся создать вид, а потом, если создание не успешно -
+                // будем искать в проекте
+                if(!SheetInfo.TransverseViewThirdRebar.ViewSectionCreator.TryCreateTransverseRebarView(
+                        Settings.TypesSettings.SelectedViewFamilyType, 
+                        3)) {
                     Repository.FindViewSectionInPj(SheetInfo.TransverseViewThirdRebar);
                 }
             }
@@ -173,7 +198,8 @@ internal class PylonSheetInfoManager {
         if(selectionSettings.NeedWorkWithSkeletonSchedule) {
             // Здесь может быть два варианта: 1) найден и вид, и видовой экран; 2) не найдено ничего
             if(SheetInfo.SkeletonSchedule.ViewElement is null) {
-                // Если вид не найден, то сначала пытаемся создать вид, а потом, если создание не успешно - будем искать в проекте
+                // Если вид не найден, то сначала пытаемся создать вид, а потом, если создание не успешно -
+                // будем искать в проекте
                 if(!SheetInfo.SkeletonSchedule.ViewScheduleCreator.TryCreateSkeletonSchedule()) {
                     Repository.FindViewScheduleInPj(SheetInfo.SkeletonSchedule);
                 }
@@ -185,7 +211,8 @@ internal class PylonSheetInfoManager {
         if(selectionSettings.NeedWorkWithSkeletonByElemsSchedule) {
             // Здесь может быть два варианта: 1) найден и вид, и видовой экран; 2) не найдено ничего
             if(SheetInfo.SkeletonByElemsSchedule.ViewElement is null) {
-                // Если вид не найден, то сначала пытаемся создать вид, а потом, если создание не успешно - будем искать в проекте
+                // Если вид не найден, то сначала пытаемся создать вид, а потом, если создание не успешно -
+                // будем искать в проекте
                 if(!SheetInfo.SkeletonByElemsSchedule.ViewScheduleCreator.TryCreateSkeletonByElemsSchedule()) {
                     Repository.FindViewScheduleInPj(SheetInfo.SkeletonByElemsSchedule);
                 }
@@ -197,7 +224,8 @@ internal class PylonSheetInfoManager {
         if(selectionSettings.NeedWorkWithMaterialSchedule) {
             // Здесь может быть два варианта: 1) найден и вид, и видовой экран; 2) не найдено ничего
             if(SheetInfo.MaterialSchedule.ViewElement is null) {
-                // Если вид не найден, то сначала пытаемся создать вид, а потом, если создание не успешно - будем искать в проекте
+                // Если вид не найден, то сначала пытаемся создать вид, а потом, если создание не успешно -
+                // будем искать в проекте
                 if(!SheetInfo.MaterialSchedule.ViewScheduleCreator.TryCreateMaterialSchedule()) {
                     Repository.FindViewScheduleInPj(SheetInfo.MaterialSchedule);
                 }
@@ -209,7 +237,8 @@ internal class PylonSheetInfoManager {
         if(selectionSettings.NeedWorkWithSystemPartsSchedule) {
             // Здесь может быть два варианта: 1) найден и вид, и видовой экран; 2) не найдено ничего
             if(SheetInfo.SystemPartsSchedule.ViewElement is null) {
-                // Если вид не найден, то сначала пытаемся создать вид, а потом, если создание не успешно - будем искать в проекте
+                // Если вид не найден, то сначала пытаемся создать вид, а потом, если создание не успешно -
+                // будем искать в проекте
                 if(!SheetInfo.SystemPartsSchedule.ViewScheduleCreator.TryCreateSystemPartsSchedule()) {
                     Repository.FindViewScheduleInPj(SheetInfo.SystemPartsSchedule);
                 }
@@ -221,7 +250,8 @@ internal class PylonSheetInfoManager {
         if(selectionSettings.NeedWorkWithIfcPartsSchedule) {
             // Здесь может быть два варианта: 1) найден и вид, и видовой экран; 2) не найдено ничего
             if(SheetInfo.IfcPartsSchedule.ViewElement is null) {
-                // Если вид не найден, то сначала пытаемся создать вид, а потом, если создание не успешно - будем искать в проекте
+                // Если вид не найден, то сначала пытаемся создать вид, а потом, если создание не успешно -
+                // будем искать в проекте
                 if(!SheetInfo.IfcPartsSchedule.ViewScheduleCreator.TryCreateIfcPartsSchedule()) {
                     Repository.FindViewScheduleInPj(SheetInfo.IfcPartsSchedule);
                 }

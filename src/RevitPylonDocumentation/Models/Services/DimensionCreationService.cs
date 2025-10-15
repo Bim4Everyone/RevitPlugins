@@ -11,8 +11,8 @@ using RevitPylonDocumentation.ViewModels;
 
 namespace RevitPylonDocumentation.Models.Services;
 internal class DimensionCreationService {
-    private readonly MainViewModel _viewModel;
-    private readonly RevitRepository _repository;
+    private readonly DimensionType _selectedDimensionType;
+    private readonly Document _doc;
     private readonly PylonView _viewOfPylon;
 
     private readonly DimensionBaseService _dimensionBaseService;
@@ -20,12 +20,11 @@ internal class DimensionCreationService {
     //  Значения параметра способа отображения размера через формулу равенства
     private readonly int _dimEqualityFormulaIndex = 2;
 
-    public DimensionCreationService(MainViewModel mvm, RevitRepository repository, PylonView pylonView, 
+    public DimensionCreationService(CreationSettings settings, Document document, PylonView pylonView, 
                                     DimensionBaseService dimensionBaseService) {
-        _viewModel = mvm;
-        _repository = repository;
+        _selectedDimensionType = settings.TypesSettings.SelectedDimensionType;
+        _doc = document;
         _viewOfPylon = pylonView;
-
         _dimensionBaseService = dimensionBaseService;
     }
 
@@ -49,8 +48,8 @@ internal class DimensionCreationService {
                                                                    dimLineOffsetOption.OffsetCoefficient);
         var refArrayFormworkGridSide = _dimensionBaseService.GetDimensionRefs(grids, gridsDirection, oldRefArray);
         if(refArrayFormworkGridSide.Size != oldRefArray.Size) {
-            _repository.Document.Create.NewDimension(view, dimensionLine, refArrayFormworkGridSide,
-                                                     _viewModel.SelectedDimensionType);
+            _doc.Create.NewDimension(view, dimensionLine, refArrayFormworkGridSide,
+                                                     _selectedDimensionType);
         }
     }
 
@@ -80,8 +79,8 @@ internal class DimensionCreationService {
         ReferenceArray refArray = _dimensionBaseService.GetDimensionRefs(dimensioningElement as FamilyInstance,
                                                                          importantRefNameParts,
                                                                          oldRefArray: oldRefArray);
-        var dimension = _repository.Document.Create.NewDimension(_viewOfPylon.ViewElement, dimensionLine, refArray,
-                                                                 _viewModel.SelectedDimensionType);
+        var dimension = _doc.Create.NewDimension(_viewOfPylon.ViewElement, dimensionLine, refArray,
+                                                                 _selectedDimensionType);
         
         if(needEqualityFormula) {
             dimension.SetParamValue(BuiltInParameter.DIM_DISPLAY_EQ, _dimEqualityFormulaIndex);
@@ -103,8 +102,8 @@ internal class DimensionCreationService {
         var dimensionLine = _dimensionBaseService.GetDimensionLine(dimLineOffsetOption.ElemForOffset,
                                                                    dimLineOffsetOption.OffsetDirectionType,
                                                                    dimLineOffsetOption.OffsetCoefficient);
-        var dimension = _repository.Document.Create.NewDimension(_viewOfPylon.ViewElement, dimensionLine, oldRefArray,
-                                                                 _viewModel.SelectedDimensionType);
+        var dimension = _doc.Create.NewDimension(_viewOfPylon.ViewElement, dimensionLine, oldRefArray,
+                                                                 _selectedDimensionType);
         if(needEqualityFormula) {
             dimension.SetParamValue(BuiltInParameter.DIM_DISPLAY_EQ, _dimEqualityFormulaIndex);
         }
