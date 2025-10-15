@@ -29,7 +29,7 @@ internal class MainViewModel : BaseViewModel {
     private string _errorText;
     private bool _pylonSelectedManually = false;
 
-    private List<PylonSheetInfo> _selectedHostsInfo = [];
+    private List<PylonSheetInfoVM> _selectedHostsInfoVM = [];
 
     private bool _settingsEdited = false;
 
@@ -138,14 +138,14 @@ internal class MainViewModel : BaseViewModel {
     /// <summary>
     /// Список всех найденных пилонов для работы в проекте (оболочек)
     /// </summary>
-    public ObservableCollection<PylonSheetInfo> HostsInfo { get; set; } = [];
+    public ObservableCollection<PylonSheetInfoVM> HostsInfoVM { get; set; } = [];
 
     /// <summary>
     /// Список пилонов (оболочек) для работы из выбранного пользователем комплекта документации
     /// </summary>
-    public List<PylonSheetInfo> SelectedHostsInfo {
-        get => _selectedHostsInfo;
-        set => RaiseAndSetIfChanged(ref _selectedHostsInfo, value);
+    public List<PylonSheetInfoVM> SelectedHostsInfoVM {
+        get => _selectedHostsInfoVM;
+        set => RaiseAndSetIfChanged(ref _selectedHostsInfoVM, value);
     }
 
     /// <summary>
@@ -288,9 +288,9 @@ internal class MainViewModel : BaseViewModel {
             transaction.RollBack();
         }
 
-        HostsInfo = new ObservableCollection<PylonSheetInfo>(_revitRepository.HostsInfo);
+        HostsInfoVM = new ObservableCollection<PylonSheetInfoVM>(_revitRepository.HostsInfo);
         ProjectSections = new ObservableCollection<string>(_revitRepository.HostProjectSections);
-        OnPropertyChanged(nameof(HostsInfo));
+        OnPropertyChanged(nameof(HostsInfoVM));
         OnPropertyChanged(nameof(ProjectSections));
     }
 
@@ -300,7 +300,7 @@ internal class MainViewModel : BaseViewModel {
     /// Отрабатывает в момент выбора комплекта документации в ComboBox
     /// </summary>
     private void GetHostMarksInGUI() {
-        SelectedHostsInfo = [.. HostsInfo
+        SelectedHostsInfoVM = [.. HostsInfoVM
             .Where(item => item.ProjectSection.Equals(SelectionSettings.SelectedProjectSection))
             .ToList()];
 
@@ -316,22 +316,22 @@ internal class MainViewModel : BaseViewModel {
         var element = _revitRepository.Document.GetElement(elementid);
 
         if(element != null) {
-            HostsInfo.Clear();
-            SelectedHostsInfo.Clear();
+            HostsInfoVM.Clear();
+            SelectedHostsInfoVM.Clear();
             SelectionSettings.SelectedProjectSection = string.Empty;
             _pylonSelectedManually = true;
 
             _revitRepository.GetHostData(this, [element]);
 
-            HostsInfo = new ObservableCollection<PylonSheetInfo>(_revitRepository.HostsInfo);
+            HostsInfoVM = new ObservableCollection<PylonSheetInfoVM>(_revitRepository.HostsInfo);
             ProjectSections = new ObservableCollection<string>(_revitRepository.HostProjectSections);
-            OnPropertyChanged(nameof(HostsInfo));
+            OnPropertyChanged(nameof(HostsInfoVM));
             OnPropertyChanged(nameof(ProjectSections));
 
 
-            if(HostsInfo.Count > 0) {
-                SelectedHostsInfo.Add(HostsInfo.FirstOrDefault());
-                HostsInfo.FirstOrDefault().IsCheck = true;
+            if(HostsInfoVM.Count > 0) {
+                SelectedHostsInfoVM.Add(HostsInfoVM.FirstOrDefault());
+                HostsInfoVM.FirstOrDefault().IsCheck = true;
                 SelectionSettings.SelectedProjectSection = ProjectSections.FirstOrDefault();
             }
         }
@@ -503,8 +503,9 @@ internal class MainViewModel : BaseViewModel {
         var paramValService = new ParamValueService(_revitRepository);
         var rebarFinder = new RebarFinderService(settings, _revitRepository, paramValService);
 
-        foreach(var hostsInfo in SelectedHostsInfo) {
-            hostsInfo.InitializeComponents(settings, _revitRepository, paramValService, rebarFinder);
+        foreach(var hostsInfoVM in SelectedHostsInfoVM) {
+            var hostsInfo = new PylonSheetInfo(settings, _revitRepository, paramValService, rebarFinder,
+                                               hostsInfoVM.ProjectSection, hostsInfoVM.PylonKeyName);
             hostsInfo.Manager.WorkWithCreation();
         }
         transaction.Commit();
@@ -744,7 +745,7 @@ internal class MainViewModel : BaseViewModel {
     /// Задает фильтрацию списка марок пилонов
     /// </summary>
     private void SetHostsInfoFilters() {
-        _hostsInfoView = CollectionViewSource.GetDefaultView(SelectedHostsInfo);
+        _hostsInfoView = CollectionViewSource.GetDefaultView(SelectedHostsInfoVM);
         _hostsInfoView.Filter = item =>
                 String.IsNullOrEmpty(HostsInfoFilter)
                     ? true
@@ -766,12 +767,12 @@ internal class MainViewModel : BaseViewModel {
     /// Отрабатывает при нажатии на кнопку "Выбрать все" возле списка марок пилонов в GUI
     /// </summary>
     private void SelectAllHostsInfoInGUI() {
-        foreach(PylonSheetInfo pylonSheetInfo in SelectedHostsInfo) {
+        foreach(PylonSheetInfoVM pylonSheetInfoVM in SelectedHostsInfoVM) {
             if(String.IsNullOrEmpty(HostsInfoFilter)
                    ? true
-                   : (pylonSheetInfo.PylonKeyName.IndexOf(HostsInfoFilter, StringComparison.OrdinalIgnoreCase) >=
+                   : (pylonSheetInfoVM.PylonKeyName.IndexOf(HostsInfoFilter, StringComparison.OrdinalIgnoreCase) >=
                   0)) {
-                pylonSheetInfo.IsCheck = true;
+                pylonSheetInfoVM.IsCheck = true;
             }
         }
 
@@ -785,12 +786,12 @@ internal class MainViewModel : BaseViewModel {
     /// Отрабатывает при нажатии на кнопку "Выбрать все" возле списка марок пилонов в GUI
     /// </summary>
     private void UnselectAllHostsInfoInGUI() {
-        foreach(PylonSheetInfo pylonSheetInfo in SelectedHostsInfo) {
+        foreach(PylonSheetInfoVM pylonSheetInfoVM in SelectedHostsInfoVM) {
             if(String.IsNullOrEmpty(HostsInfoFilter)
                    ? true
-                   : (pylonSheetInfo.PylonKeyName.IndexOf(HostsInfoFilter, StringComparison.OrdinalIgnoreCase) >=
+                   : (pylonSheetInfoVM.PylonKeyName.IndexOf(HostsInfoFilter, StringComparison.OrdinalIgnoreCase) >=
                   0)) {
-                pylonSheetInfo.IsCheck = false;
+                pylonSheetInfoVM.IsCheck = false;
             }
         }
 

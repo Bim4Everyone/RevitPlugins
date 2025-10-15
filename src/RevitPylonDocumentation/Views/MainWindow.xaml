@@ -4126,7 +4126,7 @@
                     Margin="10"
                     ScrollViewer.VerticalScrollBarVisibility="Visible"
                     ScrollViewer.CanContentScroll="False"
-                    ItemsSource="{Binding Path=SelectedHostsInfo, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
+                    ItemsSource="{Binding Path=SelectedHostsInfoVM, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
                     SelectionMode="Multiple">
 
                     <ListView.Resources>

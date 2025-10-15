@@ -151,7 +151,7 @@ internal class RevitRepository {
     /// <summary>
     /// Хранит оболочки над листами пилонов - центральное хранилище информации по пилону для работы плагина
     /// </summary>
-    public List<PylonSheetInfo> HostsInfo { get; set; } = [];
+    public List<PylonSheetInfoVM> HostsInfo { get; set; } = [];
 
     public List<string> HostProjectSections { get; set; } = [];
 
@@ -238,7 +238,7 @@ internal class RevitRepository {
                 .FirstOrDefault();
 
             if(testPylonSheetInfo is null) {
-                var pylonSheetInfo = new PylonSheetInfo(projectSection, hostMark);
+                var pylonSheetInfo = new PylonSheetInfoVM(projectSection, hostMark);
                 pylonSheetInfo.HostElems.Add(elem);
                 FindSheetInPj(mainViewModel, pylonSheetInfo);
 
@@ -276,14 +276,16 @@ internal class RevitRepository {
     /// <summary>
     /// Ищет лист в проекте по информации из оболочки листа пилона PylonSheetInfo
     /// </summary>
-    public void FindSheetInPj(MainViewModel mainViewModel, PylonSheetInfo pylonSheetInfo) {
+    public void FindSheetInPj(MainViewModel mainViewModel, PylonSheetInfoVM pylonSheetInfoVM) {
         var sheet = AllSheets
-            .Where(item => item.Name.Equals(mainViewModel.ProjectSettings.SheetPrefix + pylonSheetInfo.PylonKeyName + mainViewModel.ProjectSettings.SheetSuffix))
+            .Where(item => item.Name.Equals(mainViewModel.ProjectSettings.SheetPrefix 
+                                            + pylonSheetInfoVM.PylonKeyName 
+                                            + mainViewModel.ProjectSettings.SheetSuffix))
             .FirstOrDefault();
 
         if(sheet != null) {
-            pylonSheetInfo.SheetInProject = true;
-            pylonSheetInfo.PylonViewSheet = sheet;
+            pylonSheetInfoVM.SheetInProject = true;
+            pylonSheetInfoVM.PylonViewSheet = sheet;
         }
     }
 
