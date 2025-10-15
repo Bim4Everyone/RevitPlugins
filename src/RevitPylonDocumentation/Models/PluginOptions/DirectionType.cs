@@ -1,4 +1,4 @@
-namespace RevitPylonDocumentation.Models;
+namespace RevitPylonDocumentation.Models.PluginOptions;
 public enum DirectionType {
     Top,
     RightTop,

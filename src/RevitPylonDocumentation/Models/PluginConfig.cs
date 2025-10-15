@@ -35,18 +35,14 @@ internal class PluginConfig : ProjectConfig<PluginSettings> {
         selectionSettings.NeedWorkWithTransverseViewFirst = settings.NeedWorkWithTransverseViewFirst;
         selectionSettings.NeedWorkWithTransverseViewSecond = settings.NeedWorkWithTransverseViewSecond;
         selectionSettings.NeedWorkWithTransverseViewThird = settings.NeedWorkWithTransverseViewThird;
-        selectionSettings.NeedWorkWithRebarSchedule = settings.NeedWorkWithRebarSchedule;
         selectionSettings.NeedWorkWithMaterialSchedule = settings.NeedWorkWithMaterialSchedule;
         selectionSettings.NeedWorkWithSystemPartsSchedule = settings.NeedWorkWithSystemPartsSchedule;
         selectionSettings.NeedWorkWithIfcPartsSchedule = settings.NeedWorkWithIfcPartsSchedule;
         selectionSettings.NeedWorkWithLegend = settings.NeedWorkWithLegend;
         selectionSettings.NeedWorkWithGeneralRebarView = settings.NeedWorkWithGeneralRebarView;
         selectionSettings.NeedWorkWithGeneralPerpendicularRebarView = settings.NeedWorkWithGeneralPerpendicularRebarView;
-        selectionSettings.NeedWorkWithTransverseRebarViewFirst = settings.NeedWorkWithTransverseRebarViewFirst;
-        selectionSettings.NeedWorkWithTransverseRebarViewSecond = settings.NeedWorkWithTransverseRebarViewSecond;
         selectionSettings.NeedWorkWithSkeletonSchedule = settings.NeedWorkWithSkeletonSchedule;
         selectionSettings.NeedWorkWithSkeletonByElemsSchedule = settings.NeedWorkWithSkeletonByElemsSchedule;
-        selectionSettings.NeedWorkWithRebarNode = settings.NeedWorkWithRebarNode;
 
         projectSettings.ProjectSection = settings.ProjectSection;
         projectSettings.ProjectSectionTemp = settings.ProjectSection;
@@ -82,6 +78,28 @@ internal class PluginConfig : ProjectConfig<PluginSettings> {
         projectSettings.LegendXOffset = settings.LegendXOffset;
         projectSettings.LegendXOffsetTemp = settings.LegendXOffset;
         projectSettings.LegendYOffset = settings.LegendYOffset;
+        projectSettings.LegendYOffsetTemp = settings.LegendYOffset;
+
+        projectSettings.DimensionTypeName = settings.DimensionTypeName;
+        projectSettings.DimensionTypeNameTemp = settings.DimensionTypeName;
+        projectSettings.SpotDimensionTypeName = settings.SpotDimensionTypeName;
+        projectSettings.SpotDimensionTypeNameTemp = settings.SpotDimensionTypeName;
+
+        projectSettings.SkeletonTagTypeName = settings.SkeletonTagTypeName;
+        projectSettings.SkeletonTagTypeNameTemp = settings.SkeletonTagTypeName;
+        projectSettings.RebarTagTypeWithSerifName = settings.RebarTagTypeWithSerifName;
+        projectSettings.RebarTagTypeWithSerifNameTemp = settings.RebarTagTypeWithSerifName;
+        projectSettings.RebarTagTypeWithStepName = settings.RebarTagTypeWithStepName;
+        projectSettings.RebarTagTypeWithStepNameTemp = settings.RebarTagTypeWithStepName;
+        projectSettings.RebarTagTypeWithCommentName = settings.RebarTagTypeWithCommentName;
+        projectSettings.RebarTagTypeWithCommentNameTemp = settings.RebarTagTypeWithCommentName;
+        projectSettings.UniversalTagTypeName = settings.UniversalTagTypeName;
+        projectSettings.UniversalTagTypeNameTemp = settings.UniversalTagTypeName;
+
+        projectSettings.BreakLineTypeName = settings.BreakLineTypeName;
+        projectSettings.BreakLineTypeNameTemp = settings.BreakLineTypeName;
+        projectSettings.ConcretingJointTypeName = settings.ConcretingJointTypeName;
+        projectSettings.ConcretingJointTypeNameTemp = settings.ConcretingJointTypeName;
 
         viewSectionSettings.GeneralViewPrefix = settings.GeneralViewPrefix;
         viewSectionSettings.GeneralViewPrefixTemp = settings.GeneralViewPrefix;
@@ -96,15 +114,6 @@ internal class PluginConfig : ProjectConfig<PluginSettings> {
         viewSectionSettings.GeneralRebarViewTemplateName = settings.GeneralRebarViewTemplateName;
         viewSectionSettings.GeneralRebarViewTemplateNameTemp = settings.GeneralRebarViewTemplateName;
 
-        projectSettings.RebarNodeYOffsetTemp = settings.RebarNodeYOffset;
-        projectSettings.RebarNodeName = settings.RebarNodeName;
-        projectSettings.RebarNodeNameTemp = settings.RebarNodeName;
-        projectSettings.RebarNodeXOffset = settings.RebarNodeXOffset;
-        projectSettings.RebarNodeXOffsetTemp = settings.RebarNodeXOffset;
-        projectSettings.RebarNodeYOffset = settings.RebarNodeYOffset;
-        projectSettings.RebarNodeYOffsetTemp = settings.RebarNodeYOffset;
-
-
         viewSectionSettings.GeneralViewXOffset = settings.GeneralViewXOffset;
         viewSectionSettings.GeneralViewXOffsetTemp = settings.GeneralViewXOffset;
         viewSectionSettings.GeneralViewYTopOffset = settings.GeneralViewYTopOffset;
@@ -112,6 +121,15 @@ internal class PluginConfig : ProjectConfig<PluginSettings> {
         viewSectionSettings.GeneralViewYBottomOffset = settings.GeneralViewYBottomOffset;
         viewSectionSettings.GeneralViewYBottomOffsetTemp = settings.GeneralViewYBottomOffset;
 
+        viewSectionSettings.GeneralViewPerpXOffset = settings.GeneralViewPerpXOffset;
+        viewSectionSettings.GeneralViewPerpXOffsetTemp = settings.GeneralViewPerpXOffset;
+        viewSectionSettings.GeneralViewPerpYTopOffset = settings.GeneralViewPerpYTopOffset;
+        viewSectionSettings.GeneralViewPerpYTopOffsetTemp = settings.GeneralViewPerpYTopOffset;
+        viewSectionSettings.GeneralViewPerpYBottomOffset = settings.GeneralViewPerpYBottomOffset;
+        viewSectionSettings.GeneralViewPerpYBottomOffsetTemp = settings.GeneralViewPerpYBottomOffset;
+
+        viewSectionSettings.TransverseViewDepth = settings.TransverseViewDepth;
+        viewSectionSettings.TransverseViewDepthTemp = settings.TransverseViewDepth;
         viewSectionSettings.TransverseViewFirstPrefix = settings.TransverseViewFirstPrefix;
         viewSectionSettings.TransverseViewFirstPrefixTemp = settings.TransverseViewFirstPrefix;
         viewSectionSettings.TransverseViewFirstSuffix = settings.TransverseViewFirstSuffix;
@@ -132,6 +150,17 @@ internal class PluginConfig : ProjectConfig<PluginSettings> {
         viewSectionSettings.TransverseViewThirdElevationTemp = settings.TransverseViewThirdElevation;
         viewSectionSettings.TransverseViewTemplateName = settings.TransverseViewTemplateName;
         viewSectionSettings.TransverseViewTemplateNameTemp = settings.TransverseViewTemplateName;
+
+        viewSectionSettings.TransverseRebarViewDepth = settings.TransverseRebarViewDepth;
+        viewSectionSettings.TransverseRebarViewDepthTemp = settings.TransverseRebarViewDepth;
+        viewSectionSettings.TransverseRebarViewFirstPrefix = settings.TransverseRebarViewFirstPrefix;
+        viewSectionSettings.TransverseRebarViewFirstPrefixTemp = settings.TransverseRebarViewFirstPrefix;
+        viewSectionSettings.TransverseRebarViewFirstSuffix = settings.TransverseRebarViewFirstSuffix;
+        viewSectionSettings.TransverseRebarViewFirstSuffixTemp = settings.TransverseRebarViewFirstSuffix;
+        viewSectionSettings.TransverseRebarViewSecondPrefix = settings.TransverseRebarViewSecondPrefix;
+        viewSectionSettings.TransverseRebarViewSecondPrefixTemp = settings.TransverseRebarViewSecondPrefix;
+        viewSectionSettings.TransverseRebarViewSecondSuffix = settings.TransverseRebarViewSecondSuffix;
+        viewSectionSettings.TransverseRebarViewSecondSuffixTemp = settings.TransverseRebarViewSecondSuffix;
         viewSectionSettings.TransverseRebarViewTemplateName = settings.TransverseRebarViewTemplateName;
         viewSectionSettings.TransverseRebarViewTemplateNameTemp = settings.TransverseRebarViewTemplateName;
 
@@ -142,11 +171,6 @@ internal class PluginConfig : ProjectConfig<PluginSettings> {
 
         viewSectionSettings.ViewFamilyTypeName = settings.ViewFamilyTypeName;
         viewSectionSettings.ViewFamilyTypeNameTemp = settings.ViewFamilyTypeName;
-
-        schedulesSettings.RebarSchedulePrefix = settings.RebarSchedulePrefix;
-        schedulesSettings.RebarSchedulePrefixTemp = settings.RebarSchedulePrefix;
-        schedulesSettings.RebarScheduleSuffix = settings.RebarScheduleSuffix;
-        schedulesSettings.RebarScheduleSuffixTemp = settings.RebarScheduleSuffix;
 
         schedulesSettings.SkeletonSchedulePrefix = settings.SkeletonSchedulePrefix;
         schedulesSettings.SkeletonSchedulePrefixTemp = settings.SkeletonSchedulePrefix;
@@ -172,9 +196,6 @@ internal class PluginConfig : ProjectConfig<PluginSettings> {
         schedulesSettings.IfcPartsScheduleSuffix = settings.IfcPartsScheduleSuffix;
         schedulesSettings.IfcPartsScheduleSuffixTemp = settings.IfcPartsScheduleSuffix;
 
-        schedulesSettings.RebarScheduleName = settings.RebarScheduleName;
-        schedulesSettings.RebarScheduleNameTemp = settings.RebarScheduleName;
-
         schedulesSettings.SkeletonScheduleName = settings.SkeletonScheduleName;
         schedulesSettings.SkeletonScheduleNameTemp = settings.SkeletonScheduleName;
         schedulesSettings.SkeletonByElemsScheduleName = settings.SkeletonByElemsScheduleName;
@@ -187,9 +208,6 @@ internal class PluginConfig : ProjectConfig<PluginSettings> {
         schedulesSettings.IfcPartsScheduleName = settings.IfcPartsScheduleName;
         schedulesSettings.IfcPartsScheduleNameTemp = settings.IfcPartsScheduleName;
 
-        schedulesSettings.RebarScheduleDisp1 = settings.RebarScheduleDisp1;
-        schedulesSettings.RebarScheduleDisp1Temp = settings.RebarScheduleDisp1;
-
         schedulesSettings.SkeletonScheduleDisp1 = settings.SkeletonScheduleDisp1;
         schedulesSettings.SkeletonScheduleDisp1Temp = settings.SkeletonScheduleDisp1;
         schedulesSettings.SkeletonByElemsScheduleDisp1 = settings.SkeletonByElemsScheduleDisp1;
@@ -201,8 +219,6 @@ internal class PluginConfig : ProjectConfig<PluginSettings> {
         schedulesSettings.SystemPartsScheduleDisp1Temp = settings.SystemPartsScheduleDisp1;
         schedulesSettings.IfcPartsScheduleDisp1 = settings.IfcPartsScheduleDisp1;
         schedulesSettings.IfcPartsScheduleDisp1Temp = settings.IfcPartsScheduleDisp1;
-        schedulesSettings.RebarScheduleDisp2 = settings.RebarScheduleDisp2;
-        schedulesSettings.RebarScheduleDisp2Temp = settings.RebarScheduleDisp2;
 
         schedulesSettings.SkeletonScheduleDisp2 = settings.SkeletonScheduleDisp2;
         schedulesSettings.SkeletonScheduleDisp2Temp = settings.SkeletonScheduleDisp2;
@@ -231,24 +247,30 @@ internal class PluginConfig : ProjectConfig<PluginSettings> {
         settings.NeedWorkWithTransverseViewFirst = selectionSettings.NeedWorkWithTransverseViewFirst;
         settings.NeedWorkWithTransverseViewSecond = selectionSettings.NeedWorkWithTransverseViewSecond;
         settings.NeedWorkWithTransverseViewThird = selectionSettings.NeedWorkWithTransverseViewThird;
-        settings.NeedWorkWithRebarSchedule = selectionSettings.NeedWorkWithRebarSchedule;
         settings.NeedWorkWithMaterialSchedule = selectionSettings.NeedWorkWithMaterialSchedule;
         settings.NeedWorkWithSystemPartsSchedule = selectionSettings.NeedWorkWithSystemPartsSchedule;
         settings.NeedWorkWithIfcPartsSchedule = selectionSettings.NeedWorkWithIfcPartsSchedule;
         settings.NeedWorkWithLegend = selectionSettings.NeedWorkWithLegend;
         settings.NeedWorkWithGeneralRebarView = selectionSettings.NeedWorkWithGeneralRebarView;
         settings.NeedWorkWithGeneralPerpendicularRebarView = selectionSettings.NeedWorkWithGeneralPerpendicularRebarView;
-        settings.NeedWorkWithTransverseRebarViewFirst = selectionSettings.NeedWorkWithTransverseRebarViewFirst;
-        settings.NeedWorkWithTransverseRebarViewSecond = selectionSettings.NeedWorkWithTransverseRebarViewSecond;
         settings.NeedWorkWithSkeletonSchedule = selectionSettings.NeedWorkWithSkeletonSchedule;
         settings.NeedWorkWithSkeletonByElemsSchedule = selectionSettings.NeedWorkWithSkeletonByElemsSchedule;
-        settings.NeedWorkWithRebarNode = selectionSettings.NeedWorkWithRebarNode;
 
         settings.ProjectSection = projectSettings.ProjectSection;
         settings.Mark = projectSettings.Mark;
         settings.TitleBlockName = projectSettings.TitleBlockName;
         settings.DispatcherGroupingFirst = projectSettings.DispatcherGroupingFirst;
         settings.DispatcherGroupingSecond = projectSettings.DispatcherGroupingSecond;
+        settings.DimensionTypeName = projectSettings.DimensionTypeName;
+        settings.SpotDimensionTypeName = projectSettings.SpotDimensionTypeName;
+        settings.SkeletonTagTypeName = projectSettings.SkeletonTagTypeName;
+        settings.RebarTagTypeWithSerifName = projectSettings.RebarTagTypeWithSerifName;
+        settings.RebarTagTypeWithStepName = projectSettings.RebarTagTypeWithStepName;
+        settings.RebarTagTypeWithCommentName = projectSettings.RebarTagTypeWithCommentName;
+        settings.UniversalTagTypeName = projectSettings.UniversalTagTypeName;
+
+        settings.BreakLineTypeName = projectSettings.BreakLineTypeName;
+        settings.ConcretingJointTypeName = projectSettings.ConcretingJointTypeName;
 
         settings.SheetSize = projectSettings.SheetSize;
         settings.SheetCoefficient = projectSettings.SheetCoefficient;
@@ -274,7 +296,11 @@ internal class PluginConfig : ProjectConfig<PluginSettings> {
         settings.GeneralViewXOffset = viewSectionSettings.GeneralViewXOffset;
         settings.GeneralViewYTopOffset = viewSectionSettings.GeneralViewYTopOffset;
         settings.GeneralViewYBottomOffset = viewSectionSettings.GeneralViewYBottomOffset;
+        settings.GeneralViewPerpXOffset = viewSectionSettings.GeneralViewPerpXOffset;
+        settings.GeneralViewPerpYTopOffset = viewSectionSettings.GeneralViewPerpYTopOffset;
+        settings.GeneralViewPerpYBottomOffset = viewSectionSettings.GeneralViewPerpYBottomOffset;
 
+        settings.TransverseViewDepth = viewSectionSettings.TransverseViewDepth;
         settings.TransverseViewFirstPrefix = viewSectionSettings.TransverseViewFirstPrefix;
         settings.TransverseViewFirstSuffix = viewSectionSettings.TransverseViewFirstSuffix;
         settings.TransverseViewFirstElevation = viewSectionSettings.TransverseViewFirstElevation;
@@ -284,20 +310,20 @@ internal class PluginConfig : ProjectConfig<PluginSettings> {
         settings.TransverseViewThirdPrefix = viewSectionSettings.TransverseViewThirdPrefix;
         settings.TransverseViewThirdSuffix = viewSectionSettings.TransverseViewThirdSuffix;
         settings.TransverseViewThirdElevation = viewSectionSettings.TransverseViewThirdElevation;
+
+        settings.TransverseRebarViewDepth = viewSectionSettings.TransverseRebarViewDepth;
+        settings.TransverseRebarViewFirstPrefix = viewSectionSettings.TransverseRebarViewFirstPrefix;
+        settings.TransverseRebarViewFirstSuffix = viewSectionSettings.TransverseRebarViewFirstSuffix;
+        settings.TransverseRebarViewSecondPrefix = viewSectionSettings.TransverseRebarViewSecondPrefix;
+        settings.TransverseRebarViewSecondSuffix = viewSectionSettings.TransverseRebarViewSecondSuffix;
+
         settings.TransverseViewTemplateName = viewSectionSettings.TransverseViewTemplateName;
         settings.TransverseRebarViewTemplateName = viewSectionSettings.TransverseRebarViewTemplateName;
-
-        settings.RebarNodeName = projectSettings.RebarNodeName;
-        settings.RebarNodeXOffset = projectSettings.RebarNodeXOffset;
-        settings.RebarNodeYOffset = projectSettings.RebarNodeYOffset;
 
         settings.TransverseViewXOffset = viewSectionSettings.TransverseViewXOffset;
         settings.TransverseViewYOffset = viewSectionSettings.TransverseViewYOffset;
 
         settings.ViewFamilyTypeName = viewSectionSettings.ViewFamilyTypeName;
-
-        settings.RebarSchedulePrefix = schedulesSettings.RebarSchedulePrefix;
-        settings.RebarScheduleSuffix = schedulesSettings.RebarScheduleSuffix;
 
         settings.SkeletonSchedulePrefix = schedulesSettings.SkeletonSchedulePrefix;
         settings.SkeletonScheduleSuffix = schedulesSettings.SkeletonScheduleSuffix;
@@ -313,8 +339,6 @@ internal class PluginConfig : ProjectConfig<PluginSettings> {
         settings.IfcPartsSchedulePrefix = schedulesSettings.IfcPartsSchedulePrefix;
         settings.IfcPartsScheduleSuffix = schedulesSettings.IfcPartsScheduleSuffix;
 
-        settings.RebarScheduleName = schedulesSettings.RebarScheduleName;
-
         settings.SkeletonScheduleName = schedulesSettings.SkeletonScheduleName;
         settings.SkeletonByElemsScheduleName = schedulesSettings.SkeletonByElemsScheduleName;
 
@@ -322,15 +346,12 @@ internal class PluginConfig : ProjectConfig<PluginSettings> {
         settings.SystemPartsScheduleName = schedulesSettings.SystemPartsScheduleName;
         settings.IfcPartsScheduleName = schedulesSettings.IfcPartsScheduleName;
 
-        settings.RebarScheduleDisp1 = schedulesSettings.RebarScheduleDisp1;
-
         settings.SkeletonScheduleDisp1 = schedulesSettings.SkeletonScheduleDisp1;
         settings.SkeletonByElemsScheduleDisp1 = schedulesSettings.SkeletonByElemsScheduleDisp1;
 
         settings.MaterialScheduleDisp1 = schedulesSettings.MaterialScheduleDisp1;
         settings.SystemPartsScheduleDisp1 = schedulesSettings.SystemPartsScheduleDisp1;
         settings.IfcPartsScheduleDisp1 = schedulesSettings.IfcPartsScheduleDisp1;
-        settings.RebarScheduleDisp2 = schedulesSettings.RebarScheduleDisp2;
 
         settings.SkeletonScheduleDisp2 = schedulesSettings.SkeletonScheduleDisp2;
         settings.SkeletonByElemsScheduleDisp2 = schedulesSettings.SkeletonByElemsScheduleDisp2;
@@ -351,25 +372,29 @@ internal class PluginSettings : ProjectSettings {
     public bool NeedWorkWithTransverseViewFirst { get; set; }
     public bool NeedWorkWithTransverseViewSecond { get; set; }
     public bool NeedWorkWithTransverseViewThird { get; set; }
-    public bool NeedWorkWithRebarSchedule { get; set; }
     public bool NeedWorkWithMaterialSchedule { get; set; }
     public bool NeedWorkWithSystemPartsSchedule { get; set; }
     public bool NeedWorkWithIfcPartsSchedule { get; set; }
     public bool NeedWorkWithLegend { get; set; }
     public bool NeedWorkWithGeneralRebarView { get; set; }
     public bool NeedWorkWithGeneralPerpendicularRebarView { get; set; }
-    public bool NeedWorkWithTransverseRebarViewFirst { get; set; }
-    public bool NeedWorkWithTransverseRebarViewSecond { get; set; }
     public bool NeedWorkWithSkeletonSchedule { get; set; }
     public bool NeedWorkWithSkeletonByElemsSchedule { get; set; }
-    public bool NeedWorkWithRebarNode { get; set; }
-
 
     public string ProjectSection { get; set; }
     public string Mark { get; set; }
     public string TitleBlockName { get; set; }
     public string DispatcherGroupingFirst { get; set; }
     public string DispatcherGroupingSecond { get; set; }
+    public string DimensionTypeName { get; set; }
+    public string SpotDimensionTypeName { get; set; }
+    public string SkeletonTagTypeName { get; set; }
+    public string RebarTagTypeWithSerifName { get; set; }
+    public string RebarTagTypeWithStepName { get; set; }
+    public string RebarTagTypeWithCommentName { get; set; }
+    public string UniversalTagTypeName { get; set; }
+    public string BreakLineTypeName { get; set; }
+    public string ConcretingJointTypeName { get; set; }
     public string SheetSize { get; set; }
     public string SheetCoefficient { get; set; }
     public string SheetPrefix { get; set; }
@@ -390,6 +415,10 @@ internal class PluginSettings : ProjectSettings {
     public string GeneralViewXOffset { get; set; }
     public string GeneralViewYTopOffset { get; set; }
     public string GeneralViewYBottomOffset { get; set; }
+    public string GeneralViewPerpXOffset { get; set; }
+    public string GeneralViewPerpYTopOffset { get; set; }
+    public string GeneralViewPerpYBottomOffset { get; set; }
+    public string TransverseViewDepth { get; set; }
     public string TransverseViewFirstPrefix { get; set; }
     public string TransverseViewFirstSuffix { get; set; }
     public string TransverseViewFirstElevation { get; set; }
@@ -399,22 +428,21 @@ internal class PluginSettings : ProjectSettings {
     public string TransverseViewThirdPrefix { get; set; }
     public string TransverseViewThirdSuffix { get; set; }
     public string TransverseViewThirdElevation { get; set; }
+    public string TransverseRebarViewDepth { get; set; }
+    public string TransverseRebarViewFirstPrefix { get; set; }
+    public string TransverseRebarViewFirstSuffix { get; set; }
+    public string TransverseRebarViewSecondPrefix { get; set; }
+    public string TransverseRebarViewSecondSuffix { get; set; }
     public string TransverseViewTemplateName { get; set; }
     public string TransverseRebarViewTemplateName { get; set; }
     public string TransverseViewXOffset { get; set; }
     public string TransverseViewYOffset { get; set; }
     public string ViewFamilyTypeName { get; set; }
-    public string RebarSchedulePrefix { get; set; }
-    public string RebarScheduleSuffix { get; set; }
 
     public string SkeletonSchedulePrefix { get; set; }
     public string SkeletonScheduleSuffix { get; set; }
     public string SkeletonByElemsSchedulePrefix { get; set; }
     public string SkeletonByElemsScheduleSuffix { get; set; }
-
-    public string RebarNodeName { get; set; }
-    public string RebarNodeXOffset { get; set; }
-    public string RebarNodeYOffset { get; set; }
 
     public string MaterialSchedulePrefix { get; set; }
     public string MaterialScheduleSuffix { get; set; }
@@ -422,7 +450,6 @@ internal class PluginSettings : ProjectSettings {
     public string SystemPartsScheduleSuffix { get; set; }
     public string IfcPartsSchedulePrefix { get; set; }
     public string IfcPartsScheduleSuffix { get; set; }
-    public string RebarScheduleName { get; set; }
 
     public string SkeletonScheduleName { get; set; }
     public string SkeletonByElemsScheduleName { get; set; }
@@ -430,7 +457,6 @@ internal class PluginSettings : ProjectSettings {
     public string MaterialScheduleName { get; set; }
     public string SystemPartsScheduleName { get; set; }
     public string IfcPartsScheduleName { get; set; }
-    public string RebarScheduleDisp1 { get; set; }
 
     public string SkeletonScheduleDisp1 { get; set; }
     public string SkeletonByElemsScheduleDisp1 { get; set; }
@@ -438,7 +464,6 @@ internal class PluginSettings : ProjectSettings {
     public string MaterialScheduleDisp1 { get; set; }
     public string SystemPartsScheduleDisp1 { get; set; }
     public string IfcPartsScheduleDisp1 { get; set; }
-    public string RebarScheduleDisp2 { get; set; }
 
     public string SkeletonScheduleDisp2 { get; set; }
     public string SkeletonByElemsScheduleDisp2 { get; set; }

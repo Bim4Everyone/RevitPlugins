@@ -15,7 +15,8 @@ using dosymep.WPF.ViewModels;
 
 using RevitPylonDocumentation.Models;
 using RevitPylonDocumentation.Models.PylonSheetNView;
-using RevitPylonDocumentation.Models.UserSettings;
+using RevitPylonDocumentation.Models.Services;
+using RevitPylonDocumentation.ViewModels.UserSettings;
 using RevitPylonDocumentation.Views;
 
 using View = Autodesk.Revit.DB.View;
@@ -27,16 +28,8 @@ internal class MainViewModel : BaseViewModel {
 
     private string _errorText;
     private bool _pylonSelectedManually = false;
-    private string _selectedProjectSection = string.Empty;
-    private ViewFamilyType _selectedViewFamilyType;
-    private View _selectedGeneralViewTemplate;
-    private View _selectedGeneralRebarViewTemplate;
-    private View _selectedTransverseViewTemplate;
-    private View _selectedTransverseRebarViewTemplate;
-    private View _selectedLegend;
-    private View _selectedRebarNode;
-    private FamilySymbol _selectedTitleBlock;
-    private List<PylonSheetInfo> _selectedHostsInfo = [];
+
+    private List<PylonSheetInfoVM> _selectedHostsInfoVM = [];
 
     private bool _settingsEdited = false;
 
@@ -47,15 +40,23 @@ internal class MainViewModel : BaseViewModel {
         _pluginConfig = pluginConfig;
         _revitRepository = revitRepository;
 
-        SelectionSettings = new UserSelectionSettings();
-        ProjectSettings = new UserProjectSettings(this, _revitRepository);
-        ViewSectionSettings = new UserViewSectionSettings(this);
-        SchedulesSettings = new UserSchedulesSettings(this);
+        SelectionSettings = new UserSelectionSettingsVM();
+        ProjectSettings = new UserProjectSettingsVM(this, _revitRepository);
+        ViewSectionSettings = new UserViewSectionSettingsVM(this);
+        SchedulesSettings = new UserSchedulesSettingsVM(this);
+        TypesSettings = new UserTypesSettingsVM(this);
+        ReferenceScheduleSettings = new UserReferenceScheduleSettingsVM(this);
 
         ViewFamilyTypes = _revitRepository.ViewFamilyTypes;
         TitleBlocks = _revitRepository.TitleBlocksInProject;
         Legends = _revitRepository.LegendsInProject;
         ViewTemplatesInPj = _revitRepository.AllViewTemplates;
+
+        DimensionTypes = _revitRepository.DimensionTypes;
+        SpotDimensionTypes = _revitRepository.SpotDimensionTypes;
+        RebarTagTypes = _revitRepository.RebarTagTypes;
+        DetailComponentsTypes = _revitRepository.DetailComponentTypes;
+        TypicalAnnotationsTypes = _revitRepository.TypicalAnnotationsTypes;
 
         SetHostsInfoFilters();
 
@@ -101,23 +102,32 @@ internal class MainViewModel : BaseViewModel {
     /// <summary>
     /// Настройки выбора пользователя (с какими компонентами должен работать плагин) с предыдущего сеанса
     /// </summary>
-    public UserSelectionSettings SelectionSettings { get; set; }
+    public UserSelectionSettingsVM SelectionSettings { get; set; }
 
     /// <summary>
     /// Настройки параметров проекта с предыдущего сеанса
     /// </summary>
-    public UserProjectSettings ProjectSettings { get; set; }
+    public UserProjectSettingsVM ProjectSettings { get; set; }
 
     /// <summary>
     /// Настройки параметров и правил создания разрезов с предыдущего сеанса
     /// </summary>
-    public UserViewSectionSettings ViewSectionSettings { get; set; }
+    public UserViewSectionSettingsVM ViewSectionSettings { get; set; }
 
     /// <summary>
     /// Настройки параметров и правил создания спек с предыдущего сеанса
     /// </summary>
-    public UserSchedulesSettings SchedulesSettings { get; set; }
+    public UserSchedulesSettingsVM SchedulesSettings { get; set; }
 
+    /// <summary>
+    /// Настройки выбранных типоразмеров (не сохраняют с предыдущего сеанса, а получаются в текущем)
+    /// </summary>
+    public UserTypesSettingsVM TypesSettings { get; set; }
+
+    /// <summary>
+    /// Настройки выбранных эталонных спецификаций для копирования
+    /// </summary>
+    public UserReferenceScheduleSettingsVM ReferenceScheduleSettings { get; set; }
 
     /// <summary>
     /// Список всех комплектов документации (по ум. обр_ФОП_Раздел проекта)
@@ -126,25 +136,16 @@ internal class MainViewModel : BaseViewModel {
 
 
     /// <summary>
-    /// Выбранный пользователем комплект документации
-    /// </summary>
-    public string SelectedProjectSection {
-        get => _selectedProjectSection;
-        set => RaiseAndSetIfChanged(ref _selectedProjectSection, value);
-    }
-
-    /// <summary>
     /// Список всех найденных пилонов для работы в проекте (оболочек)
     /// </summary>
-    public ObservableCollection<PylonSheetInfo> HostsInfo { get; set; } =
-        [];
+    public ObservableCollection<PylonSheetInfoVM> HostsInfoVM { get; set; } = [];
 
     /// <summary>
     /// Список пилонов (оболочек) для работы из выбранного пользователем комплекта документации
     /// </summary>
-    public List<PylonSheetInfo> SelectedHostsInfo {
-        get => _selectedHostsInfo;
-        set => RaiseAndSetIfChanged(ref _selectedHostsInfo, value);
+    public List<PylonSheetInfoVM> SelectedHostsInfoVM {
+        get => _selectedHostsInfoVM;
+        set => RaiseAndSetIfChanged(ref _selectedHostsInfoVM, value);
     }
 
     /// <summary>
@@ -153,42 +154,9 @@ internal class MainViewModel : BaseViewModel {
     public List<FamilySymbol> TitleBlocks { get; set; } = [];
 
     /// <summary>
-    /// Выбранная пользователем рамка листа
-    /// </summary>
-    public FamilySymbol SelectedTitleBlock {
-        get => _selectedTitleBlock;
-        set {
-            RaiseAndSetIfChanged(ref _selectedTitleBlock, value);
-            ProjectSettings.TitleBlockNameTemp = value?.Name;
-        }
-    }
-
-    /// <summary>
     /// Легенды, имеющиеся в проекте
     /// </summary>
     public List<View> Legends { get; set; } = [];
-
-    /// <summary>
-    /// Выбранная пользователем легенда
-    /// </summary>
-    public View SelectedLegend {
-        get => _selectedLegend;
-        set {
-            RaiseAndSetIfChanged(ref _selectedLegend, value);
-            ProjectSettings.LegendNameTemp = value?.Name;
-        }
-    }
-
-    /// <summary>
-    /// Выбранная пользователем легенда
-    /// </summary>
-    public View SelectedRebarNode {
-        get => _selectedRebarNode;
-        set {
-            RaiseAndSetIfChanged(ref _selectedRebarNode, value);
-            ProjectSettings.RebarNodeNameTemp = value?.Name;
-        }
-    }
 
     /// <summary>
     /// Типоразмеры видов, имеющиеся в проекте
@@ -196,64 +164,34 @@ internal class MainViewModel : BaseViewModel {
     public List<ViewFamilyType> ViewFamilyTypes { get; set; } = [];
 
     /// <summary>
-    /// Выбранный пользователем типоразмер вида для создания новых видов
+    /// Типоразмеры размеров, имеющиеся в проекте
     /// </summary>
-    public ViewFamilyType SelectedViewFamilyType {
-        get => _selectedViewFamilyType;
-        set {
-            RaiseAndSetIfChanged(ref _selectedViewFamilyType, value);
-            ViewSectionSettings.ViewFamilyTypeNameTemp = value?.Name;
-        }
-    }
+    public List<DimensionType> DimensionTypes { get; set; } = [];
+
+    /// <summary>
+    /// Типоразмеры марок арматурных стержней, имеющиеся в проекте
+    /// </summary>
+    public List<FamilySymbol> RebarTagTypes { get; set; } = [];
+
+    /// <summary>
+    /// Типоразмеры элементов узла, имеющиеся в проекте
+    /// </summary>
+    public List<FamilySymbol> DetailComponentsTypes { get; set; } = [];
+
+    /// <summary>
+    /// Типоразмеры типовых аннотаций, имеющиеся в проекте
+    /// </summary>
+    public List<FamilySymbol> TypicalAnnotationsTypes { get; set; } = [];
+
+    /// <summary>
+    /// Типоразмеры высотных отметок, имеющиеся в проекте
+    /// </summary>
+    public List<SpotDimensionType> SpotDimensionTypes { get; set; } = [];
 
     /// <summary>
     /// Перечень шаблонов видов в проекте
     /// </summary>
     public List<ViewSection> ViewTemplatesInPj { get; set; } = [];
-
-    /// <summary>
-    /// Выбранный пользователем шаблон вида основных видов
-    /// </summary>
-    public View SelectedGeneralViewTemplate {
-        get => _selectedGeneralViewTemplate;
-        set {
-            RaiseAndSetIfChanged(ref _selectedGeneralViewTemplate, value);
-            ViewSectionSettings.GeneralViewTemplateNameTemp = value?.Name;
-        }
-    }
-
-    /// <summary>
-    /// Выбранный пользователем шаблон вида основных видов армирования
-    /// </summary>
-    public View SelectedGeneralRebarViewTemplate {
-        get => _selectedGeneralRebarViewTemplate;
-        set {
-            RaiseAndSetIfChanged(ref _selectedGeneralRebarViewTemplate, value);
-            ViewSectionSettings.GeneralRebarViewTemplateNameTemp = value?.Name;
-        }
-    }
-
-    /// <summary>
-    /// Выбранный пользователем шаблон вида поперечных видов
-    /// </summary>
-    public View SelectedTransverseViewTemplate {
-        get => _selectedTransverseViewTemplate;
-        set {
-            RaiseAndSetIfChanged(ref _selectedTransverseViewTemplate, value);
-            ViewSectionSettings.TransverseViewTemplateNameTemp = value?.Name;
-        }
-    }
-
-    /// <summary>
-    /// Выбранный пользователем шаблон вида поперечных видов армирования
-    /// </summary>
-    public View SelectedTransverseRebarViewTemplate {
-        get => _selectedTransverseRebarViewTemplate;
-        set {
-            RaiseAndSetIfChanged(ref _selectedTransverseRebarViewTemplate, value);
-            ViewSectionSettings.TransverseRebarViewTemplateNameTemp = value?.Name;
-        }
-    }
 
     // Инфо по пилонам
     /// <summary>
@@ -266,36 +204,6 @@ internal class MainViewModel : BaseViewModel {
     /// </summary>
     public System.Collections.IList SelectedHostMarks { get; set; }
 
-
-    /// <summary>
-    /// Эталонная спецификация арматуры
-    /// </summary>
-    public ViewSchedule ReferenceRebarSchedule { get; set; }
-
-    /// <summary>
-    /// Эталонная спецификация материалов
-    /// </summary>
-    public ViewSchedule ReferenceMaterialSchedule { get; set; }
-
-    /// <summary>
-    /// Эталонная ведомость деталей для системной арматуры
-    /// </summary>
-    public ViewSchedule ReferenceSystemPartsSchedule { get; set; }
-
-    /// <summary>
-    /// Эталонная ведомость деталей для IFC арматуры
-    /// </summary>
-    public ViewSchedule ReferenceIfcPartsSchedule { get; set; }
-
-    /// <summary>
-    /// Эталонная спецификация арматуры
-    /// </summary>
-    public ViewSchedule ReferenceSkeletonSchedule { get; set; }
-
-    /// <summary>
-    /// Эталонная спецификация арматуры
-    /// </summary>
-    public ViewSchedule ReferenceSkeletonByElemsSchedule { get; set; }
 
     /// <summary>
     /// Фильтр списка марок пилонов
@@ -315,6 +223,7 @@ internal class MainViewModel : BaseViewModel {
         get => _errorText;
         set => RaiseAndSetIfChanged(ref _errorText, value);
     }
+
 
 
     /// <summary>
@@ -379,9 +288,9 @@ internal class MainViewModel : BaseViewModel {
             transaction.RollBack();
         }
 
-        HostsInfo = new ObservableCollection<PylonSheetInfo>(_revitRepository.HostsInfo);
+        HostsInfoVM = new ObservableCollection<PylonSheetInfoVM>(_revitRepository.HostsInfo);
         ProjectSections = new ObservableCollection<string>(_revitRepository.HostProjectSections);
-        OnPropertyChanged(nameof(HostsInfo));
+        OnPropertyChanged(nameof(HostsInfoVM));
         OnPropertyChanged(nameof(ProjectSections));
     }
 
@@ -391,8 +300,8 @@ internal class MainViewModel : BaseViewModel {
     /// Отрабатывает в момент выбора комплекта документации в ComboBox
     /// </summary>
     private void GetHostMarksInGUI() {
-        SelectedHostsInfo = [.. HostsInfo
-            .Where(item => item.ProjectSection.Equals(SelectedProjectSection))
+        SelectedHostsInfoVM = [.. HostsInfoVM
+            .Where(item => item.ProjectSection.Equals(SelectionSettings.SelectedProjectSection))
             .ToList()];
 
         SetHostsInfoFilters();
@@ -407,23 +316,23 @@ internal class MainViewModel : BaseViewModel {
         var element = _revitRepository.Document.GetElement(elementid);
 
         if(element != null) {
-            HostsInfo.Clear();
-            SelectedHostsInfo.Clear();
-            SelectedProjectSection = string.Empty;
+            HostsInfoVM.Clear();
+            SelectedHostsInfoVM.Clear();
+            SelectionSettings.SelectedProjectSection = string.Empty;
             _pylonSelectedManually = true;
 
             _revitRepository.GetHostData(this, [element]);
 
-            HostsInfo = new ObservableCollection<PylonSheetInfo>(_revitRepository.HostsInfo);
+            HostsInfoVM = new ObservableCollection<PylonSheetInfoVM>(_revitRepository.HostsInfo);
             ProjectSections = new ObservableCollection<string>(_revitRepository.HostProjectSections);
-            OnPropertyChanged(nameof(HostsInfo));
+            OnPropertyChanged(nameof(HostsInfoVM));
             OnPropertyChanged(nameof(ProjectSections));
 
 
-            if(HostsInfo.Count > 0) {
-                SelectedHostsInfo.Add(HostsInfo.FirstOrDefault());
-                HostsInfo.FirstOrDefault().IsCheck = true;
-                SelectedProjectSection = ProjectSections.FirstOrDefault();
+            if(HostsInfoVM.Count > 0) {
+                SelectedHostsInfoVM.Add(HostsInfoVM.FirstOrDefault());
+                HostsInfoVM.FirstOrDefault().IsCheck = true;
+                SelectionSettings.SelectedProjectSection = ProjectSections.FirstOrDefault();
             }
         }
 
@@ -432,18 +341,14 @@ internal class MainViewModel : BaseViewModel {
         SelectionSettings.NeedWorkWithTransverseViewFirst = false;
         SelectionSettings.NeedWorkWithTransverseViewSecond = false;
         SelectionSettings.NeedWorkWithTransverseViewThird = false;
-        SelectionSettings.NeedWorkWithRebarSchedule = false;
         SelectionSettings.NeedWorkWithMaterialSchedule = false;
         SelectionSettings.NeedWorkWithSystemPartsSchedule = false;
         SelectionSettings.NeedWorkWithIfcPartsSchedule = false;
         SelectionSettings.NeedWorkWithLegend = false;
         SelectionSettings.NeedWorkWithGeneralRebarView = false;
         SelectionSettings.NeedWorkWithGeneralPerpendicularRebarView = false;
-        SelectionSettings.NeedWorkWithTransverseRebarViewFirst = false;
-        SelectionSettings.NeedWorkWithTransverseRebarViewSecond = false;
         SelectionSettings.NeedWorkWithSkeletonSchedule = false;
         SelectionSettings.NeedWorkWithSkeletonByElemsSchedule = false;
-        SelectionSettings.NeedWorkWithRebarNode = false;
 
         var mainWindow = new MainWindow {
             DataContext = this
@@ -474,51 +379,98 @@ internal class MainViewModel : BaseViewModel {
         FindTransverseViewTemplate();
         FindTransverseRebarViewTemplate();
         FindViewFamilyType();
+        FindDimensionType();
+        FindSpotDimensionType();
+        FindSkeletonTagType();
+        FindRebarTagTypeWithSerif();
+        FindRebarTagTypeWithStep();
+        FindRebarTagTypeWithComment();
+        FindUniversalTagType();
+        FindBreakLineType();
+        FindConcretingJointType();
         FindLegend();
-        FindRebarNode();
         FindTitleBlock();
 
         _settingsEdited = false;
     }
 
     private void CheckSettings() {
-        if(SelectedTitleBlock is null) {
+        if(TypesSettings.SelectedTitleBlock is null) {
             ErrorText = "Не выбран типоразмер рамки листа";
             return;
         }
 
-        if(SelectedViewFamilyType is null) {
+        if(TypesSettings.SelectedViewFamilyType is null) {
             ErrorText = "Не выбран типоразмер создаваемого вида";
             return;
         }
 
-        if(SelectedGeneralViewTemplate is null) {
+        if(TypesSettings.SelectedGeneralViewTemplate is null) {
             ErrorText = "Не выбран шаблон основных видов";
             return;
         }
 
-        if(SelectedGeneralRebarViewTemplate is null) {
+        if(TypesSettings.SelectedGeneralRebarViewTemplate is null) {
             ErrorText = "Не выбран шаблон основных видов армирования";
             return;
         }
 
-        if(SelectedTransverseViewTemplate is null) {
+        if(TypesSettings.SelectedTransverseViewTemplate is null) {
             ErrorText = "Не выбран шаблон поперечных видов";
             return;
         }
 
-        if(SelectedTransverseRebarViewTemplate is null) {
+        if(TypesSettings.SelectedTransverseRebarViewTemplate is null) {
             ErrorText = "Не выбран шаблон поперечных видов армирования";
             return;
         }
 
-        if(SelectedLegend is null) {
+        if(TypesSettings.SelectedLegend is null) {
             ErrorText = "Не выбрана легенда примечаний";
             return;
         }
 
-        if(SelectedRebarNode is null) {
-            ErrorText = "Не выбран узел армирования";
+        if(TypesSettings.SelectedViewFamilyType is null) {
+            ErrorText = "Не выбран типоразмер создаваемого вида";
+            return;
+        }
+
+        if(TypesSettings.SelectedDimensionType is null) {
+            ErrorText = "Не выбран типоразмер для расстановки размеров";
+            return;
+        }
+
+        if(TypesSettings.SelectedSpotDimensionType is null) {
+            ErrorText = "Не выбран типоразмер высотной отметки";
+            return;
+        }
+
+        if(TypesSettings.SelectedSkeletonTagType is null) {
+            ErrorText = "Не задан типоразмер марки каркаса";
+            return;
+        }
+        if(TypesSettings.SelectedRebarTagTypeWithSerif is null) {
+            ErrorText = "Не задан типоразмер марки арматуры с засечкой";
+            return;
+        }
+        if(TypesSettings.SelectedRebarTagTypeWithStep is null) {
+            ErrorText = "Не задан типоразмер марки арматуры без засечки";
+            return;
+        }
+        if(TypesSettings.SelectedRebarTagTypeWithComment is null) {
+            ErrorText = "Не задан типоразмер марки арматуры с комментарием";
+            return;
+        }
+        if(TypesSettings.SelectedUniversalTagType is null) {
+            ErrorText = "Не задан типоразмер универсальной марки";
+            return;
+        }
+        if(TypesSettings.SelectedBreakLineType is null) {
+            ErrorText = "Не задан типоразмер линии обрыва";
+            return;
+        }
+        if(TypesSettings.SelectedConcretingJointType is null) {
+            ErrorText = "Не задан типоразмер рабочего шва бетонирования";
             return;
         }
 
@@ -527,8 +479,8 @@ internal class MainViewModel : BaseViewModel {
     }
 
     /// <summary>
-    /// Определяет можно ли применить изменения настроек плагина (передать данные из временные переменных в постоянные, по которым работает плагин). 
-    /// Доступно при изменении одного из параметров настроек
+    /// Определяет можно ли применить изменения настроек плагина (передать данные из временные переменных в постоянные, 
+    /// по которым работает плагин). Доступно при изменении одного из параметров настроек
     /// </summary>
     private bool CanApplySettings() {
         return _settingsEdited;
@@ -539,7 +491,23 @@ internal class MainViewModel : BaseViewModel {
     /// </summary>
     private void CreateSheetsNViews() {
         using var transaction = _revitRepository.Document.StartTransaction("Документатор пилонов");
-        foreach(var hostsInfo in SelectedHostsInfo) {
+
+        var settings = new CreationSettings(
+            ProjectSettings.GetSettings(),
+            SchedulesSettings.GetSettings(),
+            SelectionSettings.GetSettings(),
+            ViewSectionSettings.GetSettings(),
+            TypesSettings.GetSettings(),
+            ReferenceScheduleSettings.GetSettings());
+
+        var paramValService = new ParamValueService(_revitRepository);
+        var rebarFinder = new RebarFinderService(settings, _revitRepository, paramValService);
+
+        foreach(var hostsInfoVM in SelectedHostsInfoVM) {
+            if(!hostsInfoVM.IsCheck) { continue; }
+
+            var hostsInfo = hostsInfoVM.GetPylonSheetInfo(settings, _revitRepository, paramValService, rebarFinder);
+            hostsInfo.InitializeComponents();
             hostsInfo.Manager.WorkWithCreation();
         }
         transaction.Commit();
@@ -549,23 +517,20 @@ internal class MainViewModel : BaseViewModel {
     /// Ищет эталонные спецификации по указанным именам. На основе эталонных спек создаются спеки для пилонов путем копирования
     /// </summary>
     private void FindReferenceSchedules() {
-        ReferenceRebarSchedule =
-            _revitRepository.AllScheduleViews.FirstOrDefault(sch =>
-                sch.Name.Equals(SchedulesSettings.RebarScheduleName));
-        ReferenceMaterialSchedule =
+        ReferenceScheduleSettings.ReferenceMaterialSchedule =
             _revitRepository.AllScheduleViews.FirstOrDefault(sch =>
                 sch.Name.Equals(SchedulesSettings.MaterialScheduleName));
-        ReferenceSystemPartsSchedule =
+        ReferenceScheduleSettings.ReferenceSystemPartsSchedule =
             _revitRepository.AllScheduleViews.FirstOrDefault(sch =>
                 sch.Name.Equals(SchedulesSettings.SystemPartsScheduleName));
-        ReferenceIfcPartsSchedule =
+        ReferenceScheduleSettings.ReferenceIfcPartsSchedule =
             _revitRepository.AllScheduleViews.FirstOrDefault(sch =>
                 sch.Name.Equals(SchedulesSettings.IfcPartsScheduleName));
 
-        ReferenceSkeletonSchedule =
+        ReferenceScheduleSettings.ReferenceSkeletonSchedule =
             _revitRepository.AllScheduleViews.FirstOrDefault(sch =>
                 sch.Name.Equals(SchedulesSettings.SkeletonScheduleName));
-        ReferenceSkeletonByElemsSchedule =
+        ReferenceScheduleSettings.ReferenceSkeletonByElemsSchedule =
             _revitRepository.AllScheduleViews.FirstOrDefault(sch =>
                 sch.Name.Equals(SchedulesSettings.SkeletonByElemsScheduleName));
     }
@@ -575,7 +540,7 @@ internal class MainViewModel : BaseViewModel {
     /// </summary>
     public void FindGeneralViewTemplate() {
         if(ViewSectionSettings.GeneralViewTemplateName != string.Empty) {
-            SelectedGeneralViewTemplate = ViewTemplatesInPj
+            TypesSettings.SelectedGeneralViewTemplate = ViewTemplatesInPj
                 .FirstOrDefault(view => view.Name.Equals(ViewSectionSettings.GeneralViewTemplateName));
         }
     }
@@ -585,7 +550,7 @@ internal class MainViewModel : BaseViewModel {
     /// </summary>
     public void FindGeneralRebarViewTemplate() {
         if(ViewSectionSettings.GeneralRebarViewTemplateName != string.Empty) {
-            SelectedGeneralRebarViewTemplate = ViewTemplatesInPj
+            TypesSettings.SelectedGeneralRebarViewTemplate = ViewTemplatesInPj
                 .FirstOrDefault(view => view.Name.Equals(ViewSectionSettings.GeneralRebarViewTemplateName));
         }
     }
@@ -595,7 +560,7 @@ internal class MainViewModel : BaseViewModel {
     /// </summary>
     public void FindTransverseViewTemplate() {
         if(ViewSectionSettings.TransverseViewTemplateName != string.Empty) {
-            SelectedTransverseViewTemplate = ViewTemplatesInPj
+            TypesSettings.SelectedTransverseViewTemplate = ViewTemplatesInPj
                 .FirstOrDefault(view => view.Name.Equals(ViewSectionSettings.TransverseViewTemplateName));
         }
     }
@@ -605,7 +570,7 @@ internal class MainViewModel : BaseViewModel {
     /// </summary>
     public void FindTransverseRebarViewTemplate() {
         if(ViewSectionSettings.TransverseRebarViewTemplateName != string.Empty) {
-            SelectedTransverseRebarViewTemplate = ViewTemplatesInPj
+            TypesSettings.SelectedTransverseRebarViewTemplate = ViewTemplatesInPj
                 .FirstOrDefault(view => view.Name.Equals(ViewSectionSettings.TransverseRebarViewTemplateName));
         }
     }
@@ -615,8 +580,98 @@ internal class MainViewModel : BaseViewModel {
     /// </summary>
     public void FindViewFamilyType() {
         if(ViewSectionSettings.ViewFamilyTypeName != string.Empty) {
-            SelectedViewFamilyType = ViewFamilyTypes
-                .FirstOrDefault(familyTypes => familyTypes.Name.Equals(ViewSectionSettings.ViewFamilyTypeName));
+            TypesSettings.SelectedViewFamilyType = ViewFamilyTypes
+                .FirstOrDefault(familyType => familyType.Name.Equals(ViewSectionSettings.ViewFamilyTypeName));
+        }
+    }
+
+    /// <summary>
+    /// Получает типоразмер для расстановки размеров
+    /// </summary>
+    public void FindDimensionType() {
+        if(ProjectSettings.DimensionTypeName != string.Empty) {
+            TypesSettings.SelectedDimensionType = DimensionTypes
+                .FirstOrDefault(familyType => familyType.Name.Equals(ProjectSettings.DimensionTypeName));
+        }
+    }
+
+    /// <summary>
+    /// Получает типоразмер высотной отметки
+    /// </summary>
+    public void FindSpotDimensionType() {
+        if(ProjectSettings.SpotDimensionTypeName != string.Empty) {
+            TypesSettings.SelectedSpotDimensionType = SpotDimensionTypes
+                .FirstOrDefault(familyType => familyType.Name.Equals(ProjectSettings.SpotDimensionTypeName));
+        }
+    }
+
+    /// <summary>
+    /// Получает типоразмер марки арматурного каркаса
+    /// </summary>
+    public void FindSkeletonTagType() {
+        if(ProjectSettings.SkeletonTagTypeName != string.Empty) {
+            TypesSettings.SelectedSkeletonTagType = RebarTagTypes
+                .FirstOrDefault(familyType => familyType.Name.Equals(ProjectSettings.SkeletonTagTypeName));
+        }
+    }
+
+    /// <summary>
+    /// Получает типоразмер марки арматуры с засечкой
+    /// </summary>
+    public void FindRebarTagTypeWithSerif() {
+        if(ProjectSettings.RebarTagTypeWithSerifName != string.Empty) {
+            TypesSettings.SelectedRebarTagTypeWithSerif = RebarTagTypes
+                .FirstOrDefault(familyType => familyType.Name.Equals(ProjectSettings.RebarTagTypeWithSerifName));
+        }
+    }
+
+    /// <summary>
+    /// Получает типоразмер марки арматуры с шагом
+    /// </summary>
+    public void FindRebarTagTypeWithStep() {
+        if(ProjectSettings.RebarTagTypeWithStepName != string.Empty) {
+            TypesSettings.SelectedRebarTagTypeWithStep = RebarTagTypes
+                .FirstOrDefault(familyType => familyType.Name.Equals(ProjectSettings.RebarTagTypeWithStepName));
+        }
+    }
+
+    /// <summary>
+    /// Получает типоразмер марки арматуры с количеством
+    /// </summary>
+    public void FindRebarTagTypeWithComment() {
+        if(ProjectSettings.RebarTagTypeWithCommentName != string.Empty) {
+            TypesSettings.SelectedRebarTagTypeWithComment = RebarTagTypes
+                .FirstOrDefault(familyType => familyType.Name.Equals(ProjectSettings.RebarTagTypeWithCommentName));
+        }
+    }
+
+    /// <summary>
+    /// Получает типоразмер универсальной марки
+    /// </summary>
+    public void FindUniversalTagType() {
+        if(ProjectSettings.UniversalTagTypeName != string.Empty) {
+            TypesSettings.SelectedUniversalTagType = TypicalAnnotationsTypes
+                .FirstOrDefault(familyType => familyType.Name.Equals(ProjectSettings.UniversalTagTypeName));
+        }
+    }
+
+    /// <summary>
+    /// Получает типоразмер аннотацию линии обрыва
+    /// </summary>
+    public void FindBreakLineType() {
+        if(ProjectSettings.BreakLineTypeName != string.Empty) {
+            TypesSettings.SelectedBreakLineType = DetailComponentsTypes
+                .FirstOrDefault(familyType => familyType.Name.Equals(ProjectSettings.BreakLineTypeName));
+        }
+    }
+
+    /// <summary>
+    /// Получает типоразмер аннотацию рабочего шва бетонирования
+    /// </summary>
+    public void FindConcretingJointType() {
+        if(ProjectSettings.ConcretingJointTypeName != string.Empty) {
+            TypesSettings.SelectedConcretingJointType = DetailComponentsTypes
+                .FirstOrDefault(familyType => familyType.Name.Equals(ProjectSettings.ConcretingJointTypeName));
         }
     }
 
@@ -625,18 +680,8 @@ internal class MainViewModel : BaseViewModel {
     /// </summary>
     public void FindLegend() {
         if(ProjectSettings.LegendName != string.Empty) {
-            SelectedLegend = Legends
+            TypesSettings.SelectedLegend = Legends
                 .FirstOrDefault(view => view.Name.Contains(ProjectSettings.LegendName));
-        }
-    }
-
-    /// <summary>
-    /// Получает легенду узла армирования по имени
-    /// </summary>
-    public void FindRebarNode() {
-        if(ProjectSettings.RebarNodeName != string.Empty) {
-            SelectedRebarNode = Legends
-                .FirstOrDefault(view => view.Name.Contains(ProjectSettings.RebarNodeName));
         }
     }
 
@@ -645,7 +690,7 @@ internal class MainViewModel : BaseViewModel {
     /// </summary>
     public void FindTitleBlock() {
         if(ProjectSettings.TitleBlockName != string.Empty) {
-            SelectedTitleBlock = TitleBlocks
+            TypesSettings.SelectedTitleBlock = TitleBlocks
                 .FirstOrDefault(titleBlock => titleBlock.Name.Contains(ProjectSettings.TitleBlockName));
         }
     }
@@ -702,7 +747,7 @@ internal class MainViewModel : BaseViewModel {
     /// Задает фильтрацию списка марок пилонов
     /// </summary>
     private void SetHostsInfoFilters() {
-        _hostsInfoView = CollectionViewSource.GetDefaultView(SelectedHostsInfo);
+        _hostsInfoView = CollectionViewSource.GetDefaultView(SelectedHostsInfoVM);
         _hostsInfoView.Filter = item =>
                 String.IsNullOrEmpty(HostsInfoFilter)
                     ? true
@@ -724,12 +769,12 @@ internal class MainViewModel : BaseViewModel {
     /// Отрабатывает при нажатии на кнопку "Выбрать все" возле списка марок пилонов в GUI
     /// </summary>
     private void SelectAllHostsInfoInGUI() {
-        foreach(PylonSheetInfo pylonSheetInfo in SelectedHostsInfo) {
+        foreach(PylonSheetInfoVM pylonSheetInfoVM in SelectedHostsInfoVM) {
             if(String.IsNullOrEmpty(HostsInfoFilter)
                    ? true
-                   : (pylonSheetInfo.PylonKeyName.IndexOf(HostsInfoFilter, StringComparison.OrdinalIgnoreCase) >=
+                   : (pylonSheetInfoVM.PylonKeyName.IndexOf(HostsInfoFilter, StringComparison.OrdinalIgnoreCase) >=
                   0)) {
-                pylonSheetInfo.IsCheck = true;
+                pylonSheetInfoVM.IsCheck = true;
             }
         }
 
@@ -743,12 +788,12 @@ internal class MainViewModel : BaseViewModel {
     /// Отрабатывает при нажатии на кнопку "Выбрать все" возле списка марок пилонов в GUI
     /// </summary>
     private void UnselectAllHostsInfoInGUI() {
-        foreach(PylonSheetInfo pylonSheetInfo in SelectedHostsInfo) {
+        foreach(PylonSheetInfoVM pylonSheetInfoVM in SelectedHostsInfoVM) {
             if(String.IsNullOrEmpty(HostsInfoFilter)
                    ? true
-                   : (pylonSheetInfo.PylonKeyName.IndexOf(HostsInfoFilter, StringComparison.OrdinalIgnoreCase) >=
+                   : (pylonSheetInfoVM.PylonKeyName.IndexOf(HostsInfoFilter, StringComparison.OrdinalIgnoreCase) >=
                   0)) {
-                pylonSheetInfo.IsCheck = false;
+                pylonSheetInfoVM.IsCheck = false;
             }
         }
 
@@ -767,18 +812,14 @@ internal class MainViewModel : BaseViewModel {
         SelectionSettings.NeedWorkWithTransverseViewFirst = true;
         SelectionSettings.NeedWorkWithTransverseViewSecond = true;
         SelectionSettings.NeedWorkWithTransverseViewThird = true;
-        SelectionSettings.NeedWorkWithRebarSchedule = true;
         SelectionSettings.NeedWorkWithMaterialSchedule = true;
         SelectionSettings.NeedWorkWithSystemPartsSchedule = true;
         SelectionSettings.NeedWorkWithIfcPartsSchedule = true;
         SelectionSettings.NeedWorkWithLegend = true;
         SelectionSettings.NeedWorkWithGeneralRebarView = true;
         SelectionSettings.NeedWorkWithGeneralPerpendicularRebarView = true;
-        SelectionSettings.NeedWorkWithTransverseRebarViewFirst = true;
-        SelectionSettings.NeedWorkWithTransverseRebarViewSecond = true;
         SelectionSettings.NeedWorkWithSkeletonSchedule = true;
         SelectionSettings.NeedWorkWithSkeletonByElemsSchedule = true;
-        SelectionSettings.NeedWorkWithRebarNode = true;
     }
 
 
@@ -792,18 +833,14 @@ internal class MainViewModel : BaseViewModel {
         SelectionSettings.NeedWorkWithTransverseViewFirst = false;
         SelectionSettings.NeedWorkWithTransverseViewSecond = false;
         SelectionSettings.NeedWorkWithTransverseViewThird = false;
-        SelectionSettings.NeedWorkWithRebarSchedule = false;
         SelectionSettings.NeedWorkWithMaterialSchedule = false;
         SelectionSettings.NeedWorkWithSystemPartsSchedule = false;
         SelectionSettings.NeedWorkWithIfcPartsSchedule = false;
         SelectionSettings.NeedWorkWithLegend = false;
         SelectionSettings.NeedWorkWithGeneralRebarView = false;
         SelectionSettings.NeedWorkWithGeneralPerpendicularRebarView = false;
-        SelectionSettings.NeedWorkWithTransverseRebarViewFirst = false;
-        SelectionSettings.NeedWorkWithTransverseRebarViewSecond = false;
         SelectionSettings.NeedWorkWithSkeletonSchedule = false;
         SelectionSettings.NeedWorkWithSkeletonByElemsSchedule = false;
-        SelectionSettings.NeedWorkWithRebarNode = false;
     }
 
 
@@ -817,17 +854,13 @@ internal class MainViewModel : BaseViewModel {
         SelectionSettings.NeedWorkWithTransverseViewFirst = !SelectionSettings.NeedWorkWithTransverseViewFirst;
         SelectionSettings.NeedWorkWithTransverseViewSecond = !SelectionSettings.NeedWorkWithTransverseViewSecond;
         SelectionSettings.NeedWorkWithTransverseViewThird = !SelectionSettings.NeedWorkWithTransverseViewThird;
-        SelectionSettings.NeedWorkWithRebarSchedule = !SelectionSettings.NeedWorkWithRebarSchedule;
         SelectionSettings.NeedWorkWithMaterialSchedule = !SelectionSettings.NeedWorkWithMaterialSchedule;
         SelectionSettings.NeedWorkWithSystemPartsSchedule = !SelectionSettings.NeedWorkWithSystemPartsSchedule;
         SelectionSettings.NeedWorkWithIfcPartsSchedule = !SelectionSettings.NeedWorkWithIfcPartsSchedule;
         SelectionSettings.NeedWorkWithLegend = !SelectionSettings.NeedWorkWithLegend;
         SelectionSettings.NeedWorkWithGeneralRebarView = !SelectionSettings.NeedWorkWithGeneralRebarView;
         SelectionSettings.NeedWorkWithGeneralPerpendicularRebarView = !SelectionSettings.NeedWorkWithGeneralPerpendicularRebarView;
-        SelectionSettings.NeedWorkWithTransverseRebarViewFirst = !SelectionSettings.NeedWorkWithTransverseRebarViewFirst;
-        SelectionSettings.NeedWorkWithTransverseRebarViewSecond = !SelectionSettings.NeedWorkWithTransverseRebarViewSecond;
         SelectionSettings.NeedWorkWithSkeletonSchedule = !SelectionSettings.NeedWorkWithSkeletonSchedule;
         SelectionSettings.NeedWorkWithSkeletonByElemsSchedule = !SelectionSettings.NeedWorkWithSkeletonByElemsSchedule;
-        SelectionSettings.NeedWorkWithRebarNode = !SelectionSettings.NeedWorkWithRebarNode;
     }
 }

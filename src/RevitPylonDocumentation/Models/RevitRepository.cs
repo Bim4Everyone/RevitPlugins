@@ -31,70 +31,127 @@ internal class RevitRepository {
     /// Возвращает список всех листов, имеющихся  в проекте
     /// </summary>
     public List<ViewSheet> AllSheets => new FilteredElementCollector(Document)
-            .OfClass(typeof(ViewSheet))
-            .OfType<ViewSheet>()
-            .ToList();
+        .OfClass(typeof(ViewSheet))
+        .OfType<ViewSheet>()
+        .ToList();
 
     /// <summary>
     /// Возвращает список всех сечений, имеющихся в проекте
     /// </summary>
     public List<ViewSection> AllSectionViews => new FilteredElementCollector(Document)
-            .OfClass(typeof(ViewSection))
-            .WhereElementIsNotElementType()
-            .OfType<ViewSection>()
-            .ToList();
+        .OfClass(typeof(ViewSection))
+        .WhereElementIsNotElementType()
+        .OfType<ViewSection>()
+        .ToList();
 
     /// <summary>
     /// Возвращает список всех спецификаций, имеющихся в проекте
     /// </summary>
     public List<ViewSchedule> AllScheduleViews => new FilteredElementCollector(Document)
-            .OfClass(typeof(ViewSchedule))
-            .WhereElementIsNotElementType()
-            .OfType<ViewSchedule>()
-            .Where(view => !view.IsTemplate)
-            .ToList();
+        .OfClass(typeof(ViewSchedule))
+        .WhereElementIsNotElementType()
+        .OfType<ViewSchedule>()
+        .Where(view => !view.IsTemplate)
+        .ToList();
 
     /// <summary>
     /// Возвращает список всех типоразмеров рамок листа
     /// </summary>
     public List<FamilySymbol> TitleBlocksInProject => new FilteredElementCollector(Document)
-            .OfCategory(BuiltInCategory.OST_TitleBlocks)
-            .WhereElementIsElementType()
-            .OfType<FamilySymbol>()
-            .ToList();
+        .OfCategory(BuiltInCategory.OST_TitleBlocks)
+        .WhereElementIsElementType()
+        .OfType<FamilySymbol>()
+        .ToList();
 
     /// <summary>
     /// Возвращает список типоразмеров видов в проекте
     /// </summary>
     public List<ViewFamilyType> ViewFamilyTypes => new FilteredElementCollector(Document)
-            .OfClass(typeof(ViewFamilyType))
-            .OfType<ViewFamilyType>()
-            .Where(a => ViewFamily.Section == a.ViewFamily)
-            .ToList();
+        .OfClass(typeof(ViewFamilyType))
+        .OfType<ViewFamilyType>()
+        .Where(a => ViewFamily.Section == a.ViewFamily)
+        .ToList();
+    
     /// <summary>
     /// Возвращает список всех легенд, присутствующих в проекте
     /// </summary>
     public List<View> LegendsInProject => new FilteredElementCollector(Document)
-            .OfClass(typeof(View))
-            .OfType<View>()
-            .Where(view => view.ViewType == ViewType.Legend)
-            .ToList();
+        .OfClass(typeof(View))
+        .OfType<View>()
+        .Where(view => view.ViewType == ViewType.Legend)
+        .ToList();
+    
     /// <summary>
     /// Возвращает список всех шаблонов сечений в проекте
     /// </summary>
     public List<ViewSection> AllViewTemplates => new FilteredElementCollector(Document)
-            .OfClass(typeof(ViewSection))
-            .WhereElementIsNotElementType()
-            .OfType<ViewSection>()
-            .Where(v => v.IsTemplate == true)
-            .OrderBy(a => a.Name)
-            .ToList();
+        .OfClass(typeof(ViewSection))
+        .WhereElementIsNotElementType()
+        .OfType<ViewSection>()
+        .Where(v => v.IsTemplate == true)
+        .OrderBy(a => a.Name)
+        .ToList();
 
+    /// <summary>
+    /// Возвращает список типоразмеров высотных отметок
+    /// </summary>
+    public List<DimensionType> DimensionTypes => new FilteredElementCollector(Document)
+        .OfClass(typeof(DimensionType))
+        .OfType<DimensionType>()
+        .OrderBy(a => a.Name)
+        .ToList();
+
+    /// <summary>
+    /// Возвращает список типоразмеров высотных отметок
+    /// </summary>
+    public List<SpotDimensionType> SpotDimensionTypes => new FilteredElementCollector(Document)
+        .OfClass(typeof(SpotDimensionType))
+        .OfType<SpotDimensionType>()
+        .OrderBy(a => a.Name)
+        .ToList();
+
+    /// <summary>
+    /// Возвращает список типоразмеров марок несущей арматуры
+    /// </summary>
+    public List<FamilySymbol> RebarTagTypes => new FilteredElementCollector(Document)
+        .OfCategory(BuiltInCategory.OST_RebarTags)
+        .WhereElementIsElementType()
+        .OfType<FamilySymbol>()
+        .OrderBy(a => a.Name)
+        .ToList();
+
+    /// <summary>
+    /// Возвращает список типоразмеров элементов узла
+    /// </summary>
+    public List<FamilySymbol> DetailComponentTypes => new FilteredElementCollector(Document)
+        .OfCategory(BuiltInCategory.OST_DetailComponents)
+        .WhereElementIsElementType()
+        .OfType<FamilySymbol>()
+        .OrderBy(a => a.Name)
+        .ToList();
+
+    /// <summary>
+    /// Возвращает список типоразмеров типовых аннотаций
+    /// </summary>
+    public List<FamilySymbol> TypicalAnnotationsTypes => new FilteredElementCollector(Document)
+        .OfCategory(BuiltInCategory.OST_GenericAnnotation)
+        .WhereElementIsElementType()
+        .OfType<FamilySymbol>()
+        .OrderBy(a => a.Name)
+        .ToList();
+
+    /// <summary>
+    /// Возвращает список осей, видимых на виде
+    /// </summary>
+    public List<Grid> GridsInView(View view) => new FilteredElementCollector(Document, view.Id)
+        .OfCategory(BuiltInCategory.OST_Grids)
+        .Cast<Grid>()
+        .ToList();
 
     /// <summary>
     /// Хранит оболочки над листами пилонов - центральное хранилище информации по пилону для работы плагина
     /// </summary>
-    public List<PylonSheetInfo> HostsInfo { get; set; } = [];
+    public List<PylonSheetInfoVM> HostsInfo { get; set; } = [];
 
     public List<string> HostProjectSections { get; set; } = [];
 
@@ -181,9 +238,7 @@ internal class RevitRepository {
                 .FirstOrDefault();
 
             if(testPylonSheetInfo is null) {
-                var pylonSheetInfo = new PylonSheetInfo(mainViewModel, this, hostMark) {
-                    ProjectSection = projectSection
-                };
+                var pylonSheetInfo = new PylonSheetInfoVM(projectSection, hostMark);
                 pylonSheetInfo.HostElems.Add(elem);
                 FindSheetInPj(mainViewModel, pylonSheetInfo);
 
@@ -218,18 +273,19 @@ internal class RevitRepository {
     }
 
 
-
     /// <summary>
     /// Ищет лист в проекте по информации из оболочки листа пилона PylonSheetInfo
     /// </summary>
-    public void FindSheetInPj(MainViewModel mainViewModel, PylonSheetInfo pylonSheetInfo) {
+    public void FindSheetInPj(MainViewModel mainViewModel, PylonSheetInfoVM pylonSheetInfoVM) {
         var sheet = AllSheets
-            .Where(item => item.Name.Equals(mainViewModel.ProjectSettings.SheetPrefix + pylonSheetInfo.PylonKeyName + mainViewModel.ProjectSettings.SheetSuffix))
+            .Where(item => item.Name.Equals(mainViewModel.ProjectSettings.SheetPrefix 
+                                            + pylonSheetInfoVM.PylonKeyName 
+                                            + mainViewModel.ProjectSettings.SheetSuffix))
             .FirstOrDefault();
 
         if(sheet != null) {
-            pylonSheetInfo.SheetInProject = true;
-            pylonSheetInfo.PylonViewSheet = sheet;
+            pylonSheetInfoVM.SheetInProject = true;
+            pylonSheetInfoVM.PylonViewSheet = sheet;
         }
     }
 
@@ -257,7 +313,6 @@ internal class RevitRepository {
         }
     }
 
-
     /// <summary>
     /// Ищет типоразмер по имени типа
     /// </summary>
@@ -266,6 +321,25 @@ internal class RevitRepository {
             .OfCategory(builtInCategory)
             .WhereElementIsElementType()
             .FirstOrDefault(e => e.Name == typeName) is not FamilySymbol symbol) {
+            return null;
+        }
+
+        // Убедимся, что типоразмер активен
+        if(!symbol.IsActive) {
+            symbol.Activate();
+        }
+        return symbol;
+    }
+
+    /// <summary>
+    /// Ищет типоразмер по имени типа
+    /// </summary>
+    public FamilySymbol FindSymbol(BuiltInCategory builtInCategory, string familyName, string typeName) {
+        if(new FilteredElementCollector(Document)
+            .OfCategory(builtInCategory)
+            .WhereElementIsElementType()
+            .Cast<ElementType>()
+            .FirstOrDefault(e => e.FamilyName == familyName && e.Name == typeName) is not FamilySymbol symbol) {
             return null;
         }
 
