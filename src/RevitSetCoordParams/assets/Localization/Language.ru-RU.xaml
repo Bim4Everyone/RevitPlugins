@@ -8,29 +8,54 @@
     <system:String x:Key="MainWindow.SourceFiles">Файл с объемными элементами СМР</system:String>
     <system:String x:Key="MainWindow.SourceFilesDescription">Файл, с которого будут считываться данные</system:String>
     <system:String x:Key="MainWindow.TypeModels">Тип объемных элементов СМР</system:String>
-    <system:String x:Key="MainWindow.TypeModelsDescription">Значение параметра "ФОП_Зона" объемных элементов</system:String>
+    <system:String x:Key="MainWindow.TypeModelsDescription">Будут обработаны объемные модели только этого типа</system:String>
     <system:String x:Key="MainWindow.Positions">Позиция элемента</system:String>
     <system:String x:Key="MainWindow.PositionsDescription">Определяет, относительно какой точки искать элемент</system:String>
 
-    <system:String x:Key="MainWindow.Parameters">Параметры СМР</system:String>
-    <system:String x:Key="MainWindow.ParametersDescription">Выбор параметров СМР для чтения и записи</system:String>
+    <system:String x:Key="MainWindow.Params">Параметры СМР</system:String>
+    <system:String x:Key="MainWindow.ParamsDescription">Выбор параметров СМР для чтения и записи</system:String>
     <system:String x:Key="MainWindow.Categories">Категории элементов</system:String>
     <system:String x:Key="MainWindow.CategoriesDescription">Категории элементов, в которые будет производится запись параметров</system:String>
     <system:String x:Key="MainWindow.Search">Настройки поиска</system:String>
     <system:String x:Key="MainWindow.SearchDescription">Выбор настроек поиска для потерянных элементов</system:String>
 
-    <system:String x:Key="MainWindow.MaxDiameterFindSphere">Максимальный диаметр поисковой сферы</system:String>
-    <system:String x:Key="MainWindow.MaxDiameterFindSphereDescription">Максимальное расстояние от элемента до объемного элемента</system:String>
-    <system:String x:Key="MainWindow.StepFindSphere">Шаг увеличения диаметра поисковой сферы</system:String>
-    <system:String x:Key="MainWindow.StepFindSphereDescription">Значение увеличения сферы при каждой итерации поиска</system:String>
-    <system:String x:Key="MainWindow.FindSphereTooltip">Влияет на производительность. Больше значение - меньше производительность</system:String>
-    <system:String x:Key="MainWindow.StepFindSphereTooltip">Влияет на производительность. Меньше значение - меньше производительность</system:String>
+    <system:String x:Key="MainWindow.MaxDiameterSearchSphere">Максимальный диаметр поисковой сферы</system:String>
+    <system:String x:Key="MainWindow.MaxDiameterSearchSphereDescription">Максимальное расстояние от элемента до объемного элемента</system:String>
+    <system:String x:Key="MainWindow.StepSearchSphere">Шаг увеличения диаметра поисковой сферы</system:String>
+    <system:String x:Key="MainWindow.StepSearchSphereDescription">Значение увеличения сферы при каждой итерации поиска</system:String>
+    <system:String x:Key="MainWindow.SearchSphereTooltip">Влияет на производительность. Больше значение - меньше производительность</system:String>
+    <system:String x:Key="MainWindow.StepSearchSphereTooltip">Влияет на производительность. Меньше значение - меньше производительность</system:String>    
 
-    <system:String x:Key="MainWindow.ToggleSwitch.On">Искать элементы</system:String>
-    <system:String x:Key="MainWindow.ToggleSwitch.Off">Не искать элементы</system:String>
+    <system:String x:Key="MainWindow.SearchToggleSwitchOn">Искать элементы</system:String>
+    <system:String x:Key="MainWindow.SearchToggleSwitchOff">Не искать элементы</system:String>
+
+    <system:String x:Key="MainWindow.SourceParamHeader">Параметр исходных элементов</system:String>
+    <system:String x:Key="MainWindow.TargetParamHeader">Параметр записываемых элементов</system:String>
+    <system:String x:Key="MainWindow.ParamsToggleSwitchOn">Использовать параметр</system:String>
+    <system:String x:Key="MainWindow.ParamsToggleSwitchOff">Не использовать параметр</system:String>
 
     <system:String x:Key="MainWindow.CategoryWarningTooltip">В некоторых категориях есть ошибки</system:String>    
+    <system:String x:Key="MainWindow.ParamWarningTooltip">В некоторых параметрах есть ошибки</system:String>    
 
     <system:String x:Key="MainWindow.ButtonOk">Заполнить</system:String>
-    <system:String x:Key="MainWindow.ButtonCancel">Отмена</system:String>
+    <system:String x:Key="MainWindow.ButtonCancel">Отменить</system:String>
+
+    <system:String x:Key="MainViewModel.BlockParamDescription">Параметр блока СМР</system:String>
+    <system:String x:Key="MainViewModel.BlockParamDetailDescription">Используется для определения корпуса здания</system:String>
+    <system:String x:Key="MainViewModel.SectionParamDescription">Параметр секции СМР</system:String>
+    <system:String x:Key="MainViewModel.SectionParamDetailDescription">Используется для определения секции здания</system:String>
+    <system:String x:Key="MainViewModel.FloorParamDescription">Параметр этажа СМР</system:String>
+    <system:String x:Key="MainViewModel.FloorParamDetailDescription">Используется для определения этажа здания</system:String>
+    <system:String x:Key="MainViewModel.FloorDEParamDescription">Дополнительный параметр этажа СМР</system:String>
+    <system:String x:Key="MainViewModel.FloorDEParamDetailDescription">Используется для определения этажа здания</system:String>
+    <system:String x:Key="MainViewModel.BlockingParamDescription">Параметр для блокировки</system:String>
+    <system:String x:Key="MainViewModel.BlockingParamDetailDescription">Тип параметра - да / нет</system:String>
+    <system:String x:Key="MainViewModel.WrongParamName">Ошибки в параметрах СМР</system:String>
+    
+    <system:String x:Key="CategoryViewModel.WarningStartString">Отсутствуют параметры:</system:String>
+    <system:String x:Key="ParamViewModel.WarningStartString">Ошибочные параметры:</system:String>
+
+    <system:String x:Key="Common.ParamErrorMessageBody">Ошибка загрузки параметров</system:String>
+    <system:String x:Key="Common.ConfigErrorMessageTitle">Ошибка настройки плагина</system:String>
+
 </ResourceDictionary>

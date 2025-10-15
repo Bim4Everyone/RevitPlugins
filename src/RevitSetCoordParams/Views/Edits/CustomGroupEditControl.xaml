@@ -37,7 +37,7 @@
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="*" />
                     <ColumnDefinition Width="180" />
-                    <ColumnDefinition Width="25" />
+                    <ColumnDefinition Width="40" />
                 </Grid.ColumnDefinitions>
 
                 <ui:TextBlock
@@ -67,6 +67,7 @@
                         ElementName=_this, Converter={StaticResource ExtraContentVisible}}" />                
 
                 <ContentControl
+                    HorizontalAlignment="Left"
                     Grid.RowSpan="2"
                     Grid.Column="2"                                       
                     VerticalAlignment="Center"

@@ -51,14 +51,13 @@
 
             <ui:SymbolIcon
                 Grid.Column="2"
+                HorizontalAlignment="Left"
                 Symbol="Warning24"
                 Foreground="OrangeRed"
                 FontSize="24"
                 ToolTip="{Binding WarningDescription, ElementName=_this}"
                 Visibility="{Binding HasWarning, ElementName=_this,
-                        Converter={StaticResource IconVisible}}" />
-
+                    Converter={StaticResource IconVisible}}" />
         </Grid>
-
     </Border>
 </UserControl>

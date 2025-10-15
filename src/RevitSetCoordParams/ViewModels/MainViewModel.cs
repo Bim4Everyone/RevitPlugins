@@ -1,4 +1,8 @@
+using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.ComponentModel;
+using System.Linq;
 using System.Windows.Input;
 
 using dosymep.SimpleServices;
@@ -6,26 +10,41 @@ using dosymep.WPF.Commands;
 using dosymep.WPF.ViewModels;
 
 using RevitSetCoordParams.Models;
+using RevitSetCoordParams.Models.Interfaces;
+using RevitSetCoordParams.Models.Services;
+using RevitSetCoordParams.Models.Settings;
+
 
 namespace RevitSetCoordParams.ViewModels;
 
-/// <summary>
-/// Основная ViewModel главного окна плагина.
-/// </summary>
 internal class MainViewModel : BaseViewModel {
     private readonly PluginConfig _pluginConfig;
     private readonly RevitRepository _revitRepository;
     private readonly ILocalizationService _localizationService;
+    private readonly SetCoordParamsSettings _setCoordParamsSettings;
+    private readonly IParamAvailabilityService _paramAvailabilityService;
+    private readonly ParamFactory _paramFactory;
 
+    private ObservableCollection<RangeElementsViewModel> _rangeElements;
+    private RangeElementsViewModel _selectedRangeElements;
+    private ObservableCollection<SourceFileViewModel> _sourceFiles;
+    private SourceFileViewModel _selectedSourceFile;
+    private ObservableCollection<TypeModelViewModel> _typeModels;
+    private TypeModelViewModel _selectedTypeModel;
+    private ObservableCollection<PositionViewModel> _positions;
+    private PositionViewModel _selectedPosition;
+    private ObservableCollection<ParamViewModel> _params;
+    private ObservableCollection<ParamViewModel> _selectedParams;
+    private ObservableCollection<CategoryViewModel> _categories;
+    private ObservableCollection<CategoryViewModel> _selectedCategories;
+    private bool _search;
+    private bool _hasCategoryWarning;
+    private bool _hasParamWarning;
+    private string _maxDiameterSearchSphereMm;
+    private string _stepDiameterSearchSphereMm;
     private string _errorText;
     private string _saveProperty;
 
-    /// <summary>
-    /// Создает экземпляр основной ViewModel главного окна.
-    /// </summary>
-    /// <param name="pluginConfig">Настройки плагина.</param>
-    /// <param name="revitRepository">Класс доступа к интерфейсу Revit.</param>
-    /// <param name="localizationService">Интерфейс доступа к сервису локализации.</param>
     public MainViewModel(
         PluginConfig pluginConfig,
         RevitRepository revitRepository,
@@ -34,277 +53,245 @@ internal class MainViewModel : BaseViewModel {
         _pluginConfig = pluginConfig;
         _revitRepository = revitRepository;
         _localizationService = localizationService;
+        _setCoordParamsSettings = new SetCoordParamsSettings(_revitRepository);
+        _paramAvailabilityService = new ParamAvailabilityService(_revitRepository.Document);
+        _paramFactory = new ParamFactory(_paramAvailabilityService);
 
         LoadViewCommand = RelayCommand.Create(LoadView);
         AcceptViewCommand = RelayCommand.Create(AcceptView, CanAcceptView);
-
-        Parameters.Add(new ParamViewModel {
-            Header = "Параметр 1",
-            Description = "Описание параметра 1",
-            CommonParamHeader = "Параметр донора",
-            CommonParam = "ФОП_Этаж СМР",
-            ElementParamHeader = "Параметр элемента",
-            ElementParam = "ФОП_Этаж СМР"
-        });
-
-        Parameters.Add(new ParamViewModel {
-            Header = "Параметр 2",
-            Description = "Описание параметра 2",
-            CommonParamHeader = "Параметр донора",
-            CommonParam = "ФОП_Секция СМР",
-            ElementParamHeader = "Параметр элемента",
-            ElementParam = "ФОП_Секция СМР"
-        });
-
-        Categories.Add(new CategoryViewModel {
-            CategoryName = "Стены",
-            IsChecked = true,
-            HasWarning = true,
-            WarningDescription = "Отсутствуют параметры: ФОП_Этаж СМР, ФОП_Секция СМР"
-        });
-
-        Categories.Add(new CategoryViewModel {
-            CategoryName = "Перекрытия",
-            IsChecked = true,
-            HasWarning = true,
-            WarningDescription = "Отсутствуют параметры: ФОП_Этаж СМР, ФОП_Секция СМР"
-        });
-
-        Categories.Add(new CategoryViewModel {
-            CategoryName = "Потолки",
-            IsChecked = true,
-            HasWarning = true,
-            WarningDescription = "Отсутствуют параметры: ФОП_Этаж СМР, ФОП_Секция СМР"
-        });
-
-        Categories.Add(new CategoryViewModel {
-            CategoryName = "Каркас несущий",
-            IsChecked = true,
-            HasWarning = true,
-            WarningDescription = "Отсутствуют параметры: ФОП_Этаж СМР, ФОП_Секция СМР"
-        });
-
-        Categories.Add(new CategoryViewModel {
-            CategoryName = "Фундаменты несущей конструкции",
-            IsChecked = true,
-            HasWarning = true,
-            WarningDescription = "Отсутствуют параметры: ФОП_Этаж СМР, ФОП_Секция СМР"
-        });
-
-        Categories.Add(new CategoryViewModel {
-            CategoryName = "Колонны",
-            IsChecked = true,
-            HasWarning = true,
-            WarningDescription = "Отсутствуют параметры: ФОП_Этаж СМР, ФОП_Секция СМР"
-        });
-
-        Categories.Add(new CategoryViewModel {
-            CategoryName = "Воздуховоды",
-            IsChecked = true,
-            HasWarning = true,
-            WarningDescription = "Отсутствуют параметры: ФОП_Этаж СМР, ФОП_Секция СМР"
-        });
-
-        Categories.Add(new CategoryViewModel {
-            CategoryName = "Стены",
-            IsChecked = true,
-            HasWarning = true,
-            WarningDescription = "Отсутствуют параметры: ФОП_Этаж СМР, ФОП_Секция СМР"
-        });
-
-
-        Categories.Add(new CategoryViewModel {
-            CategoryName = "Стены",
-            IsChecked = true,
-            HasWarning = true,
-            WarningDescription = "Отсутствуют параметры: ФОП_Этаж СМР, ФОП_Секция СМР"
-        });
-
-        Categories.Add(new CategoryViewModel {
-            CategoryName = "Перекрытия",
-            IsChecked = true,
-            HasWarning = true,
-            WarningDescription = "Отсутствуют параметры: ФОП_Этаж СМР, ФОП_Секция СМР"
-        });
-
-        Categories.Add(new CategoryViewModel {
-            CategoryName = "Потолки",
-            IsChecked = true,
-            HasWarning = true,
-            WarningDescription = "Отсутствуют параметры: ФОП_Этаж СМР, ФОП_Секция СМР"
-        });
-
-        Categories.Add(new CategoryViewModel {
-            CategoryName = "Каркас несущий",
-            IsChecked = true,
-            HasWarning = true,
-            WarningDescription = "Отсутствуют параметры: ФОП_Этаж СМР, ФОП_Секция СМР"
-        });
-
-        Categories.Add(new CategoryViewModel {
-            CategoryName = "Фундаменты несущей конструкции",
-            IsChecked = true,
-            HasWarning = true,
-            WarningDescription = "Отсутствуют параметры: ФОП_Этаж СМР, ФОП_Секция СМР"
-        });
-
-        Categories.Add(new CategoryViewModel {
-            CategoryName = "Колонны",
-            IsChecked = true,
-            HasWarning = true,
-            WarningDescription = "Отсутствуют параметры: ФОП_Этаж СМР, ФОП_Секция СМР"
-        });
-
-        Categories.Add(new CategoryViewModel {
-            CategoryName = "Воздуховоды",
-            IsChecked = true,
-            HasWarning = true,
-            WarningDescription = "Отсутствуют параметры: ФОП_Этаж СМР, ФОП_Секция СМР"
-        });
-
-        Categories.Add(new CategoryViewModel {
-            CategoryName = "Стены",
-            IsChecked = true,
-            HasWarning = true,
-            WarningDescription = "Отсутствуют параметры: ФОП_Этаж СМР, ФОП_Секция СМР"
-        });
-
-        Categories.Add(new CategoryViewModel {
-            CategoryName = "Стены",
-            IsChecked = true,
-            HasWarning = true,
-            WarningDescription = "Отсутствуют параметры: ФОП_Этаж СМР, ФОП_Секция СМР"
-        });
-
-        Categories.Add(new CategoryViewModel {
-            CategoryName = "Перекрытия",
-            IsChecked = true,
-            HasWarning = true,
-            WarningDescription = "Отсутствуют параметры: ФОП_Этаж СМР, ФОП_Секция СМР"
-        });
-
-        Categories.Add(new CategoryViewModel {
-            CategoryName = "Потолки",
-            IsChecked = true,
-            HasWarning = true,
-            WarningDescription = "Отсутствуют параметры: ФОП_Этаж СМР, ФОП_Секция СМР"
-        });
-
-        Categories.Add(new CategoryViewModel {
-            CategoryName = "Каркас несущий",
-            IsChecked = true,
-            HasWarning = true,
-            WarningDescription = "Отсутствуют параметры: ФОП_Этаж СМР, ФОП_Секция СМР"
-        });
-
-        Categories.Add(new CategoryViewModel {
-            CategoryName = "Фундаменты несущей конструкции",
-            IsChecked = true,
-            HasWarning = true,
-            WarningDescription = "Отсутствуют параметры: ФОП_Этаж СМР, ФОП_Секция СМР"
-        });
-
-        Categories.Add(new CategoryViewModel {
-            CategoryName = "Колонны",
-            IsChecked = true,
-            HasWarning = true,
-            WarningDescription = "Отсутствуют параметры: ФОП_Этаж СМР, ФОП_Секция СМР"
-        });
-
-        Categories.Add(new CategoryViewModel {
-            CategoryName = "Воздуховоды",
-            IsChecked = true,
-            HasWarning = true,
-            WarningDescription = "Отсутствуют параметры: ФОП_Этаж СМР, ФОП_Секция СМР"
-        });
-
-        Categories.Add(new CategoryViewModel {
-            CategoryName = "Стены",
-            IsChecked = true,
-            HasWarning = true,
-            WarningDescription = "Отсутствуют параметры: ФОП_Этаж СМР, ФОП_Секция СМР"
-        });
     }
 
-    /// <summary>
-    /// Команда загрузки главного окна.
-    /// </summary>
     public ICommand LoadViewCommand { get; }
-
-    /// <summary>
-    /// Команда применения настроек главного окна. (запуск плагина)
-    /// </summary>
-    /// <remarks>В случаях, когда используется немодальное окно, требуется данную команду удалять.</remarks>
     public ICommand AcceptViewCommand { get; }
 
-    /// <summary>
-    /// Текст ошибки, который отображается при неверном вводе пользователя.
-    /// </summary>
+    public ObservableCollection<RangeElementsViewModel> RangeElements {
+        get => _rangeElements;
+        set => RaiseAndSetIfChanged(ref _rangeElements, value);
+    }
+    public RangeElementsViewModel SelectedRangeElements {
+        get => _selectedRangeElements;
+        set => RaiseAndSetIfChanged(ref _selectedRangeElements, value);
+    }
+    public ObservableCollection<SourceFileViewModel> SourceFiles {
+        get => _sourceFiles;
+        set => RaiseAndSetIfChanged(ref _sourceFiles, value);
+    }
+    public SourceFileViewModel SelectedSourceFile {
+        get => _selectedSourceFile;
+        set => RaiseAndSetIfChanged(ref _selectedSourceFile, value);
+    }
+    public ObservableCollection<TypeModelViewModel> TypeModels {
+        get => _typeModels;
+        set => RaiseAndSetIfChanged(ref _typeModels, value);
+    }
+    public TypeModelViewModel SelectedTypeModel {
+        get => _selectedTypeModel;
+        set => RaiseAndSetIfChanged(ref _selectedTypeModel, value);
+    }
+    public ObservableCollection<PositionViewModel> Positions {
+        get => _positions;
+        set => RaiseAndSetIfChanged(ref _positions, value);
+    }
+    public PositionViewModel SelectedPosition {
+        get => _selectedPosition;
+        set => RaiseAndSetIfChanged(ref _selectedPosition, value);
+    }
+    public ObservableCollection<ParamViewModel> Params {
+        get => _params;
+        set => RaiseAndSetIfChanged(ref _params, value);
+    }
+    public ObservableCollection<ParamViewModel> SelectedParams {
+        get => _selectedParams;
+        set => RaiseAndSetIfChanged(ref _selectedParams, value);
+    }
+    public ObservableCollection<CategoryViewModel> Categories {
+        get => _categories;
+        set => RaiseAndSetIfChanged(ref _categories, value);
+    }
+    public ObservableCollection<CategoryViewModel> SelectedCategories {
+        get => _selectedCategories;
+        set => RaiseAndSetIfChanged(ref _selectedCategories, value);
+    }
+    public bool Search {
+        get => _search;
+        set => RaiseAndSetIfChanged(ref _search, value);
+    }
+    public bool HasParamWarning {
+        get => _hasParamWarning;
+        set => RaiseAndSetIfChanged(ref _hasParamWarning, value);
+    }
+    public bool HasCategoryWarning {
+        get => _hasCategoryWarning;
+        set => RaiseAndSetIfChanged(ref _hasCategoryWarning, value);
+    }
+    public string MaxDiameterSearchSphereMm {
+        get => _maxDiameterSearchSphereMm;
+        set => RaiseAndSetIfChanged(ref _maxDiameterSearchSphereMm, value);
+    }
+    public string StepDiameterSearchSphereMm {
+        get => _stepDiameterSearchSphereMm;
+        set => RaiseAndSetIfChanged(ref _stepDiameterSearchSphereMm, value);
+    }
     public string ErrorText {
         get => _errorText;
         set => RaiseAndSetIfChanged(ref _errorText, value);
     }
-
-    public ObservableCollection<ParamViewModel> Parameters { get; } = [];
-
-    public ObservableCollection<CategoryViewModel> Categories { get; } = [];
-
-    /// <summary>
-    /// Свойство для примера. (требуется удалить)
-    /// </summary>
     public string SaveProperty {
         get => _saveProperty;
         set => RaiseAndSetIfChanged(ref _saveProperty, value);
     }
 
-    /// <summary>
-    /// Метод загрузки главного окна.
-    /// </summary>
-    /// <remarks>В данном методе должна происходить загрузка настроек окна, а так же инициализация полей окна.</remarks>
-    private void LoadView() {
-        LoadConfig();
+    // Метод получения коллекции ParamViewModel для Params
+    private IEnumerable<ParamViewModel> GetParamViewModels() {
+        return _setCoordParamsSettings.Parameters
+            .Select(paramMap => new ParamViewModel {
+                ParamMap = paramMap,
+                Description = _localizationService.GetLocalizedString($"MainViewModel.{paramMap.LocalizationKey}Description"),
+                DetailDescription = _localizationService.GetLocalizedString($"MainViewModel.{paramMap.LocalizationKey}DetailDescription"),
+                SourceParamName = paramMap.SourceParam?.Name ?? string.Empty,
+                TargetParamName = paramMap.TargetParam?.Name ?? string.Empty,
+                IsChecked = true,
+                IsPair = paramMap.IsPair
+            });
     }
 
-    /// <summary>
-    /// Метод применения настроек главного окна. (выполнение плагина)
-    /// </summary>
-    /// <remarks>
-    /// В данном методе должны браться настройки пользователя и сохраняться в конфиг, а так же быть основной код плагина.
-    /// </remarks>
+    // Метод получения коллекции CategoryViewModel для Categories
+    private IEnumerable<CategoryViewModel> GetCategoryViewModels() {
+        return _setCoordParamsSettings.Categories
+            .Select(item => new CategoryViewModel {
+                Category = item,
+                CategoryName = item.Name,
+                IsChecked = true
+            })
+            .OrderBy(x => x.CategoryName ?? string.Empty);
+    }
+
+    // Метод обновления предупреждений в категориях
+    private void UpdateCategoryWarnings() {
+        var selectedParams = SelectedParams
+            .Select(paramViewModel => paramViewModel.ParamMap)
+            .ToList();
+        foreach(var category in Categories) {
+            category.UpdateWarning(_paramAvailabilityService, _localizationService, selectedParams);
+        }
+        HasCategoryWarning = Categories.Any(category => category.HasWarning);
+    }
+
+    // Метод обновления предупреждений в параметрах
+    private void UpdateParamWarnings() {
+        foreach(var param in Params) {
+            param.UpdateWarning(_paramAvailabilityService, _localizationService);
+        }
+        HasParamWarning = Params.Any(param => param.HasWarning);
+    }
+
+    // Метод обновления параметров в ParamMap
+    private bool TryUpdateParam(ParamViewModel viewModel, string paramName, bool isSource) {
+        if(viewModel.HasWarning) {
+            return false;
+        }
+        var newParam = _paramFactory.CreateRevitParam(_revitRepository.Document, paramName);
+        if(isSource) {
+            viewModel.ParamMap.SourceParam = newParam;
+        } else {
+            viewModel.ParamMap.TargetParam = newParam;
+        }
+        return true;
+    }
+
+    // Метод удаления и добавления элементов коллекции
+    private void HandleCheckedChangedParam(ParamViewModel vm) {
+        if(vm.IsChecked) {
+            SelectedParams.Add(vm);
+        } else {
+            SelectedParams.Remove(vm);
+        }
+        UpdateParamWarnings();
+    }
+
+    // Метод подписанный на событие изменения выделенных параметров
+    private void OnParamChanged(object sender, PropertyChangedEventArgs e) {
+        if(sender is not ParamViewModel vm) {
+            return;
+        }
+        bool needUpdateCategoryWarnings = false;
+
+        switch(e.PropertyName) {
+            case nameof(ParamViewModel.SourceParamName):
+                UpdateParamWarnings();
+                needUpdateCategoryWarnings = TryUpdateParam(vm, vm.SourceParamName, isSource: true);
+                break;
+
+            case nameof(ParamViewModel.TargetParamName):
+                UpdateParamWarnings();
+                needUpdateCategoryWarnings = TryUpdateParam(vm, vm.TargetParamName, isSource: false);
+                break;
+
+            case nameof(ParamViewModel.IsChecked):
+                HandleCheckedChangedParam(vm);
+                needUpdateCategoryWarnings = true;
+                break;
+        }
+        if(needUpdateCategoryWarnings) {
+            UpdateCategoryWarnings();
+        }
+    }
+
+    // Метод подписанный на событие изменения выделенных категорий
+    private void OnCategoryChanged(object sender, PropertyChangedEventArgs e) {
+        if(sender is not CategoryViewModel vm) {
+            return;
+        }
+        if(vm.IsChecked) {
+            SelectedCategories.Add(vm);
+        } else {
+            SelectedCategories.Remove(vm);
+        }
+    }
+
+    private void LoadView() {
+        LoadConfig();
+        Params = new ObservableCollection<ParamViewModel>(GetParamViewModels());
+        SelectedParams = new ObservableCollection<ParamViewModel>(Params);
+        Categories = new ObservableCollection<CategoryViewModel>(GetCategoryViewModels());
+        SelectedCategories = new ObservableCollection<CategoryViewModel>(Categories);
+        UpdateParamWarnings();
+        UpdateCategoryWarnings();
+
+        // Подписка на события в ParamViewModel
+        foreach(var param in Params) {
+            param.PropertyChanged += OnParamChanged;
+        }
+
+        // Подписка на события в CategoryViewModel
+        foreach(var category in Categories) {
+            category.PropertyChanged += OnCategoryChanged;
+        }
+
+        Search = _setCoordParamsSettings.Search;
+        MaxDiameterSearchSphereMm = Convert.ToString(_setCoordParamsSettings.MaxDiameterSearchSphereMm);
+        StepDiameterSearchSphereMm = Convert.ToString(_setCoordParamsSettings.StepDiameterSearchSphereMm);
+
+    }
     private void AcceptView() {
         SaveConfig();
     }
 
-    /// <summary>
-    /// Метод проверки возможности выполнения команды применения настроек.
-    /// </summary>
-    /// <returns>В случае когда true - команда может выполниться, в случае false - нет.</returns>
-    /// <remarks>
-    /// В данном методе происходит валидация ввода пользователя и уведомление его о неверных значениях.
-    /// В методе проверяемые свойства окна должны быть отсортированы в таком же порядке как в окне (сверху-вниз)
-    /// </remarks>
     private bool CanAcceptView() {
-        if(string.IsNullOrEmpty(SaveProperty)) {
-            ErrorText = _localizationService.GetLocalizedString("MainWindow.HelloCheck");
+        if(HasParamWarning) {
+            ErrorText = _localizationService.GetLocalizedString("MainViewModel.WrongParamName");
             return false;
         }
-
         ErrorText = null;
         return true;
     }
 
-    /// <summary>
-    /// Загрузка настроек плагина.
-    /// </summary>
     private void LoadConfig() {
         var setting = _pluginConfig.GetSettings(_revitRepository.Document);
 
         SaveProperty = setting?.SaveProperty ?? _localizationService.GetLocalizedString("MainWindow.Hello");
     }
 
-    /// <summary>
-    /// Сохранение настроек плагина.
-    /// </summary>
     private void SaveConfig() {
         var setting = _pluginConfig.GetSettings(_revitRepository.Document)
                                 ?? _pluginConfig.AddSettings(_revitRepository.Document);

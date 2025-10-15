@@ -1,4 +1,4 @@
-<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
                     xmlns:system="clr-namespace:System;assembly=mscorlib"> 
 
@@ -8,22 +8,54 @@
     <system:String x:Key="MainWindow.SourceFiles">File with common models</system:String>
     <system:String x:Key="MainWindow.SourceFilesDescription">The file from which the data will be read</system:String>
     <system:String x:Key="MainWindow.TypeModels">Type of common models</system:String>
-    <system:String x:Key="MainWindow.TypeModelsDescription">Value of the parameter "" of construction elements</system:String>
+    <system:String x:Key="MainWindow.TypeModelsDescription">Only common models of this type will be processed</system:String>
     <system:String x:Key="MainWindow.Positions">Element position</system:String>
     <system:String x:Key="MainWindow.PositionsDescription">Specifies relative position for element search</system:String>
 
-    <system:String x:Key="MainWindow.Parameters">Parameters SMR</system:String>
-    <system:String x:Key="MainWindow.ParametersDescription">Select parameters SMR for reading and writing</system:String>
+    <system:String x:Key="MainWindow.Params">Parameters SMR</system:String>
+    <system:String x:Key="MainWindow.ParamsDescription">Select parameters SMR for reading and writing</system:String>
     <system:String x:Key="MainWindow.Categories">Element categories</system:String>
     <system:String x:Key="MainWindow.CategoriesDescription">Categories of elements where parameters will be written</system:String>
     <system:String x:Key="MainWindow.Search">Search settings</system:String>
     <system:String x:Key="MainWindow.SearchDescription">Choose search settings for missing elements</system:String>
 
-    <system:String x:Key="MainWindow.ToggleSwitch.On">Search</system:String>
-    <system:String x:Key="MainWindow.ToggleSwitch.Off">Don't search</system:String>
+    <system:String x:Key="MainWindow.MaxDiameterSearchSphere">Maximum diameter of the search sphere</system:String>
+    <system:String x:Key="MainWindow.MaxDiameterSearchSphereDescription">Maximum distance from an element to a volumetric element</system:String>
+    <system:String x:Key="MainWindow.StepSearchSphere">Step of increasing the diameter of the search sphere</system:String>
+    <system:String x:Key="MainWindow.StepSearchSphereDescription">The value of the sphere increase at each search iteration</system:String>
+    <system:String x:Key="MainWindow.SearchSphereTooltip">Affects performance. Higher values ​​mean lower performance.</system:String>
+    <system:String x:Key="MainWindow.StepSearchSphereTooltip">Affects performance. Lower values ​​mean lower performance.</system:String>    
+
+    <system:String x:Key="MainWindow.SearchToggleSwitchOn">Search for elements</system:String>
+    <system:String x:Key="MainWindow.SearchToggleSwitchOff">Do not search for elements</system:String>
+
+    <system:String x:Key="MainWindow.SourceParamHeader">Source elements parameter</system:String>
+    <system:String x:Key="MainWindow.TargetParamHeader">Target elements parameter</system:String>
+    <system:String x:Key="MainWindow.ParamsToggleSwitchOn">Use parameter</system:String>
+    <system:String x:Key="MainWindow.ParamsToggleSwitchOff">Don't use parameter</system:String>
 
     <system:String x:Key="MainWindow.CategoryWarningTooltip">There are errors in the categories</system:String>    
+    <system:String x:Key="MainWindow.ParamWarningTooltip">There are errors in the parameters</system:String>    
 
     <system:String x:Key="MainWindow.ButtonOk">Set</system:String>
     <system:String x:Key="MainWindow.ButtonCancel">Cancel</system:String>
+    
+    <system:String x:Key="MainViewModel.BlockParamDescription">SMR Block Parameter</system:String>
+    <system:String x:Key="MainViewModel.BlockParamDetailDescription">Used to determine the building block</system:String>
+    <system:String x:Key="MainViewModel.SectionParamDescription">SMR Section Parameter</system:String>
+    <system:String x:Key="MainViewModel.SectionParamDetailDescription">Used to determine the building section</system:String>
+    <system:String x:Key="MainViewModel.FloorParamDescription">SMR Floor Parameter</system:String>
+    <system:String x:Key="MainViewModel.FloorParamDetailDescription">Used to determine the building floor</system:String>
+    <system:String x:Key="MainViewModel.FloorDEParamDescription">Additional SMR Floor Parameter</system:String>
+    <system:String x:Key="MainViewModel.FloorDEParamDetailDescription">Used to determine the building floor</system:String>
+    <system:String x:Key="MainViewModel.BlockingParamDescription">Blocking Parameter</system:String>
+    <system:String x:Key="MainViewModel.BlockingParamDetailDescription">Parameter type – Yes / No</system:String>
+    <system:String x:Key="MainViewModel.WrongParamName">Errors in parameters SMR</system:String>
+
+    <system:String x:Key="CategoryViewModel.WarningStartString">Missing parameters:</system:String>
+    <system:String x:Key="ParamViewModel.WarningStartString">Wrong parameters:</system:String>
+
+    <system:String x:Key="Common.ParamErrorMessageBody">Error copying parameters</system:String>
+    <system:String x:Key="Common.ConfigErrorMessageTitle">Plug-in configuration error</system:String>
+
 </ResourceDictionary>

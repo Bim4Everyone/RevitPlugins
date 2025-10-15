@@ -30,7 +30,7 @@ public partial class MainWindow {
     /// Используется для сохранения положения окна.
     /// </remarks>
     public override string PluginName => nameof(RevitSetCoordParams);
-    
+
     /// <summary>
     /// Наименование файла конфигурации.
     /// </summary>
@@ -38,7 +38,7 @@ public partial class MainWindow {
     /// Используется для сохранения положения окна.
     /// </remarks>
     public override string ProjectConfigName => nameof(MainWindow);
-    
+
     private void ButtonOk_Click(object sender, RoutedEventArgs e) {
         DialogResult = true;
     }
@@ -48,6 +48,10 @@ public partial class MainWindow {
     }
 
     private void CustomGroupEditControl_Loaded(object sender, RoutedEventArgs e) {
+
+    }
+
+    private void CustomGroupEditControl_Loaded_1(object sender, RoutedEventArgs e) {
 
     }
 }
