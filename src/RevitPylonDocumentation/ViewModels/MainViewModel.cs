@@ -504,8 +504,10 @@ internal class MainViewModel : BaseViewModel {
         var rebarFinder = new RebarFinderService(settings, _revitRepository, paramValService);
 
         foreach(var hostsInfoVM in SelectedHostsInfoVM) {
-            var hostsInfo = new PylonSheetInfo(settings, _revitRepository, paramValService, rebarFinder,
-                                               hostsInfoVM.ProjectSection, hostsInfoVM.PylonKeyName);
+            if(!hostsInfoVM.IsCheck) { continue; }
+
+            var hostsInfo = hostsInfoVM.GetPylonSheetInfo(settings, _revitRepository, paramValService, rebarFinder);
+            hostsInfo.InitializeComponents();
             hostsInfo.Manager.WorkWithCreation();
         }
         transaction.Commit();

@@ -13,11 +13,6 @@ internal class PylonSheetInfoManager {
     public void WorkWithCreation() {
         var selectionSettings = Settings.SelectionSettings;
 
-        // Если текущий PylonSheetInfo не выбран для работы - continue
-        if(!SheetInfo.IsCheck) { return; } else {
-            SheetInfo.GetViewNamesForWork();
-        }
-
         // Если листы были в проекте (когда плагин запускают для создания/размещения видов),
         // то мы об этом знаем из RevitRepository
         if(SheetInfo.PylonViewSheet is null) {

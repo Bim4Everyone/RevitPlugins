@@ -3,8 +3,6 @@ using System.Linq;
 
 using Autodesk.Revit.DB;
 
-using dosymep.WPF.ViewModels;
-
 using RevitPylonDocumentation.Models.PylonSheetNView.ViewAnnotationCreatorFactories;
 using RevitPylonDocumentation.Models.Services;
 
@@ -12,54 +10,7 @@ using Document = Autodesk.Revit.DB.Document;
 using View = Autodesk.Revit.DB.View;
 
 namespace RevitPylonDocumentation.Models.PylonSheetNView;
-internal class PylonSheetInfo : BaseViewModel {
-    private bool _isCheck = false;
-
-    internal PylonSheetInfo(CreationSettings settings, RevitRepository repository,
-                            ParamValueService paramValService, RebarFinderService rebarFinder,
-                            string projectSection, string pylonKeyName) {
-        Settings = settings;
-        Repository = repository;
-        ParamValService = paramValService;
-        RebarFinder = rebarFinder;
-        Manager = new PylonSheetInfoManager(settings, Repository, this);
-
-        PylonKeyName = pylonKeyName;
-        ProjectSection = projectSection;
-
-        GeneralView = new PylonView(settings, Repository, this,
-                                    AnnotationCreatorFactories.General);
-        GeneralViewPerpendicular = new PylonView(settings, Repository, this,
-                                                 AnnotationCreatorFactories.GeneralPerp);
-        GeneralViewRebar = new PylonView(settings, Repository, this,
-                                         AnnotationCreatorFactories.GeneralRebar);
-        GeneralViewPerpendicularRebar = new PylonView(settings, Repository, this,
-                                                      AnnotationCreatorFactories.GeneralRebarPerp);
-        TransverseViewFirst = new PylonView(settings, Repository, this,
-                                            AnnotationCreatorFactories.TransverseFirst);
-        TransverseViewSecond = new PylonView(settings, Repository, this,
-                                             AnnotationCreatorFactories.TransverseSecond);
-        TransverseViewThird = new PylonView(settings, Repository, this,
-                                            AnnotationCreatorFactories.TransverseThird);
-        TransverseViewFirstRebar = new PylonView(settings, Repository, this,
-                                                 AnnotationCreatorFactories.TransverseRebarFirst);
-        TransverseViewSecondRebar = new PylonView(settings, Repository, this,
-                                                  AnnotationCreatorFactories.TransverseRebarSecond);
-        TransverseViewThirdRebar = new PylonView(settings, Repository, this,
-                                                 AnnotationCreatorFactories.TransverseRebarThird);
-
-        SkeletonSchedule = new PylonView(settings, Repository, this);
-        SkeletonByElemsSchedule = new PylonView(settings, Repository, this);
-        MaterialSchedule = new PylonView(settings, Repository, this);
-        SystemPartsSchedule = new PylonView(settings, Repository, this);
-        IfcPartsSchedule = new PylonView(settings, Repository, this);
-
-        LegendView = new PylonView(settings, Repository, this);
-
-        ElemsInfo = new PylonElemsInfo(settings, Repository, this);
-        RebarInfo = new PylonRebarInfo(settings, Repository, this);
-    }
-
+internal class PylonSheetInfo {
     internal CreationSettings Settings { get; set; }
     internal RevitRepository Repository { get; set; }
     internal PylonSheetInfoManager Manager { get; set; }
@@ -67,11 +18,6 @@ internal class PylonSheetInfo : BaseViewModel {
     internal PylonElemsInfo ElemsInfo { get; set; }
     public ParamValueService ParamValService { get; set; }
     public RebarFinderService RebarFinder { get; set; }
-
-    public bool IsCheck {
-        get => _isCheck;
-        set => RaiseAndSetIfChanged(ref _isCheck, value);
-    }
 
     public bool SheetInProject { get; set; } = false;
 
@@ -102,7 +48,6 @@ internal class PylonSheetInfo : BaseViewModel {
     public PylonView TransverseViewThirdRebar { get; set; }
 
 
-
     // Видовые экраны спецификаций
     public PylonView MaterialSchedule { get; set; }
     public PylonView SystemPartsSchedule { get; set; }
@@ -114,6 +59,42 @@ internal class PylonSheetInfo : BaseViewModel {
     // Легенда примечаний
     public PylonView LegendView { get; set; }
 
+
+    internal void InitializeComponents() {
+        Manager = new PylonSheetInfoManager(Settings, Repository, this);
+
+        GeneralView = new PylonView(Settings, Repository, this,
+                            AnnotationCreatorFactories.General);
+        GeneralViewPerpendicular = new PylonView(Settings, Repository, this,
+                                                 AnnotationCreatorFactories.GeneralPerp);
+        GeneralViewRebar = new PylonView(Settings, Repository, this,
+                                         AnnotationCreatorFactories.GeneralRebar);
+        GeneralViewPerpendicularRebar = new PylonView(Settings, Repository, this,
+                                                      AnnotationCreatorFactories.GeneralRebarPerp);
+        TransverseViewFirst = new PylonView(Settings, Repository, this,
+                                            AnnotationCreatorFactories.TransverseFirst);
+        TransverseViewSecond = new PylonView(Settings, Repository, this,
+                                             AnnotationCreatorFactories.TransverseSecond);
+        TransverseViewThird = new PylonView(Settings, Repository, this,
+                                            AnnotationCreatorFactories.TransverseThird);
+        TransverseViewFirstRebar = new PylonView(Settings, Repository, this,
+                                                 AnnotationCreatorFactories.TransverseRebarFirst);
+        TransverseViewSecondRebar = new PylonView(Settings, Repository, this,
+                                                  AnnotationCreatorFactories.TransverseRebarSecond);
+        TransverseViewThirdRebar = new PylonView(Settings, Repository, this,
+                                                 AnnotationCreatorFactories.TransverseRebarThird);
+
+        SkeletonSchedule = new PylonView(Settings, Repository, this);
+        SkeletonByElemsSchedule = new PylonView(Settings, Repository, this);
+        MaterialSchedule = new PylonView(Settings, Repository, this);
+        SystemPartsSchedule = new PylonView(Settings, Repository, this);
+        IfcPartsSchedule = new PylonView(Settings, Repository, this);
+
+        LegendView = new PylonView(Settings, Repository, this);
+
+        ElemsInfo = new PylonElemsInfo(Settings, Repository, this);
+        RebarInfo = new PylonRebarInfo(Settings, Repository, this);
+    }
 
     /// <summary>
     /// Создание листа, задание имени, поиск рамки и задание ей нужных габаритов
