@@ -494,8 +494,8 @@ internal class MainViewModel : BaseViewModel {
 
         var settings = new CreationSettings(
             ProjectSettings.GetSettings(),
-            SchedulesSettings.GetSettings(), 
-            SelectionSettings.GetSettings(), 
+            SchedulesSettings.GetSettings(),
+            SelectionSettings.GetSettings(),
             ViewSectionSettings.GetSettings(),
             TypesSettings.GetSettings(),
             ReferenceScheduleSettings.GetSettings());
@@ -504,7 +504,7 @@ internal class MainViewModel : BaseViewModel {
         var rebarFinder = new RebarFinderService(settings, _revitRepository, paramValService);
 
         foreach(var hostsInfo in SelectedHostsInfo) {
-            hostsInfo.InitializeComponents(settings, paramValService, rebarFinder);
+            hostsInfo.InitializeComponents(settings, _revitRepository, paramValService, rebarFinder);
             hostsInfo.Manager.WorkWithCreation();
         }
         transaction.Commit();

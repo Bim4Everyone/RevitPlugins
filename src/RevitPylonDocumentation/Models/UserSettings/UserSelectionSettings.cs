@@ -13,5 +13,5 @@ internal class UserSelectionSettings {
     public bool NeedWorkWithGeneralPerpendicularRebarView { get; set; }
     public bool NeedWorkWithSkeletonSchedule { get; set; }
     public bool NeedWorkWithSkeletonByElemsSchedule { get; set; }
-    public bool SelectedProjectSection { get; set; }
+    public string SelectedProjectSection { get; set; }
 }

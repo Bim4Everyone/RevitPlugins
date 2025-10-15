@@ -74,9 +74,10 @@ internal class PylonSheetInfo : BaseViewModel {
     // Легенда примечаний
     public PylonView LegendView { get; set; }
 
-    public void InitializeComponents(CreationSettings settings, ParamValueService paramValService, 
-                                     RebarFinderService rebarFinder) {
+    public void InitializeComponents(CreationSettings settings, RevitRepository repository, 
+                                     ParamValueService paramValService, RebarFinderService rebarFinder) {
         Settings = settings;
+        Repository = repository;
         ParamValService = paramValService;
         RebarFinder = rebarFinder;
         Manager = new PylonSheetInfoManager(settings, Repository, this);
