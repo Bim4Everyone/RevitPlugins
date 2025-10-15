@@ -88,4 +88,43 @@
         x:Key="ReportsResolver.KeepOnlyOld">Не заменять</system:String>
     <system:String
         x:Key="ReportsResolver.CopyAndRename">Загрузить с переименованием</system:String>
+
+    <system:String
+        x:Key="FilterNameView.Title">Имя нового поискового набора</system:String>
+    <system:String
+        x:Key="FilterNameView.Label">Имя:</system:String>
+    <system:String
+        x:Key="FilterCreation.Title">Поисковые наборы</system:String>
+    <system:String
+        x:Key="FilterCreation.SearchSets">Поисковые наборы</system:String>
+    <system:String
+        x:Key="FilterCreation.Categories">Категории</system:String>
+    <system:String
+        x:Key="FilterCreation.CategoriesSearch">Поиск</system:String>
+    <system:String
+        x:Key="FilterCreation.CategoryNameHeader">Наименование</system:String>
+    <system:String
+        x:Key="FilterCreation.HideUncheckedCategories">Скрыть неотмеченные категории</system:String>
+    <system:String
+        x:Key="FilterCreation.Criteria">Критерии фильтрации</system:String>
+    <system:String
+        x:Key="FilterCreation.Load">Загрузить поисковые наборы</system:String>
+    <system:String
+        x:Key="FilterCreation.AddSearchSet">Создать поисковый набор</system:String>
+    <system:String
+        x:Key="FilterCreation.RenameSearchSet">Изменить имя поискового набора</system:String>
+    <system:String
+        x:Key="FilterCreation.DeleteSearchSet">Удалить поисковый набор</system:String>
+    <system:String
+        x:Key="FilterCreation.Save">Сохранить</system:String>
+    <system:String
+        x:Key="FilterCreation.SaveAs">Сохранить как</system:String>
+    <system:String
+        x:Key="FilterCreation.AddRule">Добавить правило</system:String>
+    <system:String
+        x:Key="FilterCreation.AddSet">Добавить набор</system:String>
+    <system:String
+        x:Key="FilterCreation.CheckSetButton">Проверка</system:String>
+    <system:String
+        x:Key="FilterCreation.CheckSetButtonTooltip">Проверить поисковый набор</system:String>
 </ResourceDictionary>

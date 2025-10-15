@@ -88,4 +88,43 @@
         x:Key="ReportsResolver.KeepOnlyOld">Don't replace</system:String>
     <system:String
         x:Key="ReportsResolver.CopyAndRename">Load and rename</system:String>
+
+    <system:String
+        x:Key="FilterNameView.Title">New Search Set Name</system:String>
+    <system:String
+        x:Key="FilterNameView.Label">Name:</system:String>
+    <system:String
+        x:Key="FilterCreation.Title">Search Sets</system:String>
+    <system:String
+        x:Key="FilterCreation.SearchSets">Search Sets</system:String>
+    <system:String
+        x:Key="FilterCreation.Categories">Categories</system:String>
+    <system:String
+        x:Key="FilterCreation.CategoriesSearch">Search</system:String>
+    <system:String
+        x:Key="FilterCreation.CategoryNameHeader">Name</system:String>
+    <system:String
+        x:Key="FilterCreation.HideUncheckedCategories">Hide unchecked categories</system:String>
+    <system:String
+        x:Key="FilterCreation.Criteria">Filter Criteria</system:String>
+    <system:String
+        x:Key="FilterCreation.Load">Load search sets</system:String>
+    <system:String
+        x:Key="FilterCreation.AddSearchSet">Create search set</system:String>
+    <system:String
+        x:Key="FilterCreation.RenameSearchSet">Rename search set</system:String>
+    <system:String
+        x:Key="FilterCreation.DeleteSearchSet">Delete search set</system:String>
+    <system:String
+        x:Key="FilterCreation.Save">Save</system:String>
+    <system:String
+        x:Key="FilterCreation.SaveAs">Save As</system:String>
+    <system:String
+        x:Key="FilterCreation.AddRule">Add rule</system:String>
+    <system:String
+        x:Key="FilterCreation.AddSet">Add set</system:String>
+    <system:String
+        x:Key="FilterCreation.CheckSetButton">Check</system:String>
+    <system:String
+        x:Key="FilterCreation.CheckSetButtonTooltip">Check search set</system:String>
 </ResourceDictionary>

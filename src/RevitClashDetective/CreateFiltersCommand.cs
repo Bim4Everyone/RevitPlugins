@@ -3,7 +3,6 @@ using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Reflection;
-using System.Windows;
 
 using Autodesk.Revit.Attributes;
 using Autodesk.Revit.UI;
@@ -11,7 +10,7 @@ using Autodesk.Revit.UI;
 using dosymep.Bim4Everyone;
 using dosymep.Bim4Everyone.SimpleServices;
 using dosymep.WpfCore.Ninject;
-using dosymep.Xpf.Core.Ninject;
+using dosymep.WpfUI.Core.Ninject;
 
 using Ninject;
 
@@ -52,17 +51,16 @@ public class CreateFiltersCommand : BasePluginCommand {
                 return FiltersConfig.GetFiltersConfig(path, repo.Doc);
             });
 
-        kernel.Bind<FiltersViewModel>()
+        kernel.Bind<FilterNameView>()
             .ToSelf()
-            .InSingletonScope();
-        kernel.Bind<FilterCreatorView>()
-            .ToSelf()
-            .InSingletonScope()
-            .WithPropertyValue(nameof(Window.DataContext), c => c.Kernel.Get<FiltersViewModel>());
-        kernel.UseXtraOpenFileDialog<FiltersViewModel>()
-            .UseXtraSaveFileDialog<FiltersViewModel>()
-            .UseXtraMessageBox<FiltersViewModel>();
+            .InTransientScope();
 
+        kernel.BindMainWindow<FiltersViewModel, FilterCreatorView>();
+        kernel.UseWpfOpenFileDialog<FiltersViewModel>()
+            .UseWpfSaveFileDialog<FiltersViewModel>()
+            .UseWpfUIMessageBox<FiltersViewModel>();
+
+        kernel.UseWpfUIThemeUpdater();
         string assemblyName = Assembly.GetExecutingAssembly().GetName().Name;
         kernel.UseWpfLocalization(
             $"/{assemblyName};component/assets/Localization/Language.xaml",

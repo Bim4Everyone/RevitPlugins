@@ -1,4 +1,4 @@
-﻿<UserControl
+﻿<core:WpfUIPlatformUserControl
     x:Class="RevitClashDetective.Views.CategoryView"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
@@ -6,17 +6,20 @@
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:vm="clr-namespace:RevitClashDetective.ViewModels.FilterCreatorViewModels"
     xmlns:s="clr-namespace:System;assembly=mscorlib"
-    xmlns:dxe="http://schemas.devexpress.com/winfx/2008/xaml/editors"
-    xmlns:dxmvvm="http://schemas.devexpress.com/winfx/2008/xaml/mvvm"
-    xmlns:dxg="http://schemas.devexpress.com/winfx/2008/xaml/grid"
+    xmlns:core="clr-namespace:dosymep.WpfUI.Core"
+    xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
+    xmlns:me="clr-namespace:dosymep.WpfCore.MarkupExtensions;assembly=dosymep.WpfCore"
     mc:Ignorable="d"
     d:DataContext="{d:DesignInstance {x:Type vm:FilterViewModel}, IsDesignTimeCreatable=False}">
-    <UserControl.Resources>
+    <core:WpfUIPlatformUserControl.Resources>
         <s:Boolean
             x:Key="True">True</s:Boolean>
         <s:Boolean
             x:Key="False">False</s:Boolean>
-    </UserControl.Resources>
+        <ui:TextBlock
+            x:Key="CategoryNameHeader"
+            Text="{me:LocalizationSource FilterCreation.CategoryNameHeader}" />
+    </core:WpfUIPlatformUserControl.Resources>
     <Grid>
         <Grid>
             <Grid.RowDefinitions>
@@ -27,70 +30,42 @@
                 <RowDefinition />
             </Grid.RowDefinitions>
 
-            <dxe:CheckEdit
-                Name="_che"
+            <ui:ToggleSwitch
                 Grid.Row="1"
-                Content="Скрыть неотмеченные категории"
-                Checked="_che_Checked"
-                Unchecked="_che_Checked">
-            </dxe:CheckEdit>
+                Content="{me:LocalizationSource FilterCreation.HideUncheckedCategories}">
+            </ui:ToggleSwitch>
 
-            <dxg:GridControl
-                x:Name="_dg"
+            <DockPanel
                 Grid.Row="2"
-                SelectionMode="Row"
-                ItemsSource="{Binding Categories, UpdateSourceTrigger=PropertyChanged}"
-                CustomRowFilter="_dg_CustomRowFilter">
-                <dxg:GridControl.View>
-                    <dxg:TableView
-                        AutoWidth="True"
-                        AllowGrouping="False"
-                        SearchPanelAllowFilter="True"
-                        ShowSearchPanelMode="Always"
-                        ShowGroupPanel="False"
-                        IsSynchronizedWithCurrentItem="True">
-                    </dxg:TableView>
-                </dxg:GridControl.View>
-                <dxg:GridControl.Columns>
-                    <dxg:GridColumn
-                        x:Name="_checkColumn"
-                        FieldName="IsSelected"
-                        Width="43"
-                        MaxWidth="43"
-                        MinWidth="43"
-                        AllowResizing="False"
-                        AllowSorting="False"
-                        Header=""
-                        ShowCheckBoxInHeader="True">
-                        <dxg:GridColumn.CellTemplate>
-                            <DataTemplate
-                                DataType="{x:Type vm:CategoryViewModel}">
-                                <dxe:CheckEdit
-                                    Name="PART_Editor"
-                                    HorizontalAlignment="Center"
-                                    Margin="0 -3 0 -3"
-                                    EditValue="{Binding Row.IsSelected, UpdateSourceTrigger=PropertyChanged}">
-                                    <!--<dxmvvm:Interaction.Behaviors>
-                                        <dxmvvm:EventToCommand EventName="EditValueChanged" 
-                                                       Command="{Binding RelativeSource={RelativeSource AncestorType={x:Type dxg:GridControl}}, Path=DataContext.SelectedCategoriesChangedCommand}"
-                                                               CommandParameter="{Binding ElementName=PART_Editor, Path=DataContext}"/>
-                                    </dxmvvm:Interaction.Behaviors>-->
-                                </dxe:CheckEdit>
-                            </DataTemplate>
-                        </dxg:GridColumn.CellTemplate>
-                    </dxg:GridColumn>
-                    <dxg:GridColumn
-                        ReadOnly="True"
-                        Header="Наименование"
-                        FieldName="Name" />
-                </dxg:GridControl.Columns>
-                <dxmvvm:Interaction.Behaviors>
-                    <dxmvvm:ReadOnlyDependencyPropertyBindingBehavior
-                        Property="VisibleItems"
-                        Binding="{Binding VisibleItems, Mode=OneWayToSource}" />
-                </dxmvvm:Interaction.Behaviors>
-            </dxg:GridControl>
-
+                LastChildFill="True">
+                <ui:TextBox
+                    DockPanel.Dock="Top"
+                    PlaceholderText="{me:LocalizationSource FilterCreation.CategoriesSearch}" />
+                <ui:DataGrid
+                    SelectionMode="Single"
+                    AutoGenerateColumns="False"
+                    CanUserDeleteRows="False"
+                    CanUserResizeColumns="False"
+                    CanUserReorderColumns="False"
+                    CanUserResizeRows="True"
+                    ItemsSource="{Binding Categories, UpdateSourceTrigger=PropertyChanged}">
+                    <ui:DataGrid.Columns>
+                        <DataGridCheckBoxColumn
+                            Binding="{Binding IsSelected, UpdateSourceTrigger=PropertyChanged}"
+                            Width="Auto"
+                            CanUserSort="False">
+                            <DataGridCheckBoxColumn.Header>
+                                <CheckBox />
+                            </DataGridCheckBoxColumn.Header>
+                        </DataGridCheckBoxColumn>
+                        <DataGridTextColumn
+                            Width="Auto"
+                            IsReadOnly="True"
+                            Binding="{Binding Name}"
+                            Header="{StaticResource CategoryNameHeader}" />
+                    </ui:DataGrid.Columns>
+                </ui:DataGrid>
+            </DockPanel>
         </Grid>
     </Grid>
-</UserControl>
+</core:WpfUIPlatformUserControl>

@@ -1,11 +1,22 @@
-using System.Windows.Controls;
+using dosymep.SimpleServices;
 
 namespace RevitClashDetective.Views;
-/// <summary>
-/// Interaction logic for CriterionView.xaml
-/// </summary>
-public partial class CriterionView : UserControl {
-    public CriterionView() {
+public partial class CriterionView {
+    public CriterionView() : base() {
+        InitializeComponent();
+    }
+
+    public CriterionView(
+        ILoggerService loggerService,
+        ILanguageService languageService,
+        ILocalizationService localizationService,
+        IUIThemeService uiThemeService,
+        IUIThemeUpdaterService themeUpdaterService)
+        : base(loggerService,
+            languageService,
+            localizationService,
+            uiThemeService,
+            themeUpdaterService) {
         InitializeComponent();
     }
 }

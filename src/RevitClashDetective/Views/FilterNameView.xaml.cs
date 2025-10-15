@@ -1,11 +1,20 @@
 using System.Windows;
 
+using dosymep.SimpleServices;
+
 namespace RevitClashDetective.Views;
-/// <summary>
-/// Interaction logic for FilterNameView.xaml
-/// </summary>
 public partial class FilterNameView {
-    public FilterNameView() {
+    public FilterNameView(
+    ILoggerService loggerService,
+    ISerializationService serializationService,
+    ILanguageService languageService,
+    ILocalizationService localizationService,
+    IUIThemeService uiThemeService,
+    IUIThemeUpdaterService themeUpdaterService)
+    : base(loggerService,
+        serializationService,
+        languageService, localizationService,
+        uiThemeService, themeUpdaterService) {
         InitializeComponent();
     }
 

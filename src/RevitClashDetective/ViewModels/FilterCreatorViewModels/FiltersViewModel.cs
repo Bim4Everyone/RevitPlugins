@@ -12,6 +12,9 @@ using dosymep.SimpleServices;
 using dosymep.WPF.Commands;
 using dosymep.WPF.ViewModels;
 
+using Ninject;
+using Ninject.Syntax;
+
 using RevitClashDetective.Models;
 using RevitClashDetective.Models.FilterModel;
 using RevitClashDetective.ViewModels.SearchSet;
@@ -21,6 +24,7 @@ using RevitClashDetective.Views;
 namespace RevitClashDetective.ViewModels.FilterCreatorViewModels;
 internal class FiltersViewModel : BaseViewModel {
     private readonly RevitRepository _revitRepository;
+    private readonly IResolutionRoot _resolutionRoot;
     private readonly FiltersConfig _config;
     private ObservableCollection<FilterViewModel> _filters;
     private string _errorText;
@@ -33,12 +37,14 @@ internal class FiltersViewModel : BaseViewModel {
         IOpenFileDialogService openFileDialogService,
         ISaveFileDialogService saveFileDialogService,
         IMessageBoxService messageBoxService,
+        IResolutionRoot resolutionRoot,
         FiltersConfig config) {
 
         _revitRepository = revitRepository ?? throw new ArgumentNullException(nameof(revitRepository));
         OpenFileDialogService = openFileDialogService ?? throw new ArgumentNullException(nameof(openFileDialogService));
         SaveFileDialogService = saveFileDialogService ?? throw new ArgumentNullException(nameof(saveFileDialogService));
         MessageBoxService = messageBoxService ?? throw new ArgumentNullException(nameof(messageBoxService));
+        _resolutionRoot = resolutionRoot ?? throw new ArgumentNullException(nameof(resolutionRoot));
         _config = config ?? throw new ArgumentNullException(nameof(config));
 
         InitializeFilters();
@@ -107,6 +113,7 @@ internal class FiltersViewModel : BaseViewModel {
     }
 
     private void SelectedFilterChanged() {
+        // TODO
         SelectedFilter?.InitializeFilter();
     }
 
@@ -116,7 +123,9 @@ internal class FiltersViewModel : BaseViewModel {
 
     private void Create(Window p) {
         var newFilterName = new FilterNameViewModel(Filters.Select(f => f.Name));
-        var view = new FilterNameView() { DataContext = newFilterName, Owner = p };
+        var view = _resolutionRoot.Get<FilterNameView>();
+        view.DataContext = newFilterName;
+        view.Owner = p;
         if(view.ShowDialog() == true) {
             var newFilter = new FilterViewModel(_revitRepository) { Name = newFilterName.Name, IsInitialized = true };
             Filters.Add(newFilter);
@@ -143,7 +152,9 @@ internal class FiltersViewModel : BaseViewModel {
 
     private void Rename(Window p) {
         var newFilterName = new FilterNameViewModel(Filters.Select(f => f.Name), SelectedFilter.Name);
-        var view = new FilterNameView() { DataContext = newFilterName, Owner = p };
+        var view = _resolutionRoot.Get<FilterNameView>();
+        view.DataContext = newFilterName;
+        view.Owner = p;
         if(view.ShowDialog() == true) {
             SelectedFilter.Name = newFilterName.Name;
             Filters = new ObservableCollection<FilterViewModel>(Filters.OrderBy(item => item.Name));
