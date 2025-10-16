@@ -127,4 +127,27 @@
         x:Key="FilterCreation.CheckSetButton">Проверка</system:String>
     <system:String
         x:Key="FilterCreation.CheckSetButtonTooltip">Проверить поисковый набор</system:String>
+    
+    <system:String
+        x:Key="MainWindow.Title">Проверки на коллизии</system:String>
+    <system:String
+        x:Key="MainWindow.Load">Загрузить проверки</system:String>
+    <system:String
+        x:Key="MainWindow.Save">Сохранить</system:String>
+    <system:String
+        x:Key="MainWindow.SaveAs">Сохранить как</system:String>
+    <system:String
+        x:Key="MainWindow.AddCheck">Добавить проверку</system:String>
+    <system:String
+        x:Key="MainWindow.DeleteCheck">Удалить проверку</system:String>
+    <system:String
+        x:Key="MainWindow.CheckSearch">Поиск</system:String>
+    <system:String
+        x:Key="MainWindow.NameLabel">Наименование</system:String>
+    <system:String
+        x:Key="MainWindow.FirstSelectionLabel">Выбор 1</system:String>
+    <system:String
+        x:Key="MainWindow.SecondSelectionLabel">Выбор 2</system:String>
+    <system:String
+        x:Key="MainWindow.ShowClashes">Показать отчет по коллизиям</system:String>
 </ResourceDictionary>

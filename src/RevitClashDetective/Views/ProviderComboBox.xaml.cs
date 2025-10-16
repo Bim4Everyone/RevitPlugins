@@ -1,17 +1,23 @@
-using System.Windows.Controls;
+using dosymep.SimpleServices;
 
 namespace RevitClashDetective.Views;
-/// <summary>
-/// Interaction logic for ProviderCombobBox.xaml
-/// </summary>
-public partial class ProviderComboBox : UserControl {
+public partial class ProviderComboBox {
 
-    public ProviderComboBox() {
+    public ProviderComboBox() : base() {
         InitializeComponent();
     }
 
-    private void ComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e) {
-        var comboBox = (ComboBox) sender;
-        comboBox.SelectedItem = null;
+    public ProviderComboBox(
+        ILoggerService loggerService,
+        ILanguageService languageService,
+        ILocalizationService localizationService,
+        IUIThemeService uiThemeService,
+        IUIThemeUpdaterService themeUpdaterService)
+        : base(loggerService,
+            languageService,
+            localizationService,
+            uiThemeService,
+            themeUpdaterService) {
+        InitializeComponent();
     }
 }

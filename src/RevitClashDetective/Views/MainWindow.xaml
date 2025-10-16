@@ -1,35 +1,64 @@
-﻿<base:ThemedPlatformWindow
+﻿<core:WpfUIPlatformWindow
     x:Class="RevitClashDetective.Views.MainWindow"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:local="clr-namespace:RevitClashDetective.Views"
-    xmlns:dx="http://schemas.devexpress.com/winfx/2008/xaml/core"
-    xmlns:dxe="http://schemas.devexpress.com/winfx/2008/xaml/editors"
-    xmlns:dxg="http://schemas.devexpress.com/winfx/2008/xaml/grid"
+    xmlns:core="clr-namespace:dosymep.WpfUI.Core"
+    xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
+    xmlns:me="clr-namespace:dosymep.WpfCore.MarkupExtensions;assembly=dosymep.WpfCore"
+    xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
+    xmlns:wpfbehaviors="clr-namespace:dosymep.WpfCore.Behaviors;assembly=dosymep.WpfCore"
     xmlns:clashDetective="clr-namespace:RevitClashDetective.ViewModels.ClashDetective"
-    xmlns:base="clr-namespace:dosymep.WPF.Views"
-    xmlns:mvvm="http://schemas.devexpress.com/winfx/2008/xaml/mvvm"
-    xmlns:common="clr-namespace:dosymep.Xpf.Core.SimpleServices;assembly=dosymep.Xpf.Core"
+    xmlns:cm="clr-namespace:System.ComponentModel;assembly=WindowsBase"
     mc:Ignorable="d"
-    x:Name="_this"
-    Title="Проверки на коллизии"
     Height="450"
     Width="800"
-    MinHeight="300"
-    MinWidth="500"
+    MinHeight="400"
+    MinWidth="700"
     d:DataContext="{d:DesignInstance clashDetective:MainViewModel, IsDesignTimeCreatable=False}">
-    <mvvm:Interaction.Behaviors>
-        <common:AttachServiceBehavior
+    <i:Interaction.Behaviors>
+        <wpfbehaviors:WpfAttachServiceBehavior
             AttachableService="{Binding MessageBoxService}" />
-        <common:AttachServiceBehavior
+        <wpfbehaviors:WpfAttachServiceBehavior
             AttachableService="{Binding OpenFileDialogService}" />
-        <common:AttachServiceBehavior
+        <wpfbehaviors:WpfAttachServiceBehavior
             AttachableService="{Binding SaveFileDialogService}" />
-    </mvvm:Interaction.Behaviors>
+    </i:Interaction.Behaviors>
+
+    <core:WpfUIPlatformWindow.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary
+                    Source="../Resources/CustomStyles.xaml" />
+            </ResourceDictionary.MergedDictionaries>
+            <CollectionViewSource
+                x:Key="SortedChecks"
+                Source="{Binding Checks}">
+                <CollectionViewSource.SortDescriptions>
+                    <cm:SortDescription
+                        PropertyName="Name"
+                        Direction="Ascending" />
+                </CollectionViewSource.SortDescriptions>
+            </CollectionViewSource>
+            <ui:TextBlock
+                x:Key="NameLabel"
+                Text="{me:LocalizationSource MainWindow.NameLabel}" />
+            <ui:TextBlock
+                x:Key="FirstSelectionLabel"
+                Text="{me:LocalizationSource MainWindow.FirstSelectionLabel}" />
+            <ui:TextBlock
+                x:Key="SecondSelectionLabel"
+                Text="{me:LocalizationSource MainWindow.SecondSelectionLabel}" />
+            <ui:TextBlock
+                x:Key="ShowCleshesTooltip"
+                Text="{me:LocalizationSource MainWindow.ShowClashes}" />
+        </ResourceDictionary>
+    </core:WpfUIPlatformWindow.Resources>
+
     <Grid
-        Margin="10">
+        Margin="8 0">
         <Grid.RowDefinitions>
             <RowDefinition
                 Height="Auto" />
@@ -41,189 +70,152 @@
                 Height="Auto" />
         </Grid.RowDefinitions>
 
-        <StackPanel
+        <ui:TitleBar
             Grid.Row="0"
-            Margin="0 0  0 10"
-            Orientation="Horizontal">
-            <dx:SimpleButton
-                Height="32"
-                Width="35"
-                Margin="0 0 10 0"
-                ToolTip="Загрузить проверки"
-                Command="{Binding LoadClashCommand}"
-                Glyph="{dx:DXImage 'Office2013/Actions/Download_32x32.png'}" />
+            Title="{me:LocalizationSource MainWindow.Title}" />
 
-            <dx:SimpleButton
-                Height="32"
-                Width="32"
-                Margin="0 0 10 0"
-                ToolTip="Cохранить"
-                Command="{Binding SaveClashesCommand}"
-                Glyph="{dx:DXImage 'DevAV/Actions/Save_32x32.png'}" />
-
-            <dx:SimpleButton
-                Height="32"
-                Width="32"
-                Margin="0 0 10 0"
-                ToolTip="Сохранить как"
-                Command="{Binding SaveAsClashesCommand}"
-                Glyph="{dx:DXImage 'DevAV/Actions/SaveAs_32x32.png'}" />
-
-            <dx:SimpleButton
-                Height="32"
-                Width="35"
-                Margin="0 0 10 0"
-                ToolTip="Добавить проверку"
-                Command="{Binding AddCheckCommand}"
-                Glyph="{dx:DXImage 'SvgImages/Icon Builder/Actions_Add.svg'}" />
-
-            <dx:SimpleButton
-                Height="32"
-                Width="35"
-                ToolTip="Удалить проверку"
-                Command="{Binding RemoveCheckCommand}"
-                CommandParameter="{Binding ElementName=_dg, Path=SelectedItem}"
-                Glyph="{dx:DXImage 'SvgImages/Icon Builder/Actions_Remove.svg'}" />
-
-        </StackPanel>
-
-        <StackPanel
+        <Border
             Grid.Row="1"
-            Margin="0 0  0 10"
-            Orientation="Horizontal">
+            Margin="0 0 0 8"
+            Style="{StaticResource CustomBorder}">
+            <DockPanel>
+                <ui:Button
+                    ToolTip="{me:LocalizationSource MainWindow.Load}"
+                    Command="{Binding LoadClashCommand}"
+                    Content="{ui:SymbolIcon Symbol=ArrowDownload20}" />
 
-        </StackPanel>
+                <ui:Button
+                    Margin="8 0"
+                    ToolTip="{me:LocalizationSource MainWindow.Save}"
+                    Command="{Binding SaveClashesCommand}"
+                    Content="{ui:SymbolIcon Symbol=Save20}" />
 
-        <dxg:GridControl
-            x:Name="_dg"
-            SelectionMode="Row"
+                <ui:Button
+                    ToolTip="{me:LocalizationSource MainWindow.SaveAs}"
+                    Command="{Binding SaveAsClashesCommand}"
+                    Content="{ui:SymbolIcon Symbol=SaveEdit20}" />
+
+                <ui:Button
+                    Margin="8 0"
+                    ToolTip="{me:LocalizationSource MainWindow.AddCheck}"
+                    Command="{Binding AddCheckCommand}"
+                    Content="{ui:SymbolIcon Symbol=Add20}" />
+
+                <ui:Button
+                    Appearance="Danger"
+                    ToolTip="{me:LocalizationSource MainWindow.DeleteCheck}"
+                    CommandParameter="{Binding SelectedCheck}"
+                    Command="{Binding RemoveCheckCommand}"
+                    Content="{ui:SymbolIcon Symbol=Delete20}" />
+            </DockPanel>
+        </Border>
+
+        <Border
             Grid.Row="2"
-            ItemsSource="{Binding Checks}">
-            <dxg:GridControl.View>
-                <dxg:TableView
-                    x:Name="_gridView"
-                    AutoWidth="True"
-                    ShowSearchPanelMode="Always"
-                    ShowGroupPanel="False"
-                    CellValueChanging="_gridView_CellValueChanging" />
-            </dxg:GridControl.View>
+            Style="{StaticResource CustomBorder}">
+            <DockPanel
+                LastChildFill="True">
+                <ui:TextBox
+                    DockPanel.Dock="Top"
+                    MinWidth="300"
+                    MaxWidth="300"
+                    HorizontalAlignment="Right"
+                    PlaceholderText="{me:LocalizationSource MainWindow.CheckSearch}" />
+                <ui:DataGrid
+                    SelectionMode="Single"
+                    AutoGenerateColumns="False"
+                    CanUserDeleteRows="False"
+                    CanUserReorderColumns="False"
+                    CanUserResizeColumns="False"
+                    SelectedItem="{Binding SelectedCheck}"
+                    ItemsSource="{Binding Source={StaticResource SortedChecks}}">
 
-            <dxg:GridColumn
-                Header=""
-                Width="Auto"
-                FieldName="IsSelected" />
+                    <ui:DataGrid.Columns>
+                        <DataGridCheckBoxColumn
+                            Width="Auto"
+                            CanUserSort="False"
+                            Binding="{Binding IsSelected, UpdateSourceTrigger=PropertyChanged}" />
 
-            <dxg:GridColumn
-                Width="Auto">
-                <dxg:GridColumn.CellTemplate>
-                    <DataTemplate>
-                        <Image
-                            Width="16"
-                            Height="16"
-                            ToolTip="{Binding Row.ErrorText}"
-                            HorizontalAlignment="Center">
-                            <Image.Style>
-                                <Style
-                                    TargetType="{x:Type Image}">
-                                    <Setter
-                                        Property="Source"
-                                        Value="{dx:DXImage 'Images/Status/Warning_16x16.png'}" />
-                                    <Style.Triggers>
-                                        <DataTrigger
-                                            Binding="{Binding Row.ErrorText}"
-                                            Value="{x:Null}">
-                                            <Setter
-                                                Property="Source"
-                                                Value="{x:Null}" />
-                                        </DataTrigger>
-                                    </Style.Triggers>
-                                </Style>
-                            </Image.Style>
-                        </Image>
-                    </DataTemplate>
-                </dxg:GridColumn.CellTemplate>
-            </dxg:GridColumn>
+                        <DataGridTemplateColumn
+                            Width="Auto"
+                            CanUserSort="True"
+                            SortMemberPath="Name"
+                            Header="{StaticResource NameLabel}">
+                            <DataGridTemplateColumn.CellTemplate>
+                                <DataTemplate>
+                                    <ui:TextBox
+                                        Text="{Binding Name, UpdateSourceTrigger=PropertyChanged}" />
+                                </DataTemplate>
+                            </DataGridTemplateColumn.CellTemplate>
+                        </DataGridTemplateColumn>
 
-            <dxg:GridColumn
-                Header="Наименование"
-                FieldName="Name"
-                Width="Auto"
-                SortOrder="Ascending"
-                SortIndex="0" />
+                        <DataGridTemplateColumn
+                            Width="*"
+                            CanUserSort="False"
+                            Header="{StaticResource FirstSelectionLabel}">
+                            <DataGridTemplateColumn.CellTemplate>
+                                <DataTemplate>
+                                    <local:ProviderComboBox
+                                        DataContext="{Binding Row.FirstSelection, UpdateSourceTrigger=PropertyChanged}" />
+                                </DataTemplate>
+                            </DataGridTemplateColumn.CellTemplate>
+                        </DataGridTemplateColumn>
 
-            <dxg:GridColumn
-                Header="Выбор 1"
-                Width="*">
-                <dxg:GridColumn.CellTemplate>
-                    <DataTemplate>
-                        <local:ProviderComboBox
-                            DataContext="{Binding Row.FirstSelection, UpdateSourceTrigger=PropertyChanged}" />
-                    </DataTemplate>
-                </dxg:GridColumn.CellTemplate>
-            </dxg:GridColumn>
+                        <DataGridTemplateColumn
+                            Width="*"
+                            CanUserSort="False"
+                            Header="{StaticResource SecondSelectionLabel}">
+                            <DataGridTemplateColumn.CellTemplate>
+                                <DataTemplate>
+                                    <local:ProviderComboBox
+                                        DataContext="{Binding SecondSelection, UpdateSourceTrigger=PropertyChanged}" />
+                                </DataTemplate>
+                            </DataGridTemplateColumn.CellTemplate>
+                        </DataGridTemplateColumn>
 
-            <dxg:GridColumn
-                Header="Выбор 2"
-                Width="*">
-                <dxg:GridColumn.CellTemplate>
-                    <DataTemplate
-                        DataType="{x:Type clashDetective:CheckViewModel}">
-                        <local:ProviderComboBox
-                            DataContext="{Binding Row.SecondSelection, UpdateSourceTrigger=PropertyChanged}" />
-                    </DataTemplate>
-                </dxg:GridColumn.CellTemplate>
-            </dxg:GridColumn>
-
-            <dxg:GridColumn
-                Width="Auto">
-                <dxg:GridColumn.CellTemplate>
-                    <DataTemplate
-                        DataType="{x:Type clashDetective:CheckViewModel}">
-                        <dx:SimpleButton
-                            Margin="3 0"
-                            Click="ButtonOk_Click"
-                            Command="{Binding Row.ShowClashesCommand}"
-                            ToolTip="Показать отчет по коллизиям"
-                            Glyph="pack://application:,,,/DevExpress.Images.v21.2;component/Office2013/Reports/Report_16x16.png" />
-
-                    </DataTemplate>
-                </dxg:GridColumn.CellTemplate>
-            </dxg:GridColumn>
-
-        </dxg:GridControl>
+                        <DataGridTemplateColumn
+                            Width="Auto"
+                            CanUserSort="False">
+                            <DataGridTemplateColumn.CellTemplate>
+                                <DataTemplate>
+                                    <ui:Button
+                                        Click="ButtonOk_Click"
+                                        Height="36"
+                                        Command="{Binding ShowClashesCommand}"
+                                        ToolTip="{StaticResource ShowCleshesTooltip}"
+                                        Content="{ui:SymbolIcon Symbol=Notebook20}" />
+                                </DataTemplate>
+                            </DataGridTemplateColumn.CellTemplate>
+                        </DataGridTemplateColumn>
+                    </ui:DataGrid.Columns>
+                </ui:DataGrid>
+            </DockPanel>
+        </Border>
 
         <StackPanel
             Grid.Row="3"
-            Margin="0 10 0 0"
             Orientation="Horizontal"
             HorizontalAlignment="Right">
-            <dxe:TextEdit
-                Margin="10 0"
-                IsReadOnly="True"
-                EditMode="InplaceActive"
-                EditValue="{Binding ErrorText}"
-                Foreground="Orange" />
-            <dxe:TextEdit
-                Margin="10 0"
-                IsReadOnly="True"
-                EditMode="InplaceActive"
-                EditValue="{Binding MessageText}"
-                Foreground="Green" />
-            <dx:SimpleButton
-                Content="ОК"
-                Height="25"
+            <ui:TextBlock
+                Margin="8"
+                Text="{Binding ErrorText}"
+                Style="{StaticResource CustomErrorText}" />
+            <ui:TextBlock
+                Margin="8"
+                Text="{Binding MessageText}"
+                Style="{StaticResource CustomMessageText}" />
+            <ui:Button
                 Width="80"
-                Margin="10 0"
+                Margin="8"
                 IsDefault="True"
-                Command="{Binding FindClashesCommand}"
-                CommandParameter="{Binding ElementName=_this}" />
-            <dx:SimpleButton
-                Content="Отмена"
-                Height="25"
+                Content="{me:LocalizationSource Ok}"
+                Command="{Binding FindClashesCommand}" />
+            <ui:Button
+                Margin="8 8 0 8"
                 Width="80"
                 IsCancel="true"
-                Click="ButtonCancel_Click" />
+                Click="ButtonCancel_Click"
+                Content="{me:LocalizationSource Cancel}" />
         </StackPanel>
-
     </Grid>
-</base:ThemedPlatformWindow>
+</core:WpfUIPlatformWindow>

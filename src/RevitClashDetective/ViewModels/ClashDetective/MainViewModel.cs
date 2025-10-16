@@ -26,6 +26,7 @@ internal class MainViewModel : BaseViewModel {
     private bool _canCancel = true;
     private string _messageText;
     private ObservableCollection<CheckViewModel> _checks;
+    private CheckViewModel _selectedCheck;
 
     public MainViewModel(
         RevitRepository revitRepository,
@@ -73,6 +74,11 @@ internal class MainViewModel : BaseViewModel {
     public string MessageText {
         get => _messageText;
         set => RaiseAndSetIfChanged(ref _messageText, value);
+    }
+
+    public CheckViewModel SelectedCheck {
+        get => _selectedCheck;
+        set => RaiseAndSetIfChanged(ref _selectedCheck, value);
     }
 
     public ICommand AddCheckCommand { get; }
@@ -131,13 +137,11 @@ internal class MainViewModel : BaseViewModel {
     }
 
     private void RemoveCheck(CheckViewModel p) {
-        if(Checks.Count > 0) {
-            Checks.Remove(p);
-        }
+        Checks.Remove(p);
     }
 
     private bool CanRemove(CheckViewModel p) {
-        return p != null;
+        return Checks?.Count > 0 && p is not null;
     }
 
     private void FindClashes() {
