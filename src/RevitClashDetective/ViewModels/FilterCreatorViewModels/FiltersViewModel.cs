@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.ComponentModel;
 using System.IO;
 using System.Linq;
 using System.Windows;
@@ -50,7 +51,6 @@ internal class FiltersViewModel : BaseViewModel {
         InitializeFilters();
         InitializeTimer();
 
-        SelectedFilterChangedCommand = RelayCommand.Create(SelectedFilterChanged, CanSelectedFilterChanged);
         CreateCommand = RelayCommand.Create<Window>(Create);
         DeleteCommand = RelayCommand.Create(Delete, CanDelete);
         RenameCommand = RelayCommand.Create<Window>(Rename, CanRename);
@@ -60,6 +60,9 @@ internal class FiltersViewModel : BaseViewModel {
         CheckSearchSetCommand = RelayCommand.Create(CheckSearchSet, CanSave);
 
         SelectedFilter = Filters.FirstOrDefault();
+        SelectedFilter?.InitializeFilter();
+
+        PropertyChanged += OnSelectedFilterChanged;
     }
 
     public string ErrorText {
@@ -75,8 +78,6 @@ internal class FiltersViewModel : BaseViewModel {
     public ICommand CreateCommand { get; }
     public ICommand DeleteCommand { get; }
     public ICommand RenameCommand { get; }
-    public ICommand SelectedFilterChangedCommand { get; }
-
     public ICommand SaveCommand { get; }
     public ICommand SaveAsCommand { get; }
     public ICommand LoadCommand { get; }
@@ -100,6 +101,12 @@ internal class FiltersViewModel : BaseViewModel {
         return Filters.Select(item => item.GetFilter());
     }
 
+    private void OnSelectedFilterChanged(object sender, PropertyChangedEventArgs e) {
+        if(e.PropertyName == nameof(SelectedFilter)) {
+            SelectedFilter?.InitializeFilter();
+        }
+    }
+
     private void InitializeFilters() {
         Filters = new ObservableCollection<FilterViewModel>(InitializeFilters(_config));
     }
@@ -110,15 +117,6 @@ internal class FiltersViewModel : BaseViewModel {
             filter.Set.SetRevitRepository(_revitRepository);
             yield return new FilterViewModel(_revitRepository, filter);
         }
-    }
-
-    private void SelectedFilterChanged() {
-        // TODO
-        SelectedFilter?.InitializeFilter();
-    }
-
-    private bool CanSelectedFilterChanged() {
-        return SelectedFilter != null;
     }
 
     private void Create(Window p) {
@@ -163,7 +161,7 @@ internal class FiltersViewModel : BaseViewModel {
     }
 
     private bool CanRename(Window p) {
-        return SelectedFilter != null;
+        return p is not null && SelectedFilter is not null;
     }
 
     private void Save() {

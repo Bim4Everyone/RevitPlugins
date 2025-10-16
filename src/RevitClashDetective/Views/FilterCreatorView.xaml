@@ -36,7 +36,8 @@
         </ResourceDictionary>
     </core:WpfUIPlatformWindow.Resources>
 
-    <Grid Margin="8 0">
+    <Grid
+        Margin="8 0">
         <Grid.RowDefinitions>
             <RowDefinition
                 Height="Auto" />
@@ -109,13 +110,13 @@
                     <ui:Button
                         ToolTip="{me:LocalizationSource FilterCreation.AddSearchSet}"
                         Command="{Binding CreateCommand}"
-                        CommandParameter="{Binding ElementName=ViewFilterCreator}"
+                        CommandParameter="{Binding RelativeSource={RelativeSource AncestorType=Window}}"
                         Content="{ui:SymbolIcon Symbol=Add20}" />
                     <ui:Button
                         Margin="4 0"
                         ToolTip="{me:LocalizationSource FilterCreation.RenameSearchSet}"
                         Command="{Binding RenameCommand}"
-                        CommandParameter="{Binding ElementName=ViewFilterCreator}"
+                        CommandParameter="{Binding RelativeSource={RelativeSource AncestorType=Window}}"
                         Content="{ui:SymbolIcon Symbol=Rename20}" />
                     <ui:Button
                         Appearance="Danger"
@@ -127,15 +128,7 @@
                     Margin="0 4 0 0"
                     DisplayMemberPath="Name"
                     ItemsSource="{Binding Filters}"
-                    SelectedItem="{Binding SelectedFilter, UpdateSourceTrigger=PropertyChanged}">
-                    <i:Interaction.Triggers>
-                        <i:EventTrigger
-                            EventName="SelectionChanged">
-                            <i:InvokeCommandAction
-                                Command="{Binding SelectedFilterChangedCommand}" />
-                        </i:EventTrigger>
-                    </i:Interaction.Triggers>
-                </ui:ListView>
+                    SelectedItem="{Binding SelectedFilter, UpdateSourceTrigger=PropertyChanged}" />
             </DockPanel>
         </Border>
 

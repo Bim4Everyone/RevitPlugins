@@ -10,9 +10,9 @@
     xmlns:me="clr-namespace:dosymep.WpfCore.MarkupExtensions;assembly=dosymep.WpfCore"
     mc:Ignorable="d"
     MinHeight="150"
-    MinWidth="550"
+    MinWidth="560"
     MaxHeight="150"
-    MaxWidth="550"
+    MaxWidth="560"
     WindowStartupLocation="CenterOwner"
     ResizeMode="NoResize"
     d:DataContext="{d:DesignInstance vm:FilterNameViewModel, IsDesignTimeCreatable=False}">
