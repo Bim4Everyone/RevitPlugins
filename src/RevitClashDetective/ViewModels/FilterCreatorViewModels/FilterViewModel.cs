@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.ComponentModel;
 using System.Linq;
 using System.Windows.Data;
 using System.Windows.Threading;
@@ -38,6 +39,8 @@ internal class FilterViewModel : BaseViewModel, IEquatable<FilterViewModel>, INa
 
         InitializeCategories();
         InitializeSet();
+
+        PropertyChanged += CategoriesFilterPropertyChanged;
     }
 
     public FilterViewModel(RevitRepository revitRepository, Filter filter) {
@@ -50,6 +53,8 @@ internal class FilterViewModel : BaseViewModel, IEquatable<FilterViewModel>, INa
 
         InitializeCategories(_filter.CategoryIds);
         InitializeSet(_filter.Set);
+
+        PropertyChanged += CategoriesFilterPropertyChanged;
     }
 
     public bool AllCategoriesSelected {
@@ -66,18 +71,12 @@ internal class FilterViewModel : BaseViewModel, IEquatable<FilterViewModel>, INa
 
     public string CategoriesFilter {
         get => _categoriesFilter;
-        set {
-            RaiseAndSetIfChanged(ref _categoriesFilter, value);
-            Categories.View.Refresh();
-        }
+        set => RaiseAndSetIfChanged(ref _categoriesFilter, value);
     }
 
     public bool HideUnselectedCategories {
         get => _hideUnselectedCategories;
-        set {
-            RaiseAndSetIfChanged(ref _hideUnselectedCategories, value);
-            Categories.View.Refresh();
-        }
+        set => RaiseAndSetIfChanged(ref _hideUnselectedCategories, value);
     }
 
     public string Name {
@@ -134,6 +133,13 @@ internal class FilterViewModel : BaseViewModel, IEquatable<FilterViewModel>, INa
 
     private IEnumerable<CategoryViewModel> GetSelectedCategories() {
         return AllCategories?.Where(item => item.IsSelected) ?? [];
+    }
+
+    private void CategoriesFilterPropertyChanged(object sender, PropertyChangedEventArgs e) {
+        if(e.PropertyName == nameof(CategoriesFilter)
+            || e.PropertyName == nameof(HideUnselectedCategories)) {
+            Categories?.View.Refresh();
+        }
     }
 
     private void InitializeSet(Set set = null) {
