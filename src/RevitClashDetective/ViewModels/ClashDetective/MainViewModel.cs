@@ -1,7 +1,9 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.ComponentModel;
 using System.Linq;
+using System.Windows.Data;
 using System.Windows.Input;
 using System.Windows.Threading;
 
@@ -25,8 +27,10 @@ internal class MainViewModel : BaseViewModel {
     private readonly SettingsConfig _settingsConfig;
     private bool _canCancel = true;
     private string _messageText;
-    private ObservableCollection<CheckViewModel> _checks;
+    private ObservableCollection<CheckViewModel> _allChecks;
     private CheckViewModel _selectedCheck;
+    private CollectionViewSource _checks;
+    private string _checksFilter;
 
     public MainViewModel(
         RevitRepository revitRepository,
@@ -59,6 +63,8 @@ internal class MainViewModel : BaseViewModel {
         SaveClashesCommand = RelayCommand.Create(SaveConfig);
         SaveAsClashesCommand = RelayCommand.Create(SaveAsConfig);
         LoadClashCommand = RelayCommand.Create(LoadConfig);
+
+        PropertyChanged += ChecksFilterPropertyChanged;
     }
 
     public bool CanCancel {
@@ -69,6 +75,11 @@ internal class MainViewModel : BaseViewModel {
     public string ErrorText {
         get => _errorText;
         set => RaiseAndSetIfChanged(ref _errorText, value);
+    }
+
+    public string ChecksFilter {
+        get => _checksFilter;
+        set => RaiseAndSetIfChanged(ref _checksFilter, value);
     }
 
     public string MessageText {
@@ -92,13 +103,19 @@ internal class MainViewModel : BaseViewModel {
     public IMessageBoxService MessageBoxService { get; }
 
 
-    public ObservableCollection<CheckViewModel> Checks {
+    public CollectionViewSource Checks {
         get => _checks;
-        set => RaiseAndSetIfChanged(ref _checks, value);
+        private set => RaiseAndSetIfChanged(ref _checks, value);
+    }
+
+    private ObservableCollection<CheckViewModel> AllChecks {
+        get => _allChecks;
+        set => RaiseAndSetIfChanged(ref _allChecks, value);
     }
 
     private void InitializeChecks() {
-        Checks = new ObservableCollection<CheckViewModel>(InitializeChecks(_checksConfig).OrderBy(c => c.Name));
+        AllChecks = new ObservableCollection<CheckViewModel>(InitializeChecks(_checksConfig).OrderBy(c => c.Name));
+        SetChecks(AllChecks);
     }
 
     private IEnumerable<CheckViewModel> InitializeChecks(ChecksConfig config) {
@@ -114,8 +131,14 @@ internal class MainViewModel : BaseViewModel {
         }
     }
 
+    private void ChecksFilterPropertyChanged(object sender, PropertyChangedEventArgs e) {
+        if(e.PropertyName == nameof(ChecksFilter)) {
+            Checks?.View.Refresh();
+        }
+    }
+
     private void InitializeEmptyCheck() {
-        Checks = [
+        AllChecks = [
             new CheckViewModel(_revitRepository,
             _localizationService,
             OpenFileDialogService,
@@ -124,10 +147,33 @@ internal class MainViewModel : BaseViewModel {
             _settingsConfig,
             _filtersConfig)
         ];
+        SetChecks(AllChecks);
+    }
+
+
+
+    private void SetChecks(ICollection<CheckViewModel> sourceChecks) {
+        Checks = new CollectionViewSource() { Source = sourceChecks };
+        Checks.Filter += ChecksFilterHandler;
+        Checks.SortDescriptions.Add(new System.ComponentModel.SortDescription(
+            nameof(CheckViewModel.Name),
+            System.ComponentModel.ListSortDirection.Ascending));
+        Checks.IsLiveSortingRequested = true;
+    }
+
+    private void ChecksFilterHandler(object sender, FilterEventArgs e) {
+        if(e.Item is CheckViewModel check && !string.IsNullOrWhiteSpace(ChecksFilter)) {
+            string str = ChecksFilter.ToLower();
+            e.Accepted = check.Name.ToLower().Contains(str)
+                || check.FirstSelection.Files.Any(f => f.Name.ToLower().Contains(str))
+                || check.FirstSelection.Providers.Any(p => p.Name.ToLower().Contains(str))
+                || check.SecondSelection.Files.Any(f => f.Name.ToLower().Contains(str))
+                || check.SecondSelection.Providers.Any(p => p.Name.ToLower().Contains(str));
+        }
     }
 
     private void AddCheck() {
-        Checks.Add(new CheckViewModel(_revitRepository,
+        AllChecks.Add(new CheckViewModel(_revitRepository,
             _localizationService,
             OpenFileDialogService,
             SaveFileDialogService,
@@ -137,11 +183,11 @@ internal class MainViewModel : BaseViewModel {
     }
 
     private void RemoveCheck(CheckViewModel p) {
-        Checks.Remove(p);
+        AllChecks.Remove(p);
     }
 
     private bool CanRemove(CheckViewModel p) {
-        return Checks?.Count > 0 && p is not null;
+        return AllChecks?.Count > 0 && p is not null;
     }
 
     private void FindClashes() {
@@ -149,14 +195,14 @@ internal class MainViewModel : BaseViewModel {
         RenewConfig();
         _checksConfig.SaveProjectConfig();
 
-        foreach(var check in Checks.Where(item => item.IsSelected)) {
+        foreach(var check in AllChecks.Where(item => item.IsSelected)) {
             check.SaveClashes();
         }
 
         CanCancel = true;
         MessageText = "Проверка на коллизии прошла успешно";
         Wait(() => {
-            foreach(var check in Checks) {
+            foreach(var check in AllChecks) {
                 check.IsSelected = false;
             }
             MessageText = null;
@@ -166,7 +212,7 @@ internal class MainViewModel : BaseViewModel {
 
     private void RenewConfig() {
         _checksConfig.Checks = [];
-        foreach(var check in Checks) {
+        foreach(var check in AllChecks) {
             _checksConfig.Checks.Add(new Check() {
                 Name = check.Name,
                 FirstSelection = check.FirstSelection.GetCheckSettings(),
@@ -198,14 +244,14 @@ internal class MainViewModel : BaseViewModel {
         cl.CheckConfig(config);
 
         var newChecks = InitializeChecks(config).ToList();
-        var nameResolver = new NameResolver<CheckViewModel>(Checks, newChecks);
-        Checks = new ObservableCollection<CheckViewModel>(nameResolver.GetCollection().OrderBy(c => c.Name));
+        var nameResolver = new NameResolver<CheckViewModel>(AllChecks, newChecks);
+        AllChecks = new ObservableCollection<CheckViewModel>(nameResolver.GetCollection().OrderBy(c => c.Name));
         MessageText = "Файл проверок успешно загружен";
         Wait(() => { MessageText = null; });
     }
 
     private bool HasSameNames() {
-        return Checks.Select(item => item.Name)
+        return AllChecks.Select(item => item.Name)
             .GroupBy(item => item)
             .Any(item => item.Count() > 1);
     }
@@ -215,18 +261,18 @@ internal class MainViewModel : BaseViewModel {
             ErrorText = $"У проверок должны быть разные имена.";
             return false;
         }
-        var emptyCheck = Checks.FirstOrDefault(item => !item.IsFilterSelected);
+        var emptyCheck = AllChecks.FirstOrDefault(item => !item.IsFilterSelected);
         if(emptyCheck != null) {
             ErrorText = $"У проверки \"{emptyCheck.Name}\" необходимо выбрать хотя бы один поисковый набор.";
             return false;
         }
 
-        emptyCheck = Checks.FirstOrDefault(item => !item.IsFilesSelected);
+        emptyCheck = AllChecks.FirstOrDefault(item => !item.IsFilesSelected);
         if(emptyCheck != null) {
             ErrorText = $"У проверки \"{emptyCheck.Name}\" необходимо выбрать хотя бы один файл.";
             return false;
         }
-        if(Checks.All(item => !item.IsSelected)) {
+        if(AllChecks.All(item => !item.IsSelected)) {
             ErrorText = $"Для поиска коллизий должна быть выбрана хотя бы одна проверка.";
             return false;
         }

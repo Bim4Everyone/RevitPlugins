@@ -33,15 +33,6 @@
                 <ResourceDictionary
                     Source="../Resources/CustomStyles.xaml" />
             </ResourceDictionary.MergedDictionaries>
-            <CollectionViewSource
-                x:Key="SortedChecks"
-                Source="{Binding Checks}">
-                <CollectionViewSource.SortDescriptions>
-                    <cm:SortDescription
-                        PropertyName="Name"
-                        Direction="Ascending" />
-                </CollectionViewSource.SortDescriptions>
-            </CollectionViewSource>
             <ui:TextBlock
                 x:Key="NameLabel"
                 Text="{me:LocalizationSource MainWindow.NameLabel}" />
@@ -120,6 +111,7 @@
                     MinWidth="300"
                     MaxWidth="300"
                     HorizontalAlignment="Right"
+                    Text="{Binding ChecksFilter, UpdateSourceTrigger=PropertyChanged}"
                     PlaceholderText="{me:LocalizationSource MainWindow.CheckSearch}" />
                 <ui:DataGrid
                     SelectionMode="Single"
@@ -128,7 +120,7 @@
                     CanUserReorderColumns="False"
                     CanUserResizeColumns="False"
                     SelectedItem="{Binding SelectedCheck}"
-                    ItemsSource="{Binding Source={StaticResource SortedChecks}}">
+                    ItemsSource="{Binding Checks.View, UpdateSourceTrigger=PropertyChanged}">
 
                     <ui:DataGrid.Columns>
                         <DataGridCheckBoxColumn
