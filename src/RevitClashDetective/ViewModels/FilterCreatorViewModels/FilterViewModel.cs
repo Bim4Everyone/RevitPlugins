@@ -30,29 +30,16 @@ internal class FilterViewModel : BaseViewModel, IEquatable<FilterViewModel>, INa
     private string _categoriesFilter;
 
 
-    public FilterViewModel(RevitRepository revitRepository) {
-        _id = Guid.NewGuid().ToString();
-        _revitRepository = revitRepository;
-        Name = "Без имени";
-
-        _delay = new Delay(250, SelectedCategoriesChanged);
-
-        InitializeCategories();
-        InitializeSet();
-
-        PropertyChanged += CategoriesFilterPropertyChanged;
-    }
-
-    public FilterViewModel(RevitRepository revitRepository, Filter filter) {
+    public FilterViewModel(RevitRepository revitRepository, Filter filter = null) {
         _id = Guid.NewGuid().ToString();
         _revitRepository = revitRepository;
         _filter = filter;
-        Name = _filter.Name;
+        Name = _filter?.Name;
 
         _delay = new Delay(250, SelectedCategoriesChanged);
 
-        InitializeCategories(_filter.CategoryIds);
-        InitializeSet(_filter.Set);
+        InitializeCategories(_filter?.CategoryIds);
+        InitializeSet(_filter?.Set);
 
         PropertyChanged += CategoriesFilterPropertyChanged;
     }
