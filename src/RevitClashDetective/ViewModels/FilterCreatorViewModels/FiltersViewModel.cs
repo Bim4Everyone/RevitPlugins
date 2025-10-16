@@ -201,7 +201,7 @@ internal class FiltersViewModel : BaseViewModel {
 
         string errorSetText = Filters.FirstOrDefault(s => !string.IsNullOrWhiteSpace(s.Set.GetErrorText()))
             ?.Set.GetErrorText();
-        if(string.IsNullOrWhiteSpace(errorSetText)) {
+        if(!string.IsNullOrWhiteSpace(errorSetText)) {
             ErrorText = errorSetText;
             return false;
         }
