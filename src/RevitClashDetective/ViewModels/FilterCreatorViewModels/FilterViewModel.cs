@@ -94,7 +94,7 @@ internal class FilterViewModel : BaseViewModel, IEquatable<FilterViewModel>, INa
 
     public CollectionViewSource Categories {
         get => _categories;
-        set => RaiseAndSetIfChanged(ref _categories, value);
+        private set => RaiseAndSetIfChanged(ref _categories, value);
     }
 
     public ObservableCollection<CategoryViewModel> AllCategories {
@@ -153,7 +153,7 @@ internal class FilterViewModel : BaseViewModel, IEquatable<FilterViewModel>, INa
         }
 
         foreach(var category in AllCategories) {
-            category.PropertyChanged += Category_PropertyChanged;
+            category.PropertyChanged += CategoryPropertyChanged;
         }
 
         _categoriesInfoViewModel = new CategoriesInfoViewModel(_revitRepository, GetSelectedCategories());
@@ -184,7 +184,7 @@ internal class FilterViewModel : BaseViewModel, IEquatable<FilterViewModel>, INa
             .ToList();
     }
 
-    private void Category_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e) {
+    private void CategoryPropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e) {
         if(e.PropertyName.Equals(nameof(CategoryViewModel.IsSelected))) {
             _delay.Action();
         }
