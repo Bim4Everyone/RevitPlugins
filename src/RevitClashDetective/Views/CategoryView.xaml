@@ -50,7 +50,6 @@
                     CanUserDeleteRows="False"
                     CanUserResizeColumns="False"
                     CanUserReorderColumns="False"
-                    CanUserResizeRows="True"
                     ItemsSource="{Binding Categories.View, UpdateSourceTrigger=PropertyChanged}">
                     <ui:DataGrid.Columns>
                         <DataGridCheckBoxColumn
