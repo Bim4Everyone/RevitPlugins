@@ -97,9 +97,9 @@ internal class FilterViewModel : BaseViewModel, IEquatable<FilterViewModel>, INa
         set => RaiseAndSetIfChanged(ref _categories, value);
     }
 
-    private ObservableCollection<CategoryViewModel> AllCategories {
+    public ObservableCollection<CategoryViewModel> AllCategories {
         get => _allCategories;
-        set => RaiseAndSetIfChanged(ref _allCategories, value);
+        private set => RaiseAndSetIfChanged(ref _allCategories, value);
     }
 
     public void InitializeFilter() {

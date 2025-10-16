@@ -187,17 +187,26 @@ internal class FiltersViewModel : BaseViewModel {
     }
 
     private bool CanSave() {
-        if(SelectedFilter == null || !SelectedFilter.IsInitialized) {
+        var emptyCategoryFilter = Filters.FirstOrDefault(f => f.AllCategories.All(c => !c.IsSelected));
+        if(emptyCategoryFilter is not null) {
+            ErrorText = $"Выберите категории в поисковом наборе \"{emptyCategoryFilter.Name}\".";
             return false;
         }
 
-        if(Filters.Any(item => item.Set.IsEmpty())) {
-            ErrorText = $"Все поля в поисковом наборе \"{Filters.FirstOrDefault(item => item.Set.IsEmpty())?.Name}\" должны быть заполнены.";
+        var emptyFilter = Filters.FirstOrDefault(f => f.Set.IsEmpty());
+        if(emptyFilter is not null) {
+            ErrorText = $"Все поля в поисковом наборе \"{emptyFilter.Name}\" должны быть заполнены.";
             return false;
         }
 
-        ErrorText = Filters.FirstOrDefault(item => item.Set.GetErrorText() != null)?.Set?.GetErrorText();
-        return string.IsNullOrEmpty(ErrorText);
+        string errorSetText = Filters.FirstOrDefault(s => !string.IsNullOrWhiteSpace(s.Set.GetErrorText()))
+            ?.Set.GetErrorText();
+        if(string.IsNullOrWhiteSpace(errorSetText)) {
+            ErrorText = errorSetText;
+            return false;
+        }
+        ErrorText = null;
+        return true;
     }
 
     private void Load() {
