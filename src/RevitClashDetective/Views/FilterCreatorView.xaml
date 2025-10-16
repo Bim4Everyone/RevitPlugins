@@ -13,10 +13,10 @@
     xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
     xmlns:wpfbehaviors="clr-namespace:dosymep.WpfCore.Behaviors;assembly=dosymep.WpfCore"
     mc:Ignorable="d"
-    Height="450"
+    Height="600"
     Width="1000"
-    MinHeight="300"
-    MinWidth="500"
+    MinHeight="500"
+    MinWidth="850"
     d:DataContext="{d:DesignInstance vm:FiltersViewModel, IsDesignTimeCreatable=False}">
 
     <i:Interaction.Behaviors>
