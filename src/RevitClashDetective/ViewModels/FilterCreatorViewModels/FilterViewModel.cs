@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
-using System.Windows.Input;
+using System.Windows.Data;
 using System.Windows.Threading;
 
 using Autodesk.Revit.DB;
@@ -22,8 +22,11 @@ internal class FilterViewModel : BaseViewModel, IEquatable<FilterViewModel>, INa
     private string _name;
     private SetViewModel _set;
     private CategoriesInfoViewModel _categoriesInfoViewModel;
-    private ObservableCollection<CategoryViewModel> _categories;
-    private bool? _isAllCategoriesSelected;
+    private ObservableCollection<CategoryViewModel> _allCategories;
+    private bool _allCategoriesSelected;
+    private bool _hideUnselectedCategories;
+    private CollectionViewSource _categories;
+    private string _categoriesFilter;
 
 
     public FilterViewModel(RevitRepository revitRepository) {
@@ -49,37 +52,57 @@ internal class FilterViewModel : BaseViewModel, IEquatable<FilterViewModel>, INa
         InitializeSet(_filter.Set);
     }
 
+    public bool AllCategoriesSelected {
+        get => _allCategoriesSelected;
+        set {
+            if(_allCategoriesSelected != value) {
+                RaiseAndSetIfChanged(ref _allCategoriesSelected, value);
+                foreach(var category in AllCategories) {
+                    category.IsSelected = value;
+                }
+            }
+        }
+    }
+
+    public string CategoriesFilter {
+        get => _categoriesFilter;
+        set {
+            RaiseAndSetIfChanged(ref _categoriesFilter, value);
+            Categories.View.Refresh();
+        }
+    }
+
+    public bool HideUnselectedCategories {
+        get => _hideUnselectedCategories;
+        set {
+            RaiseAndSetIfChanged(ref _hideUnselectedCategories, value);
+            Categories.View.Refresh();
+        }
+    }
+
     public string Name {
         get => _name;
         set => RaiseAndSetIfChanged(ref _name, value);
     }
 
-    public bool? IsAllCategoriesSelected {
-        get => _isAllCategoriesSelected;
-        set => RaiseAndSetIfChanged(ref _isAllCategoriesSelected, value);
-    }
-
     public bool IsInitialized { get; set; }
-    public bool IsSelectedFilterChanged { get; set; }
-
-    public ICommand SelectedCategoriesChangedCommand { get; }
 
     public SetViewModel Set {
         get => _set;
         set => RaiseAndSetIfChanged(ref _set, value);
     }
 
-    public ObservableCollection<CategoryViewModel> Categories {
+    public CollectionViewSource Categories {
         get => _categories;
         set => RaiseAndSetIfChanged(ref _categories, value);
     }
 
-    public IEnumerable<CategoryViewModel> SelectedCategories => Categories?.Where(item => item.IsSelected) ?? Enumerable.Empty<CategoryViewModel>();
-
-    public ObservableCollection<object> VisibleItems { get; set; }
+    private ObservableCollection<CategoryViewModel> AllCategories {
+        get => _allCategories;
+        set => RaiseAndSetIfChanged(ref _allCategories, value);
+    }
 
     public void InitializeFilter() {
-        IsSelectedFilterChanged = true;
         if(_filter == null || IsInitialized) {
             return;
         }
@@ -88,25 +111,67 @@ internal class FilterViewModel : BaseViewModel, IEquatable<FilterViewModel>, INa
         IsInitialized = true;
     }
 
+    public override bool Equals(object obj) {
+        return Equals(obj as FilterViewModel);
+    }
+
+    public override int GetHashCode() {
+        return 539060726 + EqualityComparer<string>.Default.GetHashCode(_id);
+    }
+
+    public bool Equals(FilterViewModel other) {
+        if(other is null) { return false; }
+        return ReferenceEquals(this, other) || _id == other._id;
+    }
+
+    public Filter GetFilter() {
+        return new Filter(_revitRepository) {
+            Name = Name,
+            Set = (Set) Set.GetCriterion(),
+            CategoryIds = GetSelectedCategories().Select(item => item.Category.Id).ToList()
+        };
+    }
+
+    private IEnumerable<CategoryViewModel> GetSelectedCategories() {
+        return AllCategories?.Where(item => item.IsSelected) ?? [];
+    }
+
     private void InitializeSet(Set set = null) {
         Set = new SetViewModel(_revitRepository, _categoriesInfoViewModel, set);
     }
 
     private void InitializeCategories(IEnumerable<ElementId> categoryIds = null) {
-        Categories = new ObservableCollection<CategoryViewModel>(GetCategoriesViewModels(_revitRepository));
+        AllCategories = new ObservableCollection<CategoryViewModel>(GetCategoriesViewModels(_revitRepository));
+        Categories = new CollectionViewSource() { Source = AllCategories };
+        Categories.Filter += CategoriesFilterHandler;
 
         if(categoryIds != null) {
-            foreach(var category in Categories
+            foreach(var category in AllCategories
                 .Where(item => categoryIds.Any(id => id == item.Category.Id))) {
                 category.IsSelected = true;
             }
         }
 
-        foreach(var category in Categories) {
+        foreach(var category in AllCategories) {
             category.PropertyChanged += Category_PropertyChanged;
         }
 
-        _categoriesInfoViewModel = new CategoriesInfoViewModel(_revitRepository, SelectedCategories);
+        _categoriesInfoViewModel = new CategoriesInfoViewModel(_revitRepository, GetSelectedCategories());
+    }
+
+    private void CategoriesFilterHandler(object sender, FilterEventArgs e) {
+        if(e.Item is CategoryViewModel category) {
+            if(HideUnselectedCategories && !category.IsSelected) {
+                e.Accepted = false;
+                return;
+            }
+            if(!string.IsNullOrWhiteSpace(CategoriesFilter)) {
+                string str = CategoriesFilter.ToLower();
+                e.Accepted = category.Name.ToLower().Contains(str);
+                return;
+            }
+            e.Accepted = true;
+        }
     }
 
     private ICollection<CategoryViewModel> GetCategoriesViewModels(RevitRepository revitRepository) {
@@ -125,31 +190,10 @@ internal class FilterViewModel : BaseViewModel, IEquatable<FilterViewModel>, INa
         }
     }
 
-    public Filter GetFilter() {
-        return new Filter(_revitRepository) {
-            Name = Name,
-            Set = (Set) Set.GetCriterion(),
-            CategoryIds = SelectedCategories.Select(item => item.Category.Id).ToList()
-        };
-    }
-
     private void SelectedCategoriesChanged() {
-        _categoriesInfoViewModel.Categories = new ObservableCollection<CategoryViewModel>(SelectedCategories);
+        _categoriesInfoViewModel.Categories = new ObservableCollection<CategoryViewModel>(GetSelectedCategories());
         _categoriesInfoViewModel.InitializeParameters();
         Set.Renew();
-    }
-
-    public override bool Equals(object obj) {
-        return Equals(obj as FilterViewModel);
-    }
-
-    public override int GetHashCode() {
-        return 539060726 + EqualityComparer<string>.Default.GetHashCode(_id);
-    }
-
-    public bool Equals(FilterViewModel other) {
-        if(other is null) { return false; }
-        return ReferenceEquals(this, other) || _id == other._id;
     }
 }
 
@@ -163,10 +207,10 @@ internal class Delay {
         _timer = new DispatcherTimer {
             Interval = new TimeSpan(0, 0, 0, 0, interval)
         };
-        _timer.Tick += _timer_Tick;
+        _timer.Tick += OnTimerTick;
     }
 
-    private void _timer_Tick(object sender, EventArgs e) {
+    private void OnTimerTick(object sender, EventArgs e) {
         _timer.Stop();
         _action();
     }

@@ -36,8 +36,7 @@
         </ResourceDictionary>
     </core:WpfUIPlatformWindow.Resources>
 
-    <Grid
-        Margin="10">
+    <Grid Margin="8 0">
         <Grid.RowDefinitions>
             <RowDefinition
                 Height="Auto" />
@@ -56,7 +55,7 @@
             <ColumnDefinition
                 Width="Auto" />
             <ColumnDefinition
-                Width="1.5*"
+                Width="2*"
                 MinWidth="200" />
             <ColumnDefinition
                 Width="Auto" />
@@ -75,20 +74,19 @@
             Grid.Row="1"
             Grid.Column="0"
             Grid.ColumnSpan="5"
+            Margin="0 0 0 8"
             Style="{StaticResource CustomBorder}">
             <DockPanel>
                 <ui:Button
-                    Margin="0 0 10 0"
                     ToolTip="{me:LocalizationSource FilterCreation.Load}"
                     Command="{Binding LoadCommand}"
                     Content="{ui:SymbolIcon Symbol=ArrowDownload20}" />
                 <ui:Button
-                    Margin="0 0 10 0"
+                    Margin="8 0"
                     ToolTip="{me:LocalizationSource FilterCreation.Save}"
                     Command="{Binding SaveCommand}"
                     Content="{ui:SymbolIcon Symbol=Save20}" />
                 <ui:Button
-                    Margin="0 0 10 0"
                     ToolTip="{me:LocalizationSource FilterCreation.SaveAs}"
                     Command="{Binding SaveAsCommand}"
                     Content="{ui:SymbolIcon Symbol=SaveEdit20}" />
@@ -104,27 +102,29 @@
                 <DockPanel
                     DockPanel.Dock="Top">
                     <Label
+                        DockPanel.Dock="Top"
+                        Margin="0 0 0 4"
                         VerticalAlignment="Center"
                         Content="{me:LocalizationSource FilterCreation.SearchSets}" />
                     <ui:Button
-                        Margin="5 0"
                         ToolTip="{me:LocalizationSource FilterCreation.AddSearchSet}"
                         Command="{Binding CreateCommand}"
                         CommandParameter="{Binding ElementName=ViewFilterCreator}"
                         Content="{ui:SymbolIcon Symbol=Add20}" />
                     <ui:Button
+                        Margin="4 0"
                         ToolTip="{me:LocalizationSource FilterCreation.RenameSearchSet}"
                         Command="{Binding RenameCommand}"
                         CommandParameter="{Binding ElementName=ViewFilterCreator}"
                         Content="{ui:SymbolIcon Symbol=Rename20}" />
                     <ui:Button
-                        Margin="5 0 0 0"
                         Appearance="Danger"
                         ToolTip="{me:LocalizationSource FilterCreation.DeleteSearchSet}"
                         Command="{Binding DeleteCommand}"
                         Content="{ui:SymbolIcon Symbol=Delete20}" />
                 </DockPanel>
                 <ui:ListView
+                    Margin="0 4 0 0"
                     DisplayMemberPath="Name"
                     ItemsSource="{Binding Filters}"
                     SelectedItem="{Binding SelectedFilter, UpdateSourceTrigger=PropertyChanged}">
@@ -187,20 +187,21 @@
             Orientation="Horizontal"
             HorizontalAlignment="Right">
             <ui:TextBlock
-                Margin="10"
+                Margin="8"
                 Text="{Binding ErrorText}"
                 Style="{StaticResource CustomErrorText}" />
             <ui:TextBlock
-                Margin="10"
+                Margin="8"
                 Text="{Binding MessageText}"
                 Style="{StaticResource CustomMessageText}" />
             <ui:Button
+                Margin="8"
                 Click="ButtonOk_Click"
                 ToolTip="{me:LocalizationSource FilterCreation.CheckSetButtonTooltip}"
                 Content="{me:LocalizationSource FilterCreation.CheckSetButton}"
                 Command="{Binding CheckSearchSetCommand}" />
             <ui:Button
-                Margin="10"
+                Margin="8"
                 Width="80"
                 Appearance="Info"
                 IsDefault="True"
@@ -208,7 +209,7 @@
                 Content="{me:LocalizationSource Ok}"
                 Command="{Binding SaveCommand}" />
             <ui:Button
-                Margin="10"
+                Margin="8 8 0 8"
                 Width="80"
                 IsCancel="true"
                 Click="ButtonCancel_Click"

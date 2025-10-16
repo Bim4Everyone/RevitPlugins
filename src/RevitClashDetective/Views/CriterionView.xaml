@@ -43,6 +43,9 @@
                 <Setter
                     Property="Margin"
                     Value="2" />
+                <Setter
+                    Property="CornerRadius"
+                    Value="{DynamicResource ControlCornerRadius}" />
                 <Style.Triggers>
                     <DataTrigger
                         Binding="{Binding SelectedEvaluator.SetEvaluator.Evaluator}"

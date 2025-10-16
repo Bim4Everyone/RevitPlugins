@@ -32,6 +32,8 @@
 
             <ui:ToggleSwitch
                 Grid.Row="1"
+                Margin="0 0 0 5"
+                IsChecked="{Binding HideUnselectedCategories, UpdateSourceTrigger=PropertyChanged}"
                 Content="{me:LocalizationSource FilterCreation.HideUncheckedCategories}">
             </ui:ToggleSwitch>
 
@@ -40,6 +42,7 @@
                 LastChildFill="True">
                 <ui:TextBox
                     DockPanel.Dock="Top"
+                    Text="{Binding CategoriesFilter, UpdateSourceTrigger=PropertyChanged}"
                     PlaceholderText="{me:LocalizationSource FilterCreation.CategoriesSearch}" />
                 <ui:DataGrid
                     SelectionMode="Single"
@@ -48,14 +51,15 @@
                     CanUserResizeColumns="False"
                     CanUserReorderColumns="False"
                     CanUserResizeRows="True"
-                    ItemsSource="{Binding Categories, UpdateSourceTrigger=PropertyChanged}">
+                    ItemsSource="{Binding Categories.View, UpdateSourceTrigger=PropertyChanged}">
                     <ui:DataGrid.Columns>
                         <DataGridCheckBoxColumn
-                            Binding="{Binding IsSelected, UpdateSourceTrigger=PropertyChanged}"
                             Width="Auto"
-                            CanUserSort="False">
+                            CanUserSort="False"
+                            Binding="{Binding IsSelected, UpdateSourceTrigger=PropertyChanged}">
                             <DataGridCheckBoxColumn.Header>
-                                <CheckBox />
+                                <CheckBox
+                                    IsChecked="{Binding DataContext.AllCategoriesSelected, RelativeSource={RelativeSource AncestorType=ui:DataGrid}, UpdateSourceTrigger=PropertyChanged}" />
                             </DataGridCheckBoxColumn.Header>
                         </DataGridCheckBoxColumn>
                         <DataGridTextColumn
