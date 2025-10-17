@@ -24,10 +24,10 @@ internal class SelectionViewModel : BaseViewModel {
     private readonly ILocalizationService _localizationService;
     private readonly IContentDialogService _contentDialogService;
     private readonly SelectionConfig _selectionConfig;
-    private ObservableCollection<FileViewModel> _allFiles;
-    private ObservableCollection<FileViewModel> _selectedFiles;
-    private ObservableCollection<FilterProviderViewModel> _allProviders;
-    private ObservableCollection<FilterProviderViewModel> _selectedProviders;
+    private ObservableCollection<FileViewModel> _allFiles = [];
+    private ObservableCollection<FileViewModel> _selectedFiles = [];
+    private ObservableCollection<FilterProviderViewModel> _allProviders = [];
+    private ObservableCollection<FilterProviderViewModel> _selectedProviders = [];
 
     public SelectionViewModel(RevitRepository revitRepository,
         FiltersConfig filterConfig,
