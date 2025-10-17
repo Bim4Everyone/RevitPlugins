@@ -150,4 +150,11 @@
         x:Key="MainWindow.SecondSelectionLabel">Выбор 2</system:String>
     <system:String
         x:Key="MainWindow.ShowClashes">Показать отчет по коллизиям</system:String>
+    
+    <system:String
+        x:Key="SelectableNamesDialog.NameHeader">Название</system:String>
+    <system:String
+        x:Key="SelectableNamesDialog.SelectFiles">Выберите файлы</system:String>
+    <system:String
+        x:Key="SelectableNamesDialog.SelectSearchSets">Выберите поисковые наборы</system:String>
 </ResourceDictionary>

@@ -32,6 +32,8 @@
             <ResourceDictionary.MergedDictionaries>
                 <ResourceDictionary
                     Source="../Resources/CustomStyles.xaml" />
+                <ResourceDictionary
+                    Source="pack://application:,,,/Wpf.Ui;component/Controls/DataGrid/DataGrid.xaml" />
             </ResourceDictionary.MergedDictionaries>
             <ui:TextBlock
                 x:Key="NameLabel"
@@ -48,8 +50,7 @@
         </ResourceDictionary>
     </core:WpfUIPlatformWindow.Resources>
 
-    <Grid
-        Margin="8 0">
+    <Grid>
         <Grid.RowDefinitions>
             <RowDefinition
                 Height="Auto" />
@@ -67,7 +68,7 @@
 
         <Border
             Grid.Row="1"
-            Margin="0 0 0 8"
+            Margin="8 0 8 8"
             Style="{StaticResource CustomBorder}">
             <DockPanel>
                 <ui:Button
@@ -103,6 +104,7 @@
 
         <Border
             Grid.Row="2"
+            Margin="8 0"
             Style="{StaticResource CustomBorder}">
             <DockPanel
                 LastChildFill="True">
@@ -119,6 +121,7 @@
                     CanUserDeleteRows="False"
                     CanUserReorderColumns="False"
                     CanUserResizeColumns="False"
+                    GridLinesVisibility="Horizontal"
                     SelectedItem="{Binding SelectedCheck}"
                     ItemsSource="{Binding Checks.View, UpdateSourceTrigger=PropertyChanged}">
 
@@ -147,7 +150,7 @@
                             Header="{StaticResource FirstSelectionLabel}">
                             <DataGridTemplateColumn.CellTemplate>
                                 <DataTemplate>
-                                    <local:ProviderComboBox
+                                    <local:SelectionView
                                         DataContext="{Binding FirstSelection, UpdateSourceTrigger=PropertyChanged}" />
                                 </DataTemplate>
                             </DataGridTemplateColumn.CellTemplate>
@@ -159,7 +162,7 @@
                             Header="{StaticResource SecondSelectionLabel}">
                             <DataGridTemplateColumn.CellTemplate>
                                 <DataTemplate>
-                                    <local:ProviderComboBox
+                                    <local:SelectionView
                                         DataContext="{Binding SecondSelection, UpdateSourceTrigger=PropertyChanged}" />
                                 </DataTemplate>
                             </DataGridTemplateColumn.CellTemplate>
@@ -184,6 +187,11 @@
             </DockPanel>
         </Border>
 
+        <ContentPresenter
+            Grid.Row="0"
+            Grid.RowSpan="4"
+            x:Name="_rootContentDialog" />
+
         <StackPanel
             Grid.Row="3"
             Orientation="Horizontal"
@@ -203,7 +211,7 @@
                 Content="{me:LocalizationSource Ok}"
                 Command="{Binding FindClashesCommand}" />
             <ui:Button
-                Margin="8 8 0 8"
+                Margin="8"
                 Width="80"
                 IsCancel="true"
                 Click="ButtonCancel_Click"

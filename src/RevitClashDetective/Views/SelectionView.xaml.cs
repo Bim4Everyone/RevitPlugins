@@ -1,13 +1,13 @@
 using dosymep.SimpleServices;
 
 namespace RevitClashDetective.Views;
-public partial class ProviderComboBox {
+public partial class SelectionView {
 
-    public ProviderComboBox() : base() {
+    public SelectionView() : base() {
         InitializeComponent();
     }
 
-    public ProviderComboBox(
+    public SelectionView(
         ILoggerService loggerService,
         ILanguageService languageService,
         ILocalizationService localizationService,

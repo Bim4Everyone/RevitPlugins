@@ -19,6 +19,8 @@ using RevitClashDetective.Models.Interfaces;
 using RevitClashDetective.ViewModels.ClashDetective;
 using RevitClashDetective.ViewModels.Services;
 
+using Wpf.Ui;
+
 namespace RevitClashDetective.ViewModels.Navigator;
 internal class ReportViewModel : BaseViewModel, INamedEntity, IEquatable<ReportViewModel> {
     private RevitRepository _revitRepository;
@@ -37,6 +39,7 @@ internal class ReportViewModel : BaseViewModel, INamedEntity, IEquatable<ReportV
     private ImaginaryFirstClashViewModel[] _imaginaryFirstClashes;
     private ImaginarySecondClashViewModel[] _imaginarySecondClashes;
     private readonly ILocalizationService _localization;
+    private readonly IContentDialogService _contentDialogService;
     private readonly SettingsConfig _settingsConfig;
 
     public ReportViewModel(RevitRepository revitRepository,
@@ -45,6 +48,7 @@ internal class ReportViewModel : BaseViewModel, INamedEntity, IEquatable<ReportV
         IOpenFileDialogService openFileDialogService,
         ISaveFileDialogService saveFileDialogService,
         IMessageBoxService messageBoxService,
+        IContentDialogService contentDialogService,
         SettingsConfig settingsConfig,
         ICollection<ClashModel> clashes = null) {
 
@@ -52,6 +56,7 @@ internal class ReportViewModel : BaseViewModel, INamedEntity, IEquatable<ReportV
         OpenFileDialogService = openFileDialogService ?? throw new ArgumentNullException(nameof(openFileDialogService));
         SaveFileDialogService = saveFileDialogService ?? throw new ArgumentNullException(nameof(saveFileDialogService));
         MessageBoxService = messageBoxService ?? throw new ArgumentNullException(nameof(messageBoxService));
+        _contentDialogService = contentDialogService ?? throw new ArgumentNullException(nameof(contentDialogService));
         _settingsConfig = settingsConfig ?? throw new ArgumentNullException(nameof(settingsConfig));
 
         Initialize(revitRepository, name);
@@ -280,6 +285,7 @@ internal class ReportViewModel : BaseViewModel, INamedEntity, IEquatable<ReportV
             MessageBoxService,
             _settingsConfig,
             filters,
+            _contentDialogService,
             c))
             .FirstOrDefault(c => c.ReportName.Equals(Name));
     }

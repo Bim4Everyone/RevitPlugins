@@ -2,6 +2,8 @@ using System.Windows;
 
 using dosymep.SimpleServices;
 
+using Wpf.Ui;
+
 namespace RevitClashDetective.Views;
 public partial class MainWindow {
     public MainWindow(
@@ -10,12 +12,14 @@ public partial class MainWindow {
     ILanguageService languageService,
     ILocalizationService localizationService,
     IUIThemeService uiThemeService,
-    IUIThemeUpdaterService themeUpdaterService)
+    IUIThemeUpdaterService themeUpdaterService,
+    IContentDialogService contentDialogService)
     : base(loggerService,
         serializationService,
         languageService, localizationService,
         uiThemeService, themeUpdaterService) {
         InitializeComponent();
+        contentDialogService.SetDialogHost(_rootContentDialog);
     }
 
     public override string PluginName => nameof(RevitClashDetective);

@@ -20,6 +20,8 @@ using RevitClashDetective.Models.Handlers;
 using RevitClashDetective.ViewModels.ClashDetective;
 using RevitClashDetective.Views;
 
+using Wpf.Ui;
+
 namespace RevitClashDetective;
 
 [Transaction(TransactionMode.Manual)]
@@ -42,6 +44,9 @@ public class DetectiveClashesCommand : BasePluginCommand {
             .InSingletonScope();
         kernel.Bind<ParameterFilterProvider>()
             .ToSelf()
+            .InSingletonScope();
+        kernel.Bind<IContentDialogService>()
+            .To<ContentDialogService>()
             .InSingletonScope();
         kernel.Bind<FiltersConfig>()
             .ToMethod(c => {

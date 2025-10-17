@@ -16,11 +16,14 @@ using RevitClashDetective.Models.Interfaces;
 using RevitClashDetective.Models.RevitClashReport;
 using RevitClashDetective.Services.RevitViewSettings;
 
+using Wpf.Ui;
+
 namespace RevitClashDetective.ViewModels.Navigator;
 
 internal class ReportsViewModel : BaseViewModel {
     private readonly RevitRepository _revitRepository;
     private readonly ILocalizationService _localizationService;
+    private readonly IContentDialogService _contentDialogService;
     private readonly SettingsConfig _settingsConfig;
     private bool _elementsIsolationEnabled = true;
     private bool _openFromClashDetector;
@@ -32,6 +35,7 @@ internal class ReportsViewModel : BaseViewModel {
         ISaveFileDialogService saveFileDialogService,
         IMessageBoxService messageBoxService,
         ILocalizationService localizationService,
+        IContentDialogService contentDialogService,
         SettingsConfig settingsConfig,
         string selectedFile = null) {
 
@@ -40,6 +44,7 @@ internal class ReportsViewModel : BaseViewModel {
         SaveFileDialogService = saveFileDialogService ?? throw new ArgumentNullException(nameof(saveFileDialogService));
         MessageBoxService = messageBoxService ?? throw new ArgumentNullException(nameof(messageBoxService));
         _localizationService = localizationService ?? throw new ArgumentNullException(nameof(localizationService));
+        _contentDialogService = contentDialogService ?? throw new ArgumentNullException(nameof(contentDialogService));
         _settingsConfig = settingsConfig ?? throw new ArgumentNullException(nameof(settingsConfig));
         Reports = [];
 
@@ -97,6 +102,7 @@ internal class ReportsViewModel : BaseViewModel {
                 OpenFileDialogService,
                 SaveFileDialogService,
                 MessageBoxService,
+                _contentDialogService,
                 _settingsConfig))
             .Where(item => item.Name.Equals(selectedFile, StringComparison.CurrentCultureIgnoreCase)));
         SelectedReport = Reports.FirstOrDefault();
@@ -114,6 +120,7 @@ internal class ReportsViewModel : BaseViewModel {
                     OpenFileDialogService,
                     SaveFileDialogService,
                     MessageBoxService,
+                    _contentDialogService,
                     _settingsConfig)));
             SelectedReport = Reports.FirstOrDefault();
         }
@@ -147,6 +154,7 @@ internal class ReportsViewModel : BaseViewModel {
                 OpenFileDialogService,
                 SaveFileDialogService,
                 MessageBoxService,
+                _contentDialogService,
                 _settingsConfig,
                 r.Clashes?.ToArray() ?? []))
             .ToArray();

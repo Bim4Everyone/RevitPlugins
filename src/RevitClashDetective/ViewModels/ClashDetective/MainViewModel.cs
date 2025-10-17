@@ -16,6 +16,8 @@ using RevitClashDetective.Models;
 using RevitClashDetective.Models.FilterModel;
 using RevitClashDetective.ViewModels.Services;
 
+using Wpf.Ui;
+
 namespace RevitClashDetective.ViewModels.ClashDetective;
 internal class MainViewModel : BaseViewModel {
     private string _errorText;
@@ -24,6 +26,7 @@ internal class MainViewModel : BaseViewModel {
     private readonly FiltersConfig _filtersConfig;
     private readonly RevitRepository _revitRepository;
     private readonly ILocalizationService _localizationService;
+    private readonly IContentDialogService _contentDialogService;
     private readonly SettingsConfig _settingsConfig;
     private bool _canCancel = true;
     private string _messageText;
@@ -38,6 +41,7 @@ internal class MainViewModel : BaseViewModel {
         IOpenFileDialogService openFileDialogService,
         ISaveFileDialogService saveFileDialogService,
         IMessageBoxService messageBoxService,
+        IContentDialogService contentDialogService,
         SettingsConfig settingsConfig,
         ChecksConfig checksConfig,
         FiltersConfig filtersConfig) {
@@ -48,6 +52,7 @@ internal class MainViewModel : BaseViewModel {
         OpenFileDialogService = openFileDialogService ?? throw new ArgumentNullException(nameof(openFileDialogService));
         SaveFileDialogService = saveFileDialogService ?? throw new ArgumentNullException(nameof(saveFileDialogService));
         MessageBoxService = messageBoxService ?? throw new ArgumentNullException(nameof(messageBoxService));
+        _contentDialogService = contentDialogService ?? throw new ArgumentNullException(nameof(contentDialogService));
         _settingsConfig = settingsConfig ?? throw new ArgumentNullException(nameof(settingsConfig));
         _checksConfig = checksConfig ?? throw new ArgumentNullException(nameof(checksConfig));
 
@@ -127,6 +132,7 @@ internal class MainViewModel : BaseViewModel {
                 MessageBoxService,
                 _settingsConfig,
                 _filtersConfig,
+                _contentDialogService,
                 check);
         }
     }
@@ -145,7 +151,8 @@ internal class MainViewModel : BaseViewModel {
             SaveFileDialogService,
             MessageBoxService,
             _settingsConfig,
-            _filtersConfig)
+            _filtersConfig,
+            _contentDialogService)
         ];
         SetChecks(AllChecks);
     }
@@ -165,10 +172,10 @@ internal class MainViewModel : BaseViewModel {
         if(e.Item is CheckViewModel check && !string.IsNullOrWhiteSpace(ChecksFilter)) {
             string str = ChecksFilter.ToLower();
             e.Accepted = check.Name.ToLower().Contains(str)
-                || check.FirstSelection.Files.Any(f => f.Name.ToLower().Contains(str))
-                || check.FirstSelection.Providers.Any(p => p.Name.ToLower().Contains(str))
-                || check.SecondSelection.Files.Any(f => f.Name.ToLower().Contains(str))
-                || check.SecondSelection.Providers.Any(p => p.Name.ToLower().Contains(str));
+                || check.FirstSelection.AllFiles.Any(f => f.Name.ToLower().Contains(str))
+                || check.FirstSelection.AllProviders.Any(p => p.Name.ToLower().Contains(str))
+                || check.SecondSelection.AllFiles.Any(f => f.Name.ToLower().Contains(str))
+                || check.SecondSelection.AllProviders.Any(p => p.Name.ToLower().Contains(str));
         }
     }
 
@@ -179,7 +186,8 @@ internal class MainViewModel : BaseViewModel {
             SaveFileDialogService,
             MessageBoxService,
             _settingsConfig,
-            _filtersConfig));
+            _filtersConfig,
+            _contentDialogService));
     }
 
     private void RemoveCheck(CheckViewModel p) {

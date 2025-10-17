@@ -15,12 +15,15 @@ using RevitClashDetective.Models.Interfaces;
 using RevitClashDetective.ViewModels.Navigator;
 using RevitClashDetective.Views;
 
+using Wpf.Ui;
+
 namespace RevitClashDetective.ViewModels.ClashDetective;
 internal class CheckViewModel : BaseViewModel, INamedEntity {
     private readonly RevitRepository _revitRepository;
     private readonly ILocalizationService _localizationService;
     private readonly SettingsConfig _settingsConfig;
     private readonly FiltersConfig _filtersConfig;
+    private readonly IContentDialogService _contentDialogService;
     private string _name;
     private string _errorText;
     private bool _hasReport;
@@ -35,6 +38,7 @@ internal class CheckViewModel : BaseViewModel, INamedEntity {
         IMessageBoxService messageBoxService,
         SettingsConfig settingsConfig,
         FiltersConfig filtersConfig,
+        IContentDialogService contentDialogService,
         Check check = null) {
 
         _revitRepository = revitRepository ?? throw new ArgumentNullException(nameof(revitRepository));
@@ -44,7 +48,7 @@ internal class CheckViewModel : BaseViewModel, INamedEntity {
         MessageBoxService = messageBoxService ?? throw new ArgumentNullException(nameof(messageBoxService));
         _settingsConfig = settingsConfig ?? throw new ArgumentNullException(nameof(settingsConfig));
         _filtersConfig = filtersConfig ?? throw new ArgumentNullException(nameof(filtersConfig));
-
+        _contentDialogService = contentDialogService ?? throw new ArgumentNullException(nameof(contentDialogService));
         Name = check?.Name ?? "Без имени";
 
         if(check == null) {
@@ -140,8 +144,16 @@ internal class CheckViewModel : BaseViewModel, INamedEntity {
     }
 
     private void InitializeSelections(Check check = null) {
-        FirstSelection = new SelectionViewModel(_revitRepository, _filtersConfig, check?.FirstSelection);
-        SecondSelection = new SelectionViewModel(_revitRepository, _filtersConfig, check?.SecondSelection);
+        FirstSelection = new SelectionViewModel(_revitRepository,
+            _filtersConfig,
+            _localizationService,
+            _contentDialogService,
+            check?.FirstSelection);
+        SecondSelection = new SelectionViewModel(_revitRepository,
+            _filtersConfig,
+            _localizationService,
+            _contentDialogService,
+            check?.SecondSelection);
     }
 
     private void InitializeFilterProviders(Check check) {
@@ -178,6 +190,7 @@ internal class CheckViewModel : BaseViewModel, INamedEntity {
             SaveFileDialogService,
             MessageBoxService,
             _localizationService,
+            _contentDialogService,
             _settingsConfig,
             ReportName) { OpenFromClashDetector = true }
         };
