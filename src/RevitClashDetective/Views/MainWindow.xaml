@@ -148,7 +148,7 @@
                             <DataGridTemplateColumn.CellTemplate>
                                 <DataTemplate>
                                     <local:ProviderComboBox
-                                        DataContext="{Binding Row.FirstSelection, UpdateSourceTrigger=PropertyChanged}" />
+                                        DataContext="{Binding FirstSelection, UpdateSourceTrigger=PropertyChanged}" />
                                 </DataTemplate>
                             </DataGridTemplateColumn.CellTemplate>
                         </DataGridTemplateColumn>
