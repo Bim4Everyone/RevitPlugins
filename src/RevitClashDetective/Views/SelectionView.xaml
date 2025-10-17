@@ -17,10 +17,31 @@
             <ResourceDictionary.MergedDictionaries>
                 <ResourceDictionary
                     Source="../Resources/CustomStyles.xaml" />
+                <ResourceDictionary
+                    Source="pack://application:,,,/Wpf.Ui;component/Controls/TextBlock/TextBlock.xaml" />
             </ResourceDictionary.MergedDictionaries>
             <res:CollectionToStringConverter
                 x:Key="CollectionToStringConverter"
                 Separator="; " />
+            <Style
+                x:Key="TextBlockAsLabel"
+                TargetType="{x:Type ui:TextBlock}">
+                <Setter
+                    Property="Focusable"
+                    Value="False" />
+                <Setter
+                    Property="TextWrapping"
+                    Value="Wrap" />
+                <Setter
+                    Property="VerticalAlignment"
+                    Value="Center" />
+                <Setter
+                    Property="Foreground"
+                    Value="{DynamicResource LabelForeground}" />
+                <Setter
+                    Property="SnapsToDevicePixels"
+                    Value="True" />
+            </Style>
         </ResourceDictionary>
     </core:WpfUIPlatformUserControl.Resources>
     <Grid>
@@ -38,6 +59,27 @@
                     Command="{Binding SelectFilesCommand}"
                     Content="{ui:SymbolIcon Symbol=Edit20}" />
                 <ui:TextBlock
+                    Text="{me:LocalizationSource MainWindow.SelectFilesLabel}">
+                    <ui:TextBlock.Style>
+                        <Style
+                            BasedOn="{StaticResource TextBlockAsLabel}"
+                            TargetType="ui:TextBlock">
+                            <Setter
+                                Property="Visibility"
+                                Value="Collapsed" />
+                            <Style.Triggers>
+                                <DataTrigger
+                                    Binding="{Binding DataContext.SelectedFiles.Count, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                                    Value="0">
+                                    <Setter
+                                        Property="Visibility"
+                                        Value="Visible" />
+                                </DataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </ui:TextBlock.Style>
+                </ui:TextBlock>
+                <ui:TextBlock
                     TextWrapping="Wrap"
                     VerticalAlignment="Center"
                     Text="{Binding SelectedFiles, Converter={StaticResource CollectionToStringConverter}}" />
@@ -52,6 +94,27 @@
                     DockPanel.Dock="Right"
                     Command="{Binding SelectProvidersCommand}"
                     Content="{ui:SymbolIcon Symbol=Edit20}" />
+                <ui:TextBlock
+                    Text="{me:LocalizationSource MainWindow.SelectSearchSetsLabel}">
+                    <ui:TextBlock.Style>
+                        <Style
+                            BasedOn="{StaticResource TextBlockAsLabel}"
+                            TargetType="ui:TextBlock">
+                            <Setter
+                                Property="Visibility"
+                                Value="Collapsed" />
+                            <Style.Triggers>
+                                <DataTrigger
+                                    Binding="{Binding DataContext.SelectedProviders.Count, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                                    Value="0">
+                                    <Setter
+                                        Property="Visibility"
+                                        Value="Visible" />
+                                </DataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </ui:TextBlock.Style>
+                </ui:TextBlock>
                 <ui:TextBlock
                     TextWrapping="Wrap"
                     VerticalAlignment="Center"
