@@ -24,6 +24,26 @@ internal class ParamFactory {
             var element = document.GetElement(id);
             if(element is SharedParameterElement) {
                 RevitParam revitParam = SharedParamsConfig.Instance.CreateRevitParam(document, element.Name);
+
+                return revitParam;
+            } else {
+                RevitParam revitParam = ProjectParamsConfig.Instance.CreateRevitParam(document, element.Name);
+                return revitParam;
+            }
+        }
+        return null;
+    }
+
+    public RevitParam CreateRevitParam2(Document document, string paramName) {
+
+        var def = _paramAvailabilityService.GetDefinitionByName(paramName);
+        var id = def.GetElementId();
+
+        if(!id.IsSystemId()) {
+            var element = document.GetElement(id);
+            if(element is SharedParameterElement) {
+                RevitParam revitParam = SharedParamsConfig.Instance.CreateRevitParam(document, element.Name);
+
                 return revitParam;
             } else {
                 RevitParam revitParam = ProjectParamsConfig.Instance.CreateRevitParam(document, element.Name);

@@ -1,42 +1,48 @@
 using System.Collections.Generic;
-using System.Linq;
 
 using Autodesk.Revit.DB;
 
-using dosymep.Bim4Everyone.SharedParams;
-
 namespace RevitSetCoordParams.Models.Settings;
-
 internal class SetCoordParamsSettings {
 
-    private readonly RevitRepository _revitRepository;
-    private readonly SearchSettings _searchSettings;
-    private readonly SharedParam _blockParam = SharedParamsConfig.Instance.BuildingWorksBlock;
-    private readonly SharedParam _sectionParam = SharedParamsConfig.Instance.BuildingWorksSection;
-    private readonly SharedParam _floorParam = SharedParamsConfig.Instance.BuildingWorksLevel;
-    private readonly SharedParam _floorDEParam = SharedParamsConfig.Instance.BuildingWorksLevelCurrency;
-    private readonly SharedParam _blockingParam = SharedParamsConfig.Instance.FixSolution;
+    private readonly Document _document;
 
-    public SetCoordParamsSettings(RevitRepository revitRepository) {
-        _revitRepository = revitRepository;
-        _searchSettings = new SearchSettings();
+    public SetCoordParamsSettings(Document document, ConfigSettings configSettings) {
+        _document = document;
+        ConfigSettings = configSettings;
     }
 
-    public List<ParamMap> Parameters => GetParameters();
-    public List<Category> Categories => GetCategories();
-    public int MaxDiameterSearchSphereMm => _searchSettings.MaxDiameterSearchSphereMm;
-    public int StepDiameterSearchSphereMm => _searchSettings.StepDiameterSearchSphereMm;
-    public bool Search => _searchSettings.Search;
+    public ConfigSettings ConfigSettings { get; private set; }
+    public List<ParamMap> ParamMaps { get; set; }
+    public List<RevitCategory> RevitCategories { get; set; }
+    public double MaxDiameterSearchSphereMm { get; set; }
+    public double StepDiameterSearchSphereMm { get; set; }
+    public bool Search { get; set; }
 
-    private List<ParamMap> GetParameters() {
-        return [new ParamMap { SourceParam = _blockParam, TargetParam = _blockParam, LocalizationKey = "BlockParam"},
-                new ParamMap { SourceParam = _sectionParam, TargetParam = _sectionParam, LocalizationKey = "SectionParam"},
-                new ParamMap { SourceParam = _floorParam, TargetParam = _floorParam, LocalizationKey = "FloorParam"},
-                new ParamMap { SourceParam = _floorDEParam, TargetParam = _floorDEParam, LocalizationKey = "FloorDEParam"},
-                new ParamMap { TargetParam = _blockingParam, LocalizationKey = "BlockingParam"}];
+
+    public void LoadConfigSettings() {
+        ParamMaps = ConfigSettings.ParamMaps;
+        RevitCategories = ConfigSettings.Categories;
+        MaxDiameterSearchSphereMm = ConfigSettings.MaxDiameterSearchSphereMm;
+        StepDiameterSearchSphereMm = ConfigSettings.StepDiameterSearchSphereMm;
+        Search = ConfigSettings.Search;
     }
 
-    private List<Category> GetCategories() {
-        return new FixedCategories().GetCategories(_revitRepository.Document).ToList();
+    public void UpdateConfigSettings() {
+        ConfigSettings.ParamMaps = ParamMaps;
+        ConfigSettings.Categories = RevitCategories;
+        ConfigSettings.MaxDiameterSearchSphereMm = MaxDiameterSearchSphereMm;
+        ConfigSettings.StepDiameterSearchSphereMm = StepDiameterSearchSphereMm;
+        ConfigSettings.Search = Search;
     }
+
+    //private List<RevitCategory> GetCategories(Document document) {
+    //    return ConfigSettings.Categories
+    //        .Select(reviCat => )
+    //        .Select(document.Settings.Categories.get_Item)
+    //        .Where(cat => cat != null)
+    //        .Select(cat => new RevitCategory() { Category = cat, IsChecked = true })
+    //        .ToList();
+    //}
 }
+

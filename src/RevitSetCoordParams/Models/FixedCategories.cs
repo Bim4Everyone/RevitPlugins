@@ -1,11 +1,11 @@
 using System.Collections.Generic;
-using System.Linq;
 
 using Autodesk.Revit.DB;
 
 namespace RevitSetCoordParams.Models;
 
 internal class FixedCategories {
+
     private readonly BuiltInCategory[] _allCategories = [
     BuiltInCategory.OST_CableTray,
     BuiltInCategory.OST_Casework,
@@ -56,11 +56,8 @@ internal class FixedCategories {
     BuiltInCategory.OST_Walls,
     BuiltInCategory.OST_Windows];
 
-    public IEnumerable<Category> GetCategories(Document document) {
-        return _allCategories
-            .Select(document.Settings.Categories.get_Item)
-            .Where(cat => cat != null)
-            .ToList();
+    public IEnumerable<BuiltInCategory> GetDefaultBuiltInCategories() {
+        return _allCategories;
     }
 }
 

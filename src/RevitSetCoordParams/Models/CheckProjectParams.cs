@@ -1,7 +1,8 @@
+using System.Linq;
+
 using Autodesk.Revit.ApplicationServices;
 using Autodesk.Revit.DB;
 
-using dosymep.Bim4Everyone.SharedParams;
 using dosymep.Bim4Everyone.Templates;
 
 namespace RevitSetCoordParams.Models;
@@ -22,12 +23,8 @@ internal class CheckProjectParams {
     }
 
     public CheckProjectParams CopyProjectParams() {
-        _projectParameters.SetupRevitParams(_document,
-                SharedParamsConfig.Instance.BuildingWorksBlock,
-                SharedParamsConfig.Instance.BuildingWorksSection,
-                SharedParamsConfig.Instance.BuildingWorksLevel,
-                SharedParamsConfig.Instance.BuildingWorksLevelCurrency,
-                SharedParamsConfig.Instance.FixSolution);
+        _projectParameters.SetupRevitParams(_document, new FixedParams().GetDefaultParams()
+            .Select(param => param.RevitParam));
         return this;
     }
 }

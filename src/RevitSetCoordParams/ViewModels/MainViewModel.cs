@@ -5,6 +5,8 @@ using System.ComponentModel;
 using System.Linq;
 using System.Windows.Input;
 
+using Autodesk.Revit.DB;
+
 using dosymep.SimpleServices;
 using dosymep.WPF.Commands;
 using dosymep.WPF.ViewModels;
@@ -21,7 +23,9 @@ internal class MainViewModel : BaseViewModel {
     private readonly PluginConfig _pluginConfig;
     private readonly RevitRepository _revitRepository;
     private readonly ILocalizationService _localizationService;
-    private readonly SetCoordParamsSettings _setCoordParamsSettings;
+
+    private SetCoordParamsSettings _setCoordParamsSettings;
+
     private readonly IParamAvailabilityService _paramAvailabilityService;
     private readonly ParamFactory _paramFactory;
 
@@ -53,7 +57,6 @@ internal class MainViewModel : BaseViewModel {
         _pluginConfig = pluginConfig;
         _revitRepository = revitRepository;
         _localizationService = localizationService;
-        _setCoordParamsSettings = new SetCoordParamsSettings(_revitRepository);
         _paramAvailabilityService = new ParamAvailabilityService(_revitRepository.Document);
         _paramFactory = new ParamFactory(_paramAvailabilityService);
 
@@ -143,25 +146,28 @@ internal class MainViewModel : BaseViewModel {
 
     // Метод получения коллекции ParamViewModel для Params
     private IEnumerable<ParamViewModel> GetParamViewModels() {
-        return _setCoordParamsSettings.Parameters
+        return _setCoordParamsSettings.ParamMaps
             .Select(paramMap => new ParamViewModel {
                 ParamMap = paramMap,
                 Description = _localizationService.GetLocalizedString($"MainViewModel.{paramMap.LocalizationKey}Description"),
                 DetailDescription = _localizationService.GetLocalizedString($"MainViewModel.{paramMap.LocalizationKey}DetailDescription"),
                 SourceParamName = paramMap.SourceParam?.Name ?? string.Empty,
                 TargetParamName = paramMap.TargetParam?.Name ?? string.Empty,
-                IsChecked = true,
+                IsChecked = paramMap.IsChecked,
                 IsPair = paramMap.IsPair
             });
     }
 
     // Метод получения коллекции CategoryViewModel для Categories
     private IEnumerable<CategoryViewModel> GetCategoryViewModels() {
-        return _setCoordParamsSettings.Categories
-            .Select(item => new CategoryViewModel {
-                Category = item,
-                CategoryName = item.Name,
-                IsChecked = true
+        return _setCoordParamsSettings.RevitCategories
+            .Select(revitCategory => new {
+                RevitCategory = revitCategory,
+                Category = Category.GetCategory(_revitRepository.Document, revitCategory.BuiltInCategory)
+            })
+            .Where(x => x.Category != null)
+            .Select(x => new CategoryViewModel(x.RevitCategory, x.Category) {
+                IsChecked = x.RevitCategory.IsChecked
             })
             .OrderBy(x => x.CategoryName ?? string.Empty);
     }
@@ -200,11 +206,13 @@ internal class MainViewModel : BaseViewModel {
     }
 
     // Метод удаления и добавления элементов коллекции
-    private void HandleCheckedChangedParam(ParamViewModel vm) {
-        if(vm.IsChecked) {
-            SelectedParams.Add(vm);
+    private void HandleCheckedChangedParam(ParamViewModel paramViewModel) {
+        if(paramViewModel.IsChecked) {
+            SelectedParams.Add(paramViewModel);
+            paramViewModel.ParamMap.IsChecked = true;
         } else {
-            SelectedParams.Remove(vm);
+            SelectedParams.Remove(paramViewModel);
+            paramViewModel.ParamMap.IsChecked = false;
         }
         UpdateParamWarnings();
     }
@@ -239,13 +247,15 @@ internal class MainViewModel : BaseViewModel {
 
     // Метод подписанный на событие изменения выделенных категорий
     private void OnCategoryChanged(object sender, PropertyChangedEventArgs e) {
-        if(sender is not CategoryViewModel vm) {
+        if(sender is not CategoryViewModel categoryViewModel) {
             return;
         }
-        if(vm.IsChecked) {
-            SelectedCategories.Add(vm);
+        if(categoryViewModel.IsChecked) {
+            SelectedCategories.Add(categoryViewModel);
+            categoryViewModel.RevitCategory.IsChecked = true;
         } else {
-            SelectedCategories.Remove(vm);
+            SelectedCategories.Remove(categoryViewModel);
+            categoryViewModel.RevitCategory.IsChecked = false;
         }
     }
 
@@ -287,16 +297,26 @@ internal class MainViewModel : BaseViewModel {
     }
 
     private void LoadConfig() {
-        var setting = _pluginConfig.GetSettings(_revitRepository.Document);
-
-        SaveProperty = setting?.SaveProperty ?? _localizationService.GetLocalizedString("MainWindow.Hello");
+        var projectConfig = _pluginConfig.GetSettings(_revitRepository.Document);
+        ConfigSettings configSettings;
+        if(projectConfig == null) {
+            configSettings = new ConfigSettings();
+            configSettings.ApplyDefaultValues();
+        } else {
+            configSettings = projectConfig.DefaultSettings;
+        }
+        _setCoordParamsSettings = new SetCoordParamsSettings(_revitRepository.Document, configSettings);
+        _setCoordParamsSettings.LoadConfigSettings();
     }
 
-    private void SaveConfig() {
-        var setting = _pluginConfig.GetSettings(_revitRepository.Document)
-                                ?? _pluginConfig.AddSettings(_revitRepository.Document);
 
-        setting.SaveProperty = SaveProperty;
+    private void SaveConfig() {
+        _setCoordParamsSettings.ParamMaps = Params.Select(paramVM => paramVM.ParamMap).ToList();
+        _setCoordParamsSettings.RevitCategories = Categories.Select(catVM => catVM.RevitCategory).ToList();
+        _setCoordParamsSettings.UpdateConfigSettings();
+        var setting = _pluginConfig.GetSettings(_revitRepository.Document)
+            ?? _pluginConfig.AddSettings(_revitRepository.Document);
+        setting.DefaultSettings = _setCoordParamsSettings.ConfigSettings;
         _pluginConfig.SaveProjectConfig();
     }
 }

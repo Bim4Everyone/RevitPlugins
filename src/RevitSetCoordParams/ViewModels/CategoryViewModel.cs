@@ -13,11 +13,18 @@ namespace RevitSetCoordParams.ViewModels;
 
 internal class CategoryViewModel : BaseViewModel {
 
+    private readonly Category _category;
     private string _warnings;
     private bool _isChecked;
     private bool _hasWarning;
 
-    public Category Category { get; set; }
+    public CategoryViewModel(RevitCategory revitCategory, Category category) {
+        RevitCategory = revitCategory;
+        _category = category;
+        CategoryName = _category.Name;
+    }
+
+    public RevitCategory RevitCategory { get; set; }
     public string CategoryName { get; set; }
 
     public string Warnings {
@@ -43,7 +50,7 @@ internal class CategoryViewModel : BaseViewModel {
 
         var warningString = new StringBuilder();
         foreach(var paramMap in paramMaps) {
-            if(paramMap.TargetParam != null && !paramAvailabilityService.IsParamAvailable(paramMap.TargetParam, Category)) {
+            if(paramMap.TargetParam != null && !paramAvailabilityService.IsParamAvailable(paramMap.TargetParam, _category)) {
                 warningString.Append($"  • {paramMap.TargetParam.Name}\n");
             }
         }

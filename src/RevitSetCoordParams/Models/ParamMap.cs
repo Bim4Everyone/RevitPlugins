@@ -7,4 +7,5 @@ internal class ParamMap {
     public RevitParam TargetParam { get; set; }
     public string LocalizationKey { get; set; }
     public bool IsPair => SourceParam != null && TargetParam != null;
+    public bool IsChecked { get; set; }
 }
