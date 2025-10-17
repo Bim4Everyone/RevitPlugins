@@ -43,20 +43,6 @@
                     Text="{Binding SelectedFiles, Converter={StaticResource CollectionToStringConverter}}" />
             </DockPanel>
         </Border>
-        <!--<ComboBox
-            Grid.Column="0"
-            IsEditable="False"
-            DisplayMemberPath="Name"
-            ItemsSource="{Binding Files}"
-            SelectedItem="{Binding SelectedFileObjects, UpdateSourceTrigger=PropertyChanged}">
-            -->
-        <!--<ComboBox.ItemTemplate>
-                <DataTemplate>
-
-                </DataTemplate>
-            </ComboBox.ItemTemplate>-->
-        <!--
-        </ComboBox>-->
         <Border
             Style="{StaticResource CustomBorder}"
             Grid.Column="1">
@@ -72,17 +58,5 @@
                     Text="{Binding SelectedProviders, Converter={StaticResource CollectionToStringConverter}}" />
             </DockPanel>
         </Border>
-        <!--<ComboBox
-            Grid.Column="1"
-            IsEditable="False"
-            DisplayMemberPath="Name"
-            ItemsSource="{Binding Providers}"
-            SelectedItem="{Binding SelectedProvidersObjects, UpdateSourceTrigger=PropertyChanged}">
-            <ComboBox.ItemTemplate>
-                <DataTemplate>
-
-                </DataTemplate>
-            </ComboBox.ItemTemplate>
-        </ComboBox>-->
     </Grid>
 </core:WpfUIPlatformUserControl>
