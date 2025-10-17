@@ -19,6 +19,8 @@ using RevitClashDetective.Models.Handlers;
 using RevitClashDetective.ViewModels.Navigator;
 using RevitClashDetective.Views;
 
+using Wpf.Ui;
+
 namespace RevitClashDetective;
 [Transaction(TransactionMode.Manual)]
 public class GetClashesCommand : BasePluginCommand {
@@ -41,6 +43,9 @@ public class GetClashesCommand : BasePluginCommand {
             .ToSelf()
             .InSingletonScope()
             .WithConstructorArgument("selectedFile", (string) null);
+        kernel.Bind<IContentDialogService>()
+            .To<ContentDialogService>()
+            .InSingletonScope();
         kernel.Bind<SettingsConfig>()
             .ToMethod(c => SettingsConfig.GetSettingsConfig(c.Kernel.Get<IConfigSerializer>()));
         kernel.UseXtraOpenFileDialog<ReportsViewModel>(
