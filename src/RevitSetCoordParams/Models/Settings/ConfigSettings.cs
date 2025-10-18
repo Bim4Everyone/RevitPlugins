@@ -15,22 +15,24 @@ internal class ConfigSettings {
     // самое распространенное значения для запись координат
     private const string _typeModel = "Координаты СМР";
 
-    public ElementsProviderType ElementsProvider { get; set; }
-    public FileProviderType FileProvider { get; set; }
+    public ProviderType ElementsProvider { get; set; }
+    public ProviderType PositionProvider { get; set; }
+    public SourceFile SourceFile { get; set; }
     public string TypeModel { get; set; }
-    public PositionProviderType PositionProvider { get; set; }
     public List<ParamMap> ParamMaps { get; set; }
     public List<RevitCategory> Categories { get; set; }
     public double MaxDiameterSearchSphereMm { get; set; }
     public double StepDiameterSearchSphereMm { get; set; }
     public bool Search { get; set; }
 
-
     public void ApplyDefaultValues() {
-        ElementsProvider = ElementsProviderType.AllElements;
-        FileProvider = FileProviderType.CoordFile;
+        ElementsProvider = ProviderType.AllElementsProvider;
+        PositionProvider = ProviderType.CenterPositionProvider;
+        SourceFile = new SourceFile {
+            ProviderType = ProviderType.CoordFileProvider,
+            SuorceFileUniqueId = null
+        };
         TypeModel = _typeModel;
-        PositionProvider = PositionProviderType.Center;
         ParamMaps = GetDefaultParams();
         Categories = GetDefaultCategories();
         MaxDiameterSearchSphereMm = _maxDiameterSearchSphereMm;

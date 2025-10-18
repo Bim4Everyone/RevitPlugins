@@ -69,7 +69,8 @@
 
                     <ComboBox
                         ItemsSource="{Binding RangeElements}"
-                        SelectedValue="{Binding SelectedRangeElements}" />
+                        SelectedValue="{Binding SelectedRangeElements}"
+                        DisplayMemberPath="Name"/>
                 </edits:CustomEditControl>
 
                 <edits:CustomEditControl
@@ -79,7 +80,8 @@
 
                     <ComboBox
                         ItemsSource="{Binding SourceFiles}"
-                        SelectedValue="{Binding SelectedSourceFile}" />
+                        SelectedValue="{Binding SelectedSourceFile}"
+                        DisplayMemberPath="Name" />
                 </edits:CustomEditControl>
 
                 <edits:CustomEditControl
@@ -89,7 +91,8 @@
 
                     <ComboBox
                         ItemsSource="{Binding TypeModels}"
-                        SelectedValue="{Binding SelectedTypeModel}" />
+                        SelectedValue="{Binding SelectedTypeModel}"
+                        DisplayMemberPath="Name" />
                 </edits:CustomEditControl>
 
                 <edits:CustomEditControl
@@ -99,7 +102,8 @@
                     
                     <ComboBox
                         ItemsSource="{Binding Positions}"
-                        SelectedValue="{Binding SelectedPosition}" />
+                        SelectedValue="{Binding SelectedPosition}"
+                        DisplayMemberPath="Name" />
                 </edits:CustomEditControl>
 
                 <edits:CustomGroupEditControl
@@ -189,6 +193,7 @@
                     Header="{me:LocalizationSource MainWindow.Search}"
                     Description="{me:LocalizationSource MainWindow.SearchDescription}"                    
                     ToggleSwitchVisible="True"
+                    IsChecked="{Binding Search, Mode=TwoWay}"
                     SwitchOnContent="{me:LocalizationSource MainWindow.SearchToggleSwitchOn}"
                     SwitchOffContent="{me:LocalizationSource MainWindow.SearchToggleSwitchOff}">
 

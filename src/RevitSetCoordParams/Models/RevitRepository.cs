@@ -1,3 +1,5 @@
+using System.Collections.Generic;
+
 using Autodesk.Revit.ApplicationServices;
 using Autodesk.Revit.DB;
 using Autodesk.Revit.UI;
@@ -15,16 +17,19 @@ internal class RevitRepository {
     public Application Application => UIApplication.Application;
     public Document Document => ActiveUIDocument.Document;
 
-    //Метод получения типа "Связанный файл"
-    //public IList<RevitElement> GetLinkTypeElements() {
-    //    var listRevitLinkTypes = new FilteredElementCollector(Document)
-    //        .OfCategory(BuiltInCategory.OST_RvtLinks)
-    //        .OfClass(typeof(RevitLinkType))
-    //        .Cast<RevitLinkType>()
-    //        .Where(linkType => !linkType.IsNestedLink)
-    //        .ToList();
-    //    return new Collection<LinkTypeElement>(listRevitLinkTypes
-    //        .Select(linkType => new LinkTypeElement(linkType))
-    //        .ToList());
-    //}
+    public ICollection<RevitElement> GetAllRevitElements(IEnumerable<RevitCategory> revitCategories) {
+        return [];
+    }
+
+    public ICollection<RevitElement> GetCurrentViewRevitElements(IEnumerable<RevitCategory> revitCategories) {
+        return [];
+    }
+
+    public ICollection<RevitElement> GetSelectedRevitElements(IEnumerable<RevitCategory> revitCategories) {
+        return [];
+    }
+
+    public View GetCurrentView() {
+        return ActiveUIDocument.ActiveView;
+    }
 }

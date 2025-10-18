@@ -12,6 +12,7 @@ using dosymep.WPF.Commands;
 using dosymep.WPF.ViewModels;
 
 using RevitSetCoordParams.Models;
+using RevitSetCoordParams.Models.Enums;
 using RevitSetCoordParams.Models.Interfaces;
 using RevitSetCoordParams.Models.Services;
 using RevitSetCoordParams.Models.Settings;
@@ -28,6 +29,7 @@ internal class MainViewModel : BaseViewModel {
 
     private readonly IParamAvailabilityService _paramAvailabilityService;
     private readonly ParamFactory _paramFactory;
+    private readonly ProvidersFactory _providersFactory;
 
     private ObservableCollection<RangeElementsViewModel> _rangeElements;
     private RangeElementsViewModel _selectedRangeElements;
@@ -59,6 +61,8 @@ internal class MainViewModel : BaseViewModel {
         _localizationService = localizationService;
         _paramAvailabilityService = new ParamAvailabilityService(_revitRepository.Document);
         _paramFactory = new ParamFactory(_paramAvailabilityService);
+        _providersFactory = new ProvidersFactory();
+
 
         LoadViewCommand = RelayCommand.Create(LoadView);
         AcceptViewCommand = RelayCommand.Create(AcceptView, CanAcceptView);
@@ -259,14 +263,59 @@ internal class MainViewModel : BaseViewModel {
         }
     }
 
+    private IEnumerable<RangeElementsViewModel> GetRangeElementsViewModels() {
+        var categories = Categories.Select(c => c.RevitCategory).ToList();
+
+        var providers = new[] {
+        new { Type = ProviderType.AllElementsProvider, Key = "RangeElementsViewModel.AllElements" },
+        new { Type = ProviderType.SelectedElementsProvider, Key = "RangeElementsViewModel.SelectedElements" },
+        new { Type = ProviderType.CurrentViewProvider, Key = "RangeElementsViewModel.CurrentViewElements" }
+        };
+
+        var currentType = _setCoordParamsSettings.ElementsProvider.Type;
+
+        return providers
+            .Select(p => new RangeElementsViewModel {
+                Name = _localizationService.GetLocalizedString(p.Key),
+                ElementsProvider = (p.Type == currentType)
+                    ? _setCoordParamsSettings.ElementsProvider // уже выбранный, не создаём заново
+                    : _providersFactory.GetElementsProvider(_revitRepository, p.Type, categories)
+            })
+            .OrderByDescending(vm => vm.ElementsProvider.Type == currentType)
+            .ToList();
+    }
+
+    private IEnumerable<PositionViewModel> GetPositionViewModels() {
+        var providers = new[] {
+        new { Type = ProviderType.CenterPositionProvider, Key = "PositionsViewModel.Center" },
+        new { Type = ProviderType.BottomPositionProvider, Key = "PositionsViewModel.Bottom" }
+        };
+
+        var currentType = _setCoordParamsSettings.PositionProvider.Type;
+
+        return providers
+            .Select(p => new PositionViewModel {
+                Name = _localizationService.GetLocalizedString(p.Key),
+                PositionProvider = (p.Type == currentType)
+                    ? _setCoordParamsSettings.PositionProvider // уже выбранный, не создаём заново
+                    : _providersFactory.GetPositionProvider(_revitRepository, p.Type)
+            })
+            .OrderByDescending(vm => vm.PositionProvider.Type == currentType)
+            .ToList();
+    }
+
     private void LoadView() {
         LoadConfig();
         Params = new ObservableCollection<ParamViewModel>(GetParamViewModels());
         SelectedParams = new ObservableCollection<ParamViewModel>(Params);
         Categories = new ObservableCollection<CategoryViewModel>(GetCategoryViewModels());
-        SelectedCategories = new ObservableCollection<CategoryViewModel>(Categories);
         UpdateParamWarnings();
         UpdateCategoryWarnings();
+        RangeElements = new ObservableCollection<RangeElementsViewModel>(GetRangeElementsViewModels());
+        SelectedRangeElements = RangeElements.First();
+        Positions = new ObservableCollection<PositionViewModel>(GetPositionViewModels());
+        SelectedPosition = Positions.First();
+
 
         // Подписка на события в ParamViewModel
         foreach(var param in Params) {
@@ -305,15 +354,22 @@ internal class MainViewModel : BaseViewModel {
         } else {
             configSettings = projectConfig.DefaultSettings;
         }
-        _setCoordParamsSettings = new SetCoordParamsSettings(_revitRepository.Document, configSettings);
+        _setCoordParamsSettings = new SetCoordParamsSettings(_revitRepository, configSettings);
         _setCoordParamsSettings.LoadConfigSettings();
     }
 
 
     private void SaveConfig() {
+
         _setCoordParamsSettings.ParamMaps = Params.Select(paramVM => paramVM.ParamMap).ToList();
         _setCoordParamsSettings.RevitCategories = Categories.Select(catVM => catVM.RevitCategory).ToList();
+        _setCoordParamsSettings.ElementsProvider = SelectedRangeElements.ElementsProvider;
+        _setCoordParamsSettings.PositionProvider = SelectedPosition.PositionProvider;
+        _setCoordParamsSettings.Search = Search;
+        _setCoordParamsSettings.MaxDiameterSearchSphereMm = Convert.ToDouble(MaxDiameterSearchSphereMm);
+        _setCoordParamsSettings.StepDiameterSearchSphereMm = Convert.ToDouble(StepDiameterSearchSphereMm);
         _setCoordParamsSettings.UpdateConfigSettings();
+
         var setting = _pluginConfig.GetSettings(_revitRepository.Document)
             ?? _pluginConfig.AddSettings(_revitRepository.Document);
         setting.DefaultSettings = _setCoordParamsSettings.ConfigSettings;

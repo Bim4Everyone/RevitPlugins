@@ -34,22 +34,22 @@ internal class ParamFactory {
         return null;
     }
 
-    public RevitParam CreateRevitParam2(Document document, string paramName) {
+    //public RevitParam CreateRevitParam2(Document document, string paramName) {
 
-        var def = _paramAvailabilityService.GetDefinitionByName(paramName);
-        var id = def.GetElementId();
+    //    var def = _paramAvailabilityService.GetDefinitionByName(paramName);
+    //    var id = def.GetElementId();
 
-        if(!id.IsSystemId()) {
-            var element = document.GetElement(id);
-            if(element is SharedParameterElement) {
-                RevitParam revitParam = SharedParamsConfig.Instance.CreateRevitParam(document, element.Name);
+    //    if(!id.IsSystemId()) {
+    //        var element = document.GetElement(id);
+    //        if(element is SharedParameterElement) {
+    //            RevitParam revitParam = SharedParamsConfig.Instance.CreateRevitParam(document, element.Name);
 
-                return revitParam;
-            } else {
-                RevitParam revitParam = ProjectParamsConfig.Instance.CreateRevitParam(document, element.Name);
-                return revitParam;
-            }
-        }
-        return null;
-    }
+    //            return revitParam;
+    //        } else {
+    //            RevitParam revitParam = ProjectParamsConfig.Instance.CreateRevitParam(document, element.Name);
+    //            return revitParam;
+    //        }
+    //    }
+    //    return null;
+    //}
 }

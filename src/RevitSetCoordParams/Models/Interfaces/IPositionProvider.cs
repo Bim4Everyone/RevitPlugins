@@ -1,12 +1,14 @@
 using System.Collections.Generic;
 
+using Autodesk.Revit.DB;
+
 using RevitSetCoordParams.Models.Enums;
 
 namespace RevitSetCoordParams.Models.Interfaces;
 
-internal interface IElementsProvider {
+internal interface IPositionProvider {
 
     ProviderType Type { get; }
 
-    ICollection<RevitElement> GetRevitElements();
+    ICollection<XYZ> GetPositionElement(Element element);
 }

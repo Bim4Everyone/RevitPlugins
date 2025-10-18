@@ -51,6 +51,25 @@
     <system:String x:Key="MainViewModel.BlockingParamDescription">Параметр для блокировки</system:String>
     <system:String x:Key="MainViewModel.BlockingParamDetailDescription">Тип параметра - да / нет</system:String>
     <system:String x:Key="MainViewModel.WrongParamName">Ошибки в параметрах СМР</system:String>
+
+    <system:String
+        x:Key="RangeElementsViewModel.AllElements">Все элементы модели</system:String>
+    <system:String
+        x:Key="RangeElementsViewModel.SelectedElements">Выделенные элементы модели</system:String>
+    <system:String
+        x:Key="RangeElementsViewModel.CurrentViewElements">Видимые элементы на виде</system:String>
+
+    <system:String
+        x:Key="PositionsViewModel.Center">По центру элемента</system:String>
+    <system:String
+        x:Key="PositionsViewModel.Bottom">По низу элемента</system:String>
+    
+
+    <system:String x:Key="AllElementsProvider.Name">Все элементы</system:String>
+    
+    
+    
+    
     
     <system:String x:Key="CategoryViewModel.WarningStartString">Отсутствуют параметры:</system:String>
     <system:String x:Key="ParamViewModel.WarningStartString">Ошибочные параметры:</system:String>
