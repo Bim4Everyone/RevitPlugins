@@ -82,28 +82,55 @@
                     </i:Interaction.Triggers>
                 </ui:AutoSuggestBox>
                 <ui:DataGrid
+                    x:Name="Schedules"
                     ItemsSource="{Binding Path=FilteredSchedules}"
                     Style="{StaticResource  CustomResizableDataGridStyle}">
                     <DataGrid.Columns>
                         <DataGridCheckBoxColumn
+                            HeaderStyle="{StaticResource CustomDataGridHeaderStyle}"                          
                             Binding="{Binding Path=IsChecked, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}">
+                                <DataGridCheckBoxColumn.CellStyle>
+                                <Style TargetType="DataGridCell">
+                                    <EventSetter
+                                        Event="CheckBox.Checked"
+                                        Handler="CheckBox_Checked" />
+                                    <EventSetter
+                                        Event="CheckBox.Unchecked"
+                                        Handler="CheckBox_Unchecked" />
+                                    <Setter
+                                        Property="Background"
+                                        Value="Transparent" />
+                                    <Setter
+                                        Property="BorderThickness"
+                                        Value="0" />
+                                </Style>
+                            </DataGridCheckBoxColumn.CellStyle>
                             <DataGridCheckBoxColumn.Header>
-                                <TextBlock Text="{me:LocalizationSource MainWindow.HeaderCheck}"/>
+                                <TextBlock
+                                    TextAlignment="Center"
+                                    Text="{me:LocalizationSource MainWindow.HeaderCheck}"/>
                             </DataGridCheckBoxColumn.Header>
                         </DataGridCheckBoxColumn>
                         <DataGridTextColumn
-                            Binding="{Binding Path=Name}"
                             Width="500"
+                            HeaderStyle="{StaticResource CustomDataGridHeaderStyle}"
+                            Binding="{Binding Path=Name}"
                             IsReadOnly="True">
                             <DataGridTextColumn.Header>
-                                <TextBlock Text="{me:LocalizationSource MainWindow.HeaderName}"/>
+                                <TextBlock
+                                    TextAlignment="Center"
+                                    Text="{me:LocalizationSource MainWindow.HeaderName}"/>
                             </DataGridTextColumn.Header>
                         </DataGridTextColumn>
                         <DataGridTextColumn
+                            HeaderStyle="{StaticResource CustomDataGridHeaderStyle}"
                             Binding="{Binding Path=OpenStatus.Name}"
+                            SortMemberPath="OpenStatus.Order"
                             IsReadOnly="True">
                             <DataGridTextColumn.Header>
-                                <TextBlock Text="{me:LocalizationSource MainWindow.HeaderStatus}"/>
+                                <TextBlock
+                                    TextAlignment="Center"
+                                    Text="{me:LocalizationSource MainWindow.HeaderStatus}"/>
                             </DataGridTextColumn.Header>
                         </DataGridTextColumn>
                     </DataGrid.Columns>
