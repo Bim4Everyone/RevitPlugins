@@ -4,7 +4,9 @@ using System.Linq;
 
 using Autodesk.Revit.DB;
 
-namespace RevitPylonDocumentation.Models;
+using RevitPylonDocumentation.Models.PluginOptions;
+
+namespace RevitPylonDocumentation.Models.Services;
 
 /// <summary>
 /// Сервис для получения элементов, на которых основывается размер - ссылках на опорные плоскости и линии размещения
@@ -30,17 +32,28 @@ internal class DimensionBaseService {
     }
 
 
-    public Line GetDimensionLine(FamilyInstance rebar, DimensionOffsetType dimensionOffsetType,
-                          double offsetCoefficient = 1) {
+    public Line GetDimensionLine(Element rebar, DirectionType directionType, double offsetCoefficient) {
         // Задаем дефолтные точки на случай, если не сработает получение
         var pt1 = new XYZ(0, 0, 0);
         var pt2 = new XYZ(0, 100, 0);
+
+        directionType = directionType switch {
+            DirectionType.LeftTop => DirectionType.Left,
+            DirectionType.LeftBottom => DirectionType.Left,
+            DirectionType.RightTop => DirectionType.Right,
+            DirectionType.RightBottom => DirectionType.Right,
+            _ => directionType
+        };
 
         // Если взять краевую точку рамки подрезки вида, то она будет в локальных координатах вида
         // Для перевода в глобальные координаты получим объект Transform
         // Получаем начало локальной системы координат вида в глобальной системе координат
         double xUpDirectionRounded = Math.Round(_viewUpDirection.X);
         double yUpDirectionRounded = Math.Round(_viewUpDirection.Y);
+        double zUpDirectionRounded = Math.Round(_viewUpDirection.Z);
+
+        double xRightDirectionRounded = Math.Round(_viewRightDirection.X);
+        double yRightDirectionRounded = Math.Round(_viewRightDirection.Y);
 
         // Создаем матрицу трансформации
         var transform = Transform.Identity;
@@ -59,169 +72,81 @@ internal class DimensionBaseService {
         var cropBoxMinGlobal = transform.OfPoint(cropBoxMin);
 
         var bbox = rebar.get_BoundingBox(_view);
-        switch(dimensionOffsetType) {
-            case DimensionOffsetType.Top:
+        switch(directionType) {
+            case DirectionType.Top:
                 // Получаем единичный вектор вида направления вверх
                 var upDirectionNormalized = _viewUpDirection.Normalize();
                 // Получаем отступ для более корректного размещения размера относительно арматуры
                 var offsetTop = upDirectionNormalized.Multiply(offsetCoefficient);
 
                 // Получаем первую точку размерной линии по BoundingBox каркаса армирования + отступ
-                if(xUpDirectionRounded == -1 || (yUpDirectionRounded == -1)) {
+                if(xUpDirectionRounded == -1 || yUpDirectionRounded == -1) {
                     pt1 = bbox.Min + offsetTop;
                 } else {
                     pt1 = bbox.Max + offsetTop;
                 }
-
-                // Если точка, куда нужно поставить размерную линию находится за рамкой подрезки,
-                // то ставим по рамки подрезки
-                if(xUpDirectionRounded.Equals(0.0) && yUpDirectionRounded.Equals(1.0)) {
-                    if(pt1.Y > cropBoxMaxGlobal.Y) {
-                        pt1 = new XYZ(pt1.X, cropBoxMaxGlobal.Y, pt1.Z);
-                    }
-                }
-
-                if(xUpDirectionRounded.Equals(0.0) && yUpDirectionRounded.Equals(-1.0)) {
-                    if(pt1.Y < cropBoxMaxGlobal.Y) {
-                        pt1 = new XYZ(pt1.X, cropBoxMaxGlobal.Y, pt1.Z);
-                    }
-                }
-
-                if(xUpDirectionRounded.Equals(1.0) && yUpDirectionRounded.Equals(0.0)) {
-                    if(pt1.X > cropBoxMaxGlobal.X) {
-                        pt1 = new XYZ(cropBoxMaxGlobal.X, pt1.Y, pt1.Z);
-                    }
-                }
-
-                if(xUpDirectionRounded.Equals(-1.0) && yUpDirectionRounded.Equals(0.0)) {
-                    if(pt1.X < cropBoxMaxGlobal.X) {
-                        pt1 = new XYZ(cropBoxMaxGlobal.X, pt1.Y, pt1.Z);
-                    }
-                }
-
                 pt2 = pt1 + _viewRightDirection;
                 break;
-            case DimensionOffsetType.Bottom:
+            case DirectionType.Bottom:
                 // Получаем единичный вектор вида направления вниз
                 var downDirectionNormalized = _viewUpDirection.Normalize().Negate();
                 // Получаем отступ для более корректного размещения размера относительно арматуры
                 var offsetBottom = downDirectionNormalized.Multiply(offsetCoefficient);
 
                 // Получаем первую точку размерной линии по BoundingBox каркаса армирования + отступ
-                if(xUpDirectionRounded == -1 || (yUpDirectionRounded == -1)) {
+                if(xUpDirectionRounded == -1 || yUpDirectionRounded == -1) {
                     pt1 = bbox.Max + offsetBottom;
                 } else {
                     pt1 = bbox.Min + offsetBottom;
                 }
-
-                // Если точка, куда нужно поставить размерную линию находится за рамкой подрезки,
-                // то ставим по рамке подрезки
-                if(xUpDirectionRounded.Equals(0.0) && yUpDirectionRounded.Equals(1.0)) {
-                    if(pt1.Y < cropBoxMinGlobal.Y) {
-                        pt1 = new XYZ(pt1.X, cropBoxMinGlobal.Y, pt1.Z);
-                    }
-                }
-
-                if(xUpDirectionRounded.Equals(0.0) && yUpDirectionRounded.Equals(-1.0)) {
-                    if(pt1.Y > cropBoxMinGlobal.Y) {
-                        pt1 = new XYZ(pt1.X, cropBoxMinGlobal.Y, pt1.Z);
-                    }
-                }
-
-                if(xUpDirectionRounded.Equals(1.0) && yUpDirectionRounded.Equals(0.0)) {
-                    if(pt1.X < cropBoxMinGlobal.X) {
-                        pt1 = new XYZ(cropBoxMinGlobal.X, pt1.Y, pt1.Z);
-                    }
-                }
-
-                if(xUpDirectionRounded.Equals(-1.0) && yUpDirectionRounded.Equals(0.0)) {
-                    if(pt1.X > cropBoxMinGlobal.X) {
-                        pt1 = new XYZ(cropBoxMinGlobal.X, pt1.Y, pt1.Z);
-                    }
-                }
-
                 pt2 = pt1 + _viewRightDirection;
                 break;
-            case DimensionOffsetType.Left:
+            case DirectionType.Left:
                 // Получаем единичный вектор вида направления вверх
                 var leftDirectionNormalized = _viewRightDirection.Normalize().Negate();
                 // Получаем отступ для более корректного размещения размера относительно арматуры
                 var offsetLeft = leftDirectionNormalized.Multiply(offsetCoefficient);
 
                 // Получаем первую точку размерной линии по BoundingBox каркаса армирования + отступ
-                if(xUpDirectionRounded == 1 || (yUpDirectionRounded == -1)) {
-                    pt1 = bbox.Max + offsetLeft;
+                if(zUpDirectionRounded == 1) {
+                    // Вертикальное сечение
+                    if(xRightDirectionRounded == -1 || yRightDirectionRounded == -1) {
+                        pt1 = bbox.Max + offsetLeft;
+                    } else {
+                        pt1 = bbox.Min + offsetLeft;
+                    }
                 } else {
-                    pt1 = bbox.Min + offsetLeft;
-                }
-
-                // Если точка, куда нужно поставить размерную линию находится за рамкой подрезки,
-                // то ставим по рамки подрезки
-                if(xUpDirectionRounded.Equals(0.0) && yUpDirectionRounded.Equals(1.0)) {
-                    if(pt1.X < cropBoxMinGlobal.X) {
-                        pt1 = new XYZ(cropBoxMinGlobal.X, pt1.Y, pt1.Z);
+                    // Горизонтальное сечение
+                    if(xUpDirectionRounded == 1 || yUpDirectionRounded == -1) {
+                        pt1 = bbox.Max + offsetLeft;
+                    } else {
+                        pt1 = bbox.Min + offsetLeft;
                     }
                 }
-
-                if(xUpDirectionRounded.Equals(0.0) && yUpDirectionRounded.Equals(-1.0)) {
-                    if(pt1.X > cropBoxMinGlobal.X) {
-                        pt1 = new XYZ(cropBoxMinGlobal.X, pt1.Y, pt1.Z);
-                    }
-                }
-
-                if(xUpDirectionRounded.Equals(1.0) && yUpDirectionRounded.Equals(0.0)) {
-                    if(pt1.Y > cropBoxMinGlobal.Y) {
-                        pt1 = new XYZ(pt1.X, cropBoxMinGlobal.Y, pt1.Z);
-                    }
-                }
-
-                if(xUpDirectionRounded.Equals(-1.0) && yUpDirectionRounded.Equals(0.0)) {
-                    if(pt1.Y < cropBoxMinGlobal.Y) {
-                        pt1 = new XYZ(pt1.X, cropBoxMinGlobal.Y, pt1.Z);
-                    }
-                }
-
                 pt2 = pt1 + _viewUpDirection;
                 break;
-            case DimensionOffsetType.Right:
+            case DirectionType.Right:
                 // Получаем единичный вектор вида направления вверх
                 var rightDirectionNormalized = _viewRightDirection.Normalize();
                 // Получаем отступ для более корректного размещения размера относительно арматуры
                 var offsetRight = rightDirectionNormalized.Multiply(offsetCoefficient);
 
                 // Получаем первую точку размерной линии по BoundingBox каркаса армирования + отступ
-                if(xUpDirectionRounded == 1 || (yUpDirectionRounded == -1)) {
-                    pt1 = bbox.Min + offsetRight;
+                if(zUpDirectionRounded == 1) {
+                    // Вертикальное сечение
+                    if(xRightDirectionRounded == -1 || yRightDirectionRounded == -1) {
+                        pt1 = bbox.Min + offsetRight;
+                    } else {
+                        pt1 = bbox.Max + offsetRight;
+                    }
                 } else {
-                    pt1 = bbox.Max + offsetRight;
-                }
-
-                // Если точка, куда нужно поставить размерную линию находится за рамкой подрезки,
-                // то ставим по рамки подрезки
-                if(xUpDirectionRounded.Equals(0.0) && yUpDirectionRounded.Equals(1.0)) {
-                    if(pt1.X > cropBoxMaxGlobal.X) {
-                        pt1 = new XYZ(cropBoxMaxGlobal.X, pt1.Y, pt1.Z);
+                    // Горизонтальное сечение
+                    if(xUpDirectionRounded == 1 || yUpDirectionRounded == -1) {
+                        pt1 = bbox.Min + offsetRight;
+                    } else {
+                        pt1 = bbox.Max + offsetRight;
                     }
                 }
-
-                if(xUpDirectionRounded.Equals(0.0) && yUpDirectionRounded.Equals(-1.0)) {
-                    if(pt1.X < cropBoxMaxGlobal.X) {
-                        pt1 = new XYZ(cropBoxMaxGlobal.X, pt1.Y, pt1.Z);
-                    }
-                }
-
-                if(xUpDirectionRounded.Equals(1.0) && yUpDirectionRounded.Equals(0.0)) {
-                    if(pt1.Y < cropBoxMaxGlobal.Y) {
-                        pt1 = new XYZ(pt1.X, cropBoxMaxGlobal.Y, pt1.Z);
-                    }
-                }
-
-                if(xUpDirectionRounded.Equals(-1.0) && yUpDirectionRounded.Equals(0.0)) {
-                    if(pt1.Y > cropBoxMaxGlobal.Y) {
-                        pt1 = new XYZ(pt1.X, cropBoxMaxGlobal.Y, pt1.Z);
-                    }
-                }
-
                 pt2 = pt1 + _viewUpDirection;
                 break;
             default:
@@ -231,8 +156,23 @@ internal class DimensionBaseService {
     }
 
 
-    public ReferenceArray GetDimensionRefs(FamilyInstance elem, char keyRefNamePart,
-                                            List<string> importantRefNameParts, ReferenceArray oldRefArray = null) {
+    /// <summary>
+    /// Возвращает массив опорных плоскостей, взятых с элемента и отфильтрованных по имени.
+    /// Имя опорной плоскости задается по маске: "ПарамФильтр1/ПарамФильтр2#_КлючСлово1_КлючСлово2",
+    /// где параметров фильтрации и ключевых слов может быть сколько угодно.
+    /// </summary>
+    /// <param name="elem">Элемент,у которого необходимо получить опорные плоскости</param>
+    /// <param name="keyRefNamePart">Символ-разделитель имени опорной плоскости между частью с информацией 
+    /// о фильтрующих параметрах и частью с ключевыми словами</param>
+    /// <param name="refNameParamsSeparator">Символ-разделитель имени опорной плоскости между фильтрующими параметрами</param>
+    /// <param name="importantRefNameParts">Список ключевых слов, которые должны быть в имени опорной плоскости</param>
+    /// <param name="unimportantRefNameParts">Список ключевых слов, которые НЕ должны быть в имени опорной плоскости</param>
+    /// <param name="oldRefArray">Предыдущий массив опорных плоскостей, в который можно дописать новые плоскости</param>
+    /// <returns></returns>
+    public ReferenceArray GetDimensionRefs(FamilyInstance elem, List<string> importantRefNameParts, 
+                                           List<string> unimportantRefNameParts = null,
+                                           char keyRefNamePart = '#', char refNameParamsSeparator = '/',
+                                           ReferenceArray oldRefArray = null) {
         var references = new List<Reference>();
         foreach(FamilyInstanceReferenceType referenceType in Enum.GetValues(typeof(FamilyInstanceReferenceType))) {
             references.AddRange(elem.GetReferences(referenceType));
@@ -246,23 +186,41 @@ internal class DimensionBaseService {
                 refArray.Append(reference);
             }
         }
-
         importantRefNameParts.Add(keyRefNamePart.ToString());
+        unimportantRefNameParts = unimportantRefNameParts is null ? [] : unimportantRefNameParts;
         foreach(var reference in references) {
             string referenceName = elem.GetReferenceName(reference);
-            if(!importantRefNameParts.All(referenceName.Contains)) {
+            if(!importantRefNameParts.All(referenceName.Contains) || unimportantRefNameParts.Any(referenceName.Contains)) {
                 continue;
             }
 
-            string paramName = referenceName.Split(keyRefNamePart)[0];
-            int paramValue = paramName == string.Empty ? 1 : _paramValueService.GetParamValueAnywhere(elem, paramName);
+            // мод_ФОП_Доборный 1/мод_ФОП_Доборный 1_Массив#1_торец
+            // мод_ФОП_Доборный 1#1_торец
+            string paramParts = referenceName.Split(keyRefNamePart)[0];
+            int paramValue = 0;
 
+            string[] parameters = [paramParts];
+            if(paramParts.Contains(refNameParamsSeparator)) {
+                parameters = paramParts.Split(refNameParamsSeparator);
+            }
+
+            foreach(string paramPart in parameters) {
+                if(paramPart == string.Empty) {
+                    paramValue = 1;
+                } else {
+                    paramValue = _paramValueService.GetParamValueAnywhere<int>(elem, paramPart);
+                }
+                if(paramValue == 0) {
+                    break;
+                }
+            }
             if(paramValue == 1) {
                 refArray.Append(reference);
             }
         }
         return refArray;
     }
+
 
     public ReferenceArray GetDimensionRefs(List<Grid> grids, XYZ direction, ReferenceArray oldRefArray = null) {
         // Создаем матрицу трансформации
@@ -287,14 +245,17 @@ internal class DimensionBaseService {
                 var lineDirection = line.Direction.Normalize();
                 var lineDirectionByView = transform.OfVector(lineDirection);
 
-                if(lineDirectionByView.IsAlmostEqualTo(normalizedDirection, 0.01)
+                // Оси могут быть проложены в двух направлениях
+                // В случае, если это вертикальный вид, то нужно привязываться к осям всегда
+                // В случае, если это горизонтальный вид, то нужно привязываться в зависимости от направления вида
+                if(_view.UpDirection.IsAlmostEqualTo(XYZ.BasisZ)
+                    || lineDirectionByView.IsAlmostEqualTo(normalizedDirection, 0.01)
                     || lineDirectionByView.IsAlmostEqualTo(normalizedDirection.Negate(), 0.01)) {
-
                     var gridRef = new Reference(grid);
                     if(gridRef != null) {
                         refArray.Append(gridRef);
                     }
-                }
+                } 
             }
         }
         return refArray;

@@ -2,7 +2,7 @@ using System;
 
 using Autodesk.Revit.DB;
 
-using RevitPylonDocumentation.ViewModels;
+using RevitPylonDocumentation.Models.UserSettings;
 
 namespace RevitPylonDocumentation.Models.PylonSheetNView;
 public class PylonViewSchedulePlacer {
@@ -26,14 +26,14 @@ public class PylonViewSchedulePlacer {
     private readonly double _schedulePartsRightOffset = -UnitUtilsHelper.ConvertToInternalValue(2.9);
 
 
-    internal PylonViewSchedulePlacer(MainViewModel mvm, RevitRepository repository, PylonSheetInfo pylonSheetInfo) {
-        ViewModel = mvm;
-        Repository = repository;
+    internal PylonViewSchedulePlacer(CreationSettings settings, Document document, PylonSheetInfo pylonSheetInfo) {
+        SchedulesSettings = settings.SchedulesSettings;
+        Doc = document;
         SheetInfo = pylonSheetInfo;
     }
 
-    internal MainViewModel ViewModel { get; set; }
-    internal RevitRepository Repository { get; set; }
+    internal UserSchedulesSettings SchedulesSettings { get; set; }
+    internal Document Doc { get; set; }
     internal PylonSheetInfo SheetInfo { get; set; }
 
 
@@ -44,9 +44,9 @@ public class PylonViewSchedulePlacer {
         } else {
             // Заполняем данные для задания
             SheetInfo.SkeletonSchedule.ViewportName =
-                ViewModel.SchedulesSettings.SkeletonSchedulePrefix
+                SchedulesSettings.SkeletonSchedulePrefix
                     + SheetInfo.PylonKeyName
-                    + ViewModel.SchedulesSettings.SkeletonScheduleSuffix;
+                    + SchedulesSettings.SkeletonScheduleSuffix;
         }
 
         // Передаем спеку армирования в метод по созданию видовых экранов в (0.0.0)
@@ -66,43 +66,6 @@ public class PylonViewSchedulePlacer {
     }
 
 
-    internal bool PlaceRebarSchedule() {
-        // Проверяем вдруг спека не создалась
-        if(SheetInfo.RebarSchedule.ViewElement == null) {
-            return false;
-        } else {
-            // Заполняем данные для задания
-            SheetInfo.RebarSchedule.ViewportName =
-                ViewModel.SchedulesSettings.RebarSchedulePrefix
-                    + SheetInfo.PylonKeyName
-                    + ViewModel.SchedulesSettings.RebarScheduleSuffix;
-        }
-
-        // Передаем спеку армирования в метод по созданию видовых экранов в (0.0.0)
-        if(!PlaceScheduleViewport(SheetInfo.PylonViewSheet, SheetInfo.RebarSchedule)) {
-            return false;
-        }
-
-        // Рассчитываем и задаем корректную точку вставки спецификации материалов пилона
-        var newCenter = new XYZ(
-            -SheetInfo.RebarSchedule.ViewportHalfWidth * 2 - _titleBlockFrameRightOffset,
-            SheetInfo.TitleBlockHeight - _titleBlockFrameTopOffset,
-            0);
-
-        if(SheetInfo.SkeletonSchedule.ViewportElement != null) {
-            newCenter = new XYZ(
-                -SheetInfo.RebarSchedule.ViewportHalfWidth * 2 - _titleBlockFrameRightOffset,
-                SheetInfo.SkeletonSchedule.ViewportCenter.Y - SheetInfo.SkeletonSchedule.ViewportHalfHeight * 2
-                + _scheduleTopOffsetSmall,
-                0);
-        }
-        (SheetInfo.RebarSchedule.ViewportElement as ScheduleSheetInstance).Point = newCenter;
-
-        SheetInfo.RebarSchedule.ViewportCenter = newCenter;
-        return true;
-    }
-
-
     internal bool PlaceMaterialSchedule() {
         // Проверяем вдруг спека не создалась
         if(SheetInfo.MaterialSchedule.ViewElement == null) {
@@ -110,9 +73,9 @@ public class PylonViewSchedulePlacer {
         } else {
             // Заполняем данные для задания
             SheetInfo.MaterialSchedule.ViewportName =
-                ViewModel.SchedulesSettings.MaterialSchedulePrefix
+                SchedulesSettings.MaterialSchedulePrefix
                     + SheetInfo.PylonKeyName
-                    + ViewModel.SchedulesSettings.MaterialScheduleSuffix;
+                    + SchedulesSettings.MaterialScheduleSuffix;
         }
 
         // Передаем спеку армирования в метод по созданию видовых экранов в (0.0.0)
@@ -126,10 +89,10 @@ public class PylonViewSchedulePlacer {
                 _defaultSchedulePositionY,
                 0);
 
-        if(SheetInfo.RebarSchedule.ViewportElement != null) {
+        if(SheetInfo.SkeletonSchedule.ViewportElement != null) {
             newCenter = new XYZ(
                 -SheetInfo.MaterialSchedule.ViewportHalfWidth * 2 - _titleBlockFrameRightOffset,
-                SheetInfo.RebarSchedule.ViewportCenter.Y - SheetInfo.RebarSchedule.ViewportHalfHeight * 2
+                SheetInfo.SkeletonSchedule.ViewportCenter.Y - SheetInfo.SkeletonSchedule.ViewportHalfHeight * 2
                 + _scheduleTopOffsetSmall,
                 0);
         }
@@ -146,9 +109,9 @@ public class PylonViewSchedulePlacer {
         } else {
             // Заполняем данные для задания
             SheetInfo.SkeletonByElemsSchedule.ViewportName =
-                ViewModel.SchedulesSettings.SkeletonByElemsSchedulePrefix
+                SchedulesSettings.SkeletonByElemsSchedulePrefix
                     + SheetInfo.PylonKeyName
-                    + ViewModel.SchedulesSettings.SkeletonByElemsScheduleSuffix;
+                    + SchedulesSettings.SkeletonByElemsScheduleSuffix;
         }
 
         // Передаем спеку армирования в метод по созданию видовых экранов в (0.0.0)
@@ -165,7 +128,9 @@ public class PylonViewSchedulePlacer {
         if(SheetInfo.MaterialSchedule.ViewportElement != null) {
             newCenter = new XYZ(
                 -SheetInfo.SkeletonByElemsSchedule.ViewportHalfWidth * 2 - _titleBlockFrameRightOffset,
-                SheetInfo.MaterialSchedule.ViewportCenter.Y - SheetInfo.MaterialSchedule.ViewportHalfHeight * 2 - _scheduleTopOffsetBig,
+                SheetInfo.MaterialSchedule.ViewportCenter.Y 
+                    - SheetInfo.MaterialSchedule.ViewportHalfHeight * 2 
+                    - _scheduleTopOffsetBig,
                 0);
         }
         (SheetInfo.SkeletonByElemsSchedule.ViewportElement as ScheduleSheetInstance).Point = newCenter;
@@ -182,9 +147,9 @@ public class PylonViewSchedulePlacer {
         } else {
             // Заполняем данные для задания
             SheetInfo.SystemPartsSchedule.ViewportName =
-                ViewModel.SchedulesSettings.SystemPartsSchedulePrefix
+                SchedulesSettings.SystemPartsSchedulePrefix
                     + SheetInfo.PylonKeyName
-                    + ViewModel.SchedulesSettings.SystemPartsScheduleSuffix;
+                    + SchedulesSettings.SystemPartsScheduleSuffix;
         }
 
         // Передаем спеку армирования в метод по созданию видовых экранов в (0.0.0)
@@ -201,7 +166,9 @@ public class PylonViewSchedulePlacer {
         if(SheetInfo.SkeletonByElemsSchedule.ViewportElement != null) {
             newCenter = new XYZ(
                 _schedulePartsRightOffset - SheetInfo.SystemPartsSchedule.ViewportHalfWidth * 2,
-                SheetInfo.SkeletonByElemsSchedule.ViewportCenter.Y - SheetInfo.SkeletonByElemsSchedule.ViewportHalfHeight * 2 - _scheduleTopOffsetBig,
+                SheetInfo.SkeletonByElemsSchedule.ViewportCenter.Y 
+                    - SheetInfo.SkeletonByElemsSchedule.ViewportHalfHeight * 2 
+                    - _scheduleTopOffsetBig,
                 0);
         }
         (SheetInfo.SystemPartsSchedule.ViewportElement as ScheduleSheetInstance).Point = newCenter;
@@ -217,9 +184,9 @@ public class PylonViewSchedulePlacer {
         } else {
             // Заполняем данные для задания
             SheetInfo.IfcPartsSchedule.ViewportName =
-                ViewModel.SchedulesSettings.IfcPartsSchedulePrefix
+                SchedulesSettings.IfcPartsSchedulePrefix
                     + SheetInfo.PylonKeyName
-                    + ViewModel.SchedulesSettings.IfcPartsScheduleSuffix;
+                    + SchedulesSettings.IfcPartsScheduleSuffix;
         }
 
         // Передаем спеку армирования в метод по созданию видовых экранов в (0.0.0)
@@ -236,7 +203,9 @@ public class PylonViewSchedulePlacer {
         if(SheetInfo.SkeletonByElemsSchedule.ViewportElement != null) {
             newCenter = new XYZ(
                 _schedulePartsRightOffset - SheetInfo.IfcPartsSchedule.ViewportHalfWidth * 2,
-                SheetInfo.SkeletonByElemsSchedule.ViewportCenter.Y - SheetInfo.SkeletonByElemsSchedule.ViewportHalfHeight * 2 - _scheduleTopOffsetBig,
+                SheetInfo.SkeletonByElemsSchedule.ViewportCenter.Y 
+                    - SheetInfo.SkeletonByElemsSchedule.ViewportHalfHeight * 2 
+                    - _scheduleTopOffsetBig,
                 0);
         }
         (SheetInfo.IfcPartsSchedule.ViewportElement as ScheduleSheetInstance).Point = newCenter;
@@ -246,12 +215,11 @@ public class PylonViewSchedulePlacer {
 
 
     public bool PlaceScheduleViewport(ViewSheet viewSheet, PylonView pylonView) {
-        var doc = Repository.Document;
-
         ScheduleSheetInstance scheduleSheetInstance;
         // Размещаем спеку пилона на листе
         try {
-            scheduleSheetInstance = ScheduleSheetInstance.Create(doc, viewSheet.Id, pylonView.ViewElement.Id, new XYZ(0, 0, 0));
+            scheduleSheetInstance = ScheduleSheetInstance.Create(Doc, viewSheet.Id, pylonView.ViewElement.Id, 
+                                                                 new XYZ(0, 0, 0));
         } catch(Exception) {
             return false;
         }

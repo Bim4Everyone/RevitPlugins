@@ -1,26 +1,20 @@
-using RevitPylonDocumentation.ViewModels;
-
 namespace RevitPylonDocumentation.Models.PylonSheetNView;
 internal class PylonSheetInfoManager {
-    public PylonSheetInfoManager(MainViewModel mvm, RevitRepository repository, PylonSheetInfo pylonSheetInfo) {
-        ViewModel = mvm;
+    public PylonSheetInfoManager(CreationSettings settings, RevitRepository repository, PylonSheetInfo pylonSheetInfo) {
+        Settings = settings;
         Repository = repository;
         SheetInfo = pylonSheetInfo;
     }
 
-    internal MainViewModel ViewModel { get; set; }
+    internal CreationSettings Settings { get; set; }
     internal RevitRepository Repository { get; set; }
     internal PylonSheetInfo SheetInfo { get; set; }
 
     public void WorkWithCreation() {
-        var selectionSettings = ViewModel.SelectionSettings;
+        var selectionSettings = Settings.SelectionSettings;
 
-        // Если текущий PylonSheetInfo не выбран для работы - continue
-        if(!SheetInfo.IsCheck) { return; } else {
-            SheetInfo.GetViewNamesForWork();
-        }
-
-        // Если листы были в проекте (когда плагин запускают для создания/размещения видов), то мы об этом знаем из RevitRepository
+        // Если листы были в проекте (когда плагин запускают для создания/размещения видов),
+        // то мы об этом знаем из RevitRepository
         if(SheetInfo.PylonViewSheet is null) {
             SheetInfo.CreateSheet();
         } else {
@@ -29,18 +23,30 @@ internal class PylonSheetInfoManager {
             SheetInfo.FindViewsNViewportsOnSheet();
             SheetInfo.FindSchedulesNViewportsOnSheet();
             SheetInfo.FindNoteLegendOnSheet();
-            SheetInfo.FindRebarLegendNodeOnSheet();
         }
 
         // Если вдруг по какой-то причине лист не был создан, то создание видов/видовых экранов не выполняем 
         if(SheetInfo.PylonViewSheet is null) { return; }
 
+        // Получаем суммарный BoundingBox по всем элементам, принадлежащим пилону
+        // (нужен для формирования рамки подрезки видов)
+        SheetInfo.ElemsInfo.FindPylonHostVectors();
+        SheetInfo.ElemsInfo.FindPylonHostOrigin();
+        SheetInfo.ElemsInfo.FindHostDimensions();
+        SheetInfo.ElemsInfo.FindHostMaxMinByZ();
+        SheetInfo.ElemsInfo.FindElemsBoundingBox();
+        SheetInfo.ElemsInfo.FindElemsBoundingBoxProps();
+
+        SheetInfo.RebarInfo.TrySetSimpleRebarMarks();
+
         // ОСНОВНОЙ ВИД
         if(selectionSettings.NeedWorkWithGeneralView) {
             // Здесь может быть два варианта: 1) найден и вид, и видовой экран; 2) не найдено ничего
             if(SheetInfo.GeneralView.ViewElement is null) {
-                // Если вид не найден, то сначала пытаемся создать вид, а потом, если создание не успешно - будем искать в проекте
-                if(!SheetInfo.GeneralView.ViewSectionCreator.TryCreateGeneralView(ViewModel.SelectedViewFamilyType)) {
+                // Если вид не найден, то сначала пытаемся создать вид, а потом, если создание не успешно -
+                // будем искать в проекте
+                if(!SheetInfo.GeneralView.ViewSectionCreator.TryCreateGeneralView(
+                        Settings.TypesSettings.SelectedViewFamilyType)) {
                     Repository.FindViewSectionInPj(SheetInfo.GeneralView);
                 }
             }
@@ -51,10 +57,12 @@ internal class PylonSheetInfoManager {
         // ОСНОВНОЙ АРМАТУРНЫЙ ВИД
         if(selectionSettings.NeedWorkWithGeneralRebarView) {
             // Здесь может быть два варианта: 1) найден и вид, и видовой экран; 2) не найдено ничего
-            if(SheetInfo.GeneralRebarView.ViewElement is null) {
-                // Если вид не найден, то сначала пытаемся создать вид, а потом, если создание не успешно - будем искать в проекте
-                if(!SheetInfo.GeneralRebarView.ViewSectionCreator.TryCreateGeneralRebarView(ViewModel.SelectedViewFamilyType)) {
-                    Repository.FindViewSectionInPj(SheetInfo.GeneralRebarView);
+            if(SheetInfo.GeneralViewRebar.ViewElement is null) {
+                // Если вид не найден, то сначала пытаемся создать вид, а потом, если создание не успешно -
+                // будем искать в проекте
+                if(!SheetInfo.GeneralViewRebar.ViewSectionCreator.TryCreateGeneralRebarView(
+                        Settings.TypesSettings.SelectedViewFamilyType)) {
+                    Repository.FindViewSectionInPj(SheetInfo.GeneralViewRebar);
                 }
             }
             // Тут точно получили вид
@@ -66,8 +74,10 @@ internal class PylonSheetInfoManager {
         if(selectionSettings.NeedWorkWithGeneralPerpendicularView) {
             // Здесь может быть два варианта: 1) найден и вид, и видовой экран; 2) не найдено ничего
             if(SheetInfo.GeneralViewPerpendicular.ViewElement is null) {
-                // Если вид не найден, то сначала пытаемся создать вид, а потом, если создание не успешно - будем искать в проекте
-                if(!SheetInfo.GeneralViewPerpendicular.ViewSectionCreator.TryCreateGeneralPerpendicularView(ViewModel.SelectedViewFamilyType)) {
+                // Если вид не найден, то сначала пытаемся создать вид, а потом, если создание не успешно -
+                // будем искать в проекте
+                if(!SheetInfo.GeneralViewPerpendicular.ViewSectionCreator.TryCreateGeneralPerpendicularView(
+                        Settings.TypesSettings.SelectedViewFamilyType)) {
                     Repository.FindViewSectionInPj(SheetInfo.GeneralViewPerpendicular);
                 }
             }
@@ -78,10 +88,12 @@ internal class PylonSheetInfoManager {
         // ОСНОВНОЙ АРМАТУРНЫЙ ПЕРПЕНДИКУЛЯРНЫЙ ВИД 
         if(selectionSettings.NeedWorkWithGeneralPerpendicularRebarView) {
             // Здесь может быть два варианта: 1) найден и вид, и видовой экран; 2) не найдено ничего
-            if(SheetInfo.GeneralRebarViewPerpendicular.ViewElement is null) {
-                // Если вид не найден, то сначала пытаемся создать вид, а потом, если создание не успешно - будем искать в проекте
-                if(!SheetInfo.GeneralRebarViewPerpendicular.ViewSectionCreator.TryCreateGeneralRebarPerpendicularView(ViewModel.SelectedViewFamilyType)) {
-                    Repository.FindViewSectionInPj(SheetInfo.GeneralRebarViewPerpendicular);
+            if(SheetInfo.GeneralViewPerpendicularRebar.ViewElement is null) {
+                // Если вид не найден, то сначала пытаемся создать вид, а потом, если создание не успешно -
+                // будем искать в проекте
+                if(!SheetInfo.GeneralViewPerpendicularRebar.ViewSectionCreator.TryCreateGeneralRebarPerpendicularView(
+                        Settings.TypesSettings.SelectedViewFamilyType)) {
+                    Repository.FindViewSectionInPj(SheetInfo.GeneralViewPerpendicularRebar);
                 }
             }
             // Тут точно получили вид
@@ -91,8 +103,11 @@ internal class PylonSheetInfoManager {
         if(selectionSettings.NeedWorkWithTransverseViewFirst) {
             // Здесь может быть два варианта: 1) найден и вид, и видовой экран; 2) не найдено ничего
             if(SheetInfo.TransverseViewFirst.ViewElement is null) {
-                // Если вид не найден, то сначала пытаемся создать вид, а потом, если создание не успешно - будем искать в проекте
-                if(!SheetInfo.TransverseViewFirst.ViewSectionCreator.TryCreateTransverseView(ViewModel.SelectedViewFamilyType, 1)) {
+                // Если вид не найден, то сначала пытаемся создать вид, а потом, если создание не успешно -
+                // будем искать в проекте
+                if(!SheetInfo.TransverseViewFirst.ViewSectionCreator.TryCreateTransverseView(
+                        Settings.TypesSettings.SelectedViewFamilyType, 
+                        1)) {
                     Repository.FindViewSectionInPj(SheetInfo.TransverseViewFirst);
                 }
             }
@@ -103,8 +118,11 @@ internal class PylonSheetInfoManager {
         if(selectionSettings.NeedWorkWithTransverseViewSecond) {
             // Здесь может быть два варианта: 1) найден и вид, и видовой экран; 2) не найдено ничего
             if(SheetInfo.TransverseViewSecond.ViewElement is null) {
-                // Если вид не найден, то сначала пытаемся создать вид, а потом, если создание не успешно - будем искать в проекте
-                if(!SheetInfo.TransverseViewSecond.ViewSectionCreator.TryCreateTransverseView(ViewModel.SelectedViewFamilyType, 2)) {
+                // Если вид не найден, то сначала пытаемся создать вид, а потом, если создание не успешно -
+                // будем искать в проекте
+                if(!SheetInfo.TransverseViewSecond.ViewSectionCreator.TryCreateTransverseView(
+                        Settings.TypesSettings.SelectedViewFamilyType, 
+                        2)) {
                     Repository.FindViewSectionInPj(SheetInfo.TransverseViewSecond);
                 }
             }
@@ -115,8 +133,11 @@ internal class PylonSheetInfoManager {
         if(selectionSettings.NeedWorkWithTransverseViewThird) {
             // Здесь может быть два варианта: 1) найден и вид, и видовой экран; 2) не найдено ничего
             if(SheetInfo.TransverseViewThird.ViewElement is null) {
-                // Если вид не найден, то сначала пытаемся создать вид, а потом, если создание не успешно - будем искать в проекте
-                if(!SheetInfo.TransverseViewThird.ViewSectionCreator.TryCreateTransverseView(ViewModel.SelectedViewFamilyType, 3)) {
+                // Если вид не найден, то сначала пытаемся создать вид, а потом, если создание не успешно -
+                // будем искать в проекте
+                if(!SheetInfo.TransverseViewThird.ViewSectionCreator.TryCreateTransverseView(
+                        Settings.TypesSettings.SelectedViewFamilyType, 
+                        3)) {
                     Repository.FindViewSectionInPj(SheetInfo.TransverseViewThird);
                 }
             }
@@ -124,36 +145,45 @@ internal class PylonSheetInfoManager {
         }
 
         // ПЕРВЫЙ ПОПЕРЕЧНЫЙ ВИД АРМИРОВАНИЯ
-        if(selectionSettings.NeedWorkWithTransverseRebarViewFirst) {
+        if(selectionSettings.NeedWorkWithTransverseViewFirst) {
             // Здесь может быть два варианта: 1) найден и вид, и видовой экран; 2) не найдено ничего
-            if(SheetInfo.TransverseRebarViewFirst.ViewElement is null) {
-                // Если вид не найден, то сначала пытаемся создать вид, а потом, если создание не успешно - будем искать в проекте
-                if(!SheetInfo.TransverseRebarViewFirst.ViewSectionCreator.TryCreateTransverseRebarView(ViewModel.SelectedViewFamilyType, 1)) {
-                    Repository.FindViewSectionInPj(SheetInfo.TransverseRebarViewFirst);
+            if(SheetInfo.TransverseViewFirstRebar.ViewElement is null) {
+                // Если вид не найден, то сначала пытаемся создать вид, а потом, если создание не успешно -
+                // будем искать в проекте
+                if(!SheetInfo.TransverseViewFirstRebar.ViewSectionCreator.TryCreateTransverseRebarView(
+                        Settings.TypesSettings.SelectedViewFamilyType, 
+                        1)) {
+                    Repository.FindViewSectionInPj(SheetInfo.TransverseViewFirstRebar);
                 }
             }
             // Тут точно получили вид
         }
 
         // ВТОРОЙ ПОПЕРЕЧНЫЙ ВИД АРМИРОВАНИЯ
-        if(selectionSettings.NeedWorkWithTransverseRebarViewSecond) {
+        if(selectionSettings.NeedWorkWithTransverseViewSecond) {
             // Здесь может быть два варианта: 1) найден и вид, и видовой экран; 2) не найдено ничего
-            if(SheetInfo.TransverseRebarViewSecond.ViewElement is null) {
-                // Если вид не найден, то сначала пытаемся создать вид, а потом, если создание не успешно - будем искать в проекте
-                if(!SheetInfo.TransverseRebarViewSecond.ViewSectionCreator.TryCreateTransverseRebarView(ViewModel.SelectedViewFamilyType, 2)) {
-                    Repository.FindViewSectionInPj(SheetInfo.TransverseRebarViewSecond);
+            if(SheetInfo.TransverseViewSecondRebar.ViewElement is null) {
+                // Если вид не найден, то сначала пытаемся создать вид, а потом, если создание не успешно -
+                // будем искать в проекте
+                if(!SheetInfo.TransverseViewSecondRebar.ViewSectionCreator.TryCreateTransverseRebarView(
+                        Settings.TypesSettings.SelectedViewFamilyType, 
+                        2)) {
+                    Repository.FindViewSectionInPj(SheetInfo.TransverseViewSecondRebar);
                 }
             }
             // Тут точно получили вид
         }
 
-        // СПЕЦИФИКАЦИЯ АРМАТУРЫ
-        if(selectionSettings.NeedWorkWithRebarSchedule) {
+        // ТРЕТИЙ ПОПЕРЕЧНЫЙ ВИД АРМИРОВАНИЯ
+        if(selectionSettings.NeedWorkWithTransverseViewThird) {
             // Здесь может быть два варианта: 1) найден и вид, и видовой экран; 2) не найдено ничего
-            if(SheetInfo.RebarSchedule.ViewElement is null) {
-                // Если вид не найден, то сначала пытаемся создать вид, а потом, если создание не успешно - будем искать в проекте
-                if(!SheetInfo.RebarSchedule.ViewScheduleCreator.TryCreateRebarSchedule()) {
-                    Repository.FindViewScheduleInPj(SheetInfo.RebarSchedule);
+            if(SheetInfo.TransverseViewThirdRebar.ViewElement is null) {
+                // Если вид не найден, то сначала пытаемся создать вид, а потом, если создание не успешно -
+                // будем искать в проекте
+                if(!SheetInfo.TransverseViewThirdRebar.ViewSectionCreator.TryCreateTransverseRebarView(
+                        Settings.TypesSettings.SelectedViewFamilyType, 
+                        3)) {
+                    Repository.FindViewSectionInPj(SheetInfo.TransverseViewThirdRebar);
                 }
             }
             // Тут точно получили вид
@@ -163,7 +193,8 @@ internal class PylonSheetInfoManager {
         if(selectionSettings.NeedWorkWithSkeletonSchedule) {
             // Здесь может быть два варианта: 1) найден и вид, и видовой экран; 2) не найдено ничего
             if(SheetInfo.SkeletonSchedule.ViewElement is null) {
-                // Если вид не найден, то сначала пытаемся создать вид, а потом, если создание не успешно - будем искать в проекте
+                // Если вид не найден, то сначала пытаемся создать вид, а потом, если создание не успешно -
+                // будем искать в проекте
                 if(!SheetInfo.SkeletonSchedule.ViewScheduleCreator.TryCreateSkeletonSchedule()) {
                     Repository.FindViewScheduleInPj(SheetInfo.SkeletonSchedule);
                 }
@@ -175,7 +206,8 @@ internal class PylonSheetInfoManager {
         if(selectionSettings.NeedWorkWithSkeletonByElemsSchedule) {
             // Здесь может быть два варианта: 1) найден и вид, и видовой экран; 2) не найдено ничего
             if(SheetInfo.SkeletonByElemsSchedule.ViewElement is null) {
-                // Если вид не найден, то сначала пытаемся создать вид, а потом, если создание не успешно - будем искать в проекте
+                // Если вид не найден, то сначала пытаемся создать вид, а потом, если создание не успешно -
+                // будем искать в проекте
                 if(!SheetInfo.SkeletonByElemsSchedule.ViewScheduleCreator.TryCreateSkeletonByElemsSchedule()) {
                     Repository.FindViewScheduleInPj(SheetInfo.SkeletonByElemsSchedule);
                 }
@@ -187,7 +219,8 @@ internal class PylonSheetInfoManager {
         if(selectionSettings.NeedWorkWithMaterialSchedule) {
             // Здесь может быть два варианта: 1) найден и вид, и видовой экран; 2) не найдено ничего
             if(SheetInfo.MaterialSchedule.ViewElement is null) {
-                // Если вид не найден, то сначала пытаемся создать вид, а потом, если создание не успешно - будем искать в проекте
+                // Если вид не найден, то сначала пытаемся создать вид, а потом, если создание не успешно -
+                // будем искать в проекте
                 if(!SheetInfo.MaterialSchedule.ViewScheduleCreator.TryCreateMaterialSchedule()) {
                     Repository.FindViewScheduleInPj(SheetInfo.MaterialSchedule);
                 }
@@ -199,7 +232,8 @@ internal class PylonSheetInfoManager {
         if(selectionSettings.NeedWorkWithSystemPartsSchedule) {
             // Здесь может быть два варианта: 1) найден и вид, и видовой экран; 2) не найдено ничего
             if(SheetInfo.SystemPartsSchedule.ViewElement is null) {
-                // Если вид не найден, то сначала пытаемся создать вид, а потом, если создание не успешно - будем искать в проекте
+                // Если вид не найден, то сначала пытаемся создать вид, а потом, если создание не успешно -
+                // будем искать в проекте
                 if(!SheetInfo.SystemPartsSchedule.ViewScheduleCreator.TryCreateSystemPartsSchedule()) {
                     Repository.FindViewScheduleInPj(SheetInfo.SystemPartsSchedule);
                 }
@@ -211,7 +245,8 @@ internal class PylonSheetInfoManager {
         if(selectionSettings.NeedWorkWithIfcPartsSchedule) {
             // Здесь может быть два варианта: 1) найден и вид, и видовой экран; 2) не найдено ничего
             if(SheetInfo.IfcPartsSchedule.ViewElement is null) {
-                // Если вид не найден, то сначала пытаемся создать вид, а потом, если создание не успешно - будем искать в проекте
+                // Если вид не найден, то сначала пытаемся создать вид, а потом, если создание не успешно -
+                // будем искать в проекте
                 if(!SheetInfo.IfcPartsSchedule.ViewScheduleCreator.TryCreateIfcPartsSchedule()) {
                     Repository.FindViewScheduleInPj(SheetInfo.IfcPartsSchedule);
                 }
@@ -227,91 +262,128 @@ internal class PylonSheetInfoManager {
 
 
 
-
         // СОЗДАНИЕ АННОТАЦИЙ ОСНОВНОГО ВИДА
         if(selectionSettings.NeedWorkWithGeneralView) {
             // Здесь может быть два варианта: 1) найден и вид, и видовой экран; 2) не найдено ничего
-            if(SheetInfo.GeneralView.ViewElement != null) {
-                SheetInfo.GeneralView.ViewDimensionCreator
-                    .TryCreateGeneralViewDimensions();
+            if(SheetInfo.GeneralView.ViewportElement is null 
+                    && SheetInfo.GeneralView.ViewElement != null) {
+                SheetInfo.GeneralView.AnnotationCreator.TryCreateViewAnnotations();
+            }
+        }
+
+        // СОЗДАНИЕ АННОТАЦИЙ ОСНОВНОГО ПЕРПЕНДИКУЛЯРНОГО ВИДА
+        if(selectionSettings.NeedWorkWithGeneralPerpendicularView) {
+            // Здесь может быть два варианта: 1) найден и вид, и видовой экран; 2) не найдено ничего
+            if(SheetInfo.GeneralViewPerpendicular.ViewportElement is null 
+                    && SheetInfo.GeneralViewPerpendicular.ViewElement != null) {
+                SheetInfo.GeneralViewPerpendicular.AnnotationCreator.TryCreateViewAnnotations();
             }
         }
 
         // СОЗДАНИЕ АННОТАЦИЙ ПЕРВОГО ПОПЕРЕЧНОГО ВИДА
         if(selectionSettings.NeedWorkWithTransverseViewFirst) {
             // Здесь может быть два варианта: 1) найден и вид, и видовой экран; 2) не найдено ничего
-            if(SheetInfo.TransverseViewFirst.ViewElement != null) {
-                SheetInfo.TransverseViewFirst.ViewDimensionCreator
-                    .TryCreateTransverseViewFirstDimensions();
-                SheetInfo.TransverseViewFirst.ViewMarkCreator
-                    .TryCreateTransverseViewMarks();
+            if(SheetInfo.TransverseViewFirst.ViewportElement is null 
+                    && SheetInfo.TransverseViewFirst.ViewElement != null) {
+                SheetInfo.TransverseViewFirst.AnnotationCreator.TryCreateViewAnnotations();
             }
         }
 
         // СОЗДАНИЕ АННОТАЦИЙ ВТОРОГО ПОПЕРЕЧНОГО ВИДА
         if(selectionSettings.NeedWorkWithTransverseViewSecond) {
             // Здесь может быть два варианта: 1) найден и вид, и видовой экран; 2) не найдено ничего
-            if(SheetInfo.TransverseViewSecond.ViewElement != null) {
-                SheetInfo.TransverseViewSecond.ViewDimensionCreator
-                    .TryCreateTransverseViewSecondDimensions();
-                SheetInfo.TransverseViewSecond.ViewMarkCreator
-                    .TryCreateTransverseViewMarks();
+            if(SheetInfo.TransverseViewSecond.ViewportElement is null 
+                    && SheetInfo.TransverseViewSecond.ViewElement != null) {
+                SheetInfo.TransverseViewSecond.AnnotationCreator.TryCreateViewAnnotations();
             }
         }
 
         // СОЗДАНИЕ АННОТАЦИЙ ТРЕТЬЕГО ПОПЕРЕЧНОГО ВИДА
         if(selectionSettings.NeedWorkWithTransverseViewThird) {
             // Здесь может быть два варианта: 1) найден и вид, и видовой экран; 2) не найдено ничего
-            if(SheetInfo.TransverseViewThird.ViewElement != null) {
-                SheetInfo.TransverseViewThird.ViewDimensionCreator
-                    .TryCreateTransverseViewThirdDimensions();
-                SheetInfo.TransverseViewThird.ViewMarkCreator
-                    .TryCreateTransverseViewMarks();
+            if(SheetInfo.TransverseViewThird.ViewportElement is null 
+                    && SheetInfo.TransverseViewThird.ViewElement != null) {
+                SheetInfo.TransverseViewThird.AnnotationCreator.TryCreateViewAnnotations();
             }
         }
 
         // СОЗДАНИЕ АННОТАЦИЙ ОСНОВНОГО АРМАТУРНОГО ВИДА
         if(selectionSettings.NeedWorkWithGeneralRebarView) {
             // Здесь может быть два варианта: 1) найден и вид, и видовой экран; 2) не найдено ничего
-            if(SheetInfo.GeneralRebarView.ViewElement != null) {
-                SheetInfo.GeneralRebarView.ViewDimensionCreator
-                    .TryCreateGeneralRebarViewDimensions();
+            if(SheetInfo.GeneralViewRebar.ViewportElement is null 
+                    && SheetInfo.GeneralViewRebar.ViewElement != null) {
+                SheetInfo.GeneralViewRebar.AnnotationCreator.TryCreateViewAnnotations();
             }
         }
 
         // СОЗДАНИЕ АННОТАЦИЙ ОСНОВНОГО ПЕРПЕНДИКУЛЯРНОГО АРМАТУРНОГО ВИДА
         if(selectionSettings.NeedWorkWithGeneralPerpendicularRebarView) {
             // Здесь может быть два варианта: 1) найден и вид, и видовой экран; 2) не найдено ничего
-            if(SheetInfo.GeneralRebarViewPerpendicular.ViewElement != null) {
-                SheetInfo.GeneralRebarViewPerpendicular.ViewDimensionCreator
-                    .TryCreateGeneralRebarPerpendicularViewDimensions();
-                SheetInfo.GeneralRebarViewPerpendicular.ViewDimensionCreator
-                    .TryCreateGeneralRebarPerpendicularViewAdditionalDimensions();
+            if(SheetInfo.GeneralViewPerpendicularRebar.ViewportElement is null 
+                    && SheetInfo.GeneralViewPerpendicularRebar.ViewElement != null) {
+                SheetInfo.GeneralViewPerpendicularRebar.AnnotationCreator.TryCreateViewAnnotations();
             }
         }
 
         // СОЗДАНИЕ АННОТАЦИЙ ПЕРВОГО ПОПЕРЕЧНОГО ВИДА АРМИРОВАНИЯ
-        if(selectionSettings.NeedWorkWithTransverseRebarViewFirst) {
+        if(selectionSettings.NeedWorkWithTransverseViewFirst) {
             // Здесь может быть два варианта: 1) найден и вид, и видовой экран; 2) не найдено ничего
-            if(SheetInfo.TransverseRebarViewFirst.ViewElement != null) {
-                SheetInfo.TransverseRebarViewFirst.ViewDimensionCreator
-                    .TryCreateTransverseRebarViewFirstDimensions();
-                SheetInfo.TransverseRebarViewFirst.ViewMarkCreator
-                    .TryCreateTransverseRebarViewMarks();
+            if(SheetInfo.TransverseViewFirstRebar.ViewportElement is null 
+                    && SheetInfo.TransverseViewFirstRebar.ViewElement != null) {
+                SheetInfo.TransverseViewFirstRebar.AnnotationCreator.TryCreateViewAnnotations();
             }
         }
 
         // СОЗДАНИЕ АННОТАЦИЙ ВТОРОГО ПОПЕРЕЧНОГО ВИДА АРМИРОВАНИЯ
-        if(selectionSettings.NeedWorkWithTransverseRebarViewSecond) {
+        if(selectionSettings.NeedWorkWithTransverseViewSecond) {
             // Здесь может быть два варианта: 1) найден и вид, и видовой экран; 2) не найдено ничего
-            if(SheetInfo.TransverseRebarViewSecond.ViewElement != null) {
-                SheetInfo.TransverseRebarViewSecond.ViewDimensionCreator
-                    .TryCreateTransverseRebarViewSecondDimensions();
-                SheetInfo.TransverseRebarViewSecond.ViewMarkCreator
-                    .TryCreateTransverseRebarViewMarks();
+            if(SheetInfo.TransverseViewSecondRebar.ViewportElement is null 
+                    && SheetInfo.TransverseViewSecondRebar.ViewElement != null) {
+                SheetInfo.TransverseViewSecondRebar.AnnotationCreator.TryCreateViewAnnotations();
             }
         }
 
+        // СОЗДАНИЕ АННОТАЦИЙ ТРЕТЬЕГО ПОПЕРЕЧНОГО ВИДА АРМИРОВАНИЯ
+        if(selectionSettings.NeedWorkWithTransverseViewThird) {
+            // Здесь может быть два варианта: 1) найден и вид, и видовой экран; 2) не найдено ничего
+            if(SheetInfo.TransverseViewThirdRebar.ViewportElement is null 
+                    && SheetInfo.TransverseViewThirdRebar.ViewElement != null) {
+                SheetInfo.TransverseViewThirdRebar.AnnotationCreator.TryCreateViewAnnotations();
+            }
+        }
+
+
+        // Размещение видов арматурного каркаса
+        if(selectionSettings.NeedWorkWithGeneralRebarView) {
+            // Если видовой экран на листе не найден, то размещаем
+            if(SheetInfo.GeneralViewRebar.ViewportElement is null) {
+                SheetInfo.GeneralViewRebar.ViewSectionPlacer.PlaceGeneralRebarViewport();
+            }
+        }
+        if(selectionSettings.NeedWorkWithGeneralPerpendicularRebarView) {
+            // Если видовой экран на листе не найден, то размещаем
+            if(SheetInfo.GeneralViewPerpendicularRebar.ViewportElement is null) {
+                SheetInfo.GeneralViewPerpendicularRebar.ViewSectionPlacer.PlaceGeneralPerpendicularRebarViewport();
+            }
+        }
+        if(selectionSettings.NeedWorkWithTransverseViewFirst) {
+            // Если видовой экран на листе не найден, то размещаем
+            if(SheetInfo.TransverseViewFirstRebar.ViewportElement is null) {
+                SheetInfo.TransverseViewFirstRebar.ViewSectionPlacer.PlaceTransverseRebarFirstViewPort();
+            }
+        }
+        if(selectionSettings.NeedWorkWithTransverseViewSecond) {
+            // Если видовой экран на листе не найден, то размещаем
+            if(SheetInfo.TransverseViewSecondRebar.ViewportElement is null) {
+                SheetInfo.TransverseViewSecondRebar.ViewSectionPlacer.PlaceTransverseRebarSecondViewPort();
+            }
+        }
+        if(selectionSettings.NeedWorkWithTransverseViewThird) {
+            // Если видовой экран на листе не найден, то размещаем
+            if(SheetInfo.TransverseViewThirdRebar.ViewportElement is null) {
+                SheetInfo.TransverseViewThirdRebar.ViewSectionPlacer.PlaceTransverseRebarThirdViewPort();
+            }
+        }
 
 
         // Размещение видов опалубки
@@ -327,10 +399,10 @@ internal class PylonSheetInfoManager {
                 SheetInfo.GeneralViewPerpendicular.ViewSectionPlacer.PlaceGeneralPerpendicularViewport();
             }
         }
-        if(selectionSettings.NeedWorkWithTransverseViewThird) {
+        if(selectionSettings.NeedWorkWithTransverseViewFirst) {
             // Если видовой экран на листе не найден, то размещаем
-            if(SheetInfo.TransverseViewThird.ViewportElement is null) {
-                SheetInfo.TransverseViewThird.ViewSectionPlacer.PlaceTransverseThirdViewPort();
+            if(SheetInfo.TransverseViewFirst.ViewportElement is null) {
+                SheetInfo.TransverseViewFirst.ViewSectionPlacer.PlaceTransverseFirstViewPort();
             }
         }
         if(selectionSettings.NeedWorkWithTransverseViewSecond) {
@@ -339,50 +411,19 @@ internal class PylonSheetInfoManager {
                 SheetInfo.TransverseViewSecond.ViewSectionPlacer.PlaceTransverseSecondViewPort();
             }
         }
-        if(selectionSettings.NeedWorkWithTransverseViewFirst) {
+        if(selectionSettings.NeedWorkWithTransverseViewThird) {
             // Если видовой экран на листе не найден, то размещаем
-            if(SheetInfo.TransverseViewFirst.ViewportElement is null) {
-                SheetInfo.TransverseViewFirst.ViewSectionPlacer.PlaceTransverseFirstViewPort();
+            if(SheetInfo.TransverseViewThird.ViewportElement is null) {
+                SheetInfo.TransverseViewThird.ViewSectionPlacer.PlaceTransverseThirdViewPort();
             }
         }
 
-        // Размещение видов арматурного каркаса
-        if(selectionSettings.NeedWorkWithGeneralRebarView) {
-            // Если видовой экран на листе не найден, то размещаем
-            if(SheetInfo.GeneralRebarView.ViewportElement is null) {
-                SheetInfo.GeneralRebarView.ViewSectionPlacer.PlaceGeneralRebarViewport();
-            }
-        }
-        if(selectionSettings.NeedWorkWithTransverseRebarViewSecond) {
-            // Если видовой экран на листе не найден, то размещаем
-            if(SheetInfo.TransverseRebarViewSecond.ViewportElement is null) {
-                SheetInfo.TransverseRebarViewSecond.ViewSectionPlacer.PlaceTransverseRebarSecondViewPort();
-            }
-        }
-        if(selectionSettings.NeedWorkWithTransverseRebarViewFirst) {
-            // Если видовой экран на листе не найден, то размещаем
-            if(SheetInfo.TransverseRebarViewFirst.ViewportElement is null) {
-                SheetInfo.TransverseRebarViewFirst.ViewSectionPlacer.PlaceTransverseRebarFirstViewPort();
-            }
-        }
-        if(selectionSettings.NeedWorkWithGeneralPerpendicularRebarView) {
-            // Если видовой экран на листе не найден, то размещаем
-            if(SheetInfo.GeneralRebarViewPerpendicular.ViewportElement is null) {
-                SheetInfo.GeneralRebarViewPerpendicular.ViewSectionPlacer.PlaceGeneralPerpendicularRebarViewport();
-            }
-        }
 
         // Размещение спецификаций
         if(selectionSettings.NeedWorkWithSkeletonSchedule) {
             // Если видовой экран на листе не найден, то размещаем
             if(SheetInfo.SkeletonSchedule.ViewportElement is null) {
                 SheetInfo.SkeletonSchedule.ViewSchedulePlacer.PlaceSkeletonSchedule();
-            }
-        }
-        if(selectionSettings.NeedWorkWithRebarSchedule) {
-            // Если видовой экран на листе не найден, то размещаем
-            if(SheetInfo.RebarSchedule.ViewportElement is null) {
-                SheetInfo.RebarSchedule.ViewSchedulePlacer.PlaceRebarSchedule();
             }
         }
         if(selectionSettings.NeedWorkWithMaterialSchedule) {
@@ -415,12 +456,6 @@ internal class PylonSheetInfoManager {
             // Если видовой экран на листе не найден, то размещаем
             if(SheetInfo.LegendView.ViewportElement is null) {
                 SheetInfo.LegendView.LegendPlacer.PlaceNoteLegend();
-            }
-        }
-        if(selectionSettings.NeedWorkWithRebarNode) {
-            // Если видовой экран на листе не найден, то размещаем
-            if(SheetInfo.RebarNodeView.ViewportElement is null) {
-                SheetInfo.RebarNodeView.LegendPlacer.PlaceRebarNodeLegend();
             }
         }
     }
