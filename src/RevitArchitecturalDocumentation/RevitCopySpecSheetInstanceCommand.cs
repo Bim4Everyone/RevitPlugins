@@ -5,6 +5,7 @@ using Autodesk.Revit.DB;
 using Autodesk.Revit.UI;
 
 using dosymep.Bim4Everyone;
+using dosymep.Bim4Everyone.ProjectConfigs;
 
 using Ninject;
 
@@ -35,7 +36,7 @@ public class RevitCopySpecSheetInstanceCommand : BasePluginCommand {
             .InSingletonScope();
 
         kernel.Bind<PluginConfig>()
-            .ToMethod(c => PluginConfig.GetPluginConfig());
+            .ToMethod(c => PluginConfig.GetPluginConfig(c.Kernel.Get<IConfigSerializer>()));
 
         kernel.Bind<CopySpecSheetInstanceVM>().ToSelf();
         kernel.Bind<CopySpecSheetInstanceV>().ToSelf()

@@ -1,0 +1,9 @@
+﻿<ResourceDictionary
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:system="clr-namespace:System;assembly=mscorlib">
+
+    <system:String x:Key="CreatingARDocsV.Title">Добавление параметров в семейство</system:String>
+    <system:String x:Key="Window.ButtonOk">Ок</system:String>
+    <system:String x:Key="Window.ButtonCancel">Отмена</system:String>
+</ResourceDictionary>
