@@ -54,7 +54,7 @@ internal class ReportsViewModel : BaseViewModel {
             InitializeFiles(selectedFile);
         }
 
-        OpenClashDetectorCommand = RelayCommand.Create(OpenClashDetector, () => OpenFromClashDetector);
+        OpenClashDetectorCommand = RelayCommand.Create(OpenClashDetector, CanOpenClashDetector);
         LoadCommand = RelayCommand.Create(Load);
         DeleteCommand = RelayCommand.Create(Delete, CanDelete);
         SelectClashCommand = RelayCommand.Create<IClashViewModel>(SelectClash, CanSelectClash);
@@ -131,6 +131,10 @@ internal class ReportsViewModel : BaseViewModel {
             var command = new DetectiveClashesCommand();
             command.ExecuteCommand(_revitRepository.UiApplication);
         });
+    }
+
+    private bool CanOpenClashDetector() {
+        return OpenFromClashDetector;
     }
 
 
