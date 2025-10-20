@@ -51,6 +51,7 @@
         </Grid.ColumnDefinitions>
         <Border
             Grid.Column="0"
+            Margin="0 0 4 0"
             Style="{StaticResource CustomBorder}">
             <DockPanel
                 LastChildFill="True">

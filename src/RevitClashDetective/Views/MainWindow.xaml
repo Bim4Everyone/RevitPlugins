@@ -55,8 +55,6 @@
             <RowDefinition
                 Height="Auto" />
             <RowDefinition
-                Height="Auto" />
-            <RowDefinition
                 Height="*" />
             <RowDefinition
                 Height="Auto" />
@@ -68,53 +66,50 @@
 
         <Border
             Grid.Row="1"
-            Margin="8 0 8 8"
-            Style="{StaticResource CustomBorder}">
-            <DockPanel>
-                <ui:Button
-                    ToolTip="{me:LocalizationSource MainWindow.Load}"
-                    Command="{Binding LoadClashCommand}"
-                    Content="{ui:SymbolIcon Symbol=ArrowDownload20}" />
-
-                <ui:Button
-                    Margin="8 0"
-                    ToolTip="{me:LocalizationSource MainWindow.Save}"
-                    Command="{Binding SaveClashesCommand}"
-                    Content="{ui:SymbolIcon Symbol=Save20}" />
-
-                <ui:Button
-                    ToolTip="{me:LocalizationSource MainWindow.SaveAs}"
-                    Command="{Binding SaveAsClashesCommand}"
-                    Content="{ui:SymbolIcon Symbol=SaveEdit20}" />
-
-                <ui:Button
-                    Margin="8 0"
-                    ToolTip="{me:LocalizationSource MainWindow.AddCheck}"
-                    Command="{Binding AddCheckCommand}"
-                    Content="{ui:SymbolIcon Symbol=Add20}" />
-
-                <ui:Button
-                    Appearance="Danger"
-                    ToolTip="{me:LocalizationSource MainWindow.DeleteCheck}"
-                    CommandParameter="{Binding SelectedCheck}"
-                    Command="{Binding RemoveCheckCommand}"
-                    Content="{ui:SymbolIcon Symbol=Delete20}" />
-            </DockPanel>
-        </Border>
-
-        <Border
-            Grid.Row="2"
             Margin="8 0"
             Style="{StaticResource CustomBorder}">
             <DockPanel
                 LastChildFill="True">
-                <ui:TextBox
-                    DockPanel.Dock="Top"
-                    MinWidth="300"
-                    MaxWidth="300"
-                    HorizontalAlignment="Right"
-                    Text="{Binding ChecksFilter, UpdateSourceTrigger=PropertyChanged}"
-                    PlaceholderText="{me:LocalizationSource MainWindow.CheckSearch}" />
+                <DockPanel
+                    Margin="0 0 0 8"
+                    DockPanel.Dock="Top">
+                    <ui:Button
+                        ToolTip="{me:LocalizationSource MainWindow.Load}"
+                        Command="{Binding LoadClashCommand}"
+                        Content="{ui:SymbolIcon Symbol=ArrowDownload20}" />
+
+                    <ui:Button
+                        Margin="8 0"
+                        ToolTip="{me:LocalizationSource MainWindow.Save}"
+                        Command="{Binding SaveClashesCommand}"
+                        Content="{ui:SymbolIcon Symbol=Save20}" />
+
+                    <ui:Button
+                        ToolTip="{me:LocalizationSource MainWindow.SaveAs}"
+                        Command="{Binding SaveAsClashesCommand}"
+                        Content="{ui:SymbolIcon Symbol=SaveEdit20}" />
+
+                    <ui:Button
+                        Margin="8 0"
+                        ToolTip="{me:LocalizationSource MainWindow.AddCheck}"
+                        Command="{Binding AddCheckCommand}"
+                        Content="{ui:SymbolIcon Symbol=Add20}" />
+
+                    <ui:Button
+                        Appearance="Danger"
+                        ToolTip="{me:LocalizationSource MainWindow.DeleteCheck}"
+                        CommandParameter="{Binding SelectedCheck}"
+                        Command="{Binding RemoveCheckCommand}"
+                        Content="{ui:SymbolIcon Symbol=Delete20}" />
+
+                    <ui:TextBox
+                        DockPanel.Dock="Right"
+                        MinWidth="300"
+                        MaxWidth="300"
+                        HorizontalAlignment="Right"
+                        Text="{Binding ChecksFilter, UpdateSourceTrigger=PropertyChanged}"
+                        PlaceholderText="{me:LocalizationSource MainWindow.CheckSearch}" />
+                </DockPanel>
                 <ui:DataGrid
                     SelectionMode="Single"
                     AutoGenerateColumns="False"
@@ -124,6 +119,27 @@
                     GridLinesVisibility="Horizontal"
                     SelectedItem="{Binding SelectedCheck}"
                     ItemsSource="{Binding Checks.View, UpdateSourceTrigger=PropertyChanged}">
+                    <ui:DataGrid.CellStyle>
+                        <Style
+                            TargetType="DataGridCell"
+                            BasedOn="{StaticResource DefaultDataGridCellStyle}">
+                            <Setter
+                                Property="VerticalAlignment"
+                                Value="Stretch" />
+                            <Setter
+                                Property="VerticalContentAlignment"
+                                Value="Stretch" />
+                            <Setter
+                                Property="HorizontalAlignment"
+                                Value="Stretch" />
+                            <Setter
+                                Property="HorizontalContentAlignment"
+                                Value="Stretch" />
+                            <Setter
+                                Property="Padding"
+                                Value="2 0" />
+                        </Style>
+                    </ui:DataGrid.CellStyle>
 
                     <ui:DataGrid.Columns>
                         <DataGridCheckBoxColumn
@@ -132,13 +148,14 @@
                             Binding="{Binding IsSelected, UpdateSourceTrigger=PropertyChanged}" />
 
                         <DataGridTemplateColumn
-                            Width="Auto"
+                            Width="150"
                             CanUserSort="True"
                             SortMemberPath="Name"
                             Header="{StaticResource NameLabel}">
                             <DataGridTemplateColumn.CellTemplate>
                                 <DataTemplate>
                                     <ui:TextBox
+                                        VerticalContentAlignment="Center"
                                         Text="{Binding Name, UpdateSourceTrigger=PropertyChanged}" />
                                 </DataTemplate>
                             </DataGridTemplateColumn.CellTemplate>
@@ -175,7 +192,6 @@
                                 <DataTemplate>
                                     <ui:Button
                                         Click="ButtonOk_Click"
-                                        Height="36"
                                         Command="{Binding ShowClashesCommand}"
                                         ToolTip="{StaticResource ShowCleshesTooltip}"
                                         Content="{ui:SymbolIcon Symbol=Notebook20}" />
@@ -189,11 +205,11 @@
 
         <ContentPresenter
             Grid.Row="0"
-            Grid.RowSpan="4"
+            Grid.RowSpan="3"
             x:Name="_rootContentDialog" />
 
         <StackPanel
-            Grid.Row="3"
+            Grid.Row="2"
             Orientation="Horizontal"
             HorizontalAlignment="Right">
             <ui:TextBlock

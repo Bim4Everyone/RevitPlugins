@@ -12,13 +12,19 @@
     mc:Ignorable="d"
     d:DataContext="{d:DesignInstance {x:Type vm:FilterViewModel}, IsDesignTimeCreatable=False}">
     <core:WpfUIPlatformUserControl.Resources>
-        <s:Boolean
-            x:Key="True">True</s:Boolean>
-        <s:Boolean
-            x:Key="False">False</s:Boolean>
-        <ui:TextBlock
-            x:Key="CategoryNameHeader"
-            Text="{me:LocalizationSource FilterCreation.CategoryNameHeader}" />
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary
+                    Source="../Resources/CustomStyles.xaml" />
+            </ResourceDictionary.MergedDictionaries>
+            <s:Boolean
+                x:Key="True">True</s:Boolean>
+            <s:Boolean
+                x:Key="False">False</s:Boolean>
+            <ui:TextBlock
+                x:Key="CategoryNameHeader"
+                Text="{me:LocalizationSource FilterCreation.CategoryNameHeader}" />
+        </ResourceDictionary>
     </core:WpfUIPlatformUserControl.Resources>
     <Grid>
         <Grid>
@@ -32,7 +38,6 @@
 
             <ui:ToggleSwitch
                 Grid.Row="1"
-                Margin="0 0 0 5"
                 IsChecked="{Binding HideUnselectedCategories, UpdateSourceTrigger=PropertyChanged}"
                 Content="{me:LocalizationSource FilterCreation.HideUncheckedCategories}">
             </ui:ToggleSwitch>
@@ -41,6 +46,7 @@
                 Grid.Row="2"
                 LastChildFill="True">
                 <ui:TextBox
+                    Margin="0 8"
                     DockPanel.Dock="Top"
                     Text="{Binding CategoriesFilter, UpdateSourceTrigger=PropertyChanged}"
                     PlaceholderText="{me:LocalizationSource FilterCreation.CategoriesSearch}" />
@@ -51,9 +57,14 @@
                     CanUserResizeColumns="False"
                     CanUserReorderColumns="False"
                     ItemsSource="{Binding Categories.View, UpdateSourceTrigger=PropertyChanged}">
+                    <ui:DataGrid.Resources>
+                        <Style
+                            TargetType="CheckBox"
+                            BasedOn="{StaticResource CustomColumnCheckBoxStyle}" />
+                    </ui:DataGrid.Resources>
                     <ui:DataGrid.Columns>
                         <DataGridCheckBoxColumn
-                            Width="Auto"
+                            Width="47"
                             CanUserSort="False"
                             Binding="{Binding IsSelected, UpdateSourceTrigger=PropertyChanged}">
                             <DataGridCheckBoxColumn.Header>

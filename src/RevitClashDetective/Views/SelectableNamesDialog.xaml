@@ -25,6 +25,8 @@
                     Source="pack://application:,,,/Wpf.Ui;component/Controls/ContentDialog/ContentDialog.xaml" />
                 <ResourceDictionary
                     Source="pack://application:,,,/Wpf.Ui;component/Controls/ListView/ListView.xaml" />
+                <ResourceDictionary
+                    Source="../Resources/CustomStyles.xaml" />
             </ResourceDictionary.MergedDictionaries>
             <ui:TextBlock
                 x:Key="NameHeader"
@@ -42,9 +44,14 @@
             CanUserReorderColumns="False"
             CanUserResizeColumns="False"
             ItemsSource="{Binding Entities}">
+            <ui:DataGrid.Resources>
+                <Style
+                    TargetType="CheckBox"
+                    BasedOn="{StaticResource CustomColumnCheckBoxStyle}" />
+            </ui:DataGrid.Resources>
             <ui:DataGrid.Columns>
                 <DataGridCheckBoxColumn
-                    Width="Auto"
+                    Width="47"
                     CanUserSort="False"
                     Binding="{Binding IsSelected, UpdateSourceTrigger=PropertyChanged}">
                     <DataGridCheckBoxColumn.Header>

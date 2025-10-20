@@ -124,11 +124,18 @@
                         Command="{Binding DeleteCommand}"
                         Content="{ui:SymbolIcon Symbol=Delete20}" />
                 </DockPanel>
-                <ui:ListView
+                <ui:DataGrid
                     Margin="0 4 0 0"
-                    DisplayMemberPath="Name"
+                    IsReadOnly="True"
+                    AutoGenerateColumns="False"
+                    HeadersVisibility="None"
                     ItemsSource="{Binding Filters}"
-                    SelectedItem="{Binding SelectedFilter, UpdateSourceTrigger=PropertyChanged}" />
+                    SelectedItem="{Binding SelectedFilter, UpdateSourceTrigger=PropertyChanged}">
+                    <ui:DataGrid.Columns>
+                        <DataGridTextColumn
+                            Binding="{Binding Name}" />
+                    </ui:DataGrid.Columns>
+                </ui:DataGrid>
             </DockPanel>
         </Border>
 

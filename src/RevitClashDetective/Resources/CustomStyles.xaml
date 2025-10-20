@@ -3,6 +3,27 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
     xmlns:controls="clr-namespace:Wpf.Ui.Controls;assembly=Wpf.Ui">
+    <ResourceDictionary.MergedDictionaries>
+        <ResourceDictionary
+            Source="pack://application:,,,/Wpf.Ui;component/Controls/CheckBox/CheckBox.xaml" />
+    </ResourceDictionary.MergedDictionaries>
+    <Style
+        x:Key="CustomColumnCheckBoxStyle"
+        TargetType="CheckBox"
+        BasedOn="{StaticResource DefaultCheckBoxStyle}">
+        <Setter
+            Property="Margin"
+            Value="0" />
+        <Setter
+            Property="Padding"
+            Value="0" />
+        <Setter
+            Property="HorizontalAlignment"
+            Value="Left" />
+        <Setter
+            Property="Width"
+            Value="47" />
+    </Style>
     <Style
         TargetType="Border"
         x:Key="CustomBorder">
@@ -124,16 +145,10 @@
         x:Key="CustomGridSplitter">
         <Setter
             Property="Width"
-            Value="10" />
+            Value="5" />
         <Setter
             Property="Background"
-            Value="{DynamicResource CardBackground}" />
-        <Setter
-            Property="BorderBrush"
-            Value="{DynamicResource CardBorderBrush}" />
-        <Setter
-            Property="BorderThickness"
-            Value="{DynamicResource CardControlBorderThemeThickness}" />
+            Value="Transparent" />
         <Setter
             Property="HorizontalAlignment"
             Value="Center" />
