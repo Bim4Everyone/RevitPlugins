@@ -17,8 +17,8 @@
     mc:Ignorable="d"
     WindowStartupLocation="CenterOwner"
     
-    Height="600" Width="1080"
-    MinHeight="600" MinWidth="1080"
+    Height="600" Width="1200"
+    MinHeight="600" MinWidth="1200"
 
     d:DataContext="{d:DesignInstance vms:CreatingARDocsVM, IsDesignTimeCreatable=False}">
 
@@ -88,6 +88,7 @@
         <StackPanel
             Grid.Row="1"
             Height="45"
+            Margin="10 0"
             Orientation="Horizontal"
             HorizontalAlignment="Left">
 
@@ -123,35 +124,60 @@
             ItemsSource="{Binding Path=TaskInformationVM.TasksForWork, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
             SelectionMode="Single"
             AutoGenerateColumns="False"
+            Style="{StaticResource CustomResizableDataGridStyle}"
             RowStyle="{x:Null}"
             GridLinesVisibility="All">
 
             <DataGrid.Columns>
-                <DataGridTextColumn
+                <DataGridTemplateColumn
                     Width="Auto"
                     Header="{StaticResource Number}"
-                    Binding="{Binding Path=TaskNumber}"
-                    IsReadOnly="True"
-                    CanUserResize="False" />
-
-                <DataGridTextColumn
-                    Width="Auto"
-                    Header="{StaticResource StartLevel}"
-                    Binding="{Binding Path=StartLevelNumber, UpdateSourceTrigger=PropertyChanged}"/>
-
-                <DataGridTextColumn
-                    Width="Auto"
-                    Header="{StaticResource EndLevel}"
-                    Binding="{Binding Path=EndLevelNumber, UpdateSourceTrigger=PropertyChanged}"/>
+                    IsReadOnly="True">
+                    <DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate>
+                            <ui:TextBlock
+                                Width="Auto"
+                                Margin="3"
+                                HorizontalAlignment="Center"
+                                Text="{Binding Path=TaskNumber, UpdateSourceTrigger=PropertyChanged}" />
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                </DataGridTemplateColumn>
 
                 <DataGridTemplateColumn
+                    Header="{StaticResource StartLevel}"
+                    Width="Auto">
+                    <DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate>
+                            <ui:TextBox
+                                Width="Auto"
+                                Margin="3"
+                                Text="{Binding Path=StartLevelNumber, UpdateSourceTrigger=PropertyChanged}"/>
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                </DataGridTemplateColumn>
+
+                <DataGridTemplateColumn
+                    Header="{StaticResource EndLevel}"
+                    Width="Auto">
+                    <DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate>
+                            <ui:TextBox
+                                Width="Auto"
+                                Margin="3"
+                                Text="{Binding Path=EndLevelNumber, UpdateSourceTrigger=PropertyChanged}"/>
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                </DataGridTemplateColumn>
+                
+                <DataGridTemplateColumn
                     Header="{StaticResource ViewScope}"
-                    Width="Auto"
+                    Width="*"
                     IsReadOnly="False">
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate>
                             <ComboBox
-                                Width="Auto"
+                                HorizontalAlignment="Stretch"
                                 Margin="3"
                                 DisplayMemberPath="Name"
                                 ItemsSource="{Binding Path=DataContext.TaskInformationVM.VisibilityScopes, 
@@ -162,10 +188,18 @@
                     </DataGridTemplateColumn.CellTemplate>
                 </DataGridTemplateColumn>
 
-                <DataGridTextColumn
-                    Width="Auto"
+                <DataGridTemplateColumn
                     Header="{StaticResource ViewNameSuffix}"
-                    Binding="{Binding Path=ViewNameSuffix, UpdateSourceTrigger=PropertyChanged}"/>
+                    Width="Auto">
+                    <DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate>
+                            <ui:TextBox
+                                Width="Auto"
+                                Margin="3"
+                                Text="{Binding Path=ViewNameSuffix, UpdateSourceTrigger=PropertyChanged}" />
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                </DataGridTemplateColumn>
 
                 <DataGridTemplateColumn
                     Header="{StaticResource SpecificationsSelection}"
@@ -175,7 +209,7 @@
                         <DataTemplate>
                             <ui:Button
                                 Margin="3"
-                                HorizontalAlignment="Center"
+                                HorizontalAlignment="Stretch"
                                 Content="{StaticResource Select}"
                                 Command="{Binding Path=DataContext.TaskInformationVM.SelectSpecsCommand, 
                                     RelativeSource={RelativeSource AncestorType={x:Type Window}}}"
@@ -185,11 +219,19 @@
                     </DataGridTemplateColumn.CellTemplate>
                 </DataGridTemplateColumn>
 
-                <DataGridTextColumn
-                    Width="Auto"
+                <DataGridTemplateColumn
                     Header="{StaticResource SpecificationsSelected}"
-                    Binding="{Binding Path=ListSpecHelpers.Count, UpdateSourceTrigger=PropertyChanged}"
-                    CanUserResize="False" />
+                    Width="Auto">
+                    <DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate>
+                            <ui:TextBlock
+                                Width="Auto"
+                                HorizontalAlignment="Center"
+                                Margin="3"
+                                Text="{Binding Path=ListSpecHelpers.Count, UpdateSourceTrigger=PropertyChanged}" />
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                </DataGridTemplateColumn>
             </DataGrid.Columns>
 
             <!--<ui:DataGrid.ItemContainerStyle>
@@ -329,7 +371,6 @@
                 <ComboBox
                      DockPanel.Dock="Bottom" 
                      Margin="5 3"
-                     Height="30"
      
                      VerticalContentAlignment="Center"
                      IsEnabled="{Binding Path=SheetOptsVM.WorkWithSheets}"
@@ -359,7 +400,7 @@
 
                 <CheckBox 
                     DockPanel.Dock="Left"
-                    Margin="5"
+                    Margin="-5 3 5 3"
                     Content="Создавать/размещать листы"
                     FontSize="14"
                     VerticalAlignment="Center"
@@ -369,10 +410,10 @@
                 <ui:TextBox 
                     DockPanel.Dock="Right"
                     Width="150"
-                    Height="30"
                     Margin="5 3"
                     VerticalContentAlignment="Center"
-                    Text="{Binding Path=SheetOptsVM.SheetNamePrefix}"/>
+                    Text="{Binding Path=SheetOptsVM.SheetNamePrefix}"
+                    IsEnabled="{Binding Path=SheetOptsVM.WorkWithSheets}"/>
 
                 <ui:TextBlock
                     DockPanel.Dock="Right"
@@ -400,7 +441,6 @@
                 <DockPanel>
                     <ComboBox
                         DockPanel.Dock="Bottom"
-                        Height="30"
                         Margin="5 3"
                         VerticalContentAlignment="Center"
                         IsEnabled="{Binding Path=ViewOptsVM.WorkWithViews}"
@@ -419,7 +459,7 @@
                     
                     <CheckBox 
                         DockPanel.Dock="Left"
-                        Margin="5"
+                        Margin="-5 3 5 3"
                         Content="Создавать/размещать виды"
                         FontSize="14"
                         VerticalAlignment="Center"
@@ -429,7 +469,6 @@
                     <ui:TextBox 
                         DockPanel.Dock="Right"
                         Width="150"
-                        Height="30"
                         Margin="5 3"
                         VerticalContentAlignment="Center"
                         IsEnabled="{Binding Path=ViewOptsVM.WorkWithViews}"
@@ -453,7 +492,6 @@
                         HorizontalAlignment="Left"/>
 
                     <ComboBox
-                        Height="30"
                         Margin="5 3"
                         VerticalContentAlignment="Center"
                         IsEnabled="{Binding Path=ViewOptsVM.WorkWithViews}"
@@ -473,7 +511,7 @@
             <DockPanel>
                 <CheckBox 
                     DockPanel.Dock="Top"
-                    Margin="5"
+                    Margin="-5 3 5 3"
                     Content="Создавать/размещать спецификации"
                     FontSize="14"
                     VerticalAlignment="Center"
@@ -482,7 +520,6 @@
 
                 <ComboBox
                     DockPanel.Dock="Bottom"
-                    Height="30"
                     Margin="5 3"
                     VerticalContentAlignment="Center"
                     IsEnabled="{Binding Path=SpecOptsVM.WorkWithSpecs}"
