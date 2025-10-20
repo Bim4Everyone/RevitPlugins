@@ -3,8 +3,17 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"    
     xmlns:system="clr-namespace:System;assembly=mscorlib">
     
+    <system:String x:Key="CreatingARDocsV.Number">№</system:String>
+    <system:String x:Key="CreatingARDocsV.StartLevel">Start level</system:String>
+    <system:String x:Key="CreatingARDocsV.EndLevel">End level</system:String>
+    <system:String x:Key="CreatingARDocsV.ViewScope">View scope</system:String>
+    <system:String x:Key="CreatingARDocsV.ViewNameSuffix">View name suffix</system:String>
+    <system:String x:Key="CreatingARDocsV.SpecificationsSelection">Specifications selection</system:String>
+    <system:String x:Key="CreatingARDocsV.SpecificationsSelected">Specifications selected</system:String>
+    
+    <system:String x:Key="CreatingARDocsV.Select">Select</system:String>
+    
     <system:String x:Key="CreatingARDocsV.Title">Adding parameters to a family</system:String>
     <system:String x:Key="Window.ButtonOk">Ok</system:String>
     <system:String x:Key="Window.ButtonCancel">Cancel</system:String>
-    
 </ResourceDictionary>
