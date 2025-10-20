@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
+using System.Windows;
 
 using dosymep.SimpleServices;
 
@@ -12,10 +13,19 @@ using RevitServerFolders.Models.FileSystem;
 namespace RevitServerFolders.Services;
 internal sealed class FileSystemModelObjectService : IModelObjectService {
     private readonly IOpenFolderDialogService _openFolderDialogService;
+    private readonly IAttachableService _attachableService;
 
     public FileSystemModelObjectService(IOpenFolderDialogService openFolderDialogService) {
         _openFolderDialogService = openFolderDialogService;
+        _attachableService = _openFolderDialogService as IAttachableService;
     }
+
+    public bool IsAttached => _attachableService?.IsAttached ?? false;
+
+    public bool AllowAttach => _attachableService?.AllowAttach ?? false;
+
+    public DependencyObject AssociatedObject => _attachableService?.AssociatedObject ?? default;
+
 
     public Task<ModelObject> SelectModelObjectDialog() {
         return SelectModelObjectDialog(Environment.GetFolderPath(Environment.SpecialFolder.Desktop));
@@ -43,6 +53,14 @@ internal sealed class FileSystemModelObjectService : IModelObjectService {
         return Directory.Exists(folderName)
             ? Task.FromResult((ModelObject) new FileSystemFolderModel(new DirectoryInfo(folderName)))
             : throw new OperationCanceledException();
+    }
+
+    public void Detach() {
+        _attachableService?.Detach();
+    }
+
+    public void Attach(DependencyObject dependencyObject) {
+        _attachableService?.Attach(dependencyObject);
     }
 
     private Task<IEnumerable<ModelObject>> ShowDialog() {
