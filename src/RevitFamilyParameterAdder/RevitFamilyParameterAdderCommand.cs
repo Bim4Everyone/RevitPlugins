@@ -10,6 +10,7 @@ using Autodesk.Revit.UI;
 using dosymep.Bim4Everyone;
 using dosymep.Bim4Everyone.ProjectConfigs;
 using dosymep.Bim4Everyone.SimpleServices;
+using dosymep.SimpleServices;
 using dosymep.WpfCore.Ninject;
 using dosymep.WpfUI.Core.Ninject;
 
@@ -32,7 +33,6 @@ public class RevitFamilyParameterAdderCommand : BasePluginCommand {
         kernel.Bind<RevitRepository>()
             .ToSelf()
             .InSingletonScope();
-        Check(kernel);
 
         // Настройка конфигурации плагина
         kernel.Bind<PluginConfig>()
@@ -41,32 +41,43 @@ public class RevitFamilyParameterAdderCommand : BasePluginCommand {
         // Используем сервис обновления тем для WinUI
         kernel.UseWpfUIThemeUpdater();
 
+        // Настройка запуска окна
+        kernel.BindMainWindow<MainViewModel, MainWindow>();
+
         // Настройка локализации,
         // получение имени сборки откуда брать текст
         string assemblyName = Assembly.GetExecutingAssembly().GetName().Name;
 
         // Настройка локализации,
         // установка дефолтной локализации "ru-RU"
-        kernel.UseWpfLocalization($"/{assemblyName};component/assets/localization/Language.xaml",
+        kernel.UseWpfLocalization(
+            $"/{assemblyName};component/assets/localization/Language.xaml",
             CultureInfo.GetCultureInfo("ru-RU"));
 
-        kernel.Bind<MainViewModel>().ToSelf();
-        kernel.Bind<MainWindow>().ToSelf()
-            .WithPropertyValue(nameof(Window.Title), PluginName)
-            .WithPropertyValue(nameof(Window.DataContext),
-                c => c.Kernel.Get<MainViewModel>());
+        // используем message box без привязки к окну,
+        // потому что он вызывается до запуска основного окна
+        kernel.UseWpfUIMessageBox();
+
+        // Проверка возможности запуска плагина
+        Check(kernel);
 
         Notification(kernel.Get<MainWindow>());
     }
 
-    private void Check(IKernel kernel) {
-        var revitRepositiry = kernel.Get<RevitRepository>();
-        if(!revitRepositiry.IsFamilyFile()) {
-            TaskDialog.Show(PluginName, $"Данный скрипт работает только в файле семейства.");
+    private static void Check(IKernel kernel) {
+        var revitRepository = kernel.Get<RevitRepository>();
+        var messageBoxService = kernel.Get<IMessageBoxService>();
+        var localizationService = kernel.Get<ILocalizationService>();
+        string title = localizationService.GetLocalizedString("MessageBox.Title");
+
+        if(!revitRepository.IsFamilyFile()) {
+            string message = localizationService.GetLocalizedString("MessageBox.IsNotFamilyFile");
+            messageBoxService.Show(message, title, MessageBoxButton.OK, MessageBoxImage.Error);
             throw new OperationCanceledException();
         }
-        if(!revitRepositiry.IsSharedParametersFileConnected()) {
-            TaskDialog.Show(PluginName, $"Файл общих параметров не найден. Проверьте, что ФОП подключен к проекту.");
+        if(!revitRepository.IsSharedParametersFileConnected()) {
+            string message = localizationService.GetLocalizedString("MessageBox.IsNotSharedParametersFileConnected");
+            messageBoxService.Show(message, title, MessageBoxButton.OK, MessageBoxImage.Error);
             throw new OperationCanceledException();
         }
     }

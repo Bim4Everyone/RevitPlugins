@@ -31,4 +31,8 @@
     
     <system:String x:Key="MainWindow.Instance">Instance</system:String>
     <system:String x:Key="MainWindow.Type">Type</system:String>
+    
+    <system:String x:Key="MessageBox.Title">Error!</system:String>
+    <system:String x:Key="MessageBox.IsNotFamilyFile">This script only works in the family file.</system:String>
+    <system:String x:Key="MessageBox.IsNotSharedParametersFileConnected">The shared parameters file was not found. Please ensure that the shared parameters file is included in the project.</system:String>
 </ResourceDictionary>

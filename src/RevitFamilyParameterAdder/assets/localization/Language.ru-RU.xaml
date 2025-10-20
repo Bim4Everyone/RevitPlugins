@@ -31,4 +31,8 @@
     
     <system:String x:Key="MainWindow.Instance">Экземпляр</system:String>
     <system:String x:Key="MainWindow.Type">Типоразмер</system:String>
+    
+    <system:String x:Key="MessageBox.Title">Ошибка!</system:String>
+    <system:String x:Key="MessageBox.IsNotFamilyFile">Данный скрипт работает только в файле семейства.</system:String>
+    <system:String x:Key="MessageBox.IsNotSharedParametersFileConnected">Файл общих параметров не найден. Проверьте, что ФОП подключен к проекту.</system:String>
 </ResourceDictionary>
