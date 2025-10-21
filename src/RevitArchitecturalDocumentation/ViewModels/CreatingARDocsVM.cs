@@ -29,7 +29,7 @@ internal class CreatingARDocsVM : BaseViewModel {
         _pluginConfig = pluginConfig;
         _revitRepository = revitRepository;
 
-        TaskInformationVM = new TasksInfoVM(pluginConfig, revitRepository, this);
+        TaskInformationVM = new TaskInfoListVM(pluginConfig, revitRepository, this);
         SheetOptsVM = new SheetOptionsVM(pluginConfig, revitRepository, mainOptions.SheetOpts);
         ViewOptsVM = new ViewOptionsVM(pluginConfig, revitRepository, mainOptions.ViewOpts);
         SpecOptsVM = new SpecOptionsVM(pluginConfig, revitRepository, mainOptions.SpecOpts);
@@ -42,7 +42,7 @@ internal class CreatingARDocsVM : BaseViewModel {
     public ICommand LoadViewCommand { get; }
     public ICommand AcceptViewCommand { get; }
 
-    public TasksInfoVM TaskInformationVM { get; }
+    public TaskInfoListVM TaskInformationVM { get; }
     public SheetOptionsVM SheetOptsVM { get; }
     public ViewOptionsVM ViewOptsVM { get; }
     public SpecOptionsVM SpecOptsVM { get; }

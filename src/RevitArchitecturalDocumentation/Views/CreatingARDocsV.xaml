@@ -152,7 +152,7 @@
                             <ui:TextBox
                                 Width="Auto"
                                 Margin="3"
-                                Text="{Binding Path=StartLevelNumber, UpdateSourceTrigger=PropertyChanged}"/>
+                                Text="{Binding Path=StartLevelNumber, UpdateSourceTrigger=PropertyChanged}" />
                         </DataTemplate>
                     </DataGridTemplateColumn.CellTemplate>
                 </DataGridTemplateColumn>
@@ -165,11 +165,11 @@
                             <ui:TextBox
                                 Width="Auto"
                                 Margin="3"
-                                Text="{Binding Path=EndLevelNumber, UpdateSourceTrigger=PropertyChanged}"/>
+                                Text="{Binding Path=EndLevelNumber, UpdateSourceTrigger=PropertyChanged}" />
                         </DataTemplate>
                     </DataGridTemplateColumn.CellTemplate>
                 </DataGridTemplateColumn>
-                
+
                 <DataGridTemplateColumn
                     Header="{StaticResource ViewScope}"
                     Width="*"
@@ -213,8 +213,7 @@
                                 Content="{StaticResource Select}"
                                 Command="{Binding Path=DataContext.TaskInformationVM.SelectSpecsCommand, 
                                     RelativeSource={RelativeSource AncestorType={x:Type Window}}}"
-                                CommandParameter="{Binding Path=DataContext, 
-                                    RelativeSource={RelativeSource AncestorType=ListViewItem}}" />
+                                CommandParameter="{Binding}" />
                         </DataTemplate>
                     </DataGridTemplateColumn.CellTemplate>
                 </DataGridTemplateColumn>
@@ -233,110 +232,6 @@
                     </DataGridTemplateColumn.CellTemplate>
                 </DataGridTemplateColumn>
             </DataGrid.Columns>
-
-            <!--<ui:DataGrid.ItemContainerStyle>
-                <Style TargetType="{x:Type ListViewItem}">
-                    <Setter Property="Focusable" Value="False"/>
-                </Style>
-            </ui:DataGrid.ItemContainerStyle>
-            
-            <ui:DataGrid.View>
-                <GridView>
-                    <GridViewColumn 
-                        Header="№"
-                        Width="30"
-                        DisplayMemberBinding="{Binding Path=TaskNumber}">
-                    </GridViewColumn>                    
-                    
-                    <GridViewColumn 
-                        Header="Начальный уровень"
-                        Width="180">
-                        <GridViewColumn.CellTemplate>
-                            <DataTemplate>
-                                <ui:TextBox
-                                    Margin="5"
-                                    Width="155"
-                                    Height="30"
-                                    HorizontalAlignment="Center"
-                                    VerticalContentAlignment="Center"
-                                    Text="{Binding Path=StartLevelNumber, UpdateSourceTrigger=PropertyChanged}"/>
-                            </DataTemplate>
-                        </GridViewColumn.CellTemplate>
-                    </GridViewColumn>
-
-                    <GridViewColumn 
-                        Header="Конечный уровень" 
-                        Width="180">
-                        <GridViewColumn.CellTemplate>
-                            <DataTemplate>
-                                <ui:TextBox
-                                    Margin="5" 
-                                    Width="155"
-                                    Height="30"
-                                    HorizontalAlignment="Center"
-                                    VerticalContentAlignment="Center"
-                                    Text="{Binding Path=EndLevelNumber, UpdateSourceTrigger=PropertyChanged}"/>
-                            </DataTemplate>
-                        </GridViewColumn.CellTemplate>
-                    </GridViewColumn>
-
-                    <GridViewColumn
-                        Header="Область видимости">
-                        <GridViewColumn.CellTemplate>
-                            <DataTemplate>
-                                <ComboBox
-                                    Margin="5"
-                                    Width="100"
-                                    Height="30"
-                                    HorizontalAlignment="Center"
-                                    DisplayMemberPath="Name"
-                                    ItemsSource="{Binding Path=DataContext.TaskInformationVM.VisibilityScopes, 
-                                        RelativeSource={RelativeSource AncestorType={x:Type Window}}}" 
-                                    SelectedItem="{Binding Path=SelectedVisibilityScope}"
-                                    Style="{StaticResource CustomComboBox}">
-                                </ComboBox>
-                            </DataTemplate>
-                        </GridViewColumn.CellTemplate>
-                    </GridViewColumn>
-
-                    <GridViewColumn Header="Суффикс видов" Width="180">
-                        <GridViewColumn.CellTemplate>
-                            <DataTemplate>
-                                <ui:TextBox 
-                                    Margin="5"
-                                    Width="155"
-                                    Height="30"
-                                    HorizontalAlignment="Center"
-                                    VerticalContentAlignment="Center"
-                                    Text="{Binding Path=ViewNameSuffix}"/>
-                            </DataTemplate>
-                        </GridViewColumn.CellTemplate>
-                    </GridViewColumn>
-
-                    <GridViewColumn Header="Выбор спецификаций" Width="180">
-                        <GridViewColumn.CellTemplate>
-                            <DataTemplate>
-                                <ui:Button
-                                    Margin="3"
-                                    Width="155"
-                                    Height="30"
-                                    HorizontalAlignment="Center"
-                                    Content="Выбрать"
-                                    FontSize="14"
-                                    
-                                    Command="{Binding Path=DataContext.TaskInformationVM.SelectSpecsCommand, 
-                                        RelativeSource={RelativeSource AncestorType={x:Type Window}}}"
-                                    CommandParameter="{Binding Path=DataContext, RelativeSource={RelativeSource AncestorType=ListViewItem}}"/>
-                            </DataTemplate>
-                        </GridViewColumn.CellTemplate>
-                    </GridViewColumn>
-
-                    <GridViewColumn 
-                        Header="Выбрано спецификаций" 
-                        Width="150"
-                        DisplayMemberBinding="{Binding Path=ListSpecHelpers.Count}"/>
-                </GridView>
-            </ui:DataGrid.View>-->
         </ui:DataGrid>
 
 
