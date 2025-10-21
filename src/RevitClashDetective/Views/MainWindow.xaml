@@ -34,6 +34,8 @@
                 <ResourceDictionary
                     Source="../Resources/CustomStyles.xaml" />
                 <ResourceDictionary
+                    Source="../Resources/CustomDataGrid.xaml" />
+                <ResourceDictionary
                     Source="pack://application:,,,/Wpf.Ui;component/Controls/DataGrid/DataGrid.xaml" />
             </ResourceDictionary.MergedDictionaries>
             <ui:TextBlock
@@ -119,8 +121,8 @@
                     AutoGenerateColumns="False"
                     CanUserDeleteRows="False"
                     CanUserReorderColumns="False"
-                    CanUserResizeColumns="False"
                     GridLinesVisibility="Horizontal"
+                    Style="{StaticResource CustomResizableDataGridStyle}"
                     SelectedItem="{Binding SelectedCheck}"
                     ItemsSource="{Binding Checks.View, UpdateSourceTrigger=PropertyChanged}">
                     <ui:DataGrid.CellStyle>
@@ -148,6 +150,7 @@
                     <ui:DataGrid.Columns>
                         <DataGridTemplateColumn
                             Width="Auto"
+                            CanUserResize="False"
                             CanUserSort="False">
                             <DataGridTemplateColumn.CellTemplate>
                                 <DataTemplate>
@@ -176,6 +179,7 @@
                                 <DataTemplate>
                                     <ui:TextBox
                                         VerticalContentAlignment="Center"
+                                        ToolTip="{Binding Name}"
                                         Text="{Binding Name, UpdateSourceTrigger=PropertyChanged}" />
                                 </DataTemplate>
                             </DataGridTemplateColumn.CellTemplate>
@@ -207,6 +211,7 @@
 
                         <DataGridTemplateColumn
                             Width="Auto"
+                            CanUserResize="False"
                             CanUserSort="False">
                             <DataGridTemplateColumn.CellTemplate>
                                 <DataTemplate>
