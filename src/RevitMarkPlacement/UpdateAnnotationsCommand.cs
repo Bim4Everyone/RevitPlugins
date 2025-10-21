@@ -5,6 +5,8 @@ using dosymep.Bim4Everyone;
 using dosymep.SimpleServices;
 
 using RevitMarkPlacement.Models;
+using RevitMarkPlacement.Models.DocumentProviders;
+using RevitMarkPlacement.Models.SelectionModes;
 using RevitMarkPlacement.ViewModels;
 using RevitMarkPlacement.Views;
 
@@ -20,7 +22,7 @@ public class UpdateAnnotationsCommand : BasePluginCommand {
         var config = AnnotationsConfig.GetAnnotationsConfig();
         var revitRepository = new RevitRepository(uiApplication.Application, uiApplication.ActiveUIDocument.Document);
 
-        var viewModel = new MainViewModel(revitRepository, config);
+        var viewModel = new MainViewModel(revitRepository, config, new CurrentDocumentProvider(uiApplication));
         if(!viewModel.CanPlaceAnnotation()) {
             var view = new ReportView { DataContext = viewModel.InfoElementsViewModel };
             if(view.ShowDialog() == true) {
@@ -33,7 +35,7 @@ public class UpdateAnnotationsCommand : BasePluginCommand {
                     .ShowAsync();
             }
         } else {
-            var marks = new TemplateLevelMarkCollection(revitRepository, new AllElementsSelection());
+            var marks = new TemplateLevelMarkCollection(revitRepository, new DBSelection(new CurrentDocumentProvider(uiApplication)));
             marks.UpdateAnnotation();
             GetPlatformService<INotificationService>()
                 .CreateNotification(PluginName, "Выполнение скрипта завершено успешно.", "C#")

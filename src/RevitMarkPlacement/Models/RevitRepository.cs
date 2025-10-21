@@ -39,8 +39,8 @@ internal class RevitRepository : BaseViewModel {
         _uiDocument = new UIDocument(document);
     }
 
-    public IEnumerable<SpotDimensionType> GetSpotDimentionTypeNames(ISelectionMode selectionMode) {
-        return selectionMode.GetSpotDimentions(_document)
+    public IEnumerable<SpotDimensionType> GetSpotDimentionTypeNames(ISpotDimensionSelection selection) {
+        return selection.GetElements()
             .Select(s => s.SpotDimensionType)
             .Distinct(new ElementNameEquatable<SpotDimensionType>());
     }
@@ -79,8 +79,8 @@ internal class RevitRepository : BaseViewModel {
                 && types.Any(t => t.Equals(item.Name, StringComparison.CurrentCultureIgnoreCase)));
     }
 
-    public IEnumerable<SpotDimension> GetSpotDimensions(ISelectionMode selectionMode) {
-        return selectionMode.GetSpotDimentions(_document);
+    public IEnumerable<SpotDimension> GetSpotDimensions(ISpotDimensionSelection selection) {
+        return selection.GetElements();
     }
 
     public IEnumerable<AnnotationSymbol> GetAnnotations() {

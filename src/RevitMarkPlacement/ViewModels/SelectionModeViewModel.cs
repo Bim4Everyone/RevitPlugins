@@ -15,18 +15,18 @@ internal class SelectionModeViewModel : BaseViewModel {
     private readonly RevitRepository _revitRepository;
     private List<SpotDimensionTypeViewModel> _spotDimentionTypes;
 
-    public SelectionModeViewModel(RevitRepository revitRepository, ISelectionMode selectionMode, string description) {
+    public SelectionModeViewModel(RevitRepository revitRepository, ISpotDimensionSelection selection, string description) {
         _revitRepository = revitRepository;
 
         Description = description;
-        SelectionMode = selectionMode;
+        Selection = selection;
 
         GetSpotDimensionTypes(null);
         GetSpotDimensionTypesCommand = new RelayCommand(GetSpotDimensionTypes);
     }
 
     public string Description { get; set; }
-    public ISelectionMode SelectionMode { get; set; }
+    public ISpotDimensionSelection Selection { get; set; }
     public ICommand GetSpotDimensionTypesCommand { get; set; }
 
     public List<SpotDimensionTypeViewModel> SpotDimentionTypes {
@@ -35,12 +35,12 @@ internal class SelectionModeViewModel : BaseViewModel {
     }
 
     public IEnumerable<SpotDimension> GetSpotDimensions() {
-        return _revitRepository.GetSpotDimensions(SelectionMode);
+        return _revitRepository.GetSpotDimensions(Selection);
     }
 
     private void GetSpotDimensionTypes(object p) {
         SpotDimentionTypes = _revitRepository
-            .GetSpotDimentionTypeNames(SelectionMode)
+            .GetSpotDimentionTypeNames(Selection)
             .Select(item => new SpotDimensionTypeViewModel(item))
             .ToList();
     }

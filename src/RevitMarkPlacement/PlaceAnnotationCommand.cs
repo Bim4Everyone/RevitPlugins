@@ -7,6 +7,7 @@ using dosymep.Bim4Everyone;
 using dosymep.SimpleServices;
 
 using RevitMarkPlacement.Models;
+using RevitMarkPlacement.Models.DocumentProviders;
 using RevitMarkPlacement.ViewModels;
 using RevitMarkPlacement.Views;
 
@@ -22,7 +23,7 @@ public class PlaceAnnotationCommand : BasePluginCommand {
         var config = AnnotationsConfig.GetAnnotationsConfig();
         var revitRepository = new RevitRepository(uiApplication.Application, uiApplication.ActiveUIDocument.Document);
 
-        var viewModel = new MainViewModel(revitRepository, config);
+        var viewModel = new MainViewModel(revitRepository, config, new CurrentDocumentProvider(uiApplication));
         Window view = null;
         if(!viewModel.CanPlaceAnnotation()) {
             view = new ReportView { DataContext = viewModel.InfoElementsViewModel };

@@ -4,6 +4,6 @@ using Autodesk.Revit.DB;
 
 namespace RevitMarkPlacement.Models;
 
-internal interface ISelectionMode {
-    IEnumerable<SpotDimension> GetSpotDimentions(Document doc);
+internal interface ISelection<out T> where T : Element {
+    IEnumerable<T> GetElements();
 }

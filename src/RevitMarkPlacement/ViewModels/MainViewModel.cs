@@ -4,11 +4,14 @@ using System.Windows.Input;
 
 using Autodesk.Revit.DB;
 
+using DevExpress.CodeParser;
+
 using dosymep.Revit;
 using dosymep.WPF.Commands;
 using dosymep.WPF.ViewModels;
 
 using RevitMarkPlacement.Models;
+using RevitMarkPlacement.Models.SelectionModes;
 
 namespace RevitMarkPlacement.ViewModels;
 
@@ -16,6 +19,7 @@ internal class MainViewModel : BaseViewModel {
     private const string _allElementsSelection = "Создать по всему проекту";
     private const string _selectedElements = "Создать по выбранным элементам";
     private readonly AnnotationsConfig _config;
+    private readonly IDocumentProvider _documentProvider;
     private readonly RevitRepository _revitRepository;
     private readonly AnnotationsSettings _settings;
     private string _errorText;
@@ -27,9 +31,10 @@ internal class MainViewModel : BaseViewModel {
     private string _selectedParameterName;
     private List<SelectionModeViewModel> _selectionModes;
 
-    public MainViewModel(RevitRepository revitRepository, AnnotationsConfig config) {
+    public MainViewModel(RevitRepository revitRepository, AnnotationsConfig config, IDocumentProvider documentProvider) {
         _revitRepository = revitRepository;
         _config = config;
+        _documentProvider = documentProvider;
         _settings = _revitRepository.GetSettings(_config);
         if(_settings == null) {
             _settings = _revitRepository.AddSettings(_config);
@@ -86,8 +91,8 @@ internal class MainViewModel : BaseViewModel {
 
     private void InitializeSelectionModes() {
         SelectionModes = new List<SelectionModeViewModel> {
-            new(_revitRepository, new AllElementsSelection(), _allElementsSelection),
-            new(_revitRepository, new ElementsSelection(), _selectedElements)
+            new(_revitRepository, new DBSelection(_documentProvider), _allElementsSelection),
+            new(_revitRepository, new SelectedOnViewSelection(_documentProvider), _selectedElements)
         };
         if(_settings.SelectionMode == SelectionMode.AllElements) {
             SelectedMode = SelectionModes[0];
@@ -110,7 +115,7 @@ internal class MainViewModel : BaseViewModel {
     }
 
     private void PlaceAnnotation(object p) {
-        var marks = new TemplateLevelMarkCollection(_revitRepository, SelectedMode.SelectionMode);
+        var marks = new TemplateLevelMarkCollection(_revitRepository, SelectedMode.Selection);
         marks.CreateAnnotation(int.Parse(FloorCount), double.Parse(SelectedFloorHeightProvider.GetFloorHeight()));
         SaveConfig();
     }

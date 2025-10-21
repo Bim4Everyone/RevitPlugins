@@ -9,11 +9,11 @@ namespace RevitMarkPlacement.Models;
 
 internal class TemplateLevelMarkCollection {
     private readonly RevitRepository _revitRepository;
-    private readonly ISelectionMode _selectionMode;
+    private readonly ISpotDimensionSelection _selection;
 
-    public TemplateLevelMarkCollection(RevitRepository revitRepository, ISelectionMode selectionMode) {
+    public TemplateLevelMarkCollection(RevitRepository revitRepository, ISpotDimensionSelection selection) {
         _revitRepository = revitRepository;
-        _selectionMode = selectionMode;
+        _selection = selection;
         InitializeTemplateLevelMarks();
     }
 
@@ -49,7 +49,7 @@ internal class TemplateLevelMarkCollection {
     }
 
     private void InitializeTemplateLevelMarks() {
-        var spots = _revitRepository.GetSpotDimensions(_selectionMode).ToList();
+        var spots = _revitRepository.GetSpotDimensions(_selection).ToList();
         var annotations = _revitRepository.GetAnnotations().ToList();
         TemplateLevelMarks = new List<TemplateLevelMark>();
         var symbols = _revitRepository.GetAnnotationSymbols();
