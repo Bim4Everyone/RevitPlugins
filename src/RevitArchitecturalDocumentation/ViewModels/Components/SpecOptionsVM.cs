@@ -42,7 +42,7 @@ internal class SpecOptionsVM : BaseViewModel {
     /// <summary>
     /// Метод перебирает все выбранные спеки во всех заданиях и собирает список параметров фильтрации. принадлежащий всем одновременно
     /// </summary>
-    public void GetFilterNames(IEnumerable<TaskInfo> tasksForWork) {
+    public void GetFilterNames(IEnumerable<TaskInfoVM> tasksForWork) {
 
         FilterNamesFromSpecs.Clear();
         foreach(var task in tasksForWork) {

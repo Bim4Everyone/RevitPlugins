@@ -182,7 +182,7 @@
                                 DisplayMemberPath="Name"
                                 ItemsSource="{Binding Path=DataContext.TaskInformationVM.VisibilityScopes, 
                                     RelativeSource={RelativeSource AncestorType={x:Type Window}}}"
-                                SelectedItem="{Binding Path=SelectedVisibilityScope}"
+                                SelectedItem="{Binding Path=SelectedVisibilityScope, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                                 Style="{StaticResource CustomComboBox}" />
                         </DataTemplate>
                     </DataGridTemplateColumn.CellTemplate>

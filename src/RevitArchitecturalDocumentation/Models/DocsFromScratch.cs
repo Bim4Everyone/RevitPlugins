@@ -7,13 +7,14 @@ using dosymep.Revit;
 
 using RevitArchitecturalDocumentation.Models.Options;
 using RevitArchitecturalDocumentation.ViewModels;
+using RevitArchitecturalDocumentation.ViewModels.Components;
 
 
 namespace RevitArchitecturalDocumentation.Models;
 internal class DocsFromScratch {
 
     public DocsFromScratch(CreatingARDocsVM pCOnASPDocsVM, RevitRepository revitRepository, ObservableCollection<TreeReportNode> report,
-        ObservableCollection<TaskInfo> tasksForWork, MainOptions mainOptions) {
+        ObservableCollection<TaskInfoVM> tasksForWork, MainOptions mainOptions) {
         MVM = pCOnASPDocsVM;
         Repository = revitRepository;
         Report = report;
@@ -29,7 +30,7 @@ internal class DocsFromScratch {
     public SheetOptions SheetOpts { get; set; }
     public ViewOptions ViewOpts { get; set; }
     public SpecOptions SpecOpts { get; set; }
-    public ObservableCollection<TaskInfo> TasksForWork { get; set; }
+    public ObservableCollection<TaskInfoVM> TasksForWork { get; set; }
 
 
 

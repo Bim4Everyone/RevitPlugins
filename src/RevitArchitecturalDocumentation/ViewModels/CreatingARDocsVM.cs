@@ -29,7 +29,7 @@ internal class CreatingARDocsVM : BaseViewModel {
         _pluginConfig = pluginConfig;
         _revitRepository = revitRepository;
 
-        TaskInformationVM = new TaskInfoVM(pluginConfig, revitRepository, this);
+        TaskInformationVM = new TasksInfoVM(pluginConfig, revitRepository, this);
         SheetOptsVM = new SheetOptionsVM(pluginConfig, revitRepository, mainOptions.SheetOpts);
         ViewOptsVM = new ViewOptionsVM(pluginConfig, revitRepository, mainOptions.ViewOpts);
         SpecOptsVM = new SpecOptionsVM(pluginConfig, revitRepository, mainOptions.SpecOpts);
@@ -42,7 +42,7 @@ internal class CreatingARDocsVM : BaseViewModel {
     public ICommand LoadViewCommand { get; }
     public ICommand AcceptViewCommand { get; }
 
-    public TaskInfoVM TaskInformationVM { get; }
+    public TasksInfoVM TaskInformationVM { get; }
     public SheetOptionsVM SheetOptsVM { get; }
     public ViewOptionsVM ViewOptsVM { get; }
     public SpecOptionsVM SpecOptsVM { get; }
@@ -270,22 +270,19 @@ internal class CreatingARDocsVM : BaseViewModel {
     /// Основной метод, выполняющий работу по созданию листов, видов, спек и выносу спек и видов на листы
     /// </summary>
     private void DoWork() {
-
         TreeReport.Add(GetInitialDataForReport());
-        var mainOptions = new MainOptions(SheetOptsVM.GetSheetOption(), ViewOptsVM.GetViewOption(), SpecOptsVM.GetSpecOption());
-
+        var mainOptions = new MainOptions(SheetOptsVM.GetSheetOption(), 
+                                          ViewOptsVM.GetViewOption(), 
+                                          SpecOptsVM.GetSpecOption());
         if(CreateViewsFromSelected) {
-
             var docsFromSelectedViewsVM = new DocsFromSelectedViews(this, _revitRepository, TreeReport,
-                TaskInformationVM.TasksForWork, mainOptions);
+                                                                    TaskInformationVM.TasksForWork, mainOptions);
             docsFromSelectedViewsVM.CreateDocs();
         } else {
-
             var docsFromScratchVM = new DocsFromScratch(this, _revitRepository, TreeReport,
-                TaskInformationVM.TasksForWork, mainOptions);
+                                                        TaskInformationVM.TasksForWork, mainOptions);
             docsFromScratchVM.CreateDocs();
         }
-
         OpenReportWindow();
     }
 }
