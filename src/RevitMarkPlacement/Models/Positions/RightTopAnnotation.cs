@@ -4,21 +4,20 @@ using System.Linq;
 
 using Autodesk.Revit.DB;
 
-namespace RevitMarkPlacement.Models;
+namespace RevitMarkPlacement.Models.Positions;
 
-internal class RightTopAnnotation : IAnnotationPosition {
-    public RightTopAnnotation(IEnumerable<FamilySymbol> symbols, XYZ plane) {
-        FamilySymbol = symbols.FirstOrDefault(item => item.Name.Equals(
-            RevitRepository.TypeTop,
-            StringComparison.CurrentCultureIgnoreCase));
+internal sealed class RightTopAnnotation : IAnnotationPosition {
+    public RightTopAnnotation(XYZ plane, IEnumerable<FamilySymbol> symbols) {
         ViewRightDirection = plane;
+        FamilySymbol = symbols.FirstOrDefault(item =>
+            item.Name.Equals(
+                RevitRepository.TypeTop,
+                StringComparison.CurrentCultureIgnoreCase));
     }
 
     public bool NeedFlip => false;
-
-    public FamilySymbol FamilySymbol { get; }
-
     public XYZ ViewRightDirection { get; }
+    public FamilySymbol FamilySymbol { get; }
 
     public XYZ GetPoint(XYZ min, XYZ max, double width, double height, double textHieght, int scale) {
         return new XYZ(

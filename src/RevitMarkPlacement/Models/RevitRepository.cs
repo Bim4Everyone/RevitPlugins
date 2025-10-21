@@ -9,6 +9,8 @@ using Autodesk.Revit.UI;
 using dosymep.Revit;
 using dosymep.WPF.ViewModels;
 
+using RevitMarkPlacement.Models.Positions;
+
 namespace RevitMarkPlacement.Models;
 
 internal class RevitRepository : BaseViewModel {
@@ -127,34 +129,34 @@ internal class RevitRepository : BaseViewModel {
                    new XYZ(Max.X, Max.Y, Min.Z))
                < 0.01) {
                 if(minOriginDist > maxOriginDist) {
-                    return new LeftTopAnnotation(symbols, spot.View.RightDirection);
+                    return new LeftTopAnnotation(spot.View.RightDirection, symbols);
                 }
 
-                return new RightTopAnnotation(symbols, spot.View.RightDirection);
+                return new RightTopAnnotation(spot.View.RightDirection, symbols);
             }
 
             if(minOriginDist > maxOriginDist) {
-                return new RightTopAnnotation(symbols, spot.View.RightDirection);
+                return new RightTopAnnotation(spot.View.RightDirection, symbols);
             }
 
-            return new LeftTopAnnotation(symbols, spot.View.RightDirection);
+            return new LeftTopAnnotation(spot.View.RightDirection, symbols);
         }
 
         if(new XYZ(Min.X + dir.X * maxMinDist, Min.Y + dir.Y * maxMinDist, Min.Z).DistanceTo(
                new XYZ(Max.X, Max.Y, Min.Z))
            < 0.01) {
             if(minOriginDist > maxOriginDist) {
-                return new LeftBottomAnnotation(symbols, spot.View.RightDirection);
+                return new LeftBottomAnnotation(spot.View.RightDirection, symbols);
             }
 
-            return new RightBottomAnnotation(symbols, spot.View.RightDirection);
+            return new RightBottomAnnotation(spot.View.RightDirection, symbols);
         }
 
         if(minOriginDist > maxOriginDist) {
-            return new RightBottomAnnotation(symbols, spot.View.RightDirection);
+            return new RightBottomAnnotation(spot.View.RightDirection, symbols);
         }
 
-        return new LeftBottomAnnotation(symbols, spot.View.RightDirection);
+        return new LeftBottomAnnotation(spot.View.RightDirection, symbols);
     }
 
     public void MirrorAnnotation(FamilyInstance annotation, XYZ axis) {
