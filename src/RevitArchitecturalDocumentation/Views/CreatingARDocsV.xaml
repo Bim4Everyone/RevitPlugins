@@ -49,9 +49,6 @@
             <ui:TextBlock
                 x:Key="SpecificationsSelected"
                 Text="{me:LocalizationSource CreatingARDocsV.SpecificationsSelected}" />
-            <ui:TextBlock
-                x:Key="Select"
-                Text="{me:LocalizationSource CreatingARDocsV.Select}" />
         </ResourceDictionary>
     </Window.Resources>
 
@@ -220,7 +217,8 @@
                                     <ui:Button
                                         Margin="3"
                                         HorizontalAlignment="Stretch"
-                                        Content="{StaticResource Select}"
+                                        FontSize="20"
+                                        Icon="{ui:SymbolIcon OpenFolder16}"
                                         Command="{Binding Path=DataContext.TaskInformationVM.SelectSpecsCommand, 
                             RelativeSource={RelativeSource AncestorType={x:Type Window}}}"
                                         CommandParameter="{Binding}" />

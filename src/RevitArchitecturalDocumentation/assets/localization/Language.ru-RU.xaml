@@ -11,10 +11,7 @@
     <system:String x:Key="CreatingARDocsV.SpecificationsSelection">Выбор спецификаций</system:String>
     <system:String x:Key="CreatingARDocsV.SpecificationsSelected">Выбрано спецификаций</system:String>
     
-    <system:String x:Key="CreatingARDocsV.Select">Выбрать</system:String>
-    
     <system:String x:Key="CreatingARDocsV.Title">Добавление параметров в семейство</system:String>
     <system:String x:Key="Window.ButtonOk">Ок</system:String>
     <system:String x:Key="Window.ButtonCancel">Отмена</system:String>
-    
 </ResourceDictionary>

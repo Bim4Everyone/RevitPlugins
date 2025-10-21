@@ -11,8 +11,6 @@
     <system:String x:Key="CreatingARDocsV.SpecificationsSelection">Specifications selection</system:String>
     <system:String x:Key="CreatingARDocsV.SpecificationsSelected">Specifications selected</system:String>
     
-    <system:String x:Key="CreatingARDocsV.Select">Select</system:String>
-    
     <system:String x:Key="CreatingARDocsV.Title">Adding parameters to a family</system:String>
     <system:String x:Key="Window.ButtonOk">Ok</system:String>
     <system:String x:Key="Window.ButtonCancel">Cancel</system:String>
