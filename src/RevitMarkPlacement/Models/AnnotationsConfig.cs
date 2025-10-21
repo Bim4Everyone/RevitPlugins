@@ -27,16 +27,20 @@ internal class AnnotationsConfig : ProjectConfig<AnnotationsSettings> {
 
 internal class AnnotationsSettings : ProjectSettings {
     public override string ProjectName { get; set; }
+   
     public int LevelCount { get; set; } = 5;
-    public ElementId GlobalParameterId { get; set; }
-    public SelectionMode SelectionMode { get; set; } = SelectionMode.SelectedElements;
-    public LevelHeightProvider LevelHeightProvider { get; set; } = LevelHeightProvider.GlobalParameter;
     public double? LevelHeight { get; set; } = 3000;
+    
+    public ElementId GlobalParameterId { get; set; }
+    
+    public Selections? SelectionMode { get; set; } = RevitMarkPlacement.Models.Selections.SelectedOnViewSelection;
+    public LevelHeightProvider? LevelHeightProvider { get; set; } = RevitMarkPlacement.Models.LevelHeightProvider.GlobalParameter;
 }
 
-internal enum SelectionMode {
-    AllElements,
-    SelectedElements
+internal enum Selections {
+    DBSelection,
+    DBViewSelection,
+    SelectedOnViewSelection,
 }
 
 internal enum LevelHeightProvider {

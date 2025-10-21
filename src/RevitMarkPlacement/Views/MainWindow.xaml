@@ -22,8 +22,8 @@
             <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
         <ListBox Grid.Row="0" BorderThickness="0" BorderBrush="Transparent"
-                 ItemsSource="{Binding SelectionModes}"
-                 SelectedItem="{Binding SelectedMode}">
+                 ItemsSource="{Binding Selections}"
+                 SelectedItem="{Binding Selection}">
             <ListBox.ItemTemplate>
                 <DataTemplate DataType="{x:Type vm:SelectionModeViewModel}">
                     <RadioButton Margin="5" FontSize="14"
@@ -45,13 +45,13 @@
             </ListBox.ItemContainerStyle>
             <b:Interaction.Triggers>
                 <b:EventTrigger EventName="SelectionChanged">
-                    <b:InvokeCommandAction Command="{Binding SelectedMode.GetSpotDimentionTypesCommand}" />
+                    <b:InvokeCommandAction Command="{Binding Selection.GetSpotDimentionTypesCommand}" />
                 </b:EventTrigger>
             </b:Interaction.Triggers>
         </ListBox>
         <GroupBox Grid.Row="1" Margin="5 10" FontSize="14" Header="Типоразмеры высотных отметок">
             <ListBox Margin="5" Height="50" MaxHeight="100" BorderThickness="0" Focusable="False"
-                     ItemsSource="{Binding SelectedMode.SpotDimentionTypes}">
+                     ItemsSource="{Binding Selection.SpotDimensionTypes}">
                 <ListBox.ItemContainerStyle>
                     <Style TargetType="{x:Type ListBoxItem}">
                         <Setter Property="Template">

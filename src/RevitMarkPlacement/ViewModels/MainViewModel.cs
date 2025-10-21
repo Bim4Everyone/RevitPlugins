@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 using System.Windows.Input;
 
@@ -19,18 +20,21 @@ namespace RevitMarkPlacement.ViewModels;
 internal class MainViewModel : BaseViewModel {
     private const string _allElementsSelection = "Создать по всему проекту";
     private const string _selectedElements = "Создать по выбранным элементам";
+    
     private readonly AnnotationsConfig _config;
     private readonly IDocumentProvider _documentProvider;
     private readonly RevitRepository _revitRepository;
     private readonly AnnotationsSettings _settings;
+    private InfoElementsViewModel _infoElementsViewModel;
+    
     private string _errorText;
     private string _floorCount;
-    private List<IFloorHeightProvider> _floorHeights;
-    private InfoElementsViewModel _infoElementsViewModel;
+    
+    private SelectionModeViewModel _selection;
+    private ObservableCollection<SelectionModeViewModel> _selections;
+    
     private IFloorHeightProvider _floorHeight;
-    private SelectionModeViewModel _selectedMode;
-    private string _selectedParameterName;
-    private List<SelectionModeViewModel> _selectionModes;
+    private ObservableCollection<IFloorHeightProvider> _floorHeights;
 
     public MainViewModel(
         RevitRepository revitRepository,
@@ -45,8 +49,8 @@ internal class MainViewModel : BaseViewModel {
         }
 
         FloorCount = _settings.LevelCount.ToString();
-        InitializeSelectionModes();
-        InitializeFloorHeightProvider();
+        LoadSelections();
+        LoadFloorHeights();
         InfoElementsViewModel = new InfoElementsViewModel();
         PlaceAnnotationCommand = new RelayCommand(PlaceAnnotation, CanPlaceAnnotation);
     }
@@ -56,27 +60,27 @@ internal class MainViewModel : BaseViewModel {
         set => RaiseAndSetIfChanged(ref _floorCount, value);
     }
 
-    public string SelectedParameterName {
-        get => _selectedParameterName;
-        set => RaiseAndSetIfChanged(ref _selectedParameterName, value);
-    }
-
     public string ErrorText {
         get => _errorText;
         set => RaiseAndSetIfChanged(ref _errorText, value);
     }
 
-    public SelectionModeViewModel SelectedMode {
-        get => _selectedMode;
-        set => RaiseAndSetIfChanged(ref _selectedMode, value);
+    public SelectionModeViewModel Selection {
+        get => _selection;
+        set => RaiseAndSetIfChanged(ref _selection, value);
+    }
+
+    public ObservableCollection<SelectionModeViewModel> Selections {
+        get => _selections;
+        set => RaiseAndSetIfChanged(ref _selections, value);
     }
 
     public IFloorHeightProvider FloorHeight {
         get => _floorHeight;
         set => RaiseAndSetIfChanged(ref _floorHeight, value);
     }
-    
-    public List<IFloorHeightProvider> FloorHeights {
+
+    public ObservableCollection<IFloorHeightProvider> FloorHeights {
         get => _floorHeights;
         set => RaiseAndSetIfChanged(ref _floorHeights, value);
     }
@@ -86,30 +90,28 @@ internal class MainViewModel : BaseViewModel {
         set => RaiseAndSetIfChanged(ref _infoElementsViewModel, value);
     }
 
-    public List<SelectionModeViewModel> SelectionModes {
-        get => _selectionModes;
-        set => RaiseAndSetIfChanged(ref _selectionModes, value);
-    }
-
     public ICommand PlaceAnnotationCommand { get; set; }
 
-    private void InitializeSelectionModes() {
-        SelectionModes = new List<SelectionModeViewModel> {
-            new(_revitRepository, new DBSelection(_documentProvider), _allElementsSelection),
-            new(_revitRepository, new SelectedOnViewSelection(_documentProvider), _selectedElements)
-        };
-        if(_settings.SelectionMode == SelectionMode.AllElements) {
-            SelectedMode = SelectionModes[0];
-        } else {
-            SelectedMode = SelectionModes[1];
+    private void LoadSelections() {
+        Selections = [
+            new SelectionModeViewModel(new DBSelection(_documentProvider), _revitRepository),
+            new SelectionModeViewModel(new SelectedOnViewSelection(_documentProvider), _revitRepository)
+        ];
+        
+        foreach(var selection in Selections) {
+            selection.LoadSpotDimensionTypes();
         }
+
+        Selection = Selections
+                        .FirstOrDefault(item => item.Selections == _settings.SelectionMode)
+                    ?? Selections.FirstOrDefault();
     }
 
-    private void InitializeFloorHeightProvider() {
-        FloorHeights = new List<IFloorHeightProvider> {
-            new UserFloorHeightViewModel(),
+    private void LoadFloorHeights() {
+        FloorHeights = [
+            new UserFloorHeightViewModel(), 
             new GlobalParamsViewModel(new DoubleGlobalParamSelection(_documentProvider))
-        };
+        ];
 
         foreach(var provider in FloorHeights) {
             provider.LoadConfig(_settings);
@@ -123,7 +125,7 @@ internal class MainViewModel : BaseViewModel {
     }
 
     private void PlaceAnnotation(object p) {
-        var marks = new TemplateLevelMarkCollection(_revitRepository, SelectedMode.Selection);
+        var marks = new TemplateLevelMarkCollection(_revitRepository, Selection.Selection);
         marks.CreateAnnotation(int.Parse(FloorCount), FloorHeight.GetFloorHeight() ?? 0);
         SaveConfig();
     }
@@ -149,14 +151,9 @@ internal class MainViewModel : BaseViewModel {
     }
 
     private void SaveConfig() {
-        if(SelectedMode.Description == _allElementsSelection) {
-            _settings.SelectionMode = SelectionMode.AllElements;
-        } else {
-            _settings.SelectionMode = SelectionMode.SelectedElements;
-        }
-
         _settings.LevelCount = int.Parse(FloorCount);
-        _settings.LevelHeightProvider = FloorHeight.LevelHeightProvider;
+        _settings.SelectionMode = Selection?.Selections;
+        _settings.LevelHeightProvider = FloorHeight?.LevelHeightProvider;
 
         foreach(var provider in FloorHeights) {
             provider.SaveConfig(_settings);

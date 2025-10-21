@@ -13,6 +13,8 @@ internal sealed class DBViewSelection : ISpotDimensionSelection {
     public DBViewSelection(IDocumentProvider documentProvider) {
         _documentProvider = documentProvider;
     }
+    
+    public Selections Selections => Selections.SelectedOnViewSelection;
 
     public IEnumerable<SpotDimension> GetElements() {
         var document = _documentProvider.GetDocument();

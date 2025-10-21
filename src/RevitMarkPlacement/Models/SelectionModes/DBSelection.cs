@@ -15,6 +15,8 @@ internal sealed class DBSelection : ISpotDimensionSelection {
         _documentProvider = documentProvider;
     }
 
+    public Selections Selections => Selections.DBSelection;
+
     public IEnumerable<SpotDimension> GetElements() {
         return new FilteredElementCollector(_documentProvider.GetDocument())
             .OfClass(typeof(SpotDimension))

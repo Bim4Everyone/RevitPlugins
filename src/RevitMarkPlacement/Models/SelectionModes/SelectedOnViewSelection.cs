@@ -17,6 +17,8 @@ internal sealed class SelectedOnViewSelection : ISpotDimensionSelection {
     public SelectedOnViewSelection(IDocumentProvider documentProvider) {
         _documentProvider = documentProvider;
     }
+    
+    public Selections Selections => Selections.SelectedOnViewSelection;
 
     public IEnumerable<SpotDimension> GetElements() {
         return _documentProvider.GetUIDocument()

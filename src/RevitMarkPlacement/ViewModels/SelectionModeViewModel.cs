@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 using System.Windows.Input;
 
@@ -13,35 +14,26 @@ namespace RevitMarkPlacement.ViewModels;
 
 internal class SelectionModeViewModel : BaseViewModel {
     private readonly RevitRepository _revitRepository;
-    private List<SpotDimensionTypeViewModel> _spotDimentionTypes;
+    private ObservableCollection<SpotDimensionTypeViewModel> _spotDimensionTypes;
 
-    public SelectionModeViewModel(RevitRepository revitRepository, ISpotDimensionSelection selection, string description) {
-        _revitRepository = revitRepository;
-
-        Description = description;
+    public SelectionModeViewModel(ISpotDimensionSelection selection, RevitRepository revitRepository) {
         Selection = selection;
-
-        GetSpotDimensionTypes(null);
-        GetSpotDimensionTypesCommand = new RelayCommand(GetSpotDimensionTypes);
+        _revitRepository = revitRepository;
     }
 
-    public string Description { get; set; }
-    public ISpotDimensionSelection Selection { get; set; }
-    public ICommand GetSpotDimensionTypesCommand { get; set; }
+    public ISpotDimensionSelection Selection { get; }
+    public Selections Selections => Selection.Selections;
 
-    public List<SpotDimensionTypeViewModel> SpotDimentionTypes {
-        get => _spotDimentionTypes;
-        set => RaiseAndSetIfChanged(ref _spotDimentionTypes, value);
+    public ObservableCollection<SpotDimensionTypeViewModel> SpotDimensionTypes {
+        get => _spotDimensionTypes;
+        set => RaiseAndSetIfChanged(ref _spotDimensionTypes, value);
     }
 
-    public IEnumerable<SpotDimension> GetSpotDimensions() {
-        return _revitRepository.GetSpotDimensions(Selection);
-    }
-
-    private void GetSpotDimensionTypes(object p) {
-        SpotDimentionTypes = _revitRepository
-            .GetSpotDimentionTypeNames(Selection)
-            .Select(item => new SpotDimensionTypeViewModel(item))
-            .ToList();
+    public void LoadSpotDimensionTypes() {
+        SpotDimensionTypes ??= [
+            .._revitRepository
+                .GetSpotDimentionTypeNames(Selection)
+                .Select(item => new SpotDimensionTypeViewModel(item))
+        ];
     }
 }
