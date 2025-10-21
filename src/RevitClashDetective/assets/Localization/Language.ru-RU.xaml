@@ -135,7 +135,7 @@
         x:Key="FilterCreation.SuccessSave">Поисковые наборы успешно сохранены</system:String>
     <system:String
         x:Key="FilterCreation.SuccessLoad">Файл поисковых наборов успешно загружен</system:String>
-    
+
     <system:String
         x:Key="FilterCreation.Validation.SetName">Введите имя поискового набора.</system:String>
     <system:String
@@ -196,7 +196,7 @@
         x:Key="MainWindow.Validation.EmptyFileInCheck">У проверки "{0}" необходимо выбрать хотя бы один файл.</system:String>
     <system:String
         x:Key="MainWindow.Validation.SelectAnyCheck">Для поиска коллизий должна быть выбрана хотя бы одна проверка.</system:String>
-    
+
     <system:String
         x:Key="Navigator.DeletePrompt">Вы уверены, что хотите удалить файл?</system:String>
     <system:String
@@ -210,7 +210,7 @@
         x:Key="SelectableNamesDialog.SelectFiles">Выберите файлы</system:String>
     <system:String
         x:Key="SelectableNamesDialog.SelectSearchSets">Выберите поисковые наборы</system:String>
-    
+
     <system:String
         x:Key="ConfigLoader.InvalidFile">Неверный файл конфигурации.</system:String>
 
@@ -231,4 +231,47 @@
         x:Key="Parameter.CannotParseInt">Значение параметра "{0}" должно быть целым числом.</system:String>
     <system:String
         x:Key="Parameter.CannotParseDouble">Значение параметра "{0}" должно быть вещественным числом.</system:String>
+
+    <system:String
+        x:Key="SetEvaluators.Or">Или</system:String>
+    <system:String
+        x:Key="SetEvaluators.And">И</system:String>
+    <system:String
+        x:Key="RuleEvaluators.FilterStringBeginsWith">Начинается с</system:String>
+    <system:String
+        x:Key="RuleEvaluators.FilterStringNotBeginsWith">Не начинается с</system:String>
+    <system:String
+        x:Key="RuleEvaluators.FilterStringContains">Содержит</system:String>
+    <system:String
+        x:Key="RuleEvaluators.FilterStringNotContains">Не содержит</system:String>
+    <system:String
+        x:Key="RuleEvaluators.FilterStringEndsWith">Заканчивается на</system:String>
+    <system:String
+        x:Key="RuleEvaluators.FilterStringNotEndsWith">Не заканчивается на</system:String>
+    <system:String
+        x:Key="RuleEvaluators.FilterStringEquals">Равно</system:String>
+    <system:String
+        x:Key="RuleEvaluators.FilterStringGreater">Больше</system:String>
+    <system:String
+        x:Key="RuleEvaluators.FilterStringGreaterOrEqual">Больше или равно</system:String>
+    <system:String
+        x:Key="RuleEvaluators.FilterStringLess">Меньше</system:String>
+    <system:String
+        x:Key="RuleEvaluators.FilterStringLessOrEqual">Меньше или равно</system:String>
+    <system:String
+        x:Key="RuleEvaluators.FilterNumericEquals">Равно</system:String>
+    <system:String
+        x:Key="RuleEvaluators.FilterNumericGreater">Больше</system:String>
+    <system:String
+        x:Key="RuleEvaluators.FilterNumericGreaterOrEqual">Больше или равно</system:String>
+    <system:String
+        x:Key="RuleEvaluators.FilterNumericLess">Меньше</system:String>
+    <system:String
+        x:Key="RuleEvaluators.FilterNumericLessOrEqual">Меньше или равно</system:String>
+    <system:String
+        x:Key="RuleEvaluators.FilterHasNoValue">Без значения</system:String>
+    <system:String
+        x:Key="RuleEvaluators.FilterHasValue">Имеет значение</system:String>
+    <system:String
+        x:Key="RuleEvaluators.FilterNotEquals">Не равно</system:String>
 </ResourceDictionary>

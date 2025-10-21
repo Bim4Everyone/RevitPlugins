@@ -124,7 +124,7 @@ internal class RuleViewModel : BaseViewModel, IСriterionViewModel {
             }
             SelectedParameter = _categoriesInfo.Parameters.First(item => item.FilterableValueProvider.Provider.Equals(_rule.Provider));
             SelectedParameterChanged();
-            SelectedRuleEvaluator = new RuleEvaluatorViewModel(_rule.Evaluator);
+            SelectedRuleEvaluator = new RuleEvaluatorViewModel(_localization, _rule.Evaluator);
             SelectedValue = new ParamValueViewModel(_rule.Value);
             if(!Values.Contains(SelectedValue)) {
                 SelectedValue = null;
@@ -144,7 +144,7 @@ internal class RuleViewModel : BaseViewModel, IСriterionViewModel {
         if(!_categoriesInfo.Parameters.Contains(SelectedParameter)) {
             _categoriesInfo.Parameters.Add(SelectedParameter);
         }
-        SelectedRuleEvaluator = new RuleEvaluatorViewModel(_rule.Evaluator);
+        SelectedRuleEvaluator = new RuleEvaluatorViewModel(_localization, _rule.Evaluator);
         SelectedValue = new ParamValueViewModel(_rule.Value);
         StringValue = SelectedValue.ParamValue.DisplayValue;
     }
@@ -161,7 +161,7 @@ internal class RuleViewModel : BaseViewModel, IСriterionViewModel {
         if(SelectedParameter != null) {
             RuleEvaluators = new ObservableCollection<RuleEvaluatorViewModel>(
                 SelectedParameter.GetEvaluators()
-                    .Select(item => new RuleEvaluatorViewModel(item)));
+                    .Select(item => new RuleEvaluatorViewModel(_localization, item)));
 
             if(SelectedRuleEvaluator != null && SelectedRuleEvaluator.Equals(RuleEvaluators.FirstOrDefault())) {
                 EvaluatorSelectionChanged();

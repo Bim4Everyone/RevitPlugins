@@ -231,4 +231,48 @@
         x:Key="Parameter.CannotParseInt">Parameter value "{0}" must be an integer.</system:String>
     <system:String
         x:Key="Parameter.CannotParseDouble">Parameter value "{0}" must be a floating-point number.</system:String>
+
+    <system:String
+        x:Key="SetEvaluators.Or">Or</system:String>
+    <system:String
+        x:Key="SetEvaluators.And">And</system:String>
+    <system:String
+        x:Key="RuleEvaluators.FilterStringBeginsWith">Begins with</system:String>
+    <system:String
+        x:Key="RuleEvaluators.FilterStringNotBeginsWith">Not begins with</system:String>
+    <system:String
+        x:Key="RuleEvaluators.FilterStringContains">Contains</system:String>
+    <system:String
+        x:Key="RuleEvaluators.FilterStringNotContains">Not contains</system:String>
+    <system:String
+        x:Key="RuleEvaluators.FilterStringEndsWith">Ends with</system:String>
+    <system:String
+        x:Key="RuleEvaluators.FilterStringNotEndsWith">Not ends with</system:String>
+    <system:String
+        x:Key="RuleEvaluators.FilterStringEquals">Equals</system:String>
+    <system:String
+        x:Key="RuleEvaluators.FilterStringGreater">Greater</system:String>
+    <system:String
+        x:Key="RuleEvaluators.FilterStringGreaterOrEqual">Greater or equal</system:String>
+    <system:String
+        x:Key="RuleEvaluators.FilterStringLess">Less</system:String>
+    <system:String
+        x:Key="RuleEvaluators.FilterStringLessOrEqual">Less or equal</system:String>
+    <system:String
+        x:Key="RuleEvaluators.FilterNumericEquals">Equals</system:String>
+    <system:String
+        x:Key="RuleEvaluators.FilterNumericGreater">Greater</system:String>
+    <system:String
+        x:Key="RuleEvaluators.FilterNumericGreaterOrEqual">Greater or equal</system:String>
+    <system:String
+        x:Key="RuleEvaluators.FilterNumericLess">Less</system:String>
+    <system:String
+        x:Key="RuleEvaluators.FilterNumericLessOrEqual">Less or equal</system:String>
+    <system:String
+        x:Key="RuleEvaluators.FilterHasNoValue">Has no value</system:String>
+    <system:String
+        x:Key="RuleEvaluators.FilterHasValue">Has value</system:String>
+    <system:String
+        x:Key="RuleEvaluators.FilterNotEquals">Not equals</system:String>
+
 </ResourceDictionary>

@@ -88,18 +88,18 @@
                             <ui:Button
                                 DockPanel.Dock="Right"
                                 Margin="3"
-                                Content="{me:LocalizationSource FilterCreation.AddRule}"
+                                Content="{Binding AddRuleCommandName}"
                                 Command="{Binding AddRuleCommand}" />
                             <ui:Button
                                 DockPanel.Dock="Right"
                                 Margin="3"
-                                Content="{me:LocalizationSource FilterCreation.AddSet}"
+                                Content="{Binding AddSetCommandName}"
                                 Command="{Binding AddSetCommand}" />
                             <ComboBox
                                 DockPanel.Dock="Left"
                                 Margin="3"
                                 IsEditable="False"
-                                DisplayMemberPath="SetEvaluator.Message"
+                                DisplayMemberPath="Name"
                                 HorizontalAlignment="Stretch"
                                 ItemsSource="{Binding Evaluators, UpdateSourceTrigger=PropertyChanged}"
                                 SelectedValue="{Binding SelectedEvaluator, UpdateSourceTrigger=PropertyChanged}" />
@@ -227,18 +227,18 @@
                     <ui:Button
                         DockPanel.Dock="Right"
                         Margin="3"
-                        Content="{me:LocalizationSource FilterCreation.AddRule}"
+                        Content="{Binding AddRuleCommandName}"
                         Command="{Binding AddRuleCommand}" />
                     <ui:Button
                         DockPanel.Dock="Right"
                         Margin="3"
-                        Content="{me:LocalizationSource FilterCreation.AddSet}"
+                        Content="{Binding AddSetCommandName}"
                         Command="{Binding AddSetCommand}" />
                     <ComboBox
                         DockPanel.Dock="Left"
                         Margin="3"
                         HorizontalAlignment="Stretch"
-                        DisplayMemberPath="SetEvaluator.Message"
+                        DisplayMemberPath="Name"
                         IsEditable="False"
                         ItemsSource="{Binding Evaluators}"
                         SelectedValue="{Binding SelectedEvaluator, UpdateSourceTrigger=PropertyChanged}" />

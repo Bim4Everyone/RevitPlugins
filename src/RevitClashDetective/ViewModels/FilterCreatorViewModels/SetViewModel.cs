@@ -35,7 +35,12 @@ internal class SetViewModel : BaseViewModel, IСriterionViewModel {
         AddSetCommand = RelayCommand.Create(AddSet);
         RemoveSetCommand = RelayCommand.Create<SetViewModel>(RemoveSet);
 
-        Evaluators = new ObservableCollection<EvaluatorViewModel>(SetEvaluatorUtils.GetEvaluators().Select(item => new EvaluatorViewModel() { SetEvaluator = item }));
+        Evaluators = new ObservableCollection<EvaluatorViewModel>(
+            SetEvaluatorUtils.GetEvaluators().Select(item => new EvaluatorViewModel(_localization) {
+                SetEvaluator = item
+            }));
+        AddRuleCommandName = _localization.GetLocalizedString("FilterCreation.AddRule");
+        AddSetCommandName = _localization.GetLocalizedString("FilterCreation.AddSet");
         if(set == null) {
             Criterions = [];
             InitializeEmptyRule();
@@ -50,6 +55,8 @@ internal class SetViewModel : BaseViewModel, IСriterionViewModel {
     public ICommand AddSetCommand { get; }
     public ICommand RemoveSetCommand { get; }
     public ICommand RemoveRuleCommand { get; }
+    public string AddRuleCommandName { get; }
+    public string AddSetCommandName { get; }
 
     public CategoriesInfoViewModel CategoryInfo {
         get => _categoryInfo;
