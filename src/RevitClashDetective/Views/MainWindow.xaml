@@ -12,6 +12,7 @@
     xmlns:wpfbehaviors="clr-namespace:dosymep.WpfCore.Behaviors;assembly=dosymep.WpfCore"
     xmlns:clashDetective="clr-namespace:RevitClashDetective.ViewModels.ClashDetective"
     xmlns:cm="clr-namespace:System.ComponentModel;assembly=WindowsBase"
+    xmlns:converters="clr-namespace:dosymep.WpfCore.Converters;assembly=dosymep.WpfCore"
     mc:Ignorable="d"
     Height="450"
     Width="800"
@@ -47,6 +48,8 @@
             <ui:TextBlock
                 x:Key="ShowCleshesTooltip"
                 Text="{me:LocalizationSource MainWindow.ShowClashes}" />
+            <converters:StringToVisibilityConverter
+                x:Key="StringToVisibilityConverter" />
         </ResourceDictionary>
     </core:WpfUIPlatformWindow.Resources>
 
@@ -111,6 +114,7 @@
                         PlaceholderText="{me:LocalizationSource MainWindow.CheckSearch}" />
                 </DockPanel>
                 <ui:DataGrid
+                    x:Name="ChecksGrid"
                     SelectionMode="Single"
                     AutoGenerateColumns="False"
                     CanUserDeleteRows="False"
@@ -142,10 +146,26 @@
                     </ui:DataGrid.CellStyle>
 
                     <ui:DataGrid.Columns>
-                        <DataGridCheckBoxColumn
+                        <DataGridTemplateColumn
                             Width="Auto"
-                            CanUserSort="False"
-                            Binding="{Binding IsSelected, UpdateSourceTrigger=PropertyChanged}" />
+                            CanUserSort="False">
+                            <DataGridTemplateColumn.CellTemplate>
+                                <DataTemplate>
+                                    <DockPanel
+                                        HorizontalAlignment="Center">
+                                        <ui:SymbolIcon
+                                            Symbol="Warning20"
+                                            Visibility="{Binding ErrorText, Converter={StaticResource StringToVisibilityConverter}}"
+                                            ToolTip="{Binding ErrorText}">
+                                        </ui:SymbolIcon>
+                                        <CheckBox
+                                            Padding="0"
+                                            Margin="4 0 0 0"
+                                            IsChecked="{Binding IsSelected, UpdateSourceTrigger=PropertyChanged}" />
+                                    </DockPanel>
+                                </DataTemplate>
+                            </DataGridTemplateColumn.CellTemplate>
+                        </DataGridTemplateColumn>
 
                         <DataGridTemplateColumn
                             Width="150"
