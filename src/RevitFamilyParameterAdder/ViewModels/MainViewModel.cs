@@ -1,4 +1,5 @@
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
@@ -96,7 +97,7 @@ internal class MainViewModel : BaseViewModel {
         LoadViewCommand = RelayCommand.Create(LoadView);
         AcceptViewCommand = RelayCommand.Create(AcceptView, CanAcceptView);
         GetParamsNSetParamFilterCommand = RelayCommand.Create(GetParamsNSetParamFilter);
-        SelectionParamsCommand = RelayCommand.Create<object>(SelectionParams);
+        SelectionParamsCommand = RelayCommand.Create<IList>(SelectionParams);
         SelectAllCommand = RelayCommand.Create<bool>(SelectAllItems);
     }
 
@@ -333,10 +334,10 @@ internal class MainViewModel : BaseViewModel {
     /// Заполняем список выбранных параметров для добавления. Работает по событию выбора в ListView
     /// </summary>
     /// <param name="p"></param>
-    private void SelectionParams(object p) {
+    private void SelectionParams(IList parameters) {
         // Забираем список выбранных элементов через CommandParameter
         SelectedParams.Clear();
-        foreach(object item in p as System.Collections.IList) {
+        foreach(object item in parameters) {
             if(item is not SharedParam sharedParam) {
                 continue;
             }
