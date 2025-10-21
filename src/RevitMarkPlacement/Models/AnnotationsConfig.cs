@@ -31,7 +31,7 @@ internal class AnnotationsSettings : ProjectSettings {
     public ElementId GlobalParameterId { get; set; }
     public SelectionMode SelectionMode { get; set; } = SelectionMode.SelectedElements;
     public LevelHeightProvider LevelHeightProvider { get; set; } = LevelHeightProvider.GlobalParameter;
-    public double LevelHeight { get; set; } = 3000;
+    public double? LevelHeight { get; set; } = 3000;
 }
 
 internal enum SelectionMode {

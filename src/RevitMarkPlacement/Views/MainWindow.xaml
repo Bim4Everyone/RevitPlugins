@@ -8,6 +8,7 @@
     xmlns:vm="clr-namespace:RevitMarkPlacement.ViewModels"
     xmlns:converters="clr-namespace:dosymep.WPF.Converters"
     xmlns:b="http://schemas.microsoft.com/xaml/behaviors"
+    xmlns:floorHeight="clr-namespace:RevitMarkPlacement.ViewModels.FloorHeight"
     mc:Ignorable="d"
     Title="Отметки типовых этажей" Height="500" Width="400"
     d:DataContext="{d:DesignInstance vm:MainViewModel, IsDesignTimeCreatable=False}">
@@ -78,8 +79,8 @@
                 <TextBox Margin="5" Text="{Binding FloorCount, UpdateSourceTrigger=PropertyChanged}" />
             </GroupBox>
             <GroupBox Grid.Row="1" Margin="5" FontSize="14" Header="Высота этажа">
-                <ListBox BorderThickness="0" ItemsSource="{Binding FloorHeightProviders}"
-                         SelectedItem="{Binding SelectedFloorHeightProvider}">
+                <ListBox BorderThickness="0" ItemsSource="{Binding FloorHeights}"
+                         SelectedItem="{Binding FloorHeight}">
                     <ListBox.ItemContainerStyle>
                         <Style TargetType="{x:Type ListBoxItem}">
                             <Setter Property="Template">
@@ -93,21 +94,21 @@
                         </Style>
                     </ListBox.ItemContainerStyle>
                     <ListBox.Resources>
-                        <DataTemplate DataType="{x:Type vm:UserFloorHeightViewModel}">
+                        <DataTemplate DataType="{x:Type floorHeight:UserFloorHeightViewModel}">
                             <StackPanel>
                                 <RadioButton Margin="5" FontSize="14" Content="{Binding Description}"
                                              IsChecked="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type ListBoxItem}}, Path=IsSelected}" />
                                 <TextBox Text="{Binding FloorHeight, UpdateSourceTrigger=PropertyChanged}" />
                             </StackPanel>
                         </DataTemplate>
-                        <DataTemplate DataType="{x:Type vm:GlobalFloorHeightViewModel}">
+                        <DataTemplate DataType="{x:Type floorHeight:GlobalParamsViewModel}">
                             <StackPanel IsEnabled="{Binding IsEnabled}">
                                 <RadioButton Margin="5" FontSize="14" Content="{Binding Description}"
                                              IsChecked="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type ListBoxItem}}, Path=IsSelected}" />
-                                <ComboBox ItemsSource="{Binding GlobalParameters}"
-                                          SelectedItem="{Binding SelectedGlobalParameter}">
+                                <ComboBox ItemsSource="{Binding GlobalParams}"
+                                          SelectedItem="{Binding GlobalParam}">
                                     <ComboBox.ItemTemplate>
-                                        <DataTemplate DataType="{x:Type vm:GlobalParameterViewModel}">
+                                        <DataTemplate DataType="{x:Type floorHeight:GlobalParamViewModel}">
                                             <StackPanel Orientation="Horizontal">
                                                 <TextBlock Text="{Binding Name}" />
                                                 <TextBlock Margin="5 0" Text="{Binding Value, StringFormat=({0} мм)}" />

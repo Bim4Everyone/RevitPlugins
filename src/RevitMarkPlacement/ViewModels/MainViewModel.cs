@@ -12,6 +12,7 @@ using dosymep.WPF.ViewModels;
 
 using RevitMarkPlacement.Models;
 using RevitMarkPlacement.Models.SelectionModes;
+using RevitMarkPlacement.ViewModels.FloorHeight;
 
 namespace RevitMarkPlacement.ViewModels;
 
@@ -24,14 +25,17 @@ internal class MainViewModel : BaseViewModel {
     private readonly AnnotationsSettings _settings;
     private string _errorText;
     private string _floorCount;
-    private List<IFloorHeightProvider> _floorHeightProviders;
+    private List<IFloorHeightProvider> _floorHeights;
     private InfoElementsViewModel _infoElementsViewModel;
-    private IFloorHeightProvider _selectedFloorHeightProvider;
+    private IFloorHeightProvider _floorHeight;
     private SelectionModeViewModel _selectedMode;
     private string _selectedParameterName;
     private List<SelectionModeViewModel> _selectionModes;
 
-    public MainViewModel(RevitRepository revitRepository, AnnotationsConfig config, IDocumentProvider documentProvider) {
+    public MainViewModel(
+        RevitRepository revitRepository,
+        AnnotationsConfig config,
+        IDocumentProvider documentProvider) {
         _revitRepository = revitRepository;
         _config = config;
         _documentProvider = documentProvider;
@@ -67,14 +71,14 @@ internal class MainViewModel : BaseViewModel {
         set => RaiseAndSetIfChanged(ref _selectedMode, value);
     }
 
-    public List<IFloorHeightProvider> FloorHeightProviders {
-        get => _floorHeightProviders;
-        set => RaiseAndSetIfChanged(ref _floorHeightProviders, value);
+    public IFloorHeightProvider FloorHeight {
+        get => _floorHeight;
+        set => RaiseAndSetIfChanged(ref _floorHeight, value);
     }
-
-    public IFloorHeightProvider SelectedFloorHeightProvider {
-        get => _selectedFloorHeightProvider;
-        set => RaiseAndSetIfChanged(ref _selectedFloorHeightProvider, value);
+    
+    public List<IFloorHeightProvider> FloorHeights {
+        get => _floorHeights;
+        set => RaiseAndSetIfChanged(ref _floorHeights, value);
     }
 
     public InfoElementsViewModel InfoElementsViewModel {
@@ -102,21 +106,25 @@ internal class MainViewModel : BaseViewModel {
     }
 
     private void InitializeFloorHeightProvider() {
-        FloorHeightProviders = new List<IFloorHeightProvider> {
-            new UserFloorHeightViewModel("Индивидуальная настройка", _settings),
-            new GlobalFloorHeightViewModel(_revitRepository, "По глобальному параметру", _settings)
+        FloorHeights = new List<IFloorHeightProvider> {
+            new UserFloorHeightViewModel(),
+            new GlobalParamsViewModel(new DoubleGlobalParamSelection(_documentProvider))
         };
-        if(_settings.LevelHeightProvider == LevelHeightProvider.UserSettings
-           || !FloorHeightProviders[1].IsEnabled) {
-            SelectedFloorHeightProvider = FloorHeightProviders[0];
-        } else {
-            SelectedFloorHeightProvider = FloorHeightProviders[1];
+
+        foreach(var provider in FloorHeights) {
+            provider.LoadConfig(_settings);
         }
+
+        FloorHeight = FloorHeights
+                          .FirstOrDefault(item =>
+                              item.IsEnabled
+                              && item.LevelHeightProvider == _settings.LevelHeightProvider)
+                      ?? FloorHeights.FirstOrDefault();
     }
 
     private void PlaceAnnotation(object p) {
         var marks = new TemplateLevelMarkCollection(_revitRepository, SelectedMode.Selection);
-        marks.CreateAnnotation(int.Parse(FloorCount), double.Parse(SelectedFloorHeightProvider.GetFloorHeight()));
+        marks.CreateAnnotation(int.Parse(FloorCount), FloorHeight.GetFloorHeight() ?? 0);
         SaveConfig();
     }
 
@@ -131,12 +139,7 @@ internal class MainViewModel : BaseViewModel {
             return false;
         }
 
-        if(!double.TryParse(SelectedFloorHeightProvider.GetFloorHeight(), out double floorHeight)) {
-            ErrorText = "Высота типового этажа должна быть числом.";
-            return false;
-        }
-
-        if(floorHeight < 1) {
+        if(FloorHeight.GetFloorHeight() < 1) {
             ErrorText = "Высота типового этажа должна быть неотрицательной.";
             return false;
         }
@@ -153,20 +156,10 @@ internal class MainViewModel : BaseViewModel {
         }
 
         _settings.LevelCount = int.Parse(FloorCount);
-        if(SelectedFloorHeightProvider is UserFloorHeightViewModel) {
-            _settings.LevelHeightProvider = LevelHeightProvider.UserSettings;
-        } else {
-            _settings.LevelHeightProvider = LevelHeightProvider.GlobalParameter;
-        }
+        _settings.LevelHeightProvider = FloorHeight.LevelHeightProvider;
 
-        foreach(var provider in FloorHeightProviders) {
-            if(provider is UserFloorHeightViewModel userFloorHeight) {
-                _settings.LevelHeight = double.Parse(userFloorHeight.FloorHeight);
-            }
-
-            if(provider is GlobalFloorHeightViewModel globalFloorHeight) {
-                _settings.GlobalParameterId = globalFloorHeight?.SelectedGlobalParameter?.ElementId;
-            }
+        foreach(var provider in FloorHeights) {
+            provider.SaveConfig(_settings);
         }
 
         _config.SaveProjectConfig();
