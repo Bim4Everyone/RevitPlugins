@@ -32,6 +32,10 @@
             <ResourceDictionary.MergedDictionaries>
                 <ResourceDictionary
                     Source="../Resources/CustomStyles.xaml" />
+                <ResourceDictionary
+                    Source="pack://application:,,,/Wpf.Ui;component/Controls/ListView/ListView.xaml" />
+                <ResourceDictionary
+                    Source="pack://application:,,,/Wpf.Ui;component/Controls/ListView/ListViewItem.xaml" />
             </ResourceDictionary.MergedDictionaries>
         </ResourceDictionary>
     </core:WpfUIPlatformWindow.Resources>
@@ -124,18 +128,23 @@
                         Command="{Binding DeleteCommand}"
                         Content="{ui:SymbolIcon Symbol=Delete20}" />
                 </DockPanel>
-                <ui:DataGrid
+                <ui:ListView
                     Margin="0 4 0 0"
-                    IsReadOnly="True"
-                    AutoGenerateColumns="False"
-                    HeadersVisibility="None"
                     ItemsSource="{Binding Filters}"
                     SelectedItem="{Binding SelectedFilter, UpdateSourceTrigger=PropertyChanged}">
-                    <ui:DataGrid.Columns>
-                        <DataGridTextColumn
-                            Binding="{Binding Name}" />
-                    </ui:DataGrid.Columns>
-                </ui:DataGrid>
+                    <ui:ListView.ItemTemplate>
+                        <DataTemplate>
+                            <DockPanel
+                                Height="20"
+                                Margin="10 4"
+                                VerticalAlignment="Center">
+                                <ui:TextBlock
+                                    VerticalAlignment="Center"
+                                    Text="{Binding Name}" />
+                            </DockPanel>
+                        </DataTemplate>
+                    </ui:ListView.ItemTemplate>
+                </ui:ListView>
             </DockPanel>
         </Border>
 
