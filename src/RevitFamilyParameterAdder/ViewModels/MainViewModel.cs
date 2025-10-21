@@ -91,8 +91,6 @@ internal class MainViewModel : BaseViewModel {
         _revitRepository = revitRepository;
         _localizationService = localizationService;
 
-        FamilyManagerFm = _revitRepository.Document.FamilyManager;
-
         _allGroup = _localizationService.GetLocalizedString("MainWindow.SelectAll");
 
         LoadViewCommand = RelayCommand.Create(LoadView);
@@ -165,6 +163,7 @@ internal class MainViewModel : BaseViewModel {
     private void LoadView() {
         IsParamsForKR = true;
         WriteFormulasInParamsForKR = true;
+        FamilyManagerFm = _revitRepository.Document.FamilyManager;
 
         // Подгружаем сохраненные данные прошлого запуска
         LoadConfig();
@@ -205,7 +204,9 @@ internal class MainViewModel : BaseViewModel {
         }
     }
 
-
+    /// <summary>
+    /// Добавляет выбранные параметры в семейство
+    /// </summary>
     private void Add() {
         using(var t = new Transaction(_revitRepository.Document)) {
             t.Start(_localizationService.GetLocalizedString("MainWindow.Title"));
