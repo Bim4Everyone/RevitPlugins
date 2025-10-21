@@ -1,0 +1,18 @@
+<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:system="clr-namespace:System;assembly=mscorlib">
+
+    <!-- Пример перевода на русский язык (google translate) -->
+
+    <system:String x:Key="MainWindow.Title">Расставить отметки</system:String>
+
+    <system:String x:Key="MainWindow.ButtonOk">ОК</system:String>
+    <system:String x:Key="MainWindow.ButtonCancel">Отмена</system:String>
+    
+    <system:String x:Key="Selections.DBSelection">Все отметки</system:String>
+    <system:String x:Key="Selections.DBViewSelection">Отметки на виде</system:String>
+    <system:String x:Key="Selections.SelectedOnViewSelection">Выделенные отметки</system:String>
+    
+    <system:String x:Key="LevelHeightProvider.UserSettings">Пользовательская</system:String>
+    <system:String x:Key="LevelHeightProvider.GlobalParameter">Глобальный параметр</system:String>
+</ResourceDictionary>

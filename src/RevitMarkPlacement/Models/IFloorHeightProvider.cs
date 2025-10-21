@@ -6,6 +6,6 @@ internal interface IFloorHeightProvider {
     
     double? GetFloorHeight();
     
-    void LoadConfig(AnnotationsSettings settings);
-    void SaveConfig(AnnotationsSettings settings);
+    void LoadConfig(RevitSettings settings);
+    void SaveConfig(RevitSettings settings);
 }

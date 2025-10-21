@@ -1,0 +1,18 @@
+<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:system="clr-namespace:System;assembly=mscorlib">
+
+    <!-- Пример перевода на английский американский язык (google translate) -->
+
+    <system:String x:Key="MainWindow.Title">Place annotations</system:String>
+
+    <system:String x:Key="MainWindow.ButtonOk">OK</system:String>
+    <system:String x:Key="MainWindow.ButtonCancel">Cancel</system:String>
+    
+    <system:String x:Key="Selections.DBSelection">All spots dimensions</system:String>
+    <system:String x:Key="Selections.DBViewSelection">Spot dimensions on view</system:String>
+    <system:String x:Key="Selections.SelectedOnViewSelection">Selected dimensions on view</system:String>
+    
+    <system:String x:Key="LevelHeightProvider.UserSettings">User</system:String>
+    <system:String x:Key="LevelHeightProvider.GlobalParameter">Global parameter</system:String>
+</ResourceDictionary>

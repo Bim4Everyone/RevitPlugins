@@ -8,24 +8,24 @@ using pyRevitLabs.Json;
 
 namespace RevitMarkPlacement.Models;
 
-internal class AnnotationsConfig : ProjectConfig<AnnotationsSettings> {
+internal class PluginConfig : ProjectConfig<RevitSettings> {
     [JsonIgnore]
     public override string ProjectConfigPath { get; set; }
 
     [JsonIgnore]
     public override IConfigSerializer Serializer { get; set; }
 
-    public static AnnotationsConfig GetAnnotationsConfig() {
+    public static PluginConfig GetPluginConfig(IConfigSerializer configSerializer) {
         return new ProjectConfigBuilder()
-            .SetSerializer(new ConfigSerializer())
+            .SetSerializer(configSerializer)
             .SetPluginName(nameof(RevitMarkPlacement))
             .SetRevitVersion(ModuleEnvironment.RevitVersion)
-            .SetProjectConfigName(nameof(AnnotationsConfig) + ".json")
-            .Build<AnnotationsConfig>();
+            .SetProjectConfigName(nameof(PluginConfig) + ".json")
+            .Build<PluginConfig>();
     }
 }
 
-internal class AnnotationsSettings : ProjectSettings {
+internal class RevitSettings : ProjectSettings {
     public override string ProjectName { get; set; }
    
     public int LevelCount { get; set; } = 5;

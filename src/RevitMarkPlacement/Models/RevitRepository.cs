@@ -27,19 +27,33 @@ internal class RevitRepository : BaseViewModel {
     public const string ElevSymbolWidth = "Длина полки";
     public const string ElevSymbolHeight = "Высота полки";
 
-    private readonly Application _application;
-
-    private readonly Document _document;
-    private readonly UIApplication _uiApplication;
-    private readonly UIDocument _uiDocument;
-
-    public RevitRepository(Application application, Document document) {
-        _application = application;
-        _uiApplication = new UIApplication(application);
-
-        _document = document;
-        _uiDocument = new UIDocument(document);
+    /// <summary>
+    /// Создает экземпляр репозитория.
+    /// </summary>
+    /// <param name="uiApplication">Класс доступа к интерфейсу Revit.</param>
+    public RevitRepository(UIApplication uiApplication) {
+        UIApplication = uiApplication;
     }
+
+    /// <summary>
+    /// Класс доступа к интерфейсу Revit.
+    /// </summary>
+    public UIApplication UIApplication { get; }
+    
+    /// <summary>
+    /// Класс доступа к интерфейсу документа Revit.
+    /// </summary>
+    public UIDocument ActiveUIDocument => UIApplication.ActiveUIDocument;
+    
+    /// <summary>
+    /// Класс доступа к приложению Revit.
+    /// </summary>
+    public Application Application => UIApplication.Application;
+    
+    /// <summary>
+    /// Класс доступа к документу Revit.
+    /// </summary>
+    public Document Document => ActiveUIDocument.Document;
 
     public IEnumerable<SpotDimensionType> GetSpotDimentionTypeNames(ISpotDimensionSelection selection) {
         return selection.GetElements()
@@ -49,22 +63,22 @@ internal class RevitRepository : BaseViewModel {
 
     public IEnumerable<GlobalParameter> GetDoubleGlobalParameters() {
         return GlobalParametersManager
-            .GetGlobalParametersOrdered(_document)
-            .Select(id => _document.GetElement(id))
+            .GetGlobalParametersOrdered(Document)
+            .Select(id => Document.GetElement(id))
             .Cast<GlobalParameter>()
             .Where(p => p.GetValue() is DoubleParameterValue);
     }
 
     public FamilyInstance CreateAnnotation(FamilySymbol symbol, XYZ point, View view) {
-        return _document.Create.NewFamilyInstance(point, symbol, view);
+        return Document.Create.NewFamilyInstance(point, symbol, view);
     }
 
     public Element GetElement(ElementId elementId) {
-        return _document.GetElement(elementId);
+        return Document.GetElement(elementId);
     }
 
     public FamilySymbol GetAnnotationSymbolType(string typeName, string familyName) {
-        return new FilteredElementCollector(_document)
+        return new FilteredElementCollector(Document)
             .OfClass(typeof(FamilySymbol))
             .Cast<FamilySymbol>()
             .FirstOrDefault(item => IsNeededAnnotationSymbol(item, typeName, familyName));
@@ -73,7 +87,7 @@ internal class RevitRepository : BaseViewModel {
     public IEnumerable<FamilySymbol> GetAnnotationSymbols() {
         string[] families = new[] { FamilyTop, FamilyBottom };
         string[] types = new[] { TypeTop, TypeBottom };
-        return new FilteredElementCollector(_document)
+        return new FilteredElementCollector(Document)
             .OfClass(typeof(FamilySymbol))
             .Cast<FamilySymbol>()
             .Where(item =>
@@ -90,20 +104,20 @@ internal class RevitRepository : BaseViewModel {
             FamilyTop,
             FamilyBottom
         };
-        return new FilteredElementCollector(_document)
+        return new FilteredElementCollector(Document)
             .OfClass(typeof(FamilyInstance))
             .OfType<AnnotationSymbol>()
             .Where(item => IsNeededAnnotationInstance(item, familyNames));
     }
 
     public TransactionGroup StartTransactionGroup(string text) {
-        var t = new TransactionGroup(_document);
+        var t = new TransactionGroup(Document);
         t.BIMStart(text);
         return t;
     }
 
     public Transaction StartTransaction(string text) {
-        var t = new Transaction(_document);
+        var t = new Transaction(Document);
         t.BIMStart(text);
         return t;
     }
@@ -160,11 +174,11 @@ internal class RevitRepository : BaseViewModel {
     }
 
     public void MirrorAnnotation(FamilyInstance annotation, XYZ axis) {
-        using(var t = _document.StartTransaction("Отражение аннотации")) {
+        using(var t = Document.StartTransaction("Отражение аннотации")) {
             if(annotation.Location is LocationPoint point) {
                 var plane = Plane.CreateByNormalAndOrigin(axis, point.Point);
-                ElementTransformUtils.MirrorElement(_document, annotation.Id, plane);
-                _document.Delete(annotation.Id);
+                ElementTransformUtils.MirrorElement(Document, annotation.Id, plane);
+                Document.Delete(annotation.Id);
             }
 
             t.Commit();
@@ -172,44 +186,36 @@ internal class RevitRepository : BaseViewModel {
     }
 
     public void DeleteElement(Element element) {
-        using(var t = new Transaction(_document)) {
+        using(var t = new Transaction(Document)) {
             t.BIMStart("Удаление элемента");
-            _document.Delete(element.Id);
+            Document.Delete(element.Id);
             t.Commit();
         }
     }
 
-    public AnnotationsSettings GetSettings(AnnotationsConfig congig) {
-        return congig.GetSettings(_document);
-    }
-
-    public AnnotationsSettings AddSettings(AnnotationsConfig congig) {
-        return congig.AddSettings(_document);
-    }
-
     public Family GetTopAnnotaionFamily() {
-        return new FilteredElementCollector(_document)
+        return new FilteredElementCollector(Document)
             .OfClass(typeof(Family))
             .Cast<Family>()
             .FirstOrDefault(item => item.Name.Equals(FamilyTop, StringComparison.CurrentCultureIgnoreCase));
     }
 
     public Family GetBottomAnnotaionFamily() {
-        return new FilteredElementCollector(_document)
+        return new FilteredElementCollector(Document)
             .OfClass(typeof(Family))
             .Cast<Family>()
             .FirstOrDefault(item => item.Name.Equals(FamilyBottom, StringComparison.CurrentCultureIgnoreCase));
     }
 
     public Document GetFamilyDocument(Family family) {
-        return _document.EditFamily(family);
+        return Document.EditFamily(family);
     }
 
     public IEnumerable<FamilySymbol> GetElevationSymbols() {
-        return new FilteredElementCollector(_document)
+        return new FilteredElementCollector(Document)
             .OfClass(typeof(SpotDimension))
             .OfType<SpotDimension>()
-            .Select(item => _document.GetElement(
+            .Select(item => Document.GetElement(
                 (ElementId) item.SpotDimensionType.GetParamValueOrDefault(BuiltInParameter.SPOT_ELEV_SYMBOL)))
             .OfType<FamilySymbol>();
     }

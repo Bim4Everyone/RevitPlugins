@@ -43,17 +43,17 @@ internal class GlobalParamsViewModel : BaseViewModel, IFloorHeightProvider {
         return GlobalParam?.Value;
     }
 
-    public void LoadConfig(AnnotationsSettings settings) {
+    public void LoadConfig(RevitSettings settings) {
         GlobalParams = new ObservableCollection<GlobalParamViewModel>(
             _globalParamSelection.GetElements()
                 .Select(item => new GlobalParamViewModel(item)));
 
         IsEnabled = GlobalParams.Count > 0;
-        GlobalParam = GlobalParams.FirstOrDefault(item => item.Id == settings.GlobalParameterId)
+        GlobalParam = GlobalParams.FirstOrDefault(item => item.Id == settings?.GlobalParameterId)
                       ?? GlobalParams.FirstOrDefault();
     }
 
-    public void SaveConfig(AnnotationsSettings settings) {
+    public void SaveConfig(RevitSettings settings) {
         settings.GlobalParameterId = GlobalParam?.Id;
     }
 }

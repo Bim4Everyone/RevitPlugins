@@ -3,11 +3,11 @@ using Autodesk.Revit.UI;
 
 namespace RevitMarkPlacement.Models.DocumentProviders;
 
-internal sealed class CurrentDocumentProvider : IDocumentProvider {
+internal sealed class ActiveDocumentProvider : IDocumentProvider {
     private readonly Document _document;
     private readonly UIDocument _uiDocument;
 
-    public CurrentDocumentProvider(UIApplication uiApplication) {
+    public ActiveDocumentProvider(UIApplication uiApplication) {
         _document = uiApplication.ActiveUIDocument.Document;
         _uiDocument = uiApplication.ActiveUIDocument;
     }

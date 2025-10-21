@@ -5,8 +5,6 @@ using System.Windows.Input;
 
 using Autodesk.Revit.DB;
 
-using DevExpress.CodeParser;
-
 using dosymep.Revit;
 using dosymep.WPF.Commands;
 using dosymep.WPF.ViewModels;
@@ -20,40 +18,38 @@ namespace RevitMarkPlacement.ViewModels;
 internal class MainViewModel : BaseViewModel {
     private const string _allElementsSelection = "Создать по всему проекту";
     private const string _selectedElements = "Создать по выбранным элементам";
-    
-    private readonly AnnotationsConfig _config;
-    private readonly IDocumentProvider _documentProvider;
+
+    private readonly PluginConfig _pluginConfig;
     private readonly RevitRepository _revitRepository;
-    private readonly AnnotationsSettings _settings;
+    private readonly IDocumentProvider _documentProvider;
+
     private InfoElementsViewModel _infoElementsViewModel;
-    
+
     private string _errorText;
     private string _floorCount;
-    
+
     private SelectionModeViewModel _selection;
     private ObservableCollection<SelectionModeViewModel> _selections;
-    
+
     private IFloorHeightProvider _floorHeight;
     private ObservableCollection<IFloorHeightProvider> _floorHeights;
 
     public MainViewModel(
+        PluginConfig pluginConfig,
         RevitRepository revitRepository,
-        AnnotationsConfig config,
         IDocumentProvider documentProvider) {
+        _pluginConfig = pluginConfig;
         _revitRepository = revitRepository;
-        _config = config;
         _documentProvider = documentProvider;
-        _settings = _revitRepository.GetSettings(_config);
-        if(_settings == null) {
-            _settings = _revitRepository.AddSettings(_config);
-        }
 
-        FloorCount = _settings.LevelCount.ToString();
-        LoadSelections();
-        LoadFloorHeights();
         InfoElementsViewModel = new InfoElementsViewModel();
-        PlaceAnnotationCommand = new RelayCommand(PlaceAnnotation, CanPlaceAnnotation);
+
+        LoadViewCommand = RelayCommand.Create(LoadView);
+        AcceptViewCommand = RelayCommand.Create(AcceptView, CanAcceptView);
     }
+
+    public ICommand LoadViewCommand { get; set; }
+    public ICommand AcceptViewCommand { get; set; }
 
     public string FloorCount {
         get => _floorCount;
@@ -90,47 +86,53 @@ internal class MainViewModel : BaseViewModel {
         set => RaiseAndSetIfChanged(ref _infoElementsViewModel, value);
     }
 
-    public ICommand PlaceAnnotationCommand { get; set; }
+    private void LoadView() {
+        var settings = _pluginConfig.GetSettings(_documentProvider.GetDocument());
 
-    private void LoadSelections() {
+        LoadSelections(settings);
+        LoadFloorHeights(settings);
+
+        FloorCount = settings?.LevelCount.ToString();
+    }
+
+    private void LoadSelections(RevitSettings settings) {
         Selections = [
             new SelectionModeViewModel(new DBSelection(_documentProvider), _revitRepository),
             new SelectionModeViewModel(new SelectedOnViewSelection(_documentProvider), _revitRepository)
         ];
-        
+
         foreach(var selection in Selections) {
             selection.LoadSpotDimensionTypes();
         }
 
         Selection = Selections
-                        .FirstOrDefault(item => item.Selections == _settings.SelectionMode)
+                        .FirstOrDefault(item => item.Selections == settings?.SelectionMode)
                     ?? Selections.FirstOrDefault();
     }
 
-    private void LoadFloorHeights() {
+    private void LoadFloorHeights(RevitSettings settings) {
         FloorHeights = [
-            new UserFloorHeightViewModel(), 
-            new GlobalParamsViewModel(new DoubleGlobalParamSelection(_documentProvider))
+            new UserFloorHeightViewModel(), new GlobalParamsViewModel(new DoubleGlobalParamSelection(_documentProvider))
         ];
 
         foreach(var provider in FloorHeights) {
-            provider.LoadConfig(_settings);
+            provider.LoadConfig(settings);
         }
 
         FloorHeight = FloorHeights
                           .FirstOrDefault(item =>
                               item.IsEnabled
-                              && item.LevelHeightProvider == _settings.LevelHeightProvider)
+                              && item.LevelHeightProvider == settings?.LevelHeightProvider)
                       ?? FloorHeights.FirstOrDefault();
     }
 
-    private void PlaceAnnotation(object p) {
+    private void AcceptView() {
         var marks = new TemplateLevelMarkCollection(_revitRepository, Selection.Selection);
         marks.CreateAnnotation(int.Parse(FloorCount), FloorHeight.GetFloorHeight() ?? 0);
         SaveConfig();
     }
 
-    private bool CanPlaceAnnotation(object p) {
+    private bool CanAcceptView() {
         if(!int.TryParse(FloorCount, out int levelCount)) {
             ErrorText = "Количество типовых этажей должно быть числом.";
             return false;
@@ -151,15 +153,19 @@ internal class MainViewModel : BaseViewModel {
     }
 
     private void SaveConfig() {
-        _settings.LevelCount = int.Parse(FloorCount);
-        _settings.SelectionMode = Selection?.Selections;
-        _settings.LevelHeightProvider = FloorHeight?.LevelHeightProvider;
+        Document document = _documentProvider.GetDocument();
+        RevitSettings setting = _pluginConfig.GetSettings(document)
+                                ?? _pluginConfig.AddSettings(document);
+
+        setting.LevelCount = int.Parse(FloorCount);
+        setting.SelectionMode = Selection?.Selections;
+        setting.LevelHeightProvider = FloorHeight?.LevelHeightProvider;
 
         foreach(var provider in FloorHeights) {
-            provider.SaveConfig(_settings);
+            provider.SaveConfig(setting);
         }
 
-        _config.SaveProjectConfig();
+        _pluginConfig.SaveProjectConfig();
     }
 
     public bool CanPlaceAnnotation() {

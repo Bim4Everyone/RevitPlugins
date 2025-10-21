@@ -22,11 +22,11 @@ internal class UserFloorHeightViewModel : BaseViewModel, IFloorHeightProvider {
         return double.TryParse(FloorHeight, out double result) ? result : null;
     }
 
-    public void LoadConfig(AnnotationsSettings settings) {
-        FloorHeight = settings.LevelHeight?.ToString(CultureInfo.CurrentCulture);
+    public void LoadConfig(RevitSettings settings) {
+        FloorHeight = settings?.LevelHeight?.ToString(CultureInfo.CurrentCulture);
     }
 
-    public void SaveConfig(AnnotationsSettings settings) {
+    public void SaveConfig(RevitSettings settings) {
         settings.LevelHeight = GetFloorHeight();
     }
 }
