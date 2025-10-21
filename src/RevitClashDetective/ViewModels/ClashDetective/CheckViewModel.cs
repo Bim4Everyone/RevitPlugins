@@ -49,7 +49,7 @@ internal class CheckViewModel : BaseViewModel, INamedEntity {
         _settingsConfig = settingsConfig ?? throw new ArgumentNullException(nameof(settingsConfig));
         _filtersConfig = filtersConfig ?? throw new ArgumentNullException(nameof(filtersConfig));
         _contentDialogService = contentDialogService ?? throw new ArgumentNullException(nameof(contentDialogService));
-        Name = check?.Name ?? "Без имени";
+        Name = check?.Name ?? _localizationService.GetLocalizedString("MainWindow.CheckDefaultName");
 
         if(check == null) {
             InitializeSelections();
@@ -161,20 +161,24 @@ internal class CheckViewModel : BaseViewModel, INamedEntity {
 
         string firstFiles = FirstSelection.GetMissedFiles();
         if(!string.IsNullOrEmpty(firstFiles)) {
-            ErrorText = $"Не найдены файлы выборки А: {firstFiles}" + Environment.NewLine;
+            ErrorText = _localizationService.GetLocalizedString("MainWindow.Validation.MissingFiles1", firstFiles)
+                + Environment.NewLine;
         }
         string firstFilters = FirstSelection.GetMissedFilters();
         if(!string.IsNullOrEmpty(firstFilters)) {
-            ErrorText += $"Не найдены поисковые наборы выборки A: {firstFilters}" + Environment.NewLine;
+            ErrorText += _localizationService.GetLocalizedString("MainWindow.Validation.MissingFilters1", firstFilters)
+                + Environment.NewLine;
         }
 
         string secondFiles = SecondSelection.GetMissedFiles();
         if(!string.IsNullOrEmpty(secondFiles)) {
-            ErrorText += $"Не найдены файлы выборки B: {secondFiles}" + Environment.NewLine;
+            ErrorText = _localizationService.GetLocalizedString("MainWindow.Validation.MissingFiles2", secondFiles)
+                + Environment.NewLine;
         }
         string secondFilters = SecondSelection.GetMissedFilters();
         if(!string.IsNullOrEmpty(secondFilters)) {
-            ErrorText += $"Не найдены поисковые наборы выборки B: {secondFilters}" + Environment.NewLine;
+            ErrorText += _localizationService.GetLocalizedString("MainWindow.Validation.MissingFilters2", secondFilters)
+                + Environment.NewLine;
         }
 
         if(ClashesConfig.GetClashesConfig(_revitRepository.GetObjectName(), ReportName).Clashes.Count > 0) {

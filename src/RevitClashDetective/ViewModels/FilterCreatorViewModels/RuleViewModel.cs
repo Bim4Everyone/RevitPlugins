@@ -2,6 +2,7 @@ using System.Collections.ObjectModel;
 using System.Linq;
 using System.Windows.Input;
 
+using dosymep.SimpleServices;
 using dosymep.WPF.ViewModels;
 
 using RevitClashDetective.Models;
@@ -11,6 +12,7 @@ using RevitClashDetective.ViewModels.FilterCreatorViewModels.Interfaces;
 namespace RevitClashDetective.ViewModels.FilterCreatorViewModels;
 internal class RuleViewModel : BaseViewModel, IСriterionViewModel {
     private readonly RevitRepository _revitRepository;
+    private readonly ILocalizationService _localization;
     private readonly Rule _rule;
     private CategoriesInfoViewModel _categoriesInfo;
     private ParameterViewModel _selectedParameter;
@@ -21,9 +23,13 @@ internal class RuleViewModel : BaseViewModel, IСriterionViewModel {
     private string _stringValue;
     private bool _isValueEditable;
 
-    public RuleViewModel(RevitRepository revitRepository, CategoriesInfoViewModel categoriesInfo, Rule rule = null) {
-        _revitRepository = revitRepository;
-        CategoriesInfo = categoriesInfo;
+    public RuleViewModel(RevitRepository revitRepository,
+        ILocalizationService localization,
+        CategoriesInfoViewModel categoriesInfo,
+        Rule rule = null) {
+        _revitRepository = revitRepository ?? throw new System.ArgumentNullException(nameof(revitRepository));
+        _localization = localization ?? throw new System.ArgumentNullException(nameof(localization));
+        CategoriesInfo = categoriesInfo ?? throw new System.ArgumentNullException(nameof(categoriesInfo));
         _rule = rule;
 
         if(_rule != null) {
@@ -114,7 +120,7 @@ internal class RuleViewModel : BaseViewModel, IСriterionViewModel {
     public void Initialize() {
         if(_rule != null) {
             if(!_categoriesInfo.Parameters.Any(item => item.FilterableValueProvider.Provider.Equals(_rule.Provider))) {
-                _categoriesInfo.Parameters.Add(new ParameterViewModel(_rule.Provider));
+                _categoriesInfo.Parameters.Add(new ParameterViewModel(_localization, _rule.Provider));
             }
             SelectedParameter = _categoriesInfo.Parameters.First(item => item.FilterableValueProvider.Provider.Equals(_rule.Provider));
             SelectedParameterChanged();
@@ -133,7 +139,7 @@ internal class RuleViewModel : BaseViewModel, IСriterionViewModel {
     }
 
     private void InitializeRule() {
-        SelectedParameter = new ParameterViewModel(_rule.Provider);
+        SelectedParameter = new ParameterViewModel(_localization, _rule.Provider);
 
         if(!_categoriesInfo.Parameters.Contains(SelectedParameter)) {
             _categoriesInfo.Parameters.Add(SelectedParameter);

@@ -14,19 +14,24 @@ using RevitClashDetective.Models.FilterModel;
 namespace RevitClashDetective.ViewModels.SearchSet;
 internal class SearchSetsViewModel : BaseViewModel {
     private readonly RevitRepository _revitRepository;
+    private readonly ILocalizationService _localization;
     private readonly SearchSetViewModel _straightSearchSet;
     private readonly SearchSetViewModel _invertedSearchSet;
     private SearchSetViewModel _searchSet;
 
-    public SearchSetsViewModel(RevitRepository revitRepository, Filter filter, IMessageBoxService messageBoxService) {
+    public SearchSetsViewModel(RevitRepository revitRepository,
+        ILocalizationService localization,
+        Filter filter,
+        IMessageBoxService messageBoxService) {
         _revitRepository = revitRepository ?? throw new ArgumentNullException(nameof(revitRepository));
+        _localization = localization ?? throw new ArgumentNullException(nameof(localization));
         Filter = filter ?? throw new ArgumentNullException(nameof(filter));
         MessageBoxService = messageBoxService ?? throw new ArgumentNullException(nameof(messageBoxService));
 
-        _straightSearchSet = new SearchSetViewModel(_revitRepository, Filter, new StraightRevitFilterGenerator());
-        _invertedSearchSet = new SearchSetViewModel(_revitRepository, Filter, new InvertedRevitFilterGenerator());
+        _straightSearchSet = new SearchSetViewModel(_revitRepository, _localization, Filter, new StraightRevitFilterGenerator());
+        _invertedSearchSet = new SearchSetViewModel(_revitRepository, _localization, Filter, new InvertedRevitFilterGenerator());
 
-        SearchSet = _straightSearchSet;
+        SearchSet = _straightSearchSet ?? throw new System.ArgumentNullException(nameof(_straightSearchSet));
         Name = filter.Name;
 
         InversionChangedCommand = RelayCommand.Create(InversionChanged);
@@ -78,7 +83,7 @@ internal class SearchSetsViewModel : BaseViewModel {
         } catch(InvalidOperationException ex) {
             MessageBoxService.Show(
                 ex.Message,
-                $"BIM",
+                _localization.GetLocalizedString("BIM"),
                 System.Windows.MessageBoxButton.OK,
                 System.Windows.MessageBoxImage.Error,
                 System.Windows.MessageBoxResult.OK);

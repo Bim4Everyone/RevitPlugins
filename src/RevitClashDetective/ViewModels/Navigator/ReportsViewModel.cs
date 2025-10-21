@@ -170,7 +170,9 @@ internal class ReportsViewModel : BaseViewModel {
     }
 
     private void Delete() {
-        if(MessageBoxService.Show("Вы уверены, что хотите удалить файл?", "BIM",
+        if(MessageBoxService.Show(
+            _localizationService.GetLocalizedString("Navigator.DeletePrompt"),
+            _localizationService.GetLocalizedString("BIM"),
             MessageBoxButton.YesNo, MessageBoxImage.Warning, MessageBoxResult.Cancel) == MessageBoxResult.Yes) {
             DeleteConfig(SelectedReport.GetUpdatedConfig());
             Reports.Remove(SelectedReport);

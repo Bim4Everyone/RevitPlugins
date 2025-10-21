@@ -8,6 +8,7 @@ using System.Windows.Threading;
 
 using Autodesk.Revit.DB;
 
+using dosymep.SimpleServices;
 using dosymep.WPF.ViewModels;
 
 using RevitClashDetective.Models;
@@ -17,6 +18,7 @@ using RevitClashDetective.Models.Interfaces;
 namespace RevitClashDetective.ViewModels.FilterCreatorViewModels;
 internal class FilterViewModel : BaseViewModel, IEquatable<FilterViewModel>, INamedEntity {
     private readonly RevitRepository _revitRepository;
+    private readonly ILocalizationService _localization;
     private readonly Filter _filter;
     private readonly Delay _delay;
     private readonly string _id;
@@ -30,9 +32,12 @@ internal class FilterViewModel : BaseViewModel, IEquatable<FilterViewModel>, INa
     private string _categoriesFilter;
 
 
-    public FilterViewModel(RevitRepository revitRepository, Filter filter = null) {
+    public FilterViewModel(RevitRepository revitRepository,
+        ILocalizationService localization,
+        Filter filter = null) {
         _id = Guid.NewGuid().ToString();
-        _revitRepository = revitRepository;
+        _revitRepository = revitRepository ?? throw new ArgumentNullException(nameof(revitRepository));
+        _localization = localization ?? throw new ArgumentNullException(nameof(localization));
         _filter = filter;
         Name = _filter?.Name;
 
@@ -130,7 +135,7 @@ internal class FilterViewModel : BaseViewModel, IEquatable<FilterViewModel>, INa
     }
 
     private void InitializeSet(Set set = null) {
-        Set = new SetViewModel(_revitRepository, _categoriesInfoViewModel, set);
+        Set = new SetViewModel(_revitRepository, _localization, _categoriesInfoViewModel, set);
     }
 
     private void InitializeCategories(IEnumerable<ElementId> categoryIds = null) {
@@ -149,7 +154,7 @@ internal class FilterViewModel : BaseViewModel, IEquatable<FilterViewModel>, INa
             category.PropertyChanged += CategoryPropertyChanged;
         }
 
-        _categoriesInfoViewModel = new CategoriesInfoViewModel(_revitRepository, GetSelectedCategories());
+        _categoriesInfoViewModel = new CategoriesInfoViewModel(_revitRepository, _localization, GetSelectedCategories());
     }
 
     private void CategoriesFilterHandler(object sender, FilterEventArgs e) {

@@ -25,7 +25,7 @@ internal class MainViewModel : BaseViewModel {
     private readonly ChecksConfig _checksConfig;
     private readonly FiltersConfig _filtersConfig;
     private readonly RevitRepository _revitRepository;
-    private readonly ILocalizationService _localizationService;
+    private readonly ILocalizationService _localization;
     private readonly IContentDialogService _contentDialogService;
     private readonly SettingsConfig _settingsConfig;
     private bool _canCancel = true;
@@ -48,7 +48,7 @@ internal class MainViewModel : BaseViewModel {
 
         _filtersConfig = filtersConfig ?? throw new ArgumentNullException(nameof(filtersConfig));
         _revitRepository = revitRepository ?? throw new ArgumentNullException(nameof(revitRepository));
-        _localizationService = localizationService ?? throw new ArgumentNullException(nameof(localizationService));
+        _localization = localizationService ?? throw new ArgumentNullException(nameof(localizationService));
         OpenFileDialogService = openFileDialogService ?? throw new ArgumentNullException(nameof(openFileDialogService));
         SaveFileDialogService = saveFileDialogService ?? throw new ArgumentNullException(nameof(saveFileDialogService));
         MessageBoxService = messageBoxService ?? throw new ArgumentNullException(nameof(messageBoxService));
@@ -126,7 +126,7 @@ internal class MainViewModel : BaseViewModel {
     private IEnumerable<CheckViewModel> InitializeChecks(ChecksConfig config) {
         foreach(var check in config.Checks) {
             yield return new CheckViewModel(_revitRepository,
-                _localizationService,
+                _localization,
                 OpenFileDialogService,
                 SaveFileDialogService,
                 MessageBoxService,
@@ -146,7 +146,7 @@ internal class MainViewModel : BaseViewModel {
     private void InitializeEmptyCheck() {
         AllChecks = [
             new CheckViewModel(_revitRepository,
-            _localizationService,
+            _localization,
             OpenFileDialogService,
             SaveFileDialogService,
             MessageBoxService,
@@ -156,8 +156,6 @@ internal class MainViewModel : BaseViewModel {
         ];
         SetChecks(AllChecks);
     }
-
-
 
     private void SetChecks(ICollection<CheckViewModel> sourceChecks) {
         Checks = new CollectionViewSource() { Source = sourceChecks };
@@ -181,7 +179,7 @@ internal class MainViewModel : BaseViewModel {
 
     private void AddCheck() {
         AllChecks.Add(new CheckViewModel(_revitRepository,
-            _localizationService,
+            _localization,
             OpenFileDialogService,
             SaveFileDialogService,
             MessageBoxService,
@@ -208,7 +206,7 @@ internal class MainViewModel : BaseViewModel {
         }
 
         CanCancel = true;
-        MessageText = "Проверка на коллизии прошла успешно";
+        MessageText = _localization.GetLocalizedString("MainWindow.SuccessClashDetection");
         Wait(() => {
             foreach(var check in AllChecks) {
                 check.IsSelected = false;
@@ -233,7 +231,7 @@ internal class MainViewModel : BaseViewModel {
     private void SaveConfig() {
         RenewConfig();
         _checksConfig.SaveProjectConfig();
-        MessageText = "Файл проверок успешно сохранен";
+        MessageText = _localization.GetLocalizedString("MainWindow.SuccessSave");
         Wait(() => { MessageText = null; });
     }
 
@@ -241,20 +239,20 @@ internal class MainViewModel : BaseViewModel {
         RenewConfig();
         var s = new ConfigSaverService(_revitRepository, SaveFileDialogService);
         s.Save(_checksConfig);
-        MessageText = "Файл проверок успешно сохранен";
+        MessageText = _localization.GetLocalizedString("MainWindow.SuccessSave");
         Wait(() => { MessageText = null; });
 
     }
 
     private void LoadConfig() {
-        var cl = new ConfigLoaderService(_revitRepository, OpenFileDialogService, MessageBoxService);
+        var cl = new ConfigLoaderService(_revitRepository, _localization, OpenFileDialogService, MessageBoxService);
         var config = cl.Load<ChecksConfig>();
         cl.CheckConfig(config);
 
         var newChecks = InitializeChecks(config).ToList();
         var nameResolver = new NameResolver<CheckViewModel>(AllChecks, newChecks);
         AllChecks = new ObservableCollection<CheckViewModel>(nameResolver.GetCollection().OrderBy(c => c.Name));
-        MessageText = "Файл проверок успешно загружен";
+        MessageText = _localization.GetLocalizedString("MainWindow.SuccessLoad");
         Wait(() => { MessageText = null; });
     }
 
@@ -266,22 +264,22 @@ internal class MainViewModel : BaseViewModel {
 
     private bool CanFindClashes() {
         if(HasSameNames()) {
-            ErrorText = $"У проверок должны быть разные имена.";
+            ErrorText = _localization.GetLocalizedString("MainWindow.Validation.NamesDuplicated");
             return false;
         }
         var emptyCheck = AllChecks.FirstOrDefault(item => !item.IsFilterSelected);
         if(emptyCheck != null) {
-            ErrorText = $"У проверки \"{emptyCheck.Name}\" необходимо выбрать хотя бы один поисковый набор.";
+            ErrorText = _localization.GetLocalizedString("MainWindow.Validation.EmptyFilterInCheck", emptyCheck.Name);
             return false;
         }
 
         emptyCheck = AllChecks.FirstOrDefault(item => !item.IsFilesSelected);
         if(emptyCheck != null) {
-            ErrorText = $"У проверки \"{emptyCheck.Name}\" необходимо выбрать хотя бы один файл.";
+            ErrorText = _localization.GetLocalizedString("MainWindow.Validation.EmptyFileInCheck", emptyCheck.Name);
             return false;
         }
         if(AllChecks.All(item => !item.IsSelected)) {
-            ErrorText = $"Для поиска коллизий должна быть выбрана хотя бы одна проверка.";
+            ErrorText = _localization.GetLocalizedString("MainWindow.Validation.SelectAnyCheck");
             return false;
         }
 

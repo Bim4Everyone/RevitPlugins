@@ -9,12 +9,14 @@ using RevitClashDetective.Models.FilterModel;
 namespace RevitClashDetective.ViewModels.Services;
 internal class ConfigLoaderService {
     private readonly RevitRepository _revitRepository;
-
+    private readonly ILocalizationService _localization;
 
     public ConfigLoaderService(RevitRepository revitRepository,
+        ILocalizationService localization,
         IOpenFileDialogService openFileDialogService,
         IMessageBoxService messageBoxService) {
         _revitRepository = revitRepository ?? throw new ArgumentNullException(nameof(revitRepository));
+        _localization = localization ?? throw new ArgumentNullException(nameof(localization));
         OpenFileDialogService = openFileDialogService ?? throw new ArgumentNullException(nameof(openFileDialogService));
         MessageBoxService = messageBoxService ?? throw new ArgumentNullException(nameof(messageBoxService));
     }
@@ -58,8 +60,8 @@ internal class ConfigLoaderService {
     }
 
     private void ShowError() {
-        MessageBoxService.Show("Неверный файл конфигурации.",
-            "BIM",
+        MessageBoxService.Show(_localization.GetLocalizedString("ConfigLoader.InvalidFile"),
+            _localization.GetLocalizedString("BIM"),
             System.Windows.MessageBoxButton.OK,
             System.Windows.MessageBoxImage.Error,
             System.Windows.MessageBoxResult.OK);

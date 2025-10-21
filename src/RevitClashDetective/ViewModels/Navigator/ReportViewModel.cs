@@ -185,7 +185,7 @@ internal class ReportViewModel : BaseViewModel, INamedEntity, IEquatable<ReportV
 
     private void Save() {
         GetUpdatedConfig().SaveProjectConfig();
-        Message = "Файл успешно сохранен";
+        Message = _localization.GetLocalizedString("Navigator.SuccessSave");
         RefreshMessage();
     }
 
@@ -193,7 +193,7 @@ internal class ReportViewModel : BaseViewModel, INamedEntity, IEquatable<ReportV
         var config = GetUpdatedConfig();
         var saver = new ConfigSaverService(_revitRepository, SaveFileDialogService);
         saver.Save(config);
-        Message = "Файл успешно сохранен";
+        Message = _localization.GetLocalizedString("Navigator.SuccessSave");
         RefreshMessage();
     }
 

@@ -3,6 +3,7 @@ using System.Collections.ObjectModel;
 using System.Linq;
 using System.Windows.Input;
 
+using dosymep.SimpleServices;
 using dosymep.WPF.Commands;
 using dosymep.WPF.ViewModels;
 
@@ -14,15 +15,19 @@ using RevitClashDetective.ViewModels.FilterCreatorViewModels.Interfaces;
 namespace RevitClashDetective.ViewModels.FilterCreatorViewModels;
 internal class SetViewModel : BaseViewModel, IСriterionViewModel {
     private readonly RevitRepository _revitRepository;
+    private readonly ILocalizationService _localization;
     private ObservableCollection<IСriterionViewModel> _criterions;
     private CategoriesInfoViewModel _categoryInfo;
     private EvaluatorViewModel _selectedEvaluator;
     private ObservableCollection<EvaluatorViewModel> _evaluators;
 
-    public SetViewModel(RevitRepository revitRepository, CategoriesInfoViewModel categoriesInfo, Set set = null) {
-        _revitRepository = revitRepository;
-
-        CategoryInfo = categoriesInfo;
+    public SetViewModel(RevitRepository revitRepository,
+        ILocalizationService localization,
+        CategoriesInfoViewModel categoriesInfo,
+        Set set = null) {
+        _revitRepository = revitRepository ?? throw new System.ArgumentNullException(nameof(revitRepository));
+        _localization = localization ?? throw new System.ArgumentNullException(nameof(localization));
+        CategoryInfo = categoriesInfo ?? throw new System.ArgumentNullException(nameof(categoriesInfo));
 
         AddRuleCommand = RelayCommand.Create(AddRule);
         RemoveRuleCommand = RelayCommand.Create<RuleViewModel>(RemoveRule);
@@ -67,23 +72,23 @@ internal class SetViewModel : BaseViewModel, IСriterionViewModel {
     }
 
     public void InitializeEmptyRule() {
-        Criterions.Add(new RuleViewModel(_revitRepository, _categoryInfo));
+        Criterions.Add(new RuleViewModel(_revitRepository, _localization, _categoryInfo));
     }
 
     private void InitializeCriterions(IEnumerable<Criterion> criterions) {
         Criterions =
         [
-            .. criterions.OfType<Set>().Select(item => new SetViewModel(_revitRepository, _categoryInfo, item)),
-            .. criterions.OfType<Rule>().Select(item => new RuleViewModel(_revitRepository, _categoryInfo, item)),
+            .. criterions.OfType<Set>().Select(item => new SetViewModel(_revitRepository, _localization, _categoryInfo, item)),
+            .. criterions.OfType<Rule>().Select(item => new RuleViewModel(_revitRepository,_localization, _categoryInfo, item)),
         ];
     }
 
     private void AddRule() {
-        Criterions.Add(new RuleViewModel(_revitRepository, _categoryInfo));
+        Criterions.Add(new RuleViewModel(_revitRepository, _localization, _categoryInfo));
     }
 
     private void AddSet() {
-        Criterions.Add(new SetViewModel(_revitRepository, _categoryInfo));
+        Criterions.Add(new SetViewModel(_revitRepository, _localization, _categoryInfo));
     }
 
     private void RemoveSet(SetViewModel p) {
