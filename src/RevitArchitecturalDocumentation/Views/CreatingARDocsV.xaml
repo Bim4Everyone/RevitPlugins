@@ -92,35 +92,7 @@
                     <RowDefinition Height="Auto" />
                 </Grid.RowDefinitions>
 
-                <StackPanel
-                    Grid.Row="0"
-                    Height="45"
-                    Margin="0"
-                    Orientation="Horizontal"
-                    HorizontalAlignment="Left">
 
-                    <ui:TextBlock
-                        Margin="5"
-                        VerticalAlignment="Center"
-                        FontSize="14"
-                        Text="Выбрано видов: " />
-
-                    <ui:TextBlock
-                        Margin="5"
-                        VerticalAlignment="Center"
-                        FontSize="14"
-                        Text="{Binding Path=SelectedViews.Count}" />
-                </StackPanel>
-
-                <CheckBox
-                    Grid.Row="0"
-                    Grid.Column="1"
-                    Margin="0"
-                    Content="Создавать на основе выбранных видов"
-                    FontSize="14"
-                    VerticalAlignment="Center"
-                    HorizontalAlignment="Right"
-                    IsChecked="{Binding Path=CreateViewsFromSelected}" />
 
                 <ui:DataGrid
                     Grid.Row="1"
@@ -340,6 +312,8 @@
                 <Grid.RowDefinitions>
                     <RowDefinition Height="Auto"/>
                     <RowDefinition Height="*"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
                 </Grid.RowDefinitions>
 
                 <DockPanel>
@@ -387,7 +361,8 @@
                         HorizontalAlignment="Right"/>
                 </DockPanel>
 
-                <StackPanel Grid.Row="1" VerticalAlignment="Bottom">
+                <StackPanel 
+                    Grid.Row="1">
                     <ui:TextBlock
                         Margin="5 3"
                         Text="Тип видового экрана:"
@@ -403,6 +378,30 @@
                         ItemsSource="{Binding Path=ViewOptsVM.ViewportTypes}" 
                         SelectedItem="{Binding Path=ViewOptsVM.SelectedViewportType}">
                     </ComboBox>
+                </StackPanel>
+
+                <CheckBox
+                    Grid.Row="2"
+                    Margin="-5 5 0 0"
+                    Content="Создавать на основе выбранных видов"
+                    FontSize="14"
+                    IsChecked="{Binding Path=CreateViewsFromSelected}"
+                    IsEnabled="{Binding Path=ViewOptsVM.WorkWithViews}" />
+
+                <StackPanel
+                    Grid.Row="3"
+                    Orientation="Horizontal">
+                    <ui:TextBlock
+                        Margin="5"
+                        VerticalAlignment="Center"
+                        FontSize="14"
+                        Text="Выбрано видов: " />
+
+                    <ui:TextBlock
+                        Margin="5"
+                        VerticalAlignment="Center"
+                        FontSize="14"
+                        Text="{Binding Path=SelectedViews.Count}" />
                 </StackPanel>
             </Grid>
         </Border>
