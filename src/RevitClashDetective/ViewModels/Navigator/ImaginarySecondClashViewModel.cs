@@ -78,6 +78,8 @@ internal class ImaginarySecondClashViewModel
 
     public double SecondElementVolume { get; }
 
+    public bool ClashDataIsValid => false;
+
 
     public ElementModel GetFirstElement() {
         throw new NotSupportedException();

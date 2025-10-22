@@ -210,7 +210,22 @@
                     ShowDataNavigator="True"
                     VirtualizingPanel.IsVirtualizingWhenGrouping="True"
                     VirtualizingPanel.VirtualizationMode="Recycling"
-                    VirtualizingPanel.IsVirtualizing="True" />
+                    VirtualizingPanel.IsVirtualizing="True">
+                    <dxg:TableView.RowStyle>
+                        <Style
+                            TargetType="dxg:RowControl">
+                            <Style.Triggers>
+                                <DataTrigger
+                                    Binding="{Binding Row.ClashDataIsValid}"
+                                    Value="False">
+                                    <Setter
+                                        Property="Foreground"
+                                        Value="Orange" />
+                                </DataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </dxg:TableView.RowStyle>
+                </dxg:TableView>
             </res:CustomGridControl.View>
 
             <res:CustomGridControl.Columns>

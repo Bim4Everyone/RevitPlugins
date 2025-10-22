@@ -47,6 +47,8 @@ internal class ClashData : IEquatable<ClashData> {
     /// </summary>
     public double OtherElementVolume { get; }
 
+    public virtual bool IsValid => true;
+
 
     public override bool Equals(object obj) {
         return Equals(obj as ClashData);
