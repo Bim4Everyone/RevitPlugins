@@ -12,19 +12,18 @@ using RevitSetCoordParams.Models.Interfaces;
 namespace RevitSetCoordParams.ViewModels;
 
 internal class CategoryViewModel : BaseViewModel {
-
-    private readonly Category _category;
+    private readonly ICategoryAvailabilityService _categoryAvailabilityService;
+    private readonly ILocalizationService _localizationService;
     private string _warnings;
     private bool _isChecked;
     private bool _hasWarning;
 
-    public CategoryViewModel(RevitCategory revitCategory, Category category) {
-        RevitCategory = revitCategory;
-        _category = category;
-        CategoryName = _category.Name;
+    public CategoryViewModel(ICategoryAvailabilityService categoryAvailabilityService, ILocalizationService localizationService) {
+        _categoryAvailabilityService = categoryAvailabilityService;
+        _localizationService = localizationService;
     }
 
-    public RevitCategory RevitCategory { get; set; }
+    public Category Category { get; set; }
     public string CategoryName { get; set; }
 
     public string Warnings {
@@ -40,23 +39,20 @@ internal class CategoryViewModel : BaseViewModel {
         set => RaiseAndSetIfChanged(ref _hasWarning, value);
     }
 
-    public void UpdateWarning(
-        IParamAvailabilityService paramAvailabilityService,
-        ILocalizationService localizationService,
-        List<ParamMap> paramMaps) {
+    public void UpdateWarning(List<ParamMap> paramMaps) {
 
         HasWarning = false;
         Warnings = string.Empty;
 
         var warningString = new StringBuilder();
         foreach(var paramMap in paramMaps) {
-            if(paramMap.TargetParam != null && !paramAvailabilityService.IsParamAvailable(paramMap.TargetParam, _category)) {
+            if(paramMap.TargetParam != null && !_categoryAvailabilityService.IsParamAvailableInCategory(paramMap.TargetParam, Category)) {
                 warningString.Append($"  • {paramMap.TargetParam.Name}\n");
             }
         }
         if(warningString.Length != 0) {
             Warnings = warningString
-                .Insert(0, localizationService.GetLocalizedString("CategoryViewModel.WarningStartString") + "\n")
+                .Insert(0, _localizationService.GetLocalizedString("CategoryViewModel.WarningStartString") + "\n")
                 .Remove(warningString.Length - 1, 1)
                 .ToString();
             HasWarning = true;

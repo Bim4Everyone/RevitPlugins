@@ -1,5 +1,7 @@
 using System.Collections.Generic;
 
+using Autodesk.Revit.DB;
+
 using RevitSetCoordParams.Models.Enums;
 using RevitSetCoordParams.Models.Interfaces;
 
@@ -7,16 +9,14 @@ namespace RevitSetCoordParams.Models.Providers;
 
 internal class ElementsProviderSelected : IElementsProvider {
     private readonly RevitRepository _revitRepository;
-    private readonly List<RevitCategory> _revitCategories;
 
-    public ElementsProviderSelected(RevitRepository revitRepository, List<RevitCategory> revitCategories) {
+    public ElementsProviderSelected(RevitRepository revitRepository) {
         _revitRepository = revitRepository;
-        _revitCategories = revitCategories;
     }
 
-    public ProviderType Type => ProviderType.SelectedElementsProvider;
+    public ElementsProviderType Type => ElementsProviderType.SelectedElementsProvider;
 
-    public ICollection<RevitElement> GetRevitElements() {
-        return _revitRepository.GetSelectedRevitElements(_revitCategories);
+    public ICollection<RevitElement> GetRevitElements(IEnumerable<BuiltInCategory> categories) {
+        return _revitRepository.GetSelectedRevitElements(categories);
     }
 }

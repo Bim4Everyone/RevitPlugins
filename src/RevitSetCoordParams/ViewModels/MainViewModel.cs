@@ -7,6 +7,7 @@ using System.Windows.Input;
 
 using Autodesk.Revit.DB;
 
+using dosymep.Revit;
 using dosymep.SimpleServices;
 using dosymep.WPF.Commands;
 using dosymep.WPF.ViewModels;
@@ -17,20 +18,17 @@ using RevitSetCoordParams.Models.Interfaces;
 using RevitSetCoordParams.Models.Services;
 using RevitSetCoordParams.Models.Settings;
 
-
 namespace RevitSetCoordParams.ViewModels;
 
 internal class MainViewModel : BaseViewModel {
     private readonly PluginConfig _pluginConfig;
     private readonly RevitRepository _revitRepository;
     private readonly ILocalizationService _localizationService;
-
-    private SetCoordParamsSettings _setCoordParamsSettings;
-
+    private readonly ICategoryAvailabilityService _categoryAvailabilityService;
     private readonly IParamAvailabilityService _paramAvailabilityService;
-    private readonly ParamFactory _paramFactory;
     private readonly ProvidersFactory _providersFactory;
-
+    private readonly ParamFactory _paramFactory;
+    private SetCoordParamsSettings _setCoordParamsSettings;
     private ObservableCollection<RangeElementsViewModel> _rangeElements;
     private RangeElementsViewModel _selectedRangeElements;
     private ObservableCollection<SourceFileViewModel> _sourceFiles;
@@ -44,31 +42,35 @@ internal class MainViewModel : BaseViewModel {
     private ObservableCollection<CategoryViewModel> _categories;
     private ObservableCollection<CategoryViewModel> _selectedCategories;
     private bool _search;
+    private bool _isCheckedAllCats;
+    private bool _isNotCheckedAllCats;
     private bool _hasCategoryWarning;
     private bool _hasParamWarning;
     private string _maxDiameterSearchSphereMm;
     private string _stepDiameterSearchSphereMm;
     private string _errorText;
-    private string _saveProperty;
 
     public MainViewModel(
         PluginConfig pluginConfig,
         RevitRepository revitRepository,
         ILocalizationService localizationService) {
-
         _pluginConfig = pluginConfig;
         _revitRepository = revitRepository;
         _localizationService = localizationService;
-        _paramAvailabilityService = new ParamAvailabilityService(_revitRepository.Document);
-        _paramFactory = new ParamFactory(_paramAvailabilityService);
+        _categoryAvailabilityService = new CategoryAvailabilityService(_revitRepository.Document);
+        _paramAvailabilityService = new ParamAvailabilityService();
         _providersFactory = new ProvidersFactory();
-
+        _paramFactory = new ParamFactory();
 
         LoadViewCommand = RelayCommand.Create(LoadView);
+        CheckAllCatsCommand = RelayCommand.Create(CheckAllCategories);
+        UncheckAllCatsCommand = RelayCommand.Create(UncheckAllCategories);
         AcceptViewCommand = RelayCommand.Create(AcceptView, CanAcceptView);
     }
 
     public ICommand LoadViewCommand { get; }
+    public ICommand CheckAllCatsCommand { get; }
+    public ICommand UncheckAllCatsCommand { get; }
     public ICommand AcceptViewCommand { get; }
 
     public ObservableCollection<RangeElementsViewModel> RangeElements {
@@ -123,14 +125,6 @@ internal class MainViewModel : BaseViewModel {
         get => _search;
         set => RaiseAndSetIfChanged(ref _search, value);
     }
-    public bool HasParamWarning {
-        get => _hasParamWarning;
-        set => RaiseAndSetIfChanged(ref _hasParamWarning, value);
-    }
-    public bool HasCategoryWarning {
-        get => _hasCategoryWarning;
-        set => RaiseAndSetIfChanged(ref _hasCategoryWarning, value);
-    }
     public string MaxDiameterSearchSphereMm {
         get => _maxDiameterSearchSphereMm;
         set => RaiseAndSetIfChanged(ref _maxDiameterSearchSphereMm, value);
@@ -139,41 +133,75 @@ internal class MainViewModel : BaseViewModel {
         get => _stepDiameterSearchSphereMm;
         set => RaiseAndSetIfChanged(ref _stepDiameterSearchSphereMm, value);
     }
+    public bool HasParamWarning {
+        get => _hasParamWarning;
+        set => RaiseAndSetIfChanged(ref _hasParamWarning, value);
+    }
+    public bool HasCategoryWarning {
+        get => _hasCategoryWarning;
+        set => RaiseAndSetIfChanged(ref _hasCategoryWarning, value);
+    }
+    public bool IsCheckedAllCats {
+        get => _isCheckedAllCats;
+        set => RaiseAndSetIfChanged(ref _isCheckedAllCats, value);
+    }
+    public bool IsNotCheckedAllCats {
+        get => _isNotCheckedAllCats;
+        set => RaiseAndSetIfChanged(ref _isNotCheckedAllCats, value);
+    }
     public string ErrorText {
         get => _errorText;
         set => RaiseAndSetIfChanged(ref _errorText, value);
     }
-    public string SaveProperty {
-        get => _saveProperty;
-        set => RaiseAndSetIfChanged(ref _saveProperty, value);
+
+    // Метод получения коллекции TypeModelViewModel для TypeModels
+    private IEnumerable<TypeModelViewModel> GetTypeModelViewModels() {
+        var currentSourceDocument = SelectedSourceFile.FileProvider.Document;
+        var sourceElementsValues = _revitRepository.GetSourceElementsValues(currentSourceDocument);
+        return !sourceElementsValues.Any()
+            ? []
+            : sourceElementsValues
+                .Select(value => new TypeModelViewModel { Name = value })
+                .OrderByDescending(vm => vm.Name == _setCoordParamsSettings.TypeModel);
     }
 
-    // Метод получения коллекции ParamViewModel для Params
-    private IEnumerable<ParamViewModel> GetParamViewModels() {
-        return _setCoordParamsSettings.ParamMaps
-            .Select(paramMap => new ParamViewModel {
-                ParamMap = paramMap,
-                Description = _localizationService.GetLocalizedString($"MainViewModel.{paramMap.LocalizationKey}Description"),
-                DetailDescription = _localizationService.GetLocalizedString($"MainViewModel.{paramMap.LocalizationKey}DetailDescription"),
-                SourceParamName = paramMap.SourceParam?.Name ?? string.Empty,
-                TargetParamName = paramMap.TargetParam?.Name ?? string.Empty,
-                IsChecked = paramMap.IsChecked,
-                IsPair = paramMap.IsPair
-            });
+    // Метод получения коллекции SourceFileViewModel для SourceFiles
+    private IEnumerable<SourceFileViewModel> GetSourceFileViewModels() {
+        var currentProvider = _setCoordParamsSettings.FileProvider;
+        return _revitRepository.GetAllDocuments()
+            .Select(document => {
+                var provider = _providersFactory.GetFileProvider(_revitRepository, document);
+                return new SourceFileViewModel(_localizationService, provider);
+            })
+            .OrderByDescending(vm => vm.FileProvider.Document.GetUniqId() == currentProvider.Document.GetUniqId());
     }
 
-    // Метод получения коллекции CategoryViewModel для Categories
-    private IEnumerable<CategoryViewModel> GetCategoryViewModels() {
-        return _setCoordParamsSettings.RevitCategories
-            .Select(revitCategory => new {
-                RevitCategory = revitCategory,
-                Category = Category.GetCategory(_revitRepository.Document, revitCategory.BuiltInCategory)
+    // Метод получения коллекции PositionViewModel для Positions
+    private IEnumerable<PositionViewModel> GetPositionViewModels() {
+        var currentProvider = _setCoordParamsSettings.PositionProvider;
+        var providers = Enum.GetValues(typeof(PositionProviderType)).Cast<PositionProviderType>();
+        return providers
+            .Select(provider => new PositionViewModel {
+                Name = _localizationService.GetLocalizedString($"MainViewModel.{provider}"),
+                PositionProvider = (provider == currentProvider.Type)
+                    ? currentProvider
+                    : _providersFactory.GetPositionProvider(_revitRepository, provider)
             })
-            .Where(x => x.Category != null)
-            .Select(x => new CategoryViewModel(x.RevitCategory, x.Category) {
-                IsChecked = x.RevitCategory.IsChecked
+            .OrderByDescending(vm => vm.PositionProvider.Type == currentProvider.Type);
+    }
+
+    // Метод получения коллекции RangeElementsViewModel для RangeElements
+    private IEnumerable<RangeElementsViewModel> GetRangeElementsViewModels() {
+        var currentProvider = _setCoordParamsSettings.ElementsProvider;
+        var providers = Enum.GetValues(typeof(ElementsProviderType)).Cast<ElementsProviderType>();
+        return providers
+            .Select(provider => new RangeElementsViewModel {
+                Name = _localizationService.GetLocalizedString($"MainViewModel.{provider}"),
+                ElementsProvider = (provider == currentProvider.Type)
+                    ? currentProvider
+                    : _providersFactory.GetElementsProvider(_revitRepository, provider)
             })
-            .OrderBy(x => x.CategoryName ?? string.Empty);
+            .OrderByDescending(vm => vm.ElementsProvider.Type == currentProvider.Type);
     }
 
     // Метод обновления предупреждений в категориях
@@ -182,7 +210,7 @@ internal class MainViewModel : BaseViewModel {
             .Select(paramViewModel => paramViewModel.ParamMap)
             .ToList();
         foreach(var category in Categories) {
-            category.UpdateWarning(_paramAvailabilityService, _localizationService, selectedParams);
+            category.UpdateWarning(selectedParams);
         }
         HasCategoryWarning = Categories.Any(category => category.HasWarning);
     }
@@ -190,153 +218,223 @@ internal class MainViewModel : BaseViewModel {
     // Метод обновления предупреждений в параметрах
     private void UpdateParamWarnings() {
         foreach(var param in Params) {
-            param.UpdateWarning(_paramAvailabilityService, _localizationService);
+            param.UpdateWarning(_selectedSourceFile.FileProvider.Document, _revitRepository.Document);
         }
         HasParamWarning = Params.Any(param => param.HasWarning);
     }
 
-    // Метод обновления параметров в ParamMap
-    private bool TryUpdateParam(ParamViewModel viewModel, string paramName, bool isSource) {
-        if(viewModel.HasWarning) {
-            return false;
-        }
-        var newParam = _paramFactory.CreateRevitParam(_revitRepository.Document, paramName);
-        if(isSource) {
-            viewModel.ParamMap.SourceParam = newParam;
-        } else {
-            viewModel.ParamMap.TargetParam = newParam;
-        }
-        return true;
-    }
-
-    // Метод удаления и добавления элементов коллекции
-    private void HandleCheckedChangedParam(ParamViewModel paramViewModel) {
-        if(paramViewModel.IsChecked) {
-            SelectedParams.Add(paramViewModel);
-            paramViewModel.ParamMap.IsChecked = true;
-        } else {
-            SelectedParams.Remove(paramViewModel);
-            paramViewModel.ParamMap.IsChecked = false;
-        }
-        UpdateParamWarnings();
-    }
-
-    // Метод подписанный на событие изменения выделенных параметров
-    private void OnParamChanged(object sender, PropertyChangedEventArgs e) {
-        if(sender is not ParamViewModel vm) {
-            return;
-        }
-        bool needUpdateCategoryWarnings = false;
-
-        switch(e.PropertyName) {
-            case nameof(ParamViewModel.SourceParamName):
-                UpdateParamWarnings();
-                needUpdateCategoryWarnings = TryUpdateParam(vm, vm.SourceParamName, isSource: true);
-                break;
-
-            case nameof(ParamViewModel.TargetParamName):
-                UpdateParamWarnings();
-                needUpdateCategoryWarnings = TryUpdateParam(vm, vm.TargetParamName, isSource: false);
-                break;
-
-            case nameof(ParamViewModel.IsChecked):
-                HandleCheckedChangedParam(vm);
-                needUpdateCategoryWarnings = true;
-                break;
-        }
-        if(needUpdateCategoryWarnings) {
-            UpdateCategoryWarnings();
+    // Метод команды на выделение всех категорий
+    private void CheckAllCategories() {
+        foreach(var catVM in Categories) {
+            catVM.IsChecked = true;
         }
     }
 
-    // Метод подписанный на событие изменения выделенных категорий
+    // Метод команды на снятие выделения всех категорий
+    private void UncheckAllCategories() {
+        foreach(var catVM in Categories) {
+            catVM.IsChecked = false;
+        }
+    }
+
+    // Метод подписанный на событие MainViewModel
+    private void OnPropertyChanged(object sender, PropertyChangedEventArgs e) {
+        if(e.PropertyName == nameof(SelectedSourceFile)) {
+            TypeModels = new ObservableCollection<TypeModelViewModel>(GetTypeModelViewModels());
+            SelectedTypeModel = TypeModels.FirstOrDefault();
+            UpdateParamWarnings();
+        }
+    }
+
+    // Метод подписанный на событие изменения CategoryViewModel
     private void OnCategoryChanged(object sender, PropertyChangedEventArgs e) {
         if(sender is not CategoryViewModel categoryViewModel) {
             return;
         }
         if(categoryViewModel.IsChecked) {
-            SelectedCategories.Add(categoryViewModel);
-            categoryViewModel.RevitCategory.IsChecked = true;
+            if(!SelectedCategories.Contains(categoryViewModel)) {
+                SelectedCategories.Add(categoryViewModel);
+            }
         } else {
             SelectedCategories.Remove(categoryViewModel);
-            categoryViewModel.RevitCategory.IsChecked = false;
         }
     }
 
-    private IEnumerable<RangeElementsViewModel> GetRangeElementsViewModels() {
-        var categories = Categories.Select(c => c.RevitCategory).ToList();
+    // Метод подписанный на событие изменения ParamViewModel
+    private void OnParamChanged(object sender, PropertyChangedEventArgs e) {
+        if(sender is not ParamViewModel vm) {
+            return;
+        }
+        switch(e.PropertyName) {
+            case nameof(ParamViewModel.SourceParamName):
+                UpdateParamWarnings();
+                if(!vm.HasWarning) {
+                    var def = _paramAvailabilityService.GetDefinitionByName(SelectedSourceFile.FileProvider.Document, vm.SourceParamName);
+                    var newParam = _paramFactory.CreateRevitParam(_revitRepository.Document, def);
+                    vm.ParamMap.SourceParam = newParam;
+                }
+                UpdateCategoryWarnings();
+                break;
 
-        var providers = new[] {
-        new { Type = ProviderType.AllElementsProvider, Key = "RangeElementsViewModel.AllElements" },
-        new { Type = ProviderType.SelectedElementsProvider, Key = "RangeElementsViewModel.SelectedElements" },
-        new { Type = ProviderType.CurrentViewProvider, Key = "RangeElementsViewModel.CurrentViewElements" }
-        };
+            case nameof(ParamViewModel.TargetParamName):
+                UpdateParamWarnings();
+                if(!vm.HasWarning) {
+                    var def = _paramAvailabilityService.GetDefinitionByName(_revitRepository.Document, vm.SourceParamName);
+                    var newParam = _paramFactory.CreateRevitParam(_revitRepository.Document, def);
+                    vm.ParamMap.TargetParam = newParam;
+                }
+                UpdateCategoryWarnings();
+                break;
 
-        var currentType = _setCoordParamsSettings.ElementsProvider.Type;
-
-        return providers
-            .Select(p => new RangeElementsViewModel {
-                Name = _localizationService.GetLocalizedString(p.Key),
-                ElementsProvider = (p.Type == currentType)
-                    ? _setCoordParamsSettings.ElementsProvider // уже выбранный, не создаём заново
-                    : _providersFactory.GetElementsProvider(_revitRepository, p.Type, categories)
-            })
-            .OrderByDescending(vm => vm.ElementsProvider.Type == currentType)
-            .ToList();
+            case nameof(ParamViewModel.IsChecked):
+                if(vm.IsChecked) {
+                    if(!SelectedParams.Contains(vm)) {
+                        SelectedParams.Add(vm);
+                    }
+                } else {
+                    SelectedParams.Remove(vm);
+                }
+                UpdateParamWarnings();
+                UpdateCategoryWarnings();
+                break;
+        }
     }
 
-    private IEnumerable<PositionViewModel> GetPositionViewModels() {
-        var providers = new[] {
-        new { Type = ProviderType.CenterPositionProvider, Key = "PositionsViewModel.Center" },
-        new { Type = ProviderType.BottomPositionProvider, Key = "PositionsViewModel.Bottom" }
-        };
+    // Метод получения коллекции CategoryViewModel для Categories
+    private IEnumerable<CategoryViewModel> GetCategoryViewModels() {
+        var allBuiltInCategories = RevitConstants.GetDefaultBuiltInCategories();
+        var savedCategories = _setCoordParamsSettings.Categories;
 
-        var currentType = _setCoordParamsSettings.PositionProvider.Type;
-
-        return providers
-            .Select(p => new PositionViewModel {
-                Name = _localizationService.GetLocalizedString(p.Key),
-                PositionProvider = (p.Type == currentType)
-                    ? _setCoordParamsSettings.PositionProvider // уже выбранный, не создаём заново
-                    : _providersFactory.GetPositionProvider(_revitRepository, p.Type)
-            })
-            .OrderByDescending(vm => vm.PositionProvider.Type == currentType)
-            .ToList();
+        return allBuiltInCategories
+        .Select(builtInCategory => {
+            var category = Category.GetCategory(_revitRepository.Document, builtInCategory);
+            return category == null
+                ? null
+                : new CategoryViewModel(_categoryAvailabilityService, _localizationService) {
+                    Category = category,
+                    CategoryName = category.Name,
+                    IsChecked = savedCategories.Contains(builtInCategory)
+                };
+        })
+        .Where(vm => vm != null)
+        .OrderBy(vm => vm.CategoryName ?? string.Empty);
     }
 
+    // Метод получения коллекции ParamViewModel для Params
+    private IEnumerable<ParamViewModel> GetParamViewModels() {
+        var defaultParamMaps = RevitConstants.GetDefaultParamMaps();
+        var savedParamMaps = _setCoordParamsSettings.ParamMaps;
+
+        var savedLookup = savedParamMaps.ToDictionary(paramMap => paramMap.Type, paramMap => paramMap);
+
+        return defaultParamMaps.Select(defaultParamMap => {
+            bool exists = savedLookup.TryGetValue(defaultParamMap.Type, out var savedParamMap);
+            var paramMap = exists ? savedParamMap : defaultParamMap;
+            bool isPair = paramMap.SourceParam != null;
+
+            return new ParamViewModel(_localizationService, _paramAvailabilityService) {
+                ParamMap = paramMap,
+                Description = _localizationService.GetLocalizedString($"MainViewModel.{paramMap.Type}Description"),
+                DetailDescription = _localizationService.GetLocalizedString($"MainViewModel.{paramMap.Type}DetailDescription"),
+                SourceParamName = paramMap.SourceParam?.Name ?? string.Empty,
+                TargetParamName = paramMap.TargetParam?.Name ?? string.Empty,
+                IsChecked = exists,
+                IsPair = isPair
+            };
+        });
+    }
+
+    // Метод загрузки вида
     private void LoadView() {
         LoadConfig();
-        Params = new ObservableCollection<ParamViewModel>(GetParamViewModels());
-        SelectedParams = new ObservableCollection<ParamViewModel>(Params);
-        Categories = new ObservableCollection<CategoryViewModel>(GetCategoryViewModels());
-        UpdateParamWarnings();
-        UpdateCategoryWarnings();
         RangeElements = new ObservableCollection<RangeElementsViewModel>(GetRangeElementsViewModels());
         SelectedRangeElements = RangeElements.First();
+        SourceFiles = new ObservableCollection<SourceFileViewModel>(GetSourceFileViewModels());
+        SelectedSourceFile = SourceFiles.First();
+        TypeModels = new ObservableCollection<TypeModelViewModel>(GetTypeModelViewModels());
+        SelectedTypeModel = TypeModels.FirstOrDefault();
         Positions = new ObservableCollection<PositionViewModel>(GetPositionViewModels());
         SelectedPosition = Positions.First();
-
-
+        Params = new ObservableCollection<ParamViewModel>(GetParamViewModels());
+        SelectedParams = [];
         // Подписка на события в ParamViewModel
         foreach(var param in Params) {
             param.PropertyChanged += OnParamChanged;
+            if(param.IsChecked) {
+                SelectedParams.Add(param);
+            }
         }
-
+        Categories = new ObservableCollection<CategoryViewModel>(GetCategoryViewModels());
+        SelectedCategories = [];
         // Подписка на события в CategoryViewModel
         foreach(var category in Categories) {
             category.PropertyChanged += OnCategoryChanged;
+            if(category.IsChecked) {
+                SelectedCategories.Add(category);
+            }
         }
-
+        // Подписка на события для обновления TypeViewModel
+        PropertyChanged += OnPropertyChanged;
+        UpdateParamWarnings();
+        UpdateCategoryWarnings();
+        IsCheckedAllCats = SelectedCategories.All(catVM => catVM.IsChecked);
+        IsNotCheckedAllCats = SelectedCategories.All(catVM => !catVM.IsChecked);
         Search = _setCoordParamsSettings.Search;
         MaxDiameterSearchSphereMm = Convert.ToString(_setCoordParamsSettings.MaxDiameterSearchSphereMm);
         StepDiameterSearchSphereMm = Convert.ToString(_setCoordParamsSettings.StepDiameterSearchSphereMm);
-
     }
+
+    // Основной метод
     private void AcceptView() {
         SaveConfig();
     }
 
+    // Метод проверки возможности выполнения основного вида
     private bool CanAcceptView() {
+        if(SelectedParams != null) {
+            if(SelectedParams.Count == 0) {
+                ErrorText = _localizationService.GetLocalizedString("MainViewModel.NoParams");
+                return false;
+            }
+            if(SelectedParams.Count == 1 && SelectedParams.First().ParamMap.SourceParam == null) {
+                ErrorText = _localizationService.GetLocalizedString("MainViewModel.NoParamMaps");
+                return false;
+            }
+        }
+        if(SelectedTypeModel == null) {
+            ErrorText = _localizationService.GetLocalizedString("MainViewModel.NoTypeModel");
+            return false;
+        }
+        if(SelectedCategories != null) {
+            if(SelectedCategories.Count == 0) {
+                ErrorText = _localizationService.GetLocalizedString("MainViewModel.NoCategories");
+                return false;
+            }
+        }
+        if(!double.TryParse(_maxDiameterSearchSphereMm, out double result)) {
+            ErrorText = _localizationService.GetLocalizedString("MainViewModel.DiameterSearchNoDouble");
+            return false;
+        }
+        if(!double.TryParse(_stepDiameterSearchSphereMm, out double resultStep)) {
+            ErrorText = _localizationService.GetLocalizedString("MainViewModel.DiameterSearchNoDouble");
+            return false;
+        }
+        if(result < 0 || resultStep < 0) {
+            ErrorText = _localizationService.GetLocalizedString("MainViewModel.DiameterSearchNoNegate");
+            return false;
+        } else if(result == 0 || resultStep == 0) {
+            ErrorText = _localizationService.GetLocalizedString("MainViewModel.DiameterSearchNoZero");
+            return false;
+        } else if(result > 100000) {
+            ErrorText = _localizationService.GetLocalizedString("MainViewModel.DiameterSearchBig");
+            return false;
+        } else if(resultStep > 2000) {
+            ErrorText = _localizationService.GetLocalizedString("MainViewModel.DiameterSearchStepBig");
+            return false;
+        } else if(resultStep > result) {
+            ErrorText = _localizationService.GetLocalizedString("MainViewModel.DiameterSearchStepBigger");
+            return false;
+        }
         if(HasParamWarning) {
             ErrorText = _localizationService.GetLocalizedString("MainViewModel.WrongParamName");
             return false;
@@ -345,6 +443,7 @@ internal class MainViewModel : BaseViewModel {
         return true;
     }
 
+    // Загрузка конфигурации пользователя
     private void LoadConfig() {
         var projectConfig = _pluginConfig.GetSettings(_revitRepository.Document);
         ConfigSettings configSettings;
@@ -352,19 +451,20 @@ internal class MainViewModel : BaseViewModel {
             configSettings = new ConfigSettings();
             configSettings.ApplyDefaultValues();
         } else {
-            configSettings = projectConfig.DefaultSettings;
+            configSettings = projectConfig.ConfigSettings;
         }
         _setCoordParamsSettings = new SetCoordParamsSettings(_revitRepository, configSettings);
         _setCoordParamsSettings.LoadConfigSettings();
     }
 
-
+    // Сохранение конфигурации пользователя
     private void SaveConfig() {
-
-        _setCoordParamsSettings.ParamMaps = Params.Select(paramVM => paramVM.ParamMap).ToList();
-        _setCoordParamsSettings.RevitCategories = Categories.Select(catVM => catVM.RevitCategory).ToList();
+        _setCoordParamsSettings.ParamMaps = SelectedParams.Select(paramVM => paramVM.ParamMap).ToList();
+        _setCoordParamsSettings.Categories = SelectedCategories.Select(catVM => catVM.Category.GetBuiltInCategory()).ToList();
         _setCoordParamsSettings.ElementsProvider = SelectedRangeElements.ElementsProvider;
         _setCoordParamsSettings.PositionProvider = SelectedPosition.PositionProvider;
+        _setCoordParamsSettings.FileProvider = SelectedSourceFile.FileProvider;
+        _setCoordParamsSettings.TypeModel = SelectedTypeModel.Name;
         _setCoordParamsSettings.Search = Search;
         _setCoordParamsSettings.MaxDiameterSearchSphereMm = Convert.ToDouble(MaxDiameterSearchSphereMm);
         _setCoordParamsSettings.StepDiameterSearchSphereMm = Convert.ToDouble(StepDiameterSearchSphereMm);
@@ -372,7 +472,7 @@ internal class MainViewModel : BaseViewModel {
 
         var setting = _pluginConfig.GetSettings(_revitRepository.Document)
             ?? _pluginConfig.AddSettings(_revitRepository.Document);
-        setting.DefaultSettings = _setCoordParamsSettings.ConfigSettings;
+        setting.ConfigSettings = _setCoordParamsSettings.ConfigSettings;
         _pluginConfig.SaveProjectConfig();
     }
 }

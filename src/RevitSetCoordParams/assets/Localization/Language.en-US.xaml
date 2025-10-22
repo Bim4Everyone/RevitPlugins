@@ -39,7 +39,10 @@
 
     <system:String x:Key="MainWindow.ButtonOk">Set</system:String>
     <system:String x:Key="MainWindow.ButtonCancel">Cancel</system:String>
-    
+
+    <system:String x:Key="MainWindow.CheckedAllCats">Select all categories</system:String>
+    <system:String x:Key="MainWindow.NotCheckedAllCats">Unselect all categories</system:String>
+
     <system:String x:Key="MainViewModel.BlockParamDescription">SMR Block Parameter</system:String>
     <system:String x:Key="MainViewModel.BlockParamDetailDescription">Used to determine the building block</system:String>
     <system:String x:Key="MainViewModel.SectionParamDescription">SMR Section Parameter</system:String>
@@ -51,11 +54,30 @@
     <system:String x:Key="MainViewModel.BlockingParamDescription">Blocking Parameter</system:String>
     <system:String x:Key="MainViewModel.BlockingParamDetailDescription">Parameter type – Yes / No</system:String>
     <system:String x:Key="MainViewModel.WrongParamName">Errors in parameters SMR</system:String>
+    <system:String x:Key="MainViewModel.NoParams">No parameters selected</system:String>
+    <system:String x:Key="MainViewModel.NoCategories">No categories selected</system:String>
+    <system:String x:Key="MainViewModel.NoParamMaps">At least one paired parameter must be selected</system:String>
+    <system:String x:Key="MainViewModel.DiameterSearchNoDouble">Input must be a number</system:String>
+    <system:String x:Key="MainViewModel.DiameterSearchNoNegate">Input must be positive</system:String>
+    <system:String x:Key="MainViewModel.DiameterSearchNoZero">Input must be greater than zero</system:String>
+    <system:String x:Key="MainViewModel.DiameterSearchBig">Input must not exceed 100,000 mm</system:String>
+    <system:String x:Key="MainViewModel.DiameterSearchStepBig">Input must not exceed 2,000 mm</system:String>
+    <system:String x:Key="MainViewModel.DiameterSearchStepBigger">Step must not exceed the maximum value</system:String>
+    <system:String x:Key="MainViewModel.AllElementsProvider">All model elements</system:String>
+    <system:String x:Key="MainViewModel.SelectedElementsProvider">Selected model elements</system:String>
+    <system:String x:Key="MainViewModel.CurrentViewProvider">Visible elements in the view</system:String>
+    <system:String x:Key="MainViewModel.CenterPositionProvider">At the center of the element</system:String>
+    <system:String x:Key="MainViewModel.BottomPositionProvider">At the bottom of the element</system:String>
+    <system:String x:Key="MainViewModel.NoTypeModel">The required 3D models are missing in the file</system:String>
+
+    <system:String x:Key="SourceFileViewModel.CurrentFile">Current file (opened)</system:String>
 
     <system:String x:Key="CategoryViewModel.WarningStartString">Missing parameters:</system:String>
+    
     <system:String x:Key="ParamViewModel.WarningStartString">Wrong parameters:</system:String>
 
     <system:String x:Key="Common.ParamErrorMessageBody">Error copying parameters</system:String>
+    
     <system:String x:Key="Common.ConfigErrorMessageTitle">Plug-in configuration error</system:String>
 
 </ResourceDictionary>

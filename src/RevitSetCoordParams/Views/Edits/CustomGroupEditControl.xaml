@@ -64,7 +64,7 @@
                     OffContent="{Binding SwitchOffContent, ElementName=_this}"
                     IsChecked="{Binding IsChecked, ElementName=_this, Mode=TwoWay}"
                     Visibility="{Binding ToggleSwitchVisible, 
-                        ElementName=_this, Converter={StaticResource ExtraContentVisible}}" />                
+                        ElementName=_this, Converter={StaticResource ExtraContentVisible}}" /> 
 
                 <ContentControl
                     HorizontalAlignment="Left"

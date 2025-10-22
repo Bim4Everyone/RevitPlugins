@@ -15,7 +15,7 @@
     <system:String x:Key="MainWindow.Params">Параметры СМР</system:String>
     <system:String x:Key="MainWindow.ParamsDescription">Выбор параметров СМР для чтения и записи</system:String>
     <system:String x:Key="MainWindow.Categories">Категории элементов</system:String>
-    <system:String x:Key="MainWindow.CategoriesDescription">Категории элементов, в которые будет производится запись параметров</system:String>
+    <system:String x:Key="MainWindow.CategoriesDescription">Категории элементов для записи параметров</system:String>
     <system:String x:Key="MainWindow.Search">Настройки поиска</system:String>
     <system:String x:Key="MainWindow.SearchDescription">Выбор настроек поиска для потерянных элементов</system:String>
 
@@ -40,6 +40,9 @@
     <system:String x:Key="MainWindow.ButtonOk">Заполнить</system:String>
     <system:String x:Key="MainWindow.ButtonCancel">Отменить</system:String>
 
+    <system:String x:Key="MainWindow.CheckedAllCats">Выбрать все категории</system:String>
+    <system:String x:Key="MainWindow.NotCheckedAllCats">Сбросить все категории</system:String>
+
     <system:String x:Key="MainViewModel.BlockParamDescription">Параметр блока СМР</system:String>
     <system:String x:Key="MainViewModel.BlockParamDetailDescription">Используется для определения корпуса здания</system:String>
     <system:String x:Key="MainViewModel.SectionParamDescription">Параметр секции СМР</system:String>
@@ -51,30 +54,30 @@
     <system:String x:Key="MainViewModel.BlockingParamDescription">Параметр для блокировки</system:String>
     <system:String x:Key="MainViewModel.BlockingParamDetailDescription">Тип параметра - да / нет</system:String>
     <system:String x:Key="MainViewModel.WrongParamName">Ошибки в параметрах СМР</system:String>
+    <system:String x:Key="MainViewModel.NoParams">Не выбраны параметры</system:String>
+    <system:String x:Key="MainViewModel.NoCategories">Не выбраны категории</system:String>
+    <system:String x:Key="MainViewModel.NoParamMaps">Должен быть выбран хотя бы один парный параметр</system:String>
+    <system:String x:Key="MainViewModel.DiameterSearchNoDouble">Вводимые данные должны быть числом</system:String>
+    <system:String x:Key="MainViewModel.DiameterSearchNoNegate">Вводимые данные должны быть положительными</system:String>
+    <system:String x:Key="MainViewModel.DiameterSearchNoZero">Вводимые данные должны быть больше нуля</system:String>
+    <system:String x:Key="MainViewModel.DiameterSearchBig">Вводимые данные не должны превышать 100,000 мм</system:String>
+    <system:String x:Key="MainViewModel.DiameterSearchStepBig">Вводимые данные не должны превышать 2,000 мм</system:String>
+    <system:String x:Key="MainViewModel.DiameterSearchStepBigger">Шаг не должен превышать максимальное значение</system:String>
+    <system:String x:Key="MainViewModel.AllElementsProvider">Все элементы модели</system:String>
+    <system:String x:Key="MainViewModel.SelectedElementsProvider">Выделенные элементы модели</system:String>
+    <system:String x:Key="MainViewModel.CurrentViewProvider">Видимые элементы на виде</system:String>
+    <system:String x:Key="MainViewModel.CenterPositionProvider">По центру элемента</system:String>
+    <system:String x:Key="MainViewModel.BottomPositionProvider">По низу элемента</system:String>    
+    <system:String x:Key="MainViewModel.NoTypeModel">В файле отсутствуют необходимые объемные модели</system:String>
 
-    <system:String
-        x:Key="RangeElementsViewModel.AllElements">Все элементы модели</system:String>
-    <system:String
-        x:Key="RangeElementsViewModel.SelectedElements">Выделенные элементы модели</system:String>
-    <system:String
-        x:Key="RangeElementsViewModel.CurrentViewElements">Видимые элементы на виде</system:String>
+    <system:String x:Key="SourceFileViewModel.CurrentFile">Текущий файл (открытый)</system:String>
 
-    <system:String
-        x:Key="PositionsViewModel.Center">По центру элемента</system:String>
-    <system:String
-        x:Key="PositionsViewModel.Bottom">По низу элемента</system:String>
-    
-
-    <system:String x:Key="AllElementsProvider.Name">Все элементы</system:String>
-    
-    
-    
-    
-    
     <system:String x:Key="CategoryViewModel.WarningStartString">Отсутствуют параметры:</system:String>
+    
     <system:String x:Key="ParamViewModel.WarningStartString">Ошибочные параметры:</system:String>
 
     <system:String x:Key="Common.ParamErrorMessageBody">Ошибка загрузки параметров</system:String>
+    
     <system:String x:Key="Common.ConfigErrorMessageTitle">Ошибка настройки плагина</system:String>
 
 </ResourceDictionary>

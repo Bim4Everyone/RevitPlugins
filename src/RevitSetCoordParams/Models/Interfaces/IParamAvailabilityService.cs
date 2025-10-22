@@ -1,11 +1,8 @@
 using Autodesk.Revit.DB;
 
-using dosymep.Bim4Everyone;
-
 namespace RevitSetCoordParams.Models.Interfaces;
 
-public interface IParamAvailabilityService {
-    bool IsParamAvailable(RevitParam param, Category category);
-    bool IsParamExist(string paramName);
-    Definition GetDefinitionByName(string paramName);
+internal interface IParamAvailabilityService {
+    bool IsParamExist(Document docstring, string paramName);
+    Definition GetDefinitionByName(Document doc, string paramName);
 }

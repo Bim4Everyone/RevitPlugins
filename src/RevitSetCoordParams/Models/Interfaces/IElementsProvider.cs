@@ -1,12 +1,14 @@
 using System.Collections.Generic;
 
+using Autodesk.Revit.DB;
+
 using RevitSetCoordParams.Models.Enums;
 
 namespace RevitSetCoordParams.Models.Interfaces;
 
 internal interface IElementsProvider {
 
-    ProviderType Type { get; }
+    ElementsProviderType Type { get; }
 
-    ICollection<RevitElement> GetRevitElements();
+    ICollection<RevitElement> GetRevitElements(IEnumerable<BuiltInCategory> categories);
 }

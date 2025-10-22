@@ -15,7 +15,7 @@ internal class PositionProviderBottom : IPositionProvider {
         _revitRepository = revitRepository;
     }
 
-    public ProviderType Type => ProviderType.BottomPositionProvider;
+    public PositionProviderType Type => PositionProviderType.BottomPositionProvider;
 
     public ICollection<XYZ> GetPositionElement(Element element) {
         throw new System.NotImplementedException();

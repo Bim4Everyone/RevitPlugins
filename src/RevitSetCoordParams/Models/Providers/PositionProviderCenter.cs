@@ -14,7 +14,7 @@ internal class PositionProviderCenter : IPositionProvider {
     public PositionProviderCenter(RevitRepository revitRepository) {
         _revitRepository = revitRepository;
     }
-    public ProviderType Type => ProviderType.CenterPositionProvider;
+    public PositionProviderType Type => PositionProviderType.CenterPositionProvider;
 
     public ICollection<XYZ> GetPositionElement(Element element) {
         throw new System.NotImplementedException();

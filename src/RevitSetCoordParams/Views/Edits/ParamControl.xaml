@@ -65,12 +65,14 @@
             <ui:ToggleSwitch                
                 Grid.Column="2"
                 Grid.Row="0"
+                VerticalAlignment="Top"
                 OnContent="{me:LocalizationSource MainWindow.ParamsToggleSwitchOn}"
                 OffContent="{me:LocalizationSource MainWindow.ParamsToggleSwitchOff}"
                 IsChecked="{Binding IsChecked, ElementName=_this, Mode=TwoWay}"/>
             
             <ui:SymbolIcon
-                Grid.Column="3"                
+                Grid.Column="3"
+                VerticalAlignment="Top"
                 Symbol="Warning24"
                 Foreground="OrangeRed"
                 FontSize="24"

@@ -2,58 +2,58 @@ using System.Collections.Generic;
 
 using Autodesk.Revit.DB;
 
-using dosymep.Bim4Everyone;
+using dosymep.Revit;
 
 using RevitSetCoordParams.Models.Interfaces;
 
 namespace RevitSetCoordParams.Models.Services;
 
-public class ParamAvailabilityService : IParamAvailabilityService {
-    private readonly Dictionary<string, HashSet<ElementId>> _paramToCategories = [];
-    private readonly Dictionary<string, Definition> _paramDefinitions = [];
+internal class ParamAvailabilityService : IParamAvailabilityService {
 
-    public ParamAvailabilityService(Document doc) {
-        BuildCache(doc);
+    private readonly Dictionary<string, ParamAvailabilityCache> _cacheByDocId = [];
+    /// <summary>
+    /// Проверяет, существует ли параметр в данном документе.
+    /// </summary>
+    public bool IsParamExist(Document doc, string paramName) {
+        var cache = GetOrBuildCache(doc);
+        return cache.ParamDefinitions.ContainsKey(paramName);
     }
 
-    public bool IsParamAvailable(RevitParam param, Category category) {
-        return _paramToCategories.TryGetValue(param.Name, out var cats)
-            && cats.Contains(category.Id);
-    }
-
-    public bool IsParamExist(string paramName) {
-        return _paramToCategories.ContainsKey(paramName);
-    }
-
-    public Definition GetDefinitionByName(string paramName) {
-        return _paramDefinitions.TryGetValue(paramName, out var def)
+    /// <summary>
+    /// Возвращает Definition по имени параметра (если существует).
+    /// </summary>
+    public Definition GetDefinitionByName(Document doc, string paramName) {
+        var cache = GetOrBuildCache(doc);
+        return cache.ParamDefinitions.TryGetValue(paramName, out var def)
             ? def
             : null;
     }
 
-    private void BuildCache(Document doc) {
-        var bindingMap = doc.ParameterBindings;
-        var it = bindingMap.ForwardIterator();
+    public ParamAvailabilityCache GetOrBuildCache(Document doc) {
+        string docId = doc.GetUniqId();
+        if(_cacheByDocId.TryGetValue(docId, out var cache)) {
+            return cache;
+        }
+
+        cache = BuildCache(doc);
+        _cacheByDocId[docId] = cache;
+        return cache;
+    }
+
+    private ParamAvailabilityCache BuildCache(Document doc) {
+        var cache = new ParamAvailabilityCache();
+        var bindings = doc.ParameterBindings;
+        var it = bindings.ForwardIterator();
 
         while(it.MoveNext()) {
             var def = it.Key;
-
             if(it.Current is not ElementBinding binding) {
                 continue;
             }
-
-            if(!_paramDefinitions.ContainsKey(def.Name)) {
-                _paramDefinitions[def.Name] = def;
-            }
-
-            if(!_paramToCategories.TryGetValue(def.Name, out var cats)) {
-                cats = [];
-                _paramToCategories[def.Name] = cats;
-            }
-
-            foreach(Category cat in binding.Categories) {
-                cats.Add(cat.Id);
+            if(!cache.ParamDefinitions.ContainsKey(def.Name)) {
+                cache.ParamDefinitions[def.Name] = def;
             }
         }
+        return cache;
     }
 }

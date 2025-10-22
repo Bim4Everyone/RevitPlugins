@@ -23,8 +23,8 @@ internal class CheckProjectParams {
     }
 
     public CheckProjectParams CopyProjectParams() {
-        _projectParameters.SetupRevitParams(_document, new FixedParams().GetDefaultParams()
-            .Select(param => param.RevitParam));
+        _projectParameters.SetupRevitParams(_document, RevitConstants.GetDefaultParamMaps()
+            .Select(param => param.TargetParam));
         return this;
     }
 }

@@ -35,6 +35,13 @@
             x:Key="ParamWarningIconVisible"
             TrueValue="Visible"
             FalseValue="Collapsed" />
+        
+        <Style
+            TargetType="ToolTip">
+            <Setter
+                Property="MaxWidth"
+                Value="500" />            
+        </Style>        
     </Window.Resources>
 
     <i:Interaction.Triggers>
@@ -81,7 +88,7 @@
                     <ComboBox
                         ItemsSource="{Binding SourceFiles}"
                         SelectedValue="{Binding SelectedSourceFile}"
-                        DisplayMemberPath="Name" />
+                        DisplayMemberPath="FileName"/>
                 </edits:CustomEditControl>
 
                 <edits:CustomEditControl
@@ -163,29 +170,56 @@
                     </edits:CustomGroupEditControl.ExtraIcon>
 
                     <edits:CustomGroupEditControl.EditControl>
-                        <ItemsControl
-                            ItemsSource="{Binding Categories}">
-                            <ItemsControl.ItemTemplate>
-                                <DataTemplate
-                                    DataType="{x:Type vms:CategoryViewModel}">
-                                    <edits:CategoryControl
-                                        CategoryName="{Binding CategoryName}"
-                                        IsChecked="{Binding IsChecked, Mode=TwoWay}"
-                                        HasWarning="{Binding HasWarning, Mode=TwoWay}"
-                                        WarningDescription="{Binding Warnings}" />
-                                </DataTemplate>
-                            </ItemsControl.ItemTemplate>
-
-                            <ItemsControl.ItemsPanel>
-                                <ItemsPanelTemplate>
-                                    <UniformGrid 
-                                        Columns="3"/>
-                                </ItemsPanelTemplate>
-                            </ItemsControl.ItemsPanel>                            
+                        <StackPanel>
+                            <Border
+                                Margin="5"
+                                VerticalAlignment="Center"
+                                HorizontalAlignment="Stretch"
+                                Background="{DynamicResource CardBackground}"
+                                BorderBrush="{DynamicResource CardBorderBrush}"
+                                CornerRadius="{DynamicResource ControlCornerRadius}"
+                                BorderThickness="{DynamicResource CardControlBorderThemeThickness}">
+                                <StackPanel
+                                    Orientation="Horizontal"
+                                    VerticalAlignment="Center"
+                                    HorizontalAlignment="Center">
+                                    <RadioButton
+                                        Margin="20,0,0,0"
+                                        GroupName="Choise"
+                                        Content="{me:LocalizationSource MainWindow.CheckedAllCats}"                                        
+                                        IsChecked="{Binding IsCheckedAllCats, Mode=TwoWay}"
+                                        Command="{Binding CheckAllCatsCommand}" />
+                                    <RadioButton
+                                        Margin="20,0,0,0"
+                                        GroupName="Choise"
+                                        Content="{me:LocalizationSource MainWindow.NotCheckedAllCats}"
+                                        IsChecked="{Binding IsNotCheckedAllCats, Mode=TwoWay}"
+                                        Command="{Binding UncheckAllCatsCommand}" />
+                                </StackPanel>
+                            </Border>
                             
-                        </ItemsControl>
-                    </edits:CustomGroupEditControl.EditControl>
+                            <ItemsControl
+                                ItemsSource="{Binding Categories}">
+                                <ItemsControl.ItemTemplate>
+                                    <DataTemplate
+                                        DataType="{x:Type vms:CategoryViewModel}">
+                                        <edits:CategoryControl
+                                            CategoryName="{Binding CategoryName}"
+                                            IsChecked="{Binding IsChecked, Mode=TwoWay}"
+                                            HasWarning="{Binding HasWarning, Mode=TwoWay}"
+                                            WarningDescription="{Binding Warnings}" />
+                                    </DataTemplate>
+                                </ItemsControl.ItemTemplate>
 
+                                <ItemsControl.ItemsPanel>
+                                    <ItemsPanelTemplate>
+                                        <UniformGrid
+                                            Columns="3" />
+                                    </ItemsPanelTemplate>
+                                </ItemsControl.ItemsPanel>
+                            </ItemsControl>
+                        </StackPanel>                        
+                    </edits:CustomGroupEditControl.EditControl> 
                 </edits:CustomGroupEditControl>
                 
                 <edits:CustomGroupEditControl                    
@@ -217,14 +251,10 @@
                             <ui:TextBox
                                 Text="{Binding StepDiameterSearchSphereMm, UpdateSourceTrigger=PropertyChanged}"
                                 ToolTip="{me:LocalizationSource MainWindow.StepSearchSphereTooltip}" />
-                        </edits:CustomEditControl>
-                        
-                    </StackPanel>
-                    
-                </edits:CustomGroupEditControl>
-                
-            </StackPanel>
-            
+                        </edits:CustomEditControl>                        
+                    </StackPanel>                    
+                </edits:CustomGroupEditControl>                
+            </StackPanel>            
         </ScrollViewer>        
 
         <StackPanel
@@ -253,8 +283,6 @@
                 IsCancel="True"
                 Click="ButtonCancel_Click" />
             
-        </StackPanel>
-        
-    </Grid>
-    
+        </StackPanel>        
+    </Grid>    
 </core:WpfUIPlatformWindow>

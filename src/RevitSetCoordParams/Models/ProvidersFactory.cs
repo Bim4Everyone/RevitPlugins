@@ -1,4 +1,6 @@
-using System.Collections.Generic;
+using Autodesk.Revit.DB;
+
+using dosymep.Revit;
 
 using RevitSetCoordParams.Models.Enums;
 using RevitSetCoordParams.Models.Interfaces;
@@ -7,28 +9,25 @@ using RevitSetCoordParams.Models.Providers;
 namespace RevitSetCoordParams.Models;
 internal class ProvidersFactory {
 
-    public IElementsProvider GetElementsProvider(RevitRepository revitRepository, ProviderType type, List<RevitCategory> revitCategories) {
+    public IElementsProvider GetElementsProvider(RevitRepository revitRepository, ElementsProviderType type) {
         return type switch {
-            ProviderType.AllElementsProvider => new ElementsProviderAll(revitRepository, revitCategories),
-            ProviderType.CurrentViewProvider => new ElementsProviderCurrentView(revitRepository, revitCategories),
-            ProviderType.SelectedElementsProvider => new ElementsProviderSelected(revitRepository, revitCategories),
-            _ => new ElementsProviderAll(revitRepository, revitCategories)
+            ElementsProviderType.AllElementsProvider => new ElementsProviderAll(revitRepository),
+            ElementsProviderType.CurrentViewProvider => new ElementsProviderCurrentView(revitRepository),
+            ElementsProviderType.SelectedElementsProvider => new ElementsProviderSelected(revitRepository),
+            _ => new ElementsProviderAll(revitRepository)
         };
     }
 
-    public IElementsProvider GetFileProvider(RevitRepository revitRepository, ProviderType type, string fileName) {
-        return type switch {
-            ProviderType.CurrentFileProvider => new FileProviderCurrent(revitRepository, fileName),
-            ProviderType.CoordFileProvider => new FileProviderCoord(revitRepository, fileName),
-            ProviderType.SelectedLinkFileProvider => new FileProviderLink(revitRepository, fileName),
-            _ => new FileProviderCoord(revitRepository, fileName)
-        };
+    public IFileProvider GetFileProvider(RevitRepository revitRepository, Document document) {
+        return document.GetUniqId().Equals(revitRepository.Document.GetUniqId())
+            ? new FileProviderCurrent(revitRepository, document)
+            : new FileProviderLink(revitRepository, document);
     }
 
-    public IPositionProvider GetPositionProvider(RevitRepository revitRepository, ProviderType type) {
+    public IPositionProvider GetPositionProvider(RevitRepository revitRepository, PositionProviderType type) {
         return type switch {
-            ProviderType.CenterPositionProvider => new PositionProviderCenter(revitRepository),
-            ProviderType.BottomPositionProvider => new PositionProviderBottom(revitRepository),
+            PositionProviderType.CenterPositionProvider => new PositionProviderCenter(revitRepository),
+            PositionProviderType.BottomPositionProvider => new PositionProviderBottom(revitRepository),
             _ => new PositionProviderCenter(revitRepository)
         };
     }

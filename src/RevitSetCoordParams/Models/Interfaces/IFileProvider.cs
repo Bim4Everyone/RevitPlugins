@@ -5,10 +5,11 @@ using Autodesk.Revit.DB;
 using RevitSetCoordParams.Models.Enums;
 
 namespace RevitSetCoordParams.Models.Interfaces;
+internal interface IFileProvider {
 
-internal interface IPositionProvider {
+    FileProviderType Type { get; }
 
-    PositionProviderType Type { get; }
+    Document Document { get; }
 
-    ICollection<XYZ> GetPositionElement(Element element);
+    ICollection<RevitElement> GetRevitElements();
 }

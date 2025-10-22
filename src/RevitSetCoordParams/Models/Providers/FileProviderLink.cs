@@ -1,21 +1,22 @@
 using System.Collections.Generic;
 
+using Autodesk.Revit.DB;
+
 using RevitSetCoordParams.Models.Enums;
 using RevitSetCoordParams.Models.Interfaces;
 
 namespace RevitSetCoordParams.Models.Providers;
 
-internal class FileProviderLink : IElementsProvider {
+internal class FileProviderLink : IFileProvider {
     private readonly RevitRepository _revitRepository;
-    private readonly string _fileName;
 
-    public FileProviderLink(RevitRepository revitRepository, string fileName) {
+    public FileProviderLink(RevitRepository revitRepository, Document document) {
         _revitRepository = revitRepository;
-        _fileName = fileName;
+        Document = document;
     }
 
-    public ProviderType Type => ProviderType.SelectedLinkFileProvider;
-
+    public FileProviderType Type => FileProviderType.LinkFileProvider;
+    public Document Document { get; private set; }
     public ICollection<RevitElement> GetRevitElements() {
         throw new System.NotImplementedException();
     }
