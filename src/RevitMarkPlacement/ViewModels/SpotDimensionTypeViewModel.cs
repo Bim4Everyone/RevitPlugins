@@ -1,6 +1,11 @@
-﻿using Autodesk.Revit.DB;
+﻿using System.Drawing;
+using System.Windows.Media.Imaging;
+
+using Autodesk.Revit.DB;
 
 using dosymep.WPF.ViewModels;
+
+using RevitMarkPlacement.Extensions;
 
 namespace RevitMarkPlacement.ViewModels;
 
@@ -12,4 +17,5 @@ internal class SpotDimensionTypeViewModel : BaseViewModel {
     }
 
     public string Name => _spotDimensionType.Name;
+    public BitmapSource PreviewImage => _spotDimensionType.GetPreviewImage(new Size(60, 60)).ConvertToBitmapSource();
 }

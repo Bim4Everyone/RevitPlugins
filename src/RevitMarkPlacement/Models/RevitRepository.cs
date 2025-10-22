@@ -55,18 +55,10 @@ internal class RevitRepository : BaseViewModel {
     /// </summary>
     public Document Document => ActiveUIDocument.Document;
 
-    public IEnumerable<SpotDimensionType> GetSpotDimentionTypeNames(ISpotDimensionSelection selection) {
+    public IEnumerable<SpotDimensionType> GetSpotDimensionTypes(ISpotDimensionSelection selection) {
         return selection.GetElements()
             .Select(s => s.SpotDimensionType)
             .Distinct(new ElementNameEquatable<SpotDimensionType>());
-    }
-
-    public IEnumerable<GlobalParameter> GetDoubleGlobalParameters() {
-        return GlobalParametersManager
-            .GetGlobalParametersOrdered(Document)
-            .Select(id => Document.GetElement(id))
-            .Cast<GlobalParameter>()
-            .Where(p => p.GetValue() is DoubleParameterValue);
     }
 
     public FamilyInstance CreateAnnotation(FamilySymbol symbol, XYZ point, View view) {

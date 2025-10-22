@@ -32,7 +32,7 @@ internal class SelectionModeViewModel : BaseViewModel {
     public void LoadSpotDimensionTypes() {
         SpotDimensionTypes ??= [
             .._revitRepository
-                .GetSpotDimentionTypeNames(Selection)
+                .GetSpotDimensionTypes(Selection)
                 .Select(item => new SpotDimensionTypeViewModel(item))
         ];
     }
