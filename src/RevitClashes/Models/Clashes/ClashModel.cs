@@ -107,11 +107,11 @@ internal class ClashModel : IEquatable<ClashModel> {
             double otherSolidsV = otherSolids.Sum(s => s.Volume);
             return new ClashData(mainSolidsV, otherSolidsV, intersectionVolume);
         } catch(ArgumentNullException) {
-            return new InvalidClashData();
+            return new ClashData();
         } catch(NullReferenceException) {
-            return new InvalidClashData();
+            return new ClashData();
         } catch(ArgumentException) {
-            return new InvalidClashData();
+            return new ClashData();
         } catch(Autodesk.Revit.Exceptions.ApplicationException) {
             return new InvalidClashData();
         }
