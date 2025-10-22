@@ -16,7 +16,7 @@ internal class ClashViewModel : BaseViewModel, IClashViewModel, IEquatable<Clash
     private ClashStatus _clashStatus;
     private string _clashName;
     private readonly RevitRepository _revitRepository;
-    private bool _hasError;
+    private bool _clashDataIsValid;
 
     public ClashViewModel(RevitRepository revitRepository, ClashModel clash) {
         _revitRepository = revitRepository;
@@ -62,8 +62,8 @@ internal class ClashViewModel : BaseViewModel, IClashViewModel, IEquatable<Clash
     }
 
     public bool ClashDataIsValid {
-        get => _hasError;
-        set => RaiseAndSetIfChanged(ref _hasError, value);
+        get => _clashDataIsValid;
+        set => RaiseAndSetIfChanged(ref _clashDataIsValid, value);
     }
 
     public ElementId FirstId { get; }
