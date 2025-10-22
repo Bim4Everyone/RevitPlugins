@@ -14,4 +14,8 @@
     <system:String x:Key="CreatingARDocsV.Title">Adding parameters to a family</system:String>
     <system:String x:Key="Window.ButtonOk">Ok</system:String>
     <system:String x:Key="Window.ButtonCancel">Cancel</system:String>
+        
+    <system:String x:Key="TreeReportVM.Title">Report</system:String>
+    <system:String x:Key="TreeReportVM.ShowAll">Show all</system:String>
+    <system:String x:Key="TreeReportVM.ShowImportant">Show important</system:String>
 </ResourceDictionary>

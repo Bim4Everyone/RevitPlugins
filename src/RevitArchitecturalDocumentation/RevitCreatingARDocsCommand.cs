@@ -15,6 +15,7 @@ using Ninject;
 
 using RevitArchitecturalDocumentation.Models;
 using RevitArchitecturalDocumentation.Models.Options;
+using RevitArchitecturalDocumentation.Models.Services;
 using RevitArchitecturalDocumentation.ViewModels;
 using RevitArchitecturalDocumentation.Views;
 
@@ -58,6 +59,15 @@ public class RevitCreatingARDocsCommand : BasePluginCommand {
         kernel.Bind<ViewOptions>()
             .ToSelf();
         kernel.Bind<SpecOptions>()
+            .ToSelf();
+
+        // Регистрируем сервис второстепенных окон
+        kernel.Bind<IWindowService>()
+            .To<WindowService>()
+            .InSingletonScope();
+
+        // Регистрируем окно отчета
+        kernel.Bind<TreeReportV>()
             .ToSelf();
 
         Notification(kernel.Get<CreatingARDocsV>());

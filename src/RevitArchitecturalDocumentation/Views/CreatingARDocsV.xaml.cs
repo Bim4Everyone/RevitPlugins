@@ -3,7 +3,7 @@ using System.Windows;
 using dosymep.SimpleServices;
 
 namespace RevitArchitecturalDocumentation.Views;
-public partial class CreatingARDocsV {
+public partial class CreatingARDocsV {  
     public CreatingARDocsV(
         ILoggerService loggerService,
         ISerializationService serializationService,

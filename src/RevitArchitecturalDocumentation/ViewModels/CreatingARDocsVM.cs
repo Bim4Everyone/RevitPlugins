@@ -9,6 +9,7 @@ using dosymep.WPF.ViewModels;
 using RevitArchitecturalDocumentation.Models;
 using RevitArchitecturalDocumentation.Models.Exceptions;
 using RevitArchitecturalDocumentation.Models.Options;
+using RevitArchitecturalDocumentation.Models.Services;
 using RevitArchitecturalDocumentation.ViewModels.Components;
 using RevitArchitecturalDocumentation.Views;
 
@@ -16,6 +17,7 @@ namespace RevitArchitecturalDocumentation.ViewModels;
 internal class CreatingARDocsVM : BaseViewModel {
     private readonly PluginConfig _pluginConfig;
     private readonly RevitRepository _revitRepository;
+    private readonly IWindowService _windowService;
 
     private bool _createViewsFromSelected = false;
     private string _errorText;
@@ -25,9 +27,11 @@ internal class CreatingARDocsVM : BaseViewModel {
     private ObservableCollection<ViewHelper> _selectedViewHelpers = [];
 
 
-    public CreatingARDocsVM(PluginConfig pluginConfig, RevitRepository revitRepository, MainOptions mainOptions) {
+    public CreatingARDocsVM(PluginConfig pluginConfig, RevitRepository revitRepository, MainOptions mainOptions, 
+                            IWindowService windowService) {
         _pluginConfig = pluginConfig;
         _revitRepository = revitRepository;
+        _windowService = windowService;
 
         TaskInformationVM = new TaskInfoListVM(pluginConfig, revitRepository, this);
         SheetOptsVM = new SheetOptionsVM(pluginConfig, revitRepository, mainOptions.SheetOpts);
@@ -257,12 +261,8 @@ internal class CreatingARDocsVM : BaseViewModel {
             // В этом случае в узле самого верхнего уровня нужно удалить соответствующую строку, чтобы его не скрывала фильтрация
             item.RewriteByChildNames("Задание", "  ~  ");
         }
-
-        var window = new TreeReportV {
-            // Передаем VM и указываем, что фильтрацию для сепарации на важные/не важные узлы будем выполнять через "  ~  "
-            DataContext = new TreeReportVM(TreeReport, "  ~  ")
-        };
-        window.Show();
+        var reportViewModel = new TreeReportVM(TreeReport, "  ~  ");
+        _windowService.Show<TreeReportV, TreeReportVM>(reportViewModel);
     }
 
 
