@@ -1,3 +1,5 @@
+using Autodesk.Revit.DB;
+
 using dosymep.Bim4Everyone;
 using dosymep.Bim4Everyone.ProjectConfigs;
 
@@ -25,5 +27,10 @@ namespace RevitCreateViewSheet.Models {
         public override string ProjectName { get; set; }
 
         public string FileDialogInitialDirectory { get; set; }
+
+        /// <summary>
+        /// Id типоразмера основной надписи для генерации новых листов
+        /// </summary>
+        public ElementId AddSheetsTitleBlock { get; set; } = ElementId.InvalidElementId;
     }
 }
