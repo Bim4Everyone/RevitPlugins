@@ -1,4 +1,5 @@
 using System.Windows;
+using System.Windows.Input;
 
 using dosymep.SimpleServices;
 
@@ -26,5 +27,11 @@ public partial class CopySpecSheetInstanceV {
 
     private void ButtonCancel_Click(object sender, RoutedEventArgs e) {
         DialogResult = false;
+    }
+
+    private void Window_KeyDown(object sender, KeyEventArgs e) {
+        if(e.Key == Key.Escape) {
+            DialogResult = false;
+        }
     }
 }
