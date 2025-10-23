@@ -10,7 +10,6 @@ using System.Windows.Input;
 
 using Autodesk.Revit.DB;
 
-using dosymep.Bim4Everyone.ProjectConfigs;
 using dosymep.Revit.Comparators;
 using dosymep.SimpleServices;
 using dosymep.WPF.Commands;
@@ -28,7 +27,7 @@ namespace RevitCreateViewSheet.ViewModels {
         private readonly EntitiesHandler _sheetsHandler;
         private readonly EntitiesTracker _entitiesTracker;
         private readonly EntitySaverProvider _entitySaverProvider;
-        private readonly IConfigSerializer _configSerializer;
+        private readonly PluginConfig _config;
         private readonly ILocalizationService _localizationService;
         private readonly IMessageBoxService _messageBoxService;
         private readonly IOpenFileDialogService _openFileService;
@@ -56,7 +55,7 @@ namespace RevitCreateViewSheet.ViewModels {
             EntitiesTracker entitiesTracker,
             EntitySaverProvider entitySaverProvider,
             SheetItemsFactory sheetItemsFactory,
-            IConfigSerializer configSerializer,
+            PluginConfig config,
             ILocalizationService localizationService,
             IMessageBoxService messageBoxService,
             IOpenFileDialogService openFileDialogService,
@@ -67,7 +66,7 @@ namespace RevitCreateViewSheet.ViewModels {
             _sheetsHandler = entitiesHandler ?? throw new ArgumentNullException(nameof(entitiesHandler));
             _entitiesTracker = entitiesTracker ?? throw new ArgumentNullException(nameof(entitiesTracker));
             _entitySaverProvider = entitySaverProvider ?? throw new ArgumentNullException(nameof(entitySaverProvider));
-            _configSerializer = configSerializer ?? throw new ArgumentNullException(nameof(configSerializer));
+            _config = config ?? throw new ArgumentNullException(nameof(config));
             _localizationService = localizationService ?? throw new ArgumentNullException(nameof(localizationService));
             _messageBoxService = messageBoxService ?? throw new ArgumentNullException(nameof(messageBoxService));
             _openFileService = openFileDialogService ?? throw new ArgumentNullException(nameof(openFileDialogService));
@@ -94,9 +93,6 @@ namespace RevitCreateViewSheet.ViewModels {
                 _localizationService.GetLocalizedString("MainWindow.AllSheets.CustomNumber"),
                 _localizationService.GetLocalizedString("MainWindow.AllSheets.Number")];
             NumerationSelectedColumn = NumerationColumns.First();
-
-            AddSheetsAlbumBlueprint = AllAlbumsBlueprints.FirstOrDefault();
-            AddSheetsTitleBlock = AllTitleBlocks.FirstOrDefault();
         }
 
         public IProgressDialogFactory ProgressDialogFactory => _progressFactory;
@@ -234,6 +230,11 @@ namespace RevitCreateViewSheet.ViewModels {
             ((INotifyCollectionChanged) _entitiesTracker.AliveSchedules).CollectionChanged += OnSchedulesChanged;
             VisibleSheets = new CollectionViewSource() { Source = _sheets };
             VisibleSheets.Filter += SheetsFilterHandler;
+
+            var settings = GetSettings();
+            AddSheetsAlbumBlueprint = AllAlbumsBlueprints.FirstOrDefault();
+            AddSheetsTitleBlock = AllTitleBlocks.FirstOrDefault(
+                t => t.TitleBlockSymbol.Id == settings.AddSheetsTitleBlock) ?? AllTitleBlocks.FirstOrDefault();
         }
 
         private void OnSchedulesChanged(object sender, NotifyCollectionChangedEventArgs e) {
@@ -336,6 +337,7 @@ namespace RevitCreateViewSheet.ViewModels {
         }
 
         private void AcceptView() {
+            SaveConfig();
             using(var progressDialogService = _progressFactory.CreateDialog()) {
                 progressDialogService.StepValue = 50;
                 progressDialogService.DisplayTitleFormat = _localizationService.GetLocalizedString("ProgressBarTitle");
@@ -419,15 +421,17 @@ namespace RevitCreateViewSheet.ViewModels {
             }
         }
 
+        private void SaveConfig() {
+            var settings = GetSettings();
+            settings.AddSheetsTitleBlock = AddSheetsTitleBlock.TitleBlockSymbol.Id;
+            _config.SaveProjectConfig();
+        }
+
         private void LoadSheets() {
-            var config = PluginConfig.GetPluginConfig(_configSerializer);
-            var settings = config.GetSettings(_revitRepository.Document)
-                ?? config.AddSettings(_revitRepository.Document);
+            var settings = GetSettings();
+            if(_openFileService.ShowDialog(settings.FileDialogInitialDirectory ?? string.Empty)) {
 
-            if(_openFileService.ShowDialog(
-                config.GetSettings(_revitRepository.Document)?.FileDialogInitialDirectory ?? string.Empty)) {
-
-                var sheetDtos = _configSerializer.Deserialize<SheetsCreationDto>(File.ReadAllText(
+                var sheetDtos = _config.Serializer.Deserialize<SheetsCreationDto>(File.ReadAllText(
                     _openFileService.File.FullName));
                 var titleBlocks = AllTitleBlocks.Select(t => t.TitleBlockSymbol).ToArray();
                 var newSheetViewModels = sheetDtos.Sheets?
@@ -442,26 +446,27 @@ namespace RevitCreateViewSheet.ViewModels {
                 }
 
                 settings.FileDialogInitialDirectory = Path.GetDirectoryName(_openFileService.File.FullName);
-                config.SaveProjectConfig();
+                SaveConfig();
             }
         }
 
         private void SaveSheets() {
-            var config = PluginConfig.GetPluginConfig(_configSerializer);
-            var settings = config.GetSettings(_revitRepository.Document)
-                ?? config.AddSettings(_revitRepository.Document);
-
-            if(_saveFileService.ShowDialog(
-                config.GetSettings(_revitRepository.Document)?.FileDialogInitialDirectory ?? string.Empty,
+            var settings = GetSettings();
+            if(_saveFileService.ShowDialog(settings.FileDialogInitialDirectory ?? string.Empty,
                 "sheets_config.json")) {
 
                 var sheetDtos = new SheetsCreationDto(_sheets.Select(s => s.SheetModel));
                 var path = _saveFileService.File.FullName;
-                File.WriteAllText(path, _configSerializer.Serialize(sheetDtos));
+                File.WriteAllText(path, _config.Serializer.Serialize(sheetDtos));
 
                 settings.FileDialogInitialDirectory = Path.GetDirectoryName(path);
-                config.SaveProjectConfig();
+                SaveConfig();
             }
+        }
+
+        private RevitSettings GetSettings() {
+            return _config.GetSettings(_revitRepository.Document)
+                ?? _config.AddSettings(_revitRepository.Document);
         }
 
         private bool CanSaveSheets() {

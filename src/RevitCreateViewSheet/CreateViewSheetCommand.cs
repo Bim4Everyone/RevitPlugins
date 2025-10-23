@@ -7,10 +7,10 @@ using Autodesk.Revit.DB;
 using Autodesk.Revit.UI;
 
 using dosymep.Bim4Everyone;
+using dosymep.Bim4Everyone.ProjectConfigs;
 using dosymep.Bim4Everyone.SimpleServices;
 using dosymep.WpfCore.Ninject;
 using dosymep.WpfUI.Core.Ninject;
-using dosymep.Xpf.Core.Ninject;
 
 using Ninject;
 
@@ -36,13 +36,12 @@ namespace RevitCreateViewSheet {
 
                 kernel.UseWpfUIThemeUpdater();
 
+                kernel.Bind<PluginConfig>()
+                    .ToMethod(c => PluginConfig.GetPluginConfig(c.Kernel.Get<IConfigSerializer>()));
                 kernel.BindMainWindow<MainViewModel, MainWindow>();
-                kernel.Bind<SelectedSheetView>()
-                    .ToSelf()
-                    .InSingletonScope();
 
-                kernel.UseXtraSaveFileDialog<MainViewModel>(filter: "JSON (*.json)|*.json");
-                kernel.UseXtraOpenFileDialog<MainViewModel>(filter: "JSON (*.json)|*.json");
+                kernel.UseWpfSaveFileDialog<MainViewModel>(filter: "JSON (*.json)|*.json");
+                kernel.UseWpfOpenFileDialog<MainViewModel>(filter: "JSON (*.json)|*.json");
                 kernel.UseWpfUIMessageBox<MainViewModel>();
 
                 string assemblyName = Assembly.GetExecutingAssembly().GetName().Name;
