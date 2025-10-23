@@ -74,6 +74,7 @@
                 ButtonContent="{ui:SymbolIcon Add24}"
                 ButtonCommand="{Binding AddViewPortCommand}">
                 <ui:DataGrid
+                    CellStyle="{StaticResource CustomDataGridCell}"
                     Style="{StaticResource CustomResizableDataGridStyle}"
                     ItemsSource="{Binding ViewPorts}"
                     SelectedItem="{Binding SelectedViewPort}">
@@ -95,26 +96,18 @@
                                         Grid.Row="1"
                                         Grid.Column="1"
                                         DisplayMemberPath="Name"
+                                        ToolTip="{Binding ViewPortType.Name}"
                                         Style="{StaticResource CustomComboBox}"
                                         ItemsSource="{Binding Path=DataContext.AllViewPortTypes, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Window}}"
                                         SelectedItem="{Binding ViewPortType, UpdateSourceTrigger=PropertyChanged}" />
                                 </DataTemplate>
                             </DataGridTemplateColumn.CellTemplate>
                         </DataGridTemplateColumn>
-                        <DataGridTemplateColumn
-                            SortMemberPath="IsPlacedStatus"
+                        <DataGridTextColumn
                             Width="Auto"
                             CanUserResize="False"
-                            Header="{StaticResource ViewPortStatusHeader}">
-                            <DataGridTemplateColumn.CellTemplate>
-                                <DataTemplate>
-                                    <ui:TextBlock
-                                        HorizontalAlignment="Center"
-                                        Text="{Binding IsPlacedStatus}">
-                                    </ui:TextBlock>
-                                </DataTemplate>
-                            </DataGridTemplateColumn.CellTemplate>
-                        </DataGridTemplateColumn>
+                            Binding="{Binding IsPlacedStatus}"
+                            Header="{StaticResource ViewPortStatusHeader}" />
                         <DataGridTemplateColumn
                             CanUserResize="False">
                             <DataGridTemplateColumn.CellTemplate>
@@ -139,6 +132,7 @@
                 ButtonContent="{ui:SymbolIcon Add24}"
                 ButtonCommand="{Binding AddScheduleCommand}">
                 <ui:DataGrid
+                    CellStyle="{StaticResource CustomDataGridCell}"
                     Style="{StaticResource CustomResizableDataGridStyle}"
                     ItemsSource="{Binding Schedules}"
                     SelectedItem="{Binding SelectedSchedule}">
@@ -155,20 +149,11 @@
                             IsReadOnly="True"
                             Header="{StaticResource SchedulesCountHeader}"
                             Binding="{Binding CountOnSheets}" />
-                        <DataGridTemplateColumn
+                        <DataGridTextColumn
                             Width="Auto"
                             CanUserResize="False"
-                            SortMemberPath="IsPlacedStatus"
-                            Header="{StaticResource ScheduleStatusHeader}">
-                            <DataGridTemplateColumn.CellTemplate>
-                                <DataTemplate>
-                                    <ui:TextBlock
-                                        HorizontalAlignment="Center"
-                                        Text="{Binding IsPlacedStatus}">
-                                    </ui:TextBlock>
-                                </DataTemplate>
-                            </DataGridTemplateColumn.CellTemplate>
-                        </DataGridTemplateColumn>
+                            Binding="{Binding IsPlacedStatus}"
+                            Header="{StaticResource ScheduleStatusHeader}" />
                         <DataGridTemplateColumn
                             CanUserResize="False">
                             <DataGridTemplateColumn.CellTemplate>
@@ -193,6 +178,7 @@
                 ButtonContent="{ui:SymbolIcon Add24}"
                 ButtonCommand="{Binding AddAnnotationCommand}">
                 <ui:DataGrid
+                    CellStyle="{StaticResource CustomDataGridCell}"
                     Style="{StaticResource CustomResizableDataGridStyle}"
                     ItemsSource="{Binding Annotations}"
                     SelectedItem="{Binding SelectedAnnotation}">
@@ -209,20 +195,11 @@
                             IsReadOnly="True"
                             Header="{StaticResource AnnotationTypeHeader}"
                             Binding="{Binding SymbolName}" />
-                        <DataGridTemplateColumn
+                        <DataGridTextColumn
                             Width="Auto"
                             CanUserResize="False"
-                            SortMemberPath="IsPlacedStatus"
-                            Header="{StaticResource AnnotationStatusHeader}">
-                            <DataGridTemplateColumn.CellTemplate>
-                                <DataTemplate>
-                                    <ui:TextBlock
-                                        HorizontalAlignment="Center"
-                                        Text="{Binding IsPlacedStatus}">
-                                    </ui:TextBlock>
-                                </DataTemplate>
-                            </DataGridTemplateColumn.CellTemplate>
-                        </DataGridTemplateColumn>
+                            Binding="{Binding IsPlacedStatus}"
+                            Header="{StaticResource AnnotationStatusHeader}" />
                         <DataGridTemplateColumn
                             CanUserResize="False">
                             <DataGridTemplateColumn.CellTemplate>

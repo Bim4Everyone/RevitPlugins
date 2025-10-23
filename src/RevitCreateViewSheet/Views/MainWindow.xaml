@@ -386,6 +386,7 @@
                         <ui:DataGrid
                             x:Name="_sheets"
                             SelectionMode="Extended"
+                            CellStyle="{StaticResource CustomDataGridCell}"
                             Style="{StaticResource CustomResizableDataGridStyle}"
                             res:DataGridSyncEditToSelectedItemProperty.SyncEditToSelectedItem="True"
                             res:CustomSortBehavior.AllowCustomSort="True"
@@ -402,6 +403,7 @@
                                         <DataTemplate>
                                             <ui:TextBox
                                                 Margin="10 0"
+                                                ToolTip="{Binding AlbumBlueprint}"
                                                 Text="{Binding AlbumBlueprint, UpdateSourceTrigger=PropertyChanged}" />
                                         </DataTemplate>
                                     </DataGridTemplateColumn.CellTemplate>
@@ -416,6 +418,7 @@
                                         <DataTemplate>
                                             <ui:TextBox
                                                 Margin="10 0"
+                                                ToolTip="{Binding SheetCustomNumber}"
                                                 Text="{Binding SheetCustomNumber, UpdateSourceTrigger=PropertyChanged}" />
                                         </DataTemplate>
                                     </DataGridTemplateColumn.CellTemplate>
@@ -429,6 +432,7 @@
                                     <DataGridTemplateColumn.CellTemplate>
                                         <DataTemplate>
                                             <ui:TextBox
+                                                ToolTip="{Binding SheetNumber}"
                                                 IsEnabled="{Binding Path=DataContext.NumberByMask, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Window}, Converter={StaticResource InverseBooleanConverter}}"
                                                 Text="{Binding SheetNumber, UpdateSourceTrigger=PropertyChanged}" />
                                         </DataTemplate>
@@ -443,6 +447,7 @@
                                         <DataTemplate>
                                             <ui:TextBox
                                                 Margin="10 0"
+                                                ToolTip="{Binding Name}"
                                                 Text="{Binding Name, UpdateSourceTrigger=PropertyChanged}" />
                                         </DataTemplate>
                                     </DataGridTemplateColumn.CellTemplate>
@@ -459,6 +464,7 @@
                                                 Grid.Column="1"
                                                 Margin="10 0 0 0"
                                                 DisplayMemberPath="Name"
+                                                ToolTip="{Binding TitleBlock.Name}"
                                                 Style="{StaticResource CustomComboBox}"
                                                 ItemsSource="{Binding Path=DataContext.AllTitleBlocks, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Window}}"
                                                 SelectedItem="{Binding TitleBlock, UpdateSourceTrigger=PropertyChanged}" />
