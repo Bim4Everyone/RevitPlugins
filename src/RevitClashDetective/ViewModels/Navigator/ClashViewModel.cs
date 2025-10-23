@@ -16,6 +16,7 @@ internal class ClashViewModel : BaseViewModel, IClashViewModel, IEquatable<Clash
     private ClashStatus _clashStatus;
     private string _clashName;
     private readonly RevitRepository _revitRepository;
+    private bool _clashDataIsValid;
 
     public ClashViewModel(RevitRepository revitRepository, ClashModel clash) {
         _revitRepository = revitRepository;
@@ -58,6 +59,11 @@ internal class ClashViewModel : BaseViewModel, IClashViewModel, IEquatable<Clash
     public string ClashName {
         get => _clashName;
         set => RaiseAndSetIfChanged(ref _clashName, value);
+    }
+
+    public bool ClashDataIsValid {
+        get => _clashDataIsValid;
+        set => RaiseAndSetIfChanged(ref _clashDataIsValid, value);
     }
 
     public ElementId FirstId { get; }
@@ -173,15 +179,18 @@ internal class ClashViewModel : BaseViewModel, IClashViewModel, IEquatable<Clash
         ClashData = clashModel
             .SetRevitRepository(_revitRepository)
             .GetClashData();
+        ClashDataIsValid = ClashData.IsValid;
 
         FirstElementVolume = _revitRepository.ConvertToM3(ClashData.MainElementVolume);
         SecondElementVolume = _revitRepository.ConvertToM3(ClashData.OtherElementVolume);
 
         IntersectionVolume = Math.Round(_revitRepository.ConvertToM3(ClashData.ClashVolume), 6);
-        FirstElementIntersectionPercentage =
-            Math.Round(ClashData.ClashVolume / ClashData.MainElementVolume * 100, 2);
-        SecondElementIntersectionPercentage =
-             Math.Round(ClashData.ClashVolume / ClashData.OtherElementVolume * 100, 2);
+        FirstElementIntersectionPercentage = ClashData.MainElementVolume > 0
+            ? Math.Round(ClashData.ClashVolume / ClashData.MainElementVolume * 100, 2)
+            : 0;
+        SecondElementIntersectionPercentage = ClashData.OtherElementVolume > 0
+            ? Math.Round(ClashData.ClashVolume / ClashData.OtherElementVolume * 100, 2)
+            : 0;
     }
 
     public void SetElementParams(string[] paramNames) {

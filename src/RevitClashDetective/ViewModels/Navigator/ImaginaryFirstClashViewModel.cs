@@ -78,6 +78,8 @@ internal class ImaginaryFirstClashViewModel
 
     public double SecondElementVolume => 0;
 
+    public bool ClashDataIsValid => true;
+
 
     public ElementModel GetFirstElement() {
         return _firstElement.Element;

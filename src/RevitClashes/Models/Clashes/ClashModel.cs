@@ -113,7 +113,7 @@ internal class ClashModel : IEquatable<ClashModel> {
         } catch(ArgumentException) {
             return new ClashData();
         } catch(Autodesk.Revit.Exceptions.ApplicationException) {
-            return new ClashData();
+            return new InvalidClashData();
         }
     }
 
@@ -130,8 +130,6 @@ internal class ClashModel : IEquatable<ClashModel> {
                 }
             }
         } catch(NullReferenceException) {
-            intersection = 0;
-        } catch(Autodesk.Revit.Exceptions.ApplicationException) {
             intersection = 0;
         }
         return intersection;

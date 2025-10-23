@@ -139,8 +139,10 @@ internal class ProvidersClashDetector {
                 solid1,
                 BooleanOperationsType.Intersect);
             return intersection.Volume > 0;
-        } catch {
-            return new ElementIntersectsSolidFilter(solid1).PassesFilter(element);
+        } catch(Autodesk.Revit.Exceptions.InvalidOperationException) {
+            // будем считать, что коллизия есть, но с кривой геометрией.
+            // Далее её можно будет проверить по объему и проценту пересечения в ClashData
+            return true;
         }
     }
 

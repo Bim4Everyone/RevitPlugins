@@ -62,6 +62,11 @@ internal interface IClashViewModel : INotifyPropertyChanged {
     double SecondElementVolume { get; }
 
     /// <summary>
+    /// Флаг, обозначающий, что в коллизии находится какая-то ошибка
+    /// </summary>
+    bool ClashDataIsValid { get; }
+
+    /// <summary>
     /// Значения дополнительных параметров первого элемента коллизии.
     /// Названия генерируемых свойств должны быть в формате Field0, Field1 и так далее.
     /// </summary>
