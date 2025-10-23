@@ -1,9 +1,19 @@
 using System.Windows;
 
+using dosymep.SimpleServices;
+
 
 namespace RevitArchitecturalDocumentation.Views;
 public partial class CopySpecSheetInstanceV {
-    public CopySpecSheetInstanceV() {
+    public CopySpecSheetInstanceV(
+    ILoggerService loggerService,
+    ISerializationService serializationService,
+    ILanguageService languageService, ILocalizationService localizationService,
+    IUIThemeService uiThemeService, IUIThemeUpdaterService themeUpdaterService)
+    : base(loggerService,
+        serializationService,
+        languageService, localizationService,
+        uiThemeService, themeUpdaterService) {
         InitializeComponent();
     }
 

@@ -39,7 +39,7 @@ internal class CreatingARDocsVM : BaseViewModel {
         SpecOptsVM = new SpecOptionsVM(pluginConfig, revitRepository, mainOptions.SpecOpts);
 
 
-        LoadViewCommand = new RelayCommand(LoadView);
+        LoadViewCommand = RelayCommand.Create<CreatingARDocsV>(LoadView);
         AcceptViewCommand = RelayCommand.Create(AcceptView, CanAcceptView);
     }
 
@@ -86,9 +86,8 @@ internal class CreatingARDocsVM : BaseViewModel {
     /// <summary>
     /// Метод, отрабатывающий при загрузке окна
     /// </summary>
-    private void LoadView(object obj) {
-
-        PCOnASPDocsView = obj as CreatingARDocsV;
+    private void LoadView(CreatingARDocsV creatingARDocsV) {
+        PCOnASPDocsView = creatingARDocsV;
         LoadConfig();
 
         if(SelectedViews.Count == 0) {

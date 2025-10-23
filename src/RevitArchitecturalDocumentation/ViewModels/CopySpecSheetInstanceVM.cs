@@ -12,6 +12,7 @@ using dosymep.WPF.ViewModels;
 
 using RevitArchitecturalDocumentation.Models;
 using RevitArchitecturalDocumentation.Models.Exceptions;
+using RevitArchitecturalDocumentation.ViewModels.Components;
 using RevitArchitecturalDocumentation.Views;
 
 namespace RevitArchitecturalDocumentation.ViewModels;
@@ -21,6 +22,7 @@ internal class CopySpecSheetInstanceVM : BaseViewModel {
 
     private ObservableCollection<SheetHelper> _selectedSheets = [];
     private ObservableCollection<SpecHelper> _scheduleSheetInstances = [];
+    private CopySpecSheetInstanceV _copySpecView;
     private List<string> _filterNamesFromSpecs = [];
     private string _selectedFilterNameForSpecs = string.Empty;
 
@@ -31,7 +33,7 @@ internal class CopySpecSheetInstanceVM : BaseViewModel {
         _revitRepository = revitRepository;
 
 
-        LoadViewCommand = RelayCommand.Create(LoadView);
+        LoadViewCommand = RelayCommand.Create<CopySpecSheetInstanceV>(LoadView);
         AcceptViewCommand = RelayCommand.Create(AcceptView, CanAcceptView);
         SelectSpecsCommand = RelayCommand.Create(SelectSpecs);
     }
@@ -67,6 +69,11 @@ internal class CopySpecSheetInstanceVM : BaseViewModel {
         set => RaiseAndSetIfChanged(ref _filterNamesFromSpecs, value);
     }
 
+    public CopySpecSheetInstanceV CopySpecView {
+        get => _copySpecView;
+        set => RaiseAndSetIfChanged(ref _copySpecView, value);
+    }
+
     /// <summary>
     /// Имя поля фильтра, которое указал пользователь как то, где прописан этаж
     /// </summary>
@@ -80,12 +87,11 @@ internal class CopySpecSheetInstanceVM : BaseViewModel {
         set => RaiseAndSetIfChanged(ref _errorText, value);
     }
 
-
     /// <summary>
     /// Метод, отрабатывающий при загрузке окна
     /// </summary>
-    private void LoadView() {
-
+    private void LoadView(CopySpecSheetInstanceV window) {
+        CopySpecView = window;
         LoadConfig();
         GetSelectedSheets();
     }
@@ -94,7 +100,6 @@ internal class CopySpecSheetInstanceVM : BaseViewModel {
     /// Метод, отрабатывающий при нажатии кнопки "Ок"
     /// </summary>
     private void AcceptView() {
-
         SaveConfig();
         CopySpecs();
     }
@@ -103,12 +108,10 @@ internal class CopySpecSheetInstanceVM : BaseViewModel {
     /// Определяет можно ли запустить работу плагина
     /// </summary>
     private bool CanAcceptView() {
-
         if(SelectedSheets.Count == 0) {
             ErrorText = "Не выбрано ни одного листа";
             return false;
         }
-
 
         foreach(var sheetHelper in SelectedSheets) {
 
@@ -126,12 +129,10 @@ internal class CopySpecSheetInstanceVM : BaseViewModel {
             }
         }
 
-
         if(ScheduleSheetInstances.Count == 0) {
             ErrorText = "Не выбрано ни одной спецификации на листе";
             return false;
         }
-
 
         foreach(var specHelper in ScheduleSheetInstances) {
 
@@ -210,6 +211,7 @@ internal class CopySpecSheetInstanceVM : BaseViewModel {
     /// Метод команды по выбору видовых окон спецификаций в пространстве Revit после закрытия окна плагина
     /// </summary>
     private void SelectSpecs() {
+        CopySpecView.Hide();
 
         ErrorText = string.Empty;
         ScheduleSheetInstances.Clear();
@@ -233,11 +235,7 @@ internal class CopySpecSheetInstanceVM : BaseViewModel {
         }
         GetFilterNames();
 
-
-        var window = new CopySpecSheetInstanceV {
-            DataContext = this
-        };
-        window.ShowDialog();
+        CopySpecView.ShowDialog();
     }
 
 
