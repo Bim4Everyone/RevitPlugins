@@ -7,6 +7,8 @@
         x:Key="Ok">ОК</system:String>
     <system:String
         x:Key="Cancel">Отмена</system:String>
+    <system:String
+        x:Key="BIM">BIM</system:String>
 
     <system:String
         x:Key="SettingsWindow.Title">Настройки</system:String>
@@ -88,4 +90,188 @@
         x:Key="ReportsResolver.KeepOnlyOld">Не заменять</system:String>
     <system:String
         x:Key="ReportsResolver.CopyAndRename">Загрузить с переименованием</system:String>
+
+    <system:String
+        x:Key="FilterNameView.Title">Имя нового поискового набора</system:String>
+    <system:String
+        x:Key="FilterNameView.Label">Имя:</system:String>
+    <system:String
+        x:Key="FilterCreation.Title">Поисковые наборы</system:String>
+    <system:String
+        x:Key="FilterCreation.SearchSets">Поисковые наборы</system:String>
+    <system:String
+        x:Key="FilterCreation.Categories">Категории</system:String>
+    <system:String
+        x:Key="FilterCreation.CategoriesSearch">Поиск</system:String>
+    <system:String
+        x:Key="FilterCreation.CategoryNameHeader">Наименование</system:String>
+    <system:String
+        x:Key="FilterCreation.HideUncheckedCategories">Скрыть неотмеченные категории</system:String>
+    <system:String
+        x:Key="FilterCreation.Criteria">Критерии фильтрации</system:String>
+    <system:String
+        x:Key="FilterCreation.Load">Загрузить поисковые наборы</system:String>
+    <system:String
+        x:Key="FilterCreation.AddSearchSet">Создать поисковый набор</system:String>
+    <system:String
+        x:Key="FilterCreation.RenameSearchSet">Изменить имя поискового набора</system:String>
+    <system:String
+        x:Key="FilterCreation.DeleteSearchSet">Удалить поисковый набор</system:String>
+    <system:String
+        x:Key="FilterCreation.Save">Сохранить</system:String>
+    <system:String
+        x:Key="FilterCreation.SaveAs">Сохранить как</system:String>
+    <system:String
+        x:Key="FilterCreation.AddRule">Добавить правило</system:String>
+    <system:String
+        x:Key="FilterCreation.AddSet">Добавить набор</system:String>
+    <system:String
+        x:Key="FilterCreation.CheckSetButton">Проверка</system:String>
+    <system:String
+        x:Key="FilterCreation.CheckSetButtonTooltip">Проверить поисковый набор</system:String>
+    <system:String
+        x:Key="FilterCreation.DeleteFilterPrompt">Удалить фильтр "{0}"?</system:String>
+    <system:String
+        x:Key="FilterCreation.SuccessSave">Поисковые наборы успешно сохранены</system:String>
+    <system:String
+        x:Key="FilterCreation.SuccessLoad">Файл поисковых наборов успешно загружен</system:String>
+
+    <system:String
+        x:Key="FilterCreation.Validation.SetName">Введите имя поискового набора.</system:String>
+    <system:String
+        x:Key="FilterCreation.Validation.DuplicatedName">Поисковый набор с таким именем уже существует.</system:String>
+    <system:String
+        x:Key="FilterCreation.Validation.SelectCategories">Выберите категории в поисковом наборе "{0}".</system:String>
+    <system:String
+        x:Key="FilterCreation.Validation.EmptySet">Все поля в поисковом наборе "{0}" должны быть заполнены.</system:String>
+
+    <system:String
+        x:Key="MainWindow.Title">Проверки на коллизии</system:String>
+    <system:String
+        x:Key="MainWindow.Load">Загрузить проверки</system:String>
+    <system:String
+        x:Key="MainWindow.Save">Сохранить</system:String>
+    <system:String
+        x:Key="MainWindow.SaveAs">Сохранить как</system:String>
+    <system:String
+        x:Key="MainWindow.AddCheck">Добавить проверку</system:String>
+    <system:String
+        x:Key="MainWindow.DeleteCheck">Удалить проверку</system:String>
+    <system:String
+        x:Key="MainWindow.CheckSearch">Поиск</system:String>
+    <system:String
+        x:Key="MainWindow.NameLabel">Наименование</system:String>
+    <system:String
+        x:Key="MainWindow.FirstSelectionLabel">Выбор 1</system:String>
+    <system:String
+        x:Key="MainWindow.SecondSelectionLabel">Выбор 2</system:String>
+    <system:String
+        x:Key="MainWindow.ShowClashes">Показать отчет по коллизиям</system:String>
+    <system:String
+        x:Key="MainWindow.SelectFilesLabel">Выберите файлы</system:String>
+    <system:String
+        x:Key="MainWindow.SelectSearchSetsLabel">Выберите поисковые наборы</system:String>
+    <system:String
+        x:Key="MainWindow.CheckDefaultName">Без имени</system:String>
+    <system:String
+        x:Key="MainWindow.SuccessClashDetection">Проверка на коллизии прошла успешно</system:String>
+    <system:String
+        x:Key="MainWindow.SuccessSave">Файл проверок успешно сохранен</system:String>
+    <system:String
+        x:Key="MainWindow.SuccessLoad">Файл проверок успешно загружен</system:String>
+
+    <system:String
+        x:Key="MainWindow.Validation.MissingFiles1">Не найдены файлы выборки 1: {0}</system:String>
+    <system:String
+        x:Key="MainWindow.Validation.MissingFilters1">Не найдены поисковые наборы выборки 1: {0}</system:String>
+    <system:String
+        x:Key="MainWindow.Validation.MissingFiles2">Не найдены файлы выборки 2: {0}</system:String>
+    <system:String
+        x:Key="MainWindow.Validation.MissingFilters2">Не найдены поисковые наборы выборки 2: {0}</system:String>
+    <system:String
+        x:Key="MainWindow.Validation.NamesDuplicated">У проверок должны быть разные имена.</system:String>
+    <system:String
+        x:Key="MainWindow.Validation.EmptyFilterInCheck">У проверки "{0}" необходимо выбрать хотя бы один поисковый набор.</system:String>
+    <system:String
+        x:Key="MainWindow.Validation.EmptyFileInCheck">У проверки "{0}" необходимо выбрать хотя бы один файл.</system:String>
+    <system:String
+        x:Key="MainWindow.Validation.SelectAnyCheck">Для поиска коллизий должна быть выбрана хотя бы одна проверка.</system:String>
+
+    <system:String
+        x:Key="Navigator.DeletePrompt">Вы уверены, что хотите удалить файл?</system:String>
+    <system:String
+        x:Key="Navigator.SuccessSave">Файл успешно сохранен</system:String>
+    <system:String
+        x:Key="Navigator.SuccessLoad">Файл успешно загружен</system:String>
+
+    <system:String
+        x:Key="SelectableNamesDialog.NameHeader">Название</system:String>
+    <system:String
+        x:Key="SelectableNamesDialog.SelectFiles">Выберите файлы</system:String>
+    <system:String
+        x:Key="SelectableNamesDialog.SelectSearchSets">Выберите поисковые наборы</system:String>
+
+    <system:String
+        x:Key="ConfigLoader.InvalidFile">Неверный файл конфигурации.</system:String>
+
+    <system:String
+        x:Key="SearchSet.FamilyType">Имя типоразмера</system:String>
+    <system:String
+        x:Key="SearchSet.Family">Имя семейства</system:String>
+    <system:String
+        x:Key="SearchSet.Category">Категория</system:String>
+    <system:String
+        x:Key="SearchSet.File">Файл</system:String>
+    <system:String
+        x:Key="SearchSet.Parameter">Параметр: {0}</system:String>
+
+    <system:String
+        x:Key="Parameter.InvalidStorageType">У параметра {0} не определен тип данных.</system:String>
+    <system:String
+        x:Key="Parameter.CannotParseInt">Значение параметра "{0}" должно быть целым числом.</system:String>
+    <system:String
+        x:Key="Parameter.CannotParseDouble">Значение параметра "{0}" должно быть вещественным числом.</system:String>
+
+    <system:String
+        x:Key="SetEvaluators.Or">Или</system:String>
+    <system:String
+        x:Key="SetEvaluators.And">И</system:String>
+    <system:String
+        x:Key="RuleEvaluators.FilterStringBeginsWith">Начинается с</system:String>
+    <system:String
+        x:Key="RuleEvaluators.FilterStringNotBeginsWith">Не начинается с</system:String>
+    <system:String
+        x:Key="RuleEvaluators.FilterStringContains">Содержит</system:String>
+    <system:String
+        x:Key="RuleEvaluators.FilterStringNotContains">Не содержит</system:String>
+    <system:String
+        x:Key="RuleEvaluators.FilterStringEndsWith">Заканчивается на</system:String>
+    <system:String
+        x:Key="RuleEvaluators.FilterStringNotEndsWith">Не заканчивается на</system:String>
+    <system:String
+        x:Key="RuleEvaluators.FilterStringEquals">Равно</system:String>
+    <system:String
+        x:Key="RuleEvaluators.FilterStringGreater">Больше</system:String>
+    <system:String
+        x:Key="RuleEvaluators.FilterStringGreaterOrEqual">Больше или равно</system:String>
+    <system:String
+        x:Key="RuleEvaluators.FilterStringLess">Меньше</system:String>
+    <system:String
+        x:Key="RuleEvaluators.FilterStringLessOrEqual">Меньше или равно</system:String>
+    <system:String
+        x:Key="RuleEvaluators.FilterNumericEquals">Равно</system:String>
+    <system:String
+        x:Key="RuleEvaluators.FilterNumericGreater">Больше</system:String>
+    <system:String
+        x:Key="RuleEvaluators.FilterNumericGreaterOrEqual">Больше или равно</system:String>
+    <system:String
+        x:Key="RuleEvaluators.FilterNumericLess">Меньше</system:String>
+    <system:String
+        x:Key="RuleEvaluators.FilterNumericLessOrEqual">Меньше или равно</system:String>
+    <system:String
+        x:Key="RuleEvaluators.FilterHasNoValue">Без значения</system:String>
+    <system:String
+        x:Key="RuleEvaluators.FilterHasValue">Имеет значение</system:String>
+    <system:String
+        x:Key="RuleEvaluators.FilterNotEquals">Не равно</system:String>
 </ResourceDictionary>

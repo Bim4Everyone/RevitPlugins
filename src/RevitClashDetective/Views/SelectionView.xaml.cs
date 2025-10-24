@@ -1,12 +1,13 @@
 using dosymep.SimpleServices;
 
 namespace RevitClashDetective.Views;
-public partial class CriterionView {
-    public CriterionView() : base() {
+public partial class SelectionView {
+
+    public SelectionView() : base() {
         InitializeComponent();
     }
 
-    public CriterionView(
+    public SelectionView(
         ILoggerService loggerService,
         ILanguageService languageService,
         ILocalizationService localizationService,

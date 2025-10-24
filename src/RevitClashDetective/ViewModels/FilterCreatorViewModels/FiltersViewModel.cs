@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.ComponentModel;
 using System.IO;
 using System.Linq;
 using System.Windows;
@@ -12,6 +13,9 @@ using dosymep.SimpleServices;
 using dosymep.WPF.Commands;
 using dosymep.WPF.ViewModels;
 
+using Ninject;
+using Ninject.Syntax;
+
 using RevitClashDetective.Models;
 using RevitClashDetective.Models.FilterModel;
 using RevitClashDetective.ViewModels.SearchSet;
@@ -21,6 +25,8 @@ using RevitClashDetective.Views;
 namespace RevitClashDetective.ViewModels.FilterCreatorViewModels;
 internal class FiltersViewModel : BaseViewModel {
     private readonly RevitRepository _revitRepository;
+    private readonly ILocalizationService _localization;
+    private readonly IResolutionRoot _resolutionRoot;
     private readonly FiltersConfig _config;
     private ObservableCollection<FilterViewModel> _filters;
     private string _errorText;
@@ -30,21 +36,24 @@ internal class FiltersViewModel : BaseViewModel {
 
     public FiltersViewModel(
         RevitRepository revitRepository,
+        ILocalizationService localization,
         IOpenFileDialogService openFileDialogService,
         ISaveFileDialogService saveFileDialogService,
         IMessageBoxService messageBoxService,
+        IResolutionRoot resolutionRoot,
         FiltersConfig config) {
 
         _revitRepository = revitRepository ?? throw new ArgumentNullException(nameof(revitRepository));
+        _localization = localization ?? throw new ArgumentNullException(nameof(localization));
         OpenFileDialogService = openFileDialogService ?? throw new ArgumentNullException(nameof(openFileDialogService));
         SaveFileDialogService = saveFileDialogService ?? throw new ArgumentNullException(nameof(saveFileDialogService));
         MessageBoxService = messageBoxService ?? throw new ArgumentNullException(nameof(messageBoxService));
+        _resolutionRoot = resolutionRoot ?? throw new ArgumentNullException(nameof(resolutionRoot));
         _config = config ?? throw new ArgumentNullException(nameof(config));
 
         InitializeFilters();
         InitializeTimer();
 
-        SelectedFilterChangedCommand = RelayCommand.Create(SelectedFilterChanged, CanSelectedFilterChanged);
         CreateCommand = RelayCommand.Create<Window>(Create);
         DeleteCommand = RelayCommand.Create(Delete, CanDelete);
         RenameCommand = RelayCommand.Create<Window>(Rename, CanRename);
@@ -54,6 +63,9 @@ internal class FiltersViewModel : BaseViewModel {
         CheckSearchSetCommand = RelayCommand.Create(CheckSearchSet, CanSave);
 
         SelectedFilter = Filters.FirstOrDefault();
+        SelectedFilter?.InitializeFilter();
+
+        PropertyChanged += OnSelectedFilterChanged;
     }
 
     public string ErrorText {
@@ -69,8 +81,6 @@ internal class FiltersViewModel : BaseViewModel {
     public ICommand CreateCommand { get; }
     public ICommand DeleteCommand { get; }
     public ICommand RenameCommand { get; }
-    public ICommand SelectedFilterChangedCommand { get; }
-
     public ICommand SaveCommand { get; }
     public ICommand SaveAsCommand { get; }
     public ICommand LoadCommand { get; }
@@ -94,6 +104,12 @@ internal class FiltersViewModel : BaseViewModel {
         return Filters.Select(item => item.GetFilter());
     }
 
+    private void OnSelectedFilterChanged(object sender, PropertyChangedEventArgs e) {
+        if(e.PropertyName == nameof(SelectedFilter)) {
+            SelectedFilter?.InitializeFilter();
+        }
+    }
+
     private void InitializeFilters() {
         Filters = new ObservableCollection<FilterViewModel>(InitializeFilters(_config));
     }
@@ -102,23 +118,17 @@ internal class FiltersViewModel : BaseViewModel {
         foreach(var filter in config.Filters.OrderBy(item => item.Name)) {
             filter.RevitRepository = _revitRepository;
             filter.Set.SetRevitRepository(_revitRepository);
-            yield return new FilterViewModel(_revitRepository, filter);
+            yield return new FilterViewModel(_revitRepository, _localization, filter);
         }
     }
 
-    private void SelectedFilterChanged() {
-        SelectedFilter?.InitializeFilter();
-    }
-
-    private bool CanSelectedFilterChanged() {
-        return SelectedFilter != null;
-    }
-
     private void Create(Window p) {
-        var newFilterName = new FilterNameViewModel(Filters.Select(f => f.Name));
-        var view = new FilterNameView() { DataContext = newFilterName, Owner = p };
+        var newFilterName = new FilterNameViewModel(_localization, Filters.Select(f => f.Name));
+        var view = _resolutionRoot.Get<FilterNameView>();
+        view.DataContext = newFilterName;
+        view.Owner = p;
         if(view.ShowDialog() == true) {
-            var newFilter = new FilterViewModel(_revitRepository) { Name = newFilterName.Name, IsInitialized = true };
+            var newFilter = new FilterViewModel(_revitRepository, _localization) { Name = newFilterName.Name, IsInitialized = true };
             Filters.Add(newFilter);
 
             Filters = new ObservableCollection<FilterViewModel>(Filters.OrderBy(item => item.Name));
@@ -127,8 +137,9 @@ internal class FiltersViewModel : BaseViewModel {
     }
 
     private void Delete() {
-        if(MessageBoxService.Show($"Удалить фильтр \"{SelectedFilter.Name}\"?",
-            "BIM",
+        if(MessageBoxService.Show(
+            _localization.GetLocalizedString("FilterCreation.DeleteFilterPrompt", SelectedFilter.Name),
+            _localization.GetLocalizedString("BIM"),
             MessageBoxButton.YesNo,
             MessageBoxImage.Warning,
             MessageBoxResult.No) == MessageBoxResult.Yes) {
@@ -142,8 +153,10 @@ internal class FiltersViewModel : BaseViewModel {
     }
 
     private void Rename(Window p) {
-        var newFilterName = new FilterNameViewModel(Filters.Select(f => f.Name), SelectedFilter.Name);
-        var view = new FilterNameView() { DataContext = newFilterName, Owner = p };
+        var newFilterName = new FilterNameViewModel(_localization, Filters.Select(f => f.Name), SelectedFilter.Name);
+        var view = _resolutionRoot.Get<FilterNameView>();
+        view.DataContext = newFilterName;
+        view.Owner = p;
         if(view.ShowDialog() == true) {
             SelectedFilter.Name = newFilterName.Name;
             Filters = new ObservableCollection<FilterViewModel>(Filters.OrderBy(item => item.Name));
@@ -152,7 +165,7 @@ internal class FiltersViewModel : BaseViewModel {
     }
 
     private bool CanRename(Window p) {
-        return SelectedFilter != null;
+        return p is not null && SelectedFilter is not null;
     }
 
     private void Save() {
@@ -161,7 +174,7 @@ internal class FiltersViewModel : BaseViewModel {
         filtersConfig.Filters = GetFilters().ToList();
         filtersConfig.RevitVersion = ModuleEnvironment.RevitVersion;
         filtersConfig.SaveProjectConfig();
-        MessageText = "Поисковые наборы успешно сохранены";
+        MessageText = _localization.GetLocalizedString("FilterCreation.SuccessSave");
         RefreshMessage();
     }
 
@@ -173,40 +186,51 @@ internal class FiltersViewModel : BaseViewModel {
 
         var cs = new ConfigSaverService(_revitRepository, SaveFileDialogService);
         cs.Save(filtersConfig);
-        MessageText = "Поисковые наборы успешно сохранены";
+        MessageText = _localization.GetLocalizedString("FilterCreation.SuccessSave");
         RefreshMessage();
     }
 
     private bool CanSave() {
-        if(SelectedFilter == null || !SelectedFilter.IsInitialized) {
+        var emptyCategoryFilter = Filters.FirstOrDefault(f => f.AllCategories.All(c => !c.IsSelected));
+        if(emptyCategoryFilter is not null) {
+            ErrorText = _localization.GetLocalizedString(
+                "FilterCreation.Validation.SelectCategories", emptyCategoryFilter.Name);
             return false;
         }
 
-        if(Filters.Any(item => item.Set.IsEmpty())) {
-            ErrorText = $"Все поля в поисковом наборе \"{Filters.FirstOrDefault(item => item.Set.IsEmpty())?.Name}\" должны быть заполнены.";
+        var emptyFilter = Filters.FirstOrDefault(f => f.Set.IsEmpty());
+        if(emptyFilter is not null) {
+            ErrorText = _localization.GetLocalizedString(
+                "FilterCreation.Validation.EmptySet", emptyFilter.Name);
             return false;
         }
 
-        ErrorText = Filters.FirstOrDefault(item => item.Set.GetErrorText() != null)?.Set?.GetErrorText();
-        return string.IsNullOrEmpty(ErrorText);
+        string errorSetText = Filters.FirstOrDefault(s => !string.IsNullOrWhiteSpace(s.Set.GetErrorText()))
+            ?.Set.GetErrorText();
+        if(!string.IsNullOrWhiteSpace(errorSetText)) {
+            ErrorText = errorSetText;
+            return false;
+        }
+        ErrorText = null;
+        return true;
     }
 
     private void Load() {
-        var cl = new ConfigLoaderService(_revitRepository, OpenFileDialogService, MessageBoxService);
+        var cl = new ConfigLoaderService(_revitRepository, _localization, OpenFileDialogService, MessageBoxService);
         var config = cl.Load<FiltersConfig>();
         cl.CheckConfig(config);
 
         var newFilters = InitializeFilters(config).ToList();
         var nameResolver = new NameResolver<FilterViewModel>(Filters, newFilters);
         Filters = new ObservableCollection<FilterViewModel>(nameResolver.GetCollection());
-        MessageText = "Файл поисковых наборов успешно загружен";
+        MessageText = _localization.GetLocalizedString("FilterCreation.SuccessLoad");
         RefreshMessage();
     }
 
     private void CheckSearchSet() {
         Save();
         var filter = SelectedFilter.GetFilter();
-        var vm = new SearchSetsViewModel(_revitRepository, filter, MessageBoxService);
+        var vm = new SearchSetsViewModel(_revitRepository, _localization, filter, MessageBoxService);
         var view = new SearchSetView() { DataContext = vm };
         view.Show();
     }

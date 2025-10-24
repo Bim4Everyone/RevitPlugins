@@ -1,7 +1,6 @@
 using System.Globalization;
 using System.IO;
 using System.Reflection;
-using System.Windows;
 
 using Autodesk.Revit.Attributes;
 using Autodesk.Revit.UI;
@@ -10,7 +9,7 @@ using dosymep.Bim4Everyone;
 using dosymep.Bim4Everyone.ProjectConfigs;
 using dosymep.Bim4Everyone.SimpleServices;
 using dosymep.WpfCore.Ninject;
-using dosymep.Xpf.Core.Ninject;
+using dosymep.WpfUI.Core.Ninject;
 
 using Ninject;
 
@@ -20,6 +19,8 @@ using RevitClashDetective.Models.GraphicView;
 using RevitClashDetective.Models.Handlers;
 using RevitClashDetective.ViewModels.ClashDetective;
 using RevitClashDetective.Views;
+
+using Wpf.Ui;
 
 namespace RevitClashDetective;
 
@@ -44,6 +45,9 @@ public class DetectiveClashesCommand : BasePluginCommand {
         kernel.Bind<ParameterFilterProvider>()
             .ToSelf()
             .InSingletonScope();
+        kernel.Bind<IContentDialogService>()
+            .To<ContentDialogService>()
+            .InSingletonScope();
         kernel.Bind<FiltersConfig>()
             .ToMethod(c => {
                 var repo = c.Kernel.Get<RevitRepository>();
@@ -59,18 +63,12 @@ public class DetectiveClashesCommand : BasePluginCommand {
         kernel.Bind<SettingsConfig>()
             .ToMethod(c => SettingsConfig.GetSettingsConfig(c.Kernel.Get<IConfigSerializer>()));
 
-        kernel.Bind<MainViewModel>()
-            .ToSelf()
-            .InSingletonScope();
-        kernel.Bind<MainWindow>()
-            .ToSelf()
-            .InSingletonScope()
-            .WithPropertyValue(nameof(Window.DataContext), c => c.Kernel.Get<MainViewModel>());
-        kernel.UseXtraOpenFileDialog<MainViewModel>()
-            .UseXtraSaveFileDialog<MainViewModel>()
-            .UseXtraMessageBox<MainViewModel>();
+        kernel.BindMainWindow<MainViewModel, MainWindow>();
+        kernel.UseWpfOpenFileDialog<MainViewModel>()
+            .UseWpfSaveFileDialog<MainViewModel>()
+            .UseWpfUIMessageBox<MainViewModel>();
 
-
+        kernel.UseWpfUIThemeUpdater();
         string assemblyName = Assembly.GetExecutingAssembly().GetName().Name;
         kernel.UseWpfLocalization(
             $"/{assemblyName};component/assets/Localization/Language.xaml",

@@ -1,199 +1,207 @@
-﻿<UserControl
+﻿<core:WpfUIPlatformUserControl
     x:Class="RevitClashDetective.Views.CriterionView"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:vm="clr-namespace:RevitClashDetective.ViewModels.FilterCreatorViewModels"
-    xmlns:dx="http://schemas.devexpress.com/winfx/2008/xaml/core"
-    xmlns:dxe="http://schemas.devexpress.com/winfx/2008/xaml/editors"
+    xmlns:core="clr-namespace:dosymep.WpfUI.Core"
+    xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
+    xmlns:me="clr-namespace:dosymep.WpfCore.MarkupExtensions;assembly=dosymep.WpfCore"
     mc:Ignorable="d"
-    Name="_this"
+    d:Background="White"
     d:DataContext="{d:DesignInstance vm:SetViewModel, IsDesignTimeCreatable=False}">
-    <UserControl.Resources>
+    <core:WpfUIPlatformUserControl.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary
+                    Source="pack://application:,,,/Wpf.Ui;component/Controls/ComboBox/ComboBox.xaml" />
+                <ResourceDictionary
+                    Source="pack://application:,,,/Wpf.Ui;component/Controls/TextBox/TextBox.xaml" />
+                <ResourceDictionary
+                    Source="pack://application:,,,/Wpf.Ui;component/Controls/Button/Button.xaml" />
+            </ResourceDictionary.MergedDictionaries>
+            <Style
+                TargetType="ListBoxItem">
+                <Setter
+                    Property="Template">
+                    <Setter.Value>
+                        <ControlTemplate
+                            TargetType="ListBoxItem">
+                            <ContentPresenter />
+                        </ControlTemplate>
+                    </Setter.Value>
+                </Setter>
+            </Style>
 
-        <Style
-            TargetType="ListBoxItem">
-            <Setter
-                Property="Template">
-                <Setter.Value>
-                    <ControlTemplate
-                        TargetType="ListBoxItem">
-                        <ContentPresenter />
-                    </ControlTemplate>
-                </Setter.Value>
-            </Setter>
-        </Style>
+            <Style
+                TargetType="{x:Type Border}"
+                x:Key="CustomColoredBorder">
+                <Setter
+                    Property="BorderThickness"
+                    Value="4 1 1 1" />
+                <Setter
+                    Property="Margin"
+                    Value="2" />
+                <Setter
+                    Property="CornerRadius"
+                    Value="{DynamicResource ControlCornerRadius}" />
+                <Style.Triggers>
+                    <DataTrigger
+                        Binding="{Binding SelectedEvaluator.SetEvaluator.Evaluator}"
+                        Value="0">
+                        <Setter
+                            Property="BorderBrush"
+                            Value="Green" />
+                    </DataTrigger>
+                    <DataTrigger
+                        Binding="{Binding SelectedEvaluator.SetEvaluator.Evaluator}"
+                        Value="1">
+                        <Setter
+                            Property="BorderBrush"
+                            Value="Blue" />
+                    </DataTrigger>
+                </Style.Triggers>
+            </Style>
 
-        <Style
-            TargetType="{x:Type Border}"
-            x:Key="border">
-            <Setter
-                Property="BorderThickness"
-                Value="4 1 1 1" />
-            <Setter
-                Property="Margin"
-                Value="2" />
-            <Style.Triggers>
-                <DataTrigger
-                    Binding="{Binding SelectedEvaluator.SetEvaluator.Evaluator}"
-                    Value="0">
-                    <Setter
-                        Property="BorderBrush"
-                        Value="Green" />
-                </DataTrigger>
-                <DataTrigger
-                    Binding="{Binding SelectedEvaluator.SetEvaluator.Evaluator}"
-                    Value="1">
-                    <Setter
-                        Property="BorderBrush"
-                        Value="MediumBlue" />
-                </DataTrigger>
-            </Style.Triggers>
-        </Style>
+            <DataTemplate
+                DataType="{x:Type vm:SetViewModel}">
+                <Border
+                    Style="{StaticResource CustomColoredBorder}">
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition />
+                            <RowDefinition />
+                        </Grid.RowDefinitions>
 
-        <DataTemplate
-            DataType="{x:Type vm:SetViewModel}">
-            <Border
-                Style="{StaticResource border}">
-                <Grid>
-                    <Grid.RowDefinitions>
-                        <RowDefinition />
-                        <RowDefinition />
-                    </Grid.RowDefinitions>
-
-                    <DockPanel
-                        Grid.Row="0"
-                        LastChildFill="True"
-                        HorizontalAlignment="Stretch">
-                        <dx:SimpleButton
-                            DockPanel.Dock="Right"
-                            Margin="3"
-                            Background="Transparent"
-                            BorderThickness="0"
-                            Command="{Binding RelativeSource={RelativeSource AncestorType={x:Type ListBox}, Mode=FindAncestor}, Path=DataContext.RemoveSetCommand}"
-                            CommandParameter="{Binding RelativeSource={RelativeSource Mode=Self}, Path=DataContext}"
-                            Glyph="{dx:DXImage 'Office2013/Actions/Cancel_16x16.png'}" />
-                        <dx:SimpleButton
-                            DockPanel.Dock="Right"
-                            Margin="3"
-                            Content="Добавить правило"
-                            Command="{Binding AddRuleCommand}" />
-                        <dx:SimpleButton
-                            DockPanel.Dock="Right"
-                            Margin="3"
-                            Content="Добавить набор"
-                            Command="{Binding AddSetCommand}" />
-                        <dxe:ComboBoxEdit
-                            DockPanel.Dock="Left"
-                            Margin="3"
-                            IsTextEditable="False"
-                            DisplayMember="SetEvaluator.Message"
-                            ItemsSource="{Binding Evaluators, UpdateSourceTrigger=PropertyChanged}"
-                            EditValue="{Binding SelectedEvaluator, UpdateSourceTrigger=PropertyChanged}"
+                        <DockPanel
+                            Grid.Row="0"
+                            LastChildFill="True"
                             HorizontalAlignment="Stretch">
-                        </dxe:ComboBoxEdit>
-                    </DockPanel>
+                            <ui:Button
+                                DockPanel.Dock="Right"
+                                Margin="3"
+                                Appearance="Danger"
+                                Command="{Binding RelativeSource={RelativeSource AncestorType={x:Type ListBox}, Mode=FindAncestor}, Path=DataContext.RemoveSetCommand}"
+                                CommandParameter="{Binding RelativeSource={RelativeSource Mode=Self}, Path=DataContext}"
+                                Content="{ui:SymbolIcon Symbol=Delete20}" />
+                            <ui:Button
+                                DockPanel.Dock="Right"
+                                Margin="3"
+                                Content="{Binding AddRuleCommandName}"
+                                Command="{Binding AddRuleCommand}" />
+                            <ui:Button
+                                DockPanel.Dock="Right"
+                                Margin="3"
+                                Content="{Binding AddSetCommandName}"
+                                Command="{Binding AddSetCommand}" />
+                            <ComboBox
+                                DockPanel.Dock="Left"
+                                Margin="3"
+                                IsEditable="False"
+                                DisplayMemberPath="Name"
+                                HorizontalAlignment="Stretch"
+                                ItemsSource="{Binding Evaluators, UpdateSourceTrigger=PropertyChanged}"
+                                SelectedValue="{Binding SelectedEvaluator, UpdateSourceTrigger=PropertyChanged}" />
+                        </DockPanel>
 
-                    <ListBox
-                        Grid.Row="1"
-                        BorderThickness="0"
-                        BorderBrush="Transparent"
-                        Focusable="False"
-                        HorizontalAlignment="Stretch"
-                        HorizontalContentAlignment="Stretch"
-                        ItemsSource="{Binding Criterions, UpdateSourceTrigger=PropertyChanged}" />
+                        <ListBox
+                            Grid.Row="1"
+                            BorderThickness="0"
+                            BorderBrush="Transparent"
+                            Focusable="False"
+                            HorizontalAlignment="Stretch"
+                            HorizontalContentAlignment="Stretch"
+                            ItemsSource="{Binding Criterions, UpdateSourceTrigger=PropertyChanged}" />
+                    </Grid>
+                </Border>
+            </DataTemplate>
 
-                </Grid>
-            </Border>
-        </DataTemplate>
+            <DataTemplate
+                DataType="{x:Type vm:RuleViewModel}">
+                <DockPanel
+                    LastChildFill="True"
+                    HorizontalAlignment="Stretch">
 
-        <DataTemplate
-            DataType="{x:Type vm:RuleViewModel}">
-            <DockPanel
-                LastChildFill="True"
-                HorizontalAlignment="Stretch">
-
-                <dxe:ComboBoxEdit
-                    DockPanel.Dock="Left"
-                    Width="200"
-                    Margin="3"
-                    IsTextEditable="False"
-                    DisplayMember="FilterableValueProvider.DisplayValue"
-                    ItemsSource="{Binding CategoriesInfo.Parameters}"
-                    EditValue="{Binding SelectedParameter, UpdateSourceTrigger=PropertyChanged}" />
-
-                <dx:SimpleButton
-                    DockPanel.Dock="Right"
-                    Width="16"
-                    Margin="3"
-                    Background="Transparent"
-                    BorderBrush="Transparent"
-                    BorderThickness="0"
-                    Command="{Binding RelativeSource={RelativeSource AncestorType={x:Type ListBox}, Mode=FindAncestor}, Path=DataContext.RemoveRuleCommand}"
-                    CommandParameter="{Binding RelativeSource={RelativeSource Mode=Self}, Path=DataContext}"
-                    Glyph="{dx:DXImage 'Office2013/Actions/Close_16x16.png'}" />
-
-                <dxe:ComboBoxEdit
-                    DockPanel.Dock="Left"
-                    Width="100"
-                    Margin="3"
-                    IsTextEditable="False"
-                    DisplayMember="Name"
-                    ItemsSource="{Binding RuleEvaluators, UpdateSourceTrigger=PropertyChanged}"
-                    EditValue="{Binding SelectedRuleEvaluator, UpdateSourceTrigger=PropertyChanged}" />
-
-                <Grid
-                    DockPanel.Dock="Right">
                     <ComboBox
+                        DockPanel.Dock="Left"
+                        Width="200"
                         Margin="3"
-                        SelectedItem="{Binding SelectedValue, UpdateSourceTrigger=PropertyChanged}"
-                        ItemsSource="{Binding Values}"
-                        DisplayMemberPath="DisplayValue"
-                        Text="{Binding StringValue}">
-                        <ComboBox.ItemsPanel>
-                            <ItemsPanelTemplate>
-                                <VirtualizingStackPanel
-                                    IsVirtualizing="True"
-                                    VirtualizingStackPanel.VirtualizationMode="Recycling" />
-                            </ItemsPanelTemplate>
-                        </ComboBox.ItemsPanel>
-                        <ComboBox.ItemTemplate>
-                            <DataTemplate
-                                DataType="{x:Type vm:ParamValueViewModel}">
-                                <TextBlock
-                                    Text="{Binding ParamValue.DisplayValue}" />
-                            </DataTemplate>
-                        </ComboBox.ItemTemplate>
-                        <ComboBox.Style>
-                            <Style
-                                TargetType="{x:Type ComboBox}">
-                                <Style.Triggers>
-                                    <DataTrigger
-                                        Binding="{Binding IsValueEditable}"
-                                        Value="True">
-                                        <Setter
-                                            Property="IsEditable"
-                                            Value="True"></Setter>
-                                    </DataTrigger>
-                                    <DataTrigger
-                                        Binding="{Binding IsValueEditable}"
-                                        Value="False">
-                                        <Setter
-                                            Property="IsEditable"
-                                            Value="False"></Setter>
-                                    </DataTrigger>
-                                </Style.Triggers>
-                            </Style>
-                        </ComboBox.Style>
-                    </ComboBox>
+                        IsEditable="False"
+                        DisplayMemberPath="FilterableValueProvider.DisplayValue"
+                        ItemsSource="{Binding CategoriesInfo.Parameters}"
+                        SelectedValue="{Binding SelectedParameter, UpdateSourceTrigger=PropertyChanged}" />
 
-                </Grid>
+                    <ui:Button
+                        DockPanel.Dock="Right"
+                        Margin="3"
+                        Appearance="Danger"
+                        Command="{Binding RelativeSource={RelativeSource AncestorType={x:Type ListBox}, Mode=FindAncestor}, Path=DataContext.RemoveRuleCommand}"
+                        CommandParameter="{Binding RelativeSource={RelativeSource Mode=Self}, Path=DataContext}"
+                        Content="{ui:SymbolIcon Symbol=Dismiss20}" />
 
-            </DockPanel>
-        </DataTemplate>
+                    <ComboBox
+                        DockPanel.Dock="Left"
+                        Width="100"
+                        Margin="3"
+                        IsEditable="False"
+                        DisplayMemberPath="Name"
+                        ItemsSource="{Binding RuleEvaluators, UpdateSourceTrigger=PropertyChanged}"
+                        SelectedValue="{Binding SelectedRuleEvaluator, UpdateSourceTrigger=PropertyChanged}" />
 
-    </UserControl.Resources>
+                    <Grid
+                        DockPanel.Dock="Right">
+                        <ComboBox
+                            Margin="3"
+                            DisplayMemberPath="DisplayValue"
+                            ScrollViewer.VerticalScrollBarVisibility="Visible"
+                            Text="{Binding StringValue}"
+                            ItemsSource="{Binding Values}"
+                            SelectedItem="{Binding SelectedValue, UpdateSourceTrigger=PropertyChanged}">
+                            <ComboBox.ItemsPanel>
+                                <ItemsPanelTemplate>
+                                    <VirtualizingStackPanel
+                                        IsVirtualizing="True"
+                                        VirtualizingStackPanel.VirtualizationMode="Recycling" />
+                                </ItemsPanelTemplate>
+                            </ComboBox.ItemsPanel>
+                            <ComboBox.ItemTemplate>
+                                <DataTemplate
+                                    DataType="{x:Type vm:ParamValueViewModel}">
+                                    <TextBlock
+                                        Text="{Binding ParamValue.DisplayValue}" />
+                                </DataTemplate>
+                            </ComboBox.ItemTemplate>
+                            <ComboBox.Style>
+                                <Style
+                                    BasedOn="{StaticResource DefaultComboBoxStyle}"
+                                    TargetType="{x:Type ComboBox}">
+                                    <Style.Triggers>
+                                        <DataTrigger
+                                            Value="True"
+                                            Binding="{Binding IsValueEditable}">
+                                            <Setter
+                                                Property="IsEditable"
+                                                Value="True" />
+                                        </DataTrigger>
+                                        <DataTrigger
+                                            Binding="{Binding IsValueEditable}"
+                                            Value="False">
+                                            <Setter
+                                                Property="IsEditable"
+                                                Value="False" />
+                                        </DataTrigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </ComboBox.Style>
+                        </ComboBox>
+
+                    </Grid>
+
+                </DockPanel>
+            </DataTemplate>
+        </ResourceDictionary>
+    </core:WpfUIPlatformUserControl.Resources>
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition
@@ -204,7 +212,7 @@
 
         <Border
             Grid.Row="0"
-            Style="{StaticResource border}">
+            Style="{StaticResource CustomColoredBorder}">
             <Grid>
                 <Grid.RowDefinitions>
                     <RowDefinition
@@ -216,29 +224,28 @@
                 <DockPanel
                     Grid.Row="0"
                     HorizontalAlignment="Stretch">
-                    <dx:SimpleButton
+                    <ui:Button
                         DockPanel.Dock="Right"
                         Margin="3"
-                        Command="{Binding AddRuleCommand}"
-                        Content="Добавить правило" />
-                    <dx:SimpleButton
+                        Content="{Binding AddRuleCommandName}"
+                        Command="{Binding AddRuleCommand}" />
+                    <ui:Button
                         DockPanel.Dock="Right"
                         Margin="3"
-                        Command="{Binding AddSetCommand}"
-                        Content="Добавить набор" />
-                    <dxe:ComboBoxEdit
+                        Content="{Binding AddSetCommandName}"
+                        Command="{Binding AddSetCommand}" />
+                    <ComboBox
                         DockPanel.Dock="Left"
                         Margin="3"
                         HorizontalAlignment="Stretch"
-                        DisplayMember="SetEvaluator.Message"
-                        IsTextEditable="False"
+                        DisplayMemberPath="Name"
+                        IsEditable="False"
                         ItemsSource="{Binding Evaluators}"
-                        EditValue="{Binding SelectedEvaluator, UpdateSourceTrigger=PropertyChanged}" />
+                        SelectedValue="{Binding SelectedEvaluator, UpdateSourceTrigger=PropertyChanged}" />
                 </DockPanel>
 
                 <ListBox
                     Grid.Row="1"
-                    x:Name="_lbCriterions"
                     HorizontalAlignment="Stretch"
                     HorizontalContentAlignment="Stretch"
                     Focusable="False"
@@ -250,4 +257,4 @@
         </Border>
 
     </Grid>
-</UserControl>
+</core:WpfUIPlatformUserControl>

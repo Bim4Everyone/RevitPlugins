@@ -7,6 +7,8 @@
         x:Key="Ok">OK</system:String>
     <system:String
         x:Key="Cancel">Cancel</system:String>
+    <system:String
+        x:Key="BIM">BIM</system:String>
 
     <system:String
         x:Key="SettingsWindow.Title">Settings</system:String>
@@ -19,29 +21,29 @@
     <system:String
         x:Key="SettingsWindow.Validation.TransparancyLessThanZero">Transparency cannot be less than 0</system:String>
     <system:String
-        x:Key="SettingsWindow.Validation.TransparancyGreaterThanHundred">Transparency cannot be more than 100%</system:String>
+        x:Key="SettingsWindow.Validation.TransparancyGreaterThanHundred">Transparency cannot be greater than 100%</system:String>
     <system:String
         x:Key="SettingsWindow.Validation.OffsetLessThanZero">Offset cannot be less than 0</system:String>
     <system:String
-        x:Key="SettingsWindow.Validation.OffsetGreaterThan">Offset cannot be more than {0}</system:String>
+        x:Key="SettingsWindow.Validation.OffsetGreaterThan">Offset cannot be greater than {0}</system:String>
     <system:String
-        x:Key="SettingsWindow.Validation.ParamIsEmpty">Set all parameter names</system:String>
+        x:Key="SettingsWindow.Validation.ParamIsEmpty">Specify names of all parameters</system:String>
     <system:String
-        x:Key="SettingsWindow.Validation.LongParam">Too long parameter name {0}</system:String>
+        x:Key="SettingsWindow.Validation.LongParam">Too long name {0}</system:String>
     <system:String
-        x:Key="SettingsWindow.MainElementVisibilitySettings">Visibility settings for the first collision element</system:String>
+        x:Key="SettingsWindow.MainElementVisibilitySettings">Visibility settings of the first clash element</system:String>
     <system:String
-        x:Key="SettingsWindow.SecondElementVisibilitySettings">Visibility settings for the second collision element</system:String>
+        x:Key="SettingsWindow.SecondElementVisibilitySettings">Visibility settings of the second clash element</system:String>
     <system:String
-        x:Key="SettingsWindow.SectionBoxSettings">Section box settings</system:String>
+        x:Key="SettingsWindow.SectionBoxSettings">3D crop settings</system:String>
     <system:String
-        x:Key="SettingsWindow.SectionBoxModeSettings">Section box mode:</system:String>
+        x:Key="SettingsWindow.SectionBoxModeSettings">3D crop mode:</system:String>
     <system:String
-        x:Key="SettingsWindow.SectionBoxAdditionalSize">Offset, mm:</system:String>
+        x:Key="SettingsWindow.SectionBoxAdditionalSize">Crop offset, mm:</system:String>
     <system:String
         x:Key="SettingsWindow.ParamsLabel">Parameters for navigator</system:String>
     <system:String
-        x:Key="SettingsWindow.ParamsTooltip">The additional parameters will be displayed in the navigator columns for each collision element, from left to right, following the fixed columns. The top parameter will be on the left.</system:String>
+        x:Key="SettingsWindow.ParamsTooltip">Additional parameters will be displayed in the navigator columns for each clash element from left to right after the fixed columns. The top parameter will appear on the left.</system:String>
     <system:String
         x:Key="SettingsWindow.AddParamTooltip">Add parameter</system:String>
     <system:String
@@ -54,7 +56,7 @@
     <system:String
         x:Key="Transactions.IsolateClashElements">Isolate clash elements</system:String>
     <system:String
-        x:Key="Transactions.ClashGraphicSettings">Clash elements graphic settings</system:String>
+        x:Key="Transactions.ClashGraphicSettings">Configure graphics of clash elements</system:String>
     <system:String
         x:Key="Transactions.ClearFilters">Reset clash element filters</system:String>
 
@@ -72,20 +74,205 @@
         x:Key="Filters.NotCollisionCategories">BIM_clashes_not_clash_element_categories_{0}</system:String>
 
     <system:String
-        x:Key="SectionBoxMode.AroundCollision">Around collision</system:String>
+        x:Key="SectionBoxMode.AroundCollision">At the intersection</system:String>
     <system:String
-        x:Key="SectionBoxMode.AroundElements">Around elements</system:String>
+        x:Key="SectionBoxMode.AroundElements">Around conflicting elements</system:String>
 
     <system:String
-        x:Key="ReportsResolver.Header">Import Reports</system:String>
+        x:Key="ReportsResolver.Header">Import reports</system:String>
     <system:String
-        x:Key="ReportsResolver.Body">The loaded file contains reports with matching names: {0}.</system:String>
+        x:Key="ReportsResolver.Body">The uploaded file contains checks with duplicate names: {0}.</system:String>
     <system:String
-        x:Key="ReportsResolver.ReplaceAndKeepStatuses">Replace with status preservation</system:String>
+        x:Key="ReportsResolver.ReplaceAndKeepStatuses">Replace while keeping statuses</system:String>
     <system:String
-        x:Key="ReportsResolver.Replace">Replace with status overwrite</system:String>
+        x:Key="ReportsResolver.Replace">Replace and overwrite statuses</system:String>
     <system:String
-        x:Key="ReportsResolver.KeepOnlyOld">Don't replace</system:String>
+        x:Key="ReportsResolver.KeepOnlyOld">Do not replace</system:String>
     <system:String
-        x:Key="ReportsResolver.CopyAndRename">Load and rename</system:String>
+        x:Key="ReportsResolver.CopyAndRename">Load with renaming</system:String>
+
+    <system:String
+        x:Key="FilterNameView.Title">New search set name</system:String>
+    <system:String
+        x:Key="FilterNameView.Label">Name:</system:String>
+    <system:String
+        x:Key="FilterCreation.Title">Search sets</system:String>
+    <system:String
+        x:Key="FilterCreation.SearchSets">Search sets</system:String>
+    <system:String
+        x:Key="FilterCreation.Categories">Categories</system:String>
+    <system:String
+        x:Key="FilterCreation.CategoriesSearch">Search</system:String>
+    <system:String
+        x:Key="FilterCreation.CategoryNameHeader">Name</system:String>
+    <system:String
+        x:Key="FilterCreation.HideUncheckedCategories">Hide unchecked categories</system:String>
+    <system:String
+        x:Key="FilterCreation.Criteria">Filter criteria</system:String>
+    <system:String
+        x:Key="FilterCreation.Load">Load search sets</system:String>
+    <system:String
+        x:Key="FilterCreation.AddSearchSet">Create search set</system:String>
+    <system:String
+        x:Key="FilterCreation.RenameSearchSet">Rename search set</system:String>
+    <system:String
+        x:Key="FilterCreation.DeleteSearchSet">Delete search set</system:String>
+    <system:String
+        x:Key="FilterCreation.Save">Save</system:String>
+    <system:String
+        x:Key="FilterCreation.SaveAs">Save as</system:String>
+    <system:String
+        x:Key="FilterCreation.AddRule">Add rule</system:String>
+    <system:String
+        x:Key="FilterCreation.AddSet">Add set</system:String>
+    <system:String
+        x:Key="FilterCreation.CheckSetButton">Check</system:String>
+    <system:String
+        x:Key="FilterCreation.CheckSetButtonTooltip">Check search set</system:String>
+    <system:String
+        x:Key="FilterCreation.DeleteFilterPrompt">Delete filter "{0}"?</system:String>
+    <system:String
+        x:Key="FilterCreation.SuccessSave">Search sets successfully saved</system:String>
+    <system:String
+        x:Key="FilterCreation.SuccessLoad">Search sets file successfully loaded</system:String>
+
+    <system:String
+        x:Key="FilterCreation.Validation.SetName">Enter the name of the search set.</system:String>
+    <system:String
+        x:Key="FilterCreation.Validation.DuplicatedName">A search set with this name already exists.</system:String>
+    <system:String
+        x:Key="FilterCreation.Validation.SelectCategories">Select categories in the search set "{0}".</system:String>
+    <system:String
+        x:Key="FilterCreation.Validation.EmptySet">All fields in the search set "{0}" must be filled.</system:String>
+
+    <system:String
+        x:Key="MainWindow.Title">Clash Checks</system:String>
+    <system:String
+        x:Key="MainWindow.Load">Load checks</system:String>
+    <system:String
+        x:Key="MainWindow.Save">Save</system:String>
+    <system:String
+        x:Key="MainWindow.SaveAs">Save as</system:String>
+    <system:String
+        x:Key="MainWindow.AddCheck">Add check</system:String>
+    <system:String
+        x:Key="MainWindow.DeleteCheck">Delete check</system:String>
+    <system:String
+        x:Key="MainWindow.CheckSearch">Search</system:String>
+    <system:String
+        x:Key="MainWindow.NameLabel">Name</system:String>
+    <system:String
+        x:Key="MainWindow.FirstSelectionLabel">Selection 1</system:String>
+    <system:String
+        x:Key="MainWindow.SecondSelectionLabel">Selection 2</system:String>
+    <system:String
+        x:Key="MainWindow.ShowClashes">Show clash report</system:String>
+    <system:String
+        x:Key="MainWindow.SelectFilesLabel">Select files</system:String>
+    <system:String
+        x:Key="MainWindow.SelectSearchSetsLabel">Select search sets</system:String>
+    <system:String
+        x:Key="MainWindow.CheckDefaultName">Untitled</system:String>
+    <system:String
+        x:Key="MainWindow.SuccessClashDetection">Clash detection completed successfully</system:String>
+    <system:String
+        x:Key="MainWindow.SuccessSave">Check file successfully saved</system:String>
+    <system:String
+        x:Key="MainWindow.SuccessLoad">Check file successfully loaded</system:String>
+
+    <system:String
+        x:Key="MainWindow.Validation.MissingFiles1">Selection 1 files not found: {0}</system:String>
+    <system:String
+        x:Key="MainWindow.Validation.MissingFilters1">Selection 1 search sets not found: {0}</system:String>
+    <system:String
+        x:Key="MainWindow.Validation.MissingFiles2">Selection 2 files not found: {0}</system:String>
+    <system:String
+        x:Key="MainWindow.Validation.MissingFilters2">Selection 2 search sets not found: {0}</system:String>
+    <system:String
+        x:Key="MainWindow.Validation.NamesDuplicated">Checks must have different names.</system:String>
+    <system:String
+        x:Key="MainWindow.Validation.EmptyFilterInCheck">Check "{0}" must contain at least one search set.</system:String>
+    <system:String
+        x:Key="MainWindow.Validation.EmptyFileInCheck">Check "{0}" must contain at least one file.</system:String>
+    <system:String
+        x:Key="MainWindow.Validation.SelectAnyCheck">At least one check must be selected for clash detection.</system:String>
+
+    <system:String
+        x:Key="Navigator.DeletePrompt">Are you sure you want to delete the file?</system:String>
+    <system:String
+        x:Key="Navigator.SuccessSave">File successfully saved</system:String>
+    <system:String
+        x:Key="Navigator.SuccessLoad">File successfully loaded</system:String>
+
+    <system:String
+        x:Key="SelectableNamesDialog.NameHeader">Name</system:String>
+    <system:String
+        x:Key="SelectableNamesDialog.SelectFiles">Select files</system:String>
+    <system:String
+        x:Key="SelectableNamesDialog.SelectSearchSets">Select search sets</system:String>
+
+    <system:String
+        x:Key="ConfigLoader.InvalidFile">Invalid configuration file.</system:String>
+
+    <system:String
+        x:Key="SearchSet.FamilyType">Type name</system:String>
+    <system:String
+        x:Key="SearchSet.Family">Family name</system:String>
+    <system:String
+        x:Key="SearchSet.Category">Category</system:String>
+    <system:String
+        x:Key="SearchSet.File">File</system:String>
+    <system:String
+        x:Key="SearchSet.Parameter">Parameter: {0}</system:String>
+
+    <system:String
+        x:Key="Parameter.InvalidStorageType">Parameter {0} has no defined data type.</system:String>
+    <system:String
+        x:Key="Parameter.CannotParseInt">Parameter value "{0}" must be an integer.</system:String>
+    <system:String
+        x:Key="Parameter.CannotParseDouble">Parameter value "{0}" must be a floating-point number.</system:String>
+
+    <system:String
+        x:Key="SetEvaluators.Or">Or</system:String>
+    <system:String
+        x:Key="SetEvaluators.And">And</system:String>
+    <system:String
+        x:Key="RuleEvaluators.FilterStringBeginsWith">Begins with</system:String>
+    <system:String
+        x:Key="RuleEvaluators.FilterStringNotBeginsWith">Not begins with</system:String>
+    <system:String
+        x:Key="RuleEvaluators.FilterStringContains">Contains</system:String>
+    <system:String
+        x:Key="RuleEvaluators.FilterStringNotContains">Not contains</system:String>
+    <system:String
+        x:Key="RuleEvaluators.FilterStringEndsWith">Ends with</system:String>
+    <system:String
+        x:Key="RuleEvaluators.FilterStringNotEndsWith">Not ends with</system:String>
+    <system:String
+        x:Key="RuleEvaluators.FilterStringEquals">Equals</system:String>
+    <system:String
+        x:Key="RuleEvaluators.FilterStringGreater">Greater</system:String>
+    <system:String
+        x:Key="RuleEvaluators.FilterStringGreaterOrEqual">Greater or equal</system:String>
+    <system:String
+        x:Key="RuleEvaluators.FilterStringLess">Less</system:String>
+    <system:String
+        x:Key="RuleEvaluators.FilterStringLessOrEqual">Less or equal</system:String>
+    <system:String
+        x:Key="RuleEvaluators.FilterNumericEquals">Equals</system:String>
+    <system:String
+        x:Key="RuleEvaluators.FilterNumericGreater">Greater</system:String>
+    <system:String
+        x:Key="RuleEvaluators.FilterNumericGreaterOrEqual">Greater or equal</system:String>
+    <system:String
+        x:Key="RuleEvaluators.FilterNumericLess">Less</system:String>
+    <system:String
+        x:Key="RuleEvaluators.FilterNumericLessOrEqual">Less or equal</system:String>
+    <system:String
+        x:Key="RuleEvaluators.FilterHasNoValue">Has no value</system:String>
+    <system:String
+        x:Key="RuleEvaluators.FilterHasValue">Has value</system:String>
+    <system:String
+        x:Key="RuleEvaluators.FilterNotEquals">Not equals</system:String>
+
 </ResourceDictionary>

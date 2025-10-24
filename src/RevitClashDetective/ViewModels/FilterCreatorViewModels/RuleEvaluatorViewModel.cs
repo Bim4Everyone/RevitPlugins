@@ -1,18 +1,21 @@
 using System;
 using System.Collections.Generic;
 
+using dosymep.SimpleServices;
 using dosymep.WPF.ViewModels;
 
 using RevitClashDetective.Models.Evaluators;
 
 namespace RevitClashDetective.ViewModels.FilterCreatorViewModels;
 internal class RuleEvaluatorViewModel : BaseViewModel, IEquatable<RuleEvaluatorViewModel> {
+    private readonly ILocalizationService _localization;
     private RuleEvaluator _ruleEvaluator;
     private string _name;
 
-    public RuleEvaluatorViewModel(RuleEvaluator ruleEvaluator) {
-        RuleEvaluator = ruleEvaluator;
-        Name = RuleEvaluator.Message;
+    public RuleEvaluatorViewModel(ILocalizationService localization, RuleEvaluator ruleEvaluator) {
+        _localization = localization ?? throw new ArgumentNullException(nameof(localization));
+        RuleEvaluator = ruleEvaluator ?? throw new ArgumentNullException(nameof(ruleEvaluator));
+        Name = _localization.GetLocalizedString($"{nameof(RuleEvaluators)}.{RuleEvaluator.Evaluator}");
     }
 
     public string Name {

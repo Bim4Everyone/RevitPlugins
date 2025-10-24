@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Windows.Input;
 
+using dosymep.SimpleServices;
 using dosymep.WPF.Commands;
 using dosymep.WPF.ViewModels;
 
@@ -12,14 +13,17 @@ internal class FilterNameViewModel : BaseViewModel {
     private readonly List<string> _oldFilterNames;
     private string _errorText;
     private readonly string _currentName;
+    private readonly ILocalizationService _localization;
 
-    public FilterNameViewModel(IEnumerable<string> oldFilterNames) {
+    public FilterNameViewModel(ILocalizationService localization, IEnumerable<string> oldFilterNames) {
+        _localization = localization ?? throw new System.ArgumentNullException(nameof(localization));
         _oldFilterNames = oldFilterNames.ToList();
 
         Create = RelayCommand.Create(() => { }, CanCreate);
     }
 
-    public FilterNameViewModel(IEnumerable<string> oldFilterNames, string currentName) {
+    public FilterNameViewModel(ILocalizationService localization, IEnumerable<string> oldFilterNames, string currentName) {
+        _localization = localization ?? throw new System.ArgumentNullException(nameof(localization));
         _oldFilterNames = oldFilterNames.ToList();
         Name = currentName;
         _currentName = currentName;
@@ -41,12 +45,12 @@ internal class FilterNameViewModel : BaseViewModel {
 
     private bool CanCreate() {
         if(string.IsNullOrEmpty(Name)) {
-            ErrorText = "Введите имя поискового набора.";
+            ErrorText = _localization.GetLocalizedString("FilterCreation.Validation.SetName");
             return false;
         }
 
         if(_oldFilterNames.Contains(Name) || Name == _currentName) {
-            ErrorText = "Поисковый набор с таким именем уже существует.";
+            ErrorText = _localization.GetLocalizedString("FilterCreation.Validation.DuplicatedName");
             return false;
         }
         ErrorText = null;

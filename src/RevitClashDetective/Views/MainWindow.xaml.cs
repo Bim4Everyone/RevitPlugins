@@ -1,14 +1,25 @@
 using System.Windows;
 
-using DevExpress.Xpf.Grid;
+using dosymep.SimpleServices;
+
+using Wpf.Ui;
 
 namespace RevitClashDetective.Views;
-/// <summary>
-/// Interaction logic for MainWindow.xaml
-/// </summary>
 public partial class MainWindow {
-    public MainWindow() {
+    public MainWindow(
+    ILoggerService loggerService,
+    ISerializationService serializationService,
+    ILanguageService languageService,
+    ILocalizationService localizationService,
+    IUIThemeService uiThemeService,
+    IUIThemeUpdaterService themeUpdaterService,
+    IContentDialogService contentDialogService)
+    : base(loggerService,
+        serializationService,
+        languageService, localizationService,
+        uiThemeService, themeUpdaterService) {
         InitializeComponent();
+        contentDialogService.SetDialogHost(_rootContentDialog);
     }
 
     public override string PluginName => nameof(RevitClashDetective);
@@ -20,9 +31,5 @@ public partial class MainWindow {
 
     private void ButtonCancel_Click(object sender, RoutedEventArgs e) {
         DialogResult = false;
-    }
-
-    private void _gridView_CellValueChanging(object sender, CellValueChangedEventArgs e) {
-        (sender as TableView).PostEditor();
     }
 }

@@ -8,6 +8,7 @@ using System.Windows.Input;
 using Autodesk.Revit.DB;
 
 using dosymep.Revit;
+using dosymep.SimpleServices;
 using dosymep.WPF.Commands;
 using dosymep.WPF.ViewModels;
 
@@ -21,13 +22,18 @@ using RevitClashDetective.Models.Interfaces;
 namespace RevitClashDetective.ViewModels.SearchSet;
 internal class GridControlViewModel : BaseViewModel {
     private readonly RevitRepository _revitRepository;
+    private readonly ILocalizationService _localization;
     private readonly IEnumerable<IFilterableValueProvider> _providers;
     private readonly IEnumerable<ElementModel> _elements;
     private int _elementsCount;
 
-    public GridControlViewModel(RevitRepository revitRepository, Filter filter, IEnumerable<ElementModel> elements) {
+    public GridControlViewModel(RevitRepository revitRepository,
+        ILocalizationService localization,
+        Filter filter,
+        IEnumerable<ElementModel> elements) {
         if(filter is null) { throw new ArgumentNullException(nameof(filter)); }
         _revitRepository = revitRepository ?? throw new ArgumentNullException(nameof(revitRepository));
+        _localization = localization ?? throw new ArgumentNullException(nameof(localization));
         _elements = elements ?? throw new ArgumentNullException(nameof(elements));
         _providers = filter.GetProviders();
         InitializeColumns();
@@ -53,7 +59,7 @@ internal class GridControlViewModel : BaseViewModel {
         Columns = new ObservableCollection<ColumnViewModel>(
             _providers.Select(item => new ColumnViewModel() {
                 FieldName = item.Name,
-                Header = $"Параметр: {item.DisplayValue}"
+                Header = _localization.GetLocalizedString("SearchSet.Parameter", item.DisplayValue)
             })
             .GroupBy(item => item.FieldName)
             .Select(item => item.First()));
@@ -96,11 +102,26 @@ internal class GridControlViewModel : BaseViewModel {
     }
 
     private void AddCommonInfo() {
-        Columns.Insert(0, new ColumnViewModel() { FieldName = "Name", Header = "Имя типоразмера" });
-        Columns.Insert(0, new ColumnViewModel() { FieldName = "FamilyName", Header = "Имя семейства" });
-        Columns.Insert(0, new ColumnViewModel() { FieldName = "Category", Header = "Категория" });
-        Columns.Insert(0, new ColumnViewModel() { FieldName = "Id", Header = "Id" });
-        Columns.Insert(0, new ColumnViewModel() { FieldName = "File", Header = "Файл" });
+        Columns.Insert(0, new ColumnViewModel() {
+            FieldName = "Name",
+            Header = _localization.GetLocalizedString("SearchSet.FamilyType")
+        });
+        Columns.Insert(0, new ColumnViewModel() {
+            FieldName = "FamilyName",
+            Header = _localization.GetLocalizedString("SearchSet.Family")
+        });
+        Columns.Insert(0, new ColumnViewModel() {
+            FieldName = "Category",
+            Header = _localization.GetLocalizedString("SearchSet.Category")
+        });
+        Columns.Insert(0, new ColumnViewModel() {
+            FieldName = "Id",
+            Header = "Id"
+        });
+        Columns.Insert(0, new ColumnViewModel() {
+            FieldName = "File",
+            Header = _localization.GetLocalizedString("SearchSet.File")
+        });
     }
 
     private void SelectElement(ExpandoObject row) {
