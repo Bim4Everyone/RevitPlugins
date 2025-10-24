@@ -10,6 +10,7 @@
     xmlns:vms="clr-namespace:RevitCreateViewSheet.ViewModels"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:local="clr-namespace:RevitCreateViewSheet.Views"
+    xmlns:res="clr-namespace:RevitCreateViewSheet.Resources"
     mc:Ignorable="d"
     Height="400"
     Width="600"
@@ -57,7 +58,7 @@
                 VerticalAlignment="Center"
                 HorizontalAlignment="Center"
                 DisplayMemberPath="Name"
-                SelectedItem="{Binding SelectedViewType}"
+                SelectedItem="{Binding SelectedViewType, UpdateSourceTrigger=PropertyChanged}"
                 ItemsSource="{Binding ViewTypes}">
             </ComboBox>
             <Label
@@ -71,10 +72,14 @@
                 MaxWidth="450"
                 Margin="0 0 0 7"
                 DisplayMemberPath="Name"
-                TextSearch.TextPath="Name"
-                Style="{StaticResource CustomEditableComboBox}"
-                ItemsSource="{Binding Views}"
-                SelectedItem="{Binding SelectedView}" />
+                IsEditable="True"
+                IsTextSearchEnabled="False"
+                StaysOpenOnEdit="True"
+                res:ComboBoxBehavior.OpenDropDownOnTextChanged="True"
+                Text="{Binding SearchViewName, UpdateSourceTrigger=PropertyChanged}"
+                Style="{StaticResource CustomComboBox}"
+                ItemsSource="{Binding Views.View}"
+                SelectedItem="{Binding SelectedView, UpdateSourceTrigger=PropertyChanged}" />
             <Label
                 HorizontalAlignment="Center"
                 Style="{StaticResource CustomLabel}"
@@ -92,7 +97,7 @@
                 DisplayMemberPath="Name"
                 TextSearch.TextPath="Name"
                 ScrollViewer.VerticalScrollBarVisibility="Visible"
-                ItemsSource="{Binding ViewPortTypes}"
+                ItemsSource="{Binding ViewPortTypes, UpdateSourceTrigger=PropertyChanged}"
                 SelectedItem="{Binding SelectedViewPortType}" />
         </StackPanel>
 

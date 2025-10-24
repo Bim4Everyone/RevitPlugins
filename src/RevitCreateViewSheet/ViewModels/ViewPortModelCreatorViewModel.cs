@@ -1,7 +1,9 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.ComponentModel;
 using System.Linq;
+using System.Windows.Data;
 using System.Windows.Input;
 
 using Autodesk.Revit.DB;
@@ -26,15 +28,12 @@ namespace RevitCreateViewSheet.ViewModels {
         /// <summary>
         /// Виды которые доступны для выбора пользователя. (Не размещенные виды)
         /// </summary>
-        private readonly List<ViewViewModel> _enabledViews;
-        /// <summary>
-        /// Виды, соответствующие выбранному пользователем типу видов. Это итоговая коллекция, которую видит пользователь
-        /// </summary>
-        private readonly ObservableCollection<ViewViewModel> _viewsForSelection;
+        private readonly ObservableCollection<ViewViewModel> _viewsCanBePlacedOnThisSheet;
         private string _errorText;
         private ViewPortTypeViewModel _selectedViewPortType;
         private ViewTypeViewModel _selectedViewType;
         private ViewViewModel _selectedView;
+        private string _searchViewName;
 
         public ViewPortModelCreatorViewModel(
             RevitRepository revitRepository,
@@ -47,25 +46,27 @@ namespace RevitCreateViewSheet.ViewModels {
             _allViews = [.. _revitRepository.GetAllViewsForViewPorts()
                 .Select(v => new ViewViewModel(v))
                 .OrderBy(a => a.Name, new LogicalStringComparer())];
-            _enabledViews = [.. _allViews];
-            _viewsForSelection = [.. _enabledViews];
-            Views = new ReadOnlyObservableCollection<ViewViewModel>(_viewsForSelection);
+            _viewsCanBePlacedOnThisSheet = [.. _allViews];
+            Views = new CollectionViewSource { Source = _viewsCanBePlacedOnThisSheet };
+            Views.Filter += ViewsFilterHandler;
             ViewPortTypes = [.. _revitRepository.GetViewPortTypes()
                 .Select(v => new ViewPortTypeViewModel(v))
                 .OrderBy(a => a.Name, new LogicalStringComparer())];
             ViewTypes = InitializeViewTypes();
             SelectedViewType = ViewTypes.First();
-            SelectedView = Views.FirstOrDefault();
             SelectedViewPortType = ViewPortTypes.FirstOrDefault();
             AcceptViewCommand = RelayCommand.Create(() => { }, CanAcceptView);
+            PropertyChanged += ViewFilterPropertyChanged;
         }
 
         public ViewTypeViewModel SelectedViewType {
             get => _selectedViewType;
-            set {
-                RaiseAndSetIfChanged(ref _selectedViewType, value);
-                UpdateViewsForSelection(value?.ViewType ?? RevitViewType.Any);
-            }
+            set => RaiseAndSetIfChanged(ref _selectedViewType, value);
+        }
+
+        public string SearchViewName {
+            get => _searchViewName;
+            set => RaiseAndSetIfChanged(ref _searchViewName, value);
         }
 
         /// <summary>
@@ -76,11 +77,13 @@ namespace RevitCreateViewSheet.ViewModels {
         /// <summary>
         /// Виды, соответствующие выбранному пользователем типу видов. Это итоговая коллекция, которую видит пользователь
         /// </summary>
-        public ReadOnlyObservableCollection<ViewViewModel> Views { get; }
+        public CollectionViewSource Views { get; }
 
         public ViewViewModel SelectedView {
             get => _selectedView;
-            set => RaiseAndSetIfChanged(ref _selectedView, value);
+            set {
+                RaiseAndSetIfChanged(ref _selectedView, value);
+            }
         }
 
         /// <summary>
@@ -94,6 +97,13 @@ namespace RevitCreateViewSheet.ViewModels {
         }
 
         public ICommand AcceptViewCommand { get; }
+
+        private void ViewFilterPropertyChanged(object sender, PropertyChangedEventArgs e) {
+            if(e.PropertyName == nameof(SelectedViewType)
+                || e.PropertyName == nameof(SearchViewName)) {
+                Views?.View.Refresh();
+            }
+        }
 
         /// <summary>
         /// Выключает отображение заданных видов для создания видовых экранов.
@@ -115,11 +125,11 @@ namespace RevitCreateViewSheet.ViewModels {
             var enabledViews = _allViews
                 .Where(v => !disabledViews.Contains(v))
                 .OrderBy(v => v.Name, new LogicalStringComparer());
-            _enabledViews.Clear();
+            _viewsCanBePlacedOnThisSheet.Clear();
             foreach(var view in enabledViews) {
-                _enabledViews.Add(view);
+                _viewsCanBePlacedOnThisSheet.Add(view);
             }
-            UpdateViewsForSelection(SelectedViewType?.ViewType ?? RevitViewType.Any);
+            SelectedView = null;
         }
 
         public string ErrorText {
@@ -128,7 +138,12 @@ namespace RevitCreateViewSheet.ViewModels {
         }
 
         private bool CanAcceptView() {
-            if(Views.Count == 0) {
+            if(SelectedViewType is null) {
+                ErrorText = _localizationService.GetLocalizedString("Errors.Validation.ViewTypeNotSet");
+                return false;
+            }
+
+            if(Views?.View.IsEmpty ?? true) {
                 ErrorText = _localizationService.GetLocalizedString("Errors.Validation.ViewsNotFound");
                 return false;
             }
@@ -154,37 +169,21 @@ namespace RevitCreateViewSheet.ViewModels {
                     _localizationService.GetLocalizedString($"{nameof(RevitViewType)}.{v}")))];
         }
 
-        private void UpdateViewsForSelection(RevitViewType revitViewType) {
-            _viewsForSelection.Clear();
-            switch(revitViewType) {
-                case RevitViewType.FloorPlan:
-                case RevitViewType.CeilingPlan:
-                case RevitViewType.EngineeringPlan:
-                case RevitViewType.AreaPlan:
-                case RevitViewType.Section:
-                case RevitViewType.Elevation:
-                case RevitViewType.Detail:
-                case RevitViewType.ThreeD:
-                case RevitViewType.Rendering:
-                case RevitViewType.DraftingView:
-                case RevitViewType.Legend: {
-                    ViewType vType = ConvertToViewType(revitViewType);
-                    foreach(var item in _enabledViews
-                        .Where(v => v.View.ViewType == vType)
-                        .OrderBy(v => v.Name, new LogicalStringComparer())) {
-                        _viewsForSelection.Add(item);
-                    }
-                    break;
+        private void ViewsFilterHandler(object sender, FilterEventArgs e) {
+            if(e.Item is ViewViewModel view) {
+                if(SelectedViewType is not null
+                    && SelectedViewType.ViewType != RevitViewType.Any
+                    && view.View.ViewType != ConvertToViewType(SelectedViewType.ViewType)) {
+                    e.Accepted = false;
+                    return;
                 }
-                case RevitViewType.Any:
-                default: {
-                    foreach(var item in _enabledViews.OrderBy(v => v.Name, new LogicalStringComparer())) {
-                        _viewsForSelection.Add(item);
-                    }
-                    break;
+                if(!string.IsNullOrWhiteSpace(SearchViewName)) {
+                    string str = SearchViewName.ToLower();
+                    e.Accepted = view.Name.ToLower().Contains(str);
+                    return;
                 }
+                e.Accepted = true;
             }
-            SelectedView = _viewsForSelection.FirstOrDefault();
         }
 
         private ViewType ConvertToViewType(RevitViewType revitViewType) {
