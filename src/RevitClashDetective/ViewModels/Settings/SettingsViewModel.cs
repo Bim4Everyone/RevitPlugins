@@ -21,6 +21,9 @@ internal class SettingsViewModel : BaseViewModel {
     private ParamViewModel _selectedParam;
     private const int _maxSectionBoxOffset = 10000;
     private const int _maxParamNameLength = 128;
+    private bool _applySectionBoxSettings;
+    private bool _applyIsolationSettings;
+    private bool _applyColorSettings;
 
     public SettingsViewModel(RevitRepository revitRepository, SettingsConfig config, ILocalizationService localizationService) {
         _revitRepository = revitRepository ?? throw new ArgumentNullException(nameof(revitRepository));
@@ -84,6 +87,21 @@ internal class SettingsViewModel : BaseViewModel {
         set => RaiseAndSetIfChanged(ref _sectionBoxOffset, value);
     }
 
+    public bool ApplySectionBoxSettings {
+        get => _applySectionBoxSettings;
+        set => RaiseAndSetIfChanged(ref _applySectionBoxSettings, value);
+    }
+
+    public bool ApplyIsolationSettings {
+        get => _applyIsolationSettings;
+        set => RaiseAndSetIfChanged(ref _applyIsolationSettings, value);
+    }
+
+    public bool ApplyColorSettings {
+        get => _applyColorSettings;
+        set => RaiseAndSetIfChanged(ref _applyColorSettings, value);
+    }
+
 
     private void LoadView() {
         LoadConfig();
@@ -139,6 +157,9 @@ internal class SettingsViewModel : BaseViewModel {
 
         SectionBoxOffset = _config.SectionBoxOffset;
         SelectedSectionBoxMode = new SectionBoxModeViewModel(_config.SectionBoxModeSettings, _localizationService);
+        ApplySectionBoxSettings = _config.ApplySectionBoxSettings;
+        ApplyIsolationSettings = _config.ApplyIsolationSettings;
+        ApplyColorSettings = _config.ApplyColorSettings;
 
         Array.ForEach(_config.ParamNames, p => Params.Add(new ParamViewModel() { Name = p }));
     }
@@ -148,6 +169,9 @@ internal class SettingsViewModel : BaseViewModel {
         _config.SecondElementVisibilitySettings = SecondElementVisibilitySettings.GetSettings();
         _config.SectionBoxOffset = SectionBoxOffset;
         _config.SectionBoxModeSettings = SelectedSectionBoxMode.Mode;
+        _config.ApplySectionBoxSettings = ApplySectionBoxSettings;
+        _config.ApplyIsolationSettings = ApplyIsolationSettings;
+        _config.ApplyColorSettings = ApplyColorSettings;
         _config.ParamNames = [.. Params.Select(p => p.Name.Trim())];
         _config.SaveProjectConfig();
     }

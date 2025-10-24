@@ -28,6 +28,21 @@ internal class SettingsConfig : ProjectConfig {
     public SectionBoxMode SectionBoxModeSettings { get; set; } = SectionBoxMode.AroundCollision;
 
     /// <summary>
+    /// Флаг для включения 3D подрезки по коллизии
+    /// </summary>
+    public bool ApplySectionBoxSettings { get; set; } = true;
+
+    /// <summary>
+    /// Флаг для включения изоляции элементов коллизии
+    /// </summary>
+    public bool ApplyIsolationSettings { get; set; } = false;
+
+    /// <summary>
+    /// Флаг для включения раскраски элементов коллизии
+    /// </summary>
+    public bool ApplyColorSettings { get; set; } = false;
+
+    /// <summary>
     /// Добавочный размер в мм для 3D подрезки суммарно вдоль оси
     /// </summary>
     public int SectionBoxOffset { get; set; } = 3000;
