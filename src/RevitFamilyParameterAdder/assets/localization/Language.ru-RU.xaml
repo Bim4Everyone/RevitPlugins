@@ -1,0 +1,38 @@
+﻿<ResourceDictionary
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:system="clr-namespace:System;assembly=mscorlib">
+
+    <system:String x:Key="MainWindow.Title">Добавление параметров в семейство</system:String>
+    <system:String x:Key="MainWindow.ButtonOk">Ок</system:String>
+    <system:String x:Key="MainWindow.ButtonCancel">Отмена</system:String>
+    
+    <system:String x:Key="MainWindow.SelectParam">Выберите параметры:</system:String>
+    <system:String x:Key="MainWindow.AddingParametersForFamilies">Загрузка параметров для семейств КР</system:String>
+    <system:String x:Key="MainWindow.AddingFormulasForParametersForFamilies">Загрузка формул для параметров для семейств КР</system:String>
+    
+    <system:String x:Key="MainWindow.GroupFilter">Фильтр по группе в ФОП:</system:String>
+    
+    <system:String x:Key="MainWindow.SelectAll">Выбрать все</system:String>
+    <system:String x:Key="MainWindow.UnselectAll">Отменить выбор</system:String>
+    
+    <system:String x:Key="MainWindow.ParamName">Имя параметра</system:String>
+    <system:String x:Key="MainWindow.SPFGroupParam">Группа параметров в ФОП</system:String>
+    <system:String x:Key="MainWindow.FamilyGroupParam">Группа параметров в семействе</system:String>
+    <system:String x:Key="MainWindow.ParamLevel">Уровень параметра</system:String>
+
+    <system:String x:Key="MainWindow.Report">Отчет</system:String>
+    <system:String x:Key="MainWindow.AddedParams">Добавлены параметры:</system:String>
+    <system:String x:Key="MainWindow.ParamsWereAlready">Параметры уже были:</system:String>
+    <system:String x:Key="MainWindow.ErrorWithAddingParams">Произошла ошибка при добавлении параметров:</system:String>
+    
+    <system:String x:Key="MainWindow.SelectParamsForAdd">Выберите параметры для добавления</system:String>
+    <system:String x:Key="MainWindow.SetGroupToAllSelectedParams">Назначьте группу всем выбранным параметрам</system:String>
+    
+    <system:String x:Key="MainWindow.Instance">Экземпляр</system:String>
+    <system:String x:Key="MainWindow.Type">Типоразмер</system:String>
+    
+    <system:String x:Key="MessageBox.Title">Ошибка!</system:String>
+    <system:String x:Key="MessageBox.IsNotFamilyFile">Данный скрипт работает только в файле семейства.</system:String>
+    <system:String x:Key="MessageBox.IsNotSharedParametersFileConnected">Файл общих параметров не найден. Проверьте, что ФОП подключен к проекту.</system:String>
+</ResourceDictionary>

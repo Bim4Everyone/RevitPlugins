@@ -1,8 +1,18 @@
 using System.Windows;
 
+using dosymep.SimpleServices;
+
 namespace RevitFamilyParameterAdder.Views;
 public partial class MainWindow {
-    public MainWindow() {
+    public MainWindow(
+        ILoggerService loggerService,
+        ISerializationService serializationService,
+        ILanguageService languageService, ILocalizationService localizationService,
+        IUIThemeService uiThemeService, IUIThemeUpdaterService themeUpdaterService)
+        : base(loggerService,
+            serializationService,
+            languageService, localizationService,
+            uiThemeService, themeUpdaterService) {
         InitializeComponent();
     }
 
@@ -15,13 +25,5 @@ public partial class MainWindow {
 
     private void ButtonCancel_Click(object sender, RoutedEventArgs e) {
         DialogResult = false;
-    }
-
-
-    private void SelectAllParams(object sender, RoutedEventArgs e) {
-        parameters.SelectAll();
-    }
-    private void UnselectAllParams(object sender, RoutedEventArgs e) {
-        parameters.UnselectAll();
     }
 }
