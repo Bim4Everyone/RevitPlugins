@@ -16,7 +16,7 @@ internal class CustomGridControl : GridControl {
     // https://supportcenter.devexpress.com/ticket/details/t410340/disable-select-unselect-row-when-clicking-on-button-in-a-column
     protected override void OnPreviewMouseLeftButtonDown(MouseButtonEventArgs e) {
         if(PreventSelectedItemsResetByCellButton
-            && SelectedItems.Count > 1
+            && SelectedItems?.Count > 1
             && LayoutTreeHelper.GetVisualParents((DependencyObject) e.OriginalSource)
             .OfType<Button>()
             .FirstOrDefault() != null) {
