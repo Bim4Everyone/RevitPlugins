@@ -411,11 +411,6 @@
         <DockPanel
             Grid.Row="3"
             Margin="0 10 0 0">
-            <DockPanel>
-                <dxe:CheckEdit
-                    EditValue="{Binding ElementsIsolationEnabled}"
-                    Content="Изолировать выделенные элементы" />
-            </DockPanel>
 
             <DockPanel
                 HorizontalAlignment="Right">

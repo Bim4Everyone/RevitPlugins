@@ -6,6 +6,8 @@
     <ResourceDictionary.MergedDictionaries>
         <ResourceDictionary
             Source="pack://application:,,,/Wpf.Ui;component/Controls/CheckBox/CheckBox.xaml" />
+        <ResourceDictionary
+            Source="pack://application:,,,/Wpf.Ui;component/Controls/ToggleSwitch/ToggleSwitch.xaml" />
     </ResourceDictionary.MergedDictionaries>
     <Style
         x:Key="CustomColumnCheckBoxStyle"
@@ -155,5 +157,44 @@
         <Setter
             Property="VerticalAlignment"
             Value="Stretch" />
+    </Style>
+    <Style
+        TargetType="ui:ToggleSwitch"
+        x:Key="LabeledToggleSwitch"
+        BasedOn="{StaticResource DefaultUiToggleSwitchStyle}">
+        <Setter
+            Property="Foreground"
+            Value="{DynamicResource LabelForeground}" />
+    </Style>
+    <Style
+        TargetType="Label"
+        x:Key="CustomLabel">
+        <Setter
+            Property="Padding"
+            Value="0,0,0,4" />
+        <Setter
+            Property="Focusable"
+            Value="False" />
+        <Setter
+            Property="Foreground"
+            Value="{DynamicResource LabelForeground}" />
+        <Setter
+            Property="SnapsToDevicePixels"
+            Value="True" />
+        <Setter
+            Property="VerticalAlignment"
+            Value="Center" />
+        <Setter
+            Property="VerticalContentAlignment"
+            Value="Center" />
+        <Style.Triggers>
+            <Trigger
+                Property="IsEnabled"
+                Value="False">
+                <Setter
+                    Property="Foreground"
+                    Value="{DynamicResource LabelForeground}" />
+            </Trigger>
+        </Style.Triggers>
     </Style>
 </ResourceDictionary>

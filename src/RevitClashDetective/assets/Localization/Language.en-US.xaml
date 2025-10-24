@@ -35,7 +35,13 @@
     <system:String
         x:Key="SettingsWindow.SecondElementVisibilitySettings">Visibility settings of the second clash element</system:String>
     <system:String
-        x:Key="SettingsWindow.SectionBoxSettings">3D crop settings</system:String>
+        x:Key="SettingsWindow.ClashViewSettings">Clash view settings</system:String>
+    <system:String
+        x:Key="SettingsWindow.ApplySectionBoxSettings">Apply 3D crop view</system:String>
+    <system:String
+        x:Key="SettingsWindow.ApplyIsolationSettings">Isolate clash elements</system:String>
+    <system:String
+        x:Key="SettingsWindow.ApplyColorSettings">Color clash elements</system:String>
     <system:String
         x:Key="SettingsWindow.SectionBoxModeSettings">3D crop mode:</system:String>
     <system:String

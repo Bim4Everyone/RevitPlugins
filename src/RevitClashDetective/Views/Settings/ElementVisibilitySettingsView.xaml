@@ -16,16 +16,24 @@
     d:DesignWidth="800"
     d:DataContext="{d:DesignInstance vms:ElementVisibilitySettingsViewModel, IsDesignTimeCreatable=False}">
 
+    <UserControl.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary
+                    Source="../../Resources/CustomStyles.xaml" />
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
+    </UserControl.Resources>
+
     <DockPanel>
         <Label
-            VerticalAlignment="Center"
-            VerticalContentAlignment="Center"
+            Style="{StaticResource CustomLabel}"
             Content="{Binding ColorLabel}" />
         <Rectangle
             Width="30"
             Height="30"
             Margin="10 0 20 0"
-            StrokeThickness="1"
+            StrokeThickness="2"
             RadiusX="4"
             RadiusY="4"
             VerticalAlignment="Center"
@@ -43,8 +51,7 @@
             </i:Interaction.Triggers>
         </Rectangle>
         <Label
-            VerticalAlignment="Center"
-            VerticalContentAlignment="Center"
+            Style="{StaticResource CustomLabel}"
             Content="{Binding TransparencyLabel}" />
         <Slider
             Margin="10 0"

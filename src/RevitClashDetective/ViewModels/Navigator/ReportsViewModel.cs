@@ -12,7 +12,6 @@ using dosymep.WPF.ViewModels;
 
 using RevitClashDetective.Models;
 using RevitClashDetective.Models.Clashes;
-using RevitClashDetective.Models.Interfaces;
 using RevitClashDetective.Models.RevitClashReport;
 using RevitClashDetective.Services.RevitViewSettings;
 
@@ -25,7 +24,6 @@ internal class ReportsViewModel : BaseViewModel {
     private readonly ILocalizationService _localizationService;
     private readonly IContentDialogService _contentDialogService;
     private readonly SettingsConfig _settingsConfig;
-    private bool _elementsIsolationEnabled = true;
     private bool _openFromClashDetector;
     private ReportViewModel _selectedFile;
     private ObservableCollection<ReportViewModel> _reports;
@@ -84,11 +82,6 @@ internal class ReportsViewModel : BaseViewModel {
     public ReportViewModel SelectedReport {
         get => _selectedFile;
         set => RaiseAndSetIfChanged(ref _selectedFile, value);
-    }
-
-    public bool ElementsIsolationEnabled {
-        get => _elementsIsolationEnabled;
-        set => RaiseAndSetIfChanged(ref _elementsIsolationEnabled, value);
     }
 
 
@@ -191,10 +184,7 @@ internal class ReportsViewModel : BaseViewModel {
     }
 
     private void SelectClash(IClashViewModel clash) {
-        IView3DSetting settings;
-        settings = ElementsIsolationEnabled
-            ? new ClashIsolationViewSettings(_revitRepository, _localizationService, clash, _settingsConfig)
-            : new ClashDefaultViewSettings(_revitRepository, _localizationService, clash, _settingsConfig);
+        var settings = new ClashViewSettings(_revitRepository, _localizationService, clash, _settingsConfig);
         _revitRepository.SelectAndShowElement(clash.GetElements(), settings);
     }
 

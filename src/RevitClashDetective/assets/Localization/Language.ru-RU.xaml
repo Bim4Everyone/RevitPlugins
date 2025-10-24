@@ -35,7 +35,13 @@
     <system:String
         x:Key="SettingsWindow.SecondElementVisibilitySettings">Настройки видимости второго элемента коллизии</system:String>
     <system:String
-        x:Key="SettingsWindow.SectionBoxSettings">Настройки 3D подрезки</system:String>
+        x:Key="SettingsWindow.ClashViewSettings">Настройки просмотра коллизий</system:String>
+    <system:String
+        x:Key="SettingsWindow.ApplySectionBoxSettings">Делать 3D подрезку</system:String>
+    <system:String
+        x:Key="SettingsWindow.ApplyIsolationSettings">Изолировать элементы коллизии</system:String>
+    <system:String
+        x:Key="SettingsWindow.ApplyColorSettings">Окрашивать элементы коллизии</system:String>
     <system:String
         x:Key="SettingsWindow.SectionBoxModeSettings">Режим 3D подрезки:</system:String>
     <system:String
