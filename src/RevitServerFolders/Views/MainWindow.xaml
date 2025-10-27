@@ -273,7 +273,7 @@
                                                     Width="55"
                                                     Margin="0 0 5 0"
                                                     Foreground="{DynamicResource LabelForeground}"
-                                                    Text="{Binding TargetFromLabel}" />
+                                                    Text="{Binding TargetToLabel}" />
                                                 <ui:TextBlock
                                                     Foreground="{DynamicResource LabelForeground}"
                                                     ToolTip="{Binding TargetFolder}">
@@ -299,7 +299,7 @@
                                                     Width="55"
                                                     Margin="0 0 5 0"
                                                     Foreground="{DynamicResource LabelForeground}"
-                                                    Text="{Binding TargetToLabel}" />
+                                                    Text="{Binding TargetFromLabel}" />
                                                 <ui:TextBlock
                                                     Foreground="{DynamicResource LabelForeground}"
                                                     ToolTip="{Binding SourceFolder}">
