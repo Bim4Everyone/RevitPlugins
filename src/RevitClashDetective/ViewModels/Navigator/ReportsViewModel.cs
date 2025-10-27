@@ -132,13 +132,20 @@ internal class ReportsViewModel : BaseViewModel {
 
 
     private void Load() {
-        if(!OpenFileDialogService.ShowDialog(_revitRepository.GetFileDialogPath())) {
+        LoggerService.Information("Запуск команды {@Command}", nameof(LoadCommand));
+        string path = _revitRepository.GetFileDialogPath();
+        LoggerService.Information("Запуск окна выбора файла: {@Path}", path);
+        if(!OpenFileDialogService.ShowDialog(path)) {
+            LoggerService.Information("Отмена команды {@Command}", nameof(LoadCommand));
             throw new OperationCanceledException();
         }
 
+        LoggerService.Information("Начало инициализации коллизий из: {@Path}", OpenFileDialogService?.File?.FullName);
         InitializeClashes(OpenFileDialogService.File.FullName);
+        LoggerService.Information("Завершение инициализации коллизий");
         _revitRepository.CommonConfig.LastRunPath = OpenFileDialogService.File.DirectoryName;
         _revitRepository.CommonConfig.SaveProjectConfig();
+        LoggerService.Information("Завершение команды {@Command}", nameof(LoadCommand));
     }
 
     private void InitializeClashes(string path) {
@@ -184,8 +191,12 @@ internal class ReportsViewModel : BaseViewModel {
     }
 
     private void SelectClash(IClashViewModel clash) {
+        LoggerService.Information("Запуск команды {@Command}", nameof(SelectClashCommand));
         var settings = new ClashViewSettings(_revitRepository, _localizationService, clash, _settingsConfig);
+        var elements = clash.GetElements();
+        LoggerService.Information("Элементы для выбора: {@Elements}", elements);
         _revitRepository.SelectAndShowElement(clash.GetElements(), settings);
+        LoggerService.Information("Завершение команды {@Command}", nameof(SelectClashCommand));
     }
 
     private bool CanSelectClash(IClashViewModel p) {
