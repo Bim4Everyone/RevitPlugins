@@ -9,6 +9,7 @@
     xmlns:vms="clr-namespace:RevitCreateViewSheet.ViewModels"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:local="clr-namespace:RevitCreateViewSheet.Views"
+    xmlns:res="clr-namespace:RevitCreateViewSheet.Resources"
     mc:Ignorable="d"
     WindowStartupLocation="CenterOwner"
     Height="300"
@@ -54,10 +55,14 @@
                 MinWidth="450"
                 MaxWidth="450"
                 DisplayMemberPath="RichName"
-                TextSearch.TextPath="RichName"
-                Style="{StaticResource CustomEditableComboBox}"
-                ItemsSource="{Binding AnnotationSymbolTypes}"
-                SelectedItem="{Binding SelectedAnnotationSymbolType}" />
+                IsEditable="True"
+                IsTextSearchEnabled="False"
+                StaysOpenOnEdit="True"
+                res:ComboBoxBehavior.OpenDropDownOnTextChanged="True"
+                Text="{Binding SearchAnnotationName, UpdateSourceTrigger=PropertyChanged}"
+                Style="{StaticResource CustomComboBox}"
+                ItemsSource="{Binding AnnotationSymbolTypes.View}"
+                SelectedItem="{Binding SelectedAnnotationSymbolType, UpdateSourceTrigger=PropertyChanged}" />
         </StackPanel>
 
         <StackPanel
