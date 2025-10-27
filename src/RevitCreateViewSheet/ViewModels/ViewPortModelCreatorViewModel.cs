@@ -47,7 +47,7 @@ namespace RevitCreateViewSheet.ViewModels {
                 .Select(v => new ViewViewModel(v))
                 .OrderBy(a => a.Name, new LogicalStringComparer())];
             _viewsCanBePlacedOnThisSheet = [.. _allViews];
-            Views = new CollectionViewSource { Source = _viewsCanBePlacedOnThisSheet };
+            Views = new CollectionViewSource() { Source = _viewsCanBePlacedOnThisSheet };
             Views.Filter += ViewsFilterHandler;
             ViewPortTypes = [.. _revitRepository.GetViewPortTypes()
                 .Select(v => new ViewPortTypeViewModel(v))
@@ -98,12 +98,6 @@ namespace RevitCreateViewSheet.ViewModels {
 
         public ICommand AcceptViewCommand { get; }
 
-        private void ViewFilterPropertyChanged(object sender, PropertyChangedEventArgs e) {
-            if(e.PropertyName == nameof(SelectedViewType)
-                || e.PropertyName == nameof(SearchViewName)) {
-                Views?.View.Refresh();
-            }
-        }
 
         /// <summary>
         /// Выключает отображение заданных видов для создания видовых экранов.
@@ -160,6 +154,13 @@ namespace RevitCreateViewSheet.ViewModels {
 
             ErrorText = null;
             return true;
+        }
+
+        private void ViewFilterPropertyChanged(object sender, PropertyChangedEventArgs e) {
+            if(e.PropertyName == nameof(SelectedViewType)
+                || e.PropertyName == nameof(SearchViewName)) {
+                Views?.View.Refresh();
+            }
         }
 
         private IReadOnlyCollection<ViewTypeViewModel> InitializeViewTypes() {
