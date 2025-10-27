@@ -48,9 +48,9 @@ public class GetClashesCommand : BasePluginCommand {
             .InSingletonScope();
         kernel.Bind<SettingsConfig>()
             .ToMethod(c => SettingsConfig.GetSettingsConfig(c.Kernel.Get<IConfigSerializer>()));
-        kernel.UseXtraOpenFileDialog<ReportsViewModel>(
+        kernel.UseWpfOpenFileDialog<ReportsViewModel>(
             filter: "NavisClashReport (*.xml)|*.xml|PluginClashReport (*.json)|*.json");
-        kernel.UseXtraSaveFileDialog<ReportsViewModel>();
+        kernel.UseWpfSaveFileDialog<ReportsViewModel>();
         kernel.UseXtraMessageBox<ReportsViewModel>();
         kernel.Bind<NavigatorView>()
             .ToSelf()
