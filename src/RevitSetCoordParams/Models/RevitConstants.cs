@@ -9,23 +9,27 @@ using RevitSetCoordParams.Models.Enums;
 
 namespace RevitSetCoordParams.Models;
 internal static class RevitConstants {
-
+    // Начальный диаметр сферы в миллиметрах
+    public static double StartDiameterSearchSphereMm = 30;
     // Средне-статистическое максимальное расстояние от удаленных элементов в моделях
     public const double MaxDiameterSearchSphereMm = 2000;
     // Наиболее оптимальный шаг увеличения поисковой сферы
     public const double StepDiameterSearchSphereMm = 200;
-    // Обычно всегда используется поиск
+    // Использование поиска по умолчанию включено
     public const bool Search = true;
     // Самое распространенное значения для записи координат
     public const string TypeModel = "Координаты СМР";
-    // Самое распространенное значения для записи координат
+    // Ключевое слово, для фильтрации объемных элементов
     public const string TypeModelPartName = "СМР";
+    // Имя рабочего набора, элементы которого не будут обработаны
+    public const string WorksetExcludeName = "99_Немоделируемые элементы";
     // Ключевая строка, по которому ищется координационный файл
     public const string CoordFilePartName = "KOORD";
     // Параметр, значения которого используется дли идентификации объемных элементов
     public static RevitParam SourceVolumeParam = SharedParamsConfig.Instance.Description;
     // Категория объемных элементов
     public static BuiltInCategory SourceVolumeCategory = BuiltInCategory.OST_GenericModel;
+
 
     // Утвержденные категории, которые используются в проектах разных дисциплин
     private static readonly List<BuiltInCategory> _allCategories = [

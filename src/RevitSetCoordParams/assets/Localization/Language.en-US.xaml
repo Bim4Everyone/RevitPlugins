@@ -68,7 +68,11 @@
     <system:String x:Key="MainViewModel.CurrentViewProvider">Visible elements in the view</system:String>
     <system:String x:Key="MainViewModel.CenterPositionProvider">At the center of the element</system:String>
     <system:String x:Key="MainViewModel.BottomPositionProvider">At the bottom of the element</system:String>
+    <system:String x:Key="MainViewModel.UpPositionProvider">At the up of the element</system:String>
     <system:String x:Key="MainViewModel.NoTypeModel">The required 3D models are missing in the file</system:String>
+
+    <system:String x:Key="MainViewModel.NoSelection">Elements is not selected</system:String>
+    <system:String x:Key="MainViewModel.WrongView">Please, open 3D-view, floor plan or schedule</system:String>
 
     <system:String x:Key="SourceFileViewModel.CurrentFile">Current file (opened)</system:String>
 
@@ -77,7 +81,9 @@
     <system:String x:Key="ParamViewModel.WarningStartString">Wrong parameters:</system:String>
 
     <system:String x:Key="Common.ParamErrorMessageBody">Error copying parameters</system:String>
-    
+
+    <system:String x:Key="SetCoordParamsProcessor.TransactionName">Assigning parameters SMR</system:String>
+
     <system:String x:Key="Common.ConfigErrorMessageTitle">Plug-in configuration error</system:String>
 
 </ResourceDictionary>

@@ -1,5 +1,3 @@
-using System.Collections.Generic;
-
 using Autodesk.Revit.DB;
 
 using RevitSetCoordParams.Models.Enums;
@@ -16,7 +14,7 @@ internal class PositionProviderCenter : IPositionProvider {
     }
     public PositionProviderType Type => PositionProviderType.CenterPositionProvider;
 
-    public ICollection<XYZ> GetPositionElement(Element element) {
-        throw new System.NotImplementedException();
+    public XYZ GetPositionElement(RevitElement revitElement) {
+        return _revitRepository.GetPositionCenter(revitElement);
     }
 }

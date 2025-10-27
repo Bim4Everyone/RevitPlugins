@@ -1,44 +1,127 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
-
 
 using Autodesk.Revit.ApplicationServices;
 using Autodesk.Revit.DB;
 using Autodesk.Revit.UI;
 
+using dosymep.Bim4Everyone;
 using dosymep.Revit;
+using dosymep.Revit.Geometry;
+
+using RevitSetCoordParams.Models.Services;
 
 namespace RevitSetCoordParams.Models;
 
 internal class RevitRepository {
 
-    // Словарь всех связанных документов, включая текущий
-    private readonly Dictionary<string, Document> _documentsByName = [];
-
     public RevitRepository(UIApplication uiApplication) {
         UIApplication = uiApplication;
-        BuildDocumentsDictionary();
     }
 
     public UIApplication UIApplication { get; }
     public UIDocument ActiveUIDocument => UIApplication.ActiveUIDocument;
     public Application Application => UIApplication.Application;
     public Document Document => ActiveUIDocument.Document;
+    private DocumentsService DocumentsService => new(Document);
 
-    public ICollection<RevitElement> GetAllRevitElements(IEnumerable<BuiltInCategory> categories) {
-        return [];
+
+    public IEnumerable<RevitElement> GetAllRevitElements(IEnumerable<BuiltInCategory> categories) {
+        return categories == null || !categories.Any()
+            ? []
+            : categories
+            .SelectMany(category => new FilteredElementCollector(Document)
+                .OfCategory(category)
+                .WhereElementIsNotElementType()
+                .Cast<Element>()
+                .Select(element => new RevitElement {
+                    Element = element,
+                    BoundingBoxXYZ = element.GetBoundingBox()
+                })
+                .Where(element => element.BoundingBoxXYZ != null)
+            );
     }
 
-    public ICollection<RevitElement> GetCurrentViewRevitElements(IEnumerable<BuiltInCategory> categories) {
-        return [];
+    public IEnumerable<RevitElement> GetCurrentViewRevitElements(IEnumerable<BuiltInCategory> categories) {
+        return categories == null || !categories.Any()
+           ? []
+           : categories
+           .SelectMany(category => new FilteredElementCollector(Document, GetCurrentView().Id)
+               .OfCategory(category)
+               .WhereElementIsNotElementType()
+               .Cast<Element>()
+               .Select(element => new RevitElement {
+                   Element = element,
+                   BoundingBoxXYZ = element.GetBoundingBox()
+               })
+               .Where(element => element.BoundingBoxXYZ != null)
+           );
     }
 
-    public ICollection<RevitElement> GetSelectedRevitElements(IEnumerable<BuiltInCategory> categories) {
-        return [];
+    public IEnumerable<RevitElement> GetSelectedRevitElements(IEnumerable<BuiltInCategory> categories) {
+        var selectedElements = ActiveUIDocument.GetSelectedElements();
+
+        if(!selectedElements.Any()) {
+            return [];
+        }
+        var categorySet = new HashSet<BuiltInCategory>(categories);
+        return selectedElements
+            .Where(element => {
+                var builtInCategory = element.Category.GetBuiltInCategory();
+                return categorySet.Contains(builtInCategory);
+            })
+            .Select(element => new RevitElement {
+                Element = element,
+                BoundingBoxXYZ = element.GetBoundingBox()
+            })
+            .Where(element => element.BoundingBoxXYZ != null);
     }
 
-    public View GetCurrentView() {
-        return ActiveUIDocument.ActiveView;
+    // Метод получения выделенных элементов
+    public IEnumerable<Element> GetSelectedElements() {
+        return ActiveUIDocument.GetSelectedElements();
+    }
+
+    public ICollection<RevitElement> GetRevitElements(Document document, string typeModel) {
+        return new FilteredElementCollector(document)
+            .OfCategory(RevitConstants.SourceVolumeCategory)
+            .WhereElementIsNotElementType()
+            .Cast<Element>()
+            .Where(instance => instance.GetParamValueString(RevitConstants.SourceVolumeParam).Equals(typeModel))
+            .Select(instance => {
+                var transform = document.IsLinked ? DocumentsService.GetTransformByName(document.GetUniqId()) : null;
+                var transSolid = SolidUtils.CreateTransformed(GetUnitedSolid(instance), transform);
+                return new RevitElement { Element = instance, Solid = transSolid };
+            })
+            .ToList();
+    }
+
+
+    // Метод получения объединенного солида
+    private Solid GetUnitedSolid(Element element) {
+        var solids = element.GetSolids().ToList();
+        var unitedSolids = SolidExtensions.CreateUnitedSolids(solids);
+
+        var validSolids = unitedSolids
+            .Where(s => s != null && s.Faces.Size > 0 && s.Edges.Size > 0)
+            .ToList();
+
+        return validSolids
+            .OrderByDescending(GetSafeSolidVolume)
+            .FirstOrDefault();
+    }
+
+    // Метод безопасного получения объёма солида
+    private double GetSafeSolidVolume(Solid solid) {
+        if(solid == null) {
+            return 0;
+        }
+        try {
+            return solid.Volume;
+        } catch {
+            return 0;
+        }
     }
 
     // Метод получения всех значений параметра ФОП_Зона у категории "Обобщенные модели"
@@ -55,62 +138,49 @@ internal class RevitRepository {
                 .Distinct();
     }
 
+    public XYZ GetPositionCenter(RevitElement revitElement) {
+        return (revitElement.BoundingBoxXYZ.Max + revitElement.BoundingBoxXYZ.Min) / 2;
+    }
+
+    public XYZ GetPositionBottom(RevitElement revitElement) {
+        var center = (revitElement.BoundingBoxXYZ.Max + revitElement.BoundingBoxXYZ.Min) / 2;
+        return new XYZ(center.X, center.Y, revitElement.BoundingBoxXYZ.Min.Z);
+    }
+
+    public XYZ GetPositionUp(RevitElement revitElement) {
+        var center = (revitElement.BoundingBoxXYZ.Max + revitElement.BoundingBoxXYZ.Min) / 2;
+        return new XYZ(center.X, center.Y, revitElement.BoundingBoxXYZ.Max.Z);
+    }
+
     // Метод возвращения документа по имени
     public Document FindDocumentsByName(string namePart) {
-        if(string.IsNullOrWhiteSpace(namePart)) {
-            return Document;
-        }
-        var koordDoc = _documentsByName
-            .FirstOrDefault(kvp => kvp.Key.Equals(RevitConstants.CoordFilePartName))
-            .Value;
-        if(koordDoc != null) {
-            return koordDoc;
-        }
-        var foundDoc = _documentsByName
-            .FirstOrDefault(kvp => kvp.Key.Contains(namePart))
-            .Value;
-        return foundDoc ?? Document;
+        return DocumentsService.GetDocumentByNamePart(namePart);
     }
 
     // Метод возвращения всех документов, включая текущий
     public IEnumerable<Document> GetAllDocuments() {
-        return _documentsByName
-            .Select(pair => pair.Value);
+        return DocumentsService.GetAllDocuments();
     }
 
-    // Метод заполнения словаря (имя, документ)
-    private void BuildDocumentsDictionary() {
-        _documentsByName.Clear();
-
-        if(Document != null) {
-            _documentsByName[Document.Title] = Document;
-        }
-
-        foreach(var linkDoc in GetLinkDocuments()) {
-            if(linkDoc != null && !_documentsByName.ContainsKey(linkDoc.Title)) {
-                _documentsByName[linkDoc.Title] = linkDoc;
-            }
-        }
+    public View GetCurrentView() {
+        return ActiveUIDocument.ActiveGraphicalView;
     }
 
-    // Метод получения документа "Связанный файл"
-    private IEnumerable<Document> GetLinkDocuments() {
-        var linkInstances = new FilteredElementCollector(Document)
-            .OfCategory(BuiltInCategory.OST_RvtLinks)
-            .OfClass(typeof(RevitLinkInstance))
-            .Cast<RevitLinkInstance>();
+    public Solid GetSphereSolid(XYZ location, double diameter) {
+        var startPoint = new XYZ(location.X, location.Y, location.Z - diameter / 2);
+        var midPoint = new XYZ(location.X + diameter / 2, location.Y, location.Z);
+        var endPoint = new XYZ(location.X, location.Y, location.Z + diameter / 2);
 
-        return !linkInstances.Any()
-            ? Enumerable.Empty<Document>()
-            : linkInstances
-        .Select(instance => new {
-            Instance = instance,
-            LinkType = Document.GetElement(instance.GetTypeId()) as RevitLinkType
-        })
-        .Where(x => x.LinkType != null
-                    && !x.LinkType.IsNestedLink
-                    && x.LinkType.GetLinkedFileStatus() == LinkedFileStatus.Loaded)
-        .Select(x => x.Instance.GetLinkDocument())
-        .Where(doc => doc != null);
+        var arc = Arc.Create(startPoint, endPoint, midPoint);
+        var line = Line.CreateBound(endPoint, startPoint);
+
+        var curve_loop = CurveLoop.Create([arc, line]);
+
+        int startAngle = 0;
+        double endAngle = 2 * Math.PI;
+
+        var frame = new Frame { Origin = location };
+
+        return GeometryCreationUtilities.CreateRevolvedGeometry(frame, [curve_loop], startAngle, endAngle);
     }
 }

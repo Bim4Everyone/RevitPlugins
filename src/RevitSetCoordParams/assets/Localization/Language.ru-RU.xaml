@@ -67,8 +67,12 @@
     <system:String x:Key="MainViewModel.SelectedElementsProvider">Выделенные элементы модели</system:String>
     <system:String x:Key="MainViewModel.CurrentViewProvider">Видимые элементы на виде</system:String>
     <system:String x:Key="MainViewModel.CenterPositionProvider">По центру элемента</system:String>
-    <system:String x:Key="MainViewModel.BottomPositionProvider">По низу элемента</system:String>    
+    <system:String x:Key="MainViewModel.BottomPositionProvider">По низу элемента</system:String>
+    <system:String x:Key="MainViewModel.UpPositionProvider">По верху элемента</system:String>
     <system:String x:Key="MainViewModel.NoTypeModel">В файле отсутствуют необходимые объемные модели</system:String>
+    
+    <system:String x:Key="MainViewModel.NoSelection">Элементы не выбраны</system:String>
+    <system:String x:Key="MainViewModel.WrongView">Пожалуйста, откройте 3Д вид, план этажа или спецификацию</system:String>
 
     <system:String x:Key="SourceFileViewModel.CurrentFile">Текущий файл (открытый)</system:String>
 
@@ -77,7 +81,9 @@
     <system:String x:Key="ParamViewModel.WarningStartString">Ошибочные параметры:</system:String>
 
     <system:String x:Key="Common.ParamErrorMessageBody">Ошибка загрузки параметров</system:String>
-    
+
+    <system:String x:Key="SetCoordParamsProcessor.TransactionName">Назначение параметров СМР</system:String>
+
     <system:String x:Key="Common.ConfigErrorMessageTitle">Ошибка настройки плагина</system:String>
 
 </ResourceDictionary>

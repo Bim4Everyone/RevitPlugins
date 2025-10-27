@@ -16,7 +16,7 @@ internal class ElementsProviderAll : IElementsProvider {
 
     public ElementsProviderType Type => ElementsProviderType.AllElementsProvider;
 
-    public ICollection<RevitElement> GetRevitElements(IEnumerable<BuiltInCategory> categories) {
+    public IEnumerable<RevitElement> GetRevitElements(IEnumerable<BuiltInCategory> categories) {
         return _revitRepository.GetAllRevitElements(categories);
     }
 }

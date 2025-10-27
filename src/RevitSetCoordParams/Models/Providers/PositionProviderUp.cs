@@ -4,18 +4,15 @@ using RevitSetCoordParams.Models.Enums;
 using RevitSetCoordParams.Models.Interfaces;
 
 namespace RevitSetCoordParams.Models.Providers;
-
-internal class PositionProviderBottom : IPositionProvider {
-
+internal class PositionProviderUp : IPositionProvider {
     private readonly RevitRepository _revitRepository;
 
-    public PositionProviderBottom(RevitRepository revitRepository) {
+    public PositionProviderUp(RevitRepository revitRepository) {
         _revitRepository = revitRepository;
     }
-
-    public PositionProviderType Type => PositionProviderType.BottomPositionProvider;
+    public PositionProviderType Type => PositionProviderType.UpPositionProvider;
 
     public XYZ GetPositionElement(RevitElement revitElement) {
-        return _revitRepository.GetPositionBottom(revitElement);
+        return _revitRepository.GetPositionUp(revitElement);
     }
 }

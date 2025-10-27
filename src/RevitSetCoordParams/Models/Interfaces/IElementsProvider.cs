@@ -10,5 +10,5 @@ internal interface IElementsProvider {
 
     ElementsProviderType Type { get; }
 
-    ICollection<RevitElement> GetRevitElements(IEnumerable<BuiltInCategory> categories);
+    IEnumerable<RevitElement> GetRevitElements(IEnumerable<BuiltInCategory> categories);
 }

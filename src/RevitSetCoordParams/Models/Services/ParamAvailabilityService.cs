@@ -29,7 +29,7 @@ internal class ParamAvailabilityService : IParamAvailabilityService {
             : null;
     }
 
-    public ParamAvailabilityCache GetOrBuildCache(Document doc) {
+    private ParamAvailabilityCache GetOrBuildCache(Document doc) {
         string docId = doc.GetUniqId();
         if(_cacheByDocId.TryGetValue(docId, out var cache)) {
             return cache;

@@ -28,6 +28,7 @@ internal class SetCoordParamsSettings {
     public double MaxDiameterSearchSphereMm { get; set; }
     public double StepDiameterSearchSphereMm { get; set; }
     public bool Search { get; set; }
+    public ISphereProvider SphereProvider { get; set; }
 
     public void LoadConfigSettings() {
         ParamMaps = ConfigSettings.ParamMaps;
@@ -39,6 +40,7 @@ internal class SetCoordParamsSettings {
         MaxDiameterSearchSphereMm = ConfigSettings.MaxDiameterSearchSphereMm;
         StepDiameterSearchSphereMm = ConfigSettings.StepDiameterSearchSphereMm;
         Search = ConfigSettings.Search;
+        SphereProvider = _providersFactory.GetSphereProvider(_revitRepository);
     }
 
     public void UpdateConfigSettings() {

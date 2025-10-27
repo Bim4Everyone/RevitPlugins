@@ -1,5 +1,3 @@
-using System.Collections.Generic;
-
 using Autodesk.Revit.DB;
 
 using RevitSetCoordParams.Models.Enums;
@@ -10,5 +8,5 @@ internal interface IPositionProvider {
 
     PositionProviderType Type { get; }
 
-    ICollection<XYZ> GetPositionElement(Element element);
+    XYZ GetPositionElement(RevitElement revitElement);
 }

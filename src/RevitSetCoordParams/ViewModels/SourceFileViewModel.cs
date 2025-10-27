@@ -1,7 +1,6 @@
 using dosymep.Revit;
 using dosymep.SimpleServices;
 
-using RevitSetCoordParams.Models.Enums;
 using RevitSetCoordParams.Models.Interfaces;
 
 namespace RevitSetCoordParams.ViewModels;
@@ -21,7 +20,7 @@ internal class SourceFileViewModel {
     public string FileName { get; set; }
 
     private string GetFileName() {
-        return FileProvider.Type == FileProviderType.CurrentFileProvider
+        return !FileProvider.Document.IsLinked
            ? _localizationService.GetLocalizedString("SourceFileViewModel.CurrentFile")
            : SuorceFileUniqueId;
     }

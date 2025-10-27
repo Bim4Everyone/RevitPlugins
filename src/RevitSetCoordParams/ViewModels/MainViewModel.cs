@@ -156,24 +156,24 @@ internal class MainViewModel : BaseViewModel {
 
     // Метод получения коллекции TypeModelViewModel для TypeModels
     private IEnumerable<TypeModelViewModel> GetTypeModelViewModels() {
-        var currentSourceDocument = SelectedSourceFile.FileProvider.Document;
-        var sourceElementsValues = _revitRepository.GetSourceElementsValues(currentSourceDocument);
+        var currentDocument = SelectedSourceFile.FileProvider.Document;
+        var sourceElementsValues = _revitRepository.GetSourceElementsValues(currentDocument);
         return !sourceElementsValues.Any()
             ? []
             : sourceElementsValues
                 .Select(value => new TypeModelViewModel { Name = value })
-                .OrderByDescending(vm => vm.Name == _setCoordParamsSettings.TypeModel);
+                .OrderByDescending(vm => vm.Name.Equals(_setCoordParamsSettings.TypeModel));
     }
 
-    // Метод получения коллекции SourceFileViewModel для SourceFiles
-    private IEnumerable<SourceFileViewModel> GetSourceFileViewModels() {
+    // Метод получения коллекции SourceFilesViewModel для SourceFiles
+    private IEnumerable<SourceFileViewModel> GetSourceFilesViewModels() {
         var currentProvider = _setCoordParamsSettings.FileProvider;
         return _revitRepository.GetAllDocuments()
             .Select(document => {
                 var provider = _providersFactory.GetFileProvider(_revitRepository, document);
                 return new SourceFileViewModel(_localizationService, provider);
             })
-            .OrderByDescending(vm => vm.FileProvider.Document.GetUniqId() == currentProvider.Document.GetUniqId());
+            .OrderByDescending(vm => vm.FileProvider.Document.GetUniqId().Equals(currentProvider.Document.GetUniqId()));
     }
 
     // Метод получения коллекции PositionViewModel для Positions
@@ -349,7 +349,7 @@ internal class MainViewModel : BaseViewModel {
         LoadConfig();
         RangeElements = new ObservableCollection<RangeElementsViewModel>(GetRangeElementsViewModels());
         SelectedRangeElements = RangeElements.First();
-        SourceFiles = new ObservableCollection<SourceFileViewModel>(GetSourceFileViewModels());
+        SourceFiles = new ObservableCollection<SourceFileViewModel>(GetSourceFilesViewModels());
         SelectedSourceFile = SourceFiles.First();
         TypeModels = new ObservableCollection<TypeModelViewModel>(GetTypeModelViewModels());
         SelectedTypeModel = TypeModels.FirstOrDefault();
@@ -387,10 +387,26 @@ internal class MainViewModel : BaseViewModel {
     // Основной метод
     private void AcceptView() {
         SaveConfig();
+        var processor = new SetCoordParamsProcessor(_localizationService, _revitRepository, _setCoordParamsSettings);
+        processor.Run();
     }
 
     // Метод проверки возможности выполнения основного вида
     private bool CanAcceptView() {
+        if(SelectedRangeElements != null) {
+            if(SelectedRangeElements.ElementsProvider.Type == ElementsProviderType.SelectedElementsProvider
+                && _revitRepository.GetSelectedElements().ToList().Count == 0) {
+                ErrorText = _localizationService.GetLocalizedString("MainViewModel.NoSelection");
+                return false;
+            }
+            if(SelectedRangeElements.ElementsProvider.Type == ElementsProviderType.CurrentViewProvider) {
+                var activeView = _revitRepository.GetCurrentView();
+                if(activeView.ViewType is not (ViewType.ThreeD or ViewType.Schedule or ViewType.FloorPlan)) {
+                    ErrorText = _localizationService.GetLocalizedString("MainViewModel.WrongView");
+                    return false;
+                }
+            }
+        }
         if(SelectedParams != null) {
             if(SelectedParams.Count == 0) {
                 ErrorText = _localizationService.GetLocalizedString("MainViewModel.NoParams");

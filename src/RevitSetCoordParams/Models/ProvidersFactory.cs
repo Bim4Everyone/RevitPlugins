@@ -1,7 +1,5 @@
 using Autodesk.Revit.DB;
 
-using dosymep.Revit;
-
 using RevitSetCoordParams.Models.Enums;
 using RevitSetCoordParams.Models.Interfaces;
 using RevitSetCoordParams.Models.Providers;
@@ -19,16 +17,19 @@ internal class ProvidersFactory {
     }
 
     public IFileProvider GetFileProvider(RevitRepository revitRepository, Document document) {
-        return document.GetUniqId().Equals(revitRepository.Document.GetUniqId())
-            ? new FileProviderCurrent(revitRepository, document)
-            : new FileProviderLink(revitRepository, document);
+        return new FileProvider(revitRepository, document);
     }
 
     public IPositionProvider GetPositionProvider(RevitRepository revitRepository, PositionProviderType type) {
         return type switch {
             PositionProviderType.CenterPositionProvider => new PositionProviderCenter(revitRepository),
             PositionProviderType.BottomPositionProvider => new PositionProviderBottom(revitRepository),
+            PositionProviderType.UpPositionProvider => new PositionProviderUp(revitRepository),
             _ => new PositionProviderCenter(revitRepository)
         };
+    }
+
+    public ISphereProvider GetSphereProvider(RevitRepository revitRepository) {
+        return new SphereProvider(revitRepository);
     }
 }
