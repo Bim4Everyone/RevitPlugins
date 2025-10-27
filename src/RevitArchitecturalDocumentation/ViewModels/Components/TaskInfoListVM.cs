@@ -6,6 +6,7 @@ using Autodesk.Revit.DB;
 using Autodesk.Revit.Exceptions;
 using Autodesk.Revit.UI.Selection;
 
+using dosymep.SimpleServices;
 using dosymep.WPF.Commands;
 using dosymep.WPF.ViewModels;
 
@@ -17,23 +18,27 @@ internal class TaskInfoListVM : BaseViewModel {
     private readonly PluginConfig _pluginConfig;
     private readonly RevitRepository _revitRepository;
     private readonly CreatingARDocsVM _creatingARDocsVM;
+    private readonly ILocalizationService _localizationService;
 
     private TaskInfoVM _selectedTask;
     private List<Element> _visibilityScopes;
     private ObservableCollection<TaskInfoVM> _tasksForWork = [];
 
 
-    public TaskInfoListVM(PluginConfig pluginConfig, RevitRepository revitRepository, CreatingARDocsVM creatingARDocsVM) {
+    public TaskInfoListVM(PluginConfig pluginConfig, RevitRepository revitRepository, CreatingARDocsVM creatingARDocsVM,
+                          ILocalizationService localizationService) {
         _pluginConfig = pluginConfig;
         _revitRepository = revitRepository;
         _creatingARDocsVM = creatingARDocsVM;
+        _localizationService = localizationService;
 
         AddTaskCommand = RelayCommand.Create(AddTask);
         DeleteTaskCommand = RelayCommand.Create(DeleteTask);
         SelectSpecsCommand = RelayCommand.Create<TaskInfoVM>(SelectSpecs);
 
         VisibilityScopes = _revitRepository.VisibilityScopes;
-        TasksForWork.Add(new TaskInfoVM(_revitRepository.RegexForBuildingPart, _revitRepository.RegexForBuildingSection, 1));
+        TasksForWork.Add(new TaskInfoVM(_revitRepository.RegexForBuildingPart, _revitRepository.RegexForBuildingSection,
+                                        localizationService, 1));
     }
 
 
@@ -65,8 +70,9 @@ internal class TaskInfoListVM : BaseViewModel {
     /// </summary>
     private void AddTask() {
         TasksForWork.Add(new TaskInfoVM(_revitRepository.RegexForBuildingPart, 
-                         _revitRepository.RegexForBuildingSection, 
-                         TasksForWork.Count + 1));
+                                        _revitRepository.RegexForBuildingSection, 
+                                        _localizationService,
+                                        TasksForWork.Count + 1));
     }
 
     /// <summary>
@@ -91,7 +97,8 @@ internal class TaskInfoListVM : BaseViewModel {
             IList<Reference> references = new List<Reference>();
             try {
                 references = _revitRepository.ActiveUIDocument.Selection
-                                .PickObjects(ObjectType.Element, selectFilter, "Выберите спецификации на листе");
+                                .PickObjects(ObjectType.Element, selectFilter, 
+                                    _localizationService.GetLocalizedString("CopySpecSheetInstanceVM.SelectSpecsOnSheet"));
             } catch(OperationCanceledException) {
 
                 _creatingARDocsVM.PCOnASPDocsView.ShowDialog();

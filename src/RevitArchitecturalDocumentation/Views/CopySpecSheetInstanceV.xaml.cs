@@ -26,12 +26,12 @@ public partial class CopySpecSheetInstanceV {
     }
 
     private void ButtonCancel_Click(object sender, RoutedEventArgs e) {
-        DialogResult = false;
+        Close();
     }
 
     private void Window_KeyDown(object sender, KeyEventArgs e) {
         if(e.Key == Key.Escape) {
-            DialogResult = false;
+            Close();
         }
     }
 }

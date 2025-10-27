@@ -50,7 +50,7 @@
 
         <ui:TitleBar
             Grid.Row="0"
-            Title="{me:LocalizationSource CreatingARDocsV.Title}" />
+            Title="{me:LocalizationSource CopySpecSheetInstanceV.Title}" />
 
         <Border
             Grid.Row="1"
@@ -73,7 +73,7 @@
                     <ui:TextBlock
                         Margin="10 3"
                         VerticalAlignment="Center"
-                        Text="Выбрано листов:" />
+                        Text="{me:LocalizationSource CopySpecSheetInstanceV.SelectedSheetCount}" />
 
                     <ui:TextBlock
                         Margin="5 3"
@@ -86,7 +86,7 @@
                     Margin="10 5"
                     VerticalAlignment="Stretch"
                     HorizontalAlignment="Stretch"
-                    Content="Выбрать спецификации"
+                    Content="{me:LocalizationSource CopySpecSheetInstanceV.SelectedSpecs}"
                     Command="{Binding Path=SelectSpecsCommand}" />
 
                 <StackPanel
@@ -97,7 +97,7 @@
                     <ui:TextBlock
                         Margin="10 3"
                         VerticalAlignment="Center"
-                        Text="Выбрано спецификаций:" />
+                        Text="{me:LocalizationSource CopySpecSheetInstanceV.SelectedSpecsCount}" />
 
                     <ui:TextBlock
                         Margin="5 3"
@@ -124,7 +124,7 @@
                     Margin="10 5"
                     VerticalAlignment="Center"
                     HorizontalAlignment="Left"
-                    Text="Выберите поле фильтрации этажа:" />
+                    Text="{me:LocalizationSource CopySpecSheetInstanceV.LevelFieldFilter}" />
 
                 <ComboBox
                     Grid.Row="1"
@@ -149,7 +149,7 @@
             <ui:Button
                 Margin="10"
                 Width="80"
-                Content="ОК"
+                Content="{me:LocalizationSource Window.ButtonOk}"
                 Appearance="Info"
                 Click="ButtonOk_Click"
                 Command="{Binding Path=AcceptViewCommand}"/>
@@ -157,7 +157,7 @@
             <ui:Button
                 Margin="10"
                 Width="80"
-                Content="Отмена"
+                Content="{me:LocalizationSource Window.ButtonCancel}"
                 Click="ButtonCancel_Click" />
         </StackPanel>
     </Grid>

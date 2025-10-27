@@ -3,8 +3,12 @@ using System.Linq;
 
 using Autodesk.Revit.DB;
 
+using dosymep.SimpleServices;
+
 namespace RevitArchitecturalDocumentation.Models;
 internal class SpecHelper {
+    private readonly ILocalizationService _localizationService;
+    
     public SpecHelper(RevitRepository revitRepository, ScheduleSheetInstance scheduleSheetInstance, TreeReportNode report = null) {
 
         Report = report;
@@ -18,10 +22,12 @@ internal class SpecHelper {
         NameHelper = new ViewNameHelper(Specification);
     }
 
-    public SpecHelper(RevitRepository revitRepository, ViewSchedule viewSchedule, TreeReportNode report = null) {
+    public SpecHelper(RevitRepository revitRepository, ViewSchedule viewSchedule, ILocalizationService localizationService,
+                      TreeReportNode report = null) {
 
         Report = report;
         Repository = revitRepository;
+        _localizationService = localizationService;
 
         Specification = viewSchedule;
         SpecificationDefinition = Specification.Definition;
@@ -31,6 +37,7 @@ internal class SpecHelper {
 
     public TreeReportNode Report { get; set; }
     public RevitRepository Repository { get; set; }
+
     public ScheduleSheetInstance SpecSheetInstance { get; set; }
     public XYZ SpecSheetInstancePoint { get; set; }
     public ViewSchedule Specification { get; set; }
@@ -71,17 +78,19 @@ internal class SpecHelper {
         SpecHelper newSpecHelper;
         // Если спеку с указанным именем не нашли, то будем создавать дублированием
         if(newViewSpec is null) {
-            Report?.AddNodeWithName($"Спецификация с именем \"{specName}\" не найдена в проекте, приступаем к созданию");
+            Report?.AddNodeWithName($"{_localizationService.GetLocalizedString("CopySpecSheetInstanceVM.Report.SpecWithName")} " +
+                $"\"{specName}\" {_localizationService.GetLocalizedString("CopySpecSheetInstanceVM.Report.NotFindLetsCreate")}");
             newViewSpec = Repository.Document.GetElement(Specification.Duplicate(ViewDuplicateOption.Duplicate)) as ViewSchedule;
-            Report?.AddNodeWithName($"Спецификация успешно создана!");
+            Report?.AddNodeWithName(_localizationService.GetLocalizedString("CopySpecSheetInstanceVM.Report.SpecCreatedSuccessfully"));
             newViewSpec.Name = specName;
-            Report?.AddNodeWithName($"Задано имя: {newViewSpec.Name}");
+            Report?.AddNodeWithName($"{_localizationService.GetLocalizedString("CopySpecSheetInstanceVM.Report.NameGiven")} {newViewSpec.Name}");
 
-            newSpecHelper = new SpecHelper(Repository, newViewSpec, Report);
+            newSpecHelper = new SpecHelper(Repository, newViewSpec, _localizationService, Report);
             newSpecHelper.ChangeSpecFilters(filterName, numberOfLevelAsInt);
         } else {
-            Report?.AddNodeWithName($"Спецификация с именем \"{newViewSpec.Name}\" успешно найдена в проекте!");
-            newSpecHelper = new SpecHelper(Repository, newViewSpec, Report);
+            Report?.AddNodeWithName($"{_localizationService.GetLocalizedString("CopySpecSheetInstanceVM.Report.SpecWithName")} " +
+                $"\"{newViewSpec.Name}\" {_localizationService.GetLocalizedString("CopySpecSheetInstanceVM.Report.SpecFinded")}");
+            newSpecHelper = new SpecHelper(Repository, newViewSpec, _localizationService, Report);
         }
         newSpecHelper.SpecSheetInstancePoint = SpecSheetInstancePoint;
 
@@ -111,7 +120,7 @@ internal class SpecHelper {
                 string newVal = string.Format(format, newFilterValue);
                 currentFilter.SetValue(newVal);
 
-                Report?.AddNodeWithName($"Фильтру задали значение {currentFilter.GetStringValue()}");
+                Report?.AddNodeWithName($"{_localizationService.GetLocalizedString("CopySpecSheetInstanceVM.Report.SetFilterValue")} {currentFilter.GetStringValue()}");
                 newScheduleFilters.Add(currentFilter);
             } else {
                 newScheduleFilters.Add(currentFilter);
@@ -136,9 +145,9 @@ internal class SpecHelper {
         SpecSheetInstance = newScheduleSheetInstance;
 
         if(newScheduleSheetInstance is null) {
-            Report?.AddNodeWithName($"❗ Не удалось создать видовой экран спецификации на листе!");
+            Report?.AddNodeWithName(_localizationService.GetLocalizedString("CopySpecSheetInstanceVM.Report.FailedViewportCreation"));
         } else {
-            Report?.AddNodeWithName($"Видовой экран спецификации успешно создан на листе!");
+            Report?.AddNodeWithName(_localizationService.GetLocalizedString("CopySpecSheetInstanceVM.Report.SuccessViewportCreation"));
         }
 
         return newScheduleSheetInstance;

@@ -7,18 +7,19 @@ using Autodesk.Revit.DB;
 using Autodesk.Revit.UI.Selection;
 
 using dosymep.Revit;
+using dosymep.SimpleServices;
 using dosymep.WPF.Commands;
 using dosymep.WPF.ViewModels;
 
 using RevitArchitecturalDocumentation.Models;
 using RevitArchitecturalDocumentation.Models.Exceptions;
-using RevitArchitecturalDocumentation.ViewModels.Components;
 using RevitArchitecturalDocumentation.Views;
 
 namespace RevitArchitecturalDocumentation.ViewModels;
 internal class CopySpecSheetInstanceVM : BaseViewModel {
     private readonly PluginConfig _pluginConfig;
     private readonly RevitRepository _revitRepository;
+    private readonly ILocalizationService _localizationService;
 
     private ObservableCollection<SheetHelper> _selectedSheets = [];
     private ObservableCollection<SpecHelper> _scheduleSheetInstances = [];
@@ -28,10 +29,11 @@ internal class CopySpecSheetInstanceVM : BaseViewModel {
 
     private string _errorText;
 
-    public CopySpecSheetInstanceVM(PluginConfig pluginConfig, RevitRepository revitRepository) {
+    public CopySpecSheetInstanceVM(PluginConfig pluginConfig, RevitRepository revitRepository, 
+                                   ILocalizationService localizationService) {
         _pluginConfig = pluginConfig;
         _revitRepository = revitRepository;
-
+        _localizationService = localizationService;
 
         LoadViewCommand = RelayCommand.Create<CopySpecSheetInstanceV>(LoadView);
         AcceptViewCommand = RelayCommand.Create(AcceptView, CanAcceptView);
@@ -109,7 +111,7 @@ internal class CopySpecSheetInstanceVM : BaseViewModel {
     /// </summary>
     private bool CanAcceptView() {
         if(SelectedSheets.Count == 0) {
-            ErrorText = "Не выбрано ни одного листа";
+            ErrorText = _localizationService.GetLocalizedString("CopySpecSheetInstanceVM.SheetNotSelected");
             return false;
         }
 
@@ -130,7 +132,7 @@ internal class CopySpecSheetInstanceVM : BaseViewModel {
         }
 
         if(ScheduleSheetInstances.Count == 0) {
-            ErrorText = "Не выбрано ни одной спецификации на листе";
+            ErrorText = _localizationService.GetLocalizedString("CopySpecSheetInstanceVM.SpecsNotSelected");
             return false;
         }
 
@@ -151,7 +153,7 @@ internal class CopySpecSheetInstanceVM : BaseViewModel {
         }
 
         if(SelectedFilterNameForSpecs == string.Empty) {
-            ErrorText = "Не выбрано поле фильтрации этажа";
+            ErrorText = _localizationService.GetLocalizedString("CopySpecSheetInstanceVM.LevelFieldFilterNotSelected");
             return false;
         }
 
@@ -217,7 +219,8 @@ internal class CopySpecSheetInstanceVM : BaseViewModel {
         ScheduleSheetInstances.Clear();
         ISelectionFilter selectFilter = new ScheduleSelectionFilter();
         IList<Reference> references = _revitRepository.ActiveUIDocument.Selection
-                        .PickObjects(ObjectType.Element, selectFilter, "Выберите спецификации на листе");
+                        .PickObjects(ObjectType.Element, selectFilter, 
+                                     _localizationService.GetLocalizedString("CopySpecSheetInstanceVM.SelectSpecsOnSheet"));
 
         foreach(var reference in references) {
             if(_revitRepository.Document.GetElement(reference) is not ScheduleSheetInstance elem) {
@@ -261,9 +264,9 @@ internal class CopySpecSheetInstanceVM : BaseViewModel {
     /// Метод, отрабатывающий при запуске плагина в работу. Выполняет копирование спецификаций
     /// </summary>
     private void CopySpecs() {
-
-        using var transaction = _revitRepository.Document.StartTransaction("Копирование спецификаций");
-
+        using var transaction = _revitRepository.Document
+            .StartTransaction(_localizationService.GetLocalizedString("CopySpecSheetInstanceV.Title"));
+        
         foreach(var sheetHelper in SelectedSheets) {
 
             foreach(var specHelper in ScheduleSheetInstances) {

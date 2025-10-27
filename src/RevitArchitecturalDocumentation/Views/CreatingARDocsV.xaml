@@ -221,14 +221,14 @@
                     <ui:Button
                         Margin="10 5 10 10"
                         MinWidth="150"
-                        Content="Добавить строку"
+                        Content="{me:LocalizationSource CreatingARDocsV.AddLine}"
                         FontSize="14"
                         Command="{Binding Path=TaskInformationVM.AddTaskCommand}" />
 
                     <ui:Button
                         Margin="10 5 10 10"
                         MinWidth="150"
-                        Content="Удалить строку"
+                        Content="{me:LocalizationSource CreatingARDocsV.DeleteLine}"
                         FontSize="14"
                         Command="{Binding Path=TaskInformationVM.DeleteTaskCommand}" />
                 </StackPanel>
@@ -244,7 +244,6 @@
                 <ComboBox
                      DockPanel.Dock="Bottom" 
                      Margin="5 3"
-     
                      VerticalContentAlignment="Center"
                      IsEnabled="{Binding Path=SheetOptsVM.WorkWithSheets}"
                      ItemsSource="{Binding Path=SheetOptsVM.TitleBlocksInProject}" 
@@ -266,7 +265,7 @@
                 <ui:TextBlock
                     DockPanel.Dock="Bottom"                        
                     Margin="5 3"
-                    Text="Выберите рамку листа:"
+                    Text="{me:LocalizationSource CreatingARDocsV.SelectTitleBlock}"
                     FontSize="14"
                     VerticalAlignment="Center"
                     HorizontalAlignment="Left"/>
@@ -274,7 +273,7 @@
                 <CheckBox 
                     DockPanel.Dock="Left"
                     Margin="-5 3 5 3"
-                    Content="Создавать/размещать листы"
+                    Content="{me:LocalizationSource CreatingARDocsV.CreateSheets}"
                     FontSize="14"
                     VerticalAlignment="Center"
                     HorizontalAlignment="Left"
@@ -291,7 +290,7 @@
                 <ui:TextBlock
                     DockPanel.Dock="Right"
                     Margin="3"
-                    Text="Префикс листа:"
+                    Text="{me:LocalizationSource CreatingARDocsV.SheetPrefix}"
                     FontSize="14"
                     VerticalAlignment="Center"
                     HorizontalAlignment="Right"/>
@@ -327,7 +326,7 @@
                     <ui:TextBlock
                         DockPanel.Dock="Bottom"
                         Margin="5 3"
-                        Text="Тип вида:"
+                        Text="{me:LocalizationSource CreatingARDocsV.ViewType}"
                         FontSize="14"
                         VerticalAlignment="Bottom"
                         HorizontalAlignment="Left"/>
@@ -335,7 +334,7 @@
                     <CheckBox 
                         DockPanel.Dock="Left"
                         Margin="-5 3 5 3"
-                        Content="Создавать/размещать виды"
+                        Content="{me:LocalizationSource CreatingARDocsV.CreatePlaceViews}"
                         FontSize="14"
                         VerticalAlignment="Center"
                         HorizontalAlignment="Left"
@@ -352,7 +351,7 @@
                     <ui:TextBlock
                         DockPanel.Dock="Right"
                         Margin="3 0"
-                        Text="Префикс вида:"
+                        Text="{me:LocalizationSource CreatingARDocsV.ViewPrefix}"
                         FontSize="14"
                         VerticalAlignment="Center"
                         HorizontalAlignment="Right"/>
@@ -362,7 +361,7 @@
                     Grid.Row="1">
                     <ui:TextBlock
                         Margin="5 3"
-                        Text="Тип видового экрана:"
+                        Text="{me:LocalizationSource CreatingARDocsV.ViewportType}"
                         FontSize="14"
                         VerticalAlignment="Bottom"
                         HorizontalAlignment="Left"/>
@@ -380,7 +379,7 @@
                 <CheckBox
                     Grid.Row="2"
                     Margin="-5 5 0 0"
-                    Content="Создавать на основе выбранных видов"
+                    Content="{me:LocalizationSource CreatingARDocsV.CreateBasedSelectedViews}"
                     FontSize="14"
                     IsChecked="{Binding Path=CreateViewsFromSelected}"
                     IsEnabled="{Binding Path=ViewOptsVM.WorkWithViews}" />
@@ -392,7 +391,7 @@
                         Margin="5"
                         VerticalAlignment="Center"
                         FontSize="14"
-                        Text="Выбрано видов: " />
+                        Text="{me:LocalizationSource CreatingARDocsV.SelectedViewCount}" />
 
                     <ui:TextBlock
                         Margin="5"
@@ -412,7 +411,7 @@
                 <CheckBox 
                     DockPanel.Dock="Top"
                     Margin="-5 3 5 3"
-                    Content="Создавать/размещать спецификации"
+                    Content="{me:LocalizationSource CreatingARDocsV.CreatePlaceSpecs}"
                     FontSize="14"
                     VerticalAlignment="Center"
                     HorizontalAlignment="Left"
@@ -430,7 +429,7 @@
                 <ui:TextBlock
                     DockPanel.Dock="Bottom"
                     Margin="5 3"
-                    Text="Выберите поле этажа:"
+                    Text="{me:LocalizationSource CreatingARDocsV.LevelFieldFilter}"
                     FontSize="14"
                     VerticalAlignment="Center"
                     HorizontalAlignment="Left"/>
