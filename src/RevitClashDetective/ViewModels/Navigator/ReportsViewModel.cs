@@ -193,11 +193,12 @@ internal class ReportsViewModel : BaseViewModel {
     private void SelectClash(IClashViewModel clash) {
         var settings = new ClashViewSettings(_revitRepository, _localizationService, clash, _settingsConfig);
         var elements = clash.GetElements();
+        var logElements = elements.Select(e => new { Id = e.Id, Document = e.DocumentName }).ToArray();
         LoggerService.Information("Запуск выбора коллизии: {@CommandInfo}",
-            new { Id = "Зависание", CommandName = nameof(SelectClashCommand), Elements = elements });
+            new { Id = "Зависание", CommandName = nameof(SelectClashCommand), Elements = logElements });
         _revitRepository.SelectAndShowElement(elements, settings);
         LoggerService.Information("Завершение выбора коллизии: {@CommandInfo}",
-            new { Id = "Зависание", CommandName = nameof(SelectClashCommand), Elements = elements });
+            new { Id = "Зависание", CommandName = nameof(SelectClashCommand) });
     }
 
     private bool CanSelectClash(IClashViewModel p) {
