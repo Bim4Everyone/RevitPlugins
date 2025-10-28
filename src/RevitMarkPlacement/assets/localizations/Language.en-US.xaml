@@ -13,7 +13,19 @@
     <system:String x:Key="MainWindow.SettingsText">Settings</system:String>
     <system:String x:Key="MainWindow.FloorCount">Floor count</system:String>
     <system:String x:Key="MainWindow.FloorHeight">Floor height</system:String>
+    
     <system:String x:Key="MainWindow.EmptySpotDimensions">Spot dimensions not found</system:String>
+    <system:String x:Key="MainWindow.EmptySelectionMode">Please select selection mode</system:String>
+    <system:String x:Key="MainWindow.EmptySpotDimensionTypes">Please select selection mode with spot dimension types</system:String>
+    <system:String x:Key="MainWindow.EmptyFloorCount">Please write floor count</system:String>
+    <system:String x:Key="MainWindow.TextFloorCount">Floor count must be a number</system:String>
+    <system:String x:Key="MainWindow.NegativeFloorCount">Floor count must be a positive number</system:String>
+    <system:String x:Key="MainWindow.EmptyFloorHeight">Please select floor height</system:String>
+    <system:String x:Key="MainWindow.EmptyFloorHeightValue">Please write floor height</system:String>
+    <system:String x:Key="MainWindow.TextFloorHeightValue">Floor height must be a number</system:String>
+    <system:String x:Key="MainWindow.NegativeFloorHeightValue">Floor height must be a positive number</system:String>
+    <system:String x:Key="MainWindow.EmptyGlobalParam">Please select a global parameter</system:String>
+    <system:String x:Key="MainWindow.NegativeGlobalParam">Floor height must be a positive number</system:String>
     
     <system:String x:Key="Selections.DBSelection">All spots dimensions</system:String>
     <system:String x:Key="Selections.DBViewSelection">Spot dimensions on view</system:String>

@@ -6,6 +6,7 @@ using System.Windows.Input;
 using Autodesk.Revit.DB;
 
 using dosymep.Revit;
+using dosymep.SimpleServices;
 using dosymep.WPF.Commands;
 using dosymep.WPF.ViewModels;
 
@@ -21,7 +22,8 @@ internal class MainViewModel : BaseViewModel {
 
     private readonly PluginConfig _pluginConfig;
     private readonly RevitRepository _revitRepository;
-    
+    private readonly ILocalizationService _localizationService;
+
     private readonly IUnitProvider _unitProvider;
     private readonly IDocumentProvider _documentProvider;
     private readonly IGlobalParamSelection _globalSelection;
@@ -41,13 +43,15 @@ internal class MainViewModel : BaseViewModel {
     public MainViewModel(
         PluginConfig pluginConfig,
         RevitRepository revitRepository,
+        ILocalizationService localizationService,
         IUnitProvider unitProvider,
         IDocumentProvider documentProvider,
         IGlobalParamSelection globalSelection,
         ISpotDimensionSelection[] spotSelections) {
         _pluginConfig = pluginConfig;
         _revitRepository = revitRepository;
-        
+        _localizationService = localizationService;
+
         _unitProvider = unitProvider;
         _documentProvider = documentProvider;
         
@@ -121,8 +125,8 @@ internal class MainViewModel : BaseViewModel {
 
     private void LoadFloorHeights(RevitSettings settings) {
         FloorHeights = [
-            new UserFloorHeightViewModel(),
-            new GlobalParamsViewModel(_unitProvider, _globalSelection)
+            new UserFloorHeightViewModel(_localizationService),
+            new GlobalParamsViewModel(_unitProvider, _globalSelection, _localizationService)
         ];
 
         foreach(var provider in FloorHeights) {
@@ -145,32 +149,32 @@ internal class MainViewModel : BaseViewModel {
 
     private bool CanAcceptView() {
         if(Selection is null) {
-            ErrorText = "Выберите режим выбора элементов.";
+            ErrorText = _localizationService.GetLocalizedString("MainWindow.EmptySelectionMode");
             return false;
         }
         
         if(Selection?.SpotDimensionTypes.Count == 0) {
-            ErrorText = "Выберите режим выбора элементов с отметками уровней.";
+            ErrorText =  _localizationService.GetLocalizedString("MainWindow.EmptySpotDimensionTypes");
             return false;
         }
         
         if(string.IsNullOrEmpty(FloorCount)) {
-            ErrorText = "Количество типовых этажей должно быть заполнено.";
+            ErrorText = _localizationService.GetLocalizedString("MainWindow.EmptyFloorCount");
             return false;
         }
         
         if(!int.TryParse(FloorCount, out int levelCount)) {
-            ErrorText = "Количество типовых этажей должно быть числом.";
+            ErrorText = _localizationService.GetLocalizedString("MainWindow.TextFloorCount");
             return false;
         }
 
         if(levelCount < 1) {
-            ErrorText = "Количество типовых этажей должно быть неотрицательным.";
+            ErrorText = _localizationService.GetLocalizedString("MainWindow.NegativeFloorCount");
             return false;
         }
 
         if(FloorHeight is null) {
-            ErrorText = "Выберите высоту типового этажа";
+            ErrorText =_localizationService.GetLocalizedString("MainWindow.EmptyFloorHeight");
             return false;
         }
 

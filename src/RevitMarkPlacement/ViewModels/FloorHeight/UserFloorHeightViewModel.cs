@@ -1,5 +1,6 @@
 ﻿using System.Globalization;
 
+using dosymep.SimpleServices;
 using dosymep.WPF.ViewModels;
 
 using RevitMarkPlacement.Models;
@@ -7,8 +8,14 @@ using RevitMarkPlacement.Models;
 namespace RevitMarkPlacement.ViewModels.FloorHeight;
 
 internal class UserFloorHeightViewModel : BaseViewModel, IFloorHeightProvider {
+    private readonly ILocalizationService _localizationService;
+   
     private string _floorHeight;
-    
+
+    public UserFloorHeightViewModel(ILocalizationService localizationService) {
+        _localizationService = localizationService;
+    }
+
     public LevelHeightProvider LevelHeightProvider => LevelHeightProvider.UserSettings;
 
     public string FloorHeight {
@@ -24,15 +31,15 @@ internal class UserFloorHeightViewModel : BaseViewModel, IFloorHeightProvider {
 
     public string GetErrorText() {
         if(string.IsNullOrEmpty(FloorHeight)) {
-            return "Высота типового этажа должна быть заполнена.";
+            return _localizationService.GetLocalizedString("MainWindow.EmptyFloorHeightValue");
         }
         
         if(!double.TryParse(FloorHeight, out double floorHeight)) {
-            return "Высота типового этажа должна быть числом.";
+            return _localizationService.GetLocalizedString("MainWindow.TextFloorHeightValue");
         }
 
         if(floorHeight < 0) {
-            return "Высота типового этажа должна быть неотрицательной.";
+            return _localizationService.GetLocalizedString("MainWindow.NegativeFloorHeightValue");
         }
 
         return null;

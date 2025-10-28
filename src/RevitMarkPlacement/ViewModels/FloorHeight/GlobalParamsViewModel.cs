@@ -4,6 +4,7 @@ using System.Linq;
 
 using Autodesk.Revit.DB;
 
+using dosymep.SimpleServices;
 using dosymep.WPF.ViewModels;
 
 using RevitMarkPlacement.Extensions;
@@ -14,14 +15,16 @@ namespace RevitMarkPlacement.ViewModels.FloorHeight;
 internal class GlobalParamsViewModel : BaseViewModel, IFloorHeightProvider {
     private readonly IUnitProvider _unitProvider;
     private readonly IGlobalParamSelection _globalParamSelection;
+    private readonly ILocalizationService _localizationService;
 
     private bool _isEnabled;
     private GlobalParamViewModel _globalParam;
     private ObservableCollection<GlobalParamViewModel> _globalParams;
 
-    public GlobalParamsViewModel(IUnitProvider unitProvider, IGlobalParamSelection globalParamSelection) {
+    public GlobalParamsViewModel(IUnitProvider unitProvider, IGlobalParamSelection globalParamSelection, ILocalizationService localizationService) {
         _unitProvider = unitProvider;
         _globalParamSelection = globalParamSelection;
+        _localizationService = localizationService;
     }
 
     public LevelHeightProvider LevelHeightProvider => LevelHeightProvider.GlobalParameter;
@@ -47,11 +50,11 @@ internal class GlobalParamsViewModel : BaseViewModel, IFloorHeightProvider {
     
     public string GetErrorText() {
         if(GlobalParam is null) {
-            return "Высота типового этажа должна быть выбрана.";
+            return _localizationService.GetLocalizedString("MainWindow.EmptyGlobalParam");
         }
         
         if(GlobalParam.Value < 0.0) {
-            return "Высота типового этажа должна быть неотрицательной.";
+            return _localizationService.GetLocalizedString("MainWindow.NegativeGlobalParam");
         }
 
         return null;
