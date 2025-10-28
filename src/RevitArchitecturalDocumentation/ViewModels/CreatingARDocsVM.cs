@@ -97,7 +97,7 @@ internal class CreatingARDocsVM : BaseViewModel {
             SelectedViews = _revitRepository.GetSelectedViewPlans();
             SelectedViewHelpers = [];
             foreach(var viewPlan in SelectedViews) {
-                var viewHelper = new ViewHelper(viewPlan);
+                var viewHelper = new ViewHelper(viewPlan, _localizationService);
                 SelectedViewHelpers.Add(viewHelper);
                 try {
                     viewHelper.NameHelper.AnalyzeNGetLevelNumber();

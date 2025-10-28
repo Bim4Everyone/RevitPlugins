@@ -3,25 +3,33 @@ using System.Linq;
 
 using Autodesk.Revit.DB;
 
+using dosymep.SimpleServices;
+
 namespace RevitArchitecturalDocumentation.Models;
 internal class ViewHelper {
+    private readonly ILocalizationService _localizationService;
+
     /// <summary>
     /// Конструктор, применяемый при создании новых видов
     /// </summary>
-    public ViewHelper(RevitRepository revitRepository, TreeReportNode report = null) {
+    public ViewHelper(RevitRepository revitRepository, ILocalizationService localizationService,
+                      TreeReportNode report = null) {
         Repository = revitRepository;
+        _localizationService = localizationService;
         Report = report;
     }
 
     /// <summary>
     /// Конструктор, применяемый при анализе существующих видов
     /// </summary>
-    public ViewHelper(ViewPlan viewPlan) {
+    public ViewHelper(ViewPlan viewPlan, ILocalizationService localizationService) {
         View = viewPlan;
         NameHelper = new ViewNameHelper(viewPlan);
+        _localizationService = localizationService;
     }
 
     public RevitRepository Repository { get; set; }
+
     public ViewPlan View { get; set; }
     public TreeReportNode Report { get; set; }
     public ViewNameHelper NameHelper { get; set; }
@@ -33,17 +41,18 @@ internal class ViewHelper {
     public ViewPlan GetView(string newViewName, Element visibilityScope = null, ViewFamilyType viewFamilyType = null, Level level = null, ViewPlan viewForDuplicate = null) {
 
         if(newViewName.Length == 0) {
-            Report?.AddNodeWithName($"❗ Произошла ошибка при работе с видом! Передано некорректное имя для задания!");
+            Report?.AddNodeWithName(_localizationService.GetLocalizedString("CreatingARDocsVM.Report.View.InvalidNameForTask"));
             return null;
         }
 
         ViewPlan newViewPlan = Repository.FindViewByName(newViewName);
         // Если newViewPlan is null, значит вид с указанным именем не найден в проекте и его нужно создать
         if(newViewPlan is null) {
-            Report?.AddNodeWithName($"Вид с именем \"{newViewName}\" не найден в проекте, приступаем к созданию!");
+            Report?.AddNodeWithName($"{_localizationService.GetLocalizedString("CreatingARDocsVM.Report.View.ViewWithName")} " +
+                $"\"{newViewName}\" {_localizationService.GetLocalizedString("CreatingARDocsVM.Report.View.NotFindLetsCreate")}");
 
             if(level is null && viewForDuplicate is null) {
-                Report?.AddNodeWithName($"❗               Произошла ошибка при создании вида! Не передано для задания уровень и область видимости!");
+                Report?.AddNodeWithName(_localizationService.GetLocalizedString("CreatingARDocsVM.Report.View.InvalidLevelAndVisibilityScope"));
                 return null;
             }
 
@@ -57,7 +66,8 @@ internal class ViewHelper {
             }
 
         } else {
-            Report?.AddNodeWithName($"Вид с именем \"{newViewName}\" успешно найден в проекте!");
+            Report?.AddNodeWithName($"{_localizationService.GetLocalizedString("CreatingARDocsVM.Report.View.ViewWithName")} " +
+                $"\"{newViewName}\" {_localizationService.GetLocalizedString("CreatingARDocsVM.Report.View.SuccessFoundInProject")}");
             View = newViewPlan;
         }
 
@@ -72,28 +82,28 @@ internal class ViewHelper {
     public ViewPlan CreateView(string newViewName, ViewFamilyType viewFamilyType, Level level) {
 
         if(newViewName.Length == 0) {
-            Report?.AddNodeWithName($"❗ Произошла ошибка при создании нового вида! Передано некорректное имя для задания!");
+            Report?.AddNodeWithName(_localizationService.GetLocalizedString("CreatingARDocsVM.Report.View.InvalidNameForTask"));
             return null;
         }
         if(viewFamilyType is null) {
-            Report?.AddNodeWithName($"❗ Произошла ошибка при создании нового вида! Не указан типоразмер вида!");
+            Report?.AddNodeWithName(_localizationService.GetLocalizedString("CreatingARDocsVM.Report.View.InvalidViewType"));
             return null;
         }
         if(level is null) {
-            Report?.AddNodeWithName($"❗ Произошла ошибка при создании нового вида! Не указан уровень, на котором нужно создать вид!");
+            Report?.AddNodeWithName(_localizationService.GetLocalizedString("CreatingARDocsVM.Report.View.InvalidLevelForView"));
             return null;
         }
 
         ViewPlan newViewPlan = null;
         try {
             newViewPlan = ViewPlan.Create(Repository.Document, viewFamilyType.Id, level.Id);
-            Report?.AddNodeWithName($"Вид успешно создан!");
-            Report?.AddNodeWithName($"Виду назначен тип {viewFamilyType.Name}!");
+            Report?.AddNodeWithName(_localizationService.GetLocalizedString("CreatingARDocsVM.Report.View.ViewCreatedSuccessfully"));
+            Report?.AddNodeWithName($"{_localizationService.GetLocalizedString("CreatingARDocsVM.Report.View.SetViewType")} {viewFamilyType.Name}!");
             newViewPlan.Name = newViewName;
-            Report?.AddNodeWithName($"Задано имя: {newViewPlan.Name}");
+            Report?.AddNodeWithName($"{_localizationService.GetLocalizedString("CreatingARDocsVM.Report.View.NameGiven")} {newViewPlan.Name}");
 
         } catch(Exception) {
-            Report?.AddNodeWithName($"❗ Произошла ошибка при создании нового вида!");
+            Report?.AddNodeWithName(_localizationService.GetLocalizedString("CreatingARDocsVM.Report.View.FailedSheetCreation"));
         }
         View = newViewPlan;
         return newViewPlan;
@@ -106,12 +116,12 @@ internal class ViewHelper {
     public ViewPlan DuplicateView(string newViewName, ViewPlan viewForDuplicate) {
 
         if(newViewName.Length == 0) {
-            Report?.AddNodeWithName($"❗ Произошла ошибка при настройке вида! Передано некорректное имя для задания!");
+            Report?.AddNodeWithName(_localizationService.GetLocalizedString("CreatingARDocsVM.Report.View.InvalidNameForTask"));
             return null;
         }
 
         if(viewForDuplicate is null) {
-            Report?.AddNodeWithName($"❗ Произошла ошибка при создании нового вида! Не указан вид, который нужно продублировать!");
+            Report?.AddNodeWithName(_localizationService.GetLocalizedString("CreatingARDocsVM.Report.View.InvalidViewForDuplicate"));
             return null;
         }
 
@@ -119,12 +129,12 @@ internal class ViewHelper {
         try {
             ElementId newViewPlanId = viewForDuplicate.Duplicate(ViewDuplicateOption.WithDetailing);
             newViewPlan = viewForDuplicate.Document.GetElement(newViewPlanId) as ViewPlan;
-            Report?.AddNodeWithName($"Вид успешно продублирован!");
+            Report?.AddNodeWithName(_localizationService.GetLocalizedString("CreatingARDocsVM.Report.View.ViewWasDuplicated"));
             newViewPlan.Name = newViewName;
-            Report?.AddNodeWithName($"Задано имя: {newViewName}");
+            Report?.AddNodeWithName($"{_localizationService.GetLocalizedString("CreatingARDocsVM.Report.View.NameGiven")} {newViewName}");
 
         } catch(Exception) {
-            Report?.AddNodeWithName($"❗ Произошла ошибка при дублировании вида!");
+            Report?.AddNodeWithName(_localizationService.GetLocalizedString("CreatingARDocsVM.Report.View.ErrorDuplicatingView"));
         }
         View = newViewPlan;
         return newViewPlan;
@@ -137,21 +147,21 @@ internal class ViewHelper {
     public void SetUpView(Element visibilityScope) {
 
         if(visibilityScope is null) {
-            Report?.AddNodeWithName($"❗ Произошла ошибка при работе с видом! Передана некорректная область видимости!");
+            Report?.AddNodeWithName(_localizationService.GetLocalizedString("CreatingARDocsVM.Report.View.InvalidVisibilityScope"));
             return;
         }
 
         if(View is null) {
-            Report?.AddNodeWithName($"❗ Произошла ошибка при настройке вида, не найден вид для работы!");
+            Report?.AddNodeWithName(_localizationService.GetLocalizedString("CreatingARDocsVM.Report.View.InvalidViewForWork"));
             return;
         }
 
         try {
             View.get_Parameter(BuiltInParameter.VIEWER_VOLUME_OF_INTEREST_CROP).Set(visibilityScope.Id);
-            Report?.AddNodeWithName($"Задана область видимости: {visibilityScope.Name}");
+            Report?.AddNodeWithName($"{_localizationService.GetLocalizedString("CreatingARDocsVM.Report.View.SetVisibilityScope")} {visibilityScope.Name}");
 
             View.get_Parameter(BuiltInParameter.VIEWER_ANNOTATION_CROP_ACTIVE).Set(1);
-            Report?.AddNodeWithName($"Задана образка аннотаций на виде");
+            Report?.AddNodeWithName(_localizationService.GetLocalizedString("CreatingARDocsVM.Report.View.SetAnnotationCropping"));
 
             var cropManager = View.GetCropRegionShapeManager();
             double dim = UnitUtilsHelper.ConvertToInternalValue(3);
@@ -159,10 +169,10 @@ internal class ViewHelper {
             cropManager.BottomAnnotationCropOffset = dim;
             cropManager.LeftAnnotationCropOffset = dim;
             cropManager.RightAnnotationCropOffset = dim;
-            Report?.AddNodeWithName($"Задано минимальное смещение обрезки аннотаций");
+            Report?.AddNodeWithName(_localizationService.GetLocalizedString("CreatingARDocsVM.Report.View.SetMinAnnotationCroppingOffset"));
 
         } catch(Exception) {
-            Report?.AddNodeWithName($"❗ Произошла ошибка при настройке вида!");
+            Report?.AddNodeWithName(_localizationService.GetLocalizedString("CreatingARDocsVM.Report.View.InvalidViewSetting"));
         }
     }
 
@@ -174,29 +184,30 @@ internal class ViewHelper {
     public Viewport PlaceViewportOnSheet(ViewSheet viewSheet, ElementType viewportType) {
         // Если переданный лист или вид is null или вид.экран вида нельзя добавить на лист, то возвращаем null
         if(viewSheet is null) {
-            Report?.AddNodeWithName($"❗ Произошла ошибка при размещении вида! Лист для размещения не найден!");
+            Report?.AddNodeWithName(_localizationService.GetLocalizedString("CreatingARDocsVM.Report.View.InvalidSheetForPlace"));
             return null;
         }
         if(View is null) {
-            Report?.AddNodeWithName($"❗ Произошла ошибка при размещении вида! Вид для размещения не найден!");
+            Report?.AddNodeWithName(_localizationService.GetLocalizedString("CreatingARDocsVM.Report.View.InvalidViewForPlace"));
             return null;
         }
         if(!Viewport.CanAddViewToSheet(Repository.Document, viewSheet.Id, View.Id)) {
-            Report?.AddNodeWithName($"❗ Произошла ошибка при размещении вида! Нельзя разместить вид на листе!");
+            Report?.AddNodeWithName(_localizationService.GetLocalizedString("CreatingARDocsVM.Report.View.CannotPlaceViewOnSheet"));
             return null;
         }
 
         // Размещаем план на листе в начальной точке, чтобы оценить габариты
         var viewPort = Viewport.Create(Repository.Document, viewSheet.Id, View.Id, new XYZ(0, 0, 0));
         if(viewPort is null) {
-            Report?.AddNodeWithName($"❗ Не удалось создать вид на листе!");
+            Report?.AddNodeWithName(_localizationService.GetLocalizedString("CreatingARDocsVM.Report.View.FailedViewportCreation"));
             return null;
         }
-        Report?.AddNodeWithName($"Видовой экран успешно создан на листе!");
+        Report?.AddNodeWithName(_localizationService.GetLocalizedString("CreatingARDocsVM.Report.View.ViewCreatedSuccessfullyOnSheet"));
 
         if(viewportType != null) {
             viewPort.ChangeTypeId(viewportType.Id);
-            Report?.AddNodeWithName($"Видовому экрану задан тип {viewportType.Name}!");
+            Report?.AddNodeWithName($"{_localizationService.GetLocalizedString("CreatingARDocsVM.Report.View.SettedViewType")}" +
+                $"{viewportType.Name}!");
         }
 
         var viewportCenter = viewPort.GetBoxCenter();
@@ -210,7 +221,7 @@ internal class ViewHelper {
             .OfCategory(BuiltInCategory.OST_TitleBlocks)
             .WhereElementIsNotElementType()
             .FirstOrDefault() is not FamilyInstance titleBlock) {
-            Report?.AddNodeWithName($"❗ Не удалось найти рамку листа, она нужна для правильного расположения вида на листе!");
+            Report?.AddNodeWithName(_localizationService.GetLocalizedString("CreatingARDocsVM.Report.View.CannotFoundTitleBlockOnSheet"));
             return null;
         }
 
@@ -230,11 +241,11 @@ internal class ViewHelper {
             0);
 
         viewPort.SetBoxCenter(correctPosition);
-        Report?.AddNodeWithName($"Вид успешно спозиционирован на листе!");
+        Report?.AddNodeWithName(_localizationService.GetLocalizedString("CreatingARDocsVM.Report.View.ViewPositionedOnSheet"));
 
 #if REVIT_2022_OR_GREATER
         viewPort.LabelOffset = new XYZ(viewportHalfWidth * 0.9, viewportHalfHeight * 2, 0);
-        Report?.AddNodeWithName($"Оглавление вида успешно спозиционировано на листе!");
+        Report?.AddNodeWithName(_localizationService.GetLocalizedString("CreatingARDocsVM.Report.View.ViewTitlePositionedOnSheet"));
 #endif
         return viewPort;
     }

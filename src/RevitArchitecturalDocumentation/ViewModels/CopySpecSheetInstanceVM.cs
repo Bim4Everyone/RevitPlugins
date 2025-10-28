@@ -197,7 +197,7 @@ internal class CopySpecSheetInstanceVM : BaseViewModel {
         foreach(var id in _revitRepository.ActiveUIDocument.Selection.GetElementIds()) {
             if(_revitRepository.Document.GetElement(id) is ViewSheet sheet) {
 
-                var sheetHelper = new SheetHelper(_revitRepository, sheet);
+                var sheetHelper = new SheetHelper(_revitRepository, sheet, _localizationService);
                 try {
                     sheetHelper.NameHelper.AnalyzeNGetLevelNumber();
 

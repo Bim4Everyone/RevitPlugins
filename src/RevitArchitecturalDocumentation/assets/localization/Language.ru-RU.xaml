@@ -87,6 +87,55 @@
     <system:String x:Key="CreatingARDocsVM.Report.LevelNumberBySelectedView">Номер этажа в соответствии с именем выбранного вида: </system:String>
     <system:String x:Key="CreatingARDocsVM.Report.WorkWithSelectedView">Работаем с выбранным видом: </system:String>
     
+    <system:String x:Key="CreatingARDocsVM.Report.Sheet.SheetWithName">Лист с именем </system:String>
+    <system:String x:Key="CreatingARDocsVM.Report.Sheet.NotFindLetsCreate">не найден в проекте, приступаем к созданию</system:String>
+    <system:String x:Key="CreatingARDocsVM.Report.Sheet.FailedSheetCreation">❗ Произошла ошибка при создании листа!</system:String>
+    <system:String x:Key="CreatingARDocsVM.Report.Sheet.SuccessFoundInProject">успешно найден в проекте!</system:String>
+    
+    <system:String x:Key="CreatingARDocsVM.Report.Sheet.InvalidNameForTask">❗ Произошла ошибка при работе с листом! Передано некорректное имя для задания!</system:String>
+    <system:String x:Key="CreatingARDocsVM.Report.Sheet.InvalidTitleBlockType">❗ Произошла ошибка при работе с листом! Передана некорректный тип рамки листа!</system:String>
+    <system:String x:Key="CreatingARDocsVM.Report.Sheet.SheetCreatedSuccessfully">Лист успешно создан!</system:String>
+    <system:String x:Key="CreatingARDocsVM.Report.Sheet.NameGiven">Задано имя:</system:String>
+    <system:String x:Key="CreatingARDocsVM.Report.Sheet.InvalidSheetWidthParamName">❗ Произошла ошибка при работе с листом! Передано некорректное имя параметра ширины рамки листа!</system:String>
+    <system:String x:Key="CreatingARDocsVM.Report.Sheet.InvalidSheetHeightParamName">❗ Произошла ошибка при работе с листом! Передано некорректное имя параметра высоты рамки листа!</system:String>
+    <system:String x:Key="CreatingARDocsVM.Report.Sheet.InvalidSheetWidthParamValue">❗ Произошла ошибка при работе с листом! Передано некорректное значение для задания ширины рамки листа!</system:String>
+    <system:String x:Key="CreatingARDocsVM.Report.Sheet.InvalidSheetHeightParamValue">❗ Произошла ошибка при работе с листом! Передано некорректное значение для задания высоты рамки листа!</system:String>
+    <system:String x:Key="CreatingARDocsVM.Report.Sheet.TitleBlockNotFound">❗ Произошла ошибка при работе с листом! Не найдена рамка листа!</system:String>
+    <system:String x:Key="CreatingARDocsVM.Report.Sheet.SettedTitleBlockDimension">Заданы габариты рамки:</system:String>
+    <system:String x:Key="CreatingARDocsVM.Report.Sheet.TitleBlockHasNotDimensionParam">❗ Произошла ошибка при работе с листом! У рамки не найден один из габаритных параметров!</system:String>
+    
+    <system:String x:Key="CreatingARDocsVM.Report.View.InvalidNameForTask">❗ Произошла ошибка при работе с видом! Передано некорректное имя для задания!</system:String>
+    <system:String x:Key="CreatingARDocsVM.Report.View.ViewWithName">Вид с именем </system:String>
+    <system:String x:Key="CreatingARDocsVM.Report.View.NotFindLetsCreate">не найден в проекте, приступаем к созданию!</system:String>
+    <system:String x:Key="CreatingARDocsVM.Report.View.InvalidLevelAndVisibilityScope">❗ Произошла ошибка при создании вида! Не передано для задания уровень и область видимости!</system:String>
+    <system:String x:Key="CreatingARDocsVM.Report.View.SuccessFoundInProject">успешно найден в проекте!</system:String>
+    
+    <system:String x:Key="CreatingARDocsVM.Report.View.InvalidViewType">❗ Произошла ошибка при создании нового вида! Не указан типоразмер вида!</system:String>
+    <system:String x:Key="CreatingARDocsVM.Report.View.InvalidLevelForView">❗ Произошла ошибка при создании нового вида! Не указан уровень, на котором нужно создать вид!</system:String>
+    <system:String x:Key="CreatingARDocsVM.Report.View.ViewCreatedSuccessfully">Вид успешно создан!</system:String>
+    <system:String x:Key="CreatingARDocsVM.Report.View.SetViewType">Виду назначен тип </system:String>
+    <system:String x:Key="CreatingARDocsVM.Report.View.NameGiven">Задано имя:</system:String>
+    <system:String x:Key="CreatingARDocsVM.Report.View.FailedSheetCreation">❗ Произошла ошибка при создании нового вида!</system:String>
+    
+    <system:String x:Key="CreatingARDocsVM.Report.View.InvalidViewForDuplicate">❗ Произошла ошибка при создании нового вида! Не указан вид, который нужно продублировать!</system:String>
+    <system:String x:Key="CreatingARDocsVM.Report.View.ViewWasDuplicated">Вид успешно продублирован!</system:String>
+    <system:String x:Key="CreatingARDocsVM.Report.View.ErrorDuplicatingView">❗ Произошла ошибка при дублировании вида!</system:String>
+    <system:String x:Key="CreatingARDocsVM.Report.View.InvalidVisibilityScope">❗ Произошла ошибка при работе с видом! Передана некорректная область видимости!</system:String>
+    <system:String x:Key="CreatingARDocsVM.Report.View.InvalidViewForWork">❗ Произошла ошибка при настройке вида, не найден вид для работы!</system:String>
+    <system:String x:Key="CreatingARDocsVM.Report.View.SetVisibilityScope">Задана область видимости: </system:String>
+    <system:String x:Key="CreatingARDocsVM.Report.View.SetAnnotationCropping">Задана обрезка аннотаций на виде </system:String>
+    <system:String x:Key="CreatingARDocsVM.Report.View.SetMinAnnotationCroppingOffset">Задано минимальное смещение обрезки аннотаций </system:String>
+    <system:String x:Key="CreatingARDocsVM.Report.View.InvalidViewSetting">❗ Произошла ошибка при настройке вида! </system:String>
+    <system:String x:Key="CreatingARDocsVM.Report.View.InvalidSheetForPlace">❗ Произошла ошибка при размещении вида! Лист для размещения не найден!</system:String>
+    <system:String x:Key="CreatingARDocsVM.Report.View.InvalidViewForPlace">❗ Произошла ошибка при размещении вида! Вид для размещения не найден!</system:String>
+    <system:String x:Key="CreatingARDocsVM.Report.View.CannotPlaceViewOnSheet">❗ Произошла ошибка при размещении вида! Нельзя разместить вид на листе!</system:String>
+    <system:String x:Key="CreatingARDocsVM.Report.View.FailedViewportCreation">❗ Не удалось создать вид на листе!</system:String>
+    <system:String x:Key="CreatingARDocsVM.Report.View.ViewCreatedSuccessfullyOnSheet">Видовой экран успешно создан на листе!</system:String>
+    <system:String x:Key="CreatingARDocsVM.Report.View.SettedViewType">Видовому экрану задан тип </system:String>
+    <system:String x:Key="CreatingARDocsVM.Report.View.CannotFoundTitleBlockOnSheet">❗ Не удалось найти рамку листа, она нужна для правильного расположения вида на листе!</system:String>
+    <system:String x:Key="CreatingARDocsVM.Report.View.ViewPositionedOnSheet">Вид успешно спозиционирован на листе!</system:String>
+    <system:String x:Key="CreatingARDocsVM.Report.View.ViewTitlePositionedOnSheet">Оглавление вида успешно спозиционировано на листе!</system:String>
+
     <system:String x:Key="TreeReportVM.Title">Отчет</system:String>
     <system:String x:Key="TreeReportVM.ShowAll">Показывать все</system:String>
     <system:String x:Key="TreeReportVM.ShowImportant">Показывать важное</system:String>

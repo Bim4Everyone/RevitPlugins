@@ -100,7 +100,7 @@ internal class DocsFromScratch {
 
                     var sheetRep = new TreeReportNode(taskRep) { Name = $"{_localizationService.GetLocalizedString("CreatingARDocsV.Report.WorkWithSheet")} \"{newSheetName}\"" };
 
-                    sheetHelper = new SheetHelper(Repository, sheetRep);
+                    sheetHelper = new SheetHelper(Repository, _localizationService, sheetRep);
                     SheetOpts.SelectedTitleBlock = SheetOpts.SelectedTitleBlock ?? Repository.TitleBlocksInProject?.FirstOrDefault(a => a.Name.Equals(SheetOpts.SelectedTitleBlockName));
                     sheetHelper.GetOrCreateSheet(newSheetName, SheetOpts.SelectedTitleBlock);
                     taskRep.Nodes.Add(sheetRep);
@@ -117,7 +117,7 @@ internal class DocsFromScratch {
 
                     var viewRep = new TreeReportNode(taskRep) { Name = $"{_localizationService.GetLocalizedString("CreatingARDocsV.Report.WorkWithView")} \"{newViewName}\"" };
 
-                    var newViewHelper = new ViewHelper(Repository, viewRep);
+                    var newViewHelper = new ViewHelper(Repository, _localizationService, viewRep);
                     _ = newViewHelper.GetView(newViewName, task.SelectedVisibilityScope, ViewOpts.SelectedViewFamilyType, level);
 
                     if(sheetHelper.Sheet != null
