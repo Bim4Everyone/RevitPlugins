@@ -14,7 +14,7 @@ internal sealed class DBViewSelection : ISpotDimensionSelection {
         _documentProvider = documentProvider;
     }
     
-    public Selections Selections => Selections.SelectedOnViewSelection;
+    public Selections Selections => Selections.DBViewSelection;
 
     public IEnumerable<SpotDimension> GetElements() {
         var document = _documentProvider.GetDocument();

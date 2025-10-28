@@ -21,8 +21,11 @@ internal class MainViewModel : BaseViewModel {
 
     private readonly PluginConfig _pluginConfig;
     private readonly RevitRepository _revitRepository;
+    
     private readonly IUnitProvider _unitProvider;
     private readonly IDocumentProvider _documentProvider;
+    private readonly IGlobalParamSelection _globalSelection;
+    private readonly ISpotDimensionSelection[] _spotSelections;
 
     private InfoElementsViewModel _infoElementsViewModel;
 
@@ -39,11 +42,17 @@ internal class MainViewModel : BaseViewModel {
         PluginConfig pluginConfig,
         RevitRepository revitRepository,
         IUnitProvider unitProvider,
-        IDocumentProvider documentProvider) {
+        IDocumentProvider documentProvider,
+        IGlobalParamSelection globalSelection,
+        ISpotDimensionSelection[] spotSelections) {
         _pluginConfig = pluginConfig;
         _revitRepository = revitRepository;
+        
         _unitProvider = unitProvider;
         _documentProvider = documentProvider;
+        
+        _globalSelection = globalSelection;
+        _spotSelections = spotSelections;
 
         InfoElementsViewModel = new InfoElementsViewModel();
 
@@ -99,10 +108,7 @@ internal class MainViewModel : BaseViewModel {
     }
 
     private void LoadSelections(RevitSettings settings) {
-        Selections = [
-            new SelectionModeViewModel(new DBSelection(_documentProvider), _revitRepository),
-            new SelectionModeViewModel(new SelectedOnViewSelection(_documentProvider), _revitRepository)
-        ];
+        Selections = [.._spotSelections.Select(item => new SelectionModeViewModel(item, _revitRepository))];
 
         foreach(var selection in Selections) {
             selection.LoadSpotDimensionTypes();
@@ -115,7 +121,8 @@ internal class MainViewModel : BaseViewModel {
 
     private void LoadFloorHeights(RevitSettings settings) {
         FloorHeights = [
-            new UserFloorHeightViewModel(), new GlobalParamsViewModel(_unitProvider, new DoubleGlobalParamSelection(_documentProvider))
+            new UserFloorHeightViewModel(),
+            new GlobalParamsViewModel(_unitProvider, _globalSelection)
         ];
 
         foreach(var provider in FloorHeights) {
