@@ -45,7 +45,7 @@
                 x:Key="CollapseSpotDimension"
                 TrueValue="Collapsed"
                 FalseValue="Visible" />
-            
+
             <DataTemplate DataType="{x:Type floorHeight:UserFloorHeightViewModel}">
                 <Grid>
                     <Grid.ColumnDefinitions>
@@ -58,12 +58,12 @@
                         Margin="5 0 0 0"
                         GroupName="123"
                         IsChecked="{Binding IsSelected, 
-                    RelativeSource={RelativeSource AncestorType=ListBoxItem}, Mode=TwoWay}"
+                            RelativeSource={RelativeSource AncestorType=ListBoxItem}, Mode=TwoWay}"
                         Content="{Binding Path=LevelHeightProvider, Converter={markupExtensions:EnumToLocale}}" />
 
                     <ui:TextBox
                         Grid.Column="1"
-                        Text="{Binding FloorHeight}" />
+                        Text="{Binding FloorHeight, UpdateSourceTrigger=PropertyChanged}" />
                 </Grid>
             </DataTemplate>
 
@@ -73,13 +73,13 @@
                         <ColumnDefinition Width="300" />
                         <ColumnDefinition Width="*" />
                     </Grid.ColumnDefinitions>
-          
+
                     <RadioButton
                         Grid.Column="0"
                         Margin="5 0 0 0"
                         GroupName="123"
                         IsChecked="{Binding IsSelected,
-                    RelativeSource={RelativeSource AncestorType=ListBoxItem}, Mode=TwoWay}"
+                            RelativeSource={RelativeSource AncestorType=ListBoxItem}, Mode=TwoWay}"
                         Content="{Binding Path=LevelHeightProvider, Converter={markupExtensions:EnumToLocale}}" />
 
                     <ComboBox
@@ -96,7 +96,7 @@
                     </ComboBox>
                 </Grid>
             </DataTemplate>
-            
+
             <DataTemplate x:Key="SelectionItemTemplate" DataType="{x:Type vms:SelectionModeViewModel}">
                 <RadioButton
                     Margin="5 0 0 0"
@@ -104,7 +104,7 @@
                 RelativeSource={RelativeSource AncestorType=ListBoxItem}, Mode=TwoWay}"
                     Content="{Binding Selections, Converter={markupExtensions:EnumToLocale}}" />
             </DataTemplate>
-            
+
         </ResourceDictionary>
     </Window.Resources>
 
@@ -174,7 +174,7 @@
                     HeaderText="{me:LocalizationSource MainWindow.FloorCount}">
                     <ui:TextBox
                         HorizontalContentAlignment="Right"
-                        Text="{Binding FloorCount}" />
+                        Text="{Binding FloorCount, UpdateSourceTrigger=PropertyChanged}" />
                 </controls:CustomEditControl>
             </Border>
 
@@ -186,6 +186,7 @@
                         Text="{me:LocalizationSource MainWindow.FloorHeight}" />
 
                     <ui:ListView
+                        SelectedItem="{Binding FloorHeight}"
                         ItemsSource="{Binding FloorHeights}" />
                 </StackPanel>
             </Border>

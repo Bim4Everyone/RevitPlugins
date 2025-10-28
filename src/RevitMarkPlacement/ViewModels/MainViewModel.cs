@@ -137,9 +137,10 @@ internal class MainViewModel : BaseViewModel {
     }
 
     private void AcceptView() {
+        SaveConfig();
+        
         var marks = new TemplateLevelMarkCollection(_revitRepository, Selection.Selection);
         marks.CreateAnnotation(int.Parse(FloorCount), FloorHeight.GetFloorHeight() ?? 0);
-        SaveConfig();
     }
 
     private bool CanAcceptView() {
