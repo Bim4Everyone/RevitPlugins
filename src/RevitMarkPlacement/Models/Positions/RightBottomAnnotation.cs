@@ -7,12 +7,9 @@ using Autodesk.Revit.DB;
 namespace RevitMarkPlacement.Models.Positions;
 
 internal sealed class RightBottomAnnotation : IAnnotationPosition {
-    public RightBottomAnnotation(XYZ plane, IEnumerable<FamilySymbol> symbols) {
+    public RightBottomAnnotation(XYZ plane, FamilySymbol familySymbol) {
         ViewRightDirection = plane;
-        FamilySymbol = symbols.FirstOrDefault(item =>
-            item.Name.Equals(
-                RevitRepository.TypeBottom,
-                StringComparison.CurrentCultureIgnoreCase));
+        FamilySymbol = familySymbol;
     }
 
     public bool NeedFlip => false;

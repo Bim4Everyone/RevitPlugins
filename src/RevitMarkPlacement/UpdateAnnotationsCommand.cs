@@ -93,17 +93,17 @@ public class UpdateAnnotationsCommand : BasePluginCommand {
             .To<DoubleGlobalParamSelection>()
             .InSingletonScope();
 
-        var viewModel = kernel.Get<MainViewModel>();
-        if(!viewModel.CanPlaceAnnotation()) {
-            // Вызывает стандартное уведомление
-            Notification(kernel.Get<ReportWindow>());
-        } else {
-            RevitRepository revitRepository = kernel.Get<RevitRepository>();
-
-            var marks = new TemplateLevelMarkCollection(
-                revitRepository,
-                new DBSelection(new ActiveDocumentProvider(uiApplication)));
-            marks.UpdateAnnotation();
-        }
+        // var viewModel = kernel.Get<MainViewModel>();
+        // if(!viewModel.CanPlaceAnnotation()) {
+        //     // Вызывает стандартное уведомление
+        //     Notification(kernel.Get<ReportWindow>());
+        // } else {
+        //     RevitRepository revitRepository = kernel.Get<RevitRepository>();
+        //
+        //     var marks = new TemplateLevelMarkCollection(
+        //         revitRepository,
+        //         new DBSelection(new ActiveDocumentProvider(uiApplication)));
+        //     marks.UpdateAnnotation();
+        // }
     }
 }

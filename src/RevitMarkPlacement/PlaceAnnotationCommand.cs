@@ -75,6 +75,10 @@ public class PlaceAnnotationCommand : BasePluginCommand {
             $"/{assemblyName};component/assets/localizations/Language.xaml",
             CultureInfo.GetCultureInfo("ru-RU"));
 
+        kernel.Bind<SystemPluginConfig>()
+            .ToSelf()
+            .InSingletonScope();
+        
         kernel.Bind<IUnitProvider>()
             .To<UnitProvider>()
             .InSingletonScope();

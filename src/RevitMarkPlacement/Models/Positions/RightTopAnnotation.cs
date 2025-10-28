@@ -7,12 +7,9 @@ using Autodesk.Revit.DB;
 namespace RevitMarkPlacement.Models.Positions;
 
 internal sealed class RightTopAnnotation : IAnnotationPosition {
-    public RightTopAnnotation(XYZ plane, IEnumerable<FamilySymbol> symbols) {
+    public RightTopAnnotation(XYZ plane, FamilySymbol familySymbol) {
         ViewRightDirection = plane;
-        FamilySymbol = symbols.FirstOrDefault(item =>
-            item.Name.Equals(
-                RevitRepository.TypeTop,
-                StringComparison.CurrentCultureIgnoreCase));
+        FamilySymbol = familySymbol;
     }
 
     public bool NeedFlip => false;

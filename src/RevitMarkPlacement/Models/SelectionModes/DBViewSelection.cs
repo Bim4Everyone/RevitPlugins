@@ -9,9 +9,11 @@ namespace RevitMarkPlacement.Models.SelectionModes;
 
 internal sealed class DBViewSelection : ISpotDimensionSelection {
     private readonly IDocumentProvider _documentProvider;
+    private readonly SystemPluginConfig _systemPluginConfig;
 
-    public DBViewSelection(IDocumentProvider documentProvider) {
+    public DBViewSelection(IDocumentProvider documentProvider, SystemPluginConfig systemPluginConfig) {
         _documentProvider = documentProvider;
+        _systemPluginConfig = systemPluginConfig;
     }
     
     public Selections Selections => Selections.DBViewSelection;
@@ -21,6 +23,6 @@ internal sealed class DBViewSelection : ISpotDimensionSelection {
         return new FilteredElementCollector(document, document.ActiveView.Id)
             .OfClass(typeof(SpotDimension))
             .OfType<SpotDimension>()
-            .Where(item => item.FilterSpotDimensions(RevitRepository.FilterSpotName));
+            .Where(item => item.FilterSpotDimensions(_systemPluginConfig.FilterSpotName));
     }
 }

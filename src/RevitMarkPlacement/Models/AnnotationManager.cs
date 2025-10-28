@@ -9,9 +9,11 @@ namespace RevitMarkPlacement.Models;
 internal class AnnotationManager {
     private readonly IAnnotationPosition _annotationPosition;
     private readonly RevitRepository _revitRepository;
+    private readonly SystemPluginConfig _systemPluginConfig;
 
-    public AnnotationManager(RevitRepository revitRepository, IAnnotationPosition annotationPosition) {
+    public AnnotationManager(RevitRepository revitRepository, SystemPluginConfig systemPluginConfig, IAnnotationPosition annotationPosition) {
         _revitRepository = revitRepository;
+        _systemPluginConfig = systemPluginConfig;
         _annotationPosition = annotationPosition;
     }
 
@@ -72,18 +74,18 @@ internal class AnnotationManager {
 
     private void SetParameters(FamilyInstance annotation, SpotDimension spot, int count, double templateFloorHeight) {
         double level = GetSpotDimensionLevel(spot);
-        annotation.SetParamValue(RevitRepository.LevelCountParam, count);
-        annotation.SetParamValue(RevitRepository.TemplateLevelHeightParam, templateFloorHeight / 1000);
-        annotation.SetParamValue(RevitRepository.FirstLevelOnParam, 0);
+        annotation.SetParamValue(_systemPluginConfig.LevelCountParamName, count);
+        annotation.SetParamValue(_systemPluginConfig.LevelHeightParamName, templateFloorHeight / 1000);
+        annotation.SetParamValue(_systemPluginConfig.FirstLevelOnParamName, 0);
 
         // могут быть проблемы, если идентификатор будет больше int
-        annotation.SetParamValue(RevitRepository.SpotDimensionIdParam, (int) spot.Id.GetIdValue());
+        annotation.SetParamValue(_systemPluginConfig.SpotDimensionIdParamName, (int) spot.Id.GetIdValue());
 
 #if REVIT_2020_OR_LESS
-            annotation.SetParamValue(RevitRepository.FirstLevelParam, UnitUtils.ConvertFromInternalUnits(level, DisplayUnitType.DUT_METERS));
+            annotation.SetParamValue(_systemPluginConfig.FirstLevelParamName, UnitUtils.ConvertFromInternalUnits(level, DisplayUnitType.DUT_METERS));
 #else
         annotation.SetParamValue(
-            RevitRepository.FirstLevelParam,
+            _systemPluginConfig.FirstLevelParamName,
             UnitUtils.ConvertFromInternalUnits(level, UnitTypeId.Meters));
 #endif
     }
@@ -98,8 +100,8 @@ internal class AnnotationManager {
     }
 
     public void UpdateAnnotation(SpotDimension spot, AnnotationSymbol annotation) {
-        int floorCount = (int) annotation.GetParamValueOrDefault(RevitRepository.LevelCountParam);
-        double floorHeight = (double) annotation.GetParamValueOrDefault(RevitRepository.TemplateLevelHeightParam);
+        int floorCount = (int) annotation.GetParamValueOrDefault(_systemPluginConfig.LevelCountParamName);
+        double floorHeight = (double) annotation.GetParamValueOrDefault(_systemPluginConfig.LevelHeightParamName);
         OverwriteAnnotation(spot, annotation, floorCount, floorHeight * 1000);
     }
 }

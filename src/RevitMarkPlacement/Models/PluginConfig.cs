@@ -27,14 +27,16 @@ internal class PluginConfig : ProjectConfig<RevitSettings> {
 
 internal class RevitSettings : ProjectSettings {
     public override string ProjectName { get; set; }
-   
+
     public int LevelCount { get; set; } = 5;
     public double? LevelHeight { get; set; } = 3000;
-    
+
     public ElementId GlobalParameterId { get; set; }
-    
+
     public Selections? SelectionMode { get; set; } = RevitMarkPlacement.Models.Selections.SelectedOnViewSelection;
-    public LevelHeightProvider? LevelHeightProvider { get; set; } = RevitMarkPlacement.Models.LevelHeightProvider.GlobalParameter;
+
+    public LevelHeightProvider? LevelHeightProvider { get; set; } =
+        RevitMarkPlacement.Models.LevelHeightProvider.GlobalParameter;
 }
 
 internal enum Selections {
@@ -46,4 +48,25 @@ internal enum Selections {
 internal enum LevelHeightProvider {
     UserSettings,
     GlobalParameter
+}
+
+internal class SystemPluginConfig {
+    public int MaxLevelCount => 12;
+    public int MaxLevelHeightMm => 10000; // mm
+    
+    public string TypeTop => "Вверх";
+    public string TypeBottom => "Вниз";
+    
+    public string FamilyTopName => "ТипАн_Отметка_ТипЭт_Разрез_Вверх";
+    public string FamilyBottomName => "ТипАн_Отметка_ТипЭт_Разрез_Вниз";
+
+    public string FirstLevelParamName => "Уровень_1";
+    public string FirstLevelOnParamName => "Вкл_Уровень_1";
+
+    public string LevelHeightParamName => "Высота типового этажа";
+    public string LevelCountParamName => "Количество типовых этажей";
+
+    public string SpotDimensionIdParamName => "Id высотной отметки";
+
+    public string FilterSpotName => "_(auto)";
 }

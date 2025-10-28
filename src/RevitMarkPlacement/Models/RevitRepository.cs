@@ -14,25 +14,14 @@ using RevitMarkPlacement.Models.Positions;
 namespace RevitMarkPlacement.Models;
 
 internal class RevitRepository : BaseViewModel {
-    public const string FamilyTop = "ТипАн_Отметка_ТипЭт_Разрез_Вверх";
-    public const string FamilyBottom = "ТипАн_Отметка_ТипЭт_Разрез_Вниз";
-    public const string TypeTop = "Вверх";
-    public const string TypeBottom = "Вниз";
-    public const string LevelCountParam = "Количество типовых этажей";
-    public const string FirstLevelOnParam = "Вкл_Уровень_1";
-    public const string SpotDimensionIdParam = "Id высотной отметки";
-    public const string TemplateLevelHeightParam = "Высота типового этажа";
-    public const string FilterSpotName = "_(auto)";
-    public const string FirstLevelParam = "Уровень_1";
-    public const string ElevSymbolWidth = "Длина полки";
-    public const string ElevSymbolHeight = "Высота полки";
+    private readonly SystemPluginConfig _systemPluginConfig;
 
     /// <summary>
     /// Создает экземпляр репозитория.
     /// </summary>
-    /// <param name="uiApplication">Класс доступа к интерфейсу Revit.</param>
-    public RevitRepository(UIApplication uiApplication) {
+    public RevitRepository(UIApplication uiApplication, SystemPluginConfig systemPluginConfig) {
         UIApplication = uiApplication;
+        _systemPluginConfig = systemPluginConfig;
     }
 
     /// <summary>
@@ -77,8 +66,8 @@ internal class RevitRepository : BaseViewModel {
     }
 
     public IEnumerable<FamilySymbol> GetAnnotationSymbols() {
-        string[] families = new[] { FamilyTop, FamilyBottom };
-        string[] types = new[] { TypeTop, TypeBottom };
+        string[] families = new[] { _systemPluginConfig.FamilyTopName, _systemPluginConfig.FamilyBottomName };
+        string[] types = new[] { _systemPluginConfig.TypeTop, _systemPluginConfig.TypeBottom };
         return new FilteredElementCollector(Document)
             .OfClass(typeof(FamilySymbol))
             .Cast<FamilySymbol>()
@@ -93,8 +82,8 @@ internal class RevitRepository : BaseViewModel {
 
     public IEnumerable<AnnotationSymbol> GetAnnotations() {
         var familyNames = new List<string> {
-            FamilyTop,
-            FamilyBottom
+            _systemPluginConfig.FamilyTopName,
+            _systemPluginConfig.FamilyBottomName
         };
         return new FilteredElementCollector(Document)
             .OfClass(typeof(FamilyInstance))
@@ -135,34 +124,38 @@ internal class RevitRepository : BaseViewModel {
                    new XYZ(Max.X, Max.Y, Min.Z))
                < 0.01) {
                 if(minOriginDist > maxOriginDist) {
-                    return new LeftTopAnnotation(spot.View.RightDirection, symbols);
+                    return new LeftTopAnnotation(spot.View.RightDirection, GetSymbol(_systemPluginConfig.TypeTop,  symbols));
                 }
 
-                return new RightTopAnnotation(spot.View.RightDirection, symbols);
+                return new RightTopAnnotation(spot.View.RightDirection, GetSymbol(_systemPluginConfig.TypeTop,  symbols));
             }
 
             if(minOriginDist > maxOriginDist) {
-                return new RightTopAnnotation(spot.View.RightDirection, symbols);
+                return new RightTopAnnotation(spot.View.RightDirection, GetSymbol(_systemPluginConfig.TypeTop,  symbols));
             }
 
-            return new LeftTopAnnotation(spot.View.RightDirection, symbols);
+            return new LeftTopAnnotation(spot.View.RightDirection, GetSymbol(_systemPluginConfig.TypeTop,  symbols));
         }
 
         if(new XYZ(Min.X + dir.X * maxMinDist, Min.Y + dir.Y * maxMinDist, Min.Z).DistanceTo(
                new XYZ(Max.X, Max.Y, Min.Z))
            < 0.01) {
             if(minOriginDist > maxOriginDist) {
-                return new LeftBottomAnnotation(spot.View.RightDirection, symbols);
+                return new LeftBottomAnnotation(spot.View.RightDirection, GetSymbol(_systemPluginConfig.TypeBottom,  symbols));
             }
 
-            return new RightBottomAnnotation(spot.View.RightDirection, symbols);
+            return new RightBottomAnnotation(spot.View.RightDirection, GetSymbol(_systemPluginConfig.TypeBottom,  symbols));
         }
 
         if(minOriginDist > maxOriginDist) {
-            return new RightBottomAnnotation(spot.View.RightDirection, symbols);
+            return new RightBottomAnnotation(spot.View.RightDirection, GetSymbol(_systemPluginConfig.TypeBottom,  symbols));
         }
 
-        return new LeftBottomAnnotation(spot.View.RightDirection, symbols);
+        return new LeftBottomAnnotation(spot.View.RightDirection, GetSymbol(_systemPluginConfig.TypeBottom,  symbols));
+    }
+
+    private FamilySymbol GetSymbol(string typeName, IEnumerable<FamilySymbol> symbols) {
+        return symbols.FirstOrDefault(item => item.Name.Equals(typeName, StringComparison.CurrentCultureIgnoreCase));
     }
 
     public void MirrorAnnotation(FamilyInstance annotation, XYZ axis) {
@@ -189,14 +182,14 @@ internal class RevitRepository : BaseViewModel {
         return new FilteredElementCollector(Document)
             .OfClass(typeof(Family))
             .Cast<Family>()
-            .FirstOrDefault(item => item.Name.Equals(FamilyTop, StringComparison.CurrentCultureIgnoreCase));
+            .FirstOrDefault(item => item.Name.Equals(_systemPluginConfig.FamilyTopName, StringComparison.CurrentCultureIgnoreCase));
     }
 
     public Family GetBottomAnnotaionFamily() {
         return new FilteredElementCollector(Document)
             .OfClass(typeof(Family))
             .Cast<Family>()
-            .FirstOrDefault(item => item.Name.Equals(FamilyBottom, StringComparison.CurrentCultureIgnoreCase));
+            .FirstOrDefault(item => item.Name.Equals(_systemPluginConfig.FamilyBottomName, StringComparison.CurrentCultureIgnoreCase));
     }
 
     public Document GetFamilyDocument(Family family) {

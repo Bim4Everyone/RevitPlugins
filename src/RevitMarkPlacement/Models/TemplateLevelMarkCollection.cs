@@ -9,10 +9,15 @@ namespace RevitMarkPlacement.Models;
 
 internal class TemplateLevelMarkCollection {
     private readonly RevitRepository _revitRepository;
+    private readonly SystemPluginConfig _systemPluginConfig;
     private readonly ISpotDimensionSelection _selection;
 
-    public TemplateLevelMarkCollection(RevitRepository revitRepository, ISpotDimensionSelection selection) {
+    public TemplateLevelMarkCollection(
+        RevitRepository revitRepository,
+        SystemPluginConfig systemPluginConfig,
+        ISpotDimensionSelection selection) {
         _revitRepository = revitRepository;
+        _systemPluginConfig = systemPluginConfig;
         _selection = selection;
         InitializeTemplateLevelMarks();
     }
@@ -55,7 +60,7 @@ internal class TemplateLevelMarkCollection {
         var symbols = _revitRepository.GetAnnotationSymbols();
         foreach(var annotation in annotations) {
             // могут быть проблемы, если идентификатор будет больше int
-            int spotId = annotation.GetParamValueOrDefault<int>(RevitRepository.SpotDimensionIdParam);
+            int spotId = annotation.GetParamValueOrDefault<int>(_systemPluginConfig.SpotDimensionIdParamName);
 #if REVIT_2023_OR_LESS
                 var spot = _revitRepository.GetElement(new ElementId(spotId)) as SpotDimension;
 #else
@@ -68,7 +73,7 @@ internal class TemplateLevelMarkCollection {
 
             if(spots.Contains(spot, new ElementNameEquatable<SpotDimension>())) {
                 var position = _revitRepository.GetSpotOrientation(spot, symbols);
-                var annotationManager = new AnnotationManager(_revitRepository, position);
+                var annotationManager = new AnnotationManager(_revitRepository, _systemPluginConfig, position);
                 TemplateLevelMarks.Add(new TemplateLevelMark(spot, annotationManager, annotation));
             }
         }
@@ -78,6 +83,9 @@ internal class TemplateLevelMarkCollection {
                 .Except(TemplateLevelMarks.Select(m => m.SpotDimension), new ElementNameEquatable<SpotDimension>())
                 .Select(s => new TemplateLevelMark(
                     s,
-                    new AnnotationManager(_revitRepository, _revitRepository.GetSpotOrientation(s, symbols)))));
+                    new AnnotationManager(
+                        _revitRepository,
+                        _systemPluginConfig,
+                        _revitRepository.GetSpotOrientation(s, symbols)))));
     }
 }

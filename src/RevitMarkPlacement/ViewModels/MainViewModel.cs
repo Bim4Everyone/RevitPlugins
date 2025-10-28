@@ -17,10 +17,8 @@ using RevitMarkPlacement.ViewModels.FloorHeight;
 namespace RevitMarkPlacement.ViewModels;
 
 internal class MainViewModel : BaseViewModel {
-    private const string _allElementsSelection = "Создать по всему проекту";
-    private const string _selectedElements = "Создать по выбранным элементам";
-
     private readonly PluginConfig _pluginConfig;
+    private readonly SystemPluginConfig _systemPluginConfig;
     private readonly RevitRepository _revitRepository;
     private readonly ILocalizationService _localizationService;
 
@@ -42,6 +40,7 @@ internal class MainViewModel : BaseViewModel {
 
     public MainViewModel(
         PluginConfig pluginConfig,
+        SystemPluginConfig systemPluginConfig,
         RevitRepository revitRepository,
         ILocalizationService localizationService,
         IUnitProvider unitProvider,
@@ -49,12 +48,14 @@ internal class MainViewModel : BaseViewModel {
         IGlobalParamSelection globalSelection,
         ISpotDimensionSelection[] spotSelections) {
         _pluginConfig = pluginConfig;
+        _systemPluginConfig = systemPluginConfig;
+        
         _revitRepository = revitRepository;
         _localizationService = localizationService;
 
         _unitProvider = unitProvider;
         _documentProvider = documentProvider;
-        
+
         _globalSelection = globalSelection;
         _spotSelections = spotSelections;
 
@@ -142,8 +143,8 @@ internal class MainViewModel : BaseViewModel {
 
     private void AcceptView() {
         SaveConfig();
-        
-        var marks = new TemplateLevelMarkCollection(_revitRepository, Selection.Selection);
+
+        var marks = new TemplateLevelMarkCollection(_revitRepository, _systemPluginConfig, Selection.Selection);
         marks.CreateAnnotation(int.Parse(FloorCount), FloorHeight.GetFloorHeight() ?? 0);
     }
 
@@ -152,17 +153,17 @@ internal class MainViewModel : BaseViewModel {
             ErrorText = _localizationService.GetLocalizedString("MainWindow.EmptySelectionMode");
             return false;
         }
-        
+
         if(Selection?.SpotDimensionTypes.Count == 0) {
-            ErrorText =  _localizationService.GetLocalizedString("MainWindow.EmptySpotDimensionTypes");
+            ErrorText = _localizationService.GetLocalizedString("MainWindow.EmptySpotDimensionTypes");
             return false;
         }
-        
+
         if(string.IsNullOrEmpty(FloorCount)) {
             ErrorText = _localizationService.GetLocalizedString("MainWindow.EmptyFloorCount");
             return false;
         }
-        
+
         if(!int.TryParse(FloorCount, out int levelCount)) {
             ErrorText = _localizationService.GetLocalizedString("MainWindow.TextFloorCount");
             return false;
@@ -174,7 +175,7 @@ internal class MainViewModel : BaseViewModel {
         }
 
         if(FloorHeight is null) {
-            ErrorText =_localizationService.GetLocalizedString("MainWindow.EmptyFloorHeight");
+            ErrorText = _localizationService.GetLocalizedString("MainWindow.EmptyFloorHeight");
             return false;
         }
 
@@ -202,89 +203,5 @@ internal class MainViewModel : BaseViewModel {
         }
 
         _pluginConfig.SaveProjectConfig();
-    }
-
-    public bool CanPlaceAnnotation() {
-        var families = CheckFamilyAnnotations();
-        CheckAnnotationParameters(families);
-        CheckElevationSymbols();
-        return InfoElementsViewModel.InfoElements.Count == 0;
-    }
-
-    private IEnumerable<Family> CheckFamilyAnnotations() {
-        var topFamily = _revitRepository.GetTopAnnotaionFamily();
-        if(topFamily != null) {
-            yield return topFamily;
-        } else {
-            InfoElementsViewModel.InfoElements.Add(
-                new InfoElementViewModel(InfoElement.FamilyAnnotationMissing, RevitRepository.FamilyTop));
-        }
-
-        var bottomFamily = _revitRepository.GetBottomAnnotaionFamily();
-        if(bottomFamily != null) {
-            yield return bottomFamily;
-        } else {
-            InfoElementsViewModel.InfoElements.Add(
-                new InfoElementViewModel(InfoElement.FamilyAnnotationMissing, RevitRepository.FamilyBottom));
-        }
-    }
-
-    private bool CheckAnnotationParameters(IEnumerable<Family> families) {
-        var parameters = new List<string> {
-            RevitRepository.LevelCountParam,
-            RevitRepository.FirstLevelOnParam,
-            RevitRepository.SpotDimensionIdParam,
-            RevitRepository.TemplateLevelHeightParam,
-            RevitRepository.FirstLevelParam
-        };
-        bool result = true;
-        foreach(var family in families) {
-            var document = _revitRepository.GetFamilyDocument(family);
-            var familyManager = document.FamilyManager;
-            try {
-                var notExistedParams = parameters
-                    .Except(familyManager.GetParameters().Select(item => item.Definition.Name))
-                    .ToList();
-
-                if(notExistedParams.Count > 0) {
-                    foreach(string param in notExistedParams) {
-                        InfoElementsViewModel.InfoElements.Add(
-                            new InfoElementViewModel(InfoElement.AnnotationParameterMissing, family.Name, param));
-                    }
-
-                    result = false;
-                }
-            } finally {
-                document.Close(false);
-            }
-        }
-
-        return result;
-    }
-
-    private bool CheckElevationSymbols() {
-        var symbols = _revitRepository.GetElevationSymbols();
-        bool result = true;
-        foreach(var symbol in symbols) {
-            if(!symbol.IsExistsParam(RevitRepository.ElevSymbolWidth)) {
-                InfoElementsViewModel.InfoElements.Add(
-                    new InfoElementViewModel(
-                        InfoElement.ElevationParameterMissing,
-                        symbol.Name,
-                        RevitRepository.ElevSymbolWidth));
-                result = false;
-            }
-
-            if(!symbol.IsExistsParam(RevitRepository.ElevSymbolHeight)) {
-                InfoElementsViewModel.InfoElements.Add(
-                    new InfoElementViewModel(
-                        InfoElement.ElevationParameterMissing,
-                        symbol.Name,
-                        RevitRepository.ElevSymbolHeight));
-                result = false;
-            }
-        }
-
-        return result;
     }
 }
