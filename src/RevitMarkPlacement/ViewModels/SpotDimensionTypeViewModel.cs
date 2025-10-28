@@ -17,5 +17,5 @@ internal class SpotDimensionTypeViewModel : BaseViewModel {
     }
 
     public string Name => _spotDimensionType.Name;
-    public BitmapSource PreviewImage => _spotDimensionType.GetPreviewImage(new Size(60, 60)).ConvertToBitmapSource();
+    public BitmapSource PreviewImage => _spotDimensionType.GetPreviewImage(new Size(24, 24)).ConvertToBitmapSource();
 }

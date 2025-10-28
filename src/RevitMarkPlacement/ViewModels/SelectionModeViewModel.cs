@@ -23,10 +23,15 @@ internal class SelectionModeViewModel : BaseViewModel {
 
     public ISpotDimensionSelection Selection { get; }
     public Selections Selections => Selection.Selections;
+    
+    public bool HasSpotDimensionTypes => SpotDimensionTypes?.Any() ?? false;
 
     public ObservableCollection<SpotDimensionTypeViewModel> SpotDimensionTypes {
         get => _spotDimensionTypes;
-        set => RaiseAndSetIfChanged(ref _spotDimensionTypes, value);
+        set {
+            RaiseAndSetIfChanged(ref _spotDimensionTypes, value);
+            OnPropertyChanged(nameof(HasSpotDimensionTypes));
+        }
     }
 
     public void LoadSpotDimensionTypes() {
@@ -35,5 +40,7 @@ internal class SelectionModeViewModel : BaseViewModel {
                 .GetSpotDimensionTypes(Selection)
                 .Select(item => new SpotDimensionTypeViewModel(item))
         ];
+        
+        
     }
 }

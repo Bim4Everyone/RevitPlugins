@@ -12,11 +12,6 @@ internal static class GlobalParameterExtensions {
             
         }
         
-#if REVIT_2021_OR_GREATER
-        return UnitUtils.ConvertFromInternalUnits(doubleParameterValue.Value, UnitTypeId.Millimeters);
-            
-#else
-        return UnitUtils.ConvertFromInternalUnits(doubleParameterValue.Value, DisplayUnitType.DUT_MILLIMETERS);
-#endif
+        return doubleParameterValue.Value;
     }
 }

@@ -25,10 +25,6 @@
 
     d:DataContext="{d:DesignInstance vms:MainViewModel, IsDesignTimeCreatable=False}">
 
-    <Window.Resources>
-        <converters:EnumConverter x:Key="EnumConverter" />
-    </Window.Resources>
-    
     <b:Interaction.Triggers>
         <b:EventTrigger
             EventName="Loaded">
@@ -42,51 +38,12 @@
             <RowDefinition Height="Auto" />
             <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
-        
+
         <ui:TitleBar
             Grid.Row="0"
-            Title="{me:LocalizationSource ReportWindow.Title}"/>
+            Title="{me:LocalizationSource ReportWindow.Title}" />
+
         
-        <ScrollViewer Grid.Row="1" CanContentScroll="False" HorizontalScrollBarVisibility="Auto">
-            <DataGrid CanUserAddRows="False"
-                      CanUserDeleteRows="False"
-                      AutoGenerateColumns="False"
-                      CanUserReorderColumns="False"
-                      CanUserResizeRows="False"
-                      HorizontalGridLinesBrush="Transparent"
-                      VerticalGridLinesBrush="Transparent"
-                      IsReadOnly="True"
-                      ItemsSource="{Binding InfoElements}"
-                      AlternationCount="2" AlternatingRowBackground="WhiteSmoke">
-                <DataGrid.Columns>
-                    <DataGridTemplateColumn>
-                        <DataGridTemplateColumn.CellTemplate>
-                            <DataTemplate DataType="{x:Type vms:InfoElementViewModel}">
-                                <Image Height="20">
-                                    <Image.Style>
-                                        <Style TargetType="Image">
-                                            <Style.Triggers>
-                                                <DataTrigger Binding="{Binding TypeInfo}" Value="0">
-                                                    <Setter Property="Source" Value="../Resources/icons8-error.png" />
-                                                </DataTrigger>
-                                                <DataTrigger Binding="{Binding TypeInfo}" Value="2">
-                                                    <Setter Property="Source" Value="../Resources/icons8-info.png" />
-                                                </DataTrigger>
-                                                <DataTrigger Binding="{Binding TypeInfo}" Value="1">
-                                                    <Setter Property="Source" Value="../Resources/icons8-warn.png" />
-                                                </DataTrigger>
-                                            </Style.Triggers>
-                                        </Style>
-                                    </Image.Style>
-                                </Image>
-                            </DataTemplate>
-                        </DataGridTemplateColumn.CellTemplate>
-                    </DataGridTemplateColumn>
-                    <DataGridTextColumn Header="Вид элемента"
-                                        Binding="{Binding ElementType, Converter={StaticResource EnumConverter}, ConverterParameter={x:Type vms:ElementType}}" />
-                    <DataGridTextColumn Width="Auto" Header="Сообщение" Binding="{Binding Message}" />
-                </DataGrid.Columns>
-            </DataGrid>
-        </ScrollViewer>
+
     </Grid>
 </core:WpfUIPlatformWindow>

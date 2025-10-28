@@ -12,13 +12,15 @@ using RevitMarkPlacement.Models;
 namespace RevitMarkPlacement.ViewModels.FloorHeight;
 
 internal class GlobalParamsViewModel : BaseViewModel, IFloorHeightProvider {
+    private readonly IUnitProvider _unitProvider;
     private readonly IGlobalParamSelection _globalParamSelection;
 
     private bool _isEnabled;
     private GlobalParamViewModel _globalParam;
     private ObservableCollection<GlobalParamViewModel> _globalParams;
 
-    public GlobalParamsViewModel(IGlobalParamSelection globalParamSelection) {
+    public GlobalParamsViewModel(IUnitProvider unitProvider, IGlobalParamSelection globalParamSelection) {
+        _unitProvider = unitProvider;
         _globalParamSelection = globalParamSelection;
     }
 
@@ -46,7 +48,7 @@ internal class GlobalParamsViewModel : BaseViewModel, IFloorHeightProvider {
     public void LoadConfig(RevitSettings settings) {
         GlobalParams = new ObservableCollection<GlobalParamViewModel>(
             _globalParamSelection.GetElements()
-                .Select(item => new GlobalParamViewModel(item)));
+                .Select(item => new GlobalParamViewModel(item, _unitProvider)));
 
         IsEnabled = GlobalParams.Count > 0;
         GlobalParam = GlobalParams.FirstOrDefault(item => item.Id == settings?.GlobalParameterId)

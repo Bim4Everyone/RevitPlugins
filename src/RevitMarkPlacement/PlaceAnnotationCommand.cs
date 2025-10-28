@@ -17,6 +17,7 @@ using Ninject;
 using RevitMarkPlacement.Models;
 using RevitMarkPlacement.Models.DocumentProviders;
 using RevitMarkPlacement.Models.SelectionModes;
+using RevitMarkPlacement.Models.UnitProviders;
 using RevitMarkPlacement.ViewModels;
 using RevitMarkPlacement.Views;
 
@@ -73,6 +74,10 @@ public class PlaceAnnotationCommand : BasePluginCommand {
         kernel.UseWpfLocalization(
             $"/{assemblyName};component/assets/localizations/Language.xaml",
             CultureInfo.GetCultureInfo("ru-RU"));
+
+        kernel.Bind<IUnitProvider>()
+            .To<UnitProvider>()
+            .InSingletonScope();
 
         kernel.Bind<IDocumentProvider>()
             .To<ActiveDocumentProvider>()

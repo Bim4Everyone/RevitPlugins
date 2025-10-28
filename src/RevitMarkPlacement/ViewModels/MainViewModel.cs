@@ -21,6 +21,7 @@ internal class MainViewModel : BaseViewModel {
 
     private readonly PluginConfig _pluginConfig;
     private readonly RevitRepository _revitRepository;
+    private readonly IUnitProvider _unitProvider;
     private readonly IDocumentProvider _documentProvider;
 
     private InfoElementsViewModel _infoElementsViewModel;
@@ -37,9 +38,11 @@ internal class MainViewModel : BaseViewModel {
     public MainViewModel(
         PluginConfig pluginConfig,
         RevitRepository revitRepository,
+        IUnitProvider unitProvider,
         IDocumentProvider documentProvider) {
         _pluginConfig = pluginConfig;
         _revitRepository = revitRepository;
+        _unitProvider = unitProvider;
         _documentProvider = documentProvider;
 
         InfoElementsViewModel = new InfoElementsViewModel();
@@ -112,7 +115,7 @@ internal class MainViewModel : BaseViewModel {
 
     private void LoadFloorHeights(RevitSettings settings) {
         FloorHeights = [
-            new UserFloorHeightViewModel(), new GlobalParamsViewModel(new DoubleGlobalParamSelection(_documentProvider))
+            new UserFloorHeightViewModel(), new GlobalParamsViewModel(_unitProvider, new DoubleGlobalParamSelection(_documentProvider))
         ];
 
         foreach(var provider in FloorHeights) {

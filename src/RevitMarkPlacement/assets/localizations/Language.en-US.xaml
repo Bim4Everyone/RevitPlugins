@@ -9,6 +9,12 @@
     <system:String x:Key="MainWindow.ButtonOk">OK</system:String>
     <system:String x:Key="MainWindow.ButtonCancel">Cancel</system:String>
     
+    <system:String x:Key="MainWindow.CreateText">Create</system:String>
+    <system:String x:Key="MainWindow.SettingsText">Settings</system:String>
+    <system:String x:Key="MainWindow.FloorCount">Floor count</system:String>
+    <system:String x:Key="MainWindow.FloorHeight">Floor height</system:String>
+    <system:String x:Key="MainWindow.EmptySpotDimensions">Spot dimensions not found</system:String>
+    
     <system:String x:Key="Selections.DBSelection">All spots dimensions</system:String>
     <system:String x:Key="Selections.DBViewSelection">Spot dimensions on view</system:String>
     <system:String x:Key="Selections.SelectedOnViewSelection">Selected dimensions on view</system:String>
