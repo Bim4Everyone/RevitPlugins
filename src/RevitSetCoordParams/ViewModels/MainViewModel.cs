@@ -38,12 +38,9 @@ internal class MainViewModel : BaseViewModel {
     private ObservableCollection<PositionViewModel> _positions;
     private PositionViewModel _selectedPosition;
     private ObservableCollection<ParamViewModel> _params;
-    private ObservableCollection<ParamViewModel> _selectedParams;
     private ObservableCollection<CategoryViewModel> _categories;
-    private ObservableCollection<CategoryViewModel> _selectedCategories;
     private bool _search;
     private bool _isCheckedAllCats;
-    private bool _isNotCheckedAllCats;
     private bool _hasCategoryWarning;
     private bool _hasParamWarning;
     private string _maxDiameterSearchSphereMm;
@@ -109,17 +106,9 @@ internal class MainViewModel : BaseViewModel {
         get => _params;
         set => RaiseAndSetIfChanged(ref _params, value);
     }
-    public ObservableCollection<ParamViewModel> SelectedParams {
-        get => _selectedParams;
-        set => RaiseAndSetIfChanged(ref _selectedParams, value);
-    }
     public ObservableCollection<CategoryViewModel> Categories {
         get => _categories;
         set => RaiseAndSetIfChanged(ref _categories, value);
-    }
-    public ObservableCollection<CategoryViewModel> SelectedCategories {
-        get => _selectedCategories;
-        set => RaiseAndSetIfChanged(ref _selectedCategories, value);
     }
     public bool Search {
         get => _search;
@@ -144,10 +133,6 @@ internal class MainViewModel : BaseViewModel {
     public bool IsCheckedAllCats {
         get => _isCheckedAllCats;
         set => RaiseAndSetIfChanged(ref _isCheckedAllCats, value);
-    }
-    public bool IsNotCheckedAllCats {
-        get => _isNotCheckedAllCats;
-        set => RaiseAndSetIfChanged(ref _isNotCheckedAllCats, value);
     }
     public string ErrorText {
         get => _errorText;
@@ -206,7 +191,8 @@ internal class MainViewModel : BaseViewModel {
 
     // Метод обновления предупреждений в категориях
     private void UpdateCategoryWarnings() {
-        var selectedParams = SelectedParams
+        var selectedParams = Params
+            .Where(paramViewModel => paramViewModel.IsChecked)
             .Select(paramViewModel => paramViewModel.ParamMap)
             .ToList();
         foreach(var category in Categories) {
@@ -246,20 +232,6 @@ internal class MainViewModel : BaseViewModel {
         }
     }
 
-    // Метод подписанный на событие изменения CategoryViewModel
-    private void OnCategoryChanged(object sender, PropertyChangedEventArgs e) {
-        if(sender is not CategoryViewModel categoryViewModel) {
-            return;
-        }
-        if(categoryViewModel.IsChecked) {
-            if(!SelectedCategories.Contains(categoryViewModel)) {
-                SelectedCategories.Add(categoryViewModel);
-            }
-        } else {
-            SelectedCategories.Remove(categoryViewModel);
-        }
-    }
-
     // Метод подписанный на событие изменения ParamViewModel
     private void OnParamChanged(object sender, PropertyChangedEventArgs e) {
         if(sender is not ParamViewModel vm) {
@@ -287,13 +259,6 @@ internal class MainViewModel : BaseViewModel {
                 break;
 
             case nameof(ParamViewModel.IsChecked):
-                if(vm.IsChecked) {
-                    if(!SelectedParams.Contains(vm)) {
-                        SelectedParams.Add(vm);
-                    }
-                } else {
-                    SelectedParams.Remove(vm);
-                }
                 UpdateParamWarnings();
                 UpdateCategoryWarnings();
                 break;
@@ -356,29 +321,16 @@ internal class MainViewModel : BaseViewModel {
         Positions = new ObservableCollection<PositionViewModel>(GetPositionViewModels());
         SelectedPosition = Positions.First();
         Params = new ObservableCollection<ParamViewModel>(GetParamViewModels());
-        SelectedParams = [];
         // Подписка на события в ParamViewModel
         foreach(var param in Params) {
             param.PropertyChanged += OnParamChanged;
-            if(param.IsChecked) {
-                SelectedParams.Add(param);
-            }
         }
         Categories = new ObservableCollection<CategoryViewModel>(GetCategoryViewModels());
-        SelectedCategories = [];
-        // Подписка на события в CategoryViewModel
-        foreach(var category in Categories) {
-            category.PropertyChanged += OnCategoryChanged;
-            if(category.IsChecked) {
-                SelectedCategories.Add(category);
-            }
-        }
         // Подписка на события для обновления TypeViewModel
         PropertyChanged += OnPropertyChanged;
         UpdateParamWarnings();
         UpdateCategoryWarnings();
-        IsCheckedAllCats = SelectedCategories.All(catVM => catVM.IsChecked);
-        IsNotCheckedAllCats = SelectedCategories.All(catVM => !catVM.IsChecked);
+        IsCheckedAllCats = Categories.All(catVM => catVM.IsChecked);
         Search = _setCoordParamsSettings.Search;
         MaxDiameterSearchSphereMm = Convert.ToString(_setCoordParamsSettings.MaxDiameterSearchSphereMm);
         StepDiameterSearchSphereMm = Convert.ToString(_setCoordParamsSettings.StepDiameterSearchSphereMm);
@@ -407,22 +359,23 @@ internal class MainViewModel : BaseViewModel {
                 }
             }
         }
-        if(SelectedParams != null) {
-            if(SelectedParams.Count == 0) {
-                ErrorText = _localizationService.GetLocalizedString("MainViewModel.NoParams");
-                return false;
-            }
-            if(SelectedParams.Count == 1 && SelectedParams.First().ParamMap.SourceParam == null) {
-                ErrorText = _localizationService.GetLocalizedString("MainViewModel.NoParamMaps");
-                return false;
-            }
-        }
         if(SelectedTypeModel == null) {
             ErrorText = _localizationService.GetLocalizedString("MainViewModel.NoTypeModel");
             return false;
         }
-        if(SelectedCategories != null) {
-            if(SelectedCategories.Count == 0) {
+        if(Params != null) {
+            var checkedParams = Params.Where(p => p.IsChecked).ToList();
+            if(checkedParams.Count == 0) {
+                ErrorText = _localizationService.GetLocalizedString("MainViewModel.NoParams");
+                return false;
+            }
+            if(checkedParams.Count == 1 && checkedParams.First().ParamMap.SourceParam == null) {
+                ErrorText = _localizationService.GetLocalizedString("MainViewModel.NoParamMaps");
+                return false;
+            }
+        }
+        if(Categories != null) {
+            if(Categories.Where(p => p.IsChecked).ToList().Count == 0) {
                 ErrorText = _localizationService.GetLocalizedString("MainViewModel.NoCategories");
                 return false;
             }
@@ -475,8 +428,8 @@ internal class MainViewModel : BaseViewModel {
 
     // Сохранение конфигурации пользователя
     private void SaveConfig() {
-        _setCoordParamsSettings.ParamMaps = SelectedParams.Select(paramVM => paramVM.ParamMap).ToList();
-        _setCoordParamsSettings.Categories = SelectedCategories.Select(catVM => catVM.Category.GetBuiltInCategory()).ToList();
+        _setCoordParamsSettings.ParamMaps = Params.Where(p => p.IsChecked).Select(paramVM => paramVM.ParamMap).ToList();
+        _setCoordParamsSettings.Categories = Categories.Where(c => c.IsChecked).Select(catVM => catVM.Category.GetBuiltInCategory()).ToList();
         _setCoordParamsSettings.ElementsProvider = SelectedRangeElements.ElementsProvider;
         _setCoordParamsSettings.PositionProvider = SelectedPosition.PositionProvider;
         _setCoordParamsSettings.FileProvider = SelectedSourceFile.FileProvider;

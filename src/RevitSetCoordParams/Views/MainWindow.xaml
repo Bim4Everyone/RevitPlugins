@@ -192,8 +192,7 @@
                                     <RadioButton
                                         Margin="20,0,0,0"
                                         GroupName="Choise"
-                                        Content="{me:LocalizationSource MainWindow.NotCheckedAllCats}"
-                                        IsChecked="{Binding IsNotCheckedAllCats, Mode=TwoWay}"
+                                        Content="{me:LocalizationSource MainWindow.NotCheckedAllCats}"                                        
                                         Command="{Binding UncheckAllCatsCommand}" />
                                 </StackPanel>
                             </Border>

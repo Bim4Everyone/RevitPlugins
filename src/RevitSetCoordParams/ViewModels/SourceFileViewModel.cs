@@ -19,6 +19,7 @@ internal class SourceFileViewModel {
     public string SuorceFileUniqueId { get; set; }
     public string FileName { get; set; }
 
+    // Метод получения имени файла
     private string GetFileName() {
         return !FileProvider.Document.IsLinked
            ? _localizationService.GetLocalizedString("SourceFileViewModel.CurrentFile")

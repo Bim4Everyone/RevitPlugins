@@ -26,7 +26,9 @@ internal class RevitRepository {
     public Document Document => ActiveUIDocument.Document;
     private DocumentsService DocumentsService => new(Document);
 
-
+    /// <summary>
+    /// Метод, получения всех элементов модели
+    /// </summary>
     public IEnumerable<RevitElement> GetAllRevitElements(IEnumerable<BuiltInCategory> categories) {
         return categories == null || !categories.Any()
             ? []

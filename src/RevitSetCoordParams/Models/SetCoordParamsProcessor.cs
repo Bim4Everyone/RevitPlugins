@@ -25,6 +25,14 @@ internal class SetCoordParamsProcessor {
         _settings = settings;
     }
 
+    /// <summary>
+    /// Основной метод поиска пересечений и заполнения параметров
+    /// </summary>    
+    /// <remarks>
+    /// В данном методе происходит пересечение объемных моделей и элементов основного файла.    
+    /// При успешном пересечении записываются параметры из объемного элемента в элемент модели
+    /// </remarks>
+    /// <returns>Возвращает коллекцию предупреждений WarningModel</returns>
     public void Run() {
         var sourceModels = _settings.FileProvider.GetRevitElements(_settings.TypeModel);
         var targetElements = _settings.ElementsProvider.GetRevitElements(_settings.Categories);

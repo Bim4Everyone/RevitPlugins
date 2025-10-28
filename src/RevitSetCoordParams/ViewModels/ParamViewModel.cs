@@ -51,8 +51,10 @@ internal class ParamViewModel : BaseViewModel {
         set => RaiseAndSetIfChanged(ref _hasWarning, value);
     }
 
+    /// <summary>
+    /// Метод, который обновляет предупреждения в параметрах
+    /// </summary>
     public void UpdateWarning(Document sourceDoc, Document targetDoc) {
-
         HasWarning = false;
         Warnings = string.Empty;
 

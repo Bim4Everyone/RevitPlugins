@@ -39,8 +39,10 @@ internal class CategoryViewModel : BaseViewModel {
         set => RaiseAndSetIfChanged(ref _hasWarning, value);
     }
 
+    /// <summary>
+    /// Метод, который обновляет предупреждения в категориях
+    /// </summary>
     public void UpdateWarning(List<ParamMap> paramMaps) {
-
         HasWarning = false;
         Warnings = string.Empty;
 
