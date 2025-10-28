@@ -1,5 +1,7 @@
-using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.ComponentModel;
 using System.Linq;
+using System.Windows.Data;
 using System.Windows.Input;
 
 using dosymep.Revit.Comparators;
@@ -13,8 +15,10 @@ namespace RevitCreateViewSheet.ViewModels {
     internal class AnnotationModelCreatorViewModel : BaseViewModel {
         private readonly RevitRepository _revitRepository;
         private readonly ILocalizationService _localizationService;
+        private readonly ObservableCollection<AnnotationSymbolTypeViewModel> _allAnnotations;
         private string _errorText;
         private AnnotationSymbolTypeViewModel _selectedAnnotation;
+        private string _searchAnnotationName;
 
         public AnnotationModelCreatorViewModel(
             RevitRepository revitRepository,
@@ -22,15 +26,17 @@ namespace RevitCreateViewSheet.ViewModels {
 
             _revitRepository = revitRepository ?? throw new System.ArgumentNullException(nameof(revitRepository));
             _localizationService = localizationService ?? throw new System.ArgumentNullException(nameof(localizationService));
-            AnnotationSymbolTypes = [.. _revitRepository.GetAllAnnotationSymbols()
+            _allAnnotations = [.. _revitRepository.GetAllAnnotationSymbols()
                 .Select(a => new AnnotationSymbolTypeViewModel(a))
                 .OrderBy(a => a.RichName, new LogicalStringComparer())];
-            SelectedAnnotationSymbolType = AnnotationSymbolTypes.FirstOrDefault();
+            AnnotationSymbolTypes = new CollectionViewSource() { Source = _allAnnotations };
+            AnnotationSymbolTypes.Filter += AnnotationsFilterHandler;
             AcceptViewCommand = RelayCommand.Create(() => { }, CanAcceptView);
+            PropertyChanged += AnnotationsFilterPropertyChanged;
         }
 
 
-        public IReadOnlyCollection<AnnotationSymbolTypeViewModel> AnnotationSymbolTypes { get; }
+        public CollectionViewSource AnnotationSymbolTypes { get; }
 
         public AnnotationSymbolTypeViewModel SelectedAnnotationSymbolType {
             get => _selectedAnnotation;
@@ -39,6 +45,11 @@ namespace RevitCreateViewSheet.ViewModels {
 
         public ICommand AcceptViewCommand { get; }
 
+        public string SearchAnnotationName {
+            get => _searchAnnotationName;
+            set => RaiseAndSetIfChanged(ref _searchAnnotationName, value);
+        }
+
         public string ErrorText {
             get => _errorText;
             set => RaiseAndSetIfChanged(ref _errorText, value);
@@ -46,7 +57,7 @@ namespace RevitCreateViewSheet.ViewModels {
 
 
         private bool CanAcceptView() {
-            if(AnnotationSymbolTypes.Count == 0) {
+            if(AnnotationSymbolTypes?.View.IsEmpty ?? true) {
                 ErrorText = _localizationService.GetLocalizedString("Errors.AnnotationsNotFound");
                 return false;
             }
@@ -58,6 +69,23 @@ namespace RevitCreateViewSheet.ViewModels {
 
             ErrorText = null;
             return true;
+        }
+
+        private void AnnotationsFilterHandler(object sender, FilterEventArgs e) {
+            if(e.Item is AnnotationSymbolTypeViewModel annotation) {
+                if(!string.IsNullOrWhiteSpace(SearchAnnotationName)) {
+                    string str = SearchAnnotationName.ToLower();
+                    e.Accepted = annotation.RichName.ToLower().Contains(str);
+                    return;
+                }
+                e.Accepted = true;
+            }
+        }
+
+        private void AnnotationsFilterPropertyChanged(object sender, PropertyChangedEventArgs e) {
+            if(e.PropertyName == nameof(SearchAnnotationName)) {
+                AnnotationSymbolTypes?.View.Refresh();
+            }
         }
     }
 }

@@ -9,6 +9,7 @@
     xmlns:me="clr-namespace:dosymep.WpfCore.MarkupExtensions;assembly=dosymep.WpfCore"
     xmlns:vms="clr-namespace:RevitCreateViewSheet.ViewModels"
     xmlns:local="clr-namespace:RevitCreateViewSheet.Views"
+    xmlns:res="clr-namespace:RevitCreateViewSheet.Resources"
     WindowStartupLocation="CenterOwner"
     mc:Ignorable="d"
     Height="300"
@@ -54,10 +55,14 @@
                 MinWidth="450"
                 MaxWidth="450"
                 DisplayMemberPath="Name"
-                TextSearch.TextPath="Name"
-                Style="{StaticResource CustomEditableComboBox}"
-                ItemsSource="{Binding ViewSchedules}"
-                SelectedItem="{Binding SelectedViewSchedule}" />
+                IsEditable="True"
+                IsTextSearchEnabled="False"
+                StaysOpenOnEdit="True"
+                res:ComboBoxBehavior.OpenDropDownOnTextChanged="True"
+                Text="{Binding SearchScheduleName, UpdateSourceTrigger=PropertyChanged}"
+                Style="{StaticResource CustomComboBox}"
+                ItemsSource="{Binding ViewSchedules.View}"
+                SelectedItem="{Binding SelectedViewSchedule, UpdateSourceTrigger=PropertyChanged}" />
         </StackPanel>
 
         <StackPanel

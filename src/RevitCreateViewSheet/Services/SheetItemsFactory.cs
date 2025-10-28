@@ -1,5 +1,4 @@
 using System;
-using System.Linq;
 
 using Ninject;
 using Ninject.Syntax;
@@ -26,7 +25,7 @@ namespace RevitCreateViewSheet.Services {
 
             var window = _resolutionRoot.Get<AnnotationModelCreatorWindow>();
             if(window.ShowDialog() ?? false) {
-                var symbol = (window.DataContext as AnnotationModelCreatorViewModel)
+                var symbol = ((AnnotationModelCreatorViewModel) window.DataContext)
                     .SelectedAnnotationSymbolType
                     .AnnotationSymbolType;
                 return new AnnotationModel(sheetModel, symbol, _entitySaverProvider.GetNewEntitySaver());
@@ -41,9 +40,8 @@ namespace RevitCreateViewSheet.Services {
 
             var window = _resolutionRoot.Get<ScheduleModelCreatorWindow>();
             if(window.ShowDialog() ?? false) {
-                var creatorView = window.DataContext as ScheduleModelCreatorViewModel;
+                var creatorView = (ScheduleModelCreatorViewModel) window.DataContext;
                 var selectedSchedule = creatorView.SelectedViewSchedule;
-                creatorView.SelectedViewSchedule = creatorView.ViewSchedules.FirstOrDefault();
                 return new ScheduleModel(
                     sheetModel,
                     selectedSchedule.ViewSchedule,
