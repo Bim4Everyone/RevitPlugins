@@ -22,13 +22,13 @@ internal class SetCoordParamsSettings {
     public IElementsProvider ElementsProvider { get; set; }
     public IPositionProvider PositionProvider { get; set; }
     public IFileProvider FileProvider { get; set; }
+    public ISphereProvider SphereProvider { get; set; }
     public string TypeModel { get; set; }
     public List<ParamMap> ParamMaps { get; set; }
     public List<BuiltInCategory> Categories { get; set; }
     public double MaxDiameterSearchSphereMm { get; set; }
     public double StepDiameterSearchSphereMm { get; set; }
     public bool Search { get; set; }
-    public ISphereProvider SphereProvider { get; set; }
 
     public void LoadConfigSettings() {
         ParamMaps = ConfigSettings.ParamMaps;

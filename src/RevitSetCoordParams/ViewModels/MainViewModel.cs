@@ -279,7 +279,7 @@ internal class MainViewModel : BaseViewModel {
             case nameof(ParamViewModel.TargetParamName):
                 UpdateParamWarnings();
                 if(!vm.HasWarning) {
-                    var def = _paramAvailabilityService.GetDefinitionByName(_revitRepository.Document, vm.SourceParamName);
+                    var def = _paramAvailabilityService.GetDefinitionByName(_revitRepository.Document, vm.TargetParamName);
                     var newParam = _paramFactory.CreateRevitParam(_revitRepository.Document, def);
                     vm.ParamMap.TargetParam = newParam;
                 }
