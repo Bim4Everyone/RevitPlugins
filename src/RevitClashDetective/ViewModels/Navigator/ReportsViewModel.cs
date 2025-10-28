@@ -195,7 +195,7 @@ internal class ReportsViewModel : BaseViewModel {
         var elements = clash.GetElements();
         LoggerService.Information("Запуск выбора коллизии: {@CommandInfo}",
             new { Id = "Зависание", CommandName = nameof(SelectClashCommand), Elements = elements });
-        _revitRepository.SelectAndShowElement(clash.GetElements(), settings);
+        _revitRepository.SelectAndShowElement(elements, settings);
         LoggerService.Information("Завершение выбора коллизии: {@CommandInfo}",
             new { Id = "Зависание", CommandName = nameof(SelectClashCommand), Elements = elements });
     }
