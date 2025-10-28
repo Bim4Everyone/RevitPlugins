@@ -21,7 +21,7 @@ namespace RevitCreateViewSheet.Services {
             if(!sheetModel.TryGetViewSheet(out _)) {
                 throw new InvalidOperationException();
             }
-            _revitRepository.UpdateViewSheet(sheetModel);
+            _revitRepository.UpdateSheet(sheetModel);
         }
 
         public void Save(ViewPortModel viewPortModel) {

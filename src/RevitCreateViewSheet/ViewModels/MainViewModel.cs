@@ -36,6 +36,8 @@ namespace RevitCreateViewSheet.ViewModels {
         private readonly SheetItemsFactory _sheetItemsFactory;
         private readonly LogicalStringComparer _comparer = new();
         private TitleBlockViewModel _addSheetsTitleBlock;
+        private SheetFormatViewModel _addSheetsFormat;
+        private bool _addSheetsIsBookOrientation;
         private string _errorText;
         private string _addSheetsErrorText;
         private string _addSheetsCount = "1";
@@ -135,6 +137,16 @@ namespace RevitCreateViewSheet.ViewModels {
             set => RaiseAndSetIfChanged(ref _addSheetsErrorText, value);
         }
 
+        public SheetFormatViewModel AddSheetsFormat {
+            get => _addSheetsFormat;
+            set => RaiseAndSetIfChanged(ref _addSheetsFormat, value);
+        }
+
+        public bool AddSheetsIsBookOrientation {
+            get => _addSheetsIsBookOrientation;
+            set => RaiseAndSetIfChanged(ref _addSheetsIsBookOrientation, value);
+        }
+
         public string AddSheetsCount {
             get => _addSheetsCount;
             set => RaiseAndSetIfChanged(ref _addSheetsCount, value);
@@ -216,6 +228,8 @@ namespace RevitCreateViewSheet.ViewModels {
         public IReadOnlyCollection<TitleBlockViewModel> AllTitleBlocks { get; }
 
         public IReadOnlyCollection<ViewPortTypeViewModel> AllViewPortTypes { get; }
+
+        public IReadOnlyCollection<SheetFormatViewModel> AllSheetFormats { get; }
 
 
         private void LoadView() {
@@ -483,8 +497,10 @@ namespace RevitCreateViewSheet.ViewModels {
             }
             if(prop.Name == nameof(SheetViewModel.AlbumBlueprint)
                 || prop.Name == nameof(SheetViewModel.Name)
-                || prop.Name == nameof(SheetViewModel.TitleBlock)) {
-                // мультиредактирование только для названия, альбома и основной надписи
+                || prop.Name == nameof(SheetViewModel.TitleBlock)
+                || prop.Name == nameof(SheetViewModel.SheetFormat)
+                || prop.Name == nameof(SheetViewModel.IsBookOrientation)) {
+                // мультиредактирование только для названия, альбома, основной надписи, формата и ориентации
                 var newValue = prop.GetValue(SelectedSheet);
 
                 SheetViewModel[] sheets = [.. SelectedSheets];

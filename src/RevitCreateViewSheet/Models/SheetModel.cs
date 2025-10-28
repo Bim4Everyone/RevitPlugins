@@ -12,6 +12,9 @@ using RevitCreateViewSheet.Services;
 
 namespace RevitCreateViewSheet.Models {
     internal class SheetModel : IEntity, IEquatable<SheetModel> {
+        public const string SheetFormatSizeParam = "А";
+        public const string SheetFormatMultiplyParam = "х";
+        public const string SheetFormatIsBookParam = "Книжный";
         private ViewSheet _viewSheet;
 
         /// <summary>
@@ -22,7 +25,7 @@ namespace RevitCreateViewSheet.Models {
         /// <param name="schedules">Спецификации на листе</param>
         /// <param name="annotations">Аннотации на листе</param>
         /// <param name="entitySaver">Сервис для сохранения листа в модели Revit</param>
-        /// <param name="titleBlockSymbol">Типоразмер основной надписи листа, если она есть</param>
+        /// <param name="titleBlock">Экземпляр основной надписи листа, если она есть</param>
         /// <exception cref="ArgumentNullException">Исключение, если обязательный параметр null</exception>
         public SheetModel(
             ViewSheet viewSheet,
@@ -30,7 +33,7 @@ namespace RevitCreateViewSheet.Models {
             ICollection<ScheduleSheetInstance> schedules,
             ICollection<AnnotationSymbol> annotations,
             ExistsEntitySaver entitySaver,
-            FamilySymbol titleBlockSymbol = default) {
+            FamilyInstance titleBlock = default) {
 
             _viewSheet = viewSheet ?? throw new ArgumentNullException(nameof(viewSheet));
             Saver = entitySaver ?? throw new ArgumentNullException(nameof(entitySaver));
@@ -41,7 +44,10 @@ namespace RevitCreateViewSheet.Models {
                 ?? throw new ArgumentNullException(nameof(schedules));
             Annotations = annotations?.Select(a => new AnnotationModel(this, a, entitySaver)).ToList()
                 ?? throw new ArgumentNullException(nameof(annotations));
-            TitleBlockSymbol = titleBlockSymbol;
+            InitialTitleBlock = titleBlock;
+            TitleBlockSymbol = InitialTitleBlock?.Symbol;
+            SheetFormat = GetSheetFormat(InitialTitleBlock);
+            IsBookOrientation = InitialTitleBlock?.GetParamValueOrDefault(SheetFormatIsBookParam, 0) == 1;
 
             AlbumBlueprint = viewSheet.GetParamValueOrDefault(
                 SharedParamsConfig.Instance.AlbumBlueprints, string.Empty);
@@ -55,7 +61,8 @@ namespace RevitCreateViewSheet.Models {
             InitialSheetNumber = SheetNumber;
             InitialSheetCustomNumber = SheetCustomNumber;
             InitialName = Name;
-            InitialTitleBlockSymbol = TitleBlockSymbol;
+            InitialSheetFormat = SheetFormat;
+            InitialIsBookOrientation = IsBookOrientation;
             Exists = true;
         }
 
@@ -74,10 +81,14 @@ namespace RevitCreateViewSheet.Models {
             AlbumBlueprint = string.Empty;
             SheetNumber = string.Empty;
             Name = string.Empty;
+            SheetFormat = new SheetFormat();
+            IsBookOrientation = false;
             InitialAlbumBlueprint = AlbumBlueprint;
             InitialSheetNumber = SheetNumber;
             InitialSheetCustomNumber = SheetCustomNumber;
             InitialName = Name;
+            InitialSheetFormat = SheetFormat;
+            InitialIsBookOrientation = IsBookOrientation;
             Exists = false;
         }
 
@@ -91,6 +102,19 @@ namespace RevitCreateViewSheet.Models {
         public string AlbumBlueprint { get; set; }
 
         public string InitialSheetNumber { get; }
+
+        public bool IsBookOrientation { get; set; }
+
+        public bool InitialIsBookOrientation { get; set; }
+
+        public SheetFormat InitialSheetFormat { get; }
+
+        public SheetFormat SheetFormat { get; set; }
+
+        /// <summary>
+        /// Существующий экземпляр основной надписи на листе
+        /// </summary>
+        public FamilyInstance InitialTitleBlock { get; }
 
         /// <summary>
         /// Системный номер листа
@@ -108,7 +132,7 @@ namespace RevitCreateViewSheet.Models {
 
         public string Name { get; set; }
 
-        public FamilySymbol InitialTitleBlockSymbol { get; }
+        public FamilySymbol InitialTitleBlockSymbol => InitialTitleBlock?.Symbol;
 
         public FamilySymbol TitleBlockSymbol { get; set; }
 
@@ -189,6 +213,16 @@ namespace RevitCreateViewSheet.Models {
                     viewsOrigin += viewsIncrementer;
                 }
             }
+        }
+
+        private SheetFormat GetSheetFormat(FamilyInstance titleBlock) {
+            if(titleBlock is not null) {
+                int size = titleBlock.GetParamValueOrDefault(SheetFormatSizeParam, 1);
+                int multiply = titleBlock.GetParamValueOrDefault(SheetFormatMultiplyParam, 1);
+                bool isBook = titleBlock.GetParamValueOrDefault(SheetFormatIsBookParam, 0) == 1;
+                return new SheetFormat((byte) size, (byte) multiply);
+            }
+            return new SheetFormat();
         }
     }
 }

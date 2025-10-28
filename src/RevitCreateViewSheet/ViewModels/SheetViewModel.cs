@@ -28,6 +28,8 @@ namespace RevitCreateViewSheet.ViewModels {
         private ViewPortViewModel _selectedViewPort;
         private ScheduleViewModel _selectedSchedule;
         private AnnotationViewModel _selectedAnnotation;
+        private bool _isBookOrientation;
+        private SheetFormatViewModel _sheetFormat;
 
         public SheetViewModel(
             SheetModel sheetModel,
@@ -43,6 +45,8 @@ namespace RevitCreateViewSheet.ViewModels {
             _name = _sheetModel.Name;
             _sheetNumber = _sheetModel.SheetNumber;
             _sheetCustomNumber = _sheetModel.SheetCustomNumber;
+            _isBookOrientation = _sheetModel.IsBookOrientation;
+            _sheetFormat = new SheetFormatViewModel(_sheetModel.SheetFormat);
             if(_sheetModel.TitleBlockSymbol is not null) {
                 _titleBlock = new TitleBlockViewModel(_sheetModel.TitleBlockSymbol);
             }
@@ -149,6 +153,22 @@ namespace RevitCreateViewSheet.ViewModels {
         public AnnotationViewModel SelectedAnnotation {
             get => _selectedAnnotation;
             set => RaiseAndSetIfChanged(ref _selectedAnnotation, value);
+        }
+
+        public bool IsBookOrientation {
+            get => _isBookOrientation;
+            set {
+                RaiseAndSetIfChanged(ref _isBookOrientation, value);
+                _sheetModel.IsBookOrientation = value;
+            }
+        }
+
+        public SheetFormatViewModel SheetFormat {
+            get => _sheetFormat;
+            set {
+                RaiseAndSetIfChanged(ref _sheetFormat, value);
+                _sheetModel.SheetFormat = value?.SheetFormat ?? new SheetFormat();
+            }
         }
 
         public ReadOnlyObservableCollection<ViewPortViewModel> ViewPorts { get; }
