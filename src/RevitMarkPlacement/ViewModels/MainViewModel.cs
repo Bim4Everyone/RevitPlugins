@@ -144,6 +144,21 @@ internal class MainViewModel : BaseViewModel {
     }
 
     private bool CanAcceptView() {
+        if(Selection is null) {
+            ErrorText = "Выберите режим выбора элементов.";
+            return false;
+        }
+        
+        if(Selection?.SpotDimensionTypes.Count == 0) {
+            ErrorText = "Выберите режим выбора элементов с отметками уровней.";
+            return false;
+        }
+        
+        if(string.IsNullOrEmpty(FloorCount)) {
+            ErrorText = "Количество типовых этажей должно быть заполнено.";
+            return false;
+        }
+        
         if(!int.TryParse(FloorCount, out int levelCount)) {
             ErrorText = "Количество типовых этажей должно быть числом.";
             return false;
@@ -154,8 +169,14 @@ internal class MainViewModel : BaseViewModel {
             return false;
         }
 
-        if(FloorHeight.GetFloorHeight() < 1) {
-            ErrorText = "Высота типового этажа должна быть неотрицательной.";
+        if(FloorHeight is null) {
+            ErrorText = "Выберите высоту типового этажа";
+            return false;
+        }
+
+        string errorText = FloorHeight.GetErrorText();
+        if(!string.IsNullOrEmpty(errorText)) {
+            ErrorText = errorText;
             return false;
         }
 

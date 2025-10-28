@@ -22,6 +22,22 @@ internal class UserFloorHeightViewModel : BaseViewModel, IFloorHeightProvider {
         return double.TryParse(FloorHeight, out double result) ? result : null;
     }
 
+    public string GetErrorText() {
+        if(string.IsNullOrEmpty(FloorHeight)) {
+            return "Высота типового этажа должна быть заполнена.";
+        }
+        
+        if(!double.TryParse(FloorHeight, out double floorHeight)) {
+            return "Высота типового этажа должна быть числом.";
+        }
+
+        if(floorHeight < 0) {
+            return "Высота типового этажа должна быть неотрицательной.";
+        }
+
+        return null;
+    }
+
     public void LoadConfig(RevitSettings settings) {
         FloorHeight = settings?.LevelHeight?.ToString(CultureInfo.CurrentCulture);
     }

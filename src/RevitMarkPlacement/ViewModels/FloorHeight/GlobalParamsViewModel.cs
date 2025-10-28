@@ -44,6 +44,18 @@ internal class GlobalParamsViewModel : BaseViewModel, IFloorHeightProvider {
     public double? GetFloorHeight() {
         return GlobalParam?.Value;
     }
+    
+    public string GetErrorText() {
+        if(GlobalParam is null) {
+            return "Высота типового этажа должна быть выбрана.";
+        }
+        
+        if(GlobalParam.Value < 0.0) {
+            return "Высота типового этажа должна быть неотрицательной.";
+        }
+
+        return null;
+    }
 
     public void LoadConfig(RevitSettings settings) {
         GlobalParams = new ObservableCollection<GlobalParamViewModel>(
