@@ -62,6 +62,7 @@ public class RevitSetCoordParamsCommand : BasePluginCommand {
 
         // Настройка запуска окна
         kernel.BindMainWindow<MainViewModel, MainWindow>();
+        kernel.BindMainWindow<WarningsViewModel, WarningsWindow>();
 
         // Настройка локализации,
         // получение имени сборки откуда брать текст
@@ -92,5 +93,8 @@ public class RevitSetCoordParamsCommand : BasePluginCommand {
 
         // Вызывает стандартное уведомление
         Notification(kernel.Get<MainWindow>());
+
+        // Вызывает стандартное уведомление
+        //Notification(kernel.Get<WarningWindow>());
     }
 }

@@ -86,4 +86,6 @@
 
     <system:String x:Key="Common.ConfigErrorMessageTitle">Ошибка настройки плагина</system:String>
 
+    <system:String x:Key="WarningsWindow.Title">Предупреждения</system:String>
+
 </ResourceDictionary>

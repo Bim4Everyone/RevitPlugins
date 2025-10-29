@@ -12,11 +12,15 @@ using dosymep.SimpleServices;
 using dosymep.WPF.Commands;
 using dosymep.WPF.ViewModels;
 
+using Ninject;
+using Ninject.Syntax;
+
 using RevitSetCoordParams.Models;
 using RevitSetCoordParams.Models.Enums;
 using RevitSetCoordParams.Models.Interfaces;
 using RevitSetCoordParams.Models.Services;
 using RevitSetCoordParams.Models.Settings;
+using RevitSetCoordParams.Views;
 
 namespace RevitSetCoordParams.ViewModels;
 
@@ -24,6 +28,7 @@ internal class MainViewModel : BaseViewModel {
     private readonly PluginConfig _pluginConfig;
     private readonly RevitRepository _revitRepository;
     private readonly ILocalizationService _localizationService;
+    private readonly IResolutionRoot _resolutionRoot;
     private readonly ICategoryAvailabilityService _categoryAvailabilityService;
     private readonly IParamAvailabilityService _paramAvailabilityService;
     private readonly ProvidersFactory _providersFactory;
@@ -50,10 +55,12 @@ internal class MainViewModel : BaseViewModel {
     public MainViewModel(
         PluginConfig pluginConfig,
         RevitRepository revitRepository,
-        ILocalizationService localizationService) {
+        ILocalizationService localizationService,
+        IResolutionRoot resolutionRoot) {
         _pluginConfig = pluginConfig;
         _revitRepository = revitRepository;
         _localizationService = localizationService;
+        _resolutionRoot = resolutionRoot;
         _categoryAvailabilityService = new CategoryAvailabilityService(_revitRepository.Document);
         _paramAvailabilityService = new ParamAvailabilityService();
         _providersFactory = new ProvidersFactory();
@@ -313,13 +320,13 @@ internal class MainViewModel : BaseViewModel {
     private void LoadView() {
         LoadConfig();
         RangeElements = new ObservableCollection<RangeElementsViewModel>(GetRangeElementsViewModels());
-        SelectedRangeElements = RangeElements.First();
+        SelectedRangeElements = RangeElements.FirstOrDefault();
         SourceFiles = new ObservableCollection<SourceFileViewModel>(GetSourceFilesViewModels());
-        SelectedSourceFile = SourceFiles.First();
+        SelectedSourceFile = SourceFiles.FirstOrDefault();
         TypeModels = new ObservableCollection<TypeModelViewModel>(GetTypeModelViewModels());
         SelectedTypeModel = TypeModels.FirstOrDefault();
         Positions = new ObservableCollection<PositionViewModel>(GetPositionViewModels());
-        SelectedPosition = Positions.First();
+        SelectedPosition = Positions.FirstOrDefault();
         Params = new ObservableCollection<ParamViewModel>(GetParamViewModels());
         // Подписка на события в ParamViewModel
         foreach(var param in Params) {
@@ -340,7 +347,15 @@ internal class MainViewModel : BaseViewModel {
     private void AcceptView() {
         SaveConfig();
         var processor = new SetCoordParamsProcessor(_localizationService, _revitRepository, _setCoordParamsSettings);
-        processor.Run();
+        var warnings = processor.Run();
+
+        if(warnings != null && warnings.Any()) {
+            var warningsViewModel = _resolutionRoot.Get<WarningsViewModel>(
+                new Ninject.Parameters.ConstructorArgument("warnings", warnings));
+            var warningsWindow = _resolutionRoot.Get<WarningsWindow>();
+            warningsWindow.Show();
+        }
+
     }
 
     // Метод проверки возможности выполнения основного вида

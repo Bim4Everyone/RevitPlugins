@@ -86,4 +86,6 @@
 
     <system:String x:Key="Common.ConfigErrorMessageTitle">Plug-in configuration error</system:String>
 
+    <system:String x:Key="WarningsWindow.Title">Warnings</system:String>
+
 </ResourceDictionary>

@@ -107,7 +107,7 @@ internal static class RevitConstants {
         new ParamMap {
             Type = ParamType.BlockingParam,
             SourceParam = null,
-            TargetParam = SharedParamsConfig.Instance.FixSolution
+            TargetParam = SharedParamsConfig.Instance.FixBuildingWorks
         },
     ];
 

@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using System.Linq;
 
 using Autodesk.Revit.DB;
@@ -26,14 +27,14 @@ internal class SetCoordParamsProcessor {
     }
 
     /// <summary>
-    /// Основной метод поиска пересечений и заполнения параметров
+    /// Основной метод поиска пересечений и заполнения параметров    
     /// </summary>    
     /// <remarks>
     /// В данном методе происходит пересечение объемных моделей и элементов основного файла.    
     /// При успешном пересечении записываются параметры из объемного элемента в элемент модели
     /// </remarks>
     /// <returns>Возвращает коллекцию предупреждений WarningModel</returns>
-    public void Run() {
+    public IReadOnlyCollection<WarningModel> Run() {
         var sourceModels = _settings.FileProvider.GetRevitElements(_settings.TypeModel);
         var targetElements = _settings.ElementsProvider.GetRevitElements(_settings.Categories);
         var positionProvider = _settings.PositionProvider;
@@ -51,12 +52,17 @@ internal class SetCoordParamsProcessor {
 
         string transactionName = _localizationService.GetLocalizedString("SetCoordParamsProcessor.TransactionName");
         using var t = _revitRepository.Document.StartTransaction(transactionName);
+        List<WarningModel> warnings = [];
         foreach(var targetElement in targetElements) {
             if(blockingParam != null) {
                 if(targetElement.Element.IsExistsParam(blockingParam.TargetParam.Name)) {
                     int blockValue = targetElement.Element.GetParamValueOrDefault<int>(blockingParam.TargetParam.Name);
                     if(blockValue == 1) {
-                        // TODO: предупреждение — элемент заблокирован
+                        warnings.Add(new WarningBlockElement {
+                            WarningDescription = WarningDescription.Blocked,
+                            Element = targetElement.Element,
+                            Caption = ""
+                        });
                         continue;
                     }
                 }
@@ -98,13 +104,27 @@ internal class SetCoordParamsProcessor {
                         }
 
                     } else {
-                        // TODO: предупреждение — параметр не найден
+                        warnings.Add(new WarningParamModel {
+                            WarningDescription = WarningDescription.NotFoundParam,
+                            Element = targetElement.Element,
+                            RevitParam = paramMap.TargetParam,
+                            Caption = ""
+                        });
                     }
                 }
             } else {
-                // TODO: предупреждение — пересечение не найдено даже при maxDiam
+                warnings.Add(new WarningSkipElement {
+                    WarningDescription = WarningDescription.NotFound,
+                    Element = targetElement.Element,
+                    Caption = ""
+                });
             }
         }
+        warnings.Add(new WarningSkipElement {
+            WarningDescription = WarningDescription.NotFound,
+            Caption = ""
+        });
         t.Commit();
+        return warnings;
     }
 }

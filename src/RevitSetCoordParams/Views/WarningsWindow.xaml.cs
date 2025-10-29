@@ -1,17 +1,11 @@
-using System.Windows;
-
 using dosymep.SimpleServices;
 
 namespace RevitSetCoordParams.Views;
-
 /// <summary>
-/// Класс главного окна плагина.
+/// Interaction logic for WarningWindow.xaml
 /// </summary>
-public partial class MainWindow {
-    /// <summary>
-    /// Инициализирует главное окно плагина.
-    /// </summary>
-    public MainWindow(
+public partial class WarningsWindow {
+    public WarningsWindow(
         ILoggerService loggerService,
         ISerializationService serializationService,
         ILanguageService languageService, ILocalizationService localizationService,
@@ -37,13 +31,5 @@ public partial class MainWindow {
     /// <remarks>
     /// Используется для сохранения положения окна.
     /// </remarks>
-    public override string ProjectConfigName => nameof(MainWindow);
-
-    private void ButtonOk_Click(object sender, RoutedEventArgs e) {
-        DialogResult = true;
-    }
-
-    private void ButtonCancel_Click(object sender, RoutedEventArgs e) {
-        DialogResult = false;
-    }
+    public override string ProjectConfigName => nameof(WarningsWindow);
 }
