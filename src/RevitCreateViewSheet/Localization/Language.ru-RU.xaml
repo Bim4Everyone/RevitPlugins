@@ -30,7 +30,13 @@
     <system:String
         x:Key="MainWindow.AllSheets.Numeration.Column">Столбец для нумерации</system:String>
     <system:String
-        x:Key="MainWindow.AllSheets.Numeration.SyncSystemNumberByMask">Системный номер по маске</system:String>
+        x:Key="MainWindow.SheetOrientation">Ориентация</system:String>
+    <system:String
+        x:Key="MainWindow.SheetFormat">Формат</system:String>
+    <system:String
+        x:Key="MainWindow.SheetFormat.Book">Книжная</system:String>
+    <system:String
+        x:Key="MainWindow.SheetFormat.Album">Альбомная</system:String>
     <system:String
         x:Key="MainWindow.AllSheets.Numeration.SyncSystemNumberByMask.ToolTip"
         xml:space="preserve">Системный номер в формате

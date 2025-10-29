@@ -13,6 +13,8 @@
     xmlns:res="clr-namespace:RevitCreateViewSheet.Resources"
     xmlns:local="clr-namespace:RevitCreateViewSheet.Views"
     xmlns:converters="clr-namespace:dosymep.WPF.Converters"
+    xmlns:wpfConverters="clr-namespace:dosymep.WpfCore.Converters;assembly=dosymep.WpfCore"
+    xmlns:sys="clr-namespace:System;assembly=mscorlib"
     mc:Ignorable="d"
     WindowStartupLocation="CenterOwner"
     Height="550"
@@ -32,6 +34,25 @@
                 x:Key="InverseBooleanConverter" />
             <res:SheetViewModelComparer
                 x:Key="SheetViewModelComparer" />
+            <ui:SymbolRegular
+                x:Key="Book">Document20</ui:SymbolRegular>
+            <ui:SymbolRegular
+                x:Key="Album">DocumentLandscape20</ui:SymbolRegular>
+            <sys:Boolean
+                x:Key="True">True</sys:Boolean>
+            <sys:Boolean
+                x:Key="False">False</sys:Boolean>
+            <wpfConverters:ObjectToObjectConverter
+                x:Key="BoolToOrientationImgConverter">
+                <wpfConverters:ObjectToObjectConverter.CoupleItems>
+                    <wpfConverters:CoupleItem
+                        Source="{StaticResource True}"
+                        Target="{StaticResource Book}" />
+                    <wpfConverters:CoupleItem
+                        Source="{StaticResource False}"
+                        Target="{StaticResource Album}" />
+                </wpfConverters:ObjectToObjectConverter.CoupleItems>
+            </wpfConverters:ObjectToObjectConverter>
             <ui:TextBlock
                 x:Key="AlbumHeader"
                 Text="{me:LocalizationSource MainWindow.AllSheets.Album}" />
@@ -50,6 +71,12 @@
             <ui:TextBlock
                 x:Key="SheetStatusHeader"
                 Text="{me:LocalizationSource MainWindow.AllSheets.Status}" />
+            <ui:TextBlock
+                x:Key="SheetFormatHeader"
+                Text="{me:LocalizationSource MainWindow.SheetFormat}" />
+            <ui:TextBlock
+                x:Key="SheetOrientationHeader"
+                Text="{me:LocalizationSource MainWindow.SheetOrientation}" />
             <ui:TextBlock
                 x:Key="DeleteSheetTooltip"
                 Text="{me:LocalizationSource MainWindow.AllSheets.DeleteSheetsButtonTooltip}" />
@@ -78,9 +105,6 @@
     </b:Interaction.Triggers>
     <Grid
         Margin="10 10 10 0">
-        <Grid.Resources>
-
-        </Grid.Resources>
         <Grid.ColumnDefinitions>
             <ColumnDefinition />
         </Grid.ColumnDefinitions>
@@ -449,6 +473,44 @@
                                                 Margin="10 0"
                                                 ToolTip="{Binding Name}"
                                                 Text="{Binding Name, UpdateSourceTrigger=PropertyChanged}" />
+                                        </DataTemplate>
+                                    </DataGridTemplateColumn.CellTemplate>
+                                </DataGridTemplateColumn>
+                                <DataGridTemplateColumn
+                                    Width="Auto"
+                                    MinWidth="50"
+                                    SortMemberPath="SheetFormat"
+                                    Header="{StaticResource SheetFormatHeader}">
+                                    <DataGridTemplateColumn.CellTemplate>
+                                        <DataTemplate>
+                                            <ComboBox
+                                                SelectedItem="{Binding SheetFormat, UpdateSourceTrigger=PropertyChanged}"
+                                                ItemsSource="{Binding Path=DataContext.AllSheetFormats, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Window}}" />
+                                        </DataTemplate>
+                                    </DataGridTemplateColumn.CellTemplate>
+                                </DataGridTemplateColumn>
+                                <DataGridTemplateColumn
+                                    Width="Auto"
+                                    MinWidth="50"
+                                    SortMemberPath="Orientation.IsBookOrientation"
+                                    Header="{StaticResource SheetOrientationHeader}">
+                                    <DataGridTemplateColumn.CellTemplate>
+                                        <DataTemplate>
+                                            <ComboBox
+                                                SelectedItem="{Binding Orientation, UpdateSourceTrigger=PropertyChanged}"
+                                                ItemsSource="{Binding Path=DataContext.Orientations, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Window}}">
+                                                <ComboBox.ItemTemplate>
+                                                    <DataTemplate>
+                                                        <DockPanel>
+                                                            <ui:SymbolIcon
+                                                                Margin="0 0 4 0"
+                                                                Symbol="{Binding IsBookOrientation, Converter={StaticResource BoolToOrientationImgConverter}}" />
+                                                            <ui:TextBlock
+                                                                Text="{Binding Name}" />
+                                                        </DockPanel>
+                                                    </DataTemplate>
+                                                </ComboBox.ItemTemplate>
+                                            </ComboBox>
                                         </DataTemplate>
                                     </DataGridTemplateColumn.CellTemplate>
                                 </DataGridTemplateColumn>

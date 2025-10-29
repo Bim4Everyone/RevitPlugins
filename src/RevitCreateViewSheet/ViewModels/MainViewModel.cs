@@ -37,7 +37,7 @@ namespace RevitCreateViewSheet.ViewModels {
         private readonly LogicalStringComparer _comparer = new();
         private TitleBlockViewModel _addSheetsTitleBlock;
         private SheetFormatViewModel _addSheetsFormat;
-        private bool _addSheetsIsBookOrientation;
+        private OrientationViewModel _addSheetsOrientation;
         private string _errorText;
         private string _addSheetsErrorText;
         private string _addSheetsCount = "1";
@@ -90,6 +90,9 @@ namespace RevitCreateViewSheet.ViewModels {
             AllViewPortTypes = [.. _revitRepository.GetViewPortTypes()
                 .Select(v => new ViewPortTypeViewModel(v))
                 .OrderBy(item => item.Name, _comparer)];
+            AllSheetFormats = SheetFormatViewModel.GetStandardSheetFormats();
+            Orientations = [new OrientationViewModel(_localizationService, false),
+                new OrientationViewModel(_localizationService, true)];
 
             NumerationColumns = [
                 _localizationService.GetLocalizedString("MainWindow.AllSheets.CustomNumber"),
@@ -142,9 +145,9 @@ namespace RevitCreateViewSheet.ViewModels {
             set => RaiseAndSetIfChanged(ref _addSheetsFormat, value);
         }
 
-        public bool AddSheetsIsBookOrientation {
-            get => _addSheetsIsBookOrientation;
-            set => RaiseAndSetIfChanged(ref _addSheetsIsBookOrientation, value);
+        public OrientationViewModel AddSheetsOrientation {
+            get => _addSheetsOrientation;
+            set => RaiseAndSetIfChanged(ref _addSheetsOrientation, value);
         }
 
         public string AddSheetsCount {
@@ -231,6 +234,8 @@ namespace RevitCreateViewSheet.ViewModels {
 
         public IReadOnlyCollection<SheetFormatViewModel> AllSheetFormats { get; }
 
+        public IReadOnlyCollection<OrientationViewModel> Orientations { get; }
+
 
         private void LoadView() {
             var sheets = _revitRepository.GetSheetModels()
@@ -270,6 +275,8 @@ namespace RevitCreateViewSheet.ViewModels {
             int lastIndex = indexes.Length > 0 ? indexes.Max(c => c.Number) : 0;
             var titleBlock = AddSheetsTitleBlock;
             var albumBlueprint = AddSheetsAlbumBlueprint;
+            var format = AddSheetsFormat;
+            var orientation = AddSheetsOrientation;
             foreach(int index in Enumerable.Range(0, int.Parse(AddSheetsCount))) {
                 ++lastIndex;
                 var sheetModel = new SheetModel(titleBlock.TitleBlockSymbol, _entitySaverProvider.GetNewEntitySaver());
@@ -277,7 +284,9 @@ namespace RevitCreateViewSheet.ViewModels {
                     sheetModel, _entitiesTracker, _sheetItemsFactory, _localizationService) {
                     AlbumBlueprint = albumBlueprint,
                     SheetCustomNumber = lastIndex.ToString(),
-                    Name = $"{_localizationService.GetLocalizedString("NewSheetTitle")} {lastIndex}"
+                    Name = $"{_localizationService.GetLocalizedString("NewSheetTitle")} {lastIndex}",
+                    SheetFormat = format,
+                    Orientation = orientation,
                 };
                 _sheets.Add(sheetViewModel);
             }
@@ -499,7 +508,7 @@ namespace RevitCreateViewSheet.ViewModels {
                 || prop.Name == nameof(SheetViewModel.Name)
                 || prop.Name == nameof(SheetViewModel.TitleBlock)
                 || prop.Name == nameof(SheetViewModel.SheetFormat)
-                || prop.Name == nameof(SheetViewModel.IsBookOrientation)) {
+                || prop.Name == nameof(SheetViewModel.Orientation)) {
                 // мультиредактирование только для названия, альбома, основной надписи, формата и ориентации
                 var newValue = prop.GetValue(SelectedSheet);
 

@@ -7,7 +7,8 @@ using dosymep.WPF.ViewModels;
 using RevitCreateViewSheet.Models;
 
 namespace RevitCreateViewSheet.ViewModels;
-internal class SheetFormatViewModel : BaseViewModel, IEquatable<SheetFormatViewModel> {
+internal class SheetFormatViewModel : BaseViewModel, IEquatable<SheetFormatViewModel>,
+    IComparable<SheetFormatViewModel>, IComparable {
     public SheetFormatViewModel(SheetFormat sheetFormat) {
         SheetFormat = sheetFormat;
     }
@@ -61,5 +62,21 @@ internal class SheetFormatViewModel : BaseViewModel, IEquatable<SheetFormatViewM
             new SheetFormatViewModel(new SheetFormat(4,8)),
             new SheetFormatViewModel(new SheetFormat(4,9)),
         ]);
+    }
+
+    public int CompareTo(SheetFormatViewModel other) {
+        if(other is null) { return 1; }
+        if(ReferenceEquals(this, other) || SheetFormat == other.SheetFormat) { return 0; }
+        if(SheetFormat.SizeIndex != other.SheetFormat.SizeIndex) {
+            return SheetFormat.SizeIndex.CompareTo(other.SheetFormat.SizeIndex);
+        }
+        if(SheetFormat.MultiplyIndex != other.SheetFormat.MultiplyIndex) {
+            return SheetFormat.MultiplyIndex.CompareTo(other.SheetFormat.MultiplyIndex);
+        }
+        return 0;
+    }
+
+    public int CompareTo(object obj) {
+        return CompareTo(obj as SheetFormatViewModel);
     }
 }
