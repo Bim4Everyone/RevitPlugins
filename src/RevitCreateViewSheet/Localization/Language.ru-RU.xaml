@@ -30,6 +30,8 @@
     <system:String
         x:Key="MainWindow.AllSheets.Numeration.Column">Столбец для нумерации</system:String>
     <system:String
+        x:Key="MainWindow.AllSheets.Numeration.SyncSystemNumberByMask">Системный номер по маске</system:String>
+    <system:String
         x:Key="MainWindow.SheetOrientation">Ориентация</system:String>
     <system:String
         x:Key="MainWindow.SheetFormat">Формат</system:String>

@@ -32,6 +32,14 @@
     <system:String
         x:Key="MainWindow.AllSheets.Numeration.SyncSystemNumberByMask">Number by mask</system:String>
     <system:String
+        x:Key="MainWindow.SheetOrientation">Orientation</system:String>
+    <system:String
+        x:Key="MainWindow.SheetFormat">Format</system:String>
+    <system:String
+        x:Key="MainWindow.SheetFormat.Book">Portrait</system:String>
+    <system:String
+        x:Key="MainWindow.SheetFormat.Album">Landscape</system:String>
+    <system:String
         x:Key="MainWindow.AllSheets.Numeration.SyncSystemNumberByMask.ToolTip"
         xml:space="preserve">Automatically update number by mask 
 {Album}-{Custom number}</system:String>
