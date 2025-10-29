@@ -57,6 +57,7 @@ internal class ReportsViewModel : BaseViewModel {
         DeleteCommand = RelayCommand.Create(Delete, CanDelete);
         SelectClashCommand = RelayCommand.Create<IClashViewModel>(SelectClash, CanSelectClash);
         SaveAllReportsCommand = RelayCommand.Create(SaveAllReports, CanSaveAllReports);
+        AskForSaveCommand = RelayCommand.Create(AskForSave);
     }
 
 
@@ -65,6 +66,7 @@ internal class ReportsViewModel : BaseViewModel {
     public ICommand LoadCommand { get; }
     public ICommand DeleteCommand { get; }
     public ICommand SaveAllReportsCommand { get; }
+    public ICommand AskForSaveCommand { get; }
     public IOpenFileDialogService OpenFileDialogService { get; }
     public ISaveFileDialogService SaveFileDialogService { get; }
     public IMessageBoxService MessageBoxService { get; }
@@ -130,6 +132,14 @@ internal class ReportsViewModel : BaseViewModel {
         return OpenFromClashDetector;
     }
 
+    private void AskForSave() {
+        if(MessageBoxService.Show(_localizationService.GetLocalizedString("Navigator.SavePrompt"),
+            _localizationService.GetLocalizedString("BIM"),
+            MessageBoxButton.YesNo,
+            MessageBoxImage.Question) == MessageBoxResult.Yes) {
+            SaveAllReports();
+        }
+    }
 
     private void Load() {
         string path = _revitRepository.GetFileDialogPath();

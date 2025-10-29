@@ -206,6 +206,8 @@
     <system:String
         x:Key="Navigator.DeletePrompt">Are you sure you want to delete the file?</system:String>
     <system:String
+        x:Key="Navigator.SavePrompt">Save clash reports?</system:String>
+    <system:String
         x:Key="Navigator.SuccessSave">File successfully saved</system:String>
     <system:String
         x:Key="Navigator.SuccessLoad">File successfully loaded</system:String>

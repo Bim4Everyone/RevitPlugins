@@ -206,6 +206,8 @@
     <system:String
         x:Key="Navigator.DeletePrompt">Вы уверены, что хотите удалить файл?</system:String>
     <system:String
+        x:Key="Navigator.SavePrompt">Сохранить отчеты о коллизиях?</system:String>
+    <system:String
         x:Key="Navigator.SuccessSave">Файл успешно сохранен</system:String>
     <system:String
         x:Key="Navigator.SuccessLoad">Файл успешно загружен</system:String>
