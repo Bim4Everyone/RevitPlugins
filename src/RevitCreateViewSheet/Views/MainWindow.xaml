@@ -34,25 +34,6 @@
                 x:Key="InverseBooleanConverter" />
             <res:SheetViewModelComparer
                 x:Key="SheetViewModelComparer" />
-            <ui:SymbolRegular
-                x:Key="Book">Document20</ui:SymbolRegular>
-            <ui:SymbolRegular
-                x:Key="Album">DocumentLandscape20</ui:SymbolRegular>
-            <sys:Boolean
-                x:Key="True">True</sys:Boolean>
-            <sys:Boolean
-                x:Key="False">False</sys:Boolean>
-            <wpfConverters:ObjectToObjectConverter
-                x:Key="BoolToOrientationImgConverter">
-                <wpfConverters:ObjectToObjectConverter.CoupleItems>
-                    <wpfConverters:CoupleItem
-                        Source="{StaticResource True}"
-                        Target="{StaticResource Book}" />
-                    <wpfConverters:CoupleItem
-                        Source="{StaticResource False}"
-                        Target="{StaticResource Album}" />
-                </wpfConverters:ObjectToObjectConverter.CoupleItems>
-            </wpfConverters:ObjectToObjectConverter>
             <ui:TextBlock
                 x:Key="AlbumHeader"
                 Text="{me:LocalizationSource MainWindow.AllSheets.Album}" />
@@ -173,9 +154,13 @@
                                     x:Name="_sheetsCreation">
                                     <Grid.ColumnDefinitions>
                                         <ColumnDefinition
-                                            Width="250" />
+                                            Width="100" />
                                         <ColumnDefinition
                                             Width="250" />
+                                        <ColumnDefinition
+                                            Width="Auto" />
+                                        <ColumnDefinition
+                                            Width="Auto" />
                                         <ColumnDefinition
                                             Width="80" />
                                         <ColumnDefinition
@@ -204,16 +189,15 @@
                                         x:Name="_sheetsCreationAlbum"
                                         Style="{StaticResource CustomEditableComboBox}"
                                         ItemsSource="{Binding AllAlbumsBlueprints, UpdateSourceTrigger=PropertyChanged}"
+                                        ToolTip="{Binding AddSheetsAlbumBlueprint}"
                                         Text="{Binding AddSheetsAlbumBlueprint, UpdateSourceTrigger=PropertyChanged}" />
 
-                                    <DockPanel
+                                    <Label
                                         Margin="20 0"
-                                        Grid.Column="1">
-                                        <Label
-                                            Style="{StaticResource CustomLabel}"
-                                            Target="{Binding ElementName=_sheetsCreationTitleBlock}"
-                                            Content="{me:LocalizationSource MainWindow.AddSheets.TitleBlock}" />
-                                    </DockPanel>
+                                        Grid.Column="1"
+                                        Style="{StaticResource CustomLabel}"
+                                        Target="{Binding ElementName=_sheetsCreationTitleBlock}"
+                                        Content="{me:LocalizationSource MainWindow.AddSheets.TitleBlock}" />
                                     <ComboBox
                                         x:Name="_sheetsCreationTitleBlock"
                                         Grid.Row="1"
@@ -221,24 +205,58 @@
                                         Margin="20 0"
                                         DisplayMemberPath="Name"
                                         Style="{StaticResource CustomComboBox}"
+                                        ToolTip="{Binding AddSheetsTitleBlock.Name}"
                                         ItemsSource="{Binding AllTitleBlocks, UpdateSourceTrigger=PropertyChanged}"
                                         SelectedItem="{Binding AddSheetsTitleBlock, UpdateSourceTrigger=PropertyChanged}" />
 
                                     <Label
+                                        Grid.Row="0"
                                         Grid.Column="2"
+                                        Style="{StaticResource CustomLabel}"
+                                        Content="{me:LocalizationSource MainWindow.SheetFormat}" />
+                                    <ComboBox
+                                        Grid.Row="1"
+                                        Grid.Column="2"
+                                        Style="{StaticResource CustomComboBox}"
+                                        ToolTip="{Binding AddSheetsFormat}"
+                                        SelectedItem="{Binding AddSheetsFormat, UpdateSourceTrigger=PropertyChanged}"
+                                        ItemsSource="{Binding AllSheetFormats}" />
+
+                                    <Label
+                                        Grid.Row="0"
+                                        Grid.Column="3"
+                                        Style="{StaticResource CustomLabel}"
+                                        Content="{me:LocalizationSource MainWindow.SheetOrientation}" />
+                                    <ComboBox
+                                        Grid.Row="1"
+                                        Grid.Column="3"
+                                        Style="{StaticResource CustomComboBox}"
+                                        ToolTip="{Binding AddSheetsOrientation.Name}"
+                                        SelectedItem="{Binding AddSheetsOrientation, UpdateSourceTrigger=PropertyChanged}"
+                                        ItemsSource="{Binding Orientations}">
+                                        <ComboBox.ItemTemplate>
+                                            <DataTemplate>
+                                                <local:OrientationTemplate
+                                                    DataContext="{Binding}" />
+                                            </DataTemplate>
+                                        </ComboBox.ItemTemplate>
+                                    </ComboBox>
+
+                                    <Label
+                                        Grid.Column="4"
                                         Grid.ColumnSpan="2"
                                         Style="{StaticResource CustomLabel}"
                                         Target="{Binding ElementName=_sheetsCreationCount}"
                                         Content="{me:LocalizationSource MainWindow.AddSheets.Count}" />
                                     <ui:TextBox
-                                        Grid.Column="2"
+                                        Grid.Column="4"
                                         Grid.Row="1"
                                         Height="40"
                                         x:Name="_sheetsCreationCount"
                                         Text="{Binding AddSheetsCount, UpdateSourceTrigger=PropertyChanged}" />
 
                                     <ui:Button
-                                        Grid.Column="3"
+                                        Grid.Column="5"
                                         Grid.Row="1"
                                         Margin="20 0"
                                         Style="{StaticResource CustomContentButton}"
@@ -246,7 +264,7 @@
                                         Command="{Binding AddSheetsCommand}" />
 
                                     <ui:Button
-                                        Grid.Column="4"
+                                        Grid.Column="6"
                                         Grid.Row="1"
                                         Style="{StaticResource CustomSymbolButton}"
                                         ToolTip="{me:LocalizationSource MainWindow.AddSheets.LoadSheetsButtonTooltip}"
@@ -254,7 +272,7 @@
                                         Command="{Binding LoadSheetsCommand}" />
 
                                     <ui:Button
-                                        Grid.Column="5"
+                                        Grid.Column="7"
                                         Grid.Row="1"
                                         Margin="20 0 0 0"
                                         Style="{StaticResource CustomSymbolButton}"
@@ -501,13 +519,8 @@
                                                 ItemsSource="{Binding Path=DataContext.Orientations, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Window}}">
                                                 <ComboBox.ItemTemplate>
                                                     <DataTemplate>
-                                                        <DockPanel>
-                                                            <ui:SymbolIcon
-                                                                Margin="0 0 4 0"
-                                                                Symbol="{Binding IsBookOrientation, Converter={StaticResource BoolToOrientationImgConverter}}" />
-                                                            <ui:TextBlock
-                                                                Text="{Binding Name}" />
-                                                        </DockPanel>
+                                                        <local:OrientationTemplate
+                                                            DataContext="{Binding}" />
                                                     </DataTemplate>
                                                 </ComboBox.ItemTemplate>
                                             </ComboBox>
