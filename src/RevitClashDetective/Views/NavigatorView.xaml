@@ -18,6 +18,7 @@
     xmlns:res="clr-namespace:RevitClashDetective.Resources"
     xmlns:c="clr-namespace:RevitClashDetective.Models.Clashes"
     xmlns:system="clr-namespace:System;assembly=mscorlib"
+    xmlns:wpfbehaviors="clr-namespace:dosymep.WpfCore.Behaviors;assembly=dosymep.WpfCore"
     mc:Ignorable="d"
     Title="Навигатор"
     Height="450"
@@ -29,10 +30,6 @@
     <mvvm:Interaction.Behaviors>
         <common:AttachServiceBehavior
             AttachableService="{Binding MessageBoxService}" />
-        <common:AttachServiceBehavior
-            AttachableService="{Binding OpenFileDialogService}" />
-        <common:AttachServiceBehavior
-            AttachableService="{Binding SaveFileDialogService}" />
     </mvvm:Interaction.Behaviors>
     <b:Interaction.Triggers>
         <b:EventTrigger
@@ -41,6 +38,12 @@
                 Command="{Binding OpenClashDetectorCommand}" />
         </b:EventTrigger>
     </b:Interaction.Triggers>
+    <b:Interaction.Behaviors>
+        <wpfbehaviors:WpfAttachServiceBehavior
+            AttachableService="{Binding OpenFileDialogService}" />
+        <wpfbehaviors:WpfAttachServiceBehavior
+            AttachableService="{Binding SaveFileDialogService}" />
+    </b:Interaction.Behaviors>
     <base:ThemedPlatformWindow.Resources>
         <system:Boolean
             x:Key="True">True</system:Boolean>
