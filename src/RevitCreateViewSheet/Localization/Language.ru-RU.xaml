@@ -71,9 +71,9 @@
     <system:String
         x:Key="MainWindow.AllSheets.Album">Альбом</system:String>
     <system:String
-        x:Key="MainWindow.AllSheets.CustomNumber">Ш.Номер листа</system:String>
+        x:Key="MainWindow.AllSheets.CustomNumber">Ш.Номер</system:String>
     <system:String
-        x:Key="MainWindow.AllSheets.Number">Номер листа</system:String>
+        x:Key="MainWindow.AllSheets.Number">Номер</system:String>
     <system:String
         x:Key="MainWindow.AllSheets.Name">Название</system:String>
     <system:String

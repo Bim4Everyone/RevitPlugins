@@ -158,9 +158,9 @@
                                         <ColumnDefinition
                                             Width="250" />
                                         <ColumnDefinition
-                                            Width="Auto" />
+                                            Width="80" />
                                         <ColumnDefinition
-                                            Width="Auto" />
+                                            Width="165" />
                                         <ColumnDefinition
                                             Width="80" />
                                         <ColumnDefinition
@@ -193,7 +193,7 @@
                                         Text="{Binding AddSheetsAlbumBlueprint, UpdateSourceTrigger=PropertyChanged}" />
 
                                     <Label
-                                        Margin="20 0"
+                                        Margin="10 0"
                                         Grid.Column="1"
                                         Style="{StaticResource CustomLabel}"
                                         Target="{Binding ElementName=_sheetsCreationTitleBlock}"
@@ -202,7 +202,7 @@
                                         x:Name="_sheetsCreationTitleBlock"
                                         Grid.Row="1"
                                         Grid.Column="1"
-                                        Margin="20 0"
+                                        Margin="10 0"
                                         DisplayMemberPath="Name"
                                         Style="{StaticResource CustomComboBox}"
                                         ToolTip="{Binding AddSheetsTitleBlock.Name}"
@@ -225,11 +225,13 @@
                                     <Label
                                         Grid.Row="0"
                                         Grid.Column="3"
+                                        Margin="10 0"
                                         Style="{StaticResource CustomLabel}"
                                         Content="{me:LocalizationSource MainWindow.SheetOrientation}" />
                                     <ComboBox
                                         Grid.Row="1"
                                         Grid.Column="3"
+                                        Margin="10 0"
                                         Style="{StaticResource CustomComboBox}"
                                         ToolTip="{Binding AddSheetsOrientation.Name}"
                                         SelectedItem="{Binding AddSheetsOrientation, UpdateSourceTrigger=PropertyChanged}"
@@ -258,7 +260,7 @@
                                     <ui:Button
                                         Grid.Column="5"
                                         Grid.Row="1"
-                                        Margin="20 0"
+                                        Margin="10 0"
                                         Style="{StaticResource CustomContentButton}"
                                         Content="{me:LocalizationSource MainWindow.AddSheets.CreateButton}"
                                         Command="{Binding AddSheetsCommand}" />
@@ -274,7 +276,7 @@
                                     <ui:Button
                                         Grid.Column="7"
                                         Grid.Row="1"
-                                        Margin="20 0 0 0"
+                                        Margin="10 0 0 0"
                                         Style="{StaticResource CustomSymbolButton}"
                                         ToolTip="{me:LocalizationSource MainWindow.AddSheets.SaveSheetsButtonTooltip}"
                                         Content="{ui:SymbolIcon ArrowUpload24}"
@@ -444,7 +446,6 @@
                                     <DataGridTemplateColumn.CellTemplate>
                                         <DataTemplate>
                                             <ui:TextBox
-                                                Margin="10 0"
                                                 ToolTip="{Binding AlbumBlueprint}"
                                                 Text="{Binding AlbumBlueprint, UpdateSourceTrigger=PropertyChanged}" />
                                         </DataTemplate>
@@ -515,6 +516,7 @@
                                     <DataGridTemplateColumn.CellTemplate>
                                         <DataTemplate>
                                             <ComboBox
+                                                Margin="10 0"
                                                 SelectedItem="{Binding Orientation, UpdateSourceTrigger=PropertyChanged}"
                                                 ItemsSource="{Binding Path=DataContext.Orientations, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Window}}">
                                                 <ComboBox.ItemTemplate>
@@ -537,8 +539,8 @@
                                             <ComboBox
                                                 Grid.Row="1"
                                                 Grid.Column="1"
-                                                Margin="10 0 0 0"
                                                 DisplayMemberPath="Name"
+                                                Margin="0 0 10 0"
                                                 ToolTip="{Binding TitleBlock.Name}"
                                                 Style="{StaticResource CustomComboBox}"
                                                 ItemsSource="{Binding Path=DataContext.AllTitleBlocks, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Window}}"
@@ -558,6 +560,7 @@
                                     <DataGridTemplateColumn.CellTemplate>
                                         <DataTemplate>
                                             <ui:Button
+                                                Margin="10 0 0 0"
                                                 Appearance="Danger"
                                                 Style="{StaticResource CustomSymbolButton}"
                                                 ToolTip="{StaticResource DeleteSheetTooltip}"
