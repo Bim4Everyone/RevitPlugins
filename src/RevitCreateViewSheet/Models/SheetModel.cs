@@ -168,7 +168,7 @@ namespace RevitCreateViewSheet.Models {
             var annotationsOrigin = origin + new XYZ(0, 7, 0);
             XYZ annotationsIncrementer = new(0.5, 0, 0);
             foreach(var annotation in Annotations) {
-                if(!annotation.Exists) {
+                if(!annotation.Exists && annotation.Location is null) {
                     annotation.Location = annotationsOrigin;
                     annotationsOrigin += annotationsIncrementer;
                 }
@@ -176,7 +176,7 @@ namespace RevitCreateViewSheet.Models {
             var schedulesOrigin = origin + new XYZ(0, 6, 0);
             XYZ schedulesIncrementer = new(5, 0, 0);
             foreach(var schedule in Schedules) {
-                if(!schedule.Exists) {
+                if(!schedule.Exists && schedule.Location is null) {
                     schedule.Location = schedulesOrigin;
                     schedulesOrigin += schedulesIncrementer;
                 }
@@ -184,7 +184,7 @@ namespace RevitCreateViewSheet.Models {
             var viewsOrigin = origin + new XYZ(0, 5, 0);
             XYZ viewsIncrementer = new(5, 0, 0);
             foreach(var viewPort in ViewPorts) {
-                if(!viewPort.Exists) {
+                if(!viewPort.Exists && viewPort.Location is null) {
                     viewPort.Location = viewsOrigin;
                     viewsOrigin += viewsIncrementer;
                 }

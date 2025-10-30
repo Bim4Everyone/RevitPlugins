@@ -89,9 +89,15 @@ Existing sheet numbers may change.</system:String>
     <system:String
         x:Key="MainWindow.AllSheets.DeleteViewPortTooltip">Delete viewport from the sheet</system:String>
     <system:String
+        x:Key="MainWindow.AllSheets.ReplaceViewPortTooltip">Deletes the viewport and creates a new one in its place</system:String>
+    <system:String
         x:Key="MainWindow.AllSheets.DeleteScheduleTooltip">Delete schedule from the sheet</system:String>
     <system:String
+        x:Key="MainWindow.AllSheets.ReplaceScheduleTooltip">Deletes an existing schedule and creates a new one in its place</system:String>
+    <system:String
         x:Key="MainWindow.AllSheets.DeleteAnnotationTooltip">Delete annotation from the sheet</system:String>
+    <system:String
+        x:Key="MainWindow.AllSheets.ReplaceAnnotationTooltip">Deletes an existing annotation and creates a new one in its place</system:String>
     <system:String
         x:Key="MainWindow.AllSheets.AnnotationType">Type</system:String>
     <system:String

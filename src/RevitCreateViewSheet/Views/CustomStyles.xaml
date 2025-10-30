@@ -335,9 +335,6 @@
         <Setter
             Property="HorizontalContentAlignment"
             Value="Center" />
-        <Setter
-            Property="Appearance"
-            Value="Info" />
     </Style>
 
     <Style

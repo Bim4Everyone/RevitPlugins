@@ -25,7 +25,7 @@ namespace RevitCreateViewSheet.Models {
             View = _viewport.Document.GetElement(_viewport.ViewId) as View
                 ?? throw new ArgumentNullException(nameof(viewport.ViewId));
             Saver = entitySaver ?? throw new ArgumentNullException(nameof(entitySaver));
-            Location = (viewport.Location as LocationPoint)?.Point;
+            Location = viewport.GetBoxCenter();
             ViewPortType = viewport.GetElementType();
             Name = viewport.Document.GetElement(viewport.ViewId).Name;
             InitialViewPortType = ViewPortType;

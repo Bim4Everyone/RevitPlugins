@@ -35,6 +35,10 @@
             <ui:TextBlock
                 x:Key="DeleteViewPortButtonTooltip"
                 Text="{me:LocalizationSource MainWindow.AllSheets.DeleteViewPortTooltip}" />
+            <ui:TextBlock
+                x:Key="ReplaceViewPortButtonTooltip"
+                TextWrapping="Wrap"
+                Text="{me:LocalizationSource MainWindow.AllSheets.ReplaceViewPortTooltip}" />
 
             <ui:TextBlock
                 x:Key="SchedulesCountHeader"
@@ -48,6 +52,10 @@
             <ui:TextBlock
                 x:Key="DeleteScheduleButtonTooltip"
                 Text="{me:LocalizationSource MainWindow.AllSheets.DeleteScheduleTooltip}" />
+            <ui:TextBlock
+                x:Key="ReplaceScheduleButtonTooltip"
+                TextWrapping="Wrap"
+                Text="{me:LocalizationSource MainWindow.AllSheets.ReplaceScheduleTooltip}" />
 
             <ui:TextBlock
                 x:Key="AnnotationFamilyHeader"
@@ -61,6 +69,10 @@
             <ui:TextBlock
                 x:Key="DeleteAnnotationButtonTooltip"
                 Text="{me:LocalizationSource MainWindow.AllSheets.DeleteAnnotationTooltip}" />
+            <ui:TextBlock
+                x:Key="ReplaceAnnotationButtonTooltip"
+                TextWrapping="Wrap"
+                Text="{me:LocalizationSource MainWindow.AllSheets.ReplaceAnnotationTooltip}" />
         </ResourceDictionary>
     </UserControl.Resources>
     <ScrollViewer
@@ -109,6 +121,22 @@
                             Binding="{Binding IsPlacedStatus}"
                             Header="{StaticResource ViewPortStatusHeader}" />
                         <DataGridTemplateColumn
+                            Width="Auto"
+                            CanUserResize="False">
+                            <DataGridTemplateColumn.CellTemplate>
+                                <DataTemplate>
+                                    <ui:Button
+                                        Margin="0 0 10 0"
+                                        Style="{StaticResource CustomSymbolButton}"
+                                        ToolTip="{StaticResource ReplaceViewPortButtonTooltip}"
+                                        Command="{Binding Path=DataContext.ReplaceViewPortCommand, ElementName=_this}"
+                                        CommandParameter="{Binding}"
+                                        Content="{ui:SymbolIcon Symbol=ArrowSync24}" />
+                                </DataTemplate>
+                            </DataGridTemplateColumn.CellTemplate>
+                        </DataGridTemplateColumn>
+                        <DataGridTemplateColumn
+                            Width="Auto"
                             CanUserResize="False">
                             <DataGridTemplateColumn.CellTemplate>
                                 <DataTemplate>
@@ -155,7 +183,23 @@
                             Binding="{Binding IsPlacedStatus}"
                             Header="{StaticResource ScheduleStatusHeader}" />
                         <DataGridTemplateColumn
-                            CanUserResize="False">
+                            CanUserResize="False"
+                            Width="Auto">
+                            <DataGridTemplateColumn.CellTemplate>
+                                <DataTemplate>
+                                    <ui:Button
+                                        Margin="0 0 10 0"
+                                        Style="{StaticResource CustomSymbolButton}"
+                                        ToolTip="{StaticResource ReplaceScheduleButtonTooltip}"
+                                        Command="{Binding Path=DataContext.ReplaceScheduleCommand, ElementName=_this}"
+                                        CommandParameter="{Binding}"
+                                        Content="{ui:SymbolIcon Symbol=ArrowSync24}" />
+                                </DataTemplate>
+                            </DataGridTemplateColumn.CellTemplate>
+                        </DataGridTemplateColumn>
+                        <DataGridTemplateColumn
+                            CanUserResize="False"
+                            Width="Auto">
                             <DataGridTemplateColumn.CellTemplate>
                                 <DataTemplate>
                                     <ui:Button
@@ -201,6 +245,22 @@
                             Binding="{Binding IsPlacedStatus}"
                             Header="{StaticResource AnnotationStatusHeader}" />
                         <DataGridTemplateColumn
+                            Width="Auto"
+                            CanUserResize="False">
+                            <DataGridTemplateColumn.CellTemplate>
+                                <DataTemplate>
+                                    <ui:Button
+                                        Margin="0 0 10 0"
+                                        Style="{StaticResource CustomSymbolButton}"
+                                        ToolTip="{StaticResource ReplaceAnnotationButtonTooltip}"
+                                        Command="{Binding Path=DataContext.ReplaceAnnotationCommand, ElementName=_this}"
+                                        CommandParameter="{Binding}"
+                                        Content="{ui:SymbolIcon Symbol=ArrowSync24}" />
+                                </DataTemplate>
+                            </DataGridTemplateColumn.CellTemplate>
+                        </DataGridTemplateColumn>
+                        <DataGridTemplateColumn
+                            Width="Auto"
                             CanUserResize="False">
                             <DataGridTemplateColumn.CellTemplate>
                                 <DataTemplate>

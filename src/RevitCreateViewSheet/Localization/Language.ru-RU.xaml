@@ -89,9 +89,15 @@
     <system:String
         x:Key="MainWindow.AllSheets.DeleteViewPortTooltip">Удаляет видовой экран с листа</system:String>
     <system:String
+        x:Key="MainWindow.AllSheets.ReplaceViewPortTooltip">Удаляет видовой экран и создает на его месте новый</system:String>
+    <system:String
         x:Key="MainWindow.AllSheets.DeleteScheduleTooltip">Удаляет спецификацию с листа</system:String>
     <system:String
+        x:Key="MainWindow.AllSheets.ReplaceScheduleTooltip">Удаляет существующую спецификацию и создает на ее месте новую</system:String>
+    <system:String
         x:Key="MainWindow.AllSheets.DeleteAnnotationTooltip">Удаляет аннотацию с листа</system:String>
+    <system:String
+        x:Key="MainWindow.AllSheets.ReplaceAnnotationTooltip">Удаляет существующую аннотацию и создает на ее месте новую</system:String>
     <system:String
         x:Key="MainWindow.AllSheets.AnnotationType">Тип</system:String>
     <system:String
