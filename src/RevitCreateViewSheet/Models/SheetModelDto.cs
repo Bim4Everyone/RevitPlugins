@@ -13,6 +13,7 @@ namespace RevitCreateViewSheet.Models {
         public SheetModelDto(SheetModel sheetModel) {
             AlbumBlueprint = sheetModel.AlbumBlueprint;
             SheetCustomNumber = sheetModel.SheetCustomNumber;
+            SheetNumber = sheetModel.SheetNumber;
             Name = sheetModel.Name;
             TitleBlockSymbolName = sheetModel.TitleBlockSymbol?.Name;
         }
@@ -26,6 +27,8 @@ namespace RevitCreateViewSheet.Models {
         /// Ш.Номер листа
         /// </summary>
         public string SheetCustomNumber { get; set; }
+
+        public string SheetNumber { get; set; }
 
         public string Name { get; set; }
 
@@ -48,7 +51,7 @@ namespace RevitCreateViewSheet.Models {
             return new SheetModel(symbol, entitySaver) {
                 AlbumBlueprint = AlbumBlueprint ?? string.Empty,
                 SheetCustomNumber = SheetCustomNumber ?? string.Empty,
-                SheetNumber = string.Join("-", [AlbumBlueprint, SheetCustomNumber]),
+                SheetNumber = SheetNumber ?? string.Empty,
                 Name = Name ?? string.Empty
             };
         }
