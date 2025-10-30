@@ -154,7 +154,8 @@ internal class MainViewModel : BaseViewModel {
             ? []
             : sourceElementsValues
                 .Select(value => new TypeModelViewModel { Name = value })
-                .OrderByDescending(vm => vm.Name.Equals(_setCoordParamsSettings.TypeModel));
+                .OrderByDescending(vm => vm.Name.Equals(_setCoordParamsSettings.TypeModel))
+                .ThenBy(vm => vm.Name);
     }
 
     // Метод получения коллекции SourceFilesViewModel для SourceFiles
@@ -165,7 +166,8 @@ internal class MainViewModel : BaseViewModel {
                 var provider = _providersFactory.GetFileProvider(_revitRepository, document);
                 return new SourceFileViewModel(_localizationService, provider);
             })
-            .OrderByDescending(vm => vm.FileProvider.Document.GetUniqId().Equals(currentProvider.Document.GetUniqId()));
+            .OrderByDescending(vm => vm.FileProvider.Document.GetUniqId().Equals(currentProvider.Document.GetUniqId()))
+            .ThenBy(vm => vm.FileName);
     }
 
     // Метод получения коллекции PositionViewModel для Positions
@@ -179,7 +181,8 @@ internal class MainViewModel : BaseViewModel {
                     ? currentProvider
                     : _providersFactory.GetPositionProvider(_revitRepository, provider)
             })
-            .OrderByDescending(vm => vm.PositionProvider.Type == currentProvider.Type);
+            .OrderByDescending(vm => vm.PositionProvider.Type == currentProvider.Type)
+            .ThenBy(vm => vm.Name);
     }
 
     // Метод получения коллекции RangeElementsViewModel для RangeElements
@@ -193,7 +196,8 @@ internal class MainViewModel : BaseViewModel {
                     ? currentProvider
                     : _providersFactory.GetElementsProvider(_revitRepository, provider)
             })
-            .OrderByDescending(vm => vm.ElementsProvider.Type == currentProvider.Type);
+            .OrderByDescending(vm => vm.ElementsProvider.Type == currentProvider.Type)
+            .ThenBy(vm => vm.Name);
     }
 
     // Метод обновления предупреждений в категориях
@@ -409,7 +413,7 @@ internal class MainViewModel : BaseViewModel {
         } else if(result == 0 || resultStep == 0) {
             ErrorText = _localizationService.GetLocalizedString("MainViewModel.DiameterSearchNoZero");
             return false;
-        } else if(result > 100000) {
+        } else if(result > 10000) {
             ErrorText = _localizationService.GetLocalizedString("MainViewModel.DiameterSearchBig");
             return false;
         } else if(resultStep > 2000) {

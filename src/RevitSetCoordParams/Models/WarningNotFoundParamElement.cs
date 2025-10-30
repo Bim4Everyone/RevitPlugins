@@ -1,6 +1,6 @@
 using dosymep.Bim4Everyone;
 
 namespace RevitSetCoordParams.Models;
-internal class WarningParamModel : WarningModel {
+internal class WarningNotFoundParamElement : WarningElement {
     public RevitParam RevitParam { get; set; }
 }

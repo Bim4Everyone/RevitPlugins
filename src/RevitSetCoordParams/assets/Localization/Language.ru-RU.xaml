@@ -60,8 +60,8 @@
     <system:String x:Key="MainViewModel.DiameterSearchNoDouble">Вводимые данные должны быть числом</system:String>
     <system:String x:Key="MainViewModel.DiameterSearchNoNegate">Вводимые данные должны быть положительными</system:String>
     <system:String x:Key="MainViewModel.DiameterSearchNoZero">Вводимые данные должны быть больше нуля</system:String>
-    <system:String x:Key="MainViewModel.DiameterSearchBig">Вводимые данные не должны превышать 100,000 мм</system:String>
-    <system:String x:Key="MainViewModel.DiameterSearchStepBig">Вводимые данные не должны превышать 2,000 мм</system:String>
+    <system:String x:Key="MainViewModel.DiameterSearchBig">Вводимые данные не должны превышать 10000 мм</system:String>
+    <system:String x:Key="MainViewModel.DiameterSearchStepBig">Вводимые данные не должны превышать 2000 мм</system:String>
     <system:String x:Key="MainViewModel.DiameterSearchStepBigger">Шаг не должен превышать максимальное значение</system:String>
     <system:String x:Key="MainViewModel.AllElementsProvider">Все элементы модели</system:String>
     <system:String x:Key="MainViewModel.SelectedElementsProvider">Выделенные элементы модели</system:String>
@@ -80,6 +80,10 @@
     
     <system:String x:Key="ParamViewModel.WarningStartString">Ошибочные параметры:</system:String>
 
+    <system:String x:Key="WarningsViewModel.SkipElement">Элементы, заблокированные параметром блокировки</system:String>
+    <system:String x:Key="WarningsViewModel.NotFoundElement">Не обработанные элементы</system:String>
+    <system:String x:Key="WarningsViewModel.NotFoundParam">Элементы, с незаполненными параметрами</system:String>
+    
     <system:String x:Key="Common.ParamErrorMessageBody">Ошибка загрузки параметров</system:String>
 
     <system:String x:Key="SetCoordParamsProcessor.TransactionName">Назначение параметров СМР</system:String>

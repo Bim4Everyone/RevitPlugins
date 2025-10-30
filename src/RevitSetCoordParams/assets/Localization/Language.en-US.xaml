@@ -60,8 +60,8 @@
     <system:String x:Key="MainViewModel.DiameterSearchNoDouble">Input must be a number</system:String>
     <system:String x:Key="MainViewModel.DiameterSearchNoNegate">Input must be positive</system:String>
     <system:String x:Key="MainViewModel.DiameterSearchNoZero">Input must be greater than zero</system:String>
-    <system:String x:Key="MainViewModel.DiameterSearchBig">Input must not exceed 100,000 mm</system:String>
-    <system:String x:Key="MainViewModel.DiameterSearchStepBig">Input must not exceed 2,000 mm</system:String>
+    <system:String x:Key="MainViewModel.DiameterSearchBig">Input must not exceed 10000 mm</system:String>
+    <system:String x:Key="MainViewModel.DiameterSearchStepBig">Input must not exceed 2000 mm</system:String>
     <system:String x:Key="MainViewModel.DiameterSearchStepBigger">Step must not exceed the maximum value</system:String>
     <system:String x:Key="MainViewModel.AllElementsProvider">All model elements</system:String>
     <system:String x:Key="MainViewModel.SelectedElementsProvider">Selected model elements</system:String>
@@ -79,6 +79,10 @@
     <system:String x:Key="CategoryViewModel.WarningStartString">Missing parameters:</system:String>
     
     <system:String x:Key="ParamViewModel.WarningStartString">Wrong parameters:</system:String>
+
+    <system:String x:Key="WarningsViewModel.SkipElement">Elements blocked by the lock parameter</system:String>
+    <system:String x:Key="WarningsViewModel.NotFoundElement">Unprocessed elements</system:String>
+    <system:String x:Key="WarningsViewModel.NotFoundParam">Elements with unset parameters</system:String>
 
     <system:String x:Key="Common.ParamErrorMessageBody">Error copying parameters</system:String>
 

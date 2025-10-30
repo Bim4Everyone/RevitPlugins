@@ -1,3 +1,3 @@
 namespace RevitSetCoordParams.Models;
-internal class WarningSkipElement : WarningModel {
+internal class WarningSkipElement : WarningElement {
 }

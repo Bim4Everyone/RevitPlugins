@@ -34,7 +34,7 @@ internal class SetCoordParamsProcessor {
     /// При успешном пересечении записываются параметры из объемного элемента в элемент модели
     /// </remarks>
     /// <returns>Возвращает коллекцию предупреждений WarningModel</returns>
-    public IReadOnlyCollection<WarningModel> Run() {
+    public IReadOnlyCollection<WarningElement> Run() {
         var sourceModels = _settings.FileProvider.GetRevitElements(_settings.TypeModel);
         var targetElements = _settings.ElementsProvider.GetRevitElements(_settings.Categories);
         var positionProvider = _settings.PositionProvider;
@@ -52,16 +52,15 @@ internal class SetCoordParamsProcessor {
 
         string transactionName = _localizationService.GetLocalizedString("SetCoordParamsProcessor.TransactionName");
         using var t = _revitRepository.Document.StartTransaction(transactionName);
-        List<WarningModel> warnings = [];
+        List<WarningElement> warnings = [];
         foreach(var targetElement in targetElements) {
             if(blockingParam != null) {
                 if(targetElement.Element.IsExistsParam(blockingParam.TargetParam.Name)) {
                     int blockValue = targetElement.Element.GetParamValueOrDefault<int>(blockingParam.TargetParam.Name);
                     if(blockValue == 1) {
-                        warnings.Add(new WarningBlockElement {
-                            WarningDescription = WarningDescription.Blocked,
-                            Element = targetElement.Element,
-                            Caption = ""
+                        warnings.Add(new WarningSkipElement {
+                            WarningType = WarningType.SkipElement,
+                            RevitElement = targetElement
                         });
                         continue;
                     }
@@ -104,26 +103,20 @@ internal class SetCoordParamsProcessor {
                         }
 
                     } else {
-                        warnings.Add(new WarningParamModel {
-                            WarningDescription = WarningDescription.NotFoundParam,
-                            Element = targetElement.Element,
-                            RevitParam = paramMap.TargetParam,
-                            Caption = ""
+                        warnings.Add(new WarningNotFoundParamElement {
+                            WarningType = WarningType.NotFoundParameter,
+                            RevitElement = targetElement,
+                            RevitParam = paramMap.TargetParam
                         });
                     }
                 }
             } else {
-                warnings.Add(new WarningSkipElement {
-                    WarningDescription = WarningDescription.NotFound,
-                    Element = targetElement.Element,
-                    Caption = ""
+                warnings.Add(new WarningNotFoundElement {
+                    WarningType = WarningType.NotFoundElement,
+                    RevitElement = targetElement
                 });
             }
         }
-        warnings.Add(new WarningSkipElement {
-            WarningDescription = WarningDescription.NotFound,
-            Caption = ""
-        });
         t.Commit();
         return warnings;
     }
