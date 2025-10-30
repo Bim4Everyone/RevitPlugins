@@ -1,21 +1,172 @@
-﻿<ResourceDictionary 
+﻿<ResourceDictionary
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"    
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:system="clr-namespace:System;assembly=mscorlib">
-    
-    <system:String x:Key="CreatingARDocsV.Number">№</system:String>
-    <system:String x:Key="CreatingARDocsV.StartLevel">Start level</system:String>
-    <system:String x:Key="CreatingARDocsV.EndLevel">End level</system:String>
-    <system:String x:Key="CreatingARDocsV.ViewScope">View scope</system:String>
-    <system:String x:Key="CreatingARDocsV.ViewNameSuffix">View name suffix</system:String>
-    <system:String x:Key="CreatingARDocsV.SpecificationsSelection">Specifications selection</system:String>
-    <system:String x:Key="CreatingARDocsV.SpecificationsSelected">Specifications selected</system:String>
-    
-    <system:String x:Key="CreatingARDocsV.Title">Adding parameters to a family</system:String>
+
     <system:String x:Key="Window.ButtonOk">Ok</system:String>
     <system:String x:Key="Window.ButtonCancel">Cancel</system:String>
-        
+
+    <system:String x:Key="CreatingARDocsV.Title">Creating AR Documentation</system:String>
+
+    <system:String x:Key="CreatingARDocsV.Number">No.</system:String>
+    <system:String x:Key="CreatingARDocsV.StartLevel">Start Level</system:String>
+    <system:String x:Key="CreatingARDocsV.EndLevel">End Level</system:String>
+    <system:String x:Key="CreatingARDocsV.ViewScope">View Scope</system:String>
+    <system:String x:Key="CreatingARDocsV.ViewNameSuffix">View Name Suffix</system:String>
+    <system:String x:Key="CreatingARDocsV.SpecificationsSelection">Specifications Selection</system:String>
+    <system:String x:Key="CreatingARDocsV.SpecificationsSelected">Specifications Selected</system:String>
+    
+    <system:String x:Key="CreatingARDocsV.AddLine">Add Line</system:String>
+    <system:String x:Key="CreatingARDocsV.DeleteLine">Delete Line</system:String>
+
+    <system:String x:Key="CreatingARDocsV.SelectTitleBlock">Select Title Block:</system:String>
+    <system:String x:Key="CreatingARDocsV.CreateSheets">Create Sheets</system:String>
+    <system:String x:Key="CreatingARDocsV.SheetPrefix">Sheet Prefix:</system:String>
+    
+    <system:String x:Key="CreatingARDocsV.CreatePlaceViews">Create/Place Views</system:String>
+    <system:String x:Key="CreatingARDocsV.ViewPrefix">View Prefix:</system:String>
+    <system:String x:Key="CreatingARDocsV.ViewType">View Type:</system:String>
+    <system:String x:Key="CreatingARDocsV.ViewportType">Viewport Type:</system:String>
+    <system:String x:Key="CreatingARDocsV.CreateBasedSelectedViews">Create Based on Selected Views</system:String>
+    <system:String x:Key="CreatingARDocsV.SelectedViewCount">Views Selected:</system:String>
+
+    <system:String x:Key="CreatingARDocsV.CreatePlaceSpecs">Create/Place Specifications</system:String>
+    <system:String x:Key="CreatingARDocsV.LevelFieldFilter">Select Level Field:</system:String>
+    
+    <system:String x:Key="CreatingARDocsVM.ViewsNotSelected">No views selected to create documentation from</system:String>
+    <system:String x:Key="CreatingARDocsVM.TitleBlockNotSelected">Title block type not selected</system:String>
+    <system:String x:Key="CreatingARDocsVM.ViewTypeNotSelected">View type not selected</system:String>
+    <system:String x:Key="CreatingARDocsVM.ViewportTypeNotSelected">Viewport type not selected</system:String>
+    <system:String x:Key="CreatingARDocsVM.LevelFieldFilterNotSelected">Specification filter field name not selected</system:String>
+    
+    <system:String x:Key="CreatingARDocsVM.UnableDetermineStartLevelInTask">Unable to determine start level in task No.</system:String>
+    <system:String x:Key="CreatingARDocsVM.UnableDetermineEndLevelInTask">Unable to determine end level in task No.</system:String>
+    <system:String x:Key="CreatingARDocsVM.StartLevelMustBeLessEndLevelInTask">Start level must be less than or equal to end level in task No.</system:String>
+    <system:String x:Key="CreatingARDocsVM.VisibilityScopeNotSelectedInTask">Visibility scope not selected in task No.</system:String>
+    <system:String x:Key="CreatingARDocsVM.UnableDetectBuildingInVisibilityScopeInTask">Unable to detect building in visibility scope in task No.</system:String>
+    <system:String x:Key="CreatingARDocsVM.UnableDetectSectionInVisibilityScopeInTask">Unable to detect section in visibility scope in task No.</system:String>
+    
+    <system:String x:Key="CreatingARDocsVM.Report.InitialData">Initial Data:</system:String>
+    <system:String x:Key="CreatingARDocsVM.Report.CreationBySelectedViews">View creation will be based on selected views. Processing selected views and applying tasks sequentially:</system:String>
+    <system:String x:Key="CreatingARDocsVM.Report.CreationFromScratch">View creation will be done from scratch. Processing project levels and applying tasks sequentially:</system:String>
+    <system:String x:Key="CreatingARDocsVM.Report.SelectedViewBeforeStart">Views selected before plugin start: </system:String>
+    <system:String x:Key="CreatingARDocsVM.Report.SelectedViewType">Selected view type: </system:String>
+    <system:String x:Key="CreatingARDocsVM.Report.SelectedViewportType">Selected viewport type: </system:String>
+    <system:String x:Key="CreatingARDocsVM.Report.SelectedTitleBlockType">Selected title block type: </system:String>
+    <system:String x:Key="CreatingARDocsVM.Report.SelectedLevelFieldFilter">Selected specification filter parameter field: </system:String>
+    
+    <system:String x:Key="CreatingARDocsVM.Report.TaskNumber">Task number: </system:String>
+    <system:String x:Key="CreatingARDocsVM.Report.StartLevel">Start level: </system:String>
+    <system:String x:Key="CreatingARDocsVM.Report.EndLevel">End level: </system:String>
+    <system:String x:Key="CreatingARDocsVM.Report.VisibilityScope">Visibility scope: </system:String>
+    <system:String x:Key="CreatingARDocsVM.Report.VisibilityScopeBuildingNumber">Visibility scope building number: </system:String>
+    <system:String x:Key="CreatingARDocsVM.Report.VisibilityScopeSectionNumber">Visibility scope section number: </system:String>
+    <system:String x:Key="CreatingARDocsVM.Report.Task">Task</system:String>
+    
+    <system:String x:Key="CreatingARDocsVM.Report.WorkWithLevel">Working with level:</system:String>
+    <system:String x:Key="CreatingARDocsVM.Report.LevelNumberNotDetected">❗ Unable to determine level number</system:String>
+    <system:String x:Key="CreatingARDocsVM.Report.LevelNumber">Level number:</system:String>
+    <system:String x:Key="CreatingARDocsVM.Report.LevelNotMatch">Level does not belong to the required building, as it doesn't contain: </system:String>
+    <system:String x:Key="CreatingARDocsVM.Report.LevelMatch">Level belongs to the required building, as it contains: </system:String>
+    <system:String x:Key="CreatingARDocsVM.Report.Level">Level</system:String>
+    <system:String x:Key="CreatingARDocsVM.Report.NotInRange">does not match the required range:</system:String>
+    <system:String x:Key="CreatingARDocsVM.Report.InRange">matches the required range:</system:String>
+    
+    <system:String x:Key="CreatingARDocsVM.Report.Building">building</system:String>
+    <system:String x:Key="CreatingARDocsVM.Report.Section">section</system:String>
+    <system:String x:Key="CreatingARDocsVM.Report.Floor">floor</system:String>
+    
+    <system:String x:Key="CreatingARDocsVM.Report.WorkWithSheet">Working with sheet</system:String>
+    <system:String x:Key="CreatingARDocsVM.Report.WorkWithView">Working with view</system:String>
+    <system:String x:Key="CreatingARDocsVM.Report.WorkWithSpec">Working with specification </system:String>
+    
+    <system:String x:Key="CreatingARDocsVM.Report.Levels">levels</system:String>
+    <system:String x:Key="CreatingARDocsVM.Report.Part">_part </system:String>
+    <system:String x:Key="CreatingARDocsVM.Report.LevelNumberBySelectedView">Floor number according to selected view name: </system:String>
+    <system:String x:Key="CreatingARDocsVM.Report.WorkWithSelectedView">Working with selected view: </system:String>
+    
+    <system:String x:Key="CreatingARDocsVM.Report.Sheet.SheetWithName">Sheet with name </system:String>
+    <system:String x:Key="CreatingARDocsVM.Report.Sheet.NotFindLetsCreate">not found in project, proceeding with creation</system:String>
+    <system:String x:Key="CreatingARDocsVM.Report.Sheet.FailedSheetCreation">❗ Error occurred while creating sheet!</system:String>
+    <system:String x:Key="CreatingARDocsVM.Report.Sheet.SuccessFoundInProject">successfully found in project!</system:String>
+    
+    <system:String x:Key="CreatingARDocsVM.Report.Sheet.InvalidNameForTask">❗ Error occurred while working with sheet! Invalid name provided for task!</system:String>
+    <system:String x:Key="CreatingARDocsVM.Report.Sheet.InvalidTitleBlockType">❗ Error occurred while working with sheet! Invalid title block type provided!</system:String>
+    <system:String x:Key="CreatingARDocsVM.Report.Sheet.SheetCreatedSuccessfully">Sheet created successfully!</system:String>
+    <system:String x:Key="CreatingARDocsVM.Report.Sheet.NameGiven">Name assigned:</system:String>
+    <system:String x:Key="CreatingARDocsVM.Report.Sheet.InvalidSheetWidthParamName">❗ Error occurred while working with sheet! Invalid sheet width parameter name provided!</system:String>
+    <system:String x:Key="CreatingARDocsVM.Report.Sheet.InvalidSheetHeightParamName">❗ Error occurred while working with sheet! Invalid sheet height parameter name provided!</system:String>
+    <system:String x:Key="CreatingARDocsVM.Report.Sheet.InvalidSheetWidthParamValue">❗ Error occurred while working with sheet! Invalid value provided for sheet width!</system:String>
+    <system:String x:Key="CreatingARDocsVM.Report.Sheet.InvalidSheetHeightParamValue">❗ Error occurred while working with sheet! Invalid value provided for sheet height!</system:String>
+    <system:String x:Key="CreatingARDocsVM.Report.Sheet.TitleBlockNotFound">❗ Error occurred while working with sheet! Title block not found!</system:String>
+    <system:String x:Key="CreatingARDocsVM.Report.Sheet.SettedTitleBlockDimension">Title block dimensions set:</system:String>
+    <system:String x:Key="CreatingARDocsVM.Report.Sheet.TitleBlockHasNotDimensionParam">❗ Error occurred while working with sheet! One of the dimensional parameters not found in title block!</system:String>
+    
+    <system:String x:Key="CreatingARDocsVM.Report.View.InvalidNameForTask">❗ Error occurred while working with view! Invalid name provided for task!</system:String>
+    <system:String x:Key="CreatingARDocsVM.Report.View.ViewWithName">View with name </system:String>
+    <system:String x:Key="CreatingARDocsVM.Report.View.NotFindLetsCreate">not found in project, proceeding with creation!</system:String>
+    <system:String x:Key="CreatingARDocsVM.Report.View.InvalidLevelAndVisibilityScope">❗ Error occurred while creating view! Level and visibility scope not provided for task!</system:String>
+    <system:String x:Key="CreatingARDocsVM.Report.View.SuccessFoundInProject">successfully found in project!</system:String>
+    
+    <system:String x:Key="CreatingARDocsVM.Report.View.InvalidViewType">❗ Error occurred while creating new view! View type not specified!</system:String>
+    <system:String x:Key="CreatingARDocsVM.Report.View.InvalidLevelForView">❗ Error occurred while creating new view! Level for view creation not specified!</system:String>
+    <system:String x:Key="CreatingARDocsVM.Report.View.ViewCreatedSuccessfully">View created successfully!</system:String>
+    <system:String x:Key="CreatingARDocsVM.Report.View.SetViewType">View assigned type </system:String>
+    <system:String x:Key="CreatingARDocsVM.Report.View.NameGiven">Name assigned:</system:String>
+    <system:String x:Key="CreatingARDocsVM.Report.View.FailedSheetCreation">❗ Error occurred while creating new view!</system:String>
+    
+    <system:String x:Key="CreatingARDocsVM.Report.View.InvalidViewForDuplicate">❗ Error occurred while creating new view! View to duplicate not specified!</system:String>
+    <system:String x:Key="CreatingARDocsVM.Report.View.ViewWasDuplicated">View duplicated successfully!</system:String>
+    <system:String x:Key="CreatingARDocsVM.Report.View.ErrorDuplicatingView">❗ Error occurred while duplicating view!</system:String>
+    <system:String x:Key="CreatingARDocsVM.Report.View.InvalidVisibilityScope">❗ Error occurred while working with view! Invalid visibility scope provided!</system:String>
+    <system:String x:Key="CreatingARDocsVM.Report.View.InvalidViewForWork">❗ Error occurred while configuring view, no view found to work with!</system:String>
+    <system:String x:Key="CreatingARDocsVM.Report.View.SetVisibilityScope">Visibility scope set: </system:String>
+    <system:String x:Key="CreatingARDocsVM.Report.View.SetAnnotationCropping">Annotation cropping set for view </system:String>
+    <system:String x:Key="CreatingARDocsVM.Report.View.SetMinAnnotationCroppingOffset">Minimum annotation cropping offset set </system:String>
+    <system:String x:Key="CreatingARDocsVM.Report.View.InvalidViewSetting">❗ Error occurred while configuring view! </system:String>
+    <system:String x:Key="CreatingARDocsVM.Report.View.InvalidSheetForPlace">❗ Error occurred while placing view! Sheet for placement not found!</system:String>
+    <system:String x:Key="CreatingARDocsVM.Report.View.InvalidViewForPlace">❗ Error occurred while placing view! View for placement not found!</system:String>
+    <system:String x:Key="CreatingARDocsVM.Report.View.CannotPlaceViewOnSheet">❗ Error occurred while placing view! Cannot place view on sheet!</system:String>
+    <system:String x:Key="CreatingARDocsVM.Report.View.FailedViewportCreation">❗ Failed to create view on sheet!</system:String>
+    <system:String x:Key="CreatingARDocsVM.Report.View.ViewCreatedSuccessfullyOnSheet">Viewport successfully created on sheet!</system:String>
+    <system:String x:Key="CreatingARDocsVM.Report.View.SettedViewType">Viewport assigned type </system:String>
+    <system:String x:Key="CreatingARDocsVM.Report.View.CannotFoundTitleBlockOnSheet">❗ Unable to find title block, it's needed for proper view placement on sheet!</system:String>
+    <system:String x:Key="CreatingARDocsVM.Report.View.ViewPositionedOnSheet">View successfully positioned on sheet!</system:String>
+    <system:String x:Key="CreatingARDocsVM.Report.View.ViewTitlePositionedOnSheet">View title successfully positioned on sheet!</system:String>
+    
+    <system:String x:Key="CreatingARDocsVM.CutNameBySymbol">Split name into blocks using symbol</system:String>
+    <system:String x:Key="CreatingARDocsVM.WordLevelNeedNearLevelNumber">The word "floor" must be specified next to the floor number</system:String>
+    <system:String x:Key="CreatingARDocsVM.LevelNumberNotFound">Floor number not found </system:String>
+    <system:String x:Key="CreatingARDocsVM.LevelNumberNotDetect">Unable to determine floor number </system:String>
+    <system:String x:Key="CreatingARDocsVM.PrefixNSuffixNotFound">Unable to get prefix and suffix </system:String>
+    
+    <system:String x:Key="CreatingARDocsVM.Sheet">sheet</system:String>
+    <system:String x:Key="CreatingARDocsVM.View">view</system:String>
+    <system:String x:Key="CreatingARDocsVM.Spec">specification</system:String>
+    <system:String x:Key="CreatingARDocsVM.Level">floor</system:String>
+
     <system:String x:Key="TreeReportV.Title">Report</system:String>
-    <system:String x:Key="TreeReportV.ShowAll">Show all</system:String>
-    <system:String x:Key="TreeReportV.ShowImportant">Show important</system:String>
+    <system:String x:Key="TreeReportV.ShowAll">Show All</system:String>
+    <system:String x:Key="TreeReportV.ShowImportant">Show Important</system:String>
+
+    <system:String x:Key="CopySpecSheetInstanceV.Title">Copy Specifications to Sheets</system:String>
+    <system:String x:Key="CopySpecSheetInstanceV.SelectedSheetCount">Sheets selected:</system:String>
+    <system:String x:Key="CopySpecSheetInstanceV.SelectedSpecs">Select Specifications</system:String>
+    <system:String x:Key="CopySpecSheetInstanceV.SelectedSpecsCount">Specifications selected:</system:String>
+    <system:String x:Key="CopySpecSheetInstanceV.LevelFieldFilter">Select Level Filter Field:</system:String>
+    
+    <system:String x:Key="CopySpecSheetInstanceVM.SheetNotSelected">No sheets selected</system:String>
+    <system:String x:Key="CopySpecSheetInstanceVM.SpecsNotSelected">No specifications selected on sheet</system:String>
+    <system:String x:Key="CopySpecSheetInstanceVM.LevelFieldFilterNotSelected">Level filter field not selected</system:String>
+    <system:String x:Key="CopySpecSheetInstanceVM.SelectSpecsOnSheet">Select specifications on sheet</system:String>
+    
+    <system:String x:Key="CopySpecSheetInstanceVM.Report.SpecWithName">Specification with name</system:String>
+    <system:String x:Key="CopySpecSheetInstanceVM.Report.NotFindLetsCreate">not found in project, proceeding with creation</system:String>
+    <system:String x:Key="CopySpecSheetInstanceVM.Report.SpecCreatedSuccessfully">Specification created successfully!</system:String>
+    <system:String x:Key="CopySpecSheetInstanceVM.Report.NameGiven">Name assigned:</system:String>
+    <system:String x:Key="CopySpecSheetInstanceVM.Report.SpecFinded">successfully found in project!</system:String>
+    <system:String x:Key="CopySpecSheetInstanceVM.Report.SetFilterValue">Filter value set to </system:String>
+
+    <system:String x:Key="CopySpecSheetInstanceVM.Report.FailedViewportCreation">❗ Failed to create specification viewport on sheet!</system:String>
+    <system:String x:Key="CopySpecSheetInstanceVM.Report.SuccessViewportCreation">Specification viewport successfully created on sheet!</system:String>
 </ResourceDictionary>
