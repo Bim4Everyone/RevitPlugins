@@ -227,7 +227,7 @@ internal class CopySpecSheetInstanceVM : BaseViewModel {
                 continue;
             }
 
-            var specHelper = new SpecHelper(_revitRepository, elem);
+            var specHelper = new SpecHelper(_revitRepository, elem, _localizationService);
             ScheduleSheetInstances.Add(specHelper);
             try {
                 specHelper.NameHelper.AnalyzeNGetNameInfo();

@@ -113,7 +113,7 @@ internal class TaskInfoListVM : BaseViewModel {
                 if(scheduleSheetInstance is null) {
                     continue;
                 }
-                var specHelper = new SpecHelper(_revitRepository, scheduleSheetInstance);
+                var specHelper = new SpecHelper(_revitRepository, scheduleSheetInstance, _localizationService);
                 task.ListSpecHelpers.Add(specHelper);
                 try {
                     specHelper.NameHelper.AnalyzeNGetNameInfo();

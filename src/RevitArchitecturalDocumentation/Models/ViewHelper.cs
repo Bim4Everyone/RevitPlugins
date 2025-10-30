@@ -24,7 +24,7 @@ internal class ViewHelper {
     /// </summary>
     public ViewHelper(ViewPlan viewPlan, ILocalizationService localizationService) {
         View = viewPlan;
-        NameHelper = new ViewNameHelper(viewPlan);
+        NameHelper = new ViewNameHelper(viewPlan, _localizationService);
         _localizationService = localizationService;
     }
 
@@ -207,7 +207,7 @@ internal class ViewHelper {
         if(viewportType != null) {
             viewPort.ChangeTypeId(viewportType.Id);
             Report?.AddNodeWithName($"{_localizationService.GetLocalizedString("CreatingARDocsVM.Report.View.SettedViewType")}" +
-                $"{viewportType.Name}!");
+                $" {viewportType.Name}!");
         }
 
         var viewportCenter = viewPort.GetBoxCenter();

@@ -14,7 +14,7 @@ internal class SheetHelper {
         Repository = revitRepository;
         _localizationService = localizationService;
         Report = report;
-        NameHelper = new ViewNameHelper(null);
+        NameHelper = new ViewNameHelper(null, localizationService);
     }
     public SheetHelper(RevitRepository revitRepository, ViewSheet sheet, ILocalizationService localizationService,
                        TreeReportNode report = null) {
@@ -22,7 +22,7 @@ internal class SheetHelper {
         Sheet = sheet;
         _localizationService = localizationService;
         Report = report;
-        NameHelper = new ViewNameHelper(sheet);
+        NameHelper = new ViewNameHelper(sheet, localizationService);
     }
 
         
@@ -57,7 +57,7 @@ internal class SheetHelper {
             Report?.AddNodeWithName($"{_localizationService.GetLocalizedString("CreatingARDocsVM.Report.Sheet.SheetWithName")}" +
                 $" \"{newSheetName}\" {_localizationService.GetLocalizedString("CreatingARDocsVM.Report.Sheet.SuccessFoundInProject")}");
 
-            NameHelper = new ViewNameHelper(newSheet);
+            NameHelper = new ViewNameHelper(newSheet, _localizationService);
             NameHelper.AnalyzeNGetLevelNumber();
         }
 
@@ -92,7 +92,7 @@ internal class SheetHelper {
         }
 
         Sheet = newSheet;
-        NameHelper = new ViewNameHelper(Sheet);
+        NameHelper = new ViewNameHelper(Sheet, _localizationService);
         NameHelper.AnalyzeNGetLevelNumber();
         return newSheet;
     }

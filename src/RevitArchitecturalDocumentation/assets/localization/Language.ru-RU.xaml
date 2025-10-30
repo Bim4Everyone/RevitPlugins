@@ -135,6 +135,17 @@
     <system:String x:Key="CreatingARDocsVM.Report.View.CannotFoundTitleBlockOnSheet">❗ Не удалось найти рамку листа, она нужна для правильного расположения вида на листе!</system:String>
     <system:String x:Key="CreatingARDocsVM.Report.View.ViewPositionedOnSheet">Вид успешно спозиционирован на листе!</system:String>
     <system:String x:Key="CreatingARDocsVM.Report.View.ViewTitlePositionedOnSheet">Оглавление вида успешно спозиционировано на листе!</system:String>
+    
+    <system:String x:Key="CreatingARDocsVM.CutNameBySymbol">Разделите имя на блоки при помощи символа</system:String>
+    <system:String x:Key="CreatingARDocsVM.WordLevelNeedNearLevelNumber">Рядом с номером этажа должно быть указано слово "этаж"</system:String>
+    <system:String x:Key="CreatingARDocsVM.LevelNumberNotFound">Не найден номер этажа </system:String>
+    <system:String x:Key="CreatingARDocsVM.LevelNumberNotDetect">Не удалось определить номер этажа </system:String>
+    <system:String x:Key="CreatingARDocsVM.PrefixNSuffixNotFound">Не удалось получить префикс и суффикс </system:String>
+    
+    <system:String x:Key="CreatingARDocsVM.Sheet">лист</system:String>
+    <system:String x:Key="CreatingARDocsVM.View">вид</system:String>
+    <system:String x:Key="CreatingARDocsVM.Spec">спецификация</system:String>
+    <system:String x:Key="CreatingARDocsVM.Level">этаж</system:String>
 
     <system:String x:Key="TreeReportVM.Title">Отчет</system:String>
     <system:String x:Key="TreeReportVM.ShowAll">Показывать все</system:String>

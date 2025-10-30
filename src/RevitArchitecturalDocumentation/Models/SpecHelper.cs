@@ -9,21 +9,23 @@ namespace RevitArchitecturalDocumentation.Models;
 internal class SpecHelper {
     private readonly ILocalizationService _localizationService;
     
-    public SpecHelper(RevitRepository revitRepository, ScheduleSheetInstance scheduleSheetInstance, TreeReportNode report = null) {
+    public SpecHelper(RevitRepository revitRepository, ScheduleSheetInstance scheduleSheetInstance, 
+                      ILocalizationService localizationService, TreeReportNode report = null) {
 
         Report = report;
         Repository = revitRepository;
+        _localizationService = localizationService;
 
         SpecSheetInstance = scheduleSheetInstance;
         SpecSheetInstancePoint = scheduleSheetInstance.Point;
         Specification = scheduleSheetInstance.Document.GetElement(scheduleSheetInstance.ScheduleId) as ViewSchedule;
         SpecificationDefinition = Specification.Definition;
         SpecificationFilters = SpecificationDefinition.GetFilters().ToList();
-        NameHelper = new ViewNameHelper(Specification);
+        NameHelper = new ViewNameHelper(Specification, _localizationService);
     }
 
-    public SpecHelper(RevitRepository revitRepository, ViewSchedule viewSchedule, ILocalizationService localizationService,
-                      TreeReportNode report = null) {
+    public SpecHelper(RevitRepository revitRepository, ViewSchedule viewSchedule, 
+                      ILocalizationService localizationService, TreeReportNode report = null) {
 
         Report = report;
         Repository = revitRepository;
@@ -32,7 +34,7 @@ internal class SpecHelper {
         Specification = viewSchedule;
         SpecificationDefinition = Specification.Definition;
         SpecificationFilters = SpecificationDefinition.GetFilters().ToList();
-        NameHelper = new ViewNameHelper(Specification);
+        NameHelper = new ViewNameHelper(Specification, _localizationService);
     }
 
     public TreeReportNode Report { get; set; }
