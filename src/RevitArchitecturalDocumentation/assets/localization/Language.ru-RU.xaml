@@ -147,9 +147,9 @@
     <system:String x:Key="CreatingARDocsVM.Spec">спецификация</system:String>
     <system:String x:Key="CreatingARDocsVM.Level">этаж</system:String>
 
-    <system:String x:Key="TreeReportVM.Title">Отчет</system:String>
-    <system:String x:Key="TreeReportVM.ShowAll">Показывать все</system:String>
-    <system:String x:Key="TreeReportVM.ShowImportant">Показывать важное</system:String>
+    <system:String x:Key="TreeReportV.Title">Отчет</system:String>
+    <system:String x:Key="TreeReportV.ShowAll">Показывать все</system:String>
+    <system:String x:Key="TreeReportV.ShowImportant">Показывать важное</system:String>
 
     <system:String x:Key="CopySpecSheetInstanceV.Title">Скопировать спецификации на листы</system:String>
     <system:String x:Key="CopySpecSheetInstanceV.SelectedSheetCount">Выбрано листов:</system:String>

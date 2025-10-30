@@ -37,7 +37,7 @@
 
         <ui:TitleBar
             Grid.Row="0"
-            Title="{me:LocalizationSource TreeReportVM.Title}" />
+            Title="{me:LocalizationSource TreeReportV.Title}" />
 
         <Border
             Grid.Row="1"
@@ -61,7 +61,7 @@
                     HorizontalAlignment="Right"
                     FlowDirection="RightToLeft"
                     GroupName="choice"
-                    Content="{me:LocalizationSource TreeReportVM.ShowAll}" />
+                    Content="{me:LocalizationSource TreeReportV.ShowAll}" />
 
                 <RadioButton
                     Grid.Row="0"
@@ -69,7 +69,7 @@
                     Margin="10"
                     VerticalAlignment="Center"
                     GroupName="choice"
-                    Content="{me:LocalizationSource TreeReportVM.ShowImportant}"
+                    Content="{me:LocalizationSource TreeReportV.ShowImportant}"
                     IsChecked="{Binding Path=ShowImportant}">
                     <i:Interaction.Triggers>
                         <i:EventTrigger EventName="Checked">

@@ -48,40 +48,40 @@ internal class DocsFromScratch {
 
         foreach(var level in Repository.Levels) {
 
-            var levelRep = new TreeReportNode(null) { Name = $"{_localizationService.GetLocalizedString("CreatingARDocsV.Report.WorkWithLevel")} \"{level.Name}\"" };
+            var levelRep = new TreeReportNode(null) { Name = $"{_localizationService.GetLocalizedString("CreatingARDocsVM.Report.WorkWithLevel")} \"{level.Name}\"" };
 
             string numberOfLevel = Repository.RegexForLevel.Match(level.Name).Groups[1].Value;
             if(!int.TryParse(numberOfLevel, out int numberOfLevelAsInt)) {
-                levelRep.AddNodeWithName($"{_localizationService.GetLocalizedString("CreatingARDocsV.Report.LevelNumberNotDetected")} {level.Name}!");
+                levelRep.AddNodeWithName($"{_localizationService.GetLocalizedString("CreatingARDocsVM.Report.LevelNumberNotDetected")} {level.Name}!");
                 continue;
             }
-            levelRep.AddNodeWithName($"{_localizationService.GetLocalizedString("CreatingARDocsV.Report.LevelNumber")} \"{numberOfLevelAsInt}\"");
+            levelRep.AddNodeWithName($"{_localizationService.GetLocalizedString("CreatingARDocsVM.Report.LevelNumber")} \"{numberOfLevelAsInt}\"");
 
             foreach(var task in TasksForWork) {
 
                 var taskRep = new TreeReportNode(levelRep) {
-                    Name = $"{_localizationService.GetLocalizedString("CreatingARDocsV.Report.TaskNumber")} \"{task.TaskNumber}\" - " +
+                    Name = $"{_localizationService.GetLocalizedString("CreatingARDocsVM.Report.TaskNumber")} \"{task.TaskNumber}\" - " +
                     $"уровни ({task.StartLevelNumberAsInt} - {task.EndLevelNumberAsInt}), {task.SelectedVisibilityScope.Name}"
                 };
 
                 string strForLevelSearch = "К" + task.NumberOfBuildingPartAsInt.ToString() + "_";
                 if(!level.Name.Contains(strForLevelSearch)) {
-                    taskRep.AddNodeWithName($"  ~  {_localizationService.GetLocalizedString("CreatingARDocsV.Report.LevelNotMatch")} \"{strForLevelSearch}\"");
+                    taskRep.AddNodeWithName($"  ~  {_localizationService.GetLocalizedString("CreatingARDocsVM.Report.LevelNotMatch")} \"{strForLevelSearch}\"");
                     levelRep.Nodes.Add(taskRep);
                     continue;
                 } else {
-                    taskRep.AddNodeWithName($"{_localizationService.GetLocalizedString("CreatingARDocsV.Report.LevelMatch")} \"{strForLevelSearch}\"");
+                    taskRep.AddNodeWithName($"{_localizationService.GetLocalizedString("CreatingARDocsVM.Report.LevelMatch")} \"{strForLevelSearch}\"");
                 }
 
                 if(numberOfLevelAsInt < task.StartLevelNumberAsInt || numberOfLevelAsInt > task.EndLevelNumberAsInt) {
-                    taskRep.AddNodeWithName($"  ~  {_localizationService.GetLocalizedString("CreatingARDocsV.Report.Level")} \"{numberOfLevelAsInt}\" " +
-                        $"{_localizationService.GetLocalizedString("CreatingARDocsV.Report.NotInRange")}  " +
+                    taskRep.AddNodeWithName($"  ~  {_localizationService.GetLocalizedString("CreatingARDocsVM.Report.Level")} \"{numberOfLevelAsInt}\" " +
+                        $"{_localizationService.GetLocalizedString("CreatingARDocsVM.Report.NotInRange")}  " +
                                  $"{task.StartLevelNumberAsInt} - {task.EndLevelNumberAsInt}");
                     levelRep.Nodes.Add(taskRep);
                     continue;
                 } else {
-                    taskRep.AddNodeWithName($"{_localizationService.GetLocalizedString("CreatingARDocsV.Report.Level")} \"{numberOfLevelAsInt}\" " +
-                        $"{_localizationService.GetLocalizedString("CreatingARDocsV.Report.InRange")} " +
+                    taskRep.AddNodeWithName($"{_localizationService.GetLocalizedString("CreatingARDocsVM.Report.Level")} \"{numberOfLevelAsInt}\" " +
+                        $"{_localizationService.GetLocalizedString("CreatingARDocsVM.Report.InRange")} " +
                                 $"{task.StartLevelNumberAsInt} - {task.EndLevelNumberAsInt}");
                 }
 
@@ -91,14 +91,14 @@ internal class DocsFromScratch {
 
                     string newSheetName = string.Format("{0}{1} {2}_{3} {4}_{5} {6}",
                         SheetOpts.SheetNamePrefix,
-                        _localizationService.GetLocalizedString("CreatingARDocsV.Report.Building"),
+                        _localizationService.GetLocalizedString("CreatingARDocsVM.Report.Building"),
                         task.NumberOfBuildingPartAsInt,
-                        _localizationService.GetLocalizedString("CreatingARDocsV.Report.Section"),
+                        _localizationService.GetLocalizedString("CreatingARDocsVM.Report.Section"),
                         task.NumberOfBuildingSectionAsInt,
-                        _localizationService.GetLocalizedString("CreatingARDocsV.Report.Floor"),
+                        _localizationService.GetLocalizedString("CreatingARDocsVM.Report.Floor"),
                         numberOfLevel);
 
-                    var sheetRep = new TreeReportNode(taskRep) { Name = $"{_localizationService.GetLocalizedString("CreatingARDocsV.Report.WorkWithSheet")} \"{newSheetName}\"" };
+                    var sheetRep = new TreeReportNode(taskRep) { Name = $"{_localizationService.GetLocalizedString("CreatingARDocsVM.Report.WorkWithSheet")} \"{newSheetName}\"" };
 
                     sheetHelper = new SheetHelper(Repository, _localizationService, sheetRep);
                     SheetOpts.SelectedTitleBlock = SheetOpts.SelectedTitleBlock ?? Repository.TitleBlocksInProject?.FirstOrDefault(a => a.Name.Equals(SheetOpts.SelectedTitleBlockName));
@@ -111,11 +111,11 @@ internal class DocsFromScratch {
                     string newViewName = string.Format("{0}{1} {2} К{3}{4}",
                         ViewOpts.ViewNamePrefix,
                         numberOfLevel,
-                        _localizationService.GetLocalizedString("CreatingARDocsV.Report.Floor"),
+                        _localizationService.GetLocalizedString("CreatingARDocsVM.Report.Floor"),
                         task.NumberOfBuildingPartAsInt,
                         task.ViewNameSuffix);
 
-                    var viewRep = new TreeReportNode(taskRep) { Name = $"{_localizationService.GetLocalizedString("CreatingARDocsV.Report.WorkWithView")} \"{newViewName}\"" };
+                    var viewRep = new TreeReportNode(taskRep) { Name = $"{_localizationService.GetLocalizedString("CreatingARDocsVM.Report.WorkWithView")} \"{newViewName}\"" };
 
                     var newViewHelper = new ViewHelper(Repository, _localizationService, viewRep);
                     _ = newViewHelper.GetView(newViewName, task.SelectedVisibilityScope, ViewOpts.SelectedViewFamilyType, level);
@@ -132,7 +132,7 @@ internal class DocsFromScratch {
                 if(SpecOpts.WorkWithSpecs) {
 
                     foreach(SpecHelper specHelper in task.ListSpecHelpers) {
-                        var specRep = new TreeReportNode(taskRep) { Name = $"{_localizationService.GetLocalizedString("CreatingARDocsV.Report.WorkWithSpec")} \"{specHelper.Specification.Name}\"" };
+                        var specRep = new TreeReportNode(taskRep) { Name = $"{_localizationService.GetLocalizedString("CreatingARDocsVM.Report.WorkWithSpec")} \"{specHelper.Specification.Name}\"" };
                         specHelper.Report = specRep;
 
                         SpecHelper newSpecHelper = specHelper.GetOrDuplicateNSetSpec(SpecOpts.SelectedFilterNameForSpecs, numberOfLevelAsInt);
