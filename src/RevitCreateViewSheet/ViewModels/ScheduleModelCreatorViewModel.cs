@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Linq;
@@ -28,8 +29,7 @@ namespace RevitCreateViewSheet.ViewModels {
             _revitRepository = revitRepository ?? throw new ArgumentNullException(nameof(revitRepository));
             _localizationService = localizationService ?? throw new ArgumentNullException(nameof(localizationService));
 
-            _allSchedules = new ObservableCollection<ViewScheduleViewModel>(_revitRepository.GetAllSchedules()
-                .Select(s => new ViewScheduleViewModel(s))
+            _allSchedules = new ObservableCollection<ViewScheduleViewModel>(GetViewSchedules(_revitRepository)
                 .OrderBy(a => a.Name, new LogicalStringComparer()));
             ViewSchedules = new CollectionViewSource() { Source = _allSchedules };
             ViewSchedules.Filter += SchedulesFilterHandler;
@@ -89,5 +89,26 @@ namespace RevitCreateViewSheet.ViewModels {
                 ViewSchedules?.View.Refresh();
             }
         }
+
+#if REVIT_2022_OR_GREATER
+        private IEnumerable<ViewScheduleViewModel> GetViewSchedules(RevitRepository repository) {
+            var allSchedules = repository.GetAllSchedules();
+            List<ViewScheduleViewModel> schedules = [];
+            foreach(var schedule in allSchedules) {
+                schedules.Add(new ViewScheduleViewModel(schedule));
+                int count = schedule.GetSegmentCount();
+                if(count > 1) {
+                    for(int i = 0; i < count; i++) {
+                        schedules.Add(new ViewScheduleViewModel(schedule, i));
+                    }
+                }
+            }
+            return schedules;
+        }
+#else
+        private IEnumerable<ViewScheduleViewModel> GetViewSchedules(RevitRepository repository) {
+            return repository.GetAllSchedules().Select(v => new ViewScheduleViewModel(v));
+        }
+#endif
     }
 }

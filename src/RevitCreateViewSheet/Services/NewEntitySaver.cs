@@ -61,7 +61,11 @@ namespace RevitCreateViewSheet.Services {
                         _localizationService.GetLocalizedString("Errors.ScheduleModel.PropertyNotSet"),
                         nameof(scheduleModel.Location)));
             }
+#if REVIT_2022_OR_GREATER
+            _revitRepository.CreateSchedule(viewSheet.Id, scheduleModel.ViewSchedule.Id, scheduleModel.Location, scheduleModel.SegmentIndex);
+#else
             _revitRepository.CreateSchedule(viewSheet.Id, scheduleModel.ViewSchedule.Id, scheduleModel.Location);
+#endif
         }
 
         public void Save(AnnotationModel annotationModel) {
