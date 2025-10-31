@@ -355,7 +355,7 @@ internal class MainViewModel : BaseViewModel {
 
         if(warnings != null && warnings.Any()) {
             var warningsViewModel = _resolutionRoot.Get<WarningsViewModel>(
-                new Ninject.Parameters.ConstructorArgument("warnings", warnings));
+                new Ninject.Parameters.ConstructorArgument("warningElements", warnings));
             var warningsWindow = _resolutionRoot.Get<WarningsWindow>();
             warningsWindow.Show();
         }

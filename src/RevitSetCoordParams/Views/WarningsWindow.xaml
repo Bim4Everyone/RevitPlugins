@@ -10,6 +10,7 @@
     xmlns:edits="clr-namespace:RevitSetCoordParams.Views.Edits"
     xmlns:vms="clr-namespace:RevitSetCoordParams.ViewModels"
     xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
+    xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
     xmlns:me="clr-namespace:dosymep.WpfCore.MarkupExtensions;assembly=dosymep.WpfCore"
     
     mc:Ignorable="d"
@@ -21,7 +22,24 @@
     MinWidth="900"
     
     d:DataContext="{d:DesignInstance vms:WarningsViewModel, IsDesignTimeCreatable=False}">
-    
+
+    <Window.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary
+                    Source="CustomStyles.xaml"  />
+            </ResourceDictionary.MergedDictionaries>            
+        </ResourceDictionary>
+    </Window.Resources>
+
+    <i:Interaction.Triggers>
+        <i:EventTrigger
+            EventName="Loaded">
+            <i:InvokeCommandAction
+                Command="{Binding LoadViewCommand}" />
+        </i:EventTrigger>
+    </i:Interaction.Triggers>
+
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition
@@ -39,27 +57,72 @@
         <ScrollViewer
             Grid.Row="1"
             VerticalScrollBarVisibility="Auto"
-            HorizontalScrollBarVisibility="Disabled">
-            
+            HorizontalScrollBarVisibility="Auto"
+            Padding="10">
             <ItemsControl
                 ItemsSource="{Binding WarningViewModels}">
                 <ItemsControl.ItemTemplate>
-                    <DataTemplate
-                        DataType="{x:Type vms:WarningGroupViewModel}">
+                    <DataTemplate>
                         <edits:CustomGroupEditControl
-                            Header="{Binding Caption}"/>
+                            Icon="{ui:SymbolIcon Warning24}"
+                            Header="{Binding Caption}"
+                            Description="{Binding Description}"
+                            IsChecked="True">
+                            <edits:CustomGroupEditControl.EditControl>
+                                <ui:DataGrid
+                                    AutoGenerateColumns="False"
+                                    IsReadOnly="True"
+                                    Style="{StaticResource CustomResizableDataGridStyle}"
+                                    ItemsSource="{Binding Warnings}">
+                                    <ui:DataGrid.Columns>
+                                        <DataGridTextColumn
+                                            Width="100"
+                                            Binding="{Binding ID}">
+                                            <DataGridTextColumn.Header>
+                                                <TextBlock
+                                                    Text="{me:LocalizationSource WarningWindow.IdField}" />
+                                            </DataGridTextColumn.Header>
+                                        </DataGridTextColumn>
+
+                                        <DataGridTextColumn
+                                            Width="200"
+                                            Binding="{Binding Family}">
+                                            <DataGridTextColumn.Header>
+                                                <TextBlock
+                                                    Text="{me:LocalizationSource WarningWindow.FamilyField}" />
+                                            </DataGridTextColumn.Header>
+                                        </DataGridTextColumn>
+
+                                        <DataGridTextColumn
+                                            Width="300"
+                                            Binding="{Binding Type}">
+                                            <DataGridTextColumn.Header>
+                                                <TextBlock
+                                                    Text="{me:LocalizationSource WarningWindow.TypeField}" />
+                                            </DataGridTextColumn.Header>
+                                        </DataGridTextColumn>
+
+                                        <DataGridTextColumn
+                                            Width="200"
+                                            Binding="{Binding Level}">
+                                            <DataGridTextColumn.Header>
+                                                <TextBlock
+                                                    Text="{me:LocalizationSource WarningWindow.LevelField}" />
+                                            </DataGridTextColumn.Header>
+                                        </DataGridTextColumn> 
+                                    </ui:DataGrid.Columns>
+                                </ui:DataGrid>
+                            </edits:CustomGroupEditControl.EditControl>
+                        </edits:CustomGroupEditControl>
                     </DataTemplate>
                 </ItemsControl.ItemTemplate>
-
                 <ItemsControl.ItemsPanel>
                     <ItemsPanelTemplate>
                         <StackPanel />
                     </ItemsPanelTemplate>
                 </ItemsControl.ItemsPanel>
             </ItemsControl>
-            
-        </ScrollViewer>
-
+        </ScrollViewer> 
     </Grid>
     
 </core:WpfUIPlatformWindow>

@@ -8,8 +8,9 @@ namespace RevitSetCoordParams.ViewModels;
 internal class WarningGroupViewModel {
     public IReadOnlyCollection<WarningElement> WarningElements { get; set; }
     public string Caption { get; set; }
+    public string Description { get; set; }
 
-    public ObservableCollection<WarningElementViewModel> Warnings { get; set; }
+    public ObservableCollection<WarningElementViewModel> Warnings => new(GetWarningElementViewModel());
 
     private IEnumerable<WarningElementViewModel> GetWarningElementViewModel() {
         return WarningElements

@@ -42,6 +42,7 @@ internal class WarningsViewModel : BaseViewModel {
             .GroupBy(element => element.WarningType)
             .Select(group => new WarningGroupViewModel {
                 Caption = _localizationService.GetLocalizedString($"WarningsViewModel.{group.Key}"),
+                Description = _localizationService.GetLocalizedString($"WarningsViewModel.{group.Key}Description"),
                 WarningElements = group.ToList()
             })
             .Concat(
@@ -55,6 +56,7 @@ internal class WarningsViewModel : BaseViewModel {
             .GroupBy(g => g.ParamNames)
             .Select(g => new WarningGroupViewModel {
                 Caption = $"{_localizationService.GetLocalizedString("WarningsViewModel.NotFoundParam")}: {g.Key}",
+                Description = _localizationService.GetLocalizedString("WarningsViewModel.NotFoundParamDescription"),
                 WarningElements = g.SelectMany(x => x.WarningElements).ToList()
             }));
     }

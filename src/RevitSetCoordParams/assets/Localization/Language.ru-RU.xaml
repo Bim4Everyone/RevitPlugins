@@ -43,6 +43,12 @@
     <system:String x:Key="MainWindow.CheckedAllCats">Выбрать все категории</system:String>
     <system:String x:Key="MainWindow.NotCheckedAllCats">Сбросить все категории</system:String>
 
+    <system:String x:Key="WarningWindow.Title">Предупреждения</system:String>
+    <system:String x:Key="WarningWindow.IdField">ID элемента</system:String>
+    <system:String x:Key="WarningWindow.FamilyField">Имя семейства</system:String>
+    <system:String x:Key="WarningWindow.TypeField">Имя типоразмера</system:String>
+    <system:String x:Key="WarningWindow.LevelField">Уровень элемента</system:String>    
+
     <system:String x:Key="MainViewModel.BlockParamDescription">Параметр блока СМР</system:String>
     <system:String x:Key="MainViewModel.BlockParamDetailDescription">Используется для определения корпуса здания</system:String>
     <system:String x:Key="MainViewModel.SectionParamDescription">Параметр секции СМР</system:String>
@@ -80,16 +86,17 @@
     
     <system:String x:Key="ParamViewModel.WarningStartString">Ошибочные параметры:</system:String>
 
-    <system:String x:Key="WarningsViewModel.SkipElement">Элементы, заблокированные параметром блокировки</system:String>
+    <system:String x:Key="WarningsViewModel.SkipElement">Пропущенные элементы</system:String>
+    <system:String x:Key="WarningsViewModel.SkipElementDescription">Элементы заблокированы параметром блокировки и пропущены плагином</system:String>
     <system:String x:Key="WarningsViewModel.NotFoundElement">Не обработанные элементы</system:String>
-    <system:String x:Key="WarningsViewModel.NotFoundParam">Элементы, с незаполненными параметрами</system:String>
+    <system:String x:Key="WarningsViewModel.NotFoundElementDescription">Элементы находятся слишком далеко или не могут быть обработаны</system:String>
+    <system:String x:Key="WarningsViewModel.NotFoundParam">Элементы с незаполненными параметрами</system:String>
+    <system:String x:Key="WarningsViewModel.NotFoundParamDescription">Данные параметры не добавлены в категории этих элементов и не были заполнены</system:String>
     
     <system:String x:Key="Common.ParamErrorMessageBody">Ошибка загрузки параметров</system:String>
 
     <system:String x:Key="SetCoordParamsProcessor.TransactionName">Назначение параметров СМР</system:String>
 
-    <system:String x:Key="Common.ConfigErrorMessageTitle">Ошибка настройки плагина</system:String>
-
-    <system:String x:Key="WarningsWindow.Title">Предупреждения</system:String>
+    <system:String x:Key="Common.ConfigErrorMessageTitle">Ошибка настройки плагина</system:String>    
 
 </ResourceDictionary>
