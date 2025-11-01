@@ -64,10 +64,13 @@ namespace RevitCreateViewSheet.ViewModels {
 
             AddViewPortCommand = RelayCommand.Create(AddViewPort);
             RemoveViewPortCommand = RelayCommand.Create<ViewPortViewModel>(RemoveViewPort, CanRemoveViewPort);
+            ReplaceViewPortCommand = RelayCommand.Create<ViewPortViewModel>(ReplaceViewPort, CanRemoveViewPort);
             AddScheduleCommand = RelayCommand.Create(AddSchedule);
             RemoveScheduleCommand = RelayCommand.Create<ScheduleViewModel>(RemoveSchedule, CanRemoveSchedule);
+            ReplaceScheduleCommand = RelayCommand.Create<ScheduleViewModel>(ReplaceSchedule, CanRemoveSchedule);
             AddAnnotationCommand = RelayCommand.Create(AddAnnotation);
             RemoveAnnotationCommand = RelayCommand.Create<AnnotationViewModel>(RemoveAnnotation, CanRemoveAnnotation);
+            ReplaceAnnotationCommand = RelayCommand.Create<AnnotationViewModel>(ReplaceAnnotation, CanRemoveAnnotation);
         }
 
 
@@ -181,22 +184,45 @@ namespace RevitCreateViewSheet.ViewModels {
 
         public ICommand RemoveViewPortCommand { get; }
 
+        public ICommand ReplaceViewPortCommand { get; }
+
         public ICommand AddScheduleCommand { get; }
 
         public ICommand RemoveScheduleCommand { get; }
+
+        public ICommand ReplaceScheduleCommand { get; }
 
         public ICommand AddAnnotationCommand { get; }
 
         public ICommand RemoveAnnotationCommand { get; }
 
+        public ICommand ReplaceAnnotationCommand { get; }
+
 
         private void AddViewPort() {
             try {
-                var viewPort = new ViewPortViewModel(
-                    _sheetItemsFactory.CreateViewPort(_sheetModel), _localizationService);
-                _viewPorts.Add(viewPort);
-                _sheetModel.ViewPorts.Add(viewPort.ViewPortModel);
-                _entitiesTracker.AddAliveViewPort(viewPort.ViewPortModel);
+                SelectedViewPort = CreateViewPort();
+            } catch(OperationCanceledException) {
+                return;
+            }
+        }
+
+        private ViewPortViewModel CreateViewPort() {
+            var viewPort = new ViewPortViewModel(
+                _sheetItemsFactory.CreateViewPort(_sheetModel), _localizationService);
+            _viewPorts.Add(viewPort);
+            _sheetModel.ViewPorts.Add(viewPort.ViewPortModel);
+            _entitiesTracker.AddAliveViewPort(viewPort.ViewPortModel);
+            return viewPort;
+        }
+
+        private void ReplaceViewPort(ViewPortViewModel existingViewPort) {
+            try {
+                SelectedViewPort = CreateViewPort();
+                SelectedViewPort.ViewPortModel.Location = existingViewPort.ViewPortModel.Location;
+                SelectedViewPort.ViewPortType = existingViewPort.ViewPortType;
+
+                RemoveViewPort(existingViewPort);
             } catch(OperationCanceledException) {
                 return;
             }
@@ -204,11 +230,27 @@ namespace RevitCreateViewSheet.ViewModels {
 
         private void AddSchedule() {
             try {
-                var schedule = new ScheduleViewModel(
-                    _sheetItemsFactory.CreateSchedule(_sheetModel), _localizationService);
-                _schedules.Add(schedule);
-                _sheetModel.Schedules.Add(schedule.ScheduleModel);
-                _entitiesTracker.AddAliveSchedule(schedule.ScheduleModel);
+                SelectedSchedule = CreateSchedule();
+            } catch(OperationCanceledException) {
+                return;
+            }
+        }
+
+        private ScheduleViewModel CreateSchedule() {
+            var schedule = new ScheduleViewModel(
+                _sheetItemsFactory.CreateSchedule(_sheetModel), _localizationService);
+            _schedules.Add(schedule);
+            _sheetModel.Schedules.Add(schedule.ScheduleModel);
+            _entitiesTracker.AddAliveSchedule(schedule.ScheduleModel);
+            return schedule;
+        }
+
+        private void ReplaceSchedule(ScheduleViewModel existingSchedule) {
+            try {
+                SelectedSchedule = CreateSchedule();
+                SelectedSchedule.ScheduleModel.Location = existingSchedule.ScheduleModel.Location;
+
+                RemoveSchedule(existingSchedule);
             } catch(OperationCanceledException) {
                 return;
             }
@@ -216,11 +258,27 @@ namespace RevitCreateViewSheet.ViewModels {
 
         private void AddAnnotation() {
             try {
-                var annotation = new AnnotationViewModel(
-                    _sheetItemsFactory.CreateAnnotation(_sheetModel), _localizationService);
-                _annotations.Add(annotation);
-                _sheetModel.Annotations.Add(annotation.AnnotationModel);
-                _entitiesTracker.AddAliveAnnotation(annotation.AnnotationModel);
+                SelectedAnnotation = CreateAnnotation();
+            } catch(OperationCanceledException) {
+                return;
+            }
+        }
+
+        private AnnotationViewModel CreateAnnotation() {
+            var annotation = new AnnotationViewModel(
+                _sheetItemsFactory.CreateAnnotation(_sheetModel), _localizationService);
+            _annotations.Add(annotation);
+            _sheetModel.Annotations.Add(annotation.AnnotationModel);
+            _entitiesTracker.AddAliveAnnotation(annotation.AnnotationModel);
+            return annotation;
+        }
+
+        private void ReplaceAnnotation(AnnotationViewModel existingAnnotation) {
+            try {
+                SelectedAnnotation = CreateAnnotation();
+                SelectedAnnotation.AnnotationModel.Location = existingAnnotation.AnnotationModel.Location;
+
+                RemoveAnnotation(existingAnnotation);
             } catch(OperationCanceledException) {
                 return;
             }
