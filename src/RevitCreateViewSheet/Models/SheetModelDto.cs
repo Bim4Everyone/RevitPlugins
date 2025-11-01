@@ -53,7 +53,7 @@ namespace RevitCreateViewSheet.Models {
                 throw new ArgumentOutOfRangeException(nameof(titleBlocks));
             }
 
-            var symbol = titleBlocks.FirstOrDefault(t => t.Name == Name) ?? titleBlocks.First();
+            var symbol = titleBlocks.FirstOrDefault(t => t.Name == TitleBlockSymbolName) ?? titleBlocks.First();
             return new SheetModel(symbol, entitySaver) {
                 AlbumBlueprint = AlbumBlueprint ?? string.Empty,
                 SheetCustomNumber = SheetCustomNumber ?? string.Empty,
