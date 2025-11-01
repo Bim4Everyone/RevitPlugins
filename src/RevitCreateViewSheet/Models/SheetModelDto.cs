@@ -38,7 +38,7 @@ namespace RevitCreateViewSheet.Models {
 
         public bool IsBookOrientation { get; set; }
 
-        public SheetFormat SheetFormat { get; set; }
+        public SheetFormat SheetFormat { get; set; } = new SheetFormat();
 
         public SheetModel CreateSheetModel(ICollection<FamilySymbol> titleBlocks, NewEntitySaver entitySaver) {
             if(titleBlocks is null) {
