@@ -16,6 +16,8 @@ namespace RevitCreateViewSheet.Models {
             SheetNumber = sheetModel.SheetNumber;
             Name = sheetModel.Name;
             TitleBlockSymbolName = sheetModel.TitleBlockSymbol?.Name;
+            IsBookOrientation = sheetModel.IsBookOrientation;
+            SheetFormat = sheetModel.SheetFormat;
         }
 
         [JsonConstructor]
@@ -34,6 +36,10 @@ namespace RevitCreateViewSheet.Models {
 
         public string TitleBlockSymbolName { get; set; }
 
+        public bool IsBookOrientation { get; set; }
+
+        public SheetFormat SheetFormat { get; set; } = new SheetFormat();
+
         public SheetModel CreateSheetModel(ICollection<FamilySymbol> titleBlocks, NewEntitySaver entitySaver) {
             if(titleBlocks is null) {
                 throw new ArgumentNullException(nameof(titleBlocks));
@@ -47,12 +53,14 @@ namespace RevitCreateViewSheet.Models {
                 throw new ArgumentOutOfRangeException(nameof(titleBlocks));
             }
 
-            var symbol = titleBlocks.FirstOrDefault(t => t.Name == Name) ?? titleBlocks.First();
+            var symbol = titleBlocks.FirstOrDefault(t => t.Name == TitleBlockSymbolName) ?? titleBlocks.First();
             return new SheetModel(symbol, entitySaver) {
                 AlbumBlueprint = AlbumBlueprint ?? string.Empty,
                 SheetCustomNumber = SheetCustomNumber ?? string.Empty,
                 SheetNumber = SheetNumber ?? string.Empty,
-                Name = Name ?? string.Empty
+                Name = Name ?? string.Empty,
+                IsBookOrientation = IsBookOrientation,
+                SheetFormat = SheetFormat
             };
         }
     }

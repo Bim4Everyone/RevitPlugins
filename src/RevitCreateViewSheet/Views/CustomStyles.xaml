@@ -34,16 +34,10 @@
             Value="{DynamicResource CustomDataGridColumnHeaderStyle}" />
         <Setter
             Property="RowStyle"
-            Value="{DynamicResource CustomDataGridRowStyle}" />
+            Value="{StaticResource DefaultDataGridRowStyle}" />
         <Setter
             Property="AutoGenerateColumns"
             Value="False" />
-        <Setter
-            Property="VirtualizingPanel.VirtualizationMode"
-            Value="Recycling" />
-        <Setter
-            Property="VirtualizingPanel.IsVirtualizing"
-            Value="True" />
         <Setter
             Property="VerticalScrollBarVisibility"
             Value="Auto" />
@@ -56,14 +50,6 @@
         <Setter
             Property="CanUserResizeColumns"
             Value="True" />
-    </Style>
-    <Style
-        x:Key="CustomDataGridRowStyle"
-        TargetType="{x:Type DataGridRow}"
-        BasedOn="{StaticResource DefaultDataGridRowStyle}">
-        <Setter
-            Property="Margin"
-            Value="0 5" />
     </Style>
     <Style
         x:Key="CustomColumnHeaderGripperStyle"
@@ -289,7 +275,7 @@
             Value="Center" />
         <Setter
             Property="Margin"
-            Value="0 0 0 7" />
+            Value="0 0 0 8" />
         <Setter
             Property="Focusable"
             Value="False" />
@@ -310,7 +296,7 @@
             Value="16" />
         <Setter
             Property="Margin"
-            Value="0 0 0 10" />
+            Value="0 0 0 8" />
     </Style>
 
     <Style
@@ -325,7 +311,7 @@
             Value="40" />
         <Setter
             Property="Height"
-            Value="40" />
+            Value="Auto" />
         <Setter
             Property="VerticalAlignment"
             Value="Center" />
@@ -346,7 +332,7 @@
             Value="80" />
         <Setter
             Property="Height"
-            Value="40" />
+            Value="Auto" />
         <Setter
             Property="VerticalAlignment"
             Value="Center" />
@@ -370,13 +356,7 @@
             Value="False" />
         <Setter
             Property="Height"
-            Value="40" />
-        <Setter
-            Property="MinHeight"
-            Value="40" />
-        <Setter
-            Property="MaxHeight"
-            Value="40" />
+            Value="Auto" />
         <Setter
             Property="ScrollViewer.VerticalScrollBarVisibility"
             Value="Visible" />
@@ -410,7 +390,7 @@
         x:Key="CustomBorder">
         <Setter
             Property="Padding"
-            Value="20" />
+            Value="14 8" />
         <Setter
             Property="VerticalAlignment"
             Value="Stretch" />
