@@ -1,0 +1,45 @@
+﻿<core:WpfUIPlatformUserControl
+    x:Class="RevitCreateViewSheet.Views.OrientationTemplate"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:local="clr-namespace:RevitCreateViewSheet.Views"
+    xmlns:wpfConverters="clr-namespace:dosymep.WpfCore.Converters;assembly=dosymep.WpfCore"
+    xmlns:sys="clr-namespace:System;assembly=mscorlib"
+    xmlns:core="clr-namespace:dosymep.WpfUI.Core"
+    xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
+    xmlns:vms="clr-namespace:RevitCreateViewSheet.ViewModels"
+    mc:Ignorable="d"
+    d:DesignHeight="450"
+    d:DesignWidth="800"
+    d:DataContext="{d:DesignInstance vms:OrientationViewModel, IsDesignTimeCreatable=False}">
+    <core:WpfUIPlatformUserControl.Resources>
+        <ui:SymbolRegular
+            x:Key="Book">Document20</ui:SymbolRegular>
+        <ui:SymbolRegular
+            x:Key="Album">DocumentLandscape20</ui:SymbolRegular>
+        <sys:Boolean
+            x:Key="True">True</sys:Boolean>
+        <sys:Boolean
+            x:Key="False">False</sys:Boolean>
+        <wpfConverters:ObjectToObjectConverter
+            x:Key="BoolToOrientationImgConverter">
+            <wpfConverters:ObjectToObjectConverter.CoupleItems>
+                <wpfConverters:CoupleItem
+                    Source="{StaticResource True}"
+                    Target="{StaticResource Book}" />
+                <wpfConverters:CoupleItem
+                    Source="{StaticResource False}"
+                    Target="{StaticResource Album}" />
+            </wpfConverters:ObjectToObjectConverter.CoupleItems>
+        </wpfConverters:ObjectToObjectConverter>
+    </core:WpfUIPlatformUserControl.Resources>
+    <DockPanel>
+        <ui:SymbolIcon
+            Margin="0 0 4 0"
+            Symbol="{Binding IsBookOrientation, Converter={StaticResource BoolToOrientationImgConverter}}" />
+        <ui:TextBlock
+            Text="{Binding Name}" />
+    </DockPanel>
+</core:WpfUIPlatformUserControl>

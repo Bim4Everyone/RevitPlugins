@@ -183,7 +183,7 @@ namespace RevitCreateViewSheet.Models {
                 .ToDictionary(g => g.Key, g => g.ToArray());
             var titleblocks = GetTitleBlockInstances()
                 .GroupBy(a => a.GetParamValueOrDefault(BuiltInParameter.SHEET_NUMBER, string.Empty))
-                .ToDictionary(g => g.Key, g => g.FirstOrDefault()?.Symbol);
+                .ToDictionary(g => g.Key, g => g.FirstOrDefault());
 
             return viewSheets.Select(sheet => new SheetModel(sheet,
                 viewports.TryGetValue(sheet.Id, out Viewport[] viewportsArr)
@@ -193,7 +193,7 @@ namespace RevitCreateViewSheet.Models {
                 annotations.TryGetValue(sheet.Id, out AnnotationSymbol[] annotationsArr)
                     ? annotationsArr : [],
                 _entitySaverProvider.GetExistsEntitySaver(),
-                titleblocks.TryGetValue(sheet.SheetNumber, out FamilySymbol titleBlock)
+                titleblocks.TryGetValue(sheet.SheetNumber, out FamilyInstance titleBlock)
                     ? titleBlock : default))
                 .ToArray();
         }
@@ -266,31 +266,55 @@ namespace RevitCreateViewSheet.Models {
                     _localizationService.GetLocalizedString("Errors.CannotCreateSheet"));
             }
             sheetModel.TrySetNewViewSheet(sheet);
-            return UpdateViewSheet(sheetModel, false);
+            var titleId = sheet.GetDependentElements(new ElementCategoryFilter(BuiltInCategory.OST_TitleBlocks))
+                .FirstOrDefault();
+            if(titleId.IsNotNull()) {
+                UpdateTitleBlockParams((FamilyInstance) Document.GetElement(titleId), sheetModel);
+            }
+            return UpdateViewSheet(sheet, sheetModel);
         }
 
-        internal ViewSheet UpdateViewSheet(SheetModel sheetModel) {
-            return UpdateViewSheet(sheetModel, true);
-        }
-
-        private ViewSheet UpdateViewSheet(SheetModel sheetModel, bool updateTitleBlock) {
+        internal ViewSheet UpdateSheet(SheetModel sheetModel) {
             if(!sheetModel.TryGetViewSheet(out var sheet)) {
                 throw new InvalidOperationException(
                     _localizationService.GetLocalizedString("Errors.CannotUpdateNotCreatetSheet"));
             }
-            if(updateTitleBlock
+            var titleBlock = UpdateTitleBlockSymbol(sheet, sheetModel);
+            UpdateTitleBlockParams(titleBlock, sheetModel);
+            return UpdateViewSheet(sheet, sheetModel);
+        }
+
+        private FamilyInstance UpdateTitleBlockSymbol(ViewSheet sheet, SheetModel sheetModel) {
+            // у листа может не быть основной надписи
+            if(sheetModel.InitialTitleBlock is not null
                 && sheetModel.TitleBlockSymbol is not null
                 && sheetModel.InitialTitleBlockSymbol?.Id != sheetModel.TitleBlockSymbol?.Id) {
 
-                var titleId = sheet.GetDependentElements(new ElementCategoryFilter(BuiltInCategory.OST_TitleBlocks))
-                    .FirstOrDefault();
-                var symbol = Document.GetElement(sheetModel.TitleBlockSymbol.Id) as FamilySymbol;
-                if(titleId.IsNotNull()) {
-                    (Document.GetElement(titleId) as FamilyInstance).Symbol = symbol;
+                var title = sheetModel.InitialTitleBlock;
+                if(title is not null) {
+                    title.Symbol = sheetModel.TitleBlockSymbol;
                 } else {
-                    Document.Create.NewFamilyInstance(sheet.Origin, symbol, sheet);
+                    return Document.Create.NewFamilyInstance(sheet.Origin, sheetModel.TitleBlockSymbol, sheet);
                 }
             }
+            return sheetModel.InitialTitleBlock;
+        }
+
+        private void UpdateTitleBlockParams(FamilyInstance titleBlock, SheetModel sheetModel) {
+            // у листа может не быть основной надписи
+            if(titleBlock is not null) {
+                if(titleBlock.IsExistsParam(SheetModel.SheetFormatSizeParam)
+                    && titleBlock.IsExistsParam(SheetModel.SheetFormatMultiplyParam)) {
+                    titleBlock.SetParamValue(SheetModel.SheetFormatSizeParam, sheetModel.SheetFormat.SizeIndex);
+                    titleBlock.SetParamValue(SheetModel.SheetFormatMultiplyParam, sheetModel.SheetFormat.MultiplyIndex);
+                }
+                if(titleBlock.IsExistsParam(SheetModel.SheetFormatIsBookParam)) {
+                    titleBlock.SetParamValue(SheetModel.SheetFormatIsBookParam, sheetModel.IsBookOrientation ? 1 : 0);
+                }
+            }
+        }
+
+        private ViewSheet UpdateViewSheet(ViewSheet sheet, SheetModel sheetModel) {
             if(sheetModel.InitialSheetCustomNumber != sheetModel.SheetCustomNumber) {
                 sheet.SetParamValue(SharedParamsConfig.Instance.StampSheetNumber, sheetModel.SheetCustomNumber);
             }

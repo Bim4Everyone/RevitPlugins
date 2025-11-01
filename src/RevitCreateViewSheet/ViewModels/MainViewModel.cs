@@ -36,6 +36,8 @@ namespace RevitCreateViewSheet.ViewModels {
         private readonly SheetItemsFactory _sheetItemsFactory;
         private readonly LogicalStringComparer _comparer = new();
         private TitleBlockViewModel _addSheetsTitleBlock;
+        private SheetFormatViewModel _addSheetsFormat;
+        private OrientationViewModel _addSheetsOrientation;
         private string _errorText;
         private string _addSheetsErrorText;
         private string _addSheetsCount = "1";
@@ -88,6 +90,9 @@ namespace RevitCreateViewSheet.ViewModels {
             AllViewPortTypes = [.. _revitRepository.GetViewPortTypes()
                 .Select(v => new ViewPortTypeViewModel(v))
                 .OrderBy(item => item.Name, _comparer)];
+            AllSheetFormats = SheetFormatViewModel.GetStandardSheetFormats();
+            Orientations = [new OrientationViewModel(_localizationService, false),
+                new OrientationViewModel(_localizationService, true)];
 
             NumerationColumns = [
                 _localizationService.GetLocalizedString("MainWindow.AllSheets.CustomNumber"),
@@ -133,6 +138,16 @@ namespace RevitCreateViewSheet.ViewModels {
         public string AddSheetsErrorText {
             get => _addSheetsErrorText;
             set => RaiseAndSetIfChanged(ref _addSheetsErrorText, value);
+        }
+
+        public SheetFormatViewModel AddSheetsFormat {
+            get => _addSheetsFormat;
+            set => RaiseAndSetIfChanged(ref _addSheetsFormat, value);
+        }
+
+        public OrientationViewModel AddSheetsOrientation {
+            get => _addSheetsOrientation;
+            set => RaiseAndSetIfChanged(ref _addSheetsOrientation, value);
         }
 
         public string AddSheetsCount {
@@ -217,6 +232,10 @@ namespace RevitCreateViewSheet.ViewModels {
 
         public IReadOnlyCollection<ViewPortTypeViewModel> AllViewPortTypes { get; }
 
+        public IReadOnlyCollection<SheetFormatViewModel> AllSheetFormats { get; }
+
+        public IReadOnlyCollection<OrientationViewModel> Orientations { get; }
+
 
         private void LoadView() {
             var sheets = _revitRepository.GetSheetModels()
@@ -256,6 +275,8 @@ namespace RevitCreateViewSheet.ViewModels {
             int lastIndex = indexes.Length > 0 ? indexes.Max(c => c.Number) : 0;
             var titleBlock = AddSheetsTitleBlock;
             var albumBlueprint = AddSheetsAlbumBlueprint;
+            var format = AddSheetsFormat;
+            var orientation = AddSheetsOrientation;
             foreach(int index in Enumerable.Range(0, int.Parse(AddSheetsCount))) {
                 ++lastIndex;
                 var sheetModel = new SheetModel(titleBlock.TitleBlockSymbol, _entitySaverProvider.GetNewEntitySaver());
@@ -263,7 +284,9 @@ namespace RevitCreateViewSheet.ViewModels {
                     sheetModel, _entitiesTracker, _sheetItemsFactory, _localizationService) {
                     AlbumBlueprint = albumBlueprint,
                     SheetCustomNumber = lastIndex.ToString(),
-                    Name = $"{_localizationService.GetLocalizedString("NewSheetTitle")} {lastIndex}"
+                    Name = $"{_localizationService.GetLocalizedString("NewSheetTitle")} {lastIndex}",
+                    SheetFormat = format,
+                    Orientation = orientation,
                 };
                 _sheets.Add(sheetViewModel);
             }
@@ -483,8 +506,10 @@ namespace RevitCreateViewSheet.ViewModels {
             }
             if(prop.Name == nameof(SheetViewModel.AlbumBlueprint)
                 || prop.Name == nameof(SheetViewModel.Name)
-                || prop.Name == nameof(SheetViewModel.TitleBlock)) {
-                // мультиредактирование только для названия, альбома и основной надписи
+                || prop.Name == nameof(SheetViewModel.TitleBlock)
+                || prop.Name == nameof(SheetViewModel.SheetFormat)
+                || prop.Name == nameof(SheetViewModel.Orientation)) {
+                // мультиредактирование только для названия, альбома, основной надписи, формата и ориентации
                 var newValue = prop.GetValue(SelectedSheet);
 
                 SheetViewModel[] sheets = [.. SelectedSheets];

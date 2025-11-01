@@ -9,7 +9,6 @@ namespace RevitCreateViewSheet.Services {
         private readonly RevitRepository _revitRepository;
         private readonly ILocalizationService _localizationService;
 
-        // TOTO localization
         public ExistsEntitySaver(RevitRepository revitRepository, ILocalizationService localizationService) {
             _revitRepository = revitRepository
                 ?? throw new ArgumentNullException(nameof(revitRepository));
@@ -22,7 +21,7 @@ namespace RevitCreateViewSheet.Services {
             if(!sheetModel.TryGetViewSheet(out _)) {
                 throw new InvalidOperationException();
             }
-            _revitRepository.UpdateViewSheet(sheetModel);
+            _revitRepository.UpdateSheet(sheetModel);
         }
 
         public void Save(ViewPortModel viewPortModel) {

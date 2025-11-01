@@ -13,6 +13,8 @@
     xmlns:res="clr-namespace:RevitCreateViewSheet.Resources"
     xmlns:local="clr-namespace:RevitCreateViewSheet.Views"
     xmlns:converters="clr-namespace:dosymep.WPF.Converters"
+    xmlns:wpfConverters="clr-namespace:dosymep.WpfCore.Converters;assembly=dosymep.WpfCore"
+    xmlns:sys="clr-namespace:System;assembly=mscorlib"
     mc:Ignorable="d"
     WindowStartupLocation="CenterOwner"
     Height="550"
@@ -51,6 +53,12 @@
                 x:Key="SheetStatusHeader"
                 Text="{me:LocalizationSource MainWindow.AllSheets.Status}" />
             <ui:TextBlock
+                x:Key="SheetFormatHeader"
+                Text="{me:LocalizationSource MainWindow.SheetFormat}" />
+            <ui:TextBlock
+                x:Key="SheetOrientationHeader"
+                Text="{me:LocalizationSource MainWindow.SheetOrientation}" />
+            <ui:TextBlock
                 x:Key="DeleteSheetTooltip"
                 Text="{me:LocalizationSource MainWindow.AllSheets.DeleteSheetsButtonTooltip}" />
         </ResourceDictionary>
@@ -78,9 +86,6 @@
     </b:Interaction.Triggers>
     <Grid
         Margin="10 10 10 0">
-        <Grid.Resources>
-
-        </Grid.Resources>
         <Grid.ColumnDefinitions>
             <ColumnDefinition />
         </Grid.ColumnDefinitions>
@@ -149,9 +154,13 @@
                                     x:Name="_sheetsCreation">
                                     <Grid.ColumnDefinitions>
                                         <ColumnDefinition
-                                            Width="250" />
+                                            Width="100" />
                                         <ColumnDefinition
                                             Width="250" />
+                                        <ColumnDefinition
+                                            Width="80" />
+                                        <ColumnDefinition
+                                            Width="165" />
                                         <ColumnDefinition
                                             Width="80" />
                                         <ColumnDefinition
@@ -180,49 +189,84 @@
                                         x:Name="_sheetsCreationAlbum"
                                         Style="{StaticResource CustomEditableComboBox}"
                                         ItemsSource="{Binding AllAlbumsBlueprints, UpdateSourceTrigger=PropertyChanged}"
+                                        ToolTip="{Binding AddSheetsAlbumBlueprint}"
                                         Text="{Binding AddSheetsAlbumBlueprint, UpdateSourceTrigger=PropertyChanged}" />
 
-                                    <DockPanel
-                                        Margin="20 0"
-                                        Grid.Column="1">
-                                        <Label
-                                            Style="{StaticResource CustomLabel}"
-                                            Target="{Binding ElementName=_sheetsCreationTitleBlock}"
-                                            Content="{me:LocalizationSource MainWindow.AddSheets.TitleBlock}" />
-                                    </DockPanel>
+                                    <Label
+                                        Margin="10 0"
+                                        Grid.Column="1"
+                                        Style="{StaticResource CustomLabel}"
+                                        Target="{Binding ElementName=_sheetsCreationTitleBlock}"
+                                        Content="{me:LocalizationSource MainWindow.AddSheets.TitleBlock}" />
                                     <ComboBox
                                         x:Name="_sheetsCreationTitleBlock"
                                         Grid.Row="1"
                                         Grid.Column="1"
-                                        Margin="20 0"
+                                        Margin="10 0"
                                         DisplayMemberPath="Name"
                                         Style="{StaticResource CustomComboBox}"
+                                        ToolTip="{Binding AddSheetsTitleBlock.Name}"
                                         ItemsSource="{Binding AllTitleBlocks, UpdateSourceTrigger=PropertyChanged}"
                                         SelectedItem="{Binding AddSheetsTitleBlock, UpdateSourceTrigger=PropertyChanged}" />
 
                                     <Label
+                                        Grid.Row="0"
                                         Grid.Column="2"
+                                        Style="{StaticResource CustomLabel}"
+                                        Content="{me:LocalizationSource MainWindow.SheetFormat}" />
+                                    <ComboBox
+                                        Grid.Row="1"
+                                        Grid.Column="2"
+                                        Style="{StaticResource CustomComboBox}"
+                                        ToolTip="{Binding AddSheetsFormat}"
+                                        SelectedItem="{Binding AddSheetsFormat, UpdateSourceTrigger=PropertyChanged}"
+                                        ItemsSource="{Binding AllSheetFormats}" />
+
+                                    <Label
+                                        Grid.Row="0"
+                                        Grid.Column="3"
+                                        Margin="10 0"
+                                        Style="{StaticResource CustomLabel}"
+                                        Content="{me:LocalizationSource MainWindow.SheetOrientation}" />
+                                    <ComboBox
+                                        Grid.Row="1"
+                                        Grid.Column="3"
+                                        Margin="10 0"
+                                        Style="{StaticResource CustomComboBox}"
+                                        ToolTip="{Binding AddSheetsOrientation.Name}"
+                                        SelectedItem="{Binding AddSheetsOrientation, UpdateSourceTrigger=PropertyChanged}"
+                                        ItemsSource="{Binding Orientations}">
+                                        <ComboBox.ItemTemplate>
+                                            <DataTemplate>
+                                                <local:OrientationTemplate
+                                                    DataContext="{Binding}" />
+                                            </DataTemplate>
+                                        </ComboBox.ItemTemplate>
+                                    </ComboBox>
+
+                                    <Label
+                                        Grid.Column="4"
                                         Grid.ColumnSpan="2"
                                         Style="{StaticResource CustomLabel}"
                                         Target="{Binding ElementName=_sheetsCreationCount}"
                                         Content="{me:LocalizationSource MainWindow.AddSheets.Count}" />
                                     <ui:TextBox
-                                        Grid.Column="2"
+                                        Grid.Column="4"
                                         Grid.Row="1"
                                         Height="40"
                                         x:Name="_sheetsCreationCount"
                                         Text="{Binding AddSheetsCount, UpdateSourceTrigger=PropertyChanged}" />
 
                                     <ui:Button
-                                        Grid.Column="3"
+                                        Grid.Column="5"
                                         Grid.Row="1"
-                                        Margin="20 0"
+                                        Margin="10 0"
                                         Style="{StaticResource CustomContentButton}"
                                         Content="{me:LocalizationSource MainWindow.AddSheets.CreateButton}"
                                         Command="{Binding AddSheetsCommand}" />
 
                                     <ui:Button
-                                        Grid.Column="4"
+                                        Grid.Column="6"
                                         Grid.Row="1"
                                         Style="{StaticResource CustomSymbolButton}"
                                         ToolTip="{me:LocalizationSource MainWindow.AddSheets.LoadSheetsButtonTooltip}"
@@ -230,9 +274,9 @@
                                         Command="{Binding LoadSheetsCommand}" />
 
                                     <ui:Button
-                                        Grid.Column="5"
+                                        Grid.Column="7"
                                         Grid.Row="1"
-                                        Margin="20 0 0 0"
+                                        Margin="10 0 0 0"
                                         Style="{StaticResource CustomSymbolButton}"
                                         ToolTip="{me:LocalizationSource MainWindow.AddSheets.SaveSheetsButtonTooltip}"
                                         Content="{ui:SymbolIcon ArrowUpload24}"
@@ -402,7 +446,6 @@
                                     <DataGridTemplateColumn.CellTemplate>
                                         <DataTemplate>
                                             <ui:TextBox
-                                                Margin="10 0"
                                                 ToolTip="{Binding AlbumBlueprint}"
                                                 Text="{Binding AlbumBlueprint, UpdateSourceTrigger=PropertyChanged}" />
                                         </DataTemplate>
@@ -453,6 +496,40 @@
                                     </DataGridTemplateColumn.CellTemplate>
                                 </DataGridTemplateColumn>
                                 <DataGridTemplateColumn
+                                    Width="Auto"
+                                    MinWidth="50"
+                                    SortMemberPath="SheetFormat"
+                                    Header="{StaticResource SheetFormatHeader}">
+                                    <DataGridTemplateColumn.CellTemplate>
+                                        <DataTemplate>
+                                            <ComboBox
+                                                SelectedItem="{Binding SheetFormat, UpdateSourceTrigger=PropertyChanged}"
+                                                ItemsSource="{Binding Path=DataContext.AllSheetFormats, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Window}}" />
+                                        </DataTemplate>
+                                    </DataGridTemplateColumn.CellTemplate>
+                                </DataGridTemplateColumn>
+                                <DataGridTemplateColumn
+                                    Width="Auto"
+                                    MinWidth="50"
+                                    SortMemberPath="Orientation.IsBookOrientation"
+                                    Header="{StaticResource SheetOrientationHeader}">
+                                    <DataGridTemplateColumn.CellTemplate>
+                                        <DataTemplate>
+                                            <ComboBox
+                                                Margin="10 0"
+                                                SelectedItem="{Binding Orientation, UpdateSourceTrigger=PropertyChanged}"
+                                                ItemsSource="{Binding Path=DataContext.Orientations, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Window}}">
+                                                <ComboBox.ItemTemplate>
+                                                    <DataTemplate>
+                                                        <local:OrientationTemplate
+                                                            DataContext="{Binding}" />
+                                                    </DataTemplate>
+                                                </ComboBox.ItemTemplate>
+                                            </ComboBox>
+                                        </DataTemplate>
+                                    </DataGridTemplateColumn.CellTemplate>
+                                </DataGridTemplateColumn>
+                                <DataGridTemplateColumn
                                     Width="350"
                                     MinWidth="100"
                                     SortMemberPath="TitleBlock.Name"
@@ -462,8 +539,8 @@
                                             <ComboBox
                                                 Grid.Row="1"
                                                 Grid.Column="1"
-                                                Margin="10 0 0 0"
                                                 DisplayMemberPath="Name"
+                                                Margin="0 0 10 0"
                                                 ToolTip="{Binding TitleBlock.Name}"
                                                 Style="{StaticResource CustomComboBox}"
                                                 ItemsSource="{Binding Path=DataContext.AllTitleBlocks, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Window}}"
@@ -483,6 +560,7 @@
                                     <DataGridTemplateColumn.CellTemplate>
                                         <DataTemplate>
                                             <ui:Button
+                                                Margin="10 0 0 0"
                                                 Appearance="Danger"
                                                 Style="{StaticResource CustomSymbolButton}"
                                                 ToolTip="{StaticResource DeleteSheetTooltip}"
