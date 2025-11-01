@@ -36,6 +36,8 @@
             EventName="Closing">
             <b:InvokeCommandAction
                 Command="{Binding OpenClashDetectorCommand}" />
+            <b:InvokeCommandAction
+                Command="{Binding AskForSaveCommand}" />
         </b:EventTrigger>
     </b:Interaction.Triggers>
     <b:Interaction.Behaviors>
