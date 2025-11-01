@@ -31,6 +31,8 @@
     <system:String
         x:Key="SettingsWindow.Validation.LongParam">Too long name {0}</system:String>
     <system:String
+        x:Key="SettingsWindow.Validation.DuplicatedParam">Duplicated parameters: {0}</system:String>
+    <system:String
         x:Key="SettingsWindow.MainElementVisibilitySettings">Visibility settings of the first clash element</system:String>
     <system:String
         x:Key="SettingsWindow.SecondElementVisibilitySettings">Visibility settings of the second clash element</system:String>

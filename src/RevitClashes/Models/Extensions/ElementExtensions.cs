@@ -24,6 +24,12 @@ internal static class ElementExtensions {
         if(value is ElementId id) {
             value = id.IsNotNull() ? element.Document.GetElement(id).Name : string.Empty;
         }
+        if(value is int worksetId
+            && element.Document.IsWorkshared
+            && element.IsExistsParam(BuiltInParameter.ELEM_PARTITION_PARAM)
+            && element.GetParam(BuiltInParameter.ELEM_PARTITION_PARAM).Definition.Name == paramName) {
+            value = element.Document.GetWorksetTable().GetWorkset(new WorksetId(worksetId))?.Name ?? string.Empty;
+        }
         return value;
     }
 
