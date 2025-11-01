@@ -42,10 +42,18 @@ namespace RevitCreateViewSheet.Services {
             if(window.ShowDialog() ?? false) {
                 var creatorView = (ScheduleModelCreatorViewModel) window.DataContext;
                 var selectedSchedule = creatorView.SelectedViewSchedule;
+#if REVIT_2022_OR_GREATER
+                return new ScheduleModel(
+                    sheetModel,
+                    selectedSchedule.ViewSchedule,
+                    _entitySaverProvider.GetNewEntitySaver(),
+                    selectedSchedule.SegmentIndex);
+#else
                 return new ScheduleModel(
                     sheetModel,
                     selectedSchedule.ViewSchedule,
                     _entitySaverProvider.GetNewEntitySaver());
+#endif
             }
             throw new OperationCanceledException();
         }

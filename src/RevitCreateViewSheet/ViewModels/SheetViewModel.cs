@@ -53,9 +53,12 @@ namespace RevitCreateViewSheet.ViewModels {
             IsPlacedStatus = localizationService.GetLocalizedString(
                 sheetModel.Exists ? "EntityState.Exist" : "EntityState.New");
 
-            _viewPorts = [.. _sheetModel.ViewPorts.Select(v => new ViewPortViewModel(v, localizationService))];
-            _schedules = [.. _sheetModel.Schedules.Select(s => new ScheduleViewModel(s, localizationService))];
-            _annotations = [.. _sheetModel.Annotations.Select(a => new AnnotationViewModel(a, localizationService))];
+            _viewPorts = [.. _sheetModel.ViewPorts.Select(v => new ViewPortViewModel(v, localizationService))
+                .OrderBy(v => v.ViewName)];
+            _schedules = [.. _sheetModel.Schedules.Select(s => new ScheduleViewModel(s, localizationService))
+                .OrderBy(s => s.Name)];
+            _annotations = [.. _sheetModel.Annotations.Select(a => new AnnotationViewModel(a, localizationService))
+                .OrderBy(a => a.SymbolName)];
             InitializeTrackedEntities();
 
             ViewPorts = new ReadOnlyObservableCollection<ViewPortViewModel>(_viewPorts);

@@ -224,6 +224,16 @@ namespace RevitCreateViewSheet.Models {
                 .ToArray();
         }
 
+#if REVIT_2022_OR_GREATER
+        internal ScheduleSheetInstance CreateSchedule(ElementId viewSheetId, ElementId scheduleViewId, XYZ point, int segmentIndex) {
+            var scheduleInstance = ScheduleSheetInstance.Create(Document, viewSheetId, scheduleViewId, point, segmentIndex);
+            if(scheduleInstance is null) {
+                throw new InvalidOperationException(
+                    _localizationService.GetLocalizedString("Errors.CannotCreateSchedule"));
+            }
+            return scheduleInstance;
+        }
+#else
         internal ScheduleSheetInstance CreateSchedule(ElementId viewSheetId, ElementId scheduleViewId, XYZ point) {
             var scheduleInstance = ScheduleSheetInstance.Create(Document, viewSheetId, scheduleViewId, point);
             if(scheduleInstance is null) {
@@ -232,6 +242,7 @@ namespace RevitCreateViewSheet.Models {
             }
             return scheduleInstance;
         }
+#endif
 
         internal Viewport CreateViewPort(ViewPortModel viewPortModel) {
             if(!viewPortModel.Sheet.TryGetViewSheet(out var sheet)) {

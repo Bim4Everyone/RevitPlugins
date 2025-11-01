@@ -24,8 +24,35 @@ namespace RevitCreateViewSheet.Models {
             Location = scheduleInstance.Point;
             Name = scheduleInstance.Name;
             Exists = true;
+#if REVIT_2022_OR_GREATER
+            SegmentIndex = scheduleInstance.SegmentIndex;
+#endif
         }
 
+#if REVIT_2022_OR_GREATER
+        /// <summary>
+        /// Создает модель новой спецификации на листе
+        /// </summary>
+        /// <param name="sheet">Модель листа</param>
+        /// <param name="schedule">Спецификация</param>
+        /// <param name="entitySaver">Сервис для сохранения новых элементов</param>
+        /// <param name="segmentIndex">Индекс сегмента спецификации</param>
+        /// <exception cref="ArgumentNullException">Исключение, если обязательный параметр null</exception>
+        public ScheduleModel(SheetModel sheet, ViewSchedule schedule, NewEntitySaver entitySaver, int segmentIndex = -1) {
+            Sheet = sheet ?? throw new ArgumentNullException(nameof(sheet));
+            ViewSchedule = schedule ?? throw new ArgumentNullException(nameof(schedule));
+            Saver = entitySaver ?? throw new ArgumentNullException(nameof(entitySaver));
+            int count = ViewSchedule.GetSegmentCount();
+            if(segmentIndex >= count) {
+                throw new ArgumentException(nameof(segmentIndex));
+            }
+            SegmentIndex = segmentIndex;
+            Name = SegmentIndex > -1
+                ? ViewSchedule.Name + $" {SegmentIndex + 1}/{count}"
+                : ViewSchedule.Name;
+            Exists = false;
+        }
+#else
         /// <summary>
         /// Создает модель новой спецификации на листе
         /// </summary>
@@ -39,6 +66,7 @@ namespace RevitCreateViewSheet.Models {
             Name = schedule.Name;
             Exists = false;
         }
+#endif
 
 
         public bool Exists { get; }
@@ -50,6 +78,10 @@ namespace RevitCreateViewSheet.Models {
         public ViewSchedule ViewSchedule { get; }
 
         public string Name { get; }
+
+#if REVIT_2022_OR_GREATER
+        public int SegmentIndex { get; }
+#endif
 
         public IEntitySaver Saver { get; }
 
@@ -68,9 +100,11 @@ namespace RevitCreateViewSheet.Models {
         }
 
         public bool Equals(ScheduleModel other) {
-            return other is not null
-                && Sheet.Equals(other.Sheet)
-                && (_scheduleInstance?.Id == other._scheduleInstance?.Id);
+            if(other is null) { return false; }
+            if(ReferenceEquals(this, other)) { return true; }
+            return Sheet.Equals(other.Sheet)
+                && (_scheduleInstance?.Id == other._scheduleInstance?.Id)
+                && Name == other.Name;
         }
 
         public override bool Equals(object obj) {
@@ -81,6 +115,7 @@ namespace RevitCreateViewSheet.Models {
             int hashCode = -43849488;
             hashCode = hashCode * -1521134295 + EqualityComparer<ElementId>.Default.GetHashCode(_scheduleInstance?.Id);
             hashCode = hashCode * -1521134295 + EqualityComparer<SheetModel>.Default.GetHashCode(Sheet);
+            hashCode = hashCode * -1521134295 + EqualityComparer<string>.Default.GetHashCode(Name);
             return hashCode;
         }
     }
