@@ -1,0 +1,174 @@
+﻿<ResourceDictionary
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:system="clr-namespace:System;assembly=mscorlib">
+
+    <system:String x:Key="Window.ButtonOk">Ок</system:String>
+    <system:String x:Key="Window.ButtonCancel">Отмена</system:String>
+
+    <system:String x:Key="CreatingARDocsV.Title">Создание документации ПСО и ДДУ</system:String>
+
+    <system:String x:Key="CreatingARDocsV.Number">№</system:String>
+    <system:String x:Key="CreatingARDocsV.StartLevel">Начальный уровень</system:String>
+    <system:String x:Key="CreatingARDocsV.EndLevel">Конечный уровень</system:String>
+    <system:String x:Key="CreatingARDocsV.ViewScope">Область видимости</system:String>
+    <system:String x:Key="CreatingARDocsV.ViewNameSuffix">Суффикс видов</system:String>
+    <system:String x:Key="CreatingARDocsV.SpecificationsSelection">Выбор спецификаций</system:String>
+    <system:String x:Key="CreatingARDocsV.SpecificationsSelected">Выбрано спецификаций</system:String>
+    
+    <system:String x:Key="CreatingARDocsV.AddLine">Добавить строку</system:String>
+    <system:String x:Key="CreatingARDocsV.DeleteLine">Удалить строку</system:String>
+
+    <system:String x:Key="CreatingARDocsV.SelectTitleBlock">Выберите рамку листа:</system:String>
+    <system:String x:Key="CreatingARDocsV.CreateSheets">Создавать листы</system:String>
+    <system:String x:Key="CreatingARDocsV.SheetPrefix">Префикс листа:</system:String>
+    
+    <system:String x:Key="CreatingARDocsV.CreatePlaceViews">Создавать/размещать виды</system:String>
+    <system:String x:Key="CreatingARDocsV.ViewPrefix">Префикс вида:</system:String>
+    <system:String x:Key="CreatingARDocsV.ViewType">Тип вида:</system:String>
+    <system:String x:Key="CreatingARDocsV.ViewportType">Тип видового экрана:</system:String>
+    <system:String x:Key="CreatingARDocsV.CreateBasedSelectedViews">Создавать на основе выбранных видов</system:String>
+    <system:String x:Key="CreatingARDocsV.SelectedViewCount">Выбрано видов:</system:String>
+
+    <system:String x:Key="CreatingARDocsV.CreatePlaceSpecs">Создавать/размещать спецификации</system:String>
+    <system:String x:Key="CreatingARDocsV.LevelFieldFilter">Выберите поле этажа:</system:String>
+    
+    <system:String x:Key="CreatingARDocsVM.ViewsNotSelected">Не выбрано видов, на основе которых создавать документацию</system:String>
+    <system:String x:Key="CreatingARDocsVM.TitleBlockNotSelected">Не выбран тип рамки листа</system:String>
+    <system:String x:Key="CreatingARDocsVM.ViewTypeNotSelected">Не выбран тип вида</system:String>
+    <system:String x:Key="CreatingARDocsVM.ViewportTypeNotSelected">Не выбран тип видового экрана</system:String>
+    <system:String x:Key="CreatingARDocsVM.LevelFieldFilterNotSelected">Не выбрано имя поля фильтра спецификации</system:String>
+    
+    <system:String x:Key="CreatingARDocsVM.UnableDetermineStartLevelInTask">Не удалось определить начальный уровень в задании №</system:String>
+    <system:String x:Key="CreatingARDocsVM.UnableDetermineEndLevelInTask">Не удалось определить конечный уровень в задании №</system:String>
+    <system:String x:Key="CreatingARDocsVM.StartLevelMustBeLessEndLevelInTask">Начальный уровень должен быть не больше конечного в задании №</system:String>
+    <system:String x:Key="CreatingARDocsVM.VisibilityScopeNotSelectedInTask">Не выбрана область видимости в задании №</system:String>
+    <system:String x:Key="CreatingARDocsVM.UnableDetectBuildingInVisibilityScopeInTask">Не удалось определить корпус у области видимости в задании №</system:String>
+    <system:String x:Key="CreatingARDocsVM.UnableDetectSectionInVisibilityScopeInTask">Не удалось определить секцию у области видимости в задании №</system:String>
+    
+    <system:String x:Key="CreatingARDocsVM.Report.InitialData">Исходные данные:</system:String>
+    <system:String x:Key="CreatingARDocsVM.Report.CreationBySelectedViews">Создание видов будет производиться на основе выбранных видов. 
+        Перебираем выбранные виды и поочередно применяем задания:</system:String>
+    <system:String x:Key="CreatingARDocsVM.Report.CreationFromScratch">Создание видов будет производиться с нуля. 
+        Перебираем уровни проекта и поочередно применяем задания:</system:String>
+    <system:String x:Key="CreatingARDocsVM.Report.SelectedViewBeforeStart">Выбрано видов до запуска плагина: </system:String>
+    <system:String x:Key="CreatingARDocsVM.Report.SelectedViewType">Выбран тип вида: </system:String>
+    <system:String x:Key="CreatingARDocsVM.Report.SelectedViewportType">Выбран тип видового экрана: </system:String>
+    <system:String x:Key="CreatingARDocsVM.Report.SelectedTitleBlockType">Выбран тип рамки листа: </system:String>
+    <system:String x:Key="CreatingARDocsVM.Report.SelectedLevelFieldFilter">Выбрано поле параметра фильтрации спецификации: </system:String>
+    
+    <system:String x:Key="CreatingARDocsVM.Report.TaskNumber">Номер задания: </system:String>
+    <system:String x:Key="CreatingARDocsVM.Report.StartLevel">Начальный уровень: </system:String>
+    <system:String x:Key="CreatingARDocsVM.Report.EndLevel">Конечный уровень: </system:String>
+    <system:String x:Key="CreatingARDocsVM.Report.VisibilityScope">Область видимости: </system:String>
+    <system:String x:Key="CreatingARDocsVM.Report.VisibilityScopeBuildingNumber">Номер корпуса области видимости: </system:String>
+    <system:String x:Key="CreatingARDocsVM.Report.VisibilityScopeSectionNumber">Номер секции области видимости: </system:String>
+    <system:String x:Key="CreatingARDocsVM.Report.Task">Задание</system:String>
+    
+    <system:String x:Key="CreatingARDocsVM.Report.WorkWithLevel">Работаем с уровнем:</system:String>
+    <system:String x:Key="CreatingARDocsVM.Report.LevelNumberNotDetected">❗ Не удалось определить номер уровня</system:String>
+    <system:String x:Key="CreatingARDocsVM.Report.LevelNumber">Номер уровня:</system:String>
+    <system:String x:Key="CreatingARDocsVM.Report.LevelNotMatch">Уровень не относится к нужному корпусу, т.к. не содержит: </system:String>
+    <system:String x:Key="CreatingARDocsVM.Report.LevelMatch">Уровень относится к нужному корпусу, т.к. содержит: </system:String>
+    <system:String x:Key="CreatingARDocsVM.Report.Level">Уровень</system:String>
+    <system:String x:Key="CreatingARDocsVM.Report.NotInRange">не подходит под искомый диапазон:</system:String>
+    <system:String x:Key="CreatingARDocsVM.Report.InRange">подходит под искомый диапазон:</system:String>
+    
+    <system:String x:Key="CreatingARDocsVM.Report.Building">корпус</system:String>
+    <system:String x:Key="CreatingARDocsVM.Report.Section">секция</system:String>
+    <system:String x:Key="CreatingARDocsVM.Report.Floor">этаж</system:String>
+    
+    <system:String x:Key="CreatingARDocsVM.Report.WorkWithSheet">Работа с листом</system:String>
+    <system:String x:Key="CreatingARDocsVM.Report.WorkWithView">Работа с видом</system:String>
+    <system:String x:Key="CreatingARDocsVM.Report.WorkWithSpec">Работа со спецификацией </system:String>
+    
+    <system:String x:Key="CreatingARDocsVM.Report.Levels">уровни</system:String>
+    <system:String x:Key="CreatingARDocsVM.Report.Part">_часть </system:String>
+    <system:String x:Key="CreatingARDocsVM.Report.LevelNumberBySelectedView">Номер этажа в соответствии с именем выбранного вида: </system:String>
+    <system:String x:Key="CreatingARDocsVM.Report.WorkWithSelectedView">Работаем с выбранным видом: </system:String>
+    
+    <system:String x:Key="CreatingARDocsVM.Report.Sheet.SheetWithName">Лист с именем </system:String>
+    <system:String x:Key="CreatingARDocsVM.Report.Sheet.NotFindLetsCreate">не найден в проекте, приступаем к созданию</system:String>
+    <system:String x:Key="CreatingARDocsVM.Report.Sheet.FailedSheetCreation">❗ Произошла ошибка при создании листа!</system:String>
+    <system:String x:Key="CreatingARDocsVM.Report.Sheet.SuccessFoundInProject">успешно найден в проекте!</system:String>
+    
+    <system:String x:Key="CreatingARDocsVM.Report.Sheet.InvalidNameForTask">❗ Произошла ошибка при работе с листом! Передано некорректное имя для задания!</system:String>
+    <system:String x:Key="CreatingARDocsVM.Report.Sheet.InvalidTitleBlockType">❗ Произошла ошибка при работе с листом! Передана некорректный тип рамки листа!</system:String>
+    <system:String x:Key="CreatingARDocsVM.Report.Sheet.SheetCreatedSuccessfully">Лист успешно создан!</system:String>
+    <system:String x:Key="CreatingARDocsVM.Report.Sheet.NameGiven">Задано имя:</system:String>
+    <system:String x:Key="CreatingARDocsVM.Report.Sheet.InvalidSheetWidthParamName">❗ Произошла ошибка при работе с листом! Передано некорректное имя параметра ширины рамки листа!</system:String>
+    <system:String x:Key="CreatingARDocsVM.Report.Sheet.InvalidSheetHeightParamName">❗ Произошла ошибка при работе с листом! Передано некорректное имя параметра высоты рамки листа!</system:String>
+    <system:String x:Key="CreatingARDocsVM.Report.Sheet.InvalidSheetWidthParamValue">❗ Произошла ошибка при работе с листом! Передано некорректное значение для задания ширины рамки листа!</system:String>
+    <system:String x:Key="CreatingARDocsVM.Report.Sheet.InvalidSheetHeightParamValue">❗ Произошла ошибка при работе с листом! Передано некорректное значение для задания высоты рамки листа!</system:String>
+    <system:String x:Key="CreatingARDocsVM.Report.Sheet.TitleBlockNotFound">❗ Произошла ошибка при работе с листом! Не найдена рамка листа!</system:String>
+    <system:String x:Key="CreatingARDocsVM.Report.Sheet.SettedTitleBlockDimension">Заданы габариты рамки:</system:String>
+    <system:String x:Key="CreatingARDocsVM.Report.Sheet.TitleBlockHasNotDimensionParam">❗ Произошла ошибка при работе с листом! У рамки не найден один из габаритных параметров!</system:String>
+    
+    <system:String x:Key="CreatingARDocsVM.Report.View.InvalidNameForTask">❗ Произошла ошибка при работе с видом! Передано некорректное имя для задания!</system:String>
+    <system:String x:Key="CreatingARDocsVM.Report.View.ViewWithName">Вид с именем </system:String>
+    <system:String x:Key="CreatingARDocsVM.Report.View.NotFindLetsCreate">не найден в проекте, приступаем к созданию!</system:String>
+    <system:String x:Key="CreatingARDocsVM.Report.View.InvalidLevelAndVisibilityScope">❗ Произошла ошибка при создании вида! Не передано для задания уровень и область видимости!</system:String>
+    <system:String x:Key="CreatingARDocsVM.Report.View.SuccessFoundInProject">успешно найден в проекте!</system:String>
+    
+    <system:String x:Key="CreatingARDocsVM.Report.View.InvalidViewType">❗ Произошла ошибка при создании нового вида! Не указан типоразмер вида!</system:String>
+    <system:String x:Key="CreatingARDocsVM.Report.View.InvalidLevelForView">❗ Произошла ошибка при создании нового вида! Не указан уровень, на котором нужно создать вид!</system:String>
+    <system:String x:Key="CreatingARDocsVM.Report.View.ViewCreatedSuccessfully">Вид успешно создан!</system:String>
+    <system:String x:Key="CreatingARDocsVM.Report.View.SetViewType">Виду назначен тип </system:String>
+    <system:String x:Key="CreatingARDocsVM.Report.View.NameGiven">Задано имя:</system:String>
+    <system:String x:Key="CreatingARDocsVM.Report.View.FailedSheetCreation">❗ Произошла ошибка при создании нового вида!</system:String>
+    
+    <system:String x:Key="CreatingARDocsVM.Report.View.InvalidViewForDuplicate">❗ Произошла ошибка при создании нового вида! Не указан вид, который нужно продублировать!</system:String>
+    <system:String x:Key="CreatingARDocsVM.Report.View.ViewWasDuplicated">Вид успешно продублирован!</system:String>
+    <system:String x:Key="CreatingARDocsVM.Report.View.ErrorDuplicatingView">❗ Произошла ошибка при дублировании вида!</system:String>
+    <system:String x:Key="CreatingARDocsVM.Report.View.InvalidVisibilityScope">❗ Произошла ошибка при работе с видом! Передана некорректная область видимости!</system:String>
+    <system:String x:Key="CreatingARDocsVM.Report.View.InvalidViewForWork">❗ Произошла ошибка при настройке вида, не найден вид для работы!</system:String>
+    <system:String x:Key="CreatingARDocsVM.Report.View.SetVisibilityScope">Задана область видимости: </system:String>
+    <system:String x:Key="CreatingARDocsVM.Report.View.SetAnnotationCropping">Задана обрезка аннотаций на виде </system:String>
+    <system:String x:Key="CreatingARDocsVM.Report.View.SetMinAnnotationCroppingOffset">Задано минимальное смещение обрезки аннотаций </system:String>
+    <system:String x:Key="CreatingARDocsVM.Report.View.InvalidViewSetting">❗ Произошла ошибка при настройке вида! </system:String>
+    <system:String x:Key="CreatingARDocsVM.Report.View.InvalidSheetForPlace">❗ Произошла ошибка при размещении вида! Лист для размещения не найден!</system:String>
+    <system:String x:Key="CreatingARDocsVM.Report.View.InvalidViewForPlace">❗ Произошла ошибка при размещении вида! Вид для размещения не найден!</system:String>
+    <system:String x:Key="CreatingARDocsVM.Report.View.CannotPlaceViewOnSheet">❗ Произошла ошибка при размещении вида! Нельзя разместить вид на листе!</system:String>
+    <system:String x:Key="CreatingARDocsVM.Report.View.FailedViewportCreation">❗ Не удалось создать вид на листе!</system:String>
+    <system:String x:Key="CreatingARDocsVM.Report.View.ViewCreatedSuccessfullyOnSheet">Видовой экран успешно создан на листе!</system:String>
+    <system:String x:Key="CreatingARDocsVM.Report.View.SettedViewType">Видовому экрану задан тип </system:String>
+    <system:String x:Key="CreatingARDocsVM.Report.View.CannotFoundTitleBlockOnSheet">❗ Не удалось найти рамку листа, она нужна для правильного расположения вида на листе!</system:String>
+    <system:String x:Key="CreatingARDocsVM.Report.View.ViewPositionedOnSheet">Вид успешно спозиционирован на листе!</system:String>
+    <system:String x:Key="CreatingARDocsVM.Report.View.ViewTitlePositionedOnSheet">Оглавление вида успешно спозиционировано на листе!</system:String>
+    
+    <system:String x:Key="CreatingARDocsVM.CutNameBySymbol">Разделите имя на блоки при помощи символа</system:String>
+    <system:String x:Key="CreatingARDocsVM.WordLevelNeedNearLevelNumber">Рядом с номером этажа должно быть указано слово "этаж"</system:String>
+    <system:String x:Key="CreatingARDocsVM.LevelNumberNotFound">Не найден номер этажа </system:String>
+    <system:String x:Key="CreatingARDocsVM.LevelNumberNotDetect">Не удалось определить номер этажа </system:String>
+    <system:String x:Key="CreatingARDocsVM.PrefixNSuffixNotFound">Не удалось получить префикс и суффикс </system:String>
+    
+    <system:String x:Key="CreatingARDocsVM.Sheet">лист</system:String>
+    <system:String x:Key="CreatingARDocsVM.View">вид</system:String>
+    <system:String x:Key="CreatingARDocsVM.Spec">спецификация</system:String>
+    <system:String x:Key="CreatingARDocsVM.Level">этаж</system:String>
+
+    <system:String x:Key="TreeReportV.Title">Отчет</system:String>
+    <system:String x:Key="TreeReportV.ShowAll">Показывать все</system:String>
+    <system:String x:Key="TreeReportV.ShowImportant">Показывать важное</system:String>
+
+    <system:String x:Key="CopySpecSheetInstanceV.Title">Скопировать спецификации на листы</system:String>
+    <system:String x:Key="CopySpecSheetInstanceV.SelectedSheetCount">Выбрано листов:</system:String>
+    <system:String x:Key="CopySpecSheetInstanceV.SelectedSpecs">Выбрать спецификации</system:String>
+    <system:String x:Key="CopySpecSheetInstanceV.SelectedSpecsCount">Выбрано спецификаций:</system:String>
+    <system:String x:Key="CopySpecSheetInstanceV.LevelFieldFilter">Выберите поле фильтрации этажа:</system:String>
+    
+    <system:String x:Key="CopySpecSheetInstanceVM.SheetNotSelected">Не выбрано ни одного листа</system:String>
+    <system:String x:Key="CopySpecSheetInstanceVM.SpecsNotSelected">Не выбрано ни одной спецификации на листе</system:String>
+    <system:String x:Key="CopySpecSheetInstanceVM.LevelFieldFilterNotSelected">Не выбрано поле фильтрации этажа</system:String>
+    <system:String x:Key="CopySpecSheetInstanceVM.SelectSpecsOnSheet">Выберите спецификации на листе</system:String>
+    
+    <system:String x:Key="CopySpecSheetInstanceVM.Report.SpecWithName">Спецификация с именем</system:String>
+    <system:String x:Key="CopySpecSheetInstanceVM.Report.NotFindLetsCreate">не найдена в проекте, приступаем к созданию</system:String>
+    <system:String x:Key="CopySpecSheetInstanceVM.Report.SpecCreatedSuccessfully">Спецификация успешно создана!</system:String>
+    <system:String x:Key="CopySpecSheetInstanceVM.Report.NameGiven">Задано имя:</system:String>
+    <system:String x:Key="CopySpecSheetInstanceVM.Report.SpecFinded">успешно найдена в проекте!</system:String>
+    <system:String x:Key="CopySpecSheetInstanceVM.Report.SetFilterValue">Фильтру задали значение </system:String>
+
+    <system:String x:Key="CopySpecSheetInstanceVM.Report.FailedViewportCreation">❗ Не удалось создать видовой экран спецификации на листе!</system:String>
+    <system:String x:Key="CopySpecSheetInstanceVM.Report.SuccessViewportCreation">Видовой экран спецификации успешно создан на листе!</system:String>
+</ResourceDictionary>

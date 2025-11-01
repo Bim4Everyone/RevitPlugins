@@ -1,8 +1,18 @@
 using System.Windows;
 
+using dosymep.SimpleServices;
+
 namespace RevitArchitecturalDocumentation.Views;
-public partial class CreatingARDocsV {
-    public CreatingARDocsV() {
+public partial class CreatingARDocsV {  
+    public CreatingARDocsV(
+        ILoggerService loggerService,
+        ISerializationService serializationService,
+        ILanguageService languageService, ILocalizationService localizationService,
+        IUIThemeService uiThemeService, IUIThemeUpdaterService themeUpdaterService)
+        : base(loggerService,
+            serializationService,
+            languageService, localizationService,
+            uiThemeService, themeUpdaterService) {
         InitializeComponent();
     }
 

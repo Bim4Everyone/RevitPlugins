@@ -3,23 +3,33 @@ using System.Linq;
 
 using Autodesk.Revit.DB;
 
+using dosymep.SimpleServices;
+
 namespace RevitArchitecturalDocumentation.Models;
 internal class SheetHelper {
-    public SheetHelper(RevitRepository revitRepository, TreeReportNode report = null) {
+    private readonly ILocalizationService _localizationService;
+
+    public SheetHelper(RevitRepository revitRepository, ILocalizationService localizationService, 
+                       TreeReportNode report = null) {
         Repository = revitRepository;
+        _localizationService = localizationService;
         Report = report;
-        NameHelper = new ViewNameHelper(null);
+        NameHelper = new ViewNameHelper(null, localizationService);
     }
-    public SheetHelper(RevitRepository revitRepository, ViewSheet sheet, TreeReportNode report = null) {
+    public SheetHelper(RevitRepository revitRepository, ViewSheet sheet, ILocalizationService localizationService,
+                       TreeReportNode report = null) {
         Repository = revitRepository;
         Sheet = sheet;
+        _localizationService = localizationService;
         Report = report;
-        NameHelper = new ViewNameHelper(sheet);
+        NameHelper = new ViewNameHelper(sheet, localizationService);
     }
 
-
+        
     public RevitRepository Repository { get; set; }
     public ViewSheet Sheet { get; set; }
+
+
     public ViewNameHelper NameHelper { get; set; }
     public TreeReportNode Report { get; set; }
 
@@ -32,7 +42,8 @@ internal class SheetHelper {
         var newSheet = Repository.GetSheetByName(newSheetName);
         Sheet = newSheet;
         if(newSheet is null) {
-            Report?.AddNodeWithName($"Лист с именем \"{newSheetName}\" не найден в проекте, приступаем к созданию");
+            Report?.AddNodeWithName($"{_localizationService.GetLocalizedString("CreatingARDocsVM.Report.Sheet.SheetWithName")} " +
+                $"\"{newSheetName}\" {_localizationService.GetLocalizedString("CreatingARDocsVM.Report.Sheet.NotFindLetsCreate")}");
             try {
                 CreateSheet(newSheetName, titleBlockType);
 
@@ -40,12 +51,13 @@ internal class SheetHelper {
                     SetUpSheetDimensions(widthParamName, heightParamName, width, height);
                 }
             } catch(Exception) {
-                Report?.AddNodeWithName($"❗ Произошла ошибка при создании листа!");
+                Report?.AddNodeWithName(_localizationService.GetLocalizedString("CreatingARDocsVM.Report.Sheet.FailedSheetCreation"));
             }
         } else {
-            Report?.AddNodeWithName($"Лист с именем \"{newSheetName}\" успешно найден в проекте!");
+            Report?.AddNodeWithName($"{_localizationService.GetLocalizedString("CreatingARDocsVM.Report.Sheet.SheetWithName")}" +
+                $" \"{newSheetName}\" {_localizationService.GetLocalizedString("CreatingARDocsVM.Report.Sheet.SuccessFoundInProject")}");
 
-            NameHelper = new ViewNameHelper(newSheet);
+            NameHelper = new ViewNameHelper(newSheet, _localizationService);
             NameHelper.AnalyzeNGetLevelNumber();
         }
 
@@ -60,27 +72,27 @@ internal class SheetHelper {
     public ViewSheet CreateSheet(string newSheetName, FamilySymbol titleBlockType) {
 
         if(newSheetName.Length == 0) {
-            Report?.AddNodeWithName($"❗ Произошла ошибка при работе с листом! Передано некорректное имя для задания!");
+            Report?.AddNodeWithName(_localizationService.GetLocalizedString("CreatingARDocsVM.Report.Sheet.InvalidNameForTask"));
 
             return null;
         }
         if(titleBlockType is null) {
-            Report?.AddNodeWithName($"❗ Произошла ошибка при работе с листом! Передана некорректный тип рамки листа!");
+            Report?.AddNodeWithName(_localizationService.GetLocalizedString("CreatingARDocsVM.Report.Sheet.InvalidTitleBlockType"));
             return null;
         }
 
         ViewSheet newSheet = null;
         try {
             newSheet = ViewSheet.Create(Repository.Document, titleBlockType.Id);
-            Report?.AddNodeWithName($"Лист успешно создан!");
+            Report?.AddNodeWithName(_localizationService.GetLocalizedString("CreatingARDocsVM.Report.Sheet.SheetCreatedSuccessfully"));
             newSheet.Name = newSheetName;
-            Report?.AddNodeWithName($"Задано имя: {newSheet.Name}");
+            Report?.AddNodeWithName($"{_localizationService.GetLocalizedString("CreatingARDocsVM.Report.Sheet.NameGiven")} {newSheet.Name}");
         } catch(Exception) {
-            Report?.AddNodeWithName($"❗ Произошла ошибка при создании листа!");
+            Report?.AddNodeWithName(_localizationService.GetLocalizedString("CreatingARDocsVM.Report.Sheet.FailedSheetCreation"));
         }
 
         Sheet = newSheet;
-        NameHelper = new ViewNameHelper(Sheet);
+        NameHelper = new ViewNameHelper(Sheet, _localizationService);
         NameHelper.AnalyzeNGetLevelNumber();
         return newSheet;
     }
@@ -92,19 +104,19 @@ internal class SheetHelper {
     public void SetUpSheetDimensions(string widthParamName, string heightParamName, int width, int height) {
 
         if(widthParamName.Length == 0) {
-            Report?.AddNodeWithName($"❗ Произошла ошибка при работе с листом! Передано некорректное имя параметра ширины рамки листа!");
+            Report?.AddNodeWithName(_localizationService.GetLocalizedString("CreatingARDocsVM.Report.Sheet.InvalidSheetWidthParamName"));
             return;
         }
         if(heightParamName.Length == 0) {
-            Report?.AddNodeWithName($"❗ Произошла ошибка при работе с листом! Передано некорректное имя параметра высоты рамки листа!");
+            Report?.AddNodeWithName(_localizationService.GetLocalizedString("CreatingARDocsVM.Report.Sheet.InvalidSheetHeightParamName"));
             return;
         }
         if(width == 0) {
-            Report?.AddNodeWithName($"❗ Произошла ошибка при работе с листом! Передано некорректное значение для задания ширины рамки листа!");
+            Report?.AddNodeWithName(_localizationService.GetLocalizedString("CreatingARDocsVM.Report.Sheet.InvalidSheetWidthParamValue"));
             return;
         }
         if(height == 0) {
-            Report?.AddNodeWithName($"❗ Произошла ошибка при работе с листом! Передано некорректное значение для задания высоты рамки листа!");
+            Report?.AddNodeWithName(_localizationService.GetLocalizedString("CreatingARDocsVM.Report.Sheet.InvalidSheetHeightParamValue"));
             return;
         }
 
@@ -116,7 +128,7 @@ internal class SheetHelper {
                 .FirstOrDefault() as FamilyInstance;
 
             if(titleBlock is null) {
-                Report?.AddNodeWithName($"❗ Произошла ошибка при работе с листом! Не найдена рамка листа!");
+                Report?.AddNodeWithName(_localizationService.GetLocalizedString("CreatingARDocsVM.Report.Sheet.TitleBlockNotFound"));
                 return;
 
             } else {
@@ -126,16 +138,16 @@ internal class SheetHelper {
                 if(widthParam != null && heightParam != null) {
                     widthParam.Set(UnitUtilsHelper.ConvertToInternalValue(width));
                     heightParam.Set(UnitUtilsHelper.ConvertToInternalValue(height));
-                    Report?.AddNodeWithName($"Заданы габариты рамки: {width}х{height}");
+                    Report?.AddNodeWithName($"{_localizationService.GetLocalizedString("CreatingARDocsVM.Report.Sheet.SettedTitleBlockDimension")} {width}х{height}");
                 } else {
-                    Report?.AddNodeWithName($"❗ Произошла ошибка при работе с листом! У рамки не найден один из габаритных параметров!");
+                    Report?.AddNodeWithName(_localizationService.GetLocalizedString("CreatingARDocsVM.Report.Sheet.TitleBlockHasNotDimensionParam"));
                     return;
                 }
                 Repository.Document.Regenerate();
             }
 
         } catch(Exception) {
-            Report?.AddNodeWithName($"❗ Произошла ошибка при создании листа!");
+            Report?.AddNodeWithName(_localizationService.GetLocalizedString("CreatingARDocsVM.Report.Sheet.FailedSheetCreation"));
         }
     }
 

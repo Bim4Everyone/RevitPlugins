@@ -1,12 +1,10 @@
-using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Windows.Input;
+using System.Text;
+using System.Text.RegularExpressions;
 
 using Autodesk.Revit.DB;
-using Autodesk.Revit.Exceptions;
-using Autodesk.Revit.UI.Selection;
 
-using dosymep.WPF.Commands;
+using dosymep.SimpleServices;
 using dosymep.WPF.ViewModels;
 
 using RevitArchitecturalDocumentation.Models;
@@ -14,111 +12,94 @@ using RevitArchitecturalDocumentation.Models.Exceptions;
 
 namespace RevitArchitecturalDocumentation.ViewModels.Components;
 internal class TaskInfoVM : BaseViewModel {
-    private readonly PluginConfig _pluginConfig;
-    private readonly RevitRepository _revitRepository;
-    private readonly CreatingARDocsVM _creatingARDocsVM;
+    private readonly ILocalizationService _localizationService;
+    private int _taskNumber;
+    private Element _selectedVisibilityScope;
+    private string _startLevelNumber;
+    private string _endLevelNumber;
+    private string _viewNameSuffix;
 
-    private TaskInfo _selectedTask;
-    private List<Element> _visibilityScopes;
-    private ObservableCollection<TaskInfo> _tasksForWork = [];
-
-
-    public TaskInfoVM(PluginConfig pluginConfig, RevitRepository revitRepository, CreatingARDocsVM creatingARDocsVM) {
-        _pluginConfig = pluginConfig;
-        _revitRepository = revitRepository;
-        _creatingARDocsVM = creatingARDocsVM;
-
-        AddTaskCommand = RelayCommand.Create(AddTask);
-        DeleteTaskCommand = RelayCommand.Create(DeleteTask);
-        SelectSpecsCommand = new RelayCommand(SelectSpecs);
-
-        VisibilityScopes = _revitRepository.VisibilityScopes;
-        TasksForWork.Add(new TaskInfo(_revitRepository.RegexForBuildingPart, _revitRepository.RegexForBuildingSection, 1));
+    public TaskInfoVM(Regex regexForBuildingPart, Regex regexForBuildingSection, ILocalizationService localizationService,
+                      int taskNumber) {
+        _localizationService = localizationService;
+        RegexForBuildingPart = regexForBuildingPart;
+        RegexForBuildingSection = regexForBuildingSection;
+        TaskNumber = taskNumber;
     }
 
-
-    public ICommand AddTaskCommand { get; }
-    public ICommand DeleteTaskCommand { get; }
-    public ICommand SelectSpecsCommand { get; }
-
-
-    public ObservableCollection<TaskInfo> TasksForWork {
-        get => _tasksForWork;
-        set => RaiseAndSetIfChanged(ref _tasksForWork, value);
+    public StringBuilder Report { get; set; }
+    public int TaskNumber {
+        get => _taskNumber;
+        set => RaiseAndSetIfChanged(ref _taskNumber, value);
     }
 
-    public TaskInfo SelectedTask {
-        get => _selectedTask;
-        set => RaiseAndSetIfChanged(ref _selectedTask, value);
+    public Regex RegexForBuildingPart { get; set; }
+    public Regex RegexForBuildingSection { get; set; }
+    public Element SelectedVisibilityScope {
+        get => _selectedVisibilityScope;
+        set => RaiseAndSetIfChanged(ref _selectedVisibilityScope, value);
     }
 
-    public List<Element> VisibilityScopes {
-        get => _visibilityScopes;
-        set => RaiseAndSetIfChanged(ref _visibilityScopes, value);
+    public string StartLevelNumber {
+        get => _startLevelNumber;
+        set => RaiseAndSetIfChanged(ref _startLevelNumber, value);
     }
+
+    public int StartLevelNumberAsInt { get; set; }
+    public string EndLevelNumber {
+        get => _endLevelNumber;
+        set => RaiseAndSetIfChanged(ref _endLevelNumber, value);
+    }
+
+    public int EndLevelNumberAsInt { get; set; }
+    public int NumberOfBuildingPartAsInt { get; set; }
+    public int NumberOfBuildingSectionAsInt { get; set; }
+    public string ViewNameSuffix {
+        get => _viewNameSuffix;
+        set => RaiseAndSetIfChanged(ref _viewNameSuffix, value);
+    }
+
+    public ObservableCollection<SpecHelper> ListSpecHelpers { get; set; } = [];
 
 
     /// <summary>
-    /// Добавляет задачу в список. 
-    /// Задача содержит информацию о начальном и конечном уровне, с которыми нужно работать; выбранную область видимости и спеки
+    /// Проверяет на наличие ошибок в задании - корректность заполнения номеров уровней, имени области видимости и т.д.
     /// </summary>
-    private void AddTask() {
+    public void CheckTasksForErrors() {
 
-        TasksForWork.Add(new TaskInfo(_revitRepository.RegexForBuildingPart, _revitRepository.RegexForBuildingSection, TasksForWork.Count + 1));
-    }
-
-    /// <summary>
-    /// Удаляет выбранную в интерфейсе задачу из списка. 
-    /// </summary>
-    private void DeleteTask() {
-
-        if(TasksForWork.Count > 0) {
-            TasksForWork.RemoveAt(TasksForWork.Count - 1);
+        // Попытка запарсить уровень с которого нужно начать создавать виды
+        if(!int.TryParse(StartLevelNumber, out int startLevelNumberAsInt)) {
+            throw new TaskException($"{_localizationService.GetLocalizedString("CreatingARDocsVM.UnableDetermineStartLevelInTask")} {TaskNumber}");
         }
-        _creatingARDocsVM.SpecOptsVM.GetFilterNames(TasksForWork);
-    }
+        StartLevelNumberAsInt = startLevelNumberAsInt;
 
-
-    /// <summary>
-    /// После скрытия окна позволяет выбрать видовые экраны спек в Revit
-    /// </summary>
-    private void SelectSpecs(object obj) {
-        _creatingARDocsVM.PCOnASPDocsView.Hide();
-
-        TaskInfo task = obj as TaskInfo;
-        if(task != null) {
-
-        ISelectionFilter selectFilter = new ScheduleSelectionFilter();
-        IList<Reference> references = new List<Reference>();
-        try {
-            references = _revitRepository.ActiveUIDocument.Selection
-                            .PickObjects(ObjectType.Element, selectFilter, "Выберите спецификации на листе");
-            } catch(OperationCanceledException) {
-
-                _creatingARDocsVM.PCOnASPDocsView.ShowDialog();
-                return;
-            }
-
-            task.ListSpecHelpers.Clear();
-
-            foreach(Reference reference in references) {
-                ScheduleSheetInstance scheduleSheetInstance = _revitRepository.Document.GetElement(reference) as ScheduleSheetInstance;
-                if(scheduleSheetInstance is null) {
-                    continue;
-                }
-
-                var specHelper = new SpecHelper(_revitRepository, scheduleSheetInstance);
-                task.ListSpecHelpers.Add(specHelper);
-                try {
-                    specHelper.NameHelper.AnalyzeNGetNameInfo();
-
-                } catch(ViewNameException ex) {
-                    _creatingARDocsVM.ErrorText = ex.Message;
-                }
-
-            }
-            _creatingARDocsVM.SpecOptsVM.GetFilterNames(TasksForWork);
+        // Попытка запарсить уровень на котором нужно закончить создавать виды
+        if(!int.TryParse(EndLevelNumber, out int endLevelNumberAsInt)) {
+            throw new TaskException($"{_localizationService.GetLocalizedString("CreatingARDocsVM.UnableDetermineEndLevelInTask")} {TaskNumber}");
         }
-        _creatingARDocsVM.PCOnASPDocsView.ShowDialog();
+        EndLevelNumberAsInt = endLevelNumberAsInt;
+
+        if(StartLevelNumberAsInt > EndLevelNumberAsInt) {
+            throw new TaskException($"{_localizationService.GetLocalizedString("CreatingARDocsVM.StartLevelMustBeLessEndLevelInTask")} {TaskNumber}");
+        }
+
+        // Проверка, что пользователь выбрал область видимости и ее данных
+        if(SelectedVisibilityScope is null) {
+            throw new TaskException($"{_localizationService.GetLocalizedString("CreatingARDocsVM.VisibilityScopeNotSelectedInTask")} {TaskNumber}");
+        } else {
+            // Попытка запарсить номер корпуса из имени области видимости
+            string numberOfBuildingPart = RegexForBuildingPart.Match(SelectedVisibilityScope.Name).Groups[1].Value;
+            if(!int.TryParse(numberOfBuildingPart, out int numberOfBuildingPartAsInt)) {
+                throw new TaskException($"{_localizationService.GetLocalizedString("CreatingARDocsVM.UnableDetectBuildingInVisibilityScopeInTask")} {TaskNumber}");
+            }
+            NumberOfBuildingPartAsInt = numberOfBuildingPartAsInt;
+
+            // Попытка запарсить номер секции из имени области видимости
+            string numberOfBuildingSection = RegexForBuildingSection.Match(SelectedVisibilityScope.Name).Groups[1].Value;
+            if(!int.TryParse(numberOfBuildingSection, out int numberOfBuildingSectionAsInt)) {
+                throw new TaskException($"{_localizationService.GetLocalizedString("CreatingARDocsVM.UnableDetectSectionInVisibilityScopeInTask")} {TaskNumber}");
+            }
+            NumberOfBuildingSectionAsInt = numberOfBuildingSectionAsInt;
+        }
     }
 }

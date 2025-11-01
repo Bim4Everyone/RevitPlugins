@@ -5,6 +5,7 @@ using System.Text.RegularExpressions;
 using Autodesk.Revit.DB;
 
 using dosymep.Revit;
+using dosymep.SimpleServices;
 
 using RevitArchitecturalDocumentation.Models.Exceptions;
 
@@ -13,15 +14,18 @@ using View = Autodesk.Revit.DB.View;
 
 namespace RevitArchitecturalDocumentation.Models;
 internal class ViewNameHelper {
-    public ViewNameHelper(View view) {
+    private readonly ILocalizationService _localizationService;
+    
+    public ViewNameHelper(View view, ILocalizationService localizationService) {
         RevitView = view;
         ViewName = view?.Name;
+        _localizationService = localizationService;
 
         GetViewCatName();
     }
 
-
     public string ViewName { get; set; }
+
     public string Prefix { get; set; }
     public string PrefixOfLevelBlock { get; set; }
     public int LevelNumber { get; set; }
@@ -75,20 +79,24 @@ internal class ViewNameHelper {
 
         // Т.к. дальше будем резать строку на блоки через символ "_", то этот символ должен в строке быть
         if(!ViewName.Contains("_")) {
-            throw new ViewNameException($"Разделите имя на блоки при помощи символа \"_\" - {RevitViewCatName} \"{ViewName}\"");
+            throw new ViewNameException($"{_localizationService.GetLocalizedString("CreatingARDocsVM.CutNameBySymbol")}" +
+                $" \"_\" - {RevitViewCatName} \"{ViewName}\"");
         }
 
         string[] splittedName = ViewName.Split('_');
 
         // Ищем блок после резки по _, в котором содержится слово "этаж"
         // Получаем "05 этаж" или "этаж 05", либо бросаем исключение, что не нашли блок с ключевым словом "этаж"
-        LevelPartOfName = splittedName.FirstOrDefault(o => o.IndexOf("этаж", StringComparison.OrdinalIgnoreCase) != -1) ??
-            throw new ViewNameException($"Рядом с номером этажа должно быть указано слово \"этаж\" - {RevitViewCatName} \"{ViewName}\"");
+        LevelPartOfName = splittedName.FirstOrDefault(o => o.IndexOf(_localizationService.GetLocalizedString("CreatingARDocsVM.Level"), 
+                                                      StringComparison.OrdinalIgnoreCase) != -1) ??
+            throw new ViewNameException($"{_localizationService.GetLocalizedString("CreatingARDocsVM.WordLevelNeedNearLevelNumber")}" +
+            $"- {RevitViewCatName} \"{ViewName}\"");
 
         // Проверяем есть ли цифры в блоке уровня
         var regex = new Regex(@"\d+");
         if(!regex.IsMatch(LevelPartOfName)) {
-            throw new ViewNameException($"Не найден номер этажа - {RevitViewCatName} \"{ViewName}\"");
+            throw new ViewNameException($"{_localizationService.GetLocalizedString("CreatingARDocsVM.LevelNumberNotFound")}" +
+                $" - {RevitViewCatName} \"{ViewName}\"");
         }
 
         // Получаем "05"
@@ -96,7 +104,8 @@ internal class ViewNameHelper {
 
         // Получаем int(5)
         if(!int.TryParse(LevelNumberAsStr, out int levelNumberAsInt)) {
-            throw new ViewNameException($"Не удалось определить номер этажа - {RevitViewCatName} \"{ViewName}\"");
+            throw new ViewNameException($"{_localizationService.GetLocalizedString("CreatingARDocsVM.LevelNumberNotDetect")}" +
+                $" - {RevitViewCatName} \"{ViewName}\"");
         }
         LevelNumber = levelNumberAsInt;
 
@@ -115,7 +124,8 @@ internal class ViewNameHelper {
         // "-AAAA-|XXXX|-BBBB-"
 
         if(stringForAnalyze is null || keyString is null) {
-            throw new ViewNameException($"Не удалось получить префикс и суффикс - {RevitViewCatName} \"{ViewName}\"");
+            throw new ViewNameException($"{_localizationService.GetLocalizedString("CreatingARDocsVM.PrefixNSuffixNotFound")}" +
+                $"- {RevitViewCatName} \"{ViewName}\"");
         }
 
         if(stringForAnalyze.StartsWith(keyString)) {
@@ -164,13 +174,13 @@ internal class ViewNameHelper {
 
         switch(RevitView.Category.GetBuiltInCategory()) {
             case BuiltInCategory.OST_Sheets:
-                RevitViewCatName = "лист";
+                RevitViewCatName = _localizationService.GetLocalizedString("CreatingARDocsVM.Sheet");
                 break;
             case BuiltInCategory.OST_Views:
-                RevitViewCatName = "вид";
+                RevitViewCatName = _localizationService.GetLocalizedString("CreatingARDocsVM.View");
                 break;
             case BuiltInCategory.OST_Schedules:
-                RevitViewCatName = "спецификация";
+                RevitViewCatName = _localizationService.GetLocalizedString("CreatingARDocsVM.Spec");
                 break;
         }
     }

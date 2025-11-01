@@ -3,12 +3,14 @@ using System.Windows.Input;
 
 using Autodesk.Revit.DB;
 
+using dosymep.SimpleServices;
 using dosymep.WPF.Commands;
 using dosymep.WPF.ViewModels;
 
 using RevitArchitecturalDocumentation.Models;
 using RevitArchitecturalDocumentation.Models.Exceptions;
 using RevitArchitecturalDocumentation.Models.Options;
+using RevitArchitecturalDocumentation.Models.Services;
 using RevitArchitecturalDocumentation.ViewModels.Components;
 using RevitArchitecturalDocumentation.Views;
 
@@ -16,6 +18,8 @@ namespace RevitArchitecturalDocumentation.ViewModels;
 internal class CreatingARDocsVM : BaseViewModel {
     private readonly PluginConfig _pluginConfig;
     private readonly RevitRepository _revitRepository;
+    private readonly IWindowService _windowService;
+    private readonly ILocalizationService _localizationService;
 
     private bool _createViewsFromSelected = false;
     private string _errorText;
@@ -25,24 +29,27 @@ internal class CreatingARDocsVM : BaseViewModel {
     private ObservableCollection<ViewHelper> _selectedViewHelpers = [];
 
 
-    public CreatingARDocsVM(PluginConfig pluginConfig, RevitRepository revitRepository, MainOptions mainOptions) {
+    public CreatingARDocsVM(PluginConfig pluginConfig, RevitRepository revitRepository, MainOptions mainOptions, 
+                            IWindowService windowService, ILocalizationService localizationService) {
         _pluginConfig = pluginConfig;
         _revitRepository = revitRepository;
+        _windowService = windowService;
+        _localizationService = localizationService;
 
-        TaskInformationVM = new TaskInfoVM(pluginConfig, revitRepository, this);
+        TaskInformationVM = new TaskInfoListVM(pluginConfig, revitRepository, this, _localizationService);
         SheetOptsVM = new SheetOptionsVM(pluginConfig, revitRepository, mainOptions.SheetOpts);
         ViewOptsVM = new ViewOptionsVM(pluginConfig, revitRepository, mainOptions.ViewOpts);
         SpecOptsVM = new SpecOptionsVM(pluginConfig, revitRepository, mainOptions.SpecOpts);
 
 
-        LoadViewCommand = new RelayCommand(LoadView);
+        LoadViewCommand = RelayCommand.Create<CreatingARDocsV>(LoadView);
         AcceptViewCommand = RelayCommand.Create(AcceptView, CanAcceptView);
     }
 
     public ICommand LoadViewCommand { get; }
     public ICommand AcceptViewCommand { get; }
 
-    public TaskInfoVM TaskInformationVM { get; }
+    public TaskInfoListVM TaskInformationVM { get; }
     public SheetOptionsVM SheetOptsVM { get; }
     public ViewOptionsVM ViewOptsVM { get; }
     public SpecOptionsVM SpecOptsVM { get; }
@@ -82,16 +89,15 @@ internal class CreatingARDocsVM : BaseViewModel {
     /// <summary>
     /// Метод, отрабатывающий при загрузке окна
     /// </summary>
-    private void LoadView(object obj) {
-
-        PCOnASPDocsView = obj as CreatingARDocsV;
+    private void LoadView(CreatingARDocsV creatingARDocsV) {
+        PCOnASPDocsView = creatingARDocsV;
         LoadConfig();
 
         if(SelectedViews.Count == 0) {
             SelectedViews = _revitRepository.GetSelectedViewPlans();
             SelectedViewHelpers = [];
             foreach(var viewPlan in SelectedViews) {
-                var viewHelper = new ViewHelper(viewPlan);
+                var viewHelper = new ViewHelper(viewPlan, _localizationService);
                 SelectedViewHelpers.Add(viewHelper);
                 try {
                     viewHelper.NameHelper.AnalyzeNGetLevelNumber();
@@ -117,7 +123,7 @@ internal class CreatingARDocsVM : BaseViewModel {
     private bool CanAcceptView() {
 
         if(SelectedViews.Count == 0 && CreateViewsFromSelected) {
-            ErrorText = "Не выбрано видов, на основе которых создавать документацию";
+            ErrorText = _localizationService.GetLocalizedString("CreatingARDocsVM.ViewsNotSelected");
             return false;
         }
 
@@ -157,22 +163,22 @@ internal class CreatingARDocsVM : BaseViewModel {
         }
 
         if(SheetOptsVM.WorkWithSheets && SheetOptsVM.SelectedTitleBlock is null) {
-            ErrorText = "Не выбран тип рамки листа";
+            ErrorText = _localizationService.GetLocalizedString("CreatingARDocsVM.TitleBlockNotSelected");
             return false;
         }
 
         if(ViewOptsVM.WorkWithViews && ViewOptsVM.SelectedViewFamilyType is null) {
-            ErrorText = "Не выбран тип вида";
+            ErrorText = _localizationService.GetLocalizedString("CreatingARDocsVM.ViewTypeNotSelected");
             return false;
         }
 
         if(ViewOptsVM.WorkWithViews && ViewOptsVM.SelectedViewportType is null) {
-            ErrorText = "Не выбран тип видового экрана";
+            ErrorText = _localizationService.GetLocalizedString("CreatingARDocsVM.ViewportTypeNotSelected");
             return false;
         }
 
         if(SpecOptsVM.WorkWithSpecs && SpecOptsVM.FilterNamesFromSpecs.Count > 0 && SpecOptsVM.SelectedFilterNameForSpecs is null) {
-            ErrorText = "Не выбрано имя поля фильтра спецификации";
+            ErrorText = _localizationService.GetLocalizedString("CreatingARDocsVM.LevelFieldFilterNotSelected");
             return false;
         }
 
@@ -213,26 +219,26 @@ internal class CreatingARDocsVM : BaseViewModel {
     /// </summary>
     private TreeReportNode GetInitialDataForReport() {
 
-        var rep = new TreeReportNode(null) { Name = "Исходные данные:" };
+        var rep = new TreeReportNode(null) { Name = _localizationService.GetLocalizedString("CreatingARDocsVM.Report.InitialData") };
 
         if(CreateViewsFromSelected) {
-            rep.AddNodeWithName($"Создание видов будет производиться на основе выбранных видов. Перебираем выбранные виды и поочередно применяем задания:");
+            rep.AddNodeWithName(_localizationService.GetLocalizedString("CreatingARDocsVM.Report.CreationBySelectedViews"));
         } else {
-            rep.AddNodeWithName($"Создание видов будет производиться с нуля. Перебираем уровни проекта и поочередно применяем задания:");
+            rep.AddNodeWithName(_localizationService.GetLocalizedString("CreatingARDocsVM.Report.CreationFromScratch"));
         }
-        rep.AddNodeWithName($"Выбрано видов до запуска плагина: {SelectedViews.Count}");
-        rep.AddNodeWithName($"Выбран тип вида: {ViewOptsVM.SelectedViewFamilyType.Name}");
-        rep.AddNodeWithName($"Выбран тип видового экрана: {ViewOptsVM.SelectedViewportType.Name}");
-        rep.AddNodeWithName($"Выбран тип рамки листа: {SheetOptsVM.SelectedTitleBlock.Name}");
-        rep.AddNodeWithName($"Выбрано поле параметра фильтрации спецификации: {SpecOptsVM.SelectedFilterNameForSpecs}");
+        rep.AddNodeWithName($"{_localizationService.GetLocalizedString("CreatingARDocsVM.Report.SelectedViewBeforeStart")} {SelectedViews.Count}");
+        rep.AddNodeWithName($"{_localizationService.GetLocalizedString("CreatingARDocsVM.Report.SelectedViewType")} {ViewOptsVM.SelectedViewFamilyType.Name}");
+        rep.AddNodeWithName($"{_localizationService.GetLocalizedString("CreatingARDocsVM.Report.SelectedViewportType")} {ViewOptsVM.SelectedViewportType.Name}");
+        rep.AddNodeWithName($"{_localizationService.GetLocalizedString("CreatingARDocsVM.Report.SelectedTitleBlockType")} {SheetOptsVM.SelectedTitleBlock.Name}");
+        rep.AddNodeWithName($"{_localizationService.GetLocalizedString("CreatingARDocsVM.Report.SelectedLevelFieldFilter")} {SpecOptsVM.SelectedFilterNameForSpecs}");
 
         foreach(var task in TaskInformationVM.TasksForWork) {
-            var taskRep = new TreeReportNode(rep) { Name = $"Номер задания: {task.TaskNumber}" };
-            taskRep.AddNodeWithName($"Начальный уровень: {task.StartLevelNumberAsInt}");
-            taskRep.AddNodeWithName($"Конечный уровень: {task.EndLevelNumberAsInt}");
-            taskRep.AddNodeWithName($"Область видимости: {task.SelectedVisibilityScope.Name}");
-            taskRep.AddNodeWithName($"Номер корпуса области видимости: {task.NumberOfBuildingPartAsInt}");
-            taskRep.AddNodeWithName($"Номер секции области видимости: {task.NumberOfBuildingSectionAsInt}");
+            var taskRep = new TreeReportNode(rep) { Name = $"{_localizationService.GetLocalizedString("CreatingARDocsVM.Report.TaskNumber")} {task.TaskNumber}" };
+            taskRep.AddNodeWithName($"{_localizationService.GetLocalizedString("CreatingARDocsVM.Report.StartLevel")} {task.StartLevelNumberAsInt}");
+            taskRep.AddNodeWithName($"{_localizationService.GetLocalizedString("CreatingARDocsVM.Report.EndLevel")} {task.EndLevelNumberAsInt}");
+            taskRep.AddNodeWithName($"{_localizationService.GetLocalizedString("CreatingARDocsVM.Report.VisibilityScope")} {task.SelectedVisibilityScope.Name}");
+            taskRep.AddNodeWithName($"{_localizationService.GetLocalizedString("CreatingARDocsVM.Report.VisibilityScopeBuildingNumber")} {task.NumberOfBuildingPartAsInt}");
+            taskRep.AddNodeWithName($"{_localizationService.GetLocalizedString("CreatingARDocsVM.Report.VisibilityScopeSectionNumber")} {task.NumberOfBuildingSectionAsInt}");
 
             rep.Nodes.Add(taskRep);
         }
@@ -255,14 +261,10 @@ internal class CreatingARDocsVM : BaseViewModel {
 
             // В случае, когда заданий несколько возможна ситуация, когда один узел не важный, а другой важный, т.к. содержит информацию о создании чего-либо
             // В этом случае в узле самого верхнего уровня нужно удалить соответствующую строку, чтобы его не скрывала фильтрация
-            item.RewriteByChildNames("Задание", "  ~  ");
+            item.RewriteByChildNames(_localizationService.GetLocalizedString("CreatingARDocsVM.Report.Task"), "  ~  ");
         }
-
-        var window = new TreeReportV {
-            // Передаем VM и указываем, что фильтрацию для сепарации на важные/не важные узлы будем выполнять через "  ~  "
-            DataContext = new TreeReportVM(TreeReport, "  ~  ")
-        };
-        window.Show();
+        var reportViewModel = new TreeReportVM(TreeReport, "  ~  ");
+        _windowService.Show<TreeReportV, TreeReportVM>(reportViewModel);
     }
 
 
@@ -270,22 +272,21 @@ internal class CreatingARDocsVM : BaseViewModel {
     /// Основной метод, выполняющий работу по созданию листов, видов, спек и выносу спек и видов на листы
     /// </summary>
     private void DoWork() {
-
         TreeReport.Add(GetInitialDataForReport());
-        var mainOptions = new MainOptions(SheetOptsVM.GetSheetOption(), ViewOptsVM.GetViewOption(), SpecOptsVM.GetSpecOption());
-
+        var mainOptions = new MainOptions(SheetOptsVM.GetSheetOption(), 
+                                          ViewOptsVM.GetViewOption(), 
+                                          SpecOptsVM.GetSpecOption());
         if(CreateViewsFromSelected) {
-
             var docsFromSelectedViewsVM = new DocsFromSelectedViews(this, _revitRepository, TreeReport,
-                TaskInformationVM.TasksForWork, mainOptions);
+                                                                    TaskInformationVM.TasksForWork, mainOptions,
+                                                                    _localizationService);
             docsFromSelectedViewsVM.CreateDocs();
         } else {
-
             var docsFromScratchVM = new DocsFromScratch(this, _revitRepository, TreeReport,
-                TaskInformationVM.TasksForWork, mainOptions);
+                                                        TaskInformationVM.TasksForWork, mainOptions,
+                                                        _localizationService);
             docsFromScratchVM.CreateDocs();
         }
-
         OpenReportWindow();
     }
 }

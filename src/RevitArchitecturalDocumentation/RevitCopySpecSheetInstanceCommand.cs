@@ -1,3 +1,5 @@
+using System.Globalization;
+using System.Reflection;
 using System.Windows;
 
 using Autodesk.Revit.Attributes;
@@ -5,14 +7,16 @@ using Autodesk.Revit.DB;
 using Autodesk.Revit.UI;
 
 using dosymep.Bim4Everyone;
+using dosymep.Bim4Everyone.ProjectConfigs;
+using dosymep.Bim4Everyone.SimpleServices;
+using dosymep.WpfCore.Ninject;
+using dosymep.WpfUI.Core.Ninject;
 
 using Ninject;
 
 using RevitArchitecturalDocumentation.Models;
 using RevitArchitecturalDocumentation.ViewModels;
 using RevitArchitecturalDocumentation.Views;
-
-using Application = Autodesk.Revit.ApplicationServices.Application;
 
 namespace RevitArchitecturalDocumentation;
 [Transaction(TransactionMode.Manual)]
@@ -22,26 +26,30 @@ public class RevitCopySpecSheetInstanceCommand : BasePluginCommand {
     }
 
     protected override void Execute(UIApplication uiApplication) {
-        using IKernel kernel = new StandardKernel();
-        kernel.Bind<UIApplication>()
-            .ToConstant(uiApplication)
-            .InTransientScope();
-        kernel.Bind<Application>()
-            .ToConstant(uiApplication.Application)
-            .InTransientScope();
+        using var kernel = uiApplication.CreatePlatformServices();
 
         kernel.Bind<RevitRepository>()
             .ToSelf()
             .InSingletonScope();
 
         kernel.Bind<PluginConfig>()
-            .ToMethod(c => PluginConfig.GetPluginConfig());
+            .ToMethod(c => PluginConfig.GetPluginConfig(c.Kernel.Get<IConfigSerializer>()));
 
-        kernel.Bind<CopySpecSheetInstanceVM>().ToSelf();
-        kernel.Bind<CopySpecSheetInstanceV>().ToSelf()
-            .WithPropertyValue(nameof(Window.Title), PluginName)
-            .WithPropertyValue(nameof(Window.DataContext),
-                c => c.Kernel.Get<CopySpecSheetInstanceVM>());
+        // Используем сервис обновления тем для WinUI
+        kernel.UseWpfUIThemeUpdater();
+
+        // Настройка запуска окна
+        kernel.BindMainWindow<CopySpecSheetInstanceVM, CopySpecSheetInstanceV>();
+
+        // Настройка локализации,
+        // получение имени сборки откуда брать текст
+        string assemblyName = Assembly.GetExecutingAssembly().GetName().Name;
+
+        // Настройка локализации,
+        // установка дефолтной локализации "ru-RU"
+        kernel.UseWpfLocalization(
+            $"/{assemblyName};component/assets/localization/Language.xaml",
+            CultureInfo.GetCultureInfo("ru-RU"));
 
         Notification(kernel.Get<CopySpecSheetInstanceV>());
     }

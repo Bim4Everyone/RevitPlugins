@@ -4,15 +4,20 @@ using System.Linq;
 using Autodesk.Revit.DB;
 
 using dosymep.Revit;
+using dosymep.SimpleServices;
 
 using RevitArchitecturalDocumentation.Models.Options;
 using RevitArchitecturalDocumentation.ViewModels;
+using RevitArchitecturalDocumentation.ViewModels.Components;
 
 namespace RevitArchitecturalDocumentation.Models;
 internal class DocsFromSelectedViews {
+    private readonly ILocalizationService _localizationService;
+    private readonly string _paramNameWidth = "Ширина";
+    private readonly string _paramNameHeight = "Высота";
 
     public DocsFromSelectedViews(CreatingARDocsVM pCOnASPDocsVM, RevitRepository revitRepository, ObservableCollection<TreeReportNode> report,
-        ObservableCollection<TaskInfo> tasksForWork, MainOptions mainOptions) {
+        ObservableCollection<TaskInfoVM> tasksForWork, MainOptions mainOptions, ILocalizationService localizationService) {
         MVM = pCOnASPDocsVM;
         Repository = revitRepository;
         Report = report;
@@ -20,6 +25,7 @@ internal class DocsFromSelectedViews {
         SheetOpts = mainOptions.SheetOpts;
         ViewOpts = mainOptions.ViewOpts;
         SpecOpts = mainOptions.SpecOpts;
+        _localizationService = localizationService;
     }
 
     public CreatingARDocsVM MVM { get; set; }
@@ -28,7 +34,8 @@ internal class DocsFromSelectedViews {
     public SheetOptions SheetOpts { get; set; }
     public ViewOptions ViewOpts { get; set; }
     public SpecOptions SpecOpts { get; set; }
-    public ObservableCollection<TaskInfo> TasksForWork { get; set; }
+
+    public ObservableCollection<TaskInfoVM> TasksForWork { get; set; }
 
 
 
@@ -37,31 +44,32 @@ internal class DocsFromSelectedViews {
     /// </summary>
     public void CreateDocs() {
 
-        using var transaction = Repository.Document.StartTransaction("Документатор АР");
+        using var transaction = Repository.Document.StartTransaction(_localizationService.GetLocalizedString("CreatingARDocsV.Title"));
 
         foreach(var viewHelper in MVM.SelectedViewHelpers) {
             int numberOfLevelAsInt = viewHelper.NameHelper.LevelNumber;
             string numberOfLevelAsStr = viewHelper.NameHelper.LevelNumberAsStr;
 
-            var selectedViewRep = new TreeReportNode(null) { Name = $"Работаем с выбранным видом: \"{viewHelper.View.Name}\"" };
-            selectedViewRep.AddNodeWithName($"Номер этажа в соответствии с именем выбранного вида: \"{numberOfLevelAsInt}\"");
+            var selectedViewRep = new TreeReportNode(null) { Name = $"{_localizationService.GetLocalizedString("CreatingARDocsVM.Report.WorkWithSelectedView")} \"{viewHelper.View.Name}\"" };
+            selectedViewRep.AddNodeWithName($"{_localizationService.GetLocalizedString("CreatingARDocsVM.Report.LevelNumberBySelectedView")} \"{numberOfLevelAsInt}\"");
 
             string viewNamePartWithSectionPart = string.Empty;
 
-            if(viewHelper.View.Name.ToLower().Contains("_часть ")) {
-                viewNamePartWithSectionPart = "_часть ";
+            if(viewHelper.View.Name.ToLower().Contains(_localizationService.GetLocalizedString("CreatingARDocsVM.Report.Part"))) {
+                viewNamePartWithSectionPart = _localizationService.GetLocalizedString("CreatingARDocsVM.Report.Part");
                 viewNamePartWithSectionPart += Repository.RegexForBuildingSectionPart.Match(viewHelper.View.Name.ToLower()).Groups[1].Value;
             }
 
             foreach(var task in TasksForWork) {
 
                 var taskRep = new TreeReportNode(selectedViewRep) {
-                    Name = $"Задание номер: \"{task.TaskNumber}\" - " +
-                    $"уровни ({task.StartLevelNumberAsInt} - {task.EndLevelNumberAsInt}), {task.SelectedVisibilityScope.Name}"
+                    Name = $"{_localizationService.GetLocalizedString("CreatingARDocsVM.Report.TaskNumber")} \"{task.TaskNumber}\" - " +
+                    $"{_localizationService.GetLocalizedString("CreatingARDocsVM.Report.Levels")} ({task.StartLevelNumberAsInt} - {task.EndLevelNumberAsInt}), {task.SelectedVisibilityScope.Name}"
                 };
 
                 if(numberOfLevelAsInt < task.StartLevelNumberAsInt || numberOfLevelAsInt > task.EndLevelNumberAsInt) {
-                    taskRep.AddNodeWithName($"  ~  Уровень вида \"{numberOfLevelAsInt}\" не подходит под искомый диапазон: " +
+                    taskRep.AddNodeWithName($"  ~  {_localizationService.GetLocalizedString("CreatingARDocsVM.Report.Level")} \"{numberOfLevelAsInt}\" " +
+                        $"{_localizationService.GetLocalizedString("CreatingARDocsVM.Report.NotInRange")} " +
                         $"{task.StartLevelNumberAsInt} - {task.EndLevelNumberAsInt}");
                     selectedViewRep.Nodes.Add(taskRep);
                     continue;
@@ -70,33 +78,38 @@ internal class DocsFromSelectedViews {
                 SheetHelper sheetHelper = null;
                 if(SheetOpts.WorkWithSheets) {
 
-                    string newSheetName = string.Format("{0}корпус {1}_секция {2}_этаж {3}",
+                    string newSheetName = string.Format("{0}{1} {2}_{3} {4}_{5} {6}",
                         SheetOpts.SheetNamePrefix,
+                        _localizationService.GetLocalizedString("CreatingARDocsVM.Report.Building"),
                         task.NumberOfBuildingPartAsInt,
+                        _localizationService.GetLocalizedString("CreatingARDocsVM.Report.Section"),
                         task.NumberOfBuildingSectionAsInt,
+                        _localizationService.GetLocalizedString("CreatingARDocsVM.Report.Floor"),
                         numberOfLevelAsStr);
 
-                    var sheetRep = new TreeReportNode(taskRep) { Name = $"Работа с листом \"{newSheetName}\"" };
-                    sheetHelper = new SheetHelper(Repository, sheetRep);
+                    var sheetRep = new TreeReportNode(taskRep) { Name = $"{_localizationService.GetLocalizedString("CreatingARDocsVM.Report.WorkWithSheet")} \"{newSheetName}\"" };
+                    sheetHelper = new SheetHelper(Repository, _localizationService, sheetRep);
                     SheetOpts.SelectedTitleBlock = SheetOpts.SelectedTitleBlock ?? Repository.TitleBlocksInProject?.FirstOrDefault(a => a.Name.Equals(SheetOpts.SelectedTitleBlockName));
-                    sheetHelper.GetOrCreateSheet(newSheetName, SheetOpts.SelectedTitleBlock, "Ширина", "Высота", 150, 110);
+
+                    sheetHelper.GetOrCreateSheet(newSheetName, SheetOpts.SelectedTitleBlock, _paramNameWidth, _paramNameHeight, 150, 110);
                     taskRep.Nodes.Add(sheetRep);
                 }
 
 
                 if(ViewOpts.WorkWithViews) {
 
-                    string newViewName = string.Format("{0}{1} этаж К{2}_С{3}{4}{5}",
+                    string newViewName = string.Format("{0}{1} {2} К{3}_С{4}{5}{6}",
                         ViewOpts.ViewNamePrefix,
                         numberOfLevelAsStr,
+                        _localizationService.GetLocalizedString("CreatingARDocsVM.Report.Floor"),
                         task.NumberOfBuildingPartAsInt,
                         task.NumberOfBuildingSectionAsInt,
                         viewNamePartWithSectionPart,
                         task.ViewNameSuffix);
 
-                    var viewRep = new TreeReportNode(taskRep) { Name = $"Работа с видом \"{newViewName}\"" };
+                    var viewRep = new TreeReportNode(taskRep) { Name = $"{_localizationService.GetLocalizedString("CreatingARDocsVM.Report.WorkWithView")} \"{newViewName}\"" };
 
-                    var newViewHelper = new ViewHelper(Repository, viewRep);
+                    var newViewHelper = new ViewHelper(Repository, _localizationService, viewRep);
                     newViewHelper.GetView(newViewName, task.SelectedVisibilityScope, viewForDuplicate: viewHelper.View);
 
                     if(sheetHelper.Sheet != null
@@ -111,7 +124,7 @@ internal class DocsFromSelectedViews {
                 if(SpecOpts.WorkWithSpecs) {
 
                     foreach(var specHelper in task.ListSpecHelpers) {
-                        var specRep = new TreeReportNode(taskRep) { Name = $"Работа со спецификацией \"{specHelper.Specification.Name}\"" };
+                        var specRep = new TreeReportNode(taskRep) { Name = $"{_localizationService.GetLocalizedString("CreatingARDocsVM.Report.WorkWithSpec")} \"{specHelper.Specification.Name}\"" };
                         specHelper.Report = specRep;
 
                         var newSpecHelper = specHelper.GetOrDuplicateNSetSpec(SpecOpts.SelectedFilterNameForSpecs, numberOfLevelAsInt);
