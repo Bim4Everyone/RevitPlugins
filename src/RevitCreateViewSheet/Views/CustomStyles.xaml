@@ -39,12 +39,6 @@
             Property="AutoGenerateColumns"
             Value="False" />
         <Setter
-            Property="VirtualizingPanel.VirtualizationMode"
-            Value="Recycling" />
-        <Setter
-            Property="VirtualizingPanel.IsVirtualizing"
-            Value="True" />
-        <Setter
             Property="VerticalScrollBarVisibility"
             Value="Auto" />
         <Setter
