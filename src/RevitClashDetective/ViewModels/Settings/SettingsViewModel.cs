@@ -143,6 +143,12 @@ internal class SettingsViewModel : BaseViewModel {
                 "SettingsWindow.Validation.LongParam", longParam.Name.Substring(0, 16) + "...");
             return false;
         }
+        var duplicatedName = Params.GroupBy(p => p.Name).FirstOrDefault(g => g.Count() > 1);
+        if(duplicatedName is not null) {
+            ErrorText = _localizationService.GetLocalizedString(
+                "SettingsWindow.Validation.DuplicatedParam", duplicatedName.Key);
+            return false;
+        }
 
         ErrorText = null;
         return true;
