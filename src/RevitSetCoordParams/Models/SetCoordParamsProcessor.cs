@@ -1,5 +1,7 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 
 using Autodesk.Revit.DB;
 
@@ -27,6 +29,11 @@ internal class SetCoordParamsProcessor {
     }
 
     /// <summary>
+    /// Свойство для определения количества элементов модели в прогресс-баре   
+    /// </summary>  
+    public IEnumerable<RevitElement> RevitElements => GetRevitElements();
+
+    /// <summary>
     /// Основной метод поиска пересечений и заполнения параметров    
     /// </summary>    
     /// <remarks>
@@ -34,9 +41,9 @@ internal class SetCoordParamsProcessor {
     /// При успешном пересечении записываются параметры из объемного элемента в элемент модели
     /// </remarks>
     /// <returns>Возвращает коллекцию предупреждений WarningModel</returns>
-    public IReadOnlyCollection<WarningElement> Run() {
+    public IReadOnlyCollection<WarningElement> Run(IProgress<int> progress = null, CancellationToken ct = default) {
         var sourceModels = _settings.FileProvider.GetRevitElements(_settings.TypeModel);
-        var targetElements = _settings.ElementsProvider.GetRevitElements(_settings.Categories);
+        var targetElements = RevitElements;
         var positionProvider = _settings.PositionProvider;
         var sphereProvider = _settings.SphereProvider;
         double startDiam = UnitUtils.ConvertToInternalUnits(RevitConstants.StartDiameterSearchSphereMm, UnitTypeId.Millimeters);
@@ -53,7 +60,9 @@ internal class SetCoordParamsProcessor {
         string transactionName = _localizationService.GetLocalizedString("SetCoordParamsProcessor.TransactionName");
         using var t = _revitRepository.Document.StartTransaction(transactionName);
         List<WarningElement> warnings = [];
+        int i = 0;
         foreach(var targetElement in targetElements) {
+            ct.ThrowIfCancellationRequested();
             if(blockingParam != null) {
                 if(targetElement.Element.IsExistsParam(blockingParam.TargetParam.Name)) {
                     int blockValue = targetElement.Element.GetParamValueOrDefault<int>(blockingParam.TargetParam.Name);
@@ -116,8 +125,14 @@ internal class SetCoordParamsProcessor {
                     RevitElement = targetElement
                 });
             }
+            progress?.Report(++i);
         }
         t.Commit();
         return warnings;
+    }
+
+    // Метод получения элементов модели для основного метода и прогресс-бара  
+    private IEnumerable<RevitElement> GetRevitElements() {
+        return _settings.ElementsProvider.GetRevitElements(_settings.Categories);
     }
 }

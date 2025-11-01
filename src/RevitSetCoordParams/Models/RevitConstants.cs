@@ -111,12 +111,16 @@ internal static class RevitConstants {
         },
     ];
 
-    // Метод получения карты параметров
+    /// <summary>
+    /// Метод получения карты параметров
+    /// </summary>
     public static List<ParamMap> GetDefaultParamMaps() {
         return _allParamMaps;
     }
 
-    // Метод получения категорий
+    /// <summary>
+    /// Метод получения категорий
+    /// </summary>
     public static List<BuiltInCategory> GetDefaultBuiltInCategories() {
         return _allCategories;
     }

@@ -56,7 +56,8 @@ internal class MainViewModel : BaseViewModel {
         PluginConfig pluginConfig,
         RevitRepository revitRepository,
         ILocalizationService localizationService,
-        IResolutionRoot resolutionRoot) {
+        IResolutionRoot resolutionRoot,
+        IProgressDialogFactory progressDialogFactory) {
         _pluginConfig = pluginConfig;
         _revitRepository = revitRepository;
         _localizationService = localizationService;
@@ -70,12 +71,17 @@ internal class MainViewModel : BaseViewModel {
         CheckAllCatsCommand = RelayCommand.Create(CheckAllCategories);
         UncheckAllCatsCommand = RelayCommand.Create(UncheckAllCategories);
         AcceptViewCommand = RelayCommand.Create(AcceptView, CanAcceptView);
+
+        ProgressDialogFactory = progressDialogFactory
+            ?? throw new System.ArgumentNullException(nameof(progressDialogFactory));
     }
 
     public ICommand LoadViewCommand { get; }
     public ICommand CheckAllCatsCommand { get; }
     public ICommand UncheckAllCatsCommand { get; }
     public ICommand AcceptViewCommand { get; }
+
+    public IProgressDialogFactory ProgressDialogFactory { get; }
 
     public ObservableCollection<RangeElementsViewModel> RangeElements {
         get => _rangeElements;
@@ -350,16 +356,28 @@ internal class MainViewModel : BaseViewModel {
     // Основной метод
     private void AcceptView() {
         SaveConfig();
+
         var processor = new SetCoordParamsProcessor(_localizationService, _revitRepository, _setCoordParamsSettings);
-        var warnings = processor.Run();
+
+        using var progressDialogService = ProgressDialogFactory.CreateDialog();
+        progressDialogService.MaxValue = processor.RevitElements.Count();
+        progressDialogService.StepValue = 20;
+        progressDialogService.DisplayTitleFormat = _localizationService.GetLocalizedString("MainViewModel.ProgressTitle");
+        var progress = progressDialogService.CreateProgress();
+
+        var ct = progressDialogService.CreateCancellationToken();
+        progressDialogService.Show();
+
+        var warnings = processor.Run(progress, ct);
 
         if(warnings != null && warnings.Any()) {
-            var warningsViewModel = _resolutionRoot.Get<WarningsViewModel>(
-                new Ninject.Parameters.ConstructorArgument("warningElements", warnings));
+            var warningsVM = _resolutionRoot.Get<WarningsViewModel>();
+            warningsVM.WarningElementsCollection = warnings;
             var warningsWindow = _resolutionRoot.Get<WarningsWindow>();
+            warningsWindow.DataContext = warningsVM;
+            warningsVM.LoadView();
             warningsWindow.Show();
         }
-
     }
 
     // Метод проверки возможности выполнения основного вида

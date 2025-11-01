@@ -6,7 +6,9 @@ using RevitSetCoordParams.Models.Providers;
 
 namespace RevitSetCoordParams.Models;
 internal class ProvidersFactory {
-
+    /// <summary>
+    /// Метод получения провайдера элементов по Enum
+    /// </summary>
     public IElementsProvider GetElementsProvider(RevitRepository revitRepository, ElementsProviderType type) {
         return type switch {
             ElementsProviderType.AllElementsProvider => new ElementsProviderAll(revitRepository),
@@ -15,11 +17,15 @@ internal class ProvidersFactory {
             _ => new ElementsProviderAll(revitRepository)
         };
     }
-
+    /// <summary>
+    /// Метод получения провайдера документа по Enum
+    /// </summary>
     public IFileProvider GetFileProvider(RevitRepository revitRepository, Document document) {
         return new FileProvider(revitRepository, document);
     }
-
+    /// <summary>
+    /// Метод получения провайдера позиции по Enum
+    /// </summary>
     public IPositionProvider GetPositionProvider(RevitRepository revitRepository, PositionProviderType type) {
         return type switch {
             PositionProviderType.CenterPositionProvider => new PositionProviderCenter(revitRepository),
@@ -28,7 +34,9 @@ internal class ProvidersFactory {
             _ => new PositionProviderCenter(revitRepository)
         };
     }
-
+    /// <summary>
+    /// Метод получения провайдера сферы
+    /// </summary>
     public ISphereProvider GetSphereProvider(RevitRepository revitRepository) {
         return new SphereProvider(revitRepository);
     }

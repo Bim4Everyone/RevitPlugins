@@ -18,10 +18,16 @@ internal class CheckProjectParams {
         _projectParameters = ProjectParameters.Create(_application);
     }
 
+    /// <summary>
+    /// Метод проверки загрузки параметров
+    /// </summary>
     public bool GetIsChecked() {
         return _isChecked;
     }
 
+    /// <summary>
+    /// Метод копирования параметров проекта
+    /// </summary>
     public CheckProjectParams CopyProjectParams() {
         _projectParameters.SetupRevitParams(_document, RevitConstants.GetDefaultParamMaps()
             .Select(param => param.TargetParam));

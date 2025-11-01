@@ -57,12 +57,13 @@ public class RevitSetCoordParamsCommand : BasePluginCommand {
         kernel.Bind<PluginConfig>()
             .ToMethod(c => PluginConfig.GetPluginConfig(c.Kernel.Get<IConfigSerializer>()));
 
+        kernel.UseWpfUIProgressDialog<MainViewModel>();
+
         // Используем сервис обновления тем для WinUI
         kernel.UseWpfUIThemeUpdater();
 
         // Настройка запуска окна
         kernel.BindMainWindow<MainViewModel, MainWindow>();
-        kernel.BindMainWindow<WarningsViewModel, WarningsWindow>();
 
         // Настройка локализации,
         // получение имени сборки откуда брать текст
@@ -93,8 +94,5 @@ public class RevitSetCoordParamsCommand : BasePluginCommand {
 
         // Вызывает стандартное уведомление
         Notification(kernel.Get<MainWindow>());
-
-        // Вызывает стандартное уведомление
-        //Notification(kernel.Get<WarningWindow>());
     }
 }

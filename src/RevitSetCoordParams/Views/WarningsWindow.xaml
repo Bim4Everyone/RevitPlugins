@@ -10,16 +10,15 @@
     xmlns:edits="clr-namespace:RevitSetCoordParams.Views.Edits"
     xmlns:vms="clr-namespace:RevitSetCoordParams.ViewModels"
     xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
-    xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
     xmlns:me="clr-namespace:dosymep.WpfCore.MarkupExtensions;assembly=dosymep.WpfCore"
     
     mc:Ignorable="d"
     
-    Height="700"
-    Width="900"
+    Height="500"
+    Width="1000"
     
-    MinHeight="700"
-    MinWidth="900"
+    MinHeight="500"
+    MinWidth="1000"
     
     d:DataContext="{d:DesignInstance vms:WarningsViewModel, IsDesignTimeCreatable=False}">
 
@@ -27,18 +26,10 @@
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
                 <ResourceDictionary
-                    Source="CustomStyles.xaml"  />
+                    Source="CustomStyles.xaml" />
             </ResourceDictionary.MergedDictionaries>            
         </ResourceDictionary>
     </Window.Resources>
-
-    <i:Interaction.Triggers>
-        <i:EventTrigger
-            EventName="Loaded">
-            <i:InvokeCommandAction
-                Command="{Binding LoadViewCommand}" />
-        </i:EventTrigger>
-    </i:Interaction.Triggers>
 
     <Grid>
         <Grid.RowDefinitions>
@@ -69,27 +60,34 @@
                             Description="{Binding Description}"
                             IsChecked="True">
                             <edits:CustomGroupEditControl.EditControl>
-                                <ui:DataGrid
+                                <ui:DataGrid                                    
                                     AutoGenerateColumns="False"
                                     IsReadOnly="True"
                                     Style="{StaticResource CustomResizableDataGridStyle}"
                                     ItemsSource="{Binding Warnings}">
                                     <ui:DataGrid.Columns>
+                                        <DataGridTemplateColumn>
+                                            <DataGridTemplateColumn.Header>                                                
+                                                <!--В динамически-создаваемом UserControl работает только DynamicResource-->
+                                                <TextBlock Text="{DynamicResource WarningWindow.IdHeader}" />
+                                            </DataGridTemplateColumn.Header>
+                                            <DataGridTemplateColumn.CellTemplate>
+                                                <DataTemplate>
+                                                    <Button
+                                                        Width="100"
+                                                        Content="{Binding ID}"
+                                                        Command="{Binding DataContext.ShowElementCommand, 
+                                                            RelativeSource={RelativeSource AncestorType=Window}}"
+                                                        CommandParameter="{Binding ID}" />
+                                                </DataTemplate>
+                                            </DataGridTemplateColumn.CellTemplate>
+                                        </DataGridTemplateColumn> 
                                         <DataGridTextColumn
-                                            Width="100"
-                                            Binding="{Binding ID}">
-                                            <DataGridTextColumn.Header>
-                                                <TextBlock
-                                                    Text="{me:LocalizationSource WarningWindow.IdField}" />
-                                            </DataGridTextColumn.Header>
-                                        </DataGridTextColumn>
-
-                                        <DataGridTextColumn
-                                            Width="200"
+                                            Width="300"
                                             Binding="{Binding Family}">
                                             <DataGridTextColumn.Header>
-                                                <TextBlock
-                                                    Text="{me:LocalizationSource WarningWindow.FamilyField}" />
+                                                <!--В динамически-создаваемом UserControl работает только DynamicResource-->
+                                                <TextBlock Text="{DynamicResource WarningWindow.FamilyHeader}" />
                                             </DataGridTextColumn.Header>
                                         </DataGridTextColumn>
 
@@ -97,17 +95,17 @@
                                             Width="300"
                                             Binding="{Binding Type}">
                                             <DataGridTextColumn.Header>
-                                                <TextBlock
-                                                    Text="{me:LocalizationSource WarningWindow.TypeField}" />
+                                                <!--В динамически-создаваемом UserControl работает только DynamicResource-->
+                                                <TextBlock Text="{DynamicResource WarningWindow.TypeHeader}" />
                                             </DataGridTextColumn.Header>
                                         </DataGridTextColumn>
 
                                         <DataGridTextColumn
                                             Width="200"
-                                            Binding="{Binding Level}">
+                                            Binding="{Binding Level}">                                            
                                             <DataGridTextColumn.Header>
-                                                <TextBlock
-                                                    Text="{me:LocalizationSource WarningWindow.LevelField}" />
+                                                <!--В динамически-создаваемом UserControl работает только DynamicResource-->
+                                                <TextBlock Text="{DynamicResource WarningWindow.LevelHeader}" />
                                             </DataGridTextColumn.Header>
                                         </DataGridTextColumn> 
                                     </ui:DataGrid.Columns>
@@ -116,13 +114,14 @@
                         </edits:CustomGroupEditControl>
                     </DataTemplate>
                 </ItemsControl.ItemTemplate>
+                
                 <ItemsControl.ItemsPanel>
                     <ItemsPanelTemplate>
                         <StackPanel />
                     </ItemsPanelTemplate>
                 </ItemsControl.ItemsPanel>
+                
             </ItemsControl>
         </ScrollViewer> 
-    </Grid>
-    
+    </Grid>    
 </core:WpfUIPlatformWindow>

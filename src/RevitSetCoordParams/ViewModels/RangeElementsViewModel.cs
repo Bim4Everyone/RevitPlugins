@@ -6,5 +6,4 @@ internal class RangeElementsViewModel {
     public string Name { get; set; }
 
     public IElementsProvider ElementsProvider { get; set; }
-
 }

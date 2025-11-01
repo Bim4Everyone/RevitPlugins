@@ -8,6 +8,9 @@ using dosymep.Revit;
 namespace RevitSetCoordParams.Models;
 internal class ParamFactory {
 
+    /// <summary>
+    /// Метод создания параметра RevitParam по его описанию
+    /// </summary>
     public RevitParam CreateRevitParam(Document document, Definition def) {
 
         var id = def.GetElementId();

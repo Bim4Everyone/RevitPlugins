@@ -7,12 +7,13 @@
     <system:String x:Key="MainWindow.RangeElementsDescription">Select how model elements will be processed</system:String>
     <system:String x:Key="MainWindow.SourceFiles">File with common models</system:String>
     <system:String x:Key="MainWindow.SourceFilesDescription">The file from which the data will be read</system:String>
-    <system:String x:Key="MainWindow.TypeModels">Type of common models</system:String>
+    
+    <system:String x:Key="MainWindow.TypeModels">Type of common models SMR</system:String>
     <system:String x:Key="MainWindow.TypeModelsDescription">Only common models of this type will be processed</system:String>
     <system:String x:Key="MainWindow.Positions">Element position</system:String>
     <system:String x:Key="MainWindow.PositionsDescription">Specifies relative position for element search</system:String>
-
     <system:String x:Key="MainWindow.Params">Parameters SMR</system:String>
+    
     <system:String x:Key="MainWindow.ParamsDescription">Select parameters SMR for reading and writing</system:String>
     <system:String x:Key="MainWindow.Categories">Element categories</system:String>
     <system:String x:Key="MainWindow.CategoriesDescription">Categories of elements where parameters will be written</system:String>
@@ -24,72 +25,81 @@
     <system:String x:Key="MainWindow.StepSearchSphere">Step of increasing the diameter of the search sphere</system:String>
     <system:String x:Key="MainWindow.StepSearchSphereDescription">The value of the sphere increase at each search iteration</system:String>
     <system:String x:Key="MainWindow.SearchSphereTooltip">Affects performance. Higher values ​​mean lower performance.</system:String>
-    <system:String x:Key="MainWindow.StepSearchSphereTooltip">Affects performance. Lower values ​​mean lower performance.</system:String>    
-
+    
+    <system:String x:Key="MainWindow.StepSearchSphereTooltip">Affects performance. Lower values ​​mean lower performance.</system:String>
     <system:String x:Key="MainWindow.SearchToggleSwitchOn">Search for elements</system:String>
     <system:String x:Key="MainWindow.SearchToggleSwitchOff">Do not search for elements</system:String>
-
     <system:String x:Key="MainWindow.SourceParamHeader">Source elements parameter</system:String>
     <system:String x:Key="MainWindow.TargetParamHeader">Target elements parameter</system:String>
+    
     <system:String x:Key="MainWindow.ParamsToggleSwitchOn">Use parameter</system:String>
     <system:String x:Key="MainWindow.ParamsToggleSwitchOff">Don't use parameter</system:String>
-
     <system:String x:Key="MainWindow.CategoryWarningTooltip">There are errors in the categories</system:String>    
-    <system:String x:Key="MainWindow.ParamWarningTooltip">There are errors in the parameters</system:String>    
-
+    <system:String x:Key="MainWindow.ParamWarningTooltip">There are errors in the parameters</system:String> 
     <system:String x:Key="MainWindow.ButtonOk">Set</system:String>
+    
     <system:String x:Key="MainWindow.ButtonCancel">Cancel</system:String>
-
     <system:String x:Key="MainWindow.CheckedAllCats">Select all categories</system:String>
     <system:String x:Key="MainWindow.NotCheckedAllCats">Unselect all categories</system:String>
+
+    <system:String x:Key="WarningWindow.Title">Warnings</system:String>
+    <system:String x:Key="WarningWindow.IdHeader">Element ID</system:String>
+    <system:String x:Key="WarningWindow.FamilyHeader">Family Name</system:String>
+    <system:String x:Key="WarningWindow.TypeHeader">Type Name</system:String>
+    <system:String x:Key="WarningWindow.LevelHeader">Element Level</system:String>
 
     <system:String x:Key="MainViewModel.BlockParamDescription">SMR Block Parameter</system:String>
     <system:String x:Key="MainViewModel.BlockParamDetailDescription">Used to determine the building block</system:String>
     <system:String x:Key="MainViewModel.SectionParamDescription">SMR Section Parameter</system:String>
     <system:String x:Key="MainViewModel.SectionParamDetailDescription">Used to determine the building section</system:String>
     <system:String x:Key="MainViewModel.FloorParamDescription">SMR Floor Parameter</system:String>
+    
     <system:String x:Key="MainViewModel.FloorParamDetailDescription">Used to determine the building floor</system:String>
     <system:String x:Key="MainViewModel.FloorDEParamDescription">Additional SMR Floor Parameter</system:String>
     <system:String x:Key="MainViewModel.FloorDEParamDetailDescription">Used to determine the building floor</system:String>
     <system:String x:Key="MainViewModel.BlockingParamDescription">Blocking Parameter</system:String>
     <system:String x:Key="MainViewModel.BlockingParamDetailDescription">Parameter type – Yes / No</system:String>
+    
     <system:String x:Key="MainViewModel.WrongParamName">Errors in parameters SMR</system:String>
     <system:String x:Key="MainViewModel.NoParams">No parameters selected</system:String>
     <system:String x:Key="MainViewModel.NoCategories">No categories selected</system:String>
     <system:String x:Key="MainViewModel.NoParamMaps">At least one paired parameter must be selected</system:String>
     <system:String x:Key="MainViewModel.DiameterSearchNoDouble">Input must be a number</system:String>
+    
     <system:String x:Key="MainViewModel.DiameterSearchNoNegate">Input must be positive</system:String>
     <system:String x:Key="MainViewModel.DiameterSearchNoZero">Input must be greater than zero</system:String>
     <system:String x:Key="MainViewModel.DiameterSearchBig">Input must not exceed 10000 mm</system:String>
     <system:String x:Key="MainViewModel.DiameterSearchStepBig">Input must not exceed 2000 mm</system:String>
     <system:String x:Key="MainViewModel.DiameterSearchStepBigger">Step must not exceed the maximum value</system:String>
+    
     <system:String x:Key="MainViewModel.AllElementsProvider">All model elements</system:String>
     <system:String x:Key="MainViewModel.SelectedElementsProvider">Selected model elements</system:String>
     <system:String x:Key="MainViewModel.CurrentViewProvider">Visible elements in the view</system:String>
     <system:String x:Key="MainViewModel.CenterPositionProvider">At the center of the element</system:String>
     <system:String x:Key="MainViewModel.BottomPositionProvider">At the bottom of the element</system:String>
+    
     <system:String x:Key="MainViewModel.UpPositionProvider">At the up of the element</system:String>
     <system:String x:Key="MainViewModel.NoTypeModel">The required 3D models are missing in the file</system:String>
-
     <system:String x:Key="MainViewModel.NoSelection">Elements is not selected</system:String>
     <system:String x:Key="MainViewModel.WrongView">Please, open 3D-view, floor plan or schedule</system:String>
+    <system:String x:Key="MainViewModel.ProgressTitle">Processing elements... [{0}]\[{1}]</system:String>
 
     <system:String x:Key="SourceFileViewModel.CurrentFile">Current file (opened)</system:String>
-
-    <system:String x:Key="CategoryViewModel.WarningStartString">Missing parameters:</system:String>
-    
+    <system:String x:Key="CategoryViewModel.WarningStartString">Missing parameters:</system:String>    
     <system:String x:Key="ParamViewModel.WarningStartString">Wrong parameters:</system:String>
-
-    <system:String x:Key="WarningsViewModel.SkipElement">Elements blocked by the lock parameter</system:String>
-    <system:String x:Key="WarningsViewModel.NotFoundElement">Unprocessed elements</system:String>
-    <system:String x:Key="WarningsViewModel.NotFoundParam">Elements with unset parameters</system:String>
-
-    <system:String x:Key="Common.ParamErrorMessageBody">Error copying parameters</system:String>
-
     <system:String x:Key="SetCoordParamsProcessor.TransactionName">Assigning parameters SMR</system:String>
-
+    <system:String x:Key="Common.ParamErrorMessageBody">Error copying parameters</system:String>
     <system:String x:Key="Common.ConfigErrorMessageTitle">Plug-in configuration error</system:String>
 
-    <system:String x:Key="WarningsWindow.Title">Warnings</system:String>
+    <system:String x:Key="WarningsViewModel.SkipElement">Skipped Elements</system:String>
+    <system:String x:Key="WarningsViewModel.SkipElementDescription">Elements are locked by a blocking parameter and were skipped by the plug-in</system:String>
+    <system:String x:Key="WarningsViewModel.NotFoundElement">Unprocessed Elements</system:String>
+    <system:String x:Key="WarningsViewModel.NotFoundElementDescription">Elements are too far away or cannot be processed</system:String>
+    <system:String x:Key="WarningsViewModel.NotFoundParam">Elements with unfilled parameters</system:String>
+    <system:String x:Key="WarningsViewModel.NotFoundParamDescription">These parameters are not added to the categories of these elements and were not filled in</system:String>
+
+    <system:String x:Key="RevitRepository.DefaultFamilyName">No Family Name</system:String>
+    <system:String x:Key="RevitRepository.DefaultTypeName">No Type Name</system:String>
+    <system:String x:Key="RevitRepository.DefaultLevelName">No Level</system:String>    
 
 </ResourceDictionary>

@@ -3,6 +3,8 @@ using System.Collections.ObjectModel;
 using System.Linq;
 using System.Windows.Input;
 
+using Autodesk.Revit.DB;
+
 using dosymep.SimpleServices;
 using dosymep.WPF.Commands;
 using dosymep.WPF.ViewModels;
@@ -12,52 +14,62 @@ using RevitSetCoordParams.Models;
 namespace RevitSetCoordParams.ViewModels;
 internal class WarningsViewModel : BaseViewModel {
     private readonly ILocalizationService _localizationService;
-    private readonly IReadOnlyCollection<WarningElement> _warningElements;
-
+    private readonly RevitRepository _revitRepository;
     private ObservableCollection<WarningGroupViewModel> _warningViewModels;
 
-    public WarningsViewModel(ILocalizationService localizationService, IReadOnlyCollection<WarningElement> warningElements) {
+    public WarningsViewModel(ILocalizationService localizationService, RevitRepository revitRepository) {
         _localizationService = localizationService;
-        _warningElements = warningElements;
+        _revitRepository = revitRepository;
 
-        LoadViewCommand = RelayCommand.Create(LoadView);
+        ShowElementCommand = RelayCommand.Create<ElementId>(ShowElement);
     }
 
-    public ICommand LoadViewCommand { get; }
+    public ICommand ShowElementCommand { get; }
+
+    public IReadOnlyCollection<WarningElement> WarningElementsCollection { get; set; }
 
     public ObservableCollection<WarningGroupViewModel> WarningViewModels {
         get => _warningViewModels;
         set => RaiseAndSetIfChanged(ref _warningViewModels, value);
     }
 
-
-    // Метод загрузки вида
-    private void LoadView() {
+    /// <summary>
+    /// Метод загрузки окна
+    /// </summary>
+    public void LoadView() {
         WarningViewModels = new ObservableCollection<WarningGroupViewModel>(GetWarningGroupViewModels());
     }
 
+    // Метод выделения элемента
+    private void ShowElement(ElementId elementId) {
+        _revitRepository.SetSelected(elementId);
+    }
+
+    // Метод формирования списка WarningGroupViewModel
     private IEnumerable<WarningGroupViewModel> GetWarningGroupViewModels() {
-        return _warningElements
+        return WarningElementsCollection
             .Where(warningElement => warningElement is not WarningNotFoundParamElement)
             .GroupBy(element => element.WarningType)
             .Select(group => new WarningGroupViewModel {
                 Caption = _localizationService.GetLocalizedString($"WarningsViewModel.{group.Key}"),
                 Description = _localizationService.GetLocalizedString($"WarningsViewModel.{group.Key}Description"),
-                WarningElements = group.ToList()
+                WarningElements = group.ToList(),
+                ShowElementCommand = ShowElementCommand
             })
             .Concat(
-                _warningElements
+                WarningElementsCollection
             .OfType<WarningNotFoundParamElement>()
             .GroupBy(w => w.RevitElement.Element.Id)
             .Select(g => new {
                 WarningElements = g.ToList(),
-                ParamNames = string.Join(", ", g.Select(x => x.RevitParam.Name))
+                ParamNames = string.Join(", ", g.Select(x => x.RevitParam.Name).Distinct())
             })
             .GroupBy(g => g.ParamNames)
             .Select(g => new WarningGroupViewModel {
                 Caption = $"{_localizationService.GetLocalizedString("WarningsViewModel.NotFoundParam")}: {g.Key}",
                 Description = _localizationService.GetLocalizedString("WarningsViewModel.NotFoundParamDescription"),
-                WarningElements = g.SelectMany(x => x.WarningElements).ToList()
+                WarningElements = g.SelectMany(x => x.WarningElements).ToList(),
+                ShowElementCommand = ShowElementCommand
             }));
     }
 }

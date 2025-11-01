@@ -9,20 +9,30 @@ using Autodesk.Revit.UI;
 using dosymep.Bim4Everyone;
 using dosymep.Revit;
 using dosymep.Revit.Geometry;
+using dosymep.SimpleServices;
 
+using RevitSetCoordParams.Models.Interfaces;
 using RevitSetCoordParams.Models.Services;
 
 namespace RevitSetCoordParams.Models;
 
 internal class RevitRepository {
-
-    private readonly DocumentsService _documentsService;
+    private readonly ILocalizationService _localizationService;
+    private readonly IDocumentsService _documentsService;
     private readonly WorksetTable _worksetTable;
+    private readonly string _defaultFamilyName;
+    private readonly string _defaultTypeName;
+    private readonly string _defaultLevelName;
 
-    public RevitRepository(UIApplication uiApplication) {
+    public RevitRepository(UIApplication uiApplication, ILocalizationService localizationService) {
         UIApplication = uiApplication;
+        _localizationService = localizationService;
         _documentsService = new DocumentsService(Document);
         _worksetTable = Document.GetWorksetTable();
+
+        _defaultFamilyName = _localizationService.GetLocalizedString("RevitRepository.DefaultFamilyName");
+        _defaultTypeName = _localizationService.GetLocalizedString("RevitRepository.DefaultTypeName");
+        _defaultLevelName = _localizationService.GetLocalizedString("RevitRepository.DefaultLevelName");
     }
 
     public UIApplication UIApplication { get; }
@@ -47,10 +57,9 @@ internal class RevitRepository {
                 .Select(element => new RevitElement {
                     Element = element,
                     BoundingBoxXYZ = element.GetBoundingBox(),
-                    LevelName = element.LevelId != ElementId.InvalidElementId
-                    ? Document.GetElement(element.LevelId)?.Name
-                    : null,
-                    FamilyName = GetFamilyName(element)
+                    FamilyName = GetFamilyName(element),
+                    TypeName = element.Name ?? _defaultTypeName,
+                    LevelName = GetLevelName(element)
                 })
                 .Where(element => element.BoundingBoxXYZ != null)
             );
@@ -73,10 +82,9 @@ internal class RevitRepository {
                .Select(element => new RevitElement {
                    Element = element,
                    BoundingBoxXYZ = element.GetBoundingBox(),
-                   LevelName = element.LevelId != ElementId.InvalidElementId
-                    ? Document.GetElement(element.LevelId)?.Name
-                    : null,
-                   FamilyName = GetFamilyName(element)
+                   FamilyName = GetFamilyName(element),
+                   TypeName = element.Name ?? _defaultTypeName,
+                   LevelName = GetLevelName(element)
                })
                .Where(element => element.BoundingBoxXYZ != null)
            );
@@ -101,10 +109,9 @@ internal class RevitRepository {
             .Select(element => new RevitElement {
                 Element = element,
                 BoundingBoxXYZ = element.GetBoundingBox(),
-                LevelName = element.LevelId != ElementId.InvalidElementId
-                    ? Document.GetElement(element.LevelId)?.Name
-                    : null,
-                FamilyName = GetFamilyName(element)
+                FamilyName = GetFamilyName(element),
+                TypeName = element.Name ?? _defaultTypeName,
+                LevelName = GetLevelName(element)
             })
             .Where(element => element.BoundingBoxXYZ != null);
     }
@@ -214,6 +221,14 @@ internal class RevitRepository {
         return GeometryCreationUtilities.CreateRevolvedGeometry(frame, [curve_loop], startAngle, endAngle);
     }
 
+    /// <summary>
+    /// Метод выделения элементов в документе
+    /// </summary>
+    public void SetSelected(ElementId elementId) {
+        List<ElementId> listElements = [elementId];
+        ActiveUIDocument.SetSelectedElements(listElements);
+    }
+
     // Метод получения объединенного солида
     private Solid GetUnitedSolid(Element element) {
         var solids = element.GetSolids().ToList();
@@ -240,11 +255,27 @@ internal class RevitRepository {
         }
     }
 
+    // Метод получения имени семейства
     private string GetFamilyName(Element element) {
-        if(element is FamilyInstance fi) {
-            return fi.Symbol?.Family?.Name;
+        return element is FamilyInstance fi
+            ? fi.Symbol?.Family?.Name ?? _defaultFamilyName
+            : element.HasElementType()
+            ? element.GetElementType()?.FamilyName
+            : _defaultFamilyName;
+    }
+
+    // Метод получения имени уровня
+    private string GetLevelName(Element element) {
+        var levelId = element.LevelId;
+        if(levelId != ElementId.InvalidElementId) {
+            return (Document.GetElement(levelId) as Level)?.Name ?? _defaultLevelName;
         }
-        var familyParam = element.get_Parameter(BuiltInParameter.ELEM_FAMILY_PARAM);
-        return familyParam?.AsValueString();
+        if(element.IsExistsParam(BuiltInParameter.INSTANCE_SCHEDULE_ONLY_LEVEL_PARAM)) {
+            var scheduleLevelId = element.GetParamValue<ElementId>(BuiltInParameter.INSTANCE_SCHEDULE_ONLY_LEVEL_PARAM);
+            if(scheduleLevelId.IsNotNull() && scheduleLevelId != ElementId.InvalidElementId) {
+                return (Document.GetElement(scheduleLevelId) as Level)?.Name ?? _defaultLevelName;
+            }
+        }
+        return _defaultLevelName;
     }
 }

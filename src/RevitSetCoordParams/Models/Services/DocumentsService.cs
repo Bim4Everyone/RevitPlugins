@@ -3,8 +3,10 @@ using System.Linq;
 
 using Autodesk.Revit.DB;
 
+using RevitSetCoordParams.Models.Interfaces;
+
 namespace RevitSetCoordParams.Models.Services;
-internal class DocumentsService {
+internal class DocumentsService : IDocumentsService {
     private readonly Dictionary<string, (Document, Transform)> _documentsByName = [];
     private readonly Document _mainDocument;
 
@@ -30,7 +32,7 @@ internal class DocumentsService {
         return foundDoc ?? _mainDocument;
     }
 
-    // Метод поиска трансформа в словаре по имени
+    // Метод поиска трансформации в словаре по имени
     public Transform GetTransformByName(string name) {
         if(string.IsNullOrWhiteSpace(name)) {
             return null;
