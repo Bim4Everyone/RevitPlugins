@@ -465,6 +465,7 @@ namespace RevitCreateViewSheet.ViewModels {
                         _localizationService))
                     ?? [];
                 foreach(var sheetViewModel in newSheetViewModels) {
+                    sheetViewModel.SheetNumberByMask = NumberByMask;
                     _sheets.Add(sheetViewModel);
                 }
 
