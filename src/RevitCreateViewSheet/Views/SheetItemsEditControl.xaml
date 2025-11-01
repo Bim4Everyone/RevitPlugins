@@ -46,7 +46,7 @@
                     Text="{Binding Header, ElementName=_this}" />
 
                 <DockPanel
-                    Margin="0 0 10 0"
+                    Margin="0 0 8 0"
                     Grid.Column="1">
                     <ui:Button
                         Style="{StaticResource CustomSymbolButton}"
