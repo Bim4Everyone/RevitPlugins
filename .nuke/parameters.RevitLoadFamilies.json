@@ -1,0 +1,15 @@
+{
+  "$schema": "./build.schema.json",
+  "Solution": "RevitPlugins.slnx",
+  "PluginName": "RevitLoadFamilies",
+  "PublishDirectory": "01.BIM.extension\\BIM.tab\\bin",
+  "RevitVersions": [
+    "Rv2022",
+    "Rv2023",
+    "Rv2024"
+  ],
+  "IconUrl": "https://icons8.com/icon/14100/download",
+  "BundleName": "Загрузить семейства",
+  "BundleType": "InvokeButton",
+  "BundleOutput": "01.BIM.extension\\BIM.tab\\Прочее.panel\\Прочее 1.stack\\Стандарты.pulldown\\Загрузить семейства.invokebutton"
+}

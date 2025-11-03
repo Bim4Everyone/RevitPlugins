@@ -34,8 +34,6 @@
     <BuildType Solution="D2022|*" Project="Debug" />
     <BuildType Solution="D2023|*" Project="Debug" />
     <BuildType Solution="D2024|*" Project="Debug" />
-    <BuildType Solution="Debug|*" Project="Debug" />
-    <BuildType Solution="Release|*" Project="Release" />
   </Project>
   <Project Path="src/RevitApartmentPlans/RevitApartmentPlans.csproj">
     <Platform Project="x64" />
@@ -119,6 +117,9 @@
     <Platform Project="x64" />
   </Project>
   <Project Path="src/RevitListOfSchedules/RevitListOfSchedules.csproj">
+    <Platform Project="x64" />
+  </Project>
+  <Project Path="src/RevitLoadFamilies/RevitLoadFamilies.csproj">
     <Platform Project="x64" />
   </Project>
   <Project Path="src/RevitMarkingElements/RevitMarkingElements.csproj">
