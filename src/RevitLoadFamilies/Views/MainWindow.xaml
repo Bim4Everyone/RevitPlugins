@@ -13,7 +13,6 @@
     xmlns:me="clr-namespace:dosymep.WpfCore.MarkupExtensions;assembly=dosymep.WpfCore"
    
     mc:Ignorable="d"
-    Title="{me:LocalizationSource MainWindow.Title}"
     
     Height="500"
     Width="700"
@@ -29,26 +28,44 @@
         </i:EventTrigger>
     </i:Interaction.Triggers>
 
-    <Grid>
+    <Grid
+        Margin="10">
         <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
             <RowDefinition Height="Auto" />
             <RowDefinition Height="*" />
             <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
-        
+
         <ui:TitleBar
             Grid.Row="0"
             Title="{me:LocalizationSource MainWindow.Title}" />
 
-        <ui:TextBox
+        <TextBlock
             Grid.Row="1"
-            Width="200"
-            VerticalAlignment="Center"
-            HorizontalAlignment="Center"
-            Text="{Binding SaveProperty, UpdateSourceTrigger=PropertyChanged}" />
+            Text="Configs"
+            FontWeight="Bold"
+            Margin="10" />
+
+        <GroupBox
+            Grid.Row="2"
+            Header="Families to download:"
+            Margin="10">
+            <ListBox
+                ItemsSource="{Binding FamilyPaths}">
+                <ListBox.ItemTemplate>
+                    <DataTemplate>
+                        <TextBlock
+                            Text="{Binding}"
+                            TextWrapping="Wrap"
+                            Margin="2" />
+                    </DataTemplate>
+                </ListBox.ItemTemplate>
+            </ListBox>
+        </GroupBox>
 
         <StackPanel
-            Grid.Row="2"
+            Grid.Row="3"
             Orientation="Horizontal"
             HorizontalAlignment="Right">
 
@@ -62,14 +79,14 @@
                 Margin="10"
                 Width="80"
                 Appearance="Info"
-                Content="{me:LocalizationSource MainWindow.ButtonOk}"
+                Content="Ok"
                 Click="ButtonOk_Click"
                 Command="{Binding AcceptViewCommand}" />
 
             <ui:Button
                 Margin="10"
                 Width="80"
-                Content="{me:LocalizationSource MainWindow.ButtonCancel}"
+                Content="Cancel"
                 IsCancel="True"
                 Click="ButtonCancel_Click" />
         </StackPanel>
