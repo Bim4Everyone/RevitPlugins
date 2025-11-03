@@ -15,6 +15,8 @@ using dosymep.WPF.ViewModels;
 using RevitLoadFamilies.Models;
 using RevitLoadFamilies.Services;
 
+using Microsoft.Win32;
+
 namespace RevitLoadFamilies.ViewModels;
 
 /// <summary>
@@ -30,6 +32,7 @@ internal class MainViewModel : BaseViewModel {
 
     private string _errorText;
     private string _saveProperty;
+    private string _selectedFamilyPath;
 
     /// <summary>
     /// Создает экземпляр основной ViewModel главного окна.
@@ -41,7 +44,7 @@ internal class MainViewModel : BaseViewModel {
         PluginConfig pluginConfig,
         RevitRepository revitRepository,
         ILocalizationService localizationService) {
-        
+
         _pluginConfig = pluginConfig;
         _revitRepository = revitRepository;
         _localizationService = localizationService;
@@ -55,6 +58,8 @@ internal class MainViewModel : BaseViewModel {
 
         LoadViewCommand = RelayCommand.Create(LoadView);
         AcceptViewCommand = RelayCommand.Create(AcceptView, CanAcceptView);
+        AddFamilyPathCommand = RelayCommand.Create(AddFamilyPath);
+        RemoveFamilyPathCommand = RelayCommand.Create(RemoveFamilyPath, CanRemoveFamilyPath);
     }
 
 
@@ -87,21 +92,37 @@ internal class MainViewModel : BaseViewModel {
             MessageBoxImage.Information);
     }
 
-
-
     /// <summary>
     /// Команда загрузки главного окна.
     /// </summary>
     public ICommand LoadViewCommand { get; }
-    
+
     /// <summary>
     /// Команда применения настроек главного окна. (запуск плагина)
     /// </summary>
     /// <remarks>В случаях, когда используется немодальное окно, требуется данную команду удалять.</remarks>
     public ICommand AcceptViewCommand { get; }
 
+    /// <summary>
+    /// Команда добавления пути к семейству.
+    /// </summary>
+    public ICommand AddFamilyPathCommand { get; }
+
+    /// <summary>
+    /// Команда удаления пути к семейству.
+    /// </summary>
+    public ICommand RemoveFamilyPathCommand { get; }
+
     public FamilyConfig CurrentConfig { get; set; }
     public ObservableCollection<string> FamilyPaths { get; set; }
+
+    /// <summary>
+    /// Выбранный путь к семейству в списке.
+    /// </summary>
+    public string SelectedFamilyPath {
+        get => _selectedFamilyPath;
+        set => RaiseAndSetIfChanged(ref _selectedFamilyPath, value);
+    }
 
     /// <summary>
     /// Текст ошибки, который отображается при неверном вводе пользователя.
@@ -139,6 +160,51 @@ internal class MainViewModel : BaseViewModel {
     }
 
     /// <summary>
+    /// Метод добавления пути к семейству.
+    /// </summary>
+    private void AddFamilyPath() {
+        var openFileDialog = new OpenFileDialog {
+            Filter = "Revit Families (*.rfa)|*.rfa",
+            Multiselect = false,
+            Title = "Выберите файл семейства Revit"
+        };
+
+        if(openFileDialog.ShowDialog() == true) {
+            if(!string.IsNullOrEmpty(openFileDialog.FileName)) {
+                // Проверяем, нет ли уже такого пути в списке
+                if(!CurrentConfig.FamilyPaths.Contains(openFileDialog.FileName)) {
+                    CurrentConfig.FamilyPaths.Add(openFileDialog.FileName);
+                    FamilyPaths.Add(openFileDialog.FileName);
+                } else {
+                    MessageBox.Show(
+                        "Данный файл уже добавлен в список.",
+                        "Предупреждение",
+                        MessageBoxButton.OK,
+                        MessageBoxImage.Warning);
+                }
+            }
+        }
+    }
+
+    /// <summary>
+    /// Метод удаления пути к семейству.
+    /// </summary>
+    private void RemoveFamilyPath() {
+        if(!string.IsNullOrEmpty(SelectedFamilyPath)) {
+            CurrentConfig.FamilyPaths.Remove(SelectedFamilyPath);
+            FamilyPaths.Remove(SelectedFamilyPath);
+            SelectedFamilyPath = null;
+        }
+    }
+
+    /// <summary>
+    /// Проверка возможности удаления пути к семейству.
+    /// </summary>
+    private bool CanRemoveFamilyPath() {
+        return !string.IsNullOrEmpty(SelectedFamilyPath);
+    }
+
+    /// <summary>
     /// Метод проверки возможности выполнения команды применения настроек.
     /// </summary>
     /// <returns>В случае когда true - команда может выполниться, в случае false - нет.</returns>
@@ -147,13 +213,6 @@ internal class MainViewModel : BaseViewModel {
     /// В методе проверяемые свойства окна должны быть отсортированы в таком же порядке как в окне (сверху-вниз)
     /// </remarks>
     private bool CanAcceptView() {
-        //if(string.IsNullOrEmpty(SaveProperty)) {
-        //    ErrorText = _localizationService.GetLocalizedString("MainWindow.HelloCheck");
-        //    return false;
-        //}
-
-        //ErrorText = null;
-        //return true;
         return CurrentConfig != null && CurrentConfig.FamilyPaths.Count > 0;
     }
 
