@@ -93,6 +93,9 @@ namespace RevitCreateViewSheet.ViewModels {
             AllSheetFormats = SheetFormatViewModel.GetStandardSheetFormats();
             Orientations = [new OrientationViewModel(_localizationService, false),
                 new OrientationViewModel(_localizationService, true)];
+            AddSheetsFormat = AllSheetFormats.First();
+            AddSheetsOrientation = Orientations.First();
+
 
             NumerationColumns = [
                 _localizationService.GetLocalizedString("MainWindow.AllSheets.CustomNumber"),

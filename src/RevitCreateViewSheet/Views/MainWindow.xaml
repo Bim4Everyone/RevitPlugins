@@ -84,8 +84,7 @@
                 Command="{Binding LoadViewCommand}" />
         </b:EventTrigger>
     </b:Interaction.Triggers>
-    <Grid
-        Margin="10 10 10 0">
+    <Grid>
         <Grid.ColumnDefinitions>
             <ColumnDefinition />
         </Grid.ColumnDefinitions>
@@ -102,6 +101,7 @@
             Grid.Row="0"
             Title="{me:LocalizationSource MainWindow.Title}" />
         <DockPanel
+            Margin="10 0"
             Grid.Row="1">
             <Grid>
                 <Grid.RowDefinitions>
@@ -116,12 +116,12 @@
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition
                         Width="2*"
-                        MinWidth="100" />
+                        MinWidth="500" />
                     <ColumnDefinition
                         Width="Auto" />
                     <ColumnDefinition
                         Width="1*"
-                        MinWidth="100" />
+                        MinWidth="500" />
                 </Grid.ColumnDefinitions>
 
                 <Grid
@@ -253,7 +253,6 @@
                                     <ui:TextBox
                                         Grid.Column="4"
                                         Grid.Row="1"
-                                        Height="40"
                                         x:Name="_sheetsCreationCount"
                                         Text="{Binding AddSheetsCount, UpdateSourceTrigger=PropertyChanged}" />
 
@@ -350,7 +349,7 @@
                                         Text="{Binding NumerationStartNumber, UpdateSourceTrigger=PropertyChanged}" />
 
                                     <DockPanel
-                                        Margin="20 0"
+                                        Margin="10 0"
                                         Grid.Row="0"
                                         Grid.Column="1">
                                         <Label
@@ -361,7 +360,7 @@
                                     <ComboBox
                                         Grid.Row="1"
                                         Grid.Column="1"
-                                        Margin="20 0"
+                                        Margin="10 0"
                                         x:Name="_numerationColumn"
                                         Style="{StaticResource CustomComboBox}"
                                         IsEnabled="{Binding NumberByMask, Converter={StaticResource InverseBooleanConverter}}"
@@ -381,7 +380,7 @@
                                         Grid.Row="2"
                                         Grid.Column="0"
                                         Grid.ColumnSpan="4"
-                                        Margin="0 20 0 0"
+                                        Margin="0 10 0 0"
                                         VerticalAlignment="Center"
                                         ToolTip="{me:LocalizationSource MainWindow.AllSheets.Numeration.SyncSystemNumberByMask.ToolTip}">
                                         <ui:ToggleSwitch
@@ -416,17 +415,18 @@
                             Style="{StaticResource CustomBigLabel}"
                             Target="{Binding ElementName=_sheets}"
                             Content="{me:LocalizationSource MainWindow.AllSheets.Sheets}" />
-                        <StackPanel
+                        <DockPanel
                             DockPanel.Dock="Top"
                             Margin="0 0 0 14">
-                            <Label
-                                Style="{StaticResource CustomLabel}"
-                                Target="{Binding ElementName=_sheetsFilter}"
-                                Content="{me:LocalizationSource MainWindow.AllSheets.Filter}" />
                             <ui:TextBox
                                 x:Name="_sheetsFilter"
+                                DockPanel.Dock="Right"
+                                MinWidth="300"
+                                MaxWidth="300"
+                                HorizontalAlignment="Right"
+                                PlaceholderText="{me:LocalizationSource MainWindow.AllSheets.Filter}"
                                 Text="{Binding SheetsFilter, UpdateSourceTrigger=PropertyChanged}" />
-                        </StackPanel>
+                        </DockPanel>
                         <ui:DataGrid
                             x:Name="_sheets"
                             SelectionMode="Extended"
@@ -530,7 +530,7 @@
                                     </DataGridTemplateColumn.CellTemplate>
                                 </DataGridTemplateColumn>
                                 <DataGridTemplateColumn
-                                    Width="350"
+                                    Width="250"
                                     MinWidth="100"
                                     SortMemberPath="TitleBlock.Name"
                                     Header="{StaticResource TitleBlockHeader}">
@@ -578,7 +578,7 @@
                 <GridSplitter
                     Grid.Row="2"
                     Grid.Column="1"
-                    Width="10"
+                    Width="5"
                     Background="{DynamicResource CardBackground}"
                     BorderBrush="{DynamicResource CardBorderBrush}"
                     BorderThickness="{DynamicResource CardControlBorderThemeThickness}"
@@ -627,7 +627,7 @@
                 Content="{me:LocalizationSource AllWindow.ButtonOk}"
                 Command="{Binding AcceptViewCommand}" />
             <ui:Button
-                Margin="10 10 0 10"
+                Margin="10"
                 IsCancel="True"
                 Click="ButtonCancel_Click"
                 Style="{StaticResource CustomContentButton}"
