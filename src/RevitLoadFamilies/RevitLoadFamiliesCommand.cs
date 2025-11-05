@@ -62,7 +62,7 @@ public class RevitLoadFamiliesCommand : BasePluginCommand {
         kernel.UseWpfUIThemeUpdater();
 
         // Настройка запуска окна
-        kernel.BindMainWindow<MainViewModel, MainWindow>();
+        kernel.BindMainWindow<MainVM, MainWindow>();
 
         // Настройка локализации,
         // получение имени сборки откуда брать текст

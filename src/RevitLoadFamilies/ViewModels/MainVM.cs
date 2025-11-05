@@ -5,6 +5,8 @@ using System.Linq;
 using System.Windows;
 using System.Windows.Input;
 
+using Autodesk.Revit.DB;
+
 using dosymep.Revit;
 using dosymep.SimpleServices;
 using dosymep.WPF.Commands;
@@ -14,13 +16,15 @@ using Microsoft.Win32;
 
 using RevitLoadFamilies.Models;
 using RevitLoadFamilies.Services;
+using RevitLoadFamilies.Services.ConfigServices;
+using RevitLoadFamilies.Services.FamilyLoading;
 
 namespace RevitLoadFamilies.ViewModels;
 
 /// <summary>
 /// Основная ViewModel главного окна плагина.
 /// </summary>
-internal class MainViewModel : BaseViewModel {
+internal class MainVM : BaseViewModel {
     private readonly PluginConfig _pluginConfig;
     private readonly RevitRepository _revitRepository;
     private readonly ILocalizationService _localizationService;
@@ -28,10 +32,11 @@ internal class MainViewModel : BaseViewModel {
     private readonly IConfigService _configService;
     private readonly IFamilyLoadService _familyLoadService;
 
+    private string _configurationFolderPath;
+    private FamilyConfigVM _selectedConfig;
     private string _errorText;
-    private FamilyConfig _selectedConfig;
 
-    public MainViewModel(PluginConfig pluginConfig, RevitRepository revitRepository,
+    public MainVM(PluginConfig pluginConfig, RevitRepository revitRepository,
                          ILocalizationService localizationService) {
         _pluginConfig = pluginConfig;
         _revitRepository = revitRepository;
@@ -50,9 +55,9 @@ internal class MainViewModel : BaseViewModel {
     public ICommand AcceptViewCommand { get; }
     public ICommand UpdateFamilyPathsCommand { get; }
 
-    public ObservableCollection<FamilyConfig> Configurations { get; set; } = [];
+    public ObservableCollection<FamilyConfigVM> Configurations { get; set; } = [];
 
-    public FamilyConfig SelectedConfig {
+    public FamilyConfigVM SelectedConfig {
         get => _selectedConfig;
         set => RaiseAndSetIfChanged(ref _selectedConfig, value);
     }
@@ -71,16 +76,14 @@ internal class MainViewModel : BaseViewModel {
         LoadConfig();
 
         // Загружаем конфигурации из файлов
-        foreach(var config in _configService.GetConfigurations()) {
-            Configurations.Add(config);
+        foreach(var config in _configService.GetConfigurations(_configurationFolderPath)) {
+            Configurations.Add(config.ToViewModel());
         }
-
         if(Configurations.Any()) {
             SelectedConfig = Configurations.First();
         } else {
             ErrorText = "Конфигурации не найдены";
         }
-
         UpdateFamilyPaths();
     }
 
@@ -98,6 +101,8 @@ internal class MainViewModel : BaseViewModel {
     /// </summary>
     private void LoadConfig() {
         RevitSettings setting = _pluginConfig.GetSettings(_revitRepository.Document);
+
+        _configurationFolderPath = setting.СonfigurationFolderPath;
     }
 
     /// <summary>

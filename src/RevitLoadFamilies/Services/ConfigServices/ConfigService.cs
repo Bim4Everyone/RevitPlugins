@@ -4,14 +4,9 @@ using System.IO;
 using System.Linq;
 using System.Windows;
 
-using Autodesk.Revit;
-using Autodesk.Revit.DB;
-
-using Microsoft.Win32;
-
 using RevitLoadFamilies.Models;
 
-namespace RevitLoadFamilies.Services;
+namespace RevitLoadFamilies.Services.ConfigServices;
 
 internal class ConfigService : IConfigService {
     private readonly RevitRepository _revitRepository;
@@ -20,14 +15,16 @@ internal class ConfigService : IConfigService {
         _revitRepository = revitRepository;
     }
 
-    public IEnumerable<FamilyConfig> GetConfigurations() {
-        string basePath = GetConfigurationsFolderPath();
-
-        if(string.IsNullOrEmpty(basePath)) {
-            return Enumerable.Empty<FamilyConfig>();
+    public IEnumerable<FamilyConfig> GetConfigurations(string configurationFolderPath) {
+        // Проверяем сохраненный путь, если он не действителен, тогда получаем стандартный
+        if (string.IsNullOrEmpty(configurationFolderPath) || !Directory.Exists(configurationFolderPath)) {
+            configurationFolderPath = GetConfigurationsFolderPath();
         }
-
-        return LoadConfigurationsFromFolder(basePath);
+        // Если стандартный путь также не действителен, тогда запрашиваем выбор папки
+        if(string.IsNullOrEmpty(configurationFolderPath) || !Directory.Exists(configurationFolderPath)) {
+            throw new ArgumentException();
+        }
+        return LoadConfigurationsFromFolder(configurationFolderPath);
     }
 
     private string GetConfigurationsFolderPath() {
@@ -47,12 +44,7 @@ internal class ConfigService : IConfigService {
     }
 
     private string GetRevitVersion() {
-        // Получаем версию Revit из продукта
-        string productVersion = _revitRepository.Application.VersionNumber;
-
-        // Извлекаем год из версии (например, "2022" из "2022.1.1")
-        string year = new string(productVersion.Take(4).ToArray());
-        return year;
+        return _revitRepository.Application.VersionNumber;
     }
 
     private string ShowFolderSelectionDialog() {
@@ -76,7 +68,6 @@ internal class ConfigService : IConfigService {
 
     private IEnumerable<FamilyConfig> LoadConfigurationsFromFolder(string folderPath) {
         var configurations = new List<FamilyConfig>();
-
         try {
             // Ищем все .txt файлы в папке
             var txtFiles = Directory.GetFiles(folderPath, "*.txt");
@@ -94,7 +85,6 @@ internal class ConfigService : IConfigService {
                 MessageBoxButton.OK,
                 MessageBoxImage.Error);
         }
-
         return configurations;
     }
 
