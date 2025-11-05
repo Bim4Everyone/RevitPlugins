@@ -1,21 +1,20 @@
 using System;
 using System.Collections.ObjectModel;
 using System.IO;
+using System.Linq;
 using System.Windows;
+using System.Windows.Data;
 using System.Windows.Input;
-using System.Xml.Linq;
-
-using Autodesk.Revit.DB;
 
 using dosymep.Revit;
 using dosymep.SimpleServices;
 using dosymep.WPF.Commands;
 using dosymep.WPF.ViewModels;
 
+using Microsoft.Win32;
+
 using RevitLoadFamilies.Models;
 using RevitLoadFamilies.Services;
-
-using Microsoft.Win32;
 
 namespace RevitLoadFamilies.ViewModels;
 
@@ -32,7 +31,7 @@ internal class MainViewModel : BaseViewModel {
 
     private string _errorText;
     private string _saveProperty;
-    private string _selectedFamilyPath;
+    private FamilyConfig _selectedConfig;
 
     /// <summary>
     /// Создает экземпляр основной ViewModel главного окна.
@@ -52,44 +51,20 @@ internal class MainViewModel : BaseViewModel {
         _configService = new ConfigService();
         _familyLoadService = new FamilyLoadService();
 
-        // Загружаем встроенную конфигурацию
-        CurrentConfig = _configService.GetDefaultConfig();
-        FamilyPaths = new ObservableCollection<string>(CurrentConfig.FamilyPaths);
+        // Загружаем конфигурации
+        Configurations = new ObservableCollection<FamilyConfig>(_configService.GetConfigurations());
+        if(Configurations.Any()) {
+            SelectedConfig = Configurations.First();
+        }
+
+        FamilyPaths = new ObservableCollection<string>();
 
         LoadViewCommand = RelayCommand.Create(LoadView);
         AcceptViewCommand = RelayCommand.Create(AcceptView, CanAcceptView);
-        AddFamilyPathCommand = RelayCommand.Create(AddFamilyPath);
-        RemoveFamilyPathCommand = RelayCommand.Create(RemoveFamilyPath, CanRemoveFamilyPath);
-    }
-
-
-    private void LoadFamilies() {
-        using var transaction = _revitRepository.Document.StartTransaction("LoadFamilies");
-
-        int successCount = 0;
-        int fileIsNotExistsCount = 0;
-        int errorCount = 0;
-
-        foreach(var filePath in CurrentConfig.FamilyPaths) {
-            try {
-                if(File.Exists(filePath)) {
-                    _familyLoadService.LoadFamily(filePath, _revitRepository.Document);
-                    successCount++;
-                } else {
-                    fileIsNotExistsCount++;
-                }
-            } catch(Exception) {
-                errorCount++;
-            }
-        }
-
-        transaction.Commit();
-
-        MessageBox.Show(
-            $"Загрузка завершена:\nУспешно: {successCount}\nНе найдено: {fileIsNotExistsCount}\nОшибок: {errorCount}",
-            "Результат загрузки",
-            MessageBoxButton.OK,
-            MessageBoxImage.Information);
+        
+        ImportConfigCommand = RelayCommand.Create(ImportConfig);
+        ExportConfigCommand = RelayCommand.Create(ExportConfig, CanExportConfig);
+        UpdateFamilyPathsCommand = RelayCommand.Create(UpdateFamilyPaths);
     }
 
     /// <summary>
@@ -113,16 +88,30 @@ internal class MainViewModel : BaseViewModel {
     /// </summary>
     public ICommand RemoveFamilyPathCommand { get; }
 
-    public FamilyConfig CurrentConfig { get; set; }
-    public ObservableCollection<string> FamilyPaths { get; set; }
+    /// <summary>
+    /// Команда импорта конфигурации.
+    /// </summary>
+    public ICommand ImportConfigCommand { get; }
 
     /// <summary>
-    /// Выбранный путь к семейству в списке.
+    /// Команда экспорта конфигурации.
     /// </summary>
-    public string SelectedFamilyPath {
-        get => _selectedFamilyPath;
-        set => RaiseAndSetIfChanged(ref _selectedFamilyPath, value);
+    public ICommand ExportConfigCommand { get; }
+
+    /// <summary>
+    /// Команда обновления списка путей семейств.
+    /// </summary>
+    public ICommand UpdateFamilyPathsCommand { get; }
+
+
+    public ObservableCollection<FamilyConfig> Configurations { get; set; }
+
+    public FamilyConfig SelectedConfig {
+        get => _selectedConfig;
+        set => RaiseAndSetIfChanged(ref _selectedConfig, value);
     }
+
+    public ObservableCollection<string> FamilyPaths { get; set; }
 
     /// <summary>
     /// Текст ошибки, который отображается при неверном вводе пользователя.
@@ -140,12 +129,15 @@ internal class MainViewModel : BaseViewModel {
         set => RaiseAndSetIfChanged(ref _saveProperty, value);
     }
 
+
+
     /// <summary>
     /// Метод загрузки главного окна.
     /// </summary>
     /// <remarks>В данном методе должна происходить загрузка настроек окна, а так же инициализация полей окна.</remarks>
     private void LoadView() {
         LoadConfig();
+        UpdateFamilyPaths();
     }
 
     /// <summary>
@@ -159,49 +151,95 @@ internal class MainViewModel : BaseViewModel {
         LoadFamilies();
     }
 
+
     /// <summary>
-    /// Метод добавления пути к семейству.
+    /// Метод импорта конфигурации.
     /// </summary>
-    private void AddFamilyPath() {
+    private void ImportConfig() {
         var openFileDialog = new OpenFileDialog {
-            Filter = "Revit Families (*.rfa)|*.rfa",
+            Filter = "Текстовые файлы (*.txt)|*.txt",
             Multiselect = false,
-            Title = "Выберите файл семейства Revit"
+            Title = "Выберите файл конфигурации для импорта"
         };
 
         if(openFileDialog.ShowDialog() == true) {
-            if(!string.IsNullOrEmpty(openFileDialog.FileName)) {
-                // Проверяем, нет ли уже такого пути в списке
-                if(!CurrentConfig.FamilyPaths.Contains(openFileDialog.FileName)) {
-                    CurrentConfig.FamilyPaths.Add(openFileDialog.FileName);
-                    FamilyPaths.Add(openFileDialog.FileName);
-                } else {
-                    MessageBox.Show(
-                        "Данный файл уже добавлен в список.",
-                        "Предупреждение",
-                        MessageBoxButton.OK,
-                        MessageBoxImage.Warning);
+            try {
+                var importedConfig = _configService.ImportConfig(openFileDialog.FileName);
+
+                // Обновляем коллекцию конфигураций
+                Configurations.Clear();
+                foreach(var config in _configService.GetConfigurations()) {
+                    Configurations.Add(config);
                 }
+                
+                // Выбираем импортированную конфигурацию
+                SelectedConfig = importedConfig;
+
+                MessageBox.Show(
+                    $"Конфигурация '{importedConfig.Name}' успешно импортирована.",
+                    "Импорт завершен",
+                    MessageBoxButton.OK,
+                    MessageBoxImage.Information);
+            } catch(Exception ex) {
+                MessageBox.Show(
+                    ex.Message,
+                    "Ошибка импорта",
+                    MessageBoxButton.OK,
+                    MessageBoxImage.Error);
             }
         }
     }
 
     /// <summary>
-    /// Метод удаления пути к семейству.
+    /// Метод экспорта выбранной конфигурации.
     /// </summary>
-    private void RemoveFamilyPath() {
-        if(!string.IsNullOrEmpty(SelectedFamilyPath)) {
-            CurrentConfig.FamilyPaths.Remove(SelectedFamilyPath);
-            FamilyPaths.Remove(SelectedFamilyPath);
-            SelectedFamilyPath = null;
+    private void ExportConfig() {
+        if(SelectedConfig == null)
+            return;
+
+        var saveFileDialog = new SaveFileDialog {
+            Filter = "Текстовые файлы (*.txt)|*.txt",
+            FileName = $"{SelectedConfig.Name}.txt",
+            Title = "Экспорт конфигурации"
+        };
+
+        if(saveFileDialog.ShowDialog() == true) {
+            try {
+                _configService.ExportConfig(SelectedConfig, saveFileDialog.FileName);
+
+                MessageBox.Show(
+                    $"Конфигурация '{SelectedConfig.Name}' успешно экспортирована.",
+                    "Экспорт завершен",
+                    MessageBoxButton.OK,
+                    MessageBoxImage.Information);
+            } catch(Exception ex) {
+                MessageBox.Show(
+                    ex.Message,
+                    "Ошибка экспорта",
+                    MessageBoxButton.OK,
+                    MessageBoxImage.Error);
+            }
         }
     }
 
     /// <summary>
-    /// Проверка возможности удаления пути к семейству.
+    /// Обновление списка путей при смене конфигурации.
     /// </summary>
-    private bool CanRemoveFamilyPath() {
-        return !string.IsNullOrEmpty(SelectedFamilyPath);
+    private void UpdateFamilyPaths() {
+        FamilyPaths.Clear();
+        if(SelectedConfig != null) {
+            foreach(var path in SelectedConfig.FamilyPaths) {
+                FamilyPaths.Add(path);
+            }
+        }
+    }
+
+
+    /// <summary>
+    /// Проверка возможности экспорта конфигурации.
+    /// </summary>
+    private bool CanExportConfig() {
+        return SelectedConfig != null && SelectedConfig.FamilyPaths.Any();
     }
 
     /// <summary>
@@ -213,7 +251,7 @@ internal class MainViewModel : BaseViewModel {
     /// В методе проверяемые свойства окна должны быть отсортированы в таком же порядке как в окне (сверху-вниз)
     /// </remarks>
     private bool CanAcceptView() {
-        return CurrentConfig != null && CurrentConfig.FamilyPaths.Count > 0;
+        return SelectedConfig != null && SelectedConfig.FamilyPaths.Any();
     }
 
     /// <summary>
@@ -234,5 +272,41 @@ internal class MainViewModel : BaseViewModel {
 
         setting.SaveProperty = SaveProperty;
         _pluginConfig.SaveProjectConfig();
+    }
+
+
+    private void LoadFamilies() {
+        if(SelectedConfig == null)
+            return;
+
+        using var transaction = _revitRepository.Document.StartTransaction("LoadFamilies");
+
+        int successCount = 0;
+        int fileIsNotExistsCount = 0;
+        int errorCount = 0;
+
+        foreach(var filePath in SelectedConfig.FamilyPaths) {
+            try {
+                if(File.Exists(filePath)) {
+                    if(_familyLoadService.LoadFamily(filePath, _revitRepository.Document)) {
+                        successCount++;
+                    } else {
+                        errorCount++;
+                    }
+                } else {
+                    fileIsNotExistsCount++;
+                }
+            } catch(Exception) {
+                errorCount++;
+            }
+        }
+
+        transaction.Commit();
+
+        MessageBox.Show(
+            $"Загрузка завершена:\nУспешно: {successCount}\nНе найдено: {fileIsNotExistsCount}\nОшибок: {errorCount}",
+            "Результат загрузки",
+            MessageBoxButton.OK,
+            MessageBoxImage.Information);
     }
 }

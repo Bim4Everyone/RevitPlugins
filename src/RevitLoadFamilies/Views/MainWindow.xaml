@@ -11,20 +11,18 @@
     xmlns:core="clr-namespace:dosymep.WpfUI.Core"
     xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
     xmlns:me="clr-namespace:dosymep.WpfCore.MarkupExtensions;assembly=dosymep.WpfCore"
-   
     mc:Ignorable="d"
-    
-    Height="500"
-    Width="700"
-    
-    MinHeight="500"
-    MinWidth="700"
-   
+    Height="550"
+    Width="800"
+    MinHeight="550"
+    MinWidth="800"
     d:DataContext="{d:DesignInstance vms:MainViewModel, IsDesignTimeCreatable=False}">
 
     <i:Interaction.Triggers>
-        <i:EventTrigger EventName="Loaded">
-            <i:InvokeCommandAction Command="{Binding LoadViewCommand}" />
+        <i:EventTrigger
+            EventName="Loaded">
+            <i:InvokeCommandAction
+                Command="{Binding LoadViewCommand}" />
         </i:EventTrigger>
     </i:Interaction.Triggers>
 
@@ -33,28 +31,70 @@
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />
             <RowDefinition Height="Auto" />
-            <RowDefinition Height="*" />
             <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
             <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
 
         <ui:TitleBar
             Grid.Row="0"
+            Grid.ColumnSpan="2"
             Title="{me:LocalizationSource MainWindow.Title}" />
 
         <TextBlock
             Grid.Row="1"
+            Grid.ColumnSpan="2"
             Text="Configs"
             FontWeight="Bold"
-            Margin="10" />
+            Margin="10,5" />
+
+        <StackPanel
+            Grid.Row="2"
+            Grid.ColumnSpan="2"
+            Orientation="Horizontal"
+            Margin="10,5">
+            <TextBlock
+                Text="Config:"
+                VerticalAlignment="Center"
+                Margin="0,0,10,0" />
+            <ComboBox
+                VirtualizingStackPanel.IsVirtualizing="False"
+                MinWidth="150"
+                ItemsSource="{Binding Configurations}"
+                DisplayMemberPath="Name"
+                SelectedItem="{Binding SelectedConfig}">
+                <i:Interaction.Triggers>
+                    <i:EventTrigger
+                        EventName="SelectionChanged">
+                        <i:InvokeCommandAction
+                            Command="{Binding UpdateFamilyPathsCommand}" />
+                    </i:EventTrigger>
+                </i:Interaction.Triggers>
+            </ComboBox>
+
+            <ListBox
+                MinWidth="150"
+                ItemsSource="{Binding Configurations}">
+            </ListBox>
+
+            <ui:Button
+                Content="Import"
+                Command="{Binding ImportConfigCommand}"
+                Icon="Import24"
+                Margin="10,0,5,0" />
+            <ui:Button
+                Content="Export"
+                Command="{Binding ExportConfigCommand}"
+                Icon="Export24" />
+        </StackPanel>
 
         <GroupBox
-            Grid.Row="2"
-            Header="Families to download:"
+            Grid.Row="3"
+            Grid.Column="0"
+            Header="Paths from config:"
             Margin="10">
             <ListBox
-                ItemsSource="{Binding FamilyPaths}"
-                SelectedItem="{Binding SelectedFamilyPath}">
+                ItemsSource="{Binding FamilyPaths}">
                 <ListBox.ItemTemplate>
                     <DataTemplate>
                         <TextBlock
@@ -67,26 +107,8 @@
         </GroupBox>
 
         <StackPanel
-            Grid.Row="3"
-            Orientation="Horizontal"
-            HorizontalAlignment="Right"
-            Margin="10">
-            <ui:Button
-                Margin="10"
-                Width="120"
-                Content="Add Family"
-                Command="{Binding AddFamilyPathCommand}"
-                Icon="Add24" />
-            <ui:Button
-                Margin="10"
-                Width="120"
-                Content="Remove"
-                Command="{Binding RemoveFamilyPathCommand}"
-                Icon="Delete24" />
-        </StackPanel>
-
-        <StackPanel
             Grid.Row="4"
+            Grid.ColumnSpan="2"
             Orientation="Horizontal"
             HorizontalAlignment="Right">
 
@@ -99,7 +121,7 @@
             <ui:Button
                 Margin="10"
                 Width="80"
-                Appearance="Info"
+                Appearance="Primary"
                 Content="Ok"
                 Click="ButtonOk_Click"
                 Command="{Binding AcceptViewCommand}" />

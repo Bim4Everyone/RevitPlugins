@@ -1,7 +1,7 @@
 using Autodesk.Revit.DB;
 
 namespace RevitLoadFamilies.Services;
-public class FamilyLoadOptions : IFamilyLoadOptions {
+internal class FamilyLoadOptions : IFamilyLoadOptions {
     public bool OnFamilyFound(bool familyInUse, out bool overwriteParameterValues) {
         overwriteParameterValues = true;
         return true;

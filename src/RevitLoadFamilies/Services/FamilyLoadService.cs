@@ -1,7 +1,7 @@
 using Autodesk.Revit.DB;
 
 namespace RevitLoadFamilies.Services;
-public class FamilyLoadService : IFamilyLoadService {
+internal class FamilyLoadService : IFamilyLoadService {
     private readonly FamilyLoadOptions _loadOptions;
 
     public FamilyLoadService() {
