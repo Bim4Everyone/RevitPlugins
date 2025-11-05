@@ -31,18 +31,18 @@ internal class MainViewModel : BaseViewModel {
     private string _errorText;
     private FamilyConfig _selectedConfig;
 
-    public MainViewModel(PluginConfig pluginConfig, RevitRepository revitRepository, 
+    public MainViewModel(PluginConfig pluginConfig, RevitRepository revitRepository,
                          ILocalizationService localizationService) {
         _pluginConfig = pluginConfig;
         _revitRepository = revitRepository;
         _localizationService = localizationService;
 
-        _configService = new ConfigService();
+        _configService = new ConfigService(revitRepository);
         _familyLoadService = new FamilyLoadService();
 
         LoadViewCommand = RelayCommand.Create(LoadView);
         AcceptViewCommand = RelayCommand.Create(AcceptView, CanAcceptView);
-        
+
         UpdateFamilyPathsCommand = RelayCommand.Create(UpdateFamilyPaths);
     }
 
@@ -50,8 +50,7 @@ internal class MainViewModel : BaseViewModel {
     public ICommand AcceptViewCommand { get; }
     public ICommand UpdateFamilyPathsCommand { get; }
 
-
-    public ObservableCollection<FamilyConfig> Configurations { get; set; }
+    public ObservableCollection<FamilyConfig> Configurations { get; set; } = [];
 
     public FamilyConfig SelectedConfig {
         get => _selectedConfig;
@@ -68,15 +67,18 @@ internal class MainViewModel : BaseViewModel {
         set => RaiseAndSetIfChanged(ref _errorText, value);
     }
 
-
     private void LoadView() {
         LoadConfig();
 
-        // Загружаем конфигурации
-        Configurations = [_configService.GetDefaultConfig()];
+        // Загружаем конфигурации из файлов
+        foreach(var config in _configService.GetConfigurations()) {
+            Configurations.Add(config);
+        }
 
         if(Configurations.Any()) {
             SelectedConfig = Configurations.First();
+        } else {
+            ErrorText = "Конфигурации не найдены";
         }
 
         UpdateFamilyPaths();
@@ -90,7 +92,6 @@ internal class MainViewModel : BaseViewModel {
     private bool CanAcceptView() {
         return SelectedConfig != null && SelectedConfig.FamilyPaths.Any();
     }
-
 
     /// <summary>
     /// Загрузка настроек плагина.
@@ -108,7 +109,6 @@ internal class MainViewModel : BaseViewModel {
         _pluginConfig.SaveProjectConfig();
     }
 
-
     /// <summary>
     /// Обновление списка путей при смене конфигурации.
     /// </summary>
@@ -120,7 +120,6 @@ internal class MainViewModel : BaseViewModel {
             }
         }
     }
-
 
     /// <summary>
     /// Загрузка семейств по путям из выбранной конфигурации

@@ -59,7 +59,7 @@
                 Margin="0,0,10,0" />
             <ComboBox
                 MinWidth="150"
-                ItemsSource="{Binding Configurations}"
+                ItemsSource="{Binding Path=Configurations}"
                 DisplayMemberPath="Name"
                 SelectedItem="{Binding SelectedConfig}">
                 <i:Interaction.Triggers>

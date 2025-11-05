@@ -4,5 +4,5 @@ using RevitLoadFamilies.Models;
 
 namespace RevitLoadFamilies.Services;
 internal interface IConfigService {
-    FamilyConfig GetDefaultConfig();
+    IEnumerable<FamilyConfig> GetConfigurations();
 }
