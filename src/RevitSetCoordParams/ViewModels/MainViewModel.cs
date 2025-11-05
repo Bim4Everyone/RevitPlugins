@@ -7,6 +7,7 @@ using System.Windows.Input;
 
 using Autodesk.Revit.DB;
 
+using dosymep.Bim4Everyone.SimpleServices;
 using dosymep.Revit;
 using dosymep.SimpleServices;
 using dosymep.WPF.Commands;
@@ -31,8 +32,8 @@ internal class MainViewModel : BaseViewModel {
     private readonly IResolutionRoot _resolutionRoot;
     private readonly ICategoryAvailabilityService _categoryAvailabilityService;
     private readonly IParamAvailabilityService _paramAvailabilityService;
+    private readonly IRevitParamFactory _revitParamFactory;
     private readonly ProvidersFactory _providersFactory;
-    private readonly ParamFactory _paramFactory;
     private SetCoordParamsSettings _setCoordParamsSettings;
     private ObservableCollection<RangeElementsViewModel> _rangeElements;
     private RangeElementsViewModel _selectedRangeElements;
@@ -57,15 +58,16 @@ internal class MainViewModel : BaseViewModel {
         RevitRepository revitRepository,
         ILocalizationService localizationService,
         IResolutionRoot resolutionRoot,
-        IProgressDialogFactory progressDialogFactory) {
+        IProgressDialogFactory progressDialogFactory,
+        IRevitParamFactory revitParamFactory) {
         _pluginConfig = pluginConfig;
         _revitRepository = revitRepository;
         _localizationService = localizationService;
         _resolutionRoot = resolutionRoot;
+        _revitParamFactory = revitParamFactory;
         _categoryAvailabilityService = new CategoryAvailabilityService(_revitRepository.Document);
         _paramAvailabilityService = new ParamAvailabilityService();
         _providersFactory = new ProvidersFactory();
-        _paramFactory = new ParamFactory();
 
         LoadViewCommand = RelayCommand.Create(LoadView);
         CheckAllCatsCommand = RelayCommand.Create(CheckAllCategories);
@@ -259,7 +261,7 @@ internal class MainViewModel : BaseViewModel {
                 UpdateParamWarnings();
                 if(!vm.HasWarning) {
                     var def = _paramAvailabilityService.GetDefinitionByName(SelectedSourceFile.FileProvider.Document, vm.SourceParamName);
-                    var newParam = _paramFactory.CreateRevitParam(_revitRepository.Document, def);
+                    var newParam = _revitParamFactory.Create(_revitRepository.Document, def.GetElementId());
                     vm.ParamMap.SourceParam = newParam;
                 }
                 UpdateCategoryWarnings();
@@ -269,7 +271,7 @@ internal class MainViewModel : BaseViewModel {
                 UpdateParamWarnings();
                 if(!vm.HasWarning) {
                     var def = _paramAvailabilityService.GetDefinitionByName(_revitRepository.Document, vm.TargetParamName);
-                    var newParam = _paramFactory.CreateRevitParam(_revitRepository.Document, def);
+                    var newParam = _revitParamFactory.Create(_revitRepository.Document, def.GetElementId());
                     vm.ParamMap.TargetParam = newParam;
                 }
                 UpdateCategoryWarnings();
