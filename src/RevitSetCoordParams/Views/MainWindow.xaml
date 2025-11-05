@@ -65,7 +65,10 @@
         
         <ui:TitleBar
             Grid.Row="0"
-            Title="{me:LocalizationSource MainWindow.Title}" />
+            Icon="{ui:SymbolIcon clipboardTaskListLtr24, FontSize=20}"
+            Title="{me:LocalizationSource MainWindow.Title}" 
+            FontSize="14"
+            FontWeight="DemiBold"/>        
 
         <ScrollViewer
             Grid.Row="1"
