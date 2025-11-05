@@ -20,6 +20,10 @@
         <converters:BoolToVisibilityConverter
             x:Key="ExtraContentVisible"
             TrueValue="Visible"
+            FalseValue="Collapsed" />        
+        <converters:BoolToVisibilityConverter
+            x:Key="ExtraTextVisible"
+            TrueValue="Visible"
             FalseValue="Collapsed" />
     </UserControl.Resources>
 
@@ -35,15 +39,13 @@
                 </Grid.RowDefinitions>
 
                 <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="*" />
-                    <ColumnDefinition Width="180" />
-                    <ColumnDefinition Width="40" />
+                    <ColumnDefinition Width="*" />                    
+                    <ColumnDefinition Width="Auto" />
                 </Grid.ColumnDefinitions>
 
                 <ui:TextBlock
                     Grid.Row="0"
-                    Grid.Column="0"
-                    Margin="0"
+                    Grid.Column="0"                    
                     FontTypography="BodyStrong"
                     TextWrapping="WrapWithOverflow"
                     Foreground="{DynamicResource TextFillColorPrimaryBrush}"
@@ -57,23 +59,34 @@
                     TextWrapping="WrapWithOverflow"
                     Text="{Binding Description, ElementName=_this}" />                
 
-                <ui:ToggleSwitch                    
-                    Grid.RowSpan="2"
-                    Grid.Column="1"
-                    OnContent="{Binding SwitchOnContent, ElementName=_this}"
-                    OffContent="{Binding SwitchOffContent, ElementName=_this}"
-                    IsChecked="{Binding IsChecked, ElementName=_this, Mode=TwoWay}"
-                    Visibility="{Binding ToggleSwitchVisible, 
-                        ElementName=_this, Converter={StaticResource ExtraContentVisible}}" /> 
-
-                <ContentControl
-                    HorizontalAlignment="Left"
-                    Grid.RowSpan="2"
-                    Grid.Column="2"                                       
+                <StackPanel
+                    Orientation="Horizontal"
+                    HorizontalAlignment="Right"
                     VerticalAlignment="Center"
-                    Content="{Binding ExtraIcon, ElementName=_this}"
-                    Visibility="{Binding ExtraIconVisible, ElementName=_this,
-                        Converter={StaticResource ExtraContentVisible}}"/>                
+                    Grid.RowSpan="2"
+                    Grid.Column="1">
+                    
+                    <ui:ToggleSwitch 
+                        Margin="10,0,10,0"
+                        OnContent="{Binding SwitchOnContent, ElementName=_this}"
+                        OffContent="{Binding SwitchOffContent, ElementName=_this}"
+                        IsChecked="{Binding IsChecked, ElementName=_this, Mode=TwoWay}"
+                        Visibility="{Binding ToggleSwitchVisible, 
+                            ElementName=_this, Converter={StaticResource ExtraContentVisible}}" />
+                    
+                    <ui:TextBlock
+                        Margin="10,0,10,0"
+                        FontTypography="BodyStrong"
+                        Text="{Binding ExtraText, ElementName=_this}"                        
+                        Visibility="{Binding ExtraTextVisible, ElementName=_this,
+                            Converter={StaticResource ExtraTextVisible}}" />
+
+                    <ContentControl
+                        Margin="10,0,10,0"                        
+                        Content="{Binding ExtraIcon, ElementName=_this}"
+                        Visibility="{Binding ExtraIconVisible, ElementName=_this,
+                            Converter={StaticResource ExtraContentVisible}}" />
+                </StackPanel>                              
 
             </Grid>
         </ui:CardExpander.Header>

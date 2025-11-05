@@ -43,7 +43,24 @@
 
         <ui:TitleBar
             Grid.Row="0"
-            Title="{me:LocalizationSource WarningWindow.Title}" />
+            Icon="{ui:SymbolIcon Warning24, FontSize=20}">
+            <ui:TitleBar.Header>
+                <StackPanel
+                    Orientation="Horizontal"
+                    HorizontalAlignment="Left"
+                    VerticalAlignment="Center">
+                    <ui:TextBlock                        
+                        FontSize="14"
+                        FontWeight="DemiBold"
+                        Text="{me:LocalizationSource WarningWindow.Title}"/>
+                    <ui:TextBlock
+                        Margin="7,0,0,0"                        
+                        FontSize="14"
+                        FontWeight="DemiBold"
+                        Text="{Binding WarningQuantity}" />
+                </StackPanel>
+            </ui:TitleBar.Header>
+        </ui:TitleBar>
 
         <ScrollViewer
             Grid.Row="1"
@@ -58,6 +75,8 @@
                             Icon="{ui:SymbolIcon Warning24}"
                             Header="{Binding Caption}"
                             Description="{Binding Description}"
+                            ExtraTextVisible="True"
+                            ExtraText="{Binding WarningQuantity}"
                             IsChecked="True">
                             <edits:CustomGroupEditControl.EditControl>
                                 <ui:DataGrid                                    
@@ -69,7 +88,7 @@
                                         <DataGridTemplateColumn>
                                             <DataGridTemplateColumn.Header>                                                
                                                 <!--В динамически-создаваемом UserControl работает только DynamicResource-->
-                                                <TextBlock Text="{DynamicResource WarningWindow.IdHeader}" />
+                                                <ui:TextBlock Text="{DynamicResource WarningWindow.IdHeader}" />
                                             </DataGridTemplateColumn.Header>
                                             <DataGridTemplateColumn.CellTemplate>
                                                 <DataTemplate>
@@ -87,7 +106,7 @@
                                             Binding="{Binding Family}">
                                             <DataGridTextColumn.Header>
                                                 <!--В динамически-создаваемом UserControl работает только DynamicResource-->
-                                                <TextBlock Text="{DynamicResource WarningWindow.FamilyHeader}" />
+                                                <ui:TextBlock Text="{DynamicResource WarningWindow.FamilyHeader}" />
                                             </DataGridTextColumn.Header>
                                         </DataGridTextColumn>
 
@@ -96,7 +115,7 @@
                                             Binding="{Binding Type}">
                                             <DataGridTextColumn.Header>
                                                 <!--В динамически-создаваемом UserControl работает только DynamicResource-->
-                                                <TextBlock Text="{DynamicResource WarningWindow.TypeHeader}" />
+                                                <ui:TextBlock Text="{DynamicResource WarningWindow.TypeHeader}" />
                                             </DataGridTextColumn.Header>
                                         </DataGridTextColumn>
 
@@ -105,7 +124,7 @@
                                             Binding="{Binding Level}">                                            
                                             <DataGridTextColumn.Header>
                                                 <!--В динамически-создаваемом UserControl работает только DynamicResource-->
-                                                <TextBlock Text="{DynamicResource WarningWindow.LevelHeader}" />
+                                                <ui:TextBlock Text="{DynamicResource WarningWindow.LevelHeader}" />
                                             </DataGridTextColumn.Header>
                                         </DataGridTextColumn> 
                                     </ui:DataGrid.Columns>

@@ -15,7 +15,6 @@ namespace RevitSetCoordParams.ViewModels;
 internal class WarningsViewModel : BaseViewModel {
     private readonly ILocalizationService _localizationService;
     private readonly RevitRepository _revitRepository;
-    private ObservableCollection<WarningGroupViewModel> _warningViewModels;
 
     public WarningsViewModel(ILocalizationService localizationService, RevitRepository revitRepository) {
         _localizationService = localizationService;
@@ -26,18 +25,17 @@ internal class WarningsViewModel : BaseViewModel {
 
     public ICommand ShowElementCommand { get; }
 
+    public string WarningQuantity { get; set; }
     public IReadOnlyCollection<WarningElement> WarningElementsCollection { get; set; }
+    public ObservableCollection<WarningGroupViewModel> WarningViewModels { get; set; }
 
-    public ObservableCollection<WarningGroupViewModel> WarningViewModels {
-        get => _warningViewModels;
-        set => RaiseAndSetIfChanged(ref _warningViewModels, value);
-    }
 
     /// <summary>
     /// Метод загрузки окна
     /// </summary>
     public void LoadView() {
         WarningViewModels = new ObservableCollection<WarningGroupViewModel>(GetWarningGroupViewModels());
+        WarningQuantity = $"({WarningViewModels.Count})";
     }
 
     // Метод выделения элемента
@@ -54,6 +52,7 @@ internal class WarningsViewModel : BaseViewModel {
                 Caption = _localizationService.GetLocalizedString($"WarningsViewModel.{group.Key}"),
                 Description = _localizationService.GetLocalizedString($"WarningsViewModel.{group.Key}Description"),
                 WarningElements = group.ToList(),
+                WarningQuantity = $"({group.Count()})",
                 ShowElementCommand = ShowElementCommand
             })
             .Concat(
@@ -69,6 +68,7 @@ internal class WarningsViewModel : BaseViewModel {
                 Caption = $"{_localizationService.GetLocalizedString("WarningsViewModel.NotFoundParam")}: {g.Key}",
                 Description = _localizationService.GetLocalizedString("WarningsViewModel.NotFoundParamDescription"),
                 WarningElements = g.SelectMany(x => x.WarningElements).ToList(),
+                WarningQuantity = $"({g.Count()})",
                 ShowElementCommand = ShowElementCommand
             }));
     }

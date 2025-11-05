@@ -15,6 +15,9 @@ public partial class CustomGroupEditControl {
     public static readonly DependencyProperty ExtraIconProperty = DependencyProperty.Register(
         nameof(ExtraIcon), typeof(IconElement), typeof(CustomGroupEditControl), new PropertyMetadata(default(IconElement)));
 
+    public static readonly DependencyProperty ExtraTextProperty = DependencyProperty.Register(
+        nameof(ExtraText), typeof(string), typeof(CustomGroupEditControl), new PropertyMetadata(default(string)));
+
     public static readonly DependencyProperty HeaderProperty = DependencyProperty.Register(
         nameof(Header), typeof(string), typeof(CustomGroupEditControl), new PropertyMetadata(default(string)));
 
@@ -32,6 +35,9 @@ public partial class CustomGroupEditControl {
 
     public static readonly DependencyProperty ExtraIconVisibleProperty = DependencyProperty.Register(
         nameof(ExtraIconVisible), typeof(bool), typeof(CustomGroupEditControl), new PropertyMetadata(false));
+
+    public static readonly DependencyProperty ExtraTextVisibleProperty = DependencyProperty.Register(
+        nameof(ExtraTextVisible), typeof(bool), typeof(CustomGroupEditControl), new PropertyMetadata(false));
 
     public static readonly DependencyProperty SwitchOnContentProperty = DependencyProperty.Register(
         nameof(SwitchOnContent), typeof(string), typeof(CustomGroupEditControl), new PropertyMetadata(default(string)));
@@ -51,6 +57,11 @@ public partial class CustomGroupEditControl {
 
     public IconElement ExtraIcon {
         get => (IconElement) GetValue(ExtraIconProperty);
+        set => SetValue(ExtraIconProperty, value);
+    }
+
+    public string ExtraText {
+        get => (string) GetValue(ExtraTextProperty);
         set => SetValue(ExtraIconProperty, value);
     }
 
@@ -92,5 +103,10 @@ public partial class CustomGroupEditControl {
     public bool ExtraIconVisible {
         get => (bool) GetValue(ExtraIconVisibleProperty);
         set => SetValue(ExtraIconVisibleProperty, value);
+    }
+
+    public bool ExtraTextVisible {
+        get => (bool) GetValue(ExtraTextVisibleProperty);
+        set => SetValue(ExtraTextVisibleProperty, value);
     }
 }

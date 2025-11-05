@@ -13,6 +13,7 @@ internal class WarningGroupViewModel {
     public ObservableCollection<WarningElementViewModel> Warnings => new(GetWarningElementViewModel());
     public string Caption { get; set; }
     public string Description { get; set; }
+    public string WarningQuantity { get; set; }
 
     // Метод получения списка WarningElementViewModel
     private IEnumerable<WarningElementViewModel> GetWarningElementViewModel() {
