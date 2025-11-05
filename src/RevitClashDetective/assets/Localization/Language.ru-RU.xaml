@@ -31,6 +31,8 @@
     <system:String
         x:Key="SettingsWindow.Validation.LongParam">Слишком длинное название {0}</system:String>
     <system:String
+        x:Key="SettingsWindow.Validation.DuplicatedParam">Параметр дублируется: {0}</system:String>
+    <system:String
         x:Key="SettingsWindow.MainElementVisibilitySettings">Настройки видимости первого элемента коллизии</system:String>
     <system:String
         x:Key="SettingsWindow.SecondElementVisibilitySettings">Настройки видимости второго элемента коллизии</system:String>
