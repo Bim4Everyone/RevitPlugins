@@ -58,7 +58,6 @@
                 VerticalAlignment="Center"
                 Margin="0,0,10,0" />
             <ComboBox
-                VirtualizingStackPanel.IsVirtualizing="False"
                 MinWidth="150"
                 ItemsSource="{Binding Configurations}"
                 DisplayMemberPath="Name"
@@ -71,21 +70,6 @@
                     </i:EventTrigger>
                 </i:Interaction.Triggers>
             </ComboBox>
-
-            <ListBox
-                MinWidth="150"
-                ItemsSource="{Binding Configurations}">
-            </ListBox>
-
-            <ui:Button
-                Content="Import"
-                Command="{Binding ImportConfigCommand}"
-                Icon="Import24"
-                Margin="10,0,5,0" />
-            <ui:Button
-                Content="Export"
-                Command="{Binding ExportConfigCommand}"
-                Icon="Export24" />
         </StackPanel>
 
         <GroupBox
