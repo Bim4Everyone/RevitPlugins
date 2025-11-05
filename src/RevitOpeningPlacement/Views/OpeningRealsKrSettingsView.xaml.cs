@@ -1,8 +1,20 @@
 using System.Windows;
 
+using dosymep.SimpleServices;
+
 namespace RevitOpeningPlacement.Views;
 public partial class OpeningRealsKrSettingsView {
-    public OpeningRealsKrSettingsView() {
+    public OpeningRealsKrSettingsView(
+    ILoggerService loggerService,
+    ISerializationService serializationService,
+    ILanguageService languageService,
+    ILocalizationService localizationService,
+    IUIThemeService uiThemeService,
+    IUIThemeUpdaterService themeUpdaterService)
+    : base(loggerService,
+        serializationService,
+        languageService, localizationService,
+        uiThemeService, themeUpdaterService) {
         InitializeComponent();
     }
 

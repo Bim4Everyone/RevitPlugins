@@ -1,17 +1,22 @@
-using System.Windows.Controls;
-
-using DevExpress.Xpf.Grid;
+using dosymep.SimpleServices;
 
 namespace RevitOpeningPlacement.Views;
-/// <summary>
-/// Interaction logic for SettingView.xaml
-/// </summary>
-public partial class SettingView : UserControl {
-    public SettingView() {
+public partial class SettingView {
+    public SettingView() : base() {
         InitializeComponent();
     }
 
-    private void TableView_CellValueChanging(object sender, CellValueChangedEventArgs e) {
-        (sender as TableView).PostEditor();
+    public SettingView(
+        ILoggerService loggerService,
+        ILanguageService languageService,
+        ILocalizationService localizationService,
+        IUIThemeService uiThemeService,
+        IUIThemeUpdaterService themeUpdaterService)
+        : base(loggerService,
+            languageService,
+            localizationService,
+            uiThemeService,
+            themeUpdaterService) {
+        InitializeComponent();
     }
 }

@@ -3,21 +3,33 @@ using System.Collections.Generic;
 
 using Autodesk.Revit.DB;
 
+using dosymep.SimpleServices;
 using dosymep.WPF.ViewModels;
 
 namespace RevitOpeningPlacement.ViewModels.Links;
 internal class LinkViewModel : BaseViewModel, IEquatable<LinkViewModel> {
     private readonly RevitLinkType _linkType;
+    private readonly ILocalizationService _localization;
     private string _futureStatus;
     private bool _isSelected;
+    private readonly string _willBeLoaded;
+    private readonly string _willNotChange;
 
-    public LinkViewModel(RevitLinkType linkTypeModel) {
-        _linkType = linkTypeModel ?? throw new System.ArgumentNullException(nameof(linkTypeModel));
+    public LinkViewModel(RevitLinkType linkTypeModel, ILocalizationService localization) {
+        _linkType = linkTypeModel ?? throw new ArgumentNullException(nameof(linkTypeModel));
+        _localization = localization ?? throw new ArgumentNullException(nameof(localization));
+
+        _willBeLoaded = _localization.GetLocalizedString(
+            "LinksSelectorWindow.LinkWillBeLoaded");
+        _willNotChange = _localization.GetLocalizedString(
+            "LinksSelectorWindow.LinkWillNotChange");
 
         Name = linkTypeModel.Name;
         IsCurrentlyLoaded = RevitLinkType.IsLoaded(linkTypeModel.Document, linkTypeModel.Id);
         IsSelected = IsCurrentlyLoaded;
-        CurrentStatus = IsCurrentlyLoaded ? "Загружено" : "Не загружено";
+        CurrentStatus = IsCurrentlyLoaded
+            ? _localization.GetLocalizedString("LinksSelectorWindow.LinkIsLoaded")
+            : _localization.GetLocalizedString("LinksSelectorWindow.LinkIsNotLoaded");
     }
 
 
@@ -29,7 +41,7 @@ internal class LinkViewModel : BaseViewModel, IEquatable<LinkViewModel> {
         get => _isSelected;
         set {
             RaiseAndSetIfChanged(ref _isSelected, value);
-            FutureStatus = (value && !IsCurrentlyLoaded) ? "Будет загружено" : "Не изменится";
+            FutureStatus = (value && !IsCurrentlyLoaded) ? _willBeLoaded : _willNotChange;
         }
     }
 

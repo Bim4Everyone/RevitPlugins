@@ -1,4 +1,4 @@
-﻿<UserControl
+﻿<core:WpfUIPlatformUserControl
     x:Class="RevitOpeningPlacement.Views.StructureCategoryView"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
@@ -6,33 +6,32 @@
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:local="clr-namespace:RevitOpeningPlacement.Views"
     xmlns:vm="clr-namespace:RevitOpeningPlacement.ViewModels.OpeningConfig"
-    xmlns:dx="http://schemas.devexpress.com/winfx/2008/xaml/core"
-    xmlns:dxe="http://schemas.devexpress.com/winfx/2008/xaml/editors"
+    xmlns:core="clr-namespace:dosymep.WpfUI.Core"
+    xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
+    xmlns:me="clr-namespace:dosymep.WpfCore.MarkupExtensions;assembly=dosymep.WpfCore"
     xmlns:views="clr-namespace:RevitOpeningPlacement.Views"
     mc:Ignorable="d"
-    Name="_this"
     d:Width="500"
     d:Height="250"
     d:Background="White"
     d:DataContext="{d:DesignInstance vm:StructureCategoryViewModel, IsDesignTimeCreatable=False}">
-    <StackPanel>
-        <CheckBox
-            Margin="9 0 0 0"
-            IsChecked="{Binding IsSelected}"
-            Content="{Binding Name}" />
-        <!--CheckEdit от DevExpress не работает нормально,
-                если он находится внутри контейнера элементов, который используется для отображения элементов из ListBoxEdit
-                https://supportcenter.devexpress.com/ticket/details/t867198/checkedit-inside-stackpanel-inside-listboxedit-does-not-work
-            -->
-        <ContentControl
-            Content="{Binding SetViewModel}">
-            <ContentControl.ContentTemplate>
-                <DataTemplate
-                    DataType="{x:Type vm:SetViewModel}">
-                    <views:SetView
-                        DataContext="{Binding}" />
-                </DataTemplate>
-            </ContentControl.ContentTemplate>
-        </ContentControl>
-    </StackPanel>
-</UserControl>
+    <DockPanel
+        LastChildFill="True">
+        <DockPanel
+            DockPanel.Dock="Top"
+            Margin="0 0 0 10">
+            <ui:ToggleSwitch
+                DockPanel.Dock="Left"
+                Margin="0 0 10 0"
+                IsChecked="{Binding IsSelected}" />
+            <Label
+                DockPanel.Dock="Left"
+                Content="{Binding Name}" />
+        </DockPanel>
+        <ScrollViewer
+            DockPanel.Dock="Bottom">
+            <views:SetView
+                DataContext="{Binding SetViewModel}" />
+        </ScrollViewer>
+    </DockPanel>
+</core:WpfUIPlatformUserControl>

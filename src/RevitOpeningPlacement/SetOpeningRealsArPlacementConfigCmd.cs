@@ -1,10 +1,13 @@
-using System.Windows.Interop;
+using System.Globalization;
+using System.Reflection;
 
 using Autodesk.Revit.Attributes;
 using Autodesk.Revit.UI;
 
 using dosymep.Bim4Everyone;
 using dosymep.Bim4Everyone.SimpleServices;
+using dosymep.WpfCore.Ninject;
+using dosymep.WpfUI.Core.Ninject;
 
 using Ninject;
 
@@ -14,7 +17,6 @@ using RevitClashDetective.Models.Handlers;
 using RevitOpeningPlacement.Models;
 using RevitOpeningPlacement.Models.Configs;
 using RevitOpeningPlacement.ViewModels.OpeningConfig;
-
 using RevitOpeningPlacement.Views;
 
 namespace RevitOpeningPlacement;
@@ -47,14 +49,16 @@ internal class SetOpeningRealsArPlacementConfigCmd : BasePluginCommand {
         kernel.Bind<ParameterFilterProvider>()
             .ToSelf()
             .InSingletonScope();
+        kernel.Bind<OpeningRealsArConfig>()
+            .ToMethod(c =>
+                    OpeningRealsArConfig.GetOpeningConfig(uiApplication.ActiveUIDocument.Document)
+                );
+        kernel.BindMainWindow<OpeningRealsArConfigViewModel, OpeningRealsArSettingsView>();
+        kernel.UseWpfUIThemeUpdater();
+        string assemblyName = Assembly.GetExecutingAssembly().GetName().Name;
+        kernel.UseWpfLocalization($"/{assemblyName};component/assets/localization/Language.xaml",
+            CultureInfo.GetCultureInfo("ru-RU"));
 
-        var revitRepository = kernel.Get<RevitRepository>();
-        var openingConfig = OpeningRealsArConfig.GetOpeningConfig(revitRepository.Doc);
-        var viewModel = new OpeningRealsArConfigViewModel(revitRepository, openingConfig);
-
-        var window = new OpeningRealsArSettingsView() { Title = PluginName, DataContext = viewModel };
-        var helper = new WindowInteropHelper(window) { Owner = uiApplication.MainWindowHandle };
-
-        window.ShowDialog();
+        Notification(kernel.Get<OpeningRealsArSettingsView>());
     }
 }

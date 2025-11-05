@@ -1,4 +1,6 @@
 using System;
+using System.Globalization;
+using System.Reflection;
 using System.Windows;
 using System.Windows.Interop;
 
@@ -8,6 +10,8 @@ using Autodesk.Revit.UI;
 
 using dosymep.Bim4Everyone;
 using dosymep.Bim4Everyone.SimpleServices;
+using dosymep.WpfCore.Ninject;
+using dosymep.WpfUI.Core.Ninject;
 
 using Ninject;
 
@@ -68,6 +72,10 @@ public class GetOpeningTasksCmd : BasePluginCommand {
             .InTransientScope()
             .WithPropertyValue(nameof(Window.DataContext),
                 c => c.Kernel.Get<LinksSelectorViewModel>());
+        kernel.UseWpfUIThemeUpdater();
+        string assemblyName = Assembly.GetExecutingAssembly().GetName().Name;
+        kernel.UseWpfLocalization($"/{assemblyName};component/assets/localization/Language.xaml",
+            CultureInfo.GetCultureInfo("ru-RU"));
 
         var repo = kernel.Get<RevitRepository>();
 

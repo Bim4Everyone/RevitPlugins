@@ -1,5 +1,6 @@
+using System.Globalization;
+using System.Reflection;
 using System.Windows;
-using System.Windows.Interop;
 
 using Autodesk.Revit.Attributes;
 using Autodesk.Revit.DB;
@@ -7,7 +8,8 @@ using Autodesk.Revit.UI;
 
 using dosymep.Bim4Everyone;
 using dosymep.Bim4Everyone.SimpleServices;
-using dosymep.Xpf.Core.Ninject;
+using dosymep.WpfCore.Ninject;
+using dosymep.WpfUI.Core.Ninject;
 
 using Ninject;
 
@@ -61,20 +63,14 @@ public class SetOpeningTasksPlacementConfigCmd : BasePluginCommand {
         kernel.Bind<IDocTypesHandler>()
             .To<DocTypesHandler>()
             .InSingletonScope();
-        kernel.Bind<MainViewModel>()
+        kernel.BindMainWindow<MainViewModel, MainWindow>();
+        kernel.Bind<UnionTaskSettingsView>()
             .ToSelf()
-            .InSingletonScope();
-        kernel.Bind<MainWindow>()
-            .ToSelf()
-            .WithPropertyValue(nameof(Window.Title), PluginName)
-            .WithPropertyValue(nameof(Window.DataContext),
-                c => c.Kernel.Get<MainViewModel>());
-        kernel.UseXtraMessageBox<MainViewModel>()
-            .UseXtraOpenFileDialog<MainViewModel>()
-            .UseXtraSaveFileDialog<MainViewModel>();
-        kernel.Bind<WindowInteropHelper>()
-            .ToConstructor(c => new WindowInteropHelper(kernel.Get<MainWindow>()))
-            .WithPropertyValue(nameof(Window.Owner), uiApplication.MainWindowHandle);
+            .InTransientScope()
+            .WithPropertyValue(nameof(Window.DataContext), c => c.Kernel.Get<MainViewModel>());
+        kernel.UseWpfUIMessageBox<MainViewModel>()
+            .UseWpfOpenFileDialog<MainViewModel>()
+            .UseWpfSaveFileDialog<MainViewModel>();
         kernel.Bind<OpeningConfig>()
             .ToMethod(c =>
                 OpeningConfig.GetOpeningConfig(uiApplication.ActiveUIDocument.Document)
@@ -82,6 +78,10 @@ public class SetOpeningTasksPlacementConfigCmd : BasePluginCommand {
         kernel.Bind<ConfigFileService>()
             .ToSelf()
             .InSingletonScope();
+        kernel.UseWpfUIThemeUpdater();
+        string assemblyName = Assembly.GetExecutingAssembly().GetName().Name;
+        kernel.UseWpfLocalization($"/{assemblyName};component/assets/localization/Language.xaml",
+            CultureInfo.GetCultureInfo("ru-RU"));
 
         kernel.Get<IRevitLinkTypesSetter>().SetRevitLinkTypes();
 

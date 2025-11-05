@@ -1,7 +1,12 @@
+using System.Globalization;
+using System.Reflection;
+
 using Autodesk.Revit.Attributes;
 using Autodesk.Revit.UI;
 
 using dosymep.Bim4Everyone.SimpleServices;
+using dosymep.WpfCore.Ninject;
+using dosymep.WpfUI.Core.Ninject;
 
 using Ninject;
 
@@ -45,6 +50,10 @@ internal class PlaceOpeningTasksBySelectionCmd : PlaceOpeningTasksCmd {
         kernel.Bind<ParameterFilterProvider>()
             .ToSelf()
             .InSingletonScope();
+        kernel.UseWpfUIThemeUpdater();
+        string assemblyName = Assembly.GetExecutingAssembly().GetName().Name;
+        kernel.UseWpfLocalization($"/{assemblyName};component/assets/localization/Language.xaml",
+            CultureInfo.GetCultureInfo("ru-RU"));
 
         kernel.Get<IRevitLinkTypesSetter>().SetRevitLinkTypes();
 
