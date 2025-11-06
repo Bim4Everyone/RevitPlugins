@@ -1,8 +1,11 @@
 ﻿using System.Globalization;
+using System.Linq;
 using System.Reflection;
 
 using Autodesk.Revit.Attributes;
+using Autodesk.Revit.DB;
 using Autodesk.Revit.UI;
+using Autodesk.Revit.UI.Selection;
 
 using dosymep.Bim4Everyone;
 using dosymep.Bim4Everyone.ProjectConfigs;
@@ -14,8 +17,11 @@ using dosymep.WpfUI.Core.Ninject;
 using Ninject;
 
 using RevitMarkPlacement.Models;
+using RevitMarkPlacement.Models.AnnotationTemplates;
 using RevitMarkPlacement.Models.DocumentProviders;
 using RevitMarkPlacement.Models.SelectionModes;
+using RevitMarkPlacement.Services;
+using RevitMarkPlacement.Services.AnnotationServices;
 using RevitMarkPlacement.ViewModels;
 using RevitMarkPlacement.Views;
 
@@ -81,17 +87,31 @@ public class UpdateAnnotationsCommand : BasePluginCommand {
             .To<DBSelection>()
             .InSingletonScope();
 
-        kernel.Bind<ISpotDimensionSelection>()
-            .To<DBViewSelection>()
-            .InSingletonScope();
-
-        kernel.Bind<ISpotDimensionSelection>()
-            .To<SelectedOnViewSelection>()
-            .InSingletonScope();
-
         kernel.Bind<IGlobalParamSelection>()
             .To<DoubleGlobalParamSelection>()
             .InSingletonScope();
+        
+        kernel.Bind<IAnnotationService>()
+            .To<UpdateAnnotationService>()
+            .InSingletonScope();
+        
+        var service = kernel.Get<IAnnotationService>();
+        var spotDimensionSelection = kernel.Get<ISpotDimensionSelection>();
+      
+        var revitRepository = kernel.Get<RevitRepository>();
+        var localizationService = kernel.Get<ILocalizationService>();
+
+        using Transaction transaction = revitRepository.StartTransaction(
+            localizationService.GetLocalizedString("MainWindow.UpdateAnnotationsTransactionName"));
+        
+        SpotDimension[] spotDimensions = spotDimensionSelection
+            .GetElements()
+            .ToArray();
+        
+        service.LoadAnnotations(spotDimensions);
+        service.ProcessAnnotations(new UpdateAnnotationTemplateOptions());
+        
+        transaction.Commit();
 
         // var viewModel = kernel.Get<MainViewModel>();
         // if(!viewModel.CanPlaceAnnotation()) {

@@ -174,7 +174,7 @@
                     HeaderText="{me:LocalizationSource MainWindow.FloorCount}">
                     <ui:TextBox
                         HorizontalContentAlignment="Right"
-                        Text="{Binding FloorCount, UpdateSourceTrigger=PropertyChanged}" />
+                        Text="{Binding LevelCount, UpdateSourceTrigger=PropertyChanged}" />
                 </controls:CustomEditControl>
             </Border>
 
@@ -186,7 +186,7 @@
                         Text="{me:LocalizationSource MainWindow.FloorHeight}" />
 
                     <ui:ListView
-                        SelectedItem="{Binding FloorHeight}"
+                        SelectedItem="{Binding LevelHeight}"
                         ItemsSource="{Binding FloorHeights}" />
                 </StackPanel>
             </Border>

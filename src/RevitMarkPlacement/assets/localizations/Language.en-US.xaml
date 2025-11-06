@@ -9,6 +9,9 @@
     <system:String x:Key="MainWindow.ButtonOk">OK</system:String>
     <system:String x:Key="MainWindow.ButtonCancel">Cancel</system:String>
     
+    <system:String x:Key="MainWindow.CreateAnnotationsTransactionName">Create annotations</system:String>
+    <system:String x:Key="MainWindow.UpdateAnnotationsTransactionName">Update annotations</system:String>
+    
     <system:String x:Key="MainWindow.CreateText">Create</system:String>
     <system:String x:Key="MainWindow.SettingsText">Settings</system:String>
     <system:String x:Key="MainWindow.FloorCount">Floor count</system:String>

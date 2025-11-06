@@ -11,7 +11,10 @@ using dosymep.WPF.Commands;
 using dosymep.WPF.ViewModels;
 
 using RevitMarkPlacement.Models;
+using RevitMarkPlacement.Models.AnnotationTemplates;
 using RevitMarkPlacement.Models.SelectionModes;
+using RevitMarkPlacement.Services;
+using RevitMarkPlacement.Services.AnnotationServices;
 using RevitMarkPlacement.ViewModels.FloorHeight;
 
 namespace RevitMarkPlacement.ViewModels;
@@ -30,12 +33,12 @@ internal class MainViewModel : BaseViewModel {
     private InfoElementsViewModel _infoElementsViewModel;
 
     private string _errorText;
-    private string _floorCount;
+    private string _levelCount;
 
     private SelectionModeViewModel _selection;
     private ObservableCollection<SelectionModeViewModel> _selections;
 
-    private IFloorHeightProvider _floorHeight;
+    private IFloorHeightProvider _levelHeight;
     private ObservableCollection<IFloorHeightProvider> _floorHeights;
 
     public MainViewModel(
@@ -68,9 +71,9 @@ internal class MainViewModel : BaseViewModel {
     public ICommand LoadViewCommand { get; set; }
     public ICommand AcceptViewCommand { get; set; }
 
-    public string FloorCount {
-        get => _floorCount;
-        set => RaiseAndSetIfChanged(ref _floorCount, value);
+    public string LevelCount {
+        get => _levelCount;
+        set => RaiseAndSetIfChanged(ref _levelCount, value);
     }
 
     public string ErrorText {
@@ -88,9 +91,9 @@ internal class MainViewModel : BaseViewModel {
         set => RaiseAndSetIfChanged(ref _selections, value);
     }
 
-    public IFloorHeightProvider FloorHeight {
-        get => _floorHeight;
-        set => RaiseAndSetIfChanged(ref _floorHeight, value);
+    public IFloorHeightProvider LevelHeight {
+        get => _levelHeight;
+        set => RaiseAndSetIfChanged(ref _levelHeight, value);
     }
 
     public ObservableCollection<IFloorHeightProvider> FloorHeights {
@@ -109,7 +112,7 @@ internal class MainViewModel : BaseViewModel {
         LoadSelections(settings);
         LoadFloorHeights(settings);
 
-        FloorCount = settings?.LevelCount.ToString();
+        LevelCount = settings?.LevelCount.ToString();
     }
 
     private void LoadSelections(RevitSettings settings) {
@@ -134,7 +137,7 @@ internal class MainViewModel : BaseViewModel {
             provider.LoadConfig(settings);
         }
 
-        FloorHeight = FloorHeights
+        LevelHeight = FloorHeights
                           .FirstOrDefault(item =>
                               item.IsEnabled
                               && item.LevelHeightProvider == settings?.LevelHeightProvider)
@@ -144,8 +147,20 @@ internal class MainViewModel : BaseViewModel {
     private void AcceptView() {
         SaveConfig();
 
-        var marks = new TemplateLevelMarkCollection(_revitRepository, _systemPluginConfig, Selection.Selection);
-        marks.CreateAnnotation(int.Parse(FloorCount), FloorHeight.GetFloorHeight() ?? 0);
+        using Transaction transaction = _revitRepository.StartTransaction(
+            _localizationService.GetLocalizedString("MainWindow.CreateAnnotationsTransactionName"));
+        
+        var service = new CreateAnnotationService(_revitRepository, _systemPluginConfig);
+
+        service.LoadAnnotations(Selection.Selection.GetElements().ToArray());
+      
+        service.ProcessAnnotations(
+            new CreateAnnotationTemplateOptions() {
+                LevelCount = int.Parse(LevelCount),
+                LevelHeightMm = LevelHeight.GetFloorHeight() ?? 0
+            });
+
+        transaction.Commit();
     }
 
     private bool CanAcceptView() {
@@ -159,12 +174,12 @@ internal class MainViewModel : BaseViewModel {
             return false;
         }
 
-        if(string.IsNullOrEmpty(FloorCount)) {
+        if(string.IsNullOrEmpty(LevelCount)) {
             ErrorText = _localizationService.GetLocalizedString("MainWindow.EmptyFloorCount");
             return false;
         }
 
-        if(!int.TryParse(FloorCount, out int levelCount)) {
+        if(!int.TryParse(LevelCount, out int levelCount)) {
             ErrorText = _localizationService.GetLocalizedString("MainWindow.TextFloorCount");
             return false;
         }
@@ -174,12 +189,12 @@ internal class MainViewModel : BaseViewModel {
             return false;
         }
 
-        if(FloorHeight is null) {
+        if(LevelHeight is null) {
             ErrorText = _localizationService.GetLocalizedString("MainWindow.EmptyFloorHeight");
             return false;
         }
 
-        string errorText = FloorHeight.GetErrorText();
+        string errorText = LevelHeight.GetErrorText();
         if(!string.IsNullOrEmpty(errorText)) {
             ErrorText = errorText;
             return false;
@@ -194,9 +209,9 @@ internal class MainViewModel : BaseViewModel {
         RevitSettings setting = _pluginConfig.GetSettings(document)
                                 ?? _pluginConfig.AddSettings(document);
 
-        setting.LevelCount = int.Parse(FloorCount);
+        setting.LevelCount = int.Parse(LevelCount);
         setting.SelectionMode = Selection?.Selections;
-        setting.LevelHeightProvider = FloorHeight?.LevelHeightProvider;
+        setting.LevelHeightProvider = LevelHeight?.LevelHeightProvider;
 
         foreach(var provider in FloorHeights) {
             provider.SaveConfig(setting);

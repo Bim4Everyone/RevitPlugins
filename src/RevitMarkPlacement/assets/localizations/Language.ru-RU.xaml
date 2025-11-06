@@ -9,6 +9,9 @@
     <system:String x:Key="MainWindow.ButtonOk">ОК</system:String>
     <system:String x:Key="MainWindow.ButtonCancel">Отмена</system:String>
     
+    <system:String x:Key="MainWindow.CreateAnnotationsTransactionName">Создание аннотаций</system:String>
+    <system:String x:Key="MainWindow.UpdateAnnotationsTransactionName">Обновление аннотаций</system:String>
+    
     <system:String x:Key="MainWindow.CreateText">Создать</system:String>
     <system:String x:Key="MainWindow.SettingsText">Настройки</system:String>
     <system:String x:Key="MainWindow.FloorCount">Количество этажей</system:String>

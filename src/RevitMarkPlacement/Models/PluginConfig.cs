@@ -1,4 +1,6 @@
-﻿using Autodesk.Revit.DB;
+﻿using System.Collections.Generic;
+
+using Autodesk.Revit.DB;
 
 using dosymep.Bim4Everyone;
 using dosymep.Bim4Everyone.ProjectConfigs;
@@ -51,12 +53,20 @@ internal enum LevelHeightProvider {
 }
 
 internal class SystemPluginConfig {
+    public SystemPluginConfig() {
+        FamilyNames = [FamilyTopName, FamilyBottomName];
+        FamilyTypeNames = [FamilyTypeTopName, FamilyTypeBottomName];
+    }
+    
+    public ICollection<string> FamilyNames { get; }
+    public ICollection<string> FamilyTypeNames { get; }
+    
     public int MaxLevelCount => 12;
     public int MaxLevelHeightMm => 10000; // mm
-    
-    public string TypeTop => "Вверх";
-    public string TypeBottom => "Вниз";
-    
+
+    public string FamilyTypeTopName => "Вверх";
+    public string FamilyTypeBottomName => "Вниз";
+
     public string FamilyTopName => "ТипАн_Отметка_ТипЭт_Разрез_Вверх";
     public string FamilyBottomName => "ТипАн_Отметка_ТипЭт_Разрез_Вниз";
 
