@@ -17,6 +17,7 @@ internal class LinksSelectorViewModel : BaseViewModel {
     private readonly IDocTypesProvider _docTypesProvider;
     private readonly ILocalizationService _localization;
     private string _errorText;
+    private bool _allLinksSelected;
 
     public LinksSelectorViewModel(
         RevitRepository revitRepository,
@@ -48,6 +49,16 @@ internal class LinksSelectorViewModel : BaseViewModel {
     public string ErrorText {
         get => _errorText;
         set => RaiseAndSetIfChanged(ref _errorText, value);
+    }
+
+    public bool AllLinksSelected {
+        get => _allLinksSelected;
+        set {
+            RaiseAndSetIfChanged(ref _allLinksSelected, value);
+            foreach(var link in Links) {
+                link.IsSelected = value;
+            }
+        }
     }
 
 

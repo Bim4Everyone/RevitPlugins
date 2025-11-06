@@ -53,38 +53,41 @@
             CanUserResizeRows="False"
             AutoGenerateColumns="False"
             ItemsSource="{Binding Links}">
+            <ui:DataGrid.Resources>
+                <Style
+                    TargetType="CheckBox"
+                    BasedOn="{StaticResource CustomColumnCheckBoxStyle}" />
+            </ui:DataGrid.Resources>
             <ui:DataGrid.Columns>
                 <DataGridCheckBoxColumn
                     CanUserResize="False"
-                    Width="Auto"
                     IsReadOnly="False"
+                    Width="47"
+                    CanUserSort="False"
                     Binding="{Binding IsSelected, UpdateSourceTrigger=PropertyChanged}">
-
+                    <DataGridCheckBoxColumn.Header>
+                        <CheckBox
+                            IsChecked="{Binding DataContext.AllLinksSelected, RelativeSource={RelativeSource AncestorType=ui:DataGrid}, UpdateSourceTrigger=PropertyChanged}" />
+                    </DataGridCheckBoxColumn.Header>
                 </DataGridCheckBoxColumn>
                 <DataGridTextColumn
                     Width="*"
-                    MinWidth="50"
+                    MinWidth="60"
                     IsReadOnly="True"
                     Header="{StaticResource NameHeader}"
-                    Binding="{Binding Name}">
-
-                </DataGridTextColumn>
+                    Binding="{Binding Name}" />
                 <DataGridTextColumn
                     Width="Auto"
-                    MinWidth="50"
+                    MinWidth="60"
                     IsReadOnly="True"
                     Header="{StaticResource CurrentStatusHeader}"
-                    Binding="{Binding CurrentStatus}">
-
-                </DataGridTextColumn>
+                    Binding="{Binding CurrentStatus}" />
                 <DataGridTextColumn
                     Width="Auto"
-                    MinWidth="50"
+                    MinWidth="60"
                     IsReadOnly="True"
                     Header="{StaticResource NewStatusHeader}"
-                    Binding="{Binding FutureStatus}">
-
-                </DataGridTextColumn>
+                    Binding="{Binding FutureStatus}" />
             </ui:DataGrid.Columns>
         </ui:DataGrid>
 
