@@ -58,7 +58,7 @@ internal class RevitRepository {
                     Element = element,
                     BoundingBoxXYZ = element.GetBoundingBox(),
                     FamilyName = GetFamilyName(element),
-                    TypeName = element.Name ?? _defaultTypeName,
+                    TypeName = element.Name.Equals(string.Empty) ? _defaultTypeName : element.Name,
                     LevelName = GetLevelName(element)
                 })
                 .Where(element => element.BoundingBoxXYZ != null)

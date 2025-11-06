@@ -82,7 +82,7 @@
     <system:String x:Key="MainViewModel.NoTypeModel">The required 3D models are missing in the file</system:String>
     <system:String x:Key="MainViewModel.NoSelection">Elements is not selected</system:String>
     <system:String x:Key="MainViewModel.WrongView">Please, open 3D-view, floor plan or schedule</system:String>
-    <system:String x:Key="MainViewModel.ProgressTitle">Processing elements... [{0}]\[{1}]</system:String>
+    <system:String x:Key="MainViewModel.ProgressTitle">Processing... [{0}]\[{1}]</system:String>
 
     <system:String x:Key="SourceFileViewModel.CurrentFile">Current file (opened)</system:String>
     <system:String x:Key="CategoryViewModel.WarningStartString">Missing parameters:</system:String>    

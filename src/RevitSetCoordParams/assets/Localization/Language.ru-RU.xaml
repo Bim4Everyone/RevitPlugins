@@ -82,7 +82,7 @@
     <system:String x:Key="MainViewModel.NoTypeModel">В файле отсутствуют необходимые объемные модели</system:String>    
     <system:String x:Key="MainViewModel.NoSelection">Элементы не выбраны</system:String>
     <system:String x:Key="MainViewModel.WrongView">Пожалуйста, откройте 3Д вид, план этажа или спецификацию</system:String>
-    <system:String x:Key="MainViewModel.ProgressTitle">Обработка элементов... [{0}]\[{1}]  </system:String>
+    <system:String x:Key="MainViewModel.ProgressTitle">Обработка... [{0}]\[{1}]  </system:String>
 
     <system:String x:Key="SourceFileViewModel.CurrentFile">Текущий файл (открытый)</system:String>
     <system:String x:Key="CategoryViewModel.WarningStartString">Отсутствуют параметры:</system:String>    

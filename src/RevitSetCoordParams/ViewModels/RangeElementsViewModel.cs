@@ -1,9 +1,16 @@
+using dosymep.WPF.ViewModels;
+
 using RevitSetCoordParams.Models.Interfaces;
 
 namespace RevitSetCoordParams.ViewModels;
-internal class RangeElementsViewModel {
+internal class RangeElementsViewModel : BaseViewModel {
 
-    public string Name { get; set; }
+    private string _name;
 
     public IElementsProvider ElementsProvider { get; set; }
+
+    public string Name {
+        get => _name;
+        set => RaiseAndSetIfChanged(ref _name, value);
+    }
 }

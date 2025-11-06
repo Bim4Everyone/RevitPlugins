@@ -15,6 +15,8 @@ namespace RevitSetCoordParams.ViewModels;
 internal class WarningsViewModel : BaseViewModel {
     private readonly ILocalizationService _localizationService;
     private readonly RevitRepository _revitRepository;
+    private ObservableCollection<WarningGroupViewModel> _warningViewModels;
+    private string _warningQuantity;
 
     public WarningsViewModel(ILocalizationService localizationService, RevitRepository revitRepository) {
         _localizationService = localizationService;
@@ -24,11 +26,16 @@ internal class WarningsViewModel : BaseViewModel {
     }
 
     public ICommand ShowElementCommand { get; }
-
-    public string WarningQuantity { get; set; }
     public IReadOnlyCollection<WarningElement> WarningElementsCollection { get; set; }
-    public ObservableCollection<WarningGroupViewModel> WarningViewModels { get; set; }
 
+    public ObservableCollection<WarningGroupViewModel> WarningViewModels {
+        get => _warningViewModels;
+        set => RaiseAndSetIfChanged(ref _warningViewModels, value);
+    }
+    public string WarningQuantity {
+        get => _warningQuantity;
+        set => RaiseAndSetIfChanged(ref _warningQuantity, value);
+    }
 
     /// <summary>
     /// Метод загрузки окна
@@ -45,18 +52,22 @@ internal class WarningsViewModel : BaseViewModel {
 
     // Метод формирования списка WarningGroupViewModel
     private IEnumerable<WarningGroupViewModel> GetWarningGroupViewModels() {
-        return WarningElementsCollection
-            .Where(warningElement => warningElement is not WarningNotFoundParamElement)
-            .GroupBy(element => element.WarningType)
-            .Select(group => new WarningGroupViewModel {
-                Caption = _localizationService.GetLocalizedString($"WarningsViewModel.{group.Key}"),
-                Description = _localizationService.GetLocalizedString($"WarningsViewModel.{group.Key}Description"),
-                WarningElements = group.ToList(),
-                WarningQuantity = $"({group.Count()})",
-                ShowElementCommand = ShowElementCommand
-            })
-            .Concat(
-                WarningElementsCollection
+        var regularGroups = WarningElementsCollection
+            .Where(w => w is not WarningNotFoundParamElement)
+            .GroupBy(w => w.WarningType)
+            .Select(group => {
+                var vm = new WarningGroupViewModel {
+                    Caption = _localizationService.GetLocalizedString($"WarningsViewModel.{group.Key}"),
+                    Description = _localizationService.GetLocalizedString($"WarningsViewModel.{group.Key}Description"),
+                    WarningElements = group.ToList(),
+                    WarningQuantity = $"({group.Count()})",
+                    ShowElementCommand = ShowElementCommand
+                };
+                vm.LoadView();
+                return vm;
+            });
+
+        var notFoundGroups = WarningElementsCollection
             .OfType<WarningNotFoundParamElement>()
             .GroupBy(w => w.RevitElement.Element.Id)
             .Select(g => new {
@@ -64,12 +75,17 @@ internal class WarningsViewModel : BaseViewModel {
                 ParamNames = string.Join(", ", g.Select(x => x.RevitParam.Name).Distinct())
             })
             .GroupBy(g => g.ParamNames)
-            .Select(g => new WarningGroupViewModel {
-                Caption = $"{_localizationService.GetLocalizedString("WarningsViewModel.NotFoundParam")}: {g.Key}",
-                Description = _localizationService.GetLocalizedString("WarningsViewModel.NotFoundParamDescription"),
-                WarningElements = g.SelectMany(x => x.WarningElements).ToList(),
-                WarningQuantity = $"({g.Count()})",
-                ShowElementCommand = ShowElementCommand
-            }));
+            .Select(g => {
+                var vm = new WarningGroupViewModel {
+                    Caption = $"{_localizationService.GetLocalizedString("WarningsViewModel.NotFoundParam")}: {g.Key}",
+                    Description = _localizationService.GetLocalizedString("WarningsViewModel.NotFoundParamDescription"),
+                    WarningElements = g.SelectMany(x => x.WarningElements).ToList(),
+                    WarningQuantity = $"({g.Count()})",
+                    ShowElementCommand = ShowElementCommand
+                };
+                vm.LoadView();
+                return vm;
+            });
+        return regularGroups.Concat(notFoundGroups);
     }
 }

@@ -3,17 +3,44 @@ using System.Collections.ObjectModel;
 using System.Linq;
 using System.Windows.Input;
 
+using dosymep.WPF.ViewModels;
+
 using RevitSetCoordParams.Models;
 
 namespace RevitSetCoordParams.ViewModels;
-internal class WarningGroupViewModel {
+internal class WarningGroupViewModel : BaseViewModel {
 
-    public IReadOnlyCollection<WarningElement> WarningElements { get; set; }
+    private ObservableCollection<WarningElementViewModel> _warnings;
+    private string _caption;
+    private string _description;
+    private string _warningQuantity;
+
+    public IReadOnlyCollection<WarningElement> WarningElements { get; set; } = [];
     public ICommand ShowElementCommand { get; set; }
-    public ObservableCollection<WarningElementViewModel> Warnings => new(GetWarningElementViewModel());
-    public string Caption { get; set; }
-    public string Description { get; set; }
-    public string WarningQuantity { get; set; }
+
+    public ObservableCollection<WarningElementViewModel> Warnings {
+        get => _warnings;
+        set => RaiseAndSetIfChanged(ref _warnings, value);
+    }
+    public string Caption {
+        get => _caption;
+        set => RaiseAndSetIfChanged(ref _caption, value);
+    }
+    public string Description {
+        get => _description;
+        set => RaiseAndSetIfChanged(ref _description, value);
+    }
+    public string WarningQuantity {
+        get => _warningQuantity;
+        set => RaiseAndSetIfChanged(ref _warningQuantity, value);
+    }
+
+    /// <summary>
+    /// Метод загрузки окна
+    /// </summary>    
+    public void LoadView() {
+        Warnings = new(GetWarningElementViewModel());
+    }
 
     // Метод получения списка WarningElementViewModel
     private IEnumerable<WarningElementViewModel> GetWarningElementViewModel() {

@@ -14,6 +14,7 @@ namespace RevitSetCoordParams.ViewModels;
 internal class CategoryViewModel : BaseViewModel {
     private readonly ICategoryAvailabilityService _categoryAvailabilityService;
     private readonly ILocalizationService _localizationService;
+    private string _categoryName;
     private string _warnings;
     private bool _isChecked;
     private bool _hasWarning;
@@ -24,8 +25,11 @@ internal class CategoryViewModel : BaseViewModel {
     }
 
     public Category Category { get; set; }
-    public string CategoryName { get; set; }
 
+    public string CategoryName {
+        get => _categoryName;
+        set => RaiseAndSetIfChanged(ref _categoryName, value);
+    }
     public string Warnings {
         get => _warnings;
         set => RaiseAndSetIfChanged(ref _warnings, value);

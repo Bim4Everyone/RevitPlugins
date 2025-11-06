@@ -14,9 +14,12 @@ internal class ParamViewModel : BaseViewModel {
     private readonly ILocalizationService _localizationService;
     private readonly IParamAvailabilityService _paramDefinitionService;
 
+    private string _description;
+    private string _detailDescription;
     private string _sourceParamName;
     private string _targetParamName;
     private string _warnings;
+    private bool _isPair;
     private bool _isChecked;
     private bool _hasWarning;
 
@@ -26,10 +29,15 @@ internal class ParamViewModel : BaseViewModel {
     }
 
     public ParamMap ParamMap { get; set; }
-    public string Description { get; set; }
-    public string DetailDescription { get; set; }
-    public bool IsPair { get; set; }
 
+    public string Description {
+        get => _description;
+        set => RaiseAndSetIfChanged(ref _description, value);
+    }
+    public string DetailDescription {
+        get => _detailDescription;
+        set => RaiseAndSetIfChanged(ref _detailDescription, value);
+    }
     public string SourceParamName {
         get => _sourceParamName;
         set => RaiseAndSetIfChanged(ref _sourceParamName, value);
@@ -41,6 +49,10 @@ internal class ParamViewModel : BaseViewModel {
     public string Warnings {
         get => _warnings;
         set => RaiseAndSetIfChanged(ref _warnings, value);
+    }
+    public bool IsPair {
+        get => _isPair;
+        set => RaiseAndSetIfChanged(ref _isPair, value);
     }
     public bool IsChecked {
         get => _isChecked;
