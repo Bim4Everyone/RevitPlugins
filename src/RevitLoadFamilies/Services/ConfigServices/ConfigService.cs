@@ -10,24 +10,28 @@ namespace RevitLoadFamilies.Services.ConfigServices;
 
 internal class ConfigService : IConfigService {
     private readonly RevitRepository _revitRepository;
+    private string _configurationFolderPath;
 
     public ConfigService(RevitRepository revitRepository) {
         _revitRepository = revitRepository;
     }
 
+    public string GetConfigurationFolderPath() => _configurationFolderPath;
+
     public IEnumerable<FamilyConfig> GetConfigurations(string configurationFolderPath) {
         // Проверяем сохраненный путь, если он не действителен, тогда получаем стандартный
         if (string.IsNullOrEmpty(configurationFolderPath) || !Directory.Exists(configurationFolderPath)) {
-            configurationFolderPath = GetConfigurationsFolderPath();
+            configurationFolderPath = FindConfigurationsFolderPath();
         }
         // Если стандартный путь также не действителен, тогда запрашиваем выбор папки
         if(string.IsNullOrEmpty(configurationFolderPath) || !Directory.Exists(configurationFolderPath)) {
             throw new ArgumentException();
         }
+        _configurationFolderPath = configurationFolderPath;
         return LoadConfigurationsFromFolder(configurationFolderPath);
     }
 
-    private string GetConfigurationsFolderPath() {
+    private string FindConfigurationsFolderPath() {
         // Получаем версию Revit
         string revitVersion = GetRevitVersion();
 

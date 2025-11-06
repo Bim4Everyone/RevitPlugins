@@ -5,17 +5,12 @@ using System.Linq;
 using System.Windows;
 using System.Windows.Input;
 
-using Autodesk.Revit.DB;
-
 using dosymep.Revit;
 using dosymep.SimpleServices;
 using dosymep.WPF.Commands;
 using dosymep.WPF.ViewModels;
 
-using Microsoft.Win32;
-
 using RevitLoadFamilies.Models;
-using RevitLoadFamilies.Services;
 using RevitLoadFamilies.Services.ConfigServices;
 using RevitLoadFamilies.Services.FamilyLoading;
 
@@ -84,6 +79,7 @@ internal class MainVM : BaseViewModel {
         } else {
             ErrorText = "Конфигурации не найдены";
         }
+        _configurationFolderPath = _configService.GetConfigurationFolderPath();
         UpdateFamilyPaths();
     }
 
@@ -111,6 +107,7 @@ internal class MainVM : BaseViewModel {
     private void SaveConfig() {
         RevitSettings setting = _pluginConfig.GetSettings(_revitRepository.Document)
                                 ?? _pluginConfig.AddSettings(_revitRepository.Document);
+        setting.СonfigurationFolderPath = _configurationFolderPath;
         _pluginConfig.SaveProjectConfig();
     }
 
