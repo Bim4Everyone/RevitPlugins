@@ -72,7 +72,7 @@
     <system:String
         x:Key="Errors.TasksNotIntersectConstruction">Ни одно из выбранных заданий на отверстия не пересекается c выбранной основой</system:String>
     <system:String
-        x:Key="Errors.CannotAcceptTask">Задание с ID: {0} из файла: \'{1}\' не удалось принять. Информация об ошибке: {2}</system:String>
+        x:Key="Errors.CannotAcceptTask">Задание с ID: {0} из файла: '{1}' не удалось принять. Информация об ошибке: {2}</system:String>
     <system:String
         x:Key="Errors.StructureNotIntersectTask">Конструкция с ID: {0} не пересекается ни с одним заданием</system:String>
     <system:String

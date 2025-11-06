@@ -910,7 +910,7 @@ internal class RevitRepository {
             if(opening is not null and FamilyInstance famInst) {
                 return new OpeningMepTaskIncoming(famInst, this, link.GetTransform());
             } else {
-                ShowErrorMessage(_localization.GetLocalizedString("Validation.InvalidTaskFamily"));
+                ShowErrorMessage(_localization.GetLocalizedString("Errors.InvalidTaskFamily"));
                 throw new OperationCanceledException();
             }
         } else {
