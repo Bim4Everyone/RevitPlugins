@@ -67,7 +67,7 @@
             <DataTemplate
                 DataType="{x:Type vm:SetViewModel}">
                 <Border
-                    Style="{StaticResource border}">
+                    Style="{StaticResource CustomColoredBorder}">
                     <Grid>
                         <Grid.RowDefinitions>
                             <RowDefinition />
@@ -132,7 +132,7 @@
                         IsEditable="False"
                         DisplayMemberPath="FilterableValueProvider.DisplayValue"
                         ItemsSource="{Binding CategoriesInfo.Parameters}"
-                        SelectedValue="{Binding SelectedParameter, UpdateSourceTrigger=PropertyChanged}" />
+                        SelectedItem="{Binding SelectedParameter, UpdateSourceTrigger=PropertyChanged}" />
 
                     <ui:Button
                         DockPanel.Dock="Right"
@@ -149,7 +149,7 @@
                         IsEditable="False"
                         DisplayMemberPath="Name"
                         ItemsSource="{Binding RuleEvaluators, UpdateSourceTrigger=PropertyChanged}"
-                        SelectedValue="{Binding SelectedRuleEvaluator, UpdateSourceTrigger=PropertyChanged}" />
+                        SelectedItem="{Binding SelectedRuleEvaluator, UpdateSourceTrigger=PropertyChanged}" />
 
                     <Grid
                         DockPanel.Dock="Right">
@@ -240,7 +240,7 @@
                         DisplayMemberPath="Name"
                         IsEditable="False"
                         ItemsSource="{Binding Evaluators}"
-                        SelectedValue="{Binding SelectedEvaluator, UpdateSourceTrigger=PropertyChanged}" />
+                        SelectedItem="{Binding SelectedEvaluator, UpdateSourceTrigger=PropertyChanged}" />
                 </DockPanel>
 
                 <ListBox

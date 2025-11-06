@@ -7,6 +7,8 @@
         <ResourceDictionary
             Source="pack://application:,,,/Wpf.Ui;component/Controls/CheckBox/CheckBox.xaml" />
         <ResourceDictionary
+            Source="pack://application:,,,/Wpf.Ui;component/Controls/TextBox/TextBox.xaml" />
+        <ResourceDictionary
             Source="pack://application:,,,/Wpf.Ui;component/Controls/ToggleSwitch/ToggleSwitch.xaml" />
     </ResourceDictionary.MergedDictionaries>
     <Style
@@ -65,6 +67,14 @@
         <Setter
             Property="CornerRadius"
             Value="{DynamicResource ControlCornerRadius}" />
+    </Style>
+    <Style
+        TargetType="{x:Type ui:TextBox}"
+        x:Key="CustomSmallTextBox"
+        BasedOn="{StaticResource DefaultUiTextBoxStyle}">
+        <Setter
+            Property="ClearButtonEnabled"
+            Value="False" />
     </Style>
     <Style
         TargetType="ui:TextBlock"

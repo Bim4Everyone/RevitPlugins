@@ -35,8 +35,7 @@
         <wpfbehaviors:WpfAttachServiceBehavior
             AttachableService="{Binding SaveFileDialogService}" />
     </i:Interaction.Behaviors>
-    <Grid
-        Margin="10">
+    <Grid>
         <Grid.RowDefinitions>
             <RowDefinition
                 Height="Auto" />
@@ -120,6 +119,7 @@
         </Border>
 
         <StackPanel
+            Grid.ColumnSpan="2"
             Grid.Row="3"
             Orientation="Horizontal"
             HorizontalAlignment="Right">

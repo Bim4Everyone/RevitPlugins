@@ -1,0 +1,65 @@
+﻿<core:WpfUIPlatformUserControl
+    x:Class="RevitOpeningPlacement.Views.OffsetRangeView"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:local="clr-namespace:RevitOpeningPlacement.Views"
+    xmlns:core="clr-namespace:dosymep.WpfUI.Core"
+    xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
+    xmlns:me="clr-namespace:dosymep.WpfCore.MarkupExtensions;assembly=dosymep.WpfCore"
+    xmlns:vm="clr-namespace:RevitOpeningPlacement.ViewModels.OpeningConfig"
+    mc:Ignorable="d"
+    d:DesignHeight="450"
+    d:DesignWidth="800"
+    d:DataContext="{d:DesignInstance vm:OffsetViewModel, IsDesignTimeCreatable=False}">
+    <core:WpfUIPlatformUserControl.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary
+                    Source="../Resources/CustomStyles.xaml" />
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
+    </core:WpfUIPlatformUserControl.Resources>
+    <DockPanel
+        HorizontalAlignment="Stretch"
+        VerticalAlignment="Center">
+        <Label
+            Style="{StaticResource CustomLabel}"
+            Content="{me:LocalizationSource MepSettingsWindow.FromSize}" />
+        <ui:TextBox
+            Width="60"
+            Text="{Binding From, UpdateSourceTrigger=PropertyChanged}"
+            Style="{StaticResource CustomSmallTextBox}" />
+        <Label
+            Style="{StaticResource CustomLabel}"
+            Content="{me:LocalizationSource MepSettingsWindow.ToSize}" />
+        <ui:TextBox
+            Width="60"
+            Text="{Binding To, UpdateSourceTrigger=PropertyChanged}"
+            Style="{StaticResource CustomSmallTextBox}" />
+        <Label
+            Style="{StaticResource CustomLabel}"
+            Content="{me:LocalizationSource MepSettingsWindow.Mm}" />
+        <Label
+            Margin="14 0 0 0"
+            Style="{StaticResource CustomLabel}"
+            Content="{me:LocalizationSource MepSettingsWindow.Offset}" />
+        <ui:TextBox
+            Width="60"
+            Text="{Binding Offset,UpdateSourceTrigger=PropertyChanged}"
+            Style="{StaticResource CustomSmallTextBox}" />
+        <Label
+            Style="{StaticResource CustomLabel}"
+            Content="{me:LocalizationSource MepSettingsWindow.Mm}" />
+        <Label
+            Margin="14 0 0 0"
+            Style="{StaticResource CustomLabel}"
+            Content="{me:LocalizationSource MepSettingsWindow.OpeningType}" />
+        <ComboBox
+            Width="150"
+            IsEditable="False"
+            ItemsSource="{Binding OpeningTypeNames}"
+            SelectedItem="{Binding SelectedOpeningType}" />
+    </DockPanel>
+</core:WpfUIPlatformUserControl>

@@ -4,7 +4,6 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-    xmlns:local="clr-namespace:RevitOpeningPlacement.Views"
     xmlns:vm="clr-namespace:RevitOpeningPlacement.ViewModels.OpeningConfig"
     xmlns:core="clr-namespace:dosymep.WpfUI.Core"
     xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
@@ -20,6 +19,14 @@
                 <ResourceDictionary
                     Source="../Resources/CustomStyles.xaml" />
             </ResourceDictionary.MergedDictionaries>
+            <ui:TextBlock
+                TextWrapping="Wrap"
+                x:Key="ParameterHeader"
+                Text="{me:LocalizationSource MepSettingsWindow.ParameterHeader}" />
+            <ui:TextBlock
+                TextWrapping="Wrap"
+                x:Key="ValueHeader"
+                Text="{me:LocalizationSource MepSettingsWindow.ValueHeader}" />
         </ResourceDictionary>
     </core:WpfUIPlatformUserControl.Resources>
     <Grid>
@@ -29,38 +36,40 @@
         </Grid.ColumnDefinitions>
 
         <Grid
-            Grid.Row="0"
             Grid.Column="0">
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition />
-                <ColumnDefinition />
-            </Grid.ColumnDefinitions>
             <Grid.RowDefinitions>
-                <RowDefinition />
+                <RowDefinition
+                    Height="Auto" />
+                <RowDefinition
+                    Height="Auto" />
+                <RowDefinition
+                    Height="*" />
             </Grid.RowDefinitions>
 
             <Border
                 Grid.Row="0"
-                ToolTip="Например, если есть кабельный лоток шириной 300 и высотой 50, то задав минимальную высоту 50 и минимальную ширину 300,&#x0a;будут создаваться отверстия только для лотков, у которых ширина >= 300 и высота >=50."
                 Style="{StaticResource CustomBorder}">
                 <DockPanel
+                    ToolTip="{me:LocalizationSource MepSettingsWindow.MinSizesTooltip}"
                     LastChildFill="True">
                     <Label
-                        Content="Минимальные размеры элементов, мм"
                         DockPanel.Dock="Top"
+                        Content="{me:LocalizationSource MepSettingsWindow.MinSizesLabel}"
                         Style="{StaticResource CustomLabel}" />
                     <ui:DataGrid
                         AutoGenerateColumns="False"
                         CanUserReorderColumns="False"
                         CanUserResizeColumns="False"
+                        CanUserAddRows="False"
+                        CanUserDeleteRows="False"
                         ItemsSource="{Binding MinSizes}">
                         <ui:DataGrid.Columns>
                             <DataGridTextColumn
-                                Header="Параметр"
                                 Width="Auto"
+                                Header="{StaticResource ParameterHeader}"
                                 Binding="{Binding DisplayName}" />
                             <DataGridTemplateColumn
-                                Header="Значение">
+                                Header="{StaticResource ValueHeader}">
                                 <DataGridTemplateColumn.CellTemplate>
                                     <DataTemplate>
                                         <ui:TextBox
@@ -74,26 +83,26 @@
             </Border>
 
             <Border
-                Grid.Column="1"
+                Grid.Row="1"
                 Style="{StaticResource CustomBorder}">
                 <StackPanel>
                     <Label
-                        Content="Округление"
+                        Content="{me:LocalizationSource MepSettingsWindow.RoundingsLabel}"
                         DockPanel.Dock="Top"
                         Style="{StaticResource CustomLabel}" />
                     <DockPanel
-                        ToolTip="Например, если через стену проходит труба диаметром 110 и выставлен Зазор=50 и Округление=50 мм,&#x0a;то будет создано отверстие диаметром 200 мм,&#x0a;так как диаметр отверстия с учетом зазоров 50 мм станет 110+2*50=210 мм, после чего будет округлен по правилам математики кратно 50 мм, то есть до 200 мм.">
+                        ToolTip="{me:LocalizationSource MepSettingsWindow.RoundingsTooltip}">
                         <Label
-                            Content="Размеров, мм:" />
+                            Content="{me:LocalizationSource MepSettingsWindow.SizeRounding}" />
                         <ComboBox
                             IsEditable="False"
                             ItemsSource="{Binding Roundings}"
                             SelectedItem="{Binding SelectedRounding}" />
                     </DockPanel>
                     <DockPanel
-                        ToolTip="Округление будет произведено относительно начала проекта.">
+                        ToolTip="{me:LocalizationSource MepSettingsWindow.ElevationRoundingTooltip}">
                         <Label
-                            Content="Отметок, мм:"
+                            Content="{me:LocalizationSource MepSettingsWindow.ElevationRounding}"
                             Style="{StaticResource CustomLabel}" />
                         <ComboBox
                             IsEditable="False"
@@ -102,159 +111,92 @@
                     </DockPanel>
                 </StackPanel>
             </Border>
+
+            <Border
+                Grid.Row="2">
+                <DockPanel
+                    LastChildFill="True"
+                    ToolTip="{me:LocalizationSource MepSettingsWindow.SizeRangesTooltip}">
+                    <DockPanel
+                        DockPanel.Dock="Top">
+                        <Label
+                            Style="{StaticResource CustomLabel}"
+                            Content="{me:LocalizationSource MepSettingsWindow.SizeRangesLabel}" />
+                        <ui:Button
+                            Margin="10 0"
+                            Command="{Binding AddOffsetCommand}"
+                            Content="{ui:SymbolIcon Symbol=Add20}" />
+                        <ui:Button
+                            Appearance="Danger"
+                            Command="{Binding RemoveOffsetCommand}"
+                            CommandParameter="{Binding ElementName=_offsets, Path=SelectedItem}"
+                            Content="{ui:SymbolIcon Symbol=Delete20}" />
+                    </DockPanel>
+                    <ui:ListView
+                        SelectionMode="Single"
+                        x:Name="_offsets"
+                        ItemsSource="{Binding Offsets}">
+                        <ui:ListView.ItemTemplate>
+                            <DataTemplate>
+                                <Border
+                                    Padding="5"
+                                    Style="{StaticResource CustomBorder}">
+                                    <views:OffsetRangeView
+                                        DataContext="{Binding}" />
+                                </Border>
+                            </DataTemplate>
+                        </ui:ListView.ItemTemplate>
+                    </ui:ListView>
+                </DockPanel>
+            </Border>
         </Grid>
 
         <Border
-            Grid.Column="0"
-            Grid.Row="1">
-            <DockPanel LastChildFill="True"
+            Grid.Column="1"
+            Style="{StaticResource CustomBorder}">
+
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition
+                        Height="Auto" />
+                    <RowDefinition />
+                    <RowDefinition />
+                    <RowDefinition />
+                </Grid.RowDefinitions>
+
+                <Label
+                    Grid.Row="0"
+                    Content="{me:LocalizationSource MepSettingsWindow.Filtration}" />
+
+                <Border
+                    Grid.Row="1"
+                    Style="{StaticResource CustomBorder}">
+                    <DockPanel
+                        LastChildFill="True">
+                        <Label
+                            DockPanel.Dock="Top"
+                            Content="{me:LocalizationSource MepSettingsWindow.MepFiltration}" />
+                        <ScrollViewer>
+                            <views:SetView
+                                DataContext="{Binding SetViewModel}" />
+                        </ScrollViewer>
+                    </DockPanel>
+                </Border>
+
+                <Border
+                    Grid.Row="2"
+                    Style="{StaticResource CustomBorder}">
+                    <views:StructureCategoryView
+                        DataContext="{Binding StructureCategories[0]}" />
+                </Border>
+
+                <Border
+                    Grid.Row="3"
+                    Style="{StaticResource CustomBorder}">
+                    <views:StructureCategoryView
+                        DataContext="{Binding StructureCategories[1]}" />
+                </Border>
+            </Grid>
         </Border>
-        <dxdo:DockLayoutManager
-            VerticalContentAlignment="Stretch">
-            <dxdo:LayoutGroup
-                Orientation="Horizontal">
-                <dxdo:LayoutGroup
-                    x:Name="layoutRoot"
-                    Orientation="Vertical"
-                    ItemWidth="*">
-                    <dxdo:LayoutGroup
-                        ItemHeight="2*">
-
-                        <dxdo:LayoutControlItem
-                            ItemHeight="3*">
-                            <lc:GroupBox
-                                Header="Зазоры для диапазонов габаритов элементов, мм">
-                                <DockPanel
-                                    LastChildFill="True"
-                                    ToolTip="Например, если имеется прямоугольный воздуховод высотой 400 шириной 600,&#x0a;задав в первой строчке От=350 До=450 Зазор=50, и во второй От=550 До=650 Зазор=100, получим отверстие размером высотой 500, шириной 800, т.к. высота стала 400+2*50, а ширина 600+2*100;&#x0a;если же выставить вместо этого От=0 До=700 Зазор=50, то получим отверстие высотой 500=400+2*50 и шириной 700=600+2*50.">
-
-                                    <StackPanel
-                                        Margin="0 0 0 5"
-                                        DockPanel.Dock="Top"
-                                        Orientation="Horizontal">
-                                        <dx:SimpleButton
-                                            Height="25"
-                                            Width="25"
-                                            Margin="0 0 5 0"
-                                            Command="{Binding AddOffsetCommand}"
-                                            Glyph="{dx:DXImage 'SvgImages/Icon Builder/Actions_Add.svg'}" />
-                                        <dx:SimpleButton
-                                            Height="25"
-                                            Width="25"
-                                            Command="{Binding RemoveOffsetCommand}"
-                                            CommandParameter="{Binding ElementName=_offsetgrid, Path=SelectedItem}"
-                                            Glyph="{dx:DXImage 'SvgImages/Icon Builder/Actions_Remove.svg'}" />
-                                    </StackPanel>
-
-                                    <dxg:GridControl
-                                        SelectionMode="Row"
-                                        DockPanel.Dock="Bottom"
-                                        x:Name="_offsetgrid"
-                                        MinHeight="85"
-                                        ItemsSource="{Binding Offsets}">
-                                        <dxg:GridControl.View>
-                                            <dxg:TableView />
-                                        </dxg:GridControl.View>
-                                        <dxg:GridControl.Columns>
-                                            <dxg:GridColumn
-                                                Header="От"
-                                                Width="100"
-                                                AllowEditing="True"
-                                                FieldName="From" />
-                                            <dxg:GridColumn
-                                                Header="До"
-                                                Width="100"
-                                                AllowEditing="True"
-                                                FieldName="To" />
-                                            <dxg:GridColumn
-                                                Header="Зазор"
-                                                Width="100"
-                                                AllowEditing="True"
-                                                FieldName="Offset" />
-                                            <dxg:GridColumn
-                                                Header="Имя типа"
-                                                AllowEditing="True"
-                                                Width="*">
-                                                <dxg:GridColumn.CellTemplate>
-                                                    <DataTemplate>
-                                                        <ComboBox
-                                                            ItemsSource="{Binding RowData.Row.OpeningTypeNames}"
-                                                            SelectedItem="{Binding RowData.Row.SelectedOpeningType}" />
-                                                    </DataTemplate>
-                                                </dxg:GridColumn.CellTemplate>
-                                            </dxg:GridColumn>
-                                        </dxg:GridControl.Columns>
-                                    </dxg:GridControl>
-                                </DockPanel>
-                            </lc:GroupBox>
-                        </dxdo:LayoutControlItem>
-
-                        <dxdo:LayoutControlItem
-                            ItemHeight="4*">
-                            <lc:GroupBox
-                                Header="Критерии фильтрации элементов ВИС">
-                                <ScrollViewer>
-                                    <ContentControl
-                                        Content="{Binding SetViewModel}">
-                                        <ContentControl.ContentTemplate>
-                                            <DataTemplate
-                                                DataType="{x:Type vm:SetViewModel}">
-                                                <views:SetView
-                                                    DataContext="{Binding}" />
-                                            </DataTemplate>
-                                        </ContentControl.ContentTemplate>
-                                    </ContentControl>
-                                </ScrollViewer>
-                            </lc:GroupBox>
-                        </dxdo:LayoutControlItem>
-
-                    </dxdo:LayoutGroup>
-                    <dxdo:LayoutGroup
-                        Orientation="Vertical"
-                        ItemWidth="*">
-                        <dxdo:LayoutControlItem
-                            ItemHeight="1*">
-                            <lc:GroupBox
-                                Header="Критерии фильтрации конструкций">
-                                <dxe:ListBoxEdit
-                                    ItemsSource="{Binding StructureCategories}">
-                                    <dxe:ListBoxEdit.ItemContainerStyle>
-                                        <Style
-                                            TargetType="dxe:ListBoxEditItem">
-                                            <Setter
-                                                Property="HorizontalContentAlignment"
-                                                Value="Stretch" />
-                                            <Setter
-                                                Property="BorderThickness"
-                                                Value="1" />
-                                            <Setter
-                                                Property="VerticalContentAlignment"
-                                                Value="Top" />
-                                            <Setter
-                                                Property="MinHeight"
-                                                Value="250" />
-                                        </Style>
-                                    </dxe:ListBoxEdit.ItemContainerStyle>
-                                    <dxe:ListBoxEdit.ItemTemplate>
-                                        <DataTemplate>
-                                            <ContentControl
-                                                Content="{Binding}">
-                                                <ContentControl.ContentTemplate>
-                                                    <DataTemplate
-                                                        DataType="{x:Type vm:StructureCategoryViewModel}">
-                                                        <views:StructureCategoryView
-                                                            DataContext="{Binding}" />
-                                                    </DataTemplate>
-                                                </ContentControl.ContentTemplate>
-                                            </ContentControl>
-                                        </DataTemplate>
-                                    </dxe:ListBoxEdit.ItemTemplate>
-                                </dxe:ListBoxEdit>
-                            </lc:GroupBox>
-                        </dxdo:LayoutControlItem>
-                    </dxdo:LayoutGroup>
-                </dxdo:LayoutGroup>
-                </dxdo:DockLayoutManager>
-
     </Grid>
 </core:WpfUIPlatformUserControl>

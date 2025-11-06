@@ -21,16 +21,16 @@
             <ResourceDictionary.MergedDictionaries>
                 <ResourceDictionary
                     Source="../Resources/CustomStyles.xaml" />
-                <ui:TextBlock
-                    x:Key="NameHeader"
-                    Text="{me:LocalizationSource LinksSelectorWindow.NameHeader}" />
-                <ui:TextBlock
-                    x:Key="CurrentStatusHeader"
-                    Text="{me:LocalizationSource LinksSelectorWindow.CurrentStatusHeader}" />
-                <ui:TextBlock
-                    x:Key="NewStatusHeader"
-                    Text="{me:LocalizationSource LinksSelectorWindow.NewStatusHeader}" />
             </ResourceDictionary.MergedDictionaries>
+            <ui:TextBlock
+                x:Key="NameHeader"
+                Text="{me:LocalizationSource LinksSelectorWindow.NameHeader}" />
+            <ui:TextBlock
+                x:Key="CurrentStatusHeader"
+                Text="{me:LocalizationSource LinksSelectorWindow.CurrentStatusHeader}" />
+            <ui:TextBlock
+                x:Key="NewStatusHeader"
+                Text="{me:LocalizationSource LinksSelectorWindow.NewStatusHeader}" />
         </ResourceDictionary>
     </core:WpfUIPlatformWindow.Resources>
     <Grid>
