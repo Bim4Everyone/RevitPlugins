@@ -21,15 +21,6 @@
                 <ResourceDictionary
                     Source="../../Resources/CustomStyles.xaml" />
             </ResourceDictionary.MergedDictionaries>
-            <ui:TextBlock
-                x:Key="NameHeader"
-                Text="{me:LocalizationSource LinksSelectorWindow.NameHeader}" />
-            <ui:TextBlock
-                x:Key="CurrentStatusHeader"
-                Text="{me:LocalizationSource LinksSelectorWindow.CurrentStatusHeader}" />
-            <ui:TextBlock
-                x:Key="NewStatusHeader"
-                Text="{me:LocalizationSource LinksSelectorWindow.NewStatusHeader}" />
         </ResourceDictionary>
     </core:WpfUIPlatformWindow.Resources>
     <Grid>
@@ -74,20 +65,32 @@
                     Width="*"
                     MinWidth="60"
                     IsReadOnly="True"
-                    Header="{StaticResource NameHeader}"
-                    Binding="{Binding Name}" />
+                    Binding="{Binding Name}">
+                    <DataGridTextColumn.Header>
+                        <ui:TextBlock
+                            Text="{DynamicResource LinksSelectorWindow.NameHeader}" />
+                    </DataGridTextColumn.Header>
+                </DataGridTextColumn>
                 <DataGridTextColumn
                     Width="Auto"
                     MinWidth="60"
                     IsReadOnly="True"
-                    Header="{StaticResource CurrentStatusHeader}"
-                    Binding="{Binding CurrentStatus}" />
+                    Binding="{Binding CurrentStatus}">
+                    <DataGridTextColumn.Header>
+                        <ui:TextBlock
+                            Text="{DynamicResource LinksSelectorWindow.CurrentStatusHeader}" />
+                    </DataGridTextColumn.Header>
+                </DataGridTextColumn>
                 <DataGridTextColumn
                     Width="Auto"
                     MinWidth="60"
                     IsReadOnly="True"
-                    Header="{StaticResource NewStatusHeader}"
-                    Binding="{Binding FutureStatus}" />
+                    Binding="{Binding FutureStatus}">
+                    <DataGridTextColumn.Header>
+                        <ui:TextBlock
+                            Text="{DynamicResource LinksSelectorWindow.NewStatusHeader}" />
+                    </DataGridTextColumn.Header>
+                </DataGridTextColumn>
             </ui:DataGrid.Columns>
         </ui:DataGrid>
 
