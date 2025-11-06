@@ -17,7 +17,7 @@ using RevitClashDetective.Models.Handlers;
 using RevitOpeningPlacement.Models;
 using RevitOpeningPlacement.Models.Configs;
 using RevitOpeningPlacement.ViewModels.OpeningConfig;
-using RevitOpeningPlacement.Views;
+using RevitOpeningPlacement.Views.Settings;
 
 namespace RevitOpeningPlacement;
 /// <summary>

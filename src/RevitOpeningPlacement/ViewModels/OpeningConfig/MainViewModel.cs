@@ -21,7 +21,8 @@ using RevitOpeningPlacement.Models.Configs;
 using RevitOpeningPlacement.Models.OpeningPlacement;
 using RevitOpeningPlacement.Services;
 using RevitOpeningPlacement.ViewModels.Services;
-using RevitOpeningPlacement.Views;
+using RevitOpeningPlacement.Views.Settings;
+using RevitOpeningPlacement.Views.Utils;
 
 namespace RevitOpeningPlacement.ViewModels.OpeningConfig;
 internal class MainViewModel : BaseViewModel {

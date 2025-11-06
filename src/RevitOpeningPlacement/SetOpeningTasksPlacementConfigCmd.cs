@@ -20,7 +20,7 @@ using RevitOpeningPlacement.Models;
 using RevitOpeningPlacement.Models.Configs;
 using RevitOpeningPlacement.Services;
 using RevitOpeningPlacement.ViewModels.OpeningConfig;
-using RevitOpeningPlacement.Views;
+using RevitOpeningPlacement.Views.Settings;
 
 namespace RevitOpeningPlacement;
 /// <summary>

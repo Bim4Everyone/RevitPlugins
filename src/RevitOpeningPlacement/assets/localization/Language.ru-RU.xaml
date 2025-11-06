@@ -37,31 +37,25 @@
     <system:String
         x:Key="MepSettingsWindow.Title">Настройки расстановки заданий</system:String>
     <system:String
-        x:Key="MepSettingsWindow.MinSizesTooltip"
-        xml:space="preserve">
-Например, если есть кабельный лоток шириной 300 и высотой 50,
+        x:Key="MepSettingsWindow.MinSizesTooltip">
+        Например, если есть кабельный лоток шириной 300 и высотой 50,
 то задав минимальную высоту 50 и минимальную ширину 300,
 будут создаваться отверстия только для лотков,
 у которых ширина >= 300 и высота >=50.</system:String>
     <system:String
         x:Key="MepSettingsWindow.MinSizesLabel">Минимальные размеры элементов, мм</system:String>
     <system:String
-        x:Key="MepSettingsWindow.ParameterHeader">Параметр</system:String>
+        x:Key="MepSettingsWindow.RoundingsLabel">Округление, мм</system:String>
     <system:String
-        x:Key="MepSettingsWindow.ValueHeader">Значение</system:String>
-    <system:String
-        x:Key="MepSettingsWindow.RoundingsLabel">Округление</system:String>
-    <system:String
-        x:Key="MepSettingsWindow.RoundingsTooltip"
-        xml:space="preserve">
-Например, если через стену проходит труба диаметром 110 и выставлен Зазор=50 и Округление=50 мм,
+        x:Key="MepSettingsWindow.RoundingsTooltip">
+        Например, если через стену проходит труба диаметром 110 и выставлен Зазор=50 и Округление=50 мм,
 то будет создано отверстие диаметром 200 мм,
 так как диаметр отверстия с учетом зазоров 50 мм станет 110+2*50=210 мм,
 после чего будет округлен по правилам математики кратно 50 мм, то есть до 200 мм.</system:String>
     <system:String
-        x:Key="MepSettingsWindow.SizeRounding">Размеров, мм:</system:String>
+        x:Key="MepSettingsWindow.SizeRounding">Размеров</system:String>
     <system:String
-        x:Key="MepSettingsWindow.ElevationRounding">Отметок, мм:</system:String>
+        x:Key="MepSettingsWindow.ElevationRounding">Отметок</system:String>
     <system:String
         x:Key="MepSettingsWindow.ElevationRoundingTooltip">Округление будет произведено относительно начала проекта.</system:String>
     <system:String
@@ -91,11 +85,10 @@
     <system:String
         x:Key="MepSettingsWindow.CheckFilterFloors">Перекрытия</system:String>
     <system:String
-        x:Key="MepSettingsWindow.SizeRangesLabel">Зазоры для диапазонов габаритов элементов</system:String>
+        x:Key="MepSettingsWindow.SizeRangesLabel">Зазоры для диапазонов габаритов элементов, мм</system:String>
     <system:String
-        x:Key="MepSettingsWindow.SizeRangesTooltip"
-        xml:space="preserve">
-Например, если имеется прямоугольный воздуховод высотой 400 шириной 600,
+        x:Key="MepSettingsWindow.SizeRangesTooltip">
+        Например, если имеется прямоугольный воздуховод высотой 400 шириной 600,
 задав в первой строчке От=350 До=450 Зазор=50, и во второй От=550 До=650 Зазор=100,
 получим отверстие размером высотой 500, шириной 800, т.к. высота стала 400+2*50, а ширина 600+2*100;
 если же выставить вместо этого От=0 До=700 Зазор=50,
@@ -106,15 +99,10 @@
     <system:String
         x:Key="MepSettingsWindow.ToSize">До</system:String>
     <system:String
-        x:Key="MepSettingsWindow.Offset">Зазор</system:String>
-    <system:String
         x:Key="MepSettingsWindow.Mm">мм</system:String>
     <system:String
-        x:Key="MepSettingsWindow.OpeningType">Тип отверстия</system:String>
-    <system:String
-        x:Key="MepSettingsWindow.UnionSettingsTooltip"
-        xml:space="preserve">
-Настройки объединения используются
+        x:Key="MepSettingsWindow.UnionSettingsTooltip">
+        Настройки объединения используются
 при ручном объединении заданий на отверстия,
 а также при автообъединении заданий на отверстия,
 в том числе в многослойных конструкциях.</system:String>
