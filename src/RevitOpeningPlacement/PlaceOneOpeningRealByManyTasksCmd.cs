@@ -5,6 +5,7 @@ using Autodesk.Revit.Attributes;
 using Autodesk.Revit.UI;
 
 using dosymep.Bim4Everyone.SimpleServices;
+using dosymep.SimpleServices;
 using dosymep.WpfCore.Ninject;
 using dosymep.WpfUI.Core.Ninject;
 
@@ -61,12 +62,13 @@ public class PlaceOneOpeningRealByManyTasksCmd : OpeningRealPlacerCmd {
         var revitRepository = kernel.Get<RevitRepository>();
         var bimPartsHandler = kernel.Get<IDocTypesHandler>();
         var docType = bimPartsHandler.GetDocType(revitRepository.Doc);
+        var localization = kernel.Get<ILocalizationService>();
         switch(docType) {
             case DocTypeEnum.AR: {
                 if(!ModelCorrect(new RealOpeningsArChecker(revitRepository))) {
                     return;
                 }
-                var placer = new RealOpeningArPlacer(revitRepository);
+                var placer = new RealOpeningArPlacer(revitRepository, localization);
                 placer.PlaceUnitedOpeningByManyTasks();
                 break;
             }
@@ -76,7 +78,7 @@ public class PlaceOneOpeningRealByManyTasksCmd : OpeningRealPlacerCmd {
                     return;
                 }
                 var config = OpeningRealsKrConfig.GetOpeningConfig(revitRepository.Doc);
-                var placer = new RealOpeningKrPlacer(revitRepository, config);
+                var placer = new RealOpeningKrPlacer(revitRepository, config, localization);
                 placer.PlaceUnitedOpeningByManyTasks();
                 break;
             }

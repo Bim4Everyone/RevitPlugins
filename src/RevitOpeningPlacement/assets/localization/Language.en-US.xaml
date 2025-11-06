@@ -3,4 +3,266 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:system="clr-namespace:System;assembly=mscorlib">
 
+    <system:String
+        x:Key="OpeningRealsArSettingsView.Title">AR Opening Placement Settings</system:String>
+    <system:String
+        x:Key="OpeningRealsArSettingsView.RoundSize">Round dimensions</system:String>
+    <system:String
+        x:Key="OpeningRealsArSettingsView.RoundElevation">Round elevation</system:String>
+    <system:String
+        x:Key="OpeningRealsArSettingsView.RoundValues">Rounding value, mm</system:String>
+
+    <system:String
+        x:Key="OpeningTasks">Opening Tasks</system:String>
+
+    <system:String
+        x:Key="NavigatorModeWindow.Title">Navigator for Structural Tasks</system:String>
+    <system:String
+        x:Key="NavigatorModeWindow.Body">Navigator mode:</system:String>
+    <system:String
+        x:Key="NavigatorModeWindow.Ar">Tasks from AR</system:String>
+    <system:String
+        x:Key="NavigatorModeWindow.Mep">Tasks from MEP</system:String>
+
+    <system:String
+        x:Key="Progress.ProcessConstructions">Processing structures... [{0}\{1}]</system:String>
+    <system:String
+        x:Key="Progress.TasksPlacing">Placing openings... [{0}\{1}]</system:String>
+    <system:String
+        x:Key="Progress.CheckDuplicates">Checking duplicates... [{0}\{1}]</system:String>
+    <system:String
+        x:Key="Progress.UniteTouching">Merging touching... [{0}\{1}]</system:String>
+
+    <system:String
+        x:Key="Transaction.PlaceSingleOpening">Placing single opening</system:String>
+    <system:String
+        x:Key="Transaction.PlaceSingleOpeningsInOneHost">Single openings in one host</system:String>
+    <system:String
+        x:Key="Transaction.PlaceSingleOpeningsInManyHosts">Single openings in multiple hosts</system:String>
+    <system:String
+        x:Key="Transaction.PlaceUnitedOpening">Placing merged opening</system:String>
+    <system:String
+        x:Key="Transaction.DeleteUnitedTasks">Deleting merged opening tasks</system:String>
+    <system:String
+        x:Key="Transaction.UniteTasks">Merging openings</system:String>
+    <system:String
+        x:Key="Transaction.HighlightHost">Highlighting opening host</system:String>
+    <system:String
+        x:Key="Transaction.TaskPlacing">Placing tasks</system:String>
+    <system:String
+        x:Key="Transaction.DeleteDuplicated">Deleting duplicate tasks</system:String>
+    <system:String
+        x:Key="Transaction.UniteMultilayers">Merging multilayer tasks</system:String>
+
+    <system:String
+        x:Key="RevitUI.PickWallsOrFloors">Select wall(s) and/or floor(s)</system:String>
+    <system:String
+        x:Key="RevitUI.PickMepElements">Select MEP elements and click 'Finish'</system:String>
+    <system:String
+        x:Key="RevitUI.PickOpeningMepTasks">Select opening task(s) from MEP link(s) and click 'Finish'</system:String>
+    <system:String
+        x:Key="RevitUI.PickOpeningMepTask">Select opening task from MEP link and click 'Finish'</system:String>
+    <system:String
+        x:Key="RevitUI.PickOpeningArTasks">Select opening task(s) from AR link(s) and click 'Finish'</system:String>
+    <system:String
+        x:Key="RevitUI.PickOpeningArTask">Select opening task from AR link and click 'Finish'</system:String>
+
+    <system:String
+        x:Key="Errors.TaskNotIntersectConstruction">Selected opening task does not intersect with selected host</system:String>
+    <system:String
+        x:Key="Errors.TasksNotIntersectConstruction">None of the selected opening tasks intersect with selected host</system:String>
+    <system:String
+        x:Key="Errors.CannotAcceptTask">Task with ID: {0} from file: '{1}' could not be accepted. Error information: {2}</system:String>
+    <system:String
+        x:Key="Errors.StructureNotIntersectTask">Structure with ID: {0} does not intersect with any task</system:String>
+    <system:String
+        x:Key="Errors.InvalidTaskFamily">Selected element is not an instance of opening task family</system:String>
+    <system:String
+        x:Key="Errors.InvalidElement">Could not identify selected element</system:String>
+    <system:String
+        x:Key="Errors.SelectTwoTasksAtLeast">At least 2 opening tasks must be selected</system:String>
+    <system:String
+        x:Key="Errors.CannotUniteTasks">Could not perform merge</system:String>
+    <system:String
+        x:Key="Errors.ClosedDocument">Plugin window was opened in another Revit document that has been closed, cannot show element.</system:String>
+    <system:String
+        x:Key="Errors.InactiveDocument">Plugin window was opened in another Revit document that is not currently active, cannot show element.</system:String>
+
+    <system:String
+        x:Key="Validation.MissingParametersInFamily">Family '{0}' is missing shared parameters: {1}</system:String>
+
+    <system:String
+        x:Key="OpeningRealsKrSettingsView.Title">Structural Opening Placement Settings</system:String>
+    <system:String
+        x:Key="OpeningRealsKrSettingsView.PlaceByAr">Place openings by tasks from AR</system:String>
+    <system:String
+        x:Key="OpeningRealsKrSettingsView.PlaceByMep">Place openings by tasks from MEP</system:String>
+    <system:String
+        x:Key="OpeningRealsKrSettingsView.RoundSize">Round dimensions</system:String>
+    <system:String
+        x:Key="OpeningRealsKrSettingsView.RoundElevation">Round elevation</system:String>
+    <system:String
+        x:Key="OpeningRealsKrSettingsView.RoundValues">Rounding value, mm</system:String>
+
+    <system:String
+        x:Key="UnionTaskSettingsView.Title">Merge Settings</system:String>
+    <system:String
+        x:Key="UnionTaskSettingsView.RoundSize">Round dimensions</system:String>
+    <system:String
+        x:Key="UnionTaskSettingsView.RoundElevation">Round elevation</system:String>
+    <system:String
+        x:Key="UnionTaskSettingsView.RoundValues">Rounding value, mm</system:String>
+
+    <system:String
+        x:Key="MepSettingsWindow.Title">Task Placement Settings</system:String>
+    <system:String
+        x:Key="MepSettingsWindow.MinSizesTooltip">
+        For example, if there is a cable tray with width 300 and height 50,
+by setting minimum height to 50 and minimum width to 300,
+openings will be created only for trays
+with width >= 300 and height >= 50.</system:String>
+    <system:String
+        x:Key="MepSettingsWindow.MinSizesLabel">Minimum element dimensions, mm</system:String>
+    <system:String
+        x:Key="MepSettingsWindow.RoundingsLabel">Rounding, mm</system:String>
+    <system:String
+        x:Key="MepSettingsWindow.RoundingsTooltip">
+        For example, if a pipe with diameter 110 passes through a wall and Clearance=50 and Rounding=50 mm are set,
+an opening with diameter 200 mm will be created,
+since the opening diameter with clearances of 50 mm becomes 110+2*50=210 mm,
+after which it will be rounded according to mathematical rules to multiples of 50 mm, i.e. to 200 mm.</system:String>
+    <system:String
+        x:Key="MepSettingsWindow.SizeRounding">Dimensions</system:String>
+    <system:String
+        x:Key="MepSettingsWindow.ElevationRounding">Elevations</system:String>
+    <system:String
+        x:Key="MepSettingsWindow.ElevationRoundingTooltip">Rounding will be performed relative to project origin.</system:String>
+    <system:String
+        x:Key="MepSettingsWindow.Filtration">Filtration</system:String>
+    <system:String
+        x:Key="MepSettingsWindow.MepFiltration">MEP</system:String>
+    <system:String
+        x:Key="MepSettingsWindow.LoadSettings">Load settings</system:String>
+    <system:String
+        x:Key="MepSettingsWindow.SaveSettings">Save</system:String>
+    <system:String
+        x:Key="MepSettingsWindow.SaveAsSettings">Save as</system:String>
+    <system:String
+        x:Key="MepSettingsWindow.OpenSettingsFolder">Open config folder</system:String>
+    <system:String
+        x:Key="MepSettingsWindow.SettingsName">Settings name:</system:String>
+    <system:String
+        x:Key="MepSettingsWindow.UnionSettings">Merge settings</system:String>
+    <system:String
+        x:Key="MepSettingsWindow.ShowPlacingErrors">Show placement errors</system:String>
+    <system:String
+        x:Key="MepSettingsWindow.CheckFilter">Check filter</system:String>
+    <system:String
+        x:Key="MepSettingsWindow.CheckFilterMep">MEP</system:String>
+    <system:String
+        x:Key="MepSettingsWindow.CheckFilterWalls">Walls</system:String>
+    <system:String
+        x:Key="MepSettingsWindow.CheckFilterFloors">Floors</system:String>
+    <system:String
+        x:Key="MepSettingsWindow.SizeRangesLabel">Clearances for element dimension ranges, mm</system:String>
+    <system:String
+        x:Key="MepSettingsWindow.SizeRangesTooltip">
+        For example, if there is a rectangular duct with height 400 and width 600,
+by setting in the first row From=350 To=450 Clearance=50, and in the second From=550 To=650 Clearance=100,
+we get an opening with height 500 and width 800, since height becomes 400+2*50, and width 600+2*100;
+however, if we set From=0 To=700 Clearance=50 instead,
+we get an opening with height 500=400+2*50 and width 700=600+2*50.</system:String>
+
+    <system:String
+        x:Key="MepSettingsWindow.FromSize">From</system:String>
+    <system:String
+        x:Key="MepSettingsWindow.ToSize">To</system:String>
+    <system:String
+        x:Key="MepSettingsWindow.Mm">mm</system:String>
+    <system:String
+        x:Key="MepSettingsWindow.UnionSettingsTooltip">
+        Merge settings are used
+for manual merging of opening tasks,
+as well as for automatic merging of opening tasks,
+including in multilayer structures.</system:String>
+
+    <system:String
+        x:Key="FilterCreation.AddRule">Add set</system:String>
+    <system:String
+        x:Key="FilterCreation.AddSet">Add rule</system:String>
+
+    <system:String
+        x:Key="LinksSelectorWindow.Title">Select Links for Processing</system:String>
+    <system:String
+        x:Key="LinksSelectorWindow.NameHeader">Name</system:String>
+    <system:String
+        x:Key="LinksSelectorWindow.CurrentStatusHeader">Current status</system:String>
+    <system:String
+        x:Key="LinksSelectorWindow.NewStatusHeader">New status</system:String>
+    <system:String
+        x:Key="LinksSelectorWindow.LinkWillBeLoaded">Will be loaded</system:String>
+    <system:String
+        x:Key="LinksSelectorWindow.LinkWillNotChange">Will not change</system:String>
+    <system:String
+        x:Key="LinksSelectorWindow.LinkIsNotLoaded">Not loaded</system:String>
+    <system:String
+        x:Key="LinksSelectorWindow.LinkIsLoaded">Loaded</system:String>
+
+    <system:String
+        x:Key="LinksSelectorWindow.Validation.SelectAnyLink">Select links for processing</system:String>
+
+    <system:String
+        x:Key="Parameter.InvalidStorageType">Parameter {0} has no defined data type.</system:String>
+    <system:String
+        x:Key="Parameter.CannotParseInt">Parameter "{0}" value must be an integer.</system:String>
+    <system:String
+        x:Key="Parameter.CannotParseDouble">Parameter "{0}" value must be a real number.</system:String>
+
+    <system:String
+        x:Key="SetEvaluators.Or">Or</system:String>
+    <system:String
+        x:Key="SetEvaluators.And">And</system:String>
+    <system:String
+        x:Key="RuleEvaluators.FilterStringBeginsWith">Begins with</system:String>
+    <system:String
+        x:Key="RuleEvaluators.FilterStringNotBeginsWith">Does not begin with</system:String>
+    <system:String
+        x:Key="RuleEvaluators.FilterStringContains">Contains</system:String>
+    <system:String
+        x:Key="RuleEvaluators.FilterStringNotContains">Does not contain</system:String>
+    <system:String
+        x:Key="RuleEvaluators.FilterStringEndsWith">Ends with</system:String>
+    <system:String
+        x:Key="RuleEvaluators.FilterStringNotEndsWith">Does not end with</system:String>
+    <system:String
+        x:Key="RuleEvaluators.FilterStringEquals">Equals</system:String>
+    <system:String
+        x:Key="RuleEvaluators.FilterStringGreater">Greater than</system:String>
+    <system:String
+        x:Key="RuleEvaluators.FilterStringGreaterOrEqual">Greater than or equal</system:String>
+    <system:String
+        x:Key="RuleEvaluators.FilterStringLess">Less than</system:String>
+    <system:String
+        x:Key="RuleEvaluators.FilterStringLessOrEqual">Less than or equal</system:String>
+    <system:String
+        x:Key="RuleEvaluators.FilterNumericEquals">Equals</system:String>
+    <system:String
+        x:Key="RuleEvaluators.FilterNumericGreater">Greater than</system:String>
+    <system:String
+        x:Key="RuleEvaluators.FilterNumericGreaterOrEqual">Greater than or equal</system:String>
+    <system:String
+        x:Key="RuleEvaluators.FilterNumericLess">Less than</system:String>
+    <system:String
+        x:Key="RuleEvaluators.FilterNumericLessOrEqual">Less than or equal</system:String>
+    <system:String
+        x:Key="RuleEvaluators.FilterHasNoValue">Has no value</system:String>
+    <system:String
+        x:Key="RuleEvaluators.FilterHasValue">Has value</system:String>
+    <system:String
+        x:Key="RuleEvaluators.FilterNotEquals">Not equal</system:String>
+
+    <system:String
+        x:Key="Ok">OK</system:String>
+    <system:String
+        x:Key="Cancel">Cancel</system:String>
 </ResourceDictionary>

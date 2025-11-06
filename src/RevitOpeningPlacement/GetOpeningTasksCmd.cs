@@ -10,6 +10,7 @@ using Autodesk.Revit.UI;
 
 using dosymep.Bim4Everyone;
 using dosymep.Bim4Everyone.SimpleServices;
+using dosymep.SimpleServices;
 using dosymep.WpfCore.Ninject;
 using dosymep.WpfUI.Core.Ninject;
 
@@ -158,12 +159,12 @@ public class GetOpeningTasksCmd : BasePluginCommand {
         return false;
     }
 
-    private KrNavigatorMode GetKrNavigatorMode() {
-        var navigatorModeDialog = new TaskDialog("Навигатор по заданиям для КР") {
-            MainInstruction = "Режим навигатора:"
+    private KrNavigatorMode GetKrNavigatorMode(ILocalizationService localization) {
+        var navigatorModeDialog = new TaskDialog(localization.GetLocalizedString("NavigatorModeWindow.Title")) {
+            MainInstruction = localization.GetLocalizedString("NavigatorModeWindow.Body")
         };
-        navigatorModeDialog.AddCommandLink(TaskDialogCommandLinkId.CommandLink1, "Задания от АР");
-        navigatorModeDialog.AddCommandLink(TaskDialogCommandLinkId.CommandLink2, "Задания от ВИС");
+        navigatorModeDialog.AddCommandLink(TaskDialogCommandLinkId.CommandLink1, localization.GetLocalizedString("NavigatorModeWindow.Ar"));
+        navigatorModeDialog.AddCommandLink(TaskDialogCommandLinkId.CommandLink2, localization.GetLocalizedString("NavigatorModeWindow.Mep"));
         navigatorModeDialog.CommonButtons = TaskDialogCommonButtons.Close;
         navigatorModeDialog.DefaultButton = TaskDialogResult.Close;
         var result = navigatorModeDialog.Show();
@@ -184,7 +185,7 @@ public class GetOpeningTasksCmd : BasePluginCommand {
                 return OpeningRealsKrConfig.GetOpeningConfig(repo.Doc);
             });
 
-        var navigatorMode = GetKrNavigatorMode();
+        var navigatorMode = GetKrNavigatorMode(kernel.Get<ILocalizationService>());
         var config = kernel.Get<OpeningRealsKrConfig>();
         DocTypeEnum[] docTypes;
         switch(navigatorMode) {

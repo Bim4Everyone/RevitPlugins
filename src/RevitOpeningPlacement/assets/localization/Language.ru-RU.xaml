@@ -11,6 +11,85 @@
         x:Key="OpeningRealsArSettingsView.RoundElevation">Округлять отметку</system:String>
     <system:String
         x:Key="OpeningRealsArSettingsView.RoundValues">Значение округления, мм</system:String>
+    
+    <system:String
+        x:Key="OpeningTasks">Задания на отверстия</system:String>
+
+    <system:String
+        x:Key="NavigatorModeWindow.Title">Навигатор по заданиям для КР</system:String>
+    <system:String
+        x:Key="NavigatorModeWindow.Body">Режим навигатора:</system:String>
+    <system:String
+        x:Key="NavigatorModeWindow.Ar">Задания от АР</system:String>
+    <system:String
+        x:Key="NavigatorModeWindow.Mep">Задания от ВИС</system:String>
+
+    <system:String
+        x:Key="Progress.ProcessConstructions">Обработка конструкций... [{0}\{1}]</system:String>
+    <system:String
+        x:Key="Progress.TasksPlacing">Расстановка отверстий... [{0}\{1}]</system:String>
+    <system:String
+        x:Key="Progress.CheckDuplicates">Проверка дублей... [{0}\{1}]</system:String>
+    <system:String
+        x:Key="Progress.UniteTouching">Объединение касающихся... [{0}\{1}]</system:String>
+
+    <system:String
+        x:Key="Transaction.PlaceSingleOpening">Размещение одиночного отверстия</system:String>
+    <system:String
+        x:Key="Transaction.PlaceSingleOpeningsInOneHost">Одиночные отверстия в одном хосте</system:String>
+    <system:String
+        x:Key="Transaction.PlaceSingleOpeningsInManyHosts">Одиночные отверстия в нескольких хостах</system:String>
+    <system:String
+        x:Key="Transaction.PlaceUnitedOpening">Размещение объединенного отверстия</system:String>
+    <system:String
+        x:Key="Transaction.DeleteUnitedTasks">Удаление объединенных заданий на отверстия</system:String>
+    <system:String
+        x:Key="Transaction.UniteTasks">Объединение отверстий</system:String>
+    <system:String
+        x:Key="Transaction.HighlightHost">Выделение хоста отверстия</system:String>
+    <system:String
+        x:Key="Transaction.TaskPlacing">Расстановка заданий</system:String>
+    <system:String
+        x:Key="Transaction.DeleteDuplicated">Удаление дублирующих заданий</system:String>
+    <system:String
+        x:Key="Transaction.UniteMultilayers">Объединение многослойных заданий</system:String>
+
+    <system:String
+        x:Key="RevitUI.PickWallsOrFloors">Выберите стену(ы) и(или) перекрытие(я)</system:String>
+    <system:String
+        x:Key="RevitUI.PickMepElements">Выберите элементы ВИС и нажмите 'Готово'</system:String>
+    <system:String
+        x:Key="RevitUI.PickOpeningMepTasks">Выберите задание(я) на отверстие(я) из связи(ей) ВИС и нажмите 'Готово'</system:String>
+    <system:String
+        x:Key="RevitUI.PickOpeningMepTask">"Выберите задание на отверстие из связи ВИС и нажмите 'Готово'"</system:String>
+    <system:String
+        x:Key="RevitUI.PickOpeningArTasks">Выберите задание(я) на отверстие(я) из связи(ей) АР и нажмите 'Готово'</system:String>
+    <system:String
+        x:Key="RevitUI.PickOpeningArTask">"Выберите задание на отверстие из связи АР и нажмите 'Готово'"</system:String>
+
+    <system:String
+        x:Key="Errors.TaskNotIntersectConstruction">Выбранное задание на отверстие не пересекается c выбранной основой</system:String>
+    <system:String
+        x:Key="Errors.TasksNotIntersectConstruction">Ни одно из выбранных заданий на отверстия не пересекается c выбранной основой</system:String>
+    <system:String
+        x:Key="Errors.CannotAcceptTask">Задание с ID: {0} из файла: \'{1}\' не удалось принять. Информация об ошибке: {2}</system:String>
+    <system:String
+        x:Key="Errors.StructureNotIntersectTask">Конструкция с ID: {0} не пересекается ни с одним заданием</system:String>
+    <system:String
+        x:Key="Errors.InvalidTaskFamily">Выбранный элемент не является экземпляром семейства задания на отверстие</system:String>
+    <system:String
+        x:Key="Errors.InvalidElement">Не удалось определить выбранный элемент</system:String>
+    <system:String
+        x:Key="Errors.SelectTwoTasksAtLeast">Необходимо выбрать как минимум 2 задания на отверстия</system:String>
+    <system:String
+        x:Key="Errors.CannotUniteTasks">Не удалось выполнить объединение</system:String>
+    <system:String
+        x:Key="Errors.ClosedDocument">Окно плагина было открыто в другом документе Revit, который был закрыт, нельзя показать элемент.</system:String>
+    <system:String
+        x:Key="Errors.InactiveDocument">Окно плагина было открыто в другом документе Revit, который сейчас не активен, нельзя показать элемент.</system:String>
+
+    <system:String
+        x:Key="Validation.MissingParametersInFamily">У семейства '{0}' отсутствуют общие параметры: {1}</system:String>
 
     <system:String
         x:Key="OpeningRealsKrSettingsView.Title">Настройки расстановки отверстий КР</system:String>

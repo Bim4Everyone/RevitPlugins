@@ -5,6 +5,7 @@ using Autodesk.Revit.Attributes;
 using Autodesk.Revit.UI;
 
 using dosymep.Bim4Everyone.SimpleServices;
+using dosymep.SimpleServices;
 using dosymep.WpfCore.Ninject;
 using dosymep.WpfUI.Core.Ninject;
 
@@ -61,6 +62,6 @@ internal class PlaceOpeningTasksBySelectionCmd : PlaceOpeningTasksCmd {
         var selectedMepElements = revitRepository
             .PickMepElements(OpeningConfig.GetOpeningConfig(revitRepository.Doc).Categories);
 
-        PlaceOpeningTasks(uiApplication, revitRepository, selectedMepElements);
+        PlaceOpeningTasks(uiApplication, revitRepository, kernel.Get<ILocalizationService>(), selectedMepElements);
     }
 }
