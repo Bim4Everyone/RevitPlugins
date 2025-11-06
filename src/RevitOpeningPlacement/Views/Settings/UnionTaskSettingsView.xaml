@@ -11,6 +11,11 @@
     xmlns:me="clr-namespace:dosymep.WpfCore.MarkupExtensions;assembly=dosymep.WpfCore"
     WindowStartupLocation="CenterOwner"
     mc:Ignorable="d"
+    MinWidth="350"
+    MaxWidth="350"
+    MinHeight="200"
+    MaxHeight="200"
+    ResizeMode="NoResize"
     d:DataContext="{d:DesignInstance vms:MainViewModel, IsDesignTimeCreatable=False}">
     <core:WpfUIPlatformWindow.Resources>
         <ResourceDictionary>
@@ -31,10 +36,13 @@
         </Grid.RowDefinitions>
         <ui:TitleBar
             Grid.Row="0"
+            ShowMaximize="False"
+            ShowMinimize="False"
             Title="{me:LocalizationSource UnionTaskSettingsView.Title}" />
 
         <StackPanel
             Grid.Row="1"
+            Margin="10 0"
             HorizontalAlignment="Stretch"
             VerticalAlignment="Center">
             <DockPanel
@@ -83,6 +91,7 @@
                 Content="{me:LocalizationSource Ok}" />
             <ui:Button
                 Width="80"
+                Margin="10"
                 IsCancel="True"
                 Click="ButtonCancel_Click"
                 Content="{me:LocalizationSource Cancel}" />

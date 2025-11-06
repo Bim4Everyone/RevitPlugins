@@ -78,6 +78,7 @@ internal class MepCategoryViewModel : BaseViewModel {
         set => RaiseAndSetIfChanged(ref _name, value);
     }
 
+    // TODO
     public string ImageSource { get; set; }
 
     public ObservableCollection<SizeViewModel> MinSizes {

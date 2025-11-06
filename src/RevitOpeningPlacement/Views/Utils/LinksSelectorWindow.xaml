@@ -10,10 +10,10 @@
     xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
     xmlns:me="clr-namespace:dosymep.WpfCore.MarkupExtensions;assembly=dosymep.WpfCore"
     mc:Ignorable="d"
-    Height="300"
-    Width="600"
-    MinHeight="150"
-    MinWidth="150"
+    Height="600"
+    Width="800"
+    MinHeight="500"
+    MinWidth="600"
     d:DataContext="{d:DesignInstance vms:LinksSelectorViewModel, IsDesignTimeCreatable=False}">
     <core:WpfUIPlatformWindow.Resources>
         <ResourceDictionary>
