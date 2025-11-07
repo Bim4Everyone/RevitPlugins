@@ -1,36 +1,54 @@
-﻿<base:ThemedPlatformWindow
-    x:Class="RevitRooms.Views.RoomsNumsWindows"
+﻿<core:WpfUIPlatformWindow
+    x:Class="RevitRooms.Views.RoomsNumsWindow"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:base="clr-namespace:dosymep.WPF.Views"
-    xmlns:dxe="http://schemas.devexpress.com/winfx/2008/xaml/editors"
+    xmlns:local="clr-namespace:RevitRooms.Views"
     xmlns:vms="clr-namespace:RevitRooms.ViewModels"
-    xmlns:dx="http://schemas.devexpress.com/winfx/2008/xaml/core"
-    xmlns:dxg="http://schemas.devexpress.com/winfx/2008/xaml/grid"
-    xmlns:dxmvvm="http://schemas.devexpress.com/winfx/2008/xaml/mvvm"
+    xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
+    xmlns:core="clr-namespace:dosymep.WpfUI.Core"
+    xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
+    xmlns:me="clr-namespace:dosymep.WpfCore.MarkupExtensions;assembly=dosymep.WpfCore"
 
     mc:Ignorable="d"
     WindowStartupLocation="CenterOwner"
 
-    Title="MainWindow"
-    Height="650" Width="850"
-
+    Height="650" 
+    Width="850"
+    
+    MinHeight="650"
+    MinWidth="850"
+    
     x:Name="_this"
 
     d:DataContext="{d:DesignInstance vms:RoomNumsViewModel, IsDesignTimeCreatable=False}">
 
-    <Window.Resources>
-        <BooleanToVisibilityConverter x:Key="BoolToVis" />
-    </Window.Resources>
-    
-    <dxmvvm:Interaction.Behaviors>
-        <dxmvvm:EventToCommand
-            EventName="Loaded"
-            Command="{Binding RoomsNums.LoadViewCommand}" />
-    </dxmvvm:Interaction.Behaviors>
-    
+    <i:Interaction.Triggers>
+        <i:EventTrigger
+            EventName="Loaded">
+            <i:InvokeCommandAction
+                Command="{Binding LoadViewCommand}" />
+        </i:EventTrigger>
+        <i:EventTrigger
+            EventName="Loaded">
+            <i:InvokeCommandAction
+                Command="{Binding RoomsNums.LoadViewCommand}" />
+        </i:EventTrigger>
+    </i:Interaction.Triggers>
+
+    <core:WpfUIPlatformWindow.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary
+                    Source="Styles.xaml" />
+            </ResourceDictionary.MergedDictionaries>
+            <BooleanToVisibilityConverter
+                x:Key="BoolToVis" />
+        </ResourceDictionary>
+    </core:WpfUIPlatformWindow.Resources>
+
     <Grid>
         <Grid.ColumnDefinitions>
             <ColumnDefinition />
@@ -48,61 +66,62 @@
             <RowDefinition Height="Auto" />
             <RowDefinition Height="Auto" />
             <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
             <RowDefinition Height="*" />
             <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
 
-        <dxe:ComboBoxEdit
-            Grid.Row="0" Grid.Column="0"
-            Grid.ColumnSpan="2"
+        <ui:TitleBar
+            VerticalAlignment="Center"
+            Grid.Row="0"
+            Grid.ColumnSpan="4"
+            Title="{me:LocalizationSource MainWindow.Title}" />
+
+        <ComboBox
+            Grid.Row="1" Grid.Column="0"
+            Grid.ColumnSpan="4"
             Margin="10"
-            IsTextEditable="False"
-            DisplayMember="Name"
+            DisplayMemberPath="Name"
             ItemsSource="{Binding RoomsNumsViewModels}"
-            EditValue="{Binding RoomsNums}" />
+            SelectedItem="{Binding RoomsNums}" />
 
         <DockPanel
-            Grid.Row="1" Grid.Column="0"
+            Grid.Row="2" Grid.Column="0"
             Grid.ColumnSpan="2"
             Margin="10">
             <TextBlock
                 Margin="0,0,10,0"
                 Text="Стадия:" />
-            <dxe:ComboBoxEdit
-                IsTextEditable="False"
-                DisplayMember="Name"
+            <ComboBox
+                DisplayMemberPath="Name"
                 ItemsSource="{Binding RoomsNums.Phases}"
                 SelectedItem="{Binding RoomsNums.Phase}" />
         </DockPanel>
 
         <DockPanel
-            Grid.Row="0" Grid.Column="2"
+            Grid.Row="2" Grid.Column="2"
             Grid.ColumnSpan="2"
             Margin="10">
-
             <TextBlock
                 Margin="0,0,10,0"
                 Text="Префикс:" />
-
-            <dxe:TextEdit
-                EditValue="{Binding RoomsNums.Prefix, UpdateSourceTrigger=PropertyChanged}" />
+            <TextBox
+                Text="{Binding RoomsNums.Prefix, UpdateSourceTrigger=PropertyChanged}" />
         </DockPanel>
 
         <DockPanel
-            Grid.Row="1" Grid.Column="2"
-            Grid.ColumnSpan="2"
+            Grid.Row="3" Grid.Column="2"
+            Grid.ColumnSpan="3"
             Margin="10">
-
             <TextBlock
                 Margin="0,0,10,0"
                 Text="Суффикс:" />
-
-            <dxe:TextEdit
-                EditValue="{Binding RoomsNums.Suffix, UpdateSourceTrigger=PropertyChanged}" />
+            <TextBox
+                Text="{Binding RoomsNums.Suffix, UpdateSourceTrigger=PropertyChanged}" />
         </DockPanel>
 
         <DockPanel
-            Grid.Row="2" Grid.Column="0"
+            Grid.Row="3" Grid.Column="0"
             Grid.ColumnSpan="2"
             Margin="10">
 
@@ -110,12 +129,12 @@
                 Margin="0,0,10,0"
                 Text="Начальный номер:" />
 
-            <dxe:TextEdit
-                EditValue="{Binding RoomsNums.StartNumber, UpdateSourceTrigger=PropertyChanged}" />
+            <TextBox
+                Text="{Binding RoomsNums.StartNumber, UpdateSourceTrigger=PropertyChanged}" />
         </DockPanel>
         
         <RadioButton
-            Grid.Row="3" 
+            Grid.Row="4" 
             Grid.Column="0"
             Grid.ColumnSpan="4"
             Margin="10"
@@ -127,7 +146,7 @@
         
         <RadioButton
             x:Name="_roomsNums"
-            Grid.Row="4" 
+            Grid.Row="6" 
             Grid.Column="0"
             Grid.ColumnSpan="4" 
             Margin="10"
@@ -138,7 +157,7 @@
         </RadioButton>
         
         <RadioButton 
-            Grid.Row="5"
+            Grid.Row="6"
             Grid.Column="0" 
             Grid.ColumnSpan="4" 
             Margin="20,10,10,10" 
@@ -149,7 +168,7 @@
             IsChecked="{Binding RoomsNums.IsNumRoomsGroup}" />
         
         <RadioButton 
-            Grid.Row="6" 
+            Grid.Row="7" 
             Grid.Column="0" 
             Grid.ColumnSpan="4" 
             Margin="20,10,10,10"
@@ -160,7 +179,7 @@
             IsChecked="{Binding RoomsNums.IsNumRoomsSectionLevels}" />
         
         <RadioButton 
-            Grid.Row="7" 
+            Grid.Row="8" 
             Grid.Column="0" 
             Grid.ColumnSpan="4" 
             Margin="20,10,10,10" GroupName="rooms_nums"
@@ -169,171 +188,190 @@
                 Converter={StaticResource BoolToVis}}"
             IsChecked="{Binding RoomsNums.IsNumRoomsSection}" />
         
-        <DockPanel Grid.Row="8" Grid.Column="0" Margin="10" LastChildFill="True">
-            <TextBlock DockPanel.Dock="Top" Margin="0,0,0,10" Text="Секции для нумерации" />
+        <DockPanel 
+            Grid.Row="9" 
+            Grid.Column="0" 
+            Margin="10" 
+            LastChildFill="True">
+            <TextBlock 
+                DockPanel.Dock="Top" 
+                Margin="0,0,0,10" 
+                Text="Секции для нумерации" />
 
-            <dxg:GridControl
+            <ui:DataGrid
+                AutoGenerateColumns="False"
+                CanUserResizeColumns="True"
+                Style="{StaticResource CustomResizableDataGridStyle}"
                 ItemsSource="{Binding RoomsNums.Sections}">
-
-                <dxg:GridControl.View>
-                    <dxg:TableView
-                        AutoWidth="True"
-                        AllowGrouping="False"
-                        ShowGroupPanel="False" />
-                </dxg:GridControl.View>
-
-                <dxg:GridColumn
-                    Header=""
-                    ToolTip="Выделение"
-                    FieldName="IsSelected"
-                    Width="43" MaxWidth="43"
-                    MinWidth="43" AllowResizing="False"
-                    AllowColumnFiltering="False"
-                    AllowSorting="False"
-                    ShowCheckBoxInHeader="True">
-                    <dxg:GridColumn.CellTemplate>
-                        <DataTemplate>
-                            <dxe:CheckEdit
-                                Name="PART_Editor"
-                                IsChecked="{Binding Row.IsSelected}" />
-                        </DataTemplate>
-                    </dxg:GridColumn.CellTemplate>
-                </dxg:GridColumn>
-
-                <dxg:GridColumn ReadOnly="True" FieldName="Name" Header="Наименование" />
-            </dxg:GridControl>
+                <DataGrid.Columns>
+                    <DataGridCheckBoxColumn
+                        Binding="{Binding Path=IsSelected, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}">
+                        <DataGridCheckBoxColumn.Header>
+                            <TextBlock
+                                Text="{me:LocalizationSource MainWindow.HeaderCheck}" />
+                        </DataGridCheckBoxColumn.Header>
+                    </DataGridCheckBoxColumn>
+                    <DataGridTextColumn
+                        IsReadOnly="True"
+                        Binding="{Binding Path=Name}">
+                        <DataGridTextColumn.Header>
+                            <TextBlock
+                                Text="{me:LocalizationSource MainWindow.HeaderLevels}" />
+                        </DataGridTextColumn.Header>
+                    </DataGridTextColumn>
+                </DataGrid.Columns>
+            </ui:DataGrid>
         </DockPanel>
 
-        <DockPanel Grid.Row="8" Grid.Column="1" Margin="10" LastChildFill="True">
-            <TextBlock DockPanel.Dock="Top" Margin="0,0,0,10" Text="Группы для нумерации" />
-            <dxg:GridControl
+        <DockPanel 
+            Grid.Row="9" 
+            Grid.Column="1" 
+            Margin="10" 
+            LastChildFill="True">
+            <TextBlock 
+                DockPanel.Dock="Top" 
+                Margin="0,0,0,10" 
+                Text="Группы для нумерации" />
+            <ui:DataGrid
+                AutoGenerateColumns="False"
+                CanUserResizeColumns="True"
+                Style="{StaticResource CustomResizableDataGridStyle}"
                 ItemsSource="{Binding RoomsNums.Groups}">
-
-                <dxg:GridControl.View>
-                    <dxg:TableView
-                        AutoWidth="True"
-                        AllowGrouping="False"
-                        ShowGroupPanel="False" />
-                </dxg:GridControl.View>
-
-                <dxg:GridColumn
-                    Header=""
-                    ToolTip="Выделение"
-                    FieldName="IsSelected"
-                    Width="43" MaxWidth="43"
-                    MinWidth="43" AllowResizing="False"
-                    AllowColumnFiltering="False"
-                    AllowSorting="False"
-                    ShowCheckBoxInHeader="True">
-                    <dxg:GridColumn.CellTemplate>
-                        <DataTemplate>
-                            <dxe:CheckEdit
-                                Name="PART_Editor"
-                                IsChecked="{Binding Row.IsSelected}" />
-                        </DataTemplate>
-                    </dxg:GridColumn.CellTemplate>
-                </dxg:GridColumn>
-
-                <dxg:GridColumn ReadOnly="True" FieldName="Name" Header="Наименование" />
-            </dxg:GridControl>
+                <DataGrid.Columns>
+                    <DataGridCheckBoxColumn
+                        Binding="{Binding Path=IsSelected, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}">
+                        <DataGridCheckBoxColumn.Header>
+                            <TextBlock
+                                Text="{me:LocalizationSource MainWindow.HeaderCheck}" />
+                        </DataGridCheckBoxColumn.Header>
+                    </DataGridCheckBoxColumn>
+                    <DataGridTextColumn
+                        IsReadOnly="True"
+                        Binding="{Binding Path=Name}">
+                        <DataGridTextColumn.Header>
+                            <TextBlock
+                                Text="{me:LocalizationSource MainWindow.HeaderLevels}" />
+                        </DataGridTextColumn.Header>
+                    </DataGridTextColumn>
+                </DataGrid.Columns>
+            </ui:DataGrid>
         </DockPanel>
 
-        <DockPanel Grid.Row="8" Grid.Column="2" Margin="10" LastChildFill="True">
-            <TextBlock DockPanel.Dock="Top" Margin="0,0,0,10" Text="Уровни для нумерации" />
-
-            <dxg:GridControl
+        <DockPanel 
+            Grid.Row="9" 
+            Grid.Column="2" 
+            Margin="10" 
+            LastChildFill="True">
+            <TextBlock 
+                DockPanel.Dock="Top" 
+                Margin="0,0,0,10" 
+                Text="Уровни для нумерации" />
+            <ui:DataGrid
+                AutoGenerateColumns="False"
+                CanUserResizeColumns="True"
+                Style="{StaticResource CustomResizableDataGridStyle}"
                 ItemsSource="{Binding RoomsNums.Levels}">
-
-                <dxg:GridControl.View>
-                    <dxg:TableView
-                        AutoWidth="True"
-                        AllowGrouping="False"
-                        ShowGroupPanel="False" />
-                </dxg:GridControl.View>
-
-                <dxg:GridColumn
-                    Header=""
-                    ToolTip="Выделение"
-                    FieldName="IsSelected"
-                    Width="43" MaxWidth="43"
-                    MinWidth="43" AllowResizing="False"
-                    AllowColumnFiltering="False"
-                    AllowSorting="False"
-                    ShowCheckBoxInHeader="True">
-                    <dxg:GridColumn.CellTemplate>
-                        <DataTemplate>
-                            <dxe:CheckEdit
-                                Name="PART_Editor"
-                                IsChecked="{Binding Row.IsSelected}" />
-                        </DataTemplate>
-                    </dxg:GridColumn.CellTemplate>
-                </dxg:GridColumn>
-
-                <dxg:GridColumn ReadOnly="True" FieldName="Name" Header="Наименование" />
-                <dxg:GridColumn ReadOnly="True" FieldName="LevelNames" Header="Уровень" />
-            </dxg:GridControl>
+                <DataGrid.Columns>
+                    <DataGridCheckBoxColumn
+                        Binding="{Binding Path=IsSelected, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}">
+                        <DataGridCheckBoxColumn.Header>
+                            <TextBlock
+                                Text="{me:LocalizationSource MainWindow.HeaderCheck}" />
+                        </DataGridCheckBoxColumn.Header>
+                    </DataGridCheckBoxColumn>
+                    <DataGridTextColumn
+                        IsReadOnly="True"
+                        Binding="{Binding Path=Name}">
+                        <DataGridTextColumn.Header>
+                            <TextBlock
+                                Text="{me:LocalizationSource MainWindow.HeaderLevels}" />
+                        </DataGridTextColumn.Header>
+                    </DataGridTextColumn>
+                    <DataGridTextColumn
+                        IsReadOnly="True"
+                        Binding="{Binding Path=LevelNames}">
+                        <DataGridTextColumn.Header>
+                            <TextBlock
+                                Text="{me:LocalizationSource MainWindow.HeaderLevels}" />
+                        </DataGridTextColumn.Header>
+                    </DataGridTextColumn>
+                </DataGrid.Columns>
+            </ui:DataGrid>
         </DockPanel>
 
-        <DockPanel Grid.Row="8" Grid.Column="3" Margin="10" LastChildFill="True">
+        <DockPanel 
+            Grid.Row="9" Grid.Column="3" 
+            Margin="10" 
+            LastChildFill="True">
             <TextBlock DockPanel.Dock="Top" Margin="0,0,0,10" Text="Приоритеты помещений" />
             <StackPanel DockPanel.Dock="Bottom" Orientation="Horizontal">
-                <dx:SimpleButton
+                <ui:Button
                     ToolTip="Вверх"
                     Width="25" Margin=" 5"
                     Command="{Binding RoomsNums.UpOrderCommand}"
                     CommandParameter="{Binding SelectedItems, ElementName=listbox}"
-                    GlyphHeight="16" Glyph="{dx:DXImage SvgImages/Arrows/MoveUp.svg}" />
-                <dx:SimpleButton
+                    Icon="SvgImages/Arrows/MoveUp.svg" />
+                <ui:Button
                     ToolTip="Вниз"
                     Width="25" Margin="5"
                     Command="{Binding RoomsNums.DownOrderCommand}"
                     CommandParameter="{Binding SelectedItems, ElementName=listbox}"
-                    GlyphHeight="16" Glyph="{dx:DXImage SvgImages/Arrows/MoveDown.svg}" />
-                <dx:SimpleButton
+                    Icon="SvgImages/Arrows/MoveDown.svg"/>
+                <ui:Button
                     ToolTip="Добавить"
                     Width="25" Margin="5"
                     Command="{Binding RoomsNums.AddOrderCommand}"
-                    GlyphHeight="16" Glyph="{dx:DXImage Office2013/Actions/Add_16x16.png}" />
-                <dx:SimpleButton
+                    Icon="Office2013/Actions/Add_16x16.png"/>
+                <ui:Button
                     ToolTip="Удалить"
                     Width="25" Margin="5"
                     Command="{Binding RoomsNums.RemoveOrderCommand}"
                     CommandParameter="{Binding SelectedItems, ElementName=listbox}"
-                    GlyphHeight="16" Glyph="{dx:DXImage Office2013/Actions/Cancel_16x16.png}" />
-                <dx:SimpleButton
+                    Icon="Office2013/Actions/Cancel_16x16.png"/>
+                <ui:Button
                     ToolTip="Сохранить"
                     Width="25" Margin="5"
                     Command="{Binding RoomsNums.SaveOrderCommand}"
-                    GlyphHeight="16" Glyph="{dx:DXImage SvgImages/Save/Save.svg}" />
+                    Icon="SvgImages/Save/Save.svg"/>
             </StackPanel>
 
-            <dxg:GridControl
+            <ui:DataGrid
                 x:Name="listbox"
-                SelectionMode="Row"
+                AutoGenerateColumns="False"
+                CanUserResizeColumns="True"
+                Style="{StaticResource CustomResizableDataGridStyle}"
                 ItemsSource="{Binding RoomsNums.SelectedNumberingOrders}">
 
-                <dxg:GridControl.View>
-                    <dxg:TableView
-                        AutoWidth="True"
-                        AllowEditing="False"
-                        AllowGrouping="False"
-                        ShowGroupPanel="False" />
-                </dxg:GridControl.View>
-
-                <dxg:GridColumn FieldName="Name" Header="Наименование" />
-            </dxg:GridControl>
+                <DataGridTextColumn
+                    IsReadOnly="True"
+                    Binding="{Binding Path=LevelNames}">
+                    <DataGridTextColumn.Header>
+                        <TextBlock
+                            Text="{me:LocalizationSource MainWindow.HeaderLevels}" />
+                    </DataGridTextColumn.Header>
+                </DataGridTextColumn>
+            </ui:DataGrid>
         </DockPanel>
 
         <StackPanel
-            Grid.Row="9" Grid.Column="0"
+            Grid.Row="10" Grid.Column="0"
             Grid.ColumnSpan="4"
             Orientation="Horizontal" HorizontalAlignment="Right">
-
-            <TextBlock Margin="10" Text="{Binding RoomsNums.ErrorText}" Foreground="Orange" />
-            <dx:SimpleButton Content="Запуск" Height="25" Width="70" Margin="10" IsDefault="True"
-                             Command="{Binding RoomsNums.NumerateRoomsCommand}" />
-            <dx:SimpleButton Content="Отмена" Height="25" Width="70" Margin="10" IsCancel="true"
-                             Click="ButtonCancel_Click" />
+            <TextBlock 
+                Margin="10" 
+                Text="{Binding RoomsNums.ErrorText}" 
+                Foreground="Orange" />
+            <ui:Button 
+                Content="Запуск" 
+                Height="35" Width="80" Margin="10" 
+                IsDefault="True"
+                Command="{Binding RoomsNums.NumerateRoomsCommand}" />
+            <ui:Button 
+                Content="Отмена" 
+                Height="35" Width="80" 
+                Margin="10" 
+                IsCancel="true"
+                Click="ButtonCancel_Click" />
         </StackPanel>
     </Grid>
-</base:ThemedPlatformWindow>
+</core:WpfUIPlatformWindow>
