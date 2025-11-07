@@ -1,12 +1,21 @@
-﻿<ResourceDictionary 
+﻿<ResourceDictionary
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
+    xmlns:controls="clr-namespace:Wpf.Ui.Controls;assembly=Wpf.Ui">
+    <ResourceDictionary.MergedDictionaries>
+        <ResourceDictionary
+            Source="pack://application:,,,/Wpf.Ui;component/Controls/DataGrid/DataGrid.xaml" />
+        <ResourceDictionary
+            Source="pack://application:,,,/Wpf.Ui;component/Controls/ComboBox/ComboBox.xaml" />
+    </ResourceDictionary.MergedDictionaries>
+    
     <Style
         TargetType="Border"
         x:Key="CustomBorder">
         <Setter
             Property="Padding"
-            Value="20" />
+            Value="14,8" />
         <Setter
             Property="VerticalAlignment"
             Value="Stretch" />
@@ -59,5 +68,41 @@
         <Setter 
             Property="Foreground" 
             Value="{DynamicResource TextFillColorPrimaryBrush}" />
+    </Style>
+
+    <Style
+        x:Key="CustomResizableDataGridStyle"
+        TargetType="ui:DataGrid"
+        BasedOn="{StaticResource DefaultUiDataGridStyle}">
+        <Setter
+            Property="ColumnHeaderStyle"
+            Value="{DynamicResource CustomDataGridColumnHeaderStyle}" />
+        <Setter
+            Property="RowStyle"
+            Value="{DynamicResource CustomDataGridRowStyle}" />
+        <Setter
+            Property="AutoGenerateColumns"
+            Value="False" />
+        <Setter
+            Property="VirtualizingPanel.VirtualizationMode"
+            Value="Recycling" />
+        <Setter
+            Property="VirtualizingPanel.IsVirtualizing"
+            Value="True" />
+        <Setter
+            Property="VerticalScrollBarVisibility"
+            Value="Auto" />
+        <Setter
+            Property="HorizontalScrollBarVisibility"
+            Value="Auto" />
+        <Setter
+            Property="CanUserReorderColumns"
+            Value="False" />
+        <Setter
+            Property="CanUserResizeColumns"
+            Value="True" />
+        <Setter
+            Property="GridLinesVisibility"
+            Value="All" />
     </Style>
 </ResourceDictionary>

@@ -15,11 +15,11 @@
     mc:Ignorable="d"
     WindowStartupLocation="CenterOwner"
 
-    Height="700" 
-    Width="900"
+    Height="800" 
+    Width="1000"
     
-    MinHeight="700"
-    MinWidth="900"
+    MinHeight="800"
+    MinWidth="1000"
     
     d:DataContext="{d:DesignInstance vms:RoomsViewModel, IsDesignTimeCreatable=False}">
 
@@ -48,11 +48,6 @@
             <RowDefinition Height="Auto" />
             <RowDefinition Height="Auto" />
             <RowDefinition Height="Auto" />
-            <RowDefinition Height="Auto" />
-            <RowDefinition Height="Auto" />
-            <RowDefinition Height="Auto" />
-            <RowDefinition Height="Auto" />
-            <RowDefinition Height="Auto" />
             <RowDefinition Height="*" />
             <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
@@ -61,153 +56,175 @@
             VerticalAlignment="Center"
             Grid.Row="0"
             Title="{me:LocalizationSource MainWindow.Title}"/>
-
-        <ComboBox
+        
+        <Border
             Grid.Row="1"
-            Margin="10"
-            ItemsSource="{Binding RevitViewModels}"
-            DisplayMemberPath="Name"
-            SelectedItem="{Binding RevitViewModel}"/>
-
-        <CheckBox
-            Grid.Row="2"
-            Margin="10"
-            IsChecked="{Binding RevitViewModel.IsFillLevel}">
-            <TextBlock 
-                Text="{Binding LevelParamName, Mode=OneWay, StringFormat='Заполнить {0}'}" />
-        </CheckBox>
-
-        <CheckBox
-            Grid.Row="3"
-            Margin="10"
-            Content="Рассчитать площадь по пятну"
-            IsChecked="{Binding RevitViewModel.IsSpotCalcArea}" />
-
-        <CheckBox
-            Grid.Row="4"
-            Margin="10"
-            Content="Рассчитать количество комнат"
-            IsChecked="{Binding RevitViewModel.IsCountRooms}" />
-
-        <CheckBox
-            x:Name="_checkArea"
-            Grid.Row="5"
-            Margin="10"
-            Content="Проверить площадь помещений на изменения:"
-            IsChecked="{Binding RevitViewModel.IsCheckRoomsChanges}" />
-
-        <StackPanel
-            Grid.Row="6"
-            Margin="0,5,10,0"
-            Orientation="Horizontal"
-            Visibility="{Binding ElementName=_checkArea,Path=IsChecked, Converter={StaticResource BoolToVis}}">
-            <TextBlock
-                Margin="50,0,10,0" Text="Точность проверки" />
-            <ui:TextBox
-                Width="50"
-                Text="{Binding RevitViewModel.RoomAccuracy, UpdateSourceTrigger=PropertyChanged}" />
-            <TextBlock
-                Margin="10,0,0,0" Text="%" />
-        </StackPanel>
-
-        <DockPanel 
-            Grid.Row="7" 
-            Margin="10">
-            <TextBlock
-                Width="158"
-                VerticalAlignment="Center"
-                Text="Стадии:" />
+            Margin="14,0,14,4"
+            Style="{StaticResource CustomBorder}">
             <ComboBox
-                Margin="10,0,0,0"
+                ItemsSource="{Binding RevitViewModels}"
                 DisplayMemberPath="Name"
-                ItemsSource="{Binding RevitViewModel.Phases}"
-                SelectedValue="{Binding Phase}"/>
-        </DockPanel>
+                SelectedItem="{Binding RevitViewModel}" />
+        </Border>
 
-        <DockPanel 
-            Grid.Row="8" 
-            Margin="10">
-            <TextBlock
-                x:Name="_text"
-                VerticalAlignment="Center"
-                Text="Число знаков после запятой:" />
+        <Border
+            Grid.Row="2"
+            Margin="14,4"
+            Style="{StaticResource CustomBorder}">
+            <StackPanel>
+                <CheckBox
+                    Margin="0,4"
+                    IsChecked="{Binding RevitViewModel.IsFillLevel}">
+                    <TextBlock
+                        Text="{Binding LevelParamName, Mode=OneWay, StringFormat='Заполнить {0}'}" />
+                </CheckBox>
 
-            <ComboBox
-                Margin="10,0,0,0"
-                ItemsSource="{Binding RevitViewModel.RoundAccuracyValues}"
-                SelectedValue="{Binding RoundAccuracy}"/>
-        </DockPanel>
+                <CheckBox
+                    Margin="0,4"
+                    Content="Рассчитать площадь по пятну"
+                    IsChecked="{Binding RevitViewModel.IsSpotCalcArea}" />
 
-        <ui:DataGrid
-            Grid.Row="9"
-            Margin="10"
-            AutoGenerateColumns="False"
-            IsEnabled="{Binding RevitViewModel.IsAllowSelectLevels}"
-            ItemsSource="{Binding RevitViewModel.Levels}">
+                <CheckBox
+                    Margin="0,4"
+                    Content="Рассчитать количество комнат"
+                    IsChecked="{Binding RevitViewModel.IsCountRooms}" />
 
-            <DataGrid.Columns>
-                <DataGridCheckBoxColumn
-                    Binding="{Binding Path=IsSelected, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}">
-                    <DataGridCheckBoxColumn.Header>
-                        <TextBlock
-                            Text="{me:LocalizationSource MainWindow.HeaderCheck}" />
-                    </DataGridCheckBoxColumn.Header>
-                </DataGridCheckBoxColumn>
-                <DataGridTextColumn
-                    Binding="{Binding Path=Name}"
-                    Width="500"
-                    IsReadOnly="True">
-                    <DataGridTextColumn.Header>
-                        <TextBlock
-                            Text="{me:LocalizationSource MainWindow.HeaderName}" />
-                    </DataGridTextColumn.Header>
-                </DataGridTextColumn>              
-                <DataGridTextColumn
-                    Binding="{Binding Path=LevelNames}"
-                    Width="500"
-                    IsReadOnly="True">
-                    <DataGridTextColumn.Header>
-                        <TextBlock
-                            Text="{me:LocalizationSource MainWindow.HeaderName}" />
-                    </DataGridTextColumn.Header>
-                </DataGridTextColumn>              
-            </DataGrid.Columns>
+                <CheckBox
+                    x:Name="_checkArea"
+                    Margin="0,4"
+                    Content="Проверить площадь помещений на изменения"
+                    IsChecked="{Binding RevitViewModel.IsCheckRoomsChanges}" />
 
-        </ui:DataGrid>
+                <StackPanel
+                    Grid.Row="6"
+                    Margin="0,4"
+                    Orientation="Horizontal"
+                    Visibility="{Binding ElementName=_checkArea,Path=IsChecked, Converter={StaticResource BoolToVis}}">
+                    <TextBlock
+                        Margin="70,0,10,0"
+                        VerticalAlignment="Center"
+                        Text="Точность проверки:" />
+                    <ui:TextBox
+                        Width="80"
+                        Text="{Binding RevitViewModel.RoomAccuracy, UpdateSourceTrigger=PropertyChanged}" />
+                    <TextBlock
+                        Margin="10,0,0,0"
+                        VerticalAlignment="Center"
+                        Text="%" />
+                </StackPanel>
+            </StackPanel>
+        </Border>
+
+        <Border
+            Grid.Row="3"
+            Margin="14,4"
+            Style="{StaticResource CustomBorder}">
+            <StackPanel>
+            <DockPanel
+                    Grid.Row="7"
+                    Margin="10,4,0,4">
+                    <TextBlock
+                        Width="200"
+                        VerticalAlignment="Center"
+                        Text="Стадия:" />
+                    <ComboBox
+                        Margin="10,0,0,0"
+                        DisplayMemberPath="Name"
+                        ItemsSource="{Binding RevitViewModel.Phases}"
+                        SelectedValue="{Binding RevitViewModel.Phase}" />
+                </DockPanel>
+
+                <DockPanel
+                    Grid.Row="8"
+                    Margin="10,4,0,4">
+                    <TextBlock
+                        x:Name="_text"
+                        Width="200"
+                        VerticalAlignment="Center"
+                        Text="Число знаков после запятой:" />
+                    <ComboBox
+                        Margin="10,0,0,0"
+                        ItemsSource="{Binding RevitViewModel.RoundAccuracyValues}"
+                        SelectedValue="{Binding RevitViewModel.RoundAccuracy}" />
+                </DockPanel>
+            </StackPanel>
+        </Border>
+
+        <Border
+            Grid.Row="4"
+            Margin="14,4"
+            Style="{StaticResource CustomBorder}">
+            <ui:DataGrid
+                AutoGenerateColumns="False"
+                CanUserResizeColumns="True"
+                Style="{StaticResource CustomResizableDataGridStyle}"
+                IsEnabled="{Binding RevitViewModel.IsAllowSelectLevels}"
+                ItemsSource="{Binding RevitViewModel.Levels}">
+                <DataGrid.Columns>
+                    <DataGridCheckBoxColumn
+                        Binding="{Binding Path=IsSelected, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}">
+                        <DataGridCheckBoxColumn.Header>
+                            <TextBlock
+                                Text="{me:LocalizationSource MainWindow.HeaderCheck}" />
+                        </DataGridCheckBoxColumn.Header>
+                    </DataGridCheckBoxColumn>
+                    <DataGridTextColumn
+                        Binding="{Binding Path=Name}"
+                        Width="500"
+                        IsReadOnly="True">
+                        <DataGridTextColumn.Header>
+                            <TextBlock
+                                Text="{me:LocalizationSource MainWindow.HeaderLevels}" />
+                        </DataGridTextColumn.Header>
+                    </DataGridTextColumn>
+                    <DataGridTextColumn
+                        Binding="{Binding Path=LevelNames}"
+                        Width="300"
+                        IsReadOnly="True">
+                        <DataGridTextColumn.Header>
+                            <TextBlock
+                                Text="{me:LocalizationSource MainWindow.HeaderFloors}" />
+                        </DataGridTextColumn.Header>
+                    </DataGridTextColumn>
+                </DataGrid.Columns>
+
+            </ui:DataGrid>
+        </Border>
 
         <CheckBox
-            Grid.Row="10"
-            Margin="10"
+            Grid.Row="5"
+            Margin="14,4,0,14"
             Content="Не показывать предупреждения"
             IsChecked="{Binding RevitViewModel.NotShowWarnings}" />
 
         <StackPanel 
-            Grid.Row="10" 
-            Orientation="Horizontal" 
+            Grid.Row="5" 
+            Orientation="Horizontal"
+            Margin="0,4,14,14"
             HorizontalAlignment="Right">
             <TextBlock 
-                Margin="10" 
+                Margin="8" 
                 VerticalAlignment="Center"
                 Text="{Binding RevitViewModel.ErrorText}" 
                 Foreground="Orange" />
 
             <ui:Button
-                Content="Рассчитать зоны" 
-                Margin="10" 
+                Content="Рассчитать зоны"
+                Margin="4,0" 
                 Click="ButtonOK_Click"
                 Command="{Binding RevitViewModel.CalculateAreasCommand}" />
 
             <ui:Button
-                Content="Рассчитать помещения" 
-                Margin="10" 
+                Content="Рассчитать помещения"
+                Margin="4,0" 
                 IsDefault="True"
                 Click="ButtonOK_Click" 
                 Command="{Binding RevitViewModel.CalculateCommand}" />
 
             <ui:Button
                 Content="Отмена" 
-                Width="70" 
-                Margin="10" 
+                Width="80"
+                Margin="4,0,0,0"
                 IsCancel="true" 
                 Click="ButtonCancel_Click" />
         </StackPanel>
