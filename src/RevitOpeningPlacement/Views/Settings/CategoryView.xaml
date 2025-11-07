@@ -8,10 +8,17 @@
     xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
     xmlns:me="clr-namespace:dosymep.WpfCore.MarkupExtensions;assembly=dosymep.WpfCore"
     xmlns:vm="clr-namespace:RevitOpeningPlacement.ViewModels.OpeningConfig"
+    xmlns:res="clr-namespace:RevitOpeningPlacement.Resources"
     mc:Ignorable="d"
     d:DesignHeight="450"
     d:DesignWidth="800"
     d:DataContext="{d:DesignInstance vm:MainViewModel, IsDesignTimeCreatable=False}">
+    <core:WpfUIPlatformUserControl.Resources>
+        <ResourceDictionary>
+            <res:ImageSourceConverter
+                x:Key="ImageSourceConverter" />
+        </ResourceDictionary>
+    </core:WpfUIPlatformUserControl.Resources>
     <Grid>
         <ui:ListView
             ItemsSource="{Binding MepCategories}"
@@ -23,6 +30,12 @@
                         ToolTip="{Binding Name}">
                         <CheckBox
                             IsChecked="{Binding IsSelected, UpdateSourceTrigger=PropertyChanged}" />
+                        <Image
+                            DockPanel.Dock="Left"
+                            Width="38"
+                            Height="38"
+                            VerticalAlignment="Center"
+                            Source="{Binding ImageSource, Converter={StaticResource ImageSourceConverter}}" />
                         <ui:TextBlock
                             Margin="4 0 0 0"
                             VerticalAlignment="Center"

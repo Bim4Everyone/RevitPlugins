@@ -17,11 +17,11 @@ internal class MepCategory : IEquatable<MepCategory> {
     public const int DefaultMinSizeMm = 0;
     public const int DefaultMaxSizeMm = 10000;
     public const int DefaultOffsetMm = 50;
-    public const string PipeImageSource = "../Resources/pipe.png";
-    public const string RectDuctImageSource = "../Resources/rectangleDuct.png";
-    public const string RoundDuctImageSource = "../Resources/roundDuct.png";
-    public const string CableTrayImageSource = "../Resources/tray.png";
-    public const string ConduitImageSource = "../Resources/conduit.png";
+    public const string PipeImageSource = "pipe.png";
+    public const string RectDuctImageSource = "rectangleDuct.png";
+    public const string RoundDuctImageSource = "roundDuct.png";
+    public const string CableTrayImageSource = "tray.png";
+    public const string ConduitImageSource = "conduit.png";
 
 
     /// <summary>

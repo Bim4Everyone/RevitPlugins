@@ -7,10 +7,10 @@
 	</PropertyGroup>
 	
 	<ItemGroup>
-	  <Resource Include="Resources\conduit.png" />
-	  <Resource Include="Resources\pipe.png" />
-	  <Resource Include="Resources\rectangleDuct.png" />
-	  <Resource Include="Resources\roundDuct.png" />
-	  <Resource Include="Resources\tray.png" />
+	  <Resource Include="assets\images\conduit.png" />
+	  <Resource Include="assets\images\pipe.png" />
+	  <Resource Include="assets\images\rectangleDuct.png" />
+	  <Resource Include="assets\images\roundDuct.png" />
+	  <Resource Include="assets\images\tray.png" />
 	</ItemGroup>
 </Project>
