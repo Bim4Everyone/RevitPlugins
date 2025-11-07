@@ -36,63 +36,65 @@
             Grid.Row="0"
             Title="{me:LocalizationSource LinksSelectorWindow.Title}" />
 
-        <ui:DataGrid
+        <Border
             Grid.Row="1"
-            RowHeight="35"
-            GridLinesVisibility="All"
-            CanUserReorderColumns="False"
-            CanUserResizeRows="False"
-            AutoGenerateColumns="False"
-            ItemsSource="{Binding Links}">
-            <ui:DataGrid.Resources>
-                <Style
-                    TargetType="CheckBox"
-                    BasedOn="{StaticResource CustomColumnCheckBoxStyle}" />
-            </ui:DataGrid.Resources>
-            <ui:DataGrid.Columns>
-                <DataGridCheckBoxColumn
-                    CanUserResize="False"
-                    IsReadOnly="False"
-                    Width="47"
-                    CanUserSort="False"
-                    Binding="{Binding IsSelected, UpdateSourceTrigger=PropertyChanged}">
-                    <DataGridCheckBoxColumn.Header>
-                        <CheckBox
-                            IsChecked="{Binding DataContext.AllLinksSelected, RelativeSource={RelativeSource AncestorType=ui:DataGrid}, UpdateSourceTrigger=PropertyChanged}" />
-                    </DataGridCheckBoxColumn.Header>
-                </DataGridCheckBoxColumn>
-                <DataGridTextColumn
-                    Width="*"
-                    MinWidth="60"
-                    IsReadOnly="True"
-                    Binding="{Binding Name}">
-                    <DataGridTextColumn.Header>
-                        <ui:TextBlock
-                            Text="{DynamicResource LinksSelectorWindow.NameHeader}" />
-                    </DataGridTextColumn.Header>
-                </DataGridTextColumn>
-                <DataGridTextColumn
-                    Width="Auto"
-                    MinWidth="60"
-                    IsReadOnly="True"
-                    Binding="{Binding CurrentStatus}">
-                    <DataGridTextColumn.Header>
-                        <ui:TextBlock
-                            Text="{DynamicResource LinksSelectorWindow.CurrentStatusHeader}" />
-                    </DataGridTextColumn.Header>
-                </DataGridTextColumn>
-                <DataGridTextColumn
-                    Width="Auto"
-                    MinWidth="60"
-                    IsReadOnly="True"
-                    Binding="{Binding FutureStatus}">
-                    <DataGridTextColumn.Header>
-                        <ui:TextBlock
-                            Text="{DynamicResource LinksSelectorWindow.NewStatusHeader}" />
-                    </DataGridTextColumn.Header>
-                </DataGridTextColumn>
-            </ui:DataGrid.Columns>
-        </ui:DataGrid>
+            Margin="8 0"
+            Style="{StaticResource CustomBorder}">
+            <ui:DataGrid
+                RowHeight="35"
+                GridLinesVisibility="All"
+                CanUserReorderColumns="False"
+                CanUserResizeRows="False"
+                AutoGenerateColumns="False"
+                ItemsSource="{Binding Links}">
+                <ui:DataGrid.Resources>
+                    <Style
+                        TargetType="CheckBox"
+                        BasedOn="{StaticResource CustomColumnCheckBoxStyle}" />
+                </ui:DataGrid.Resources>
+                <ui:DataGrid.Columns>
+                    <DataGridCheckBoxColumn
+                        CanUserResize="False"
+                        IsReadOnly="False"
+                        Width="47"
+                        CanUserSort="False"
+                        Binding="{Binding IsSelected, UpdateSourceTrigger=PropertyChanged}">
+                        <DataGridCheckBoxColumn.Header>
+                            <CheckBox
+                                IsChecked="{Binding DataContext.AllLinksSelected, RelativeSource={RelativeSource AncestorType=ui:DataGrid}, UpdateSourceTrigger=PropertyChanged}" />
+                        </DataGridCheckBoxColumn.Header>
+                    </DataGridCheckBoxColumn>
+                    <DataGridTextColumn
+                        Width="*"
+                        MinWidth="60"
+                        IsReadOnly="True"
+                        Binding="{Binding Name}">
+                        <DataGridTextColumn.Header>
+                            <ui:TextBlock
+                                Text="{DynamicResource LinksSelectorWindow.NameHeader}" />
+                        </DataGridTextColumn.Header>
+                    </DataGridTextColumn>
+                    <DataGridTextColumn
+                        Width="140"
+                        IsReadOnly="True"
+                        Binding="{Binding CurrentStatus}">
+                        <DataGridTextColumn.Header>
+                            <ui:TextBlock
+                                Text="{DynamicResource LinksSelectorWindow.CurrentStatusHeader}" />
+                        </DataGridTextColumn.Header>
+                    </DataGridTextColumn>
+                    <DataGridTextColumn
+                        Width="140"
+                        IsReadOnly="True"
+                        Binding="{Binding FutureStatus}">
+                        <DataGridTextColumn.Header>
+                            <ui:TextBlock
+                                Text="{DynamicResource LinksSelectorWindow.NewStatusHeader}" />
+                        </DataGridTextColumn.Header>
+                    </DataGridTextColumn>
+                </ui:DataGrid.Columns>
+            </ui:DataGrid>
+        </Border>
 
         <StackPanel
             Grid.Row="2"
@@ -100,13 +102,13 @@
             HorizontalAlignment="Right">
 
             <ui:TextBlock
-                Margin="10"
+                Margin="8"
                 Style="{StaticResource CustomErrorText}"
                 Text="{Binding ErrorText}" />
 
             <ui:Button
                 Appearance="Info"
-                Margin="10"
+                Margin="8"
                 Width="80"
                 IsDefault="True"
                 Click="ButtonOk_Click"
@@ -114,7 +116,7 @@
                 Command="{Binding AcceptViewCommand}" />
 
             <ui:Button
-                Margin="10"
+                Margin="8"
                 Width="80"
                 IsCancel="True"
                 Click="ButtonCancel_Click"

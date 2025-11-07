@@ -13,8 +13,8 @@
     mc:Ignorable="d"
     MinWidth="350"
     MaxWidth="350"
-    MinHeight="300"
-    MaxHeight="300"
+    MinHeight="350"
+    MaxHeight="350"
     ResizeMode="NoResize"
     d:DataContext="{d:DesignInstance vms:OpeningRealsKrConfigViewModel, IsDesignTimeCreatable=False}">
     <core:WpfUIPlatformWindow.Resources>
@@ -30,7 +30,9 @@
             <RowDefinition
                 Height="Auto" />
             <RowDefinition
-                Height="*" />
+                Height="1*" />
+            <RowDefinition
+                Height="1*" />
             <RowDefinition
                 Height="Auto" />
         </Grid.RowDefinitions>
@@ -41,69 +43,81 @@
             ShowMinimize="False"
             Title="{me:LocalizationSource OpeningRealsKrSettingsView.Title}" />
 
-        <StackPanel
+        <Border
             Grid.Row="1"
-            Margin="10 0"
-            HorizontalAlignment="Stretch"
-            VerticalAlignment="Center">
-            <RadioButton
-                GroupName="PlacementType"
-                Content="{me:LocalizationSource OpeningRealsKrSettingsView.PlaceByAr}"
-                IsChecked="{Binding PlaceByAr}" />
-            <RadioButton
-                Margin="0 5 0 0"
-                GroupName="PlacementType"
-                Content="{me:LocalizationSource OpeningRealsKrSettingsView.PlaceByMep}"
-                IsChecked="{Binding PlaceByMep}" />
+            Margin="8 0"
+            Style="{StaticResource CustomBorder}">
+            <StackPanel
+                HorizontalAlignment="Stretch"
+                VerticalAlignment="Center">
+                <RadioButton
+                    GroupName="PlacementType"
+                    Content="{me:LocalizationSource OpeningRealsKrSettingsView.PlaceByAr}"
+                    IsChecked="{Binding PlaceByAr}" />
+                <RadioButton
+                    Margin="0 5 0 0"
+                    GroupName="PlacementType"
+                    Content="{me:LocalizationSource OpeningRealsKrSettingsView.PlaceByMep}"
+                    IsChecked="{Binding PlaceByMep}" />
+            </StackPanel>
+        </Border>
 
-            <DockPanel
-                Margin="0 5"
-                HorizontalAlignment="Stretch">
-                <ui:ToggleSwitch
-                    Content="{me:LocalizationSource OpeningRealsKrSettingsView.RoundSize}"
-                    IsChecked="{Binding RoundSize, UpdateSourceTrigger=PropertyChanged}" />
-                <ComboBox
-                    IsEditable="False"
-                    HorizontalAlignment="Right"
-                    MinWidth="{StaticResource SmallInputWidth}"
-                    Width="{StaticResource SmallInputWidth}"
-                    ToolTip="{me:LocalizationSource OpeningRealsKrSettingsView.RoundValues}"
-                    IsEnabled="{Binding RoundSize}"
-                    ItemsSource="{Binding EnabledRoundings}"
-                    SelectedItem="{Binding SelectedRoundSize, UpdateSourceTrigger=PropertyChanged}" />
-            </DockPanel>
-            <DockPanel
-                HorizontalAlignment="Stretch">
-                <ui:ToggleSwitch
-                    Content="{me:LocalizationSource OpeningRealsKrSettingsView.RoundElevation}"
-                    IsChecked="{Binding RoundElevation, UpdateSourceTrigger=PropertyChanged}" />
-                <ComboBox
-                    IsEditable="False"
-                    HorizontalAlignment="Right"
-                    MinWidth="{StaticResource SmallInputWidth}"
-                    Width="{StaticResource SmallInputWidth}"
-                    ToolTip="{me:LocalizationSource OpeningRealsKrSettingsView.RoundValues}"
-                    IsEnabled="{Binding RoundElevation}"
-                    ItemsSource="{Binding EnabledRoundings}"
-                    SelectedItem="{Binding SelectedRoundElevation, UpdateSourceTrigger=PropertyChanged}" />
-            </DockPanel>
-        </StackPanel>
+        <Border
+            Grid.Row="2"
+            Margin="8 10 8 0"
+            Style="{StaticResource CustomBorder}">
+            <StackPanel
+                HorizontalAlignment="Stretch"
+                VerticalAlignment="Center">
+                <DockPanel
+                    Margin="0 5"
+                    HorizontalAlignment="Stretch">
+                    <ui:ToggleSwitch
+                        Content="{me:LocalizationSource OpeningRealsKrSettingsView.RoundSize}"
+                        IsChecked="{Binding RoundSize, UpdateSourceTrigger=PropertyChanged}" />
+                    <ComboBox
+                        IsEditable="False"
+                        HorizontalAlignment="Right"
+                        MinWidth="{StaticResource SmallInputWidth}"
+                        Width="{StaticResource SmallInputWidth}"
+                        ToolTip="{me:LocalizationSource OpeningRealsKrSettingsView.RoundValues}"
+                        IsEnabled="{Binding RoundSize}"
+                        ItemsSource="{Binding EnabledRoundings}"
+                        SelectedItem="{Binding SelectedRoundSize, UpdateSourceTrigger=PropertyChanged}" />
+                </DockPanel>
+                <DockPanel
+                    HorizontalAlignment="Stretch">
+                    <ui:ToggleSwitch
+                        Content="{me:LocalizationSource OpeningRealsKrSettingsView.RoundElevation}"
+                        IsChecked="{Binding RoundElevation, UpdateSourceTrigger=PropertyChanged}" />
+                    <ComboBox
+                        IsEditable="False"
+                        HorizontalAlignment="Right"
+                        MinWidth="{StaticResource SmallInputWidth}"
+                        Width="{StaticResource SmallInputWidth}"
+                        ToolTip="{me:LocalizationSource OpeningRealsKrSettingsView.RoundValues}"
+                        IsEnabled="{Binding RoundElevation}"
+                        ItemsSource="{Binding EnabledRoundings}"
+                        SelectedItem="{Binding SelectedRoundElevation, UpdateSourceTrigger=PropertyChanged}" />
+                </DockPanel>
+            </StackPanel>
+        </Border>
 
         <DockPanel
-            Grid.Row="2"
+            Grid.Row="3"
             HorizontalAlignment="Right"
             VerticalAlignment="Bottom">
             <ui:Button
                 Appearance="Info"
                 Width="80"
-                Margin="10"
+                Margin="8"
                 IsDefault="True"
                 Click="ButtonOk_Click"
                 Content="{me:LocalizationSource Ok}"
                 Command="{Binding SaveConfigCommand}" />
             <ui:Button
                 Width="80"
-                Margin="10"
+                Margin="8"
                 IsCancel="True"
                 Click="ButtonCancel_Click"
                 Content="{me:LocalizationSource Cancel}" />

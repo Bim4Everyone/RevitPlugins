@@ -40,43 +40,46 @@
             ShowMinimize="False"
             Title="{me:LocalizationSource UnionTaskSettingsView.Title}" />
 
-        <StackPanel
+        <Border
             Grid.Row="1"
-            Margin="10 0"
-            HorizontalAlignment="Stretch"
-            VerticalAlignment="Center">
-            <DockPanel
-                Margin="0 5"
-                HorizontalAlignment="Stretch">
-                <ui:ToggleSwitch
-                    Content="{me:LocalizationSource UnionTaskSettingsView.RoundSize}"
-                    IsChecked="{Binding RoundUnitedTaskSize, UpdateSourceTrigger=PropertyChanged}" />
-                <ComboBox
-                    MinWidth="{StaticResource SmallInputWidth}"
-                    Width="{StaticResource SmallInputWidth}"
-                    IsEditable="False"
-                    HorizontalAlignment="Right"
-                    ToolTip="{me:LocalizationSource UnionTaskSettingsView.RoundValues}"
-                    IsEnabled="{Binding RoundUnitedTaskSize}"
-                    ItemsSource="{Binding EnabledRoundings}"
-                    SelectedItem="{Binding SelectedSizeRoundForUnitedTask, UpdateSourceTrigger=PropertyChanged}" />
-            </DockPanel>
-            <DockPanel
-                HorizontalAlignment="Stretch">
-                <ui:ToggleSwitch
-                    Content="{me:LocalizationSource UnionTaskSettingsView.RoundElevation}"
-                    IsChecked="{Binding RoundUnitedTaskElevation, UpdateSourceTrigger=PropertyChanged}" />
-                <ComboBox
-                    MinWidth="{StaticResource SmallInputWidth}"
-                    Width="{StaticResource SmallInputWidth}"
-                    IsEditable="False"
-                    HorizontalAlignment="Right"
-                    ToolTip="{me:LocalizationSource UnionTaskSettingsView.RoundValues}"
-                    IsEnabled="{Binding RoundUnitedTaskElevation}"
-                    ItemsSource="{Binding EnabledRoundings}"
-                    SelectedItem="{Binding SelectedElevationRoundingForUnitedTask, UpdateSourceTrigger=PropertyChanged}" />
-            </DockPanel>
-        </StackPanel>
+            Margin="8 0"
+            Style="{StaticResource CustomBorder}">
+            <StackPanel
+                HorizontalAlignment="Stretch"
+                VerticalAlignment="Center">
+                <DockPanel
+                    Margin="0 5"
+                    HorizontalAlignment="Stretch">
+                    <ui:ToggleSwitch
+                        Content="{me:LocalizationSource UnionTaskSettingsView.RoundSize}"
+                        IsChecked="{Binding RoundUnitedTaskSize, UpdateSourceTrigger=PropertyChanged}" />
+                    <ComboBox
+                        MinWidth="{StaticResource SmallInputWidth}"
+                        Width="{StaticResource SmallInputWidth}"
+                        IsEditable="False"
+                        HorizontalAlignment="Right"
+                        ToolTip="{me:LocalizationSource UnionTaskSettingsView.RoundValues}"
+                        IsEnabled="{Binding RoundUnitedTaskSize}"
+                        ItemsSource="{Binding EnabledRoundings}"
+                        SelectedItem="{Binding SelectedSizeRoundForUnitedTask, UpdateSourceTrigger=PropertyChanged}" />
+                </DockPanel>
+                <DockPanel
+                    HorizontalAlignment="Stretch">
+                    <ui:ToggleSwitch
+                        Content="{me:LocalizationSource UnionTaskSettingsView.RoundElevation}"
+                        IsChecked="{Binding RoundUnitedTaskElevation, UpdateSourceTrigger=PropertyChanged}" />
+                    <ComboBox
+                        MinWidth="{StaticResource SmallInputWidth}"
+                        Width="{StaticResource SmallInputWidth}"
+                        IsEditable="False"
+                        HorizontalAlignment="Right"
+                        ToolTip="{me:LocalizationSource UnionTaskSettingsView.RoundValues}"
+                        IsEnabled="{Binding RoundUnitedTaskElevation}"
+                        ItemsSource="{Binding EnabledRoundings}"
+                        SelectedItem="{Binding SelectedElevationRoundingForUnitedTask, UpdateSourceTrigger=PropertyChanged}" />
+                </DockPanel>
+            </StackPanel>
+        </Border>
 
         <DockPanel
             Grid.Row="2"
@@ -84,14 +87,14 @@
             VerticalAlignment="Bottom">
             <ui:Button
                 Width="80"
-                Margin="10"
+                Margin="8"
                 Appearance="Info"
                 IsDefault="True"
                 Click="ButtonOk_Click"
                 Content="{me:LocalizationSource Ok}" />
             <ui:Button
                 Width="80"
-                Margin="10"
+                Margin="8"
                 IsCancel="True"
                 Click="ButtonCancel_Click"
                 Content="{me:LocalizationSource Cancel}" />

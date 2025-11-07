@@ -60,7 +60,7 @@
         <Border
             Grid.Row="1"
             Grid.ColumnSpan="2"
-            Margin="0 0 0 10"
+            Margin="8 0 8 10"
             Style="{StaticResource CustomBorder}">
             <DockPanel>
                 <ui:Button
@@ -96,6 +96,7 @@
         <Border
             Grid.Row="2"
             Grid.Column="0"
+            Margin="8 0 0 0"
             Style="{StaticResource CustomBorder}">
             <DockPanel
                 LastChildFill="True">
@@ -114,7 +115,7 @@
         <views:SettingView
             Grid.Row="2"
             Grid.Column="1"
-            Margin="10 0 0 0"
+            Margin="10 0 8 0"
             DataContext="{Binding SelectedMepCategoryViewModel}" />
 
         <StackPanel
@@ -123,19 +124,19 @@
             Orientation="Horizontal"
             HorizontalAlignment="Right">
             <ui:TextBlock
-                Margin="10"
+                Margin="8"
                 Text="{Binding ErrorText}"
                 Style="{StaticResource CustomErrorText}" />
             <ui:TextBlock
-                Margin="10"
+                Margin="8"
                 Text="{Binding MessageText}"
                 Style="{StaticResource CustomMessageText}" />
             <ui:ToggleSwitch
-                Margin="10"
+                Margin="8"
                 Content="{me:LocalizationSource MepSettingsWindow.ShowPlacingErrors}"
                 IsChecked="{Binding ShowPlacingErrors, UpdateSourceTrigger=PropertyChanged}" />
             <ui:DropDownButton
-                Margin="10"
+                Margin="8"
                 Content="{me:LocalizationSource MepSettingsWindow.CheckFilter}">
                 <ui:DropDownButton.Flyout>
                     <ContextMenu>
@@ -156,15 +157,15 @@
             </ui:DropDownButton>
             <ui:Button
                 Width="80"
-                Margin="10"
+                Margin="8"
                 IsDefault="True"
                 Click="ButtonOk_Click"
                 Appearance="Info"
                 Content="{me:LocalizationSource Ok}"
                 Command="{Binding SaveConfigCommand}" />
             <ui:Button
-                Margin="10"
                 Width="80"
+                Margin="8"
                 IsCancel="true"
                 Click="ButtonCancel_Click"
                 Content="{me:LocalizationSource Cancel}" />
