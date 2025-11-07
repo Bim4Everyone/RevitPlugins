@@ -42,6 +42,7 @@ internal abstract class RoomsNumsViewModel : BaseViewModel, INumberingOrder {
     private ObservableCollection<NumberingOrderViewModel> _selectedNumberingOrders;
 
     public System.Windows.Window ParentWindow { get; set; }
+    public RoomsNumsConfig RoomsNumsConfig { get; set; }
 
     public RoomsNumsViewModel(RevitRepository revitRepository) {
         _revitRepository = revitRepository;
@@ -140,14 +141,14 @@ internal abstract class RoomsNumsViewModel : BaseViewModel, INumberingOrder {
     public ICommand RemoveOrderCommand { get; }
     public ICommand SaveOrderCommand { get; }
 
-    public PhaseViewModel Phase {
-        get => _phase;
-        set => RaiseAndSetIfChanged(ref _phase, value);
-    }
 
     public ObservableCollection<PhaseViewModel> Phases {
         get => _phases;
         set => RaiseAndSetIfChanged(ref _phases, value);
+    }
+    public PhaseViewModel Phase {
+        get => _phase;
+        set => RaiseAndSetIfChanged(ref _phase, value);
     }
 
     public ObservableCollection<SpatialElementViewModel> SpatialElements {
@@ -528,8 +529,7 @@ internal abstract class RoomsNumsViewModel : BaseViewModel, INumberingOrder {
     }
 
     private void LoadPluginConfig() {
-        var roomsConfig = RoomsNumsConfig.GetPluginConfig();
-        var settings = roomsConfig.GetSettings(_revitRepository.DocumentName);
+        var settings = RoomsNumsConfig.GetSettings(_revitRepository.DocumentName);
 
         StartNumber = settings?.StartNumber ?? "1";
         IsNumFlats = settings?.IsNumFlats ?? default;
@@ -559,9 +559,8 @@ internal abstract class RoomsNumsViewModel : BaseViewModel, INumberingOrder {
     }
 
     private void SavePluginConfig() {
-        var roomsConfig = RoomsNumsConfig.GetPluginConfig();
-        var settings = roomsConfig.GetSettings(_revitRepository.DocumentName)
-                                     ?? roomsConfig.AddSettings(_revitRepository.DocumentName);
+        var settings = RoomsNumsConfig.GetSettings(_revitRepository.DocumentName)
+                                     ?? RoomsNumsConfig.AddSettings(_revitRepository.DocumentName);
 
         settings.StartNumber = StartNumber;
         settings.IsNumFlats = IsNumFlats;
@@ -589,6 +588,6 @@ internal abstract class RoomsNumsViewModel : BaseViewModel, INumberingOrder {
             .Select(item => item.ElementId)
             .ToList();
 
-        roomsConfig.SaveProjectConfig();
+        RoomsNumsConfig.SaveProjectConfig();
     }
 }

@@ -17,9 +17,9 @@ public class RoomsNumsConfig : ProjectConfig<RoomsNumsSettings> {
     [JsonIgnore]
     public override IConfigSerializer Serializer { get; set; }
 
-    public static RoomsNumsConfig GetPluginConfig() {
+    public static RoomsNumsConfig GetPluginConfig(IConfigSerializer configSerializer) {
         return new ProjectConfigBuilder()
-            .SetSerializer(new ConfigSerializer())
+            .SetSerializer(configSerializer)
             .SetPluginName(nameof(RevitRooms))
             .SetRevitVersion(ModuleEnvironment.RevitVersion)
             .SetProjectConfigName(nameof(RoomsNumsConfig) + ".json")
