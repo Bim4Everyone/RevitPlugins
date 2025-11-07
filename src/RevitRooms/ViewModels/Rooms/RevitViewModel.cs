@@ -17,7 +17,7 @@ using RevitRooms.Models.Calculation;
 using RevitRooms.Services;
 using RevitRooms.Views;
 
-namespace RevitRooms.ViewModels;
+namespace RevitRooms.ViewModels.Rooms;
 internal abstract class RevitViewModel : BaseViewModel {
     public Guid _id;
     protected readonly RevitRepository _revitRepository;

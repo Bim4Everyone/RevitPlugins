@@ -11,7 +11,7 @@ using dosymep.WPF.Commands;
 using dosymep.WPF.ViewModels;
 
 using RevitRooms.Models;
-using RevitRooms.ViewModels.Revit.RoomsNums;
+using RevitRooms.ViewModels.RoomsNums;
 using RevitRooms.Views;
 
 namespace RevitRooms.ViewModels;
@@ -21,8 +21,8 @@ internal class RoomNumsViewModel : BaseViewModel {
     private readonly ILocalizationService _localizationService;
     private readonly RoomsNumsWindow _window;
 
-    private ObservableCollection<RoomsNumsViewModel> _roomsNumsViewModels;
-    private RoomsNumsViewModel _roomsNums;
+    private ObservableCollection<RevitViewModel> _roomsNumsViewModels;
+    private RevitViewModel _roomsNums;
 
     public RoomNumsViewModel(RoomsNumsConfig roomsConfig,
                              RevitRepository revitRepository,
@@ -38,12 +38,12 @@ internal class RoomNumsViewModel : BaseViewModel {
 
     public ICommand LoadViewCommand { get; }
 
-    public RoomsNumsViewModel RoomsNums {
+    public RevitViewModel RoomsNums {
         get => _roomsNums;
         set => RaiseAndSetIfChanged(ref _roomsNums, value);
     }
 
-    public ObservableCollection<RoomsNumsViewModel> RoomsNumsViewModels {
+    public ObservableCollection<RevitViewModel> RoomsNumsViewModels {
         get => _roomsNumsViewModels;
         set => RaiseAndSetIfChanged(ref _roomsNumsViewModels, value);
     }

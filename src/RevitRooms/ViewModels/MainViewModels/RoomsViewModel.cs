@@ -14,7 +14,7 @@ using dosymep.WPF.ViewModels;
 
 using RevitRooms.Models;
 using RevitRooms.Services;
-using RevitRooms.ViewModels.Revit;
+using RevitRooms.ViewModels.Rooms;
 
 namespace RevitRooms.ViewModels;
 internal class RoomsViewModel : BaseViewModel {

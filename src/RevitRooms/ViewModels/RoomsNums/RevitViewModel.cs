@@ -19,8 +19,8 @@ using RevitRooms.Commands.Numerates;
 using RevitRooms.Models;
 using RevitRooms.Views;
 
-namespace RevitRooms.ViewModels;
-internal abstract class RoomsNumsViewModel : BaseViewModel, INumberingOrder {
+namespace RevitRooms.ViewModels.RoomsNums;
+internal abstract class RevitViewModel : BaseViewModel, INumberingOrder {
     public Guid _id;
     private string _errorText;
     private string _prefix;
@@ -44,7 +44,7 @@ internal abstract class RoomsNumsViewModel : BaseViewModel, INumberingOrder {
     public System.Windows.Window ParentWindow { get; set; }
     public RoomsNumsConfig RoomsNumsConfig { get; set; }
 
-    public RoomsNumsViewModel(RevitRepository revitRepository) {
+    public RevitViewModel(RevitRepository revitRepository) {
         _revitRepository = revitRepository;
 
         LoadViewCommand = RelayCommand.Create(LoadView);

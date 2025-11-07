@@ -5,7 +5,7 @@ using System.Linq;
 using RevitRooms.Models;
 using RevitRooms.Services;
 
-namespace RevitRooms.ViewModels.Revit;
+namespace RevitRooms.ViewModels.Rooms;
 internal class SelectedRevitViewModel : RevitViewModel {
     public SelectedRevitViewModel(RevitRepository revitRepository, RoomsConfig roomsConfig, ErrorWindowService errorWindowService)
         : base(revitRepository, roomsConfig, errorWindowService) {
