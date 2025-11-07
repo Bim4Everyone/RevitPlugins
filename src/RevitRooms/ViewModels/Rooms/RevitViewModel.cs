@@ -33,10 +33,18 @@ internal abstract class RevitViewModel : BaseViewModel {
         _roomsConfig = roomsConfig;
         _errorWindowService = errorWindowService;
 
-        Levels = [.. GetLevelViewModels().OrderBy(item => item.Element.Elevation).Where(item => item.SpatialElements.Count > 0)];
-        AdditionalPhases = [.. _revitRepository.GetAdditionalPhases().Select(item => new PhaseViewModel(item, _revitRepository))];
-
-        Phases = [.. Levels.SelectMany(item => item.SpatialElements).Select(item => item.Phase).Where(item => item != null).Distinct().Except(AdditionalPhases)];
+        Levels = [.. GetLevelViewModels()
+            .OrderBy(item => item.Element.Elevation)
+            .Where(item => item.SpatialElements.Count > 0)];
+        AdditionalPhases = [.. _revitRepository
+            .GetAdditionalPhases()
+            .Select(item => new PhaseViewModel(item, _revitRepository))];
+        Phases = [.. Levels
+            .SelectMany(item => item.SpatialElements)
+            .Select(item => item.Phase)
+            .Where(item => item != null)
+            .Distinct()
+            .Except(AdditionalPhases)];
         Phase = Phases.FirstOrDefault();
 
         RoundAccuracy = 1;
