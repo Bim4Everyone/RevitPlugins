@@ -193,6 +193,15 @@
                         Command="{Binding SelectedReport.ShowImaginaryClashesChangedCommand}" />
                 </mvvm:Interaction.Triggers>
             </dxe:CheckEdit>
+            <dx:SimpleButton
+                Margin="5 0 0 0"
+                Width="Auto"
+                HorizontalAlignment="Left"
+                HorizontalContentAlignment="Left"
+                ToolTip="Выделить элементы 1 и 2 выборки из выбранных коллизий"
+                Content="1 &amp; 2"
+                Command="{Binding SelectedReport.PickBothElementsCommand}"
+                Glyph="{dx:DXImage 'Images/RichEdit/Select_16x16.png'}" />
         </DockPanel>
 
         <res:CustomGridControl
