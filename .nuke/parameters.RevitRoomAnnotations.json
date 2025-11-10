@@ -2,14 +2,14 @@
   "$schema": "./build.schema.json",
   "Solution": "RevitPlugins.slnx",
   "PluginName": "RevitRoomAnnotations",
-  "PublishDirectory": "05.EOM-SS.extension\\ЭОМ и СС.tab\\bin",
+  "PublishDirectory": "05.EOM-SS.extension\\ЭОМиСС.tab\\bin",
   "RevitVersions": [
     "Rv2022",
     "Rv2023",
     "Rv2024"
   ],
-  "IconUrl": "hhttps://icons8.com/icon/4025/room",
+  "IconUrl": "https://icons8.com/icon/4025/room",
   "BundleName": "Помещения в ЭОМ",
   "BundleType": "InvokeButton",
-  "BundleOutput": "05.EOM-SS.extension\\ЭОМ и СС.tab\\Помещения в ЭОМ.panel"
+  "BundleOutput": "05.EOM-SS.extension\\ЭОМиСС.tab\\Помещения в ЭОМ.panel"
 }
