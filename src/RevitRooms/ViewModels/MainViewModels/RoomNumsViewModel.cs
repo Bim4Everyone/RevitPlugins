@@ -16,7 +16,7 @@ using RevitRooms.Views;
 
 namespace RevitRooms.ViewModels;
 internal class RoomNumsViewModel : BaseViewModel {
-    private readonly RoomsNumsConfig _roomsConfig;
+    private readonly RoomsNumsConfig _roomsNumsConfig;
     private readonly RevitRepository _revitRepository;
     private readonly ILocalizationService _localizationService;
     private readonly RoomsNumsWindow _window;
@@ -24,11 +24,11 @@ internal class RoomNumsViewModel : BaseViewModel {
     private ObservableCollection<RevitViewModel> _roomsNumsViewModels;
     private RevitViewModel _roomsNums;
 
-    public RoomNumsViewModel(RoomsNumsConfig roomsConfig,
+    public RoomNumsViewModel(RoomsNumsConfig roomsNumsConfig,
                              RevitRepository revitRepository,
                              ILocalizationService localizationService,
                              RoomsNumsWindow window) {
-        _roomsConfig = roomsConfig;
+        _roomsNumsConfig = roomsNumsConfig;
         _revitRepository = revitRepository;
         _localizationService = localizationService;
         _window = window;
@@ -63,26 +63,23 @@ internal class RoomNumsViewModel : BaseViewModel {
         }
 
         RoomsNumsViewModels = [
-            new ViewRevitViewModel(_revitRepository) { 
+            new ViewRevitViewModel(_revitRepository, _roomsNumsConfig) { 
                 Name = "Выборка по текущему виду",
-                RoomsNumsConfig = _roomsConfig,
                 ParentWindow = _window
             },
-            new ElementsRevitViewModel(_revitRepository) { 
+            new ElementsRevitViewModel(_revitRepository, _roomsNumsConfig) { 
                 Name = "Выборка по всем элементам",
-                RoomsNumsConfig = _roomsConfig,
                 ParentWindow = _window
             },
-            new SelectedRevitViewModel(_revitRepository) { 
+            new SelectedRevitViewModel(_revitRepository, _roomsNumsConfig) { 
                 Name = "Выборка по выделенным элементам",
-                RoomsNumsConfig = _roomsConfig,
                 ParentWindow = _window
             }
         ];
 
         RoomsNums = RoomsNumsViewModels[1];
 
-        var settings = _roomsConfig.GetSettings(_revitRepository.DocumentName);
+        var settings = _roomsNumsConfig.GetSettings(_revitRepository.DocumentName);
         if(settings != null) {
             RoomsNums = RoomsNumsViewModels
                 .FirstOrDefault(item => item._id == settings.SelectedRoomId) ?? RoomsNums;
