@@ -52,7 +52,7 @@ internal class MainViewModel : BaseViewModel {
         ISpotDimensionSelection[] spotSelections) {
         _pluginConfig = pluginConfig;
         _systemPluginConfig = systemPluginConfig;
-        
+
         _revitRepository = revitRepository;
         _localizationService = localizationService;
 
@@ -147,20 +147,20 @@ internal class MainViewModel : BaseViewModel {
     private void AcceptView() {
         SaveConfig();
 
-        using Transaction transaction = _revitRepository.StartTransaction(
+        using TransactionGroup transaction = _revitRepository.StartTransactionGroup(
             _localizationService.GetLocalizedString("MainWindow.CreateAnnotationsTransactionName"));
-        
+
         var service = new CreateAnnotationService(_revitRepository, _systemPluginConfig);
 
         service.LoadAnnotations(Selection.Selection.GetElements().ToArray());
-      
+
         service.ProcessAnnotations(
             new CreateAnnotationTemplateOptions() {
                 LevelCount = int.Parse(LevelCount),
                 LevelHeightMm = LevelHeight.GetFloorHeight() ?? 0
             });
 
-        transaction.Commit();
+        transaction.Assimilate();
     }
 
     private bool CanAcceptView() {

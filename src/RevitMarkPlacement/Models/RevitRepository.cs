@@ -47,6 +47,10 @@ internal class RevitRepository : BaseViewModel {
     public Transaction StartTransaction(string transactionName) {
         return Document.StartTransaction(transactionName);
     }
+    
+    public TransactionGroup StartTransactionGroup(string transactionName) {
+        return Document.StartTransactionGroup(transactionName);
+    }
 
     public IEnumerable<SpotDimensionType> GetSpotDimensionTypes(ISpotDimensionSelection selection) {
         return selection.GetElements()
@@ -83,11 +87,12 @@ internal class RevitRepository : BaseViewModel {
             .ToArray();
     }
 
-    public void MirrorAnnotation(FamilyInstance annotation, XYZ axis) {
-        if(annotation.Location is LocationPoint point) {
+    public void MirrorAnnotationSymbol(AnnotationSymbol annotationSymbol, XYZ axis) {
+        if(annotationSymbol.Location is LocationPoint point
+           && ElementTransformUtils.CanMirrorElement(Document, annotationSymbol.Id)) {
             var plane = Plane.CreateByNormalAndOrigin(axis, point.Point);
-            ElementTransformUtils.MirrorElement(Document, annotation.Id, plane);
-            Document.Delete(annotation.Id);
+            ElementTransformUtils.MirrorElement(Document, annotationSymbol.Id, plane);
+            Document.Delete(annotationSymbol.Id);
         }
     }
 

@@ -32,10 +32,14 @@ internal sealed class CreateAnnotationService : AnnotationService {
     }
 
     private void PrepareAnnotations() {
+        var transaction = _revitRepository.StartTransaction("aaaaa");
+      
         IReadOnlyCollection<AnnotationSymbol> annotationSymbols = _revitRepository.GetAnnotationSymbols();
         foreach(AnnotationSymbol annotationSymbol in annotationSymbols) {
             _revitRepository.DeleteElement(annotationSymbol);
         }
+
+        transaction.Commit();
     }
 
     private AnnotationSymbolType GetSymbolType(

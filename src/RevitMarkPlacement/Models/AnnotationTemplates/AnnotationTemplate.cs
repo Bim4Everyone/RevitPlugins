@@ -36,6 +36,15 @@ internal abstract class AnnotationTemplate<T> : IAnnotationTemplate where T : An
     protected abstract AnnotationSymbol ProcessAnnotation(T annotationTemplateOptions);
 
     protected AnnotationSymbol CreateAnnotation(int levelCount, double levelHeightMm) {
+        var annotationSymbol = CreateAnnotationSymbol(levelCount, levelHeightMm);
+
+        MirrorAnnotationSymbol(annotationSymbol);
+
+        return annotationSymbol;
+    }
+
+    private AnnotationSymbol CreateAnnotationSymbol(int levelCount, double levelHeightMm) {
+        var transaction = _revitRepository.StartTransaction("aaaaa");
         var placePoint = SpotDimension.LeaderEndPosition;
 
         AnnotationSymbol annotationSymbol = _revitRepository.CreateAnnotationSymbol(
@@ -49,7 +58,7 @@ internal abstract class AnnotationTemplate<T> : IAnnotationTemplate where T : An
 
         // HACK: могут быть проблемы, если идентификатор будет больше int
         double level = GetSpotDimensionLevel(SpotDimension);
-        
+
         annotationSymbol.SetParamValue(
             _systemPluginConfig.SpotDimensionIdParamName,
             (int) SpotDimension.Id.GetIdValue());
@@ -57,11 +66,29 @@ internal abstract class AnnotationTemplate<T> : IAnnotationTemplate where T : An
         annotationSymbol.SetParamValue(
             _systemPluginConfig.FirstLevelParamName,
             UnitUtils.ConvertFromInternalUnits(level, UnitTypeId.Meters));
+        transaction.Commit();
 
         return annotationSymbol;
+    }
+    
+    private void MirrorAnnotationSymbol(AnnotationSymbol annotationSymbol) {
+        if(IsMirrored()) {
+            var transaction = _revitRepository.StartTransaction("aaaaa");
+            
+            _revitRepository.MirrorAnnotationSymbol(annotationSymbol, SpotDimension.View.RightDirection);
+            
+            transaction.Commit();
+        }
     }
 
     private static double GetSpotDimensionLevel(SpotDimension spot) {
         return spot.GetParamValueOrDefault<double>(BuiltInParameter.SPOT_ELEV_SINGLE_OR_UPPER_VALUE);
+    }
+
+    private bool IsMirrored() {
+        double diff = SpotDimension.View.RightDirection
+            .DotProduct(SpotDimension.LeaderEndPosition - SpotDimension.LeaderShoulderPosition);
+
+        return diff < 0;
     }
 }
