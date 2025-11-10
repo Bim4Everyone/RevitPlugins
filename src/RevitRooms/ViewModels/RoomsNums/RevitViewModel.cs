@@ -22,6 +22,9 @@ using RevitRooms.Views;
 namespace RevitRooms.ViewModels.RoomsNums;
 internal abstract class RevitViewModel : BaseViewModel, INumberingOrder {
     public Guid _id;
+    protected readonly RevitRepository _revitRepository;
+    protected readonly RoomsNumsConfig _roomsNumsConfig;
+
     private string _errorText;
     private string _prefix;
     private string _suffix;
@@ -31,7 +34,7 @@ internal abstract class RevitViewModel : BaseViewModel, INumberingOrder {
     private bool _isNumRoomsSection;
     private bool _isNumRoomsSectionLevels;
     private string _startNumber;
-    protected readonly RevitRepository _revitRepository;
+
     private PhaseViewModel _phase;
     private ObservableCollection<PhaseViewModel> _phases;
     private ObservableCollection<SpatialElementViewModel> _spatialElements;
@@ -42,22 +45,11 @@ internal abstract class RevitViewModel : BaseViewModel, INumberingOrder {
     private ObservableCollection<NumberingOrderViewModel> _selectedNumberingOrders;
 
     public System.Windows.Window ParentWindow { get; set; }
-    public RoomsNumsConfig RoomsNumsConfig { get; set; }
 
-    public RevitViewModel(RevitRepository revitRepository) {
+    public RevitViewModel(RevitRepository revitRepository, RoomsNumsConfig roomsNumsConfig) {
         _revitRepository = revitRepository;
+        _roomsNumsConfig = roomsNumsConfig;
 
-        LoadViewCommand = RelayCommand.Create(LoadView);
-        NumerateRoomsCommand = new RelayCommand(NumerateRooms, CanNumerateRooms);
-
-        UpOrderCommand = new UpOrderCommand(this);
-        DownOrderCommand = new DownOrderCommand(this);
-        AddOrderCommand = new AddOrderCommand(this);
-        RemoveOrderCommand = new RemoveOrderCommand(this);
-        SaveOrderCommand = new SaveOrderCommand(this, _revitRepository);
-    }
-
-    private void LoadView() {
         var additionalPhases = _revitRepository.GetAdditionalPhases()
             .Select(item => new PhaseViewModel(item, _revitRepository))
             .ToArray();
@@ -79,10 +71,27 @@ internal abstract class RevitViewModel : BaseViewModel, INumberingOrder {
                 .Where(item => item.Order > 0)];
 
         StartNumber = "1";
-        Phase = Phases.FirstOrDefault();
+        Phase = Phases.FirstOrDefault();        
+
+        NumerateRoomsCommand = new RelayCommand(NumerateRooms, CanNumerateRooms);
+
+        UpOrderCommand = new UpOrderCommand(this);
+        DownOrderCommand = new DownOrderCommand(this);
+        AddOrderCommand = new AddOrderCommand(this);
+        RemoveOrderCommand = new RemoveOrderCommand(this);
+        SaveOrderCommand = new SaveOrderCommand(this, _revitRepository);
 
         LoadPluginConfig();
     }
+
+    public ICommand LoadViewCommand { get; }
+    public ICommand NumerateRoomsCommand { get; }
+
+    public ICommand UpOrderCommand { get; }
+    public ICommand DownOrderCommand { get; }
+    public ICommand AddOrderCommand { get; }
+    public ICommand RemoveOrderCommand { get; }
+    public ICommand SaveOrderCommand { get; }
 
     public string Name { get; set; }
     protected abstract IEnumerable<SpatialElementViewModel> GetSpatialElements();
@@ -131,16 +140,6 @@ internal abstract class RevitViewModel : BaseViewModel, INumberingOrder {
         get => _isNumRoomsSectionLevels;
         set => RaiseAndSetIfChanged(ref _isNumRoomsSectionLevels, value);
     }
-
-    public ICommand LoadViewCommand { get; }
-    public ICommand NumerateRoomsCommand { get; }
-
-    public ICommand UpOrderCommand { get; }
-    public ICommand DownOrderCommand { get; }
-    public ICommand AddOrderCommand { get; }
-    public ICommand RemoveOrderCommand { get; }
-    public ICommand SaveOrderCommand { get; }
-
 
     public ObservableCollection<PhaseViewModel> Phases {
         get => _phases;
@@ -529,7 +528,7 @@ internal abstract class RevitViewModel : BaseViewModel, INumberingOrder {
     }
 
     private void LoadPluginConfig() {
-        var settings = RoomsNumsConfig.GetSettings(_revitRepository.DocumentName);
+        var settings = _roomsNumsConfig.GetSettings(_revitRepository.DocumentName);
 
         StartNumber = settings?.StartNumber ?? "1";
         IsNumFlats = settings?.IsNumFlats ?? default;
@@ -559,8 +558,8 @@ internal abstract class RevitViewModel : BaseViewModel, INumberingOrder {
     }
 
     private void SavePluginConfig() {
-        var settings = RoomsNumsConfig.GetSettings(_revitRepository.DocumentName)
-                                     ?? RoomsNumsConfig.AddSettings(_revitRepository.DocumentName);
+        var settings = _roomsNumsConfig.GetSettings(_revitRepository.DocumentName)
+                                     ?? _roomsNumsConfig.AddSettings(_revitRepository.DocumentName);
 
         settings.StartNumber = StartNumber;
         settings.IsNumFlats = IsNumFlats;
@@ -588,6 +587,6 @@ internal abstract class RevitViewModel : BaseViewModel, INumberingOrder {
             .Select(item => item.ElementId)
             .ToList();
 
-        RoomsNumsConfig.SaveProjectConfig();
+        _roomsNumsConfig.SaveProjectConfig();
     }
 }

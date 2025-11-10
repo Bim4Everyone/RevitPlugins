@@ -6,8 +6,8 @@ using RevitRooms.Models;
 
 namespace RevitRooms.ViewModels.RoomsNums;
 internal class SelectedRevitViewModel : RevitViewModel {
-    public SelectedRevitViewModel(RevitRepository revitRepository)
-        : base(revitRepository) {
+    public SelectedRevitViewModel(RevitRepository revitRepository, RoomsNumsConfig roomsNumsConfig)
+        : base(revitRepository, roomsNumsConfig) {
         _id = new Guid("AAAC541D-16B3-4E82-A702-208B099AB031");
     }
 
