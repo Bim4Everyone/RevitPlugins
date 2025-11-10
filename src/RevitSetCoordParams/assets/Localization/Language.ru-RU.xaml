@@ -1,0 +1,105 @@
+<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:system="clr-namespace:System;assembly=mscorlib">
+
+    <system:String x:Key="MainWindow.Title">Заполнить параметры СМР</system:String>
+    <system:String x:Key="MainWindow.RangeElements">Диапазон обработки элементов модели</system:String>
+    <system:String x:Key="MainWindow.RangeElementsDescription">Выбор варианта обработки элементов модели</system:String>    
+    <system:String x:Key="MainWindow.SourceFiles">Файл с объемными элементами СМР</system:String>
+    <system:String x:Key="MainWindow.SourceFilesDescription">Файл, с которого будут считываться данные</system:String>
+    
+    <system:String x:Key="MainWindow.TypeModels">Тип объемных элементов СМР</system:String>
+    <system:String x:Key="MainWindow.TypeModelsDescription">Будут обработаны объемные модели только этого типа</system:String>
+    <system:String x:Key="MainWindow.Positions">Позиция элемента</system:String>
+    <system:String x:Key="MainWindow.PositionsDescription">Определяет, относительно какой точки искать элемент</system:String>
+    <system:String x:Key="MainWindow.Params">Параметры СМР</system:String>
+    
+    <system:String x:Key="MainWindow.ParamsDescription">Выбор параметров СМР для чтения и записи</system:String>
+    <system:String x:Key="MainWindow.Categories">Категории элементов</system:String>
+    <system:String x:Key="MainWindow.CategoriesDescription">Категории элементов для записи параметров</system:String>
+    <system:String x:Key="MainWindow.Search">Настройки поиска</system:String>
+    <system:String x:Key="MainWindow.SearchDescription">Выбор настроек поиска для потерянных элементов</system:String>
+
+    <system:String x:Key="MainWindow.MaxDiameterSearchSphere">Максимальный диаметр поисковой сферы</system:String>
+    <system:String x:Key="MainWindow.MaxDiameterSearchSphereDescription">Максимальное расстояние от элемента до объемного элемента</system:String>
+    <system:String x:Key="MainWindow.StepSearchSphere">Шаг увеличения диаметра поисковой сферы</system:String>
+    <system:String x:Key="MainWindow.StepSearchSphereDescription">Значение увеличения сферы при каждой итерации поиска</system:String>
+    <system:String x:Key="MainWindow.SearchSphereTooltip">Влияет на производительность. Больше значение - меньше производительность</system:String>
+    
+    <system:String x:Key="MainWindow.StepSearchSphereTooltip">Влияет на производительность. Меньше значение - меньше производительность</system:String> 
+    <system:String x:Key="MainWindow.SearchToggleSwitchOn">Искать элементы</system:String>
+    <system:String x:Key="MainWindow.SearchToggleSwitchOff">Не искать элементы</system:String>
+    <system:String x:Key="MainWindow.SourceParamHeader">Параметр исходных элементов</system:String>
+    <system:String x:Key="MainWindow.TargetParamHeader">Параметр записываемых элементов</system:String>
+    
+    <system:String x:Key="MainWindow.ParamsToggleSwitchOn">Использовать параметр</system:String>
+    <system:String x:Key="MainWindow.ParamsToggleSwitchOff">Не использовать параметр</system:String>
+    <system:String x:Key="MainWindow.CategoryWarningTooltip">В некоторых категориях есть ошибки</system:String>    
+    <system:String x:Key="MainWindow.ParamWarningTooltip">В некоторых параметрах есть ошибки</system:String>
+    <system:String x:Key="MainWindow.ButtonOk">Заполнить</system:String>
+    
+    <system:String x:Key="MainWindow.ButtonCancel">Отменить</system:String>
+    <system:String x:Key="MainWindow.CheckedAllCats">Выбрать все категории</system:String>
+    <system:String x:Key="MainWindow.NotCheckedAllCats">Сбросить все категории</system:String>
+
+    <system:String x:Key="WarningWindow.Title">Предупреждения</system:String>
+    <system:String x:Key="WarningWindow.IdHeader">ID элемента</system:String>
+    <system:String x:Key="WarningWindow.FamilyHeader">Имя семейства</system:String>
+    <system:String x:Key="WarningWindow.TypeHeader">Имя типоразмера</system:String>
+    <system:String x:Key="WarningWindow.LevelHeader">Уровень элемента</system:String>    
+
+    <system:String x:Key="MainViewModel.BlockParamDescription">Параметр блока СМР</system:String>
+    <system:String x:Key="MainViewModel.BlockParamDetailDescription">Используется для определения корпуса здания</system:String>
+    <system:String x:Key="MainViewModel.SectionParamDescription">Параметр секции СМР</system:String>
+    <system:String x:Key="MainViewModel.SectionParamDetailDescription">Используется для определения секции здания</system:String>
+    <system:String x:Key="MainViewModel.FloorParamDescription">Параметр этажа СМР</system:String>
+    
+    <system:String x:Key="MainViewModel.FloorParamDetailDescription">Используется для определения этажа здания</system:String>
+    <system:String x:Key="MainViewModel.FloorDEParamDescription">Дополнительный параметр этажа СМР</system:String>
+    <system:String x:Key="MainViewModel.FloorDEParamDetailDescription">Используется для определения этажа здания</system:String>
+    <system:String x:Key="MainViewModel.BlockingParamDescription">Параметр для блокировки</system:String>
+    <system:String x:Key="MainViewModel.BlockingParamDetailDescription">Тип параметра - да / нет</system:String>
+    
+    <system:String x:Key="MainViewModel.WrongParamName">Ошибки в параметрах СМР</system:String>
+    <system:String x:Key="MainViewModel.NoParams">Не выбраны параметры</system:String>
+    <system:String x:Key="MainViewModel.NoCategories">Не выбраны категории</system:String>
+    <system:String x:Key="MainViewModel.NoParamMaps">Должен быть выбран хотя бы один парный параметр</system:String>
+    <system:String x:Key="MainViewModel.DiameterSearchNoDouble">Вводимые данные должны быть числом</system:String>
+    
+    <system:String x:Key="MainViewModel.DiameterSearchNoNegate">Вводимые данные должны быть положительными</system:String>
+    <system:String x:Key="MainViewModel.DiameterSearchNoZero">Вводимые данные должны быть больше нуля</system:String>
+    <system:String x:Key="MainViewModel.DiameterSearchBig">Вводимые данные не должны превышать 10000 мм</system:String>
+    <system:String x:Key="MainViewModel.DiameterSearchStepBig">Вводимые данные не должны превышать 2000 мм</system:String>
+    <system:String x:Key="MainViewModel.DiameterSearchStepBigger">Шаг не должен превышать максимальное значение</system:String>
+    
+    <system:String x:Key="MainViewModel.AllElementsProvider">Все элементы модели</system:String>
+    <system:String x:Key="MainViewModel.SelectedElementsProvider">Выделенные элементы модели</system:String>
+    <system:String x:Key="MainViewModel.CurrentViewProvider">Видимые элементы на виде</system:String>
+    <system:String x:Key="MainViewModel.CenterPositionProvider">По центру элемента</system:String>
+    <system:String x:Key="MainViewModel.BottomPositionProvider">По низу элемента</system:String>
+    
+    <system:String x:Key="MainViewModel.UpPositionProvider">По верху элемента</system:String>
+    <system:String x:Key="MainViewModel.NoTypeModel">В файле отсутствуют необходимые объемные модели</system:String>    
+    <system:String x:Key="MainViewModel.NoSelection">Элементы не выбраны</system:String>
+    <system:String x:Key="MainViewModel.WrongView">Пожалуйста, откройте 3Д вид, план этажа или спецификацию</system:String>
+    <system:String x:Key="MainViewModel.ProgressTitle">Обработка... [{0}]\[{1}]  </system:String>
+
+    <system:String x:Key="SourceFileViewModel.CurrentFile">Текущий файл (открытый)</system:String>
+    <system:String x:Key="CategoryViewModel.WarningStartString">Отсутствуют параметры:</system:String>    
+    <system:String x:Key="ParamViewModel.WarningStartString">Ошибочные параметры:</system:String>
+    <system:String x:Key="SetCoordParamsProcessor.TransactionName">Назначение параметров СМР</system:String>
+    <system:String x:Key="Common.ParamErrorMessageBody">Ошибка загрузки параметров</system:String>
+    <system:String x:Key="Common.ConfigErrorMessageTitle">Ошибка настройки плагина</system:String>
+
+    <system:String x:Key="WarningsViewModel.SkipElement">Пропущенные элементы</system:String>
+    <system:String x:Key="WarningsViewModel.SkipElementDescription">Элементы заблокированы параметром блокировки и пропущены плагином</system:String>
+    <system:String x:Key="WarningsViewModel.NotFoundElement">Не обработанные элементы</system:String>
+    <system:String x:Key="WarningsViewModel.NotFoundElementDescription">Элементы находятся слишком далеко или не могут быть обработаны</system:String>
+    <system:String x:Key="WarningsViewModel.NotFoundParam">Элементы с незаполненными параметрами</system:String>
+    <system:String x:Key="WarningsViewModel.NotFoundParamDescription">Данные параметры не добавлены в категории этих элементов и не были заполнены</system:String>
+
+    <system:String x:Key="RevitRepository.DefaultFamilyName">Нет имени семейства</system:String>
+    <system:String x:Key="RevitRepository.DefaultTypeName">Нет имени типа</system:String>
+    <system:String x:Key="RevitRepository.DefaultLevelName">Нет уровня</system:String>
+
+</ResourceDictionary>
