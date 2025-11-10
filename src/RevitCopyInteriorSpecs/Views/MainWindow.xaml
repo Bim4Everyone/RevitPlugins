@@ -1,10 +1,14 @@
-<base:PlatformWindow
+<core:WpfUIPlatformWindow
     x:Class="RevitCopyInteriorSpecs.Views.MainWindow"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
+    
+    xmlns:core="clr-namespace:dosymep.WpfUI.Core"
+    xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
+    xmlns:me="clr-namespace:dosymep.WpfCore.MarkupExtensions;assembly=dosymep.WpfCore"
     
     xmlns:base="clr-namespace:dosymep.WPF.Views"
     xmlns:local="clr-namespace:RevitCopyInteriorSpecs.Views"
@@ -14,10 +18,11 @@
 
     mc:Ignorable="d"
     WindowStartupLocation="CenterOwner"
-    Title="{DynamicResource MainWindow.Title}"
+    
     Height="500" Width="920"
     MinHeight="450" MinWidth="700"
-    d:DataContext="{d:DesignInstance vms:MainViewModel, IsDesignTimeCreatable=False}">
+    d:DataContext="{d:DesignInstance vms:MainViewModel, IsDesignTimeCreatable=False}"
+    PreviewMouseDown="WindowPreviewMouseDown">
 
     <i:Interaction.Triggers>
         <i:EventTrigger EventName="Loaded">
@@ -26,80 +31,147 @@
                 CommandParameter="{Binding RelativeSource={RelativeSource AncestorType={x:Type Window}}}"/>
         </i:EventTrigger>
     </i:Interaction.Triggers>
-    
+
     <Window.Resources>
-        <converters:NumberWithOffsetConverter x:Key="columnContentWidthConverter" Offset="-15" />
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary
+                    Source="CustomStyles.xaml" />
+            </ResourceDictionary.MergedDictionaries>
+            <converters:NumberWithOffsetConverter
+                x:Key="columnContentWidthConverter"
+                Offset="-15" />
+        </ResourceDictionary>
     </Window.Resources>
+    
+    <!--<Window.Resources>
+        <converters:NumberWithOffsetConverter x:Key="columnContentWidthConverter" Offset="-15" />
+    </Window.Resources>-->
 
     <Grid>
         <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
             <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
-        <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="*"/>
-            <ColumnDefinition Width="Auto"/>
-        </Grid.ColumnDefinitions>
 
+        <ui:TitleBar
+            Grid.Row="0"
+            Title="{me:LocalizationSource MainWindow.Title}" />
 
-        <Canvas
-            Grid.Column="1" 
-            Width="{Binding ActualWidth, ElementName=expander}" 
-            Panel.ZIndex="1"
-            Margin="0 5 5 0">
-            <Expander 
-                x:Name="expander"
-                ExpandDirection="Down"
-                FlowDirection="RightToLeft"
-                Background="White"
-                BorderThickness="1"
-                BorderBrush="Gray" 
-                Padding="3" 
-                Header="{DynamicResource MainWindow.Settings}">
-
-                <Grid FlowDirection="LeftToRight">
-                    <controls:ParametersControl/>
-                </Grid>
-            </Expander>
-        </Canvas>
-
-
-        <Grid Grid.ColumnSpan="2">
+        <Grid
+            x:Name="contentGrid"
+            Grid.Row="1" >
             <Grid.RowDefinitions>
                 <RowDefinition Height="Auto" />
                 <RowDefinition Height="*" />
-                <RowDefinition Height="Auto" />
-                <RowDefinition Height="Auto" />
             </Grid.RowDefinitions>
+            
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="0.2*"/>
+            </Grid.ColumnDefinitions>
 
-            <controls:SelectedSpecsControl Grid.Row="0" Margin="0 10 0 0"/>
-            <controls:TasksControl Grid.Row="1" />
+            <Border
+                Grid.Row="0"
+                Margin="10 5 5 5"
+                Style="{StaticResource CustomBorder}">
+                <controls:SelectedSpecsControl
+                    Grid.Row="0"
+                    Margin="0 10 0 0" />
+            </Border>
+            
+            <Border
+                Grid.Row="1"
+                Grid.ColumnSpan="2"
+                Margin="5"
+                Style="{StaticResource CustomBorder}">
+                <controls:TasksControl
+                    Grid.Row="1" />
+            </Border>
 
-            <StackPanel
-                Grid.Row="3"
-                Height="45"
-                Orientation="Horizontal"
-                HorizontalAlignment="Right">
-                <TextBlock
-                    Margin="10"
-                    Foreground="Orange"
-                    VerticalAlignment="Center"
-                    Text="{Binding ErrorText}" />
+            <!--<Grid
+                Grid.Row="1"
+                Grid.ColumnSpan="2">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto" />
+                </Grid.RowDefinitions>
 
-                <Button
-                    Margin="10"
-                    Width="80"
-                    Content="{DynamicResource MainWindow.ButtonOk}"
-                    IsDefault="True"
-                    Click="ButtonOk_Click"
-                    Command="{Binding AcceptViewCommand}" />
+                <controls:TasksControl
+                    Grid.Row="1" />
+            </Grid>-->
+            
 
-                <Button
-                    Margin="10"
-                    Width="80"
-                    Content="{DynamicResource MainWindow.ButtonCancel}"
-                    IsCancel="True"
-                    Click="ButtonCancel_Click" />
-            </StackPanel>
+            <Canvas
+                Grid.Row="0"
+                Grid.Column="1"
+                FlowDirection="RightToLeft"
+                x:Name="canvas"
+                Margin="0 5 5 0"
+                MouseDown="CanvasMouseDown">
+                <Expander
+                    x:Name="expander"
+                    ExpandDirection="Down"
+                    Expanded="ExpanderExpanded"
+                    Collapsed="ExpanderCollapsed"
+                    MinWidth="{Binding ElementName=canvas, Path=ActualWidth}"
+                    MinHeight="{Binding ElementName=canvas, Path=ActualHeight}"
+                    MaxHeight="{Binding ElementName=contentGrid, Path=ActualHeight}">
+                    <Expander.Header>
+                        <TextBlock
+                            Text="{me:LocalizationSource MainWindow.Settings}"
+                            HorizontalAlignment="Center"
+                            Padding="3">
+                            <TextBlock.ToolTip>
+                                <ToolTip>
+                                    <TextBlock
+                                        Text="{me:LocalizationSource MainWindow.SettingsToolTip}"
+                                        FontSize="12"
+                                        TextWrapping="Wrap"
+                                        TextAlignment="Justify"
+                                        FlowDirection="LeftToRight"
+                                        ToolTipService.InitialShowDelay="1000"
+                                        ToolTipService.ShowDuration="20000"
+                                        ToolTipService.BetweenShowDelay="1" />
+                                </ToolTip>
+                            </TextBlock.ToolTip>
+                        </TextBlock>
+                    </Expander.Header>
+
+                    <Grid
+                        FlowDirection="LeftToRight">
+                        <controls:ParametersControl />
+                    </Grid>
+                </Expander>
+            </Canvas>
         </Grid>
+
+        
+        <StackPanel
+            Grid.Row="2"
+            Orientation="Horizontal"
+            HorizontalAlignment="Right">
+            <ui:TextBlock
+                Margin="10"
+                Foreground="Orange"
+                VerticalAlignment="Center"
+                Text="{Binding ErrorText}" />
+
+            <ui:Button
+                Margin="10"
+                MinWidth="80"
+                Appearance="Info"
+                Content="Ok"
+                IsDefault="True"
+                Click="ButtonOk_Click"
+                Command="{Binding AcceptViewCommand}" />
+
+            <ui:Button
+                Margin="10"
+                MinWidth="80"
+                Content="Cancel"
+                IsCancel="True"
+                Click="ButtonCancel_Click" />
+        </StackPanel>
     </Grid>
-</base:PlatformWindow>
+</core:WpfUIPlatformWindow>
