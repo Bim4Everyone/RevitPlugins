@@ -13,8 +13,8 @@
     mc:Ignorable="d"
     MinWidth="350"
     MaxWidth="350"
-    MinHeight="350"
-    MaxHeight="350"
+    MinHeight="295"
+    MaxHeight="295"
     ResizeMode="NoResize"
     d:DataContext="{d:DesignInstance vms:OpeningRealsKrConfigViewModel, IsDesignTimeCreatable=False}">
     <core:WpfUIPlatformWindow.Resources>
@@ -30,9 +30,9 @@
             <RowDefinition
                 Height="Auto" />
             <RowDefinition
-                Height="1*" />
+                Height="Auto" />
             <RowDefinition
-                Height="1*" />
+                Height="Auto" />
             <RowDefinition
                 Height="Auto" />
         </Grid.RowDefinitions>
@@ -70,7 +70,6 @@
                 HorizontalAlignment="Stretch"
                 VerticalAlignment="Center">
                 <DockPanel
-                    Margin="0 5"
                     HorizontalAlignment="Stretch">
                     <ui:ToggleSwitch
                         Content="{me:LocalizationSource OpeningRealsKrSettingsView.RoundSize}"
@@ -86,6 +85,7 @@
                         SelectedItem="{Binding SelectedRoundSize, UpdateSourceTrigger=PropertyChanged}" />
                 </DockPanel>
                 <DockPanel
+                    Margin="0 5 0 0"
                     HorizontalAlignment="Stretch">
                     <ui:ToggleSwitch
                         Content="{me:LocalizationSource OpeningRealsKrSettingsView.RoundElevation}"

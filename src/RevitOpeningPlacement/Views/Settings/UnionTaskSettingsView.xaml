@@ -30,7 +30,7 @@
             <RowDefinition
                 Height="Auto" />
             <RowDefinition
-                Height="*" />
+                Height="Auto" />
             <RowDefinition
                 Height="Auto" />
         </Grid.RowDefinitions>
@@ -48,7 +48,6 @@
                 HorizontalAlignment="Stretch"
                 VerticalAlignment="Center">
                 <DockPanel
-                    Margin="0 5"
                     HorizontalAlignment="Stretch">
                     <ui:ToggleSwitch
                         Content="{me:LocalizationSource UnionTaskSettingsView.RoundSize}"
@@ -64,6 +63,7 @@
                         SelectedItem="{Binding SelectedSizeRoundForUnitedTask, UpdateSourceTrigger=PropertyChanged}" />
                 </DockPanel>
                 <DockPanel
+                    Margin="0 5 0 0"
                     HorizontalAlignment="Stretch">
                     <ui:ToggleSwitch
                         Content="{me:LocalizationSource UnionTaskSettingsView.RoundElevation}"
