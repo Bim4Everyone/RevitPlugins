@@ -199,6 +199,7 @@
                 HorizontalAlignment="Left"
                 HorizontalContentAlignment="Left"
                 ToolTip="Выделить элементы 1 и 2 выборки из выбранных коллизий"
+                Padding="3 0"
                 Content="1 &amp; 2"
                 Command="{Binding SelectedReport.PickBothElementsCommand}"
                 Glyph="{dx:DXImage 'Images/RichEdit/Select_16x16.png'}" />
