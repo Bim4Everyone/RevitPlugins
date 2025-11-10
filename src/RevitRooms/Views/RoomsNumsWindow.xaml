@@ -31,11 +31,6 @@
             <i:InvokeCommandAction
                 Command="{Binding LoadViewCommand}" />
         </i:EventTrigger>
-        <i:EventTrigger
-            EventName="Loaded">
-            <i:InvokeCommandAction
-                Command="{Binding RoomsNums.LoadViewCommand}" />
-        </i:EventTrigger>
     </i:Interaction.Triggers>
 
     <core:WpfUIPlatformWindow.Resources>
@@ -67,6 +62,7 @@
             <RowDefinition Height="Auto" />
             <RowDefinition Height="Auto" />
             <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
             <RowDefinition Height="*" />
             <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
@@ -81,8 +77,8 @@
             Grid.Row="1" Grid.Column="0"
             Grid.ColumnSpan="4"
             Margin="10"
-            DisplayMemberPath="Name"
             ItemsSource="{Binding RoomsNumsViewModels}"
+            DisplayMemberPath="Name"
             SelectedItem="{Binding RoomsNums}" />
 
         <DockPanel
@@ -93,8 +89,8 @@
                 Margin="0,0,10,0"
                 Text="Стадия:" />
             <ComboBox
-                DisplayMemberPath="Name"
                 ItemsSource="{Binding RoomsNums.Phases}"
+                DisplayMemberPath="Name"
                 SelectedItem="{Binding RoomsNums.Phase}" />
         </DockPanel>
 
@@ -157,7 +153,7 @@
         </RadioButton>
         
         <RadioButton 
-            Grid.Row="6"
+            Grid.Row="7"
             Grid.Column="0" 
             Grid.ColumnSpan="4" 
             Margin="20,10,10,10" 
@@ -168,7 +164,7 @@
             IsChecked="{Binding RoomsNums.IsNumRoomsGroup}" />
         
         <RadioButton 
-            Grid.Row="7" 
+            Grid.Row="8" 
             Grid.Column="0" 
             Grid.ColumnSpan="4" 
             Margin="20,10,10,10"
@@ -179,7 +175,7 @@
             IsChecked="{Binding RoomsNums.IsNumRoomsSectionLevels}" />
         
         <RadioButton 
-            Grid.Row="8" 
+            Grid.Row="9" 
             Grid.Column="0" 
             Grid.ColumnSpan="4" 
             Margin="20,10,10,10" GroupName="rooms_nums"
@@ -189,7 +185,7 @@
             IsChecked="{Binding RoomsNums.IsNumRoomsSection}" />
         
         <DockPanel 
-            Grid.Row="9" 
+            Grid.Row="10" 
             Grid.Column="0" 
             Margin="10" 
             LastChildFill="True">
@@ -224,7 +220,7 @@
         </DockPanel>
 
         <DockPanel 
-            Grid.Row="9" 
+            Grid.Row="10" 
             Grid.Column="1" 
             Margin="10" 
             LastChildFill="True">
@@ -258,7 +254,7 @@
         </DockPanel>
 
         <DockPanel 
-            Grid.Row="9" 
+            Grid.Row="10" 
             Grid.Column="2" 
             Margin="10" 
             LastChildFill="True">
@@ -300,7 +296,7 @@
         </DockPanel>
 
         <DockPanel 
-            Grid.Row="9" Grid.Column="3" 
+            Grid.Row="10" Grid.Column="3" 
             Margin="10" 
             LastChildFill="True">
             <TextBlock DockPanel.Dock="Top" Margin="0,0,0,10" Text="Приоритеты помещений" />
@@ -341,10 +337,8 @@
                 CanUserResizeColumns="True"
                 Style="{StaticResource CustomResizableDataGridStyle}"
                 ItemsSource="{Binding RoomsNums.SelectedNumberingOrders}">
-
                 <DataGridTextColumn
-                    IsReadOnly="True"
-                    Binding="{Binding Path=LevelNames}">
+                    Binding="{Binding Path=Name}">
                     <DataGridTextColumn.Header>
                         <TextBlock
                             Text="{me:LocalizationSource MainWindow.HeaderLevels}" />
@@ -354,7 +348,7 @@
         </DockPanel>
 
         <StackPanel
-            Grid.Row="10" Grid.Column="0"
+            Grid.Row="11" Grid.Column="0"
             Grid.ColumnSpan="4"
             Orientation="Horizontal" HorizontalAlignment="Right">
             <TextBlock 
