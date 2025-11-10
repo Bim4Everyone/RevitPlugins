@@ -36,18 +36,19 @@ internal class RevitRepository {
     private readonly UIDocument _uiDocument;
 
     private readonly RevitClashDetective.Models.RevitRepository _clashRevitRepository;
-
+    private readonly ILocalizationService _localization;
     private readonly View3DProvider _view3DProvider;
     private readonly View3D _view;
     private readonly List<ElementId> _linkTypeIdsToUse;
 
     public RevitRepository(
         UIApplication uiApplication,
-        RevitClashDetective.Models.RevitRepository clashRepository) {
+        RevitClashDetective.Models.RevitRepository clashRepository,
+        ILocalizationService localization) {
 
         UIApplication = uiApplication ?? throw new ArgumentNullException(nameof(uiApplication));
         _clashRevitRepository = clashRepository ?? throw new ArgumentNullException(nameof(clashRepository));
-
+        _localization = localization ?? throw new ArgumentNullException(nameof(localization));
         _application = UIApplication.Application;
         _uiDocument = UIApplication.ActiveUIDocument;
         Doc = _uiDocument.Document;
@@ -392,7 +393,8 @@ internal class RevitRepository {
         var elementToHighlight = selectorAndHighlighter.GetElementToHighlight();
         if(elementToHighlight != null) {
             try {
-                new ElementHighlighter(this, _view, elementToHighlight, GetMessageBoxService()).HighlightElement();
+                new ElementHighlighter(this, _view, elementToHighlight, GetMessageBoxService(), _localization)
+                    .HighlightElement();
             } catch(ArgumentException) {
                 // элемент для выделения не стена и не перекрытие
             }
@@ -531,7 +533,7 @@ internal class RevitRepository {
     }
 
     public void DeleteElements(ICollection<ElementId> elements) {
-        using var t = Doc.StartTransaction("Удаление объединенных заданий на отверстия");
+        using var t = Doc.StartTransaction(_localization.GetLocalizedString("Transaction.DeleteUnitedTasks"));
         Doc.Delete(elements);
         t.Commit();
     }
@@ -554,7 +556,7 @@ internal class RevitRepository {
         var placer = GetOpeningPlacer(openingTasks, config);
         FamilyInstance createdOpening = null;
         try {
-            using var t = GetTransaction("Объединение отверстий");
+            using var t = GetTransaction(_localization.GetLocalizedString("Transaction.UniteTasks"));
             createdOpening = placer.Place();
             t.Commit();
 
@@ -665,7 +667,7 @@ internal class RevitRepository {
     /// если семейства заданий на отверстия не самой последней версии
     /// </summary>
     public bool ContinueIfTaskFamiliesNotLatest() {
-        var checker = new FamiliesParametersChecker(this);
+        var checker = new FamiliesParametersChecker(this, _localization);
         bool familiesLatest = checker.IsCorrect();
 
         if(!familiesLatest) {
@@ -831,7 +833,7 @@ internal class RevitRepository {
         var references = _uiDocument.Selection.PickObjects(
             ObjectType.Element,
             filter,
-            "Выберите стену(ы) и(или) перекрытие(я)");
+            _localization.GetLocalizedString("RevitUI.PickWallsOrFloors"));
 
         HashSet<Element> hosts = [];
         foreach(var reference in references) {
@@ -854,7 +856,7 @@ internal class RevitRepository {
         var references = _uiDocument.Selection.PickObjects(
             ObjectType.LinkedElement,
             filter,
-            "Выберите задание(я) на отверстие(я) из связи(ей) ВИС и нажмите \"Готово\"");
+            _localization.GetLocalizedString("RevitUI.PickOpeningMepTasks"));
 
         HashSet<OpeningMepTaskIncoming> openingTasks = [];
         foreach(var reference in references) {
@@ -901,18 +903,18 @@ internal class RevitRepository {
         var reference = _uiDocument.Selection.PickObject(
             ObjectType.LinkedElement,
             filter,
-            "Выберите задание на отверстие из связи ВИС и нажмите \"Готово\"");
+            _localization.GetLocalizedString("RevitUI.PickOpeningMepTask"));
 
         if((reference != null) && (Doc.GetElement(reference) is RevitLinkInstance link)) {
             var opening = link.GetLinkDocument().GetElement(reference.LinkedElementId);
             if(opening is not null and FamilyInstance famInst) {
                 return new OpeningMepTaskIncoming(famInst, this, link.GetTransform());
             } else {
-                ShowErrorMessage($"Выбранный элемент не является экземпляром семейства задания на отверстие");
+                ShowErrorMessage(_localization.GetLocalizedString("Errors.InvalidTaskFamily"));
                 throw new OperationCanceledException();
             }
         } else {
-            ShowErrorMessage($"Не удалось определить выбранный элемент");
+            ShowErrorMessage(_localization.GetLocalizedString("Errors.InvalidElement"));
             throw new OperationCanceledException();
         }
     }
@@ -929,18 +931,18 @@ internal class RevitRepository {
         var reference = _uiDocument.Selection.PickObject(
             ObjectType.LinkedElement,
             filter,
-            "Выберите задание на отверстие из связи АР и нажмите \"Готово\"");
+            _localization.GetLocalizedString("RevitUI.PickOpeningArTask"));
 
         if((reference != null) && (Doc.GetElement(reference) is RevitLinkInstance link)) {
             var opening = link.GetLinkDocument().GetElement(reference.LinkedElementId);
             if(opening is not null and FamilyInstance famInst) {
                 return new OpeningArTaskIncoming(this, famInst, link.GetTransform());
             } else {
-                ShowErrorMessage($"Выбранный элемент не является экземпляром семейства задания на отверстие");
+                ShowErrorMessage(_localization.GetLocalizedString("Errors.InvalidTaskFamily"));
                 throw new OperationCanceledException();
             }
         } else {
-            ShowErrorMessage($"Не удалось определить выбранный элемент");
+            ShowErrorMessage(_localization.GetLocalizedString("Errors.InvalidElement"));
             throw new OperationCanceledException();
         }
     }
@@ -958,7 +960,7 @@ internal class RevitRepository {
             .PickObjects(
             ObjectType.LinkedElement,
             filter,
-            "Выберите задание(я) на отверстие(я) из связи(ей) АР и нажмите \"Готово\"");
+            _localization.GetLocalizedString("RevitUI.PickOpeningArTasks"));
 
         HashSet<OpeningArTaskIncoming> openingTasks = [];
         foreach(var reference in references) {
@@ -988,7 +990,7 @@ internal class RevitRepository {
         ISelectionFilter filter = new SelectionFilterMepElements(this, categories);
 
         var references = _uiDocument.Selection
-            .PickObjects(ObjectType.Element, filter, "Выберите элементы ВИС и нажмите \"Готово\"");
+            .PickObjects(ObjectType.Element, filter, _localization.GetLocalizedString("RevitUI.PickMepElements"));
 
         HashSet<ElementId> mepElements = [];
         foreach(var reference in references) {
@@ -1068,7 +1070,7 @@ internal class RevitRepository {
         var dialog = GetMessageBoxService();
         dialog.Show(
             message,
-            "Задания на отверстия",
+            _localization.GetLocalizedString("OpeningTasks"),
             System.Windows.MessageBoxButton.OK,
             System.Windows.MessageBoxImage.Error,
             System.Windows.MessageBoxResult.OK);
@@ -1235,32 +1237,14 @@ internal class RevitRepository {
             return group.GetOpeningPlacer(this, config);
 
         } catch(ArgumentNullException nullEx) {
-            var dialog = GetMessageBoxService();
-            dialog.Show(
-                nullEx.Message,
-                "Задания на отверстия",
-                System.Windows.MessageBoxButton.OK,
-                System.Windows.MessageBoxImage.Error,
-                System.Windows.MessageBoxResult.OK);
+            ShowErrorMessage(nullEx.Message);
             throw new OperationCanceledException();
 
         } catch(ArgumentOutOfRangeException) {
-            var dialog = GetMessageBoxService();
-            dialog.Show(
-                "Необходимо выбрать как минимум 2 задания на отверстия",
-                "Задания на отверстия",
-                System.Windows.MessageBoxButton.OK,
-                System.Windows.MessageBoxImage.Error,
-                System.Windows.MessageBoxResult.OK);
+            ShowErrorMessage(_localization.GetLocalizedString("Errors.SelectTwoTasksAtLeast"));
             throw new OperationCanceledException();
         } catch(InvalidOperationException) {
-            var dialog = GetMessageBoxService();
-            dialog.Show(
-                "Не удалось выполнить объединение",
-                "Задания на отверстия",
-                System.Windows.MessageBoxButton.OK,
-                System.Windows.MessageBoxImage.Error,
-                System.Windows.MessageBoxResult.OK);
+            ShowErrorMessage(_localization.GetLocalizedString("Errors.CannotUniteTasks"));
             throw new OperationCanceledException();
         }
     }

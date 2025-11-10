@@ -1,16 +1,16 @@
 using System.Collections.ObjectModel;
 using System.Linq;
 
+using dosymep.SimpleServices;
 using dosymep.WPF.ViewModels;
 
 using RevitClashDetective.Models.FilterModel;
 
 using RevitOpeningPlacement.ViewModels.OpeningConfig.Interfaces;
 
-
-
 namespace RevitOpeningPlacement.ViewModels.OpeningConfig;
 internal class RuleViewModel : BaseViewModel, ICriterionViewModel {
+    private readonly ILocalizationService _localization;
     private readonly Rule _rule;
     private CategoriesInfoViewModel _categoriesInfo;
     private ParameterViewModel _selectedParameter;
@@ -21,8 +21,11 @@ internal class RuleViewModel : BaseViewModel, ICriterionViewModel {
     private string _stringValue;
     private bool _isValueEditable;
 
-    public RuleViewModel(CategoriesInfoViewModel categoriesInfo, Rule rule = null) {
-        CategoriesInfo = categoriesInfo;
+    public RuleViewModel(ILocalizationService localization,
+        CategoriesInfoViewModel categoriesInfo,
+        Rule rule = null) {
+        _localization = localization ?? throw new System.ArgumentNullException(nameof(localization));
+        CategoriesInfo = categoriesInfo ?? throw new System.ArgumentNullException(nameof(categoriesInfo));
         _rule = rule;
 
         PropertyChanged += RuleViewModelChanged;
@@ -109,11 +112,11 @@ internal class RuleViewModel : BaseViewModel, ICriterionViewModel {
     public void Initialize() {
         if(_rule != null) {
             if(!_categoriesInfo.Parameters.Any(item => item.FilterableValueProvider.Provider.Equals(_rule.Provider))) {
-                _categoriesInfo.Parameters.Add(new ParameterViewModel(_rule.Provider));
+                _categoriesInfo.Parameters.Add(new ParameterViewModel(_localization, _rule.Provider));
             }
             SelectedParameter = _categoriesInfo.Parameters.First(item => item.FilterableValueProvider.Provider.Equals(_rule.Provider));
             SelectedParameterChanged();
-            SelectedRuleEvaluator = new RuleEvaluatorViewModel(_rule.Evaluator);
+            SelectedRuleEvaluator = new RuleEvaluatorViewModel(_localization, _rule.Evaluator);
             SelectedValue = new ParamValueViewModel(_rule.Value);
             if(!Values.Contains(SelectedValue)) {
                 SelectedValue = null;
@@ -128,11 +131,11 @@ internal class RuleViewModel : BaseViewModel, ICriterionViewModel {
     }
 
     private void InitializeRule() {
-        SelectedParameter = new ParameterViewModel(_rule.Provider);
+        SelectedParameter = new ParameterViewModel(_localization, _rule.Provider);
         if(!_categoriesInfo.Parameters.Contains(SelectedParameter)) {
             _categoriesInfo.Parameters.Add(SelectedParameter);
         }
-        SelectedRuleEvaluator = new RuleEvaluatorViewModel(_rule.Evaluator);
+        SelectedRuleEvaluator = new RuleEvaluatorViewModel(_localization, _rule.Evaluator);
         SelectedValue = new ParamValueViewModel(_rule.Value);
         StringValue = SelectedValue.ParamValue.DisplayValue;
     }
@@ -149,7 +152,7 @@ internal class RuleViewModel : BaseViewModel, ICriterionViewModel {
         if(SelectedParameter != null) {
             RuleEvaluators = new ObservableCollection<RuleEvaluatorViewModel>(
                 SelectedParameter.GetEvaluators()
-                    .Select(item => new RuleEvaluatorViewModel(item)));
+                    .Select(item => new RuleEvaluatorViewModel(_localization, item)));
 
             if((SelectedRuleEvaluator != null) && RuleEvaluators.Contains(SelectedRuleEvaluator)) {
                 EvaluatorSelectionChanged();

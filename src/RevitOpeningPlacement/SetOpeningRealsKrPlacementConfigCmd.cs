@@ -1,10 +1,13 @@
-using System.Windows.Interop;
+using System.Globalization;
+using System.Reflection;
 
 using Autodesk.Revit.Attributes;
 using Autodesk.Revit.UI;
 
 using dosymep.Bim4Everyone;
 using dosymep.Bim4Everyone.SimpleServices;
+using dosymep.WpfCore.Ninject;
+using dosymep.WpfUI.Core.Ninject;
 
 using Ninject;
 
@@ -14,7 +17,7 @@ using RevitClashDetective.Models.Handlers;
 using RevitOpeningPlacement.Models;
 using RevitOpeningPlacement.Models.Configs;
 using RevitOpeningPlacement.ViewModels.OpeningConfig;
-using RevitOpeningPlacement.Views;
+using RevitOpeningPlacement.Views.Settings;
 
 namespace RevitOpeningPlacement;
 /// <summary>
@@ -46,14 +49,16 @@ internal class SetOpeningRealsKrPlacementConfigCmd : BasePluginCommand {
         kernel.Bind<ParameterFilterProvider>()
             .ToSelf()
             .InSingletonScope();
+        kernel.Bind<OpeningRealsKrConfig>()
+            .ToMethod(c =>
+                    OpeningRealsKrConfig.GetOpeningConfig(uiApplication.ActiveUIDocument.Document)
+                );
+        kernel.BindMainWindow<OpeningRealsKrConfigViewModel, OpeningRealsKrSettingsView>();
+        kernel.UseWpfUIThemeUpdater();
+        string assemblyName = Assembly.GetExecutingAssembly().GetName().Name;
+        kernel.UseWpfLocalization($"/{assemblyName};component/assets/localization/Language.xaml",
+            CultureInfo.GetCultureInfo("ru-RU"));
 
-        var revitRepository = kernel.Get<RevitRepository>();
-        var openingConfig = OpeningRealsKrConfig.GetOpeningConfig(revitRepository.Doc);
-        var viewModel = new OpeningRealsKrConfigViewModel(revitRepository, openingConfig);
-
-        var window = new OpeningRealsKrSettingsView() { Title = PluginName, DataContext = viewModel };
-        var helper = new WindowInteropHelper(window) { Owner = uiApplication.MainWindowHandle };
-
-        window.ShowDialog();
+        Notification(kernel.Get<OpeningRealsKrSettingsView>());
     }
 }

@@ -1,9 +1,10 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 
 using Autodesk.Revit.DB;
+
+using dosymep.SimpleServices;
 
 using RevitOpeningPlacement.Models.Interfaces;
 
@@ -13,6 +14,7 @@ namespace RevitOpeningPlacement.Models.OpeningPlacement.Checkers;
 /// </summary>
 internal class FamiliesParametersChecker : IChecker {
     private readonly RevitRepository _revitRepository;
+    private readonly ILocalizationService _localization;
 
 
     /// <summary>
@@ -20,26 +22,24 @@ internal class FamiliesParametersChecker : IChecker {
     /// </summary>
     /// <param name="revitRepository">Репозиторий активного документа ревита</param>
     /// <exception cref="ArgumentNullException">Исключение, если обязательный параметр null</exception>
-    public FamiliesParametersChecker(RevitRepository revitRepository) {
+    public FamiliesParametersChecker(RevitRepository revitRepository, ILocalizationService localization) {
         _revitRepository = revitRepository ?? throw new ArgumentNullException(nameof(revitRepository));
+        _localization = localization ?? throw new ArgumentNullException(nameof(localization));
     }
 
 
     public string GetErrorMessage() {
-        var message = new StringBuilder();
         foreach(OpeningType openingType in Enum.GetValues(typeof(OpeningType))) {
             var family = _revitRepository.GetOpeningTaskFamily(openingType);
             var notExistentParameters = GetNotExistentParameters(_revitRepository, family);
 
             if(notExistentParameters.Count > 0) {
-                message.AppendLine($"У семейства \"{family.Name}\" отсутствуют общие параметры:");
-                foreach(string paramName in notExistentParameters) {
-                    message.AppendLine(paramName);
-                }
-                message.AppendLine();
+                return _localization.GetLocalizedString("Validation.MissingParametersInFamily",
+                    family.Name,
+                    string.Join("\n", notExistentParameters));
             }
         }
-        return message.ToString();
+        return string.Empty;
     }
 
     public bool IsCorrect() {

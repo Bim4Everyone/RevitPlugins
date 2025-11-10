@@ -1,9 +1,11 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.IO;
 using System.Linq;
 using System.Windows.Input;
 
+using dosymep.SimpleServices;
 using dosymep.WPF.Commands;
 using dosymep.WPF.ViewModels;
 
@@ -14,6 +16,7 @@ using RevitOpeningPlacement.Models.TypeNamesProviders;
 namespace RevitOpeningPlacement.ViewModels.OpeningConfig;
 internal class MepCategoryViewModel : BaseViewModel {
     private const string _pipeDiameterDisplayName = "Внешний диаметр";
+    private readonly ILocalizationService _localization;
     private string _name;
     private ObservableCollection<SizeViewModel> _minSizes;
     private ObservableCollection<OffsetViewModel> _offsets;
@@ -23,9 +26,12 @@ internal class MepCategoryViewModel : BaseViewModel {
     private int _selectedRounding;
     private int _selectedElevationRounding;
 
-    public MepCategoryViewModel(RevitRepository revitRepository, MepCategory mepCategory) {
+    public MepCategoryViewModel(RevitRepository revitRepository,
+        ILocalizationService localization,
+        MepCategory mepCategory) {
+        _localization = localization ?? throw new ArgumentNullException(nameof(localization));
         Name = mepCategory.Name;
-        ImageSource = mepCategory.ImageSource;
+        ImageSource = Path.GetFileName(mepCategory.ImageSource);
         MinSizes = new ObservableCollection<SizeViewModel>(
             mepCategory.MinSizes.Select(item => new SizeViewModel(item)));
         IsRound = mepCategory.IsRound;
@@ -34,11 +40,11 @@ internal class MepCategoryViewModel : BaseViewModel {
             mepCategory.Offsets.Select(
                 item => new OffsetViewModel(item, new TypeNamesProvider(mepCategory.IsRound))));
         StructureCategories = new ObservableCollection<StructureCategoryViewModel>(
-            mepCategory.Intersections.Select(c => new StructureCategoryViewModel(revitRepository, c)));
+            mepCategory.Intersections.Select(c => new StructureCategoryViewModel(revitRepository, c, _localization)));
         SelectedRounding = mepCategory.Rounding;
         SelectedElevationRounding = mepCategory.ElevationRounding;
         var categoriesInfoViewModel = GetCategoriesInfoViewModel(revitRepository, Name);
-        SetViewModel = new SetViewModel(revitRepository, categoriesInfoViewModel, mepCategory.Set);
+        SetViewModel = new SetViewModel(revitRepository, _localization, categoriesInfoViewModel, mepCategory.Set);
         RenameDisplayParameters();
         AddOffsetCommand = RelayCommand.Create(AddOffset);
         RemoveOffsetCommand = RelayCommand.Create<OffsetViewModel>(RemoveOffset, CanRemoveOffset);
@@ -184,6 +190,6 @@ internal class MepCategoryViewModel : BaseViewModel {
 
     private CategoriesInfoViewModel GetCategoriesInfoViewModel(RevitRepository revitRepository, string mepCategoryName) {
         var revitCategories = revitRepository.GetCategories(revitRepository.GetMepCategoryEnum(mepCategoryName));
-        return new CategoriesInfoViewModel(revitRepository, revitCategories);
+        return new CategoriesInfoViewModel(revitRepository, _localization, revitCategories);
     }
 }

@@ -14,6 +14,7 @@ internal class ElementHighlighter {
     private readonly RevitRepository _revitRepository;
     private readonly View3D _view3D;
     private readonly IMessageBoxService _messageBoxService;
+    private readonly ILocalizationService _localization;
 
     /// <summary>
     /// Конструктор класса для графического выделения заданного элемента (стены или перекрытия) на 3D виде
@@ -31,11 +32,13 @@ internal class ElementHighlighter {
     public ElementHighlighter(RevitRepository revitRepository,
         View3D view3D,
         Element elementToHighlight,
-        IMessageBoxService messageBoxService) {
+        IMessageBoxService messageBoxService,
+        ILocalizationService localization) {
 
         _revitRepository = revitRepository ?? throw new ArgumentNullException(nameof(revitRepository));
         _view3D = view3D ?? throw new ArgumentNullException(nameof(view3D));
         _messageBoxService = messageBoxService ?? throw new ArgumentNullException(nameof(messageBoxService));
+        _localization = localization ?? throw new ArgumentNullException(nameof(localization));
         var element = elementToHighlight ?? throw new ArgumentNullException(nameof(elementToHighlight));
         _elementToHighlight = element is Wall or Floor
             ? element
@@ -49,15 +52,15 @@ internal class ElementHighlighter {
 
         } catch(AccessViolationException) {
             _messageBoxService.Show(
-                $"Окно плагина было открыто в другом документе Revit, который был закрыт, нельзя показать элемент.",
-                $"BIM",
+                _localization.GetLocalizedString("Errors.ClosedDocument"),
+                _localization.GetLocalizedString("OpeningTasks"),
                 System.Windows.MessageBoxButton.OK,
                 System.Windows.MessageBoxImage.Error,
                 System.Windows.MessageBoxResult.OK);
         } catch(Autodesk.Revit.Exceptions.InvalidOperationException) {
             _messageBoxService.Show(
-                $"Окно плагина было открыто в другом документе Revit, который сейчас не активен, нельзя показать элемент.",
-                $"BIM",
+                _localization.GetLocalizedString("Errors.InactiveDocument"),
+                _localization.GetLocalizedString("OpeningTasks"),
                 System.Windows.MessageBoxButton.OK,
                 System.Windows.MessageBoxImage.Error,
                 System.Windows.MessageBoxResult.OK);
@@ -71,7 +74,7 @@ internal class ElementHighlighter {
         var doc = _view3D.Document;
         var filters = ParameterFilterInitializer.GetHighlightFilters(doc, _elementToHighlight);
         var graphicsSettings = GraphicSettingsInitializer.GetNotInterestingConstructionsGraphicSettings();
-        using var t = doc.StartTransaction("Выделение хоста отверстия");
+        using var t = doc.StartTransaction(_localization.GetLocalizedString("Transaction.HighlightHost"));
 
         foreach(var filter in filters) {
             if(_view3D.GetFilters().Contains(filter.Id)) {

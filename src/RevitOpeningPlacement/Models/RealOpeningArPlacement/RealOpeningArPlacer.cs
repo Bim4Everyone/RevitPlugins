@@ -6,6 +6,7 @@ using System.Text;
 using Autodesk.Revit.DB;
 
 using dosymep.Revit;
+using dosymep.SimpleServices;
 
 using RevitClashDetective.Models.Extensions;
 
@@ -22,6 +23,7 @@ namespace RevitOpeningPlacement.Models.RealOpeningArPlacement;
 /// </summary>
 internal class RealOpeningArPlacer {
     private readonly RevitRepository _revitRepository;
+    private readonly ILocalizationService _localization;
     private readonly OpeningRealsArConfig _config;
 
     public const string RealOpeningArDiameter = "ФОП_РАЗМ_Диаметр";
@@ -44,8 +46,9 @@ internal class RealOpeningArPlacer {
     /// </summary>
     /// <param name="revitRepository">Репозиторий активного АР документа ревита, в котором будет происходить размещение чистовых отверстий</param>
     /// <exception cref="ArgumentNullException">Исключение, если обязательный параметр null</exception>
-    public RealOpeningArPlacer(RevitRepository revitRepository) {
+    public RealOpeningArPlacer(RevitRepository revitRepository, ILocalizationService localization) {
         _revitRepository = revitRepository ?? throw new ArgumentNullException(nameof(revitRepository));
+        _localization = localization ?? throw new ArgumentNullException(nameof(localization));
         _config = OpeningRealsArConfig.GetOpeningConfig(_revitRepository.Doc);
     }
 
@@ -58,12 +61,14 @@ internal class RealOpeningArPlacer {
         var host = _revitRepository.PickHostForRealOpening();
         var openingTask = _revitRepository.PickSingleOpeningMepTaskIncoming();
 
-        using var transaction = _revitRepository.GetTransaction("Размещение одиночного отверстия");
+        using var transaction = _revitRepository.GetTransaction(
+            _localization.GetLocalizedString("Transaction.PlaceSingleOpening"));
         try {
             if(openingTask.IntersectsSolid(host.GetSolid(), host.GetBoundingBox())) {
                 PlaceByOneTask(host, openingTask);
             } else {
-                _revitRepository.ShowErrorMessage("Выбранное задание на отверстие не пересекается c выбранной основой");
+                _revitRepository.ShowErrorMessage(
+                    _localization.GetLocalizedString("Errors.TaskNotIntersectConstruction"));
                 throw new OperationCanceledException();
             }
         } catch(OpeningNotPlacedException e) {
@@ -84,12 +89,14 @@ internal class RealOpeningArPlacer {
 
         try {
             if(openingTasks.Count > 0) {
-                using var transaction = _revitRepository.GetTransaction("Размещение объединенного отверстия");
+                using var transaction = _revitRepository.GetTransaction(
+                    _localization.GetLocalizedString("Transaction.PlaceUnitedOpening"));
                 PlaceUnitedByManyTasks(host, openingTasks);
 
                 transaction.Commit();
             } else {
-                _revitRepository.ShowErrorMessage("Ни одно из выбранных заданий на отверстия не пересекается c выбранной основой");
+                _revitRepository.ShowErrorMessage(
+                    _localization.GetLocalizedString("Errors.TasksNotIntersectConstruction"));
                 throw new OperationCanceledException();
             }
         } catch(OpeningNotPlacedException e) {
@@ -107,22 +114,24 @@ internal class RealOpeningArPlacer {
         var host = _revitRepository.PickHostForRealOpening();
         var openingTasks = _revitRepository.PickManyOpeningMepTasksIncoming().Where(opening => opening.IntersectsSolid(host.GetSolid(), host.GetBoundingBox())).ToHashSet();
 
-        var sb = new StringBuilder();
-        using(var transaction = _revitRepository.GetTransaction("Одиночные отверстия в одном хосте")) {
+        string error = string.Empty;
+        using(var transaction = _revitRepository.GetTransaction(
+            _localization.GetLocalizedString("Transaction.PlaceSingleOpeningsInOneHost"))) {
             foreach(var openingTask in openingTasks) {
                 try {
                     PlaceByOneTask(host, openingTask);
 
                 } catch(OpeningNotPlacedException e) {
-                    sb.AppendLine($"Задание с ID: {openingTask.Id} из файла: \'{openingTask.FileName}\' не удалось принять. Информация об ошибке:");
-                    sb.AppendLine(e.Message);
-                    sb.AppendLine();
+                    error = _localization.GetLocalizedString("Errors.CannotAcceptTask",
+                        openingTask.Id,
+                        openingTask.FileName,
+                        e.Message);
                 }
             }
             transaction.Commit();
         }
-        if(sb.Length > 0) {
-            _revitRepository.ShowErrorMessage(sb.ToString());
+        if(!string.IsNullOrWhiteSpace(error)) {
+            _revitRepository.ShowErrorMessage(error);
         }
     }
 #pragma warning restore 0618
@@ -136,10 +145,11 @@ internal class RealOpeningArPlacer {
         var allOpeningTasks = _revitRepository.GetOpeningsMepTasksIncoming();
 
         var sb = new StringBuilder();
-        using(var transaction = _revitRepository.GetTransaction("Одиночные отверстия в нескольких хостах")) {
+        using(var transaction = _revitRepository.GetTransaction(
+            _localization.GetLocalizedString("Transaction.PlaceSingleOpeningsInManyHosts"))) {
             using(var progressBar = _revitRepository.GetProgressDialogService()) {
                 progressBar.StepValue = 1;
-                progressBar.DisplayTitleFormat = "Обработка конструкций... [{0}\\{1}]";
+                progressBar.DisplayTitleFormat = _localization.GetLocalizedString("Progress.ProcessConstructions");
                 var progress = progressBar.CreateProgress();
                 progressBar.MaxValue = hosts.Count();
                 var ct = progressBar.CreateCancellationToken();
@@ -151,16 +161,18 @@ internal class RealOpeningArPlacer {
 
                     ICollection<OpeningMepTaskIncoming> openingTasks = allOpeningTasks.Where(opening => opening.IntersectsSolid(host.GetSolid(), host.GetBoundingBox())).ToHashSet();
                     if(openingTasks.Count == 0) {
-                        sb.AppendLine($"Конструкция с ID: {host.Id} не пересекается ни с одним заданием");
+                        sb.AppendLine(_localization.GetLocalizedString("Errors.StructureNotIntersectTask", host.Id));
                     }
                     foreach(var openingTask in openingTasks) {
                         try {
                             PlaceByOneTask(host, openingTask);
 
                         } catch(OpeningNotPlacedException e) {
-                            sb.AppendLine($"Задание с ID: {openingTask.Id} из файла: \'{openingTask.FileName}\' не удалось принять. Информация об ошибке:");
-                            sb.AppendLine(e.Message);
-                            sb.AppendLine();
+                            sb.AppendLine(_localization.GetLocalizedString(
+                                "Errors.CannotAcceptTask",
+                                openingTask.Id,
+                                openingTask.FileName,
+                                e.Message));
                         }
                     }
 
