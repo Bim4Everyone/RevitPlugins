@@ -5,8 +5,6 @@ using System.Windows.Input;
 
 using Autodesk.Revit.DB;
 
-using DevExpress.XtraExport.Helpers;
-
 using dosymep.Bim4Everyone.SharedParams;
 using dosymep.SimpleServices;
 using dosymep.WPF.Commands;
