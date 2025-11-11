@@ -5,6 +5,7 @@
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
+    xmlns:s="clr-namespace:System;assembly=mscorlib"
     
     xmlns:core="clr-namespace:dosymep.WpfUI.Core"
     xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
@@ -20,12 +21,13 @@
     <UserControl.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
-                <ResourceDictionary
-                    Source="../CustomStyles.xaml" />
+                <ResourceDictionary Source="../CustomStyles.xaml" />
             </ResourceDictionary.MergedDictionaries>
+            
             <converters:NumberWithOffsetConverter
                 x:Key="columnContentWidthConverter"
                 Offset="-15" />
+            
             <ui:TextBlock
                 x:Key="GroupType"
                 Text="{me:LocalizationSource MainWindow.GroupType}" />
@@ -47,6 +49,8 @@
             <ui:TextBlock
                 x:Key="ThirdDispatcherGroupingLevel"
                 Text="{me:LocalizationSource MainWindow.ThirdDispatcherGroupingLevel}" />
+            
+            <s:Double x:Key="ColumnWidth">120</s:Double>
         </ResourceDictionary>
     </UserControl.Resources>
 
@@ -251,15 +255,13 @@
                 <DataGridTemplateColumn
                     x:Name="column1"
                     Header="{StaticResource GroupType}"
-                    Width="120">
+                    Width="Auto"
+                    MinWidth="{StaticResource ColumnWidth}">
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate>
                             <ui:TextBox
-                                Padding="2"
-                                MinWidth="{Binding ElementName=column1, Path=Width, 
-                                    Converter={StaticResource ResourceKey=columnContentWidthConverter}}"
-                                HorizontalAlignment="Center"
-                                VerticalContentAlignment="Center"
+                                Margin="3"
+                                Width="Auto"
                                 Text="{Binding Path=GroupType, UpdateSourceTrigger=PropertyChanged}" />
                         </DataTemplate>
                     </DataGridTemplateColumn.CellTemplate>
@@ -268,14 +270,13 @@
                 <DataGridTemplateColumn
                     Header="{StaticResource Level}"
                     x:Name="column2"
-                    Width="120">
+                    Width="Auto"
+                    MinWidth="{StaticResource ColumnWidth}">
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate>
                             <ComboBox
-                                MinWidth="{Binding ElementName=column2, Path=Width, 
-                                    Converter={StaticResource ResourceKey=columnContentWidthConverter}}"
-                                HorizontalAlignment="Center"
-                                VerticalContentAlignment="Center"
+                                Margin="3"
+                                HorizontalAlignment="Stretch"
                                 DisplayMemberPath="Name"
                                 ItemsSource="{Binding Path=DataContext.TasksVM.Levels, 
                                     RelativeSource={RelativeSource AncestorType={x:Type Window}}}"
@@ -288,15 +289,13 @@
                 <DataGridTemplateColumn
                     Header="{StaticResource LevelShortName}"
                     x:Name="column3"
-                    Width="120">
+                    Width="Auto"
+                    MinWidth="{StaticResource ColumnWidth}">
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate>
                             <TextBox
-                                Padding="2"
-                                MinWidth="{Binding ElementName=column3, Path=Width, 
-                                    Converter={StaticResource ResourceKey=columnContentWidthConverter}}"
-                                HorizontalAlignment="Center"
-                                VerticalContentAlignment="Center"
+                                Margin="3"
+                                Width="Auto"
                                 Text="{Binding Path=LevelShortName, UpdateSourceTrigger=PropertyChanged}" />
                         </DataTemplate>
                     </DataGridTemplateColumn.CellTemplate>
@@ -305,14 +304,13 @@
                 <DataGridTemplateColumn
                     Header="{StaticResource Phase}"
                     x:Name="column4"
-                    Width="120">
+                    Width="Auto"
+                    MinWidth="{StaticResource ColumnWidth}">
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate>
                             <ComboBox
-                                MinWidth="{Binding ElementName=column4, Path=Width, 
-                                    Converter={StaticResource ResourceKey=columnContentWidthConverter}}"
-                                HorizontalAlignment="Center"
-                                VerticalContentAlignment="Center"
+                                Margin="3"
+                                HorizontalAlignment="Stretch"
                                 DisplayMemberPath="Name"
                                 ItemsSource="{Binding Path=DataContext.TasksVM.Phases, 
                                     RelativeSource={RelativeSource AncestorType={x:Type Window}}}"
@@ -325,15 +323,13 @@
                 <DataGridTemplateColumn
                     Header="{StaticResource FirstDispatcherGroupingLevel}"
                     x:Name="column5"
-                    Width="120">
+                    Width="Auto"
+                    MinWidth="{StaticResource ColumnWidth}">
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate>
                             <TextBox
-                                Padding="2"
-                                MinWidth="{Binding ElementName=column5, Path=Width, 
-                                    Converter={StaticResource ResourceKey=columnContentWidthConverter}}"
-                                HorizontalAlignment="Center"
-                                VerticalContentAlignment="Center"
+                                Margin="3"
+                                Width="Auto"
                                 Text="{Binding Path=FirstDispatcherGroupingLevel,
                                     UpdateSourceTrigger=PropertyChanged}" />
                         </DataTemplate>
@@ -343,15 +339,13 @@
                 <DataGridTemplateColumn
                     Header="{StaticResource SecondDispatcherGroupingLevel}"
                     x:Name="column6"
-                    Width="120">
+                    Width="Auto"
+                    MinWidth="{StaticResource ColumnWidth}">
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate>
                             <TextBox
-                                Padding="2"
-                                MinWidth="{Binding ElementName=column6, Path=Width, 
-                                    Converter={StaticResource ResourceKey=columnContentWidthConverter}}"
-                                HorizontalAlignment="Center"
-                                VerticalContentAlignment="Center"
+                                Margin="3"
+                                Width="Auto"
                                 Text="{Binding Path=SecondDispatcherGroupingLevel,
                                     UpdateSourceTrigger=PropertyChanged}" />
                         </DataTemplate>
@@ -361,15 +355,13 @@
                 <DataGridTemplateColumn
                     Header="{StaticResource ThirdDispatcherGroupingLevel}"
                     x:Name="column7"
-                    Width="120">
+                    Width="Auto"
+                    MinWidth="{StaticResource ColumnWidth}">
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate>
                             <TextBox
-                                Padding="2"
-                                MinWidth="{Binding ElementName=column7, Path=Width, 
-                                    Converter={StaticResource ResourceKey=columnContentWidthConverter}}"
-                                HorizontalAlignment="Center"
-                                VerticalContentAlignment="Center"
+                                Margin="3"
+                                Width="Auto"
                                 Text="{Binding Path=ThirdDispatcherGroupingLevel,
                                     UpdateSourceTrigger=PropertyChanged}" />
                         </DataTemplate>
