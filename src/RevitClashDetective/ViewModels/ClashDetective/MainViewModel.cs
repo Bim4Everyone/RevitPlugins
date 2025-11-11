@@ -119,8 +119,7 @@ internal class MainViewModel : BaseViewModel {
     }
 
     private void InitializeChecks() {
-        AllChecks = new ObservableCollection<CheckViewModel>(InitializeChecks(_checksConfig).OrderBy(c => c.Name));
-        SetChecks(AllChecks);
+        SetAllChecks(InitializeChecks(_checksConfig).OrderBy(c => c.Name));
     }
 
     private IEnumerable<CheckViewModel> InitializeChecks(ChecksConfig config) {
@@ -144,7 +143,7 @@ internal class MainViewModel : BaseViewModel {
     }
 
     private void InitializeEmptyCheck() {
-        AllChecks = [
+        SetAllChecks([
             new CheckViewModel(_revitRepository,
             _localization,
             OpenFileDialogService,
@@ -152,8 +151,11 @@ internal class MainViewModel : BaseViewModel {
             MessageBoxService,
             _settingsConfig,
             _filtersConfig,
-            _contentDialogService)
-        ];
+            _contentDialogService)]);
+    }
+
+    private void SetAllChecks(IEnumerable<CheckViewModel> checks) {
+        AllChecks = [..checks];
         SetChecks(AllChecks);
     }
 
@@ -251,7 +253,7 @@ internal class MainViewModel : BaseViewModel {
 
         var newChecks = InitializeChecks(config).ToList();
         var nameResolver = new NameResolver<CheckViewModel>(AllChecks, newChecks);
-        AllChecks = new ObservableCollection<CheckViewModel>(nameResolver.GetCollection().OrderBy(c => c.Name));
+        SetAllChecks(nameResolver.GetCollection().OrderBy(c => c.Name));
         MessageText = _localization.GetLocalizedString("MainWindow.SuccessLoad");
         Wait(() => { MessageText = null; });
     }
