@@ -63,7 +63,7 @@ internal class RevitRepository : BaseViewModel {
     }
 
     public T GetElement<T>(ElementId elementId) where T : Element {
-        return (T) Document.GetElement(elementId);
+        return Document.GetElement(elementId) as T;
     }
 
     public IReadOnlyCollection<AnnotationSymbol> GetAnnotationSymbols() {
@@ -97,7 +97,11 @@ internal class RevitRepository : BaseViewModel {
     }
 
     public void DeleteElement(Element element) {
+        Transaction transaction = Document.StartTransaction("Remove element");
+        
         Document.Delete(element.Id);
+        
+        transaction.Commit();
     }
 
     private bool IsNeededAnnotationSymbol(FamilySymbol symbol, string typeName, string familyName) {

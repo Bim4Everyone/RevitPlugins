@@ -42,7 +42,10 @@ internal abstract class AnnotationService : IAnnotationService {
     /// <returns>Возвращает высотную отметку по идентификатору из параметра.</returns>
     /// <remarks>HACK: могут быть проблемы, если идентификатор будет больше int</remarks>
     protected ElementId GetSpotDimensionId(AnnotationSymbol annotation) {
-        int spotId = annotation.GetParamValueOrDefault<int>(_systemPluginConfig.SpotDimensionIdParamName);
+        int? spotId = annotation.GetParamValueOrDefault<int?>(_systemPluginConfig.SpotDimensionIdParamName);
+        if(spotId is null) {
+            return ElementId.InvalidElementId;
+        }
 
 #if REVIT_2023_OR_LESS
         return new ElementId(spotId);

@@ -44,7 +44,8 @@ internal abstract class AnnotationTemplate<T> : IAnnotationTemplate where T : An
     }
 
     private AnnotationSymbol CreateAnnotationSymbol(int levelCount, double levelHeightMm) {
-        var transaction = _revitRepository.StartTransaction("aaaaa");
+        var transaction = _revitRepository.StartTransaction("Create an annotation symbol");
+       
         var placePoint = SpotDimension.LeaderEndPosition;
 
         AnnotationSymbol annotationSymbol = _revitRepository.CreateAnnotationSymbol(
@@ -66,6 +67,7 @@ internal abstract class AnnotationTemplate<T> : IAnnotationTemplate where T : An
         annotationSymbol.SetParamValue(
             _systemPluginConfig.FirstLevelParamName,
             UnitUtils.ConvertFromInternalUnits(level, UnitTypeId.Meters));
+       
         transaction.Commit();
 
         return annotationSymbol;
@@ -73,7 +75,7 @@ internal abstract class AnnotationTemplate<T> : IAnnotationTemplate where T : An
     
     private void MirrorAnnotationSymbol(AnnotationSymbol annotationSymbol) {
         if(IsMirrored()) {
-            var transaction = _revitRepository.StartTransaction("aaaaa");
+            var transaction = _revitRepository.StartTransaction("Mirror an annotation symbol");
             
             _revitRepository.MirrorAnnotationSymbol(annotationSymbol, SpotDimension.View.RightDirection);
             

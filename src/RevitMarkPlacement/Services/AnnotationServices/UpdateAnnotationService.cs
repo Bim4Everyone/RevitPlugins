@@ -18,21 +18,36 @@ internal sealed class UpdateAnnotationService : AnnotationService {
 
     protected override IEnumerable<IAnnotationTemplate> LoadAnnotationsImpl(ICollection<SpotDimension> spotDimensions) {
         if(spotDimensions.Count == 0) {
-            return _revitRepository.GetAnnotationSymbols()
-                .Select(item => new UpdateAnnotationTemplate(
-                    GetSpotDimension(item),
-                    item,
-                    _revitRepository,
-                    _systemPluginConfig))
-                .ToArray();
+            return GetAllAnnotationTemplates().ToArray();
         }
 
         return SelectedAnnotationTemplates(spotDimensions);
     }
 
+    private IEnumerable<IAnnotationTemplate> GetAllAnnotationTemplates() {
+        foreach(var annotationSymbol in _revitRepository.GetAnnotationSymbols()) {
+            SpotDimension spotDimension = GetSpotDimension(annotationSymbol);
+            if(spotDimension is null) {
+                _revitRepository.DeleteElement(annotationSymbol);
+                continue;
+            }
+
+            yield return new UpdateAnnotationTemplate(
+                spotDimension,
+                annotationSymbol,
+                _revitRepository,
+                _systemPluginConfig);
+        }
+    }
+
     private IEnumerable<IAnnotationTemplate> SelectedAnnotationTemplates(ICollection<SpotDimension> spotDimensions) {
         foreach(var annotationSymbol in _revitRepository.GetAnnotationSymbols()) {
             SpotDimension spotDimension = GetSpotDimension(annotationSymbol);
+            if(spotDimension is null) {
+                _revitRepository.DeleteElement(annotationSymbol);
+                continue;
+            }
+
             if(spotDimensions.Contains(spotDimension, _spotDimensionComparer)) {
                 yield return new UpdateAnnotationTemplate(
                     spotDimension,

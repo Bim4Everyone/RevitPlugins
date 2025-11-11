@@ -101,7 +101,7 @@ public class UpdateAnnotationsCommand : BasePluginCommand {
         var revitRepository = kernel.Get<RevitRepository>();
         var localizationService = kernel.Get<ILocalizationService>();
 
-        using Transaction transaction = revitRepository.StartTransaction(
+        using TransactionGroup transaction = revitRepository.StartTransactionGroup(
             localizationService.GetLocalizedString("MainWindow.UpdateAnnotationsTransactionName"));
         
         SpotDimension[] spotDimensions = spotDimensionSelection
@@ -111,7 +111,7 @@ public class UpdateAnnotationsCommand : BasePluginCommand {
         service.LoadAnnotations(spotDimensions);
         service.ProcessAnnotations(new UpdateAnnotationTemplateOptions());
         
-        transaction.Commit();
+        transaction.Assimilate();
 
         // var viewModel = kernel.Get<MainViewModel>();
         // if(!viewModel.CanPlaceAnnotation()) {
