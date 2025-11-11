@@ -11,6 +11,7 @@
     xmlns:me="clr-namespace:dosymep.WpfCore.MarkupExtensions;assembly=dosymep.WpfCore"
     xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
     xmlns:wpfbehaviors="clr-namespace:dosymep.WpfCore.Behaviors;assembly=dosymep.WpfCore"
+    xmlns:res="clr-namespace:RevitClashDetective.Resources"
     mc:Ignorable="d"
     Height="600"
     Width="1000"
@@ -25,14 +26,9 @@
             AttachableService="{Binding OpenFileDialogService}" />
         <wpfbehaviors:WpfAttachServiceBehavior
             AttachableService="{Binding SaveFileDialogService}" />
+        <res:WindowClosingBehavior
+            Handler="{Binding}" />
     </i:Interaction.Behaviors>
-    <i:Interaction.Triggers>
-        <i:EventTrigger
-            EventName="Closing">
-            <i:InvokeCommandAction
-                Command="{Binding AskForSaveCommand}" />
-        </i:EventTrigger>
-    </i:Interaction.Triggers>
 
     <core:WpfUIPlatformWindow.Resources>
         <ResourceDictionary>

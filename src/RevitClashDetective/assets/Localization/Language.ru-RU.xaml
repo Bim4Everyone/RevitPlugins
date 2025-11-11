@@ -212,6 +212,8 @@
     <system:String
         x:Key="Navigator.SavePrompt">Сохранить отчеты о коллизиях?</system:String>
     <system:String
+        x:Key="Navigator.CannotSavePrompt">Нельзя сохранить текущую конфигурацию, закрыть окно без сохранения?</system:String>
+    <system:String
         x:Key="Navigator.SuccessSave">Файл успешно сохранен</system:String>
     <system:String
         x:Key="Navigator.SuccessLoad">Файл успешно загружен</system:String>

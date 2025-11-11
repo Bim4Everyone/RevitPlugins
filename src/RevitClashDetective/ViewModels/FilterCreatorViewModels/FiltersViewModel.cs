@@ -19,12 +19,14 @@ using Ninject.Syntax;
 
 using RevitClashDetective.Models;
 using RevitClashDetective.Models.FilterModel;
+using RevitClashDetective.Resources;
 using RevitClashDetective.ViewModels.SearchSet;
 using RevitClashDetective.ViewModels.Services;
 using RevitClashDetective.Views;
 
 namespace RevitClashDetective.ViewModels.FilterCreatorViewModels;
-internal class FiltersViewModel : BaseViewModel {
+
+internal class FiltersViewModel : BaseViewModel, IWindowClosingHandler {
     private readonly RevitRepository _revitRepository;
     private readonly ILocalizationService _localization;
     private readonly IResolutionRoot _resolutionRoot;
@@ -63,7 +65,6 @@ internal class FiltersViewModel : BaseViewModel {
         SaveAsCommand = RelayCommand.Create(SaveAs, CanSave);
         LoadCommand = RelayCommand.Create(Load);
         CheckSearchSetCommand = RelayCommand.Create(CheckSearchSet, CanSave);
-        AskForSaveCommand = RelayCommand.Create(AskForSave);
 
         SelectedFilter = Filters.FirstOrDefault();
         SelectedFilter?.InitializeFilter();
@@ -81,7 +82,6 @@ internal class FiltersViewModel : BaseViewModel {
         set => RaiseAndSetIfChanged(ref _messageText, value);
     }
 
-    public ICommand AskForSaveCommand { get; }
     public ICommand CreateCommand { get; }
     public ICommand CopyCommand { get; }
     public ICommand DeleteCommand { get; }
@@ -264,18 +264,6 @@ internal class FiltersViewModel : BaseViewModel {
         view.Show();
     }
 
-    private void AskForSave() {
-        if(SaveCommand.CanExecute(default)
-           && MessageBoxService.Show(
-               _localization.GetLocalizedString("Navigator.SavePrompt"),
-               _localization.GetLocalizedString("BIM"),
-               MessageBoxButton.YesNo,
-               MessageBoxImage.Question)
-           == MessageBoxResult.Yes) {
-            SaveCommand.Execute(default);
-        }
-    }
-
     private void InitializeTimer() {
         _timer = new DispatcherTimer {
             Interval = new TimeSpan(0, 0, 0, 3)
@@ -285,5 +273,25 @@ internal class FiltersViewModel : BaseViewModel {
 
     private void RefreshMessage() {
         _timer.Start();
+    }
+
+    public void OnWindowClosing(CancelEventArgs e) {
+        if(SaveCommand.CanExecute(default)
+           && MessageBoxService.Show(
+               _localization.GetLocalizedString("Navigator.SavePrompt"),
+               _localization.GetLocalizedString("BIM"),
+               MessageBoxButton.YesNo,
+               MessageBoxImage.Question)
+           == MessageBoxResult.Yes) {
+            SaveCommand.Execute(default);
+        } else if(!SaveCommand.CanExecute(default)
+                  && MessageBoxService.Show(
+                      _localization.GetLocalizedString("Navigator.CannotSavePrompt"),
+                      _localization.GetLocalizedString("BIM"),
+                      MessageBoxButton.OKCancel,
+                      MessageBoxImage.Warning)
+                  == MessageBoxResult.Cancel) {
+            e.Cancel = true;
+        }
     }
 }

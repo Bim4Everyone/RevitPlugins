@@ -212,6 +212,8 @@
     <system:String
         x:Key="Navigator.SavePrompt">Save clash reports?</system:String>
     <system:String
+        x:Key="Navigator.CannotSavePrompt">Unable to save current configuration, close window without saving?</system:String>
+    <system:String
         x:Key="Navigator.SuccessSave">File successfully saved</system:String>
     <system:String
         x:Key="Navigator.SuccessLoad">File successfully loaded</system:String>
