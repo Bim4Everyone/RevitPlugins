@@ -18,7 +18,15 @@
     d:DataContext="{d:DesignInstance Type=vms:MainViewModel}">
 
     <UserControl.Resources>
-        <converters:NumberWithOffsetConverter x:Key="columnContentWidthConverter" Offset="-15" />
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary
+                    Source="../CustomStyles.xaml" />
+            </ResourceDictionary.MergedDictionaries>
+            <converters:NumberWithOffsetConverter
+                x:Key="columnContentWidthConverter"
+                Offset="-15" />
+        </ResourceDictionary>
     </UserControl.Resources>
 
     <Grid>
@@ -76,8 +84,7 @@
                 <TextBox
                     Margin="15 5 5 5"
                     Padding="2"
-                    Width="{Binding ElementName=column1, Path=Width, 
-                        Converter={StaticResource ResourceKey=columnContentWidthConverter}}"
+                    MinWidth="120"
                     VerticalAlignment="Center"
                     HorizontalAlignment="Left"
                     Text="{Binding Path=TasksVM.GeneralGroupType, UpdateSourceTrigger=PropertyChanged}">
@@ -93,8 +100,7 @@
 
                 <ComboBox
                     Margin="8 8"
-                    Width="{Binding ElementName=column2, Path=Width, 
-                        Converter={StaticResource ResourceKey=columnContentWidthConverter}}"
+                    MinWidth="120"
                     VerticalContentAlignment="Center"
                     HorizontalAlignment="Center"
                     DisplayMemberPath="Name"
@@ -113,8 +119,7 @@
                 <TextBox
                     Margin="8 5"
                     Padding="2"
-                    Width="{Binding ElementName=column3, Path=Width, 
-                        Converter={StaticResource ResourceKey=columnContentWidthConverter}}"
+                    MinWidth="120"
                     VerticalAlignment="Center"
                     HorizontalAlignment="Left"
                     Text="{Binding Path=TasksVM.GeneralLevelShortName, UpdateSourceTrigger=PropertyChanged}">
@@ -130,8 +135,7 @@
 
                 <ComboBox
                     Margin="8 8"
-                    Width="{Binding ElementName=column4, Path=Width, 
-                        Converter={StaticResource ResourceKey=columnContentWidthConverter}}"
+                    MinWidth="120"
                     VerticalContentAlignment="Center"
                     HorizontalAlignment="Center"
                     DisplayMemberPath="Name"
@@ -150,8 +154,7 @@
                 <TextBox
                     Margin="8 5"
                     Padding="2"
-                    Width="{Binding ElementName=column5, Path=Width, 
-                        Converter={StaticResource ResourceKey=columnContentWidthConverter}}"
+                    MinWidth="120"
                     VerticalAlignment="Center"
                     HorizontalAlignment="Left"
                     Text="{Binding Path=TasksVM.GeneralFirstDispatcherGroupingLevel, 
@@ -169,8 +172,7 @@
                 <TextBox
                     Margin="8 5"
                     Padding="2"
-                    Width="{Binding ElementName=column6, Path=Width, 
-                        Converter={StaticResource ResourceKey=columnContentWidthConverter}}"
+                    MinWidth="120"
                     VerticalAlignment="Center"
                     HorizontalAlignment="Left"
                     Text="{Binding Path=TasksVM.GeneralSecondDispatcherGroupingLevel, 
@@ -188,8 +190,7 @@
                 <TextBox
                     Margin="8 5"
                     Padding="2"
-                    Width="{Binding ElementName=column7, Path=Width, 
-                        Converter={StaticResource ResourceKey=columnContentWidthConverter}}"
+                    MinWidth="120"
                     VerticalAlignment="Center"
                     HorizontalAlignment="Left"
                     Text="{Binding Path=TasksVM.GeneralThirdDispatcherGroupingLevel, 
@@ -212,144 +213,148 @@
             VerticalAlignment="Bottom"
             Text="{me:LocalizationSource MainWindow.TaskRows}" />
 
-        <ListView
+        <ui:DataGrid
             Grid.Row="4"
             Margin="5"
             ScrollViewer.VerticalScrollBarVisibility="Visible"
             ScrollViewer.CanContentScroll="False"
             ItemsSource="{Binding Path=TasksVM.TasksForWork, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
             SelectedItem="{Binding Path=TasksVM.SelectedTask, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
-            SelectionMode="Single">
+            SelectionMode="Single"
+            AutoGenerateColumns="False"
+            Style="{StaticResource CustomResizableDataGridStyle}"
+            RowStyle="{x:Null}"
+            GridLinesVisibility="All">
 
-            <ListView.View>
-                <GridView>
-                    <GridViewColumn
-                        x:Name="column1"
-                        Header="{DynamicResource MainWindow.GroupType}"
-                        Width="120">
-                        <GridViewColumn.CellTemplate>
-                            <DataTemplate>
-                                <TextBox
-                                    Padding="2"
-                                    Width="{Binding ElementName=column1, Path=Width, 
-                                        Converter={StaticResource ResourceKey=columnContentWidthConverter}}"
-                                    HorizontalAlignment="Center"
-                                    VerticalContentAlignment="Center"
-                                    Text="{Binding Path=GroupType, UpdateSourceTrigger=PropertyChanged}" />
-                            </DataTemplate>
-                        </GridViewColumn.CellTemplate>
-                    </GridViewColumn>
+            <DataGrid.Columns>
+                <DataGridTemplateColumn
+                    x:Name="column1"
+                    Header="{DynamicResource MainWindow.GroupType}"
+                    Width="120">
+                    <DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate>
+                            <ui:TextBox
+                                Padding="2"
+                                MinWidth="{Binding ElementName=column1, Path=Width, 
+                                    Converter={StaticResource ResourceKey=columnContentWidthConverter}}"
+                                HorizontalAlignment="Center"
+                                VerticalContentAlignment="Center"
+                                Text="{Binding Path=GroupType, UpdateSourceTrigger=PropertyChanged}" />
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                </DataGridTemplateColumn>
 
-                    <GridViewColumn
-                        Header="{DynamicResource MainWindow.Level}"
-                        x:Name="column2"
-                        Width="120">
-                        <GridViewColumn.CellTemplate>
-                            <DataTemplate>
-                                <ComboBox
-                                    Width="{Binding ElementName=column2, Path=Width, 
-                                        Converter={StaticResource ResourceKey=columnContentWidthConverter}}"
-                                    HorizontalAlignment="Center"
-                                    VerticalContentAlignment="Center"
-                                    DisplayMemberPath="Name"
-                                    ItemsSource="{Binding Path=DataContext.TasksVM.Levels, 
-                                        RelativeSource={RelativeSource AncestorType={x:Type Window}}}"
-                                    SelectedItem="{Binding Path=Level}">
-                                </ComboBox>
-                            </DataTemplate>
-                        </GridViewColumn.CellTemplate>
-                    </GridViewColumn>
+                <DataGridTemplateColumn
+                    Header="{DynamicResource MainWindow.Level}"
+                    x:Name="column2"
+                    Width="120">
+                    <DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate>
+                            <ComboBox
+                                MinWidth="{Binding ElementName=column2, Path=Width, 
+                                    Converter={StaticResource ResourceKey=columnContentWidthConverter}}"
+                                HorizontalAlignment="Center"
+                                VerticalContentAlignment="Center"
+                                DisplayMemberPath="Name"
+                                ItemsSource="{Binding Path=DataContext.TasksVM.Levels, 
+                                    RelativeSource={RelativeSource AncestorType={x:Type Window}}}"
+                                SelectedItem="{Binding Path=Level}" >
+                            </ComboBox>
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                </DataGridTemplateColumn>
 
-                    <GridViewColumn
-                        Header="{DynamicResource MainWindow.LevelShortName}"
-                        x:Name="column3"
-                        Width="120">
-                        <GridViewColumn.CellTemplate>
-                            <DataTemplate>
-                                <TextBox
-                                    Padding="2"
-                                    Width="{Binding ElementName=column3, Path=Width, 
-                                        Converter={StaticResource ResourceKey=columnContentWidthConverter}}"
-                                    HorizontalAlignment="Center"
-                                    VerticalContentAlignment="Center"
-                                    Text="{Binding Path=LevelShortName, UpdateSourceTrigger=PropertyChanged}" />
-                            </DataTemplate>
-                        </GridViewColumn.CellTemplate>
-                    </GridViewColumn>
+                <DataGridTemplateColumn
+                    Header="{DynamicResource MainWindow.LevelShortName}"
+                    x:Name="column3"
+                    Width="120">
+                    <DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate>
+                            <TextBox
+                                Padding="2"
+                                MinWidth="{Binding ElementName=column3, Path=Width, 
+                                    Converter={StaticResource ResourceKey=columnContentWidthConverter}}"
+                                HorizontalAlignment="Center"
+                                VerticalContentAlignment="Center"
+                                Text="{Binding Path=LevelShortName, UpdateSourceTrigger=PropertyChanged}" />
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                </DataGridTemplateColumn>
 
-                    <GridViewColumn
-                        Header="{DynamicResource MainWindow.Phase}"
-                        x:Name="column4"
-                        Width="120">
-                        <GridViewColumn.CellTemplate>
-                            <DataTemplate>
-                                <ComboBox
-                                    Width="{Binding ElementName=column4, Path=Width, 
-                                        Converter={StaticResource ResourceKey=columnContentWidthConverter}}"
-                                    HorizontalAlignment="Center"
-                                    VerticalContentAlignment="Center"
-                                    DisplayMemberPath="Name"
-                                    ItemsSource="{Binding Path=DataContext.TasksVM.Phases, 
-                                        RelativeSource={RelativeSource AncestorType={x:Type Window}}}"
-                                    SelectedItem="{Binding Path=Phase}">
-                                </ComboBox>
-                            </DataTemplate>
-                        </GridViewColumn.CellTemplate>
-                    </GridViewColumn>
+                <DataGridTemplateColumn
+                    Header="{DynamicResource MainWindow.Phase}"
+                    x:Name="column4"
+                    Width="120">
+                    <DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate>
+                            <ComboBox
+                                MinWidth="{Binding ElementName=column4, Path=Width, 
+                                    Converter={StaticResource ResourceKey=columnContentWidthConverter}}"
+                                HorizontalAlignment="Center"
+                                VerticalContentAlignment="Center"
+                                DisplayMemberPath="Name"
+                                ItemsSource="{Binding Path=DataContext.TasksVM.Phases, 
+                                    RelativeSource={RelativeSource AncestorType={x:Type Window}}}"
+                                SelectedItem="{Binding Path=Phase}">
+                            </ComboBox>
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                </DataGridTemplateColumn>
 
-                    <GridViewColumn
-                        Header="{DynamicResource MainWindow.FirstDispatcherGroupingLevel}"
-                        x:Name="column5"
-                        Width="120">
-                        <GridViewColumn.CellTemplate>
-                            <DataTemplate>
-                                <TextBox
-                                    Padding="2"
-                                    Width="{Binding ElementName=column5, Path=Width, 
-                                        Converter={StaticResource ResourceKey=columnContentWidthConverter}}"
-                                    HorizontalAlignment="Center"
-                                    VerticalContentAlignment="Center"
-                                    Text="{Binding Path=FirstDispatcherGroupingLevel,
-                                        UpdateSourceTrigger=PropertyChanged}" />
-                            </DataTemplate>
-                        </GridViewColumn.CellTemplate>
-                    </GridViewColumn>
-
-                    <GridViewColumn
-                        Header="{DynamicResource MainWindow.SecondDispatcherGroupingLevel}"
-                        x:Name="column6"
-                        Width="120">
-                        <GridViewColumn.CellTemplate>
-                            <DataTemplate>
-                                <TextBox
-                                    Padding="2"
-                                    Width="{Binding ElementName=column6, Path=Width, 
-                                        Converter={StaticResource ResourceKey=columnContentWidthConverter}}"
-                                    HorizontalAlignment="Center"
-                                    VerticalContentAlignment="Center"
-                                    Text="{Binding Path=SecondDispatcherGroupingLevel, UpdateSourceTrigger=PropertyChanged}" />
-                            </DataTemplate>
-                        </GridViewColumn.CellTemplate>
-                    </GridViewColumn>
-
-                    <GridViewColumn
-                        Header="{DynamicResource MainWindow.ThirdDispatcherGroupingLevel}"
-                        x:Name="column7"
-                        Width="120">
-                        <GridViewColumn.CellTemplate>
-                            <DataTemplate>
-                                <TextBox
-                                    Padding="2"
-                                    Width="{Binding ElementName=column7, Path=Width, 
-                                        Converter={StaticResource ResourceKey=columnContentWidthConverter}}"
-                                    HorizontalAlignment="Center"
-                                    VerticalContentAlignment="Center"
-                                    Text="{Binding Path=ThirdDispatcherGroupingLevel, UpdateSourceTrigger=PropertyChanged}" />
-                            </DataTemplate>
-                        </GridViewColumn.CellTemplate>
-                    </GridViewColumn>
-                </GridView>
-            </ListView.View>
-        </ListView>
+                <DataGridTemplateColumn
+                    Header="{DynamicResource MainWindow.FirstDispatcherGroupingLevel}"
+                    x:Name="column5"
+                    Width="120">
+                    <DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate>
+                            <TextBox
+                                Padding="2"
+                                MinWidth="{Binding ElementName=column5, Path=Width, 
+                                    Converter={StaticResource ResourceKey=columnContentWidthConverter}}"
+                                HorizontalAlignment="Center"
+                                VerticalContentAlignment="Center"
+                                Text="{Binding Path=FirstDispatcherGroupingLevel,
+                                    UpdateSourceTrigger=PropertyChanged}" />
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                </DataGridTemplateColumn>
+                
+                <DataGridTemplateColumn
+                    Header="{DynamicResource MainWindow.SecondDispatcherGroupingLevel}"
+                    x:Name="column6"
+                    Width="120">
+                    <DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate>
+                            <TextBox
+                                Padding="2"
+                                MinWidth="{Binding ElementName=column6, Path=Width, 
+                                    Converter={StaticResource ResourceKey=columnContentWidthConverter}}"
+                                HorizontalAlignment="Center"
+                                VerticalContentAlignment="Center"
+                                Text="{Binding Path=SecondDispatcherGroupingLevel,
+                                    UpdateSourceTrigger=PropertyChanged}" />
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                </DataGridTemplateColumn>
+                
+                <DataGridTemplateColumn
+                    Header="{DynamicResource MainWindow.ThirdDispatcherGroupingLevel}"
+                    x:Name="column7"
+                    Width="120">
+                    <DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate>
+                            <TextBox
+                                Padding="2"
+                                MinWidth="{Binding ElementName=column7, Path=Width, 
+                                    Converter={StaticResource ResourceKey=columnContentWidthConverter}}"
+                                HorizontalAlignment="Center"
+                                VerticalContentAlignment="Center"
+                                Text="{Binding Path=ThirdDispatcherGroupingLevel,
+                                    UpdateSourceTrigger=PropertyChanged}" />
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                </DataGridTemplateColumn>
+            </DataGrid.Columns>
+        </ui:DataGrid>
     </Grid>
 </UserControl>
