@@ -126,6 +126,8 @@
     <system:String
         x:Key="FilterCreation.DeleteSearchSet">Удалить поисковый набор</system:String>
     <system:String
+        x:Key="FilterCreation.CopySearchSet">Копировать поисковый набор</system:String>
+    <system:String
         x:Key="FilterCreation.Save">Сохранить</system:String>
     <system:String
         x:Key="FilterCreation.SaveAs">Сохранить как</system:String>
@@ -138,7 +140,7 @@
     <system:String
         x:Key="FilterCreation.CheckSetButtonTooltip">Проверить поисковый набор</system:String>
     <system:String
-        x:Key="FilterCreation.DeleteFilterPrompt">Удалить фильтр "{0}"?</system:String>
+        x:Key="FilterCreation.DeleteFilterPrompt">Удалить фильтры "{0}"?</system:String>
     <system:String
         x:Key="FilterCreation.SuccessSave">Поисковые наборы успешно сохранены</system:String>
     <system:String
