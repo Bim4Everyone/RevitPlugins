@@ -199,9 +199,9 @@
     <system:String
         x:Key="MainWindow.Validation.NamesDuplicated">У проверок должны быть разные имена.</system:String>
     <system:String
-        x:Key="MainWindow.Validation.EmptyFilterInCheck">У проверки "{0}" необходимо выбрать хотя бы один поисковый набор.</system:String>
+        x:Key="MainWindow.Validation.EmptyFilterInCheck">У проверки "{0}" не заданы поисковые наборы.</system:String>
     <system:String
-        x:Key="MainWindow.Validation.EmptyFileInCheck">У проверки "{0}" необходимо выбрать хотя бы один файл.</system:String>
+        x:Key="MainWindow.Validation.EmptyFileInCheck">У проверки "{0}" не заданы файлы.</system:String>
     <system:String
         x:Key="MainWindow.Validation.SelectAnyCheck">Для поиска коллизий должна быть выбрана хотя бы одна проверка.</system:String>
 

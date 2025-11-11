@@ -199,9 +199,9 @@
     <system:String
         x:Key="MainWindow.Validation.NamesDuplicated">Checks must have different names.</system:String>
     <system:String
-        x:Key="MainWindow.Validation.EmptyFilterInCheck">Check "{0}" must contain at least one search set.</system:String>
+        x:Key="MainWindow.Validation.EmptyFilterInCheck">Check "{0}" doesn't specify any search set.</system:String>
     <system:String
-        x:Key="MainWindow.Validation.EmptyFileInCheck">Check "{0}" must contain at least one file.</system:String>
+        x:Key="MainWindow.Validation.EmptyFileInCheck">Check "{0}" doesn't specify any file.</system:String>
     <system:String
         x:Key="MainWindow.Validation.SelectAnyCheck">At least one check must be selected for clash detection.</system:String>
 

@@ -267,22 +267,24 @@ internal class MainViewModel : BaseViewModel {
             ErrorText = _localization.GetLocalizedString("MainWindow.Validation.NamesDuplicated");
             return false;
         }
-        var emptyCheck = AllChecks.FirstOrDefault(item => !item.IsFilterSelected);
+
+        var selectedChecks = AllChecks.Where(item => item.IsSelected).ToArray();
+        if(selectedChecks.Length == 0) {
+            ErrorText = _localization.GetLocalizedString("MainWindow.Validation.SelectAnyCheck");
+            return false;
+        }
+
+        var emptyCheck = selectedChecks.FirstOrDefault(item => !item.IsFilterSelected);
         if(emptyCheck != null) {
             ErrorText = _localization.GetLocalizedString("MainWindow.Validation.EmptyFilterInCheck", emptyCheck.Name);
             return false;
         }
 
-        emptyCheck = AllChecks.FirstOrDefault(item => !item.IsFilesSelected);
+        emptyCheck = selectedChecks.FirstOrDefault(item => !item.IsFilesSelected);
         if(emptyCheck != null) {
             ErrorText = _localization.GetLocalizedString("MainWindow.Validation.EmptyFileInCheck", emptyCheck.Name);
             return false;
         }
-        if(AllChecks.All(item => !item.IsSelected)) {
-            ErrorText = _localization.GetLocalizedString("MainWindow.Validation.SelectAnyCheck");
-            return false;
-        }
-
         ErrorText = null;
         return true;
     }
