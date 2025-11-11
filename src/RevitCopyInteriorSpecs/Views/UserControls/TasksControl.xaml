@@ -50,7 +50,7 @@
                 x:Key="ThirdDispatcherGroupingLevel"
                 Text="{me:LocalizationSource MainWindow.ThirdDispatcherGroupingLevel}" />
             
-            <s:Double x:Key="ColumnWidth">120</s:Double>
+            <s:Double x:Key="ColumnWidth">150</s:Double>
         </ResourceDictionary>
     </UserControl.Resources>
 
@@ -106,10 +106,10 @@
             HorizontalScrollBarVisibility="Auto">
             <StackPanel
                 Orientation="Horizontal">
-                <TextBox
+                <ui:TextBox
                     Margin="15 5 5 5"
                     Padding="2"
-                    MinWidth="120"
+                    MinWidth="{Binding ElementName=column1, Path=ActualWidth, Converter={StaticResource ResourceKey=columnContentWidthConverter}}"
                     VerticalAlignment="Center"
                     HorizontalAlignment="Left"
                     Text="{Binding Path=TasksVM.GeneralGroupType, UpdateSourceTrigger=PropertyChanged}">
@@ -121,13 +121,12 @@
                                 Command="{Binding TasksVM.GeneralGroupTypeChangedCommand}" />
                         </i:EventTrigger>
                     </i:Interaction.Triggers>
-                </TextBox>
+                </ui:TextBox>
 
                 <ComboBox
                     Margin="8 8"
-                    MinWidth="120"
-                    VerticalContentAlignment="Center"
-                    HorizontalAlignment="Center"
+                    Width="{Binding ElementName=column2, Path=ActualWidth, 
+                            Converter={StaticResource ResourceKey=columnContentWidthConverter}}"
                     DisplayMemberPath="Name"
                     ItemsSource="{Binding Path=TasksVM.Levels, UpdateSourceTrigger=PropertyChanged}"
                     SelectedItem="{Binding Path=TasksVM.GeneralLevel, UpdateSourceTrigger=PropertyChanged}">
@@ -141,10 +140,11 @@
                     </i:Interaction.Triggers>
                 </ComboBox>
 
-                <TextBox
+                <ui:TextBox
                     Margin="8 5"
                     Padding="2"
-                    MinWidth="120"
+                    MinWidth="{Binding ElementName=column3, Path=ActualWidth, 
+                            Converter={StaticResource ResourceKey=columnContentWidthConverter}}"
                     VerticalAlignment="Center"
                     HorizontalAlignment="Left"
                     Text="{Binding Path=TasksVM.GeneralLevelShortName, UpdateSourceTrigger=PropertyChanged}">
@@ -156,13 +156,12 @@
                                 Command="{Binding TasksVM.GeneralLevelShortNameChangedCommand}" />
                         </i:EventTrigger>
                     </i:Interaction.Triggers>
-                </TextBox>
+                </ui:TextBox>
 
                 <ComboBox
                     Margin="8 8"
-                    MinWidth="120"
-                    VerticalContentAlignment="Center"
-                    HorizontalAlignment="Center"
+                    Width="{Binding ElementName=column4, Path=ActualWidth, 
+                            Converter={StaticResource ResourceKey=columnContentWidthConverter}}"
                     DisplayMemberPath="Name"
                     ItemsSource="{Binding Path=TasksVM.Phases, UpdateSourceTrigger=PropertyChanged}"
                     SelectedItem="{Binding Path=TasksVM.GeneralPhase, UpdateSourceTrigger=PropertyChanged}">
@@ -176,10 +175,11 @@
                     </i:Interaction.Triggers>
                 </ComboBox>
 
-                <TextBox
+                <ui:TextBox
                     Margin="8 5"
                     Padding="2"
-                    MinWidth="120"
+                    MinWidth="{Binding ElementName=column5, Path=ActualWidth, 
+                            Converter={StaticResource ResourceKey=columnContentWidthConverter}}"
                     VerticalAlignment="Center"
                     HorizontalAlignment="Left"
                     Text="{Binding Path=TasksVM.GeneralFirstDispatcherGroupingLevel, 
@@ -192,12 +192,13 @@
                                 Command="{Binding TasksVM.GeneralFirstDispatcherGroupingLevelChangedCommand}" />
                         </i:EventTrigger>
                     </i:Interaction.Triggers>
-                </TextBox>
+                </ui:TextBox>
 
-                <TextBox
+                <ui:TextBox
                     Margin="8 5"
                     Padding="2"
-                    MinWidth="120"
+                    MinWidth="{Binding ElementName=column6, Path=ActualWidth, 
+                            Converter={StaticResource ResourceKey=columnContentWidthConverter}}"
                     VerticalAlignment="Center"
                     HorizontalAlignment="Left"
                     Text="{Binding Path=TasksVM.GeneralSecondDispatcherGroupingLevel, 
@@ -210,12 +211,13 @@
                                 Command="{Binding TasksVM.GeneralSecondDispatcherGroupingLevelChangedCommand}" />
                         </i:EventTrigger>
                     </i:Interaction.Triggers>
-                </TextBox>
+                </ui:TextBox>
 
-                <TextBox
+                <ui:TextBox
                     Margin="8 5"
                     Padding="2"
-                    MinWidth="120"
+                    MinWidth="{Binding ElementName=column7, Path=ActualWidth, 
+                            Converter={StaticResource ResourceKey=columnContentWidthConverter}}"
                     VerticalAlignment="Center"
                     HorizontalAlignment="Left"
                     Text="{Binding Path=TasksVM.GeneralThirdDispatcherGroupingLevel, 
@@ -228,7 +230,7 @@
                                 Command="{Binding TasksVM.GeneralThirdDispatcherGroupingLevelChangedCommand}" />
                         </i:EventTrigger>
                     </i:Interaction.Triggers>
-                </TextBox>
+                </ui:TextBox>
             </StackPanel>
         </ScrollViewer>
 
@@ -248,7 +250,6 @@
             SelectionMode="Single"
             AutoGenerateColumns="False"
             Style="{StaticResource CustomResizableDataGridStyle}"
-            RowStyle="{x:Null}"
             GridLinesVisibility="All">
 
             <DataGrid.Columns>

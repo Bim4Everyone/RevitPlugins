@@ -19,8 +19,8 @@
     mc:Ignorable="d"
     WindowStartupLocation="CenterOwner"
     
-    Height="500" Width="920"
-    MinHeight="450" MinWidth="700"
+    Height="500" Width="1200"
+    MinHeight="500" MinWidth="1200"
     d:DataContext="{d:DesignInstance vms:MainViewModel, IsDesignTimeCreatable=False}"
     PreviewMouseDown="WindowPreviewMouseDown">
 
