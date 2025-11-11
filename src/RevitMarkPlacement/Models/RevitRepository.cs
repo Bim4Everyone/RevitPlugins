@@ -91,8 +91,7 @@ internal class RevitRepository : BaseViewModel {
         if(annotationSymbol.Location is LocationPoint point
            && ElementTransformUtils.CanMirrorElement(Document, annotationSymbol.Id)) {
             var plane = Plane.CreateByNormalAndOrigin(axis, point.Point);
-            ElementTransformUtils.MirrorElement(Document, annotationSymbol.Id, plane);
-            Document.Delete(annotationSymbol.Id);
+            ElementTransformUtils.MirrorElements(Document, [annotationSymbol.Id], plane, false);
         }
     }
 
@@ -102,11 +101,6 @@ internal class RevitRepository : BaseViewModel {
         Document.Delete(element.Id);
         
         transaction.Commit();
-    }
-
-    private bool IsNeededAnnotationSymbol(FamilySymbol symbol, string typeName, string familyName) {
-        return symbol.Name.Equals(typeName, StringComparison.CurrentCultureIgnoreCase)
-               && symbol.Family.Name.Equals(familyName, StringComparison.CurrentCultureIgnoreCase);
     }
 
     private bool IsNeededAnnotationInstance(AnnotationSymbol instance) {
