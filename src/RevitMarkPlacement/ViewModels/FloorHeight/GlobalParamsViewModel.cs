@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 
@@ -21,7 +22,10 @@ internal class GlobalParamsViewModel : BaseViewModel, IFloorHeightProvider {
     private GlobalParamViewModel _globalParam;
     private ObservableCollection<GlobalParamViewModel> _globalParams;
 
-    public GlobalParamsViewModel(IUnitProvider unitProvider, IGlobalParamSelection globalParamSelection, ILocalizationService localizationService) {
+    public GlobalParamsViewModel(
+        IUnitProvider unitProvider,
+        IGlobalParamSelection globalParamSelection,
+        ILocalizationService localizationService) {
         _unitProvider = unitProvider;
         _globalParamSelection = globalParamSelection;
         _localizationService = localizationService;
@@ -47,13 +51,14 @@ internal class GlobalParamsViewModel : BaseViewModel, IFloorHeightProvider {
     public double? GetFloorHeight() {
         return GlobalParam?.Value;
     }
-    
+
     public string GetErrorText() {
         if(GlobalParam is null) {
             return _localizationService.GetLocalizedString("MainWindow.EmptyGlobalParam");
         }
-        
-        if(GlobalParam.Value < 0.0) {
+
+        if(GlobalParam.IsValidObject
+           && GlobalParam.Value < 0.0) {
             return _localizationService.GetLocalizedString("MainWindow.NegativeGlobalParam");
         }
 

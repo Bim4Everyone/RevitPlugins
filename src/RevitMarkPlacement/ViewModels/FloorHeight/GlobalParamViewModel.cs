@@ -17,7 +17,8 @@ internal class GlobalParamViewModel : BaseViewModel {
 
         DisplayName = GetDisplayName();
     }
-
+    public bool IsValidObject => _globalParameter.IsValidObject;
+    
     public ElementId Id => _globalParameter.Id;
     public string Name => _globalParameter.Name;
     public double Value => _globalParameter.AsDouble();
