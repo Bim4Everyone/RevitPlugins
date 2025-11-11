@@ -26,6 +26,27 @@
             <converters:NumberWithOffsetConverter
                 x:Key="columnContentWidthConverter"
                 Offset="-15" />
+            <ui:TextBlock
+                x:Key="GroupType"
+                Text="{me:LocalizationSource MainWindow.GroupType}" />
+            <ui:TextBlock
+                x:Key="Level"
+                Text="{me:LocalizationSource MainWindow.Level}" />
+            <ui:TextBlock
+                x:Key="LevelShortName"
+                Text="{me:LocalizationSource MainWindow.LevelShortName}" />
+            <ui:TextBlock
+                x:Key="Phase"
+                Text="{me:LocalizationSource MainWindow.Phase}" />
+            <ui:TextBlock
+                x:Key="FirstDispatcherGroupingLevel"
+                Text="{me:LocalizationSource MainWindow.FirstDispatcherGroupingLevel}" />
+            <ui:TextBlock
+                x:Key="SecondDispatcherGroupingLevel"
+                Text="{me:LocalizationSource MainWindow.SecondDispatcherGroupingLevel}" />
+            <ui:TextBlock
+                x:Key="ThirdDispatcherGroupingLevel"
+                Text="{me:LocalizationSource MainWindow.ThirdDispatcherGroupingLevel}" />
         </ResourceDictionary>
     </UserControl.Resources>
 
@@ -229,7 +250,7 @@
             <DataGrid.Columns>
                 <DataGridTemplateColumn
                     x:Name="column1"
-                    Header="{DynamicResource MainWindow.GroupType}"
+                    Header="{StaticResource GroupType}"
                     Width="120">
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate>
@@ -245,7 +266,7 @@
                 </DataGridTemplateColumn>
 
                 <DataGridTemplateColumn
-                    Header="{DynamicResource MainWindow.Level}"
+                    Header="{StaticResource Level}"
                     x:Name="column2"
                     Width="120">
                     <DataGridTemplateColumn.CellTemplate>
@@ -265,7 +286,7 @@
                 </DataGridTemplateColumn>
 
                 <DataGridTemplateColumn
-                    Header="{DynamicResource MainWindow.LevelShortName}"
+                    Header="{StaticResource LevelShortName}"
                     x:Name="column3"
                     Width="120">
                     <DataGridTemplateColumn.CellTemplate>
@@ -282,7 +303,7 @@
                 </DataGridTemplateColumn>
 
                 <DataGridTemplateColumn
-                    Header="{DynamicResource MainWindow.Phase}"
+                    Header="{StaticResource Phase}"
                     x:Name="column4"
                     Width="120">
                     <DataGridTemplateColumn.CellTemplate>
@@ -302,7 +323,7 @@
                 </DataGridTemplateColumn>
 
                 <DataGridTemplateColumn
-                    Header="{DynamicResource MainWindow.FirstDispatcherGroupingLevel}"
+                    Header="{StaticResource FirstDispatcherGroupingLevel}"
                     x:Name="column5"
                     Width="120">
                     <DataGridTemplateColumn.CellTemplate>
@@ -320,7 +341,7 @@
                 </DataGridTemplateColumn>
                 
                 <DataGridTemplateColumn
-                    Header="{DynamicResource MainWindow.SecondDispatcherGroupingLevel}"
+                    Header="{StaticResource SecondDispatcherGroupingLevel}"
                     x:Name="column6"
                     Width="120">
                     <DataGridTemplateColumn.CellTemplate>
@@ -338,7 +359,7 @@
                 </DataGridTemplateColumn>
                 
                 <DataGridTemplateColumn
-                    Header="{DynamicResource MainWindow.ThirdDispatcherGroupingLevel}"
+                    Header="{StaticResource ThirdDispatcherGroupingLevel}"
                     x:Name="column7"
                     Width="120">
                     <DataGridTemplateColumn.CellTemplate>
