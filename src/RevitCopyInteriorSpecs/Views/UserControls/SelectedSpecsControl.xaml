@@ -13,15 +13,15 @@
 
     <StackPanel Orientation="Horizontal">
         <TextBlock
-            Margin="5"
-            Width="250"
+            Margin="7"
+            MinWidth="250"
             VerticalAlignment="Center"
             HorizontalAlignment="Left"
             Text="{DynamicResource MainWindow.SelectedSpecs}" />
 
         <TextBlock
-            Margin="5"
-            Width="200"
+            Margin="7"
+            MinWidth="200"
             VerticalAlignment="Center"
             Text="{Binding Path=SelectedSpecsVM.SelectedSpecs.Count}" />
     </StackPanel>

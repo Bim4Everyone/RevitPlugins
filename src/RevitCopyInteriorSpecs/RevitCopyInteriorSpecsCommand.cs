@@ -30,15 +30,17 @@ public class RevitCopyInteriorSpecsCommand : BasePluginCommand {
     }
 
     protected override void Execute(UIApplication uiApplication) {
-        using var kernel = uiApplication.CreatePlatformServices();
-        
+        // Создание контейнера зависимостей плагина с сервисами из платформы
+        using IKernel kernel = uiApplication.CreatePlatformServices();
+
+        // Настройка доступа к Revit
         kernel.Bind<RevitRepository>()
             .ToSelf()
             .InSingletonScope();
 
+        // Настройка конфигурации плагина
         kernel.Bind<PluginConfig>()
             .ToMethod(c => PluginConfig.GetPluginConfig(c.Kernel.Get<IConfigSerializer>()));
-
 
         // Используем сервис обновления тем для WinUI
         kernel.UseWpfUIThemeUpdater();
@@ -53,7 +55,7 @@ public class RevitCopyInteriorSpecsCommand : BasePluginCommand {
         // Настройка локализации,
         // установка дефолтной локализации "ru-RU"
         kernel.UseWpfLocalization(
-            $"/{assemblyName};component/assets/localization/Language.xaml",
+            $"/{assemblyName};component/assets/localizations/Language.xaml",
             CultureInfo.GetCultureInfo("ru-RU"));
 
         kernel.Bind<SpecificationService>()
