@@ -61,6 +61,7 @@ internal class FiltersViewModel : BaseViewModel {
         SaveAsCommand = RelayCommand.Create(SaveAs, CanSave);
         LoadCommand = RelayCommand.Create(Load);
         CheckSearchSetCommand = RelayCommand.Create(CheckSearchSet, CanSave);
+        AskForSaveCommand = RelayCommand.Create(AskForSave);
 
         SelectedFilter = Filters.FirstOrDefault();
         SelectedFilter?.InitializeFilter();
@@ -78,6 +79,7 @@ internal class FiltersViewModel : BaseViewModel {
         set => RaiseAndSetIfChanged(ref _messageText, value);
     }
 
+    public ICommand AskForSaveCommand { get; }
     public ICommand CreateCommand { get; }
     public ICommand DeleteCommand { get; }
     public ICommand RenameCommand { get; }
@@ -233,6 +235,18 @@ internal class FiltersViewModel : BaseViewModel {
         var vm = new SearchSetsViewModel(_revitRepository, _localization, filter, MessageBoxService);
         var view = new SearchSetView() { DataContext = vm };
         view.Show();
+    }
+
+    private void AskForSave() {
+        if(SaveCommand.CanExecute(default)
+           && MessageBoxService.Show(
+               _localization.GetLocalizedString("Navigator.SavePrompt"),
+               _localization.GetLocalizedString("BIM"),
+               MessageBoxButton.YesNo,
+               MessageBoxImage.Question)
+           == MessageBoxResult.Yes) {
+            SaveCommand.Execute(default);
+        }
     }
 
     private void InitializeTimer() {

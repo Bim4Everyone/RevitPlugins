@@ -26,6 +26,13 @@
         <wpfbehaviors:WpfAttachServiceBehavior
             AttachableService="{Binding SaveFileDialogService}" />
     </i:Interaction.Behaviors>
+    <i:Interaction.Triggers>
+        <i:EventTrigger
+            EventName="Closing">
+            <i:InvokeCommandAction
+                Command="{Binding AskForSaveCommand}" />
+        </i:EventTrigger>
+    </i:Interaction.Triggers>
 
     <core:WpfUIPlatformWindow.Resources>
         <ResourceDictionary>
