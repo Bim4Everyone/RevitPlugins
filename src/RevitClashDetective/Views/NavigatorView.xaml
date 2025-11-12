@@ -135,17 +135,21 @@
                 Command="{Binding SelectedReport.SaveAsCommand}"
                 Glyph="{dx:DXImage 'DevAV/Actions/SaveAs_32x32.png'}" />
             <dx:SimpleButton
-                DockPanel.Dock="Left"
+                DockPanel.Dock="Right"
                 Margin="5 0 0 0"
                 ToolTip="Удалить активную проверку"
                 Command="{Binding DeleteCommand}"
-                Glyph="{dx:DXImage 'Office2013/Reports/DeleteGroupHeader_32x32.png'}" />
+                Glyph="{dx:DXImage 'Images/Actions/Trash_32x32.png'}" />
             <dxe:ComboBoxEdit
-                IsTextEditable="False"
+                IsTextEditable="True"
+                AutoComplete="True"
+                IsCaseSensitiveSearch="False"
+                IncrementalFiltering="True"
+                ImmediatePopup="True"
                 Margin="5 0 0 0"
-                ItemsSource="{Binding Reports}"
                 DisplayMember="Name"
-                SelectedItem="{Binding SelectedReport}">
+                ItemsSource="{Binding Reports}"
+                SelectedItem="{Binding SelectedReport, UpdateSourceTrigger=PropertyChanged}">
             </dxe:ComboBoxEdit>
 
         </DockPanel>
@@ -189,6 +193,16 @@
                         Command="{Binding SelectedReport.ShowImaginaryClashesChangedCommand}" />
                 </mvvm:Interaction.Triggers>
             </dxe:CheckEdit>
+            <dx:SimpleButton
+                Margin="5 0 0 0"
+                Width="Auto"
+                HorizontalAlignment="Left"
+                HorizontalContentAlignment="Left"
+                ToolTip="Выделить элементы 1 и 2 выборки из выбранных коллизий"
+                Padding="3 0"
+                Content="1 &amp; 2"
+                Command="{Binding SelectedReport.PickBothElementsCommand}"
+                Glyph="{dx:DXImage 'Images/RichEdit/Select_16x16.png'}" />
         </DockPanel>
 
         <res:CustomGridControl
@@ -263,6 +277,9 @@
                     </dxg:GridColumn.CellTemplate>
                 </dxg:GridColumn>
                 <dxg:GridColumn
+                    AllowSorting="True"
+                    AllowGrouping="True"
+                    FieldName="ClashStatus"
                     Header="Статус">
                     <dxg:GridColumn.CellTemplate>
                         <DataTemplate>
