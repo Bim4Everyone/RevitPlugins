@@ -15,11 +15,11 @@
     mc:Ignorable="d"
     WindowStartupLocation="CenterOwner"
 
-    Height="650" 
-    Width="850"
+    Height="800" 
+    Width="1300"
     
-    MinHeight="650"
-    MinWidth="850"
+    MinHeight="800"
+    MinWidth="1300"
     
     x:Name="_this"
 
@@ -45,20 +45,7 @@
     </core:WpfUIPlatformWindow.Resources>
 
     <Grid>
-        <Grid.ColumnDefinitions>
-            <ColumnDefinition />
-            <ColumnDefinition />
-            <ColumnDefinition />
-            <ColumnDefinition />
-        </Grid.ColumnDefinitions>
-
         <Grid.RowDefinitions>
-            <RowDefinition Height="Auto" />
-            <RowDefinition Height="Auto" />
-            <RowDefinition Height="Auto" />
-            <RowDefinition Height="Auto" />
-            <RowDefinition Height="Auto" />
-            <RowDefinition Height="Auto" />
             <RowDefinition Height="Auto" />
             <RowDefinition Height="Auto" />
             <RowDefinition Height="Auto" />
@@ -73,284 +60,279 @@
             Grid.ColumnSpan="4"
             Title="{me:LocalizationSource MainWindow.Title}" />
 
-        <ComboBox
-            Grid.Row="1" Grid.Column="0"
-            Grid.ColumnSpan="4"
-            Margin="10"
-            ItemsSource="{Binding RoomsNumsViewModels}"
-            DisplayMemberPath="Name"
-            SelectedItem="{Binding RoomsNums}" />
-
-        <DockPanel
-            Grid.Row="2" Grid.Column="0"
-            Grid.ColumnSpan="2"
-            Margin="10">
-            <TextBlock
-                Margin="0,0,10,0"
-                Text="Стадия:" />
+        <Border
+            Grid.Row="1"
+            Margin="14,0,14,4"
+            Style="{StaticResource CustomBorder}">
             <ComboBox
-                ItemsSource="{Binding RoomsNums.Phases}"
+                ItemsSource="{Binding RoomsNumsViewModels}"
                 DisplayMemberPath="Name"
-                SelectedItem="{Binding RoomsNums.Phase}" />
-        </DockPanel>
+                SelectedItem="{Binding RoomsNums}" />
+        </Border>
 
-        <DockPanel
-            Grid.Row="2" Grid.Column="2"
-            Grid.ColumnSpan="2"
-            Margin="10">
-            <TextBlock
-                Margin="0,0,10,0"
-                Text="Префикс:" />
-            <TextBox
-                Text="{Binding RoomsNums.Prefix, UpdateSourceTrigger=PropertyChanged}" />
-        </DockPanel>
+        <Border
+            Grid.Row="2"
+            Margin="14,4"
+            Style="{StaticResource CustomBorder}">
+            <UniformGrid
+                Rows="2"
+                Columns="2">
+                <DockPanel
+                    Margin="10,4">
+                    <TextBlock
+                        Width="140"
+                        VerticalAlignment="Center"
+                        Text="Стадия:" />
+                    <ComboBox
+                        ItemsSource="{Binding RoomsNums.Phases}"
+                        DisplayMemberPath="Name"
+                        SelectedItem="{Binding RoomsNums.Phase}" />
+                </DockPanel>
+                <DockPanel
+                    Margin="20,4,0,4">
+                    <TextBlock
+                        Width="80"
+                        VerticalAlignment="Center"
+                        Text="Суффикс:" />
+                    <TextBox
+                        Text="{Binding RoomsNums.Suffix, UpdateSourceTrigger=PropertyChanged}" />
+                </DockPanel>
+                <DockPanel
+                    Margin="10,4">
+                    <TextBlock
+                        Width="140"
+                        VerticalAlignment="Center"
+                        Text="Начальный номер:" />
+                    <TextBox
+                        Text="{Binding RoomsNums.StartNumber, UpdateSourceTrigger=PropertyChanged}" />
+                </DockPanel>
+                <DockPanel
+                    Margin="20,4,0,4">
+                    <TextBlock
+                        Width="80"
+                        VerticalAlignment="Center"
+                        Text="Префикс:" />
+                    <TextBox
+                        Text="{Binding RoomsNums.Prefix, UpdateSourceTrigger=PropertyChanged}" />
+                </DockPanel>
+            </UniformGrid>
+        </Border>
 
-        <DockPanel
-            Grid.Row="3" Grid.Column="2"
-            Grid.ColumnSpan="3"
-            Margin="10">
-            <TextBlock
-                Margin="0,0,10,0"
-                Text="Суффикс:" />
-            <TextBox
-                Text="{Binding RoomsNums.Suffix, UpdateSourceTrigger=PropertyChanged}" />
-        </DockPanel>
-
-        <DockPanel
-            Grid.Row="3" Grid.Column="0"
-            Grid.ColumnSpan="2"
-            Margin="10">
-
-            <TextBlock
-                Margin="0,0,10,0"
-                Text="Начальный номер:" />
-
-            <TextBox
-                Text="{Binding RoomsNums.StartNumber, UpdateSourceTrigger=PropertyChanged}" />
-        </DockPanel>
-        
-        <RadioButton
-            Grid.Row="4" 
+        <Border
+            Grid.Row="3"
             Grid.Column="0"
             Grid.ColumnSpan="4"
-            Margin="10"
-            GroupName="nums"
-            IsChecked="{Binding RoomsNums.IsNumFlats}">
-            <TextBlock Text="{Binding ApartmentNumberParamName, 
-                Mode=OneWay, StringFormat='Нумерация квартир ({0})'}" />
-        </RadioButton>
-        
-        <RadioButton
-            x:Name="_roomsNums"
-            Grid.Row="6" 
-            Grid.Column="0"
-            Grid.ColumnSpan="4" 
-            Margin="10"
-            GroupName="nums"
-            IsChecked="{Binding RoomsNums.IsNumRooms}">
-            <TextBlock Text="{Binding NumberParamName, 
-                Mode=OneWay, StringFormat='Нумерация, помещений ({0})'}" />
-        </RadioButton>
-        
-        <RadioButton 
-            Grid.Row="7"
-            Grid.Column="0" 
-            Grid.ColumnSpan="4" 
-            Margin="20,10,10,10" 
-            GroupName="rooms_nums"
-            Content="Нумерация помещений в пределах секции, этажа и группы"
-            Visibility="{Binding ElementName=_roomsNums,Path=IsChecked, 
-                Converter={StaticResource BoolToVis}}"
-            IsChecked="{Binding RoomsNums.IsNumRoomsGroup}" />
-        
-        <RadioButton 
-            Grid.Row="8" 
-            Grid.Column="0" 
-            Grid.ColumnSpan="4" 
-            Margin="20,10,10,10"
-            GroupName="rooms_nums"
-            Content="Нумерация помещений в пределах секции и этажа"
-            Visibility="{Binding ElementName=_roomsNums,Path=IsChecked, 
-                Converter={StaticResource BoolToVis}}"
-            IsChecked="{Binding RoomsNums.IsNumRoomsSectionLevels}" />
-        
-        <RadioButton 
-            Grid.Row="9" 
-            Grid.Column="0" 
-            Grid.ColumnSpan="4" 
-            Margin="20,10,10,10" GroupName="rooms_nums"
-            Content="Нумерация помещений в пределах секции"
-            Visibility="{Binding ElementName=_roomsNums,Path=IsChecked, 
-                Converter={StaticResource BoolToVis}}"
-            IsChecked="{Binding RoomsNums.IsNumRoomsSection}" />
-        
-        <DockPanel 
-            Grid.Row="10" 
-            Grid.Column="0" 
-            Margin="10" 
-            LastChildFill="True">
-            <TextBlock 
-                DockPanel.Dock="Top" 
-                Margin="0,0,0,10" 
-                Text="Секции для нумерации" />
+            Margin="14,4"
+            Style="{StaticResource CustomBorder}">
+            <StackPanel>
+                <RadioButton
+                    Margin="10,4"
+                    GroupName="nums"
+                    IsChecked="{Binding RoomsNums.IsNumFlats}">
+                    <TextBlock
+                        Text="{Binding ApartmentNumberParamName, Mode=OneWay, StringFormat='Нумерация квартир ({0})'}" />
+                </RadioButton>
+                <RadioButton
+                    x:Name="_roomsNums"
+                    Margin="10,4"
+                    GroupName="nums"
+                    IsChecked="{Binding RoomsNums.IsNumRooms}">
+                    <TextBlock
+                        Text="{Binding NumberParamName, Mode=OneWay, StringFormat='Нумерация, помещений ({0})'}" />
+                </RadioButton>
 
-            <ui:DataGrid
-                AutoGenerateColumns="False"
-                CanUserResizeColumns="True"
-                Style="{StaticResource CustomResizableDataGridStyle}"
-                ItemsSource="{Binding RoomsNums.Sections}">
-                <DataGrid.Columns>
-                    <DataGridCheckBoxColumn
-                        Binding="{Binding Path=IsSelected, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}">
-                        <DataGridCheckBoxColumn.Header>
-                            <TextBlock
-                                Text="{me:LocalizationSource MainWindow.HeaderCheck}" />
-                        </DataGridCheckBoxColumn.Header>
-                    </DataGridCheckBoxColumn>
-                    <DataGridTextColumn
-                        IsReadOnly="True"
-                        Binding="{Binding Path=Name}">
-                        <DataGridTextColumn.Header>
-                            <TextBlock
-                                Text="{me:LocalizationSource MainWindow.HeaderLevels}" />
-                        </DataGridTextColumn.Header>
-                    </DataGridTextColumn>
-                </DataGrid.Columns>
-            </ui:DataGrid>
-        </DockPanel>
-
-        <DockPanel 
-            Grid.Row="10" 
-            Grid.Column="1" 
-            Margin="10" 
-            LastChildFill="True">
-            <TextBlock 
-                DockPanel.Dock="Top" 
-                Margin="0,0,0,10" 
-                Text="Группы для нумерации" />
-            <ui:DataGrid
-                AutoGenerateColumns="False"
-                CanUserResizeColumns="True"
-                Style="{StaticResource CustomResizableDataGridStyle}"
-                ItemsSource="{Binding RoomsNums.Groups}">
-                <DataGrid.Columns>
-                    <DataGridCheckBoxColumn
-                        Binding="{Binding Path=IsSelected, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}">
-                        <DataGridCheckBoxColumn.Header>
-                            <TextBlock
-                                Text="{me:LocalizationSource MainWindow.HeaderCheck}" />
-                        </DataGridCheckBoxColumn.Header>
-                    </DataGridCheckBoxColumn>
-                    <DataGridTextColumn
-                        IsReadOnly="True"
-                        Binding="{Binding Path=Name}">
-                        <DataGridTextColumn.Header>
-                            <TextBlock
-                                Text="{me:LocalizationSource MainWindow.HeaderLevels}" />
-                        </DataGridTextColumn.Header>
-                    </DataGridTextColumn>
-                </DataGrid.Columns>
-            </ui:DataGrid>
-        </DockPanel>
-
-        <DockPanel 
-            Grid.Row="10" 
-            Grid.Column="2" 
-            Margin="10" 
-            LastChildFill="True">
-            <TextBlock 
-                DockPanel.Dock="Top" 
-                Margin="0,0,0,10" 
-                Text="Уровни для нумерации" />
-            <ui:DataGrid
-                AutoGenerateColumns="False"
-                CanUserResizeColumns="True"
-                Style="{StaticResource CustomResizableDataGridStyle}"
-                ItemsSource="{Binding RoomsNums.Levels}">
-                <DataGrid.Columns>
-                    <DataGridCheckBoxColumn
-                        Binding="{Binding Path=IsSelected, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}">
-                        <DataGridCheckBoxColumn.Header>
-                            <TextBlock
-                                Text="{me:LocalizationSource MainWindow.HeaderCheck}" />
-                        </DataGridCheckBoxColumn.Header>
-                    </DataGridCheckBoxColumn>
-                    <DataGridTextColumn
-                        IsReadOnly="True"
-                        Binding="{Binding Path=Name}">
-                        <DataGridTextColumn.Header>
-                            <TextBlock
-                                Text="{me:LocalizationSource MainWindow.HeaderLevels}" />
-                        </DataGridTextColumn.Header>
-                    </DataGridTextColumn>
-                    <DataGridTextColumn
-                        IsReadOnly="True"
-                        Binding="{Binding Path=LevelNames}">
-                        <DataGridTextColumn.Header>
-                            <TextBlock
-                                Text="{me:LocalizationSource MainWindow.HeaderLevels}" />
-                        </DataGridTextColumn.Header>
-                    </DataGridTextColumn>
-                </DataGrid.Columns>
-            </ui:DataGrid>
-        </DockPanel>
-
-        <DockPanel 
-            Grid.Row="10" Grid.Column="3" 
-            Margin="10" 
-            LastChildFill="True">
-            <TextBlock DockPanel.Dock="Top" Margin="0,0,0,10" Text="Приоритеты помещений" />
-            <StackPanel DockPanel.Dock="Bottom" Orientation="Horizontal">
-                <ui:Button
-                    ToolTip="Вверх"
-                    Width="25" Margin=" 5"
-                    Command="{Binding RoomsNums.UpOrderCommand}"
-                    CommandParameter="{Binding SelectedItems, ElementName=listbox}"
-                    Icon="SvgImages/Arrows/MoveUp.svg" />
-                <ui:Button
-                    ToolTip="Вниз"
-                    Width="25" Margin="5"
-                    Command="{Binding RoomsNums.DownOrderCommand}"
-                    CommandParameter="{Binding SelectedItems, ElementName=listbox}"
-                    Icon="SvgImages/Arrows/MoveDown.svg"/>
-                <ui:Button
-                    ToolTip="Добавить"
-                    Width="25" Margin="5"
-                    Command="{Binding RoomsNums.AddOrderCommand}"
-                    Icon="Office2013/Actions/Add_16x16.png"/>
-                <ui:Button
-                    ToolTip="Удалить"
-                    Width="25" Margin="5"
-                    Command="{Binding RoomsNums.RemoveOrderCommand}"
-                    CommandParameter="{Binding SelectedItems, ElementName=listbox}"
-                    Icon="Office2013/Actions/Cancel_16x16.png"/>
-                <ui:Button
-                    ToolTip="Сохранить"
-                    Width="25" Margin="5"
-                    Command="{Binding RoomsNums.SaveOrderCommand}"
-                    Icon="SvgImages/Save/Save.svg"/>
+                <RadioButton
+                    Margin="25,4"
+                    GroupName="rooms_nums"
+                    Content="Нумерация помещений в пределах секции, этажа и группы"
+                    Visibility="{Binding ElementName=_roomsNums,Path=IsChecked, Converter={StaticResource BoolToVis}}"
+                    IsChecked="{Binding RoomsNums.IsNumRoomsGroup}" />
+                <RadioButton
+                    Margin="25,4"
+                    GroupName="rooms_nums"
+                    Content="Нумерация помещений в пределах секции и этажа"
+                    Visibility="{Binding ElementName=_roomsNums,Path=IsChecked, Converter={StaticResource BoolToVis}}"
+                    IsChecked="{Binding RoomsNums.IsNumRoomsSectionLevels}" />
+                <RadioButton
+                    Margin="25,4"
+                    GroupName="rooms_nums"
+                    Content="Нумерация помещений в пределах секции"
+                    Visibility="{Binding ElementName=_roomsNums,Path=IsChecked, Converter={StaticResource BoolToVis}}"
+                    IsChecked="{Binding RoomsNums.IsNumRoomsSection}" />
             </StackPanel>
+        </Border>
 
-            <ui:DataGrid
-                x:Name="listbox"
-                AutoGenerateColumns="False"
-                CanUserResizeColumns="True"
-                Style="{StaticResource CustomResizableDataGridStyle}"
-                ItemsSource="{Binding RoomsNums.SelectedNumberingOrders}">
-                <DataGridTextColumn
-                    Binding="{Binding Path=Name}">
-                    <DataGridTextColumn.Header>
-                        <TextBlock
-                            Text="{me:LocalizationSource MainWindow.HeaderLevels}" />
-                    </DataGridTextColumn.Header>
-                </DataGridTextColumn>
-            </ui:DataGrid>
-        </DockPanel>
+        <Border
+            Grid.Row="4"
+            Margin="14,4"
+            Style="{StaticResource CustomBorder}">
+            <Grid
+                Margin="10,5">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="*" />
+                </Grid.RowDefinitions>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition />
+                    <ColumnDefinition />
+                    <ColumnDefinition />
+                    <ColumnDefinition />
+                </Grid.ColumnDefinitions>
+                
+                <TextBlock
+                    Grid.Row="0"
+                    Grid.Column="0"
+                    HorizontalAlignment="Center"
+                    Text="Секции для нумерации" />
+                <Border
+                    Grid.Row="1"
+                    Grid.Column="0"
+                    Margin="0,5,4,0"
+                    Style="{StaticResource CustomBorder}">
+                    <ui:DataGrid
+                        AutoGenerateColumns="False"
+                        CanUserResizeColumns="True"
+                        HeadersVisibility="None"
+                        Style="{StaticResource CustomResizableDataGridStyle}"
+                        ItemsSource="{Binding RoomsNums.Sections}">
+                        <DataGrid.Columns>
+                            <DataGridCheckBoxColumn
+                                Binding="{Binding Path=IsSelected, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}">
+                            </DataGridCheckBoxColumn>
+                            <DataGridTextColumn
+                                IsReadOnly="True"
+                                Binding="{Binding Path=Name}">
+                            </DataGridTextColumn>
+                        </DataGrid.Columns>
+                    </ui:DataGrid>
+                </Border>
+
+                <TextBlock
+                    Grid.Row="0"
+                    Grid.Column="1"
+                    HorizontalAlignment="Center"
+                    Text="Группы для нумерации" />
+                <Border
+                    Grid.Row="1"
+                    Grid.Column="1"
+                    Margin="4,5,4,0"
+                    Style="{StaticResource CustomBorder}">
+                    <ui:DataGrid
+                        Grid.Row="1"
+                        Grid.Column="0"
+                        AutoGenerateColumns="False"
+                        CanUserResizeColumns="True"
+                        HeadersVisibility="None"
+                        Style="{StaticResource CustomResizableDataGridStyle}"
+                        ItemsSource="{Binding RoomsNums.Groups}">
+                        <DataGrid.Columns>
+                            <DataGridCheckBoxColumn
+                                Binding="{Binding Path=IsSelected, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}">
+                            </DataGridCheckBoxColumn>
+                            <DataGridTextColumn
+                                IsReadOnly="True"
+                                Binding="{Binding Path=Name}">
+                            </DataGridTextColumn>
+                        </DataGrid.Columns>
+                    </ui:DataGrid>
+                </Border>
+
+                <TextBlock
+                    Grid.Row="0"
+                    Grid.Column="2"
+                    HorizontalAlignment="Center"
+                    Text="Уровни для нумерации" />
+                <Border
+                    Grid.Row="1"
+                    Grid.Column="2"
+                    Margin="4,5,4,0"
+                    Style="{StaticResource CustomBorder}">
+                    <ui:DataGrid
+                        AutoGenerateColumns="False"
+                        CanUserResizeColumns="True"
+                        HeadersVisibility="None"
+                        Style="{StaticResource CustomResizableDataGridStyle}"
+                        ItemsSource="{Binding RoomsNums.Levels}">
+                        <DataGrid.Columns>
+                            <DataGridCheckBoxColumn
+                                Binding="{Binding Path=IsSelected, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}">
+                            </DataGridCheckBoxColumn>
+                            <DataGridTextColumn
+                                IsReadOnly="True"
+                                Binding="{Binding Path=Name}">
+                            </DataGridTextColumn>
+                            <DataGridTextColumn
+                                IsReadOnly="True"
+                                Binding="{Binding Path=LevelNames}">
+                            </DataGridTextColumn>
+                        </DataGrid.Columns>
+                    </ui:DataGrid>
+                </Border>
+                
+                <TextBlock
+                    Grid.Row="0"
+                    Grid.Column="3"
+                    HorizontalAlignment="Center"
+                    Text="Приоритеты помещений" />
+                <Border
+                    Grid.Row="1"
+                    Grid.Column="3"
+                    Margin="4,5,0,0"
+                    Style="{StaticResource CustomBorder}">
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition />
+                            <RowDefinition  Height="50"/>
+                        </Grid.RowDefinitions>
+                        <ListBox
+                            Grid.Row="0"
+                            x:Name="listbox"
+                            DisplayMemberPath="Name"
+                            ItemsSource="{Binding RoomsNums.SelectedNumberingOrders}">
+                        </ListBox>
+
+                        <StackPanel
+                            Grid.Row="1"
+                            Orientation="Horizontal"
+                            HorizontalAlignment="Center">
+                            <ui:Button
+                                ToolTip="Вверх"
+                                Margin="5"
+                                Command="{Binding RoomsNums.UpOrderCommand}"
+                                CommandParameter="{Binding SelectedItems, ElementName=listbox}"
+                                Icon="{ui:SymbolIcon ArrowCircleUp12, FontSize=20}" />
+                            <ui:Button
+                                ToolTip="Вниз"
+                                Margin="5"
+                                Command="{Binding RoomsNums.DownOrderCommand}"
+                                CommandParameter="{Binding SelectedItems, ElementName=listbox}"
+                                Icon="{ui:SymbolIcon ArrowCircleDown12, FontSize=20}" />
+                            <ui:Button
+                                ToolTip="Добавить"
+                                Margin="5"
+                                Command="{Binding RoomsNums.AddOrderCommand}"
+                                Icon="{ui:SymbolIcon AddCircle12, FontSize=20}" />
+                            <ui:Button
+                                ToolTip="Удалить"
+                                Margin="5"
+                                Command="{Binding RoomsNums.RemoveOrderCommand}"
+                                CommandParameter="{Binding SelectedItems, ElementName=listbox}"
+                                Icon="{ui:SymbolIcon Delete12, FontSize=20}" />
+                            <ui:Button
+                                ToolTip="Сохранить"
+                                Margin="5"
+                                Command="{Binding RoomsNums.SaveOrderCommand}"
+                                Icon="{ui:SymbolIcon Save20, FontSize=20}" />
+                        </StackPanel>
+                    </Grid>
+                </Border>
+            </Grid>
+        </Border>
 
         <StackPanel
-            Grid.Row="11" Grid.Column="0"
-            Grid.ColumnSpan="4"
-            Orientation="Horizontal" HorizontalAlignment="Right">
+            Grid.Row="5"
+            Orientation="Horizontal" 
+            HorizontalAlignment="Right">
             <TextBlock 
                 Margin="10" 
                 Text="{Binding RoomsNums.ErrorText}" 
