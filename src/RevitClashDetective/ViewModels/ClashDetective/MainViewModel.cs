@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Linq;
+using System.Windows;
 using System.Windows.Data;
 using System.Windows.Input;
 using System.Windows.Threading;
@@ -68,6 +69,7 @@ internal class MainViewModel : BaseViewModel {
         SaveClashesCommand = RelayCommand.Create(SaveConfig);
         SaveAsClashesCommand = RelayCommand.Create(SaveAsConfig);
         LoadClashCommand = RelayCommand.Create(LoadConfig);
+        AskForSaveCommand = RelayCommand.Create(AskForSave);
 
         PropertyChanged += ChecksFilterPropertyChanged;
     }
@@ -97,6 +99,7 @@ internal class MainViewModel : BaseViewModel {
         set => RaiseAndSetIfChanged(ref _selectedCheck, value);
     }
 
+    public ICommand AskForSaveCommand { get; }
     public ICommand AddCheckCommand { get; }
     public ICommand RemoveCheckCommand { get; }
     public ICommand FindClashesCommand { get; }
@@ -267,24 +270,37 @@ internal class MainViewModel : BaseViewModel {
             ErrorText = _localization.GetLocalizedString("MainWindow.Validation.NamesDuplicated");
             return false;
         }
-        var emptyCheck = AllChecks.FirstOrDefault(item => !item.IsFilterSelected);
+
+        var selectedChecks = AllChecks.Where(item => item.IsSelected).ToArray();
+        if(selectedChecks.Length == 0) {
+            ErrorText = _localization.GetLocalizedString("MainWindow.Validation.SelectAnyCheck");
+            return false;
+        }
+
+        var emptyCheck = selectedChecks.FirstOrDefault(item => !item.IsFilterSelected);
         if(emptyCheck != null) {
             ErrorText = _localization.GetLocalizedString("MainWindow.Validation.EmptyFilterInCheck", emptyCheck.Name);
             return false;
         }
 
-        emptyCheck = AllChecks.FirstOrDefault(item => !item.IsFilesSelected);
+        emptyCheck = selectedChecks.FirstOrDefault(item => !item.IsFilesSelected);
         if(emptyCheck != null) {
             ErrorText = _localization.GetLocalizedString("MainWindow.Validation.EmptyFileInCheck", emptyCheck.Name);
             return false;
         }
-        if(AllChecks.All(item => !item.IsSelected)) {
-            ErrorText = _localization.GetLocalizedString("MainWindow.Validation.SelectAnyCheck");
-            return false;
-        }
-
         ErrorText = null;
         return true;
+    }
+
+    private void AskForSave() {
+        if(MessageBoxService.Show(
+               _localization.GetLocalizedString("Navigator.SavePrompt"),
+               _localization.GetLocalizedString("BIM"),
+               MessageBoxButton.YesNo,
+               MessageBoxImage.Question)
+           == MessageBoxResult.Yes) {
+            SaveClashesCommand.Execute(default);
+        }
     }
 
     private void Wait(Action action) {

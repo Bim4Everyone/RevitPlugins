@@ -126,6 +126,8 @@
     <system:String
         x:Key="FilterCreation.DeleteSearchSet">Delete search set</system:String>
     <system:String
+        x:Key="FilterCreation.CopySearchSet">Copy search set</system:String>
+    <system:String
         x:Key="FilterCreation.Save">Save</system:String>
     <system:String
         x:Key="FilterCreation.SaveAs">Save as</system:String>
@@ -138,7 +140,7 @@
     <system:String
         x:Key="FilterCreation.CheckSetButtonTooltip">Check search set</system:String>
     <system:String
-        x:Key="FilterCreation.DeleteFilterPrompt">Delete filter "{0}"?</system:String>
+        x:Key="FilterCreation.DeleteFilterPrompt">Delete filters "{0}"?</system:String>
     <system:String
         x:Key="FilterCreation.SuccessSave">Search sets successfully saved</system:String>
     <system:String
@@ -199,9 +201,9 @@
     <system:String
         x:Key="MainWindow.Validation.NamesDuplicated">Checks must have different names.</system:String>
     <system:String
-        x:Key="MainWindow.Validation.EmptyFilterInCheck">Check "{0}" must contain at least one search set.</system:String>
+        x:Key="MainWindow.Validation.EmptyFilterInCheck">Check "{0}" doesn't specify any search set.</system:String>
     <system:String
-        x:Key="MainWindow.Validation.EmptyFileInCheck">Check "{0}" must contain at least one file.</system:String>
+        x:Key="MainWindow.Validation.EmptyFileInCheck">Check "{0}" doesn't specify any file.</system:String>
     <system:String
         x:Key="MainWindow.Validation.SelectAnyCheck">At least one check must be selected for clash detection.</system:String>
 
@@ -209,6 +211,8 @@
         x:Key="Navigator.DeletePrompt">Are you sure you want to delete the file?</system:String>
     <system:String
         x:Key="Navigator.SavePrompt">Save clash reports?</system:String>
+    <system:String
+        x:Key="Navigator.CannotSavePrompt">Unable to save current configuration, close window without saving?</system:String>
     <system:String
         x:Key="Navigator.SuccessSave">File successfully saved</system:String>
     <system:String

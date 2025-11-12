@@ -126,6 +126,8 @@
     <system:String
         x:Key="FilterCreation.DeleteSearchSet">Удалить поисковый набор</system:String>
     <system:String
+        x:Key="FilterCreation.CopySearchSet">Копировать поисковый набор</system:String>
+    <system:String
         x:Key="FilterCreation.Save">Сохранить</system:String>
     <system:String
         x:Key="FilterCreation.SaveAs">Сохранить как</system:String>
@@ -138,7 +140,7 @@
     <system:String
         x:Key="FilterCreation.CheckSetButtonTooltip">Проверить поисковый набор</system:String>
     <system:String
-        x:Key="FilterCreation.DeleteFilterPrompt">Удалить фильтр "{0}"?</system:String>
+        x:Key="FilterCreation.DeleteFilterPrompt">Удалить фильтры "{0}"?</system:String>
     <system:String
         x:Key="FilterCreation.SuccessSave">Поисковые наборы успешно сохранены</system:String>
     <system:String
@@ -199,9 +201,9 @@
     <system:String
         x:Key="MainWindow.Validation.NamesDuplicated">У проверок должны быть разные имена.</system:String>
     <system:String
-        x:Key="MainWindow.Validation.EmptyFilterInCheck">У проверки "{0}" необходимо выбрать хотя бы один поисковый набор.</system:String>
+        x:Key="MainWindow.Validation.EmptyFilterInCheck">У проверки "{0}" не заданы поисковые наборы.</system:String>
     <system:String
-        x:Key="MainWindow.Validation.EmptyFileInCheck">У проверки "{0}" необходимо выбрать хотя бы один файл.</system:String>
+        x:Key="MainWindow.Validation.EmptyFileInCheck">У проверки "{0}" не заданы файлы.</system:String>
     <system:String
         x:Key="MainWindow.Validation.SelectAnyCheck">Для поиска коллизий должна быть выбрана хотя бы одна проверка.</system:String>
 
@@ -209,6 +211,8 @@
         x:Key="Navigator.DeletePrompt">Вы уверены, что хотите удалить файл?</system:String>
     <system:String
         x:Key="Navigator.SavePrompt">Сохранить отчеты о коллизиях?</system:String>
+    <system:String
+        x:Key="Navigator.CannotSavePrompt">Нельзя сохранить текущую конфигурацию, закрыть окно без сохранения?</system:String>
     <system:String
         x:Key="Navigator.SuccessSave">Файл успешно сохранен</system:String>
     <system:String
