@@ -26,7 +26,7 @@
             
             <converters:NumberWithOffsetConverter
                 x:Key="columnContentWidthConverter"
-                Offset="-15" />
+                Offset="-5" />
             
             <ui:TextBlock
                 x:Key="GroupType"
@@ -49,8 +49,11 @@
             <ui:TextBlock
                 x:Key="ThirdDispatcherGroupingLevel"
                 Text="{me:LocalizationSource MainWindow.ThirdDispatcherGroupingLevel}" />
-            
-            <s:Double x:Key="ColumnWidth">150</s:Double>
+
+            <s:Double
+                x:Key="ComboBoxColumnWidth">200</s:Double>
+            <s:Double
+                x:Key="TextBoxColumnWidth">150</s:Double>
         </ResourceDictionary>
     </UserControl.Resources>
 
@@ -61,6 +64,7 @@
             <RowDefinition Height="Auto" />
             <RowDefinition Height="Auto" />
             <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
 
         <ui:TextBlock
@@ -81,23 +85,6 @@
                 Margin="10 5"
                 VerticalAlignment="Bottom"
                 Text="{me:LocalizationSource MainWindow.SimultaneousFillingFields}" />
-
-            <StackPanel
-                Grid.Column="1"
-                Orientation="Horizontal"
-                HorizontalAlignment="Right">
-                <Button
-                    Margin="5"
-                    MinWidth="150"
-                    Content="{DynamicResource MainWindow.AddTask}"
-                    Command="{Binding Path=TasksVM.AddTaskCommand}" />
-
-                <Button
-                    Margin="5"
-                    MinWidth="150"
-                    Content="{DynamicResource MainWindow.DeleteTask}"
-                    Command="{Binding Path=TasksVM.DeleteTaskCommand}" />
-            </StackPanel>
         </Grid>
 
         <ScrollViewer
@@ -107,11 +94,11 @@
             <StackPanel
                 Orientation="Horizontal">
                 <ui:TextBox
-                    Margin="15 5 5 5"
-                    Padding="2"
-                    MinWidth="{Binding ElementName=column1, Path=ActualWidth, Converter={StaticResource ResourceKey=columnContentWidthConverter}}"
+                    Margin="15 3 5 3"
+                    MinWidth="{Binding ElementName=column1, Path=ActualWidth, 
+                        Converter={StaticResource ResourceKey=columnContentWidthConverter}}"
                     VerticalAlignment="Center"
-                    HorizontalAlignment="Left"
+                    HorizontalAlignment="Stretch"
                     Text="{Binding Path=TasksVM.GeneralGroupType, UpdateSourceTrigger=PropertyChanged}">
 
                     <i:Interaction.Triggers>
@@ -124,7 +111,7 @@
                 </ui:TextBox>
 
                 <ComboBox
-                    Margin="8 8"
+                    Margin="3 8"
                     Width="{Binding ElementName=column2, Path=ActualWidth, 
                             Converter={StaticResource ResourceKey=columnContentWidthConverter}}"
                     DisplayMemberPath="Name"
@@ -141,12 +128,11 @@
                 </ComboBox>
 
                 <ui:TextBox
-                    Margin="8 5"
-                    Padding="2"
+                    Margin="3 8"
                     MinWidth="{Binding ElementName=column3, Path=ActualWidth, 
                             Converter={StaticResource ResourceKey=columnContentWidthConverter}}"
                     VerticalAlignment="Center"
-                    HorizontalAlignment="Left"
+                    HorizontalAlignment="Stretch"
                     Text="{Binding Path=TasksVM.GeneralLevelShortName, UpdateSourceTrigger=PropertyChanged}">
 
                     <i:Interaction.Triggers>
@@ -159,7 +145,7 @@
                 </ui:TextBox>
 
                 <ComboBox
-                    Margin="8 8"
+                    Margin="3 8"
                     Width="{Binding ElementName=column4, Path=ActualWidth, 
                             Converter={StaticResource ResourceKey=columnContentWidthConverter}}"
                     DisplayMemberPath="Name"
@@ -176,12 +162,11 @@
                 </ComboBox>
 
                 <ui:TextBox
-                    Margin="8 5"
-                    Padding="2"
+                    Margin="3 8"
                     MinWidth="{Binding ElementName=column5, Path=ActualWidth, 
                             Converter={StaticResource ResourceKey=columnContentWidthConverter}}"
                     VerticalAlignment="Center"
-                    HorizontalAlignment="Left"
+                    HorizontalAlignment="Stretch"
                     Text="{Binding Path=TasksVM.GeneralFirstDispatcherGroupingLevel, 
                         UpdateSourceTrigger=PropertyChanged}">
 
@@ -195,12 +180,11 @@
                 </ui:TextBox>
 
                 <ui:TextBox
-                    Margin="8 5"
-                    Padding="2"
+                    Margin="3 8"
                     MinWidth="{Binding ElementName=column6, Path=ActualWidth, 
                             Converter={StaticResource ResourceKey=columnContentWidthConverter}}"
                     VerticalAlignment="Center"
-                    HorizontalAlignment="Left"
+                    HorizontalAlignment="Stretch"
                     Text="{Binding Path=TasksVM.GeneralSecondDispatcherGroupingLevel, 
                         UpdateSourceTrigger=PropertyChanged}">
 
@@ -214,12 +198,11 @@
                 </ui:TextBox>
 
                 <ui:TextBox
-                    Margin="8 5"
-                    Padding="2"
+                    Margin="3 8"
                     MinWidth="{Binding ElementName=column7, Path=ActualWidth, 
                             Converter={StaticResource ResourceKey=columnContentWidthConverter}}"
                     VerticalAlignment="Center"
-                    HorizontalAlignment="Left"
+                    HorizontalAlignment="Stretch"
                     Text="{Binding Path=TasksVM.GeneralThirdDispatcherGroupingLevel, 
                         UpdateSourceTrigger=PropertyChanged}">
 
@@ -257,7 +240,7 @@
                     x:Name="column1"
                     Header="{StaticResource GroupType}"
                     Width="Auto"
-                    MinWidth="{StaticResource ColumnWidth}">
+                    MinWidth="{StaticResource TextBoxColumnWidth}">
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate>
                             <ui:TextBox
@@ -272,7 +255,7 @@
                     Header="{StaticResource Level}"
                     x:Name="column2"
                     Width="Auto"
-                    MinWidth="{StaticResource ColumnWidth}">
+                    MinWidth="{StaticResource ComboBoxColumnWidth}">
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate>
                             <ComboBox
@@ -291,7 +274,7 @@
                     Header="{StaticResource LevelShortName}"
                     x:Name="column3"
                     Width="Auto"
-                    MinWidth="{StaticResource ColumnWidth}">
+                    MinWidth="{StaticResource TextBoxColumnWidth}">
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate>
                             <TextBox
@@ -306,7 +289,7 @@
                     Header="{StaticResource Phase}"
                     x:Name="column4"
                     Width="Auto"
-                    MinWidth="{StaticResource ColumnWidth}">
+                    MinWidth="{StaticResource ComboBoxColumnWidth}">
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate>
                             <ComboBox
@@ -325,7 +308,7 @@
                     Header="{StaticResource FirstDispatcherGroupingLevel}"
                     x:Name="column5"
                     Width="Auto"
-                    MinWidth="{StaticResource ColumnWidth}">
+                    MinWidth="{StaticResource TextBoxColumnWidth}">
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate>
                             <TextBox
@@ -341,7 +324,7 @@
                     Header="{StaticResource SecondDispatcherGroupingLevel}"
                     x:Name="column6"
                     Width="Auto"
-                    MinWidth="{StaticResource ColumnWidth}">
+                    MinWidth="{StaticResource TextBoxColumnWidth}">
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate>
                             <TextBox
@@ -357,7 +340,7 @@
                     Header="{StaticResource ThirdDispatcherGroupingLevel}"
                     x:Name="column7"
                     Width="Auto"
-                    MinWidth="{StaticResource ColumnWidth}">
+                    MinWidth="{StaticResource TextBoxColumnWidth}">
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate>
                             <TextBox
@@ -370,5 +353,23 @@
                 </DataGridTemplateColumn>
             </DataGrid.Columns>
         </ui:DataGrid>
+
+        <StackPanel
+            Grid.Row="5"
+            Grid.Column="1"
+            Orientation="Horizontal"
+            HorizontalAlignment="Right">
+            <Button
+                Margin="5"
+                MinWidth="150"
+                Content="{DynamicResource MainWindow.AddTask}"
+                Command="{Binding Path=TasksVM.AddTaskCommand}" />
+
+            <Button
+                Margin="5"
+                MinWidth="150"
+                Content="{DynamicResource MainWindow.DeleteTask}"
+                Command="{Binding Path=TasksVM.DeleteTaskCommand}" />
+        </StackPanel>
     </Grid>
 </UserControl>

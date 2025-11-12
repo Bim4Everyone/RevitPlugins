@@ -19,8 +19,8 @@
     mc:Ignorable="d"
     WindowStartupLocation="CenterOwner"
     
-    Height="500" Width="1200"
-    MinHeight="500" MinWidth="1200"
+    Height="500" Width="1230"
+    MinHeight="500" MinWidth="900"
     d:DataContext="{d:DesignInstance vms:MainViewModel, IsDesignTimeCreatable=False}"
     PreviewMouseDown="WindowPreviewMouseDown">
 
@@ -44,10 +44,6 @@
         </ResourceDictionary>
     </Window.Resources>
     
-    <!--<Window.Resources>
-        <converters:NumberWithOffsetConverter x:Key="columnContentWidthConverter" Offset="-15" />
-    </Window.Resources>-->
-
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />
