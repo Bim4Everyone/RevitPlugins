@@ -188,13 +188,18 @@ internal class MainViewModel : BaseViewModel {
             ErrorText = _localizationService.GetLocalizedString("MainWindow.NegativeFloorCount");
             return false;
         }
+        
+        if(levelCount > _systemPluginConfig.MaxLevelCount) {
+            ErrorText = _localizationService.GetLocalizedString("MainWindow.MaxFloorCount", _systemPluginConfig.MaxLevelCount);
+            return false;
+        }
 
         if(LevelHeight is null) {
             ErrorText = _localizationService.GetLocalizedString("MainWindow.EmptyFloorHeight");
             return false;
         }
 
-        string errorText = LevelHeight.GetErrorText();
+        string errorText = LevelHeight.GetErrorText(_systemPluginConfig);
         if(!string.IsNullOrEmpty(errorText)) {
             ErrorText = errorText;
             return false;

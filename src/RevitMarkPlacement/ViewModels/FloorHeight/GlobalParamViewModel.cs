@@ -25,6 +25,10 @@ internal class GlobalParamViewModel : BaseViewModel {
     public double Value => _globalParameter.AsDouble();
     public string DisplayName { get; }
 
+    public double GetValueMm() {
+        return UnitUtils.ConvertFromInternalUnits(Value, UnitTypeId.Millimeters);
+    }
+
     private string GetDisplayName() {
         string value = UnitFormatUtils.Format(
             _unitProvider.GetUnits(),

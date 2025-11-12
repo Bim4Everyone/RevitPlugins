@@ -52,14 +52,19 @@ internal class GlobalParamsViewModel : BaseViewModel, IFloorHeightProvider {
         return GlobalParam?.Value;
     }
 
-    public string GetErrorText() {
+    public string GetErrorText(SystemPluginConfig systemPluginConfig) {
         if(GlobalParam is null) {
             return _localizationService.GetLocalizedString("MainWindow.EmptyGlobalParam");
         }
 
         if(GlobalParam.IsValidObject
-           && GlobalParam.Value < 0.0) {
+           && GlobalParam.GetValueMm() < 0.0) {
             return _localizationService.GetLocalizedString("MainWindow.NegativeGlobalParam");
+        }
+        
+        if(GlobalParam.IsValidObject
+           && GlobalParam.GetValueMm() > systemPluginConfig.MaxLevelHeightMm) {
+            return _localizationService.GetLocalizedString("MainWindow.MaxGlobalParam", systemPluginConfig.MaxLevelHeightMm);
         }
 
         return null;

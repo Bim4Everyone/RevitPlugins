@@ -29,7 +29,7 @@ internal class UserFloorHeightViewModel : BaseViewModel, IFloorHeightProvider {
         return double.TryParse(FloorHeight, out double result) ? result : null;
     }
 
-    public string GetErrorText() {
+    public string GetErrorText(SystemPluginConfig systemPluginConfig) {
         if(string.IsNullOrEmpty(FloorHeight)) {
             return _localizationService.GetLocalizedString("MainWindow.EmptyFloorHeightValue");
         }
@@ -40,6 +40,10 @@ internal class UserFloorHeightViewModel : BaseViewModel, IFloorHeightProvider {
 
         if(floorHeight < 0) {
             return _localizationService.GetLocalizedString("MainWindow.NegativeFloorHeightValue");
+        }
+        
+        if(floorHeight > systemPluginConfig.MaxLevelHeightMm) {
+            return _localizationService.GetLocalizedString("MainWindow.MaxFloorHeightValue", systemPluginConfig.MaxLevelHeightMm);
         }
 
         return null;

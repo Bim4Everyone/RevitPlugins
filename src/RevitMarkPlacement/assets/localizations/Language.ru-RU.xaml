@@ -23,12 +23,15 @@
     <system:String x:Key="MainWindow.EmptyFloorCount">Укажите количество этажей</system:String>
     <system:String x:Key="MainWindow.TextFloorCount">Количество этажей должно быть числом</system:String>
     <system:String x:Key="MainWindow.NegativeFloorCount">Количество этажей должно быть неотрицательным числом</system:String>
+    <system:String x:Key="MainWindow.MaxFloorCount">Количество этажей должно быть меньше {0}</system:String>
     <system:String x:Key="MainWindow.EmptyFloorHeight">Выберите высоту этажа</system:String>
     <system:String x:Key="MainWindow.EmptyFloorHeightValue">Укажите значение высоты этажа</system:String>
     <system:String x:Key="MainWindow.TextFloorHeightValue">Высота этажа должна быть числом</system:String>
     <system:String x:Key="MainWindow.NegativeFloorHeightValue">Высота этажа должна быть неотрицательным числом</system:String>
+    <system:String x:Key="MainWindow.MaxFloorHeightValue">Высота этажа должна быть меньше {0} мм</system:String>
     <system:String x:Key="MainWindow.EmptyGlobalParam">Выберите глобальный параметр</system:String>
     <system:String x:Key="MainWindow.NegativeGlobalParam">Значение глобального параметра должно быть неотрицательным числом</system:String>
+    <system:String x:Key="MainWindow.MaxGlobalParam">Высота этажа должна быть меньше {0} мм</system:String>
     
     <system:String x:Key="Selections.DBSelection">Все отметки</system:String>
     <system:String x:Key="Selections.DBViewSelection">Отметки на виде</system:String>

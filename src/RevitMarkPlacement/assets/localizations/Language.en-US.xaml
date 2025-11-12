@@ -23,12 +23,15 @@
     <system:String x:Key="MainWindow.EmptyFloorCount">Please write floor count</system:String>
     <system:String x:Key="MainWindow.TextFloorCount">Floor count must be a number</system:String>
     <system:String x:Key="MainWindow.NegativeFloorCount">Floor count must be a positive number</system:String>
+    <system:String x:Key="MainWindow.MaxFloorCount">Floor count must be less {0}</system:String>
     <system:String x:Key="MainWindow.EmptyFloorHeight">Please select floor height</system:String>
     <system:String x:Key="MainWindow.EmptyFloorHeightValue">Please write floor height</system:String>
     <system:String x:Key="MainWindow.TextFloorHeightValue">Floor height must be a number</system:String>
     <system:String x:Key="MainWindow.NegativeFloorHeightValue">Floor height must be a positive number</system:String>
+    <system:String x:Key="MainWindow.MaxFloorHeightValue">Floor height must be less {0} mm</system:String>
     <system:String x:Key="MainWindow.EmptyGlobalParam">Please select a global parameter</system:String>
     <system:String x:Key="MainWindow.NegativeGlobalParam">Floor height must be a positive number</system:String>
+    <system:String x:Key="MainWindow.MaxGlobalParam">Floor height must be less {0} mm</system:String>
     
     <system:String x:Key="Selections.DBSelection">All spots dimensions</system:String>
     <system:String x:Key="Selections.DBViewSelection">Spot dimensions on view</system:String>
