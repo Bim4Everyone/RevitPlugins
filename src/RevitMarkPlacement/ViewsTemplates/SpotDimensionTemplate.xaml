@@ -4,6 +4,7 @@
                     xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml">
     <DataTemplate x:Key="SpotDimensionTemplate" DataType="{x:Type vms:SpotDimensionTypeViewModel}">
         <ui:TextBlock
+            Margin="5 0 0 0"
             Appearance="Secondary"
             Text="{Binding Name}" />
     </DataTemplate>

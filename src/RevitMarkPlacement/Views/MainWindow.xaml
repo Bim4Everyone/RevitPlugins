@@ -21,10 +21,10 @@
     Title="{me:LocalizationSource MainWindow.Title}"
 
     Width="800"
-    Height="450"
+    Height="650"
 
     MinWidth="800"
-    MinHeight="450"
+    MinHeight="650"
 
     d:DataContext="{d:DesignInstance vms:MainViewModel, IsDesignTimeCreatable=False}">
 
@@ -47,7 +47,8 @@
                 FalseValue="Visible" />
 
             <DataTemplate DataType="{x:Type floorHeight:UserFloorHeightViewModel}">
-                <Grid>
+                <Grid
+                    IsEnabled="{Binding IsEnabled}">
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="300" />
                         <ColumnDefinition Width="*" />
@@ -68,7 +69,9 @@
             </DataTemplate>
 
             <DataTemplate DataType="{x:Type floorHeight:GlobalParamsViewModel}">
-                <Grid>
+                <Grid
+                    IsEnabled="{Binding IsEnabled}">
+                    
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="300" />
                         <ColumnDefinition Width="*" />
@@ -101,7 +104,7 @@
                 <RadioButton
                     Margin="5 0 0 0"
                     IsChecked="{Binding IsSelected, 
-                RelativeSource={RelativeSource AncestorType=ListBoxItem}, Mode=TwoWay}"
+                        RelativeSource={RelativeSource AncestorType=ListBoxItem}, Mode=TwoWay}"
                     Content="{Binding Selections, Converter={markupExtensions:EnumToLocale}}" />
             </DataTemplate>
 
@@ -173,7 +176,6 @@
                 <controls:CustomEditControl
                     HeaderText="{me:LocalizationSource MainWindow.FloorCount}">
                     <ui:TextBox
-                        HorizontalContentAlignment="Right"
                         Text="{Binding LevelCount, UpdateSourceTrigger=PropertyChanged}" />
                 </controls:CustomEditControl>
             </Border>
