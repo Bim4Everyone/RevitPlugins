@@ -16,6 +16,7 @@ using RevitMarkPlacement.Models.SelectionModes;
 using RevitMarkPlacement.Services;
 using RevitMarkPlacement.Services.AnnotationServices;
 using RevitMarkPlacement.ViewModels.FloorHeight;
+using RevitMarkPlacement.ViewModels.ReportViewModels;
 
 namespace RevitMarkPlacement.ViewModels;
 
@@ -30,7 +31,7 @@ internal class MainViewModel : BaseViewModel {
     private readonly IGlobalParamSelection _globalSelection;
     private readonly ISpotDimensionSelection[] _spotSelections;
 
-    private InfoElementsViewModel _infoElementsViewModel;
+    private ReportElementsViewModel _reportElementsViewModel;
 
     private string _errorText;
     private string _levelCount;
@@ -62,7 +63,7 @@ internal class MainViewModel : BaseViewModel {
         _globalSelection = globalSelection;
         _spotSelections = spotSelections;
 
-        InfoElementsViewModel = new InfoElementsViewModel();
+        ReportElementsViewModel = new ReportElementsViewModel();
 
         LoadViewCommand = RelayCommand.Create(LoadView);
         AcceptViewCommand = RelayCommand.Create(AcceptView, CanAcceptView);
@@ -101,9 +102,9 @@ internal class MainViewModel : BaseViewModel {
         set => RaiseAndSetIfChanged(ref _floorHeights, value);
     }
 
-    public InfoElementsViewModel InfoElementsViewModel {
-        get => _infoElementsViewModel;
-        set => RaiseAndSetIfChanged(ref _infoElementsViewModel, value);
+    public ReportElementsViewModel ReportElementsViewModel {
+        get => _reportElementsViewModel;
+        set => RaiseAndSetIfChanged(ref _reportElementsViewModel, value);
     }
 
     private void LoadView() {

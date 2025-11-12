@@ -1,4 +1,5 @@
-﻿using System.Globalization;
+﻿using System;
+using System.Globalization;
 using System.Reflection;
 using System.Windows;
 
@@ -18,7 +19,9 @@ using RevitMarkPlacement.Models;
 using RevitMarkPlacement.Models.DocumentProviders;
 using RevitMarkPlacement.Models.SelectionModes;
 using RevitMarkPlacement.Models.UnitProviders;
+using RevitMarkPlacement.Services;
 using RevitMarkPlacement.ViewModels;
+using RevitMarkPlacement.ViewModels.ReportViewModels;
 using RevitMarkPlacement.Views;
 
 namespace RevitMarkPlacement;
@@ -78,7 +81,7 @@ public class PlaceAnnotationCommand : BasePluginCommand {
         kernel.Bind<SystemPluginConfig>()
             .ToSelf()
             .InSingletonScope();
-        
+
         kernel.Bind<IUnitProvider>()
             .To<UnitProvider>()
             .InSingletonScope();
@@ -103,7 +106,22 @@ public class PlaceAnnotationCommand : BasePluginCommand {
             .To<DoubleGlobalParamSelection>()
             .InSingletonScope();
 
-        // Вызывает стандартное уведомление
+        kernel.Bind<IReportService>()
+            .To<ReportService>()
+            .InSingletonScope();
+
+        kernel.BindOtherWindow<ReportElementsViewModel, ReportElementsWindow>();
+
+        Check(kernel);
         Notification(kernel.Get<MainWindow>());
+    }
+
+    private static void Check(IKernel kernel) {
+        IReportService reportService = kernel.Get<IReportService>();
+        if(reportService.LoadReportElements()) {
+            reportService.ShowReport();
+            
+            throw new OperationCanceledException();
+        }
     }
 }

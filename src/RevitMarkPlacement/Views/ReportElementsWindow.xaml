@@ -1,5 +1,5 @@
 ﻿<core:WpfUIPlatformWindow
-    x:Class="RevitMarkPlacement.Views.ReportWindow"
+    x:Class="RevitMarkPlacement.Views.ReportElementsWindow"
     xmlns:base="clr-namespace:dosymep.WPF.Views"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"

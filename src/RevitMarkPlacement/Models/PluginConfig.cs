@@ -56,10 +56,19 @@ internal class SystemPluginConfig {
     public SystemPluginConfig() {
         FamilyNames = [FamilyTopName, FamilyBottomName];
         FamilyTypeNames = [FamilyTypeTopName, FamilyTypeBottomName];
+
+        FamilyParamsNames = [
+            FirstLevelParamName,
+            FirstLevelOnParamName,
+            LevelHeightParamName,
+            LevelCountParamName,
+            SpotDimensionIdParamName
+        ];
     }
-    
-    public ICollection<string> FamilyNames { get; }
-    public ICollection<string> FamilyTypeNames { get; }
+
+    public HashSet<string> FamilyNames { get; }
+    public HashSet<string> FamilyTypeNames { get; }
+    public HashSet<string> FamilyParamsNames { get; }
     
     public int MaxLevelCount => 12;
     public int MaxLevelHeightMm => 10000; // mm

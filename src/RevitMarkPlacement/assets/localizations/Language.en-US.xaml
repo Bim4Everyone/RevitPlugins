@@ -8,15 +8,15 @@
 
     <system:String x:Key="MainWindow.ButtonOk">OK</system:String>
     <system:String x:Key="MainWindow.ButtonCancel">Cancel</system:String>
-    
+
     <system:String x:Key="MainWindow.CreateAnnotationsTransactionName">Create annotations</system:String>
     <system:String x:Key="MainWindow.UpdateAnnotationsTransactionName">Update annotations</system:String>
-    
+
     <system:String x:Key="MainWindow.CreateText">Create</system:String>
     <system:String x:Key="MainWindow.SettingsText">Settings</system:String>
     <system:String x:Key="MainWindow.FloorCount">Floor count</system:String>
     <system:String x:Key="MainWindow.FloorHeight">Floor height</system:String>
-    
+
     <system:String x:Key="MainWindow.EmptySpotDimensions">Spot dimensions not found</system:String>
     <system:String x:Key="MainWindow.EmptySelectionMode">Please select selection mode</system:String>
     <system:String x:Key="MainWindow.EmptySpotDimensionTypes">Please select selection mode with spot dimension types</system:String>
@@ -32,11 +32,19 @@
     <system:String x:Key="MainWindow.EmptyGlobalParam">Please select a global parameter</system:String>
     <system:String x:Key="MainWindow.NegativeGlobalParam">Floor height must be a positive number</system:String>
     <system:String x:Key="MainWindow.MaxGlobalParam">Floor height must be less {0} mm</system:String>
-    
+
     <system:String x:Key="Selections.DBSelection">All spots dimensions</system:String>
     <system:String x:Key="Selections.DBViewSelection">Spot dimensions on view</system:String>
     <system:String x:Key="Selections.SelectedOnViewSelection">Selected dimensions on view</system:String>
-    
+
     <system:String x:Key="LevelHeightProvider.UserSettings">User</system:String>
     <system:String x:Key="LevelHeightProvider.GlobalParameter">Global parameter</system:String>
+
+    <system:String x:Key="Report.MissingParamTitle">Missing family parameter</system:String>
+    <system:String x:Key="Report.MissingParamDescription">Not found the required parameter in a family document</system:String>
+    <system:String x:Key="Report.MissingParamMessageFormat">Not found the required parameter {1} in a family {0}</system:String>
+
+    <system:String x:Key="Report.MissingFamilyTitle">Missing family</system:String>
+    <system:String x:Key="Report.MissingFamilyDescription">Not found the required family in a document</system:String>
+    <system:String x:Key="Report.MissingFamilyMessageFormat">Not found the required family {0} in a document</system:String>
 </ResourceDictionary>

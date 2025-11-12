@@ -43,11 +43,11 @@ internal class RevitRepository : BaseViewModel {
     /// Класс доступа к документу Revit.
     /// </summary>
     public Document Document => ActiveUIDocument.Document;
-    
+
     public Transaction StartTransaction(string transactionName) {
         return Document.StartTransaction(transactionName);
     }
-    
+
     public TransactionGroup StartTransactionGroup(string transactionName) {
         return Document.StartTransactionGroup(transactionName);
     }
@@ -97,10 +97,22 @@ internal class RevitRepository : BaseViewModel {
 
     public void DeleteElement(Element element) {
         Transaction transaction = Document.StartTransaction("Remove element");
-        
+
         Document.Delete(element.Id);
-        
+
         transaction.Commit();
+    }
+
+    public Family GetAnnotationFamily(string familyName) {
+        return new FilteredElementCollector(Document)
+            .OfClass(typeof(Family))
+            .Cast<Family>()
+            .FirstOrDefault(item => item.Name.Equals(
+                familyName, StringComparison.CurrentCultureIgnoreCase));
+    }
+
+    public Document LoadFamilyDocument(Family family) {
+        return Document.EditFamily(family);
     }
 
     private bool IsNeededAnnotationInstance(AnnotationSymbol instance) {

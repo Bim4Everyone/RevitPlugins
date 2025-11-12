@@ -8,8 +8,8 @@ namespace RevitMarkPlacement.Views;
 /// <summary>
 ///     Interaction logic for ReportView.xaml
 /// </summary>
-public partial class ReportWindow {
-    public ReportWindow(
+public partial class ReportElementsWindow {
+    public ReportElementsWindow(
         ILoggerService loggerService,
         ISerializationService serializationService,
         ILanguageService languageService,
@@ -37,7 +37,7 @@ public partial class ReportWindow {
     /// <remarks>
     /// Используется для сохранения положения окна.
     /// </remarks>
-    public override string ProjectConfigName => nameof(ReportWindow);
+    public override string ProjectConfigName => nameof(ReportElementsWindow);
 
     private void ButtonOk_Click(object sender, RoutedEventArgs e) {
         DialogResult = true;

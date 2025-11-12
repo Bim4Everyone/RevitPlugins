@@ -1,4 +1,5 @@
-﻿using System.Globalization;
+﻿using System;
+using System.Globalization;
 using System.Linq;
 using System.Reflection;
 
@@ -23,6 +24,7 @@ using RevitMarkPlacement.Models.SelectionModes;
 using RevitMarkPlacement.Services;
 using RevitMarkPlacement.Services.AnnotationServices;
 using RevitMarkPlacement.ViewModels;
+using RevitMarkPlacement.ViewModels.ReportViewModels;
 using RevitMarkPlacement.Views;
 
 namespace RevitMarkPlacement;
@@ -67,7 +69,7 @@ public class UpdateAnnotationsCommand : BasePluginCommand {
         kernel.UseWpfUIThemeUpdater();
 
         // Настройка запуска окна
-        kernel.BindMainWindow<MainViewModel, ReportWindow>();
+        kernel.BindMainWindow<MainViewModel, ReportElementsWindow>();
 
         // Настройка локализации,
         // получение имени сборки откуда брать текст
@@ -90,40 +92,47 @@ public class UpdateAnnotationsCommand : BasePluginCommand {
         kernel.Bind<IGlobalParamSelection>()
             .To<DoubleGlobalParamSelection>()
             .InSingletonScope();
-        
+
         kernel.Bind<IAnnotationService>()
             .To<UpdateAnnotationService>()
             .InSingletonScope();
-        
+
+        kernel.Bind<IReportService>()
+            .To<ReportService>()
+            .InSingletonScope();
+
+        kernel.BindOtherWindow<ReportElementsViewModel, ReportElementsWindow>();
+
+        Check(kernel);
+        UpdateAnnotations(kernel);
+    }
+
+    private static void Check(IKernel kernel) {
+        IReportService reportService = kernel.Get<IReportService>();
+        if(reportService.LoadReportElements()) {
+            reportService.ShowReport();
+
+            throw new OperationCanceledException();
+        }
+    }
+
+    private static void UpdateAnnotations(IKernel kernel) {
         var service = kernel.Get<IAnnotationService>();
         var spotDimensionSelection = kernel.Get<ISpotDimensionSelection>();
-      
+
         var revitRepository = kernel.Get<RevitRepository>();
         var localizationService = kernel.Get<ILocalizationService>();
 
         using TransactionGroup transaction = revitRepository.StartTransactionGroup(
             localizationService.GetLocalizedString("MainWindow.UpdateAnnotationsTransactionName"));
-        
+
         SpotDimension[] spotDimensions = spotDimensionSelection
             .GetElements()
             .ToArray();
-        
+
         service.LoadAnnotations(spotDimensions);
         service.ProcessAnnotations(new UpdateAnnotationTemplateOptions());
-        
-        transaction.Assimilate();
 
-        // var viewModel = kernel.Get<MainViewModel>();
-        // if(!viewModel.CanPlaceAnnotation()) {
-        //     // Вызывает стандартное уведомление
-        //     Notification(kernel.Get<ReportWindow>());
-        // } else {
-        //     RevitRepository revitRepository = kernel.Get<RevitRepository>();
-        //
-        //     var marks = new TemplateLevelMarkCollection(
-        //         revitRepository,
-        //         new DBSelection(new ActiveDocumentProvider(uiApplication)));
-        //     marks.UpdateAnnotation();
-        // }
+        transaction.Assimilate();
     }
 }
