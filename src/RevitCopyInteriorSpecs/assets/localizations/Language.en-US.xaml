@@ -4,5 +4,44 @@
 
     <system:String x:Key="MainWindow.Title">Copying specifications</system:String>
 
+    <system:String x:Key="MainWindow.Settings">Settings</system:String>
 
+    <system:String x:Key="MainWindow.NoSpecsSelected">No specifications selected</system:String>
+    <system:String x:Key="MainWindow.NoTasksCreated">No tasks created</system:String>
+    <system:String x:Key="MainWindow.NotAllLevelsSelected">Not all tasks have a level selected</system:String>
+    <system:String x:Key="MainWindow.NotAllPhasesSelected">Not all tasks have a phase selected</system:String>
+
+    <system:String x:Key="MainWindow.GroupTypeParamNameEmpty">Parameter name for group type not specified</system:String>
+    <system:String x:Key="MainWindow.LevelParamNameEmpty">Parameter name for level not specified</system:String>
+    <system:String x:Key="MainWindow.LevelShortNameParamNameEmpty">The parameter name for the floor is not specified</system:String>
+    <system:String x:Key="MainWindow.PhaseParamNameEmpty">Parameter name for stage not specified</system:String>
+    <system:String x:Key="MainWindow.FirstDispatcherGroupingLevelParamNameEmpty">No parameter name specified for dispatcher grouping 1</system:String>
+    <system:String x:Key="MainWindow.SecondDispatcherGroupingLevelParamNameEmpty">No parameter name specified for dispatcher grouping 2</system:String>
+    <system:String x:Key="MainWindow.ThirdDispatcherGroupingLevelParamNameEmpty">No parameter name specified for dispatcher grouping 3</system:String>
+
+    <system:String x:Key="MainWindow.ButtonOk">OK</system:String>
+    <system:String x:Key="MainWindow.ButtonCancel">Cancel</system:String>
+
+    <system:String x:Key="MainWindow.SelectedSpecs">Selected specifications to copy:</system:String>
+    <system:String x:Key="MainWindow.SimultaneousFillingFields">To fill in the fields of the task lines simultaneously:</system:String>
+
+    <system:String x:Key="MainWindow.Tasks">Tasks for the plugin to work</system:String>
+    <system:String x:Key="MainWindow.TaskRows">Task rows:</system:String>
+    <system:String x:Key="MainWindow.GroupType">Group type</system:String>
+    <system:String x:Key="MainWindow.Level">Level</system:String>
+    <system:String x:Key="MainWindow.LevelShortName">Floor</system:String>
+    <system:String x:Key="MainWindow.Phase">Phase</system:String>
+    <system:String x:Key="MainWindow.FirstDispatcherGroupingLevel">Grouping 1</system:String>
+    <system:String x:Key="MainWindow.SecondDispatcherGroupingLevel">Grouping 2</system:String>
+    <system:String x:Key="MainWindow.ThirdDispatcherGroupingLevel">Grouping 3</system:String>
+    
+    <system:String x:Key="MainWindow.AddTask">Add task</system:String>
+    <system:String x:Key="MainWindow.DeleteTask">Delete task</system:String>
+
+    <system:String x:Key="MainWindow.Parameters">Parameters</system:String>
+    <system:String x:Key="MainWindow.ProjectParametersSettings">Project parameters settings</system:String>
+
+    <system:String x:Key="MainWindow.SpecificationAlreadyExists">The project already has a specification with the name</system:String>
+    <system:String x:Key="MainWindow.ErrorReport">Error report</system:String>
+    <system:String x:Key="MainWindow.TransactionName">BIM: Copying specifications</system:String>
 </ResourceDictionary>

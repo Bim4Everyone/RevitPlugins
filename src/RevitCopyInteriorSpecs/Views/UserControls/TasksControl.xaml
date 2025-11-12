@@ -69,23 +69,16 @@
 
         <ui:TextBlock
             Grid.Row="0"
-            Margin="10 5"
+            Margin="15 10"
+            FontWeight="Bold"
             VerticalAlignment="Bottom"
             Text="{me:LocalizationSource MainWindow.Tasks}" />
 
-        <Grid
-            Grid.Row="1">
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="*" />
-                <ColumnDefinition Width="Auto" />
-            </Grid.ColumnDefinitions>
-
-            <ui:TextBlock
-                Grid.Column="0"
-                Margin="10 5"
-                VerticalAlignment="Bottom"
-                Text="{me:LocalizationSource MainWindow.SimultaneousFillingFields}" />
-        </Grid>
+        <ui:TextBlock
+            Grid.Row="1"
+            Margin="15 5"
+            VerticalAlignment="Bottom"
+            Text="{me:LocalizationSource MainWindow.SimultaneousFillingFields}" />
 
         <ScrollViewer
             Grid.Row="2"
@@ -219,7 +212,7 @@
 
         <ui:TextBlock
             Grid.Row="3"
-            Margin="10 5"
+            Margin="15 5"
             VerticalAlignment="Bottom"
             Text="{me:LocalizationSource MainWindow.TaskRows}" />
 
@@ -362,13 +355,13 @@
             <Button
                 Margin="5"
                 MinWidth="150"
-                Content="{DynamicResource MainWindow.AddTask}"
+                Content="{me:LocalizationSource MainWindow.AddTask}"
                 Command="{Binding Path=TasksVM.AddTaskCommand}" />
 
             <Button
                 Margin="5"
                 MinWidth="150"
-                Content="{DynamicResource MainWindow.DeleteTask}"
+                Content="{me:LocalizationSource MainWindow.DeleteTask}"
                 Command="{Binding Path=TasksVM.DeleteTaskCommand}" />
         </StackPanel>
     </Grid>

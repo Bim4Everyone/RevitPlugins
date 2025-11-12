@@ -50,7 +50,7 @@
                 Grid.Row="0"
                 Grid.Column="0"
                 Margin="5 5 5 0"
-                Text="{DynamicResource MainWindow.GroupType}" />
+                Text="{me:LocalizationSource MainWindow.GroupType}" />
 
             <ui:TextBox
                 Grid.Row="0"
@@ -63,7 +63,7 @@
                 Grid.Row="1"
                 Grid.Column="0"
                 Margin="5 5 5 0"
-                Text="{DynamicResource MainWindow.Level}" />
+                Text="{me:LocalizationSource MainWindow.Level}" />
 
             <ui:TextBox
                 Grid.Row="1"
@@ -76,7 +76,7 @@
                 Grid.Row="2"
                 Grid.Column="0"
                 Margin="5 5 5 0"
-                Text="{DynamicResource MainWindow.LevelShortName}" />
+                Text="{me:LocalizationSource MainWindow.LevelShortName}" />
 
             <ui:TextBox
                 Grid.Row="2"
@@ -89,7 +89,7 @@
                 Grid.Row="3"
                 Grid.Column="0"
                 Margin="5 5 5 0"
-                Text="{DynamicResource MainWindow.Phase}" />
+                Text="{me:LocalizationSource MainWindow.Phase}" />
 
             <ui:TextBox
                 Grid.Row="3"
@@ -102,7 +102,7 @@
                 Grid.Row="4"
                 Grid.Column="0"
                 Margin="5 5 5 0"
-                Text="{DynamicResource MainWindow.FirstDispatcherGroupingLevel}" />
+                Text="{me:LocalizationSource MainWindow.FirstDispatcherGroupingLevel}" />
 
             <ui:TextBox
                 Grid.Row="4"
@@ -115,7 +115,7 @@
                 Grid.Row="5"
                 Grid.Column="0"
                 Margin="5 5 5 0"
-                Text="{DynamicResource MainWindow.SecondDispatcherGroupingLevel}" />
+                Text="{me:LocalizationSource MainWindow.SecondDispatcherGroupingLevel}" />
 
             <ui:TextBox
                 Grid.Row="5"
@@ -128,7 +128,7 @@
                 Grid.Row="6"
                 Grid.Column="0"
                 Margin="5 5 5 0"
-                Text="{DynamicResource MainWindow.ThirdDispatcherGroupingLevel}" />
+                Text="{me:LocalizationSource MainWindow.ThirdDispatcherGroupingLevel}" />
 
             <ui:TextBox
                 Grid.Row="6"

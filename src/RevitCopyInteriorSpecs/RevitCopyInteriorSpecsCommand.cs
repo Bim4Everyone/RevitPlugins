@@ -60,6 +60,8 @@ public class RevitCopyInteriorSpecsCommand : BasePluginCommand {
 
         kernel.Bind<SpecificationService>()
             .ToSelf();
+        kernel.Bind<DefaultParamNameService>()
+            .ToSelf();
 
         Notification(kernel.Get<MainWindow>());
     }

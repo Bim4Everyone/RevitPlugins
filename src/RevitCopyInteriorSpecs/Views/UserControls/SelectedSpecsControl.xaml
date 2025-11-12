@@ -4,6 +4,10 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        
+    xmlns:core="clr-namespace:dosymep.WpfUI.Core"
+    xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
+    xmlns:me="clr-namespace:dosymep.WpfCore.MarkupExtensions;assembly=dosymep.WpfCore"
     
     xmlns:local="clr-namespace:RevitCopyInteriorSpecs.Views"
     xmlns:vms="clr-namespace:RevitCopyInteriorSpecs.ViewModels"
@@ -13,11 +17,11 @@
 
     <StackPanel Orientation="Horizontal">
         <TextBlock
-            Margin="7"
+            Margin="15 7"
             MinWidth="250"
             VerticalAlignment="Center"
             HorizontalAlignment="Left"
-            Text="{DynamicResource MainWindow.SelectedSpecs}" />
+            Text="{me:LocalizationSource MainWindow.SelectedSpecs}" />
 
         <TextBlock
             Margin="7"
