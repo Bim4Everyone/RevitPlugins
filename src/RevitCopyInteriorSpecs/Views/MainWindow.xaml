@@ -94,21 +94,7 @@
                         <TextBlock
                             Text="{me:LocalizationSource MainWindow.Settings}"
                             HorizontalAlignment="Center"
-                            Padding="3">
-                            <TextBlock.ToolTip>
-                                <ToolTip>
-                                    <TextBlock
-                                        Text="{me:LocalizationSource MainWindow.SettingsToolTip}"
-                                        FontSize="12"
-                                        TextWrapping="Wrap"
-                                        TextAlignment="Justify"
-                                        FlowDirection="LeftToRight"
-                                        ToolTipService.InitialShowDelay="1000"
-                                        ToolTipService.ShowDuration="20000"
-                                        ToolTipService.BetweenShowDelay="1" />
-                                </ToolTip>
-                            </TextBlock.ToolTip>
-                        </TextBlock>
+                            Padding="3" />
                     </Expander.Header>
 
                     <Grid
