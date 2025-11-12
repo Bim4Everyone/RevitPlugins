@@ -90,6 +90,9 @@ internal class SleeveModel : IEquatable<SleeveModel> {
         return (start, start + orientation * Length);
     }
 
+    /// <summary>
+    /// Гильзы можно объединить, только если их диаметры равны и их оси лежат на одной прямой
+    /// </summary>
     public bool CanMerge(SleeveModel second) {
         if(this.Equals(second)) { return false; }
         double distanceTolerance = _familyInstance.Document.Application.ShortCurveTolerance;
@@ -98,7 +101,7 @@ internal class SleeveModel : IEquatable<SleeveModel> {
         }
         double angleTolerance = _familyInstance.Document.Application.AngleTolerance;
         var locationDiff = this.Location - second.Location;
-        double angle = this.GetOrientation().AngleTo(locationDiff);
+        double angle = locationDiff.IsAlmostEqualTo(new XYZ()) ? 0 : this.GetOrientation().AngleTo(locationDiff);
         return locationDiff.GetLength() <= (this.Length / 2 + second.Length / 2 + distanceTolerance * 2)
             && (angle <= angleTolerance || (Math.PI - angleTolerance) <= angle && angle <= Math.PI);
     }
