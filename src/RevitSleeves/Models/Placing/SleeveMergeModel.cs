@@ -35,13 +35,14 @@ internal class SleeveMergeModel {
 
     public (XYZ Start, XYZ End) GetEndPoints() {
         var orientation = GetOrientation();
-        var startPoint = _sleeves[0].Location;
-        var orderedSleeves = _sleeves.OrderBy(s => orientation.DotProduct(s.Location - startPoint)).ToArray();
-        var first = orderedSleeves.First();
-        var last = orderedSleeves.Last();
-        double length = first.Length / 2 + (last.Location - first.Location).GetLength() + last.Length / 2;
-        var start = first.Location - orientation * first.Length / 2;
-        return (start, start + orientation * length);
+        var comparingPoint = _sleeves[0].Location;
+        var points = _sleeves.SelectMany(s => {
+                (var a, var b) = s.GetEndPoints();
+                return new XYZ[] { a, b };
+            })
+            .OrderBy(p => orientation.DotProduct(p - comparingPoint))
+            .ToArray();
+        return (points.First(), points.Last());
     }
 
     public IReadOnlyCollection<SleeveModel> GetSleeves() {
