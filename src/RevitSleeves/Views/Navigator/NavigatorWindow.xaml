@@ -19,19 +19,6 @@
     d:DataContext="{d:DesignInstance vms:NavigatorViewModel, IsDesignTimeCreatable=False}">
     <core:WpfUIPlatformWindow.Resources>
         <ResourceDictionary>
-            <CollectionViewSource
-                x:Key="groupedSleeves"
-                Source="{Binding Sleeves}">
-                <CollectionViewSource.GroupDescriptions>
-                    <PropertyGroupDescription
-                        PropertyName="Status" />
-                </CollectionViewSource.GroupDescriptions>
-                <CollectionViewSource.SortDescriptions>
-                    <cm:SortDescription
-                        PropertyName="StatusValue"
-                        Direction="Ascending" />
-                </CollectionViewSource.SortDescriptions>
-            </CollectionViewSource>
             <ui:TextBlock
                 x:Key="DiameterHeader"
                 Text="{me:LocalizationSource Diameter}" />
@@ -69,16 +56,26 @@
             Style="{StaticResource CustomBorder}">
             <DockPanel
                 LastChildFill="True">
-                <Label
-                    Style="{StaticResource CustomLabel}"
-                    Content="{Binding SettingsNameHeader}"
-                    DockPanel.Dock="Top" />
+                <DockPanel
+                    DockPanel.Dock="Top"
+                    LastChildFill="True">
+                    <Label
+                        Style="{StaticResource CustomLabel}"
+                        Content="{Binding SettingsNameHeader}" />
+                    <ui:TextBox
+                        DockPanel.Dock="Right"
+                        MinWidth="300"
+                        MaxWidth="300"
+                        HorizontalAlignment="Right"
+                        Text="{Binding SleevesFilter, UpdateSourceTrigger=PropertyChanged}"
+                        PlaceholderText="{me:LocalizationSource Navigator.Search}" />
+                </DockPanel>
                 <ui:DataGrid
                     RowHeight="26"
                     VerticalContentAlignment="Center"
                     CellStyle="{StaticResource CustomDataGridCell}"
                     Style="{StaticResource CustomReadonlyDataGrid}"
-                    ItemsSource="{Binding Source={StaticResource groupedSleeves}}">
+                    ItemsSource="{Binding Sleeves.View}">
                     <ui:DataGrid.GroupStyle>
                         <GroupStyle
                             ContainerStyle="{StaticResource CustomGroupHeaderStyle}" />
