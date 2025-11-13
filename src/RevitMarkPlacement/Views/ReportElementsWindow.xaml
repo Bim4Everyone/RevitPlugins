@@ -43,80 +43,83 @@
             Grid.Row="0"
             Title="{me:LocalizationSource ReportWindow.Title}" />
 
-
-        <ItemsControl
+        <ScrollViewer
             Grid.Row="1"
-            ItemsSource="{Binding ReportElements}">
+            VerticalScrollBarVisibility="Auto">
+            <ItemsControl
+                ItemsSource="{Binding ReportElements}">
 
-            <ItemsControl.ItemTemplate>
-                <DataTemplate DataType="vms:ReportElementViewModel">
-                    <Border>
-                        <Border.Style>
-                            <Style TargetType="Border">
-                                <Setter Property="Margin" Value="8 0 8 8" />
-                                <Setter Property="Padding" Value="14 8" />
-                                <Setter Property="Background" Value="{DynamicResource CardBackground}" />
-                                <Setter Property="CornerRadius" Value="{DynamicResource ControlCornerRadius}" />
-                            </Style>
-                        </Border.Style>
+                <ItemsControl.ItemTemplate>
+                    <DataTemplate DataType="vms:ReportElementViewModel">
+                        <Border>
+                            <Border.Style>
+                                <Style TargetType="Border">
+                                    <Setter Property="Margin" Value="8 0 8 8" />
+                                    <Setter Property="Padding" Value="14 8" />
+                                    <Setter Property="Background" Value="{DynamicResource CardBackground}" />
+                                    <Setter Property="CornerRadius" Value="{DynamicResource ControlCornerRadius}" />
+                                </Style>
+                            </Border.Style>
 
-                        <Grid
-                            ToolTip="{Binding DescriptionDescription}">
+                            <Grid
+                                ToolTip="{Binding DescriptionDescription}">
 
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="Auto" />
-                                <ColumnDefinition Width="*" />
-                                <ColumnDefinition Width="Auto" />
-                            </Grid.ColumnDefinitions>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="Auto" />
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="Auto" />
+                                </Grid.ColumnDefinitions>
 
-                            <Grid.RowDefinitions>
-                                <RowDefinition Height="Auto" />
-                                <RowDefinition Height="Auto" />
-                            </Grid.RowDefinitions>
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="Auto" />
+                                    <RowDefinition Height="Auto" />
+                                </Grid.RowDefinitions>
 
-                            <ui:SymbolIcon
-                                Grid.Row="0"
-                                Grid.Column="0"
-                                Grid.RowSpan="2"
-                                Margin="0 0 8 0"
-                                FontSize="24"
-                                Symbol="Warning24" />
+                                <ui:SymbolIcon
+                                    Grid.Row="0"
+                                    Grid.Column="0"
+                                    Grid.RowSpan="2"
+                                    Margin="0 0 8 0"
+                                    FontSize="24"
+                                    Symbol="Warning24" />
 
-                            <ui:TextBlock
-                                Grid.Row="0"
-                                Grid.Column="1"
-                                Margin="0 0 8 0"
-                                Appearance="Primary"
-                                FontTypography="BodyStrong"
-                                Text="{Binding DescriptionTitle}" />
+                                <ui:TextBlock
+                                    Grid.Row="0"
+                                    Grid.Column="1"
+                                    Margin="0 0 8 0"
+                                    Appearance="Primary"
+                                    FontTypography="BodyStrong"
+                                    Text="{Binding DescriptionTitle}" />
 
-                            <ui:TextBlock
-                                Grid.Row="1"
-                                Grid.Column="1"
-                                Margin="0 0 8 0"
-                                Appearance="Secondary"
-                                Text="{Binding FormattedMessage}" />
+                                <ui:TextBlock
+                                    Grid.Row="1"
+                                    Grid.Column="1"
+                                    Margin="0 0 8 0"
+                                    Appearance="Secondary"
+                                    Text="{Binding FormattedMessage}"
+                                    ToolTip="{Binding FormattedMessage}" />
 
-                            <ui:TextBlock
-                                Grid.Row="0"
-                                Grid.Column="2"
-                                Appearance="Disabled"
-                                HorizontalAlignment="Right"
-                                Text="{Binding DescriptionReportLevel}" />
+                                <ui:TextBlock
+                                    Grid.Row="0"
+                                    Grid.Column="2"
+                                    Appearance="Disabled"
+                                    HorizontalAlignment="Right"
+                                    Text="{Binding DescriptionReportLevel}" />
 
-                            <ui:TextBlock
-                                Grid.Row="1"
-                                Grid.Column="2"
-                                Appearance="Disabled"
-                                HorizontalAlignment="Right"
-                                Text="{Binding DescriptionId}" />
-                            
-                        </Grid>
-                    </Border>
-                </DataTemplate>
-            </ItemsControl.ItemTemplate>
+                                <ui:TextBlock
+                                    Grid.Row="1"
+                                    Grid.Column="2"
+                                    Appearance="Disabled"
+                                    HorizontalAlignment="Right"
+                                    Text="{Binding DescriptionId}" />
 
-        </ItemsControl>
+                            </Grid>
+                        </Border>
+                    </DataTemplate>
+                </ItemsControl.ItemTemplate>
+
+            </ItemsControl>
+        </ScrollViewer>
         
         <StackPanel
             Grid.Row="2"
