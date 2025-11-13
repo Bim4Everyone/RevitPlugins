@@ -314,15 +314,21 @@ namespace RevitCreateViewSheet.Models {
         private void UpdateTitleBlockParams(FamilyInstance titleBlock, SheetModel sheetModel) {
             // у листа может не быть основной надписи
             if(titleBlock is not null) {
-                if(titleBlock.IsExistsParam(SheetModel.SheetFormatSizeParam)
-                    && titleBlock.IsExistsParam(SheetModel.SheetFormatMultiplyParam)) {
+                if(CanSetParam(titleBlock, SheetModel.SheetFormatSizeParam)
+                   && CanSetParam(titleBlock, SheetModel.SheetFormatMultiplyParam)) {
                     titleBlock.SetParamValue(SheetModel.SheetFormatSizeParam, sheetModel.SheetFormat.SizeIndex);
                     titleBlock.SetParamValue(SheetModel.SheetFormatMultiplyParam, sheetModel.SheetFormat.MultiplyIndex);
                 }
-                if(titleBlock.IsExistsParam(SheetModel.SheetFormatIsBookParam)) {
+
+                if(CanSetParam(titleBlock, SheetModel.SheetFormatIsBookParam)) {
                     titleBlock.SetParamValue(SheetModel.SheetFormatIsBookParam, sheetModel.IsBookOrientation ? 1 : 0);
                 }
             }
+        }
+
+        private bool CanSetParam(FamilyInstance instance, string paramName) {
+            return instance.IsExistsParam(paramName)
+                   && !instance.GetParam(SheetModel.SheetFormatSizeParam).IsReadOnly;
         }
 
         private ViewSheet UpdateViewSheet(ViewSheet sheet, SheetModel sheetModel) {
