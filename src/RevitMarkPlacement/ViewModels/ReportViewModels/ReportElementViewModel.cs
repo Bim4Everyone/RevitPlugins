@@ -7,6 +7,11 @@ namespace RevitMarkPlacement.ViewModels.ReportViewModels;
 internal class ReportElementViewModel : BaseViewModel {
     private readonly ReportElement _reportElement;
 
+    public ReportElementViewModel() {
+        _reportElement = null;
+    }
+    
+
     public ReportElementViewModel(ReportElement reportElement) {
         _reportElement = reportElement;
 

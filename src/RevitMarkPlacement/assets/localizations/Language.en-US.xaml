@@ -47,4 +47,11 @@
     <system:String x:Key="Report.MissingFamilyTitle">Missing family</system:String>
     <system:String x:Key="Report.MissingFamilyDescription">Not found the required family in a document</system:String>
     <system:String x:Key="Report.MissingFamilyMessageFormat">Not found the required family {0} in a document</system:String>
+    
+    <system:String x:Key="ReportWindow.Title">Report window</system:String>
+    <system:String x:Key="ReportWindow.ButtonCancel">Exit</system:String>
+    
+    <system:String x:Key="ReportLevel.Error">Error</system:String>
+    <system:String x:Key="ReportLevel.Warning">Warning</system:String>
+    <system:String x:Key="ReportLevel.Information">Information</system:String>
 </ResourceDictionary>

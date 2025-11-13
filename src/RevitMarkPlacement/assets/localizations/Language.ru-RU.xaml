@@ -47,4 +47,11 @@
     <system:String x:Key="Report.MissingFamilyTitle">Отсутствует семейство</system:String>
     <system:String x:Key="Report.MissingFamilyDescription">Не было найдено обязательное семейство в проекте</system:String>
     <system:String x:Key="Report.MissingFamilyMessageFormat">Не было найдено обязательное семейство {0} в проекте</system:String>
+    
+    <system:String x:Key="ReportWindow.Title">Список предупреждений</system:String>
+    <system:String x:Key="ReportWindow.ButtonCancel">Выход</system:String>
+    
+    <system:String x:Key="ReportLevel.Error">Ошибка</system:String>
+    <system:String x:Key="ReportLevel.Warning">Предупреждение</system:String>
+    <system:String x:Key="ReportLevel.Information">Информация</system:String>
 </ResourceDictionary>
