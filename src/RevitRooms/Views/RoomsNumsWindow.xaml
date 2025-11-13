@@ -335,6 +335,7 @@
             HorizontalAlignment="Right">
             <TextBlock 
                 Margin="10" 
+                VerticalAlignment="Center"
                 Text="{Binding RoomsNums.ErrorText}" 
                 Foreground="Orange" />
             <ui:Button 
