@@ -107,8 +107,8 @@ internal class NavigatorViewModel : BaseViewModel {
             e.Accepted = sleeve.Status.IndexOf(str, StringComparison.OrdinalIgnoreCase) >= 0
                          || sleeve.Comment.IndexOf(str, StringComparison.OrdinalIgnoreCase) >= 0
                          || sleeve.Id.ToString().IndexOf(str, StringComparison.OrdinalIgnoreCase) >= 0
-                         || sleeve.Diameter.ToString().IndexOf(str, StringComparison.InvariantCultureIgnoreCase) >= 0
-                         || sleeve.Length.ToString().IndexOf(str, StringComparison.InvariantCultureIgnoreCase) >= 0;
+                         || sleeve.Diameter.ToString(CultureInfo.InvariantCulture).IndexOf(str) >= 0
+                         || sleeve.Length.ToString(CultureInfo.InvariantCulture).IndexOf(str) >= 0;
         }
     }
 
