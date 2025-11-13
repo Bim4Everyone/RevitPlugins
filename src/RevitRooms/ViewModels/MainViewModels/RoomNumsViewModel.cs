@@ -11,12 +11,14 @@ using dosymep.WPF.Commands;
 using dosymep.WPF.ViewModels;
 
 using RevitRooms.Models;
+using RevitRooms.Services;
 using RevitRooms.ViewModels.RoomsNums;
 using RevitRooms.Views;
 
 namespace RevitRooms.ViewModels;
 internal class RoomNumsViewModel : BaseViewModel {
     private readonly RoomsNumsConfig _roomsNumsConfig;
+    private readonly NumOrderWindowService _numberingWindowService;
     private readonly RevitRepository _revitRepository;
     private readonly ILocalizationService _localizationService;
     private readonly RoomsNumsWindow _window;
@@ -27,7 +29,9 @@ internal class RoomNumsViewModel : BaseViewModel {
     public RoomNumsViewModel(RoomsNumsConfig roomsNumsConfig,
                              RevitRepository revitRepository,
                              ILocalizationService localizationService,
-                             RoomsNumsWindow window) {
+                             RoomsNumsWindow window,
+                             NumOrderWindowService numberingWindowService) {
+        _numberingWindowService = numberingWindowService;
         _roomsNumsConfig = roomsNumsConfig;
         _revitRepository = revitRepository;
         _localizationService = localizationService;
@@ -63,15 +67,15 @@ internal class RoomNumsViewModel : BaseViewModel {
         }
 
         RoomsNumsViewModels = [
-            new ViewRevitViewModel(_revitRepository, _roomsNumsConfig) { 
+            new ViewRevitViewModel(_revitRepository, _roomsNumsConfig, _numberingWindowService) { 
                 Name = "Выборка по текущему виду",
                 ParentWindow = _window
             },
-            new ElementsRevitViewModel(_revitRepository, _roomsNumsConfig) { 
+            new ElementsRevitViewModel(_revitRepository, _roomsNumsConfig, _numberingWindowService) { 
                 Name = "Выборка по всем элементам",
                 ParentWindow = _window
             },
-            new SelectedRevitViewModel(_revitRepository, _roomsNumsConfig) { 
+            new SelectedRevitViewModel(_revitRepository, _roomsNumsConfig, _numberingWindowService) { 
                 Name = "Выборка по выделенным элементам",
                 ParentWindow = _window
             }

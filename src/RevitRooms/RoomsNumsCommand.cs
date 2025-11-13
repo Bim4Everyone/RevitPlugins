@@ -34,6 +34,10 @@ public class RoomsNumsCommand : BasePluginCommand {
             .ToSelf()
             .InSingletonScope();
 
+        kernel.Bind<NumOrderWindowService>()
+            .ToSelf()
+            .InSingletonScope();
+
         // Настройка конфигурации плагина
         kernel.Bind<RoomsNumsConfig>()
             .ToMethod(c => RoomsNumsConfig.GetPluginConfig(c.Kernel.Get<IConfigSerializer>()));

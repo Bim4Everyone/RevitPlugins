@@ -7,8 +7,6 @@ using System.Windows.Input;
 using Autodesk.Revit.DB;
 using Autodesk.Revit.UI;
 
-using DevExpress.Mvvm.Native;
-
 using dosymep.Bim4Everyone.ProjectParams;
 using dosymep.SimpleServices;
 using dosymep.WPF.Commands;
@@ -17,6 +15,7 @@ using dosymep.WPF.ViewModels;
 using RevitRooms.Commands;
 using RevitRooms.Commands.Numerates;
 using RevitRooms.Models;
+using RevitRooms.Services;
 using RevitRooms.Views;
 
 namespace RevitRooms.ViewModels.RoomsNums;
@@ -46,7 +45,9 @@ internal abstract class RevitViewModel : BaseViewModel, INumberingOrder {
 
     public System.Windows.Window ParentWindow { get; set; }
 
-    public RevitViewModel(RevitRepository revitRepository, RoomsNumsConfig roomsNumsConfig) {
+    public RevitViewModel(RevitRepository revitRepository, 
+                          RoomsNumsConfig roomsNumsConfig, 
+                          NumOrderWindowService numOrderWindowService) {
         _revitRepository = revitRepository;
         _roomsNumsConfig = roomsNumsConfig;
 
@@ -64,11 +65,8 @@ internal abstract class RevitViewModel : BaseViewModel, INumberingOrder {
         Groups = [.. GetGroups()];
         Sections = [.. GetSections()];
 
-        NumberingOrders = [.. GetNumberingOrders()
-                .Where(item => item.Order == 0)];
-
-        SelectedNumberingOrders = [.. GetNumberingOrders()
-                .Where(item => item.Order > 0)];
+        NumberingOrders = [.. GetNumberingOrders().Where(item => item.Order == 0)];
+        SelectedNumberingOrders = [.. GetNumberingOrders().Where(item => item.Order > 0)];
 
         StartNumber = "1";
         Phase = Phases.FirstOrDefault();        
@@ -77,7 +75,7 @@ internal abstract class RevitViewModel : BaseViewModel, INumberingOrder {
 
         UpOrderCommand = new UpOrderCommand(this);
         DownOrderCommand = new DownOrderCommand(this);
-        AddOrderCommand = new AddOrderCommand(this);
+        AddOrderCommand = new AddOrderCommand(this, numOrderWindowService);
         RemoveOrderCommand = new RemoveOrderCommand(this);
         SaveOrderCommand = new SaveOrderCommand(this, _revitRepository);
 
