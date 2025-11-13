@@ -3,6 +3,7 @@ using System.Collections.ObjectModel;
 using System.Windows;
 using System.Windows.Input;
 
+using dosymep.SimpleServices;
 using dosymep.WPF.Commands;
 
 using RevitRooms.ViewModels;
@@ -12,7 +13,15 @@ namespace RevitRooms.Views;
 /// Interaction logic for NumberingOrderSelectWindow.xaml
 /// </summary>
 public partial class NumberingOrderSelectWindow {
-    public NumberingOrderSelectWindow() {
+    public NumberingOrderSelectWindow(
+        ILoggerService loggerService,
+        ISerializationService serializationService,
+        ILanguageService languageService, ILocalizationService localizationService,
+        IUIThemeService uiThemeService, IUIThemeUpdaterService themeUpdaterService)
+        : base(loggerService,
+               serializationService,
+               languageService, localizationService,
+               uiThemeService, themeUpdaterService) {
         InitializeComponent();
     }
 
