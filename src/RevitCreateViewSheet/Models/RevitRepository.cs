@@ -328,7 +328,7 @@ namespace RevitCreateViewSheet.Models {
 
         private bool CanSetParam(FamilyInstance instance, string paramName) {
             return instance.IsExistsParam(paramName)
-                   && !instance.GetParam(SheetModel.SheetFormatSizeParam).IsReadOnly;
+                   && !instance.GetParam(paramName).IsReadOnly;
         }
 
         private ViewSheet UpdateViewSheet(ViewSheet sheet, SheetModel sheetModel) {
