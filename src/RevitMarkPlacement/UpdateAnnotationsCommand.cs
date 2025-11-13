@@ -21,6 +21,7 @@ using RevitMarkPlacement.Models;
 using RevitMarkPlacement.Models.AnnotationTemplates;
 using RevitMarkPlacement.Models.DocumentProviders;
 using RevitMarkPlacement.Models.SelectionModes;
+using RevitMarkPlacement.Models.UnitProviders;
 using RevitMarkPlacement.Services;
 using RevitMarkPlacement.Services.AnnotationServices;
 using RevitMarkPlacement.ViewModels;
@@ -69,7 +70,7 @@ public class UpdateAnnotationsCommand : BasePluginCommand {
         kernel.UseWpfUIThemeUpdater();
 
         // Настройка запуска окна
-        kernel.BindMainWindow<MainViewModel, ReportElementsWindow>();
+        kernel.BindMainWindow<ReportElementsViewModel, ReportElementsWindow>();
 
         // Настройка локализации,
         // получение имени сборки откуда брать текст
@@ -80,7 +81,15 @@ public class UpdateAnnotationsCommand : BasePluginCommand {
         kernel.UseWpfLocalization(
             $"/{assemblyName};component/assets/localizations/Language.xaml",
             CultureInfo.GetCultureInfo("ru-RU"));
+        
+        kernel.Bind<SystemPluginConfig>()
+            .ToSelf()
+            .InSingletonScope();
 
+        kernel.Bind<IUnitProvider>()
+            .To<UnitProvider>()
+            .InSingletonScope();
+        
         kernel.Bind<IDocumentProvider>()
             .To<ActiveDocumentProvider>()
             .InSingletonScope();
@@ -100,8 +109,6 @@ public class UpdateAnnotationsCommand : BasePluginCommand {
         kernel.Bind<IReportService>()
             .To<ReportService>()
             .InSingletonScope();
-
-        kernel.BindOtherWindow<ReportElementsViewModel, ReportElementsWindow>();
 
         Check(kernel);
         UpdateAnnotations(kernel);
