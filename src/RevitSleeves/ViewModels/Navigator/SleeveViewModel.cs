@@ -30,7 +30,8 @@ internal class SleeveViewModel : BaseViewModel, IEquatable<SleeveViewModel> {
         StatusValue = _sleeve.Status;
         Diameter = _revitRepository.ConvertFromInternal(_sleeve.Diameter);
         Length = Math.Round(_revitRepository.ConvertFromInternal(_sleeve.Length), 1);
-        Comment = _sleeve.GetFamilyInstance().GetParamValue<string>(BuiltInParameter.ALL_MODEL_INSTANCE_COMMENTS);
+        Comment = _sleeve.GetFamilyInstance()
+            .GetParamValueOrDefault(BuiltInParameter.ALL_MODEL_INSTANCE_COMMENTS, string.Empty);
         Id = _sleeve.Id.GetIdValue();
     }
 
