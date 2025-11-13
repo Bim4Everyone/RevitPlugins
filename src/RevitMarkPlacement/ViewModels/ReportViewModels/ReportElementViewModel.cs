@@ -1,30 +1,34 @@
-﻿using dosymep.WPF.ViewModels;
+﻿using System.Collections.Generic;
+using System.Collections.ObjectModel;
+
+using dosymep.WPF.ViewModels;
 
 using RevitMarkPlacement.Models.ReportElements;
 
 namespace RevitMarkPlacement.ViewModels.ReportViewModels;
 
 internal class ReportElementViewModel : BaseViewModel {
-    private readonly ReportElement _reportElement;
+    private readonly ReportDescription _reportDescription;
 
     public ReportElementViewModel() {
-        _reportElement = null;
-    }
-    
-
-    public ReportElementViewModel(ReportElement reportElement) {
-        _reportElement = reportElement;
-
-        DescriptionId = reportElement.Description.Id;
-        DescriptionTitle = reportElement.Description.Title;
-        FormattedMessage = reportElement.FormattedMessage;
-        DescriptionDescription = reportElement.Description.Description;
-        DescriptionReportLevel = reportElement.Description.ReportLevel;
+        _reportDescription = null;
     }
 
-    public string DescriptionId { get; }
-    public string DescriptionTitle { get; }
-    public string FormattedMessage { get; }
-    public string DescriptionDescription { get; }
-    public ReportLevel DescriptionReportLevel { get; }
+
+    public ReportElementViewModel(ReportDescription reportDescription, IEnumerable<string> messages) {
+        _reportDescription = reportDescription;
+
+        Id = _reportDescription.Id;
+        Title = _reportDescription.Title;
+        Description = _reportDescription.Description;
+        ReportLevel = _reportDescription.ReportLevel;
+
+        Messages = [..messages];
+    }
+
+    public string Id { get; }
+    public string Title { get; }
+    public string Description { get; }
+    public ReportLevel ReportLevel { get; }
+    public ObservableCollection<string> Messages { get; }
 }

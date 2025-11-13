@@ -81,8 +81,10 @@ internal sealed class ReportService : IReportService {
         var reportElementsViewModel = (ReportElementsViewModel) reportElementsWindow.DataContext;
 
         reportElementsViewModel.ReportElements.Clear();
-        foreach(var reportElement in _reportElements) {
-            reportElementsViewModel.ReportElements.Add(new ReportElementViewModel(reportElement));
+        foreach(var group in _reportElements.GroupBy(item=> item.Description)) {
+            var report = group.Key;
+            var reportMessages = group.Select(item => item.FormattedMessage);
+            reportElementsViewModel.ReportElements.Add(new ReportElementViewModel(report, reportMessages));
         }
 
         if(reportElementsViewModel.ReportElements.Count == 0) {
