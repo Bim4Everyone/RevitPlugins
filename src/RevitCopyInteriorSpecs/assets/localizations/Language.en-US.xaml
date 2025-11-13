@@ -43,5 +43,5 @@
 
     <system:String x:Key="MainWindow.SpecificationAlreadyExists">The project already has a specification with the name</system:String>
     <system:String x:Key="MainWindow.ErrorReport">Error report</system:String>
-    <system:String x:Key="MainWindow.TransactionName">BIM: Copying specifications</system:String>
+    <system:String x:Key="MainWindow.TransactionName">Copying specifications</system:String>
 </ResourceDictionary>

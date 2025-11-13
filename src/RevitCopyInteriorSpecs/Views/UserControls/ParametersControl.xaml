@@ -56,7 +56,7 @@
                 Grid.Row="0"
                 Grid.Column="1"
                 Margin="5"
-                Padding="1"
+                Padding="5"
                 Text="{Binding Path=ParametersVM.GroupTypeParamName, UpdateSourceTrigger=PropertyChanged}" />
 
             <ui:TextBlock
@@ -69,7 +69,7 @@
                 Grid.Row="1"
                 Grid.Column="1"
                 Margin="5"
-                Padding="1"
+                Padding="5"
                 Text="{Binding Path=ParametersVM.LevelParamName, UpdateSourceTrigger=PropertyChanged}" />
 
             <ui:TextBlock
@@ -82,7 +82,7 @@
                 Grid.Row="2"
                 Grid.Column="1"
                 Margin="5"
-                Padding="1"
+                Padding="5"
                 Text="{Binding Path=ParametersVM.LevelShortNameParamName, UpdateSourceTrigger=PropertyChanged}" />
 
             <ui:TextBlock
@@ -95,7 +95,7 @@
                 Grid.Row="3"
                 Grid.Column="1"
                 Margin="5"
-                Padding="1"
+                Padding="5"
                 Text="{Binding Path=ParametersVM.PhaseParamName, UpdateSourceTrigger=PropertyChanged}" />
 
             <ui:TextBlock
@@ -108,7 +108,7 @@
                 Grid.Row="4"
                 Grid.Column="1"
                 Margin="5"
-                Padding="1"
+                Padding="5"
                 Text="{Binding Path=ParametersVM.FirstDispatcherGroupingLevelParamName, UpdateSourceTrigger=PropertyChanged}" />
 
             <ui:TextBlock
@@ -121,7 +121,7 @@
                 Grid.Row="5"
                 Grid.Column="1"
                 Margin="5"
-                Padding="1"
+                Padding="5"
                 Text="{Binding Path=ParametersVM.SecondDispatcherGroupingLevelParamName, UpdateSourceTrigger=PropertyChanged}" />
 
             <ui:TextBlock
@@ -134,7 +134,7 @@
                 Grid.Row="6"
                 Grid.Column="1"
                 Margin="5"
-                Padding="1"
+                Padding="5"
                 Text="{Binding Path=ParametersVM.ThirdDispatcherGroupingLevelParamName, UpdateSourceTrigger=PropertyChanged}" />
         </Grid>
     </Border>

@@ -1,5 +1,3 @@
-// Ignore Spelling: plugin
-
 using System;
 using System.Windows;
 using System.Windows.Input;
@@ -66,7 +64,6 @@ internal class MainViewModel : BaseViewModel {
     private void LoadView() {
         LoadConfig();
         SelectedSpecsVM.GetSelectedSpecs();
-        TasksVM.TasksForWork.Add(new TaskInfoViewModel());
     }
 
 

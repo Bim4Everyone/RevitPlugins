@@ -224,9 +224,11 @@
             ItemsSource="{Binding Path=TasksVM.TasksForWork, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
             SelectedItem="{Binding Path=TasksVM.SelectedTask, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
             SelectionMode="Single"
+            VirtualizingStackPanel.IsVirtualizing="True"
             AutoGenerateColumns="False"
             Style="{StaticResource CustomResizableDataGridStyle}"
-            GridLinesVisibility="All">
+            GridLinesVisibility="All"
+            CanUserAddRows="False">
 
             <DataGrid.Columns>
                 <DataGridTemplateColumn
@@ -257,7 +259,7 @@
                                 DisplayMemberPath="Name"
                                 ItemsSource="{Binding Path=DataContext.TasksVM.Levels, 
                                     RelativeSource={RelativeSource AncestorType={x:Type Window}}}"
-                                SelectedItem="{Binding Path=Level}" >
+                                SelectedItem="{Binding Path=Level, UpdateSourceTrigger=PropertyChanged}" >
                             </ComboBox>
                         </DataTemplate>
                     </DataGridTemplateColumn.CellTemplate>
@@ -291,7 +293,7 @@
                                 DisplayMemberPath="Name"
                                 ItemsSource="{Binding Path=DataContext.TasksVM.Phases, 
                                     RelativeSource={RelativeSource AncestorType={x:Type Window}}}"
-                                SelectedItem="{Binding Path=Phase}">
+                                SelectedItem="{Binding Path=Phase, UpdateSourceTrigger=PropertyChanged}">
                             </ComboBox>
                         </DataTemplate>
                     </DataGridTemplateColumn.CellTemplate>
