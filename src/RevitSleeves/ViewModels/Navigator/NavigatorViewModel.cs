@@ -1,3 +1,4 @@
+using System;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Globalization;
@@ -102,12 +103,12 @@ internal class NavigatorViewModel : BaseViewModel {
         if(e.Item is SleeveViewModel sleeve
            && !string.IsNullOrWhiteSpace(SleevesFilter)) {
             e.Accepted = true;
-            string str = SleevesFilter.ToLower().Trim();
-            e.Accepted = sleeve.Id.ToString().Contains(str)
-                         || sleeve.Comment.ToLower().Contains(str)
-                         || sleeve.Diameter.ToString(CultureInfo.InvariantCulture).Contains(str)
-                         || sleeve.Length.ToString(CultureInfo.InvariantCulture).Contains(str)
-                         || sleeve.Status.ToLower().Contains(str);
+            string str = SleevesFilter.Trim();
+            e.Accepted = sleeve.Status.IndexOf(str, StringComparison.OrdinalIgnoreCase) >= 0
+                         || sleeve.Comment.IndexOf(str, StringComparison.OrdinalIgnoreCase) >= 0
+                         || sleeve.Id.ToString().IndexOf(str, StringComparison.OrdinalIgnoreCase) >= 0
+                         || sleeve.Diameter.ToString().IndexOf(str, StringComparison.InvariantCultureIgnoreCase) >= 0
+                         || sleeve.Length.ToString().IndexOf(str, StringComparison.InvariantCultureIgnoreCase) >= 0;
         }
     }
 
