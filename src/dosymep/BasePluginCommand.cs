@@ -27,10 +27,13 @@ namespace dosymep.Bim4Everyone {
         /// </summary>
         protected ILoggerService LoggerService => GetPlatformService<ILoggerService>();
 
+        protected IDictionary<string, string> JournalData { get; private set; }
+
         /// <inheritdoc />
         public Result Execute(ExternalCommandData commandData, ref string message, ElementSet elements) {
+            JournalData = commandData.JournalData;
             FromGui = GetFromGui(commandData.JournalData);
-            
+
             PluginLoggerService = LoggerService.ForPluginContext(PluginName);
             PluginLoggerService.Information("Запуск команды расширения.");
 
@@ -44,28 +47,28 @@ namespace dosymep.Bim4Everyone {
                 if(!FromGui) {
                     return Result.Cancelled;
                 }
-                
+
                 GetPlatformService<INotificationService>()
                     .CreateWarningNotification(PluginName, "Выполнение скрипта отменено.")
                     .ShowAsync();
             } catch(Autodesk.Revit.Exceptions.OperationCanceledException) {
                 PluginLoggerService.Warning("Отмена выполнения команды расширения.");
-                
+
                 if(!FromGui) {
                     return Result.Cancelled;
                 }
-                
+
                 GetPlatformService<INotificationService>()
                     .CreateWarningNotification(PluginName, "Выполнение скрипта отменено.")
                     .ShowAsync();
             } catch(Exception ex) {
                 PluginLoggerService.Warning(ex, "Ошибка в команде расширения.");
-                
+
                 if(!FromGui) {
                     message = ex.Message;
                     return Result.Failed;
                 }
-                
+
 #if DEBUG
                 TaskDialog.Show(PluginName, ex.ToString());
 #else
@@ -103,7 +106,7 @@ namespace dosymep.Bim4Everyone {
         protected void Notification(Window window) {
             Notification(window.ShowDialog());
         }
-        
+
         protected void Notification(bool? dialogResult) {
             if(dialogResult == null) {
                 GetPlatformService<INotificationService>()

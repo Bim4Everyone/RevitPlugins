@@ -1,0 +1,57 @@
+<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:system="clr-namespace:System;assembly=mscorlib">
+
+    <!-- Пример перевода на английский американский язык (google translate) -->
+
+    <system:String x:Key="MainWindow.Title">Place annotations</system:String>
+
+    <system:String x:Key="MainWindow.ButtonOk">OK</system:String>
+    <system:String x:Key="MainWindow.ButtonCancel">Cancel</system:String>
+
+    <system:String x:Key="MainWindow.CreateAnnotationsTransactionName">Create annotations</system:String>
+    <system:String x:Key="MainWindow.UpdateAnnotationsTransactionName">Update annotations</system:String>
+
+    <system:String x:Key="MainWindow.CreateText">Create</system:String>
+    <system:String x:Key="MainWindow.SettingsText">Settings</system:String>
+    <system:String x:Key="MainWindow.FloorCount">Floor count</system:String>
+    <system:String x:Key="MainWindow.FloorHeight">Floor height</system:String>
+
+    <system:String x:Key="MainWindow.EmptySpotDimensions">Spot dimensions not found</system:String>
+    <system:String x:Key="MainWindow.EmptySelectionMode">Please select selection mode</system:String>
+    <system:String x:Key="MainWindow.EmptySpotDimensionTypes">Please select selection mode with spot dimension types</system:String>
+    <system:String x:Key="MainWindow.EmptyFloorCount">Please write floor count</system:String>
+    <system:String x:Key="MainWindow.TextFloorCount">Floor count must be a number</system:String>
+    <system:String x:Key="MainWindow.NegativeFloorCount">Floor count must be a positive number</system:String>
+    <system:String x:Key="MainWindow.MaxFloorCount">Floor count must be less {0}</system:String>
+    <system:String x:Key="MainWindow.EmptyFloorHeight">Please select floor height</system:String>
+    <system:String x:Key="MainWindow.EmptyFloorHeightValue">Please write floor height</system:String>
+    <system:String x:Key="MainWindow.TextFloorHeightValue">Floor height must be a number</system:String>
+    <system:String x:Key="MainWindow.NegativeFloorHeightValue">Floor height must be a positive number</system:String>
+    <system:String x:Key="MainWindow.MaxFloorHeightValue">Floor height must be less {0} mm</system:String>
+    <system:String x:Key="MainWindow.EmptyGlobalParam">Please select a global parameter</system:String>
+    <system:String x:Key="MainWindow.NegativeGlobalParam">Floor height must be a positive number</system:String>
+    <system:String x:Key="MainWindow.MaxGlobalParam">Floor height must be less {0} mm</system:String>
+
+    <system:String x:Key="Selections.DBSelection">All spots dimensions</system:String>
+    <system:String x:Key="Selections.DBViewSelection">Spot dimensions on view</system:String>
+    <system:String x:Key="Selections.SelectedOnViewSelection">Selected dimensions on view</system:String>
+
+    <system:String x:Key="LevelHeightProvider.UserSettings">User</system:String>
+    <system:String x:Key="LevelHeightProvider.GlobalParameter">Global parameter</system:String>
+
+    <system:String x:Key="Report.MissingParamTitle">Missing family parameter</system:String>
+    <system:String x:Key="Report.MissingParamDescription">Not found the required parameter in a family document</system:String>
+    <system:String x:Key="Report.MissingParamMessageFormat">Not found the required parameter {1} in a family {0}</system:String>
+
+    <system:String x:Key="Report.MissingFamilyTitle">Missing family</system:String>
+    <system:String x:Key="Report.MissingFamilyDescription">Not found the required family in a document</system:String>
+    <system:String x:Key="Report.MissingFamilyMessageFormat">Not found the required family {0} in a document</system:String>
+    
+    <system:String x:Key="ReportWindow.Title">Report window</system:String>
+    <system:String x:Key="ReportWindow.ButtonCancel">Exit</system:String>
+    
+    <system:String x:Key="ReportLevel.Error">Error</system:String>
+    <system:String x:Key="ReportLevel.Warning">Warning</system:String>
+    <system:String x:Key="ReportLevel.Information">Information</system:String>
+</ResourceDictionary>
