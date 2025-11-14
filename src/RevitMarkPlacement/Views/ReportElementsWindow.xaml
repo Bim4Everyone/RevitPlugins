@@ -10,6 +10,7 @@
     xmlns:b="http://schemas.microsoft.com/xaml/behaviors"
     xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
     xmlns:vms="clr-namespace:RevitMarkPlacement.ViewModels.ReportViewModels"
+    xmlns:markupExtensions="clr-namespace:RevitMarkPlacement.MarkupExtensions"
 
     mc:Ignorable="d"
     WindowStartupLocation="CenterOwner"
@@ -97,7 +98,7 @@
                                             Appearance="Disabled"
                                             VerticalAlignment="Center"
                                             HorizontalAlignment="Right"
-                                            Text="{Binding ReportLevel}" />
+                                            Text="{Binding ReportLevel, Converter={markupExtensions:EnumToLocale}}" />
 
                                         <ui:TextBlock
                                             Margin="0 0 5 0"
