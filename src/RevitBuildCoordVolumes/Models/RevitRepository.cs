@@ -31,9 +31,9 @@ internal class RevitRepository {
         return ActiveUIDocument.GetSelectedElements();
     }
 
-    public
 
-    private void Process() {
+
+    public void Process() {
         if(GetSelectedElements().FirstOrDefault() is not Area area) {
             TaskDialog.Show("Ошибка", "Выберите одну зону (Area).");
             return;

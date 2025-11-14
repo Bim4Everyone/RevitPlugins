@@ -9,7 +9,7 @@ namespace RevitBuildCoordVolumes.Views;
 /// </summary>
 public partial class MainWindow {
     /// <summary>
-    /// Иницализирует главное окно плагина.
+    /// Инициализирует главное окно плагина.
     /// </summary>
     public MainWindow(
         ILoggerService loggerService,
@@ -30,7 +30,7 @@ public partial class MainWindow {
     /// Используется для сохранения положения окна.
     /// </remarks>
     public override string PluginName => nameof(RevitBuildCoordVolumes);
-    
+
     /// <summary>
     /// Наименование файла конфигурации.
     /// </summary>
@@ -38,7 +38,7 @@ public partial class MainWindow {
     /// Используется для сохранения положения окна.
     /// </remarks>
     public override string ProjectConfigName => nameof(MainWindow);
-    
+
     private void ButtonOk_Click(object sender, RoutedEventArgs e) {
         DialogResult = true;
     }

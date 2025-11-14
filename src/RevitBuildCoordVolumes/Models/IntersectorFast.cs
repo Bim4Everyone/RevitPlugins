@@ -12,18 +12,6 @@ internal class IntersectorFast {
     private readonly Document _document;
     private readonly List<FloorInfo> _floors = [];
 
-    private readonly ICollection<string> _krNames = new[] {
-        "(КР)", "(К)", "(K)", "КЖ", "кж", "ЖБ", "жб",
-        "Плита", "плита", "Железобетон", "железобетон",
-        "Монолит", "монолит", "Перекрытие", "перекрытие",
-        "floor", "slab"
-    };
-
-    private readonly ICollection<BuiltInCategory> _krCategories = new[] {
-        BuiltInCategory.OST_StructuralFoundation,
-        BuiltInCategory.OST_Floors
-    };
-
     public IntersectorFast(Document document) {
         _document = document;
         CollectFloorsFromLinks();
@@ -73,13 +61,13 @@ internal class IntersectorFast {
             var transform = link.GetTotalTransform();
 
             var collector = new FilteredElementCollector(linkDoc)
-                .WherePasses(new ElementMulticategoryFilter(_krCategories))
+                .WherePasses(new ElementMulticategoryFilter(RevitConstants.SlabCategories))
                 .WhereElementIsNotElementType()
                 .ToElements();
 
             foreach(var elem in collector) {
                 string typeName = elem.Name ?? "";
-                if(!_krNames.Any(s => typeName.IndexOf(s, StringComparison.OrdinalIgnoreCase) >= 0)) {
+                if(!RevitConstants.SlabTypeNames.Any(s => typeName.IndexOf(s, StringComparison.OrdinalIgnoreCase) >= 0)) {
                     continue;
                 }
 

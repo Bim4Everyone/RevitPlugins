@@ -1,0 +1,64 @@
+﻿<UserControl
+    x:Class="RevitBuildCoordVolumes.Views.Edits.CustomEditControl"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
+    Margin="5"
+    x:Name="_this"
+    mc:Ignorable="d"
+    d:DesignHeight="50"
+    d:DesignWidth="300">
+
+    <Border
+        VerticalAlignment="Center"
+        HorizontalAlignment="Stretch"
+        Padding="{DynamicResource CardControlPadding}"
+        Background="{DynamicResource CardBackground}"
+        BorderBrush="{DynamicResource CardBorderBrush}"
+        CornerRadius="{DynamicResource ControlCornerRadius}"
+        BorderThickness="{DynamicResource CardControlBorderThemeThickness}">
+        <Grid>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition
+                    Width="Auto" />
+                <ColumnDefinition
+                    Width="*" />
+                <ColumnDefinition
+                    Width="Auto" />
+            </Grid.ColumnDefinitions>
+
+            <ContentControl
+                Grid.Column="0"
+                Focusable="False"
+                FontSize="24"
+                VerticalAlignment="Center"
+                Margin="{DynamicResource CardControlIconMargin}"
+                Foreground="{DynamicResource CardForeground}"
+                Content="{Binding Icon, ElementName=_this}" />
+
+            <StackPanel
+                Grid.Column="1">
+                <ui:TextBlock
+                    Margin="0"
+                    FontTypography="BodyStrong"
+                    Foreground="{DynamicResource TextFillColorPrimaryBrush}"
+                    Text="{Binding Header, ElementName=_this}"
+                    TextWrapping="WrapWithOverflow" />
+                <ui:TextBlock
+                    Appearance="Secondary"
+                    Foreground="{DynamicResource TextFillColorSecondaryBrush}"
+                    Text="{Binding Description, ElementName=_this}"
+                    TextWrapping="WrapWithOverflow" />
+            </StackPanel>
+
+            <ContentControl
+                Grid.Column="2"
+                Width="300"
+                VerticalAlignment="Center"
+                Margin="{DynamicResource CardControlContentMargin}"
+                Content="{Binding EditControl, ElementName=_this}" />
+        </Grid>
+    </Border>
+</UserControl>

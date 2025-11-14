@@ -1,13 +1,31 @@
 <ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-                    xmlns:system="clr-namespace:System;assembly=mscorlib">
+                    xmlns:system="clr-namespace:System;assembly=mscorlib">    
 
-    <!-- Пример перевода на русский язык (google translate) -->
+    <system:String x:Key="MainWindow.Title">Построить объемы СМР</system:String>
+    <system:String x:Key="MainWindow.SourceFiles">Тип файла с геометрией</system:String>
+    <system:String x:Key="MainWindow.SourceFilesDescription">Файл, где расположены плиты перекрытий</system:String>
+    <system:String x:Key="MainWindow.TypeZones">Зоны</system:String>
+    <system:String x:Key="MainWindow.TypeZonesDescription">Выбор зон для построения объемных элементов</system:String>
+    <system:String x:Key="MainWindow.TypeSlabs">Типоразмер плит перекрытий</system:String>
+    <system:String x:Key="MainWindow.TypeSlabsDescription">Часть имени типоразмера, использующиеся для определения основы</system:String>
 
-    <system:String x:Key="MainWindow.Title">Пример команды</system:String>
-    <system:String x:Key="MainWindow.Hello">Привет, Revit!</system:String>
-    <system:String x:Key="MainWindow.HelloCheck">Введите значение сохраняемого свойства.</system:String>
+    <system:String x:Key="MainWindow.PositionsUp">Позиция верха объемного элемента</system:String>
+    <system:String x:Key="MainWindow.PositionsUpDescription">Относительно какой точки плиты строить верх объемного элемента</system:String>
+    <system:String x:Key="MainWindow.PositionsBottom">Позиция низа объемного элемента</system:String>
+    <system:String x:Key="MainWindow.PositionsBottomDescription">Относительно какой точки плиты строить низ объемного элемента</system:String>
 
-    <system:String x:Key="MainWindow.ButtonOk">ОК</system:String>
-    <system:String x:Key="MainWindow.ButtonCancel">Отмена</system:String>
+    <system:String x:Key="MainWindow.SearchSide">Длина стороны поисковой фигуры в мм</system:String>
+    <system:String x:Key="MainWindow.SearchSideDescription">Фигуры, на которые разбивается зона для построения объема</system:String>
+    <system:String x:Key="MainWindow.SearchSideTooltip">Влияет на производительность. Меньше значение - меньше производительность</system:String>
+
+    <system:String x:Key="MainWindow.Params">Параметры СМР</system:String>
+    <system:String x:Key="MainWindow.ParamsDescription">Выбор параметров СМР для чтения и записи</system:String>
+    <system:String x:Key="MainWindow.ParamsToggleSwitchOn">Использовать параметр</system:String>
+    <system:String x:Key="MainWindow.ParamsToggleSwitchOff">Не использовать параметр</system:String>
+    <system:String x:Key="MainWindow.ParamWarningTooltip">В некоторых параметрах есть ошибки</system:String>
+
+    <system:String x:Key="MainWindow.ButtonOk">Построить</system:String>
+    <system:String x:Key="MainWindow.ButtonCancel">Отменить</system:String>
+
 </ResourceDictionary>

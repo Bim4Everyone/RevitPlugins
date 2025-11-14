@@ -1,0 +1,127 @@
+﻿<UserControl
+    x:Class="RevitBuildCoordVolumes.Views.Edits.ParamControl"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
+    xmlns:me="clr-namespace:dosymep.WpfCore.MarkupExtensions;assembly=dosymep.WpfCore"
+    xmlns:converters="clr-namespace:dosymep.WpfCore.Converters;assembly=dosymep.WpfCore"
+    xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
+    Margin="5"
+    x:Name="_this"
+    mc:Ignorable="d"
+    d:DesignHeight="200"
+    d:DesignWidth="800">
+
+    <UserControl.Resources>
+        <converters:BoolToVisibilityConverter
+            x:Key="StackPanelVisibility"
+            TrueValue="Visible"
+            FalseValue="Collapsed" />
+
+        <converters:BoolToVisibilityConverter
+            x:Key="IconVisible"
+            TrueValue="Visible"
+            FalseValue="Collapsed" />
+    </UserControl.Resources>
+
+    <Border
+        VerticalAlignment="Center"
+        HorizontalAlignment="Stretch"
+        Padding="{DynamicResource CardControlPadding}"
+        Background="{DynamicResource CardBackground}"
+        BorderBrush="{DynamicResource CardBorderBrush}"
+        CornerRadius="{DynamicResource ControlCornerRadius}"
+        BorderThickness="{DynamicResource CardControlBorderThemeThickness}">
+
+        <Grid>
+            <Grid.RowDefinitions>
+                <RowDefinition />
+                <RowDefinition />
+            </Grid.RowDefinitions>
+
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition
+                    Width="*" />
+                <ColumnDefinition
+                    Width="100" />
+                <ColumnDefinition
+                    Width="*" />
+                <ColumnDefinition
+                    Width="40" />
+            </Grid.ColumnDefinitions>
+
+            <StackPanel
+                Grid.Column="0"
+                Grid.Row="0">
+                <ui:TextBlock
+                    FontTypography="BodyStrong"
+                    Foreground="{DynamicResource TextFillColorPrimaryBrush}"
+                    Text="{Binding Description, ElementName=_this}"
+                    TextWrapping="WrapWithOverflow" />
+                <ui:TextBlock
+                    Appearance="Secondary"
+                    Foreground="{DynamicResource TextFillColorSecondaryBrush}"
+                    Text="{Binding DetailDescription, ElementName=_this}"
+                    TextWrapping="WrapWithOverflow" />
+            </StackPanel>
+
+            <ui:ToggleSwitch
+                Grid.Column="2"
+                Grid.Row="0"
+                VerticalAlignment="Top"
+                OnContent="{me:LocalizationSource MainWindow.ParamsToggleSwitchOn}"
+                OffContent="{me:LocalizationSource MainWindow.ParamsToggleSwitchOff}"
+                IsChecked="{Binding IsChecked, ElementName=_this, Mode=TwoWay}" />
+
+            <ui:SymbolIcon
+                Grid.Column="3"
+                VerticalAlignment="Top"
+                Symbol="Warning24"
+                Foreground="OrangeRed"
+                FontSize="24"
+                ToolTip="{Binding WarningDescription, ElementName=_this}"
+                Visibility="{Binding HasWarning, ElementName=_this,
+                    Converter={StaticResource IconVisible}}" />
+
+            <StackPanel
+                Grid.Column="0"
+                Grid.Row="1"
+                Margin="0,15,0,0"
+                IsEnabled="{Binding IsChecked, ElementName=_this}"
+                Visibility="{Binding IsPair, 
+                    ElementName=_this, Converter={StaticResource StackPanelVisibility}}">
+
+                <ui:TextBlock
+                    Foreground="{DynamicResource TextFillColorSecondaryBrush}"
+                    Text="{me:LocalizationSource MainWindow.SourceParamHeader}"
+                    TextWrapping="WrapWithOverflow" />
+                <ui:TextBox
+                    Margin="0,5,0,0"
+                    Foreground="{DynamicResource TextFillColorPrimaryBrush}"
+                    Text="{Binding SourceParamName, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, ElementName=_this}"
+                    TextWrapping="WrapWithOverflow" />
+
+            </StackPanel>
+
+            <StackPanel
+                Grid.Column="2"
+                Grid.Row="1"
+                Margin="0,15,0,0"
+                IsEnabled="{Binding IsChecked, ElementName=_this}">
+
+                <ui:TextBlock
+                    Foreground="{DynamicResource TextFillColorSecondaryBrush}"
+                    Text="{me:LocalizationSource MainWindow.TargetParamHeader}"
+                    TextWrapping="WrapWithOverflow" />
+                <ui:TextBox
+                    Margin="0,5,0,0"
+                    Foreground="{DynamicResource TextFillColorPrimaryBrush}"
+                    Text="{Binding TargetParamName, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, ElementName=_this}"
+                    TextWrapping="WrapWithOverflow" />
+
+            </StackPanel>
+        </Grid>
+    </Border>
+</UserControl>
