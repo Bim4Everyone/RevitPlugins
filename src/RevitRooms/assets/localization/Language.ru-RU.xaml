@@ -2,7 +2,9 @@
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
                     xmlns:system="clr-namespace:System;assembly=mscorlib">
 
-    <system:String x:Key="MainWindow.Title">Квартирография</system:String>
+    <system:String x:Key="RoomsWindow.Title">Квартирография</system:String>
+    <system:String x:Key="RoomsNumsWindow.Title">Нумерация помещений</system:String>
+    <system:String x:Key="InfoElementsWindow.Title">Ошибки и предупреждения</system:String>
 
     <system:String x:Key="MainWindow.HeaderCheck">Выбрать</system:String>
     <system:String x:Key="MainWindow.HeaderLevels">Этажи</system:String>
@@ -11,4 +13,11 @@
     <system:String x:Key="MainWindow.ViewRevitName">Выборка по текущему виду</system:String>
     <system:String x:Key="MainWindow.ElementsRevitName">Выборка по всем элементам</system:String>
     <system:String x:Key="MainWindow.SelectedRevitName">Выборка по выделенным элементам</system:String>
+
+    <system:String x:Key="InfoElementsWindow.HeaderId">Id</system:String>
+    <system:String x:Key="InfoElementsWindow.HeaderCategory">Категория</system:String>
+    <system:String x:Key="InfoElementsWindow.HeaderName">Имя</system:String>
+    <system:String x:Key="InfoElementsWindow.HeaderLevel">Уровень</system:String>
+    <system:String x:Key="InfoElementsWindow.HeaderPhase">Стадия</system:String>
+    <system:String x:Key="InfoElementsWindow.HeaderDescription">Описание</system:String>
 </ResourceDictionary>
