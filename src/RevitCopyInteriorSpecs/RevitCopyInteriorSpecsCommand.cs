@@ -1,6 +1,5 @@
 using System.Globalization;
 using System.Reflection;
-using System.Windows;
 
 using Autodesk.Revit.Attributes;
 using Autodesk.Revit.DB;
@@ -9,11 +8,8 @@ using Autodesk.Revit.UI;
 using dosymep.Bim4Everyone;
 using dosymep.Bim4Everyone.ProjectConfigs;
 using dosymep.Bim4Everyone.SimpleServices;
-using dosymep.SimpleServices;
-using dosymep.WPF.Views;
 using dosymep.WpfCore.Ninject;
 using dosymep.WpfUI.Core.Ninject;
-using dosymep.Xpf.Core.Ninject;
 
 using Ninject;
 
