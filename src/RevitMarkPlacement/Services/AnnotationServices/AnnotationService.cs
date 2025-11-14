@@ -48,7 +48,7 @@ internal abstract class AnnotationService : IAnnotationService {
         }
 
 #if REVIT_2023_OR_LESS
-        return new ElementId(spotId);
+        return new ElementId((int) spotId);
 #else
         return new ElementId((long) spotId);
 #endif
