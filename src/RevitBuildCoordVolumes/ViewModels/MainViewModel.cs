@@ -8,9 +8,6 @@ using RevitBuildCoordVolumes.Models;
 
 namespace RevitBuildCoordVolumes.ViewModels;
 
-/// <summary>
-/// Основная ViewModel главного окна плагина.
-/// </summary>
 internal class MainViewModel : BaseViewModel {
     private readonly PluginConfig _pluginConfig;
     private readonly RevitRepository _revitRepository;
@@ -18,18 +15,12 @@ internal class MainViewModel : BaseViewModel {
 
     private string _errorText;
     private string _saveProperty;
-    
-    /// <summary>
-    /// Создает экземпляр основной ViewModel главного окна.
-    /// </summary>
-    /// <param name="pluginConfig">Настройки плагина.</param>
-    /// <param name="revitRepository">Класс доступа к интерфейсу Revit.</param>
-    /// <param name="localizationService">Интерфейс доступа к сервису локализации.</param>
+
     public MainViewModel(
         PluginConfig pluginConfig,
         RevitRepository revitRepository,
         ILocalizationService localizationService) {
-        
+
         _pluginConfig = pluginConfig;
         _revitRepository = revitRepository;
         _localizationService = localizationService;
@@ -42,7 +33,7 @@ internal class MainViewModel : BaseViewModel {
     /// Команда загрузки главного окна.
     /// </summary>
     public ICommand LoadViewCommand { get; }
-    
+
     /// <summary>
     /// Команда применения настроек главного окна. (запуск плагина)
     /// </summary>
@@ -80,6 +71,9 @@ internal class MainViewModel : BaseViewModel {
     /// В данном методе должны браться настройки пользователя и сохраняться в конфиг, а так же быть основной код плагина.
     /// </remarks>
     private void AcceptView() {
+
+        _revitRepository.Process();
+
         SaveConfig();
     }
 
@@ -105,7 +99,7 @@ internal class MainViewModel : BaseViewModel {
     /// Загрузка настроек плагина.
     /// </summary>
     private void LoadConfig() {
-        RevitSettings setting = _pluginConfig.GetSettings(_revitRepository.Document);
+        var setting = _pluginConfig.GetSettings(_revitRepository.Document);
 
         SaveProperty = setting?.SaveProperty ?? _localizationService.GetLocalizedString("MainWindow.Hello");
     }
@@ -114,7 +108,7 @@ internal class MainViewModel : BaseViewModel {
     /// Сохранение настроек плагина.
     /// </summary>
     private void SaveConfig() {
-        RevitSettings setting = _pluginConfig.GetSettings(_revitRepository.Document)
+        var setting = _pluginConfig.GetSettings(_revitRepository.Document)
                                 ?? _pluginConfig.AddSettings(_revitRepository.Document);
 
         setting.SaveProperty = SaveProperty;
