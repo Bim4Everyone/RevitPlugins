@@ -5,6 +5,10 @@
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     
+    xmlns:core="clr-namespace:dosymep.WpfUI.Core"
+    xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
+    xmlns:me="clr-namespace:dosymep.WpfCore.MarkupExtensions;assembly=dosymep.WpfCore"
+    
     xmlns:local="clr-namespace:RevitCopyInteriorSpecs.Views"
     xmlns:vms="clr-namespace:RevitCopyInteriorSpecs.ViewModels"
     mc:Ignorable="d"
@@ -12,9 +16,18 @@
     MinWidth="400"
     d:DataContext="{d:DesignInstance vms:MainViewModel, IsDesignTimeCreatable=False}">
 
-    <GroupBox 
-        Margin="5" 
-        Header="{DynamicResource MainWindow.Parameters}">
+    <UserControl.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary
+                    Source="../CustomStyles.xaml" />
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
+    </UserControl.Resources>
+
+    <Border
+        Margin="5"
+        Style="{StaticResource CustomBorder}">
         <Grid>
             <Grid.RowDefinitions>
                 <RowDefinition Height="Auto" />
@@ -27,107 +40,102 @@
             </Grid.RowDefinitions>
 
             <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="Auto"/>
-                <ColumnDefinition Width="*"/>
+                <ColumnDefinition
+                    Width="Auto" />
+                <ColumnDefinition
+                    Width="*" />
             </Grid.ColumnDefinitions>
 
-            <TextBlock
+            <ui:TextBlock
                 Grid.Row="0"
                 Grid.Column="0"
                 Margin="5 5 5 0"
-                Text="{DynamicResource MainWindow.GroupType}"/>
+                Text="{me:LocalizationSource MainWindow.GroupType}" />
 
-            <TextBox
+            <ui:TextBox
                 Grid.Row="0"
                 Grid.Column="1"
-                Margin="5" 
-                Padding="1"
-                Text="{Binding Path=ParametersVM.GroupTypeParamName, UpdateSourceTrigger=PropertyChanged}"/>
+                Margin="5"
+                Padding="5"
+                Text="{Binding Path=ParametersVM.GroupTypeParamName, UpdateSourceTrigger=PropertyChanged}" />
 
-            
-            <TextBlock
+            <ui:TextBlock
                 Grid.Row="1"
                 Grid.Column="0"
                 Margin="5 5 5 0"
-                Text="{DynamicResource MainWindow.Level}"/>
+                Text="{me:LocalizationSource MainWindow.Level}" />
 
-            <TextBox
+            <ui:TextBox
                 Grid.Row="1"
                 Grid.Column="1"
-                Margin="5" 
-                Padding="1"
-                Text="{Binding Path=ParametersVM.LevelParamName, UpdateSourceTrigger=PropertyChanged}"/>
-            
-            
-            <TextBlock
+                Margin="5"
+                Padding="5"
+                Text="{Binding Path=ParametersVM.LevelParamName, UpdateSourceTrigger=PropertyChanged}" />
+
+            <ui:TextBlock
                 Grid.Row="2"
                 Grid.Column="0"
                 Margin="5 5 5 0"
-                Text="{DynamicResource MainWindow.LevelShortName}"/>
+                Text="{me:LocalizationSource MainWindow.LevelShortName}" />
 
-            <TextBox
+            <ui:TextBox
                 Grid.Row="2"
                 Grid.Column="1"
-                Margin="5" 
-                Padding="1"
-                Text="{Binding Path=ParametersVM.LevelShortNameParamName, UpdateSourceTrigger=PropertyChanged}"/>
+                Margin="5"
+                Padding="5"
+                Text="{Binding Path=ParametersVM.LevelShortNameParamName, UpdateSourceTrigger=PropertyChanged}" />
 
-            
-            <TextBlock
+            <ui:TextBlock
                 Grid.Row="3"
                 Grid.Column="0"
                 Margin="5 5 5 0"
-                Text="{DynamicResource MainWindow.Phase}"/>
+                Text="{me:LocalizationSource MainWindow.Phase}" />
 
-            <TextBox
+            <ui:TextBox
                 Grid.Row="3"
                 Grid.Column="1"
-                Margin="5" 
-                Padding="1"
-                Text="{Binding Path=ParametersVM.PhaseParamName, UpdateSourceTrigger=PropertyChanged}"/>
+                Margin="5"
+                Padding="5"
+                Text="{Binding Path=ParametersVM.PhaseParamName, UpdateSourceTrigger=PropertyChanged}" />
 
-
-            <TextBlock
+            <ui:TextBlock
                 Grid.Row="4"
                 Grid.Column="0"
                 Margin="5 5 5 0"
-                Text="{DynamicResource MainWindow.FirstDispatcherGroupingLevel}"/>
+                Text="{me:LocalizationSource MainWindow.FirstDispatcherGroupingLevel}" />
 
-            <TextBox
+            <ui:TextBox
                 Grid.Row="4"
                 Grid.Column="1"
-                Margin="5" 
-                Padding="1"
-                Text="{Binding Path=ParametersVM.FirstDispatcherGroupingLevelParamName, UpdateSourceTrigger=PropertyChanged}"/>
+                Margin="5"
+                Padding="5"
+                Text="{Binding Path=ParametersVM.FirstDispatcherGroupingLevelParamName, UpdateSourceTrigger=PropertyChanged}" />
 
-            
-            <TextBlock
+            <ui:TextBlock
                 Grid.Row="5"
                 Grid.Column="0"
                 Margin="5 5 5 0"
-                Text="{DynamicResource MainWindow.SecondDispatcherGroupingLevel}"/>
+                Text="{me:LocalizationSource MainWindow.SecondDispatcherGroupingLevel}" />
 
-            <TextBox
+            <ui:TextBox
                 Grid.Row="5"
                 Grid.Column="1"
-                Margin="5" 
-                Padding="1"
-                Text="{Binding Path=ParametersVM.SecondDispatcherGroupingLevelParamName, UpdateSourceTrigger=PropertyChanged}"/>
+                Margin="5"
+                Padding="5"
+                Text="{Binding Path=ParametersVM.SecondDispatcherGroupingLevelParamName, UpdateSourceTrigger=PropertyChanged}" />
 
-            
-            <TextBlock
+            <ui:TextBlock
                 Grid.Row="6"
                 Grid.Column="0"
                 Margin="5 5 5 0"
-                Text="{DynamicResource MainWindow.ThirdDispatcherGroupingLevel}"/>
+                Text="{me:LocalizationSource MainWindow.ThirdDispatcherGroupingLevel}" />
 
-            <TextBox
+            <ui:TextBox
                 Grid.Row="6"
                 Grid.Column="1"
-                Margin="5" 
-                Padding="1"
-                Text="{Binding Path=ParametersVM.ThirdDispatcherGroupingLevelParamName, 
-                UpdateSourceTrigger=PropertyChanged}" />
+                Margin="5"
+                Padding="5"
+                Text="{Binding Path=ParametersVM.ThirdDispatcherGroupingLevelParamName, UpdateSourceTrigger=PropertyChanged}" />
         </Grid>
-    </GroupBox>
+    </Border>
 </UserControl>

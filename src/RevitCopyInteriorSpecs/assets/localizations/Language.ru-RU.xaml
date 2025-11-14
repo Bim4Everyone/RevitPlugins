@@ -1,19 +1,10 @@
 <ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
                     xmlns:system="clr-namespace:System;assembly=mscorlib">
-    
-    <!-- Пример перевода на русский язык (google translate) -->
 
     <system:String x:Key="MainWindow.Title">Копирование спецификаций АИ</system:String>
 
     <system:String x:Key="MainWindow.Settings">Настройки</system:String>
-    <system:String x:Key="MainWindow.GroupTypeParamName">ФОП_Тип квартиры</system:String>
-    <system:String x:Key="MainWindow.LevelParamName">Уровень</system:String>
-    <system:String x:Key="MainWindow.LevelShortNameParamName">ФОП_Этаж</system:String>
-    <system:String x:Key="MainWindow.PhaseParamName">Стадия</system:String>
-    <system:String x:Key="MainWindow.FirstDispatcherGroupingLevelParamName">_Стадия Проекта</system:String>
-    <system:String x:Key="MainWindow.SecondDispatcherGroupingLevelParamName">_Группа Видов</system:String>
-    <system:String x:Key="MainWindow.ThirdDispatcherGroupingLevelParamName">Назначение вида</system:String>
 
     <system:String x:Key="MainWindow.NoSpecsSelected">Не выбрано ни одной спецификации</system:String>
     <system:String x:Key="MainWindow.NoTasksCreated">Не создано ни одной задачи</system:String>
@@ -28,7 +19,7 @@
     <system:String x:Key="MainWindow.SecondDispatcherGroupingLevelParamNameEmpty">Не указано имя параметра для группировки диспетчера 2</system:String>
     <system:String x:Key="MainWindow.ThirdDispatcherGroupingLevelParamNameEmpty">Не указано имя параметра для группировки диспетчера 3</system:String>
     
-    <system:String x:Key="MainWindow.ButtonOk">ОК</system:String>
+    <system:String x:Key="MainWindow.ButtonOk">Ок</system:String>
     <system:String x:Key="MainWindow.ButtonCancel">Отмена</system:String>
 
     <system:String x:Key="MainWindow.SelectedSpecs">Выбрано спецификаций для копирования:</system:String>
@@ -52,5 +43,5 @@
 
     <system:String x:Key="MainWindow.SpecificationAlreadyExists">В проекте уже есть спецификация с именем</system:String>
     <system:String x:Key="MainWindow.ErrorReport">Отчет по ошибкам</system:String>
-    <system:String x:Key="MainWindow.TransactionName">BIM: Копирование спецификаций АИ</system:String>
+    <system:String x:Key="MainWindow.TransactionName">Копирование спецификаций АИ</system:String>
 </ResourceDictionary>

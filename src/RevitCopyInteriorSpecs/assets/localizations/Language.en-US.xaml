@@ -1,18 +1,10 @@
 <ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
                     xmlns:system="clr-namespace:System;assembly=mscorlib">
-    
-    <!-- Пример перевода на английский американский язык (google translate) -->
 
     <system:String x:Key="MainWindow.Title">Copying specifications</system:String>
 
     <system:String x:Key="MainWindow.Settings">Settings</system:String>
-    <system:String x:Key="MainWindow.GroupTypeParamName">ФОП_Тип квартиры</system:String>
-    <system:String x:Key="MainWindow.LevelParamName">Level</system:String>
-    <system:String x:Key="MainWindow.LevelShortNameParamName">ФОП_Этаж</system:String>
-    <system:String x:Key="MainWindow.FirstDispatcherGroupingLevelParamName">_Стадия Проекта</system:String>
-    <system:String x:Key="MainWindow.SecondDispatcherGroupingLevelParamName">_Группа Видов</system:String>
-    <system:String x:Key="MainWindow.ThirdDispatcherGroupingLevelParamName">Назначение вида</system:String>
 
     <system:String x:Key="MainWindow.NoSpecsSelected">No specifications selected</system:String>
     <system:String x:Key="MainWindow.NoTasksCreated">No tasks created</system:String>
@@ -51,5 +43,5 @@
 
     <system:String x:Key="MainWindow.SpecificationAlreadyExists">The project already has a specification with the name</system:String>
     <system:String x:Key="MainWindow.ErrorReport">Error report</system:String>
-    <system:String x:Key="MainWindow.TransactionName">BIM: Copying specifications</system:String>
+    <system:String x:Key="MainWindow.TransactionName">Copying specifications</system:String>
 </ResourceDictionary>

@@ -1,5 +1,3 @@
-// Ignore Spelling: plugin
-
 using System;
 using System.Windows;
 using System.Windows.Input;
@@ -20,6 +18,7 @@ internal class MainViewModel : BaseViewModel {
     private readonly PluginConfig _pluginConfig;
     private readonly RevitRepository _revitRepository;
     private readonly SpecificationService _specificationService;
+    private readonly DefaultParamNameService _defaultParamNameService;
     private readonly ILocalizationService _localizationService;
 
     private string _errorText;
@@ -29,11 +28,13 @@ internal class MainViewModel : BaseViewModel {
         PluginConfig pluginConfig,
         RevitRepository revitRepository,
         SpecificationService specificationService,
+        DefaultParamNameService defaultParamNameService,
         ILocalizationService localizationService) {
 
         _pluginConfig = pluginConfig;
         _revitRepository = revitRepository;
         _specificationService = specificationService;
+        _defaultParamNameService = defaultParamNameService;
         _localizationService = localizationService;
 
 
@@ -63,7 +64,6 @@ internal class MainViewModel : BaseViewModel {
     private void LoadView() {
         LoadConfig();
         SelectedSpecsVM.GetSelectedSpecs();
-        TasksVM.TasksForWork.Add(new TaskInfoViewModel());
     }
 
 
@@ -180,25 +180,25 @@ internal class MainViewModel : BaseViewModel {
 
         ParametersVM.GroupTypeParamName =
             setting?.GroupTypeParamName ??
-                _localizationService.GetLocalizedString("MainWindow.GroupTypeParamName");
+                _defaultParamNameService.GetGroupType();
         ParametersVM.LevelParamName =
             setting?.LevelParamName ??
-                _localizationService.GetLocalizedString("MainWindow.LevelParamName");
+                _defaultParamNameService.GetLevel();
         ParametersVM.LevelShortNameParamName =
             setting?.LevelShortNameParamName ??
-                _localizationService.GetLocalizedString("MainWindow.LevelShortNameParamName");
+                _defaultParamNameService.GetLevelShortName();
         ParametersVM.PhaseParamName =
             setting?.PhaseParamName ??
-                _localizationService.GetLocalizedString("MainWindow.PhaseParamName");
+                _defaultParamNameService.GetPhase();
         ParametersVM.FirstDispatcherGroupingLevelParamName =
             setting?.FirstDispatcherGroupingLevelParamName ??
-                _localizationService.GetLocalizedString("MainWindow.FirstDispatcherGroupingLevelParamName");
+                _defaultParamNameService.GetFirstDispatcherGroupingLevel();
         ParametersVM.SecondDispatcherGroupingLevelParamName =
             setting?.SecondDispatcherGroupingLevelParamName ??
-                _localizationService.GetLocalizedString("MainWindow.SecondDispatcherGroupingLevelParamName");
+                _defaultParamNameService.GetSecondDispatcherGroupingLevel();
         ParametersVM.ThirdDispatcherGroupingLevelParamName =
             setting?.ThirdDispatcherGroupingLevelParamName ??
-                _localizationService.GetLocalizedString("MainWindow.ThirdDispatcherGroupingLevelParamName");
+                _defaultParamNameService.GetThirdDispatcherGroupingLevel();
     }
 
     private void SaveConfig() {

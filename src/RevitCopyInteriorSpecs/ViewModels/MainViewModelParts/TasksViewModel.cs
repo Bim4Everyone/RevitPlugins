@@ -34,6 +34,8 @@ internal class TasksViewModel : BaseViewModel {
         Levels = _revitRepository.GetElements<Level>();
         Phases = _revitRepository.GetElements<Phase>();
 
+        AddTask();
+
         AddTaskCommand = RelayCommand.Create(AddTask);
         DeleteTaskCommand = RelayCommand.Create(DeleteTask, CanDeleteTask);
 

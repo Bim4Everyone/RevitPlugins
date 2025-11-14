@@ -5,6 +5,11 @@
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
+    xmlns:s="clr-namespace:System;assembly=mscorlib"
+    
+    xmlns:core="clr-namespace:dosymep.WpfUI.Core"
+    xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
+    xmlns:me="clr-namespace:dosymep.WpfCore.MarkupExtensions;assembly=dosymep.WpfCore"
     
     xmlns:local="clr-namespace:RevitCopyInteriorSpecs.Views" 
     xmlns:vms="clr-namespace:RevitCopyInteriorSpecs.ViewModels"
@@ -14,339 +19,352 @@
     d:DataContext="{d:DesignInstance Type=vms:MainViewModel}">
 
     <UserControl.Resources>
-        <converters:NumberWithOffsetConverter x:Key="columnContentWidthConverter" Offset="-15" />
-    </UserControl.Resources>
-    
-    <GroupBox Margin="5" Header="{DynamicResource MainWindow.Tasks}">
-        <Grid>
-            <Grid.RowDefinitions>
-                <RowDefinition Height="Auto" />
-                <RowDefinition Height="Auto" />
-                <RowDefinition Height="Auto" />
-                <RowDefinition Height="*" />
-            </Grid.RowDefinitions>
-
-            <Grid>
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="*" />
-                    <ColumnDefinition Width="Auto" />
-                </Grid.ColumnDefinitions>
-
-                <Label 
-                    Grid.Column="0"
-                    Margin="5 0" 
-                    VerticalAlignment="Bottom"
-                    Content="{DynamicResource MainWindow.SimultaneousFillingFields}" />
-
-                <StackPanel 
-                    Grid.Column="1" 
-                    Orientation="Horizontal" 
-                    HorizontalAlignment="Right">
-                    <Button
-                        Margin="5" 
-                        Padding="5"
-                        MinWidth="130" 
-                        MinHeight="15"
-                        Content="{DynamicResource MainWindow.AddTask}" 
-                        Command="{Binding Path=TasksVM.AddTaskCommand}" />
-
-                    <Button
-                        Margin="5" 
-                        Padding="5"
-                        MinWidth="130" 
-                        MinHeight="30"
-                        Content="{DynamicResource MainWindow.DeleteTask}" 
-                        Command="{Binding Path=TasksVM.DeleteTaskCommand}" />
-                </StackPanel>
-            </Grid>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="../CustomStyles.xaml" />
+            </ResourceDictionary.MergedDictionaries>
             
-            <ScrollViewer 
-                Grid.Row="1"
-                VerticalScrollBarVisibility="Hidden" 
-                HorizontalScrollBarVisibility="Auto">
-                <StackPanel
-                    Orientation="Horizontal">
-                    <TextBox
-                        Margin="15 5 5 5"
-                        Padding="2"
-                        Width="{Binding ElementName=column1, Path=Width, 
+            <converters:NumberWithOffsetConverter
+                x:Key="columnContentWidthConverter"
+                Offset="-5" />
+            
+            <ui:TextBlock
+                x:Key="GroupType"
+                Text="{me:LocalizationSource MainWindow.GroupType}" />
+            <ui:TextBlock
+                x:Key="Level"
+                Text="{me:LocalizationSource MainWindow.Level}" />
+            <ui:TextBlock
+                x:Key="LevelShortName"
+                Text="{me:LocalizationSource MainWindow.LevelShortName}" />
+            <ui:TextBlock
+                x:Key="Phase"
+                Text="{me:LocalizationSource MainWindow.Phase}" />
+            <ui:TextBlock
+                x:Key="FirstDispatcherGroupingLevel"
+                Text="{me:LocalizationSource MainWindow.FirstDispatcherGroupingLevel}" />
+            <ui:TextBlock
+                x:Key="SecondDispatcherGroupingLevel"
+                Text="{me:LocalizationSource MainWindow.SecondDispatcherGroupingLevel}" />
+            <ui:TextBlock
+                x:Key="ThirdDispatcherGroupingLevel"
+                Text="{me:LocalizationSource MainWindow.ThirdDispatcherGroupingLevel}" />
+
+            <s:Double
+                x:Key="ComboBoxColumnWidth">200</s:Double>
+            <s:Double
+                x:Key="TextBoxColumnWidth">150</s:Double>
+        </ResourceDictionary>
+    </UserControl.Resources>
+
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+
+        <ui:TextBlock
+            Grid.Row="0"
+            Margin="15 10"
+            FontWeight="Bold"
+            VerticalAlignment="Bottom"
+            Text="{me:LocalizationSource MainWindow.Tasks}" />
+
+        <ui:TextBlock
+            Grid.Row="1"
+            Margin="15 5"
+            VerticalAlignment="Bottom"
+            Text="{me:LocalizationSource MainWindow.SimultaneousFillingFields}" />
+
+        <ScrollViewer
+            Grid.Row="2"
+            VerticalScrollBarVisibility="Hidden"
+            HorizontalScrollBarVisibility="Auto">
+            <StackPanel
+                Orientation="Horizontal">
+                <ui:TextBox
+                    Margin="15 3 5 3"
+                    MinWidth="{Binding ElementName=column1, Path=ActualWidth, 
+                        Converter={StaticResource ResourceKey=columnContentWidthConverter}}"
+                    VerticalAlignment="Center"
+                    HorizontalAlignment="Stretch"
+                    Text="{Binding Path=TasksVM.GeneralGroupType, UpdateSourceTrigger=PropertyChanged}">
+
+                    <i:Interaction.Triggers>
+                        <i:EventTrigger
+                            EventName="TextChanged">
+                            <i:InvokeCommandAction
+                                Command="{Binding TasksVM.GeneralGroupTypeChangedCommand}" />
+                        </i:EventTrigger>
+                    </i:Interaction.Triggers>
+                </ui:TextBox>
+
+                <ComboBox
+                    Margin="3 8"
+                    Width="{Binding ElementName=column2, Path=ActualWidth, 
                             Converter={StaticResource ResourceKey=columnContentWidthConverter}}"
-                        VerticalAlignment="Center"
-                        HorizontalAlignment="Left"
-                        Text="{Binding Path=TasksVM.GeneralGroupType, UpdateSourceTrigger=PropertyChanged}" >
+                    DisplayMemberPath="Name"
+                    ItemsSource="{Binding Path=TasksVM.Levels, UpdateSourceTrigger=PropertyChanged}"
+                    SelectedItem="{Binding Path=TasksVM.GeneralLevel, UpdateSourceTrigger=PropertyChanged}">
 
-                        <i:Interaction.Triggers>
-                            <i:EventTrigger EventName="TextChanged">
-                                <i:InvokeCommandAction
-                                    Command="{Binding TasksVM.GeneralGroupTypeChangedCommand}"/>
-                            </i:EventTrigger>
-                        </i:Interaction.Triggers>
-                    </TextBox>
+                    <i:Interaction.Triggers>
+                        <i:EventTrigger
+                            EventName="SelectionChanged">
+                            <i:InvokeCommandAction
+                                Command="{Binding TasksVM.GeneralLevelChangedCommand}" />
+                        </i:EventTrigger>
+                    </i:Interaction.Triggers>
+                </ComboBox>
 
-                    <ComboBox
-                        Margin="8 8"
-                        Width="{Binding ElementName=column2, Path=Width, 
+                <ui:TextBox
+                    Margin="3 8"
+                    MinWidth="{Binding ElementName=column3, Path=ActualWidth, 
                             Converter={StaticResource ResourceKey=columnContentWidthConverter}}"
-    
-                        VerticalContentAlignment="Center"
-                        HorizontalAlignment="Center"
-                        DisplayMemberPath="Name"
-                        ItemsSource="{Binding Path=TasksVM.Levels, UpdateSourceTrigger=PropertyChanged}" 
-                        SelectedItem="{Binding Path=TasksVM.GeneralLevel, UpdateSourceTrigger=PropertyChanged}" >
+                    VerticalAlignment="Center"
+                    HorizontalAlignment="Stretch"
+                    Text="{Binding Path=TasksVM.GeneralLevelShortName, UpdateSourceTrigger=PropertyChanged}">
 
-                        <i:Interaction.Triggers>
-                            <i:EventTrigger EventName="SelectionChanged">
-                                <i:InvokeCommandAction
-                                    Command="{Binding TasksVM.GeneralLevelChangedCommand}"/>
-                            </i:EventTrigger>
-                        </i:Interaction.Triggers>
-                    </ComboBox>
+                    <i:Interaction.Triggers>
+                        <i:EventTrigger
+                            EventName="TextChanged">
+                            <i:InvokeCommandAction
+                                Command="{Binding TasksVM.GeneralLevelShortNameChangedCommand}" />
+                        </i:EventTrigger>
+                    </i:Interaction.Triggers>
+                </ui:TextBox>
 
-                    <TextBox
-                        Margin="8 5"
-                        Padding="2"
-                        Width="{Binding ElementName=column3, Path=Width, 
+                <ComboBox
+                    Margin="3 8"
+                    Width="{Binding ElementName=column4, Path=ActualWidth, 
                             Converter={StaticResource ResourceKey=columnContentWidthConverter}}"
-                        VerticalAlignment="Center"
-                        HorizontalAlignment="Left"
-                        Text="{Binding Path=TasksVM.GeneralLevelShortName, UpdateSourceTrigger=PropertyChanged}" >
+                    DisplayMemberPath="Name"
+                    ItemsSource="{Binding Path=TasksVM.Phases, UpdateSourceTrigger=PropertyChanged}"
+                    SelectedItem="{Binding Path=TasksVM.GeneralPhase, UpdateSourceTrigger=PropertyChanged}">
 
-                        <i:Interaction.Triggers>
-                            <i:EventTrigger EventName="TextChanged">
-                                <i:InvokeCommandAction
-                                    Command="{Binding TasksVM.GeneralLevelShortNameChangedCommand}"/>
-                            </i:EventTrigger>
-                        </i:Interaction.Triggers>
-                    </TextBox>
+                    <i:Interaction.Triggers>
+                        <i:EventTrigger
+                            EventName="SelectionChanged">
+                            <i:InvokeCommandAction
+                                Command="{Binding TasksVM.GeneralPhaseChangedCommand}" />
+                        </i:EventTrigger>
+                    </i:Interaction.Triggers>
+                </ComboBox>
 
-                    <ComboBox
-                        Margin="8 8"
-                        Width="{Binding ElementName=column4, Path=Width, 
+                <ui:TextBox
+                    Margin="3 8"
+                    MinWidth="{Binding ElementName=column5, Path=ActualWidth, 
                             Converter={StaticResource ResourceKey=columnContentWidthConverter}}"
-    
-                        VerticalContentAlignment="Center"
-                        HorizontalAlignment="Center"
-                        DisplayMemberPath="Name"
-                        ItemsSource="{Binding Path=TasksVM.Phases, UpdateSourceTrigger=PropertyChanged}" 
-                        SelectedItem="{Binding Path=TasksVM.GeneralPhase, UpdateSourceTrigger=PropertyChanged}">
+                    VerticalAlignment="Center"
+                    HorizontalAlignment="Stretch"
+                    Text="{Binding Path=TasksVM.GeneralFirstDispatcherGroupingLevel, 
+                        UpdateSourceTrigger=PropertyChanged}">
 
-                        <i:Interaction.Triggers>
-                            <i:EventTrigger EventName="SelectionChanged">
-                                <i:InvokeCommandAction
-                                    Command="{Binding TasksVM.GeneralPhaseChangedCommand}"/>
-                            </i:EventTrigger>
-                        </i:Interaction.Triggers>
-                    </ComboBox>
+                    <i:Interaction.Triggers>
+                        <i:EventTrigger
+                            EventName="TextChanged">
+                            <i:InvokeCommandAction
+                                Command="{Binding TasksVM.GeneralFirstDispatcherGroupingLevelChangedCommand}" />
+                        </i:EventTrigger>
+                    </i:Interaction.Triggers>
+                </ui:TextBox>
 
-                    <TextBox
-                        Margin="8 5"
-                        Padding="2"
-                        Width="{Binding ElementName=column5, Path=Width, 
-                             Converter={StaticResource ResourceKey=columnContentWidthConverter}}"
-                        VerticalAlignment="Center"
-                        HorizontalAlignment="Left"
-                        Text="{Binding Path=TasksVM.GeneralFirstDispatcherGroupingLevel, 
-                            UpdateSourceTrigger=PropertyChanged}" >
+                <ui:TextBox
+                    Margin="3 8"
+                    MinWidth="{Binding ElementName=column6, Path=ActualWidth, 
+                            Converter={StaticResource ResourceKey=columnContentWidthConverter}}"
+                    VerticalAlignment="Center"
+                    HorizontalAlignment="Stretch"
+                    Text="{Binding Path=TasksVM.GeneralSecondDispatcherGroupingLevel, 
+                        UpdateSourceTrigger=PropertyChanged}">
 
-                        <i:Interaction.Triggers>
-                            <i:EventTrigger EventName="TextChanged">
-                                <i:InvokeCommandAction
-                                    Command="{Binding TasksVM.GeneralFirstDispatcherGroupingLevelChangedCommand}"/>
-                            </i:EventTrigger>
-                        </i:Interaction.Triggers>
-                    </TextBox>
+                    <i:Interaction.Triggers>
+                        <i:EventTrigger
+                            EventName="TextChanged">
+                            <i:InvokeCommandAction
+                                Command="{Binding TasksVM.GeneralSecondDispatcherGroupingLevelChangedCommand}" />
+                        </i:EventTrigger>
+                    </i:Interaction.Triggers>
+                </ui:TextBox>
 
+                <ui:TextBox
+                    Margin="3 8"
+                    MinWidth="{Binding ElementName=column7, Path=ActualWidth, 
+                            Converter={StaticResource ResourceKey=columnContentWidthConverter}}"
+                    VerticalAlignment="Center"
+                    HorizontalAlignment="Stretch"
+                    Text="{Binding Path=TasksVM.GeneralThirdDispatcherGroupingLevel, 
+                        UpdateSourceTrigger=PropertyChanged}">
 
-                    <TextBox
-                        Margin="8 5"
-                        Padding="2"
-                        Width="{Binding ElementName=column6, Path=Width, 
-                             Converter={StaticResource ResourceKey=columnContentWidthConverter}}"
-                        VerticalAlignment="Center"
-                        HorizontalAlignment="Left"
-                        Text="{Binding Path=TasksVM.GeneralSecondDispatcherGroupingLevel, 
-                            UpdateSourceTrigger=PropertyChanged}" >
+                    <i:Interaction.Triggers>
+                        <i:EventTrigger
+                            EventName="TextChanged">
+                            <i:InvokeCommandAction
+                                Command="{Binding TasksVM.GeneralThirdDispatcherGroupingLevelChangedCommand}" />
+                        </i:EventTrigger>
+                    </i:Interaction.Triggers>
+                </ui:TextBox>
+            </StackPanel>
+        </ScrollViewer>
 
-                        <i:Interaction.Triggers>
-                            <i:EventTrigger EventName="TextChanged">
-                                <i:InvokeCommandAction
-                                    Command="{Binding TasksVM.GeneralSecondDispatcherGroupingLevelChangedCommand}"/>
-                            </i:EventTrigger>
-                        </i:Interaction.Triggers>
-                    </TextBox>
+        <ui:TextBlock
+            Grid.Row="3"
+            Margin="15 5"
+            VerticalAlignment="Bottom"
+            Text="{me:LocalizationSource MainWindow.TaskRows}" />
 
+        <ui:DataGrid
+            Grid.Row="4"
+            Margin="5"
+            ScrollViewer.VerticalScrollBarVisibility="Visible"
+            ScrollViewer.CanContentScroll="False"
+            ItemsSource="{Binding Path=TasksVM.TasksForWork, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
+            SelectedItem="{Binding Path=TasksVM.SelectedTask, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
+            SelectionMode="Single"
+            VirtualizingStackPanel.IsVirtualizing="True"
+            AutoGenerateColumns="False"
+            Style="{StaticResource CustomResizableDataGridStyle}"
+            GridLinesVisibility="All"
+            CanUserAddRows="False">
 
-                    <TextBox
-                        Margin="8 5"
-                        Padding="2"
-                        Width="{Binding ElementName=column7, Path=Width, 
-                             Converter={StaticResource ResourceKey=columnContentWidthConverter}}"
-                        VerticalAlignment="Center"
-                        HorizontalAlignment="Left"
-                        Text="{Binding Path=TasksVM.GeneralThirdDispatcherGroupingLevel, 
-                            UpdateSourceTrigger=PropertyChanged}" >
+            <DataGrid.Columns>
+                <DataGridTemplateColumn
+                    x:Name="column1"
+                    Header="{StaticResource GroupType}"
+                    Width="Auto"
+                    MinWidth="{StaticResource TextBoxColumnWidth}">
+                    <DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate>
+                            <ui:TextBox
+                                Margin="3"
+                                Width="Auto"
+                                Text="{Binding Path=GroupType, UpdateSourceTrigger=PropertyChanged}" />
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                </DataGridTemplateColumn>
 
-                        <i:Interaction.Triggers>
-                            <i:EventTrigger EventName="TextChanged">
-                                <i:InvokeCommandAction
-                                    Command="{Binding TasksVM.GeneralThirdDispatcherGroupingLevelChangedCommand}"/>
-                            </i:EventTrigger>
-                        </i:Interaction.Triggers>
-                    </TextBox>
-                </StackPanel>
-            </ScrollViewer>
+                <DataGridTemplateColumn
+                    Header="{StaticResource Level}"
+                    x:Name="column2"
+                    Width="Auto"
+                    MinWidth="{StaticResource ComboBoxColumnWidth}">
+                    <DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate>
+                            <ComboBox
+                                Margin="3"
+                                HorizontalAlignment="Stretch"
+                                DisplayMemberPath="Name"
+                                ItemsSource="{Binding Path=DataContext.TasksVM.Levels, 
+                                    RelativeSource={RelativeSource AncestorType={x:Type Window}}}"
+                                SelectedItem="{Binding Path=Level, UpdateSourceTrigger=PropertyChanged}" >
+                            </ComboBox>
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                </DataGridTemplateColumn>
 
-            <Label 
-                Grid.Row="2" 
-                Margin="5 0" 
-                VerticalAlignment="Bottom"
-                Content="{DynamicResource MainWindow.TaskRows}" />
+                <DataGridTemplateColumn
+                    Header="{StaticResource LevelShortName}"
+                    x:Name="column3"
+                    Width="Auto"
+                    MinWidth="{StaticResource TextBoxColumnWidth}">
+                    <DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate>
+                            <TextBox
+                                Margin="3"
+                                Width="Auto"
+                                Text="{Binding Path=LevelShortName, UpdateSourceTrigger=PropertyChanged}" />
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                </DataGridTemplateColumn>
 
-            <ListView 
-                Grid.Row="3"
+                <DataGridTemplateColumn
+                    Header="{StaticResource Phase}"
+                    x:Name="column4"
+                    Width="Auto"
+                    MinWidth="{StaticResource ComboBoxColumnWidth}">
+                    <DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate>
+                            <ComboBox
+                                Margin="3"
+                                HorizontalAlignment="Stretch"
+                                DisplayMemberPath="Name"
+                                ItemsSource="{Binding Path=DataContext.TasksVM.Phases, 
+                                    RelativeSource={RelativeSource AncestorType={x:Type Window}}}"
+                                SelectedItem="{Binding Path=Phase, UpdateSourceTrigger=PropertyChanged}">
+                            </ComboBox>
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                </DataGridTemplateColumn>
+
+                <DataGridTemplateColumn
+                    Header="{StaticResource FirstDispatcherGroupingLevel}"
+                    x:Name="column5"
+                    Width="Auto"
+                    MinWidth="{StaticResource TextBoxColumnWidth}">
+                    <DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate>
+                            <TextBox
+                                Margin="3"
+                                Width="Auto"
+                                Text="{Binding Path=FirstDispatcherGroupingLevel,
+                                    UpdateSourceTrigger=PropertyChanged}" />
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                </DataGridTemplateColumn>
+                
+                <DataGridTemplateColumn
+                    Header="{StaticResource SecondDispatcherGroupingLevel}"
+                    x:Name="column6"
+                    Width="Auto"
+                    MinWidth="{StaticResource TextBoxColumnWidth}">
+                    <DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate>
+                            <TextBox
+                                Margin="3"
+                                Width="Auto"
+                                Text="{Binding Path=SecondDispatcherGroupingLevel,
+                                    UpdateSourceTrigger=PropertyChanged}" />
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                </DataGridTemplateColumn>
+                
+                <DataGridTemplateColumn
+                    Header="{StaticResource ThirdDispatcherGroupingLevel}"
+                    x:Name="column7"
+                    Width="Auto"
+                    MinWidth="{StaticResource TextBoxColumnWidth}">
+                    <DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate>
+                            <TextBox
+                                Margin="3"
+                                Width="Auto"
+                                Text="{Binding Path=ThirdDispatcherGroupingLevel,
+                                    UpdateSourceTrigger=PropertyChanged}" />
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                </DataGridTemplateColumn>
+            </DataGrid.Columns>
+        </ui:DataGrid>
+
+        <StackPanel
+            Grid.Row="5"
+            Grid.Column="1"
+            Orientation="Horizontal"
+            HorizontalAlignment="Right">
+            <Button
                 Margin="5"
-                ScrollViewer.VerticalScrollBarVisibility="Visible"
-                ScrollViewer.CanContentScroll="False"
-                ItemsSource="{Binding Path=TasksVM.TasksForWork, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
-                SelectedItem="{Binding Path=TasksVM.SelectedTask, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
-                SelectionMode="Single">
+                MinWidth="150"
+                Content="{me:LocalizationSource MainWindow.AddTask}"
+                Command="{Binding Path=TasksVM.AddTaskCommand}" />
 
-                <ListView.View>
-                    <GridView>
-                        <GridViewColumn 
-                            x:Name="column1"
-                            Header="{DynamicResource MainWindow.GroupType}"
-                            Width="120">
-                            <GridViewColumn.CellTemplate>
-                                <DataTemplate>
-                                    <TextBox
-                                        Padding="2"
-                                        Width="{Binding ElementName=column1, Path=Width, 
-                                            Converter={StaticResource ResourceKey=columnContentWidthConverter}}"
-                                        HorizontalAlignment="Center"
-                                        VerticalContentAlignment="Center"
-                                        Text="{Binding Path=GroupType, UpdateSourceTrigger=PropertyChanged}"/>
-                                </DataTemplate>
-                            </GridViewColumn.CellTemplate>
-                        </GridViewColumn>
-
-                        <GridViewColumn
-                            Header="{DynamicResource MainWindow.Level}"
-                            x:Name="column2"
-                            Width="120">
-                            <GridViewColumn.CellTemplate>
-                                <DataTemplate>
-                                    <ComboBox
-                                        Width="{Binding ElementName=column2, Path=Width, 
-                                            Converter={StaticResource ResourceKey=columnContentWidthConverter}}"
-                    
-                                        HorizontalAlignment="Center"
-                                        VerticalContentAlignment="Center"
-                                        DisplayMemberPath="Name"
-                                        ItemsSource="{Binding Path=DataContext.TasksVM.Levels, 
-                                            RelativeSource={RelativeSource AncestorType={x:Type Window}}}" 
-                                        SelectedItem="{Binding Path=Level}">
-                                    </ComboBox>
-                                </DataTemplate>
-                            </GridViewColumn.CellTemplate>
-                        </GridViewColumn>
-
-                        <GridViewColumn 
-                            Header="{DynamicResource MainWindow.LevelShortName}"
-                            x:Name="column3"
-                            Width="120">
-                            <GridViewColumn.CellTemplate>
-                                <DataTemplate>
-                                    <TextBox
-                                        Padding="2"
-                                        Width="{Binding ElementName=column3, Path=Width, 
-                                            Converter={StaticResource ResourceKey=columnContentWidthConverter}}"
-                    
-                                        HorizontalAlignment="Center"
-                                        VerticalContentAlignment="Center"
-                                        Text="{Binding Path=LevelShortName, UpdateSourceTrigger=PropertyChanged}"/>
-                                </DataTemplate>
-                            </GridViewColumn.CellTemplate>
-                        </GridViewColumn>
-
-                        <GridViewColumn
-                            Header="{DynamicResource MainWindow.Phase}"
-                            x:Name="column4"
-                            Width="120">
-                            <GridViewColumn.CellTemplate>
-                                <DataTemplate>
-                                    <ComboBox
-                                        Width="{Binding ElementName=column4, Path=Width, 
-                                            Converter={StaticResource ResourceKey=columnContentWidthConverter}}"
-                    
-                                        HorizontalAlignment="Center"
-                                        VerticalContentAlignment="Center"
-                                        DisplayMemberPath="Name"
-                                        ItemsSource="{Binding Path=DataContext.TasksVM.Phases, 
-                                            RelativeSource={RelativeSource AncestorType={x:Type Window}}}" 
-                                        SelectedItem="{Binding Path=Phase}">
-                                    </ComboBox>
-                                </DataTemplate>
-                            </GridViewColumn.CellTemplate>
-                        </GridViewColumn>
-
-                        <GridViewColumn 
-                            Header="{DynamicResource MainWindow.FirstDispatcherGroupingLevel}"
-                            x:Name="column5"
-                            Width="120">
-                            <GridViewColumn.CellTemplate>
-                                <DataTemplate>
-                                    <TextBox
-                                        Padding="2"
-                                        Width="{Binding ElementName=column5, Path=Width, 
-                                            Converter={StaticResource ResourceKey=columnContentWidthConverter}}"
-                    
-                                        HorizontalAlignment="Center"
-                                        VerticalContentAlignment="Center"
-                                        Text="{Binding Path=FirstDispatcherGroupingLevel,
-                                            UpdateSourceTrigger=PropertyChanged}"/>
-                                </DataTemplate>
-                            </GridViewColumn.CellTemplate>
-                        </GridViewColumn>
-
-                        <GridViewColumn 
-                            Header="{DynamicResource MainWindow.SecondDispatcherGroupingLevel}"
-                            x:Name="column6"
-                            Width="120">
-                            <GridViewColumn.CellTemplate>
-                                <DataTemplate>
-                                    <TextBox
-                                        Padding="2"
-                                        Width="{Binding ElementName=column6, Path=Width, 
-                                            Converter={StaticResource ResourceKey=columnContentWidthConverter}}"
-                    
-                                        HorizontalAlignment="Center"
-                                        VerticalContentAlignment="Center"
-                                        Text="{Binding Path=SecondDispatcherGroupingLevel, UpdateSourceTrigger=PropertyChanged}"/>
-                                </DataTemplate>
-                            </GridViewColumn.CellTemplate>
-                        </GridViewColumn>
-
-                        <GridViewColumn 
-                            Header="{DynamicResource MainWindow.ThirdDispatcherGroupingLevel}"
-                            x:Name="column7"
-                            Width="120">
-                            <GridViewColumn.CellTemplate>
-                                <DataTemplate>
-                                    <TextBox
-                                        Padding="2"
-                                        Width="{Binding ElementName=column7, Path=Width, 
-                                            Converter={StaticResource ResourceKey=columnContentWidthConverter}}"
-                    
-                                        HorizontalAlignment="Center"
-                                        VerticalContentAlignment="Center"
-                                        Text="{Binding Path=ThirdDispatcherGroupingLevel, UpdateSourceTrigger=PropertyChanged}"/>
-                                </DataTemplate>
-                            </GridViewColumn.CellTemplate>
-                        </GridViewColumn>
-                    </GridView>
-                </ListView.View>
-            </ListView>
-        </Grid>
-    </GroupBox>
+            <Button
+                Margin="5"
+                MinWidth="150"
+                Content="{me:LocalizationSource MainWindow.DeleteTask}"
+                Command="{Binding Path=TasksVM.DeleteTaskCommand}" />
+        </StackPanel>
+    </Grid>
 </UserControl>
