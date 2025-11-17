@@ -1,0 +1,57 @@
+<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:system="clr-namespace:System;assembly=mscorlib">
+
+    <!-- Пример перевода на русский язык -->
+
+    <system:String x:Key="MainWindow.Title">Расставить отметки</system:String>
+
+    <system:String x:Key="MainWindow.ButtonOk">ОК</system:String>
+    <system:String x:Key="MainWindow.ButtonCancel">Отмена</system:String>
+    
+    <system:String x:Key="MainWindow.CreateAnnotationsTransactionName">Создание аннотаций</system:String>
+    <system:String x:Key="MainWindow.UpdateAnnotationsTransactionName">Обновление аннотаций</system:String>
+    
+    <system:String x:Key="MainWindow.CreateText">Создать</system:String>
+    <system:String x:Key="MainWindow.SettingsText">Настройки</system:String>
+    <system:String x:Key="MainWindow.FloorCount">Количество этажей</system:String>
+    <system:String x:Key="MainWindow.FloorHeight">Высота этажа</system:String>
+    
+    <system:String x:Key="MainWindow.EmptySpotDimensions">Отметки высоты не найдены</system:String>
+    <system:String x:Key="MainWindow.EmptySelectionMode">Выберите режим выбора</system:String>
+    <system:String x:Key="MainWindow.EmptySpotDimensionTypes">Выберите режим выбора с отметками уровней</system:String>
+    <system:String x:Key="MainWindow.EmptyFloorCount">Укажите количество этажей</system:String>
+    <system:String x:Key="MainWindow.TextFloorCount">Количество этажей должно быть числом</system:String>
+    <system:String x:Key="MainWindow.NegativeFloorCount">Количество этажей должно быть неотрицательным числом</system:String>
+    <system:String x:Key="MainWindow.MaxFloorCount">Количество этажей должно быть меньше {0}</system:String>
+    <system:String x:Key="MainWindow.EmptyFloorHeight">Выберите высоту этажа</system:String>
+    <system:String x:Key="MainWindow.EmptyFloorHeightValue">Укажите значение высоты этажа</system:String>
+    <system:String x:Key="MainWindow.TextFloorHeightValue">Высота этажа должна быть числом</system:String>
+    <system:String x:Key="MainWindow.NegativeFloorHeightValue">Высота этажа должна быть неотрицательным числом</system:String>
+    <system:String x:Key="MainWindow.MaxFloorHeightValue">Высота этажа должна быть меньше {0} мм</system:String>
+    <system:String x:Key="MainWindow.EmptyGlobalParam">Выберите глобальный параметр</system:String>
+    <system:String x:Key="MainWindow.NegativeGlobalParam">Значение глобального параметра должно быть неотрицательным числом</system:String>
+    <system:String x:Key="MainWindow.MaxGlobalParam">Высота этажа должна быть меньше {0} мм</system:String>
+    
+    <system:String x:Key="Selections.DBSelection">Все отметки</system:String>
+    <system:String x:Key="Selections.DBViewSelection">Отметки на виде</system:String>
+    <system:String x:Key="Selections.SelectedOnViewSelection">Выделенные отметки</system:String>
+    
+    <system:String x:Key="LevelHeightProvider.UserSettings">Пользовательская</system:String>
+    <system:String x:Key="LevelHeightProvider.GlobalParameter">Глобальный параметр</system:String>
+    
+    <system:String x:Key="Report.MissingParamTitle">Отсутствует параметр в семействе</system:String>
+    <system:String x:Key="Report.MissingParamDescription">Не был найден обязательный параметр в семействе</system:String>
+    <system:String x:Key="Report.MissingParamMessageFormat">Не был найден обязательный параметр {1} в семействе {0}</system:String>
+
+    <system:String x:Key="Report.MissingFamilyTitle">Отсутствует семейство</system:String>
+    <system:String x:Key="Report.MissingFamilyDescription">Не было найдено обязательное семейство в проекте</system:String>
+    <system:String x:Key="Report.MissingFamilyMessageFormat">Не было найдено обязательное семейство {0} в проекте</system:String>
+    
+    <system:String x:Key="ReportWindow.Title">Список предупреждений</system:String>
+    <system:String x:Key="ReportWindow.ButtonCancel">Выход</system:String>
+    
+    <system:String x:Key="ReportLevel.Error">Ошибка</system:String>
+    <system:String x:Key="ReportLevel.Warning">Предупреждение</system:String>
+    <system:String x:Key="ReportLevel.Information">Информация</system:String>
+</ResourceDictionary>

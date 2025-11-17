@@ -6,10 +6,10 @@ using dosymep.WPF.Views;
 namespace RevitMarkPlacement.Views;
 
 /// <summary>
-///     Interaction logic for MainWindow.xaml
+///     Interaction logic for ReportView.xaml
 /// </summary>
-public partial class MainWindow {
-    public MainWindow(
+public partial class ReportElementsWindow {
+    public ReportElementsWindow(
         ILoggerService loggerService,
         ISerializationService serializationService,
         ILanguageService languageService,
@@ -37,7 +37,7 @@ public partial class MainWindow {
     /// <remarks>
     /// Используется для сохранения положения окна.
     /// </remarks>
-    public override string ProjectConfigName => nameof(MainWindow);
+    public override string ProjectConfigName => nameof(ReportElementsWindow);
 
     private void ButtonOk_Click(object sender, RoutedEventArgs e) {
         DialogResult = true;
