@@ -1,4 +1,5 @@
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
@@ -63,7 +64,7 @@ internal class MainViewModel : BaseViewModel {
             InitializeEmptyCheck();
         }
         AddCheckCommand = RelayCommand.Create(AddCheck);
-        RemoveCheckCommand = RelayCommand.Create<CheckViewModel>(RemoveCheck, CanRemove);
+        RemoveCheckCommand = RelayCommand.Create<IList>(RemoveCheck, CanRemove);
         FindClashesCommand = RelayCommand.Create(FindClashes, CanFindClashes);
 
         SaveClashesCommand = RelayCommand.Create(SaveConfig);
@@ -193,12 +194,15 @@ internal class MainViewModel : BaseViewModel {
             _contentDialogService));
     }
 
-    private void RemoveCheck(CheckViewModel p) {
-        AllChecks.Remove(p);
+    private void RemoveCheck(IList selectedItems) {
+        var checks = selectedItems.OfType<CheckViewModel>().ToArray();
+        foreach(var check in checks) {
+            AllChecks.Remove(check);
+        }
     }
 
-    private bool CanRemove(CheckViewModel p) {
-        return AllChecks?.Count > 0 && p is not null;
+    private bool CanRemove(IList selectedItems) {
+        return selectedItems is not null && AllChecks?.Count > selectedItems.Count;
     }
 
     private void FindClashes() {

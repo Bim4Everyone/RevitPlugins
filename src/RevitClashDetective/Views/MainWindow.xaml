@@ -110,7 +110,7 @@
                     <ui:Button
                         Appearance="Danger"
                         ToolTip="{me:LocalizationSource MainWindow.DeleteCheck}"
-                        CommandParameter="{Binding SelectedCheck}"
+                        CommandParameter="{Binding SelectedItems, ElementName=ChecksGrid}"
                         Command="{Binding RemoveCheckCommand}"
                         Content="{ui:SymbolIcon Symbol=Delete20}" />
 
@@ -124,7 +124,7 @@
                 </DockPanel>
                 <ui:DataGrid
                     x:Name="ChecksGrid"
-                    SelectionMode="Single"
+                    SelectionMode="Extended"
                     AutoGenerateColumns="False"
                     CanUserDeleteRows="False"
                     CanUserReorderColumns="False"
