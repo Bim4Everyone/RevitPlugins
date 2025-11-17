@@ -150,7 +150,7 @@ internal abstract class RevitViewModel : BaseViewModel {
         // Обрабатываем все зоны
         var errorElements = new Dictionary<string, WarningViewModel>();
         var redundantAreas = GetAreas().Where(item => item.IsRedundant == true || item.NotEnclosed == true);
-        AddElements(InfoElement.RedundantAreas, redundantAreas, errorElements);
+        AddElements(WarningInfo.RedundantAreas, redundantAreas, errorElements);
 
         InfoElements = errorElements.Values.ToList();
         if(InfoElements.Count > 0) {
@@ -187,7 +187,7 @@ internal abstract class RevitViewModel : BaseViewModel {
                 if(isChangedArea && IsCheckRoomsChanges) {
                     double differences = areaWithRatio.GetDifferences();
                     double percentChange = areaWithRatio.GetPercentChange();
-                    AddElement(InfoElement.BigChangesAreas, FormatMessage(differences, percentChange), spatialElement, bigChangesRooms);
+                    AddElement(WarningInfo.BigChangesAreas, FormatMessage(differences, percentChange), spatialElement, bigChangesRooms);
                 }
             }
 
@@ -266,25 +266,25 @@ internal abstract class RevitViewModel : BaseViewModel {
             // Все помещения которые
             // избыточные или не окруженные
             var redundantRooms = rooms.Where(item => item.IsRedundant == true || item.NotEnclosed == true);
-            AddElements(InfoElement.RedundantRooms, redundantRooms, errorElements);
+            AddElements(WarningInfo.RedundantRooms, redundantRooms, errorElements);
 
             // Все помещения у которых
             // не заполнены обязательные параметры
             foreach(var room in rooms) {
                 if(room.Room == null) {
-                    AddElement(InfoElement.RequiredParams.FormatMessage(ProjectParamsConfig.Instance.RoomName.Name),
+                    AddElement(WarningInfo.RequiredParams.FormatMessage(ProjectParamsConfig.Instance.RoomName.Name),
                         null, room, errorElements);
                 }
 
                 if(room.RoomGroup == null) {
                     AddElement(
-                        InfoElement.RequiredParams.FormatMessage(ProjectParamsConfig.Instance.RoomGroupName.Name),
+                        WarningInfo.RequiredParams.FormatMessage(ProjectParamsConfig.Instance.RoomGroupName.Name),
                         null, room, errorElements);
                 }
 
                 if(room.RoomSection == null) {
                     AddElement(
-                        InfoElement.RequiredParams.FormatMessage(ProjectParamsConfig.Instance.RoomSectionName.Name),
+                        WarningInfo.RequiredParams.FormatMessage(ProjectParamsConfig.Instance.RoomSectionName.Name),
                         null, room, errorElements);
                 }
             }
@@ -303,12 +303,12 @@ internal abstract class RevitViewModel : BaseViewModel {
                 if(IsNotEqualGroupType(flat)) {
                     string roomGroup = flat.FirstOrDefault()?.RoomGroup.Name;
                     string roomSection = flat.FirstOrDefault()?.RoomSection.Name;
-                    AddElements(InfoElement.NotEqualGroupType.FormatMessage(roomGroup, roomSection), flat,
+                    AddElements(WarningInfo.NotEqualGroupType.FormatMessage(roomGroup, roomSection), flat,
                         errorElements);
                 }
 
                 if(IsNotEqualMultiLevel(flat.Where(item => !string.IsNullOrEmpty(item.RoomMultilevelGroup)))) {
-                    AddElements(InfoElement.NotEqualMultiLevel, flat, errorElements);
+                    AddElements(WarningInfo.NotEqualMultiLevel, flat, errorElements);
                 }
             }
         }
@@ -333,7 +333,7 @@ internal abstract class RevitViewModel : BaseViewModel {
             // найдены самопересечения
             var countourIntersectRooms = rooms
                 .Where(item => item.IsCountourIntersect == true);
-            AddElements(InfoElement.CountourIntersectRooms, countourIntersectRooms, warningElements);
+            AddElements(WarningInfo.CountourIntersectRooms, countourIntersectRooms, warningElements);
         }
 
         InfoElements = warningElements.Values.Union(errorElements.Values).ToList();
@@ -356,14 +356,14 @@ internal abstract class RevitViewModel : BaseViewModel {
         var notEqualSectionDoors = separators
             .Where(item => !item.IsSectionNameEqual);
 
-        AddElements(InfoElement.NotEqualSectionDoors, notEqualSectionDoors, warningElements);
+        AddElements(WarningInfo.NotEqualSectionDoors, notEqualSectionDoors, warningElements);
 
         // Все разделители
         // с не совпадающей группой
         var notEqualGroup = separators
             .Where(item => !item.IsGroupNameEqual);
 
-        AddElements(InfoElement.NotEqualGroup, notEqualGroup, warningElements);
+        AddElements(WarningInfo.NotEqualGroup, notEqualGroup, warningElements);
     }
 
     private void CheckDoorsAndWindows(
@@ -379,14 +379,14 @@ internal abstract class RevitViewModel : BaseViewModel {
         var notEqualSectionDoors = doorsAndWindows
             .Where(item => !item.IsSectionNameEqual);
 
-        AddElements(InfoElement.NotEqualSectionDoors, notEqualSectionDoors, warningElements);
+        AddElements(WarningInfo.NotEqualSectionDoors, notEqualSectionDoors, warningElements);
 
         // Все окна и двери
         // с не совпадающей группой
         var notEqualGroup = doorsAndWindows
             .Where(item => !item.IsGroupNameEqual);
 
-        AddElements(InfoElement.NotEqualGroup, notEqualGroup, warningElements);
+        AddElements(WarningInfo.NotEqualGroup, notEqualGroup, warningElements);
     }
 
     private void CalculateAreas(List<PhaseViewModel> phases, IEnumerable<LevelViewModel> levels) {
@@ -422,7 +422,7 @@ internal abstract class RevitViewModel : BaseViewModel {
                 if(isChangedRoomArea && IsCheckRoomsChanges) {
                     double differences = areaWithRatio.GetDifferences();
                     double percentChange = areaWithRatio.GetPercentChange();
-                    AddElement(InfoElement.BigChangesRoomAreas, FormatMessage(differences, percentChange),
+                    AddElement(WarningInfo.BigChangesRoomAreas, FormatMessage(differences, percentChange),
                         spatialElement, bigChangesRooms);
                 }
             }
@@ -467,7 +467,7 @@ internal abstract class RevitViewModel : BaseViewModel {
                    calculation.RevitParam == SharedParamsConfig.Instance.ApartmentArea) {
                     double differences = calculation.GetDifferences();
                     double percentChange = calculation.GetPercentChange();
-                    AddElement(InfoElement.BigChangesFlatAreas, FormatMessage(differences, percentChange), room,
+                    AddElement(WarningInfo.BigChangesFlatAreas, FormatMessage(differences, percentChange), room,
                         bigChangesRooms);
                 }
             }
@@ -530,7 +530,7 @@ internal abstract class RevitViewModel : BaseViewModel {
         return int.TryParse(RoomAccuracy, out int result) ? result : 100;
     }
 
-    private void AddElements(InfoElement infoElement, 
+    private void AddElements(WarningInfo infoElement, 
                              IEnumerable<IElementViewModel<Element>> elements, 
                              Dictionary<string, WarningViewModel> infoElements) {
         foreach(var element in elements) {
@@ -538,7 +538,7 @@ internal abstract class RevitViewModel : BaseViewModel {
         }
     }
 
-    private void AddElement(InfoElement infoElement, 
+    private void AddElement(WarningInfo infoElement, 
                             string message, 
                             IElementViewModel<Element> element, 
                             Dictionary<string, 

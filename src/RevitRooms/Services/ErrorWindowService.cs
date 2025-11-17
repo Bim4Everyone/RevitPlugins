@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using Ninject;
 using Ninject.Syntax;
 
+using RevitRooms.Models;
 using RevitRooms.ViewModels;
 using RevitRooms.Views;
 
@@ -24,7 +25,7 @@ internal class ErrorWindowService {
                                  IEnumerable<WarningViewModel> warnings) {
         if(notShowWarnings) {
             warnings = warnings
-                .Where(item => item.TypeInfo != TypeInfo.Warning)
+                .Where(item => item.TypeInfo != WarningTypeInfo.Warning)
                 .OrderBy(x => x.TypeInfo);
         }
 

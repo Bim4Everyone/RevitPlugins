@@ -20,4 +20,7 @@
     <system:String x:Key="InfoElementsWindow.HeaderLevel">Уровень</system:String>
     <system:String x:Key="InfoElementsWindow.HeaderPhase">Стадия</system:String>
     <system:String x:Key="InfoElementsWindow.HeaderDescription">Описание</system:String>
+    
+    <system:String x:Key="InfoElementsWindow.StatusError">Ошибка</system:String>
+    <system:String x:Key="InfoElementsWindow.StatusWarning">Предупреждение</system:String>
 </ResourceDictionary>

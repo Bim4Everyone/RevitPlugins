@@ -19,10 +19,3 @@ public partial class InfoElementsWindow {
     public override string PluginName => nameof(RevitRooms);
     public override string ProjectConfigName => nameof(InfoElementsWindow);
 }
-
-internal enum TypeInfo {
-    None,
-    Info,
-    Error,
-    Warning,
-}

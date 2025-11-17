@@ -375,25 +375,25 @@ internal abstract class RevitViewModel : BaseViewModel, INumberingOrder {
         // избыточные или не окруженные
         var redundantRooms = workingObjects
             .Where(item => item.IsRedundant == true || item.NotEnclosed == true);
-        AddElements(InfoElement.RedundantRooms, redundantRooms, errorElements);
+        AddElements(WarningInfo.RedundantRooms, redundantRooms, errorElements);
 
         // Все помещения у которых
         // не заполнены обязательные параметры
         foreach(var room in workingObjects) {
             if(room.Room == null) {
-                AddElement(InfoElement.RequiredParams.FormatMessage(ProjectParamsConfig.Instance.RoomName.Name),
+                AddElement(WarningInfo.RequiredParams.FormatMessage(ProjectParamsConfig.Instance.RoomName.Name),
                     null, room, errorElements);
             }
 
             if(room.RoomGroup == null) {
                 AddElement(
-                    InfoElement.RequiredParams.FormatMessage(ProjectParamsConfig.Instance.RoomGroupName.Name), null,
+                    WarningInfo.RequiredParams.FormatMessage(ProjectParamsConfig.Instance.RoomGroupName.Name), null,
                     room, errorElements);
             }
 
             if(room.RoomSection == null) {
                 AddElement(
-                    InfoElement.RequiredParams.FormatMessage(ProjectParamsConfig.Instance.RoomSectionName.Name),
+                    WarningInfo.RequiredParams.FormatMessage(ProjectParamsConfig.Instance.RoomSectionName.Name),
                     null, room, errorElements);
             }
         }
@@ -409,7 +409,7 @@ internal abstract class RevitViewModel : BaseViewModel, INumberingOrder {
                 .Count() > 1;
 
             if(notSameValue) {
-                AddElements(InfoElement.ErrorMultiLevelRoom, multiLevelRoomGroup, errorElements);
+                AddElements(WarningInfo.ErrorMultiLevelRoom, multiLevelRoomGroup, errorElements);
             }
         }
 
@@ -423,7 +423,7 @@ internal abstract class RevitViewModel : BaseViewModel, INumberingOrder {
                 .Count() != 2;
 
             if(notSameValue) {
-                AddElements(InfoElement.ErrorMultiLevelRoom, multiLevelRoomGroup, errorElements);
+                AddElements(WarningInfo.ErrorMultiLevelRoom, multiLevelRoomGroup, errorElements);
             }
         }
 
@@ -486,14 +486,14 @@ internal abstract class RevitViewModel : BaseViewModel, INumberingOrder {
         return int.TryParse(StartNumber, out int value) ? value : 0;
     }
 
-    private void AddElements(InfoElement infoElement, IEnumerable<IElementViewModel<Element>> elements,
+    private void AddElements(WarningInfo infoElement, IEnumerable<IElementViewModel<Element>> elements,
         Dictionary<string, WarningViewModel> infoElements) {
         foreach(var element in elements) {
             AddElement(infoElement, null, element, infoElements);
         }
     }
 
-    private void AddElement(InfoElement infoElement, string message, IElementViewModel<Element> element,
+    private void AddElement(WarningInfo infoElement, string message, IElementViewModel<Element> element,
         Dictionary<string, WarningViewModel> infoElements) {
         if(!infoElements.TryGetValue(infoElement.Message, out var value)) {
             value = new WarningViewModel() {
