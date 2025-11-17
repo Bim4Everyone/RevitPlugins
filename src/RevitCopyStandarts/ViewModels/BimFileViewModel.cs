@@ -147,13 +147,33 @@ internal class BimFileViewModel : BaseViewModel {
             return [];
         }
 
-        var temp = sourceDocument.ProjectInformation.Address
-            .Split(['\n'], StringSplitOptions.RemoveEmptyEntries)
-            .Select(item => GetCopyStandartsCommand(sourceDocument, item.Trim()));
+        var address = sourceDocument.ProjectInformation.Address;
+        var t = address.Split(['\n'], StringSplitOptions.RemoveEmptyEntries);
 
-        return [];
+        var test = File.Exists(t.First());
+        var test2 = t.First().Trim();
+
+        var f = GetLoadFamilyCommand(sourceDocument, t.First().Trim());
+
+        //var temp = sourceDocument.ProjectInformation.Address
+        //    .Split(['\n'], StringSplitOptions.RemoveEmptyEntries)
+        //    .Select(item => GetCopyStandartsCommand(sourceDocument, item.Trim()))
+        //    .ToList();
+
+        return [f];
     }
 
+
+
+    private ICopyStandartsCommand GetLoadFamilyCommand(Document sourceDocument, string path) {
+        if(File.Exists(path)) {
+            return new LoadFamilyCommand(sourceDocument, _revitRepository.Document, _localizationService) {
+                Path = path
+            };
+        }
+
+        throw new ArgumentException(_localizationService.GetLocalizedString("Exceptions.PathToFamlyFilyNotExists", path));
+    }
 
 
 
