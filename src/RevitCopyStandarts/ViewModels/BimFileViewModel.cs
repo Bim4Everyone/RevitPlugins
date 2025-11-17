@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Windows.Input;
+using System.Windows.Shapes;
 
 using Autodesk.Revit.ApplicationServices;
 using Autodesk.Revit.DB;
@@ -204,20 +205,23 @@ internal class BimFileViewModel : BaseViewModel {
             || !sourceDocument.ProjectInformation.Address.Contains(':')) {
             return [];
         }
-
-        return sourceDocument.ProjectInformation.Address
+        var command = GetLoadFamiliesCommand(sourceDocument, sourceDocument.ProjectInformation.Address
             .Split(['\n'], StringSplitOptions.RemoveEmptyEntries)
-            .Select(item => GetLoadFamilyCommand(sourceDocument, item.Trim()));
+            .Select(item => item.Trim()));
+
+        return [command];
     }
 
-    private ICopyStandartsCommand GetLoadFamilyCommand(Document sourceDocument, string path) {
-        if(File.Exists(path)) {
-            return new LoadFamilyCommand(sourceDocument, _revitRepository.Document, _localizationService) {
-                Path = path
-            };
+    private ICopyStandartsCommand GetLoadFamiliesCommand(Document sourceDocument, IEnumerable<string> paths) {
+        foreach(var path in paths) {
+            if(!File.Exists(path)) {
+                throw new ArgumentException(_localizationService.GetLocalizedString("Exceptions.PathToFamlyFilyNotExists", path));
+            }
         }
 
-        throw new ArgumentException(_localizationService.GetLocalizedString("Exceptions.PathToFamlyFilyNotExists", path));
+        return new LoadFamiliesCommand(sourceDocument, _revitRepository.Document, _localizationService) {
+            Paths = paths
+        };
     }
 }
 
