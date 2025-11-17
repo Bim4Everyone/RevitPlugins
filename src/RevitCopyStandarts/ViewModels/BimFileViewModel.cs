@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -111,6 +111,7 @@ internal class BimFileViewModel : BaseViewModel {
 
             commands.AddRange(GetOptionalStandarts(sourceDocument));
             commands.AddRange(GetIdOptionalStandarts(sourceDocument));
+            commands.AddRange(GetFamilyStandarts(sourceDocument));
 
             using(var window = _progressDialogFactory.CreateDialog()) {
                 window.MaxValue = commands.Count;
@@ -136,6 +137,25 @@ internal class BimFileViewModel : BaseViewModel {
             sourceDocument.Close(false);
         }
     }
+
+    /// <summary>
+    /// Метод для добавления команд по загрузке семейств в случае, если в Адресс прописаны пути
+    /// </summary>
+    private IEnumerable<ICopyStandartsCommand> GetFamilyStandarts(Document sourceDocument) {
+        if(string.IsNullOrEmpty(sourceDocument.ProjectInformation.Address) 
+            || !sourceDocument.ProjectInformation.Address.Contains(':')) {
+            return [];
+        }
+
+        var temp = sourceDocument.ProjectInformation.Address
+            .Split(['\n'], StringSplitOptions.RemoveEmptyEntries)
+            .Select(item => GetCopyStandartsCommand(sourceDocument, item.Trim()));
+
+        return [];
+    }
+
+
+
 
     private IEnumerable<ICopyStandartsCommand> GetOptionalStandarts(Document sourceDocument) {
         if(string.IsNullOrEmpty(sourceDocument.ProjectInformation.Status)) {
