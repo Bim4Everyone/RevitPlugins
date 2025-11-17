@@ -22,9 +22,7 @@ internal class LoadFamilyCommand : ICopyStandartsCommand {
         transaction.BIMStart(_localizationService.GetLocalizedString("LoadFamilyCommandTransaction"));
 
         var loadOptions = new FamilyLoadOptions();
-
         _target.LoadFamily(Path, loadOptions, out _);
-
         transaction.Commit();
     }
 }

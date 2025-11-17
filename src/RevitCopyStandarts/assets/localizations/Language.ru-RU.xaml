@@ -38,7 +38,7 @@
     <system:String x:Key="CopyObjectStylesCommandTransactionGroup">Копирование \"Стили объектов\"</system:String>
     <system:String x:Key="CopyObjectStylesCommandTransaction">Копирование \"Стили объектов - {0}\"</system:String>
 
-    <system:String x:Key="LoadFamilyCommandTransaction">Загрузка семейств</system:String>
+    <system:String x:Key="LoadFamilyCommandTransaction">Загрузка семейства</system:String>
     
     <system:String x:Key="CopyStandartsCommandTransactionGroup">Копирование \"{0}\"</system:String>
     <system:String x:Key="CopyStandartsCommandTransaction">Копирование \"{0} - {1}\"</system:String>

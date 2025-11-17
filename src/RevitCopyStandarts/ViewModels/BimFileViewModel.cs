@@ -138,45 +138,6 @@ internal class BimFileViewModel : BaseViewModel {
         }
     }
 
-    /// <summary>
-    /// Метод для добавления команд по загрузке семейств в случае, если в Адресс прописаны пути
-    /// </summary>
-    private IEnumerable<ICopyStandartsCommand> GetFamilyStandarts(Document sourceDocument) {
-        if(string.IsNullOrEmpty(sourceDocument.ProjectInformation.Address) 
-            || !sourceDocument.ProjectInformation.Address.Contains(':')) {
-            return [];
-        }
-
-        var address = sourceDocument.ProjectInformation.Address;
-        var t = address.Split(['\n'], StringSplitOptions.RemoveEmptyEntries);
-
-        var test = File.Exists(t.First());
-        var test2 = t.First().Trim();
-
-        var f = GetLoadFamilyCommand(sourceDocument, t.First().Trim());
-
-        //var temp = sourceDocument.ProjectInformation.Address
-        //    .Split(['\n'], StringSplitOptions.RemoveEmptyEntries)
-        //    .Select(item => GetCopyStandartsCommand(sourceDocument, item.Trim()))
-        //    .ToList();
-
-        return [f];
-    }
-
-
-
-    private ICopyStandartsCommand GetLoadFamilyCommand(Document sourceDocument, string path) {
-        if(File.Exists(path)) {
-            return new LoadFamilyCommand(sourceDocument, _revitRepository.Document, _localizationService) {
-                Path = path
-            };
-        }
-
-        throw new ArgumentException(_localizationService.GetLocalizedString("Exceptions.PathToFamlyFilyNotExists", path));
-    }
-
-
-
     private IEnumerable<ICopyStandartsCommand> GetOptionalStandarts(Document sourceDocument) {
         if(string.IsNullOrEmpty(sourceDocument.ProjectInformation.Status)) {
             return [];
@@ -236,6 +197,27 @@ internal class BimFileViewModel : BaseViewModel {
 
         return sourceDocument.GetElement(new ElementId(result));
 #endif
+    }
+
+    private IEnumerable<ICopyStandartsCommand> GetFamilyStandarts(Document sourceDocument) {
+        if(string.IsNullOrEmpty(sourceDocument.ProjectInformation.Address)
+            || !sourceDocument.ProjectInformation.Address.Contains(':')) {
+            return [];
+        }
+
+        return sourceDocument.ProjectInformation.Address
+            .Split(['\n'], StringSplitOptions.RemoveEmptyEntries)
+            .Select(item => GetLoadFamilyCommand(sourceDocument, item.Trim()));
+    }
+
+    private ICopyStandartsCommand GetLoadFamilyCommand(Document sourceDocument, string path) {
+        if(File.Exists(path)) {
+            return new LoadFamilyCommand(sourceDocument, _revitRepository.Document, _localizationService) {
+                Path = path
+            };
+        }
+
+        throw new ArgumentException(_localizationService.GetLocalizedString("Exceptions.PathToFamlyFilyNotExists", path));
     }
 }
 

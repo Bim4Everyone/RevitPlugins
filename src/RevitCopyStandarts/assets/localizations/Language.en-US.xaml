@@ -38,7 +38,7 @@
     <system:String x:Key="CopyObjectStylesCommandTransactionGroup">Copying "Object Styles"</system:String>
     <system:String x:Key="CopyObjectStylesCommandTransaction">Copying "Object Styles - {0}"</system:String>
     
-    <system:String x:Key="LoadFamilyCommandTransaction">Loading families</system:String>
+    <system:String x:Key="LoadFamilyCommandTransaction">Loading family</system:String>
     
     <system:String x:Key="CopyStandartsCommandTransactionGroup">Copying "{0}"</system:String>
     <system:String x:Key="CopyStandartsCommandTransaction">Copying "{0} - {1}"</system:String>
