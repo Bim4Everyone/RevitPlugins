@@ -19,7 +19,7 @@ using RevitRooms.Services;
 using RevitRooms.Views;
 
 namespace RevitRooms.ViewModels.RoomsNums;
-internal abstract class RevitViewModel : BaseViewModel, INumberingOrder {
+internal abstract class RevitRoomNumsViewModel : BaseViewModel, INumberingOrder {
     public Guid _id;
     protected readonly RevitRepository _revitRepository;
     protected readonly RoomsNumsConfig _roomsNumsConfig;
@@ -45,7 +45,7 @@ internal abstract class RevitViewModel : BaseViewModel, INumberingOrder {
 
     public System.Windows.Window ParentWindow { get; set; }
 
-    public RevitViewModel(RevitRepository revitRepository, 
+    public RevitRoomNumsViewModel(RevitRepository revitRepository, 
                           RoomsNumsConfig roomsNumsConfig, 
                           NumOrderWindowService numOrderWindowService) {
         _revitRepository = revitRepository;

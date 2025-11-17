@@ -6,7 +6,7 @@ using RevitRooms.Models;
 using RevitRooms.Services;
 
 namespace RevitRooms.ViewModels.Rooms;
-internal class ElementsRevitViewModel : RevitViewModel {
+internal class ElementsRevitViewModel : RevitRoomsViewModel {
     public ElementsRevitViewModel(RevitRepository revitRepository, RoomsConfig roomsConfig, ErrorWindowService errorWindowService)
         : base(revitRepository, roomsConfig, errorWindowService) {
         _id = new Guid("19723C2C-75ED-4B0A-8279-8493A949E52F");

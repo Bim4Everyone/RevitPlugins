@@ -18,7 +18,7 @@ using RevitRooms.Services;
 using RevitRooms.Views;
 
 namespace RevitRooms.ViewModels.Rooms;
-internal abstract class RevitViewModel : BaseViewModel {
+internal abstract class RevitRoomsViewModel : BaseViewModel {
     public Guid _id;
     protected readonly RevitRepository _revitRepository;
     private readonly RoomsConfig _roomsConfig;
@@ -28,7 +28,7 @@ internal abstract class RevitViewModel : BaseViewModel {
     private bool _isAllowSelectLevels;
     private bool _isFillLevel;
 
-    public RevitViewModel(RevitRepository revitRepository, RoomsConfig roomsConfig, ErrorWindowService errorWindowService) {
+    public RevitRoomsViewModel(RevitRepository revitRepository, RoomsConfig roomsConfig, ErrorWindowService errorWindowService) {
         _revitRepository = revitRepository;
         _roomsConfig = roomsConfig;
         _errorWindowService = errorWindowService;

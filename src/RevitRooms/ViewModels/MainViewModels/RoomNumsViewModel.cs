@@ -23,8 +23,8 @@ internal class RoomNumsViewModel : BaseViewModel {
     private readonly ILocalizationService _localizationService;
     private readonly RoomsNumsWindow _window;
 
-    private ObservableCollection<RevitViewModel> _roomsNumsViewModels;
-    private RevitViewModel _roomsNums;
+    private ObservableCollection<RevitRoomNumsViewModel> _roomsNumsViewModels;
+    private RevitRoomNumsViewModel _roomsNums;
 
     public RoomNumsViewModel(RoomsNumsConfig roomsNumsConfig,
                              RevitRepository revitRepository,
@@ -42,12 +42,12 @@ internal class RoomNumsViewModel : BaseViewModel {
 
     public ICommand LoadViewCommand { get; }
 
-    public RevitViewModel RoomsNums {
+    public RevitRoomNumsViewModel RoomsNums {
         get => _roomsNums;
         set => RaiseAndSetIfChanged(ref _roomsNums, value);
     }
 
-    public ObservableCollection<RevitViewModel> RoomsNumsViewModels {
+    public ObservableCollection<RevitRoomNumsViewModel> RoomsNumsViewModels {
         get => _roomsNumsViewModels;
         set => RaiseAndSetIfChanged(ref _roomsNumsViewModels, value);
     }

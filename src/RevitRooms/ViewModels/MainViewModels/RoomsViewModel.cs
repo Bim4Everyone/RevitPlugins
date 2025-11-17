@@ -21,8 +21,8 @@ internal class RoomsViewModel : BaseViewModel {
     private readonly ILocalizationService _localizationService;
     private readonly ErrorWindowService _errorWindowService;
 
-    private ObservableCollection<RevitViewModel> _revitViewModels;
-    private RevitViewModel _revitViewModel;
+    private ObservableCollection<RevitRoomsViewModel> _revitViewModels;
+    private RevitRoomsViewModel _revitViewModel;
 
     public RoomsViewModel(RoomsConfig roomsConfig,
                           RevitRepository revitRepository,
@@ -38,12 +38,12 @@ internal class RoomsViewModel : BaseViewModel {
 
     public ICommand LoadViewCommand { get; }
 
-    public RevitViewModel RevitViewModel {
+    public RevitRoomsViewModel RevitViewModel {
         get => _revitViewModel;
         set => RaiseAndSetIfChanged(ref _revitViewModel, value);
     }
 
-    public ObservableCollection<RevitViewModel> RevitViewModels {
+    public ObservableCollection<RevitRoomsViewModel> RevitViewModels {
         get => _revitViewModels;
         set => RaiseAndSetIfChanged(ref _revitViewModels, value);
     }

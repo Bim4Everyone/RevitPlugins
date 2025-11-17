@@ -6,7 +6,7 @@ using RevitRooms.Models;
 using RevitRooms.Services;
 
 namespace RevitRooms.ViewModels.RoomsNums;
-internal class SelectedRevitViewModel : RevitViewModel {
+internal class SelectedRevitViewModel : RevitRoomNumsViewModel {
     public SelectedRevitViewModel(RevitRepository revitRepository, 
                                   RoomsNumsConfig roomsNumsConfig, 
                                   NumOrderWindowService numOrderWindowService)
