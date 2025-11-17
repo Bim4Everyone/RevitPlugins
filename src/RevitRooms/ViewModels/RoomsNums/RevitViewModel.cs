@@ -369,32 +369,32 @@ internal abstract class RevitViewModel : BaseViewModel, INumberingOrder {
     }
 
     private bool CheckWorkingObjects(SpatialElementViewModel[] workingObjects) {
-        var errorElements = new Dictionary<string, WarningViewModel>();
+        var errors = new Dictionary<string, WarningViewModel>();
 
         // Все помещения которые
         // избыточные или не окруженные
         var redundantRooms = workingObjects
             .Where(item => item.IsRedundant == true || item.NotEnclosed == true);
-        AddElements(WarningInfo.RedundantRooms, redundantRooms, errorElements);
+        AddElements(WarningInfo.RedundantRooms, redundantRooms, errors);
 
         // Все помещения у которых
         // не заполнены обязательные параметры
         foreach(var room in workingObjects) {
             if(room.Room == null) {
                 AddElement(WarningInfo.RequiredParams.FormatMessage(ProjectParamsConfig.Instance.RoomName.Name),
-                    null, room, errorElements);
+                    null, room, errors);
             }
 
             if(room.RoomGroup == null) {
                 AddElement(
                     WarningInfo.RequiredParams.FormatMessage(ProjectParamsConfig.Instance.RoomGroupName.Name), null,
-                    room, errorElements);
+                    room, errors);
             }
 
             if(room.RoomSection == null) {
                 AddElement(
                     WarningInfo.RequiredParams.FormatMessage(ProjectParamsConfig.Instance.RoomSectionName.Name),
-                    null, room, errorElements);
+                    null, room, errors);
             }
         }
 
@@ -409,7 +409,7 @@ internal abstract class RevitViewModel : BaseViewModel, INumberingOrder {
                 .Count() > 1;
 
             if(notSameValue) {
-                AddElements(WarningInfo.ErrorMultiLevelRoom, multiLevelRoomGroup, errorElements);
+                AddElements(WarningInfo.ErrorMultiLevelRoom, multiLevelRoomGroup, errors);
             }
         }
 
@@ -423,11 +423,11 @@ internal abstract class RevitViewModel : BaseViewModel, INumberingOrder {
                 .Count() != 2;
 
             if(notSameValue) {
-                AddElements(WarningInfo.ErrorMultiLevelRoom, multiLevelRoomGroup, errorElements);
+                AddElements(WarningInfo.ErrorMultiLevelRoom, multiLevelRoomGroup, errors);
             }
         }
 
-        return ShowInfoElementsWindow("Информация", errorElements.Values);
+        return ShowInfoElementsWindow("Информация", errors.Values);
     }
 
     private bool CanNumerateRooms(object param) {
@@ -486,23 +486,26 @@ internal abstract class RevitViewModel : BaseViewModel, INumberingOrder {
         return int.TryParse(StartNumber, out int value) ? value : 0;
     }
 
-    private void AddElements(WarningInfo infoElement, IEnumerable<IElementViewModel<Element>> elements,
-        Dictionary<string, WarningViewModel> infoElements) {
+    private void AddElements(WarningInfo warningInfo, 
+                             IEnumerable<IElementViewModel<Element>> elements,
+                             Dictionary<string, WarningViewModel> warningElements) {
         foreach(var element in elements) {
-            AddElement(infoElement, null, element, infoElements);
+            AddElement(warningInfo, null, element, warningElements);
         }
     }
 
-    private void AddElement(WarningInfo infoElement, string message, IElementViewModel<Element> element,
-        Dictionary<string, WarningViewModel> infoElements) {
-        if(!infoElements.TryGetValue(infoElement.Message, out var value)) {
+    private void AddElement(WarningInfo warningInfo, 
+                            string message, 
+                            IElementViewModel<Element> element,
+                            Dictionary<string, WarningViewModel> warningElements) {
+        if(!warningElements.TryGetValue(warningInfo.Message, out var value)) {
             value = new WarningViewModel() {
-                Message = infoElement.Message,
-                TypeInfo = infoElement.TypeInfo,
-                Description = infoElement.Description,
+                Message = warningInfo.Message,
+                TypeInfo = warningInfo.TypeInfo,
+                Description = warningInfo.Description,
                 Elements = []
             };
-            infoElements.Add(infoElement.Message, value);
+            warningElements.Add(warningInfo.Message, value);
         }
 
         value.Elements.Add(new WarningElementViewModel() { Element = element, Description = message });

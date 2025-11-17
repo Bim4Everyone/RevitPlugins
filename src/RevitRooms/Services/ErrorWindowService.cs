@@ -30,7 +30,7 @@ internal class ErrorWindowService {
         }
 
         if(warnings.Any()) {
-            var window = _resolutionRoot.Get<InfoElementsWindow>();
+            var window = _resolutionRoot.Get<WarningsWindow>();
             window.Title = title;
             window.DataContext = new WarningsViewModel() {
                 Warnings = [.. warnings.OrderBy(x => x.TypeInfo)]

@@ -91,7 +91,7 @@ internal abstract class RevitViewModel : BaseViewModel {
     public ObservableCollection<LevelViewModel> Levels { get; }
     public ObservableCollection<PhaseViewModel> AdditionalPhases { get; }
 
-    private List<WarningViewModel> InfoElements { get; set; } = [];
+    private List<WarningViewModel> Warnings { get; set; } = [];
 
     protected abstract IEnumerable<LevelViewModel> GetLevelViewModels();
 
@@ -152,9 +152,9 @@ internal abstract class RevitViewModel : BaseViewModel {
         var redundantAreas = GetAreas().Where(item => item.IsRedundant == true || item.NotEnclosed == true);
         AddElements(WarningInfo.RedundantAreas, redundantAreas, errorElements);
 
-        InfoElements = errorElements.Values.ToList();
-        if(InfoElements.Count > 0) {
-            _errorWindowService.ShowNoticeWindow("Ошибки", NotShowWarnings, InfoElements);
+        Warnings = errorElements.Values.ToList();
+        if(Warnings.Count > 0) {
+            _errorWindowService.ShowNoticeWindow("Ошибки", NotShowWarnings, Warnings);
             return;
         }
 
@@ -194,8 +194,8 @@ internal abstract class RevitViewModel : BaseViewModel {
             transaction.Commit();
         }
 
-        InfoElements.AddRange(bigChangesRooms.Values);
-        if(!_errorWindowService.ShowNoticeWindow("Информация", NotShowWarnings, InfoElements)) {
+        Warnings.AddRange(bigChangesRooms.Values);
+        if(!_errorWindowService.ShowNoticeWindow("Информация", NotShowWarnings, Warnings)) {
             TaskDialog.Show("Предупреждение!", "Расчет завершен!");
         }
     }
@@ -219,7 +219,7 @@ internal abstract class RevitViewModel : BaseViewModel {
         // Проверка всех элементов
         // на выделенных уровнях
         if(CheckElements(phases, levels)) {
-            _errorWindowService.ShowNoticeWindow("Ошибки", NotShowWarnings, InfoElements);
+            _errorWindowService.ShowNoticeWindow("Ошибки", NotShowWarnings, Warnings);
             return;
         }
 
@@ -314,7 +314,7 @@ internal abstract class RevitViewModel : BaseViewModel {
         }
 
         // Ошибки, которые не останавливают выполнение скрипта
-        var warningElements = new Dictionary<string, WarningViewModel>();
+        var warnings = new Dictionary<string, WarningViewModel>();
 
         var checkPhases = new List<PhaseViewModel>() { Phase };
         var customPhase = phases.FirstOrDefault(item =>
@@ -326,17 +326,17 @@ internal abstract class RevitViewModel : BaseViewModel {
         foreach(var level in levels) {
             var rooms = level.GetRooms(checkPhases).ToArray();
 
-            CheckRoomSeparators(level, checkPhases, warningElements, rooms);
-            CheckDoorsAndWindows(level, checkPhases, warningElements, rooms);
+            CheckRoomSeparators(level, checkPhases, warnings, rooms);
+            CheckDoorsAndWindows(level, checkPhases, warnings, rooms);
 
             // Все помещений у которых
             // найдены самопересечения
             var countourIntersectRooms = rooms
                 .Where(item => item.IsCountourIntersect == true);
-            AddElements(WarningInfo.CountourIntersectRooms, countourIntersectRooms, warningElements);
+            AddElements(WarningInfo.CountourIntersectRooms, countourIntersectRooms, warnings);
         }
 
-        InfoElements = warningElements.Values.Union(errorElements.Values).ToList();
+        Warnings = warnings.Values.Union(errorElements.Values).ToList();
         return errorElements.Count > 0;
     }
 
@@ -450,8 +450,8 @@ internal abstract class RevitViewModel : BaseViewModel {
 
 
         transaction.Commit();
-        InfoElements.AddRange(bigChangesRooms.Values);
-        if(!_errorWindowService.ShowNoticeWindow("Информация", NotShowWarnings, InfoElements)) {
+        Warnings.AddRange(bigChangesRooms.Values);
+        if(!_errorWindowService.ShowNoticeWindow("Информация", NotShowWarnings, Warnings)) {
             TaskDialog.Show("Предупреждение!", "Расчет завершен!");
         }
     }
