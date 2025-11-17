@@ -17,10 +17,12 @@
     <system:String x:Key="Notification.Title">Copy standards</system:String>
     <system:String x:Key="Notification.Message">Standards copying completed successfully.</system:String>
     
+    <system:String x:Key="MessageBox.Title.Error">Error</system:String>
+    
     <system:String x:Key="Exceptions.UnknownClassName">Unknown command name "{0}".</system:String>
     <system:String x:Key="Exceptions.NullElementId">Element identifier cannot be empty or null.</system:String>
     <system:String x:Key="Exceptions.NumElementId">Element identifier must be a number.</system:String>
-    <system:String x:Key="Exceptions.PathToFamlyFilyNotExists">The path to the family file does not exist.</system:String>
+    <system:String x:Key="Exceptions.PathToFamlyFilyNotExists">The path to the family file does not exist: "{0}".</system:String>
 
     <system:String x:Key="CopyViewTemplatesCommandName">Template</system:String>
     <system:String x:Key="CopyViewSchedulesCommandName">Schedule</system:String>

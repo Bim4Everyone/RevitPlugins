@@ -17,10 +17,12 @@
     <system:String x:Key="Notification.Title">Копирование стандартов</system:String>
     <system:String x:Key="Notification.Message">Копирование стандартов завершено успешно.</system:String>
     
+    <system:String x:Key="MessageBox.Title.Error">Ошибка</system:String>
+    
     <system:String x:Key="Exceptions.UnknownClassName">Неизвестное наименование команды "{0}".</system:String>
     <system:String x:Key="Exceptions.NullElementId">Идентификатор элемента не может быть пустым или null.</system:String>
     <system:String x:Key="Exceptions.NumElementId">Идентификатор элемента должен быть числом.</system:String>
-    <system:String x:Key="Exceptions.PathToFamlyFilyNotExists">Путь до файла семейства не существует.</system:String>
+    <system:String x:Key="Exceptions.PathToFamlyFilyNotExists">Путь до файла семейства не существует: "{0}".</system:String>
     
     <system:String x:Key="CopyViewTemplatesCommandName">Шаблон</system:String>
     <system:String x:Key="CopyViewSchedulesCommandName">Спецификация</system:String>
