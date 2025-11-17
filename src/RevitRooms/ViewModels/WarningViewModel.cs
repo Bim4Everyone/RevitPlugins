@@ -11,7 +11,11 @@ using dosymep.WPF.ViewModels;
 using RevitRooms.Views;
 
 namespace RevitRooms.ViewModels;
-internal class InfoElementViewModel : BaseViewModel {
+/// <summary>
+/// Класс для представления информации об ошибке или предупреждении.
+/// Содержит описание ошибки и список элементов Revit с этой ошибкой.
+/// </summary>
+internal class WarningViewModel : BaseViewModel {
     public string Message { get; set; }
     public string Description { get; set; }
 
@@ -27,10 +31,14 @@ internal class InfoElementViewModel : BaseViewModel {
         }
     }
 
-    public ObservableCollection<MessageElementViewModel> Elements { get; set; }
+    public ObservableCollection<WarningElementViewModel> Elements { get; set; }
 }
 
-internal class MessageElementViewModel {
+/// <summary>
+/// Класс для представления элемента Revit с ошибкой.
+/// Содержит информацию об этом элементе.
+/// </summary>
+internal class WarningElementViewModel {
     public string Description { get; set; }
     public IElementViewModel<Element> Element { get; set; }
 

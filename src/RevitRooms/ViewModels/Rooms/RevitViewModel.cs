@@ -91,7 +91,7 @@ internal abstract class RevitViewModel : BaseViewModel {
     public ObservableCollection<LevelViewModel> Levels { get; }
     public ObservableCollection<PhaseViewModel> AdditionalPhases { get; }
 
-    private List<InfoElementViewModel> InfoElements { get; set; } = [];
+    private List<WarningViewModel> InfoElements { get; set; } = [];
 
     protected abstract IEnumerable<LevelViewModel> GetLevelViewModels();
 
@@ -148,7 +148,7 @@ internal abstract class RevitViewModel : BaseViewModel {
         _revitRepository.RemoveUnplacedSpatialElements();
 
         // Обрабатываем все зоны
-        var errorElements = new Dictionary<string, InfoElementViewModel>();
+        var errorElements = new Dictionary<string, WarningViewModel>();
         var redundantAreas = GetAreas().Where(item => item.IsRedundant == true || item.NotEnclosed == true);
         AddElements(InfoElement.RedundantAreas, redundantAreas, errorElements);
 
@@ -161,7 +161,7 @@ internal abstract class RevitViewModel : BaseViewModel {
         // получаем уже обработанные имена уровней
         var levelNames = _revitRepository.GetLevelNames();
 
-        var bigChangesRooms = new Dictionary<string, InfoElementViewModel>();
+        var bigChangesRooms = new Dictionary<string, WarningViewModel>();
         using(var transaction = _revitRepository.StartTransaction("Расчет площадей")) {
             // Надеюсь будет достаточно быстро отрабатывать :)
             // Обновление параметра округления у зон
@@ -259,7 +259,7 @@ internal abstract class RevitViewModel : BaseViewModel {
     }
 
     private bool CheckElements(List<PhaseViewModel> phases, IEnumerable<LevelViewModel> levels) {
-        var errorElements = new Dictionary<string, InfoElementViewModel>();
+        var errorElements = new Dictionary<string, WarningViewModel>();
         foreach(var level in levels) {
             var rooms = level.GetRooms(phases);
 
@@ -314,7 +314,7 @@ internal abstract class RevitViewModel : BaseViewModel {
         }
 
         // Ошибки, которые не останавливают выполнение скрипта
-        var warningElements = new Dictionary<string, InfoElementViewModel>();
+        var warningElements = new Dictionary<string, WarningViewModel>();
 
         var checkPhases = new List<PhaseViewModel>() { Phase };
         var customPhase = phases.FirstOrDefault(item =>
@@ -343,7 +343,7 @@ internal abstract class RevitViewModel : BaseViewModel {
     private void CheckRoomSeparators(
         LevelViewModel level,
         List<PhaseViewModel> checkPhases,
-        Dictionary<string, InfoElementViewModel> warningElements,
+        Dictionary<string, WarningViewModel> warningElements,
         SpatialElementViewModel[] rooms) {
         // добавляем разделители помещений
         var separators = level.GetRoomSeparators(checkPhases).ToArray();
@@ -369,7 +369,7 @@ internal abstract class RevitViewModel : BaseViewModel {
     private void CheckDoorsAndWindows(
         LevelViewModel level,
         List<PhaseViewModel> checkPhases,
-        Dictionary<string, InfoElementViewModel> warningElements,
+        Dictionary<string, WarningViewModel> warningElements,
         SpatialElementViewModel[] rooms) {
         var doors = level.GetDoors(checkPhases).ToArray();
         var doorsAndWindows = doors.Union(level.GetWindows(checkPhases)).ToArray();
@@ -394,7 +394,7 @@ internal abstract class RevitViewModel : BaseViewModel {
         // получаем обработанные имена уровней
         var levelNames = _revitRepository.GetLevelNames();
 
-        var bigChangesRooms = new Dictionary<string, InfoElementViewModel>();
+        var bigChangesRooms = new Dictionary<string, WarningViewModel>();
 
         // Надеюсь будет достаточно быстро отрабатывать :)
         // Подсчет площадей помещений
@@ -456,7 +456,7 @@ internal abstract class RevitViewModel : BaseViewModel {
         }
     }
 
-    private void UpdateParam(SpatialElementViewModel[] flat, Dictionary<string, InfoElementViewModel> bigChangesRooms) {
+    private void UpdateParam(SpatialElementViewModel[] flat, Dictionary<string, WarningViewModel> bigChangesRooms) {
         foreach(var calculation in GetParamCalculations()) {
             foreach(var room in flat) {
                 calculation.CalculateParam(room);
@@ -530,19 +530,29 @@ internal abstract class RevitViewModel : BaseViewModel {
         return int.TryParse(RoomAccuracy, out int result) ? result : 100;
     }
 
-    private void AddElements(InfoElement infoElement, IEnumerable<IElementViewModel<Element>> elements, Dictionary<string, InfoElementViewModel> infoElements) {
+    private void AddElements(InfoElement infoElement, 
+                             IEnumerable<IElementViewModel<Element>> elements, 
+                             Dictionary<string, WarningViewModel> infoElements) {
         foreach(var element in elements) {
             AddElement(infoElement, null, element, infoElements);
         }
     }
 
-    private void AddElement(InfoElement infoElement, string message, IElementViewModel<Element> element, Dictionary<string, InfoElementViewModel> infoElements) {
+    private void AddElement(InfoElement infoElement, 
+                            string message, 
+                            IElementViewModel<Element> element, 
+                            Dictionary<string, 
+                            WarningViewModel> infoElements) {
         if(!infoElements.TryGetValue(infoElement.Message, out var value)) {
-            value = new InfoElementViewModel() { Message = infoElement.Message, TypeInfo = infoElement.TypeInfo, Description = infoElement.Description, Elements = [] };
+            value = new WarningViewModel() { 
+                Message = infoElement.Message, 
+                TypeInfo = infoElement.TypeInfo, 
+                Description = infoElement.Description, 
+                Elements = [] };
             infoElements.Add(infoElement.Message, value);
         }
 
-        value.Elements.Add(new MessageElementViewModel() { Element = element, Description = message });
+        value.Elements.Add(new WarningElementViewModel() { Element = element, Description = message });
     }
 
     //private bool ShowInfoElementsWindow(string title, IEnumerable<InfoElementViewModel> infoElements) {

@@ -49,7 +49,7 @@ public class RoomsCommand : BasePluginCommand {
 
         // Настройка запуска окна
         kernel.BindMainWindow<RoomsViewModel, RoomsWindow>();
-        kernel.BindOtherWindow<InfoElementsViewModel, InfoElementsWindow>();
+        kernel.BindOtherWindow<WarningsViewModel, InfoElementsWindow>();
 
         // Настройка локализации,
         // получение имени сборки откуда брать текст

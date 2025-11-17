@@ -369,7 +369,7 @@ internal abstract class RevitViewModel : BaseViewModel, INumberingOrder {
     }
 
     private bool CheckWorkingObjects(SpatialElementViewModel[] workingObjects) {
-        var errorElements = new Dictionary<string, InfoElementViewModel>();
+        var errorElements = new Dictionary<string, WarningViewModel>();
 
         // Все помещения которые
         // избыточные или не окруженные
@@ -487,16 +487,16 @@ internal abstract class RevitViewModel : BaseViewModel, INumberingOrder {
     }
 
     private void AddElements(InfoElement infoElement, IEnumerable<IElementViewModel<Element>> elements,
-        Dictionary<string, InfoElementViewModel> infoElements) {
+        Dictionary<string, WarningViewModel> infoElements) {
         foreach(var element in elements) {
             AddElement(infoElement, null, element, infoElements);
         }
     }
 
     private void AddElement(InfoElement infoElement, string message, IElementViewModel<Element> element,
-        Dictionary<string, InfoElementViewModel> infoElements) {
+        Dictionary<string, WarningViewModel> infoElements) {
         if(!infoElements.TryGetValue(infoElement.Message, out var value)) {
-            value = new InfoElementViewModel() {
+            value = new WarningViewModel() {
                 Message = infoElement.Message,
                 TypeInfo = infoElement.TypeInfo,
                 Description = infoElement.Description,
@@ -505,10 +505,10 @@ internal abstract class RevitViewModel : BaseViewModel, INumberingOrder {
             infoElements.Add(infoElement.Message, value);
         }
 
-        value.Elements.Add(new MessageElementViewModel() { Element = element, Description = message });
+        value.Elements.Add(new WarningElementViewModel() { Element = element, Description = message });
     }
 
-    private bool ShowInfoElementsWindow(string title, ICollection<InfoElementViewModel> infoElements) {
+    private bool ShowInfoElementsWindow(string title, ICollection<WarningViewModel> infoElements) {
         if(infoElements.Any()) {
             //var window = new InfoElementsWindow() {
             //    Title = title,

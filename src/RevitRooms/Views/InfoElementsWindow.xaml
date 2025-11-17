@@ -21,7 +21,7 @@
     MinHeight="500"
     MinWidth="1000"
     
-    d:DataContext="{d:DesignInstance vms:InfoElementsViewModel, IsDesignTimeCreatable=False}">
+    d:DataContext="{d:DesignInstance vms:WarningsViewModel, IsDesignTimeCreatable=False}">
 
     <core:WpfUIPlatformWindow.Resources>
         <ResourceDictionary>
@@ -36,7 +36,6 @@
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />
             <RowDefinition Height="*" />
-            <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
 
         <ui:TitleBar
@@ -44,106 +43,108 @@
             VerticalAlignment="Center"
             Title="Errors" />
 
-        <ItemsControl
+        <ScrollViewer
             Grid.Row="1"
-            Padding="10"
-            VirtualizingPanel.IsVirtualizing="True"
-            VirtualizingPanel.VirtualizationMode="Recycling"
-            ScrollViewer.CanContentScroll="True"
-            ItemsSource="{Binding InfoElements}">
-            <ItemsControl.ItemTemplate>
-                <DataTemplate>
-                    <edits:CustomGroupEditControl
-                        Icon="{ui:SymbolIcon Warning24}"
-                        Header="{Binding TypeInfoText}"
-                        Description="{Binding Description}"
-                        ExtraTextVisible="True"
-                        ExtraText="{Binding WarningQuantity}"
-                        IsChecked="True">
-                        <edits:CustomGroupEditControl.EditControl>
-                            <ui:DataGrid
-                                MaxHeight="500"
-                                AutoGenerateColumns="False"
-                                IsReadOnly="True"
-                                Style="{StaticResource CustomResizableDataGridStyle}"
-                                ItemsSource="{Binding Elements}">
-                                <ui:DataGrid.Columns>
-                                    <DataGridTemplateColumn>
-                                        <DataGridTemplateColumn.Header>
-                                            <!--В динамически-создаваемом UserControl работает только DynamicResource-->
-                                            <ui:TextBlock
-                                                Text="{DynamicResource InfoElementsWindow.HeaderId}" /> 
-                                        </DataGridTemplateColumn.Header>
-                                        <DataGridTemplateColumn.CellTemplate>
-                                            <DataTemplate>
-                                                <Button
-                                                    Width="100"
-                                                    Content="{Binding ElementId}"
-                                                    Command="{Binding DataContext.ShowElementCommand}" />
-                                            </DataTemplate>
-                                        </DataGridTemplateColumn.CellTemplate>
-                                    </DataGridTemplateColumn>
+            VerticalScrollBarVisibility="Auto">
+            <ItemsControl
+                Padding="10"
+                VirtualizingPanel.IsVirtualizing="True"
+                VirtualizingPanel.VirtualizationMode="Recycling"
+                ScrollViewer.CanContentScroll="True"
+                ItemsSource="{Binding Warnings}">
+                <ItemsControl.ItemTemplate>
+                    <DataTemplate>
+                        <edits:CustomGroupEditControl
+                            Icon="{ui:SymbolIcon Warning24}"
+                            Header="{Binding TypeInfoText}"
+                            Description="{Binding Description}"
+                            ExtraTextVisible="True"
+                            ExtraText="{Binding WarningQuantity}"
+                            IsChecked="True">
+                            <edits:CustomGroupEditControl.EditControl>
+                                <ui:DataGrid
+                                    MaxHeight="500"
+                                    AutoGenerateColumns="False"
+                                    IsReadOnly="True"
+                                    Style="{StaticResource CustomResizableDataGridStyle}"
+                                    ItemsSource="{Binding Elements}">
+                                    <ui:DataGrid.Columns>
+                                        <DataGridTemplateColumn>
+                                            <DataGridTemplateColumn.Header>
+                                                <!--В динамически-создаваемом UserControl работает только DynamicResource-->
+                                                <ui:TextBlock
+                                                    Text="{DynamicResource InfoElementsWindow.HeaderId}" /> 
+                                            </DataGridTemplateColumn.Header>
+                                            <DataGridTemplateColumn.CellTemplate>
+                                                <DataTemplate>
+                                                    <Button
+                                                        Width="100"
+                                                        Content="{Binding ElementId}"
+                                                        Command="{Binding ShowElementCommand}" />
+                                                </DataTemplate>
+                                            </DataGridTemplateColumn.CellTemplate>
+                                        </DataGridTemplateColumn>
                                     
-                                    <DataGridTextColumn
-                                        Width="120"
-                                        Binding="{Binding CategoryName}">
-                                        <DataGridTextColumn.Header>
-                                            <!--В динамически-создаваемом UserControl работает только DynamicResource-->
-                                            <ui:TextBlock
-                                                Text="{DynamicResource InfoElementsWindow.HeaderCategory}" />
-                                        </DataGridTextColumn.Header>
-                                    </DataGridTextColumn>
+                                        <DataGridTextColumn
+                                            Width="120"
+                                            Binding="{Binding CategoryName}">
+                                            <DataGridTextColumn.Header>
+                                                <!--В динамически-создаваемом UserControl работает только DynamicResource-->
+                                                <ui:TextBlock
+                                                    Text="{DynamicResource InfoElementsWindow.HeaderCategory}" />
+                                            </DataGridTextColumn.Header>
+                                        </DataGridTextColumn>
 
-                                    <DataGridTextColumn
-                                        Width="300"
-                                        Binding="{Binding Name}">
-                                        <DataGridTextColumn.Header>
-                                            <ui:TextBlock
-                                                Text="{DynamicResource InfoElementsWindow.HeaderName}" />
-                                        </DataGridTextColumn.Header>
-                                    </DataGridTextColumn>
+                                        <DataGridTextColumn
+                                            Width="300"
+                                            Binding="{Binding Name}">
+                                            <DataGridTextColumn.Header>
+                                                <ui:TextBlock
+                                                    Text="{DynamicResource InfoElementsWindow.HeaderName}" />
+                                            </DataGridTextColumn.Header>
+                                        </DataGridTextColumn>
 
-                                    <DataGridTextColumn
-                                        Width="200"
-                                        Binding="{Binding LevelName}">
-                                        <DataGridTextColumn.Header>
-                                            <ui:TextBlock
-                                                Text="{DynamicResource InfoElementsWindow.HeaderLevel}" />
-                                        </DataGridTextColumn.Header>
-                                    </DataGridTextColumn>
+                                        <DataGridTextColumn
+                                            Width="200"
+                                            Binding="{Binding LevelName}">
+                                            <DataGridTextColumn.Header>
+                                                <ui:TextBlock
+                                                    Text="{DynamicResource InfoElementsWindow.HeaderLevel}" />
+                                            </DataGridTextColumn.Header>
+                                        </DataGridTextColumn>
                                     
-                                    <DataGridTextColumn
-                                        Width="150"
-                                        Binding="{Binding PhaseName}">
-                                        <DataGridTextColumn.Header>
-                                            <ui:TextBlock
-                                                Text="{DynamicResource InfoElementsWindow.HeaderPhase}" />
-                                        </DataGridTextColumn.Header>
-                                    </DataGridTextColumn>
+                                        <DataGridTextColumn
+                                            Width="150"
+                                            Binding="{Binding PhaseName}">
+                                            <DataGridTextColumn.Header>
+                                                <ui:TextBlock
+                                                    Text="{DynamicResource InfoElementsWindow.HeaderPhase}" />
+                                            </DataGridTextColumn.Header>
+                                        </DataGridTextColumn>
 
-                                    <DataGridTextColumn
-                                        Width="100"
-                                        Binding="{Binding Description}">
-                                        <DataGridTextColumn.Header>
-                                            <ui:TextBlock
-                                                Text="{DynamicResource InfoElementsWindow.HeaderDescription}" />
-                                        </DataGridTextColumn.Header>
-                                    </DataGridTextColumn>
-                                </ui:DataGrid.Columns>
-                            </ui:DataGrid>
-                        </edits:CustomGroupEditControl.EditControl>
-                    </edits:CustomGroupEditControl>
-                </DataTemplate>
-            </ItemsControl.ItemTemplate>
+                                        <DataGridTextColumn
+                                            Width="100"
+                                            Binding="{Binding Description}">
+                                            <DataGridTextColumn.Header>
+                                                <ui:TextBlock
+                                                    Text="{DynamicResource InfoElementsWindow.HeaderDescription}" />
+                                            </DataGridTextColumn.Header>
+                                        </DataGridTextColumn>
+                                    </ui:DataGrid.Columns>
+                                </ui:DataGrid>
+                            </edits:CustomGroupEditControl.EditControl>
+                        </edits:CustomGroupEditControl>
+                    </DataTemplate>
+                </ItemsControl.ItemTemplate>
 
-            <ItemsControl.ItemsPanel>
-                <ItemsPanelTemplate>
-                    <VirtualizingStackPanel
-                        IsVirtualizing="True"
-                        VirtualizationMode="Recycling" />
-                </ItemsPanelTemplate>
-            </ItemsControl.ItemsPanel>
-
+                <ItemsControl.ItemsPanel>
+                    <ItemsPanelTemplate>
+                        <VirtualizingStackPanel
+                            IsVirtualizing="True"
+                            VirtualizationMode="Recycling" />
+                    </ItemsPanelTemplate>
+                </ItemsControl.ItemsPanel>
         </ItemsControl>
+        </ScrollViewer>
     </Grid>
 </core:WpfUIPlatformWindow>

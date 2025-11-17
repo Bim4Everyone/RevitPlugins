@@ -21,17 +21,18 @@ internal class ErrorWindowService {
 
     public bool ShowNoticeWindow(string title, 
                                  bool notShowWarnings,
-                                 IEnumerable<InfoElementViewModel> infoElements) {
+                                 IEnumerable<WarningViewModel> warnings) {
         if(notShowWarnings) {
-            infoElements = infoElements.Where(item => item.TypeInfo != TypeInfo.Warning);
+            warnings = warnings
+                .Where(item => item.TypeInfo != TypeInfo.Warning)
+                .OrderBy(x => x.TypeInfo);
         }
 
-        if(infoElements.Any()) {
+        if(warnings.Any()) {
             var window = _resolutionRoot.Get<InfoElementsWindow>();
             window.Title = title;
-            window.DataContext = new InfoElementsViewModel() {
-                InfoElement = infoElements.FirstOrDefault(),
-                InfoElements = [.. infoElements]
+            window.DataContext = new WarningsViewModel() {
+                Warnings = [.. warnings.OrderBy(x => x.TypeInfo)]
             };
 
             window.Show();
