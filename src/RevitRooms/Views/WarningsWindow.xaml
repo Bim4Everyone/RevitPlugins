@@ -35,6 +35,7 @@
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
             <RowDefinition Height="*" />
         </Grid.RowDefinitions>
 
@@ -43,8 +44,13 @@
             VerticalAlignment="Center"
             Title="Errors" />
 
+        <TextBlock
+            Grid.Row="1" 
+            Margin="20,5"
+            Text="{Binding Description}"/>
+
         <ScrollViewer
-            Grid.Row="1"
+            Grid.Row="2"
             VerticalScrollBarVisibility="Auto">
             <ItemsControl
                 Padding="10"

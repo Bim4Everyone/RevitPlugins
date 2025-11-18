@@ -22,18 +22,37 @@ internal class ErrorWindowService {
 
     public bool ShowNoticeWindow(string title, 
                                  bool notShowWarnings,
-                                 IEnumerable<WarningViewModel> warnings) {
+                                 IEnumerable<WarningViewModel> allWarnings) {
         if(notShowWarnings) {
-            warnings = warnings
+            allWarnings = allWarnings
                 .Where(item => item.TypeInfo != WarningTypeInfo.Warning)
                 .OrderBy(x => x.TypeInfo);
         }
 
-        if(warnings.Any()) {
+        if(allWarnings.Any()) {
+            bool hasErrors = allWarnings
+                .Where(item => item.TypeInfo == WarningTypeInfo.Error)
+                .OrderBy(x => x.TypeInfo)
+                .Any();
+            bool hasWarnings = allWarnings
+                .Where(item => item.TypeInfo == WarningTypeInfo.Warning)
+                .OrderBy(x => x.TypeInfo)
+                .Any();
+
+            string message;
+            if(hasErrors && hasWarnings) {
+                message = "Расчет не выполнен, так как есть ошибки и предупреждения.\r\nОшибки обязательны к исправлению.\r\nПредупреждения следует проанализировать и при необходимости исправить.";
+            } else if(hasErrors) {
+                message = "Расчет не выполнен, так как есть ошибки.\r\nОшибки обязательны к исправлению.";
+            } else {
+                message = "Расчет завершен с предупреждениями.\r\nПредупреждения следует проанализировать и при необходимости исправить.";
+            }
+
             var window = _resolutionRoot.Get<WarningsWindow>();
             window.Title = title;
             window.DataContext = new WarningsViewModel() {
-                Warnings = [.. warnings.OrderBy(x => x.TypeInfo)]
+                Description = message,
+                Warnings = [.. allWarnings.OrderBy(x => x.TypeInfo)]
             };
 
             window.Show();

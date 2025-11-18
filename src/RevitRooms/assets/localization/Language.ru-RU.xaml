@@ -4,7 +4,7 @@
 
     <system:String x:Key="RoomsWindow.Title">Квартирография</system:String>
     <system:String x:Key="RoomsNumsWindow.Title">Нумерация помещений</system:String>
-    <system:String x:Key="InfoElementsWindow.Title">Ошибки и предупреждения</system:String>
+    <system:String x:Key="WarningsWindow.Title">Ошибки и предупреждения</system:String>
 
     <system:String x:Key="MainWindow.HeaderCheck">Выбрать</system:String>
     <system:String x:Key="MainWindow.HeaderLevels">Этажи</system:String>
@@ -14,13 +14,13 @@
     <system:String x:Key="MainWindow.ElementsRevitName">Выборка по всем элементам</system:String>
     <system:String x:Key="MainWindow.SelectedRevitName">Выборка по выделенным элементам</system:String>
 
-    <system:String x:Key="InfoElementsWindow.HeaderId">Id</system:String>
-    <system:String x:Key="InfoElementsWindow.HeaderCategory">Категория</system:String>
-    <system:String x:Key="InfoElementsWindow.HeaderName">Имя</system:String>
-    <system:String x:Key="InfoElementsWindow.HeaderLevel">Уровень</system:String>
-    <system:String x:Key="InfoElementsWindow.HeaderPhase">Стадия</system:String>
-    <system:String x:Key="InfoElementsWindow.HeaderDescription">Описание</system:String>
+    <system:String x:Key="WarningsWindow.HeaderId">Id</system:String>
+    <system:String x:Key="WarningsWindow.HeaderCategory">Категория</system:String>
+    <system:String x:Key="WarningsWindow.HeaderName">Имя</system:String>
+    <system:String x:Key="WarningsWindow.HeaderLevel">Уровень</system:String>
+    <system:String x:Key="WarningsWindow.HeaderPhase">Стадия</system:String>
+    <system:String x:Key="WarningsWindow.HeaderDescription">Описание</system:String>
     
-    <system:String x:Key="InfoElementsWindow.StatusError">Ошибка</system:String>
-    <system:String x:Key="InfoElementsWindow.StatusWarning">Предупреждение</system:String>
+    <system:String x:Key="WarningsWindow.StatusError">Ошибка</system:String>
+    <system:String x:Key="WarningsWindow.StatusWarning">Предупреждение</system:String>
 </ResourceDictionary>

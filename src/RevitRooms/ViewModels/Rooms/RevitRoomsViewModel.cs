@@ -28,7 +28,9 @@ internal abstract class RevitRoomsViewModel : BaseViewModel {
     private bool _isAllowSelectLevels;
     private bool _isFillLevel;
 
-    public RevitRoomsViewModel(RevitRepository revitRepository, RoomsConfig roomsConfig, ErrorWindowService errorWindowService) {
+    public RevitRoomsViewModel(RevitRepository revitRepository, 
+                               RoomsConfig roomsConfig, 
+                               ErrorWindowService errorWindowService) {
         _revitRepository = revitRepository;
         _roomsConfig = roomsConfig;
         _errorWindowService = errorWindowService;
@@ -452,7 +454,7 @@ internal abstract class RevitRoomsViewModel : BaseViewModel {
         transaction.Commit();
         Warnings.AddRange(bigChangesRooms.Values);
         if(!_errorWindowService.ShowNoticeWindow("Информация", NotShowWarnings, Warnings)) {
-            TaskDialog.Show("Предупреждение!", "Расчет завершен!");
+            TaskDialog.Show("Предупреждение!", "Расчет завершен успешно!");
         }
     }
 

@@ -63,7 +63,7 @@ internal class WarningInfo {
     public static WarningInfo CountourIntersectRooms { get; } = new WarningInfo() {
         TypeInfo = WarningTypeInfo.Warning,
         Message = "Найдены самопересечения помещений.",
-        Description = "Для данных помещений обнаружены самопересечения контуров."
+        Description = "Для данных помещений обнаружены самопересечения контуров. При возможности их следует исправлять разделителями помещений, так как самопересечения могут привести к ошибочному расчету площадей."
     };
 
     public static WarningInfo BigChangesRoomAreas { get; } = new WarningInfo() {
