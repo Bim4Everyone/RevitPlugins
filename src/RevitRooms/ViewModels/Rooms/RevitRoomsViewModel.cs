@@ -9,6 +9,7 @@ using Autodesk.Revit.UI;
 
 using dosymep.Bim4Everyone.ProjectParams;
 using dosymep.Bim4Everyone.SharedParams;
+using dosymep.SimpleServices;
 using dosymep.WPF.Commands;
 using dosymep.WPF.ViewModels;
 
@@ -22,6 +23,7 @@ internal abstract class RevitRoomsViewModel : BaseViewModel {
     public Guid _id;
     protected readonly RevitRepository _revitRepository;
     private readonly RoomsConfig _roomsConfig;
+    private readonly IMessageBoxService _messageBoxService;
     private readonly ErrorWindowService _errorWindowService;
 
     private string _errorText;
@@ -29,10 +31,12 @@ internal abstract class RevitRoomsViewModel : BaseViewModel {
     private bool _isFillLevel;
 
     public RevitRoomsViewModel(RevitRepository revitRepository, 
-                               RoomsConfig roomsConfig, 
+                               RoomsConfig roomsConfig,
+                               IMessageBoxService messageBoxService,
                                ErrorWindowService errorWindowService) {
         _revitRepository = revitRepository;
         _roomsConfig = roomsConfig;
+        _messageBoxService = messageBoxService;
         _errorWindowService = errorWindowService;
 
         Levels = [.. GetLevelViewModels()
@@ -198,7 +202,7 @@ internal abstract class RevitRoomsViewModel : BaseViewModel {
 
         Warnings.AddRange(bigChangesRooms.Values);
         if(!_errorWindowService.ShowNoticeWindow("Информация", NotShowWarnings, Warnings)) {
-            TaskDialog.Show("Предупреждение!", "Расчет завершен!");
+            _messageBoxService.Show("Расчет завершен!", "Предупреждение!");
         }
     }
 
@@ -454,7 +458,7 @@ internal abstract class RevitRoomsViewModel : BaseViewModel {
         transaction.Commit();
         Warnings.AddRange(bigChangesRooms.Values);
         if(!_errorWindowService.ShowNoticeWindow("Информация", NotShowWarnings, Warnings)) {
-            TaskDialog.Show("Предупреждение!", "Расчет завершен успешно!");
+            _messageBoxService.Show("Расчет завершен!", "Предупреждение!");
         }
     }
 

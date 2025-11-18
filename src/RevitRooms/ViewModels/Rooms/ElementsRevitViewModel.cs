@@ -2,13 +2,18 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 
+using dosymep.SimpleServices;
+
 using RevitRooms.Models;
 using RevitRooms.Services;
 
 namespace RevitRooms.ViewModels.Rooms;
 internal class ElementsRevitViewModel : RevitRoomsViewModel {
-    public ElementsRevitViewModel(RevitRepository revitRepository, RoomsConfig roomsConfig, ErrorWindowService errorWindowService)
-        : base(revitRepository, roomsConfig, errorWindowService) {
+    public ElementsRevitViewModel(RevitRepository revitRepository, 
+                                  RoomsConfig roomsConfig, 
+                                  IMessageBoxService messageBoxService, 
+                                  ErrorWindowService errorWindowService)
+        : base(revitRepository, roomsConfig, messageBoxService, errorWindowService) {
         _id = new Guid("19723C2C-75ED-4B0A-8279-8493A949E52F");
         IsAllowSelectLevels = true;
     }

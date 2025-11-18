@@ -19,6 +19,7 @@ internal class RoomsViewModel : BaseViewModel {
     private readonly RoomsConfig _roomsConfig;
     private readonly RevitRepository _revitRepository;
     private readonly ILocalizationService _localizationService;
+    private readonly IMessageBoxService _messageBoxService;
     private readonly ErrorWindowService _errorWindowService;
 
     private ObservableCollection<RevitRoomsViewModel> _revitViewModels;
@@ -27,10 +28,12 @@ internal class RoomsViewModel : BaseViewModel {
     public RoomsViewModel(RoomsConfig roomsConfig,
                           RevitRepository revitRepository,
                           ILocalizationService localizationService,
+                          IMessageBoxService messageBoxService,
                           ErrorWindowService errorWindowService) {
         _roomsConfig = roomsConfig;
         _revitRepository = revitRepository;
         _localizationService = localizationService;
+        _messageBoxService = messageBoxService;
         _errorWindowService = errorWindowService;
 
         LoadViewCommand = RelayCommand.Create(LoadView);
@@ -62,13 +65,13 @@ internal class RoomsViewModel : BaseViewModel {
         }
 
         RevitViewModels = [
-            new ViewRevitViewModel(_revitRepository, _roomsConfig, _errorWindowService) {
+            new ViewRevitViewModel(_revitRepository, _roomsConfig, _messageBoxService, _errorWindowService) {
                 Name = _localizationService.GetLocalizedString("MainWindow.ViewRevitName")
             },
-            new ElementsRevitViewModel(_revitRepository, _roomsConfig, _errorWindowService) {
+            new ElementsRevitViewModel(_revitRepository, _roomsConfig, _messageBoxService, _errorWindowService) {
                 Name = _localizationService.GetLocalizedString("MainWindow.ElementsRevitName") 
             },
-            new SelectedRevitViewModel(_revitRepository, _roomsConfig, _errorWindowService) {
+            new SelectedRevitViewModel(_revitRepository, _roomsConfig, _messageBoxService, _errorWindowService) {
                 Name = _localizationService.GetLocalizedString("MainWindow.SelectedRevitName")
             },
         ];

@@ -2,13 +2,18 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 
+using dosymep.SimpleServices;
+
 using RevitRooms.Models;
 using RevitRooms.Services;
 
 namespace RevitRooms.ViewModels.Rooms;
 internal class SelectedRevitViewModel : RevitRoomsViewModel {
-    public SelectedRevitViewModel(RevitRepository revitRepository, RoomsConfig roomsConfig, ErrorWindowService errorWindowService)
-        : base(revitRepository, roomsConfig, errorWindowService) {
+    public SelectedRevitViewModel(RevitRepository revitRepository, 
+                                  RoomsConfig roomsConfig,
+                                  IMessageBoxService messageBoxService,
+                                  ErrorWindowService errorWindowService)
+        : base(revitRepository, roomsConfig, messageBoxService, errorWindowService) {
         _id = new Guid("AAAC541D-16B3-4E82-A702-208B099AB031");
         foreach(var level in Levels) {
             level.IsSelected = true;
