@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using System.Linq;
 
 using Autodesk.Revit.DB;
@@ -22,7 +22,7 @@ internal class CopyViewLegendsCommand : ICopyStandartsCommand {
         _localizationService = localizationService;
     }
 
-    public string Name => _localizationService.GetLocalizedString("CopyViewLegendsCommand");
+    public string Name => _localizationService.GetLocalizedString("CopyViewLegendsCommandName");
 
     public void Execute() {
         var sourceElements = GetElements(_source).ToList();

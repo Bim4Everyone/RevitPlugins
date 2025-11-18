@@ -1,7 +1,6 @@
 #region Namespaces
 
 using System.Globalization;
-using System.IO;
 using System.Reflection;
 
 using Autodesk.Revit.Attributes;
@@ -42,6 +41,9 @@ public class CopyStandartsRevitCommand : BasePluginCommand {
         // Настройка конфигурации плагина
         kernel.Bind<PluginConfig>()
             .ToMethod(c => PluginConfig.GetPluginConfig(c.Kernel.Get<IConfigSerializer>()));
+
+        // Настройка сервиса окошек сообщений
+        kernel.UseWpfUIMessageBox<MainViewModel>();
 
         // Используем сервис обновления тем для WinUI
         kernel.UseWpfUIThemeUpdater();
