@@ -315,7 +315,7 @@ internal abstract class RevitRoomNumsViewModel : BaseViewModel, INumberingOrder 
 
         ParentWindow.DialogResult = true;
         ParentWindow.Close();
-        _messageBoxService.Show("Расчет завершен!", "Предупреждение!");
+        _messageBoxService.Show("Расчет завершен успешно!", "Предупреждение!");
     }
 
     private IProgressDialogService SetupProgressDialog(SpatialElementViewModel[] orderedObjects) {
