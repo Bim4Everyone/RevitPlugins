@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Windows;
 
 using Autodesk.Revit.DB;
 using Autodesk.Revit.UI;
@@ -11,16 +12,21 @@ using dosymep.Bim4Everyone.ProjectParams;
 using dosymep.Bim4Everyone.Schedules;
 using dosymep.Bim4Everyone.SharedParams;
 using dosymep.Bim4Everyone.Templates;
+using dosymep.SimpleServices;
 
 namespace RevitRooms.Models;
 internal class CheckProjectParams {
     private readonly UIApplication _uiApplication;
+    private readonly ILocalizationService _localizationService;
     private readonly ProjectParameters _projectParameters;
 
     private bool _isChecked = true;
 
-    public CheckProjectParams(UIApplication uiApplication) {
-        _uiApplication = uiApplication;
+    public CheckProjectParams(RevitRepository revitRepository,
+                              ILocalizationService localizationService) {
+        _uiApplication = revitRepository.UIApplication;
+        _localizationService = localizationService;
+
         _projectParameters = ProjectParameters.Create(_uiApplication.Application);
     }
 

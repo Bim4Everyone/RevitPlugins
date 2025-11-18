@@ -23,6 +23,7 @@ internal abstract class RevitRoomNumsViewModel : BaseViewModel, INumberingOrder 
     public Guid _id;
     protected readonly RevitRepository _revitRepository;
     protected readonly RoomsNumsConfig _roomsNumsConfig;
+    protected readonly IMessageBoxService _messageBoxService;
 
     private string _errorText;
     private string _prefix;
@@ -46,10 +47,12 @@ internal abstract class RevitRoomNumsViewModel : BaseViewModel, INumberingOrder 
     public System.Windows.Window ParentWindow { get; set; }
 
     public RevitRoomNumsViewModel(RevitRepository revitRepository, 
-                          RoomsNumsConfig roomsNumsConfig, 
-                          NumOrderWindowService numOrderWindowService) {
+                                  RoomsNumsConfig roomsNumsConfig,
+                                  IMessageBoxService messageBoxService,
+                                  NumOrderWindowService numOrderWindowService) {
         _revitRepository = revitRepository;
         _roomsNumsConfig = roomsNumsConfig;
+        _messageBoxService = messageBoxService;
 
         var additionalPhases = _revitRepository.GetAdditionalPhases()
             .Select(item => new PhaseViewModel(item, _revitRepository))
@@ -312,7 +315,7 @@ internal abstract class RevitRoomNumsViewModel : BaseViewModel, INumberingOrder 
 
         ParentWindow.DialogResult = true;
         ParentWindow.Close();
-        TaskDialog.Show("Предупреждение!", "Расчет завершен!");
+        _messageBoxService.Show("Расчет завершен!", "Предупреждение!");
     }
 
     private IProgressDialogService SetupProgressDialog(SpatialElementViewModel[] orderedObjects) {

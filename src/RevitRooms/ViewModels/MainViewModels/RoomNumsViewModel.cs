@@ -19,7 +19,9 @@ namespace RevitRooms.ViewModels;
 internal class RoomNumsViewModel : BaseViewModel {
     private readonly RoomsNumsConfig _roomsNumsConfig;
     private readonly NumOrderWindowService _numberingWindowService;
+    private readonly CheckProjectParams _checkProjectParams;
     private readonly RevitRepository _revitRepository;
+    private readonly IMessageBoxService _messageBoxService;
     private readonly ILocalizationService _localizationService;
     private readonly RoomsNumsWindow _window;
 
@@ -29,12 +31,16 @@ internal class RoomNumsViewModel : BaseViewModel {
     public RoomNumsViewModel(RoomsNumsConfig roomsNumsConfig,
                              RevitRepository revitRepository,
                              ILocalizationService localizationService,
+                             IMessageBoxService messageBoxService,
                              RoomsNumsWindow window,
+                             CheckProjectParams checkProjectParams,
                              NumOrderWindowService numberingWindowService) {
         _numberingWindowService = numberingWindowService;
+        _checkProjectParams = checkProjectParams;
         _roomsNumsConfig = roomsNumsConfig;
         _revitRepository = revitRepository;
         _localizationService = localizationService;
+        _messageBoxService = messageBoxService;
         _window = window;
 
         LoadViewCommand = RelayCommand.Create(LoadView);
@@ -56,7 +62,7 @@ internal class RoomNumsViewModel : BaseViewModel {
     public string ApartmentNumberParamName => SharedParamsConfig.Instance.ApartmentNumber.Name;
 
     private void LoadView() {
-        bool isChecked = new CheckProjectParams(_revitRepository.UIApplication)
+        bool isChecked = _checkProjectParams
             .CopyProjectParams()
             .CopyKeySchedules()
             .CheckKeySchedules()
@@ -67,15 +73,15 @@ internal class RoomNumsViewModel : BaseViewModel {
         }
 
         RoomsNumsViewModels = [
-            new ViewRevitViewModel(_revitRepository, _roomsNumsConfig, _numberingWindowService) { 
+            new ViewRevitViewModel(_revitRepository, _roomsNumsConfig, _messageBoxService, _numberingWindowService) { 
                 Name = "Выборка по текущему виду",
                 ParentWindow = _window
             },
-            new ElementsRevitViewModel(_revitRepository, _roomsNumsConfig, _numberingWindowService) { 
+            new ElementsRevitViewModel(_revitRepository, _roomsNumsConfig, _messageBoxService, _numberingWindowService) { 
                 Name = "Выборка по всем элементам",
                 ParentWindow = _window
             },
-            new SelectedRevitViewModel(_revitRepository, _roomsNumsConfig, _numberingWindowService) { 
+            new SelectedRevitViewModel(_revitRepository, _roomsNumsConfig, _messageBoxService, _numberingWindowService) { 
                 Name = "Выборка по выделенным элементам",
                 ParentWindow = _window
             }

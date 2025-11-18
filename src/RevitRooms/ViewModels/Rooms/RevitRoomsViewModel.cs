@@ -22,9 +22,9 @@ namespace RevitRooms.ViewModels.Rooms;
 internal abstract class RevitRoomsViewModel : BaseViewModel {
     public Guid _id;
     protected readonly RevitRepository _revitRepository;
-    private readonly RoomsConfig _roomsConfig;
-    private readonly IMessageBoxService _messageBoxService;
-    private readonly ErrorWindowService _errorWindowService;
+    protected readonly RoomsConfig _roomsConfig;
+    protected readonly IMessageBoxService _messageBoxService;
+    protected readonly ErrorWindowService _errorWindowService;
 
     private string _errorText;
     private bool _isAllowSelectLevels;

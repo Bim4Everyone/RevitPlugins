@@ -40,6 +40,10 @@ public class RoomsCommand : BasePluginCommand {
             .ToSelf()
             .InSingletonScope();
 
+        kernel.Bind<CheckProjectParams>()
+            .ToSelf()
+            .InSingletonScope();
+
         // Настройка конфигурации плагина
         kernel.Bind<RoomsConfig>()
             .ToMethod(c => RoomsConfig.GetRoomsConfig(c.Kernel.Get<IConfigSerializer>()));
