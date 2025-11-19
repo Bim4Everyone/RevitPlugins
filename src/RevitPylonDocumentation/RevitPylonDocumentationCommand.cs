@@ -1,19 +1,21 @@
-using System.Windows;
+using System.Globalization;
+using System.Reflection;
 
 using Autodesk.Revit.Attributes;
 using Autodesk.Revit.DB;
 using Autodesk.Revit.UI;
 
 using dosymep.Bim4Everyone;
-using dosymep.SimpleServices;
+using dosymep.Bim4Everyone.ProjectConfigs;
+using dosymep.Bim4Everyone.SimpleServices;
+using dosymep.WpfCore.Ninject;
+using dosymep.WpfUI.Core.Ninject;
 
 using Ninject;
 
 using RevitPylonDocumentation.Models;
 using RevitPylonDocumentation.ViewModels;
 using RevitPylonDocumentation.Views;
-
-using Application = Autodesk.Revit.ApplicationServices.Application;
 
 namespace RevitPylonDocumentation;
 [Transaction(TransactionMode.Manual)]
@@ -23,36 +25,34 @@ public class RevitPylonDocumentationCommand : BasePluginCommand {
     }
 
     protected override void Execute(UIApplication uiApplication) {
-        using IKernel kernel = new StandardKernel();
-        kernel.Bind<UIApplication>()
-            .ToConstant(uiApplication)
-            .InTransientScope();
-        kernel.Bind<Application>()
-            .ToConstant(uiApplication.Application)
-            .InTransientScope();
+        using IKernel kernel = uiApplication.CreatePlatformServices();
 
+        // Настройка доступа к Revit
         kernel.Bind<RevitRepository>()
             .ToSelf()
             .InSingletonScope();
 
+        // Настройка конфигурации плагина
         kernel.Bind<PluginConfig>()
-            .ToMethod(c => PluginConfig.GetPluginConfig());
+            .ToMethod(c => PluginConfig.GetPluginConfig(c.Kernel.Get<IConfigSerializer>()));
 
-        kernel.Bind<MainViewModel>().ToSelf();
-        kernel.Bind<MainWindow>().ToSelf()
-            .WithPropertyValue(nameof(Window.Title), PluginName)
-            .WithPropertyValue(nameof(Window.DataContext),
-                c => c.Kernel.Get<MainViewModel>());
+        // Используем сервис обновления тем для WinUI
+        kernel.UseWpfUIThemeUpdater();
 
-        MainWindow window = kernel.Get<MainWindow>();
-        if(window.ShowDialog() == true) {
-            GetPlatformService<INotificationService>()
-                .CreateNotification(PluginName, "Выполнение скрипта завершено успешно.", "C#")
-                .ShowAsync();
-        } else {
-            GetPlatformService<INotificationService>()
-                .CreateWarningNotification(PluginName, "Выполнение скрипта отменено.")
-                .ShowAsync();
-        }
+        // Настройка запуска окна
+        kernel.BindMainWindow<MainViewModel, MainWindow>();
+
+        // Настройка локализации,
+        // получение имени сборки откуда брать текст
+        string assemblyName = Assembly.GetExecutingAssembly().GetName().Name;
+
+        // Настройка локализации,
+        // установка дефолтной локализации "ru-RU"
+        kernel.UseWpfLocalization(
+            $"/{assemblyName};component/assets/localization/Language.xaml",
+            CultureInfo.GetCultureInfo("ru-RU"));
+
+        // Вызывает стандартное уведомление
+        Notification(kernel.Get<MainWindow>());
     }
 }

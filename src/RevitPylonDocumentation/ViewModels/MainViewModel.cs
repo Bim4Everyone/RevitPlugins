@@ -311,49 +311,49 @@ internal class MainViewModel : BaseViewModel {
     /// Дает возможность пользователю выбрать вручную нужный для работы пилон
     /// </summary>
     private void SelectPylon() {
-        var elementid = _revitRepository.ActiveUIDocument.Selection
-            .PickObject(ObjectType.Element, "Выберите пилон").ElementId;
-        var element = _revitRepository.Document.GetElement(elementid);
+        //var elementid = _revitRepository.ActiveUIDocument.Selection
+        //    .PickObject(ObjectType.Element, "Выберите пилон").ElementId;
+        //var element = _revitRepository.Document.GetElement(elementid);
 
-        if(element != null) {
-            HostsInfoVM.Clear();
-            SelectedHostsInfoVM.Clear();
-            SelectionSettings.SelectedProjectSection = string.Empty;
-            _pylonSelectedManually = true;
+        //if(element != null) {
+        //    HostsInfoVM.Clear();
+        //    SelectedHostsInfoVM.Clear();
+        //    SelectionSettings.SelectedProjectSection = string.Empty;
+        //    _pylonSelectedManually = true;
 
-            _revitRepository.GetHostData(this, [element]);
+        //    _revitRepository.GetHostData(this, [element]);
 
-            HostsInfoVM = new ObservableCollection<PylonSheetInfoVM>(_revitRepository.HostsInfo);
-            ProjectSections = new ObservableCollection<string>(_revitRepository.HostProjectSections);
-            OnPropertyChanged(nameof(HostsInfoVM));
-            OnPropertyChanged(nameof(ProjectSections));
+        //    HostsInfoVM = new ObservableCollection<PylonSheetInfoVM>(_revitRepository.HostsInfo);
+        //    ProjectSections = new ObservableCollection<string>(_revitRepository.HostProjectSections);
+        //    OnPropertyChanged(nameof(HostsInfoVM));
+        //    OnPropertyChanged(nameof(ProjectSections));
 
 
-            if(HostsInfoVM.Count > 0) {
-                SelectedHostsInfoVM.Add(HostsInfoVM.FirstOrDefault());
-                HostsInfoVM.FirstOrDefault().IsCheck = true;
-                SelectionSettings.SelectedProjectSection = ProjectSections.FirstOrDefault();
-            }
-        }
+        //    if(HostsInfoVM.Count > 0) {
+        //        SelectedHostsInfoVM.Add(HostsInfoVM.FirstOrDefault());
+        //        HostsInfoVM.FirstOrDefault().IsCheck = true;
+        //        SelectionSettings.SelectedProjectSection = ProjectSections.FirstOrDefault();
+        //    }
+        //}
 
-        SelectionSettings.NeedWorkWithGeneralView = false;
-        SelectionSettings.NeedWorkWithGeneralPerpendicularView = false;
-        SelectionSettings.NeedWorkWithTransverseViewFirst = false;
-        SelectionSettings.NeedWorkWithTransverseViewSecond = false;
-        SelectionSettings.NeedWorkWithTransverseViewThird = false;
-        SelectionSettings.NeedWorkWithMaterialSchedule = false;
-        SelectionSettings.NeedWorkWithSystemPartsSchedule = false;
-        SelectionSettings.NeedWorkWithIfcPartsSchedule = false;
-        SelectionSettings.NeedWorkWithLegend = false;
-        SelectionSettings.NeedWorkWithGeneralRebarView = false;
-        SelectionSettings.NeedWorkWithGeneralPerpendicularRebarView = false;
-        SelectionSettings.NeedWorkWithSkeletonSchedule = false;
-        SelectionSettings.NeedWorkWithSkeletonByElemsSchedule = false;
+        //SelectionSettings.NeedWorkWithGeneralView = false;
+        //SelectionSettings.NeedWorkWithGeneralPerpendicularView = false;
+        //SelectionSettings.NeedWorkWithTransverseViewFirst = false;
+        //SelectionSettings.NeedWorkWithTransverseViewSecond = false;
+        //SelectionSettings.NeedWorkWithTransverseViewThird = false;
+        //SelectionSettings.NeedWorkWithMaterialSchedule = false;
+        //SelectionSettings.NeedWorkWithSystemPartsSchedule = false;
+        //SelectionSettings.NeedWorkWithIfcPartsSchedule = false;
+        //SelectionSettings.NeedWorkWithLegend = false;
+        //SelectionSettings.NeedWorkWithGeneralRebarView = false;
+        //SelectionSettings.NeedWorkWithGeneralPerpendicularRebarView = false;
+        //SelectionSettings.NeedWorkWithSkeletonSchedule = false;
+        //SelectionSettings.NeedWorkWithSkeletonByElemsSchedule = false;
 
-        var mainWindow = new MainWindow {
-            DataContext = this
-        };
-        mainWindow.ShowDialog();
+        //var mainWindow = new MainWindow {
+        //    DataContext = this
+        //};
+        //mainWindow.ShowDialog();
     }
 
 

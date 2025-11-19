@@ -1,28 +1,27 @@
-﻿<base:PlatformWindow
+﻿<core:WpfUIPlatformWindow
     x:Class="RevitPylonDocumentation.Views.MainWindow"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
+    
+    xmlns:core="clr-namespace:dosymep.WpfUI.Core"
+    xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
+    xmlns:me="clr-namespace:dosymep.WpfCore.MarkupExtensions;assembly=dosymep.WpfCore"
+    
     xmlns:base="clr-namespace:dosymep.WPF.Views"
-    xmlns:local="clr-namespace:RevitPylonDocumentation.Views"
     xmlns:vms="clr-namespace:RevitPylonDocumentation.ViewModels"
+    xmlns:local="clr-namespace:RevitPylonDocumentation.Views"
+    xmlns:pages="clr-namespace:RevitPylonDocumentation.Views.Pages"
+    
     mc:Ignorable="d"
     WindowStartupLocation="CenterOwner"
-    Title="MainWindow"
-    AllowsTransparency="True"
-    WindowStyle="None"
-    Background="Transparent"
-    Height="750"
-    MinHeight="750"
-    MaxHeight="750"
-    Width="720"
-    MinWidth="720"
-    MaxWidth="720"
-    d:DataContext="{d:DesignInstance vms:MainViewModel, IsDesignTimeCreatable=False}"
-    x:Name="window"
-    Loaded="Window_Loaded">
+    
+    Height="750"    Width="1500"
+    MinHeight="750" MinWidth="1500"
+
+    d:DataContext="{d:DesignInstance vms:MainViewModel, IsDesignTimeCreatable=False}">
 
     <i:Interaction.Triggers>
         <i:EventTrigger
@@ -43,7 +42,69 @@
         </ResourceDictionary>
     </Window.Resources>
 
-    <Border
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+
+        <ui:TitleBar
+            Grid.Row="0"
+            Title="Title" />
+        
+        <ui:NavigationView
+            Grid.Row="1"
+            PaneDisplayMode="Left"
+            PaneTitle="Pane Title"
+            OpenPaneLength="200"
+            IsPaneOpen="True"
+            IsBackButtonVisible="Collapsed"
+            IsPaneVisible="True">
+            <ui:NavigationView.MenuItems>
+                <ui:NavigationViewItem
+                    Content="General"
+                    Icon="{ui:SymbolIcon Home24}"
+                    TargetPageType="{x:Type pages:GeneralPage}" />
+                <ui:NavigationViewItem
+                    Content="Vertical view"
+                    Icon="{ui:SymbolIcon Library24}"
+                    TargetPageType="{x:Type pages:VerticalViewSettingsPage}" />
+                <ui:NavigationViewItem
+                    Content="Horizontal view"
+                    Icon="{ui:SymbolIcon Library24}"
+                    TargetPageType="{x:Type pages:HorizontalViewSettingsPage}" />
+                <ui:NavigationViewItem
+                    Content="Schedules"
+                    Icon="{ui:SymbolIcon Library24}"
+                    TargetPageType="{x:Type pages:SchedulesPage}" />
+                <ui:NavigationViewItem
+                    Content="Legends"
+                    Icon="{ui:SymbolIcon Library24}"
+                    TargetPageType="{x:Type pages:LegendViewsPage}" />
+                <ui:NavigationViewItem
+                    Content="Pylon parameters"
+                    Icon="{ui:SymbolIcon Library24}"
+                    TargetPageType="{x:Type pages:PylonParamsPage}" />
+                <ui:NavigationViewItem
+                    Content="Project parameters"
+                    Icon="{ui:SymbolIcon Library24}"
+                    TargetPageType="{x:Type pages:ProjectParamsPage}" />
+                <ui:NavigationViewItem
+                    Content="Sheet parameters"
+                    Icon="{ui:SymbolIcon Library24}"
+                    TargetPageType="{x:Type pages:SheetParamsPage}" />
+            </ui:NavigationView.MenuItems>
+            <ui:NavigationView.FooterMenuItems>
+                <ui:NavigationViewItem
+                    Content="Settings"
+                    Icon="{ui:SymbolIcon Settings24}"
+                    TargetPageType="{x:Type pages:AboutPage}" />
+            </ui:NavigationView.FooterMenuItems>
+        </ui:NavigationView>
+    </Grid>
+    
+
+    <!--<Border
         CornerRadius="10"
         BorderBrush="Black"
         BorderThickness="1"
@@ -994,7 +1055,7 @@
                                     </StackPanel>
                                 </GroupBox>
 
-                                <!-- Вертикальные виды -->
+                                --><!-- Вертикальные виды --><!--
                                 <GroupBox
                                     Margin="5 0 5 10">
                                     <GroupBox.Header>
@@ -1672,7 +1733,7 @@
                                     </StackPanel>
                                 </GroupBox>
 
-                                <!-- Горизонтальные виды -->
+                                --><!-- Горизонтальные виды --><!--
                                 <GroupBox
                                     Margin="5 0 5 10">
                                     <GroupBox.Header>
@@ -2547,7 +2608,7 @@
                                     </StackPanel>
                                 </GroupBox>
 
-                                <!-- Легенда примечания -->
+                                --><!-- Легенда примечания --><!--
                                 <GroupBox
                                     Margin="5 0 5 10">
                                     <GroupBox.Header>
@@ -2692,7 +2753,7 @@
                                     </StackPanel>
                                 </GroupBox>
 
-                                <!-- Спека материалов -->
+                                --><!-- Спека материалов --><!--
                                 <GroupBox
                                     Margin="5 0 5 10">
                                     <GroupBox.Header>
@@ -2899,7 +2960,7 @@
                                     </StackPanel>
                                 </GroupBox>
 
-                                <!-- Ведомость системных деталей -->
+                                --><!-- Ведомость системных деталей --><!--
                                 <GroupBox
                                     Margin="5 0 5 10">
                                     <GroupBox.Header>
@@ -3107,7 +3168,7 @@
                                     </StackPanel>
                                 </GroupBox>
 
-                                <!-- Ведомость IFC деталей -->
+                                --><!-- Ведомость IFC деталей --><!--
                                 <GroupBox
                                     Margin="5 0 5 10">
                                     <GroupBox.Header>
@@ -3317,7 +3378,7 @@
                                 </GroupBox>
 
                                 
-                                <!-- Спецификация каркасов -->
+                                --><!-- Спецификация каркасов --><!--
                                 <GroupBox
                                     Margin="5 0 5 10">
                                     <GroupBox.Header>
@@ -3525,7 +3586,7 @@
                                     </StackPanel>
                                 </GroupBox>
 
-                                <!-- Спецификация элементов каркасов -->
+                                --><!-- Спецификация элементов каркасов --><!--
                                 <GroupBox
                                     Margin="5 0 5 10">
                                     <GroupBox.Header>
@@ -3733,7 +3794,7 @@
                                     </StackPanel>
                                 </GroupBox>
 
-                                <!-- Правила фильтров в спецификациях -->
+                                --><!-- Правила фильтров в спецификациях --><!--
                                 <GroupBox
                                     Margin="5 0 5 10">
                                     <GroupBox.Header>
@@ -4590,5 +4651,5 @@
                 </StackPanel>
             </Grid>
         </Grid>
-    </Border>
-</base:PlatformWindow>
+    </Border>-->
+</core:WpfUIPlatformWindow>

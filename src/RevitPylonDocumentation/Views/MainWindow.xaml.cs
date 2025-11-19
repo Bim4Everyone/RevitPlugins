@@ -1,9 +1,19 @@
 using System.Windows;
 using System.Windows.Input;
 
+using dosymep.SimpleServices;
+
 namespace RevitPylonDocumentation.Views;
 public partial class MainWindow {
-    public MainWindow() {
+    public MainWindow(
+        ILoggerService loggerService,
+        ISerializationService serializationService,
+        ILanguageService languageService, ILocalizationService localizationService,
+        IUIThemeService uiThemeService, IUIThemeUpdaterService themeUpdaterService)
+        : base(loggerService,
+            serializationService,
+            languageService, localizationService,
+            uiThemeService, themeUpdaterService) {
         InitializeComponent();
     }
 
@@ -17,15 +27,15 @@ public partial class MainWindow {
         DialogResult = false;
     }
 
-    private void SelectAllHostMarks(object sender, RoutedEventArgs e) {
-        hostMarks.SelectAll();
-    }
-    private void UnselectAllHostMarks(object sender, RoutedEventArgs e) {
-        hostMarks.UnselectAll();
-    }
-    private void Window_Loaded(object sender, RoutedEventArgs e) {
-        expander.MaxHeight = window.ActualHeight * 0.83;
-    }
+    //private void SelectAllHostMarks(object sender, RoutedEventArgs e) {
+    //    hostMarks.SelectAll();
+    //}
+    //private void UnselectAllHostMarks(object sender, RoutedEventArgs e) {
+    //    hostMarks.UnselectAll();
+    //}
+    //private void Window_Loaded(object sender, RoutedEventArgs e) {
+    //    expander.MaxHeight = window.ActualHeight * 0.83;
+    //}
 
     private void Grid_MouseDown(object sender, System.Windows.Input.MouseButtonEventArgs e) {
 
