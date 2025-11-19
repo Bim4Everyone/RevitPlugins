@@ -12,8 +12,9 @@ internal class SelectedRevitViewModel : RevitRoomsViewModel {
     public SelectedRevitViewModel(RevitRepository revitRepository, 
                                   RoomsConfig roomsConfig,
                                   IMessageBoxService messageBoxService,
+                                  ILocalizationService localizationService,
                                   ErrorWindowService errorWindowService)
-        : base(revitRepository, roomsConfig, messageBoxService, errorWindowService) {
+        : base(revitRepository, roomsConfig, messageBoxService, localizationService, errorWindowService) {
         _id = new Guid("AAAC541D-16B3-4E82-A702-208B099AB031");
         foreach(var level in Levels) {
             level.IsSelected = true;

@@ -6,6 +6,7 @@ using Autodesk.Revit.DB;
 using DevExpress.Utils.Extensions;
 
 using dosymep.Bim4Everyone.SystemParams;
+using dosymep.SimpleServices;
 
 using RevitRooms.Models;
 using RevitRooms.ViewModels;
@@ -16,13 +17,15 @@ internal sealed class NumerateSectionLevel : NumerateCommand {
 
     private string _levelName;
 
-    public NumerateSectionLevel(RevitRepository revitRepository, IDictionary<ElementId, int> ordering)
+    public NumerateSectionLevel(RevitRepository revitRepository,
+                                ILocalizationService localizationService,
+                                IDictionary<ElementId, int> ordering)
         : base(revitRepository) {
         _ordering = ordering;
 
-        RevitParam =
-            SystemParamsConfig.Instance.CreateRevitParam(revitRepository.Document, BuiltInParameter.ROOM_NUMBER);
-        TransactionName = "Нумерация помещений по секции и этажу";
+        RevitParam = SystemParamsConfig.Instance
+            .CreateRevitParam(revitRepository.Document, BuiltInParameter.ROOM_NUMBER);
+        TransactionName = localizationService.GetLocalizedString("Transaction.NumBySectionGroup");
     }
 
     protected override SpatialElementViewModel[]

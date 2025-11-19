@@ -6,6 +6,7 @@ using Autodesk.Revit.DB;
 using DevExpress.Utils.Extensions;
 
 using dosymep.Bim4Everyone.SystemParams;
+using dosymep.SimpleServices;
 
 using RevitRooms.Models;
 using RevitRooms.ViewModels;
@@ -16,13 +17,15 @@ internal class NumSectionCommand : NumerateCommand {
 
     private object _first;
 
-    public NumSectionCommand(RevitRepository revitRepository, IDictionary<ElementId, int> ordering)
+    public NumSectionCommand(RevitRepository revitRepository,
+                             ILocalizationService localizationService,
+                             IDictionary<ElementId, int> ordering)
         : base(revitRepository) {
         _ordering = ordering;
 
         RevitParam =
             SystemParamsConfig.Instance.CreateRevitParam(revitRepository.Document, BuiltInParameter.ROOM_NUMBER);
-        TransactionName = "Нумерация помещений по секции";
+        TransactionName = localizationService.GetLocalizedString("Transaction.NumBySection");
     }
 
     protected override SpatialElementViewModel[] OrderElements(IEnumerable<SpatialElementViewModel> spatialElements) {

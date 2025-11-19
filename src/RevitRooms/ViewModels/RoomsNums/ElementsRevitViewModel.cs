@@ -12,8 +12,9 @@ internal class ElementsRevitViewModel : RevitRoomNumsViewModel {
     public ElementsRevitViewModel(RevitRepository revitRepository, 
                                   RoomsNumsConfig roomsNumsConfig,
                                   IMessageBoxService messageBoxService,
+                                  ILocalizationService localizationService,
                                   NumOrderWindowService numOrderWindowService)
-        : base(revitRepository, roomsNumsConfig, messageBoxService, numOrderWindowService) {
+        : base(revitRepository, roomsNumsConfig, messageBoxService, localizationService, numOrderWindowService) {
         _id = new Guid("19723C2C-75ED-4B0A-8279-8493A949E52F");
     }
 

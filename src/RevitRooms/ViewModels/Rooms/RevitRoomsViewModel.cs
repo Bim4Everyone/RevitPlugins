@@ -24,6 +24,7 @@ internal abstract class RevitRoomsViewModel : BaseViewModel {
     protected readonly RevitRepository _revitRepository;
     protected readonly RoomsConfig _roomsConfig;
     protected readonly IMessageBoxService _messageBoxService;
+    protected readonly ILocalizationService _localizationService;
     protected readonly ErrorWindowService _errorWindowService;
 
     private string _errorText;
@@ -33,10 +34,12 @@ internal abstract class RevitRoomsViewModel : BaseViewModel {
     public RevitRoomsViewModel(RevitRepository revitRepository, 
                                RoomsConfig roomsConfig,
                                IMessageBoxService messageBoxService,
+                               ILocalizationService localizationService,
                                ErrorWindowService errorWindowService) {
         _revitRepository = revitRepository;
         _roomsConfig = roomsConfig;
         _messageBoxService = messageBoxService;
+        _localizationService = localizationService;
         _errorWindowService = errorWindowService;
 
         Levels = [.. GetLevelViewModels()
@@ -493,6 +496,8 @@ internal abstract class RevitRoomsViewModel : BaseViewModel {
     }
 
     private IEnumerable<IParamCalculation> GetParamCalculations() {
+        string phaseNameCheck = _localizationService.GetLocalizedString("Rooms.ApartContourPhase");
+
         yield return new ApartmentAreaCalculation(GetRoomAccuracy(), RoundAccuracy) { Phase = Phase.Element };
         yield return new ApartmentAreaRatioCalculation(GetRoomAccuracy(), RoundAccuracy) { Phase = Phase.Element };
         yield return new ApartmentLivingAreaCalculation(GetRoomAccuracy(), RoundAccuracy) { Phase = Phase.Element };
@@ -503,7 +508,7 @@ internal abstract class RevitRoomsViewModel : BaseViewModel {
         }
 
         if(IsSpotCalcArea) {
-            yield return new ApartmentFullAreaCalculation(GetRoomAccuracy(), RoundAccuracy) { Phase = Phase.Element };
+            yield return new ApartmentFullAreaCalculation(GetRoomAccuracy(), RoundAccuracy, phaseNameCheck) { Phase = Phase.Element };
         }
     }
 

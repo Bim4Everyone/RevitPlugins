@@ -68,14 +68,17 @@ internal class RoomsViewModel : BaseViewModel {
         }
 
         RevitViewModels = [
-            new ViewRevitViewModel(_revitRepository, _roomsConfig, _messageBoxService, _errorWindowService) {
-                Name = _localizationService.GetLocalizedString("MainWindow.ViewRevitName")
+            new ViewRevitViewModel(_revitRepository, _roomsConfig, _messageBoxService, 
+                                   _localizationService, _errorWindowService) {
+                Name = _localizationService.GetLocalizedString("MainWindow.SelectView")
             },
-            new ElementsRevitViewModel(_revitRepository, _roomsConfig, _messageBoxService, _errorWindowService) {
-                Name = _localizationService.GetLocalizedString("MainWindow.ElementsRevitName") 
+            new ElementsRevitViewModel(_revitRepository, _roomsConfig, _messageBoxService,
+                                       _localizationService, _errorWindowService) {
+                Name = _localizationService.GetLocalizedString("MainWindow.SelectAll") 
             },
-            new SelectedRevitViewModel(_revitRepository, _roomsConfig, _messageBoxService, _errorWindowService) {
-                Name = _localizationService.GetLocalizedString("MainWindow.SelectedRevitName")
+            new SelectedRevitViewModel(_revitRepository, _roomsConfig, _messageBoxService, 
+                                       _localizationService, _errorWindowService) {
+                Name = _localizationService.GetLocalizedString("MainWindow.SelectSelected")
             },
         ];
 

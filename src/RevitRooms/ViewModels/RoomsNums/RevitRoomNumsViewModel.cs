@@ -24,6 +24,7 @@ internal abstract class RevitRoomNumsViewModel : BaseViewModel, INumberingOrder 
     protected readonly RevitRepository _revitRepository;
     protected readonly RoomsNumsConfig _roomsNumsConfig;
     protected readonly IMessageBoxService _messageBoxService;
+    protected readonly ILocalizationService _localizationService;
 
     private string _errorText;
     private string _prefix;
@@ -49,10 +50,12 @@ internal abstract class RevitRoomNumsViewModel : BaseViewModel, INumberingOrder 
     public RevitRoomNumsViewModel(RevitRepository revitRepository, 
                                   RoomsNumsConfig roomsNumsConfig,
                                   IMessageBoxService messageBoxService,
+                                  ILocalizationService localizationService,
                                   NumOrderWindowService numOrderWindowService) {
         _revitRepository = revitRepository;
         _roomsNumsConfig = roomsNumsConfig;
         _messageBoxService = messageBoxService;
+        _localizationService = localizationService;
 
         var additionalPhases = _revitRepository.GetAdditionalPhases()
             .Select(item => new PhaseViewModel(item, _revitRepository))
@@ -80,7 +83,7 @@ internal abstract class RevitRoomNumsViewModel : BaseViewModel, INumberingOrder 
         DownOrderCommand = new DownOrderCommand(this);
         AddOrderCommand = new AddOrderCommand(this, numOrderWindowService);
         RemoveOrderCommand = new RemoveOrderCommand(this);
-        SaveOrderCommand = new SaveOrderCommand(this, _revitRepository);
+        SaveOrderCommand = new SaveOrderCommand(this, _revitRepository, localizationService);
 
         LoadPluginConfig();
     }
@@ -271,7 +274,7 @@ internal abstract class RevitRoomNumsViewModel : BaseViewModel, INumberingOrder 
             window.Show();
             if(IsNumFlats) {
                 var numerateCommand =
-                    new NumFlatsCommand(_revitRepository) { Start = startNumber, Prefix = Prefix, Suffix = Suffix };
+                    new NumFlatsCommand(_revitRepository, _localizationService) { Start = startNumber, Prefix = Prefix, Suffix = Suffix };
                 numerateCommand.Numerate(orderedObjects, window.CreateProgress(), window.CreateCancellationToken());
             } else {
                 UpdateNumeringOrder();
@@ -283,7 +286,7 @@ internal abstract class RevitRoomNumsViewModel : BaseViewModel, INumberingOrder 
 
                 if(IsNumRoomsGroup) {
                     var numerateCommand =
-                        new NumSectionGroup(_revitRepository, selectedOrder) {
+                        new NumSectionGroup(_revitRepository, _localizationService, selectedOrder) {
                             Start = startNumber,
                             Prefix = Prefix,
                             Suffix = Suffix
@@ -291,7 +294,7 @@ internal abstract class RevitRoomNumsViewModel : BaseViewModel, INumberingOrder 
                     numerateCommand.Numerate(orderedObjects, window.CreateProgress(), window.CreateCancellationToken());
                 } else if(IsNumRoomsSection) {
                     var numerateCommand =
-                        new NumSectionCommand(_revitRepository, selectedOrder) {
+                        new NumSectionCommand(_revitRepository, _localizationService, selectedOrder) {
                             Start = startNumber,
                             Prefix = Prefix,
                             Suffix = Suffix
@@ -299,7 +302,7 @@ internal abstract class RevitRoomNumsViewModel : BaseViewModel, INumberingOrder 
                     numerateCommand.Numerate(orderedObjects, window.CreateProgress(), window.CreateCancellationToken());
                 } else if(IsNumRoomsSectionLevels) {
                     var numerateCommand =
-                        new NumerateSectionLevel(_revitRepository, selectedOrder) {
+                        new NumerateSectionLevel(_revitRepository, _localizationService, selectedOrder) {
                             Start = startNumber,
                             Prefix = Prefix,
                             Suffix = Suffix

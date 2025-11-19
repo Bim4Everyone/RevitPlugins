@@ -28,7 +28,9 @@ internal abstract class NumerateCommand {
     protected RevitParam RevitParam { get; set; }
     protected string TransactionName { get; set; }
 
-    public void Numerate(SpatialElementViewModel[] spatialElements, IProgress<int> progress = default, CancellationToken cancellationToken = default) {
+    public void Numerate(SpatialElementViewModel[] spatialElements, 
+                         IProgress<int> progress = default, 
+                         CancellationToken cancellationToken = default) {
         var orderedElements = OrderElements(spatialElements);
         using var transaction = _revitRepository.StartTransaction(TransactionName);
         int flatCount = Start;

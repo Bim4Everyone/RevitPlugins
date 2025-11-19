@@ -22,9 +22,8 @@ internal class NumOrderWindowService {
 
     public INumberingOrder NumberingOrder => _numberingOrder;
 
-    public bool ShowWindow(string title, INumberingOrder numberingOrder) {
+    public bool ShowWindow(INumberingOrder numberingOrder) {
         var window = _resolutionRoot.Get<NumberingOrderSelectWindow>();
-        window.Title = title;
         window.DataContext = new NumberingOrderSelectViewModel() {
             NumberingOrders =
                 [.. numberingOrder.NumberingOrders.OrderBy(item => item.Name)]

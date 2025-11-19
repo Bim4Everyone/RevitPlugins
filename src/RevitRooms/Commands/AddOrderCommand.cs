@@ -15,7 +15,7 @@ internal class AddOrderCommand : BaseCommand {
     }
 
     public override void Execute(object parameter) {
-        if(_numberingWindowService.ShowWindow("Приоритеты", _numberingOrder)) {
+        if(_numberingWindowService.ShowWindow(_numberingOrder)) {
             _numberingOrder = _numberingWindowService.NumberingOrder;
         }
     }

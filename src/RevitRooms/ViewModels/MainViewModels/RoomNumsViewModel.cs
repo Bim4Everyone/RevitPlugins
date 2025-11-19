@@ -73,16 +73,19 @@ internal class RoomNumsViewModel : BaseViewModel {
         }
 
         RoomsNumsViewModels = [
-            new ViewRevitViewModel(_revitRepository, _roomsNumsConfig, _messageBoxService, _numberingWindowService) { 
-                Name = "Выборка по текущему виду",
+            new ViewRevitViewModel(_revitRepository, _roomsNumsConfig, _messageBoxService, 
+                                   _localizationService, _numberingWindowService) { 
+                Name = _localizationService.GetLocalizedString("MainWindow.SelectView"),
                 ParentWindow = _window
             },
-            new ElementsRevitViewModel(_revitRepository, _roomsNumsConfig, _messageBoxService, _numberingWindowService) { 
-                Name = "Выборка по всем элементам",
+            new ElementsRevitViewModel(_revitRepository, _roomsNumsConfig, _messageBoxService, 
+                                       _localizationService, _numberingWindowService) {
+                Name = _localizationService.GetLocalizedString("MainWindow.SelectAll"),
                 ParentWindow = _window
             },
-            new SelectedRevitViewModel(_revitRepository, _roomsNumsConfig, _messageBoxService, _numberingWindowService) { 
-                Name = "Выборка по выделенным элементам",
+            new SelectedRevitViewModel(_revitRepository, _roomsNumsConfig, _messageBoxService, 
+                                       _localizationService, _numberingWindowService) { 
+                Name = _localizationService.GetLocalizedString("MainWindow.SelectSelected"),
                 ParentWindow = _window
             }
         ];

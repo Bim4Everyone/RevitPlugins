@@ -5,21 +5,35 @@
     <system:String x:Key="RoomsWindow.Title">Квартирография</system:String>
     <system:String x:Key="RoomsNumsWindow.Title">Нумерация помещений</system:String>
     <system:String x:Key="WarningsWindow.Title">Ошибки и предупреждения</system:String>
+    <system:String x:Key="NumberingOrderWindow.Title">Приоритеты</system:String>
+    
+    <system:String x:Key="Transaction.NumBySectionGroup">Нумерация помещений по секции и этажу</system:String>
+    <system:String x:Key="Transaction.NumByGroup">Нумерация групп помещений</system:String>
+    <system:String x:Key="Transaction.NumBySection">Нумерация помещений по секции</system:String>
+    <system:String x:Key="Transaction.NumBySectionGroupLevel">Нумерация помещений в пределах каждой секции, этажа и группы</system:String>
+    <system:String x:Key="Transaction.UpdateNumOrder">Изменение приоритета нумерации</system:String>    
+    
+    <system:String x:Key="Rooms.ApartContourPhase">Межквартирные перегородки</system:String>
+    
+    
 
+    <system:String x:Key="MainWindow.SelectView">Выборка по текущему виду</system:String>
+    <system:String x:Key="MainWindow.SelectAll">Выборка по всем элементам</system:String>
+    <system:String x:Key="MainWindow.SelectSelected">Выборка по выделенным элементам</system:String>
+    
     <system:String x:Key="MainWindow.HeaderCheck">Выбрать</system:String>
     <system:String x:Key="MainWindow.HeaderLevels">Этажи</system:String>
     <system:String x:Key="MainWindow.HeaderFloors">Уровни</system:String>
-    
-    <system:String x:Key="MainWindow.ViewRevitName">Выборка по текущему виду</system:String>
-    <system:String x:Key="MainWindow.ElementsRevitName">Выборка по всем элементам</system:String>
-    <system:String x:Key="MainWindow.SelectedRevitName">Выборка по выделенным элементам</system:String>
 
+    
     <system:String x:Key="WarningsWindow.HeaderId">Id</system:String>
     <system:String x:Key="WarningsWindow.HeaderCategory">Категория</system:String>
     <system:String x:Key="WarningsWindow.HeaderName">Имя</system:String>
     <system:String x:Key="WarningsWindow.HeaderLevel">Уровень</system:String>
     <system:String x:Key="WarningsWindow.HeaderPhase">Стадия</system:String>
     <system:String x:Key="WarningsWindow.HeaderDescription">Описание</system:String>
+    
+    <system:String x:Key="WarningsWindow.UnclosedRooms">Избыточные или не окруженные помещения.</system:String>
     
     <system:String x:Key="WarningsWindow.StatusError">Ошибка</system:String>
     <system:String x:Key="WarningsWindow.StatusWarning">Предупреждение</system:String>

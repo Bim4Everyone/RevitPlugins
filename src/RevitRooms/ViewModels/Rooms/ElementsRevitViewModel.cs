@@ -11,9 +11,10 @@ namespace RevitRooms.ViewModels.Rooms;
 internal class ElementsRevitViewModel : RevitRoomsViewModel {
     public ElementsRevitViewModel(RevitRepository revitRepository, 
                                   RoomsConfig roomsConfig, 
-                                  IMessageBoxService messageBoxService, 
+                                  IMessageBoxService messageBoxService,
+                                  ILocalizationService localizationService,
                                   ErrorWindowService errorWindowService)
-        : base(revitRepository, roomsConfig, messageBoxService, errorWindowService) {
+        : base(revitRepository, roomsConfig, messageBoxService, localizationService, errorWindowService) {
         _id = new Guid("19723C2C-75ED-4B0A-8279-8493A949E52F");
         IsAllowSelectLevels = true;
     }
