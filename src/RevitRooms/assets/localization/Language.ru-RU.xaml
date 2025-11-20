@@ -33,8 +33,51 @@
     <system:String x:Key="WarningsWindow.HeaderPhase">Стадия</system:String>
     <system:String x:Key="WarningsWindow.HeaderDescription">Описание</system:String>
     
-    <system:String x:Key="WarningsWindow.UnclosedRooms">Избыточные или не окруженные помещения.</system:String>
+    <system:String x:Key="WarningsWindow.RedundantRooms">Избыточные или не окруженные помещения.</system:String>
+    <system:String x:Key="WarningsWindow.RedundantRoomsDescription">Для запуска плагина следует исправить или удалить все неокруженные и избыточные помещения.</system:String>
+    <system:String x:Key="WarningsWindow.RedundantAreas">Избыточные или не окруженные зоны.</system:String>
+    <system:String x:Key="WarningsWindow.RedundantAreasDescription">Для запуска плагина следует исправить или удалить все неокруженные и избыточные зоны.</system:String>
+    <system:String x:Key="WarningsWindow.RequiredParams">Не заполнен обязательный параметр "{0}".</system:String>
+    <system:String x:Key="WarningsWindow.RequiredParamsDescription">У данных помещений не заполнен ключевой параметр. Для запуска плагина необходимо заполнить значение этого параметра у каждого помещения в списке.</system:String>
+    <system:String x:Key="WarningsWindow.NotEqualGroupType">Не совпадают значения параметров групп "{0} - {1}" и типа групп.</system:String>
+    <system:String x:Key="WarningsWindow.NotEqualGroupTypeDescription">
+        Для помещений  данной группы на указанных этажах не совпадает значение параметра {0}.
+        
+        Для всех помещений в пределах одной группы и одного этажа параметры "{1}" и "{2}" должны соответствовать друг другу.
+    </system:String>
+    <system:String x:Key="WarningsWindow.NotEqualMultiLevel">Не совпадают значения параметров у многоуровневых квартир.</system:String>
+    <system:String x:Key="WarningsWindow.NotEqualMultiLevelDescription">Для помещений не совпадают значения параметров "{0}" и "{1}".</system:String>
+    <system:String x:Key="WarningsWindow.ErrorMultiLevelRoom">Ошибка в заполнении параметра "{0}".</system:String>
+    <system:String x:Key="WarningsWindow.ErrorMultiLevelRoomDescription">Ошибка в заполнении параметра "{0}". Параметр должен быть заполнен только для помещений одного этажа группы.</system:String>
     
+    <system:String x:Key="WarningsWindow.EqualSectionDoors">Проверка параметра "{0}" по дверям.</system:String>
+    <system:String x:Key="WarningsWindow.EqualSectionDoorsDescription">Обнаружены помещения, принадлежащие разным секциям, но имеющие доступ друг к другу через двери, окна (балконные блоки) или разделители помещений. Проверьте корректность параметра "{0}" для помещений, соединенных данными элементами.</system:String>
+       
+    <system:String x:Key="WarningsWindow.NotEqualGroup">Проверка параметра "{0}" по дверям и окнам.</system:String>
+    <system:String x:Key="WarningsWindow.NotEqualGroupDescription">Обнаружены помещения, принадлежащие разным квартирам, но имеющие доступ друг к другу через двери, окна (балконные блоки) или разделители помещений. Проверьте корректность параметра "{0}" для помещений, соединенных данными элементами.</system:String>
+           
+    <system:String x:Key="WarningsWindow.CountourIntersectRooms">Найдены самопересечения помещений.</system:String>
+    <system:String x:Key="WarningsWindow.CountourIntersectRoomsDescription">Для данных помещений обнаружены самопересечения контуров. При возможности их следует исправлять разделителями помещений, так как самопересечения могут привести к ошибочному расчету площадей.</system:String>
+    
+    <system:String x:Key="WarningsWindow.BigChangesRoomAreas">Большие изменения в площади помещений.</system:String>
+    <system:String x:Key="WarningsWindow.BigChangesFlatAreas">Большие изменения в площади квартир.</system:String>
+    <system:String x:Key="WarningsWindow.BigChangesAreas">Большие изменения в площади зон.</system:String>
+    <system:String x:Key="WarningsWindow.BigChangesDescription">При текущем расчете новые значения площадей превышают заданную разницу по сравнению с предыдущими значениями.</system:String>
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+  
     <system:String x:Key="WarningsWindow.StatusError">Ошибка</system:String>
     <system:String x:Key="WarningsWindow.StatusWarning">Предупреждение</system:String>
 </ResourceDictionary>

@@ -381,25 +381,25 @@ internal abstract class RevitRoomNumsViewModel : BaseViewModel, INumberingOrder 
         // избыточные или не окруженные
         var redundantRooms = workingObjects
             .Where(item => item.IsRedundant == true || item.NotEnclosed == true);
-        AddElements(WarningInfo.RedundantRooms, redundantRooms, errors);
+        AddElements(WarningInfo.GetRedundantRooms(_localizationService), redundantRooms, errors);
 
         // Все помещения у которых
         // не заполнены обязательные параметры
         foreach(var room in workingObjects) {
             if(room.Room == null) {
-                AddElement(WarningInfo.RequiredParams.FormatMessage(ProjectParamsConfig.Instance.RoomName.Name),
+                AddElement(WarningInfo.GetRequiredParams(_localizationService, ProjectParamsConfig.Instance.RoomName.Name),
                     null, room, errors);
             }
 
             if(room.RoomGroup == null) {
                 AddElement(
-                    WarningInfo.RequiredParams.FormatMessage(ProjectParamsConfig.Instance.RoomGroupName.Name), null,
+                    WarningInfo.GetRequiredParams(_localizationService, ProjectParamsConfig.Instance.RoomGroupName.Name), null,
                     room, errors);
             }
 
             if(room.RoomSection == null) {
                 AddElement(
-                    WarningInfo.RequiredParams.FormatMessage(ProjectParamsConfig.Instance.RoomSectionName.Name),
+                    WarningInfo.GetRequiredParams(_localizationService, ProjectParamsConfig.Instance.RoomSectionName.Name),
                     null, room, errors);
             }
         }
@@ -415,7 +415,7 @@ internal abstract class RevitRoomNumsViewModel : BaseViewModel, INumberingOrder 
                 .Count() > 1;
 
             if(notSameValue) {
-                AddElements(WarningInfo.ErrorMultiLevelRoom, multiLevelRoomGroup, errors);
+                AddElements(WarningInfo.GetErrorMultiLevelRoom(_localizationService), multiLevelRoomGroup, errors);
             }
         }
 
@@ -429,7 +429,7 @@ internal abstract class RevitRoomNumsViewModel : BaseViewModel, INumberingOrder 
                 .Count() != 2;
 
             if(notSameValue) {
-                AddElements(WarningInfo.ErrorMultiLevelRoom, multiLevelRoomGroup, errors);
+                AddElements(WarningInfo.GetErrorMultiLevelRoom(_localizationService), multiLevelRoomGroup, errors);
             }
         }
 
