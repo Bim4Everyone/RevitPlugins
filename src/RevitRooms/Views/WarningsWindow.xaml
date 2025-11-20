@@ -62,7 +62,7 @@
                     <DataTemplate>
                         <edits:CustomGroupEditControl
                             Icon="{ui:SymbolIcon Warning24}"
-                            Header="{Binding TypeInfoText}"
+                            Header="{Binding FullMessage}"
                             Description="{Binding Description}"
                             ExtraTextVisible="True"
                             ExtraText="{Binding WarningQuantity}"

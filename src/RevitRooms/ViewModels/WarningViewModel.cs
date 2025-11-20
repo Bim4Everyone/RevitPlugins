@@ -31,6 +31,8 @@ internal class WarningViewModel : BaseViewModel {
         }
     }
 
+    public string FullMessage => $"{TypeInfoText}. {Message}";
+
     public ObservableCollection<WarningElementViewModel> Elements { get; set; }
 }
 
