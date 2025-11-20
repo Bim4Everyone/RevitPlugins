@@ -8,10 +8,10 @@ namespace RevitRooms.Models.Calculation;
 internal class ApartmentFullAreaCalculation : DoubleParamCalculation {
     private readonly string _phaseNameCheck;
 
-    public ApartmentFullAreaCalculation(int percent, int accuracy, string phaseNameCheck)
+    public ApartmentFullAreaCalculation(int percent, int accuracy)
         : base(percent, accuracy) {
         RevitParam = SharedParamsConfig.Instance.ApartmentFullArea;
-        _phaseNameCheck = phaseNameCheck;
+        _phaseNameCheck = "Межквартирные перегородки";
     }
 
     public override void CalculateParam(SpatialElementViewModel spatialElement) {
