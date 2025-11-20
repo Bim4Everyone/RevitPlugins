@@ -32,11 +32,9 @@ internal class ErrorWindowService {
         if(allWarnings.Any()) {
             bool hasErrors = allWarnings
                 .Where(item => item.TypeInfo == WarningTypeInfo.Error)
-                .OrderBy(x => x.TypeInfo)
                 .Any();
             bool hasWarnings = allWarnings
                 .Where(item => item.TypeInfo == WarningTypeInfo.Warning)
-                .OrderBy(x => x.TypeInfo)
                 .Any();
 
             string message;
