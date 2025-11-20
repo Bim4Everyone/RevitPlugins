@@ -11,7 +11,9 @@
     <system:String x:Key="Transaction.NumByGroup">Нумерация групп помещений</system:String>
     <system:String x:Key="Transaction.NumBySection">Нумерация помещений по секции</system:String>
     <system:String x:Key="Transaction.NumBySectionGroupLevel">Нумерация помещений в пределах каждой секции, этажа и группы</system:String>
-    <system:String x:Key="Transaction.UpdateNumOrder">Изменение приоритета нумерации</system:String>    
+    <system:String x:Key="Transaction.UpdateNumOrder">Изменение приоритета нумерации</system:String>
+    
+    <system:String x:Key="Exception.CopySchedule">Для копирования спецификации закройте спецификацию "{0}".</system:String>    
     
     <system:String x:Key="Rooms.ApartContourPhase">Межквартирные перегородки</system:String>
     
@@ -64,7 +66,19 @@
     <system:String x:Key="WarningsWindow.BigChangesAreas">Большие изменения в площади зон.</system:String>
     <system:String x:Key="WarningsWindow.BigChangesDescription">При текущем расчете новые значения площадей превышают заданную разницу по сравнению с предыдущими значениями.</system:String>
     
-    
+    <system:String x:Key="TaskDialogWarning.ScheduleErrors">Были найдены некорректные ключевые спецификации.</system:String>
+    <system:String x:Key="TaskDialogWarning.ScheduleErrors">
+        {0}
+        
+        
+        Проверьте название ключевого параметра и количество столбцов спецификации.
+        
+        
+        ВНИМАНИЕ! При замене ключевой спецификации будут удалены соответствующие ключевые значения у помещений и ключевой параметр из спецификаций!
+    </system:String>
+    <system:String x:Key="TaskDialogWarning.UpdateSchedule">Заменить на спецификации из шаблона?</system:String>
+    <system:String x:Key="TaskDialogWarning.Exit">Выход без изменений спецификаций</system:String>
+    <system:String x:Key="TaskDialogWarning.NotFilledSchedules">Были найдены не заполненные ключевые спецификации:</system:String>
     
     
     
