@@ -152,7 +152,7 @@ internal class CheckProjectParams {
     private void CheckActiveView(IEnumerable<RevitScheduleRule> scheduleRules) {
         var openedView = scheduleRules.FirstOrDefault(item => item.ScheduleName.Equals(_uiApplication.ActiveUIDocument.ActiveView.Name));
         if(openedView != null) {
-            throw new InvalidOperationException(_localizationService.GetLocalizedString("Exception.CopySchedule", openedView.ScheduleName);
+            throw new InvalidOperationException(_localizationService.GetLocalizedString("Exception.CopySchedule", openedView.ScheduleName));
         }
     }
 
