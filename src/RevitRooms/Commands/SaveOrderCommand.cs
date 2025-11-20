@@ -1,3 +1,4 @@
+using dosymep.Revit;
 using dosymep.SimpleServices;
 
 using RevitRooms.Models;
@@ -17,18 +18,19 @@ internal class SaveOrderCommand : BaseCommand {
 
     public override void Execute(object parameter) {
         string transactionName = _localizationService.GetLocalizedString("Transaction.UpdateNumOrder");
-        using var transaction = _revitRepository.StartTransaction(transactionName);
-        foreach(var order in _numberingOrder.NumberingOrders) {
-            order.Order = 0;
-            order.UpdateOrder();
-        }
+        using(var transaction = _revitRepository.Document.StartTransaction(transactionName)) {
+            foreach(var order in _numberingOrder.NumberingOrders) {
+                order.Order = 0;
+                order.UpdateOrder();
+            }
 
-        int count = 0;
-        foreach(var order in _numberingOrder.SelectedNumberingOrders) {
-            order.Order = ++count;
-            order.UpdateOrder();
-        }
+            int count = 0;
+            foreach(var order in _numberingOrder.SelectedNumberingOrders) {
+                order.Order = ++count;
+                order.UpdateOrder();
+            }
 
-        transaction.Commit();
+            transaction.Commit();
+        }
     }
 }

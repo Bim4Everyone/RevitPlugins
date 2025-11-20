@@ -164,8 +164,12 @@ internal class RevitRepository {
     /// </summary>
     /// <remarks>Создает свою транзакцию.</remarks>
     public void RemoveUnplacedSpatialElements() {
-        var unplacedRooms = GetSpatialElements().Union(GetAllAreas()).Where(item => item.Location == null || item.Level == null);
+        var unplacedRooms = GetSpatialElements()
+            .Union(GetAllAreas())
+            .Where(item => item.Location == null || item.Level == null);
+
         string transactionName = _localizationService.GetLocalizedString("Transaction.DeleteRoomsAndAreas");
+
         using(var t = Document.StartTransaction(transactionName)) {
             Document.Delete(unplacedRooms.Select(item => item.Id).ToArray());
             t.Commit();

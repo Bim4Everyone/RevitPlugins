@@ -5,6 +5,7 @@ using System.Threading;
 using Autodesk.Revit.DB;
 
 using dosymep.Bim4Everyone;
+using dosymep.Revit;
 
 using RevitRooms.Comparators;
 using RevitRooms.Models;
@@ -32,29 +33,30 @@ internal abstract class NumerateCommand {
                          IProgress<int> progress = default, 
                          CancellationToken cancellationToken = default) {
         var orderedElements = OrderElements(spatialElements);
-        using var transaction = _revitRepository.StartTransaction(TransactionName);
-        int flatCount = Start;
+        using(var transaction = _revitRepository.Document.StartTransaction(TransactionName)) {
+            int flatCount = Start;
 
-        int count = 0;
-        foreach(var element in orderedElements) {
-            progress?.Report(++count);
-            cancellationToken.ThrowIfCancellationRequested();
+            int count = 0;
+            foreach(var element in orderedElements) {
+                progress?.Report(++count);
+                cancellationToken.ThrowIfCancellationRequested();
 
-            var numMode = CountFlat(element);
-            if(numMode == NumMode.Reset) {
-                flatCount = Start;
-            } else if(numMode == NumMode.Increment) {
-                ++flatCount;
+                var numMode = CountFlat(element);
+                if(numMode == NumMode.Reset) {
+                    flatCount = Start;
+                } else if(numMode == NumMode.Increment) {
+                    ++flatCount;
+                }
+
+                if(element.IsNumberFix) {
+                    continue;
+                }
+
+                element.Element.SetParamValue(RevitParam, Prefix + flatCount + Suffix);
             }
 
-            if(element.IsNumberFix) {
-                continue;
-            }
-
-            element.Element.SetParamValue(RevitParam, Prefix + flatCount + Suffix);
+            transaction.Commit();
         }
-
-        transaction.Commit();
     }
 
     protected abstract NumMode CountFlat(SpatialElementViewModel spatialElement);

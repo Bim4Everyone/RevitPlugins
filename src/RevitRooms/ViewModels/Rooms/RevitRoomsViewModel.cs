@@ -9,6 +9,7 @@ using Autodesk.Revit.UI;
 
 using dosymep.Bim4Everyone.ProjectParams;
 using dosymep.Bim4Everyone.SharedParams;
+using dosymep.Revit;
 using dosymep.SimpleServices;
 using dosymep.WPF.Commands;
 using dosymep.WPF.ViewModels;
@@ -171,7 +172,7 @@ internal abstract class RevitRoomsViewModel : BaseViewModel {
         var levelNames = _revitRepository.GetLevelNames();
 
         var bigChangesRooms = new Dictionary<string, WarningViewModel>();
-        using(var transaction = _revitRepository.StartTransaction("Расчет площадей")) {
+        using(var transaction = _revitRepository.Document.StartTransaction("Расчет площадей")) {
             // Надеюсь будет достаточно быстро отрабатывать :)
             // Обновление параметра округления у зон
             foreach(var spatialElement in GetAreas()) {
@@ -399,66 +400,66 @@ internal abstract class RevitRoomsViewModel : BaseViewModel {
     }
 
     private void CalculateAreas(List<PhaseViewModel> phases, IEnumerable<LevelViewModel> levels) {
-        using var transaction = _revitRepository.StartTransaction("Расчет площадей");
         // получаем обработанные имена уровней
         var levelNames = _revitRepository.GetLevelNames();
-
         var bigChangesRooms = new Dictionary<string, WarningViewModel>();
 
-        // Надеюсь будет достаточно быстро отрабатывать :)
-        // Подсчет площадей помещений
-        foreach(var level in levels) {
-            foreach(var spatialElement in level.GetRooms(phases)) {
-                if(IsFillLevel && !spatialElement.IsLevelFix) {
-                    // Заполняем параметр Этаж
-                    _revitRepository.UpdateLevelSharedParam(spatialElement.Element, levelNames);
-                }
+        using(var transaction = _revitRepository.Document.StartTransaction("Расчет площадей")) {
+            // Надеюсь будет достаточно быстро отрабатывать :)
+            // Подсчет площадей помещений
+            foreach(var level in levels) {
+                foreach(var spatialElement in level.GetRooms(phases)) {
+                    if(IsFillLevel && !spatialElement.IsLevelFix) {
+                        // Заполняем параметр Этаж
+                        _revitRepository.UpdateLevelSharedParam(spatialElement.Element, levelNames);
+                    }
 
-                // Заполняем дублирующие
-                // общие параметры
-                spatialElement.UpdateSharedParams();
+                    // Заполняем дублирующие
+                    // общие параметры
+                    spatialElement.UpdateSharedParams();
 
-                // Обновление параметра площади 
-                var area = new RoomAreaCalculation(GetRoomAccuracy(), RoundAccuracy) { Phase = Phase.Element };
-                area.CalculateParam(spatialElement);
-                bool isChangedRoomArea = area.SetParamValue(spatialElement);
+                    // Обновление параметра площади 
+                    var area = new RoomAreaCalculation(GetRoomAccuracy(), RoundAccuracy) { Phase = Phase.Element };
+                    area.CalculateParam(spatialElement);
+                    bool isChangedRoomArea = area.SetParamValue(spatialElement);
 
-                // Площадь с коэффициентном зависит от площади без коэффициента
-                var areaWithRatio = new AreaWithRatioCalculation(GetRoomAccuracy(), RoundAccuracy) { Phase = Phase.Element };
-                areaWithRatio.CalculateParam(spatialElement);
-                areaWithRatio.SetParamValue(spatialElement);
+                    // Площадь с коэффициентном зависит от площади без коэффициента
+                    var areaWithRatio = new AreaWithRatioCalculation(GetRoomAccuracy(), RoundAccuracy) { Phase = Phase.Element };
+                    areaWithRatio.CalculateParam(spatialElement);
+                    areaWithRatio.SetParamValue(spatialElement);
 
-                if(isChangedRoomArea && IsCheckRoomsChanges) {
-                    double differences = areaWithRatio.GetDifferences();
-                    double percentChange = areaWithRatio.GetPercentChange();
-                    AddElement(WarningInfo.GetBigChangesRoomAreas(_localizationService), FormatMessage(differences, percentChange),
-                        spatialElement, bigChangesRooms);
+                    if(isChangedRoomArea && IsCheckRoomsChanges) {
+                        double differences = areaWithRatio.GetDifferences();
+                        double percentChange = areaWithRatio.GetPercentChange();
+                        AddElement(WarningInfo.GetBigChangesRoomAreas(_localizationService), FormatMessage(differences, percentChange),
+                            spatialElement, bigChangesRooms);
+                    }
                 }
             }
+
+            // Обработка параметров зависящих от квартир
+            var flats = levels
+                .SelectMany(item => item.GetRooms(phases))
+                .Where(item => string.IsNullOrEmpty(item.RoomMultilevelGroup))
+                .GroupBy(item => new { s = item.RoomSection.Id, g = item.RoomGroup.Id, item.LevelId });
+
+            foreach(var flat in flats) {
+                UpdateParam(flat.ToArray(), bigChangesRooms);
+            }
+
+            // многоуровневые квартиры
+            var multiLevels = levels
+                .SelectMany(item => item.GetRooms(phases))
+                .Where(item => !string.IsNullOrEmpty(item.RoomMultilevelGroup))
+                .GroupBy(item => new { item.RoomSection.Id, item.RoomMultilevelGroup });
+
+            foreach(var multiLevel in multiLevels) {
+                UpdateParam(multiLevel.ToArray(), bigChangesRooms);
+            }
+
+            transaction.Commit();
         }
 
-        // Обработка параметров зависящих от квартир
-        var flats = levels
-            .SelectMany(item => item.GetRooms(phases))
-            .Where(item => string.IsNullOrEmpty(item.RoomMultilevelGroup))
-            .GroupBy(item => new { s = item.RoomSection.Id, g = item.RoomGroup.Id, item.LevelId });
-
-        foreach(var flat in flats) {
-            UpdateParam(flat.ToArray(), bigChangesRooms);
-        }
-
-        // многоуровневые квартиры
-        var multiLevels = levels
-            .SelectMany(item => item.GetRooms(phases))
-            .Where(item => !string.IsNullOrEmpty(item.RoomMultilevelGroup))
-            .GroupBy(item => new { item.RoomSection.Id, item.RoomMultilevelGroup });
-
-        foreach(var multiLevel in multiLevels) {
-            UpdateParam(multiLevel.ToArray(), bigChangesRooms);
-        }
-
-
-        transaction.Commit();
         Warnings.AddRange(bigChangesRooms.Values);
         if(!_errorWindowService.ShowNoticeWindow("Информация", NotShowWarnings, Warnings)) {
             _messageBoxService.Show("Расчет завершен!", "Предупреждение!");
