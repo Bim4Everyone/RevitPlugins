@@ -164,7 +164,7 @@ internal abstract class RevitRoomsViewModel : BaseViewModel {
 
         Warnings = errorElements.Values.ToList();
         if(Warnings.Count > 0) {
-            _errorWindowService.ShowNoticeWindow("Ошибки", NotShowWarnings, Warnings);
+            _errorWindowService.ShowNoticeWindow(NotShowWarnings, Warnings);
             return;
         }
 
@@ -172,7 +172,8 @@ internal abstract class RevitRoomsViewModel : BaseViewModel {
         var levelNames = _revitRepository.GetLevelNames();
 
         var bigChangesRooms = new Dictionary<string, WarningViewModel>();
-        using(var transaction = _revitRepository.Document.StartTransaction("Расчет площадей")) {
+        string transactionName = _localizationService.GetLocalizedString("Transaction.CalculateAreas");
+        using(var transaction = _revitRepository.Document.StartTransaction(transactionName)) {
             // Надеюсь будет достаточно быстро отрабатывать :)
             // Обновление параметра округления у зон
             foreach(var spatialElement in GetAreas()) {
@@ -205,8 +206,10 @@ internal abstract class RevitRoomsViewModel : BaseViewModel {
         }
 
         Warnings.AddRange(bigChangesRooms.Values);
-        if(!_errorWindowService.ShowNoticeWindow("Информация", NotShowWarnings, Warnings)) {
-            _messageBoxService.Show("Расчет завершен!", "Предупреждение!");
+        if(!_errorWindowService.ShowNoticeWindow(NotShowWarnings, Warnings)) {
+            string message = _localizationService.GetLocalizedString("TaskDialog.Result");
+            string title = _localizationService.GetLocalizedString("TaskDialog.Information");
+            _messageBoxService.Show(message, title);
         }
     }
 
@@ -229,7 +232,7 @@ internal abstract class RevitRoomsViewModel : BaseViewModel {
         // Проверка всех элементов
         // на выделенных уровнях
         if(CheckElements(phases, levels)) {
-            _errorWindowService.ShowNoticeWindow("Ошибки", NotShowWarnings, Warnings);
+            _errorWindowService.ShowNoticeWindow(NotShowWarnings, Warnings);
             return;
         }
 
@@ -243,24 +246,24 @@ internal abstract class RevitRoomsViewModel : BaseViewModel {
 
     private bool CanCalculate(object p) {
         if(IsCheckRoomsChanges) {
-            if(!int.TryParse(RoomAccuracy, out int сheckRoomAccuracy)) {
-                ErrorText = "Точность проверки должна быть числом.";
+            if(!int.TryParse(RoomAccuracy, out int checkRoomAccuracy)) {
+                ErrorText = _localizationService.GetLocalizedString("RoomsWindow.WarningAccuracy");
                 return false;
             }
 
-            if(сheckRoomAccuracy <= 0 || сheckRoomAccuracy > 100) {
-                ErrorText = "Точность проверки должна быть от 1 до 100.";
+            if(checkRoomAccuracy <= 0 || checkRoomAccuracy > 100) {
+                ErrorText = _localizationService.GetLocalizedString("RoomsWindow.WarningAccuracyRange");
                 return false;
             }
         }
 
         if(Phase == null) {
-            ErrorText = "Выберите стадию.";
+            ErrorText = _localizationService.GetLocalizedString("RoomsWindow.WarningSelectPhase");
             return false;
         }
 
         if(!Levels.Any(item => item.IsSelected)) {
-            ErrorText = "Выберите хотя бы один уровень.";
+            ErrorText = _localizationService.GetLocalizedString("RoomsWindow.WarningSelectLevels");
             return false;
         }
 
@@ -404,7 +407,8 @@ internal abstract class RevitRoomsViewModel : BaseViewModel {
         var levelNames = _revitRepository.GetLevelNames();
         var bigChangesRooms = new Dictionary<string, WarningViewModel>();
 
-        using(var transaction = _revitRepository.Document.StartTransaction("Расчет площадей")) {
+        string transactionName = _localizationService.GetLocalizedString("Transaction.CalculateAreas");
+        using(var transaction = _revitRepository.Document.StartTransaction(transactionName)) {
             // Надеюсь будет достаточно быстро отрабатывать :)
             // Подсчет площадей помещений
             foreach(var level in levels) {
@@ -461,8 +465,10 @@ internal abstract class RevitRoomsViewModel : BaseViewModel {
         }
 
         Warnings.AddRange(bigChangesRooms.Values);
-        if(!_errorWindowService.ShowNoticeWindow("Информация", NotShowWarnings, Warnings)) {
-            _messageBoxService.Show("Расчет завершен!", "Предупреждение!");
+        if(!_errorWindowService.ShowNoticeWindow(NotShowWarnings, Warnings)) {
+            string message = _localizationService.GetLocalizedString("TaskDialog.Result");
+            string title = _localizationService.GetLocalizedString("TaskDialog.Information");
+            _messageBoxService.Show(message, title);
         }
     }
 
@@ -477,15 +483,18 @@ internal abstract class RevitRoomsViewModel : BaseViewModel {
                    calculation.RevitParam == SharedParamsConfig.Instance.ApartmentArea) {
                     double differences = calculation.GetDifferences();
                     double percentChange = calculation.GetPercentChange();
-                    AddElement(WarningInfo.GetBigChangesFlatAreas(_localizationService), FormatMessage(differences, percentChange), room,
-                        bigChangesRooms);
+                    AddElement(WarningInfo.GetBigChangesFlatAreas(_localizationService), 
+                               FormatMessage(differences, percentChange), 
+                               room,
+                               bigChangesRooms);
                 }
             }
         }
     }
 
     private string FormatMessage(double differences, double percentChange) {
-        return $"Изменение: {percentChange:F0}% ({differences:F} {GetSquareMetersText()}).";
+        return _localizationService.GetLocalizedString(
+            "WarningsWindow.BigChangeDiff", $"{percentChange:F0}", $"{differences:F}", GetSquareMetersText());
     }
 
     private IEnumerable<IEnumerable<SpatialElementViewModel>> GetFlats(IEnumerable<SpatialElementViewModel> rooms) {

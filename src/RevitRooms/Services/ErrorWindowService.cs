@@ -4,6 +4,8 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
+using dosymep.SimpleServices;
+
 using Ninject;
 using Ninject.Syntax;
 
@@ -15,13 +17,14 @@ namespace RevitRooms.Services;
 
 internal class ErrorWindowService {
     private readonly IResolutionRoot _resolutionRoot;
+    private readonly ILocalizationService _localizationService;
 
-    public ErrorWindowService(IResolutionRoot resolutionRoot) {
+    public ErrorWindowService(IResolutionRoot resolutionRoot, ILocalizationService localizationService) {
         _resolutionRoot = resolutionRoot;
+        _localizationService = localizationService;
     }
 
-    public bool ShowNoticeWindow(string title, 
-                                 bool notShowWarnings,
+    public bool ShowNoticeWindow(bool notShowWarnings,
                                  IEnumerable<WarningViewModel> allWarnings) {
         if(notShowWarnings) {
             allWarnings = allWarnings
@@ -39,15 +42,14 @@ internal class ErrorWindowService {
 
             string message;
             if(hasErrors && hasWarnings) {
-                message = "Расчет не выполнен, так как есть ошибки и предупреждения.\r\nОшибки обязательны к исправлению.\r\nПредупреждения следует проанализировать и при необходимости исправить.";
+                message = _localizationService.GetLocalizedString("WarningsWindow.MainInfoErrorsAndWarnings");
             } else if(hasErrors) {
-                message = "Расчет не выполнен, так как есть ошибки.\r\nОшибки обязательны к исправлению.";
+                message = _localizationService.GetLocalizedString("WarningsWindow.MainInfoErrors");
             } else {
-                message = "Расчет завершен с предупреждениями.\r\nПредупреждения следует проанализировать и при необходимости исправить.";
+                message = _localizationService.GetLocalizedString("WarningsWindow.MainInfoWarnings");
             }
 
             var window = _resolutionRoot.Get<WarningsWindow>();
-            window.Title = title;
             window.DataContext = new WarningsViewModel() {
                 Description = message,
                 Warnings = [.. allWarnings.OrderBy(x => x.TypeInfo)]

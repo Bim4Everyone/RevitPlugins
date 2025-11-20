@@ -13,6 +13,7 @@
     <system:String x:Key="Transaction.NumBySectionGroupLevel">Нумерация помещений в пределах каждой секции, этажа и группы</system:String>
     <system:String x:Key="Transaction.UpdateNumOrder">Изменение приоритета нумерации</system:String>
     <system:String x:Key="Transaction.DeleteRoomsAndAreas">Удаление не размещенных помещений и зон</system:String>
+    <system:String x:Key="Transaction.CalculateAreas">Расчет площадей</system:String>
     
     <system:String x:Key="Exception.CopySchedule">Для копирования спецификации закройте спецификацию "{0}".</system:String>    
 
@@ -23,7 +24,11 @@
     <system:String x:Key="MainWindow.HeaderCheck">Выбрать</system:String>
     <system:String x:Key="MainWindow.HeaderLevels">Этажи</system:String>
     <system:String x:Key="MainWindow.HeaderFloors">Уровни</system:String>
-
+    
+    <system:String x:Key="RoomsWindow.WarningAccuracy">Точность проверки должна быть числом</system:String>
+    <system:String x:Key="RoomsWindow.WarningAccuracyRange">Точность проверки должна быть от 1 до 100</system:String>
+    <system:String x:Key="RoomsWindow.WarningSelectPhase">Выберите стадию</system:String>
+    <system:String x:Key="RoomsWindow.WarningSelectLevels">Выберите хотя бы один уровень</system:String>
     
     <system:String x:Key="WarningsWindow.HeaderId">Id</system:String>
     <system:String x:Key="WarningsWindow.HeaderCategory">Категория</system:String>
@@ -62,6 +67,21 @@
     <system:String x:Key="WarningsWindow.BigChangesFlatAreas">Большие изменения в площади квартир.</system:String>
     <system:String x:Key="WarningsWindow.BigChangesAreas">Большие изменения в площади зон.</system:String>
     <system:String x:Key="WarningsWindow.BigChangesDescription">При текущем расчете новые значения площадей превышают заданную разницу по сравнению с предыдущими значениями.</system:String>
+    <system:String x:Key="WarningsWindow.BigChangeDiff">Изменение: {0}% ({1} {2}).</system:String>
+    
+    <system:String x:Key="WarningsWindow.MainInfoErrorsAndWarnings">
+        Расчет не выполнен, так как есть ошибки и предупреждения.        
+        Ошибки обязательны к исправлению.        
+        Предупреждения следует проанализировать и при необходимости исправить.
+    </system:String>
+    <system:String x:Key="WarningsWindow.MainInfoErrors">
+        Расчет не выполнен, так как есть ошибки.
+        Ошибки обязательны к исправлению.</system:String>
+    <system:String x:Key="WarningsWindow.MainInfoWarnings">
+        Расчет завершен с предупреждениями.
+        Предупреждения следует проанализировать и при необходимости исправить.
+    </system:String>
+    
     
     <system:String x:Key="TaskDialogWarning.ScheduleErrors">Были найдены некорректные ключевые спецификации.</system:String>
     <system:String x:Key="TaskDialogWarning.ScheduleErrorsDescription">
@@ -76,6 +96,9 @@
     <system:String x:Key="TaskDialogWarning.UpdateSchedule">Заменить на спецификации из шаблона?</system:String>
     <system:String x:Key="TaskDialogWarning.Exit">Выход без изменений спецификаций</system:String>
     <system:String x:Key="TaskDialogWarning.NotFilledSchedules">Были найдены не заполненные ключевые спецификации:</system:String>
+    
+    <system:String x:Key="TaskDialog.Information">Информация</system:String>
+    <system:String x:Key="TaskDialog.Result">Расчет завершен успешно!</system:String>
     
     
     

@@ -42,7 +42,7 @@
         <ui:TitleBar
             Grid.Row="0"
             VerticalAlignment="Center"
-            Title="Errors" />
+            Title="Ошибки" />
 
         <TextBlock
             Grid.Row="1" 
