@@ -12,12 +12,9 @@
     <system:String x:Key="Transaction.NumBySection">Нумерация помещений по секции</system:String>
     <system:String x:Key="Transaction.NumBySectionGroupLevel">Нумерация помещений в пределах каждой секции, этажа и группы</system:String>
     <system:String x:Key="Transaction.UpdateNumOrder">Изменение приоритета нумерации</system:String>
+    <system:String x:Key="Transaction.DeleteRoomsAndAreas">Удаление не размещенных помещений и зон</system:String>
     
     <system:String x:Key="Exception.CopySchedule">Для копирования спецификации закройте спецификацию "{0}".</system:String>    
-    
-    <system:String x:Key="Rooms.ApartContourPhase">Межквартирные перегородки</system:String>
-    
-    
 
     <system:String x:Key="MainWindow.SelectView">Выборка по текущему виду</system:String>
     <system:String x:Key="MainWindow.SelectAll">Выборка по всем элементам</system:String>
@@ -67,7 +64,7 @@
     <system:String x:Key="WarningsWindow.BigChangesDescription">При текущем расчете новые значения площадей превышают заданную разницу по сравнению с предыдущими значениями.</system:String>
     
     <system:String x:Key="TaskDialogWarning.ScheduleErrors">Были найдены некорректные ключевые спецификации.</system:String>
-    <system:String x:Key="TaskDialogWarning.ScheduleErrors">
+    <system:String x:Key="TaskDialogWarning.ScheduleErrorsDescription">
         {0}
         
         

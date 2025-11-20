@@ -13,13 +13,16 @@ using dosymep.Bim4Everyone;
 using dosymep.Bim4Everyone.KeySchedules;
 using dosymep.Bim4Everyone.SharedParams;
 using dosymep.Revit;
+using dosymep.SimpleServices;
 
 namespace RevitRooms.Models;
 internal class RevitRepository {
+    private readonly ILocalizationService _localizationService;
     private readonly ElementFilter _filter;
 
-    public RevitRepository(UIApplication uiApplication) {
+    public RevitRepository(UIApplication uiApplication, ILocalizationService localizationService) {
         UIApplication = uiApplication;
+        _localizationService = localizationService;
         _filter = new ElementMulticategoryFilter(new[] { BuiltInCategory.OST_Rooms, BuiltInCategory.OST_Areas });
     }
 
@@ -162,12 +165,11 @@ internal class RevitRepository {
     /// <remarks>Создает свою транзакцию.</remarks>
     public void RemoveUnplacedSpatialElements() {
         var unplacedRooms = GetSpatialElements().Union(GetAllAreas()).Where(item => item.Location == null || item.Level == null);
-        using var transaction = new Transaction(Document);
-        transaction.Start("Удаление не размещенных помещений и зон");
-
-        Document.Delete(unplacedRooms.Select(item => item.Id).ToArray());
-
-        transaction.Commit();
+        string transactionName = _localizationService.GetLocalizedString("Transaction.DeleteRoomsAndAreas");
+        using(var t = Document.StartTransaction(transactionName)) {
+            Document.Delete(unplacedRooms.Select(item => item.Id).ToArray());
+            t.Commit();
+        }
     }
 
     public IList<Area> GetAllAreas() {
