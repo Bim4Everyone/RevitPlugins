@@ -15,7 +15,7 @@
     xmlns:local="clr-namespace:RevitPylonDocumentation.Views.Pages"
     xmlns:views="clr-namespace:RevitPylonDocumentation.Views"
     mc:Ignorable="d" 
-    d:DesignHeight="450" d:DesignWidth="600"
+    d:DesignHeight="550" d:DesignWidth="600"
     Title="GeneralPage"
     d:DataContext="{d:DesignInstance vms:MainViewModel, IsDesignTimeCreatable=False}"
     
@@ -93,6 +93,7 @@
                     </ComboBox>
 
                     <ui:Button
+                        x:Name="refHeightButton"
                         Grid.Column="1"
                         Margin="5"
                         VerticalAlignment="Stretch"
@@ -207,7 +208,7 @@
         <Border Name="Toggles"
             Grid.Row="0"
             Grid.Column="1"
-            Margin="7 15 7 7"
+            Margin="7 15 15 7"
             Style="{StaticResource CustomBorder}">
             <Grid>
                 <Grid.RowDefinitions>
@@ -220,11 +221,39 @@
                     <ColumnDefinition Width="*"/>
                 </Grid.ColumnDefinitions>
 
-                <ui:TextBlock 
+                <Grid
                     Grid.Row="0"
-                    Grid.ColumnSpan="2"
-                    Text="Sheet elements"/>
+                    Grid.ColumnSpan="2">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
 
+                    <ui:TextBlock
+                        Grid.Column="0"
+                        Margin="5"
+                        FontSize="16"
+                        Text="Элементы листа"
+                        VerticalAlignment="Center"
+                        Style="{StaticResource CustomTextBlock}" />
+
+                    <ui:Button
+                        Grid.Column="1"
+                        Margin="5"
+                        VerticalAlignment="Stretch"
+                        MinHeight="{Binding ElementName=refHeightButton, Path=ActualHeight}"
+                        Icon="{ui:SymbolIcon ToggleRight16}"
+                        Command="{Binding Path=SelectAllFuncInGUICommand}" />
+                    
+                    <ui:Button
+                        Grid.Column="2"
+                        Margin="5"
+                        VerticalAlignment="Stretch"
+                        Icon="{ui:SymbolIcon ToggleLeft16}"
+                        Command="{Binding Path=UnselectAllFuncInGUICommand}"/>
+                </Grid>
+                
                 <Grid Name="FormworkToggles"
                     Grid.Row="1" 
                     Grid.Column="0">
@@ -239,32 +268,39 @@
 
                     <ui:TextBlock
                         Grid.Row="0"
-                        Text="Formwork views" />
+                        Margin="5"
+                        Text="Виды опалубки"
+                        Style="{StaticResource CustomTextBlock}" />
 
                     <ui:ToggleSwitch
                         Grid.Row="1"
-                        IsChecked="True"
-                        Content="General"/>
+                        Margin="5"
+                        IsChecked="{Binding Path=SelectionSettings.NeedWorkWithGeneralView}"
+                        Content="Основной"/>
 
                     <ui:ToggleSwitch
                         Grid.Row="2"
-                        IsChecked="True"
-                        Content="Side" />
+                        Margin="5"
+                        IsChecked="{Binding Path=SelectionSettings.NeedWorkWithGeneralPerpendicularView}"
+                        Content="Боковой" />
 
                     <ui:ToggleSwitch
                         Grid.Row="3"
-                        IsChecked="True"
-                        Content="Hor1" />
+                        Margin="5"
+                        IsChecked="{Binding Path=SelectionSettings.NeedWorkWithTransverseViewFirst}"
+                        Content="Поперечный 1" />
 
                     <ui:ToggleSwitch
                         Grid.Row="4"
-                        IsChecked="True"
-                        Content="Hor2" />
+                        Margin="5"
+                        IsChecked="{Binding Path=SelectionSettings.NeedWorkWithTransverseViewSecond}"
+                        Content="Поперечный 2" />
 
                     <ui:ToggleSwitch
                         Grid.Row="5"
-                        IsChecked="True"
-                        Content="Hor3" />
+                        Margin="5"
+                        IsChecked="{Binding Path=SelectionSettings.NeedWorkWithTransverseViewThird}"
+                        Content="Поперечный 3" />
                 </Grid>
                 
                 <Grid Name="RebarToggles"
@@ -281,32 +317,39 @@
 
                     <ui:TextBlock
                         Grid.Row="0"
-                        Text="Rebar views" />
+                        Margin="5"
+                        Text="Виды армирования"
+                        Style="{StaticResource CustomTextBlock}" />
 
                     <ui:ToggleSwitch
                         Grid.Row="1"
-                        IsChecked="True"
-                        Content="General" />
+                        Margin="5"
+                        IsChecked="{Binding Path=SelectionSettings.NeedWorkWithGeneralRebarView}"
+                        Content="Основной" />
 
                     <ui:ToggleSwitch
                         Grid.Row="2"
-                        IsChecked="True"
-                        Content="Side" />
+                        Margin="5"
+                        IsChecked="{Binding Path=SelectionSettings.NeedWorkWithGeneralPerpendicularRebarView}"
+                        Content="Боковой" />
 
                     <ui:ToggleSwitch
                         Grid.Row="3"
-                        IsChecked="True"
-                        Content="Hor1" />
+                        Margin="5"
+                        IsChecked="{Binding Path=SelectionSettings.NeedWorkWithTransverseViewFirst}"
+                        Content="Поперечный 1" />
 
                     <ui:ToggleSwitch
                         Grid.Row="4"
-                        IsChecked="True"
-                        Content="Hor2" />
+                        Margin="5"
+                        IsChecked="{Binding Path=SelectionSettings.NeedWorkWithTransverseViewSecond}"
+                        Content="Поперечный 2" />
 
                     <ui:ToggleSwitch
                         Grid.Row="5"
-                        IsChecked="True"
-                        Content="Hor3" />
+                        Margin="5"
+                        IsChecked="{Binding Path=SelectionSettings.NeedWorkWithTransverseViewThird}"
+                        Content="Поперечный 3" />
                 </Grid>
                 
                 <Grid Name="SpecToggles"
@@ -323,32 +366,39 @@
 
                     <ui:TextBlock
                         Grid.Row="0"
-                        Text="Spec views" />
+                        Margin="5"
+                        Text="Виды спецификаций"
+                        Style="{StaticResource CustomTextBlock}" />
 
                     <ui:ToggleSwitch
                         Grid.Row="1"
-                        IsChecked="True"
-                        Content="Frame" />
+                        Margin="5"
+                        IsChecked="{Binding Path=SelectionSettings.NeedWorkWithSkeletonSchedule}"
+                        Content="Каркас" />
 
                     <ui:ToggleSwitch
                         Grid.Row="2"
-                        IsChecked="True"
-                        Content="Elements of frame" />
+                        Margin="5"
+                        IsChecked="{Binding Path=SelectionSettings.NeedWorkWithSkeletonByElemsSchedule}"
+                        Content="Елементы каркаса" />
 
                     <ui:ToggleSwitch
                         Grid.Row="3"
-                        IsChecked="True"
-                        Content="Materials" />
+                        Margin="5"
+                        IsChecked="{Binding Path=SelectionSettings.NeedWorkWithMaterialSchedule}"
+                        Content="Материалы" />
 
                     <ui:ToggleSwitch
                         Grid.Row="4"
-                        IsChecked="True"
-                        Content="System parts" />
+                        Margin="5"
+                        IsChecked="{Binding Path=SelectionSettings.NeedWorkWithSystemPartsSchedule}"
+                        Content="Системные детали" />
 
                     <ui:ToggleSwitch
                         Grid.Row="5"
-                        IsChecked="True"
-                        Content="IFC parts" />
+                        Margin="5"
+                        IsChecked="{Binding Path=SelectionSettings.NeedWorkWithIfcPartsSchedule}"
+                        Content="IFC детали" />
                 </Grid>
 
                 <Grid Name="OtherToggles"
@@ -365,12 +415,15 @@
 
                     <ui:TextBlock
                         Grid.Row="0"
-                        Text="Other views" />
+                        Margin="5"
+                        Text="Другие виды"
+                        Style="{StaticResource CustomTextBlock}" />
 
                     <ui:ToggleSwitch
                         Grid.Row="1"
-                        IsChecked="True"
-                        Content="Legend" />
+                        Margin="5"
+                        IsChecked="{Binding Path=SelectionSettings.NeedWorkWithLegend}"
+                        Content="Легенда примечания" />
                 </Grid>
             </Grid>
         </Border>
@@ -378,7 +431,7 @@
         <Border Name="SheetProps"
             Grid.Row="1"
             Grid.Column="1"
-            Margin="7"
+            Margin="7 7 15 7"
             Style="{StaticResource CustomBorder}">
             <Grid>
                 <Grid.RowDefinitions>
@@ -406,7 +459,7 @@
         <Border Name="ViewTemplates"
             Grid.Row="2"
             Grid.Column="1"
-            Margin="7 7 7 10"
+            Margin="7 7 15 10"
             Style="{StaticResource CustomBorder}">
             <Grid>
                 <Grid.RowDefinitions>

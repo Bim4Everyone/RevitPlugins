@@ -28,7 +28,8 @@
             Source="pack://application:,,,/Wpf.Ui;component/Controls/ScrollViewer/ScrollViewer.xaml" />
     </ResourceDictionary.MergedDictionaries>
 
-    <Style TargetType="{x:Type TextBlock}" x:Key="CustomTextBlock">
+    <Style x:Key="CustomTextBlock"
+        TargetType="{x:Type TextBlock}" >
         <Setter
             Property="Foreground"
             Value="{DynamicResource TextFillColorPrimaryBrush}" />
@@ -37,18 +38,16 @@
             Value="14" />
     </Style>
 
-    <Style
+    <Style x:Key="CustomListViewItem"
         TargetType="ui:ListViewItem"
-        x:Key="CustomListViewItem"
         BasedOn="{StaticResource ListViewItemStyle}">
         <Setter
             Property="IsSelected"
             Value="{Binding IsCheck, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" />
     </Style>
 
-    <Style
-        TargetType="Border"
-        x:Key="CustomBorder">
+    <Style x:Key="CustomBorder"
+        TargetType="Border" >
         <Setter
             Property="Padding"
             Value="10" />
