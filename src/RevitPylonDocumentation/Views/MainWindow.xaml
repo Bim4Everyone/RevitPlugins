@@ -31,13 +31,24 @@
         </i:EventTrigger>
     </i:Interaction.Triggers>
 
-    <Window.Resources>
+    <!--<Window.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
                 <ResourceDictionary
                     Source="ResourceDictionary.xaml" />
                 <ResourceDictionary
                     Source="TooltipsDictionary.xaml" />
+                <ResourceDictionary
+                    Source="CustomStyles.xaml" />
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
+    </Window.Resources>-->
+
+    <Window.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary
+                    Source="CustomStyles.xaml" />
             </ResourceDictionary.MergedDictionaries>
         </ResourceDictionary>
     </Window.Resources>
@@ -51,9 +62,11 @@
         <ui:TitleBar
             Grid.Row="0"
             Title="Title" />
-        
+
         <ui:NavigationView
             Grid.Row="1"
+            x:Name="_rootNavigationView"
+            FrameMargin="0"
             PaneDisplayMode="Left"
             PaneTitle="Pane Title"
             OpenPaneLength="200"

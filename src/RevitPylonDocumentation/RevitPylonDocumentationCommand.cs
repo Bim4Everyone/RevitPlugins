@@ -13,9 +13,13 @@ using dosymep.WpfUI.Core.Ninject;
 
 using Ninject;
 
+using RevitPylonDocumentation.Extensions;
+using RevitPylonDocumentation.Factories;
 using RevitPylonDocumentation.Models;
 using RevitPylonDocumentation.ViewModels;
 using RevitPylonDocumentation.Views;
+
+using Wpf.Ui.Abstractions;
 
 namespace RevitPylonDocumentation;
 [Transaction(TransactionMode.Manual)]
@@ -26,10 +30,15 @@ public class RevitPylonDocumentationCommand : BasePluginCommand {
 
     protected override void Execute(UIApplication uiApplication) {
         using IKernel kernel = uiApplication.CreatePlatformServices();
+        kernel.BindPages();
 
         // Настройка доступа к Revit
         kernel.Bind<RevitRepository>()
             .ToSelf()
+            .InSingletonScope();
+
+        kernel.Bind<INavigationViewPageProvider>()
+            .To<NavigationViewPageProvider>()
             .InSingletonScope();
 
         // Настройка конфигурации плагина
