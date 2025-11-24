@@ -28,6 +28,15 @@
             Source="pack://application:,,,/Wpf.Ui;component/Controls/ScrollViewer/ScrollViewer.xaml" />
     </ResourceDictionary.MergedDictionaries>
 
+    <Style TargetType="{x:Type TextBlock}" x:Key="CustomTextBlock">
+        <Setter
+            Property="Foreground"
+            Value="{DynamicResource TextFillColorPrimaryBrush}" />
+        <Setter
+            Property="FontSize"
+            Value="14" />
+    </Style>
+
     <Style
         TargetType="ui:ListViewItem"
         x:Key="CustomListViewItem"
@@ -42,10 +51,10 @@
         x:Key="CustomBorder">
         <Setter
             Property="Padding"
-            Value="7" />
+            Value="10" />
         <Setter
             Property="CornerRadius"
-            Value="5" />
+            Value="10" />
         <Setter
             Property="VerticalAlignment"
             Value="Stretch" />
@@ -76,8 +85,5 @@
         <Setter
             Property="FocusVisualStyle"
             Value="{DynamicResource DefaultControlFocusVisualStyle}" />
-        <Setter
-            Property="CornerRadius"
-            Value="{DynamicResource ControlCornerRadius}" />
     </Style>
 </ResourceDictionary>

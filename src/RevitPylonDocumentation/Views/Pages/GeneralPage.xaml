@@ -15,9 +15,12 @@
     xmlns:local="clr-namespace:RevitPylonDocumentation.Views.Pages"
     xmlns:views="clr-namespace:RevitPylonDocumentation.Views"
     mc:Ignorable="d" 
-    d:DesignHeight="450" d:DesignWidth="500"
+    d:DesignHeight="450" d:DesignWidth="600"
     Title="GeneralPage"
-    d:DataContext="{d:DesignInstance vms:MainViewModel, IsDesignTimeCreatable=False}">
+    d:DataContext="{d:DesignInstance vms:MainViewModel, IsDesignTimeCreatable=False}"
+    
+    
+    ScrollViewer.CanContentScroll="False">
     <core:WpfUIPlatformPage.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
@@ -42,7 +45,6 @@
         <Border Name="Marks"
             Grid.RowSpan="3"
             Margin="15 15 7 10"
-            CornerRadius="10"
             Style="{StaticResource CustomBorder}">
             <Grid>
                 <Grid.RowDefinitions>
@@ -54,18 +56,20 @@
                     <RowDefinition Height="*" />
                 </Grid.RowDefinitions>
 
-                <ui:TextBlock 
+                <ui:TextBlock
                     Grid.Row="0"
                     Margin="5"
                     HorizontalAlignment="Stretch"
                     FontSize="16"
-                    Text="Выбор пилонов"/>
+                    Text="Выбор пилонов"
+                    Style="{StaticResource CustomTextBlock}"/>
 
                 <ui:TextBlock 
                     Grid.Row="1"
                     Margin="5"
                     HorizontalAlignment="Stretch"
-                    Text="Комплект документации:"/>
+                    Text="Комплект документации:"
+                    Style="{StaticResource CustomTextBlock}"/>
 
                 <Grid
                     Grid.Row="2">
@@ -95,15 +99,40 @@
                         Content="Выбрать пилон"/>
                 </Grid>
 
-                <TextBlock
+                <ui:TextBlock
                     Grid.Row="3"
                     Margin="5"
-                    Text="Выберите марки пилонов для обработки:" />
+                    Text="Выберите марки пилонов для обработки:"
+                    Style="{StaticResource CustomTextBlock}" />
 
-                <ui:TextBox
-                    Grid.Row="4"
-                    Margin="5"
-                    PlaceholderText="Поиск..." />
+                <Grid
+                    Grid.Row="4">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="Auto" />
+                    </Grid.ColumnDefinitions>
+
+                    <ui:TextBox
+                        Grid.Column="0"
+                        Margin="5"
+                        PlaceholderText="Поиск..."
+                        Text="{Binding Path=HostsInfoFilter, UpdateSourceTrigger=PropertyChanged}" />
+
+                    <ui:Button
+                        Grid.Column="1"
+                        Margin="5"
+                        VerticalAlignment="Stretch"
+                        Icon="{ui:SymbolIcon CheckboxChecked24}"
+                        Command="{Binding Path=SelectAllHostsInfoInGUICommand}" />
+
+                    <ui:Button
+                        Grid.Column="2"
+                        Margin="5"
+                        VerticalAlignment="Stretch"
+                        Icon="{ui:SymbolIcon CheckboxUnchecked24}"
+                        Command="{Binding Path=UnselectAllHostsInfoInGUICommand}" />
+                </Grid>
 
                 <ui:ListView
                     x:Name="hostMarks"
@@ -179,7 +208,6 @@
             Grid.Row="0"
             Grid.Column="1"
             Margin="7 15 7 7"
-            CornerRadius="10"
             Style="{StaticResource CustomBorder}">
             <Grid>
                 <Grid.RowDefinitions>
@@ -351,7 +379,6 @@
             Grid.Row="1"
             Grid.Column="1"
             Margin="7"
-            CornerRadius="10"
             Style="{StaticResource CustomBorder}">
             <Grid>
                 <Grid.RowDefinitions>
@@ -380,7 +407,6 @@
             Grid.Row="2"
             Grid.Column="1"
             Margin="7 7 7 10"
-            CornerRadius="10"
             Style="{StaticResource CustomBorder}">
             <Grid>
                 <Grid.RowDefinitions>
