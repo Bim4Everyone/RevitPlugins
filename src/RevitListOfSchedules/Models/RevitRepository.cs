@@ -55,7 +55,14 @@ internal class RevitRepository {
     public IList<SheetElement> GetSheetElements(Document document) {
         return new Collection<SheetElement>(GetViewSheets(document)
             .Select(sheet => new SheetElement(_paramFactory, sheet))
-            .OrderBy(sheet => Convert.ToInt32(sheet.Number))
+            .OrderBy(sheet => {
+                string s = sheet.Number?.Trim();
+                return string.IsNullOrEmpty(s)
+                ? 0
+                : double.TryParse(s, out double d)
+                ? (int) d
+                : 0;
+            })
             .ToList());
     }
 

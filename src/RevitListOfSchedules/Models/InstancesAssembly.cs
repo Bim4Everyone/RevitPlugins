@@ -8,6 +8,8 @@ using dosymep.Revit;
 
 namespace RevitListOfSchedules.Models;
 internal class InstancesAssembly {
+    // Ключевое слово для поиска среди строк в заголовке спецификации
+    private readonly IEnumerable<string> _approvedLines = ["Ведомость", "Спецификация"];
     private readonly RevitRepository _revitRepository;
     private readonly ViewDrafting _viewDrafting;
     private readonly FamilySymbol _familySymbol;
@@ -28,10 +30,26 @@ internal class InstancesAssembly {
         foreach(var schedule in listOfSchedules) {
             var tableData = schedule.GetTableData();
             var headData = tableData.GetSectionData(SectionType.Header);
-            string scheduleName = headData == null
-                ? schedule.Name
-                : headData.GetCellText(0, 0);
-            PlaceFamilyInstance(sheetNumber, sheetRevNumber, scheduleName);
+
+            if(headData != null && !headData.HideSection) {
+                string resultScheduleName = null;
+                bool found = false;
+
+                for(int i = 0; i < headData.NumberOfRows && !found; i++) {
+                    for(int j = 0; j < headData.NumberOfColumns && !found; j++) {
+                        string cellText = headData.GetCellText(i, j);
+                        if(_approvedLines.Any(cellText.Contains)) {
+                            resultScheduleName = cellText;
+                            found = true;
+                        }
+                    }
+                }
+                if(found) {
+                    PlaceFamilyInstance(sheetNumber, sheetRevNumber, resultScheduleName);
+                } else {
+                    PlaceFamilyInstance(sheetNumber, sheetRevNumber, schedule.Name);
+                }
+            }
         }
     }
 
