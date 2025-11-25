@@ -14,6 +14,7 @@
     xmlns:vms="clr-namespace:RevitPylonDocumentation.ViewModels"
     xmlns:local="clr-namespace:RevitPylonDocumentation.Views.Pages"
     xmlns:views="clr-namespace:RevitPylonDocumentation.Views"
+    xmlns:controls="clr-namespace:RevitPylonDocumentation.Views.Controls"
     mc:Ignorable="d" 
     d:DesignHeight="550" d:DesignWidth="600"
     Title="GeneralPage"
@@ -26,6 +27,8 @@
             <ResourceDictionary.MergedDictionaries>
                 <ResourceDictionary
                     Source="../CustomStyles.xaml" />
+                <ResourceDictionary
+                    Source="../TooltipsDictionary.xaml" />
             </ResourceDictionary.MergedDictionaries>
         </ResourceDictionary>
     </core:WpfUIPlatformPage.Resources>
@@ -256,7 +259,8 @@
                 
                 <Grid Name="FormworkToggles"
                     Grid.Row="1" 
-                    Grid.Column="0">
+                    Grid.Column="0"
+                    Margin="5">
                     <Grid.RowDefinitions>
                         <RowDefinition Height="Auto" />
                         <RowDefinition Height="*" />
@@ -305,7 +309,8 @@
                 
                 <Grid Name="RebarToggles"
                     Grid.Row="1"
-                    Grid.Column="1">
+                    Grid.Column="1"
+                    Margin="5">
                     <Grid.RowDefinitions>
                         <RowDefinition Height="Auto" />
                         <RowDefinition Height="*" />
@@ -354,7 +359,8 @@
                 
                 <Grid Name="SpecToggles"
                     Grid.Row="2"
-                    Grid.Column="0">
+                    Grid.Column="0"
+                    Margin="5">
                     <Grid.RowDefinitions>
                         <RowDefinition Height="Auto" />
                         <RowDefinition Height="*" />
@@ -403,7 +409,8 @@
 
                 <Grid Name="OtherToggles"
                     Grid.Row="2"
-                    Grid.Column="1">
+                    Grid.Column="1"
+                    Margin="5">
                     <Grid.RowDefinitions>
                         <RowDefinition Height="Auto" />
                         <RowDefinition Height="*" />
@@ -433,27 +440,22 @@
             Grid.Column="1"
             Margin="7 7 15 7"
             Style="{StaticResource CustomBorder}">
-            <Grid>
-                <Grid.RowDefinitions>
-                    <RowDefinition
-                        Height="*" />
-                    <RowDefinition
-                        Height="Auto" />
-                </Grid.RowDefinitions>
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition
-                        Width="*" />
-                    <ColumnDefinition
-                        Width="*" />
-                </Grid.ColumnDefinitions>
+            <StackPanel>
+                <ui:TextBlock
+                    Grid.Row="0"
+                    Margin="5"
+                    FontSize="16"
+                    Text="Лист"
+                    Style="{StaticResource CustomTextBlock}" />
 
-                <Grid>
+                <controls:TextBoxSettingControl
+                    Grid.Row="1"
+                    LabelText="Параметр фильтрации типовых пилонов"
+                    TextBoxText="{Binding ProjectSettings.TypicalPylonFilterParameterTemp}"
+                    ToolTipText="Параметр фильтрации типовых пилонов"
+                    TextChangedCommand="{Binding SettingsChangedCommand}" />
 
-                </Grid>
-
-                <TextBlock
-                    Text="SOMEEEEEeee teeeeeeeeeeeeeeeext" />
-            </Grid>
+            </StackPanel>
         </Border>
 
         <Border Name="ViewTemplates"
