@@ -7,11 +7,11 @@ using dosymep.SimpleServices;
 
 namespace RevitCopyStandarts.Models.Commands;
 internal class LoadFamiliesCommand : ICopyStandartsCommand {
-    private readonly IEnumerable<string> _paths;
+    private readonly List<string> _paths;
     private readonly Document _target;
     private readonly ILocalizationService _localizationService; 
     
-    public LoadFamiliesCommand(IEnumerable<string> paths, Document target, ILocalizationService localizationService) {
+    public LoadFamiliesCommand(List<string> paths, Document target, ILocalizationService localizationService) {
         _paths = paths;
         _target = target;
         _localizationService = localizationService;

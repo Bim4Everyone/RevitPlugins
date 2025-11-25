@@ -218,12 +218,13 @@ internal class BimFileViewModel : BaseViewModel {
         var command = GetLoadFamiliesCommand(
             sourceDocument.ProjectInformation.Address
                 .Split(['\n'], StringSplitOptions.RemoveEmptyEntries)
-                .Select(item => item.Trim()));
+                .Select(item => item.Trim())
+                .ToList());
 
         return [command];
     }
 
-    private ICopyStandartsCommand GetLoadFamiliesCommand(IEnumerable<string> paths) {
+    private ICopyStandartsCommand GetLoadFamiliesCommand(List<string> paths) {
         foreach(var path in paths) {
             if(!File.Exists(path)) {
                 throw new ArgumentException(
