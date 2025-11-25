@@ -12,5 +12,5 @@ internal interface IPositionProvider {
     /// <summary>
     /// Метод получения координаты элемента по элементу
     /// </summary>
-    XYZ GetPositionElement(SlabElement slabElement);
+    XYZ GetPositionSlabElement(SlabElement slabElement);
 }

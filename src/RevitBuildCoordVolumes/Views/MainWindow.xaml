@@ -16,9 +16,9 @@
     xmlns:wpfbehaviors="clr-namespace:dosymep.WpfCore.Behaviors;assembly=dosymep.WpfCore"
     mc:Ignorable="d"
     Title="{me:LocalizationSource MainWindow.Title}"
-    Height="720"
+    Height="820"
     Width="900"
-    MinHeight="720"
+    MinHeight="820"
     MinWidth="900"
     d:DataContext="{d:DesignInstance vms:MainViewModel, IsDesignTimeCreatable=False}">
 
@@ -30,6 +30,11 @@
     <Window.Resources> 
         <converters:BoolToVisibilityConverter
             x:Key="ParamWarningIconVisible"
+            TrueValue="Visible"
+            FalseValue="Collapsed" />
+        
+        <converters:BoolToVisibilityConverter
+            x:Key="SlabWarningIconVisible"
             TrueValue="Visible"
             FalseValue="Collapsed" />
 
@@ -73,114 +78,202 @@
 
             <StackPanel
                 Margin="10">
+                <GroupBox
+                    Margin="0,0,0,10"                                        
+                    BorderThickness="0"
+                    Header="{me:LocalizationSource MainWindow.GroupBoxGeometry}"
+                    FontWeight="DemiBold">                    
+                    <StackPanel>
+                        <edits:CustomGroupEditControl
+                            Icon="{ui:SymbolIcon form24}"
+                            Header="{me:LocalizationSource MainWindow.SourceFiles}"
+                            Description="{me:LocalizationSource MainWindow.SourceFilesDescription}"
+                            ExtraIconVisible="False">
+                            <edits:CustomGroupEditControl.EditControl>
+                                <StackPanel>
+                                    <ui:AutoSuggestBox
+                                        Margin="5,0,5,5"
+                                        Icon="{ui:SymbolIcon Search24}"
+                                        Text="{Binding SearchTextDocs, Mode=TwoWay}"
+                                        PlaceholderText="{me:LocalizationSource MainWindow.SearchTextDocs}">
+                                        <i:Interaction.Triggers>
+                                            <i:EventTrigger
+                                                EventName="TextChanged">
+                                                <i:InvokeCommandAction
+                                                    Command="{Binding SearchDocsCommand}" />
+                                            </i:EventTrigger>
+                                        </i:Interaction.Triggers>
+                                    </ui:AutoSuggestBox>
 
-                <edits:CustomEditControl
-                    Icon="{ui:SymbolIcon mobileOptimized24}"
-                    Header="{me:LocalizationSource MainWindow.SourceFiles}"
-                    Description="{me:LocalizationSource MainWindow.SourceFilesDescription}">
+                                    <ItemsControl
+                                        ItemsSource="{Binding FilteredDocuments}">
+                                        <ItemsControl.ItemTemplate>
+                                            <DataTemplate
+                                                DataType="{x:Type vms:DocumentViewModel}">
+                                                <edits:SlabControl
+                                                    SlabName="{Binding Name}"
+                                                    IsChecked="{Binding IsChecked, Mode=TwoWay}"
+                                                    HasWarning="False"/>
+                                            </DataTemplate>
+                                        </ItemsControl.ItemTemplate>
 
-                    <ComboBox
-                        ItemsSource="{Binding SourceFiles}"
-                        SelectedValue="{Binding SelectedSourceFile}"
-                        DisplayMemberPath="FileName" />
-                </edits:CustomEditControl>
+                                        <ItemsControl.ItemsPanel>
+                                            <ItemsPanelTemplate>
+                                                <UniformGrid
+                                                    Columns="1" />
+                                            </ItemsPanelTemplate>
+                                        </ItemsControl.ItemsPanel>
+                                    </ItemsControl>
+                                </StackPanel>
+                            </edits:CustomGroupEditControl.EditControl>
+                        </edits:CustomGroupEditControl>
 
-                <edits:CustomEditControl
-                    Icon="{ui:SymbolIcon grid24}"
-                    Header="{me:LocalizationSource MainWindow.TypeZones}"
-                    Description="{me:LocalizationSource MainWindow.TypeZonesDescription}">
+                        <edits:CustomGroupEditControl
+                            Icon="{ui:SymbolIcon form24}"
+                            Header="{me:LocalizationSource MainWindow.TypeSlabs}"
+                            Description="{me:LocalizationSource MainWindow.TypeSlabsDescription}"
+                            ExtraIconVisible="False">                            
 
-                    <ComboBox
-                        ItemsSource="{Binding TypeZones}"
-                        SelectedValue="{Binding SelectedTypeZone}"
-                        DisplayMemberPath="Name" />
-                </edits:CustomEditControl>
+                            <edits:CustomGroupEditControl.EditControl>
+                                <StackPanel>
+                                    <ui:AutoSuggestBox
+                                        Margin="5,0,5,5"
+                                        Icon="{ui:SymbolIcon Search24}"
+                                        Text="{Binding SearchTextSlabs, Mode=TwoWay}"
+                                        PlaceholderText="{me:LocalizationSource MainWindow.SearchTextSlabs}">
+                                        <i:Interaction.Triggers>
+                                            <i:EventTrigger
+                                                EventName="TextChanged">
+                                                <i:InvokeCommandAction
+                                                    Command="{Binding SearchSlabsCommand}" />
+                                            </i:EventTrigger>
+                                        </i:Interaction.Triggers>
+                                    </ui:AutoSuggestBox>
 
-                <edits:CustomEditControl
-                    Icon="{ui:SymbolIcon fullScreenMaximize24}"
-                    Header="{me:LocalizationSource MainWindow.TypeSlabs}"
-                    Description="{me:LocalizationSource MainWindow.TypeSlabsDescription}">                    
+                                    <ItemsControl
+                                        ItemsSource="{Binding FilteredSlabs}">
+                                        <ItemsControl.ItemTemplate>
+                                            <DataTemplate
+                                                DataType="{x:Type vms:SlabViewModel}">
+                                                <edits:SlabControl
+                                                    SlabName="{Binding Name}"
+                                                    IsChecked="{Binding IsChecked, Mode=TwoWay}"
+                                                    HasWarning="False"/>
+                                            </DataTemplate>
+                                        </ItemsControl.ItemTemplate>
 
-                    <ui:TextBox
-                        Margin="0,5,0,0"
-                        Foreground="{DynamicResource TextFillColorPrimaryBrush}"
-                        Text="{Binding TypeSlabs, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-                        TextWrapping="WrapWithOverflow" />
-                </edits:CustomEditControl>                
+                                        <ItemsControl.ItemsPanel>
+                                            <ItemsPanelTemplate>
+                                                <UniformGrid
+                                                    Columns="1" />
+                                            </ItemsPanelTemplate>
+                                        </ItemsControl.ItemsPanel>
+                                    </ItemsControl>
+                                </StackPanel>
+                            </edits:CustomGroupEditControl.EditControl>
+                        </edits:CustomGroupEditControl>
+                    </StackPanel>
+                </GroupBox>                
 
-                <edits:CustomEditControl
-                    Icon="{ui:SymbolIcon fullScreenMinimize24}"
-                    Header="{me:LocalizationSource MainWindow.PositionsUp}"
-                    Description="{me:LocalizationSource MainWindow.PositionsUpDescription}">
+                <GroupBox
+                    Margin="0,0,0,10"
+                    BorderThickness="0"
+                    Header="{me:LocalizationSource MainWindow.GroupBoxParameters}"
+                    FontWeight="DemiBold">
+                    <StackPanel>
+                        <edits:CustomEditControl
+                            Icon="{ui:SymbolIcon grid24}"
+                            Header="{me:LocalizationSource MainWindow.TypeZones}"
+                            Description="{me:LocalizationSource MainWindow.TypeZonesDescription}">
 
-                    <ComboBox
-                        ItemsSource="{Binding PositionsUp}"
-                        SelectedValue="{Binding SelectedPositionUp}"
-                        DisplayMemberPath="Name" />
-                </edits:CustomEditControl>
+                            <ComboBox
+                                ItemsSource="{Binding TypeZones}"
+                                SelectedValue="{Binding SelectedTypeZone}"
+                                DisplayMemberPath="Name" />
+                        </edits:CustomEditControl>
+                        
+                        <edits:CustomGroupEditControl
+                            Icon="{ui:SymbolIcon clipboardTaskListLtr24}"
+                            Header="{me:LocalizationSource MainWindow.Params}"
+                            Description="{me:LocalizationSource MainWindow.ParamsDescription}"
+                            ExtraIconVisible="True">
+                            <edits:CustomGroupEditControl.ExtraIcon>
+                                <ui:SymbolIcon
+                                    Symbol="Warning24"
+                                    Foreground="OrangeRed"
+                                    FontSize="24"
+                                    ToolTip="{me:LocalizationSource MainWindow.ParamWarningTooltip}"
+                                    Visibility="{Binding HasParamWarning, Converter={StaticResource ParamWarningIconVisible}}" />
+                            </edits:CustomGroupEditControl.ExtraIcon>
 
-                <edits:CustomEditControl
-                    Icon="{ui:SymbolIcon fullScreenMinimize24}"
-                    Header="{me:LocalizationSource MainWindow.PositionsBottom}"
-                    Description="{me:LocalizationSource MainWindow.PositionsBottomDescription}">
+                            <edits:CustomGroupEditControl.EditControl>
+                                <ItemsControl
+                                    ItemsSource="{Binding Params}">
+                                    <ItemsControl.ItemTemplate>
+                                        <DataTemplate
+                                            DataType="{x:Type vms:ParamViewModel}">
+                                            <edits:ParamControl
+                                                Description="{Binding Description}"
+                                                DetailDescription="{Binding DetailDescription}"
+                                                SourceParamName="{Binding SourceParamName, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
+                                                TargetParamName="{Binding TargetParamName, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
+                                                IsChecked="{Binding IsChecked, Mode=TwoWay}"
+                                                IsPair="{Binding IsPair, Mode=TwoWay}"
+                                                HasWarning="{Binding HasWarning, Mode=TwoWay}"
+                                                WarningDescription="{Binding Warnings}" />
+                                        </DataTemplate>
+                                    </ItemsControl.ItemTemplate>
 
-                    <ComboBox
-                        ItemsSource="{Binding PositionsBottom}"
-                        SelectedValue="{Binding SelectedPositionBottom}"
-                        DisplayMemberPath="Name" />
-                </edits:CustomEditControl>
+                                    <ItemsControl.ItemsPanel>
+                                        <ItemsPanelTemplate>
+                                            <StackPanel />
+                                        </ItemsPanelTemplate>
+                                    </ItemsControl.ItemsPanel>
+                                </ItemsControl>
+                            </edits:CustomGroupEditControl.EditControl>
+                        </edits:CustomGroupEditControl>
+                    </StackPanel>
+                </GroupBox>
 
-                <edits:CustomEditControl
-                    Icon="{ui:SymbolIcon fullScreenMaximize24}"
-                    Header="{me:LocalizationSource MainWindow.SearchSide}"
-                    Description="{me:LocalizationSource MainWindow.SearchSideDescription}">
+                <GroupBox
+                    Margin="0,0,0,10"
+                    BorderThickness="0"
+                    Header="{me:LocalizationSource MainWindow.GroupBoxVolumes}"
+                    FontWeight="DemiBold">
+                    <StackPanel>
+                        <edits:CustomEditControl
+                            Icon="{ui:SymbolIcon fullScreenMinimize24}"
+                            Header="{me:LocalizationSource MainWindow.PositionUp}"
+                            Description="{me:LocalizationSource MainWindow.PositionUpDescription}">
 
-                    <ui:TextBox
-                        Text="{Binding SearchSide, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-                        ToolTip="{me:LocalizationSource MainWindow.SearchSideTooltip}"/>
-                </edits:CustomEditControl>
+                            <ComboBox
+                                ItemsSource="{Binding PositionUp}"
+                                SelectedValue="{Binding SelectedPositionUp}"
+                                DisplayMemberPath="Name" />
+                        </edits:CustomEditControl>
 
-                <edits:CustomGroupEditControl
-                    Icon="{ui:SymbolIcon clipboardTaskListLtr24}"
-                    Header="{me:LocalizationSource MainWindow.Params}"
-                    Description="{me:LocalizationSource MainWindow.ParamsDescription}"
-                    ExtraIconVisible="True">
-                    <edits:CustomGroupEditControl.ExtraIcon>
-                        <ui:SymbolIcon
-                            Symbol="Warning24"
-                            Foreground="OrangeRed"
-                            FontSize="24"
-                            ToolTip="{me:LocalizationSource MainWindow.ParamWarningTooltip}"
-                            Visibility="{Binding HasParamWarning, Converter={StaticResource ParamWarningIconVisible}}" />
-                    </edits:CustomGroupEditControl.ExtraIcon>
+                        <edits:CustomEditControl
+                            Icon="{ui:SymbolIcon fullScreenMinimize24}"
+                            Header="{me:LocalizationSource MainWindow.PositionBottom}"
+                            Description="{me:LocalizationSource MainWindow.PositionBottomDescription}">
 
-                    <edits:CustomGroupEditControl.EditControl>
-                        <ItemsControl
-                            ItemsSource="{Binding Params}">
-                            <ItemsControl.ItemTemplate>
-                                <DataTemplate
-                                    DataType="{x:Type vms:ParamViewModel}">
-                                    <edits:ParamControl
-                                        Description="{Binding Description}"
-                                        DetailDescription="{Binding DetailDescription}"
-                                        SourceParamName="{Binding SourceParamName, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
-                                        TargetParamName="{Binding TargetParamName, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
-                                        IsChecked="{Binding IsChecked, Mode=TwoWay}"
-                                        IsPair="{Binding IsPair, Mode=TwoWay}"
-                                        HasWarning="{Binding HasWarning, Mode=TwoWay}"
-                                        WarningDescription="{Binding Warnings}" />
-                                </DataTemplate>
-                            </ItemsControl.ItemTemplate>
+                            <ComboBox
+                                ItemsSource="{Binding PositionBottom}"
+                                SelectedValue="{Binding SelectedPositionBottom}"
+                                DisplayMemberPath="Name" />
+                        </edits:CustomEditControl>
 
-                            <ItemsControl.ItemsPanel>
-                                <ItemsPanelTemplate>
-                                    <StackPanel />
-                                </ItemsPanelTemplate>
-                            </ItemsControl.ItemsPanel>
-                        </ItemsControl>
-                    </edits:CustomGroupEditControl.EditControl>
+                        <edits:CustomEditControl
+                            Icon="{ui:SymbolIcon fullScreenMaximize24}"
+                            Header="{me:LocalizationSource MainWindow.SearchSide}"
+                            Description="{me:LocalizationSource MainWindow.SearchSideDescription}">
 
-                </edits:CustomGroupEditControl>  
+                            <ui:TextBox
+                                Text="{Binding SearchSide, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                ToolTip="{me:LocalizationSource MainWindow.SearchSideTooltip}" />
+                        </edits:CustomEditControl>
+                    </StackPanel>
+                </GroupBox>
             </StackPanel>
         </ScrollViewer>
 

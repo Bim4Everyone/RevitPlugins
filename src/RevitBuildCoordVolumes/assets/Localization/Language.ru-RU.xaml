@@ -3,17 +3,17 @@
                     xmlns:system="clr-namespace:System;assembly=mscorlib">    
 
     <system:String x:Key="MainWindow.Title">Построить объемы СМР</system:String>
-    <system:String x:Key="MainWindow.SourceFiles">Тип файла с геометрией</system:String>
-    <system:String x:Key="MainWindow.SourceFilesDescription">Файл, где расположены плиты перекрытий</system:String>
-    <system:String x:Key="MainWindow.TypeZones">Зоны</system:String>
-    <system:String x:Key="MainWindow.TypeZonesDescription">Выбор зон для построения объемных элементов</system:String>
-    <system:String x:Key="MainWindow.TypeSlabs">Типоразмер плит перекрытий</system:String>
-    <system:String x:Key="MainWindow.TypeSlabsDescription">Часть имени типоразмера, использующиеся для определения основы</system:String>
+    <system:String x:Key="MainWindow.SourceFiles">Файлы с плитами перекрытий</system:String>
+    <system:String x:Key="MainWindow.SourceFilesDescription">Файлы, где расположены плиты перекрытий</system:String>
+    <system:String x:Key="MainWindow.TypeZones">Тип зоны</system:String>
+    <system:String x:Key="MainWindow.TypeZonesDescription">Выбор типа зоны для построения объемных элементов</system:String>
+    <system:String x:Key="MainWindow.TypeSlabs">Типоразмеры плит перекрытий</system:String>
+    <system:String x:Key="MainWindow.TypeSlabsDescription">Типоразмеры плит использующиеся для определения основы</system:String>
 
-    <system:String x:Key="MainWindow.PositionsUp">Позиция верха объемного элемента</system:String>
-    <system:String x:Key="MainWindow.PositionsUpDescription">Относительно какой точки плиты строить верх объемного элемента</system:String>
-    <system:String x:Key="MainWindow.PositionsBottom">Позиция низа объемного элемента</system:String>
-    <system:String x:Key="MainWindow.PositionsBottomDescription">Относительно какой точки плиты строить низ объемного элемента</system:String>
+    <system:String x:Key="MainWindow.PositionUp">Позиция верха объемного элемента</system:String>
+    <system:String x:Key="MainWindow.PositionUpDescription">Относительно какой точки плиты строить верх объемного элемента</system:String>
+    <system:String x:Key="MainWindow.PositionBottom">Позиция низа объемного элемента</system:String>
+    <system:String x:Key="MainWindow.PositionBottomDescription">Относительно какой точки плиты строить низ объемного элемента</system:String>
 
     <system:String x:Key="MainWindow.SearchSide">Длина стороны поисковой фигуры в мм</system:String>
     <system:String x:Key="MainWindow.SearchSideDescription">Фигуры, на которые разбивается зона для построения объема</system:String>
@@ -24,8 +24,46 @@
     <system:String x:Key="MainWindow.ParamsToggleSwitchOn">Использовать параметр</system:String>
     <system:String x:Key="MainWindow.ParamsToggleSwitchOff">Не использовать параметр</system:String>
     <system:String x:Key="MainWindow.ParamWarningTooltip">В некоторых параметрах есть ошибки</system:String>
+    
+    <system:String x:Key="MainWindow.SourceParamHeader">Параметр зон</system:String>
+    <system:String x:Key="MainWindow.TargetParamHeader">Параметр объемных элементов</system:String>
+
+    <system:String x:Key="MainWindow.SearchTextDocs">Поиск по имени файла</system:String>
+    <system:String x:Key="MainWindow.SearchTextSlabs">Поиск по имени типоразмера</system:String>
+
+    <system:String x:Key="MainWindow.GroupBoxGeometry">Настройки геометрии</system:String>
+    <system:String x:Key="MainWindow.GroupBoxParameters">Настройки параметров</system:String>
+    <system:String x:Key="MainWindow.GroupBoxVolumes">Настройки объемных элементов</system:String>
 
     <system:String x:Key="MainWindow.ButtonOk">Построить</system:String>
     <system:String x:Key="MainWindow.ButtonCancel">Отменить</system:String>
+    
+    <system:String x:Key="MainViewModel.UpPosition">Верх плиты перекрытия</system:String>
+    <system:String x:Key="MainViewModel.BottomPosition">Низ плиты перекрытия</system:String>
+
+    <system:String x:Key="MainViewModel.DescriptionParamDescription">Параметр типа зон</system:String>
+    <system:String x:Key="MainViewModel.DescriptionParamDetailDescription">Используется для определения типа зон</system:String>
+    <system:String x:Key="MainViewModel.BlockParamDescription">Параметр блока СМР</system:String>
+    <system:String x:Key="MainViewModel.BlockParamDetailDescription">Используется для определения корпуса здания</system:String>
+    <system:String x:Key="MainViewModel.SectionParamDescription">Параметр секции СМР</system:String>
+    <system:String x:Key="MainViewModel.SectionParamDetailDescription">Используется для определения секции здания</system:String>
+    <system:String x:Key="MainViewModel.FloorParamDescription">Параметр этажа СМР</system:String>
+    <system:String x:Key="MainViewModel.FloorParamDetailDescription">Используется для определения этажа здания</system:String>
+    <system:String x:Key="MainViewModel.FloorDEParamDescription">Дополнительный параметр этажа СМР</system:String>
+    <system:String x:Key="MainViewModel.FloorDEParamDetailDescription">Используется для определения этажа здания</system:String>
+
+    <system:String x:Key="MainViewModel.NoDocuments">Не выбраны файлы с перекрытиями</system:String>
+    <system:String x:Key="MainViewModel.NoParams">Не выбраны параметры</system:String>
+    <system:String x:Key="MainViewModel.NoSlabs">Не выбраны плиты перекрытий</system:String>
+    <system:String x:Key="MainViewModel.NoTypeZone">Не выбран тип зон</system:String>
+    <system:String x:Key="MainViewModel.ErrorParams">Ошибки в параметрах</system:String>
+    <system:String x:Key="MainViewModel.SearchSideNoDouble">Вводимые данные должны быть числом</system:String>
+    <system:String x:Key="MainViewModel.SearchSideNoNegate">Вводимые данные должны быть положительными</system:String>
+    <system:String x:Key="MainViewModel.SearchSideNoZero">Вводимые данные должны быть больше нуля</system:String>
+    <system:String x:Key="MainViewModel.SearchSideBig">Вводимые данные не должны превышать 500 мм</system:String>
+    <system:String x:Key="MainViewModel.SearchSideSmall">Вводимые данные не должны быть меньше 10 мм</system:String>
+
+    <system:String x:Key="ParamViewModel.WarningStartString">Ошибочные параметры:</system:String>
+    <system:String x:Key="DocumentViewModel.CurrentFile">Текущий файл (открытый)</system:String>
 
 </ResourceDictionary>

@@ -4,6 +4,8 @@ using System.Linq;
 
 using Autodesk.Revit.DB;
 
+using RevitBuildCoordVolumes.Models.Geometry;
+
 namespace RevitBuildCoordVolumes.Models;
 internal class AreaDivider {
 

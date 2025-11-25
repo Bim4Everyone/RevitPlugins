@@ -23,8 +23,17 @@ internal static class RevitConstants {
     // Наиболее оптимальная сторона фигуры для поиска плиты в миллиметрах
     public static double SearchSide = 50;
 
+    // Параметр, значения которого используется дли идентификации зон
+    //public static RevitParam ZoneParama = SharedParamsConfig.Instance.Description;
+
+
     // Утвержденные карты параметров, которые используются в проектах разных дисциплин
     private static readonly List<ParamMap> _allParamMaps = [
+        new ParamMap {
+            Type = ParamType.DescriptionParam,
+            SourceParam = SharedParamsConfig.Instance.Description,
+            TargetParam = SharedParamsConfig.Instance.Description
+        },
         new ParamMap {
             Type = ParamType.BlockParam,
             SourceParam = SharedParamsConfig.Instance.BuildingWorksBlock,
@@ -44,11 +53,6 @@ internal static class RevitConstants {
             Type = ParamType.FloorDEParam,
             SourceParam = SharedParamsConfig.Instance.BuildingWorksLevelCurrency,
             TargetParam = SharedParamsConfig.Instance.BuildingWorksLevelCurrency
-        },
-        new ParamMap {
-            Type = ParamType.BlockingParam,
-            SourceParam = null,
-            TargetParam = SharedParamsConfig.Instance.FixBuildingWorks
         },
     ];
 

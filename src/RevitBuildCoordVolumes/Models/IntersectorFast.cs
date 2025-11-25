@@ -67,7 +67,7 @@ internal class IntersectorFast {
 
             foreach(var elem in collector) {
                 string typeName = elem.Name ?? "";
-                if(!RevitConstants.SlabTypeNames.Any(s => typeName.IndexOf(s, StringComparison.OrdinalIgnoreCase) >= 0)) {
+                if(!RevitConstants.GetDefaultSlabTypeNames().Any(s => typeName.IndexOf(s, StringComparison.OrdinalIgnoreCase) >= 0)) {
                     continue;
                 }
 
