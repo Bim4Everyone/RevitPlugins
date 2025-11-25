@@ -29,10 +29,24 @@
     </ResourceDictionary.MergedDictionaries>
 
     <Style
+        x:Key="ComboBoxWithTooltipStyle"
+        TargetType="{x:Type ComboBox}"
+        BasedOn="{StaticResource DefaultComboBoxStyle}">
+        <Setter
+            Property="ToolTipService.InitialShowDelay"
+            Value="1000" />
+        <Setter
+            Property="ToolTipService.ShowDuration"
+            Value="20000" />
+        <Setter
+            Property="ToolTipService.BetweenShowDelay"
+            Value="1" />
+    </Style>
+    
+    <Style
         x:Key="TextBoxWithTooltipStyle"
         TargetType="{x:Type TextBox}"
         BasedOn="{StaticResource DefaultTextBoxStyle}">
-
         <Setter
             Property="ToolTipService.InitialShowDelay"
             Value="1000" />

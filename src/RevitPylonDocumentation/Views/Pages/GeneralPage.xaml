@@ -448,13 +448,13 @@
                     Text="Лист"
                     Style="{StaticResource CustomTextBlock}" />
 
-                <controls:TextBoxSettingControl
-                    Grid.Row="1"
-                    LabelText="Параметр фильтрации типовых пилонов"
-                    TextBoxText="{Binding ProjectSettings.TypicalPylonFilterParameterTemp}"
-                    ToolTipText="Параметр фильтрации типовых пилонов"
-                    TextChangedCommand="{Binding SettingsChangedCommand}" />
-
+                <controls:ComboBoxSettingControl
+                    Grid.Row="2"
+                    LabelText="Выберите типоразмер рамки листа:"
+                    ItemsSource="{Binding TitleBlocks}"
+                    SelectedItem="{Binding TypesSettings.SelectedTitleBlock}"
+                    ToolTipText="Выберите типоразмер рамки листа"
+                    SelectionChangedCommand="{Binding SettingsChangedCommand}" />
             </StackPanel>
         </Border>
 
