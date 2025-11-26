@@ -15,10 +15,10 @@
     mc:Ignorable="d"
     WindowStartupLocation="CenterOwner"
 
-    Height="800" 
+    Height="900" 
     Width="1000"
     
-    MinHeight="800"
+    MinHeight="900"
     MinWidth="1000"
     
     d:DataContext="{d:DesignInstance vms:RoomsViewModel, IsDesignTimeCreatable=False}">
