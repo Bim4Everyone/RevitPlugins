@@ -118,7 +118,6 @@ internal class BimFileViewModel : BaseViewModel {
             using(var window = _progressDialogFactory.CreateDialog()) {
                 window.MaxValue = commands.Count;
                 window.DisplayTitleFormat = _localizationService.GetLocalizedString("ProgressDialog.Title");
-                ;
                 window.Show();
 
                 int counter = 1;
