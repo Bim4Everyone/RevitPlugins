@@ -304,29 +304,29 @@
                                 Margin="5"
                                 Command="{Binding RoomsNums.UpOrderCommand}"
                                 CommandParameter="{Binding SelectedItems, ElementName=listbox}"
-                                Icon="{ui:SymbolIcon ArrowCircleUp12, FontSize=20}" />
+                                Icon="{ui:SymbolIcon ArrowCircleUp16, FontSize=20}" />
                             <ui:Button
                                 ToolTip="{me:LocalizationSource RoomNumsWindow.ButtonDownToolTip}"
                                 Margin="5"
                                 Command="{Binding RoomsNums.DownOrderCommand}"
                                 CommandParameter="{Binding SelectedItems, ElementName=listbox}"
-                                Icon="{ui:SymbolIcon ArrowCircleDown12, FontSize=20}" />
+                                Icon="{ui:SymbolIcon ArrowCircleDown16, FontSize=20}" />
                             <ui:Button
                                 ToolTip="{me:LocalizationSource RoomNumsWindow.ButtonAddToolTip}"
                                 Margin="5"
                                 Command="{Binding RoomsNums.AddOrderCommand}"
-                                Icon="{ui:SymbolIcon AddCircle12, FontSize=20}" />
+                                Icon="{ui:SymbolIcon AddCircle16, FontSize=20}" />
                             <ui:Button
                                 ToolTip="{me:LocalizationSource RoomNumsWindow.ButtonDeleteToolTip}"
                                 Margin="5"
                                 Command="{Binding RoomsNums.RemoveOrderCommand}"
                                 CommandParameter="{Binding SelectedItems, ElementName=listbox}"
-                                Icon="{ui:SymbolIcon Delete12, FontSize=20}" />
+                                Icon="{ui:SymbolIcon Delete16, FontSize=20}" />
                             <ui:Button
                                 ToolTip="{me:LocalizationSource RoomNumsWindow.ButtonSaveToolTip}"
                                 Margin="5"
                                 Command="{Binding RoomsNums.SaveOrderCommand}"
-                                Icon="{ui:SymbolIcon Save20, FontSize=20}" />
+                                Icon="{ui:SymbolIcon Save16, FontSize=20}" />
                         </StackPanel>
                     </Grid>
                 </Border>
