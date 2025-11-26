@@ -30,8 +30,10 @@ internal class NumOrderWindowService {
         };
 
         if(window.ShowDialog() == true) {
-            var selection = (window.DataContext as NumberingOrderSelectViewModel).SelectedNumberingOrders;
-            numberingOrder.SelectNumberingOrder(selection.OfType<NumberingOrderViewModel>());
+            var selection = (window.DataContext as NumberingOrderSelectViewModel)
+                .NumberingOrders
+                .Where(x => x.IsSelected);
+            numberingOrder.SelectNumberingOrder(selection);
             _numberingOrder = numberingOrder;
             return true;
         }

@@ -16,11 +16,11 @@
     mc:Ignorable="d"
     WindowStartupLocation="CenterScreen"
     
-    Height="600"
-    Width="700"
+    Height="500"
+    Width="600"
     
-    MinHeight="600"
-    MinWidth="700"
+    MinHeight="500"
+    MinWidth="600"
     
     d:DataContext="{d:DesignInstance vms:NumberingOrderSelectViewModel, IsDesignTimeCreatable=False}">
 
@@ -49,17 +49,20 @@
             Grid.Row="1"
             Margin="10,5"
             Style="{StaticResource CustomBorder}">
-            <ListBox
-                SelectionMode="Extended"
-                ItemsSource="{Binding NumberingOrders}"
-                DisplayMemberPath="Name">
-                <i:Interaction.Behaviors>
-                    <behaviors:SelectedItemsBehavior
-                        SelectedItems="{Binding DataContext.SelectedNumberingOrders, 
-                                                RelativeSource={RelativeSource AncestorType=Window},
-                                                Mode=TwoWay}" />
-                </i:Interaction.Behaviors>
-            </ListBox>
+            <ui:DataGrid
+                AutoGenerateColumns="False"
+                CanUserResizeColumns="True"
+                Style="{StaticResource CustomResizableDataGridStyle}"
+                HeadersVisibility="None"
+                ItemsSource="{Binding NumberingOrders}">
+                <DataGrid.Columns>
+                    <DataGridCheckBoxColumn
+                        Binding="{Binding Path=IsSelected, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" />
+                    <DataGridTextColumn
+                        Width="470"
+                        Binding="{Binding Path=Name}" />
+                </DataGrid.Columns>
+            </ui:DataGrid>
         </Border>
 
         <StackPanel 
