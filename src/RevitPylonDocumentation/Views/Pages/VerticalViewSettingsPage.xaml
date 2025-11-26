@@ -121,8 +121,7 @@
             </StackPanel>
         </Border>
 
-        <Border
-            Name="GeneralOffsets"
+        <Border Name="GeneralOffsets"
             Grid.Column="0"
             Grid.Row="2"
             Margin="15 7 7 15"
@@ -148,8 +147,7 @@
             </StackPanel>
         </Border>
 
-        <Border
-            Name="TransverseOffsets"
+        <Border Name="TransverseOffsets"
             Grid.Column="1"
             Grid.Row="2"
             Margin="7 7 15 15"

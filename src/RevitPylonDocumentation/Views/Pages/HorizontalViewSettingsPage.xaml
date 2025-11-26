@@ -1,45 +1,202 @@
-﻿<Page x:Class="RevitPylonDocumentation.Views.Pages.HorizontalViewSettingsPage"
-      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-      xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
-      xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
-      xmlns:local="clr-namespace:RevitPylonDocumentation.Views.Pages"
-      mc:Ignorable="d" 
-      d:DesignHeight="450" d:DesignWidth="800"
-      Title="HorizontalViewSettingsPage">
+﻿<core:WpfUIPlatformPage 
+    x:Class="RevitPylonDocumentation.Views.Pages.HorizontalViewSettingsPage"
+    x:ClassModifier="internal"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
+    
+    xmlns:core="clr-namespace:dosymep.WpfUI.Core"
+    xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
+    xmlns:me="clr-namespace:dosymep.WpfCore.MarkupExtensions;assembly=dosymep.WpfCore"
+    
+    xmlns:vms="clr-namespace:RevitPylonDocumentation.ViewModels"
+    xmlns:local="clr-namespace:RevitPylonDocumentation.Views.Pages"
+    xmlns:views="clr-namespace:RevitPylonDocumentation.Views"
+    xmlns:controls="clr-namespace:RevitPylonDocumentation.Views.Controls"
+    
+    mc:Ignorable="d"
+    ScrollViewer.CanContentScroll="False"
+    Title="HorizontalViewSettingsPage"
+    d:DesignHeight="700"
+    d:DesignWidth="600"
+    d:DataContext="{d:DesignInstance vms:MainViewModel, IsDesignTimeCreatable=False}">
+    <core:WpfUIPlatformPage.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary
+                    Source="../CustomStyles.xaml" />
+                <ResourceDictionary
+                    Source="../TooltipsDictionary.xaml" />
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
+    </core:WpfUIPlatformPage.Resources>
 
     <Grid>
         <Grid.ColumnDefinitions>
-            <ColumnDefinition
-                Width="*" />
-            <ColumnDefinition
-                Width="*" />
+            <ColumnDefinition Width="*" />
+            <ColumnDefinition Width="*" />
         </Grid.ColumnDefinitions>
         <Grid.RowDefinitions>
-            <RowDefinition
-                Height="*" />
-            <RowDefinition
-                Height="*" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
 
         <Border
-            Grid.Row="0"
-            Grid.RowSpan="2"
+            Name="FormworkProps"
             Grid.Column="0"
-            Margin="8"
-            Background="Aquamarine"
-            CornerRadius="8" />
-        <Border
             Grid.Row="0"
-            Grid.Column="1"
-            Margin="8"
-            Background="Gray"
-            CornerRadius="8" />
+            Margin="15 15 7 7"
+            Style="{StaticResource CustomBorder}">
+            <StackPanel>
+                <controls:DoubleTextBoxSettingControl
+                    LabelText="Маска имени первого горизонтального вида пилона:"
+                    FirstTextBoxText="{Binding Path=ViewSectionSettings.TransverseViewFirstPrefixTemp, UpdateSourceTrigger=PropertyChanged}"
+                    SecondTextBoxText="{Binding Path=ViewSectionSettings.TransverseViewFirstSuffixTemp, UpdateSourceTrigger=PropertyChanged}"
+                    ToolTipText="Маска имени первого горизонтального вида пилона"
+                    TextChangedCommand="{Binding SettingsChangedCommand}" />
+                
+                <controls:DoubleTextBoxSettingControl
+                    LabelText="Маска имени второго горизонтального вида пилона:"
+                    FirstTextBoxText="{Binding Path=ViewSectionSettings.TransverseViewSecondPrefixTemp, UpdateSourceTrigger=PropertyChanged}"
+                    SecondTextBoxText="{Binding Path=ViewSectionSettings.TransverseViewSecondSuffixTemp, UpdateSourceTrigger=PropertyChanged}"
+                    ToolTipText="Маска имени второго горизонтального вида пилона"
+                    TextChangedCommand="{Binding SettingsChangedCommand}" />
+                
+                <controls:DoubleTextBoxSettingControl
+                    LabelText="Маска имени третьего горизонтального вида пилона:"
+                    FirstTextBoxText="{Binding Path=ViewSectionSettings.TransverseViewThirdPrefixTemp, UpdateSourceTrigger=PropertyChanged}"
+                    SecondTextBoxText="{Binding Path=ViewSectionSettings.TransverseViewThirdSuffixTemp, UpdateSourceTrigger=PropertyChanged}"
+                    ToolTipText="Маска имени третьего горизонтального вида пилона"
+                    TextChangedCommand="{Binding SettingsChangedCommand}" />
+
+                <controls:ComboBoxSettingControl
+                    LabelText="Выберите шаблон горизонтального вида:"
+                    ItemsSource="{Binding ViewTemplatesInPj}"
+                    SelectedItem="{Binding TypesSettings.SelectedTransverseViewTemplate}"
+                    ToolTipText="Выберите шаблон горизонтального вида"
+                    SelectionChangedCommand="{Binding SettingsChangedCommand}"
+                    ItemTemplate="{StaticResource WithoutFamilyNameItemTemplate}" />
+
+                <controls:TextBoxSettingControl
+                    LabelText="Глубина горизонтального вида"
+                    TextBoxText="{Binding Path=ViewSectionSettings.TransverseViewDepthTemp, UpdateSourceTrigger=PropertyChanged}"
+                    ToolTipText="Глубина горизонтального вида"
+                    TextChangedCommand="{Binding SettingsChangedCommand}" />
+            </StackPanel>
+        </Border>
+
         <Border
-            Grid.Row="1"
+            Name="RebarProps"
             Grid.Column="1"
-            Margin="8"
-            Background="DarkOrange"
-            CornerRadius="8" />
+            Grid.Row="0"
+            Margin="7 15 15 7"
+            Style="{StaticResource CustomBorder}">
+            <StackPanel>
+                <controls:DoubleTextBoxSettingControl
+                    LabelText="Маска имени первого горизонтального вида армирования пилона:"
+                    FirstTextBoxText="{Binding Path=ViewSectionSettings.TransverseRebarViewFirstPrefixTemp, UpdateSourceTrigger=PropertyChanged}"
+                    SecondTextBoxText="{Binding Path=ViewSectionSettings.TransverseRebarViewFirstSuffixTemp, UpdateSourceTrigger=PropertyChanged}"
+                    ToolTipText="Маска имени первого горизонтального вида пилона"
+                    TextChangedCommand="{Binding SettingsChangedCommand}" />
+
+                <controls:DoubleTextBoxSettingControl
+                    LabelText="Маска имени второго горизонтального вида армирования пилона:"
+                    FirstTextBoxText="{Binding Path=ViewSectionSettings.TransverseRebarViewSecondPrefixTemp, UpdateSourceTrigger=PropertyChanged}"
+                    SecondTextBoxText="{Binding Path=ViewSectionSettings.TransverseRebarViewSecondSuffixTemp, UpdateSourceTrigger=PropertyChanged}"
+                    ToolTipText="Маска имени второго горизонтального вида пилона"
+                    TextChangedCommand="{Binding SettingsChangedCommand}" />
+
+                <controls:DoubleTextBoxSettingControl
+                    LabelText="Маска имени третьего горизонтального вида армирования пилона:"
+                    FirstTextBoxText="{Binding Path=ViewSectionSettings.TransverseRebarViewThirdPrefixTemp, UpdateSourceTrigger=PropertyChanged}"
+                    SecondTextBoxText="{Binding Path=ViewSectionSettings.TransverseRebarViewThirdSuffixTemp, UpdateSourceTrigger=PropertyChanged}"
+                    ToolTipText="Маска имени третьего горизонтального вида пилона"
+                    TextChangedCommand="{Binding SettingsChangedCommand}" />
+
+                <controls:ComboBoxSettingControl
+                    LabelText="Выберите шаблон горизонтального вида армирования:"
+                    ItemsSource="{Binding ViewTemplatesInPj}"
+                    SelectedItem="{Binding TypesSettings.SelectedTransverseRebarViewTemplate}"
+                    ToolTipText="Выберите шаблон горизонтального вида армирования"
+                    SelectionChangedCommand="{Binding SettingsChangedCommand}"
+                    ItemTemplate="{StaticResource WithoutFamilyNameItemTemplate}" />
+
+                <controls:TextBoxSettingControl
+                    LabelText="Глубина горизонтального вида армирования"
+                    TextBoxText="{Binding Path=ViewSectionSettings.TransverseRebarViewDepthTemp, UpdateSourceTrigger=PropertyChanged}"
+                    ToolTipText="Глубина горизонтального вида"
+                    TextChangedCommand="{Binding SettingsChangedCommand}" />
+            </StackPanel>
+        </Border>
+
+        <Border
+            Name="ElevationProps"
+            Grid.Column="0"
+            Grid.Row="1"
+            Margin="15 15 7 7"
+            Style="{StaticResource CustomBorder}">
+            <StackPanel>
+                <controls:TextBoxSettingControl
+                    LabelText="Отступ снизу до первого горизонтального вида"
+                    TextBoxText="{Binding Path=ViewSectionSettings.TransverseViewFirstElevationTemp, UpdateSourceTrigger=PropertyChanged}"
+                    ToolTipText="Отступ снизу до первого горизонтального вида"
+                    TextChangedCommand="{Binding SettingsChangedCommand}" />
+
+                <controls:TextBoxSettingControl
+                    LabelText="Отступ сверху до второго горизонтального вида"
+                    TextBoxText="{Binding Path=ViewSectionSettings.TransverseViewSecondElevationTemp, UpdateSourceTrigger=PropertyChanged}"
+                    ToolTipText="Отступ сверху до второго горизонтального вида"
+                    TextChangedCommand="{Binding SettingsChangedCommand}" />
+
+                <controls:TextBoxSettingControl
+                    LabelText="Отступ сверху до третьего горизонтального вида"
+                    TextBoxText="{Binding Path=ViewSectionSettings.TransverseViewThirdElevationTemp, UpdateSourceTrigger=PropertyChanged}"
+                    ToolTipText="Отступ сверху до третьего горизонтального вида"
+                    TextChangedCommand="{Binding SettingsChangedCommand}" />
+            </StackPanel>
+        </Border>
+
+        <Border
+            Name="ViewOffsets"
+            Grid.Column="1"
+            Grid.Row="1"
+            Margin="7 15 15 7"
+            Style="{StaticResource CustomBorder}">
+            <StackPanel>
+                <controls:TextBoxSettingControl
+                    LabelText="Отступ по X у горизонтального вида"
+                    TextBoxText="{Binding Path=ViewSectionSettings.TransverseViewXOffsetTemp, UpdateSourceTrigger=PropertyChanged}"
+                    ToolTipText="Отступ по X у горизонтального вида"
+                    TextChangedCommand="{Binding SettingsChangedCommand}" />
+
+                <controls:TextBoxSettingControl
+                    LabelText="Отступ по Y у горизонтального вида"
+                    TextBoxText="{Binding Path=ViewSectionSettings.TransverseViewYOffsetTemp, UpdateSourceTrigger=PropertyChanged}"
+                    ToolTipText="Отступ по X у горизонтального вида"
+                    TextChangedCommand="{Binding SettingsChangedCommand}" />
+            </StackPanel>
+        </Border>
+
+        <Border
+            Name="ViewTypeProps"
+            Grid.Column="0"
+            Grid.ColumnSpan="2"
+            Grid.Row="2"
+            Margin="15 7 15 7"
+            Style="{StaticResource CustomBorder}">
+            <StackPanel>
+                <controls:ComboBoxSettingControl
+                    LabelText="Выберите типоразмер для горизонтальных видов:"
+                    ItemsSource="{Binding ViewFamilyTypes}"
+                    SelectedItem="{Binding TypesSettings.SelectedViewFamilyType}"
+                    ToolTipText="Выберите типоразмер для горизонтальных видов"
+                    SelectionChangedCommand="{Binding SettingsChangedCommand}"
+                    ItemTemplate="{StaticResource WithoutFamilyNameItemTemplate}" />
+            </StackPanel>
+        </Border>
     </Grid>
-</Page>
+</core:WpfUIPlatformPage>

@@ -537,13 +537,13 @@
             Orientation="Horizontal"
             HorizontalAlignment="Right">
             <TextBlock
-                Margin="10"
+                Margin="10 5 10 15"
                 Foreground="Orange"
                 VerticalAlignment="Center"
                 Text="{Binding ErrorText}" />
 
             <ui:Button
-                Margin="10"
+                Margin="10 5 10 15"
                 MinWidth="150"
                 Content="Ок"
                 Appearance="Info"
@@ -551,7 +551,7 @@
                 Click="ButtonOk_Click" />
 
             <ui:Button
-                Margin="10"
+                Margin="10 5 15 15"
                 MinWidth="150"
                 Content="Отмена"
                 Click="ButtonCancel_Click" />
