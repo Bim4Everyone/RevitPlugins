@@ -18,8 +18,8 @@
     mc:Ignorable="d"
     WindowStartupLocation="CenterOwner"
     
-    Height="1000"    Width="1200"
-    MinHeight="1000" MinWidth="1200"
+    Height="1000"    Width="1500"
+    MinHeight="1000" MinWidth="1500"
     
     d:DataContext="{d:DesignInstance vms:MainViewModel, IsDesignTimeCreatable=False}">
 
@@ -69,7 +69,7 @@
             FrameMargin="0"
             PaneDisplayMode="Left"
             PaneTitle="Настройки"
-            OpenPaneLength="200"
+            OpenPaneLength="300"
             IsPaneOpen="True"
             IsBackButtonVisible="Collapsed"
             IsPaneVisible="True">

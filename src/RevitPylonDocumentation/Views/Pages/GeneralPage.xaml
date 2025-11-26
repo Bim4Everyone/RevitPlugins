@@ -152,57 +152,6 @@
                             </CheckBox>
                         </DataTemplate>
                     </ui:ListView.ItemTemplate>
-
-                    <!--<ui:ListView.Resources>
-                        <Style
-                            TargetType="Border">
-                            <Setter
-                                Property="CornerRadius"
-                                Value="7" />
-                        </Style>
-                    </ui:ListView.Resources>
-
-                    <ui:ListView.ItemTemplate>
-                        <DataTemplate>
-                            <StackPanel
-                                Orientation="Horizontal"
-                                Margin="5">
-                                <CheckBox
-                                    x:Name="chk"
-                                    IsChecked="{Binding Path=IsCheck, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" />
-                                <TextBlock
-                                    Margin="10 0 0 0"
-                                    Text="{Binding Path=PylonKeyName}" />
-                            </StackPanel>
-                        </DataTemplate>
-                    </ui:ListView.ItemTemplate>
-
-                    <ui:ListView.ItemContainerStyle>
-                        <Style
-                            TargetType="{x:Type ListBoxItem}">
-                            <Setter
-                                Property="Margin"
-                                Value="3" />
-                            <Setter
-                                Property="IsSelected"
-                                Value="{Binding Path=IsCheck, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" />
-                            <Setter
-                                Property="Template">
-                                <Setter.Value>
-                                    <ControlTemplate
-                                        TargetType="{x:Type ListBoxItem}">
-                                        <Border
-                                            CornerRadius="5"
-                                            Background="{TemplateBinding Background}"
-                                            BorderThickness="1">
-
-                                            <ContentPresenter />
-                                        </Border>
-                                    </ControlTemplate>
-                                </Setter.Value>
-                            </Setter>
-                        </Style>
-                    </ui:ListView.ItemContainerStyle>-->
                 </ui:ListView>
             </Grid>
         </Border>

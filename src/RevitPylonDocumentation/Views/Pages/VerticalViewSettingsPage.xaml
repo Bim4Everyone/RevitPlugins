@@ -103,28 +103,10 @@
             </StackPanel>
         </Border>
 
-        <Border Name="ViewTypeProps"
-            Grid.Column="0"
-            Grid.ColumnSpan="2"
-            Grid.Row="1"
-            Margin="15 7 15 7"
-            Style="{StaticResource CustomBorder}">
-            <StackPanel>
-                <controls:ComboBoxSettingControl
-                    Grid.Row="2"
-                    LabelText="Выберите типоразмер для основного и бокового видов:"
-                    ItemsSource="{Binding ViewFamilyTypes}"
-                    SelectedItem="{Binding TypesSettings.SelectedViewFamilyType}"
-                    ToolTipText="Выберите типоразмер для основного и бокового видов"
-                    SelectionChangedCommand="{Binding SettingsChangedCommand}"
-                    ItemTemplate="{StaticResource WithoutFamilyNameItemTemplate}" />
-            </StackPanel>
-        </Border>
-
         <Border Name="GeneralOffsets"
             Grid.Column="0"
-            Grid.Row="2"
-            Margin="15 7 7 15"
+            Grid.Row="1"
+            Margin="15 7 7 7"
             Style="{StaticResource CustomBorder}">
             <StackPanel>
                 <controls:TextBoxSettingControl
@@ -149,8 +131,8 @@
 
         <Border Name="TransverseOffsets"
             Grid.Column="1"
-            Grid.Row="2"
-            Margin="7 7 15 15"
+            Grid.Row="1"
+            Margin="7 7 15 7"
             Style="{StaticResource CustomBorder}">
             <StackPanel>
                 <controls:TextBoxSettingControl
@@ -170,6 +152,24 @@
                     TextBoxText="{Binding Path=ViewSectionSettings.GeneralViewPerpYBottomOffsetTemp, UpdateSourceTrigger=PropertyChanged}"
                     ToolTipText="Отступ по Y снизу у бокового вида"
                     TextChangedCommand="{Binding SettingsChangedCommand}" />
+            </StackPanel>
+        </Border>
+
+        <Border Name="ViewTypeProps"
+            Grid.Column="0"
+            Grid.ColumnSpan="2"
+            Grid.Row="2"
+            Margin="15 7 15 15"
+            Style="{StaticResource CustomBorder}">
+            <StackPanel>
+                <controls:ComboBoxSettingControl
+                    Grid.Row="2"
+                    LabelText="Выберите типоразмер для основного и бокового видов:"
+                    ItemsSource="{Binding ViewFamilyTypes}"
+                    SelectedItem="{Binding TypesSettings.SelectedViewFamilyType}"
+                    ToolTipText="Выберите типоразмер для основного и бокового видов"
+                    SelectionChangedCommand="{Binding SettingsChangedCommand}"
+                    ItemTemplate="{StaticResource WithoutFamilyNameItemTemplate}" />
             </StackPanel>
         </Border>
     </Grid>

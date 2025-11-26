@@ -1,17 +1,332 @@
-﻿<Page x:Class="RevitPylonDocumentation.Views.Pages.SchedulesPage"
-      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-      xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
-      xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
-      xmlns:local="clr-namespace:RevitPylonDocumentation.Views.Pages"
-      mc:Ignorable="d" 
-      d:DesignHeight="450" d:DesignWidth="800"
-      Title="SchedulesPage">
+﻿<core:WpfUIPlatformPage
+    x:Class="RevitPylonDocumentation.Views.Pages.SchedulesPage"
+    x:ClassModifier="internal"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
+    
+    xmlns:core="clr-namespace:dosymep.WpfUI.Core"
+    xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
+    xmlns:me="clr-namespace:dosymep.WpfCore.MarkupExtensions;assembly=dosymep.WpfCore"
+    
+    xmlns:vms="clr-namespace:RevitPylonDocumentation.ViewModels"
+    xmlns:local="clr-namespace:RevitPylonDocumentation.Views.Pages"
+    xmlns:views="clr-namespace:RevitPylonDocumentation.Views"
+    xmlns:controls="clr-namespace:RevitPylonDocumentation.Views.Controls"
+    
+    mc:Ignorable="d"
+    ScrollViewer.CanContentScroll="False"
+    Title="SchedulesPage"
+    d:DesignHeight="700"
+    d:DesignWidth="600"
+    d:DataContext="{d:DesignInstance vms:MainViewModel, IsDesignTimeCreatable=False}">
+    <core:WpfUIPlatformPage.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary
+                    Source="../CustomStyles.xaml" />
+                <ResourceDictionary
+                    Source="../TooltipsDictionary.xaml" />
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
+    </core:WpfUIPlatformPage.Resources>
 
-    <Grid>
-        <TextBlock
-            HorizontalAlignment="Center"
-            VerticalAlignment="Center"
-            Text="SchedulesPage" />
-    </Grid>
-</Page>
+    <ui:PassiveScrollViewer>
+        <Grid>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="*" />
+            </Grid.ColumnDefinitions>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+            </Grid.RowDefinitions>
+
+            <Border Name="SkeletonSpec"
+                Grid.Column="0"
+                Grid.Row="0"
+                Margin="15 15 7 7"
+                Style="{StaticResource CustomBorder}">
+                <StackPanel>
+                    <ui:TextBlock
+                        FontSize="16"
+                        Margin="5 0 5 5"
+                        Text="Спецификация каркасов"
+                        Style="{StaticResource CustomTextBlock}" />
+
+                    <controls:DoubleTextBoxSettingControl
+                        LabelText="Маска имени спецификации каркасов:"
+                        FirstTextBoxText="{Binding Path=SchedulesSettings.SkeletonSchedulePrefixTemp, UpdateSourceTrigger=PropertyChanged}"
+                        SecondTextBoxText="{Binding Path=SchedulesSettings.SkeletonScheduleSuffixTemp, UpdateSourceTrigger=PropertyChanged}"
+                        ToolTipText="Маска имени спецификации каркасов"
+                        TextChangedCommand="{Binding SettingsChangedCommand}" />
+
+                    <controls:TextBoxSettingControl
+                        LabelText="Имя для поиска эталонной спецификации каркасов:"
+                        TextBoxText="{Binding Path=SchedulesSettings.SkeletonScheduleNameTemp, UpdateSourceTrigger=PropertyChanged}"
+                        ToolTipText="Имя для поиска эталонной спецификации каркасов"
+                        TextChangedCommand="{Binding SettingsChangedCommand}" />
+
+                    <controls:TextBoxSettingControl
+                        LabelText="В параметр для группировки диспетчера 1:"
+                        TextBoxText="{Binding Path=SchedulesSettings.SkeletonScheduleDisp1Temp, UpdateSourceTrigger=PropertyChanged}"
+                        ToolTipText="В параметр для группировки диспетчера 1"
+                        TextChangedCommand="{Binding SettingsChangedCommand}" />
+
+                    <controls:TextBoxSettingControl
+                        LabelText="В параметр для группировки диспетчера 2:"
+                        TextBoxText="{Binding Path=SchedulesSettings.SkeletonScheduleDisp2Temp, UpdateSourceTrigger=PropertyChanged}"
+                        ToolTipText="В параметр для группировки диспетчера 2"
+                        TextChangedCommand="{Binding SettingsChangedCommand}" />
+                </StackPanel>
+            </Border>
+
+            <Border Name="SysPartSpec"
+                Grid.Column="1"
+                Grid.Row="0"
+                Margin="7 15 15 7"
+                Style="{StaticResource CustomBorder}">
+                <StackPanel>
+                    <ui:TextBlock
+                        FontSize="16"
+                        Margin="5 0 5 5"
+                        Text="Ведомость системных деталей"
+                        Style="{StaticResource CustomTextBlock}" />
+
+                    <controls:DoubleTextBoxSettingControl
+                        LabelText="Маска имени ведомости системных деталей:"
+                        FirstTextBoxText="{Binding Path=SchedulesSettings.SystemPartsSchedulePrefixTemp, UpdateSourceTrigger=PropertyChanged}"
+                        SecondTextBoxText="{Binding Path=SchedulesSettings.SystemPartsScheduleSuffixTemp, UpdateSourceTrigger=PropertyChanged}"
+                        ToolTipText="Маска имени ведомости системных деталей"
+                        TextChangedCommand="{Binding SettingsChangedCommand}" />
+
+                    <controls:TextBoxSettingControl
+                        LabelText="Имя для поиска эталонной ведомости системных деталей:"
+                        TextBoxText="{Binding Path=SchedulesSettings.SystemPartsScheduleNameTemp, UpdateSourceTrigger=PropertyChanged}"
+                        ToolTipText="Имя для поиска эталонной ведомости системных деталей"
+                        TextChangedCommand="{Binding SettingsChangedCommand}" />
+
+                    <controls:TextBoxSettingControl
+                        LabelText="В параметр для группировки диспетчера 1:"
+                        TextBoxText="{Binding Path=SchedulesSettings.SystemPartsScheduleDisp1Temp, UpdateSourceTrigger=PropertyChanged}"
+                        ToolTipText="В параметр для группировки диспетчера 1"
+                        TextChangedCommand="{Binding SettingsChangedCommand}" />
+
+                    <controls:TextBoxSettingControl
+                        LabelText="В параметр для группировки диспетчера 2:"
+                        TextBoxText="{Binding Path=SchedulesSettings.SystemPartsScheduleDisp2Temp, UpdateSourceTrigger=PropertyChanged}"
+                        ToolTipText="В параметр для группировки диспетчера 2"
+                        TextChangedCommand="{Binding SettingsChangedCommand}" />
+                </StackPanel>
+            </Border>
+            
+            <Border Name="SkeletonByElemsSpec"
+                Grid.Column="0"
+                Grid.Row="1"
+                Margin="15 7 7 7"
+                Style="{StaticResource CustomBorder}">
+                <StackPanel>
+                    <ui:TextBlock
+                        FontSize="16"
+                        Margin="5 0 5 5"
+                        Text="Спецификация элементов каркасов"
+                        Style="{StaticResource CustomTextBlock}" />
+
+                    <controls:DoubleTextBoxSettingControl
+                        LabelText="Маска имени спецификации элементов каркасов:"
+                        FirstTextBoxText="{Binding Path=SchedulesSettings.SkeletonByElemsSchedulePrefixTemp, UpdateSourceTrigger=PropertyChanged}"
+                        SecondTextBoxText="{Binding Path=SchedulesSettings.SkeletonByElemsScheduleSuffixTemp, UpdateSourceTrigger=PropertyChanged}"
+                        ToolTipText="Маска имени спецификации элементов каркасов"
+                        TextChangedCommand="{Binding SettingsChangedCommand}" />
+
+                    <controls:TextBoxSettingControl
+                        LabelText="Имя для поиска эталонной спецификации элементов каркасов:"
+                        TextBoxText="{Binding Path=SchedulesSettings.SkeletonByElemsScheduleNameTemp, UpdateSourceTrigger=PropertyChanged}"
+                        ToolTipText="Имя для поиска эталонной спецификации элементов каркасов"
+                        TextChangedCommand="{Binding SettingsChangedCommand}" />
+
+                    <controls:TextBoxSettingControl
+                        LabelText="В параметр для группировки диспетчера 1:"
+                        TextBoxText="{Binding Path=SchedulesSettings.SkeletonByElemsScheduleDisp1Temp, UpdateSourceTrigger=PropertyChanged}"
+                        ToolTipText="В параметр для группировки диспетчера 1"
+                        TextChangedCommand="{Binding SettingsChangedCommand}" />
+
+                    <controls:TextBoxSettingControl
+                        LabelText="В параметр для группировки диспетчера 2:"
+                        TextBoxText="{Binding Path=SchedulesSettings.SkeletonByElemsScheduleDisp2Temp, UpdateSourceTrigger=PropertyChanged}"
+                        ToolTipText="В параметр для группировки диспетчера 2"
+                        TextChangedCommand="{Binding SettingsChangedCommand}" />
+                </StackPanel>
+            </Border>
+
+            <Border Name="IfcPartSpec"
+                Grid.Column="1"
+                Grid.Row="1"
+                Margin="7 7 15 7"
+                Style="{StaticResource CustomBorder}">
+                <StackPanel>
+                    <ui:TextBlock
+                        Margin="5 0 5 5"
+                        FontSize="16"
+                        Text="Ведомость IFC деталей"
+                        Style="{StaticResource CustomTextBlock}" />
+
+                    <controls:DoubleTextBoxSettingControl
+                        LabelText="Маска имени ведомости IFC деталей:"
+                        FirstTextBoxText="{Binding Path=SchedulesSettings.IfcPartsSchedulePrefixTemp, UpdateSourceTrigger=PropertyChanged}"
+                        SecondTextBoxText="{Binding Path=SchedulesSettings.IfcPartsScheduleSuffixTemp, UpdateSourceTrigger=PropertyChanged}"
+                        ToolTipText="Маска имени ведомости IFC деталей"
+                        TextChangedCommand="{Binding SettingsChangedCommand}" />
+
+                    <controls:TextBoxSettingControl
+                        LabelText="Имя для поиска эталонной ведомости IFC деталей:"
+                        TextBoxText="{Binding Path=SchedulesSettings.IfcPartsScheduleNameTemp, UpdateSourceTrigger=PropertyChanged}"
+                        ToolTipText="Имя для поиска эталонной ведомости IFC деталей"
+                        TextChangedCommand="{Binding SettingsChangedCommand}" />
+
+                    <controls:TextBoxSettingControl
+                        LabelText="В параметр для группировки диспетчера 1:"
+                        TextBoxText="{Binding Path=SchedulesSettings.IfcPartsScheduleDisp1Temp, UpdateSourceTrigger=PropertyChanged}"
+                        ToolTipText="В параметр для группировки диспетчера 1"
+                        TextChangedCommand="{Binding SettingsChangedCommand}" />
+
+                    <controls:TextBoxSettingControl
+                        LabelText="В параметр для группировки диспетчера 2:"
+                        TextBoxText="{Binding Path=SchedulesSettings.IfcPartsScheduleDisp2Temp, UpdateSourceTrigger=PropertyChanged}"
+                        ToolTipText="В параметр для группировки диспетчера 2"
+                        TextChangedCommand="{Binding SettingsChangedCommand}" />
+                </StackPanel>
+            </Border>
+            
+            <Border Name="MaterialSpec"
+                Grid.Column="0"
+                Grid.Row="2"
+                Margin="15 7 7 15"
+                Style="{StaticResource CustomBorder}">
+                <StackPanel>
+                    <ui:TextBlock
+                        Margin="5 0 5 5"
+                        FontSize="16"
+                        Text="Спецификация материалов"
+                        Style="{StaticResource CustomTextBlock}" />
+
+                    <controls:DoubleTextBoxSettingControl
+                        LabelText="Маска имени спецификации материалов:"
+                        FirstTextBoxText="{Binding Path=SchedulesSettings.MaterialSchedulePrefixTemp, UpdateSourceTrigger=PropertyChanged}"
+                        SecondTextBoxText="{Binding Path=SchedulesSettings.MaterialScheduleSuffixTemp, UpdateSourceTrigger=PropertyChanged}"
+                        ToolTipText="Маска имени спецификации материалов"
+                        TextChangedCommand="{Binding SettingsChangedCommand}" />
+
+                    <controls:TextBoxSettingControl
+                        LabelText="Имя для поиска эталонной спецификации материалов:"
+                        TextBoxText="{Binding Path=SchedulesSettings.MaterialScheduleNameTemp, UpdateSourceTrigger=PropertyChanged}"
+                        ToolTipText="Имя для поиска эталонной спецификации материалов"
+                        TextChangedCommand="{Binding SettingsChangedCommand}" />
+
+                    <controls:TextBoxSettingControl
+                        LabelText="В параметр для группировки диспетчера 1:"
+                        TextBoxText="{Binding Path=SchedulesSettings.MaterialScheduleDisp1Temp, UpdateSourceTrigger=PropertyChanged}"
+                        ToolTipText="В параметр для группировки диспетчера 1"
+                        TextChangedCommand="{Binding SettingsChangedCommand}" />
+
+                    <controls:TextBoxSettingControl
+                        LabelText="В параметр для группировки диспетчера 2:"
+                        TextBoxText="{Binding Path=SchedulesSettings.MaterialScheduleDisp2Temp, UpdateSourceTrigger=PropertyChanged}"
+                        ToolTipText="В параметр для группировки диспетчера 2"
+                        TextChangedCommand="{Binding SettingsChangedCommand}" />
+                </StackPanel>
+            </Border>
+
+            <Border Name="ParamsForScheduleFilters"
+                Grid.Column="1"
+                Grid.ColumnSpan="1"
+                Grid.Row="2"
+                Margin="7 7 15 15"
+                Style="{StaticResource CustomBorder}">
+                <StackPanel>
+                    <ui:TextBlock
+                        FontSize="16"
+                        Margin="5 0 5 5"
+                        Text="Список параметров фильтрации для спецификаций"
+                        Style="{StaticResource CustomTextBlock}" />
+
+                    <ui:ListView
+                        Margin="0 5"
+                        ItemsSource="{Binding Path=SchedulesSettings.ParamsForScheduleFiltersTemp, UpdateSourceTrigger=PropertyChanged}"
+                        SelectionMode="Multiple">
+
+                        <ui:ListView.ItemTemplate>
+                            <DataTemplate>
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="Auto" />
+                                        <ColumnDefinition Width="*" />
+                                        <ColumnDefinition Width="*" />
+                                    </Grid.ColumnDefinitions>
+                            
+                                    <CheckBox
+                                        Grid.Column="0"
+                                        Padding="-1 0 0 0"
+                                        IsChecked="{Binding Path=IsCheck, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
+                                        VerticalAlignment="Center" />
+                            
+                                    <ui:TextBox
+                                        Grid.Column="1"
+                                        Margin="0 0 5 0"
+                                        FontSize="13"
+                                        Style="{StaticResource TextBoxWithTooltipStyle}"
+                                        Text="{Binding Path=ParamNameInSchedule, UpdateSourceTrigger=PropertyChanged}">
+                                        <i:Interaction.Triggers>
+                                            <i:EventTrigger
+                                                EventName="TextChanged">
+                                                <i:InvokeCommandAction
+                                                    Command="{Binding DataContext.SettingsChangedCommand, RelativeSource={RelativeSource AncestorType={x:Type Window}}}" />
+                                            </i:EventTrigger>
+                                        </i:Interaction.Triggers>
+                                    </ui:TextBox>
+
+                                    <ui:TextBox
+                                        Grid.Column="2"
+                                        Margin="5 0 0 0"
+                                        FontSize="13"
+                                        Style="{StaticResource TextBoxWithTooltipStyle}"
+                                        Text="{Binding Path=ParamNameInHost, UpdateSourceTrigger=PropertyChanged}">
+                                        <i:Interaction.Triggers>
+                                            <i:EventTrigger
+                                                EventName="TextChanged">
+                                                <i:InvokeCommandAction
+                                                    Command="{Binding DataContext.SettingsChangedCommand, RelativeSource={RelativeSource AncestorType={x:Type Window}}}" />
+                                            </i:EventTrigger>
+                                        </i:Interaction.Triggers>
+                                    </ui:TextBox>
+                                </Grid>
+                            </DataTemplate>
+                        </ui:ListView.ItemTemplate>
+                    </ui:ListView>
+
+                    <StackPanel
+                        Orientation="Horizontal"
+                        HorizontalAlignment="Right">
+
+                        <ui:Button
+                            Margin="5 5"
+                            MinWidth="150"
+                            Content="Добавить"
+                            Appearance="Info"
+                            Command="{Binding AddScheduleFilterParamCommand}" />
+
+                        <ui:Button
+                            Margin="5 5"
+                            MinWidth="150"
+                            Content="Удалить"
+                            Command="{Binding DeleteScheduleFilterParamCommand}" />
+                    </StackPanel>
+                </StackPanel>
+            </Border>
+        </Grid>
+    </ui:PassiveScrollViewer>
+</core:WpfUIPlatformPage>

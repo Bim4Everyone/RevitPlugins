@@ -45,8 +45,7 @@
             <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
 
-        <Border
-            Name="FormworkProps"
+        <Border Name="FormworkProps"
             Grid.Column="0"
             Grid.Row="0"
             Margin="15 15 7 7"
@@ -89,8 +88,7 @@
             </StackPanel>
         </Border>
 
-        <Border
-            Name="RebarProps"
+        <Border Name="RebarProps"
             Grid.Column="1"
             Grid.Row="0"
             Margin="7 15 15 7"
@@ -133,8 +131,7 @@
             </StackPanel>
         </Border>
 
-        <Border
-            Name="ElevationProps"
+        <Border Name="ElevationProps"
             Grid.Column="0"
             Grid.Row="1"
             Margin="15 15 7 7"
@@ -160,8 +157,7 @@
             </StackPanel>
         </Border>
 
-        <Border
-            Name="ViewOffsets"
+        <Border Name="ViewOffsets"
             Grid.Column="1"
             Grid.Row="1"
             Margin="7 15 15 7"
@@ -181,8 +177,7 @@
             </StackPanel>
         </Border>
 
-        <Border
-            Name="ViewTypeProps"
+        <Border Name="ViewTypeProps"
             Grid.Column="0"
             Grid.ColumnSpan="2"
             Grid.Row="2"

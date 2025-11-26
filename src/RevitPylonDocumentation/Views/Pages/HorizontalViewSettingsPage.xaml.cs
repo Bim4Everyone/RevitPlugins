@@ -7,9 +7,7 @@ namespace RevitPylonDocumentation.Views.Pages;
 /// Логика взаимодействия для HorizontalViewSettingsPage.xaml
 /// </summary>
 internal partial class HorizontalViewSettingsPage {
-    public HorizontalViewSettingsPage() {
-        InitializeComponent();
-    }
+    public HorizontalViewSettingsPage() { }
 
     public HorizontalViewSettingsPage(MainViewModel viewModel,
         ILoggerService loggerService,
