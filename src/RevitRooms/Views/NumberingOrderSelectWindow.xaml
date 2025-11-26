@@ -67,7 +67,7 @@
             Orientation="Horizontal"
             HorizontalAlignment="Right">
             <ui:Button
-                Content="ОК"
+                Content="{me:LocalizationSource Button.Ok}"
                 Height="35"
                 Width="80"
                 Margin="10"
@@ -76,7 +76,7 @@
                 Command="{Binding SelectCommand}" />
 
             <ui:Button
-                Content="Отмена"
+                Content="{me:LocalizationSource Button.Cancel}"
                 Height="35"
                 Width="80"
                 Margin="10"

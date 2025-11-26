@@ -58,7 +58,7 @@
             VerticalAlignment="Center"
             Grid.Row="0"
             Grid.ColumnSpan="4"
-            Title="{me:LocalizationSource MainWindow.Title}" />
+            Title="{me:LocalizationSource RoomsNumsWindow.Title}" />
 
         <Border
             Grid.Row="1"
@@ -82,7 +82,7 @@
                     <TextBlock
                         Width="140"
                         VerticalAlignment="Center"
-                        Text="Стадия:" />
+                        Text="{me:LocalizationSource MainWindow.Phase}" />
                     <ComboBox
                         ItemsSource="{Binding RoomsNums.Phases}"
                         DisplayMemberPath="Name"
@@ -93,7 +93,7 @@
                     <TextBlock
                         Width="80"
                         VerticalAlignment="Center"
-                        Text="Суффикс:" />
+                        Text="{me:LocalizationSource RoomNumsWindow.Suffix}" />
                     <TextBox
                         Text="{Binding RoomsNums.Suffix, UpdateSourceTrigger=PropertyChanged}" />
                 </DockPanel>
@@ -102,7 +102,7 @@
                     <TextBlock
                         Width="140"
                         VerticalAlignment="Center"
-                        Text="Начальный номер:" />
+                        Text="{me:LocalizationSource RoomNumsWindow.StartNumber}" />
                     <TextBox
                         Text="{Binding RoomsNums.StartNumber, UpdateSourceTrigger=PropertyChanged}" />
                 </DockPanel>
@@ -111,7 +111,7 @@
                     <TextBlock
                         Width="80"
                         VerticalAlignment="Center"
-                        Text="Префикс:" />
+                        Text="{me:LocalizationSource RoomNumsWindow.Prefix}" />
                     <TextBox
                         Text="{Binding RoomsNums.Prefix, UpdateSourceTrigger=PropertyChanged}" />
                 </DockPanel>
@@ -129,34 +129,38 @@
                     Margin="10,4"
                     GroupName="nums"
                     IsChecked="{Binding RoomsNums.IsNumFlats}">
-                    <TextBlock
-                        Text="{Binding ApartmentNumberParamName, Mode=OneWay, StringFormat='Нумерация квартир ({0})'}" />
+                    <TextBlock>
+                        <Run Text="{me:LocalizationSource RoomNumsWindow.Aparts}"/>
+                        <Run Text="("/><Run Text="{Binding ApartmentNumberParamName, Mode=OneWay}"/><Run Text=")"/>
+                    </TextBlock>
                 </RadioButton>
                 <RadioButton
                     x:Name="_roomsNums"
                     Margin="10,4"
                     GroupName="nums"
                     IsChecked="{Binding RoomsNums.IsNumRooms}">
-                    <TextBlock
-                        Text="{Binding NumberParamName, Mode=OneWay, StringFormat='Нумерация, помещений ({0})'}" />
+                    <TextBlock>
+                        <Run Text="{me:LocalizationSource RoomNumsWindow.Rooms}"/>
+                        <Run Text="("/><Run Text="{Binding NumberParamName, Mode=OneWay}"/><Run Text=")"/>
+                    </TextBlock>
                 </RadioButton>
 
                 <RadioButton
                     Margin="25,4"
                     GroupName="rooms_nums"
-                    Content="Нумерация помещений в пределах секции, этажа и группы"
+                    Content="{me:LocalizationSource RoomNumsWindow.NumByGroup}"
                     Visibility="{Binding ElementName=_roomsNums,Path=IsChecked, Converter={StaticResource BoolToVis}}"
                     IsChecked="{Binding RoomsNums.IsNumRoomsGroup}" />
                 <RadioButton
                     Margin="25,4"
                     GroupName="rooms_nums"
-                    Content="Нумерация помещений в пределах секции и этажа"
+                    Content="{me:LocalizationSource RoomNumsWindow.NumByLevel}"
                     Visibility="{Binding ElementName=_roomsNums,Path=IsChecked, Converter={StaticResource BoolToVis}}"
                     IsChecked="{Binding RoomsNums.IsNumRoomsSectionLevels}" />
                 <RadioButton
                     Margin="25,4"
                     GroupName="rooms_nums"
-                    Content="Нумерация помещений в пределах секции"
+                    Content="{me:LocalizationSource RoomNumsWindow.NumBySection}"
                     Visibility="{Binding ElementName=_roomsNums,Path=IsChecked, Converter={StaticResource BoolToVis}}"
                     IsChecked="{Binding RoomsNums.IsNumRoomsSection}" />
             </StackPanel>
@@ -183,7 +187,7 @@
                     Grid.Row="0"
                     Grid.Column="0"
                     HorizontalAlignment="Center"
-                    Text="Секции для нумерации" />
+                    Text="{me:LocalizationSource RoomNumsWindow.Sections}" />
                 <Border
                     Grid.Row="1"
                     Grid.Column="0"
@@ -211,7 +215,7 @@
                     Grid.Row="0"
                     Grid.Column="1"
                     HorizontalAlignment="Center"
-                    Text="Группы для нумерации" />
+                    Text="{me:LocalizationSource RoomNumsWindow.Groups}" />
                 <Border
                     Grid.Row="1"
                     Grid.Column="1"
@@ -241,7 +245,7 @@
                     Grid.Row="0"
                     Grid.Column="2"
                     HorizontalAlignment="Center"
-                    Text="Уровни для нумерации" />
+                    Text="{me:LocalizationSource RoomNumsWindow.Levels}" />
                 <Border
                     Grid.Row="1"
                     Grid.Column="2"
@@ -273,7 +277,7 @@
                     Grid.Row="0"
                     Grid.Column="3"
                     HorizontalAlignment="Center"
-                    Text="Приоритеты помещений" />
+                    Text="{me:LocalizationSource RoomNumsWindow.Priorities}" />
                 <Border
                     Grid.Row="1"
                     Grid.Column="3"
@@ -296,30 +300,30 @@
                             Orientation="Horizontal"
                             HorizontalAlignment="Center">
                             <ui:Button
-                                ToolTip="Вверх"
+                                ToolTip="{me:LocalizationSource RoomNumsWindow.ButtonUpToolTip}"
                                 Margin="5"
                                 Command="{Binding RoomsNums.UpOrderCommand}"
                                 CommandParameter="{Binding SelectedItems, ElementName=listbox}"
                                 Icon="{ui:SymbolIcon ArrowCircleUp12, FontSize=20}" />
                             <ui:Button
-                                ToolTip="Вниз"
+                                ToolTip="{me:LocalizationSource RoomNumsWindow.ButtonDownToolTip}"
                                 Margin="5"
                                 Command="{Binding RoomsNums.DownOrderCommand}"
                                 CommandParameter="{Binding SelectedItems, ElementName=listbox}"
                                 Icon="{ui:SymbolIcon ArrowCircleDown12, FontSize=20}" />
                             <ui:Button
-                                ToolTip="Добавить"
+                                ToolTip="{me:LocalizationSource RoomNumsWindow.ButtonAddToolTip}"
                                 Margin="5"
                                 Command="{Binding RoomsNums.AddOrderCommand}"
                                 Icon="{ui:SymbolIcon AddCircle12, FontSize=20}" />
                             <ui:Button
-                                ToolTip="Удалить"
+                                ToolTip="{me:LocalizationSource RoomNumsWindow.ButtonDeleteToolTip}"
                                 Margin="5"
                                 Command="{Binding RoomsNums.RemoveOrderCommand}"
                                 CommandParameter="{Binding SelectedItems, ElementName=listbox}"
                                 Icon="{ui:SymbolIcon Delete12, FontSize=20}" />
                             <ui:Button
-                                ToolTip="Сохранить"
+                                ToolTip="{me:LocalizationSource RoomNumsWindow.ButtonSaveToolTip}"
                                 Margin="5"
                                 Command="{Binding RoomsNums.SaveOrderCommand}"
                                 Icon="{ui:SymbolIcon Save20, FontSize=20}" />
@@ -338,13 +342,13 @@
                 VerticalAlignment="Center"
                 Text="{Binding RoomsNums.ErrorText}" 
                 Foreground="Orange" />
-            <ui:Button 
-                Content="Запуск" 
+            <ui:Button
+                Content="{me:LocalizationSource Button.Ok}" 
                 Height="35" Width="80" Margin="10" 
                 IsDefault="True"
                 Command="{Binding RoomsNums.NumerateRoomsCommand}" />
-            <ui:Button 
-                Content="Отмена" 
+            <ui:Button
+                Content="{me:LocalizationSource Button.Cancel}" 
                 Height="35" Width="80" 
                 Margin="10" 
                 IsCancel="true"

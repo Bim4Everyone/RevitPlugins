@@ -42,7 +42,7 @@
         <ui:TitleBar
             Grid.Row="0"
             VerticalAlignment="Center"
-            Title="Ошибки" />
+            Title="{me:LocalizationSource WarningsWindow.Title}" />
 
         <TextBlock
             Grid.Row="1" 
@@ -95,7 +95,6 @@
                                             Width="120"
                                             Binding="{Binding CategoryName}">
                                             <DataGridTextColumn.Header>
-                                                <!--В динамически-создаваемом UserControl работает только DynamicResource-->
                                                 <ui:TextBlock
                                                     Text="{DynamicResource InfoElementsWindow.HeaderCategory}" />
                                             </DataGridTextColumn.Header>

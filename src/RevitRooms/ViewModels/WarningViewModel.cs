@@ -6,6 +6,7 @@ using Autodesk.Revit.DB;
 
 using dosymep.Bim4Everyone.ProjectParams;
 using dosymep.Bim4Everyone.SharedParams;
+using dosymep.SimpleServices;
 using dosymep.WPF.ViewModels;
 
 using RevitRooms.Models;
@@ -16,6 +17,10 @@ namespace RevitRooms.ViewModels;
 /// Содержит описание ошибки и список элементов Revit с этой ошибкой.
 /// </summary>
 internal class WarningViewModel : BaseViewModel {
+    private readonly ILocalizationService _localizationService;
+    public WarningViewModel(ILocalizationService localizationService) {
+        _localizationService = localizationService;
+    }
     public string Message { get; set; }
     public string Description { get; set; }
 
@@ -23,10 +28,10 @@ internal class WarningViewModel : BaseViewModel {
     public string TypeInfoText {
         get {
             return TypeInfo switch {
-                WarningTypeInfo.Error => "Ошибка",
-                WarningTypeInfo.Info => "Информация",
-                WarningTypeInfo.Warning => "Предупреждение",
-                _ => "Неизвестно",
+                WarningTypeInfo.Error => _localizationService.GetLocalizedString("WarningType.Error"),
+                WarningTypeInfo.Info => _localizationService.GetLocalizedString("WarningType.Info"),
+                WarningTypeInfo.Warning => _localizationService.GetLocalizedString("WarningType.Warning"),
+                _ => _localizationService.GetLocalizedString("WarningType.Unknown"),
             };
         }
     }

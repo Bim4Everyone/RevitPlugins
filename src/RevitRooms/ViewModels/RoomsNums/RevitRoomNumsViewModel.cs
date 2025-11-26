@@ -309,7 +309,8 @@ internal abstract class RevitRoomNumsViewModel : BaseViewModel, INumberingOrder 
                         };
                     numerateCommand.Numerate(orderedObjects, window.CreateProgress(), window.CreateCancellationToken());
                 } else {
-                    throw new InvalidOperationException("Выбран неизвестный режим работы.");
+                    string excMessage = _localizationService.GetLocalizedString("UnknownSettings");
+                    throw new InvalidOperationException(excMessage);
                 }
             }
         }
@@ -318,26 +319,34 @@ internal abstract class RevitRoomNumsViewModel : BaseViewModel, INumberingOrder 
 
         ParentWindow.DialogResult = true;
         ParentWindow.Close();
-        _messageBoxService.Show("Расчет завершен успешно!", "Предупреждение!");
+        string message = _localizationService.GetLocalizedString("TaskDialog.Result");
+        string title = _localizationService.GetLocalizedString("TaskDialog.Information");
+        _messageBoxService.Show(message, title);
     }
 
     private IProgressDialogService SetupProgressDialog(SpatialElementViewModel[] orderedObjects) {
         var service = GetPlatformService<IProgressDialogService>();
         service.StepValue = 10;
         service.MaxValue = orderedObjects.Length;
-        service.DisplayTitleFormat = "Нумерация [{0}]\\{1}]";
+        service.DisplayTitleFormat =  _localizationService.GetLocalizedString("RoomNumsWindow.Numerating");
         return service;
     }
 
     private bool ShowNotFoundNames(string[] notFoundNames) {
-        var taskDialog = new TaskDialog("Квартирография Стадии П.") {
+        string message = _localizationService.GetLocalizedString("WarningsWindow.NoPriorities");
+        string title = _localizationService.GetLocalizedString("RoomsWindow.Title");
+
+        var taskDialog = new TaskDialog(title) {
             AllowCancellation = true,
-            MainInstruction = "В списке приоритетов отсутствуют наименования помещений.",
+            MainInstruction = message,
             MainContent = " - " + string.Join(Environment.NewLine + " - ", notFoundNames)
         };
 
-        taskDialog.AddCommandLink(TaskDialogCommandLinkId.CommandLink1, "Добавить отсутствующие?");
-        taskDialog.AddCommandLink(TaskDialogCommandLinkId.CommandLink2, "Выход");
+        string addNewMessage = _localizationService.GetLocalizedString("WarningsWindow.AddPriorities");
+        string exitMessage = _localizationService.GetLocalizedString("WarningsWindow.Exit");
+
+        taskDialog.AddCommandLink(TaskDialogCommandLinkId.CommandLink1, addNewMessage);
+        taskDialog.AddCommandLink(TaskDialogCommandLinkId.CommandLink2, exitMessage);
         if(taskDialog.Show() == TaskDialogResult.CommandLink1) {
             var selection = NumberingOrders
                 .Where(item => notFoundNames.Contains(item.Name))
@@ -432,55 +441,55 @@ internal abstract class RevitRoomNumsViewModel : BaseViewModel, INumberingOrder 
                 AddElements(WarningInfo.GetErrorMultiLevelRoom(_localizationService), multiLevelRoomGroup, errors);
             }
         }
-
-        return ShowInfoElementsWindow("Информация", errors.Values);
+        string title = _localizationService.GetLocalizedString("TaskDialog.Information");
+        return ShowInfoElementsWindow(title, errors.Values);
     }
 
     private bool CanNumerateRooms(object param) {
         if(!int.TryParse(StartNumber, out int value)) {
-            ErrorText = "Начальный номер должен быть числом.";
+            ErrorText = _localizationService.GetLocalizedString("RoomNumsWindow.WarningStartNumber");
             return false;
         }
 
         if(value < 1) {
-            ErrorText = "Начальный номер должен быть положительным числом.";
+            ErrorText = _localizationService.GetLocalizedString("RoomNumsWindow.WarningPositiveStartNumber");
             return false;
         }
 
         if(Phase == null) {
-            ErrorText = "Выберите стадию.";
+            ErrorText = _localizationService.GetLocalizedString("RoomNumsWindow.WarningSelectPhase");
             return false;
         }
 
         if(IsNumFlats == false && IsNumRooms == false) {
-            ErrorText = "Выберите выберете режим работы.";
+            ErrorText = _localizationService.GetLocalizedString("RoomNumsWindow.WarningSelectMode");
             return false;
         }
 
         if(IsNumRooms && IsNumRoomsGroup == false && IsNumRoomsSection == false &&
            IsNumRoomsSectionLevels == false) {
-            ErrorText = "Выберите выберете режим работы нумерации помещений.";
+            ErrorText = _localizationService.GetLocalizedString("RoomNumsWindow.WarningSelectModeRooms");
             return false;
         }
 
         if(!Sections.Any(item => item.IsSelected)) {
-            ErrorText = "Выберите хотя бы одну секцию.";
+            ErrorText = _localizationService.GetLocalizedString("RoomNumsWindow.WarningSelectSection");
             return false;
         }
 
         if(!Groups.Any(item => item.IsSelected)) {
-            ErrorText = "Выберите хотя бы одну группу.";
+            ErrorText = _localizationService.GetLocalizedString("RoomNumsWindow.WarningSelectGroup");
             return false;
         }
 
         if(!Levels.Any(item => item.IsSelected)) {
-            ErrorText = "Выберите хотя бы один уровень.";
+            ErrorText = _localizationService.GetLocalizedString("RoomNumsWindow.WarningSelectLevel");
             return false;
         }
 
 
         if(!SelectedNumberingOrders.Any() && IsNumRooms) {
-            ErrorText = "Настройте список приоритетов нумерации.";
+            ErrorText = _localizationService.GetLocalizedString("RoomNumsWindow.WarningSetPriorities");
             return false;
         }
 
@@ -505,7 +514,7 @@ internal abstract class RevitRoomNumsViewModel : BaseViewModel, INumberingOrder 
                             IElementViewModel<Element> element,
                             Dictionary<string, WarningViewModel> warningElements) {
         if(!warningElements.TryGetValue(warningInfo.Message, out var value)) {
-            value = new WarningViewModel() {
+            value = new WarningViewModel(_localizationService) {
                 Message = warningInfo.Message,
                 TypeInfo = warningInfo.TypeInfo,
                 Description = warningInfo.Description,

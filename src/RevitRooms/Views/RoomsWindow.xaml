@@ -75,24 +75,26 @@
                 <CheckBox
                     Margin="0,4"
                     IsChecked="{Binding RevitViewModel.IsFillLevel}">
-                    <TextBlock
-                        Text="{Binding LevelParamName, Mode=OneWay, StringFormat='Заполнить {0}'}" />
+                    <TextBlock>
+                        <Run Text="{me:LocalizationSource RoomsWindow.SetLevel}"/>
+                        <Run Text="{Binding LevelParamName, Mode=OneWay}"/>
+                    </TextBlock>
                 </CheckBox>
 
                 <CheckBox
                     Margin="0,4"
-                    Content="Рассчитать площадь по пятну"
+                    Content="{me:LocalizationSource RoomsWindow.CalculateContourArea}"
                     IsChecked="{Binding RevitViewModel.IsSpotCalcArea}" />
 
                 <CheckBox
                     Margin="0,4"
-                    Content="Рассчитать количество комнат"
+                    Content="{me:LocalizationSource RoomsWindow.CountRooms}"
                     IsChecked="{Binding RevitViewModel.IsCountRooms}" />
 
                 <CheckBox
                     x:Name="_checkArea"
                     Margin="0,4"
-                    Content="Проверить площадь помещений на изменения"
+                    Content="{me:LocalizationSource RoomsWindow.CheckChanges}"
                     IsChecked="{Binding RevitViewModel.IsCheckRoomsChanges}" />
 
                 <StackPanel
@@ -103,7 +105,7 @@
                     <TextBlock
                         Margin="70,0,10,0"
                         VerticalAlignment="Center"
-                        Text="Точность проверки:" />
+                        Text="{me:LocalizationSource RoomsWindow.CheckAccuracy}" />
                     <ui:TextBox
                         Width="80"
                         Text="{Binding RevitViewModel.RoomAccuracy, UpdateSourceTrigger=PropertyChanged}" />
@@ -126,7 +128,7 @@
                     <TextBlock
                         Width="200"
                         VerticalAlignment="Center"
-                        Text="Стадия:" />
+                        Text="{me:LocalizationSource MainWindow.Phase}" />
                     <ComboBox
                         Margin="10,0,0,0"
                         DisplayMemberPath="Name"
@@ -141,7 +143,7 @@
                         x:Name="_text"
                         Width="200"
                         VerticalAlignment="Center"
-                        Text="Число знаков после запятой:" />
+                        Text="{me:LocalizationSource RoomsWindow.Accuracy}" />
                     <ComboBox
                         Margin="10,0,0,0"
                         ItemsSource="{Binding RevitViewModel.RoundAccuracyValues}"
@@ -194,7 +196,7 @@
         <CheckBox
             Grid.Row="5"
             Margin="14,4,0,14"
-            Content="Не показывать предупреждения"
+            Content="{me:LocalizationSource RoomsWindow.NotShowWarnings}"
             IsChecked="{Binding RevitViewModel.NotShowWarnings}" />
 
         <StackPanel 
@@ -209,20 +211,20 @@
                 Foreground="Orange" />
 
             <ui:Button
-                Content="Рассчитать зоны"
+                Content="{me:LocalizationSource RoomsWindow.ButtonCalculateAreas}"
                 Margin="4,0" 
                 Click="ButtonOK_Click"
                 Command="{Binding RevitViewModel.CalculateAreasCommand}" />
 
             <ui:Button
-                Content="Рассчитать помещения"
+                Content="{me:LocalizationSource RoomsWindow.ButtonCalculateRooms}"
                 Margin="4,0" 
                 IsDefault="True"
                 Click="ButtonOK_Click" 
                 Command="{Binding RevitViewModel.CalculateCommand}" />
 
             <ui:Button
-                Content="Отмена" 
+                Content="{me:LocalizationSource Button.Cancel}" 
                 Width="80"
                 Margin="4,0,0,0"
                 IsCancel="true" 

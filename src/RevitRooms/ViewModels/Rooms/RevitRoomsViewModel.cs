@@ -563,7 +563,7 @@ internal abstract class RevitRoomsViewModel : BaseViewModel {
                             Dictionary<string, 
                             WarningViewModel> infoElements) {
         if(!infoElements.TryGetValue(infoElement.Message, out var value)) {
-            value = new WarningViewModel() { 
+            value = new WarningViewModel(_localizationService) { 
                 Message = infoElement.Message, 
                 TypeInfo = infoElement.TypeInfo, 
                 Description = infoElement.Description, 
