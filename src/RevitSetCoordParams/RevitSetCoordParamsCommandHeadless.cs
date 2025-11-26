@@ -1,3 +1,4 @@
+using System;
 using System.Globalization;
 using System.Reflection;
 
@@ -42,21 +43,28 @@ public class RevitSetCoordParamsCommandHeadless : BasePluginCommand {
             $"/{assemblyName};component/assets/localization/language.xaml",
             CultureInfo.GetCultureInfo("ru-RU"));
 
+        var localizationService = kernel.Get<ILocalizationService>();
+        var revitRepository = kernel.Get<RevitRepository>();
+        var pluginConfig = kernel.Get<PluginConfig>();
+
         // Основной блок кода для выполнения в Headless-режиме
         try {
             // Загрузка параметров проекта        
             bool isParamChecked = new CheckProjectParams(uiApplication.Application, uiApplication.ActiveUIDocument.Document)
                 .CopyProjectParams()
                 .GetIsChecked();
-            // Создание экземпляра класса настроек плагина по умолчанию
-            var defaultConfigSettings = new ConfigSettings();
-            defaultConfigSettings.ApplyDefaultValues();
 
-            var localizationService = kernel.Get<ILocalizationService>();
-            var revitRepository = kernel.Get<RevitRepository>();
+            var projectConfig = pluginConfig.GetSettings(revitRepository.Document);
+            ConfigSettings configSettings;
+            if(projectConfig == null) {
+                configSettings = new ConfigSettings();
+                configSettings.ApplyDefaultValues();
+            } else {
+                configSettings = projectConfig.ConfigSettings;
+            }
 
             // Создание основного класса настроек и загрузка в него настроек по умолчанию
-            var setCoordParamsSettings = new SetCoordParamsSettings(revitRepository, defaultConfigSettings);
+            var setCoordParamsSettings = new SetCoordParamsSettings(revitRepository, configSettings);
             setCoordParamsSettings.LoadConfigSettings();
 
             // Создание основного класса процессора
@@ -65,7 +73,10 @@ public class RevitSetCoordParamsCommandHeadless : BasePluginCommand {
             // Основной метод
             processor.Run();
 
-        } catch {
+        } catch(Exception ex) {
+            string errorText = localizationService.GetLocalizedString("RevitSetCoordParamsCommandHeadless.Error");
+            PluginLoggerService.Error(ex, errorText);
+            throw;
         }
     }
 }
