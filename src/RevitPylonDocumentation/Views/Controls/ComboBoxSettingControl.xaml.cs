@@ -21,6 +21,9 @@ public partial class ComboBoxSettingControl : UserControl {
     public static readonly DependencyProperty SelectionChangedCommandProperty = DependencyProperty.Register(
         nameof(SelectionChangedCommand), typeof(ICommand), typeof(ComboBoxSettingControl), new PropertyMetadata(default(ICommand)));
 
+    public static readonly DependencyProperty ItemTemplateProperty = DependencyProperty.Register(
+        nameof(ItemTemplate), typeof(DataTemplate), typeof(ComboBoxSettingControl), new PropertyMetadata(default(DataTemplate)));
+
     public ComboBoxSettingControl() {
         InitializeComponent();
     }
@@ -48,5 +51,10 @@ public partial class ComboBoxSettingControl : UserControl {
     public ICommand SelectionChangedCommand {
         get => (ICommand) GetValue(SelectionChangedCommandProperty);
         set => SetValue(SelectionChangedCommandProperty, value);
+    }
+
+    public DataTemplate ItemTemplate {
+        get => (DataTemplate) GetValue(ItemTemplateProperty);
+        set => SetValue(ItemTemplateProperty, value);
     }
 }

@@ -15,13 +15,12 @@
     xmlns:local="clr-namespace:RevitPylonDocumentation.Views.Pages"
     xmlns:views="clr-namespace:RevitPylonDocumentation.Views"
     xmlns:controls="clr-namespace:RevitPylonDocumentation.Views.Controls"
-    mc:Ignorable="d" 
-    d:DesignHeight="550" d:DesignWidth="600"
+    
+    mc:Ignorable="d"
+    ScrollViewer.CanContentScroll="False"
     Title="GeneralPage"
-    d:DataContext="{d:DesignInstance vms:MainViewModel, IsDesignTimeCreatable=False}"
-    
-    
-    ScrollViewer.CanContentScroll="False">
+    d:DesignHeight="700" d:DesignWidth="600"
+    d:DataContext="{d:DesignInstance vms:MainViewModel, IsDesignTimeCreatable=False}" >
     <core:WpfUIPlatformPage.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
@@ -238,7 +237,6 @@
                         Margin="5"
                         FontSize="16"
                         Text="Элементы листа"
-                        VerticalAlignment="Center"
                         Style="{StaticResource CustomTextBlock}" />
 
                     <ui:Button
@@ -454,7 +452,8 @@
                     ItemsSource="{Binding TitleBlocks}"
                     SelectedItem="{Binding TypesSettings.SelectedTitleBlock}"
                     ToolTipText="Выберите типоразмер рамки листа"
-                    SelectionChangedCommand="{Binding SettingsChangedCommand}" />
+                    SelectionChangedCommand="{Binding SettingsChangedCommand}"
+                    ItemTemplate="{StaticResource WithFamilyNameItemTemplate}"/>
             </StackPanel>
         </Border>
 
@@ -465,24 +464,70 @@
             Style="{StaticResource CustomBorder}">
             <Grid>
                 <Grid.RowDefinitions>
-                    <RowDefinition
-                        Height="*" />
-                    <RowDefinition
-                        Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="*" />
                 </Grid.RowDefinitions>
                 <Grid.ColumnDefinitions>
-                    <ColumnDefinition
-                        Width="*" />
-                    <ColumnDefinition
-                        Width="*" />
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="*" />
                 </Grid.ColumnDefinitions>
 
-                <Grid>
+                <StackPanel
+                    Name="FormworkTemplates"
+                    Grid.Row="1"
+                    Grid.Column="0"
+                    Margin="5">
 
-                </Grid>
+                    <ui:TextBlock
+                        Margin="5"
+                        Text="Шаблоны видов опалубки"
+                        Style="{StaticResource CustomTextBlock}" />
 
-                <TextBlock
-                    Text="SOMEEEEEeee teeeeeeeeeeeeeeeext" />
+                    <controls:ComboBoxSettingControl
+                        LabelText="Вертикальных видов"
+                        ItemsSource="{Binding ViewTemplatesInPj}"
+                        SelectedItem="{Binding TypesSettings.SelectedGeneralViewTemplate}"
+                        SelectionChangedCommand="{Binding SettingsChangedCommand}"
+                        ItemTemplate="{StaticResource WithoutFamilyNameItemTemplate}" />
+
+                    <controls:ComboBoxSettingControl
+                        LabelText="Горизонтальных видов"
+                        ItemsSource="{Binding ViewTemplatesInPj}"
+                        SelectedItem="{Binding TypesSettings.SelectedTransverseViewTemplate}"
+                        SelectionChangedCommand="{Binding SettingsChangedCommand}"
+                        ItemTemplate="{StaticResource WithoutFamilyNameItemTemplate}" />
+                </StackPanel>
+
+                <StackPanel
+                    Name="RebarTemplates"
+                    Grid.Row="1"
+                    Grid.Column="1"
+                    Margin="5">
+
+                    <ui:TextBlock
+                        Grid.Row="0"
+                        Margin="5"
+                        Text="Шаблоны видов армирования"
+                        Style="{StaticResource CustomTextBlock}" />
+
+                    <controls:ComboBoxSettingControl
+                        Grid.Row="2"
+                        Grid.Column="1"
+                        LabelText="Вертикальных видов"
+                        ItemsSource="{Binding ViewTemplatesInPj}"
+                        SelectedItem="{Binding TypesSettings.SelectedGeneralRebarViewTemplate}"
+                        SelectionChangedCommand="{Binding SettingsChangedCommand}"
+                        ItemTemplate="{StaticResource WithoutFamilyNameItemTemplate}" />
+
+                    <controls:ComboBoxSettingControl
+                        Grid.Row="3"
+                        Grid.Column="1"
+                        LabelText="Горизонтальных видов"
+                        ItemsSource="{Binding ViewTemplatesInPj}"
+                        SelectedItem="{Binding TypesSettings.SelectedTransverseRebarViewTemplate}"
+                        SelectionChangedCommand="{Binding SettingsChangedCommand}"
+                        ItemTemplate="{StaticResource WithoutFamilyNameItemTemplate}" />
+                </StackPanel>
             </Grid>
         </Border>
 
@@ -500,7 +545,7 @@
             <ui:Button
                 Margin="10"
                 MinWidth="150"
-                Content="ButtonOk"
+                Content="Ок"
                 Appearance="Info"
                 Command="{Binding CreateCommand}"
                 Click="ButtonOk_Click" />
@@ -508,7 +553,7 @@
             <ui:Button
                 Margin="10"
                 MinWidth="150"
-                Content="ButtonCancel"
+                Content="Отмена"
                 Click="ButtonCancel_Click" />
         </StackPanel>
     </Grid>

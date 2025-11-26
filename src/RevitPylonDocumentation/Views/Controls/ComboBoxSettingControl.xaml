@@ -18,6 +18,33 @@
                 <ResourceDictionary
                     Source="../CustomStyles.xaml" />
             </ResourceDictionary.MergedDictionaries>
+
+            <DataTemplate
+                x:Key="DefaultItemTemplate">
+                <TextBlock
+                    Text="{Binding}" />
+            </DataTemplate>
+
+            <DataTemplate
+                x:Key="WithFamilyNameItemTemplate">
+                <TextBlock>
+                    <TextBlock.Text>
+                        <MultiBinding
+                            StringFormat="{}{0}: {1}">
+                            <Binding
+                                Path="FamilyName" />
+                            <Binding
+                                Path="Name" />
+                        </MultiBinding>
+                    </TextBlock.Text>
+                </TextBlock>
+            </DataTemplate>
+
+            <DataTemplate
+                x:Key="WithoutFamilyNameItemTemplate">
+                <TextBlock
+                    Text="{Binding Name}" />
+            </DataTemplate>
         </ResourceDictionary>
     </UserControl.Resources>
 
@@ -36,23 +63,8 @@
             ItemsSource="{Binding ItemsSource, ElementName=_this}"
             SelectedItem="{Binding SelectedItem, ElementName=_this}"
             Style="{StaticResource ComboBoxWithTooltipStyle}"
-            ToolTip="{Binding ToolTipText, ElementName=_this}">
-
-            <ComboBox.ItemTemplate>
-                <DataTemplate>
-                    <TextBlock>
-                        <TextBlock.Text>
-                            <MultiBinding
-                                StringFormat="{}{0}: {1}">
-                                <Binding
-                                    Path="FamilyName" />
-                                <Binding
-                                    Path="Name" />
-                            </MultiBinding>
-                        </TextBlock.Text>
-                    </TextBlock>
-                </DataTemplate>
-            </ComboBox.ItemTemplate>
+            ToolTip="{Binding ToolTipText, ElementName=_this}"
+            ItemTemplate="{Binding ItemTemplate, ElementName=_this}">
 
             <i:Interaction.Triggers>
                 <i:EventTrigger

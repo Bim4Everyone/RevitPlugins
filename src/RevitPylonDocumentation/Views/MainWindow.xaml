@@ -18,8 +18,8 @@
     mc:Ignorable="d"
     WindowStartupLocation="CenterOwner"
     
-    Height="750"    Width="1000"
-    MinHeight="750" MinWidth="1000"
+    Height="1000"    Width="1200"
+    MinHeight="1000" MinWidth="1200"
     
     d:DataContext="{d:DesignInstance vms:MainViewModel, IsDesignTimeCreatable=False}">
 
@@ -68,42 +68,42 @@
             x:Name="_rootNavigationView"
             FrameMargin="0"
             PaneDisplayMode="Left"
-            PaneTitle="Pane Title"
+            PaneTitle="Настройки"
             OpenPaneLength="200"
             IsPaneOpen="True"
             IsBackButtonVisible="Collapsed"
             IsPaneVisible="True">
             <ui:NavigationView.MenuItems>
                 <ui:NavigationViewItem
-                    Content="General"
+                    Content="Запуск плагина"
                     Icon="{ui:SymbolIcon Home24}"
                     TargetPageType="{x:Type pages:GeneralPage}" />
                 <ui:NavigationViewItem
-                    Content="Vertical view"
+                    Content="Вертикальные виды"
                     Icon="{ui:SymbolIcon Library24}"
                     TargetPageType="{x:Type pages:VerticalViewSettingsPage}" />
                 <ui:NavigationViewItem
-                    Content="Horizontal view"
+                    Content="Горизонтальные виды"
                     Icon="{ui:SymbolIcon Library24}"
                     TargetPageType="{x:Type pages:HorizontalViewSettingsPage}" />
                 <ui:NavigationViewItem
-                    Content="Schedules"
+                    Content="Спецификации"
                     Icon="{ui:SymbolIcon Library24}"
                     TargetPageType="{x:Type pages:SchedulesPage}" />
                 <ui:NavigationViewItem
-                    Content="Legends"
+                    Content="Легенды и типовые аннотации"
                     Icon="{ui:SymbolIcon Library24}"
                     TargetPageType="{x:Type pages:LegendViewsPage}" />
                 <ui:NavigationViewItem
-                    Content="Pylon parameters"
+                    Content="Параметры пилона"
                     Icon="{ui:SymbolIcon Library24}"
                     TargetPageType="{x:Type pages:PylonParamsPage}" />
                 <ui:NavigationViewItem
-                    Content="Project parameters"
+                    Content="Параметры проекта"
                     Icon="{ui:SymbolIcon Library24}"
                     TargetPageType="{x:Type pages:ProjectParamsPage}" />
                 <ui:NavigationViewItem
-                    Content="Sheet parameters"
+                    Content="Параметры листов"
                     Icon="{ui:SymbolIcon Library24}"
                     TargetPageType="{x:Type pages:SheetParamsPage}" />
             </ui:NavigationView.MenuItems>
