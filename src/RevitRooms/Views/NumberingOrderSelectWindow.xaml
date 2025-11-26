@@ -8,7 +8,6 @@
     xmlns:local="clr-namespace:RevitRooms.Views"
     xmlns:vms="clr-namespace:RevitRooms.Views"
     xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
-    xmlns:behaviors="clr-namespace:RevitRooms.Behaviors"
     xmlns:core="clr-namespace:dosymep.WpfUI.Core"
     xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
     xmlns:me="clr-namespace:dosymep.WpfCore.MarkupExtensions;assembly=dosymep.WpfCore"

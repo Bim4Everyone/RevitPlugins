@@ -138,6 +138,7 @@
     <system:String x:Key="WarningsWindow.AddPriorities">Добавить отсутствующие?</system:String>
     <system:String x:Key="WarningsWindow.Exit">Выход</system:String>    
     
+    
     <system:String x:Key="TaskDialogWarning.ScheduleErrors">Были найдены некорректные ключевые спецификации.</system:String>
     <system:String x:Key="TaskDialogWarning.ScheduleErrorsDescription">
         {0}
@@ -150,8 +151,7 @@
     </system:String>
     <system:String x:Key="TaskDialogWarning.UpdateSchedule">Заменить на спецификации из шаблона?</system:String>
     <system:String x:Key="TaskDialogWarning.Exit">Выход без изменений спецификаций</system:String>
-    <system:String x:Key="TaskDialogWarning.NotFilledSchedules">Были найдены не заполненные ключевые спецификации:</system:String>
-    
+    <system:String x:Key="TaskDialogWarning.NotFilledSchedules">Были найдены не заполненные ключевые спецификации:</system:String>    
     <system:String x:Key="TaskDialog.Information">Информация</system:String>
     <system:String x:Key="TaskDialog.Result">Расчет завершен успешно!</system:String> 
     

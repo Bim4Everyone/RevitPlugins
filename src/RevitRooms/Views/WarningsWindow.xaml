@@ -15,10 +15,10 @@
     
     mc:Ignorable="d"
     
-    Height="500"
+    Height="700"
     Width="1000"
     
-    MinHeight="500"
+    MinHeight="700"
     MinWidth="1000"
     
     d:DataContext="{d:DesignInstance vms:WarningsViewModel, IsDesignTimeCreatable=False}">
@@ -79,7 +79,7 @@
                                             <DataGridTemplateColumn.Header>
                                                 <!--В динамически-создаваемом UserControl работает только DynamicResource-->
                                                 <ui:TextBlock
-                                                    Text="{DynamicResource InfoElementsWindow.HeaderId}" /> 
+                                                    Text="{DynamicResource WarningsWindow.HeaderId}" /> 
                                             </DataGridTemplateColumn.Header>
                                             <DataGridTemplateColumn.CellTemplate>
                                                 <DataTemplate>
@@ -96,7 +96,7 @@
                                             Binding="{Binding CategoryName}">
                                             <DataGridTextColumn.Header>
                                                 <ui:TextBlock
-                                                    Text="{DynamicResource InfoElementsWindow.HeaderCategory}" />
+                                                    Text="{DynamicResource WarningsWindow.HeaderCategory}" />
                                             </DataGridTextColumn.Header>
                                         </DataGridTextColumn>
 
@@ -105,7 +105,7 @@
                                             Binding="{Binding Name}">
                                             <DataGridTextColumn.Header>
                                                 <ui:TextBlock
-                                                    Text="{DynamicResource InfoElementsWindow.HeaderName}" />
+                                                    Text="{DynamicResource WarningsWindow.HeaderName}" />
                                             </DataGridTextColumn.Header>
                                         </DataGridTextColumn>
 
@@ -114,7 +114,7 @@
                                             Binding="{Binding LevelName}">
                                             <DataGridTextColumn.Header>
                                                 <ui:TextBlock
-                                                    Text="{DynamicResource InfoElementsWindow.HeaderLevel}" />
+                                                    Text="{DynamicResource WarningsWindow.HeaderLevel}" />
                                             </DataGridTextColumn.Header>
                                         </DataGridTextColumn>
                                     
@@ -123,7 +123,7 @@
                                             Binding="{Binding PhaseName}">
                                             <DataGridTextColumn.Header>
                                                 <ui:TextBlock
-                                                    Text="{DynamicResource InfoElementsWindow.HeaderPhase}" />
+                                                    Text="{DynamicResource WarningsWindow.HeaderPhase}" />
                                             </DataGridTextColumn.Header>
                                         </DataGridTextColumn>
 
@@ -132,7 +132,7 @@
                                             Binding="{Binding Description}">
                                             <DataGridTextColumn.Header>
                                                 <ui:TextBlock
-                                                    Text="{DynamicResource InfoElementsWindow.HeaderDescription}" />
+                                                    Text="{DynamicResource WarningsWindow.HeaderDescription}" />
                                             </DataGridTextColumn.Header>
                                         </DataGridTextColumn>
                                     </ui:DataGrid.Columns>
