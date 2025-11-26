@@ -61,7 +61,7 @@
                 <ItemsControl.ItemTemplate>
                     <DataTemplate>
                         <edits:CustomGroupEditControl
-                            Icon="{ui:SymbolIcon Warning24}"
+                            Icon="{Binding Icon}"
                             Header="{Binding FullMessage}"
                             Description="{Binding Description}"
                             ExtraTextVisible="True"
