@@ -9,7 +9,7 @@ using dosymep.Revit;
 namespace RevitListOfSchedules.Models;
 internal class InstancesAssembly {
     // Ключевое слово для поиска среди строк в заголовке спецификации
-    private readonly IEnumerable<string> _approvedLines = ["Ведомость", "Спецификация"];
+    private readonly IEnumerable<string> _approvedLines = ["ведомость", "спецификация", "перечень", "список"];
     private readonly RevitRepository _revitRepository;
     private readonly ViewDrafting _viewDrafting;
     private readonly FamilySymbol _familySymbol;
@@ -35,10 +35,10 @@ internal class InstancesAssembly {
                 string resultScheduleName = null;
                 bool found = false;
 
-                for(int i = 0; i < headData.NumberOfRows && !found; i++) {
-                    for(int j = 0; j < headData.NumberOfColumns && !found; j++) {
+                for(int i = headData.FirstRowNumber; i < headData.NumberOfRows && !found; i++) {
+                    for(int j = headData.FirstColumnNumber; j < headData.NumberOfColumns && !found; j++) {
                         string cellText = headData.GetCellText(i, j);
-                        if(_approvedLines.Any(cellText.Contains)) {
+                        if(_approvedLines.Any(cellText.ToLower().Contains)) {
                             resultScheduleName = cellText;
                             found = true;
                         }
@@ -46,7 +46,11 @@ internal class InstancesAssembly {
                 }
                 if(found) {
                     PlaceFamilyInstance(sheetNumber, sheetRevNumber, resultScheduleName);
-                } else {
+                } else if(!found
+                    && headData.NumberOfRows == 1
+                    && headData.NumberOfColumns == 1
+                    && string.IsNullOrEmpty(headData.GetCellText(0, 0))) {
+
                     PlaceFamilyInstance(sheetNumber, sheetRevNumber, schedule.Name);
                 }
             }

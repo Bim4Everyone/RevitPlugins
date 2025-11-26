@@ -9,7 +9,7 @@
     <system:String
         x:Key="MainWindow.Settings">Настройки</system:String>
     <system:String
-        x:Key="MainWindow.GroupParameters">Параметр группировки:</system:String>
+        x:Key="MainWindow.GroupParameters">Параметр группировки</system:String>
     <system:String
         x:Key="MainWindow.GroupParametersTooltip">Параметр, используемый в группировке листов</system:String>
     <system:String
