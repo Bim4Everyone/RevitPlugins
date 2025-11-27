@@ -16,10 +16,10 @@
     mc:Ignorable="d"
     
     Height="700"
-    Width="1000"
+    Width="1150"
     
     MinHeight="700"
-    MinWidth="1000"
+    MinWidth="1150"
     
     d:DataContext="{d:DesignInstance vms:WarningsViewModel, IsDesignTimeCreatable=False}">
 
@@ -69,16 +69,14 @@
                             IsChecked="True">
                             <edits:CustomGroupEditControl.EditControl>
                                 <ui:DataGrid
-                                    MaxHeight="500"
-                                    AutoGenerateColumns="False"
-                                    IsReadOnly="True"
+
                                     Style="{StaticResource CustomResizableDataGridStyle}"
                                     ItemsSource="{Binding Elements}">
                                     <ui:DataGrid.Columns>
                                         <DataGridTemplateColumn>
                                             <DataGridTemplateColumn.Header>
                                                 <!--В динамически-создаваемом UserControl работает только DynamicResource-->
-                                                <ui:TextBlock
+                                                <TextBlock
                                                     Text="{DynamicResource WarningsWindow.HeaderId}" /> 
                                             </DataGridTemplateColumn.Header>
                                             <DataGridTemplateColumn.CellTemplate>
@@ -95,25 +93,25 @@
                                             Width="120"
                                             Binding="{Binding CategoryName}">
                                             <DataGridTextColumn.Header>
-                                                <ui:TextBlock
+                                                <TextBlock
                                                     Text="{DynamicResource WarningsWindow.HeaderCategory}" />
                                             </DataGridTextColumn.Header>
                                         </DataGridTextColumn>
 
                                         <DataGridTextColumn
-                                            Width="300"
+                                            Width="270"
                                             Binding="{Binding Name}">
                                             <DataGridTextColumn.Header>
-                                                <ui:TextBlock
+                                                <TextBlock
                                                     Text="{DynamicResource WarningsWindow.HeaderName}" />
                                             </DataGridTextColumn.Header>
                                         </DataGridTextColumn>
 
                                         <DataGridTextColumn
-                                            Width="200"
+                                            Width="180"
                                             Binding="{Binding LevelName}">
                                             <DataGridTextColumn.Header>
-                                                <ui:TextBlock
+                                                <TextBlock
                                                     Text="{DynamicResource WarningsWindow.HeaderLevel}" />
                                             </DataGridTextColumn.Header>
                                         </DataGridTextColumn>
@@ -122,16 +120,17 @@
                                             Width="150"
                                             Binding="{Binding PhaseName}">
                                             <DataGridTextColumn.Header>
-                                                <ui:TextBlock
+                                                <TextBlock
                                                     Text="{DynamicResource WarningsWindow.HeaderPhase}" />
                                             </DataGridTextColumn.Header>
                                         </DataGridTextColumn>
 
                                         <DataGridTextColumn
-                                            Width="100"
+                                            Width="250"
+                                            Visibility="{Binding ShowDescription}"
                                             Binding="{Binding Description}">
                                             <DataGridTextColumn.Header>
-                                                <ui:TextBlock
+                                                <TextBlock
                                                     Text="{DynamicResource WarningsWindow.HeaderDescription}" />
                                             </DataGridTextColumn.Header>
                                         </DataGridTextColumn>

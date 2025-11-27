@@ -104,5 +104,8 @@
         <Setter
             Property="GridLinesVisibility"
             Value="All" />
+        <Setter
+            Property="IsReadOnly"
+            Value="True" />
     </Style>
 </ResourceDictionary>
