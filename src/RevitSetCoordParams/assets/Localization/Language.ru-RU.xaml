@@ -102,4 +102,5 @@
     <system:String x:Key="RevitRepository.DefaultTypeName">Нет имени типа</system:String>
     <system:String x:Key="RevitRepository.DefaultLevelName">Нет уровня</system:String>
 
+    <system:String x:Key="RevitSetCoordParamsCommandHeadless.Error">Ошибка записи параметров СМР</system:String>
 </ResourceDictionary>
