@@ -157,6 +157,7 @@
             Margin="14,4"
             Style="{StaticResource CustomBorder}">
             <ui:DataGrid
+                x:Name="Levels"
                 AutoGenerateColumns="False"
                 CanUserResizeColumns="True"
                 Style="{StaticResource CustomResizableDataGridStyle}"
@@ -169,6 +170,23 @@
                             <TextBlock
                                 Text="{me:LocalizationSource MainWindow.HeaderCheck}" />
                         </DataGridCheckBoxColumn.Header>
+                        <DataGridCheckBoxColumn.CellStyle>
+                            <Style
+                                TargetType="DataGridCell">
+                                <EventSetter
+                                    Event="CheckBox.Checked"
+                                    Handler="CheckBox_Checked" />
+                                <EventSetter
+                                    Event="CheckBox.Unchecked"
+                                    Handler="CheckBox_Unchecked" />
+                                <Setter
+                                    Property="Background"
+                                    Value="Transparent" />
+                                <Setter
+                                    Property="BorderThickness"
+                                    Value="0" />
+                            </Style>
+                        </DataGridCheckBoxColumn.CellStyle>
                     </DataGridCheckBoxColumn>
                     <DataGridTextColumn
                         Binding="{Binding Path=Name}"

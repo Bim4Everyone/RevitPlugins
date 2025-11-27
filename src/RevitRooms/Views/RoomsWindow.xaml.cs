@@ -2,6 +2,10 @@ using System.Windows;
 
 using dosymep.SimpleServices;
 
+using RevitRooms.ViewModels;
+
+using Wpf.Ui.Controls;
+
 namespace RevitRooms.Views;
 /// <summary>
 /// Interaction logic for RoomsWindow.xaml
@@ -28,5 +32,21 @@ public partial class RoomsWindow {
 
     private void ButtonCancel_Click(object sender, RoutedEventArgs e) {
         DialogResult = false;
+    }
+
+    private void CheckBox_Checked(object sender, RoutedEventArgs e) {
+        ChangeSelected(true);
+    }
+
+    private void CheckBox_Unchecked(object sender, RoutedEventArgs e) {
+        ChangeSelected(false);
+    }
+
+    private void ChangeSelected(bool state) {
+        var dataGrid = (DataGrid) FindName("Levels");
+        var levels = dataGrid.SelectedItems;
+        foreach(LevelViewModel level in levels) {
+            level.IsSelected = state;
+        }
     }
 }
