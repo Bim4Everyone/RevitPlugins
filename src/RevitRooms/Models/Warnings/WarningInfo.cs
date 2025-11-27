@@ -81,11 +81,11 @@ internal class WarningInfo {
         };
     }
 
-    public static WarningInfo GetCountourIntersectRooms(ILocalizationService localizationService) {
+    public static WarningInfo GetContourIntersectRooms(ILocalizationService localizationService) {
         return new WarningInfo() {
             TypeInfo = WarningTypeInfo.Warning,
-            Message = localizationService.GetLocalizedString("WarningsWindow.CountourIntersectRooms"),
-            Description = localizationService.GetLocalizedString("WarningsWindow.CountourIntersectRoomsDescription")
+            Message = localizationService.GetLocalizedString("WarningsWindow.ContourIntersectRooms"),
+            Description = localizationService.GetLocalizedString("WarningsWindow.CoutourIntersectRoomsDescription")
         };
     }
 

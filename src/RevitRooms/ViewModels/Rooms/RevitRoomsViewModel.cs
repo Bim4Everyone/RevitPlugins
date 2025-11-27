@@ -344,9 +344,9 @@ internal abstract class RevitRoomsViewModel : BaseViewModel {
 
             // Все помещений у которых
             // найдены самопересечения
-            var countourIntersectRooms = rooms
+            var contourIntersectRooms = rooms
                 .Where(item => item.IsCountourIntersect == true);
-            AddElements(WarningInfo.GetCountourIntersectRooms(_localizationService), countourIntersectRooms, warnings);
+            AddElements(WarningInfo.GetContourIntersectRooms(_localizationService), contourIntersectRooms, warnings);
         }
 
         Warnings = warnings.Values.Union(errorElements.Values).ToList();

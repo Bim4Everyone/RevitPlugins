@@ -5,14 +5,17 @@
     <system:String x:Key="RoomsWindow.Title">Квартирография</system:String>
     <system:String x:Key="RoomsNumsWindow.Title">Нумерация помещений</system:String>
     <system:String x:Key="WarningsWindow.Title">Ошибки и предупреждения</system:String>
-    <system:String x:Key="NumberingOrderWindow.Title">Приоритеты</system:String>
+    <system:String x:Key="NumberingOrderWindow.Title">Приоритеты</system:String>    
+        
+    <system:String x:Key="Button.Ok">ОК</system:String> 
+    <system:String x:Key="Button.Cancel">Отмена</system:String> 
     
-    <system:String x:Key="Transaction.NumBySectionGroup">Нумерация помещений по секции и этажу</system:String>
     <system:String x:Key="Transaction.NumByGroup">Нумерация групп помещений</system:String>
     <system:String x:Key="Transaction.NumBySection">Нумерация помещений по секции</system:String>
+    <system:String x:Key="Transaction.NumBySectionGroup">Нумерация помещений по секции и этажу</system:String>
     <system:String x:Key="Transaction.NumBySectionGroupLevel">Нумерация помещений в пределах каждой секции, этажа и группы</system:String>
     <system:String x:Key="Transaction.UpdateNumOrder">Изменение приоритета нумерации</system:String>
-    <system:String x:Key="Transaction.DeleteRoomsAndAreas">Удаление не размещенных помещений и зон</system:String>
+    <system:String x:Key="Transaction.DeleteRoomsAndAreas">Удаление неразмещенных помещений и зон</system:String>
     <system:String x:Key="Transaction.CalculateAreas">Расчет площадей</system:String>
     
     <system:String x:Key="Exception.CopySchedule">Для копирования спецификации закройте спецификацию "{0}".</system:String>    
@@ -23,43 +26,32 @@
     <system:String x:Key="WarningType.Warning">Предупреждение</system:String>    
     <system:String x:Key="WarningType.Unknown">Неизвестно</system:String>    
 
+    
     <system:String x:Key="MainWindow.SelectView">Выборка по текущему виду</system:String>
     <system:String x:Key="MainWindow.SelectAll">Выборка по всем элементам</system:String>
-    <system:String x:Key="MainWindow.SelectSelected">Выборка по выделенным элементам</system:String>
-    
+    <system:String x:Key="MainWindow.SelectSelected">Выборка по выделенным элементам</system:String>    
     <system:String x:Key="MainWindow.HeaderCheck">Выбрать</system:String>
     <system:String x:Key="MainWindow.HeaderLevels">Этажи</system:String>
     <system:String x:Key="MainWindow.HeaderFloors">Уровни</system:String>
     <system:String x:Key="MainWindow.Phase">Стадия:</system:String>
     
+    
+    <system:String x:Key="RoomsWindow.SetLevel">Заполнить</system:String>
+    <system:String x:Key="RoomsWindow.CalculateContourArea">Рассчитать площадь по пятну</system:String>
+    <system:String x:Key="RoomsWindow.CountRooms">Рассчитать количество комнат</system:String>
+    <system:String x:Key="RoomsWindow.CheckChanges">Проверить площадь помещений на изменения</system:String>    
+    <system:String x:Key="RoomsWindow.CheckAccuracy">Точность проверки:</system:String>
+    <system:String x:Key="RoomsWindow.Accuracy">Число знаков после запятой:</system:String>
+    <system:String x:Key="RoomsWindow.NotShowWarnings">Не показывать предупреждения</system:String>
     <system:String x:Key="RoomsWindow.WarningAccuracy">Точность проверки должна быть числом</system:String>
     <system:String x:Key="RoomsWindow.WarningAccuracyRange">Точность проверки должна быть от 1 до 100</system:String>
     <system:String x:Key="RoomsWindow.WarningSelectPhase">Выберите стадию</system:String>
     <system:String x:Key="RoomsWindow.WarningSelectLevels">Выберите хотя бы один уровень</system:String>
-    <system:String x:Key="RoomsWindow.SetLevel">Заполнить</system:String>
-    <system:String x:Key="RoomsWindow.CalculateContourArea">Рассчитать площадь по пятну</system:String>
-    <system:String x:Key="RoomsWindow.CountRooms">Рассчитать количество комнат</system:String>
-    <system:String x:Key="RoomsWindow.CheckChanges">Проверить площадь помещений на изменения</system:String>
-    
-    <system:String x:Key="RoomsWindow.CheckAccuracy">Точность проверки:</system:String>
-    <system:String x:Key="RoomsWindow.Accuracy">Число знаков после запятой:</system:String>
-    <system:String x:Key="RoomsWindow.NotShowWarnings">Не показывать предупреждения</system:String>
     <system:String x:Key="RoomsWindow.ButtonCalculateAreas">Рассчитать зоны</system:String>
     <system:String x:Key="RoomsWindow.ButtonCalculateRooms">Рассчитать помещения</system:String>
     
     
     <system:String x:Key="RoomNumsWindow.Numerating">Нумерация [{0}]\{1}]</system:String>
-    <system:String x:Key="RoomNumsWindow.WarningStartNumber">Начальный номер должен быть числом</system:String>
-    <system:String x:Key="RoomNumsWindow.WarningPositiveStartNumber">Начальный номер должен быть положительным числом</system:String>
-    <system:String x:Key="RoomNumsWindow.WarningSelectPhase">Выберите стадию</system:String>
-    <system:String x:Key="RoomNumsWindow.WarningSelectMode">Выберите выберете режим работы</system:String>
-    <system:String x:Key="RoomNumsWindow.WarningSelectModeRooms">Выберите выберете режим работы нумерации помещений</system:String>
-    <system:String x:Key="RoomNumsWindow.WarningSelectSection">Выберите хотя бы одну секцию</system:String>
-    <system:String x:Key="RoomNumsWindow.WarningSelectGroup">Выберите хотя бы одну группу</system:String>
-    <system:String x:Key="RoomNumsWindow.WarningSelectLevel">Выберите хотя бы один уровень</system:String>
-    <system:String x:Key="RoomNumsWindow.WarningSetPriorities">Настройте список приоритетов нумерации</system:String>
-    
-    
     <system:String x:Key="RoomNumsWindow.Suffix">Суффикс:</system:String>
     <system:String x:Key="RoomNumsWindow.StartNumber">Начальный номер:</system:String>
     <system:String x:Key="RoomNumsWindow.Prefix">Префикс:</system:String>
@@ -72,6 +64,15 @@
     <system:String x:Key="RoomNumsWindow.Groups">Группы для нумерации</system:String>
     <system:String x:Key="RoomNumsWindow.Levels">Уровни для нумерации</system:String>
     <system:String x:Key="RoomNumsWindow.Priorities">Приоритеты помещений</system:String>
+    <system:String x:Key="RoomNumsWindow.WarningStartNumber">Начальный номер должен быть числом</system:String>
+    <system:String x:Key="RoomNumsWindow.WarningPositiveStartNumber">Начальный номер должен быть положительным числом</system:String>
+    <system:String x:Key="RoomNumsWindow.WarningSelectPhase">Выберите стадию</system:String>
+    <system:String x:Key="RoomNumsWindow.WarningSelectMode">Выберите режим работы</system:String>
+    <system:String x:Key="RoomNumsWindow.WarningSelectModeRooms">Выберите режим работы нумерации помещений</system:String>
+    <system:String x:Key="RoomNumsWindow.WarningSelectSection">Выберите хотя бы одну секцию</system:String>
+    <system:String x:Key="RoomNumsWindow.WarningSelectGroup">Выберите хотя бы одну группу</system:String>
+    <system:String x:Key="RoomNumsWindow.WarningSelectLevel">Выберите хотя бы один уровень</system:String>
+    <system:String x:Key="RoomNumsWindow.WarningSetPriorities">Настройте список приоритетов нумерации</system:String>
     <system:String x:Key="RoomNumsWindow.ButtonUpToolTip">Вверх</system:String>
     <system:String x:Key="RoomNumsWindow.ButtonDownToolTip">Вниз</system:String>
     <system:String x:Key="RoomNumsWindow.ButtonAddToolTip">Добавить</system:String>
@@ -84,40 +85,34 @@
     <system:String x:Key="WarningsWindow.HeaderName">Имя</system:String>
     <system:String x:Key="WarningsWindow.HeaderLevel">Уровень</system:String>
     <system:String x:Key="WarningsWindow.HeaderPhase">Стадия</system:String>
-    <system:String x:Key="WarningsWindow.HeaderDescription">Описание</system:String>
-    
-    <system:String x:Key="WarningsWindow.RedundantRooms">Избыточные или не окруженные помещения.</system:String>
+    <system:String x:Key="WarningsWindow.HeaderDescription">Описание</system:String>    
+    <system:String x:Key="WarningsWindow.RedundantRooms">Избыточные или неокруженные помещения.</system:String>
     <system:String x:Key="WarningsWindow.RedundantRoomsDescription">Для запуска плагина следует исправить или удалить все неокруженные и избыточные помещения.</system:String>
-    <system:String x:Key="WarningsWindow.RedundantAreas">Избыточные или не окруженные зоны.</system:String>
+    <system:String x:Key="WarningsWindow.RedundantAreas">Избыточные или неокруженные зоны.</system:String>
     <system:String x:Key="WarningsWindow.RedundantAreasDescription">Для запуска плагина следует исправить или удалить все неокруженные и избыточные зоны.</system:String>
     <system:String x:Key="WarningsWindow.RequiredParams">Не заполнен обязательный параметр "{0}".</system:String>
     <system:String x:Key="WarningsWindow.RequiredParamsDescription">У данных помещений не заполнен ключевой параметр. Для запуска плагина необходимо заполнить значение этого параметра у каждого помещения в списке.</system:String>
     <system:String x:Key="WarningsWindow.NotEqualGroupType">Не совпадают значения параметров групп "{0} - {1}" и типа групп.</system:String>
     <system:String x:Key="WarningsWindow.NotEqualGroupTypeDescription">
-        Для помещений  данной группы на указанных этажах не совпадает значение параметра {0}.
+        Для помещений данной группы на указанных этажах не совпадает значение параметра {0}.
         
         Для всех помещений в пределах одной группы и одного этажа параметры "{1}" и "{2}" должны соответствовать друг другу.
     </system:String>
     <system:String x:Key="WarningsWindow.NotEqualMultiLevel">Не совпадают значения параметров у многоуровневых квартир.</system:String>
     <system:String x:Key="WarningsWindow.NotEqualMultiLevelDescription">Для помещений не совпадают значения параметров "{0}" и "{1}".</system:String>
     <system:String x:Key="WarningsWindow.ErrorMultiLevelRoom">Ошибка в заполнении параметра "{0}".</system:String>
-    <system:String x:Key="WarningsWindow.ErrorMultiLevelRoomDescription">Ошибка в заполнении параметра "{0}". Параметр должен быть заполнен только для помещений одного этажа группы.</system:String>
-    
+    <system:String x:Key="WarningsWindow.ErrorMultiLevelRoomDescription">Ошибка в заполнении параметра "{0}". Параметр должен быть заполнен только для помещений одного этажа группы.</system:String>    
     <system:String x:Key="WarningsWindow.EqualSectionDoors">Проверка параметра "{0}" по дверям.</system:String>
     <system:String x:Key="WarningsWindow.EqualSectionDoorsDescription">Обнаружены помещения, принадлежащие разным секциям, но имеющие доступ друг к другу через двери, окна (балконные блоки) или разделители помещений. Проверьте корректность параметра "{0}" для помещений, соединенных данными элементами.</system:String>
-       
     <system:String x:Key="WarningsWindow.NotEqualGroup">Проверка параметра "{0}" по дверям и окнам.</system:String>
-    <system:String x:Key="WarningsWindow.NotEqualGroupDescription">Обнаружены помещения, принадлежащие разным квартирам, но имеющие доступ друг к другу через двери, окна (балконные блоки) или разделители помещений. Проверьте корректность параметра "{0}" для помещений, соединенных данными элементами.</system:String>
-           
-    <system:String x:Key="WarningsWindow.CountourIntersectRooms">Найдены самопересечения помещений.</system:String>
-    <system:String x:Key="WarningsWindow.CountourIntersectRoomsDescription">Для данных помещений обнаружены самопересечения контуров. При возможности их следует исправлять разделителями помещений, так как самопересечения могут привести к ошибочному расчету площадей.</system:String>
-    
+    <system:String x:Key="WarningsWindow.NotEqualGroupDescription">Обнаружены помещения, принадлежащие разным квартирам, но имеющие доступ друг к другу через двери, окна (балконные блоки) или разделители помещений. Проверьте корректность параметра "{0}" для помещений, соединенных данными элементами.</system:String>           
+    <system:String x:Key="WarningsWindow.ContourIntersectRooms">Найдены самопересечения помещений.</system:String>
+    <system:String x:Key="WarningsWindow.ContourIntersectRoomsDescription">Для данных помещений обнаружены самопересечения контуров. При возможности их следует исправлять разделителями помещений, так как самопересечения могут привести к ошибочному расчету площадей.</system:String>
     <system:String x:Key="WarningsWindow.BigChangesRoomAreas">Большие изменения в площади помещений.</system:String>
     <system:String x:Key="WarningsWindow.BigChangesFlatAreas">Большие изменения в площади квартир.</system:String>
     <system:String x:Key="WarningsWindow.BigChangesAreas">Большие изменения в площади зон.</system:String>
     <system:String x:Key="WarningsWindow.BigChangesDescription">При текущем расчете новые значения площадей превышают заданную разницу по сравнению с предыдущими значениями.</system:String>
     <system:String x:Key="WarningsWindow.BigChangeDiff">Изменение: {0}% ({1} {2}).</system:String>
-    
     <system:String x:Key="WarningsWindow.MainInfoErrorsAndWarnings">
         Расчет не выполнен, так как есть ошибки и предупреждения.        
         Ошибки обязательны к исправлению.        
@@ -129,11 +124,9 @@
     <system:String x:Key="WarningsWindow.MainInfoWarnings">
         Расчет завершен с предупреждениями.
         Предупреждения следует проанализировать и при необходимости исправить.
-    </system:String>
-        
+    </system:String>        
     <system:String x:Key="WarningsWindow.StatusError">Ошибка</system:String>
-    <system:String x:Key="WarningsWindow.StatusWarning">Предупреждение</system:String>
-    
+    <system:String x:Key="WarningsWindow.StatusWarning">Предупреждение</system:String>    
     <system:String x:Key="WarningsWindow.NoPriorities">В списке приоритетов отсутствуют наименования помещений.</system:String>
     <system:String x:Key="WarningsWindow.AddPriorities">Добавить отсутствующие?</system:String>
     <system:String x:Key="WarningsWindow.Exit">Выход</system:String>    
@@ -154,7 +147,4 @@
     <system:String x:Key="TaskDialogWarning.NotFilledSchedules">Были найдены не заполненные ключевые спецификации:</system:String>    
     <system:String x:Key="TaskDialog.Information">Информация</system:String>
     <system:String x:Key="TaskDialog.Result">Расчет завершен успешно!</system:String> 
-    
-    <system:String x:Key="Button.Ok">Ок</system:String> 
-    <system:String x:Key="Button.Cancel">Отмена</system:String> 
 </ResourceDictionary>
