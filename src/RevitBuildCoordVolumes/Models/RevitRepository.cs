@@ -73,6 +73,14 @@ internal class RevitRepository {
     }
 
     /// <summary>
+    /// Получение всех типов перекрытий и фундаментных плит
+    /// </summary>
+    public IEnumerable<SlabElement> GetSlabs(IEnumerable<string> typeSlabs) {
+        return typeSlabs
+            .SelectMany(_slabsService.GetSlabsByName);
+    }
+
+    /// <summary>
     /// Метод получения всех вариантов значений зон по заданному параметру
     /// </summary>
     public IEnumerable<string> GetTypeZones(RevitParam revitParam) {
@@ -99,31 +107,9 @@ internal class RevitRepository {
             .OfType<Element>();
     }
 
-
-
     public IEnumerable<Element> GetSelectedElements() {
         return ActiveUIDocument.GetSelectedElements();
     }
-
-
-
-    // Метод получения перекрытий и плит из одного документа   
-    private IEnumerable<SlabElement> LoadSlabsFromDocument(Document doc) {
-        var categoryFilters = RevitConstants.SlabCategories
-            .Select(cat => (ElementFilter) new ElementCategoryFilter(cat))
-            .ToList();
-
-        var multiFilter = new LogicalOrFilter(categoryFilters);
-
-        return new FilteredElementCollector(doc)
-            .WherePasses(multiFilter)
-            .WhereElementIsNotElementType()
-            .OfType<Element>()
-            .Where(element => !string.IsNullOrWhiteSpace(element.Name))
-            .Select(element => new SlabElement { Element = element, Name = element.Name });
-    }
-
-
 
     public void Process() {
         if(GetSelectedElements().FirstOrDefault() is not Area area) {

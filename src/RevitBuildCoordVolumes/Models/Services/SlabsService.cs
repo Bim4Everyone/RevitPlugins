@@ -48,16 +48,23 @@ internal class SlabsService : ISlabsService {
         return new FilteredElementCollector(doc)
             .WherePasses(multiFilter)
             .WhereElementIsNotElementType()
-            .OfType<Element>()
-            .Where(element => !string.IsNullOrWhiteSpace(element.Name))
-            .Select(element => new SlabElement { Element = element, Name = element.Name });
+            .OfType<Floor>()
+            .Where(floor => !string.IsNullOrWhiteSpace(floor.Name))
+            .Select(floor => new SlabElement { Floor = floor, Name = floor.Name, ContourPoints = GetContourSlab(doc, floor), Document = doc });
     }
 
-    public SlabElement GetSlabByName(string name) {
-        throw new System.NotImplementedException();
+    private IList<XYZ> GetContourSlab(Document doc, Floor floor) {
+        var sketchId = floor.SketchId;
+        var sketch = doc.GetElement(sketchId) as Sketch;
+        var profile = sketch.Profile;
+        var externalContour = profile.get_Item(0);
+
+        var listXyz = new List<XYZ>();
+        foreach(Curve curve in externalContour) {
+            listXyz.Add(curve.GetEndPoint(0));
+        }
+        return listXyz;
     }
 
-    IEnumerable<SlabElement> ISlabsService.GetSlabsByDocs(IEnumerable<Document> documents) {
-        return GetSlabsByDocs(documents);
-    }
+
 }

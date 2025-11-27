@@ -30,7 +30,7 @@ public class RevitBuildCoordVolumesCommand : BasePluginCommand {
     /// Инициализирует команду плагина.
     /// </summary>
     public RevitBuildCoordVolumesCommand() {
-        PluginName = "RevitBuildCoordVolumes";
+        PluginName = "Построение объемов СМР";
     }
 
     /// <summary>

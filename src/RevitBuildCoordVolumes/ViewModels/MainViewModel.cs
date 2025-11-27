@@ -286,7 +286,7 @@ internal class MainViewModel : BaseViewModel {
             : allSlabs
                 .Select(slabType => new SlabViewModel {
                     Name = slabType,
-                    IsChecked = savedSlabs.Contains(slabType)
+                    IsChecked = savedSlabs.Contains(slabType),
                 })
                 .OrderBy(vm => vm.Name);
     }
@@ -340,7 +340,9 @@ internal class MainViewModel : BaseViewModel {
     }
     private void AcceptView() {
         SaveConfig();
-        //_revitRepository.Process();
+
+        var processor = new BuildCoordVolumesProcessor(_localizationService, _revitRepository, _buildCoordVolumesSettings);
+        processor.Run();
     }
 
     private bool CanAcceptView() {

@@ -217,7 +217,7 @@
                                                 DetailDescription="{Binding DetailDescription}"
                                                 SourceParamName="{Binding SourceParamName, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
                                                 TargetParamName="{Binding TargetParamName, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
-                                                IsChecked="{Binding IsChecked, Mode=TwoWay}"
+                                                IsChecked="{Binding IsChecked, Mode=TwoWay}"                                                
                                                 IsPair="{Binding IsPair, Mode=TwoWay}"
                                                 HasWarning="{Binding HasWarning, Mode=TwoWay}"
                                                 WarningDescription="{Binding Warnings}" />
