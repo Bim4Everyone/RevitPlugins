@@ -85,7 +85,7 @@ internal class WarningInfo {
         return new WarningInfo() {
             TypeInfo = WarningTypeInfo.Warning,
             Message = localizationService.GetLocalizedString("WarningsWindow.ContourIntersectRooms"),
-            Description = localizationService.GetLocalizedString("WarningsWindow.CoutourIntersectRoomsDescription")
+            Description = localizationService.GetLocalizedString("WarningsWindow.ContourIntersectRoomsDescription")
         };
     }
 
