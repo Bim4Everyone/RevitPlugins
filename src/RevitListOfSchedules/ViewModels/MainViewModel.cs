@@ -344,7 +344,7 @@ internal class MainViewModel : BaseViewModel {
             var viewDrafting = _revitRepository.GetViewDrafting(albumName);
             var tempDoc = new TempFamilyDocument(_localizationService, _revitRepository, _familyLoadOptions, albumName);
             var famSymbol = tempDoc.GetFamilySymbol();
-            var instancesAssembly = new InstancesAssembly(_revitRepository, viewDrafting, famSymbol, albumName);
+            var instancesAssembly = new InstancesAssembly(_localizationService, _revitRepository, viewDrafting, famSymbol, albumName);
 
             instancesAssembly.DeleteFamilyInstances();
 

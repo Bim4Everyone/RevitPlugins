@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -5,25 +6,34 @@ using Autodesk.Revit.DB;
 
 using dosymep.Bim4Everyone;
 using dosymep.Revit;
+using dosymep.SimpleServices;
 
 namespace RevitListOfSchedules.Models;
 internal class InstancesAssembly {
-    // Ключевое слово для поиска среди строк в заголовке спецификации
-    private readonly IEnumerable<string> _approvedLines = ["ведомость", "спецификация", "перечень", "список"];
+    private readonly ILocalizationService _localizationService;
+    private readonly IEnumerable<string> _approvedLines;
     private readonly RevitRepository _revitRepository;
     private readonly ViewDrafting _viewDrafting;
     private readonly FamilySymbol _familySymbol;
     private readonly string _albumName;
 
     public InstancesAssembly(
+        ILocalizationService localizationService,
         RevitRepository revitRepository,
         ViewDrafting viewDrafting,
         FamilySymbol familySymbol,
         string albumName) {
+        _localizationService = localizationService;
         _revitRepository = revitRepository;
         _viewDrafting = viewDrafting;
         _familySymbol = familySymbol;
         _albumName = albumName;
+
+        string localizedApprovedLines = _localizationService.GetLocalizedString("InstancesAssembly.ApprovedLines");
+
+        _approvedLines = localizedApprovedLines
+            .Split([','], StringSplitOptions.RemoveEmptyEntries)
+            .Select(s => s.Trim());
     }
 
     public void PlaceFamilyInstances(string sheetNumber, string sheetRevNumber, IList<ViewSchedule> listOfSchedules) {
