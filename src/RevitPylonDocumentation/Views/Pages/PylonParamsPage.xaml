@@ -1,17 +1,86 @@
-﻿<Page x:Class="RevitPylonDocumentation.Views.Pages.PylonParamsPage"
-      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-      xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
-      xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
-      xmlns:local="clr-namespace:RevitPylonDocumentation.Views.Pages"
-      mc:Ignorable="d" 
-      d:DesignHeight="450" d:DesignWidth="800"
-      Title="PylonParamsPage">
+﻿<core:WpfUIPlatformPage
+    x:Class="RevitPylonDocumentation.Views.Pages.PylonParamsPage"
+    x:ClassModifier="internal"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
+    xmlns:core="clr-namespace:dosymep.WpfUI.Core"
+    xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
+    xmlns:me="clr-namespace:dosymep.WpfCore.MarkupExtensions;assembly=dosymep.WpfCore"
+    xmlns:vms="clr-namespace:RevitPylonDocumentation.ViewModels"
+    xmlns:local="clr-namespace:RevitPylonDocumentation.Views.Pages"
+    xmlns:views="clr-namespace:RevitPylonDocumentation.Views"
+    xmlns:controls="clr-namespace:RevitPylonDocumentation.Views.Controls"
+    mc:Ignorable="d"
+    ScrollViewer.CanContentScroll="False"
+    Title="PylonParamsPage"
+    d:DesignHeight="700"
+    d:DesignWidth="600"
+    d:DataContext="{d:DesignInstance vms:MainViewModel, IsDesignTimeCreatable=False}">
+    <core:WpfUIPlatformPage.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary
+                    Source="../CustomStyles.xaml" />
+                <ResourceDictionary
+                    Source="../TooltipsDictionary.xaml" />
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
+    </core:WpfUIPlatformPage.Resources>
 
     <Grid>
-        <TextBlock
-            HorizontalAlignment="Center"
-            VerticalAlignment="Center"
-            Text="PylonParamsPage" />
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+        
+        <Border Name="PylonProps"
+            Margin="15"
+            Style="{StaticResource CustomBorder}">
+            <StackPanel>
+                <ui:TextBlock
+                    FontSize="16"
+                    Margin="5 0 5 5"
+                    Text="Параметры, принадлежащие опалубочному элементу пилона"
+                    Style="{StaticResource CustomTextBlock}" />
+
+                <controls:TextBoxSettingControl
+                    LabelText="Параметр марки пилона:"
+                    TextBoxText="{Binding Path=ProjectSettings.MarkTemp, UpdateSourceTrigger=PropertyChanged}"
+                    ToolTipText="Параметр марки пилона"
+                    TextChangedCommand="{Binding SettingsChangedCommand}" />
+
+                <controls:TextBoxSettingControl
+                    LabelText="Параметр комплекта документации пилона:"
+                    TextBoxText="{Binding Path=ProjectSettings.ProjectSectionTemp, UpdateSourceTrigger=PropertyChanged}"
+                    ToolTipText="Параметр комплекта документации пилона"
+                    TextChangedCommand="{Binding SettingsChangedCommand}" />
+
+                <controls:TextBoxSettingControl
+                    LabelText="Параметр фильтрации типовых пилонов:"
+                    TextBoxText="{Binding Path=ProjectSettings.TypicalPylonFilterParameterTemp, UpdateSourceTrigger=PropertyChanged}"
+                    ToolTipText="Параметр фильтрации типовых пилонов"
+                    TextChangedCommand="{Binding SettingsChangedCommand}" />
+
+                <controls:TextBoxSettingControl
+                    LabelText="Значение параметра фильтрации типовых пилонов:"
+                    TextBoxText="{Binding Path=ProjectSettings.TypicalPylonFilterValueTemp, UpdateSourceTrigger=PropertyChanged}"
+                    ToolTipText="Значение параметра фильтрации типовых пилонов"
+                    TextChangedCommand="{Binding SettingsChangedCommand}" />
+
+                <controls:TextBoxSettingControl
+                    LabelText="Параметр длины сечения пилона:"
+                    TextBoxText="{Binding Path=ProjectSettings.PylonLengthParamNameTemp, UpdateSourceTrigger=PropertyChanged}"
+                    ToolTipText="Параметр длины сечения пилона"
+                    TextChangedCommand="{Binding SettingsChangedCommand}" />
+
+                <controls:TextBoxSettingControl
+                    LabelText="Параметр ширины сечения пилона:"
+                    TextBoxText="{Binding Path=ProjectSettings.PylonWidthParamNameTemp, UpdateSourceTrigger=PropertyChanged}"
+                    ToolTipText="Параметр ширины сечения пилона"
+                    TextChangedCommand="{Binding SettingsChangedCommand}" />
+            </StackPanel>
+        </Border>
     </Grid>
-</Page>
+</core:WpfUIPlatformPage>
