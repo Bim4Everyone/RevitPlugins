@@ -107,12 +107,31 @@
                     Icon="{ui:SymbolIcon Library24}"
                     TargetPageType="{x:Type pages:SheetParamsPage}" />
             </ui:NavigationView.MenuItems>
-            <ui:NavigationView.FooterMenuItems>
-                <ui:NavigationViewItem
-                    Content="Settings"
-                    Icon="{ui:SymbolIcon Settings24}"
-                    TargetPageType="{x:Type pages:AboutPage}" />
-            </ui:NavigationView.FooterMenuItems>
+            <ui:NavigationView.PaneFooter>
+                <Border
+                    Margin="10 20"
+                    Style="{StaticResource CustomBorder}">
+                    <StackPanel>
+                        <TextBlock
+                            Margin="5"
+                            FontWeight="Medium"
+                            Foreground="{ui:ThemeResource TextFillColorSecondaryBrush}"
+                            Text="BIM-Совет" />
+
+                        <TextBlock
+                            Margin="5"
+                            TextWrapping="WrapWithOverflow"
+                            Foreground="{ui:ThemeResource TextFillColorSecondaryBrush}"
+                            Text="1. Убедитесь, что у нужных пилонов заполнена Фильтрация 1 'на 1 шт.'" />
+
+                        <TextBlock
+                            Margin="5"
+                            TextWrapping="WrapWithOverflow"
+                            Foreground="{ui:ThemeResource TextFillColorSecondaryBrush}"
+                            Text="2. Убедитесь, что загрузили последние версии семейств опалубки и армирования из библиотеки" />
+                    </StackPanel>
+                </Border>
+            </ui:NavigationView.PaneFooter>
         </ui:NavigationView>
     </Grid>
     
