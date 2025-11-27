@@ -38,8 +38,7 @@
                 <RowDefinition Height="Auto" />
             </Grid.RowDefinitions>
 
-            <Border
-                Name="ProjectProps"
+            <Border Name="ProjectProps"
                 Margin="15"
                 Style="{StaticResource CustomBorder}">
                 <StackPanel>
