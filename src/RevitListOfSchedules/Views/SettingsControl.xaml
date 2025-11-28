@@ -8,8 +8,8 @@
     xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
     xmlns:me="clr-namespace:dosymep.WpfCore.MarkupExtensions;assembly=dosymep.WpfCore"
     mc:Ignorable="d"
-    d:DesignHeight="370"
-    d:DesignWidth="600">
+    d:DesignHeight="350"
+    d:DesignWidth="750">
 
     <UserControl.Resources>
         <ResourceDictionary>
@@ -23,25 +23,30 @@
     <StackPanel
         FlowDirection="LeftToRight"
         Background="{DynamicResource ComboBoxDropDownBackground}">
-        <Border
+        <Border            
+            Margin="5"
             Style="{StaticResource CustomBorder}"
-            Height="65">
+            Height="75">
             <Grid>
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition
-                        Width="350" />
+                        Width="450" />
                     <ColumnDefinition
                         Width="Auto" />
                 </Grid.ColumnDefinitions>
                 <StackPanel
                     Grid.Column="0">
-                    <Label
+                    <ui:TextBlock
+                        Margin="5"
+                        FontWeight="DemiBold"
+                        FontSize="15"
                         VerticalAlignment="Center"
-                        Content="{me:LocalizationSource MainWindow.GroupParameters}" />
-                    <Label
-                        FontSize="10"
+                        Text="{me:LocalizationSource MainWindow.GroupParameters}" />
+                    <ui:TextBlock                        
+                        FontSize="13"
+                        Margin="5,0,0,0"
                         VerticalAlignment="Center"
-                        Content="{me:LocalizationSource MainWindow.GroupParametersTooltip}" />
+                        Text="{me:LocalizationSource MainWindow.GroupParametersTooltip}" />
                 </StackPanel>
                 <ComboBox
                     Grid.Column="1"
@@ -53,24 +58,29 @@
             </Grid>
         </Border>
         <Border
+            Margin="5"
             Style="{StaticResource CustomBorder}"
-            Height="65">
+            Height="75">
             <Grid>
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition
-                        Width="350" />
+                        Width="450" />
                     <ColumnDefinition
                         Width="*" />
                 </Grid.ColumnDefinitions>
                 <StackPanel
                     Grid.Column="0">
-                    <Label
+                    <ui:TextBlock
+                        Margin="5"
+                        FontWeight="DemiBold"
+                        FontSize="15"
                         VerticalAlignment="Center"
-                        Content="{me:LocalizationSource MainWindow.CreateList}" />
-                    <Label
-                        FontSize="10"
+                        Text="{me:LocalizationSource MainWindow.CreateList}" />
+                    <ui:TextBlock
+                        FontSize="13"
+                        Margin="5,0,0,0"                        
                         VerticalAlignment="Center"
-                        Content="{me:LocalizationSource MainWindow.CreateListTooltip}" />
+                        Text="{me:LocalizationSource MainWindow.CreateListTooltip}" />
                 </StackPanel>
                 <ui:ToggleSwitch
                     Grid.Column="1"
@@ -81,24 +91,29 @@
             </Grid>
         </Border>
         <Border
+            Margin="5"
             Style="{StaticResource CustomBorder}"
-            Height="65">
+            Height="75">
             <Grid>
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition
-                        Width="350" />
+                        Width="450" />
                     <ColumnDefinition
                         Width="*" />
                 </Grid.ColumnDefinitions>
                 <StackPanel
                     Grid.Column="0">
-                    <Label
+                    <ui:TextBlock
+                        Margin="5"
+                        FontWeight="DemiBold"
+                        FontSize="15"
                         VerticalAlignment="Center"
-                        Content="{me:LocalizationSource MainWindow.AddListToSheet}" />
-                    <Label
-                        FontSize="10"
+                        Text="{me:LocalizationSource MainWindow.AddListToSheet}" />
+                    <ui:TextBlock
+                        FontSize="13"
+                        Margin="5,0,0,0"
                         VerticalAlignment="Center"
-                        Content="{me:LocalizationSource MainWindow.AddListToSheetTooltip}" />
+                        Text="{me:LocalizationSource MainWindow.AddListToSheetTooltip}" />
                 </StackPanel>
                 <ui:ToggleSwitch
                     Grid.Column="1"
@@ -109,24 +124,29 @@
             </Grid>
         </Border>
         <Border
+            Margin="5"
             Style="{StaticResource CustomBorder}"
-            Height="65">
+            Height="75">
             <Grid>
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition
-                        Width="350" />
+                        Width="450" />
                     <ColumnDefinition
                         Width="*" />
                 </Grid.ColumnDefinitions>
                 <StackPanel
                     Grid.Column="0">
-                    <Label
+                    <ui:TextBlock
+                        Margin="5"
+                        FontWeight="DemiBold"
+                        FontSize="15"
                         VerticalAlignment="Center"
-                        Content="{me:LocalizationSource MainWindow.ConsiderRevision}" />
-                    <Label
-                        FontSize="10"
+                        Text="{me:LocalizationSource MainWindow.ConsiderRevision}" />
+                    <ui:TextBlock
+                        FontSize="13"
+                        Margin="5,0,0,0"
                         VerticalAlignment="Center"
-                        Content="{me:LocalizationSource MainWindow.ConsiderRevisionTooltip}" />
+                        Text="{me:LocalizationSource MainWindow.ConsiderRevisionTooltip}" />
                 </StackPanel>
                 <ui:ToggleSwitch
                     Grid.Column="1"
