@@ -11,7 +11,7 @@ using dosymep.SimpleServices;
 namespace RevitListOfSchedules.Models;
 internal class InstancesAssembly {
     private readonly ILocalizationService _localizationService;
-    private readonly IEnumerable<string> _approvedLines;
+    private readonly IList<string> _approvedLines;
     private readonly RevitRepository _revitRepository;
     private readonly ViewDrafting _viewDrafting;
     private readonly FamilySymbol _familySymbol;
@@ -33,7 +33,8 @@ internal class InstancesAssembly {
 
         _approvedLines = localizedApprovedLines
             .Split([','], StringSplitOptions.RemoveEmptyEntries)
-            .Select(s => s.Trim());
+            .Select(s => s.Trim())
+            .ToList();
     }
 
     public void PlaceFamilyInstances(string sheetNumber, string sheetRevNumber, IList<ViewSchedule> listOfSchedules) {
