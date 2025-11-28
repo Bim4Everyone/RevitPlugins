@@ -1,11 +1,17 @@
 using System.Windows;
+using System.Windows.Threading;
 
 using dosymep.SimpleServices;
+
+using RevitParamsChecker.Views.Dashboard;
+
+using Wpf.Ui.Abstractions;
 
 namespace RevitParamsChecker.Views;
 
 public partial class MainWindow {
     public MainWindow(
+        INavigationViewPageProvider navigationViewPageProvider,
         ILoggerService loggerService,
         ISerializationService serializationService,
         ILanguageService languageService,
@@ -20,6 +26,10 @@ public partial class MainWindow {
             uiThemeService,
             themeUpdaterService) {
         InitializeComponent();
+        _rootNavigationView.SetPageProviderService(navigationViewPageProvider);
+        Dispatcher.BeginInvoke(
+            DispatcherPriority.Loaded,
+            () => _rootNavigationView.Navigate(typeof(DashboardPage)));
     }
 
     public override string PluginName => nameof(RevitParamsChecker);

@@ -5,6 +5,7 @@ using dosymep.WPF.Commands;
 using dosymep.WPF.ViewModels;
 
 using RevitParamsChecker.Models;
+using RevitParamsChecker.Services;
 
 namespace RevitParamsChecker.ViewModels;
 

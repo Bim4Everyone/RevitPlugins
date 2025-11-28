@@ -1,5 +1,4 @@
-namespace RevitParamsChecker.Models;
+namespace RevitParamsChecker.Services;
 
 public class ChecksEngine {
-    
 }

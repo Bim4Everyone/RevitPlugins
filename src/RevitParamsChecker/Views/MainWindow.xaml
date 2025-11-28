@@ -11,32 +11,85 @@
     xmlns:core="clr-namespace:dosymep.WpfUI.Core"
     xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
     xmlns:me="clr-namespace:dosymep.WpfCore.MarkupExtensions;assembly=dosymep.WpfCore"
-
+    xmlns:checksViews="clr-namespace:RevitParamsChecker.Views.Checks"
+    xmlns:dashboardViews="clr-namespace:RevitParamsChecker.Views.Dashboard"
+    xmlns:filtrationViews="clr-namespace:RevitParamsChecker.Views.Filtration"
+    xmlns:resultsViews="clr-namespace:RevitParamsChecker.Views.Results"
+    xmlns:rulesViews="clr-namespace:RevitParamsChecker.Views.Rules"
     mc:Ignorable="d"
     Title="{me:LocalizationSource MainWindow.Title}"
-
     Height="500"
     Width="700"
-
     MinHeight="500"
     MinWidth="700"
-
     d:DataContext="{d:DesignInstance vms:MainViewModel, IsDesignTimeCreatable=False}">
 
     <i:Interaction.Triggers>
-        <i:EventTrigger EventName="Loaded">
-            <i:InvokeCommandAction Command="{Binding LoadViewCommand}" />
+        <i:EventTrigger
+            EventName="Loaded">
+            <i:InvokeCommandAction
+                Command="{Binding LoadViewCommand}" />
         </i:EventTrigger>
     </i:Interaction.Triggers>
 
     <Grid>
         <Grid.RowDefinitions>
-            <RowDefinition Height="Auto" /> <RowDefinition Height="*" /> <RowDefinition Height="Auto" />
+            <RowDefinition
+                Height="Auto" />
+            <RowDefinition
+                Height="*" />
+            <RowDefinition
+                Height="Auto" />
         </Grid.RowDefinitions>
 
         <ui:TitleBar
             Grid.Row="0"
+            x:Name="_titleBar"
             Title="{me:LocalizationSource MainWindow.Title}" />
+
+        <ui:NavigationView
+            Grid.Row="0"
+            x:Name="_rootNavigationView"
+            FrameMargin="0"
+            OpenPaneLength="200"
+            IsPaneOpen="True"
+            PaneDisplayMode="Left"
+            IsBackButtonVisible="Visible"
+            IsPaneVisible="True"
+            IsPaneToggleVisible="True"
+            TitleBar="{Binding ElementName=_titleBar}"
+            BreadcrumbBar="{Binding ElementName=_breadcrumbBar}">
+
+            <ui:NavigationView.Header>
+                <StackPanel
+                    Margin="42 20 42 20">
+                    <ui:BreadcrumbBar
+                        x:Name="_breadcrumbBar" />
+                </StackPanel>
+            </ui:NavigationView.Header>
+
+            <ui:NavigationView.MenuItems>
+                <ui:NavigationViewItem
+                    Content="{me:LocalizationSource DashboardPage.Title}"
+                    TargetPageType="{x:Type dashboardViews:DashboardPage}" />
+
+                <ui:NavigationViewItem
+                    Content="{me:LocalizationSource FiltrationPage.Title}"
+                    TargetPageType="{x:Type filtrationViews:FiltrationPage}" />
+
+                <ui:NavigationViewItem
+                    Content="{me:LocalizationSource RulesPage.Title}"
+                    TargetPageType="{x:Type rulesViews:RulesPage}" />
+
+                <ui:NavigationViewItem
+                    Content="{me:LocalizationSource ChecksPage.Title}"
+                    TargetPageType="{x:Type checksViews:ChecksPage}" />
+
+                <ui:NavigationViewItem
+                    Content="{me:LocalizationSource ResultsPage.Title}"
+                    TargetPageType="{x:Type resultsViews:ResultsPage}" />
+            </ui:NavigationView.MenuItems>
+        </ui:NavigationView>
 
         <StackPanel
             Grid.Row="2"
@@ -53,14 +106,14 @@
                 Margin="10"
                 Width="80"
                 Appearance="Info"
-                Content="{me:LocalizationSource MainWindow.ButtonOk}"
+                Content="{me:LocalizationSource Ok}"
                 Click="ButtonOk_Click"
                 Command="{Binding AcceptViewCommand}" />
 
             <ui:Button
                 Margin="10"
                 Width="80"
-                Content="{me:LocalizationSource MainWindow.ButtonCancel}"
+                Content="{me:LocalizationSource Cancel}"
                 IsCancel="True"
                 Click="ButtonCancel_Click" />
         </StackPanel>
