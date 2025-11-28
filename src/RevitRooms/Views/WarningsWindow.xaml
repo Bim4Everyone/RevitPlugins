@@ -47,6 +47,7 @@
         <TextBlock
             Grid.Row="1" 
             Margin="20,5"
+            TextWrapping="Wrap"
             Text="{Binding Description}"/>
 
         <ScrollViewer
