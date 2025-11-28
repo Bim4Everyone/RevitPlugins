@@ -45,68 +45,51 @@
                     Text="Параметры, принадлежащие опалубочному элементу пилона"
                     Style="{StaticResource CustomTextBlock}" />
 
-                <Grid>
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="*" />
-                        <ColumnDefinition Width="*" />
-                    </Grid.ColumnDefinitions>
-                    
-                    <controls:TextBoxSettingControl
-                        Grid.Column="0"
-                        LabelText="Параметр марки пилона:"
-                        TextBoxText="{Binding Path=ProjectSettings.MarkTemp, UpdateSourceTrigger=PropertyChanged}"
-                        ToolTipText="Параметр марки пилона"
-                        TextChangedCommand="{Binding SettingsChangedCommand}" />
+                <controls:TextBoxSettingControl
+                    LabelText="Параметр марки пилона:"
+                    TextBoxText="{Binding Path=ProjectSettings.MarkTemp, UpdateSourceTrigger=PropertyChanged}"
+                    ToolTipText="Параметр марки пилона"
+                    TextChangedCommand="{Binding SettingsChangedCommand}" />
 
-                    <controls:TextBoxSettingControl
-                        Grid.Column="1"
-                        LabelText="Параметр комплекта документации пилона:"
-                        TextBoxText="{Binding Path=ProjectSettings.ProjectSectionTemp, UpdateSourceTrigger=PropertyChanged}"
-                        ToolTipText="Параметр комплекта документации пилона"
-                        TextChangedCommand="{Binding SettingsChangedCommand}" />
-                </Grid>
+                <controls:TextBoxSettingControl
+                    LabelText="Параметр комплекта документации пилона:"
+                    TextBoxText="{Binding Path=ProjectSettings.ProjectSectionTemp, UpdateSourceTrigger=PropertyChanged}"
+                    ToolTipText="Параметр комплекта документации пилона"
+                    TextChangedCommand="{Binding SettingsChangedCommand}" />
 
-                <Grid>
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="*" />
-                        <ColumnDefinition Width="*" />
-                    </Grid.ColumnDefinitions>
+                <controls:TextBoxSettingControl
+                    LabelText="Параметр фильтрации типовых пилонов и его значение:"
+                    TextBoxText="{Binding Path=ProjectSettings.TypicalPylonFilterParameterTemp, UpdateSourceTrigger=PropertyChanged}"
+                    ToolTipText="Параметр фильтрации типовых пилонов и его значение"
+                    TextChangedCommand="{Binding SettingsChangedCommand}" />
 
-                    <controls:TextBoxSettingControl
-                        Grid.Column="0"
-                        LabelText="Параметр фильтрации типовых пилонов:"
-                        TextBoxText="{Binding Path=ProjectSettings.TypicalPylonFilterParameterTemp, UpdateSourceTrigger=PropertyChanged}"
-                        ToolTipText="Параметр фильтрации типовых пилонов"
-                        TextChangedCommand="{Binding SettingsChangedCommand}" />
+                <ui:TextBox
+                    Margin="5"
+                    HorizontalAlignment="Stretch"
+                    Text="{Binding Path=ProjectSettings.TypicalPylonFilterValueTemp, UpdateSourceTrigger=PropertyChanged}"
+                    Style="{StaticResource TextBoxWithTooltipStyle}"
+                    ToolTip="Значение параметра фильтрации типовых пилонов">
 
-                    <controls:TextBoxSettingControl
-                        Grid.Column="1"
-                        LabelText="Значение параметра фильтрации типовых пилонов:"
-                        TextBoxText="{Binding Path=ProjectSettings.TypicalPylonFilterValueTemp, UpdateSourceTrigger=PropertyChanged}"
-                        ToolTipText="Значение параметра фильтрации типовых пилонов"
-                        TextChangedCommand="{Binding SettingsChangedCommand}" />
-                </Grid>
+                    <i:Interaction.Triggers>
+                        <i:EventTrigger
+                            EventName="TextChanged">
+                            <i:InvokeCommandAction
+                                Command="{Binding TextChangedCommand, ElementName=_this}" />
+                        </i:EventTrigger>
+                    </i:Interaction.Triggers>
+                </ui:TextBox>
 
-                <Grid>
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="*" />
-                        <ColumnDefinition Width="*" />
-                    </Grid.ColumnDefinitions>
+                <controls:TextBoxSettingControl
+                    LabelText="Параметр длины сечения пилона:"
+                    TextBoxText="{Binding Path=ProjectSettings.PylonLengthParamNameTemp, UpdateSourceTrigger=PropertyChanged}"
+                    ToolTipText="Параметр длины сечения пилона"
+                    TextChangedCommand="{Binding SettingsChangedCommand}" />
 
-                    <controls:TextBoxSettingControl
-                        Grid.Column="0"
-                        LabelText="Параметр длины сечения пилона:"
-                        TextBoxText="{Binding Path=ProjectSettings.PylonLengthParamNameTemp, UpdateSourceTrigger=PropertyChanged}"
-                        ToolTipText="Параметр длины сечения пилона"
-                        TextChangedCommand="{Binding SettingsChangedCommand}" />
-
-                    <controls:TextBoxSettingControl
-                        Grid.Column="1"
-                        LabelText="Параметр ширины сечения пилона:"
-                        TextBoxText="{Binding Path=ProjectSettings.PylonWidthParamNameTemp, UpdateSourceTrigger=PropertyChanged}"
-                        ToolTipText="Параметр ширины сечения пилона"
-                        TextChangedCommand="{Binding SettingsChangedCommand}" />
-                </Grid>
+                <controls:TextBoxSettingControl
+                    LabelText="Параметр ширины сечения пилона:"
+                    TextBoxText="{Binding Path=ProjectSettings.PylonWidthParamNameTemp, UpdateSourceTrigger=PropertyChanged}"
+                    ToolTipText="Параметр ширины сечения пилона"
+                    TextChangedCommand="{Binding SettingsChangedCommand}" />
             </StackPanel>
         </Border>
     </Grid>
