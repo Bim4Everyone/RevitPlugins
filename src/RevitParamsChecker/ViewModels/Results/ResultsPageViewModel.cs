@@ -1,5 +1,4 @@
 namespace RevitParamsChecker.ViewModels.Results;
 
-public class ResultsPageViewModel {
-    
+internal class ResultsPageViewModel {
 }

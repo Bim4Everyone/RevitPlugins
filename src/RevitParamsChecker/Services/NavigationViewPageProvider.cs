@@ -7,7 +7,7 @@ using Wpf.Ui.Abstractions;
 
 namespace RevitParamsChecker.Services;
 
-public class NavigationViewPageProvider : INavigationViewPageProvider {
+internal class NavigationViewPageProvider : INavigationViewPageProvider {
     private readonly IResolutionRoot _root;
 
     public NavigationViewPageProvider(IResolutionRoot root) {

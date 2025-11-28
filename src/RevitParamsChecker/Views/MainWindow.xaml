@@ -22,7 +22,8 @@
     Width="700"
     MinHeight="500"
     MinWidth="700"
-    d:DataContext="{d:DesignInstance vms:MainViewModel, IsDesignTimeCreatable=False}">
+    d:DataContext="{d:DesignInstance vms:MainViewModel, IsDesignTimeCreatable=False}"
+    x:ClassModifier="internal">
 
     <i:Interaction.Triggers>
         <i:EventTrigger

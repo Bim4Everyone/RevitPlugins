@@ -6,15 +6,13 @@ using Autodesk.Revit.Attributes;
 using Autodesk.Revit.UI;
 
 using dosymep.Bim4Everyone;
-using dosymep.Bim4Everyone.ProjectConfigs;
 using dosymep.Bim4Everyone.SimpleServices;
 using dosymep.WpfCore.Ninject;
 using dosymep.WpfUI.Core.Ninject;
 
 using Ninject;
 
-using RevitParamsChecker.Models;
-using RevitParamsChecker.Models.Rules;
+using RevitParamsChecker.Models.Revit;
 using RevitParamsChecker.Services;
 using RevitParamsChecker.ViewModels;
 using RevitParamsChecker.ViewModels.Checks;

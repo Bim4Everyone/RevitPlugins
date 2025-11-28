@@ -1,15 +1,26 @@
-<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-                    xmlns:system="clr-namespace:System;assembly=mscorlib">
+<ResourceDictionary
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:system="clr-namespace:System;assembly=mscorlib">
 
-    <system:String x:Key="MainWindow.Title">Проверка параметров</system:String>
+    <system:String
+        x:Key="MainWindow.Title">Проверка параметров</system:String>
 
-    <system:String x:Key="DashboardPage.Title">Главная</system:String>
-    <system:String x:Key="FiltrationPage.Title">Поисковые наборы</system:String>
-    <system:String x:Key="RulesPage.Title">Правила</system:String>
-    <system:String x:Key="ChecksPage.Title">Проверки</system:String>
-    <system:String x:Key="ResultsPage.Title">Анализ</system:String>
+    <system:String
+        x:Key="DashboardPage.Title">Главная</system:String>
+    <system:String
+        x:Key="FiltrationPage.Title">Поисковые наборы</system:String>
+    <system:String
+        x:Key="RulesPage.Title">Правила</system:String>
+    <system:String
+        x:Key="ChecksPage.Title">Проверки</system:String>
+    <system:String
+        x:Key="ResultsPage.Title">Анализ</system:String>
+    <system:String
+        x:Key="Exceptions.ParamNotFound">Параметр отсутствует: {0}</system:String>
 
-    <system:String x:Key="Ok">ОК</system:String>
-    <system:String x:Key="Cancel">Отмена</system:String>
+    <system:String
+        x:Key="Ok">ОК</system:String>
+    <system:String
+        x:Key="Cancel">Отмена</system:String>
 </ResourceDictionary>

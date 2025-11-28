@@ -9,7 +9,7 @@ using Wpf.Ui.Abstractions;
 
 namespace RevitParamsChecker.Views;
 
-public partial class MainWindow {
+internal partial class MainWindow {
     public MainWindow(
         INavigationViewPageProvider navigationViewPageProvider,
         ILoggerService loggerService,

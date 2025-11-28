@@ -5,7 +5,7 @@ using pyRevitLabs.Json;
 
 namespace RevitParamsChecker.Models.Checks;
 
-public class ChecksConfig : ProjectConfig {
+internal class ChecksConfig : ProjectConfig {
     [JsonIgnore]
     public override string ProjectConfigPath { get; set; }
 
