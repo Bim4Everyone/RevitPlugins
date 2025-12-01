@@ -20,6 +20,16 @@
         x:Key="Exceptions.ParamNotFound">Параметр отсутствует: {0}</system:String>
 
     <system:String
+        x:Key="NamesSelectionDialog.NamesHeader">Название</system:String>
+
+    <system:String
+        x:Key="NameEditor.Label">Имя:</system:String>
+    <system:String
+        x:Key="NameEditor.Validation.EmptyName">Введите новое название</system:String>
+    <system:String
+        x:Key="NameEditor.Validation.DuplicatedName">Такое название уже существует</system:String>
+
+    <system:String
         x:Key="Ok">ОК</system:String>
     <system:String
         x:Key="Cancel">Отмена</system:String>

@@ -39,7 +39,7 @@ internal class ParameterRule : ValidationRule {
         }
 
         var parameter = element.GetParam(ParameterName);
-        string actualValue = parameter.AsValueString().Split(' ').FirstOrDefault() ?? string.Empty;
+        string actualValue = parameter.AsValueString()?.Split(' ').FirstOrDefault() ?? string.Empty;
 
         return Operator.Evaluate(actualValue, ExpectedValue);
     }

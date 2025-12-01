@@ -1,0 +1,72 @@
+<ui:ContentDialog
+    x:Class="RevitParamsChecker.Views.Utils.SelectableNamesDialog"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:local="clr-namespace:RevitParamsChecker.Views.Utils"
+    xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
+    xmlns:me="clr-namespace:dosymep.WpfCore.MarkupExtensions;assembly=dosymep.WpfCore"
+    xmlns:vms="clr-namespace:RevitParamsChecker.ViewModels.Utils"
+    mc:Ignorable="d"
+    Title="{Binding Title}"
+    x:ClassModifier="internal"
+    DialogMaxWidth="650"
+    PrimaryButtonAppearance="Primary"
+    CloseButtonText="{me:LocalizationSource Cancel}"
+    PrimaryButtonText="{me:LocalizationSource Ok}"
+    ui:Design.Background="{DynamicResource ApplicationBackgroundBrush}"
+    ui:Design.Foreground="{DynamicResource TextFillColorPrimaryBrush}"
+    d:DataContext="{d:DesignInstance vms:SelectableNamesViewModel, IsDesignTimeCreatable=False}">
+    <ui:ContentDialog.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary
+                    Source="pack://application:,,,/Wpf.Ui;component/Controls/ContentDialog/ContentDialog.xaml" />
+                <ResourceDictionary
+                    Source="pack://application:,,,/Wpf.Ui;component/Controls/ListView/ListView.xaml" />
+                <ResourceDictionary
+                    Source="../../Resources/CustomDataGrid.xaml" />
+            </ResourceDictionary.MergedDictionaries>
+            <Style
+                BasedOn="{StaticResource {x:Type ui:ContentDialog}}"
+                TargetType="{x:Type local:SelectableNamesDialog}" />
+        </ResourceDictionary>
+    </ui:ContentDialog.Resources>
+    <Grid>
+        <ui:DataGrid
+            SelectionMode="Single"
+            AutoGenerateColumns="False"
+            CanUserDeleteRows="False"
+            CanUserReorderColumns="False"
+            CanUserResizeColumns="False"
+            ItemsSource="{Binding Entities}">
+            <ui:DataGrid.Resources>
+                <Style
+                    TargetType="CheckBox"
+                    BasedOn="{StaticResource CustomColumnCheckBoxStyle}" />
+            </ui:DataGrid.Resources>
+            <ui:DataGrid.Columns>
+                <DataGridCheckBoxColumn
+                    Width="47"
+                    CanUserSort="False"
+                    Binding="{Binding IsSelected, UpdateSourceTrigger=PropertyChanged}">
+                    <DataGridCheckBoxColumn.Header>
+                        <CheckBox
+                            IsChecked="{Binding DataContext.AllSelected,
+                            RelativeSource={RelativeSource AncestorType=ui:DataGrid}, UpdateSourceTrigger=PropertyChanged}" />
+                    </DataGridCheckBoxColumn.Header>
+                </DataGridCheckBoxColumn>
+                <DataGridTextColumn
+                    Width="*"
+                    IsReadOnly="True"
+                    Binding="{Binding Name}">
+                    <DataGridTextColumn.Header>
+                        <ui:TextBlock
+                            Text="{DynamicResource NamesSelectionDialog.NamesHeader}"></ui:TextBlock>
+                    </DataGridTextColumn.Header>
+                </DataGridTextColumn>
+            </ui:DataGrid.Columns>
+        </ui:DataGrid>
+    </Grid>
+</ui:ContentDialog>

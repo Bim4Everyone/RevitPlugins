@@ -1,6 +1,8 @@
 using System.Globalization;
 using System.Reflection;
+using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Forms.VisualStyles;
 
 using Autodesk.Revit.Attributes;
 using Autodesk.Revit.UI;
@@ -20,15 +22,16 @@ using RevitParamsChecker.ViewModels.Dashboard;
 using RevitParamsChecker.ViewModels.Filtration;
 using RevitParamsChecker.ViewModels.Results;
 using RevitParamsChecker.ViewModels.Rules;
+using RevitParamsChecker.ViewModels.Utils;
 using RevitParamsChecker.Views;
 using RevitParamsChecker.Views.Checks;
 using RevitParamsChecker.Views.Dashboard;
 using RevitParamsChecker.Views.Filtration;
 using RevitParamsChecker.Views.Results;
 using RevitParamsChecker.Views.Rules;
+using RevitParamsChecker.Views.Utils;
 
 using Wpf.Ui.Abstractions;
-using Wpf.Ui.Controls;
 
 namespace RevitParamsChecker;
 
@@ -47,6 +50,7 @@ public class RevitParamsCheckerCommand : BasePluginCommand {
 
         BindViewModels(kernel);
         BindPages(kernel);
+        BindUtilsViews(kernel);
         kernel.Bind<INavigationViewPageProvider>()
             .To<NavigationViewPageProvider>()
             .InSingletonScope();
@@ -103,5 +107,22 @@ public class RevitParamsCheckerCommand : BasePluginCommand {
         kernel.Bind<ResultsPageViewModel>()
             .ToSelf()
             .InSingletonScope();
+    }
+
+    private void BindUtilsViews(IKernel kernel) {
+        kernel.Bind<NameEditorViewModel>()
+            .ToSelf()
+            .InTransientScope();
+        kernel.Bind<NameEditorWindow>()
+            .ToSelf()
+            .InTransientScope()
+            .WithPropertyValue(nameof(Window.Owner), c => c.Kernel.Get<MainWindow>());
+
+        kernel.Bind<SelectableNamesViewModel>()
+            .ToSelf()
+            .InTransientScope();
+        kernel.Bind<SelectableNamesDialog>()
+            .ToSelf()
+            .InTransientScope();
     }
 }
