@@ -1,0 +1,77 @@
+<core:WpfUIPlatformUserControl
+    x:Class="RevitParamsChecker.Views.Controls.EditableListControl"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:core="clr-namespace:dosymep.WpfUI.Core"
+    xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
+    xmlns:me="clr-namespace:dosymep.WpfCore.MarkupExtensions;assembly=dosymep.WpfCore"
+    xmlns:local="clr-namespace:RevitParamsChecker.Views.Controls"
+    mc:Ignorable="d"
+    x:Name="_this"
+    d:DesignHeight="300"
+    d:DesignWidth="300"
+    x:ClassModifier="internal">
+    <core:WpfUIPlatformUserControl.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary
+                    Source="../../Resources/CustomStyles.xaml" />
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
+    </core:WpfUIPlatformUserControl.Resources>
+    <Border
+        Style="{StaticResource CustomBorder}">
+        <DockPanel
+            LastChildFill="True">
+            <DockPanel
+                DockPanel.Dock="Top">
+                <Label
+                    DockPanel.Dock="Top"
+                    Margin="0 0 0 4"
+                    VerticalAlignment="Center"
+                    Content="{Binding ListLabel, ElementName=_this}" />
+                <ui:Button
+                    ToolTip="{me:LocalizationSource EditableList.Tooltip.Add}"
+                    Command="{Binding AddCommand, ElementName=_this}"
+                    Content="{ui:SymbolIcon Symbol=Add20}" />
+                <ui:Button
+                    Margin="4 0"
+                    ToolTip="{me:LocalizationSource EditableList.Tooltip.Rename}"
+                    Command="{Binding RenameCommand, ElementName=_this}"
+                    Content="{ui:SymbolIcon Symbol=Rename20}" />
+                <ui:Button
+                    ToolTip="{me:LocalizationSource EditableList.Tooltip.Copy}"
+                    Command="{Binding CopyCommand, ElementName=_this}"
+                    Content="{ui:SymbolIcon Symbol=Copy20}" />
+                <ui:Button
+                    Appearance="Danger"
+                    Margin="4 0 0 0"
+                    ToolTip="{me:LocalizationSource EditableList.Tooltip.Remove}"
+                    Command="{Binding RemoveCommand, ElementName=_this}"
+                    CommandParameter="{Binding Path=SelectedItems, ElementName=_filtersList}"
+                    Content="{ui:SymbolIcon Symbol=Delete20}" />
+            </DockPanel>
+            <ui:ListView
+                Margin="0 4 0 0"
+                SelectionMode="Extended"
+                ItemsSource="{Binding ListItemsSource, ElementName=_this}"
+                SelectedItem="{Binding ListSelectedItem, ElementName=_this, UpdateSourceTrigger=PropertyChanged}">
+                <ui:ListView.ItemTemplate>
+                    <DataTemplate>
+                        <DockPanel
+                            Height="20"
+                            Margin="10 4"
+                            VerticalAlignment="Center">
+                            <!-- нужно, чтобы у viewmodel был переопределен ToString -->
+                            <ui:TextBlock
+                                VerticalAlignment="Center"
+                                Text="{Binding}" />
+                        </DockPanel>
+                    </DataTemplate>
+                </ui:ListView.ItemTemplate>
+            </ui:ListView>
+        </DockPanel>
+    </Border>
+</core:WpfUIPlatformUserControl>

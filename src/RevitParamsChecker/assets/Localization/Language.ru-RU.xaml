@@ -23,6 +23,22 @@
         x:Key="NamesSelectionDialog.NamesHeader">Название</system:String>
 
     <system:String
+        x:Key="PageMenu.Tooltip.Load">Загрузить</system:String>
+    <system:String
+        x:Key="PageMenu.Tooltip.Save">Сохранить</system:String>
+    <system:String
+        x:Key="PageMenu.Tooltip.SaveAs">Сохранить как</system:String>
+
+    <system:String
+        x:Key="EditableList.Tooltip.Add">Добавить</system:String>
+    <system:String
+        x:Key="EditableList.Tooltip.Rename">Переименовать</system:String>
+    <system:String
+        x:Key="EditableList.Tooltip.Copy">Копировать</system:String>
+    <system:String
+        x:Key="EditableList.Tooltip.Remove">Удалить</system:String>
+
+    <system:String
         x:Key="NameEditor.Label">Имя:</system:String>
     <system:String
         x:Key="NameEditor.Validation.EmptyName">Введите новое название</system:String>

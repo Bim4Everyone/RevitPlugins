@@ -10,8 +10,9 @@
     xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
     xmlns:vms="clr-namespace:RevitParamsChecker.ViewModels.Dashboard"
     mc:Ignorable="d"
-    Height="450"
-    Width="800"
+    d:DesignHeight="450"
+    d:DesignWidth="800"
+    Background="Green"
     d:DataContext="{d:DesignInstance vms:DashboardPageViewModel, IsDesignTimeCreatable=False}">
     <Grid>
         <ui:TextBlock
