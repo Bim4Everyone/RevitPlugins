@@ -9,12 +9,44 @@
     xmlns:me="clr-namespace:dosymep.WpfCore.MarkupExtensions;assembly=dosymep.WpfCore"
     xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
     xmlns:vms="clr-namespace:RevitParamsChecker.ViewModels.Dashboard"
+    ScrollViewer.CanContentScroll="False"
     mc:Ignorable="d"
     d:DesignHeight="450"
     d:DesignWidth="800"
     d:DataContext="{d:DesignInstance vms:DashboardPageViewModel, IsDesignTimeCreatable=False}">
-    <Grid>
-        <ui:TextBlock
-            Text="{me:LocalizationSource DashboardPage.Title}" />
-    </Grid>
+    <core:WpfUIPlatformPage.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary
+                    Source="pack://application:,,,/Wpf.Ui;component/Controls/TextBlock/TextBlock.xaml" />
+                <ResourceDictionary
+                    Source="../../Resources/CustomStyles.xaml" />
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
+    </core:WpfUIPlatformPage.Resources>
+    <Border
+        Style="{StaticResource CustomBorder}">
+        <StackPanel>
+            <TextBlock
+                Text="Краткая инструкция"
+                FontWeight="SemiBold"
+                Margin="0 0 0 8" />
+            <TextBlock
+                Margin="14 0 0 0"
+                TextWrapping="Wrap"
+                Text="1. Создайте поисковые наборы для получения обрабатываемых элементов." />
+            <TextBlock
+                Margin="14 0 0 0"
+                TextWrapping="Wrap"
+                Text="2. Создайте правила проверки параметров." />
+            <TextBlock
+                Margin="14 0 0 0"
+                TextWrapping="Wrap"
+                Text="3. Настройте проверки, используя документы Revit, созданные поисковые наборы и проверки." />
+            <TextBlock
+                Margin="14 0 0 0"
+                TextWrapping="Wrap"
+                Text="4. Запустите проверки. Для просмотра результатов перейдите в Анализ." />
+        </StackPanel>
+    </Border>
 </core:WpfUIPlatformPage>
