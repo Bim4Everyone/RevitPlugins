@@ -9,7 +9,7 @@
     xmlns:me="clr-namespace:dosymep.WpfCore.MarkupExtensions;assembly=dosymep.WpfCore"
     xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
     xmlns:vms="clr-namespace:RevitParamsChecker.ViewModels.Filtration"
-    xmlns:c="clr-namespace:RevitParamsChecker.Views.Controls"
+    xmlns:custom="clr-namespace:RevitParamsChecker.Views.Controls"
     xmlns:filtration="clr-namespace:RevitParamsChecker.Views.Filtration"
     ScrollViewer.CanContentScroll="False"
     mc:Ignorable="d"
@@ -45,14 +45,15 @@
                 MinWidth="200" />
         </Grid.ColumnDefinitions>
 
-        <c:PageMenuControl
+        <custom:PageMenuControl
             Grid.Row="0"
             Grid.ColumnSpan="3"
+            Margin="0 0 0 8"
             LoadButtonCommand="{Binding LoadCommand}"
             SaveButtonCommand="{Binding SaveCommand}"
             SaveAsButtonCommand="{Binding SaveAsCommand}" />
 
-        <c:EditableListControl
+        <custom:EditableListControl
             Grid.Row="1"
             Grid.Column="0"
             ListItemsSource="{Binding Filters}"
@@ -66,22 +67,26 @@
             Grid.Column="1"
             Style="{StaticResource CustomGridSplitter}" />
 
-        <TextBlock
+        <DockPanel
             Grid.Row="1"
             Grid.Column="2"
-            Text="Фильтр из либы TODO" />
+            Background="Orange">
+            <TextBlock
+                Text="FilterControl из либы TODO" />
+        </DockPanel>
 
-        <DockPanel
+        <Border
             Grid.Row="2"
             Grid.Column="0"
-            Grid.ColumnSpan="3">
-            <Border
-                Style="{StaticResource CustomBorder}">
+            Grid.ColumnSpan="3"
+            Margin="0 8 0 0"
+            Style="{StaticResource CustomBorder}">
+            <DockPanel>
                 <ui:Button
                     HorizontalAlignment="Right"
                     Content="{me:LocalizationSource FiltersPage.ShowFilterElements}"
                     Command="{Binding ShowElementsCommand}" />
-            </Border>
-        </DockPanel>
+            </DockPanel>
+        </Border>
     </Grid>
 </core:WpfUIPlatformPage>

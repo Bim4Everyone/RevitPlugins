@@ -67,10 +67,9 @@
                             Height="20"
                             Margin="10 4"
                             VerticalAlignment="Center">
-                            <!-- нужно, чтобы у viewmodel был переопределен ToString -->
                             <ui:TextBlock
                                 VerticalAlignment="Center"
-                                Text="{Binding}" />
+                                Text="{Binding Name}" />
                         </DockPanel>
                     </DataTemplate>
                 </ui:ListView.ItemTemplate>

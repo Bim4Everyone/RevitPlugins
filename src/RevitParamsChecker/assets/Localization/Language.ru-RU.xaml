@@ -23,9 +23,9 @@
         x:Key="NamesSelectionDialog.NamesHeader">Название</system:String>
 
     <system:String
-        x:Key="FiltersPage.NewFilterPrompt">Введите название нового фильтра</system:String>
+        x:Key="FiltersPage.NewFilterPrompt">Новый поисковый набор</system:String>
     <system:String
-        x:Key="FiltersPage.RenameFilterPrompt">Введите новое название фильтра</system:String>
+        x:Key="FiltersPage.RenameFilterPrompt">Переименование поискового набора</system:String>
     <system:String
         x:Key="FiltersPage.ShowFilterElements">Показать элементы</system:String>
 
