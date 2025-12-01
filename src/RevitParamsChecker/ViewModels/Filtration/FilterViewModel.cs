@@ -6,8 +6,8 @@ using dosymep.WPF.ViewModels;
 namespace RevitParamsChecker.ViewModels.Filtration;
 
 internal class FilterViewModel : BaseViewModel, IEquatable<FilterViewModel> {
-    private string _name;
     private readonly Guid _guid;
+    private string _name;
 
     public FilterViewModel() {
         _guid = Guid.NewGuid();
@@ -23,7 +23,7 @@ internal class FilterViewModel : BaseViewModel, IEquatable<FilterViewModel> {
     }
 
     public override int GetHashCode() {
-        return 412060723 + EqualityComparer<Guid>.Default.GetHashCode(_guid);
+        return _guid.GetHashCode();
     }
 
     public bool Equals(FilterViewModel other) {
@@ -36,9 +36,5 @@ internal class FilterViewModel : BaseViewModel, IEquatable<FilterViewModel> {
         }
 
         return _guid == other._guid;
-    }
-
-    public override string ToString() {
-        return Name;
     }
 }
