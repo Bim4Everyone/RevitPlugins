@@ -49,7 +49,7 @@
             Title="{me:LocalizationSource MainWindow.Title}" />
 
         <ui:NavigationView
-            Grid.Row="0"
+            Grid.Row="1"
             x:Name="_rootNavigationView"
             FrameMargin="0"
             OpenPaneLength="200"
@@ -71,22 +71,27 @@
 
             <ui:NavigationView.MenuItems>
                 <ui:NavigationViewItem
+                    Icon="{ui:SymbolIcon Symbol=Home24}"
                     Content="{me:LocalizationSource DashboardPage.Title}"
                     TargetPageType="{x:Type dashboardViews:DashboardPage}" />
 
                 <ui:NavigationViewItem
+                    Icon="{ui:SymbolIcon Symbol=Filter24}"
                     Content="{me:LocalizationSource FiltrationPage.Title}"
                     TargetPageType="{x:Type filtrationViews:FiltrationPage}" />
 
                 <ui:NavigationViewItem
+                    Icon="{ui:SymbolIcon Symbol=MathFormula24}"
                     Content="{me:LocalizationSource RulesPage.Title}"
                     TargetPageType="{x:Type rulesViews:RulesPage}" />
 
                 <ui:NavigationViewItem
+                    Icon="{ui:SymbolIcon Symbol=TableSettings24}"
                     Content="{me:LocalizationSource ChecksPage.Title}"
                     TargetPageType="{x:Type checksViews:ChecksPage}" />
 
                 <ui:NavigationViewItem
+                    Icon="{ui:SymbolIcon Symbol=DocumentTableCheckmark24}"
                     Content="{me:LocalizationSource ResultsPage.Title}"
                     TargetPageType="{x:Type resultsViews:ResultsPage}" />
             </ui:NavigationView.MenuItems>

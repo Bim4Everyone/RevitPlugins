@@ -26,6 +26,8 @@
         x:Key="FiltersPage.NewFilterPrompt">Введите название нового фильтра</system:String>
     <system:String
         x:Key="FiltersPage.RenameFilterPrompt">Введите новое название фильтра</system:String>
+    <system:String
+        x:Key="FiltersPage.ShowFilterElements">Показать элементы</system:String>
 
     <system:String
         x:Key="PageMenu.Tooltip.Load">Загрузить</system:String>

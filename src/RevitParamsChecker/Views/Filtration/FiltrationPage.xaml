@@ -11,6 +11,7 @@
     xmlns:vms="clr-namespace:RevitParamsChecker.ViewModels.Filtration"
     xmlns:c="clr-namespace:RevitParamsChecker.Views.Controls"
     xmlns:filtration="clr-namespace:RevitParamsChecker.Views.Filtration"
+    ScrollViewer.CanContentScroll="False"
     mc:Ignorable="d"
     d:DesignHeight="450"
     d:DesignWidth="800"
@@ -23,55 +24,64 @@
             </ResourceDictionary.MergedDictionaries>
         </ResourceDictionary>
     </core:WpfUIPlatformPage.Resources>
-    <ScrollViewer
-        VerticalScrollBarVisibility="Auto"
-        HorizontalScrollBarVisibility="Disabled">
-        <Grid>
-            <Grid.RowDefinitions>
-                <RowDefinition
-                    Height="Auto" />
-                <RowDefinition
-                    Height="*" />
-                <RowDefinition
-                    Height="Auto" />
-            </Grid.RowDefinitions>
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition
+                Height="Auto" />
+            <RowDefinition
+                Height="*" />
+            <RowDefinition
+                Height="Auto" />
+        </Grid.RowDefinitions>
 
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition
-                    Width="1.5*"
-                    MinWidth="200" />
-                <ColumnDefinition
-                    Width="Auto" />
-                <ColumnDefinition
-                    Width="6*"
-                    MinWidth="200" />
-            </Grid.ColumnDefinitions>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition
+                Width="1.5*"
+                MinWidth="200" />
+            <ColumnDefinition
+                Width="Auto" />
+            <ColumnDefinition
+                Width="6*"
+                MinWidth="200" />
+        </Grid.ColumnDefinitions>
 
-            <c:PageMenuControl
-                Grid.Row="0"
-                Grid.ColumnSpan="3"
-                LoadButtonCommand="{Binding LoadCommand}"
-                SaveButtonCommand="{Binding SaveCommand}"
-                SaveAsButtonCommand="{Binding SaveAsCommand}" />
+        <c:PageMenuControl
+            Grid.Row="0"
+            Grid.ColumnSpan="3"
+            LoadButtonCommand="{Binding LoadCommand}"
+            SaveButtonCommand="{Binding SaveCommand}"
+            SaveAsButtonCommand="{Binding SaveAsCommand}" />
 
-            <c:EditableListControl
-                Grid.Row="1"
-                Grid.Column="0"
-                ListItemsSource="{Binding Filters}"
-                AddItemCommand="{Binding AddFilterCommand}"
-                RenameItemCommand="{Binding RenameFilterCommand}"
-                CopyItemCommand="{Binding CopyFilterCommand}"
-                RemoveItemsCommand="{Binding RemoveFiltersCommand}" />
+        <c:EditableListControl
+            Grid.Row="1"
+            Grid.Column="0"
+            ListItemsSource="{Binding Filters}"
+            AddItemCommand="{Binding AddFilterCommand}"
+            RenameItemCommand="{Binding RenameFilterCommand}"
+            CopyItemCommand="{Binding CopyFilterCommand}"
+            RemoveItemsCommand="{Binding RemoveFiltersCommand}" />
 
-            <GridSplitter
-                Grid.Row="1"
-                Grid.Column="1"
-                Style="{StaticResource CustomGridSplitter}" />
+        <GridSplitter
+            Grid.Row="1"
+            Grid.Column="1"
+            Style="{StaticResource CustomGridSplitter}" />
 
-            <TextBlock
-                Grid.Row="1"
-                Grid.Column="2"
-                Text="Фильтр из либы TODO" />
-        </Grid>
-    </ScrollViewer>
+        <TextBlock
+            Grid.Row="1"
+            Grid.Column="2"
+            Text="Фильтр из либы TODO" />
+
+        <DockPanel
+            Grid.Row="2"
+            Grid.Column="0"
+            Grid.ColumnSpan="3">
+            <Border
+                Style="{StaticResource CustomBorder}">
+                <ui:Button
+                    HorizontalAlignment="Right"
+                    Content="{me:LocalizationSource FiltersPage.ShowFilterElements}"
+                    Command="{Binding ShowElementsCommand}" />
+            </Border>
+        </DockPanel>
+    </Grid>
 </core:WpfUIPlatformPage>
