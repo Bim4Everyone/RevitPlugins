@@ -8,13 +8,17 @@ using Autodesk.Revit.Attributes;
 using Autodesk.Revit.UI;
 
 using dosymep.Bim4Everyone;
+using dosymep.Bim4Everyone.ProjectConfigs;
 using dosymep.Bim4Everyone.SimpleServices;
 using dosymep.WpfCore.Ninject;
 using dosymep.WpfUI.Core.Ninject;
 
 using Ninject;
 
+using RevitParamsChecker.Models.Checks;
+using RevitParamsChecker.Models.Filtration;
 using RevitParamsChecker.Models.Revit;
+using RevitParamsChecker.Models.Rules;
 using RevitParamsChecker.Services;
 using RevitParamsChecker.ViewModels;
 using RevitParamsChecker.ViewModels.Checks;
@@ -51,6 +55,8 @@ public class RevitParamsCheckerCommand : BasePluginCommand {
         BindViewModels(kernel);
         BindPages(kernel);
         BindUtilsViews(kernel);
+        BindRepos(kernel);
+        BindServices(kernel);
         kernel.Bind<INavigationViewPageProvider>()
             .To<NavigationViewPageProvider>()
             .InSingletonScope();
@@ -124,5 +130,31 @@ public class RevitParamsCheckerCommand : BasePluginCommand {
         kernel.Bind<SelectableNamesDialog>()
             .ToSelf()
             .InTransientScope();
+    }
+
+    private void BindRepos(IKernel kernel) {
+        kernel.Bind<FiltersConfig>()
+            .ToMethod(c => FiltersConfig.GetConfig(c.Kernel.Get<IConfigSerializer>()));
+        kernel.Bind<FiltersRepository>()
+            .ToSelf()
+            .InSingletonScope();
+
+        kernel.Bind<RulesConfig>()
+            .ToMethod(c => RulesConfig.GetConfig(c.Kernel.Get<IConfigSerializer>()));
+        kernel.Bind<RulesRepository>()
+            .ToSelf()
+            .InSingletonScope();
+
+        kernel.Bind<ChecksConfig>()
+            .ToMethod(c => ChecksConfig.GetConfig(c.Kernel.Get<IConfigSerializer>()));
+        kernel.Bind<ChecksRepository>()
+            .ToSelf()
+            .InSingletonScope();
+    }
+
+    private void BindServices(IKernel kernel) {
+        kernel.Bind<NameEditorService>()
+            .ToSelf()
+            .InSingletonScope();
     }
 }

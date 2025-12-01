@@ -130,7 +130,7 @@
         x:Key="CustomGridSplitter">
         <Setter
             Property="Width"
-            Value="5" />
+            Value="4" />
         <Setter
             Property="Background"
             Value="Transparent" />

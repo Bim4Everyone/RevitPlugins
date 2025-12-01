@@ -34,28 +34,31 @@
                     Content="{Binding ListLabel, ElementName=_this}" />
                 <ui:Button
                     ToolTip="{me:LocalizationSource EditableList.Tooltip.Add}"
-                    Command="{Binding AddCommand, ElementName=_this}"
+                    Command="{Binding AddItemCommand, ElementName=_this}"
                     Content="{ui:SymbolIcon Symbol=Add20}" />
                 <ui:Button
                     Margin="4 0"
                     ToolTip="{me:LocalizationSource EditableList.Tooltip.Rename}"
-                    Command="{Binding RenameCommand, ElementName=_this}"
+                    Command="{Binding RenameItemCommand, ElementName=_this}"
+                    CommandParameter="{Binding SelectedItem, ElementName=_list}"
                     Content="{ui:SymbolIcon Symbol=Rename20}" />
                 <ui:Button
                     ToolTip="{me:LocalizationSource EditableList.Tooltip.Copy}"
-                    Command="{Binding CopyCommand, ElementName=_this}"
+                    Command="{Binding CopyItemCommand, ElementName=_this}"
+                    CommandParameter="{Binding SelectedItem, ElementName=_list}"
                     Content="{ui:SymbolIcon Symbol=Copy20}" />
                 <ui:Button
                     Appearance="Danger"
                     Margin="4 0 0 0"
                     ToolTip="{me:LocalizationSource EditableList.Tooltip.Remove}"
-                    Command="{Binding RemoveCommand, ElementName=_this}"
-                    CommandParameter="{Binding Path=SelectedItems, ElementName=_filtersList}"
+                    Command="{Binding RemoveItemsCommand, ElementName=_this}"
+                    CommandParameter="{Binding Path=SelectedItems, ElementName=_list}"
                     Content="{ui:SymbolIcon Symbol=Delete20}" />
             </DockPanel>
             <ui:ListView
                 Margin="0 4 0 0"
                 SelectionMode="Extended"
+                x:Name="_list"
                 ItemsSource="{Binding ListItemsSource, ElementName=_this}"
                 SelectedItem="{Binding ListSelectedItem, ElementName=_this, UpdateSourceTrigger=PropertyChanged}">
                 <ui:ListView.ItemTemplate>

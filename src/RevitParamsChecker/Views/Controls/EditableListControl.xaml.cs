@@ -33,38 +33,38 @@ internal partial class EditableListControl {
         typeof(EditableListControl),
         new PropertyMetadata(default(string)));
 
-    public static readonly DependencyProperty AddCommandProperty = DependencyProperty.Register(
-        nameof(ListLabel),
+    public static readonly DependencyProperty AddItemCommandProperty = DependencyProperty.Register(
+        nameof(AddItemCommand),
         typeof(ICommand),
         typeof(EditableListControl),
         new PropertyMetadata(null));
 
-    public static readonly DependencyProperty RenameCommandProperty = DependencyProperty.Register(
-        nameof(ListLabel),
+    public static readonly DependencyProperty RenameItemCommandProperty = DependencyProperty.Register(
+        nameof(RenameItemCommand),
         typeof(ICommand),
         typeof(EditableListControl),
         new PropertyMetadata(null));
 
-    public static readonly DependencyProperty CopyCommandProperty = DependencyProperty.Register(
-        nameof(ListLabel),
+    public static readonly DependencyProperty CopyItemCommandProperty = DependencyProperty.Register(
+        nameof(CopyItemCommand),
         typeof(ICommand),
         typeof(EditableListControl),
         new PropertyMetadata(null));
 
-    public static readonly DependencyProperty RemoveCommandProperty = DependencyProperty.Register(
-        nameof(ListLabel),
+    public static readonly DependencyProperty RemoveItemsCommandProperty = DependencyProperty.Register(
+        nameof(RemoveItemsCommand),
         typeof(ICommand),
         typeof(EditableListControl),
         new PropertyMetadata(null));
 
     public static readonly DependencyProperty ListItemsSourceProperty = DependencyProperty.Register(
-        nameof(ListLabel),
+        nameof(ListItemsSource),
         typeof(IEnumerable),
         typeof(EditableListControl),
         new PropertyMetadata(null));
 
     public static readonly DependencyProperty ListSelectedItemProperty = DependencyProperty.Register(
-        nameof(ListLabel),
+        nameof(ListSelectedItem),
         typeof(object),
         typeof(EditableListControl),
         new PropertyMetadata(null));
@@ -74,24 +74,24 @@ internal partial class EditableListControl {
         set => SetValue(ListLabelProperty, value);
     }
 
-    public ICommand AddCommand {
-        get => (ICommand) GetValue(AddCommandProperty);
-        set => SetValue(AddCommandProperty, value);
+    public ICommand AddItemCommand {
+        get => (ICommand) GetValue(AddItemCommandProperty);
+        set => SetValue(AddItemCommandProperty, value);
     }
 
-    public ICommand RenameCommand {
-        get => (ICommand) GetValue(RenameCommandProperty);
-        set => SetValue(RenameCommandProperty, value);
+    public ICommand RenameItemCommand {
+        get => (ICommand) GetValue(RenameItemCommandProperty);
+        set => SetValue(RenameItemCommandProperty, value);
     }
 
-    public ICommand CopyCommand {
-        get => (ICommand) GetValue(CopyCommandProperty);
-        set => SetValue(CopyCommandProperty, value);
+    public ICommand CopyItemCommand {
+        get => (ICommand) GetValue(CopyItemCommandProperty);
+        set => SetValue(CopyItemCommandProperty, value);
     }
 
-    public ICommand RemoveCommand {
-        get => (ICommand) GetValue(RemoveCommandProperty);
-        set => SetValue(RemoveCommandProperty, value);
+    public ICommand RemoveItemsCommand {
+        get => (ICommand) GetValue(RemoveItemsCommandProperty);
+        set => SetValue(RemoveItemsCommandProperty, value);
     }
 
     public IEnumerable ListItemsSource {
