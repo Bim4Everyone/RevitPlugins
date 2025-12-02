@@ -80,31 +80,31 @@
                     TargetPageType="{x:Type pages:GeneralPage}" />
                 <ui:NavigationViewItem
                     Content="Вертикальные виды"
-                    Icon="{ui:SymbolIcon Library24}"
+                    Icon="{ui:SymbolIcon CenterHorizontal24}"
                     TargetPageType="{x:Type pages:VerticalViewSettingsPage}" />
                 <ui:NavigationViewItem
                     Content="Горизонтальные виды"
-                    Icon="{ui:SymbolIcon Library24}"
+                    Icon="{ui:SymbolIcon CenterVertical24}"
                     TargetPageType="{x:Type pages:HorizontalViewSettingsPage}" />
                 <ui:NavigationViewItem
                     Content="Спецификации"
-                    Icon="{ui:SymbolIcon Library24}"
+                    Icon="{ui:SymbolIcon TableSettings24}"
                     TargetPageType="{x:Type pages:SchedulesPage}" />
                 <ui:NavigationViewItem
                     Content="Легенды и типовые аннотации"
-                    Icon="{ui:SymbolIcon Library24}"
+                    Icon="{ui:SymbolIcon BarcodeScanner24}"
                     TargetPageType="{x:Type pages:LegendViewsPage}" />
                 <ui:NavigationViewItem
                     Content="Параметры пилона"
-                    Icon="{ui:SymbolIcon Library24}"
+                    Icon="{ui:SymbolIcon PauseSettings20}"
                     TargetPageType="{x:Type pages:PylonParamsPage}" />
                 <ui:NavigationViewItem
                     Content="Параметры проекта"
-                    Icon="{ui:SymbolIcon Library24}"
+                    Icon="{ui:SymbolIcon ArchiveSettings24}"
                     TargetPageType="{x:Type pages:ProjectParamsPage}" />
                 <ui:NavigationViewItem
                     Content="Параметры листов"
-                    Icon="{ui:SymbolIcon Library24}"
+                    Icon="{ui:SymbolIcon DocumentSettings20}"
                     TargetPageType="{x:Type pages:SheetParamsPage}" />
             </ui:NavigationView.MenuItems>
             <ui:NavigationView.PaneFooter>
@@ -116,13 +116,13 @@
                             Margin="5"
                             FontWeight="Medium"
                             Foreground="{ui:ThemeResource TextFillColorSecondaryBrush}"
-                            Text="BIM-Совет" />
+                            Text="💡  BIM-Совет" />
 
                         <TextBlock
                             Margin="5"
                             TextWrapping="WrapWithOverflow"
                             Foreground="{ui:ThemeResource TextFillColorSecondaryBrush}"
-                            Text="1. Убедитесь, что у нужных пилонов заполнена Фильтрация 1 'на 1 шт.'" />
+                            Text="1. Убедитесь, что у нужных пилонов параметр 'обр_ФОП_Фильтрация 1' заполнен 'на 1 шт.'" />
 
                         <TextBlock
                             Margin="5"
