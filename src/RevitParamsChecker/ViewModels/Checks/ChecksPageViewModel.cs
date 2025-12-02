@@ -37,8 +37,14 @@ internal class ChecksPageViewModel : BaseViewModel {
     public ICommand SaveCommand { get; }
     public ICommand SaveAsCommand { get; }
     public ICommand AddCheckCommand { get; }
+    public ICommand CopyCheckCommand { get; }
     public ICommand RenameCheckCommand { get; }
     public ICommand RemoveChecksCommand { get; }
+    public ICommand ExecuteChecksCommand { get; }
+    public IAsyncCommand SetCheckSelectedFilesCommand { get; }
+    public IAsyncCommand SetCheckSelectedFiltersCommand { get; }
+    public IAsyncCommand SetCheckSelectedRulesCommand { get; }
+
     public ObservableCollection<CheckViewModel> Checks { get; }
 
     public bool AllSelected {

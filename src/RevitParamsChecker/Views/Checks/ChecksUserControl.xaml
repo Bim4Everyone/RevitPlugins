@@ -1,0 +1,158 @@
+<core:WpfUIPlatformUserControl
+    x:Class="RevitParamsChecker.Views.Checks.ChecksUserControl"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:local="clr-namespace:RevitParamsChecker.Views.Checks"
+    xmlns:core="clr-namespace:dosymep.WpfUI.Core"
+    xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
+    xmlns:me="clr-namespace:dosymep.WpfCore.MarkupExtensions;assembly=dosymep.WpfCore"
+    xmlns:vms="clr-namespace:RevitParamsChecker.ViewModels.Checks"
+    mc:Ignorable="d"
+    d:DesignHeight="300"
+    d:DesignWidth="300"
+    x:ClassModifier="internal"
+    d:DataContext="{d:DesignInstance vms:ChecksPageViewModel, IsDesignTimeCreatable=False}">
+    <core:WpfUIPlatformUserControl.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary
+                    Source="../../Resources/CustomStyles.xaml" />
+                <ResourceDictionary
+                    Source="../../Resources/CustomDataGrid.xaml" />
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
+    </core:WpfUIPlatformUserControl.Resources>
+    <Border
+        Style="{StaticResource CustomBorder}">
+        <DockPanel
+            LastChildFill="True">
+            <DockPanel
+                Margin="0 0 0 8"
+                DockPanel.Dock="Top">
+                <ui:Button
+                    ToolTip="{me:LocalizationSource EditableList.Tooltip.Add}"
+                    Command="{Binding AddCheckCommand}"
+                    Content="{ui:SymbolIcon Symbol=Add20}" />
+
+                <ui:Button
+                    Margin="8 0"
+                    ToolTip="{me:LocalizationSource EditableList.Tooltip.Rename}"
+                    CommandParameter="{Binding SelectedItem, ElementName=_checksGrid}"
+                    Command="{Binding RenameCheckCommand}"
+                    Content="{ui:SymbolIcon Symbol=Rename20}" />
+
+                <ui:Button
+                    ToolTip="{me:LocalizationSource EditableList.Tooltip.Copy}"
+                    CommandParameter="{Binding SelectedItem, ElementName=_checksGrid}"
+                    Command="{Binding CopyCheckCommand}"
+                    Content="{ui:SymbolIcon Symbol=Copy20}" />
+
+                <ui:Button
+                    Margin="8 0 0 0"
+                    Appearance="Danger"
+                    ToolTip="{me:LocalizationSource EditableList.Tooltip.Remove}"
+                    CommandParameter="{Binding SelectedItems, ElementName=_checksGrid}"
+                    Command="{Binding RemoveChecksCommand}"
+                    Content="{ui:SymbolIcon Symbol=Delete20}" />
+            </DockPanel>
+
+            <ui:DataGrid
+                x:Name="_checksGrid"
+                SelectionMode="Extended"
+                AutoGenerateColumns="False"
+                CanUserAddRows="False"
+                CanUserDeleteRows="False"
+                CanUserReorderColumns="False"
+                GridLinesVisibility="Horizontal"
+                Style="{StaticResource CustomResizableDataGridStyle}"
+                ItemsSource="{Binding Checks}">
+                <ui:DataGrid.Resources>
+                    <Style
+                        TargetType="CheckBox"
+                        BasedOn="{StaticResource CustomColumnCheckBoxStyle}" />
+                </ui:DataGrid.Resources>
+                <ui:DataGrid.CellStyle>
+                    <Style
+                        TargetType="DataGridCell"
+                        BasedOn="{StaticResource DefaultDataGridCellStyle}">
+                        <Setter
+                            Property="VerticalAlignment"
+                            Value="Stretch" />
+                        <Setter
+                            Property="VerticalContentAlignment"
+                            Value="Stretch" />
+                        <Setter
+                            Property="HorizontalAlignment"
+                            Value="Stretch" />
+                        <Setter
+                            Property="HorizontalContentAlignment"
+                            Value="Stretch" />
+                        <Setter
+                            Property="Padding"
+                            Value="2 0" />
+                    </Style>
+                </ui:DataGrid.CellStyle>
+
+                <ui:DataGrid.Columns>
+                    <DataGridCheckBoxColumn
+                        CanUserResize="False"
+                        Width="47"
+                        CanUserSort="False"
+                        Binding="{Binding IsSelected, UpdateSourceTrigger=PropertyChanged}">
+                        <DataGridCheckBoxColumn.Header>
+                            <CheckBox
+                                IsChecked="{Binding DataContext.AllSelected, RelativeSource={RelativeSource AncestorType=ui:DataGrid}, UpdateSourceTrigger=PropertyChanged}" />
+                        </DataGridCheckBoxColumn.Header>
+                    </DataGridCheckBoxColumn>
+
+                    <DataGridTextColumn
+                        IsReadOnly="True"
+                        Binding="{Binding Name}">
+                        <DataGridTextColumn.Header>
+                            <ui:TextBlock
+                                Text="{DynamicResource ChecksPage.NameHeader}" />
+                        </DataGridTextColumn.Header>
+                        <DataGridTextColumn.CellStyle>
+                            <Style
+                                TargetType="{x:Type DataGridCell}">
+                                <Setter
+                                    Property="Template">
+                                    <Setter.Value>
+                                        <ControlTemplate
+                                            TargetType="{x:Type DataGridCell}">
+                                            <Grid>
+                                                <ContentPresenter
+                                                    VerticalAlignment="Center" />
+                                            </Grid>
+                                        </ControlTemplate>
+                                    </Setter.Value>
+                                </Setter>
+                                <Setter
+                                    Property="ToolTip"
+                                    Value="{Binding RelativeSource={RelativeSource Self}, Path=Content.Text}">
+                                </Setter>
+                            </Style>
+                        </DataGridTextColumn.CellStyle>
+                    </DataGridTextColumn>
+
+                    <DataGridTemplateColumn>
+                        <DataGridTemplateColumn.CellTemplate>
+                            <DataTemplate>
+                                <local:SelectedNamesUserControl
+                                    SelectedNames="{Binding SelectedFiles, UpdateSourceTrigger=PropertyChanged}"
+                                    SelectNamesCommandParameter="{Binding}"
+                                    SelectNamesCommand="{Binding DataContext.SetCheckSelectedFilesCommand, RelativeSource={RelativeSource AncestorType=UserControl, Mode=FindAncestor}}" />
+                            </DataTemplate>
+                        </DataGridTemplateColumn.CellTemplate>
+                        <DataGridTemplateColumn.Header>
+                            <ui:TextBlock
+                                Text="{DynamicResource ChecksPage.FilesHeader}" />
+                        </DataGridTemplateColumn.Header>
+                    </DataGridTemplateColumn>
+                </ui:DataGrid.Columns>
+            </ui:DataGrid>
+        </DockPanel>
+    </Border>
+</core:WpfUIPlatformUserControl>

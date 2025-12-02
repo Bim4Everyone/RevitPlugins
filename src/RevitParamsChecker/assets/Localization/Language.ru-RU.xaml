@@ -45,6 +45,19 @@
         x:Key="RulesPage.ValuePlaceholder">Значение</system:String>
 
     <system:String
+        x:Key="ChecksPage.ExecuteChecksButton">Запустить выбранные</system:String>
+    <system:String
+        x:Key="ChecksPage.NameHeader">Название</system:String>
+    <system:String
+        x:Key="ChecksPage.NothingSelectPrompt">Ничего не выбрано</system:String>
+    <system:String
+        x:Key="ChecksPage.FilesHeader">Файлы</system:String>
+    <system:String
+        x:Key="ChecksPage.FiltersHeader">Поисковые наборы</system:String>
+    <system:String
+        x:Key="ChecksPage.RulesHeader">Правила</system:String>
+
+    <system:String
         x:Key="FiltersPage.NewFilterPrompt">Новый поисковый набор</system:String>
     <system:String
         x:Key="FiltersPage.RenameFilterPrompt">Переименование поискового набора</system:String>
