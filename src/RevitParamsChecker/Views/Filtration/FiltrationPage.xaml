@@ -10,7 +10,6 @@
     xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
     xmlns:vms="clr-namespace:RevitParamsChecker.ViewModels.Filtration"
     xmlns:custom="clr-namespace:RevitParamsChecker.Views.Controls"
-    xmlns:filtration="clr-namespace:RevitParamsChecker.Views.Filtration"
     ScrollViewer.CanContentScroll="False"
     mc:Ignorable="d"
     d:DesignHeight="450"

@@ -1,0 +1,132 @@
+<core:WpfUIPlatformUserControl
+    x:Class="RevitParamsChecker.Views.Rules.ParamsSetUserControl"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:core="clr-namespace:dosymep.WpfUI.Core"
+    xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
+    xmlns:me="clr-namespace:dosymep.WpfCore.MarkupExtensions;assembly=dosymep.WpfCore"
+    xmlns:local="clr-namespace:RevitParamsChecker.Views.Rules"
+    xmlns:vms="clr-namespace:RevitParamsChecker.ViewModels.Rules"
+    mc:Ignorable="d"
+    d:DesignHeight="300"
+    d:DesignWidth="300"
+    x:ClassModifier="internal"
+    d:DataContext="{d:DesignInstance vms:ParamsSetViewModel, IsDesignTimeCreatable=False}">
+    <core:WpfUIPlatformUserControl.Resources>
+        <Style
+            TargetType="ListBoxItem">
+            <Setter
+                Property="Template">
+                <Setter.Value>
+                    <ControlTemplate
+                        TargetType="ListBoxItem">
+                        <ContentPresenter />
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <Style
+            TargetType="{x:Type Border}"
+            x:Key="CustomColoredBorder">
+            <Setter
+                Property="BorderThickness"
+                Value="4 1 1 1" />
+            <Setter
+                Property="Margin"
+                Value="2" />
+            <Setter
+                Property="CornerRadius"
+                Value="{DynamicResource ControlCornerRadius}" />
+            <Style.Triggers>
+                <DataTrigger
+                    Binding="{Binding SelectedOperator.IsAndOperator}"
+                    Value="True">
+                    <Setter
+                        Property="BorderBrush"
+                        Value="Green" />
+                </DataTrigger>
+                <DataTrigger
+                    Binding="{Binding SelectedOperator.IsAndOperator}"
+                    Value="False">
+                    <Setter
+                        Property="BorderBrush"
+                        Value="Blue" />
+                </DataTrigger>
+            </Style.Triggers>
+        </Style>
+
+        <DataTemplate
+            DataType="{x:Type vms:ParamRuleViewModel}">
+            <local:ParamRuleUserControl />
+        </DataTemplate>
+
+        <DataTemplate
+            DataType="{x:Type vms:ParamsSetViewModel}">
+            <local:ParamsSetUserControl />
+        </DataTemplate>
+    </core:WpfUIPlatformUserControl.Resources>
+
+    <Border
+        Style="{StaticResource CustomColoredBorder}">
+        <Grid>
+            <Grid.RowDefinitions>
+                <RowDefinition />
+                <RowDefinition />
+                <RowDefinition />
+            </Grid.RowDefinitions>
+
+            <DockPanel
+                Grid.Row="0"
+                LastChildFill="True"
+                HorizontalAlignment="Stretch">
+                <ui:Button
+                    DockPanel.Dock="Right"
+                    Margin="3"
+                    Appearance="Danger"
+                    Command="{Binding RelativeSource={RelativeSource AncestorType={x:Type ListBox}, Mode=FindAncestor}, Path=DataContext.RemoveInnerParamSetCommand}"
+                    CommandParameter="{Binding}"
+                    Content="{ui:SymbolIcon Symbol=Delete20}" />
+                <ui:Button
+                    DockPanel.Dock="Right"
+                    Margin="3"
+                    Content="{me:LocalizationSource RulesPage.AddParamRuleButton}"
+                    Command="{Binding AddInnerParamRuleCommand}" />
+                <ui:Button
+                    DockPanel.Dock="Right"
+                    Margin="3"
+                    Content="{me:LocalizationSource RulesPage.AddParamsSetButton}"
+                    Command="{Binding AddInnerParamSetCommand}" />
+                <ComboBox
+                    DockPanel.Dock="Left"
+                    Margin="3"
+                    IsEditable="False"
+                    DisplayMemberPath="Name"
+                    HorizontalAlignment="Stretch"
+                    ItemsSource="{Binding AvailableLogicalOperators}"
+                    SelectedValue="{Binding SelectedOperator, UpdateSourceTrigger=PropertyChanged}" />
+            </DockPanel>
+
+            <ListBox
+                Grid.Row="1"
+                BorderThickness="0"
+                BorderBrush="Transparent"
+                Focusable="False"
+                HorizontalAlignment="Stretch"
+                HorizontalContentAlignment="Stretch"
+                ItemsSource="{Binding InnerParamRules}" />
+
+            <ListBox
+                Grid.Row="2"
+                BorderThickness="0"
+                BorderBrush="Transparent"
+                Focusable="False"
+                HorizontalAlignment="Stretch"
+                HorizontalContentAlignment="Stretch"
+                ItemsSource="{Binding InnerParamSets}" />
+        </Grid>
+
+    </Border>
+</core:WpfUIPlatformUserControl>

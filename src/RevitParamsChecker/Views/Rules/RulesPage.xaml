@@ -8,13 +8,66 @@
     xmlns:core="clr-namespace:dosymep.WpfUI.Core"
     xmlns:me="clr-namespace:dosymep.WpfCore.MarkupExtensions;assembly=dosymep.WpfCore"
     xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
-    xmlns:vms="clr-namespace:RevitParamsChecker.ViewModels.Dashboard"
+    xmlns:custom="clr-namespace:RevitParamsChecker.Views.Controls"
+    xmlns:vms="clr-namespace:RevitParamsChecker.ViewModels.Rules"
     ScrollViewer.CanContentScroll="False"
     mc:Ignorable="d"
     d:DesignHeight="450"
-    d:DesignWidth="800">
+    d:DesignWidth="800"
+    d:DataContext="{d:DesignInstance vms:RulesPageViewModel, IsDesignTimeCreatable=False}">
+    <core:WpfUIPlatformPage.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary
+                    Source="../../Resources/CustomStyles.xaml" />
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
+    </core:WpfUIPlatformPage.Resources>
     <Grid>
-        <ui:TextBlock
-            Text="{me:LocalizationSource RulesPage.Title}" />
+        <Grid.RowDefinitions>
+            <RowDefinition
+                Height="Auto" />
+            <RowDefinition
+                Height="*" />
+        </Grid.RowDefinitions>
+
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition
+                Width="1.5*"
+                MinWidth="200" />
+            <ColumnDefinition
+                Width="Auto" />
+            <ColumnDefinition
+                Width="6*"
+                MinWidth="200" />
+        </Grid.ColumnDefinitions>
+
+        <custom:PageMenuControl
+            Grid.Row="0"
+            Grid.ColumnSpan="3"
+            Margin="0 0 0 8"
+            LoadButtonCommand="{Binding LoadCommand}"
+            SaveButtonCommand="{Binding SaveCommand}"
+            SaveAsButtonCommand="{Binding SaveAsCommand}" />
+
+        <custom:EditableListControl
+            Grid.Row="1"
+            Grid.Column="0"
+            ListItemsSource="{Binding Rules}"
+            ListSelectedItem="{Binding SelectedRule, UpdateSourceTrigger=PropertyChanged}"
+            AddItemCommand="{Binding AddRuleCommand}"
+            RenameItemCommand="{Binding RenameRuleCommand}"
+            CopyItemCommand="{Binding CopyRuleCommand}"
+            RemoveItemsCommand="{Binding RemoveRulesCommand}" />
+
+        <GridSplitter
+            Grid.Row="1"
+            Grid.Column="1"
+            Style="{StaticResource CustomGridSplitter}" />
+
+        <local:RuleUserControl
+            Grid.Row="1"
+            Grid.Column="2"
+            DataContext="{Binding SelectedRule}" />
     </Grid>
 </core:WpfUIPlatformPage>

@@ -31,6 +31,18 @@
         x:Key="RulesPage.NewRulePrompt">Новое правило</system:String>
     <system:String
         x:Key="RulesPage.RenameRulePrompt">Переименование правила</system:String>
+    <system:String
+        x:Key="RulesPage.DescriptionLabel">Описание:</system:String>
+    <system:String
+        x:Key="RulesPage.RuleLabel">Правило:</system:String>
+    <system:String
+        x:Key="RulesPage.AddParamRuleButton">Добавить правило</system:String>
+    <system:String
+        x:Key="RulesPage.AddParamsSetButton">Добавить набор</system:String>
+    <system:String
+        x:Key="RulesPage.ParamNamePlaceholder">Название параметра</system:String>
+    <system:String
+        x:Key="RulesPage.ValuePlaceholder">Значение</system:String>
 
     <system:String
         x:Key="FiltersPage.NewFilterPrompt">Новый поисковый набор</system:String>
@@ -61,6 +73,40 @@
         x:Key="NameEditor.Validation.EmptyName">Введите новое название</system:String>
     <system:String
         x:Key="NameEditor.Validation.DuplicatedName">Такое название уже существует</system:String>
+
+    <system:String
+        x:Key="BeginsWithOperator">Начинается с</system:String>
+    <system:String
+        x:Key="ContainsOperator">Содержит</system:String>
+    <system:String
+        x:Key="EndsWithOperator">Заканчивается на</system:String>
+    <system:String
+        x:Key="EqualsOperator">Равно</system:String>
+    <system:String
+        x:Key="GreaterOperator">Больше</system:String>
+    <system:String
+        x:Key="GreaterOrEqualOperator">Больше или равно</system:String>
+    <system:String
+        x:Key="HasNoValueOperator">Нет значения</system:String>
+    <system:String
+        x:Key="HasValueOperator">Имеет значение</system:String>
+    <system:String
+        x:Key="LessOperator">Меньше</system:String>
+    <system:String
+        x:Key="LessOrEqualOperator">Меньше или равно</system:String>
+    <system:String
+        x:Key="NotBeginsWithOperator">Не начинается с</system:String>
+    <system:String
+        x:Key="NotContainsOperator">Не содержит</system:String>
+    <system:String
+        x:Key="NotEndsWithOperator">Не заканчивается на</system:String>
+    <system:String
+        x:Key="NotEqualsOperator">Не равно</system:String>
+
+    <system:String
+        x:Key="AndOperator">И</system:String>
+    <system:String
+        x:Key="OrOperator">Или</system:String>
 
     <system:String
         x:Key="Ok">ОК</system:String>

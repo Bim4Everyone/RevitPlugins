@@ -60,7 +60,7 @@
                 SelectionMode="Extended"
                 x:Name="_list"
                 ItemsSource="{Binding ListItemsSource, ElementName=_this}"
-                SelectedItem="{Binding ListSelectedItem, ElementName=_this, UpdateSourceTrigger=PropertyChanged}">
+                SelectedItem="{Binding ListSelectedItem, ElementName=_this}">
                 <ui:ListView.ItemTemplate>
                     <DataTemplate>
                         <DockPanel

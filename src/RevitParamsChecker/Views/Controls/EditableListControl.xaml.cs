@@ -67,7 +67,7 @@ internal partial class EditableListControl {
         nameof(ListSelectedItem),
         typeof(object),
         typeof(EditableListControl),
-        new PropertyMetadata(null));
+        new FrameworkPropertyMetadata(null, FrameworkPropertyMetadataOptions.BindsTwoWayByDefault));
 
     public string ListLabel {
         get => (string) GetValue(ListLabelProperty);
