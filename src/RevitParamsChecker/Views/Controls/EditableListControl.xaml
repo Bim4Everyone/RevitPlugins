@@ -27,17 +27,12 @@
             LastChildFill="True">
             <DockPanel
                 DockPanel.Dock="Top">
-                <Label
-                    DockPanel.Dock="Top"
-                    Margin="0 0 0 4"
-                    VerticalAlignment="Center"
-                    Content="{Binding ListLabel, ElementName=_this}" />
                 <ui:Button
                     ToolTip="{me:LocalizationSource EditableList.Tooltip.Add}"
                     Command="{Binding AddItemCommand, ElementName=_this}"
                     Content="{ui:SymbolIcon Symbol=Add20}" />
                 <ui:Button
-                    Margin="4 0"
+                    Margin="8 0"
                     ToolTip="{me:LocalizationSource EditableList.Tooltip.Rename}"
                     Command="{Binding RenameItemCommand, ElementName=_this}"
                     CommandParameter="{Binding SelectedItem, ElementName=_list}"
@@ -49,7 +44,7 @@
                     Content="{ui:SymbolIcon Symbol=Copy20}" />
                 <ui:Button
                     Appearance="Danger"
-                    Margin="4 0 0 0"
+                    Margin="8 0 0 0"
                     ToolTip="{me:LocalizationSource EditableList.Tooltip.Remove}"
                     Command="{Binding RemoveItemsCommand, ElementName=_this}"
                     CommandParameter="{Binding Path=SelectedItems, ElementName=_list}"

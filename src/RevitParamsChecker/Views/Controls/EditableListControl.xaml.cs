@@ -27,12 +27,6 @@ internal partial class EditableListControl {
         InitializeComponent();
     }
 
-    public static readonly DependencyProperty ListLabelProperty = DependencyProperty.Register(
-        nameof(ListLabel),
-        typeof(string),
-        typeof(EditableListControl),
-        new PropertyMetadata(default(string)));
-
     public static readonly DependencyProperty AddItemCommandProperty = DependencyProperty.Register(
         nameof(AddItemCommand),
         typeof(ICommand),
@@ -68,11 +62,6 @@ internal partial class EditableListControl {
         typeof(object),
         typeof(EditableListControl),
         new FrameworkPropertyMetadata(null, FrameworkPropertyMetadataOptions.BindsTwoWayByDefault));
-
-    public string ListLabel {
-        get => (string) GetValue(ListLabelProperty);
-        set => SetValue(ListLabelProperty, value);
-    }
 
     public ICommand AddItemCommand {
         get => (ICommand) GetValue(AddItemCommandProperty);
