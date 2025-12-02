@@ -7,7 +7,7 @@ using RevitParamsChecker.Models.Rules.ComparisonOperators;
 
 namespace RevitParamsChecker.ViewModels.Rules;
 
-internal class ComparisonOperatorViewModel : BaseViewModel {
+internal class ComparisonOperatorViewModel : BaseViewModel, IEquatable<ComparisonOperatorViewModel> {
     private readonly ILocalizationService _localization;
 
     public ComparisonOperatorViewModel(ILocalizationService localization, ComparisonOperator comparisonOperator) {
@@ -19,4 +19,8 @@ internal class ComparisonOperatorViewModel : BaseViewModel {
     public string Name { get; }
 
     public ComparisonOperator Operator { get; }
+
+    public bool Equals(ComparisonOperatorViewModel other) {
+        return other is not null && Operator.Equals(other.Operator);
+    }
 }

@@ -11,4 +11,16 @@ internal class AndOperator : LogicalOperator {
         bool[] arr = results?.ToArray() ?? [];
         return arr.Length == 0 || arr.All(r => r == true);
     }
+
+    public override bool Equals(LogicalOperator other) {
+        if(other is null) {
+            return false;
+        }
+
+        if(ReferenceEquals(this, other)) {
+            return true;
+        }
+
+        return other is AndOperator;
+    }
 }

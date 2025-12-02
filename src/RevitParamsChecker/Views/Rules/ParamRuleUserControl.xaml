@@ -38,7 +38,7 @@
             IsEditable="False"
             DisplayMemberPath="Name"
             ItemsSource="{Binding AvailableOperators}"
-            SelectedIndex="{Binding SelectedOperator, UpdateSourceTrigger=PropertyChanged}" />
+            SelectedValue="{Binding SelectedOperator, UpdateSourceTrigger=PropertyChanged}" />
 
         <ui:TextBox
             Grid.Column="2"

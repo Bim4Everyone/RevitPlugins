@@ -47,8 +47,12 @@
                     Content="{me:LocalizationSource RulesPage.RuleLabel}" />
             </StackPanel>
 
-            <local:ParamsSetUserControl
-                DataContext="{Binding RootSet}" />
+            <ScrollViewer
+                HorizontalScrollBarVisibility="Disabled"
+                VerticalScrollBarVisibility="Auto">
+                <local:ParamsSetUserControl
+                    DataContext="{Binding RootSet}" />
+            </ScrollViewer>
         </DockPanel>
     </Border>
 </core:WpfUIPlatformUserControl>

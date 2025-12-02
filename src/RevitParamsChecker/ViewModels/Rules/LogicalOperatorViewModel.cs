@@ -7,7 +7,7 @@ using RevitParamsChecker.Models.Rules.LogicalOperators;
 
 namespace RevitParamsChecker.ViewModels.Rules;
 
-internal class LogicalOperatorViewModel : BaseViewModel {
+internal class LogicalOperatorViewModel : BaseViewModel, IEquatable<LogicalOperatorViewModel> {
     private readonly ILocalizationService _localization;
 
     public LogicalOperatorViewModel(ILocalizationService localization, LogicalOperator logicalOperator) {
@@ -19,8 +19,14 @@ internal class LogicalOperatorViewModel : BaseViewModel {
 
     public string Name { get; }
 
-    // свойство для раскраски набора по цвету
+    ///<summary>
+    /// Свойство для раскраски набора по цвету
+    /// </summary>
     public bool IsAndOperator { get; }
 
     public LogicalOperator Operator { get; }
+
+    public bool Equals(LogicalOperatorViewModel other) {
+        return other is not null && Operator.Equals(other.Operator);
+    }
 }

@@ -11,4 +11,16 @@ internal class OrOperator : LogicalOperator {
         bool[] arr = results?.ToArray() ?? [];
         return arr.Length == 0 || arr.Any(r => r == true);
     }
+
+    public override bool Equals(LogicalOperator other) {
+        if(other is null) {
+            return false;
+        }
+
+        if(ReferenceEquals(this, other)) {
+            return true;
+        }
+
+        return other is OrOperator;
+    }
 }
