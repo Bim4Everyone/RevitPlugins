@@ -18,7 +18,7 @@ internal class NameEditorService {
         _resolutionRoot = resolutionRoot ?? throw new ArgumentNullException(nameof(resolutionRoot));
     }
 
-    public async Task<ICollection<string>> SelectNames(string prompt, string[] allNames, string[] selectedNames) {
+    public async Task<ICollection<string>> SelectNamesAsync(string prompt, string[] allNames, string[] selectedNames) {
         var allNamesArg = new ConstructorArgument(nameof(allNames), allNames);
         var selectedNamesArg = new ConstructorArgument(nameof(selectedNames), selectedNames);
         var vm = _resolutionRoot.Get<SelectableNamesViewModel>(allNamesArg, selectedNamesArg);

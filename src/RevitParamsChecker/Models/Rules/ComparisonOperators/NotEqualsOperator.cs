@@ -21,4 +21,8 @@ internal class NotEqualsOperator : ComparisonOperator {
 
         return other is NotEqualsOperator;
     }
+
+    public override ComparisonOperator Copy() {
+        return new NotEqualsOperator();
+    }
 }

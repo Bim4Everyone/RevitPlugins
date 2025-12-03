@@ -51,6 +51,12 @@
         x:Key="ChecksPage.FiltersHeader">Поисковые наборы</system:String>
     <system:String
         x:Key="ChecksPage.RulesHeader">Правила</system:String>
+    <system:String
+        x:Key="ChecksPage.SetSelectedFilesPrompt">Выберите файлы</system:String>
+    <system:String
+        x:Key="ChecksPage.SetSelectedFiltersPrompt">Выберите поисковые наборы</system:String>
+    <system:String
+        x:Key="ChecksPage.SetSelectedRulesPrompt">Выберите правила</system:String>
 
     <system:String
         x:Key="ResultsPage.RulesHeader">Правила</system:String>

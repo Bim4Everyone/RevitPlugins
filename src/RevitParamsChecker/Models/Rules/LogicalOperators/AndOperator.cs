@@ -23,4 +23,8 @@ internal class AndOperator : LogicalOperator {
 
         return other is AndOperator;
     }
+
+    public override LogicalOperator Copy() {
+        return new AndOperator();
+    }
 }

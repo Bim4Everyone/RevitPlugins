@@ -21,4 +21,8 @@ internal class ContainsOperator : ComparisonOperator {
 
         return other is ContainsOperator;
     }
+
+    public override ComparisonOperator Copy() {
+        return new ContainsOperator();
+    }
 }

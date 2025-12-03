@@ -42,9 +42,9 @@ internal class ChecksEngine {
 
         var elements = GetElements(check);
         var rules = check.Rules.Select(r => _rulesRepo.GetRule(r)).ToArray();
-        List<RuleResult> ruleResults = new();
+        List<RuleResult> ruleResults = [];
         foreach(var rule in rules) {
-            List<ElementResult> elementResults = new();
+            List<ElementResult> elementResults = [];
             foreach(var element in elements) {
                 try {
                     bool success = rule.RootRule.Evaluate(element.Element);
@@ -71,7 +71,7 @@ internal class ChecksEngine {
     private ICollection<ElementModel> GetElements(Check check) {
         var filters = check.Filters.Select(f => _filtersRepo.GetFilter(f)).ToArray();
         var docs = check.Files.Select(c => _revitRepo.GetDocument(c)).ToArray();
-        List<ElementModel> elements = new();
+        List<ElementModel> elements = [];
         foreach(var doc in docs) {
             foreach(var filter in filters) {
                 elements.AddRange(_revitRepo.GetElements(doc, filter));

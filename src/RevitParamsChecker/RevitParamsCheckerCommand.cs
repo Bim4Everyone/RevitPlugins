@@ -2,7 +2,6 @@ using System.Globalization;
 using System.Reflection;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Forms.VisualStyles;
 
 using Autodesk.Revit.Attributes;
 using Autodesk.Revit.UI;
@@ -22,7 +21,6 @@ using RevitParamsChecker.Models.Rules;
 using RevitParamsChecker.Services;
 using RevitParamsChecker.ViewModels;
 using RevitParamsChecker.ViewModels.Checks;
-using RevitParamsChecker.ViewModels.Dashboard;
 using RevitParamsChecker.ViewModels.Filtration;
 using RevitParamsChecker.ViewModels.Results;
 using RevitParamsChecker.ViewModels.Rules;
@@ -35,6 +33,7 @@ using RevitParamsChecker.Views.Results;
 using RevitParamsChecker.Views.Rules;
 using RevitParamsChecker.Views.Utils;
 
+using Wpf.Ui;
 using Wpf.Ui.Abstractions;
 
 namespace RevitParamsChecker;
@@ -60,6 +59,9 @@ public class RevitParamsCheckerCommand : BasePluginCommand {
         kernel.Bind<INavigationViewPageProvider>()
             .To<NavigationViewPageProvider>()
             .InSingletonScope();
+        kernel.Bind<IContentDialogService>()
+            .To<ContentDialogService>()
+            .InSingletonScope();
 
         kernel.UseWpfUIThemeUpdater();
 
@@ -77,8 +79,7 @@ public class RevitParamsCheckerCommand : BasePluginCommand {
     private void BindPages(IKernel kernel) {
         kernel.Bind<DashboardPage>()
             .ToSelf()
-            .InSingletonScope()
-            .WithPropertyValue(nameof(Page.DataContext), c => c.Kernel.Get<DashboardPageViewModel>());
+            .InSingletonScope();
         kernel.Bind<ChecksPage>()
             .ToSelf()
             .InSingletonScope()
@@ -98,9 +99,6 @@ public class RevitParamsCheckerCommand : BasePluginCommand {
     }
 
     private void BindViewModels(IKernel kernel) {
-        kernel.Bind<DashboardPageViewModel>()
-            .ToSelf()
-            .InSingletonScope();
         kernel.Bind<ChecksPageViewModel>()
             .ToSelf()
             .InSingletonScope();

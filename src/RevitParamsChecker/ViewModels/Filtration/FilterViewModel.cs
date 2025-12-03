@@ -3,13 +3,19 @@ using System.Collections.Generic;
 
 using dosymep.WPF.ViewModels;
 
+using RevitParamsChecker.Models.Filtration;
+
 namespace RevitParamsChecker.ViewModels.Filtration;
 
 internal class FilterViewModel : BaseViewModel, IEquatable<FilterViewModel> {
     private readonly Guid _guid;
     private string _name;
+    private Filter _filter;
 
-    public FilterViewModel() {
+    public FilterViewModel(Filter filter) {
+        // TODO адаптировать под либу фильтрации
+        _filter = filter ?? throw new ArgumentNullException(nameof(filter));
+        Name = _filter.Name;
         _guid = Guid.NewGuid();
     }
 
@@ -36,5 +42,10 @@ internal class FilterViewModel : BaseViewModel, IEquatable<FilterViewModel> {
         }
 
         return _guid == other._guid;
+    }
+
+    public Filter GetFilter() {
+        _filter.Name = Name;
+        return _filter;
     }
 }

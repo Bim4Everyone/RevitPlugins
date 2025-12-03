@@ -5,12 +5,14 @@ using dosymep.SimpleServices;
 
 using RevitParamsChecker.Views.Dashboard;
 
+using Wpf.Ui;
 using Wpf.Ui.Abstractions;
 
 namespace RevitParamsChecker.Views;
 
 internal partial class MainWindow {
     public MainWindow(
+        IContentDialogService contentDialogService,
         INavigationViewPageProvider navigationViewPageProvider,
         ILoggerService loggerService,
         ISerializationService serializationService,
@@ -26,6 +28,7 @@ internal partial class MainWindow {
             uiThemeService,
             themeUpdaterService) {
         InitializeComponent();
+        contentDialogService.SetDialogHost(_rootContentDialog);
         _rootNavigationView.SetPageProviderService(navigationViewPageProvider);
         Dispatcher.BeginInvoke(
             DispatcherPriority.Loaded,

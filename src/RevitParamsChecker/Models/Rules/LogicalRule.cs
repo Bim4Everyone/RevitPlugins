@@ -11,9 +11,9 @@ internal class LogicalRule : ValidationRule {
     public LogicalRule() {
     }
 
-    public ValidationRule[] ChildRules { get; set; }
+    public ValidationRule[] ChildRules { get; set; } = [];
 
-    public LogicalOperator Operator { get; set; }
+    public LogicalOperator Operator { get; set; } = new AndOperator();
 
     public override bool Evaluate(Element element) {
         if(ChildRules is null) {
@@ -25,5 +25,12 @@ internal class LogicalRule : ValidationRule {
         }
 
         return Operator.Combine(ChildRules.Select(r => r.Evaluate(element)));
+    }
+
+    public override ValidationRule Copy() {
+        return new LogicalRule() {
+            Operator = Operator.Copy(),
+            ChildRules = [..ChildRules.Select(c => c.Copy())]
+        };
     }
 }

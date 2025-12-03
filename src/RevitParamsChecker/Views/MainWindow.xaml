@@ -97,6 +97,11 @@
             </ui:NavigationView.MenuItems>
         </ui:NavigationView>
 
+        <ContentPresenter
+            Grid.Row="0"
+            Grid.RowSpan="2"
+            x:Name="_rootContentDialog" />
+
         <StackPanel
             Grid.Row="2"
             Orientation="Horizontal"

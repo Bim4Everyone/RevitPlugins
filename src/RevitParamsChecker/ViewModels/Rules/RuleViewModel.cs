@@ -4,18 +4,25 @@ using System.Collections.Generic;
 using dosymep.SimpleServices;
 using dosymep.WPF.ViewModels;
 
+using RevitParamsChecker.Models.Rules;
+
 namespace RevitParamsChecker.ViewModels.Rules;
 
 internal class RuleViewModel : BaseViewModel, IEquatable<RuleViewModel> {
+    private readonly Rule _rule;
     private readonly Guid _guid;
     private string _name;
     private string _description;
 
     public RuleViewModel(
+        Rule rule,
         ICollection<LogicalOperatorViewModel> logicalOperators,
         ICollection<ComparisonOperatorViewModel> comparisonOperators) {
+        _rule = rule ?? throw new ArgumentNullException(nameof(rule));
         _guid = Guid.NewGuid();
-        RootSet = new ParamsSetViewModel(logicalOperators, comparisonOperators); // TODO
+        Name = _rule.Name;
+        Description = _rule.Description;
+        RootSet = new ParamsSetViewModel(_rule.RootRule, logicalOperators, comparisonOperators);
     }
 
     public string Name {
@@ -48,5 +55,12 @@ internal class RuleViewModel : BaseViewModel, IEquatable<RuleViewModel> {
 
     public override int GetHashCode() {
         return _guid.GetHashCode();
+    }
+
+    public Rule GetRule() {
+        _rule.Name = Name;
+        _rule.Description = Description;
+        _rule.RootRule = RootSet.GetRule();
+        return _rule;
     }
 }

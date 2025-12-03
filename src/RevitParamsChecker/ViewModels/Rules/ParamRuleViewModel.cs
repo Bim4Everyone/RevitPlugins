@@ -10,11 +10,12 @@ using RevitParamsChecker.Models.Rules;
 namespace RevitParamsChecker.ViewModels.Rules;
 
 internal class ParamRuleViewModel : BaseViewModel {
+    private readonly ParameterRule _rule;
     private string _paramName;
     private string _expectedValue;
     private ComparisonOperatorViewModel _selectedOperator;
 
-    public ParamRuleViewModel(ICollection<ComparisonOperatorViewModel> operators) {
+    public ParamRuleViewModel(ParameterRule rule, ICollection<ComparisonOperatorViewModel> operators) {
         if(operators == null) {
             throw new ArgumentNullException(nameof(operators));
         }
@@ -23,8 +24,14 @@ internal class ParamRuleViewModel : BaseViewModel {
             throw new ArgumentException(nameof(operators));
         }
 
+        _rule = rule ?? throw new ArgumentNullException(nameof(rule));
+
         AvailableOperators = new ReadOnlyCollection<ComparisonOperatorViewModel>(operators.ToArray());
-        SelectedOperator = AvailableOperators.First();
+        SelectedOperator = _rule.Operator != null
+            ? AvailableOperators.First(o => o.Operator.Equals(_rule.Operator))
+            : AvailableOperators.First();
+        ParamName = _rule.ParameterName;
+        ExpectedValue = _rule.ExpectedValue;
     }
 
     public string ParamName {
@@ -57,10 +64,9 @@ internal class ParamRuleViewModel : BaseViewModel {
             throw new InvalidOperationException($"Сначала надо назначить {nameof(SelectedOperator)}");
         }
 
-        return new ParameterRule() {
-            ParameterName = ParamName,
-            ExpectedValue = ExpectedValue,
-            Operator = SelectedOperator.Operator
-        };
+        _rule.ParameterName = ParamName;
+        _rule.ExpectedValue = ExpectedValue;
+        _rule.Operator = SelectedOperator.Operator;
+        return _rule;
     }
 }

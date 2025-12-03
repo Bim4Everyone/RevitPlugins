@@ -21,4 +21,8 @@ internal class BeginsWithOperator : ComparisonOperator {
 
         return other is BeginsWithOperator;
     }
+
+    public override ComparisonOperator Copy() {
+        return new BeginsWithOperator();
+    }
 }

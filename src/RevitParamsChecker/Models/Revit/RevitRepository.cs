@@ -21,6 +21,11 @@ internal class RevitRepository {
 
     public Document Document => ActiveUIDocument.Document;
 
+    public DocumentModel[] GetDocuments() {
+        // TODO
+        return [new DocumentModel(Document)];
+    }
+
     public DocumentModel GetDocument(string name) {
         throw new System.NotImplementedException(); // TODO
     }

@@ -21,4 +21,8 @@ internal class LessOperator : ComparisonOperator {
 
         return other is LessOperator;
     }
+
+    public override ComparisonOperator Copy() {
+        return new LessOperator();
+    }
 }

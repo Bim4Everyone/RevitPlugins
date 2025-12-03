@@ -25,11 +25,17 @@ internal class FiltrationPageViewModel : BaseViewModel {
         _localization = localization ?? throw new ArgumentNullException(nameof(localization));
         _filtersRepo = filtersRepo ?? throw new ArgumentNullException(nameof(filtersRepo));
         _nameEditorService = nameEditorService ?? throw new ArgumentNullException(nameof(nameEditorService));
-        // TODO
-        Filters = [];
+
+        Filters = [.._filtersRepo.GetFilters().Select(f => new FilterViewModel(f))];
+
         AddFilterCommand = RelayCommand.Create(AddFilter);
         RenameFilterCommand = RelayCommand.Create<FilterViewModel>(RenameFilter, CanRenameFilter);
         RemoveFiltersCommand = RelayCommand.Create<IList>(RemoveFilters, CanRemoveFilters);
+        CopyFilterCommand = RelayCommand.Create<FilterViewModel>(CopyFilter, CanCopyFilter);
+        SaveCommand = RelayCommand.Create(Save, CanSave);
+        SaveAsCommand = RelayCommand.Create(SaveAs, CanSave);
+        LoadCommand = RelayCommand.Create(Load);
+        ShowElementsCommand = RelayCommand.Create(ShowElements, CanShowElements);
     }
 
     public ICommand LoadCommand { get; }
@@ -45,13 +51,13 @@ internal class FiltrationPageViewModel : BaseViewModel {
 
     private void AddFilter() {
         try {
-            var newName = _nameEditorService.CreateNewName(
+            string newName = _nameEditorService.CreateNewName(
                 _localization.GetLocalizedString("FiltersPage.NewFilterPrompt"),
                 Filters.Select(f => f.Name).ToArray());
-            Filters.Add(new FilterViewModel() { Name = newName });
+            var filter = new Filter() { Name = newName };
+            Filters.Add(new FilterViewModel(filter));
         } catch(OperationCanceledException) {
         }
-        // TODO
     }
 
     private void RenameFilter(FilterViewModel filter) {
@@ -62,11 +68,26 @@ internal class FiltrationPageViewModel : BaseViewModel {
                 filter.Name);
         } catch(OperationCanceledException) {
         }
-        // TODO
     }
 
     private bool CanRenameFilter(FilterViewModel filter) {
         return filter is not null;
+    }
+
+    private void CopyFilter(FilterViewModel filter) {
+        try {
+            var copyFilter = filter.GetFilter().Copy();
+            copyFilter.Name = _nameEditorService.CreateNewName(
+                _localization.GetLocalizedString("FiltersPage.NewFilterPrompt"),
+                Filters.Select(f => f.Name).ToArray(),
+                filter.Name);
+            Filters.Add(new FilterViewModel(copyFilter));
+        } catch(OperationCanceledException) {
+        }
+    }
+
+    private bool CanCopyFilter(FilterViewModel filter) {
+        return filter is not null; // TODO тут должна быть проверка ошибок в модели копируемого фильтра
     }
 
     private void RemoveFilters(IList items) {
@@ -74,11 +95,34 @@ internal class FiltrationPageViewModel : BaseViewModel {
         foreach(var filter in filters) {
             Filters.Remove(filter);
         }
-        // TODO
     }
 
     private bool CanRemoveFilters(IList items) {
         return items != null
                && items.OfType<FilterViewModel>().Count() != 0;
+    }
+
+    private void Save() {
+        _filtersRepo.SetFilters(Filters.Select(f => f.GetFilter()).ToArray());
+    }
+
+    private void SaveAs() {
+        // TODO
+    }
+
+    private bool CanSave() {
+        return true; // TODO здесь должна быть проверка на ошибки в моделях всех фильтров
+    }
+
+    private void Load() {
+        // TODO
+    }
+
+    private void ShowElements() {
+        // TODO
+    }
+
+    private bool CanShowElements() {
+        return CanSave();
     }
 }

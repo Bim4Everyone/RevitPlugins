@@ -12,4 +12,8 @@ internal class Filter {
     public ElementFilter GetFilter() {
         return new ElementCategoryFilter(BuiltInCategory.OST_PipeCurves);
     }
+
+    public Filter Copy() {
+        return new Filter() { Name = Name };
+    }
 }

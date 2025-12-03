@@ -21,4 +21,8 @@ internal class NotContainsOperator : ComparisonOperator {
 
         return other is NotContainsOperator;
     }
+
+    public override ComparisonOperator Copy() {
+        return new NotContainsOperator();
+    }
 }

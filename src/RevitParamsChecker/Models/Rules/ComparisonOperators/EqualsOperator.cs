@@ -21,4 +21,8 @@ internal class EqualsOperator : ComparisonOperator {
 
         return other is EqualsOperator;
     }
+
+    public override ComparisonOperator Copy() {
+        return new EqualsOperator();
+    }
 }

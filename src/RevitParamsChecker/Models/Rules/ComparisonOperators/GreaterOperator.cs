@@ -21,4 +21,8 @@ internal class GreaterOperator : ComparisonOperator {
 
         return other is GreaterOperator;
     }
+
+    public override ComparisonOperator Copy() {
+        return new GreaterOperator();
+    }
 }

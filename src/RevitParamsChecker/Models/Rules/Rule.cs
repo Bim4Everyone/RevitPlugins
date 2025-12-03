@@ -8,9 +8,13 @@ internal class Rule {
 
     public string Description { get; set; }
 
-    public LogicalRule RootRule { get; set; }
+    public LogicalRule RootRule { get; set; } = new LogicalRule();
 
     public Rule Copy() {
-        throw new System.NotImplementedException(); // TODO
+        return new Rule() {
+            Name = Name,
+            Description = Description,
+            RootRule = (LogicalRule) RootRule.Copy()
+        };
     }
 }

@@ -16,6 +16,8 @@ public class DocumentModel {
         IsLink = true;
     }
 
+    public string Name => Document.Title;
+
     public Document Document { get; }
 
     public bool IsLink { get; }

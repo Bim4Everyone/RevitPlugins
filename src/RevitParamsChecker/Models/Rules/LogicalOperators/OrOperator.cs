@@ -23,4 +23,8 @@ internal class OrOperator : LogicalOperator {
 
         return other is OrOperator;
     }
+
+    public override LogicalOperator Copy() {
+        return new OrOperator();
+    }
 }

@@ -35,10 +35,17 @@ internal class RulesPageViewModel : BaseViewModel {
         _availableLogicalOperators = GetAvailableLogicalOperators(_localization);
         _availableComparisonOperators = GetAvailableComparisonOperators(_localization);
 
-        Rules = []; // TODO
+        Rules = [
+            .._rulesRepo.GetRules()
+                .Select(r => new RuleViewModel(r, _availableLogicalOperators, _availableComparisonOperators))
+        ];
         AddRuleCommand = RelayCommand.Create(AddRule);
         RenameRuleCommand = RelayCommand.Create<RuleViewModel>(RenameRule, CanRenameRule);
         RemoveRulesCommand = RelayCommand.Create<IList>(RemoveRules, CanRemoveRules);
+        CopyRuleCommand = RelayCommand.Create<RuleViewModel>(CopyRule, CanCopyRule);
+        LoadCommand = RelayCommand.Create(Load);
+        SaveCommand = RelayCommand.Create(Save, CanSave);
+        SaveAsCommand = RelayCommand.Create(SaveAs, CanSave);
     }
 
     public ICommand LoadCommand { get; }
@@ -58,13 +65,17 @@ internal class RulesPageViewModel : BaseViewModel {
 
     private void AddRule() {
         try {
-            var newName = _nameEditorService.CreateNewName(
+            var newRule = new Rule();
+            newRule.Name = _nameEditorService.CreateNewName(
                 _localization.GetLocalizedString("RulesPage.NewRulePrompt"),
                 Rules.Select(f => f.Name).ToArray());
-            Rules.Add(new RuleViewModel(_availableLogicalOperators, _availableComparisonOperators) { Name = newName });
+            Rules.Add(
+                new RuleViewModel(
+                    newRule,
+                    _availableLogicalOperators,
+                    _availableComparisonOperators));
         } catch(OperationCanceledException) {
         }
-        // TODO
     }
 
     private void RenameRule(RuleViewModel rule) {
@@ -75,7 +86,22 @@ internal class RulesPageViewModel : BaseViewModel {
                 rule.Name);
         } catch(OperationCanceledException) {
         }
-        // TODO
+    }
+
+    private void CopyRule(RuleViewModel rule) {
+        try {
+            var copyRule = rule.GetRule().Copy();
+            copyRule.Name = _nameEditorService.CreateNewName(
+                _localization.GetLocalizedString("RulesPage.NewRulePrompt"),
+                Rules.Select(f => f.Name).ToArray(),
+                rule.Name);
+            Rules.Add(new RuleViewModel(copyRule, _availableLogicalOperators, _availableComparisonOperators));
+        } catch(OperationCanceledException) {
+        }
+    }
+
+    private bool CanCopyRule(RuleViewModel rule) {
+        return rule != null; // TODO валидация правила
     }
 
     private bool CanRenameRule(RuleViewModel rule) {
@@ -87,12 +113,27 @@ internal class RulesPageViewModel : BaseViewModel {
         foreach(var rule in rules) {
             Rules.Remove(rule);
         }
-        // TODO
     }
 
     private bool CanRemoveRules(IList items) {
         return items != null
                && items.OfType<RuleViewModel>().Count() != 0;
+    }
+
+    private void Load() {
+        // TODO
+    }
+
+    private void Save() {
+        _rulesRepo.SetRules(Rules.Select(r => r.GetRule()).ToArray());
+    }
+
+    private void SaveAs() {
+        // TODO
+    }
+
+    private bool CanSave() {
+        return true; // TODO валидация
     }
 
     private ICollection<ComparisonOperatorViewModel>

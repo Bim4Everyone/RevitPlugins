@@ -12,14 +12,20 @@ using RevitParamsChecker.Models.Rules;
 namespace RevitParamsChecker.ViewModels.Rules;
 
 internal class ParamsSetViewModel : BaseViewModel {
+    private readonly LogicalRule _logicalRule;
     private readonly ICollection<ComparisonOperatorViewModel> _availableComparisonOperators;
     private LogicalOperatorViewModel _selectedOperator;
 
     public ParamsSetViewModel(
+        LogicalRule logicalRule,
         ICollection<LogicalOperatorViewModel> logicalOperators,
         ICollection<ComparisonOperatorViewModel> comparisonOperators) {
         if(logicalOperators == null) {
             throw new ArgumentNullException(nameof(logicalOperators));
+        }
+
+        if(comparisonOperators == null) {
+            throw new ArgumentNullException(nameof(comparisonOperators));
         }
 
         if(logicalOperators.Count == 0) {
@@ -30,18 +36,24 @@ internal class ParamsSetViewModel : BaseViewModel {
             throw new ArgumentOutOfRangeException(nameof(comparisonOperators));
         }
 
-        _availableComparisonOperators =
-            comparisonOperators ?? throw new ArgumentNullException(nameof(comparisonOperators));
-
+        _logicalRule = logicalRule ?? throw new ArgumentNullException(nameof(logicalRule));
+        _availableComparisonOperators = comparisonOperators;
         AvailableLogicalOperators = new ReadOnlyCollection<LogicalOperatorViewModel>(logicalOperators.ToArray());
-        SelectedOperator = AvailableLogicalOperators.First();
-        InnerParamRules = [];
-        InnerParamSets = [];
-
-        AddInnerParamRuleCommand = RelayCommand.Create(AddRule);
-        RemoveInnerParamRuleCommand = RelayCommand.Create<ParamRuleViewModel>(RemoveRule, CanRemoveRule);
-        AddInnerParamSetCommand = RelayCommand.Create(AddSet);
-        RemoveInnerParamSetCommand = RelayCommand.Create<ParamsSetViewModel>(RemoveSet, CanRemoveSet);
+        SelectedOperator = _logicalRule.Operator != null
+            ? AvailableLogicalOperators.First(o => o.Operator.Equals(_logicalRule.Operator))
+            : AvailableLogicalOperators.First();
+        InnerParamRules = [
+            .._logicalRule.ChildRules.OfType<ParameterRule>()
+                .Select(r => new ParamRuleViewModel(r, _availableComparisonOperators))
+        ];
+        InnerParamSets = [
+            .._logicalRule.ChildRules.OfType<LogicalRule>()
+                .Select(r => new ParamsSetViewModel(r, AvailableLogicalOperators, _availableComparisonOperators))
+        ];
+        AddInnerParamRuleCommand = RelayCommand.Create(AddInnerRule);
+        RemoveInnerParamRuleCommand = RelayCommand.Create<ParamRuleViewModel>(RemoveInnerRule, CanRemoveInnerRule);
+        AddInnerParamSetCommand = RelayCommand.Create(AddInnerSet);
+        RemoveInnerParamSetCommand = RelayCommand.Create<ParamsSetViewModel>(RemoveInnerSet, CanRemoveInnerSet);
     }
 
     public ICommand AddInnerParamRuleCommand { get; }
@@ -61,33 +73,35 @@ internal class ParamsSetViewModel : BaseViewModel {
     public ObservableCollection<ParamsSetViewModel> InnerParamSets { get; }
 
     public LogicalRule GetRule() {
-        return new LogicalRule() {
-            Operator = SelectedOperator.Operator,
-            ChildRules = [..InnerParamSets.Select(s => s.GetRule()), ..InnerParamRules.Select(s => s.GetRule())]
-        };
+        _logicalRule.Operator = SelectedOperator.Operator;
+        _logicalRule.ChildRules = [
+            ..InnerParamSets.Select(s => s.GetRule()), ..InnerParamRules.Select(s => s.GetRule())
+        ];
+        return _logicalRule;
     }
 
-    private void AddSet() {
-        InnerParamSets.Add(new ParamsSetViewModel(AvailableLogicalOperators, _availableComparisonOperators));
+    private void AddInnerSet() {
+        InnerParamSets.Add(
+            new ParamsSetViewModel(new LogicalRule(), AvailableLogicalOperators, _availableComparisonOperators));
     }
 
-    private void RemoveSet(ParamsSetViewModel p) {
+    private void RemoveInnerSet(ParamsSetViewModel p) {
         InnerParamSets.Remove(p);
     }
 
-    private bool CanRemoveSet(ParamsSetViewModel p) {
+    private bool CanRemoveInnerSet(ParamsSetViewModel p) {
         return p is not null;
     }
 
-    private void AddRule() {
-        InnerParamRules.Add(new ParamRuleViewModel(_availableComparisonOperators));
+    private void AddInnerRule() {
+        InnerParamRules.Add(new ParamRuleViewModel(new ParameterRule(), _availableComparisonOperators));
     }
 
-    private void RemoveRule(ParamRuleViewModel p) {
+    private void RemoveInnerRule(ParamRuleViewModel p) {
         InnerParamRules.Remove(p);
     }
 
-    private bool CanRemoveRule(ParamRuleViewModel p) {
+    private bool CanRemoveInnerRule(ParamRuleViewModel p) {
         return p is not null;
     }
 }

@@ -19,4 +19,8 @@ internal class HasValueOperator : ComparisonOperator {
 
         return other is HasValueOperator;
     }
+
+    public override ComparisonOperator Copy() {
+        return new HasValueOperator();
+    }
 }

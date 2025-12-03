@@ -4,17 +4,25 @@ using System.Collections.ObjectModel;
 using dosymep.WPF.Commands;
 using dosymep.WPF.ViewModels;
 
+using RevitParamsChecker.Models.Checks;
+
 namespace RevitParamsChecker.ViewModels.Checks;
 
 internal class CheckViewModel : BaseViewModel, IEquatable<CheckViewModel> {
+    private readonly Check _check;
     private readonly Guid _guid;
     private string _name;
     private bool _isSelected;
-    private ObservableCollection<string> _selectedFiles = [];
-    private ObservableCollection<string> _selectedFilters = [];
-    private ObservableCollection<string> _selectedRules = [];
+    private ObservableCollection<string> _selectedFiles;
+    private ObservableCollection<string> _selectedFilters;
+    private ObservableCollection<string> _selectedRules;
 
-    public CheckViewModel() {
+    public CheckViewModel(Check check) {
+        _check = check ?? throw new ArgumentNullException(nameof(check));
+        Name = _check.Name;
+        SelectedFiles = [.._check.Files];
+        SelectedFilters = [.._check.Filters];
+        SelectedRules = [.._check.Rules];
         _guid = Guid.NewGuid();
     }
 
@@ -61,5 +69,13 @@ internal class CheckViewModel : BaseViewModel, IEquatable<CheckViewModel> {
 
     public override int GetHashCode() {
         return _guid.GetHashCode();
+    }
+
+    public Check GetCheck() {
+        _check.Name = Name;
+        _check.Files = [..SelectedFiles];
+        _check.Filters = [..SelectedFilters];
+        _check.Rules = [..SelectedRules];
+        return _check;
     }
 }
