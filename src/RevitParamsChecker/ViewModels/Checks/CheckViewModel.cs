@@ -10,9 +10,9 @@ internal class CheckViewModel : BaseViewModel, IEquatable<CheckViewModel> {
     private readonly Guid _guid;
     private string _name;
     private bool _isSelected;
-    private ObservableCollection<string> _selectedFiles;
-    private ObservableCollection<string> _selectedFilters;
-    private ObservableCollection<string> _selectedRules;
+    private ObservableCollection<string> _selectedFiles = [];
+    private ObservableCollection<string> _selectedFilters = [];
+    private ObservableCollection<string> _selectedRules = [];
 
     public CheckViewModel() {
         _guid = Guid.NewGuid();

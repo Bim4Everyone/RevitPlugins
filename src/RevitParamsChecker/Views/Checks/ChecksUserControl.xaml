@@ -79,7 +79,7 @@
                 <ui:DataGrid.Columns>
                     <DataGridCheckBoxColumn
                         CanUserResize="False"
-                        Width="47"
+                        Width="50"
                         CanUserSort="False"
                         Binding="{Binding IsSelected, UpdateSourceTrigger=PropertyChanged}">
                         <DataGridCheckBoxColumn.Header>
@@ -90,6 +90,7 @@
 
                     <DataGridTextColumn
                         IsReadOnly="True"
+                        MinWidth="100"
                         Binding="{Binding Name}">
                         <DataGridTextColumn.Header>
                             <ui:TextBlock
@@ -118,7 +119,9 @@
                         </DataGridTextColumn.CellStyle>
                     </DataGridTextColumn>
 
-                    <DataGridTemplateColumn>
+                    <DataGridTemplateColumn
+                        MinWidth="100"
+                        Width="*">
                         <DataGridTemplateColumn.CellTemplate>
                             <DataTemplate>
                                 <local:SelectedNamesUserControl
@@ -130,6 +133,40 @@
                         <DataGridTemplateColumn.Header>
                             <ui:TextBlock
                                 Text="{DynamicResource ChecksPage.FilesHeader}" />
+                        </DataGridTemplateColumn.Header>
+                    </DataGridTemplateColumn>
+
+                    <DataGridTemplateColumn
+                        MinWidth="100"
+                        Width="*">
+                        <DataGridTemplateColumn.CellTemplate>
+                            <DataTemplate>
+                                <local:SelectedNamesUserControl
+                                    SelectedNames="{Binding SelectedFilters, UpdateSourceTrigger=PropertyChanged}"
+                                    SelectNamesCommandParameter="{Binding}"
+                                    SelectNamesCommand="{Binding DataContext.SetCheckSelectedFiltersCommand, RelativeSource={RelativeSource AncestorType=UserControl, Mode=FindAncestor}}" />
+                            </DataTemplate>
+                        </DataGridTemplateColumn.CellTemplate>
+                        <DataGridTemplateColumn.Header>
+                            <ui:TextBlock
+                                Text="{DynamicResource ChecksPage.FiltersHeader}" />
+                        </DataGridTemplateColumn.Header>
+                    </DataGridTemplateColumn>
+
+                    <DataGridTemplateColumn
+                        MinWidth="100"
+                        Width="*">
+                        <DataGridTemplateColumn.CellTemplate>
+                            <DataTemplate>
+                                <local:SelectedNamesUserControl
+                                    SelectedNames="{Binding SelectedRules, UpdateSourceTrigger=PropertyChanged}"
+                                    SelectNamesCommandParameter="{Binding}"
+                                    SelectNamesCommand="{Binding DataContext.SetCheckSelectedRulesCommand, RelativeSource={RelativeSource AncestorType=UserControl, Mode=FindAncestor}}" />
+                            </DataTemplate>
+                        </DataGridTemplateColumn.CellTemplate>
+                        <DataGridTemplateColumn.Header>
+                            <ui:TextBlock
+                                Text="{DynamicResource ChecksPage.RulesHeader}" />
                         </DataGridTemplateColumn.Header>
                     </DataGridTemplateColumn>
                 </ui:DataGrid.Columns>

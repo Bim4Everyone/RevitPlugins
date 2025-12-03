@@ -23,11 +23,6 @@
         x:Key="NamesSelectionDialog.NamesHeader">Название</system:String>
 
     <system:String
-        x:Key="ChecksPage.NewRulePrompt">Новая проверка</system:String>
-    <system:String
-        x:Key="ChecksPage.RenameRulePrompt">Переименование проверки</system:String>
-
-    <system:String
         x:Key="RulesPage.NewRulePrompt">Новое правило</system:String>
     <system:String
         x:Key="RulesPage.RenameRulePrompt">Переименование правила</system:String>
