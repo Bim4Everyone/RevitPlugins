@@ -49,6 +49,12 @@
             Margin="15 15 7 7"
             Style="{StaticResource CustomBorder}">
             <StackPanel>
+                <controls:SettingsTitleControl
+                    LabelText="Основной вид опалубки"
+                    ToolTipText="Основной вид опалубки"
+                    ButtonCommand="{Binding ApplySettingsCommand}"
+                    ButtonMouseLeaveCommand="{Binding CheckSettingsCommand}" />
+
                 <controls:DoubleTextBoxSettingControl
                     LabelText="Маска имени основного вида пилона:"
                     FirstTextBoxText="{Binding Path=ViewSectionSettings.GeneralViewPrefixTemp, UpdateSourceTrigger=PropertyChanged}"
@@ -79,6 +85,12 @@
             Margin="7 15 15 7"
             Style="{StaticResource CustomBorder}">
             <StackPanel>
+                <controls:SettingsTitleControl
+                    LabelText="Основной вид армирования"
+                    ToolTipText="Основной вид армирования"
+                    ButtonCommand="{Binding ApplySettingsCommand}"
+                    ButtonMouseLeaveCommand="{Binding CheckSettingsCommand}" />
+
                 <controls:DoubleTextBoxSettingControl
                     LabelText="Маска имени основного вида армирования пилона:"
                     FirstTextBoxText="{Binding Path=ViewSectionSettings.GeneralRebarViewPrefixTemp, UpdateSourceTrigger=PropertyChanged}"
@@ -109,6 +121,12 @@
             Margin="15 7 7 7"
             Style="{StaticResource CustomBorder}">
             <StackPanel>
+                <controls:SettingsTitleControl
+                    LabelText="Отступы основного вида"
+                    ToolTipText="Отступы основного вида"
+                    ButtonCommand="{Binding ApplySettingsCommand}"
+                    ButtonMouseLeaveCommand="{Binding CheckSettingsCommand}" />
+                
                 <controls:TextBoxSettingControl
                     LabelText="Отступ по X у основного вида"
                     TextBoxText="{Binding Path=ViewSectionSettings.GeneralViewXOffsetTemp, UpdateSourceTrigger=PropertyChanged}"
@@ -129,12 +147,18 @@
             </StackPanel>
         </Border>
 
-        <Border Name="TransverseOffsets"
+        <Border Name="GeneralViewPerpOffsets"
             Grid.Column="1"
             Grid.Row="1"
             Margin="7 7 15 7"
             Style="{StaticResource CustomBorder}">
             <StackPanel>
+                <controls:SettingsTitleControl
+                    LabelText="Отступы бокового вида"
+                    ToolTipText="Отступы бокового вида"
+                    ButtonCommand="{Binding ApplySettingsCommand}"
+                    ButtonMouseLeaveCommand="{Binding CheckSettingsCommand}" />
+                
                 <controls:TextBoxSettingControl
                     LabelText="Отступ по X у бокового вида"
                     TextBoxText="{Binding Path=ViewSectionSettings.GeneralViewPerpXOffsetTemp, UpdateSourceTrigger=PropertyChanged}"
@@ -162,6 +186,12 @@
             Margin="15 7 15 15"
             Style="{StaticResource CustomBorder}">
             <StackPanel>
+                <controls:SettingsTitleControl
+                    LabelText="Типоразмер вида"
+                    ToolTipText="Типоразмер вида"
+                    ButtonCommand="{Binding ApplySettingsCommand}"
+                    ButtonMouseLeaveCommand="{Binding CheckSettingsCommand}" />
+                
                 <controls:ComboBoxSettingControl
                     Grid.Row="2"
                     LabelText="Выберите типоразмер для основного и бокового видов:"

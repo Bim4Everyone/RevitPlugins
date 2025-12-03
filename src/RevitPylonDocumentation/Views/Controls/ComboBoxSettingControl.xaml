@@ -31,10 +31,8 @@
                     <TextBlock.Text>
                         <MultiBinding
                             StringFormat="{}{0}: {1}">
-                            <Binding
-                                Path="FamilyName" />
-                            <Binding
-                                Path="Name" />
+                            <Binding Path="FamilyName" />
+                            <Binding Path="Name" />
                         </MultiBinding>
                     </TextBlock.Text>
                 </TextBlock>

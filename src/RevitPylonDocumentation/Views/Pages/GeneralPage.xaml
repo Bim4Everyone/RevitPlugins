@@ -388,12 +388,11 @@
             Margin="7 7 15 7"
             Style="{StaticResource CustomBorder}">
             <StackPanel>
-                <ui:TextBlock
-                    Grid.Row="0"
-                    Margin="5"
-                    FontSize="16"
-                    Text="Лист"
-                    Style="{StaticResource CustomTextBlock}" />
+                <controls:SettingsTitleControl
+                    LabelText="Лист"
+                    ToolTipText="Параметры листа"
+                    ButtonCommand="{Binding ApplySettingsCommand}"
+                    ButtonMouseLeaveCommand="{Binding CheckSettingsCommand}" />
 
                 <controls:ComboBoxSettingControl
                     Grid.Row="2"
@@ -429,6 +428,7 @@
 
                     <ui:TextBlock
                         Margin="5"
+                        FontSize="16"
                         Text="Шаблоны видов опалубки"
                         Style="{StaticResource CustomTextBlock}" />
 
@@ -453,11 +453,11 @@
                     Grid.Column="1"
                     Margin="5">
 
-                    <ui:TextBlock
-                        Grid.Row="0"
-                        Margin="5"
-                        Text="Шаблоны видов армирования"
-                        Style="{StaticResource CustomTextBlock}" />
+                    <controls:SettingsTitleControl
+                        LabelText="Шаблоны видов армирования"
+                        ToolTipText="Шаблоны видов армирования"
+                        ButtonCommand="{Binding ApplySettingsCommand}"
+                        ButtonMouseLeaveCommand="{Binding CheckSettingsCommand}" />
 
                     <controls:ComboBoxSettingControl
                         Grid.Row="2"
@@ -496,7 +496,7 @@
                 MinWidth="150"
                 Content="Ок"
                 Appearance="Info"
-                Command="{Binding CreateCommand}"
+                Command="{Binding AcceptViewCommand}"
                 Click="ButtonOk_Click" />
 
             <ui:Button

@@ -38,10 +38,6 @@ internal static class NinjectExtensions {
             .ToSelf()
             .InSingletonScope();
 
-        kernel.Bind<AboutPage>()
-            .ToSelf()
-            .InSingletonScope();
-
         return kernel;
     }
 
