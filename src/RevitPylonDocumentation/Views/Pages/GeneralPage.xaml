@@ -480,30 +480,13 @@
             </Grid>
         </Border>
 
-        <StackPanel
+        <controls:AppFooterControl
             Grid.Row="3"
             Grid.ColumnSpan="2"
-            Orientation="Horizontal"
-            HorizontalAlignment="Right">
-            <TextBlock
-                Margin="10 5 10 15"
-                Foreground="Orange"
-                VerticalAlignment="Center"
-                Text="{Binding ErrorText}" />
-
-            <ui:Button
-                Margin="10 5 10 15"
-                MinWidth="150"
-                Content="Ок"
-                Appearance="Info"
-                Command="{Binding AcceptViewCommand}"
-                Click="ButtonOk_Click" />
-
-            <ui:Button
-                Margin="10 5 15 15"
-                MinWidth="150"
-                Content="Отмена"
-                Click="ButtonCancel_Click" />
-        </StackPanel>
+            HorizontalAlignment="Right"
+            ErrorText="{Binding ErrorText}"
+            OkButtonText="Запуск"
+            OkCommand="{Binding AcceptViewCommand}"
+            CancelButtonText="Отмена"/>
     </Grid>
 </core:WpfUIPlatformPage>

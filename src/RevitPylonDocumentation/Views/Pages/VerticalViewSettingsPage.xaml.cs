@@ -1,3 +1,5 @@
+using System.Windows;
+
 using dosymep.SimpleServices;
 
 using RevitPylonDocumentation.ViewModels;
@@ -18,5 +20,20 @@ internal partial class VerticalViewSettingsPage {
             uiThemeService, themeUpdaterService) {
         InitializeComponent();
         DataContext = viewModel;
+    }
+
+
+    private void ButtonOk_Click(object sender, RoutedEventArgs e) {
+        var window = Window.GetWindow(this) as MainWindow;
+        if(window != null) {
+            window.DialogResult = true;
+        }
+    }
+
+    private void ButtonCancel_Click(object sender, RoutedEventArgs e) {
+        var window = Window.GetWindow(this) as MainWindow;
+        if(window != null) {
+            window.DialogResult = false;
+        }
     }
 }

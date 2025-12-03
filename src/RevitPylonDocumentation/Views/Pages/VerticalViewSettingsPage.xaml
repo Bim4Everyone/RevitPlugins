@@ -41,6 +41,8 @@
             <RowDefinition Height="Auto" />
             <RowDefinition Height="Auto" />
             <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
 
         <Border Name="FormworkProps"
@@ -202,5 +204,13 @@
                     ItemTemplate="{StaticResource WithoutFamilyNameItemTemplate}" />
             </StackPanel>
         </Border>
+
+        <controls:AppFooterControl
+            Grid.Row="4"
+            Grid.ColumnSpan="2"
+            HorizontalAlignment="Right"
+            ErrorText="{Binding ErrorText}"
+            ShowOkButton="False"
+            CancelButtonText="Отмена" />
     </Grid>
 </core:WpfUIPlatformPage>

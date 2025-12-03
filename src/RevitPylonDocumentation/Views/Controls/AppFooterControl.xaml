@@ -1,0 +1,47 @@
+﻿<UserControl
+    x:Class="RevitPylonDocumentation.Views.Controls.AppFooterControl"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
+    x:Name="_this"
+    HorizontalAlignment="Stretch"
+    mc:Ignorable="d"
+    d:DesignHeight="50"
+    d:DesignWidth="400">
+    <UserControl.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary
+                    Source="../CustomStyles.xaml" />
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
+    </UserControl.Resources>
+    
+    <StackPanel
+        Orientation="Horizontal"
+        HorizontalAlignment="Right">
+
+        <TextBlock
+            Margin="10 5 10 15"
+            Foreground="Orange"
+            VerticalAlignment="Center"
+            Text="{Binding ErrorText, ElementName=_this}" />
+
+        <ui:Button
+            Margin="10 5 10 15"
+            MinWidth="150"
+            Content="{Binding OkButtonText, ElementName=_this}"
+            Appearance="Info"
+            Visibility="{Binding ShowOkButton, ElementName=_this, Converter={StaticResource BooleanToVisibilityConverter}}"
+            Command="{Binding OkCommand, ElementName=_this}"
+            Click="ButtonOk_Click" />
+
+        <ui:Button
+            Margin="10 5 15 15"
+            MinWidth="150"
+            Content="{Binding CancelButtonText, ElementName=_this}"
+            Click="ButtonCancel_Click"/>
+    </StackPanel>
+</UserControl>

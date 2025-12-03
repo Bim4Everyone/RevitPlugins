@@ -34,12 +34,12 @@
 
     <Grid>
         <Grid.RowDefinitions>
-            <RowDefinition
-                Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
 
-        <Border
-            Name="PylonProps"
+        <Border Name="PylonProps"
             Margin="15"
             Style="{StaticResource CustomBorder}">
             <StackPanel>
@@ -86,5 +86,13 @@
                 </Grid>
             </StackPanel>
         </Border>
+
+        <controls:AppFooterControl
+            Grid.Row="2"
+            Grid.ColumnSpan="2"
+            HorizontalAlignment="Right"
+            ErrorText="{Binding ErrorText}"
+            ShowOkButton="False"
+            CancelButtonText="Отмена" />
     </Grid>
 </core:WpfUIPlatformPage>

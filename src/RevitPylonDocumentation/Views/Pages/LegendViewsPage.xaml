@@ -35,6 +35,8 @@
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
 
         <Border Name="LegendsProps"
@@ -81,5 +83,12 @@
                 </Grid>
             </StackPanel>
         </Border>
+
+        <controls:AppFooterControl
+            Grid.Row="2"
+            HorizontalAlignment="Right"
+            ErrorText="{Binding ErrorText}"
+            ShowOkButton="False"
+            CancelButtonText="Отмена" />
     </Grid>
 </core:WpfUIPlatformPage>

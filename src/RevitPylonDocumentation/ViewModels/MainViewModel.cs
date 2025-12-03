@@ -361,6 +361,7 @@ internal class MainViewModel : BaseViewModel {
     /// Применяет изменения настроек плагина (передает данные из временных переменных в постоянные, по которым работает плагин)
     /// </summary>
     private void ApplySettings() {
+        SaveConfig();
         ErrorText = string.Empty;
 
         ProjectSettings.ApplyProjectSettings();

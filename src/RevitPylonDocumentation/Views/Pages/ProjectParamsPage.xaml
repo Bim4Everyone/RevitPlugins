@@ -31,10 +31,12 @@
             </ResourceDictionary.MergedDictionaries>
         </ResourceDictionary>
     </core:WpfUIPlatformPage.Resources>
-
+    
     <ui:PassiveScrollViewer>
         <Grid>
             <Grid.RowDefinitions>
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="*" />
                 <RowDefinition Height="Auto" />
             </Grid.RowDefinitions>
 
@@ -47,13 +49,15 @@
                         Margin="5 0 5 5"
                         Text="Параметры, относящиеся к проекту, в котором вы работаете"
                         Style="{StaticResource CustomTextBlock}" />
-                    
+
                     <Grid>
                         <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="*" />
-                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition
+                                Width="*" />
+                            <ColumnDefinition
+                                Width="*" />
                         </Grid.ColumnDefinitions>
-                        
+
                         <controls:TextBoxSettingControl
                             Grid.Column="0"
                             LabelText="Параметр для группировки диспетчера 1:"
@@ -71,8 +75,10 @@
 
                     <Grid>
                         <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="*" />
-                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition
+                                Width="*" />
+                            <ColumnDefinition
+                                Width="*" />
                         </Grid.ColumnDefinitions>
 
                         <controls:ComboBoxSettingControl
@@ -93,11 +99,13 @@
                             SelectionChangedCommand="{Binding SettingsChangedCommand}"
                             ItemTemplate="{StaticResource WithoutFamilyNameItemTemplate}" />
                     </Grid>
-                    
+
                     <Grid>
                         <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="*" />
-                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition
+                                Width="*" />
+                            <ColumnDefinition
+                                Width="*" />
                         </Grid.ColumnDefinitions>
 
                         <controls:ComboBoxSettingControl
@@ -118,11 +126,13 @@
                             SelectionChangedCommand="{Binding SettingsChangedCommand}"
                             ItemTemplate="{StaticResource WithoutFamilyNameItemTemplate}" />
                     </Grid>
-                    
+
                     <Grid>
                         <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="*" />
-                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition
+                                Width="*" />
+                            <ColumnDefinition
+                                Width="*" />
                         </Grid.ColumnDefinitions>
 
                         <controls:ComboBoxSettingControl
@@ -143,11 +153,13 @@
                             SelectionChangedCommand="{Binding SettingsChangedCommand}"
                             ItemTemplate="{StaticResource WithoutFamilyNameItemTemplate}" />
                     </Grid>
-                    
+
                     <Grid>
                         <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="*" />
-                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition
+                                Width="*" />
+                            <ColumnDefinition
+                                Width="*" />
                         </Grid.ColumnDefinitions>
 
                         <controls:ComboBoxSettingControl
@@ -168,11 +180,13 @@
                             SelectionChangedCommand="{Binding SettingsChangedCommand}"
                             ItemTemplate="{StaticResource WithoutFamilyNameItemTemplate}" />
                     </Grid>
-                    
+
                     <Grid>
                         <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="*" />
-                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition
+                                Width="*" />
+                            <ColumnDefinition
+                                Width="*" />
                         </Grid.ColumnDefinitions>
 
                         <controls:ComboBoxSettingControl
@@ -186,6 +200,14 @@
                     </Grid>
                 </StackPanel>
             </Border>
+
+            <controls:AppFooterControl
+                Grid.Row="2"
+                Grid.ColumnSpan="2"
+                HorizontalAlignment="Right"
+                ErrorText="{Binding ErrorText}"
+                ShowOkButton="False"
+                CancelButtonText="Отмена" />
         </Grid>
     </ui:PassiveScrollViewer>
 </core:WpfUIPlatformPage>
