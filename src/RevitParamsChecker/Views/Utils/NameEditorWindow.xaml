@@ -49,6 +49,7 @@
                 DockPanel.Dock="Left"
                 VerticalAlignment="Center"
                 Margin="10 0"
+                FontSize="{DynamicResource ControlContentThemeFontSize}"
                 Content="{me:LocalizationSource NameEditor.Label}" />
             <ui:TextBox
                 DockPanel.Dock="Right"

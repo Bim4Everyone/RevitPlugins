@@ -30,11 +30,12 @@
                 DockPanel.Dock="Top">
                 <Label
                     Margin="0 0 0 8"
-                    FontSize="20"
+                    FontSize="{StaticResource HeaderLabelFontSize}"
                     FontWeight="SemiBold"
                     Content="{Binding Name}" />
                 <Label
                     Margin="0 0 0 4"
+                    FontSize="{DynamicResource ControlContentThemeFontSize}"
                     Content="{me:LocalizationSource RulesPage.DescriptionLabel}"></Label>
                 <ui:TextBox
                     Height="100"
@@ -44,6 +45,7 @@
                     Text="{Binding Description, UpdateSourceTrigger=PropertyChanged}" />
                 <Label
                     Margin="0 8 0 4"
+                    FontSize="{DynamicResource ControlContentThemeFontSize}"
                     Content="{me:LocalizationSource RulesPage.RuleLabel}" />
             </StackPanel>
 

@@ -44,13 +44,15 @@
                 LastChildFill="True">
                 <Label
                     DockPanel.Dock="Top"
+                    FontSize="{StaticResource HeaderLabelFontSize}"
                     Content="{Binding Name}" />
                 <DockPanel
-                    VerticalAlignment="Center"
                     Margin="0 0 0 4"
                     Dock="Top">
                     <Label
                         Padding="0"
+                        VerticalAlignment="Center"
+                        FontSize="{DynamicResource ControlContentThemeFontSize}"
                         Content="{me:LocalizationSource ResultsPage.ElementsHeader}" />
                     <ui:TextBox
                         DockPanel.Dock="Right"
@@ -146,6 +148,7 @@
                 <DockPanel
                     Dock="Top">
                     <Label
+                        FontSize="{DynamicResource ControlContentThemeFontSize}"
                         Content="{me:LocalizationSource ResultsPage.RulesHeader}" />
                 </DockPanel>
                 <ui:ListView

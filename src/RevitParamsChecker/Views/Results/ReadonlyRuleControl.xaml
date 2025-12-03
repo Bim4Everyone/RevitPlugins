@@ -27,6 +27,7 @@
         Style="{StaticResource CustomBorder}">
         <StackPanel>
             <Label
+                FontSize="{DynamicResource ControlContentThemeFontSize}"
                 Content="{Binding Name}" />
             <rules:ParamsSetUserControl
                 IsEnabled="False"
