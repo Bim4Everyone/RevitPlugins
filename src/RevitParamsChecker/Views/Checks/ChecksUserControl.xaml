@@ -9,6 +9,7 @@
     xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
     xmlns:me="clr-namespace:dosymep.WpfCore.MarkupExtensions;assembly=dosymep.WpfCore"
     xmlns:vms="clr-namespace:RevitParamsChecker.ViewModels.Checks"
+    xmlns:custom="clr-namespace:RevitParamsChecker.Views.Controls"
     mc:Ignorable="d"
     d:DesignHeight="300"
     d:DesignWidth="300"
@@ -28,36 +29,16 @@
         Style="{StaticResource CustomBorder}">
         <DockPanel
             LastChildFill="True">
-            <DockPanel
+            <custom:CrudButtonsControl
+                DockPanel.Dock="Top"
                 Margin="0 0 0 8"
-                DockPanel.Dock="Top">
-                <ui:Button
-                    ToolTip="{me:LocalizationSource EditableList.Tooltip.Add}"
-                    Command="{Binding AddCheckCommand}"
-                    Content="{ui:SymbolIcon Symbol=Add20}" />
-
-                <ui:Button
-                    Margin="8 0"
-                    ToolTip="{me:LocalizationSource EditableList.Tooltip.Rename}"
-                    CommandParameter="{Binding SelectedItem, ElementName=_checksGrid}"
-                    Command="{Binding RenameCheckCommand}"
-                    Content="{ui:SymbolIcon Symbol=Rename20}" />
-
-                <ui:Button
-                    ToolTip="{me:LocalizationSource EditableList.Tooltip.Copy}"
-                    CommandParameter="{Binding SelectedItem, ElementName=_checksGrid}"
-                    Command="{Binding CopyCheckCommand}"
-                    Content="{ui:SymbolIcon Symbol=Copy20}" />
-
-                <ui:Button
-                    Margin="8 0 0 0"
-                    Appearance="Danger"
-                    ToolTip="{me:LocalizationSource EditableList.Tooltip.Remove}"
-                    CommandParameter="{Binding SelectedItems, ElementName=_checksGrid}"
-                    Command="{Binding RemoveChecksCommand}"
-                    Content="{ui:SymbolIcon Symbol=Delete20}" />
-            </DockPanel>
-
+                AddCommand="{Binding AddCheckCommand}"
+                RenameCommand="{Binding RenameCheckCommand}"
+                RenameCommandParameter="{Binding SelectedItem, ElementName=_checksGrid}"
+                CopyCommand="{Binding CopyCheckCommand}"
+                CopyCommandParameter="{Binding SelectedItem, ElementName=_checksGrid}"
+                RemoveCommand="{Binding RemoveChecksCommand}"
+                RemoveCommandParameter="{Binding SelectedItems, ElementName=_checksGrid}" />
             <ui:DataGrid
                 x:Name="_checksGrid"
                 SelectionMode="Extended"

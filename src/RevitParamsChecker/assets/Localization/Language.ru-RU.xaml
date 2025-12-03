@@ -72,13 +72,13 @@
         x:Key="PageMenu.Tooltip.SaveAs">Сохранить как</system:String>
 
     <system:String
-        x:Key="EditableList.Tooltip.Add">Добавить</system:String>
+        x:Key="CrudButtons.Tooltip.Add">Добавить</system:String>
     <system:String
-        x:Key="EditableList.Tooltip.Rename">Переименовать</system:String>
+        x:Key="CrudButtons.Tooltip.Rename">Переименовать</system:String>
     <system:String
-        x:Key="EditableList.Tooltip.Copy">Копировать</system:String>
+        x:Key="CrudButtons.Tooltip.Copy">Копировать</system:String>
     <system:String
-        x:Key="EditableList.Tooltip.Remove">Удалить</system:String>
+        x:Key="CrudButtons.Tooltip.Remove">Удалить</system:String>
 
     <system:String
         x:Key="NameEditor.Label">Имя:</system:String>

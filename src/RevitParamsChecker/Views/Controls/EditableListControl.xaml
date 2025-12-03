@@ -25,31 +25,15 @@
         Style="{StaticResource CustomBorder}">
         <DockPanel
             LastChildFill="True">
-            <DockPanel
-                DockPanel.Dock="Top">
-                <ui:Button
-                    ToolTip="{me:LocalizationSource EditableList.Tooltip.Add}"
-                    Command="{Binding AddItemCommand, ElementName=_this}"
-                    Content="{ui:SymbolIcon Symbol=Add20}" />
-                <ui:Button
-                    Margin="8 0"
-                    ToolTip="{me:LocalizationSource EditableList.Tooltip.Rename}"
-                    Command="{Binding RenameItemCommand, ElementName=_this}"
-                    CommandParameter="{Binding SelectedItem, ElementName=_list}"
-                    Content="{ui:SymbolIcon Symbol=Rename20}" />
-                <ui:Button
-                    ToolTip="{me:LocalizationSource EditableList.Tooltip.Copy}"
-                    Command="{Binding CopyItemCommand, ElementName=_this}"
-                    CommandParameter="{Binding SelectedItem, ElementName=_list}"
-                    Content="{ui:SymbolIcon Symbol=Copy20}" />
-                <ui:Button
-                    Appearance="Danger"
-                    Margin="8 0 0 0"
-                    ToolTip="{me:LocalizationSource EditableList.Tooltip.Remove}"
-                    Command="{Binding RemoveItemsCommand, ElementName=_this}"
-                    CommandParameter="{Binding Path=SelectedItems, ElementName=_list}"
-                    Content="{ui:SymbolIcon Symbol=Delete20}" />
-            </DockPanel>
+            <local:CrudButtonsControl
+                DockPanel.Dock="Top"
+                AddCommand="{Binding AddItemCommand, ElementName=_this}"
+                RenameCommand="{Binding RenameItemCommand, ElementName=_this}"
+                RenameCommandParameter="{Binding SelectedItem, ElementName=_list}"
+                CopyCommand="{Binding CopyItemCommand, ElementName=_this}"
+                CopyCommandParameter="{Binding SelectedItem, ElementName=_list}"
+                RemoveCommand="{Binding RemoveItemsCommand, ElementName=_this}"
+                RemoveCommandParameter="{Binding SelectedItems, ElementName=_list}" />
             <ui:ListView
                 Margin="0 4 0 0"
                 SelectionMode="Extended"
