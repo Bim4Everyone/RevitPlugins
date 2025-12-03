@@ -1,14 +1,13 @@
 using dosymep.SimpleServices;
 
-namespace RevitParamsChecker.Views.Checks;
+namespace RevitParamsChecker.Views.Results;
 
-internal partial class ChecksUserControl {
-    public ChecksUserControl()
-        : base() {
+internal partial class ReadonlyRuleControl {
+    public ReadonlyRuleControl() {
         InitializeComponent();
     }
 
-    public ChecksUserControl(
+    public ReadonlyRuleControl(
         ILoggerService loggerService,
         ILanguageService languageService,
         ILocalizationService localizationService,

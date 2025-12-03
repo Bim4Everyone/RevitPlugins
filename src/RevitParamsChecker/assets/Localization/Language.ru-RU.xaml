@@ -53,6 +53,21 @@
         x:Key="ChecksPage.RulesHeader">Правила</system:String>
 
     <system:String
+        x:Key="ResultsPage.RulesHeader">Правила</system:String>
+    <system:String
+        x:Key="ResultsPage.ElementsHeader">Элементы</system:String>
+    <system:String
+        x:Key="ResultsPage.FileNameHeader">Файл</system:String>
+    <system:String
+        x:Key="ResultsPage.IdHeader">Id</system:String>
+    <system:String
+        x:Key="ResultsPage.RuleNameHeader">Правило</system:String>
+    <system:String
+        x:Key="ResultsPage.StatusHeader">Статус</system:String>
+    <system:String
+        x:Key="ResultsPage.ElementsSearchPlaceholder">Поиск</system:String>
+
+    <system:String
         x:Key="FiltersPage.NewFilterPrompt">Новый поисковый набор</system:String>
     <system:String
         x:Key="FiltersPage.RenameFilterPrompt">Переименование поискового набора</system:String>

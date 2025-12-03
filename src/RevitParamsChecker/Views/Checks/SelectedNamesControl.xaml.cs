@@ -6,13 +6,13 @@ using dosymep.SimpleServices;
 
 namespace RevitParamsChecker.Views.Checks;
 
-internal partial class SelectedNamesUserControl {
-    public SelectedNamesUserControl()
+internal partial class SelectedNamesControl {
+    public SelectedNamesControl()
         : base() {
         InitializeComponent();
     }
 
-    public SelectedNamesUserControl(
+    public SelectedNamesControl(
         ILoggerService loggerService,
         ILanguageService languageService,
         ILocalizationService localizationService,
@@ -30,25 +30,25 @@ internal partial class SelectedNamesUserControl {
     public static readonly DependencyProperty SelectedNamesProperty = DependencyProperty.Register(
         nameof(SelectedNames),
         typeof(ICollection<string>),
-        typeof(SelectedNamesUserControl),
+        typeof(SelectedNamesControl),
         new FrameworkPropertyMetadata(null, FrameworkPropertyMetadataOptions.BindsTwoWayByDefault));
 
     public static readonly DependencyProperty SelectNamesCommandProperty = DependencyProperty.Register(
         nameof(SelectNamesCommand),
         typeof(ICommand),
-        typeof(SelectedNamesUserControl),
+        typeof(SelectedNamesControl),
         new PropertyMetadata(null));
 
     public static readonly DependencyProperty SelectNamesCommandParameterProperty = DependencyProperty.Register(
         nameof(SelectNamesCommandParameter),
         typeof(object),
-        typeof(SelectedNamesUserControl),
+        typeof(SelectedNamesControl),
         new PropertyMetadata(null));
 
     public static readonly DependencyProperty SelectNamesPromptProperty = DependencyProperty.Register(
         nameof(SelectNamesPrompt),
         typeof(string),
-        typeof(SelectedNamesUserControl),
+        typeof(SelectedNamesControl),
         new PropertyMetadata(default(string)));
 
     public ICollection<string> SelectedNames {

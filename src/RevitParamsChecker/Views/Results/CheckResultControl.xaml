@@ -1,0 +1,164 @@
+<core:WpfUIPlatformUserControl
+    x:Class="RevitParamsChecker.Views.Results.CheckResultControl"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:local="clr-namespace:RevitParamsChecker.Views.Results"
+    xmlns:core="clr-namespace:dosymep.WpfUI.Core"
+    xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
+    xmlns:me="clr-namespace:dosymep.WpfCore.MarkupExtensions;assembly=dosymep.WpfCore"
+    xmlns:vms="clr-namespace:RevitParamsChecker.ViewModels.Results"
+    mc:Ignorable="d"
+    d:DesignHeight="300"
+    d:DesignWidth="300"
+    x:Name="_this"
+    d:DataContext="{d:DesignInstance vms:CheckResultViewModel, IsDesignTimeCreatable=False}"
+    x:ClassModifier="internal">
+    <core:WpfUIPlatformUserControl.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary
+                    Source="../../Resources/CustomStyles.xaml" />
+                <ResourceDictionary
+                    Source="../../Resources/CustomDataGrid.xaml" />
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
+    </core:WpfUIPlatformUserControl.Resources>
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition
+                Width="2*"
+                MinWidth="200" />
+            <ColumnDefinition
+                Width="Auto" />
+            <ColumnDefinition
+                Width="1*"
+                MinWidth="200" />
+        </Grid.ColumnDefinitions>
+
+        <Border
+            Grid.Column="0"
+            Style="{StaticResource CustomBorder}">
+            <DockPanel
+                LastChildFill="True">
+                <Label
+                    DockPanel.Dock="Top"
+                    Content="{Binding Name}" />
+                <DockPanel
+                    VerticalAlignment="Center"
+                    Margin="0 0 0 4"
+                    Dock="Top">
+                    <Label
+                        Padding="0"
+                        Content="{me:LocalizationSource ResultsPage.ElementsHeader}" />
+                    <ui:TextBox
+                        DockPanel.Dock="Right"
+                        MinWidth="300"
+                        MaxWidth="300"
+                        HorizontalAlignment="Right"
+                        Text="{Binding ElementsFilter, UpdateSourceTrigger=PropertyChanged}"
+                        PlaceholderText="{me:LocalizationSource ResultsPage.ElementsSearchPlaceholder}" />
+                </DockPanel>
+                <ui:DataGrid
+                    x:Name="_elements"
+                    SelectionMode="Extended"
+                    AutoGenerateColumns="False"
+                    CanUserAddRows="False"
+                    CanUserDeleteRows="False"
+                    CanUserReorderColumns="False"
+                    GridLinesVisibility="All"
+                    IsReadOnly="True"
+                    RowHeight="26"
+                    CellStyle="{StaticResource CustomTooltipDataGridCell}"
+                    Style="{StaticResource CustomResizableDataGridStyle}"
+                    ItemsSource="{Binding ElementResults}">
+                    <ui:DataGrid.Columns>
+                        <DataGridTemplateColumn
+                            Width="Auto"
+                            CanUserResize="False">
+                            <DataGridTemplateColumn.CellTemplate>
+                                <DataTemplate>
+                                    <ui:Button
+                                        Height="Auto"
+                                        Padding="6 2"
+                                        VerticalContentAlignment="Center"
+                                        Content="{ui:SymbolIcon Symbol=Search20}"
+                                        CommandParameter="{Binding SelectedItems, ElementName=_elements}"
+                                        Command="{Binding DataContext.SelectElementsCommand, ElementName=_this}" />
+                                </DataTemplate>
+                            </DataGridTemplateColumn.CellTemplate>
+                        </DataGridTemplateColumn>
+
+                        <DataGridTextColumn
+                            MinWidth="50"
+                            Width="*"
+                            Binding="{Binding FileName}">
+                            <DataGridTextColumn.Header>
+                                <ui:TextBlock
+                                    Text="{DynamicResource ResultsPage.FileNameHeader}" />
+                            </DataGridTextColumn.Header>
+                        </DataGridTextColumn>
+
+                        <DataGridTextColumn
+                            MinWidth="50"
+                            Width="*"
+                            Binding="{Binding Id}">
+                            <DataGridTextColumn.Header>
+                                <ui:TextBlock
+                                    Text="{DynamicResource ResultsPage.IdHeader}" />
+                            </DataGridTextColumn.Header>
+                        </DataGridTextColumn>
+
+                        <DataGridTextColumn
+                            MinWidth="50"
+                            Width="*"
+                            Binding="{Binding RuleName}">
+                            <DataGridTextColumn.Header>
+                                <ui:TextBlock
+                                    Text="{DynamicResource ResultsPage.RuleNameHeader}" />
+                            </DataGridTextColumn.Header>
+                        </DataGridTextColumn>
+
+                        <DataGridTextColumn
+                            MinWidth="50"
+                            Width="*"
+                            Binding="{Binding Status}">
+                            <DataGridTextColumn.Header>
+                                <ui:TextBlock
+                                    Text="{DynamicResource ResultsPage.StatusHeader}" />
+                            </DataGridTextColumn.Header>
+                        </DataGridTextColumn>
+                    </ui:DataGrid.Columns>
+                </ui:DataGrid>
+            </DockPanel>
+        </Border>
+
+        <GridSplitter
+            Grid.Column="1"
+            Style="{StaticResource CustomGridSplitter}" />
+
+        <Border
+            Grid.Column="2"
+            Style="{StaticResource CustomBorder}">
+            <DockPanel
+                LastChildFill="True">
+                <DockPanel
+                    Dock="Top">
+                    <Label
+                        Content="{me:LocalizationSource ResultsPage.RulesHeader}" />
+                </DockPanel>
+                <ui:ListView
+                    SelectionMode="Single"
+                    ItemsSource="{Binding RuleResults}">
+                    <ui:ListView.ItemTemplate>
+                        <DataTemplate>
+                            <local:ReadonlyRuleControl
+                                DataContext="{Binding}" />
+                        </DataTemplate>
+                    </ui:ListView.ItemTemplate>
+                </ui:ListView>
+            </DockPanel>
+        </Border>
+    </Grid>
+</core:WpfUIPlatformUserControl>

@@ -40,7 +40,7 @@
             SaveButtonCommand="{Binding SaveCommand}"
             SaveAsButtonCommand="{Binding SaveAsCommand}" />
 
-        <local:ChecksUserControl
+        <local:ChecksControl
             Grid.Row="1"
             DataContext="{Binding}" />
 
