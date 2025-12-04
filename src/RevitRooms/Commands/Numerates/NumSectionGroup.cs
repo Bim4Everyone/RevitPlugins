@@ -3,8 +3,6 @@ using System.Linq;
 
 using Autodesk.Revit.DB;
 
-using DevExpress.Utils.Extensions;
-
 using dosymep.Bim4Everyone.SystemParams;
 using dosymep.SimpleServices;
 
@@ -37,7 +35,7 @@ internal class NumSectionGroup : NumerateCommand {
             .OrderBy(item => item.RoomSection, _elementComparer)
             .ThenBy(item => item.RoomGroup, _elementComparer)
             .ThenBy(item => item.LevelElevation)
-            .ThenBy(item => _ordering.GetValueOrDefault(item.Room.Id, 0))
+            .ThenBy(item => _ordering.TryGetValue(item.Room.Id, out var value) ? value : 0)
             .ThenBy(item => GetDistance(item.Element)) // в одной группе может быть несколько гостиных и тп
             .ToArray();
     }

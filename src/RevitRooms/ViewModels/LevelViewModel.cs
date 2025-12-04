@@ -9,8 +9,6 @@ using Autodesk.Revit.DB.Architecture;
 
 using RevitRooms.Models;
 
-using Element = DevExpress.Map.Kml.Model.Element;
-
 namespace RevitRooms.ViewModels;
 internal class LevelViewModel : ElementViewModel<Level> {
     private readonly string _name;

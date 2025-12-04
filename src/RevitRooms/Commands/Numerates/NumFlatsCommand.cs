@@ -3,8 +3,6 @@ using System.Linq;
 
 using Autodesk.Revit.DB;
 
-using DevExpress.Mvvm.Native;
-
 using dosymep.Bim4Everyone.SharedParams;
 using dosymep.SimpleServices;
 

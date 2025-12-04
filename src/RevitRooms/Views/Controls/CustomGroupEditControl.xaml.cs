@@ -2,8 +2,6 @@ using System.ComponentModel;
 using System.Windows;
 using System.Windows.Markup;
 
-using DevExpress.Xpf.Editors;
-
 using Wpf.Ui.Controls;
 
 namespace RevitRooms.Views.Controls;

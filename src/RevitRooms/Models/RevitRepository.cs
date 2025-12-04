@@ -7,8 +7,6 @@ using Autodesk.Revit.ApplicationServices;
 using Autodesk.Revit.DB;
 using Autodesk.Revit.UI;
 
-using DevExpress.Utils.Extensions;
-
 using dosymep.Bim4Everyone;
 using dosymep.Bim4Everyone.KeySchedules;
 using dosymep.Bim4Everyone.SharedParams;
@@ -109,7 +107,7 @@ internal class RevitRepository {
 
     public void UpdateLevelSharedParam(SpatialElement spatialElement, Dictionary<ElementId, string> levelNames) {
         spatialElement.SetParamValue(SharedParamsConfig.Instance.Level,
-            levelNames.GetValueOrDefault(spatialElement.Level.Id, spatialElement.Level.Name));
+            levelNames.TryGetValue(spatialElement.Level.Id, out var value) ? value : spatialElement.Level.Name);
     }
 
     private string GetLevelName(Level level) {
