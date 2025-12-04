@@ -46,11 +46,11 @@
             Margin="15"
             Style="{StaticResource CustomBorder}">
             <StackPanel>
-                <ui:TextBlock
-                    FontSize="16"
-                    Margin="5 0 5 5"
-                    Text="Легенда примечания"
-                    Style="{StaticResource CustomTextBlock}" />
+                <controls:SettingsTitleControl
+                    LabelText="Легенда примечания"
+                    ToolTipText="Легенда примечания"
+                    ButtonCommand="{Binding ApplySettingsCommand}"
+                    ButtonMouseLeaveCommand="{Binding CheckSettingsCommand}" />
 
                 <controls:ComboBoxSettingControl
                     Grid.Row="2"

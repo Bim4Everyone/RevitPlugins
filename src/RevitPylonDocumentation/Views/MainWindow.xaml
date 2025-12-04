@@ -19,8 +19,8 @@
     mc:Ignorable="d"
     WindowStartupLocation="CenterOwner"
     
-    Height="1000"    Width="1500"
-    MinHeight="1000" MinWidth="1500"
+    Height="1020"    Width="1500"
+    MinHeight="1020" MinWidth="1500"
     
     d:DataContext="{d:DesignInstance vms:MainViewModel, IsDesignTimeCreatable=False}">
 
@@ -73,7 +73,7 @@
             OpenPaneLength="300"
             IsPaneOpen="True"
             IsBackButtonVisible="Collapsed"
-            IsPaneVisible="True">
+            IsPaneVisible="True" >
             <ui:NavigationView.MenuItems>
                 <ui:NavigationViewItem
                     Content="Запуск плагина"

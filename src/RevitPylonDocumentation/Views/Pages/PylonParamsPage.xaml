@@ -41,11 +41,11 @@
             Margin="15"
             Style="{StaticResource CustomBorder}">
             <StackPanel>
-                <ui:TextBlock
-                    FontSize="16"
-                    Margin="5 0 5 5"
-                    Text="Параметры, принадлежащие опалубочному элементу пилона"
-                    Style="{StaticResource CustomTextBlock}" />
+                <controls:SettingsTitleControl
+                    LabelText="Параметры, принадлежащие опалубочному элементу пилона"
+                    ToolTipText="Параметры, принадлежащие опалубочному элементу пилона"
+                    ButtonCommand="{Binding ApplySettingsCommand}"
+                    ButtonMouseLeaveCommand="{Binding CheckSettingsCommand}" />
 
                 <controls:TextBoxSettingControl
                     LabelText="Параметр марки пилона:"

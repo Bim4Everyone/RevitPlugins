@@ -44,18 +44,16 @@
                 Margin="15"
                 Style="{StaticResource CustomBorder}">
                 <StackPanel>
-                    <ui:TextBlock
-                        FontSize="16"
-                        Margin="5 0 5 5"
-                        Text="Параметры, относящиеся к проекту, в котором вы работаете"
-                        Style="{StaticResource CustomTextBlock}" />
+                    <controls:SettingsTitleControl
+                        LabelText="Параметры, относящиеся к проекту, в котором вы работаете"
+                        ToolTipText="Параметры, относящиеся к проекту, в котором вы работаете"
+                        ButtonCommand="{Binding ApplySettingsCommand}"
+                        ButtonMouseLeaveCommand="{Binding CheckSettingsCommand}" />
 
                     <Grid>
                         <Grid.ColumnDefinitions>
-                            <ColumnDefinition
-                                Width="*" />
-                            <ColumnDefinition
-                                Width="*" />
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="*" />
                         </Grid.ColumnDefinitions>
 
                         <controls:TextBoxSettingControl

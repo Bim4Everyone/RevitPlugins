@@ -52,6 +52,12 @@
             Margin="15 15 7 7"
             Style="{StaticResource CustomBorder}">
             <StackPanel>
+                <controls:SettingsTitleControl
+                    LabelText="Горизонтальный вид опалубки"
+                    ToolTipText="Горизонтальный вид опалубки"
+                    ButtonCommand="{Binding ApplySettingsCommand}"
+                    ButtonMouseLeaveCommand="{Binding CheckSettingsCommand}" />
+
                 <controls:DoubleTextBoxSettingControl
                     LabelText="Маска имени первого горизонтального вида пилона:"
                     FirstTextBoxText="{Binding Path=ViewSectionSettings.TransverseViewFirstPrefixTemp, UpdateSourceTrigger=PropertyChanged}"
@@ -95,6 +101,12 @@
             Margin="7 15 15 7"
             Style="{StaticResource CustomBorder}">
             <StackPanel>
+                <controls:SettingsTitleControl
+                    LabelText="Горизонтальный вид армирования"
+                    ToolTipText="Горизонтальный вид армирования"
+                    ButtonCommand="{Binding ApplySettingsCommand}"
+                    ButtonMouseLeaveCommand="{Binding CheckSettingsCommand}" />
+                
                 <controls:DoubleTextBoxSettingControl
                     LabelText="Маска имени первого горизонтального вида армирования пилона:"
                     FirstTextBoxText="{Binding Path=ViewSectionSettings.TransverseRebarViewFirstPrefixTemp, UpdateSourceTrigger=PropertyChanged}"
@@ -138,6 +150,12 @@
             Margin="15 15 7 7"
             Style="{StaticResource CustomBorder}">
             <StackPanel>
+                <controls:SettingsTitleControl
+                    LabelText="Отступы горизонтального вида от низа"
+                    ToolTipText="Отступы горизонтального вида от низа"
+                    ButtonCommand="{Binding ApplySettingsCommand}"
+                    ButtonMouseLeaveCommand="{Binding CheckSettingsCommand}" />
+                
                 <controls:TextBoxSettingControl
                     LabelText="Отступ снизу до первого горизонтального вида"
                     TextBoxText="{Binding Path=ViewSectionSettings.TransverseViewFirstElevationTemp, UpdateSourceTrigger=PropertyChanged}"
@@ -164,6 +182,12 @@
             Margin="7 15 15 7"
             Style="{StaticResource CustomBorder}">
             <StackPanel>
+                <controls:SettingsTitleControl
+                    LabelText="Отступы горизонтального вида от пилона"
+                    ToolTipText="Отступы горизонтального вида от пилона"
+                    ButtonCommand="{Binding ApplySettingsCommand}"
+                    ButtonMouseLeaveCommand="{Binding CheckSettingsCommand}" />
+                
                 <controls:TextBoxSettingControl
                     LabelText="Отступ по X у горизонтального вида"
                     TextBoxText="{Binding Path=ViewSectionSettings.TransverseViewXOffsetTemp, UpdateSourceTrigger=PropertyChanged}"
@@ -185,6 +209,12 @@
             Margin="15 7 15 7"
             Style="{StaticResource CustomBorder}">
             <StackPanel>
+                <controls:SettingsTitleControl
+                    LabelText="Типоразмер вида"
+                    ToolTipText="Типоразмер вида"
+                    ButtonCommand="{Binding ApplySettingsCommand}"
+                    ButtonMouseLeaveCommand="{Binding CheckSettingsCommand}" />
+                
                 <controls:ComboBoxSettingControl
                     LabelText="Выберите типоразмер для горизонтальных видов:"
                     ItemsSource="{Binding ViewFamilyTypes}"

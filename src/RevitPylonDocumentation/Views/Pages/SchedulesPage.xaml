@@ -52,11 +52,11 @@
                 Margin="15 15 7 7"
                 Style="{StaticResource CustomBorder}">
                 <StackPanel>
-                    <ui:TextBlock
-                        FontSize="16"
-                        Margin="5 0 5 5"
-                        Text="Спецификация каркасов"
-                        Style="{StaticResource CustomTextBlock}" />
+                    <controls:SettingsTitleControl
+                        LabelText="Спецификация каркасов"
+                        ToolTipText="Спецификация каркасов"
+                        ButtonCommand="{Binding ApplySettingsCommand}"
+                        ButtonMouseLeaveCommand="{Binding CheckSettingsCommand}" />
 
                     <controls:DoubleTextBoxSettingControl
                         LabelText="Маска имени спецификации каркасов:"
@@ -91,12 +91,12 @@
                 Margin="7 15 15 7"
                 Style="{StaticResource CustomBorder}">
                 <StackPanel>
-                    <ui:TextBlock
-                        FontSize="16"
-                        Margin="5 0 5 5"
-                        Text="Ведомость системных деталей"
-                        Style="{StaticResource CustomTextBlock}" />
-
+                    <controls:SettingsTitleControl
+                        LabelText="Ведомость системных деталей"
+                        ToolTipText="Ведомость системных деталей"
+                        ButtonCommand="{Binding ApplySettingsCommand}"
+                        ButtonMouseLeaveCommand="{Binding CheckSettingsCommand}" />
+                    
                     <controls:DoubleTextBoxSettingControl
                         LabelText="Маска имени ведомости системных деталей:"
                         FirstTextBoxText="{Binding Path=SchedulesSettings.SystemPartsSchedulePrefixTemp, UpdateSourceTrigger=PropertyChanged}"
@@ -130,11 +130,11 @@
                 Margin="15 7 7 7"
                 Style="{StaticResource CustomBorder}">
                 <StackPanel>
-                    <ui:TextBlock
-                        FontSize="16"
-                        Margin="5 0 5 5"
-                        Text="Спецификация элементов каркасов"
-                        Style="{StaticResource CustomTextBlock}" />
+                    <controls:SettingsTitleControl
+                        LabelText="Спецификация элементов каркасов"
+                        ToolTipText="Спецификация элементов каркасов"
+                        ButtonCommand="{Binding ApplySettingsCommand}"
+                        ButtonMouseLeaveCommand="{Binding CheckSettingsCommand}" />
 
                     <controls:DoubleTextBoxSettingControl
                         LabelText="Маска имени спецификации элементов каркасов:"
@@ -169,12 +169,12 @@
                 Margin="7 7 15 7"
                 Style="{StaticResource CustomBorder}">
                 <StackPanel>
-                    <ui:TextBlock
-                        Margin="5 0 5 5"
-                        FontSize="16"
-                        Text="Ведомость IFC деталей"
-                        Style="{StaticResource CustomTextBlock}" />
-
+                    <controls:SettingsTitleControl
+                        LabelText="Ведомость IFC деталей"
+                        ToolTipText="Ведомость IFC деталей"
+                        ButtonCommand="{Binding ApplySettingsCommand}"
+                        ButtonMouseLeaveCommand="{Binding CheckSettingsCommand}" />
+                    
                     <controls:DoubleTextBoxSettingControl
                         LabelText="Маска имени ведомости IFC деталей:"
                         FirstTextBoxText="{Binding Path=SchedulesSettings.IfcPartsSchedulePrefixTemp, UpdateSourceTrigger=PropertyChanged}"
@@ -208,12 +208,12 @@
                 Margin="15 7 7 15"
                 Style="{StaticResource CustomBorder}">
                 <StackPanel>
-                    <ui:TextBlock
-                        Margin="5 0 5 5"
-                        FontSize="16"
-                        Text="Спецификация материалов"
-                        Style="{StaticResource CustomTextBlock}" />
-
+                    <controls:SettingsTitleControl
+                        LabelText="Спецификация материалов"
+                        ToolTipText="Спецификация материалов"
+                        ButtonCommand="{Binding ApplySettingsCommand}"
+                        ButtonMouseLeaveCommand="{Binding CheckSettingsCommand}" />
+                    
                     <controls:DoubleTextBoxSettingControl
                         LabelText="Маска имени спецификации материалов:"
                         FirstTextBoxText="{Binding Path=SchedulesSettings.MaterialSchedulePrefixTemp, UpdateSourceTrigger=PropertyChanged}"
@@ -248,12 +248,12 @@
                 Margin="7 7 15 15"
                 Style="{StaticResource CustomBorder}">
                 <StackPanel>
-                    <ui:TextBlock
-                        FontSize="16"
-                        Margin="5 0 5 5"
-                        Text="Список параметров фильтрации для спецификаций"
-                        Style="{StaticResource CustomTextBlock}" />
-
+                    <controls:SettingsTitleControl
+                        LabelText="Список параметров фильтрации для спецификаций"
+                        ToolTipText="Список параметров фильтрации для спецификаций"
+                        ButtonCommand="{Binding ApplySettingsCommand}"
+                        ButtonMouseLeaveCommand="{Binding CheckSettingsCommand}" />
+                    
                     <ui:ListView
                         Margin="0 5"
                         ItemsSource="{Binding Path=SchedulesSettings.ParamsForScheduleFiltersTemp, UpdateSourceTrigger=PropertyChanged}"

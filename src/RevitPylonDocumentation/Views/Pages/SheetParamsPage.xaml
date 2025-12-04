@@ -43,11 +43,11 @@
             Margin="15"
             Style="{StaticResource CustomBorder}">
             <StackPanel>
-                <ui:TextBlock
-                    FontSize="16"
-                    Margin="5 0 5 5"
-                    Text="Правила, по которым будут создаваться новые листы в проекте"
-                    Style="{StaticResource CustomTextBlock}" />
+                <controls:SettingsTitleControl
+                    LabelText="Правила, по которым будут создаваться новые листы в проекте"
+                    ToolTipText="Правила, по которым будут создаваться новые листы в проекте"
+                    ButtonCommand="{Binding ApplySettingsCommand}"
+                    ButtonMouseLeaveCommand="{Binding CheckSettingsCommand}" />
 
                 <controls:DoubleTextBoxSettingControl
                     LabelText="Маска имени листа пилона:"
