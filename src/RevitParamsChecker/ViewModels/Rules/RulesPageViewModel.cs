@@ -20,8 +20,6 @@ internal class RulesPageViewModel : BaseViewModel {
     private readonly ILocalizationService _localization;
     private readonly RulesRepository _rulesRepo;
     private readonly NameEditorService _nameEditorService;
-    private readonly ICollection<LogicalOperatorViewModel> _availableLogicalOperators;
-    private readonly ICollection<ComparisonOperatorViewModel> _availableComparisonOperators;
     private RuleViewModel _selectedRule;
 
     public RulesPageViewModel(
@@ -32,12 +30,9 @@ internal class RulesPageViewModel : BaseViewModel {
         _rulesRepo = rulesRepo ?? throw new ArgumentNullException(nameof(rulesRepo));
         _nameEditorService = nameEditorService ?? throw new ArgumentNullException(nameof(nameEditorService));
 
-        _availableLogicalOperators = GetAvailableLogicalOperators(_localization);
-        _availableComparisonOperators = GetAvailableComparisonOperators(_localization);
-
         Rules = [
             .._rulesRepo.GetRules()
-                .Select(r => new RuleViewModel(r, _availableLogicalOperators, _availableComparisonOperators))
+                .Select(r => new RuleViewModel(r, _localization))
         ];
         AddRuleCommand = RelayCommand.Create(AddRule);
         RenameRuleCommand = RelayCommand.Create<RuleViewModel>(RenameRule, CanRenameRule);
@@ -69,11 +64,7 @@ internal class RulesPageViewModel : BaseViewModel {
             newRule.Name = _nameEditorService.CreateNewName(
                 _localization.GetLocalizedString("RulesPage.NewRulePrompt"),
                 Rules.Select(f => f.Name).ToArray());
-            Rules.Add(
-                new RuleViewModel(
-                    newRule,
-                    _availableLogicalOperators,
-                    _availableComparisonOperators));
+            Rules.Add(new RuleViewModel(newRule, _localization));
         } catch(OperationCanceledException) {
         }
     }
@@ -95,7 +86,7 @@ internal class RulesPageViewModel : BaseViewModel {
                 _localization.GetLocalizedString("RulesPage.NewRulePrompt"),
                 Rules.Select(f => f.Name).ToArray(),
                 rule.Name);
-            Rules.Add(new RuleViewModel(copyRule, _availableLogicalOperators, _availableComparisonOperators));
+            Rules.Add(new RuleViewModel(copyRule, _localization));
         } catch(OperationCanceledException) {
         }
     }
@@ -134,32 +125,5 @@ internal class RulesPageViewModel : BaseViewModel {
 
     private bool CanSave() {
         return true; // TODO валидация
-    }
-
-    private ICollection<ComparisonOperatorViewModel>
-        GetAvailableComparisonOperators(ILocalizationService localization) {
-        return [
-            new ComparisonOperatorViewModel(localization, new EqualsOperator()),
-            new ComparisonOperatorViewModel(localization, new NotEqualsOperator()),
-            new ComparisonOperatorViewModel(localization, new GreaterOperator()),
-            new ComparisonOperatorViewModel(localization, new GreaterOrEqualOperator()),
-            new ComparisonOperatorViewModel(localization, new LessOperator()),
-            new ComparisonOperatorViewModel(localization, new LessOrEqualOperator()),
-            new ComparisonOperatorViewModel(localization, new BeginsWithOperator()),
-            new ComparisonOperatorViewModel(localization, new NotBeginsWithOperator()),
-            new ComparisonOperatorViewModel(localization, new EndsWithOperator()),
-            new ComparisonOperatorViewModel(localization, new NotEndsWithOperator()),
-            new ComparisonOperatorViewModel(localization, new ContainsOperator()),
-            new ComparisonOperatorViewModel(localization, new NotContainsOperator()),
-            new ComparisonOperatorViewModel(localization, new HasValueOperator()),
-            new ComparisonOperatorViewModel(localization, new HasNoValueOperator())
-        ];
-    }
-
-    private ICollection<LogicalOperatorViewModel> GetAvailableLogicalOperators(ILocalizationService localization) {
-        return [
-            new LogicalOperatorViewModel(localization, new AndOperator()),
-            new LogicalOperatorViewModel(localization, new OrOperator())
-        ];
     }
 }

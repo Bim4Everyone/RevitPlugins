@@ -3,30 +3,46 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 
+using dosymep.SimpleServices;
 using dosymep.WPF.ViewModels;
 
 using RevitParamsChecker.Models.Rules;
+using RevitParamsChecker.Models.Rules.ComparisonOperators;
 
 namespace RevitParamsChecker.ViewModels.Rules;
 
 internal class ParamRuleViewModel : BaseViewModel {
     private readonly ParameterRule _rule;
+    private readonly ILocalizationService _localization;
     private string _paramName;
     private string _expectedValue;
     private ComparisonOperatorViewModel _selectedOperator;
 
-    public ParamRuleViewModel(ParameterRule rule, ICollection<ComparisonOperatorViewModel> operators) {
-        if(operators == null) {
-            throw new ArgumentNullException(nameof(operators));
-        }
+    private static readonly IReadOnlyCollection<ComparisonOperator> _availableComparisonOperators = [
+        new EqualsOperator(),
+        new NotEqualsOperator(),
+        new GreaterOperator(),
+        new GreaterOrEqualOperator(),
+        new LessOperator(),
+        new LessOrEqualOperator(),
+        new BeginsWithOperator(),
+        new NotBeginsWithOperator(),
+        new EndsWithOperator(),
+        new NotEndsWithOperator(),
+        new ContainsOperator(),
+        new NotContainsOperator(),
+        new HasValueOperator(),
+        new HasNoValueOperator()
+    ];
 
-        if(operators.Count == 0) {
-            throw new ArgumentException(nameof(operators));
-        }
-
+    public ParamRuleViewModel(ParameterRule rule, ILocalizationService localization) {
         _rule = rule ?? throw new ArgumentNullException(nameof(rule));
+        _localization = localization ?? throw new ArgumentNullException(nameof(localization));
 
-        AvailableOperators = new ReadOnlyCollection<ComparisonOperatorViewModel>(operators.ToArray());
+        AvailableOperators = new ReadOnlyCollection<ComparisonOperatorViewModel>(
+            _availableComparisonOperators
+                .Select(o => new ComparisonOperatorViewModel(_localization, o))
+                .ToArray());
         SelectedOperator = _rule.Operator != null
             ? AvailableOperators.First(o => o.Operator.Equals(_rule.Operator))
             : AvailableOperators.First();

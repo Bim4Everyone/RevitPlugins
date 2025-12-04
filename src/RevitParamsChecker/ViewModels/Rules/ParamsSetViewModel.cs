@@ -4,51 +4,43 @@ using System.Collections.ObjectModel;
 using System.Linq;
 using System.Windows.Input;
 
+using dosymep.SimpleServices;
 using dosymep.WPF.Commands;
 using dosymep.WPF.ViewModels;
 
 using RevitParamsChecker.Models.Rules;
+using RevitParamsChecker.Models.Rules.LogicalOperators;
 
 namespace RevitParamsChecker.ViewModels.Rules;
 
 internal class ParamsSetViewModel : BaseViewModel {
     private readonly LogicalRule _logicalRule;
-    private readonly ICollection<ComparisonOperatorViewModel> _availableComparisonOperators;
+    private readonly ILocalizationService _localization;
     private LogicalOperatorViewModel _selectedOperator;
+
+    private static readonly IReadOnlyCollection<LogicalOperator> _availableLogicalOperators = [
+        new AndOperator(), new OrOperator()
+    ];
 
     public ParamsSetViewModel(
         LogicalRule logicalRule,
-        ICollection<LogicalOperatorViewModel> logicalOperators,
-        ICollection<ComparisonOperatorViewModel> comparisonOperators) {
-        if(logicalOperators == null) {
-            throw new ArgumentNullException(nameof(logicalOperators));
-        }
-
-        if(comparisonOperators == null) {
-            throw new ArgumentNullException(nameof(comparisonOperators));
-        }
-
-        if(logicalOperators.Count == 0) {
-            throw new ArgumentOutOfRangeException(nameof(logicalOperators));
-        }
-
-        if(comparisonOperators.Count == 0) {
-            throw new ArgumentOutOfRangeException(nameof(comparisonOperators));
-        }
-
+        ILocalizationService localization) {
         _logicalRule = logicalRule ?? throw new ArgumentNullException(nameof(logicalRule));
-        _availableComparisonOperators = comparisonOperators;
-        AvailableLogicalOperators = new ReadOnlyCollection<LogicalOperatorViewModel>(logicalOperators.ToArray());
+        _localization = localization ?? throw new ArgumentNullException(nameof(localization));
+        AvailableLogicalOperators = new ReadOnlyCollection<LogicalOperatorViewModel>(
+            _availableLogicalOperators
+                .Select(o => new LogicalOperatorViewModel(_localization, o))
+                .ToArray());
         SelectedOperator = _logicalRule.Operator != null
             ? AvailableLogicalOperators.First(o => o.Operator.Equals(_logicalRule.Operator))
             : AvailableLogicalOperators.First();
         InnerParamRules = [
             .._logicalRule.ChildRules.OfType<ParameterRule>()
-                .Select(r => new ParamRuleViewModel(r, _availableComparisonOperators))
+                .Select(r => new ParamRuleViewModel(r, _localization))
         ];
         InnerParamSets = [
             .._logicalRule.ChildRules.OfType<LogicalRule>()
-                .Select(r => new ParamsSetViewModel(r, AvailableLogicalOperators, _availableComparisonOperators))
+                .Select(r => new ParamsSetViewModel(r, _localization))
         ];
         AddInnerParamRuleCommand = RelayCommand.Create(AddInnerRule);
         RemoveInnerParamRuleCommand = RelayCommand.Create<ParamRuleViewModel>(RemoveInnerRule, CanRemoveInnerRule);
@@ -82,7 +74,7 @@ internal class ParamsSetViewModel : BaseViewModel {
 
     private void AddInnerSet() {
         InnerParamSets.Add(
-            new ParamsSetViewModel(new LogicalRule(), AvailableLogicalOperators, _availableComparisonOperators));
+            new ParamsSetViewModel(new LogicalRule(), _localization));
     }
 
     private void RemoveInnerSet(ParamsSetViewModel p) {
@@ -94,7 +86,7 @@ internal class ParamsSetViewModel : BaseViewModel {
     }
 
     private void AddInnerRule() {
-        InnerParamRules.Add(new ParamRuleViewModel(new ParameterRule(), _availableComparisonOperators));
+        InnerParamRules.Add(new ParamRuleViewModel(new ParameterRule(), _localization));
     }
 
     private void RemoveInnerRule(ParamRuleViewModel p) {

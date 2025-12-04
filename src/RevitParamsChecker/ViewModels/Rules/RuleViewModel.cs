@@ -10,19 +10,20 @@ namespace RevitParamsChecker.ViewModels.Rules;
 
 internal class RuleViewModel : BaseViewModel, IEquatable<RuleViewModel> {
     private readonly Rule _rule;
+    private readonly ILocalizationService _localization;
     private readonly Guid _guid;
     private string _name;
     private string _description;
 
     public RuleViewModel(
         Rule rule,
-        ICollection<LogicalOperatorViewModel> logicalOperators,
-        ICollection<ComparisonOperatorViewModel> comparisonOperators) {
+        ILocalizationService localization) {
         _rule = rule ?? throw new ArgumentNullException(nameof(rule));
+        _localization = localization ?? throw new ArgumentNullException(nameof(localization));
         _guid = Guid.NewGuid();
         Name = _rule.Name;
         Description = _rule.Description;
-        RootSet = new ParamsSetViewModel(_rule.RootRule, logicalOperators, comparisonOperators);
+        RootSet = new ParamsSetViewModel(_rule.RootRule, _localization);
     }
 
     public string Name {
