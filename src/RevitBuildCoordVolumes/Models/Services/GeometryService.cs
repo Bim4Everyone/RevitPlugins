@@ -6,10 +6,16 @@ using Autodesk.Revit.DB;
 
 using RevitBuildCoordVolumes.Models.Geometry;
 
-namespace RevitBuildCoordVolumes.Models;
-internal class AreaDivider {
-
-    public List<Polygon> DivideArea(Area area, double side, double minimalLength, double limit) {
+namespace RevitBuildCoordVolumes.Models.Services;
+internal class GeometryService {
+    /// <summary>
+    /// Метод разделения зоны на полигоны
+    /// </summary>    
+    /// <remarks>
+    /// В данном методе производится разделение зоны на полигоны (квадраты) и остаточные фигуры (не менее 3 сторон)
+    /// </remarks>
+    /// <returns>список Polygon</returns>
+    public List<Polygon> DivideArea(Area area, double side, double minimalLength) {
         var opt = new SpatialElementBoundaryOptions();
         var loops = area.GetBoundarySegments(opt);
         if(loops == null || loops.Count == 0) {
@@ -82,26 +88,98 @@ internal class AreaDivider {
                     if(from.DistanceTo(to) > minimalLength) {
                         sideLines.Add(Line.CreateBound(from, to));
                     }
+                    ;
                 }
-
                 // Добавьте этот многоугольник, если есть хотя бы 3 стороны
                 if(sideLines.Count >= 3) {
                     polygons.Add(new Polygon {
                         Sides = sideLines,
-                        LocationPointZ = polyPoints.First().Z
+                        Center = center
                     });
                 }
-
                 created++;
-                if(created > limit) {
-                    break;
-                }
             }
         }
         return polygons;
     }
 
-    // Проверить, находятся ли линии ab и cd в единой плоскости и пересекаются ли
+    /// <summary>
+    /// Метод проверки точки нахождение точки внутри заданных точек
+    /// </summary>    
+    /// <remarks>
+    /// В данном методе производится вычисление координат точки и сравнивание с заданными точками контура
+    /// </remarks>
+    /// <returns>bool</returns>   
+    public bool IsPointInsidePolygon(XYZ p, List<XYZ> polygon) {
+        bool inside = false;
+        for(int i = 0, j = polygon.Count - 1; i < polygon.Count; j = i++) {
+            if((polygon[i].Y > p.Y) != (polygon[j].Y > p.Y) &&
+                p.X < (polygon[j].X - polygon[i].X) * (p.Y - polygon[i].Y) /
+                 (polygon[j].Y - polygon[i].Y) + polygon[i].X) {
+                inside = !inside;
+            }
+        }
+        return inside;
+    }
+
+    public bool IsPointInsideFloorPolygon(XYZ p, List<List<XYZ>> outer, List<List<XYZ>> holes) {
+        // 1. Должна быть внутри хотя бы одного внешнего контура
+        bool insideOuter = false;
+        foreach(var loop in outer) {
+            if(IsPointInsidePolygon(p, loop)) {
+                insideOuter = true;
+                break;
+            }
+        }
+
+        if(!insideOuter) {
+            return false;
+        }
+
+        //2.Не должна быть внутри ни одной дыры
+        foreach(var hole in holes) {
+            if(IsPointInsidePolygon(p, hole)) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+
+    public void ClassifyContours(List<List<XYZ>> contours, out List<List<XYZ>> outer, out List<List<XYZ>> holes) {
+        outer = [];
+        holes = [];
+
+        int n = contours.Count;
+
+        for(int i = 0; i < n; i++) {
+            var loopI = contours[i];
+            var testPoint = loopI[0]; // первая точка контура
+
+            bool isHole = false;
+
+            for(int j = 0; j < n; j++) {
+                if(i == j) {
+                    continue;
+                }
+
+                if(IsPointInsidePolygon(testPoint, contours[j])) {
+                    // контур i находится внутри контура j
+                    isHole = true;
+                    break;
+                }
+            }
+
+            if(isHole) {
+                holes.Add(loopI);
+            } else {
+                outer.Add(loopI);
+            }
+        }
+    }
+
+    // Метод проверки, находятся ли линии ab и cd в единой плоскости и пересекаются ли
     private bool TryGetLinesIntersection(XYZ a, XYZ b, XYZ c, XYZ d, out XYZ intersection) {
         intersection = null;
         double ax = b.X - a.X;
@@ -127,16 +205,19 @@ internal class AreaDivider {
         return true;
     }
 
-    // Проверка, находится ли точка внутри полигона    
-    private bool IsPointInsidePolygon(XYZ p, List<XYZ> polygon) {
-        bool inside = false;
-        for(int i = 0, j = polygon.Count - 1; i < polygon.Count; j = i++) {
-            if(((polygon[i].Y > p.Y) != (polygon[j].Y > p.Y)) &&
-                (p.X < (polygon[j].X - polygon[i].X) * (p.Y - polygon[i].Y) /
-                 (polygon[j].Y - polygon[i].Y) + polygon[i].X)) {
-                inside = !inside;
-            }
-        }
-        return inside;
-    }
+    //public IntersectionResult IsPointInsideSlabElement(XYZ point, SlabElement slabElement) {
+    //    var upFaces = slabElement.Faces;
+    //    foreach(var face in upFaces) {
+    //        var result = face.Project(point);
+    //        if(result != null) {
+    //            return result;
+    //        }
+    //    }
+    //    return null;
+    //}
+
+    //public XYZ IsPointInsideFloor(XYZ point, Floor floor) {
+    //    var projectPoint = floor.GetVerticalProjectionPoint(point, FloorFace.Top);
+    //    return projectPoint ?? null;
+    //}
 }

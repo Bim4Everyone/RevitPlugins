@@ -1,13 +1,12 @@
 using dosymep.WPF.ViewModels;
 
-using RevitBuildCoordVolumes.Models.Interfaces;
+using RevitBuildCoordVolumes.Models.Enums;
 
 namespace RevitBuildCoordVolumes.ViewModels;
-internal class PositionViewModel : BaseViewModel {
-
+internal class AlgorithmViewModel : BaseViewModel {
     private string _name;
 
-    public IPositionProvider PositionProvider { get; set; }
+    public AlgorithmType AlgorithmType { get; set; }
 
     public string Name {
         get => _name;

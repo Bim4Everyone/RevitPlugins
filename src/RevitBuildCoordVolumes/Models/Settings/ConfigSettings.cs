@@ -5,20 +5,19 @@ using RevitBuildCoordVolumes.Models.Enums;
 namespace RevitBuildCoordVolumes.Models.Settings;
 
 internal class ConfigSettings {
-    public List<string> Documents { get; set; }
+    public AlgorithmType AlgorithmType { get; set; }
     public string TypeZone { get; set; }
-    public PositionProviderType UpPositionProvider { get; set; }
-    public PositionProviderType BottomPositionProvider { get; set; }
     public List<ParamMap> ParamMaps { get; set; }
+    public List<string> Documents { get; set; }
     public List<string> TypeSlabs { get; set; }
     public double SearchSide { get; set; }
 
     public void ApplyDefaultValues() {
-        Documents = [];
-        TypeZone = RevitConstants.TypeZone;
-        UpPositionProvider = PositionProviderType.UpPosition;
-        BottomPositionProvider = PositionProviderType.UpPosition;
+        AlgorithmType = AlgorithmType.AdvancedAreaExtrude;
+        TypeZone = string.Empty;
         ParamMaps = GetDefaultParamMaps();
+        Documents = [];
+        TypeSlabs = [];
         SearchSide = RevitConstants.SearchSide;
     }
 

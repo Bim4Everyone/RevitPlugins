@@ -1,11 +1,14 @@
+using System;
+using System.Collections.Generic;
 using System.Linq;
-using System.Windows;
-
-using Autodesk.Revit.DB;
+using System.Threading;
 
 using dosymep.Revit;
 using dosymep.SimpleServices;
 
+using RevitBuildCoordVolumes.Models.Enums;
+using RevitBuildCoordVolumes.Models.Interfaces;
+using RevitBuildCoordVolumes.Models.Services;
 using RevitBuildCoordVolumes.Models.Settings;
 
 namespace RevitBuildCoordVolumes.Models;
@@ -14,6 +17,9 @@ internal class BuildCoordVolumesProcessor {
     private readonly ILocalizationService _localizationService;
     private readonly RevitRepository _revitRepository;
     private readonly BuildCoordVolumesSettings _settings;
+    private readonly SolidsService _solidsService;
+    private readonly GeometryService _geometryService;
+
     public BuildCoordVolumesProcessor(
         ILocalizationService localizationService,
         RevitRepository revitRepository,
@@ -21,65 +27,40 @@ internal class BuildCoordVolumesProcessor {
         _localizationService = localizationService;
         _revitRepository = revitRepository;
         _settings = settings;
+        _solidsService = new SolidsService();
+        _geometryService = new GeometryService();
     }
 
-    public void Run() {
+    public IEnumerable<RevitArea> Areas => GetRevitAreas();
 
-        string areaType = _settings.TypeZone;
+    public void Run(IProgress<int> progress = null, CancellationToken ct = default) {
 
-        var allSlabs = _revitRepository.GetSlabs(_settings.TypeSlabs);
+        IBuildAreaExtrusion buildAreaExtrusion;
+        buildAreaExtrusion = _settings.AlgorithmType == AlgorithmType.AdvancedAreaExtrude
+            ? new AdvancedAreaExtrusionBuilder(_revitRepository, _settings, _solidsService, _geometryService)
+            : new AreaExtrusionBuilder();
 
-        double minSlab = allSlabs
-            .Select(s => s.Floor.GetBoundingBox().Max.Z)
-            .Min();
+        string transactionName = _localizationService.GetLocalizedString("BuildCoordVolumesProcessor.TransactionName");
+        using var t = _revitRepository.Document.StartTransaction(transactionName);
+        int i = 0;
+        foreach(var area in Areas) {
+            ct.ThrowIfCancellationRequested();
 
-        double maxSlab = allSlabs
-            .Select(s => s.Floor.GetBoundingBox().Max.Z)
-            .Max();
+            buildAreaExtrusion.BuildAreaExtrusion(area);
 
-        var stops = allSlabs
-            .Select(s => s.Floor.GetBoundingBox().Max.Z);
-
-        var areaTypeParam = _settings.ParamMaps.First().SourceParam;
-        var areas = _revitRepository.GetRevitAreas(areaType, areaTypeParam);
-
-        var divider = new AreaDivider();
-
-        double minimalSide = _revitRepository.Application.ShortCurveTolerance;
-        double side = UnitUtils.ConvertToInternalUnits(_settings.SearchSide, UnitTypeId.Millimeters);
-
-        foreach(var area in areas) {
-
-            var polygons = divider.DivideArea((Area) area.Area, side, minimalSide, 1000000);
-
-            foreach(var polygon in polygons) {
-
-
-
-            }
-
-            var p = allSlabs.First().ContourPoints;
-
-            var po = allSlabs.First();
-
-            var topfaces = HostObjectUtils.GetTopFaces(po.Floor);
-
-            var elId = topfaces.First().ElementReferenceType;
-
-
-
-            MessageBox.Show(elId.ToString());
-
-
-
+            progress?.Report(++i);
         }
 
-
-
+        t.Commit();
     }
 
-
-
-
-
+    // Метод получения элементов модели для основного метода и прогресс-бара  
+    private IEnumerable<RevitArea> GetRevitAreas() {
+        string areaType = _settings.TypeZone;
+        var areaTypeParam = _settings.ParamMaps.First().SourceParam;
+        return _revitRepository.GetRevitAreas(areaType, areaTypeParam);
+    }
 }
+
+
+

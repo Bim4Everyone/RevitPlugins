@@ -14,6 +14,14 @@ internal interface IDocumentsService {
     /// <returns>Document</returns>
     Document GetDocumentByName(string name);
     /// <summary>
+    /// Метод получения трансформации
+    /// </summary>    
+    /// <remarks>
+    /// В данном методе производится получение трансформации по имени документа
+    /// </remarks>
+    /// <returns>Transform</returns>
+    Transform GetTransformByName(string name);
+    /// <summary>
     /// Метод получения документов
     /// </summary>    
     /// <remarks>

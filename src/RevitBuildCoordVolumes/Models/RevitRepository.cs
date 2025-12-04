@@ -8,7 +8,6 @@ using Autodesk.Revit.UI;
 using dosymep.Bim4Everyone;
 using dosymep.Revit;
 
-using RevitBuildCoordVolumes.Models.Geometry;
 using RevitBuildCoordVolumes.Models.Interfaces;
 using RevitBuildCoordVolumes.Models.Services;
 
@@ -17,17 +16,11 @@ namespace RevitBuildCoordVolumes.Models;
 internal class RevitRepository {
     private readonly IDocumentsService _documentsService;
     private readonly ISlabsService _slabsService;
-    private readonly View _view;
-    private readonly double _minimalSide;
-    private readonly double _side;
 
     public RevitRepository(UIApplication uiApp) {
         UIApplication = uiApp;
         _documentsService = new DocumentsService(Document);
-        _slabsService = new SlabsService();
-        _view = Document.ActiveView;
-        _minimalSide = Application.ShortCurveTolerance;
-        _side = UnitUtils.ConvertToInternalUnits(300, UnitTypeId.SquareMeters);
+        _slabsService = new SlabsService(_documentsService);
     }
 
     public UIApplication UIApplication { get; }
@@ -50,23 +43,9 @@ internal class RevitRepository {
     }
 
     /// <summary>
-    /// Метод получения координаты элементы по верху
-    /// </summary>
-    public XYZ GetPositionUp(SlabElement revitElement) {
-        return new XYZ(0, 0, 0);
-    }
-
-    /// <summary>
-    /// Метод получения координаты элементы по низу
-    /// </summary>
-    public XYZ GetPositionBottom(SlabElement revitElement) {
-        return new XYZ(0, 0, 0);
-    }
-
-    /// <summary>
     /// Получение всех типов перекрытий и фундаментных плит
     /// </summary>
-    public IEnumerable<string> GetTypeSlabs(IEnumerable<Document> documents) {
+    public IEnumerable<string> GetTypeSlabsByDocs(IEnumerable<Document> documents) {
         return _slabsService.GetSlabsByDocs(documents)
             .Select(slab => slab.Name)
             .Distinct();
@@ -75,19 +54,22 @@ internal class RevitRepository {
     /// <summary>
     /// Получение всех типов перекрытий и фундаментных плит
     /// </summary>
-    public IEnumerable<SlabElement> GetSlabs(IEnumerable<string> typeSlabs) {
-        return typeSlabs
-            .SelectMany(_slabsService.GetSlabsByName);
+    public IEnumerable<SlabElement> GetSlabsByTypesAndDocs(IEnumerable<string> typeSlabs, IEnumerable<Document> documents) {
+        return _slabsService.GetSlabsByTypesAndDocs(typeSlabs, documents);
     }
+
 
     /// <summary>
     /// Метод получения всех вариантов значений зон по заданному параметру
     /// </summary>
     public IEnumerable<string> GetTypeZones(RevitParam revitParam) {
-        return GetAreas()
-            .Select(area => area.GetParamValueOrDefault<string>(revitParam.Name))
-            .Where(str => !string.IsNullOrEmpty(str))
-            .Distinct();
+        return revitParam != null
+            ? GetAreas()
+                .Select(area => area.GetParamValueOrDefault<string>(revitParam.Name))
+                .Where(str => !string.IsNullOrEmpty(str))
+                .Distinct()
+            : [];
+
     }
 
     /// <summary>
@@ -100,41 +82,11 @@ internal class RevitRepository {
     }
 
     // Метод получения системных зон
-    private IEnumerable<Element> GetAreas() {
+    private IEnumerable<Area> GetAreas() {
         return new FilteredElementCollector(Document)
             .OfCategory(BuiltInCategory.OST_Areas)
             .WhereElementIsNotElementType()
-            .OfType<Element>();
+            .OfType<Area>();
     }
-
-    public IEnumerable<Element> GetSelectedElements() {
-        return ActiveUIDocument.GetSelectedElements();
-    }
-
-    public void Process() {
-        if(GetSelectedElements().FirstOrDefault() is not Area area) {
-            //TaskDialog.Show("Ошибка", "Выберите одну зону (Area).");
-            return;
-        }
-
-        var divider = new AreaDivider();
-
-        var polygons = divider.DivideArea(area, _side, _minimalSide, 5000);
-
-        Draw(polygons);
-    }
-
-    private void Draw(List<Polygon> polygons) {
-        using var tr = new Transaction(Document, "Draw");
-        tr.Start();
-        foreach(var polygon in polygons) {
-            foreach(var line in polygon.Sides) {
-                Document.Create.NewDetailCurve(_view, line);
-            }
-        }
-        tr.Commit();
-    }
-
-
 }
 

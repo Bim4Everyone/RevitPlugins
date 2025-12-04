@@ -26,21 +26,20 @@ internal class MainViewModel : BaseViewModel {
     private readonly IParamAvailabilityService _paramAvailabilityService;
     private readonly ICategoryAvailabilityService _categoryAvailabilityService;
     private readonly IRevitParamFactory _revitParamFactory;
-    private readonly ProvidersFactory _providersFactory;
     private BuildCoordVolumesSettings _buildCoordVolumesSettings;
+    private ObservableCollection<AlgorithmViewModel> _typeAlgorithms;
     private ObservableCollection<DocumentViewModel> _documents;
     private ObservableCollection<DocumentViewModel> _filteredDocuments;
     private ObservableCollection<TypeZoneViewModel> _typeZones;
+    private AlgorithmViewModel _selectedTypeAlgorithm;
     private TypeZoneViewModel _selectedTypeZone;
-    private ObservableCollection<PositionViewModel> _positionUp;
-    private PositionViewModel _selectedPositionUp;
-    private ObservableCollection<PositionViewModel> _positionBottom;
-    private PositionViewModel _selectedPositionBottom;
     private string _searchSide;
     private ObservableCollection<ParamViewModel> _params;
     private ObservableCollection<SlabViewModel> _slabs;
     private ObservableCollection<SlabViewModel> _filteredSlabs;
     private bool _hasParamWarning;
+    private bool _requiredCheckArea;
+    private bool _isAdvancedAlgorithm;
     private string _errorText;
     private string _searchTextDocs;
     private string _searchTextSlabs;
@@ -58,9 +57,9 @@ internal class MainViewModel : BaseViewModel {
         _paramAvailabilityService = new ParamAvailabilityService();
         _categoryAvailabilityService = new CategoryAvailabilityService(_revitRepository.Document);
         _revitParamFactory = revitParamFactory;
-        _providersFactory = new ProvidersFactory();
 
         LoadViewCommand = RelayCommand.Create(LoadView);
+        CheckAreaCommand = RelayCommand.Create(CheckArea, CanCheckArea);
         SearchDocsCommand = RelayCommand.Create(ApplySearchDocs);
         SearchSlabsCommand = RelayCommand.Create(ApplySearchSlabs);
         AcceptViewCommand = RelayCommand.Create(AcceptView, CanAcceptView);
@@ -70,6 +69,7 @@ internal class MainViewModel : BaseViewModel {
     }
 
     public ICommand LoadViewCommand { get; }
+    public ICommand CheckAreaCommand { get; }
     public ICommand AcceptViewCommand { get; }
     public ICommand SearchDocsCommand { get; }
     public ICommand SearchSlabsCommand { get; }
@@ -84,6 +84,14 @@ internal class MainViewModel : BaseViewModel {
         get => _filteredDocuments;
         set => RaiseAndSetIfChanged(ref _filteredDocuments, value);
     }
+    public ObservableCollection<AlgorithmViewModel> TypeAlgorithms {
+        get => _typeAlgorithms;
+        set => RaiseAndSetIfChanged(ref _typeAlgorithms, value);
+    }
+    public AlgorithmViewModel SelectedTypeAlgorithm {
+        get => _selectedTypeAlgorithm;
+        set => RaiseAndSetIfChanged(ref _selectedTypeAlgorithm, value);
+    }
     public ObservableCollection<TypeZoneViewModel> TypeZones {
         get => _typeZones;
         set => RaiseAndSetIfChanged(ref _typeZones, value);
@@ -91,22 +99,6 @@ internal class MainViewModel : BaseViewModel {
     public TypeZoneViewModel SelectedTypeZone {
         get => _selectedTypeZone;
         set => RaiseAndSetIfChanged(ref _selectedTypeZone, value);
-    }
-    public ObservableCollection<PositionViewModel> PositionUp {
-        get => _positionUp;
-        set => RaiseAndSetIfChanged(ref _positionUp, value);
-    }
-    public PositionViewModel SelectedPositionUp {
-        get => _selectedPositionUp;
-        set => RaiseAndSetIfChanged(ref _selectedPositionUp, value);
-    }
-    public ObservableCollection<PositionViewModel> PositionBottom {
-        get => _positionBottom;
-        set => RaiseAndSetIfChanged(ref _positionBottom, value);
-    }
-    public PositionViewModel SelectedPositionBottom {
-        get => _selectedPositionBottom;
-        set => RaiseAndSetIfChanged(ref _selectedPositionBottom, value);
     }
     public string SearchSide {
         get => _searchSide;
@@ -128,6 +120,14 @@ internal class MainViewModel : BaseViewModel {
         get => _hasParamWarning;
         set => RaiseAndSetIfChanged(ref _hasParamWarning, value);
     }
+    public bool RequiredCheckArea {
+        get => _requiredCheckArea;
+        set => RaiseAndSetIfChanged(ref _requiredCheckArea, value);
+    }
+    public bool IsAdvancedAlgorithm {
+        get => _isAdvancedAlgorithm;
+        set => RaiseAndSetIfChanged(ref _isAdvancedAlgorithm, value);
+    }
     public string SearchTextDocs {
         get => _searchTextDocs;
         set => RaiseAndSetIfChanged(ref _searchTextDocs, value);
@@ -141,12 +141,88 @@ internal class MainViewModel : BaseViewModel {
         set => RaiseAndSetIfChanged(ref _errorText, value);
     }
 
-    // Метод обновления предупреждений в параметрах
-    private void UpdateParamWarnings() {
-        foreach(var param in Params) {
-            param.UpdateWarning(_revitRepository.Document);
+    // Метод обновления параметра в TypeZones
+    private void UpdateTypeZones() {
+        TypeZones = new ObservableCollection<TypeZoneViewModel>(GetTypeZoneViewModels());
+        SelectedTypeZone = TypeZones.FirstOrDefault();
+        UpdateRequiredCheckArea();
+    }
+
+    // Метод получения коллекции TypeModelViewModel для TypeModels
+    private IEnumerable<TypeZoneViewModel> GetTypeZoneViewModels() {
+        var documents = FilteredDocuments.Where(vm => vm.IsChecked).Select(vm => vm.Document);
+        var param = Params.FirstOrDefault()?.ParamMap.SourceParam;
+        var typeZones = _revitRepository.GetTypeZones(param);
+        return !typeZones.Any()
+            ? []
+            : typeZones
+                .Select(value => new TypeZoneViewModel { Name = value })
+                .OrderByDescending(vm => vm.Name.Equals(_buildCoordVolumesSettings.TypeZone))
+                .ThenBy(vm => vm.Name);
+    }
+
+    // Метод обновления параметра в FilteredSlabs
+    private void UpdateFilteredSlabs() {
+        Slabs = new ObservableCollection<SlabViewModel>(GetSlabViewModels());
+        FilteredSlabs = new ObservableCollection<SlabViewModel>(Slabs);
+    }
+
+    // Метод для реализации поиска в плитах перекрытия
+    private void ApplySearchSlabs() {
+        FilteredSlabs = string.IsNullOrEmpty(SearchTextSlabs)
+            ? new ObservableCollection<SlabViewModel>(Slabs)
+            : new ObservableCollection<SlabViewModel>(Slabs
+                .Where(item => item.Name
+                .IndexOf(SearchTextSlabs, StringComparison.OrdinalIgnoreCase) >= 0));
+    }
+
+    // Метод получения коллекции SlabViewModel для Slabs
+    private IEnumerable<SlabViewModel> GetSlabViewModels() {
+        var documents = FilteredDocuments.Where(vm => vm.IsChecked).Select(vm => vm.Document);
+        var allSlabs = _revitRepository.GetTypeSlabsByDocs(documents);
+        var savedSlabs = _buildCoordVolumesSettings.TypeSlabs;
+        return !allSlabs.Any()
+            ? []
+            : allSlabs
+                .Select(slabType => new SlabViewModel {
+                    Name = slabType,
+                    IsChecked = savedSlabs.Contains(slabType),
+                })
+                .OrderBy(vm => vm.Name);
+    }
+
+    // Метод для реализации поиска в документах
+    private void ApplySearchDocs() {
+        FilteredDocuments = string.IsNullOrEmpty(SearchTextDocs)
+            ? new ObservableCollection<DocumentViewModel>(Documents)
+            : new ObservableCollection<DocumentViewModel>(Documents
+                .Where(item => item.Name
+                .IndexOf(SearchTextDocs, StringComparison.OrdinalIgnoreCase) >= 0));
+    }
+
+    // Метод подписанный на событие изменения DocumentViewModel
+    private void OnDocumentChanged(object sender, PropertyChangedEventArgs e) {
+        if(sender is not DocumentViewModel vm) {
+            return;
         }
-        HasParamWarning = Params.Any(param => param.HasWarning);
+        if(e.PropertyName == nameof(vm.IsChecked)) {
+            UpdateFilteredSlabs();
+        }
+    }
+
+    // Метод получения коллекции DocumentViewModel для Documents
+    private IEnumerable<DocumentViewModel> GetDocumentViewModels() {
+        var allDocuments = _revitRepository.GetAllDocuments();
+        var savedDocumentsNames = _buildCoordVolumesSettings.Documents
+            .Select(doc => doc.GetUniqId());
+
+        return !allDocuments.Any()
+            ? []
+            : allDocuments
+                .Select(document => new DocumentViewModel(_localizationService, document) {
+                    IsChecked = savedDocumentsNames.Contains(document.GetUniqId())
+                })
+                .OrderBy(vm => vm.Name);
     }
 
     // Метод подписанный на событие изменения ParamViewModel
@@ -182,15 +258,12 @@ internal class MainViewModel : BaseViewModel {
         }
     }
 
-    // Метод подписанный на событие изменения ParamViewModel
-    private void OnDocumentChanged(object sender, PropertyChangedEventArgs e) {
-        if(sender is not DocumentViewModel vm) {
-            return;
+    // Метод обновления предупреждений в параметрах
+    private void UpdateParamWarnings() {
+        foreach(var param in Params) {
+            param.UpdateWarning(_revitRepository.Document);
         }
-        if(e.PropertyName == nameof(vm.IsChecked)) {
-            UpdateTypeZones();
-            UpdateFilteredSlabs();
-        }
+        HasParamWarning = Params.Any(param => param.HasWarning);
     }
 
     // Метод получения коллекции ParamViewModel для Params
@@ -217,98 +290,56 @@ internal class MainViewModel : BaseViewModel {
         });
     }
 
-    // Метод получения коллекции PositionViewModel для Positions
-    private IEnumerable<PositionViewModel> GetPositionViewModels(bool upPosition) {
-        var currentProvider = upPosition
-            ? _buildCoordVolumesSettings.UpPositionProvider
-            : _buildCoordVolumesSettings.BottomPositionProvider;
-        var providers = Enum.GetValues(typeof(PositionProviderType)).Cast<PositionProviderType>();
-        return providers
-            .Select(provider => new PositionViewModel {
-                Name = _localizationService.GetLocalizedString($"MainViewModel.{provider}"),
-                PositionProvider = (provider == currentProvider.Type)
-                    ? currentProvider
-                    : _providersFactory.GetPositionProvider(_revitRepository, provider)
+    // Метод обновляющий состояние свойства для скрытия/отображения дополнительных настроек основного окна
+    private void UpdateVisibilitySettings() {
+        IsAdvancedAlgorithm = SelectedTypeAlgorithm.AlgorithmType == AlgorithmType.AdvancedAreaExtrude;
+    }
+
+    // Метод подписанный на события
+    private void OnPropertyChanged(object sender, PropertyChangedEventArgs e) {
+        if(e.PropertyName == nameof(SelectedTypeAlgorithm)) {
+            UpdateVisibilitySettings();
+        }
+        if(e.PropertyName == nameof(SelectedTypeZone)) {
+            UpdateRequiredCheckArea();
+        }
+
+    }
+
+    // Метод получения коллекции AlgorithmViewModel для TypeAlgorithms
+    private IEnumerable<AlgorithmViewModel> GetTypeAlgorithmsViewModels() {
+        var currentAlgorithmType = _buildCoordVolumesSettings.AlgorithmType;
+        var algorithmTypes = Enum.GetValues(typeof(AlgorithmType)).Cast<AlgorithmType>();
+        return algorithmTypes
+            .Select(algorithmType => new AlgorithmViewModel {
+                Name = _localizationService.GetLocalizedString($"MainViewModel.{algorithmType}"),
+                AlgorithmType = algorithmType
             })
-            .OrderByDescending(vm => vm.PositionProvider.Type == currentProvider.Type)
+            .OrderByDescending(vm => vm.AlgorithmType == currentAlgorithmType)
             .ThenBy(vm => vm.Name);
     }
 
-    // Метод получения коллекции TypeModelViewModel для TypeModels
-    private IEnumerable<TypeZoneViewModel> GetTypeZoneViewModels() {
-        var documents = FilteredDocuments.Where(vm => vm.IsChecked).Select(vm => vm.Document);
-        var param = Params.FirstOrDefault()?.ParamMap.SourceParam;
-        var typeZones = _revitRepository.GetTypeZones(param);
-        return !typeZones.Any()
-            ? []
-            : typeZones
-                .Select(value => new TypeZoneViewModel { Name = value })
-                .OrderByDescending(vm => vm.Name.Equals(_buildCoordVolumesSettings.TypeZone))
-                .ThenBy(vm => vm.Name);
+    private void UpdateRequiredCheckArea() {
+        RequiredCheckArea = true;
     }
 
-    // Метод обновления параметра в TypeZones
-    private void UpdateFilteredSlabs() {
-        FilteredSlabs.Clear();
-        Slabs = new ObservableCollection<SlabViewModel>(GetSlabViewModels());
-        FilteredSlabs = new ObservableCollection<SlabViewModel>(Slabs);
-    }
-
-    // Метод обновления параметра в FilteredSlabs
-    private void UpdateTypeZones() {
-        TypeZones.Clear();
-        TypeZones = new ObservableCollection<TypeZoneViewModel>(GetTypeZoneViewModels());
-        SelectedTypeZone = TypeZones.FirstOrDefault();
-    }
-
-    // Метод получения коллекции DocumentViewModel для Documents
-    private IEnumerable<DocumentViewModel> GetDocumentViewModels() {
-        var allDocuments = _revitRepository.GetAllDocuments();
-        var savedDocumentsNames = _buildCoordVolumesSettings.Documents
-            .Select(doc => doc.GetUniqId());
-
-        return !allDocuments.Any()
-            ? []
-            : allDocuments
-                .Select(document => new DocumentViewModel(_localizationService, document) {
-                    IsChecked = savedDocumentsNames.Contains(document.GetUniqId())
-                })
-                .OrderBy(vm => vm.Name);
-    }
-
-    // Метод получения коллекции SlabViewModel для Slabs
-    private IEnumerable<SlabViewModel> GetSlabViewModels() {
-        var documents = FilteredDocuments.Where(vm => vm.IsChecked).Select(vm => vm.Document);
-        var allSlabs = _revitRepository.GetTypeSlabs(documents);
-        var savedSlabs = _buildCoordVolumesSettings.TypeSlabs;
-        return !allSlabs.Any()
-            ? []
-            : allSlabs
-                .Select(slabType => new SlabViewModel {
-                    Name = slabType,
-                    IsChecked = savedSlabs.Contains(slabType),
-                })
-                .OrderBy(vm => vm.Name);
-    }
-
-    private void ApplySearchSlabs() {
-        FilteredSlabs = string.IsNullOrEmpty(SearchTextSlabs)
-            ? new ObservableCollection<SlabViewModel>(Slabs)
-            : new ObservableCollection<SlabViewModel>(Slabs
-                .Where(item => item.Name
-                .IndexOf(SearchTextSlabs, StringComparison.OrdinalIgnoreCase) >= 0));
-    }
-
-    private void ApplySearchDocs() {
-        FilteredDocuments = string.IsNullOrEmpty(SearchTextDocs)
-            ? new ObservableCollection<DocumentViewModel>(Documents)
-            : new ObservableCollection<DocumentViewModel>(Documents
-                .Where(item => item.Name
-                .IndexOf(SearchTextDocs, StringComparison.OrdinalIgnoreCase) >= 0));
-    }
-
+    // Метод загрузки окна
     private void LoadView() {
         LoadConfig();
+        TypeAlgorithms = new ObservableCollection<AlgorithmViewModel>(GetTypeAlgorithmsViewModels());
+        SelectedTypeAlgorithm = TypeAlgorithms.FirstOrDefault();
+
+        UpdateVisibilitySettings();
+
+        // Подписка на события для обновления IsAdvancedAlgorithm
+        PropertyChanged += OnPropertyChanged;
+
+        Params = new ObservableCollection<ParamViewModel>(GetParamViewModels());
+        // Подписка на события в ParamViewModel
+        foreach(var param in Params) {
+            param.PropertyChanged += OnParamChanged;
+        }
+        UpdateParamWarnings();
 
         Documents = new ObservableCollection<DocumentViewModel>(GetDocumentViewModels());
         FilteredDocuments = new ObservableCollection<DocumentViewModel>(Documents);
@@ -317,35 +348,52 @@ internal class MainViewModel : BaseViewModel {
             document.PropertyChanged += OnDocumentChanged;
         }
 
-        Params = new ObservableCollection<ParamViewModel>(GetParamViewModels());
-        // Подписка на события в ParamViewModel
-        foreach(var param in Params) {
-            param.PropertyChanged += OnParamChanged;
-        }
-
-        UpdateParamWarnings();
-
         TypeZones = new ObservableCollection<TypeZoneViewModel>(GetTypeZoneViewModels());
         SelectedTypeZone = TypeZones.FirstOrDefault();
 
         Slabs = new ObservableCollection<SlabViewModel>(GetSlabViewModels());
         FilteredSlabs = new ObservableCollection<SlabViewModel>(Slabs);
 
-        PositionUp = new ObservableCollection<PositionViewModel>(GetPositionViewModels(true));
-        SelectedPositionUp = PositionUp.FirstOrDefault();
-        PositionBottom = new ObservableCollection<PositionViewModel>(GetPositionViewModels(false));
-        SelectedPositionBottom = PositionBottom.FirstOrDefault();
         SearchSide = Convert.ToString(_buildCoordVolumesSettings.SearchSide);
 
+        UpdateRequiredCheckArea();
     }
+
+    // Метод проверки зон
+    private void CheckArea() {
+        // реализация проверки зон
+        RequiredCheckArea = false;
+    }
+
+    // Метод проверки возможности выполнения метода проверки зон
+    private bool CanCheckArea() {
+        return SelectedTypeZone != null;
+    }
+
+    // Основной метод
     private void AcceptView() {
         SaveConfig();
 
         var processor = new BuildCoordVolumesProcessor(_localizationService, _revitRepository, _buildCoordVolumesSettings);
-        processor.Run();
+
+        using var progressDialogService = ProgressDialogFactory.CreateDialog();
+        progressDialogService.MaxValue = processor.Areas.Count();
+        progressDialogService.StepValue = 1;
+        progressDialogService.DisplayTitleFormat = _localizationService.GetLocalizedString("MainViewModel.ProgressTitle");
+        var progress = progressDialogService.CreateProgress();
+
+        var ct = progressDialogService.CreateCancellationToken();
+        progressDialogService.Show();
+
+        processor.Run(progress, ct);
     }
 
+    // Метод проверки возможности выполнения основного метода
     private bool CanAcceptView() {
+        if(RequiredCheckArea) {
+            ErrorText = _localizationService.GetLocalizedString("MainViewModel.RequiredCheckArea");
+            return false;
+        }
         if(FilteredDocuments != null) {
             var checkedDocs = FilteredDocuments.Where(p => p.IsChecked).ToList();
             if(checkedDocs.Count == 0) {
@@ -354,6 +402,11 @@ internal class MainViewModel : BaseViewModel {
             }
         }
         if(Params != null) {
+            var firstParamMap = Params.FirstOrDefault();
+            if(firstParamMap != null && !firstParamMap.IsChecked && firstParamMap.ParamMap.Type == ParamType.DescriptionParam) {
+                ErrorText = _localizationService.GetLocalizedString("MainViewModel.NoMainParam");
+                return false;
+            }
             var checkedParams = Params.Where(p => p.IsChecked).ToList();
             if(checkedParams.Count == 0) {
                 ErrorText = _localizationService.GetLocalizedString("MainViewModel.NoParams");
@@ -396,6 +449,7 @@ internal class MainViewModel : BaseViewModel {
         return true;
     }
 
+    // Метод загрузки конфигурации пользователя
     private void LoadConfig() {
         var projectConfig = _pluginConfig.GetSettings(_revitRepository.Document);
         ConfigSettings configSettings;
@@ -409,13 +463,13 @@ internal class MainViewModel : BaseViewModel {
         _buildCoordVolumesSettings.LoadConfigSettings();
     }
 
+    // Метод сохранения конфигурации пользователя
     private void SaveConfig() {
+        _buildCoordVolumesSettings.AlgorithmType = SelectedTypeAlgorithm.AlgorithmType;
         _buildCoordVolumesSettings.Documents = FilteredDocuments.Where(vm => vm.IsChecked).Select(d => d.Document).ToList();
         _buildCoordVolumesSettings.TypeSlabs = FilteredSlabs.Where(vm => vm.IsChecked).Select(vm => vm.Name).ToList();
         _buildCoordVolumesSettings.TypeZone = SelectedTypeZone.Name;
         _buildCoordVolumesSettings.ParamMaps = Params.Where(vm => vm.IsChecked).Select(vm => vm.ParamMap).ToList();
-        _buildCoordVolumesSettings.UpPositionProvider = SelectedPositionUp.PositionProvider;
-        _buildCoordVolumesSettings.BottomPositionProvider = SelectedPositionBottom.PositionProvider;
         _buildCoordVolumesSettings.SearchSide = Convert.ToDouble(SearchSide);
         _buildCoordVolumesSettings.UpdateConfigSettings();
 

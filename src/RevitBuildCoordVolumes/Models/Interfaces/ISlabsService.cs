@@ -11,7 +11,7 @@ internal interface ISlabsService {
     /// В данном методе производится получения плиты перекрытия по имени
     /// </remarks>
     /// <returns>SlabElement</returns>
-    IEnumerable<SlabElement> GetSlabsByName(string name);
+    IEnumerable<SlabElement> GetSlabsByTypesAndDocs(IEnumerable<string> name, IEnumerable<Document> documents);
     /// <summary>
     /// Метод получения плит по имени документа
     /// </summary>    

@@ -8,7 +8,7 @@ using RevitBuildCoordVolumes.Models.Interfaces;
 namespace RevitBuildCoordVolumes.Models.Services;
 
 internal class DocumentsService : IDocumentsService {
-    private readonly Dictionary<string, Document> _documentsByName = [];
+    private readonly Dictionary<string, (Document, Transform)> _documentsByName = [];
 
     public DocumentsService(Document mainDocument) {
         BuildDocumentsDictionary(mainDocument);
@@ -21,25 +21,37 @@ internal class DocumentsService : IDocumentsService {
         }
         var foundDoc = _documentsByName
             .FirstOrDefault(dic => dic.Key.Equals(name))
-            .Value;
+            .Value.Item1;
         return foundDoc ?? null;
+    }
+
+    // Метод поиска трансформации в словаре по имени
+    public Transform GetTransformByName(string name) {
+        if(string.IsNullOrWhiteSpace(name)) {
+            return null;
+        }
+        var foundTrans = _documentsByName
+            .FirstOrDefault(dic => dic.Key.Equals(name))
+            .Value.Item2;
+        return foundTrans ?? null;
     }
 
     // Метод получения всех документов из словаря
     public IEnumerable<Document> GetAllDocuments() {
-        return _documentsByName.Values;
+        return _documentsByName.Values
+            .Select(cort => cort.Item1);
     }
 
     // Метод построения словаря
     private void BuildDocumentsDictionary(Document mainDocument) {
         _documentsByName.Clear();
-        _documentsByName[mainDocument.Title] = mainDocument;
+        _documentsByName[mainDocument.Title] = (mainDocument, null);
 
         foreach(var linkInst in GetLinkInstances(mainDocument)) {
             var doc = linkInst.GetLinkDocument();
             var trans = linkInst.GetTransform();
             if(doc != null && !_documentsByName.ContainsKey(doc.Title)) {
-                _documentsByName[doc.Title] = doc;
+                _documentsByName[doc.Title] = (doc, trans);
             }
         }
     }
@@ -59,12 +71,8 @@ internal class DocumentsService : IDocumentsService {
             LinkType = doc.GetElement(instance.GetTypeId()) as RevitLinkType
         })
         .Where(x => x.LinkType != null
-                    && !x.LinkType.IsNestedLink
+                    //&& !x.LinkType.IsNestedLink
                     && x.LinkType.GetLinkedFileStatus() == LinkedFileStatus.Loaded)
         .Select(x => x.Instance);
-    }
-
-    public Transform GetTransformByName(string name) {
-        throw new System.NotImplementedException();
     }
 }

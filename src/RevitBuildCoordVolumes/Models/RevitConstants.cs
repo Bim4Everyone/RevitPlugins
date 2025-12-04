@@ -21,7 +21,7 @@ internal static class RevitConstants {
     public const string TypeZone = "Координаты СМР";
 
     // Наиболее оптимальная сторона фигуры для поиска плиты в миллиметрах
-    public static double SearchSide = 50;
+    public static double SearchSide = 200;
 
     // Параметр, значения которого используется дли идентификации зон
     //public static RevitParam ZoneParama = SharedParamsConfig.Instance.Description;
@@ -57,7 +57,7 @@ internal static class RevitConstants {
     ];
 
     // Части имен типоразмеров плит перекрытий КР
-    private static readonly List<string> _slabTypeNames = [
+    public static readonly List<string> SlabTypeNames = [
         "(КР)",
         "КЖ",
         "кж",
@@ -73,11 +73,5 @@ internal static class RevitConstants {
     /// </summary>
     public static List<ParamMap> GetDefaultParamMaps() {
         return _allParamMaps;
-    }
-    /// <summary>
-    /// Метод получения частей имен типоразмеров перекрытий
-    /// </summary>
-    public static List<string> GetDefaultSlabTypeNames() {
-        return _slabTypeNames;
     }
 }
