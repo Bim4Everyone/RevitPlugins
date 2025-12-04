@@ -50,7 +50,7 @@ internal class ChecksEngine {
                 try {
                     bool success = rule.RootRule.Evaluate(element.Element);
                     var status = success ? StatusCode.Valid : StatusCode.Invalid;
-                    elementResults.Add(new ElementResult(element, status));
+                    elementResults.Add(new ElementResult(element, status, rule.Name));
                 } catch(ParamNotFoundException exParam) {
                     elementResults.Add(
                         new ElementResult(

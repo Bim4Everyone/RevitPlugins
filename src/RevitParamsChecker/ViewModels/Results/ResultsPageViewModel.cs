@@ -21,8 +21,9 @@ internal class ResultsPageViewModel : BaseViewModel {
         _localization = localization ?? throw new ArgumentNullException(nameof(localization));
         _checkResultsRepo = checkResultsRepo ?? throw new ArgumentNullException(nameof(checkResultsRepo));
 
-        CheckResults = [new CheckResultViewModel()]; // TODO
+        CheckResults = [.._checkResultsRepo.GetCheckResults().Select(c => new CheckResultViewModel(_localization, c))];
         RemoveCheckResultsCommand = RelayCommand.Create<IList>(RemoveCheckResults, CanRemoveChecksResults);
+        _checkResultsRepo.ResultsAdded += ResultsAddedHandler;
     }
 
     public ICommand RemoveCheckResultsCommand { get; }
@@ -38,11 +39,20 @@ internal class ResultsPageViewModel : BaseViewModel {
         var checkResults = items.OfType<CheckResultViewModel>().ToArray();
         foreach(var checkResult in checkResults) {
             CheckResults.Remove(checkResult);
+            _checkResultsRepo.RemoveCheckResult(checkResult.CheckResult);
         }
-        // TODO
     }
 
     private bool CanRemoveChecksResults(IList items) {
         return items != null && items.OfType<CheckResultViewModel>().Count() != 0;
+    }
+
+    private void ResultsAddedHandler(object sender, ResultsChangedEventArgs e) {
+        CheckResults.Clear();
+        foreach(var res in e.NewCheckResults) {
+            CheckResults.Add(new CheckResultViewModel(_localization, res));
+        }
+
+        SelectedCheckResult = CheckResults.FirstOrDefault();
     }
 }

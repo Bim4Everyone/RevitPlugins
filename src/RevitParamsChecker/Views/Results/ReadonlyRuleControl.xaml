@@ -8,12 +8,12 @@
     xmlns:core="clr-namespace:dosymep.WpfUI.Core"
     xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
     xmlns:me="clr-namespace:dosymep.WpfCore.MarkupExtensions;assembly=dosymep.WpfCore"
-    xmlns:vms="clr-namespace:RevitParamsChecker.ViewModels.Results"
+    xmlns:vms="clr-namespace:RevitParamsChecker.ViewModels.Rules"
     xmlns:rules="clr-namespace:RevitParamsChecker.Views.Rules"
     mc:Ignorable="d"
     d:DesignHeight="300"
     d:DesignWidth="300"
-    d:DataContext="{d:DesignInstance vms:RuleResultViewModel, IsDesignTimeCreatable=False}"
+    d:DataContext="{d:DesignInstance vms:RuleViewModel, IsDesignTimeCreatable=False}"
     x:ClassModifier="internal">
     <core:WpfUIPlatformUserControl.Resources>
         <ResourceDictionary>
@@ -31,7 +31,7 @@
                 Content="{Binding Name}" />
             <rules:ParamsSetUserControl
                 IsEnabled="False"
-                DataContext="{Binding  RootParamsSet}" />
+                DataContext="{Binding  RootSet}" />
         </StackPanel>
     </Border>
 </core:WpfUIPlatformUserControl>

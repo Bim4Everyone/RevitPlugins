@@ -1,20 +1,37 @@
+using System;
 using System.Collections;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Windows.Input;
 
+using dosymep.SimpleServices;
 using dosymep.WPF.Commands;
 using dosymep.WPF.ViewModels;
+
+using RevitParamsChecker.Models.Results;
+using RevitParamsChecker.ViewModels.Rules;
 
 namespace RevitParamsChecker.ViewModels.Results;
 
 internal class CheckResultViewModel : BaseViewModel {
+    private readonly ILocalizationService _localization;
     private string _elementsFilter;
 
-    public CheckResultViewModel() {
-        // TODO
-        Name = "Проверка 1";
-        ElementResults = [new ElementResultViewModel()];
+    public CheckResultViewModel(ILocalizationService localization, CheckResult checkResult) {
+        _localization = localization ?? throw new ArgumentNullException(nameof(localization));
+        CheckResult = checkResult ?? throw new ArgumentNullException(nameof(checkResult));
+        Name = CheckResult.CheckCopy.Name;
+        ElementResults = new ReadOnlyCollection<ElementResultViewModel>(
+            CheckResult.RuleResults.SelectMany(res => res.ElementResults)
+                .Select(e => new ElementResultViewModel(_localization, e))
+                .ToArray()
+        );
+        RulesStamp = new ReadOnlyCollection<RuleViewModel>(
+            CheckResult.RuleResults
+                .Select(r => new RuleViewModel(r.RuleCopy, _localization))
+                .ToArray()
+        );
         SelectElementsCommand = RelayCommand.Create<IList>(SelectElements, CanSelectElements);
     }
 
@@ -22,10 +39,15 @@ internal class CheckResultViewModel : BaseViewModel {
 
     public string Name { get; }
 
-    public ObservableCollection<RuleResultViewModel> RuleResults { get; }
+    public CheckResult CheckResult { get; }
 
-    public ObservableCollection<ElementResultViewModel> ElementResults { get; }
+    public IReadOnlyCollection<RuleViewModel> RulesStamp { get; }
 
+    public IReadOnlyCollection<ElementResultViewModel> ElementResults { get; }
+
+    /// <summary>
+    /// Фильтр для таблицы с элементами в ui
+    /// </summary>
     public string ElementsFilter {
         get => _elementsFilter;
         set => RaiseAndSetIfChanged(ref _elementsFilter, value);

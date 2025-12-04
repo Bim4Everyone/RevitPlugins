@@ -181,12 +181,14 @@ internal class ChecksPageViewModel : BaseViewModel {
         using var progressDialogService = ProgressDialogFactory.CreateDialog();
         progressDialogService.Indeterminate = true;
         var ct = progressDialogService.CreateCancellationToken();
-        progressDialogService.ShowDialog();
+        progressDialogService.Show();
 
         var checks = Checks.Where(f => f.IsSelected).Select(c => c.GetCheck()).ToArray();
         foreach(var check in checks) {
             _checksEngine.Run(check, ct);
         }
+
+        progressDialogService?.Close();
     }
 
     private bool CanExecuteChecks() {

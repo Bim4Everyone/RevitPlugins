@@ -47,6 +47,7 @@ internal class RevitRepository {
     public ICollection<ElementModel> GetElements(DocumentModel doc, Filter filter) {
         var elementFilter = filter.GetFilter();
         return new FilteredElementCollector(doc.Document)
+            .WhereElementIsNotElementType()
             .WherePasses(elementFilter)
             .ToElements()
             .Select(e => new ElementModel(

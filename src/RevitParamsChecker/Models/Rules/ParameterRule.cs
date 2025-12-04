@@ -35,7 +35,7 @@ internal class ParameterRule : ValidationRule {
         }
 
         if(!element.IsExistsParam(ParameterName)) {
-            throw new ParamNotFoundException(nameof(ParameterName));
+            throw new ParamNotFoundException(ParameterName);
         }
 
         var parameter = element.GetParam(ParameterName);
