@@ -28,6 +28,7 @@ internal class ChecksPageViewModel : BaseViewModel {
     private string[] _availableFiles;
     private string[] _availableFilters;
     private string[] _availableRules;
+    private CheckViewModel _selectedCheck;
 
     public ChecksPageViewModel(
         ILocalizationService localization,
@@ -48,6 +49,7 @@ internal class ChecksPageViewModel : BaseViewModel {
         _availableRules = [.._rulesRepo.GetRules().Select(r => r.Name)];
 
         Checks = [.._checksRepo.GetChecks().Select(c => new CheckViewModel(c)).ToArray()];
+        SelectedCheck = Checks.FirstOrDefault();
         AddCheckCommand = RelayCommand.Create(AddCheck);
         RenameCheckCommand = RelayCommand.Create<CheckViewModel>(RenameCheck, CanRenameCheck);
         RemoveChecksCommand = RelayCommand.Create<IList>(RemoveChecks, CanRemoveChecks);
@@ -81,6 +83,11 @@ internal class ChecksPageViewModel : BaseViewModel {
 
     public ObservableCollection<CheckViewModel> Checks { get; }
 
+    public CheckViewModel SelectedCheck {
+        get => _selectedCheck;
+        set => RaiseAndSetIfChanged(ref _selectedCheck, value);
+    }
+
     public bool AllSelected {
         get => _allSelected;
         set => RaiseAndSetIfChanged(ref _allSelected, value);
@@ -92,7 +99,9 @@ internal class ChecksPageViewModel : BaseViewModel {
             newCheck.Name = _nameEditorService.CreateNewName(
                 _localization.GetLocalizedString("ChecksPage.NewCheckPrompt"),
                 Checks.Select(f => f.Name).ToArray());
-            Checks.Add(new CheckViewModel(newCheck));
+            var vm = new CheckViewModel(newCheck);
+            Checks.Add(vm);
+            SelectedCheck = vm;
         } catch(OperationCanceledException) {
         }
     }
@@ -114,7 +123,9 @@ internal class ChecksPageViewModel : BaseViewModel {
                 _localization.GetLocalizedString("ChecksPage.NewCheckPrompt"),
                 Checks.Select(f => f.Name).ToArray(),
                 check.Name);
-            Checks.Add(new CheckViewModel(copyCheck));
+            var vm = new CheckViewModel(copyCheck);
+            Checks.Add(vm);
+            SelectedCheck = vm;
         } catch(OperationCanceledException) {
         }
     }
@@ -132,7 +143,8 @@ internal class ChecksPageViewModel : BaseViewModel {
         foreach(var filter in filters) {
             Checks.Remove(filter);
         }
-        // TODO
+
+        SelectedCheck = Checks.FirstOrDefault();
     }
 
     private bool CanRemoveChecks(IList items) {

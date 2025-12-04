@@ -34,6 +34,7 @@ internal class RulesPageViewModel : BaseViewModel {
             .._rulesRepo.GetRules()
                 .Select(r => new RuleViewModel(r, _localization))
         ];
+        SelectedRule = Rules.FirstOrDefault();
         AddRuleCommand = RelayCommand.Create(AddRule);
         RenameRuleCommand = RelayCommand.Create<RuleViewModel>(RenameRule, CanRenameRule);
         RemoveRulesCommand = RelayCommand.Create<IList>(RemoveRules, CanRemoveRules);
@@ -64,7 +65,9 @@ internal class RulesPageViewModel : BaseViewModel {
             newRule.Name = _nameEditorService.CreateNewName(
                 _localization.GetLocalizedString("RulesPage.NewRulePrompt"),
                 Rules.Select(f => f.Name).ToArray());
-            Rules.Add(new RuleViewModel(newRule, _localization));
+            var vm = new RuleViewModel(newRule, _localization);
+            Rules.Add(vm);
+            SelectedRule = vm;
         } catch(OperationCanceledException) {
         }
     }
@@ -86,7 +89,9 @@ internal class RulesPageViewModel : BaseViewModel {
                 _localization.GetLocalizedString("RulesPage.NewRulePrompt"),
                 Rules.Select(f => f.Name).ToArray(),
                 rule.Name);
-            Rules.Add(new RuleViewModel(copyRule, _localization));
+            var vm = new RuleViewModel(copyRule, _localization);
+            Rules.Add(vm);
+            SelectedRule = vm;
         } catch(OperationCanceledException) {
         }
     }
@@ -104,6 +109,8 @@ internal class RulesPageViewModel : BaseViewModel {
         foreach(var rule in rules) {
             Rules.Remove(rule);
         }
+
+        SelectedRule = Rules.FirstOrDefault();
     }
 
     private bool CanRemoveRules(IList items) {

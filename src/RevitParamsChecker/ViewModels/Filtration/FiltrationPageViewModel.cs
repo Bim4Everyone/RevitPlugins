@@ -17,6 +17,7 @@ internal class FiltrationPageViewModel : BaseViewModel {
     private readonly ILocalizationService _localization;
     private readonly FiltersRepository _filtersRepo;
     private readonly NameEditorService _nameEditorService;
+    private FilterViewModel _selectedFilter;
 
     public FiltrationPageViewModel(
         ILocalizationService localization,
@@ -27,7 +28,7 @@ internal class FiltrationPageViewModel : BaseViewModel {
         _nameEditorService = nameEditorService ?? throw new ArgumentNullException(nameof(nameEditorService));
 
         Filters = [.._filtersRepo.GetFilters().Select(f => new FilterViewModel(f))];
-
+        SelectedFilter = Filters.FirstOrDefault();
         AddFilterCommand = RelayCommand.Create(AddFilter);
         RenameFilterCommand = RelayCommand.Create<FilterViewModel>(RenameFilter, CanRenameFilter);
         RemoveFiltersCommand = RelayCommand.Create<IList>(RemoveFilters, CanRemoveFilters);
@@ -49,13 +50,20 @@ internal class FiltrationPageViewModel : BaseViewModel {
 
     public ObservableCollection<FilterViewModel> Filters { get; }
 
+    public FilterViewModel SelectedFilter {
+        get => _selectedFilter;
+        set => RaiseAndSetIfChanged(ref _selectedFilter, value);
+    }
+
     private void AddFilter() {
         try {
             string newName = _nameEditorService.CreateNewName(
                 _localization.GetLocalizedString("FiltersPage.NewFilterPrompt"),
                 Filters.Select(f => f.Name).ToArray());
             var filter = new Filter() { Name = newName };
-            Filters.Add(new FilterViewModel(filter));
+            var vm = new FilterViewModel(filter);
+            Filters.Add(vm);
+            SelectedFilter = vm;
         } catch(OperationCanceledException) {
         }
     }
@@ -81,7 +89,9 @@ internal class FiltrationPageViewModel : BaseViewModel {
                 _localization.GetLocalizedString("FiltersPage.NewFilterPrompt"),
                 Filters.Select(f => f.Name).ToArray(),
                 filter.Name);
-            Filters.Add(new FilterViewModel(copyFilter));
+            var vm = new FilterViewModel(copyFilter);
+            Filters.Add(vm);
+            SelectedFilter = vm;
         } catch(OperationCanceledException) {
         }
     }
@@ -95,6 +105,8 @@ internal class FiltrationPageViewModel : BaseViewModel {
         foreach(var filter in filters) {
             Filters.Remove(filter);
         }
+
+        SelectedFilter = Filters.FirstOrDefault();
     }
 
     private bool CanRemoveFilters(IList items) {

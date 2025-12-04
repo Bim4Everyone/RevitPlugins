@@ -54,7 +54,7 @@
             Grid.Row="1"
             Grid.Column="0"
             ListItemsSource="{Binding Rules}"
-            ListSelectedItem="{Binding SelectedRule, UpdateSourceTrigger=PropertyChanged}"
+            ListSelectedItem="{Binding SelectedRule}"
             AddItemCommand="{Binding AddRuleCommand}"
             RenameItemCommand="{Binding RenameRuleCommand}"
             CopyItemCommand="{Binding CopyRuleCommand}"

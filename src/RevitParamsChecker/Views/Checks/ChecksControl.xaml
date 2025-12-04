@@ -48,6 +48,7 @@
                 CanUserReorderColumns="False"
                 GridLinesVisibility="Horizontal"
                 Style="{StaticResource CustomResizableDataGridStyle}"
+                SelectedItem="{Binding SelectedCheck}"
                 ItemsSource="{Binding Checks}">
                 <ui:DataGrid.Resources>
                     <Style
