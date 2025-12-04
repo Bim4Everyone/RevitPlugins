@@ -104,33 +104,25 @@ public class RevitParamsCheckerCommand : BasePluginCommand {
     }
 
     private void BindPageViewModels(IKernel kernel) {
-        var openFileDialogCtorArg = new ConstructorArgument(
-            "openFileDialogService",
-            c => c.Kernel.Get<MainViewModel>().OpenFileDialogService);
-        var saveFileDialogCtorArg = new ConstructorArgument(
-            "saveFileDialogService",
-            c => c.Kernel.Get<MainViewModel>().SaveFileDialogService);
-        var messageBoxDialogCtorArg = new ConstructorArgument(
-            "messageBoxService",
-            c => c.Kernel.Get<MainViewModel>().MessageBoxService);
+        // если создать ConstructorArgument и прокинуть в WithConstructorArgument, почему-то не работает
         kernel.Bind<ChecksPageViewModel>()
             .ToSelf()
             .InSingletonScope()
-            .WithConstructorArgument(openFileDialogCtorArg)
-            .WithConstructorArgument(saveFileDialogCtorArg)
-            .WithConstructorArgument(messageBoxDialogCtorArg);
+            .WithConstructorArgument("openFileDialogService", c => c.Kernel.Get<MainViewModel>().OpenFileDialogService)
+            .WithConstructorArgument("saveFileDialogService", c => c.Kernel.Get<MainViewModel>().SaveFileDialogService)
+            .WithConstructorArgument("messageBoxService", c => c.Kernel.Get<MainViewModel>().MessageBoxService);
         kernel.Bind<RulesPageViewModel>()
             .ToSelf()
             .InSingletonScope()
-            .WithConstructorArgument(openFileDialogCtorArg)
-            .WithConstructorArgument(saveFileDialogCtorArg)
-            .WithConstructorArgument(messageBoxDialogCtorArg);
+            .WithConstructorArgument("openFileDialogService", c => c.Kernel.Get<MainViewModel>().OpenFileDialogService)
+            .WithConstructorArgument("saveFileDialogService", c => c.Kernel.Get<MainViewModel>().SaveFileDialogService)
+            .WithConstructorArgument("messageBoxService", c => c.Kernel.Get<MainViewModel>().MessageBoxService);
         kernel.Bind<FiltrationPageViewModel>()
             .ToSelf()
             .InSingletonScope()
-            .WithConstructorArgument(openFileDialogCtorArg)
-            .WithConstructorArgument(saveFileDialogCtorArg)
-            .WithConstructorArgument(messageBoxDialogCtorArg);
+            .WithConstructorArgument("openFileDialogService", c => c.Kernel.Get<MainViewModel>().OpenFileDialogService)
+            .WithConstructorArgument("saveFileDialogService", c => c.Kernel.Get<MainViewModel>().SaveFileDialogService)
+            .WithConstructorArgument("messageBoxService", c => c.Kernel.Get<MainViewModel>().MessageBoxService);
         kernel.Bind<ResultsPageViewModel>()
             .ToSelf()
             .InSingletonScope();
