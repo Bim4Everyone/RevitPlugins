@@ -17,7 +17,7 @@ internal class FiltrationPageViewModel : BaseViewModel {
     private readonly ILocalizationService _localization;
     private readonly FiltersRepository _filtersRepo;
     private readonly FiltersConverter _filtersConverter;
-    private readonly NameEditorService _nameEditorService;
+    private readonly NamesService _namesService;
     private FilterViewModel _selectedFilter;
 
     public FiltrationPageViewModel(
@@ -26,13 +26,13 @@ internal class FiltrationPageViewModel : BaseViewModel {
         ISaveFileDialogService saveFileDialogService,
         FiltersRepository filtersRepo,
         FiltersConverter filtersConverter,
-        NameEditorService nameEditorService) {
+        NamesService namesService) {
         OpenFileDialogService = openFileDialogService ?? throw new ArgumentNullException(nameof(openFileDialogService));
         SaveFileDialogService = saveFileDialogService ?? throw new ArgumentNullException(nameof(saveFileDialogService));
         _localization = localization ?? throw new ArgumentNullException(nameof(localization));
         _filtersRepo = filtersRepo ?? throw new ArgumentNullException(nameof(filtersRepo));
         _filtersConverter = filtersConverter ?? throw new ArgumentNullException(nameof(filtersConverter));
-        _nameEditorService = nameEditorService ?? throw new ArgumentNullException(nameof(nameEditorService));
+        _namesService = namesService ?? throw new ArgumentNullException(nameof(namesService));
 
         Filters = [.._filtersRepo.GetFilters().Select(f => new FilterViewModel(f))];
         SelectedFilter = Filters.FirstOrDefault();
@@ -66,7 +66,7 @@ internal class FiltrationPageViewModel : BaseViewModel {
 
     private void AddFilter() {
         try {
-            string newName = _nameEditorService.CreateNewName(
+            string newName = _namesService.CreateNewName(
                 _localization.GetLocalizedString("FiltersPage.NewFilterPrompt"),
                 Filters.Select(f => f.Name).ToArray());
             var filter = new Filter() { Name = newName };
@@ -79,7 +79,7 @@ internal class FiltrationPageViewModel : BaseViewModel {
 
     private void RenameFilter(FilterViewModel filter) {
         try {
-            filter.Name = _nameEditorService.CreateNewName(
+            filter.Name = _namesService.CreateNewName(
                 _localization.GetLocalizedString("FiltersPage.RenameFilterPrompt"),
                 Filters.Select(f => f.Name).ToArray(),
                 filter.Name);
@@ -94,7 +94,7 @@ internal class FiltrationPageViewModel : BaseViewModel {
     private void CopyFilter(FilterViewModel filter) {
         try {
             var copyFilter = filter.GetFilter().Copy();
-            copyFilter.Name = _nameEditorService.CreateNewName(
+            copyFilter.Name = _namesService.CreateNewName(
                 _localization.GetLocalizedString("FiltersPage.NewFilterPrompt"),
                 Filters.Select(f => f.Name).ToArray(),
                 filter.Name);

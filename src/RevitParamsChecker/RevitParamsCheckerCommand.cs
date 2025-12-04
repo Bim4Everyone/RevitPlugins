@@ -187,7 +187,7 @@ public class RevitParamsCheckerCommand : BasePluginCommand {
     }
 
     private void BindServices(IKernel kernel) {
-        kernel.Bind<NameEditorService>()
+        kernel.Bind<NamesService>()
             .ToSelf()
             .InSingletonScope();
     }

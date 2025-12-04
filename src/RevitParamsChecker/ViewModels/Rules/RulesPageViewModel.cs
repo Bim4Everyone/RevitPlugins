@@ -20,7 +20,7 @@ internal class RulesPageViewModel : BaseViewModel {
     private readonly ILocalizationService _localization;
     private readonly RulesRepository _rulesRepo;
     private readonly RulesConverter _rulesConverter;
-    private readonly NameEditorService _nameEditorService;
+    private readonly NamesService _namesService;
     private RuleViewModel _selectedRule;
 
     public RulesPageViewModel(
@@ -29,13 +29,13 @@ internal class RulesPageViewModel : BaseViewModel {
         ISaveFileDialogService saveFileDialogService,
         RulesRepository rulesRepo,
         RulesConverter rulesConverter,
-        NameEditorService nameEditorService) {
+        NamesService namesService) {
         OpenFileDialogService = openFileDialogService ?? throw new ArgumentNullException(nameof(openFileDialogService));
         SaveFileDialogService = saveFileDialogService ?? throw new ArgumentNullException(nameof(saveFileDialogService));
         _localization = localization ?? throw new ArgumentNullException(nameof(localization));
         _rulesRepo = rulesRepo ?? throw new ArgumentNullException(nameof(rulesRepo));
         _rulesConverter = rulesConverter ?? throw new ArgumentNullException(nameof(rulesConverter));
-        _nameEditorService = nameEditorService ?? throw new ArgumentNullException(nameof(nameEditorService));
+        _namesService = namesService ?? throw new ArgumentNullException(nameof(namesService));
 
         Rules = [
             .._rulesRepo.GetRules()
@@ -71,7 +71,7 @@ internal class RulesPageViewModel : BaseViewModel {
     private void AddRule() {
         try {
             var newRule = new Rule();
-            newRule.Name = _nameEditorService.CreateNewName(
+            newRule.Name = _namesService.CreateNewName(
                 _localization.GetLocalizedString("RulesPage.NewRulePrompt"),
                 Rules.Select(f => f.Name).ToArray());
             var vm = new RuleViewModel(newRule, _localization);
@@ -83,7 +83,7 @@ internal class RulesPageViewModel : BaseViewModel {
 
     private void RenameRule(RuleViewModel rule) {
         try {
-            rule.Name = _nameEditorService.CreateNewName(
+            rule.Name = _namesService.CreateNewName(
                 _localization.GetLocalizedString("RulesPage.RenameRulePrompt"),
                 Rules.Select(f => f.Name).ToArray(),
                 rule.Name);
@@ -94,7 +94,7 @@ internal class RulesPageViewModel : BaseViewModel {
     private void CopyRule(RuleViewModel rule) {
         try {
             var copyRule = rule.GetRule().Copy();
-            copyRule.Name = _nameEditorService.CreateNewName(
+            copyRule.Name = _namesService.CreateNewName(
                 _localization.GetLocalizedString("RulesPage.NewRulePrompt"),
                 Rules.Select(f => f.Name).ToArray(),
                 rule.Name);

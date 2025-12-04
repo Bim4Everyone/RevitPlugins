@@ -24,7 +24,7 @@ internal class ChecksPageViewModel : BaseViewModel {
     private readonly ChecksRepository _checksRepo;
     private readonly RevitRepository _revitRepo;
     private readonly ChecksConverter _checksConverter;
-    private readonly NameEditorService _nameEditorService;
+    private readonly NamesService _namesService;
     private bool _allSelected;
     private string[] _availableFiles;
     private string[] _availableFilters;
@@ -40,7 +40,7 @@ internal class ChecksPageViewModel : BaseViewModel {
         ChecksRepository checksRepo,
         RevitRepository revitRepo,
         ChecksConverter checksConverter,
-        NameEditorService nameEditorService) {
+        NamesService namesService) {
         OpenFileDialogService = openFileDialogService ?? throw new ArgumentNullException(nameof(openFileDialogService));
         SaveFileDialogService = saveFileDialogService ?? throw new ArgumentNullException(nameof(saveFileDialogService));
         _localization = localization ?? throw new ArgumentNullException(nameof(localization));
@@ -49,7 +49,7 @@ internal class ChecksPageViewModel : BaseViewModel {
         _checksRepo = checksRepo ?? throw new ArgumentNullException(nameof(checksRepo));
         _revitRepo = revitRepo ?? throw new ArgumentNullException(nameof(revitRepo));
         _checksConverter = checksConverter ?? throw new ArgumentNullException(nameof(checksConverter));
-        _nameEditorService = nameEditorService ?? throw new ArgumentNullException(nameof(nameEditorService));
+        _namesService = namesService ?? throw new ArgumentNullException(nameof(namesService));
 
         _availableFiles = [.._revitRepo.GetDocuments().Select(d => d.Name)];
         _availableFilters = [.._filtersRepo.GetFilters().Select(f => f.Name)];
@@ -102,7 +102,7 @@ internal class ChecksPageViewModel : BaseViewModel {
     private void AddCheck() {
         try {
             var newCheck = new Check();
-            newCheck.Name = _nameEditorService.CreateNewName(
+            newCheck.Name = _namesService.CreateNewName(
                 _localization.GetLocalizedString("ChecksPage.NewCheckPrompt"),
                 Checks.Select(f => f.Name).ToArray());
             var vm = new CheckViewModel(newCheck);
@@ -114,7 +114,7 @@ internal class ChecksPageViewModel : BaseViewModel {
 
     private void RenameCheck(CheckViewModel check) {
         try {
-            check.Name = _nameEditorService.CreateNewName(
+            check.Name = _namesService.CreateNewName(
                 _localization.GetLocalizedString("ChecksPage.RenameCheckPrompt"),
                 Checks.Select(f => f.Name).ToArray(),
                 check.Name);
@@ -125,7 +125,7 @@ internal class ChecksPageViewModel : BaseViewModel {
     private void CopyCheck(CheckViewModel check) {
         try {
             var copyCheck = check.GetCheck().Copy();
-            copyCheck.Name = _nameEditorService.CreateNewName(
+            copyCheck.Name = _namesService.CreateNewName(
                 _localization.GetLocalizedString("ChecksPage.NewCheckPrompt"),
                 Checks.Select(f => f.Name).ToArray(),
                 check.Name);
@@ -184,7 +184,7 @@ internal class ChecksPageViewModel : BaseViewModel {
 
     private async Task SetSelectedFilesAsync(CheckViewModel check) {
         try {
-            var selectedFiles = await _nameEditorService.SelectNamesAsync(
+            var selectedFiles = await _namesService.SelectNamesAsync(
                 _localization.GetLocalizedString("ChecksPage.SetSelectedFilesPrompt"),
                 _availableFiles.ToArray(),
                 check.SelectedFiles.ToArray());
@@ -195,7 +195,7 @@ internal class ChecksPageViewModel : BaseViewModel {
 
     private async Task SetSelectedFiltersAsync(CheckViewModel check) {
         try {
-            var selectedFilters = await _nameEditorService.SelectNamesAsync(
+            var selectedFilters = await _namesService.SelectNamesAsync(
                 _localization.GetLocalizedString("ChecksPage.SetSelectedFiltersPrompt"),
                 _availableFilters.ToArray(),
                 check.SelectedFilters.ToArray());
@@ -206,7 +206,7 @@ internal class ChecksPageViewModel : BaseViewModel {
 
     private async Task SetSelectedRulesAsync(CheckViewModel check) {
         try {
-            var selectedRules = await _nameEditorService.SelectNamesAsync(
+            var selectedRules = await _namesService.SelectNamesAsync(
                 _localization.GetLocalizedString("ChecksPage.SetSelectedRulesPrompt"),
                 _availableRules.ToArray(),
                 check.SelectedRules.ToArray());
