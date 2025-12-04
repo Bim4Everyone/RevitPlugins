@@ -1,0 +1,265 @@
+<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:system="clr-namespace:System;assembly=mscorlib">
+    <!-- MainWindow -->
+    <system:String x:Key="MainWindow.Title">Pylon Documentation Automation</system:String>
+    <system:String x:Key="MainWindow.Settings">Settings</system:String>
+
+    <system:String x:Key="MainWindow.PluginRun">Plugin Run</system:String>
+    <system:String x:Key="MainWindow.SettingsMenu">Settings</system:String>
+
+    <system:String x:Key="MainWindow.VerticalViews">Vertical Views</system:String>
+    <system:String x:Key="MainWindow.HorizontalViews">Horizontal Views</system:String>
+    <system:String x:Key="MainWindow.Schedules">Schedules</system:String>
+    <system:String x:Key="MainWindow.LegendsAndAnnotations">Legends and Annotations</system:String>
+    <system:String x:Key="MainWindow.PylonParameters">Pylon Parameters</system:String>
+    <system:String x:Key="MainWindow.ProjectParameters">Project Parameters</system:String>
+    <system:String x:Key="MainWindow.SheetParameters">Sheet Parameters</system:String>
+
+    <system:String x:Key="MainWindow.BimTipTitle">BIM Tip</system:String>
+    <system:String x:Key="MainWindow.BimTip1">1. Make sure that the required pylons have the parameter 'Filtration 1' filled with 'per 1 piece'</system:String>
+    <system:String x:Key="MainWindow.BimTip2">2. Make sure you have loaded the latest versions of formwork and reinforcement families from the library</system:String>
+
+    <!-- GeneralPage -->
+    <system:String x:Key="GeneralPage.PylonSelection">Pylon Selection</system:String>
+    <system:String x:Key="GeneralPage.DocumentationSet">Documentation Set:</system:String>
+    <system:String x:Key="GeneralPage.SelectPylon">Select Pylon</system:String>
+    <system:String x:Key="GeneralPage.SelectPylonMarks">Select pylon marks for processing:</system:String>
+    <system:String x:Key="GeneralPage.SearchPlaceholder">Search...</system:String>
+
+    <system:String x:Key="GeneralPage.SheetElements">Sheet Elements</system:String>
+
+    <system:String x:Key="GeneralPage.FormworkViews">Formwork Views</system:String>
+    <system:String x:Key="GeneralPage.Main">Main</system:String>
+    <system:String x:Key="GeneralPage.Side">Side</system:String>
+    <system:String x:Key="GeneralPage.Transverse1">Transverse 1</system:String>
+    <system:String x:Key="GeneralPage.Transverse2">Transverse 2</system:String>
+    <system:String x:Key="GeneralPage.Transverse3">Transverse 3</system:String>
+
+    <system:String x:Key="GeneralPage.RebarViews">Rebar Views</system:String>
+
+    <system:String x:Key="GeneralPage.ScheduleViews">Schedule Views</system:String>
+    <system:String x:Key="GeneralPage.Skeleton">Skeleton</system:String>
+    <system:String x:Key="GeneralPage.SkeletonElements">Skeleton Elements</system:String>
+    <system:String x:Key="GeneralPage.Materials">Materials</system:String>
+    <system:String x:Key="GeneralPage.SystemParts">System Parts</system:String>
+    <system:String x:Key="GeneralPage.IfcParts">IFC Parts</system:String>
+
+    <system:String x:Key="GeneralPage.OtherViews">Other Views</system:String>
+    <system:String x:Key="GeneralPage.NotesLegend">Notes Legend</system:String>
+
+    <system:String x:Key="GeneralPage.Sheet">Sheet</system:String>
+    <system:String x:Key="GeneralPage.SheetParameters">Sheet Parameters</system:String>
+    <system:String x:Key="GeneralPage.SelectTitleBlockType">Select title block type:</system:String>
+    <system:String x:Key="GeneralPage.SelectTitleBlockTypeTooltip">Select title block type</system:String>
+
+    <system:String x:Key="GeneralPage.FormworkViewTemplates">Formwork View Templates</system:String>
+    <system:String x:Key="GeneralPage.RebarViewTemplates">Rebar View Templates</system:String>
+    <system:String x:Key="GeneralPage.RebarViewTemplatesTooltip">Rebar View Templates</system:String>
+    <system:String x:Key="GeneralPage.VerticalViews">Vertical Views</system:String>
+    <system:String x:Key="GeneralPage.HorizontalViews">Horizontal Views</system:String>
+
+    <system:String x:Key="GeneralPage.Run">Run</system:String>
+    <system:String x:Key="GeneralPage.Cancel">Cancel</system:String>
+
+    <!-- VerticalViewSettingsPage -->
+    <system:String x:Key="VerticalView.FormworkMainView">Formwork Main View</system:String>
+    <system:String x:Key="VerticalView.PylonMainViewNameMask">Pylon main view name mask:</system:String>
+    <system:String x:Key="VerticalView.PylonMainViewNameMaskTooltip">Pylon main view name mask</system:String>
+    <system:String x:Key="VerticalView.PylonSideViewNameMask">Pylon side view name mask:</system:String>
+    <system:String x:Key="VerticalView.PylonSideViewNameMaskTooltip">Pylon side view name mask</system:String>
+    <system:String x:Key="VerticalView.SelectMainAndSideViewTemplate">Select template for main and side views:</system:String>
+    <system:String x:Key="VerticalView.SelectMainAndSideViewTemplateTooltip">Select template for main and side views</system:String>
+
+    <system:String x:Key="VerticalView.RebarMainView">Rebar Main View</system:String>
+    <system:String x:Key="VerticalView.PylonMainRebarViewNameMask">Pylon main rebar view name mask:</system:String>
+    <system:String x:Key="VerticalView.PylonMainRebarViewNameMaskTooltip">Pylon main rebar view name mask</system:String>
+    <system:String x:Key="VerticalView.PylonSideRebarViewNameMask">Pylon side rebar view name mask:</system:String>
+    <system:String x:Key="VerticalView.PylonSideRebarViewNameMaskTooltip">Pylon side rebar view name mask</system:String>
+    <system:String x:Key="VerticalView.SelectMainAndSideRebarViewTemplate">Select template for main and side rebar views:</system:String>
+    <system:String x:Key="VerticalView.SelectMainAndSideRebarViewTemplateTooltip">Select template for main and side rebar views</system:String>
+
+    <system:String x:Key="VerticalView.MainViewOffsets">Main View Offsets</system:String>
+    <system:String x:Key="VerticalView.MainViewXOffset">Main view X offset</system:String>
+    <system:String x:Key="VerticalView.MainViewXOffsetTooltip">Main view X offset</system:String>
+    <system:String x:Key="VerticalView.MainViewYTopOffset">Main view top Y offset</system:String>
+    <system:String x:Key="VerticalView.MainViewYTopOffsetTooltip">Main view top Y offset</system:String>
+    <system:String x:Key="VerticalView.MainViewYBottomOffset">Main view bottom Y offset</system:String>
+    <system:String x:Key="VerticalView.MainViewYBottomOffsetTooltip">Main view bottom Y offset</system:String>
+
+    <system:String x:Key="VerticalView.SideViewOffsets">Side View Offsets</system:String>
+    <system:String x:Key="VerticalView.SideViewXOffset">Side view X offset</system:String>
+    <system:String x:Key="VerticalView.SideViewXOffsetTooltip">Side view X offset</system:String>
+    <system:String x:Key="VerticalView.SideViewYTopOffset">Side view top Y offset</system:String>
+    <system:String x:Key="VerticalView.SideViewYTopOffsetTooltip">Side view top Y offset</system:String>
+    <system:String x:Key="VerticalView.SideViewYBottomOffset">Side view bottom Y offset</system:String>
+    <system:String x:Key="VerticalView.SideViewYBottomOffsetTooltip">Side view bottom Y offset</system:String>
+
+    <system:String x:Key="VerticalView.ViewTypeSize">View Type Size</system:String>
+    <system:String x:Key="VerticalView.SelectViewTypeSizeForMainAndSideViews">Select view type size for main and side views:</system:String>
+    <system:String x:Key="VerticalView.SelectViewTypeSizeForMainAndSideViewsTooltip">Select view type size for main and side views</system:String>
+
+    <!-- HorizontalViewSettingsPage -->
+    <system:String x:Key="HorizontalView.FormworkHorizontalView">Horizontal Formwork View</system:String>
+    <system:String x:Key="HorizontalView.FirstHorizontalViewNameMask">First horizontal view name mask:</system:String>
+    <system:String x:Key="HorizontalView.FirstHorizontalViewNameMaskTooltip">First horizontal view name mask</system:String>
+    <system:String x:Key="HorizontalView.SecondHorizontalViewNameMask">Second horizontal view name mask:</system:String>
+    <system:String x:Key="HorizontalView.SecondHorizontalViewNameMaskTooltip">Second horizontal view name mask</system:String>
+    <system:String x:Key="HorizontalView.ThirdHorizontalViewNameMask">Third horizontal view name mask:</system:String>
+    <system:String x:Key="HorizontalView.ThirdHorizontalViewNameMaskTooltip">Third horizontal view name mask</system:String>
+    <system:String x:Key="HorizontalView.SelectHorizontalViewTemplate">Select horizontal view template:</system:String>
+    <system:String x:Key="HorizontalView.SelectHorizontalViewTemplateTooltip">Select horizontal view template</system:String>
+    <system:String x:Key="HorizontalView.HorizontalViewDepth">Horizontal view depth</system:String>
+    <system:String x:Key="HorizontalView.HorizontalViewDepthTooltip">Horizontal view depth</system:String>
+
+    <system:String x:Key="HorizontalView.RebarHorizontalView">Horizontal Rebar View</system:String>
+    <system:String x:Key="HorizontalView.FirstRebarHorizontalViewNameMask">First horizontal rebar view name mask:</system:String>
+    <system:String x:Key="HorizontalView.FirstRebarHorizontalViewNameMaskTooltip">First horizontal view name mask</system:String>
+    <system:String x:Key="HorizontalView.SecondRebarHorizontalViewNameMask">Second horizontal rebar view name mask:</system:String>
+    <system:String x:Key="HorizontalView.SecondRebarHorizontalViewNameMaskTooltip">Second horizontal view name mask</system:String>
+    <system:String x:Key="HorizontalView.ThirdRebarHorizontalViewNameMask">Third horizontal rebar view name mask:</system:String>
+    <system:String x:Key="HorizontalView.ThirdRebarHorizontalViewNameMaskTooltip">Third horizontal view name mask</system:String>
+    <system:String x:Key="HorizontalView.SelectRebarHorizontalViewTemplate">Select horizontal rebar view template:</system:String>
+    <system:String x:Key="HorizontalView.SelectRebarHorizontalViewTemplateTooltip">Select horizontal rebar view template</system:String>
+    <system:String x:Key="HorizontalView.RebarHorizontalViewDepth">Horizontal rebar view depth</system:String>
+    <system:String x:Key="HorizontalView.RebarHorizontalViewDepthTooltip">Horizontal view depth</system:String>
+
+    <system:String x:Key="HorizontalView.HorizontalViewBottomOffsets">Horizontal view bottom offsets</system:String>
+    <system:String x:Key="HorizontalView.FirstHorizontalViewBottomOffset">Bottom offset to first horizontal view</system:String>
+    <system:String x:Key="HorizontalView.FirstHorizontalViewBottomOffsetTooltip">Bottom offset to first horizontal view</system:String>
+    <system:String x:Key="HorizontalView.SecondHorizontalViewTopOffset">Top offset to second horizontal view</system:String>
+    <system:String x:Key="HorizontalView.SecondHorizontalViewTopOffsetTooltip">Top offset to second horizontal view</system:String>
+    <system:String x:Key="HorizontalView.ThirdHorizontalViewTopOffset">Top offset to third horizontal view</system:String>
+    <system:String x:Key="HorizontalView.ThirdHorizontalViewTopOffsetTooltip">Top offset to third horizontal view</system:String>
+
+    <system:String x:Key="HorizontalView.HorizontalViewPylonOffsets">Horizontal view pylon offsets</system:String>
+    <system:String x:Key="HorizontalView.HorizontalViewXOffset">Horizontal view X offset</system:String>
+    <system:String x:Key="HorizontalView.HorizontalViewXOffsetTooltip">Horizontal view X offset</system:String>
+    <system:String x:Key="HorizontalView.HorizontalViewYOffset">Horizontal view Y offset</system:String>
+    <system:String x:Key="HorizontalView.HorizontalViewYOffsetTooltip">Horizontal view X offset</system:String>
+
+    <system:String x:Key="HorizontalView.SelectViewTypeSizeForHorizontalViews">Select view type size for horizontal views:</system:String>
+    <system:String x:Key="HorizontalView.SelectViewTypeSizeForHorizontalViewsTooltip">Select view type size for horizontal views</system:String>
+    
+    <!-- LegendViewsPage -->
+    <system:String x:Key="LegendView.NotesLegend">Notes Legend</system:String>
+    <system:String x:Key="LegendView.SelectNotesLegend">Select notes legend:</system:String>
+    <system:String x:Key="LegendView.SelectNotesLegendTooltip">Select notes legend</system:String>
+    <system:String x:Key="LegendView.XOffsetFromBottomRightCorner">X offset from bottom right corner of frame:</system:String>
+    <system:String x:Key="LegendView.XOffsetFromBottomRightCornerTooltip">X offset from bottom right corner of frame</system:String>
+    <system:String x:Key="LegendView.YOffsetFromBottomRightCorner">Y offset from bottom right corner of frame:</system:String>
+    <system:String x:Key="LegendView.YOffsetFromBottomRightCornerTooltip">Y offset from bottom right corner of frame</system:String>
+    
+    <!-- ProjectParamsPage -->
+    <system:String x:Key="ProjectParams.ProjectRelatedParameters">Parameters related to the project you are working in</system:String>
+
+    <system:String x:Key="ProjectParams.DispatcherGroupingFirstParameter">Parameter for dispatcher grouping 1:</system:String>
+    <system:String x:Key="ProjectParams.DispatcherGroupingFirstParameterTooltip">Parameter for dispatcher grouping 1</system:String>
+    <system:String x:Key="ProjectParams.DispatcherGroupingSecondParameter">Parameter for dispatcher grouping 2:</system:String>
+    <system:String x:Key="ProjectParams.DispatcherGroupingSecondParameterTooltip">Parameter for dispatcher grouping 2</system:String>
+
+    <system:String x:Key="ProjectParams.SelectDimensionTypeSize">Select dimension type size:</system:String>
+    <system:String x:Key="ProjectParams.SelectDimensionTypeSizeTooltip">Select dimension type size</system:String>
+    <system:String x:Key="ProjectParams.SelectSpotDimensionTypeSize">Select spot dimension type size:</system:String>
+    <system:String x:Key="ProjectParams.SelectSpotDimensionTypeSizeTooltip">Select spot dimension type size</system:String>
+
+    <system:String x:Key="ProjectParams.SelectRebarProductMarkTypeSize">Select rebar product mark type size:</system:String>
+    <system:String x:Key="ProjectParams.SelectRebarProductMarkTypeSizeTooltip">Select rebar product mark type size</system:String>
+    <system:String x:Key="ProjectParams.SelectRebarMarkWithSerifTypeSize">Select rebar mark with serif type size:</system:String>
+    <system:String x:Key="ProjectParams.SelectRebarMarkWithSerifTypeSizeTooltip">Select rebar mark with serif type size</system:String>
+    <system:String x:Key="ProjectParams.SelectRebarMarkWithStepTypeSize">Select rebar mark with step type size:</system:String>
+    <system:String x:Key="ProjectParams.SelectRebarMarkWithStepTypeSizeTooltip">Select rebar mark with step type size</system:String>
+    <system:String x:Key="ProjectParams.SelectRebarMarkWithCommentTypeSize">Select rebar mark with comment type size:</system:String>
+    <system:String x:Key="ProjectParams.SelectRebarMarkWithCommentTypeSizeTooltip">Select rebar mark with comment type size</system:String>
+
+    <system:String x:Key="ProjectParams.SelectUniversalMarkWithTextTypeSize">Select universal mark with text type size:</system:String>
+    <system:String x:Key="ProjectParams.SelectUniversalMarkWithTextTypeSizeTooltip">Select universal mark with text type size</system:String>
+    <system:String x:Key="ProjectParams.SelectBreakLineTypeSize">Select break line type size:</system:String>
+    <system:String x:Key="ProjectParams.SelectBreakLineTypeSizeTooltip">Select break line type size</system:String>
+    <system:String x:Key="ProjectParams.SelectConcretingJointTypeSize">Select concreting joint type size:</system:String>
+    <system:String x:Key="ProjectParams.SelectConcretingJointTypeSizeTooltip">Select concreting joint type size</system:String>
+
+    <!-- PylonParamsPage -->
+    <system:String x:Key="PylonParams.FormworkElementParameters">Parameters belonging to the pylon formwork element</system:String>
+
+    <system:String x:Key="PylonParams.PylonMarkParameter">Pylon mark parameter:</system:String>
+    <system:String x:Key="PylonParams.PylonMarkParameterTooltip">Pylon mark parameter</system:String>
+    <system:String x:Key="PylonParams.PylonDocumentationSetParameter">Pylon documentation set parameter:</system:String>
+    <system:String x:Key="PylonParams.PylonDocumentationSetParameterTooltip">Pylon documentation set parameter</system:String>
+
+    <system:String x:Key="PylonParams.TypicalPylonFilterParameter">Typical pylon filter parameter and its value:</system:String>
+    <system:String x:Key="PylonParams.TypicalPylonFilterParameterTooltip">Typical pylon filter parameter and its value</system:String>
+    <system:String x:Key="PylonParams.TypicalPylonFilterValueTooltip">Typical pylon filter parameter value</system:String>
+
+    <system:String x:Key="PylonParams.PylonSectionLengthParameter">Pylon section length parameter:</system:String>
+    <system:String x:Key="PylonParams.PylonSectionLengthParameterTooltip">Pylon section length parameter</system:String>
+    <system:String x:Key="PylonParams.PylonSectionWidthParameter">Pylon section width parameter:</system:String>
+    <system:String x:Key="PylonParams.PylonSectionWidthParameterTooltip">Pylon section width parameter</system:String>
+
+    <!-- SchedulesPage -->
+    <system:String x:Key="Schedules.SkeletonSpecification">Skeleton Specification</system:String>
+    <system:String x:Key="Schedules.SkeletonSpecNameMask">Skeleton specification name mask:</system:String>
+    <system:String x:Key="Schedules.SkeletonSpecNameMaskTooltip">Skeleton specification name mask</system:String>
+    <system:String x:Key="Schedules.ReferenceSkeletonSpecSearchName">Reference skeleton specification search name:</system:String>
+    <system:String x:Key="Schedules.ReferenceSkeletonSpecSearchNameTooltip">Reference skeleton specification search name</system:String>
+    <system:String x:Key="Schedules.DispatcherGroupingFirstParameterForSpec">To parameter for dispatcher grouping 1:</system:String>
+    <system:String x:Key="Schedules.DispatcherGroupingFirstParameterForSpecTooltip">To parameter for dispatcher grouping 1</system:String>
+    <system:String x:Key="Schedules.DispatcherGroupingSecondParameterForSpec">To parameter for dispatcher grouping 2:</system:String>
+    <system:String x:Key="Schedules.DispatcherGroupingSecondParameterForSpecTooltip">To parameter for dispatcher grouping 2</system:String>
+
+    <system:String x:Key="Schedules.SystemPartsSchedule">System Parts Schedule</system:String>
+    <system:String x:Key="Schedules.SystemPartsScheduleNameMask">System parts schedule name mask:</system:String>
+    <system:String x:Key="Schedules.SystemPartsScheduleNameMaskTooltip">System parts schedule name mask</system:String>
+    <system:String x:Key="Schedules.ReferenceSystemPartsScheduleSearchName">Reference system parts schedule search name:</system:String>
+    <system:String x:Key="Schedules.ReferenceSystemPartsScheduleSearchNameTooltip">Reference system parts schedule search name</system:String>
+    <system:String x:Key="Schedules.DispatcherGroupingFirstParameterForSchedule">To parameter for dispatcher grouping 1:</system:String>
+    <system:String x:Key="Schedules.DispatcherGroupingFirstParameterForScheduleTooltip">To parameter for dispatcher grouping 1</system:String>
+    <system:String x:Key="Schedules.DispatcherGroupingSecondParameterForSchedule">To parameter for dispatcher grouping 2:</system:String>
+    <system:String x:Key="Schedules.DispatcherGroupingSecondParameterForScheduleTooltip">To parameter for dispatcher grouping 2</system:String>
+
+    <system:String x:Key="Schedules.SkeletonElementsSpecification">Skeleton Elements Specification</system:String>
+    <system:String x:Key="Schedules.SkeletonElementsSpecNameMask">Skeleton elements specification name mask:</system:String>
+    <system:String x:Key="Schedules.SkeletonElementsSpecNameMaskTooltip">Skeleton elements specification name mask</system:String>
+    <system:String x:Key="Schedules.ReferenceSkeletonElementsSpecSearchName">Reference skeleton elements specification search name:</system:String>
+    <system:String x:Key="Schedules.ReferenceSkeletonElementsSpecSearchNameTooltip">Reference skeleton elements specification search name</system:String>
+    <system:String x:Key="Schedules.DispatcherGroupingFirstParameterForSpecElements">To parameter for dispatcher grouping 1:</system:String>
+    <system:String x:Key="Schedules.DispatcherGroupingFirstParameterForSpecElementsTooltip">To parameter for dispatcher grouping 1</system:String>
+    <system:String x:Key="Schedules.DispatcherGroupingSecondParameterForSpecElements">To parameter for dispatcher grouping 2:</system:String>
+    <system:String x:Key="Schedules.DispatcherGroupingSecondParameterForSpecElementsTooltip">To parameter for dispatcher grouping 2</system:String>
+
+    <system:String x:Key="Schedules.IfcPartsSchedule">IFC Parts Schedule</system:String>
+    <system:String x:Key="Schedules.IfcPartsScheduleNameMask">IFC parts schedule name mask:</system:String>
+    <system:String x:Key="Schedules.IfcPartsScheduleNameMaskTooltip">IFC parts schedule name mask</system:String>
+    <system:String x:Key="Schedules.ReferenceIfcPartsScheduleSearchName">Reference IFC parts schedule search name:</system:String>
+    <system:String x:Key="Schedules.ReferenceIfcPartsScheduleSearchNameTooltip">Reference IFC parts schedule search name</system:String>
+    <system:String x:Key="Schedules.DispatcherGroupingFirstParameterForIfcSchedule">To parameter for dispatcher grouping 1:</system:String>
+    <system:String x:Key="Schedules.DispatcherGroupingFirstParameterForIfcScheduleTooltip">To parameter for dispatcher grouping 1</system:String>
+    <system:String x:Key="Schedules.DispatcherGroupingSecondParameterForIfcSchedule">To parameter for dispatcher grouping 2:</system:String>
+    <system:String x:Key="Schedules.DispatcherGroupingSecondParameterForIfcScheduleTooltip">To parameter for dispatcher grouping 2</system:String>
+
+    <system:String x:Key="Schedules.MaterialsSpecification">Materials Specification</system:String>
+    <system:String x:Key="Schedules.MaterialsSpecNameMask">Materials specification name mask:</system:String>
+    <system:String x:Key="Schedules.MaterialsSpecNameMaskTooltip">Materials specification name mask</system:String>
+    <system:String x:Key="Schedules.ReferenceMaterialsSpecSearchName">Reference materials specification search name:</system:String>
+    <system:String x:Key="Schedules.ReferenceMaterialsSpecSearchNameTooltip">Reference materials specification search name</system:String>
+    <system:String x:Key="Schedules.DispatcherGroupingFirstParameterForMaterials">To parameter for dispatcher grouping 1:</system:String>
+    <system:String x:Key="Schedules.DispatcherGroupingFirstParameterForMaterialsTooltip">To parameter for dispatcher grouping 1</system:String>
+    <system:String x:Key="Schedules.DispatcherGroupingSecondParameterForMaterials">To parameter for dispatcher grouping 2:</system:String>
+    <system:String x:Key="Schedules.DispatcherGroupingSecondParameterForMaterialsTooltip">To parameter for dispatcher grouping 2</system:String>
+
+    <system:String x:Key="Schedules.ScheduleFilterParametersList">Schedule filter parameters list</system:String>
+
+    <system:String x:Key="Schedules.Add">Add</system:String>
+    <system:String x:Key="Schedules.Delete">Delete</system:String>
+
+    <!-- SheetParamsPage -->
+    <system:String x:Key="SheetParams.SheetCreationRules">Rules for creating new sheets in the project</system:String>
+
+    <system:String x:Key="SheetParams.PylonSheetNameMask">Pylon sheet name mask:</system:String>
+    <system:String x:Key="SheetParams.PylonSheetNameMaskTooltip">Pylon sheet name mask</system:String>
+
+    <system:String x:Key="SheetParams.SheetSizeParameter">Parameter for sheet frame format:</system:String>
+    <system:String x:Key="SheetParams.SheetSizeParameterTooltip">Parameter for sheet frame format</system:String>
+    <system:String x:Key="SheetParams.SheetCoefficientParameter">Parameter for sheet frame format multiplier:</system:String>
+    <system:String x:Key="SheetParams.SheetCoefficientParameterTooltip">Parameter for sheet frame format multiplier</system:String>
+</ResourceDictionary>

@@ -31,7 +31,7 @@
             </ResourceDictionary.MergedDictionaries>
         </ResourceDictionary>
     </core:WpfUIPlatformPage.Resources>
-    
+
     <ui:PassiveScrollViewer>
         <Grid>
             <Grid.RowDefinitions>
@@ -45,8 +45,8 @@
                 Style="{StaticResource CustomBorder}">
                 <StackPanel>
                     <controls:SettingsTitleControl
-                        LabelText="Параметры, относящиеся к проекту, в котором вы работаете"
-                        ToolTipText="Параметры, относящиеся к проекту, в котором вы работаете"
+                        LabelText="{me:LocalizationSource ProjectParams.ProjectRelatedParameters}"
+                        ToolTipText="{me:LocalizationSource ProjectParams.ProjectRelatedParameters}"
                         ButtonCommand="{Binding ApplySettingsCommand}"
                         ButtonMouseLeaveCommand="{Binding CheckSettingsCommand}" />
 
@@ -58,16 +58,16 @@
 
                         <controls:TextBoxSettingControl
                             Grid.Column="0"
-                            LabelText="Параметр для группировки диспетчера 1:"
+                            LabelText="{me:LocalizationSource ProjectParams.DispatcherGroupingFirstParameter}"
                             TextBoxText="{Binding Path=ProjectSettings.DispatcherGroupingFirstTemp, UpdateSourceTrigger=PropertyChanged}"
-                            ToolTipText="Параметр для группировки диспетчера 1"
+                            ToolTipText="{me:LocalizationSource ProjectParams.DispatcherGroupingFirstParameterTooltip}"
                             TextChangedCommand="{Binding SettingsChangedCommand}" />
 
                         <controls:TextBoxSettingControl
                             Grid.Column="1"
-                            LabelText="Параметр для группировки диспетчера 2:"
+                            LabelText="{me:LocalizationSource ProjectParams.DispatcherGroupingSecondParameter}"
                             TextBoxText="{Binding Path=ProjectSettings.DispatcherGroupingSecondTemp, UpdateSourceTrigger=PropertyChanged}"
-                            ToolTipText="Параметр для группировки диспетчера 2"
+                            ToolTipText="{me:LocalizationSource ProjectParams.DispatcherGroupingSecondParameterTooltip}"
                             TextChangedCommand="{Binding SettingsChangedCommand}" />
                     </Grid>
 
@@ -81,19 +81,19 @@
 
                         <controls:ComboBoxSettingControl
                             Grid.Column="0"
-                            LabelText="Выберите типоразмер размера:"
+                            LabelText="{me:LocalizationSource ProjectParams.SelectDimensionTypeSize}"
                             ItemsSource="{Binding DimensionTypes}"
                             SelectedItem="{Binding TypesSettings.SelectedDimensionType}"
-                            ToolTipText="Выберите типоразмер размера"
+                            ToolTipText="{me:LocalizationSource ProjectParams.SelectDimensionTypeSizeTooltip}"
                             SelectionChangedCommand="{Binding SettingsChangedCommand}"
                             ItemTemplate="{StaticResource WithoutFamilyNameItemTemplate}" />
 
                         <controls:ComboBoxSettingControl
                             Grid.Column="1"
-                            LabelText="Выберите типоразмер высотной отметки:"
+                            LabelText="{me:LocalizationSource ProjectParams.SelectSpotDimensionTypeSize}"
                             ItemsSource="{Binding SpotDimensionTypes}"
                             SelectedItem="{Binding TypesSettings.SelectedSpotDimensionType}"
-                            ToolTipText="Выберите типоразмер высотной отметки"
+                            ToolTipText="{me:LocalizationSource ProjectParams.SelectSpotDimensionTypeSizeTooltip}"
                             SelectionChangedCommand="{Binding SettingsChangedCommand}"
                             ItemTemplate="{StaticResource WithoutFamilyNameItemTemplate}" />
                     </Grid>
@@ -108,19 +108,19 @@
 
                         <controls:ComboBoxSettingControl
                             Grid.Column="0"
-                            LabelText="Выберите типоразмер марки арматурного изделия:"
+                            LabelText="{me:LocalizationSource ProjectParams.SelectRebarProductMarkTypeSize}"
                             ItemsSource="{Binding RebarTagTypes}"
                             SelectedItem="{Binding TypesSettings.SelectedSkeletonTagType}"
-                            ToolTipText="Выберите типоразмер марки арматурного изделия"
+                            ToolTipText="{me:LocalizationSource ProjectParams.SelectRebarProductMarkTypeSizeTooltip}"
                             SelectionChangedCommand="{Binding SettingsChangedCommand}"
                             ItemTemplate="{StaticResource WithoutFamilyNameItemTemplate}" />
 
                         <controls:ComboBoxSettingControl
                             Grid.Column="1"
-                            LabelText="Выберите типоразмер марки арматуры с засечкой:"
+                            LabelText="{me:LocalizationSource ProjectParams.SelectRebarMarkWithSerifTypeSize}"
                             ItemsSource="{Binding RebarTagTypes}"
                             SelectedItem="{Binding TypesSettings.SelectedRebarTagTypeWithSerif}"
-                            ToolTipText="Выберите типоразмер марки арматуры с засечкой"
+                            ToolTipText="{me:LocalizationSource ProjectParams.SelectRebarMarkWithSerifTypeSizeTooltip}"
                             SelectionChangedCommand="{Binding SettingsChangedCommand}"
                             ItemTemplate="{StaticResource WithoutFamilyNameItemTemplate}" />
                     </Grid>
@@ -135,19 +135,19 @@
 
                         <controls:ComboBoxSettingControl
                             Grid.Column="0"
-                            LabelText="Выберите типоразмер марки арматуры с шагом:"
+                            LabelText="{me:LocalizationSource ProjectParams.SelectRebarMarkWithStepTypeSize}"
                             ItemsSource="{Binding RebarTagTypes}"
                             SelectedItem="{Binding TypesSettings.SelectedRebarTagTypeWithStep}"
-                            ToolTipText="Выберите типоразмер марки арматуры с шагом"
+                            ToolTipText="{me:LocalizationSource ProjectParams.SelectRebarMarkWithStepTypeSizeTooltip}"
                             SelectionChangedCommand="{Binding SettingsChangedCommand}"
                             ItemTemplate="{StaticResource WithoutFamilyNameItemTemplate}" />
 
                         <controls:ComboBoxSettingControl
                             Grid.Column="1"
-                            LabelText="Выберите типоразмер марки арматуры с комментарием:"
+                            LabelText="{me:LocalizationSource ProjectParams.SelectRebarMarkWithCommentTypeSize}"
                             ItemsSource="{Binding RebarTagTypes}"
                             SelectedItem="{Binding TypesSettings.SelectedRebarTagTypeWithComment}"
-                            ToolTipText="Выберите типоразмер марки арматуры с комментарием"
+                            ToolTipText="{me:LocalizationSource ProjectParams.SelectRebarMarkWithCommentTypeSizeTooltip}"
                             SelectionChangedCommand="{Binding SettingsChangedCommand}"
                             ItemTemplate="{StaticResource WithoutFamilyNameItemTemplate}" />
                     </Grid>
@@ -162,19 +162,19 @@
 
                         <controls:ComboBoxSettingControl
                             Grid.Column="0"
-                            LabelText="Выберите типоразмер универсальной марки с текстом:"
+                            LabelText="{me:LocalizationSource ProjectParams.SelectUniversalMarkWithTextTypeSize}"
                             ItemsSource="{Binding TypicalAnnotationsTypes}"
                             SelectedItem="{Binding TypesSettings.SelectedUniversalTagType}"
-                            ToolTipText="Выберите типоразмер универсальной марки с текстом"
+                            ToolTipText="{me:LocalizationSource ProjectParams.SelectUniversalMarkWithTextTypeSizeTooltip}"
                             SelectionChangedCommand="{Binding SettingsChangedCommand}"
                             ItemTemplate="{StaticResource WithoutFamilyNameItemTemplate}" />
 
                         <controls:ComboBoxSettingControl
                             Grid.Column="1"
-                            LabelText="Выберите типоразмер линии обрыва:"
+                            LabelText="{me:LocalizationSource ProjectParams.SelectBreakLineTypeSize}"
                             ItemsSource="{Binding DetailComponentsTypes}"
                             SelectedItem="{Binding TypesSettings.SelectedBreakLineType}"
-                            ToolTipText="Выберите типоразмер линии обрыва"
+                            ToolTipText="{me:LocalizationSource ProjectParams.SelectBreakLineTypeSizeTooltip}"
                             SelectionChangedCommand="{Binding SettingsChangedCommand}"
                             ItemTemplate="{StaticResource WithoutFamilyNameItemTemplate}" />
                     </Grid>
@@ -189,10 +189,10 @@
 
                         <controls:ComboBoxSettingControl
                             Grid.Column="0"
-                            LabelText="Выберите типоразмер рабочего шва бетонирования:"
+                            LabelText="{me:LocalizationSource ProjectParams.SelectConcretingJointTypeSize}"
                             ItemsSource="{Binding DetailComponentsTypes}"
                             SelectedItem="{Binding TypesSettings.SelectedConcretingJointType}"
-                            ToolTipText="Выберите типоразмер рабочего шва бетонирования"
+                            ToolTipText="{me:LocalizationSource ProjectParams.SelectConcretingJointTypeSizeTooltip}"
                             SelectionChangedCommand="{Binding SettingsChangedCommand}"
                             ItemTemplate="{StaticResource WithoutFamilyNameItemTemplate}" />
                     </Grid>
@@ -205,7 +205,7 @@
                 HorizontalAlignment="Right"
                 ErrorText="{Binding ErrorText}"
                 ShowOkButton="False"
-                CancelButtonText="Отмена" />
+                CancelButtonText="{me:LocalizationSource GeneralPage.Cancel}" />
         </Grid>
     </ui:PassiveScrollViewer>
 </core:WpfUIPlatformPage>

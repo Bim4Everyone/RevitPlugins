@@ -58,7 +58,7 @@ public class RevitPylonDocumentationCommand : BasePluginCommand {
         // Настройка локализации,
         // установка дефолтной локализации "ru-RU"
         kernel.UseWpfLocalization(
-            $"/{assemblyName};component/assets/localization/Language.xaml",
+            $"/{assemblyName};component/assets/localizations/Language.xaml",
             CultureInfo.GetCultureInfo("ru-RU"));
 
         // Вызывает стандартное уведомление

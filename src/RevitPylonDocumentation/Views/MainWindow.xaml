@@ -62,14 +62,14 @@
 
         <ui:TitleBar
             Grid.Row="0"
-            Title="Title" />
+            Title="{me:LocalizationSource MainWindow.Title}" />
 
         <ui:NavigationView
             Grid.Row="1"
             x:Name="_rootNavigationView"
             FrameMargin="0"
             PaneDisplayMode="Left"
-            PaneTitle="Настройки"
+            PaneTitle="{me:LocalizationSource MainWindow.Settings}"
             OpenPaneLength="300"
             IsPaneOpen="True"
             IsBackButtonVisible="Collapsed"
@@ -77,41 +77,41 @@
             IsPaneToggleVisible="False">
             <ui:NavigationView.MenuItems>
                 <ui:NavigationViewItem
-                    Content="Запуск плагина"
+                    Content="{me:LocalizationSource MainWindow.PluginRun}"
                     Icon="{ui:SymbolIcon Home24}"
                     TargetPageType="{x:Type pages:GeneralPage}" />
-                
+
                 <ui:NavigationViewItem
-                    Content="Настройки"
+                    Content="{me:LocalizationSource MainWindow.SettingsMenu}"
                     Icon="{ui:SymbolIcon Settings24}"
                     IsExpanded="True">
                     <ui:NavigationViewItem.MenuItems >
                         <ui:NavigationViewItem
-                            Content="Вертикальные виды"
+                            Content="{me:LocalizationSource MainWindow.VerticalViews}"
                             Icon="{ui:SymbolIcon CenterHorizontal24}"
                             TargetPageType="{x:Type pages:VerticalViewSettingsPage}" />
                         <ui:NavigationViewItem
-                            Content="Горизонтальные виды"
+                            Content="{me:LocalizationSource MainWindow.HorizontalViews}"
                             Icon="{ui:SymbolIcon CenterVertical24}"
                             TargetPageType="{x:Type pages:HorizontalViewSettingsPage}" />
                         <ui:NavigationViewItem
-                            Content="Спецификации"
+                            Content="{me:LocalizationSource MainWindow.Schedules}"
                             Icon="{ui:SymbolIcon TableSettings24}"
                             TargetPageType="{x:Type pages:SchedulesPage}" />
                         <ui:NavigationViewItem
-                            Content="Легенды и типовые аннотации"
+                            Content="{me:LocalizationSource MainWindow.LegendsAndAnnotations}"
                             Icon="{ui:SymbolIcon BarcodeScanner24}"
                             TargetPageType="{x:Type pages:LegendViewsPage}" />
                         <ui:NavigationViewItem
-                            Content="Параметры пилона"
+                            Content="{me:LocalizationSource MainWindow.PylonParameters}"
                             Icon="{ui:SymbolIcon PauseSettings20}"
                             TargetPageType="{x:Type pages:PylonParamsPage}" />
                         <ui:NavigationViewItem
-                            Content="Параметры проекта"
+                            Content="{me:LocalizationSource MainWindow.ProjectParameters}"
                             Icon="{ui:SymbolIcon ArchiveSettings24}"
                             TargetPageType="{x:Type pages:ProjectParamsPage}" />
                         <ui:NavigationViewItem
-                            Content="Параметры листов"
+                            Content="{me:LocalizationSource MainWindow.SheetParameters}"
                             Icon="{ui:SymbolIcon DocumentSettings20}"
                             TargetPageType="{x:Type pages:SheetParamsPage}" />
                     </ui:NavigationViewItem.MenuItems>
@@ -126,25 +126,25 @@
                             Margin="5"
                             FontWeight="Medium"
                             Foreground="{ui:ThemeResource TextFillColorSecondaryBrush}"
-                            Text="💡  BIM-Совет" />
+                            Text="{me:LocalizationSource MainWindow.BimTipTitle}" />
 
                         <TextBlock
                             Margin="5"
                             TextWrapping="WrapWithOverflow"
                             Foreground="{ui:ThemeResource TextFillColorSecondaryBrush}"
-                            Text="1. Убедитесь, что у нужных пилонов параметр 'обр_ФОП_Фильтрация 1' заполнен 'на 1 шт.'" />
+                            Text="{me:LocalizationSource MainWindow.BimTip1}" />
 
                         <TextBlock
                             Margin="5"
                             TextWrapping="WrapWithOverflow"
                             Foreground="{ui:ThemeResource TextFillColorSecondaryBrush}"
-                            Text="2. Убедитесь, что загрузили последние версии семейств опалубки и армирования из библиотеки" />
+                            Text="{me:LocalizationSource MainWindow.BimTip2}" />
                     </StackPanel>
                 </Border>
             </ui:NavigationView.PaneFooter>
         </ui:NavigationView>
     </Grid>
-    
+
 
     <!--<Border
         CornerRadius="10"

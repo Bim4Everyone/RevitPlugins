@@ -292,7 +292,13 @@ internal class PluginConfig : ProjectConfig<PluginSettings> {
         settings.GeneralViewPerpendicularPrefix = viewSectionSettings.GeneralViewPerpendicularPrefix;
         settings.GeneralViewPerpendicularSuffix = viewSectionSettings.GeneralViewPerpendicularSuffix;
         settings.GeneralViewTemplateName = viewSectionSettings.GeneralViewTemplateName;
+
+        settings.GeneralRebarViewPrefix = viewSectionSettings.GeneralRebarViewPrefix;
+        settings.GeneralRebarViewSuffix = viewSectionSettings.GeneralRebarViewSuffix;
+        settings.GeneralRebarViewPerpendicularPrefix = viewSectionSettings.GeneralRebarViewPerpendicularPrefix;
+        settings.GeneralRebarViewPerpendicularSuffix = viewSectionSettings.GeneralRebarViewPerpendicularSuffix;
         settings.GeneralRebarViewTemplateName = viewSectionSettings.GeneralRebarViewTemplateName;
+
         settings.GeneralViewXOffset = viewSectionSettings.GeneralViewXOffset;
         settings.GeneralViewYTopOffset = viewSectionSettings.GeneralViewYTopOffset;
         settings.GeneralViewYBottomOffset = viewSectionSettings.GeneralViewYBottomOffset;
@@ -316,6 +322,8 @@ internal class PluginConfig : ProjectConfig<PluginSettings> {
         settings.TransverseRebarViewFirstSuffix = viewSectionSettings.TransverseRebarViewFirstSuffix;
         settings.TransverseRebarViewSecondPrefix = viewSectionSettings.TransverseRebarViewSecondPrefix;
         settings.TransverseRebarViewSecondSuffix = viewSectionSettings.TransverseRebarViewSecondSuffix;
+        settings.TransverseRebarViewThirdPrefix = viewSectionSettings.TransverseRebarViewThirdPrefix;
+        settings.TransverseRebarViewThirdSuffix = viewSectionSettings.TransverseRebarViewThirdSuffix;
 
         settings.TransverseViewTemplateName = viewSectionSettings.TransverseViewTemplateName;
         settings.TransverseRebarViewTemplateName = viewSectionSettings.TransverseRebarViewTemplateName;
@@ -410,6 +418,10 @@ internal class PluginSettings : ProjectSettings {
     public string GeneralViewSuffix { get; set; }
     public string GeneralViewPerpendicularPrefix { get; set; }
     public string GeneralViewPerpendicularSuffix { get; set; }
+    public string GeneralRebarViewPrefix { get; set; }
+    public string GeneralRebarViewSuffix { get; set; }
+    public string GeneralRebarViewPerpendicularPrefix { get; set; }
+    public string GeneralRebarViewPerpendicularSuffix { get; set; }
     public string GeneralViewTemplateName { get; set; }
     public string GeneralRebarViewTemplateName { get; set; }
     public string GeneralViewXOffset { get; set; }
@@ -433,6 +445,8 @@ internal class PluginSettings : ProjectSettings {
     public string TransverseRebarViewFirstSuffix { get; set; }
     public string TransverseRebarViewSecondPrefix { get; set; }
     public string TransverseRebarViewSecondSuffix { get; set; }
+    public string TransverseRebarViewThirdPrefix { get; set; }
+    public string TransverseRebarViewThirdSuffix { get; set; }
     public string TransverseViewTemplateName { get; set; }
     public string TransverseRebarViewTemplateName { get; set; }
     public string TransverseViewXOffset { get; set; }

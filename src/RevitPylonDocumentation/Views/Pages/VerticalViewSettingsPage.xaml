@@ -31,7 +31,7 @@
             </ResourceDictionary.MergedDictionaries>
         </ResourceDictionary>
     </core:WpfUIPlatformPage.Resources>
-    
+
     <Grid>
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="*" />
@@ -52,30 +52,30 @@
             Style="{StaticResource CustomBorder}">
             <StackPanel>
                 <controls:SettingsTitleControl
-                    LabelText="Основной вид опалубки"
-                    ToolTipText="Основной вид опалубки"
+                    LabelText="{me:LocalizationSource VerticalView.FormworkMainView}"
+                    ToolTipText="{me:LocalizationSource VerticalView.FormworkMainView}"
                     ButtonCommand="{Binding ApplySettingsCommand}"
                     ButtonMouseLeaveCommand="{Binding CheckSettingsCommand}" />
 
                 <controls:DoubleTextBoxSettingControl
-                    LabelText="Маска имени основного вида пилона:"
+                    LabelText="{me:LocalizationSource VerticalView.PylonMainViewNameMask}"
                     FirstTextBoxText="{Binding Path=ViewSectionSettings.GeneralViewPrefixTemp, UpdateSourceTrigger=PropertyChanged}"
                     SecondTextBoxText="{Binding Path=ViewSectionSettings.GeneralViewSuffixTemp, UpdateSourceTrigger=PropertyChanged}"
-                    ToolTipText="Маска имени основного вида пилона"
+                    ToolTipText="{me:LocalizationSource VerticalView.PylonMainViewNameMaskTooltip}"
                     TextChangedCommand="{Binding SettingsChangedCommand}" />
-                
+
                 <controls:DoubleTextBoxSettingControl
-                    LabelText="Маска имени бокового вида пилона:"
+                    LabelText="{me:LocalizationSource VerticalView.PylonSideViewNameMask}"
                     FirstTextBoxText="{Binding Path=ViewSectionSettings.GeneralViewPerpendicularPrefixTemp, UpdateSourceTrigger=PropertyChanged}"
                     SecondTextBoxText="{Binding Path=ViewSectionSettings.GeneralViewPerpendicularSuffixTemp, UpdateSourceTrigger=PropertyChanged}"
-                    ToolTipText="Маска имени бокового вида пилона"
+                    ToolTipText="{me:LocalizationSource VerticalView.PylonSideViewNameMaskTooltip}"
                     TextChangedCommand="{Binding SettingsChangedCommand}" />
 
                 <controls:ComboBoxSettingControl
-                    LabelText="Выберите шаблон основного и бокового вида:"
+                    LabelText="{me:LocalizationSource VerticalView.SelectMainAndSideViewTemplate}"
                     ItemsSource="{Binding ViewTemplatesInPj}"
                     SelectedItem="{Binding TypesSettings.SelectedGeneralViewTemplate}"
-                    ToolTipText="Выберите шаблон основного и бокового вида"
+                    ToolTipText="{me:LocalizationSource VerticalView.SelectMainAndSideViewTemplateTooltip}"
                     SelectionChangedCommand="{Binding SettingsChangedCommand}"
                     ItemTemplate="{StaticResource WithoutFamilyNameItemTemplate}" />
             </StackPanel>
@@ -88,30 +88,30 @@
             Style="{StaticResource CustomBorder}">
             <StackPanel>
                 <controls:SettingsTitleControl
-                    LabelText="Основной вид армирования"
-                    ToolTipText="Основной вид армирования"
+                    LabelText="{me:LocalizationSource VerticalView.RebarMainView}"
+                    ToolTipText="{me:LocalizationSource VerticalView.RebarMainView}"
                     ButtonCommand="{Binding ApplySettingsCommand}"
                     ButtonMouseLeaveCommand="{Binding CheckSettingsCommand}" />
 
                 <controls:DoubleTextBoxSettingControl
-                    LabelText="Маска имени основного вида армирования пилона:"
+                    LabelText="{me:LocalizationSource VerticalView.PylonMainRebarViewNameMask}"
                     FirstTextBoxText="{Binding Path=ViewSectionSettings.GeneralRebarViewPrefixTemp, UpdateSourceTrigger=PropertyChanged}"
                     SecondTextBoxText="{Binding Path=ViewSectionSettings.GeneralRebarViewSuffixTemp, UpdateSourceTrigger=PropertyChanged}"
-                    ToolTipText="Маска имени основного вида армирования пилона"
+                    ToolTipText="{me:LocalizationSource VerticalView.PylonMainRebarViewNameMaskTooltip}"
                     TextChangedCommand="{Binding SettingsChangedCommand}" />
-                
+
                 <controls:DoubleTextBoxSettingControl
-                    LabelText="Маска имени бокового вида армирования пилона:"
+                    LabelText="{me:LocalizationSource VerticalView.PylonSideRebarViewNameMask}"
                     FirstTextBoxText="{Binding Path=ViewSectionSettings.GeneralRebarViewPerpendicularPrefixTemp, UpdateSourceTrigger=PropertyChanged}"
                     SecondTextBoxText="{Binding Path=ViewSectionSettings.GeneralRebarViewPerpendicularSuffixTemp, UpdateSourceTrigger=PropertyChanged}"
-                    ToolTipText="Маска имени бокового вида армирования пилона"
+                    ToolTipText="{me:LocalizationSource VerticalView.PylonSideRebarViewNameMaskTooltip}"
                     TextChangedCommand="{Binding SettingsChangedCommand}" />
 
                 <controls:ComboBoxSettingControl
-                    LabelText="Выберите шаблон основного и бокового вида армирования:"
+                    LabelText="{me:LocalizationSource VerticalView.SelectMainAndSideRebarViewTemplate}"
                     ItemsSource="{Binding ViewTemplatesInPj}"
                     SelectedItem="{Binding TypesSettings.SelectedGeneralRebarViewTemplate}"
-                    ToolTipText="Выберите шаблон основного и бокового вида армирования"
+                    ToolTipText="{me:LocalizationSource VerticalView.SelectMainAndSideRebarViewTemplateTooltip}"
                     SelectionChangedCommand="{Binding SettingsChangedCommand}"
                     ItemTemplate="{StaticResource WithoutFamilyNameItemTemplate}" />
             </StackPanel>
@@ -124,27 +124,27 @@
             Style="{StaticResource CustomBorder}">
             <StackPanel>
                 <controls:SettingsTitleControl
-                    LabelText="Отступы основного вида"
-                    ToolTipText="Отступы основного вида"
+                    LabelText="{me:LocalizationSource VerticalView.MainViewOffsets}"
+                    ToolTipText="{me:LocalizationSource VerticalView.MainViewOffsets}"
                     ButtonCommand="{Binding ApplySettingsCommand}"
                     ButtonMouseLeaveCommand="{Binding CheckSettingsCommand}" />
-                
+
                 <controls:TextBoxSettingControl
-                    LabelText="Отступ по X у основного вида"
+                    LabelText="{me:LocalizationSource VerticalView.MainViewXOffset}"
                     TextBoxText="{Binding Path=ViewSectionSettings.GeneralViewXOffsetTemp, UpdateSourceTrigger=PropertyChanged}"
-                    ToolTipText="Отступ по X у основного вида"
+                    ToolTipText="{me:LocalizationSource VerticalView.MainViewXOffsetTooltip}"
                     TextChangedCommand="{Binding SettingsChangedCommand}" />
-                
+
                 <controls:TextBoxSettingControl
-                    LabelText="Отступ по Y сверху у основного вида"
+                    LabelText="{me:LocalizationSource VerticalView.MainViewYTopOffset}"
                     TextBoxText="{Binding Path=ViewSectionSettings.GeneralViewYTopOffsetTemp, UpdateSourceTrigger=PropertyChanged}"
-                    ToolTipText="Отступ по Y сверху у основного вида"
+                    ToolTipText="{me:LocalizationSource VerticalView.MainViewYTopOffsetTooltip}"
                     TextChangedCommand="{Binding SettingsChangedCommand}" />
-                
+
                 <controls:TextBoxSettingControl
-                    LabelText="Отступ по Y снизу у основного вида"
+                    LabelText="{me:LocalizationSource VerticalView.MainViewYBottomOffset}"
                     TextBoxText="{Binding Path=ViewSectionSettings.GeneralViewYBottomOffsetTemp, UpdateSourceTrigger=PropertyChanged}"
-                    ToolTipText="Отступ по Y снизу у основного вида"
+                    ToolTipText="{me:LocalizationSource VerticalView.MainViewYBottomOffsetTooltip}"
                     TextChangedCommand="{Binding SettingsChangedCommand}" />
             </StackPanel>
         </Border>
@@ -156,27 +156,27 @@
             Style="{StaticResource CustomBorder}">
             <StackPanel>
                 <controls:SettingsTitleControl
-                    LabelText="Отступы бокового вида"
-                    ToolTipText="Отступы бокового вида"
+                    LabelText="{me:LocalizationSource VerticalView.SideViewOffsets}"
+                    ToolTipText="{me:LocalizationSource VerticalView.SideViewOffsets}"
                     ButtonCommand="{Binding ApplySettingsCommand}"
                     ButtonMouseLeaveCommand="{Binding CheckSettingsCommand}" />
-                
+
                 <controls:TextBoxSettingControl
-                    LabelText="Отступ по X у бокового вида"
+                    LabelText="{me:LocalizationSource VerticalView.SideViewXOffset}"
                     TextBoxText="{Binding Path=ViewSectionSettings.GeneralViewPerpXOffsetTemp, UpdateSourceTrigger=PropertyChanged}"
-                    ToolTipText="Отступ по X у бокового вида"
+                    ToolTipText="{me:LocalizationSource VerticalView.SideViewXOffsetTooltip}"
                     TextChangedCommand="{Binding SettingsChangedCommand}" />
 
                 <controls:TextBoxSettingControl
-                    LabelText="Отступ по Y сверху у бокового вида"
+                    LabelText="{me:LocalizationSource VerticalView.SideViewYTopOffset}"
                     TextBoxText="{Binding Path=ViewSectionSettings.GeneralViewPerpYTopOffsetTemp, UpdateSourceTrigger=PropertyChanged}"
-                    ToolTipText="Отступ по Y сверху у бокового вида"
+                    ToolTipText="{me:LocalizationSource VerticalView.SideViewYTopOffsetTooltip}"
                     TextChangedCommand="{Binding SettingsChangedCommand}" />
 
                 <controls:TextBoxSettingControl
-                    LabelText="Отступ по Y снизу у бокового вида"
+                    LabelText="{me:LocalizationSource VerticalView.SideViewYBottomOffset}"
                     TextBoxText="{Binding Path=ViewSectionSettings.GeneralViewPerpYBottomOffsetTemp, UpdateSourceTrigger=PropertyChanged}"
-                    ToolTipText="Отступ по Y снизу у бокового вида"
+                    ToolTipText="{me:LocalizationSource VerticalView.SideViewYBottomOffsetTooltip}"
                     TextChangedCommand="{Binding SettingsChangedCommand}" />
             </StackPanel>
         </Border>
@@ -189,17 +189,17 @@
             Style="{StaticResource CustomBorder}">
             <StackPanel>
                 <controls:SettingsTitleControl
-                    LabelText="Типоразмер вида"
-                    ToolTipText="Типоразмер вида"
+                    LabelText="{me:LocalizationSource VerticalView.ViewTypeSize}"
+                    ToolTipText="{me:LocalizationSource VerticalView.ViewTypeSize}"
                     ButtonCommand="{Binding ApplySettingsCommand}"
                     ButtonMouseLeaveCommand="{Binding CheckSettingsCommand}" />
-                
+
                 <controls:ComboBoxSettingControl
                     Grid.Row="2"
-                    LabelText="Выберите типоразмер для основного и бокового видов:"
+                    LabelText="{me:LocalizationSource VerticalView.SelectViewTypeSizeForMainAndSideViews}"
                     ItemsSource="{Binding ViewFamilyTypes}"
                     SelectedItem="{Binding TypesSettings.SelectedViewFamilyType}"
-                    ToolTipText="Выберите типоразмер для основного и бокового видов"
+                    ToolTipText="{me:LocalizationSource VerticalView.SelectViewTypeSizeForMainAndSideViewsTooltip}"
                     SelectionChangedCommand="{Binding SettingsChangedCommand}"
                     ItemTemplate="{StaticResource WithoutFamilyNameItemTemplate}" />
             </StackPanel>
@@ -211,6 +211,6 @@
             HorizontalAlignment="Right"
             ErrorText="{Binding ErrorText}"
             ShowOkButton="False"
-            CancelButtonText="Отмена" />
+            CancelButtonText="{me:LocalizationSource GeneralPage.Cancel}" />
     </Grid>
 </core:WpfUIPlatformPage>

@@ -44,23 +44,23 @@
             Style="{StaticResource CustomBorder}">
             <StackPanel>
                 <controls:SettingsTitleControl
-                    LabelText="Правила, по которым будут создаваться новые листы в проекте"
-                    ToolTipText="Правила, по которым будут создаваться новые листы в проекте"
+                    LabelText="{me:LocalizationSource SheetParams.SheetCreationRules}"
+                    ToolTipText="{me:LocalizationSource SheetParams.SheetCreationRules}"
                     ButtonCommand="{Binding ApplySettingsCommand}"
                     ButtonMouseLeaveCommand="{Binding CheckSettingsCommand}" />
 
                 <controls:DoubleTextBoxSettingControl
-                    LabelText="Маска имени листа пилона:"
+                    LabelText="{me:LocalizationSource SheetParams.PylonSheetNameMask}"
                     FirstTextBoxText="{Binding Path=ProjectSettings.SheetPrefixTemp, UpdateSourceTrigger=PropertyChanged}"
                     SecondTextBoxText="{Binding Path=ProjectSettings.SheetSuffixTemp, UpdateSourceTrigger=PropertyChanged}"
-                    ToolTipText="Маска имени листа пилона"
+                    ToolTipText="{me:LocalizationSource SheetParams.PylonSheetNameMaskTooltip}"
                     TextChangedCommand="{Binding SettingsChangedCommand}" />
 
                 <controls:ComboBoxSettingControl
-                    LabelText="Выберите типоразмер рамки листа:"
+                    LabelText="{me:LocalizationSource GeneralPage.SelectTitleBlockType}"
                     ItemsSource="{Binding TitleBlocks}"
                     SelectedItem="{Binding TypesSettings.SelectedTitleBlock}"
-                    ToolTipText="Выберите типоразмер рамки листа"
+                    ToolTipText="{me:LocalizationSource GeneralPage.SelectTitleBlockTypeTooltip}"
                     SelectionChangedCommand="{Binding SettingsChangedCommand}"
                     ItemTemplate="{StaticResource WithFamilyNameItemTemplate}" />
 
@@ -72,16 +72,16 @@
 
                     <controls:TextBoxSettingControl
                         Grid.Column="0"
-                        LabelText="Параметр для формата рамки листа:"
+                        LabelText="{me:LocalizationSource SheetParams.SheetSizeParameter}"
                         TextBoxText="{Binding Path=ProjectSettings.SheetSizeTemp, UpdateSourceTrigger=PropertyChanged}"
-                        ToolTipText="Параметр для формата рамки листа"
+                        ToolTipText="{me:LocalizationSource SheetParams.SheetSizeParameterTooltip}"
                         TextChangedCommand="{Binding SettingsChangedCommand}" />
 
                     <controls:TextBoxSettingControl
                         Grid.Column="1"
-                        LabelText="Параметр для множителя формата рамки листа:"
+                        LabelText="{me:LocalizationSource SheetParams.SheetCoefficientParameter}"
                         TextBoxText="{Binding Path=ProjectSettings.SheetCoefficientTemp, UpdateSourceTrigger=PropertyChanged}"
-                        ToolTipText="Параметр для множителя формата рамки листа"
+                        ToolTipText="{me:LocalizationSource SheetParams.SheetCoefficientParameterTooltip}"
                         TextChangedCommand="{Binding SettingsChangedCommand}" />
                 </Grid>
             </StackPanel>
@@ -93,6 +93,6 @@
             HorizontalAlignment="Right"
             ErrorText="{Binding ErrorText}"
             ShowOkButton="False"
-            CancelButtonText="Отмена" />
+            CancelButtonText="{me:LocalizationSource GeneralPage.Cancel}" />
     </Grid>
 </core:WpfUIPlatformPage>

@@ -47,17 +47,17 @@
             Style="{StaticResource CustomBorder}">
             <StackPanel>
                 <controls:SettingsTitleControl
-                    LabelText="Легенда примечания"
-                    ToolTipText="Легенда примечания"
+                    LabelText="{me:LocalizationSource LegendView.NotesLegend}"
+                    ToolTipText="{me:LocalizationSource LegendView.NotesLegend}"
                     ButtonCommand="{Binding ApplySettingsCommand}"
                     ButtonMouseLeaveCommand="{Binding CheckSettingsCommand}" />
 
                 <controls:ComboBoxSettingControl
                     Grid.Row="2"
-                    LabelText="Выберите легенду примечания:"
+                    LabelText="{me:LocalizationSource LegendView.SelectNotesLegend}"
                     ItemsSource="{Binding Legends}"
                     SelectedItem="{Binding TypesSettings.SelectedLegend}"
-                    ToolTipText="Выберите легенду примечания"
+                    ToolTipText="{me:LocalizationSource LegendView.SelectNotesLegendTooltip}"
                     SelectionChangedCommand="{Binding SettingsChangedCommand}"
                     ItemTemplate="{StaticResource WithoutFamilyNameItemTemplate}" />
 
@@ -69,16 +69,16 @@
 
                     <controls:TextBoxSettingControl
                         Grid.Column="0"
-                        LabelText="Смещение по X от нижнего правого угла рамки:"
+                        LabelText="{me:LocalizationSource LegendView.XOffsetFromBottomRightCorner}"
                         TextBoxText="{Binding Path=ProjectSettings.LegendXOffsetTemp, UpdateSourceTrigger=PropertyChanged}"
-                        ToolTipText="Смещение по X от нижнего правого угла рамки"
+                        ToolTipText="{me:LocalizationSource LegendView.XOffsetFromBottomRightCornerTooltip}"
                         TextChangedCommand="{Binding SettingsChangedCommand}" />
 
                     <controls:TextBoxSettingControl
                         Grid.Column="1"
-                        LabelText="Смещение по Y от нижнего правого угла рамки:"
+                        LabelText="{me:LocalizationSource LegendView.YOffsetFromBottomRightCorner}"
                         TextBoxText="{Binding Path=ProjectSettings.LegendYOffsetTemp, UpdateSourceTrigger=PropertyChanged}"
-                        ToolTipText="Смещение по Y от нижнего правого угла рамки"
+                        ToolTipText="{me:LocalizationSource LegendView.YOffsetFromBottomRightCornerTooltip}"
                         TextChangedCommand="{Binding SettingsChangedCommand}" />
                 </Grid>
             </StackPanel>
@@ -89,6 +89,6 @@
             HorizontalAlignment="Right"
             ErrorText="{Binding ErrorText}"
             ShowOkButton="False"
-            CancelButtonText="Отмена" />
+            CancelButtonText="{me:LocalizationSource GeneralPage.Cancel}" />
     </Grid>
 </core:WpfUIPlatformPage>

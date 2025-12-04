@@ -53,44 +53,44 @@
             Style="{StaticResource CustomBorder}">
             <StackPanel>
                 <controls:SettingsTitleControl
-                    LabelText="Горизонтальный вид опалубки"
-                    ToolTipText="Горизонтальный вид опалубки"
+                    LabelText="{me:LocalizationSource HorizontalView.FormworkHorizontalView}"
+                    ToolTipText="{me:LocalizationSource HorizontalView.FormworkHorizontalView}"
                     ButtonCommand="{Binding ApplySettingsCommand}"
                     ButtonMouseLeaveCommand="{Binding CheckSettingsCommand}" />
 
                 <controls:DoubleTextBoxSettingControl
-                    LabelText="Маска имени первого горизонтального вида пилона:"
+                    LabelText="{me:LocalizationSource HorizontalView.FirstHorizontalViewNameMask}"
                     FirstTextBoxText="{Binding Path=ViewSectionSettings.TransverseViewFirstPrefixTemp, UpdateSourceTrigger=PropertyChanged}"
                     SecondTextBoxText="{Binding Path=ViewSectionSettings.TransverseViewFirstSuffixTemp, UpdateSourceTrigger=PropertyChanged}"
-                    ToolTipText="Маска имени первого горизонтального вида пилона"
+                    ToolTipText="{me:LocalizationSource HorizontalView.FirstHorizontalViewNameMaskTooltip}"
                     TextChangedCommand="{Binding SettingsChangedCommand}" />
-                
+
                 <controls:DoubleTextBoxSettingControl
-                    LabelText="Маска имени второго горизонтального вида пилона:"
+                    LabelText="{me:LocalizationSource HorizontalView.SecondHorizontalViewNameMask}"
                     FirstTextBoxText="{Binding Path=ViewSectionSettings.TransverseViewSecondPrefixTemp, UpdateSourceTrigger=PropertyChanged}"
                     SecondTextBoxText="{Binding Path=ViewSectionSettings.TransverseViewSecondSuffixTemp, UpdateSourceTrigger=PropertyChanged}"
-                    ToolTipText="Маска имени второго горизонтального вида пилона"
+                    ToolTipText="{me:LocalizationSource HorizontalView.SecondHorizontalViewNameMaskTooltip}"
                     TextChangedCommand="{Binding SettingsChangedCommand}" />
-                
+
                 <controls:DoubleTextBoxSettingControl
-                    LabelText="Маска имени третьего горизонтального вида пилона:"
+                    LabelText="{me:LocalizationSource HorizontalView.ThirdHorizontalViewNameMask}"
                     FirstTextBoxText="{Binding Path=ViewSectionSettings.TransverseViewThirdPrefixTemp, UpdateSourceTrigger=PropertyChanged}"
                     SecondTextBoxText="{Binding Path=ViewSectionSettings.TransverseViewThirdSuffixTemp, UpdateSourceTrigger=PropertyChanged}"
-                    ToolTipText="Маска имени третьего горизонтального вида пилона"
+                    ToolTipText="{me:LocalizationSource HorizontalView.ThirdHorizontalViewNameMaskTooltip}"
                     TextChangedCommand="{Binding SettingsChangedCommand}" />
 
                 <controls:ComboBoxSettingControl
-                    LabelText="Выберите шаблон горизонтального вида:"
+                    LabelText="{me:LocalizationSource HorizontalView.SelectHorizontalViewTemplate}"
                     ItemsSource="{Binding ViewTemplatesInPj}"
                     SelectedItem="{Binding TypesSettings.SelectedTransverseViewTemplate}"
-                    ToolTipText="Выберите шаблон горизонтального вида"
+                    ToolTipText="{me:LocalizationSource HorizontalView.SelectHorizontalViewTemplateTooltip}"
                     SelectionChangedCommand="{Binding SettingsChangedCommand}"
                     ItemTemplate="{StaticResource WithoutFamilyNameItemTemplate}" />
 
                 <controls:TextBoxSettingControl
-                    LabelText="Глубина горизонтального вида"
+                    LabelText="{me:LocalizationSource HorizontalView.HorizontalViewDepth}"
                     TextBoxText="{Binding Path=ViewSectionSettings.TransverseViewDepthTemp, UpdateSourceTrigger=PropertyChanged}"
-                    ToolTipText="Глубина горизонтального вида"
+                    ToolTipText="{me:LocalizationSource HorizontalView.HorizontalViewDepthTooltip}"
                     TextChangedCommand="{Binding SettingsChangedCommand}" />
             </StackPanel>
         </Border>
@@ -102,44 +102,44 @@
             Style="{StaticResource CustomBorder}">
             <StackPanel>
                 <controls:SettingsTitleControl
-                    LabelText="Горизонтальный вид армирования"
-                    ToolTipText="Горизонтальный вид армирования"
+                    LabelText="{me:LocalizationSource HorizontalView.RebarHorizontalView}"
+                    ToolTipText="{me:LocalizationSource HorizontalView.RebarHorizontalView}"
                     ButtonCommand="{Binding ApplySettingsCommand}"
                     ButtonMouseLeaveCommand="{Binding CheckSettingsCommand}" />
-                
+
                 <controls:DoubleTextBoxSettingControl
-                    LabelText="Маска имени первого горизонтального вида армирования пилона:"
+                    LabelText="{me:LocalizationSource HorizontalView.FirstRebarHorizontalViewNameMask}"
                     FirstTextBoxText="{Binding Path=ViewSectionSettings.TransverseRebarViewFirstPrefixTemp, UpdateSourceTrigger=PropertyChanged}"
                     SecondTextBoxText="{Binding Path=ViewSectionSettings.TransverseRebarViewFirstSuffixTemp, UpdateSourceTrigger=PropertyChanged}"
-                    ToolTipText="Маска имени первого горизонтального вида пилона"
+                    ToolTipText="{me:LocalizationSource HorizontalView.FirstRebarHorizontalViewNameMaskTooltip}"
                     TextChangedCommand="{Binding SettingsChangedCommand}" />
 
                 <controls:DoubleTextBoxSettingControl
-                    LabelText="Маска имени второго горизонтального вида армирования пилона:"
+                    LabelText="{me:LocalizationSource HorizontalView.SecondRebarHorizontalViewNameMask}"
                     FirstTextBoxText="{Binding Path=ViewSectionSettings.TransverseRebarViewSecondPrefixTemp, UpdateSourceTrigger=PropertyChanged}"
                     SecondTextBoxText="{Binding Path=ViewSectionSettings.TransverseRebarViewSecondSuffixTemp, UpdateSourceTrigger=PropertyChanged}"
-                    ToolTipText="Маска имени второго горизонтального вида пилона"
+                    ToolTipText="{me:LocalizationSource HorizontalView.SecondRebarHorizontalViewNameMaskTooltip}"
                     TextChangedCommand="{Binding SettingsChangedCommand}" />
 
                 <controls:DoubleTextBoxSettingControl
-                    LabelText="Маска имени третьего горизонтального вида армирования пилона:"
+                    LabelText="{me:LocalizationSource HorizontalView.ThirdRebarHorizontalViewNameMask}"
                     FirstTextBoxText="{Binding Path=ViewSectionSettings.TransverseRebarViewThirdPrefixTemp, UpdateSourceTrigger=PropertyChanged}"
                     SecondTextBoxText="{Binding Path=ViewSectionSettings.TransverseRebarViewThirdSuffixTemp, UpdateSourceTrigger=PropertyChanged}"
-                    ToolTipText="Маска имени третьего горизонтального вида пилона"
+                    ToolTipText="{me:LocalizationSource HorizontalView.ThirdRebarHorizontalViewNameMaskTooltip}"
                     TextChangedCommand="{Binding SettingsChangedCommand}" />
 
                 <controls:ComboBoxSettingControl
-                    LabelText="Выберите шаблон горизонтального вида армирования:"
+                    LabelText="{me:LocalizationSource HorizontalView.SelectRebarHorizontalViewTemplate}"
                     ItemsSource="{Binding ViewTemplatesInPj}"
                     SelectedItem="{Binding TypesSettings.SelectedTransverseRebarViewTemplate}"
-                    ToolTipText="Выберите шаблон горизонтального вида армирования"
+                    ToolTipText="{me:LocalizationSource HorizontalView.SelectRebarHorizontalViewTemplateTooltip}"
                     SelectionChangedCommand="{Binding SettingsChangedCommand}"
                     ItemTemplate="{StaticResource WithoutFamilyNameItemTemplate}" />
 
                 <controls:TextBoxSettingControl
-                    LabelText="Глубина горизонтального вида армирования"
+                    LabelText="{me:LocalizationSource HorizontalView.RebarHorizontalViewDepth}"
                     TextBoxText="{Binding Path=ViewSectionSettings.TransverseRebarViewDepthTemp, UpdateSourceTrigger=PropertyChanged}"
-                    ToolTipText="Глубина горизонтального вида"
+                    ToolTipText="{me:LocalizationSource HorizontalView.RebarHorizontalViewDepthTooltip}"
                     TextChangedCommand="{Binding SettingsChangedCommand}" />
             </StackPanel>
         </Border>
@@ -151,27 +151,27 @@
             Style="{StaticResource CustomBorder}">
             <StackPanel>
                 <controls:SettingsTitleControl
-                    LabelText="Отступы горизонтального вида от низа"
-                    ToolTipText="Отступы горизонтального вида от низа"
+                    LabelText="{me:LocalizationSource HorizontalView.HorizontalViewBottomOffsets}"
+                    ToolTipText="{me:LocalizationSource HorizontalView.HorizontalViewBottomOffsets}"
                     ButtonCommand="{Binding ApplySettingsCommand}"
                     ButtonMouseLeaveCommand="{Binding CheckSettingsCommand}" />
-                
+
                 <controls:TextBoxSettingControl
-                    LabelText="Отступ снизу до первого горизонтального вида"
+                    LabelText="{me:LocalizationSource HorizontalView.FirstHorizontalViewBottomOffset}"
                     TextBoxText="{Binding Path=ViewSectionSettings.TransverseViewFirstElevationTemp, UpdateSourceTrigger=PropertyChanged}"
-                    ToolTipText="Отступ снизу до первого горизонтального вида"
+                    ToolTipText="{me:LocalizationSource HorizontalView.FirstHorizontalViewBottomOffsetTooltip}"
                     TextChangedCommand="{Binding SettingsChangedCommand}" />
 
                 <controls:TextBoxSettingControl
-                    LabelText="Отступ сверху до второго горизонтального вида"
+                    LabelText="{me:LocalizationSource HorizontalView.SecondHorizontalViewTopOffset}"
                     TextBoxText="{Binding Path=ViewSectionSettings.TransverseViewSecondElevationTemp, UpdateSourceTrigger=PropertyChanged}"
-                    ToolTipText="Отступ сверху до второго горизонтального вида"
+                    ToolTipText="{me:LocalizationSource HorizontalView.SecondHorizontalViewTopOffsetTooltip}"
                     TextChangedCommand="{Binding SettingsChangedCommand}" />
 
                 <controls:TextBoxSettingControl
-                    LabelText="Отступ сверху до третьего горизонтального вида"
+                    LabelText="{me:LocalizationSource HorizontalView.ThirdHorizontalViewTopOffset}"
                     TextBoxText="{Binding Path=ViewSectionSettings.TransverseViewThirdElevationTemp, UpdateSourceTrigger=PropertyChanged}"
-                    ToolTipText="Отступ сверху до третьего горизонтального вида"
+                    ToolTipText="{me:LocalizationSource HorizontalView.ThirdHorizontalViewTopOffsetTooltip}"
                     TextChangedCommand="{Binding SettingsChangedCommand}" />
             </StackPanel>
         </Border>
@@ -183,21 +183,21 @@
             Style="{StaticResource CustomBorder}">
             <StackPanel>
                 <controls:SettingsTitleControl
-                    LabelText="Отступы горизонтального вида от пилона"
-                    ToolTipText="Отступы горизонтального вида от пилона"
+                    LabelText="{me:LocalizationSource HorizontalView.HorizontalViewPylonOffsets}"
+                    ToolTipText="{me:LocalizationSource HorizontalView.HorizontalViewPylonOffsets}"
                     ButtonCommand="{Binding ApplySettingsCommand}"
                     ButtonMouseLeaveCommand="{Binding CheckSettingsCommand}" />
-                
+
                 <controls:TextBoxSettingControl
-                    LabelText="Отступ по X у горизонтального вида"
+                    LabelText="{me:LocalizationSource HorizontalView.HorizontalViewXOffset}"
                     TextBoxText="{Binding Path=ViewSectionSettings.TransverseViewXOffsetTemp, UpdateSourceTrigger=PropertyChanged}"
-                    ToolTipText="Отступ по X у горизонтального вида"
+                    ToolTipText="{me:LocalizationSource HorizontalView.HorizontalViewXOffsetTooltip}"
                     TextChangedCommand="{Binding SettingsChangedCommand}" />
 
                 <controls:TextBoxSettingControl
-                    LabelText="Отступ по Y у горизонтального вида"
+                    LabelText="{me:LocalizationSource HorizontalView.HorizontalViewYOffset}"
                     TextBoxText="{Binding Path=ViewSectionSettings.TransverseViewYOffsetTemp, UpdateSourceTrigger=PropertyChanged}"
-                    ToolTipText="Отступ по X у горизонтального вида"
+                    ToolTipText="{me:LocalizationSource HorizontalView.HorizontalViewYOffsetTooltip}"
                     TextChangedCommand="{Binding SettingsChangedCommand}" />
             </StackPanel>
         </Border>
@@ -210,16 +210,16 @@
             Style="{StaticResource CustomBorder}">
             <StackPanel>
                 <controls:SettingsTitleControl
-                    LabelText="Типоразмер вида"
-                    ToolTipText="Типоразмер вида"
+                    LabelText="{me:LocalizationSource VerticalView.ViewTypeSize}"
+                    ToolTipText="{me:LocalizationSource VerticalView.ViewTypeSize}"
                     ButtonCommand="{Binding ApplySettingsCommand}"
                     ButtonMouseLeaveCommand="{Binding CheckSettingsCommand}" />
-                
+
                 <controls:ComboBoxSettingControl
-                    LabelText="Выберите типоразмер для горизонтальных видов:"
+                    LabelText="{me:LocalizationSource HorizontalView.SelectViewTypeSizeForHorizontalViews}"
                     ItemsSource="{Binding ViewFamilyTypes}"
                     SelectedItem="{Binding TypesSettings.SelectedViewFamilyType}"
-                    ToolTipText="Выберите типоразмер для горизонтальных видов"
+                    ToolTipText="{me:LocalizationSource HorizontalView.SelectViewTypeSizeForHorizontalViewsTooltip}"
                     SelectionChangedCommand="{Binding SettingsChangedCommand}"
                     ItemTemplate="{StaticResource WithoutFamilyNameItemTemplate}" />
             </StackPanel>
@@ -231,6 +231,6 @@
             HorizontalAlignment="Right"
             ErrorText="{Binding ErrorText}"
             ShowOkButton="False"
-            CancelButtonText="Отмена" />
+            CancelButtonText="{me:LocalizationSource GeneralPage.Cancel}" />
     </Grid>
 </core:WpfUIPlatformPage>

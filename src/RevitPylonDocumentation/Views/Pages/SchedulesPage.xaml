@@ -53,34 +53,34 @@
                 Style="{StaticResource CustomBorder}">
                 <StackPanel>
                     <controls:SettingsTitleControl
-                        LabelText="Спецификация каркасов"
-                        ToolTipText="Спецификация каркасов"
+                        LabelText="{me:LocalizationSource Schedules.SkeletonSpecification}"
+                        ToolTipText="{me:LocalizationSource Schedules.SkeletonSpecification}"
                         ButtonCommand="{Binding ApplySettingsCommand}"
                         ButtonMouseLeaveCommand="{Binding CheckSettingsCommand}" />
 
                     <controls:DoubleTextBoxSettingControl
-                        LabelText="Маска имени спецификации каркасов:"
+                        LabelText="{me:LocalizationSource Schedules.SkeletonSpecNameMask}"
                         FirstTextBoxText="{Binding Path=SchedulesSettings.SkeletonSchedulePrefixTemp, UpdateSourceTrigger=PropertyChanged}"
                         SecondTextBoxText="{Binding Path=SchedulesSettings.SkeletonScheduleSuffixTemp, UpdateSourceTrigger=PropertyChanged}"
-                        ToolTipText="Маска имени спецификации каркасов"
+                        ToolTipText="{me:LocalizationSource Schedules.SkeletonSpecNameMaskTooltip}"
                         TextChangedCommand="{Binding SettingsChangedCommand}" />
 
                     <controls:TextBoxSettingControl
-                        LabelText="Имя для поиска эталонной спецификации каркасов:"
+                        LabelText="{me:LocalizationSource Schedules.ReferenceSkeletonSpecSearchName}"
                         TextBoxText="{Binding Path=SchedulesSettings.SkeletonScheduleNameTemp, UpdateSourceTrigger=PropertyChanged}"
-                        ToolTipText="Имя для поиска эталонной спецификации каркасов"
+                        ToolTipText="{me:LocalizationSource Schedules.ReferenceSkeletonSpecSearchNameTooltip}"
                         TextChangedCommand="{Binding SettingsChangedCommand}" />
 
                     <controls:TextBoxSettingControl
-                        LabelText="В параметр для группировки диспетчера 1:"
+                        LabelText="{me:LocalizationSource Schedules.DispatcherGroupingFirstParameterForSpec}"
                         TextBoxText="{Binding Path=SchedulesSettings.SkeletonScheduleDisp1Temp, UpdateSourceTrigger=PropertyChanged}"
-                        ToolTipText="В параметр для группировки диспетчера 1"
+                        ToolTipText="{me:LocalizationSource Schedules.DispatcherGroupingFirstParameterForSpecTooltip}"
                         TextChangedCommand="{Binding SettingsChangedCommand}" />
 
                     <controls:TextBoxSettingControl
-                        LabelText="В параметр для группировки диспетчера 2:"
+                        LabelText="{me:LocalizationSource Schedules.DispatcherGroupingSecondParameterForSpec}"
                         TextBoxText="{Binding Path=SchedulesSettings.SkeletonScheduleDisp2Temp, UpdateSourceTrigger=PropertyChanged}"
-                        ToolTipText="В параметр для группировки диспетчера 2"
+                        ToolTipText="{me:LocalizationSource Schedules.DispatcherGroupingSecondParameterForSpecTooltip}"
                         TextChangedCommand="{Binding SettingsChangedCommand}" />
                 </StackPanel>
             </Border>
@@ -92,34 +92,34 @@
                 Style="{StaticResource CustomBorder}">
                 <StackPanel>
                     <controls:SettingsTitleControl
-                        LabelText="Ведомость системных деталей"
-                        ToolTipText="Ведомость системных деталей"
+                        LabelText="{me:LocalizationSource Schedules.SystemPartsSchedule}"
+                        ToolTipText="{me:LocalizationSource Schedules.SystemPartsSchedule}"
                         ButtonCommand="{Binding ApplySettingsCommand}"
                         ButtonMouseLeaveCommand="{Binding CheckSettingsCommand}" />
-                    
+
                     <controls:DoubleTextBoxSettingControl
-                        LabelText="Маска имени ведомости системных деталей:"
+                        LabelText="{me:LocalizationSource Schedules.SystemPartsScheduleNameMask}"
                         FirstTextBoxText="{Binding Path=SchedulesSettings.SystemPartsSchedulePrefixTemp, UpdateSourceTrigger=PropertyChanged}"
                         SecondTextBoxText="{Binding Path=SchedulesSettings.SystemPartsScheduleSuffixTemp, UpdateSourceTrigger=PropertyChanged}"
-                        ToolTipText="Маска имени ведомости системных деталей"
+                        ToolTipText="{me:LocalizationSource Schedules.SystemPartsScheduleNameMaskTooltip}"
                         TextChangedCommand="{Binding SettingsChangedCommand}" />
 
                     <controls:TextBoxSettingControl
-                        LabelText="Имя для поиска эталонной ведомости системных деталей:"
+                        LabelText="{me:LocalizationSource Schedules.ReferenceSystemPartsScheduleSearchName}"
                         TextBoxText="{Binding Path=SchedulesSettings.SystemPartsScheduleNameTemp, UpdateSourceTrigger=PropertyChanged}"
-                        ToolTipText="Имя для поиска эталонной ведомости системных деталей"
+                        ToolTipText="{me:LocalizationSource Schedules.ReferenceSystemPartsScheduleSearchNameTooltip}"
                         TextChangedCommand="{Binding SettingsChangedCommand}" />
 
                     <controls:TextBoxSettingControl
-                        LabelText="В параметр для группировки диспетчера 1:"
+                        LabelText="{me:LocalizationSource Schedules.DispatcherGroupingFirstParameterForSchedule}"
                         TextBoxText="{Binding Path=SchedulesSettings.SystemPartsScheduleDisp1Temp, UpdateSourceTrigger=PropertyChanged}"
-                        ToolTipText="В параметр для группировки диспетчера 1"
+                        ToolTipText="{me:LocalizationSource Schedules.DispatcherGroupingFirstParameterForScheduleTooltip}"
                         TextChangedCommand="{Binding SettingsChangedCommand}" />
 
                     <controls:TextBoxSettingControl
-                        LabelText="В параметр для группировки диспетчера 2:"
+                        LabelText="{me:LocalizationSource Schedules.DispatcherGroupingSecondParameterForSchedule}"
                         TextBoxText="{Binding Path=SchedulesSettings.SystemPartsScheduleDisp2Temp, UpdateSourceTrigger=PropertyChanged}"
-                        ToolTipText="В параметр для группировки диспетчера 2"
+                        ToolTipText="{me:LocalizationSource Schedules.DispatcherGroupingSecondParameterForScheduleTooltip}"
                         TextChangedCommand="{Binding SettingsChangedCommand}" />
                 </StackPanel>
             </Border>
@@ -131,34 +131,34 @@
                 Style="{StaticResource CustomBorder}">
                 <StackPanel>
                     <controls:SettingsTitleControl
-                        LabelText="Спецификация элементов каркасов"
-                        ToolTipText="Спецификация элементов каркасов"
+                        LabelText="{me:LocalizationSource Schedules.SkeletonElementsSpecification}"
+                        ToolTipText="{me:LocalizationSource Schedules.SkeletonElementsSpecification}"
                         ButtonCommand="{Binding ApplySettingsCommand}"
                         ButtonMouseLeaveCommand="{Binding CheckSettingsCommand}" />
 
                     <controls:DoubleTextBoxSettingControl
-                        LabelText="Маска имени спецификации элементов каркасов:"
+                        LabelText="{me:LocalizationSource Schedules.SkeletonElementsSpecNameMask}"
                         FirstTextBoxText="{Binding Path=SchedulesSettings.SkeletonByElemsSchedulePrefixTemp, UpdateSourceTrigger=PropertyChanged}"
                         SecondTextBoxText="{Binding Path=SchedulesSettings.SkeletonByElemsScheduleSuffixTemp, UpdateSourceTrigger=PropertyChanged}"
-                        ToolTipText="Маска имени спецификации элементов каркасов"
+                        ToolTipText="{me:LocalizationSource Schedules.SkeletonElementsSpecNameMaskTooltip}"
                         TextChangedCommand="{Binding SettingsChangedCommand}" />
 
                     <controls:TextBoxSettingControl
-                        LabelText="Имя для поиска эталонной спецификации элементов каркасов:"
+                        LabelText="{me:LocalizationSource Schedules.ReferenceSkeletonElementsSpecSearchName}"
                         TextBoxText="{Binding Path=SchedulesSettings.SkeletonByElemsScheduleNameTemp, UpdateSourceTrigger=PropertyChanged}"
-                        ToolTipText="Имя для поиска эталонной спецификации элементов каркасов"
+                        ToolTipText="{me:LocalizationSource Schedules.ReferenceSkeletonElementsSpecSearchNameTooltip}"
                         TextChangedCommand="{Binding SettingsChangedCommand}" />
 
                     <controls:TextBoxSettingControl
-                        LabelText="В параметр для группировки диспетчера 1:"
+                        LabelText="{me:LocalizationSource Schedules.DispatcherGroupingFirstParameterForSpecElements}"
                         TextBoxText="{Binding Path=SchedulesSettings.SkeletonByElemsScheduleDisp1Temp, UpdateSourceTrigger=PropertyChanged}"
-                        ToolTipText="В параметр для группировки диспетчера 1"
+                        ToolTipText="{me:LocalizationSource Schedules.DispatcherGroupingFirstParameterForSpecElementsTooltip}"
                         TextChangedCommand="{Binding SettingsChangedCommand}" />
 
                     <controls:TextBoxSettingControl
-                        LabelText="В параметр для группировки диспетчера 2:"
+                        LabelText="{me:LocalizationSource Schedules.DispatcherGroupingSecondParameterForSpecElements}"
                         TextBoxText="{Binding Path=SchedulesSettings.SkeletonByElemsScheduleDisp2Temp, UpdateSourceTrigger=PropertyChanged}"
-                        ToolTipText="В параметр для группировки диспетчера 2"
+                        ToolTipText="{me:LocalizationSource Schedules.DispatcherGroupingSecondParameterForSpecElementsTooltip}"
                         TextChangedCommand="{Binding SettingsChangedCommand}" />
                 </StackPanel>
             </Border>
@@ -170,34 +170,34 @@
                 Style="{StaticResource CustomBorder}">
                 <StackPanel>
                     <controls:SettingsTitleControl
-                        LabelText="Ведомость IFC деталей"
-                        ToolTipText="Ведомость IFC деталей"
+                        LabelText="{me:LocalizationSource Schedules.IfcPartsSchedule}"
+                        ToolTipText="{me:LocalizationSource Schedules.IfcPartsSchedule}"
                         ButtonCommand="{Binding ApplySettingsCommand}"
                         ButtonMouseLeaveCommand="{Binding CheckSettingsCommand}" />
-                    
+
                     <controls:DoubleTextBoxSettingControl
-                        LabelText="Маска имени ведомости IFC деталей:"
+                        LabelText="{me:LocalizationSource Schedules.IfcPartsScheduleNameMask}"
                         FirstTextBoxText="{Binding Path=SchedulesSettings.IfcPartsSchedulePrefixTemp, UpdateSourceTrigger=PropertyChanged}"
                         SecondTextBoxText="{Binding Path=SchedulesSettings.IfcPartsScheduleSuffixTemp, UpdateSourceTrigger=PropertyChanged}"
-                        ToolTipText="Маска имени ведомости IFC деталей"
+                        ToolTipText="{me:LocalizationSource Schedules.IfcPartsScheduleNameMaskTooltip}"
                         TextChangedCommand="{Binding SettingsChangedCommand}" />
 
                     <controls:TextBoxSettingControl
-                        LabelText="Имя для поиска эталонной ведомости IFC деталей:"
+                        LabelText="{me:LocalizationSource Schedules.ReferenceIfcPartsScheduleSearchName}"
                         TextBoxText="{Binding Path=SchedulesSettings.IfcPartsScheduleNameTemp, UpdateSourceTrigger=PropertyChanged}"
-                        ToolTipText="Имя для поиска эталонной ведомости IFC деталей"
+                        ToolTipText="{me:LocalizationSource Schedules.ReferenceIfcPartsScheduleSearchNameTooltip}"
                         TextChangedCommand="{Binding SettingsChangedCommand}" />
 
                     <controls:TextBoxSettingControl
-                        LabelText="В параметр для группировки диспетчера 1:"
+                        LabelText="{me:LocalizationSource Schedules.DispatcherGroupingFirstParameterForIfcSchedule}"
                         TextBoxText="{Binding Path=SchedulesSettings.IfcPartsScheduleDisp1Temp, UpdateSourceTrigger=PropertyChanged}"
-                        ToolTipText="В параметр для группировки диспетчера 1"
+                        ToolTipText="{me:LocalizationSource Schedules.DispatcherGroupingFirstParameterForIfcScheduleTooltip}"
                         TextChangedCommand="{Binding SettingsChangedCommand}" />
 
                     <controls:TextBoxSettingControl
-                        LabelText="В параметр для группировки диспетчера 2:"
+                        LabelText="{me:LocalizationSource Schedules.DispatcherGroupingSecondParameterForIfcSchedule}"
                         TextBoxText="{Binding Path=SchedulesSettings.IfcPartsScheduleDisp2Temp, UpdateSourceTrigger=PropertyChanged}"
-                        ToolTipText="В параметр для группировки диспетчера 2"
+                        ToolTipText="{me:LocalizationSource Schedules.DispatcherGroupingSecondParameterForIfcScheduleTooltip}"
                         TextChangedCommand="{Binding SettingsChangedCommand}" />
                 </StackPanel>
             </Border>
@@ -209,34 +209,34 @@
                 Style="{StaticResource CustomBorder}">
                 <StackPanel>
                     <controls:SettingsTitleControl
-                        LabelText="Спецификация материалов"
-                        ToolTipText="Спецификация материалов"
+                        LabelText="{me:LocalizationSource Schedules.MaterialsSpecification}"
+                        ToolTipText="{me:LocalizationSource Schedules.MaterialsSpecification}"
                         ButtonCommand="{Binding ApplySettingsCommand}"
                         ButtonMouseLeaveCommand="{Binding CheckSettingsCommand}" />
-                    
+
                     <controls:DoubleTextBoxSettingControl
-                        LabelText="Маска имени спецификации материалов:"
+                        LabelText="{me:LocalizationSource Schedules.MaterialsSpecNameMask}"
                         FirstTextBoxText="{Binding Path=SchedulesSettings.MaterialSchedulePrefixTemp, UpdateSourceTrigger=PropertyChanged}"
                         SecondTextBoxText="{Binding Path=SchedulesSettings.MaterialScheduleSuffixTemp, UpdateSourceTrigger=PropertyChanged}"
-                        ToolTipText="Маска имени спецификации материалов"
+                        ToolTipText="{me:LocalizationSource Schedules.MaterialsSpecNameMaskTooltip}"
                         TextChangedCommand="{Binding SettingsChangedCommand}" />
 
                     <controls:TextBoxSettingControl
-                        LabelText="Имя для поиска эталонной спецификации материалов:"
+                        LabelText="{me:LocalizationSource Schedules.ReferenceMaterialsSpecSearchName}"
                         TextBoxText="{Binding Path=SchedulesSettings.MaterialScheduleNameTemp, UpdateSourceTrigger=PropertyChanged}"
-                        ToolTipText="Имя для поиска эталонной спецификации материалов"
+                        ToolTipText="{me:LocalizationSource Schedules.ReferenceMaterialsSpecSearchNameTooltip}"
                         TextChangedCommand="{Binding SettingsChangedCommand}" />
 
                     <controls:TextBoxSettingControl
-                        LabelText="В параметр для группировки диспетчера 1:"
+                        LabelText="{me:LocalizationSource Schedules.DispatcherGroupingFirstParameterForMaterials}"
                         TextBoxText="{Binding Path=SchedulesSettings.MaterialScheduleDisp1Temp, UpdateSourceTrigger=PropertyChanged}"
-                        ToolTipText="В параметр для группировки диспетчера 1"
+                        ToolTipText="{me:LocalizationSource Schedules.DispatcherGroupingFirstParameterForMaterialsTooltip}"
                         TextChangedCommand="{Binding SettingsChangedCommand}" />
 
                     <controls:TextBoxSettingControl
-                        LabelText="В параметр для группировки диспетчера 2:"
+                        LabelText="{me:LocalizationSource Schedules.DispatcherGroupingSecondParameterForMaterials}"
                         TextBoxText="{Binding Path=SchedulesSettings.MaterialScheduleDisp2Temp, UpdateSourceTrigger=PropertyChanged}"
-                        ToolTipText="В параметр для группировки диспетчера 2"
+                        ToolTipText="{me:LocalizationSource Schedules.DispatcherGroupingSecondParameterForMaterialsTooltip}"
                         TextChangedCommand="{Binding SettingsChangedCommand}" />
                 </StackPanel>
             </Border>
@@ -249,11 +249,11 @@
                 Style="{StaticResource CustomBorder}">
                 <StackPanel>
                     <controls:SettingsTitleControl
-                        LabelText="Список параметров фильтрации для спецификаций"
-                        ToolTipText="Список параметров фильтрации для спецификаций"
+                        LabelText="{me:LocalizationSource Schedules.ScheduleFilterParametersList}"
+                        ToolTipText="{me:LocalizationSource Schedules.ScheduleFilterParametersList}"
                         ButtonCommand="{Binding ApplySettingsCommand}"
                         ButtonMouseLeaveCommand="{Binding CheckSettingsCommand}" />
-                    
+
                     <ui:ListView
                         Margin="0 5"
                         ItemsSource="{Binding Path=SchedulesSettings.ParamsForScheduleFiltersTemp, UpdateSourceTrigger=PropertyChanged}"
@@ -318,14 +318,14 @@
                         <ui:Button
                             Margin="5 5"
                             MinWidth="150"
-                            Content="Добавить"
+                            Content="{me:LocalizationSource Schedules.Add}"
                             Appearance="Info"
                             Command="{Binding AddScheduleFilterParamCommand}" />
 
                         <ui:Button
                             Margin="5 5"
                             MinWidth="150"
-                            Content="Удалить"
+                            Content="{me:LocalizationSource Schedules.Delete}"
                             Command="{Binding DeleteScheduleFilterParamCommand}" />
                     </StackPanel>
                 </StackPanel>
@@ -337,7 +337,7 @@
                 HorizontalAlignment="Right"
                 ErrorText="{Binding ErrorText}"
                 ShowOkButton="False"
-                CancelButtonText="Отмена" />
+                CancelButtonText="{me:LocalizationSource GeneralPage.Cancel}" />
         </Grid>
     </ui:PassiveScrollViewer>
 </core:WpfUIPlatformPage>

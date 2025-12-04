@@ -1,0 +1,266 @@
+<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:system="clr-namespace:System;assembly=mscorlib">
+    
+    <!-- MainWindow -->
+    <system:String x:Key="MainWindow.Title">Документация пилонов</system:String>
+    <system:String x:Key="MainWindow.Settings">Настройки</system:String>
+
+    <system:String x:Key="MainWindow.PluginRun">Запуск плагина</system:String>
+    <system:String x:Key="MainWindow.SettingsMenu">Настройки</system:String>
+
+    <system:String x:Key="MainWindow.VerticalViews">Вертикальные виды</system:String>
+    <system:String x:Key="MainWindow.HorizontalViews">Горизонтальные виды</system:String>
+    <system:String x:Key="MainWindow.Schedules">Спецификации</system:String>
+    <system:String x:Key="MainWindow.LegendsAndAnnotations">Легенды и типовые аннотации</system:String>
+    <system:String x:Key="MainWindow.PylonParameters">Параметры пилона</system:String>
+    <system:String x:Key="MainWindow.ProjectParameters">Параметры проекта</system:String>
+    <system:String x:Key="MainWindow.SheetParameters">Параметры листов</system:String>
+
+    <system:String x:Key="MainWindow.BimTipTitle">💡  BIM-Совет</system:String>
+    <system:String x:Key="MainWindow.BimTip1">1. Убедитесь, что у нужных пилонов параметр 'обр_ФОП_Фильтрация 1' заполнен 'на 1 шт.'</system:String>
+    <system:String x:Key="MainWindow.BimTip2">2. Убедитесь, что загрузили последние версии семейств опалубки и армирования из библиотеки</system:String>
+    
+    <!-- GeneralPage -->
+    <system:String x:Key="GeneralPage.PylonSelection">Выбор пилонов</system:String>
+    <system:String x:Key="GeneralPage.DocumentationSet">Комплект документации:</system:String>
+    <system:String x:Key="GeneralPage.SelectPylon">Выбрать пилон</system:String>
+    <system:String x:Key="GeneralPage.SelectPylonMarks">Выберите марки пилонов для обработки:</system:String>
+    <system:String x:Key="GeneralPage.SearchPlaceholder">Поиск...</system:String>
+
+    <system:String x:Key="GeneralPage.SheetElements">Элементы листа</system:String>
+
+    <system:String x:Key="GeneralPage.FormworkViews">Виды опалубки</system:String>
+    <system:String x:Key="GeneralPage.Main">Основной</system:String>
+    <system:String x:Key="GeneralPage.Side">Боковой</system:String>
+    <system:String x:Key="GeneralPage.Transverse1">Поперечный 1</system:String>
+    <system:String x:Key="GeneralPage.Transverse2">Поперечный 2</system:String>
+    <system:String x:Key="GeneralPage.Transverse3">Поперечный 3</system:String>
+
+    <system:String x:Key="GeneralPage.RebarViews">Виды армирования</system:String>
+
+    <system:String x:Key="GeneralPage.ScheduleViews">Виды спецификаций</system:String>
+    <system:String x:Key="GeneralPage.Skeleton">Каркас</system:String>
+    <system:String x:Key="GeneralPage.SkeletonElements">Элементы каркаса</system:String>
+    <system:String x:Key="GeneralPage.Materials">Материалы</system:String>
+    <system:String x:Key="GeneralPage.SystemParts">Системные детали</system:String>
+    <system:String x:Key="GeneralPage.IfcParts">IFC детали</system:String>
+
+    <system:String x:Key="GeneralPage.OtherViews">Другие виды</system:String>
+    <system:String x:Key="GeneralPage.NotesLegend">Легенда примечания</system:String>
+
+    <system:String x:Key="GeneralPage.Sheet">Лист</system:String>
+    <system:String x:Key="GeneralPage.SheetParameters">Параметры листа</system:String>
+    <system:String x:Key="GeneralPage.SelectTitleBlockType">Выберите типоразмер рамки листа:</system:String>
+    <system:String x:Key="GeneralPage.SelectTitleBlockTypeTooltip">Выберите типоразмер рамки листа</system:String>
+
+    <system:String x:Key="GeneralPage.FormworkViewTemplates">Шаблоны видов опалубки</system:String>
+    <system:String x:Key="GeneralPage.RebarViewTemplates">Шаблоны видов армирования</system:String>
+    <system:String x:Key="GeneralPage.RebarViewTemplatesTooltip">Шаблоны видов армирования</system:String>
+    <system:String x:Key="GeneralPage.VerticalViews">Вертикальных видов</system:String>
+    <system:String x:Key="GeneralPage.HorizontalViews">Горизонтальных видов</system:String>
+
+    <system:String x:Key="GeneralPage.Run">Запуск</system:String>
+    <system:String x:Key="GeneralPage.Cancel">Отмена</system:String>
+
+    <!-- VerticalViewSettingsPage -->
+    <system:String x:Key="VerticalView.FormworkMainView">Основной вид опалубки</system:String>
+    <system:String x:Key="VerticalView.PylonMainViewNameMask">Маска имени основного вида пилона:</system:String>
+    <system:String x:Key="VerticalView.PylonMainViewNameMaskTooltip">Маска имени основного вида пилона</system:String>
+    <system:String x:Key="VerticalView.PylonSideViewNameMask">Маска имени бокового вида пилона:</system:String>
+    <system:String x:Key="VerticalView.PylonSideViewNameMaskTooltip">Маска имени бокового вида пилона</system:String>
+    <system:String x:Key="VerticalView.SelectMainAndSideViewTemplate">Выберите шаблон основного и бокового вида:</system:String>
+    <system:String x:Key="VerticalView.SelectMainAndSideViewTemplateTooltip">Выберите шаблон основного и бокового вида</system:String>
+
+    <system:String x:Key="VerticalView.RebarMainView">Основной вид армирования</system:String>
+    <system:String x:Key="VerticalView.PylonMainRebarViewNameMask">Маска имени основного вида армирования пилона:</system:String>
+    <system:String x:Key="VerticalView.PylonMainRebarViewNameMaskTooltip">Маска имени основного вида армирования пилона</system:String>
+    <system:String x:Key="VerticalView.PylonSideRebarViewNameMask">Маска имени бокового вида армирования пилона:</system:String>
+    <system:String x:Key="VerticalView.PylonSideRebarViewNameMaskTooltip">Маска имени бокового вида армирования пилона</system:String>
+    <system:String x:Key="VerticalView.SelectMainAndSideRebarViewTemplate">Выберите шаблон основного и бокового вида армирования:</system:String>
+    <system:String x:Key="VerticalView.SelectMainAndSideRebarViewTemplateTooltip">Выберите шаблон основного и бокового вида армирования</system:String>
+
+    <system:String x:Key="VerticalView.MainViewOffsets">Отступы основного вида</system:String>
+    <system:String x:Key="VerticalView.MainViewXOffset">Отступ по X у основного вида</system:String>
+    <system:String x:Key="VerticalView.MainViewXOffsetTooltip">Отступ по X у основного вида</system:String>
+    <system:String x:Key="VerticalView.MainViewYTopOffset">Отступ по Y сверху у основного вида</system:String>
+    <system:String x:Key="VerticalView.MainViewYTopOffsetTooltip">Отступ по Y сверху у основного вида</system:String>
+    <system:String x:Key="VerticalView.MainViewYBottomOffset">Отступ по Y снизу у основного вида</system:String>
+    <system:String x:Key="VerticalView.MainViewYBottomOffsetTooltip">Отступ по Y снизу у основного вида</system:String>
+
+    <system:String x:Key="VerticalView.SideViewOffsets">Отступы бокового вида</system:String>
+    <system:String x:Key="VerticalView.SideViewXOffset">Отступ по X у бокового вида</system:String>
+    <system:String x:Key="VerticalView.SideViewXOffsetTooltip">Отступ по X у бокового вида</system:String>
+    <system:String x:Key="VerticalView.SideViewYTopOffset">Отступ по Y сверху у бокового вида</system:String>
+    <system:String x:Key="VerticalView.SideViewYTopOffsetTooltip">Отступ по Y сверху у бокового вида</system:String>
+    <system:String x:Key="VerticalView.SideViewYBottomOffset">Отступ по Y снизу у бокового вида</system:String>
+    <system:String x:Key="VerticalView.SideViewYBottomOffsetTooltip">Отступ по Y снизу у бокового вида</system:String>
+
+    <system:String x:Key="VerticalView.ViewTypeSize">Типоразмер вида</system:String>
+    <system:String x:Key="VerticalView.SelectViewTypeSizeForMainAndSideViews">Выберите типоразмер для основного и бокового видов:</system:String>
+    <system:String x:Key="VerticalView.SelectViewTypeSizeForMainAndSideViewsTooltip">Выберите типоразмер для основного и бокового видов</system:String>
+    
+    <!-- HorizontalViewSettingsPage -->
+    <system:String x:Key="HorizontalView.FormworkHorizontalView">Горизонтальный вид опалубки</system:String>
+    <system:String x:Key="HorizontalView.FirstHorizontalViewNameMask">Маска имени первого горизонтального вида пилона:</system:String>
+    <system:String x:Key="HorizontalView.FirstHorizontalViewNameMaskTooltip">Маска имени первого горизонтального вида пилона</system:String>
+    <system:String x:Key="HorizontalView.SecondHorizontalViewNameMask">Маска имени второго горизонтального вида пилона:</system:String>
+    <system:String x:Key="HorizontalView.SecondHorizontalViewNameMaskTooltip">Маска имени второго горизонтального вида пилона</system:String>
+    <system:String x:Key="HorizontalView.ThirdHorizontalViewNameMask">Маска имени третьего горизонтального вида пилона:</system:String>
+    <system:String x:Key="HorizontalView.ThirdHorizontalViewNameMaskTooltip">Маска имени третьего горизонтального вида пилона</system:String>
+    <system:String x:Key="HorizontalView.SelectHorizontalViewTemplate">Выберите шаблон горизонтального вида:</system:String>
+    <system:String x:Key="HorizontalView.SelectHorizontalViewTemplateTooltip">Выберите шаблон горизонтального вида</system:String>
+    <system:String x:Key="HorizontalView.HorizontalViewDepth">Глубина горизонтального вида</system:String>
+    <system:String x:Key="HorizontalView.HorizontalViewDepthTooltip">Глубина горизонтального вида</system:String>
+
+    <system:String x:Key="HorizontalView.RebarHorizontalView">Горизонтальный вид армирования</system:String>
+    <system:String x:Key="HorizontalView.FirstRebarHorizontalViewNameMask">Маска имени первого горизонтального вида армирования пилона:</system:String>
+    <system:String x:Key="HorizontalView.FirstRebarHorizontalViewNameMaskTooltip">Маска имени первого горизонтального вида пилона</system:String>
+    <system:String x:Key="HorizontalView.SecondRebarHorizontalViewNameMask">Маска имени второго горизонтального вида армирования пилона:</system:String>
+    <system:String x:Key="HorizontalView.SecondRebarHorizontalViewNameMaskTooltip">Маска имени второго горизонтального вида пилона</system:String>
+    <system:String x:Key="HorizontalView.ThirdRebarHorizontalViewNameMask">Маска имени третьего горизонтального вида армирования пилона:</system:String>
+    <system:String x:Key="HorizontalView.ThirdRebarHorizontalViewNameMaskTooltip">Маска имени третьего горизонтального вида пилона</system:String>
+    <system:String x:Key="HorizontalView.SelectRebarHorizontalViewTemplate">Выберите шаблон горизонтального вида армирования:</system:String>
+    <system:String x:Key="HorizontalView.SelectRebarHorizontalViewTemplateTooltip">Выберите шаблон горизонтального вида армирования</system:String>
+    <system:String x:Key="HorizontalView.RebarHorizontalViewDepth">Глубина горизонтального вида армирования</system:String>
+    <system:String x:Key="HorizontalView.RebarHorizontalViewDepthTooltip">Глубина горизонтального вида</system:String>
+
+    <system:String x:Key="HorizontalView.HorizontalViewBottomOffsets">Отступы горизонтального вида от низа</system:String>
+    <system:String x:Key="HorizontalView.FirstHorizontalViewBottomOffset">Отступ снизу до первого горизонтального вида</system:String>
+    <system:String x:Key="HorizontalView.FirstHorizontalViewBottomOffsetTooltip">Отступ снизу до первого горизонтального вида</system:String>
+    <system:String x:Key="HorizontalView.SecondHorizontalViewTopOffset">Отступ сверху до второго горизонтального вида</system:String>
+    <system:String x:Key="HorizontalView.SecondHorizontalViewTopOffsetTooltip">Отступ сверху до второго горизонтального вида</system:String>
+    <system:String x:Key="HorizontalView.ThirdHorizontalViewTopOffset">Отступ сверху до третьего горизонтального вида</system:String>
+    <system:String x:Key="HorizontalView.ThirdHorizontalViewTopOffsetTooltip">Отступ сверху до третьего горизонтального вида</system:String>
+
+    <system:String x:Key="HorizontalView.HorizontalViewPylonOffsets">Отступы горизонтального вида от пилона</system:String>
+    <system:String x:Key="HorizontalView.HorizontalViewXOffset">Отступ по X у горизонтального вида</system:String>
+    <system:String x:Key="HorizontalView.HorizontalViewXOffsetTooltip">Отступ по X у горизонтального вида</system:String>
+    <system:String x:Key="HorizontalView.HorizontalViewYOffset">Отступ по Y у горизонтального вида</system:String>
+    <system:String x:Key="HorizontalView.HorizontalViewYOffsetTooltip">Отступ по X у горизонтального вида</system:String>
+
+    <system:String x:Key="HorizontalView.SelectViewTypeSizeForHorizontalViews">Выберите типоразмер для горизонтальных видов:</system:String>
+    <system:String x:Key="HorizontalView.SelectViewTypeSizeForHorizontalViewsTooltip">Выберите типоразмер для горизонтальных видов</system:String>
+
+    <!-- LegendViewsPage -->
+    <system:String x:Key="LegendView.NotesLegend">Легенда примечания</system:String>
+    <system:String x:Key="LegendView.SelectNotesLegend">Выберите легенду примечания:</system:String>
+    <system:String x:Key="LegendView.SelectNotesLegendTooltip">Выберите легенду примечания</system:String>
+    <system:String x:Key="LegendView.XOffsetFromBottomRightCorner">Смещение по X от нижнего правого угла рамки:</system:String>
+    <system:String x:Key="LegendView.XOffsetFromBottomRightCornerTooltip">Смещение по X от нижнего правого угла рамки</system:String>
+    <system:String x:Key="LegendView.YOffsetFromBottomRightCorner">Смещение по Y от нижнего правого угла рамки:</system:String>
+    <system:String x:Key="LegendView.YOffsetFromBottomRightCornerTooltip">Смещение по Y от нижнего правого угла рамки</system:String>
+
+    <!-- ProjectParamsPage -->
+    <system:String x:Key="ProjectParams.ProjectRelatedParameters">Параметры, относящиеся к проекту, в котором вы работаете</system:String>
+
+    <system:String x:Key="ProjectParams.DispatcherGroupingFirstParameter">Параметр для группировки диспетчера 1:</system:String>
+    <system:String x:Key="ProjectParams.DispatcherGroupingFirstParameterTooltip">Параметр для группировки диспетчера 1</system:String>
+    <system:String x:Key="ProjectParams.DispatcherGroupingSecondParameter">Параметр для группировки диспетчера 2:</system:String>
+    <system:String x:Key="ProjectParams.DispatcherGroupingSecondParameterTooltip">Параметр для группировки диспетчера 2</system:String>
+
+    <system:String x:Key="ProjectParams.SelectDimensionTypeSize">Выберите типоразмер размера:</system:String>
+    <system:String x:Key="ProjectParams.SelectDimensionTypeSizeTooltip">Выберите типоразмер размера</system:String>
+    <system:String x:Key="ProjectParams.SelectSpotDimensionTypeSize">Выберите типоразмер высотной отметки:</system:String>
+    <system:String x:Key="ProjectParams.SelectSpotDimensionTypeSizeTooltip">Выберите типоразмер высотной отметки</system:String>
+
+    <system:String x:Key="ProjectParams.SelectRebarProductMarkTypeSize">Выберите типоразмер марки арматурного изделия:</system:String>
+    <system:String x:Key="ProjectParams.SelectRebarProductMarkTypeSizeTooltip">Выберите типоразмер марки арматурного изделия</system:String>
+    <system:String x:Key="ProjectParams.SelectRebarMarkWithSerifTypeSize">Выберите типоразмер марки арматуры с засечкой:</system:String>
+    <system:String x:Key="ProjectParams.SelectRebarMarkWithSerifTypeSizeTooltip">Выберите типоразмер марки арматуры с засечкой</system:String>
+    <system:String x:Key="ProjectParams.SelectRebarMarkWithStepTypeSize">Выберите типоразмер марки арматуры с шагом:</system:String>
+    <system:String x:Key="ProjectParams.SelectRebarMarkWithStepTypeSizeTooltip">Выберите типоразмер марки арматуры с шагом</system:String>
+    <system:String x:Key="ProjectParams.SelectRebarMarkWithCommentTypeSize">Выберите типоразмер марки арматуры с комментарием:</system:String>
+    <system:String x:Key="ProjectParams.SelectRebarMarkWithCommentTypeSizeTooltip">Выберите типоразмер марки арматуры с комментарием</system:String>
+
+    <system:String x:Key="ProjectParams.SelectUniversalMarkWithTextTypeSize">Выберите типоразмер универсальной марки с текстом:</system:String>
+    <system:String x:Key="ProjectParams.SelectUniversalMarkWithTextTypeSizeTooltip">Выберите типоразмер универсальной марки с текстом</system:String>
+    <system:String x:Key="ProjectParams.SelectBreakLineTypeSize">Выберите типоразмер линии обрыва:</system:String>
+    <system:String x:Key="ProjectParams.SelectBreakLineTypeSizeTooltip">Выберите типоразмер линии обрыва</system:String>
+    <system:String x:Key="ProjectParams.SelectConcretingJointTypeSize">Выберите типоразмер рабочего шва бетонирования:</system:String>
+    <system:String x:Key="ProjectParams.SelectConcretingJointTypeSizeTooltip">Выберите типоразмер рабочего шва бетонирования</system:String>
+
+    <!-- PylonParamsPage -->
+    <system:String x:Key="PylonParams.FormworkElementParameters">Параметры, принадлежащие опалубочному элементу пилона</system:String>
+
+    <system:String x:Key="PylonParams.PylonMarkParameter">Параметр марки пилона:</system:String>
+    <system:String x:Key="PylonParams.PylonMarkParameterTooltip">Параметр марки пилона</system:String>
+    <system:String x:Key="PylonParams.PylonDocumentationSetParameter">Параметр комплекта документации пилона:</system:String>
+    <system:String x:Key="PylonParams.PylonDocumentationSetParameterTooltip">Параметр комплекта документации пилона</system:String>
+
+    <system:String x:Key="PylonParams.TypicalPylonFilterParameter">Параметр фильтрации типовых пилонов и его значение:</system:String>
+    <system:String x:Key="PylonParams.TypicalPylonFilterParameterTooltip">Параметр фильтрации типовых пилонов и его значение</system:String>
+    <system:String x:Key="PylonParams.TypicalPylonFilterValueTooltip">Значение параметра фильтрации типовых пилонов</system:String>
+
+    <system:String x:Key="PylonParams.PylonSectionLengthParameter">Параметр длины сечения пилона:</system:String>
+    <system:String x:Key="PylonParams.PylonSectionLengthParameterTooltip">Параметр длины сечения пилона</system:String>
+    <system:String x:Key="PylonParams.PylonSectionWidthParameter">Параметр ширины сечения пилона:</system:String>
+    <system:String x:Key="PylonParams.PylonSectionWidthParameterTooltip">Параметр ширины сечения пилона</system:String>
+
+    <!-- SchedulesPage -->
+    <system:String x:Key="Schedules.SkeletonSpecification">Спецификация каркасов</system:String>
+    <system:String x:Key="Schedules.SkeletonSpecNameMask">Маска имени спецификации каркасов:</system:String>
+    <system:String x:Key="Schedules.SkeletonSpecNameMaskTooltip">Маска имени спецификации каркасов</system:String>
+    <system:String x:Key="Schedules.ReferenceSkeletonSpecSearchName">Имя для поиска эталонной спецификации каркасов:</system:String>
+    <system:String x:Key="Schedules.ReferenceSkeletonSpecSearchNameTooltip">Имя для поиска эталонной спецификации каркасов</system:String>
+    <system:String x:Key="Schedules.DispatcherGroupingFirstParameterForSpec">В параметр для группировки диспетчера 1:</system:String>
+    <system:String x:Key="Schedules.DispatcherGroupingFirstParameterForSpecTooltip">В параметр для группировки диспетчера 1</system:String>
+    <system:String x:Key="Schedules.DispatcherGroupingSecondParameterForSpec">В параметр для группировки диспетчера 2:</system:String>
+    <system:String x:Key="Schedules.DispatcherGroupingSecondParameterForSpecTooltip">В параметр для группировки диспетчера 2</system:String>
+
+    <system:String x:Key="Schedules.SystemPartsSchedule">Ведомость системных деталей</system:String>
+    <system:String x:Key="Schedules.SystemPartsScheduleNameMask">Маска имени ведомости системных деталей:</system:String>
+    <system:String x:Key="Schedules.SystemPartsScheduleNameMaskTooltip">Маска имени ведомости системных деталей</system:String>
+    <system:String x:Key="Schedules.ReferenceSystemPartsScheduleSearchName">Имя для поиска эталонной ведомости системных деталей:</system:String>
+    <system:String x:Key="Schedules.ReferenceSystemPartsScheduleSearchNameTooltip">Имя для поиска эталонной ведомости системных деталей</system:String>
+    <system:String x:Key="Schedules.DispatcherGroupingFirstParameterForSchedule">В параметр для группировки диспетчера 1:</system:String>
+    <system:String x:Key="Schedules.DispatcherGroupingFirstParameterForScheduleTooltip">В параметр для группировки диспетчера 1</system:String>
+    <system:String x:Key="Schedules.DispatcherGroupingSecondParameterForSchedule">В параметр для группировки диспетчера 2:</system:String>
+    <system:String x:Key="Schedules.DispatcherGroupingSecondParameterForScheduleTooltip">В параметр для группировки диспетчера 2</system:String>
+
+    <system:String x:Key="Schedules.SkeletonElementsSpecification">Спецификация элементов каркасов</system:String>
+    <system:String x:Key="Schedules.SkeletonElementsSpecNameMask">Маска имени спецификации элементов каркасов:</system:String>
+    <system:String x:Key="Schedules.SkeletonElementsSpecNameMaskTooltip">Маска имени спецификации элементов каркасов</system:String>
+    <system:String x:Key="Schedules.ReferenceSkeletonElementsSpecSearchName">Имя для поиска эталонной спецификации элементов каркасов:</system:String>
+    <system:String x:Key="Schedules.ReferenceSkeletonElementsSpecSearchNameTooltip">Имя для поиска эталонной спецификации элементов каркасов</system:String>
+    <system:String x:Key="Schedules.DispatcherGroupingFirstParameterForSpecElements">В параметр для группировки диспетчера 1:</system:String>
+    <system:String x:Key="Schedules.DispatcherGroupingFirstParameterForSpecElementsTooltip">В параметр для группировки диспетчера 1</system:String>
+    <system:String x:Key="Schedules.DispatcherGroupingSecondParameterForSpecElements">В параметр для группировки диспетчера 2:</system:String>
+    <system:String x:Key="Schedules.DispatcherGroupingSecondParameterForSpecElementsTooltip">В параметр для группировки диспетчера 2</system:String>
+
+    <system:String x:Key="Schedules.IfcPartsSchedule">Ведомость IFC деталей</system:String>
+    <system:String x:Key="Schedules.IfcPartsScheduleNameMask">Маска имени ведомости IFC деталей:</system:String>
+    <system:String x:Key="Schedules.IfcPartsScheduleNameMaskTooltip">Маска имени ведомости IFC деталей</system:String>
+    <system:String x:Key="Schedules.ReferenceIfcPartsScheduleSearchName">Имя для поиска эталонной ведомости IFC деталей:</system:String>
+    <system:String x:Key="Schedules.ReferenceIfcPartsScheduleSearchNameTooltip">Имя для поиска эталонной ведомости IFC деталей</system:String>
+    <system:String x:Key="Schedules.DispatcherGroupingFirstParameterForIfcSchedule">В параметр для группировки диспетчера 1:</system:String>
+    <system:String x:Key="Schedules.DispatcherGroupingFirstParameterForIfcScheduleTooltip">В параметр для группировки диспетчера 1</system:String>
+    <system:String x:Key="Schedules.DispatcherGroupingSecondParameterForIfcSchedule">В параметр для группировки диспетчера 2:</system:String>
+    <system:String x:Key="Schedules.DispatcherGroupingSecondParameterForIfcScheduleTooltip">В параметр для группировки диспетчера 2</system:String>
+
+    <system:String x:Key="Schedules.MaterialsSpecification">Спецификация материалов</system:String>
+    <system:String x:Key="Schedules.MaterialsSpecNameMask">Маска имени спецификации материалов:</system:String>
+    <system:String x:Key="Schedules.MaterialsSpecNameMaskTooltip">Маска имени спецификации материалов</system:String>
+    <system:String x:Key="Schedules.ReferenceMaterialsSpecSearchName">Имя для поиска эталонной спецификации материалов:</system:String>
+    <system:String x:Key="Schedules.ReferenceMaterialsSpecSearchNameTooltip">Имя для поиска эталонной спецификации материалов</system:String>
+    <system:String x:Key="Schedules.DispatcherGroupingFirstParameterForMaterials">В параметр для группировки диспетчера 1:</system:String>
+    <system:String x:Key="Schedules.DispatcherGroupingFirstParameterForMaterialsTooltip">В параметр для группировки диспетчера 1</system:String>
+    <system:String x:Key="Schedules.DispatcherGroupingSecondParameterForMaterials">В параметр для группировки диспетчера 2:</system:String>
+    <system:String x:Key="Schedules.DispatcherGroupingSecondParameterForMaterialsTooltip">В параметр для группировки диспетчера 2</system:String>
+
+    <system:String x:Key="Schedules.ScheduleFilterParametersList">Список параметров фильтрации для спецификаций</system:String>
+
+    <system:String x:Key="Schedules.Add">Добавить</system:String>
+    <system:String x:Key="Schedules.Delete">Удалить</system:String>
+
+    <!-- SheetParamsPage -->
+    <system:String x:Key="SheetParams.SheetCreationRules">Правила, по которым будут создаваться новые листы в проекте</system:String>
+
+    <system:String x:Key="SheetParams.PylonSheetNameMask">Маска имени листа пилона:</system:String>
+    <system:String x:Key="SheetParams.PylonSheetNameMaskTooltip">Маска имени листа пилона</system:String>
+
+    <system:String x:Key="SheetParams.SheetSizeParameter">Параметр для формата рамки листа:</system:String>
+    <system:String x:Key="SheetParams.SheetSizeParameterTooltip">Параметр для формата рамки листа</system:String>
+    <system:String x:Key="SheetParams.SheetCoefficientParameter">Параметр для множителя формата рамки листа:</system:String>
+    <system:String x:Key="SheetParams.SheetCoefficientParameterTooltip">Параметр для множителя формата рамки листа</system:String>
+</ResourceDictionary>
