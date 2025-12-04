@@ -13,6 +13,7 @@ using dosymep.WpfCore.Ninject;
 using dosymep.WpfUI.Core.Ninject;
 
 using Ninject;
+using Ninject.Parameters;
 
 using RevitParamsChecker.Models.Checks;
 using RevitParamsChecker.Models.Filtration;
@@ -51,11 +52,12 @@ public class RevitParamsCheckerCommand : BasePluginCommand {
             .ToSelf()
             .InSingletonScope();
 
-        BindViewModels(kernel);
+        BindPageViewModels(kernel);
         BindPages(kernel);
         BindUtilsViews(kernel);
         BindRepos(kernel);
         BindServices(kernel);
+        BindConverters(kernel);
         kernel.Bind<INavigationViewPageProvider>()
             .To<NavigationViewPageProvider>()
             .InSingletonScope();
@@ -66,6 +68,8 @@ public class RevitParamsCheckerCommand : BasePluginCommand {
         kernel.UseWpfUIThemeUpdater();
 
         kernel.BindMainWindow<MainViewModel, MainWindow>();
+        kernel.UseWpfOpenFileDialog<MainViewModel>();
+        kernel.UseWpfSaveFileDialog<MainViewModel>();
 
         string assemblyName = Assembly.GetExecutingAssembly().GetName().Name;
 
@@ -98,19 +102,33 @@ public class RevitParamsCheckerCommand : BasePluginCommand {
             .WithPropertyValue(nameof(Page.DataContext), c => c.Kernel.Get<ResultsPageViewModel>());
     }
 
-    private void BindViewModels(IKernel kernel) {
+    private void BindPageViewModels(IKernel kernel) {
+        var openFileDialogCtorArg = new ConstructorArgument(
+            "openFileDialogService",
+            c => c.Kernel.Get<MainViewModel>().OpenFileDialogService);
+        var saveFileDialogCtorArg = new ConstructorArgument(
+            "saveFileDialogService",
+            c => c.Kernel.Get<MainViewModel>().SaveFileDialogService);
         kernel.Bind<ChecksPageViewModel>()
             .ToSelf()
-            .InSingletonScope();
+            .InSingletonScope()
+            .WithConstructorArgument(openFileDialogCtorArg)
+            .WithConstructorArgument(openFileDialogCtorArg);
         kernel.Bind<RulesPageViewModel>()
             .ToSelf()
-            .InSingletonScope();
+            .InSingletonScope()
+            .WithConstructorArgument(openFileDialogCtorArg)
+            .WithConstructorArgument(openFileDialogCtorArg);
         kernel.Bind<FiltrationPageViewModel>()
             .ToSelf()
-            .InSingletonScope();
+            .InSingletonScope()
+            .WithConstructorArgument(openFileDialogCtorArg)
+            .WithConstructorArgument(openFileDialogCtorArg);
         kernel.Bind<ResultsPageViewModel>()
             .ToSelf()
-            .InSingletonScope();
+            .InSingletonScope()
+            .WithConstructorArgument(openFileDialogCtorArg)
+            .WithConstructorArgument(openFileDialogCtorArg);
     }
 
     private void BindUtilsViews(IKernel kernel) {
@@ -131,23 +149,41 @@ public class RevitParamsCheckerCommand : BasePluginCommand {
     }
 
     private void BindRepos(IKernel kernel) {
+        kernel.Bind<JsonSerializationService>()
+            .ToSelf()
+            .InSingletonScope();
         kernel.Bind<FiltersConfig>()
-            .ToMethod(c => FiltersConfig.GetConfig(c.Kernel.Get<IConfigSerializer>()));
+            .ToMethod(c => FiltersConfig.GetConfig(c.Kernel.Get<JsonSerializationService>()));
         kernel.Bind<FiltersRepository>()
             .ToSelf()
             .InSingletonScope();
 
         kernel.Bind<RulesConfig>()
-            .ToMethod(c => RulesConfig.GetConfig(c.Kernel.Get<IConfigSerializer>()));
+            .ToMethod(c => RulesConfig.GetConfig(c.Kernel.Get<JsonSerializationService>()));
         kernel.Bind<RulesRepository>()
             .ToSelf()
             .InSingletonScope();
 
         kernel.Bind<ChecksConfig>()
-            .ToMethod(c => ChecksConfig.GetConfig(c.Kernel.Get<IConfigSerializer>()));
+            .ToMethod(c => ChecksConfig.GetConfig(c.Kernel.Get<JsonSerializationService>()));
         kernel.Bind<ChecksRepository>()
             .ToSelf()
             .InSingletonScope();
+    }
+
+    private void BindConverters(IKernel kernel) {
+        kernel.Bind<FiltersConverter>()
+            .ToSelf()
+            .InSingletonScope()
+            .WithConstructorArgument("serializer", c => c.Kernel.Get<JsonSerializationService>());
+        kernel.Bind<ChecksConverter>()
+            .ToSelf()
+            .InSingletonScope()
+            .WithConstructorArgument("serializer", c => c.Kernel.Get<JsonSerializationService>());
+        kernel.Bind<RulesConverter>()
+            .ToSelf()
+            .InSingletonScope()
+            .WithConstructorArgument("serializer", c => c.Kernel.Get<JsonSerializationService>());
     }
 
     private void BindServices(IKernel kernel) {

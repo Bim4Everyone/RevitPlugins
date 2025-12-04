@@ -23,6 +23,7 @@ internal class ChecksPageViewModel : BaseViewModel {
     private readonly RulesRepository _rulesRepo;
     private readonly ChecksRepository _checksRepo;
     private readonly RevitRepository _revitRepo;
+    private readonly ChecksConverter _checksConverter;
     private readonly NameEditorService _nameEditorService;
     private bool _allSelected;
     private string[] _availableFiles;
@@ -32,16 +33,22 @@ internal class ChecksPageViewModel : BaseViewModel {
 
     public ChecksPageViewModel(
         ILocalizationService localization,
+        IOpenFileDialogService openFileDialogService,
+        ISaveFileDialogService saveFileDialogService,
         FiltersRepository filtersRepo,
         RulesRepository rulesRepo,
         ChecksRepository checksRepo,
         RevitRepository revitRepo,
+        ChecksConverter checksConverter,
         NameEditorService nameEditorService) {
+        OpenFileDialogService = openFileDialogService ?? throw new ArgumentNullException(nameof(openFileDialogService));
+        SaveFileDialogService = saveFileDialogService ?? throw new ArgumentNullException(nameof(saveFileDialogService));
         _localization = localization ?? throw new ArgumentNullException(nameof(localization));
         _filtersRepo = filtersRepo ?? throw new ArgumentNullException(nameof(filtersRepo));
         _rulesRepo = rulesRepo ?? throw new ArgumentNullException(nameof(rulesRepo));
         _checksRepo = checksRepo ?? throw new ArgumentNullException(nameof(checksRepo));
         _revitRepo = revitRepo ?? throw new ArgumentNullException(nameof(revitRepo));
+        _checksConverter = checksConverter ?? throw new ArgumentNullException(nameof(checksConverter));
         _nameEditorService = nameEditorService ?? throw new ArgumentNullException(nameof(nameEditorService));
 
         _availableFiles = [.._revitRepo.GetDocuments().Select(d => d.Name)];
@@ -58,12 +65,9 @@ internal class ChecksPageViewModel : BaseViewModel {
         SaveCommand = RelayCommand.Create(Save, CanSave);
         SaveAsCommand = RelayCommand.Create(SaveAs, CanSave);
         ExecuteChecksCommand = RelayCommand.Create(ExecuteChecks, CanExecuteChecks);
-        SetCheckSelectedFilesCommand =
-            RelayCommand.CreateAsync<CheckViewModel>(SetSelectedFilesAsync, CanSetSelectedItems);
-        SetCheckSelectedFiltersCommand =
-            RelayCommand.CreateAsync<CheckViewModel>(SetSelectedFiltersAsync, CanSetSelectedItems);
-        SetCheckSelectedRulesCommand =
-            RelayCommand.CreateAsync<CheckViewModel>(SetSelectedRulesAsync, CanSetSelectedItems);
+        SetCheckSelectedFilesCommand = RelayCommand.CreateAsync<CheckViewModel>(SetSelectedFilesAsync, CanSetItems);
+        SetCheckSelectedFiltersCommand = RelayCommand.CreateAsync<CheckViewModel>(SetSelectedFiltersAsync, CanSetItems);
+        SetCheckSelectedRulesCommand = RelayCommand.CreateAsync<CheckViewModel>(SetSelectedRulesAsync, CanSetItems);
 
         _filtersRepo.FiltersChanged += FiltersChangedHandler;
         _rulesRepo.RulesChanged += RulesChangedHandler;
@@ -80,6 +84,8 @@ internal class ChecksPageViewModel : BaseViewModel {
     public IAsyncCommand SetCheckSelectedFilesCommand { get; }
     public IAsyncCommand SetCheckSelectedFiltersCommand { get; }
     public IAsyncCommand SetCheckSelectedRulesCommand { get; }
+    public IOpenFileDialogService OpenFileDialogService { get; }
+    public ISaveFileDialogService SaveFileDialogService { get; }
 
     public ObservableCollection<CheckViewModel> Checks { get; }
 
@@ -209,7 +215,7 @@ internal class ChecksPageViewModel : BaseViewModel {
         }
     }
 
-    private bool CanSetSelectedItems(CheckViewModel check) {
+    private bool CanSetItems(CheckViewModel check) {
         return check is not null;
     }
 

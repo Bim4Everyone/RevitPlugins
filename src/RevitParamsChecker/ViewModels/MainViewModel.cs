@@ -1,41 +1,35 @@
+using System;
 using System.Windows.Input;
 
 using dosymep.SimpleServices;
 using dosymep.WPF.Commands;
 using dosymep.WPF.ViewModels;
 
-using RevitParamsChecker.Models;
-using RevitParamsChecker.Models.Revit;
-using RevitParamsChecker.Services;
-
 namespace RevitParamsChecker.ViewModels;
 
 internal class MainViewModel : BaseViewModel {
-    private readonly RevitRepository _revitRepository;
     private readonly ILocalizationService _localizationService;
 
     private string _errorText;
 
     public MainViewModel(
-        RevitRepository revitRepository,
-        ILocalizationService localizationService) {
-        _revitRepository = revitRepository;
-        _localizationService = localizationService;
+        ILocalizationService localizationService,
+        IOpenFileDialogService openFileDialogService,
+        ISaveFileDialogService saveFileDialogService) {
+        _localizationService = localizationService ?? throw new ArgumentNullException(nameof(localizationService));
+        OpenFileDialogService = openFileDialogService ?? throw new ArgumentNullException(nameof(openFileDialogService));
+        SaveFileDialogService = saveFileDialogService ?? throw new ArgumentNullException(nameof(saveFileDialogService));
 
-        LoadViewCommand = RelayCommand.Create(LoadView);
         AcceptViewCommand = RelayCommand.Create(AcceptView, CanAcceptView);
     }
 
-    public ICommand LoadViewCommand { get; }
-
     public ICommand AcceptViewCommand { get; }
+    public IOpenFileDialogService OpenFileDialogService { get; }
+    public ISaveFileDialogService SaveFileDialogService { get; }
 
     public string ErrorText {
         get => _errorText;
         set => RaiseAndSetIfChanged(ref _errorText, value);
-    }
-
-    private void LoadView() {
     }
 
     private void AcceptView() {

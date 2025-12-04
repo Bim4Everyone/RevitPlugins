@@ -19,15 +19,22 @@ namespace RevitParamsChecker.ViewModels.Rules;
 internal class RulesPageViewModel : BaseViewModel {
     private readonly ILocalizationService _localization;
     private readonly RulesRepository _rulesRepo;
+    private readonly RulesConverter _rulesConverter;
     private readonly NameEditorService _nameEditorService;
     private RuleViewModel _selectedRule;
 
     public RulesPageViewModel(
         ILocalizationService localization,
+        IOpenFileDialogService openFileDialogService,
+        ISaveFileDialogService saveFileDialogService,
         RulesRepository rulesRepo,
+        RulesConverter rulesConverter,
         NameEditorService nameEditorService) {
+        OpenFileDialogService = openFileDialogService ?? throw new ArgumentNullException(nameof(openFileDialogService));
+        SaveFileDialogService = saveFileDialogService ?? throw new ArgumentNullException(nameof(saveFileDialogService));
         _localization = localization ?? throw new ArgumentNullException(nameof(localization));
         _rulesRepo = rulesRepo ?? throw new ArgumentNullException(nameof(rulesRepo));
+        _rulesConverter = rulesConverter ?? throw new ArgumentNullException(nameof(rulesConverter));
         _nameEditorService = nameEditorService ?? throw new ArgumentNullException(nameof(nameEditorService));
 
         Rules = [
@@ -51,6 +58,8 @@ internal class RulesPageViewModel : BaseViewModel {
     public ICommand RenameRuleCommand { get; }
     public ICommand CopyRuleCommand { get; }
     public ICommand RemoveRulesCommand { get; }
+    public IOpenFileDialogService OpenFileDialogService { get; }
+    public ISaveFileDialogService SaveFileDialogService { get; }
 
     public ObservableCollection<RuleViewModel> Rules { get; }
 

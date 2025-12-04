@@ -16,15 +16,22 @@ namespace RevitParamsChecker.ViewModels.Filtration;
 internal class FiltrationPageViewModel : BaseViewModel {
     private readonly ILocalizationService _localization;
     private readonly FiltersRepository _filtersRepo;
+    private readonly FiltersConverter _filtersConverter;
     private readonly NameEditorService _nameEditorService;
     private FilterViewModel _selectedFilter;
 
     public FiltrationPageViewModel(
         ILocalizationService localization,
+        IOpenFileDialogService openFileDialogService,
+        ISaveFileDialogService saveFileDialogService,
         FiltersRepository filtersRepo,
+        FiltersConverter filtersConverter,
         NameEditorService nameEditorService) {
+        OpenFileDialogService = openFileDialogService ?? throw new ArgumentNullException(nameof(openFileDialogService));
+        SaveFileDialogService = saveFileDialogService ?? throw new ArgumentNullException(nameof(saveFileDialogService));
         _localization = localization ?? throw new ArgumentNullException(nameof(localization));
         _filtersRepo = filtersRepo ?? throw new ArgumentNullException(nameof(filtersRepo));
+        _filtersConverter = filtersConverter ?? throw new ArgumentNullException(nameof(filtersConverter));
         _nameEditorService = nameEditorService ?? throw new ArgumentNullException(nameof(nameEditorService));
 
         Filters = [.._filtersRepo.GetFilters().Select(f => new FilterViewModel(f))];
@@ -47,6 +54,8 @@ internal class FiltrationPageViewModel : BaseViewModel {
     public ICommand CopyFilterCommand { get; }
     public ICommand RemoveFiltersCommand { get; }
     public ICommand ShowElementsCommand { get; }
+    public IOpenFileDialogService OpenFileDialogService { get; }
+    public ISaveFileDialogService SaveFileDialogService { get; }
 
     public ObservableCollection<FilterViewModel> Filters { get; }
 
