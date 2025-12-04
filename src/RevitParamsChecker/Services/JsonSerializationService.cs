@@ -10,7 +10,10 @@ internal class JsonSerializationService : IConfigSerializer {
     private readonly JsonSerializerSettings _settings;
 
     public JsonSerializationService() {
-        _settings = new JsonSerializerSettings() { TypeNameHandling = TypeNameHandling.Objects };
+        _settings = new JsonSerializerSettings() {
+            TypeNameHandling = TypeNameHandling.Objects,
+            SerializationBinder = new JsonSerializationBinder()
+        };
     }
 
     public string Serialize<T>(T @object) {
