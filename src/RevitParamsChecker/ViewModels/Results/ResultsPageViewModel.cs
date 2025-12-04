@@ -9,19 +9,28 @@ using dosymep.WPF.Commands;
 using dosymep.WPF.ViewModels;
 
 using RevitParamsChecker.Models.Results;
+using RevitParamsChecker.Models.Revit;
 
 namespace RevitParamsChecker.ViewModels.Results;
 
 internal class ResultsPageViewModel : BaseViewModel {
     private readonly ILocalizationService _localization;
     private readonly CheckResultsRepository _checkResultsRepo;
+    private readonly RevitRepository _revitRepo;
     private CheckResultViewModel _selectedCheckResult;
 
-    public ResultsPageViewModel(ILocalizationService localization, CheckResultsRepository checkResultsRepo) {
+    public ResultsPageViewModel(
+        ILocalizationService localization,
+        CheckResultsRepository checkResultsRepo,
+        RevitRepository revitRepo) {
         _localization = localization ?? throw new ArgumentNullException(nameof(localization));
         _checkResultsRepo = checkResultsRepo ?? throw new ArgumentNullException(nameof(checkResultsRepo));
+        _revitRepo = revitRepo ?? throw new ArgumentNullException(nameof(revitRepo));
 
-        CheckResults = [.._checkResultsRepo.GetCheckResults().Select(c => new CheckResultViewModel(_localization, c))];
+        CheckResults = [
+            .._checkResultsRepo.GetCheckResults().Select(c => new CheckResultViewModel(_localization, c, _revitRepo))
+        ];
+        SelectedCheckResult = CheckResults.FirstOrDefault();
         RemoveCheckResultsCommand = RelayCommand.Create<IList>(RemoveCheckResults, CanRemoveChecksResults);
         _checkResultsRepo.ResultsAdded += ResultsAddedHandler;
     }
@@ -49,8 +58,8 @@ internal class ResultsPageViewModel : BaseViewModel {
 
     private void ResultsAddedHandler(object sender, ResultsChangedEventArgs e) {
         CheckResults.Clear();
-        foreach(var res in e.NewCheckResults) {
-            CheckResults.Add(new CheckResultViewModel(_localization, res));
+        foreach(var result in e.NewCheckResults) {
+            CheckResults.Add(new CheckResultViewModel(_localization, result, _revitRepo));
         }
 
         SelectedCheckResult = CheckResults.FirstOrDefault();

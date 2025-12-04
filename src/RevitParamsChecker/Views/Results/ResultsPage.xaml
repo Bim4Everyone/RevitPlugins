@@ -25,12 +25,12 @@
     <Grid>
         <Grid.ColumnDefinitions>
             <ColumnDefinition
-                Width="1.5*"
+                Width="1*"
                 MinWidth="200" />
             <ColumnDefinition
                 Width="Auto" />
             <ColumnDefinition
-                Width="6*"
+                Width="8*"
                 MinWidth="200" />
         </Grid.ColumnDefinitions>
 

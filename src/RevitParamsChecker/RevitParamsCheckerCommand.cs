@@ -17,6 +17,7 @@ using Ninject.Parameters;
 
 using RevitParamsChecker.Models.Checks;
 using RevitParamsChecker.Models.Filtration;
+using RevitParamsChecker.Models.Results;
 using RevitParamsChecker.Models.Revit;
 using RevitParamsChecker.Models.Rules;
 using RevitParamsChecker.Services;
@@ -166,6 +167,10 @@ public class RevitParamsCheckerCommand : BasePluginCommand {
         kernel.Bind<ChecksConfig>()
             .ToMethod(c => ChecksConfig.GetConfig(c.Kernel.Get<JsonSerializationService>()));
         kernel.Bind<ChecksRepository>()
+            .ToSelf()
+            .InSingletonScope();
+
+        kernel.Bind<CheckResultsRepository>()
             .ToSelf()
             .InSingletonScope();
     }

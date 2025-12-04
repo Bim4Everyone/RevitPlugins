@@ -153,6 +153,15 @@
         x:Key="OrOperator">Или</system:String>
 
     <system:String
+        x:Key="StatusCode.Valid">Соответствует</system:String>
+    <system:String
+        x:Key="StatusCode.Invalid">Не соответствует</system:String>
+    <system:String
+        x:Key="StatusCode.ParamNotFound">Параметр отсутствует</system:String>
+    <system:String
+        x:Key="StatusCode.Error">Ошибка</system:String>
+
+    <system:String
         x:Key="Ok">ОК</system:String>
     <system:String
         x:Key="Cancel">Отмена</system:String>

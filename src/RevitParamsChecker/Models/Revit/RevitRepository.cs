@@ -56,6 +56,17 @@ internal class RevitRepository {
             .ToArray();
     }
 
+    public void SelectElements(ICollection<ElementModel> elements) {
+#if REVIT_2023_OR_GREATER
+        ActiveUIDocument.Selection.SetReferences(elements.Select(e => e.Reference).ToArray());
+#else
+        ActiveUIDocument.Selection.SetElementIds(
+            elements.Where(e => e.Element.Document.Equals(Document))
+                .Select(e => e.Element.Id)
+                .ToArray());
+#endif
+    }
+
     private ICollection<RevitLinkInstance> GetRevitLinkInstances() {
         return new FilteredElementCollector(Document)
             .OfClass(typeof(RevitLinkInstance))

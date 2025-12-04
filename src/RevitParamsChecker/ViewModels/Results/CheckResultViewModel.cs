@@ -10,16 +10,19 @@ using dosymep.WPF.Commands;
 using dosymep.WPF.ViewModels;
 
 using RevitParamsChecker.Models.Results;
+using RevitParamsChecker.Models.Revit;
 using RevitParamsChecker.ViewModels.Rules;
 
 namespace RevitParamsChecker.ViewModels.Results;
 
 internal class CheckResultViewModel : BaseViewModel {
     private readonly ILocalizationService _localization;
+    private readonly RevitRepository _revitRepo;
     private string _elementsFilter;
 
-    public CheckResultViewModel(ILocalizationService localization, CheckResult checkResult) {
+    public CheckResultViewModel(ILocalizationService localization, CheckResult checkResult, RevitRepository revitRepo) {
         _localization = localization ?? throw new ArgumentNullException(nameof(localization));
+        _revitRepo = revitRepo ?? throw new ArgumentNullException(nameof(revitRepo));
         CheckResult = checkResult ?? throw new ArgumentNullException(nameof(checkResult));
         Name = CheckResult.CheckCopy.Name;
         ElementResults = new ReadOnlyCollection<ElementResultViewModel>(
@@ -54,7 +57,10 @@ internal class CheckResultViewModel : BaseViewModel {
     }
 
     private void SelectElements(IList items) {
-        // TODO
+        var elements = items.OfType<ElementResultViewModel>()
+            .Select(vm => vm.ElementResult.ElementModel)
+            .ToArray();
+        _revitRepo.SelectElements(elements);
     }
 
     private bool CanSelectElements(IList items) {
