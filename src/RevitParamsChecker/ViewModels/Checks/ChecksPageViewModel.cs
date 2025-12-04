@@ -3,7 +3,6 @@ using System.Collections;
 using System.Collections.ObjectModel;
 using System.IO;
 using System.Linq;
-using System.Net;
 using System.Threading.Tasks;
 using System.Windows.Input;
 
@@ -103,7 +102,14 @@ internal class ChecksPageViewModel : BaseViewModel {
 
     public bool AllSelected {
         get => _allSelected;
-        set => RaiseAndSetIfChanged(ref _allSelected, value);
+        set {
+            if(_allSelected != value) {
+                RaiseAndSetIfChanged(ref _allSelected, value);
+                foreach(var check in Checks) {
+                    check.IsSelected = value;
+                }
+            }
+        }
     }
 
     private void AddCheck() {
