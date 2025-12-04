@@ -73,40 +73,49 @@
             OpenPaneLength="300"
             IsPaneOpen="True"
             IsBackButtonVisible="Collapsed"
-            IsPaneVisible="True" >
+            IsPaneVisible="True" 
+            IsPaneToggleVisible="False">
             <ui:NavigationView.MenuItems>
                 <ui:NavigationViewItem
                     Content="Запуск плагина"
                     Icon="{ui:SymbolIcon Home24}"
                     TargetPageType="{x:Type pages:GeneralPage}" />
+                
                 <ui:NavigationViewItem
-                    Content="Вертикальные виды"
-                    Icon="{ui:SymbolIcon CenterHorizontal24}"
-                    TargetPageType="{x:Type pages:VerticalViewSettingsPage}" />
-                <ui:NavigationViewItem
-                    Content="Горизонтальные виды"
-                    Icon="{ui:SymbolIcon CenterVertical24}"
-                    TargetPageType="{x:Type pages:HorizontalViewSettingsPage}" />
-                <ui:NavigationViewItem
-                    Content="Спецификации"
-                    Icon="{ui:SymbolIcon TableSettings24}"
-                    TargetPageType="{x:Type pages:SchedulesPage}" />
-                <ui:NavigationViewItem
-                    Content="Легенды и типовые аннотации"
-                    Icon="{ui:SymbolIcon BarcodeScanner24}"
-                    TargetPageType="{x:Type pages:LegendViewsPage}" />
-                <ui:NavigationViewItem
-                    Content="Параметры пилона"
-                    Icon="{ui:SymbolIcon PauseSettings20}"
-                    TargetPageType="{x:Type pages:PylonParamsPage}" />
-                <ui:NavigationViewItem
-                    Content="Параметры проекта"
-                    Icon="{ui:SymbolIcon ArchiveSettings24}"
-                    TargetPageType="{x:Type pages:ProjectParamsPage}" />
-                <ui:NavigationViewItem
-                    Content="Параметры листов"
-                    Icon="{ui:SymbolIcon DocumentSettings20}"
-                    TargetPageType="{x:Type pages:SheetParamsPage}" />
+                    Content="Настройки"
+                    Icon="{ui:SymbolIcon Settings24}"
+                    IsExpanded="True">
+                    <ui:NavigationViewItem.MenuItems >
+                        <ui:NavigationViewItem
+                            Content="Вертикальные виды"
+                            Icon="{ui:SymbolIcon CenterHorizontal24}"
+                            TargetPageType="{x:Type pages:VerticalViewSettingsPage}" />
+                        <ui:NavigationViewItem
+                            Content="Горизонтальные виды"
+                            Icon="{ui:SymbolIcon CenterVertical24}"
+                            TargetPageType="{x:Type pages:HorizontalViewSettingsPage}" />
+                        <ui:NavigationViewItem
+                            Content="Спецификации"
+                            Icon="{ui:SymbolIcon TableSettings24}"
+                            TargetPageType="{x:Type pages:SchedulesPage}" />
+                        <ui:NavigationViewItem
+                            Content="Легенды и типовые аннотации"
+                            Icon="{ui:SymbolIcon BarcodeScanner24}"
+                            TargetPageType="{x:Type pages:LegendViewsPage}" />
+                        <ui:NavigationViewItem
+                            Content="Параметры пилона"
+                            Icon="{ui:SymbolIcon PauseSettings20}"
+                            TargetPageType="{x:Type pages:PylonParamsPage}" />
+                        <ui:NavigationViewItem
+                            Content="Параметры проекта"
+                            Icon="{ui:SymbolIcon ArchiveSettings24}"
+                            TargetPageType="{x:Type pages:ProjectParamsPage}" />
+                        <ui:NavigationViewItem
+                            Content="Параметры листов"
+                            Icon="{ui:SymbolIcon DocumentSettings20}"
+                            TargetPageType="{x:Type pages:SheetParamsPage}" />
+                    </ui:NavigationViewItem.MenuItems>
+                </ui:NavigationViewItem>
             </ui:NavigationView.MenuItems>
             <ui:NavigationView.PaneFooter>
                 <Border
