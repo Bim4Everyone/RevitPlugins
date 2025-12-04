@@ -30,6 +30,8 @@
             AttachableService="{Binding OpenFileDialogService}" />
         <wpfbehaviors:WpfAttachServiceBehavior
             AttachableService="{Binding SaveFileDialogService}" />
+        <wpfbehaviors:WpfAttachServiceBehavior
+            AttachableService="{Binding MessageBoxService}" />
     </i:Interaction.Behaviors>
     <Grid>
         <Grid.RowDefinitions>

@@ -1,14 +1,14 @@
 using System;
 using System.Collections.ObjectModel;
 
-using dosymep.WPF.Commands;
 using dosymep.WPF.ViewModels;
 
+using RevitParamsChecker.Models;
 using RevitParamsChecker.Models.Checks;
 
 namespace RevitParamsChecker.ViewModels.Checks;
 
-internal class CheckViewModel : BaseViewModel, IEquatable<CheckViewModel> {
+internal class CheckViewModel : BaseViewModel, IEquatable<CheckViewModel>, IName {
     private readonly Check _check;
     private readonly Guid _guid;
     private string _name;

@@ -3,11 +3,12 @@ using System.Collections.Generic;
 
 using dosymep.WPF.ViewModels;
 
+using RevitParamsChecker.Models;
 using RevitParamsChecker.Models.Filtration;
 
 namespace RevitParamsChecker.ViewModels.Filtration;
 
-internal class FilterViewModel : BaseViewModel, IEquatable<FilterViewModel> {
+internal class FilterViewModel : BaseViewModel, IEquatable<FilterViewModel>, IName {
     private readonly Guid _guid;
     private string _name;
     private Filter _filter;

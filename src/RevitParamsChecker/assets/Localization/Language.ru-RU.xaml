@@ -57,6 +57,21 @@
         x:Key="ChecksPage.SetSelectedFiltersPrompt">Выберите поисковые наборы</system:String>
     <system:String
         x:Key="ChecksPage.SetSelectedRulesPrompt">Выберите правила</system:String>
+    <system:String
+        x:Key="ChecksPage.SaveFileDefaultName">Настройки проверок параметров</system:String>
+    <system:String
+        x:Key="ChecksPage.Error.CannotLoadChecks">Не удалось загрузить проверки</system:String>
+
+    <system:String
+        x:Key="NamesResolver.Header">Загрузка настроек</system:String>
+    <system:String
+        x:Key="NamesResolver.Body">В загружаемом файле содержатся существующие имена: {0}.</system:String>
+    <system:String
+        x:Key="NamesResolver.Replace">Заменить</system:String>
+    <system:String
+        x:Key="NamesResolver.KeepOnlyOld">Не заменять</system:String>
+    <system:String
+        x:Key="NamesResolver.CopyAndRename">Загрузить с переименованием</system:String>
 
     <system:String
         x:Key="ResultsPage.RulesHeader">Правила</system:String>

@@ -8,17 +8,19 @@ using dosymep.WPF.ViewModels;
 namespace RevitParamsChecker.ViewModels;
 
 internal class MainViewModel : BaseViewModel {
-    private readonly ILocalizationService _localizationService;
+    private readonly ILocalizationService _localization;
 
     private string _errorText;
 
     public MainViewModel(
-        ILocalizationService localizationService,
+        ILocalizationService localization,
         IOpenFileDialogService openFileDialogService,
-        ISaveFileDialogService saveFileDialogService) {
-        _localizationService = localizationService ?? throw new ArgumentNullException(nameof(localizationService));
+        ISaveFileDialogService saveFileDialogService,
+        IMessageBoxService messageBoxService) {
+        _localization = localization ?? throw new ArgumentNullException(nameof(localization));
         OpenFileDialogService = openFileDialogService ?? throw new ArgumentNullException(nameof(openFileDialogService));
         SaveFileDialogService = saveFileDialogService ?? throw new ArgumentNullException(nameof(saveFileDialogService));
+        MessageBoxService = messageBoxService ?? throw new ArgumentNullException(nameof(messageBoxService));
 
         AcceptViewCommand = RelayCommand.Create(AcceptView, CanAcceptView);
     }
@@ -26,6 +28,7 @@ internal class MainViewModel : BaseViewModel {
     public ICommand AcceptViewCommand { get; }
     public IOpenFileDialogService OpenFileDialogService { get; }
     public ISaveFileDialogService SaveFileDialogService { get; }
+    public IMessageBoxService MessageBoxService { get; }
 
     public string ErrorText {
         get => _errorText;

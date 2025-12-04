@@ -68,8 +68,9 @@ public class RevitParamsCheckerCommand : BasePluginCommand {
         kernel.UseWpfUIThemeUpdater();
 
         kernel.BindMainWindow<MainViewModel, MainWindow>();
-        kernel.UseWpfOpenFileDialog<MainViewModel>();
-        kernel.UseWpfSaveFileDialog<MainViewModel>();
+        kernel.UseWpfOpenFileDialog<MainViewModel>(filter: "JSON files (*.json)|*.json");
+        kernel.UseWpfSaveFileDialog<MainViewModel>(filter: "JSON files (*.json)|*.json");
+        kernel.UseWpfUIMessageBox<MainViewModel>();
 
         string assemblyName = Assembly.GetExecutingAssembly().GetName().Name;
 
@@ -109,26 +110,30 @@ public class RevitParamsCheckerCommand : BasePluginCommand {
         var saveFileDialogCtorArg = new ConstructorArgument(
             "saveFileDialogService",
             c => c.Kernel.Get<MainViewModel>().SaveFileDialogService);
+        var messageBoxDialogCtorArg = new ConstructorArgument(
+            "messageBoxService",
+            c => c.Kernel.Get<MainViewModel>().MessageBoxService);
         kernel.Bind<ChecksPageViewModel>()
             .ToSelf()
             .InSingletonScope()
             .WithConstructorArgument(openFileDialogCtorArg)
-            .WithConstructorArgument(openFileDialogCtorArg);
+            .WithConstructorArgument(saveFileDialogCtorArg)
+            .WithConstructorArgument(messageBoxDialogCtorArg);
         kernel.Bind<RulesPageViewModel>()
             .ToSelf()
             .InSingletonScope()
             .WithConstructorArgument(openFileDialogCtorArg)
-            .WithConstructorArgument(openFileDialogCtorArg);
+            .WithConstructorArgument(saveFileDialogCtorArg)
+            .WithConstructorArgument(messageBoxDialogCtorArg);
         kernel.Bind<FiltrationPageViewModel>()
             .ToSelf()
             .InSingletonScope()
             .WithConstructorArgument(openFileDialogCtorArg)
-            .WithConstructorArgument(openFileDialogCtorArg);
+            .WithConstructorArgument(saveFileDialogCtorArg)
+            .WithConstructorArgument(messageBoxDialogCtorArg);
         kernel.Bind<ResultsPageViewModel>()
             .ToSelf()
-            .InSingletonScope()
-            .WithConstructorArgument(openFileDialogCtorArg)
-            .WithConstructorArgument(openFileDialogCtorArg);
+            .InSingletonScope();
     }
 
     private void BindUtilsViews(IKernel kernel) {

@@ -1,7 +1,9 @@
 using System;
 using System.Collections;
 using System.Collections.ObjectModel;
+using System.IO;
 using System.Linq;
+using System.Net;
 using System.Threading.Tasks;
 using System.Windows.Input;
 
@@ -25,6 +27,7 @@ internal class ChecksPageViewModel : BaseViewModel {
     private readonly RevitRepository _revitRepo;
     private readonly ChecksConverter _checksConverter;
     private readonly NamesService _namesService;
+    private string _dirPath;
     private bool _allSelected;
     private string[] _availableFiles;
     private string[] _availableFilters;
@@ -35,6 +38,7 @@ internal class ChecksPageViewModel : BaseViewModel {
         ILocalizationService localization,
         IOpenFileDialogService openFileDialogService,
         ISaveFileDialogService saveFileDialogService,
+        IMessageBoxService messageBoxService,
         FiltersRepository filtersRepo,
         RulesRepository rulesRepo,
         ChecksRepository checksRepo,
@@ -43,6 +47,7 @@ internal class ChecksPageViewModel : BaseViewModel {
         NamesService namesService) {
         OpenFileDialogService = openFileDialogService ?? throw new ArgumentNullException(nameof(openFileDialogService));
         SaveFileDialogService = saveFileDialogService ?? throw new ArgumentNullException(nameof(saveFileDialogService));
+        MessageBoxService = messageBoxService ?? throw new ArgumentNullException(nameof(messageBoxService));
         _localization = localization ?? throw new ArgumentNullException(nameof(localization));
         _filtersRepo = filtersRepo ?? throw new ArgumentNullException(nameof(filtersRepo));
         _rulesRepo = rulesRepo ?? throw new ArgumentNullException(nameof(rulesRepo));
@@ -50,6 +55,7 @@ internal class ChecksPageViewModel : BaseViewModel {
         _revitRepo = revitRepo ?? throw new ArgumentNullException(nameof(revitRepo));
         _checksConverter = checksConverter ?? throw new ArgumentNullException(nameof(checksConverter));
         _namesService = namesService ?? throw new ArgumentNullException(nameof(namesService));
+        _dirPath = Environment.GetFolderPath(Environment.SpecialFolder.Desktop);
 
         _availableFiles = [.._revitRepo.GetDocuments().Select(d => d.Name)];
         _availableFilters = [.._filtersRepo.GetFilters().Select(f => f.Name)];
@@ -86,6 +92,7 @@ internal class ChecksPageViewModel : BaseViewModel {
     public IAsyncCommand SetCheckSelectedRulesCommand { get; }
     public IOpenFileDialogService OpenFileDialogService { get; }
     public ISaveFileDialogService SaveFileDialogService { get; }
+    public IMessageBoxService MessageBoxService { get; }
 
     public ObservableCollection<CheckViewModel> Checks { get; }
 
@@ -167,7 +174,26 @@ internal class ChecksPageViewModel : BaseViewModel {
     }
 
     private void Load() {
-        // TODO
+        if(OpenFileDialogService.ShowDialog(_dirPath)) {
+            string filePath = OpenFileDialogService.File.FullName;
+            string str = File.ReadAllText(filePath);
+            Check[] checks;
+            try {
+                checks = _checksConverter.ConvertFromString(str);
+            } catch(InvalidOperationException) {
+                MessageBoxService.Show(
+                    _localization.GetLocalizedString("ChecksPage.Error.CannotLoadChecks"));
+                return;
+            }
+
+            var newVms = _namesService.GetResolvedCollection(
+                    Checks.ToArray(),
+                    checks.Select(c => new CheckViewModel(c)).ToArray())
+                .OfType<CheckViewModel>();
+            foreach(var vm in newVms) {
+                Checks.Add(vm);
+            }
+        }
     }
 
     private void Save() {
@@ -175,7 +201,14 @@ internal class ChecksPageViewModel : BaseViewModel {
     }
 
     private void SaveAs() {
-        // TODO
+        if(SaveFileDialogService.ShowDialog(
+               _dirPath,
+               _localization.GetLocalizedString("ChecksPage.SaveFileDefaultName"))) {
+            var checks = Checks.Select(c => c.GetCheck()).ToArray();
+            string str = _checksConverter.ConvertToString(checks);
+            File.WriteAllText(SaveFileDialogService.File.FullName, str);
+            _dirPath = SaveFileDialogService.File.DirectoryName;
+        }
     }
 
     private bool CanSave() {

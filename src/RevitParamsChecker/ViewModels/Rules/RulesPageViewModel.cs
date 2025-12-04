@@ -27,11 +27,13 @@ internal class RulesPageViewModel : BaseViewModel {
         ILocalizationService localization,
         IOpenFileDialogService openFileDialogService,
         ISaveFileDialogService saveFileDialogService,
+        IMessageBoxService messageBoxService,
         RulesRepository rulesRepo,
         RulesConverter rulesConverter,
         NamesService namesService) {
         OpenFileDialogService = openFileDialogService ?? throw new ArgumentNullException(nameof(openFileDialogService));
         SaveFileDialogService = saveFileDialogService ?? throw new ArgumentNullException(nameof(saveFileDialogService));
+        MessageBoxService = messageBoxService ?? throw new ArgumentNullException(nameof(messageBoxService));
         _localization = localization ?? throw new ArgumentNullException(nameof(localization));
         _rulesRepo = rulesRepo ?? throw new ArgumentNullException(nameof(rulesRepo));
         _rulesConverter = rulesConverter ?? throw new ArgumentNullException(nameof(rulesConverter));
@@ -60,6 +62,7 @@ internal class RulesPageViewModel : BaseViewModel {
     public ICommand RemoveRulesCommand { get; }
     public IOpenFileDialogService OpenFileDialogService { get; }
     public ISaveFileDialogService SaveFileDialogService { get; }
+    public IMessageBoxService MessageBoxService { get; }
 
     public ObservableCollection<RuleViewModel> Rules { get; }
 

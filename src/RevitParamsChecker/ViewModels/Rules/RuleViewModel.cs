@@ -4,11 +4,12 @@ using System.Collections.Generic;
 using dosymep.SimpleServices;
 using dosymep.WPF.ViewModels;
 
+using RevitParamsChecker.Models;
 using RevitParamsChecker.Models.Rules;
 
 namespace RevitParamsChecker.ViewModels.Rules;
 
-internal class RuleViewModel : BaseViewModel, IEquatable<RuleViewModel> {
+internal class RuleViewModel : BaseViewModel, IEquatable<RuleViewModel>, IName {
     private readonly Rule _rule;
     private readonly ILocalizationService _localization;
     private readonly Guid _guid;
