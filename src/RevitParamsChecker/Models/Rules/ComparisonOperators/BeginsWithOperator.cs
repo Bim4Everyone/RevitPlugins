@@ -7,7 +7,7 @@ internal class BeginsWithOperator : ComparisonOperator {
     }
 
     public override bool Evaluate(string actualValue, string expectedValue) {
-        return actualValue.StartsWith(expectedValue, StringComparison.OrdinalIgnoreCase);
+        return actualValue.StartsWith(expectedValue, StringComparison.CurrentCultureIgnoreCase);
     }
 
     public override bool Equals(ComparisonOperator other) {

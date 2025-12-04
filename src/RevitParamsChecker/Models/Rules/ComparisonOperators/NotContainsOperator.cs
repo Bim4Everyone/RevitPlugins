@@ -7,7 +7,7 @@ internal class NotContainsOperator : ComparisonOperator {
     }
 
     public override bool Evaluate(string actualValue, string expectedValue) {
-        return actualValue.IndexOf(expectedValue, StringComparison.OrdinalIgnoreCase) <= 0;
+        return actualValue.IndexOf(expectedValue, StringComparison.CurrentCultureIgnoreCase) <= 0;
     }
 
     public override bool Equals(ComparisonOperator other) {

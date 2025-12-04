@@ -71,6 +71,7 @@ public class RevitParamsCheckerCommand : BasePluginCommand {
         kernel.UseWpfOpenFileDialog<MainViewModel>(filter: "JSON files (*.json)|*.json");
         kernel.UseWpfSaveFileDialog<MainViewModel>(filter: "JSON files (*.json)|*.json");
         kernel.UseWpfUIMessageBox<MainViewModel>();
+        kernel.UseWpfUIProgressDialog<MainViewModel>();
 
         string assemblyName = Assembly.GetExecutingAssembly().GetName().Name;
 
@@ -110,7 +111,8 @@ public class RevitParamsCheckerCommand : BasePluginCommand {
             .InSingletonScope()
             .WithConstructorArgument("openFileDialogService", c => c.Kernel.Get<MainViewModel>().OpenFileDialogService)
             .WithConstructorArgument("saveFileDialogService", c => c.Kernel.Get<MainViewModel>().SaveFileDialogService)
-            .WithConstructorArgument("messageBoxService", c => c.Kernel.Get<MainViewModel>().MessageBoxService);
+            .WithConstructorArgument("messageBoxService", c => c.Kernel.Get<MainViewModel>().MessageBoxService)
+            .WithConstructorArgument("progressDialogFactory", c => c.Kernel.Get<MainViewModel>().ProgressDialogFactory);
         kernel.Bind<RulesPageViewModel>()
             .ToSelf()
             .InSingletonScope()

@@ -26,6 +26,7 @@ internal class ChecksPageViewModel : BaseViewModel {
     private readonly RevitRepository _revitRepo;
     private readonly ChecksConverter _checksConverter;
     private readonly NamesService _namesService;
+    private readonly ChecksEngine _checksEngine;
     private string _dirPath;
     private bool _allSelected;
     private string[] _availableFiles;
@@ -38,15 +39,18 @@ internal class ChecksPageViewModel : BaseViewModel {
         IOpenFileDialogService openFileDialogService,
         ISaveFileDialogService saveFileDialogService,
         IMessageBoxService messageBoxService,
+        IProgressDialogFactory progressDialogFactory,
         FiltersRepository filtersRepo,
         RulesRepository rulesRepo,
         ChecksRepository checksRepo,
         RevitRepository revitRepo,
         ChecksConverter checksConverter,
-        NamesService namesService) {
+        NamesService namesService,
+        ChecksEngine checksEngine) {
         OpenFileDialogService = openFileDialogService ?? throw new ArgumentNullException(nameof(openFileDialogService));
         SaveFileDialogService = saveFileDialogService ?? throw new ArgumentNullException(nameof(saveFileDialogService));
         MessageBoxService = messageBoxService ?? throw new ArgumentNullException(nameof(messageBoxService));
+        ProgressDialogFactory = progressDialogFactory ?? throw new ArgumentNullException(nameof(progressDialogFactory));
         _localization = localization ?? throw new ArgumentNullException(nameof(localization));
         _filtersRepo = filtersRepo ?? throw new ArgumentNullException(nameof(filtersRepo));
         _rulesRepo = rulesRepo ?? throw new ArgumentNullException(nameof(rulesRepo));
@@ -54,6 +58,7 @@ internal class ChecksPageViewModel : BaseViewModel {
         _revitRepo = revitRepo ?? throw new ArgumentNullException(nameof(revitRepo));
         _checksConverter = checksConverter ?? throw new ArgumentNullException(nameof(checksConverter));
         _namesService = namesService ?? throw new ArgumentNullException(nameof(namesService));
+        _checksEngine = checksEngine ?? throw new ArgumentNullException(nameof(checksEngine));
         _dirPath = Environment.GetFolderPath(Environment.SpecialFolder.Desktop);
 
         _availableFiles = [.._revitRepo.GetDocuments().Select(d => d.Name)];
@@ -92,6 +97,7 @@ internal class ChecksPageViewModel : BaseViewModel {
     public IOpenFileDialogService OpenFileDialogService { get; }
     public ISaveFileDialogService SaveFileDialogService { get; }
     public IMessageBoxService MessageBoxService { get; }
+    public IProgressDialogFactory ProgressDialogFactory { get; }
 
     public ObservableCollection<CheckViewModel> Checks { get; }
 
@@ -172,11 +178,19 @@ internal class ChecksPageViewModel : BaseViewModel {
     }
 
     private void ExecuteChecks() {
-        // TODO
+        using var progressDialogService = ProgressDialogFactory.CreateDialog();
+        progressDialogService.Indeterminate = true;
+        var ct = progressDialogService.CreateCancellationToken();
+        progressDialogService.ShowDialog();
+
+        var checks = Checks.Where(f => f.IsSelected).Select(c => c.GetCheck()).ToArray();
+        foreach(var check in checks) {
+            _checksEngine.Run(check, ct);
+        }
     }
 
     private bool CanExecuteChecks() {
-        return true; // TODO
+        return Checks.Count(c => c.IsSelected) > 0; // TODO
     }
 
     private void Load() {
@@ -192,13 +206,16 @@ internal class ChecksPageViewModel : BaseViewModel {
                 return;
             }
 
-            var newVms = _namesService.GetResolvedCollection(
+            var vms = _namesService.GetResolvedCollection(
                     Checks.ToArray(),
                     checks.Select(c => new CheckViewModel(c)).ToArray())
                 .OfType<CheckViewModel>();
-            foreach(var vm in newVms) {
+            Checks.Clear();
+            foreach(var vm in vms) {
                 Checks.Add(vm);
             }
+
+            SelectedCheck = Checks.FirstOrDefault();
         }
     }
 

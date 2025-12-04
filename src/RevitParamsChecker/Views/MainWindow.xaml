@@ -32,6 +32,8 @@
             AttachableService="{Binding SaveFileDialogService}" />
         <wpfbehaviors:WpfAttachServiceBehavior
             AttachableService="{Binding MessageBoxService}" />
+        <wpfbehaviors:WpfAttachServiceBehavior
+            AttachableService="{Binding ProgressDialogFactory}" />
     </i:Interaction.Behaviors>
     <Grid>
         <Grid.RowDefinitions>

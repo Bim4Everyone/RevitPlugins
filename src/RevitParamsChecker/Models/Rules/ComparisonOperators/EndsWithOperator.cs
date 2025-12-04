@@ -7,7 +7,7 @@ internal class EndsWithOperator : ComparisonOperator {
     }
 
     public override bool Evaluate(string actualValue, string expectedValue) {
-        return actualValue.EndsWith(expectedValue, StringComparison.OrdinalIgnoreCase);
+        return actualValue.EndsWith(expectedValue, StringComparison.CurrentCultureIgnoreCase);
     }
 
     public override bool Equals(ComparisonOperator other) {

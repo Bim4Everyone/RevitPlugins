@@ -28,6 +28,6 @@ internal class FiltersRepository {
     public Filter GetFilter(string filterName) {
         return _filtersConfig.Filters.FirstOrDefault(f => f.Name.Equals(
             filterName,
-            StringComparison.OrdinalIgnoreCase));
+            StringComparison.CurrentCultureIgnoreCase));
     }
 }

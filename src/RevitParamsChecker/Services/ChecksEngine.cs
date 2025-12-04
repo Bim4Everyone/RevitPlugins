@@ -35,7 +35,7 @@ internal class ChecksEngine {
         _localization = localization ?? throw new ArgumentNullException(nameof(localization));
     }
 
-    public void Run(Check check) {
+    public void Run(Check check, CancellationToken ct = default) {
         if(check == null) {
             throw new ArgumentNullException(nameof(check));
         }
@@ -46,6 +46,7 @@ internal class ChecksEngine {
         foreach(var rule in rules) {
             List<ElementResult> elementResults = [];
             foreach(var element in elements) {
+                ct.ThrowIfCancellationRequested();
                 try {
                     bool success = rule.RootRule.Evaluate(element.Element);
                     var status = success ? StatusCode.Valid : StatusCode.Invalid;

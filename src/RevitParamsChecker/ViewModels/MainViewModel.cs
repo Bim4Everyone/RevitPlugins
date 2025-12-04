@@ -16,11 +16,13 @@ internal class MainViewModel : BaseViewModel {
         ILocalizationService localization,
         IOpenFileDialogService openFileDialogService,
         ISaveFileDialogService saveFileDialogService,
-        IMessageBoxService messageBoxService) {
+        IMessageBoxService messageBoxService,
+        IProgressDialogFactory progressDialogFactory) {
         _localization = localization ?? throw new ArgumentNullException(nameof(localization));
         OpenFileDialogService = openFileDialogService ?? throw new ArgumentNullException(nameof(openFileDialogService));
         SaveFileDialogService = saveFileDialogService ?? throw new ArgumentNullException(nameof(saveFileDialogService));
         MessageBoxService = messageBoxService ?? throw new ArgumentNullException(nameof(messageBoxService));
+        ProgressDialogFactory = progressDialogFactory ?? throw new ArgumentNullException(nameof(progressDialogFactory));
 
         AcceptViewCommand = RelayCommand.Create(AcceptView, CanAcceptView);
     }
@@ -29,6 +31,7 @@ internal class MainViewModel : BaseViewModel {
     public IOpenFileDialogService OpenFileDialogService { get; }
     public ISaveFileDialogService SaveFileDialogService { get; }
     public IMessageBoxService MessageBoxService { get; }
+    public IProgressDialogFactory ProgressDialogFactory { get; }
 
     public string ErrorText {
         get => _errorText;

@@ -26,6 +26,8 @@ internal class RulesRepository {
     }
 
     public Rule GetRule(string ruleName) {
-        return _rulesConfig.Rules.FirstOrDefault(r => r.Name.Equals(ruleName, StringComparison.OrdinalIgnoreCase));
+        return _rulesConfig.Rules.FirstOrDefault(r => r.Name.Equals(
+            ruleName,
+            StringComparison.CurrentCultureIgnoreCase));
     }
 }
