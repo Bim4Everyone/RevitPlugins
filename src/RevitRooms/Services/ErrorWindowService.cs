@@ -25,11 +25,12 @@ internal class ErrorWindowService {
     }
 
     public bool ShowNoticeWindow(bool notShowWarnings,
-                                 IEnumerable<WarningViewModel> allWarnings) {
+                                 IList<WarningViewModel> allWarnings) {
         if(notShowWarnings) {
             allWarnings = allWarnings
                 .Where(item => item.TypeInfo != WarningTypeInfo.Warning)
-                .OrderBy(x => x.TypeInfo);
+                .OrderBy(x => x.TypeInfo)
+                .ToList();
         }
 
         if(allWarnings.Any()) {
