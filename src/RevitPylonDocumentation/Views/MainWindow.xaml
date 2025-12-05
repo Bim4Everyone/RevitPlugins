@@ -32,19 +32,6 @@
         </i:EventTrigger>
     </i:Interaction.Triggers>
 
-    <!--<Window.Resources>
-        <ResourceDictionary>
-            <ResourceDictionary.MergedDictionaries>
-                <ResourceDictionary
-                    Source="ResourceDictionary.xaml" />
-                <ResourceDictionary
-                    Source="TooltipsDictionary.xaml" />
-                <ResourceDictionary
-                    Source="CustomStyles.xaml" />
-            </ResourceDictionary.MergedDictionaries>
-        </ResourceDictionary>
-    </Window.Resources>-->
-
     <Window.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>

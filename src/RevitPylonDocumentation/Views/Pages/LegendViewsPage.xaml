@@ -26,8 +26,6 @@
             <ResourceDictionary.MergedDictionaries>
                 <ResourceDictionary
                     Source="../CustomStyles.xaml" />
-                <ResourceDictionary
-                    Source="../TooltipsDictionary.xaml" />
             </ResourceDictionary.MergedDictionaries>
         </ResourceDictionary>
     </core:WpfUIPlatformPage.Resources>
