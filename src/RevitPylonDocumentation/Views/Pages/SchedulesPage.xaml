@@ -58,26 +58,26 @@
 
                     <controls:DoubleTextBoxSettingControl
                         LabelText="{me:LocalizationSource Schedules.SkeletonSpecNameMask}"
-                        FirstTextBoxText="{Binding Path=SchedulesSettings.SkeletonSchedulePrefixTemp, UpdateSourceTrigger=PropertyChanged}"
-                        SecondTextBoxText="{Binding Path=SchedulesSettings.SkeletonScheduleSuffixTemp, UpdateSourceTrigger=PropertyChanged}"
+                        FirstTextBoxText="{Binding Path=SchedulesSettings.SkeletonSchedulePrefixTemp, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
+                        SecondTextBoxText="{Binding Path=SchedulesSettings.SkeletonScheduleSuffixTemp, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
                         ToolTipText="{me:LocalizationSource SchedulesPage.SkeletonSpecNameMaskToolTip}"
                         TextChangedCommand="{Binding SettingsChangedCommand}" />
 
                     <controls:TextBoxSettingControl
                         LabelText="{me:LocalizationSource Schedules.ReferenceSkeletonSpecSearchName}"
-                        TextBoxText="{Binding Path=SchedulesSettings.SkeletonScheduleNameTemp, UpdateSourceTrigger=PropertyChanged}"
+                        TextBoxText="{Binding Path=SchedulesSettings.SkeletonScheduleNameTemp, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
                         ToolTipText="{me:LocalizationSource SchedulesPage.ReferenceSkeletonSpecSearchNameToolTip}"
                         TextChangedCommand="{Binding SettingsChangedCommand}" />
 
                     <controls:TextBoxSettingControl
                         LabelText="{me:LocalizationSource Schedules.DispatcherGroupingFirstParameterForSpec}"
-                        TextBoxText="{Binding Path=SchedulesSettings.SkeletonScheduleDisp1Temp, UpdateSourceTrigger=PropertyChanged}"
+                        TextBoxText="{Binding Path=SchedulesSettings.SkeletonScheduleDisp1Temp, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
                         ToolTipText="{me:LocalizationSource SchedulesPage.DispatcherGroupingFirstParameterForSpecToolTip}"
                         TextChangedCommand="{Binding SettingsChangedCommand}" />
 
                     <controls:TextBoxSettingControl
                         LabelText="{me:LocalizationSource Schedules.DispatcherGroupingSecondParameterForSpec}"
-                        TextBoxText="{Binding Path=SchedulesSettings.SkeletonScheduleDisp2Temp, UpdateSourceTrigger=PropertyChanged}"
+                        TextBoxText="{Binding Path=SchedulesSettings.SkeletonScheduleDisp2Temp, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
                         ToolTipText="{me:LocalizationSource SchedulesPage.DispatcherGroupingSecondParameterForSpecToolTip}"
                         TextChangedCommand="{Binding SettingsChangedCommand}" />
                 </StackPanel>
@@ -97,26 +97,26 @@
 
                     <controls:DoubleTextBoxSettingControl
                         LabelText="{me:LocalizationSource Schedules.SystemPartsScheduleNameMask}"
-                        FirstTextBoxText="{Binding Path=SchedulesSettings.SystemPartsSchedulePrefixTemp, UpdateSourceTrigger=PropertyChanged}"
-                        SecondTextBoxText="{Binding Path=SchedulesSettings.SystemPartsScheduleSuffixTemp, UpdateSourceTrigger=PropertyChanged}"
+                        FirstTextBoxText="{Binding Path=SchedulesSettings.SystemPartsSchedulePrefixTemp, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
+                        SecondTextBoxText="{Binding Path=SchedulesSettings.SystemPartsScheduleSuffixTemp, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
                         ToolTipText="{me:LocalizationSource SchedulesPage.SystemPartsScheduleNameMaskToolTip}"
                         TextChangedCommand="{Binding SettingsChangedCommand}" />
 
                     <controls:TextBoxSettingControl
                         LabelText="{me:LocalizationSource Schedules.ReferenceSystemPartsScheduleSearchName}"
-                        TextBoxText="{Binding Path=SchedulesSettings.SystemPartsScheduleNameTemp, UpdateSourceTrigger=PropertyChanged}"
+                        TextBoxText="{Binding Path=SchedulesSettings.SystemPartsScheduleNameTemp, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
                         ToolTipText="{me:LocalizationSource SchedulesPage.ReferenceSystemPartsScheduleSearchNameToolTip}"
                         TextChangedCommand="{Binding SettingsChangedCommand}" />
 
                     <controls:TextBoxSettingControl
                         LabelText="{me:LocalizationSource Schedules.DispatcherGroupingFirstParameterForSchedule}"
-                        TextBoxText="{Binding Path=SchedulesSettings.SystemPartsScheduleDisp1Temp, UpdateSourceTrigger=PropertyChanged}"
+                        TextBoxText="{Binding Path=SchedulesSettings.SystemPartsScheduleDisp1Temp, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
                         ToolTipText="{me:LocalizationSource SchedulesPage.DispatcherGroupingFirstParameterForScheduleToolTip}"
                         TextChangedCommand="{Binding SettingsChangedCommand}" />
 
                     <controls:TextBoxSettingControl
                         LabelText="{me:LocalizationSource Schedules.DispatcherGroupingSecondParameterForSchedule}"
-                        TextBoxText="{Binding Path=SchedulesSettings.SystemPartsScheduleDisp2Temp, UpdateSourceTrigger=PropertyChanged}"
+                        TextBoxText="{Binding Path=SchedulesSettings.SystemPartsScheduleDisp2Temp, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
                         ToolTipText="{me:LocalizationSource SchedulesPage.DispatcherGroupingSecondParameterForScheduleToolTip}"
                         TextChangedCommand="{Binding SettingsChangedCommand}" />
                 </StackPanel>
@@ -136,26 +136,26 @@
 
                     <controls:DoubleTextBoxSettingControl
                         LabelText="{me:LocalizationSource Schedules.SkeletonElementsSpecNameMask}"
-                        FirstTextBoxText="{Binding Path=SchedulesSettings.SkeletonByElemsSchedulePrefixTemp, UpdateSourceTrigger=PropertyChanged}"
-                        SecondTextBoxText="{Binding Path=SchedulesSettings.SkeletonByElemsScheduleSuffixTemp, UpdateSourceTrigger=PropertyChanged}"
+                        FirstTextBoxText="{Binding Path=SchedulesSettings.SkeletonByElemsSchedulePrefixTemp, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
+                        SecondTextBoxText="{Binding Path=SchedulesSettings.SkeletonByElemsScheduleSuffixTemp, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
                         ToolTipText="{me:LocalizationSource SchedulesPage.SkeletonElementsSpecNameMaskToolTip}"
                         TextChangedCommand="{Binding SettingsChangedCommand}" />
 
                     <controls:TextBoxSettingControl
                         LabelText="{me:LocalizationSource Schedules.ReferenceSkeletonElementsSpecSearchName}"
-                        TextBoxText="{Binding Path=SchedulesSettings.SkeletonByElemsScheduleNameTemp, UpdateSourceTrigger=PropertyChanged}"
+                        TextBoxText="{Binding Path=SchedulesSettings.SkeletonByElemsScheduleNameTemp, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
                         ToolTipText="{me:LocalizationSource SchedulesPage.ReferenceSkeletonElementsSpecSearchNameToolTip}"
                         TextChangedCommand="{Binding SettingsChangedCommand}" />
 
                     <controls:TextBoxSettingControl
                         LabelText="{me:LocalizationSource Schedules.DispatcherGroupingFirstParameterForSpecElements}"
-                        TextBoxText="{Binding Path=SchedulesSettings.SkeletonByElemsScheduleDisp1Temp, UpdateSourceTrigger=PropertyChanged}"
+                        TextBoxText="{Binding Path=SchedulesSettings.SkeletonByElemsScheduleDisp1Temp, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
                         ToolTipText="{me:LocalizationSource SchedulesPage.DispatcherGroupingFirstParameterForSpecElementsToolTip}"
                         TextChangedCommand="{Binding SettingsChangedCommand}" />
 
                     <controls:TextBoxSettingControl
                         LabelText="{me:LocalizationSource Schedules.DispatcherGroupingSecondParameterForSpecElements}"
-                        TextBoxText="{Binding Path=SchedulesSettings.SkeletonByElemsScheduleDisp2Temp, UpdateSourceTrigger=PropertyChanged}"
+                        TextBoxText="{Binding Path=SchedulesSettings.SkeletonByElemsScheduleDisp2Temp, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
                         ToolTipText="{me:LocalizationSource SchedulesPage.DispatcherGroupingSecondParameterForSpecElementsToolTip}"
                         TextChangedCommand="{Binding SettingsChangedCommand}" />
                 </StackPanel>
@@ -175,26 +175,26 @@
 
                     <controls:DoubleTextBoxSettingControl
                         LabelText="{me:LocalizationSource Schedules.IfcPartsScheduleNameMask}"
-                        FirstTextBoxText="{Binding Path=SchedulesSettings.IfcPartsSchedulePrefixTemp, UpdateSourceTrigger=PropertyChanged}"
-                        SecondTextBoxText="{Binding Path=SchedulesSettings.IfcPartsScheduleSuffixTemp, UpdateSourceTrigger=PropertyChanged}"
+                        FirstTextBoxText="{Binding Path=SchedulesSettings.IfcPartsSchedulePrefixTemp, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
+                        SecondTextBoxText="{Binding Path=SchedulesSettings.IfcPartsScheduleSuffixTemp, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
                         ToolTipText="{me:LocalizationSource SchedulesPage.IfcPartsScheduleNameMaskToolTip}"
                         TextChangedCommand="{Binding SettingsChangedCommand}" />
 
                     <controls:TextBoxSettingControl
                         LabelText="{me:LocalizationSource Schedules.ReferenceIfcPartsScheduleSearchName}"
-                        TextBoxText="{Binding Path=SchedulesSettings.IfcPartsScheduleNameTemp, UpdateSourceTrigger=PropertyChanged}"
+                        TextBoxText="{Binding Path=SchedulesSettings.IfcPartsScheduleNameTemp, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
                         ToolTipText="{me:LocalizationSource SchedulesPage.ReferenceIfcPartsScheduleSearchNameToolTip}"
                         TextChangedCommand="{Binding SettingsChangedCommand}" />
 
                     <controls:TextBoxSettingControl
                         LabelText="{me:LocalizationSource Schedules.DispatcherGroupingFirstParameterForIfcSchedule}"
-                        TextBoxText="{Binding Path=SchedulesSettings.IfcPartsScheduleDisp1Temp, UpdateSourceTrigger=PropertyChanged}"
+                        TextBoxText="{Binding Path=SchedulesSettings.IfcPartsScheduleDisp1Temp, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
                         ToolTipText="{me:LocalizationSource SchedulesPage.DispatcherGroupingFirstParameterForIfcScheduleToolTip}"
                         TextChangedCommand="{Binding SettingsChangedCommand}" />
 
                     <controls:TextBoxSettingControl
                         LabelText="{me:LocalizationSource Schedules.DispatcherGroupingSecondParameterForIfcSchedule}"
-                        TextBoxText="{Binding Path=SchedulesSettings.IfcPartsScheduleDisp2Temp, UpdateSourceTrigger=PropertyChanged}"
+                        TextBoxText="{Binding Path=SchedulesSettings.IfcPartsScheduleDisp2Temp, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
                         ToolTipText="{me:LocalizationSource SchedulesPage.DispatcherGroupingSecondParameterForIfcScheduleToolTip}"
                         TextChangedCommand="{Binding SettingsChangedCommand}" />
                 </StackPanel>
@@ -214,26 +214,26 @@
 
                     <controls:DoubleTextBoxSettingControl
                         LabelText="{me:LocalizationSource Schedules.MaterialsSpecNameMask}"
-                        FirstTextBoxText="{Binding Path=SchedulesSettings.MaterialSchedulePrefixTemp, UpdateSourceTrigger=PropertyChanged}"
-                        SecondTextBoxText="{Binding Path=SchedulesSettings.MaterialScheduleSuffixTemp, UpdateSourceTrigger=PropertyChanged}"
+                        FirstTextBoxText="{Binding Path=SchedulesSettings.MaterialSchedulePrefixTemp, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
+                        SecondTextBoxText="{Binding Path=SchedulesSettings.MaterialScheduleSuffixTemp, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
                         ToolTipText="{me:LocalizationSource SchedulesPage.MaterialsSpecNameMaskToolTip}"
                         TextChangedCommand="{Binding SettingsChangedCommand}" />
 
                     <controls:TextBoxSettingControl
                         LabelText="{me:LocalizationSource Schedules.ReferenceMaterialsSpecSearchName}"
-                        TextBoxText="{Binding Path=SchedulesSettings.MaterialScheduleNameTemp, UpdateSourceTrigger=PropertyChanged}"
+                        TextBoxText="{Binding Path=SchedulesSettings.MaterialScheduleNameTemp, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
                         ToolTipText="{me:LocalizationSource SchedulesPage.ReferenceMaterialsSpecSearchNameToolTip}"
                         TextChangedCommand="{Binding SettingsChangedCommand}" />
 
                     <controls:TextBoxSettingControl
                         LabelText="{me:LocalizationSource Schedules.DispatcherGroupingFirstParameterForMaterials}"
-                        TextBoxText="{Binding Path=SchedulesSettings.MaterialScheduleDisp1Temp, UpdateSourceTrigger=PropertyChanged}"
+                        TextBoxText="{Binding Path=SchedulesSettings.MaterialScheduleDisp1Temp, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
                         ToolTipText="{me:LocalizationSource SchedulesPage.DispatcherGroupingFirstParameterForMaterialsToolTip}"
                         TextChangedCommand="{Binding SettingsChangedCommand}" />
 
                     <controls:TextBoxSettingControl
                         LabelText="{me:LocalizationSource Schedules.DispatcherGroupingSecondParameterForMaterials}"
-                        TextBoxText="{Binding Path=SchedulesSettings.MaterialScheduleDisp2Temp, UpdateSourceTrigger=PropertyChanged}"
+                        TextBoxText="{Binding Path=SchedulesSettings.MaterialScheduleDisp2Temp, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
                         ToolTipText="{me:LocalizationSource SchedulesPage.DispatcherGroupingSecondParameterForMaterialsToolTip}"
                         TextChangedCommand="{Binding SettingsChangedCommand}" />
                 </StackPanel>
@@ -254,7 +254,7 @@
 
                     <ui:ListView
                         Margin="0 5"
-                        ItemsSource="{Binding Path=SchedulesSettings.ParamsForScheduleFiltersTemp, UpdateSourceTrigger=PropertyChanged}"
+                        ItemsSource="{Binding Path=SchedulesSettings.ParamsForScheduleFiltersTemp, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
                         SelectionMode="Multiple">
 
                         <ui:ListView.ItemTemplate>
@@ -280,7 +280,7 @@
                                         Margin="0 0 5 0"
                                         FontSize="13"
                                         Style="{StaticResource TextBoxWithTooltipStyle}"
-                                        Text="{Binding Path=ParamNameInSchedule, UpdateSourceTrigger=PropertyChanged}"
+                                        Text="{Binding Path=ParamNameInSchedule, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
                                         ToolTip="{me:LocalizationSource SchedulesPage.ParamNameInScheduleToolTip}">
                                         <i:Interaction.Triggers>
                                             <i:EventTrigger
@@ -296,7 +296,7 @@
                                         Margin="5 0 0 0"
                                         FontSize="13"
                                         Style="{StaticResource TextBoxWithTooltipStyle}"
-                                        Text="{Binding Path=ParamNameInHost, UpdateSourceTrigger=PropertyChanged}"
+                                        Text="{Binding Path=ParamNameInHost, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
                                         ToolTip="{me:LocalizationSource SchedulesPage.ParamNameInHostToolTip}">
                                         <i:Interaction.Triggers>
                                             <i:EventTrigger

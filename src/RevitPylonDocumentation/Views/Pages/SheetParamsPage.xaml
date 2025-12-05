@@ -49,15 +49,15 @@
 
                 <controls:DoubleTextBoxSettingControl
                     LabelText="{me:LocalizationSource SheetParams.PylonSheetNameMask}"
-                    FirstTextBoxText="{Binding Path=ProjectSettings.SheetPrefixTemp, UpdateSourceTrigger=PropertyChanged}"
-                    SecondTextBoxText="{Binding Path=ProjectSettings.SheetSuffixTemp, UpdateSourceTrigger=PropertyChanged}"
+                    FirstTextBoxText="{Binding Path=ProjectSettings.SheetPrefixTemp, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
+                    SecondTextBoxText="{Binding Path=ProjectSettings.SheetSuffixTemp, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
                     ToolTipText="{me:LocalizationSource SheetParams.PylonSheetNameMaskToolTip}"
                     TextChangedCommand="{Binding SettingsChangedCommand}" />
 
                 <controls:ComboBoxSettingControl
                     LabelText="{me:LocalizationSource GeneralPage.SelectTitleBlockType}"
                     ItemsSource="{Binding TitleBlocks}"
-                    SelectedItem="{Binding TypesSettings.SelectedTitleBlock}"
+                    SelectedItem="{Binding TypesSettings.SelectedTitleBlock, Mode=TwoWay}"
                     ToolTipText="{me:LocalizationSource SheetParams.SelectTitleBlockTypeToolTip}"
                     SelectionChangedCommand="{Binding SettingsChangedCommand}"
                     ItemTemplate="{StaticResource WithFamilyNameItemTemplate}" />
@@ -71,14 +71,14 @@
                     <controls:TextBoxSettingControl
                         Grid.Column="0"
                         LabelText="{me:LocalizationSource SheetParams.SheetSizeParameter}"
-                        TextBoxText="{Binding Path=ProjectSettings.SheetSizeTemp, UpdateSourceTrigger=PropertyChanged}"
+                        TextBoxText="{Binding Path=ProjectSettings.SheetSizeTemp, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
                         ToolTipText="{me:LocalizationSource SheetParams.SheetSizeParameterToolTip}"
                         TextChangedCommand="{Binding SettingsChangedCommand}" />
 
                     <controls:TextBoxSettingControl
                         Grid.Column="1"
                         LabelText="{me:LocalizationSource SheetParams.SheetCoefficientParameter}"
-                        TextBoxText="{Binding Path=ProjectSettings.SheetCoefficientTemp, UpdateSourceTrigger=PropertyChanged}"
+                        TextBoxText="{Binding Path=ProjectSettings.SheetCoefficientTemp, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
                         ToolTipText="{me:LocalizationSource SheetParams.SheetCoefficientParameterToolTip}"
                         TextChangedCommand="{Binding SettingsChangedCommand}" />
                 </Grid>

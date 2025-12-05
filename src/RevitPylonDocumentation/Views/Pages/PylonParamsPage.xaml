@@ -47,19 +47,19 @@
 
                 <controls:TextBoxSettingControl
                     LabelText="{me:LocalizationSource PylonParams.PylonMarkParameter}"
-                    TextBoxText="{Binding Path=ProjectSettings.MarkTemp, UpdateSourceTrigger=PropertyChanged}"
+                    TextBoxText="{Binding Path=ProjectSettings.MarkTemp, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
                     ToolTipText="{me:LocalizationSource PylonParamsPage.PylonMarkParameterToolTip}"
                     TextChangedCommand="{Binding SettingsChangedCommand}" />
 
                 <controls:TextBoxSettingControl
                     LabelText="{me:LocalizationSource PylonParams.PylonDocumentationSetParameter}"
-                    TextBoxText="{Binding Path=ProjectSettings.ProjectSectionTemp, UpdateSourceTrigger=PropertyChanged}"
+                    TextBoxText="{Binding Path=ProjectSettings.ProjectSectionTemp, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
                     ToolTipText="{me:LocalizationSource PylonParamsPage.PylonDocumentationSetParameterToolTip}"
                     TextChangedCommand="{Binding SettingsChangedCommand}" />
 
                 <controls:TextBoxSettingControl
                     LabelText="{me:LocalizationSource PylonParams.TypicalPylonFilterParameter}"
-                    TextBoxText="{Binding Path=ProjectSettings.TypicalPylonFilterParameterTemp, UpdateSourceTrigger=PropertyChanged}"
+                    TextBoxText="{Binding Path=ProjectSettings.TypicalPylonFilterParameterTemp, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
                     ToolTipText="{me:LocalizationSource PylonParamsPage.TypicalPylonFilterParameterToolTip}"
                     TextChangedCommand="{Binding SettingsChangedCommand}" />
 
@@ -81,13 +81,13 @@
 
                 <controls:TextBoxSettingControl
                     LabelText="{me:LocalizationSource PylonParams.PylonSectionLengthParameter}"
-                    TextBoxText="{Binding Path=ProjectSettings.PylonLengthParamNameTemp, UpdateSourceTrigger=PropertyChanged}"
+                    TextBoxText="{Binding Path=ProjectSettings.PylonLengthParamNameTemp, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
                     ToolTipText="{me:LocalizationSource PylonParamsPage.PylonSectionLengthParameterToolTip}"
                     TextChangedCommand="{Binding SettingsChangedCommand}" />
 
                 <controls:TextBoxSettingControl
                     LabelText="{me:LocalizationSource PylonParams.PylonSectionWidthParameter}"
-                    TextBoxText="{Binding Path=ProjectSettings.PylonWidthParamNameTemp, UpdateSourceTrigger=PropertyChanged}"
+                    TextBoxText="{Binding Path=ProjectSettings.PylonWidthParamNameTemp, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
                     ToolTipText="{me:LocalizationSource PylonParamsPage.PylonSectionWidthParameterToolTip}"
                     TextChangedCommand="{Binding SettingsChangedCommand}" />
             </StackPanel>

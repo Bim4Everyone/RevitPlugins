@@ -57,14 +57,14 @@
                         <controls:TextBoxSettingControl
                             Grid.Column="0"
                             LabelText="{me:LocalizationSource ProjectParams.DispatcherGroupingFirstParameter}"
-                            TextBoxText="{Binding Path=ProjectSettings.DispatcherGroupingFirstTemp, UpdateSourceTrigger=PropertyChanged}"
+                            TextBoxText="{Binding Path=ProjectSettings.DispatcherGroupingFirstTemp, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
                             ToolTipText="{me:LocalizationSource ProjectParams.DispatcherGroupingFirstParameterToolTip}"
                             TextChangedCommand="{Binding SettingsChangedCommand}" />
 
                         <controls:TextBoxSettingControl
                             Grid.Column="1"
                             LabelText="{me:LocalizationSource ProjectParams.DispatcherGroupingSecondParameter}"
-                            TextBoxText="{Binding Path=ProjectSettings.DispatcherGroupingSecondTemp, UpdateSourceTrigger=PropertyChanged}"
+                            TextBoxText="{Binding Path=ProjectSettings.DispatcherGroupingSecondTemp, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
                             ToolTipText="{me:LocalizationSource ProjectParams.DispatcherGroupingSecondParameterToolTip}"
                             TextChangedCommand="{Binding SettingsChangedCommand}" />
                     </Grid>
@@ -81,7 +81,7 @@
                             Grid.Column="0"
                             LabelText="{me:LocalizationSource ProjectParams.SelectDimensionTypeSize}"
                             ItemsSource="{Binding DimensionTypes}"
-                            SelectedItem="{Binding TypesSettings.SelectedDimensionType}"
+                            SelectedItem="{Binding TypesSettings.SelectedDimensionType, Mode=TwoWay}"
                             ToolTipText="{me:LocalizationSource ProjectParams.SelectDimensionTypeSizeToolTip}"
                             SelectionChangedCommand="{Binding SettingsChangedCommand}"
                             ItemTemplate="{StaticResource WithoutFamilyNameItemTemplate}" />
@@ -90,7 +90,7 @@
                             Grid.Column="1"
                             LabelText="{me:LocalizationSource ProjectParams.SelectSpotDimensionTypeSize}"
                             ItemsSource="{Binding SpotDimensionTypes}"
-                            SelectedItem="{Binding TypesSettings.SelectedSpotDimensionType}"
+                            SelectedItem="{Binding TypesSettings.SelectedSpotDimensionType, Mode=TwoWay}"
                             ToolTipText="{me:LocalizationSource ProjectParams.SelectSpotDimensionTypeSizeToolTip}"
                             SelectionChangedCommand="{Binding SettingsChangedCommand}"
                             ItemTemplate="{StaticResource WithoutFamilyNameItemTemplate}" />
@@ -108,7 +108,7 @@
                             Grid.Column="0"
                             LabelText="{me:LocalizationSource ProjectParams.SelectRebarProductMarkTypeSize}"
                             ItemsSource="{Binding RebarTagTypes}"
-                            SelectedItem="{Binding TypesSettings.SelectedSkeletonTagType}"
+                            SelectedItem="{Binding TypesSettings.SelectedSkeletonTagType, Mode=TwoWay}"
                             ToolTipText="{me:LocalizationSource ProjectParams.SelectRebarProductMarkTypeSizeToolTip}"
                             SelectionChangedCommand="{Binding SettingsChangedCommand}"
                             ItemTemplate="{StaticResource WithoutFamilyNameItemTemplate}" />
@@ -117,7 +117,7 @@
                             Grid.Column="1"
                             LabelText="{me:LocalizationSource ProjectParams.SelectRebarMarkWithSerifTypeSize}"
                             ItemsSource="{Binding RebarTagTypes}"
-                            SelectedItem="{Binding TypesSettings.SelectedRebarTagTypeWithSerif}"
+                            SelectedItem="{Binding TypesSettings.SelectedRebarTagTypeWithSerif, Mode=TwoWay}"
                             ToolTipText="{me:LocalizationSource ProjectParams.SelectRebarMarkWithSerifTypeSizeToolTip}"
                             SelectionChangedCommand="{Binding SettingsChangedCommand}"
                             ItemTemplate="{StaticResource WithoutFamilyNameItemTemplate}" />
@@ -135,7 +135,7 @@
                             Grid.Column="0"
                             LabelText="{me:LocalizationSource ProjectParams.SelectRebarMarkWithStepTypeSize}"
                             ItemsSource="{Binding RebarTagTypes}"
-                            SelectedItem="{Binding TypesSettings.SelectedRebarTagTypeWithStep}"
+                            SelectedItem="{Binding TypesSettings.SelectedRebarTagTypeWithStep, Mode=TwoWay}"
                             ToolTipText="{me:LocalizationSource ProjectParams.SelectRebarMarkWithStepTypeSizeToolTip}"
                             SelectionChangedCommand="{Binding SettingsChangedCommand}"
                             ItemTemplate="{StaticResource WithoutFamilyNameItemTemplate}" />
@@ -144,7 +144,7 @@
                             Grid.Column="1"
                             LabelText="{me:LocalizationSource ProjectParams.SelectRebarMarkWithCommentTypeSize}"
                             ItemsSource="{Binding RebarTagTypes}"
-                            SelectedItem="{Binding TypesSettings.SelectedRebarTagTypeWithComment}"
+                            SelectedItem="{Binding TypesSettings.SelectedRebarTagTypeWithComment, Mode=TwoWay}"
                             ToolTipText="{me:LocalizationSource ProjectParams.SelectRebarMarkWithCommentTypeSizeToolTip}"
                             SelectionChangedCommand="{Binding SettingsChangedCommand}"
                             ItemTemplate="{StaticResource WithoutFamilyNameItemTemplate}" />
@@ -162,7 +162,7 @@
                             Grid.Column="0"
                             LabelText="{me:LocalizationSource ProjectParams.SelectUniversalMarkWithTextTypeSize}"
                             ItemsSource="{Binding TypicalAnnotationsTypes}"
-                            SelectedItem="{Binding TypesSettings.SelectedUniversalTagType}"
+                            SelectedItem="{Binding TypesSettings.SelectedUniversalTagType, Mode=TwoWay}"
                             ToolTipText="{me:LocalizationSource ProjectParams.SelectUniversalMarkWithTextTypeSizeToolTip}"
                             SelectionChangedCommand="{Binding SettingsChangedCommand}"
                             ItemTemplate="{StaticResource WithoutFamilyNameItemTemplate}" />
@@ -171,7 +171,7 @@
                             Grid.Column="1"
                             LabelText="{me:LocalizationSource ProjectParams.SelectBreakLineTypeSize}"
                             ItemsSource="{Binding DetailComponentsTypes}"
-                            SelectedItem="{Binding TypesSettings.SelectedBreakLineType}"
+                            SelectedItem="{Binding TypesSettings.SelectedBreakLineType, Mode=TwoWay}"
                             ToolTipText="{me:LocalizationSource ProjectParams.SelectBreakLineTypeSizeToolTip}"
                             SelectionChangedCommand="{Binding SettingsChangedCommand}"
                             ItemTemplate="{StaticResource WithoutFamilyNameItemTemplate}" />
@@ -189,7 +189,7 @@
                             Grid.Column="0"
                             LabelText="{me:LocalizationSource ProjectParams.SelectConcretingJointTypeSize}"
                             ItemsSource="{Binding DetailComponentsTypes}"
-                            SelectedItem="{Binding TypesSettings.SelectedConcretingJointType}"
+                            SelectedItem="{Binding TypesSettings.SelectedConcretingJointType, Mode=TwoWay}"
                             ToolTipText="{me:LocalizationSource ProjectParams.SelectConcretingJointTypeSizeToolTip}"
                             SelectionChangedCommand="{Binding SettingsChangedCommand}"
                             ItemTemplate="{StaticResource WithoutFamilyNameItemTemplate}" />

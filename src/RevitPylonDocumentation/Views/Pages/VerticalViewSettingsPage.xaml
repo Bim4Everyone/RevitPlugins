@@ -57,22 +57,22 @@
 
                 <controls:DoubleTextBoxSettingControl
                     LabelText="{me:LocalizationSource VerticalView.PylonMainViewNameMask}"
-                    FirstTextBoxText="{Binding Path=ViewSectionSettings.GeneralViewPrefixTemp, UpdateSourceTrigger=PropertyChanged}"
-                    SecondTextBoxText="{Binding Path=ViewSectionSettings.GeneralViewSuffixTemp, UpdateSourceTrigger=PropertyChanged}"
+                    FirstTextBoxText="{Binding Path=ViewSectionSettings.GeneralViewPrefixTemp, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
+                    SecondTextBoxText="{Binding Path=ViewSectionSettings.GeneralViewSuffixTemp, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
                     ToolTipText="{me:LocalizationSource VerticalViewSettingsPage.PylonMainViewNameMaskToolTip}"
                     TextChangedCommand="{Binding SettingsChangedCommand}" />
 
                 <controls:DoubleTextBoxSettingControl
                     LabelText="{me:LocalizationSource VerticalView.PylonSideViewNameMask}"
-                    FirstTextBoxText="{Binding Path=ViewSectionSettings.GeneralViewPerpendicularPrefixTemp, UpdateSourceTrigger=PropertyChanged}"
-                    SecondTextBoxText="{Binding Path=ViewSectionSettings.GeneralViewPerpendicularSuffixTemp, UpdateSourceTrigger=PropertyChanged}"
+                    FirstTextBoxText="{Binding Path=ViewSectionSettings.GeneralViewPerpendicularPrefixTemp, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
+                    SecondTextBoxText="{Binding Path=ViewSectionSettings.GeneralViewPerpendicularSuffixTemp, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
                     ToolTipText="{me:LocalizationSource VerticalViewSettingsPage.PylonSideViewNameMaskToolTip}"
                     TextChangedCommand="{Binding SettingsChangedCommand}" />
 
                 <controls:ComboBoxSettingControl
                     LabelText="{me:LocalizationSource VerticalView.SelectMainAndSideViewTemplate}"
                     ItemsSource="{Binding ViewTemplatesInPj}"
-                    SelectedItem="{Binding TypesSettings.SelectedGeneralViewTemplate}"
+                    SelectedItem="{Binding TypesSettings.SelectedGeneralViewTemplate, Mode=TwoWay}"
                     ToolTipText="{me:LocalizationSource VerticalViewSettingsPage.SelectMainAndSideViewTemplateToolTip}"
                     SelectionChangedCommand="{Binding SettingsChangedCommand}"
                     ItemTemplate="{StaticResource WithoutFamilyNameItemTemplate}" />
@@ -93,22 +93,22 @@
 
                 <controls:DoubleTextBoxSettingControl
                     LabelText="{me:LocalizationSource VerticalView.PylonMainRebarViewNameMask}"
-                    FirstTextBoxText="{Binding Path=ViewSectionSettings.GeneralRebarViewPrefixTemp, UpdateSourceTrigger=PropertyChanged}"
-                    SecondTextBoxText="{Binding Path=ViewSectionSettings.GeneralRebarViewSuffixTemp, UpdateSourceTrigger=PropertyChanged}"
+                    FirstTextBoxText="{Binding Path=ViewSectionSettings.GeneralRebarViewPrefixTemp, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
+                    SecondTextBoxText="{Binding Path=ViewSectionSettings.GeneralRebarViewSuffixTemp, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
                     ToolTipText="{me:LocalizationSource VerticalViewSettingsPage.PylonMainRebarViewNameMaskToolTip}"
                     TextChangedCommand="{Binding SettingsChangedCommand}" />
 
                 <controls:DoubleTextBoxSettingControl
                     LabelText="{me:LocalizationSource VerticalView.PylonSideRebarViewNameMask}"
-                    FirstTextBoxText="{Binding Path=ViewSectionSettings.GeneralRebarViewPerpendicularPrefixTemp, UpdateSourceTrigger=PropertyChanged}"
-                    SecondTextBoxText="{Binding Path=ViewSectionSettings.GeneralRebarViewPerpendicularSuffixTemp, UpdateSourceTrigger=PropertyChanged}"
+                    FirstTextBoxText="{Binding Path=ViewSectionSettings.GeneralRebarViewPerpendicularPrefixTemp, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
+                    SecondTextBoxText="{Binding Path=ViewSectionSettings.GeneralRebarViewPerpendicularSuffixTemp, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
                     ToolTipText="{me:LocalizationSource VerticalViewSettingsPage.PylonSideRebarViewNameMaskToolTip}"
                     TextChangedCommand="{Binding SettingsChangedCommand}" />
 
                 <controls:ComboBoxSettingControl
                     LabelText="{me:LocalizationSource VerticalView.SelectMainAndSideRebarViewTemplate}"
                     ItemsSource="{Binding ViewTemplatesInPj}"
-                    SelectedItem="{Binding TypesSettings.SelectedGeneralRebarViewTemplate}"
+                    SelectedItem="{Binding TypesSettings.SelectedGeneralRebarViewTemplate, Mode=TwoWay}"
                     ToolTipText="{me:LocalizationSource VerticalViewSettingsPage.SelectMainAndSideRebarViewTemplateToolTip}"
                     SelectionChangedCommand="{Binding SettingsChangedCommand}"
                     ItemTemplate="{StaticResource WithoutFamilyNameItemTemplate}" />
@@ -129,19 +129,19 @@
 
                 <controls:TextBoxSettingControl
                     LabelText="{me:LocalizationSource VerticalView.MainViewXOffset}"
-                    TextBoxText="{Binding Path=ViewSectionSettings.GeneralViewXOffsetTemp, UpdateSourceTrigger=PropertyChanged}"
+                    TextBoxText="{Binding Path=ViewSectionSettings.GeneralViewXOffsetTemp, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
                     ToolTipText="{me:LocalizationSource VerticalViewSettingsPage.MainViewXOffsetToolTip}"
                     TextChangedCommand="{Binding SettingsChangedCommand}" />
 
                 <controls:TextBoxSettingControl
                     LabelText="{me:LocalizationSource VerticalView.MainViewYTopOffset}"
-                    TextBoxText="{Binding Path=ViewSectionSettings.GeneralViewYTopOffsetTemp, UpdateSourceTrigger=PropertyChanged}"
+                    TextBoxText="{Binding Path=ViewSectionSettings.GeneralViewYTopOffsetTemp, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
                     ToolTipText="{me:LocalizationSource VerticalViewSettingsPage.MainViewYTopOffsetToolTip}"
                     TextChangedCommand="{Binding SettingsChangedCommand}" />
 
                 <controls:TextBoxSettingControl
                     LabelText="{me:LocalizationSource VerticalView.MainViewYBottomOffset}"
-                    TextBoxText="{Binding Path=ViewSectionSettings.GeneralViewYBottomOffsetTemp, UpdateSourceTrigger=PropertyChanged}"
+                    TextBoxText="{Binding Path=ViewSectionSettings.GeneralViewYBottomOffsetTemp, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
                     ToolTipText="{me:LocalizationSource VerticalViewSettingsPage.MainViewYBottomOffsetToolTip}"
                     TextChangedCommand="{Binding SettingsChangedCommand}" />
             </StackPanel>
@@ -161,19 +161,19 @@
 
                 <controls:TextBoxSettingControl
                     LabelText="{me:LocalizationSource VerticalView.SideViewXOffset}"
-                    TextBoxText="{Binding Path=ViewSectionSettings.GeneralViewPerpXOffsetTemp, UpdateSourceTrigger=PropertyChanged}"
+                    TextBoxText="{Binding Path=ViewSectionSettings.GeneralViewPerpXOffsetTemp, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
                     ToolTipText="{me:LocalizationSource VerticalViewSettingsPage.SideViewXOffsetToolTip}"
                     TextChangedCommand="{Binding SettingsChangedCommand}" />
 
                 <controls:TextBoxSettingControl
                     LabelText="{me:LocalizationSource VerticalView.SideViewYTopOffset}"
-                    TextBoxText="{Binding Path=ViewSectionSettings.GeneralViewPerpYTopOffsetTemp, UpdateSourceTrigger=PropertyChanged}"
+                    TextBoxText="{Binding Path=ViewSectionSettings.GeneralViewPerpYTopOffsetTemp, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
                     ToolTipText="{me:LocalizationSource VerticalViewSettingsPage.SideViewYTopOffsetToolTip}"
                     TextChangedCommand="{Binding SettingsChangedCommand}" />
 
                 <controls:TextBoxSettingControl
                     LabelText="{me:LocalizationSource VerticalView.SideViewYBottomOffset}"
-                    TextBoxText="{Binding Path=ViewSectionSettings.GeneralViewPerpYBottomOffsetTemp, UpdateSourceTrigger=PropertyChanged}"
+                    TextBoxText="{Binding Path=ViewSectionSettings.GeneralViewPerpYBottomOffsetTemp, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
                     ToolTipText="{me:LocalizationSource VerticalViewSettingsPage.SideViewYBottomOffsetToolTip}"
                     TextChangedCommand="{Binding SettingsChangedCommand}" />
             </StackPanel>
@@ -196,7 +196,7 @@
                     Grid.Row="2"
                     LabelText="{me:LocalizationSource VerticalView.SelectViewTypeSizeForMainAndSideViews}"
                     ItemsSource="{Binding ViewFamilyTypes}"
-                    SelectedItem="{Binding TypesSettings.SelectedViewFamilyType}"
+                    SelectedItem="{Binding TypesSettings.SelectedViewFamilyType, Mode=TwoWay}"
                     ToolTipText="{me:LocalizationSource VerticalViewSettingsPage.SelectViewTypeSizeForMainAndSideViewsToolTip}"
                     SelectionChangedCommand="{Binding SettingsChangedCommand}"
                     ItemTemplate="{StaticResource WithoutFamilyNameItemTemplate}" />

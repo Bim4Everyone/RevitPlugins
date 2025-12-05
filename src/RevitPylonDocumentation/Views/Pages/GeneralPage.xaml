@@ -120,7 +120,7 @@
                         Grid.Column="0"
                         Margin="5"
                         PlaceholderText="{me:LocalizationSource GeneralPage.SearchPlaceholder}"
-                        Text="{Binding Path=HostsInfoFilter, UpdateSourceTrigger=PropertyChanged}" 
+                        Text="{Binding Path=HostsInfoFilter, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" 
                         ToolTip="{me:LocalizationSource GeneralPage.SearchPylonsToolTip}"/>
 
                     <ui:Button
@@ -419,7 +419,7 @@
                     Grid.Row="2"
                     LabelText="{me:LocalizationSource GeneralPage.SelectTitleBlockType}"
                     ItemsSource="{Binding TitleBlocks}"
-                    SelectedItem="{Binding TypesSettings.SelectedTitleBlock}"
+                    SelectedItem="{Binding TypesSettings.SelectedTitleBlock, Mode=TwoWay}"
                     ToolTipText="Типоразмер рамки (штампа), которая будет размещена на новых листах"
                     SelectionChangedCommand="{Binding SettingsChangedCommand}"
                     ItemTemplate="{StaticResource WithFamilyNameItemTemplate}"/>
@@ -456,7 +456,7 @@
                     <controls:ComboBoxSettingControl
                         LabelText="{me:LocalizationSource GeneralPage.VerticalViews}"
                         ItemsSource="{Binding ViewTemplatesInPj}"
-                        SelectedItem="{Binding TypesSettings.SelectedGeneralViewTemplate}"
+                        SelectedItem="{Binding TypesSettings.SelectedGeneralViewTemplate, Mode=TwoWay}"
                         ToolTipText="Шаблон вида, который необходимо применить к основному и боковому виду при их создании."
                         SelectionChangedCommand="{Binding SettingsChangedCommand}"
                         ItemTemplate="{StaticResource WithoutFamilyNameItemTemplate}" />
@@ -464,7 +464,7 @@
                     <controls:ComboBoxSettingControl
                         LabelText="{me:LocalizationSource GeneralPage.HorizontalViews}"
                         ItemsSource="{Binding ViewTemplatesInPj}"
-                        SelectedItem="{Binding TypesSettings.SelectedTransverseViewTemplate}"
+                        SelectedItem="{Binding TypesSettings.SelectedTransverseViewTemplate, Mode=TwoWay}"
                         ToolTipText="Шаблон вида, который необходимо применить к горизонтальным видам при их создании."
                         SelectionChangedCommand="{Binding SettingsChangedCommand}"
                         ItemTemplate="{StaticResource WithoutFamilyNameItemTemplate}" />
@@ -487,7 +487,7 @@
                         Grid.Column="1"
                         LabelText="{me:LocalizationSource GeneralPage.VerticalViews}"
                         ItemsSource="{Binding ViewTemplatesInPj}"
-                        SelectedItem="{Binding TypesSettings.SelectedGeneralRebarViewTemplate}"
+                        SelectedItem="{Binding TypesSettings.SelectedGeneralRebarViewTemplate, Mode=TwoWay}"
                         ToolTipText="Шаблон вида, который необходимо применить к основному и боковому виду армирования при их создании."
                         SelectionChangedCommand="{Binding SettingsChangedCommand}"
                         ItemTemplate="{StaticResource WithoutFamilyNameItemTemplate}" />
@@ -497,7 +497,7 @@
                         Grid.Column="1"
                         LabelText="{me:LocalizationSource GeneralPage.HorizontalViews}"
                         ItemsSource="{Binding ViewTemplatesInPj}"
-                        SelectedItem="{Binding TypesSettings.SelectedTransverseRebarViewTemplate}"
+                        SelectedItem="{Binding TypesSettings.SelectedTransverseRebarViewTemplate, Mode=TwoWay}"
                         ToolTipText="Шаблон вида, который необходимо применить к горизонтальным видам армирования при их создании."
                         SelectionChangedCommand="{Binding SettingsChangedCommand}"
                         ItemTemplate="{StaticResource WithoutFamilyNameItemTemplate}" />
