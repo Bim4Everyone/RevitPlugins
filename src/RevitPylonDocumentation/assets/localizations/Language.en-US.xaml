@@ -73,6 +73,21 @@
     <system:String x:Key="MainWindow.BimTip1">1. Make sure that the required pylons have the parameter 'Filtration 1' filled with 'per 1 piece'</system:String>
     <system:String x:Key="MainWindow.BimTip2">2. Make sure you have loaded the latest versions of formwork and reinforcement families from the library</system:String>
 
+    <system:String x:Key="MainWindow.VerticalViewsSettings">A tab with settings for vertical views 
+        - views of formwork and reinforcement that look at the pylon from the side</system:String>
+    <system:String x:Key="MainWindow.HorizontalViewsSettings">A tab with settings for horizontal views 
+        - views of formwork and reinforcement that cut the pylon crosswise and look from top to bottom</system:String>
+    <system:String x:Key="MainWindow.SchedulesSettings">A tab with specification settings 
+        - tables with data on the pylon and its reinforcement</system:String>
+    <system:String x:Key="MainWindow.LegendsAndAnnotationsSettings">A tab with settings for other views, for example, 
+        here you can set up the legend of the note and the rules for its placement on the view</system:String>
+    <system:String x:Key="MainWindow.PylonParametersSettings">A tab with pylon parameter settings 
+        - parameters that relate to the pylon formwork model, such as its length and section width</system:String>
+    <system:String x:Key="MainWindow.ProjectParametersSettings">A tab with project parameter settings 
+        - parameters that determine the grouping in the manager, as well as the sizes that should be used for annotation</system:String>
+    <system:String x:Key="MainWindow.SheetParametersSettings">A tab with sheet parameters settings 
+        - parameters that determine the characteristics of the sheet, such as its format</system:String>
+    
     <!-- GeneralPage -->
     <system:String x:Key="GeneralPage.PylonSelection">Pylon Selection</system:String>
     <system:String x:Key="GeneralPage.DocumentationSet">Documentation Set:</system:String>

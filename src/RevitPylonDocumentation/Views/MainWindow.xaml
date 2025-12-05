@@ -89,31 +89,38 @@
                         <ui:NavigationViewItem
                             Content="{me:LocalizationSource MainWindow.VerticalViews}"
                             Icon="{ui:SymbolIcon CenterHorizontal24}"
-                            TargetPageType="{x:Type pages:VerticalViewSettingsPage}" />
+                            TargetPageType="{x:Type pages:VerticalViewSettingsPage}"
+                            ToolTip="{me:LocalizationSource MainWindow.VerticalViewsSettings}"/>
                         <ui:NavigationViewItem
                             Content="{me:LocalizationSource MainWindow.HorizontalViews}"
                             Icon="{ui:SymbolIcon CenterVertical24}"
-                            TargetPageType="{x:Type pages:HorizontalViewSettingsPage}" />
+                            TargetPageType="{x:Type pages:HorizontalViewSettingsPage}" 
+                            ToolTip="{me:LocalizationSource MainWindow.HorizontalViewsSettings}"/>
                         <ui:NavigationViewItem
                             Content="{me:LocalizationSource MainWindow.Schedules}"
                             Icon="{ui:SymbolIcon TableSettings24}"
-                            TargetPageType="{x:Type pages:SchedulesPage}" />
+                            TargetPageType="{x:Type pages:SchedulesPage}" 
+                            ToolTip="{me:LocalizationSource MainWindow.SchedulesSettings}"/>
                         <ui:NavigationViewItem
                             Content="{me:LocalizationSource MainWindow.LegendsAndAnnotations}"
                             Icon="{ui:SymbolIcon BarcodeScanner24}"
-                            TargetPageType="{x:Type pages:LegendViewsPage}" />
+                            TargetPageType="{x:Type pages:LegendViewsPage}" 
+                            ToolTip="{me:LocalizationSource MainWindow.LegendsAndAnnotationsSettings}"/>
                         <ui:NavigationViewItem
                             Content="{me:LocalizationSource MainWindow.PylonParameters}"
                             Icon="{ui:SymbolIcon PauseSettings20}"
-                            TargetPageType="{x:Type pages:PylonParamsPage}" />
+                            TargetPageType="{x:Type pages:PylonParamsPage}" 
+                            ToolTip="{me:LocalizationSource MainWindow.PylonParametersSettings}"/>
                         <ui:NavigationViewItem
                             Content="{me:LocalizationSource MainWindow.ProjectParameters}"
                             Icon="{ui:SymbolIcon ArchiveSettings24}"
-                            TargetPageType="{x:Type pages:ProjectParamsPage}" />
+                            TargetPageType="{x:Type pages:ProjectParamsPage}" 
+                            ToolTip="{me:LocalizationSource MainWindow.ProjectParametersSettings}"/>
                         <ui:NavigationViewItem
                             Content="{me:LocalizationSource MainWindow.SheetParameters}"
                             Icon="{ui:SymbolIcon DocumentSettings20}"
-                            TargetPageType="{x:Type pages:SheetParamsPage}" />
+                            TargetPageType="{x:Type pages:SheetParamsPage}" 
+                            ToolTip="{me:LocalizationSource MainWindow.SheetParametersSettings}"/>
                     </ui:NavigationViewItem.MenuItems>
                 </ui:NavigationViewItem>
             </ui:NavigationView.MenuItems>
