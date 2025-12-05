@@ -1,3 +1,4 @@
+using dosymep.SimpleServices;
 using dosymep.WPF.ViewModels;
 
 using RevitPylonDocumentation.Models.UserSettings;
@@ -5,6 +6,8 @@ using RevitPylonDocumentation.ViewModels;
 
 namespace RevitPylonDocumentation.ViewModels.UserSettings;
 internal class UserViewSectionSettingsVM : BaseViewModel {
+    private readonly ILocalizationService _localizationService;
+    
     private string _generalViewPrefixTemp = "";
     private string _generalViewSuffixTemp = "";
     private string _generalRebarViewPrefixTemp = "Каркас ";
@@ -50,8 +53,9 @@ internal class UserViewSectionSettingsVM : BaseViewModel {
 
     private string _viewFamilyTypeNameTemp = "РАЗРЕЗ_Номер вида без номера листа";
 
-    public UserViewSectionSettingsVM(MainViewModel mainViewModel) {
+    public UserViewSectionSettingsVM(MainViewModel mainViewModel, ILocalizationService localizationService) {
         ViewModel = mainViewModel;
+        _localizationService = localizationService;
     }
 
     public MainViewModel ViewModel { get; set; }
@@ -334,39 +338,39 @@ internal class UserViewSectionSettingsVM : BaseViewModel {
 
     public void CheckViewSectionsSettings() {
         if(!int.TryParse(ViewModel.ViewSectionSettings.GeneralViewXOffset, out _)) {
-            ViewModel.ErrorText = "Значение отступа основного вида по X некорректно";
+            ViewModel.ErrorText = _localizationService.GetLocalizedString("VM.MainViewXOffsetInvalid");
         }
         if(!int.TryParse(ViewModel.ViewSectionSettings.GeneralViewYTopOffset, out _)) {
-            ViewModel.ErrorText = "Значение отступа основного вида по Y сверху некорректно";
+            ViewModel.ErrorText = _localizationService.GetLocalizedString("VM.MainViewYTopOffsetInvalid");
         }
         if(!int.TryParse(ViewModel.ViewSectionSettings.GeneralViewYBottomOffset, out _)) {
-            ViewModel.ErrorText = "Значение отступа основного вида по Y снизу некорректно";
+            ViewModel.ErrorText = _localizationService.GetLocalizedString("VM.MainViewYBottomOffsetInvalid");
         }
         if(!int.TryParse(ViewModel.ViewSectionSettings.GeneralViewPerpXOffset, out _)) {
-            ViewModel.ErrorText = "Значение отступа бокового вида по X некорректно";
+            ViewModel.ErrorText = _localizationService.GetLocalizedString("VM.SideViewXOffsetInvalid");
         }
         if(!int.TryParse(ViewModel.ViewSectionSettings.GeneralViewPerpYTopOffset, out _)) {
-            ViewModel.ErrorText = "Значение отступа бокового вида по Y сверху некорректно";
+            ViewModel.ErrorText = _localizationService.GetLocalizedString("VM.SideViewYTopOffsetInvalid");
         }
         if(!int.TryParse(ViewModel.ViewSectionSettings.GeneralViewPerpYBottomOffset, out _)) {
-            ViewModel.ErrorText = "Значение отступа бокового вида по Y снизу некорректно";
+            ViewModel.ErrorText = _localizationService.GetLocalizedString("VM.SideViewYBottomOffsetInvalid");
         }
 
         if(!int.TryParse(ViewModel.ViewSectionSettings.TransverseViewXOffset, out _)) {
-            ViewModel.ErrorText = "Значение отступа поперечного вида по X некорректно";
+            ViewModel.ErrorText = _localizationService.GetLocalizedString("VM.TransverseViewXOffsetInvalid");
         }
         if(!int.TryParse(ViewModel.ViewSectionSettings.TransverseViewYOffsetTemp, out _)) {
-            ViewModel.ErrorText = "Значение отступа поперечного вида по Y некорректно";
+            ViewModel.ErrorText = _localizationService.GetLocalizedString("VM.TransverseViewYOffsetInvalid");
         }
 
         if(!double.TryParse(ViewModel.ViewSectionSettings.TransverseViewFirstElevationTemp, out _)) {
-            ViewModel.ErrorText = "Значение возвышения первого горизонтального вида некорректно";
+            ViewModel.ErrorText = _localizationService.GetLocalizedString("VM.FirstHorizontalViewElevationInvalid");
         }
         if(!double.TryParse(ViewModel.ViewSectionSettings.TransverseViewSecondElevationTemp, out _)) {
-            ViewModel.ErrorText = "Значение возвышения второго горизонтального вида некорректно";
+            ViewModel.ErrorText = _localizationService.GetLocalizedString("VM.SecondHorizontalViewElevationInvalid");
         }
         if(!double.TryParse(ViewModel.ViewSectionSettings.TransverseViewThirdElevationTemp, out _)) {
-            ViewModel.ErrorText = "Значение возвышения третьего горизонтального вида некорректно";
+            ViewModel.ErrorText = _localizationService.GetLocalizedString("VM.ThirdHorizontalViewElevationInvalid");
         }
     }
 

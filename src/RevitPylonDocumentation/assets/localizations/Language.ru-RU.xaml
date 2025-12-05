@@ -1,7 +1,59 @@
 <ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
                     xmlns:system="clr-namespace:System;assembly=mscorlib">
-    
+
+    <!-- Pylon Analysis Error Messages -->
+    <system:String x:Key="VM.TypicalPylonFilterParamNotFound">Параметр фильтрации типовых пилонов не найден</system:String>
+    <system:String x:Key="VM.ProjectSectionParamNotFound">Параметр раздела не найден у элементов Стен или Несущих колонн</system:String>
+    <system:String x:Key="VM.HostMarkParamNotFound">Параметр марки не найден у элементов Стен или Несущих колонн</system:String>
+    <system:String x:Key="VM.DuplicatePylonMarksFound">Найдены пилоны с одинаковой маркой</system:String>
+
+    <!-- ViewModel Error Messages -->
+    <system:String x:Key="VM.SelectPylon">Выберите пилон</system:String>
+    <system:String x:Key="VM.SheetTypeNotSelected">Не выбран типоразмер рамки листа</system:String>
+    <system:String x:Key="VM.ViewTypeNotSelected">Не выбран типоразмер создаваемого вида</system:String>
+    <system:String x:Key="VM.MainViewsTemplateNotSelected">Не выбран шаблон основных видов</system:String>
+    <system:String x:Key="VM.MainRebarViewsTemplateNotSelected">Не выбран шаблон основных видов армирования</system:String>
+    <system:String x:Key="VM.TransverseViewsTemplateNotSelected">Не выбран шаблон поперечных видов</system:String>
+    <system:String x:Key="VM.TransverseRebarViewsTemplateNotSelected">Не выбран шаблон поперечных видов армирования</system:String>
+    <system:String x:Key="VM.LegendNotSelected">Не выбрана легенда примечаний</system:String>
+    <system:String x:Key="VM.ViewTypeSizeNotSelected">Не выбран типоразмер создаваемого вида</system:String>
+    <system:String x:Key="VM.DimensionTypeNotSelected">Не выбран типоразмер для расстановки размеров</system:String>
+    <system:String x:Key="VM.SpotDimensionTypeNotSelected">Не выбран типоразмер высотной отметки</system:String>
+    <system:String x:Key="VM.SkeletonTagTypeNotSelected">Не задан типоразмер марки каркаса</system:String>
+    <system:String x:Key="VM.RebarTagWithSerifTypeNotSelected">Не задан типоразмер марки арматуры с засечкой</system:String>
+    <system:String x:Key="VM.RebarTagWithoutSerifTypeNotSelected">Не задан типоразмер марки арматуры без засечки</system:String>
+    <system:String x:Key="VM.RebarTagWithCommentTypeNotSelected">Не задан типоразмер марки арматуры с комментарием</system:String>
+    <system:String x:Key="VM.UniversalTagTypeNotSelected">Не задан типоразмер универсальной марки</system:String>
+    <system:String x:Key="VM.BreakLineTypeNotSelected">Не задан типоразмер линии обрыва</system:String>
+    <system:String x:Key="VM.ConcretingJointTypeNotSelected">Не задан типоразмер рабочего шва бетонирования</system:String>
+    <system:String x:Key="VM.WriteName">Введите название</system:String>
+
+    <!-- Project Settings Validation Error Messages -->
+    <system:String x:Key="VM.DispatcherGroupingFirstParamInvalid">Наименование параметра диспетчера 1 некорректно</system:String>
+    <system:String x:Key="VM.DispatcherGroupingSecondParamInvalid">Наименование параметра диспетчера 2 некорректно</system:String>
+    <system:String x:Key="VM.LegendOffsetsNotSet">Не заданы отступы на листе для легенды примечаний</system:String>
+    <system:String x:Key="VM.SheetSizeParamInvalid">Наименование параметра формата рамки листа некорректно</system:String>
+    <system:String x:Key="VM.SheetCoefficientParamInvalid">Наименование параметра множителя формата рамки листа некорректно</system:String>
+    <system:String x:Key="VM.PylonLengthParamInvalid">Наименование параметра длины сечения пилона некорректно</system:String>
+    <system:String x:Key="VM.PylonWidthParamInvalid">Наименование параметра ширины сечения пилона некорректно</system:String>
+
+    <!-- View Sections Settings Validation Error Messages -->
+    <system:String x:Key="VM.MainViewXOffsetInvalid">Значение отступа основного вида по X некорректно</system:String>
+    <system:String x:Key="VM.MainViewYTopOffsetInvalid">Значение отступа основного вида по Y сверху некорректно</system:String>
+    <system:String x:Key="VM.MainViewYBottomOffsetInvalid">Значение отступа основного вида по Y снизу некорректно</system:String>
+
+    <system:String x:Key="VM.SideViewXOffsetInvalid">Значение отступа бокового вида по X некорректно</system:String>
+    <system:String x:Key="VM.SideViewYTopOffsetInvalid">Значение отступа бокового вида по Y сверху некорректно</system:String>
+    <system:String x:Key="VM.SideViewYBottomOffsetInvalid">Значение отступа бокового вида по Y снизу некорректно</system:String>
+
+    <system:String x:Key="VM.TransverseViewXOffsetInvalid">Значение отступа поперечного вида по X некорректно</system:String>
+    <system:String x:Key="VM.TransverseViewYOffsetInvalid">Значение отступа поперечного вида по Y некорректно</system:String>
+
+    <system:String x:Key="VM.FirstHorizontalViewElevationInvalid">Значение возвышения первого горизонтального вида некорректно</system:String>
+    <system:String x:Key="VM.SecondHorizontalViewElevationInvalid">Значение возвышения второго горизонтального вида некорректно</system:String>
+    <system:String x:Key="VM.ThirdHorizontalViewElevationInvalid">Значение возвышения третьего горизонтального вида некорректно</system:String>
+
     <!-- MainWindow -->
     <system:String x:Key="MainWindow.Title">Документация пилонов</system:String>
     <system:String x:Key="MainWindow.Settings">Настройки</system:String>

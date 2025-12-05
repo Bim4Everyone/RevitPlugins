@@ -6,6 +6,7 @@ using Autodesk.Revit.DB;
 using Autodesk.Revit.UI;
 
 using dosymep.Revit;
+using dosymep.SimpleServices;
 
 using RevitPylonDocumentation.Models.PylonSheetNView;
 using RevitPylonDocumentation.ViewModels;
@@ -15,13 +16,17 @@ using View = Autodesk.Revit.DB.View;
 
 namespace RevitPylonDocumentation.Models;
 internal class RevitRepository {
+    private readonly ILocalizationService _localizationService;
     private readonly double _maxDistanceBetweenPylon = 10;
 
-    public RevitRepository(UIApplication uiApplication) {
+    public RevitRepository(UIApplication uiApplication,
+                           ILocalizationService localizationService) {
         UIApplication = uiApplication;
+        _localizationService = localizationService;
     }
 
     public UIApplication UIApplication { get; }
+
     public UIDocument ActiveUIDocument => UIApplication.ActiveUIDocument;
 
     public Application Application => UIApplication.Application;
@@ -207,7 +212,7 @@ internal class RevitRepository {
             // Запрашиваем параметр фильтрации типовых пилонов. Если он не равен заданному, то отсеиваем этот пилон
             var typicalPylonParameter = elem.LookupParameter(mainViewModel.ProjectSettings.TypicalPylonFilterParameter);
             if(typicalPylonParameter == null) {
-                mainViewModel.ErrorText = "Параметр фильтрации типовых пилонов не найден";
+                mainViewModel.ErrorText = _localizationService.GetLocalizedString("VM.TypicalPylonFilterParamNotFound");
                 return;
             }
 
@@ -217,7 +222,7 @@ internal class RevitRepository {
             // Запрашиваем Раздел проекта
             var projectSectionParameter = elem.LookupParameter(mainViewModel.ProjectSettings.ProjectSection);
             if(projectSectionParameter == null) {
-                mainViewModel.ErrorText = "Параметр раздела не найден у элементов Стен или Несущих колонн";
+                mainViewModel.ErrorText = _localizationService.GetLocalizedString("VM.ProjectSectionParamNotFound");
                 return;
             }
             string projectSection = projectSectionParameter.AsString();
@@ -227,7 +232,7 @@ internal class RevitRepository {
             // Запрашиваем Марку пилона
             var hostMarkParameter = elem.LookupParameter(mainViewModel.ProjectSettings.Mark);
             if(hostMarkParameter == null) {
-                mainViewModel.ErrorText = "Параметр марки не найден у элементов Стен или Несущих колонн";
+                mainViewModel.ErrorText = _localizationService.GetLocalizedString("VM.HostMarkParamNotFound");
                 return;
             }
             string hostMark = hostMarkParameter.AsString();
@@ -266,7 +271,7 @@ internal class RevitRepository {
                     : (elemForCompareByDistance.Location as LocationPoint).Point;
 
                 if(pt1.DistanceTo(pt2) > _maxDistanceBetweenPylon) {
-                    mainViewModel.ErrorText = "Найдены пилоны с одинаковой маркой";
+                    mainViewModel.ErrorText = _localizationService.GetLocalizedString("VM.DuplicatePylonMarksFound");
                 }
             }
         }

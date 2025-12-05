@@ -3,6 +3,7 @@ using System.Linq;
 using Autodesk.Revit.DB;
 
 using dosymep.Revit;
+using dosymep.SimpleServices;
 using dosymep.WPF.ViewModels;
 
 using RevitPylonDocumentation.Models;
@@ -12,6 +13,8 @@ using RevitPylonDocumentation.ViewModels;
 
 namespace RevitPylonDocumentation.ViewModels.UserSettings;
 internal class UserProjectSettingsVM : BaseViewModel {
+    private readonly ILocalizationService _localizationService;
+    
     private string _projectSectionTemp = "обр_ФОП_Раздел проекта";
     private string _markTemp = "Марка";
     private string _titleBlockNameTemp = "Создать типы по комплектам";
@@ -45,14 +48,15 @@ internal class UserProjectSettingsVM : BaseViewModel {
     private string _breakLineTypeNameTemp = "Линейный обрыв";
     private string _concretingJointTypeNameTemp = "3 мм_М 20";
 
-    public UserProjectSettingsVM(MainViewModel mainViewModel, RevitRepository repository) {
+    public UserProjectSettingsVM(MainViewModel mainViewModel, RevitRepository repository, 
+                                 ILocalizationService localizationService) {
         ViewModel = mainViewModel;
         Repository = repository;
+        _localizationService = localizationService;
     }
 
     public MainViewModel ViewModel { get; set; }
     internal RevitRepository Repository { get; set; }
-
 
     public string ProjectSection { get; set; }
     public string ProjectSectionTemp {
@@ -240,30 +244,30 @@ internal class UserProjectSettingsVM : BaseViewModel {
     public void CheckProjectSettings() {
         // Пытаемся проверить виды
         if(Repository.AllSectionViews.FirstOrDefault()?.LookupParameter(DispatcherGroupingFirst) is null) {
-            ViewModel.ErrorText = "Наименование параметра диспетчера 1 некорректно";
+            ViewModel.ErrorText = _localizationService.GetLocalizedString("VM.DispatcherGroupingFirstParamInvalid");
         }
         if(Repository.AllSectionViews.FirstOrDefault()?.LookupParameter(DispatcherGroupingSecond) is null) {
-            ViewModel.ErrorText = "Наименование параметра диспетчера 2 некорректно";
+            ViewModel.ErrorText = _localizationService.GetLocalizedString("VM.DispatcherGroupingSecondParamInvalid");
         }
 
         // Пытаемся проверить спеки
         if(Repository.AllScheduleViews.FirstOrDefault()?.LookupParameter(DispatcherGroupingFirst) is null) {
-            ViewModel.ErrorText = "Наименование параметра диспетчера 1 некорректно";
+            ViewModel.ErrorText = _localizationService.GetLocalizedString("VM.DispatcherGroupingFirstParamInvalid");
         }
         if(Repository.AllScheduleViews.FirstOrDefault()?.LookupParameter(DispatcherGroupingSecond) is null) {
-            ViewModel.ErrorText = "Наименование параметра диспетчера 2 некорректно";
+            ViewModel.ErrorText = _localizationService.GetLocalizedString("VM.DispatcherGroupingSecondParamInvalid");
         }
 
         // Проверяем, чтоб были заданы офсеты видового экрана легенды
         if(LegendXOffset is null || LegendYOffset is null) {
-            ViewModel.ErrorText = "Не заданы отступы на листе для легенды примечений";
+            ViewModel.ErrorText = _localizationService.GetLocalizedString("VM.LegendOffsetsNotSet");
         }
 
-        using(var transaction = Repository.Document.StartTransaction("Проверка параметров на листе")) {
+        using(var transaction = Repository.Document.StartTransaction("Checking parameters on sheet")) {
             // Листов в проекте может не быть или рамка может быть другая, поэтому создаем свой лист для тестов с нужной рамкой
             var viewSheet = ViewSheet.Create(Repository.Document, ViewModel.TypesSettings.SelectedTitleBlock.Id);
             if(viewSheet?.LookupParameter(DispatcherGroupingFirst) is null) {
-                ViewModel.ErrorText = "Наименование параметра диспетчера 1 некорректно";
+                ViewModel.ErrorText = _localizationService.GetLocalizedString("VM.DispatcherGroupingFirstParamInvalid");
             }
 
             // Ищем рамку листа
@@ -273,10 +277,10 @@ internal class UserProjectSettingsVM : BaseViewModel {
                 .FirstOrDefault() as FamilyInstance;
 
             if(titleBlock?.LookupParameter(SheetSize) is null) {
-                ViewModel.ErrorText = "Наименование параметра формата рамки листа некорректно";
+                ViewModel.ErrorText = _localizationService.GetLocalizedString("VM.SheetSizeParamInvalid");
             }
             if(titleBlock?.LookupParameter(SheetCoefficient) is null) {
-                ViewModel.ErrorText = "Наименование параметра множителя формата рамки листа некорректно";
+                ViewModel.ErrorText = _localizationService.GetLocalizedString("VM.SheetCoefficientParamInvalid");
             }
 
             // Удаляем созданный лист
@@ -293,12 +297,12 @@ internal class UserProjectSettingsVM : BaseViewModel {
             var pylonType = Repository.Document.GetElement(pylon?.GetTypeId()) as FamilySymbol;
 
             if(pylonType?.LookupParameter(PylonLengthParamName) is null) {
-                ViewModel.ErrorText = "Наименование параметра длины сечения пилона некорректно";
+                ViewModel.ErrorText = _localizationService.GetLocalizedString("VM.PylonLengthParamInvalid");
                 break;
             }
 
             if(pylonType?.LookupParameter(PylonWidthParamName) is null) {
-                ViewModel.ErrorText = "Наименование параметра ширины сечения пилона некорректно";
+                ViewModel.ErrorText = _localizationService.GetLocalizedString("VM.PylonWidthParamInvalid");
                 break;
             }
         }

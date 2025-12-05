@@ -10,6 +10,7 @@ using Autodesk.Revit.DB;
 using Autodesk.Revit.UI.Selection;
 
 using dosymep.Revit;
+using dosymep.SimpleServices;
 using dosymep.WPF.Commands;
 using dosymep.WPF.ViewModels;
 
@@ -25,6 +26,7 @@ namespace RevitPylonDocumentation.ViewModels;
 internal class MainViewModel : BaseViewModel {
     private readonly PluginConfig _pluginConfig;
     private readonly RevitRepository _revitRepository;
+    private readonly ILocalizationService _localizationService;
 
     private string _errorText;
     private bool _pylonSelectedManually = false;
@@ -36,13 +38,15 @@ internal class MainViewModel : BaseViewModel {
     private string _hostsInfoFilter;
     private ICollectionView _hostsInfoView;
 
-    public MainViewModel(PluginConfig pluginConfig, RevitRepository revitRepository) {
+    public MainViewModel(PluginConfig pluginConfig, RevitRepository revitRepository,
+                         ILocalizationService localizationService) {
         _pluginConfig = pluginConfig;
         _revitRepository = revitRepository;
+        _localizationService = localizationService;
 
         SelectionSettings = new UserSelectionSettingsVM();
-        ProjectSettings = new UserProjectSettingsVM(this, _revitRepository);
-        ViewSectionSettings = new UserViewSectionSettingsVM(this);
+        ProjectSettings = new UserProjectSettingsVM(this, _revitRepository, _localizationService);
+        ViewSectionSettings = new UserViewSectionSettingsVM(this, _localizationService);
         SchedulesSettings = new UserSchedulesSettingsVM(this);
         TypesSettings = new UserTypesSettingsVM(this);
         ReferenceScheduleSettings = new UserReferenceScheduleSettingsVM(this);
@@ -282,7 +286,7 @@ internal class MainViewModel : BaseViewModel {
         ProjectSections.Clear();
 
         using(var transaction =
-              _revitRepository.Document.StartTransaction("Получение возможных комплектов документации")) {
+              _revitRepository.Document.StartTransaction("Search for possible documentation sets")) {
             _revitRepository.GetHostData(this);
 
             transaction.RollBack();
@@ -312,7 +316,7 @@ internal class MainViewModel : BaseViewModel {
     /// </summary>
     private void SelectPylon() {
         //var elementid = _revitRepository.ActiveUIDocument.Selection
-        //    .PickObject(ObjectType.Element, "Выберите пилон").ElementId;
+        //    .PickObject(ObjectType.Element, _localizationService.GetLocalizedString("VM.SelectPylon")).ElementId;
         //var element = _revitRepository.Document.GetElement(elementid);
 
         //if(element != null) {
@@ -396,81 +400,87 @@ internal class MainViewModel : BaseViewModel {
 
     private void CheckSettings() {
         if(TypesSettings.SelectedTitleBlock is null) {
-            ErrorText = "Не выбран типоразмер рамки листа";
+            ErrorText = _localizationService.GetLocalizedString("VM.SheetTypeNotSelected");
             return;
         }
 
         if(TypesSettings.SelectedViewFamilyType is null) {
-            ErrorText = "Не выбран типоразмер создаваемого вида";
+            ErrorText = _localizationService.GetLocalizedString("VM.ViewTypeNotSelected");
             return;
         }
 
         if(TypesSettings.SelectedGeneralViewTemplate is null) {
-            ErrorText = "Не выбран шаблон основных видов";
+            ErrorText = _localizationService.GetLocalizedString("VM.MainViewsTemplateNotSelected");
             return;
         }
 
         if(TypesSettings.SelectedGeneralRebarViewTemplate is null) {
-            ErrorText = "Не выбран шаблон основных видов армирования";
+            ErrorText = _localizationService.GetLocalizedString("VM.MainRebarViewsTemplateNotSelected");
             return;
         }
 
         if(TypesSettings.SelectedTransverseViewTemplate is null) {
-            ErrorText = "Не выбран шаблон поперечных видов";
+            ErrorText = _localizationService.GetLocalizedString("VM.TransverseViewsTemplateNotSelected");
             return;
         }
 
         if(TypesSettings.SelectedTransverseRebarViewTemplate is null) {
-            ErrorText = "Не выбран шаблон поперечных видов армирования";
+            ErrorText = _localizationService.GetLocalizedString("VM.TransverseRebarViewsTemplateNotSelected");
             return;
         }
 
         if(TypesSettings.SelectedLegend is null) {
-            ErrorText = "Не выбрана легенда примечаний";
+            ErrorText = _localizationService.GetLocalizedString("VM.LegendNotSelected");
             return;
         }
 
         if(TypesSettings.SelectedViewFamilyType is null) {
-            ErrorText = "Не выбран типоразмер создаваемого вида";
+            ErrorText = _localizationService.GetLocalizedString("VM.ViewTypeSizeNotSelected");
             return;
         }
 
         if(TypesSettings.SelectedDimensionType is null) {
-            ErrorText = "Не выбран типоразмер для расстановки размеров";
+            ErrorText = _localizationService.GetLocalizedString("VM.DimensionTypeNotSelected");
             return;
         }
 
         if(TypesSettings.SelectedSpotDimensionType is null) {
-            ErrorText = "Не выбран типоразмер высотной отметки";
+            ErrorText = _localizationService.GetLocalizedString("VM.SpotDimensionTypeNotSelected");
             return;
         }
 
         if(TypesSettings.SelectedSkeletonTagType is null) {
-            ErrorText = "Не задан типоразмер марки каркаса";
+            ErrorText = _localizationService.GetLocalizedString("VM.SkeletonTagTypeNotSelected");
             return;
         }
+
         if(TypesSettings.SelectedRebarTagTypeWithSerif is null) {
-            ErrorText = "Не задан типоразмер марки арматуры с засечкой";
+            ErrorText = _localizationService.GetLocalizedString("VM.RebarTagWithSerifTypeNotSelected");
             return;
         }
+
         if(TypesSettings.SelectedRebarTagTypeWithStep is null) {
-            ErrorText = "Не задан типоразмер марки арматуры без засечки";
+            ErrorText = _localizationService.GetLocalizedString("VM.RebarTagWithoutSerifTypeNotSelected");
             return;
         }
+
         if(TypesSettings.SelectedRebarTagTypeWithComment is null) {
-            ErrorText = "Не задан типоразмер марки арматуры с комментарием";
+            ErrorText = _localizationService.GetLocalizedString("VM.RebarTagWithCommentTypeNotSelected");
             return;
         }
+
         if(TypesSettings.SelectedUniversalTagType is null) {
-            ErrorText = "Не задан типоразмер универсальной марки";
+            ErrorText = _localizationService.GetLocalizedString("VM.UniversalTagTypeNotSelected");
             return;
         }
+
         if(TypesSettings.SelectedBreakLineType is null) {
-            ErrorText = "Не задан типоразмер линии обрыва";
+            ErrorText = _localizationService.GetLocalizedString("VM.BreakLineTypeNotSelected");
             return;
         }
+
         if(TypesSettings.SelectedConcretingJointType is null) {
-            ErrorText = "Не задан типоразмер рабочего шва бетонирования";
+            ErrorText = _localizationService.GetLocalizedString("VM.ConcretingJointTypeNotSelected");
             return;
         }
 
@@ -490,7 +500,8 @@ internal class MainViewModel : BaseViewModel {
     /// Анализирует выбранные пользователем элементы вида, создает лист, виды, спецификации, и размещает их на листе
     /// </summary>
     private void CreateSheetsNViews() {
-        using var transaction = _revitRepository.Document.StartTransaction("Документатор пилонов");
+        using var transaction = _revitRepository.Document.StartTransaction(
+            _localizationService.GetLocalizedString("MainWindow.Title"));
 
         var settings = new CreationSettings(
             ProjectSettings.GetSettings(),
@@ -701,7 +712,9 @@ internal class MainViewModel : BaseViewModel {
     /// </summary>
     private void AddScheduleFilterParam() {
         SchedulesSettings.ParamsForScheduleFilters.Add(
-            new ScheduleFilterParamHelper("Введите название", "Введите название"));
+            new ScheduleFilterParamHelper(
+                _localizationService.GetLocalizedString("VM.WriteName"),
+                _localizationService.GetLocalizedString("VM.WriteName")));
         SettingsChanged();
     }
 

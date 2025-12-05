@@ -1,6 +1,59 @@
 <ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
                     xmlns:system="clr-namespace:System;assembly=mscorlib">
+
+    <!-- Pylon Analysis Error Messages -->
+    <system:String x:Key="VM.TypicalPylonFilterParamNotFound">Typical pylon filter parameter not found</system:String>
+    <system:String x:Key="VM.ProjectSectionParamNotFound">Project section parameter not found in Walls or Structural Columns</system:String>
+    <system:String x:Key="VM.HostMarkParamNotFound">Host mark parameter not found in Walls or Structural Columns</system:String>
+    <system:String x:Key="VM.DuplicatePylonMarksFound">Pylons with duplicate marks found</system:String>
+
+    <!-- ViewModel Error Messages -->
+    <system:String x:Key="VM.SelectPylon">Select a pylon</system:String>
+    <system:String x:Key="VM.SheetTypeNotSelected">The sheet frame size is not selected</system:String>
+    <system:String x:Key="VM.ViewTypeNotSelected">View type size not selected</system:String>
+    <system:String x:Key="VM.MainViewsTemplateNotSelected">Main views template not selected</system:String>
+    <system:String x:Key="VM.MainRebarViewsTemplateNotSelected">Main rebar views template not selected</system:String>
+    <system:String x:Key="VM.TransverseViewsTemplateNotSelected">Transverse views template not selected</system:String>
+    <system:String x:Key="VM.TransverseRebarViewsTemplateNotSelected">Transverse rebar views template not selected</system:String>
+    <system:String x:Key="VM.LegendNotSelected">Notes legend not selected</system:String>
+    <system:String x:Key="VM.ViewTypeSizeNotSelected">View type size not selected</system:String>
+    <system:String x:Key="VM.DimensionTypeNotSelected">Dimension type size not selected</system:String>
+    <system:String x:Key="VM.SpotDimensionTypeNotSelected">Spot dimension type size not selected</system:String>
+    <system:String x:Key="VM.SkeletonTagTypeNotSelected">Skeleton tag type size not set</system:String>
+    <system:String x:Key="VM.RebarTagWithSerifTypeNotSelected">Rebar tag with serif type size not set</system:String>
+    <system:String x:Key="VM.RebarTagWithoutSerifTypeNotSelected">Rebar tag without serif type size not set</system:String>
+    <system:String x:Key="VM.RebarTagWithCommentTypeNotSelected">Rebar tag with comment type size not set</system:String>
+    <system:String x:Key="VM.UniversalTagTypeNotSelected">Universal tag type size not set</system:String>
+    <system:String x:Key="VM.BreakLineTypeNotSelected">Break line type size not set</system:String>
+    <system:String x:Key="VM.ConcretingJointTypeNotSelected">Concreting joint type size not set</system:String>
+    <system:String x:Key="VM.WriteName">Enter the name</system:String>
+
+    <!-- Project Settings Validation Error Messages -->
+    <system:String x:Key="VM.DispatcherGroupingFirstParamInvalid">Dispatcher grouping 1 parameter name is incorrect</system:String>
+    <system:String x:Key="VM.DispatcherGroupingSecondParamInvalid">Dispatcher grouping 2 parameter name is incorrect</system:String>
+    <system:String x:Key="VM.LegendOffsetsNotSet">Legend offsets on sheet are not set</system:String>
+    <system:String x:Key="VM.SheetSizeParamInvalid">Sheet frame format parameter name is incorrect</system:String>
+    <system:String x:Key="VM.SheetCoefficientParamInvalid">Sheet frame format multiplier parameter name is incorrect</system:String>
+    <system:String x:Key="VM.PylonLengthParamInvalid">Pylon section length parameter name is incorrect</system:String>
+    <system:String x:Key="VM.PylonWidthParamInvalid">Pylon section width parameter name is incorrect</system:String>
+
+    <!-- View Sections Settings Validation Error Messages -->
+    <system:String x:Key="VM.MainViewXOffsetInvalid">Main view X offset value is incorrect</system:String>
+    <system:String x:Key="VM.MainViewYTopOffsetInvalid">Main view top Y offset value is incorrect</system:String>
+    <system:String x:Key="VM.MainViewYBottomOffsetInvalid">Main view bottom Y offset value is incorrect</system:String>
+
+    <system:String x:Key="VM.SideViewXOffsetInvalid">Side view X offset value is incorrect</system:String>
+    <system:String x:Key="VM.SideViewYTopOffsetInvalid">Side view top Y offset value is incorrect</system:String>
+    <system:String x:Key="VM.SideViewYBottomOffsetInvalid">Side view bottom Y offset value is incorrect</system:String>
+
+    <system:String x:Key="VM.TransverseViewXOffsetInvalid">Transverse view X offset value is incorrect</system:String>
+    <system:String x:Key="VM.TransverseViewYOffsetInvalid">Transverse view Y offset value is incorrect</system:String>
+
+    <system:String x:Key="VM.FirstHorizontalViewElevationInvalid">First horizontal view elevation value is incorrect</system:String>
+    <system:String x:Key="VM.SecondHorizontalViewElevationInvalid">Second horizontal view elevation value is incorrect</system:String>
+    <system:String x:Key="VM.ThirdHorizontalViewElevationInvalid">Third horizontal view elevation value is incorrect</system:String>
+    
     <!-- MainWindow -->
     <system:String x:Key="MainWindow.Title">Pylon Documentation Automation</system:String>
     <system:String x:Key="MainWindow.Settings">Settings</system:String>
