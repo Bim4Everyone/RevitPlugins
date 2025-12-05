@@ -43,26 +43,26 @@
             <StackPanel>
                 <controls:SettingsTitleControl
                     LabelText="{me:LocalizationSource PylonParams.FormworkElementParameters}"
-                    ToolTipText="Параметры, принадлежащие опалубочному элементу пилона"
+                    ToolTipText="{me:LocalizationSource PylonParamsPage.FormworkElementParametersToolTip}"
                     ButtonCommand="{Binding ApplySettingsCommand}"
                     ButtonMouseLeaveCommand="{Binding CheckSettingsCommand}" />
 
                 <controls:TextBoxSettingControl
                     LabelText="{me:LocalizationSource PylonParams.PylonMarkParameter}"
                     TextBoxText="{Binding Path=ProjectSettings.MarkTemp, UpdateSourceTrigger=PropertyChanged}"
-                    ToolTipText="Имя параметра, в котором у пилона прописывается значение марки пилона"
+                    ToolTipText="{me:LocalizationSource PylonParamsPage.PylonMarkParameterToolTip}"
                     TextChangedCommand="{Binding SettingsChangedCommand}" />
 
                 <controls:TextBoxSettingControl
                     LabelText="{me:LocalizationSource PylonParams.PylonDocumentationSetParameter}"
                     TextBoxText="{Binding Path=ProjectSettings.ProjectSectionTemp, UpdateSourceTrigger=PropertyChanged}"
-                    ToolTipText="Имя параметра, в котором у пилона прописывается комплект документации"
+                    ToolTipText="{me:LocalizationSource PylonParamsPage.PylonDocumentationSetParameterToolTip}"
                     TextChangedCommand="{Binding SettingsChangedCommand}" />
 
                 <controls:TextBoxSettingControl
                     LabelText="{me:LocalizationSource PylonParams.TypicalPylonFilterParameter}"
                     TextBoxText="{Binding Path=ProjectSettings.TypicalPylonFilterParameterTemp, UpdateSourceTrigger=PropertyChanged}"
-                    ToolTipText="Имя параметра, в котором у пилона прописывается отличительная черта типовых пилонов"
+                    ToolTipText="{me:LocalizationSource PylonParamsPage.TypicalPylonFilterParameterToolTip}"
                     TextChangedCommand="{Binding SettingsChangedCommand}" />
 
                 <ui:TextBox
@@ -70,7 +70,7 @@
                     HorizontalAlignment="Stretch"
                     Text="{Binding Path=ProjectSettings.TypicalPylonFilterValueTemp, UpdateSourceTrigger=PropertyChanged}"
                     Style="{StaticResource TextBoxWithTooltipStyle}"
-                    ToolTip="Значение параметра, в котором у пилона прописывается отличительная черта типовых пилонов">
+                    ToolTip="{me:LocalizationSource PylonParamsPage.TypicalPylonFilterValueToolTip}">
 
                     <i:Interaction.Triggers>
                         <i:EventTrigger
@@ -84,13 +84,13 @@
                 <controls:TextBoxSettingControl
                     LabelText="{me:LocalizationSource PylonParams.PylonSectionLengthParameter}"
                     TextBoxText="{Binding Path=ProjectSettings.PylonLengthParamNameTemp, UpdateSourceTrigger=PropertyChanged}"
-                    ToolTipText="Имя параметра, в котором у пилона на уровне типоразмера прописывается длина сечения"
+                    ToolTipText="{me:LocalizationSource PylonParamsPage.PylonSectionLengthParameterToolTip}"
                     TextChangedCommand="{Binding SettingsChangedCommand}" />
 
                 <controls:TextBoxSettingControl
                     LabelText="{me:LocalizationSource PylonParams.PylonSectionWidthParameter}"
                     TextBoxText="{Binding Path=ProjectSettings.PylonWidthParamNameTemp, UpdateSourceTrigger=PropertyChanged}"
-                    ToolTipText="Имя параметра, в котором у пилона на уровне типоразмера прописывается ширина сечения"
+                    ToolTipText="{me:LocalizationSource PylonParamsPage.PylonSectionWidthParameterToolTip}"
                     TextChangedCommand="{Binding SettingsChangedCommand}" />
             </StackPanel>
         </Border>

@@ -54,7 +54,7 @@
             <StackPanel>
                 <controls:SettingsTitleControl
                     LabelText="{me:LocalizationSource HorizontalView.FormworkHorizontalView}"
-                    ToolTipText="Правила, по которым будут создаваться горизонтальные разрезы для пилонов в проекте"
+                    ToolTipText="{me:LocalizationSource HorizontalViewSettingsPage.FormworkHorizontalViewToolTip}"
                     ButtonCommand="{Binding ApplySettingsCommand}"
                     ButtonMouseLeaveCommand="{Binding CheckSettingsCommand}" />
 
@@ -62,35 +62,35 @@
                     LabelText="{me:LocalizationSource HorizontalView.FirstHorizontalViewNameMask}"
                     FirstTextBoxText="{Binding Path=ViewSectionSettings.TransverseViewFirstPrefixTemp, UpdateSourceTrigger=PropertyChanged}"
                     SecondTextBoxText="{Binding Path=ViewSectionSettings.TransverseViewFirstSuffixTemp, UpdateSourceTrigger=PropertyChanged}"
-                    ToolTipText="Префикс и суффикс имени первого горизонтального вида пилона, т.е. то, что должно идти в названии вида перед указанием марки пилона и после нее.&#10;Например, в имени первого горизонтального вида пилона:&#10;&quot;Пилон 12.30.25-12⌀20-П1_Сеч.1-1&quot;,&#10;где &quot;12.30.25-12⌀20-П1&quot; - это марка пилона,&#10;&quot;Пилон &quot; - это префикс,&#10;&quot;_Сеч.1-1&quot; - это суффикс."
+                    ToolTipText="{me:LocalizationSource HorizontalViewSettingsPage.FirstHorizontalViewNameMaskToolTip}"
                     TextChangedCommand="{Binding SettingsChangedCommand}" />
 
                 <controls:DoubleTextBoxSettingControl
                     LabelText="{me:LocalizationSource HorizontalView.SecondHorizontalViewNameMask}"
                     FirstTextBoxText="{Binding Path=ViewSectionSettings.TransverseViewSecondPrefixTemp, UpdateSourceTrigger=PropertyChanged}"
                     SecondTextBoxText="{Binding Path=ViewSectionSettings.TransverseViewSecondSuffixTemp, UpdateSourceTrigger=PropertyChanged}"
-                    ToolTipText="Префикс и суффикс имени второго горизонтального вида пилона, т.е. то, что должно идти в названии вида перед указанием марки пилона и после нее.&#10;Например, в имени второго горизонтального вида пилона:&#10;&quot;Пилон 12.30.25-12⌀20-П1_Сеч.2-2&quot;,&#10;где &quot;12.30.25-12⌀20-П1&quot; - это марка пилона,&#10;&quot;Пилон &quot; - это префикс,&#10;&quot;_Сеч.2-2&quot; - это суффикс."
+                    ToolTipText="{me:LocalizationSource HorizontalViewSettingsPage.SecondHorizontalViewNameMaskToolTip}"
                     TextChangedCommand="{Binding SettingsChangedCommand}" />
 
                 <controls:DoubleTextBoxSettingControl
                     LabelText="{me:LocalizationSource HorizontalView.ThirdHorizontalViewNameMask}"
                     FirstTextBoxText="{Binding Path=ViewSectionSettings.TransverseViewThirdPrefixTemp, UpdateSourceTrigger=PropertyChanged}"
                     SecondTextBoxText="{Binding Path=ViewSectionSettings.TransverseViewThirdSuffixTemp, UpdateSourceTrigger=PropertyChanged}"
-                    ToolTipText="Префикс и суффикс имени третьего горизонтального вида пилона, т.е. то, что должно идти в названии вида перед указанием марки пилона и после нее.&#10;Например, в имени третьего горизонтального вида пилона:&#10;&quot;Пилон 12.30.25-12⌀20-П1_Сеч.3-3&quot;,&#10;где &quot;12.30.25-12⌀20-П1&quot; - это марка пилона,&#10;&quot;Пилон &quot; - это префикс,&#10;&quot;_Сеч.3-3&quot; - это суффикс."
+                    ToolTipText="{me:LocalizationSource HorizontalViewSettingsPage.ThirdHorizontalViewNameMaskToolTip}"
                     TextChangedCommand="{Binding SettingsChangedCommand}" />
 
                 <controls:ComboBoxSettingControl
                     LabelText="{me:LocalizationSource HorizontalView.SelectHorizontalViewTemplate}"
                     ItemsSource="{Binding ViewTemplatesInPj}"
                     SelectedItem="{Binding TypesSettings.SelectedTransverseViewTemplate}"
-                    ToolTipText="Шаблон вида, который необходимо применить к горизонтальным видам при их создании."
+                    ToolTipText="{me:LocalizationSource HorizontalViewSettingsPage.SelectHorizontalViewTemplateToolTip}"
                     SelectionChangedCommand="{Binding SettingsChangedCommand}"
                     ItemTemplate="{StaticResource WithoutFamilyNameItemTemplate}" />
 
                 <controls:TextBoxSettingControl
                     LabelText="{me:LocalizationSource HorizontalView.HorizontalViewDepth}"
                     TextBoxText="{Binding Path=ViewSectionSettings.TransverseViewDepthTemp, UpdateSourceTrigger=PropertyChanged}"
-                    ToolTipText="Глубина проецирования горизонтального разреза"
+                    ToolTipText="{me:LocalizationSource HorizontalViewSettingsPage.HorizontalViewDepthToolTip}"
                     TextChangedCommand="{Binding SettingsChangedCommand}" />
             </StackPanel>
         </Border>
@@ -103,7 +103,7 @@
             <StackPanel>
                 <controls:SettingsTitleControl
                     LabelText="{me:LocalizationSource HorizontalView.RebarHorizontalView}"
-                    ToolTipText="Правила, по которым будут создаваться горизонтальные разрезы армирования для пилонов в проекте"
+                    ToolTipText="{me:LocalizationSource HorizontalViewSettingsPage.RebarHorizontalViewToolTip}"
                     ButtonCommand="{Binding ApplySettingsCommand}"
                     ButtonMouseLeaveCommand="{Binding CheckSettingsCommand}" />
 
@@ -111,35 +111,35 @@
                     LabelText="{me:LocalizationSource HorizontalView.FirstRebarHorizontalViewNameMask}"
                     FirstTextBoxText="{Binding Path=ViewSectionSettings.TransverseRebarViewFirstPrefixTemp, UpdateSourceTrigger=PropertyChanged}"
                     SecondTextBoxText="{Binding Path=ViewSectionSettings.TransverseRebarViewFirstSuffixTemp, UpdateSourceTrigger=PropertyChanged}"
-                    ToolTipText="Префикс и суффикс имени первого горизонтального вида армирования пилона, т.е. то, что должно идти в названии вида перед указанием марки пилона и после нее.&#10;Например, в имени первого горизонтального вида армирования пилона:&#10;&quot;Пилон 12.30.25-12⌀20-П1_Сеч.1-1&quot;,&#10;где &quot;12.30.25-12⌀20-П1&quot; - это марка пилона,&#10;&quot;Пилон &quot; - это префикс,&#10;&quot;_Сеч.1-1&quot; - это суффикс."
+                    ToolTipText="{me:LocalizationSource HorizontalViewSettingsPage.FirstRebarHorizontalViewNameMaskToolTip}"
                     TextChangedCommand="{Binding SettingsChangedCommand}" />
 
                 <controls:DoubleTextBoxSettingControl
                     LabelText="{me:LocalizationSource HorizontalView.SecondRebarHorizontalViewNameMask}"
                     FirstTextBoxText="{Binding Path=ViewSectionSettings.TransverseRebarViewSecondPrefixTemp, UpdateSourceTrigger=PropertyChanged}"
                     SecondTextBoxText="{Binding Path=ViewSectionSettings.TransverseRebarViewSecondSuffixTemp, UpdateSourceTrigger=PropertyChanged}"
-                    ToolTipText="Префикс и суффикс имени второго горизонтального вида армирования пилона, т.е. то, что должно идти в названии вида перед указанием марки пилона и после нее.&#10;Например, в имени второго горизонтального вида армирования пилона:&#10;&quot;Пилон 12.30.25-12⌀20-П1_Сеч.2-2&quot;,&#10;где &quot;12.30.25-12⌀20-П1&quot; - это марка пилона,&#10;&quot;Пилон &quot; - это префикс,&#10;&quot;_Сеч.2-2&quot; - это суффикс."
+                    ToolTipText="{me:LocalizationSource HorizontalViewSettingsPage.SecondRebarHorizontalViewNameMaskToolTip}"
                     TextChangedCommand="{Binding SettingsChangedCommand}" />
 
                 <controls:DoubleTextBoxSettingControl
                     LabelText="{me:LocalizationSource HorizontalView.ThirdRebarHorizontalViewNameMask}"
                     FirstTextBoxText="{Binding Path=ViewSectionSettings.TransverseRebarViewThirdPrefixTemp, UpdateSourceTrigger=PropertyChanged}"
                     SecondTextBoxText="{Binding Path=ViewSectionSettings.TransverseRebarViewThirdSuffixTemp, UpdateSourceTrigger=PropertyChanged}"
-                    ToolTipText="Префикс и суффикс имени третьего горизонтального вида армирования пилона, т.е. то, что должно идти в названии вида перед указанием марки пилона и после нее.&#10;Например, в имени третьего горизонтального вида армирования пилона:&#10;&quot;Пилон 12.30.25-12⌀20-П1_Сеч.3-3&quot;,&#10;где &quot;12.30.25-12⌀20-П1&quot; - это марка пилона,&#10;&quot;Пилон &quot; - это префикс,&#10;&quot;_Сеч.3-3&quot; - это суффикс."
+                    ToolTipText="{me:LocalizationSource HorizontalViewSettingsPage.ThirdRebarHorizontalViewNameMaskToolTip}"
                     TextChangedCommand="{Binding SettingsChangedCommand}" />
 
                 <controls:ComboBoxSettingControl
                     LabelText="{me:LocalizationSource HorizontalView.SelectRebarHorizontalViewTemplate}"
                     ItemsSource="{Binding ViewTemplatesInPj}"
                     SelectedItem="{Binding TypesSettings.SelectedTransverseRebarViewTemplate}"
-                    ToolTipText="Шаблон вида, который необходимо применить к горизонтальным видам армирования при их создании."
+                    ToolTipText="{me:LocalizationSource HorizontalViewSettingsPage.SelectRebarHorizontalViewTemplateToolTip}"
                     SelectionChangedCommand="{Binding SettingsChangedCommand}"
                     ItemTemplate="{StaticResource WithoutFamilyNameItemTemplate}" />
 
                 <controls:TextBoxSettingControl
                     LabelText="{me:LocalizationSource HorizontalView.RebarHorizontalViewDepth}"
                     TextBoxText="{Binding Path=ViewSectionSettings.TransverseRebarViewDepthTemp, UpdateSourceTrigger=PropertyChanged}"
-                    ToolTipText="Глубина проецирования горизонтального разреза армирования"
+                    ToolTipText="{me:LocalizationSource HorizontalViewSettingsPage.RebarHorizontalViewDepthToolTip}"
                     TextChangedCommand="{Binding SettingsChangedCommand}" />
             </StackPanel>
         </Border>
@@ -152,26 +152,26 @@
             <StackPanel>
                 <controls:SettingsTitleControl
                     LabelText="{me:LocalizationSource HorizontalView.HorizontalViewBottomOffsets}"
-                    ToolTipText="Положение горизонтальных разрезов относительно высоты пилона"
+                    ToolTipText="{me:LocalizationSource HorizontalViewSettingsPage.HorizontalViewBottomOffsetsToolTip}"
                     ButtonCommand="{Binding ApplySettingsCommand}"
                     ButtonMouseLeaveCommand="{Binding CheckSettingsCommand}" />
 
                 <controls:TextBoxSettingControl
                     LabelText="{me:LocalizationSource HorizontalView.FirstHorizontalViewBottomOffset}"
                     TextBoxText="{Binding Path=ViewSectionSettings.TransverseViewFirstElevationTemp, UpdateSourceTrigger=PropertyChanged}"
-                    ToolTipText="Положение горизонтального разреза относительно пилона задается при помощи отступа от нижней части пилона в мм"
+                    ToolTipText="{me:LocalizationSource HorizontalViewSettingsPage.FirstHorizontalViewBottomOffsetToolTip}"
                     TextChangedCommand="{Binding SettingsChangedCommand}" />
 
                 <controls:TextBoxSettingControl
                     LabelText="{me:LocalizationSource HorizontalView.SecondHorizontalViewTopOffset}"
                     TextBoxText="{Binding Path=ViewSectionSettings.TransverseViewSecondElevationTemp, UpdateSourceTrigger=PropertyChanged}"
-                    ToolTipText="Положение горизонтального разреза относительно пилона задается при помощи отступа от верхней части пилона в мм"
+                    ToolTipText="{me:LocalizationSource HorizontalViewSettingsPage.SecondHorizontalViewTopOffsetToolTip}"
                     TextChangedCommand="{Binding SettingsChangedCommand}" />
 
                 <controls:TextBoxSettingControl
                     LabelText="{me:LocalizationSource HorizontalView.ThirdHorizontalViewTopOffset}"
                     TextBoxText="{Binding Path=ViewSectionSettings.TransverseViewThirdElevationTemp, UpdateSourceTrigger=PropertyChanged}"
-                    ToolTipText="Положение горизонтального разреза относительно пилона задается при помощи отступа от верхней части пилона в мм"
+                    ToolTipText="{me:LocalizationSource HorizontalViewSettingsPage.ThirdHorizontalViewTopOffsetToolTip}"
                     TextChangedCommand="{Binding SettingsChangedCommand}" />
             </StackPanel>
         </Border>
@@ -184,20 +184,20 @@
             <StackPanel>
                 <controls:SettingsTitleControl
                     LabelText="{me:LocalizationSource HorizontalView.HorizontalViewPylonOffsets}"
-                    ToolTipText="Отступы горизонтальных видов от границ пилона на листе"
+                    ToolTipText="{me:LocalizationSource HorizontalViewSettingsPage.HorizontalViewPylonOffsetsToolTip}"
                     ButtonCommand="{Binding ApplySettingsCommand}"
                     ButtonMouseLeaveCommand="{Binding CheckSettingsCommand}" />
 
                 <controls:TextBoxSettingControl
                     LabelText="{me:LocalizationSource HorizontalView.HorizontalViewXOffset}"
                     TextBoxText="{Binding Path=ViewSectionSettings.TransverseViewXOffsetTemp, UpdateSourceTrigger=PropertyChanged}"
-                    ToolTipText="Укажите отступ от пилона вправо и влево у горизонтальных видов"
+                    ToolTipText="{me:LocalizationSource HorizontalViewSettingsPage.HorizontalViewXOffsetToolTip}"
                     TextChangedCommand="{Binding SettingsChangedCommand}" />
 
                 <controls:TextBoxSettingControl
                     LabelText="{me:LocalizationSource HorizontalView.HorizontalViewYOffset}"
                     TextBoxText="{Binding Path=ViewSectionSettings.TransverseViewYOffsetTemp, UpdateSourceTrigger=PropertyChanged}"
-                    ToolTipText="Укажите отступ от пилона сверху и снизу у горизонтальных видов"
+                    ToolTipText="{me:LocalizationSource HorizontalViewSettingsPage.HorizontalViewYOffsetToolTip}"
                     TextChangedCommand="{Binding SettingsChangedCommand}" />
             </StackPanel>
         </Border>
@@ -211,7 +211,7 @@
             <StackPanel>
                 <controls:SettingsTitleControl
                     LabelText="{me:LocalizationSource VerticalView.ViewTypeSize}"
-                    ToolTipText="Типоразмеры видов для горизонтальных разрезов"
+                    ToolTipText="{me:LocalizationSource HorizontalViewSettingsPage.ViewTypeSizeToolTip}"
                     ButtonCommand="{Binding ApplySettingsCommand}"
                     ButtonMouseLeaveCommand="{Binding CheckSettingsCommand}" />
 
@@ -219,7 +219,7 @@
                     LabelText="{me:LocalizationSource HorizontalView.SelectViewTypeSizeForHorizontalViews}"
                     ItemsSource="{Binding ViewFamilyTypes}"
                     SelectedItem="{Binding TypesSettings.SelectedViewFamilyType}"
-                    ToolTipText="Типоразмер вида, который необходимо применить к горизонтальным видам при их создании."
+                    ToolTipText="{me:LocalizationSource HorizontalViewSettingsPage.SelectViewTypeSizeForHorizontalViewsToolTip}"
                     SelectionChangedCommand="{Binding SettingsChangedCommand}"
                     ItemTemplate="{StaticResource WithoutFamilyNameItemTemplate}" />
             </StackPanel>

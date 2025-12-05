@@ -53,7 +53,7 @@
             <StackPanel>
                 <controls:SettingsTitleControl
                     LabelText="{me:LocalizationSource VerticalView.FormworkMainView}"
-                    ToolTipText="Правила, по которым будут создаваться вертикальные разрезы для пилонов в проекте"
+                    ToolTipText="{me:LocalizationSource VerticalViewSettingsPage.FormworkMainViewToolTip}"
                     ButtonCommand="{Binding ApplySettingsCommand}"
                     ButtonMouseLeaveCommand="{Binding CheckSettingsCommand}" />
 
@@ -61,21 +61,21 @@
                     LabelText="{me:LocalizationSource VerticalView.PylonMainViewNameMask}"
                     FirstTextBoxText="{Binding Path=ViewSectionSettings.GeneralViewPrefixTemp, UpdateSourceTrigger=PropertyChanged}"
                     SecondTextBoxText="{Binding Path=ViewSectionSettings.GeneralViewSuffixTemp, UpdateSourceTrigger=PropertyChanged}"
-                    ToolTipText="Префикс и суффикс имени основного вида пилона, т.е. то, что должно идти в названии вида перед указанием марки пилона и после нее.&#10;Например, в имени основного вида пилона:&#10;&quot;Пилон 12.30.25-12⌀20-П1_ЖБ&quot;,&#10;где &quot;12.30.25-12⌀20-П1&quot; - это марка пилона,&#10;&quot;Пилон &quot; - это префикс,&#10;&quot;_ЖБ&quot; - это суффикс."
+                    ToolTipText="{me:LocalizationSource VerticalViewSettingsPage.PylonMainViewNameMaskToolTip}"
                     TextChangedCommand="{Binding SettingsChangedCommand}" />
 
                 <controls:DoubleTextBoxSettingControl
                     LabelText="{me:LocalizationSource VerticalView.PylonSideViewNameMask}"
                     FirstTextBoxText="{Binding Path=ViewSectionSettings.GeneralViewPerpendicularPrefixTemp, UpdateSourceTrigger=PropertyChanged}"
                     SecondTextBoxText="{Binding Path=ViewSectionSettings.GeneralViewPerpendicularSuffixTemp, UpdateSourceTrigger=PropertyChanged}"
-                    ToolTipText="Префикс и суффикс имени бокового вида пилона, т.е. то, что должно идти в названии вида перед указанием марки пилона и после нее.&#10;Например, в имени бокового вида пилона:&#10;&quot;Пилон 12.30.25-12⌀20-П1_ЖБ&quot;,&#10;где &quot;12.30.25-12⌀20-П1&quot; - это марка пилона,&#10;&quot;Пилон &quot; - это префикс,&#10;&quot;_ЖБ&quot; - это суффикс."
+                    ToolTipText="{me:LocalizationSource VerticalViewSettingsPage.PylonSideViewNameMaskToolTip}"
                     TextChangedCommand="{Binding SettingsChangedCommand}" />
 
                 <controls:ComboBoxSettingControl
                     LabelText="{me:LocalizationSource VerticalView.SelectMainAndSideViewTemplate}"
                     ItemsSource="{Binding ViewTemplatesInPj}"
                     SelectedItem="{Binding TypesSettings.SelectedGeneralViewTemplate}"
-                    ToolTipText="Шаблон вида, который необходимо применить к основному и боковому виду при их создании."
+                    ToolTipText="{me:LocalizationSource VerticalViewSettingsPage.SelectMainAndSideViewTemplateToolTip}"
                     SelectionChangedCommand="{Binding SettingsChangedCommand}"
                     ItemTemplate="{StaticResource WithoutFamilyNameItemTemplate}" />
             </StackPanel>
@@ -89,7 +89,7 @@
             <StackPanel>
                 <controls:SettingsTitleControl
                     LabelText="{me:LocalizationSource VerticalView.RebarMainView}"
-                    ToolTipText="Правила, по которым будут создаваться вертикальные разрезы армирования для пилонов в проекте"
+                    ToolTipText="{me:LocalizationSource VerticalViewSettingsPage.RebarMainViewToolTip}"
                     ButtonCommand="{Binding ApplySettingsCommand}"
                     ButtonMouseLeaveCommand="{Binding CheckSettingsCommand}" />
 
@@ -97,21 +97,21 @@
                     LabelText="{me:LocalizationSource VerticalView.PylonMainRebarViewNameMask}"
                     FirstTextBoxText="{Binding Path=ViewSectionSettings.GeneralRebarViewPrefixTemp, UpdateSourceTrigger=PropertyChanged}"
                     SecondTextBoxText="{Binding Path=ViewSectionSettings.GeneralRebarViewSuffixTemp, UpdateSourceTrigger=PropertyChanged}"
-                    ToolTipText="Префикс и суффикс имени основного вида армирования пилона, т.е. то, что должно идти в названии вида перед указанием марки пилона и после нее.&#10;Например, в имени основного армирования вида пилона:&#10;&quot;Пилон 12.30.25-12⌀20-П1_ЖБ&quot;,&#10;где &quot;12.30.25-12⌀20-П1&quot; - это марка пилона,&#10;&quot;Пилон &quot; - это префикс,&#10;&quot;_ЖБ&quot; - это суффикс."
+                    ToolTipText="{me:LocalizationSource VerticalViewSettingsPage.PylonMainRebarViewNameMaskToolTip}"
                     TextChangedCommand="{Binding SettingsChangedCommand}" />
 
                 <controls:DoubleTextBoxSettingControl
                     LabelText="{me:LocalizationSource VerticalView.PylonSideRebarViewNameMask}"
                     FirstTextBoxText="{Binding Path=ViewSectionSettings.GeneralRebarViewPerpendicularPrefixTemp, UpdateSourceTrigger=PropertyChanged}"
                     SecondTextBoxText="{Binding Path=ViewSectionSettings.GeneralRebarViewPerpendicularSuffixTemp, UpdateSourceTrigger=PropertyChanged}"
-                    ToolTipText="Префикс и суффикс имени бокового вида армирования пилона, т.е. то, что должно идти в названии вида перед указанием марки пилона и после нее.&#10;Например, в имени бокового вида пилона:&#10;&quot;Пилон 12.30.25-12⌀20-П1_ЖБ&quot;,&#10;где &quot;12.30.25-12⌀20-П1&quot; - это марка пилона,&#10;&quot;Пилон &quot; - это префикс,&#10;&quot;_ЖБ&quot; - это суффикс."
+                    ToolTipText="{me:LocalizationSource VerticalViewSettingsPage.PylonSideRebarViewNameMaskToolTip}"
                     TextChangedCommand="{Binding SettingsChangedCommand}" />
 
                 <controls:ComboBoxSettingControl
                     LabelText="{me:LocalizationSource VerticalView.SelectMainAndSideRebarViewTemplate}"
                     ItemsSource="{Binding ViewTemplatesInPj}"
                     SelectedItem="{Binding TypesSettings.SelectedGeneralRebarViewTemplate}"
-                    ToolTipText="Шаблон вида, который необходимо применить к основному и боковому виду армирования при их создании."
+                    ToolTipText="{me:LocalizationSource VerticalViewSettingsPage.SelectMainAndSideRebarViewTemplateToolTip}"
                     SelectionChangedCommand="{Binding SettingsChangedCommand}"
                     ItemTemplate="{StaticResource WithoutFamilyNameItemTemplate}" />
             </StackPanel>
@@ -125,26 +125,26 @@
             <StackPanel>
                 <controls:SettingsTitleControl
                     LabelText="{me:LocalizationSource VerticalView.MainViewOffsets}"
-                    ToolTipText="Отступы основного вертикального вида от границ пилона на листе"
+                    ToolTipText="{me:LocalizationSource VerticalViewSettingsPage.MainViewOffsetsToolTip}"
                     ButtonCommand="{Binding ApplySettingsCommand}"
                     ButtonMouseLeaveCommand="{Binding CheckSettingsCommand}" />
 
                 <controls:TextBoxSettingControl
                     LabelText="{me:LocalizationSource VerticalView.MainViewXOffset}"
                     TextBoxText="{Binding Path=ViewSectionSettings.GeneralViewXOffsetTemp, UpdateSourceTrigger=PropertyChanged}"
-                    ToolTipText="Укажите отступ от пилона вправо и влево у основного вида"
+                    ToolTipText="{me:LocalizationSource VerticalViewSettingsPage.MainViewXOffsetToolTip}"
                     TextChangedCommand="{Binding SettingsChangedCommand}" />
 
                 <controls:TextBoxSettingControl
                     LabelText="{me:LocalizationSource VerticalView.MainViewYTopOffset}"
                     TextBoxText="{Binding Path=ViewSectionSettings.GeneralViewYTopOffsetTemp, UpdateSourceTrigger=PropertyChanged}"
-                    ToolTipText="Укажите отступ от пилона сверху у основного вида"
+                    ToolTipText="{me:LocalizationSource VerticalViewSettingsPage.MainViewYTopOffsetToolTip}"
                     TextChangedCommand="{Binding SettingsChangedCommand}" />
 
                 <controls:TextBoxSettingControl
                     LabelText="{me:LocalizationSource VerticalView.MainViewYBottomOffset}"
                     TextBoxText="{Binding Path=ViewSectionSettings.GeneralViewYBottomOffsetTemp, UpdateSourceTrigger=PropertyChanged}"
-                    ToolTipText="Укажите отступ от пилона снизу у основного вида"
+                    ToolTipText="{me:LocalizationSource VerticalViewSettingsPage.MainViewYBottomOffsetToolTip}"
                     TextChangedCommand="{Binding SettingsChangedCommand}" />
             </StackPanel>
         </Border>
@@ -157,26 +157,26 @@
             <StackPanel>
                 <controls:SettingsTitleControl
                     LabelText="{me:LocalizationSource VerticalView.SideViewOffsets}"
-                    ToolTipText="Отступы бокового вертикального вида от границ пилона на листе"
+                    ToolTipText="{me:LocalizationSource VerticalViewSettingsPage.SideViewOffsetsToolTip}"
                     ButtonCommand="{Binding ApplySettingsCommand}"
                     ButtonMouseLeaveCommand="{Binding CheckSettingsCommand}" />
 
                 <controls:TextBoxSettingControl
                     LabelText="{me:LocalizationSource VerticalView.SideViewXOffset}"
                     TextBoxText="{Binding Path=ViewSectionSettings.GeneralViewPerpXOffsetTemp, UpdateSourceTrigger=PropertyChanged}"
-                    ToolTipText="Укажите отступ от пилона вправо и влево у бокового вида"
+                    ToolTipText="{me:LocalizationSource VerticalViewSettingsPage.SideViewXOffsetToolTip}"
                     TextChangedCommand="{Binding SettingsChangedCommand}" />
 
                 <controls:TextBoxSettingControl
                     LabelText="{me:LocalizationSource VerticalView.SideViewYTopOffset}"
                     TextBoxText="{Binding Path=ViewSectionSettings.GeneralViewPerpYTopOffsetTemp, UpdateSourceTrigger=PropertyChanged}"
-                    ToolTipText="Укажите отступ от пилона сверху у бокового вида"
+                    ToolTipText="{me:LocalizationSource VerticalViewSettingsPage.SideViewYTopOffsetToolTip}"
                     TextChangedCommand="{Binding SettingsChangedCommand}" />
 
                 <controls:TextBoxSettingControl
                     LabelText="{me:LocalizationSource VerticalView.SideViewYBottomOffset}"
                     TextBoxText="{Binding Path=ViewSectionSettings.GeneralViewPerpYBottomOffsetTemp, UpdateSourceTrigger=PropertyChanged}"
-                    ToolTipText="Укажите отступ от пилона снизу у бокового вида"
+                    ToolTipText="{me:LocalizationSource VerticalViewSettingsPage.SideViewYBottomOffsetToolTip}"
                     TextChangedCommand="{Binding SettingsChangedCommand}" />
             </StackPanel>
         </Border>
@@ -190,7 +190,7 @@
             <StackPanel>
                 <controls:SettingsTitleControl
                     LabelText="{me:LocalizationSource VerticalView.ViewTypeSize}"
-                    ToolTipText="Типоразмеры видов для вертикальных разрезов"
+                    ToolTipText="{me:LocalizationSource VerticalViewSettingsPage.ViewTypeSizeToolTip}"
                     ButtonCommand="{Binding ApplySettingsCommand}"
                     ButtonMouseLeaveCommand="{Binding CheckSettingsCommand}" />
 
@@ -199,7 +199,7 @@
                     LabelText="{me:LocalizationSource VerticalView.SelectViewTypeSizeForMainAndSideViews}"
                     ItemsSource="{Binding ViewFamilyTypes}"
                     SelectedItem="{Binding TypesSettings.SelectedViewFamilyType}"
-                    ToolTipText="Типоразмер вида, который необходимо применить к основному и боковому виду при их создании."
+                    ToolTipText="{me:LocalizationSource VerticalViewSettingsPage.SelectViewTypeSizeForMainAndSideViewsToolTip}"
                     SelectionChangedCommand="{Binding SettingsChangedCommand}"
                     ItemTemplate="{StaticResource WithoutFamilyNameItemTemplate}" />
             </StackPanel>

@@ -45,7 +45,7 @@
             <StackPanel>
                 <controls:SettingsTitleControl
                     LabelText="{me:LocalizationSource SheetParams.SheetCreationRules}"
-                    ToolTipText="Правила, по которым будут создаваться новые листы в проекте"
+                    ToolTipText="{me:LocalizationSource SheetParams.SheetCreationRulesToolTip}"
                     ButtonCommand="{Binding ApplySettingsCommand}"
                     ButtonMouseLeaveCommand="{Binding CheckSettingsCommand}" />
 
@@ -53,14 +53,14 @@
                     LabelText="{me:LocalizationSource SheetParams.PylonSheetNameMask}"
                     FirstTextBoxText="{Binding Path=ProjectSettings.SheetPrefixTemp, UpdateSourceTrigger=PropertyChanged}"
                     SecondTextBoxText="{Binding Path=ProjectSettings.SheetSuffixTemp, UpdateSourceTrigger=PropertyChanged}"
-                    ToolTipText="Префикс и суффикс имени листа, т.е. то, что должно идти в названии листа перед указанием марки пилона и после нее.&#10;Например, в имени листа:&#10;&quot;Пилон 12.30.25-12⌀20-П1_ЖБ&quot;,&#10;где &quot;12.30.25-12⌀20-П1&quot; - это марка пилона,&#10;&quot;Пилон &quot; - это префикс,&#10;&quot;_ЖБ&quot; - это суффикс."
+                    ToolTipText="{me:LocalizationSource SheetParams.PylonSheetNameMaskToolTip}"
                     TextChangedCommand="{Binding SettingsChangedCommand}" />
 
                 <controls:ComboBoxSettingControl
                     LabelText="{me:LocalizationSource GeneralPage.SelectTitleBlockType}"
                     ItemsSource="{Binding TitleBlocks}"
                     SelectedItem="{Binding TypesSettings.SelectedTitleBlock}"
-                    ToolTipText="Типоразмер рамки (штампа), которая будет размещена на новых листах"
+                    ToolTipText="{me:LocalizationSource SheetParams.SelectTitleBlockTypeToolTip}"
                     SelectionChangedCommand="{Binding SettingsChangedCommand}"
                     ItemTemplate="{StaticResource WithFamilyNameItemTemplate}" />
 
@@ -74,14 +74,14 @@
                         Grid.Column="0"
                         LabelText="{me:LocalizationSource SheetParams.SheetSizeParameter}"
                         TextBoxText="{Binding Path=ProjectSettings.SheetSizeTemp, UpdateSourceTrigger=PropertyChanged}"
-                        ToolTipText="Имя параметра рамки листа, в котором задается значение формата листа.&#10;Например, если вам необходимо задать рамке листа формат &quot;А3&quot;, то в данный параметр вы будете записывать &quot;3&quot;&#10;В этом поле нужно указать имя этого параметра."
+                        ToolTipText="{me:LocalizationSource SheetParams.SheetSizeParameterToolTip}"
                         TextChangedCommand="{Binding SettingsChangedCommand}" />
 
                     <controls:TextBoxSettingControl
                         Grid.Column="1"
                         LabelText="{me:LocalizationSource SheetParams.SheetCoefficientParameter}"
                         TextBoxText="{Binding Path=ProjectSettings.SheetCoefficientTemp, UpdateSourceTrigger=PropertyChanged}"
-                        ToolTipText="Имя параметра рамки листа, в котором задается значение множителя формата листа.&#10;Например, если вам необходимо задать рамке листа формат &quot;А2х3&quot;, то в данный параметр вы будете записывать &quot;3&quot;, чтобы указать, что формат &quot;А2&quot; умножен на 3.&#10;В этом поле нужно указать имя этого параметра."
+                        ToolTipText="{me:LocalizationSource SheetParams.SheetCoefficientParameterToolTip}"
                         TextChangedCommand="{Binding SettingsChangedCommand}" />
                 </Grid>
             </StackPanel>

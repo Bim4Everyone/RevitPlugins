@@ -46,7 +46,7 @@
                 <StackPanel>
                     <controls:SettingsTitleControl
                         LabelText="{me:LocalizationSource ProjectParams.ProjectRelatedParameters}"
-                        ToolTipText="Параметры, относящиеся к проекту, в котором вы работаете"
+                        ToolTipText="{me:LocalizationSource ProjectParams.ProjectRelatedParametersToolTip}"
                         ButtonCommand="{Binding ApplySettingsCommand}"
                         ButtonMouseLeaveCommand="{Binding CheckSettingsCommand}" />
 
@@ -60,14 +60,14 @@
                             Grid.Column="0"
                             LabelText="{me:LocalizationSource ProjectParams.DispatcherGroupingFirstParameter}"
                             TextBoxText="{Binding Path=ProjectSettings.DispatcherGroupingFirstTemp, UpdateSourceTrigger=PropertyChanged}"
-                            ToolTipText="Имя параметра, который используется в проекте для группировки диспетчера на первом уровне"
+                            ToolTipText="{me:LocalizationSource ProjectParams.DispatcherGroupingFirstParameterToolTip}"
                             TextChangedCommand="{Binding SettingsChangedCommand}" />
 
                         <controls:TextBoxSettingControl
                             Grid.Column="1"
                             LabelText="{me:LocalizationSource ProjectParams.DispatcherGroupingSecondParameter}"
                             TextBoxText="{Binding Path=ProjectSettings.DispatcherGroupingSecondTemp, UpdateSourceTrigger=PropertyChanged}"
-                            ToolTipText="Имя параметра, который используется в проекте для группировки диспетчера на втором уровне"
+                            ToolTipText="{me:LocalizationSource ProjectParams.DispatcherGroupingSecondParameterToolTip}"
                             TextChangedCommand="{Binding SettingsChangedCommand}" />
                     </Grid>
 
@@ -84,7 +84,7 @@
                             LabelText="{me:LocalizationSource ProjectParams.SelectDimensionTypeSize}"
                             ItemsSource="{Binding DimensionTypes}"
                             SelectedItem="{Binding TypesSettings.SelectedDimensionType}"
-                            ToolTipText="Выберите типоразмер размера для расстановки размеров на видах"
+                            ToolTipText="{me:LocalizationSource ProjectParams.SelectDimensionTypeSizeToolTip}"
                             SelectionChangedCommand="{Binding SettingsChangedCommand}"
                             ItemTemplate="{StaticResource WithoutFamilyNameItemTemplate}" />
 
@@ -93,7 +93,7 @@
                             LabelText="{me:LocalizationSource ProjectParams.SelectSpotDimensionTypeSize}"
                             ItemsSource="{Binding SpotDimensionTypes}"
                             SelectedItem="{Binding TypesSettings.SelectedSpotDimensionType}"
-                            ToolTipText="Выберите типоразмер высотной отметки для расстановки отметок высот"
+                            ToolTipText="{me:LocalizationSource ProjectParams.SelectSpotDimensionTypeSizeToolTip}"
                             SelectionChangedCommand="{Binding SettingsChangedCommand}"
                             ItemTemplate="{StaticResource WithoutFamilyNameItemTemplate}" />
                     </Grid>
@@ -111,7 +111,7 @@
                             LabelText="{me:LocalizationSource ProjectParams.SelectRebarProductMarkTypeSize}"
                             ItemsSource="{Binding RebarTagTypes}"
                             SelectedItem="{Binding TypesSettings.SelectedSkeletonTagType}"
-                            ToolTipText="Выберите типоразмер марки арматурного изделия для маркировки каркасов"
+                            ToolTipText="{me:LocalizationSource ProjectParams.SelectRebarProductMarkTypeSizeToolTip}"
                             SelectionChangedCommand="{Binding SettingsChangedCommand}"
                             ItemTemplate="{StaticResource WithoutFamilyNameItemTemplate}" />
 
@@ -120,7 +120,7 @@
                             LabelText="{me:LocalizationSource ProjectParams.SelectRebarMarkWithSerifTypeSize}"
                             ItemsSource="{Binding RebarTagTypes}"
                             SelectedItem="{Binding TypesSettings.SelectedRebarTagTypeWithSerif}"
-                            ToolTipText="Выберите типоразмер марки арматуры с засечкой для маркировки отдельных стержней"
+                            ToolTipText="{me:LocalizationSource ProjectParams.SelectRebarMarkWithSerifTypeSizeToolTip}"
                             SelectionChangedCommand="{Binding SettingsChangedCommand}"
                             ItemTemplate="{StaticResource WithoutFamilyNameItemTemplate}" />
                     </Grid>
@@ -138,7 +138,7 @@
                             LabelText="{me:LocalizationSource ProjectParams.SelectRebarMarkWithStepTypeSize}"
                             ItemsSource="{Binding RebarTagTypes}"
                             SelectedItem="{Binding TypesSettings.SelectedRebarTagTypeWithStep}"
-                            ToolTipText="Выберите типоразмер марки арматуры с шагом для маркировки стержней с указанием шага"
+                            ToolTipText="{me:LocalizationSource ProjectParams.SelectRebarMarkWithStepTypeSizeToolTip}"
                             SelectionChangedCommand="{Binding SettingsChangedCommand}"
                             ItemTemplate="{StaticResource WithoutFamilyNameItemTemplate}" />
 
@@ -147,7 +147,7 @@
                             LabelText="{me:LocalizationSource ProjectParams.SelectRebarMarkWithCommentTypeSize}"
                             ItemsSource="{Binding RebarTagTypes}"
                             SelectedItem="{Binding TypesSettings.SelectedRebarTagTypeWithComment}"
-                            ToolTipText="Выберите типоразмер марки арматуры с комментарием для маркировки с дополнительными комментариями"
+                            ToolTipText="{me:LocalizationSource ProjectParams.SelectRebarMarkWithCommentTypeSizeToolTip}"
                             SelectionChangedCommand="{Binding SettingsChangedCommand}"
                             ItemTemplate="{StaticResource WithoutFamilyNameItemTemplate}" />
                     </Grid>
@@ -165,7 +165,7 @@
                             LabelText="{me:LocalizationSource ProjectParams.SelectUniversalMarkWithTextTypeSize}"
                             ItemsSource="{Binding TypicalAnnotationsTypes}"
                             SelectedItem="{Binding TypesSettings.SelectedUniversalTagType}"
-                            ToolTipText="Выберите типоразмер универсальной марки с текстом для прочих обозначений"
+                            ToolTipText="{me:LocalizationSource ProjectParams.SelectUniversalMarkWithTextTypeSizeToolTip}"
                             SelectionChangedCommand="{Binding SettingsChangedCommand}"
                             ItemTemplate="{StaticResource WithoutFamilyNameItemTemplate}" />
 
@@ -174,7 +174,7 @@
                             LabelText="{me:LocalizationSource ProjectParams.SelectBreakLineTypeSize}"
                             ItemsSource="{Binding DetailComponentsTypes}"
                             SelectedItem="{Binding TypesSettings.SelectedBreakLineType}"
-                            ToolTipText="Выберите типоразмер линии обрыва для обозначения обрывов на видах"
+                            ToolTipText="{me:LocalizationSource ProjectParams.SelectBreakLineTypeSizeToolTip}"
                             SelectionChangedCommand="{Binding SettingsChangedCommand}"
                             ItemTemplate="{StaticResource WithoutFamilyNameItemTemplate}" />
                     </Grid>
@@ -192,7 +192,7 @@
                             LabelText="{me:LocalizationSource ProjectParams.SelectConcretingJointTypeSize}"
                             ItemsSource="{Binding DetailComponentsTypes}"
                             SelectedItem="{Binding TypesSettings.SelectedConcretingJointType}"
-                            ToolTipText="Выберите типоразмер рабочего шва бетонирования для обозначения швов бетонирования"
+                            ToolTipText="{me:LocalizationSource ProjectParams.SelectConcretingJointTypeSizeToolTip}"
                             SelectionChangedCommand="{Binding SettingsChangedCommand}"
                             ItemTemplate="{StaticResource WithoutFamilyNameItemTemplate}" />
                     </Grid>

@@ -85,7 +85,7 @@
                         Margin="5"
                         ItemsSource="{Binding ProjectSections}"
                         SelectedItem="{Binding Path=SelectionSettings.SelectedProjectSection}"
-                        ToolTip="Выберите комплект документации, с пилонами которого желаете поработать. Если вы хотите поработать с каким то конкретным пилоном, то нажмите кнопку справа &quot;Выбрать пилон&quot;.&#10;После этого выберите в списке ниже нужные марки пилонов, и в списке справа виды/спецификации, которые хотите создать/разместить. Затем нажмите &quot;Ок&quot;&#10;Если в списке ничего не отображается или внизу окна написана ошибка оранжевым текстом - отредактируйте &quot;Настройки&quot; в правом верхем углу.">
+                        ToolTip="{me:LocalizationSource GeneralPage.DocumentationSetToolTip}">
                         <i:Interaction.Triggers>
                             <i:EventTrigger
                                 EventName="SelectionChanged">
@@ -101,7 +101,7 @@
                         Margin="5"
                         VerticalAlignment="Stretch"
                         Content="{me:LocalizationSource GeneralPage.SelectPylon}"
-                        ToolTip="Чтобы выбрать какой то конкретный пилон вручную:&#10;1) нажмите эту кнопку;&#10;2) окно плагина закроется и вам будет предоставлена возможность выбора элемента - кликните на нужный пилон;&#10;3) окно плагина снова откроется и вы сможете продолжить настройки."/>
+                        ToolTip="{me:LocalizationSource GeneralPage.SelectPylonToolTip}"/>
                 </Grid>
 
                 <ui:TextBlock
@@ -123,7 +123,7 @@
                         Margin="5"
                         PlaceholderText="{me:LocalizationSource GeneralPage.SearchPlaceholder}"
                         Text="{Binding Path=HostsInfoFilter, UpdateSourceTrigger=PropertyChanged}" 
-                        ToolTip="Введите текст для поиска в списке ниже"/>
+                        ToolTip="{me:LocalizationSource GeneralPage.SearchPylonsToolTip}"/>
 
                     <ui:Button
                         Grid.Column="1"
@@ -131,7 +131,7 @@
                         VerticalAlignment="Stretch"
                         Icon="{ui:SymbolIcon CheckboxChecked24}"
                         Command="{Binding Path=SelectAllHostsInfoInGUICommand}" 
-                        ToolTip="Нажмите, чтобы выбрать все марки пилонов, видимые в списке ниже"/>
+                        ToolTip="{me:LocalizationSource GeneralPage.SelectAllPylonsToolTip}"/>
 
                     <ui:Button
                         Grid.Column="2"
@@ -139,7 +139,7 @@
                         VerticalAlignment="Stretch"
                         Icon="{ui:SymbolIcon CheckboxUnchecked24}"
                         Command="{Binding Path=UnselectAllHostsInfoInGUICommand}" 
-                        ToolTip="Нажмите, чтобы отменить выбор всех марок пилонов, видимых в списке ниже"/>
+                        ToolTip="{me:LocalizationSource GeneralPage.UnselectAllPylonsToolTip}"/>
                 </Grid>
 
                 <ui:ListView
@@ -200,7 +200,7 @@
                         MinHeight="{Binding ElementName=refHeightButton, Path=ActualHeight}"
                         Icon="{ui:SymbolIcon ToggleRight16}"
                         Command="{Binding Path=SelectAllFuncInGUICommand}" 
-                        ToolTip="Нажмите, чтобы передвинуть тумблеры вправо у всех видов/спецификаций ниже"/>
+                        ToolTip="{me:LocalizationSource GeneralPage.SelectAllViewsToolTip}"/>
 
                     <ui:Button
                         Grid.Column="2"
@@ -208,7 +208,7 @@
                         VerticalAlignment="Stretch"
                         Icon="{ui:SymbolIcon ToggleLeft16}"
                         Command="{Binding Path=UnselectAllFuncInGUICommand}"
-                        ToolTip="Нажмите, чтобы передвинуть тумблеры влево у всех видов/спецификаций ниже"/>
+                        ToolTip="{me:LocalizationSource GeneralPage.UnselectAllViewsToolTip}"/>
                 </Grid>
 
                 <Grid Name="FormworkToggles"
@@ -235,35 +235,35 @@
                         Margin="5"
                         IsChecked="{Binding Path=SelectionSettings.NeedWorkWithGeneralView}"
                         Content="{me:LocalizationSource GeneralPage.Main}" 
-                        ToolTip="Передвиньте тумблер вправо, если хотите, чтобы плагин создал и разместил на листах у выбранных пилонов основной вид пилона (вертикальный вид, который смотрит на большую сторону пилона)"/>
+                        ToolTip="{me:LocalizationSource GeneralPage.FormworkMainViewToolTip}"/>
 
                     <ui:ToggleSwitch
                         Grid.Row="2"
                         Margin="5"
                         IsChecked="{Binding Path=SelectionSettings.NeedWorkWithGeneralPerpendicularView}"
                         Content="{me:LocalizationSource GeneralPage.Side}" 
-                        ToolTip="Передвиньте тумблер вправо, если хотите, чтобы плагин создал и разместил на листах у выбранных пилонов боковой вид пилона (вертикальный вид, который смотрит на меньшую сторону пилона)"/>
+                        ToolTip="{me:LocalizationSource GeneralPage.FormworkSideViewToolTip}"/>
 
                     <ui:ToggleSwitch
                         Grid.Row="3"
                         Margin="5"
                         IsChecked="{Binding Path=SelectionSettings.NeedWorkWithTransverseViewFirst}"
                         Content="{me:LocalizationSource GeneralPage.Transverse1}" 
-                        ToolTip="Передвиньте тумблер вправо, если хотите, чтобы плагин создал и разместил на листах у выбранных пилонов поперечный разрез на уровне 1/4 высоты пилона"/>
+                        ToolTip="{me:LocalizationSource GeneralPage.FormworkTransverse1ToolTip}"/>
 
                     <ui:ToggleSwitch
                         Grid.Row="4"
                         Margin="5"
                         IsChecked="{Binding Path=SelectionSettings.NeedWorkWithTransverseViewSecond}"
                         Content="{me:LocalizationSource GeneralPage.Transverse2}" 
-                        ToolTip="Передвиньте тумблер вправо, если хотите, чтобы плагин создал и разместил на листах у выбранных пилонов поперечный разрез на уровне 1/2 высоты пилона"/>
+                        ToolTip="{me:LocalizationSource GeneralPage.FormworkTransverse2ToolTip}"/>
 
                     <ui:ToggleSwitch
                         Grid.Row="5"
                         Margin="5"
                         IsChecked="{Binding Path=SelectionSettings.NeedWorkWithTransverseViewThird}"
                         Content="{me:LocalizationSource GeneralPage.Transverse3}" 
-                        ToolTip="Передвиньте тумблер вправо, если хотите, чтобы плагин создал и разместил на листах у выбранных пилонов поперечный разрез на уровне на 5/4 высоты пилона"/>
+                        ToolTip="{me:LocalizationSource GeneralPage.FormworkTransverse3ToolTip}"/>
                 </Grid>
 
                 <Grid Name="RebarToggles"
@@ -290,35 +290,35 @@
                         Margin="5"
                         IsChecked="{Binding Path=SelectionSettings.NeedWorkWithGeneralRebarView}"
                         Content="{me:LocalizationSource GeneralPage.Main}" 
-                        ToolTip="Передвиньте тумблер вправо, если хотите, чтобы плагин создал и разместил на листах у выбранных пилонов основной вид каркаса"/>
+                        ToolTip="{me:LocalizationSource GeneralPage.RebarMainViewToolTip}"/>
 
                     <ui:ToggleSwitch
                         Grid.Row="2"
                         Margin="5"
                         IsChecked="{Binding Path=SelectionSettings.NeedWorkWithGeneralPerpendicularRebarView}"
                         Content="{me:LocalizationSource GeneralPage.Side}" 
-                        ToolTip="Передвиньте тумблер вправо, если хотите, чтобы плагин создал и разместил на листах у выбранных пилонов боковой вид каркаса"/>
+                        ToolTip="{me:LocalizationSource GeneralPage.RebarSideViewToolTip}"/>
 
                     <ui:ToggleSwitch
                         Grid.Row="3"
                         Margin="5"
                         IsChecked="{Binding Path=SelectionSettings.NeedWorkWithTransverseViewFirst}"
                         Content="{me:LocalizationSource GeneralPage.Transverse1}" 
-                        ToolTip="Передвиньте тумблер вправо, если хотите, чтобы плагин создал и разместил на листах у выбранных пилонов первый поперечный разрез каркаса"/>
+                        ToolTip="{me:LocalizationSource GeneralPage.RebarTransverse1ToolTip}"/>
 
                     <ui:ToggleSwitch
                         Grid.Row="4"
                         Margin="5"
                         IsChecked="{Binding Path=SelectionSettings.NeedWorkWithTransverseViewSecond}"
                         Content="{me:LocalizationSource GeneralPage.Transverse2}" 
-                        ToolTip="Передвиньте тумблер вправо, если хотите, чтобы плагин создал и разместил на листах у выбранных пилонов второй поперечный разрез каркаса"/>
+                        ToolTip="{me:LocalizationSource GeneralPage.RebarTransverse2ToolTip}"/>
 
                     <ui:ToggleSwitch
                         Grid.Row="5"
                         Margin="5"
                         IsChecked="{Binding Path=SelectionSettings.NeedWorkWithTransverseViewThird}"
                         Content="{me:LocalizationSource GeneralPage.Transverse3}" 
-                        ToolTip="Передвиньте тумблер вправо, если хотите, чтобы плагин создал и разместил на листах у выбранных пилонов третий поперечный разрез каркаса"/>
+                        ToolTip="{me:LocalizationSource GeneralPage.RebarTransverse3ToolTip}"/>
                 </Grid>
 
                 <Grid Name="SpecToggles"
@@ -345,35 +345,35 @@
                         Margin="5"
                         IsChecked="{Binding Path=SelectionSettings.NeedWorkWithSkeletonSchedule}"
                         Content="{me:LocalizationSource GeneralPage.Skeleton}" 
-                        ToolTip="Передвиньте тумблер вправо, если хотите, чтобы плагин создал и разместил на листах у выбранных пилонов общую спецификацию каркаса"/>
+                        ToolTip="{me:LocalizationSource GeneralPage.SkeletonScheduleToolTip}"/>
 
                     <ui:ToggleSwitch
                         Grid.Row="2"
                         Margin="5"
                         IsChecked="{Binding Path=SelectionSettings.NeedWorkWithSkeletonByElemsSchedule}"
                         Content="{me:LocalizationSource GeneralPage.SkeletonElements}" 
-                        ToolTip="Передвиньте тумблер вправо, если хотите, чтобы плагин создал и разместил на листах у выбранных пилонов поэлементную спецификацию каркаса"/>
+                        ToolTip="{me:LocalizationSource GeneralPage.SkeletonElementsScheduleToolTip}"/>
 
                     <ui:ToggleSwitch
                         Grid.Row="3"
                         Margin="5"
                         IsChecked="{Binding Path=SelectionSettings.NeedWorkWithMaterialSchedule}"
                         Content="{me:LocalizationSource GeneralPage.Materials}" 
-                        ToolTip="Передвиньте тумблер вправо, если хотите, чтобы плагин создал и разместил на листах у выбранных пилонов спецификацию материалов"/>
+                        ToolTip="{me:LocalizationSource GeneralPage.MaterialsScheduleToolTip}"/>
 
                     <ui:ToggleSwitch
                         Grid.Row="4"
                         Margin="5"
                         IsChecked="{Binding Path=SelectionSettings.NeedWorkWithSystemPartsSchedule}"
                         Content="{me:LocalizationSource GeneralPage.SystemParts}" 
-                        ToolTip="Передвиньте тумблер вправо, если хотите, чтобы плагин создал и разместил на листах у выбранных пилонов ведомость системной арматуры"/>
+                        ToolTip="{me:LocalizationSource GeneralPage.SystemPartsScheduleToolTip}"/>
 
                     <ui:ToggleSwitch
                         Grid.Row="5"
                         Margin="5"
                         IsChecked="{Binding Path=SelectionSettings.NeedWorkWithIfcPartsSchedule}"
                         Content="{me:LocalizationSource GeneralPage.IfcParts}" 
-                        ToolTip="Передвиньте тумблер вправо, если хотите, чтобы плагин создал и разместил на листах у выбранных пилонов ведомость IFC арматуры"/>
+                        ToolTip="{me:LocalizationSource GeneralPage.IfcPartsScheduleToolTip}"/>
                 </Grid>
 
                 <Grid Name="OtherToggles"
@@ -400,7 +400,7 @@
                         Margin="5"
                         IsChecked="{Binding Path=SelectionSettings.NeedWorkWithLegend}"
                         Content="{me:LocalizationSource GeneralPage.NotesLegend}" 
-                        ToolTip="Передвиньте тумблер вправо, если хотите, чтобы плагин разместил на листах у выбранных пилонов легенду примечания"/>
+                        ToolTip="{me:LocalizationSource GeneralPage.NotesLegendToolTip}"/>
                 </Grid>
             </Grid>
         </Border>
