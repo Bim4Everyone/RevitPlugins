@@ -54,7 +54,7 @@
                 <StackPanel>
                     <controls:SettingsTitleControl
                         LabelText="{me:LocalizationSource Schedules.SkeletonSpecification}"
-                        ToolTipText="{me:LocalizationSource Schedules.SkeletonSpecification}"
+                        ToolTipText="Правила, по которым будет создаваться спецификация каркасов для пилонов"
                         ButtonCommand="{Binding ApplySettingsCommand}"
                         ButtonMouseLeaveCommand="{Binding CheckSettingsCommand}" />
 
@@ -62,25 +62,25 @@
                         LabelText="{me:LocalizationSource Schedules.SkeletonSpecNameMask}"
                         FirstTextBoxText="{Binding Path=SchedulesSettings.SkeletonSchedulePrefixTemp, UpdateSourceTrigger=PropertyChanged}"
                         SecondTextBoxText="{Binding Path=SchedulesSettings.SkeletonScheduleSuffixTemp, UpdateSourceTrigger=PropertyChanged}"
-                        ToolTipText="{me:LocalizationSource Schedules.SkeletonSpecNameMaskTooltip}"
+                        ToolTipText="Префикс и суффикс имени спецификации каркасов пилона, т.е. то, что должно идти в названии спецификации перед указанием марки пилона и после нее.&#10;Например, в имени спецификации каркасов пилона:&#10;&quot;Пилон 12.30.25-12⌀20-П1_ВД_IFC&quot;,&#10;где &quot;12.30.25-12⌀20-П1&quot; - это марка пилона,&#10;&quot;Пилон &quot; - это префикс,&#10;&quot;_ВД_IFC&quot; - это суффикс."
                         TextChangedCommand="{Binding SettingsChangedCommand}" />
 
                     <controls:TextBoxSettingControl
                         LabelText="{me:LocalizationSource Schedules.ReferenceSkeletonSpecSearchName}"
                         TextBoxText="{Binding Path=SchedulesSettings.SkeletonScheduleNameTemp, UpdateSourceTrigger=PropertyChanged}"
-                        ToolTipText="{me:LocalizationSource Schedules.ReferenceSkeletonSpecSearchNameTooltip}"
+                        ToolTipText="Имя эталонной спецификации каркасов, которая будет копироваться для получения спецификации каркасов пилона."
                         TextChangedCommand="{Binding SettingsChangedCommand}" />
 
                     <controls:TextBoxSettingControl
                         LabelText="{me:LocalizationSource Schedules.DispatcherGroupingFirstParameterForSpec}"
                         TextBoxText="{Binding Path=SchedulesSettings.SkeletonScheduleDisp1Temp, UpdateSourceTrigger=PropertyChanged}"
-                        ToolTipText="{me:LocalizationSource Schedules.DispatcherGroupingFirstParameterForSpecTooltip}"
+                        ToolTipText="Значение, которое будет использовано для заполнения параметра группировки диспетчера на первом уровне у спецификации каркасов.&#10;В зависимости от того, какое значение будет здесь указано возможны следующие варианты:&#10;1) если указать название параметра, который имеется у пилона, то плагин возьмет значение этого параметра из пилона и запишет в параметр для группировки диспетчера на первом уровне у спецификации каркасов.&#10;Пример: если записать значение &quot;Марка&quot;, то плагин обратиться к перечню параметров пилона и поймет, что параметр с именем &quot;Марка&quot; у пилона есть. Далее он считает значение из параметра &quot;Марка&quot; у пилона и запишет в параметр для группировки диспетчера на первом уровне у спецификации каркасов.&#10;2) если параметр с указанным значением не будет найден у пилона, то данное значение просто запишется в параметр для группировки диспетчера на первом уровне у спецификации каркасов.&#10;Пример: если записать значение &quot;ВД&quot;, то плагин обратиться к перечню параметров пилона и поймет, что параметра с именем &quot;ВД&quot; у пилона нет. Тогда он просто запишет &quot;ВД&quot; в параметр для группировки диспетчера на первом уровне у спецификации каркасов."
                         TextChangedCommand="{Binding SettingsChangedCommand}" />
 
                     <controls:TextBoxSettingControl
                         LabelText="{me:LocalizationSource Schedules.DispatcherGroupingSecondParameterForSpec}"
                         TextBoxText="{Binding Path=SchedulesSettings.SkeletonScheduleDisp2Temp, UpdateSourceTrigger=PropertyChanged}"
-                        ToolTipText="{me:LocalizationSource Schedules.DispatcherGroupingSecondParameterForSpecTooltip}"
+                        ToolTipText="Значение, которое будет использовано для заполнения параметра группировки диспетчера на втором уровне у спецификации каркасов.&#10;В зависимости от того, какое значение будет здесь указано возможны следующие варианты:&#10;1) если указать название параметра, который имеется у пилона, то плагин возьмет значение этого параметра из пилона и запишет в параметр для группировки диспетчера на втором уровне у спецификации каркасов.&#10;Пример: если записать значение &quot;Марка&quot;, то плагин обратиться к перечню параметров пилона и поймет, что параметр с именем &quot;Марка&quot; у пилона есть. Далее он считает значение из параметра &quot;Марка&quot; у пилона и запишет в параметр для группировки диспетчера на втором уровне у спецификации каркасов.&#10;2) если параметр с указанным значением не будет найден у пилона, то данное значение просто запишется в параметр для группировки диспетчера на втором уровне у спецификации каркасов.&#10;Пример: если записать значение &quot;ВД&quot;, то плагин обратиться к перечню параметров пилона и поймет, что параметра с именем &quot;ВД&quot; у пилона нет. Тогда он просто запишет &quot;ВД&quot; в параметр для группировки диспетчера на втором уровне у спецификации каркасов."
                         TextChangedCommand="{Binding SettingsChangedCommand}" />
                 </StackPanel>
             </Border>
@@ -93,7 +93,7 @@
                 <StackPanel>
                     <controls:SettingsTitleControl
                         LabelText="{me:LocalizationSource Schedules.SystemPartsSchedule}"
-                        ToolTipText="{me:LocalizationSource Schedules.SystemPartsSchedule}"
+                        ToolTipText="Правила, по которым будет создаваться ведомость системных деталей для пилонов"
                         ButtonCommand="{Binding ApplySettingsCommand}"
                         ButtonMouseLeaveCommand="{Binding CheckSettingsCommand}" />
 
@@ -101,25 +101,25 @@
                         LabelText="{me:LocalizationSource Schedules.SystemPartsScheduleNameMask}"
                         FirstTextBoxText="{Binding Path=SchedulesSettings.SystemPartsSchedulePrefixTemp, UpdateSourceTrigger=PropertyChanged}"
                         SecondTextBoxText="{Binding Path=SchedulesSettings.SystemPartsScheduleSuffixTemp, UpdateSourceTrigger=PropertyChanged}"
-                        ToolTipText="{me:LocalizationSource Schedules.SystemPartsScheduleNameMaskTooltip}"
+                        ToolTipText="Префикс и суффикс имени ведомости системных деталей пилона, т.е. то, что должно идти в названии ведомости перед указанием марки пилона и после нее.&#10;Например, в имени ведомости системных деталей пилона:&#10;&quot;Пилон 12.30.25-12⌀20-П1_ВД_СИС&quot;,&#10;где &quot;12.30.25-12⌀20-П1&quot; - это марка пилона,&#10;&quot;Пилон &quot; - это префикс,&#10;&quot;_ВД_СИС&quot; - это суффикс."
                         TextChangedCommand="{Binding SettingsChangedCommand}" />
 
                     <controls:TextBoxSettingControl
                         LabelText="{me:LocalizationSource Schedules.ReferenceSystemPartsScheduleSearchName}"
                         TextBoxText="{Binding Path=SchedulesSettings.SystemPartsScheduleNameTemp, UpdateSourceTrigger=PropertyChanged}"
-                        ToolTipText="{me:LocalizationSource Schedules.ReferenceSystemPartsScheduleSearchNameTooltip}"
+                        ToolTipText="Имя эталонной ведомости системных деталей, которая будет копироваться для получения ведомости системных деталей пилона."
                         TextChangedCommand="{Binding SettingsChangedCommand}" />
 
                     <controls:TextBoxSettingControl
                         LabelText="{me:LocalizationSource Schedules.DispatcherGroupingFirstParameterForSchedule}"
                         TextBoxText="{Binding Path=SchedulesSettings.SystemPartsScheduleDisp1Temp, UpdateSourceTrigger=PropertyChanged}"
-                        ToolTipText="{me:LocalizationSource Schedules.DispatcherGroupingFirstParameterForScheduleTooltip}"
+                        ToolTipText="Значение, которое будет использовано для заполнения параметра группировки диспетчера на первом уровне у ведомости системных деталей.&#10;В зависимости от того, какое значение будет здесь указано возможны следующие варианты:&#10;1) если указать название параметра, который имеется у пилона, то плагин возьмет значение этого параметра из пилона и запишет в параметр для группировки диспетчера на первом уровне у ведомости системных деталей.&#10;Пример: если записать значение &quot;Марка&quot;, то плагин обратиться к перечню параметров пилона и поймет, что параметр с именем &quot;Марка&quot; у пилона есть. Далее он считает значение из параметра &quot;Марка&quot; у пилона и запишет в параметр для группировки диспетчера на первом уровне у ведомости системных деталей.&#10;2) если параметр с указанным значением не будет найден у пилона, то данное значение просто запишется в параметр для группировки диспетчера на первом уровне у ведомости системных деталей.&#10;Пример: если записать значение &quot;ВД&quot;, то плагин обратиться к перечню параметров пилона и поймет, что параметра с именем &quot;ВД&quot; у пилона нет. Тогда он просто запишет &quot;ВД&quot; в параметр для группировки диспетчера на первом уровне у ведомости системных деталей."
                         TextChangedCommand="{Binding SettingsChangedCommand}" />
 
                     <controls:TextBoxSettingControl
                         LabelText="{me:LocalizationSource Schedules.DispatcherGroupingSecondParameterForSchedule}"
                         TextBoxText="{Binding Path=SchedulesSettings.SystemPartsScheduleDisp2Temp, UpdateSourceTrigger=PropertyChanged}"
-                        ToolTipText="{me:LocalizationSource Schedules.DispatcherGroupingSecondParameterForScheduleTooltip}"
+                        ToolTipText="Значение, которое будет использовано для заполнения параметра группировки диспетчера на втором уровне у ведомости системных деталей.&#10;В зависимости от того, какое значение будет здесь указано возможны следующие варианты:&#10;1) если указать название параметра, который имеется у пилона, то плагин возьмет значение этого параметра из пилона и запишет в параметр для группировки диспетчера на втором уровне у ведомости системных деталей.&#10;Пример: если записать значение &quot;Марка&quot;, то плагин обратиться к перечню параметров пилона и поймет, что параметр с именем &quot;Марка&quot; у пилона есть. Далее он считает значение из параметра &quot;Марка&quot; у пилона и запишет в параметр для группировки диспетчера на втором уровне у ведомости системных деталей.&#10;2) если параметр с указанным значением не будет найден у пилона, то данное значение просто запишется в параметр для группировки диспетчера на втором уровне у ведомости системных деталей.&#10;Пример: если записать значение &quot;ВД&quot;, то плагин обратиться к перечню параметров пилона и поймет, что параметра с именем &quot;ВД&quot; у пилона нет. Тогда он просто запишет &quot;ВД&quot; в параметр для группировки диспетчера на втором уровне у ведомости системных деталей."
                         TextChangedCommand="{Binding SettingsChangedCommand}" />
                 </StackPanel>
             </Border>
@@ -132,7 +132,7 @@
                 <StackPanel>
                     <controls:SettingsTitleControl
                         LabelText="{me:LocalizationSource Schedules.SkeletonElementsSpecification}"
-                        ToolTipText="{me:LocalizationSource Schedules.SkeletonElementsSpecification}"
+                        ToolTipText="Правила, по которым будет создаваться спецификация элементов каркасов для пилонов"
                         ButtonCommand="{Binding ApplySettingsCommand}"
                         ButtonMouseLeaveCommand="{Binding CheckSettingsCommand}" />
 
@@ -140,25 +140,25 @@
                         LabelText="{me:LocalizationSource Schedules.SkeletonElementsSpecNameMask}"
                         FirstTextBoxText="{Binding Path=SchedulesSettings.SkeletonByElemsSchedulePrefixTemp, UpdateSourceTrigger=PropertyChanged}"
                         SecondTextBoxText="{Binding Path=SchedulesSettings.SkeletonByElemsScheduleSuffixTemp, UpdateSourceTrigger=PropertyChanged}"
-                        ToolTipText="{me:LocalizationSource Schedules.SkeletonElementsSpecNameMaskTooltip}"
+                        ToolTipText="Префикс и суффикс имени спецификации элементов каркасов пилона, т.е. то, что должно идти в названии спецификации перед указанием марки пилона и после нее.&#10;Например, в имени спецификации элементов каркасов пилона:&#10;&quot;Пилон 12.30.25-12⌀20-П1_ВД_IFC&quot;,&#10;где &quot;12.30.25-12⌀20-П1&quot; - это марка пилона,&#10;&quot;Пилон &quot; - это префикс,&#10;&quot;_ВД_IFC&quot; - это суффикс."
                         TextChangedCommand="{Binding SettingsChangedCommand}" />
 
                     <controls:TextBoxSettingControl
                         LabelText="{me:LocalizationSource Schedules.ReferenceSkeletonElementsSpecSearchName}"
                         TextBoxText="{Binding Path=SchedulesSettings.SkeletonByElemsScheduleNameTemp, UpdateSourceTrigger=PropertyChanged}"
-                        ToolTipText="{me:LocalizationSource Schedules.ReferenceSkeletonElementsSpecSearchNameTooltip}"
+                        ToolTipText="Имя эталонной спецификации элементов каркасов, которая будет копироваться для получения спецификации элементов каркасов пилона."
                         TextChangedCommand="{Binding SettingsChangedCommand}" />
 
                     <controls:TextBoxSettingControl
                         LabelText="{me:LocalizationSource Schedules.DispatcherGroupingFirstParameterForSpecElements}"
                         TextBoxText="{Binding Path=SchedulesSettings.SkeletonByElemsScheduleDisp1Temp, UpdateSourceTrigger=PropertyChanged}"
-                        ToolTipText="{me:LocalizationSource Schedules.DispatcherGroupingFirstParameterForSpecElementsTooltip}"
+                        ToolTipText="Значение, которое будет использовано для заполнения параметра группировки диспетчера на первом уровне у спецификации элементов каркасов.&#10;В зависимости от того, какое значение будет здесь указано возможны следующие варианты:&#10;1) если указать название параметра, который имеется у пилона, то плагин возьмет значение этого параметра из пилона и запишет в параметр для группировки диспетчера на первом уровне у спецификации элементов каркасов.&#10;Пример: если записать значение &quot;Марка&quot;, то плагин обратиться к перечню параметров пилона и поймет, что параметр с именем &quot;Марка&quot; у пилона есть. Далее он считает значение из параметра &quot;Марка&quot; у пилона и запишет в параметр для группировки диспетчера на первом уровне у спецификации элементов каркасов.&#10;2) если параметр с указанным значением не будет найден у пилона, то данное значение просто запишется в параметр для группировки диспетчера на первом уровне у спецификации элементов каркасов.&#10;Пример: если записать значение &quot;ВД&quot;, то плагин обратиться к перечню параметров пилона и поймет, что параметра с именем &quot;ВД&quot; у пилона нет. Тогда он просто запишет &quot;ВД&quot; в параметр для группировки диспетчера на первом уровне у спецификации элементов каркасов."
                         TextChangedCommand="{Binding SettingsChangedCommand}" />
 
                     <controls:TextBoxSettingControl
                         LabelText="{me:LocalizationSource Schedules.DispatcherGroupingSecondParameterForSpecElements}"
                         TextBoxText="{Binding Path=SchedulesSettings.SkeletonByElemsScheduleDisp2Temp, UpdateSourceTrigger=PropertyChanged}"
-                        ToolTipText="{me:LocalizationSource Schedules.DispatcherGroupingSecondParameterForSpecElementsTooltip}"
+                        ToolTipText="Значение, которое будет использовано для заполнения параметра группировки диспетчера на втором уровне у спецификации элементов каркасов.&#10;В зависимости от того, какое значение будет здесь указано возможны следующие варианты:&#10;1) если указать название параметра, который имеется у пилона, то плагин возьмет значение этого параметра из пилона и запишет в параметр для группировки диспетчера на втором уровне у спецификации элементов каркасов.&#10;Пример: если записать значение &quot;Марка&quot;, то плагин обратиться к перечню параметров пилона и поймет, что параметр с именем &quot;Марка&quot; у пилона есть. Далее он считает значение из параметра &quot;Марка&quot; у пилона и запишет в параметр для группировки диспетчера на втором уровне у спецификации элементов каркасов.&#10;2) если параметр с указанным значением не будет найден у пилона, то данное значение просто запишется в параметр для группировки диспетчера на втором уровне у спецификации элементов каркасов.&#10;Пример: если записать значение &quot;ВД&quot;, то плагин обратиться к перечню параметров пилона и поймет, что параметра с именем &quot;ВД&quot; у пилона нет. Тогда он просто запишет &quot;ВД&quot; в параметр для группировки диспетчера на втором уровне у спецификации элементов каркасов."
                         TextChangedCommand="{Binding SettingsChangedCommand}" />
                 </StackPanel>
             </Border>
@@ -171,7 +171,7 @@
                 <StackPanel>
                     <controls:SettingsTitleControl
                         LabelText="{me:LocalizationSource Schedules.IfcPartsSchedule}"
-                        ToolTipText="{me:LocalizationSource Schedules.IfcPartsSchedule}"
+                        ToolTipText="Правила, по которым будет создаваться ведомость IFC деталей для пилонов"
                         ButtonCommand="{Binding ApplySettingsCommand}"
                         ButtonMouseLeaveCommand="{Binding CheckSettingsCommand}" />
 
@@ -179,25 +179,25 @@
                         LabelText="{me:LocalizationSource Schedules.IfcPartsScheduleNameMask}"
                         FirstTextBoxText="{Binding Path=SchedulesSettings.IfcPartsSchedulePrefixTemp, UpdateSourceTrigger=PropertyChanged}"
                         SecondTextBoxText="{Binding Path=SchedulesSettings.IfcPartsScheduleSuffixTemp, UpdateSourceTrigger=PropertyChanged}"
-                        ToolTipText="{me:LocalizationSource Schedules.IfcPartsScheduleNameMaskTooltip}"
+                        ToolTipText="Префикс и суффикс имени ведомости IFC деталей пилона, т.е. то, что должно идти в названии ведомости перед указанием марки пилона и после нее.&#10;Например, в имени ведомости IFC деталей пилона:&#10;&quot;Пилон 12.30.25-12⌀20-П1_ВД_IFC&quot;,&#10;где &quot;12.30.25-12⌀20-П1&quot; - это марка пилона,&#10;&quot;Пилон &quot; - это префикс,&#10;&quot;_ВД_IFC&quot; - это суффикс."
                         TextChangedCommand="{Binding SettingsChangedCommand}" />
 
                     <controls:TextBoxSettingControl
                         LabelText="{me:LocalizationSource Schedules.ReferenceIfcPartsScheduleSearchName}"
                         TextBoxText="{Binding Path=SchedulesSettings.IfcPartsScheduleNameTemp, UpdateSourceTrigger=PropertyChanged}"
-                        ToolTipText="{me:LocalizationSource Schedules.ReferenceIfcPartsScheduleSearchNameTooltip}"
+                        ToolTipText="Имя эталонной ведомости IFC деталей, которая будет копироваться для получения ведомости IFC деталей пилона."
                         TextChangedCommand="{Binding SettingsChangedCommand}" />
 
                     <controls:TextBoxSettingControl
                         LabelText="{me:LocalizationSource Schedules.DispatcherGroupingFirstParameterForIfcSchedule}"
                         TextBoxText="{Binding Path=SchedulesSettings.IfcPartsScheduleDisp1Temp, UpdateSourceTrigger=PropertyChanged}"
-                        ToolTipText="{me:LocalizationSource Schedules.DispatcherGroupingFirstParameterForIfcScheduleTooltip}"
+                        ToolTipText="Значение, которое будет использовано для заполнения параметра группировки диспетчера на первом уровне у ведомости IFC деталей.&#10;В зависимости от того, какое значение будет здесь указано возможны следующие варианты:&#10;1) если указать название параметра, который имеется у пилона, то плагин возьмет значение этого параметра из пилона и запишет в параметр для группировки диспетчера на первом уровне у ведомости IFC деталей.&#10;Пример: если записать значение &quot;Марка&quot;, то плагин обратиться к перечню параметров пилона и поймет, что параметр с именем &quot;Марка&quot; у пилона есть. Далее он считает значение из параметра &quot;Марка&quot; у пилона и запишет в параметр для группировки диспетчера на первом уровне у ведомости IFC деталей.&#10;2) если параметр с указанным значением не будет найден у пилона, то данное значение просто запишется в параметр для группировки диспетчера на первом уровне у ведомости IFC деталей.&#10;Пример: если записать значение &quot;ВД&quot;, то плагин обратиться к перечню параметров пилона и поймет, что параметра с именем &quot;ВД&quot; у пилона нет. Тогда он просто запишет &quot;ВД&quot; в параметр для группировки диспетчера на первом уровне у ведомости IFC деталей."
                         TextChangedCommand="{Binding SettingsChangedCommand}" />
 
                     <controls:TextBoxSettingControl
                         LabelText="{me:LocalizationSource Schedules.DispatcherGroupingSecondParameterForIfcSchedule}"
                         TextBoxText="{Binding Path=SchedulesSettings.IfcPartsScheduleDisp2Temp, UpdateSourceTrigger=PropertyChanged}"
-                        ToolTipText="{me:LocalizationSource Schedules.DispatcherGroupingSecondParameterForIfcScheduleTooltip}"
+                        ToolTipText="Значение, которое будет использовано для заполнения параметра группировки диспетчера на втором уровне у ведомости IFC деталей.&#10;В зависимости от того, какое значение будет здесь указано возможны следующие варианты:&#10;1) если указать название параметра, который имеется у пилона, то плагин возьмет значение этого параметра из пилона и запишет в параметр для группировки диспетчера на втором уровне у ведомости IFC деталей.&#10;Пример: если записать значение &quot;Марка&quot;, то плагин обратиться к перечню параметров пилона и поймет, что параметр с именем &quot;Марка&quot; у пилона есть. Далее он считает значение из параметра &quot;Марка&quot; у пилона и запишет в параметр для группировки диспетчера на втором уровне у ведомости IFC деталей.&#10;2) если параметр с указанным значением не будет найден у пилона, то данное значение просто запишется в параметр для группировки диспетчера на втором уровне у ведомости IFC деталей.&#10;Пример: если записать значение &quot;ВД&quot;, то плагин обратиться к перечню параметров пилона и поймет, что параметра с именем &quot;ВД&quot; у пилона нет. Тогда он просто запишет &quot;ВД&quot; в параметр для группировки диспетчера на втором уровне у ведомости IFC деталей."
                         TextChangedCommand="{Binding SettingsChangedCommand}" />
                 </StackPanel>
             </Border>
@@ -210,7 +210,7 @@
                 <StackPanel>
                     <controls:SettingsTitleControl
                         LabelText="{me:LocalizationSource Schedules.MaterialsSpecification}"
-                        ToolTipText="{me:LocalizationSource Schedules.MaterialsSpecification}"
+                        ToolTipText="Правила, по которым будет создаваться спецификация материалов для пилонов"
                         ButtonCommand="{Binding ApplySettingsCommand}"
                         ButtonMouseLeaveCommand="{Binding CheckSettingsCommand}" />
 
@@ -218,25 +218,25 @@
                         LabelText="{me:LocalizationSource Schedules.MaterialsSpecNameMask}"
                         FirstTextBoxText="{Binding Path=SchedulesSettings.MaterialSchedulePrefixTemp, UpdateSourceTrigger=PropertyChanged}"
                         SecondTextBoxText="{Binding Path=SchedulesSettings.MaterialScheduleSuffixTemp, UpdateSourceTrigger=PropertyChanged}"
-                        ToolTipText="{me:LocalizationSource Schedules.MaterialsSpecNameMaskTooltip}"
+                        ToolTipText="Префикс и суффикс имени спецификации материалов пилона, т.е. то, что должно идти в названии спецификации перед указанием марки пилона и после нее.&#10;Например, в имени спецификации материалов пилона:&#10;&quot;Пилон 12.30.25-12⌀20-П1_СМ&quot;,&#10;где &quot;12.30.25-12⌀20-П1&quot; - это марка пилона,&#10;&quot;Пилон &quot; - это префикс,&#10;&quot;_СМ&quot; - это суффикс."
                         TextChangedCommand="{Binding SettingsChangedCommand}" />
 
                     <controls:TextBoxSettingControl
                         LabelText="{me:LocalizationSource Schedules.ReferenceMaterialsSpecSearchName}"
                         TextBoxText="{Binding Path=SchedulesSettings.MaterialScheduleNameTemp, UpdateSourceTrigger=PropertyChanged}"
-                        ToolTipText="{me:LocalizationSource Schedules.ReferenceMaterialsSpecSearchNameTooltip}"
+                        ToolTipText="Имя эталонной спецификации материалов, которая будет копироваться для получения спецификации материалов пилона."
                         TextChangedCommand="{Binding SettingsChangedCommand}" />
 
                     <controls:TextBoxSettingControl
                         LabelText="{me:LocalizationSource Schedules.DispatcherGroupingFirstParameterForMaterials}"
                         TextBoxText="{Binding Path=SchedulesSettings.MaterialScheduleDisp1Temp, UpdateSourceTrigger=PropertyChanged}"
-                        ToolTipText="{me:LocalizationSource Schedules.DispatcherGroupingFirstParameterForMaterialsTooltip}"
+                        ToolTipText="Значение, которое будет использовано для заполнения параметра группировки диспетчера на первом уровне у спецификации материалов.&#10;В зависимости от того, какое значение будет здесь указано возможны следующие варианты:&#10;1) если указать название параметра, который имеется у пилона, то плагин возьмет значение этого параметра из пилона и запишет в параметр для группировки диспетчера на первом уровне у спецификации материалов.&#10;Пример: если записать значение &quot;Марка&quot;, то плагин обратиться к перечню параметров пилона и поймет, что параметр с именем &quot;Марка&quot; у пилона есть. Далее он считает значение из параметра &quot;Марка&quot; у пилона и запишет в параметр для группировки диспетчера на первом уровне у спецификации материалов.&#10;2) если параметр с указанным значением не будет найден у пилона, то данное значение просто запишется в параметр для группировки диспетчера на первом уровне у спецификации материалов.&#10;Пример: если записать значение &quot;СМ&quot;, то плагин обратиться к перечню параметров пилона и поймет, что параметра с именем &quot;СМ&quot; у пилона нет. Тогда он просто запишет &quot;СМ&quot; в параметр для группировки диспетчера на первом уровне у спецификации материалов."
                         TextChangedCommand="{Binding SettingsChangedCommand}" />
 
                     <controls:TextBoxSettingControl
                         LabelText="{me:LocalizationSource Schedules.DispatcherGroupingSecondParameterForMaterials}"
                         TextBoxText="{Binding Path=SchedulesSettings.MaterialScheduleDisp2Temp, UpdateSourceTrigger=PropertyChanged}"
-                        ToolTipText="{me:LocalizationSource Schedules.DispatcherGroupingSecondParameterForMaterialsTooltip}"
+                        ToolTipText="Значение, которое будет использовано для заполнения параметра группировки диспетчера на втором уровне у спецификации материалов.&#10;В зависимости от того, какое значение будет здесь указано возможны следующие варианты:&#10;1) если указать название параметра, который имеется у пилона, то плагин возьмет значение этого параметра из пилона и запишет в параметр для группировки диспетчера на втором уровне у спецификации материалов.&#10;Пример: если записать значение &quot;Марка&quot;, то плагин обратиться к перечню параметров пилона и поймет, что параметр с именем &quot;Марка&quot; у пилона есть. Далее он считает значение из параметра &quot;Марка&quot; у пилона и запишет в параметр для группировки диспетчера на втором уровне у спецификации материалов.&#10;2) если параметр с указанным значением не будет найден у пилона, то данное значение просто запишется в параметр для группировки диспетчера на втором уровне у спецификации материалов.&#10;Пример: если записать значение &quot;СМ&quot;, то плагин обратиться к перечню параметров пилона и поймет, что параметра с именем &quot;СМ&quot; у пилона нет. Тогда он просто запишет &quot;СМ&quot; в параметр для группировки диспетчера на втором уровне у спецификации материалов."
                         TextChangedCommand="{Binding SettingsChangedCommand}" />
                 </StackPanel>
             </Border>
@@ -250,7 +250,7 @@
                 <StackPanel>
                     <controls:SettingsTitleControl
                         LabelText="{me:LocalizationSource Schedules.ScheduleFilterParametersList}"
-                        ToolTipText="{me:LocalizationSource Schedules.ScheduleFilterParametersList}"
+                        ToolTipText="Правила, по которым будут формироваться фильтры в спецификациях и ведомостях"
                         ButtonCommand="{Binding ApplySettingsCommand}"
                         ButtonMouseLeaveCommand="{Binding CheckSettingsCommand}" />
 
@@ -282,7 +282,8 @@
                                         Margin="0 0 5 0"
                                         FontSize="13"
                                         Style="{StaticResource TextBoxWithTooltipStyle}"
-                                        Text="{Binding Path=ParamNameInSchedule, UpdateSourceTrigger=PropertyChanged}">
+                                        Text="{Binding Path=ParamNameInSchedule, UpdateSourceTrigger=PropertyChanged}"
+                                        ToolTip="Название параметра в фильтре спецификации">
                                         <i:Interaction.Triggers>
                                             <i:EventTrigger
                                                 EventName="TextChanged">
@@ -297,7 +298,8 @@
                                         Margin="5 0 0 0"
                                         FontSize="13"
                                         Style="{StaticResource TextBoxWithTooltipStyle}"
-                                        Text="{Binding Path=ParamNameInHost, UpdateSourceTrigger=PropertyChanged}">
+                                        Text="{Binding Path=ParamNameInHost, UpdateSourceTrigger=PropertyChanged}"
+                                        ToolTip="Название параметра у пилона или значение для фильтра">
                                         <i:Interaction.Triggers>
                                             <i:EventTrigger
                                                 EventName="TextChanged">
@@ -320,13 +322,15 @@
                             MinWidth="150"
                             Content="{me:LocalizationSource Schedules.Add}"
                             Appearance="Info"
-                            Command="{Binding AddScheduleFilterParamCommand}" />
+                            Command="{Binding AddScheduleFilterParamCommand}"
+                            ToolTip="Добавляет новую строку в списке выше" />
 
                         <ui:Button
                             Margin="5 5"
                             MinWidth="150"
                             Content="{me:LocalizationSource Schedules.Delete}"
-                            Command="{Binding DeleteScheduleFilterParamCommand}" />
+                            Command="{Binding DeleteScheduleFilterParamCommand}"
+                            ToolTip="Удаляет отмеченные галочкой строки из списка выше" />
                     </StackPanel>
                 </StackPanel>
             </Border>
