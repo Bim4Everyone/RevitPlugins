@@ -30,7 +30,12 @@
             <ColumnDefinition
                 Width="Auto" />
             <ColumnDefinition
-                Width="8*"
+                Width="5*"
+                MinWidth="200" />
+            <ColumnDefinition
+                Width="Auto" />
+            <ColumnDefinition
+                Width="3*"
                 MinWidth="200" />
         </Grid.ColumnDefinitions>
 
@@ -45,5 +50,33 @@
         <local:CheckResultControl
             Grid.Column="2"
             DataContext="{Binding SelectedCheckResult}" />
+
+        <GridSplitter
+            Grid.Column="3"
+            Style="{StaticResource CustomGridSplitter}" />
+
+        <Border
+            Grid.Column="4"
+            Style="{StaticResource CustomBorder}">
+            <DockPanel
+                LastChildFill="True">
+                <DockPanel
+                    Dock="Top">
+                    <Label
+                        FontSize="{DynamicResource ControlContentThemeFontSize}"
+                        Content="{me:LocalizationSource ResultsPage.RulesHeader}" />
+                </DockPanel>
+                <ui:ListView
+                    SelectionMode="Single"
+                    ItemsSource="{Binding SelectedCheckResult.RulesStamp}">
+                    <ui:ListView.ItemTemplate>
+                        <DataTemplate>
+                            <local:ReadonlyRuleControl
+                                DataContext="{Binding}" />
+                        </DataTemplate>
+                    </ui:ListView.ItemTemplate>
+                </ui:ListView>
+            </DockPanel>
+        </Border>
     </Grid>
 </core:WpfUIPlatformPage>
