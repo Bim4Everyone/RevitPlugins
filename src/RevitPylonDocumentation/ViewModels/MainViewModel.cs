@@ -244,7 +244,6 @@ internal class MainViewModel : BaseViewModel {
     /// Метод, отрабатывающий при нажатии кнопки "Ок"
     /// </summary>
     private void AcceptView() {
-        SaveConfig();
         CreateSheetsNViews();
     }
 
@@ -396,6 +395,7 @@ internal class MainViewModel : BaseViewModel {
         FindTitleBlock();
 
         _settingsEdited = false;
+        SaveConfig();
     }
 
     private void CheckSettings() {
