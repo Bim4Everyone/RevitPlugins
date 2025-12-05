@@ -48,7 +48,7 @@
             <StackPanel>
                 <controls:SettingsTitleControl
                     LabelText="{me:LocalizationSource LegendView.NotesLegend}"
-                    ToolTipText="{me:LocalizationSource LegendView.NotesLegend}"
+                    ToolTipText="Правила, по которым будут размещаться на листах легенды примечаний для пилонов"
                     ButtonCommand="{Binding ApplySettingsCommand}"
                     ButtonMouseLeaveCommand="{Binding CheckSettingsCommand}" />
 
@@ -57,7 +57,7 @@
                     LabelText="{me:LocalizationSource LegendView.SelectNotesLegend}"
                     ItemsSource="{Binding Legends}"
                     SelectedItem="{Binding TypesSettings.SelectedLegend}"
-                    ToolTipText="{me:LocalizationSource LegendView.SelectNotesLegendTooltip}"
+                    ToolTipText="Выберите из представленного списка легенду, содержащую примечания листа пилона, которую необходимо разместить на листе."
                     SelectionChangedCommand="{Binding SettingsChangedCommand}"
                     ItemTemplate="{StaticResource WithoutFamilyNameItemTemplate}" />
 
@@ -71,14 +71,14 @@
                         Grid.Column="0"
                         LabelText="{me:LocalizationSource LegendView.XOffsetFromBottomRightCorner}"
                         TextBoxText="{Binding Path=ProjectSettings.LegendXOffsetTemp, UpdateSourceTrigger=PropertyChanged}"
-                        ToolTipText="{me:LocalizationSource LegendView.XOffsetFromBottomRightCornerTooltip}"
+                        ToolTipText="Укажите смещение по горизонтали (по оси Х) от нижнего правого угла рамки листа до середины видового экрана легенды примечания"
                         TextChangedCommand="{Binding SettingsChangedCommand}" />
 
                     <controls:TextBoxSettingControl
                         Grid.Column="1"
                         LabelText="{me:LocalizationSource LegendView.YOffsetFromBottomRightCorner}"
                         TextBoxText="{Binding Path=ProjectSettings.LegendYOffsetTemp, UpdateSourceTrigger=PropertyChanged}"
-                        ToolTipText="{me:LocalizationSource LegendView.YOffsetFromBottomRightCornerTooltip}"
+                        ToolTipText="Укажите смещение по вертикали (по оси Y) от нижнего правого угла рамки листа до середины видового экрана легенды примечания"
                         TextChangedCommand="{Binding SettingsChangedCommand}" />
                 </Grid>
             </StackPanel>
