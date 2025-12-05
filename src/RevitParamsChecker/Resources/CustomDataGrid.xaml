@@ -6,6 +6,8 @@
     <ResourceDictionary.MergedDictionaries>
         <ResourceDictionary
             Source="pack://application:,,,/Wpf.Ui;component/Controls/DataGrid/DataGrid.xaml" />
+        <ui:ThemesDictionary />
+        <ui:ControlsDictionary />
     </ResourceDictionary.MergedDictionaries>
     <Style
         x:Key="CustomResizableDataGridStyle"

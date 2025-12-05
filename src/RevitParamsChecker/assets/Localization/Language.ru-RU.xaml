@@ -165,4 +165,6 @@
         x:Key="Ok">ОК</system:String>
     <system:String
         x:Key="Cancel">Отмена</system:String>
+    <system:String
+        x:Key="Close">Закрыть</system:String>
 </ResourceDictionary>

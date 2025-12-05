@@ -23,6 +23,7 @@
     Width="700"
     MinHeight="500"
     MinWidth="700"
+    Closed="MainWindow_OnClosed"
     d:DataContext="{d:DesignInstance vms:MainViewModel, IsDesignTimeCreatable=False}"
     x:ClassModifier="internal">
     <i:Interaction.Behaviors>
@@ -118,15 +119,7 @@
             <ui:Button
                 Margin="10"
                 Width="80"
-                Appearance="Info"
-                Content="{me:LocalizationSource Ok}"
-                Click="ButtonOk_Click"
-                Command="{Binding AcceptViewCommand}" />
-
-            <ui:Button
-                Margin="10"
-                Width="80"
-                Content="{me:LocalizationSource Cancel}"
+                Content="{me:LocalizationSource Close}"
                 IsCancel="True"
                 Click="ButtonCancel_Click" />
         </StackPanel>

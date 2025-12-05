@@ -20,6 +20,8 @@
             <ResourceDictionary.MergedDictionaries>
                 <ResourceDictionary
                     Source="../../Resources/CustomStyles.xaml" />
+                <ui:ControlsDictionary />
+                <ui:ThemesDictionary />
             </ResourceDictionary.MergedDictionaries>
         </ResourceDictionary>
     </core:WpfUIPlatformPage.Resources>

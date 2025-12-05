@@ -7,13 +7,11 @@ using Autodesk.Revit.Attributes;
 using Autodesk.Revit.UI;
 
 using dosymep.Bim4Everyone;
-using dosymep.Bim4Everyone.ProjectConfigs;
 using dosymep.Bim4Everyone.SimpleServices;
 using dosymep.WpfCore.Ninject;
 using dosymep.WpfUI.Core.Ninject;
 
 using Ninject;
-using Ninject.Parameters;
 
 using RevitParamsChecker.Models.Checks;
 using RevitParamsChecker.Models.Filtration;
@@ -47,7 +45,7 @@ public class RevitParamsCheckerCommand : BasePluginCommand {
     }
 
     protected override void Execute(UIApplication uiApplication) {
-        using IKernel kernel = uiApplication.CreatePlatformServices();
+        IKernel kernel = uiApplication.CreatePlatformServices();
 
         kernel.Bind<RevitRepository>()
             .ToSelf()
@@ -80,7 +78,7 @@ public class RevitParamsCheckerCommand : BasePluginCommand {
             $"/{assemblyName};component/assets/localization/language.xaml",
             CultureInfo.GetCultureInfo("ru-RU"));
 
-        Notification(kernel.Get<MainWindow>());
+        kernel.Get<MainWindow>().Show();
     }
 
     private void BindPages(IKernel kernel) {

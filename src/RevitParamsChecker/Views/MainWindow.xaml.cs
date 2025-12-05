@@ -1,7 +1,10 @@
+using System;
 using System.Windows;
 using System.Windows.Threading;
 
 using dosymep.SimpleServices;
+
+using Ninject;
 
 using RevitParamsChecker.Views.Dashboard;
 
@@ -10,8 +13,11 @@ using Wpf.Ui.Abstractions;
 
 namespace RevitParamsChecker.Views;
 
-internal partial class MainWindow {
+internal partial class MainWindow : IDisposable {
+    private readonly IKernel _kernel;
+
     public MainWindow(
+        IKernel kernel,
         IContentDialogService contentDialogService,
         INavigationViewPageProvider navigationViewPageProvider,
         ILoggerService loggerService,
@@ -28,6 +34,7 @@ internal partial class MainWindow {
             uiThemeService,
             themeUpdaterService) {
         InitializeComponent();
+        _kernel = kernel ?? throw new ArgumentNullException(nameof(kernel));
         contentDialogService.SetDialogHost(_rootContentDialog);
         _rootNavigationView.SetPageProviderService(navigationViewPageProvider);
         Dispatcher.BeginInvoke(
@@ -35,15 +42,19 @@ internal partial class MainWindow {
             () => _rootNavigationView.Navigate(typeof(DashboardPage)));
     }
 
+    public void Dispose() {
+        _kernel?.Dispose();
+    }
+
     public override string PluginName => nameof(RevitParamsChecker);
 
     public override string ProjectConfigName => nameof(MainWindow);
 
-    private void ButtonOk_Click(object sender, RoutedEventArgs e) {
-        DialogResult = true;
+    private void ButtonCancel_Click(object sender, RoutedEventArgs e) {
+        Close();
     }
 
-    private void ButtonCancel_Click(object sender, RoutedEventArgs e) {
-        DialogResult = false;
+    private void MainWindow_OnClosed(object sender, EventArgs e) {
+        Dispose();
     }
 }
