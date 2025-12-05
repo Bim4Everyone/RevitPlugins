@@ -46,9 +46,9 @@ internal class RevitRepository {
 
     public ICollection<ElementModel> GetElements(DocumentModel doc, Filter filter) {
         var elementFilter = filter.GetFilter();
+        // TODO прокинуть фильтр. сейчас для стресс теста берутся все элементы из документа
         return new FilteredElementCollector(doc.Document)
             .WhereElementIsNotElementType()
-            .WherePasses(elementFilter)
             .ToElements()
             .Select(e => new ElementModel(
                 e,
