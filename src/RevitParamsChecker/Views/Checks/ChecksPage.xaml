@@ -23,6 +23,12 @@
             </ResourceDictionary.MergedDictionaries>
         </ResourceDictionary>
     </core:WpfUIPlatformPage.Resources>
+    <core:WpfUIPlatformPage.InputBindings>
+        <KeyBinding
+            Key="S"
+            Modifiers="Control"
+            Command="{Binding SaveCommand}" />
+    </core:WpfUIPlatformPage.InputBindings>
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition
