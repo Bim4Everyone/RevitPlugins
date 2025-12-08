@@ -1,3 +1,4 @@
+using System;
 using System.Globalization;
 using System.Reflection;
 
@@ -8,10 +9,13 @@ using Autodesk.Revit.UI;
 using dosymep.Bim4Everyone;
 using dosymep.Bim4Everyone.ProjectConfigs;
 using dosymep.Bim4Everyone.SimpleServices;
+using dosymep.SimpleServices;
 using dosymep.WpfCore.Ninject;
 using dosymep.WpfUI.Core.Ninject;
 
 using Ninject;
+using Ninject.Activation;
+using Ninject.Parameters;
 
 using RevitPylonDocumentation.Extensions;
 using RevitPylonDocumentation.Factories;
@@ -49,7 +53,9 @@ public class RevitPylonDocumentationCommand : BasePluginCommand {
         kernel.UseWpfUIThemeUpdater();
 
         // Настройка запуска окна
-        kernel.BindMainWindow<MainViewModel, MainWindow>();
+        kernel.Bind<MainViewModel>().ToSelf().InSingletonScope();
+        kernel.Bind<IHasTheme, IHasLocalization, MainWindow>().To<MainWindow>()
+            .WithPropertyValue("DataContext", (IContext c) => c.Kernel.Get<MainViewModel>(Array.Empty<IParameter>()));
 
         // Настройка локализации,
         // получение имени сборки откуда брать текст

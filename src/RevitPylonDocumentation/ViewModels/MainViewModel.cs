@@ -7,7 +7,6 @@ using System.Windows.Data;
 using System.Windows.Input;
 
 using Autodesk.Revit.DB;
-using Autodesk.Revit.DB.Architecture;
 using Autodesk.Revit.UI.Selection;
 
 using dosymep.Revit;
@@ -320,9 +319,6 @@ internal class MainViewModel : BaseViewModel {
     /// Дает возможность пользователю выбрать вручную нужный для работы пилон
     /// </summary>
     private void SelectPylon() {
-        var mainWindow = _resolutionRoot.Get<MainWindow>();
-        mainWindow.Hide();
-
         var elementid = _revitRepository.ActiveUIDocument.Selection
             .PickObject(ObjectType.Element, _localizationService.GetLocalizedString("VM.SelectPylon")).ElementId;
         var element = _revitRepository.Document.GetElement(elementid);
@@ -362,10 +358,7 @@ internal class MainViewModel : BaseViewModel {
         SelectionSettings.NeedWorkWithSkeletonSchedule = false;
         SelectionSettings.NeedWorkWithSkeletonByElemsSchedule = false;
 
-        //var t = _resolutionRoot.Get<MainWindow>().ShowDialog();
-        //mainWindow.DataContext = this;
-
-        mainWindow.ShowDialog();
+        _resolutionRoot.Get<MainWindow>().ShowDialog();
     }
 
 
