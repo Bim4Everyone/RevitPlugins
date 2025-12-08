@@ -91,7 +91,8 @@
 
                     <DataGridTextColumn
                         IsReadOnly="True"
-                        MinWidth="100">
+                        MinWidth="100"
+                        SortMemberPath="Name">
                         <DataGridTextColumn.Header>
                             <ui:TextBlock
                                 Text="{DynamicResource ChecksPage.NameHeader}" />

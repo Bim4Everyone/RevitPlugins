@@ -29,8 +29,15 @@
             <Label
                 FontSize="{DynamicResource ControlContentThemeFontSize}"
                 Content="{Binding Name}" />
+            <ui:TextBlock
+                Margin="0 0 0 4"
+                TextWrapping="Wrap"
+                MaxWidth="{Binding ActualWidth, ElementName=_paramsSetControl}"
+                FontSize="{DynamicResource ControlContentThemeFontSize}"
+                Text="{Binding Description}" />
             <rules:ParamsSetUserControl
                 IsEnabled="False"
+                x:Name="_paramsSetControl"
                 DataContext="{Binding  RootSet}" />
         </StackPanel>
     </Border>

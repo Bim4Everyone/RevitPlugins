@@ -84,13 +84,14 @@
     <system:String
         x:Key="ResultsPage.FileNameHeader">Файл</system:String>
     <system:String
-        x:Key="ResultsPage.IdHeader">Id</system:String>
-    <system:String
         x:Key="ResultsPage.RuleNameHeader">Правило</system:String>
     <system:String
         x:Key="ResultsPage.StatusHeader">Статус</system:String>
     <system:String
+        x:Key="ResultsPage.FamilyTypeNameHeader">Тип</system:String>
+    <system:String
         x:Key="ResultsPage.ElementsSearchPlaceholder">Поиск</system:String>
+
 
     <system:String
         x:Key="FiltersPage.NewFilterPrompt">Новый поисковый набор</system:String>

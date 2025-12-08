@@ -92,10 +92,10 @@
                     <DataGridTextColumn
                         MinWidth="50"
                         Width="*"
-                        Binding="{Binding Id}">
+                        Binding="{Binding FamilyTypeName}">
                         <DataGridTextColumn.Header>
                             <ui:TextBlock
-                                Text="{DynamicResource ResultsPage.IdHeader}" />
+                                Text="{DynamicResource ResultsPage.FamilyTypeNameHeader}" />
                         </DataGridTextColumn.Header>
                     </DataGridTextColumn>
 

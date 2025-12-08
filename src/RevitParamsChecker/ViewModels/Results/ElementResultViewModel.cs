@@ -19,6 +19,7 @@ internal class ElementResultViewModel : BaseViewModel {
         ElementResult = elementResult ?? throw new ArgumentNullException(nameof(elementResult));
         Id = ElementResult.ElementModel.Element.Id;
         FileName = ElementResult.ElementModel.Element.Document.Title;
+        FamilyTypeName = ElementResult.ElementModel.Element.Name;
         Status = _localization.GetLocalizedString($"{nameof(StatusCode)}.{ElementResult.Status}");
         Error = ElementResult.Error;
         RuleName = ElementResult.RuleName;
@@ -27,6 +28,8 @@ internal class ElementResultViewModel : BaseViewModel {
     public ElementId Id { get; }
 
     public string FileName { get; }
+
+    public string FamilyTypeName { get; }
 
     public string Status { get; }
 
