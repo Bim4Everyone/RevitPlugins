@@ -98,6 +98,7 @@
                         Grid.Column="1"
                         Margin="5"
                         VerticalAlignment="Stretch"
+                        Command="{Binding SelectPylonCommand}"
                         Content="{me:LocalizationSource GeneralPage.SelectPylon}"
                         ToolTip="{me:LocalizationSource GeneralPage.SelectPylonToolTip}"/>
                 </Grid>

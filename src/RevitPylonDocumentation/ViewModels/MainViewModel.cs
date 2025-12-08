@@ -7,12 +7,16 @@ using System.Windows.Data;
 using System.Windows.Input;
 
 using Autodesk.Revit.DB;
+using Autodesk.Revit.DB.Architecture;
 using Autodesk.Revit.UI.Selection;
 
 using dosymep.Revit;
 using dosymep.SimpleServices;
 using dosymep.WPF.Commands;
 using dosymep.WPF.ViewModels;
+
+using Ninject;
+using Ninject.Syntax;
 
 using RevitPylonDocumentation.Models;
 using RevitPylonDocumentation.Models.PylonSheetNView;
@@ -27,6 +31,7 @@ internal class MainViewModel : BaseViewModel {
     private readonly PluginConfig _pluginConfig;
     private readonly RevitRepository _revitRepository;
     private readonly ILocalizationService _localizationService;
+    private readonly IResolutionRoot _resolutionRoot;
 
     private string _errorText;
     private bool _pylonSelectedManually = false;
@@ -39,10 +44,11 @@ internal class MainViewModel : BaseViewModel {
     private ICollectionView _hostsInfoView;
 
     public MainViewModel(PluginConfig pluginConfig, RevitRepository revitRepository,
-                         ILocalizationService localizationService) {
+                         ILocalizationService localizationService, IResolutionRoot resolutionRoot) {
         _pluginConfig = pluginConfig;
         _revitRepository = revitRepository;
         _localizationService = localizationService;
+        _resolutionRoot = resolutionRoot;
 
         SelectionSettings = new UserSelectionSettingsVM();
         ProjectSettings = new UserProjectSettingsVM(this, _revitRepository, _localizationService);
@@ -314,49 +320,52 @@ internal class MainViewModel : BaseViewModel {
     /// Дает возможность пользователю выбрать вручную нужный для работы пилон
     /// </summary>
     private void SelectPylon() {
-        //var elementid = _revitRepository.ActiveUIDocument.Selection
-        //    .PickObject(ObjectType.Element, _localizationService.GetLocalizedString("VM.SelectPylon")).ElementId;
-        //var element = _revitRepository.Document.GetElement(elementid);
+        var mainWindow = _resolutionRoot.Get<MainWindow>();
+        mainWindow.Hide();
 
-        //if(element != null) {
-        //    HostsInfoVM.Clear();
-        //    SelectedHostsInfoVM.Clear();
-        //    SelectionSettings.SelectedProjectSection = string.Empty;
-        //    _pylonSelectedManually = true;
+        var elementid = _revitRepository.ActiveUIDocument.Selection
+            .PickObject(ObjectType.Element, _localizationService.GetLocalizedString("VM.SelectPylon")).ElementId;
+        var element = _revitRepository.Document.GetElement(elementid);
 
-        //    _revitRepository.GetHostData(this, [element]);
+        if(element != null) {
+            HostsInfoVM.Clear();
+            SelectedHostsInfoVM.Clear();
+            SelectionSettings.SelectedProjectSection = string.Empty;
+            _pylonSelectedManually = true;
 
-        //    HostsInfoVM = new ObservableCollection<PylonSheetInfoVM>(_revitRepository.HostsInfo);
-        //    ProjectSections = new ObservableCollection<string>(_revitRepository.HostProjectSections);
-        //    OnPropertyChanged(nameof(HostsInfoVM));
-        //    OnPropertyChanged(nameof(ProjectSections));
+            _revitRepository.GetHostData(this, [element]);
+
+            HostsInfoVM = new ObservableCollection<PylonSheetInfoVM>(_revitRepository.HostsInfo);
+            ProjectSections = new ObservableCollection<string>(_revitRepository.HostProjectSections);
+            OnPropertyChanged(nameof(HostsInfoVM));
+            OnPropertyChanged(nameof(ProjectSections));
 
 
-        //    if(HostsInfoVM.Count > 0) {
-        //        SelectedHostsInfoVM.Add(HostsInfoVM.FirstOrDefault());
-        //        HostsInfoVM.FirstOrDefault().IsCheck = true;
-        //        SelectionSettings.SelectedProjectSection = ProjectSections.FirstOrDefault();
-        //    }
-        //}
+            if(HostsInfoVM.Count > 0) {
+                SelectedHostsInfoVM.Add(HostsInfoVM.FirstOrDefault());
+                HostsInfoVM.FirstOrDefault().IsCheck = true;
+                SelectionSettings.SelectedProjectSection = ProjectSections.FirstOrDefault();
+            }
+        }
 
-        //SelectionSettings.NeedWorkWithGeneralView = false;
-        //SelectionSettings.NeedWorkWithGeneralPerpendicularView = false;
-        //SelectionSettings.NeedWorkWithTransverseViewFirst = false;
-        //SelectionSettings.NeedWorkWithTransverseViewSecond = false;
-        //SelectionSettings.NeedWorkWithTransverseViewThird = false;
-        //SelectionSettings.NeedWorkWithMaterialSchedule = false;
-        //SelectionSettings.NeedWorkWithSystemPartsSchedule = false;
-        //SelectionSettings.NeedWorkWithIfcPartsSchedule = false;
-        //SelectionSettings.NeedWorkWithLegend = false;
-        //SelectionSettings.NeedWorkWithGeneralRebarView = false;
-        //SelectionSettings.NeedWorkWithGeneralPerpendicularRebarView = false;
-        //SelectionSettings.NeedWorkWithSkeletonSchedule = false;
-        //SelectionSettings.NeedWorkWithSkeletonByElemsSchedule = false;
+        SelectionSettings.NeedWorkWithGeneralView = false;
+        SelectionSettings.NeedWorkWithGeneralPerpendicularView = false;
+        SelectionSettings.NeedWorkWithTransverseViewFirst = false;
+        SelectionSettings.NeedWorkWithTransverseViewSecond = false;
+        SelectionSettings.NeedWorkWithTransverseViewThird = false;
+        SelectionSettings.NeedWorkWithMaterialSchedule = false;
+        SelectionSettings.NeedWorkWithSystemPartsSchedule = false;
+        SelectionSettings.NeedWorkWithIfcPartsSchedule = false;
+        SelectionSettings.NeedWorkWithLegend = false;
+        SelectionSettings.NeedWorkWithGeneralRebarView = false;
+        SelectionSettings.NeedWorkWithGeneralPerpendicularRebarView = false;
+        SelectionSettings.NeedWorkWithSkeletonSchedule = false;
+        SelectionSettings.NeedWorkWithSkeletonByElemsSchedule = false;
 
-        //var mainWindow = new MainWindow {
-        //    DataContext = this
-        //};
-        //mainWindow.ShowDialog();
+        //var t = _resolutionRoot.Get<MainWindow>().ShowDialog();
+        //mainWindow.DataContext = this;
+
+        mainWindow.ShowDialog();
     }
 
 

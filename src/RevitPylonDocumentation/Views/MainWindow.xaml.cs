@@ -47,10 +47,10 @@ public partial class MainWindow {
     //    expander.MaxHeight = window.ActualHeight * 0.83;
     //}
 
-    private void Grid_MouseDown(object sender, System.Windows.Input.MouseButtonEventArgs e) {
+    //private void Grid_MouseDown(object sender, System.Windows.Input.MouseButtonEventArgs e) {
 
-        if(e.ChangedButton == MouseButton.Left) {
-            DragMove();
-        }
-    }
+    //    if(e.ChangedButton == MouseButton.Left) {
+    //        DragMove();
+    //    }
+    //}
 }
