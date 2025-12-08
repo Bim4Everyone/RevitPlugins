@@ -11,19 +11,19 @@ internal class SelectableNamesViewModel : BaseViewModel {
     private string _title;
     private bool _allSelected;
 
-    public SelectableNamesViewModel(string[] allNames, string[] currentSelection) {
+    public SelectableNamesViewModel(string[] allNames, string[] selectedNames) {
         if(allNames is null) {
             throw new ArgumentNullException(nameof(allNames));
         }
 
-        if(currentSelection is null) {
-            throw new ArgumentNullException(nameof(currentSelection));
+        if(selectedNames is null) {
+            throw new ArgumentNullException(nameof(selectedNames));
         }
 
         Entities = new ObservableCollection<SelectableNameViewModel>(
             allNames.Distinct().Select(e => new SelectableNameViewModel(e)));
         foreach(var entity in Entities) {
-            if(currentSelection.Any(s => entity.Name.Equals(s, StringComparison.CurrentCultureIgnoreCase))) {
+            if(selectedNames.Any(s => entity.Name.Equals(s, StringComparison.CurrentCultureIgnoreCase))) {
                 entity.IsSelected = true;
             }
         }
