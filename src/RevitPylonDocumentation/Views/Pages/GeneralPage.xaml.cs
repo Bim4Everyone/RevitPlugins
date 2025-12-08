@@ -20,13 +20,6 @@ internal partial class GeneralPage {
         DataContext = viewModel;
     }
 
-    private void ButtonOk_Click(object sender, RoutedEventArgs e) {
-        var window = Window.GetWindow(this) as MainWindow;
-        if(window != null) {
-            window.DialogResult = true;
-        }
-    }
-
     private void ButtonCancel_Click(object sender, RoutedEventArgs e) {
         var window = Window.GetWindow(this) as MainWindow;
         if(window != null) {
