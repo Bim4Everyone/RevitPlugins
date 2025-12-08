@@ -34,9 +34,9 @@
                 Command="{Binding SaveButtonCommand, ElementName=_this}"
                 Content="{ui:SymbolIcon Symbol=Save20}" />
             <ui:Button
-                ToolTip="{me:LocalizationSource PageMenu.Tooltip.SaveAs}"
-                Command="{Binding SaveAsButtonCommand, ElementName=_this}"
-                Content="{ui:SymbolIcon Symbol=SaveEdit20}" />
+                ToolTip="{me:LocalizationSource PageMenu.Tooltip.Export}"
+                Command="{Binding ExportButtonCommand, ElementName=_this}"
+                Content="{ui:SymbolIcon Symbol=ArrowExportUp20}" />
         </DockPanel>
     </Border>
 </core:WpfUIPlatformUserControl>

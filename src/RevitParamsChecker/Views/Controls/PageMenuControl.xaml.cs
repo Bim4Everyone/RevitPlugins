@@ -38,8 +38,8 @@ internal partial class PageMenuControl {
         typeof(PageMenuControl),
         new PropertyMetadata(null));
 
-    public static readonly DependencyProperty SaveAsButtonCommandProperty = DependencyProperty.Register(
-        nameof(SaveAsButtonCommand),
+    public static readonly DependencyProperty ExportButtonCommandProperty = DependencyProperty.Register(
+        nameof(ExportButtonCommand),
         typeof(ICommand),
         typeof(PageMenuControl),
         new PropertyMetadata(null));
@@ -54,8 +54,8 @@ internal partial class PageMenuControl {
         set => SetValue(SaveButtonCommandProperty, value);
     }
 
-    public ICommand SaveAsButtonCommand {
-        get => (ICommand) GetValue(SaveAsButtonCommandProperty);
-        set => SetValue(SaveAsButtonCommandProperty, value);
+    public ICommand ExportButtonCommand {
+        get => (ICommand) GetValue(ExportButtonCommandProperty);
+        set => SetValue(ExportButtonCommandProperty, value);
     }
 }

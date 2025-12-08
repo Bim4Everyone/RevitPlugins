@@ -73,7 +73,7 @@ internal class ChecksPageViewModel : BaseViewModel {
         CopyCheckCommand = RelayCommand.Create<CheckViewModel>(CopyCheck, CanCopyCheck);
         LoadCommand = RelayCommand.Create(Load);
         SaveCommand = RelayCommand.Create(Save, CanSave);
-        SaveAsCommand = RelayCommand.Create(SaveAs, CanSave);
+        ExportCommand = RelayCommand.Create(Export, CanSave);
         ExecuteChecksCommand = RelayCommand.Create(ExecuteChecks, CanExecuteChecks);
         SetCheckSelectedFilesCommand = RelayCommand.CreateAsync<CheckViewModel>(SetSelectedFilesAsync, CanSetItems);
         SetCheckSelectedFiltersCommand = RelayCommand.CreateAsync<CheckViewModel>(SetSelectedFiltersAsync, CanSetItems);
@@ -85,7 +85,7 @@ internal class ChecksPageViewModel : BaseViewModel {
 
     public ICommand LoadCommand { get; }
     public ICommand SaveCommand { get; }
-    public ICommand SaveAsCommand { get; }
+    public ICommand ExportCommand { get; }
     public ICommand AddCheckCommand { get; }
     public ICommand CopyCheckCommand { get; }
     public ICommand RenameCheckCommand { get; }
@@ -225,7 +225,7 @@ internal class ChecksPageViewModel : BaseViewModel {
         _checksRepo.SetChecks(Checks.Select(c => c.GetCheck()).ToArray());
     }
 
-    private void SaveAs() {
+    private void Export() {
         if(SaveFileDialogService.ShowDialog(
                _dirPath,
                _localization.GetLocalizedString("ChecksPage.SaveFileDefaultName"))) {

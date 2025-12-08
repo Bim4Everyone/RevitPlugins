@@ -43,14 +43,14 @@ internal class FiltrationPageViewModel : BaseViewModel {
         RemoveFiltersCommand = RelayCommand.Create<IList>(RemoveFilters, CanRemoveFilters);
         CopyFilterCommand = RelayCommand.Create<FilterViewModel>(CopyFilter, CanCopyFilter);
         SaveCommand = RelayCommand.Create(Save, CanSave);
-        SaveAsCommand = RelayCommand.Create(SaveAs, CanSave);
+        ExportCommand = RelayCommand.Create(Export, CanSave);
         LoadCommand = RelayCommand.Create(Load);
         ShowElementsCommand = RelayCommand.Create(ShowElements, CanShowElements);
     }
 
     public ICommand LoadCommand { get; }
     public ICommand SaveCommand { get; }
-    public ICommand SaveAsCommand { get; }
+    public ICommand ExportCommand { get; }
     public ICommand AddFilterCommand { get; }
     public ICommand RenameFilterCommand { get; }
     public ICommand CopyFilterCommand { get; }
@@ -130,7 +130,7 @@ internal class FiltrationPageViewModel : BaseViewModel {
         _filtersRepo.SetFilters(Filters.Select(f => f.GetFilter()).ToArray());
     }
 
-    private void SaveAs() {
+    private void Export() {
         // TODO
     }
 

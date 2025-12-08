@@ -50,12 +50,12 @@ internal class RulesPageViewModel : BaseViewModel {
         CopyRuleCommand = RelayCommand.Create<RuleViewModel>(CopyRule, CanCopyRule);
         LoadCommand = RelayCommand.Create(Load);
         SaveCommand = RelayCommand.Create(Save, CanSave);
-        SaveAsCommand = RelayCommand.Create(SaveAs, CanSave);
+        ExportCommand = RelayCommand.Create(Export, CanSave);
     }
 
     public ICommand LoadCommand { get; }
     public ICommand SaveCommand { get; }
-    public ICommand SaveAsCommand { get; }
+    public ICommand ExportCommand { get; }
     public ICommand AddRuleCommand { get; }
     public ICommand RenameRuleCommand { get; }
     public ICommand CopyRuleCommand { get; }
@@ -138,7 +138,7 @@ internal class RulesPageViewModel : BaseViewModel {
         _rulesRepo.SetRules(Rules.Select(r => r.GetRule()).ToArray());
     }
 
-    private void SaveAs() {
+    private void Export() {
         // TODO
     }
 
