@@ -38,6 +38,10 @@
         x:Key="RulesPage.ParamNamePlaceholder">Название параметра</system:String>
     <system:String
         x:Key="RulesPage.ValuePlaceholder">Значение</system:String>
+    <system:String
+        x:Key="RulesPage.SaveFileDefaultName">Настройка правил проверки параметров</system:String>
+    <system:String
+        x:Key="RulesPage.Error.CannotLoadRules">Не удалось загрузить правила</system:String>
 
     <system:String
         x:Key="ChecksPage.ExecuteChecksButton">Запустить выбранные</system:String>
@@ -94,6 +98,10 @@
         x:Key="FiltersPage.RenameFilterPrompt">Переименование поискового набора</system:String>
     <system:String
         x:Key="FiltersPage.ShowFilterElements">Показать элементы</system:String>
+    <system:String
+        x:Key="FiltrationPage.SaveFileDefaultName">Настройка поисковых наборов</system:String>
+    <system:String
+        x:Key="FiltrationPage.Error.CannotLoadFilters">Не удалось загрузить поисковые наборы</system:String>
 
     <system:String
         x:Key="PageMenu.Tooltip.Load">Загрузить</system:String>

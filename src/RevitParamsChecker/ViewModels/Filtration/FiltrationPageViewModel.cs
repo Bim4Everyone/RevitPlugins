@@ -1,7 +1,10 @@
 using System;
 using System.Collections;
 using System.Collections.ObjectModel;
+using System.IO;
 using System.Linq;
+using System.Net;
+using System.Windows;
 using System.Windows.Input;
 
 using dosymep.SimpleServices;
@@ -19,6 +22,7 @@ internal class FiltrationPageViewModel : BaseViewModel {
     private readonly FiltersConverter _filtersConverter;
     private readonly NamesService _namesService;
     private FilterViewModel _selectedFilter;
+    private string _dirPath;
 
     public FiltrationPageViewModel(
         ILocalizationService localization,
@@ -35,6 +39,7 @@ internal class FiltrationPageViewModel : BaseViewModel {
         _filtersRepo = filtersRepo ?? throw new ArgumentNullException(nameof(filtersRepo));
         _filtersConverter = filtersConverter ?? throw new ArgumentNullException(nameof(filtersConverter));
         _namesService = namesService ?? throw new ArgumentNullException(nameof(namesService));
+        _dirPath = Environment.GetFolderPath(Environment.SpecialFolder.Desktop);
 
         Filters = [.._filtersRepo.GetFilters().Select(f => new FilterViewModel(f))];
         SelectedFilter = Filters.FirstOrDefault();
@@ -131,7 +136,14 @@ internal class FiltrationPageViewModel : BaseViewModel {
     }
 
     private void Export() {
-        // TODO
+        if(SaveFileDialogService.ShowDialog(
+               _dirPath,
+               _localization.GetLocalizedString("FiltrationPage.SaveFileDefaultName"))) {
+            var filters = Filters.Select(f => f.GetFilter()).ToArray();
+            string str = _filtersConverter.ConvertToString(filters);
+            File.WriteAllText(SaveFileDialogService.File.FullName, str);
+            _dirPath = SaveFileDialogService.File.DirectoryName;
+        }
     }
 
     private bool CanSave() {
@@ -139,7 +151,29 @@ internal class FiltrationPageViewModel : BaseViewModel {
     }
 
     private void Load() {
-        // TODO
+        if(OpenFileDialogService.ShowDialog(_dirPath)) {
+            string str = File.ReadAllText(OpenFileDialogService.File.FullName);
+            Filter[] filters;
+            try {
+                filters = _filtersConverter.ConvertFromString(str);
+            } catch(InvalidOperationException) {
+                MessageBoxService.Show(_localization.GetLocalizedString("FiltrationPage.Error.CannotLoadFilters"));
+                return;
+            }
+
+            var vms = _namesService.GetResolvedCollection(
+                    Filters.ToArray(),
+                    filters.Select(f => new FilterViewModel(f)).ToArray())
+                .OfType<FilterViewModel>();
+            string selectedName = SelectedFilter.Name;
+            Filters.Clear();
+            foreach(var vm in vms) {
+                Filters.Add(vm);
+            }
+
+            SelectedFilter = Filters.FirstOrDefault(f => f.Name.Equals(selectedName)) ?? Filters.FirstOrDefault();
+            _dirPath = OpenFileDialogService.File.DirectoryName;
+        }
     }
 
     private void ShowElements() {

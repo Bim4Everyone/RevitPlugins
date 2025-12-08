@@ -197,14 +197,12 @@ internal class ChecksPageViewModel : BaseViewModel {
 
     private void Load() {
         if(OpenFileDialogService.ShowDialog(_dirPath)) {
-            string filePath = OpenFileDialogService.File.FullName;
-            string str = File.ReadAllText(filePath);
+            string str = File.ReadAllText(OpenFileDialogService.File.FullName);
             Check[] checks;
             try {
                 checks = _checksConverter.ConvertFromString(str);
             } catch(InvalidOperationException) {
-                MessageBoxService.Show(
-                    _localization.GetLocalizedString("ChecksPage.Error.CannotLoadChecks"));
+                MessageBoxService.Show(_localization.GetLocalizedString("ChecksPage.Error.CannotLoadChecks"));
                 return;
             }
 
@@ -212,12 +210,14 @@ internal class ChecksPageViewModel : BaseViewModel {
                     Checks.ToArray(),
                     checks.Select(c => new CheckViewModel(c)).ToArray())
                 .OfType<CheckViewModel>();
+            string selectedName = SelectedCheck.Name;
             Checks.Clear();
             foreach(var vm in vms) {
                 Checks.Add(vm);
             }
 
-            SelectedCheck = Checks.FirstOrDefault();
+            SelectedCheck = Checks.FirstOrDefault(c => c.Name.Equals(selectedName)) ?? Checks.FirstOrDefault();
+            _dirPath = OpenFileDialogService.File.DirectoryName;
         }
     }
 

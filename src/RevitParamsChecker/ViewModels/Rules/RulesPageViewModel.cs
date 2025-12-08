@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.IO;
 using System.Linq;
 using System.Windows.Input;
 
@@ -22,6 +23,7 @@ internal class RulesPageViewModel : BaseViewModel {
     private readonly RulesConverter _rulesConverter;
     private readonly NamesService _namesService;
     private RuleViewModel _selectedRule;
+    private string _dirPath;
 
     public RulesPageViewModel(
         ILocalizationService localization,
@@ -38,6 +40,7 @@ internal class RulesPageViewModel : BaseViewModel {
         _rulesRepo = rulesRepo ?? throw new ArgumentNullException(nameof(rulesRepo));
         _rulesConverter = rulesConverter ?? throw new ArgumentNullException(nameof(rulesConverter));
         _namesService = namesService ?? throw new ArgumentNullException(nameof(namesService));
+        _dirPath = Environment.GetFolderPath(Environment.SpecialFolder.Desktop);
 
         Rules = [
             .._rulesRepo.GetRules()
@@ -131,7 +134,29 @@ internal class RulesPageViewModel : BaseViewModel {
     }
 
     private void Load() {
-        // TODO
+        if(OpenFileDialogService.ShowDialog(_dirPath)) {
+            string str = File.ReadAllText(OpenFileDialogService.File.FullName);
+            Rule[] rules;
+            try {
+                rules = _rulesConverter.ConvertFromString(str);
+            } catch(InvalidOperationException) {
+                MessageBoxService.Show(_localization.GetLocalizedString("RulesPage.Error.CannotLoadRules"));
+                return;
+            }
+
+            var vms = _namesService.GetResolvedCollection(
+                    Rules.ToArray(),
+                    rules.Select(r => new RuleViewModel(r, _localization)).ToArray())
+                .OfType<RuleViewModel>();
+            string selectedName = SelectedRule.Name;
+            Rules.Clear();
+            foreach(var vm in vms) {
+                Rules.Add(vm);
+            }
+
+            SelectedRule = Rules.FirstOrDefault(r => r.Name.Equals(selectedName)) ?? Rules.FirstOrDefault();
+            _dirPath = OpenFileDialogService.File.DirectoryName;
+        }
     }
 
     private void Save() {
@@ -139,7 +164,14 @@ internal class RulesPageViewModel : BaseViewModel {
     }
 
     private void Export() {
-        // TODO
+        if(SaveFileDialogService.ShowDialog(
+               _dirPath,
+               _localization.GetLocalizedString("RulesPage.SaveFileDefaultName"))) {
+            var rules = Rules.Select(r => r.GetRule()).ToArray();
+            string str = _rulesConverter.ConvertToString(rules);
+            File.WriteAllText(SaveFileDialogService.File.FullName, str);
+            _dirPath = SaveFileDialogService.File.DirectoryName;
+        }
     }
 
     private bool CanSave() {
