@@ -1,6 +1,5 @@
 using System;
 using System.Collections;
-using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.IO;
 using System.Linq;
@@ -11,8 +10,6 @@ using dosymep.WPF.Commands;
 using dosymep.WPF.ViewModels;
 
 using RevitParamsChecker.Models.Rules;
-using RevitParamsChecker.Models.Rules.ComparisonOperators;
-using RevitParamsChecker.Models.Rules.LogicalOperators;
 using RevitParamsChecker.Services;
 
 namespace RevitParamsChecker.ViewModels.Rules;
@@ -80,7 +77,7 @@ internal class RulesPageViewModel : BaseViewModel {
             newRule.Name = _namesService.CreateNewName(
                 _localization.GetLocalizedString("RulesPage.NewRulePrompt"),
                 Rules.Select(f => f.Name).ToArray());
-            var vm = new RuleViewModel(newRule, _localization);
+            var vm = new RuleViewModel(newRule, _localization) { Modified = true };
             Rules.Add(vm);
             SelectedRule = vm;
         } catch(OperationCanceledException) {
@@ -93,6 +90,7 @@ internal class RulesPageViewModel : BaseViewModel {
                 _localization.GetLocalizedString("RulesPage.RenameRulePrompt"),
                 Rules.Select(f => f.Name).ToArray(),
                 rule.Name);
+            rule.Modified = true;
         } catch(OperationCanceledException) {
         }
     }
@@ -104,7 +102,7 @@ internal class RulesPageViewModel : BaseViewModel {
                 _localization.GetLocalizedString("RulesPage.NewRulePrompt"),
                 Rules.Select(f => f.Name).ToArray(),
                 rule.Name);
-            var vm = new RuleViewModel(copyRule, _localization);
+            var vm = new RuleViewModel(copyRule, _localization) { Modified = true };
             Rules.Add(vm);
             SelectedRule = vm;
         } catch(OperationCanceledException) {
@@ -151,6 +149,7 @@ internal class RulesPageViewModel : BaseViewModel {
             string selectedName = SelectedRule.Name;
             Rules.Clear();
             foreach(var vm in vms) {
+                vm.Modified = true;
                 Rules.Add(vm);
             }
 
@@ -161,6 +160,9 @@ internal class RulesPageViewModel : BaseViewModel {
 
     private void Save() {
         _rulesRepo.SetRules(Rules.Select(r => r.GetRule()).ToArray());
+        foreach(var vm in Rules) {
+            vm.Modified = false;
+        }
     }
 
     private void Export() {

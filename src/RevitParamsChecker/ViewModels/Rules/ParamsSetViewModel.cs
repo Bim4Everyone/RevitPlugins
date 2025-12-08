@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.ComponentModel;
 using System.Linq;
 using System.Windows.Input;
 
@@ -46,6 +47,8 @@ internal class ParamsSetViewModel : BaseViewModel {
         RemoveInnerParamRuleCommand = RelayCommand.Create<ParamRuleViewModel>(RemoveInnerRule, CanRemoveInnerRule);
         AddInnerParamSetCommand = RelayCommand.Create(AddInnerSet);
         RemoveInnerParamSetCommand = RelayCommand.Create<ParamsSetViewModel>(RemoveInnerSet, CanRemoveInnerSet);
+        SubscribeToPropertyChanged(InnerParamSets, InnerSetChanged);
+        SubscribeToPropertyChanged(InnerParamRules, InnerRuleChanged);
     }
 
     public ICommand AddInnerParamRuleCommand { get; }
@@ -73,12 +76,16 @@ internal class ParamsSetViewModel : BaseViewModel {
     }
 
     private void AddInnerSet() {
-        InnerParamSets.Add(
-            new ParamsSetViewModel(new LogicalRule(), _localization));
+        var vm = new ParamsSetViewModel(new LogicalRule(), _localization);
+        InnerParamSets.Add(vm);
+        vm.PropertyChanged += InnerSetChanged;
+        OnPropertyChanged(nameof(InnerParamSets));
     }
 
     private void RemoveInnerSet(ParamsSetViewModel p) {
         InnerParamSets.Remove(p);
+        p.PropertyChanged -= InnerSetChanged;
+        OnPropertyChanged(nameof(InnerParamSets));
     }
 
     private bool CanRemoveInnerSet(ParamsSetViewModel p) {
@@ -86,14 +93,35 @@ internal class ParamsSetViewModel : BaseViewModel {
     }
 
     private void AddInnerRule() {
-        InnerParamRules.Add(new ParamRuleViewModel(new ParameterRule(), _localization));
+        var vm = new ParamRuleViewModel(new ParameterRule(), _localization);
+        InnerParamRules.Add(vm);
+        vm.PropertyChanged += InnerRuleChanged;
+        OnPropertyChanged(nameof(InnerParamRules));
     }
 
     private void RemoveInnerRule(ParamRuleViewModel p) {
         InnerParamRules.Remove(p);
+        p.PropertyChanged -= InnerRuleChanged;
+        OnPropertyChanged(nameof(InnerParamRules));
     }
 
     private bool CanRemoveInnerRule(ParamRuleViewModel p) {
         return p is not null;
+    }
+
+    private void InnerRuleChanged(object sender, PropertyChangedEventArgs args) {
+        OnPropertyChanged(nameof(InnerParamRules));
+    }
+
+    private void InnerSetChanged(object sender, PropertyChangedEventArgs args) {
+        OnPropertyChanged(nameof(InnerParamSets));
+    }
+
+    private void SubscribeToPropertyChanged(
+        IEnumerable<INotifyPropertyChanged> items,
+        PropertyChangedEventHandler handler) {
+        foreach(var i in items) {
+            i.PropertyChanged += handler;
+        }
     }
 }

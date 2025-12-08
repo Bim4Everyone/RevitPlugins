@@ -48,8 +48,31 @@
                             VerticalAlignment="Center">
                             <ui:TextBlock
                                 VerticalAlignment="Center"
-                                ToolTip="{Binding Name}"
-                                Text="{Binding Name}" />
+                                ToolTip="{Binding Name}">
+                                <ui:TextBlock.Style>
+                                    <Style
+                                        TargetType="ui:TextBlock">
+                                        <Setter
+                                            Property="Text"
+                                            Value="{Binding Name}" />
+                                        <Setter
+                                            Property="FontWeight"
+                                            Value="Normal" />
+                                        <Style.Triggers>
+                                            <DataTrigger
+                                                Binding="{Binding Modified}"
+                                                Value="True">
+                                                <Setter
+                                                    Property="Text"
+                                                    Value="{Binding Name, StringFormat='{}{0} *'}" />
+                                                <Setter
+                                                    Property="FontWeight"
+                                                    Value="Bold" />
+                                            </DataTrigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </ui:TextBlock.Style>
+                            </ui:TextBlock>
                         </DockPanel>
                     </DataTemplate>
                 </ui:ListView.ItemTemplate>

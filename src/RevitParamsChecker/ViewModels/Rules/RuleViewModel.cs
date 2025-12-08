@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 
 using dosymep.SimpleServices;
 using dosymep.WPF.ViewModels;
@@ -15,6 +16,7 @@ internal class RuleViewModel : BaseViewModel, IEquatable<RuleViewModel>, IName {
     private readonly Guid _guid;
     private string _name;
     private string _description;
+    private bool _modified;
 
     public RuleViewModel(
         Rule rule,
@@ -25,6 +27,9 @@ internal class RuleViewModel : BaseViewModel, IEquatable<RuleViewModel>, IName {
         Name = _rule.Name;
         Description = _rule.Description;
         RootSet = new ParamsSetViewModel(_rule.RootRule, _localization);
+
+        PropertyChanged += OnModelPropertyChanged;
+        RootSet.PropertyChanged += OnRootSetChanged;
     }
 
     public string Name {
@@ -35,6 +40,11 @@ internal class RuleViewModel : BaseViewModel, IEquatable<RuleViewModel>, IName {
     public string Description {
         get => _description;
         set => RaiseAndSetIfChanged(ref _description, value);
+    }
+
+    public bool Modified {
+        get => _modified;
+        set => RaiseAndSetIfChanged(ref _modified, value);
     }
 
     public ParamsSetViewModel RootSet { get; }
@@ -64,5 +74,16 @@ internal class RuleViewModel : BaseViewModel, IEquatable<RuleViewModel>, IName {
         _rule.Description = Description;
         _rule.RootRule = RootSet.GetRule();
         return _rule;
+    }
+
+    private void OnRootSetChanged(object sender, PropertyChangedEventArgs e) {
+        Modified = true;
+    }
+
+    private void OnModelPropertyChanged(object sender, PropertyChangedEventArgs e) {
+        if(e.PropertyName == nameof(Description)
+           || e.PropertyName == nameof(Name)) {
+            Modified = true;
+        }
     }
 }
