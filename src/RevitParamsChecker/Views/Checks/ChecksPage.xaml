@@ -38,7 +38,8 @@
             Margin="0 0 0 8"
             LoadButtonCommand="{Binding LoadCommand}"
             SaveButtonCommand="{Binding SaveCommand}"
-            ExportButtonCommand="{Binding ExportCommand}" />
+            ExportButtonCommand="{Binding ExportCommand}"
+            ShowSaveChangesPrompt="{Binding ChecksModified}" />
 
         <local:ChecksControl
             Grid.Row="1"

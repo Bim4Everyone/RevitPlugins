@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.ObjectModel;
+using System.ComponentModel;
 using System.IO;
 using System.Linq;
 using System.Net;
@@ -23,6 +24,7 @@ internal class FiltrationPageViewModel : BaseViewModel {
     private readonly NamesService _namesService;
     private FilterViewModel _selectedFilter;
     private string _dirPath;
+    private bool _filtersModified;
 
     public FiltrationPageViewModel(
         ILocalizationService localization,
@@ -41,7 +43,7 @@ internal class FiltrationPageViewModel : BaseViewModel {
         _namesService = namesService ?? throw new ArgumentNullException(nameof(namesService));
         _dirPath = Environment.GetFolderPath(Environment.SpecialFolder.Desktop);
 
-        Filters = [.._filtersRepo.GetFilters().Select(f => new FilterViewModel(f))];
+        Filters = [.._filtersRepo.GetFilters().Select(f => new FilterViewModel(f) { Modified = false })];
         SelectedFilter = Filters.FirstOrDefault();
         AddFilterCommand = RelayCommand.Create(AddFilter);
         RenameFilterCommand = RelayCommand.Create<FilterViewModel>(RenameFilter, CanRenameFilter);
@@ -51,6 +53,7 @@ internal class FiltrationPageViewModel : BaseViewModel {
         ExportCommand = RelayCommand.Create(Export, CanSave);
         LoadCommand = RelayCommand.Create(Load);
         ShowElementsCommand = RelayCommand.Create(ShowElements, CanShowElements);
+        SubscribeToChanges(Filters);
     }
 
     public ICommand LoadCommand { get; }
@@ -67,6 +70,11 @@ internal class FiltrationPageViewModel : BaseViewModel {
 
     public ObservableCollection<FilterViewModel> Filters { get; }
 
+    public bool FiltersModified {
+        get => _filtersModified;
+        set => RaiseAndSetIfChanged(ref _filtersModified, value);
+    }
+
     public FilterViewModel SelectedFilter {
         get => _selectedFilter;
         set => RaiseAndSetIfChanged(ref _selectedFilter, value);
@@ -79,8 +87,10 @@ internal class FiltrationPageViewModel : BaseViewModel {
                 Filters.Select(f => f.Name).ToArray());
             var filter = new Filter() { Name = newName };
             var vm = new FilterViewModel(filter);
+            vm.PropertyChanged += OnFilterChanged;
             Filters.Add(vm);
             SelectedFilter = vm;
+            FiltersModified = true;
         } catch(OperationCanceledException) {
         }
     }
@@ -107,8 +117,10 @@ internal class FiltrationPageViewModel : BaseViewModel {
                 Filters.Select(f => f.Name).ToArray(),
                 filter.Name);
             var vm = new FilterViewModel(copyFilter);
+            vm.PropertyChanged += OnFilterChanged;
             Filters.Add(vm);
             SelectedFilter = vm;
+            FiltersModified = true;
         } catch(OperationCanceledException) {
         }
     }
@@ -120,10 +132,12 @@ internal class FiltrationPageViewModel : BaseViewModel {
     private void RemoveFilters(IList items) {
         var filters = items.OfType<FilterViewModel>().ToArray();
         foreach(var filter in filters) {
+            filter.PropertyChanged -= OnFilterChanged;
             Filters.Remove(filter);
         }
 
         SelectedFilter = Filters.FirstOrDefault();
+        FiltersModified = true;
     }
 
     private bool CanRemoveFilters(IList items) {
@@ -133,6 +147,11 @@ internal class FiltrationPageViewModel : BaseViewModel {
 
     private void Save() {
         _filtersRepo.SetFilters(Filters.Select(f => f.GetFilter()).ToArray());
+        foreach(var vm in Filters) {
+            vm.Modified = false;
+        }
+
+        FiltersModified = false;
     }
 
     private void Export() {
@@ -163,7 +182,12 @@ internal class FiltrationPageViewModel : BaseViewModel {
 
             var vms = _namesService.GetResolvedCollection(
                     Filters.ToArray(),
-                    filters.Select(f => new FilterViewModel(f)).ToArray())
+                    filters.Select(f => {
+                            var vm = new FilterViewModel(f);
+                            vm.PropertyChanged += OnFilterChanged;
+                            return vm;
+                        })
+                        .ToArray())
                 .OfType<FilterViewModel>();
             string selectedName = SelectedFilter.Name;
             Filters.Clear();
@@ -171,6 +195,7 @@ internal class FiltrationPageViewModel : BaseViewModel {
                 Filters.Add(vm);
             }
 
+            FiltersModified = true;
             SelectedFilter = Filters.FirstOrDefault(f => f.Name.Equals(selectedName)) ?? Filters.FirstOrDefault();
             _dirPath = OpenFileDialogService.File.DirectoryName;
         }
@@ -182,5 +207,18 @@ internal class FiltrationPageViewModel : BaseViewModel {
 
     private bool CanShowElements() {
         return CanSave();
+    }
+
+    private void SubscribeToChanges(ObservableCollection<FilterViewModel> filters) {
+        foreach(var filter in filters) {
+            filter.PropertyChanged += OnFilterChanged;
+        }
+    }
+
+    private void OnFilterChanged(object sender, PropertyChangedEventArgs e) {
+        if((sender is FilterViewModel filter)
+           && filter.Modified) {
+            FiltersModified = true;
+        }
     }
 }

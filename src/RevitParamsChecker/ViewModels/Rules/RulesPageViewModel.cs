@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.ObjectModel;
+using System.ComponentModel;
 using System.IO;
 using System.Linq;
 using System.Windows.Input;
@@ -21,6 +22,7 @@ internal class RulesPageViewModel : BaseViewModel {
     private readonly NamesService _namesService;
     private RuleViewModel _selectedRule;
     private string _dirPath;
+    private bool _rulesModified;
 
     public RulesPageViewModel(
         ILocalizationService localization,
@@ -41,7 +43,7 @@ internal class RulesPageViewModel : BaseViewModel {
 
         Rules = [
             .._rulesRepo.GetRules()
-                .Select(r => new RuleViewModel(r, _localization))
+                .Select(r => new RuleViewModel(r, _localization) { Modified = false })
         ];
         SelectedRule = Rules.FirstOrDefault();
         AddRuleCommand = RelayCommand.Create(AddRule);
@@ -51,6 +53,7 @@ internal class RulesPageViewModel : BaseViewModel {
         LoadCommand = RelayCommand.Create(Load);
         SaveCommand = RelayCommand.Create(Save, CanSave);
         ExportCommand = RelayCommand.Create(Export, CanSave);
+        SubscribeToChanges(Rules);
     }
 
     public ICommand LoadCommand { get; }
@@ -71,15 +74,22 @@ internal class RulesPageViewModel : BaseViewModel {
         set => RaiseAndSetIfChanged(ref _selectedRule, value);
     }
 
+    public bool RulesModified {
+        get => _rulesModified;
+        set => RaiseAndSetIfChanged(ref _rulesModified, value);
+    }
+
     private void AddRule() {
         try {
             var newRule = new Rule();
             newRule.Name = _namesService.CreateNewName(
                 _localization.GetLocalizedString("RulesPage.NewRulePrompt"),
                 Rules.Select(f => f.Name).ToArray());
-            var vm = new RuleViewModel(newRule, _localization) { Modified = true };
+            var vm = new RuleViewModel(newRule, _localization);
+            vm.PropertyChanged += OnRuleChanged;
             Rules.Add(vm);
             SelectedRule = vm;
+            RulesModified = true;
         } catch(OperationCanceledException) {
         }
     }
@@ -90,7 +100,6 @@ internal class RulesPageViewModel : BaseViewModel {
                 _localization.GetLocalizedString("RulesPage.RenameRulePrompt"),
                 Rules.Select(f => f.Name).ToArray(),
                 rule.Name);
-            rule.Modified = true;
         } catch(OperationCanceledException) {
         }
     }
@@ -102,9 +111,11 @@ internal class RulesPageViewModel : BaseViewModel {
                 _localization.GetLocalizedString("RulesPage.NewRulePrompt"),
                 Rules.Select(f => f.Name).ToArray(),
                 rule.Name);
-            var vm = new RuleViewModel(copyRule, _localization) { Modified = true };
+            var vm = new RuleViewModel(copyRule, _localization);
+            vm.PropertyChanged += OnRuleChanged;
             Rules.Add(vm);
             SelectedRule = vm;
+            RulesModified = true;
         } catch(OperationCanceledException) {
         }
     }
@@ -120,10 +131,12 @@ internal class RulesPageViewModel : BaseViewModel {
     private void RemoveRules(IList items) {
         var rules = items.OfType<RuleViewModel>().ToArray();
         foreach(var rule in rules) {
+            rule.PropertyChanged -= OnRuleChanged;
             Rules.Remove(rule);
         }
 
         SelectedRule = Rules.FirstOrDefault();
+        RulesModified = true;
     }
 
     private bool CanRemoveRules(IList items) {
@@ -144,15 +157,20 @@ internal class RulesPageViewModel : BaseViewModel {
 
             var vms = _namesService.GetResolvedCollection(
                     Rules.ToArray(),
-                    rules.Select(r => new RuleViewModel(r, _localization)).ToArray())
+                    rules.Select(r => {
+                            var rule = new RuleViewModel(r, _localization);
+                            rule.PropertyChanged += OnRuleChanged;
+                            return rule;
+                        })
+                        .ToArray())
                 .OfType<RuleViewModel>();
             string selectedName = SelectedRule.Name;
             Rules.Clear();
             foreach(var vm in vms) {
-                vm.Modified = true;
                 Rules.Add(vm);
             }
 
+            RulesModified = true;
             SelectedRule = Rules.FirstOrDefault(r => r.Name.Equals(selectedName)) ?? Rules.FirstOrDefault();
             _dirPath = OpenFileDialogService.File.DirectoryName;
         }
@@ -163,6 +181,8 @@ internal class RulesPageViewModel : BaseViewModel {
         foreach(var vm in Rules) {
             vm.Modified = false;
         }
+
+        RulesModified = false;
     }
 
     private void Export() {
@@ -178,5 +198,18 @@ internal class RulesPageViewModel : BaseViewModel {
 
     private bool CanSave() {
         return true; // TODO валидация
+    }
+
+    private void SubscribeToChanges(ObservableCollection<RuleViewModel> rules) {
+        foreach(var check in rules) {
+            check.PropertyChanged += OnRuleChanged;
+        }
+    }
+
+    private void OnRuleChanged(object sender, PropertyChangedEventArgs e) {
+        if((sender is RuleViewModel check)
+           && check.Modified) {
+            RulesModified = true;
+        }
     }
 }

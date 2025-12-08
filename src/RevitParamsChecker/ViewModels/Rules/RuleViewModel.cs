@@ -27,6 +27,7 @@ internal class RuleViewModel : BaseViewModel, IEquatable<RuleViewModel>, IName {
         Name = _rule.Name;
         Description = _rule.Description;
         RootSet = new ParamsSetViewModel(_rule.RootRule, _localization);
+        Modified = true;
 
         PropertyChanged += OnModelPropertyChanged;
         RootSet.PropertyChanged += OnRootSetChanged;

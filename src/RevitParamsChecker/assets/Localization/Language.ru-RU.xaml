@@ -109,6 +109,9 @@
         x:Key="PageMenu.Tooltip.Save">Сохранить</system:String>
     <system:String
         x:Key="PageMenu.Tooltip.Export">Экспорт</system:String>
+    <system:String
+        x:Key="PageMenu.SaveChangesPrompt">Сохраните изменения</system:String>
+
 
     <system:String
         x:Key="CrudButtons.Tooltip.Add">Добавить</system:String>

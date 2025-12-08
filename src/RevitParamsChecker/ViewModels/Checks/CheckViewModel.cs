@@ -1,5 +1,6 @@
 using System;
 using System.Collections.ObjectModel;
+using System.ComponentModel;
 
 using dosymep.WPF.ViewModels;
 
@@ -16,14 +17,17 @@ internal class CheckViewModel : BaseViewModel, IEquatable<CheckViewModel>, IName
     private ObservableCollection<string> _selectedFiles;
     private ObservableCollection<string> _selectedFilters;
     private ObservableCollection<string> _selectedRules;
+    private bool _modified;
 
     public CheckViewModel(Check check) {
         _check = check ?? throw new ArgumentNullException(nameof(check));
         Name = _check.Name;
+        Modified = true;
         SelectedFiles = [.._check.Files];
         SelectedFilters = [.._check.Filters];
         SelectedRules = [.._check.Rules];
         _guid = Guid.NewGuid();
+        PropertyChanged += OnModelPropertyChanged;
     }
 
     public string Name {
@@ -34,6 +38,11 @@ internal class CheckViewModel : BaseViewModel, IEquatable<CheckViewModel>, IName
     public bool IsSelected {
         get => _isSelected;
         set => RaiseAndSetIfChanged(ref _isSelected, value);
+    }
+
+    public bool Modified {
+        get => _modified;
+        set => RaiseAndSetIfChanged(ref _modified, value);
     }
 
     public ObservableCollection<string> SelectedFiles {
@@ -77,5 +86,14 @@ internal class CheckViewModel : BaseViewModel, IEquatable<CheckViewModel>, IName
         _check.Filters = [..SelectedFilters];
         _check.Rules = [..SelectedRules];
         return _check;
+    }
+
+    private void OnModelPropertyChanged(object sender, PropertyChangedEventArgs e) {
+        if(e.PropertyName == nameof(Name)
+           || e.PropertyName == nameof(SelectedFilters)
+           || e.PropertyName == nameof(SelectedFiles)
+           || e.PropertyName == nameof(SelectedRules)) {
+            Modified = true;
+        }
     }
 }

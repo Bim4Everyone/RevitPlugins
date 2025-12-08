@@ -44,6 +44,12 @@ internal partial class PageMenuControl {
         typeof(PageMenuControl),
         new PropertyMetadata(null));
 
+    public static readonly DependencyProperty ShowSaveChangesPromptProperty = DependencyProperty.Register(
+        nameof(ShowSaveChangesPrompt),
+        typeof(bool),
+        typeof(PageMenuControl),
+        new PropertyMetadata(false));
+
     public ICommand LoadButtonCommand {
         get => (ICommand) GetValue(LoadButtonCommandProperty);
         set => SetValue(LoadButtonCommandProperty, value);
@@ -57,5 +63,10 @@ internal partial class PageMenuControl {
     public ICommand ExportButtonCommand {
         get => (ICommand) GetValue(ExportButtonCommandProperty);
         set => SetValue(ExportButtonCommandProperty, value);
+    }
+
+    public bool ShowSaveChangesPrompt {
+        get => (bool) GetValue(ShowSaveChangesPromptProperty);
+        set => SetValue(ShowSaveChangesPromptProperty, value);
     }
 }

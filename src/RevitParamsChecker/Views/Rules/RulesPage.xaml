@@ -48,7 +48,8 @@
             Margin="0 0 0 8"
             LoadButtonCommand="{Binding LoadCommand}"
             SaveButtonCommand="{Binding SaveCommand}"
-            ExportButtonCommand="{Binding ExportCommand}" />
+            ExportButtonCommand="{Binding ExportCommand}"
+            ShowSaveChangesPrompt="{Binding RulesModified}" />
 
         <custom:EditableListControl
             Grid.Row="1"

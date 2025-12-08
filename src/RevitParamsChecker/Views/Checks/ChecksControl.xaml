@@ -91,12 +91,34 @@
 
                     <DataGridTextColumn
                         IsReadOnly="True"
-                        MinWidth="100"
-                        Binding="{Binding Name}">
+                        MinWidth="100">
                         <DataGridTextColumn.Header>
                             <ui:TextBlock
                                 Text="{DynamicResource ChecksPage.NameHeader}" />
                         </DataGridTextColumn.Header>
+                        <DataGridTextColumn.ElementStyle>
+                            <Style
+                                TargetType="TextBlock">
+                                <Setter
+                                    Property="Text"
+                                    Value="{Binding Name}" />
+                                <Setter
+                                    Property="FontWeight"
+                                    Value="Normal" />
+                                <Style.Triggers>
+                                    <DataTrigger
+                                        Binding="{Binding Modified}"
+                                        Value="True">
+                                        <Setter
+                                            Property="Text"
+                                            Value="{Binding Name, StringFormat='{}{0} *'}" />
+                                        <Setter
+                                            Property="FontWeight"
+                                            Value="Bold" />
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </DataGridTextColumn.ElementStyle>
                     </DataGridTextColumn>
 
                     <DataGridTemplateColumn

@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.ObjectModel;
+using System.ComponentModel;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
@@ -33,6 +34,7 @@ internal class ChecksPageViewModel : BaseViewModel {
     private string[] _availableFilters;
     private string[] _availableRules;
     private CheckViewModel _selectedCheck;
+    private bool _checksModified;
 
     public ChecksPageViewModel(
         ILocalizationService localization,
@@ -65,7 +67,7 @@ internal class ChecksPageViewModel : BaseViewModel {
         _availableFilters = [.._filtersRepo.GetFilters().Select(f => f.Name)];
         _availableRules = [.._rulesRepo.GetRules().Select(r => r.Name)];
 
-        Checks = [.._checksRepo.GetChecks().Select(c => new CheckViewModel(c)).ToArray()];
+        Checks = [.._checksRepo.GetChecks().Select(c => new CheckViewModel(c) { Modified = false })];
         SelectedCheck = Checks.FirstOrDefault();
         AddCheckCommand = RelayCommand.Create(AddCheck);
         RenameCheckCommand = RelayCommand.Create<CheckViewModel>(RenameCheck, CanRenameCheck);
@@ -81,6 +83,7 @@ internal class ChecksPageViewModel : BaseViewModel {
 
         _filtersRepo.FiltersChanged += FiltersChangedHandler;
         _rulesRepo.RulesChanged += RulesChangedHandler;
+        SubscribeToChanges(Checks);
     }
 
     public ICommand LoadCommand { get; }
@@ -118,6 +121,11 @@ internal class ChecksPageViewModel : BaseViewModel {
         }
     }
 
+    public bool ChecksModified {
+        get => _checksModified;
+        set => RaiseAndSetIfChanged(ref _checksModified, value);
+    }
+
     private void AddCheck() {
         try {
             var newCheck = new Check();
@@ -125,8 +133,10 @@ internal class ChecksPageViewModel : BaseViewModel {
                 _localization.GetLocalizedString("ChecksPage.NewCheckPrompt"),
                 Checks.Select(f => f.Name).ToArray());
             var vm = new CheckViewModel(newCheck);
+            vm.PropertyChanged += OnCheckChanged;
             Checks.Add(vm);
             SelectedCheck = vm;
+            ChecksModified = true;
         } catch(OperationCanceledException) {
         }
     }
@@ -149,8 +159,10 @@ internal class ChecksPageViewModel : BaseViewModel {
                 Checks.Select(f => f.Name).ToArray(),
                 check.Name);
             var vm = new CheckViewModel(copyCheck);
+            vm.PropertyChanged += OnCheckChanged;
             Checks.Add(vm);
             SelectedCheck = vm;
+            ChecksModified = true;
         } catch(OperationCanceledException) {
         }
     }
@@ -164,12 +176,14 @@ internal class ChecksPageViewModel : BaseViewModel {
     }
 
     private void RemoveChecks(IList items) {
-        var filters = items.OfType<CheckViewModel>().ToArray();
-        foreach(var filter in filters) {
-            Checks.Remove(filter);
+        var checks = items.OfType<CheckViewModel>().ToArray();
+        foreach(var check in checks) {
+            check.PropertyChanged -= OnCheckChanged;
+            Checks.Remove(check);
         }
 
         SelectedCheck = Checks.FirstOrDefault();
+        ChecksModified = true;
     }
 
     private bool CanRemoveChecks(IList items) {
@@ -208,7 +222,12 @@ internal class ChecksPageViewModel : BaseViewModel {
 
             var vms = _namesService.GetResolvedCollection(
                     Checks.ToArray(),
-                    checks.Select(c => new CheckViewModel(c)).ToArray())
+                    checks.Select(c => {
+                            var check = new CheckViewModel(c);
+                            check.PropertyChanged += OnCheckChanged;
+                            return check;
+                        })
+                        .ToArray())
                 .OfType<CheckViewModel>();
             string selectedName = SelectedCheck.Name;
             Checks.Clear();
@@ -216,6 +235,7 @@ internal class ChecksPageViewModel : BaseViewModel {
                 Checks.Add(vm);
             }
 
+            ChecksModified = true;
             SelectedCheck = Checks.FirstOrDefault(c => c.Name.Equals(selectedName)) ?? Checks.FirstOrDefault();
             _dirPath = OpenFileDialogService.File.DirectoryName;
         }
@@ -223,6 +243,11 @@ internal class ChecksPageViewModel : BaseViewModel {
 
     private void Save() {
         _checksRepo.SetChecks(Checks.Select(c => c.GetCheck()).ToArray());
+        foreach(var vm in Checks) {
+            vm.Modified = false;
+        }
+
+        ChecksModified = false;
     }
 
     private void Export() {
@@ -285,5 +310,18 @@ internal class ChecksPageViewModel : BaseViewModel {
     private void FiltersChangedHandler(object sender, FiltersChangedEventArgs e) {
         // TODO
         _availableFilters = [..e.NewFilters.Select(f => f.Name)];
+    }
+
+    private void SubscribeToChanges(ObservableCollection<CheckViewModel> checks) {
+        foreach(var check in checks) {
+            check.PropertyChanged += OnCheckChanged;
+        }
+    }
+
+    private void OnCheckChanged(object sender, PropertyChangedEventArgs e) {
+        if((sender is CheckViewModel check)
+           && check.Modified) {
+            ChecksModified = true;
+        }
     }
 }

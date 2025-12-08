@@ -8,6 +8,7 @@
     xmlns:core="clr-namespace:dosymep.WpfUI.Core"
     xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
     xmlns:me="clr-namespace:dosymep.WpfCore.MarkupExtensions;assembly=dosymep.WpfCore"
+    xmlns:converters="clr-namespace:dosymep.WpfCore.Converters;assembly=dosymep.WpfCore"
     mc:Ignorable="d"
     x:Name="_this"
     d:DesignHeight="300"
@@ -19,6 +20,10 @@
                 <ResourceDictionary
                     Source="../../Resources/CustomStyles.xaml" />
             </ResourceDictionary.MergedDictionaries>
+            <converters:BoolToVisibilityConverter
+                x:Key="BoolToVisibilityConverter"
+                TrueValue="Visible"
+                FalseValue="Collapsed" />
         </ResourceDictionary>
     </core:WpfUIPlatformUserControl.Resources>
     <Border
@@ -37,6 +42,13 @@
                 ToolTip="{me:LocalizationSource PageMenu.Tooltip.Export}"
                 Command="{Binding ExportButtonCommand, ElementName=_this}"
                 Content="{ui:SymbolIcon Symbol=ArrowExportUp20}" />
+            <Label
+                Margin="8 0 0 0"
+                VerticalAlignment="Center"
+                Padding="0"
+                FontSize="{DynamicResource ControlContentThemeFontSize}"
+                Visibility="{Binding ShowSaveChangesPrompt, ElementName=_this, Converter={StaticResource BoolToVisibilityConverter}}"
+                Content="{me:LocalizationSource PageMenu.SaveChangesPrompt}" />
         </DockPanel>
     </Border>
 </core:WpfUIPlatformUserControl>
