@@ -119,19 +119,19 @@
                         <TextBlock
                             Margin="5"
                             FontWeight="Medium"
-                            Foreground="{ui:ThemeResource TextFillColorSecondaryBrush}"
+                            Foreground="{ui:ThemeResource TextFillColorPrimaryBrush}"
                             Text="{me:LocalizationSource MainWindow.BimTipTitle}" />
 
                         <TextBlock
                             Margin="5"
                             TextWrapping="WrapWithOverflow"
-                            Foreground="{ui:ThemeResource TextFillColorSecondaryBrush}"
+                            Foreground="{ui:ThemeResource TextFillColorPrimaryBrush}"
                             Text="{me:LocalizationSource MainWindow.BimTip1}" />
 
                         <TextBlock
                             Margin="5"
                             TextWrapping="WrapWithOverflow"
-                            Foreground="{ui:ThemeResource TextFillColorSecondaryBrush}"
+                            Foreground="{ui:ThemeResource TextFillColorPrimaryBrush}"
                             Text="{me:LocalizationSource MainWindow.BimTip2}" />
                     </StackPanel>
                 </Border>
