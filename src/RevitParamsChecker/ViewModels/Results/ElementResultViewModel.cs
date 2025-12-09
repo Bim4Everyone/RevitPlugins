@@ -19,7 +19,7 @@ internal class ElementResultViewModel : BaseViewModel {
         ElementResult = elementResult ?? throw new ArgumentNullException(nameof(elementResult));
         Id = ElementResult.ElementModel.Element.Id;
         FileName = ElementResult.ElementModel.Element.Document.Title;
-        FamilyTypeName = ElementResult.ElementModel.Element.Name;
+        FamilyTypeName = ElementResult.ElementModel.Element.Name ?? string.Empty;
         Status = _localization.GetLocalizedString($"{nameof(StatusCode)}.{ElementResult.Status}");
         Error = ElementResult.Error;
         RuleName = ElementResult.RuleName;

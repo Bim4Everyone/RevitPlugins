@@ -61,7 +61,12 @@
                 RowHeight="26"
                 CellStyle="{StaticResource CustomTooltipDataGridCell}"
                 Style="{StaticResource CustomResizableDataGridStyle}"
-                ItemsSource="{Binding ElementResults}">
+                ItemsSource="{Binding ElementResults.View}">
+                <DataGrid.GroupStyle>
+                    <GroupStyle
+                        ContainerStyle="{StaticResource CustomGroupHeaderStyle}">
+                    </GroupStyle>
+                </DataGrid.GroupStyle>
                 <ui:DataGrid.Columns>
                     <DataGridTemplateColumn
                         Width="Auto"
