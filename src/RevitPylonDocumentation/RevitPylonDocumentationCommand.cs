@@ -18,7 +18,6 @@ using Ninject.Activation;
 using Ninject.Parameters;
 
 using RevitPylonDocumentation.Extensions;
-using RevitPylonDocumentation.Factories;
 using RevitPylonDocumentation.Models;
 using RevitPylonDocumentation.ViewModels;
 using RevitPylonDocumentation.Views;

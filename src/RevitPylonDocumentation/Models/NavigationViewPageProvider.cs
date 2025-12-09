@@ -5,7 +5,7 @@ using Ninject.Syntax;
 
 using Wpf.Ui.Abstractions;
 
-namespace RevitPylonDocumentation.Factories;
+namespace RevitPylonDocumentation.Models;
 
 internal sealed class NavigationViewPageProvider : INavigationViewPageProvider {
     private readonly IResolutionRoot _resolutionRoot;
