@@ -145,7 +145,7 @@ internal class PylonSheetInfoManager {
         }
 
         // ПЕРВЫЙ ПОПЕРЕЧНЫЙ ВИД АРМИРОВАНИЯ
-        if(selectionSettings.NeedWorkWithTransverseViewFirst) {
+        if(selectionSettings.NeedWorkWithTransverseRebarViewFirst) {
             // Здесь может быть два варианта: 1) найден и вид, и видовой экран; 2) не найдено ничего
             if(SheetInfo.TransverseViewFirstRebar.ViewElement is null) {
                 // Если вид не найден, то сначала пытаемся создать вид, а потом, если создание не успешно -
@@ -160,7 +160,7 @@ internal class PylonSheetInfoManager {
         }
 
         // ВТОРОЙ ПОПЕРЕЧНЫЙ ВИД АРМИРОВАНИЯ
-        if(selectionSettings.NeedWorkWithTransverseViewSecond) {
+        if(selectionSettings.NeedWorkWithTransverseRebarViewSecond) {
             // Здесь может быть два варианта: 1) найден и вид, и видовой экран; 2) не найдено ничего
             if(SheetInfo.TransverseViewSecondRebar.ViewElement is null) {
                 // Если вид не найден, то сначала пытаемся создать вид, а потом, если создание не успешно -
@@ -175,7 +175,7 @@ internal class PylonSheetInfoManager {
         }
 
         // ТРЕТИЙ ПОПЕРЕЧНЫЙ ВИД АРМИРОВАНИЯ
-        if(selectionSettings.NeedWorkWithTransverseViewThird) {
+        if(selectionSettings.NeedWorkWithTransverseRebarViewThird) {
             // Здесь может быть два варианта: 1) найден и вид, и видовой экран; 2) не найдено ничего
             if(SheetInfo.TransverseViewThirdRebar.ViewElement is null) {
                 // Если вид не найден, то сначала пытаемся создать вид, а потом, если создание не успешно -
@@ -326,7 +326,7 @@ internal class PylonSheetInfoManager {
         }
 
         // СОЗДАНИЕ АННОТАЦИЙ ПЕРВОГО ПОПЕРЕЧНОГО ВИДА АРМИРОВАНИЯ
-        if(selectionSettings.NeedWorkWithTransverseViewFirst) {
+        if(selectionSettings.NeedWorkWithTransverseRebarViewFirst) {
             // Здесь может быть два варианта: 1) найден и вид, и видовой экран; 2) не найдено ничего
             if(SheetInfo.TransverseViewFirstRebar.ViewportElement is null 
                     && SheetInfo.TransverseViewFirstRebar.ViewElement != null) {
@@ -335,7 +335,7 @@ internal class PylonSheetInfoManager {
         }
 
         // СОЗДАНИЕ АННОТАЦИЙ ВТОРОГО ПОПЕРЕЧНОГО ВИДА АРМИРОВАНИЯ
-        if(selectionSettings.NeedWorkWithTransverseViewSecond) {
+        if(selectionSettings.NeedWorkWithTransverseRebarViewSecond) {
             // Здесь может быть два варианта: 1) найден и вид, и видовой экран; 2) не найдено ничего
             if(SheetInfo.TransverseViewSecondRebar.ViewportElement is null 
                     && SheetInfo.TransverseViewSecondRebar.ViewElement != null) {
@@ -344,7 +344,7 @@ internal class PylonSheetInfoManager {
         }
 
         // СОЗДАНИЕ АННОТАЦИЙ ТРЕТЬЕГО ПОПЕРЕЧНОГО ВИДА АРМИРОВАНИЯ
-        if(selectionSettings.NeedWorkWithTransverseViewThird) {
+        if(selectionSettings.NeedWorkWithTransverseRebarViewThird) {
             // Здесь может быть два варианта: 1) найден и вид, и видовой экран; 2) не найдено ничего
             if(SheetInfo.TransverseViewThirdRebar.ViewportElement is null 
                     && SheetInfo.TransverseViewThirdRebar.ViewElement != null) {
@@ -366,19 +366,19 @@ internal class PylonSheetInfoManager {
                 SheetInfo.GeneralViewPerpendicularRebar.ViewSectionPlacer.PlaceGeneralPerpendicularRebarViewport();
             }
         }
-        if(selectionSettings.NeedWorkWithTransverseViewFirst) {
+        if(selectionSettings.NeedWorkWithTransverseRebarViewFirst) {
             // Если видовой экран на листе не найден, то размещаем
             if(SheetInfo.TransverseViewFirstRebar.ViewportElement is null) {
                 SheetInfo.TransverseViewFirstRebar.ViewSectionPlacer.PlaceTransverseRebarFirstViewPort();
             }
         }
-        if(selectionSettings.NeedWorkWithTransverseViewSecond) {
+        if(selectionSettings.NeedWorkWithTransverseRebarViewSecond) {
             // Если видовой экран на листе не найден, то размещаем
             if(SheetInfo.TransverseViewSecondRebar.ViewportElement is null) {
                 SheetInfo.TransverseViewSecondRebar.ViewSectionPlacer.PlaceTransverseRebarSecondViewPort();
             }
         }
-        if(selectionSettings.NeedWorkWithTransverseViewThird) {
+        if(selectionSettings.NeedWorkWithTransverseRebarViewThird) {
             // Если видовой экран на листе не найден, то размещаем
             if(SheetInfo.TransverseViewThirdRebar.ViewportElement is null) {
                 SheetInfo.TransverseViewThirdRebar.ViewSectionPlacer.PlaceTransverseRebarThirdViewPort();

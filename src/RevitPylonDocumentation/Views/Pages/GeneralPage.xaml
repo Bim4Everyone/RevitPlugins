@@ -302,21 +302,21 @@
                     <ui:ToggleSwitch
                         Grid.Row="3"
                         Margin="5"
-                        IsChecked="{Binding Path=SelectionSettings.NeedWorkWithTransverseViewFirst}"
+                        IsChecked="{Binding Path=SelectionSettings.NeedWorkWithTransverseRebarViewFirst}"
                         Content="{me:LocalizationSource GeneralPage.Transverse1}" 
                         ToolTip="{me:LocalizationSource GeneralPage.RebarTransverse1ToolTip}"/>
 
                     <ui:ToggleSwitch
                         Grid.Row="4"
                         Margin="5"
-                        IsChecked="{Binding Path=SelectionSettings.NeedWorkWithTransverseViewSecond}"
+                        IsChecked="{Binding Path=SelectionSettings.NeedWorkWithTransverseRebarViewSecond}"
                         Content="{me:LocalizationSource GeneralPage.Transverse2}" 
                         ToolTip="{me:LocalizationSource GeneralPage.RebarTransverse2ToolTip}"/>
 
                     <ui:ToggleSwitch
                         Grid.Row="5"
                         Margin="5"
-                        IsChecked="{Binding Path=SelectionSettings.NeedWorkWithTransverseViewThird}"
+                        IsChecked="{Binding Path=SelectionSettings.NeedWorkWithTransverseRebarViewThird}"
                         Content="{me:LocalizationSource GeneralPage.Transverse3}" 
                         ToolTip="{me:LocalizationSource GeneralPage.RebarTransverse3ToolTip}"/>
                 </Grid>

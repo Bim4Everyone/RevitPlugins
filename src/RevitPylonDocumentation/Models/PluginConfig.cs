@@ -35,14 +35,19 @@ internal class PluginConfig : ProjectConfig<PluginSettings> {
         selectionSettings.NeedWorkWithTransverseViewFirst = settings.NeedWorkWithTransverseViewFirst;
         selectionSettings.NeedWorkWithTransverseViewSecond = settings.NeedWorkWithTransverseViewSecond;
         selectionSettings.NeedWorkWithTransverseViewThird = settings.NeedWorkWithTransverseViewThird;
+
+        selectionSettings.NeedWorkWithGeneralRebarView = settings.NeedWorkWithGeneralRebarView;
+        selectionSettings.NeedWorkWithGeneralPerpendicularRebarView = settings.NeedWorkWithGeneralPerpendicularRebarView;
+        selectionSettings.NeedWorkWithTransverseRebarViewFirst = settings.NeedWorkWithTransverseRebarViewFirst;
+        selectionSettings.NeedWorkWithTransverseRebarViewSecond = settings.NeedWorkWithTransverseRebarViewSecond;
+        selectionSettings.NeedWorkWithTransverseRebarViewThird = settings.NeedWorkWithTransverseRebarViewThird;
+
+        selectionSettings.NeedWorkWithSkeletonSchedule = settings.NeedWorkWithSkeletonSchedule;
+        selectionSettings.NeedWorkWithSkeletonByElemsSchedule = settings.NeedWorkWithSkeletonByElemsSchedule;
         selectionSettings.NeedWorkWithMaterialSchedule = settings.NeedWorkWithMaterialSchedule;
         selectionSettings.NeedWorkWithSystemPartsSchedule = settings.NeedWorkWithSystemPartsSchedule;
         selectionSettings.NeedWorkWithIfcPartsSchedule = settings.NeedWorkWithIfcPartsSchedule;
         selectionSettings.NeedWorkWithLegend = settings.NeedWorkWithLegend;
-        selectionSettings.NeedWorkWithGeneralRebarView = settings.NeedWorkWithGeneralRebarView;
-        selectionSettings.NeedWorkWithGeneralPerpendicularRebarView = settings.NeedWorkWithGeneralPerpendicularRebarView;
-        selectionSettings.NeedWorkWithSkeletonSchedule = settings.NeedWorkWithSkeletonSchedule;
-        selectionSettings.NeedWorkWithSkeletonByElemsSchedule = settings.NeedWorkWithSkeletonByElemsSchedule;
 
         projectSettings.ProjectSection = settings.ProjectSection;
         projectSettings.ProjectSectionTemp = settings.ProjectSection;
@@ -262,14 +267,19 @@ internal class PluginConfig : ProjectConfig<PluginSettings> {
         settings.NeedWorkWithTransverseViewFirst = selectionSettings.NeedWorkWithTransverseViewFirst;
         settings.NeedWorkWithTransverseViewSecond = selectionSettings.NeedWorkWithTransverseViewSecond;
         settings.NeedWorkWithTransverseViewThird = selectionSettings.NeedWorkWithTransverseViewThird;
+
+        settings.NeedWorkWithGeneralRebarView = selectionSettings.NeedWorkWithGeneralRebarView;
+        settings.NeedWorkWithGeneralPerpendicularRebarView = selectionSettings.NeedWorkWithGeneralPerpendicularRebarView;
+        settings.NeedWorkWithTransverseRebarViewFirst = selectionSettings.NeedWorkWithTransverseRebarViewFirst;
+        settings.NeedWorkWithTransverseRebarViewSecond = selectionSettings.NeedWorkWithTransverseRebarViewSecond;
+        settings.NeedWorkWithTransverseRebarViewThird = selectionSettings.NeedWorkWithTransverseRebarViewThird;
+
+        settings.NeedWorkWithSkeletonSchedule = selectionSettings.NeedWorkWithSkeletonSchedule;
+        settings.NeedWorkWithSkeletonByElemsSchedule = selectionSettings.NeedWorkWithSkeletonByElemsSchedule;
         settings.NeedWorkWithMaterialSchedule = selectionSettings.NeedWorkWithMaterialSchedule;
         settings.NeedWorkWithSystemPartsSchedule = selectionSettings.NeedWorkWithSystemPartsSchedule;
         settings.NeedWorkWithIfcPartsSchedule = selectionSettings.NeedWorkWithIfcPartsSchedule;
         settings.NeedWorkWithLegend = selectionSettings.NeedWorkWithLegend;
-        settings.NeedWorkWithGeneralRebarView = selectionSettings.NeedWorkWithGeneralRebarView;
-        settings.NeedWorkWithGeneralPerpendicularRebarView = selectionSettings.NeedWorkWithGeneralPerpendicularRebarView;
-        settings.NeedWorkWithSkeletonSchedule = selectionSettings.NeedWorkWithSkeletonSchedule;
-        settings.NeedWorkWithSkeletonByElemsSchedule = selectionSettings.NeedWorkWithSkeletonByElemsSchedule;
 
         settings.ProjectSection = projectSettings.ProjectSection;
         settings.Mark = projectSettings.Mark;
@@ -395,12 +405,16 @@ internal class PluginSettings : ProjectSettings {
     public bool NeedWorkWithTransverseViewFirst { get; set; }
     public bool NeedWorkWithTransverseViewSecond { get; set; }
     public bool NeedWorkWithTransverseViewThird { get; set; }
+    public bool NeedWorkWithGeneralRebarView { get; set; }
+    public bool NeedWorkWithGeneralPerpendicularRebarView { get; set; }
+    public bool NeedWorkWithTransverseRebarViewFirst { get; set; }
+    public bool NeedWorkWithTransverseRebarViewSecond { get; set; }
+    public bool NeedWorkWithTransverseRebarViewThird { get; set; }
+
     public bool NeedWorkWithMaterialSchedule { get; set; }
     public bool NeedWorkWithSystemPartsSchedule { get; set; }
     public bool NeedWorkWithIfcPartsSchedule { get; set; }
     public bool NeedWorkWithLegend { get; set; }
-    public bool NeedWorkWithGeneralRebarView { get; set; }
-    public bool NeedWorkWithGeneralPerpendicularRebarView { get; set; }
     public bool NeedWorkWithSkeletonSchedule { get; set; }
     public bool NeedWorkWithSkeletonByElemsSchedule { get; set; }
 

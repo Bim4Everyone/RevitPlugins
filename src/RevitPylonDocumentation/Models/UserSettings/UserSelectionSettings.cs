@@ -5,13 +5,16 @@ internal class UserSelectionSettings {
     public bool NeedWorkWithTransverseViewFirst { get; set; }
     public bool NeedWorkWithTransverseViewSecond { get; set; }
     public bool NeedWorkWithTransverseViewThird { get; set; }
+    public bool NeedWorkWithGeneralRebarView { get; set; }
+    public bool NeedWorkWithGeneralPerpendicularRebarView { get; set; }
+    public bool NeedWorkWithTransverseRebarViewFirst { get; set; }
+    public bool NeedWorkWithTransverseRebarViewSecond { get; set; }
+    public bool NeedWorkWithTransverseRebarViewThird { get; set; }
+    public bool NeedWorkWithSkeletonSchedule { get; set; }
+    public bool NeedWorkWithSkeletonByElemsSchedule { get; set; }
     public bool NeedWorkWithMaterialSchedule { get; set; }
     public bool NeedWorkWithSystemPartsSchedule { get; set; }
     public bool NeedWorkWithIfcPartsSchedule { get; set; }
     public bool NeedWorkWithLegend { get; set; }
-    public bool NeedWorkWithGeneralRebarView { get; set; }
-    public bool NeedWorkWithGeneralPerpendicularRebarView { get; set; }
-    public bool NeedWorkWithSkeletonSchedule { get; set; }
-    public bool NeedWorkWithSkeletonByElemsSchedule { get; set; }
     public string SelectedProjectSection { get; set; }
 }

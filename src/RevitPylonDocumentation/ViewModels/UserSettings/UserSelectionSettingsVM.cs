@@ -10,15 +10,18 @@ internal class UserSelectionSettingsVM : BaseViewModel {
     private bool _needWorkWithTransverseViewSecond = false;
     private bool _needWorkWithTransverseViewThird = false;
 
+    private bool _needWorkWithGeneralRebarView = false;
+    private bool _needWorkWithGeneralPerpendicularRebarView = false;
+    private bool _needWorkWithTransverseRebarViewFirst = false;
+    private bool _needWorkWithTransverseRebarViewSecond = false;
+    private bool _needWorkWithTransverseRebarViewThird = false;
+
+    private bool _needWorkWithSkeletonSchedule = false;
+    private bool _needWorkWithSkeletonByElemsSchedule = false;
     private bool _needWorkWithMaterialSchedule = false;
     private bool _needWorkWithSystemPartsSchedule = false;
     private bool _needWorkWithIfcPartsSchedule = false;
     private bool _needWorkWithLegend = false;
-
-    private bool _needWorkWithGeneralRebarView = false;
-    private bool _needWorkWithGeneralPerpendicularRebarView = false;
-    private bool _needWorkWithSkeletonSchedule = false;
-    private bool _needWorkWithSkeletonByElemsSchedule = false;
 
     private string _selectedProjectSection = string.Empty;
 
@@ -46,6 +49,41 @@ internal class UserSelectionSettingsVM : BaseViewModel {
         set => RaiseAndSetIfChanged(ref _needWorkWithTransverseViewThird, value);
     }
 
+    public bool NeedWorkWithGeneralRebarView {
+        get => _needWorkWithGeneralRebarView;
+        set => RaiseAndSetIfChanged(ref _needWorkWithGeneralRebarView, value);
+    }
+
+    public bool NeedWorkWithGeneralPerpendicularRebarView {
+        get => _needWorkWithGeneralPerpendicularRebarView;
+        set => RaiseAndSetIfChanged(ref _needWorkWithGeneralPerpendicularRebarView, value);
+    }
+
+    public bool NeedWorkWithTransverseRebarViewFirst {
+        get => _needWorkWithTransverseRebarViewFirst;
+        set => RaiseAndSetIfChanged(ref _needWorkWithTransverseRebarViewFirst, value);
+    }
+
+    public bool NeedWorkWithTransverseRebarViewSecond {
+        get => _needWorkWithTransverseRebarViewSecond;
+        set => RaiseAndSetIfChanged(ref _needWorkWithTransverseRebarViewSecond, value);
+    }
+
+    public bool NeedWorkWithTransverseRebarViewThird {
+        get => _needWorkWithTransverseRebarViewThird;
+        set => RaiseAndSetIfChanged(ref _needWorkWithTransverseRebarViewThird, value);
+    }
+
+    public bool NeedWorkWithSkeletonSchedule {
+        get => _needWorkWithSkeletonSchedule;
+        set => RaiseAndSetIfChanged(ref _needWorkWithSkeletonSchedule, value);
+    }
+
+    public bool NeedWorkWithSkeletonByElemsSchedule {
+        get => _needWorkWithSkeletonByElemsSchedule;
+        set => RaiseAndSetIfChanged(ref _needWorkWithSkeletonByElemsSchedule, value);
+    }
+
     public bool NeedWorkWithMaterialSchedule {
         get => _needWorkWithMaterialSchedule;
         set => RaiseAndSetIfChanged(ref _needWorkWithMaterialSchedule, value);
@@ -66,25 +104,6 @@ internal class UserSelectionSettingsVM : BaseViewModel {
         set => RaiseAndSetIfChanged(ref _needWorkWithLegend, value);
     }
 
-    public bool NeedWorkWithGeneralRebarView {
-        get => _needWorkWithGeneralRebarView;
-        set => RaiseAndSetIfChanged(ref _needWorkWithGeneralRebarView, value);
-    }
-
-    public bool NeedWorkWithGeneralPerpendicularRebarView {
-        get => _needWorkWithGeneralPerpendicularRebarView;
-        set => RaiseAndSetIfChanged(ref _needWorkWithGeneralPerpendicularRebarView, value);
-    }
-
-    public bool NeedWorkWithSkeletonSchedule {
-        get => _needWorkWithSkeletonSchedule;
-        set => RaiseAndSetIfChanged(ref _needWorkWithSkeletonSchedule, value);
-    }
-
-    public bool NeedWorkWithSkeletonByElemsSchedule {
-        get => _needWorkWithSkeletonByElemsSchedule;
-        set => RaiseAndSetIfChanged(ref _needWorkWithSkeletonByElemsSchedule, value);
-    }
 
     /// <summary>
     /// Выбранный пользователем комплект документации

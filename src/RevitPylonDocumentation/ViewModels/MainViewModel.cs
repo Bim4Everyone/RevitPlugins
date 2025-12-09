@@ -827,14 +827,18 @@ internal class MainViewModel : BaseViewModel {
         SelectionSettings.NeedWorkWithTransverseViewFirst = true;
         SelectionSettings.NeedWorkWithTransverseViewSecond = true;
         SelectionSettings.NeedWorkWithTransverseViewThird = true;
+        SelectionSettings.NeedWorkWithGeneralRebarView = true;
+        SelectionSettings.NeedWorkWithGeneralPerpendicularRebarView = true;
+        SelectionSettings.NeedWorkWithTransverseRebarViewFirst = true;
+        SelectionSettings.NeedWorkWithTransverseRebarViewSecond = true;
+        SelectionSettings.NeedWorkWithTransverseRebarViewThird = true;
+
+        SelectionSettings.NeedWorkWithSkeletonSchedule = true;
+        SelectionSettings.NeedWorkWithSkeletonByElemsSchedule = true;
         SelectionSettings.NeedWorkWithMaterialSchedule = true;
         SelectionSettings.NeedWorkWithSystemPartsSchedule = true;
         SelectionSettings.NeedWorkWithIfcPartsSchedule = true;
         SelectionSettings.NeedWorkWithLegend = true;
-        SelectionSettings.NeedWorkWithGeneralRebarView = true;
-        SelectionSettings.NeedWorkWithGeneralPerpendicularRebarView = true;
-        SelectionSettings.NeedWorkWithSkeletonSchedule = true;
-        SelectionSettings.NeedWorkWithSkeletonByElemsSchedule = true;
     }
 
 
@@ -848,12 +852,16 @@ internal class MainViewModel : BaseViewModel {
         SelectionSettings.NeedWorkWithTransverseViewFirst = false;
         SelectionSettings.NeedWorkWithTransverseViewSecond = false;
         SelectionSettings.NeedWorkWithTransverseViewThird = false;
+        SelectionSettings.NeedWorkWithGeneralRebarView = false;
+        SelectionSettings.NeedWorkWithGeneralPerpendicularRebarView = false;
+        SelectionSettings.NeedWorkWithTransverseRebarViewFirst = false;
+        SelectionSettings.NeedWorkWithTransverseRebarViewSecond = false;
+        SelectionSettings.NeedWorkWithTransverseRebarViewThird = false;
+
         SelectionSettings.NeedWorkWithMaterialSchedule = false;
         SelectionSettings.NeedWorkWithSystemPartsSchedule = false;
         SelectionSettings.NeedWorkWithIfcPartsSchedule = false;
         SelectionSettings.NeedWorkWithLegend = false;
-        SelectionSettings.NeedWorkWithGeneralRebarView = false;
-        SelectionSettings.NeedWorkWithGeneralPerpendicularRebarView = false;
         SelectionSettings.NeedWorkWithSkeletonSchedule = false;
         SelectionSettings.NeedWorkWithSkeletonByElemsSchedule = false;
     }
@@ -869,13 +877,17 @@ internal class MainViewModel : BaseViewModel {
         SelectionSettings.NeedWorkWithTransverseViewFirst = !SelectionSettings.NeedWorkWithTransverseViewFirst;
         SelectionSettings.NeedWorkWithTransverseViewSecond = !SelectionSettings.NeedWorkWithTransverseViewSecond;
         SelectionSettings.NeedWorkWithTransverseViewThird = !SelectionSettings.NeedWorkWithTransverseViewThird;
+        SelectionSettings.NeedWorkWithGeneralRebarView = !SelectionSettings.NeedWorkWithGeneralRebarView;
+        SelectionSettings.NeedWorkWithGeneralPerpendicularRebarView = !SelectionSettings.NeedWorkWithGeneralPerpendicularRebarView;
+        SelectionSettings.NeedWorkWithTransverseRebarViewFirst = !SelectionSettings.NeedWorkWithTransverseRebarViewFirst;
+        SelectionSettings.NeedWorkWithTransverseRebarViewSecond = !SelectionSettings.NeedWorkWithTransverseRebarViewSecond;
+        SelectionSettings.NeedWorkWithTransverseRebarViewThird = !SelectionSettings.NeedWorkWithTransverseRebarViewThird;
+
+        SelectionSettings.NeedWorkWithSkeletonSchedule = !SelectionSettings.NeedWorkWithSkeletonSchedule;
+        SelectionSettings.NeedWorkWithSkeletonByElemsSchedule = !SelectionSettings.NeedWorkWithSkeletonByElemsSchedule;
         SelectionSettings.NeedWorkWithMaterialSchedule = !SelectionSettings.NeedWorkWithMaterialSchedule;
         SelectionSettings.NeedWorkWithSystemPartsSchedule = !SelectionSettings.NeedWorkWithSystemPartsSchedule;
         SelectionSettings.NeedWorkWithIfcPartsSchedule = !SelectionSettings.NeedWorkWithIfcPartsSchedule;
         SelectionSettings.NeedWorkWithLegend = !SelectionSettings.NeedWorkWithLegend;
-        SelectionSettings.NeedWorkWithGeneralRebarView = !SelectionSettings.NeedWorkWithGeneralRebarView;
-        SelectionSettings.NeedWorkWithGeneralPerpendicularRebarView = !SelectionSettings.NeedWorkWithGeneralPerpendicularRebarView;
-        SelectionSettings.NeedWorkWithSkeletonSchedule = !SelectionSettings.NeedWorkWithSkeletonSchedule;
-        SelectionSettings.NeedWorkWithSkeletonByElemsSchedule = !SelectionSettings.NeedWorkWithSkeletonByElemsSchedule;
     }
 }
