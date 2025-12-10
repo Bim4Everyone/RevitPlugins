@@ -19,7 +19,6 @@ namespace RevitRooms.ViewModels;
 internal class RoomNumsViewModel : BaseViewModel {
     private readonly RoomsNumsConfig _roomsNumsConfig;
     private readonly NumOrderWindowService _numberingWindowService;
-    private readonly CheckProjectParams _checkProjectParams;
     private readonly RevitRepository _revitRepository;
     private readonly IMessageBoxService _messageBoxService;
     private readonly ILocalizationService _localizationService;
@@ -33,10 +32,8 @@ internal class RoomNumsViewModel : BaseViewModel {
                              ILocalizationService localizationService,
                              IMessageBoxService messageBoxService,
                              RoomsNumsWindow window,
-                             CheckProjectParams checkProjectParams,
                              NumOrderWindowService numberingWindowService) {
         _numberingWindowService = numberingWindowService;
-        _checkProjectParams = checkProjectParams;
         _roomsNumsConfig = roomsNumsConfig;
         _revitRepository = revitRepository;
         _localizationService = localizationService;
@@ -62,16 +59,6 @@ internal class RoomNumsViewModel : BaseViewModel {
     public string ApartmentNumberParamName => SharedParamsConfig.Instance.ApartmentNumber.Name;
 
     private void LoadView() {
-        bool isChecked = _checkProjectParams
-            .CopyProjectParams()
-            .CopyKeySchedules()
-            .CheckKeySchedules()
-            .GetIsChecked();
-
-        if(!isChecked) {
-            throw new OperationCanceledException();
-        }
-
         RoomsNumsViewModels = [
             new ViewRevitViewModel(_revitRepository, _roomsNumsConfig, _messageBoxService, 
                                    _localizationService, _numberingWindowService) { 

@@ -21,7 +21,6 @@ internal class RoomsViewModel : BaseViewModel {
     private readonly ILocalizationService _localizationService;
     private readonly IMessageBoxService _messageBoxService;
     private readonly ErrorWindowService _errorWindowService;
-    private readonly CheckProjectParams _checkProjectParams;
 
     private ObservableCollection<RevitRoomsViewModel> _revitViewModels;
     private RevitRoomsViewModel _revitViewModel;
@@ -30,14 +29,12 @@ internal class RoomsViewModel : BaseViewModel {
                           RevitRepository revitRepository,
                           ILocalizationService localizationService,
                           IMessageBoxService messageBoxService,
-                          CheckProjectParams checkProjectParams,
                           ErrorWindowService errorWindowService) {
         _roomsConfig = roomsConfig;
         _revitRepository = revitRepository;
         _localizationService = localizationService;
         _messageBoxService = messageBoxService;
         _errorWindowService = errorWindowService;
-        _checkProjectParams = checkProjectParams;
 
         LoadViewCommand = RelayCommand.Create(LoadView);
     }
@@ -57,16 +54,6 @@ internal class RoomsViewModel : BaseViewModel {
     public string LevelParamName => SharedParamsConfig.Instance.Level.Name;
 
     private void LoadView() {
-        bool isChecked = _checkProjectParams
-            .CopyProjectParams()
-            .CopyKeySchedules()
-            .CheckKeySchedules()
-            .GetIsChecked();
-
-        if(!isChecked) {
-            throw new OperationCanceledException();
-        }
-
         RevitViewModels = [
             new ViewRevitViewModel(_revitRepository, _roomsConfig, _messageBoxService, 
                                    _localizationService, _errorWindowService) {

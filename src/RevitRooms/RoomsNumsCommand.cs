@@ -62,7 +62,17 @@ public class RoomsNumsCommand : BasePluginCommand {
             $"/{assemblyName};component/assets/localization/language.xaml",
             CultureInfo.GetCultureInfo("ru-RU"));
 
-        // Вызывает стандартное уведомление
+        var checkProjectParams = kernel.Get<CheckProjectParams>();
+        bool isChecked = checkProjectParams
+            .CopyProjectParams()
+            .CopyKeySchedules()
+            .CheckKeySchedules()
+            .GetIsChecked();
+
+        if(!isChecked) {
+            Notification(false);
+        }
+
         Notification(kernel.Get<RoomsNumsWindow>());
     }
 }
