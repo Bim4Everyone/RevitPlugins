@@ -65,9 +65,11 @@
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="*" />
                         <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="*" />
                     </Grid.ColumnDefinitions>
 
                     <CheckBox
+                        x:Name="OverrideColorCheckBox"
                         Grid.Column="0"
                         HorizontalAlignment="Right"
                         FlowDirection="RightToLeft"
@@ -81,6 +83,16 @@
 
                     <CheckBox
                         Grid.Column="1"
+                        Content="{me:LocalizationSource MainWindow.OverrideLines}"
+                        IsChecked="{Binding OverrideLines}"
+                        ToolTip="{me:LocalizationSource MainWindow.OverrideLinesToolTip}"
+                        IsEnabled="{Binding ElementName=OverrideColorCheckBox, Path=IsChecked}"
+                        ToolTipService.InitialShowDelay="1000"
+                        ToolTipService.ShowDuration="20000"
+                        ToolTipService.BetweenShowDelay="1" />
+
+                    <CheckBox
+                        Grid.Column="2"
                         Content="{me:LocalizationSource MainWindow.OverrideHatching}"
                         IsChecked="{Binding OverrideByPattern}"
                         ToolTip="{me:LocalizationSource MainWindow.OverrideHatchingToolTip}"
