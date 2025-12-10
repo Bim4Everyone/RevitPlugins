@@ -108,9 +108,9 @@ internal class CheckResultViewModel : BaseViewModel {
     }
 
     private void SetGrouping(CollectionViewSource elementResults) {
-        ElementResults.GroupDescriptions.Clear();
+        elementResults.GroupDescriptions.Clear();
         foreach(var p in GetGroupDescriptions()) {
-            ElementResults.GroupDescriptions.Add(p);
+            elementResults.GroupDescriptions.Add(p);
         }
     }
 
