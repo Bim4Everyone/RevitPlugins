@@ -85,12 +85,12 @@ internal class CheckResultViewModel : BaseViewModel {
         }
 
         if(e.Item is ElementResultViewModel result) {
-            e.Accepted = result.FileName.IndexOf(filter, StringComparison.OrdinalIgnoreCase) >= 0
-                         || result.FamilyTypeName.IndexOf(filter, StringComparison.OrdinalIgnoreCase) >= 0
-                         || result.RuleName.IndexOf(filter, StringComparison.OrdinalIgnoreCase) >= 0
-                         || result.Status.IndexOf(filter, StringComparison.OrdinalIgnoreCase) >= 0
-                         || result.Error.IndexOf(filter, StringComparison.OrdinalIgnoreCase) >= 0
-                         || result.UserMark.IndexOf(filter, StringComparison.OrdinalIgnoreCase) >= 0;
+            e.Accepted = result.FileName?.IndexOf(filter, StringComparison.OrdinalIgnoreCase) >= 0
+                         || result.FamilyTypeName?.IndexOf(filter, StringComparison.OrdinalIgnoreCase) >= 0
+                         || result.RuleName?.IndexOf(filter, StringComparison.OrdinalIgnoreCase) >= 0
+                         || result.Status?.IndexOf(filter, StringComparison.OrdinalIgnoreCase) >= 0
+                         || result.Error?.IndexOf(filter, StringComparison.OrdinalIgnoreCase) >= 0
+                         || result.UserMark?.IndexOf(filter, StringComparison.OrdinalIgnoreCase) >= 0;
         }
     }
 
