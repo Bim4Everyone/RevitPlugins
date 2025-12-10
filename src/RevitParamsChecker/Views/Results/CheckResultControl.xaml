@@ -56,6 +56,7 @@
                 CanUserAddRows="False"
                 CanUserDeleteRows="False"
                 CanUserReorderColumns="False"
+                CanUserSortColumns="False"
                 GridLinesVisibility="All"
                 IsReadOnly="True"
                 RowHeight="26"
@@ -68,6 +69,12 @@
                     </GroupStyle>
                 </DataGrid.GroupStyle>
                 <ui:DataGrid.Columns>
+                    <DataGridTextColumn
+                        Width="Auto"
+                        Header="#"
+                        Binding="{Binding ItemNumber}">
+
+                    </DataGridTextColumn>
                     <DataGridTemplateColumn
                         Width="Auto"
                         CanUserResize="False">
@@ -86,7 +93,7 @@
 
                     <DataGridTextColumn
                         MinWidth="50"
-                        Width="*"
+                        Width="Auto"
                         Binding="{Binding FileName}">
                         <DataGridTextColumn.Header>
                             <ui:TextBlock
@@ -96,7 +103,7 @@
 
                     <DataGridTextColumn
                         MinWidth="50"
-                        Width="*"
+                        Width="Auto"
                         Binding="{Binding FamilyTypeName}">
                         <DataGridTextColumn.Header>
                             <ui:TextBlock
@@ -106,7 +113,7 @@
 
                     <DataGridTextColumn
                         MinWidth="50"
-                        Width="*"
+                        Width="Auto"
                         Binding="{Binding RuleName}">
                         <DataGridTextColumn.Header>
                             <ui:TextBlock
@@ -116,7 +123,7 @@
 
                     <DataGridTextColumn
                         MinWidth="50"
-                        Width="*"
+                        Width="Auto"
                         Binding="{Binding Status}">
                         <DataGridTextColumn.Header>
                             <ui:TextBlock

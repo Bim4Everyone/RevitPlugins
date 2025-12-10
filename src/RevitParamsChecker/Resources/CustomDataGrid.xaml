@@ -23,7 +23,16 @@
             Property="VirtualizingPanel.VirtualizationMode"
             Value="Recycling" />
         <Setter
-            Property="VirtualizingPanel.IsVirtualizing"
+            Property="VirtualizingStackPanel.IsVirtualizing"
+            Value="True" />
+        <Setter
+            Property="EnableRowVirtualization"
+            Value="True" />
+        <Setter
+            Property="VirtualizingStackPanel.IsVirtualizingWhenGrouping"
+            Value="True" />
+        <Setter
+            Property="VirtualizingStackPanel.IsContainerVirtualizable"
             Value="True" />
         <Setter
             Property="CanUserResizeColumns"
@@ -277,6 +286,40 @@
         <Setter
             Property="ToolTip"
             Value="{Binding RelativeSource={RelativeSource Self}, Path=Content.Text}">
+        </Setter>
+    </Style>
+    <Style
+        x:Key="CustomGroupHeaderStyle"
+        TargetType="{x:Type GroupItem}">
+        <Setter
+            Property="Template">
+            <Setter.Value>
+                <ControlTemplate
+                    TargetType="{x:Type GroupItem}">
+                    <ui:CardExpander
+                        IsExpanded="False">
+                        <ui:CardExpander.Header>
+                            <DockPanel
+                                Margin="0 0 14 0"
+                                HorizontalAlignment="Stretch">
+                                <TextBlock
+                                    Text="{Binding Path=Name}" />
+                                <DockPanel
+                                    HorizontalAlignment="Right">
+                                    <TextBlock
+                                        Text="{Binding Path=ItemCount}" />
+                                </DockPanel>
+                            </DockPanel>
+                        </ui:CardExpander.Header>
+                        <ui:CardExpander.Content>
+                            <ItemsPresenter
+                                VirtualizingPanel.IsContainerVirtualizable="True"
+                                VirtualizingPanel.IsVirtualizingWhenGrouping="True"
+                                VirtualizingPanel.IsVirtualizing="True" />
+                        </ui:CardExpander.Content>
+                    </ui:CardExpander>
+                </ControlTemplate>
+            </Setter.Value>
         </Setter>
     </Style>
 </ResourceDictionary>

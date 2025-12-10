@@ -31,16 +31,8 @@ internal class CheckResultViewModel : BaseViewModel {
         _revitRepo = revitRepo ?? throw new ArgumentNullException(nameof(revitRepo));
         CheckResult = checkResult ?? throw new ArgumentNullException(nameof(checkResult));
         Name = CheckResult.CheckCopy.Name;
-        RulesStamp = new ReadOnlyCollection<RuleViewModel>(
-            CheckResult.RuleResults
-                .Select(r => new RuleViewModel(r.RuleCopy, _localization))
-                .ToArray()
-        );
-        _allElementResults = [
-            ..CheckResult.RuleResults.SelectMany(res => res.ElementResults)
-                .Select(e => new ElementResultViewModel(_localization, e))
-                .ToArray()
-        ];
+        RulesStamp = GetRulesStamp(CheckResult, _localization);
+        _allElementResults = GetElementResults(CheckResult, _localization);
         ElementResults = new CollectionViewSource() { Source = _allElementResults };
         ElementResults.Filter += ElementResultsFilterHandler;
         SelectElementsCommand = RelayCommand.Create<IList>(SelectElements, CanSelectElements);
@@ -48,9 +40,9 @@ internal class CheckResultViewModel : BaseViewModel {
             300,
             () => Dispatcher.CurrentDispatcher.BeginInvoke(
                 DispatcherPriority.Background,
-                () => ElementResults?.View.Refresh())
+                () => ElementResults.View.Refresh())
         );
-
+        SetGrouping(ElementResults);
         PropertyChanged += ElementsFilterPropertyChanged;
     }
 
@@ -99,5 +91,57 @@ internal class CheckResultViewModel : BaseViewModel {
                          || result.Status.IndexOf(filter, StringComparison.OrdinalIgnoreCase) >= 0
                          || result.Error.IndexOf(filter, StringComparison.OrdinalIgnoreCase) >= 0;
         }
+    }
+
+    private PropertyGroupDescription[] GetGroupDescriptions() {
+        return [
+            new PropertyGroupDescription(
+                nameof(ElementResultViewModel.ChunkName)),
+            new PropertyGroupDescription(
+                nameof(ElementResultViewModel.Status)),
+            new PropertyGroupDescription(
+                nameof(ElementResultViewModel.FileName)),
+            new PropertyGroupDescription(
+                nameof(ElementResultViewModel.RuleName))
+        ];
+    }
+
+    private void SetGrouping(CollectionViewSource elementResults) {
+        ElementResults.GroupDescriptions.Clear();
+        foreach(var p in GetGroupDescriptions()) {
+            ElementResults.GroupDescriptions.Add(p);
+        }
+    }
+
+    private ObservableCollection<ElementResultViewModel> GetElementResults(
+        CheckResult checkResult,
+        ILocalizationService localization) {
+        ElementResultViewModel[] elements = checkResult.RuleResults
+            .SelectMany(res => res.ElementResults)
+            .Select(e => new ElementResultViewModel(localization, e))
+            .OrderBy(e => e.ElementResult.Status)
+            .ThenBy(e => e.FileName)
+            .ThenBy(e => e.RuleName)
+            .ThenBy(e => e.FamilyTypeName)
+            .ToArray();
+        const int chunkSize = 1000;
+        for(int i = 0; i < elements.Length; i++) {
+            int groupStart = (i / chunkSize) * chunkSize + 1;
+            int groupEnd = Math.Min(groupStart + chunkSize - 1, elements.Length);
+            elements[i].ItemNumber = i + 1;
+            elements[i].ChunkName = $"[{groupStart}...{groupEnd}]";
+        }
+
+        return new ObservableCollection<ElementResultViewModel>(elements);
+    }
+
+    private ReadOnlyCollection<RuleViewModel> GetRulesStamp(
+        CheckResult checkResult,
+        ILocalizationService localization) {
+        return new ReadOnlyCollection<RuleViewModel>(
+            checkResult.RuleResults
+                .Select(r => new RuleViewModel(r.RuleCopy, localization))
+                .ToArray()
+        );
     }
 }
