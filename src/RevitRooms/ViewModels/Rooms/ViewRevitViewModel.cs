@@ -29,6 +29,6 @@ internal class ViewRevitViewModel : RevitRoomsViewModel {
             .Where(item => item.Level != null)
             .GroupBy(item => item.Level.Name.Split('_').FirstOrDefault())
             .Select(item =>
-                new LevelViewModel(item.Key, item.Select(room => room.Level).ToList(), _revitRepository, item));
+                new LevelViewModel(item.Key, item.Select(room => room.Level).ToList(), _revitRepository, item, _pluginSettings));
     }
 }

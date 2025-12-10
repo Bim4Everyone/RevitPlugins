@@ -27,6 +27,7 @@ internal abstract class RevitRoomsViewModel : BaseViewModel {
     protected readonly IMessageBoxService _messageBoxService;
     protected readonly ILocalizationService _localizationService;
     protected readonly ErrorWindowService _errorWindowService;
+    protected readonly PluginSettings _pluginSettings;
 
     private string _errorText;
     private bool _isAllowSelectLevels;
@@ -42,6 +43,7 @@ internal abstract class RevitRoomsViewModel : BaseViewModel {
         _messageBoxService = messageBoxService;
         _localizationService = localizationService;
         _errorWindowService = errorWindowService;
+        _pluginSettings = _roomsConfig.PluginSettings;
 
         Levels = [.. GetLevelViewModels()
             .OrderBy(item => item.Element.Elevation)
@@ -273,6 +275,8 @@ internal abstract class RevitRoomsViewModel : BaseViewModel {
 
     private bool CheckElements(List<PhaseViewModel> phases, IEnumerable<LevelViewModel> levels) {
         var errorElements = new Dictionary<string, WarningViewModel>();
+        string phaseName = _roomsConfig.PluginSettings.PhaseRoomsPartition;
+
         foreach(var level in levels) {
             var rooms = level.GetRooms(phases);
 
@@ -305,7 +309,7 @@ internal abstract class RevitRoomsViewModel : BaseViewModel {
             // Все помещения у которых
             // не совпадают значения группы и типа группы
             var checksRooms = rooms.Where(room => room.RoomGroup != null && room.RoomSection != null)
-                .Where(room => room.Phase == Phase || room.PhaseName.Equals("Межквартирные перегородки",
+                .Where(room => room.Phase == Phase || room.PhaseName.Equals(phaseName,
                     StringComparison.CurrentCultureIgnoreCase))
                 .Where(ContainGroups);
 
@@ -331,7 +335,7 @@ internal abstract class RevitRoomsViewModel : BaseViewModel {
 
         var checkPhases = new List<PhaseViewModel>() { Phase };
         var customPhase = phases.FirstOrDefault(item =>
-            item.PhaseName?.Equals("Межквартирные перегородки", StringComparison.CurrentCultureIgnoreCase) == true);
+            item.PhaseName?.Equals(phaseName, StringComparison.CurrentCultureIgnoreCase) == true);
         if(customPhase != null) {
             checkPhases.Add(customPhase);
         }
@@ -516,12 +520,23 @@ internal abstract class RevitRoomsViewModel : BaseViewModel {
         }
 
         if(IsSpotCalcArea) {
-            yield return new ApartmentFullAreaCalculation(GetRoomAccuracy(), RoundAccuracy) { Phase = Phase.Element };
+            string phaseName = _roomsConfig.PluginSettings.PhaseRoomsPartition;
+            yield return new ApartmentFullAreaCalculation(GetRoomAccuracy(), RoundAccuracy, phaseName) { Phase = Phase.Element };
         }
     }
 
     private IEnumerable<SpatialElementViewModel> GetAreas() {
         return Levels.Where(item => item.IsSelected).SelectMany(item => item.GetAreas());
+    }
+
+    private bool ContainGroups(SpatialElementViewModel item) {
+        return new[] {
+            _pluginSettings.ApartmentName,
+            _pluginSettings.RoomsName,
+            _pluginSettings.HotelRoom,
+            _pluginSettings.Penthouse 
+        }
+        .Any(group => Contains(item.RoomGroup.Name, group, StringComparison.CurrentCultureIgnoreCase));
     }
 
     private static bool IsNotEqualGroupType(IEnumerable<SpatialElementViewModel> rooms) {
@@ -534,11 +549,6 @@ internal abstract class RevitRoomsViewModel : BaseViewModel {
         return rooms
             .Select(group => group.RoomMultilevelGroup)
             .Distinct().Count() > 1;
-    }
-
-    private static bool ContainGroups(SpatialElementViewModel item) {
-        return new[] { "апартаменты", "квартира", "гостиничный номер", "пентхаус" }
-            .Any(group => Contains(item.RoomGroup.Name, group, StringComparison.CurrentCultureIgnoreCase));
     }
 
     private static bool Contains(string source, string toCheck, StringComparison comp) {

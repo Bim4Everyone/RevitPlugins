@@ -6,8 +6,14 @@ using RevitRooms.Models;
 
 namespace RevitRooms.ViewModels;
 internal class FamilyInstanceViewModel : ElementViewModel<FamilyInstance> {
-    public FamilyInstanceViewModel(FamilyInstance familyInstance, PhaseViewModel phase, RevitRepository revitRepository) :
-        base(familyInstance, revitRepository) {
+    private readonly PluginSettings _pluginSettings;
+
+    public FamilyInstanceViewModel(FamilyInstance familyInstance, 
+                                   PhaseViewModel phase, 
+                                   RevitRepository revitRepository,
+                                   PluginSettings pluginSettings) :
+            base(familyInstance, revitRepository) {
+        _pluginSettings = pluginSettings;
 
         Phase = phase;
         try {
@@ -45,8 +51,8 @@ internal class FamilyInstanceViewModel : ElementViewModel<FamilyInstance> {
                 return true;
             }
 
-            if(ToRoom.RoomGroup?.Name.IndexOf("квартира", StringComparison.CurrentCultureIgnoreCase) < 0
-                || FromRoom.RoomGroup?.Name.IndexOf("квартира", StringComparison.CurrentCultureIgnoreCase) < 0) {
+            if(ToRoom.RoomGroup?.Name.IndexOf(_pluginSettings.RoomsName, StringComparison.CurrentCultureIgnoreCase) < 0
+                || FromRoom.RoomGroup?.Name.IndexOf(_pluginSettings.RoomsName, StringComparison.CurrentCultureIgnoreCase) < 0) {
                 return true;
             }
 

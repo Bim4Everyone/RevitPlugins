@@ -25,6 +25,7 @@ internal abstract class RevitRoomNumsViewModel : BaseViewModel, INumberingOrder 
     protected readonly RoomsNumsConfig _roomsNumsConfig;
     protected readonly IMessageBoxService _messageBoxService;
     protected readonly ILocalizationService _localizationService;
+    protected readonly PluginSettings _pluginSettings;
 
     private string _errorText;
     private string _prefix;
@@ -56,6 +57,7 @@ internal abstract class RevitRoomNumsViewModel : BaseViewModel, INumberingOrder 
         _roomsNumsConfig = roomsNumsConfig;
         _messageBoxService = messageBoxService;
         _localizationService = localizationService;
+        _pluginSettings = _roomsNumsConfig.PluginSettings;
 
         var additionalPhases = _revitRepository.GetAdditionalPhases()
             .Select(item => new PhaseViewModel(item, _revitRepository))
@@ -200,7 +202,7 @@ internal abstract class RevitRoomNumsViewModel : BaseViewModel, INumberingOrder 
             .GroupBy(item => item.Name.Split('_').FirstOrDefault())
             .Select(item =>
                 new LevelViewModel(item.Key, item.ToList(), _revitRepository,
-                    SpatialElements.Select(room => room.Element)))
+                    SpatialElements.Select(room => room.Element), _pluginSettings))
             .Distinct()
             .OrderBy(item => item.Element.Elevation);
     }

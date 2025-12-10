@@ -9,10 +9,12 @@ using RevitRooms.Models;
 namespace RevitRooms.ViewModels;
 internal sealed class RoomSeparatorViewModel : ElementViewModel<CurveElement> {
     private readonly List<SpatialElementViewModel> _rooms = [];
+    private readonly PluginSettings _pluginSettings;
 
-    public RoomSeparatorViewModel(CurveElement element, PhaseViewModel phase, RevitRepository revitRepository)
+    public RoomSeparatorViewModel(CurveElement element, PhaseViewModel phase, RevitRepository revitRepository, PluginSettings pluginSettings)
         : base(element, revitRepository) {
         Phase = phase;
+        _pluginSettings = pluginSettings;
     }
 
     public PhaseViewModel Phase { get; }
@@ -56,7 +58,7 @@ internal sealed class RoomSeparatorViewModel : ElementViewModel<CurveElement> {
 
             return _rooms
                 .Where(item =>
-                    item.RoomGroup?.Name.IndexOf("квартира", StringComparison.CurrentCultureIgnoreCase) >= 0)
+                    item.RoomGroup?.Name.IndexOf(_pluginSettings.RoomsName, StringComparison.CurrentCultureIgnoreCase) >= 0)
                 .Select(item => item.RoomGroup?.Id)
                 .Distinct()
                 .Count() <= 1; // может не быть квартир и будет значение 0

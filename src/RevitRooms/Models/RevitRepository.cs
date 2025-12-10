@@ -16,10 +16,14 @@ using dosymep.SimpleServices;
 namespace RevitRooms.Models;
 internal class RevitRepository {
     private readonly ILocalizationService _localizationService;
+    private readonly RoomsConfig _roomsConfig;
     private readonly ElementFilter _filter;
 
-    public RevitRepository(UIApplication uiApplication, ILocalizationService localizationService) {
+    public RevitRepository(UIApplication uiApplication, 
+                           RoomsConfig roomsConfig, 
+                           ILocalizationService localizationService) {
         UIApplication = uiApplication;
+        _roomsConfig = roomsConfig;
         _localizationService = localizationService;
         _filter = new ElementMulticategoryFilter(new[] { BuiltInCategory.OST_Rooms, BuiltInCategory.OST_Areas });
     }
@@ -73,10 +77,14 @@ internal class RevitRepository {
     }
 
     public IList<Phase> GetAdditionalPhases() {
+        var settings = _roomsConfig.PluginSettings;
+        string phaseRoomsPartition = settings.PhaseRoomsPartition;
+        string phaseBuildingContour = settings.PhaseBuildingContour;
+
         return new FilteredElementCollector(Document)
             .WhereElementIsNotElementType()
             .OfClass(typeof(Phase))
-            .Where(item => item.Name.Equals("Контур здания") || item.Name.Equals("Межквартирные перегородки"))
+            .Where(item => item.Name.Equals(phaseBuildingContour) || item.Name.Equals(phaseRoomsPartition))
             .OfType<Phase>()
             .ToList();
     }
@@ -128,22 +136,31 @@ internal class RevitRepository {
             .Select(item => (item.Id, GetLevelName(item)))
             .ToArray();
 
+        var settings = _roomsConfig.PluginSettings;
+        string levelRoofPrefix = settings.LevelRoofPrefix;
+        string levelRoof = settings.LevelRoof;
+        string levelTechPrefix = settings.LevelTechPrefix;
+        string levelTech = settings.LevelTech;
+        string levelUndergroundPrefix = settings.LevelUndergroundPrefix;
+        string levelUnderground = settings.LevelUnderground;
+
         bool isOneUnderLevel = levelPairs
-            .Where(item => item.LevelName.StartsWith("П", StringComparison.CurrentCultureIgnoreCase))
+            .Where(item => item.LevelName
+            .StartsWith(levelUndergroundPrefix, StringComparison.CurrentCultureIgnoreCase))
             .GroupBy(item => item.LevelName)
             .Count() == 1;
 
         var levelNames = new Dictionary<ElementId, string>();
         foreach((var elementId, string levelName) in levelPairs) {
-            if(levelName.StartsWith("К", StringComparison.CurrentCultureIgnoreCase)) {
-                levelNames.Add(elementId, "Кровля");
-            } else if(levelName.StartsWith("Т", StringComparison.CurrentCultureIgnoreCase)) {
-                levelNames.Add(elementId, "Технический");
-            } else if(levelName.StartsWith("П", StringComparison.CurrentCultureIgnoreCase)) {
+            if(levelName.StartsWith(levelRoofPrefix, StringComparison.CurrentCultureIgnoreCase)) {
+                levelNames.Add(elementId, levelRoof);
+            } else if(levelName.StartsWith(levelTechPrefix, StringComparison.CurrentCultureIgnoreCase)) {
+                levelNames.Add(elementId, levelTech);
+            } else if(levelName.StartsWith(levelUndergroundPrefix, StringComparison.CurrentCultureIgnoreCase)) {
                 if(isOneUnderLevel) {
-                    levelNames.Add(elementId, "Подземный");
+                    levelNames.Add(elementId, levelUnderground);
                 } else if(int.TryParse(levelName.Substring(1), out int index)) {
-                    levelNames.Add(elementId, $"Подземный -{index}");
+                    levelNames.Add(elementId, $"{levelUnderground} -{index}");
                 }
             } else if(Regex.IsMatch(levelName, "[0-9]+")) {
                 if(int.TryParse(levelName, out int index)) {

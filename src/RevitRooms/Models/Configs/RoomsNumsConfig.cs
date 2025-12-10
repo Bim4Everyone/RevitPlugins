@@ -11,6 +11,15 @@ using pyRevitLabs.Json;
 
 namespace RevitRooms.Models;
 public class RoomsNumsConfig : ProjectConfig<RoomsNumsSettings> {
+    private readonly PluginSettings _pluginSettings;
+
+    public RoomsNumsConfig() {
+        _pluginSettings = new PluginSettings();        
+    }
+
+    [JsonIgnore]
+    public PluginSettings PluginSettings => _pluginSettings;
+
     [JsonIgnore]
     public override string ProjectConfigPath { get; set; }
 
