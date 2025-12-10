@@ -90,10 +90,10 @@
                 AutoGenerateColumns="False"
                 CanUserAddRows="False"
                 CanUserDeleteRows="False"
-                CanUserReorderColumns="False"
+                CanUserReorderColumns="True"
                 CanUserSortColumns="False"
                 GridLinesVisibility="All"
-                IsReadOnly="True"
+                IsReadOnly="False"
                 RowHeight="26"
                 CellStyle="{StaticResource CustomTooltipDataGridCell}"
                 Style="{StaticResource CustomResizableDataGridStyle}"
@@ -107,11 +107,14 @@
                     <DataGridTextColumn
                         Width="Auto"
                         Header="#"
+                        IsReadOnly="True"
+                        CanUserReorder="False"
                         Binding="{Binding ItemNumber}">
 
                     </DataGridTextColumn>
                     <DataGridTemplateColumn
                         Width="Auto"
+                        CanUserReorder="False"
                         CanUserResize="False">
                         <DataGridTemplateColumn.CellTemplate>
                             <DataTemplate>
@@ -128,6 +131,7 @@
 
                     <DataGridTemplateColumn
                         Width="8"
+                        CanUserReorder="False"
                         CanUserResize="False">
                         <DataGridTemplateColumn.CellTemplate>
                             <DataTemplate>
@@ -144,6 +148,7 @@
                     <DataGridTextColumn
                         MinWidth="50"
                         Width="Auto"
+                        IsReadOnly="True"
                         Binding="{Binding FileName}">
                         <DataGridTextColumn.Header>
                             <ui:TextBlock
@@ -154,6 +159,7 @@
                     <DataGridTextColumn
                         MinWidth="50"
                         Width="200"
+                        IsReadOnly="True"
                         Binding="{Binding FamilyTypeName}">
                         <DataGridTextColumn.Header>
                             <ui:TextBlock
@@ -164,6 +170,7 @@
                     <DataGridTextColumn
                         MinWidth="50"
                         Width="Auto"
+                        IsReadOnly="True"
                         Binding="{Binding RuleName}">
                         <DataGridTextColumn.Header>
                             <ui:TextBlock
@@ -174,10 +181,21 @@
                     <DataGridTextColumn
                         MinWidth="50"
                         Width="Auto"
+                        IsReadOnly="True"
                         Binding="{Binding Status}">
                         <DataGridTextColumn.Header>
                             <ui:TextBlock
                                 Text="{DynamicResource ResultsPage.StatusHeader}" />
+                        </DataGridTextColumn.Header>
+                    </DataGridTextColumn>
+
+                    <DataGridTextColumn
+                        MinWidth="50"
+                        Width="100"
+                        Binding="{Binding UserMark, UpdateSourceTrigger=PropertyChanged}">
+                        <DataGridTextColumn.Header>
+                            <ui:TextBlock
+                                Text="{DynamicResource ResultsPage.UserMarkHeader}" />
                         </DataGridTextColumn.Header>
                     </DataGridTextColumn>
                 </ui:DataGrid.Columns>

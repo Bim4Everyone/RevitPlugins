@@ -89,7 +89,8 @@ internal class CheckResultViewModel : BaseViewModel {
                          || result.FamilyTypeName.IndexOf(filter, StringComparison.OrdinalIgnoreCase) >= 0
                          || result.RuleName.IndexOf(filter, StringComparison.OrdinalIgnoreCase) >= 0
                          || result.Status.IndexOf(filter, StringComparison.OrdinalIgnoreCase) >= 0
-                         || result.Error.IndexOf(filter, StringComparison.OrdinalIgnoreCase) >= 0;
+                         || result.Error.IndexOf(filter, StringComparison.OrdinalIgnoreCase) >= 0
+                         || result.UserMark.IndexOf(filter, StringComparison.OrdinalIgnoreCase) >= 0;
         }
     }
 

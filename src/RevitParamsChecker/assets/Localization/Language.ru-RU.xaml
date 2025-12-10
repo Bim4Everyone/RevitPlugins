@@ -90,6 +90,8 @@
     <system:String
         x:Key="ResultsPage.FamilyTypeNameHeader">Тип</system:String>
     <system:String
+        x:Key="ResultsPage.UserMarkHeader">Пометки</system:String>
+    <system:String
         x:Key="ResultsPage.ElementsSearchPlaceholder">Поиск</system:String>
 
 

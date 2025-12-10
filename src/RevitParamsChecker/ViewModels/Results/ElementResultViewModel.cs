@@ -15,6 +15,7 @@ internal class ElementResultViewModel : BaseViewModel {
     private readonly ILocalizationService _localization;
     private string _chunkName;
     private int _itemNumber;
+    private string _userMark;
 
     public ElementResultViewModel(ILocalizationService localization, ElementResult elementResult) {
         _localization = localization ?? throw new ArgumentNullException(nameof(localization));
@@ -37,6 +38,11 @@ internal class ElementResultViewModel : BaseViewModel {
     public int ItemNumber {
         get => _itemNumber;
         set => RaiseAndSetIfChanged(ref _itemNumber, value);
+    }
+
+    public string UserMark {
+        get => _userMark;
+        set => RaiseAndSetIfChanged(ref _userMark, value);
     }
 
     public string FileName { get; }
