@@ -29,16 +29,22 @@
         Style="{StaticResource CustomBorder}">
         <DockPanel
             LastChildFill="True">
-            <custom:CrudButtonsControl
-                DockPanel.Dock="Top"
+            <DockPanel
                 Margin="0 0 0 8"
-                AddCommand="{Binding AddCheckCommand}"
-                RenameCommand="{Binding RenameCheckCommand}"
-                RenameCommandParameter="{Binding SelectedItem, ElementName=_checksGrid}"
-                CopyCommand="{Binding CopyCheckCommand}"
-                CopyCommandParameter="{Binding SelectedItem, ElementName=_checksGrid}"
-                RemoveCommand="{Binding RemoveChecksCommand}"
-                RemoveCommandParameter="{Binding SelectedItems, ElementName=_checksGrid}" />
+                DockPanel.Dock="Top">
+                <custom:CrudButtonsControl
+                    AddCommand="{Binding AddCheckCommand}"
+                    RenameCommand="{Binding RenameCheckCommand}"
+                    RenameCommandParameter="{Binding SelectedItem, ElementName=_checksGrid}"
+                    CopyCommand="{Binding CopyCheckCommand}"
+                    CopyCommandParameter="{Binding SelectedItem, ElementName=_checksGrid}"
+                    RemoveCommand="{Binding RemoveChecksCommand}"
+                    RemoveCommandParameter="{Binding SelectedItems, ElementName=_checksGrid}" />
+                <ui:Button
+                    Margin="8 0 0 0"
+                    Content="{me:LocalizationSource ChecksPage.ExecuteChecksButton}"
+                    Command="{Binding ExecuteChecksCommand}" />
+            </DockPanel>
             <ui:DataGrid
                 x:Name="_checksGrid"
                 SelectionMode="Extended"
