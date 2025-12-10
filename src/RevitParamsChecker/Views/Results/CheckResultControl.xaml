@@ -9,6 +9,8 @@
     xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
     xmlns:me="clr-namespace:dosymep.WpfCore.MarkupExtensions;assembly=dosymep.WpfCore"
     xmlns:vms="clr-namespace:RevitParamsChecker.ViewModels.Results"
+    xmlns:converters="clr-namespace:dosymep.WpfCore.Converters;assembly=dosymep.WpfCore"
+    xmlns:models="clr-namespace:RevitParamsChecker.Models.Results"
     mc:Ignorable="d"
     d:DesignHeight="300"
     d:DesignWidth="300"
@@ -23,6 +25,39 @@
                 <ResourceDictionary
                     Source="../../Resources/CustomDataGrid.xaml" />
             </ResourceDictionary.MergedDictionaries>
+            <models:StatusCode
+                x:Key="ErrorCode">Error</models:StatusCode>
+            <models:StatusCode
+                x:Key="ValidCode">Valid</models:StatusCode>
+            <models:StatusCode
+                x:Key="InvalidCode">Invalid</models:StatusCode>
+            <models:StatusCode
+                x:Key="ParamNotFoundCode">ParamNotFound</models:StatusCode>
+            <Brush
+                x:Key="ErrorBrush">Magenta</Brush>
+            <Brush
+                x:Key="ValidBrush">Green</Brush>
+            <Brush
+                x:Key="ParamNotFoundBrush">Orange</Brush>
+            <Brush
+                x:Key="InvalidBrush">Red</Brush>
+            <converters:ObjectToObjectConverter
+                x:Key="StatusToColorConverter">
+                <converters:ObjectToObjectConverter.CoupleItems>
+                    <converters:CoupleItem
+                        Target="{StaticResource ErrorBrush}"
+                        Source="{StaticResource ErrorCode}" />
+                    <converters:CoupleItem
+                        Target="{StaticResource ValidBrush}"
+                        Source="{StaticResource ValidCode}" />
+                    <converters:CoupleItem
+                        Target="{StaticResource InvalidBrush}"
+                        Source="{StaticResource InvalidCode}" />
+                    <converters:CoupleItem
+                        Target="{StaticResource ParamNotFoundBrush}"
+                        Source="{StaticResource ParamNotFoundCode}" />
+                </converters:ObjectToObjectConverter.CoupleItems>
+            </converters:ObjectToObjectConverter>
         </ResourceDictionary>
     </core:WpfUIPlatformUserControl.Resources>
     <Border
@@ -87,6 +122,21 @@
                                     Content="{ui:SymbolIcon Symbol=Search20}"
                                     CommandParameter="{Binding SelectedItems, ElementName=_elements}"
                                     Command="{Binding DataContext.SelectElementsCommand, ElementName=_this}" />
+                            </DataTemplate>
+                        </DataGridTemplateColumn.CellTemplate>
+                    </DataGridTemplateColumn>
+
+                    <DataGridTemplateColumn
+                        Width="8"
+                        CanUserResize="False">
+                        <DataGridTemplateColumn.CellTemplate>
+                            <DataTemplate>
+                                <Rectangle
+                                    Height="20"
+                                    Width="4"
+                                    VerticalAlignment="Center"
+                                    Fill="{Binding ElementResult.Status, Converter={StaticResource StatusToColorConverter}}">
+                                </Rectangle>
                             </DataTemplate>
                         </DataGridTemplateColumn.CellTemplate>
                     </DataGridTemplateColumn>
