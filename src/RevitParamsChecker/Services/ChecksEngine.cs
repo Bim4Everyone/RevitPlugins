@@ -56,9 +56,10 @@ internal class ChecksEngine {
                         new ElementResult(
                             element,
                             StatusCode.ParamNotFound,
+                            rule.Name,
                             _localization.GetLocalizedString("Exceptions.ParamNotFound", exParam.Message)));
                 } catch(Autodesk.Revit.Exceptions.ApplicationException exRevit) {
-                    elementResults.Add(new ElementResult(element, StatusCode.Error, exRevit.Message));
+                    elementResults.Add(new ElementResult(element, StatusCode.Error, rule.Name, exRevit.Message));
                 }
             }
 
