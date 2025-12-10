@@ -6,6 +6,8 @@
     <ResourceDictionary.MergedDictionaries>
         <ResourceDictionary
             Source="pack://application:,,,/Wpf.Ui;component/Controls/DataGrid/DataGrid.xaml" />
+        <ResourceDictionary
+            Source="./CustomExpander.xaml" />
         <ui:ThemesDictionary />
         <ui:ControlsDictionary />
     </ResourceDictionary.MergedDictionaries>
@@ -297,6 +299,7 @@
                 <ControlTemplate
                     TargetType="{x:Type GroupItem}">
                     <ui:CardExpander
+                        Style="{StaticResource CustomDefaultUiCardExpanderStyle}"
                         IsExpanded="False">
                         <ui:CardExpander.Header>
                             <DockPanel
