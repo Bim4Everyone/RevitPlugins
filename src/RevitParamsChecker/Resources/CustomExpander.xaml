@@ -4,123 +4,19 @@
     xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
     xmlns:system="clr-namespace:System;assembly=mscorlib">
     <ResourceDictionary.MergedDictionaries>
+        <ResourceDictionary
+            Source="pack://application:,,,/Wpf.Ui;component/Controls/CardExpander/CardExpander.xaml"></ResourceDictionary>
         <ui:ThemesDictionary />
         <ui:ControlsDictionary />
     </ResourceDictionary.MergedDictionaries>
     <!-- Стиль для экспандера без анимации -->
 
-    <ControlTemplate
-        x:Key="CustomDefaultUiCardExpanderToggleButtonStyle"
-        TargetType="{x:Type ToggleButton}">
-        <Border
-            Padding="{TemplateBinding Padding}"
-            Background="Transparent">
-            <Grid>
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition
-                        Width="*" />
-                    <ColumnDefinition
-                        Width="Auto" />
-                </Grid.ColumnDefinitions>
-                <ContentPresenter
-                    x:Name="ContentPresenter"
-                    Grid.Column="0"
-                    HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
-                    VerticalAlignment="{TemplateBinding VerticalContentAlignment}"
-                    Content="{TemplateBinding Content}" />
-                <ui:SymbolIcon
-                    x:Name="ControlChevronIcon"
-                    Grid.Column="1"
-                    Margin="0"
-                    VerticalAlignment="Center"
-                    FontSize="{StaticResource CardExpanderChevronSize}"
-                    Foreground="{TemplateBinding Foreground}"
-                    Symbol="ChevronDown24"
-                    RenderTransformOrigin="0.5, 0.5" />
-            </Grid>
-        </Border>
-        <ControlTemplate.Triggers>
-            <Trigger
-                Property="IsChecked"
-                Value="True">
-                <Setter
-                    TargetName="ControlChevronIcon"
-                    Property="RenderTransform">
-                    <Setter.Value>
-                        <RotateTransform
-                            Angle="180" />
-                    </Setter.Value>
-                </Setter>
-            </Trigger>
-            <Trigger
-                Property="IsChecked"
-                Value="False">
-                <Setter
-                    TargetName="ControlChevronIcon"
-                    Property="RenderTransform">
-                    <Setter.Value>
-                        <RotateTransform
-                            Angle="0" />
-                    </Setter.Value>
-                </Setter>
-            </Trigger>
-        </ControlTemplate.Triggers>
-    </ControlTemplate>
-
+    <!-- This style is based on DefaultUiCardExpanderStyle but with all animations removed -->
     <Style
-        x:Key="CustomDefaultUiCardExpanderStyle"
+        x:Key="CustomCardExpanderNoAnimationStyle"
+        BasedOn="{StaticResource DefaultUiCardExpanderStyle}"
         TargetType="{x:Type ui:CardExpander}">
-        <Setter
-            Property="FocusVisualStyle"
-            Value="{DynamicResource DefaultControlFocusVisualStyle}" />
-        <Setter
-            Property="Background"
-            Value="{DynamicResource CardBackground}" />
-        <Setter
-            Property="Foreground"
-            Value="{DynamicResource CardForeground}" />
-        <Setter
-            Property="BorderBrush"
-            Value="{DynamicResource CardBorderBrush}" />
-        <Setter
-            Property="BorderThickness"
-            Value="{StaticResource CardExpanderBorderThemeThickness}" />
-        <Setter
-            Property="Padding"
-            Value="{StaticResource CardExpanderPadding}" />
-        <Setter
-            Property="ContentPadding"
-            Value="{StaticResource CardExpanderPadding}" />
-        <Setter
-            Property="HorizontalAlignment"
-            Value="Stretch" />
-        <Setter
-            Property="VerticalAlignment"
-            Value="Center" />
-        <Setter
-            Property="HorizontalContentAlignment"
-            Value="Stretch" />
-        <Setter
-            Property="VerticalContentAlignment"
-            Value="Center" />
-        <Setter
-            Property="FontSize"
-            Value="{DynamicResource ControlContentThemeFontSize}" />
-        <Setter
-            Property="FontWeight"
-            Value="Normal" />
-        <Setter
-            Property="CornerRadius"
-            Value="{DynamicResource ControlCornerRadius}" />
-        <Setter
-            Property="IsExpanded"
-            Value="False" />
-        <Setter
-            Property="SnapsToDevicePixels"
-            Value="True" />
-        <Setter
-            Property="OverridesDefaultStyle"
-            Value="True" />
+        <!-- Override the Template to remove animations -->
         <Setter
             Property="Template">
             <Setter.Value>
@@ -153,8 +49,38 @@
                                 Foreground="{TemplateBinding Foreground}"
                                 IsChecked="{Binding IsExpanded, Mode=TwoWay, RelativeSource={RelativeSource TemplatedParent}}"
                                 IsEnabled="{TemplateBinding IsEnabled}"
-                                OverridesDefaultStyle="True"
-                                Template="{StaticResource CustomDefaultUiCardExpanderToggleButtonStyle}">
+                                OverridesDefaultStyle="True">
+                                <ToggleButton.Template>
+                                    <ControlTemplate
+                                        TargetType="{x:Type ToggleButton}">
+                                        <Border
+                                            Padding="{TemplateBinding Padding}"
+                                            Background="Transparent">
+                                            <Grid>
+                                                <Grid.ColumnDefinitions>
+                                                    <ColumnDefinition
+                                                        Width="*" />
+                                                    <ColumnDefinition
+                                                        Width="Auto" />
+                                                </Grid.ColumnDefinitions>
+                                                <ContentPresenter
+                                                    x:Name="ContentPresenter"
+                                                    Grid.Column="0"
+                                                    HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
+                                                    VerticalAlignment="{TemplateBinding VerticalContentAlignment}"
+                                                    Content="{TemplateBinding Content}" />
+                                                <ui:SymbolIcon
+                                                    x:Name="ControlChevronIcon"
+                                                    Grid.Column="1"
+                                                    Margin="0"
+                                                    VerticalAlignment="Center"
+                                                    FontSize="16"
+                                                    Foreground="{TemplateBinding Foreground}"
+                                                    Symbol="ChevronDown24" />
+                                            </Grid>
+                                        </Border>
+                                    </ControlTemplate>
+                                </ToggleButton.Template>
                                 <ToggleButton.Content>
                                     <Grid>
                                         <Grid.ColumnDefinitions>
@@ -167,11 +93,11 @@
                                         <ContentControl
                                             x:Name="ControlIcon"
                                             Grid.Column="0"
-                                            Margin="{StaticResource CardExpanderIconMargin}"
+                                            Margin="0,0,14,0"
                                             VerticalAlignment="Center"
                                             Content="{TemplateBinding Icon}"
                                             Focusable="False"
-                                            FontSize="{StaticResource CardExpanderIconSize}"
+                                            FontSize="24"
                                             Foreground="{TemplateBinding Foreground}"
                                             KeyboardNavigation.IsTabStop="False" />
 
@@ -246,8 +172,4 @@
             </Setter.Value>
         </Setter>
     </Style>
-
-    <Style
-        BasedOn="{StaticResource CustomDefaultUiCardExpanderStyle}"
-        TargetType="{x:Type ui:CardExpander}" />
 </ResourceDictionary>

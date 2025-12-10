@@ -137,8 +137,9 @@
                             <DataTemplate>
                                 <Rectangle
                                     Height="20"
-                                    Width="4"
+                                    Width="6"
                                     VerticalAlignment="Center"
+                                    ToolTip="{Binding ElementResult.Error}"
                                     Fill="{Binding ElementResult.Status, Converter={StaticResource StatusToColorConverter}}">
                                 </Rectangle>
                             </DataTemplate>

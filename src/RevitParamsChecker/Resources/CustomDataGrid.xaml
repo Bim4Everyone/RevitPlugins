@@ -299,7 +299,7 @@
                 <ControlTemplate
                     TargetType="{x:Type GroupItem}">
                     <ui:CardExpander
-                        Style="{StaticResource CustomDefaultUiCardExpanderStyle}"
+                        Style="{StaticResource CustomCardExpanderNoAnimationStyle}"
                         IsExpanded="False">
                         <ui:CardExpander.Header>
                             <DockPanel
