@@ -25,9 +25,6 @@
     <Grid>
         <Grid.ColumnDefinitions>
             <ColumnDefinition
-                Width="1*"
-                MinWidth="200" />
-            <ColumnDefinition
                 Width="Auto" />
             <ColumnDefinition
                 Width="5*"
@@ -43,20 +40,17 @@
             Grid.Column="0"
             DataContext="{Binding}" />
 
-        <GridSplitter
-            Grid.Column="1"
-            Style="{StaticResource CustomGridSplitter}" />
-
         <local:CheckResultControl
-            Grid.Column="2"
+            Grid.Column="1"
+            Margin="4 0 0 0"
             DataContext="{Binding SelectedCheckResult}" />
 
         <GridSplitter
-            Grid.Column="3"
+            Grid.Column="2"
             Style="{StaticResource CustomGridSplitter}" />
 
         <Border
-            Grid.Column="4"
+            Grid.Column="3"
             Style="{StaticResource CustomBorder}">
             <DockPanel
                 LastChildFill="True">

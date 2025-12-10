@@ -9,9 +9,11 @@
     xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
     xmlns:me="clr-namespace:dosymep.WpfCore.MarkupExtensions;assembly=dosymep.WpfCore"
     xmlns:vms="clr-namespace:RevitParamsChecker.ViewModels.Results"
+    xmlns:converters="clr-namespace:dosymep.WpfCore.Converters;assembly=dosymep.WpfCore"
     mc:Ignorable="d"
     d:DesignHeight="300"
     d:DesignWidth="300"
+    x:Name="_this"
     x:ClassModifier="internal"
     d:DataContext="{d:DesignInstance vms:ResultsPageViewModel, IsDesignTimeCreatable=False}">
     <core:WpfUIPlatformUserControl.Resources>
@@ -20,6 +22,10 @@
                 <ResourceDictionary
                     Source="../../Resources/CustomStyles.xaml" />
             </ResourceDictionary.MergedDictionaries>
+            <converters:BoolToVisibilityConverter
+                x:Key="BoolToVisibilityConverter"
+                TrueValue="Visible"
+                FalseValue="Collapsed" />
         </ResourceDictionary>
     </core:WpfUIPlatformUserControl.Resources>
     <Border
@@ -30,14 +36,20 @@
                 Dock="Top">
                 <ui:Button
                     Appearance="Danger"
+                    Visibility="{Binding IsListVisible, ElementName=_this, Converter={StaticResource BoolToVisibilityConverter}}"
                     Content="{ui:SymbolIcon Symbol=Delete20}"
                     Command="{Binding RemoveCheckResultsCommand}"
-                    CommandParameter="{Binding SelectedItems, ElementName=_list}"></ui:Button>
+                    CommandParameter="{Binding SelectedItems, ElementName=_list}" />
+                <ui:Button
+                    HorizontalAlignment="Right"
+                    Content="{ui:SymbolIcon Symbol=Navigation20}"
+                    Click="ListToggleViewButton_Clicked" />
             </DockPanel>
             <ui:ListView
                 Margin="0 4 0 0"
                 SelectionMode="Single"
                 x:Name="_list"
+                Visibility="{Binding IsListVisible, ElementName=_this, Converter={StaticResource BoolToVisibilityConverter}}"
                 ItemsSource="{Binding CheckResults}"
                 SelectedItem="{Binding SelectedCheckResult}">
                 <ui:ListView.ItemTemplate>
