@@ -124,7 +124,7 @@ internal class CheckResultViewModel : BaseViewModel {
             .ThenBy(e => e.RuleName)
             .ThenBy(e => e.FamilyTypeName)
             .ToArray();
-        const int chunkSize = 1000;
+        const int chunkSize = 500;
         for(int i = 0; i < elements.Length; i++) {
             int groupStart = (i / chunkSize) * chunkSize + 1;
             int groupEnd = Math.Min(groupStart + chunkSize - 1, elements.Length);

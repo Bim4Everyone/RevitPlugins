@@ -103,7 +103,7 @@
 
                     <DataGridTextColumn
                         MinWidth="50"
-                        Width="Auto"
+                        Width="200"
                         Binding="{Binding FamilyTypeName}">
                         <DataGridTextColumn.Header>
                             <ui:TextBlock
