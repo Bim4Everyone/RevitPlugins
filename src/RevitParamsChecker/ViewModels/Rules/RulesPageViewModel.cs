@@ -127,7 +127,7 @@ internal class RulesPageViewModel : BaseViewModel {
     }
 
     private bool CanCopyRule(RuleViewModel rule) {
-        return rule != null; // TODO валидация правила
+        return rule != null && rule.RootSet.IsValid();
     }
 
     private bool CanRenameRule(RuleViewModel rule) {

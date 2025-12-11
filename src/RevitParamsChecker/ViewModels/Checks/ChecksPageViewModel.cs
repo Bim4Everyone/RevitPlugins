@@ -178,7 +178,7 @@ internal class ChecksPageViewModel : BaseViewModel {
     }
 
     private bool CanCopyCheck(CheckViewModel check) {
-        return check is not null; // TODO валидация
+        return check is not null;
     }
 
     private bool CanRenameCheck(CheckViewModel filter) {
