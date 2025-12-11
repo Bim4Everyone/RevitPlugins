@@ -11,6 +11,8 @@
         <ui:ThemesDictionary />
         <ui:ControlsDictionary />
     </ResourceDictionary.MergedDictionaries>
+    <!-- Стиль для ListView, в котором у выделенного элемента появляется синяя граница по периметру 
+    вместо вертикального синего штриха слева как по дефолту в wpf ui -->
     <ControlTemplate
         x:Key="CustomNullViewItemTemplate"
         TargetType="{x:Type ui:ListViewItem}">
@@ -19,11 +21,23 @@
             Margin="0"
             Padding="0"
             Background="{TemplateBinding Background}"
-            BorderBrush="Transparent"
             BorderThickness="1"
             CornerRadius="{TemplateBinding Border.CornerRadius}">
-            <ContentPresenter
-                Margin="{TemplateBinding Padding}" />
+            <Grid>
+                <ContentPresenter
+                    Margin="{TemplateBinding Padding}" />
+                <Rectangle
+                    x:Name="ActiveRectangle"
+                    Margin="0"
+                    HorizontalAlignment="Stretch"
+                    VerticalAlignment="Stretch"
+                    Stroke="{DynamicResource ListViewItemPillFillBrush}"
+                    Fill="Transparent"
+                    StrokeThickness="3"
+                    RadiusX="8"
+                    RadiusY="8"
+                    Visibility="Collapsed" />
+            </Grid>
         </Border>
         <ControlTemplate.Triggers>
             <MultiTrigger>
@@ -44,17 +58,13 @@
                 Property="IsSelected"
                 Value="True">
                 <Setter
+                    TargetName="ActiveRectangle"
+                    Property="Visibility"
+                    Value="Visible" />
+                <Setter
                     TargetName="Border"
                     Property="Background"
                     Value="{DynamicResource ListViewItemBackgroundPointerOver}" />
-                <Setter
-                    TargetName="Border"
-                    Property="BorderBrush"
-                    Value="{DynamicResource ListViewItemPillFillBrush}" />
-                <Setter
-                    TargetName="Border"
-                    Property="BorderThickness"
-                    Value="2" />
             </Trigger>
         </ControlTemplate.Triggers>
     </ControlTemplate>
@@ -67,14 +77,27 @@
             Margin="0"
             Padding="0"
             Background="{TemplateBinding Background}"
-            BorderBrush="Transparent"
-            BorderThickness="1"
+            BorderBrush="{TemplateBinding Border.BorderBrush}"
+            BorderThickness="{TemplateBinding Border.BorderThickness}"
             CornerRadius="{TemplateBinding Border.CornerRadius}">
-            <ui:GridViewRowPresenter
-                Margin="{TemplateBinding Padding}"
-                VerticalAlignment="{TemplateBinding Control.VerticalContentAlignment}"
-                Columns="{TemplateBinding GridView.ColumnCollection}"
-                Content="{TemplateBinding ContentControl.Content}" />
+            <Grid>
+                <ui:GridViewRowPresenter
+                    Margin="{TemplateBinding Padding}"
+                    VerticalAlignment="{TemplateBinding Control.VerticalContentAlignment}"
+                    Columns="{TemplateBinding GridView.ColumnCollection}"
+                    Content="{TemplateBinding ContentControl.Content}" />
+                <Rectangle
+                    x:Name="ActiveRectangle"
+                    Margin="0"
+                    HorizontalAlignment="Stretch"
+                    VerticalAlignment="Stretch"
+                    Stroke="{DynamicResource ListViewItemPillFillBrush}"
+                    Fill="Transparent"
+                    StrokeThickness="3"
+                    RadiusX="8"
+                    RadiusY="8"
+                    Visibility="Collapsed" />
+            </Grid>
         </Border>
         <ControlTemplate.Triggers>
             <MultiTrigger>
@@ -95,17 +118,13 @@
                 Property="IsSelected"
                 Value="True">
                 <Setter
+                    TargetName="ActiveRectangle"
+                    Property="Visibility"
+                    Value="Visible" />
+                <Setter
                     TargetName="Border"
                     Property="Background"
                     Value="{DynamicResource ListViewItemBackgroundPointerOver}" />
-                <Setter
-                    TargetName="Border"
-                    Property="BorderBrush"
-                    Value="{DynamicResource ListViewItemPillFillBrush}" />
-                <Setter
-                    TargetName="Border"
-                    Property="BorderThickness"
-                    Value="2" />
             </Trigger>
         </ControlTemplate.Triggers>
     </ControlTemplate>

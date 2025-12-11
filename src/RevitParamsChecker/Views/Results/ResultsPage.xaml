@@ -23,8 +23,6 @@
                     Source="../../Resources/CustomStyles.xaml" />
                 <ResourceDictionary
                     Source="../../Resources/CustomListViewItemStyle.xaml" />
-                <ResourceDictionary
-                    Source="../../Resources/CustomListViewStyle.xaml" />
             </ResourceDictionary.MergedDictionaries>
         </ResourceDictionary>
     </core:WpfUIPlatformPage.Resources>
