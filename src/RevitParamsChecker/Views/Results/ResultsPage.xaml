@@ -21,6 +21,10 @@
             <ResourceDictionary.MergedDictionaries>
                 <ResourceDictionary
                     Source="../../Resources/CustomStyles.xaml" />
+                <ResourceDictionary
+                    Source="../../Resources/CustomListViewItemStyle.xaml" />
+                <ResourceDictionary
+                    Source="../../Resources/CustomListViewStyle.xaml" />
             </ResourceDictionary.MergedDictionaries>
         </ResourceDictionary>
     </core:WpfUIPlatformPage.Resources>
@@ -64,6 +68,7 @@
                 </DockPanel>
                 <ui:ListView
                     SelectionMode="Single"
+                    ItemContainerStyle="{StaticResource CustomListViewItemStyle}"
                     SelectedItem="{Binding SelectedCheckResult.SelectedRuleStamp}"
                     ItemsSource="{Binding SelectedCheckResult.RulesStamp}">
                     <i:Interaction.Behaviors>
