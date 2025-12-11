@@ -68,11 +68,35 @@ internal class ParamsSetViewModel : BaseViewModel {
     public ObservableCollection<ParamsSetViewModel> InnerParamSets { get; }
 
     public LogicalRule GetRule() {
+        Validate();
         _logicalRule.Operator = SelectedOperator.Operator;
         _logicalRule.ChildRules = [
             ..InnerParamSets.Select(s => s.GetRule()), ..InnerParamRules.Select(s => s.GetRule())
         ];
         return _logicalRule;
+    }
+
+    public bool IsValid() {
+        try {
+            Validate();
+            return true;
+        } catch(InvalidOperationException) {
+            return false;
+        }
+    }
+
+    public void Validate() {
+        if(SelectedOperator is null) {
+            throw new InvalidOperationException($"Сначала надо назначить {nameof(SelectedOperator)}");
+        }
+
+        foreach(var rule in InnerParamRules) {
+            rule.Validate();
+        }
+
+        foreach(var set in InnerParamSets) {
+            set.Validate();
+        }
     }
 
     private void AddInnerSet() {

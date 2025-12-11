@@ -23,6 +23,7 @@ internal class RulesPageViewModel : BaseViewModel {
     private RuleViewModel _selectedRule;
     private string _dirPath;
     private bool _rulesModified;
+    private string _errorText;
 
     public RulesPageViewModel(
         ILocalizationService localization,
@@ -77,6 +78,11 @@ internal class RulesPageViewModel : BaseViewModel {
     public bool RulesModified {
         get => _rulesModified;
         set => RaiseAndSetIfChanged(ref _rulesModified, value);
+    }
+
+    public string ErrorText {
+        get => _errorText;
+        set => RaiseAndSetIfChanged(ref _errorText, value);
     }
 
     private void AddRule() {
@@ -197,7 +203,14 @@ internal class RulesPageViewModel : BaseViewModel {
     }
 
     private bool CanSave() {
-        return true; // TODO валидация
+        var invalidRule = Rules.FirstOrDefault(r => !r.RootSet.IsValid());
+        if(invalidRule is not null) {
+            ErrorText = _localization.GetLocalizedString("RulesPage.Validation.InvalidRule", invalidRule.Name);
+            return false;
+        }
+
+        ErrorText = null;
+        return true;
     }
 
     private void SubscribeToChanges(ObservableCollection<RuleViewModel> rules) {
@@ -207,8 +220,8 @@ internal class RulesPageViewModel : BaseViewModel {
     }
 
     private void OnRuleChanged(object sender, PropertyChangedEventArgs e) {
-        if((sender is RuleViewModel check)
-           && check.Modified) {
+        if((sender is RuleViewModel rule)
+           && rule.Modified) {
             RulesModified = true;
         }
     }

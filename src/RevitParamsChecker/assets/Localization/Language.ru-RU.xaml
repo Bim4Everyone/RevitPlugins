@@ -29,7 +29,7 @@
     <system:String
         x:Key="RulesPage.DescriptionLabel">Описание:</system:String>
     <system:String
-        x:Key="RulesPage.RuleLabel">Правило:</system:String>
+        x:Key="RulesPage.RuleLabel">Формула правила:</system:String>
     <system:String
         x:Key="RulesPage.AddParamRuleButton">Добавить правило</system:String>
     <system:String
@@ -42,6 +42,8 @@
         x:Key="RulesPage.SaveFileDefaultName">Настройка правил проверки параметров</system:String>
     <system:String
         x:Key="RulesPage.Error.CannotLoadRules">Не удалось загрузить правила</system:String>
+    <system:String
+        x:Key="RulesPage.Validation.InvalidRule">Заполните все поля в формуле правила '{0}'</system:String>
 
     <system:String
         x:Key="ChecksPage.ExecuteChecksButton">Запустить выбранные</system:String>

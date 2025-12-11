@@ -43,6 +43,7 @@
         <ui:TextBox
             Grid.Column="2"
             Margin="3"
+            IsEnabled="{Binding ExpectedValueNeeded}"
             Text="{Binding ExpectedValue, UpdateSourceTrigger=PropertyChanged}" />
 
         <ui:Button

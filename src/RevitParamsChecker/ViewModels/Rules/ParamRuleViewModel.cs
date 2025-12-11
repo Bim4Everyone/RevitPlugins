@@ -16,6 +16,7 @@ internal class ParamRuleViewModel : BaseViewModel {
     private readonly ILocalizationService _localization;
     private string _paramName;
     private string _expectedValue;
+    private bool _expectedValueNeeded = true;
     private ComparisonOperatorViewModel _selectedOperator;
 
     private static readonly IReadOnlyCollection<ComparisonOperator> _availableComparisonOperators = [
@@ -55,9 +56,23 @@ internal class ParamRuleViewModel : BaseViewModel {
         set => RaiseAndSetIfChanged(ref _paramName, value);
     }
 
+    public bool ExpectedValueNeeded {
+        get => _expectedValueNeeded;
+        set {
+            RaiseAndSetIfChanged(ref _expectedValueNeeded, value);
+            if(!value) {
+                ExpectedValue = string.Empty;
+            }
+        }
+    }
+
     public ComparisonOperatorViewModel SelectedOperator {
         get => _selectedOperator;
-        set => RaiseAndSetIfChanged(ref _selectedOperator, value);
+        set {
+            RaiseAndSetIfChanged(ref _selectedOperator, value);
+            ExpectedValueNeeded = (value?.Operator is not HasValueOperator
+                                   && value?.Operator is not HasNoValueOperator);
+        }
     }
 
     public IReadOnlyCollection<ComparisonOperatorViewModel> AvailableOperators { get; }
@@ -68,21 +83,35 @@ internal class ParamRuleViewModel : BaseViewModel {
     }
 
     public ParameterRule GetRule() {
+        Validate();
+
+        _rule.ParameterName = ParamName;
+        _rule.ExpectedValue = ExpectedValue;
+        _rule.Operator = SelectedOperator.Operator;
+        return _rule;
+    }
+
+    public bool IsValid() {
+        try {
+            Validate();
+            return true;
+        } catch(InvalidOperationException) {
+            return false;
+        }
+    }
+
+    public void Validate() {
         if(string.IsNullOrWhiteSpace(ParamName)) {
             throw new InvalidOperationException($"Сначала надо назначить {nameof(ParamName)}");
         }
 
-        if(string.IsNullOrWhiteSpace(ExpectedValue)) {
+        if(ExpectedValueNeeded && string.IsNullOrWhiteSpace(ExpectedValue)
+           || ExpectedValue == null) {
             throw new InvalidOperationException($"Сначала надо назначить {nameof(ExpectedValue)}");
         }
 
         if(SelectedOperator is null) {
             throw new InvalidOperationException($"Сначала надо назначить {nameof(SelectedOperator)}");
         }
-
-        _rule.ParameterName = ParamName;
-        _rule.ExpectedValue = ExpectedValue;
-        _rule.Operator = SelectedOperator.Operator;
-        return _rule;
     }
 }

@@ -52,6 +52,7 @@
             Grid.Row="0"
             Grid.ColumnSpan="3"
             Margin="0 0 0 8"
+            PageWarningMessage="{Binding ErrorText}"
             LoadButtonCommand="{Binding LoadCommand}"
             SaveButtonCommand="{Binding SaveCommand}"
             ExportButtonCommand="{Binding ExportCommand}"
