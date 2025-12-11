@@ -38,9 +38,7 @@ internal class CheckResultViewModel : BaseViewModel {
         SelectElementsCommand = RelayCommand.Create<IList>(SelectElements, CanSelectElements);
         _refreshViewDelay = new DelayAction(
             300,
-            () => Dispatcher.CurrentDispatcher.BeginInvoke(
-                DispatcherPriority.Background,
-                () => ElementResults.View.Refresh())
+            () => ElementResults.View.Refresh()
         );
         SetGrouping(ElementResults);
         PropertyChanged += ElementsFilterPropertyChanged;
