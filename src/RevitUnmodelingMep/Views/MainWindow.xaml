@@ -15,13 +15,72 @@
     mc:Ignorable="d"
     Title="{me:LocalizationSource MainWindow.Title}"
     
-    Height="500"
-    Width="700"
+    Height="720"
+    Width="1100"
     
-    MinHeight="500"
-    MinWidth="700"
+    MinHeight="640"
+    MinWidth="960"
    
     d:DataContext="{d:DesignInstance vms:MainViewModel, IsDesignTimeCreatable=False}">
+
+    <core:WpfUIPlatformWindow.Resources>
+        <Style
+            TargetType="Border"
+            x:Key="CardBorder">
+            <Setter Property="Background" Value="{DynamicResource CardBackground}" />
+            <Setter Property="BorderBrush" Value="{DynamicResource CardBorderBrush}" />
+            <Setter Property="BorderThickness" Value="{DynamicResource CardControlBorderThemeThickness}" />
+            <Setter Property="CornerRadius" Value="{DynamicResource ControlCornerRadius}" />
+            <Setter Property="Padding" Value="16" />
+        </Style>
+
+        <Style
+            TargetType="TextBlock"
+            x:Key="FieldLabel">
+            <Setter Property="FontSize" Value="12" />
+            <Setter Property="Opacity" Value="0.8" />
+            <Setter Property="Margin" Value="0 6 0 2" />
+        </Style>
+
+        <Style
+            TargetType="ListBoxItem"
+            x:Key="NavItemStyle">
+            <Setter Property="MinHeight" Value="48" />
+            <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+            <Setter Property="Margin" Value="0 4 0 0" />
+            <Setter Property="Padding" Value="12" />
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="ListBoxItem">
+                        <Border
+                            x:Name="NavBorder"
+                            Background="{DynamicResource CardBackground}"
+                            BorderBrush="{DynamicResource CardBorderBrush}"
+                            BorderThickness="{DynamicResource CardControlBorderThemeThickness}"
+                            CornerRadius="{DynamicResource ControlCornerRadius}"
+                            SnapsToDevicePixels="True">
+                            <ContentPresenter
+                                Margin="6 0"
+                                VerticalAlignment="Center"
+                                RecognizesAccessKey="True" />
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="NavBorder" Property="Background" Value="{DynamicResource SubtleFillColorTertiaryBrush}" />
+                            </Trigger>
+                            <Trigger Property="IsSelected" Value="True">
+                                <Setter TargetName="NavBorder" Property="Background" Value="{DynamicResource SubtleFillColorTertiaryBrush}" />
+                                <Setter TargetName="NavBorder" Property="BorderBrush" Value="{DynamicResource CardBorderBrush}" />
+                            </Trigger>
+                            <Trigger Property="IsEnabled" Value="False">
+                                <Setter Property="Opacity" Value="0.5" />
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+    </core:WpfUIPlatformWindow.Resources>
 
     <i:Interaction.Triggers>
         <i:EventTrigger EventName="Loaded">
@@ -38,40 +97,333 @@
         
         <ui:TitleBar
             Grid.Row="0"
-            Title="{me:LocalizationSource MainWindow.Title}" />
+            Title="Настройки немоделируемых" />
 
-        <ui:TextBox
+        <Grid
             Grid.Row="1"
-            Width="200"
-            VerticalAlignment="Center"
-            HorizontalAlignment="Center"
-            Text="{Binding SaveProperty, UpdateSourceTrigger=PropertyChanged}" />
+            Margin="12">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="240" />
+                <ColumnDefinition Width="16" />
+                <ColumnDefinition Width="*" />
+            </Grid.ColumnDefinitions>
 
-        <StackPanel
+            <Border
+                Grid.Column="0"
+                Style="{StaticResource CardBorder}"
+                Padding="12">
+                <StackPanel>
+                    <ui:TextBlock
+                        Margin="4 0 0 12"
+                        FontSize="16"
+                        FontWeight="SemiBold"
+                        Text="{me:LocalizationSource MainWindow.Title}" />
+
+                    <ListBox
+                        x:Name="NavigationList"
+                        BorderThickness="0"
+                        Background="Transparent"
+                        SelectedIndex="{Binding SelectedIndex, ElementName=ContentTabs, Mode=TwoWay}"
+                        ItemContainerStyle="{StaticResource NavItemStyle}">
+                        <ListBoxItem Content="Типы расходников" />
+                        <ListBoxItem Content="Назначение расходников" />
+                    </ListBox>
+                </StackPanel>
+            </Border>
+
+            <Border
+                Grid.Column="2"
+                Style="{StaticResource CardBorder}">
+                <TabControl
+                    x:Name="ContentTabs"
+                    Background="Transparent"
+                    BorderThickness="0">
+                    <TabControl.Resources>
+                        <Style TargetType="TabItem">
+                            <Setter Property="Visibility" Value="Collapsed" />
+                        </Style>
+                    </TabControl.Resources>
+
+                    <TabItem Header="Типы расходников">
+                        <ScrollViewer VerticalScrollBarVisibility="Auto">
+                            <StackPanel Margin="0 0 0 12">
+                                <Border Style="{StaticResource CardBorder}">
+                                    <StackPanel>
+                                        <ItemsControl
+                                            ItemsSource="{Binding ConsumableTypes}">
+                                            <ItemsControl.ItemTemplate>
+                                                <DataTemplate>
+                                                    <Expander
+                                                        Margin="0 0 0 8"
+                                                        IsExpanded="False">
+                                                        <Expander.Header>
+                                                            <Grid
+                                                                Height="44"
+                                                                MinHeight="44"
+                                                                VerticalAlignment="Center">
+                                                                <Grid.ColumnDefinitions>
+                                                                    <ColumnDefinition Width="*" />
+                                                                    <ColumnDefinition Width="Auto" />
+                                                                </Grid.ColumnDefinitions>
+
+                                                                <TextBlock
+                                                                    Margin="0 0 8 0"
+                                                                    VerticalAlignment="Center"
+                                                                    Text="{Binding Name}" />
+
+                                                                <ui:Button
+                                                                    Grid.Column="1"
+                                                                    Width="36"
+                                                                    Height="36"
+                                                                    Padding="0"
+                                                                    VerticalAlignment="Center"
+                                                                    HorizontalAlignment="Center"
+                                                                    Appearance="Transparent"
+                                                                    Content="{ui:SymbolIcon Symbol=Delete24}"
+                                                                    Command="{Binding DataContext.RemoveConsumableTypeCommand, RelativeSource={RelativeSource AncestorType=Window}}"
+                                                                    CommandParameter="{Binding}" />
+                                                            </Grid>
+                                                        </Expander.Header>
+
+                                                        <StackPanel>
+                                                            <TextBlock
+                                                                Style="{StaticResource FieldLabel}"
+                                                                Text="Имя расходника" />
+                                                            <ui:TextBox
+                                                                Text="{Binding Name, UpdateSourceTrigger=PropertyChanged}" />
+
+                                                            <TextBlock
+                                                                Style="{StaticResource FieldLabel}"
+                                                                Text="Категория" />
+                                                            <ComboBox
+                                                                MinHeight="32"
+                                                                Text="{Binding Category, UpdateSourceTrigger=PropertyChanged}" />
+
+                                                            <TextBlock
+                                                                Style="{StaticResource FieldLabel}"
+                                                                Text="Группирование" />
+                                                            <ComboBox
+                                                                MinHeight="32"
+                                                                Text="{Binding Grouping, UpdateSourceTrigger=PropertyChanged}" />
+
+                                                            <TextBlock
+                                                                Style="{StaticResource FieldLabel}"
+                                                                Text="Наименование" />
+                                                            <ui:TextBox
+                                                                Text="{Binding Naming, UpdateSourceTrigger=PropertyChanged}" />
+
+                                                            <TextBlock
+                                                                Style="{StaticResource FieldLabel}"
+                                                                Text="Марка" />
+                                                            <ui:TextBox
+                                                                Text="{Binding Brand, UpdateSourceTrigger=PropertyChanged}" />
+
+                                                            <TextBlock
+                                                                Style="{StaticResource FieldLabel}"
+                                                                Text="Код изделия" />
+                                                            <ui:TextBox
+                                                                Text="{Binding Code, UpdateSourceTrigger=PropertyChanged}" />
+
+                                                            <TextBlock
+                                                                Style="{StaticResource FieldLabel}"
+                                                                Text="Единица" />
+                                                            <ui:TextBox
+                                                                Text="{Binding Unit, UpdateSourceTrigger=PropertyChanged}" />
+
+                                                            <TextBlock
+                                                                Style="{StaticResource FieldLabel}"
+                                                                Text="Завод" />
+                                                            <ui:TextBox
+                                                                Text="{Binding Factory, UpdateSourceTrigger=PropertyChanged}" />
+
+                                                            <TextBlock
+                                                                Style="{StaticResource FieldLabel}"
+                                                                Text="Формула числа (Double, итог выражения - Value = )" />
+                                                            <ui:TextBox
+                                                                AcceptsReturn="True"
+                                                                Height="90"
+                                                                TextWrapping="Wrap"
+                                                                Text="{Binding NumberFormula, UpdateSourceTrigger=PropertyChanged}" />
+
+                                                            <TextBlock
+                                                                Style="{StaticResource FieldLabel}"
+                                                                Text="Формат примечаний (Str)" />
+                                                            <ui:TextBox
+                                                                AcceptsReturn="True"
+                                                                Height="60"
+                                                                TextWrapping="Wrap"
+                                                                Text="{Binding NoteFormat, UpdateSourceTrigger=PropertyChanged}" />
+
+                                                            <!-- Эмаль и Грунтовка убраны по запросу -->
+                                                        </StackPanel>
+                                                    </Expander>
+                                                </DataTemplate>
+                                            </ItemsControl.ItemTemplate>
+                                        </ItemsControl>
+
+                                        <StackPanel
+                                            Orientation="Horizontal"
+                                            HorizontalAlignment="Right"
+                                            Margin="0 12 0 0">
+                                            <ui:Button
+                                                Width="36"
+                                                Height="36"
+                                                Padding="0"
+                                                HorizontalAlignment="Center"
+                                                VerticalAlignment="Center"
+                                                Content="{ui:SymbolIcon Symbol=Add24}"
+                                                Command="{Binding AddConsumableTypeCommand}" />
+                                        </StackPanel>
+                                    </StackPanel>
+                                </Border>
+                            </StackPanel>
+                        </ScrollViewer>
+                    </TabItem>
+
+                    <TabItem Header="Назначение расходников">
+                        <ScrollViewer VerticalScrollBarVisibility="Auto">
+                            <StackPanel>
+                                <Border Style="{StaticResource CardBorder}">
+                                    <StackPanel>
+                                        <Expander
+                                            Margin="0 0 0 8"
+                                            IsExpanded="False">
+                                            <Expander.Header>
+                                                <TextBlock FontWeight="SemiBold" Text="Типы труб" />
+                                            </Expander.Header>
+                                            <StackPanel Margin="0 8 0 0">
+                                                <ComboBox
+                                                    MinHeight="32" />
+                                            </StackPanel>
+                                        </Expander>
+
+                                        <Expander
+                                            Margin="0 0 0 8"
+                                            IsExpanded="False">
+                                            <Expander.Header>
+                                                <TextBlock FontWeight="SemiBold" Text="Типы воздуховодов" />
+                                            </Expander.Header>
+
+                                            <StackPanel Margin="0 8 0 0">
+                                                <Border Style="{StaticResource CardBorder}">
+                                                    <StackPanel>
+                                                        <ComboBox
+                                                            MinHeight="32" />
+
+                                                        <ui:ToggleSwitch
+                                                            Margin="0 8 0 0"
+                                                            Content="Металл для крепления воздуховодов" />
+                                                        <ui:ToggleSwitch Content="Расходник 1" />
+                                                        <ui:ToggleSwitch Content="Расходник 2" />
+                                                        <ui:ToggleSwitch Content="..." />
+                                                    </StackPanel>
+                                                </Border>
+
+                                                <Border
+                                                    Style="{StaticResource CardBorder}"
+                                                    Margin="0 8 0 0">
+                                                    <StackPanel>
+                                                        <ComboBox
+                                                            MinHeight="32" />
+                                                    </StackPanel>
+                                                </Border>
+                                            </StackPanel>
+                                        </Expander>
+
+                                        <Expander Margin="0 0 0 8" IsExpanded="False">
+                                            <Expander.Header>
+                                                <TextBlock FontWeight="SemiBold" Text="Типы изоляции труб" />
+                                            </Expander.Header>
+                                            <StackPanel Margin="0 8 0 0">
+                                                <ComboBox
+                                                    MinHeight="32" />
+                                            </StackPanel>
+                                        </Expander>
+
+                                        <Expander Margin="0 0 0 8" IsExpanded="False">
+                                            <Expander.Header>
+                                                <TextBlock FontWeight="SemiBold" Text="Типы изоляции воздуховодов" />
+                                            </Expander.Header>
+                                            <StackPanel Margin="0 8 0 0">
+                                                <ComboBox
+                                                    MinHeight="32" />
+                                            </StackPanel>
+                                        </Expander>
+
+                                        <Expander Margin="0 0 0 8" IsExpanded="False">
+                                            <Expander.Header>
+                                                <TextBlock FontWeight="SemiBold" Text="Типы систем труб" />
+                                            </Expander.Header>
+                                            <StackPanel Margin="0 8 0 0">
+                                                <ComboBox
+                                                    MinHeight="32" />
+                                            </StackPanel>
+                                        </Expander>
+
+                                        <Expander IsExpanded="False">
+                                            <Expander.Header>
+                                                <TextBlock FontWeight="SemiBold" Text="Типы систем воздуховодов" />
+                                            </Expander.Header>
+                                            <StackPanel Margin="0 8 0 0">
+                                                <ComboBox
+                                                    MinHeight="32" />
+                                            </StackPanel>
+                                        </Expander>
+                                    </StackPanel>
+                                </Border>
+                            </StackPanel>
+                        </ScrollViewer>
+                    </TabItem>
+                </TabControl>
+            </Border>
+        </Grid>
+
+        <Grid
             Grid.Row="2"
-            Orientation="Horizontal"
-            HorizontalAlignment="Right">
+            Margin="12">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="Auto" />
+            </Grid.ColumnDefinitions>
+
+            <StackPanel
+                Orientation="Horizontal"
+                HorizontalAlignment="Left">
+                <ui:Button
+                    Margin="0 0 8 0"
+                    Width="100"
+                    Content="Импорт" />
+                <ui:Button
+                    Width="100"
+                    Content="Экспорт" />
+            </StackPanel>
 
             <ui:TextBlock
-                Margin="10"
-                Foreground="Orange"
+                Grid.Column="1"
+                Margin="12 0"
                 VerticalAlignment="Center"
+                Foreground="Orange"
                 Text="{Binding ErrorText}" />
 
-            <ui:Button
-                Margin="10"
-                Width="80"
-                Appearance="Info"
-                Content="{me:LocalizationSource MainWindow.ButtonOk}"
-                Click="ButtonOk_Click"
-                Command="{Binding AcceptViewCommand}" />
+            <StackPanel
+                Grid.Column="2"
+                Orientation="Horizontal"
+                HorizontalAlignment="Right">
+                <ui:Button
+                    Margin="0 0 8 0"
+                    Width="90"
+                    Appearance="Info"
+                    Content="{me:LocalizationSource MainWindow.ButtonOk}"
+                    Click="ButtonOk_Click"
+                    Command="{Binding AcceptViewCommand}" />
 
-            <ui:Button
-                Margin="10"
-                Width="80"
-                Content="{me:LocalizationSource MainWindow.ButtonCancel}"
-                IsCancel="True"
-                Click="ButtonCancel_Click" />
-        </StackPanel>
+                <ui:Button
+                    Width="90"
+                    Content="{me:LocalizationSource MainWindow.ButtonCancel}"
+                    IsCancel="True"
+                    Click="ButtonCancel_Click" />
+            </StackPanel>
+        </Grid>
     </Grid>
 </core:WpfUIPlatformWindow>

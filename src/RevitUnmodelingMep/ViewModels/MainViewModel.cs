@@ -1,3 +1,4 @@
+using System.Collections.ObjectModel;
 using System.Windows.Input;
 
 using dosymep.SimpleServices;
@@ -18,6 +19,7 @@ internal class MainViewModel : BaseViewModel {
 
     private string _errorText;
     private string _saveProperty;
+    private ObservableCollection<ConsumableTypeItem> _consumableTypes;
     
     /// <summary>
     /// Создает экземпляр основной ViewModel главного окна.
@@ -36,6 +38,12 @@ internal class MainViewModel : BaseViewModel {
 
         LoadViewCommand = RelayCommand.Create(LoadView);
         AcceptViewCommand = RelayCommand.Create(AcceptView, CanAcceptView);
+        AddConsumableTypeCommand = RelayCommand.Create(AddConsumableType);
+        RemoveConsumableTypeCommand = RelayCommand.Create<ConsumableTypeItem>(RemoveConsumableType, CanRemoveConsumableType);
+
+        ConsumableTypes = new ObservableCollection<ConsumableTypeItem> {
+            new ConsumableTypeItem { Title = "Расходник 1", Name = "Тестовый расходник" }
+        };
     }
 
     /// <summary>
@@ -48,6 +56,10 @@ internal class MainViewModel : BaseViewModel {
     /// </summary>
     /// <remarks>В случаях, когда используется немодальное окно, требуется данную команду удалять.</remarks>
     public ICommand AcceptViewCommand { get; }
+
+    public ICommand AddConsumableTypeCommand { get; }
+
+    public ICommand RemoveConsumableTypeCommand { get; }
 
     /// <summary>
     /// Текст ошибки, который отображается при неверном вводе пользователя.
@@ -63,6 +75,11 @@ internal class MainViewModel : BaseViewModel {
     public string SaveProperty {
         get => _saveProperty;
         set => RaiseAndSetIfChanged(ref _saveProperty, value);
+    }
+
+    public ObservableCollection<ConsumableTypeItem> ConsumableTypes {
+        get => _consumableTypes;
+        set => RaiseAndSetIfChanged(ref _consumableTypes, value);
     }
 
     /// <summary>
@@ -119,5 +136,119 @@ internal class MainViewModel : BaseViewModel {
 
         setting.SaveProperty = SaveProperty;
         _pluginConfig.SaveProjectConfig();
+    }
+
+    private void AddConsumableType() {
+        int index = ConsumableTypes.Count + 1;
+        ConsumableTypes.Add(new ConsumableTypeItem {
+            Title = $"Расходник {index}",
+            Name = "Тестовый расходник"
+        });
+        CommandManager.InvalidateRequerySuggested();
+    }
+
+    private bool CanRemoveConsumableType(ConsumableTypeItem item) {
+        return ConsumableTypes?.Count > 0 && (item == null || ConsumableTypes.Contains(item));
+    }
+
+    private void RemoveConsumableType(ConsumableTypeItem item) {
+        if(ConsumableTypes == null || ConsumableTypes.Count == 0) {
+            return;
+        }
+
+        if(item != null && ConsumableTypes.Contains(item)) {
+            ConsumableTypes.Remove(item);
+        } else {
+            ConsumableTypes.RemoveAt(ConsumableTypes.Count - 1);
+        }
+
+        CommandManager.InvalidateRequerySuggested();
+    }
+
+    internal class ConsumableTypeItem : BaseViewModel {
+        private string _title;
+        private string _selectedType;
+        private string _name;
+        private string _category;
+        private string _grouping;
+        private string _naming;
+        private string _brand;
+        private string _code;
+        private string _unit;
+        private string _factory;
+        private string _numberFormula;
+        private string _noteFormat;
+        private string _enamel;
+        private string _primer;
+
+        public string Title {
+            get => _title;
+            set => RaiseAndSetIfChanged(ref _title, value);
+        }
+
+        public string SelectedType {
+            get => _selectedType;
+            set => RaiseAndSetIfChanged(ref _selectedType, value);
+        }
+
+        public string Name {
+            get => _name;
+            set => RaiseAndSetIfChanged(ref _name, value);
+        }
+
+        public string Category {
+            get => _category;
+            set => RaiseAndSetIfChanged(ref _category, value);
+        }
+
+        public string Grouping {
+            get => _grouping;
+            set => RaiseAndSetIfChanged(ref _grouping, value);
+        }
+
+        public string Naming {
+            get => _naming;
+            set => RaiseAndSetIfChanged(ref _naming, value);
+        }
+
+        public string Brand {
+            get => _brand;
+            set => RaiseAndSetIfChanged(ref _brand, value);
+        }
+
+        public string Code {
+            get => _code;
+            set => RaiseAndSetIfChanged(ref _code, value);
+        }
+
+        public string Unit {
+            get => _unit;
+            set => RaiseAndSetIfChanged(ref _unit, value);
+        }
+
+        public string Factory {
+            get => _factory;
+            set => RaiseAndSetIfChanged(ref _factory, value);
+        }
+
+        public string NumberFormula {
+            get => _numberFormula;
+            set => RaiseAndSetIfChanged(ref _numberFormula, value);
+        }
+
+        public string NoteFormat {
+            get => _noteFormat;
+            set => RaiseAndSetIfChanged(ref _noteFormat, value);
+        }
+
+        public string Enamel {
+            get => _enamel;
+            set => RaiseAndSetIfChanged(ref _enamel, value);
+        }
+
+        public string Primer {
+            get => _primer;
+            set => RaiseAndSetIfChanged(ref _primer, value);
+        }
     }
 }
