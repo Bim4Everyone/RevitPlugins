@@ -163,6 +163,16 @@
                                 Text="{DynamicResource ResultsPage.FileNameHeader}" />
                         </DataGridTextColumn.Header>
                     </DataGridTextColumn>
+                    <DataGridTextColumn
+                        MinWidth="50"
+                        Width="Auto"
+                        IsReadOnly="True"
+                        Binding="{Binding CategoryName}">
+                        <DataGridTextColumn.Header>
+                            <ui:TextBlock
+                                Text="{DynamicResource ResultsPage.CategoryNameHeader}" />
+                        </DataGridTextColumn.Header>
+                    </DataGridTextColumn>
 
                     <DataGridTextColumn
                         MinWidth="50"

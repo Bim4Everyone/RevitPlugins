@@ -26,6 +26,7 @@ internal class ElementResultViewModel : BaseViewModel {
         Status = _localization.GetLocalizedString($"{nameof(StatusCode)}.{ElementResult.Status}");
         Error = ElementResult.Error;
         RuleName = ElementResult.RuleName;
+        CategoryName = ElementResult.ElementModel.Element.Category?.Name ?? string.Empty;
     }
 
     public ElementId Id { get; }
@@ -44,6 +45,8 @@ internal class ElementResultViewModel : BaseViewModel {
         get => _userMark;
         set => RaiseAndSetIfChanged(ref _userMark, value);
     }
+
+    public string CategoryName { get; }
 
     public string FileName { get; }
 

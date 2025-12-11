@@ -111,7 +111,8 @@ internal class CheckResultViewModel : BaseViewModel {
                          || result.RuleName?.IndexOf(filter, StringComparison.OrdinalIgnoreCase) >= 0
                          || result.Status?.IndexOf(filter, StringComparison.OrdinalIgnoreCase) >= 0
                          || result.Error?.IndexOf(filter, StringComparison.OrdinalIgnoreCase) >= 0
-                         || result.UserMark?.IndexOf(filter, StringComparison.OrdinalIgnoreCase) >= 0;
+                         || result.UserMark?.IndexOf(filter, StringComparison.OrdinalIgnoreCase) >= 0
+                         || result.CategoryName?.IndexOf(filter, StringComparison.OrdinalIgnoreCase) >= 0;
         }
     }
 
@@ -128,7 +129,10 @@ internal class CheckResultViewModel : BaseViewModel {
                 nameof(ElementResultViewModel.RuleName)),
             new PropertyViewModel(
                 localization.GetLocalizedString("ResultsPage.FamilyTypeNameHeader"),
-                nameof(ElementResultViewModel.FamilyTypeName))
+                nameof(ElementResultViewModel.FamilyTypeName)),
+            new PropertyViewModel(
+                localization.GetLocalizedString("ResultsPage.CategoryNameHeader"),
+                nameof(ElementResultViewModel.CategoryName))
         ];
     }
 
