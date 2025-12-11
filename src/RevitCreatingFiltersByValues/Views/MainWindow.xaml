@@ -61,18 +61,10 @@
                 Margin="10 5 5 5"
                 Style="{StaticResource CustomBorder}">
 
-                <Grid>
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="*" />
-                        <ColumnDefinition Width="*" />
-                        <ColumnDefinition Width="*" />
-                    </Grid.ColumnDefinitions>
-
+                <StackPanel
+                    Orientation="Horizontal">
                     <CheckBox
                         x:Name="OverrideColorCheckBox"
-                        Grid.Column="0"
-                        HorizontalAlignment="Right"
-                        FlowDirection="RightToLeft"
                         Content="{me:LocalizationSource MainWindow.OverrideColor}"
                         IsChecked="{Binding OverrideByColor}"
                         ToolTip="{me:LocalizationSource MainWindow.OverrideColor}"
@@ -82,7 +74,6 @@
                     </CheckBox>
 
                     <CheckBox
-                        Grid.Column="1"
                         Content="{me:LocalizationSource MainWindow.OverrideLines}"
                         IsChecked="{Binding OverrideLines}"
                         ToolTip="{me:LocalizationSource MainWindow.OverrideLinesToolTip}"
@@ -92,14 +83,13 @@
                         ToolTipService.BetweenShowDelay="1" />
 
                     <CheckBox
-                        Grid.Column="2"
                         Content="{me:LocalizationSource MainWindow.OverrideHatching}"
                         IsChecked="{Binding OverrideByPattern}"
                         ToolTip="{me:LocalizationSource MainWindow.OverrideHatchingToolTip}"
                         ToolTipService.InitialShowDelay="1000"
                         ToolTipService.ShowDuration="20000"
                         ToolTipService.BetweenShowDelay="1" />
-                </Grid>
+                </StackPanel>
             </Border>
 
             <Grid
