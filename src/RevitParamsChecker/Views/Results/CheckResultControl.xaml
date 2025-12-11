@@ -155,7 +155,7 @@
 
                     <DataGridTextColumn
                         MinWidth="50"
-                        Width="Auto"
+                        Width="150"
                         IsReadOnly="True"
                         Binding="{Binding FileName}">
                         <DataGridTextColumn.Header>
@@ -165,7 +165,7 @@
                     </DataGridTextColumn>
                     <DataGridTextColumn
                         MinWidth="50"
-                        Width="Auto"
+                        Width="150"
                         IsReadOnly="True"
                         Binding="{Binding CategoryName}">
                         <DataGridTextColumn.Header>
@@ -176,7 +176,7 @@
 
                     <DataGridTextColumn
                         MinWidth="50"
-                        Width="200"
+                        Width="150"
                         IsReadOnly="True"
                         Binding="{Binding FamilyTypeName}">
                         <DataGridTextColumn.Header>
@@ -187,7 +187,7 @@
 
                     <DataGridTextColumn
                         MinWidth="50"
-                        Width="Auto"
+                        Width="150"
                         IsReadOnly="True"
                         Binding="{Binding RuleName}">
                         <DataGridTextColumn.Header>

@@ -49,7 +49,6 @@ internal class RevitRepository {
         // TODO прокинуть фильтр. сейчас для стресс теста берутся все элементы из документа
         return new FilteredElementCollector(doc.Document)
             .WhereElementIsNotElementType()
-            .ToElements()
             .Select(e => new ElementModel(
                 e,
                 doc.IsLink ? new Reference(e).CreateLinkReference(doc.Link) : new Reference(e)))
