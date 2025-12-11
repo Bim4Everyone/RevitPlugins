@@ -6,7 +6,6 @@ using System.ComponentModel;
 using System.Linq;
 using System.Windows.Data;
 using System.Windows.Input;
-using System.Windows.Threading;
 
 using dosymep.SimpleServices;
 using dosymep.WPF.Commands;
@@ -24,6 +23,7 @@ internal class CheckResultViewModel : BaseViewModel {
     private readonly DelayAction _refreshViewDelay;
     private readonly RevitRepository _revitRepo;
     private readonly ObservableCollection<ElementResultViewModel> _allElementResults;
+    private readonly PropertyGroupDescription _defaultGroupDescription;
     private string _elementsFilter;
 
     public CheckResultViewModel(ILocalizationService localization, CheckResult checkResult, RevitRepository revitRepo) {
@@ -36,19 +36,24 @@ internal class CheckResultViewModel : BaseViewModel {
         ElementResults = new CollectionViewSource() { Source = _allElementResults };
         ElementResults.Filter += ElementResultsFilterHandler;
         SelectElementsCommand = RelayCommand.Create<IList>(SelectElements, CanSelectElements);
-        _refreshViewDelay = new DelayAction(
-            300,
-            () => ElementResults.View.Refresh()
-        );
-        SetGrouping(ElementResults);
+        RegroupElementsCommand = RelayCommand.Create(RegroupElements);
+        _refreshViewDelay = new DelayAction(300, () => ElementResults.View.Refresh());
+        var availableProperties = GetEditableGroupProperties(_localization);
+        GroupingProperties = new GroupDescriptionsViewModel(availableProperties, [availableProperties.First()]);
+        _defaultGroupDescription = new PropertyGroupDescription(nameof(ElementResultViewModel.ChunkName));
+        ResetGrouping(
+            ElementResults,
+            [_defaultGroupDescription, availableProperties.First().PropertyGroupDescription]);
         PropertyChanged += ElementsFilterPropertyChanged;
     }
 
     public ICommand SelectElementsCommand { get; }
+    public ICommand RegroupElementsCommand { get; }
     public string Name { get; }
     public CheckResult CheckResult { get; }
     public IReadOnlyCollection<RuleViewModel> RulesStamp { get; }
     public CollectionViewSource ElementResults { get; }
+    public GroupDescriptionsViewModel GroupingProperties { get; }
 
     /// <summary>
     /// Фильтр для таблицы с элементами в ui
@@ -92,23 +97,27 @@ internal class CheckResultViewModel : BaseViewModel {
         }
     }
 
-    private PropertyGroupDescription[] GetGroupDescriptions() {
+    private IList<PropertyViewModel> GetEditableGroupProperties(ILocalizationService localization) {
         return [
-            new PropertyGroupDescription(
-                nameof(ElementResultViewModel.ChunkName)),
-            new PropertyGroupDescription(
+            new PropertyViewModel(
+                localization.GetLocalizedString("ResultsPage.StatusHeader"),
                 nameof(ElementResultViewModel.Status)),
-            new PropertyGroupDescription(
+            new PropertyViewModel(
+                localization.GetLocalizedString("ResultsPage.FileNameHeader"),
                 nameof(ElementResultViewModel.FileName)),
-            new PropertyGroupDescription(
-                nameof(ElementResultViewModel.RuleName))
+            new PropertyViewModel(
+                localization.GetLocalizedString("ResultsPage.RuleNameHeader"),
+                nameof(ElementResultViewModel.RuleName)),
+            new PropertyViewModel(
+                localization.GetLocalizedString("ResultsPage.FamilyTypeNameHeader"),
+                nameof(ElementResultViewModel.FamilyTypeName))
         ];
     }
 
-    private void SetGrouping(CollectionViewSource elementResults) {
-        elementResults.GroupDescriptions.Clear();
-        foreach(var p in GetGroupDescriptions()) {
-            elementResults.GroupDescriptions.Add(p);
+    private void ResetGrouping(CollectionViewSource collection, IList<PropertyGroupDescription> properties) {
+        collection.GroupDescriptions.Clear();
+        foreach(var p in properties) {
+            collection.GroupDescriptions.Add(p);
         }
     }
 
@@ -142,5 +151,12 @@ internal class CheckResultViewModel : BaseViewModel {
                 .Select(r => new RuleViewModel(r.RuleCopy, localization))
                 .ToArray()
         );
+    }
+
+    private void RegroupElements() {
+        var groups = GroupingProperties.GroupDescriptions
+            .Select(g => g.SelectedProperty.PropertyGroupDescription)
+            .ToArray();
+        ResetGrouping(ElementResults, [_defaultGroupDescription, .. groups]);
     }
 }

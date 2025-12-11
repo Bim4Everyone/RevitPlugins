@@ -84,6 +84,12 @@
                     Text="{Binding ElementsFilter, UpdateSourceTrigger=PropertyChanged}"
                     PlaceholderText="{me:LocalizationSource ResultsPage.ElementsSearchPlaceholder}" />
             </DockPanel>
+            <DockPanel
+                Dock="Top">
+                <local:GroupsEditorControl
+                    UpdateCommand="{Binding DataContext.RegroupElementsCommand, ElementName=_this}"
+                    DataContext="{Binding GroupingProperties}"></local:GroupsEditorControl>
+            </DockPanel>
             <ui:DataGrid
                 x:Name="_elements"
                 SelectionMode="Extended"

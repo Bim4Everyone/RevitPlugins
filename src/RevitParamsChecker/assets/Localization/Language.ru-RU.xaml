@@ -94,6 +94,14 @@
     <system:String
         x:Key="ResultsPage.ElementsSearchPlaceholder">Поиск</system:String>
 
+    <system:String
+        x:Key="GroupsEditor.Label">Группировка</system:String>
+    <system:String
+        x:Key="GroupsEditor.UpdateButtonTooltip">Применить изменения</system:String>
+    <system:String
+        x:Key="GroupsEditor.AddButtonTooltip">Добавить столбец для группировки</system:String>
+    <system:String
+        x:Key="GroupsEditor.RemoveButtonTooltip">Удалить столбец для группировки</system:String>
 
     <system:String
         x:Key="FiltersPage.NewFilterPrompt">Новый поисковый набор</system:String>
