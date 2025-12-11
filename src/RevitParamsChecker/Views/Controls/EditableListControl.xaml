@@ -8,6 +8,7 @@
     xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
     xmlns:me="clr-namespace:dosymep.WpfCore.MarkupExtensions;assembly=dosymep.WpfCore"
     xmlns:local="clr-namespace:RevitParamsChecker.Views.Controls"
+    xmlns:cm="clr-namespace:System.ComponentModel;assembly=WindowsBase"
     mc:Ignorable="d"
     x:Name="_this"
     d:DesignHeight="300"
@@ -19,6 +20,16 @@
                 <ResourceDictionary
                     Source="../../Resources/CustomStyles.xaml" />
             </ResourceDictionary.MergedDictionaries>
+            <CollectionViewSource
+                x:Key="_sortedItems"
+                IsLiveSortingRequested="True"
+                Source="{Binding ListItemsSource, ElementName=_this}">
+                <CollectionViewSource.SortDescriptions>
+                    <cm:SortDescription
+                        PropertyName="Name"
+                        Direction="Ascending" />
+                </CollectionViewSource.SortDescriptions>
+            </CollectionViewSource>
         </ResourceDictionary>
     </core:WpfUIPlatformUserControl.Resources>
     <Border
@@ -38,7 +49,7 @@
                 Margin="0 4 0 0"
                 SelectionMode="Extended"
                 x:Name="_list"
-                ItemsSource="{Binding ListItemsSource, ElementName=_this}"
+                ItemsSource="{Binding Source={StaticResource _sortedItems}}"
                 SelectedItem="{Binding ListSelectedItem, ElementName=_this}">
                 <ui:ListView.ItemTemplate>
                     <DataTemplate>
