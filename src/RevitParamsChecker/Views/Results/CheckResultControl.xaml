@@ -101,6 +101,7 @@
                 GridLinesVisibility="All"
                 IsReadOnly="False"
                 RowHeight="26"
+                SelectedItem="{Binding SelectedElementResult, UpdateSourceTrigger=PropertyChanged}"
                 CellStyle="{StaticResource CustomTooltipDataGridCell}"
                 Style="{StaticResource CustomResizableDataGridStyle}"
                 ItemsSource="{Binding ElementResults.View}">

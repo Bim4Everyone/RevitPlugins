@@ -6,9 +6,11 @@
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:local="clr-namespace:RevitParamsChecker.Views.Results"
     xmlns:core="clr-namespace:dosymep.WpfUI.Core"
+    xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
     xmlns:me="clr-namespace:dosymep.WpfCore.MarkupExtensions;assembly=dosymep.WpfCore"
     xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
     xmlns:vms="clr-namespace:RevitParamsChecker.ViewModels.Results"
+    xmlns:res="clr-namespace:RevitParamsChecker.Resources"
     ScrollViewer.CanContentScroll="False"
     mc:Ignorable="d"
     d:DesignHeight="450"
@@ -62,7 +64,12 @@
                 </DockPanel>
                 <ui:ListView
                     SelectionMode="Single"
+                    SelectedItem="{Binding SelectedCheckResult.SelectedRuleStamp}"
                     ItemsSource="{Binding SelectedCheckResult.RulesStamp}">
+                    <i:Interaction.Behaviors>
+                        <res:ScrollIntoViewBehavior
+                            SelectedItem="{Binding SelectedCheckResult.SelectedRuleStamp}" />
+                    </i:Interaction.Behaviors>
                     <ui:ListView.ItemTemplate>
                         <DataTemplate>
                             <local:ReadonlyRuleControl

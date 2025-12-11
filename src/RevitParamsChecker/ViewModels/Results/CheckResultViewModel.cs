@@ -25,6 +25,8 @@ internal class CheckResultViewModel : BaseViewModel {
     private readonly ObservableCollection<ElementResultViewModel> _allElementResults;
     private readonly PropertyGroupDescription _defaultGroupDescription;
     private string _elementsFilter;
+    private ElementResultViewModel _selectedElementResult;
+    private RuleViewModel _selectedRuleStamp;
 
     public CheckResultViewModel(ILocalizationService localization, CheckResult checkResult, RevitRepository revitRepo) {
         _localization = localization ?? throw new ArgumentNullException(nameof(localization));
@@ -54,6 +56,22 @@ internal class CheckResultViewModel : BaseViewModel {
     public IReadOnlyCollection<RuleViewModel> RulesStamp { get; }
     public CollectionViewSource ElementResults { get; }
     public GroupDescriptionsViewModel GroupingProperties { get; }
+
+    public ElementResultViewModel SelectedElementResult {
+        get => _selectedElementResult;
+        set {
+            RaiseAndSetIfChanged(ref _selectedElementResult, value);
+            var ruleName = value?.RuleName;
+            if(!string.IsNullOrWhiteSpace(ruleName)) {
+                SelectedRuleStamp = RulesStamp.FirstOrDefault(r => r.Name == ruleName);
+            }
+        }
+    }
+
+    public RuleViewModel SelectedRuleStamp {
+        get => _selectedRuleStamp;
+        set => RaiseAndSetIfChanged(ref _selectedRuleStamp, value);
+    }
 
     /// <summary>
     /// Фильтр для таблицы с элементами в ui
