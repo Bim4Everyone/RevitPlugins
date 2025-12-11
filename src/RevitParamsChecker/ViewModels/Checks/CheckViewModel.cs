@@ -13,6 +13,9 @@ internal class CheckViewModel : BaseViewModel, IEquatable<CheckViewModel>, IName
     private readonly Check _check;
     private readonly Guid _guid;
     private string _name;
+    private string _warningFiles;
+    private string _warningFilters;
+    private string _warningRules;
     private bool _isSelected;
     private ObservableCollection<string> _selectedFiles;
     private ObservableCollection<string> _selectedFilters;
@@ -33,6 +36,21 @@ internal class CheckViewModel : BaseViewModel, IEquatable<CheckViewModel>, IName
     public string Name {
         get => _name;
         set => RaiseAndSetIfChanged(ref _name, value);
+    }
+
+    public string WarningFiles {
+        get => _warningFiles;
+        set => RaiseAndSetIfChanged(ref _warningFiles, value);
+    }
+
+    public string WarningFilters {
+        get => _warningFilters;
+        set => RaiseAndSetIfChanged(ref _warningFilters, value);
+    }
+
+    public string WarningRules {
+        get => _warningRules;
+        set => RaiseAndSetIfChanged(ref _warningRules, value);
     }
 
     public bool IsSelected {

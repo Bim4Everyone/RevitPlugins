@@ -1,5 +1,6 @@
 using System;
 using System.Collections;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.IO;
@@ -83,6 +84,9 @@ internal class ChecksPageViewModel : BaseViewModel {
 
         _filtersRepo.FiltersChanged += FiltersChangedHandler;
         _rulesRepo.RulesChanged += RulesChangedHandler;
+        ValidateFiles(_localization, Checks, _availableFiles);
+        ValidateFilters(_localization, Checks, _availableFilters);
+        ValidateRules(_localization, Checks, _availableRules);
         SubscribeToChanges(Checks);
     }
 
@@ -272,6 +276,7 @@ internal class ChecksPageViewModel : BaseViewModel {
                 _availableFiles.ToArray(),
                 check.SelectedFiles.ToArray());
             check.SelectedFiles = [..selectedFiles];
+            check.WarningFiles = string.Empty;
         } catch(OperationCanceledException) {
         }
     }
@@ -283,6 +288,7 @@ internal class ChecksPageViewModel : BaseViewModel {
                 _availableFilters.ToArray(),
                 check.SelectedFilters.ToArray());
             check.SelectedFilters = [..selectedFilters];
+            check.WarningFilters = string.Empty;
         } catch(OperationCanceledException) {
         }
     }
@@ -294,6 +300,7 @@ internal class ChecksPageViewModel : BaseViewModel {
                 _availableRules.ToArray(),
                 check.SelectedRules.ToArray());
             check.SelectedRules = [..selectedRules];
+            check.WarningRules = string.Empty;
         } catch(OperationCanceledException) {
         }
     }
@@ -303,13 +310,13 @@ internal class ChecksPageViewModel : BaseViewModel {
     }
 
     private void RulesChangedHandler(object sender, RulesChangedEventArgs e) {
-        // TODO
         _availableRules = [..e.NewRules.Select(r => r.Name)];
+        ValidateRules(_localization, Checks, _availableRules);
     }
 
     private void FiltersChangedHandler(object sender, FiltersChangedEventArgs e) {
-        // TODO
         _availableFilters = [..e.NewFilters.Select(f => f.Name)];
+        ValidateFilters(_localization, Checks, _availableFilters);
     }
 
     private void SubscribeToChanges(ObservableCollection<CheckViewModel> checks) {
@@ -322,6 +329,68 @@ internal class ChecksPageViewModel : BaseViewModel {
         if((sender is CheckViewModel check)
            && check.Modified) {
             ChecksModified = true;
+        }
+    }
+
+    private void ValidateFiles(
+        ILocalizationService localization,
+        ICollection<CheckViewModel> checks,
+        string[] availableFiles) {
+        foreach(var check in checks) {
+            string[] filesInCheck = check.SelectedFiles.ToArray();
+            string[] missingFiles = filesInCheck.Except(availableFiles).ToArray();
+            if(missingFiles.Length == 0) {
+                return;
+            }
+
+            check.SelectedFiles = [..filesInCheck.Intersect(availableFiles)];
+            check.WarningFiles = localization.GetLocalizedString(
+                "ChecksPage.Warning.MissingFiles",
+                GetMissingStringsWarningMessage(missingFiles));
+        }
+    }
+
+    private void ValidateFilters(
+        ILocalizationService localization,
+        ICollection<CheckViewModel> checks,
+        string[] availableFilters) {
+        foreach(var check in checks) {
+            string[] filtersInCheck = check.SelectedFilters.ToArray();
+            string[] missingFilters = filtersInCheck.Except(availableFilters).ToArray();
+            if(missingFilters.Length == 0) {
+                return;
+            }
+
+            check.SelectedFilters = [..filtersInCheck.Intersect(availableFilters)];
+            check.WarningFilters = localization.GetLocalizedString(
+                "ChecksPage.Warning.MissingFilters",
+                GetMissingStringsWarningMessage(missingFilters));
+        }
+    }
+
+    private void ValidateRules(
+        ILocalizationService localization,
+        ICollection<CheckViewModel> checks,
+        string[] availableRules) {
+        foreach(var check in checks) {
+            string[] rulesInCheck = check.SelectedRules.ToArray();
+            string[] missingRules = rulesInCheck.Except(availableRules).ToArray();
+            if(missingRules.Length == 0) {
+                return;
+            }
+
+            check.SelectedRules = [..rulesInCheck.Intersect(availableRules)];
+            check.WarningRules = localization.GetLocalizedString(
+                "ChecksPage.Warning.MissingRules",
+                GetMissingStringsWarningMessage(missingRules));
+        }
+    }
+
+    private string GetMissingStringsWarningMessage(string[] items) {
+        if(items.Length <= 5) {
+            return string.Join("\n", items);
+        } else {
+            return string.Join("\n", items.Take(5));
         }
     }
 }

@@ -51,6 +51,12 @@ internal partial class SelectedNamesControl {
         typeof(SelectedNamesControl),
         new PropertyMetadata(default(string)));
 
+    public static readonly DependencyProperty WarningMessageProperty = DependencyProperty.Register(
+        nameof(WarningMessage),
+        typeof(string),
+        typeof(SelectedNamesControl),
+        new FrameworkPropertyMetadata(null, FrameworkPropertyMetadataOptions.BindsTwoWayByDefault));
+
     public ICollection<string> SelectedNames {
         get => (ICollection<string>) GetValue(SelectedNamesProperty);
         set => SetValue(SelectedNamesProperty, value);
@@ -69,5 +75,10 @@ internal partial class SelectedNamesControl {
     public string SelectNamesPrompt {
         get => (string) GetValue(SelectNamesPromptProperty);
         set => SetValue(SelectNamesPromptProperty, value);
+    }
+
+    public string WarningMessage {
+        get => (string) GetValue(WarningMessageProperty);
+        set => SetValue(WarningMessageProperty, value);
     }
 }

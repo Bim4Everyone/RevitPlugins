@@ -65,6 +65,24 @@
         x:Key="ChecksPage.SaveFileDefaultName">Настройки проверок параметров</system:String>
     <system:String
         x:Key="ChecksPage.Error.CannotLoadChecks">Не удалось загрузить проверки</system:String>
+    <system:String
+        xml:space="preserve"
+        x:Key="ChecksPage.Warning.MissingFiles">
+Выбранные ранее файлы отсутствуют:
+{0}
+    </system:String>
+    <system:String
+        xml:space="preserve"
+        x:Key="ChecksPage.Warning.MissingFilters">
+Выбранные ранее фильтры отсутствуют:
+{0}
+    </system:String>
+    <system:String
+        xml:space="preserve"
+        x:Key="ChecksPage.Warning.MissingRules">
+Выбранные ранее проверки отсутствуют:
+{0}
+    </system:String>
 
     <system:String
         x:Key="NamesResolver.Header">Загрузка настроек</system:String>

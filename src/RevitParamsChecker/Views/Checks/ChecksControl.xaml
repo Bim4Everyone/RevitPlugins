@@ -134,7 +134,8 @@
                         <DataGridTemplateColumn.CellTemplate>
                             <DataTemplate>
                                 <local:SelectedNamesControl
-                                    SelectedNames="{Binding SelectedFiles, UpdateSourceTrigger=PropertyChanged}"
+                                    WarningMessage="{Binding WarningFiles}"
+                                    SelectedNames="{Binding SelectedFiles}"
                                     SelectNamesCommandParameter="{Binding}"
                                     SelectNamesCommand="{Binding DataContext.SetCheckSelectedFilesCommand, RelativeSource={RelativeSource AncestorType=UserControl, Mode=FindAncestor}}" />
                             </DataTemplate>
@@ -151,7 +152,8 @@
                         <DataGridTemplateColumn.CellTemplate>
                             <DataTemplate>
                                 <local:SelectedNamesControl
-                                    SelectedNames="{Binding SelectedFilters, UpdateSourceTrigger=PropertyChanged}"
+                                    WarningMessage="{Binding WarningFilters}"
+                                    SelectedNames="{Binding SelectedFilters}"
                                     SelectNamesCommandParameter="{Binding}"
                                     SelectNamesCommand="{Binding DataContext.SetCheckSelectedFiltersCommand, RelativeSource={RelativeSource AncestorType=UserControl, Mode=FindAncestor}}" />
                             </DataTemplate>
@@ -168,7 +170,8 @@
                         <DataGridTemplateColumn.CellTemplate>
                             <DataTemplate>
                                 <local:SelectedNamesControl
-                                    SelectedNames="{Binding SelectedRules, UpdateSourceTrigger=PropertyChanged}"
+                                    WarningMessage="{Binding WarningRules}"
+                                    SelectedNames="{Binding SelectedRules}"
                                     SelectNamesCommandParameter="{Binding}"
                                     SelectNamesCommand="{Binding DataContext.SetCheckSelectedRulesCommand, RelativeSource={RelativeSource AncestorType=UserControl, Mode=FindAncestor}}" />
                             </DataTemplate>

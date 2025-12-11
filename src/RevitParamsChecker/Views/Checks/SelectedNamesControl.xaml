@@ -9,6 +9,7 @@
     xmlns:me="clr-namespace:dosymep.WpfCore.MarkupExtensions;assembly=dosymep.WpfCore"
     xmlns:local="clr-namespace:RevitParamsChecker.Views.Checks"
     xmlns:res="clr-namespace:RevitParamsChecker.Resources"
+    xmlns:converters="clr-namespace:dosymep.WpfCore.Converters;assembly=dosymep.WpfCore"
     mc:Ignorable="d"
     x:Name="_this"
     d:DesignHeight="300"
@@ -22,6 +23,8 @@
                 <ResourceDictionary
                     Source="pack://application:,,,/Wpf.Ui;component/Controls/TextBlock/TextBlock.xaml" />
             </ResourceDictionary.MergedDictionaries>
+            <converters:StringToVisibilityConverter
+                x:Key="StringToVisibilityConverter" />
             <res:CollectionToStringConverter
                 x:Key="CollectionToStringConverter"
                 Separator="; " />
@@ -51,10 +54,18 @@
         <DockPanel
             LastChildFill="True">
             <ui:Button
+                Margin="4 0 0 0"
                 DockPanel.Dock="Right"
                 CommandParameter="{Binding SelectNamesCommandParameter, ElementName=_this}"
                 Command="{Binding SelectNamesCommand, ElementName=_this}"
                 Content="{ui:SymbolIcon Symbol=Edit20}" />
+            <ui:SymbolIcon
+                DockPanel.Dock="Right"
+                VerticalAlignment="Center"
+                Foreground="Orange"
+                Symbol="Warning20"
+                Visibility="{Binding WarningMessage, ElementName=_this, Converter={StaticResource StringToVisibilityConverter}}"
+                ToolTip="{Binding WarningMessage, ElementName=_this}" />
             <ui:TextBlock
                 Text="{me:LocalizationSource ChecksPage.NothingSelectPrompt}">
                 <ui:TextBlock.Style>
