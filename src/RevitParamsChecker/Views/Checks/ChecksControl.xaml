@@ -44,6 +44,11 @@
                     Margin="8 0 0 0"
                     Content="{me:LocalizationSource ChecksPage.ExecuteChecksButton}"
                     Command="{Binding ExecuteChecksCommand}" />
+                <ui:TextBlock
+                    Margin="8 0 0 0"
+                    HorizontalAlignment="Left"
+                    Style="{StaticResource CustomErrorText}"
+                    Text="{Binding ErrorText}" />
             </DockPanel>
             <ui:DataGrid
                 x:Name="_checksGrid"

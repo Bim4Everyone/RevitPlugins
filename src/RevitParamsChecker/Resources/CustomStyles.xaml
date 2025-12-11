@@ -73,6 +73,9 @@
             Property="SnapsToDevicePixels"
             Value="True" />
         <Setter
+            Property="FontSize"
+            Value="{DynamicResource ControlContentThemeFontSize}" />
+        <Setter
             Property="OverridesDefaultStyle"
             Value="True" />
         <Style.Triggers>
@@ -95,6 +98,9 @@
     <Style
         TargetType="ui:TextBlock"
         x:Key="CustomMessageText">
+        <Setter
+            Property="FontSize"
+            Value="{DynamicResource ControlContentThemeFontSize}" />
         <Setter
             Property="Foreground"
             Value="Green" />

@@ -29,6 +29,7 @@ internal class ChecksPageViewModel : BaseViewModel {
     private readonly ChecksConverter _checksConverter;
     private readonly NamesService _namesService;
     private readonly ChecksEngine _checksEngine;
+    private string _errorText;
     private string _dirPath;
     private bool _allSelected;
     private string[] _availableFiles;
@@ -125,6 +126,11 @@ internal class ChecksPageViewModel : BaseViewModel {
         }
     }
 
+    public string ErrorText {
+        get => _errorText;
+        set => RaiseAndSetIfChanged(ref _errorText, value);
+    }
+
     public bool ChecksModified {
         get => _checksModified;
         set => RaiseAndSetIfChanged(ref _checksModified, value);
@@ -210,7 +216,29 @@ internal class ChecksPageViewModel : BaseViewModel {
     }
 
     private bool CanExecuteChecks() {
-        return Checks.Count(c => c.IsSelected) > 0; // TODO
+        var selectedChecks = Checks.Where(f => f.IsSelected).ToArray();
+        if(selectedChecks.Length == 0) {
+            ErrorText = _localization.GetLocalizedString("ChecksPage.Validation.SelectAnyCheck");
+            return false;
+        }
+
+        if(!selectedChecks.All(c => c.SelectedFiles.Count > 0)) {
+            ErrorText = _localization.GetLocalizedString("ChecksPage.Validation.SelectedChecksHaveEmptyFiles");
+            return false;
+        }
+
+        if(!selectedChecks.All(c => c.SelectedFilters.Count > 0)) {
+            ErrorText = _localization.GetLocalizedString("ChecksPage.Validation.SelectedChecksHaveEmptyFilters");
+            return false;
+        }
+
+        if(!selectedChecks.All(c => c.SelectedRules.Count > 0)) {
+            ErrorText = _localization.GetLocalizedString("ChecksPage.Validation.SelectedChecksHaveEmptyRules");
+            return false;
+        }
+
+        ErrorText = null;
+        return true;
     }
 
     private void Load() {
@@ -266,7 +294,7 @@ internal class ChecksPageViewModel : BaseViewModel {
     }
 
     private bool CanSave() {
-        return true; // TODO
+        return true;
     }
 
     private async Task SetSelectedFilesAsync(CheckViewModel check) {

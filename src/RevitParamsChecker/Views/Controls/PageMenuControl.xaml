@@ -49,6 +49,12 @@
                 FontSize="{DynamicResource ControlContentThemeFontSize}"
                 Visibility="{Binding ShowSaveChangesPrompt, ElementName=_this, Converter={StaticResource BoolToVisibilityConverter}}"
                 Content="{me:LocalizationSource PageMenu.SaveChangesPrompt}" />
+            <ui:TextBlock
+                Margin="8 0 0 0"
+                HorizontalAlignment="Left"
+                Style="{StaticResource CustomErrorText}"
+                ToolTip="{Binding PageWarningMessage, ElementName=_this}"
+                Text="{Binding PageWarningMessage, ElementName=_this}" />
         </DockPanel>
     </Border>
 </core:WpfUIPlatformUserControl>

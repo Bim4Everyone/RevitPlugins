@@ -83,6 +83,15 @@
 Выбранные ранее проверки отсутствуют:
 {0}
     </system:String>
+    <system:String
+        x:Key="ChecksPage.Validation.SelectAnyCheck">Выберите хотя бы 1 проверку</system:String>
+    <system:String
+        x:Key="ChecksPage.Validation.SelectedChecksHaveEmptyFiles">Укажите файлы для всех выбранных проверок</system:String>
+    <system:String
+        x:Key="ChecksPage.Validation.SelectedChecksHaveEmptyFilters">Укажите фильтры для всех выбранных проверок</system:String>
+    <system:String
+        x:Key="ChecksPage.Validation.SelectedChecksHaveEmptyRules">Укажите правила для всех выбранных проверок</system:String>
+
 
     <system:String
         x:Key="NamesResolver.Header">Загрузка настроек</system:String>

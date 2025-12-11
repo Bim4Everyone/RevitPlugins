@@ -50,6 +50,12 @@ internal partial class PageMenuControl {
         typeof(PageMenuControl),
         new PropertyMetadata(false));
 
+    public static readonly DependencyProperty PageWarningMessageProperty = DependencyProperty.Register(
+        nameof(PageWarningMessage),
+        typeof(string),
+        typeof(PageMenuControl),
+        new FrameworkPropertyMetadata(null, FrameworkPropertyMetadataOptions.BindsTwoWayByDefault));
+
     public ICommand LoadButtonCommand {
         get => (ICommand) GetValue(LoadButtonCommandProperty);
         set => SetValue(LoadButtonCommandProperty, value);
@@ -68,5 +74,10 @@ internal partial class PageMenuControl {
     public bool ShowSaveChangesPrompt {
         get => (bool) GetValue(ShowSaveChangesPromptProperty);
         set => SetValue(ShowSaveChangesPromptProperty, value);
+    }
+
+    public string PageWarningMessage {
+        get => (string) GetValue(PageWarningMessageProperty);
+        set => SetValue(PageWarningMessageProperty, value);
     }
 }
