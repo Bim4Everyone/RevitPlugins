@@ -7,7 +7,7 @@
         <ResourceDictionary
             Source="pack://application:,,,/Wpf.Ui;component/Controls/DataGrid/DataGrid.xaml" />
         <ResourceDictionary
-            Source="./CustomExpander.xaml" />
+            Source="./CustomExpanderStyle.xaml" />
         <ui:ThemesDictionary />
         <ui:ControlsDictionary />
     </ResourceDictionary.MergedDictionaries>

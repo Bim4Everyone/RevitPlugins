@@ -11,12 +11,10 @@
     </ResourceDictionary.MergedDictionaries>
     <!-- Стиль для экспандера без анимации -->
 
-    <!-- This style is based on DefaultUiCardExpanderStyle but with all animations removed -->
     <Style
         x:Key="CustomCardExpanderNoAnimationStyle"
         BasedOn="{StaticResource DefaultUiCardExpanderStyle}"
         TargetType="{x:Type ui:CardExpander}">
-        <!-- Override the Template to remove animations -->
         <Setter
             Property="Template">
             <Setter.Value>
@@ -111,7 +109,6 @@
                             </ToggleButton>
                         </Border>
 
-                        <!--  Collapsed content to expand  -->
                         <Border
                             x:Name="ContentPresenterBorder"
                             Grid.Row="1"
