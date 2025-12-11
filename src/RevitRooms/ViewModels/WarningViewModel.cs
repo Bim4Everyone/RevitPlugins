@@ -21,28 +21,10 @@ namespace RevitRooms.ViewModels;
 internal class WarningViewModel : BaseViewModel {
     private readonly ILocalizationService _localizationService;
 
-    private readonly IconElement _errorIcon;
-    private readonly IconElement _warningIcon;
-    private readonly IconElement _infoIcon;
-    private readonly IconElement _unknownIcon;
-
-
     public WarningViewModel(ILocalizationService localizationService) {
         _localizationService = localizationService;
-
-        _errorIcon = new SymbolIcon(SymbolRegular.DismissCircle24) {
-            FontSize = 24
-        };
-        _warningIcon = new SymbolIcon(SymbolRegular.Warning24) {
-            FontSize = 24
-        };
-        _infoIcon = new SymbolIcon(SymbolRegular.Warning24) {
-            FontSize = 24
-        };
-        _unknownIcon = new SymbolIcon(SymbolRegular.Square24) {
-            FontSize = 24
-        };
     }
+
     public string Message { get; set; }
     public string Description { get; set; }
 
@@ -58,17 +40,6 @@ internal class WarningViewModel : BaseViewModel {
         }
     }
     public string FullMessage => $"{TypeInfoText}. {Message}";
-    public IconElement Icon {
-        get {
-            return TypeInfo switch {
-                WarningTypeInfo.Error => _errorIcon,
-                WarningTypeInfo.Info => _infoIcon,
-                WarningTypeInfo.Warning => _warningIcon,
-                _ => _unknownIcon
-            };
-        }
-    }
-
     public ObservableCollection<WarningElementViewModel> Elements { get; set; }
 }
 
