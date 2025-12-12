@@ -185,6 +185,11 @@ internal class CheckResultViewModel : BaseViewModel {
     }
 
     private void RegroupElements() {
+        if(!GroupingProperties.IsGroupingEnabled) {
+            ResetGrouping(ElementResults, []);
+            return;
+        }
+
         var groups = GroupingProperties.GroupDescriptions
             .Select(g => g.SelectedProperty.PropertyGroupDescription)
             .ToArray();

@@ -11,6 +11,7 @@ namespace RevitParamsChecker.ViewModels.Results;
 
 internal class GroupDescriptionsViewModel : BaseViewModel {
     private GroupDescriptionViewModel _selectedGroupDescription;
+    private bool _isGroupingEnabled = true;
 
     public GroupDescriptionsViewModel(
         ICollection<PropertyViewModel> availableProperties,
@@ -40,6 +41,17 @@ internal class GroupDescriptionsViewModel : BaseViewModel {
     public IReadOnlyCollection<PropertyViewModel> AvailableProperties { get; }
 
     public ObservableCollection<GroupDescriptionViewModel> GroupDescriptions { get; }
+
+    public bool IsGroupingEnabled {
+        get => _isGroupingEnabled;
+        set {
+            RaiseAndSetIfChanged(ref _isGroupingEnabled, value);
+            if(!value) {
+                SelectedGroupDescription = null;
+                GroupDescriptions.Clear();
+            }
+        }
+    }
 
     public GroupDescriptionViewModel SelectedGroupDescription {
         get => _selectedGroupDescription;

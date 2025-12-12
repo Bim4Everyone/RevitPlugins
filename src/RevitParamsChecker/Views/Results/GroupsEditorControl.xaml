@@ -26,22 +26,26 @@
     <Border
         Style="{StaticResource CustomBorder}">
         <DockPanel>
-            <Label
-                DockPanel.Dock="Top"
-                Margin="0"
-                Content="{me:LocalizationSource GroupsEditor.Label}"
-                FontSize="{DynamicResource ControlContentThemeFontSize}" />
+            <DockPanel>
+                <ui:ToggleSwitch
+                    DockPanel.Dock="Top"
+                    IsChecked="{Binding IsGroupingEnabled}"
+                    Content="{me:LocalizationSource GroupsEditor.Label}"
+                    FontSize="{DynamicResource ControlContentThemeFontSize}" />
+            </DockPanel>
             <ui:Button
                 ToolTip="{me:LocalizationSource GroupsEditor.UpdateButtonTooltip}"
                 Content="{ui:SymbolIcon Symbol=ArrowSync20}"
                 Command="{Binding UpdateCommand, ElementName=_this}" />
             <ui:Button
                 Margin="8 0"
+                IsEnabled="{Binding IsGroupingEnabled}"
                 ToolTip="{me:LocalizationSource GroupsEditor.AddButtonTooltip}"
                 Content="{ui:SymbolIcon Symbol=Add20}"
                 Command="{Binding AddGroupCommand}" />
             <ui:Button
                 Appearance="Danger"
+                IsEnabled="{Binding IsGroupingEnabled}"
                 ToolTip="{me:LocalizationSource GroupsEditor.RemoveButtonTooltip}"
                 Content="{ui:SymbolIcon Symbol=Delete20}"
                 Command="{Binding RemoveGroupCommand}"
@@ -49,6 +53,7 @@
             <ui:ListView
                 x:Name="_groups"
                 SelectionMode="Single"
+                IsEnabled="{Binding IsGroupingEnabled}"
                 SelectedItem="{Binding SelectedGroupDescription}"
                 ItemsSource="{Binding GroupDescriptions}"
                 ScrollViewer.HorizontalScrollBarVisibility="Auto"
