@@ -1,8 +1,10 @@
+using System;
 using System.Globalization;
 using System.Reflection;
 using System.Windows;
 
 using Autodesk.Revit.Attributes;
+using Autodesk.Revit.DB;
 using Autodesk.Revit.UI;
 
 using dosymep.Bim4Everyone;
@@ -45,6 +47,7 @@ public class RevitUnmodelingMepCommand : BasePluginCommand {
     /// В случаях, когда не используется конфигурация
     /// или локализация требуется удалять их использование полностью во всем проекте.
     /// </remarks>
+    /// 
     protected override void Execute(UIApplication uiApplication) {
         // Создание контейнера зависимостей плагина с сервисами из платформы
         using IKernel kernel = uiApplication.CreatePlatformServices();
@@ -74,7 +77,22 @@ public class RevitUnmodelingMepCommand : BasePluginCommand {
             $"/{assemblyName};component/assets/localization/language.xaml",
             CultureInfo.GetCultureInfo("ru-RU"));
 
+        var servise = GetPlatformService<IMessageBoxService>();
+        CheckDocument(uiApplication.ActiveUIDocument.Document, servise);
+
         // Вызывает стандартное уведомление
         Notification(kernel.Get<MainWindow>());
+    }
+
+    private void CheckDocument(Document document, IMessageBoxService service) {
+        EditorChecker editorChecker = new(document);
+        ProjectInfo info = document.ProjectInformation;
+
+        editorChecker.GetReport(info);
+
+        if(!string.IsNullOrEmpty(editorChecker.FinalReport)) {
+            service.Show(editorChecker.FinalReport, "Настройки немоделируемых", MessageBoxButton.OK, MessageBoxImage.Error);
+            throw new OperationCanceledException();
+        }
     }
 }

@@ -14,10 +14,11 @@ internal class RevitRepository {
     /// <summary>
     /// Создает экземпляр репозитория.
     /// </summary>
-    /// <param name="uiApplication">Класс доступа к интерфейсу Revit.</param>
+    /// <param name="u  iApplication">Класс доступа к интерфейсу Revit.</param>
     public RevitRepository(UIApplication uiApplication) {
         UIApplication = uiApplication;
     }
+
 
     /// <summary>
     /// Класс доступа к интерфейсу Revit.
