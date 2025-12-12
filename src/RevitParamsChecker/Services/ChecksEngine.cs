@@ -73,10 +73,12 @@ internal class ChecksEngine {
     private ICollection<ElementModel> GetElements(Check check) {
         var filters = check.Filters.Select(f => _filtersRepo.GetFilter(f)).ToArray();
         var docs = check.Files.Select(c => _revitRepo.GetDocument(c)).ToArray();
-        List<ElementModel> elements = [];
+        HashSet<ElementModel> elements = []; // фильтры могут пересекаться и надо избежать дублей элементов
         foreach(var doc in docs) {
             foreach(var filter in filters) {
-                elements.AddRange(_revitRepo.GetElements(doc, filter));
+                foreach(var el in _revitRepo.GetElements(doc, filter)) {
+                    elements.Add(el);
+                }
             }
         }
 
