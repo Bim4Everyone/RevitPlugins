@@ -136,7 +136,7 @@
                     </StackPanel>
                 </Border>
 
-                <Border Name="ElevationProps"
+                <Border Name="Offsets"
                     Margin="7"
                     Style="{StaticResource CustomBorder}">
                     <StackPanel>
@@ -163,18 +163,6 @@
                             TextBoxText="{Binding Path=ViewSectionSettings.TransverseViewThirdElevationTemp, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
                             ToolTipText="{me:LocalizationSource HorizontalViewSettingsPage.ThirdHorizontalViewTopOffsetToolTip}"
                             TextChangedCommand="{Binding SettingsChangedCommand}" />
-                    </StackPanel>
-                </Border>
-
-                <Border Name="ViewOffsets"
-                    Margin="7"
-                    Style="{StaticResource CustomBorder}">
-                    <StackPanel>
-                        <controls:SettingsTitleControl
-                            LabelText="{me:LocalizationSource HorizontalView.HorizontalViewPylonOffsets}"
-                            ToolTipText="{me:LocalizationSource HorizontalViewSettingsPage.HorizontalViewPylonOffsetsToolTip}"
-                            ButtonCommand="{Binding ApplySettingsCommand}"
-                            ButtonMouseLeaveCommand="{Binding CheckSettingsCommand}" />
 
                         <controls:TextBoxSettingControl
                             LabelText="{me:LocalizationSource HorizontalView.HorizontalViewXOffset}"

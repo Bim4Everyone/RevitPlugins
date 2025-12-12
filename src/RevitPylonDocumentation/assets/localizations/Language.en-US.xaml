@@ -192,7 +192,7 @@
     <system:String x:Key="HorizontalView.RebarHorizontalViewDepth">Horizontal rebar view depth</system:String>
     <system:String x:Key="HorizontalView.RebarHorizontalViewDepthTooltip">Horizontal view depth</system:String>
 
-    <system:String x:Key="HorizontalView.HorizontalViewBottomOffsets">Horizontal view bottom offsets</system:String>
+    <system:String x:Key="HorizontalView.HorizontalViewBottomOffsets">Horizontal view offsets</system:String>
     <system:String x:Key="HorizontalView.FirstHorizontalViewBottomOffset">Bottom offset to first horizontal view</system:String>
     <system:String x:Key="HorizontalView.FirstHorizontalViewBottomOffsetTooltip">Bottom offset to first horizontal view</system:String>
     <system:String x:Key="HorizontalView.SecondHorizontalViewTopOffset">Top offset to second horizontal view</system:String>
@@ -200,11 +200,10 @@
     <system:String x:Key="HorizontalView.ThirdHorizontalViewTopOffset">Top offset to third horizontal view</system:String>
     <system:String x:Key="HorizontalView.ThirdHorizontalViewTopOffsetTooltip">Top offset to third horizontal view</system:String>
 
-    <system:String x:Key="HorizontalView.HorizontalViewPylonOffsets">Horizontal view pylon offsets</system:String>
-    <system:String x:Key="HorizontalView.HorizontalViewXOffset">Horizontal view X offset</system:String>
-    <system:String x:Key="HorizontalView.HorizontalViewXOffsetTooltip">Horizontal view X offset</system:String>
-    <system:String x:Key="HorizontalView.HorizontalViewYOffset">Horizontal view Y offset</system:String>
-    <system:String x:Key="HorizontalView.HorizontalViewYOffsetTooltip">Horizontal view X offset</system:String>
+    <system:String x:Key="HorizontalView.HorizontalViewXOffset">Horizontal view X offset from pylon</system:String>
+    <system:String x:Key="HorizontalView.HorizontalViewXOffsetTooltip">Horizontal view X offset from pylon</system:String>
+    <system:String x:Key="HorizontalView.HorizontalViewYOffset">Horizontal view Y offset from pylon</system:String>
+    <system:String x:Key="HorizontalView.HorizontalViewYOffsetTooltip">Horizontal view X offset from pylon</system:String>
 
     <system:String x:Key="HorizontalView.SelectViewTypeSizeForHorizontalViews">Select view type size for horizontal views:</system:String>
     <system:String x:Key="HorizontalView.SelectViewTypeSizeForHorizontalViewsTooltip">Select view type size for horizontal views</system:String>

@@ -192,7 +192,7 @@
     <system:String x:Key="HorizontalView.RebarHorizontalViewDepth">Глубина горизонтального вида армирования</system:String>
     <system:String x:Key="HorizontalView.RebarHorizontalViewDepthTooltip">Глубина горизонтального вида</system:String>
 
-    <system:String x:Key="HorizontalView.HorizontalViewBottomOffsets">Отступы горизонтального вида от низа</system:String>
+    <system:String x:Key="HorizontalView.HorizontalViewBottomOffsets">Отступы горизонтального вида</system:String>
     <system:String x:Key="HorizontalView.FirstHorizontalViewBottomOffset">Отступ снизу до первого горизонтального вида</system:String>
     <system:String x:Key="HorizontalView.FirstHorizontalViewBottomOffsetTooltip">Отступ снизу до первого горизонтального вида</system:String>
     <system:String x:Key="HorizontalView.SecondHorizontalViewTopOffset">Отступ сверху до второго горизонтального вида</system:String>
@@ -200,11 +200,10 @@
     <system:String x:Key="HorizontalView.ThirdHorizontalViewTopOffset">Отступ сверху до третьего горизонтального вида</system:String>
     <system:String x:Key="HorizontalView.ThirdHorizontalViewTopOffsetTooltip">Отступ сверху до третьего горизонтального вида</system:String>
 
-    <system:String x:Key="HorizontalView.HorizontalViewPylonOffsets">Отступы горизонтального вида от пилона</system:String>
-    <system:String x:Key="HorizontalView.HorizontalViewXOffset">Отступ по X у горизонтального вида</system:String>
-    <system:String x:Key="HorizontalView.HorizontalViewXOffsetTooltip">Отступ по X у горизонтального вида</system:String>
-    <system:String x:Key="HorizontalView.HorizontalViewYOffset">Отступ по Y у горизонтального вида</system:String>
-    <system:String x:Key="HorizontalView.HorizontalViewYOffsetTooltip">Отступ по X у горизонтального вида</system:String>
+    <system:String x:Key="HorizontalView.HorizontalViewXOffset">Отступ по X у горизонтального вида от пилона</system:String>
+    <system:String x:Key="HorizontalView.HorizontalViewXOffsetTooltip">Отступ по X у горизонтального вида от пилона</system:String>
+    <system:String x:Key="HorizontalView.HorizontalViewYOffset">Отступ по Y у горизонтального вида от пилона</system:String>
+    <system:String x:Key="HorizontalView.HorizontalViewYOffsetTooltip">Отступ по X у горизонтального вида от пилона</system:String>
 
     <system:String x:Key="HorizontalView.SelectViewTypeSizeForHorizontalViews">Выберите типоразмер для горизонтальных видов:</system:String>
     <system:String x:Key="HorizontalView.SelectViewTypeSizeForHorizontalViewsTooltip">Выберите типоразмер для горизонтальных видов</system:String>
