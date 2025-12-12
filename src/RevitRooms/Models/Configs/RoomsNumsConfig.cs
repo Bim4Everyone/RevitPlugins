@@ -11,15 +11,24 @@ using pyRevitLabs.Json;
 
 namespace RevitRooms.Models;
 public class RoomsNumsConfig : ProjectConfig<RoomsNumsSettings> {
+    private readonly PluginSettings _pluginSettings;
+
+    public RoomsNumsConfig() {
+        _pluginSettings = new PluginSettings();        
+    }
+
+    [JsonIgnore]
+    public PluginSettings PluginSettings => _pluginSettings;
+
     [JsonIgnore]
     public override string ProjectConfigPath { get; set; }
 
     [JsonIgnore]
     public override IConfigSerializer Serializer { get; set; }
 
-    public static RoomsNumsConfig GetPluginConfig() {
+    public static RoomsNumsConfig GetPluginConfig(IConfigSerializer configSerializer) {
         return new ProjectConfigBuilder()
-            .SetSerializer(new ConfigSerializer())
+            .SetSerializer(configSerializer)
             .SetPluginName(nameof(RevitRooms))
             .SetRevitVersion(ModuleEnvironment.RevitVersion)
             .SetProjectConfigName(nameof(RoomsNumsConfig) + ".json")

@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Windows;
 
 using Autodesk.Revit.DB;
 using Autodesk.Revit.UI;
@@ -11,16 +12,21 @@ using dosymep.Bim4Everyone.ProjectParams;
 using dosymep.Bim4Everyone.Schedules;
 using dosymep.Bim4Everyone.SharedParams;
 using dosymep.Bim4Everyone.Templates;
+using dosymep.SimpleServices;
 
 namespace RevitRooms.Models;
 internal class CheckProjectParams {
     private readonly UIApplication _uiApplication;
+    private readonly ILocalizationService _localizationService;
     private readonly ProjectParameters _projectParameters;
 
     private bool _isChecked = true;
 
-    public CheckProjectParams(UIApplication uiApplication) {
-        _uiApplication = uiApplication;
+    public CheckProjectParams(RevitRepository revitRepository,
+                              ILocalizationService localizationService) {
+        _uiApplication = revitRepository.UIApplication;
+        _localizationService = localizationService;
+
         _projectParameters = ProjectParameters.Create(_uiApplication.Application);
     }
 
@@ -146,7 +152,7 @@ internal class CheckProjectParams {
     private void CheckActiveView(IEnumerable<RevitScheduleRule> scheduleRules) {
         var openedView = scheduleRules.FirstOrDefault(item => item.ScheduleName.Equals(_uiApplication.ActiveUIDocument.ActiveView.Name));
         if(openedView != null) {
-            throw new InvalidOperationException($"Для копирования спецификации закройте спецификацию \"{openedView.ScheduleName}\".");
+            throw new InvalidOperationException(_localizationService.GetLocalizedString("Exception.CopySchedule", openedView.ScheduleName));
         }
     }
 
@@ -172,21 +178,18 @@ internal class CheckProjectParams {
 
         if(brokenKeySchedules.Count > 0) {
             _isChecked = false;
-            var taskDialog = new TaskDialog("Квартирография Стадии П.") {
+            var taskDialog = new TaskDialog(_localizationService.GetLocalizedString("RoomsWindow.Title")) {
                 AllowCancellation = true,
-                MainInstruction = "Были найдены некорректные ключевые спецификации.",
-                MainContent = " - "
-                    + string.Join(Environment.NewLine + " - ", brokenKeySchedules.Select(item => item.TestingSchedule.Name))
-                    + Environment.NewLine
-                    + Environment.NewLine
-                    + "Проверьте название ключевого параметра и количество столбцов спецификации."
-                    + Environment.NewLine
-                    + Environment.NewLine
-                    + "ВНИМАНИЕ! При замене ключевой спецификации будут удалены соответствующие ключевые значения у помещений и ключевой параметр из спецификаций!"
+                MainInstruction = _localizationService.GetLocalizedString("TaskDialogWarning.ScheduleErrors"),
+                MainContent = _localizationService.GetLocalizedString(
+                    "TaskDialogWarning.ScheduleErrors", 
+                    string.Join(Environment.NewLine + " - ", brokenKeySchedules.Select(item => item.TestingSchedule.Name)))
             };
 
-            taskDialog.AddCommandLink(TaskDialogCommandLinkId.CommandLink1, "Заменить на спецификации из шаблона?");
-            taskDialog.AddCommandLink(TaskDialogCommandLinkId.CommandLink2, "Выход без изменений спецификаций");
+            taskDialog.AddCommandLink(TaskDialogCommandLinkId.CommandLink1, 
+                                      _localizationService.GetLocalizedString("TaskDialogWarning.UpdateSchedule"));
+            taskDialog.AddCommandLink(TaskDialogCommandLinkId.CommandLink2, 
+                                      _localizationService.GetLocalizedString("TaskDialogWarning.Exit"));
             return taskDialog.Show() == TaskDialogResult.CommandLink1
                 ? ReplaceKeySchedules(brokenKeySchedules.Select(item => item.KeyScheduleRule))
                 : this;
@@ -194,9 +197,9 @@ internal class CheckProjectParams {
 
         if(notFilledKeySchedules.Count > 0) {
             _isChecked = false;
-            var taskDialog = new TaskDialog("Квартирография Стадии П.") {
+            var taskDialog = new TaskDialog(_localizationService.GetLocalizedString("RoomsWindow.Title")) {
                 AllowCancellation = true,
-                MainInstruction = "Были найдены не заполненные ключевые спецификации:",
+                MainInstruction = _localizationService.GetLocalizedString("TaskDialogWarning.NotFilledSchedules"),
                 MainContent = " - " + string.Join(Environment.NewLine + " - ", notFilledKeySchedules.Select(item => item.TestingSchedule.Name)),
                 ExpandedContent = Environment.NewLine + string.Join(Environment.NewLine, notFilledKeySchedules.Select(FormatMessage))
             };

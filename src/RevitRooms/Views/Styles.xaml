@@ -1,0 +1,136 @@
+﻿<ResourceDictionary
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
+    xmlns:models="clr-namespace:RevitRooms.Models"
+    xmlns:conv="clr-namespace:dosymep.WpfCore.Converters;assembly=dosymep.WpfCore"
+    xmlns:controls="clr-namespace:Wpf.Ui.Controls;assembly=Wpf.Ui">
+    <ResourceDictionary.MergedDictionaries>
+        <ResourceDictionary
+            Source="pack://application:,,,/Wpf.Ui;component/Controls/DataGrid/DataGrid.xaml" />
+        <ResourceDictionary
+            Source="pack://application:,,,/Wpf.Ui;component/Controls/ComboBox/ComboBox.xaml" />
+    </ResourceDictionary.MergedDictionaries>
+    
+    <Style
+        TargetType="Border"
+        x:Key="CustomBorder">
+        <Setter
+            Property="Padding"
+            Value="14,8" />
+        <Setter
+            Property="VerticalAlignment"
+            Value="Stretch" />
+        <Setter
+            Property="HorizontalAlignment"
+            Value="Stretch" />
+        <Setter
+            Property="SnapsToDevicePixels"
+            Value="True" />
+        <Setter
+            Property="OverridesDefaultStyle"
+            Value="True" />
+        <Setter
+            Property="ScrollViewer.HorizontalScrollBarVisibility"
+            Value="Auto" />
+        <Setter
+            Property="ScrollViewer.VerticalScrollBarVisibility"
+            Value="Disabled" />
+        <Setter
+            Property="Background"
+            Value="{DynamicResource CardBackground}" />
+        <Setter
+            Property="BorderBrush"
+            Value="{DynamicResource CardBorderBrush}" />
+        <Setter
+            Property="BorderThickness"
+            Value="{DynamicResource CardControlBorderThemeThickness}" />
+        <Setter
+            Property="FocusVisualStyle"
+            Value="{DynamicResource DefaultControlFocusVisualStyle}" />
+        <Setter
+            Property="CornerRadius"
+            Value="{DynamicResource ControlCornerRadius}" />
+    </Style>
+
+    <Style
+        TargetType="Border"
+        x:Key="CustomBorderNoPadding"
+        BasedOn="{StaticResource CustomBorder}">
+        <Setter
+            Property="Padding"
+            Value="0" />
+    </Style>
+
+    <Style 
+        TargetType="{x:Type GridViewColumnHeader}">
+        <Setter 
+            Property="Background" 
+            Value="{DynamicResource CardBackground}" />
+        <Setter 
+            Property="Foreground" 
+            Value="{DynamicResource TextFillColorPrimaryBrush}" />
+    </Style>
+
+    <Style
+        x:Key="CustomResizableDataGridStyle"
+        TargetType="ui:DataGrid"
+        BasedOn="{StaticResource DefaultUiDataGridStyle}">
+        <Setter
+            Property="ColumnHeaderStyle"
+            Value="{DynamicResource CustomDataGridColumnHeaderStyle}" />
+        <Setter
+            Property="RowStyle"
+            Value="{DynamicResource CustomDataGridRowStyle}" />
+        <Setter
+            Property="AutoGenerateColumns"
+            Value="False" />
+        <Setter
+            Property="VirtualizingPanel.VirtualizationMode"
+            Value="Recycling" />
+        <Setter
+            Property="VirtualizingPanel.IsVirtualizing"
+            Value="True" />
+        <Setter
+            Property="VerticalScrollBarVisibility"
+            Value="Auto" />
+        <Setter
+            Property="HorizontalScrollBarVisibility"
+            Value="Auto" />
+        <Setter
+            Property="CanUserReorderColumns"
+            Value="False" />
+        <Setter
+            Property="CanUserResizeColumns"
+            Value="True" />
+        <Setter
+            Property="GridLinesVisibility"
+            Value="All" />
+        <Setter
+            Property="IsReadOnly"
+            Value="True" />
+    </Style>
+
+    <ui:SymbolRegular
+        x:Key="Error">DismissCircle24</ui:SymbolRegular>
+    <ui:SymbolRegular
+        x:Key="Warning">Warning24</ui:SymbolRegular>
+    <ui:SymbolRegular
+        x:Key="DefaultIcon">Square24</ui:SymbolRegular>
+    <conv:ObjectToObjectConverter
+        x:Key="WarningIconConverter"
+        DefaultTarget="{StaticResource DefaultIcon}">
+
+        <conv:CoupleItem
+            Source="{x:Static models:WarningTypeInfo.Error}"
+            Target="{StaticResource Error}" />
+
+        <conv:CoupleItem
+            Source="{x:Static models:WarningTypeInfo.Warning}"
+            Target="{StaticResource Warning}" />
+
+        <conv:CoupleItem
+            Source="{x:Static models:WarningTypeInfo.Info}"
+            Target="{StaticResource Warning}" />
+    </conv:ObjectToObjectConverter>
+</ResourceDictionary>

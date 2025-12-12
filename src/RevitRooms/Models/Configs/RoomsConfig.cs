@@ -10,16 +10,25 @@ using dosymep.Serializers;
 using pyRevitLabs.Json;
 
 namespace RevitRooms.Models;
-public class RoomsConfig : ProjectConfig<RoomsSettingsConfig> {
+public class RoomsConfig : ProjectConfig<RoomsSettings> {
+    private readonly PluginSettings _pluginSettings;
+
+    public RoomsConfig() {
+        _pluginSettings = new PluginSettings();
+    }
+
+    [JsonIgnore]
+    public PluginSettings PluginSettings => _pluginSettings;
+
     [JsonIgnore]
     public override string ProjectConfigPath { get; set; }
 
     [JsonIgnore]
     public override IConfigSerializer Serializer { get; set; }
 
-    public static RoomsConfig GetRoomsConfig() {
+    public static RoomsConfig GetRoomsConfig(IConfigSerializer configSerializer) {
         return new ProjectConfigBuilder()
-            .SetSerializer(new ConfigSerializer())
+            .SetSerializer(configSerializer)
             .SetPluginName(nameof(RevitRooms))
             .SetRevitVersion(ModuleEnvironment.RevitVersion)
             .SetProjectConfigName(nameof(RoomsConfig) + ".json")
@@ -27,7 +36,7 @@ public class RoomsConfig : ProjectConfig<RoomsSettingsConfig> {
     }
 }
 
-public class RoomsSettingsConfig : ProjectSettings {
+public class RoomsSettings : ProjectSettings {
     public Guid SelectedRoomId { get; set; }
 
     public ElementId PhaseElementId { get; set; }
@@ -42,5 +51,4 @@ public class RoomsSettingsConfig : ProjectSettings {
 
     public List<ElementId> Levels { get; set; } = [];
     public override string ProjectName { get; set; }
-
 }

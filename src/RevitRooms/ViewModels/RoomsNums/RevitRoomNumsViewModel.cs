@@ -7,8 +7,6 @@ using System.Windows.Input;
 using Autodesk.Revit.DB;
 using Autodesk.Revit.UI;
 
-using DevExpress.Mvvm.Native;
-
 using dosymep.Bim4Everyone.ProjectParams;
 using dosymep.SimpleServices;
 using dosymep.WPF.Commands;
@@ -17,11 +15,18 @@ using dosymep.WPF.ViewModels;
 using RevitRooms.Commands;
 using RevitRooms.Commands.Numerates;
 using RevitRooms.Models;
+using RevitRooms.Services;
 using RevitRooms.Views;
 
-namespace RevitRooms.ViewModels;
-internal abstract class RoomsNumsViewModel : BaseViewModel, INumberingOrder {
+namespace RevitRooms.ViewModels.RoomsNums;
+internal abstract class RevitRoomNumsViewModel : BaseViewModel, INumberingOrder {
     public Guid _id;
+    protected readonly RevitRepository _revitRepository;
+    protected readonly RoomsNumsConfig _roomsNumsConfig;
+    protected readonly IMessageBoxService _messageBoxService;
+    protected readonly ILocalizationService _localizationService;
+    protected readonly PluginSettings _pluginSettings;
+
     private string _errorText;
     private string _prefix;
     private string _suffix;
@@ -31,7 +36,7 @@ internal abstract class RoomsNumsViewModel : BaseViewModel, INumberingOrder {
     private bool _isNumRoomsSection;
     private bool _isNumRoomsSectionLevels;
     private string _startNumber;
-    protected readonly RevitRepository _revitRepository;
+
     private PhaseViewModel _phase;
     private ObservableCollection<PhaseViewModel> _phases;
     private ObservableCollection<SpatialElementViewModel> _spatialElements;
@@ -43,20 +48,17 @@ internal abstract class RoomsNumsViewModel : BaseViewModel, INumberingOrder {
 
     public System.Windows.Window ParentWindow { get; set; }
 
-    public RoomsNumsViewModel(RevitRepository revitRepository) {
+    public RevitRoomNumsViewModel(RevitRepository revitRepository, 
+                                  RoomsNumsConfig roomsNumsConfig,
+                                  IMessageBoxService messageBoxService,
+                                  ILocalizationService localizationService,
+                                  NumOrderWindowService numOrderWindowService) {
         _revitRepository = revitRepository;
+        _roomsNumsConfig = roomsNumsConfig;
+        _messageBoxService = messageBoxService;
+        _localizationService = localizationService;
+        _pluginSettings = _roomsNumsConfig.PluginSettings;
 
-        LoadViewCommand = RelayCommand.Create(LoadView);
-        NumerateRoomsCommand = new RelayCommand(NumerateRooms, CanNumerateRooms);
-
-        UpOrderCommand = new UpOrderCommand(this);
-        DownOrderCommand = new DownOrderCommand(this);
-        AddOrderCommand = new AddOrderCommand(this);
-        RemoveOrderCommand = new RemoveOrderCommand(this);
-        SaveOrderCommand = new SaveOrderCommand(this, _revitRepository);
-    }
-
-    private void LoadView() {
         var additionalPhases = _revitRepository.GetAdditionalPhases()
             .Select(item => new PhaseViewModel(item, _revitRepository))
             .ToArray();
@@ -71,17 +73,31 @@ internal abstract class RoomsNumsViewModel : BaseViewModel, INumberingOrder {
         Groups = [.. GetGroups()];
         Sections = [.. GetSections()];
 
-        NumberingOrders = [.. GetNumberingOrders()
-                .Where(item => item.Order == 0)];
-
-        SelectedNumberingOrders = [.. GetNumberingOrders()
-                .Where(item => item.Order > 0)];
+        NumberingOrders = [.. GetNumberingOrders().Where(item => item.Order == 0)];
+        SelectedNumberingOrders = [.. GetNumberingOrders().Where(item => item.Order > 0)];
 
         StartNumber = "1";
-        Phase = Phases.FirstOrDefault();
+        Phase = Phases.FirstOrDefault();        
+
+        NumerateRoomsCommand = new RelayCommand(NumerateRooms, CanNumerateRooms);
+
+        UpOrderCommand = new UpOrderCommand(this);
+        DownOrderCommand = new DownOrderCommand(this);
+        AddOrderCommand = new AddOrderCommand(this, numOrderWindowService);
+        RemoveOrderCommand = new RemoveOrderCommand(this);
+        SaveOrderCommand = new SaveOrderCommand(this, _revitRepository, localizationService);
 
         LoadPluginConfig();
     }
+
+    public ICommand LoadViewCommand { get; }
+    public ICommand NumerateRoomsCommand { get; }
+
+    public ICommand UpOrderCommand { get; }
+    public ICommand DownOrderCommand { get; }
+    public ICommand AddOrderCommand { get; }
+    public ICommand RemoveOrderCommand { get; }
+    public ICommand SaveOrderCommand { get; }
 
     public string Name { get; set; }
     protected abstract IEnumerable<SpatialElementViewModel> GetSpatialElements();
@@ -131,23 +147,13 @@ internal abstract class RoomsNumsViewModel : BaseViewModel, INumberingOrder {
         set => RaiseAndSetIfChanged(ref _isNumRoomsSectionLevels, value);
     }
 
-    public ICommand LoadViewCommand { get; }
-    public ICommand NumerateRoomsCommand { get; }
-
-    public ICommand UpOrderCommand { get; }
-    public ICommand DownOrderCommand { get; }
-    public ICommand AddOrderCommand { get; }
-    public ICommand RemoveOrderCommand { get; }
-    public ICommand SaveOrderCommand { get; }
-
-    public PhaseViewModel Phase {
-        get => _phase;
-        set => RaiseAndSetIfChanged(ref _phase, value);
-    }
-
     public ObservableCollection<PhaseViewModel> Phases {
         get => _phases;
         set => RaiseAndSetIfChanged(ref _phases, value);
+    }
+    public PhaseViewModel Phase {
+        get => _phase;
+        set => RaiseAndSetIfChanged(ref _phase, value);
     }
 
     public ObservableCollection<SpatialElementViewModel> SpatialElements {
@@ -196,7 +202,7 @@ internal abstract class RoomsNumsViewModel : BaseViewModel, INumberingOrder {
             .GroupBy(item => item.Name.Split('_').FirstOrDefault())
             .Select(item =>
                 new LevelViewModel(item.Key, item.ToList(), _revitRepository,
-                    SpatialElements.Select(room => room.Element)))
+                    SpatialElements.Select(room => room.Element), _pluginSettings))
             .Distinct()
             .OrderBy(item => item.Element.Elevation);
     }
@@ -270,7 +276,7 @@ internal abstract class RoomsNumsViewModel : BaseViewModel, INumberingOrder {
             window.Show();
             if(IsNumFlats) {
                 var numerateCommand =
-                    new NumFlatsCommand(_revitRepository) { Start = startNumber, Prefix = Prefix, Suffix = Suffix };
+                    new NumFlatsCommand(_revitRepository, _localizationService) { Start = startNumber, Prefix = Prefix, Suffix = Suffix };
                 numerateCommand.Numerate(orderedObjects, window.CreateProgress(), window.CreateCancellationToken());
             } else {
                 UpdateNumeringOrder();
@@ -282,7 +288,7 @@ internal abstract class RoomsNumsViewModel : BaseViewModel, INumberingOrder {
 
                 if(IsNumRoomsGroup) {
                     var numerateCommand =
-                        new NumSectionGroup(_revitRepository, selectedOrder) {
+                        new NumSectionGroup(_revitRepository, _localizationService, selectedOrder) {
                             Start = startNumber,
                             Prefix = Prefix,
                             Suffix = Suffix
@@ -290,7 +296,7 @@ internal abstract class RoomsNumsViewModel : BaseViewModel, INumberingOrder {
                     numerateCommand.Numerate(orderedObjects, window.CreateProgress(), window.CreateCancellationToken());
                 } else if(IsNumRoomsSection) {
                     var numerateCommand =
-                        new NumSectionCommand(_revitRepository, selectedOrder) {
+                        new NumSectionCommand(_revitRepository, _localizationService, selectedOrder) {
                             Start = startNumber,
                             Prefix = Prefix,
                             Suffix = Suffix
@@ -298,14 +304,15 @@ internal abstract class RoomsNumsViewModel : BaseViewModel, INumberingOrder {
                     numerateCommand.Numerate(orderedObjects, window.CreateProgress(), window.CreateCancellationToken());
                 } else if(IsNumRoomsSectionLevels) {
                     var numerateCommand =
-                        new NumerateSectionLevel(_revitRepository, selectedOrder) {
+                        new NumerateSectionLevel(_revitRepository, _localizationService, selectedOrder) {
                             Start = startNumber,
                             Prefix = Prefix,
                             Suffix = Suffix
                         };
                     numerateCommand.Numerate(orderedObjects, window.CreateProgress(), window.CreateCancellationToken());
                 } else {
-                    throw new InvalidOperationException("Выбран неизвестный режим работы.");
+                    string excMessage = _localizationService.GetLocalizedString("UnknownSettings");
+                    throw new InvalidOperationException(excMessage);
                 }
             }
         }
@@ -314,26 +321,34 @@ internal abstract class RoomsNumsViewModel : BaseViewModel, INumberingOrder {
 
         ParentWindow.DialogResult = true;
         ParentWindow.Close();
-        TaskDialog.Show("Предупреждение!", "Расчет завершен!");
+        string message = _localizationService.GetLocalizedString("TaskDialog.Result");
+        string title = _localizationService.GetLocalizedString("TaskDialog.Information");
+        _messageBoxService.Show(message, title);
     }
 
     private IProgressDialogService SetupProgressDialog(SpatialElementViewModel[] orderedObjects) {
         var service = GetPlatformService<IProgressDialogService>();
         service.StepValue = 10;
         service.MaxValue = orderedObjects.Length;
-        service.DisplayTitleFormat = "Нумерация [{0}]\\{1}]";
+        service.DisplayTitleFormat =  _localizationService.GetLocalizedString("RoomNumsWindow.Numerating");
         return service;
     }
 
     private bool ShowNotFoundNames(string[] notFoundNames) {
-        var taskDialog = new TaskDialog("Квартирография Стадии П.") {
+        string message = _localizationService.GetLocalizedString("WarningsWindow.NoPriorities");
+        string title = _localizationService.GetLocalizedString("RoomsWindow.Title");
+
+        var taskDialog = new TaskDialog(title) {
             AllowCancellation = true,
-            MainInstruction = "В списке приоритетов отсутствуют наименования помещений.",
+            MainInstruction = message,
             MainContent = " - " + string.Join(Environment.NewLine + " - ", notFoundNames)
         };
 
-        taskDialog.AddCommandLink(TaskDialogCommandLinkId.CommandLink1, "Добавить отсутствующие?");
-        taskDialog.AddCommandLink(TaskDialogCommandLinkId.CommandLink2, "Выход");
+        string addNewMessage = _localizationService.GetLocalizedString("WarningsWindow.AddPriorities");
+        string exitMessage = _localizationService.GetLocalizedString("WarningsWindow.Exit");
+
+        taskDialog.AddCommandLink(TaskDialogCommandLinkId.CommandLink1, addNewMessage);
+        taskDialog.AddCommandLink(TaskDialogCommandLinkId.CommandLink2, exitMessage);
         if(taskDialog.Show() == TaskDialogResult.CommandLink1) {
             var selection = NumberingOrders
                 .Where(item => notFoundNames.Contains(item.Name))
@@ -371,32 +386,32 @@ internal abstract class RoomsNumsViewModel : BaseViewModel, INumberingOrder {
     }
 
     private bool CheckWorkingObjects(SpatialElementViewModel[] workingObjects) {
-        var errorElements = new Dictionary<string, InfoElementViewModel>();
+        var errors = new Dictionary<string, WarningViewModel>();
 
         // Все помещения которые
         // избыточные или не окруженные
         var redundantRooms = workingObjects
             .Where(item => item.IsRedundant == true || item.NotEnclosed == true);
-        AddElements(InfoElement.RedundantRooms, redundantRooms, errorElements);
+        AddElements(WarningInfo.GetRedundantRooms(_localizationService), redundantRooms, errors);
 
         // Все помещения у которых
         // не заполнены обязательные параметры
         foreach(var room in workingObjects) {
             if(room.Room == null) {
-                AddElement(InfoElement.RequiredParams.FormatMessage(ProjectParamsConfig.Instance.RoomName.Name),
-                    null, room, errorElements);
+                AddElement(WarningInfo.GetRequiredParams(_localizationService, ProjectParamsConfig.Instance.RoomName.Name),
+                    null, room, errors);
             }
 
             if(room.RoomGroup == null) {
                 AddElement(
-                    InfoElement.RequiredParams.FormatMessage(ProjectParamsConfig.Instance.RoomGroupName.Name), null,
-                    room, errorElements);
+                    WarningInfo.GetRequiredParams(_localizationService, ProjectParamsConfig.Instance.RoomGroupName.Name), null,
+                    room, errors);
             }
 
             if(room.RoomSection == null) {
                 AddElement(
-                    InfoElement.RequiredParams.FormatMessage(ProjectParamsConfig.Instance.RoomSectionName.Name),
-                    null, room, errorElements);
+                    WarningInfo.GetRequiredParams(_localizationService, ProjectParamsConfig.Instance.RoomSectionName.Name),
+                    null, room, errors);
             }
         }
 
@@ -411,7 +426,7 @@ internal abstract class RoomsNumsViewModel : BaseViewModel, INumberingOrder {
                 .Count() > 1;
 
             if(notSameValue) {
-                AddElements(InfoElement.ErrorMultiLevelRoom, multiLevelRoomGroup, errorElements);
+                AddElements(WarningInfo.GetErrorMultiLevelRoom(_localizationService), multiLevelRoomGroup, errors);
             }
         }
 
@@ -425,58 +440,58 @@ internal abstract class RoomsNumsViewModel : BaseViewModel, INumberingOrder {
                 .Count() != 2;
 
             if(notSameValue) {
-                AddElements(InfoElement.ErrorMultiLevelRoom, multiLevelRoomGroup, errorElements);
+                AddElements(WarningInfo.GetErrorMultiLevelRoom(_localizationService), multiLevelRoomGroup, errors);
             }
         }
-
-        return ShowInfoElementsWindow("Информация", errorElements.Values);
+        string title = _localizationService.GetLocalizedString("TaskDialog.Information");
+        return ShowInfoElementsWindow(title, errors.Values);
     }
 
     private bool CanNumerateRooms(object param) {
         if(!int.TryParse(StartNumber, out int value)) {
-            ErrorText = "Начальный номер должен быть числом.";
+            ErrorText = _localizationService.GetLocalizedString("RoomNumsWindow.WarningStartNumber");
             return false;
         }
 
         if(value < 1) {
-            ErrorText = "Начальный номер должен быть положительным числом.";
+            ErrorText = _localizationService.GetLocalizedString("RoomNumsWindow.WarningPositiveStartNumber");
             return false;
         }
 
         if(Phase == null) {
-            ErrorText = "Выберите стадию.";
+            ErrorText = _localizationService.GetLocalizedString("RoomNumsWindow.WarningSelectPhase");
             return false;
         }
 
         if(IsNumFlats == false && IsNumRooms == false) {
-            ErrorText = "Выберите выберете режим работы.";
+            ErrorText = _localizationService.GetLocalizedString("RoomNumsWindow.WarningSelectMode");
             return false;
         }
 
         if(IsNumRooms && IsNumRoomsGroup == false && IsNumRoomsSection == false &&
            IsNumRoomsSectionLevels == false) {
-            ErrorText = "Выберите выберете режим работы нумерации помещений.";
+            ErrorText = _localizationService.GetLocalizedString("RoomNumsWindow.WarningSelectModeRooms");
             return false;
         }
 
         if(!Sections.Any(item => item.IsSelected)) {
-            ErrorText = "Выберите хотя бы одну секцию.";
+            ErrorText = _localizationService.GetLocalizedString("RoomNumsWindow.WarningSelectSection");
             return false;
         }
 
         if(!Groups.Any(item => item.IsSelected)) {
-            ErrorText = "Выберите хотя бы одну группу.";
+            ErrorText = _localizationService.GetLocalizedString("RoomNumsWindow.WarningSelectGroup");
             return false;
         }
 
         if(!Levels.Any(item => item.IsSelected)) {
-            ErrorText = "Выберите хотя бы один уровень.";
+            ErrorText = _localizationService.GetLocalizedString("RoomNumsWindow.WarningSelectLevel");
             return false;
         }
 
 
         if(!SelectedNumberingOrders.Any() && IsNumRooms) {
-            ErrorText = "Настройте список приоритетов нумерации.";
+            ErrorText = _localizationService.GetLocalizedString("RoomNumsWindow.WarningSetPriorities");
             return false;
         }
 
@@ -488,39 +503,42 @@ internal abstract class RoomsNumsViewModel : BaseViewModel, INumberingOrder {
         return int.TryParse(StartNumber, out int value) ? value : 0;
     }
 
-    private void AddElements(InfoElement infoElement, IEnumerable<IElementViewModel<Element>> elements,
-        Dictionary<string, InfoElementViewModel> infoElements) {
+    private void AddElements(WarningInfo warningInfo, 
+                             IEnumerable<IElementViewModel<Element>> elements,
+                             Dictionary<string, WarningViewModel> warningElements) {
         foreach(var element in elements) {
-            AddElement(infoElement, null, element, infoElements);
+            AddElement(warningInfo, null, element, warningElements);
         }
     }
 
-    private void AddElement(InfoElement infoElement, string message, IElementViewModel<Element> element,
-        Dictionary<string, InfoElementViewModel> infoElements) {
-        if(!infoElements.TryGetValue(infoElement.Message, out var value)) {
-            value = new InfoElementViewModel() {
-                Message = infoElement.Message,
-                TypeInfo = infoElement.TypeInfo,
-                Description = infoElement.Description,
+    private void AddElement(WarningInfo warningInfo, 
+                            string message, 
+                            IElementViewModel<Element> element,
+                            Dictionary<string, WarningViewModel> warningElements) {
+        if(!warningElements.TryGetValue(warningInfo.Message, out var value)) {
+            value = new WarningViewModel(_localizationService) {
+                Message = warningInfo.Message,
+                TypeInfo = warningInfo.TypeInfo,
+                Description = warningInfo.Description,
                 Elements = []
             };
-            infoElements.Add(infoElement.Message, value);
+            warningElements.Add(warningInfo.Message, value);
         }
 
-        value.Elements.Add(new MessageElementViewModel() { Element = element, Description = message });
+        value.Elements.Add(new WarningElementViewModel() { Element = element, Description = message });
     }
 
-    private bool ShowInfoElementsWindow(string title, ICollection<InfoElementViewModel> infoElements) {
+    private bool ShowInfoElementsWindow(string title, ICollection<WarningViewModel> infoElements) {
         if(infoElements.Any()) {
-            var window = new InfoElementsWindow() {
-                Title = title,
-                DataContext = new InfoElementsViewModel() {
-                    InfoElement = infoElements.FirstOrDefault(),
-                    InfoElements = [.. infoElements]
-                }
-            };
+            //var window = new InfoElementsWindow() {
+            //    Title = title,
+            //    DataContext = new InfoElementsViewModel() {
+            //        InfoElement = infoElements.FirstOrDefault(),
+            //        InfoElements = [.. infoElements]
+            //    }
+            //};
 
-            window.Show();
+            //window.Show();
             return true;
         }
 
@@ -528,8 +546,7 @@ internal abstract class RoomsNumsViewModel : BaseViewModel, INumberingOrder {
     }
 
     private void LoadPluginConfig() {
-        var roomsConfig = RoomsNumsConfig.GetPluginConfig();
-        var settings = roomsConfig.GetSettings(_revitRepository.DocumentName);
+        var settings = _roomsNumsConfig.GetSettings(_revitRepository.DocumentName);
 
         StartNumber = settings?.StartNumber ?? "1";
         IsNumFlats = settings?.IsNumFlats ?? default;
@@ -559,9 +576,8 @@ internal abstract class RoomsNumsViewModel : BaseViewModel, INumberingOrder {
     }
 
     private void SavePluginConfig() {
-        var roomsConfig = RoomsNumsConfig.GetPluginConfig();
-        var settings = roomsConfig.GetSettings(_revitRepository.DocumentName)
-                                     ?? roomsConfig.AddSettings(_revitRepository.DocumentName);
+        var settings = _roomsNumsConfig.GetSettings(_revitRepository.DocumentName)
+                                     ?? _roomsNumsConfig.AddSettings(_revitRepository.DocumentName);
 
         settings.StartNumber = StartNumber;
         settings.IsNumFlats = IsNumFlats;
@@ -589,6 +605,6 @@ internal abstract class RoomsNumsViewModel : BaseViewModel, INumberingOrder {
             .Select(item => item.ElementId)
             .ToList();
 
-        roomsConfig.SaveProjectConfig();
+        _roomsNumsConfig.SaveProjectConfig();
     }
 }
