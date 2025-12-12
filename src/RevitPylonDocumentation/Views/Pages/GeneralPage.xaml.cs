@@ -32,7 +32,7 @@ internal partial class GeneralPage {
         UniformGrid uniformGrid = sender as UniformGrid;
         if(uniformGrid is null) { return; }
 
-        if(uniformGrid.ActualWidth > 400) {
+        if(uniformGrid.ActualWidth > 500) {
             uniformGrid.Columns = 2;
         } else {
             uniformGrid.Columns = 1;

@@ -204,225 +204,240 @@
                                 ToolTip="{me:LocalizationSource GeneralPage.UnselectAllViewsToolTip}" />
                         </Grid>
 
-                        <UniformGrid
+                        <Grid
                             Grid.Row="1"
-                            SizeChanged="UniformGrid_SizeChanged">
-                            <Grid Name="FormworkToggles"
-                                Grid.Row="1"
-                                Grid.Column="0"
-                                Margin="5">
-                                <Grid.RowDefinitions>
-                                    <RowDefinition
-                                        Height="Auto" />
-                                    <RowDefinition
-                                        Height="*" />
-                                    <RowDefinition
-                                        Height="*" />
-                                    <RowDefinition
-                                        Height="*" />
-                                    <RowDefinition
-                                        Height="*" />
-                                    <RowDefinition
-                                        Height="*" />
-                                </Grid.RowDefinitions>
+                            Grid.IsSharedSizeScope="True">
+                            <WrapPanel>
+                                <Grid Name="FormworkToggles"
+                                    Margin="5">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition
+                                            Width="Auto"
+                                            SharedSizeGroup="ToggleGroup" />
+                                    </Grid.ColumnDefinitions>
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition
+                                            Height="Auto" />
+                                        <RowDefinition
+                                            Height="*" />
+                                        <RowDefinition
+                                            Height="*" />
+                                        <RowDefinition
+                                            Height="*" />
+                                        <RowDefinition
+                                            Height="*" />
+                                        <RowDefinition
+                                            Height="*" />
+                                    </Grid.RowDefinitions>
 
-                                <ui:TextBlock
-                                    Grid.Row="0"
-                                    Margin="5"
-                                    Text="{me:LocalizationSource GeneralPage.FormworkViews}"
-                                    Style="{StaticResource CustomTextBlock}" />
+                                    <ui:TextBlock
+                                        Grid.Row="0"
+                                        Margin="5"
+                                        Text="{me:LocalizationSource GeneralPage.FormworkViews}"
+                                        Style="{StaticResource CustomTextBlock}" />
 
-                                <ui:ToggleSwitch
-                                    Grid.Row="1"
-                                    Margin="5"
-                                    IsChecked="{Binding Path=SelectionSettings.NeedWorkWithGeneralView}"
-                                    Content="{me:LocalizationSource GeneralPage.Main}"
-                                    ToolTip="{me:LocalizationSource GeneralPage.FormworkMainViewToolTip}" />
+                                    <ui:ToggleSwitch
+                                        Grid.Row="1"
+                                        Margin="5"
+                                        IsChecked="{Binding Path=SelectionSettings.NeedWorkWithGeneralView}"
+                                        Content="{me:LocalizationSource GeneralPage.Main}"
+                                        ToolTip="{me:LocalizationSource GeneralPage.FormworkMainViewToolTip}" />
 
-                                <ui:ToggleSwitch
-                                    Grid.Row="2"
-                                    Margin="5"
-                                    IsChecked="{Binding Path=SelectionSettings.NeedWorkWithGeneralPerpendicularView}"
-                                    Content="{me:LocalizationSource GeneralPage.Side}"
-                                    ToolTip="{me:LocalizationSource GeneralPage.FormworkSideViewToolTip}" />
+                                    <ui:ToggleSwitch
+                                        Grid.Row="2"
+                                        Margin="5"
+                                        IsChecked="{Binding Path=SelectionSettings.NeedWorkWithGeneralPerpendicularView}"
+                                        Content="{me:LocalizationSource GeneralPage.Side}"
+                                        ToolTip="{me:LocalizationSource GeneralPage.FormworkSideViewToolTip}" />
 
-                                <ui:ToggleSwitch
-                                    Grid.Row="3"
-                                    Margin="5"
-                                    IsChecked="{Binding Path=SelectionSettings.NeedWorkWithTransverseViewFirst}"
-                                    Content="{me:LocalizationSource GeneralPage.Transverse1}"
-                                    ToolTip="{me:LocalizationSource GeneralPage.FormworkTransverse1ToolTip}" />
+                                    <ui:ToggleSwitch
+                                        Grid.Row="3"
+                                        Margin="5"
+                                        IsChecked="{Binding Path=SelectionSettings.NeedWorkWithTransverseViewFirst}"
+                                        Content="{me:LocalizationSource GeneralPage.Transverse1}"
+                                        ToolTip="{me:LocalizationSource GeneralPage.FormworkTransverse1ToolTip}" />
 
-                                <ui:ToggleSwitch
-                                    Grid.Row="4"
-                                    Margin="5"
-                                    IsChecked="{Binding Path=SelectionSettings.NeedWorkWithTransverseViewSecond}"
-                                    Content="{me:LocalizationSource GeneralPage.Transverse2}"
-                                    ToolTip="{me:LocalizationSource GeneralPage.FormworkTransverse2ToolTip}" />
+                                    <ui:ToggleSwitch
+                                        Grid.Row="4"
+                                        Margin="5"
+                                        IsChecked="{Binding Path=SelectionSettings.NeedWorkWithTransverseViewSecond}"
+                                        Content="{me:LocalizationSource GeneralPage.Transverse2}"
+                                        ToolTip="{me:LocalizationSource GeneralPage.FormworkTransverse2ToolTip}" />
 
-                                <ui:ToggleSwitch
-                                    Grid.Row="5"
-                                    Margin="5"
-                                    IsChecked="{Binding Path=SelectionSettings.NeedWorkWithTransverseViewThird}"
-                                    Content="{me:LocalizationSource GeneralPage.Transverse3}"
-                                    ToolTip="{me:LocalizationSource GeneralPage.FormworkTransverse3ToolTip}" />
-                            </Grid>
+                                    <ui:ToggleSwitch
+                                        Grid.Row="5"
+                                        Margin="5"
+                                        IsChecked="{Binding Path=SelectionSettings.NeedWorkWithTransverseViewThird}"
+                                        Content="{me:LocalizationSource GeneralPage.Transverse3}"
+                                        ToolTip="{me:LocalizationSource GeneralPage.FormworkTransverse3ToolTip}" />
+                                </Grid>
 
-                            <Grid Name="RebarToggles"
-                                Grid.Row="1"
-                                Grid.Column="1"
-                                Margin="5">
-                                <Grid.RowDefinitions>
-                                    <RowDefinition
-                                        Height="Auto" />
-                                    <RowDefinition
-                                        Height="*" />
-                                    <RowDefinition
-                                        Height="*" />
-                                    <RowDefinition
-                                        Height="*" />
-                                    <RowDefinition
-                                        Height="*" />
-                                    <RowDefinition
-                                        Height="*" />
-                                </Grid.RowDefinitions>
+                                <Grid Name="RebarToggles"
+                                    Margin="5">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition
+                                            Width="Auto"
+                                            SharedSizeGroup="ToggleGroup" />
+                                    </Grid.ColumnDefinitions>
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition
+                                            Height="Auto" />
+                                        <RowDefinition
+                                            Height="*" />
+                                        <RowDefinition
+                                            Height="*" />
+                                        <RowDefinition
+                                            Height="*" />
+                                        <RowDefinition
+                                            Height="*" />
+                                        <RowDefinition
+                                            Height="*" />
+                                    </Grid.RowDefinitions>
 
-                                <ui:TextBlock
-                                    Grid.Row="0"
-                                    Margin="5"
-                                    Text="{me:LocalizationSource GeneralPage.RebarViews}"
-                                    Style="{StaticResource CustomTextBlock}" />
+                                    <ui:TextBlock
+                                        Grid.Row="0"
+                                        Margin="5"
+                                        Text="{me:LocalizationSource GeneralPage.RebarViews}"
+                                        Style="{StaticResource CustomTextBlock}" />
 
-                                <ui:ToggleSwitch
-                                    Grid.Row="1"
-                                    Margin="5"
-                                    IsChecked="{Binding Path=SelectionSettings.NeedWorkWithGeneralRebarView}"
-                                    Content="{me:LocalizationSource GeneralPage.Main}"
-                                    ToolTip="{me:LocalizationSource GeneralPage.RebarMainViewToolTip}" />
+                                    <ui:ToggleSwitch
+                                        Grid.Row="1"
+                                        Margin="5"
+                                        IsChecked="{Binding Path=SelectionSettings.NeedWorkWithGeneralRebarView}"
+                                        Content="{me:LocalizationSource GeneralPage.Main}"
+                                        ToolTip="{me:LocalizationSource GeneralPage.RebarMainViewToolTip}" />
 
-                                <ui:ToggleSwitch
-                                    Grid.Row="2"
-                                    Margin="5"
-                                    IsChecked="{Binding Path=SelectionSettings.NeedWorkWithGeneralPerpendicularRebarView}"
-                                    Content="{me:LocalizationSource GeneralPage.Side}"
-                                    ToolTip="{me:LocalizationSource GeneralPage.RebarSideViewToolTip}" />
+                                    <ui:ToggleSwitch
+                                        Grid.Row="2"
+                                        Margin="5"
+                                        IsChecked="{Binding Path=SelectionSettings.NeedWorkWithGeneralPerpendicularRebarView}"
+                                        Content="{me:LocalizationSource GeneralPage.Side}"
+                                        ToolTip="{me:LocalizationSource GeneralPage.RebarSideViewToolTip}" />
 
-                                <ui:ToggleSwitch
-                                    Grid.Row="3"
-                                    Margin="5"
-                                    IsChecked="{Binding Path=SelectionSettings.NeedWorkWithTransverseRebarViewFirst}"
-                                    Content="{me:LocalizationSource GeneralPage.Transverse1}"
-                                    ToolTip="{me:LocalizationSource GeneralPage.RebarTransverse1ToolTip}" />
+                                    <ui:ToggleSwitch
+                                        Grid.Row="3"
+                                        Margin="5"
+                                        IsChecked="{Binding Path=SelectionSettings.NeedWorkWithTransverseRebarViewFirst}"
+                                        Content="{me:LocalizationSource GeneralPage.Transverse1}"
+                                        ToolTip="{me:LocalizationSource GeneralPage.RebarTransverse1ToolTip}" />
 
-                                <ui:ToggleSwitch
-                                    Grid.Row="4"
-                                    Margin="5"
-                                    IsChecked="{Binding Path=SelectionSettings.NeedWorkWithTransverseRebarViewSecond}"
-                                    Content="{me:LocalizationSource GeneralPage.Transverse2}"
-                                    ToolTip="{me:LocalizationSource GeneralPage.RebarTransverse2ToolTip}" />
+                                    <ui:ToggleSwitch
+                                        Grid.Row="4"
+                                        Margin="5"
+                                        IsChecked="{Binding Path=SelectionSettings.NeedWorkWithTransverseRebarViewSecond}"
+                                        Content="{me:LocalizationSource GeneralPage.Transverse2}"
+                                        ToolTip="{me:LocalizationSource GeneralPage.RebarTransverse2ToolTip}" />
 
-                                <ui:ToggleSwitch
-                                    Grid.Row="5"
-                                    Margin="5"
-                                    IsChecked="{Binding Path=SelectionSettings.NeedWorkWithTransverseRebarViewThird}"
-                                    Content="{me:LocalizationSource GeneralPage.Transverse3}"
-                                    ToolTip="{me:LocalizationSource GeneralPage.RebarTransverse3ToolTip}" />
-                            </Grid>
+                                    <ui:ToggleSwitch
+                                        Grid.Row="5"
+                                        Margin="5"
+                                        IsChecked="{Binding Path=SelectionSettings.NeedWorkWithTransverseRebarViewThird}"
+                                        Content="{me:LocalizationSource GeneralPage.Transverse3}"
+                                        ToolTip="{me:LocalizationSource GeneralPage.RebarTransverse3ToolTip}" />
+                                </Grid>
 
-                            <Grid Name="SpecToggles"
-                                Grid.Row="2"
-                                Grid.Column="0"
-                                Margin="5">
-                                <Grid.RowDefinitions>
-                                    <RowDefinition
-                                        Height="Auto" />
-                                    <RowDefinition
-                                        Height="*" />
-                                    <RowDefinition
-                                        Height="*" />
-                                    <RowDefinition
-                                        Height="*" />
-                                    <RowDefinition
-                                        Height="*" />
-                                    <RowDefinition
-                                        Height="*" />
-                                </Grid.RowDefinitions>
+                                <Grid Name="SpecToggles"
+                                    Margin="5">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition
+                                            Width="Auto"
+                                            SharedSizeGroup="ToggleGroup" />
+                                    </Grid.ColumnDefinitions>
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition
+                                            Height="Auto" />
+                                        <RowDefinition
+                                            Height="*" />
+                                        <RowDefinition
+                                            Height="*" />
+                                        <RowDefinition
+                                            Height="*" />
+                                        <RowDefinition
+                                            Height="*" />
+                                        <RowDefinition
+                                            Height="*" />
+                                    </Grid.RowDefinitions>
 
-                                <ui:TextBlock
-                                    Grid.Row="0"
-                                    Margin="5"
-                                    Text="{me:LocalizationSource GeneralPage.ScheduleViews}"
-                                    Style="{StaticResource CustomTextBlock}" />
+                                    <ui:TextBlock
+                                        Grid.Row="0"
+                                        Margin="5"
+                                        Text="{me:LocalizationSource GeneralPage.ScheduleViews}"
+                                        Style="{StaticResource CustomTextBlock}" />
 
-                                <ui:ToggleSwitch
-                                    Grid.Row="1"
-                                    Margin="5"
-                                    IsChecked="{Binding Path=SelectionSettings.NeedWorkWithSkeletonSchedule}"
-                                    Content="{me:LocalizationSource GeneralPage.Skeleton}"
-                                    ToolTip="{me:LocalizationSource GeneralPage.SkeletonScheduleToolTip}" />
+                                    <ui:ToggleSwitch
+                                        Grid.Row="1"
+                                        Margin="5"
+                                        IsChecked="{Binding Path=SelectionSettings.NeedWorkWithSkeletonSchedule}"
+                                        Content="{me:LocalizationSource GeneralPage.Skeleton}"
+                                        ToolTip="{me:LocalizationSource GeneralPage.SkeletonScheduleToolTip}" />
 
-                                <ui:ToggleSwitch
-                                    Grid.Row="2"
-                                    Margin="5"
-                                    IsChecked="{Binding Path=SelectionSettings.NeedWorkWithSkeletonByElemsSchedule}"
-                                    Content="{me:LocalizationSource GeneralPage.SkeletonElements}"
-                                    ToolTip="{me:LocalizationSource GeneralPage.SkeletonElementsScheduleToolTip}" />
+                                    <ui:ToggleSwitch
+                                        Grid.Row="2"
+                                        Margin="5"
+                                        IsChecked="{Binding Path=SelectionSettings.NeedWorkWithSkeletonByElemsSchedule}"
+                                        Content="{me:LocalizationSource GeneralPage.SkeletonElements}"
+                                        ToolTip="{me:LocalizationSource GeneralPage.SkeletonElementsScheduleToolTip}" />
 
-                                <ui:ToggleSwitch
-                                    Grid.Row="3"
-                                    Margin="5"
-                                    IsChecked="{Binding Path=SelectionSettings.NeedWorkWithMaterialSchedule}"
-                                    Content="{me:LocalizationSource GeneralPage.Materials}"
-                                    ToolTip="{me:LocalizationSource GeneralPage.MaterialsScheduleToolTip}" />
+                                    <ui:ToggleSwitch
+                                        Grid.Row="3"
+                                        Margin="5"
+                                        IsChecked="{Binding Path=SelectionSettings.NeedWorkWithMaterialSchedule}"
+                                        Content="{me:LocalizationSource GeneralPage.Materials}"
+                                        ToolTip="{me:LocalizationSource GeneralPage.MaterialsScheduleToolTip}" />
 
-                                <ui:ToggleSwitch
-                                    Grid.Row="4"
-                                    Margin="5"
-                                    IsChecked="{Binding Path=SelectionSettings.NeedWorkWithSystemPartsSchedule}"
-                                    Content="{me:LocalizationSource GeneralPage.SystemParts}"
-                                    ToolTip="{me:LocalizationSource GeneralPage.SystemPartsScheduleToolTip}" />
+                                    <ui:ToggleSwitch
+                                        Grid.Row="4"
+                                        Margin="5"
+                                        IsChecked="{Binding Path=SelectionSettings.NeedWorkWithSystemPartsSchedule}"
+                                        Content="{me:LocalizationSource GeneralPage.SystemParts}"
+                                        ToolTip="{me:LocalizationSource GeneralPage.SystemPartsScheduleToolTip}" />
 
-                                <ui:ToggleSwitch
-                                    Grid.Row="5"
-                                    Margin="5"
-                                    IsChecked="{Binding Path=SelectionSettings.NeedWorkWithIfcPartsSchedule}"
-                                    Content="{me:LocalizationSource GeneralPage.IfcParts}"
-                                    ToolTip="{me:LocalizationSource GeneralPage.IfcPartsScheduleToolTip}" />
-                            </Grid>
+                                    <ui:ToggleSwitch
+                                        Grid.Row="5"
+                                        Margin="5"
+                                        IsChecked="{Binding Path=SelectionSettings.NeedWorkWithIfcPartsSchedule}"
+                                        Content="{me:LocalizationSource GeneralPage.IfcParts}"
+                                        ToolTip="{me:LocalizationSource GeneralPage.IfcPartsScheduleToolTip}" />
+                                </Grid>
 
-                            <Grid Name="OtherToggles"
-                                Grid.Row="2"
-                                Grid.Column="1"
-                                Margin="5">
-                                <Grid.RowDefinitions>
-                                    <RowDefinition
-                                        Height="Auto" />
-                                    <RowDefinition
-                                        Height="*" />
-                                    <RowDefinition
-                                        Height="*" />
-                                    <RowDefinition
-                                        Height="*" />
-                                    <RowDefinition
-                                        Height="*" />
-                                    <RowDefinition
-                                        Height="*" />
-                                </Grid.RowDefinitions>
+                                <Grid Name="OtherToggles"
+                                    Margin="5">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition
+                                            Width="Auto"
+                                            SharedSizeGroup="ToggleGroup" />
+                                    </Grid.ColumnDefinitions>
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition
+                                            Height="Auto" />
+                                        <RowDefinition
+                                            Height="*" />
+                                        <RowDefinition
+                                            Height="*" />
+                                        <RowDefinition
+                                            Height="*" />
+                                        <RowDefinition
+                                            Height="*" />
+                                        <RowDefinition
+                                            Height="*" />
+                                    </Grid.RowDefinitions>
 
-                                <ui:TextBlock
-                                    Grid.Row="0"
-                                    Margin="5"
-                                    Text="{me:LocalizationSource GeneralPage.OtherViews}"
-                                    Style="{StaticResource CustomTextBlock}" />
+                                    <ui:TextBlock
+                                        Grid.Row="0"
+                                        Margin="5"
+                                        Text="{me:LocalizationSource GeneralPage.OtherViews}"
+                                        Style="{StaticResource CustomTextBlock}" />
 
-                                <ui:ToggleSwitch
-                                    Grid.Row="1"
-                                    Margin="5"
-                                    IsChecked="{Binding Path=SelectionSettings.NeedWorkWithLegend}"
-                                    Content="{me:LocalizationSource GeneralPage.NotesLegend}"
-                                    ToolTip="{me:LocalizationSource GeneralPage.NotesLegendToolTip}" />
-                            </Grid>
-                        </UniformGrid>
+                                    <ui:ToggleSwitch
+                                        Grid.Row="1"
+                                        Margin="5"
+                                        IsChecked="{Binding Path=SelectionSettings.NeedWorkWithLegend}"
+                                        Content="{me:LocalizationSource GeneralPage.NotesLegend}"
+                                        ToolTip="{me:LocalizationSource GeneralPage.NotesLegendToolTip}" />
+                                </Grid>
+                            </WrapPanel>
+                        </Grid>
+
                     </Grid>
                 </Border>
 
