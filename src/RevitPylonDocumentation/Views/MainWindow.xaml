@@ -21,7 +21,7 @@
     
     Height="1020"    Width="1500"
     MinHeight="500" MinWidth="900"
-    
+    KeyDown="Window_KeyDown"
     d:DataContext="{d:DesignInstance vms:MainViewModel, IsDesignTimeCreatable=False}">
 
     <i:Interaction.Triggers>

@@ -1,3 +1,4 @@
+using System.Windows.Input;
 using System.Windows.Threading;
 
 using dosymep.SimpleServices;
@@ -9,7 +10,7 @@ using Wpf.Ui.Abstractions;
 namespace RevitPylonDocumentation.Views;
 public partial class MainWindow {
     public MainWindow(
-        INavigationViewPageProvider navigationViewPageProvider, 
+        INavigationViewPageProvider navigationViewPageProvider,
         ILoggerService loggerService,
         ISerializationService serializationService,
         ILanguageService languageService, ILocalizationService localizationService,
@@ -27,4 +28,10 @@ public partial class MainWindow {
 
     public override string PluginName => nameof(RevitPylonDocumentation);
     public override string ProjectConfigName => nameof(MainWindow);
+
+    private void Window_KeyDown(object sender, KeyEventArgs e) {
+        if(e.Key == Key.Escape) {
+            Close();
+        }
+    }
 }
