@@ -19,6 +19,11 @@ using RevitParamsChecker.ViewModels.Rules;
 namespace RevitParamsChecker.ViewModels.Results;
 
 internal class CheckResultViewModel : BaseViewModel {
+    /// <summary>
+    /// Максимальный размер одной группы элементов
+    /// </summary>
+    private const int _chunkSize = 1000;
+
     private readonly ILocalizationService _localization;
     private readonly DelayAction _refreshViewDelay;
     private readonly RevitRepository _revitRepo;
@@ -43,9 +48,14 @@ internal class CheckResultViewModel : BaseViewModel {
         var availableProperties = GetEditableGroupProperties(_localization);
         GroupingProperties = new GroupDescriptionsViewModel(availableProperties, [availableProperties.First()]);
         _defaultGroupDescription = new PropertyGroupDescription(nameof(ElementResultViewModel.ChunkName));
-        ResetGrouping(
-            ElementResults,
-            [_defaultGroupDescription, availableProperties.First().PropertyGroupDescription]);
+        if(_allElementResults.Count <= _chunkSize) {
+            ResetGrouping(ElementResults, [availableProperties.First().PropertyGroupDescription]);
+        } else {
+            ResetGrouping(
+                ElementResults,
+                [_defaultGroupDescription, availableProperties.First().PropertyGroupDescription]);
+        }
+
         PropertyChanged += ElementsFilterPropertyChanged;
     }
 
@@ -154,10 +164,9 @@ internal class CheckResultViewModel : BaseViewModel {
             .ThenBy(e => e.RuleName)
             .ThenBy(e => e.FamilyTypeName)
             .ToArray();
-        const int chunkSize = 1000;
         for(int i = 0; i < elements.Length; i++) {
-            int groupStart = (i / chunkSize) * chunkSize + 1;
-            int groupEnd = Math.Min(groupStart + chunkSize - 1, elements.Length);
+            int groupStart = (i / _chunkSize) * _chunkSize + 1;
+            int groupEnd = Math.Min(groupStart + _chunkSize - 1, elements.Length);
             elements[i].ItemNumber = i + 1;
             elements[i].ChunkName = $"[{groupStart}...{groupEnd}]";
         }
@@ -179,6 +188,10 @@ internal class CheckResultViewModel : BaseViewModel {
         var groups = GroupingProperties.GroupDescriptions
             .Select(g => g.SelectedProperty.PropertyGroupDescription)
             .ToArray();
-        ResetGrouping(ElementResults, [_defaultGroupDescription, .. groups]);
+        if(_allElementResults.Count <= _chunkSize) {
+            ResetGrouping(ElementResults, groups);
+        } else {
+            ResetGrouping(ElementResults, [_defaultGroupDescription, .. groups]);
+        }
     }
 }
