@@ -97,7 +97,7 @@
                 CanUserAddRows="False"
                 CanUserDeleteRows="False"
                 CanUserReorderColumns="True"
-                CanUserSortColumns="False"
+                CanUserSortColumns="True"
                 GridLinesVisibility="All"
                 IsReadOnly="False"
                 RowHeight="26"
