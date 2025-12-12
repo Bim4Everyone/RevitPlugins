@@ -12,7 +12,7 @@ internal class FiltersConfig : ProjectConfig {
     [JsonIgnore]
     public override IConfigSerializer Serializer { get; set; }
 
-    public Filter[] Filters { get; set; } = [];
+    public Filter[] Filters { get; set; } = [new Filter() { Name = "default" }];
 
     public static FiltersConfig GetConfig(IConfigSerializer configSerializer) {
         return new ProjectConfigBuilder()

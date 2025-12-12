@@ -12,7 +12,7 @@ internal class ChecksConfig : ProjectConfig {
     [JsonIgnore]
     public override IConfigSerializer Serializer { get; set; }
 
-    public Check[] Checks { get; set; } = [];
+    public Check[] Checks { get; set; } = [new Check() { Name = "default" }];
 
     public static ChecksConfig GetConfig(IConfigSerializer configSerializer) {
         return new ProjectConfigBuilder()

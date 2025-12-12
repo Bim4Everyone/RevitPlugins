@@ -12,7 +12,7 @@ internal class RulesConfig : ProjectConfig {
     [JsonIgnore]
     public override IConfigSerializer Serializer { get; set; }
 
-    public Rule[] Rules { get; set; } = [];
+    public Rule[] Rules { get; set; } = [new Rule() { Name = "default" }];
 
     public static RulesConfig GetConfig(IConfigSerializer configSerializer) {
         return new ProjectConfigBuilder()
