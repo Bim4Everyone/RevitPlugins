@@ -10,6 +10,9 @@
     <system:String x:Key="MainWindow.OverrideColor">Переопределять цвет</system:String>
     <system:String x:Key="MainWindow.OverrideColorToolTip">Будет выполнено переопределение графики путем задания цвета</system:String>
     
+    <system:String x:Key="MainWindow.OverrideLines">Переопределять цвет линий</system:String>
+    <system:String x:Key="MainWindow.OverrideLinesToolTip">Будет выполнено переопределение графики путем задания цвета линиям</system:String>
+    
     <system:String x:Key="MainWindow.OverrideHatching">Переопределять штриховку</system:String>
     <system:String x:Key="MainWindow.OverrideHatchingToolTip">Будет выполнено переопределение графики путем задания штриховки</system:String>
     
