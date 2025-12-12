@@ -744,6 +744,7 @@ internal class MainViewModel : BaseViewModel {
     /// </summary>
     private void SettingsChanged() {
         _settingsEdited = true;
+        ErrorText = _localizationService.GetLocalizedString("VM.NeedSaveSettings");
     }
 
     /// <summary>

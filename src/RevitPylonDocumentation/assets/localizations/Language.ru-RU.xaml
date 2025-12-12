@@ -2,6 +2,8 @@
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
                     xmlns:system="clr-namespace:System;assembly=mscorlib">
 
+    <system:String x:Key="VM.NeedSaveSettings">Сохраните настройки</system:String>
+    
     <!-- Pylon Analysis Error Messages -->
     <system:String x:Key="VM.TypicalPylonFilterParamNotFound">Параметр фильтрации типовых пилонов не найден</system:String>
     <system:String x:Key="VM.ProjectSectionParamNotFound">Параметр раздела не найден у элементов Стен или Несущих колонн</system:String>
