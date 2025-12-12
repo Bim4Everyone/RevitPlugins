@@ -1,10 +1,5 @@
-using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Web.Security;
 
 using dosymep.Bim4Everyone;
 using dosymep.Bim4Everyone.SharedParams;
@@ -13,33 +8,27 @@ using dosymep.WPF.ViewModels;
 
 using RevitRoomTagPlacement.Models;
 
-namespace RevitRoomTagPlacement.ViewModels {
-    internal class RoomGroupViewModel : BaseViewModel {
+namespace RevitRoomTagPlacement.ViewModels;
+internal class RoomGroupViewModel : BaseViewModel {
+    private bool _isChecked;
 
-        private readonly string _name;
-        private readonly IReadOnlyCollection<RoomFromRevit> _rooms;
-        private readonly IReadOnlyCollection<Apartment> _apartments;
+    public RoomGroupViewModel(string name, IEnumerable<RoomFromRevit> rooms) {
+        Name = name;
+        Rooms = rooms.ToList();
 
-        private bool _isChecked;
+        RevitParam sectionParam = SharedParamsConfig.Instance.RoomSectionShortName;
+        Apartments = Rooms
+            .GroupBy(r => r.RoomObject.GetParamValueOrDefault(sectionParam, "<Без секции>"))
+            .Select(x => new Apartment(x))
+            .ToList();
+    }
 
-        public RoomGroupViewModel(string name, IEnumerable<RoomFromRevit> rooms) {
-            _name = name;
-            _rooms = rooms.ToList();
+    public string Name { get; }
+    public IReadOnlyCollection<RoomFromRevit> Rooms { get; }
+    public IReadOnlyCollection<Apartment> Apartments { get; }
 
-            RevitParam sectionParam = SharedParamsConfig.Instance.RoomSectionShortName;
-            _apartments = _rooms
-                .GroupBy(r => r.RoomObject.GetParamValueOrDefault(sectionParam, "<Без секции>"))
-                .Select(x => new Apartment(x))
-                .ToList();
-        }
-
-        public string Name => _name;
-        public IReadOnlyCollection<RoomFromRevit> Rooms => _rooms;
-        public IReadOnlyCollection<Apartment> Apartments => _apartments;
-
-        public bool IsChecked {
-            get => _isChecked;
-            set => RaiseAndSetIfChanged(ref _isChecked, value);
-        }
+    public bool IsChecked {
+        get => _isChecked;
+        set => RaiseAndSetIfChanged(ref _isChecked, value);
     }
 }
