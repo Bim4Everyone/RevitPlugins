@@ -1,13 +1,11 @@
 using System;
 
-using dosymep.WPF.ViewModels;
-
 using Autodesk.Revit.DB;
 
 using dosymep.SimpleServices;
+using dosymep.WPF.ViewModels;
 
 using RevitParamsChecker.Models.Results;
-using RevitParamsChecker.Models.Revit;
 
 namespace RevitParamsChecker.ViewModels.Results;
 
