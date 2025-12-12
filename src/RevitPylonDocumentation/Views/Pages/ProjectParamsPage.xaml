@@ -29,56 +29,46 @@
             </ResourceDictionary.MergedDictionaries>
         </ResourceDictionary>
     </core:WpfUIPlatformPage.Resources>
+    
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
 
-    <ui:PassiveScrollViewer>
-        <Grid>
-            <Grid.RowDefinitions>
-                <RowDefinition Height="Auto" />
-                <RowDefinition Height="*" />
-                <RowDefinition Height="Auto" />
-            </Grid.RowDefinitions>
-
+        <ScrollViewer>
             <Border Name="ProjectProps"
                 Margin="15"
                 Style="{StaticResource CustomBorder}">
-                <StackPanel>
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
+                    </Grid.RowDefinitions>
+
                     <controls:SettingsTitleControl
                         LabelText="{me:LocalizationSource ProjectParams.ProjectRelatedParameters}"
                         ToolTipText="{me:LocalizationSource ProjectParams.ProjectRelatedParametersToolTip}"
                         ButtonCommand="{Binding ApplySettingsCommand}"
                         ButtonMouseLeaveCommand="{Binding CheckSettingsCommand}" />
 
-                    <Grid>
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="*" />
-                            <ColumnDefinition Width="*" />
-                        </Grid.ColumnDefinitions>
+                    <UniformGrid
+                        Grid.Row="1"
+                        SizeChanged="UniformGrid_SizeChanged">
 
                         <controls:TextBoxSettingControl
-                            Grid.Column="0"
                             LabelText="{me:LocalizationSource ProjectParams.DispatcherGroupingFirstParameter}"
                             TextBoxText="{Binding Path=ProjectSettings.DispatcherGroupingFirstTemp, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
                             ToolTipText="{me:LocalizationSource ProjectParams.DispatcherGroupingFirstParameterToolTip}"
                             TextChangedCommand="{Binding SettingsChangedCommand}" />
 
                         <controls:TextBoxSettingControl
-                            Grid.Column="1"
                             LabelText="{me:LocalizationSource ProjectParams.DispatcherGroupingSecondParameter}"
                             TextBoxText="{Binding Path=ProjectSettings.DispatcherGroupingSecondTemp, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
                             ToolTipText="{me:LocalizationSource ProjectParams.DispatcherGroupingSecondParameterToolTip}"
                             TextChangedCommand="{Binding SettingsChangedCommand}" />
-                    </Grid>
-
-                    <Grid>
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition
-                                Width="*" />
-                            <ColumnDefinition
-                                Width="*" />
-                        </Grid.ColumnDefinitions>
 
                         <controls:ComboBoxSettingControl
-                            Grid.Column="0"
                             LabelText="{me:LocalizationSource ProjectParams.SelectDimensionTypeSize}"
                             ItemsSource="{Binding DimensionTypes}"
                             SelectedItem="{Binding TypesSettings.SelectedDimensionType, Mode=TwoWay}"
@@ -87,22 +77,12 @@
                             ItemTemplate="{StaticResource WithoutFamilyNameItemTemplate}" />
 
                         <controls:ComboBoxSettingControl
-                            Grid.Column="1"
                             LabelText="{me:LocalizationSource ProjectParams.SelectSpotDimensionTypeSize}"
                             ItemsSource="{Binding SpotDimensionTypes}"
                             SelectedItem="{Binding TypesSettings.SelectedSpotDimensionType, Mode=TwoWay}"
                             ToolTipText="{me:LocalizationSource ProjectParams.SelectSpotDimensionTypeSizeToolTip}"
                             SelectionChangedCommand="{Binding SettingsChangedCommand}"
                             ItemTemplate="{StaticResource WithoutFamilyNameItemTemplate}" />
-                    </Grid>
-
-                    <Grid>
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition
-                                Width="*" />
-                            <ColumnDefinition
-                                Width="*" />
-                        </Grid.ColumnDefinitions>
 
                         <controls:ComboBoxSettingControl
                             Grid.Column="0"
@@ -114,25 +94,14 @@
                             ItemTemplate="{StaticResource WithoutFamilyNameItemTemplate}" />
 
                         <controls:ComboBoxSettingControl
-                            Grid.Column="1"
                             LabelText="{me:LocalizationSource ProjectParams.SelectRebarMarkWithSerifTypeSize}"
                             ItemsSource="{Binding RebarTagTypes}"
                             SelectedItem="{Binding TypesSettings.SelectedRebarTagTypeWithSerif, Mode=TwoWay}"
                             ToolTipText="{me:LocalizationSource ProjectParams.SelectRebarMarkWithSerifTypeSizeToolTip}"
                             SelectionChangedCommand="{Binding SettingsChangedCommand}"
                             ItemTemplate="{StaticResource WithoutFamilyNameItemTemplate}" />
-                    </Grid>
-
-                    <Grid>
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition
-                                Width="*" />
-                            <ColumnDefinition
-                                Width="*" />
-                        </Grid.ColumnDefinitions>
 
                         <controls:ComboBoxSettingControl
-                            Grid.Column="0"
                             LabelText="{me:LocalizationSource ProjectParams.SelectRebarMarkWithStepTypeSize}"
                             ItemsSource="{Binding RebarTagTypes}"
                             SelectedItem="{Binding TypesSettings.SelectedRebarTagTypeWithStep, Mode=TwoWay}"
@@ -141,25 +110,14 @@
                             ItemTemplate="{StaticResource WithoutFamilyNameItemTemplate}" />
 
                         <controls:ComboBoxSettingControl
-                            Grid.Column="1"
                             LabelText="{me:LocalizationSource ProjectParams.SelectRebarMarkWithCommentTypeSize}"
                             ItemsSource="{Binding RebarTagTypes}"
                             SelectedItem="{Binding TypesSettings.SelectedRebarTagTypeWithComment, Mode=TwoWay}"
                             ToolTipText="{me:LocalizationSource ProjectParams.SelectRebarMarkWithCommentTypeSizeToolTip}"
                             SelectionChangedCommand="{Binding SettingsChangedCommand}"
                             ItemTemplate="{StaticResource WithoutFamilyNameItemTemplate}" />
-                    </Grid>
-
-                    <Grid>
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition
-                                Width="*" />
-                            <ColumnDefinition
-                                Width="*" />
-                        </Grid.ColumnDefinitions>
 
                         <controls:ComboBoxSettingControl
-                            Grid.Column="0"
                             LabelText="{me:LocalizationSource ProjectParams.SelectUniversalMarkWithTextTypeSize}"
                             ItemsSource="{Binding TypicalAnnotationsTypes}"
                             SelectedItem="{Binding TypesSettings.SelectedUniversalTagType, Mode=TwoWay}"
@@ -168,42 +126,30 @@
                             ItemTemplate="{StaticResource WithoutFamilyNameItemTemplate}" />
 
                         <controls:ComboBoxSettingControl
-                            Grid.Column="1"
                             LabelText="{me:LocalizationSource ProjectParams.SelectBreakLineTypeSize}"
                             ItemsSource="{Binding DetailComponentsTypes}"
                             SelectedItem="{Binding TypesSettings.SelectedBreakLineType, Mode=TwoWay}"
                             ToolTipText="{me:LocalizationSource ProjectParams.SelectBreakLineTypeSizeToolTip}"
                             SelectionChangedCommand="{Binding SettingsChangedCommand}"
                             ItemTemplate="{StaticResource WithoutFamilyNameItemTemplate}" />
-                    </Grid>
-
-                    <Grid>
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition
-                                Width="*" />
-                            <ColumnDefinition
-                                Width="*" />
-                        </Grid.ColumnDefinitions>
 
                         <controls:ComboBoxSettingControl
-                            Grid.Column="0"
                             LabelText="{me:LocalizationSource ProjectParams.SelectConcretingJointTypeSize}"
                             ItemsSource="{Binding DetailComponentsTypes}"
                             SelectedItem="{Binding TypesSettings.SelectedConcretingJointType, Mode=TwoWay}"
                             ToolTipText="{me:LocalizationSource ProjectParams.SelectConcretingJointTypeSizeToolTip}"
                             SelectionChangedCommand="{Binding SettingsChangedCommand}"
                             ItemTemplate="{StaticResource WithoutFamilyNameItemTemplate}" />
-                    </Grid>
-                </StackPanel>
+                    </UniformGrid>
+                </Grid>
             </Border>
+        </ScrollViewer>
 
-            <controls:AppFooterControl
-                Grid.Row="2"
-                Grid.ColumnSpan="2"
-                HorizontalAlignment="Right"
-                ErrorText="{Binding ErrorText}"
-                ShowOkButton="False"
-                CancelButtonText="{me:LocalizationSource GeneralPage.Cancel}" />
-        </Grid>
-    </ui:PassiveScrollViewer>
+        <controls:AppFooterControl
+            Grid.Row="1"
+            HorizontalAlignment="Right"
+            ErrorText="{Binding ErrorText}"
+            ShowOkButton="False"
+            CancelButtonText="{me:LocalizationSource GeneralPage.Cancel}" />
+    </Grid>
 </core:WpfUIPlatformPage>

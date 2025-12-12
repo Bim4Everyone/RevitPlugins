@@ -257,6 +257,7 @@
 
     <system:String x:Key="PylonParams.TypicalPylonFilterParameter">Typical pylon filter parameter and its value:</system:String>
     <system:String x:Key="PylonParams.TypicalPylonFilterParameterTooltip">Typical pylon filter parameter and its value</system:String>
+    <system:String x:Key="PylonParams.TypicalPylonFilterValue">Typical pylon filter parameter value</system:String>
     <system:String x:Key="PylonParams.TypicalPylonFilterValueTooltip">Typical pylon filter parameter value</system:String>
 
     <system:String x:Key="PylonParams.PylonSectionLengthParameter">Pylon section length parameter:</system:String>

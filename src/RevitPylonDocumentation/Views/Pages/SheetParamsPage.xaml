@@ -32,62 +32,62 @@
 
     <Grid>
         <Grid.RowDefinitions>
-            <RowDefinition Height="Auto" />
             <RowDefinition Height="*" />
             <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
 
-        <Border Name="PylonProps"
-            Margin="15"
-            Style="{StaticResource CustomBorder}">
-            <StackPanel>
-                <controls:SettingsTitleControl
-                    LabelText="{me:LocalizationSource SheetParams.SheetCreationRules}"
-                    ToolTipText="{me:LocalizationSource SheetParams.SheetCreationRulesToolTip}"
-                    ButtonCommand="{Binding ApplySettingsCommand}"
-                    ButtonMouseLeaveCommand="{Binding CheckSettingsCommand}" />
-
-                <controls:DoubleTextBoxSettingControl
-                    LabelText="{me:LocalizationSource SheetParams.PylonSheetNameMask}"
-                    FirstTextBoxText="{Binding Path=ProjectSettings.SheetPrefixTemp, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
-                    SecondTextBoxText="{Binding Path=ProjectSettings.SheetSuffixTemp, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
-                    ToolTipText="{me:LocalizationSource SheetParams.PylonSheetNameMaskToolTip}"
-                    TextChangedCommand="{Binding SettingsChangedCommand}" />
-
-                <controls:ComboBoxSettingControl
-                    LabelText="{me:LocalizationSource GeneralPage.SelectTitleBlockType}"
-                    ItemsSource="{Binding TitleBlocks}"
-                    SelectedItem="{Binding TypesSettings.SelectedTitleBlock, Mode=TwoWay}"
-                    ToolTipText="{me:LocalizationSource SheetParams.SelectTitleBlockTypeToolTip}"
-                    SelectionChangedCommand="{Binding SettingsChangedCommand}"
-                    ItemTemplate="{StaticResource WithFamilyNameItemTemplate}" />
-
+        <ScrollViewer>
+            <Border Name="PylonProps"
+                Margin="15"
+                Style="{StaticResource CustomBorder}">
                 <Grid>
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="*" />
-                        <ColumnDefinition Width="*" />
-                    </Grid.ColumnDefinitions>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
+                    </Grid.RowDefinitions>
+                    
+                    <controls:SettingsTitleControl
+                        LabelText="{me:LocalizationSource SheetParams.SheetCreationRules}"
+                        ToolTipText="{me:LocalizationSource SheetParams.SheetCreationRulesToolTip}"
+                        ButtonCommand="{Binding ApplySettingsCommand}"
+                        ButtonMouseLeaveCommand="{Binding CheckSettingsCommand}" />
 
-                    <controls:TextBoxSettingControl
-                        Grid.Column="0"
-                        LabelText="{me:LocalizationSource SheetParams.SheetSizeParameter}"
-                        TextBoxText="{Binding Path=ProjectSettings.SheetSizeTemp, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
-                        ToolTipText="{me:LocalizationSource SheetParams.SheetSizeParameterToolTip}"
-                        TextChangedCommand="{Binding SettingsChangedCommand}" />
+                    <UniformGrid
+                        Grid.Row="1"
+                        SizeChanged="UniformGrid_SizeChanged">
+                        <controls:DoubleTextBoxSettingControl
+                            LabelText="{me:LocalizationSource SheetParams.PylonSheetNameMask}"
+                            FirstTextBoxText="{Binding Path=ProjectSettings.SheetPrefixTemp, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
+                            SecondTextBoxText="{Binding Path=ProjectSettings.SheetSuffixTemp, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
+                            ToolTipText="{me:LocalizationSource SheetParams.PylonSheetNameMaskToolTip}"
+                            TextChangedCommand="{Binding SettingsChangedCommand}" />
 
-                    <controls:TextBoxSettingControl
-                        Grid.Column="1"
-                        LabelText="{me:LocalizationSource SheetParams.SheetCoefficientParameter}"
-                        TextBoxText="{Binding Path=ProjectSettings.SheetCoefficientTemp, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
-                        ToolTipText="{me:LocalizationSource SheetParams.SheetCoefficientParameterToolTip}"
-                        TextChangedCommand="{Binding SettingsChangedCommand}" />
+                        <controls:ComboBoxSettingControl
+                            LabelText="{me:LocalizationSource GeneralPage.SelectTitleBlockType}"
+                            ItemsSource="{Binding TitleBlocks}"
+                            SelectedItem="{Binding TypesSettings.SelectedTitleBlock, Mode=TwoWay}"
+                            ToolTipText="{me:LocalizationSource SheetParams.SelectTitleBlockTypeToolTip}"
+                            SelectionChangedCommand="{Binding SettingsChangedCommand}"
+                            ItemTemplate="{StaticResource WithFamilyNameItemTemplate}" />
+
+                        <controls:TextBoxSettingControl
+                            LabelText="{me:LocalizationSource SheetParams.SheetSizeParameter}"
+                            TextBoxText="{Binding Path=ProjectSettings.SheetSizeTemp, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
+                            ToolTipText="{me:LocalizationSource SheetParams.SheetSizeParameterToolTip}"
+                            TextChangedCommand="{Binding SettingsChangedCommand}" />
+
+                        <controls:TextBoxSettingControl
+                            LabelText="{me:LocalizationSource SheetParams.SheetCoefficientParameter}"
+                            TextBoxText="{Binding Path=ProjectSettings.SheetCoefficientTemp, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
+                            ToolTipText="{me:LocalizationSource SheetParams.SheetCoefficientParameterToolTip}"
+                            TextChangedCommand="{Binding SettingsChangedCommand}" />
+                    </UniformGrid>
                 </Grid>
-            </StackPanel>
-        </Border>
-
+            </Border>
+        </ScrollViewer>
+        
         <controls:AppFooterControl
-            Grid.Row="2"
-            Grid.ColumnSpan="2"
+            Grid.Row="1"
             HorizontalAlignment="Right"
             ErrorText="{Binding ErrorText}"
             ShowOkButton="False"

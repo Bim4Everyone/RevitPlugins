@@ -257,6 +257,7 @@
 
     <system:String x:Key="PylonParams.TypicalPylonFilterParameter">Параметр фильтрации типовых пилонов и его значение:</system:String>
     <system:String x:Key="PylonParams.TypicalPylonFilterParameterTooltip">Параметр фильтрации типовых пилонов и его значение</system:String>
+    <system:String x:Key="PylonParams.TypicalPylonFilterValue">Значение параметра фильтрации типовых пилонов:</system:String>
     <system:String x:Key="PylonParams.TypicalPylonFilterValueTooltip">Значение параметра фильтрации типовых пилонов</system:String>
 
     <system:String x:Key="PylonParams.PylonSectionLengthParameter">Параметр длины сечения пилона:</system:String>

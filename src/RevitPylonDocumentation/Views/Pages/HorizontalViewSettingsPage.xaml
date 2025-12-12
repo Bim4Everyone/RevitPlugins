@@ -31,204 +31,192 @@
         </ResourceDictionary>
     </core:WpfUIPlatformPage.Resources>
 
-    <Grid>
-        <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="*" />
-            <ColumnDefinition Width="*" />
-        </Grid.ColumnDefinitions>
-        <Grid.RowDefinitions>
-            <RowDefinition Height="Auto" />
-            <RowDefinition Height="Auto" />
-            <RowDefinition Height="Auto" />
-            <RowDefinition Height="*" />
-            <RowDefinition Height="Auto" />
-        </Grid.RowDefinitions>
+    <ScrollViewer>
+        <Grid>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="*" />
+                <RowDefinition Height="Auto" />
+            </Grid.RowDefinitions>
 
-        <Border Name="FormworkProps"
-            Grid.Column="0"
-            Grid.Row="0"
-            Margin="15 15 7 7"
-            Style="{StaticResource CustomBorder}">
-            <StackPanel>
-                <controls:SettingsTitleControl
-                    LabelText="{me:LocalizationSource HorizontalView.FormworkHorizontalView}"
-                    ToolTipText="{me:LocalizationSource HorizontalViewSettingsPage.FormworkHorizontalViewToolTip}"
-                    ButtonCommand="{Binding ApplySettingsCommand}"
-                    ButtonMouseLeaveCommand="{Binding CheckSettingsCommand}" />
+            <UniformGrid
+                Margin="7"
+                SizeChanged="UniformGrid_SizeChanged">
+                <Border Name="FormworkProps"
+                    Margin="7"
+                    Style="{StaticResource CustomBorder}">
+                    <StackPanel>
+                        <controls:SettingsTitleControl
+                            LabelText="{me:LocalizationSource HorizontalView.FormworkHorizontalView}"
+                            ToolTipText="{me:LocalizationSource HorizontalViewSettingsPage.FormworkHorizontalViewToolTip}"
+                            ButtonCommand="{Binding ApplySettingsCommand}"
+                            ButtonMouseLeaveCommand="{Binding CheckSettingsCommand}" />
 
-                <controls:DoubleTextBoxSettingControl
-                    LabelText="{me:LocalizationSource HorizontalView.FirstHorizontalViewNameMask}"
-                    FirstTextBoxText="{Binding Path=ViewSectionSettings.TransverseViewFirstPrefixTemp, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
-                    SecondTextBoxText="{Binding Path=ViewSectionSettings.TransverseViewFirstSuffixTemp, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
-                    ToolTipText="{me:LocalizationSource HorizontalViewSettingsPage.FirstHorizontalViewNameMaskToolTip}"
-                    TextChangedCommand="{Binding SettingsChangedCommand}" />
+                        <controls:DoubleTextBoxSettingControl
+                            LabelText="{me:LocalizationSource HorizontalView.FirstHorizontalViewNameMask}"
+                            FirstTextBoxText="{Binding Path=ViewSectionSettings.TransverseViewFirstPrefixTemp, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
+                            SecondTextBoxText="{Binding Path=ViewSectionSettings.TransverseViewFirstSuffixTemp, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
+                            ToolTipText="{me:LocalizationSource HorizontalViewSettingsPage.FirstHorizontalViewNameMaskToolTip}"
+                            TextChangedCommand="{Binding SettingsChangedCommand}" />
 
-                <controls:DoubleTextBoxSettingControl
-                    LabelText="{me:LocalizationSource HorizontalView.SecondHorizontalViewNameMask}"
-                    FirstTextBoxText="{Binding Path=ViewSectionSettings.TransverseViewSecondPrefixTemp, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
-                    SecondTextBoxText="{Binding Path=ViewSectionSettings.TransverseViewSecondSuffixTemp, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
-                    ToolTipText="{me:LocalizationSource HorizontalViewSettingsPage.SecondHorizontalViewNameMaskToolTip}"
-                    TextChangedCommand="{Binding SettingsChangedCommand}" />
+                        <controls:DoubleTextBoxSettingControl
+                            LabelText="{me:LocalizationSource HorizontalView.SecondHorizontalViewNameMask}"
+                            FirstTextBoxText="{Binding Path=ViewSectionSettings.TransverseViewSecondPrefixTemp, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
+                            SecondTextBoxText="{Binding Path=ViewSectionSettings.TransverseViewSecondSuffixTemp, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
+                            ToolTipText="{me:LocalizationSource HorizontalViewSettingsPage.SecondHorizontalViewNameMaskToolTip}"
+                            TextChangedCommand="{Binding SettingsChangedCommand}" />
 
-                <controls:DoubleTextBoxSettingControl
-                    LabelText="{me:LocalizationSource HorizontalView.ThirdHorizontalViewNameMask}"
-                    FirstTextBoxText="{Binding Path=ViewSectionSettings.TransverseViewThirdPrefixTemp, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
-                    SecondTextBoxText="{Binding Path=ViewSectionSettings.TransverseViewThirdSuffixTemp, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
-                    ToolTipText="{me:LocalizationSource HorizontalViewSettingsPage.ThirdHorizontalViewNameMaskToolTip}"
-                    TextChangedCommand="{Binding SettingsChangedCommand}" />
+                        <controls:DoubleTextBoxSettingControl
+                            LabelText="{me:LocalizationSource HorizontalView.ThirdHorizontalViewNameMask}"
+                            FirstTextBoxText="{Binding Path=ViewSectionSettings.TransverseViewThirdPrefixTemp, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
+                            SecondTextBoxText="{Binding Path=ViewSectionSettings.TransverseViewThirdSuffixTemp, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
+                            ToolTipText="{me:LocalizationSource HorizontalViewSettingsPage.ThirdHorizontalViewNameMaskToolTip}"
+                            TextChangedCommand="{Binding SettingsChangedCommand}" />
 
-                <controls:ComboBoxSettingControl
-                    LabelText="{me:LocalizationSource HorizontalView.SelectHorizontalViewTemplate}"
-                    ItemsSource="{Binding ViewTemplatesInPj}"
-                    SelectedItem="{Binding TypesSettings.SelectedTransverseViewTemplate, Mode=TwoWay}"
-                    ToolTipText="{me:LocalizationSource HorizontalViewSettingsPage.SelectHorizontalViewTemplateToolTip}"
-                    SelectionChangedCommand="{Binding SettingsChangedCommand}"
-                    ItemTemplate="{StaticResource WithoutFamilyNameItemTemplate}" />
+                        <controls:ComboBoxSettingControl
+                            LabelText="{me:LocalizationSource HorizontalView.SelectHorizontalViewTemplate}"
+                            ItemsSource="{Binding ViewTemplatesInPj}"
+                            SelectedItem="{Binding TypesSettings.SelectedTransverseViewTemplate, Mode=TwoWay}"
+                            ToolTipText="{me:LocalizationSource HorizontalViewSettingsPage.SelectHorizontalViewTemplateToolTip}"
+                            SelectionChangedCommand="{Binding SettingsChangedCommand}"
+                            ItemTemplate="{StaticResource WithoutFamilyNameItemTemplate}" />
 
-                <controls:TextBoxSettingControl
-                    LabelText="{me:LocalizationSource HorizontalView.HorizontalViewDepth}"
-                    TextBoxText="{Binding Path=ViewSectionSettings.TransverseViewDepthTemp, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
-                    ToolTipText="{me:LocalizationSource HorizontalViewSettingsPage.HorizontalViewDepthToolTip}"
-                    TextChangedCommand="{Binding SettingsChangedCommand}" />
-            </StackPanel>
-        </Border>
+                        <controls:TextBoxSettingControl
+                            LabelText="{me:LocalizationSource HorizontalView.HorizontalViewDepth}"
+                            TextBoxText="{Binding Path=ViewSectionSettings.TransverseViewDepthTemp, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
+                            ToolTipText="{me:LocalizationSource HorizontalViewSettingsPage.HorizontalViewDepthToolTip}"
+                            TextChangedCommand="{Binding SettingsChangedCommand}" />
+                    </StackPanel>
+                </Border>
 
-        <Border Name="RebarProps"
-            Grid.Column="1"
-            Grid.Row="0"
-            Margin="7 15 15 7"
-            Style="{StaticResource CustomBorder}">
-            <StackPanel>
-                <controls:SettingsTitleControl
-                    LabelText="{me:LocalizationSource HorizontalView.RebarHorizontalView}"
-                    ToolTipText="{me:LocalizationSource HorizontalViewSettingsPage.RebarHorizontalViewToolTip}"
-                    ButtonCommand="{Binding ApplySettingsCommand}"
-                    ButtonMouseLeaveCommand="{Binding CheckSettingsCommand}" />
+                <Border Name="RebarProps"
+                    Margin="7"
+                    Style="{StaticResource CustomBorder}">
+                    <StackPanel>
+                        <controls:SettingsTitleControl
+                            LabelText="{me:LocalizationSource HorizontalView.RebarHorizontalView}"
+                            ToolTipText="{me:LocalizationSource HorizontalViewSettingsPage.RebarHorizontalViewToolTip}"
+                            ButtonCommand="{Binding ApplySettingsCommand}"
+                            ButtonMouseLeaveCommand="{Binding CheckSettingsCommand}" />
 
-                <controls:DoubleTextBoxSettingControl
-                    LabelText="{me:LocalizationSource HorizontalView.FirstRebarHorizontalViewNameMask}"
-                    FirstTextBoxText="{Binding Path=ViewSectionSettings.TransverseRebarViewFirstPrefixTemp, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
-                    SecondTextBoxText="{Binding Path=ViewSectionSettings.TransverseRebarViewFirstSuffixTemp, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
-                    ToolTipText="{me:LocalizationSource HorizontalViewSettingsPage.FirstRebarHorizontalViewNameMaskToolTip}"
-                    TextChangedCommand="{Binding SettingsChangedCommand}" />
+                        <controls:DoubleTextBoxSettingControl
+                            LabelText="{me:LocalizationSource HorizontalView.FirstRebarHorizontalViewNameMask}"
+                            FirstTextBoxText="{Binding Path=ViewSectionSettings.TransverseRebarViewFirstPrefixTemp, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
+                            SecondTextBoxText="{Binding Path=ViewSectionSettings.TransverseRebarViewFirstSuffixTemp, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
+                            ToolTipText="{me:LocalizationSource HorizontalViewSettingsPage.FirstRebarHorizontalViewNameMaskToolTip}"
+                            TextChangedCommand="{Binding SettingsChangedCommand}" />
 
-                <controls:DoubleTextBoxSettingControl
-                    LabelText="{me:LocalizationSource HorizontalView.SecondRebarHorizontalViewNameMask}"
-                    FirstTextBoxText="{Binding Path=ViewSectionSettings.TransverseRebarViewSecondPrefixTemp, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
-                    SecondTextBoxText="{Binding Path=ViewSectionSettings.TransverseRebarViewSecondSuffixTemp, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
-                    ToolTipText="{me:LocalizationSource HorizontalViewSettingsPage.SecondRebarHorizontalViewNameMaskToolTip}"
-                    TextChangedCommand="{Binding SettingsChangedCommand}" />
+                        <controls:DoubleTextBoxSettingControl
+                            LabelText="{me:LocalizationSource HorizontalView.SecondRebarHorizontalViewNameMask}"
+                            FirstTextBoxText="{Binding Path=ViewSectionSettings.TransverseRebarViewSecondPrefixTemp, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
+                            SecondTextBoxText="{Binding Path=ViewSectionSettings.TransverseRebarViewSecondSuffixTemp, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
+                            ToolTipText="{me:LocalizationSource HorizontalViewSettingsPage.SecondRebarHorizontalViewNameMaskToolTip}"
+                            TextChangedCommand="{Binding SettingsChangedCommand}" />
 
-                <controls:DoubleTextBoxSettingControl
-                    LabelText="{me:LocalizationSource HorizontalView.ThirdRebarHorizontalViewNameMask}"
-                    FirstTextBoxText="{Binding Path=ViewSectionSettings.TransverseRebarViewThirdPrefixTemp, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
-                    SecondTextBoxText="{Binding Path=ViewSectionSettings.TransverseRebarViewThirdSuffixTemp, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
-                    ToolTipText="{me:LocalizationSource HorizontalViewSettingsPage.ThirdRebarHorizontalViewNameMaskToolTip}"
-                    TextChangedCommand="{Binding SettingsChangedCommand}" />
+                        <controls:DoubleTextBoxSettingControl
+                            LabelText="{me:LocalizationSource HorizontalView.ThirdRebarHorizontalViewNameMask}"
+                            FirstTextBoxText="{Binding Path=ViewSectionSettings.TransverseRebarViewThirdPrefixTemp, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
+                            SecondTextBoxText="{Binding Path=ViewSectionSettings.TransverseRebarViewThirdSuffixTemp, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
+                            ToolTipText="{me:LocalizationSource HorizontalViewSettingsPage.ThirdRebarHorizontalViewNameMaskToolTip}"
+                            TextChangedCommand="{Binding SettingsChangedCommand}" />
 
-                <controls:ComboBoxSettingControl
-                    LabelText="{me:LocalizationSource HorizontalView.SelectRebarHorizontalViewTemplate}"
-                    ItemsSource="{Binding ViewTemplatesInPj}"
-                    SelectedItem="{Binding TypesSettings.SelectedTransverseRebarViewTemplate, Mode=TwoWay}"
-                    ToolTipText="{me:LocalizationSource HorizontalViewSettingsPage.SelectRebarHorizontalViewTemplateToolTip}"
-                    SelectionChangedCommand="{Binding SettingsChangedCommand}"
-                    ItemTemplate="{StaticResource WithoutFamilyNameItemTemplate}" />
+                        <controls:ComboBoxSettingControl
+                            LabelText="{me:LocalizationSource HorizontalView.SelectRebarHorizontalViewTemplate}"
+                            ItemsSource="{Binding ViewTemplatesInPj}"
+                            SelectedItem="{Binding TypesSettings.SelectedTransverseRebarViewTemplate, Mode=TwoWay}"
+                            ToolTipText="{me:LocalizationSource HorizontalViewSettingsPage.SelectRebarHorizontalViewTemplateToolTip}"
+                            SelectionChangedCommand="{Binding SettingsChangedCommand}"
+                            ItemTemplate="{StaticResource WithoutFamilyNameItemTemplate}" />
 
-                <controls:TextBoxSettingControl
-                    LabelText="{me:LocalizationSource HorizontalView.RebarHorizontalViewDepth}"
-                    TextBoxText="{Binding Path=ViewSectionSettings.TransverseRebarViewDepthTemp, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
-                    ToolTipText="{me:LocalizationSource HorizontalViewSettingsPage.RebarHorizontalViewDepthToolTip}"
-                    TextChangedCommand="{Binding SettingsChangedCommand}" />
-            </StackPanel>
-        </Border>
+                        <controls:TextBoxSettingControl
+                            LabelText="{me:LocalizationSource HorizontalView.RebarHorizontalViewDepth}"
+                            TextBoxText="{Binding Path=ViewSectionSettings.TransverseRebarViewDepthTemp, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
+                            ToolTipText="{me:LocalizationSource HorizontalViewSettingsPage.RebarHorizontalViewDepthToolTip}"
+                            TextChangedCommand="{Binding SettingsChangedCommand}" />
+                    </StackPanel>
+                </Border>
 
-        <Border Name="ElevationProps"
-            Grid.Column="0"
-            Grid.Row="1"
-            Margin="15 15 7 7"
-            Style="{StaticResource CustomBorder}">
-            <StackPanel>
-                <controls:SettingsTitleControl
-                    LabelText="{me:LocalizationSource HorizontalView.HorizontalViewBottomOffsets}"
-                    ToolTipText="{me:LocalizationSource HorizontalViewSettingsPage.HorizontalViewBottomOffsetsToolTip}"
-                    ButtonCommand="{Binding ApplySettingsCommand}"
-                    ButtonMouseLeaveCommand="{Binding CheckSettingsCommand}" />
+                <Border Name="ElevationProps"
+                    Margin="7"
+                    Style="{StaticResource CustomBorder}">
+                    <StackPanel>
+                        <controls:SettingsTitleControl
+                            LabelText="{me:LocalizationSource HorizontalView.HorizontalViewBottomOffsets}"
+                            ToolTipText="{me:LocalizationSource HorizontalViewSettingsPage.HorizontalViewBottomOffsetsToolTip}"
+                            ButtonCommand="{Binding ApplySettingsCommand}"
+                            ButtonMouseLeaveCommand="{Binding CheckSettingsCommand}" />
 
-                <controls:TextBoxSettingControl
-                    LabelText="{me:LocalizationSource HorizontalView.FirstHorizontalViewBottomOffset}"
-                    TextBoxText="{Binding Path=ViewSectionSettings.TransverseViewFirstElevationTemp, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
-                    ToolTipText="{me:LocalizationSource HorizontalViewSettingsPage.FirstHorizontalViewBottomOffsetToolTip}"
-                    TextChangedCommand="{Binding SettingsChangedCommand}" />
+                        <controls:TextBoxSettingControl
+                            LabelText="{me:LocalizationSource HorizontalView.FirstHorizontalViewBottomOffset}"
+                            TextBoxText="{Binding Path=ViewSectionSettings.TransverseViewFirstElevationTemp, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
+                            ToolTipText="{me:LocalizationSource HorizontalViewSettingsPage.FirstHorizontalViewBottomOffsetToolTip}"
+                            TextChangedCommand="{Binding SettingsChangedCommand}" />
 
-                <controls:TextBoxSettingControl
-                    LabelText="{me:LocalizationSource HorizontalView.SecondHorizontalViewTopOffset}"
-                    TextBoxText="{Binding Path=ViewSectionSettings.TransverseViewSecondElevationTemp, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
-                    ToolTipText="{me:LocalizationSource HorizontalViewSettingsPage.SecondHorizontalViewTopOffsetToolTip}"
-                    TextChangedCommand="{Binding SettingsChangedCommand}" />
+                        <controls:TextBoxSettingControl
+                            LabelText="{me:LocalizationSource HorizontalView.SecondHorizontalViewTopOffset}"
+                            TextBoxText="{Binding Path=ViewSectionSettings.TransverseViewSecondElevationTemp, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
+                            ToolTipText="{me:LocalizationSource HorizontalViewSettingsPage.SecondHorizontalViewTopOffsetToolTip}"
+                            TextChangedCommand="{Binding SettingsChangedCommand}" />
 
-                <controls:TextBoxSettingControl
-                    LabelText="{me:LocalizationSource HorizontalView.ThirdHorizontalViewTopOffset}"
-                    TextBoxText="{Binding Path=ViewSectionSettings.TransverseViewThirdElevationTemp, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
-                    ToolTipText="{me:LocalizationSource HorizontalViewSettingsPage.ThirdHorizontalViewTopOffsetToolTip}"
-                    TextChangedCommand="{Binding SettingsChangedCommand}" />
-            </StackPanel>
-        </Border>
+                        <controls:TextBoxSettingControl
+                            LabelText="{me:LocalizationSource HorizontalView.ThirdHorizontalViewTopOffset}"
+                            TextBoxText="{Binding Path=ViewSectionSettings.TransverseViewThirdElevationTemp, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
+                            ToolTipText="{me:LocalizationSource HorizontalViewSettingsPage.ThirdHorizontalViewTopOffsetToolTip}"
+                            TextChangedCommand="{Binding SettingsChangedCommand}" />
+                    </StackPanel>
+                </Border>
 
-        <Border Name="ViewOffsets"
-            Grid.Column="1"
-            Grid.Row="1"
-            Margin="7 15 15 7"
-            Style="{StaticResource CustomBorder}">
-            <StackPanel>
-                <controls:SettingsTitleControl
-                    LabelText="{me:LocalizationSource HorizontalView.HorizontalViewPylonOffsets}"
-                    ToolTipText="{me:LocalizationSource HorizontalViewSettingsPage.HorizontalViewPylonOffsetsToolTip}"
-                    ButtonCommand="{Binding ApplySettingsCommand}"
-                    ButtonMouseLeaveCommand="{Binding CheckSettingsCommand}" />
+                <Border Name="ViewOffsets"
+                    Margin="7"
+                    Style="{StaticResource CustomBorder}">
+                    <StackPanel>
+                        <controls:SettingsTitleControl
+                            LabelText="{me:LocalizationSource HorizontalView.HorizontalViewPylonOffsets}"
+                            ToolTipText="{me:LocalizationSource HorizontalViewSettingsPage.HorizontalViewPylonOffsetsToolTip}"
+                            ButtonCommand="{Binding ApplySettingsCommand}"
+                            ButtonMouseLeaveCommand="{Binding CheckSettingsCommand}" />
 
-                <controls:TextBoxSettingControl
-                    LabelText="{me:LocalizationSource HorizontalView.HorizontalViewXOffset}"
-                    TextBoxText="{Binding Path=ViewSectionSettings.TransverseViewXOffsetTemp, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
-                    ToolTipText="{me:LocalizationSource HorizontalViewSettingsPage.HorizontalViewXOffsetToolTip}"
-                    TextChangedCommand="{Binding SettingsChangedCommand}" />
+                        <controls:TextBoxSettingControl
+                            LabelText="{me:LocalizationSource HorizontalView.HorizontalViewXOffset}"
+                            TextBoxText="{Binding Path=ViewSectionSettings.TransverseViewXOffsetTemp, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
+                            ToolTipText="{me:LocalizationSource HorizontalViewSettingsPage.HorizontalViewXOffsetToolTip}"
+                            TextChangedCommand="{Binding SettingsChangedCommand}" />
 
-                <controls:TextBoxSettingControl
-                    LabelText="{me:LocalizationSource HorizontalView.HorizontalViewYOffset}"
-                    TextBoxText="{Binding Path=ViewSectionSettings.TransverseViewYOffsetTemp, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
-                    ToolTipText="{me:LocalizationSource HorizontalViewSettingsPage.HorizontalViewYOffsetToolTip}"
-                    TextChangedCommand="{Binding SettingsChangedCommand}" />
-            </StackPanel>
-        </Border>
+                        <controls:TextBoxSettingControl
+                            LabelText="{me:LocalizationSource HorizontalView.HorizontalViewYOffset}"
+                            TextBoxText="{Binding Path=ViewSectionSettings.TransverseViewYOffsetTemp, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
+                            ToolTipText="{me:LocalizationSource HorizontalViewSettingsPage.HorizontalViewYOffsetToolTip}"
+                            TextChangedCommand="{Binding SettingsChangedCommand}" />
+                    </StackPanel>
+                </Border>
 
-        <Border Name="ViewTypeProps"
-            Grid.Column="0"
-            Grid.ColumnSpan="2"
-            Grid.Row="2"
-            Margin="15 7 15 7"
-            Style="{StaticResource CustomBorder}">
-            <StackPanel>
-                <controls:SettingsTitleControl
-                    LabelText="{me:LocalizationSource VerticalView.ViewTypeSize}"
-                    ToolTipText="{me:LocalizationSource HorizontalViewSettingsPage.ViewTypeSizeToolTip}"
-                    ButtonCommand="{Binding ApplySettingsCommand}"
-                    ButtonMouseLeaveCommand="{Binding CheckSettingsCommand}" />
+                <Border Name="ViewTypeProps"
+                    Margin="7"
+                    Style="{StaticResource CustomBorder}">
+                    <StackPanel>
+                        <controls:SettingsTitleControl
+                            LabelText="{me:LocalizationSource VerticalView.ViewTypeSize}"
+                            ToolTipText="{me:LocalizationSource HorizontalViewSettingsPage.ViewTypeSizeToolTip}"
+                            ButtonCommand="{Binding ApplySettingsCommand}"
+                            ButtonMouseLeaveCommand="{Binding CheckSettingsCommand}" />
 
-                <controls:ComboBoxSettingControl
-                    LabelText="{me:LocalizationSource HorizontalView.SelectViewTypeSizeForHorizontalViews}"
-                    ItemsSource="{Binding ViewFamilyTypes}"
-                    SelectedItem="{Binding TypesSettings.SelectedViewFamilyType, Mode=TwoWay}"
-                    ToolTipText="{me:LocalizationSource HorizontalViewSettingsPage.SelectViewTypeSizeForHorizontalViewsToolTip}"
-                    SelectionChangedCommand="{Binding SettingsChangedCommand}"
-                    ItemTemplate="{StaticResource WithoutFamilyNameItemTemplate}" />
-            </StackPanel>
-        </Border>
+                        <controls:ComboBoxSettingControl
+                            LabelText="{me:LocalizationSource HorizontalView.SelectViewTypeSizeForHorizontalViews}"
+                            ItemsSource="{Binding ViewFamilyTypes}"
+                            SelectedItem="{Binding TypesSettings.SelectedViewFamilyType, Mode=TwoWay}"
+                            ToolTipText="{me:LocalizationSource HorizontalViewSettingsPage.SelectViewTypeSizeForHorizontalViewsToolTip}"
+                            SelectionChangedCommand="{Binding SettingsChangedCommand}"
+                            ItemTemplate="{StaticResource WithoutFamilyNameItemTemplate}" />
+                    </StackPanel>
+                </Border>
+            </UniformGrid>
 
-        <controls:AppFooterControl
-            Grid.Row="4"
-            Grid.ColumnSpan="2"
-            HorizontalAlignment="Right"
-            ErrorText="{Binding ErrorText}"
-            ShowOkButton="False"
-            CancelButtonText="{me:LocalizationSource GeneralPage.Cancel}" />
-    </Grid>
+            <controls:AppFooterControl
+                Grid.Row="2"
+                HorizontalAlignment="Right"
+                ErrorText="{Binding ErrorText}"
+                ShowOkButton="False"
+                CancelButtonText="{me:LocalizationSource GeneralPage.Cancel}" />
+        </Grid>
+    </ScrollViewer>
 </core:WpfUIPlatformPage>

@@ -31,315 +31,308 @@
         </ResourceDictionary>
     </core:WpfUIPlatformPage.Resources>
 
-    <ui:PassiveScrollViewer>
-        <Grid>
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="*" />
-                <ColumnDefinition Width="*" />
-            </Grid.ColumnDefinitions>
-            <Grid.RowDefinitions>
-                <RowDefinition Height="Auto" />
-                <RowDefinition Height="*" />
-                <RowDefinition Height="Auto" />
-                <RowDefinition Height="Auto" />
-            </Grid.RowDefinitions>
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
 
-            <Border Name="SkeletonSpec"
-                Grid.Column="0"
-                Grid.Row="0"
-                Margin="15 15 7 7"
-                Style="{StaticResource CustomBorder}">
-                <StackPanel>
-                    <controls:SettingsTitleControl
-                        LabelText="{me:LocalizationSource Schedules.SkeletonSpecification}"
-                        ToolTipText="{me:LocalizationSource SchedulesPage.SkeletonSpecificationToolTip}"
-                        ButtonCommand="{Binding ApplySettingsCommand}"
-                        ButtonMouseLeaveCommand="{Binding CheckSettingsCommand}" />
+        <ScrollViewer>
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="*" />
+                </Grid.RowDefinitions>
 
-                    <controls:DoubleTextBoxSettingControl
-                        LabelText="{me:LocalizationSource Schedules.SkeletonSpecNameMask}"
-                        FirstTextBoxText="{Binding Path=SchedulesSettings.SkeletonSchedulePrefixTemp, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
-                        SecondTextBoxText="{Binding Path=SchedulesSettings.SkeletonScheduleSuffixTemp, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
-                        ToolTipText="{me:LocalizationSource SchedulesPage.SkeletonSpecNameMaskToolTip}"
-                        TextChangedCommand="{Binding SettingsChangedCommand}" />
+                <Border
+                    Name="ParamsForScheduleFilters"
+                    Margin="15 15 15 7"
+                    Style="{StaticResource CustomBorder}">
+                    <StackPanel>
+                        <controls:SettingsTitleControl
+                            LabelText="{me:LocalizationSource Schedules.ScheduleFilterParametersList}"
+                            ToolTipText="{me:LocalizationSource SchedulesPage.ScheduleFilterParametersListToolTip}"
+                            ButtonCommand="{Binding ApplySettingsCommand}"
+                            ButtonMouseLeaveCommand="{Binding CheckSettingsCommand}" />
 
-                    <controls:TextBoxSettingControl
-                        LabelText="{me:LocalizationSource Schedules.ReferenceSkeletonSpecSearchName}"
-                        TextBoxText="{Binding Path=SchedulesSettings.SkeletonScheduleNameTemp, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
-                        ToolTipText="{me:LocalizationSource SchedulesPage.ReferenceSkeletonSpecSearchNameToolTip}"
-                        TextChangedCommand="{Binding SettingsChangedCommand}" />
+                        <ui:ListView
+                            Margin="0 5"
+                            ItemsSource="{Binding Path=SchedulesSettings.ParamsForScheduleFiltersTemp, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
+                            SelectionMode="Multiple">
 
-                    <controls:TextBoxSettingControl
-                        LabelText="{me:LocalizationSource Schedules.DispatcherGroupingFirstParameterForSpec}"
-                        TextBoxText="{Binding Path=SchedulesSettings.SkeletonScheduleDisp1Temp, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
-                        ToolTipText="{me:LocalizationSource SchedulesPage.DispatcherGroupingFirstParameterForSpecToolTip}"
-                        TextChangedCommand="{Binding SettingsChangedCommand}" />
+                            <ui:ListView.ItemTemplate>
+                                <DataTemplate>
+                                    <Grid>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="Auto" />
+                                            <ColumnDefinition Width="*" />
+                                            <ColumnDefinition Width="*" />
+                                        </Grid.ColumnDefinitions>
 
-                    <controls:TextBoxSettingControl
-                        LabelText="{me:LocalizationSource Schedules.DispatcherGroupingSecondParameterForSpec}"
-                        TextBoxText="{Binding Path=SchedulesSettings.SkeletonScheduleDisp2Temp, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
-                        ToolTipText="{me:LocalizationSource SchedulesPage.DispatcherGroupingSecondParameterForSpecToolTip}"
-                        TextChangedCommand="{Binding SettingsChangedCommand}" />
-                </StackPanel>
-            </Border>
+                                        <CheckBox
+                                            Grid.Column="0"
+                                            Padding="-1 0 0 0"
+                                            IsChecked="{Binding Path=IsCheck, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
+                                            VerticalAlignment="Center" />
 
-            <Border Name="SysPartSpec"
-                Grid.Column="1"
-                Grid.Row="0"
-                Margin="7 15 15 7"
-                Style="{StaticResource CustomBorder}">
-                <StackPanel>
-                    <controls:SettingsTitleControl
-                        LabelText="{me:LocalizationSource Schedules.SystemPartsSchedule}"
-                        ToolTipText="{me:LocalizationSource SchedulesPage.SystemPartsScheduleToolTip}"
-                        ButtonCommand="{Binding ApplySettingsCommand}"
-                        ButtonMouseLeaveCommand="{Binding CheckSettingsCommand}" />
+                                        <ui:TextBox
+                                            Grid.Column="1"
+                                            Margin="0 0 5 0"
+                                            Style="{StaticResource TextBoxWithTooltipStyle}"
+                                            Text="{Binding Path=ParamNameInSchedule, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
+                                            ToolTip="{me:LocalizationSource SchedulesPage.ParamNameInScheduleToolTip}">
+                                            <i:Interaction.Triggers>
+                                                <i:EventTrigger
+                                                    EventName="TextChanged">
+                                                    <i:InvokeCommandAction
+                                                        Command="{Binding DataContext.SettingsChangedCommand, RelativeSource={RelativeSource AncestorType={x:Type Window}}}" />
+                                                </i:EventTrigger>
+                                            </i:Interaction.Triggers>
+                                        </ui:TextBox>
 
-                    <controls:DoubleTextBoxSettingControl
-                        LabelText="{me:LocalizationSource Schedules.SystemPartsScheduleNameMask}"
-                        FirstTextBoxText="{Binding Path=SchedulesSettings.SystemPartsSchedulePrefixTemp, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
-                        SecondTextBoxText="{Binding Path=SchedulesSettings.SystemPartsScheduleSuffixTemp, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
-                        ToolTipText="{me:LocalizationSource SchedulesPage.SystemPartsScheduleNameMaskToolTip}"
-                        TextChangedCommand="{Binding SettingsChangedCommand}" />
+                                        <ui:TextBox
+                                            Grid.Column="2"
+                                            Margin="5 0 0 0"
+                                            Style="{StaticResource TextBoxWithTooltipStyle}"
+                                            Text="{Binding Path=ParamNameInHost, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
+                                            ToolTip="{me:LocalizationSource SchedulesPage.ParamNameInHostToolTip}">
+                                            <i:Interaction.Triggers>
+                                                <i:EventTrigger
+                                                    EventName="TextChanged">
+                                                    <i:InvokeCommandAction
+                                                        Command="{Binding DataContext.SettingsChangedCommand, RelativeSource={RelativeSource AncestorType={x:Type Window}}}" />
+                                                </i:EventTrigger>
+                                            </i:Interaction.Triggers>
+                                        </ui:TextBox>
+                                    </Grid>
+                                </DataTemplate>
+                            </ui:ListView.ItemTemplate>
+                        </ui:ListView>
 
-                    <controls:TextBoxSettingControl
-                        LabelText="{me:LocalizationSource Schedules.ReferenceSystemPartsScheduleSearchName}"
-                        TextBoxText="{Binding Path=SchedulesSettings.SystemPartsScheduleNameTemp, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
-                        ToolTipText="{me:LocalizationSource SchedulesPage.ReferenceSystemPartsScheduleSearchNameToolTip}"
-                        TextChangedCommand="{Binding SettingsChangedCommand}" />
+                        <StackPanel
+                            Orientation="Horizontal"
+                            HorizontalAlignment="Right">
 
-                    <controls:TextBoxSettingControl
-                        LabelText="{me:LocalizationSource Schedules.DispatcherGroupingFirstParameterForSchedule}"
-                        TextBoxText="{Binding Path=SchedulesSettings.SystemPartsScheduleDisp1Temp, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
-                        ToolTipText="{me:LocalizationSource SchedulesPage.DispatcherGroupingFirstParameterForScheduleToolTip}"
-                        TextChangedCommand="{Binding SettingsChangedCommand}" />
+                            <ui:Button
+                                Margin="5 5"
+                                MinWidth="150"
+                                Content="{me:LocalizationSource Schedules.Add}"
+                                Appearance="Info"
+                                Command="{Binding AddScheduleFilterParamCommand}"
+                                ToolTip="{me:LocalizationSource SchedulesPage.AddButtonToolTip}" />
 
-                    <controls:TextBoxSettingControl
-                        LabelText="{me:LocalizationSource Schedules.DispatcherGroupingSecondParameterForSchedule}"
-                        TextBoxText="{Binding Path=SchedulesSettings.SystemPartsScheduleDisp2Temp, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
-                        ToolTipText="{me:LocalizationSource SchedulesPage.DispatcherGroupingSecondParameterForScheduleToolTip}"
-                        TextChangedCommand="{Binding SettingsChangedCommand}" />
-                </StackPanel>
-            </Border>
-
-            <Border Name="SkeletonByElemsSpec"
-                Grid.Column="0"
-                Grid.Row="1"
-                Margin="15 7 7 7"
-                Style="{StaticResource CustomBorder}">
-                <StackPanel>
-                    <controls:SettingsTitleControl
-                        LabelText="{me:LocalizationSource Schedules.SkeletonElementsSpecification}"
-                        ToolTipText="{me:LocalizationSource SchedulesPage.SkeletonElementsSpecificationToolTip}"
-                        ButtonCommand="{Binding ApplySettingsCommand}"
-                        ButtonMouseLeaveCommand="{Binding CheckSettingsCommand}" />
-
-                    <controls:DoubleTextBoxSettingControl
-                        LabelText="{me:LocalizationSource Schedules.SkeletonElementsSpecNameMask}"
-                        FirstTextBoxText="{Binding Path=SchedulesSettings.SkeletonByElemsSchedulePrefixTemp, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
-                        SecondTextBoxText="{Binding Path=SchedulesSettings.SkeletonByElemsScheduleSuffixTemp, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
-                        ToolTipText="{me:LocalizationSource SchedulesPage.SkeletonElementsSpecNameMaskToolTip}"
-                        TextChangedCommand="{Binding SettingsChangedCommand}" />
-
-                    <controls:TextBoxSettingControl
-                        LabelText="{me:LocalizationSource Schedules.ReferenceSkeletonElementsSpecSearchName}"
-                        TextBoxText="{Binding Path=SchedulesSettings.SkeletonByElemsScheduleNameTemp, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
-                        ToolTipText="{me:LocalizationSource SchedulesPage.ReferenceSkeletonElementsSpecSearchNameToolTip}"
-                        TextChangedCommand="{Binding SettingsChangedCommand}" />
-
-                    <controls:TextBoxSettingControl
-                        LabelText="{me:LocalizationSource Schedules.DispatcherGroupingFirstParameterForSpecElements}"
-                        TextBoxText="{Binding Path=SchedulesSettings.SkeletonByElemsScheduleDisp1Temp, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
-                        ToolTipText="{me:LocalizationSource SchedulesPage.DispatcherGroupingFirstParameterForSpecElementsToolTip}"
-                        TextChangedCommand="{Binding SettingsChangedCommand}" />
-
-                    <controls:TextBoxSettingControl
-                        LabelText="{me:LocalizationSource Schedules.DispatcherGroupingSecondParameterForSpecElements}"
-                        TextBoxText="{Binding Path=SchedulesSettings.SkeletonByElemsScheduleDisp2Temp, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
-                        ToolTipText="{me:LocalizationSource SchedulesPage.DispatcherGroupingSecondParameterForSpecElementsToolTip}"
-                        TextChangedCommand="{Binding SettingsChangedCommand}" />
-                </StackPanel>
-            </Border>
-
-            <Border Name="IfcPartSpec"
-                Grid.Column="1"
-                Grid.Row="1"
-                Margin="7 7 15 7"
-                Style="{StaticResource CustomBorder}">
-                <StackPanel>
-                    <controls:SettingsTitleControl
-                        LabelText="{me:LocalizationSource Schedules.IfcPartsSchedule}"
-                        ToolTipText="{me:LocalizationSource SchedulesPage.IfcPartsScheduleToolTip}"
-                        ButtonCommand="{Binding ApplySettingsCommand}"
-                        ButtonMouseLeaveCommand="{Binding CheckSettingsCommand}" />
-
-                    <controls:DoubleTextBoxSettingControl
-                        LabelText="{me:LocalizationSource Schedules.IfcPartsScheduleNameMask}"
-                        FirstTextBoxText="{Binding Path=SchedulesSettings.IfcPartsSchedulePrefixTemp, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
-                        SecondTextBoxText="{Binding Path=SchedulesSettings.IfcPartsScheduleSuffixTemp, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
-                        ToolTipText="{me:LocalizationSource SchedulesPage.IfcPartsScheduleNameMaskToolTip}"
-                        TextChangedCommand="{Binding SettingsChangedCommand}" />
-
-                    <controls:TextBoxSettingControl
-                        LabelText="{me:LocalizationSource Schedules.ReferenceIfcPartsScheduleSearchName}"
-                        TextBoxText="{Binding Path=SchedulesSettings.IfcPartsScheduleNameTemp, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
-                        ToolTipText="{me:LocalizationSource SchedulesPage.ReferenceIfcPartsScheduleSearchNameToolTip}"
-                        TextChangedCommand="{Binding SettingsChangedCommand}" />
-
-                    <controls:TextBoxSettingControl
-                        LabelText="{me:LocalizationSource Schedules.DispatcherGroupingFirstParameterForIfcSchedule}"
-                        TextBoxText="{Binding Path=SchedulesSettings.IfcPartsScheduleDisp1Temp, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
-                        ToolTipText="{me:LocalizationSource SchedulesPage.DispatcherGroupingFirstParameterForIfcScheduleToolTip}"
-                        TextChangedCommand="{Binding SettingsChangedCommand}" />
-
-                    <controls:TextBoxSettingControl
-                        LabelText="{me:LocalizationSource Schedules.DispatcherGroupingSecondParameterForIfcSchedule}"
-                        TextBoxText="{Binding Path=SchedulesSettings.IfcPartsScheduleDisp2Temp, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
-                        ToolTipText="{me:LocalizationSource SchedulesPage.DispatcherGroupingSecondParameterForIfcScheduleToolTip}"
-                        TextChangedCommand="{Binding SettingsChangedCommand}" />
-                </StackPanel>
-            </Border>
-
-            <Border Name="MaterialSpec"
-                Grid.Column="0"
-                Grid.Row="2"
-                Margin="15 7 7 15"
-                Style="{StaticResource CustomBorder}">
-                <StackPanel>
-                    <controls:SettingsTitleControl
-                        LabelText="{me:LocalizationSource Schedules.MaterialsSpecification}"
-                        ToolTipText="{me:LocalizationSource SchedulesPage.MaterialsSpecificationToolTip}"
-                        ButtonCommand="{Binding ApplySettingsCommand}"
-                        ButtonMouseLeaveCommand="{Binding CheckSettingsCommand}" />
-
-                    <controls:DoubleTextBoxSettingControl
-                        LabelText="{me:LocalizationSource Schedules.MaterialsSpecNameMask}"
-                        FirstTextBoxText="{Binding Path=SchedulesSettings.MaterialSchedulePrefixTemp, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
-                        SecondTextBoxText="{Binding Path=SchedulesSettings.MaterialScheduleSuffixTemp, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
-                        ToolTipText="{me:LocalizationSource SchedulesPage.MaterialsSpecNameMaskToolTip}"
-                        TextChangedCommand="{Binding SettingsChangedCommand}" />
-
-                    <controls:TextBoxSettingControl
-                        LabelText="{me:LocalizationSource Schedules.ReferenceMaterialsSpecSearchName}"
-                        TextBoxText="{Binding Path=SchedulesSettings.MaterialScheduleNameTemp, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
-                        ToolTipText="{me:LocalizationSource SchedulesPage.ReferenceMaterialsSpecSearchNameToolTip}"
-                        TextChangedCommand="{Binding SettingsChangedCommand}" />
-
-                    <controls:TextBoxSettingControl
-                        LabelText="{me:LocalizationSource Schedules.DispatcherGroupingFirstParameterForMaterials}"
-                        TextBoxText="{Binding Path=SchedulesSettings.MaterialScheduleDisp1Temp, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
-                        ToolTipText="{me:LocalizationSource SchedulesPage.DispatcherGroupingFirstParameterForMaterialsToolTip}"
-                        TextChangedCommand="{Binding SettingsChangedCommand}" />
-
-                    <controls:TextBoxSettingControl
-                        LabelText="{me:LocalizationSource Schedules.DispatcherGroupingSecondParameterForMaterials}"
-                        TextBoxText="{Binding Path=SchedulesSettings.MaterialScheduleDisp2Temp, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
-                        ToolTipText="{me:LocalizationSource SchedulesPage.DispatcherGroupingSecondParameterForMaterialsToolTip}"
-                        TextChangedCommand="{Binding SettingsChangedCommand}" />
-                </StackPanel>
-            </Border>
-
-            <Border Name="ParamsForScheduleFilters"
-                Grid.Column="1"
-                Grid.ColumnSpan="1"
-                Grid.Row="2"
-                Margin="7 7 15 15"
-                Style="{StaticResource CustomBorder}">
-                <StackPanel>
-                    <controls:SettingsTitleControl
-                        LabelText="{me:LocalizationSource Schedules.ScheduleFilterParametersList}"
-                        ToolTipText="{me:LocalizationSource SchedulesPage.ScheduleFilterParametersListToolTip}"
-                        ButtonCommand="{Binding ApplySettingsCommand}"
-                        ButtonMouseLeaveCommand="{Binding CheckSettingsCommand}" />
-
-                    <ui:ListView
-                        Margin="0 5"
-                        ItemsSource="{Binding Path=SchedulesSettings.ParamsForScheduleFiltersTemp, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
-                        SelectionMode="Multiple">
-
-                        <ui:ListView.ItemTemplate>
-                            <DataTemplate>
-                                <Grid>
-                                    <Grid.ColumnDefinitions>
-                                        <ColumnDefinition
-                                            Width="Auto" />
-                                        <ColumnDefinition
-                                            Width="*" />
-                                        <ColumnDefinition
-                                            Width="*" />
-                                    </Grid.ColumnDefinitions>
-
-                                    <CheckBox
-                                        Grid.Column="0"
-                                        Padding="-1 0 0 0"
-                                        IsChecked="{Binding Path=IsCheck, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
-                                        VerticalAlignment="Center" />
-
-                                    <ui:TextBox
-                                        Grid.Column="1"
-                                        Margin="0 0 5 0"
-                                        FontSize="13"
-                                        Style="{StaticResource TextBoxWithTooltipStyle}"
-                                        Text="{Binding Path=ParamNameInSchedule, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
-                                        ToolTip="{me:LocalizationSource SchedulesPage.ParamNameInScheduleToolTip}">
-                                        <i:Interaction.Triggers>
-                                            <i:EventTrigger
-                                                EventName="TextChanged">
-                                                <i:InvokeCommandAction
-                                                    Command="{Binding DataContext.SettingsChangedCommand, RelativeSource={RelativeSource AncestorType={x:Type Window}}}" />
-                                            </i:EventTrigger>
-                                        </i:Interaction.Triggers>
-                                    </ui:TextBox>
-
-                                    <ui:TextBox
-                                        Grid.Column="2"
-                                        Margin="5 0 0 0"
-                                        FontSize="13"
-                                        Style="{StaticResource TextBoxWithTooltipStyle}"
-                                        Text="{Binding Path=ParamNameInHost, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
-                                        ToolTip="{me:LocalizationSource SchedulesPage.ParamNameInHostToolTip}">
-                                        <i:Interaction.Triggers>
-                                            <i:EventTrigger
-                                                EventName="TextChanged">
-                                                <i:InvokeCommandAction
-                                                    Command="{Binding DataContext.SettingsChangedCommand, RelativeSource={RelativeSource AncestorType={x:Type Window}}}" />
-                                            </i:EventTrigger>
-                                        </i:Interaction.Triggers>
-                                    </ui:TextBox>
-                                </Grid>
-                            </DataTemplate>
-                        </ui:ListView.ItemTemplate>
-                    </ui:ListView>
-
-                    <StackPanel
-                        Orientation="Horizontal"
-                        HorizontalAlignment="Right">
-
-                        <ui:Button
-                            Margin="5 5"
-                            MinWidth="150"
-                            Content="{me:LocalizationSource Schedules.Add}"
-                            Appearance="Info"
-                            Command="{Binding AddScheduleFilterParamCommand}"
-                            ToolTip="{me:LocalizationSource SchedulesPage.AddButtonToolTip}" />
-
-                        <ui:Button
-                            Margin="5 5"
-                            MinWidth="150"
-                            Content="{me:LocalizationSource Schedules.Delete}"
-                            Command="{Binding DeleteScheduleFilterParamCommand}"
-                            ToolTip="{me:LocalizationSource SchedulesPage.DeleteButtonToolTip}" />
+                            <ui:Button
+                                Margin="5 5"
+                                MinWidth="150"
+                                Content="{me:LocalizationSource Schedules.Delete}"
+                                Command="{Binding DeleteScheduleFilterParamCommand}"
+                                ToolTip="{me:LocalizationSource SchedulesPage.DeleteButtonToolTip}" />
+                        </StackPanel>
                     </StackPanel>
-                </StackPanel>
-            </Border>
+                </Border>
+                
+                <UniformGrid
+                    Grid.Row="1"
+                    Margin="7 0 7 7"
+                    SizeChanged="UniformGrid_SizeChanged">
+                    <Border
+                        Name="SkeletonSpec"
+                        Margin="7"
+                        Style="{StaticResource CustomBorder}">
+                        <StackPanel>
+                            <controls:SettingsTitleControl
+                                LabelText="{me:LocalizationSource Schedules.SkeletonSpecification}"
+                                ToolTipText="{me:LocalizationSource SchedulesPage.SkeletonSpecificationToolTip}"
+                                ButtonCommand="{Binding ApplySettingsCommand}"
+                                ButtonMouseLeaveCommand="{Binding CheckSettingsCommand}" />
 
-            <controls:AppFooterControl
-                Grid.Row="3"
-                Grid.ColumnSpan="2"
-                HorizontalAlignment="Right"
-                ErrorText="{Binding ErrorText}"
-                ShowOkButton="False"
-                CancelButtonText="{me:LocalizationSource GeneralPage.Cancel}" />
-        </Grid>
-    </ui:PassiveScrollViewer>
+                            <controls:DoubleTextBoxSettingControl
+                                LabelText="{me:LocalizationSource Schedules.SkeletonSpecNameMask}"
+                                FirstTextBoxText="{Binding Path=SchedulesSettings.SkeletonSchedulePrefixTemp, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
+                                SecondTextBoxText="{Binding Path=SchedulesSettings.SkeletonScheduleSuffixTemp, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
+                                ToolTipText="{me:LocalizationSource SchedulesPage.SkeletonSpecNameMaskToolTip}"
+                                TextChangedCommand="{Binding SettingsChangedCommand}" />
+
+                            <controls:TextBoxSettingControl
+                                LabelText="{me:LocalizationSource Schedules.ReferenceSkeletonSpecSearchName}"
+                                TextBoxText="{Binding Path=SchedulesSettings.SkeletonScheduleNameTemp, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
+                                ToolTipText="{me:LocalizationSource SchedulesPage.ReferenceSkeletonSpecSearchNameToolTip}"
+                                TextChangedCommand="{Binding SettingsChangedCommand}" />
+
+                            <controls:TextBoxSettingControl
+                                LabelText="{me:LocalizationSource Schedules.DispatcherGroupingFirstParameterForSpec}"
+                                TextBoxText="{Binding Path=SchedulesSettings.SkeletonScheduleDisp1Temp, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
+                                ToolTipText="{me:LocalizationSource SchedulesPage.DispatcherGroupingFirstParameterForSpecToolTip}"
+                                TextChangedCommand="{Binding SettingsChangedCommand}" />
+
+                            <controls:TextBoxSettingControl
+                                LabelText="{me:LocalizationSource Schedules.DispatcherGroupingSecondParameterForSpec}"
+                                TextBoxText="{Binding Path=SchedulesSettings.SkeletonScheduleDisp2Temp, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
+                                ToolTipText="{me:LocalizationSource SchedulesPage.DispatcherGroupingSecondParameterForSpecToolTip}"
+                                TextChangedCommand="{Binding SettingsChangedCommand}" />
+                        </StackPanel>
+                    </Border>
+
+                    <Border
+                        Name="SysPartSpec"
+                        Margin="7"
+                        Style="{StaticResource CustomBorder}">
+                        <StackPanel>
+                            <controls:SettingsTitleControl
+                                LabelText="{me:LocalizationSource Schedules.SystemPartsSchedule}"
+                                ToolTipText="{me:LocalizationSource SchedulesPage.SystemPartsScheduleToolTip}"
+                                ButtonCommand="{Binding ApplySettingsCommand}"
+                                ButtonMouseLeaveCommand="{Binding CheckSettingsCommand}" />
+
+                            <controls:DoubleTextBoxSettingControl
+                                LabelText="{me:LocalizationSource Schedules.SystemPartsScheduleNameMask}"
+                                FirstTextBoxText="{Binding Path=SchedulesSettings.SystemPartsSchedulePrefixTemp, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
+                                SecondTextBoxText="{Binding Path=SchedulesSettings.SystemPartsScheduleSuffixTemp, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
+                                ToolTipText="{me:LocalizationSource SchedulesPage.SystemPartsScheduleNameMaskToolTip}"
+                                TextChangedCommand="{Binding SettingsChangedCommand}" />
+
+                            <controls:TextBoxSettingControl
+                                LabelText="{me:LocalizationSource Schedules.ReferenceSystemPartsScheduleSearchName}"
+                                TextBoxText="{Binding Path=SchedulesSettings.SystemPartsScheduleNameTemp, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
+                                ToolTipText="{me:LocalizationSource SchedulesPage.ReferenceSystemPartsScheduleSearchNameToolTip}"
+                                TextChangedCommand="{Binding SettingsChangedCommand}" />
+
+                            <controls:TextBoxSettingControl
+                                LabelText="{me:LocalizationSource Schedules.DispatcherGroupingFirstParameterForSchedule}"
+                                TextBoxText="{Binding Path=SchedulesSettings.SystemPartsScheduleDisp1Temp, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
+                                ToolTipText="{me:LocalizationSource SchedulesPage.DispatcherGroupingFirstParameterForScheduleToolTip}"
+                                TextChangedCommand="{Binding SettingsChangedCommand}" />
+
+                            <controls:TextBoxSettingControl
+                                LabelText="{me:LocalizationSource Schedules.DispatcherGroupingSecondParameterForSchedule}"
+                                TextBoxText="{Binding Path=SchedulesSettings.SystemPartsScheduleDisp2Temp, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
+                                ToolTipText="{me:LocalizationSource SchedulesPage.DispatcherGroupingSecondParameterForScheduleToolTip}"
+                                TextChangedCommand="{Binding SettingsChangedCommand}" />
+                        </StackPanel>
+                    </Border>
+
+                    <Border
+                        Name="SkeletonByElemsSpec"
+                        Margin="7"
+                        Style="{StaticResource CustomBorder}">
+                        <StackPanel>
+                            <controls:SettingsTitleControl
+                                LabelText="{me:LocalizationSource Schedules.SkeletonElementsSpecification}"
+                                ToolTipText="{me:LocalizationSource SchedulesPage.SkeletonElementsSpecificationToolTip}"
+                                ButtonCommand="{Binding ApplySettingsCommand}"
+                                ButtonMouseLeaveCommand="{Binding CheckSettingsCommand}" />
+
+                            <controls:DoubleTextBoxSettingControl
+                                LabelText="{me:LocalizationSource Schedules.SkeletonElementsSpecNameMask}"
+                                FirstTextBoxText="{Binding Path=SchedulesSettings.SkeletonByElemsSchedulePrefixTemp, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
+                                SecondTextBoxText="{Binding Path=SchedulesSettings.SkeletonByElemsScheduleSuffixTemp, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
+                                ToolTipText="{me:LocalizationSource SchedulesPage.SkeletonElementsSpecNameMaskToolTip}"
+                                TextChangedCommand="{Binding SettingsChangedCommand}" />
+
+                            <controls:TextBoxSettingControl
+                                LabelText="{me:LocalizationSource Schedules.ReferenceSkeletonElementsSpecSearchName}"
+                                TextBoxText="{Binding Path=SchedulesSettings.SkeletonByElemsScheduleNameTemp, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
+                                ToolTipText="{me:LocalizationSource SchedulesPage.ReferenceSkeletonElementsSpecSearchNameToolTip}"
+                                TextChangedCommand="{Binding SettingsChangedCommand}" />
+
+                            <controls:TextBoxSettingControl
+                                LabelText="{me:LocalizationSource Schedules.DispatcherGroupingFirstParameterForSpecElements}"
+                                TextBoxText="{Binding Path=SchedulesSettings.SkeletonByElemsScheduleDisp1Temp, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
+                                ToolTipText="{me:LocalizationSource SchedulesPage.DispatcherGroupingFirstParameterForSpecElementsToolTip}"
+                                TextChangedCommand="{Binding SettingsChangedCommand}" />
+
+                            <controls:TextBoxSettingControl
+                                LabelText="{me:LocalizationSource Schedules.DispatcherGroupingSecondParameterForSpecElements}"
+                                TextBoxText="{Binding Path=SchedulesSettings.SkeletonByElemsScheduleDisp2Temp, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
+                                ToolTipText="{me:LocalizationSource SchedulesPage.DispatcherGroupingSecondParameterForSpecElementsToolTip}"
+                                TextChangedCommand="{Binding SettingsChangedCommand}" />
+                        </StackPanel>
+                    </Border>
+
+                    <Border
+                        Name="IfcPartSpec"
+                        Margin="7"
+                        Style="{StaticResource CustomBorder}">
+                        <StackPanel>
+                            <controls:SettingsTitleControl
+                                LabelText="{me:LocalizationSource Schedules.IfcPartsSchedule}"
+                                ToolTipText="{me:LocalizationSource SchedulesPage.IfcPartsScheduleToolTip}"
+                                ButtonCommand="{Binding ApplySettingsCommand}"
+                                ButtonMouseLeaveCommand="{Binding CheckSettingsCommand}" />
+
+                            <controls:DoubleTextBoxSettingControl
+                                LabelText="{me:LocalizationSource Schedules.IfcPartsScheduleNameMask}"
+                                FirstTextBoxText="{Binding Path=SchedulesSettings.IfcPartsSchedulePrefixTemp, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
+                                SecondTextBoxText="{Binding Path=SchedulesSettings.IfcPartsScheduleSuffixTemp, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
+                                ToolTipText="{me:LocalizationSource SchedulesPage.IfcPartsScheduleNameMaskToolTip}"
+                                TextChangedCommand="{Binding SettingsChangedCommand}" />
+
+                            <controls:TextBoxSettingControl
+                                LabelText="{me:LocalizationSource Schedules.ReferenceIfcPartsScheduleSearchName}"
+                                TextBoxText="{Binding Path=SchedulesSettings.IfcPartsScheduleNameTemp, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
+                                ToolTipText="{me:LocalizationSource SchedulesPage.ReferenceIfcPartsScheduleSearchNameToolTip}"
+                                TextChangedCommand="{Binding SettingsChangedCommand}" />
+
+                            <controls:TextBoxSettingControl
+                                LabelText="{me:LocalizationSource Schedules.DispatcherGroupingFirstParameterForIfcSchedule}"
+                                TextBoxText="{Binding Path=SchedulesSettings.IfcPartsScheduleDisp1Temp, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
+                                ToolTipText="{me:LocalizationSource SchedulesPage.DispatcherGroupingFirstParameterForIfcScheduleToolTip}"
+                                TextChangedCommand="{Binding SettingsChangedCommand}" />
+
+                            <controls:TextBoxSettingControl
+                                LabelText="{me:LocalizationSource Schedules.DispatcherGroupingSecondParameterForIfcSchedule}"
+                                TextBoxText="{Binding Path=SchedulesSettings.IfcPartsScheduleDisp2Temp, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
+                                ToolTipText="{me:LocalizationSource SchedulesPage.DispatcherGroupingSecondParameterForIfcScheduleToolTip}"
+                                TextChangedCommand="{Binding SettingsChangedCommand}" />
+                        </StackPanel>
+                    </Border>
+
+                    <Border
+                        Name="MaterialSpec"
+                        Margin="7"
+                        Style="{StaticResource CustomBorder}">
+                        <StackPanel>
+                            <controls:SettingsTitleControl
+                                LabelText="{me:LocalizationSource Schedules.MaterialsSpecification}"
+                                ToolTipText="{me:LocalizationSource SchedulesPage.MaterialsSpecificationToolTip}"
+                                ButtonCommand="{Binding ApplySettingsCommand}"
+                                ButtonMouseLeaveCommand="{Binding CheckSettingsCommand}" />
+
+                            <controls:DoubleTextBoxSettingControl
+                                LabelText="{me:LocalizationSource Schedules.MaterialsSpecNameMask}"
+                                FirstTextBoxText="{Binding Path=SchedulesSettings.MaterialSchedulePrefixTemp, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
+                                SecondTextBoxText="{Binding Path=SchedulesSettings.MaterialScheduleSuffixTemp, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
+                                ToolTipText="{me:LocalizationSource SchedulesPage.MaterialsSpecNameMaskToolTip}"
+                                TextChangedCommand="{Binding SettingsChangedCommand}" />
+
+                            <controls:TextBoxSettingControl
+                                LabelText="{me:LocalizationSource Schedules.ReferenceMaterialsSpecSearchName}"
+                                TextBoxText="{Binding Path=SchedulesSettings.MaterialScheduleNameTemp, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
+                                ToolTipText="{me:LocalizationSource SchedulesPage.ReferenceMaterialsSpecSearchNameToolTip}"
+                                TextChangedCommand="{Binding SettingsChangedCommand}" />
+
+                            <controls:TextBoxSettingControl
+                                LabelText="{me:LocalizationSource Schedules.DispatcherGroupingFirstParameterForMaterials}"
+                                TextBoxText="{Binding Path=SchedulesSettings.MaterialScheduleDisp1Temp, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
+                                ToolTipText="{me:LocalizationSource SchedulesPage.DispatcherGroupingFirstParameterForMaterialsToolTip}"
+                                TextChangedCommand="{Binding SettingsChangedCommand}" />
+
+                            <controls:TextBoxSettingControl
+                                LabelText="{me:LocalizationSource Schedules.DispatcherGroupingSecondParameterForMaterials}"
+                                TextBoxText="{Binding Path=SchedulesSettings.MaterialScheduleDisp2Temp, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
+                                ToolTipText="{me:LocalizationSource SchedulesPage.DispatcherGroupingSecondParameterForMaterialsToolTip}"
+                                TextChangedCommand="{Binding SettingsChangedCommand}" />
+                        </StackPanel>
+                    </Border>
+                </UniformGrid>
+            </Grid>
+        </ScrollViewer>
+
+        <controls:AppFooterControl
+            Grid.Row="1"
+            HorizontalAlignment="Right"
+            ErrorText="{Binding ErrorText}"
+            ShowOkButton="False"
+            CancelButtonText="{me:LocalizationSource GeneralPage.Cancel}" />
+    </Grid>
 </core:WpfUIPlatformPage>

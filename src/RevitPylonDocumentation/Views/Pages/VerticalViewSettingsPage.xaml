@@ -30,185 +30,173 @@
         </ResourceDictionary>
     </core:WpfUIPlatformPage.Resources>
 
-    <Grid>
-        <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="*" />
-            <ColumnDefinition Width="*" />
-        </Grid.ColumnDefinitions>
-        <Grid.RowDefinitions>
-            <RowDefinition Height="Auto" />
-            <RowDefinition Height="Auto" />
-            <RowDefinition Height="Auto" />
-            <RowDefinition Height="*" />
-            <RowDefinition Height="Auto" />
-        </Grid.RowDefinitions>
+    <ScrollViewer>
+        <Grid>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="*" />
+                <RowDefinition Height="Auto" />
+            </Grid.RowDefinitions>
 
-        <Border Name="FormworkProps"
-            Grid.Column="0"
-            Grid.Row="0"
-            Margin="15 15 7 7"
-            Style="{StaticResource CustomBorder}">
-            <StackPanel>
-                <controls:SettingsTitleControl
-                    LabelText="{me:LocalizationSource VerticalView.FormworkMainView}"
-                    ToolTipText="{me:LocalizationSource VerticalViewSettingsPage.FormworkMainViewToolTip}"
-                    ButtonCommand="{Binding ApplySettingsCommand}"
-                    ButtonMouseLeaveCommand="{Binding CheckSettingsCommand}" />
+            <UniformGrid
+                Margin="7"
+                SizeChanged="UniformGrid_SizeChanged">
+                <Border Name="FormworkProps"
+                    Margin="7"
+                    Style="{StaticResource CustomBorder}">
+                    <StackPanel>
+                        <controls:SettingsTitleControl
+                            LabelText="{me:LocalizationSource VerticalView.FormworkMainView}"
+                            ToolTipText="{me:LocalizationSource VerticalViewSettingsPage.FormworkMainViewToolTip}"
+                            ButtonCommand="{Binding ApplySettingsCommand}"
+                            ButtonMouseLeaveCommand="{Binding CheckSettingsCommand}" />
 
-                <controls:DoubleTextBoxSettingControl
-                    LabelText="{me:LocalizationSource VerticalView.PylonMainViewNameMask}"
-                    FirstTextBoxText="{Binding Path=ViewSectionSettings.GeneralViewPrefixTemp, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
-                    SecondTextBoxText="{Binding Path=ViewSectionSettings.GeneralViewSuffixTemp, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
-                    ToolTipText="{me:LocalizationSource VerticalViewSettingsPage.PylonMainViewNameMaskToolTip}"
-                    TextChangedCommand="{Binding SettingsChangedCommand}" />
+                        <controls:DoubleTextBoxSettingControl
+                            LabelText="{me:LocalizationSource VerticalView.PylonMainViewNameMask}"
+                            FirstTextBoxText="{Binding Path=ViewSectionSettings.GeneralViewPrefixTemp, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
+                            SecondTextBoxText="{Binding Path=ViewSectionSettings.GeneralViewSuffixTemp, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
+                            ToolTipText="{me:LocalizationSource VerticalViewSettingsPage.PylonMainViewNameMaskToolTip}"
+                            TextChangedCommand="{Binding SettingsChangedCommand}" />
 
-                <controls:DoubleTextBoxSettingControl
-                    LabelText="{me:LocalizationSource VerticalView.PylonSideViewNameMask}"
-                    FirstTextBoxText="{Binding Path=ViewSectionSettings.GeneralViewPerpendicularPrefixTemp, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
-                    SecondTextBoxText="{Binding Path=ViewSectionSettings.GeneralViewPerpendicularSuffixTemp, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
-                    ToolTipText="{me:LocalizationSource VerticalViewSettingsPage.PylonSideViewNameMaskToolTip}"
-                    TextChangedCommand="{Binding SettingsChangedCommand}" />
+                        <controls:DoubleTextBoxSettingControl
+                            LabelText="{me:LocalizationSource VerticalView.PylonSideViewNameMask}"
+                            FirstTextBoxText="{Binding Path=ViewSectionSettings.GeneralViewPerpendicularPrefixTemp, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
+                            SecondTextBoxText="{Binding Path=ViewSectionSettings.GeneralViewPerpendicularSuffixTemp, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
+                            ToolTipText="{me:LocalizationSource VerticalViewSettingsPage.PylonSideViewNameMaskToolTip}"
+                            TextChangedCommand="{Binding SettingsChangedCommand}" />
 
-                <controls:ComboBoxSettingControl
-                    LabelText="{me:LocalizationSource VerticalView.SelectMainAndSideViewTemplate}"
-                    ItemsSource="{Binding ViewTemplatesInPj}"
-                    SelectedItem="{Binding TypesSettings.SelectedGeneralViewTemplate, Mode=TwoWay}"
-                    ToolTipText="{me:LocalizationSource VerticalViewSettingsPage.SelectMainAndSideViewTemplateToolTip}"
-                    SelectionChangedCommand="{Binding SettingsChangedCommand}"
-                    ItemTemplate="{StaticResource WithoutFamilyNameItemTemplate}" />
-            </StackPanel>
-        </Border>
+                        <controls:ComboBoxSettingControl
+                            LabelText="{me:LocalizationSource VerticalView.SelectMainAndSideViewTemplate}"
+                            ItemsSource="{Binding ViewTemplatesInPj}"
+                            SelectedItem="{Binding TypesSettings.SelectedGeneralViewTemplate, Mode=TwoWay}"
+                            ToolTipText="{me:LocalizationSource VerticalViewSettingsPage.SelectMainAndSideViewTemplateToolTip}"
+                            SelectionChangedCommand="{Binding SettingsChangedCommand}"
+                            ItemTemplate="{StaticResource WithoutFamilyNameItemTemplate}" />
+                    </StackPanel>
+                </Border>
 
-        <Border Name="RebarProps"
-            Grid.Column="1"
-            Grid.Row="0"
-            Margin="7 15 15 7"
-            Style="{StaticResource CustomBorder}">
-            <StackPanel>
-                <controls:SettingsTitleControl
-                    LabelText="{me:LocalizationSource VerticalView.RebarMainView}"
-                    ToolTipText="{me:LocalizationSource VerticalViewSettingsPage.RebarMainViewToolTip}"
-                    ButtonCommand="{Binding ApplySettingsCommand}"
-                    ButtonMouseLeaveCommand="{Binding CheckSettingsCommand}" />
+                <Border Name="RebarProps"
+                    Margin="7"
+                    Style="{StaticResource CustomBorder}">
+                    <StackPanel>
+                        <controls:SettingsTitleControl
+                            LabelText="{me:LocalizationSource VerticalView.RebarMainView}"
+                            ToolTipText="{me:LocalizationSource VerticalViewSettingsPage.RebarMainViewToolTip}"
+                            ButtonCommand="{Binding ApplySettingsCommand}"
+                            ButtonMouseLeaveCommand="{Binding CheckSettingsCommand}" />
 
-                <controls:DoubleTextBoxSettingControl
-                    LabelText="{me:LocalizationSource VerticalView.PylonMainRebarViewNameMask}"
-                    FirstTextBoxText="{Binding Path=ViewSectionSettings.GeneralRebarViewPrefixTemp, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
-                    SecondTextBoxText="{Binding Path=ViewSectionSettings.GeneralRebarViewSuffixTemp, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
-                    ToolTipText="{me:LocalizationSource VerticalViewSettingsPage.PylonMainRebarViewNameMaskToolTip}"
-                    TextChangedCommand="{Binding SettingsChangedCommand}" />
+                        <controls:DoubleTextBoxSettingControl
+                            LabelText="{me:LocalizationSource VerticalView.PylonMainRebarViewNameMask}"
+                            FirstTextBoxText="{Binding Path=ViewSectionSettings.GeneralRebarViewPrefixTemp, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
+                            SecondTextBoxText="{Binding Path=ViewSectionSettings.GeneralRebarViewSuffixTemp, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
+                            ToolTipText="{me:LocalizationSource VerticalViewSettingsPage.PylonMainRebarViewNameMaskToolTip}"
+                            TextChangedCommand="{Binding SettingsChangedCommand}" />
 
-                <controls:DoubleTextBoxSettingControl
-                    LabelText="{me:LocalizationSource VerticalView.PylonSideRebarViewNameMask}"
-                    FirstTextBoxText="{Binding Path=ViewSectionSettings.GeneralRebarViewPerpendicularPrefixTemp, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
-                    SecondTextBoxText="{Binding Path=ViewSectionSettings.GeneralRebarViewPerpendicularSuffixTemp, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
-                    ToolTipText="{me:LocalizationSource VerticalViewSettingsPage.PylonSideRebarViewNameMaskToolTip}"
-                    TextChangedCommand="{Binding SettingsChangedCommand}" />
+                        <controls:DoubleTextBoxSettingControl
+                            LabelText="{me:LocalizationSource VerticalView.PylonSideRebarViewNameMask}"
+                            FirstTextBoxText="{Binding Path=ViewSectionSettings.GeneralRebarViewPerpendicularPrefixTemp, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
+                            SecondTextBoxText="{Binding Path=ViewSectionSettings.GeneralRebarViewPerpendicularSuffixTemp, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
+                            ToolTipText="{me:LocalizationSource VerticalViewSettingsPage.PylonSideRebarViewNameMaskToolTip}"
+                            TextChangedCommand="{Binding SettingsChangedCommand}" />
 
-                <controls:ComboBoxSettingControl
-                    LabelText="{me:LocalizationSource VerticalView.SelectMainAndSideRebarViewTemplate}"
-                    ItemsSource="{Binding ViewTemplatesInPj}"
-                    SelectedItem="{Binding TypesSettings.SelectedGeneralRebarViewTemplate, Mode=TwoWay}"
-                    ToolTipText="{me:LocalizationSource VerticalViewSettingsPage.SelectMainAndSideRebarViewTemplateToolTip}"
-                    SelectionChangedCommand="{Binding SettingsChangedCommand}"
-                    ItemTemplate="{StaticResource WithoutFamilyNameItemTemplate}" />
-            </StackPanel>
-        </Border>
+                        <controls:ComboBoxSettingControl
+                            LabelText="{me:LocalizationSource VerticalView.SelectMainAndSideRebarViewTemplate}"
+                            ItemsSource="{Binding ViewTemplatesInPj}"
+                            SelectedItem="{Binding TypesSettings.SelectedGeneralRebarViewTemplate, Mode=TwoWay}"
+                            ToolTipText="{me:LocalizationSource VerticalViewSettingsPage.SelectMainAndSideRebarViewTemplateToolTip}"
+                            SelectionChangedCommand="{Binding SettingsChangedCommand}"
+                            ItemTemplate="{StaticResource WithoutFamilyNameItemTemplate}" />
+                    </StackPanel>
+                </Border>
 
-        <Border Name="GeneralOffsets"
-            Grid.Column="0"
-            Grid.Row="1"
-            Margin="15 7 7 7"
-            Style="{StaticResource CustomBorder}">
-            <StackPanel>
-                <controls:SettingsTitleControl
-                    LabelText="{me:LocalizationSource VerticalView.MainViewOffsets}"
-                    ToolTipText="{me:LocalizationSource VerticalViewSettingsPage.MainViewOffsetsToolTip}"
-                    ButtonCommand="{Binding ApplySettingsCommand}"
-                    ButtonMouseLeaveCommand="{Binding CheckSettingsCommand}" />
+                <Border Name="GeneralOffsets"
+                    Margin="7"
+                    Style="{StaticResource CustomBorder}">
+                    <StackPanel>
+                        <controls:SettingsTitleControl
+                            LabelText="{me:LocalizationSource VerticalView.MainViewOffsets}"
+                            ToolTipText="{me:LocalizationSource VerticalViewSettingsPage.MainViewOffsetsToolTip}"
+                            ButtonCommand="{Binding ApplySettingsCommand}"
+                            ButtonMouseLeaveCommand="{Binding CheckSettingsCommand}" />
 
-                <controls:TextBoxSettingControl
-                    LabelText="{me:LocalizationSource VerticalView.MainViewXOffset}"
-                    TextBoxText="{Binding Path=ViewSectionSettings.GeneralViewXOffsetTemp, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
-                    ToolTipText="{me:LocalizationSource VerticalViewSettingsPage.MainViewXOffsetToolTip}"
-                    TextChangedCommand="{Binding SettingsChangedCommand}" />
+                        <controls:TextBoxSettingControl
+                            LabelText="{me:LocalizationSource VerticalView.MainViewXOffset}"
+                            TextBoxText="{Binding Path=ViewSectionSettings.GeneralViewXOffsetTemp, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
+                            ToolTipText="{me:LocalizationSource VerticalViewSettingsPage.MainViewXOffsetToolTip}"
+                            TextChangedCommand="{Binding SettingsChangedCommand}" />
 
-                <controls:TextBoxSettingControl
-                    LabelText="{me:LocalizationSource VerticalView.MainViewYTopOffset}"
-                    TextBoxText="{Binding Path=ViewSectionSettings.GeneralViewYTopOffsetTemp, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
-                    ToolTipText="{me:LocalizationSource VerticalViewSettingsPage.MainViewYTopOffsetToolTip}"
-                    TextChangedCommand="{Binding SettingsChangedCommand}" />
+                        <controls:TextBoxSettingControl
+                            LabelText="{me:LocalizationSource VerticalView.MainViewYTopOffset}"
+                            TextBoxText="{Binding Path=ViewSectionSettings.GeneralViewYTopOffsetTemp, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
+                            ToolTipText="{me:LocalizationSource VerticalViewSettingsPage.MainViewYTopOffsetToolTip}"
+                            TextChangedCommand="{Binding SettingsChangedCommand}" />
 
-                <controls:TextBoxSettingControl
-                    LabelText="{me:LocalizationSource VerticalView.MainViewYBottomOffset}"
-                    TextBoxText="{Binding Path=ViewSectionSettings.GeneralViewYBottomOffsetTemp, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
-                    ToolTipText="{me:LocalizationSource VerticalViewSettingsPage.MainViewYBottomOffsetToolTip}"
-                    TextChangedCommand="{Binding SettingsChangedCommand}" />
-            </StackPanel>
-        </Border>
+                        <controls:TextBoxSettingControl
+                            LabelText="{me:LocalizationSource VerticalView.MainViewYBottomOffset}"
+                            TextBoxText="{Binding Path=ViewSectionSettings.GeneralViewYBottomOffsetTemp, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
+                            ToolTipText="{me:LocalizationSource VerticalViewSettingsPage.MainViewYBottomOffsetToolTip}"
+                            TextChangedCommand="{Binding SettingsChangedCommand}" />
+                    </StackPanel>
+                </Border>
 
-        <Border Name="GeneralViewPerpOffsets"
-            Grid.Column="1"
-            Grid.Row="1"
-            Margin="7 7 15 7"
-            Style="{StaticResource CustomBorder}">
-            <StackPanel>
-                <controls:SettingsTitleControl
-                    LabelText="{me:LocalizationSource VerticalView.SideViewOffsets}"
-                    ToolTipText="{me:LocalizationSource VerticalViewSettingsPage.SideViewOffsetsToolTip}"
-                    ButtonCommand="{Binding ApplySettingsCommand}"
-                    ButtonMouseLeaveCommand="{Binding CheckSettingsCommand}" />
+                <Border Name="GeneralViewPerpOffsets"
+                    Margin="7"
+                    Style="{StaticResource CustomBorder}">
+                    <StackPanel>
+                        <controls:SettingsTitleControl
+                            LabelText="{me:LocalizationSource VerticalView.SideViewOffsets}"
+                            ToolTipText="{me:LocalizationSource VerticalViewSettingsPage.SideViewOffsetsToolTip}"
+                            ButtonCommand="{Binding ApplySettingsCommand}"
+                            ButtonMouseLeaveCommand="{Binding CheckSettingsCommand}" />
 
-                <controls:TextBoxSettingControl
-                    LabelText="{me:LocalizationSource VerticalView.SideViewXOffset}"
-                    TextBoxText="{Binding Path=ViewSectionSettings.GeneralViewPerpXOffsetTemp, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
-                    ToolTipText="{me:LocalizationSource VerticalViewSettingsPage.SideViewXOffsetToolTip}"
-                    TextChangedCommand="{Binding SettingsChangedCommand}" />
+                        <controls:TextBoxSettingControl
+                            LabelText="{me:LocalizationSource VerticalView.SideViewXOffset}"
+                            TextBoxText="{Binding Path=ViewSectionSettings.GeneralViewPerpXOffsetTemp, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
+                            ToolTipText="{me:LocalizationSource VerticalViewSettingsPage.SideViewXOffsetToolTip}"
+                            TextChangedCommand="{Binding SettingsChangedCommand}" />
 
-                <controls:TextBoxSettingControl
-                    LabelText="{me:LocalizationSource VerticalView.SideViewYTopOffset}"
-                    TextBoxText="{Binding Path=ViewSectionSettings.GeneralViewPerpYTopOffsetTemp, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
-                    ToolTipText="{me:LocalizationSource VerticalViewSettingsPage.SideViewYTopOffsetToolTip}"
-                    TextChangedCommand="{Binding SettingsChangedCommand}" />
+                        <controls:TextBoxSettingControl
+                            LabelText="{me:LocalizationSource VerticalView.SideViewYTopOffset}"
+                            TextBoxText="{Binding Path=ViewSectionSettings.GeneralViewPerpYTopOffsetTemp, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
+                            ToolTipText="{me:LocalizationSource VerticalViewSettingsPage.SideViewYTopOffsetToolTip}"
+                            TextChangedCommand="{Binding SettingsChangedCommand}" />
 
-                <controls:TextBoxSettingControl
-                    LabelText="{me:LocalizationSource VerticalView.SideViewYBottomOffset}"
-                    TextBoxText="{Binding Path=ViewSectionSettings.GeneralViewPerpYBottomOffsetTemp, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
-                    ToolTipText="{me:LocalizationSource VerticalViewSettingsPage.SideViewYBottomOffsetToolTip}"
-                    TextChangedCommand="{Binding SettingsChangedCommand}" />
-            </StackPanel>
-        </Border>
+                        <controls:TextBoxSettingControl
+                            LabelText="{me:LocalizationSource VerticalView.SideViewYBottomOffset}"
+                            TextBoxText="{Binding Path=ViewSectionSettings.GeneralViewPerpYBottomOffsetTemp, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
+                            ToolTipText="{me:LocalizationSource VerticalViewSettingsPage.SideViewYBottomOffsetToolTip}"
+                            TextChangedCommand="{Binding SettingsChangedCommand}" />
+                    </StackPanel>
+                </Border>
 
-        <Border Name="ViewTypeProps"
-            Grid.Column="0"
-            Grid.ColumnSpan="2"
-            Grid.Row="2"
-            Margin="15 7 15 15"
-            Style="{StaticResource CustomBorder}">
-            <StackPanel>
-                <controls:SettingsTitleControl
-                    LabelText="{me:LocalizationSource VerticalView.ViewTypeSize}"
-                    ToolTipText="{me:LocalizationSource VerticalViewSettingsPage.ViewTypeSizeToolTip}"
-                    ButtonCommand="{Binding ApplySettingsCommand}"
-                    ButtonMouseLeaveCommand="{Binding CheckSettingsCommand}" />
+                <Border Name="ViewTypeProps"
+                    Margin="7"
+                    Style="{StaticResource CustomBorder}">
+                    <StackPanel>
+                        <controls:SettingsTitleControl
+                            LabelText="{me:LocalizationSource VerticalView.ViewTypeSize}"
+                            ToolTipText="{me:LocalizationSource VerticalViewSettingsPage.ViewTypeSizeToolTip}"
+                            ButtonCommand="{Binding ApplySettingsCommand}"
+                            ButtonMouseLeaveCommand="{Binding CheckSettingsCommand}" />
 
-                <controls:ComboBoxSettingControl
-                    Grid.Row="2"
-                    LabelText="{me:LocalizationSource VerticalView.SelectViewTypeSizeForMainAndSideViews}"
-                    ItemsSource="{Binding ViewFamilyTypes}"
-                    SelectedItem="{Binding TypesSettings.SelectedViewFamilyType, Mode=TwoWay}"
-                    ToolTipText="{me:LocalizationSource VerticalViewSettingsPage.SelectViewTypeSizeForMainAndSideViewsToolTip}"
-                    SelectionChangedCommand="{Binding SettingsChangedCommand}"
-                    ItemTemplate="{StaticResource WithoutFamilyNameItemTemplate}" />
-            </StackPanel>
-        </Border>
+                        <controls:ComboBoxSettingControl
+                            Grid.Row="2"
+                            LabelText="{me:LocalizationSource VerticalView.SelectViewTypeSizeForMainAndSideViews}"
+                            ItemsSource="{Binding ViewFamilyTypes}"
+                            SelectedItem="{Binding TypesSettings.SelectedViewFamilyType, Mode=TwoWay}"
+                            ToolTipText="{me:LocalizationSource VerticalViewSettingsPage.SelectViewTypeSizeForMainAndSideViewsToolTip}"
+                            SelectionChangedCommand="{Binding SettingsChangedCommand}"
+                            ItemTemplate="{StaticResource WithoutFamilyNameItemTemplate}" />
+                    </StackPanel>
+                </Border>
+            </UniformGrid>
 
-        <controls:AppFooterControl
-            Grid.Row="4"
-            Grid.ColumnSpan="2"
-            HorizontalAlignment="Right"
-            ErrorText="{Binding ErrorText}"
-            ShowOkButton="False"
-            CancelButtonText="{me:LocalizationSource GeneralPage.Cancel}" />
-    </Grid>
+            <controls:AppFooterControl
+                Grid.Row="2"
+                HorizontalAlignment="Right"
+                ErrorText="{Binding ErrorText}"
+                ShowOkButton="False"
+                CancelButtonText="{me:LocalizationSource GeneralPage.Cancel}" />
+        </Grid>
+    </ScrollViewer>
 </core:WpfUIPlatformPage>
