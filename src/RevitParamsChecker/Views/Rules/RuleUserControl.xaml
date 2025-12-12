@@ -14,6 +14,7 @@
     d:DesignWidth="300"
     x:ClassModifier="internal"
     d:DataContext="{d:DesignInstance vms:RuleViewModel, IsDesignTimeCreatable=False}">
+    <!-- Отображение 1 правила проверки -->
     <core:WpfUIPlatformUserControl.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>

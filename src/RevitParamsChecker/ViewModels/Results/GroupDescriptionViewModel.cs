@@ -4,6 +4,9 @@ using dosymep.WPF.ViewModels;
 
 namespace RevitParamsChecker.ViewModels.Results;
 
+/// <summary>
+/// Вью модель для уровня группировки
+/// </summary>
 internal class GroupDescriptionViewModel : BaseViewModel, IEquatable<GroupDescriptionViewModel> {
     private readonly Guid _id;
     private PropertyViewModel _selectedProperty;

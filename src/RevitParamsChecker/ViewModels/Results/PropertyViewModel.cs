@@ -5,6 +5,9 @@ using dosymep.WPF.ViewModels;
 
 namespace RevitParamsChecker.ViewModels.Results;
 
+/// <summary>
+/// Вью модель для выбранного свойства в уровне группировки
+/// </summary>
 internal class PropertyViewModel : BaseViewModel, IEquatable<PropertyViewModel> {
     private readonly string _propertyName;
 

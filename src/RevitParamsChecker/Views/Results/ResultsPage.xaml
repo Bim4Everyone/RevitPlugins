@@ -26,6 +26,7 @@
             </ResourceDictionary.MergedDictionaries>
         </ResourceDictionary>
     </core:WpfUIPlatformPage.Resources>
+    <!-- Страница анализа -->
     <Grid>
         <Grid.ColumnDefinitions>
             <ColumnDefinition

@@ -23,6 +23,7 @@
             </ResourceDictionary.MergedDictionaries>
         </ResourceDictionary>
     </core:WpfUIPlatformUserControl.Resources>
+    <!-- Редактор группировки (для DataGrid) -->
     <Border
         Style="{StaticResource CustomBorder}">
         <DockPanel>

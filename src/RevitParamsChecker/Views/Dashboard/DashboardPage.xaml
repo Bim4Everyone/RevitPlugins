@@ -12,6 +12,7 @@
     mc:Ignorable="d"
     d:DesignHeight="450"
     d:DesignWidth="800">
+    <!-- Начальная страница -->
     <core:WpfUIPlatformPage.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>

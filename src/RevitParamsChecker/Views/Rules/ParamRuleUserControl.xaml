@@ -14,6 +14,7 @@
     d:DesignWidth="300"
     x:ClassModifier="internal"
     d:DataContext="{d:DesignInstance vms:ParamRuleViewModel, IsDesignTimeCreatable=False}">
+    <!-- Правило для 1 параметра -->
     <Grid>
         <Grid.ColumnDefinitions>
             <ColumnDefinition

@@ -28,6 +28,7 @@
                 FalseValue="Collapsed" />
         </ResourceDictionary>
     </core:WpfUIPlatformUserControl.Resources>
+    <!-- Список заголовков результатов проверок -->
     <Border
         Style="{StaticResource CustomBorder}">
         <DockPanel

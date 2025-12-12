@@ -17,6 +17,7 @@
     x:Name="_this"
     d:DataContext="{d:DesignInstance vms:CheckResultViewModel, IsDesignTimeCreatable=False}"
     x:ClassModifier="internal">
+    <!-- Список результатов элементов по конкретной проверке -->
     <core:WpfUIPlatformUserControl.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>

@@ -23,6 +23,7 @@
             </ResourceDictionary.MergedDictionaries>
         </ResourceDictionary>
     </core:WpfUIPlatformUserControl.Resources>
+    <!-- Не редактируемая копия правила проверки на странице анализа -->
     <Border
         Style="{StaticResource CustomBorder}">
         <StackPanel>

@@ -18,6 +18,7 @@
     ui:Design.Background="{DynamicResource ApplicationBackgroundBrush}"
     ui:Design.Foreground="{DynamicResource TextFillColorPrimaryBrush}"
     d:DataContext="{d:DesignInstance vms:SelectableNamesViewModel, IsDesignTimeCreatable=False}">
+    <!-- Диалог для выбора строк из фиксированной коллекции строк -->
     <ui:ContentDialog.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>

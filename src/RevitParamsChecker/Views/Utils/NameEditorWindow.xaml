@@ -17,6 +17,7 @@
     WindowStartupLocation="CenterOwner"
     ResizeMode="NoResize"
     d:DataContext="{d:DesignInstance vms:NameEditorViewModel, IsDesignTimeCreatable=False}">
+    <!-- Окно для переименования и назначения нового названия -->
     <core:WpfUIPlatformWindow.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>

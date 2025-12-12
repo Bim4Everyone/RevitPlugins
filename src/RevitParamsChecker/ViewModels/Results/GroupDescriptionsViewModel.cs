@@ -9,6 +9,9 @@ using dosymep.WPF.ViewModels;
 
 namespace RevitParamsChecker.ViewModels.Results;
 
+/// <summary>
+/// Вью модель для редактора уровней группировки (для DataGrid)
+/// </summary>
 internal class GroupDescriptionsViewModel : BaseViewModel {
     private GroupDescriptionViewModel _selectedGroupDescription;
     private bool _isGroupingEnabled = true;

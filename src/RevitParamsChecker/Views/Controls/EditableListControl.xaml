@@ -14,6 +14,7 @@
     d:DesignHeight="300"
     d:DesignWidth="300"
     x:ClassModifier="internal">
+    <!-- Список названий с кнопками по добавлению, копированию, переименованию и удалению сущностей -->
     <core:WpfUIPlatformUserControl.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>

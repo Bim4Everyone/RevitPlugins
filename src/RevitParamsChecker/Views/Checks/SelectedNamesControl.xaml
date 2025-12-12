@@ -15,6 +15,7 @@
     d:DesignHeight="300"
     d:DesignWidth="300"
     x:ClassModifier="internal">
+    <!-- Отображение для выбранных файлов/фильтров/правил для 1 проверки -->
     <core:WpfUIPlatformUserControl.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>

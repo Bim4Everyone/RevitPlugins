@@ -14,6 +14,8 @@
     d:DesignHeight="300"
     d:DesignWidth="300"
     x:ClassModifier="internal">
+    <!-- Ряд кнопок для сохранения, загрузки и экспорта данных с текстом подсказки и текстом предупреждения. 
+    Используется как header для страниц. -->
     <core:WpfUIPlatformUserControl.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
