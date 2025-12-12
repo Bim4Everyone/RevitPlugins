@@ -27,13 +27,12 @@
     <Border
         Style="{StaticResource CustomBorder}">
         <DockPanel>
-            <DockPanel>
-                <ui:ToggleSwitch
-                    DockPanel.Dock="Top"
-                    IsChecked="{Binding IsGroupingEnabled}"
-                    Content="{me:LocalizationSource GroupsEditor.Label}"
-                    FontSize="{DynamicResource ControlContentThemeFontSize}" />
-            </DockPanel>
+            <ui:ToggleSwitch
+                DockPanel.Dock="Top"
+                Margin="0 0 0 8"
+                IsChecked="{Binding IsGroupingEnabled}"
+                Content="{me:LocalizationSource GroupsEditor.Label}"
+                FontSize="{DynamicResource ControlContentThemeFontSize}" />
             <ui:Button
                 ToolTip="{me:LocalizationSource GroupsEditor.UpdateButtonTooltip}"
                 Content="{ui:SymbolIcon Symbol=ArrowSync20}"

@@ -27,25 +27,13 @@
         Style="{StaticResource CustomBorder}">
         <StackPanel>
             <TextBlock
-                Text="Краткая инструкция"
+                Text="{me:LocalizationSource DashboardPage.Instruction.Title}"
                 FontWeight="SemiBold"
                 Margin="0 0 0 8" />
             <TextBlock
                 Margin="14 0 0 0"
                 TextWrapping="Wrap"
-                Text="1. Создайте поисковые наборы для получения обрабатываемых элементов." />
-            <TextBlock
-                Margin="14 0 0 0"
-                TextWrapping="Wrap"
-                Text="2. Создайте правила проверки параметров." />
-            <TextBlock
-                Margin="14 0 0 0"
-                TextWrapping="Wrap"
-                Text="3. Настройте проверки, используя документы Revit, созданные поисковые наборы и проверки." />
-            <TextBlock
-                Margin="14 0 0 0"
-                TextWrapping="Wrap"
-                Text="4. Запустите проверки. Для просмотра результатов перейдите в Анализ." />
+                Text="{me:LocalizationSource DashboardPage.Instruction.Body}" />
         </StackPanel>
     </Border>
 </core:WpfUIPlatformPage>
