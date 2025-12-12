@@ -94,7 +94,6 @@
     <system:String
         x:Key="ChecksPage.Validation.SelectedChecksHaveEmptyRules">Укажите правила для всех выбранных проверок</system:String>
 
-
     <system:String
         x:Key="NamesResolver.Header">Загрузка настроек</system:String>
     <system:String
@@ -153,7 +152,6 @@
         x:Key="PageMenu.Tooltip.Export">Экспорт</system:String>
     <system:String
         x:Key="PageMenu.SaveChangesPrompt">Сохраните изменения</system:String>
-
 
     <system:String
         x:Key="CrudButtons.Tooltip.Add">Добавить</system:String>
