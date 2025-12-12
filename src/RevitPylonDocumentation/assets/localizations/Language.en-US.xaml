@@ -122,6 +122,7 @@
     <system:String x:Key="GeneralPage.SelectTitleBlockTypeTooltip">Select title block type</system:String>
 
     <system:String x:Key="GeneralPage.FormworkViewTemplates">Formwork View Templates</system:String>
+    <system:String x:Key="GeneralPage.FormworkViewTemplatesTooltip">Formwork View Templates</system:String>
     <system:String x:Key="GeneralPage.RebarViewTemplates">Rebar View Templates</system:String>
     <system:String x:Key="GeneralPage.RebarViewTemplatesTooltip">Rebar View Templates</system:String>
     <system:String x:Key="GeneralPage.VerticalViews">Vertical Views</system:String>

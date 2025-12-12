@@ -1,4 +1,5 @@
 using System.Windows;
+using System.Windows.Controls.Primitives;
 
 using dosymep.SimpleServices;
 
@@ -24,6 +25,17 @@ internal partial class GeneralPage {
         var window = Window.GetWindow(this) as MainWindow;
         if(window != null) {
             window.DialogResult = false;
+        }
+    }
+
+    private void UniformGrid_SizeChanged(object sender, System.Windows.SizeChangedEventArgs e) {
+        UniformGrid uniformGrid = sender as UniformGrid;
+        if(uniformGrid is null) { return; }
+
+        if(uniformGrid.ActualWidth > 400) {
+            uniformGrid.Columns = 2;
+        } else {
+            uniformGrid.Columns = 1;
         }
     }
 }
