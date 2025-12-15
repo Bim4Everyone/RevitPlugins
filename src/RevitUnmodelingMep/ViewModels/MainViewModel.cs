@@ -1,6 +1,8 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Collections.Specialized;
+using System.ComponentModel;
 using System.Linq;
 using System.Text.RegularExpressions;
 using System.Windows.Input;
@@ -30,6 +32,7 @@ internal class MainViewModel : BaseViewModel {
     private string _errorText;
     private string _saveProperty;
     private ObservableCollection<ConsumableTypeItem> _consumableTypes;
+    private ObservableCollection<CategoryAssignmentItem> _categoryAssignments;
     private int _lastConfigIndex;
     private readonly IReadOnlyList<CategoryOption> _categoryOptions;
     
@@ -55,6 +58,7 @@ internal class MainViewModel : BaseViewModel {
         RemoveConsumableTypeCommand = RelayCommand.Create<ConsumableTypeItem>(RemoveConsumableType, CanRemoveConsumableType);
 
         ConsumableTypes = new ObservableCollection<ConsumableTypeItem>();
+        CategoryAssignments = new ObservableCollection<CategoryAssignmentItem>();
     }
 
     /// <summary>
@@ -91,6 +95,11 @@ internal class MainViewModel : BaseViewModel {
     public ObservableCollection<ConsumableTypeItem> ConsumableTypes {
         get => _consumableTypes;
         set => RaiseAndSetIfChanged(ref _consumableTypes, value);
+    }
+
+    public ObservableCollection<CategoryAssignmentItem> CategoryAssignments {
+        get => _categoryAssignments;
+        set => RaiseAndSetIfChanged(ref _categoryAssignments, value);
     }
 
     public IReadOnlyList<CategoryOption> CategoryOptions => _categoryOptions;
@@ -138,6 +147,7 @@ internal class MainViewModel : BaseViewModel {
         RevitSettings setting = _pluginConfig.GetSettings(_revitRepository.Document);
 
         LoadUnmodelingConfigs();
+        UpdateTypesLists();
 
         SaveProperty = setting?.SaveProperty ?? _localizationService.GetLocalizedString("MainWindow.Hello");
     }
@@ -170,6 +180,7 @@ internal class MainViewModel : BaseViewModel {
             CategoryId = defaultCategory?.Id.ToString()
         });
         CommandManager.InvalidateRequerySuggested();
+        UpdateTypesLists();
     }
 
     private bool CanRemoveConsumableType(ConsumableTypeItem item) {
@@ -184,6 +195,7 @@ internal class MainViewModel : BaseViewModel {
         ConsumableTypes.RemoveAt(ConsumableTypes.Count - 1);
 
         CommandManager.InvalidateRequerySuggested();
+        UpdateTypesLists();
     }
 
     internal class ConsumableTypeItem : BaseViewModel {
@@ -379,11 +391,92 @@ internal class MainViewModel : BaseViewModel {
         return $"config_{_lastConfigIndex:000}";
     }
 
+    private void UpdateTypesLists() {
+        List<BuiltInCategory> categories = new List<BuiltInCategory> {
+            BuiltInCategory.OST_PipeCurves,
+            BuiltInCategory.OST_DuctCurves,
+            BuiltInCategory.OST_PipeInsulations,
+            BuiltInCategory.OST_DuctInsulations,
+            BuiltInCategory.OST_DuctSystem,
+            BuiltInCategory.OST_PipingSystem
+        };
+
+        var assignments = new ObservableCollection<CategoryAssignmentItem>();
+
+        foreach(BuiltInCategory builtInCategory in categories) {
+            CategoryOption option = CategoryOptions.FirstOrDefault(o => o.BuiltInCategory == builtInCategory);
+            int optionCategoryId = option?.Id ?? (int) builtInCategory;
+            string categoryName = option?.Name ?? builtInCategory.ToString();
+
+            List<Element> types = _revitRepository.GetElementsByCategory(builtInCategory) ?? new List<Element>();
+            if(types.Count == 0) {
+                continue;
+            }
+
+            List<ConsumableTypeItem> configsForCategory = ConsumableTypes?
+                .Where(c => TryGetCategoryId(c, out int cid) && cid == optionCategoryId)
+                .ToList() ?? new List<ConsumableTypeItem>();
+
+            ObservableCollection<SystemTypeItem> systemTypes =
+                new ObservableCollection<SystemTypeItem>(
+                    types
+                        .OfType<ElementType>()
+                        .Select(type => CreateSystemTypeItem(type, configsForCategory)));
+
+            assignments.Add(new CategoryAssignmentItem {
+                Name = categoryName,
+                Category = builtInCategory,
+                SystemTypes = systemTypes
+            });
+        }
+
+        CategoryAssignments = assignments;
+    }
+
     private void UpdateConfigIndex(string configKey) {
         Match match = Regex.Match(configKey ?? string.Empty, @"config_(\d+)", RegexOptions.IgnoreCase);
         if(match.Success && int.TryParse(match.Groups[1].Value, out int value) && value > _lastConfigIndex) {
             _lastConfigIndex = value;
         }
+    }
+
+    private SystemTypeItem CreateSystemTypeItem(ElementType elementType, List<ConsumableTypeItem> configs) {
+        int typeId = GetElementIdValue(elementType.Id);
+
+        ObservableCollection<ConfigAssignmentItem> configAssignments =
+            new ObservableCollection<ConfigAssignmentItem>(
+                configs.Select(config => new ConfigAssignmentItem(config, typeId)));
+
+        return new SystemTypeItem {
+            Name = elementType.Name,
+            Id = typeId,
+            Configs = configAssignments
+        };
+    }
+
+    private static int GetElementIdValue(ElementId elementId) {
+        long value;
+#if REVIT_2024_OR_GREATER
+        value = elementId?.Value ?? 0;
+#else
+        value = elementId?.IntegerValue ?? 0;
+#endif
+        return unchecked((int) value);
+    }
+
+    private static bool TryGetCategoryId(ConsumableTypeItem item, out int categoryId) {
+        if(item?.SelectedCategory != null) {
+            categoryId = item.SelectedCategory.Id;
+            return true;
+        }
+
+        if(!string.IsNullOrWhiteSpace(item?.CategoryId) && int.TryParse(item.CategoryId, out int parsed)) {
+            categoryId = parsed;
+            return true;
+        }
+
+        categoryId = 0;
+        return false;
     }
 
     private IReadOnlyList<CategoryOption> CreateCategoryOptions() {
@@ -447,5 +540,167 @@ internal class MainViewModel : BaseViewModel {
         public string Name { get; set; }
         public BuiltInCategory BuiltInCategory { get; set; }
         public int Id { get; set; }
+    }
+
+    internal class CategoryAssignmentItem : BaseViewModel {
+        private string _name;
+        private ObservableCollection<SystemTypeItem> _systemTypes;
+
+        public string Name {
+            get => _name;
+            set => RaiseAndSetIfChanged(ref _name, value);
+        }
+
+        public BuiltInCategory Category { get; set; }
+
+        public ObservableCollection<SystemTypeItem> SystemTypes {
+            get => _systemTypes;
+            set => RaiseAndSetIfChanged(ref _systemTypes, value);
+        }
+    }
+
+    internal class SystemTypeItem : BaseViewModel {
+        private string _name;
+        private ObservableCollection<ConfigAssignmentItem> _configs;
+
+        public string Name {
+            get => _name;
+            set => RaiseAndSetIfChanged(ref _name, value);
+        }
+
+        public int Id { get; set; }
+
+        public ObservableCollection<ConfigAssignmentItem> Configs {
+            get => _configs;
+            set {
+                if(!ReferenceEquals(_configs, value)) {
+                    RaiseAndSetIfChanged(ref _configs, value);
+                    AttachConfigs(_configs);
+                    RaisePropertyChanged(nameof(IsAllSelected));
+                }
+            }
+        }
+
+        public bool IsAllSelected {
+            get => Configs != null && Configs.Count > 0 && Configs.All(c => c.IsChecked);
+            set {
+                if(Configs == null) {
+                    return;
+                }
+
+                foreach(ConfigAssignmentItem config in Configs) {
+                    config.IsChecked = value;
+                }
+                RaisePropertyChanged(nameof(IsAllSelected));
+            }
+        }
+
+        private void AttachConfigs(ObservableCollection<ConfigAssignmentItem> configs) {
+            if(configs == null) {
+                return;
+            }
+
+            configs.CollectionChanged += ConfigsOnCollectionChanged;
+            foreach(ConfigAssignmentItem config in configs) {
+                config.PropertyChanged += ConfigOnPropertyChanged;
+            }
+        }
+
+        private void ConfigsOnCollectionChanged(object sender, NotifyCollectionChangedEventArgs e) {
+            if(e.NewItems != null) {
+                foreach(ConfigAssignmentItem item in e.NewItems) {
+                    item.PropertyChanged += ConfigOnPropertyChanged;
+                }
+            }
+
+            if(e.OldItems != null) {
+                foreach(ConfigAssignmentItem item in e.OldItems) {
+                    item.PropertyChanged -= ConfigOnPropertyChanged;
+                }
+            }
+
+            RaisePropertyChanged(nameof(IsAllSelected));
+        }
+
+        private void ConfigOnPropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e) {
+            if(e.PropertyName == nameof(ConfigAssignmentItem.IsChecked)) {
+                RaisePropertyChanged(nameof(IsAllSelected));
+            }
+        }
+    }
+
+    internal class ConfigAssignmentItem : BaseViewModel {
+        private readonly ConsumableTypeItem _config;
+        private readonly int _systemTypeId;
+        private bool _isChecked;
+
+        public ConfigAssignmentItem(ConsumableTypeItem config, int systemTypeId) {
+            _config = config;
+            _systemTypeId = systemTypeId;
+
+            _isChecked = HasAssignment(config, systemTypeId);
+        }
+
+        public string Name => _config?.Name;
+
+        public bool IsChecked {
+            get => _isChecked;
+            set {
+                bool changed = _isChecked != value;
+                RaiseAndSetIfChanged(ref _isChecked, value);
+
+                if(!changed) {
+                    return;
+                }
+
+                if(value) {
+                    AddAssignment(_config, _systemTypeId);
+                } else {
+                    RemoveAssignment(_config, _systemTypeId);
+                }
+            }
+        }
+
+        private static bool HasAssignment(ConsumableTypeItem config, int systemTypeId) {
+            if(config?.AssignedElementIds == null) {
+                return false;
+            }
+
+            return config.AssignedElementIds
+                .Select(token => token.Type switch {
+                    JTokenType.Integer => (int?) token,
+                    JTokenType.String => int.TryParse(token.ToString(), out int val) ? val : (int?) null,
+                    _ => null
+                })
+                .Any(val => val == systemTypeId);
+        }
+
+        private static void AddAssignment(ConsumableTypeItem config, int systemTypeId) {
+            if(config.AssignedElementIds == null) {
+                config.AssignedElementIds = new JArray();
+            }
+
+            if(!HasAssignment(config, systemTypeId)) {
+                config.AssignedElementIds.Add(systemTypeId);
+            }
+        }
+
+        private static void RemoveAssignment(ConsumableTypeItem config, int systemTypeId) {
+            if(config.AssignedElementIds == null) {
+                return;
+            }
+
+            JToken tokenToRemove = config.AssignedElementIds
+                .FirstOrDefault(token => {
+                    int? val = token.Type switch {
+                        JTokenType.Integer => (int?) token,
+                        JTokenType.String => int.TryParse(token.ToString(), out int parsed) ? parsed : (int?) null,
+                        _ => null
+                    };
+                    return val == systemTypeId;
+                });
+
+            tokenToRemove?.Remove();
+        }
     }
 }

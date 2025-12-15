@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Windows;
 
 using Autodesk.Revit.ApplicationServices;
@@ -34,6 +35,14 @@ internal class RevitRepository {
         Doc = document;
 
         SettingsUpdaterWorker.PrepareSettings();
+    }
+
+    public List<Element> GetElementsByCategory(BuiltInCategory category) {
+        return new FilteredElementCollector(Doc)
+            .OfCategory(category)
+            .WhereElementIsElementType()
+            .ToElements()
+            .ToList();
     }
 
     /// <summary>
