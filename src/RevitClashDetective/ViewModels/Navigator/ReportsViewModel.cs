@@ -64,7 +64,7 @@ internal class ReportsViewModel : BaseViewModel, ISupportServices {
         LoadCommand = RelayCommand.Create(Load);
         DeleteCommand = RelayCommand.Create(Delete, CanDelete);
         SelectClashCommand = RelayCommand.Create<IClashViewModel>(SelectClash, CanSelectClash);
-        EditCommentsCommand = RelayCommand.Create<ClashViewModel>(EditComments, CanEditComments);
+        EditCommentsCommand = RelayCommand.Create<IClashViewModel>(EditComments, CanEditComments);
         SaveAllReportsCommand = RelayCommand.Create(SaveAllReports, CanSaveAllReports);
         AskForSaveCommand = RelayCommand.Create(AskForSave);
     }
@@ -225,7 +225,8 @@ internal class ReportsViewModel : BaseViewModel, ISupportServices {
         return Reports.Count > 0;
     }
 
-    private void EditComments(ClashViewModel clash) {
+    private void EditComments(IClashViewModel clashVm) {
+        var clash = (ClashViewModel) clashVm;
         var dialogService = this.GetService<IDialogService>();
         dialogService.ShowDialog(
             dialogCommands: [
@@ -240,7 +241,7 @@ internal class ReportsViewModel : BaseViewModel, ISupportServices {
             viewModel: clash);
     }
 
-    private bool CanEditComments(ClashViewModel clash) {
-        return clash != null;
+    private bool CanEditComments(IClashViewModel clash) {
+        return clash is ClashViewModel;
     }
 }
