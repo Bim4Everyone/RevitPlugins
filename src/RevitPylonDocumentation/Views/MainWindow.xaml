@@ -61,7 +61,7 @@
             IsPaneOpen="True"
             IsBackButtonVisible="Collapsed"
             IsPaneVisible="True" 
-            IsPaneToggleVisible="False">
+            IsPaneToggleVisible="True">
             <ui:NavigationView.MenuItems>
                 <ui:NavigationViewItem
                     Content="{me:LocalizationSource MainWindow.PluginRun}"
@@ -114,7 +114,9 @@
             <ui:NavigationView.PaneFooter>
                 <Border
                     Margin="10 20"
-                    Style="{StaticResource CustomBorder}">
+                    Style="{StaticResource CustomBorder}"
+                    Visibility="{Binding ElementName=_rootNavigationView, Path=IsPaneOpen, 
+                        Converter={StaticResource BooleanToVisibilityConverter}}">
                     <StackPanel>
                         <TextBlock
                             Margin="5"
