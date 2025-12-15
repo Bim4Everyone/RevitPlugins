@@ -50,7 +50,6 @@ internal class FiltrationPageViewModel : BaseViewModel {
         SaveCommand = RelayCommand.Create(Save, CanSave);
         ExportCommand = RelayCommand.Create(Export, CanSave);
         LoadCommand = RelayCommand.Create(Load);
-        ShowElementsCommand = RelayCommand.Create(ShowElements, CanShowElements);
         SubscribeToChanges(Filters);
     }
 
@@ -61,7 +60,6 @@ internal class FiltrationPageViewModel : BaseViewModel {
     public ICommand RenameFilterCommand { get; }
     public ICommand CopyFilterCommand { get; }
     public ICommand RemoveFiltersCommand { get; }
-    public ICommand ShowElementsCommand { get; }
     public IOpenFileDialogService OpenFileDialogService { get; }
     public ISaveFileDialogService SaveFileDialogService { get; }
     public IMessageBoxService MessageBoxService { get; }
@@ -197,14 +195,6 @@ internal class FiltrationPageViewModel : BaseViewModel {
             SelectedFilter = Filters.FirstOrDefault(f => f.Name.Equals(selectedName)) ?? Filters.FirstOrDefault();
             _dirPath = OpenFileDialogService.File.DirectoryName;
         }
-    }
-
-    private void ShowElements() {
-        // TODO
-    }
-
-    private bool CanShowElements() {
-        return CanSave();
     }
 
     private void SubscribeToChanges(ObservableCollection<FilterViewModel> filters) {
