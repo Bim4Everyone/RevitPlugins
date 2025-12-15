@@ -18,7 +18,6 @@ using Ninject;
 using Ninject.Syntax;
 
 using RevitPylonDocumentation.Models;
-using RevitPylonDocumentation.Models.PylonSheetNView;
 using RevitPylonDocumentation.Models.Services;
 using RevitPylonDocumentation.ViewModels.UserSettings;
 using RevitPylonDocumentation.Views;
@@ -767,7 +766,7 @@ internal class MainViewModel : BaseViewModel {
         _hostsInfoView.Filter = item =>
                 String.IsNullOrEmpty(HostsInfoFilter)
                     ? true
-                    : ((PylonSheetInfo) item).PylonKeyName.IndexOf(HostsInfoFilter,
+                    : ((PylonSheetInfoVM) item).PylonKeyName.IndexOf(HostsInfoFilter,
                     StringComparison.OrdinalIgnoreCase) >= 0;
     }
 
