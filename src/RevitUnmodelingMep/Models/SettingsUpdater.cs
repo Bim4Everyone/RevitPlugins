@@ -30,11 +30,7 @@ internal class SettingsUpdater {
         string value = (string) _doc.ProjectInformation
             .GetSharedParamValue(SharedParamsConfig.Instance.VISSettings.Name);
 
-        if(string.IsNullOrWhiteSpace(value)) {
-            return new JObject();
-        }
-
-        return JObject.Parse(value);
+        return ParseSettings(value);
     }
 
     public void PrepareSettings() {
@@ -135,13 +131,7 @@ internal class SettingsUpdater {
             _doc.ProjectInformation.GetParamValueOrDefault(
                 SharedParamsConfig.Instance.VISSettings, string.Empty);
 
-        JObject data;
-        try {
-            data = JObject.Parse(settingsText);
-        } catch {
-            return null;
-        }
-
+        JObject data = ParseSettings(settingsText);
         JToken node = data;
         foreach(string key in keyPath) {
             if(node is JObject obj && obj.ContainsKey(key)) {
@@ -159,12 +149,7 @@ internal class SettingsUpdater {
         IList<string> keyPath,
         JToken newValue) {
 
-        JObject data;
-        try {
-            data = JObject.Parse(settingsText);
-        } catch {
-            data = new JObject();
-        }
+        JObject data = ParseSettings(settingsText);
 
         JObject node = data;
         for(int i = 0; i < keyPath.Count - 1; i++) {
@@ -178,5 +163,64 @@ internal class SettingsUpdater {
         node[keyPath[keyPath.Count - 1]] = newValue;
 
         return JsonConvert.SerializeObject(data, Formatting.Indented);
+    }
+
+    public string SetSettingValue(IList<string> keyPath, JToken newValue) {
+        string settingsText =
+            _doc.ProjectInformation.GetParamValueOrDefault(
+                SharedParamsConfig.Instance.VISSettings, string.Empty);
+
+        string updatedSettings = SetSettingValue(settingsText, keyPath, newValue);
+        SaveSettings(updatedSettings);
+        return updatedSettings;
+    }
+
+    public string RemoveSettingValue(string settingsText, IList<string> keyPath) {
+        JObject data = ParseSettings(settingsText);
+
+        JObject node = data;
+        for(int i = 0; i < keyPath.Count - 1; i++) {
+            string key = keyPath[i];
+            if(node.ContainsKey(key) && node[key] is JObject nested) {
+                node = nested;
+            } else {
+                return JsonConvert.SerializeObject(data, Formatting.Indented);
+            }
+        }
+
+        node.Remove(keyPath[keyPath.Count - 1]);
+        return JsonConvert.SerializeObject(data, Formatting.Indented);
+    }
+
+    public string RemoveSettingValue(IList<string> keyPath) {
+        string settingsText =
+            _doc.ProjectInformation.GetParamValueOrDefault(
+                SharedParamsConfig.Instance.VISSettings, string.Empty);
+
+        string updatedSettings = RemoveSettingValue(settingsText, keyPath);
+        SaveSettings(updatedSettings);
+        return updatedSettings;
+    }
+
+    private static JObject ParseSettings(string settingsText) {
+        try {
+            return string.IsNullOrWhiteSpace(settingsText)
+                ? new JObject()
+                : JObject.Parse(settingsText);
+        } catch {
+            return new JObject();
+        }
+    }
+
+    private void SaveSettings(string settingsText) {
+        using(var tr = new Transaction(_doc, "BIM: Update VIS settings")) {
+            tr.Start();
+
+            _doc.ProjectInformation.SetParamValue(
+                SharedParamsConfig.Instance.VISSettings,
+                settingsText);
+
+            tr.Commit();
+        }
     }
 }

@@ -197,12 +197,14 @@
                                                                 Text="Категория" />
                                                             <ComboBox
                                                                 MinHeight="32"
-                                                                Text="{Binding Category, UpdateSourceTrigger=PropertyChanged}" />
+                                                                ItemsSource="{Binding DataContext.CategoryOptions, RelativeSource={RelativeSource AncestorType=Window}}"
+                                                                DisplayMemberPath="Name"
+                                                                SelectedItem="{Binding SelectedCategory, Mode=TwoWay}" />
 
                                                             <TextBlock
                                                                 Style="{StaticResource FieldLabel}"
                                                                 Text="Группирование" />
-                                                            <ComboBox
+                                                            <ui:TextBox
                                                                 MinHeight="32"
                                                                 Text="{Binding Grouping, UpdateSourceTrigger=PropertyChanged}" />
 
