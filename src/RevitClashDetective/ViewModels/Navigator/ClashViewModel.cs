@@ -23,12 +23,14 @@ internal class ClashViewModel : BaseViewModel, IClashViewModel, IEquatable<Clash
     private string _clashName;
     private readonly RevitRepository _revitRepository;
     private bool _clashDataIsValid;
+    private ClashCommentViewModel _selectedComment;
 
     public ClashViewModel(RevitRepository revitRepository, ClashModel clash) {
         _revitRepository = revitRepository;
 
         ClashName = clash.Name;
-        Comments = [..clash.Comments?.Select(c => new ClashCommentViewModel(c)) ?? []];
+        Comments = [..clash.Comments?.Select(c => new ClashCommentViewModel(_revitRepository, c)) ?? []];
+        SelectedComment = Comments.FirstOrDefault();
 
         FirstId = clash.MainElement.Id;
         FirstCategory = clash.MainElement.Category;
@@ -77,6 +79,11 @@ internal class ClashViewModel : BaseViewModel, IClashViewModel, IEquatable<Clash
     public bool ClashDataIsValid {
         get => _clashDataIsValid;
         set => RaiseAndSetIfChanged(ref _clashDataIsValid, value);
+    }
+
+    public ClashCommentViewModel SelectedComment {
+        get => _selectedComment;
+        set => RaiseAndSetIfChanged(ref _selectedComment, value);
     }
 
     public ObservableCollection<ClashCommentViewModel> Comments { get; }
@@ -235,16 +242,19 @@ internal class ClashViewModel : BaseViewModel, IClashViewModel, IEquatable<Clash
             id = Comments.Max(c => c.Id) + 1;
         }
 
-        Comments.Add(
-            new ClashCommentViewModel(
-                new ClashComment() {
-                    Id = id,
-                    Author = _revitRepository.UiApplication.Application.Username
-                }));
+        var c = new ClashCommentViewModel(
+            _revitRepository,
+            new ClashComment() {
+                Id = id,
+                Author = _revitRepository.UiApplication.Application.Username
+            });
+        Comments.Add(c);
+        SelectedComment = c;
     }
 
     private void RemoveComment(ClashCommentViewModel comment) {
         Comments.Remove(comment);
+        SelectedComment = Comments.FirstOrDefault();
     }
 
     private bool CanRemoveComment(ClashCommentViewModel comment) {

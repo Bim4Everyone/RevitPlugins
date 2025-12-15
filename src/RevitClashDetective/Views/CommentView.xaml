@@ -13,7 +13,10 @@
     d:DesignHeight="300"
     d:DesignWidth="300"
     d:DataContext="{d:DesignInstance vms:ClashCommentViewModel, IsDesignTimeCreatable=False}">
-    <Border>
+    <Border
+        BorderThickness="1"
+        Padding="14 8">
+
         <Grid>
             <Grid.RowDefinitions>
                 <RowDefinition
@@ -24,7 +27,7 @@
 
             <Grid
                 Grid.Row="0"
-                Margin="0 0 0 8">
+                Margin="0 0 0 4">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition
                         Width="*" />
@@ -36,7 +39,7 @@
                     Orientation="Horizontal"
                     Grid.Column="0">
                     <dx:DXImage
-                        Source="{dx:DXImage SvgImages/Icon Builder/Actions_User.svg}"
+                        Source="{dx:DXImage 'Images/People/User_16x16.png'}"
                         Width="14"
                         Height="14"
                         Margin="0 0 4 0" />
@@ -68,5 +71,4 @@
             </dxe:TextEdit>
         </Grid>
     </Border>
-
 </UserControl>

@@ -100,6 +100,15 @@
                 <Style
                     TargetType="Window">
                     <Setter
+                        Property="MinHeight"
+                        Value="400" />
+                    <Setter
+                        Property="MaxHeight"
+                        Value="800" />
+                    <Setter
+                        Property="MinWidth"
+                        Value="600" />
+                    <Setter
                         Property="SizeToContent"
                         Value="WidthAndHeight" />
                     <Setter
@@ -329,16 +338,32 @@
                 </dxg:GridColumn>
 
                 <dxg:GridColumn
-                    Width="Auto"
+                    MinWidth="30"
                     ReadOnly="True"
-                    ToolTip="Комментарии"
-                    AllowResizing="False">
+                    AllowResizing="True"
+                    AllowGrouping="False"
+                    Header="Комментарии"
+                    FieldName="CommentsCount"
+                    UnboundType="Integer"
+                    UnboundExpression="Count([Comments])">
                     <dxg:GridColumn.CellTemplate>
                         <DataTemplate>
-                            <dx:SimpleButton
-                                Glyph="{dx:DXImage 'SvgImages/Icon Builder/Actions_Comment.svg'}"
-                                Command="{Binding ElementName=_dg, Path=DataContext.EditCommentsCommand}"
-                                CommandParameter="{Binding Row}" />
+                            <DockPanel>
+                                <TextBlock
+                                    Margin="4 0 0 0"
+                                    VerticalAlignment="Center"
+                                    TextTrimming="CharacterEllipsis"
+                                    Text="{Binding Row.Comments.Count}" />
+                                <dx:SimpleButton
+                                    DockPanel.Dock="Right"
+                                    Width="Auto"
+                                    MinWidth="20"
+                                    HorizontalAlignment="Right"
+                                    Focusable="False"
+                                    Glyph="{dx:DXImage 'Images/Comments/ShowHideComment_16x16.png'}"
+                                    Command="{Binding ElementName=_dg, Path=DataContext.EditCommentsCommand}"
+                                    CommandParameter="{Binding Row}" />
+                            </DockPanel>
                         </DataTemplate>
                     </dxg:GridColumn.CellTemplate>
                 </dxg:GridColumn>

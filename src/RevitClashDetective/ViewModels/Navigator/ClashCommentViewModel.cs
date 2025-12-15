@@ -3,17 +3,20 @@ using System.ComponentModel;
 
 using dosymep.WPF.ViewModels;
 
+using RevitClashDetective.Models;
 using RevitClashDetective.Models.Clashes;
 
 namespace RevitClashDetective.ViewModels.Navigator;
 
 internal class ClashCommentViewModel : BaseViewModel, IEquatable<ClashCommentViewModel> {
+    private readonly RevitRepository _repo;
     private readonly ClashComment _comment;
     private string _body;
     private string _author;
     private DateTime _date;
 
-    public ClashCommentViewModel(ClashComment comment) {
+    public ClashCommentViewModel(RevitRepository repo, ClashComment comment) {
+        _repo = repo ?? throw new ArgumentNullException(nameof(repo));
         _comment = comment ?? throw new ArgumentNullException(nameof(comment));
         Id = _comment.Id;
         Body = _comment.Body;
@@ -81,6 +84,7 @@ internal class ClashCommentViewModel : BaseViewModel, IEquatable<ClashCommentVie
 
     private void ContentChangedHandler(object sender, PropertyChangedEventArgs e) {
         if(e.PropertyName == nameof(Body)) {
+            Author = _repo.UiApplication.Application.Username;
             Date = DateTime.Now;
         }
     }

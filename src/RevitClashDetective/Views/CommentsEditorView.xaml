@@ -23,26 +23,28 @@
                 Height="*" />
         </Grid.RowDefinitions>
 
-        <DockPanel
-            Grid.Row="0">
+        <StackPanel
+            Grid.Row="0"
+            Margin="0 0 0 8"
+            Orientation="Horizontal">
             <dx:SimpleButton
                 Command="{Binding AddCommentCommand}"
-                Glyph="{dx:DXImage SvgImages/Icon Builder/Actions_Add.svg}"
+                Glyph="{dx:DXImage 'Office2013/Actions/Add_32x32.png'}"
                 Margin="0 0 8 0" />
-
             <dx:SimpleButton
                 Command="{Binding RemoveCommentCommand}"
                 CommandParameter="{Binding SelectedItem, ElementName=_commentsListView}"
-                Glyph="{dx:DXImage SvgImages/Icon Builder/Actions_Remove.svg}" />
-        </DockPanel>
+                Glyph="{dx:DXImage 'Office2013/Actions/Cancel_32x32.png'}" />
+        </StackPanel>
 
         <ListView
             Grid.Row="1"
             x:Name="_commentsListView"
             SelectionMode="Single"
-            ItemsSource="{Binding Comments}"
             ScrollViewer.HorizontalScrollBarVisibility="Disabled"
-            ScrollViewer.VerticalScrollBarVisibility="Auto">
+            ScrollViewer.VerticalScrollBarVisibility="Auto"
+            ItemsSource="{Binding Comments}"
+            SelectedItem="{Binding SelectedComment}">
 
             <ListView.ItemContainerStyle>
                 <Style
