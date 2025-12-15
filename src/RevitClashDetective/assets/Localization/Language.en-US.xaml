@@ -145,6 +145,11 @@
         x:Key="FilterCreation.SuccessSave">Search sets successfully saved</system:String>
     <system:String
         x:Key="FilterCreation.SuccessLoad">Search sets file successfully loaded</system:String>
+    <system:String
+        x:Key="FilterCreation.SavePrompt">Save search sets?</system:String>
+    <system:String
+        x:Key="FilterCreation.CannotSavePrompt">Unable to save current configuration, close window without saving?</system:String>
+
 
     <system:String
         x:Key="FilterCreation.Validation.SetName">Enter the name of the search set.</system:String>
@@ -189,6 +194,8 @@
         x:Key="MainWindow.SuccessSave">Check file successfully saved</system:String>
     <system:String
         x:Key="MainWindow.SuccessLoad">Check file successfully loaded</system:String>
+    <system:String
+        x:Key="MainWindow.SavePrompt">Save checks settings?</system:String>
 
     <system:String
         x:Key="MainWindow.Validation.MissingFiles1">Selection 1 files not found: {0}</system:String>
@@ -217,6 +224,8 @@
         x:Key="Navigator.SuccessSave">File successfully saved</system:String>
     <system:String
         x:Key="Navigator.SuccessLoad">File successfully loaded</system:String>
+    <system:String
+        x:Key="Navigator.ClashComments">Comments of clash '{0}'</system:String>
 
     <system:String
         x:Key="SelectableNamesDialog.NameHeader">Name</system:String>
@@ -288,5 +297,4 @@
         x:Key="RuleEvaluators.FilterHasValue">Has value</system:String>
     <system:String
         x:Key="RuleEvaluators.FilterNotEquals">Not equals</system:String>
-
 </ResourceDictionary>
