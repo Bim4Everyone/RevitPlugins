@@ -41,7 +41,7 @@
         </Grid.RowDefinitions>
 
         <Border Name="Marks"
-            Margin="7"
+            Margin="14 14 0 14"
             Style="{StaticResource CustomBorder}">
             <Grid>
                 <Grid.RowDefinitions>
@@ -159,10 +159,11 @@
         </Border>
 
         <ScrollViewer
+            Margin="0 7"
             Grid.Column="1">
             <StackPanel>
                 <Border Name="Toggles"
-                    Margin="7"
+                    Margin="14 7"
                     Style="{StaticResource CustomBorder}">
                     <Grid>
                         <Grid.RowDefinitions>
@@ -442,7 +443,7 @@
                 </Border>
 
                 <Border Name="SheetProps"
-                    Margin="7"
+                    Margin="14 7"
                     Style="{StaticResource CustomBorder}">
                     <StackPanel>
                         <controls:SettingsTitleControl
@@ -463,7 +464,7 @@
                 </Border>
 
                 <Border Name="ViewTemplates"
-                    Margin="7"
+                    Margin="14 7"
                     Style="{StaticResource CustomBorder}">
                     <UniformGrid
                         SizeChanged="UniformGrid_SizeChanged">
