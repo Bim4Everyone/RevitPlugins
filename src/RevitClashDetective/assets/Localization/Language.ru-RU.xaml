@@ -217,6 +217,8 @@
         x:Key="Navigator.SuccessSave">Файл успешно сохранен</system:String>
     <system:String
         x:Key="Navigator.SuccessLoad">Файл успешно загружен</system:String>
+    <system:String
+        x:Key="Navigator.ClashComments">Комментарии коллизии '{0}'</system:String>
 
     <system:String
         x:Key="SelectableNamesDialog.NameHeader">Название</system:String>

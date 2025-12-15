@@ -11,6 +11,7 @@
     xmlns:mvvm="http://schemas.devexpress.com/winfx/2008/xaml/mvvm"
     xmlns:dxg="http://schemas.devexpress.com/winfx/2008/xaml/grid"
     xmlns:dx="http://schemas.devexpress.com/winfx/2008/xaml/core"
+    xmlns:local="clr-namespace:RevitClashDetective.Views"
     xmlns:base="clr-namespace:dosymep.WPF.Views"
     xmlns:converters="clr-namespace:dosymep.WpfCore.Converters;assembly=dosymep.WpfCore"
     xmlns:common="clr-namespace:dosymep.Xpf.Core.SimpleServices;assembly=dosymep.Xpf.Core"
@@ -27,10 +28,6 @@
     MinWidth="500"
     x:ClassModifier="internal"
     d:DataContext="{d:DesignInstance vm:ReportsViewModel, IsDesignTimeCreatable=False}">
-    <mvvm:Interaction.Behaviors>
-        <common:AttachServiceBehavior
-            AttachableService="{Binding MessageBoxService}" />
-    </mvvm:Interaction.Behaviors>
     <b:Interaction.Triggers>
         <b:EventTrigger
             EventName="Closing">
@@ -47,6 +44,10 @@
             AttachableService="{Binding SaveFileDialogService}" />
     </b:Interaction.Behaviors>
     <base:ThemedPlatformWindow.Resources>
+        <DataTemplate
+            x:Key="CommentEditorTemplate">
+            <local:CommentsEditorView />
+        </DataTemplate>
         <system:Boolean
             x:Key="True">True</system:Boolean>
         <system:Boolean
@@ -92,6 +93,24 @@
                 Value="False" />
         </Style>
     </base:ThemedPlatformWindow.Resources>
+    <mvvm:Interaction.Behaviors>
+        <dx:DialogService
+            ViewTemplate="{StaticResource CommentEditorTemplate}">
+            <dx:DialogService.DialogStyle>
+                <Style
+                    TargetType="Window">
+                    <Setter
+                        Property="SizeToContent"
+                        Value="WidthAndHeight" />
+                    <Setter
+                        Property="WindowStyle"
+                        Value="ToolWindow" />
+                </Style>
+            </dx:DialogService.DialogStyle>
+        </dx:DialogService>
+        <common:AttachServiceBehavior
+            AttachableService="{Binding MessageBoxService}" />
+    </mvvm:Interaction.Behaviors>
     <Grid
         Margin="10">
 
@@ -305,6 +324,21 @@
                                     </DataTemplate>
                                 </dxe:ComboBoxEdit.ItemTemplate>
                             </dxe:ComboBoxEdit>
+                        </DataTemplate>
+                    </dxg:GridColumn.CellTemplate>
+                </dxg:GridColumn>
+
+                <dxg:GridColumn
+                    Width="Auto"
+                    ReadOnly="True"
+                    ToolTip="Комментарии"
+                    AllowResizing="False">
+                    <dxg:GridColumn.CellTemplate>
+                        <DataTemplate>
+                            <dx:SimpleButton
+                                Glyph="{dx:DXImage 'SvgImages/Icon Builder/Actions_Comment.svg'}"
+                                Command="{Binding ElementName=_dg, Path=DataContext.EditCommentsCommand}"
+                                CommandParameter="{Binding Row}" />
                         </DataTemplate>
                     </dxg:GridColumn.CellTemplate>
                 </dxg:GridColumn>

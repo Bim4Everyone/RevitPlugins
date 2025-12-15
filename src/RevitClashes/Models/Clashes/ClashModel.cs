@@ -46,6 +46,7 @@ internal class ClashModel : IEquatable<ClashModel> {
     public ElementModel MainElement { get; set; }
     public ElementModel OtherElement { get; set; }
 
+    public HashSet<ClashComment> Comments { get; set; } = [];
 
     public ClashModel SetRevitRepository(RevitRepository revitRepository) {
         _revitRepository = revitRepository;

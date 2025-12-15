@@ -1,0 +1,63 @@
+<UserControl
+    x:Class="RevitClashDetective.Views.CommentsEditorView"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:local="clr-namespace:RevitClashDetective.Views"
+    xmlns:base="clr-namespace:dosymep.WPF.Views"
+    xmlns:dxe="http://schemas.devexpress.com/winfx/2008/xaml/editors"
+    xmlns:mvvm="http://schemas.devexpress.com/winfx/2008/xaml/mvvm"
+    xmlns:dxg="http://schemas.devexpress.com/winfx/2008/xaml/grid"
+    xmlns:dx="http://schemas.devexpress.com/winfx/2008/xaml/core"
+    xmlns:vms="clr-namespace:RevitClashDetective.ViewModels.Navigator"
+    mc:Ignorable="d"
+    d:DesignHeight="300"
+    d:DesignWidth="300"
+    d:DataContext="{d:DesignInstance vms:ClashViewModel, IsDesignTimeCreatable=False}">
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition
+                Height="Auto" />
+            <RowDefinition
+                Height="*" />
+        </Grid.RowDefinitions>
+
+        <DockPanel
+            Grid.Row="0">
+            <dx:SimpleButton
+                Command="{Binding AddCommentCommand}"
+                Glyph="{dx:DXImage SvgImages/Icon Builder/Actions_Add.svg}"
+                Margin="0 0 8 0" />
+
+            <dx:SimpleButton
+                Command="{Binding RemoveCommentCommand}"
+                CommandParameter="{Binding SelectedItem, ElementName=_commentsListView}"
+                Glyph="{dx:DXImage SvgImages/Icon Builder/Actions_Remove.svg}" />
+        </DockPanel>
+
+        <ListView
+            Grid.Row="1"
+            x:Name="_commentsListView"
+            SelectionMode="Single"
+            ItemsSource="{Binding Comments}"
+            ScrollViewer.HorizontalScrollBarVisibility="Disabled"
+            ScrollViewer.VerticalScrollBarVisibility="Auto">
+
+            <ListView.ItemContainerStyle>
+                <Style
+                    TargetType="ListViewItem">
+                    <Setter
+                        Property="HorizontalContentAlignment"
+                        Value="Stretch" />
+                </Style>
+            </ListView.ItemContainerStyle>
+
+            <ListView.ItemTemplate>
+                <DataTemplate>
+                    <local:CommentView />
+                </DataTemplate>
+            </ListView.ItemTemplate>
+        </ListView>
+    </Grid>
+</UserControl>

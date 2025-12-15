@@ -1,9 +1,15 @@
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Dynamic;
+using System.Linq;
+using System.Windows.Input;
 
 using Autodesk.Revit.DB;
 
+using DevExpress.XtraSpreadsheet.Model;
+
+using dosymep.WPF.Commands;
 using dosymep.WPF.ViewModels;
 
 using RevitClashDetective.Models;
@@ -22,6 +28,7 @@ internal class ClashViewModel : BaseViewModel, IClashViewModel, IEquatable<Clash
         _revitRepository = revitRepository;
 
         ClashName = clash.Name;
+        Comments = [..clash.Comments?.Select(c => new ClashCommentViewModel(c)) ?? []];
 
         FirstId = clash.MainElement.Id;
         FirstCategory = clash.MainElement.Category;
@@ -44,8 +51,14 @@ internal class ClashViewModel : BaseViewModel, IClashViewModel, IEquatable<Clash
         ClashStatus = clash.ClashStatus;
         Clash = clash;
         Clash.SetRevitRepository(_revitRepository);
+
+        AddCommentCommand = RelayCommand.Create(AddComment);
+        RemoveCommentCommand = RelayCommand.Create<ClashCommentViewModel>(RemoveComment, CanRemoveComment);
     }
 
+    public ICommand AddCommentCommand { get; }
+
+    public ICommand RemoveCommentCommand { get; }
 
     public ClashStatus ClashStatus {
         get => _clashStatus;
@@ -65,6 +78,8 @@ internal class ClashViewModel : BaseViewModel, IClashViewModel, IEquatable<Clash
         get => _clashDataIsValid;
         set => RaiseAndSetIfChanged(ref _clashDataIsValid, value);
     }
+
+    public ObservableCollection<ClashCommentViewModel> Comments { get; }
 
     public ElementId FirstId { get; }
 
@@ -122,6 +137,7 @@ internal class ClashViewModel : BaseViewModel, IClashViewModel, IEquatable<Clash
     public ClashModel GetClashModel() {
         Clash.ClashStatus = ClashStatus;
         Clash.Name = ClashName;
+        Clash.Comments = Comments.Select(c => c.GetComment()).ToHashSet();
         return Clash;
     }
 
@@ -209,5 +225,29 @@ internal class ClashViewModel : BaseViewModel, IClashViewModel, IEquatable<Clash
         for(int i = 0; i < paramNames.Length; i++) {
             elementParams.Add($"{ElementParamFieldName}{i}", element.GetParamValueAsString(paramNames[i]));
         }
+    }
+
+    private void AddComment() {
+        int id;
+        if(Comments.Count == 0) {
+            id = 1;
+        } else {
+            id = Comments.Max(c => c.Id) + 1;
+        }
+
+        Comments.Add(
+            new ClashCommentViewModel(
+                new ClashComment() {
+                    Id = id,
+                    Author = _revitRepository.UiApplication.Application.Username
+                }));
+    }
+
+    private void RemoveComment(ClashCommentViewModel comment) {
+        Comments.Remove(comment);
+    }
+
+    private bool CanRemoveComment(ClashCommentViewModel comment) {
+        return comment != null;
     }
 }
