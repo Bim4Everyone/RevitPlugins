@@ -9,87 +9,73 @@ using dosymep.Revit;
 
 using pyRevitLabs.Json;
 
-namespace RevitDeclarations.Models
-{
-    internal class RoomElement {
-        private readonly Room _revitRoom;
-        private readonly string _name;
+namespace RevitDeclarations.Models;
+internal class RoomElement {
+    public RoomElement(Room room, DeclarationSettings settings) {
+        RevitRoom = room;
 
-        private readonly double _areaRevit;
-        private readonly double _areaCoefRevit;
-        private readonly double _areaLivingRevit;
-        private readonly double _areaNonSummerRevit;
-        private readonly double _area;
-        private readonly double _areaCoef;
+        Name = RevitRoom.get_Parameter(BuiltInParameter.ROOM_NAME).AsString();
 
-        public RoomElement(Room room, DeclarationSettings settings) {
-            _revitRoom = room;
+        AreaRevit = ParamConverter.ConvertArea(RevitRoom.Area, settings.AccuracyForArea);
+        var areaCalculator = new RoomAreaCalculator(settings, this);
+        AreaCoefRevit = areaCalculator.CalculateAreaCoefRevit();
+        AreaLivingRevit = areaCalculator.CalculateAreaLivingRevit();
+        AreaNonSummerRevit = areaCalculator.CalculateAreaNonSummerRevit();
 
-            _name = _revitRoom.get_Parameter(BuiltInParameter.ROOM_NAME).AsString();
+        Area = GetAreaParamValue(settings.RoomAreaParam, settings.AccuracyForArea);
+        AreaCoef = GetAreaParamValue(settings.RoomAreaCoefParam, settings.AccuracyForArea);
+    }
 
-            _areaRevit = ParamConverter.ConvertArea(_revitRoom.Area, settings.AccuracyForArea);
-            RoomAreaCalculator areaCalculator = new RoomAreaCalculator(settings, this);
-            _areaCoefRevit = areaCalculator.CalculateAreaCoefRevit();
-            _areaLivingRevit = areaCalculator.CalculateAreaLivingRevit();
-            _areaNonSummerRevit = areaCalculator.CalculateAreaNonSummerRevit();
+    [JsonIgnore]
+    public Room RevitRoom { get; }
 
-            _area = GetAreaParamValue(settings.RoomAreaParam, settings.AccuracyForArea);
-            _areaCoef = GetAreaParamValue(settings.RoomAreaCoefParam, settings.AccuracyForArea);
-        }
+    [JsonIgnore]
+    public ElementId RoomLevel => RevitRoom.LevelId;
+    [JsonProperty("room_type")]
+    public string Name { get; }
+    [JsonIgnore]
+    public string DeclarationName => $"{Name}_{Number}";
 
-        [JsonIgnore] 
-        public Room RevitRoom => _revitRoom;
+    [JsonIgnore]
+    public double AreaRevit { get; }
+    [JsonIgnore]
+    public double AreaCoefRevit { get; }
+    [JsonIgnore]
+    public double AreaLivingRevit { get; }
+    [JsonIgnore]
+    public double AreaNonSummerRevit { get; }
 
-        [JsonIgnore]
-        public ElementId RoomLevel => _revitRoom.LevelId;
-        [JsonProperty("room_type")]
-        public string Name => _name;
-        [JsonIgnore]
-        public string DeclarationName => $"{Name}_{Number}";
+    [JsonProperty("area")]
+    public double Area { get; }
+    [JsonProperty("area_k")]
+    public double AreaCoef { get; }
+    [JsonProperty("number")]
+    public string Number => RevitRoom.Number;
 
-        [JsonIgnore]
-        public double AreaRevit => _areaRevit;
-        [JsonIgnore]
-        public double AreaCoefRevit => _areaCoefRevit;
-        [JsonIgnore]
-        public double AreaLivingRevit => _areaLivingRevit;
-        [JsonIgnore]
-        public double AreaNonSummerRevit => _areaNonSummerRevit;
+    public string GetTextParamValue(Parameter parameter) {
+        return RevitRoom.GetParamValueOrDefault<string>(parameter.Definition.Name);
+    }
 
-        [JsonProperty("area")]
-        public double Area => _area;
-        [JsonProperty("area_k")]
-        public double AreaCoef => _areaCoef;
-        [JsonProperty("number")]
-        public string Number => _revitRoom.Number;
+    public double GetAreaParamValue(Parameter parameter, int accuracy) {
+        double value = RevitRoom.GetParamValueOrDefault<double>(parameter.Definition.Name);
+        return ParamConverter.ConvertArea(value, accuracy);
+    }
 
-        public string GetTextParamValue(Parameter parameter) {
-            return RevitRoom.GetParamValueOrDefault<string>(parameter.Definition.Name);
-        }
+    public double GetLengthParamValue(Parameter parameter, int accuracy) {
+        double value = RevitRoom.GetParamValueOrDefault<double>(parameter.Definition.Name);
+        return ParamConverter.ConvertLength(value, accuracy);
+    }
 
-        public double GetAreaParamValue(Parameter parameter, int accuracy) {
-            var value = RevitRoom.GetParamValueOrDefault<double>(parameter.Definition.Name);
-            return ParamConverter.ConvertArea(value, accuracy);
-        }
+    public double GetIntAndCurrencyParamValue(Parameter parameter) {
+        return parameter.StorageType == StorageType.Double
+            ? RevitRoom.GetParamValueOrDefault<double>(parameter.Definition.Name)
+            : RevitRoom.GetParamValueOrDefault<int>(parameter.Definition.Name);
+    }
 
-        public double GetLengthParamValue(Parameter parameter, int accuracy) {
-            var value = RevitRoom.GetParamValueOrDefault<double>(parameter.Definition.Name);
-            return ParamConverter.ConvertLength(value, accuracy);
-        }
-
-        public double GetIntAndCurrencyParamValue(Parameter parameter) {
-            if(parameter.StorageType == StorageType.Double) {
-                return RevitRoom.GetParamValueOrDefault<double>(parameter.Definition.Name);
-            } else {
-                return RevitRoom.GetParamValueOrDefault<int>(parameter.Definition.Name);
-            }
-        }
-
-        public IReadOnlyList<ElementId> GetBoundaries() {
-            return _revitRoom.GetBoundarySegments(SpatialElementExtensions.DefaultBoundaryOptions)
-                .SelectMany(item => item)
-                .Select(item => item.ElementId)
-                .ToList();
-        }
+    public IReadOnlyList<ElementId> GetBoundaries() {
+        return RevitRoom.GetBoundarySegments(SpatialElementExtensions.DefaultBoundaryOptions)
+            .SelectMany(item => item)
+            .Select(item => item.ElementId)
+            .ToList();
     }
 }
