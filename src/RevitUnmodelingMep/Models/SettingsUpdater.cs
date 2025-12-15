@@ -1,15 +1,21 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Reflection;
+using System.Windows;
+using System.Windows.Controls;
 
 using Autodesk.Revit.DB;
 
 using dosymep.Bim4Everyone;
 using dosymep.Bim4Everyone.SharedParams;
+using dosymep.Bim4Everyone.Templates;
 using dosymep.Revit;
 
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+
+using Wpf.Ui.Controls;
 
 namespace RevitUnmodelingMep.Models; 
 
@@ -20,16 +26,46 @@ internal class SettingsUpdater {
         _doc = doc;
     }
 
+    public JObject GetUnmodelingConfig() {
+        string value = (string) _doc.ProjectInformation
+            .GetSharedParamValue(SharedParamsConfig.Instance.VISSettings.Name);
+
+        if(string.IsNullOrWhiteSpace(value)) {
+            return new JObject();
+        }
+
+        return JObject.Parse(value);
+    }
+
     public void PrepareSettings() {
         JObject LoadDefaultSettings() {
-            string scriptDir = Path.GetDirectoryName(
-                System.Reflection.Assembly.GetExecutingAssembly().Location);
+            var assembly = Assembly.GetExecutingAssembly();
+            string assemblyPath = string.Empty;
 
-            string extRoot = Path.GetFullPath(
-                Path.Combine(scriptDir, "..", "..", "..", ".."));
+            if(!string.IsNullOrWhiteSpace(assembly.CodeBase)) {
+                assemblyPath = new Uri(assembly.CodeBase).LocalPath;
+            }
 
-            string defaultsPath = Path.Combine(
-                extRoot, "lib", "default_spec_settings.json");
+            if(string.IsNullOrWhiteSpace(assemblyPath) && !string.IsNullOrWhiteSpace(assembly.Location)) {
+                assemblyPath = assembly.Location;
+            }
+
+            if(string.IsNullOrWhiteSpace(assemblyPath)) {
+                assemblyPath = AppDomain.CurrentDomain.BaseDirectory;
+            }
+
+            string dllDir = Path.GetDirectoryName(assemblyPath)
+                            ?? AppDomain.CurrentDomain.BaseDirectory;
+
+            // Основной путь: профиль pyRevit -> Extensions -> 04.OV-VK.extension -> lib
+            string appData = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
+            string defaultLibPath = Path.Combine(appData, "pyRevit", "Extensions", "04.OV-VK.extension", "lib");
+
+            // Fallback: если dll действительно лежит в ...\ОВиВК.tab\bin, поднимаемся на две директории вверх и заходим в lib
+            string fallbackLibPath = Path.GetFullPath(Path.Combine(dllDir, "..", "..", "lib"));
+
+            string libDir = Directory.Exists(defaultLibPath) ? defaultLibPath : fallbackLibPath;
+            string defaultsPath = Path.Combine(libDir, "default_spec_settings.json");
 
             return JObject.Parse(File.ReadAllText(defaultsPath));
         }
@@ -50,10 +86,13 @@ internal class SettingsUpdater {
             return current;
         }
 
+        ProjectParameters projectParameters = ProjectParameters.Create(_doc.Application);
+        projectParameters.SetupRevitParam(_doc, SharedParamsConfig.Instance.VISSettings);
+
         string settingsText =
             _doc.ProjectInformation.GetParamValueOrDefault(
                 SharedParamsConfig.Instance.VISSettings, string.Empty);
-
+         
         JObject defaultSettings = LoadDefaultSettings();
 
         JObject currentSettings;

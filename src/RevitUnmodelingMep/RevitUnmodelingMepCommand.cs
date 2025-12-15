@@ -57,6 +57,14 @@ public class RevitUnmodelingMepCommand : BasePluginCommand {
             .ToSelf()
             .InSingletonScope();
 
+        kernel.Bind<Document>()
+            .ToMethod(ctx => ctx.Kernel.Get<UIApplication>().ActiveUIDocument.Document)
+            .InSingletonScope();
+
+        kernel.Bind<SettingsUpdater>()
+            .ToSelf()
+            .InSingletonScope();
+
         // Настройка конфигурации плагина
         kernel.Bind<PluginConfig>()
             .ToMethod(c => PluginConfig.GetPluginConfig(c.Kernel.Get<IConfigSerializer>()));
