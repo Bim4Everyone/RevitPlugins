@@ -45,6 +45,10 @@ internal class RevitRepository {
             .ToList();
     }
 
+    public void CalculateUnmodeling() {
+        System.Windows.MessageBox.Show("Test");
+    }
+
     /// <summary>
     /// Класс доступа к интерфейсу Revit.
     /// </summary>

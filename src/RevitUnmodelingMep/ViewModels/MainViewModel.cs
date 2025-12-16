@@ -1,8 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Collections.Specialized;
-using System.ComponentModel;
 using System.Linq;
 using System.Text.RegularExpressions;
 using System.Windows.Input;
@@ -19,9 +17,7 @@ using RevitUnmodelingMep.Models;
 
 namespace RevitUnmodelingMep.ViewModels;
 
-/// <summary>
-/// Основная ViewModel главного окна плагина.
-/// </summary>
+
 internal class MainViewModel : BaseViewModel {
     private const string _unmodelingConfigKey = "UNMODELING_CONFIG";
 
@@ -36,12 +32,7 @@ internal class MainViewModel : BaseViewModel {
     private int _lastConfigIndex;
     private readonly IReadOnlyList<CategoryOption> _categoryOptions;
     
-    /// <summary>
-    /// Создает экземпляр основной ViewModel главного окна.
-    /// </summary>
-    /// <param name="pluginConfig">Настройки плагина.</param>
-    /// <param name="revitRepository">Класс доступа к интерфейсу Revit.</param>
-    /// <param name="localizationService">Интерфейс доступа к сервису локализации.</param>
+
     public MainViewModel(
         PluginConfig pluginConfig,
         RevitRepository revitRepository,
@@ -61,32 +52,23 @@ internal class MainViewModel : BaseViewModel {
         CategoryAssignments = new ObservableCollection<CategoryAssignmentItem>();
     }
 
-    /// <summary>
-    /// Команда загрузки главного окна.
-    /// </summary>
+
     public ICommand LoadViewCommand { get; }
     
-    /// <summary>
-    /// Команда применения настроек главного окна. (запуск плагина)
-    /// </summary>
-    /// <remarks>В случаях, когда используется немодальное окно, требуется данную команду удалять.</remarks>
+
     public ICommand AcceptViewCommand { get; }
 
     public ICommand AddConsumableTypeCommand { get; }
 
     public ICommand RemoveConsumableTypeCommand { get; }
 
-    /// <summary>
-    /// Текст ошибки, который отображается при неверном вводе пользователя.
-    /// </summary>
+
     public string ErrorText {
         get => _errorText;
         set => RaiseAndSetIfChanged(ref _errorText, value);
     }
 
-    /// <summary>
-    /// Свойство для примера. (требуется удалить)
-    /// </summary>
+
     public string SaveProperty {
         get => _saveProperty;
         set => RaiseAndSetIfChanged(ref _saveProperty, value);
@@ -104,32 +86,16 @@ internal class MainViewModel : BaseViewModel {
 
     public IReadOnlyList<CategoryOption> CategoryOptions => _categoryOptions;
 
-    /// <summary>
-    /// Метод загрузки главного окна.
-    /// </summary>
-    /// <remarks>В данном методе должна происходить загрузка настроек окна, а так же инициализация полей окна.</remarks>
+
     private void LoadView() {
         LoadConfig();
     }
 
-    /// <summary>
-    /// Метод применения настроек главного окна. (выполнение плагина)
-    /// </summary>
-    /// <remarks>
-    /// В данном методе должны браться настройки пользователя и сохраняться в конфиг, а так же быть основной код плагина.
-    /// </remarks>
+
     private void AcceptView() {
         SaveConfig();
     }
 
-    /// <summary>
-    /// Метод проверки возможности выполнения команды применения настроек.
-    /// </summary>
-    /// <returns>В случае когда true - команда может выполниться, в случае false - нет.</returns>
-    /// <remarks>
-    /// В данном методе происходит валидация ввода пользователя и уведомление его о неверных значениях.
-    /// В методе проверяемые свойства окна должны быть отсортированы в таком же порядке как в окне (сверху-вниз)
-    /// </remarks>
     private bool CanAcceptView() {
         if(string.IsNullOrEmpty(SaveProperty)) {
             ErrorText = _localizationService.GetLocalizedString("MainWindow.HelloCheck");
@@ -140,9 +106,7 @@ internal class MainViewModel : BaseViewModel {
         return true;
     }
 
-    /// <summary>
-    /// Загрузка настроек плагина.
-    /// </summary>
+
     private void LoadConfig() {
         RevitSettings setting = _pluginConfig.GetSettings(_revitRepository.Document);
 
@@ -152,9 +116,6 @@ internal class MainViewModel : BaseViewModel {
         SaveProperty = setting?.SaveProperty ?? _localizationService.GetLocalizedString("MainWindow.Hello");
     }
 
-    /// <summary>
-    /// Сохранение настроек плагина.
-    /// </summary>
     private void SaveConfig() {
         RevitSettings setting = _pluginConfig.GetSettings(_revitRepository.Document)
                                 ?? _pluginConfig.AddSettings(_revitRepository.Document);
@@ -196,147 +157,6 @@ internal class MainViewModel : BaseViewModel {
 
         CommandManager.InvalidateRequerySuggested();
         UpdateTypesLists();
-    }
-
-    internal class ConsumableTypeItem : BaseViewModel {
-        private string _title;
-        private string _selectedType;
-        private string _name;
-        private string _grouping;
-        private string _naming;
-        private string _brand;
-        private string _code;
-        private string _unit;
-        private string _factory;
-        private string _numberFormula;
-        private string _noteFormat;
-        private string _enamel;
-        private string _primer;
-        private CategoryOption _selectedCategory;
-
-        public string Title {
-            get => _title;
-            set => RaiseAndSetIfChanged(ref _title, value);
-        }
-
-        public string ConfigKey { get; set; }
-
-        public string SelectedType {
-            get => _selectedType;
-            set => RaiseAndSetIfChanged(ref _selectedType, value);
-        }
-
-        public string Name {
-            get => _name;
-            set => RaiseAndSetIfChanged(ref _name, value);
-        }
-
-        public string CategoryId { get; set; }
-
-        public string Grouping {
-            get => _grouping;
-            set => RaiseAndSetIfChanged(ref _grouping, value);
-        }
-
-        public string Naming {
-            get => _naming;
-            set => RaiseAndSetIfChanged(ref _naming, value);
-        }
-
-        public string Brand {
-            get => _brand;
-            set => RaiseAndSetIfChanged(ref _brand, value);
-        }
-
-        public string Code {
-            get => _code;
-            set => RaiseAndSetIfChanged(ref _code, value);
-        }
-
-        public string Unit {
-            get => _unit;
-            set => RaiseAndSetIfChanged(ref _unit, value);
-        }
-
-        public string Factory {
-            get => _factory;
-            set => RaiseAndSetIfChanged(ref _factory, value);
-        }
-
-        public string NumberFormula {
-            get => _numberFormula;
-            set => RaiseAndSetIfChanged(ref _numberFormula, value);
-        }
-
-        public string NoteFormat {
-            get => _noteFormat;
-            set => RaiseAndSetIfChanged(ref _noteFormat, value);
-        }
-
-        public string Enamel {
-            get => _enamel;
-            set => RaiseAndSetIfChanged(ref _enamel, value);
-        }
-
-        public string Primer {
-            get => _primer;
-            set => RaiseAndSetIfChanged(ref _primer, value);
-        }
-
-        public CategoryOption SelectedCategory {
-            get => _selectedCategory;
-            set {
-                RaiseAndSetIfChanged(ref _selectedCategory, value);
-                CategoryId = value?.Id.ToString();
-            }
-        }
-
-        public JArray AssignedElementIds { get; set; } = new JArray();
-
-        public JObject RawConfig { get; set; } = new JObject();
-
-        public static ConsumableTypeItem FromConfig(JProperty configProperty) {
-            JObject value = configProperty.Value as JObject ?? new JObject();
-            JObject clonedValue = (JObject) value.DeepClone();
-            JArray assignedIds = value["ASSIGNED_ELEMENT_IDS"] as JArray ?? new JArray();
-
-            return new ConsumableTypeItem {
-                ConfigKey = configProperty.Name,
-                Title = (string) value["CONFIG_NAME"],
-                Name = (string) value["CONFIG_NAME"],
-                Naming = (string) value["NAME"],
-                CategoryId = (string) value["CATEGORY"],
-                Grouping = (string) value["GROUP"],
-                Brand = (string) value["MARK"],
-                Code = (string) value["CODE"],
-                Unit = (string) value["UNIT"],
-                Factory = (string) value["CREATOR"],
-                NumberFormula = (string) value["VALUE_FORMULA"],
-                NoteFormat = (string) value["NOTE_FORMAT"],
-                AssignedElementIds = new JArray(assignedIds),
-                RawConfig = clonedValue
-            };
-        }
-
-        public JObject ToJObject() {
-            JObject result = RawConfig != null
-                ? (JObject) RawConfig.DeepClone()
-                : new JObject();
-
-            result["CONFIG_NAME"] = Name ?? string.Empty;
-            result["NAME"] = Naming ?? string.Empty;
-            result["CATEGORY"] = CategoryId ?? string.Empty;
-            result["GROUP"] = Grouping ?? string.Empty;
-            result["MARK"] = Brand ?? string.Empty;
-            result["CODE"] = Code ?? string.Empty;
-            result["UNIT"] = Unit ?? string.Empty;
-            result["CREATOR"] = Factory ?? string.Empty;
-            result["VALUE_FORMULA"] = NumberFormula ?? string.Empty;
-            result["NOTE_FORMAT"] = NoteFormat ?? string.Empty;
-            result["ASSIGNED_ELEMENT_IDS"] = AssignedElementIds ?? new JArray();
-
-            return result;
-        }
     }
 
     private void LoadUnmodelingConfigs() {
@@ -519,7 +339,6 @@ internal class MainViewModel : BaseViewModel {
             return CategoryOptions.FirstOrDefault(o => o.Id == id);
         }
 
-        // Support legacy string like "BuiltInCategory.OST_PipeCurves"
         string trimmed = categoryValue.Trim();
         if(trimmed.StartsWith("BuiltInCategory.", StringComparison.OrdinalIgnoreCase)) {
             string enumName = trimmed.Substring("BuiltInCategory.".Length);
@@ -530,177 +349,8 @@ internal class MainViewModel : BaseViewModel {
             }
         }
 
-        // Fallback: match by display name
         return CategoryOptions.FirstOrDefault(o =>
             string.Equals(o.Name, categoryValue, StringComparison.OrdinalIgnoreCase))
                ?? CategoryOptions.FirstOrDefault();
-    }
-
-    internal class CategoryOption {
-        public string Name { get; set; }
-        public BuiltInCategory BuiltInCategory { get; set; }
-        public int Id { get; set; }
-    }
-
-    internal class CategoryAssignmentItem : BaseViewModel {
-        private string _name;
-        private ObservableCollection<SystemTypeItem> _systemTypes;
-
-        public string Name {
-            get => _name;
-            set => RaiseAndSetIfChanged(ref _name, value);
-        }
-
-        public BuiltInCategory Category { get; set; }
-
-        public ObservableCollection<SystemTypeItem> SystemTypes {
-            get => _systemTypes;
-            set => RaiseAndSetIfChanged(ref _systemTypes, value);
-        }
-    }
-
-    internal class SystemTypeItem : BaseViewModel {
-        private string _name;
-        private ObservableCollection<ConfigAssignmentItem> _configs;
-
-        public string Name {
-            get => _name;
-            set => RaiseAndSetIfChanged(ref _name, value);
-        }
-
-        public int Id { get; set; }
-
-        public ObservableCollection<ConfigAssignmentItem> Configs {
-            get => _configs;
-            set {
-                if(!ReferenceEquals(_configs, value)) {
-                    RaiseAndSetIfChanged(ref _configs, value);
-                    AttachConfigs(_configs);
-                    RaisePropertyChanged(nameof(IsAllSelected));
-                }
-            }
-        }
-
-        public bool IsAllSelected {
-            get => Configs != null && Configs.Count > 0 && Configs.All(c => c.IsChecked);
-            set {
-                if(Configs == null) {
-                    return;
-                }
-
-                foreach(ConfigAssignmentItem config in Configs) {
-                    config.IsChecked = value;
-                }
-                RaisePropertyChanged(nameof(IsAllSelected));
-            }
-        }
-
-        private void AttachConfigs(ObservableCollection<ConfigAssignmentItem> configs) {
-            if(configs == null) {
-                return;
-            }
-
-            configs.CollectionChanged += ConfigsOnCollectionChanged;
-            foreach(ConfigAssignmentItem config in configs) {
-                config.PropertyChanged += ConfigOnPropertyChanged;
-            }
-        }
-
-        private void ConfigsOnCollectionChanged(object sender, NotifyCollectionChangedEventArgs e) {
-            if(e.NewItems != null) {
-                foreach(ConfigAssignmentItem item in e.NewItems) {
-                    item.PropertyChanged += ConfigOnPropertyChanged;
-                }
-            }
-
-            if(e.OldItems != null) {
-                foreach(ConfigAssignmentItem item in e.OldItems) {
-                    item.PropertyChanged -= ConfigOnPropertyChanged;
-                }
-            }
-
-            RaisePropertyChanged(nameof(IsAllSelected));
-        }
-
-        private void ConfigOnPropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e) {
-            if(e.PropertyName == nameof(ConfigAssignmentItem.IsChecked)) {
-                RaisePropertyChanged(nameof(IsAllSelected));
-            }
-        }
-    }
-
-    internal class ConfigAssignmentItem : BaseViewModel {
-        private readonly ConsumableTypeItem _config;
-        private readonly int _systemTypeId;
-        private bool _isChecked;
-
-        public ConfigAssignmentItem(ConsumableTypeItem config, int systemTypeId) {
-            _config = config;
-            _systemTypeId = systemTypeId;
-
-            _isChecked = HasAssignment(config, systemTypeId);
-        }
-
-        public string Name => _config?.Name;
-
-        public bool IsChecked {
-            get => _isChecked;
-            set {
-                bool changed = _isChecked != value;
-                RaiseAndSetIfChanged(ref _isChecked, value);
-
-                if(!changed) {
-                    return;
-                }
-
-                if(value) {
-                    AddAssignment(_config, _systemTypeId);
-                } else {
-                    RemoveAssignment(_config, _systemTypeId);
-                }
-            }
-        }
-
-        private static bool HasAssignment(ConsumableTypeItem config, int systemTypeId) {
-            if(config?.AssignedElementIds == null) {
-                return false;
-            }
-
-            return config.AssignedElementIds
-                .Select(token => token.Type switch {
-                    JTokenType.Integer => (int?) token,
-                    JTokenType.String => int.TryParse(token.ToString(), out int val) ? val : (int?) null,
-                    _ => null
-                })
-                .Any(val => val == systemTypeId);
-        }
-
-        private static void AddAssignment(ConsumableTypeItem config, int systemTypeId) {
-            if(config.AssignedElementIds == null) {
-                config.AssignedElementIds = new JArray();
-            }
-
-            if(!HasAssignment(config, systemTypeId)) {
-                config.AssignedElementIds.Add(systemTypeId);
-            }
-        }
-
-        private static void RemoveAssignment(ConsumableTypeItem config, int systemTypeId) {
-            if(config.AssignedElementIds == null) {
-                return;
-            }
-
-            JToken tokenToRemove = config.AssignedElementIds
-                .FirstOrDefault(token => {
-                    int? val = token.Type switch {
-                        JTokenType.Integer => (int?) token,
-                        JTokenType.String => int.TryParse(token.ToString(), out int parsed) ? parsed : (int?) null,
-                        _ => null
-                    };
-                    return val == systemTypeId;
-                });
-
-            tokenToRemove?.Remove();
-        }
     }
 }
