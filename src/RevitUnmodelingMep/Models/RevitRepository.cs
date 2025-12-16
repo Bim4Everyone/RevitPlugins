@@ -24,17 +24,22 @@ namespace RevitUnmodelingMep.Models;
 /// </remarks>
 internal class RevitRepository {
     public SettingsUpdater SettingsUpdaterWorker { get; set; }
+    public UnmodelingProcessor Processor { get; set; }
     public Document Doc { get; set; }
     /// <summary>
     /// Создает экземпляр репозитория.
     /// </summary>
     /// <param name="u  iApplication">Класс доступа к интерфейсу Revit.</param>
-    public RevitRepository(UIApplication uiApplication, SettingsUpdater settingsUpdaterWorker, Document document) {
+    public RevitRepository(UIApplication uiApplication, SettingsUpdater settingsUpdaterWorker, Document document, UnmodelingProcessor unmodelingProcessor) {
         UIApplication = uiApplication;
         SettingsUpdaterWorker = settingsUpdaterWorker;
+        Processor = unmodelingProcessor;
+        
         Doc = document;
 
         SettingsUpdaterWorker.PrepareSettings();
+        Processor.StartupChecks();
+        
     }
 
     public List<Element> GetElementsByCategory(BuiltInCategory category) {
