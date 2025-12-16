@@ -93,7 +93,7 @@
     <system:String
         x:Key="ReportsResolver.ReplaceAndKeepStatuses">Заменить с сохранением статусов</system:String>
     <system:String
-        x:Key="ReportsResolver.Replace">Заменить с перезаписью статусов</system:String>
+        x:Key="ReportsResolver.Replace">Заменить с перезаписью статусов и комментариев</system:String>
     <system:String
         x:Key="ReportsResolver.KeepOnlyOld">Не заменять</system:String>
     <system:String

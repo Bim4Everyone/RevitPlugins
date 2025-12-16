@@ -91,7 +91,7 @@
     <system:String
         x:Key="ReportsResolver.Body">The uploaded file contains checks with duplicate names: {0}.</system:String>
     <system:String
-        x:Key="ReportsResolver.ReplaceAndKeepStatuses">Replace while keeping statuses</system:String>
+        x:Key="ReportsResolver.ReplaceAndKeepStatuses">Replace while keeping statuses and comments</system:String>
     <system:String
         x:Key="ReportsResolver.Replace">Replace and overwrite statuses</system:String>
     <system:String
