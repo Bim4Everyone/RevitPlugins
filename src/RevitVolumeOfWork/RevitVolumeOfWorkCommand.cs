@@ -1,4 +1,4 @@
-using System.Globalization;
+﻿using System.Globalization;
 using System.Reflection;
 using System.Windows;
 
@@ -20,8 +20,6 @@ using RevitVolumeOfWork.Models;
 using RevitVolumeOfWork.ViewModels;
 using RevitVolumeOfWork.Views;
 
-using Application = Autodesk.Revit.ApplicationServices.Application;
-
 namespace RevitVolumeOfWork; 
 [Transaction(TransactionMode.Manual)]
 public class RevitVolumeOfWorkCommand : BasePluginCommand {
@@ -39,25 +37,15 @@ public class RevitVolumeOfWorkCommand : BasePluginCommand {
 
         kernel.Bind<PluginConfig>()
             .ToMethod(c => PluginConfig.GetPluginConfig());
+        
+        // Используем сервис обновления тем для WinUI
+        kernel.UseWpfUIThemeUpdater();
 
-        kernel.Bind<MainViewModel>().ToSelf();
-        kernel.Bind<MainWindow>().ToSelf()
-            .WithPropertyValue(nameof(Window.Title), PluginName)
-            .WithPropertyValue(nameof(Window.DataContext),
-                c => c.Kernel.Get<MainViewModel>());
+        kernel.BindMainWindow<MainViewModel, MainWindow>();
 
         UpdateParams(uiApplication);
 
-        var window = kernel.Get<MainWindow>();
-        if(window.ShowDialog() == true) {
-            GetPlatformService<INotificationService>()
-                .CreateNotification(PluginName, "Выполнение скрипта завершено успешно.", "C#")
-                .ShowAsync();
-        } else {
-            GetPlatformService<INotificationService>()
-                .CreateWarningNotification(PluginName, "Выполнение скрипта отменено.")
-                .ShowAsync();
-        }
+        Notification(kernel.Get<MainWindow>());
     }
 
     private static void UpdateParams(UIApplication uiApplication) {

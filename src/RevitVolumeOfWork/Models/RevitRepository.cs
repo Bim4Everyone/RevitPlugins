@@ -74,12 +74,4 @@ internal class RevitRepository {
         }
         t.Commit();
     }
-
-    public void SetAll(List<LevelViewModel> allLevels, bool value) {
-        foreach(var level in allLevels) { level.IsSelected = value; }
-    }
-
-    public void InvertAll(List<LevelViewModel> allLevels) {
-        foreach(var level in allLevels) { level.IsSelected = !level.IsSelected; }
-    }
 }

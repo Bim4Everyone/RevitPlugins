@@ -11,27 +11,20 @@ using RevitVolumeOfWork.Models;
 
 namespace RevitVolumeOfWork.ViewModels; 
 internal class MainViewModel : BaseViewModel {
-    protected readonly RevitRepository _revitRepository;
-
+    private readonly RevitRepository _revitRepository;
     private string _errorText;
     private bool _clearWallsParameters;
 
     public MainViewModel(RevitRepository revitRepository) {
         _revitRepository = revitRepository;
-        SetWallParametersCommand = new RelayCommand(SetWallParameters, CanSetWallParameters);
 
         Levels = [.. GetLevelViewModels()
             .OrderBy(item => item.Element.Elevation)];
-
-        CheckAllCommand = new RelayCommand(CheckAll);
-        UnCheckAllCommand = new RelayCommand(UnCheckAll);
-        InvertAllCommand = new RelayCommand(InvertAll);
+        
+        SetWallParametersCommand = new RelayCommand(SetWallParameters, CanSetWallParameters);
     }
 
     public ICommand SetWallParametersCommand { get; }
-    public ICommand CheckAllCommand { get; }
-    public ICommand UnCheckAllCommand { get; }
-    public ICommand InvertAllCommand { get; }
 
     public List<LevelViewModel> Levels { get; }
 
@@ -88,18 +81,6 @@ internal class MainViewModel : BaseViewModel {
     public bool ClearWallsParameters {
         get => _clearWallsParameters;
         set => RaiseAndSetIfChanged(ref _clearWallsParameters, value);
-    }
-
-    private void CheckAll(object p) {
-        _revitRepository.SetAll(Levels, true);
-    }
-
-    private void UnCheckAll(object p) {
-        _revitRepository.SetAll(Levels, false);
-    }
-
-    private void InvertAll(object p) {
-        _revitRepository.InvertAll(Levels);
     }
 
     public string ErrorText {
