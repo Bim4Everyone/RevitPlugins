@@ -43,6 +43,16 @@ public class RevitVolumeOfWorkCommand : BasePluginCommand {
 
         kernel.BindMainWindow<MainViewModel, MainWindow>();
 
+        // Настройка локализации,
+        // получение имени сборки откуда брать текст
+        string assemblyName = Assembly.GetExecutingAssembly().GetName().Name;
+
+        // Настройка локализации,
+        // установка дефолтной локализации "ru-RU"
+        kernel.UseWpfLocalization(
+            $"/{assemblyName};component/assets/localization/language.xaml",
+            CultureInfo.GetCultureInfo("ru-RU"));
+        
         UpdateParams(uiApplication);
 
         Notification(kernel.Get<MainWindow>());

@@ -4,6 +4,7 @@ using System.Windows.Input;
 
 using dosymep.Bim4Everyone.ProjectParams;
 using dosymep.Revit;
+using dosymep.SimpleServices;
 using dosymep.WPF.Commands;
 using dosymep.WPF.ViewModels;
 
@@ -12,11 +13,13 @@ using RevitVolumeOfWork.Models;
 namespace RevitVolumeOfWork.ViewModels; 
 internal class MainViewModel : BaseViewModel {
     private readonly RevitRepository _revitRepository;
+    private readonly ILocalizationService _localizationService;
     private string _errorText;
     private bool _clearWallsParameters;
 
-    public MainViewModel(RevitRepository revitRepository) {
+    public MainViewModel(RevitRepository revitRepository, ILocalizationService localizationService) {
         _revitRepository = revitRepository;
+        _localizationService = localizationService;
 
         Levels = [.. GetLevelViewModels()
             .OrderBy(item => item.Element.Elevation)];
