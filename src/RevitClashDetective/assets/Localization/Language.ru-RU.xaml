@@ -93,7 +93,7 @@
     <system:String
         x:Key="ReportsResolver.ReplaceAndKeepStatuses">Заменить с сохранением статусов</system:String>
     <system:String
-        x:Key="ReportsResolver.Replace">Заменить с перезаписью статусов</system:String>
+        x:Key="ReportsResolver.Replace">Заменить с перезаписью статусов и комментариев</system:String>
     <system:String
         x:Key="ReportsResolver.KeepOnlyOld">Не заменять</system:String>
     <system:String
@@ -145,6 +145,11 @@
         x:Key="FilterCreation.SuccessSave">Поисковые наборы успешно сохранены</system:String>
     <system:String
         x:Key="FilterCreation.SuccessLoad">Файл поисковых наборов успешно загружен</system:String>
+    <system:String
+        x:Key="FilterCreation.SavePrompt">Сохранить поисковые наборы?</system:String>
+    <system:String
+        x:Key="FilterCreation.CannotSavePrompt">Нельзя сохранить текущую конфигурацию, закрыть окно без сохранения?</system:String>
+
 
     <system:String
         x:Key="FilterCreation.Validation.SetName">Введите имя поискового набора.</system:String>
@@ -189,6 +194,8 @@
         x:Key="MainWindow.SuccessSave">Файл проверок успешно сохранен</system:String>
     <system:String
         x:Key="MainWindow.SuccessLoad">Файл проверок успешно загружен</system:String>
+    <system:String
+        x:Key="MainWindow.SavePrompt">Сохранить настройки проверок?</system:String>
 
     <system:String
         x:Key="MainWindow.Validation.MissingFiles1">Не найдены файлы выборки 1: {0}</system:String>
@@ -217,6 +224,8 @@
         x:Key="Navigator.SuccessSave">Файл успешно сохранен</system:String>
     <system:String
         x:Key="Navigator.SuccessLoad">Файл успешно загружен</system:String>
+    <system:String
+        x:Key="Navigator.ClashComments">Комментарии коллизии '{0}'</system:String>
 
     <system:String
         x:Key="SelectableNamesDialog.NameHeader">Название</system:String>

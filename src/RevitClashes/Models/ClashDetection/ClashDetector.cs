@@ -33,12 +33,15 @@ internal class ClashDetector {
 }
 
 internal class ClashesMarker {
-    public static IEnumerable<ClashModel> MarkSolvedClashes(IEnumerable<ClashModel> newClashes, IEnumerable<ClashModel> oldClashes) {
+    public static IEnumerable<ClashModel> MarkSolvedClashes(
+        ICollection<ClashModel> newClashes,
+        ICollection<ClashModel> oldClashes) {
         foreach(var newClash in newClashes) {
-            var oldClashe = oldClashes.FirstOrDefault(item => item.Equals(newClash));
-            if(oldClashe != null) {
-                newClash.ClashStatus = oldClashe.ClashStatus;
-                newClash.Name = string.IsNullOrWhiteSpace(oldClashe.Name) ? newClash.Name : oldClashe.Name;
+            var oldClash = oldClashes.FirstOrDefault(item => item.Equals(newClash));
+            if(oldClash != null) {
+                newClash.ClashStatus = oldClash.ClashStatus;
+                newClash.Name = string.IsNullOrWhiteSpace(oldClash.Name) ? newClash.Name : oldClash.Name;
+                newClash.Comments = oldClash.Comments;
             }
             yield return newClash;
         }

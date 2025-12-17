@@ -5,6 +5,9 @@ using System.Linq;
 using System.Windows;
 using System.Windows.Input;
 
+using DevExpress.Mvvm;
+using DevExpress.Mvvm.POCO;
+
 using dosymep.Bim4Everyone;
 using dosymep.SimpleServices;
 using dosymep.WPF.Commands;
@@ -17,9 +20,13 @@ using RevitClashDetective.Services.RevitViewSettings;
 
 using Wpf.Ui;
 
+using IMessageBoxService = dosymep.SimpleServices.IMessageBoxService;
+using IOpenFileDialogService = dosymep.SimpleServices.IOpenFileDialogService;
+using ISaveFileDialogService = dosymep.SimpleServices.ISaveFileDialogService;
+
 namespace RevitClashDetective.ViewModels.Navigator;
 
-internal class ReportsViewModel : BaseViewModel {
+internal class ReportsViewModel : BaseViewModel, ISupportServices {
     private readonly RevitRepository _revitRepository;
     private readonly ILocalizationService _localizationService;
     private readonly IContentDialogService _contentDialogService;
@@ -52,10 +59,12 @@ internal class ReportsViewModel : BaseViewModel {
             InitializeFiles(selectedFile);
         }
 
+        ServiceContainer = new ServiceContainer(this);
         OpenClashDetectorCommand = RelayCommand.Create(OpenClashDetector, CanOpenClashDetector);
         LoadCommand = RelayCommand.Create(Load);
         DeleteCommand = RelayCommand.Create(Delete, CanDelete);
         SelectClashCommand = RelayCommand.Create<IClashViewModel>(SelectClash, CanSelectClash);
+        EditCommentsCommand = RelayCommand.Create<IClashViewModel>(EditComments, CanEditComments);
         SaveAllReportsCommand = RelayCommand.Create(SaveAllReports, CanSaveAllReports);
         AskForSaveCommand = RelayCommand.Create(AskForSave);
     }
@@ -67,9 +76,12 @@ internal class ReportsViewModel : BaseViewModel {
     public ICommand DeleteCommand { get; }
     public ICommand SaveAllReportsCommand { get; }
     public ICommand AskForSaveCommand { get; }
+    public ICommand EditCommentsCommand { get; }
     public IOpenFileDialogService OpenFileDialogService { get; }
     public ISaveFileDialogService SaveFileDialogService { get; }
     public IMessageBoxService MessageBoxService { get; }
+    public IServiceContainer ServiceContainer { get; }
+
 
     public ObservableCollection<ReportViewModel> Reports {
         get => _reports;
@@ -153,7 +165,6 @@ internal class ReportsViewModel : BaseViewModel {
     }
 
     private void InitializeClashes(string path) {
-        string name = Path.GetFileNameWithoutExtension(path);
         var reports = ReportLoader.GetReports(_revitRepository, path)
             .Select(r => new ReportViewModel(
                 _revitRepository,
@@ -197,7 +208,6 @@ internal class ReportsViewModel : BaseViewModel {
     private void SelectClash(IClashViewModel clash) {
         var settings = new ClashViewSettings(_revitRepository, _localizationService, clash, _settingsConfig);
         var elements = clash.GetElements();
-        var logElements = elements.Select(e => new { Id = e.Id, Document = e.DocumentName }).ToArray();
         _revitRepository.SelectAndShowElement(elements, settings);
     }
 
@@ -213,5 +223,25 @@ internal class ReportsViewModel : BaseViewModel {
 
     private bool CanSaveAllReports() {
         return Reports.Count > 0;
+    }
+
+    private void EditComments(IClashViewModel clashVm) {
+        var clash = (ClashViewModel) clashVm;
+        var dialogService = this.GetService<IDialogService>();
+        dialogService.ShowDialog(
+            dialogCommands: [
+                new UICommand(
+                    id: MessageBoxResult.OK,
+                    caption: _localizationService.GetLocalizedString("Ok"),
+                    command: null,
+                    isDefault: true,
+                    isCancel: false)
+            ],
+            title: _localizationService.GetLocalizedString("Navigator.ClashComments", clash.ClashName),
+            viewModel: clash);
+    }
+
+    private bool CanEditComments(IClashViewModel clash) {
+        return clash is ClashViewModel;
     }
 }

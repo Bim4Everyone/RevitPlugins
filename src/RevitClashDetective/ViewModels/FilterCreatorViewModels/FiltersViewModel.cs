@@ -278,7 +278,7 @@ internal class FiltersViewModel : BaseViewModel, IWindowClosingHandler {
     public void OnWindowClosing(CancelEventArgs e) {
         if(SaveCommand.CanExecute(default)
            && MessageBoxService.Show(
-               _localization.GetLocalizedString("Navigator.SavePrompt"),
+               _localization.GetLocalizedString("FilterCreation.SavePrompt"),
                _localization.GetLocalizedString("BIM"),
                MessageBoxButton.YesNo,
                MessageBoxImage.Question)
@@ -286,7 +286,7 @@ internal class FiltersViewModel : BaseViewModel, IWindowClosingHandler {
             SaveCommand.Execute(default);
         } else if(!SaveCommand.CanExecute(default)
                   && MessageBoxService.Show(
-                      _localization.GetLocalizedString("Navigator.CannotSavePrompt"),
+                      _localization.GetLocalizedString("FilterCreation.CannotSavePrompt"),
                       _localization.GetLocalizedString("BIM"),
                       MessageBoxButton.OKCancel,
                       MessageBoxImage.Warning)
