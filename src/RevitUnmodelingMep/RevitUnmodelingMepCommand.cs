@@ -99,7 +99,9 @@ public class RevitUnmodelingMepCommand : BasePluginCommand {
         editorChecker.GetReport(info);
 
         if(!string.IsNullOrEmpty(editorChecker.FinalReport)) {
-            service.Show(editorChecker.FinalReport, "Настройки немоделируемых", MessageBoxButton.OK, MessageBoxImage.Error);
+            service.Show(editorChecker.FinalReport, "Настройки немоделируемых", 
+                MessageBoxButton.OK, 
+                MessageBoxImage.Error);
             throw new OperationCanceledException();
         }
     }

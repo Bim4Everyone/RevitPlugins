@@ -7,9 +7,11 @@ using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
+using System.Windows.Controls;
 
 using Autodesk.Revit;
 using Autodesk.Revit.DB;
+using Autodesk.Revit.DB.Structure;
 
 using dosymep.Bim4Everyone;
 using dosymep.Bim4Everyone.SharedParams;
@@ -17,18 +19,32 @@ using dosymep.Bim4Everyone.Templates;
 using dosymep.Revit;
 using dosymep.SimpleServices;
 
+using RevitUnmodelingMep.Models.Entities;
+
+
 #nullable enable
 namespace RevitUnmodelingMep.Models;
 
 internal class UnmodelingProcessor {
+    private const string _familyName = "_Якорный элемент";
+    private const string _emptyDescription = "Пустая строка";
+    private const string _conumableDescription = "Временная заглушка";
+    private const string _obsoletteConsumableDescriptionName = "ФОП_ВИС_Назначение"; 
+
     private readonly Document _doc;
     private WorksetId? _ws_id;
     private FamilySymbol? _famylySymbol;
     private readonly string _libDir;
+    
+    private const double _coordinateStep = 0.001;
+    private double _maxLocationY = 0;
+
     public UnmodelingProcessor(Document doc) {
         _doc = doc;
         _libDir = GetLibFolder();
     }
+
+    public void DeleteAllUnmodeling() { }
 
     public void StartupChecks() {
 
@@ -111,16 +127,115 @@ internal class UnmodelingProcessor {
         }
     }
 
-    private FamilySymbol GetFamilySymbol() {
-        string familyName = "_Якорный элемент";
+    private XYZ GetNextLocation() {
+        if(_maxLocationY == 0) {
+            var genericModels = GetGenericCollection();
 
-        FamilySymbol? symbol = FindFamilySymbol(familyName);
+            if(genericModels.Count == 0) {
+                return new XYZ(0, 0, 0);
+            }
+
+            foreach(Element element in genericModels) {
+                if(element.Location is not LocationPoint locationPoint) {
+                    continue;
+                }
+                XYZ point = locationPoint.Point;
+                double yValue = point.Y;
+                if (yValue > _maxLocationY) {
+                    _maxLocationY = yValue;
+                }
+            }
+        }
+        _maxLocationY = _maxLocationY + _coordinateStep;
+        return new XYZ(0, _maxLocationY, 0);
+    }
+    
+    private void CreateNewPosition(NewRowElement newRowElement) {
+
+        newRowElement.Number = Math.Round(newRowElement.Number, 2, MidpointRounding.AwayFromZero);
+
+        if(newRowElement.Number == 0) {
+            return;
+        }
+
+        XYZ location = GetNextLocation();
+
+        FamilyInstance familyInstance = _doc.Create.NewFamilyInstance(
+            location, 
+            _famylySymbol, 
+            StructuralType.NonStructural);
+
+        Parameter instWorkset = familyInstance.GetParam(BuiltInParameter.ELEM_PARTITION_PARAM);
+
+        if(_ws_id is null)
+            throw new InvalidOperationException("Рабочий набор немоделируемых не инициализирован");
+#if REVIT_2024_OR_GREATER
+        instWorkset.Set(_ws_id.Value);
+#else
+        instWorkset.Set(_ws_id.IntegerValue);
+#endif
+        string group = $"{newRowElement.Group}" +
+            $"_{newRowElement.Name}" +
+            $"_{newRowElement.Mark}" +
+            $"_{newRowElement.Maker}" +
+            $"_{newRowElement.Code}";
+
+        SharedParam numberParam;
+        if (_doc.IsExistsParam(SharedParamsConfig.Instance.VISSpecNumbersCurrency)){
+            numberParam = SharedParamsConfig.Instance.VISSpecNumbersCurrency;
+        } else {
+            numberParam = SharedParamsConfig.Instance.VISSpecNumbers;
+        }
+
+        Parameter descriptionParam = familyInstance.GetParam(SharedParamsConfig.Instance.Description);
+
+        void SetUnmodelingValue(FamilyInstance familyInstance, SharedParam sharedParam, object? value) {
+            if(value is null)
+                return;
+
+            switch(value) {
+                case string s:
+                    familyInstance.SetParamValue(sharedParam, s);
+                    break;
+
+                case double d:
+                    familyInstance.SetParamValue(sharedParam, d);
+                    break;
+
+                default:
+                    throw new NotSupportedException(
+                        $"Тип {value.GetType().Name} не поддерживается");
+            }
+        }
+
+        SetUnmodelingValue(familyInstance, SharedParamsConfig.Instance.VISSystemName, newRowElement.System);
+        SetUnmodelingValue(familyInstance, SharedParamsConfig.Instance.VISGrouping, group);
+        SetUnmodelingValue(familyInstance, SharedParamsConfig.Instance.VISCombinedName, newRowElement.Name);
+        SetUnmodelingValue(familyInstance, SharedParamsConfig.Instance.VISMarkNumber, newRowElement.Mark);
+        SetUnmodelingValue(familyInstance, SharedParamsConfig.Instance.VISItemCode, newRowElement.Code);
+        SetUnmodelingValue(familyInstance, SharedParamsConfig.Instance.VISManufacturer, newRowElement.Maker);
+        SetUnmodelingValue(familyInstance, SharedParamsConfig.Instance.VISUnit, newRowElement.Unit);
+        SetUnmodelingValue(familyInstance, numberParam, newRowElement.Number);
+        SetUnmodelingValue(familyInstance, SharedParamsConfig.Instance.VISMass, newRowElement.Mass);
+        SetUnmodelingValue(familyInstance, SharedParamsConfig.Instance.VISNote, newRowElement.Note);
+        SetUnmodelingValue(familyInstance, SharedParamsConfig.Instance.EconomicFunction, newRowElement.Function);
+        SetUnmodelingValue(familyInstance, SharedParamsConfig.Instance.BuildingWorksBlock, newRowElement.SmrBlock);
+        SetUnmodelingValue(familyInstance, SharedParamsConfig.Instance.BuildingWorksSection, newRowElement.SmrSection);
+        SetUnmodelingValue(familyInstance, SharedParamsConfig.Instance.BuildingWorksLevel, newRowElement.SmrFloor);
+        SetUnmodelingValue(familyInstance, 
+            SharedParamsConfig.Instance.BuildingWorksLevelCurrency, 
+            newRowElement.SmrFloorDE);
+
+    }
+
+    private FamilySymbol GetFamilySymbol() {
+        FamilySymbol? symbol = FindFamilySymbol(_familyName);
 
         if(symbol != null) {
             return symbol;
         }
 
-        string familyPath = Path.Combine(_libDir, familyName + ".rfa");
+        string familyPath = Path.Combine(_libDir, _familyName + ".rfa");
 
         using(var t = _doc.StartTransaction("Загрузка семейства")) {
             if(_doc.LoadFamily(familyPath, out Family loadedFamily) && loadedFamily != null) {
@@ -131,7 +246,7 @@ internal class UnmodelingProcessor {
                     return (FamilySymbol) _doc.GetElement(symbolId);
                 }
 
-                symbol = FindFamilySymbol(familyName);
+                symbol = FindFamilySymbol(_familyName);
                 if(symbol != null) {
                     return symbol;
                 }
@@ -149,5 +264,53 @@ internal class UnmodelingProcessor {
         .OfClass(typeof(FamilySymbol))
         .Cast<FamilySymbol>()
         .FirstOrDefault(s => s.Family.Name.Equals(familyName, StringComparison.Ordinal));
+    }
+
+    private void RemoveUnmodeling() {
+        EditorChecker editorChecker = new EditorChecker(_doc);
+        List<FamilyInstance> genericCollection = GetGenericCollection();
+
+        foreach(FamilyInstance familyInstance in genericCollection) {
+            editorChecker.GetReport(familyInstance);
+
+            if(!string.IsNullOrEmpty(editorChecker.FinalReport)) {
+                MessageBox.Show(editorChecker.FinalReport, "Настройки немоделируемых",
+                    MessageBoxButton.OK,
+                    MessageBoxImage.Error);
+                throw new OperationCanceledException();
+            }
+        }
+
+        using(var t = _doc.StartTransaction("Очистка немоделируемых")) {
+
+            foreach(FamilyInstance familyInstance in genericCollection) {
+                string currentDescription =
+                    familyInstance.GetParamValueOrDefault<string>(SharedParamsConfig.Instance.Description);
+
+                currentDescription = !string.IsNullOrEmpty(currentDescription)
+                    ? currentDescription
+                    : familyInstance.GetParamValueOrDefault<string>(_obsoletteConsumableDescriptionName);
+
+                if(currentDescription == _conumableDescription) {
+                    _doc.Delete(familyInstance.Id);
+                }
+            }
+
+            t.Commit();
+        }
+    }
+
+    private List<FamilyInstance> GetGenericCollection() {
+        var genericModels = new FilteredElementCollector(_doc)
+            .OfCategory(BuiltInCategory.OST_GenericModel)
+            .WhereElementIsNotElementType()
+            .OfClass(typeof(FamilyInstance))
+            .Cast<FamilyInstance>()
+            .Where(fi => fi.Symbol != null &&
+                         fi.Symbol.Family != null &&
+                         fi.Symbol.Family.Name.Equals(_familyName, StringComparison.Ordinal))
+            .ToList();
+
+        return genericModels;
     }
 }
