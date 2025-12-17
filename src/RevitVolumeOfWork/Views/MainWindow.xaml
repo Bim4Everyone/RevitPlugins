@@ -65,7 +65,7 @@
                 ItemsSource="{Binding Levels}">
                 <DataGrid.Columns>
                     <DataGridCheckBoxColumn
-                        Binding="{Binding Path=IsSelected, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}">
+                        Binding="{Binding Path=IsChecked, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}">
                         <DataGridCheckBoxColumn.Header>
                             <TextBlock
                                 Text="{me:LocalizationSource MainWindow.Check}" />

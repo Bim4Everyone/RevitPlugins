@@ -43,7 +43,7 @@ namespace RevitVolumeOfWork.Views {
             var dataGrid = (DataGrid) FindName("Levels");
             var levels = dataGrid.SelectedItems;
             foreach(LevelViewModel level in levels) {
-                level.IsSelected = state;
+                level.IsChecked = state;
             }
         }
     }

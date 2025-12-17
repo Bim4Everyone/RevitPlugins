@@ -12,12 +12,19 @@ using RevitVolumeOfWork.Models;
 
 namespace RevitVolumeOfWork.ViewModels; 
 internal class MainViewModel : BaseViewModel {
+    private readonly PluginConfig _pluginConfig;
     private readonly RevitRepository _revitRepository;
     private readonly ILocalizationService _localizationService;
+    
     private string _errorText;
+    
     private bool _clearWallsParameters;
+    private IList<LevelViewModel> _levels;
 
-    public MainViewModel(RevitRepository revitRepository, ILocalizationService localizationService) {
+    public MainViewModel(PluginConfig pluginConfig,
+                         RevitRepository revitRepository, 
+                         ILocalizationService localizationService) {
+        _pluginConfig = pluginConfig;
         _revitRepository = revitRepository;
         _localizationService = localizationService;
 
@@ -25,13 +32,28 @@ internal class MainViewModel : BaseViewModel {
             .OrderBy(item => item.Element.Elevation)];
         
         SetWallParametersCommand = new RelayCommand(SetWallParameters, CanSetWallParameters);
+        
+        LoadConfig();
     }
 
     public ICommand SetWallParametersCommand { get; }
 
-    public List<LevelViewModel> Levels { get; }
+    public IList<LevelViewModel> Levels {
+        get => _levels;
+        set => RaiseAndSetIfChanged(ref _levels, value);
+    }
 
-    protected IEnumerable<LevelViewModel> GetLevelViewModels() {
+    public bool ClearWallsParameters {
+        get => _clearWallsParameters;
+        set => RaiseAndSetIfChanged(ref _clearWallsParameters, value);
+    }
+
+    public string ErrorText {
+        get => _errorText;
+        set => RaiseAndSetIfChanged(ref _errorText, value);
+    }
+    
+    private IEnumerable<LevelViewModel> GetLevelViewModels() {
         return _revitRepository.GetRooms()
             .Where(item => item.Level != null)
             .GroupBy(item => item.Level.Name)
@@ -41,11 +63,11 @@ internal class MainViewModel : BaseViewModel {
     private void SetWallParameters(object p) {
         if(ClearWallsParameters) {
             _revitRepository.ClearWallsParameters(Levels
-                .Where(item => item.IsSelected)
+                .Where(item => item.IsChecked)
                 .Select(x => x.Element));
         }
 
-        var rooms = Levels.Where(item => item.IsSelected)
+        var rooms = Levels.Where(item => item.IsChecked)
             .SelectMany(x => x.Rooms)
             .ToList();
 
@@ -65,6 +87,8 @@ internal class MainViewModel : BaseViewModel {
                                         wallElement.GetRoomsParameters(nameof(RoomElement.Group)));
         }
         t.Commit();
+        
+        SaveConfig();
     }
 
     private bool CanSetWallParameters(object p) {
@@ -72,7 +96,7 @@ internal class MainViewModel : BaseViewModel {
             ErrorText = "Помещения отсутствуют в проекте";
             return false;
         }
-        if(!Levels.Any(x => x.IsSelected)) {
+        if(!Levels.Any(x => x.IsChecked)) {
             ErrorText = "Выберите уровни";
             return false;
         }
@@ -81,13 +105,27 @@ internal class MainViewModel : BaseViewModel {
         return true;
     }
 
-    public bool ClearWallsParameters {
-        get => _clearWallsParameters;
-        set => RaiseAndSetIfChanged(ref _clearWallsParameters, value);
+    private void LoadConfig() {
+        RevitSettings settings = _pluginConfig.GetSettings(_revitRepository.Document);
+        if(settings is null) {
+            return;
+        }
+        
+        var levels = Levels.Where(x => settings.Levels.Contains(x.Name));
+        foreach(var level in levels) {
+            level.IsChecked = true;
+        }
     }
 
-    public string ErrorText {
-        get => _errorText;
-        set => RaiseAndSetIfChanged(ref _errorText, value);
+    private void SaveConfig() {
+        RevitSettings settings = _pluginConfig.GetSettings(_revitRepository.Document);
+        
+        settings ??= _pluginConfig.AddSettings(_revitRepository.Document);
+        
+        settings.Levels = [.. Levels
+            .Where(x => x.IsChecked)
+            .Select(x => x.Name)];
+        
+        _pluginConfig.SaveProjectConfig();
     }
 }
