@@ -18,18 +18,25 @@
             </ResourceDictionary.MergedDictionaries>
         </ResourceDictionary>
     </UserControl.Resources>
-    
-    <StackPanel
-        Orientation="Horizontal"
-        HorizontalAlignment="Right">
+
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="*" />
+            <ColumnDefinition Width="Auto" />
+            <ColumnDefinition Width="Auto" />
+        </Grid.ColumnDefinitions>
 
         <TextBlock
+            Grid.Column="0"
             Margin="10 5 10 15"
             Foreground="Orange"
             VerticalAlignment="Center"
+            TextAlignment="Right"
+            TextWrapping="WrapWithOverflow"
             Text="{Binding ErrorText, ElementName=_this}" />
 
         <ui:Button
+            Grid.Column="1"
             Margin="10 5 10 15"
             MinWidth="150"
             Content="{Binding OkButtonText, ElementName=_this}"
@@ -39,9 +46,10 @@
             Click="ButtonOk_Click" />
 
         <ui:Button
+            Grid.Column="2"
             Margin="10 5 15 15"
             MinWidth="150"
             Content="{Binding CancelButtonText, ElementName=_this}"
-            Click="ButtonCancel_Click"/>
-    </StackPanel>
+            Click="ButtonCancel_Click" />
+    </Grid>
 </UserControl>
