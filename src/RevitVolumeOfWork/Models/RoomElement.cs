@@ -7,6 +7,7 @@ using Autodesk.Revit.DB.Architecture;
 using dosymep.Bim4Everyone;
 using dosymep.Bim4Everyone.ProjectParams;
 using dosymep.Revit;
+using dosymep.SimpleServices;
 
 namespace RevitVolumeOfWork.Models; 
 internal class RoomElement {
@@ -18,17 +19,19 @@ internal class RoomElement {
     private readonly string _group;
     private readonly string _id;
 
-    public RoomElement(Room room, Document document) {
+    public RoomElement(ILocalizationService localizationService, Room room, Document document) {
         _room = room;
         _document = document;
+
+        string defaultParamValue = localizationService.GetLocalizedString("DefaultParamValue");
         
         _level =  _room.Level;
         _id = _room.Id.ToString();
-        _name =  _room.GetParamValueOrDefault(BuiltInParameter.ROOM_NAME, "<Пусто>");
-        _number = _room.GetParamValueOrDefault(BuiltInParameter.ROOM_NUMBER, "<Пусто>");
+        _name =  _room.GetParamValueOrDefault(BuiltInParameter.ROOM_NAME, defaultParamValue);
+        _number = _room.GetParamValueOrDefault(BuiltInParameter.ROOM_NUMBER, defaultParamValue);
         var keyParamValueId = _room.GetParamValueOrDefault<ElementId>(ProjectParamsConfig.Instance.RoomGroupName);
         _group =  keyParamValueId.IsNull()
-            ? "<Пусто>"
+            ? defaultParamValue
             : _document.GetElement(keyParamValueId).Name;
     }
 

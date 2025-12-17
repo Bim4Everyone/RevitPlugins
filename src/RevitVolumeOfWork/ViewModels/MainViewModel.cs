@@ -72,8 +72,9 @@ internal class MainViewModel : BaseViewModel {
             .ToList();
 
         var allWalls = _revitRepository.GetGroupedRoomsByWalls(rooms);
-
-        using var t = _revitRepository.Document.StartTransaction("Заполнить параметры ВОР");
+        
+        string transactionName = _localizationService.GetLocalizedString("TransactionName.SetParams");
+        using var t = _revitRepository.Document.StartTransaction(transactionName);
         foreach(var wallElement in allWalls) {
             var wall = wallElement.Wall;
 

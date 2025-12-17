@@ -48,7 +48,7 @@
             <CheckBox
                 Margin="10, 5"
                 VerticalAlignment="Bottom"
-                Content="Очистить параметры всех стен перед запуском"
+                Content="{me:LocalizationSource MainWindow.ClearParams}"
                 IsChecked="{Binding ClearWallsParameters}"/>
         </Border>
         
@@ -115,14 +115,14 @@
             <ui:Button
                 Margin="10"
                 Width="80"
-                Content="ОК"
+                Content="{me:LocalizationSource MainWindow.Ok}"
                 Command="{Binding SetWallParametersCommand}"
                 Click="ButtonOk_Click" />
 
             <ui:Button
                 Margin="10"
                 Width="80"
-                Content="Отмена"
+                Content="{me:LocalizationSource MainWindow.Cancel}"
                 Click="ButtonCancel_Click" />
         </StackPanel>
     </Grid>
