@@ -551,7 +551,7 @@ internal class MainViewModel : BaseViewModel {
     /// Получает шаблон для основных видов по имени
     /// </summary>
     public void FindGeneralViewTemplate() {
-        if(ViewSectionSettings.GeneralViewTemplateName != string.Empty) {
+        if(!String.IsNullOrEmpty(ViewSectionSettings.GeneralViewTemplateName)) {
             TypesSettings.SelectedGeneralViewTemplate = ViewTemplatesInPj
                 .FirstOrDefault(view => view.Name.Equals(ViewSectionSettings.GeneralViewTemplateName));
         }
@@ -561,7 +561,7 @@ internal class MainViewModel : BaseViewModel {
     /// Получает шаблон для основных видов армирования по имени
     /// </summary>
     public void FindGeneralRebarViewTemplate() {
-        if(ViewSectionSettings.GeneralRebarViewTemplateName != string.Empty) {
+        if(!String.IsNullOrEmpty(ViewSectionSettings.GeneralRebarViewTemplateName)) {
             TypesSettings.SelectedGeneralRebarViewTemplate = ViewTemplatesInPj
                 .FirstOrDefault(view => view.Name.Equals(ViewSectionSettings.GeneralRebarViewTemplateName));
         }
@@ -571,7 +571,7 @@ internal class MainViewModel : BaseViewModel {
     /// Получает шаблон для поперечных видов по имени
     /// </summary>
     public void FindTransverseViewTemplate() {
-        if(ViewSectionSettings.TransverseViewTemplateName != string.Empty) {
+        if(!String.IsNullOrEmpty(ViewSectionSettings.TransverseViewTemplateName)) {
             TypesSettings.SelectedTransverseViewTemplate = ViewTemplatesInPj
                 .FirstOrDefault(view => view.Name.Equals(ViewSectionSettings.TransverseViewTemplateName));
         }
@@ -581,7 +581,7 @@ internal class MainViewModel : BaseViewModel {
     /// Получает шаблон для поперечных видов армирования по имени
     /// </summary>
     public void FindTransverseRebarViewTemplate() {
-        if(ViewSectionSettings.TransverseRebarViewTemplateName != string.Empty) {
+        if(!String.IsNullOrEmpty(ViewSectionSettings.TransverseRebarViewTemplateName)) {
             TypesSettings.SelectedTransverseRebarViewTemplate = ViewTemplatesInPj
                 .FirstOrDefault(view => view.Name.Equals(ViewSectionSettings.TransverseRebarViewTemplateName));
         }
@@ -591,7 +591,7 @@ internal class MainViewModel : BaseViewModel {
     /// Получает типоразмер вида для создаваемых видов
     /// </summary>
     public void FindViewFamilyType() {
-        if(ViewSectionSettings.ViewFamilyTypeName != string.Empty) {
+        if(!String.IsNullOrEmpty(ViewSectionSettings.ViewFamilyTypeName)) {
             TypesSettings.SelectedViewFamilyType = ViewFamilyTypes
                 .FirstOrDefault(familyType => familyType.Name.Equals(ViewSectionSettings.ViewFamilyTypeName));
         }
@@ -601,7 +601,7 @@ internal class MainViewModel : BaseViewModel {
     /// Получает типоразмер для расстановки размеров
     /// </summary>
     public void FindDimensionType() {
-        if(ProjectSettings.DimensionTypeName != string.Empty) {
+        if(!String.IsNullOrEmpty(ProjectSettings.DimensionTypeName)) {
             TypesSettings.SelectedDimensionType = DimensionTypes
                 .FirstOrDefault(familyType => familyType.Name.Equals(ProjectSettings.DimensionTypeName));
         }
@@ -611,7 +611,7 @@ internal class MainViewModel : BaseViewModel {
     /// Получает типоразмер высотной отметки
     /// </summary>
     public void FindSpotDimensionType() {
-        if(ProjectSettings.SpotDimensionTypeName != string.Empty) {
+        if(!String.IsNullOrEmpty(ProjectSettings.SpotDimensionTypeName)) {
             TypesSettings.SelectedSpotDimensionType = SpotDimensionTypes
                 .FirstOrDefault(familyType => familyType.Name.Equals(ProjectSettings.SpotDimensionTypeName));
         }
@@ -621,7 +621,7 @@ internal class MainViewModel : BaseViewModel {
     /// Получает типоразмер марки арматурного каркаса
     /// </summary>
     public void FindSkeletonTagType() {
-        if(ProjectSettings.SkeletonTagTypeName != string.Empty) {
+        if(!String.IsNullOrEmpty(ProjectSettings.SkeletonTagTypeName)) {
             TypesSettings.SelectedSkeletonTagType = RebarTagTypes
                 .FirstOrDefault(familyType => familyType.Name.Equals(ProjectSettings.SkeletonTagTypeName));
         }
@@ -631,7 +631,7 @@ internal class MainViewModel : BaseViewModel {
     /// Получает типоразмер марки арматуры с засечкой
     /// </summary>
     public void FindRebarTagTypeWithSerif() {
-        if(ProjectSettings.RebarTagTypeWithSerifName != string.Empty) {
+        if(!String.IsNullOrEmpty(ProjectSettings.RebarTagTypeWithSerifName)) {
             TypesSettings.SelectedRebarTagTypeWithSerif = RebarTagTypes
                 .FirstOrDefault(familyType => familyType.Name.Equals(ProjectSettings.RebarTagTypeWithSerifName));
         }
@@ -641,7 +641,7 @@ internal class MainViewModel : BaseViewModel {
     /// Получает типоразмер марки арматуры с шагом
     /// </summary>
     public void FindRebarTagTypeWithStep() {
-        if(ProjectSettings.RebarTagTypeWithStepName != string.Empty) {
+        if(!String.IsNullOrEmpty(ProjectSettings.RebarTagTypeWithStepName)) {
             TypesSettings.SelectedRebarTagTypeWithStep = RebarTagTypes
                 .FirstOrDefault(familyType => familyType.Name.Equals(ProjectSettings.RebarTagTypeWithStepName));
         }
@@ -651,7 +651,7 @@ internal class MainViewModel : BaseViewModel {
     /// Получает типоразмер марки арматуры с количеством
     /// </summary>
     public void FindRebarTagTypeWithComment() {
-        if(ProjectSettings.RebarTagTypeWithCommentName != string.Empty) {
+        if(!String.IsNullOrEmpty(ProjectSettings.RebarTagTypeWithCommentName)) {
             TypesSettings.SelectedRebarTagTypeWithComment = RebarTagTypes
                 .FirstOrDefault(familyType => familyType.Name.Equals(ProjectSettings.RebarTagTypeWithCommentName));
         }
@@ -661,7 +661,7 @@ internal class MainViewModel : BaseViewModel {
     /// Получает типоразмер универсальной марки
     /// </summary>
     public void FindUniversalTagType() {
-        if(ProjectSettings.UniversalTagTypeName != string.Empty) {
+        if(!String.IsNullOrEmpty(ProjectSettings.UniversalTagTypeName)) {
             TypesSettings.SelectedUniversalTagType = TypicalAnnotationsTypes
                 .FirstOrDefault(familyType => familyType.Name.Equals(ProjectSettings.UniversalTagTypeName));
         }
@@ -671,7 +671,7 @@ internal class MainViewModel : BaseViewModel {
     /// Получает типоразмер аннотацию линии обрыва
     /// </summary>
     public void FindBreakLineType() {
-        if(ProjectSettings.BreakLineTypeName != string.Empty) {
+        if(!String.IsNullOrEmpty(ProjectSettings.BreakLineTypeName)) {
             TypesSettings.SelectedBreakLineType = DetailComponentsTypes
                 .FirstOrDefault(familyType => familyType.Name.Equals(ProjectSettings.BreakLineTypeName));
         }
@@ -681,7 +681,7 @@ internal class MainViewModel : BaseViewModel {
     /// Получает типоразмер аннотацию рабочего шва бетонирования
     /// </summary>
     public void FindConcretingJointType() {
-        if(ProjectSettings.ConcretingJointTypeName != string.Empty) {
+        if(!String.IsNullOrEmpty(ProjectSettings.ConcretingJointTypeName)) {
             TypesSettings.SelectedConcretingJointType = DetailComponentsTypes
                 .FirstOrDefault(familyType => familyType.Name.Equals(ProjectSettings.ConcretingJointTypeName));
         }
@@ -691,7 +691,7 @@ internal class MainViewModel : BaseViewModel {
     /// Получает легенду примечания по имени
     /// </summary>
     public void FindLegend() {
-        if(ProjectSettings.LegendName != string.Empty) {
+        if(!String.IsNullOrEmpty(ProjectSettings.LegendName)) {
             TypesSettings.SelectedLegend = Legends
                 .FirstOrDefault(view => view.Name.Contains(ProjectSettings.LegendName));
         }
@@ -701,7 +701,7 @@ internal class MainViewModel : BaseViewModel {
     /// Получает типоразмер рамки листа по имени типа
     /// </summary>
     public void FindTitleBlock() {
-        if(ProjectSettings.TitleBlockName != string.Empty) {
+        if(!String.IsNullOrEmpty(ProjectSettings.TitleBlockName)) {
             TypesSettings.SelectedTitleBlock = TitleBlocks
                 .FirstOrDefault(titleBlock => titleBlock.Name.Contains(ProjectSettings.TitleBlockName));
         }
