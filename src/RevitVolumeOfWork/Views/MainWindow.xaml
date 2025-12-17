@@ -4,17 +4,14 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-
     xmlns:base="clr-namespace:dosymep.WPF.Views"
     xmlns:local="clr-namespace:RevitVolumeOfWork.Views"
     xmlns:vms="clr-namespace:RevitVolumeOfWork.ViewModels"
-	xmlns:dx="http://schemas.devexpress.com/winfx/2008/xaml/core"
 	xmlns:core="clr-namespace:dosymep.WpfUI.Core"
     xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
     xmlns:me="clr-namespace:dosymep.WpfCore.MarkupExtensions;assembly=dosymep.WpfCore"
     
 	mc:Ignorable="d"
-    Title="{me:LocalizationSource MainWindow.Title}"
     WindowStartupLocation="CenterOwner"
     
     Height="750" Width="550"
@@ -71,7 +68,7 @@
                         Binding="{Binding Path=IsSelected, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}">
                         <DataGridCheckBoxColumn.Header>
                             <TextBlock
-                                Text="{me:LocalizationSource MainWindow.HeaderCheck}" />
+                                Text="{me:LocalizationSource MainWindow.Check}" />
                         </DataGridCheckBoxColumn.Header>
                         <DataGridCheckBoxColumn.CellStyle>
                             <Style
@@ -93,11 +90,11 @@
                     </DataGridCheckBoxColumn>
                     <DataGridTextColumn
                         Binding="{Binding Path=Name}"
-                        Width="400"
+                        Width="370"
                         IsReadOnly="True">
                         <DataGridTextColumn.Header>
                             <TextBlock
-                                Text="{me:LocalizationSource MainWindow.HeaderLevels}" />
+                                Text="{me:LocalizationSource MainWindow.Levels}" />
                         </DataGridTextColumn.Header>
                     </DataGridTextColumn>
                 </DataGrid.Columns>

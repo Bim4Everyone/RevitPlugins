@@ -1,0 +1,8 @@
+<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:system="clr-namespace:System;assembly=mscorlib">
+
+    <system:String x:Key="MainWindow.Title">Volume of works</system:String>
+    <system:String x:Key="MainWindow.Check">Select</system:String>
+    <system:String x:Key="MainWindow.Levels">Levels</system:String>
+</ResourceDictionary>

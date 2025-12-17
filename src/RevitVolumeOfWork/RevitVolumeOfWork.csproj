@@ -3,4 +3,21 @@
 		<UseWpfUI>true</UseWpfUI>
 		<LangVersion>12</LangVersion>
 	</PropertyGroup>
+	<ItemGroup>
+	  <Page Update="Views\Styles.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	    <XamlRuntime>Wpf</XamlRuntime>
+	    <SubType>Designer</SubType>
+	  </Page>
+	  <Page Update="assets\localization\Language.en-US.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	    <XamlRuntime>Wpf</XamlRuntime>
+	    <SubType>Designer</SubType>
+	  </Page>
+	  <Page Update="assets\localization\Language.ru-RU.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	    <XamlRuntime>Wpf</XamlRuntime>
+	    <SubType>Designer</SubType>
+	  </Page>
+	</ItemGroup>
 </Project>
