@@ -66,6 +66,7 @@
     <system:String x:Key="MainWindow.VerticalViews">Вертикальные виды</system:String>
     <system:String x:Key="MainWindow.HorizontalViews">Горизонтальные виды</system:String>
     <system:String x:Key="MainWindow.Schedules">Спецификации</system:String>
+    <system:String x:Key="MainWindow.ScheduleFilters">Спецификации. Фильтрация</system:String>
     <system:String x:Key="MainWindow.LegendsAndAnnotations">Легенды и типовые аннотации</system:String>
     <system:String x:Key="MainWindow.PylonParameters">Параметры пилона</system:String>
     <system:String x:Key="MainWindow.ProjectParameters">Параметры проекта</system:String>
@@ -81,6 +82,8 @@
         - видов опалубки и армирования, которые разрезают пилон поперек и смотрят сверху вниз</system:String>
     <system:String x:Key="MainWindow.SchedulesSettings">Вкладка с настройками спецификаций 
         - таблиц с данными о пилоне и его армировании</system:String>
+    <system:String x:Key="MainWindow.ScheduleFiltersSettings">Вкладка с настройками фильтрации спецификаций 
+        - правила изменения фильтров после копирования спецификаций</system:String>
     <system:String x:Key="MainWindow.LegendsAndAnnotationsSettings">Вкладка с настройками иных видов, 
         например, здесь вы можете настроить легенду примечания и правила ее размещения на виде</system:String>
     <system:String x:Key="MainWindow.PylonParametersSettings">Вкладка с настройками параметров пилона 

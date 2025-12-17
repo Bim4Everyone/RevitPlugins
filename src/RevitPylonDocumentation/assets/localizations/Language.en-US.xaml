@@ -66,6 +66,8 @@
     <system:String x:Key="MainWindow.VerticalViews">Vertical Views</system:String>
     <system:String x:Key="MainWindow.HorizontalViews">Horizontal Views</system:String>
     <system:String x:Key="MainWindow.Schedules">Schedules</system:String>
+    <system:String x:Key="MainWindow.ScheduleFilters">Schedules. Filtration</system:String>
+
     <system:String x:Key="MainWindow.LegendsAndAnnotations">Legends and Annotations</system:String>
     <system:String x:Key="MainWindow.PylonParameters">Pylon Parameters</system:String>
     <system:String x:Key="MainWindow.ProjectParameters">Project Parameters</system:String>
@@ -81,6 +83,8 @@
         - views of formwork and reinforcement that cut the pylon crosswise and look from top to bottom</system:String>
     <system:String x:Key="MainWindow.SchedulesSettings">A tab with specification settings 
         - tables with data on the pylon and its reinforcement</system:String>
+    <system:String x:Key="MainWindow.ScheduleFiltersSettings">Specification filter settings tab
+        - rules for changing filters after copying specifications</system:String>
     <system:String x:Key="MainWindow.LegendsAndAnnotationsSettings">A tab with settings for other views, for example, 
         here you can set up the legend of the note and the rules for its placement on the view</system:String>
     <system:String x:Key="MainWindow.PylonParametersSettings">A tab with pylon parameter settings 

@@ -19,8 +19,8 @@
     mc:Ignorable="d"
     WindowStartupLocation="CenterOwner"
     
-    Height="1020"    Width="1500"
-    MinHeight="700" MinWidth="900"
+    Height="1000"    Width="1500"
+    MinHeight="750" MinWidth="900"
     KeyDown="Window_KeyDown"
     d:DataContext="{d:DesignInstance vms:MainViewModel, IsDesignTimeCreatable=False}">
 
@@ -88,6 +88,11 @@
                             Icon="{ui:SymbolIcon TableSettings24}"
                             TargetPageType="{x:Type pages:SchedulesPage}" 
                             ToolTip="{me:LocalizationSource MainWindow.SchedulesSettings}"/>
+                        <ui:NavigationViewItem
+                            Content="{me:LocalizationSource MainWindow.ScheduleFilters}"
+                            Icon="{ui:SymbolIcon DataUsageSettings20}"
+                            TargetPageType="{x:Type pages:ScheduleFiltersPage}"
+                            ToolTip="{me:LocalizationSource MainWindow.ScheduleFiltersSettings}"/>
                         <ui:NavigationViewItem
                             Content="{me:LocalizationSource MainWindow.LegendsAndAnnotations}"
                             Icon="{ui:SymbolIcon BarcodeScanner24}"
