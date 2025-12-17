@@ -5,6 +5,8 @@
     <system:String x:Key="MainWindow.Check">Select</system:String>
     <system:String x:Key="MainWindow.Levels">Levels</system:String>
     <system:String x:Key="MainWindow.ClearParams">Clear parameters before start</system:String>
+    <system:String x:Key="MainWindow.ErrorNoRooms">No rooms in the project</system:String>
+    <system:String x:Key="MainWindow.ErrorSelectLevels">Select levels</system:String>
     <system:String x:Key="MainWindow.Ok">OK</system:String>
     <system:String x:Key="MainWindow.Cancel">Cancel</system:String>
     

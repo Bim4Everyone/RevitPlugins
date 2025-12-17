@@ -52,7 +52,6 @@
                 IsChecked="{Binding ClearWallsParameters}"/>
         </Border>
         
-        
         <Border
             Grid.Row="2"
             Margin="14,4"

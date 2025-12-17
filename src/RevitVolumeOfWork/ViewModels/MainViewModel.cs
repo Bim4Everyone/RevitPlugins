@@ -73,7 +73,7 @@ internal class MainViewModel : BaseViewModel {
 
         var allWalls = _revitRepository.GetGroupedRoomsByWalls(rooms);
         
-        string transactionName = _localizationService.GetLocalizedString("TransactionName.SetParams");
+        string transactionName = _localizationService.GetLocalizedString("Transaction.SetParams");
         using var t = _revitRepository.Document.StartTransaction(transactionName);
         foreach(var wallElement in allWalls) {
             var wall = wallElement.Wall;
@@ -94,15 +94,15 @@ internal class MainViewModel : BaseViewModel {
 
     private bool CanSetWallParameters(object p) {
         if(Levels.Count == 0) {
-            ErrorText = "Помещения отсутствуют в проекте";
+            ErrorText = _localizationService.GetLocalizedString("MainWindow.ErrorNoRooms");
             return false;
         }
         if(!Levels.Any(x => x.IsChecked)) {
-            ErrorText = "Выберите уровни";
+            ErrorText = _localizationService.GetLocalizedString("MainWindow.ErrorSelectLevels");
             return false;
         }
 
-        ErrorText = "";
+        ErrorText = string.Empty;
         return true;
     }
 

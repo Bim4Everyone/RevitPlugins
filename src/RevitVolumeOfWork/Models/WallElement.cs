@@ -9,8 +9,8 @@ internal class WallElement {
     
     public WallElement(Element wall) {
         _wall = wall;
-
     }
+    
     public Element Wall => _wall;
     public List<RoomElement> Rooms { get; set; }
 

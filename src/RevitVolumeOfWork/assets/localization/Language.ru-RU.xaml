@@ -5,6 +5,8 @@
     <system:String x:Key="MainWindow.Check">Выбрать</system:String>
     <system:String x:Key="MainWindow.Levels">Уровни</system:String>
     <system:String x:Key="MainWindow.ClearParams">Очистить параметры всех стен перед запуском</system:String>
+    <system:String x:Key="MainWindow.ErrorNoRooms">Помещения отсутствуют в проекте</system:String>
+    <system:String x:Key="MainWindow.ErrorSelectLevels">Выберите уровни</system:String>
     <system:String x:Key="MainWindow.Ok">ОК</system:String>
     <system:String x:Key="MainWindow.Cancel">Отмена</system:String>
     

@@ -70,10 +70,10 @@ internal class RevitRepository {
         string transactionName = _localizationService.GetLocalizedString("Transaction.ClearParams");
         using var t = Document.StartTransaction(transactionName);
         foreach(var wall in collector) {
-            wall.SetParamValue(ProjectParamsConfig.Instance.RelatedRoomName, "");
-            wall.SetParamValue(ProjectParamsConfig.Instance.RelatedRoomNumber, "");
-            wall.SetParamValue(ProjectParamsConfig.Instance.RelatedRoomID, "");
-            wall.SetParamValue(ProjectParamsConfig.Instance.RelatedRoomGroup, "");
+            wall.SetParamValue(ProjectParamsConfig.Instance.RelatedRoomName, string.Empty);
+            wall.SetParamValue(ProjectParamsConfig.Instance.RelatedRoomNumber, string.Empty);
+            wall.SetParamValue(ProjectParamsConfig.Instance.RelatedRoomID, string.Empty);
+            wall.SetParamValue(ProjectParamsConfig.Instance.RelatedRoomGroup, string.Empty);
         }
         t.Commit();
     }
