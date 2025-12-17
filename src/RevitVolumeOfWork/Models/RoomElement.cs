@@ -10,28 +10,33 @@ using dosymep.Revit;
 
 namespace RevitVolumeOfWork.Models; 
 internal class RoomElement {
-
     private readonly Room _room;
     private readonly Document _document;
+    private readonly Level _level;
+    private readonly string _name;
+    private readonly string _number;
+    private readonly string _group;
+    private readonly string _id;
 
     public RoomElement(Room room, Document document) {
         _room = room;
         _document = document;
+        
+        _level =  _room.Level;
+        _id = _room.Id.ToString();
+        _name =  _room.GetParamValueOrDefault(BuiltInParameter.ROOM_NAME, "<Пусто>");
+        _number = _room.GetParamValueOrDefault(BuiltInParameter.ROOM_NUMBER, "<Пусто>");
+        var keyParamValueId = _room.GetParamValueOrDefault<ElementId>(ProjectParamsConfig.Instance.RoomGroupName);
+        _group =  keyParamValueId.IsNull()
+            ? "<Пусто>"
+            : _document.GetElement(keyParamValueId).Name;
     }
 
-    public Level Level => _room.Level;
-    public string Name => _room.GetParamValueOrDefault(BuiltInParameter.ROOM_NAME, "<Пусто>");
-    public string Number => _room.GetParamValueOrDefault(BuiltInParameter.ROOM_NUMBER, "<Пусто>");
-    public string Group {
-        get {
-            var keyParamValueId = _room.GetParamValueOrDefault<ElementId>(ProjectParamsConfig.Instance.RoomGroupName);
-
-            return keyParamValueId.IsNull()
-                ? "<Пусто>"
-                : _document.GetElement(keyParamValueId).Name;
-        }
-    }
-    public string Id => _room.Id.ToString();
+    public Level Level => _level;
+    public string Name => _name;
+    public string Number => _number;
+    public string Group => _group;
+    public string Id => _id;
 
     public List<Element> GetBoundaryWalls() {
         var wallCategoryId = new ElementId(BuiltInCategory.OST_Walls);

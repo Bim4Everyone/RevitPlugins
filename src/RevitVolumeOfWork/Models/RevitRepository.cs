@@ -10,8 +10,6 @@ using dosymep.Bim4Everyone;
 using dosymep.Bim4Everyone.ProjectParams;
 using dosymep.Revit;
 
-using RevitVolumeOfWork.ViewModels;
-
 namespace RevitVolumeOfWork.Models; 
 internal class RevitRepository {
     public RevitRepository(UIApplication uiApplication) {

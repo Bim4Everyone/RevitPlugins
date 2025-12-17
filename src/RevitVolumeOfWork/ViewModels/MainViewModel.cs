@@ -78,13 +78,13 @@ internal class MainViewModel : BaseViewModel {
             var wall = wallElement.Wall;
 
             wall.SetProjectParamValue(ProjectParamsConfig.Instance.RelatedRoomName.Name,
-                                        wallElement.GetRoomsParameters(nameof(RoomElement.Name)));
+                                      wallElement.GetRoomsParameters(nameof(RoomElement.Name)));
             wall.SetProjectParamValue(ProjectParamsConfig.Instance.RelatedRoomNumber.Name,
-                                        wallElement.GetRoomsParameters(nameof(RoomElement.Number)));
+                                      wallElement.GetRoomsParameters(nameof(RoomElement.Number)));
             wall.SetProjectParamValue(ProjectParamsConfig.Instance.RelatedRoomID.Name,
-                                        wallElement.GetRoomsParameters(nameof(RoomElement.Id)));
+                                      wallElement.GetRoomsParameters(nameof(RoomElement.Id)));
             wall.SetProjectParamValue(ProjectParamsConfig.Instance.RelatedRoomGroup.Name,
-                                        wallElement.GetRoomsParameters(nameof(RoomElement.Group)));
+                                      wallElement.GetRoomsParameters(nameof(RoomElement.Group)));
         }
         t.Commit();
         
