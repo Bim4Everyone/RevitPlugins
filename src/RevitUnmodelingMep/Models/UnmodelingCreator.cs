@@ -160,7 +160,7 @@ internal class UnmodelingCreator {
         _maxLocationY = _maxLocationY + _coordinateStep;
         return new XYZ(0, _maxLocationY, 0);
     }
-    
+
     public void CreateNewPosition(NewRowElement newRowElement) {
 
         newRowElement.Number = Math.Round(newRowElement.Number, 2, MidpointRounding.AwayFromZero);
@@ -170,106 +170,72 @@ internal class UnmodelingCreator {
         }
 
         XYZ location = GetNextLocation();
-        FamilySymbol symbol = Symbol;
 
-        void CreateAndFill() {
-            EnsureSymbolActive(symbol);
+        FamilyInstance familyInstance = _doc.Create.NewFamilyInstance(
+            location,
+            _famylySymbol,
+            StructuralType.NonStructural);
 
-            FamilyInstance familyInstance = _doc.Create.NewFamilyInstance(
-                location,
-                symbol,
-                StructuralType.NonStructural);
+        Parameter instWorkset = familyInstance.GetParam(BuiltInParameter.ELEM_PARTITION_PARAM);
 
-            Parameter instWorkset = familyInstance.GetParam(BuiltInParameter.ELEM_PARTITION_PARAM);
+        if(_ws_id is null)
+            throw new InvalidOperationException("Рабочий набор немоделируемых не инициализирован");
+        instWorkset.Set(_ws_id.IntegerValue);
 
-            if(_ws_id is null) {
-                throw new InvalidOperationException("Рабочий набор немоделируемых не инициализирован");
-            }
+        string group = $"{newRowElement.Group}" +
+            $"_{newRowElement.Name}" +
+            $"_{newRowElement.Mark}" +
+            $"_{newRowElement.Maker}" +
+            $"_{newRowElement.Code}";
 
-            instWorkset.Set(_ws_id.IntegerValue);
-
-            string group = $"{newRowElement.Group}" +
-                $"_{newRowElement.Name}" +
-                $"_{newRowElement.Mark}" +
-                $"_{newRowElement.Maker}" +
-                $"_{newRowElement.Code}";
-
-            SharedParam numberParam;
-            if(_doc.IsExistsParam(SharedParamsConfig.Instance.VISSpecNumbersCurrency)) {
-                numberParam = SharedParamsConfig.Instance.VISSpecNumbersCurrency;
-            } else {
-                numberParam = SharedParamsConfig.Instance.VISSpecNumbers;
-            }
-
-            void SetUnmodelingValue(FamilyInstance instance, SharedParam sharedParam, object? value) {
-                if(value is null) {
-                    return;
-                }
-
-                switch(value) {
-                    case string s:
-                        instance.SetParamValue(sharedParam, s);
-                        break;
-
-                    case double d:
-                        instance.SetParamValue(sharedParam, d);
-                        break;
-
-                    default:
-                        throw new NotSupportedException($"Тип {value.GetType().Name} не поддерживается");
-                }
-            }
-
-            SetUnmodelingValue(familyInstance, SharedParamsConfig.Instance.VISSystemName, newRowElement.System);
-            SetUnmodelingValue(familyInstance, SharedParamsConfig.Instance.VISGrouping, group);
-            SetUnmodelingValue(familyInstance, SharedParamsConfig.Instance.VISCombinedName, newRowElement.Name);
-            SetUnmodelingValue(familyInstance, SharedParamsConfig.Instance.VISMarkNumber, newRowElement.Mark);
-            SetUnmodelingValue(familyInstance, SharedParamsConfig.Instance.VISItemCode, newRowElement.Code);
-            SetUnmodelingValue(familyInstance, SharedParamsConfig.Instance.VISManufacturer, newRowElement.Maker);
-            SetUnmodelingValue(familyInstance, SharedParamsConfig.Instance.VISUnit, newRowElement.Unit);
-            SetUnmodelingValue(familyInstance, numberParam, newRowElement.Number);
-            SetUnmodelingValue(familyInstance, SharedParamsConfig.Instance.VISMass, newRowElement.Mass);
-            SetUnmodelingValue(familyInstance, SharedParamsConfig.Instance.VISNote, newRowElement.Note);
-            SetUnmodelingValue(familyInstance, SharedParamsConfig.Instance.EconomicFunction, newRowElement.Function);
-            SetUnmodelingValue(familyInstance, SharedParamsConfig.Instance.BuildingWorksBlock, newRowElement.SmrBlock);
-            SetUnmodelingValue(familyInstance, SharedParamsConfig.Instance.BuildingWorksSection, newRowElement.SmrSection);
-            SetUnmodelingValue(familyInstance, SharedParamsConfig.Instance.BuildingWorksLevel, newRowElement.SmrFloor);
-            SetUnmodelingValue(
-                familyInstance,
-                SharedParamsConfig.Instance.BuildingWorksLevelCurrency,
-                newRowElement.SmrFloorDE);
-        }
-
-        // Создание FamilyInstance должно выполняться в транзакции.
-        if(_doc.IsModifiable) {
-            CreateAndFill();
+        SharedParam numberParam;
+        if(_doc.IsExistsParam(SharedParamsConfig.Instance.VISSpecNumbersCurrency)) {
+            numberParam = SharedParamsConfig.Instance.VISSpecNumbersCurrency;
         } else {
-            using(var t = _doc.StartTransaction("Создание немоделируемого элемента")) {
-                CreateAndFill();
-                t.Commit();
+            numberParam = SharedParamsConfig.Instance.VISSpecNumbers;
+        }
+
+        Parameter descriptionParam = familyInstance.GetParam(SharedParamsConfig.Instance.Description);
+
+        void SetUnmodelingValue(FamilyInstance familyInstance, SharedParam sharedParam, object? value) {
+            if(value is null)
+                return;
+
+            switch(value) {
+                case string s:
+                    familyInstance.SetParamValue(sharedParam, s);
+                    break;
+
+                case double d:
+                    familyInstance.SetParamValue(sharedParam, d);
+                    break;
+
+                default:
+                    throw new NotSupportedException(
+                        $"Тип {value.GetType().Name} не поддерживается");
             }
         }
 
+        SetUnmodelingValue(familyInstance, SharedParamsConfig.Instance.VISSystemName, newRowElement.System);
+        SetUnmodelingValue(familyInstance, SharedParamsConfig.Instance.VISGrouping, group);
+        SetUnmodelingValue(familyInstance, SharedParamsConfig.Instance.VISCombinedName, newRowElement.Name);
+        SetUnmodelingValue(familyInstance, SharedParamsConfig.Instance.VISMarkNumber, newRowElement.Mark);
+        SetUnmodelingValue(familyInstance, SharedParamsConfig.Instance.VISItemCode, newRowElement.Code);
+        SetUnmodelingValue(familyInstance, SharedParamsConfig.Instance.VISManufacturer, newRowElement.Maker);
+        SetUnmodelingValue(familyInstance, SharedParamsConfig.Instance.VISUnit, newRowElement.Unit);
+        SetUnmodelingValue(familyInstance, numberParam, newRowElement.Number);
+        SetUnmodelingValue(familyInstance, SharedParamsConfig.Instance.VISMass, newRowElement.Mass);
+        SetUnmodelingValue(familyInstance, SharedParamsConfig.Instance.VISNote, newRowElement.Note);
+        SetUnmodelingValue(familyInstance, SharedParamsConfig.Instance.EconomicFunction, newRowElement.Function);
+        SetUnmodelingValue(familyInstance, SharedParamsConfig.Instance.BuildingWorksBlock, newRowElement.SmrBlock);
+        SetUnmodelingValue(familyInstance, SharedParamsConfig.Instance.BuildingWorksSection, newRowElement.SmrSection);
+        SetUnmodelingValue(familyInstance, SharedParamsConfig.Instance.BuildingWorksLevel, newRowElement.SmrFloor);
+        SetUnmodelingValue(familyInstance,
+            SharedParamsConfig.Instance.BuildingWorksLevelCurrency,
+            newRowElement.SmrFloorDE);
+        SetUnmodelingValue(familyInstance, SharedParamsConfig.Instance.Description, _conumableDescription);
     }
 
-    private void EnsureSymbolActive(FamilySymbol symbol) {
-        if(symbol.IsActive) {
-            return;
-        }
-
-        // FamilySymbol.Activate() должен вызываться в транзакции.
-        if(_doc.IsModifiable) {
-            symbol.Activate();
-            _doc.Regenerate();
-            return;
-        }
-
-        using(var t = _doc.StartTransaction("Активация типа семейства")) {
-            symbol.Activate();
-            _doc.Regenerate();
-            t.Commit();
-        }
-    }
 
     private FamilySymbol GetFamilySymbol() {
         FamilySymbol? symbol = FindFamilySymbol(_familyName);
