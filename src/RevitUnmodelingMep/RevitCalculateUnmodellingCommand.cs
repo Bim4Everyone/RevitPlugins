@@ -51,6 +51,14 @@ namespace RevitUnmodelingMep {
                 .ToSelf()
                 .InSingletonScope();
 
+            kernel.Bind<UnmodelingCreator>()
+                .ToSelf()
+                .InSingletonScope();
+
+            kernel.Bind<UnmodelingCalculator>()
+                .ToSelf()
+                .InSingletonScope();
+
             // Настройка конфигурации плагина
             kernel.Bind<PluginConfig>()
                 .ToMethod(c => PluginConfig.GetPluginConfig(c.Kernel.Get<IConfigSerializer>()));

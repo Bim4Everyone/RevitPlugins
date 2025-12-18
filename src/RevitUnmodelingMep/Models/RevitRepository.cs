@@ -10,6 +10,8 @@ using Autodesk.Revit.UI;
 using dosymep.Bim4Everyone.SharedParams;
 using dosymep.Revit;
 
+using Newtonsoft.Json.Linq;
+
 using Wpf.Ui.Controls;
 
 using Application = Autodesk.Revit.ApplicationServices.Application;
@@ -24,22 +26,28 @@ namespace RevitUnmodelingMep.Models;
 /// </remarks>
 internal class RevitRepository {
     public SettingsUpdater SettingsUpdaterWorker { get; set; }
-    public UnmodelingProcessor Processor { get; set; }
+    public UnmodelingCreator Creator { get; set; }
     public Document Doc { get; set; }
     /// <summary>
     /// Создает экземпляр репозитория.
     /// </summary>
     /// <param name="u  iApplication">Класс доступа к интерфейсу Revit.</param>
-    public RevitRepository(UIApplication uiApplication, SettingsUpdater settingsUpdaterWorker, Document document, UnmodelingProcessor unmodelingProcessor) {
+    public RevitRepository(UIApplication uiApplication, 
+        SettingsUpdater settingsUpdaterWorker, 
+        Document document, 
+        UnmodelingCreator unmodelingCreator) {
         UIApplication = uiApplication;
         SettingsUpdaterWorker = settingsUpdaterWorker;
-        Processor = unmodelingProcessor;
+        Creator = unmodelingCreator;
         
         Doc = document;
 
         SettingsUpdaterWorker.PrepareSettings();
-        Processor.StartupChecks();
-        
+        Creator.StartupChecks();
+        Creator.DeleteAllUnmodeling();
+
+        JObject unmodelingSettings = settingsUpdaterWorker.GetUnmodelingConfig();
+
     }
 
     public List<Element> GetElementsByCategory(BuiltInCategory category) {

@@ -25,7 +25,7 @@ using RevitUnmodelingMep.Models.Entities;
 #nullable enable
 namespace RevitUnmodelingMep.Models;
 
-internal class UnmodelingProcessor {
+internal class UnmodelingCreator {
     private const string _familyName = "_Якорный элемент";
     private const string _emptyDescription = "Пустая строка";
     private const string _conumableDescription = "Временная заглушка";
@@ -39,7 +39,7 @@ internal class UnmodelingProcessor {
     private const double _coordinateStep = 0.001;
     private double _maxLocationY = 0;
 
-    public UnmodelingProcessor(Document doc) {
+    public UnmodelingCreator(Document doc) {
         _doc = doc;
         _libDir = GetLibFolder();
     }
@@ -169,11 +169,8 @@ internal class UnmodelingProcessor {
 
         if(_ws_id is null)
             throw new InvalidOperationException("Рабочий набор немоделируемых не инициализирован");
-#if REVIT_2024_OR_GREATER
-        instWorkset.Set(_ws_id.Value);
-#else
         instWorkset.Set(_ws_id.IntegerValue);
-#endif
+
         string group = $"{newRowElement.Group}" +
             $"_{newRowElement.Name}" +
             $"_{newRowElement.Mark}" +
