@@ -47,7 +47,7 @@ namespace RevitUnmodelingMep {
                 .ToMethod(ctx => ctx.Kernel.Get<UIApplication>().ActiveUIDocument.Document)
                 .InSingletonScope();
 
-            kernel.Bind<SettingsUpdater>()
+            kernel.Bind<VisSettingsStorage>()
                 .ToSelf()
                 .InSingletonScope();
 

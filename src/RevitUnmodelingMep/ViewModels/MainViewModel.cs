@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
-using System.Text.RegularExpressions;
 using System.Windows.Input;
 
 using dosymep.SimpleServices;
@@ -19,8 +18,6 @@ namespace RevitUnmodelingMep.ViewModels;
 
 
 internal class MainViewModel : BaseViewModel {
-    private const string _unmodelingConfigKey = "UNMODELING_CONFIG";
-
     private readonly PluginConfig _pluginConfig;
     private readonly RevitRepository _revitRepository;
     private readonly ILocalizationService _localizationService;
@@ -160,32 +157,19 @@ internal class MainViewModel : BaseViewModel {
     }
 
     private void LoadUnmodelingConfigs() {
-        JObject settings = _revitRepository.SettingsUpdaterWorker.GetUnmodelingConfig();
-        IEnumerable<ConsumableTypeItem> consumableTypes = GetConsumableItems(settings);
+        IReadOnlyList<ConsumableTypeItem> consumableTypes =
+            UnmodelingConfigReader.LoadUnmodelingConfigs(
+                _revitRepository.VisSettingsStorage,
+                ResolveCategoryOption,
+                out _lastConfigIndex);
+
         ConsumableTypes = new ObservableCollection<ConsumableTypeItem>(consumableTypes);
-    }
-
-    private IEnumerable<ConsumableTypeItem> GetConsumableItems(JObject settings) {
-        _lastConfigIndex = 0;
-        if(settings == null) {
-            yield break;
-        }
-
-        if(settings.TryGetValue(_unmodelingConfigKey, out JToken configToken)
-           && configToken is JObject configObj) {
-            foreach(JProperty property in configObj.Properties()) {
-                UpdateConfigIndex(property.Name);
-                ConsumableTypeItem item = ConsumableTypeItem.FromConfig(property);
-                item.SelectedCategory = ResolveCategoryOption(item.CategoryId);
-                yield return item;
-            }
-        }
     }
 
     private void SaveUnmodelingConfigs() {
         JObject configs = BuildUnmodelingConfigs();
-        _revitRepository.SettingsUpdaterWorker.SetSettingValue(
-            new List<string> { _unmodelingConfigKey },
+        _revitRepository.VisSettingsStorage.SetSettingValue(
+            new List<string> { UnmodelingConfigReader.UnmodelingConfigKey },
             configs);
     }
 
@@ -251,13 +235,6 @@ internal class MainViewModel : BaseViewModel {
         }
 
         CategoryAssignments = assignments;
-    }
-
-    private void UpdateConfigIndex(string configKey) {
-        Match match = Regex.Match(configKey ?? string.Empty, @"config_(\d+)", RegexOptions.IgnoreCase);
-        if(match.Success && int.TryParse(match.Groups[1].Value, out int value) && value > _lastConfigIndex) {
-            _lastConfigIndex = value;
-        }
     }
 
     private SystemTypeItem CreateSystemTypeItem(ElementType elementType, List<ConsumableTypeItem> configs) {

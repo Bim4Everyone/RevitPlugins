@@ -19,10 +19,10 @@ using Wpf.Ui.Controls;
 
 namespace RevitUnmodelingMep.Models; 
 
-internal class SettingsUpdater {
+internal class VisSettingsStorage {
     private readonly Document _doc;
 
-    public SettingsUpdater(Document doc) {
+    public VisSettingsStorage(Document doc) {
         _doc = doc;
     }
 

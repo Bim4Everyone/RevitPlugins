@@ -25,7 +25,7 @@ namespace RevitUnmodelingMep.Models;
 /// В случае если данный класс разрастается, рекомендуется его разделить на несколько.
 /// </remarks>
 internal class RevitRepository {
-    public SettingsUpdater SettingsUpdaterWorker { get; set; }
+    public VisSettingsStorage VisSettingsStorage { get; set; }
     public UnmodelingCreator Creator { get; set; }
     public Document Doc { get; set; }
     /// <summary>
@@ -33,16 +33,16 @@ internal class RevitRepository {
     /// </summary>
     /// <param name="u  iApplication">Класс доступа к интерфейсу Revit.</param>
     public RevitRepository(UIApplication uiApplication, 
-        SettingsUpdater settingsUpdaterWorker, 
+        VisSettingsStorage settingsUpdaterWorker, 
         Document document, 
         UnmodelingCreator unmodelingCreator) {
         UIApplication = uiApplication;
-        SettingsUpdaterWorker = settingsUpdaterWorker;
+        VisSettingsStorage = settingsUpdaterWorker;
         Creator = unmodelingCreator;
         
         Doc = document;
 
-        SettingsUpdaterWorker.PrepareSettings();
+        VisSettingsStorage.PrepareSettings();
         Creator.StartupChecks();
         Creator.DeleteAllUnmodeling();
 
