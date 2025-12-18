@@ -12,6 +12,8 @@ using dosymep.Revit;
 
 using Newtonsoft.Json.Linq;
 
+using RevitUnmodelingMep.Models.Entities;
+
 using Wpf.Ui.Controls;
 
 using Application = Autodesk.Revit.ApplicationServices.Application;
@@ -28,6 +30,7 @@ internal class RevitRepository {
     public VisSettingsStorage VisSettingsStorage { get; set; }
     public UnmodelingCreator Creator { get; set; }
     public Document Doc { get; set; }
+
     /// <summary>
     /// Создает экземпляр репозитория.
     /// </summary>
@@ -44,7 +47,7 @@ internal class RevitRepository {
 
         VisSettingsStorage.PrepareSettings();
         Creator.StartupChecks();
-        Creator.DeleteAllUnmodeling();
+        
 
         JObject unmodelingSettings = settingsUpdaterWorker.GetUnmodelingConfig();
 
@@ -59,7 +62,29 @@ internal class RevitRepository {
     }
 
     public void CalculateUnmodeling() {
-        System.Windows.MessageBox.Show("Test");
+        int lastIndex;
+        var configs = UnmodelingConfigReader.LoadUnmodelingConfigs(
+            VisSettingsStorage,
+            resolveCategoryOption: null,
+            out lastIndex);
+
+        using(var t = Doc.StartTransaction("Расчет расходников")) {
+            Creator.RemoveUnmodeling();
+
+            if(!Creator.Symbol.IsActive) {
+                Creator.Symbol.Activate();
+                Doc.Regenerate();
+            }
+
+            foreach(var config in configs) {
+                NewRowElement newRowElement = new NewRowElement();
+                newRowElement.Name = config.Name;
+                newRowElement.Number = 1;
+                Creator.CreateNewPosition(newRowElement);
+            }
+
+            t.Commit();
+        }
     }
 
     /// <summary>
