@@ -30,6 +30,7 @@ internal class RevitRepository {
     public VisSettingsStorage VisSettingsStorage { get; set; }
     public UnmodelingCreator Creator { get; set; }
     public Document Doc { get; set; }
+    public UnmodelingCalculator Calculator { get; set; }
 
     /// <summary>
     /// Создает экземпляр репозитория.
@@ -38,11 +39,12 @@ internal class RevitRepository {
     public RevitRepository(UIApplication uiApplication, 
         VisSettingsStorage settingsUpdaterWorker, 
         Document document, 
-        UnmodelingCreator unmodelingCreator) {
+        UnmodelingCreator unmodelingCreator,
+        UnmodelingCalculator unmodelingCalculator) {
         UIApplication = uiApplication;
         VisSettingsStorage = settingsUpdaterWorker;
         Creator = unmodelingCreator;
-        
+        Calculator = unmodelingCalculator;
         Doc = document;
 
         VisSettingsStorage.PrepareSettings();
@@ -51,14 +53,6 @@ internal class RevitRepository {
 
         JObject unmodelingSettings = settingsUpdaterWorker.GetUnmodelingConfig();
 
-    }
-
-    public List<Element> GetElementsByCategory(BuiltInCategory category) {
-        return new FilteredElementCollector(Doc)
-            .OfCategory(category)
-            .WhereElementIsElementType()
-            .ToElements()
-            .ToList();
     }
 
     public void CalculateUnmodeling() {
@@ -77,10 +71,10 @@ internal class RevitRepository {
             }
 
             foreach(var config in configs) {
-                NewRowElement newRowElement = new NewRowElement();
-                newRowElement.Name = config.Name;
-                newRowElement.Number = 1;
-                Creator.CreateNewPosition(newRowElement);
+                List <NewRowElement> newRowElements = Calculator.GetElementsToGenerate(config);
+                foreach(var newRowElement in newRowElements) {
+                    Creator.CreateNewPosition(newRowElement);
+                }
             }
 
             t.Commit();

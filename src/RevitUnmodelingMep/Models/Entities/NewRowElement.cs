@@ -4,9 +4,12 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
+using Autodesk.Revit.DB;
+
 namespace RevitUnmodelingMep.Models.Entities;
 
 internal class NewRowElement {
+    private Element _element;
     private string _system;
     private string _function;
     private string _group;
@@ -102,5 +105,9 @@ internal class NewRowElement {
     public string SmrFloorDE {
         get => _smrFloorDE;
         set => _smrFloorDE = value;
+    }
+    public Element Element { 
+        get => _element; 
+        set => _element = value; 
     }
 }

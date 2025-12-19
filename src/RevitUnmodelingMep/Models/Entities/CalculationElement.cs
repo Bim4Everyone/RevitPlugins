@@ -9,14 +9,19 @@ using Autodesk.Revit.DB;
 namespace RevitUnmodelingMep.Models.Entities;
 
 internal class CalculationElement {
+    private string _formula;
     private bool _isRound;
     private bool _isInsulated;
     private double _insulationThikness;
     private double _length;
-    private double _diameter;
+    private double _outDiameter;
+    private double _perimeter;
+    private double _inDiameter;
     private double _width;
     private double _height;
     private Element _element;
+
+    
 
     public bool IsRound {
         get { return _isRound; }
@@ -39,8 +44,8 @@ internal class CalculationElement {
     }
 
     public double Diameter {
-        get { return _diameter; }
-        set { _diameter = value; }
+        get { return _outDiameter; }
+        set { _outDiameter = value; }
     }
 
     public double Width {
@@ -56,5 +61,20 @@ internal class CalculationElement {
     public Element Element {
         get { return _element; }
         set { _element = value; }
+    }
+
+    public string Formula { 
+        get => _formula; 
+        set => _formula = value; 
+    }
+
+    public double Perimeter { 
+        get => _perimeter; 
+        set => _perimeter = value; 
+    }
+
+    public double InDiameter { 
+        get => _inDiameter; 
+        set => _inDiameter = value; 
     }
 }
