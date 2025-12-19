@@ -130,7 +130,7 @@ internal class MainViewModel : BaseViewModel {
 
         ConsumableTypes.Add(new ConsumableTypeItem {
             Title = $"Config {index}",
-            Name = configKey,
+            ConsumableTypeName = configKey,
             ConfigKey = configKey,
             RawConfig = new JObject(),
             AssignedElementIds = new JArray(),

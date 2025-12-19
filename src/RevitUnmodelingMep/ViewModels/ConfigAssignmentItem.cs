@@ -18,7 +18,7 @@ internal class ConfigAssignmentItem : BaseViewModel {
         _isChecked = HasAssignment(config, systemTypeId);
     }
 
-    public string Name => _config?.Name;
+    public string Name => _config?.ConsumableTypeName;
 
     public bool IsChecked {
         get => _isChecked;

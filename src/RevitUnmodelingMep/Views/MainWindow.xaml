@@ -169,7 +169,7 @@
                                                                 <TextBlock
                                                                     Margin="0 0 8 0"
                                                                     VerticalAlignment="Center"
-                                                                    Text="{Binding Name}" />
+                                                                    Text="{Binding ConsumableTypeName}" />
 
                                                                 <ui:Button
                                                                     Grid.Column="1"
@@ -189,8 +189,8 @@
                                                             <TextBlock
                                                                 Style="{StaticResource FieldLabel}"
                                                                 Text="Название расходника" />
-                                                            <ui:TextBox
-                                                                Text="{Binding Name, UpdateSourceTrigger=PropertyChanged}" />
+                                                                <ui:TextBox
+                                                                    Text="{Binding ConsumableTypeName, UpdateSourceTrigger=PropertyChanged}" />
 
                                                             <TextBlock
                                                                 Style="{StaticResource FieldLabel}"
@@ -211,14 +211,14 @@
                                                             <TextBlock
                                                                 Style="{StaticResource FieldLabel}"
                                                                 Text="Полное наименование" />
-                                                            <ui:TextBox
-                                                                Text="{Binding Naming, UpdateSourceTrigger=PropertyChanged}" />
+                                                                <ui:TextBox
+                                                                    Text="{Binding Name, UpdateSourceTrigger=PropertyChanged}" />
 
                                                             <TextBlock
                                                                 Style="{StaticResource FieldLabel}"
                                                                 Text="Марка" />
-                                                            <ui:TextBox
-                                                                Text="{Binding Brand, UpdateSourceTrigger=PropertyChanged}" />
+                                                                <ui:TextBox
+                                                                    Text="{Binding Mark, UpdateSourceTrigger=PropertyChanged}" />
 
                                                             <TextBlock
                                                                 Style="{StaticResource FieldLabel}"
@@ -235,26 +235,26 @@
                                                             <TextBlock
                                                                 Style="{StaticResource FieldLabel}"
                                                                 Text="Производитель" />
-                                                            <ui:TextBox
-                                                                Text="{Binding Factory, UpdateSourceTrigger=PropertyChanged}" />
+                                                                <ui:TextBox
+                                                                    Text="{Binding Maker, UpdateSourceTrigger=PropertyChanged}" />
 
                                                             <TextBlock
                                                                 Style="{StaticResource FieldLabel}"
                                                                 Text="Формула количества (Double, без префикса Value = )" />
-                                                            <ui:TextBox
-                                                                AcceptsReturn="True"
-                                                                Height="90"
-                                                                TextWrapping="Wrap"
-                                                                Text="{Binding NumberFormula, UpdateSourceTrigger=PropertyChanged}" />
+                                                                <ui:TextBox
+                                                                    AcceptsReturn="True"
+                                                                    Height="90"
+                                                                    TextWrapping="Wrap"
+                                                                    Text="{Binding Formula, UpdateSourceTrigger=PropertyChanged}" />
 
                                                             <TextBlock
                                                                 Style="{StaticResource FieldLabel}"
                                                                 Text="Формат примечания (Str)" />
-                                                            <ui:TextBox
-                                                                AcceptsReturn="True"
-                                                                Height="60"
-                                                                TextWrapping="Wrap"
-                                                                Text="{Binding NoteFormat, UpdateSourceTrigger=PropertyChanged}" />
+                                                                <ui:TextBox
+                                                                    AcceptsReturn="True"
+                                                                    Height="60"
+                                                                    TextWrapping="Wrap"
+                                                                    Text="{Binding Note, UpdateSourceTrigger=PropertyChanged}" />
 
                                                             <!-- Р­РјР°Р»СЊ Рё Р“СЂСѓРЅС‚РѕРІРєР° СѓР±СЂР°РЅС‹ РїРѕ Р·Р°РїСЂРѕСЃСѓ -->
                                                         </StackPanel>
@@ -377,5 +377,4 @@
         </Grid>
     </Grid>
 </core:WpfUIPlatformWindow>
-
 

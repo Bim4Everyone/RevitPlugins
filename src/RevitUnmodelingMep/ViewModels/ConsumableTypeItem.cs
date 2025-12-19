@@ -7,17 +7,15 @@ namespace RevitUnmodelingMep.ViewModels;
 internal class ConsumableTypeItem : BaseViewModel {
     private string _title;
     private string _selectedType;
-    private string _name;
+    private string _consumableTypeName;
     private string _grouping;
-    private string _naming;
-    private string _brand;
+    private string _name;
+    private string _mark;
     private string _code;
     private string _unit;
-    private string _factory;
-    private string _numberFormula;
-    private string _noteFormat;
-    private string _enamel;
-    private string _primer;
+    private string _maker;
+    private string _formula;
+    private string _note;
     private CategoryOption _selectedCategory;
 
     public string Title {
@@ -32,9 +30,9 @@ internal class ConsumableTypeItem : BaseViewModel {
         set => RaiseAndSetIfChanged(ref _selectedType, value);
     }
 
-    public string Name {
-        get => _name;
-        set => RaiseAndSetIfChanged(ref _name, value);
+    public string ConsumableTypeName {
+        get => _consumableTypeName;
+        set => RaiseAndSetIfChanged(ref _consumableTypeName, value);
     }
 
     public string CategoryId { get; set; }
@@ -44,14 +42,14 @@ internal class ConsumableTypeItem : BaseViewModel {
         set => RaiseAndSetIfChanged(ref _grouping, value);
     }
 
-    public string Naming {
-        get => _naming;
-        set => RaiseAndSetIfChanged(ref _naming, value);
+    public string Name {
+        get => _name;
+        set => RaiseAndSetIfChanged(ref _name, value);
     }
 
-    public string Brand {
-        get => _brand;
-        set => RaiseAndSetIfChanged(ref _brand, value);
+    public string Mark {
+        get => _mark;
+        set => RaiseAndSetIfChanged(ref _mark, value);
     }
 
     public string Code {
@@ -64,29 +62,19 @@ internal class ConsumableTypeItem : BaseViewModel {
         set => RaiseAndSetIfChanged(ref _unit, value);
     }
 
-    public string Factory {
-        get => _factory;
-        set => RaiseAndSetIfChanged(ref _factory, value);
+    public string Maker {
+        get => _maker;
+        set => RaiseAndSetIfChanged(ref _maker, value);
     }
 
-    public string NumberFormula {
-        get => _numberFormula;
-        set => RaiseAndSetIfChanged(ref _numberFormula, value);
+    public string Formula {
+        get => _formula;
+        set => RaiseAndSetIfChanged(ref _formula, value);
     }
 
-    public string NoteFormat {
-        get => _noteFormat;
-        set => RaiseAndSetIfChanged(ref _noteFormat, value);
-    }
-
-    public string Enamel {
-        get => _enamel;
-        set => RaiseAndSetIfChanged(ref _enamel, value);
-    }
-
-    public string Primer {
-        get => _primer;
-        set => RaiseAndSetIfChanged(ref _primer, value);
+    public string Note {
+        get => _note;
+        set => RaiseAndSetIfChanged(ref _note, value);
     }
 
     public CategoryOption SelectedCategory {
@@ -109,16 +97,16 @@ internal class ConsumableTypeItem : BaseViewModel {
         return new ConsumableTypeItem {
             ConfigKey = configProperty.Name,
             Title = (string) value["CONFIG_NAME"],
-            Name = (string) value["CONFIG_NAME"],
-            Naming = (string) value["NAME"],
+            ConsumableTypeName = (string) value["CONFIG_NAME"],
+            Name = (string) value["NAME"],
             CategoryId = (string) value["CATEGORY"],
             Grouping = (string) value["GROUP"],
-            Brand = (string) value["MARK"],
+            Mark = (string) value["MARK"],
             Code = (string) value["CODE"],
             Unit = (string) value["UNIT"],
-            Factory = (string) value["CREATOR"],
-            NumberFormula = (string) value["VALUE_FORMULA"],
-            NoteFormat = (string) value["NOTE_FORMAT"],
+            Maker = (string) value["CREATOR"],
+            Formula = (string) value["VALUE_FORMULA"],
+            Note = (string) value["NOTE_FORMAT"],
             AssignedElementIds = new JArray(assignedIds),
             RawConfig = clonedValue
         };
@@ -129,16 +117,16 @@ internal class ConsumableTypeItem : BaseViewModel {
             ? (JObject) RawConfig.DeepClone()
             : new JObject();
 
-        result["CONFIG_NAME"] = Name ?? string.Empty;
-        result["NAME"] = Naming ?? string.Empty;
+        result["CONFIG_NAME"] = ConsumableTypeName ?? string.Empty;
+        result["NAME"] = Name ?? string.Empty;
         result["CATEGORY"] = CategoryId ?? string.Empty;
         result["GROUP"] = Grouping ?? string.Empty;
-        result["MARK"] = Brand ?? string.Empty;
+        result["MARK"] = Mark ?? string.Empty;
         result["CODE"] = Code ?? string.Empty;
         result["UNIT"] = Unit ?? string.Empty;
-        result["CREATOR"] = Factory ?? string.Empty;
-        result["VALUE_FORMULA"] = NumberFormula ?? string.Empty;
-        result["NOTE_FORMAT"] = NoteFormat ?? string.Empty;
+        result["CREATOR"] = Maker ?? string.Empty;
+        result["VALUE_FORMULA"] = Formula ?? string.Empty;
+        result["NOTE_FORMAT"] = Note ?? string.Empty;
         result["ASSIGNED_ELEMENT_IDS"] = AssignedElementIds ?? new JArray();
 
         return result;

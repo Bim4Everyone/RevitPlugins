@@ -232,7 +232,7 @@ internal class UnmodelingCreator {
         SetUnmodelingValue(familyInstance, SharedParamsConfig.Instance.BuildingWorksLevel, newRowElement.SmrFloor);
         SetUnmodelingValue(familyInstance,
             SharedParamsConfig.Instance.BuildingWorksLevelCurrency,
-            newRowElement.SmrFloorDE);
+            newRowElement.SmrFloorCurrency);
         SetUnmodelingValue(familyInstance, SharedParamsConfig.Instance.Description, _conumableDescription);
     }
 

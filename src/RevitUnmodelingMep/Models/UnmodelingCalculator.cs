@@ -71,10 +71,10 @@ internal class UnmodelingCalculator {
                     element.GetParamValueOrDefault<string>(SharedParamsConfig.Instance.EconomicFunction, "");
                 string system =
                     element.GetParamValueOrDefault<string>(SharedParamsConfig.Instance.VISSystemName, "");
-                string name = config.Naming;
-                string mark = config.Brand;
+                string name = config.Name;
+                string mark = config.Mark;
                 string code = config.Code;
-                string maker = config.Factory;
+                string maker = config.Maker;
                 string unit = config.Unit;
 
                 string group = $"{config.Grouping}_{name}_{mark}_{code}_{maker}";
@@ -85,7 +85,7 @@ internal class UnmodelingCalculator {
                     SmrBlock = smrBlock,
                     SmrSection = smrSection,
                     SmrFloor = smrFloor,
-                    SmrFloorDE = smrFloorCurrnecy,
+                    SmrFloorCurrency = smrFloorCurrnecy,
                     Name = name,
                     Code = code,
                     Mark = mark,
@@ -115,7 +115,7 @@ internal class UnmodelingCalculator {
 
         foreach(NewRowElement draftRow in draftRows) {
             CalculationElement calcElement = GetGeometricDescription(draftRow.Element, config);
-            draftRow.Number = CalculateFormula(config.NumberFormula, calcElement);
+            draftRow.Number = CalculateFormula(config.Formula, calcElement);
         }
 
         NewRowElement baseRow = draftRows.First();
@@ -127,7 +127,7 @@ internal class UnmodelingCalculator {
             SmrBlock = baseRow.SmrBlock,
             SmrSection = baseRow.SmrSection,
             SmrFloor = baseRow.SmrFloor,
-            SmrFloorDE = baseRow.SmrFloorDE,
+            SmrFloorCurrency = baseRow.SmrFloorCurrency,
             Name = baseRow.Name,
             Code = baseRow.Code,
             Mark = baseRow.Mark,
@@ -145,7 +145,7 @@ internal class UnmodelingCalculator {
     private CalculationElement GetGeometricDescription(Element element, ConsumableTypeItem config) {
         CalculationElement calcElement = new CalculationElement();
 
-        calcElement.Formula = config.NumberFormula;
+        calcElement.Formula = config.Formula;
         calcElement.Element = element;
 
         return new CalculationElement();

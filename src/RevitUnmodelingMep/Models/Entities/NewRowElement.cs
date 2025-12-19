@@ -102,7 +102,7 @@ internal class NewRowElement {
         set => _smrFloor = value;
     }
 
-    public string SmrFloorDE {
+    public string SmrFloorCurrency {
         get => _smrFloorDE;
         set => _smrFloorDE = value;
     }
