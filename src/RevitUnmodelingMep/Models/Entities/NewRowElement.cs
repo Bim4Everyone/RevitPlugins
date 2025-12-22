@@ -26,6 +26,7 @@ internal class NewRowElement {
     private string _smrSection;
     private string _smrFloor;
     private string _smrFloorDE;
+    private List<CalculationElement> _dependentCalculations;
 
     public string System {
         get => _system;
@@ -109,5 +110,9 @@ internal class NewRowElement {
     public Element Element { 
         get => _element; 
         set => _element = value; 
+    }
+    internal List<CalculationElement> DependentCalculations { 
+        get => _dependentCalculations; 
+        set => _dependentCalculations = value; 
     }
 }

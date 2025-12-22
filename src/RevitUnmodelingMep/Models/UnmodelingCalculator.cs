@@ -153,9 +153,12 @@ internal class UnmodelingCalculator {
             return new NewRowElement();
         }
 
+        List<CalculationElement> calculationElements = new List<CalculationElement>();
+
         foreach(NewRowElement draftRow in draftRows) {
             CalculationElement calcElement = GetGeometricDescription(draftRow.Element);
             draftRow.Number = CalculateFormula(config.Formula, calcElement);
+            calculationElements.Add(calcElement);
         }
 
         NewRowElement baseRow = draftRows.First();
@@ -173,13 +176,32 @@ internal class UnmodelingCalculator {
             Mark = baseRow.Mark,
             Maker = baseRow.Maker,
             Unit = baseRow.Unit,
-            Note = baseRow.Note,
             Number = totalNumber,
             System = baseRow.System,
             Function = baseRow.Function,
             Description = baseRow.Description,
-            Mass = baseRow.Mass
+            Mass = baseRow.Mass,
+            Note = CreateNote(config, calculationElements)
         };
+    }
+
+    private string CreateNote(ConsumableTypeItem config, List<CalculationElement> calculationElements) {
+        string noteFormula = config.Note ?? string.Empty;
+        double sumArea = calculationElements.Sum(r => r.Area);
+        double sumLength = calculationElements.Sum(r => r.Length);
+        double count = calculationElements.Count();
+
+        string FormatValue(double value) {
+            double rounded = Math.Round(value, 2);
+            return rounded.ToString("0.##", CultureInfo.InvariantCulture);
+        }
+
+        string result = noteFormula
+            .Replace("{sumArea}", FormatValue(sumArea))
+            .Replace("{sumLength}", FormatValue(sumLength))
+            .Replace("{count}", FormatValue(count));
+
+        return result;
     }
 
     private CalculationElement GetGeometricDescription(Element element) {
