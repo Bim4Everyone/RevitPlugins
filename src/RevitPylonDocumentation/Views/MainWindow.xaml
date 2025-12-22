@@ -38,6 +38,9 @@
                 <ResourceDictionary
                     Source="CustomStyles.xaml" />
             </ResourceDictionary.MergedDictionaries>
+            <SolidColorBrush
+                x:Key="InfoBadgeCriticalSeverityBackgroundBrush"
+                Color="Orange" />
         </ResourceDictionary>
     </Window.Resources>
 
@@ -77,7 +80,14 @@
                             Content="{me:LocalizationSource MainWindow.VerticalViews}"
                             Icon="{ui:SymbolIcon CenterHorizontal24}"
                             TargetPageType="{x:Type pages:VerticalViewSettingsPage}"
-                            ToolTip="{me:LocalizationSource MainWindow.VerticalViewsSettings}"/>
+                            ToolTip="{me:LocalizationSource MainWindow.VerticalViewsSettings}">
+                            <ui:NavigationViewItem.InfoBadge>
+                                <ui:InfoBadge
+                                    Style="{StaticResource RoundInfoBadgeStyle}"
+                                    Visibility="{Binding Path=ViewSectionSettings.HasErrors, 
+                                        Converter={StaticResource BooleanToVisibilityConverter}}" />
+                            </ui:NavigationViewItem.InfoBadge>
+                        </ui:NavigationViewItem>
                         <ui:NavigationViewItem
                             Content="{me:LocalizationSource MainWindow.HorizontalViews}"
                             Icon="{ui:SymbolIcon CenterVertical24}"

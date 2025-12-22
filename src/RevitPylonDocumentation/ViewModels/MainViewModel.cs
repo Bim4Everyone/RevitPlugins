@@ -90,7 +90,6 @@ internal class MainViewModel : BaseViewModel {
         InvertAllFuncInGUICommand = RelayCommand.Create(InvertAllFuncInGUI);
     }
 
-
     public ICommand LoadViewCommand { get; }
     public ICommand AcceptViewCommand { get; }
     public ICommand ApplySettingsCommand { get; }

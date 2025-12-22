@@ -26,7 +26,29 @@
             Source="pack://application:,,,/Wpf.Ui;component/Controls/TextBlock/TextBlock.xaml" />
         <ResourceDictionary
             Source="pack://application:,,,/Wpf.Ui;component/Controls/ScrollViewer/ScrollViewer.xaml" />
+        <ResourceDictionary
+            Source="pack://application:,,,/Wpf.Ui;component/Controls/InfoBadge/InfoBadge.xaml" />
     </ResourceDictionary.MergedDictionaries>
+
+    <Style
+        TargetType="ui:InfoBadge"
+        x:Key="RoundInfoBadgeStyle">
+        <Setter
+            Property="Template">
+            <Setter.Value>
+                <ControlTemplate
+                    TargetType="ui:InfoBadge">
+                    <Grid>
+                        <Ellipse
+                            Fill="Orange"
+                            Margin="10"
+                            Width="15"
+                            Height="15"/>
+                    </Grid>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
 
     <Style
         x:Key="ComboBoxWithTooltipStyle"
@@ -57,6 +79,222 @@
             Property="ToolTipService.BetweenShowDelay"
             Value="1" />
     </Style>
+
+    <Style
+        x:Key="ErrorTextBoxStyle1"
+        TargetType="TextBox"
+        BasedOn="{StaticResource TextBoxWithTooltipStyle}">
+        <Setter
+            Property="Validation.ErrorTemplate">
+            <Setter.Value>
+                <ControlTemplate>
+                    <AdornedElementPlaceholder />
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+
+        <!--<Style.Triggers>
+            <Trigger
+                Property="Validation.HasError"
+                Value="True">
+                <Setter
+                    Property="Background"
+                    Value="{ui:ThemeResource AccentTextFillColorTertiaryBrush}" />
+                
+            </Trigger>
+        </Style.Triggers>-->
+
+        <Style.Triggers>
+            <Trigger
+                Property="Validation.HasError"
+                Value="True">
+                <Setter
+                    Property="BorderBrush"
+                    Value="{ui:ThemeResource AccentTextFillColorTertiaryBrush}" />
+                <Setter
+                    Property="BorderThickness"
+                    Value="3" />
+            </Trigger>
+        </Style.Triggers>
+    </Style>
+    
+    <Style
+        x:Key="ErrorTextBoxStyle3"
+        TargetType="TextBox"
+        BasedOn="{StaticResource TextBoxWithTooltipStyle}">
+        <Setter
+            Property="Validation.ErrorTemplate">
+            <Setter.Value>
+                <ControlTemplate>
+                    <AdornedElementPlaceholder />
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+
+        <Style.Triggers>
+            <Trigger
+                Property="Validation.HasError"
+                Value="True">
+                <Setter
+                    Property="BorderBrush"
+                    Value="Orange" />
+                <Setter
+                    Property="BorderThickness"
+                    Value="1" />
+                <Setter
+                    Property="Background">
+                    <Setter.Value>
+                        <SolidColorBrush
+                            Color="Orange"
+                            Opacity="0.1" />
+                    </Setter.Value>
+                </Setter>
+            </Trigger>
+        </Style.Triggers>
+    </Style>
+
+    <Style
+        x:Key="ErrorTextBoxStyle2"
+        TargetType="TextBox"
+        BasedOn="{StaticResource TextBoxWithTooltipStyle}">
+
+        <Setter
+            Property="Validation.ErrorTemplate">
+            <Setter.Value>
+                <ControlTemplate>
+                    <AdornedElementPlaceholder />
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+
+        <!-- Устанавливаем начальную кисть из темы -->
+        <Setter
+            Property="BorderBrush"
+            Value="{DynamicResource {ui:ThemeResource AccentTextFillColorDisabledBrush}}" />
+
+        <Setter
+            Property="BorderThickness"
+            Value="1" />
+
+        <Style.Triggers>
+            <Trigger
+                Property="Validation.HasError"
+                Value="True">
+
+                <Trigger.EnterActions>
+                    <BeginStoryboard>
+                        <Storyboard
+                            RepeatBehavior="Forever"
+                            AutoReverse="True">
+                            <!-- Используем ObjectAnimationUsingKeyFrames для работы с Brush -->
+                            <ObjectAnimationUsingKeyFrames
+                                Storyboard.TargetProperty="BorderBrush">
+
+                                <DiscreteObjectKeyFrame
+                                    KeyTime="0:0:0">
+                                    <DiscreteObjectKeyFrame.Value>
+                                        <DynamicResource
+                                            ResourceKey="{ui:ThemeResource AccentTextFillColorDisabledBrush}" />
+                                    </DiscreteObjectKeyFrame.Value>
+                                </DiscreteObjectKeyFrame>
+
+                                <DiscreteObjectKeyFrame
+                                    KeyTime="0:0:0.5">
+                                    <DiscreteObjectKeyFrame.Value>
+                                        <DynamicResource
+                                            ResourceKey="{ui:ThemeResource AccentTextFillColorTertiaryBrush}" />
+                                    </DiscreteObjectKeyFrame.Value>
+                                </DiscreteObjectKeyFrame>
+                            </ObjectAnimationUsingKeyFrames>
+
+                            <!-- Анимация толщины для лучшего визуального эффекта -->
+                            <ThicknessAnimation
+                                Storyboard.TargetProperty="BorderThickness"
+                                From="1"
+                                To="2"
+                                Duration="0:0:0.5" />
+                        </Storyboard>
+                    </BeginStoryboard>
+                </Trigger.EnterActions>
+
+                <Trigger.ExitActions>
+                    <BeginStoryboard>
+                        <Storyboard>
+                            <ObjectAnimationUsingKeyFrames
+                                Storyboard.TargetProperty="BorderBrush">
+                                <DiscreteObjectKeyFrame
+                                    KeyTime="0:0:0">
+                                    <DiscreteObjectKeyFrame.Value>
+                                        <DynamicResource
+                                            ResourceKey="{ui:ThemeResource AccentTextFillColorDisabledBrush}" />
+                                    </DiscreteObjectKeyFrame.Value>
+                                </DiscreteObjectKeyFrame>
+                            </ObjectAnimationUsingKeyFrames>
+                            <ThicknessAnimation
+                                Storyboard.TargetProperty="BorderThickness"
+                                To="1"
+                                Duration="0:0:0.2" />
+                        </Storyboard>
+                    </BeginStoryboard>
+                </Trigger.ExitActions>
+
+                <Setter
+                    Property="ToolTip"
+                    Value="{Binding RelativeSource={RelativeSource Self}, 
+                           Path=(Validation.Errors)[0].ErrorContent}" />
+            </Trigger>
+        </Style.Triggers>
+    </Style>
+
+    <Style
+        x:Key="ErrorTextBoxStyle"
+        TargetType="TextBox"
+        BasedOn="{StaticResource TextBoxWithTooltipStyle}">
+
+        <!-- Отключаем стандартный ErrorTemplate -->
+        <Setter
+            Property="Validation.ErrorTemplate">
+            <Setter.Value>
+                <ControlTemplate>
+                    <AdornedElementPlaceholder />
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+
+        <Style.Triggers>
+            <Trigger
+                Property="Validation.HasError"
+                Value="True">
+
+                <Trigger.EnterActions>
+                    <BeginStoryboard>
+                        <Storyboard
+                            RepeatBehavior="Forever"
+                            AutoReverse="True">
+                            <ThicknessAnimation
+                                Storyboard.TargetProperty="BorderThickness"
+                                From="1"
+                                To="3"
+                                Duration="0:0:0.5" />
+                        </Storyboard>
+                    </BeginStoryboard>
+                </Trigger.EnterActions>
+
+                <Trigger.ExitActions>
+                    <BeginStoryboard>
+                        <Storyboard>
+                            <ThicknessAnimation
+                                Storyboard.TargetProperty="BorderThickness"
+                                To="1"
+                                Duration="0:0:0.3" />
+                        </Storyboard>
+                    </BeginStoryboard>
+                </Trigger.ExitActions>
+            </Trigger>
+        </Style.Triggers>
+    </Style>
+
+
 
     <Style x:Key="CustomTextBlock"
         TargetType="ui:TextBlock" >

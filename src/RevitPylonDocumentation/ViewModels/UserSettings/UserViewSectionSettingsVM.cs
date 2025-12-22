@@ -1,13 +1,13 @@
+using System.ComponentModel.DataAnnotations;
+
 using dosymep.SimpleServices;
-using dosymep.WPF.ViewModels;
 
 using RevitPylonDocumentation.Models.UserSettings;
-using RevitPylonDocumentation.ViewModels;
 
 namespace RevitPylonDocumentation.ViewModels.UserSettings;
-internal class UserViewSectionSettingsVM : BaseViewModel {
+internal class UserViewSectionSettingsVM : ValidatableViewModel {
     private readonly ILocalizationService _localizationService;
-    
+
     private string _generalViewPrefixTemp = "";
     private string _generalViewSuffixTemp = "";
     private string _generalRebarViewPrefixTemp = "Каркас ";
@@ -59,6 +59,50 @@ internal class UserViewSectionSettingsVM : BaseViewModel {
     }
 
     public MainViewModel ViewModel { get; set; }
+
+
+
+
+    private int _age = 1;
+
+    [Range(0, 100)]
+    [Required()]
+    public int Age {
+        get => _age;
+        set {
+            RaiseAndSetIfChanged(ref _age, value);
+            ValidateProperty(value);
+        }
+    }
+
+    private int _height = 2;
+
+    [Range(0, 100)]
+    [Required()]
+    public int Height {
+        get => _height;
+        set {
+            RaiseAndSetIfChanged(ref _height, value);
+            ValidateProperty(value);
+        }
+    }
+
+
+    private int _width = 2;
+
+    [Required]
+    [Range(0, 100)]
+    public int Width {
+        get => _width;
+        set {
+            RaiseAndSetIfChanged(ref _width, value);
+            ValidateProperty(value);
+        }
+    }
+
+
+
+
 
     public string GeneralViewPrefix { get; set; }
     public string GeneralViewPrefixTemp {
