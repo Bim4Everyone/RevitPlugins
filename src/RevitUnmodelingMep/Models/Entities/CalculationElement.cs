@@ -23,7 +23,9 @@ internal class CalculationElement {
     private double _insulationArea;
     private Element _element;
 
-    
+    public CalculationElement(Element element) { 
+        Element = element;
+    }
 
     public bool IsRound {
         get { return _isRound; }
@@ -37,27 +39,27 @@ internal class CalculationElement {
 
     public double InsulationThikness {
         get { return _insulationThikness; }
-        set { _insulationThikness = value; }
+        set { _insulationThikness = UnitUtils.ConvertFromInternalUnits(value, UnitTypeId.Millimeters); }
     }
 
     public double Length {
         get { return _length; }
-        set { _length = value; }
+        set { _length = UnitUtils.ConvertFromInternalUnits(value, UnitTypeId.Millimeters); }
     }
 
     public double Diameter {
         get { return _inDiameter; }
-        set { _inDiameter = value; }
+        set { _inDiameter = UnitUtils.ConvertFromInternalUnits(value, UnitTypeId.Millimeters); }
     }
 
     public double Width {
         get { return _width; }
-        set { _width = value; }
+        set { _width = UnitUtils.ConvertFromInternalUnits(value, UnitTypeId.Millimeters); }
     }
 
     public double Height {
         get { return _height; }
-        set { _height = value; }
+        set { _height = UnitUtils.ConvertFromInternalUnits(value, UnitTypeId.Millimeters); }
     }
 
     public Element Element {
@@ -72,20 +74,20 @@ internal class CalculationElement {
 
     public double Perimeter { 
         get => _perimeter; 
-        set => _perimeter = value; 
+        set => _perimeter = UnitUtils.ConvertFromInternalUnits(value, UnitTypeId.Millimeters); 
     }
 
     public double OutDiameter { 
         get => _outDiameter; 
-        set => _outDiameter = value; 
+        set => _outDiameter = UnitUtils.ConvertFromInternalUnits(value, UnitTypeId.Millimeters); 
     }
     public double Area { 
         get => _area; 
-        set => _area = value; 
+        set => _area = UnitUtils.ConvertFromInternalUnits(value, UnitTypeId.SquareMeters); 
     }
 
     public double InsulationArea {
         get => _insulationArea;
-        set => _insulationArea = value;
+        set => _insulationArea = UnitUtils.ConvertFromInternalUnits(value, UnitTypeId.SquareMeters);
     }
 }

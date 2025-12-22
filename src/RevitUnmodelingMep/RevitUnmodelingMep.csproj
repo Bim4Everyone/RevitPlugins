@@ -4,6 +4,11 @@
         <LangVersion>12</LangVersion>
     </PropertyGroup>
     <ItemGroup>
+	  <PackageReference Include="CodingSeb.ExpressionEvaluator" Version="1.4.41">
+		    <PrivateAssets>all</PrivateAssets>
+		    <ExcludeAssets>runtime</ExcludeAssets>
+	  </PackageReference>	
+	    
       <PackageReference Include="Newtonsoft.Json" Version="13.0.4" />
     </ItemGroup>
 </Project>

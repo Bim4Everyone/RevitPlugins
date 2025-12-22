@@ -1,8 +1,10 @@
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using CodingSeb.ExpressionEvaluator;
 
 using Autodesk.Revit.DB;
 using Autodesk.Revit.DB.Mechanical;
@@ -18,6 +20,7 @@ using Ninject.Activation;
 
 using RevitUnmodelingMep.Models.Entities;
 using RevitUnmodelingMep.ViewModels;
+using System.ComponentModel;
 
 namespace RevitUnmodelingMep.Models;
 
@@ -118,13 +121,13 @@ internal class UnmodelingCalculator {
         }
 
         foreach(NewRowElement draftRow in draftRows) {
-            CalculationElement calcElement = GetGeometricDescription(draftRow.Element, config);
+            CalculationElement calcElement = GetGeometricDescription(draftRow.Element);
             draftRow.Number = CalculateFormula(config.Formula, calcElement);
         }
 
         NewRowElement baseRow = draftRows.First();
         double totalNumber = draftRows.Sum(r => r.Number);
-        Console.WriteLine(baseRow.Name);
+        
         return new NewRowElement {
             Element = baseRow.Element,
             Group = baseRow.Group,
@@ -146,12 +149,7 @@ internal class UnmodelingCalculator {
         };
     }
 
-    private CalculationElement GetGeometricDescription(Element element, ConsumableTypeItem config) {
-        CalculationElement calcElement = new CalculationElement();
-
-        calcElement.Formula = config.Formula;
-        calcElement.Element = element;
-
+    private CalculationElement GetGeometricDescription(Element element) {
         Category category = element.Category;
 
         if(element.Category.IsId(BuiltInCategory.OST_DuctCurves)) {
@@ -167,30 +165,54 @@ internal class UnmodelingCalculator {
             return GetDuctInsGeoDesc((DuctInsulation) element);
         }
         if(element.Category.IsId(BuiltInCategory.OST_DuctSystem)) {
-            return new CalculationElement();
+            return GetSystemDesc(element);
         }
         if(element.Category.IsId(BuiltInCategory.OST_PipingSystem)) {
-            return new CalculationElement();
+            return GetSystemDesc(element);
         }
 
-        return new CalculationElement();
+        throw new InvalidOperationException(
+           $"GetGeometricDescription unexpected element type: (Id {element?.Id})");
     }
 
     private double CalculateFormula(string formula, CalculationElement calElement) {
-        if(formula is null) {
-            throw new ArgumentNullException(nameof(formula));
+        var evaluator = new ExpressionEvaluator();
+
+        StringBuilder logBuilder = new StringBuilder();
+        logBuilder.AppendLine("CalculateFormula variables:");
+        logBuilder.AppendLine($"ElementId: {calElement.Element.Id}");
+        logBuilder.AppendLine($"Formula: {formula}");
+
+        foreach(var property in calElement.GetType().GetProperties()) {
+            if(!property.CanRead) {
+                continue;
+            }
+
+            object value = property.GetValue(calElement);
+            evaluator.Variables[property.Name] = value;
+
+
+            string valueText = value switch {
+                double d => d.ToString(CultureInfo.InvariantCulture),
+                float f => f.ToString(CultureInfo.InvariantCulture),
+                null => "null",
+                _ => value.ToString()
+            };
+            logBuilder.AppendLine($"{property.Name} = {valueText}");
         }
 
-        if(calElement is null) {
-            throw new ArgumentNullException(nameof(calElement));
-        }
+        object result = evaluator.Evaluate(formula);
+        
+        logBuilder.AppendLine($"Result: {result}");
+        Console.WriteLine(logBuilder.ToString());
 
-        return 1;
+        return Convert.ToDouble(result);
     }
 
     private CalculationElement GetDuctGeoDesc(MEPCurve duct) {
         DuctType ductType = (DuctType) duct.GetElementType();
-        CalculationElement calculationElement = new CalculationElement();
+        CalculationElement calculationElement = new CalculationElement(duct);
+
         if(ductType.Shape == ConnectorProfileType.Round) {
             calculationElement.IsRound = true;
             calculationElement.Diameter = duct.Diameter;
@@ -228,7 +250,8 @@ internal class UnmodelingCalculator {
     }
 
     private CalculationElement GetPipeGeoDesc(Pipe pipe) {
-        CalculationElement calculationElement = new CalculationElement();
+        CalculationElement calculationElement = new CalculationElement(pipe);
+
         double length = pipe.GetParamValueOrDefault<double>(BuiltInParameter.CURVE_ELEM_LENGTH);
         double outDiameter = pipe.GetParamValueOrDefault<double>(BuiltInParameter.RBS_PIPE_OUTER_DIAMETER);
 
@@ -261,7 +284,7 @@ internal class UnmodelingCalculator {
     }
 
     private CalculationElement GetPipeInsGeoDes(PipeInsulation pipeIns) {
-        CalculationElement calculationElement = new CalculationElement();
+        CalculationElement calculationElement = new CalculationElement(pipeIns);
         Pipe pipe = (Pipe) _doc.GetElement(pipeIns.HostElementId);
         double inDiameter = pipe.Diameter;
 
@@ -283,7 +306,7 @@ internal class UnmodelingCalculator {
     private CalculationElement GetDuctInsGeoDesc(DuctInsulation ductIns) {
         MEPCurve duct = (MEPCurve) _doc.GetElement(ductIns.HostElementId);
         DuctType ductType = (DuctType) duct.GetElementType();
-        CalculationElement calculationElement = new CalculationElement();
+        CalculationElement calculationElement = new CalculationElement(ductIns);
         if(ductType.Shape == ConnectorProfileType.Round) {
             calculationElement.IsRound = true;
             calculationElement.Diameter = ductIns.Diameter;
@@ -299,6 +322,12 @@ internal class UnmodelingCalculator {
         calculationElement.Length = ductIns.GetParamValueOrDefault<double>(BuiltInParameter.CURVE_ELEM_LENGTH);
 
 
+        return calculationElement;
+    }
+
+    private CalculationElement GetSystemDesc(Element element) {
+        CalculationElement calculationElement = new CalculationElement(element);
+        calculationElement.Element = element;
         return calculationElement;
     }
 }
