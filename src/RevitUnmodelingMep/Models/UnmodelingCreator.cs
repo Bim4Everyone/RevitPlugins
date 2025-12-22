@@ -28,8 +28,10 @@ namespace RevitUnmodelingMep.Models;
 internal class UnmodelingCreator {
     private const string _familyName = "_Якорный элемент";
     private const string _emptyDescription = "Пустая строка";
-    private const string _conumableDescription = "Временная заглушка";
-    private const string _obsoletteConsumableDescriptionName = "ФОП_ВИС_Назначение"; 
+    private const string _conumableDescription = "Расчет расходников";
+    private const string _obsoletteConsumableDescriptionName = "ФОП_ВИС_Назначение";
+    private readonly List<string> _obsoletteConsumableDescriptions = 
+        ["Расчет краски и креплений", "Расходники изоляции"];
 
     private readonly Document _doc;
     private WorksetId? _ws_id;
@@ -299,7 +301,9 @@ internal class UnmodelingCreator {
                 ? currentDescription
                 : familyInstance.GetParamValueOrDefault<string>(_obsoletteConsumableDescriptionName);
 
-            if(currentDescription == _conumableDescription) {
+
+            if(currentDescription == _conumableDescription
+                || _obsoletteConsumableDescriptions.Contains(currentDescription)) {
                 _doc.Delete(familyInstance.Id);
             }
         }
