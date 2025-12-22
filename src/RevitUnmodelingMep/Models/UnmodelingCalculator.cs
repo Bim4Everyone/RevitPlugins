@@ -282,27 +282,31 @@ internal class UnmodelingCalculator {
 
         calculationElement.SystemSharedName = 
             duct.GetParamValueOrDefault<string>(SharedParamsConfig.Instance.VISSystemName, "");
-        calculationElement.SystemTypeName = duct.MEPSystem.GetElementType().Name; 
-
+        calculationElement.SystemTypeName = duct.MEPSystem.GetElementType().Name;
+        double length = duct.GetParamValueOrDefault<double>(BuiltInParameter.CURVE_ELEM_LENGTH);
         if(ductType.Shape == ConnectorProfileType.Round) {
             calculationElement.IsRound = true;
             calculationElement.Diameter = duct.Diameter;
             calculationElement.Perimeter = Math.PI * 2 * duct.Diameter;
+            double crossSectionArea = Math.PI * Math.Pow(duct.Diameter / 2, 2);
+            double volume = crossSectionArea * length;
+            calculationElement.Volume = volume;
 
         } else {
             calculationElement.IsRound = false;
             calculationElement.Width = duct.Width;
             calculationElement.Height = duct.Height;
             calculationElement.Perimeter = duct.Width * 2 + duct.Height * 2;
+            double crossSectionArea = duct.Width * duct.Height;
+            double volume = crossSectionArea * length;
+            calculationElement.Volume = volume;
         }
 
-        double length = duct.GetParamValueOrDefault<double>(BuiltInParameter.CURVE_ELEM_LENGTH);
+        
         double area = duct.GetParamValueOrDefault<double>(BuiltInParameter.RBS_CURVE_SURFACE_AREA);
-        double volume = area * length;
 
         calculationElement.Area = area;
         calculationElement.Length = length;
-        calculationElement.Volume = volume;
         calculationElement.InsulationThikness =
             duct.GetParamValueOrDefault<double>(BuiltInParameter.RBS_REFERENCE_INSULATION_THICKNESS);
         if(calculationElement.InsulationThikness == 0) {
@@ -334,13 +338,14 @@ internal class UnmodelingCalculator {
 
         double length = pipe.GetParamValueOrDefault<double>(BuiltInParameter.CURVE_ELEM_LENGTH);
         double outDiameter = pipe.GetParamValueOrDefault<double>(BuiltInParameter.RBS_PIPE_OUTER_DIAMETER);
-        double area = Math.PI * outDiameter * length;
-        double volume = area * length;
+        double crossSectionArea = Math.PI * Math.Pow(pipe.Diameter / 2, 2);
+        double surfaceArea = Math.PI * outDiameter * length;
+        double volume = crossSectionArea * length;
 
         calculationElement.IsRound = true;
         calculationElement.Diameter = pipe.Diameter;
         calculationElement.OutDiameter = outDiameter;
-        calculationElement.Area = area;
+        calculationElement.Area = surfaceArea;
         calculationElement.Volume = volume;
         calculationElement.Perimeter = Math.PI * 2 * pipe.Diameter;
         calculationElement.Length = length;
