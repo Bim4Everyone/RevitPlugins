@@ -6,6 +6,10 @@ using System.Threading.Tasks;
 using System.Windows.Controls;
 
 using Autodesk.Revit.DB;
+using Autodesk.Revit.DB.Mechanical;
+using Autodesk.Revit.DB.Plumbing;
+
+using dosymep.Revit;
 
 namespace RevitUnmodelingMep.Models;
 
@@ -18,10 +22,32 @@ internal static class CollectionGenerator {
             .ToList();
     }
 
-    public static List<Element> GetTypeInstances(Document doc, ElementId typeId) { 
-        return new FilteredElementCollector(doc)
+    public static List<Element> GetTypeInstances(Document doc, ElementId typeId) {
+        ElementType type = doc.GetElement(typeId) as ElementType;
+
+        List<Element> elements = new FilteredElementCollector(doc)
             .WhereElementIsNotElementType()
             .Where(e => e.GetTypeId() == typeId)
             .ToList();
+
+        if(type.InAnyCategory(
+            [
+            BuiltInCategory.OST_PipeInsulations,
+            BuiltInCategory.OST_DuctInsulations
+        ])) {
+            elements = elements
+                .Where(e => {
+                    if(e is PipeInsulation pipeInsulation)
+                        return pipeInsulation.HostElementId != ElementId.InvalidElementId;
+
+                    if(e is DuctInsulation ductInsulation)
+                        return ductInsulation.HostElementId != ElementId.InvalidElementId;
+
+                    return false;
+                })
+                .ToList();
+        }
+
+        return elements;
     }
 }

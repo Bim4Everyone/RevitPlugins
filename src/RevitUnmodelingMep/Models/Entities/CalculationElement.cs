@@ -14,11 +14,13 @@ internal class CalculationElement {
     private bool _isInsulated;
     private double _insulationThikness;
     private double _length;
-    private double _outDiameter;
     private double _perimeter;
+    private double _area;
+    private double _outDiameter;
     private double _inDiameter;
     private double _width;
     private double _height;
+    private double _insulationArea;
     private Element _element;
 
     
@@ -44,8 +46,8 @@ internal class CalculationElement {
     }
 
     public double Diameter {
-        get { return _outDiameter; }
-        set { _outDiameter = value; }
+        get { return _inDiameter; }
+        set { _inDiameter = value; }
     }
 
     public double Width {
@@ -73,8 +75,17 @@ internal class CalculationElement {
         set => _perimeter = value; 
     }
 
-    public double InDiameter { 
-        get => _inDiameter; 
-        set => _inDiameter = value; 
+    public double OutDiameter { 
+        get => _outDiameter; 
+        set => _outDiameter = value; 
+    }
+    public double Area { 
+        get => _area; 
+        set => _area = value; 
+    }
+
+    public double InsulationArea {
+        get => _insulationArea;
+        set => _insulationArea = value;
     }
 }

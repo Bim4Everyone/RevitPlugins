@@ -5,12 +5,16 @@ using System.Text;
 using System.Threading.Tasks;
 
 using Autodesk.Revit.DB;
+using Autodesk.Revit.DB.Mechanical;
+using Autodesk.Revit.DB.Plumbing;
 
 using dosymep.Bim4Everyone;
 using dosymep.Bim4Everyone.SharedParams;
+using dosymep.Revit;
 
 using Newtonsoft.Json.Linq;
 
+using Ninject.Activation;
 
 using RevitUnmodelingMep.Models.Entities;
 using RevitUnmodelingMep.ViewModels;
@@ -148,6 +152,27 @@ internal class UnmodelingCalculator {
         calcElement.Formula = config.Formula;
         calcElement.Element = element;
 
+        Category category = element.Category;
+
+        if(element.Category.IsId(BuiltInCategory.OST_DuctCurves)) {
+            return GetDuctGeoDesc((MEPCurve) element);
+        }
+        if(element.Category.IsId(BuiltInCategory.OST_PipeCurves)) {
+            return GetPipeGeoDesc((Pipe) element);
+        }
+        if(element.Category.IsId(BuiltInCategory.OST_PipeInsulations)) {
+            return GetPipeInsGeoDes((PipeInsulation) element);
+        }
+        if(element.Category.IsId(BuiltInCategory.OST_DuctInsulations)) {
+            return GetDuctInsGeoDesc((DuctInsulation) element);
+        }
+        if(element.Category.IsId(BuiltInCategory.OST_DuctSystem)) {
+            return new CalculationElement();
+        }
+        if(element.Category.IsId(BuiltInCategory.OST_PipingSystem)) {
+            return new CalculationElement();
+        }
+
         return new CalculationElement();
     }
 
@@ -161,5 +186,119 @@ internal class UnmodelingCalculator {
         }
 
         return 1;
+    }
+
+    private CalculationElement GetDuctGeoDesc(MEPCurve duct) {
+        DuctType ductType = (DuctType) duct.GetElementType();
+        CalculationElement calculationElement = new CalculationElement();
+        if(ductType.Shape == ConnectorProfileType.Round) {
+            calculationElement.IsRound = true;
+            calculationElement.Diameter = duct.Diameter;
+            calculationElement.Perimeter = Math.PI * 2 * duct.Diameter;
+
+        } else {
+            calculationElement.IsRound = false;
+            calculationElement.Width = duct.Width;
+            calculationElement.Height = duct.Height;
+            calculationElement.Perimeter = duct.Width * 2 + duct.Height * 2;
+        }
+
+
+        calculationElement.Area = duct.GetParamValueOrDefault<double>(BuiltInParameter.RBS_CURVE_SURFACE_AREA);
+        calculationElement.InsulationThikness =
+            duct.GetParamValueOrDefault<double>(BuiltInParameter.RBS_REFERENCE_INSULATION_THICKNESS);
+        if(calculationElement.InsulationThikness == 0) {
+            calculationElement.IsInsulated = false;
+        } else {
+            calculationElement.IsInsulated = true;
+            ElementFilter insulationFilter = new ElementClassFilter(typeof(DuctInsulation));
+            ICollection<ElementId> dependentInsulations = duct.GetDependentElements(insulationFilter);
+            double insulationArea = 0;
+            foreach(ElementId insulationId in dependentInsulations) {
+                Element insulation = _doc.GetElement(insulationId);
+                double area =
+                    insulation.GetParamValueOrDefault<double>(BuiltInParameter.RBS_CURVE_SURFACE_AREA);
+                insulationArea += area;
+            }
+            calculationElement.InsulationArea = insulationArea;
+        }
+
+        calculationElement.Length = duct.GetParamValueOrDefault<double>(BuiltInParameter.CURVE_ELEM_LENGTH);
+        return calculationElement;
+    }
+
+    private CalculationElement GetPipeGeoDesc(Pipe pipe) {
+        CalculationElement calculationElement = new CalculationElement();
+        double length = pipe.GetParamValueOrDefault<double>(BuiltInParameter.CURVE_ELEM_LENGTH);
+        double outDiameter = pipe.GetParamValueOrDefault<double>(BuiltInParameter.RBS_PIPE_OUTER_DIAMETER);
+
+        calculationElement.IsRound = true;
+        calculationElement.Diameter = pipe.Diameter;
+        calculationElement.OutDiameter = outDiameter;
+        calculationElement.Area = Math.PI * outDiameter * length;
+        calculationElement.Perimeter = Math.PI * 2 * pipe.Diameter;
+        calculationElement.Length = length;
+
+        calculationElement.InsulationThikness = 
+            pipe.GetParamValueOrDefault<double>(BuiltInParameter.RBS_REFERENCE_INSULATION_THICKNESS);
+        if(calculationElement.InsulationThikness == 0) {
+            calculationElement.IsInsulated = false;
+        } else {
+            calculationElement.IsInsulated = true;
+            ElementFilter insulationFilter = new ElementClassFilter(typeof(PipeInsulation));
+            ICollection<ElementId> dependentInsulations = pipe.GetDependentElements(insulationFilter);
+            double insulationArea = 0;
+            foreach(ElementId insulationId in dependentInsulations) {
+                Element insulation = _doc.GetElement(insulationId);
+                double area =
+                    insulation.GetParamValueOrDefault<double>(BuiltInParameter.RBS_CURVE_SURFACE_AREA);
+                insulationArea += area;
+            }
+            calculationElement.InsulationArea = insulationArea;
+        }
+
+        return calculationElement;
+    }
+
+    private CalculationElement GetPipeInsGeoDes(PipeInsulation pipeIns) {
+        CalculationElement calculationElement = new CalculationElement();
+        Pipe pipe = (Pipe) _doc.GetElement(pipeIns.HostElementId);
+        double inDiameter = pipe.Diameter;
+
+        calculationElement.InsulationThikness = pipeIns.Thickness;
+        calculationElement.IsRound = true;
+        calculationElement.Diameter = pipe.Diameter;
+        calculationElement.OutDiameter = pipeIns.Diameter;
+        ;
+        calculationElement.Area 
+            = pipeIns.GetParamValueOrDefault<double>(BuiltInParameter.RBS_CURVE_SURFACE_AREA);
+
+        calculationElement.Perimeter = Math.PI * 2 * pipeIns.Diameter;
+        calculationElement.Length = pipeIns.GetParamValueOrDefault<double>(BuiltInParameter.CURVE_ELEM_LENGTH);
+
+        return calculationElement;
+
+    }
+
+    private CalculationElement GetDuctInsGeoDesc(DuctInsulation ductIns) {
+        MEPCurve duct = (MEPCurve) _doc.GetElement(ductIns.HostElementId);
+        DuctType ductType = (DuctType) duct.GetElementType();
+        CalculationElement calculationElement = new CalculationElement();
+        if(ductType.Shape == ConnectorProfileType.Round) {
+            calculationElement.IsRound = true;
+            calculationElement.Diameter = ductIns.Diameter;
+            calculationElement.Perimeter = Math.PI * 2 * ductIns.Diameter;
+
+        } else {
+            calculationElement.IsRound = false;
+            calculationElement.Width = ductIns.Width;
+            calculationElement.Height = ductIns.Height;
+            calculationElement.Perimeter = ductIns.Width * 2 + ductIns.Height * 2;
+        }
+        calculationElement.Area = ductIns.GetParamValueOrDefault<double>(BuiltInParameter.RBS_CURVE_SURFACE_AREA);
+        calculationElement.Length = ductIns.GetParamValueOrDefault<double>(BuiltInParameter.CURVE_ELEM_LENGTH);
+
+
+        return calculationElement;
     }
 }
