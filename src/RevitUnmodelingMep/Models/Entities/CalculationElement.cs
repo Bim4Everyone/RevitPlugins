@@ -10,12 +10,15 @@ namespace RevitUnmodelingMep.Models.Entities;
 
 internal class CalculationElement {
     private string _formula;
+    private string _systemTypeName;
+    private string _systemSharedName;
     private bool _isRound;
     private bool _isInsulated;
     private double _insulationThikness;
     private double _length;
     private double _perimeter;
     private double _area;
+    private double _volume;
     private double _outDiameter;
     private double _inDiameter;
     private double _width;
@@ -89,5 +92,17 @@ internal class CalculationElement {
     public double InsulationArea {
         get => _insulationArea;
         set => _insulationArea = UnitUtils.ConvertFromInternalUnits(value, UnitTypeId.SquareMeters);
+    }
+    public double Volume {
+        get => _volume; 
+        set => _volume = UnitUtils.ConvertFromInternalUnits(value, UnitTypeId.CubicMeters); 
+    }
+    public string SystemTypeName { 
+        get => _systemTypeName; 
+        set => _systemTypeName = value; 
+    }
+    public string SystemSharedName { 
+        get => _systemSharedName; 
+        set => _systemSharedName = value; 
     }
 }

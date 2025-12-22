@@ -1,14 +1,18 @@
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Globalization;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using CodingSeb.ExpressionEvaluator;
+using System.Xml;
 
 using Autodesk.Revit.DB;
 using Autodesk.Revit.DB.Mechanical;
 using Autodesk.Revit.DB.Plumbing;
+using Autodesk.Revit.UI;
+
+using CodingSeb.ExpressionEvaluator;
 
 using dosymep.Bim4Everyone;
 using dosymep.Bim4Everyone.SharedParams;
@@ -20,7 +24,6 @@ using Ninject.Activation;
 
 using RevitUnmodelingMep.Models.Entities;
 using RevitUnmodelingMep.ViewModels;
-using System.ComponentModel;
 
 namespace RevitUnmodelingMep.Models;
 
@@ -74,10 +77,39 @@ internal class UnmodelingCalculator {
                     element.GetParamValueOrDefault<string>(SharedParamsConfig.Instance.BuildingWorksLevel, "");
                 string smrFloorCurrnecy =
                     element.GetParamValueOrDefault<string>(SharedParamsConfig.Instance.BuildingWorksLevelCurrency, "");
-                string economicFunction =
-                    element.GetParamValueOrDefault<string>(SharedParamsConfig.Instance.EconomicFunction, "");
-                string system =
-                    element.GetParamValueOrDefault<string>(SharedParamsConfig.Instance.VISSystemName, "");
+
+
+                string economicFunction = string.Empty;
+                string system = string.Empty;
+
+                if(element.InAnyCategory([BuiltInCategory.OST_PipingSystem, BuiltInCategory.OST_DuctSystem])) {
+                    MEPSystem mepSystem = element as MEPSystem;
+                    ElementSet network = new ElementSet();
+
+                    if(mepSystem != null && mepSystem.Category.IsId(BuiltInCategory.OST_PipingSystem)) {
+                        network = ((PipingSystem) mepSystem).PipingNetwork;
+                    } else if(mepSystem != null && mepSystem.Category.IsId(BuiltInCategory.OST_DuctSystem)) {
+                        network = ((MechanicalSystem) mepSystem).DuctNetwork;
+                    }
+
+                    Element firstCurve = network
+                        .Cast<Element>()
+                        .FirstOrDefault(e => e is MEPCurve);
+
+                    if(firstCurve != null) {
+                        economicFunction =
+                            firstCurve.GetParamValueOrDefault<string>(SharedParamsConfig.Instance.EconomicFunction, "");
+                        system =
+                            firstCurve.GetParamValueOrDefault<string>(SharedParamsConfig.Instance.VISSystemName, "");
+                    }
+                } else {
+                    economicFunction =
+                        element.GetParamValueOrDefault<string>(SharedParamsConfig.Instance.EconomicFunction, "");
+                    system =
+                        element.GetParamValueOrDefault<string>(SharedParamsConfig.Instance.VISSystemName, "");
+                }
+
+
                 string name = config.Name;
                 string mark = config.Mark;
                 string code = config.Code;
@@ -87,6 +119,8 @@ internal class UnmodelingCalculator {
                 string group = $"{config.Grouping}_{name}_{mark}_{code}_{maker}";
 
                 NewRowElement newRow = new NewRowElement {
+                    System = system,
+                    Function = economicFunction,
                     Element = element,
                     Group = group,
                     SmrBlock = smrBlock,
@@ -100,9 +134,8 @@ internal class UnmodelingCalculator {
                     Unit = unit
                 };
 
-               
-
-                string key = $"{config.Grouping}_{smrBlock}_{smrSection}_{smrFloor}_{name}_{mark}_{code}_{maker}";
+                // TODO: Нужно ли в ключе делить по СМР?
+                string key = $"{config.Grouping}_{system}_{economicFunction}_{name}_{mark}_{code}_{maker}";
 
                 if(!elementsByGrouping.TryGetValue(key, out List<NewRowElement> groupingElements)) {
                     groupingElements = new List<NewRowElement>();
@@ -175,22 +208,18 @@ internal class UnmodelingCalculator {
            $"GetGeometricDescription unexpected element type: (Id {element?.Id})");
     }
 
-    private double CalculateFormula(string formula, CalculationElement calElement) {
-        var evaluator = new ExpressionEvaluator();
-
+    private void BuildDebugLog(CalculationElement calcElement, string formula) {
         StringBuilder logBuilder = new StringBuilder();
         logBuilder.AppendLine("CalculateFormula variables:");
-        logBuilder.AppendLine($"ElementId: {calElement.Element.Id}");
+        logBuilder.AppendLine($"ElementId: {calcElement.Element.Id}");
         logBuilder.AppendLine($"Formula: {formula}");
 
-        foreach(var property in calElement.GetType().GetProperties()) {
+        foreach(var property in calcElement.GetType().GetProperties()) {
             if(!property.CanRead) {
                 continue;
             }
 
-            object value = property.GetValue(calElement);
-            evaluator.Variables[property.Name] = value;
-
+            object value = property.GetValue(calcElement);
 
             string valueText = value switch {
                 double d => d.ToString(CultureInfo.InvariantCulture),
@@ -201,17 +230,37 @@ internal class UnmodelingCalculator {
             logBuilder.AppendLine($"{property.Name} = {valueText}");
         }
 
-        object result = evaluator.Evaluate(formula);
-        
-        logBuilder.AppendLine($"Result: {result}");
         Console.WriteLine(logBuilder.ToString());
+    }
 
-        return Convert.ToDouble(result);
+    private double CalculateFormula(string formula, CalculationElement calElement) {
+        var evaluator = new ExpressionEvaluator();
+
+        foreach(var property in calElement.GetType().GetProperties()) {
+            if(!property.CanRead) {
+                continue;
+            }
+
+            object value = property.GetValue(calElement);
+            evaluator.Variables[property.Name] = value;
+        }
+
+        try {
+            object result = evaluator.Evaluate(formula);
+            return Convert.ToDouble(result);
+        } catch(Exception) {
+            BuildDebugLog(calElement, formula);
+            throw;
+        }
     }
 
     private CalculationElement GetDuctGeoDesc(MEPCurve duct) {
         DuctType ductType = (DuctType) duct.GetElementType();
         CalculationElement calculationElement = new CalculationElement(duct);
+
+        calculationElement.SystemSharedName = 
+            duct.GetParamValueOrDefault<string>(SharedParamsConfig.Instance.VISSystemName, "");
+        calculationElement.SystemTypeName = duct.MEPSystem.GetElementType().Name; 
 
         if(ductType.Shape == ConnectorProfileType.Round) {
             calculationElement.IsRound = true;
@@ -225,8 +274,13 @@ internal class UnmodelingCalculator {
             calculationElement.Perimeter = duct.Width * 2 + duct.Height * 2;
         }
 
+        double length = duct.GetParamValueOrDefault<double>(BuiltInParameter.CURVE_ELEM_LENGTH);
+        double area = duct.GetParamValueOrDefault<double>(BuiltInParameter.RBS_CURVE_SURFACE_AREA);
+        double volume = area * length;
 
-        calculationElement.Area = duct.GetParamValueOrDefault<double>(BuiltInParameter.RBS_CURVE_SURFACE_AREA);
+        calculationElement.Area = area;
+        calculationElement.Length = length;
+        calculationElement.Volume = volume;
         calculationElement.InsulationThikness =
             duct.GetParamValueOrDefault<double>(BuiltInParameter.RBS_REFERENCE_INSULATION_THICKNESS);
         if(calculationElement.InsulationThikness == 0) {
@@ -235,30 +289,37 @@ internal class UnmodelingCalculator {
             calculationElement.IsInsulated = true;
             ElementFilter insulationFilter = new ElementClassFilter(typeof(DuctInsulation));
             ICollection<ElementId> dependentInsulations = duct.GetDependentElements(insulationFilter);
-            double insulationArea = 0;
+            double sumInsulationArea = 0;
             foreach(ElementId insulationId in dependentInsulations) {
                 Element insulation = _doc.GetElement(insulationId);
-                double area =
+                double insArea =
                     insulation.GetParamValueOrDefault<double>(BuiltInParameter.RBS_CURVE_SURFACE_AREA);
-                insulationArea += area;
+                sumInsulationArea += insArea;
             }
-            calculationElement.InsulationArea = insulationArea;
+            calculationElement.InsulationArea = sumInsulationArea;
         }
 
-        calculationElement.Length = duct.GetParamValueOrDefault<double>(BuiltInParameter.CURVE_ELEM_LENGTH);
+        
         return calculationElement;
     }
 
     private CalculationElement GetPipeGeoDesc(Pipe pipe) {
         CalculationElement calculationElement = new CalculationElement(pipe);
 
+        calculationElement.SystemSharedName =
+            pipe.GetParamValueOrDefault<string>(SharedParamsConfig.Instance.VISSystemName, "");
+        calculationElement.SystemTypeName = pipe.MEPSystem.GetElementType().Name;
+
         double length = pipe.GetParamValueOrDefault<double>(BuiltInParameter.CURVE_ELEM_LENGTH);
         double outDiameter = pipe.GetParamValueOrDefault<double>(BuiltInParameter.RBS_PIPE_OUTER_DIAMETER);
+        double area = Math.PI * outDiameter * length;
+        double volume = area * length;
 
         calculationElement.IsRound = true;
         calculationElement.Diameter = pipe.Diameter;
         calculationElement.OutDiameter = outDiameter;
-        calculationElement.Area = Math.PI * outDiameter * length;
+        calculationElement.Area = area;
+        calculationElement.Volume = volume;
         calculationElement.Perimeter = Math.PI * 2 * pipe.Diameter;
         calculationElement.Length = length;
 
@@ -270,14 +331,14 @@ internal class UnmodelingCalculator {
             calculationElement.IsInsulated = true;
             ElementFilter insulationFilter = new ElementClassFilter(typeof(PipeInsulation));
             ICollection<ElementId> dependentInsulations = pipe.GetDependentElements(insulationFilter);
-            double insulationArea = 0;
+            double sumInsulationArea = 0;
             foreach(ElementId insulationId in dependentInsulations) {
                 Element insulation = _doc.GetElement(insulationId);
-                double area =
+                double insArea =
                     insulation.GetParamValueOrDefault<double>(BuiltInParameter.RBS_CURVE_SURFACE_AREA);
-                insulationArea += area;
+                sumInsulationArea += insArea;
             }
-            calculationElement.InsulationArea = insulationArea;
+            calculationElement.InsulationArea = sumInsulationArea;
         }
 
         return calculationElement;
@@ -287,6 +348,10 @@ internal class UnmodelingCalculator {
         CalculationElement calculationElement = new CalculationElement(pipeIns);
         Pipe pipe = (Pipe) _doc.GetElement(pipeIns.HostElementId);
         double inDiameter = pipe.Diameter;
+
+        calculationElement.SystemSharedName =
+            pipeIns.GetParamValueOrDefault<string>(SharedParamsConfig.Instance.VISSystemName, "");
+        calculationElement.SystemTypeName = pipeIns.MEPSystem.GetElementType().Name;
 
         calculationElement.InsulationThikness = pipeIns.Thickness;
         calculationElement.IsRound = true;
@@ -318,6 +383,10 @@ internal class UnmodelingCalculator {
             calculationElement.Height = ductIns.Height;
             calculationElement.Perimeter = ductIns.Width * 2 + ductIns.Height * 2;
         }
+
+        calculationElement.SystemSharedName =
+            ductIns.GetParamValueOrDefault<string>(SharedParamsConfig.Instance.VISSystemName, "");
+        calculationElement.SystemTypeName = ductIns.MEPSystem.GetElementType().Name;
         calculationElement.Area = ductIns.GetParamValueOrDefault<double>(BuiltInParameter.RBS_CURVE_SURFACE_AREA);
         calculationElement.Length = ductIns.GetParamValueOrDefault<double>(BuiltInParameter.CURVE_ELEM_LENGTH);
 
