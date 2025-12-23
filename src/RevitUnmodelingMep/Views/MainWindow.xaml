@@ -183,7 +183,13 @@
                                                                 </Grid>
                                                             </Expander.Header>
 
-                                                            <StackPanel>
+                                                            <Border Padding="5">
+                                                                <StackPanel>
+                                                                    <StackPanel.Resources>
+                                                                        <Style TargetType="Control">
+                                                                            <Setter Property="Margin" Value="0 4 0 0" />
+                                                                        </Style>
+                                                                    </StackPanel.Resources>
                                                                 <TextBlock
                                                                     Style="{StaticResource FieldLabel}"
                                                                 Text="Название расходника" />
@@ -237,7 +243,8 @@
                                                                     Text="{Binding Maker, UpdateSourceTrigger=PropertyChanged}" />
 
                                                                 <CheckBox
-                                                                    Margin="0 6 0 0"
+                                                                    Margin="0 2 0 0"
+                                                                    Padding="0"
                                                                     Content="Использовать проектные запасы по категории"
                                                                     IsChecked="{Binding UseCategoryReserve, Mode=TwoWay}" />
 
@@ -261,6 +268,7 @@
 
                                                                 <!-- ?­???????? ?? ?????????????????? ???????????? ???? ?????????????? -->
                                                             </StackPanel>
+                                                            </Border>
                                                         </Expander>
 
                                                         <ui:Button
