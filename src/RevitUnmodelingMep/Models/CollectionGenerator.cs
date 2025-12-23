@@ -24,6 +24,8 @@ internal static class CollectionGenerator {
 
     public static List<Element> GetTypeInstances(Document doc, ElementId typeId) {
         ElementType type = doc.GetElement(typeId) as ElementType;
+        if(type == null)
+            return new List<Element>();
 
         List<Element> elements = new FilteredElementCollector(doc)
             .WhereElementIsNotElementType()
@@ -31,17 +33,30 @@ internal static class CollectionGenerator {
             .ToList();
 
         if(type.InAnyCategory(
-            [
+            new[]
+            {
             BuiltInCategory.OST_PipeInsulations,
             BuiltInCategory.OST_DuctInsulations
-        ])) {
+            })) {
+            bool IsValidHost(ElementId hostId) {
+                if(hostId == ElementId.InvalidElementId)
+                    return false;
+
+                Element host = doc.GetElement(hostId);
+                if(host?.Category == null)
+                    return false;
+
+                return host.Category.IsId(BuiltInCategory.OST_PipeFitting)
+                       || host.Category.IsId(BuiltInCategory.OST_DuctFitting);
+            }
+
             elements = elements
                 .Where(e => {
                     if(e is PipeInsulation pipeInsulation)
-                        return pipeInsulation.HostElementId != ElementId.InvalidElementId;
+                        return IsValidHost(pipeInsulation.HostElementId);
 
                     if(e is DuctInsulation ductInsulation)
-                        return ductInsulation.HostElementId != ElementId.InvalidElementId;
+                        return IsValidHost(ductInsulation.HostElementId);
 
                     return false;
                 })
@@ -50,4 +65,5 @@ internal static class CollectionGenerator {
 
         return elements;
     }
+
 }

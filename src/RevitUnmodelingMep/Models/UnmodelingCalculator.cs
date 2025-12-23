@@ -29,9 +29,15 @@ namespace RevitUnmodelingMep.Models;
 
 internal class UnmodelingCalculator {
     private readonly Document _doc;
+    private readonly double _stockDuctPipe;
+    private readonly double _stockDuctIns;
+    private readonly double _stockPipeIns;
 
     public UnmodelingCalculator(Document doc) {
         _doc = doc;
+        _stockDuctPipe = GetStocks(BuiltInCategory.OST_DuctCurves);
+        _stockPipeIns = GetStocks(BuiltInCategory.OST_PipeInsulations);
+        _stockDuctIns = GetStocks(BuiltInCategory.OST_DuctInsulations);
     }
 
     public List<NewRowElement> GetElementsToGenerate(ConsumableTypeItem config) {
@@ -48,8 +54,25 @@ internal class UnmodelingCalculator {
         return rowsToGenerate;
     }
 
-    private Dictionary<string, List<NewRowElement>> GetSplitedNewRows(ConsumableTypeItem config) {
+    private double GetStocks(BuiltInCategory category) {
+        if(category == BuiltInCategory.OST_PipeCurves || category == BuiltInCategory.OST_DuctCurves) {
+            return 1 + _doc.ProjectInformation.GetParamValueOrDefault<double>(
+                SharedParamsConfig.Instance.VISPipeDuctReserve) / 100;
+        }
+        if(category == BuiltInCategory.OST_PipeInsulations) {
+            return 1 + _doc.ProjectInformation.GetParamValueOrDefault<double>(
+                SharedParamsConfig.Instance.VISPipeInsulationReserve) / 100;
+        }
+        if(category == BuiltInCategory.OST_DuctInsulations) {
+            return 1 + _doc.ProjectInformation.GetParamValueOrDefault<double>(
+                SharedParamsConfig.Instance.VISDuctInsulationReserve) / 100;
+        }
 
+        return 1;
+    }
+            
+
+    private Dictionary<string, List<NewRowElement>> GetSplitedNewRows(ConsumableTypeItem config) {
         int categoryId = int.Parse(config.CategoryId);
         BuiltInCategory category = (BuiltInCategory) categoryId;
         JArray assignedTypes = config.AssignedElementIds;
@@ -157,7 +180,7 @@ internal class UnmodelingCalculator {
 
         foreach(NewRowElement draftRow in draftRows) {
             CalculationElement calcElement = GetGeometricDescription(draftRow.Element);
-            draftRow.Number = CalculateFormula(config.Formula, calcElement);
+            draftRow.Number = CalculateFormula(config, calcElement);
             calculationElements.Add(calcElement);
         }
 
@@ -197,9 +220,9 @@ internal class UnmodelingCalculator {
         }
 
         string result = noteFormula
-            .Replace("{sumArea}", FormatValue(sumArea))
-            .Replace("{sumLength}", FormatValue(sumLength))
-            .Replace("{count}", FormatValue(count));
+            .Replace("sumArea", FormatValue(sumArea))
+            .Replace("sumLength", FormatValue(sumLength))
+            .Replace("count", FormatValue(count));
 
         return result;
     }
@@ -257,7 +280,28 @@ internal class UnmodelingCalculator {
         throw new OperationCanceledException();
     }
 
-    private double CalculateFormula(string formula, CalculationElement calElement) {
+    private BuiltInCategory ParseCategory(ConsumableTypeItem config) {
+        int categoryId = int.Parse(config.CategoryId);
+        return (BuiltInCategory) categoryId;
+
+    }
+
+    private double CalculateFormula(ConsumableTypeItem config, CalculationElement calElement) {
+        double projectStock = 1;
+        BuiltInCategory category = ParseCategory(config);
+
+        if(
+        category == BuiltInCategory.OST_PipeCurves || category == BuiltInCategory.OST_DuctCurves) {
+            projectStock = _stockDuctPipe;
+        }
+        if(category == BuiltInCategory.OST_PipeInsulations) {
+            projectStock = _stockPipeIns;
+        }
+        if(category == BuiltInCategory.OST_DuctInsulations) {
+            projectStock = _stockDuctIns;
+        }
+
+        string formula = config.Formula;
         var evaluator = new ExpressionEvaluator();
 
         foreach(var property in calElement.GetType().GetProperties()) {
@@ -271,6 +315,9 @@ internal class UnmodelingCalculator {
 
         try {
             object result = evaluator.Evaluate(formula);
+            if(config.UseCategoryReserve) {
+                return Convert.ToDouble(result) * projectStock;
+            }
             return Convert.ToDouble(result);
         } catch(Exception) {
             BuildDebugLog(calElement, formula);
