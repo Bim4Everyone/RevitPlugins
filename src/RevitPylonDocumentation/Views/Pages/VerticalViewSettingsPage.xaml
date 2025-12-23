@@ -149,14 +149,14 @@
 
                             <ui:TextBox
                                 Margin="5"
-                                Style="{StaticResource ErrorTextBoxStyle}"
+                                Style="{StaticResource ValidationTextBoxStyle}"
                                 Text="{Binding ViewSectionSettings.GeneralViewYTopOffsetTemp, 
                                     ValidatesOnNotifyDataErrors=True,  
                                     UpdateSourceTrigger=PropertyChanged}" />
 
                             <ui:TextBox
                                 Margin="5"
-                                Style="{StaticResource ErrorTextBoxStyle}"
+                                Style="{StaticResource ValidationTextBoxStyle}"
                                 Text="{Binding ViewSectionSettings.Width, ValidatesOnNotifyDataErrors=True,  UpdateSourceTrigger=PropertyChanged}" />
                         </StackPanel>
                     </Border>

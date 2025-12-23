@@ -41,9 +41,9 @@ public partial class TextBoxSettingControl : UserControl {
         set => SetValue(TextChangedCommandProperty, value);
     }
 
-    private void This_Error(object sender, ValidationErrorEventArgs e) {
+    private void Validation_Error(object sender, ValidationErrorEventArgs e) {
         if(e.Action == ValidationErrorEventAction.Added) {
-            GeneralTextBox.Style = (Style) FindResource("ErrorTextBoxStyle1");
+            GeneralTextBox.Style = (Style) FindResource("ErrorTextBoxStyle");
         } else if(e.Action == ValidationErrorEventAction.Removed) {
             GeneralTextBox.Style = (Style) FindResource("TextBoxWithTooltipStyle");
         }
