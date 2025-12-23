@@ -4,6 +4,7 @@ using System.Collections.ObjectModel;
 using System.IO;
 using System.Linq;
 using System.Windows.Input;
+using System.Text.RegularExpressions;
 
 using Microsoft.Win32;
 
@@ -108,39 +109,15 @@ internal class MainViewModel : BaseViewModel {
     }
 
     private bool CanAcceptView() {
-        if(string.IsNullOrEmpty(SaveProperty)) {
-            ErrorText = _localizationService.GetLocalizedString("MainWindow.HelloCheck");
-            return false;
-        }
+        bool isValid = FormulaValidator.ValidateFormulas(
+            ConsumableTypes,
+            SaveProperty,
+            _localizationService.GetLocalizedString("MainWindow.HelloCheck"),
+            item => TryGetCategoryId(item, out int cid) ? cid : (int?) null,
+            out string error);
 
-        ConsumableTypeItem missingFormula = ConsumableTypes?
-            .FirstOrDefault(item => string.IsNullOrWhiteSpace(item?.Formula));
-
-        if(missingFormula != null) {
-            string name = missingFormula.ConsumableTypeName
-                          ?? missingFormula.Title
-                          ?? missingFormula.ConfigKey
-                          ?? "Неизвестный элемент";
-            ErrorText = $"Заполните формулу: {name}.";
-            return false;
-        }
-
-        ConsumableTypeItem formulaWithComma = ConsumableTypes?
-            .FirstOrDefault(item =>
-                !string.IsNullOrWhiteSpace(item?.Formula) &&
-                item.Formula.Contains(","));
-
-        if(formulaWithComma != null) {
-            string name = formulaWithComma.ConsumableTypeName
-                          ?? formulaWithComma.Title
-                          ?? formulaWithComma.ConfigKey
-                          ?? "Неизвестный элемент";
-            ErrorText = $"В формуле используется запятая вместо точки: {name}.";
-            return false;
-        }
-
-        ErrorText = null;
-        return true;
+        ErrorText = error;
+        return isValid;
     }
 
 
