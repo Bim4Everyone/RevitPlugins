@@ -130,8 +130,7 @@
                                     Path=ViewSectionSettings.GeneralViewXOffsetTemp, 
                                     UpdateSourceTrigger=PropertyChanged, 
                                     Mode=TwoWay,
-                                    ValidatesOnDataErrors=True, 
-                                    ValidatesOnExceptions=True, NotifyOnValidationError=True, ValidatesOnNotifyDataErrors=True}"
+                                    ValidatesOnDataErrors=True, NotifyOnValidationError=True}"
                                 ToolTipText="{me:LocalizationSource VerticalViewSettingsPage.MainViewXOffsetToolTip}"
                                 TextChangedCommand="{Binding SettingsChangedCommand}" />
 
