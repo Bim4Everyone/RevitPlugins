@@ -125,6 +125,20 @@ internal class MainViewModel : BaseViewModel {
             return false;
         }
 
+        ConsumableTypeItem formulaWithComma = ConsumableTypes?
+            .FirstOrDefault(item =>
+                !string.IsNullOrWhiteSpace(item?.Formula) &&
+                item.Formula.Contains(","));
+
+        if(formulaWithComma != null) {
+            string name = formulaWithComma.ConsumableTypeName
+                          ?? formulaWithComma.Title
+                          ?? formulaWithComma.ConfigKey
+                          ?? "Неизвестный элемент";
+            ErrorText = $"В формуле используется запятая вместо точки: {name}.";
+            return false;
+        }
+
         ErrorText = null;
         return true;
     }

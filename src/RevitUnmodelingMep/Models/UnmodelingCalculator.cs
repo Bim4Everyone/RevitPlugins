@@ -187,8 +187,8 @@ internal class UnmodelingCalculator {
 
     private string CreateNote(ConsumableTypeItem config, List<CalculationElement> calculationElements) {
         string noteFormula = config.Note ?? string.Empty;
-        double sumArea = calculationElements.Sum(r => r.Area);
-        double sumLength = calculationElements.Sum(r => r.Length);
+        double sumArea = calculationElements.Sum(r => r.Area ?? throw new InvalidOperationException("Area is null."));
+        double sumLength = calculationElements.Sum(r => r.Length ?? throw new InvalidOperationException("Length is null."));
         double count = calculationElements.Count();
 
         string FormatValue(double value) {
@@ -232,7 +232,7 @@ internal class UnmodelingCalculator {
 
     private void BuildDebugLog(CalculationElement calcElement, string formula) {
         StringBuilder logBuilder = new StringBuilder();
-        logBuilder.AppendLine("CalculateFormula variables:");
+        logBuilder.AppendLine("Ошибка в расчете элемента:");
         logBuilder.AppendLine($"ElementId: {calcElement.Element.Id}");
         logBuilder.AppendLine($"Formula: {formula}");
 
@@ -253,6 +253,8 @@ internal class UnmodelingCalculator {
         }
 
         Console.WriteLine(logBuilder.ToString());
+
+        throw new OperationCanceledException();
     }
 
     private double CalculateFormula(string formula, CalculationElement calElement) {
