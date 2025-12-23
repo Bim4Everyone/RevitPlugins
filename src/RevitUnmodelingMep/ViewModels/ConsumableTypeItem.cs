@@ -14,6 +14,7 @@ internal class ConsumableTypeItem : BaseViewModel {
     private string _code;
     private string _unit;
     private string _maker;
+    private bool _useCategoryReserve;
     private string _formula;
     private string _note;
     private CategoryOption _selectedCategory;
@@ -67,6 +68,11 @@ internal class ConsumableTypeItem : BaseViewModel {
         set => RaiseAndSetIfChanged(ref _maker, value);
     }
 
+    public bool UseCategoryReserve {
+        get => _useCategoryReserve;
+        set => RaiseAndSetIfChanged(ref _useCategoryReserve, value);
+    }
+
     public string Formula {
         get => _formula;
         set => RaiseAndSetIfChanged(ref _formula, value);
@@ -105,6 +111,7 @@ internal class ConsumableTypeItem : BaseViewModel {
             Code = (string) value["CODE"],
             Unit = (string) value["UNIT"],
             Maker = (string) value["CREATOR"],
+            UseCategoryReserve = (bool?) value["USE_CATEGORY_RESERVE"] ?? false,
             Formula = (string) value["VALUE_FORMULA"],
             Note = (string) value["NOTE_FORMAT"],
             AssignedElementIds = new JArray(assignedIds),
@@ -125,6 +132,7 @@ internal class ConsumableTypeItem : BaseViewModel {
         result["CODE"] = Code ?? string.Empty;
         result["UNIT"] = Unit ?? string.Empty;
         result["CREATOR"] = Maker ?? string.Empty;
+        result["USE_CATEGORY_RESERVE"] = UseCategoryReserve;
         result["VALUE_FORMULA"] = Formula ?? string.Empty;
         result["NOTE_FORMAT"] = Note ?? string.Empty;
         result["ASSIGNED_ELEMENT_IDS"] = AssignedElementIds ?? new JArray();
