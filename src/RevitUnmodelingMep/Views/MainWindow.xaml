@@ -261,8 +261,8 @@
                                                         <ui:Button
                                                             Grid.Column="1"
                                                             Width="36"
-                                                            Height="36"
-                                                            Margin="8 4 0 0"
+                                                            Height="38"
+                                                            Margin="8 0 0 0"
                                                             Padding="0"
                                                             VerticalAlignment="Top"
                                                             HorizontalAlignment="Center"
@@ -357,8 +357,12 @@
                     Width="100"
                     Content="Импорт" />
                 <ui:Button
+                    Margin="0 0 8 0"
                     Width="100"
                     Content="Экспорт" />
+                <ui:Button
+                    Width="100"
+                    Content="Сброс" />
             </StackPanel>
 
             <ui:TextBlock
