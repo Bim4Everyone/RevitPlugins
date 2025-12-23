@@ -153,112 +153,124 @@
                                             ItemsSource="{Binding ConsumableTypes}">
                                             <ItemsControl.ItemTemplate>
                                                 <DataTemplate>
-                                                    <Expander
-                                                        Margin="0 0 0 8"
-                                                        IsExpanded="False">
-                                                        <Expander.Header>
-                                                            <Grid
-                                                                Height="44"
-                                                                MinHeight="44"
-                                                                VerticalAlignment="Center">
-                                                                <Grid.ColumnDefinitions>
-                                                                    <ColumnDefinition Width="*" />
-                                                                    <ColumnDefinition Width="Auto" />
-                                                                </Grid.ColumnDefinitions>
+                                                    <Grid Margin="0 0 0 8">
+                                                        <Grid.ColumnDefinitions>
+                                                            <ColumnDefinition Width="*" />
+                                                            <ColumnDefinition Width="Auto" />
+                                                        </Grid.ColumnDefinitions>
 
-                                                                <TextBlock
-                                                                    Margin="0 0 8 0"
-                                                                    VerticalAlignment="Center"
-                                                                    Text="{Binding ConsumableTypeName}" />
-
-                                                                <ui:Button
-                                                                    Grid.Column="1"
-                                                                    Width="36"
+                                                        <Expander
+                                                            Grid.Column="0"
+                                                            MinHeight="36"
+                                                            IsExpanded="False"
+                                                            Padding="0">
+                                                            <Expander.Resources>
+                                                                <Style TargetType="ToggleButton">
+                                                                    <Setter Property="Height" Value="36" />
+                                                                    <Setter Property="MinHeight" Value="36" />
+                                                                    <Setter Property="Padding" Value="0" />
+                                                                </Style>
+                                                            </Expander.Resources>
+                                                            <Expander.Header>
+                                                                <Grid
                                                                     Height="36"
-                                                                    Padding="0"
-                                                                    VerticalAlignment="Center"
-                                                                    HorizontalAlignment="Center"
-                                                                    Appearance="Transparent"
-                                                                    Content="{ui:SymbolIcon Symbol=Delete24}"
-                                                                    Command="{Binding DataContext.RemoveConsumableTypeCommand, RelativeSource={RelativeSource AncestorType=Window}}"
-                                                                    CommandParameter="{Binding}" />
-                                                            </Grid>
-                                                        </Expander.Header>
+                                                                    MinHeight="36"
+                                                                    VerticalAlignment="Center">
+                                                                    <TextBlock
+                                                                        Margin="0 0 8 0"
+                                                                        VerticalAlignment="Center"
+                                                                        Text="{Binding ConsumableTypeName}" />
+                                                                </Grid>
+                                                            </Expander.Header>
 
-                                                        <StackPanel>
-                                                            <TextBlock
-                                                                Style="{StaticResource FieldLabel}"
+                                                            <StackPanel>
+                                                                <TextBlock
+                                                                    Style="{StaticResource FieldLabel}"
                                                                 Text="Название расходника" />
                                                                 <ui:TextBox
                                                                     Text="{Binding ConsumableTypeName, UpdateSourceTrigger=PropertyChanged}" />
 
-                                                            <TextBlock
-                                                                Style="{StaticResource FieldLabel}"
+                                                                <TextBlock
+                                                                    Style="{StaticResource FieldLabel}"
                                                                 Text="Категория" />
-                                                            <ComboBox
-                                                                MinHeight="32"
-                                                                ItemsSource="{Binding DataContext.CategoryOptions, RelativeSource={RelativeSource AncestorType=Window}}"
-                                                                DisplayMemberPath="Name"
-                                                                SelectedItem="{Binding SelectedCategory, Mode=TwoWay}" />
+                                                                <ComboBox
+                                                                    MinHeight="32"
+                                                                    ItemsSource="{Binding DataContext.CategoryOptions, RelativeSource={RelativeSource AncestorType=Window}}"
+                                                                    DisplayMemberPath="Name"
+                                                                    SelectedItem="{Binding SelectedCategory, Mode=TwoWay}" />
 
-                                                            <TextBlock
-                                                                Style="{StaticResource FieldLabel}"
+                                                                <TextBlock
+                                                                    Style="{StaticResource FieldLabel}"
                                                                 Text="Группирование" />
-                                                            <ui:TextBox
-                                                                MinHeight="32"
-                                                                Text="{Binding Grouping, UpdateSourceTrigger=PropertyChanged}" />
+                                                                <ui:TextBox
+                                                                    MinHeight="32"
+                                                                    Text="{Binding Grouping, UpdateSourceTrigger=PropertyChanged}" />
 
-                                                            <TextBlock
-                                                                Style="{StaticResource FieldLabel}"
+                                                                <TextBlock
+                                                                    Style="{StaticResource FieldLabel}"
                                                                 Text="Полное наименование" />
                                                                 <ui:TextBox
                                                                     Text="{Binding Name, UpdateSourceTrigger=PropertyChanged}" />
 
-                                                            <TextBlock
-                                                                Style="{StaticResource FieldLabel}"
+                                                                <TextBlock
+                                                                    Style="{StaticResource FieldLabel}"
                                                                 Text="Марка" />
                                                                 <ui:TextBox
                                                                     Text="{Binding Mark, UpdateSourceTrigger=PropertyChanged}" />
 
-                                                            <TextBlock
-                                                                Style="{StaticResource FieldLabel}"
+                                                                <TextBlock
+                                                                    Style="{StaticResource FieldLabel}"
                                                                 Text="Код" />
-                                                            <ui:TextBox
-                                                                Text="{Binding Code, UpdateSourceTrigger=PropertyChanged}" />
+                                                                <ui:TextBox
+                                                                    Text="{Binding Code, UpdateSourceTrigger=PropertyChanged}" />
 
-                                                            <TextBlock
-                                                                Style="{StaticResource FieldLabel}"
+                                                                <TextBlock
+                                                                    Style="{StaticResource FieldLabel}"
                                                                 Text="Ед. изм." />
-                                                            <ui:TextBox
-                                                                Text="{Binding Unit, UpdateSourceTrigger=PropertyChanged}" />
+                                                                <ui:TextBox
+                                                                    Text="{Binding Unit, UpdateSourceTrigger=PropertyChanged}" />
 
-                                                            <TextBlock
-                                                                Style="{StaticResource FieldLabel}"
+                                                                <TextBlock
+                                                                    Style="{StaticResource FieldLabel}"
                                                                 Text="Производитель" />
                                                                 <ui:TextBox
                                                                     Text="{Binding Maker, UpdateSourceTrigger=PropertyChanged}" />
 
-                                                            <TextBlock
-                                                                Style="{StaticResource FieldLabel}"
-                                                                Text="Формула количества (Double, без префикса Value = )" />
+                                                                <TextBlock
+                                                                    Style="{StaticResource FieldLabel}"
+                                                                Text="Формула количества" />
                                                                 <ui:TextBox
                                                                     AcceptsReturn="True"
                                                                     Height="90"
                                                                     TextWrapping="Wrap"
                                                                     Text="{Binding Formula, UpdateSourceTrigger=PropertyChanged}" />
 
-                                                            <TextBlock
-                                                                Style="{StaticResource FieldLabel}"
-                                                                Text="Формат примечания (Str)" />
+                                                                <TextBlock
+                                                                    Style="{StaticResource FieldLabel}"
+                                                                Text="Формат примечания" />
                                                                 <ui:TextBox
                                                                     AcceptsReturn="True"
                                                                     Height="60"
                                                                     TextWrapping="Wrap"
                                                                     Text="{Binding Note, UpdateSourceTrigger=PropertyChanged}" />
 
-                                                            <!-- Р­РјР°Р»СЊ Рё Р“СЂСѓРЅС‚РѕРІРєР° СѓР±СЂР°РЅС‹ РїРѕ Р·Р°РїСЂРѕСЃСѓ -->
-                                                        </StackPanel>
-                                                    </Expander>
+                                                                <!-- ?­???????? ?? ?????????????????? ???????????? ???? ?????????????? -->
+                                                            </StackPanel>
+                                                        </Expander>
+
+                                                        <ui:Button
+                                                            Grid.Column="1"
+                                                            Width="36"
+                                                            Height="36"
+                                                            Margin="8 4 0 0"
+                                                            Padding="0"
+                                                            VerticalAlignment="Top"
+                                                            HorizontalAlignment="Center"
+                                                            Appearance="Transparent"
+                                                            Content="{ui:SymbolIcon Symbol=Delete24}"
+                                                            Command="{Binding DataContext.RemoveConsumableTypeCommand, RelativeSource={RelativeSource AncestorType=Window}}"
+                                                            CommandParameter="{Binding}" />
+                                                    </Grid>
                                                 </DataTemplate>
                                             </ItemsControl.ItemTemplate>
                                         </ItemsControl>
@@ -377,4 +389,3 @@
         </Grid>
     </Grid>
 </core:WpfUIPlatformWindow>
-
