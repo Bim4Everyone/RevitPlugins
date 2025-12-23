@@ -173,7 +173,11 @@ internal class MainViewModel : BaseViewModel {
             return;
         }
 
-        ConsumableTypes.RemoveAt(ConsumableTypes.Count - 1);
+        if(item != null && ConsumableTypes.Contains(item)) {
+            ConsumableTypes.Remove(item);
+        } else {
+            ConsumableTypes.RemoveAt(ConsumableTypes.Count - 1);
+        }
 
         CommandManager.InvalidateRequerySuggested();
         UpdateTypesLists();
