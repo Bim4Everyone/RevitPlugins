@@ -8,6 +8,8 @@ using System.Runtime.CompilerServices;
 
 using dosymep.WPF.ViewModels;
 
+namespace RevitPylonDocumentation.ViewModels.UserSettings;
+
 internal abstract class ValidatableViewModel : BaseViewModel, INotifyDataErrorInfo {
     private readonly Dictionary<string, List<string>> _errors = new Dictionary<string, List<string>>();
 

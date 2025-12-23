@@ -126,7 +126,12 @@
 
                             <controls:TextBoxSettingControl
                                 LabelText="{me:LocalizationSource VerticalView.MainViewXOffset}"
-                                TextBoxText="{Binding Path=ViewSectionSettings.GeneralViewXOffsetTemp, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
+                                TextBoxText="{Binding 
+                                    Path=ViewSectionSettings.GeneralViewXOffsetTemp, 
+                                    UpdateSourceTrigger=PropertyChanged, 
+                                    Mode=TwoWay,
+                                    ValidatesOnDataErrors=True, 
+                                    ValidatesOnExceptions=True, NotifyOnValidationError=True, ValidatesOnNotifyDataErrors=True}"
                                 ToolTipText="{me:LocalizationSource VerticalViewSettingsPage.MainViewXOffsetToolTip}"
                                 TextChangedCommand="{Binding SettingsChangedCommand}" />
 
