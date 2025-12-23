@@ -369,14 +369,17 @@
                 <ui:Button
                     Margin="0 0 8 0"
                     Width="100"
-                    Content="Импорт" />
+                    Content="Импорт"
+                    Command="{Binding ImportConfigsCommand}" />
                 <ui:Button
                     Margin="0 0 8 0"
                     Width="100"
-                    Content="Экспорт" />
+                    Content="Экспорт"
+                    Command="{Binding ExportConfigsCommand}" />
                 <ui:Button
                     Width="100"
-                    Content="Сброс" />
+                    Content="Сброс"
+                    Command="{Binding ResetConfigsCommand}" />
             </StackPanel>
 
             <ui:TextBlock

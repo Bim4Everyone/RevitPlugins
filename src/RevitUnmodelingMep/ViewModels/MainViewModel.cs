@@ -1,8 +1,11 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.IO;
 using System.Linq;
 using System.Windows.Input;
+
+using Microsoft.Win32;
 
 using dosymep.SimpleServices;
 using dosymep.WPF.Commands;
@@ -45,6 +48,9 @@ internal class MainViewModel : BaseViewModel {
         AcceptViewCommand = RelayCommand.Create(AcceptView, CanAcceptView);
         AddConsumableTypeCommand = RelayCommand.Create(AddConsumableType);
         RemoveConsumableTypeCommand = RelayCommand.Create<ConsumableTypeItem>(RemoveConsumableType, CanRemoveConsumableType);
+        ImportConfigsCommand = RelayCommand.Create(ImportConfigs);
+        ExportConfigsCommand = RelayCommand.Create(ExportConfigs);
+        ResetConfigsCommand = RelayCommand.Create(ResetConfigs);
 
         ConsumableTypes = new ObservableCollection<ConsumableTypeItem>();
         CategoryAssignments = new ObservableCollection<CategoryAssignmentItem>();
@@ -59,6 +65,12 @@ internal class MainViewModel : BaseViewModel {
     public ICommand AddConsumableTypeCommand { get; }
 
     public ICommand RemoveConsumableTypeCommand { get; }
+
+    public ICommand ImportConfigsCommand { get; }
+
+    public ICommand ExportConfigsCommand { get; }
+
+    public ICommand ResetConfigsCommand { get; }
 
 
     public string ErrorText {
@@ -180,6 +192,63 @@ internal class MainViewModel : BaseViewModel {
         }
 
         CommandManager.InvalidateRequerySuggested();
+        UpdateTypesLists();
+    }
+
+    private void ResetConfigs() {
+        JObject defaults = _revitRepository.VisSettingsStorage.GetDefaultSettings();
+        LoadConsumableTypesFromSettings(defaults);
+    }
+
+    private void ImportConfigs() {
+        var dialog = new OpenFileDialog {
+            Filter = "JSON files (*.json)|*.json|All files (*.*)|*.*"
+        };
+
+        if(dialog.ShowDialog() != true) {
+            return;
+        }
+
+        try {
+            string fileContent = File.ReadAllText(dialog.FileName);
+            JObject imported = JObject.Parse(fileContent);
+            LoadConsumableTypesFromSettings(imported);
+        } catch {
+            ErrorText = "Не удалось импортировать конфиги из выбранного файла.";
+        }
+    }
+
+    private void ExportConfigs() {
+        var dialog = new SaveFileDialog {
+            Filter = "JSON files (*.json)|*.json|All files (*.*)|*.*",
+            FileName = "unmodeling_configs.json"
+        };
+
+        if(dialog.ShowDialog() != true) {
+            return;
+        }
+
+        JObject configs = BuildUnmodelingConfigs();
+        File.WriteAllText(dialog.FileName, configs.ToString());
+    }
+
+    private void LoadConsumableTypesFromSettings(JObject settings) {
+        JObject settingsWithKey;
+        if(settings?.ContainsKey(UnmodelingConfigReader.UnmodelingConfigKey) == true) {
+            settingsWithKey = settings;
+        } else {
+            settingsWithKey = new JObject {
+                [UnmodelingConfigReader.UnmodelingConfigKey] = settings ?? new JObject()
+            };
+        }
+
+        IReadOnlyList<ConsumableTypeItem> consumableTypes =
+            UnmodelingConfigReader.GetConsumableItems(
+                settingsWithKey,
+                ResolveCategoryOption,
+                out _lastConfigIndex);
+
+        ConsumableTypes = new ObservableCollection<ConsumableTypeItem>(consumableTypes);
         UpdateTypesLists();
     }
 

@@ -175,6 +175,35 @@ internal class VisSettingsStorage {
         return updatedSettings;
     }
 
+    public JObject GetDefaultSettings() {
+        var assembly = Assembly.GetExecutingAssembly();
+        string assemblyPath = string.Empty;
+
+        if(!string.IsNullOrWhiteSpace(assembly.CodeBase)) {
+            assemblyPath = new Uri(assembly.CodeBase).LocalPath;
+        }
+
+        if(string.IsNullOrWhiteSpace(assemblyPath) && !string.IsNullOrWhiteSpace(assembly.Location)) {
+            assemblyPath = assembly.Location;
+        }
+
+        if(string.IsNullOrWhiteSpace(assemblyPath)) {
+            assemblyPath = AppDomain.CurrentDomain.BaseDirectory;
+        }
+
+        string dllDir = Path.GetDirectoryName(assemblyPath)
+                        ?? AppDomain.CurrentDomain.BaseDirectory;
+
+        string appData = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
+        string defaultLibPath = Path.Combine(appData, "pyRevit", "Extensions", "04.OV-VK.extension", "lib");
+        string fallbackLibPath = Path.GetFullPath(Path.Combine(dllDir, "..", "..", "lib"));
+
+        string libDir = Directory.Exists(defaultLibPath) ? defaultLibPath : fallbackLibPath;
+        string defaultsPath = Path.Combine(libDir, "default_spec_settings.json");
+
+        return JObject.Parse(File.ReadAllText(defaultsPath));
+    }
+
     public string RemoveSettingValue(string settingsText, IList<string> keyPath) {
         JObject data = ParseSettings(settingsText);
 
