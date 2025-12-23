@@ -27,32 +27,6 @@
                 <ResourceDictionary
                     Source="../CustomStyles.xaml" />
             </ResourceDictionary.MergedDictionaries>
-
-            <ControlTemplate
-                x:Key="validationFailed1">
-                <StackPanel
-                    Orientation="Horizontal">
-                    <AdornedElementPlaceholder />
-                    <TextBlock
-                        Foreground="Red"
-                        FontSize="26"
-                        FontWeight="Bold">!</TextBlock>
-                </StackPanel>
-            </ControlTemplate>
-
-            <ControlTemplate
-                x:Key="validationFailed2">
-                <Border
-                    BorderBrush="Red"
-                    BorderThickness="1">
-                    <AdornedElementPlaceholder />
-                </Border>
-            </ControlTemplate>
-
-            <ControlTemplate
-                x:Key="validationFailed">
-                <AdornedElementPlaceholder />
-            </ControlTemplate>
         </ResourceDictionary>
     </core:WpfUIPlatformPage.Resources>
 
@@ -171,21 +145,14 @@
                             <ui:TextBox
                                 Margin="5"
                                 Style="{StaticResource ErrorTextBoxStyle}"
-                                Text="{Binding ViewSectionSettings.Age,  UpdateSourceTrigger=PropertyChanged}" />
+                                Text="{Binding ViewSectionSettings.GeneralViewYTopOffsetTemp, 
+                                    ValidatesOnNotifyDataErrors=True,  
+                                    UpdateSourceTrigger=PropertyChanged}" />
 
                             <ui:TextBox
                                 Margin="5"
-                                Style="{StaticResource ErrorTextBoxStyle1}"
-                                Text="{Binding ViewSectionSettings.Height,  UpdateSourceTrigger=PropertyChanged}" />
-                            
-                            <ui:TextBox
-                                Margin="5"
-                                Style="{StaticResource ErrorTextBoxStyle3}"
+                                Style="{StaticResource ErrorTextBoxStyle}"
                                 Text="{Binding ViewSectionSettings.Width, ValidatesOnNotifyDataErrors=True,  UpdateSourceTrigger=PropertyChanged}" />
-
-                            <ui:TextBlock
-                                Margin="5"
-                                Text="{Binding Path=ViewSectionSettings.HasErrors, UpdateSourceTrigger=PropertyChanged}" />
                         </StackPanel>
                     </Border>
 

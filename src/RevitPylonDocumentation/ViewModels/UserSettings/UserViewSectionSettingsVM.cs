@@ -165,15 +165,27 @@ internal class UserViewSectionSettingsVM : ValidatableViewModel {
     }
 
     public string GeneralViewXOffset { get; set; }
+
+    [Required(ErrorMessage = "Должно быть заполнено целым числом")]
+    [RegularExpression(@"^-?\d+$", ErrorMessage = "Должно быть целым числом")]
     public string GeneralViewXOffsetTemp {
         get => _generalViewXOffsetTemp;
-        set => RaiseAndSetIfChanged(ref _generalViewXOffsetTemp, value);
+        set {
+            RaiseAndSetIfChanged(ref _generalViewXOffsetTemp, value);
+            ValidateProperty(value);
+        }
     }
 
     public string GeneralViewYTopOffset { get; set; }
+
+    [Required(ErrorMessage = "Должно быть заполнено целым числом")]
+    [RegularExpression(@"^-?\d+$", ErrorMessage = "Должно быть целым числом")]
     public string GeneralViewYTopOffsetTemp {
         get => _generalViewYTopOffsetTemp;
-        set => RaiseAndSetIfChanged(ref _generalViewYTopOffsetTemp, value);
+        set {
+            RaiseAndSetIfChanged(ref _generalViewYTopOffsetTemp, value);
+            ValidateProperty(value);
+        }
     }
 
     public string GeneralViewYBottomOffset { get; set; }
