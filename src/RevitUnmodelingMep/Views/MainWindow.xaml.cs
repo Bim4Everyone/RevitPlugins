@@ -1,6 +1,9 @@
 using System.Windows;
+using System.Windows.Controls;
 
 using dosymep.SimpleServices;
+
+using RevitUnmodelingMep.ViewModels;
 
 namespace RevitUnmodelingMep.Views;
 
@@ -45,5 +48,11 @@ public partial class MainWindow {
 
     private void ButtonCancel_Click(object sender, RoutedEventArgs e) {
         DialogResult = false;
+    }
+
+    private void ContentTabs_OnSelectionChanged(object sender, SelectionChangedEventArgs e) {
+        if(e.Source is TabControl && DataContext is MainViewModel viewModel) {
+            viewModel.RefreshAssignmentsFromConsumableTypes();
+        }
     }
 }

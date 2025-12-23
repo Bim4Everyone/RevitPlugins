@@ -28,6 +28,7 @@ internal class MainViewModel : BaseViewModel {
     private ObservableCollection<CategoryAssignmentItem> _categoryAssignments;
     private int _lastConfigIndex;
     private readonly IReadOnlyList<CategoryOption> _categoryOptions;
+    private bool _isViewLoaded;
     
 
     public MainViewModel(
@@ -82,6 +83,7 @@ internal class MainViewModel : BaseViewModel {
     }
 
     public IReadOnlyList<CategoryOption> CategoryOptions => _categoryOptions;
+    public bool IsViewLoaded => _isViewLoaded;
 
 
     private void LoadView() {
@@ -99,6 +101,18 @@ internal class MainViewModel : BaseViewModel {
             return false;
         }
 
+        ConsumableTypeItem missingFormula = ConsumableTypes?
+            .FirstOrDefault(item => string.IsNullOrWhiteSpace(item?.Formula));
+
+        if(missingFormula != null) {
+            string name = missingFormula.ConsumableTypeName
+                          ?? missingFormula.Title
+                          ?? missingFormula.ConfigKey
+                          ?? "Неизвестный элемент";
+            ErrorText = $"Заполните формулу: {name}.";
+            return false;
+        }
+
         ErrorText = null;
         return true;
     }
@@ -111,6 +125,7 @@ internal class MainViewModel : BaseViewModel {
         UpdateTypesLists();
 
         SaveProperty = setting?.SaveProperty ?? _localizationService.GetLocalizedString("MainWindow.Hello");
+        _isViewLoaded = true;
     }
 
     private void SaveConfig() {
@@ -120,6 +135,14 @@ internal class MainViewModel : BaseViewModel {
         setting.SaveProperty = SaveProperty;
         SaveUnmodelingConfigs();
         _pluginConfig.SaveProjectConfig();
+    }
+
+    public void RefreshAssignmentsFromConsumableTypes() {
+        if(!_isViewLoaded) {
+            return;
+        }
+
+        UpdateTypesLists();
     }
 
     private void AddConsumableType() {

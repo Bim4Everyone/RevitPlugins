@@ -137,7 +137,8 @@
                 <TabControl
                     x:Name="ContentTabs"
                     Background="Transparent"
-                    BorderThickness="0">
+                    BorderThickness="0"
+                    SelectionChanged="ContentTabs_OnSelectionChanged">
                     <TabControl.Resources>
                         <Style TargetType="TabItem">
                             <Setter Property="Visibility" Value="Collapsed" />
