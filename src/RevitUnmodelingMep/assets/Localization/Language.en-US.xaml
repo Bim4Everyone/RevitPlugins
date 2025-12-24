@@ -51,9 +51,13 @@
 
     Unmodeling elements will be created in this workset and its visibility must be excluded.
     </system:String>
+    <system:String x:Key="UnmodelingCreator.WSSetup">Worksets setup</system:String>
     <system:String x:Key="UnmodelingCreator.VisibilityCaption">Worksets</system:String>
     <system:String x:Key="UnmodelingCreator.LoadFamilyTransactionName">Load family</system:String>
     <system:String x:Key="UnmodelingCreator.LoadFamilyError">Failed to load anchor element family</system:String>
 
     <system:String x:Key="UnmodelingCalculator.Error">Error while calculating element</system:String>
+
+    <system:String x:Key="EditorChecker.SettigsIsBusy">Project information is editing by user: </system:String>
+    <system:String x:Key="EditorChecker.SettigsIsOutDated">You own the items, but your file is out of date. Please sync.</system:String>
 </ResourceDictionary>

@@ -97,7 +97,7 @@
         
         <ui:TitleBar
             Grid.Row="0"
-            Title="Настройка расходников" />
+            Title="{me:LocalizationSource MainWindow.Title}" />
 
         <Grid
             Grid.Row="1"
@@ -125,8 +125,8 @@
                         Background="Transparent"
                         SelectedIndex="{Binding SelectedIndex, ElementName=ContentTabs, Mode=TwoWay}"
                         ItemContainerStyle="{StaticResource NavItemStyle}">
-                        <ListBoxItem Content="Типы расходников" />
-                        <ListBoxItem Content="Назначение расходников" />
+                        <ListBoxItem Content="{me:LocalizationSource MainWindow.TabTypesName}" />
+                        <ListBoxItem Content="{me:LocalizationSource MainWindow.TabDestinationName}" />
                     </ListBox>
                 </StackPanel>
             </Border>
@@ -145,7 +145,7 @@
                         </Style>
                     </TabControl.Resources>
 
-                    <TabItem Header="Типы расходников">
+                    <TabItem Header="{me:LocalizationSource MainWindow.TabTypesName}">
                         <ScrollViewer VerticalScrollBarVisibility="Auto">
                             <StackPanel Margin="0 0 0 12">
                                 <Border Style="{StaticResource CardBorder}">
@@ -199,7 +199,7 @@
 
                                                                 <TextBlock
                                                                     Style="{StaticResource FieldLabel}"
-                                                                Text="Категория" />
+                                                                    Text="{DynamicResource MainWindow.Category}" />
                                                                 <ComboBox
                                                                     MinHeight="32"
                                                                     ItemsSource="{Binding DataContext.CategoryOptions, RelativeSource={RelativeSource AncestorType=Window}}"
@@ -208,50 +208,50 @@
 
                                                                 <TextBlock
                                                                     Style="{StaticResource FieldLabel}"
-                                                                Text="Группирование" />
+                                                                    Text="{DynamicResource MainWindow.Group}" />
                                                                 <ui:TextBox
                                                                     MinHeight="32"
                                                                     Text="{Binding Grouping, UpdateSourceTrigger=PropertyChanged}" />
 
                                                                 <TextBlock
                                                                     Style="{StaticResource FieldLabel}"
-                                                                Text="Полное наименование" />
+                                                                    Text="{DynamicResource MainWindow.FullName}" />
                                                                 <ui:TextBox
                                                                     Text="{Binding Name, UpdateSourceTrigger=PropertyChanged}" />
 
                                                                 <TextBlock
                                                                     Style="{StaticResource FieldLabel}"
-                                                                Text="Марка" />
+                                                                    Text="{DynamicResource MainWindow.Mark}" />
                                                                 <ui:TextBox
                                                                     Text="{Binding Mark, UpdateSourceTrigger=PropertyChanged}" />
 
                                                                 <TextBlock
                                                                     Style="{StaticResource FieldLabel}"
-                                                                Text="Код" />
+                                                                    Text="{DynamicResource MainWindow.Code}" />
                                                                 <ui:TextBox
                                                                     Text="{Binding Code, UpdateSourceTrigger=PropertyChanged}" />
 
                                                                 <TextBlock
                                                                     Style="{StaticResource FieldLabel}"
-                                                                Text="Ед. изм." />
+                                                                    Text="{DynamicResource MainWindow.Unit}" />
                                                                 <ui:TextBox
                                                                     Text="{Binding Unit, UpdateSourceTrigger=PropertyChanged}" />
 
                                                                 <TextBlock
                                                                     Style="{StaticResource FieldLabel}"
-                                                                Text="Производитель" />
+                                                                    Text="{DynamicResource MainWindow.Creator}" />
                                                                 <ui:TextBox
                                                                     Text="{Binding Maker, UpdateSourceTrigger=PropertyChanged}" />
 
                                                                 <CheckBox
                                                                     Margin="0 2 0 0"
                                                                     Padding="0"
-                                                                    Content="Использовать проектные запасы по категории"
+                                                                    Content="{DynamicResource MainWindow.UseProjectStock}"
                                                                     IsChecked="{Binding UseCategoryReserve, Mode=TwoWay}" />
 
                                                                 <TextBlock
                                                                     Style="{StaticResource FieldLabel}"
-                                                                Text="Формула количества" />
+                                                                    Text="{DynamicResource MainWindow.Formula}" />
                                                                 <ui:TextBox
                                                                     AcceptsReturn="True"
                                                                     Height="90"
@@ -260,7 +260,7 @@
 
                                                                 <TextBlock
                                                                     Style="{StaticResource FieldLabel}"
-                                                                Text="Формат примечания" />
+                                                                    Text="{DynamicResource MainWindow.Note}" />
                                                                 <ui:TextBox
                                                                     AcceptsReturn="True"
                                                                     Height="60"
@@ -301,12 +301,12 @@
                                                 Content="{ui:SymbolIcon Symbol=Add24}"
                                                 Command="{Binding AddConsumableTypeCommand}" />
                                         </StackPanel>
-                                    </StackPanel>
-                                </Border>
+                                            </StackPanel>
+                                        </Border>
                             </StackPanel>
                         </ScrollViewer>
                     </TabItem>
-                    <TabItem Header="Назначение расходников">
+                    <TabItem Header="{me:LocalizationSource MainWindow.TabDestinationName}">
                         <ScrollViewer VerticalScrollBarVisibility="Auto">
 
                             <ItemsControl ItemsSource="{Binding CategoryAssignments}">
@@ -328,7 +328,7 @@
                                                                             <ColumnDefinition Width="Auto" />
                                                                         </Grid.ColumnDefinitions>
                                                                         <TextBlock VerticalAlignment="Center" Text="{Binding Name}" />
-                                                                        <CheckBox Grid.Column="1" VerticalAlignment="Center" Content="Выбрать все" IsChecked="{Binding IsAllSelected, Mode=TwoWay}" />
+                                                                        <CheckBox Grid.Column="1" VerticalAlignment="Center" Content="{DynamicResource MainWindow.SelectAll}" IsChecked="{Binding IsAllSelected, Mode=TwoWay}" />
                                                                     </Grid>
                                                                 </Expander.Header>
                                                                 <ItemsControl ItemsSource="{Binding Configs}">
@@ -377,7 +377,7 @@
                     Command="{Binding ExportConfigsCommand}" />
                 <ui:Button
                     Width="100"
-                    Content="{me:LocalizationSource MainWindow.ButtonExport}"
+                    Content="{me:LocalizationSource MainWindow.ButtonDefault}"
                     Command="{Binding ResetConfigsCommand}" />
             </StackPanel>
 

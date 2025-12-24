@@ -115,9 +115,10 @@ internal class UnmodelingCreator {
         string targetName = "99_Немоделируемые элементы";
         string warningText = _localizationService.GetLocalizedString("UnmodelingCreator.VisibilityWarning");
         string warningCaption = _localizationService.GetLocalizedString("UnmodelingCreator.VisibilityCaption");
+        string transctionName = _localizationService.GetLocalizedString("UnmodelingCreator.WSSetup");
 
         if(WorksetTable.IsWorksetNameUnique(_doc, targetName)) {
-            using(var t = _doc.StartTransaction("Настройка рабочих наборов")) {
+            using(var t = _doc.StartTransaction(transctionName)) {
 
                 Workset newWS = Workset.Create(_doc, targetName);
                 _ws_id = newWS.Id;
@@ -247,8 +248,10 @@ internal class UnmodelingCreator {
         }
 
         string familyPath = Path.Combine(_libDir, _familyName + ".rfa");
+        string transactionName = _localizationService.GetLocalizedString(
+            "UnmodelingCreator.LoadFamilyTransactionName");
 
-        using(var t = _doc.StartTransaction(_localizationService.GetLocalizedString("UnmodelingCreator.LoadFamilyTransactionName"))) {
+        using(var t = _doc.StartTransaction(transactionName)) {
             if(_doc.LoadFamily(familyPath, out Family loadedFamily) && loadedFamily != null) {
                 t.Commit();
 
@@ -278,8 +281,9 @@ internal class UnmodelingCreator {
     }
 
     public void RemoveUnmodeling() {
-        EditorChecker editorChecker = new EditorChecker(_doc);
+        EditorChecker editorChecker = new EditorChecker(_doc, _localizationService);
         List<FamilyInstance> genericCollection = GetGenericCollection();
+        string transactionName = _localizationService.GetLocalizedString("MainWindow.Title");
 
         foreach(FamilyInstance familyInstance in genericCollection) {
             editorChecker.GetReport(familyInstance);

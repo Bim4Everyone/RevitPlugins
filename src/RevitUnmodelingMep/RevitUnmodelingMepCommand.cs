@@ -85,15 +85,17 @@ public class RevitUnmodelingMepCommand : BasePluginCommand {
             $"/{assemblyName};component/assets/localization/language.xaml",
             CultureInfo.GetCultureInfo("ru-RU"));
 
+        var localizationService = kernel.Get<ILocalizationService>();
+
         var servise = GetPlatformService<IMessageBoxService>();
-        CheckDocument(uiApplication.ActiveUIDocument.Document, servise);
+        CheckDocument(uiApplication.ActiveUIDocument.Document, servise, localizationService);
 
         // Вызывает стандартное уведомление
         Notification(kernel.Get<MainWindow>());
     }
 
-    private void CheckDocument(Document document, IMessageBoxService service) {
-        EditorChecker editorChecker = new(document);
+    private void CheckDocument(Document document, IMessageBoxService service, ILocalizationService localizationService) {
+        EditorChecker editorChecker = new(document, localizationService);
         ProjectInfo info = document.ProjectInformation;
 
         editorChecker.GetReport(info);

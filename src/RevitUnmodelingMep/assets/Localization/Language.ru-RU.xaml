@@ -52,10 +52,15 @@
 
     В данном рабочем наборе будут создаваться немоделируемые элементы и требуется исключить их видимость.
     </system:String>
+    <system:String x:Key="UnmodelingCreator.WSSetup">Настройка рабочих наборов</system:String>
     <system:String x:Key="UnmodelingCreator.VisibilityCaption">Рабочие наборы</system:String>
     <system:String x:Key="UnmodelingCreator.LoadFamilyTransactionName">Загрузка семейства</system:String>
     <system:String x:Key="UnmodelingCreator.LoadFamilyError">Не удалось загрузить семейство якорного элемента</system:String>
 
     <system:String x:Key="UnmodelingCalculator.Error">Ошибка в расчете элемента</system:String>
+
+
+    <system:String x:Key="EditorChecker.SettigsIsBusy">Сведения о проекте сейчас редактирует пользователь: </system:String>
+    <system:String x:Key="EditorChecker.SettigsIsOutDated">Элемент принадлежит вам, но файл устарел. Выполните синхронизацию с центральным файлом.</system:String>
 
 </ResourceDictionary>
