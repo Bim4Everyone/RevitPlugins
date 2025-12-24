@@ -22,6 +22,9 @@ namespace RevitUnmodelingMep.ViewModels;
 
 
 internal class MainViewModel : BaseViewModel {
+    private const string UnmodelingSettingsKey = "UNMODELING_SETTINGS";
+    private const string OnlyProjectInstancesKey = "ONLY_PROJECT_INSTANCES";
+
     private readonly PluginConfig _pluginConfig;
     private readonly RevitRepository _revitRepository;
     private readonly ILocalizationService _localizationService;
@@ -30,6 +33,7 @@ internal class MainViewModel : BaseViewModel {
     private string _saveProperty;
     private ObservableCollection<ConsumableTypeItem> _consumableTypes;
     private ObservableCollection<CategoryAssignmentItem> _categoryAssignments;
+    private bool _onlyPlacedInProject = true;
     private int _lastConfigIndex;
     private readonly IReadOnlyList<CategoryOption> _categoryOptions;
     private bool _isViewLoaded;
@@ -97,6 +101,21 @@ internal class MainViewModel : BaseViewModel {
 
     public IReadOnlyList<CategoryOption> CategoryOptions => _categoryOptions;
     public bool IsViewLoaded => _isViewLoaded;
+
+    public bool OnlyPlacedInProject {
+        get => _onlyPlacedInProject;
+        set {
+            if(_onlyPlacedInProject == value) {
+                return;
+            }
+
+            RaiseAndSetIfChanged(ref _onlyPlacedInProject, value);
+
+            if(_isViewLoaded) {
+                UpdateTypesLists();
+            }
+        }
+    }
 
 
     private void LoadView() {
@@ -220,19 +239,16 @@ internal class MainViewModel : BaseViewModel {
             return;
         }
 
-        JObject configs = BuildUnmodelingConfigs();
-        File.WriteAllText(dialog.FileName, configs.ToString());
+        var exported = new JObject {
+            [UnmodelingConfigReader.UnmodelingConfigKey] = BuildUnmodelingConfigs(),
+            [UnmodelingSettingsKey] = BuildUnmodelingSettings()
+        };
+        File.WriteAllText(dialog.FileName, exported.ToString());
     }
 
     private void LoadConsumableTypesFromSettings(JObject settings) {
-        JObject settingsWithKey;
-        if(settings?.ContainsKey(UnmodelingConfigReader.UnmodelingConfigKey) == true) {
-            settingsWithKey = settings;
-        } else {
-            settingsWithKey = new JObject {
-                [UnmodelingConfigReader.UnmodelingConfigKey] = settings ?? new JObject()
-            };
-        }
+        JObject settingsWithKey = NormalizeSettings(settings);
+        ApplySettings(settingsWithKey);
 
         IReadOnlyList<ConsumableTypeItem> consumableTypes =
             UnmodelingConfigReader.GetConsumableItems(
@@ -245,9 +261,13 @@ internal class MainViewModel : BaseViewModel {
     }
 
     private void LoadUnmodelingConfigs() {
+        JObject settings = _revitRepository.VisSettingsStorage.GetUnmodelingConfig();
+        settings = NormalizeSettings(settings);
+        ApplySettings(settings);
+
         IReadOnlyList<ConsumableTypeItem> consumableTypes =
-            UnmodelingConfigReader.LoadUnmodelingConfigs(
-                _revitRepository.VisSettingsStorage,
+            UnmodelingConfigReader.GetConsumableItems(
+                settings,
                 ResolveCategoryOption,
                 out _lastConfigIndex);
 
@@ -259,6 +279,10 @@ internal class MainViewModel : BaseViewModel {
         _revitRepository.VisSettingsStorage.SetSettingValue(
             new List<string> { UnmodelingConfigReader.UnmodelingConfigKey },
             configs);
+
+        _revitRepository.VisSettingsStorage.SetSettingValue(
+            new List<string> { UnmodelingSettingsKey },
+            BuildUnmodelingSettings());
     }
 
     private JObject BuildUnmodelingConfigs() {
@@ -278,6 +302,35 @@ internal class MainViewModel : BaseViewModel {
         return configs;
     }
 
+    private JObject BuildUnmodelingSettings() {
+        return new JObject {
+            [OnlyProjectInstancesKey] = OnlyPlacedInProject
+        };
+    }
+
+    private static JObject NormalizeSettings(JObject settings) {
+        if(settings?.ContainsKey(UnmodelingConfigReader.UnmodelingConfigKey) == true) {
+            return settings;
+        }
+
+        return new JObject {
+            [UnmodelingConfigReader.UnmodelingConfigKey] = settings ?? new JObject()
+        };
+    }
+
+    private void ApplySettings(JObject settings) {
+        if(settings == null) {
+            return;
+        }
+
+        if(settings.TryGetValue(UnmodelingSettingsKey, out JToken settingsToken)
+           && settingsToken is JObject settingsObj
+           && settingsObj.TryGetValue(OnlyProjectInstancesKey, out JToken onlyProjectToken)
+           && onlyProjectToken.Type == JTokenType.Boolean) {
+            OnlyPlacedInProject = (bool) onlyProjectToken;
+        }
+    }
+
     private string GetNextConfigKey() {
         _lastConfigIndex++;
         return $"config_{_lastConfigIndex:000}";
@@ -293,7 +346,7 @@ internal class MainViewModel : BaseViewModel {
             BuiltInCategory.OST_PipingSystem
         };
 
-        var assignments = new ObservableCollection<CategoryAssignmentItem>();
+        var assignments = new List<CategoryAssignmentItem>();
 
         foreach(BuiltInCategory builtInCategory in categories) {
             CategoryOption option = CategoryOptions.FirstOrDefault(o => o.BuiltInCategory == builtInCategory);
@@ -308,13 +361,22 @@ internal class MainViewModel : BaseViewModel {
 
             List<ConsumableTypeItem> configsForCategory = ConsumableTypes?
                 .Where(c => TryGetCategoryId(c, out int cid) && cid == optionCategoryId)
+                .OrderBy(c => c?.ConsumableTypeName ?? string.Empty, StringComparer.CurrentCultureIgnoreCase)
                 .ToList() ?? new List<ConsumableTypeItem>();
+
+            HashSet<int> placedTypeIds = OnlyPlacedInProject ? GetPlacedTypeIds(builtInCategory) : null;
 
             ObservableCollection<SystemTypeItem> systemTypes =
                 new ObservableCollection<SystemTypeItem>(
                     types
                         .OfType<ElementType>()
+                        .Where(type => placedTypeIds == null || placedTypeIds.Contains(GetElementIdValue(type.Id)))
+                        .OrderBy(type => type?.Name ?? string.Empty, StringComparer.CurrentCultureIgnoreCase)
                         .Select(type => CreateSystemTypeItem(type, configsForCategory)));
+
+            if(systemTypes.Count == 0) {
+                continue;
+            }
 
             assignments.Add(new CategoryAssignmentItem {
                 Name = categoryName,
@@ -323,7 +385,27 @@ internal class MainViewModel : BaseViewModel {
             });
         }
 
-        CategoryAssignments = assignments;
+        CategoryAssignments = new ObservableCollection<CategoryAssignmentItem>(
+            assignments.OrderBy(a => a?.Name ?? string.Empty, StringComparer.CurrentCultureIgnoreCase));
+    }
+
+    private HashSet<int> GetPlacedTypeIds(BuiltInCategory builtInCategory) {
+        var result = new HashSet<int>();
+
+        var collector = new FilteredElementCollector(_revitRepository.Doc)
+            .OfCategory(builtInCategory)
+            .WhereElementIsNotElementType();
+
+        foreach(Element element in collector) {
+            ElementId typeId = element.GetTypeId();
+            if(typeId == null || typeId == ElementId.InvalidElementId) {
+                continue;
+            }
+
+            result.Add(GetElementIdValue(typeId));
+        }
+
+        return result;
     }
 
     private SystemTypeItem CreateSystemTypeItem(ElementType elementType, List<ConsumableTypeItem> configs) {

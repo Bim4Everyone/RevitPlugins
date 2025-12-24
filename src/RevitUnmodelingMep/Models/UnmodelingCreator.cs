@@ -68,6 +68,7 @@ internal class UnmodelingCreator {
                         SharedParamsConfig.Instance.BuildingWorksBlock,
                         SharedParamsConfig.Instance.BuildingWorksSection,
                         SharedParamsConfig.Instance.BuildingWorksLevel,
+                        SharedParamsConfig.Instance.BuildingWorksLevelCurrency,
                         SharedParamsConfig.Instance.VISSettings,
                         SharedParamsConfig.Instance.Description
             ];

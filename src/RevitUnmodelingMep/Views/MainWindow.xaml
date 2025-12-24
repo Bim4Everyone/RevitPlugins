@@ -113,12 +113,6 @@
                 Style="{StaticResource CardBorder}"
                 Padding="12">
                 <StackPanel>
-                    <ui:TextBlock
-                        Margin="4 0 0 12"
-                        FontSize="16"
-                        FontWeight="SemiBold"
-                        Text="{me:LocalizationSource MainWindow.Title}" />
-
                     <ListBox
                         x:Name="NavigationList"
                         BorderThickness="0"
@@ -308,45 +302,52 @@
                     </TabItem>
                     <TabItem Header="{me:LocalizationSource MainWindow.TabDestinationName}">
                         <ScrollViewer VerticalScrollBarVisibility="Auto">
+                            <StackPanel>
+                                <ItemsControl ItemsSource="{Binding CategoryAssignments}">
+                                    <ItemsControl.ItemTemplate>
+                                        <DataTemplate>
+                                            <Expander Margin="0 0 0 8" IsExpanded="False">
+                                                <Expander.Header>
+                                                    <TextBlock FontWeight="SemiBold" Text="{Binding Name}" />
+                                                </Expander.Header>
+                                                <StackPanel Margin="0 8 0 0">
+                                                    <ItemsControl ItemsSource="{Binding SystemTypes}">
+                                                        <ItemsControl.ItemTemplate>
+                                                            <DataTemplate>
+                                                                <Expander Margin="0 0 0 8" IsExpanded="False">
+                                                                    <Expander.Header>
+                                                                        <Grid>
+                                                                            <Grid.ColumnDefinitions>
+                                                                                <ColumnDefinition Width="*" />
+                                                                                <ColumnDefinition Width="Auto" />
+                                                                            </Grid.ColumnDefinitions>
+                                                                            <TextBlock VerticalAlignment="Center" Text="{Binding Name}" />
+                                                                            <CheckBox Grid.Column="1" VerticalAlignment="Center" Content="{DynamicResource MainWindow.SelectAll}" IsChecked="{Binding IsAllSelected, Mode=TwoWay}" />
+                                                                        </Grid>
+                                                                    </Expander.Header>
+                                                                    <ItemsControl ItemsSource="{Binding Configs}">
+                                                                        <ItemsControl.ItemTemplate>
+                                                                            <DataTemplate>
+                                                                                <CheckBox Margin="0 4 0 0" Content="{Binding Name}" IsChecked="{Binding IsChecked, Mode=TwoWay}" />
+                                                                            </DataTemplate>
+                                                                        </ItemsControl.ItemTemplate>
+                                                                    </ItemsControl>
+                                                                </Expander>
+                                                            </DataTemplate>
+                                                        </ItemsControl.ItemTemplate>
+                                                    </ItemsControl>
+                                                </StackPanel>
+                                            </Expander>
+                                        </DataTemplate>
+                                    </ItemsControl.ItemTemplate>
+                                </ItemsControl>
 
-                            <ItemsControl ItemsSource="{Binding CategoryAssignments}">
-                                <ItemsControl.ItemTemplate>
-                                    <DataTemplate>
-                                        <Expander Margin="0 0 0 8" IsExpanded="False">
-                                            <Expander.Header>
-                                                <TextBlock FontWeight="SemiBold" Text="{Binding Name}" />
-                                            </Expander.Header>
-                                            <StackPanel Margin="0 8 0 0">
-                                                <ItemsControl ItemsSource="{Binding SystemTypes}">
-                                                    <ItemsControl.ItemTemplate>
-                                                        <DataTemplate>
-                                                            <Expander Margin="0 0 0 8" IsExpanded="False">
-                                                                <Expander.Header>
-                                                                    <Grid>
-                                                                        <Grid.ColumnDefinitions>
-                                                                            <ColumnDefinition Width="*" />
-                                                                            <ColumnDefinition Width="Auto" />
-                                                                        </Grid.ColumnDefinitions>
-                                                                        <TextBlock VerticalAlignment="Center" Text="{Binding Name}" />
-                                                                        <CheckBox Grid.Column="1" VerticalAlignment="Center" Content="{DynamicResource MainWindow.SelectAll}" IsChecked="{Binding IsAllSelected, Mode=TwoWay}" />
-                                                                    </Grid>
-                                                                </Expander.Header>
-                                                                <ItemsControl ItemsSource="{Binding Configs}">
-                                                                    <ItemsControl.ItemTemplate>
-                                                                        <DataTemplate>
-                                                                            <CheckBox Margin="0 4 0 0" Content="{Binding Name}" IsChecked="{Binding IsChecked, Mode=TwoWay}" />
-                                                                        </DataTemplate>
-                                                                    </ItemsControl.ItemTemplate>
-                                                                </ItemsControl>
-                                                            </Expander>
-                                                        </DataTemplate>
-                                                    </ItemsControl.ItemTemplate>
-                                                </ItemsControl>
-                                            </StackPanel>
-                                        </Expander>
-                                    </DataTemplate>
-                                </ItemsControl.ItemTemplate>
-                            </ItemsControl>
+                                <CheckBox
+                                    Margin="0 8 0 0"
+                                    HorizontalAlignment="Left"
+                                    Content="{DynamicResource MainWindow.CheckboxOnlyInstances}"
+                                    IsChecked="{Binding OnlyPlacedInProject, Mode=TwoWay}" />
+                            </StackPanel>
                         </ScrollViewer>
                     </TabItem>
                 </TabControl>
