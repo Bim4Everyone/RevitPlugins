@@ -33,7 +33,9 @@ internal static class FormulaValidator {
         errorText = null;
 
         if(string.IsNullOrEmpty(saveProperty)) {
-            errorText = emptySavePropertyMessage;
+            errorText = !string.IsNullOrWhiteSpace(emptySavePropertyMessage)
+                ? emptySavePropertyMessage
+                : "Validation error.";
             return false;
         }
 
@@ -87,14 +89,14 @@ internal static class FormulaValidator {
             ?? Enumerable.Empty<string>();
 
         HashSet<string> allowedSet = new HashSet<string>(allowed);
-        HashSet<string> builtins = new HashSet<string> {
+        HashSet<string> builtins = new HashSet<string>(StringComparer.OrdinalIgnoreCase) {
             "PI", "E", "TRUE", "FALSE", "NAN", "INFINITY"
         };
 
         // ?‘?ó>‘?‘Øøç? ‘?‘'‘??ó??‘<ç >ñ‘'ç‘?ø>‘<, ‘Ø‘'?+‘< ñ?ç?ø ??‘?‘'‘?ñ óø?‘<‘Øçó ?ç ?ø>ñ?ñ‘???ø>ñ‘?‘? óøó ñ?ç?‘'ñ‘"ñóø‘'?‘?‘<.
         string formulaNoStrings = Regex.Replace(item.Formula, "\"[^\"]*\"", " ");
 
-        foreach(Match match in Regex.Matches(formulaNoStrings, @"[A-Za-z_][A-Za-z0-9_]*")) {
+        foreach(Match match in Regex.Matches(formulaNoStrings, @"[\p{L}_][\p{L}\p{Nd}_]*")) {
             string token = match.Value;
             if(allowedSet.Contains(token) || builtins.Contains(token)) {
                 continue;

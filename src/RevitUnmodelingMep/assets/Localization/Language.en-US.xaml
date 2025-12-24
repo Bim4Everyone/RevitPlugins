@@ -28,6 +28,9 @@
     <system:String x:Key="MainWindow.Formula">Formula</system:String>
     <system:String x:Key="MainWindow.Note">Note formula</system:String>
 
+    <system:String x:Key="MainViewModel.SavePropertyDefault">default</system:String>
+    <system:String x:Key="MainViewModel.SavePropertyEmpty">Configuration error: required setting is empty.</system:String>
+
     <system:String x:Key="Repository.TransactionName">Consumables calculation</system:String>
 
     <system:String x:Key="MainViewModel.ImportError">Unable to import settings from selected file.</system:String>

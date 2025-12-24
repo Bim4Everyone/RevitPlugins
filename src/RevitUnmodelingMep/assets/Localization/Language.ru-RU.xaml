@@ -27,6 +27,9 @@
     <system:String x:Key="MainWindow.UseProjectStock">Использовать проектные запасы по категории</system:String>
     <system:String x:Key="MainWindow.Formula">Формула</system:String>
     <system:String x:Key="MainWindow.Note">Формула примечания</system:String>
+
+    <system:String x:Key="MainViewModel.SavePropertyDefault">по умолчанию</system:String>
+    <system:String x:Key="MainViewModel.SavePropertyEmpty">Ошибка конфигурации: не задано обязательное значение.</system:String>
     
 
     <system:String x:Key="Repository.TransactionName">Расчет расходников</system:String>

@@ -131,7 +131,7 @@ internal class MainViewModel : BaseViewModel {
         bool isValid = FormulaValidator.ValidateFormulas(
             ConsumableTypes,
             SaveProperty,
-            _localizationService.GetLocalizedString("MainWindow.HelloCheck"),
+            _localizationService.GetLocalizedString("MainViewModel.SavePropertyEmpty"),
             _localizationService,
             item => TryGetCategoryId(item, out int cid) ? cid : (int?) null,
             out string error);
@@ -147,7 +147,7 @@ internal class MainViewModel : BaseViewModel {
         LoadUnmodelingConfigs();
         UpdateTypesLists();
 
-        SaveProperty = setting?.SaveProperty ?? _localizationService.GetLocalizedString("MainWindow.Hello");
+        SaveProperty = setting?.SaveProperty ?? _localizationService.GetLocalizedString("MainViewModel.SavePropertyDefault");
         _isViewLoaded = true;
     }
 
