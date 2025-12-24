@@ -69,8 +69,7 @@ internal class UnmodelingCreator {
                         SharedParamsConfig.Instance.BuildingWorksSection,
                         SharedParamsConfig.Instance.BuildingWorksLevel,
                         SharedParamsConfig.Instance.BuildingWorksLevelCurrency,
-                        SharedParamsConfig.Instance.VISSettings,
-                        SharedParamsConfig.Instance.Description
+                        SharedParamsConfig.Instance.VISSettings
             ];
 
         ProjectParameters projectParameters = ProjectParameters.Create(_doc.Application);
@@ -79,6 +78,42 @@ internal class UnmodelingCreator {
         CheckWorksets();
 
         _famylySymbol = GetFamilySymbol();
+
+        if(CheckSymbol(_famylySymbol) == false) {
+            MessageBox.Show(_localizationService.GetLocalizedString("UnmodelingCreator.FamilyOutdatedError"));
+            throw new OperationCanceledException();
+        }
+    }
+
+    private IList<string> GetFamilySharedParameterNames(Family family) {
+        // Открываем документ семейства для редактирования
+        Document familyDoc = _doc.EditFamily(family);
+
+        try {
+            FamilyManager familyManager = familyDoc.FamilyManager;
+
+            IList<string> sharedParameters = new List<string>();
+
+            foreach(FamilyParameter param in familyManager.Parameters) {
+                if(param.IsShared) {
+                    sharedParameters.Add(param.Definition.Name);
+                }
+            }
+
+            return sharedParameters;
+        } finally {
+            // Закрываем документ семейства без сохранения изменений
+            familyDoc.Close(false);
+        }
+    }
+
+    private bool CheckSymbol(FamilySymbol famylySymbol) {
+        string paraName = SharedParamsConfig.Instance.Description.Name;
+        Family family = famylySymbol.Family;
+
+        IList<string> paraNames = GetFamilySharedParameterNames(family);
+
+        return paraNames.Contains(paraName);
     }
 
     private string GetLibFolder() {

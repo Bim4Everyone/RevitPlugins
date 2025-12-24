@@ -55,6 +55,7 @@
     <system:String x:Key="UnmodelingCreator.VisibilityCaption">Worksets</system:String>
     <system:String x:Key="UnmodelingCreator.LoadFamilyTransactionName">Load family</system:String>
     <system:String x:Key="UnmodelingCreator.LoadFamilyError">Failed to load anchor element family</system:String>
+    <system:String x:Key="UnmodelingCreator.FamilyOutdatedError">Update the anchor element family.</system:String>
 
     <system:String x:Key="UnmodelingCalculator.Error">Error while calculating element</system:String>
 
