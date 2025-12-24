@@ -113,6 +113,7 @@ internal class MainViewModel : BaseViewModel {
             ConsumableTypes,
             SaveProperty,
             _localizationService.GetLocalizedString("MainWindow.HelloCheck"),
+            _localizationService,
             item => TryGetCategoryId(item, out int cid) ? cid : (int?) null,
             out string error);
 
@@ -205,7 +206,7 @@ internal class MainViewModel : BaseViewModel {
             JObject imported = JObject.Parse(fileContent);
             LoadConsumableTypesFromSettings(imported);
         } catch {
-            ErrorText = "Не удалось импортировать конфиги из выбранного файла.";
+            ErrorText = _localizationService.GetLocalizedString("MainViewModel.ImportError");
         }
     }
 
@@ -366,12 +367,25 @@ internal class MainViewModel : BaseViewModel {
 
     private IReadOnlyList<CategoryOption> CreateCategoryOptions() {
         List<CategoryOption> options = new List<CategoryOption> {
-            CreateCategoryOption("Воздуховоды", BuiltInCategory.OST_DuctCurves),
-            CreateCategoryOption("Трубы", BuiltInCategory.OST_PipeCurves),
-            CreateCategoryOption("Материалы изоляции трубопроводов", BuiltInCategory.OST_PipeInsulations),
-            CreateCategoryOption("Материалы изоляции воздуховодов", BuiltInCategory.OST_DuctInsulations),
-            CreateCategoryOption("Системы воздуховодов", BuiltInCategory.OST_DuctSystem),
-            CreateCategoryOption("Системы трубопроводов", BuiltInCategory.OST_PipingSystem)
+            
+            CreateCategoryOption(
+                _localizationService.GetLocalizedString("MainViewModel.DuctsName"), 
+                BuiltInCategory.OST_DuctCurves),
+            CreateCategoryOption(
+                _localizationService.GetLocalizedString("MainViewModel.PipesName"), 
+                BuiltInCategory.OST_PipeCurves),
+            CreateCategoryOption(
+                _localizationService.GetLocalizedString("MainViewModel.PipeInsName"), 
+                BuiltInCategory.OST_PipeInsulations),
+            CreateCategoryOption(
+                _localizationService.GetLocalizedString("MainViewModel.DuctInsName"), 
+                BuiltInCategory.OST_DuctInsulations),
+            CreateCategoryOption(
+                _localizationService.GetLocalizedString("MainViewModel.DuctSysName"), 
+                BuiltInCategory.OST_DuctSystem),
+            CreateCategoryOption(
+                _localizationService.GetLocalizedString("MainViewModel.PipeSysName"), 
+                BuiltInCategory.OST_PipingSystem)
         };
 
         return options;

@@ -34,6 +34,7 @@ internal class UnmodelingCreator {
         ["Расчет краски и креплений", "Расходники изоляции"];
 
     private readonly Document _doc;
+    private readonly ILocalizationService _localizationService;
     private WorksetId? _ws_id;
     private FamilySymbol? _famylySymbol;
     private readonly string _libDir;
@@ -41,8 +42,9 @@ internal class UnmodelingCreator {
     private const double _coordinateStep = 0.001;
     private double _maxLocationY = 0;
 
-    public UnmodelingCreator(Document doc) {
+    public UnmodelingCreator(Document doc, ILocalizationService localizationService) {
         _doc = doc;
+        _localizationService = localizationService;
         _libDir = GetLibFolder();
     }
 
@@ -50,7 +52,7 @@ internal class UnmodelingCreator {
         get {
             if(_famylySymbol is null) {
                 throw new InvalidOperationException(
-                    "Символ семейства якорного элемента не инициализирован. Вызовите StartupChecks() перед расчетом.");
+                    "_famylySymbol is null");
             }
 
             return _famylySymbol;
@@ -111,10 +113,8 @@ internal class UnmodelingCreator {
 
     private void CheckWorksets() {
         string targetName = "99_Немоделируемые элементы";
-        string warningText = "Рабочий набор \"99_Немоделируемые элементы\" на данный момент отображается на всех видах.\n\n" +
-                "Откройте диспетчер рабочих наборов и снимите галочку с параметра \"Видимый на всех видах\".\n\n" +
-                "В данном рабочем наборе будут создаваться немоделируемые элементы и требуется исключить их видимость.";
-        string warningCaption = "Рабочие наборы";
+        string warningText = _localizationService.GetLocalizedString("UnmodelingCreator.VisibilityWarning");
+        string warningCaption = _localizationService.GetLocalizedString("UnmodelingCreator.VisibilityCaption");
 
         if(WorksetTable.IsWorksetNameUnique(_doc, targetName)) {
             using(var t = _doc.StartTransaction("Настройка рабочих наборов")) {
@@ -181,7 +181,7 @@ internal class UnmodelingCreator {
         Parameter instWorkset = familyInstance.GetParam(BuiltInParameter.ELEM_PARTITION_PARAM);
 
         if(_ws_id is null)
-            throw new InvalidOperationException("Рабочий набор немоделируемых не инициализирован");
+            throw new InvalidOperationException("_ws_id is null");
         instWorkset.Set(_ws_id.IntegerValue);
 
         string group = $"{newRowElement.Group}" +
@@ -214,7 +214,7 @@ internal class UnmodelingCreator {
 
                 default:
                     throw new NotSupportedException(
-                        $"Тип {value.GetType().Name} не поддерживается");
+                        "Unsupported value type");
             }
         }
 
@@ -248,7 +248,7 @@ internal class UnmodelingCreator {
 
         string familyPath = Path.Combine(_libDir, _familyName + ".rfa");
 
-        using(var t = _doc.StartTransaction("Загрузка семейства")) {
+        using(var t = _doc.StartTransaction(_localizationService.GetLocalizedString("UnmodelingCreator.LoadFamilyTransactionName"))) {
             if(_doc.LoadFamily(familyPath, out Family loadedFamily) && loadedFamily != null) {
                 t.Commit();
 
@@ -265,7 +265,7 @@ internal class UnmodelingCreator {
                 t.Commit();
             }
         }
-        MessageBox.Show("Не удалось загрузить семейство якорного элемента");
+        MessageBox.Show(_localizationService.GetLocalizedString("UnmodelingCreator.LoadFamilyError"));
         throw new OperationCanceledException();
     }
 

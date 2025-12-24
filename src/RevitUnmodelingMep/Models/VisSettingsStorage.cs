@@ -11,19 +11,22 @@ using dosymep.Bim4Everyone;
 using dosymep.Bim4Everyone.SharedParams;
 using dosymep.Bim4Everyone.Templates;
 using dosymep.Revit;
+using dosymep.SimpleServices;
 
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 
 using Wpf.Ui.Controls;
 
-namespace RevitUnmodelingMep.Models; 
+namespace RevitUnmodelingMep.Models;
 
 internal class VisSettingsStorage {
     private readonly Document _doc;
+    private readonly ILocalizationService _localizationService;
 
-    public VisSettingsStorage(Document doc) {
+    public VisSettingsStorage(Document doc, ILocalizationService localizationService) {
         _doc = doc;
+        _localizationService = localizationService;
     }
 
     public JObject GetUnmodelingConfig() {
@@ -53,11 +56,11 @@ internal class VisSettingsStorage {
             string dllDir = Path.GetDirectoryName(assemblyPath)
                             ?? AppDomain.CurrentDomain.BaseDirectory;
 
-            // Основной путь: профиль pyRevit -> Extensions -> 04.OV-VK.extension -> lib
+            // Р?С?Р?Р?Р?Р?Р?Р№ РїС?С'С?: РїС?Р?С"РёР>С? pyRevit -> Extensions -> 04.OV-VK.extension -> lib
             string appData = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
             string defaultLibPath = Path.Combine(appData, "pyRevit", "Extensions", "04.OV-VK.extension", "lib");
 
-            // Fallback: если dll действительно лежит в ...\ОВиВК.tab\bin, поднимаемся на две директории вверх и заходим в lib
+            // Fallback: РчС?Р>Рё dll Р?РчР№С?С'Р?РёС'РчР>С?Р?Р? Р>РчРРёС' Р? ...\Р?Р'РёР'Р?.tab\bin, РїР?Р?Р?РёР?Р°РчР?С?С? Р?Р° Р?Р?Рч Р?РёС?РчРєС'Р?С?РёРё Р?Р?РчС?С: Рё Р·Р°С:Р?Р?РёР? Р? lib
             string fallbackLibPath = Path.GetFullPath(Path.Combine(dllDir, "..", "..", "lib"));
 
             string libDir = Directory.Exists(defaultLibPath) ? defaultLibPath : fallbackLibPath;
@@ -88,7 +91,7 @@ internal class VisSettingsStorage {
         string settingsText =
             _doc.ProjectInformation.GetParamValueOrDefault(
                 SharedParamsConfig.Instance.VISSettings, string.Empty);
-         
+
         JObject defaultSettings = LoadDefaultSettings();
 
         JObject currentSettings;
@@ -112,7 +115,7 @@ internal class VisSettingsStorage {
 
         if(settingsChanged) {
             using(var tr =
-                new Transaction(_doc, "BIM: Подготовка настроек")) {
+                new Transaction(_doc, _localizationService.GetLocalizedString("VisSettingsStorage.TransactionName"))) {
                 tr.Start();
 
                 _doc.ProjectInformation.SetParamValue(
@@ -242,7 +245,7 @@ internal class VisSettingsStorage {
     }
 
     private void SaveSettings(string settingsText) {
-        using(var tr = new Transaction(_doc, "BIM: Update VIS settings")) {
+        using(var tr = new Transaction(_doc, _localizationService.GetLocalizedString("VisSettingsStorage.TransactionName"))) {
             tr.Start();
 
             _doc.ProjectInformation.SetParamValue(

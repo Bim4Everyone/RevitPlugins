@@ -19,6 +19,7 @@ using dosymep.Bim4Everyone.ProjectConfigs;
 using dosymep.Bim4Everyone.SimpleServices;
 using dosymep.SimpleServices;
 using dosymep.WPF.Views;
+using dosymep.WpfCore.Ninject;
 using dosymep.Xpf.Core.Ninject;
 
 using Ninject;
@@ -37,6 +38,16 @@ namespace RevitUnmodelingMep {
         protected override void Execute(UIApplication uiApplication) {
             // Создание контейнера зависимостей плагина с сервисами из платформы
             using IKernel kernel = uiApplication.CreatePlatformServices();
+
+            // Настройка локализации,
+            // получение имени сборки откуда брать текст
+            string assemblyName = Assembly.GetExecutingAssembly().GetName().Name;
+
+            // Настройка локализации,
+            // установка дефолтной локализации "ru-RU"
+            kernel.UseWpfLocalization(
+                $"/{assemblyName};component/assets/Localization/Language.xaml",
+                CultureInfo.GetCultureInfo("ru-RU"));
 
             // Настройка доступа к Revit
             kernel.Bind<RevitRepository>()

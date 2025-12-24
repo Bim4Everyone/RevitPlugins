@@ -7,6 +7,8 @@ using System.Text.RegularExpressions;
 
 using Autodesk.Revit.DB;
 
+using dosymep.SimpleServices;
+
 using RevitUnmodelingMep.Models.Entities;
 
 namespace RevitUnmodelingMep.ViewModels;
@@ -24,6 +26,7 @@ internal static class FormulaValidator {
         IEnumerable<ConsumableTypeItem> consumableTypes,
         string saveProperty,
         string emptySavePropertyMessage,
+        ILocalizationService localizationService,
         Func<ConsumableTypeItem, int?> resolveCategoryId,
         out string errorText) {
 
@@ -39,7 +42,8 @@ internal static class FormulaValidator {
 
         if(missingFormula != null) {
             string name = GetName(missingFormula);
-            errorText = $"Заполните формулу: {name}.";
+            string message = localizationService?.GetLocalizedString("FormulaValidator.FormulaError");
+            errorText = AppendDetail(message, name);
             return false;
         }
 
@@ -50,14 +54,16 @@ internal static class FormulaValidator {
 
         if(formulaWithComma != null) {
             string name = GetName(formulaWithComma);
-            errorText = $"В формуле используется запятая вместо точки: {name}.";
+            string message = localizationService?.GetLocalizedString("FormulaValidator.DotError");
+            errorText = AppendDetail(message, name);
             return false;
         }
 
         foreach(ConsumableTypeItem item in consumableTypes ?? Enumerable.Empty<ConsumableTypeItem>()) {
             if(!IsFormulaAllowed(item, resolveCategoryId, out string invalidToken)) {
                 string name = GetName(item);
-                errorText = $"Недопустимая переменная в формуле {name}: {invalidToken}.";
+                string message = localizationService?.GetLocalizedString("FormulaValidator.VariableError");
+                errorText = AppendDetail(AppendDetail(message, name), invalidToken);
                 return false;
             }
         }
@@ -85,7 +91,7 @@ internal static class FormulaValidator {
             "PI", "E", "TRUE", "FALSE", "NAN", "INFINITY"
         };
 
-        // Исключаем строковые литералы, чтобы имена внутри кавычек не валидировались как идентификаторы.
+        // ?‘?ó>‘?‘Øøç? ‘?‘'‘??ó??‘<ç >ñ‘'ç‘?ø>‘<, ‘Ø‘'?+‘< ñ?ç?ø ??‘?‘'‘?ñ óø?‘<‘Øçó ?ç ?ø>ñ?ñ‘???ø>ñ‘?‘? óøó ñ?ç?‘'ñ‘"ñóø‘'?‘?‘<.
         string formulaNoStrings = Regex.Replace(item.Formula, "\"[^\"]*\"", " ");
 
         foreach(Match match in Regex.Matches(formulaNoStrings, @"[A-Za-z_][A-Za-z0-9_]*")) {
@@ -105,7 +111,19 @@ internal static class FormulaValidator {
         return item.ConsumableTypeName
                ?? item.Title
                ?? item.ConfigKey
-               ?? "Неизвестный элемент";
+               ?? "?çñú?ç‘?‘'?‘<ü ‘?>ç?ç?‘'";
+    }
+
+    private static string AppendDetail(string message, string detail) {
+        if(string.IsNullOrWhiteSpace(detail)) {
+            return message;
+        }
+
+        if(string.IsNullOrWhiteSpace(message)) {
+            return detail;
+        }
+
+        return $"{message}: {detail}";
     }
 
     public static List<string> GetFormulaPropWhiteList(int categoryId) {

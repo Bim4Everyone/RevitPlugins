@@ -9,6 +9,7 @@ using Autodesk.Revit.UI;
 
 using dosymep.Bim4Everyone.SharedParams;
 using dosymep.Revit;
+using dosymep.SimpleServices;
 
 using Newtonsoft.Json.Linq;
 
@@ -27,10 +28,13 @@ namespace RevitUnmodelingMep.Models;
 /// В случае если данный класс разрастается, рекомендуется его разделить на несколько.
 /// </remarks>
 internal class RevitRepository {
+    private readonly ILocalizationService _localizationService;
     public VisSettingsStorage VisSettingsStorage { get; set; }
     public UnmodelingCreator Creator { get; set; }
     public Document Doc { get; set; }
     public UnmodelingCalculator Calculator { get; set; }
+
+
 
     /// <summary>
     /// Создает экземпляр репозитория.
@@ -40,7 +44,10 @@ internal class RevitRepository {
         VisSettingsStorage settingsUpdaterWorker, 
         Document document, 
         UnmodelingCreator unmodelingCreator,
-        UnmodelingCalculator unmodelingCalculator) {
+        UnmodelingCalculator unmodelingCalculator, 
+        ILocalizationService localizationService
+        ) {
+        _localizationService = localizationService;
         UIApplication = uiApplication;
         VisSettingsStorage = settingsUpdaterWorker;
         Creator = unmodelingCreator;
@@ -62,7 +69,7 @@ internal class RevitRepository {
             resolveCategoryOption: null,
             out lastIndex);
 
-        using(var t = Doc.StartTransaction("Расчет расходников")) {
+        using(var t = Doc.StartTransaction(_localizationService.GetLocalizedString("Repository.TransactionName"))) {
             Creator.RemoveUnmodeling();
 
             if(!Creator.Symbol.IsActive) {

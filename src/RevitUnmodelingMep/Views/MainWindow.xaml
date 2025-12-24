@@ -267,7 +267,6 @@
                                                                     TextWrapping="Wrap"
                                                                     Text="{Binding Note, UpdateSourceTrigger=PropertyChanged}" />
 
-                                                                <!-- ?­???????? ?? ?????????????????? ???????????? ???? ?????????????? -->
                                                             </StackPanel>
                                                             </Border>
                                                         </Expander>
@@ -369,16 +368,16 @@
                 <ui:Button
                     Margin="0 0 8 0"
                     Width="100"
-                    Content="Импорт"
+                    Content="{me:LocalizationSource MainWindow.ButtonImport}"
                     Command="{Binding ImportConfigsCommand}" />
                 <ui:Button
                     Margin="0 0 8 0"
                     Width="100"
-                    Content="Экспорт"
+                    Content="{me:LocalizationSource MainWindow.ButtonExport}"
                     Command="{Binding ExportConfigsCommand}" />
                 <ui:Button
                     Width="100"
-                    Content="Сброс"
+                    Content="{me:LocalizationSource MainWindow.ButtonExport}"
                     Command="{Binding ResetConfigsCommand}" />
             </StackPanel>
 

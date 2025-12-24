@@ -17,6 +17,7 @@ using CodingSeb.ExpressionEvaluator;
 using dosymep.Bim4Everyone;
 using dosymep.Bim4Everyone.SharedParams;
 using dosymep.Revit;
+using dosymep.SimpleServices;
 
 using Newtonsoft.Json.Linq;
 
@@ -29,12 +30,14 @@ namespace RevitUnmodelingMep.Models;
 
 internal class UnmodelingCalculator {
     private readonly Document _doc;
+    private readonly ILocalizationService _localizationService;
     private readonly double _stockDuctPipe;
     private readonly double _stockDuctIns;
     private readonly double _stockPipeIns;
 
-    public UnmodelingCalculator(Document doc) {
+    public UnmodelingCalculator(Document doc, ILocalizationService localizationService) {
         _doc = doc;
+        _localizationService = localizationService;
         _stockDuctPipe = GetStocks(BuiltInCategory.OST_DuctCurves);
         _stockPipeIns = GetStocks(BuiltInCategory.OST_PipeInsulations);
         _stockDuctIns = GetStocks(BuiltInCategory.OST_DuctInsulations);
@@ -255,7 +258,8 @@ internal class UnmodelingCalculator {
 
     private void BuildDebugLog(CalculationElement calcElement, string formula) {
         StringBuilder logBuilder = new StringBuilder();
-        logBuilder.AppendLine("Ошибка в расчете элемента:");
+        string errorMessage = _localizationService.GetLocalizedString("UnmodelingCalculator.Error");
+        logBuilder.AppendLine(errorMessage);
         logBuilder.AppendLine($"ElementId: {calcElement.Element.Id}");
         logBuilder.AppendLine($"Formula: {formula}");
 
@@ -277,7 +281,7 @@ internal class UnmodelingCalculator {
 
         Console.WriteLine(logBuilder.ToString());
 
-        throw new OperationCanceledException();
+        throw new OperationCanceledException(errorMessage);
     }
 
     private BuiltInCategory ParseCategory(ConsumableTypeItem config) {
