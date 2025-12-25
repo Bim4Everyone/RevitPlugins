@@ -15,6 +15,7 @@
     xmlns:local="clr-namespace:RevitPylonDocumentation.Views"
     xmlns:pages="clr-namespace:RevitPylonDocumentation.Views.Pages"
     xmlns:controls="clr-namespace:RevitPylonDocumentation.Views.Controls"
+    xmlns:converters="clr-namespace:RevitPylonDocumentation.Views.Converters"
     
     mc:Ignorable="d"
     WindowStartupLocation="CenterOwner"
@@ -38,6 +39,8 @@
                 <ResourceDictionary
                     Source="CustomStyles.xaml" />
             </ResourceDictionary.MergedDictionaries>
+            <converters:AnyBooleanToVisibilityConverter
+                x:Key="AnyBooleanToVisibilityConverter" />
             <SolidColorBrush
                 x:Key="InfoBadgeCriticalSeverityBackgroundBrush"
                 Color="Orange" />
@@ -83,9 +86,17 @@
                             ToolTip="{me:LocalizationSource MainWindow.VerticalViewsSettings}">
                             <ui:NavigationViewItem.InfoBadge>
                                 <ui:InfoBadge
-                                    Style="{StaticResource RoundInfoBadgeStyle}"
-                                    Visibility="{Binding Path=ViewSectionSettings.HasErrors, 
-                                        Converter={StaticResource BooleanToVisibilityConverter}}" />
+                                    Style="{StaticResource RoundInfoBadgeStyle}">
+                                    <ui:InfoBadge.Visibility>
+                                        <MultiBinding
+                                            Converter="{StaticResource AnyBooleanToVisibilityConverter}">
+                                            <Binding
+                                                Path="ViewSectionSettings.HasErrors" />
+                                            <Binding
+                                                Path="TypesSettings.HasErrors" />
+                                        </MultiBinding>
+                                    </ui:InfoBadge.Visibility>
+                                </ui:InfoBadge>
                             </ui:NavigationViewItem.InfoBadge>
                         </ui:NavigationViewItem>
                         <ui:NavigationViewItem

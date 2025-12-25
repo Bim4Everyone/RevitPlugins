@@ -58,6 +58,19 @@ internal abstract class ValidatableViewModel : BaseViewModel, INotifyDataErrorIn
         UpdateHasErrors();
     }
 
+    /// <summary>
+    /// Валидирует все свойства класса, помеченные атрибутами валидации
+    /// </summary>
+    public void ValidateAllProperties() {
+        var properties = GetType().GetProperties()
+            .Where(p => p.CanRead && p.GetCustomAttributes(typeof(ValidationAttribute), true).Any());
+
+        foreach(var property in properties) {
+            var value = property.GetValue(this);
+            ValidateProperty(value, property.Name);
+        }
+    }
+
     private void OnErrorsChanged(string propertyName) {
         ErrorsChanged?.Invoke(this, new DataErrorsChangedEventArgs(propertyName));
     }

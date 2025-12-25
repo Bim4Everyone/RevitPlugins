@@ -27,6 +27,7 @@ internal class UserTypesSettingsVM : ValidatableViewModel {
 
     public UserTypesSettingsVM(MainViewModel mainViewModel) {
         ViewModel = mainViewModel;
+        ValidateAllProperties();
     }
 
     public MainViewModel ViewModel { get; set; }
