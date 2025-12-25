@@ -181,10 +181,10 @@ internal class UnmodelingCalculator {
             return new NewRowElement();
         }
 
-        List<CalculationElement> calculationElements = new List<CalculationElement>();
+        List<CalculationElementBase> calculationElements = new List<CalculationElementBase>();
 
         foreach(NewRowElement draftRow in draftRows) {
-            CalculationElement calcElement = GetGeometricDescription(draftRow.Element);
+            CalculationElementBase calcElement = GetGeometricDescription(draftRow.Element);
             draftRow.Number = CalculateFormula(config, calcElement);
             calculationElements.Add(calcElement);
         }
@@ -213,16 +213,16 @@ internal class UnmodelingCalculator {
         };
     }
 
-    private string CreateNote(ConsumableTypeItem config, List<CalculationElement> calculationElements) {
+    private string CreateNote(ConsumableTypeItem config, List<CalculationElementBase> calculationElements) {
         string noteFormula = config.Note ?? string.Empty;
 
         // учитываем только элементы у которых хоть одно значение не ноль
         var filtered = calculationElements
-            .Where(r => (r.Area ?? 0) != 0 || (r.Length ?? 0) != 0)
+            .Where(r => (GetDoublePropertyValue(r, "Area") ?? 0) != 0 || (GetDoublePropertyValue(r, "Length") ?? 0) != 0)
             .ToList();
 
-        double sumArea = filtered.Any() ? filtered.Sum(r => r.Area ?? 0) : 0;
-        double sumLength = filtered.Any() ? filtered.Sum(r => r.Length ?? 0) : 0;
+        double sumArea = filtered.Any() ? filtered.Sum(r => GetDoublePropertyValue(r, "Area") ?? 0) : 0;
+        double sumLength = filtered.Any() ? filtered.Sum(r => GetDoublePropertyValue(r, "Length") ?? 0) : 0;
         double count = filtered.Count;
 
         string FormatValue(double value) {
@@ -238,7 +238,7 @@ internal class UnmodelingCalculator {
         return result;
     }
 
-    private CalculationElement GetGeometricDescription(Element element) {
+    private CalculationElementBase GetGeometricDescription(Element element) {
         Category category = element.Category;
 
         if(element.Category.IsId(BuiltInCategory.OST_DuctCurves)) {
@@ -264,7 +264,7 @@ internal class UnmodelingCalculator {
            $"GetGeometricDescription unexpected element type: (Id {element?.Id})");
     }
 
-    private void BuildDebugLog(CalculationElement calcElement, string formula) {
+    private void BuildDebugLog(CalculationElementBase calcElement, string formula) {
         StringBuilder logBuilder = new StringBuilder();
         string errorMessage = _localizationService.GetLocalizedString("UnmodelingCalculator.Error");
         logBuilder.AppendLine(errorMessage);
@@ -298,7 +298,7 @@ internal class UnmodelingCalculator {
 
     }
 
-    private double CalculateFormula(ConsumableTypeItem config, CalculationElement calElement) {
+    private double CalculateFormula(ConsumableTypeItem config, CalculationElementBase calElement) {
         double projectStock = 1;
         BuiltInCategory category = ParseCategory(config);
 
@@ -337,9 +337,9 @@ internal class UnmodelingCalculator {
         }
     }
 
-    private CalculationElement GetDuctGeoDesc(MEPCurve duct) {
+    private CalculationElementBase GetDuctGeoDesc(MEPCurve duct) {
         DuctType ductType = (DuctType) duct.GetElementType();
-        CalculationElement calculationElement = new CalculationElement(duct);
+        CalculationElementDuct calculationElement = new CalculationElementDuct(duct);
 
         calculationElement.SystemSharedName = 
             duct.GetParamValueOrDefault<string>(SharedParamsConfig.Instance.VISSystemName, "");
@@ -390,8 +390,8 @@ internal class UnmodelingCalculator {
         return calculationElement;
     }
 
-    private CalculationElement GetPipeGeoDesc(Pipe pipe) {
-        CalculationElement calculationElement = new CalculationElement(pipe);
+    private CalculationElementBase GetPipeGeoDesc(Pipe pipe) {
+        CalculationElementPipe calculationElement = new CalculationElementPipe(pipe);
 
         calculationElement.SystemSharedName =
             pipe.GetParamValueOrDefault<string>(SharedParamsConfig.Instance.VISSystemName, "");
@@ -432,8 +432,8 @@ internal class UnmodelingCalculator {
         return calculationElement;
     }
 
-    private CalculationElement GetPipeInsGeoDes(PipeInsulation pipeIns) {
-        CalculationElement calculationElement = new CalculationElement(pipeIns);
+    private CalculationElementBase GetPipeInsGeoDes(PipeInsulation pipeIns) {
+        CalculationElementPipeIns calculationElement = new CalculationElementPipeIns(pipeIns);
         Pipe pipe = (Pipe) _doc.GetElement(pipeIns.HostElementId);
         double inDiameter = pipe.Diameter;
 
@@ -456,10 +456,10 @@ internal class UnmodelingCalculator {
 
     }
 
-    private CalculationElement GetDuctInsGeoDesc(DuctInsulation ductIns) {
+    private CalculationElementBase GetDuctInsGeoDesc(DuctInsulation ductIns) {
         MEPCurve duct = (MEPCurve) _doc.GetElement(ductIns.HostElementId);
         DuctType ductType = (DuctType) duct.GetElementType();
-        CalculationElement calculationElement = new CalculationElement(ductIns);
+        CalculationElementDuctIns calculationElement = new CalculationElementDuctIns(ductIns);
         if(ductType.Shape == ConnectorProfileType.Round) {
             calculationElement.IsRound = true;
             calculationElement.Diameter = ductIns.Diameter;
@@ -482,9 +482,10 @@ internal class UnmodelingCalculator {
         return calculationElement;
     }
 
-    private CalculationElement GetSystemDesc(Element element) {
-        CalculationElement calculationElement = new CalculationElement(element);
-        calculationElement.Element = element;
+    private CalculationElementBase GetSystemDesc(Element element) {
+        CalculationElementBase calculationElement = element.Category.IsId(BuiltInCategory.OST_PipingSystem)
+            ? new CalculationElementPipeSystem(element)
+            : new CalculationElementDuctSystem(element);
 
         MEPSystem mepSystem = element as MEPSystem;
         ElementSet network = new ElementSet();
@@ -511,5 +512,26 @@ internal class UnmodelingCalculator {
         
 
         return calculationElement;
+    }
+
+    private static double? GetDoublePropertyValue(object instance, string propertyName) {
+        if(instance == null || string.IsNullOrWhiteSpace(propertyName)) {
+            return null;
+        }
+
+        var property = instance.GetType().GetProperty(propertyName);
+        if(property == null || !property.CanRead) {
+            return null;
+        }
+
+        object value = property.GetValue(instance);
+        return value switch {
+            null => null,
+            double d => d,
+            float f => f,
+            int i => i,
+            long l => l,
+            _ => null
+        };
     }
 }

@@ -22,8 +22,8 @@ namespace RevitUnmodelingMep.ViewModels;
 
 
 internal class MainViewModel : BaseViewModel {
-    private const string UnmodelingSettingsKey = "UNMODELING_SETTINGS";
-    private const string OnlyProjectInstancesKey = "ONLY_PROJECT_INSTANCES";
+    private const string _unmodelingSettingsKey = "UNMODELING_SETTINGS";
+    private const string _onlyProjectInstancesKey = "ONLY_PROJECT_INSTANCES";
 
     private readonly PluginConfig _pluginConfig;
     private readonly RevitRepository _revitRepository;
@@ -241,7 +241,7 @@ internal class MainViewModel : BaseViewModel {
 
         var exported = new JObject {
             [UnmodelingConfigReader.UnmodelingConfigKey] = BuildUnmodelingConfigs(),
-            [UnmodelingSettingsKey] = BuildUnmodelingSettings()
+            [_unmodelingSettingsKey] = BuildUnmodelingSettings()
         };
         File.WriteAllText(dialog.FileName, exported.ToString());
     }
@@ -281,7 +281,7 @@ internal class MainViewModel : BaseViewModel {
             configs);
 
         _revitRepository.VisSettingsStorage.SetSettingValue(
-            new List<string> { UnmodelingSettingsKey },
+            new List<string> { _unmodelingSettingsKey },
             BuildUnmodelingSettings());
     }
 
@@ -304,7 +304,7 @@ internal class MainViewModel : BaseViewModel {
 
     private JObject BuildUnmodelingSettings() {
         return new JObject {
-            [OnlyProjectInstancesKey] = OnlyPlacedInProject
+            [_onlyProjectInstancesKey] = OnlyPlacedInProject
         };
     }
 
@@ -323,9 +323,9 @@ internal class MainViewModel : BaseViewModel {
             return;
         }
 
-        if(settings.TryGetValue(UnmodelingSettingsKey, out JToken settingsToken)
+        if(settings.TryGetValue(_unmodelingSettingsKey, out JToken settingsToken)
            && settingsToken is JObject settingsObj
-           && settingsObj.TryGetValue(OnlyProjectInstancesKey, out JToken onlyProjectToken)
+           && settingsObj.TryGetValue(_onlyProjectInstancesKey, out JToken onlyProjectToken)
            && onlyProjectToken.Type == JTokenType.Boolean) {
             OnlyPlacedInProject = (bool) onlyProjectToken;
         }

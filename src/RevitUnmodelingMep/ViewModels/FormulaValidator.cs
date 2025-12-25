@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Text.RegularExpressions;
+using System.Reflection;
 
 using Autodesk.Revit.DB;
 
@@ -85,7 +86,7 @@ internal static class FormulaValidator {
 
         int categoryId = resolveCategoryId?.Invoke(item) ?? 0;
 
-        var allowed = GetFormulaPropWhiteList(categoryId)
+        var allowed = GetAllowedPropertyNames(categoryId)
             ?? Enumerable.Empty<string>();
 
         HashSet<string> allowedSet = new HashSet<string>(
@@ -96,7 +97,6 @@ internal static class FormulaValidator {
             "PI", "E", "TRUE", "FALSE", "NAN", "INFINITY"
         };
 
-        // ?‘?ó>‘?‘Øøç? ‘?‘'‘??ó??‘<ç >ñ‘'ç‘?ø>‘<, ‘Ø‘'?+‘< ñ?ç?ø ??‘?‘'‘?ñ óø?‘<‘Øçó ?ç ?ø>ñ?ñ‘???ø>ñ‘?‘? óøó ñ?ç?‘'ñ‘"ñóø‘'?‘?‘<.
         string formulaNoStrings = Regex.Replace(item.Formula, "\"[^\"]*\"", " ");
 
         foreach(Match match in Regex.Matches(formulaNoStrings, @"[\p{L}_][\p{L}\p{Nd}_]*")) {
@@ -116,7 +116,7 @@ internal static class FormulaValidator {
         return item.ConsumableTypeName
                ?? item.Title
                ?? item.ConfigKey
-               ?? "?çñú?ç‘?‘'?‘<ü ‘?>ç?ç?‘'";
+               ?? "Unexpected Name";
     }
 
     private static string AppendDetail(string message, string detail) {
@@ -131,34 +131,39 @@ internal static class FormulaValidator {
         return $"{message}: {detail}";
     }
 
-    public static List<string> GetFormulaPropWhiteList(int categoryId) {
+    public static IEnumerable<string> GetAllowedPropertyNames(int categoryId) {
         BuiltInCategory category = (BuiltInCategory) categoryId;
+        Type elementType = category switch {
+            BuiltInCategory.OST_DuctCurves => typeof(CalculationElementDuct),
+            BuiltInCategory.OST_PipeCurves => typeof(CalculationElementPipe),
+            BuiltInCategory.OST_PipeInsulations => typeof(CalculationElementPipeIns),
+            BuiltInCategory.OST_DuctInsulations => typeof(CalculationElementDuctIns),
+            BuiltInCategory.OST_PipingSystem => typeof(CalculationElementPipeSystem),
+            BuiltInCategory.OST_DuctSystem => typeof(CalculationElementDuctSystem),
+            _ => null
+        };
 
-        List<string> allowedNames = [];
-        if (category == BuiltInCategory.OST_DuctCurves) {
-            allowedNames = ["SystemSharedName", "SystemTypeName", "IsRound", "Diameter", "Width", "Height", "Perimeter",
-                "Volume", "Area", "Length", "InsulationThikness", "IsInsulated", "InsulationArea"];
-            return allowedNames;
-        }
-        if (category == BuiltInCategory.OST_PipeCurves) {
-            allowedNames = ["SystemSharedName", "SystemTypeName", "IsRound", "Diameter", "OutDiameter", "Area",
-                "Volume", "Perimeter", "Length", "InsulationThikness", "IsInsulated", "InsulationArea"];
-            return allowedNames;
-        }
-        if(category == BuiltInCategory.OST_PipeInsulations) {
-            allowedNames = ["SystemSharedName", "SystemTypeName", "InsulationThikness", "IsRound", "Diameter", 
-                "OutDiameter", "Area", "Perimeter", "Length"];
-            return allowedNames;
-        }
-        if(category == BuiltInCategory.OST_DuctInsulations) {
-            allowedNames = ["SystemSharedName", "SystemTypeName", "IsRound", "Diameter", "Width", "Height", "Perimeter", 
-                "Area", "Length"];
-            return allowedNames;
-        }
-        if(category == BuiltInCategory.OST_PipingSystem || category == BuiltInCategory.OST_DuctSystem) {
-            allowedNames = ["SystemTypeName", "SystemSharedName"];
+        if(elementType == null) {
+            return Enumerable.Empty<string>();
         }
 
-        return allowedNames;
+        return elementType
+            .GetProperties(BindingFlags.Instance | BindingFlags.Public)
+            .Where(p => p.CanRead
+                        && p.GetIndexParameters().Length == 0
+                        && p.Name != nameof(CalculationElementBase.Element)
+                        && IsAllowedPropertyType(p.PropertyType))
+            .Select(p => p.Name);
+    }
+
+    private static bool IsAllowedPropertyType(Type type) {
+        type = Nullable.GetUnderlyingType(type) ?? type;
+        return type == typeof(string)
+               || type == typeof(bool)
+               || type == typeof(int)
+               || type == typeof(long)
+               || type == typeof(float)
+               || type == typeof(double)
+               || type.IsEnum;
     }
 }
