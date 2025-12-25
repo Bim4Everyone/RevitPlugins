@@ -9,12 +9,16 @@ using Autodesk.Revit.DB;
 using Autodesk.Revit.DB.Mechanical;
 using Autodesk.Revit.DB.Plumbing;
 
+using dosymep.Bim4Everyone;
+using dosymep.Bim4Everyone.SharedParams;
 using dosymep.Revit;
+
+using static Microsoft.WindowsAPICodePack.Shell.PropertySystem.SystemProperties;
 
 namespace RevitUnmodelingMep.Models;
 
 internal static class CollectionGenerator {
-    public static List<Element> GetElementsByCategory(Document doc, BuiltInCategory category) {
+    public static List<Element> GetElementTypesByCategory(Document doc, BuiltInCategory category) {
         return new FilteredElementCollector(doc)
             .OfCategory(category)
             .WhereElementIsElementType()
@@ -31,6 +35,48 @@ internal static class CollectionGenerator {
             .WhereElementIsNotElementType()
             .Where(e => e.GetTypeId() == typeId)
             .ToList();
+
+        if(type.InAnyCategory([BuiltInCategory.OST_PipingSystem, BuiltInCategory.OST_DuctSystem])) {
+            var unique = new Dictionary<string, Element>();
+
+            foreach(var element in elements) {
+                var mepSystem = element as MEPSystem;
+                if(mepSystem == null)
+                    continue;
+
+                ElementSet network = null;
+
+                if(mepSystem.Category.IsId(BuiltInCategory.OST_PipingSystem)) {
+                    network = ((PipingSystem) mepSystem).PipingNetwork;
+                } else if(mepSystem.Category.IsId(BuiltInCategory.OST_DuctSystem)) {
+                    network = ((MechanicalSystem) mepSystem).DuctNetwork;
+                }
+
+                if(network == null || network.IsEmpty)
+                    continue;
+
+                var firstCurve = network
+                    .Cast<Element>()
+                    .FirstOrDefault(e => e is MEPCurve);
+
+                if(firstCurve == null)
+                    continue;
+
+                var systemName = firstCurve
+                    .GetParamValueOrDefault<string>(SharedParamsConfig.Instance.VISSystemName, "")
+                    ?.Trim();
+
+                if(string.IsNullOrEmpty(systemName))
+                    continue;
+
+                if(!unique.ContainsKey(systemName)) {
+                    unique[systemName] = element;
+                }
+            }
+
+            // получили список только уникальных по systemName систем
+            return unique.Values.ToList();
+        }
 
         if(type.InAnyCategory(
             new[]

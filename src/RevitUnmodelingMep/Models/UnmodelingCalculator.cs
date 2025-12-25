@@ -26,6 +26,8 @@ using Ninject.Activation;
 using RevitUnmodelingMep.Models.Entities;
 using RevitUnmodelingMep.ViewModels;
 
+using static Microsoft.WindowsAPICodePack.Shell.PropertySystem.SystemProperties;
+
 namespace RevitUnmodelingMep.Models;
 
 internal class UnmodelingCalculator {
@@ -213,9 +215,15 @@ internal class UnmodelingCalculator {
 
     private string CreateNote(ConsumableTypeItem config, List<CalculationElement> calculationElements) {
         string noteFormula = config.Note ?? string.Empty;
-        double sumArea = calculationElements.Sum(r => r.Area ?? throw new InvalidOperationException("Area is null."));
-        double sumLength = calculationElements.Sum(r => r.Length ?? throw new InvalidOperationException("Length is null."));
-        double count = calculationElements.Count();
+
+        // учитываем только элементы у которых хоть одно значение не ноль
+        var filtered = calculationElements
+            .Where(r => (r.Area ?? 0) != 0 || (r.Length ?? 0) != 0)
+            .ToList();
+
+        double sumArea = filtered.Any() ? filtered.Sum(r => r.Area ?? 0) : 0;
+        double sumLength = filtered.Any() ? filtered.Sum(r => r.Length ?? 0) : 0;
+        double count = filtered.Count;
 
         string FormatValue(double value) {
             double rounded = Math.Round(value, 2);
@@ -477,6 +485,31 @@ internal class UnmodelingCalculator {
     private CalculationElement GetSystemDesc(Element element) {
         CalculationElement calculationElement = new CalculationElement(element);
         calculationElement.Element = element;
+
+        MEPSystem mepSystem = element as MEPSystem;
+        ElementSet network = new ElementSet();
+
+        if(mepSystem != null && mepSystem.Category.IsId(BuiltInCategory.OST_PipingSystem)) {
+            network = ((PipingSystem) mepSystem).PipingNetwork;
+        } else if(mepSystem != null && mepSystem.Category.IsId(BuiltInCategory.OST_DuctSystem)) {
+            network = ((MechanicalSystem) mepSystem).DuctNetwork;
+        }
+
+        Element firstNetworkElement = network
+            .Cast<Element>()
+            .FirstOrDefault();
+
+        if (firstNetworkElement is null) {
+            return calculationElement;
+        }
+
+        string system =
+            firstNetworkElement.GetParamValueOrDefault<string>(SharedParamsConfig.Instance.VISSystemName, "");
+
+        calculationElement.SystemSharedName = system;
+        calculationElement.SystemTypeName = element.GetElementType().Name;
+        
+
         return calculationElement;
     }
 }

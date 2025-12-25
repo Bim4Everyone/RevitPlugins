@@ -88,7 +88,10 @@ internal static class FormulaValidator {
         var allowed = GetFormulaPropWhiteList(categoryId)
             ?? Enumerable.Empty<string>();
 
-        HashSet<string> allowedSet = new HashSet<string>(allowed);
+        HashSet<string> allowedSet = new HashSet<string>(
+            allowed.Select(a => a?.Trim())
+                .Where(a => !string.IsNullOrWhiteSpace(a)),
+            StringComparer.OrdinalIgnoreCase);
         HashSet<string> builtins = new HashSet<string>(StringComparer.OrdinalIgnoreCase) {
             "PI", "E", "TRUE", "FALSE", "NAN", "INFINITY"
         };
@@ -153,7 +156,7 @@ internal static class FormulaValidator {
             return allowedNames;
         }
         if(category == BuiltInCategory.OST_PipingSystem || category == BuiltInCategory.OST_DuctSystem) {
-            allowedNames = ["SystemTypeName", "SystemSharedName "];
+            allowedNames = ["SystemTypeName", "SystemSharedName"];
         }
 
         return allowedNames;

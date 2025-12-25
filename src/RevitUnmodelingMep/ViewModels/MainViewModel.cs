@@ -353,7 +353,7 @@ internal class MainViewModel : BaseViewModel {
             int optionCategoryId = option?.Id ?? (int) builtInCategory;
             string categoryName = option?.Name ?? builtInCategory.ToString();
 
-            List<Element> types = CollectionGenerator.GetElementsByCategory(_revitRepository.Doc, builtInCategory) 
+            List<Element> types = CollectionGenerator.GetElementTypesByCategory(_revitRepository.Doc, builtInCategory) 
                 ?? new List<Element>();
             if(types.Count == 0) {
                 continue;
