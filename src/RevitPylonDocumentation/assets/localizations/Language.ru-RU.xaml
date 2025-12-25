@@ -4,6 +4,9 @@
 
     <system:String x:Key="VM.NeedSaveSettings">Сохраните настройки</system:String>
     
+    <system:String x:Key="MainWindow.MustBeInteger">Введите целое число</system:String>
+    
+    
     <!-- Pylon Analysis Error Messages -->
     <system:String x:Key="VM.TypicalPylonFilterParamNotFound">Параметр фильтрации типовых пилонов не найден</system:String>
     <system:String x:Key="VM.ProjectSectionParamNotFound">Параметр раздела не найден у элементов Стен или Несущих колонн</system:String>

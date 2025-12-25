@@ -64,6 +64,25 @@
             Value="1" />
     </Style>
 
+    <Style x:Key="ErrorComboBoxStyle"
+        TargetType="{x:Type ComboBox}"
+        BasedOn="{StaticResource ComboBoxWithTooltipStyle}">
+        <Setter
+            Property="BorderBrush"
+            Value="Orange" />
+        <Setter
+            Property="BorderThickness"
+            Value="1" />
+        <Setter
+            Property="Background">
+            <Setter.Value>
+                <SolidColorBrush
+                    Color="Orange"
+                    Opacity="0.1" />
+            </Setter.Value>
+        </Setter>
+    </Style>
+
     <Style x:Key="TextBoxWithTooltipStyle"
         TargetType="{x:Type ui:TextBox}"
         BasedOn="{StaticResource DefaultUiTextBoxStyle}">
@@ -78,42 +97,7 @@
             Value="1" />
     </Style>
 
-    <Style x:Key="ValidationTextBoxStyle"
-        TargetType="{x:Type ui:TextBox}"
-        BasedOn="{StaticResource TextBoxWithTooltipStyle}">
-        <Setter
-            Property="Validation.ErrorTemplate">
-            <Setter.Value>
-                <ControlTemplate>
-                    <AdornedElementPlaceholder />
-                </ControlTemplate>
-            </Setter.Value>
-        </Setter>
-
-        <Style.Triggers>
-            <Trigger
-                Property="Validation.HasError"
-                Value="True">
-                <Setter
-                    Property="BorderBrush"
-                    Value="Orange" />
-                <Setter
-                    Property="BorderThickness"
-                    Value="1" />
-                <Setter
-                    Property="Background">
-                    <Setter.Value>
-                        <SolidColorBrush
-                            Color="Orange"
-                            Opacity="0.1" />
-                    </Setter.Value>
-                </Setter>
-            </Trigger>
-        </Style.Triggers>
-    </Style>
-
-    <Style
-        x:Key="ErrorTextBoxStyle"
+    <Style x:Key="ErrorTextBoxStyle"
         TargetType="{x:Type ui:TextBox}"
         BasedOn="{StaticResource TextBoxWithTooltipStyle}">
         <Setter

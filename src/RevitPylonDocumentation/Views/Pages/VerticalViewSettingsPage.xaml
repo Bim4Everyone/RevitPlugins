@@ -128,35 +128,31 @@
                                 LabelText="{me:LocalizationSource VerticalView.MainViewXOffset}"
                                 TextBoxText="{Binding 
                                     Path=ViewSectionSettings.GeneralViewXOffsetTemp, 
-                                    UpdateSourceTrigger=PropertyChanged, 
-                                    Mode=TwoWay,
+                                    UpdateSourceTrigger=PropertyChanged, Mode=TwoWay,
                                     ValidatesOnDataErrors=True, NotifyOnValidationError=True}"
                                 ToolTipText="{me:LocalizationSource VerticalViewSettingsPage.MainViewXOffsetToolTip}"
+                                PlaceholderText="{me:LocalizationSource MainWindow.MustBeInteger}"
                                 TextChangedCommand="{Binding SettingsChangedCommand}" />
 
                             <controls:TextBoxSettingControl
                                 LabelText="{me:LocalizationSource VerticalView.MainViewYTopOffset}"
-                                TextBoxText="{Binding Path=ViewSectionSettings.GeneralViewYTopOffsetTemp, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
+                                TextBoxText="{Binding 
+                                    Path=ViewSectionSettings.GeneralViewYTopOffsetTemp, 
+                                    UpdateSourceTrigger=PropertyChanged, Mode=TwoWay,
+                                    ValidatesOnDataErrors=True, NotifyOnValidationError=True}"
                                 ToolTipText="{me:LocalizationSource VerticalViewSettingsPage.MainViewYTopOffsetToolTip}"
+                                PlaceholderText="{me:LocalizationSource MainWindow.MustBeInteger}"
                                 TextChangedCommand="{Binding SettingsChangedCommand}" />
 
                             <controls:TextBoxSettingControl
                                 LabelText="{me:LocalizationSource VerticalView.MainViewYBottomOffset}"
-                                TextBoxText="{Binding Path=ViewSectionSettings.GeneralViewYBottomOffsetTemp, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
+                                TextBoxText="{Binding 
+                                    Path=ViewSectionSettings.GeneralViewYBottomOffsetTemp, 
+                                    UpdateSourceTrigger=PropertyChanged, Mode=TwoWay,
+                                    ValidatesOnDataErrors=True, NotifyOnValidationError=True}"
                                 ToolTipText="{me:LocalizationSource VerticalViewSettingsPage.MainViewYBottomOffsetToolTip}"
+                                PlaceholderText="{me:LocalizationSource MainWindow.MustBeInteger}"
                                 TextChangedCommand="{Binding SettingsChangedCommand}" />
-
-                            <ui:TextBox
-                                Margin="5"
-                                Style="{StaticResource ValidationTextBoxStyle}"
-                                Text="{Binding ViewSectionSettings.GeneralViewYTopOffsetTemp, 
-                                    ValidatesOnNotifyDataErrors=True,  
-                                    UpdateSourceTrigger=PropertyChanged}" />
-
-                            <ui:TextBox
-                                Margin="5"
-                                Style="{StaticResource ValidationTextBoxStyle}"
-                                Text="{Binding ViewSectionSettings.Width, ValidatesOnNotifyDataErrors=True,  UpdateSourceTrigger=PropertyChanged}" />
                         </StackPanel>
                     </Border>
 
@@ -172,20 +168,32 @@
 
                             <controls:TextBoxSettingControl
                                 LabelText="{me:LocalizationSource VerticalView.SideViewXOffset}"
-                                TextBoxText="{Binding Path=ViewSectionSettings.GeneralViewPerpXOffsetTemp, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
+                                TextBoxText="{Binding 
+                                    Path=ViewSectionSettings.GeneralViewPerpXOffsetTemp, 
+                                    UpdateSourceTrigger=PropertyChanged, Mode=TwoWay,
+                                    ValidatesOnDataErrors=True, NotifyOnValidationError=True}"
                                 ToolTipText="{me:LocalizationSource VerticalViewSettingsPage.SideViewXOffsetToolTip}"
+                                PlaceholderText="{me:LocalizationSource MainWindow.MustBeInteger}"
                                 TextChangedCommand="{Binding SettingsChangedCommand}" />
 
                             <controls:TextBoxSettingControl
                                 LabelText="{me:LocalizationSource VerticalView.SideViewYTopOffset}"
-                                TextBoxText="{Binding Path=ViewSectionSettings.GeneralViewPerpYTopOffsetTemp, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
+                                TextBoxText="{Binding 
+                                    Path=ViewSectionSettings.GeneralViewPerpYTopOffsetTemp, 
+                                    UpdateSourceTrigger=PropertyChanged, Mode=TwoWay,
+                                    ValidatesOnDataErrors=True, NotifyOnValidationError=True}"
                                 ToolTipText="{me:LocalizationSource VerticalViewSettingsPage.SideViewYTopOffsetToolTip}"
+                                PlaceholderText="{me:LocalizationSource MainWindow.MustBeInteger}"
                                 TextChangedCommand="{Binding SettingsChangedCommand}" />
 
                             <controls:TextBoxSettingControl
                                 LabelText="{me:LocalizationSource VerticalView.SideViewYBottomOffset}"
-                                TextBoxText="{Binding Path=ViewSectionSettings.GeneralViewPerpYBottomOffsetTemp, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
+                                TextBoxText="{Binding 
+                                    Path=ViewSectionSettings.GeneralViewPerpYBottomOffsetTemp, 
+                                    UpdateSourceTrigger=PropertyChanged, Mode=TwoWay,
+                                    ValidatesOnDataErrors=True, NotifyOnValidationError=True}"
                                 ToolTipText="{me:LocalizationSource VerticalViewSettingsPage.SideViewYBottomOffsetToolTip}"
+                                PlaceholderText="{me:LocalizationSource MainWindow.MustBeInteger}"
                                 TextChangedCommand="{Binding SettingsChangedCommand}" />
                         </StackPanel>
                     </Border>
@@ -204,7 +212,10 @@
                                 Grid.Row="2"
                                 LabelText="{me:LocalizationSource VerticalView.SelectViewTypeSizeForMainAndSideViews}"
                                 ItemsSource="{Binding ViewFamilyTypes}"
-                                SelectedItem="{Binding TypesSettings.SelectedViewFamilyType, Mode=TwoWay}"
+                                SelectedItem="{Binding 
+                                    Path=TypesSettings.SelectedViewFamilyType, 
+                                    UpdateSourceTrigger=PropertyChanged,Mode=TwoWay,
+                                    ValidatesOnDataErrors=True, NotifyOnValidationError=True}"
                                 ToolTipText="{me:LocalizationSource VerticalViewSettingsPage.SelectViewTypeSizeForMainAndSideViewsToolTip}"
                                 SelectionChangedCommand="{Binding SettingsChangedCommand}"
                                 ItemTemplate="{StaticResource WithoutFamilyNameItemTemplate}" />

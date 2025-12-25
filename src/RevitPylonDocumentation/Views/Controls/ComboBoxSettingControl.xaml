@@ -11,7 +11,10 @@
     HorizontalAlignment="Stretch"
     mc:Ignorable="d"
     d:DesignHeight="100"
-    d:DesignWidth="480">
+    d:DesignWidth="480"
+    
+    Validation.Error="Validation_Error"
+    Validation.ErrorTemplate="{x:Null}">
     <UserControl.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
@@ -56,6 +59,7 @@
         </ui:TextBlock>
 
         <ComboBox
+            x:Name="GeneralComboBox"
             Margin="5"
             HorizontalAlignment="Stretch"
             ItemsSource="{Binding ItemsSource, ElementName=_this}"

@@ -14,6 +14,9 @@ public partial class TextBoxSettingControl : UserControl {
     public static readonly DependencyProperty TextBoxTextProperty = DependencyProperty.Register(
         nameof(TextBoxText), typeof(string), typeof(TextBoxSettingControl), new PropertyMetadata(default(string)));
 
+    public static readonly DependencyProperty PlaceholderTextProperty = DependencyProperty.Register(
+        nameof(PlaceholderText), typeof(string), typeof(TextBoxSettingControl), new PropertyMetadata(default(string)));
+
     public static readonly DependencyProperty TextChangedCommandProperty = DependencyProperty.Register(
         nameof(TextChangedCommand), typeof(ICommand), typeof(TextBoxSettingControl), new PropertyMetadata(default(ICommand)));
 
@@ -34,6 +37,11 @@ public partial class TextBoxSettingControl : UserControl {
     public string TextBoxText {
         get => (string) GetValue(TextBoxTextProperty);
         set => SetValue(TextBoxTextProperty, value);
+    }
+
+    public string PlaceholderText {
+        get => (string) GetValue(PlaceholderTextProperty);
+        set => SetValue(PlaceholderTextProperty, value);
     }
 
     public ICommand TextChangedCommand {

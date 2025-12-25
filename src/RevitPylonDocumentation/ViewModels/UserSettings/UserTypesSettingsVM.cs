@@ -1,14 +1,11 @@
+using System.ComponentModel.DataAnnotations;
+
 using Autodesk.Revit.DB;
 
-using dosymep.Bim4Everyone.ProjectConfigs;
-using dosymep.WPF.ViewModels;
-
-using RevitPylonDocumentation.Models;
 using RevitPylonDocumentation.Models.UserSettings;
-using RevitPylonDocumentation.ViewModels;
 
 namespace RevitPylonDocumentation.ViewModels.UserSettings;
-internal class UserTypesSettingsVM : BaseViewModel {
+internal class UserTypesSettingsVM : ValidatableViewModel {
     private ViewFamilyType _selectedViewFamilyType;
     private DimensionType _selectedDimensionType;
     private FamilySymbol _selectedSkeletonTagType;
@@ -59,11 +56,13 @@ internal class UserTypesSettingsVM : BaseViewModel {
     /// <summary>
     /// Выбранный пользователем типоразмер вида для создания новых видов
     /// </summary>
+    [Required]
     public ViewFamilyType SelectedViewFamilyType {
         get => _selectedViewFamilyType;
         set {
             RaiseAndSetIfChanged(ref _selectedViewFamilyType, value);
             ViewModel.ViewSectionSettings.ViewFamilyTypeNameTemp = value?.Name;
+            ValidateProperty(value);
         }
     }
 

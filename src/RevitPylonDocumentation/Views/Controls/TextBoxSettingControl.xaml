@@ -39,7 +39,7 @@
             HorizontalAlignment="Stretch"
             Text="{Binding TextBoxText, ElementName=_this}"
             ToolTip="{Binding ToolTipText, ElementName=_this}"
-            PlaceholderText="{Binding (Validation.Errors)[0].ErrorContent, ElementName=_this}">
+            PlaceholderText="{Binding PlaceholderText, ElementName=_this}">
 
             <i:Interaction.Triggers>
                 <i:EventTrigger

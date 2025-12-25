@@ -3,6 +3,9 @@
                     xmlns:system="clr-namespace:System;assembly=mscorlib">
 
     <system:String x:Key="VM.NeedSaveSettings">Save the settings</system:String>
+
+    <system:String x:Key="MainWindow.MustBeInteger">Enter an integer</system:String>
+
     
     <!-- Pylon Analysis Error Messages -->
     <system:String x:Key="VM.TypicalPylonFilterParamNotFound">Typical pylon filter parameter not found</system:String>

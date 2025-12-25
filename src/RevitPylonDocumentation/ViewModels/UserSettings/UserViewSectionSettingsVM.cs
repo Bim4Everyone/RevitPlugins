@@ -60,50 +60,6 @@ internal class UserViewSectionSettingsVM : ValidatableViewModel {
 
     public MainViewModel ViewModel { get; set; }
 
-
-
-
-    private int _age = 1;
-
-    [Range(0, 100)]
-    [Required()]
-    public int Age {
-        get => _age;
-        set {
-            RaiseAndSetIfChanged(ref _age, value);
-            ValidateProperty(value);
-        }
-    }
-
-    private int _height = 2;
-
-    [Range(0, 100)]
-    [Required()]
-    public int Height {
-        get => _height;
-        set {
-            RaiseAndSetIfChanged(ref _height, value);
-            ValidateProperty(value);
-        }
-    }
-
-
-    private int _width = 2;
-
-    [Required]
-    [Range(0, 100)]
-    public int Width {
-        get => _width;
-        set {
-            RaiseAndSetIfChanged(ref _width, value);
-            ValidateProperty(value);
-        }
-    }
-
-
-
-
-
     public string GeneralViewPrefix { get; set; }
     public string GeneralViewPrefixTemp {
         get => _generalViewPrefixTemp;
@@ -165,9 +121,8 @@ internal class UserViewSectionSettingsVM : ValidatableViewModel {
     }
 
     public string GeneralViewXOffset { get; set; }
-
-    [Required(ErrorMessage = "Должно быть заполнено целым числом")]
-    [RegularExpression(@"^-?\d+$", ErrorMessage = "Должно быть целым числом")]
+    [Required]
+    [RegularExpression(@"^-?\d+$")]
     public string GeneralViewXOffsetTemp {
         get => _generalViewXOffsetTemp;
         set {
@@ -177,9 +132,8 @@ internal class UserViewSectionSettingsVM : ValidatableViewModel {
     }
 
     public string GeneralViewYTopOffset { get; set; }
-
-    [Required(ErrorMessage = "Должно быть заполнено целым числом")]
-    [RegularExpression(@"^-?\d+$", ErrorMessage = "Должно быть целым числом")]
+    [Required]
+    [RegularExpression(@"^-?\d+$")]
     public string GeneralViewYTopOffsetTemp {
         get => _generalViewYTopOffsetTemp;
         set {
@@ -189,27 +143,47 @@ internal class UserViewSectionSettingsVM : ValidatableViewModel {
     }
 
     public string GeneralViewYBottomOffset { get; set; }
+    [Required]
+    [RegularExpression(@"^-?\d+$")]
     public string GeneralViewYBottomOffsetTemp {
         get => _generalViewYBottomOffsetTemp;
-        set => RaiseAndSetIfChanged(ref _generalViewYBottomOffsetTemp, value);
+        set {
+            RaiseAndSetIfChanged(ref _generalViewYBottomOffsetTemp, value);
+            ValidateProperty(value);
+        }
     }
 
     public string GeneralViewPerpXOffset { get; set; }
+    [Required]
+    [RegularExpression(@"^-?\d+$")]
     public string GeneralViewPerpXOffsetTemp {
         get => _generalViewPerpXOffsetTemp;
-        set => RaiseAndSetIfChanged(ref _generalViewPerpXOffsetTemp, value);
+        set {
+            RaiseAndSetIfChanged(ref _generalViewPerpXOffsetTemp, value);
+            ValidateProperty(value);
+        }
     }
 
     public string GeneralViewPerpYTopOffset { get; set; }
+    [Required]
+    [RegularExpression(@"^-?\d+$")]
     public string GeneralViewPerpYTopOffsetTemp {
         get => _generalViewPerpYTopOffsetTemp;
-        set => RaiseAndSetIfChanged(ref _generalViewPerpYTopOffsetTemp, value);
+        set {
+            RaiseAndSetIfChanged(ref _generalViewPerpYTopOffsetTemp, value);
+            ValidateProperty(value);
+        }
     }
 
     public string GeneralViewPerpYBottomOffset { get; set; }
+    [Required]
+    [RegularExpression(@"^-?\d+$")]
     public string GeneralViewPerpYBottomOffsetTemp {
         get => _generalViewPerpYBottomOffsetTemp;
-        set => RaiseAndSetIfChanged(ref _generalViewPerpYBottomOffsetTemp, value);
+        set {
+            RaiseAndSetIfChanged(ref _generalViewPerpYBottomOffsetTemp, value);
+            ValidateProperty(value);
+        }
     }
 
     public string TransverseViewDepth { get; set; }

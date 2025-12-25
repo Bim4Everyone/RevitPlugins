@@ -1,6 +1,6 @@
+using System.Collections;
 using System.Windows;
 using System.Windows.Controls;
-using System.Collections;
 using System.Windows.Input;
 
 namespace RevitPylonDocumentation.Views.Controls;
@@ -56,5 +56,13 @@ public partial class ComboBoxSettingControl : UserControl {
     public DataTemplate ItemTemplate {
         get => (DataTemplate) GetValue(ItemTemplateProperty);
         set => SetValue(ItemTemplateProperty, value);
+    }
+
+    private void Validation_Error(object sender, ValidationErrorEventArgs e) {
+        if(e.Action == ValidationErrorEventAction.Added) {
+            GeneralComboBox.Style = (Style) FindResource("ErrorComboBoxStyle");
+        } else if(e.Action == ValidationErrorEventAction.Removed) {
+            GeneralComboBox.Style = (Style) FindResource("ComboBoxWithTooltipStyle");
+        }
     }
 }
