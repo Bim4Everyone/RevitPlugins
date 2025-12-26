@@ -27,6 +27,7 @@ internal class RevitRepository {
     public UIDocument ActiveUIDocument => UIApplication.ActiveUIDocument;
     public Application Application => UIApplication.Application;
     public Document Document => ActiveUIDocument.Document;
+    public double MinimalSide => Application.ShortCurveTolerance;
 
     /// <summary>
     /// Метод получения всех документов
@@ -63,13 +64,12 @@ internal class RevitRepository {
     /// Метод получения всех вариантов значений зон по заданному параметру
     /// </summary>
     public IEnumerable<string> GetTypeZones(RevitParam revitParam) {
-        return revitParam != null
-            ? GetAreas()
+        return revitParam == null
+            ? []
+            : GetAreas()
                 .Select(area => area.GetParamValueOrDefault<string>(revitParam.Name))
                 .Where(str => !string.IsNullOrEmpty(str))
-                .Distinct()
-            : [];
-
+                .Distinct();
     }
 
     /// <summary>
@@ -87,6 +87,15 @@ internal class RevitRepository {
             .OfCategory(BuiltInCategory.OST_Areas)
             .WhereElementIsNotElementType()
             .OfType<Area>();
+    }
+
+    // Метод получения типа семейства
+    public FamilySymbol GetFamilySymbol(Family family) {
+        ElementFilter filter = new FamilySymbolFilter(family.Id);
+        return new FilteredElementCollector(Document)
+            .WherePasses(filter)
+            .Cast<FamilySymbol>()
+            .First();
     }
 }
 

@@ -1,15 +1,18 @@
+using System;
 using System.Collections.Generic;
 
 using Autodesk.Revit.DB;
 
 namespace RevitBuildCoordVolumes.Models;
-
+/// <summary>
+/// Представление плиты с необходимой информацией для построения колонн
+/// </summary>
 internal class SlabElement {
+    public Floor Floor { get; set; }
     public string Name { get; set; }
     public string LevelName { get; set; }
-    public Floor Floor { get; set; }
-    public Solid FloorSolid { get; set; }
-    public List<XYZ> ExternalContourPoints { get; set; }
-    public List<List<XYZ>> FullExternalContourPoints { get; set; }
-    public List<Face> Faces { get; set; }
+    public Guid Guid { get; set; }
+    public List<Face> UpFaces { get; set; }
+    public Transform Transform { get; set; }
+    public bool IsSloped { get; set; }
 }

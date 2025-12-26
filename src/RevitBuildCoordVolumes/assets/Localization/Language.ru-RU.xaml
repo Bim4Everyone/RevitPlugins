@@ -65,12 +65,18 @@
     <system:String x:Key="MainViewModel.SearchSideNoNegate">Вводимые данные должны быть положительными</system:String>
     <system:String x:Key="MainViewModel.SearchSideNoZero">Вводимые данные должны быть больше нуля</system:String>
     <system:String x:Key="MainViewModel.SearchSideBig">Вводимые данные не должны превышать 500 мм</system:String>
-    <system:String x:Key="MainViewModel.SearchSideSmall">Вводимые данные не должны быть меньше 10 мм</system:String>
-    <system:String x:Key="MainViewModel.ProgressTitle">Обработка зон... [{0}]\[{1}]</system:String>
+    <system:String x:Key="MainViewModel.SearchSideSmall">Вводимые данные не должны быть меньше 10 мм</system:String>     
+    
+    <system:String x:Key="MainViewModel.ProgressTitle">Построение объёмов... [{0}]\[{1}]</system:String>
 
     <system:String x:Key="ParamViewModel.WarningStartString">Ошибочные параметры:</system:String>
     <system:String x:Key="DocumentViewModel.CurrentFile">Текущий файл (открытый)</system:String>
 
     <system:String x:Key="BuildCoordVolumesProcessor.TransactionName">Построение объемов СМР</system:String>
+
+    <system:String x:Key="FamilyDocument.TransactionName">Категория, выдавливание, материал</system:String>
+    <system:String x:Key="FamilyDocument.MaterialName">стекло</system:String>
+    <system:String x:Key="FamilyDocument.FamilyName">{0}ОбщМд_Координаты СМР_{1}{2}</system:String>
+    <system:String x:Key="FamilyDocument.TemplateFamilyName">{0}\Метрическая система, типовая модель.rft</system:String>
 
 </ResourceDictionary>

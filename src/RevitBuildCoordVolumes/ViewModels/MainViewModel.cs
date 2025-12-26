@@ -370,23 +370,27 @@ internal class MainViewModel : BaseViewModel {
         return SelectedTypeZone != null;
     }
 
-    // Основной метод
+    //Основной метод
     private void AcceptView() {
         SaveConfig();
 
+        // Экземпляр процессора
         var processor = new BuildCoordVolumesProcessor(_localizationService, _revitRepository, _buildCoordVolumesSettings);
-
+        int count = processor.RevitAreas.Count;
         using var progressDialogService = ProgressDialogFactory.CreateDialog();
-        progressDialogService.MaxValue = processor.Areas.Count();
-        progressDialogService.StepValue = 1;
-        progressDialogService.DisplayTitleFormat = _localizationService.GetLocalizedString("MainViewModel.ProgressTitle");
         var progress = progressDialogService.CreateProgress();
-
         var ct = progressDialogService.CreateCancellationToken();
+
+        progressDialogService.MaxValue = count;
+        progressDialogService.StepValue = count / 10;
+        progressDialogService.DisplayTitleFormat = _localizationService.GetLocalizedString("MainViewModel.ProgressTitle");
+
         progressDialogService.Show();
 
+        // Основной метод построения объемов
         processor.Run(progress, ct);
     }
+
 
     // Метод проверки возможности выполнения основного метода
     private bool CanAcceptView() {

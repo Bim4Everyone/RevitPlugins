@@ -6,19 +6,16 @@ using System.Threading;
 using dosymep.Revit;
 using dosymep.SimpleServices;
 
-using RevitBuildCoordVolumes.Models.Enums;
 using RevitBuildCoordVolumes.Models.Interfaces;
-using RevitBuildCoordVolumes.Models.Services;
 using RevitBuildCoordVolumes.Models.Settings;
 
 namespace RevitBuildCoordVolumes.Models;
 internal class BuildCoordVolumesProcessor {
-
     private readonly ILocalizationService _localizationService;
+    private readonly IExtrusionBuilder _builder;
     private readonly RevitRepository _revitRepository;
     private readonly BuildCoordVolumesSettings _settings;
-    private readonly SolidsService _solidsService;
-    private readonly GeometryService _geometryService;
+    private readonly BuilderFactory _builderFactory;
 
     public BuildCoordVolumesProcessor(
         ILocalizationService localizationService,
@@ -27,40 +24,30 @@ internal class BuildCoordVolumesProcessor {
         _localizationService = localizationService;
         _revitRepository = revitRepository;
         _settings = settings;
-        _solidsService = new SolidsService();
-        _geometryService = new GeometryService();
+        _builderFactory = new BuilderFactory(_revitRepository, _settings);
+        _builder = _builderFactory.Create(_settings.AlgorithmType);
     }
 
-    public IEnumerable<RevitArea> Areas => GetRevitAreas();
+    public List<RevitArea> RevitAreas => GetRevitAreas();
+
 
     public void Run(IProgress<int> progress = null, CancellationToken ct = default) {
 
-        IBuildAreaExtrusion buildAreaExtrusion;
-        buildAreaExtrusion = _settings.AlgorithmType == AlgorithmType.AdvancedAreaExtrude
-            ? new AdvancedAreaExtrusionBuilder(_revitRepository, _settings, _solidsService, _geometryService)
-            : new AreaExtrusionBuilder();
-
         string transactionName = _localizationService.GetLocalizedString("BuildCoordVolumesProcessor.TransactionName");
         using var t = _revitRepository.Document.StartTransaction(transactionName);
-        int i = 0;
-        foreach(var area in Areas) {
+
+        int pro = 0;
+        foreach(var revitArea in RevitAreas) {
             ct.ThrowIfCancellationRequested();
-
-            buildAreaExtrusion.BuildAreaExtrusion(area);
-
-            progress?.Report(++i);
+            var geomElements = _builder.BuildVolumes(revitArea);
+            progress?.Report(++pro);
         }
-
         t.Commit();
     }
 
-    // Метод получения элементов модели для основного метода и прогресс-бара  
-    private IEnumerable<RevitArea> GetRevitAreas() {
+    private List<RevitArea> GetRevitAreas() {
         string areaType = _settings.TypeZone;
         var areaTypeParam = _settings.ParamMaps.First().SourceParam;
-        return _revitRepository.GetRevitAreas(areaType, areaTypeParam);
+        return _revitRepository.GetRevitAreas(areaType, areaTypeParam).ToList();
     }
 }
-
-
-

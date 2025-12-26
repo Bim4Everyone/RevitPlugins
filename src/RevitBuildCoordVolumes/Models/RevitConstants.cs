@@ -14,8 +14,11 @@ internal static class RevitConstants {
         BuiltInCategory.OST_StructuralFoundation,
         BuiltInCategory.OST_Floors];
 
+    // ID категории для построения DirectShape
+    public static readonly ElementId ElementIdDirectShape = new(BuiltInCategory.OST_GenericModel);
+
     // Категория объемных элементов
-    public static BuiltInCategory SourceVolumeCategory = BuiltInCategory.OST_GenericModel;
+    //public static BuiltInCategory SourceVolumeCategory = BuiltInCategory.OST_GenericModel;
 
     // Самое распространенное значения для записи координат
     public const string TypeZone = "Координаты СМР";

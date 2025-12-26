@@ -3,4 +3,8 @@
         <UseWpfUI>true</UseWpfUI>
         <LangVersion>12</LangVersion>
     </PropertyGroup>
+    <ItemGroup>
+      <Compile Remove="Models\AdvancedAreaExtrusionBuilder.cs" />
+      <Compile Remove="Models\AreaExtrusionDotsBuilder.cs" />
+    </ItemGroup>
 </Project>
