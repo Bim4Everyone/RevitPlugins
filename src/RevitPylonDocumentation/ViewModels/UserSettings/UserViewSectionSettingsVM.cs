@@ -56,6 +56,7 @@ internal class UserViewSectionSettingsVM : ValidatableViewModel {
     public UserViewSectionSettingsVM(MainViewModel mainViewModel, ILocalizationService localizationService) {
         ViewModel = mainViewModel;
         _localizationService = localizationService;
+        ValidateAllProperties();
     }
 
     public MainViewModel ViewModel { get; set; }
@@ -186,10 +187,16 @@ internal class UserViewSectionSettingsVM : ValidatableViewModel {
         }
     }
 
+
     public string TransverseViewDepth { get; set; }
+    [Required]
+    [RegularExpression(@"^-?\d+$")]
     public string TransverseViewDepthTemp {
         get => _transverseViewDepthTemp;
-        set => RaiseAndSetIfChanged(ref _transverseViewDepthTemp, value);
+        set {
+            RaiseAndSetIfChanged(ref _transverseViewDepthTemp, value);
+            ValidateProperty(value);
+        }
     }
 
     public string TransverseViewFirstPrefix { get; set; }
@@ -205,9 +212,14 @@ internal class UserViewSectionSettingsVM : ValidatableViewModel {
     }
 
     public string TransverseViewFirstElevation { get; set; }
+    [Required]
+    [RegularExpression(@"^-?\d+$")]
     public string TransverseViewFirstElevationTemp {
         get => _transverseViewFirstElevationTemp;
-        set => RaiseAndSetIfChanged(ref _transverseViewFirstElevationTemp, value);
+        set {
+            RaiseAndSetIfChanged(ref _transverseViewFirstElevationTemp, value);
+            ValidateProperty(value);
+        }
     }
 
 
@@ -224,9 +236,14 @@ internal class UserViewSectionSettingsVM : ValidatableViewModel {
     }
 
     public string TransverseViewSecondElevation { get; set; }
+    [Required]
+    [RegularExpression(@"^-?\d+$")]
     public string TransverseViewSecondElevationTemp {
         get => _transverseViewSecondElevationTemp;
-        set => RaiseAndSetIfChanged(ref _transverseViewSecondElevationTemp, value);
+        set {
+            RaiseAndSetIfChanged(ref _transverseViewSecondElevationTemp, value);
+            ValidateProperty(value);
+        }
     }
 
     public string TransverseViewThirdPrefix { get; set; }
@@ -242,15 +259,25 @@ internal class UserViewSectionSettingsVM : ValidatableViewModel {
     }
 
     public string TransverseViewThirdElevation { get; set; }
+    [Required]
+    [RegularExpression(@"^-?\d+$")]
     public string TransverseViewThirdElevationTemp {
         get => _transverseViewThirdElevationTemp;
-        set => RaiseAndSetIfChanged(ref _transverseViewThirdElevationTemp, value);
+        set {
+            RaiseAndSetIfChanged(ref _transverseViewThirdElevationTemp, value);
+            ValidateProperty(value);
+        }
     }
 
     public string TransverseRebarViewDepth { get; set; }
+    [Required]
+    [RegularExpression(@"^-?\d+$")]
     public string TransverseRebarViewDepthTemp {
         get => _transverseRebarViewDepthTemp;
-        set => RaiseAndSetIfChanged(ref _transverseRebarViewDepthTemp, value);
+        set {
+            RaiseAndSetIfChanged(ref _transverseRebarViewDepthTemp, value);
+            ValidateProperty(value);
+        }
     }
 
     public string TransverseRebarViewFirstPrefix { get; set; }
@@ -302,15 +329,25 @@ internal class UserViewSectionSettingsVM : ValidatableViewModel {
     }
 
     public string TransverseViewXOffset { get; set; }
+    [Required]
+    [RegularExpression(@"^-?\d+$")]
     public string TransverseViewXOffsetTemp {
         get => _transverseViewXOffsetTemp;
-        set => RaiseAndSetIfChanged(ref _transverseViewXOffsetTemp, value);
+        set {
+            RaiseAndSetIfChanged(ref _transverseViewXOffsetTemp, value);
+            ValidateProperty(value);
+        }
     }
 
     public string TransverseViewYOffset { get; set; }
+    [Required]
+    [RegularExpression(@"^-?\d+$")]
     public string TransverseViewYOffsetTemp {
         get => _transverseViewYOffsetTemp;
-        set => RaiseAndSetIfChanged(ref _transverseViewYOffsetTemp, value);
+        set {
+            RaiseAndSetIfChanged(ref _transverseViewYOffsetTemp, value);
+            ValidateProperty(value);
+        }
     }
 
     public string ViewFamilyTypeName { get; set; }
