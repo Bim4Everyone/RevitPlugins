@@ -102,7 +102,7 @@ internal class MainViewModel : BaseViewModel {
             return false;
         }
 
-        ErrorText = string.Empty;
+        ErrorText = null;
         return true;
     }
 
