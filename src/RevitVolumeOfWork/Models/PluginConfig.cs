@@ -1,3 +1,5 @@
+using System.Collections.Generic;
+
 using dosymep.Bim4Everyone;
 using dosymep.Bim4Everyone.ProjectConfigs;
 using dosymep.Serializers;
@@ -5,10 +7,12 @@ using dosymep.Serializers;
 using pyRevitLabs.Json;
 
 namespace RevitVolumeOfWork.Models; 
-internal class PluginConfig : ProjectConfig<PluginSettings> {
-    [JsonIgnore] public override string ProjectConfigPath { get; set; }
+internal class PluginConfig : ProjectConfig<RevitSettings> {
+    [JsonIgnore] 
+    public override string ProjectConfigPath { get; set; }
 
-    [JsonIgnore] public override IConfigSerializer Serializer { get; set; }
+    [JsonIgnore] 
+    public override IConfigSerializer Serializer { get; set; }
 
     public static PluginConfig GetPluginConfig() {
         return new ProjectConfigBuilder()
@@ -20,6 +24,7 @@ internal class PluginConfig : ProjectConfig<PluginSettings> {
     }
 }
 
-internal class PluginSettings : ProjectSettings {
+internal class RevitSettings : ProjectSettings {
     public override string ProjectName { get; set; }
+    public IList<string> Levels { get; set; } = [];
 }

@@ -9,13 +9,15 @@ using Autodesk.Revit.UI;
 using dosymep.Bim4Everyone;
 using dosymep.Bim4Everyone.ProjectParams;
 using dosymep.Revit;
-
-using RevitVolumeOfWork.ViewModels;
+using dosymep.SimpleServices;
 
 namespace RevitVolumeOfWork.Models; 
 internal class RevitRepository {
-    public RevitRepository(UIApplication uiApplication) {
+    private readonly ILocalizationService _localizationService;
+    
+    public RevitRepository(UIApplication uiApplication, ILocalizationService localizationService) {
         UIApplication = uiApplication;
+        _localizationService  = localizationService;
     }
 
     public UIApplication UIApplication { get; }
@@ -27,7 +29,7 @@ internal class RevitRepository {
     public IList<RoomElement> GetRooms() {
         return new FilteredElementCollector(Document)
             .OfCategory(BuiltInCategory.OST_Rooms)
-            .Select(x => new RoomElement((Room) x, Document))
+            .Select(x => new RoomElement(_localizationService, (Room) x, Document))
             .ToList();
     }
 
@@ -64,22 +66,15 @@ internal class RevitRepository {
         var collector = new FilteredElementCollector(Document)
             .OfClass(typeof(Wall))
             .WherePasses(orFilter);
-
-        using var t = Document.StartTransaction("Очистить параметры ВОР стен");
+        
+        string transactionName = _localizationService.GetLocalizedString("Transaction.ClearParams");
+        using var t = Document.StartTransaction(transactionName);
         foreach(var wall in collector) {
-            wall.SetParamValue(ProjectParamsConfig.Instance.RelatedRoomName, "");
-            wall.SetParamValue(ProjectParamsConfig.Instance.RelatedRoomNumber, "");
-            wall.SetParamValue(ProjectParamsConfig.Instance.RelatedRoomID, "");
-            wall.SetParamValue(ProjectParamsConfig.Instance.RelatedRoomGroup, "");
+            wall.SetParamValue(ProjectParamsConfig.Instance.RelatedRoomName, string.Empty);
+            wall.SetParamValue(ProjectParamsConfig.Instance.RelatedRoomNumber, string.Empty);
+            wall.SetParamValue(ProjectParamsConfig.Instance.RelatedRoomID, string.Empty);
+            wall.SetParamValue(ProjectParamsConfig.Instance.RelatedRoomGroup, string.Empty);
         }
         t.Commit();
-    }
-
-    public void SetAll(List<LevelViewModel> allLevels, bool value) {
-        foreach(var level in allLevels) { level.IsSelected = value; }
-    }
-
-    public void InvertAll(List<LevelViewModel> allLevels) {
-        foreach(var level in allLevels) { level.IsSelected = !level.IsSelected; }
     }
 }

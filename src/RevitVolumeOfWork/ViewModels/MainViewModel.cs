@@ -4,6 +4,7 @@ using System.Windows.Input;
 
 using dosymep.Bim4Everyone.ProjectParams;
 using dosymep.Revit;
+using dosymep.SimpleServices;
 using dosymep.WPF.Commands;
 using dosymep.WPF.ViewModels;
 
@@ -11,31 +12,48 @@ using RevitVolumeOfWork.Models;
 
 namespace RevitVolumeOfWork.ViewModels; 
 internal class MainViewModel : BaseViewModel {
-    protected readonly RevitRepository _revitRepository;
-
+    private readonly PluginConfig _pluginConfig;
+    private readonly RevitRepository _revitRepository;
+    private readonly ILocalizationService _localizationService;
+    
     private string _errorText;
+    
     private bool _clearWallsParameters;
+    private IList<LevelViewModel> _levels;
 
-    public MainViewModel(RevitRepository revitRepository) {
+    public MainViewModel(PluginConfig pluginConfig,
+                         RevitRepository revitRepository, 
+                         ILocalizationService localizationService) {
+        _pluginConfig = pluginConfig;
         _revitRepository = revitRepository;
-        SetWallParametersCommand = new RelayCommand(SetWallParameters, CanSetWallParameters);
+        _localizationService = localizationService;
 
         Levels = [.. GetLevelViewModels()
             .OrderBy(item => item.Element.Elevation)];
-
-        CheckAllCommand = new RelayCommand(CheckAll);
-        UnCheckAllCommand = new RelayCommand(UnCheckAll);
-        InvertAllCommand = new RelayCommand(InvertAll);
+        
+        SetWallParametersCommand = new RelayCommand(SetWallParameters, CanSetWallParameters);
+        
+        LoadConfig();
     }
 
     public ICommand SetWallParametersCommand { get; }
-    public ICommand CheckAllCommand { get; }
-    public ICommand UnCheckAllCommand { get; }
-    public ICommand InvertAllCommand { get; }
 
-    public List<LevelViewModel> Levels { get; }
+    public IList<LevelViewModel> Levels {
+        get => _levels;
+        set => RaiseAndSetIfChanged(ref _levels, value);
+    }
 
-    protected IEnumerable<LevelViewModel> GetLevelViewModels() {
+    public bool ClearWallsParameters {
+        get => _clearWallsParameters;
+        set => RaiseAndSetIfChanged(ref _clearWallsParameters, value);
+    }
+
+    public string ErrorText {
+        get => _errorText;
+        set => RaiseAndSetIfChanged(ref _errorText, value);
+    }
+    
+    private IEnumerable<LevelViewModel> GetLevelViewModels() {
         return _revitRepository.GetRooms()
             .Where(item => item.Level != null)
             .GroupBy(item => item.Level.Name)
@@ -45,65 +63,70 @@ internal class MainViewModel : BaseViewModel {
     private void SetWallParameters(object p) {
         if(ClearWallsParameters) {
             _revitRepository.ClearWallsParameters(Levels
-                .Where(item => item.IsSelected)
+                .Where(item => item.IsChecked)
                 .Select(x => x.Element));
         }
 
-        var rooms = Levels.Where(item => item.IsSelected)
+        var rooms = Levels.Where(item => item.IsChecked)
             .SelectMany(x => x.Rooms)
             .ToList();
 
         var allWalls = _revitRepository.GetGroupedRoomsByWalls(rooms);
-
-        using var t = _revitRepository.Document.StartTransaction("Заполнить параметры ВОР");
+        
+        string transactionName = _localizationService.GetLocalizedString("Transaction.SetParams");
+        using var t = _revitRepository.Document.StartTransaction(transactionName);
         foreach(var wallElement in allWalls) {
             var wall = wallElement.Wall;
 
             wall.SetProjectParamValue(ProjectParamsConfig.Instance.RelatedRoomName.Name,
-                                        wallElement.GetRoomsParameters(nameof(RoomElement.Name)));
+                                      wallElement.GetRoomsParameters(nameof(RoomElement.Name)));
             wall.SetProjectParamValue(ProjectParamsConfig.Instance.RelatedRoomNumber.Name,
-                                        wallElement.GetRoomsParameters(nameof(RoomElement.Number)));
+                                      wallElement.GetRoomsParameters(nameof(RoomElement.Number)));
             wall.SetProjectParamValue(ProjectParamsConfig.Instance.RelatedRoomID.Name,
-                                        wallElement.GetRoomsParameters(nameof(RoomElement.Id)));
+                                      wallElement.GetRoomsParameters(nameof(RoomElement.Id)));
             wall.SetProjectParamValue(ProjectParamsConfig.Instance.RelatedRoomGroup.Name,
-                                        wallElement.GetRoomsParameters(nameof(RoomElement.Group)));
+                                      wallElement.GetRoomsParameters(nameof(RoomElement.Group)));
         }
         t.Commit();
+        
+        SaveConfig();
     }
 
     private bool CanSetWallParameters(object p) {
         if(Levels.Count == 0) {
-            ErrorText = "Помещения отсутствуют в проекте";
+            ErrorText = _localizationService.GetLocalizedString("MainWindow.ErrorNoRooms");
             return false;
         }
-        if(!Levels.Any(x => x.IsSelected)) {
-            ErrorText = "Выберите уровни";
+        if(!Levels.Any(x => x.IsChecked)) {
+            ErrorText = _localizationService.GetLocalizedString("MainWindow.ErrorSelectLevels");
             return false;
         }
 
-        ErrorText = "";
+        ErrorText = null;
         return true;
     }
 
-    public bool ClearWallsParameters {
-        get => _clearWallsParameters;
-        set => RaiseAndSetIfChanged(ref _clearWallsParameters, value);
+    private void LoadConfig() {
+        RevitSettings settings = _pluginConfig.GetSettings(_revitRepository.Document);
+        if(settings is null) {
+            return;
+        }
+        
+        var levels = Levels.Where(x => settings.Levels.Contains(x.Name));
+        foreach(var level in levels) {
+            level.IsChecked = true;
+        }
     }
 
-    private void CheckAll(object p) {
-        _revitRepository.SetAll(Levels, true);
-    }
-
-    private void UnCheckAll(object p) {
-        _revitRepository.SetAll(Levels, false);
-    }
-
-    private void InvertAll(object p) {
-        _revitRepository.InvertAll(Levels);
-    }
-
-    public string ErrorText {
-        get => _errorText;
-        set => RaiseAndSetIfChanged(ref _errorText, value);
+    private void SaveConfig() {
+        RevitSettings settings = _pluginConfig.GetSettings(_revitRepository.Document);
+        
+        settings ??= _pluginConfig.AddSettings(_revitRepository.Document);
+        
+        settings.Levels = [.. Levels
+            .Where(x => x.IsChecked)
+            .Select(x => x.Name)];
+        
+        _pluginConfig.SaveProjectConfig();
     }
 }

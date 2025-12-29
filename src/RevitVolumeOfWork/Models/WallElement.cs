@@ -5,11 +5,13 @@ using Autodesk.Revit.DB;
 
 namespace RevitVolumeOfWork.Models; 
 internal class WallElement {
+    private readonly Element _wall;
+    
     public WallElement(Element wall) {
-        Wall = wall;
-
+        _wall = wall;
     }
-    public Element Wall { get; }
+    
+    public Element Wall => _wall;
     public List<RoomElement> Rooms { get; set; }
 
     public string GetRoomsParameters(string fieldName) {

@@ -8,22 +8,23 @@ using RevitVolumeOfWork.Models;
 
 namespace RevitVolumeOfWork.ViewModels; 
 internal class LevelViewModel : BaseViewModel {
-    private bool _isSelected;
+    private readonly string _name;
+    private readonly Level _element;
+    private readonly IEnumerable<RoomElement> _rooms;
+    private bool _isChecked;
 
     public LevelViewModel(string name, Level level, IEnumerable<RoomElement> rooms) {
-        Element = level;
-        Rooms = rooms;
-        Name = name;
+        _name = name;
+        _element = level;
+        _rooms = rooms;
     }
 
-    public string Name { get; set; }
+    public string Name => _name;
+    public Level Element => _element;
+    public IEnumerable<RoomElement> Rooms => _rooms;
 
-    public Level Element { get; }
-
-    public bool IsSelected {
-        get => _isSelected;
-        set => RaiseAndSetIfChanged(ref _isSelected, value);
+    public bool IsChecked {
+        get => _isChecked;
+        set => RaiseAndSetIfChanged(ref _isChecked, value);
     }
-
-    public IEnumerable<RoomElement> Rooms { get; }
 }

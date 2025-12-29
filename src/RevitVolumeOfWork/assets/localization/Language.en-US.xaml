@@ -1,0 +1,16 @@
+<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:system="clr-namespace:System;assembly=mscorlib">
+    <system:String x:Key="MainWindow.Title">Bill of quantities for walls</system:String>
+    <system:String x:Key="MainWindow.Check">Select</system:String>
+    <system:String x:Key="MainWindow.Levels">Levels</system:String>
+    <system:String x:Key="MainWindow.ClearParams">Clear parameters before start</system:String>
+    <system:String x:Key="MainWindow.ErrorNoRooms">No rooms in the project</system:String>
+    <system:String x:Key="MainWindow.ErrorSelectLevels">Select levels</system:String>
+    <system:String x:Key="MainWindow.Ok">OK</system:String>
+    <system:String x:Key="MainWindow.Cancel">Cancel</system:String>
+    
+    <system:String x:Key="Transaction.ClearParams">Clear bill of quantities parameters for walls</system:String>
+    <system:String x:Key="Transaction.SetParams">Set bill of quantities parameters for walls</system:String>
+    <system:String x:Key="DefaultParamValue">&lt;Empty&gt;</system:String>
+</ResourceDictionary>
