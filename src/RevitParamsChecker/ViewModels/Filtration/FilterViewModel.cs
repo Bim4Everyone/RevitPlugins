@@ -1,23 +1,26 @@
 using System;
 using System.ComponentModel;
 
+using Bim4Everyone.RevitFiltration.Controls;
+
 using dosymep.WPF.ViewModels;
 
 using RevitParamsChecker.Models;
-using RevitParamsChecker.Models.Filtration;
 
 namespace RevitParamsChecker.ViewModels.Filtration;
 
 internal class FilterViewModel : BaseViewModel, IEquatable<FilterViewModel>, IName {
     private readonly Guid _guid;
     private string _name;
-    private Filter _filter;
     private bool _modified;
 
-    public FilterViewModel(Filter filter) {
-        // TODO адаптировать под либу фильтрации
-        _filter = filter ?? throw new ArgumentNullException(nameof(filter));
-        Name = _filter.Name;
+    public FilterViewModel(string name, ILogicalFilterProvider filterProvider) {
+        if(string.IsNullOrWhiteSpace(name)) {
+            throw new ArgumentException(nameof(name));
+        }
+
+        FilterProvider = filterProvider ?? throw new ArgumentNullException(nameof(filterProvider));
+        Name = name;
         Modified = true;
         _guid = Guid.NewGuid();
         PropertyChanged += OnModelPropertyChanged;
@@ -32,6 +35,8 @@ internal class FilterViewModel : BaseViewModel, IEquatable<FilterViewModel>, INa
         get => _modified;
         set => RaiseAndSetIfChanged(ref _modified, value);
     }
+
+    public ILogicalFilterProvider FilterProvider { get; }
 
     public override bool Equals(object obj) {
         return Equals(obj as FilterViewModel);
@@ -53,13 +58,8 @@ internal class FilterViewModel : BaseViewModel, IEquatable<FilterViewModel>, INa
         return _guid == other._guid;
     }
 
-    public Filter GetFilter() {
-        _filter.Name = Name;
-        return _filter;
-    }
-
     private void OnModelPropertyChanged(object sender, PropertyChangedEventArgs e) {
-        if(e.PropertyName == nameof(Filter.Name)) {
+        if(e.PropertyName == nameof(Name)) {
             Modified = true;
         }
     }

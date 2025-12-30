@@ -1,10 +1,13 @@
 using System;
 using System.Collections;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.IO;
 using System.Linq;
 using System.Windows.Input;
+
+using Bim4Everyone.RevitFiltration.Controls;
 
 using dosymep.SimpleServices;
 using dosymep.WPF.Commands;
@@ -17,18 +20,25 @@ namespace RevitParamsChecker.ViewModels.Filtration;
 
 internal class FiltrationPageViewModel : BaseViewModel {
     private readonly ILocalizationService _localization;
+    private readonly ILogicalFilterProviderFactory _filterProviderFactory;
+    private readonly IFilterContextParser _filterContextParser;
+    private readonly IDataProvider _dataProvider;
     private readonly FiltersRepository _filtersRepo;
     private readonly FiltersConverter _filtersConverter;
     private readonly NamesService _namesService;
     private FilterViewModel _selectedFilter;
     private string _dirPath;
     private bool _filtersModified;
+    private string _errorText;
 
     public FiltrationPageViewModel(
         ILocalizationService localization,
         IOpenFileDialogService openFileDialogService,
         ISaveFileDialogService saveFileDialogService,
         IMessageBoxService messageBoxService,
+        ILogicalFilterProviderFactory filterProviderFactory,
+        IFilterContextParser filterContextParser,
+        IDataProvider dataProvider,
         FiltersRepository filtersRepo,
         FiltersConverter filtersConverter,
         NamesService namesService) {
@@ -36,12 +46,16 @@ internal class FiltrationPageViewModel : BaseViewModel {
         SaveFileDialogService = saveFileDialogService ?? throw new ArgumentNullException(nameof(saveFileDialogService));
         MessageBoxService = messageBoxService ?? throw new ArgumentNullException(nameof(messageBoxService));
         _localization = localization ?? throw new ArgumentNullException(nameof(localization));
+        _filterProviderFactory =
+            filterProviderFactory ?? throw new ArgumentNullException(nameof(filterProviderFactory));
+        _filterContextParser = filterContextParser ?? throw new ArgumentNullException(nameof(filterContextParser));
+        _dataProvider = dataProvider ?? throw new ArgumentNullException(nameof(dataProvider));
         _filtersRepo = filtersRepo ?? throw new ArgumentNullException(nameof(filtersRepo));
         _filtersConverter = filtersConverter ?? throw new ArgumentNullException(nameof(filtersConverter));
         _namesService = namesService ?? throw new ArgumentNullException(nameof(namesService));
         _dirPath = Environment.GetFolderPath(Environment.SpecialFolder.Desktop);
 
-        Filters = [.._filtersRepo.GetFilters().Select(f => new FilterViewModel(f) { Modified = false })];
+        Filters = [.._filtersRepo.GetFilters().Select(GetFilterViewModel)];
         SelectedFilter = Filters.FirstOrDefault();
         AddFilterCommand = RelayCommand.Create(AddFilter);
         RenameFilterCommand = RelayCommand.Create<FilterViewModel>(RenameFilter, CanRenameFilter);
@@ -71,6 +85,11 @@ internal class FiltrationPageViewModel : BaseViewModel {
         set => RaiseAndSetIfChanged(ref _filtersModified, value);
     }
 
+    public string ErrorText {
+        get => _errorText;
+        set => RaiseAndSetIfChanged(ref _errorText, value);
+    }
+
     public FilterViewModel SelectedFilter {
         get => _selectedFilter;
         set => RaiseAndSetIfChanged(ref _selectedFilter, value);
@@ -81,8 +100,7 @@ internal class FiltrationPageViewModel : BaseViewModel {
             string newName = _namesService.CreateNewName(
                 _localization.GetLocalizedString("FiltersPage.NewFilterPrompt"),
                 Filters.Select(f => f.Name).ToArray());
-            var filter = new Filter() { Name = newName };
-            var vm = new FilterViewModel(filter);
+            var vm = new FilterViewModel(newName, GetFilterProvider());
             vm.PropertyChanged += OnFilterChanged;
             Filters.Add(vm);
             SelectedFilter = vm;
@@ -107,12 +125,12 @@ internal class FiltrationPageViewModel : BaseViewModel {
 
     private void CopyFilter(FilterViewModel filter) {
         try {
-            var copyFilter = filter.GetFilter().Copy();
-            copyFilter.Name = _namesService.CreateNewName(
+            string copyName = _namesService.CreateNewName(
                 _localization.GetLocalizedString("FiltersPage.NewFilterPrompt"),
                 Filters.Select(f => f.Name).ToArray(),
                 filter.Name);
-            var vm = new FilterViewModel(copyFilter);
+            var copyContext = GetFilterProvider(_filterContextParser.Serialize(filter.FilterProvider.GetFilter()));
+            var vm = new FilterViewModel(copyName, copyContext);
             vm.PropertyChanged += OnFilterChanged;
             Filters.Add(vm);
             SelectedFilter = vm;
@@ -122,7 +140,7 @@ internal class FiltrationPageViewModel : BaseViewModel {
     }
 
     private bool CanCopyFilter(FilterViewModel filter) {
-        return filter is not null; // TODO тут должна быть проверка ошибок в модели копируемого фильтра
+        return filter is not null && filter.FilterProvider.CanGetFilter(out _);
     }
 
     private void RemoveFilters(IList items) {
@@ -142,7 +160,7 @@ internal class FiltrationPageViewModel : BaseViewModel {
     }
 
     private void Save() {
-        _filtersRepo.SetFilters(Filters.Select(f => f.GetFilter()).ToArray());
+        _filtersRepo.SetFilters(GetFilterModels(Filters));
         foreach(var vm in Filters) {
             vm.Modified = false;
         }
@@ -154,7 +172,7 @@ internal class FiltrationPageViewModel : BaseViewModel {
         if(SaveFileDialogService.ShowDialog(
                _dirPath,
                _localization.GetLocalizedString("FiltrationPage.SaveFileDefaultName"))) {
-            var filters = Filters.Select(f => f.GetFilter()).ToArray();
+            var filters = GetFilterModels(Filters);
             string str = _filtersConverter.ConvertToString(filters);
             File.WriteAllText(SaveFileDialogService.File.FullName, str);
             _dirPath = SaveFileDialogService.File.DirectoryName;
@@ -162,7 +180,23 @@ internal class FiltrationPageViewModel : BaseViewModel {
     }
 
     private bool CanSave() {
-        return true; // TODO здесь должна быть проверка на ошибки в моделях всех фильтров
+        foreach(var vm in Filters) {
+            if(!vm.FilterProvider.CanGetFilter(out var errors)) {
+                ErrorText = $"{vm.Name}: {errors.FirstOrDefault()?.Message}";
+                return false;
+            }
+        }
+
+        ErrorText = string.Empty;
+        return true;
+    }
+
+    private Filter[] GetFilterModels(IEnumerable<FilterViewModel> filterViewModels) {
+        return filterViewModels.Select(f => new Filter() {
+                Name = f.Name,
+                FilterContext = _filterContextParser.Serialize(f.FilterProvider.GetFilter())
+            })
+            .ToArray();
     }
 
     private void Load() {
@@ -179,7 +213,7 @@ internal class FiltrationPageViewModel : BaseViewModel {
             var vms = _namesService.GetResolvedCollection(
                     Filters.ToArray(),
                     filters.Select(f => {
-                            var vm = new FilterViewModel(f);
+                            var vm = GetFilterViewModel(f);
                             vm.PropertyChanged += OnFilterChanged;
                             return vm;
                         })
@@ -207,6 +241,23 @@ internal class FiltrationPageViewModel : BaseViewModel {
         if((sender is FilterViewModel filter)
            && filter.Modified) {
             FiltersModified = true;
+        }
+    }
+
+    private FilterViewModel GetFilterViewModel(Filter filter) {
+        return new FilterViewModel(filter.Name, GetFilterProvider(filter.FilterContext)) { Modified = false };
+    }
+
+    private ILogicalFilterProvider GetFilterProvider(string serializedContext = "") {
+        if(string.IsNullOrWhiteSpace(serializedContext)) {
+            return _filterProviderFactory.Create(_dataProvider);
+        }
+
+        bool success = _filterContextParser.TryParse(serializedContext, out var context);
+        if(success) {
+            return _filterProviderFactory.Create(_dataProvider, context!);
+        } else {
+            return _filterProviderFactory.Create(_dataProvider);
         }
     }
 }

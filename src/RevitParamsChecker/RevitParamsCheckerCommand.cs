@@ -6,6 +6,13 @@ using System.Windows.Controls;
 using Autodesk.Revit.Attributes;
 using Autodesk.Revit.UI;
 
+using Bim4Everyone.RevitFiltration.Controls;
+using Bim4Everyone.RevitFiltration.Controls.Extensions;
+#if REVIT_2022
+// TODO
+using Bim4Everyone.RevitFiltration.Extensions;
+#endif
+
 using dosymep.Bim4Everyone;
 using dosymep.Bim4Everyone.SimpleServices;
 using dosymep.WpfCore.Ninject;
@@ -57,6 +64,15 @@ public class RevitParamsCheckerCommand : BasePluginCommand {
         BindRepos(kernel);
         BindServices(kernel);
         BindConverters(kernel);
+#if REVIT_2022
+// TODO
+        kernel.UseDefaultFactory();
+#endif
+        kernel.UseDefaultProviderFactory();
+        kernel.UseDefaultContextParser();
+        kernel.Bind<IDataProvider>()
+            .To<FilterDataProvider>()
+            .InSingletonScope();
         kernel.Bind<INavigationViewPageProvider>()
             .To<NavigationViewPageProvider>()
             .InSingletonScope();
@@ -78,7 +94,8 @@ public class RevitParamsCheckerCommand : BasePluginCommand {
             $"/{assemblyName};component/assets/localization/language.xaml",
             CultureInfo.GetCultureInfo("ru-RU"));
 
-        kernel.Get<MainWindow>().Show();
+        // kernel.Get<MainWindow>().Show();
+        kernel.Get<MainWindow>().ShowDialog();
     }
 
     private void BindPages(IKernel kernel) {

@@ -10,6 +10,7 @@
     xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
     xmlns:vms="clr-namespace:RevitParamsChecker.ViewModels.Filtration"
     xmlns:custom="clr-namespace:RevitParamsChecker.Views.Controls"
+    xmlns:filtration="clr-namespace:Bim4Everyone.RevitFiltration.Controls.Views;assembly=Bim4Everyone.RevitFiltration.Controls"
     ScrollViewer.CanContentScroll="False"
     mc:Ignorable="d"
     d:DesignHeight="450"
@@ -55,6 +56,7 @@
             Grid.Row="0"
             Grid.ColumnSpan="3"
             Margin="0 0 0 8"
+            PageWarningMessage="{Binding ErrorText}"
             LoadButtonCommand="{Binding LoadCommand}"
             SaveButtonCommand="{Binding SaveCommand}"
             ExportButtonCommand="{Binding ExportCommand}"
@@ -75,12 +77,9 @@
             Grid.Column="1"
             Style="{StaticResource CustomGridSplitter}" />
 
-        <DockPanel
+        <filtration:DynamicCategoriesFilterControl
             Grid.Row="1"
             Grid.Column="2"
-            Background="Orange">
-            <TextBlock
-                Text="FilterControl из либы TODO" />
-        </DockPanel>
+            LogicalFilterProvider="{Binding SelectedFilter.FilterProvider}" />
     </Grid>
 </core:WpfUIPlatformPage>

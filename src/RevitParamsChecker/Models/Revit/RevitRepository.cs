@@ -6,15 +6,20 @@ using Autodesk.Revit.ApplicationServices;
 using Autodesk.Revit.DB;
 using Autodesk.Revit.UI;
 
+using Bim4Everyone.RevitFiltration.Controls;
+
 using RevitParamsChecker.Models.Filtration;
 
 namespace RevitParamsChecker.Models.Revit;
 
 internal class RevitRepository {
+    private readonly IFilterContextParser _filterParser;
     private DocumentModel[] _documentsCache;
+    private readonly FilterBuildOptions _filterBuildOptions = new();
 
-    public RevitRepository(UIApplication uiApplication) {
-        UIApplication = uiApplication;
+    public RevitRepository(UIApplication uiApplication, IFilterContextParser filterParser) {
+        _filterParser = filterParser ?? throw new ArgumentNullException(nameof(filterParser));
+        UIApplication = uiApplication ?? throw new ArgumentNullException(nameof(uiApplication));
     }
 
     public UIApplication UIApplication { get; }
@@ -45,10 +50,17 @@ internal class RevitRepository {
     }
 
     public ICollection<ElementModel> GetElements(DocumentModel doc, Filter filter) {
-        var elementFilter = filter.GetFilter();
-        // TODO прокинуть фильтр. сейчас для стресс теста берутся все элементы из документа
+        bool success = _filterParser.TryParse(filter.FilterContext, out var context);
+        if(!success) {
+            throw new InvalidOperationException(filter.Name);
+        }
+
+        var paramsFilter = context!.GetFilter().Build(doc.Document, _filterBuildOptions);
+        var categoriesFilter = new ElementMulticategoryFilter(context.SelectedCategories);
         return new FilteredElementCollector(doc.Document)
             .WhereElementIsNotElementType()
+            .WherePasses(categoriesFilter)
+            .WherePasses(paramsFilter)
             .Select(e => new ElementModel(
                 e,
                 doc.IsLink ? new Reference(e).CreateLinkReference(doc.Link) : new Reference(e)))
