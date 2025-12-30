@@ -1,9 +1,8 @@
 using System.Linq;
-using System.Windows.Controls;
 using System.Windows.Input;
 
 namespace RevitDeclarations.Views;
-public partial class DeclarationTabItem : UserControl {
+public partial class DeclarationTabItem {
     public DeclarationTabItem() {
         InitializeComponent();
     }

@@ -5,12 +5,15 @@ using Autodesk.Revit.UI;
 
 using dosymep.Bim4Everyone;
 using dosymep.Bim4Everyone.SimpleServices;
+using dosymep.WpfUI.Core.Ninject;
 
 using Ninject;
 
 using RevitDeclarations.Models;
 using RevitDeclarations.ViewModels;
 using RevitDeclarations.Views;
+
+using Wpf.Ui.Abstractions;
 
 namespace RevitDeclarations;
 [Transaction(TransactionMode.Manual)]
@@ -31,6 +34,13 @@ public class ApartmentsDeclarationCommand : BasePluginCommand {
         kernel.Bind<ApartmentsConfig>()
             .ToMethod(c => ApartmentsConfig.GetPluginConfig());
 
+        kernel.Bind<INavigationViewPageProvider>()
+            .To<NavigationViewPageProvider>()
+            .InSingletonScope();
+        
+        // Используем сервис обновления тем для WinUI
+        kernel.UseWpfUIThemeUpdater();
+        
         kernel.Bind<ApartmentsMainVM>().ToSelf();
         kernel.Bind<ApartmentsMainWindow>().ToSelf()
             .WithPropertyValue(nameof(Window.Title), PluginName)
