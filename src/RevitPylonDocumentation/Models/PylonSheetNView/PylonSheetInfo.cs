@@ -187,21 +187,21 @@ internal class PylonSheetInfo {
     /// Получает и сохраняет имена видов в соответствии с префиксами/суффиксами, которые указал пользователь
     /// </summary>
     public void GetViewNamesForWork() {
-        GeneralView.ViewName = Settings.ViewSectionSettings.GeneralViewPrefix + PylonKeyName + Settings.ViewSectionSettings.GeneralViewSuffix;
-        GeneralViewPerpendicular.ViewName = Settings.ViewSectionSettings.GeneralViewPerpendicularPrefix + PylonKeyName + Settings.ViewSectionSettings.GeneralViewPerpendicularSuffix;
-        TransverseViewFirst.ViewName = Settings.ViewSectionSettings.TransverseViewFirstPrefix + PylonKeyName + Settings.ViewSectionSettings.TransverseViewFirstSuffix;
-        TransverseViewSecond.ViewName = Settings.ViewSectionSettings.TransverseViewSecondPrefix + PylonKeyName + Settings.ViewSectionSettings.TransverseViewSecondSuffix;
-        TransverseViewThird.ViewName = Settings.ViewSectionSettings.TransverseViewThirdPrefix + PylonKeyName + Settings.ViewSectionSettings.TransverseViewThirdSuffix;
+        GeneralView.ViewName = Settings.VerticalViewSettings.GeneralViewPrefix + PylonKeyName + Settings.VerticalViewSettings.GeneralViewSuffix;
+        GeneralViewPerpendicular.ViewName = Settings.VerticalViewSettings.GeneralViewPerpendicularPrefix + PylonKeyName + Settings.VerticalViewSettings.GeneralViewPerpendicularSuffix;
+        TransverseViewFirst.ViewName = Settings.HorizontalViewSettings.TransverseViewFirstPrefix + PylonKeyName + Settings.HorizontalViewSettings.TransverseViewFirstSuffix;
+        TransverseViewSecond.ViewName = Settings.HorizontalViewSettings.TransverseViewSecondPrefix + PylonKeyName + Settings.HorizontalViewSettings.TransverseViewSecondSuffix;
+        TransverseViewThird.ViewName = Settings.HorizontalViewSettings.TransverseViewThirdPrefix + PylonKeyName + Settings.HorizontalViewSettings.TransverseViewThirdSuffix;
 
         MaterialSchedule.ViewName = Settings.SchedulesSettings.MaterialSchedulePrefix + PylonKeyName + Settings.SchedulesSettings.MaterialScheduleSuffix;
         SystemPartsSchedule.ViewName = Settings.SchedulesSettings.SystemPartsSchedulePrefix + PylonKeyName + Settings.SchedulesSettings.SystemPartsScheduleSuffix;
         IfcPartsSchedule.ViewName = Settings.SchedulesSettings.IfcPartsSchedulePrefix + PylonKeyName + Settings.SchedulesSettings.IfcPartsScheduleSuffix;
 
-        GeneralViewRebar.ViewName = Settings.ViewSectionSettings.GeneralRebarViewPrefix + PylonKeyName + Settings.ViewSectionSettings.GeneralRebarViewSuffix;
-        GeneralViewPerpendicularRebar.ViewName = Settings.ViewSectionSettings.GeneralRebarViewPerpendicularPrefix + PylonKeyName + Settings.ViewSectionSettings.GeneralRebarViewPerpendicularSuffix;
-        TransverseViewFirstRebar.ViewName = Settings.ViewSectionSettings.TransverseRebarViewFirstPrefix + PylonKeyName + Settings.ViewSectionSettings.TransverseRebarViewFirstSuffix;
-        TransverseViewSecondRebar.ViewName = Settings.ViewSectionSettings.TransverseRebarViewSecondPrefix + PylonKeyName + Settings.ViewSectionSettings.TransverseRebarViewSecondSuffix;
-        TransverseViewThirdRebar.ViewName = Settings.ViewSectionSettings.TransverseRebarViewThirdPrefix + PylonKeyName + Settings.ViewSectionSettings.TransverseRebarViewThirdSuffix;
+        GeneralViewRebar.ViewName = Settings.VerticalViewSettings.GeneralRebarViewPrefix + PylonKeyName + Settings.VerticalViewSettings.GeneralRebarViewSuffix;
+        GeneralViewPerpendicularRebar.ViewName = Settings.VerticalViewSettings.GeneralRebarViewPerpendicularPrefix + PylonKeyName + Settings.VerticalViewSettings.GeneralRebarViewPerpendicularSuffix;
+        TransverseViewFirstRebar.ViewName = Settings.HorizontalViewSettings.TransverseRebarViewFirstPrefix + PylonKeyName + Settings.HorizontalViewSettings.TransverseRebarViewFirstSuffix;
+        TransverseViewSecondRebar.ViewName = Settings.HorizontalViewSettings.TransverseRebarViewSecondPrefix + PylonKeyName + Settings.HorizontalViewSettings.TransverseRebarViewSecondSuffix;
+        TransverseViewThirdRebar.ViewName = Settings.HorizontalViewSettings.TransverseRebarViewThirdPrefix + PylonKeyName + Settings.HorizontalViewSettings.TransverseRebarViewThirdSuffix;
 
         SkeletonSchedule.ViewName = Settings.SchedulesSettings.SkeletonSchedulePrefix + PylonKeyName + Settings.SchedulesSettings.SkeletonScheduleSuffix;
         SkeletonByElemsSchedule.ViewName = Settings.SchedulesSettings.SkeletonByElemsSchedulePrefix + PylonKeyName + Settings.SchedulesSettings.SkeletonByElemsScheduleSuffix;

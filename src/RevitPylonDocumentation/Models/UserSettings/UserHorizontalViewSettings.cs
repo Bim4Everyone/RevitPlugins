@@ -1,21 +1,8 @@
+using Autodesk.Revit.DB;
+
 namespace RevitPylonDocumentation.Models.UserSettings;
-internal class UserViewSectionSettings {
-    public string GeneralViewPrefix { get; set; }
-    public string GeneralViewSuffix { get; set; }
-    public string GeneralViewPerpendicularPrefix { get; set; }
-    public string GeneralViewPerpendicularSuffix { get; set; }
-    public string GeneralRebarViewPrefix { get; set; }
-    public string GeneralRebarViewSuffix { get; set; }
-    public string GeneralRebarViewPerpendicularPrefix { get; set; }
-    public string GeneralRebarViewPerpendicularSuffix { get; set; }
-    public string GeneralViewTemplateName { get; set; }
-    public string GeneralRebarViewTemplateName { get; set; }
-    public string GeneralViewXOffset { get; set; }
-    public string GeneralViewYTopOffset { get; set; }
-    public string GeneralViewYBottomOffset { get; set; }
-    public string GeneralViewPerpXOffset { get; set; }
-    public string GeneralViewPerpYTopOffset { get; set; }
-    public string GeneralViewPerpYBottomOffset { get; set; }
+
+internal class UserHorizontalViewSettings {
     public string TransverseViewDepth { get; set; }
     public string TransverseViewFirstPrefix { get; set; }
     public string TransverseViewFirstSuffix { get; set; }
@@ -37,5 +24,6 @@ internal class UserViewSectionSettings {
     public string TransverseRebarViewTemplateName { get; set; }
     public string TransverseViewXOffset { get; set; }
     public string TransverseViewYOffset { get; set; }
-    public string ViewFamilyTypeName { get; set; }
+    public string TransverseViewFamilyTypeName { get; set; }
+    public ViewFamilyType SelectedTransverseViewFamilyType { get; set; }
 }

@@ -86,24 +86,23 @@
                             ToolTip="{me:LocalizationSource MainWindow.VerticalViewsSettings}">
                             <ui:NavigationViewItem.InfoBadge>
                                 <ui:InfoBadge
-                                    Style="{StaticResource RoundInfoBadgeStyle}">
-                                    <ui:InfoBadge.Visibility>
-                                        <MultiBinding
-                                            Converter="{StaticResource AnyBooleanToVisibilityConverter}">
-                                            <Binding
-                                                Path="ViewSectionSettings.HasErrors" />
-                                            <Binding
-                                                Path="TypesSettings.HasErrors" />
-                                        </MultiBinding>
-                                    </ui:InfoBadge.Visibility>
+                                    Style="{StaticResource RoundInfoBadgeStyle}"
+                                    Visibility="{Binding Path=VerticalViewSettings.HasErrors, Converter={StaticResource BooleanToVisibilityConverter}}">
                                 </ui:InfoBadge>
                             </ui:NavigationViewItem.InfoBadge>
                         </ui:NavigationViewItem>
                         <ui:NavigationViewItem
                             Content="{me:LocalizationSource MainWindow.HorizontalViews}"
                             Icon="{ui:SymbolIcon CenterVertical24}"
-                            TargetPageType="{x:Type pages:HorizontalViewSettingsPage}" 
-                            ToolTip="{me:LocalizationSource MainWindow.HorizontalViewsSettings}"/>
+                            TargetPageType="{x:Type pages:HorizontalViewSettingsPage}"
+                            ToolTip="{me:LocalizationSource MainWindow.HorizontalViewsSettings}">
+                            <ui:NavigationViewItem.InfoBadge>
+                                <ui:InfoBadge
+                                    Style="{StaticResource RoundInfoBadgeStyle}"
+                                    Visibility="{Binding Path=HorizontalViewSettings.HasErrors, Converter={StaticResource BooleanToVisibilityConverter}}">
+                                </ui:InfoBadge>
+                            </ui:NavigationViewItem.InfoBadge>
+                        </ui:NavigationViewItem>
                         <ui:NavigationViewItem
                             Content="{me:LocalizationSource MainWindow.Schedules}"
                             Icon="{ui:SymbolIcon TableSettings24}"

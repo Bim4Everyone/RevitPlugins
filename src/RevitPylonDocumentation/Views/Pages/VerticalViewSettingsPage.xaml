@@ -58,15 +58,15 @@
 
                             <controls:DoubleTextBoxSettingControl
                                 LabelText="{me:LocalizationSource VerticalView.PylonMainViewNameMask}"
-                                FirstTextBoxText="{Binding Path=ViewSectionSettings.GeneralViewPrefixTemp, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
-                                SecondTextBoxText="{Binding Path=ViewSectionSettings.GeneralViewSuffixTemp, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
+                                FirstTextBoxText="{Binding Path=VerticalViewSettings.GeneralViewPrefixTemp, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
+                                SecondTextBoxText="{Binding Path=VerticalViewSettings.GeneralViewSuffixTemp, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
                                 ToolTipText="{me:LocalizationSource VerticalViewSettingsPage.PylonMainViewNameMaskToolTip}"
                                 TextChangedCommand="{Binding SettingsChangedCommand}" />
 
                             <controls:DoubleTextBoxSettingControl
                                 LabelText="{me:LocalizationSource VerticalView.PylonSideViewNameMask}"
-                                FirstTextBoxText="{Binding Path=ViewSectionSettings.GeneralViewPerpendicularPrefixTemp, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
-                                SecondTextBoxText="{Binding Path=ViewSectionSettings.GeneralViewPerpendicularSuffixTemp, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
+                                FirstTextBoxText="{Binding Path=VerticalViewSettings.GeneralViewPerpendicularPrefixTemp, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
+                                SecondTextBoxText="{Binding Path=VerticalViewSettings.GeneralViewPerpendicularSuffixTemp, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
                                 ToolTipText="{me:LocalizationSource VerticalViewSettingsPage.PylonSideViewNameMaskToolTip}"
                                 TextChangedCommand="{Binding SettingsChangedCommand}" />
 
@@ -74,7 +74,7 @@
                                 LabelText="{me:LocalizationSource VerticalView.SelectMainAndSideViewTemplate}"
                                 ItemsSource="{Binding ViewTemplatesInPj}"
                                 SelectedItem="{Binding 
-                                    Path=TypesSettings.SelectedGeneralViewTemplate, 
+                                    Path=VerticalViewSettings.SelectedGeneralViewTemplate, 
                                     UpdateSourceTrigger=PropertyChanged, Mode=TwoWay,
                                     ValidatesOnDataErrors=True, NotifyOnValidationError=True}"
                                 ToolTipText="{me:LocalizationSource VerticalViewSettingsPage.SelectMainAndSideViewTemplateToolTip}"
@@ -95,15 +95,15 @@
 
                             <controls:DoubleTextBoxSettingControl
                                 LabelText="{me:LocalizationSource VerticalView.PylonMainRebarViewNameMask}"
-                                FirstTextBoxText="{Binding Path=ViewSectionSettings.GeneralRebarViewPrefixTemp, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
-                                SecondTextBoxText="{Binding Path=ViewSectionSettings.GeneralRebarViewSuffixTemp, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
+                                FirstTextBoxText="{Binding Path=VerticalViewSettings.GeneralRebarViewPrefixTemp, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
+                                SecondTextBoxText="{Binding Path=VerticalViewSettings.GeneralRebarViewSuffixTemp, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
                                 ToolTipText="{me:LocalizationSource VerticalViewSettingsPage.PylonMainRebarViewNameMaskToolTip}"
                                 TextChangedCommand="{Binding SettingsChangedCommand}" />
 
                             <controls:DoubleTextBoxSettingControl
                                 LabelText="{me:LocalizationSource VerticalView.PylonSideRebarViewNameMask}"
-                                FirstTextBoxText="{Binding Path=ViewSectionSettings.GeneralRebarViewPerpendicularPrefixTemp, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
-                                SecondTextBoxText="{Binding Path=ViewSectionSettings.GeneralRebarViewPerpendicularSuffixTemp, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
+                                FirstTextBoxText="{Binding Path=VerticalViewSettings.GeneralRebarViewPerpendicularPrefixTemp, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
+                                SecondTextBoxText="{Binding Path=VerticalViewSettings.GeneralRebarViewPerpendicularSuffixTemp, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
                                 ToolTipText="{me:LocalizationSource VerticalViewSettingsPage.PylonSideRebarViewNameMaskToolTip}"
                                 TextChangedCommand="{Binding SettingsChangedCommand}" />
 
@@ -111,7 +111,7 @@
                                 LabelText="{me:LocalizationSource VerticalView.SelectMainAndSideRebarViewTemplate}"
                                 ItemsSource="{Binding ViewTemplatesInPj}"
                                 SelectedItem="{Binding 
-                                    Path=TypesSettings.SelectedGeneralRebarViewTemplate, 
+                                    Path=VerticalViewSettings.SelectedGeneralRebarViewTemplate, 
                                     UpdateSourceTrigger=PropertyChanged, Mode=TwoWay,
                                     ValidatesOnDataErrors=True, NotifyOnValidationError=True}"
                                 ToolTipText="{me:LocalizationSource VerticalViewSettingsPage.SelectMainAndSideRebarViewTemplateToolTip}"
@@ -133,7 +133,7 @@
                             <controls:TextBoxSettingControl
                                 LabelText="{me:LocalizationSource VerticalView.MainViewXOffset}"
                                 TextBoxText="{Binding 
-                                    Path=ViewSectionSettings.GeneralViewXOffsetTemp, 
+                                    Path=VerticalViewSettings.GeneralViewXOffsetTemp, 
                                     UpdateSourceTrigger=PropertyChanged, Mode=TwoWay,
                                     ValidatesOnDataErrors=True, NotifyOnValidationError=True}"
                                 ToolTipText="{me:LocalizationSource VerticalViewSettingsPage.MainViewXOffsetToolTip}"
@@ -143,7 +143,7 @@
                             <controls:TextBoxSettingControl
                                 LabelText="{me:LocalizationSource VerticalView.MainViewYTopOffset}"
                                 TextBoxText="{Binding 
-                                    Path=ViewSectionSettings.GeneralViewYTopOffsetTemp, 
+                                    Path=VerticalViewSettings.GeneralViewYTopOffsetTemp, 
                                     UpdateSourceTrigger=PropertyChanged, Mode=TwoWay,
                                     ValidatesOnDataErrors=True, NotifyOnValidationError=True}"
                                 ToolTipText="{me:LocalizationSource VerticalViewSettingsPage.MainViewYTopOffsetToolTip}"
@@ -153,7 +153,7 @@
                             <controls:TextBoxSettingControl
                                 LabelText="{me:LocalizationSource VerticalView.MainViewYBottomOffset}"
                                 TextBoxText="{Binding 
-                                    Path=ViewSectionSettings.GeneralViewYBottomOffsetTemp, 
+                                    Path=VerticalViewSettings.GeneralViewYBottomOffsetTemp, 
                                     UpdateSourceTrigger=PropertyChanged, Mode=TwoWay,
                                     ValidatesOnDataErrors=True, NotifyOnValidationError=True}"
                                 ToolTipText="{me:LocalizationSource VerticalViewSettingsPage.MainViewYBottomOffsetToolTip}"
@@ -175,7 +175,7 @@
                             <controls:TextBoxSettingControl
                                 LabelText="{me:LocalizationSource VerticalView.SideViewXOffset}"
                                 TextBoxText="{Binding 
-                                    Path=ViewSectionSettings.GeneralViewPerpXOffsetTemp, 
+                                    Path=VerticalViewSettings.GeneralViewPerpXOffsetTemp, 
                                     UpdateSourceTrigger=PropertyChanged, Mode=TwoWay,
                                     ValidatesOnDataErrors=True, NotifyOnValidationError=True}"
                                 ToolTipText="{me:LocalizationSource VerticalViewSettingsPage.SideViewXOffsetToolTip}"
@@ -185,7 +185,7 @@
                             <controls:TextBoxSettingControl
                                 LabelText="{me:LocalizationSource VerticalView.SideViewYTopOffset}"
                                 TextBoxText="{Binding 
-                                    Path=ViewSectionSettings.GeneralViewPerpYTopOffsetTemp, 
+                                    Path=VerticalViewSettings.GeneralViewPerpYTopOffsetTemp, 
                                     UpdateSourceTrigger=PropertyChanged, Mode=TwoWay,
                                     ValidatesOnDataErrors=True, NotifyOnValidationError=True}"
                                 ToolTipText="{me:LocalizationSource VerticalViewSettingsPage.SideViewYTopOffsetToolTip}"
@@ -195,7 +195,7 @@
                             <controls:TextBoxSettingControl
                                 LabelText="{me:LocalizationSource VerticalView.SideViewYBottomOffset}"
                                 TextBoxText="{Binding 
-                                    Path=ViewSectionSettings.GeneralViewPerpYBottomOffsetTemp, 
+                                    Path=VerticalViewSettings.GeneralViewPerpYBottomOffsetTemp, 
                                     UpdateSourceTrigger=PropertyChanged, Mode=TwoWay,
                                     ValidatesOnDataErrors=True, NotifyOnValidationError=True}"
                                 ToolTipText="{me:LocalizationSource VerticalViewSettingsPage.SideViewYBottomOffsetToolTip}"
@@ -219,7 +219,7 @@
                                 LabelText="{me:LocalizationSource VerticalView.SelectViewTypeSizeForMainAndSideViews}"
                                 ItemsSource="{Binding ViewFamilyTypes}"
                                 SelectedItem="{Binding 
-                                    Path=TypesSettings.SelectedViewFamilyType, 
+                                    Path=VerticalViewSettings.SelectedGeneralViewFamilyType, 
                                     UpdateSourceTrigger=PropertyChanged,Mode=TwoWay,
                                     ValidatesOnDataErrors=True, NotifyOnValidationError=True}"
                                 ToolTipText="{me:LocalizationSource VerticalViewSettingsPage.SelectViewTypeSizeForMainAndSideViewsToolTip}"

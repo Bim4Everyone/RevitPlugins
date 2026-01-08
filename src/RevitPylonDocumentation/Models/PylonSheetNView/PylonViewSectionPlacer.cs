@@ -25,13 +25,15 @@ public class PylonViewSectionPlacer {
 
 
     internal PylonViewSectionPlacer(CreationSettings settings, Document document, PylonSheetInfo pylonSheetInfo) {
-        SectionSettings = settings.ViewSectionSettings;
+        VerticalSectionSettings = settings.VerticalViewSettings;
+        HorizontalSectionSettings = settings.HorizontalViewSettings;
         SelectionSettings = settings.SelectionSettings;
         Doc = document;
         SheetInfo = pylonSheetInfo;
     }
 
-    internal UserViewSectionSettings SectionSettings { get; set; }
+    internal UserVerticalViewSettings VerticalSectionSettings { get; set; }
+    internal UserHorizontalViewSettings HorizontalSectionSettings { get; set; }
     internal UserSelectionSettings SelectionSettings { get; set; }
     internal Document Doc { get; set; }
     internal PylonSheetInfo SheetInfo { get; set; }
@@ -50,9 +52,9 @@ public class PylonViewSectionPlacer {
             // номер не должен совпадать с номером основного вида армирования
             SheetInfo.GeneralView.ViewportNumber = "100";
             SheetInfo.GeneralView.ViewportName =
-                SectionSettings.GeneralViewPrefix
+                VerticalSectionSettings.GeneralViewPrefix
                 + SheetInfo.PylonKeyName
-                + SectionSettings.GeneralViewSuffix;
+                + VerticalSectionSettings.GeneralViewSuffix;
         }
 
         // Передаем основной вид пилона в метод по созданию видов в (0.0.0)
@@ -69,7 +71,7 @@ public class PylonViewSectionPlacer {
             SheetInfo.SetTitleBlockSize(Doc, 2, 1);
         }
 
-        double newCenterX = -SheetInfo.TitleBlockWidth + SheetInfo.GeneralView.ViewportHalfWidth 
+        double newCenterX = -SheetInfo.TitleBlockWidth + SheetInfo.GeneralView.ViewportHalfWidth
                                                        + _titleBlockFrameLeftOffset;
 
         // Рассчитываем и задаем корректную точку вставки основного вида опалубки пилона, если есть другие виды
@@ -117,9 +119,9 @@ public class PylonViewSectionPlacer {
             // номер не должен совпадать с номером основного вида опалубки
             SheetInfo.GeneralViewRebar.ViewportNumber = "101";
             SheetInfo.GeneralViewRebar.ViewportName =
-                SectionSettings.GeneralRebarViewPrefix
+                VerticalSectionSettings.GeneralRebarViewPrefix
                 + SheetInfo.PylonKeyName
-                + SectionSettings.GeneralRebarViewSuffix;
+                + VerticalSectionSettings.GeneralRebarViewSuffix;
         }
 
         // Передаем основной вид пилона в метод по созданию видов в (0.0.0)
@@ -158,9 +160,9 @@ public class PylonViewSectionPlacer {
             // Индекс перпендикулярного вида опалубки на листе
             SheetInfo.GeneralViewPerpendicular.ViewportNumber = "4";
             SheetInfo.GeneralViewPerpendicular.ViewportName =
-                SectionSettings.GeneralViewPerpendicularPrefix
+                VerticalSectionSettings.GeneralViewPerpendicularPrefix
                 + SheetInfo.PylonKeyName
-                + SectionSettings.GeneralViewPerpendicularSuffix;
+                + VerticalSectionSettings.GeneralViewPerpendicularSuffix;
         }
 
         // Передаем основной перпендикулярный вид пилона в метод по созданию видов в (0.0.0)
@@ -168,7 +170,7 @@ public class PylonViewSectionPlacer {
             return false;
         }
         // Рассчитываем и задаем корректную точку вставки основного перпендикулярного вида пилона
-        double newCenterX = -SheetInfo.TitleBlockWidth + SheetInfo.GeneralViewPerpendicular.ViewportHalfWidth 
+        double newCenterX = -SheetInfo.TitleBlockWidth + SheetInfo.GeneralViewPerpendicular.ViewportHalfWidth
                                                        + _titleBlockFrameLeftOffset;
 
         // Рассчитываем и задаем корректную точку вставки основного перпендикулярного вида армирования пилона,
@@ -208,9 +210,9 @@ public class PylonViewSectionPlacer {
             // Индекс перпендикулярного вида армирования на листе
             SheetInfo.GeneralViewPerpendicularRebar.ViewportNumber = "г";
             SheetInfo.GeneralViewPerpendicularRebar.ViewportName =
-                SectionSettings.GeneralRebarViewPerpendicularPrefix
+                VerticalSectionSettings.GeneralRebarViewPerpendicularPrefix
                 + SheetInfo.PylonKeyName
-                + SectionSettings.GeneralRebarViewPerpendicularSuffix;
+                + VerticalSectionSettings.GeneralRebarViewPerpendicularSuffix;
         }
 
         // Передаем основной перпендикулярный вид пилона в метод по созданию видов в (0.0.0)
@@ -221,8 +223,8 @@ public class PylonViewSectionPlacer {
         // Смещение в случае, если ни один другой видовой экран не будет найден на листе
         double defaultOffsetX = -2.5;
         // Рассчитываем и задаем корректную точку вставки основного перпендикулярного вида армирования пилона
-        double newCenterX = -SheetInfo.TitleBlockWidth + SheetInfo.GeneralViewPerpendicularRebar.ViewportHalfWidth 
-                                                       + _titleBlockFrameLeftOffset 
+        double newCenterX = -SheetInfo.TitleBlockWidth + SheetInfo.GeneralViewPerpendicularRebar.ViewportHalfWidth
+                                                       + _titleBlockFrameLeftOffset
                                                        + defaultOffsetX;
 
         // Рассчитываем и задаем корректную точку вставки основного перпендикулярного вида армирования пилона
@@ -235,7 +237,7 @@ public class PylonViewSectionPlacer {
                                                        + SheetInfo.GeneralViewPerpendicularRebar.ViewportHalfWidth;
         }
         var newCenter = new XYZ(newCenterX,
-                                SheetInfo.TitleBlockHeight - SheetInfo.GeneralViewPerpendicularRebar.ViewportHalfHeight 
+                                SheetInfo.TitleBlockHeight - SheetInfo.GeneralViewPerpendicularRebar.ViewportHalfHeight
                                                            - _titleBlockFrameTopOffset * 2,
                                 0);
 
@@ -402,7 +404,7 @@ public class PylonViewSectionPlacer {
         // Рассчитываем и задаем корректную точку вставки поперечного вида армирования пилона
         // Дефолтные значения координат для размещения видового экрана, используемое в случае, если 
         // референсные видовые экраны на листе не будут найдены
-        double newCenterX = -SheetInfo.TitleBlockWidth + SheetInfo.TransverseViewFirstRebar.ViewportHalfWidth 
+        double newCenterX = -SheetInfo.TitleBlockWidth + SheetInfo.TransverseViewFirstRebar.ViewportHalfWidth
                                                        + _titleBlockFrameLeftOffset;
         double newCenterY = UnitUtilsHelper.ConvertToInternalValue(-50);
 
@@ -448,7 +450,7 @@ public class PylonViewSectionPlacer {
         // Рассчитываем и задаем корректную точку вставки поперечного вида армирования пилона
         // Дефолтные значения координат для размещения видового экрана, используемое в случае, если 
         // референсные видовые экраны на листе не будут найдены
-        double newCenterX = -SheetInfo.TitleBlockWidth + SheetInfo.TransverseViewSecondRebar.ViewportHalfWidth 
+        double newCenterX = -SheetInfo.TitleBlockWidth + SheetInfo.TransverseViewSecondRebar.ViewportHalfWidth
                                                        + _titleBlockFrameLeftOffset;
         double newCenterY = UnitUtilsHelper.ConvertToInternalValue(-25);
 
@@ -496,7 +498,7 @@ public class PylonViewSectionPlacer {
         // Рассчитываем и задаем корректную точку вставки поперечного вида армирования пилона
         // Дефолтные значения координат для размещения видового экрана, используемое в случае, если 
         // референсные видовые экраны на листе не будут найдены
-        double newCenterX = -SheetInfo.TitleBlockWidth + SheetInfo.TransverseViewThirdRebar.ViewportHalfWidth 
+        double newCenterX = -SheetInfo.TitleBlockWidth + SheetInfo.TransverseViewThirdRebar.ViewportHalfWidth
                                                        + _titleBlockFrameLeftOffset;
         double newCenterY = UnitUtilsHelper.ConvertToInternalValue(0);
 
@@ -514,7 +516,7 @@ public class PylonViewSectionPlacer {
         }
 
         if(refPylonView != null) {
-            newCenterX = refPylonView.ViewportCenter.X + refPylonView.ViewportHalfWidth 
+            newCenterX = refPylonView.ViewportCenter.X + refPylonView.ViewportHalfWidth
                                                        + SheetInfo.TransverseViewThirdRebar.ViewportHalfWidth
                                                        + _viewportOffset;
             newCenterY = SheetInfo.TransverseViewThirdRebar.ViewportHalfHeight + _titleBlockFrameBottomOffset;

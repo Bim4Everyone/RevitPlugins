@@ -6,7 +6,6 @@ using RevitPylonDocumentation.Models.UserSettings;
 
 namespace RevitPylonDocumentation.ViewModels.UserSettings;
 internal class UserTypesSettingsVM : ValidatableViewModel {
-    private ViewFamilyType _selectedViewFamilyType;
     private DimensionType _selectedDimensionType;
     private FamilySymbol _selectedSkeletonTagType;
     private FamilySymbol _selectedRebarTagTypeWithSerif;
@@ -18,10 +17,6 @@ internal class UserTypesSettingsVM : ValidatableViewModel {
     private FamilySymbol _selectedConcretingJointType;
 
     private SpotDimensionType _selectedSpotDimensionType;
-    private View _selectedGeneralViewTemplate;
-    private View _selectedGeneralRebarViewTemplate;
-    private View _selectedTransverseViewTemplate;
-    private View _selectedTransverseRebarViewTemplate;
     private View _selectedLegend;
     private FamilySymbol _selectedTitleBlock;
 
@@ -58,18 +53,7 @@ internal class UserTypesSettingsVM : ValidatableViewModel {
         }
     }
 
-    /// <summary>
-    /// Выбранный пользователем типоразмер вида для создания новых видов
-    /// </summary>
-    [Required]
-    public ViewFamilyType SelectedViewFamilyType {
-        get => _selectedViewFamilyType;
-        set {
-            RaiseAndSetIfChanged(ref _selectedViewFamilyType, value);
-            ViewModel.ViewSectionSettings.ViewFamilyTypeNameTemp = value?.Name;
-            ValidateProperty(value);
-        }
-    }
+
 
     /// <summary>
     /// Выбранный пользователем типоразмер высотной отметки
@@ -187,59 +171,6 @@ internal class UserTypesSettingsVM : ValidatableViewModel {
             ValidateProperty(value);
         }
     }
-
-    /// <summary>
-    /// Выбранный пользователем шаблон вида основных видов
-    /// </summary>
-    [Required]
-    public View SelectedGeneralViewTemplate {
-        get => _selectedGeneralViewTemplate;
-        set {
-            RaiseAndSetIfChanged(ref _selectedGeneralViewTemplate, value);
-            ViewModel.ViewSectionSettings.GeneralViewTemplateNameTemp = value?.Name;
-            ValidateProperty(value);
-        }
-    }
-
-    /// <summary>
-    /// Выбранный пользователем шаблон вида основных видов армирования
-    /// </summary>
-    [Required]
-    public View SelectedGeneralRebarViewTemplate {
-        get => _selectedGeneralRebarViewTemplate;
-        set {
-            RaiseAndSetIfChanged(ref _selectedGeneralRebarViewTemplate, value);
-            ViewModel.ViewSectionSettings.GeneralRebarViewTemplateNameTemp = value?.Name;
-            ValidateProperty(value);
-        }
-    }
-
-    /// <summary>
-    /// Выбранный пользователем шаблон вида поперечных видов
-    /// </summary>
-    [Required]
-    public View SelectedTransverseViewTemplate {
-        get => _selectedTransverseViewTemplate;
-        set {
-            RaiseAndSetIfChanged(ref _selectedTransverseViewTemplate, value);
-            ViewModel.ViewSectionSettings.TransverseViewTemplateNameTemp = value?.Name;
-            ValidateProperty(value);
-        }
-    }
-
-    /// <summary>
-    /// Выбранный пользователем шаблон вида поперечных видов армирования
-    /// </summary>
-    [Required]
-    public View SelectedTransverseRebarViewTemplate {
-        get => _selectedTransverseRebarViewTemplate;
-        set {
-            RaiseAndSetIfChanged(ref _selectedTransverseRebarViewTemplate, value);
-            ViewModel.ViewSectionSettings.TransverseRebarViewTemplateNameTemp = value?.Name;
-            ValidateProperty(value);
-        }
-    }
-
 
     public UserTypesSettings GetSettings() {
         var settings = new UserTypesSettings();

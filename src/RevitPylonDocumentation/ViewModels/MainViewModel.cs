@@ -50,10 +50,12 @@ internal class MainViewModel : BaseViewModel {
 
         SelectionSettings = new UserSelectionSettingsVM();
         ProjectSettings = new UserProjectSettingsVM(this, _revitRepository, _localizationService);
-        ViewSectionSettings = new UserViewSectionSettingsVM(this, _localizationService);
+        VerticalViewSettings = new UserVerticalViewSettingsPageVM(this, _localizationService);
+        HorizontalViewSettings = new UserHorizontalViewSettingsPageVM(this, _localizationService);
         SchedulesSettings = new UserSchedulesSettingsVM(this);
         TypesSettings = new UserTypesSettingsVM(this);
         ReferenceScheduleSettings = new UserReferenceScheduleSettingsVM(this);
+
 
         ViewFamilyTypes = _revitRepository.ViewFamilyTypes;
         TitleBlocks = _revitRepository.TitleBlocksInProject;
@@ -117,9 +119,14 @@ internal class MainViewModel : BaseViewModel {
     public UserProjectSettingsVM ProjectSettings { get; set; }
 
     /// <summary>
-    /// Настройки параметров и правил создания разрезов с предыдущего сеанса
+    /// Настройки параметров и правил создания вертикальных разрезов с предыдущего сеанса
     /// </summary>
-    public UserViewSectionSettingsVM ViewSectionSettings { get; set; }
+    public UserVerticalViewSettingsPageVM VerticalViewSettings { get; set; }
+
+    /// <summary>
+    /// Настройки параметров и правил создания горизонтальных разрезов с предыдущего сеанса
+    /// </summary>
+    public UserHorizontalViewSettingsPageVM HorizontalViewSettings { get; set; }
 
     /// <summary>
     /// Настройки параметров и правил создания спек с предыдущего сеанса
@@ -367,7 +374,8 @@ internal class MainViewModel : BaseViewModel {
         ErrorText = string.Empty;
 
         ProjectSettings.ApplyProjectSettings();
-        ViewSectionSettings.ApplyViewSectionsSettings();
+        VerticalViewSettings.ApplyViewSectionsSettings();
+        HorizontalViewSettings.ApplyViewSectionsSettings();
         SchedulesSettings.ApplySchedulesSettings();
 
         // Получаем заново список заполненных разделов проекта
@@ -381,7 +389,8 @@ internal class MainViewModel : BaseViewModel {
         FindGeneralRebarViewTemplate();
         FindTransverseViewTemplate();
         FindTransverseRebarViewTemplate();
-        FindViewFamilyType();
+        FindVerticalViewFamilyType();
+        FindHorizontalViewFamilyType();
         FindDimensionType();
         FindSpotDimensionType();
         FindSkeletonTagType();
@@ -404,38 +413,38 @@ internal class MainViewModel : BaseViewModel {
             return;
         }
 
-        if(TypesSettings.SelectedViewFamilyType is null) {
+        if(VerticalViewSettings.SelectedGeneralViewFamilyType is null) {
             ErrorText = _localizationService.GetLocalizedString("VM.ViewTypeNotSelected");
             return;
         }
 
-        if(TypesSettings.SelectedGeneralViewTemplate is null) {
+        if(HorizontalViewSettings.SelectedTransverseViewFamilyType is null) {
+            ErrorText = _localizationService.GetLocalizedString("VM.ViewTypeNotSelected");
+            return;
+        }
+
+        if(VerticalViewSettings.SelectedGeneralViewTemplate is null) {
             ErrorText = _localizationService.GetLocalizedString("VM.MainViewsTemplateNotSelected");
             return;
         }
 
-        if(TypesSettings.SelectedGeneralRebarViewTemplate is null) {
+        if(VerticalViewSettings.SelectedGeneralRebarViewTemplate is null) {
             ErrorText = _localizationService.GetLocalizedString("VM.MainRebarViewsTemplateNotSelected");
             return;
         }
 
-        if(TypesSettings.SelectedTransverseViewTemplate is null) {
+        if(HorizontalViewSettings.SelectedTransverseViewTemplate is null) {
             ErrorText = _localizationService.GetLocalizedString("VM.TransverseViewsTemplateNotSelected");
             return;
         }
 
-        if(TypesSettings.SelectedTransverseRebarViewTemplate is null) {
+        if(HorizontalViewSettings.SelectedTransverseRebarViewTemplate is null) {
             ErrorText = _localizationService.GetLocalizedString("VM.TransverseRebarViewsTemplateNotSelected");
             return;
         }
 
         if(TypesSettings.SelectedLegend is null) {
             ErrorText = _localizationService.GetLocalizedString("VM.LegendNotSelected");
-            return;
-        }
-
-        if(TypesSettings.SelectedViewFamilyType is null) {
-            ErrorText = _localizationService.GetLocalizedString("VM.ViewTypeSizeNotSelected");
             return;
         }
 
@@ -485,7 +494,8 @@ internal class MainViewModel : BaseViewModel {
         }
 
         ProjectSettings.CheckProjectSettings();
-        ViewSectionSettings.CheckViewSectionsSettings();
+        VerticalViewSettings.CheckViewSectionsSettings();
+        HorizontalViewSettings.CheckViewSectionsSettings();
     }
 
     /// <summary>
@@ -507,7 +517,8 @@ internal class MainViewModel : BaseViewModel {
             ProjectSettings.GetSettings(),
             SchedulesSettings.GetSettings(),
             SelectionSettings.GetSettings(),
-            ViewSectionSettings.GetSettings(),
+            VerticalViewSettings.GetSettings(),
+            HorizontalViewSettings.GetSettings(),
             TypesSettings.GetSettings(),
             ReferenceScheduleSettings.GetSettings());
 
@@ -550,9 +561,9 @@ internal class MainViewModel : BaseViewModel {
     /// Получает шаблон для основных видов по имени
     /// </summary>
     public void FindGeneralViewTemplate() {
-        if(!String.IsNullOrEmpty(ViewSectionSettings.GeneralViewTemplateName)) {
-            TypesSettings.SelectedGeneralViewTemplate = ViewTemplatesInPj
-                .FirstOrDefault(view => view.Name.Equals(ViewSectionSettings.GeneralViewTemplateName));
+        if(!String.IsNullOrEmpty(VerticalViewSettings.GeneralViewTemplateName)) {
+            VerticalViewSettings.SelectedGeneralViewTemplate = ViewTemplatesInPj
+                .FirstOrDefault(view => view.Name.Equals(VerticalViewSettings.GeneralViewTemplateName));
         }
     }
 
@@ -560,9 +571,9 @@ internal class MainViewModel : BaseViewModel {
     /// Получает шаблон для основных видов армирования по имени
     /// </summary>
     public void FindGeneralRebarViewTemplate() {
-        if(!String.IsNullOrEmpty(ViewSectionSettings.GeneralRebarViewTemplateName)) {
-            TypesSettings.SelectedGeneralRebarViewTemplate = ViewTemplatesInPj
-                .FirstOrDefault(view => view.Name.Equals(ViewSectionSettings.GeneralRebarViewTemplateName));
+        if(!String.IsNullOrEmpty(VerticalViewSettings.GeneralRebarViewTemplateName)) {
+            VerticalViewSettings.SelectedGeneralRebarViewTemplate = ViewTemplatesInPj
+                .FirstOrDefault(view => view.Name.Equals(VerticalViewSettings.GeneralRebarViewTemplateName));
         }
     }
 
@@ -570,9 +581,9 @@ internal class MainViewModel : BaseViewModel {
     /// Получает шаблон для поперечных видов по имени
     /// </summary>
     public void FindTransverseViewTemplate() {
-        if(!String.IsNullOrEmpty(ViewSectionSettings.TransverseViewTemplateName)) {
-            TypesSettings.SelectedTransverseViewTemplate = ViewTemplatesInPj
-                .FirstOrDefault(view => view.Name.Equals(ViewSectionSettings.TransverseViewTemplateName));
+        if(!String.IsNullOrEmpty(HorizontalViewSettings.TransverseViewTemplateName)) {
+            HorizontalViewSettings.SelectedTransverseViewTemplate = ViewTemplatesInPj
+                .FirstOrDefault(view => view.Name.Equals(HorizontalViewSettings.TransverseViewTemplateName));
         }
     }
 
@@ -580,19 +591,29 @@ internal class MainViewModel : BaseViewModel {
     /// Получает шаблон для поперечных видов армирования по имени
     /// </summary>
     public void FindTransverseRebarViewTemplate() {
-        if(!String.IsNullOrEmpty(ViewSectionSettings.TransverseRebarViewTemplateName)) {
-            TypesSettings.SelectedTransverseRebarViewTemplate = ViewTemplatesInPj
-                .FirstOrDefault(view => view.Name.Equals(ViewSectionSettings.TransverseRebarViewTemplateName));
+        if(!String.IsNullOrEmpty(HorizontalViewSettings.TransverseRebarViewTemplateName)) {
+            HorizontalViewSettings.SelectedTransverseRebarViewTemplate = ViewTemplatesInPj
+                .FirstOrDefault(view => view.Name.Equals(HorizontalViewSettings.TransverseRebarViewTemplateName));
+        }
+    }
+
+    /// <summary>
+    /// Получает типоразмер вида для создаваемых видов
+    /// </summary> 
+    public void FindVerticalViewFamilyType() {
+        if(!String.IsNullOrEmpty(VerticalViewSettings.GeneralViewFamilyTypeName)) {
+            VerticalViewSettings.SelectedGeneralViewFamilyType = ViewFamilyTypes
+                .FirstOrDefault(familyType => familyType.Name.Equals(VerticalViewSettings.GeneralViewFamilyTypeName));
         }
     }
 
     /// <summary>
     /// Получает типоразмер вида для создаваемых видов
     /// </summary>
-    public void FindViewFamilyType() {
-        if(!String.IsNullOrEmpty(ViewSectionSettings.ViewFamilyTypeName)) {
-            TypesSettings.SelectedViewFamilyType = ViewFamilyTypes
-                .FirstOrDefault(familyType => familyType.Name.Equals(ViewSectionSettings.ViewFamilyTypeName));
+    public void FindHorizontalViewFamilyType() {
+        if(!String.IsNullOrEmpty(HorizontalViewSettings.TransverseViewFamilyTypeName)) {
+            HorizontalViewSettings.SelectedTransverseViewFamilyType = ViewFamilyTypes
+                .FirstOrDefault(familyType => familyType.Name.Equals(HorizontalViewSettings.TransverseViewFamilyTypeName));
         }
     }
 
