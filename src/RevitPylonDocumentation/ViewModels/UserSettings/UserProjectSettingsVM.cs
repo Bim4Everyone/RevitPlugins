@@ -13,8 +13,6 @@ namespace RevitPylonDocumentation.ViewModels.UserSettings;
 internal class UserProjectSettingsVM : BaseViewModel {
     private readonly ILocalizationService _localizationService;
 
-    private string _projectSectionTemp = "обр_ФОП_Раздел проекта";
-    private string _markTemp = "Марка";
     private string _titleBlockNameTemp = "Создать типы по комплектам";
     private string _dispatcherGroupingFirstTemp = "_Группа видов 1";
     private string _dispatcherGroupingSecondTemp = "_Группа видов 2";
@@ -23,12 +21,6 @@ internal class UserProjectSettingsVM : BaseViewModel {
 
     private string _sheetPrefixTemp = "Пилон ";
     private string _sheetSuffixTemp = "";
-
-    private string _typicalPylonFilterParameterTemp = "обр_ФОП_Фильтрация 1";
-    private string _typicalPylonFilterValueTemp = "на 1 шт.";
-
-    private string _pylonLengthParamNameTemp = "ФОП_РАЗМ_Длина";
-    private string _pylonWidthParamNameTemp = "ФОП_РАЗМ_Ширина";
 
     private string _dimensionTypeNameTemp = "я_Основной_Плагин_2.5 мм";
     private string _spotDimensionTypeNameTemp = "Стрелка_Проектная_Верх";
@@ -52,17 +44,7 @@ internal class UserProjectSettingsVM : BaseViewModel {
     public MainViewModel ViewModel { get; set; }
     internal RevitRepository Repository { get; set; }
 
-    public string ProjectSection { get; set; }
-    public string ProjectSectionTemp {
-        get => _projectSectionTemp;
-        set => RaiseAndSetIfChanged(ref _projectSectionTemp, value);
-    }
 
-    public string Mark { get; set; }
-    public string MarkTemp {
-        get => _markTemp;
-        set => RaiseAndSetIfChanged(ref _markTemp, value);
-    }
 
     public string TitleBlockName { get; set; }
     public string TitleBlockNameTemp {
@@ -105,28 +87,6 @@ internal class UserProjectSettingsVM : BaseViewModel {
         set => RaiseAndSetIfChanged(ref _sheetSuffixTemp, value);
     }
 
-    public string TypicalPylonFilterParameter { get; set; }
-    public string TypicalPylonFilterParameterTemp {
-        get => _typicalPylonFilterParameterTemp;
-        set => RaiseAndSetIfChanged(ref _typicalPylonFilterParameterTemp, value);
-    }
-
-    public string TypicalPylonFilterValue { get; set; }
-    public string TypicalPylonFilterValueTemp {
-        get => _typicalPylonFilterValueTemp;
-        set => RaiseAndSetIfChanged(ref _typicalPylonFilterValueTemp, value);
-    }
-    public string PylonLengthParamName { get; set; }
-    public string PylonLengthParamNameTemp {
-        get => _pylonLengthParamNameTemp;
-        set => RaiseAndSetIfChanged(ref _pylonLengthParamNameTemp, value);
-    }
-
-    public string PylonWidthParamName { get; set; }
-    public string PylonWidthParamNameTemp {
-        get => _pylonWidthParamNameTemp;
-        set => RaiseAndSetIfChanged(ref _pylonWidthParamNameTemp, value);
-    }
 
     public string DimensionTypeName { get; set; }
     public string DimensionTypeNameTemp {
@@ -183,8 +143,7 @@ internal class UserProjectSettingsVM : BaseViewModel {
     }
 
     public void ApplyProjectSettings() {
-        ProjectSection = ProjectSectionTemp;
-        Mark = MarkTemp;
+
         TitleBlockName = TitleBlockNameTemp;
         DispatcherGroupingFirst = DispatcherGroupingFirstTemp;
         DispatcherGroupingSecond = DispatcherGroupingSecondTemp;
@@ -194,11 +153,6 @@ internal class UserProjectSettingsVM : BaseViewModel {
         SheetPrefix = SheetPrefixTemp;
         SheetSuffix = SheetSuffixTemp;
 
-        TypicalPylonFilterParameter = TypicalPylonFilterParameterTemp;
-        TypicalPylonFilterValue = TypicalPylonFilterValueTemp;
-
-        PylonLengthParamName = PylonLengthParamNameTemp;
-        PylonWidthParamName = PylonWidthParamNameTemp;
 
         DimensionTypeName = DimensionTypeNameTemp;
         SpotDimensionTypeName = SpotDimensionTypeNameTemp;
@@ -252,25 +206,6 @@ internal class UserProjectSettingsVM : BaseViewModel {
             // Удаляем созданный лист
             Repository.Document.Delete(viewSheet.Id);
             transaction.RollBack();
-        }
-
-
-        // Перебираем пилоны, которые найдены в проекте для работы и проверяем у НесКлн параметры сечения
-        foreach(var sheetInfo in Repository.HostsInfo) {
-            var pylon = sheetInfo.HostElems.FirstOrDefault();
-            if(pylon?.Category.GetBuiltInCategory() != BuiltInCategory.OST_StructuralColumns) { continue; }
-
-            var pylonType = Repository.Document.GetElement(pylon?.GetTypeId()) as FamilySymbol;
-
-            if(pylonType?.LookupParameter(PylonLengthParamName) is null) {
-                ViewModel.ErrorText = _localizationService.GetLocalizedString("VM.PylonLengthParamInvalid");
-                break;
-            }
-
-            if(pylonType?.LookupParameter(PylonWidthParamName) is null) {
-                ViewModel.ErrorText = _localizationService.GetLocalizedString("VM.PylonWidthParamInvalid");
-                break;
-            }
         }
     }
 

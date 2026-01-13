@@ -135,8 +135,15 @@
                         <ui:NavigationViewItem
                             Content="{me:LocalizationSource MainWindow.PylonParameters}"
                             Icon="{ui:SymbolIcon PauseSettings20}"
-                            TargetPageType="{x:Type pages:PylonParamsPage}" 
-                            ToolTip="{me:LocalizationSource MainWindow.PylonParametersSettings}"/>
+                            TargetPageType="{x:Type pages:PylonParamsPage}"
+                            ToolTip="{me:LocalizationSource MainWindow.PylonParametersSettings}">
+                            <ui:NavigationViewItem.InfoBadge>
+                                <ui:InfoBadge
+                                    Style="{StaticResource RoundInfoBadgeStyle}"
+                                    Visibility="{Binding Path=PylonSettings.HasErrors, Converter={StaticResource BooleanToVisibilityConverter}}">
+                                </ui:InfoBadge>
+                            </ui:NavigationViewItem.InfoBadge>
+                        </ui:NavigationViewItem>
                         <ui:NavigationViewItem
                             Content="{me:LocalizationSource MainWindow.ProjectParameters}"
                             Icon="{ui:SymbolIcon ArchiveSettings24}"

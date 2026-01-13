@@ -18,6 +18,7 @@ internal class UserLegendsAndAnnotationsSettingsVM : ValidatableViewModel {
     public UserLegendsAndAnnotationsSettingsVM(MainViewModel mainViewModel, ILocalizationService localizationService) {
         ViewModel = mainViewModel;
         _localizationService = localizationService;
+        ValidateAllProperties();
     }
 
     public MainViewModel ViewModel { get; set; }

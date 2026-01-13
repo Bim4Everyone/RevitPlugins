@@ -54,6 +54,9 @@ internal class MainViewModel : BaseViewModel {
         SchedulesSettings = new UserSchedulesSettingsPageVM(this);
         ScheduleFiltersSettings = new UserScheduleFiltersSettingsPageVM(this);
         LegendsAndAnnotationsSettings = new UserLegendsAndAnnotationsSettingsVM(this, _localizationService);
+
+        PylonSettings = new UserPylonSettingsVM(this, _revitRepository, _localizationService);
+
         ProjectSettings = new UserProjectSettingsVM(this, _revitRepository, _localizationService);
         TypesSettings = new UserTypesSettingsVM(this);
         ReferenceScheduleSettings = new UserReferenceScheduleSettingsVM(this);
@@ -118,6 +121,11 @@ internal class MainViewModel : BaseViewModel {
     /// Настройки параметров проекта с предыдущего сеанса
     /// </summary>
     public UserProjectSettingsVM ProjectSettings { get; set; }
+
+    /// <summary>
+    /// Настройки параметров проекта с предыдущего сеанса
+    /// </summary>
+    public UserPylonSettingsVM PylonSettings { get; set; }
 
     /// <summary>
     /// Настройки параметров и правил создания вертикальных разрезов с предыдущего сеанса
@@ -387,7 +395,7 @@ internal class MainViewModel : BaseViewModel {
         VerticalViewSettings.ApplyViewSectionsSettings();
         HorizontalViewSettings.ApplyViewSectionsSettings();
         SchedulesSettings.ApplySchedulesSettings();
-        ScheduleFiltersSettings.ApplySchedulesSettings();
+        ScheduleFiltersSettings.ApplyScheduleFiltersSettings();
         LegendsAndAnnotationsSettings.ApplyLegendsAndAnnotationsSettings();
         ProjectSettings.ApplyProjectSettings();
 
@@ -529,6 +537,7 @@ internal class MainViewModel : BaseViewModel {
 
         var settings = new CreationSettings(
             ProjectSettings.GetSettings(),
+            PylonSettings.GetSettings(),
             SchedulesSettings.GetSettings(),
             ScheduleFiltersSettings.GetSettings(),
             SelectionSettings.GetSettings(),

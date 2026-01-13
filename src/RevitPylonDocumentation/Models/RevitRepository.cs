@@ -76,7 +76,7 @@ internal class RevitRepository {
         .OfType<ViewFamilyType>()
         .Where(a => ViewFamily.Section == a.ViewFamily)
         .ToList();
-    
+
     /// <summary>
     /// Возвращает список всех легенд, присутствующих в проекте
     /// </summary>
@@ -85,7 +85,7 @@ internal class RevitRepository {
         .OfType<View>()
         .Where(view => view.ViewType == ViewType.Legend)
         .ToList();
-    
+
     /// <summary>
     /// Возвращает список всех шаблонов сечений в проекте
     /// </summary>
@@ -210,17 +210,17 @@ internal class RevitRepository {
             if(!elem.Name.Contains("Пилон") && !elem.Name.Contains("Колонна")) { continue; }
 
             // Запрашиваем параметр фильтрации типовых пилонов. Если он не равен заданному, то отсеиваем этот пилон
-            var typicalPylonParameter = elem.LookupParameter(mainViewModel.ProjectSettings.TypicalPylonFilterParameter);
+            var typicalPylonParameter = elem.LookupParameter(mainViewModel.PylonSettings.TypicalPylonFilterParameter);
             if(typicalPylonParameter == null) {
                 mainViewModel.ErrorText = _localizationService.GetLocalizedString("VM.TypicalPylonFilterParamNotFound");
                 return;
             }
 
             if(typicalPylonParameter.AsString() is null
-                || typicalPylonParameter.AsString() != mainViewModel.ProjectSettings.TypicalPylonFilterValue) { continue; }
+                || typicalPylonParameter.AsString() != mainViewModel.PylonSettings.TypicalPylonFilterValue) { continue; }
 
             // Запрашиваем Раздел проекта
-            var projectSectionParameter = elem.LookupParameter(mainViewModel.ProjectSettings.ProjectSection);
+            var projectSectionParameter = elem.LookupParameter(mainViewModel.PylonSettings.ProjectSection);
             if(projectSectionParameter == null) {
                 mainViewModel.ErrorText = _localizationService.GetLocalizedString("VM.ProjectSectionParamNotFound");
                 return;
@@ -230,7 +230,7 @@ internal class RevitRepository {
 
 
             // Запрашиваем Марку пилона
-            var hostMarkParameter = elem.LookupParameter(mainViewModel.ProjectSettings.Mark);
+            var hostMarkParameter = elem.LookupParameter(mainViewModel.PylonSettings.Mark);
             if(hostMarkParameter == null) {
                 mainViewModel.ErrorText = _localizationService.GetLocalizedString("VM.HostMarkParamNotFound");
                 return;
@@ -283,8 +283,8 @@ internal class RevitRepository {
     /// </summary>
     public void FindSheetInPj(MainViewModel mainViewModel, PylonSheetInfoVM pylonSheetInfoVM) {
         var sheet = AllSheets
-            .Where(item => item.Name.Equals(mainViewModel.ProjectSettings.SheetPrefix 
-                                            + pylonSheetInfoVM.PylonKeyName 
+            .Where(item => item.Name.Equals(mainViewModel.ProjectSettings.SheetPrefix
+                                            + pylonSheetInfoVM.PylonKeyName
                                             + mainViewModel.ProjectSettings.SheetSuffix))
             .FirstOrDefault();
 

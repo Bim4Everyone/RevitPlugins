@@ -55,37 +55,55 @@
                         SizeChanged="UniformGrid_SizeChanged">
                         <controls:TextBoxSettingControl
                             LabelText="{me:LocalizationSource PylonParams.PylonMarkParameter}"
-                            TextBoxText="{Binding Path=ProjectSettings.MarkTemp, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
+                            TextBoxText="{Binding 
+                                Path=PylonSettings.MarkTemp, 
+                                UpdateSourceTrigger=PropertyChanged, Mode=TwoWay,
+                                ValidatesOnDataErrors=True, NotifyOnValidationError=True}"
                             ToolTipText="{me:LocalizationSource PylonParamsPage.PylonMarkParameterToolTip}"
                             TextChangedCommand="{Binding SettingsChangedCommand}" />
 
                         <controls:TextBoxSettingControl
                             LabelText="{me:LocalizationSource PylonParams.PylonDocumentationSetParameter}"
-                            TextBoxText="{Binding Path=ProjectSettings.ProjectSectionTemp, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
+                            TextBoxText="{Binding 
+                                Path=PylonSettings.ProjectSectionTemp, 
+                                UpdateSourceTrigger=PropertyChanged, Mode=TwoWay,
+                                ValidatesOnDataErrors=True, NotifyOnValidationError=True}"
                             ToolTipText="{me:LocalizationSource PylonParamsPage.PylonDocumentationSetParameterToolTip}"
                             TextChangedCommand="{Binding SettingsChangedCommand}" />
 
                         <controls:TextBoxSettingControl
                             LabelText="{me:LocalizationSource PylonParams.TypicalPylonFilterParameter}"
-                            TextBoxText="{Binding Path=ProjectSettings.TypicalPylonFilterParameterTemp, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
+                            TextBoxText="{Binding 
+                                Path=PylonSettings.TypicalPylonFilterParameterTemp, 
+                                UpdateSourceTrigger=PropertyChanged, Mode=TwoWay,
+                                ValidatesOnDataErrors=True, NotifyOnValidationError=True}"
                             ToolTipText="{me:LocalizationSource PylonParamsPage.TypicalPylonFilterParameterToolTip}"
                             TextChangedCommand="{Binding SettingsChangedCommand}" />
 
                         <controls:TextBoxSettingControl
                             LabelText="{me:LocalizationSource PylonParams.TypicalPylonFilterValue}"
-                            TextBoxText="{Binding Path=ProjectSettings.TypicalPylonFilterValueTemp, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
+                            TextBoxText="{Binding 
+                                Path=PylonSettings.TypicalPylonFilterValueTemp, 
+                                UpdateSourceTrigger=PropertyChanged, Mode=TwoWay,
+                                ValidatesOnDataErrors=True, NotifyOnValidationError=True}"
                             ToolTipText="{me:LocalizationSource PylonParamsPage.TypicalPylonFilterValueToolTip}"
                             TextChangedCommand="{Binding SettingsChangedCommand}" />
 
                         <controls:TextBoxSettingControl
                             LabelText="{me:LocalizationSource PylonParams.PylonSectionLengthParameter}"
-                            TextBoxText="{Binding Path=ProjectSettings.PylonLengthParamNameTemp, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
+                            TextBoxText="{Binding 
+                                Path=PylonSettings.PylonLengthParamNameTemp, 
+                                UpdateSourceTrigger=PropertyChanged, Mode=TwoWay,
+                                ValidatesOnDataErrors=True, NotifyOnValidationError=True}"
                             ToolTipText="{me:LocalizationSource PylonParamsPage.PylonSectionLengthParameterToolTip}"
                             TextChangedCommand="{Binding SettingsChangedCommand}" />
 
                         <controls:TextBoxSettingControl
                             LabelText="{me:LocalizationSource PylonParams.PylonSectionWidthParameter}"
-                            TextBoxText="{Binding Path=ProjectSettings.PylonWidthParamNameTemp, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
+                            TextBoxText="{Binding 
+                                Path=PylonSettings.PylonWidthParamNameTemp, 
+                                UpdateSourceTrigger=PropertyChanged, Mode=TwoWay,
+                                ValidatesOnDataErrors=True, NotifyOnValidationError=True}"
                             ToolTipText="{me:LocalizationSource PylonParamsPage.PylonSectionWidthParameterToolTip}"
                             TextChangedCommand="{Binding SettingsChangedCommand}" />
                     </UniformGrid>

@@ -30,6 +30,7 @@ internal class PluginConfig : ProjectConfig<PluginSettings> {
         var schedulesSettings = mainViewModel.SchedulesSettings;
         var scheduleFiltersSettings = mainViewModel.ScheduleFiltersSettings;
         var legendsAndAnnotationsSettings = mainViewModel.LegendsAndAnnotationsSettings;
+        var pylonSettings = mainViewModel.PylonSettings;
         var projectSettings = mainViewModel.ProjectSettings;
 
         selectionSettings.NeedWorkWithGeneralView = settings.NeedWorkWithGeneralView;
@@ -210,20 +211,25 @@ internal class PluginConfig : ProjectConfig<PluginSettings> {
         legendsAndAnnotationsSettings.LegendYOffset = settings.LegendYOffset;
         legendsAndAnnotationsSettings.LegendYOffsetTemp = settings.LegendYOffset;
 
-        projectSettings.ProjectSection = settings.ProjectSection;
-        projectSettings.ProjectSectionTemp = settings.ProjectSection;
-        projectSettings.Mark = settings.Mark;
-        projectSettings.MarkTemp = settings.Mark;
+        pylonSettings.ProjectSection = settings.ProjectSection;
+        pylonSettings.ProjectSectionTemp = settings.ProjectSection;
+        pylonSettings.Mark = settings.Mark;
+        pylonSettings.MarkTemp = settings.Mark;
+        pylonSettings.PylonLengthParamName = settings.PylonLengthParamName;
+        pylonSettings.PylonLengthParamNameTemp = settings.PylonLengthParamName;
+        pylonSettings.PylonWidthParamName = settings.PylonWidthParamName;
+        pylonSettings.PylonWidthParamNameTemp = settings.PylonWidthParamName;
+        pylonSettings.TypicalPylonFilterParameter = settings.TypicalPylonFilterParameter;
+        pylonSettings.TypicalPylonFilterParameterTemp = settings.TypicalPylonFilterParameter;
+        pylonSettings.TypicalPylonFilterValue = settings.TypicalPylonFilterValue;
+        pylonSettings.TypicalPylonFilterValueTemp = settings.TypicalPylonFilterValue;
+
         projectSettings.TitleBlockName = settings.TitleBlockName;
         projectSettings.TitleBlockNameTemp = settings.TitleBlockName;
         projectSettings.DispatcherGroupingFirst = settings.DispatcherGroupingFirst;
         projectSettings.DispatcherGroupingFirstTemp = settings.DispatcherGroupingFirst;
         projectSettings.DispatcherGroupingSecond = settings.DispatcherGroupingSecond;
         projectSettings.DispatcherGroupingSecondTemp = settings.DispatcherGroupingSecond;
-        projectSettings.PylonLengthParamName = settings.PylonLengthParamName;
-        projectSettings.PylonLengthParamNameTemp = settings.PylonLengthParamName;
-        projectSettings.PylonWidthParamName = settings.PylonWidthParamName;
-        projectSettings.PylonWidthParamNameTemp = settings.PylonWidthParamName;
 
         projectSettings.SheetSize = settings.SheetSize;
         projectSettings.SheetSizeTemp = settings.SheetSize;
@@ -233,11 +239,6 @@ internal class PluginConfig : ProjectConfig<PluginSettings> {
         projectSettings.SheetPrefixTemp = settings.SheetPrefix;
         projectSettings.SheetSuffix = settings.SheetSuffix;
         projectSettings.SheetSuffixTemp = settings.SheetSuffix;
-
-        projectSettings.TypicalPylonFilterParameter = settings.TypicalPylonFilterParameter;
-        projectSettings.TypicalPylonFilterParameterTemp = settings.TypicalPylonFilterParameter;
-        projectSettings.TypicalPylonFilterValue = settings.TypicalPylonFilterValue;
-        projectSettings.TypicalPylonFilterValueTemp = settings.TypicalPylonFilterValue;
 
         projectSettings.DimensionTypeName = settings.DimensionTypeName;
         projectSettings.DimensionTypeNameTemp = settings.DimensionTypeName;
@@ -268,6 +269,7 @@ internal class PluginConfig : ProjectConfig<PluginSettings> {
         var schedulesSettings = mainViewModel.SchedulesSettings;
         var scheduleFiltersSettings = mainViewModel.ScheduleFiltersSettings;
         var legendsAndAnnotationsSettings = mainViewModel.LegendsAndAnnotationsSettings;
+        var pylonSettings = mainViewModel.PylonSettings;
         var projectSettings = mainViewModel.ProjectSettings;
 
         settings.NeedWorkWithGeneralView = selectionSettings.NeedWorkWithGeneralView;
@@ -377,8 +379,13 @@ internal class PluginConfig : ProjectConfig<PluginSettings> {
         settings.LegendXOffset = legendsAndAnnotationsSettings.LegendXOffset;
         settings.LegendYOffset = legendsAndAnnotationsSettings.LegendYOffset;
 
-        settings.ProjectSection = projectSettings.ProjectSection;
-        settings.Mark = projectSettings.Mark;
+        settings.ProjectSection = pylonSettings.ProjectSection;
+        settings.Mark = pylonSettings.Mark;
+        settings.TypicalPylonFilterParameter = pylonSettings.TypicalPylonFilterParameter;
+        settings.TypicalPylonFilterValue = pylonSettings.TypicalPylonFilterValue;
+        settings.PylonLengthParamName = pylonSettings.PylonLengthParamName;
+        settings.PylonWidthParamName = pylonSettings.PylonWidthParamName;
+
         settings.TitleBlockName = projectSettings.TitleBlockName;
         settings.DispatcherGroupingFirst = projectSettings.DispatcherGroupingFirst;
         settings.DispatcherGroupingSecond = projectSettings.DispatcherGroupingSecond;
@@ -397,12 +404,6 @@ internal class PluginConfig : ProjectConfig<PluginSettings> {
         settings.SheetCoefficient = projectSettings.SheetCoefficient;
         settings.SheetPrefix = projectSettings.SheetPrefix;
         settings.SheetSuffix = projectSettings.SheetSuffix;
-
-        settings.TypicalPylonFilterParameter = projectSettings.TypicalPylonFilterParameter;
-        settings.TypicalPylonFilterValue = projectSettings.TypicalPylonFilterValue;
-
-        settings.PylonLengthParamName = projectSettings.PylonLengthParamName;
-        settings.PylonWidthParamName = projectSettings.PylonWidthParamName;
     }
 }
 

@@ -3,6 +3,7 @@ using RevitPylonDocumentation.Models.UserSettings;
 namespace RevitPylonDocumentation.Models;
 internal class CreationSettings {
     public CreationSettings(UserProjectSettings projectSettings,
+                            UserPylonSettings pylonSettings,
                             UserSchedulesSettings schedulesSettings,
                             UserScheduleFiltersSettings scheduleFiltersSettings,
                             UserSelectionSettings selectionSettings,
@@ -12,6 +13,7 @@ internal class CreationSettings {
                             UserTypesSettings typesSettings,
                             UserReferenceScheduleSettings referenceScheduleSettings) {
         ProjectSettings = projectSettings;
+        PylonSettings = pylonSettings;
         SchedulesSettings = schedulesSettings;
         ScheduleFiltersSettings = scheduleFiltersSettings;
         SelectionSettings = selectionSettings;
@@ -23,6 +25,7 @@ internal class CreationSettings {
     }
 
     public UserProjectSettings ProjectSettings { get; private set; }
+    public UserPylonSettings PylonSettings { get; private set; }
     public UserSchedulesSettings SchedulesSettings { get; private set; }
     public UserScheduleFiltersSettings ScheduleFiltersSettings { get; private set; }
     public UserSelectionSettings SelectionSettings { get; private set; }

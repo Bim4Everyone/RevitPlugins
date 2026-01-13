@@ -34,7 +34,7 @@ internal class UserScheduleFiltersSettingsPageVM : ValidatableViewModel {
         }
     }
 
-    public void ApplySchedulesSettings() {
+    public void ApplyScheduleFiltersSettings() {
         ParamsForScheduleFilters = ParamsForScheduleFiltersTemp;
     }
 
