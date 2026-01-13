@@ -57,28 +57,37 @@
                         SizeChanged="UniformGrid_SizeChanged">
                         <controls:DoubleTextBoxSettingControl
                             LabelText="{me:LocalizationSource SheetParams.PylonSheetNameMask}"
-                            FirstTextBoxText="{Binding Path=ProjectSettings.SheetPrefixTemp, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
-                            SecondTextBoxText="{Binding Path=ProjectSettings.SheetSuffixTemp, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
+                            FirstTextBoxText="{Binding Path=SheetSettings.SheetPrefixTemp, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
+                            SecondTextBoxText="{Binding Path=SheetSettings.SheetSuffixTemp, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
                             ToolTipText="{me:LocalizationSource SheetParams.PylonSheetNameMaskToolTip}"
                             TextChangedCommand="{Binding SettingsChangedCommand}" />
 
                         <controls:ComboBoxSettingControl
                             LabelText="{me:LocalizationSource GeneralPage.SelectTitleBlockType}"
                             ItemsSource="{Binding TitleBlocks}"
-                            SelectedItem="{Binding TypesSettings.SelectedTitleBlock, Mode=TwoWay}"
+                            SelectedItem="{Binding 
+                                Path=SheetSettings.SelectedTitleBlock, 
+                                UpdateSourceTrigger=PropertyChanged, Mode=TwoWay,
+                                ValidatesOnDataErrors=True, NotifyOnValidationError=True}"
                             ToolTipText="{me:LocalizationSource SheetParams.SelectTitleBlockTypeToolTip}"
                             SelectionChangedCommand="{Binding SettingsChangedCommand}"
                             ItemTemplate="{StaticResource WithFamilyNameItemTemplate}" />
 
                         <controls:TextBoxSettingControl
                             LabelText="{me:LocalizationSource SheetParams.SheetSizeParameter}"
-                            TextBoxText="{Binding Path=ProjectSettings.SheetSizeTemp, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
+                            TextBoxText="{Binding 
+                                Path=SheetSettings.SheetSizeTemp, 
+                                UpdateSourceTrigger=PropertyChanged, Mode=TwoWay,
+                                ValidatesOnDataErrors=True, NotifyOnValidationError=True}"
                             ToolTipText="{me:LocalizationSource SheetParams.SheetSizeParameterToolTip}"
                             TextChangedCommand="{Binding SettingsChangedCommand}" />
 
                         <controls:TextBoxSettingControl
                             LabelText="{me:LocalizationSource SheetParams.SheetCoefficientParameter}"
-                            TextBoxText="{Binding Path=ProjectSettings.SheetCoefficientTemp, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
+                            TextBoxText="{Binding
+                                Path=SheetSettings.SheetCoefficientTemp, 
+                                UpdateSourceTrigger=PropertyChanged, Mode=TwoWay,
+                                ValidatesOnDataErrors=True, NotifyOnValidationError=True}"
                             ToolTipText="{me:LocalizationSource SheetParams.SheetCoefficientParameterToolTip}"
                             TextChangedCommand="{Binding SettingsChangedCommand}" />
                     </UniformGrid>

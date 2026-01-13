@@ -54,10 +54,9 @@ internal class MainViewModel : BaseViewModel {
         SchedulesSettings = new UserSchedulesSettingsPageVM(this);
         ScheduleFiltersSettings = new UserScheduleFiltersSettingsPageVM(this);
         LegendsAndAnnotationsSettings = new UserLegendsAndAnnotationsSettingsVM(this, _localizationService);
-
         PylonSettings = new UserPylonSettingsVM(this, _revitRepository, _localizationService);
-
         ProjectSettings = new UserProjectSettingsVM(this, _revitRepository, _localizationService);
+        SheetSettings = new UserSheetSettingsVM(this, _revitRepository, _localizationService);
         TypesSettings = new UserTypesSettingsVM(this);
         ReferenceScheduleSettings = new UserReferenceScheduleSettingsVM(this);
 
@@ -123,7 +122,12 @@ internal class MainViewModel : BaseViewModel {
     public UserProjectSettingsVM ProjectSettings { get; set; }
 
     /// <summary>
-    /// Настройки параметров проекта с предыдущего сеанса
+    /// Настройки параметров листов с предыдущего сеанса
+    /// </summary>
+    public UserSheetSettingsVM SheetSettings { get; set; }
+
+    /// <summary>
+    /// Настройки параметров пилонов с предыдущего сеанса
     /// </summary>
     public UserPylonSettingsVM PylonSettings { get; set; }
 
@@ -397,7 +401,9 @@ internal class MainViewModel : BaseViewModel {
         SchedulesSettings.ApplySchedulesSettings();
         ScheduleFiltersSettings.ApplyScheduleFiltersSettings();
         LegendsAndAnnotationsSettings.ApplyLegendsAndAnnotationsSettings();
+        PylonSettings.ApplyPylonSettings();
         ProjectSettings.ApplyProjectSettings();
+        SheetSettings.ApplySheetSettings();
 
         // Получаем заново список заполненных разделов проекта
         if(!_pylonSelectedManually) {
@@ -429,7 +435,7 @@ internal class MainViewModel : BaseViewModel {
     }
 
     private void CheckSettings() {
-        if(TypesSettings.SelectedTitleBlock is null) {
+        if(SheetSettings.SelectedTitleBlock is null) {
             ErrorText = _localizationService.GetLocalizedString("VM.SheetTypeNotSelected");
             return;
         }
@@ -517,7 +523,9 @@ internal class MainViewModel : BaseViewModel {
         VerticalViewSettings.CheckViewSectionsSettings();
         HorizontalViewSettings.CheckViewSectionsSettings();
         LegendsAndAnnotationsSettings.CheckLegendsAndAnnotationsSettings();
+        PylonSettings.CheckPylonSettings();
         ProjectSettings.CheckProjectSettings();
+        SheetSettings.CheckSheetSettings();
     }
 
     /// <summary>
@@ -537,6 +545,7 @@ internal class MainViewModel : BaseViewModel {
 
         var settings = new CreationSettings(
             ProjectSettings.GetSettings(),
+            SheetSettings.GetSettings(),
             PylonSettings.GetSettings(),
             SchedulesSettings.GetSettings(),
             ScheduleFiltersSettings.GetSettings(),
@@ -746,9 +755,9 @@ internal class MainViewModel : BaseViewModel {
     /// Получает типоразмер рамки листа по имени типа
     /// </summary>
     public void FindTitleBlock() {
-        if(!String.IsNullOrEmpty(ProjectSettings.TitleBlockName)) {
-            TypesSettings.SelectedTitleBlock = TitleBlocks
-                .FirstOrDefault(titleBlock => titleBlock.Name.Contains(ProjectSettings.TitleBlockName));
+        if(!String.IsNullOrEmpty(SheetSettings.TitleBlockName)) {
+            SheetSettings.SelectedTitleBlock = TitleBlocks
+                .FirstOrDefault(titleBlock => titleBlock.Name.Contains(SheetSettings.TitleBlockName));
         }
     }
 

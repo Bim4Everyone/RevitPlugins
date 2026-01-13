@@ -152,8 +152,15 @@
                         <ui:NavigationViewItem
                             Content="{me:LocalizationSource MainWindow.SheetParameters}"
                             Icon="{ui:SymbolIcon DocumentSettings20}"
-                            TargetPageType="{x:Type pages:SheetParamsPage}" 
-                            ToolTip="{me:LocalizationSource MainWindow.SheetParametersSettings}"/>
+                            TargetPageType="{x:Type pages:SheetParamsPage}"
+                            ToolTip="{me:LocalizationSource MainWindow.SheetParametersSettings}">
+                            <ui:NavigationViewItem.InfoBadge>
+                                <ui:InfoBadge
+                                    Style="{StaticResource RoundInfoBadgeStyle}"
+                                    Visibility="{Binding Path=SheetSettings.HasErrors, Converter={StaticResource BooleanToVisibilityConverter}}">
+                                </ui:InfoBadge>
+                            </ui:NavigationViewItem.InfoBadge>
+                        </ui:NavigationViewItem>
                     </ui:NavigationViewItem.MenuItems>
                 </ui:NavigationViewItem>
             </ui:NavigationView.MenuItems>

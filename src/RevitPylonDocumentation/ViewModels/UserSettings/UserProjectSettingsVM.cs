@@ -1,8 +1,5 @@
 using System.Linq;
 
-using Autodesk.Revit.DB;
-
-using dosymep.Revit;
 using dosymep.SimpleServices;
 using dosymep.WPF.ViewModels;
 
@@ -13,14 +10,9 @@ namespace RevitPylonDocumentation.ViewModels.UserSettings;
 internal class UserProjectSettingsVM : BaseViewModel {
     private readonly ILocalizationService _localizationService;
 
-    private string _titleBlockNameTemp = "Создать типы по комплектам";
+
     private string _dispatcherGroupingFirstTemp = "_Группа видов 1";
     private string _dispatcherGroupingSecondTemp = "_Группа видов 2";
-    private string _sheetSizeTemp = "А";
-    private string _sheetCoefficientTemp = "х";
-
-    private string _sheetPrefixTemp = "Пилон ";
-    private string _sheetSuffixTemp = "";
 
     private string _dimensionTypeNameTemp = "я_Основной_Плагин_2.5 мм";
     private string _spotDimensionTypeNameTemp = "Стрелка_Проектная_Верх";
@@ -45,13 +37,6 @@ internal class UserProjectSettingsVM : BaseViewModel {
     internal RevitRepository Repository { get; set; }
 
 
-
-    public string TitleBlockName { get; set; }
-    public string TitleBlockNameTemp {
-        get => _titleBlockNameTemp;
-        set => RaiseAndSetIfChanged(ref _titleBlockNameTemp, value);
-    }
-
     public string DispatcherGroupingFirst { get; set; }
     public string DispatcherGroupingFirstTemp {
         get => _dispatcherGroupingFirstTemp;
@@ -62,31 +47,6 @@ internal class UserProjectSettingsVM : BaseViewModel {
         get => _dispatcherGroupingSecondTemp;
         set => RaiseAndSetIfChanged(ref _dispatcherGroupingSecondTemp, value);
     }
-
-    public string SheetSize { get; set; }
-    public string SheetSizeTemp {
-        get => _sheetSizeTemp;
-        set => RaiseAndSetIfChanged(ref _sheetSizeTemp, value);
-    }
-
-    public string SheetCoefficient { get; set; }
-    public string SheetCoefficientTemp {
-        get => _sheetCoefficientTemp;
-        set => RaiseAndSetIfChanged(ref _sheetCoefficientTemp, value);
-    }
-
-    public string SheetPrefix { get; set; }
-    public string SheetPrefixTemp {
-        get => _sheetPrefixTemp;
-        set => RaiseAndSetIfChanged(ref _sheetPrefixTemp, value);
-    }
-
-    public string SheetSuffix { get; set; }
-    public string SheetSuffixTemp {
-        get => _sheetSuffixTemp;
-        set => RaiseAndSetIfChanged(ref _sheetSuffixTemp, value);
-    }
-
 
     public string DimensionTypeName { get; set; }
     public string DimensionTypeNameTemp {
@@ -143,16 +103,8 @@ internal class UserProjectSettingsVM : BaseViewModel {
     }
 
     public void ApplyProjectSettings() {
-
-        TitleBlockName = TitleBlockNameTemp;
         DispatcherGroupingFirst = DispatcherGroupingFirstTemp;
         DispatcherGroupingSecond = DispatcherGroupingSecondTemp;
-
-        SheetSize = SheetSizeTemp;
-        SheetCoefficient = SheetCoefficientTemp;
-        SheetPrefix = SheetPrefixTemp;
-        SheetSuffix = SheetSuffixTemp;
-
 
         DimensionTypeName = DimensionTypeNameTemp;
         SpotDimensionTypeName = SpotDimensionTypeNameTemp;
@@ -181,31 +133,6 @@ internal class UserProjectSettingsVM : BaseViewModel {
         }
         if(Repository.AllScheduleViews.FirstOrDefault()?.LookupParameter(DispatcherGroupingSecond) is null) {
             ViewModel.ErrorText = _localizationService.GetLocalizedString("VM.DispatcherGroupingSecondParamInvalid");
-        }
-
-        using(var transaction = Repository.Document.StartTransaction("Checking parameters on sheet")) {
-            // Листов в проекте может не быть или рамка может быть другая, поэтому создаем свой лист для тестов с нужной рамкой
-            var viewSheet = ViewSheet.Create(Repository.Document, ViewModel.TypesSettings.SelectedTitleBlock.Id);
-            if(viewSheet?.LookupParameter(DispatcherGroupingFirst) is null) {
-                ViewModel.ErrorText = _localizationService.GetLocalizedString("VM.DispatcherGroupingFirstParamInvalid");
-            }
-
-            // Ищем рамку листа
-            var titleBlock = new FilteredElementCollector(Repository.Document, viewSheet.Id)
-                .OfCategory(BuiltInCategory.OST_TitleBlocks)
-                .WhereElementIsNotElementType()
-                .FirstOrDefault() as FamilyInstance;
-
-            if(titleBlock?.LookupParameter(SheetSize) is null) {
-                ViewModel.ErrorText = _localizationService.GetLocalizedString("VM.SheetSizeParamInvalid");
-            }
-            if(titleBlock?.LookupParameter(SheetCoefficient) is null) {
-                ViewModel.ErrorText = _localizationService.GetLocalizedString("VM.SheetCoefficientParamInvalid");
-            }
-
-            // Удаляем созданный лист
-            Repository.Document.Delete(viewSheet.Id);
-            transaction.RollBack();
         }
     }
 

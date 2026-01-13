@@ -99,7 +99,7 @@ internal class UserPylonSettingsVM : ValidatableViewModel {
         }
     }
 
-    public void ApplyScheduleFiltersSettings() {
+    public void ApplyPylonSettings() {
         ProjectSection = ProjectSectionTemp;
         Mark = MarkTemp;
 
@@ -110,7 +110,7 @@ internal class UserPylonSettingsVM : ValidatableViewModel {
         PylonWidthParamName = PylonWidthParamNameTemp;
     }
 
-    public void CheckProjectSettings() {
+    public void CheckPylonSettings() {
         // Перебираем пилоны, которые найдены в проекте для работы и проверяем у НесКлн параметры сечения
         foreach(var sheetInfo in Repository.HostsInfo) {
             var pylon = sheetInfo.HostElems.FirstOrDefault();

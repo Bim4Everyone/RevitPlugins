@@ -66,8 +66,8 @@ public class PylonViewSectionCreator {
             if(viewSection != null) {
                 viewSection.Name = VerticalSectionSettings.GeneralViewPrefix + SheetInfo.PylonKeyName
                     + VerticalSectionSettings.GeneralViewSuffix;
-                if(TypesSettings.SelectedGeneralViewTemplate != null) {
-                    viewSection.ViewTemplateId = TypesSettings.SelectedGeneralViewTemplate.Id;
+                if(VerticalSectionSettings.SelectedGeneralViewTemplate != null) {
+                    viewSection.ViewTemplateId = VerticalSectionSettings.SelectedGeneralViewTemplate.Id;
                 }
             }
         } catch(Exception) {
@@ -130,8 +130,8 @@ public class PylonViewSectionCreator {
                     VerticalSectionSettings.GeneralRebarViewPrefix
                     + SheetInfo.PylonKeyName
                     + VerticalSectionSettings.GeneralRebarViewSuffix;
-                if(TypesSettings.SelectedGeneralRebarViewTemplate != null) {
-                    viewSection.ViewTemplateId = TypesSettings.SelectedGeneralRebarViewTemplate.Id;
+                if(VerticalSectionSettings.SelectedGeneralRebarViewTemplate != null) {
+                    viewSection.ViewTemplateId = VerticalSectionSettings.SelectedGeneralRebarViewTemplate.Id;
                 }
             }
         } catch(Exception) {
@@ -194,8 +194,8 @@ public class PylonViewSectionCreator {
             if(viewSection != null) {
                 viewSection.Name = VerticalSectionSettings.GeneralViewPerpendicularPrefix + SheetInfo.PylonKeyName
                     + VerticalSectionSettings.GeneralViewPerpendicularSuffix;
-                if(TypesSettings.SelectedGeneralViewTemplate != null) {
-                    viewSection.ViewTemplateId = TypesSettings.SelectedGeneralViewTemplate.Id;
+                if(VerticalSectionSettings.SelectedGeneralViewTemplate != null) {
+                    viewSection.ViewTemplateId = VerticalSectionSettings.SelectedGeneralViewTemplate.Id;
                 }
             }
         } catch(Exception) {
@@ -260,8 +260,8 @@ public class PylonViewSectionCreator {
                     VerticalSectionSettings.GeneralRebarViewPerpendicularPrefix
                     + SheetInfo.PylonKeyName
                     + VerticalSectionSettings.GeneralRebarViewPerpendicularSuffix;
-                if(TypesSettings.SelectedGeneralRebarViewTemplate != null) {
-                    viewSection.ViewTemplateId = TypesSettings.SelectedGeneralRebarViewTemplate.Id;
+                if(VerticalSectionSettings.SelectedGeneralRebarViewTemplate != null) {
+                    viewSection.ViewTemplateId = VerticalSectionSettings.SelectedGeneralRebarViewTemplate.Id;
                 }
             }
         } catch(Exception) {
@@ -366,23 +366,23 @@ public class PylonViewSectionCreator {
                     viewSection.Name = HorizontalSectionSettings.TransverseViewFirstPrefix + SheetInfo.PylonKeyName
                         + HorizontalSectionSettings.TransverseViewFirstSuffix;
                     // Если был выбран шаблон вида, то назначаем
-                    if(TypesSettings.SelectedTransverseViewTemplate != null) {
-                        viewSection.ViewTemplateId = TypesSettings.SelectedTransverseViewTemplate.Id;
+                    if(HorizontalSectionSettings.SelectedTransverseViewTemplate != null) {
+                        viewSection.ViewTemplateId = HorizontalSectionSettings.SelectedTransverseViewTemplate.Id;
                     }
                     SheetInfo.TransverseViewFirst.ViewElement = viewSection;
 
                 } else if(transverseViewNum == 2) {
                     viewSection.Name = HorizontalSectionSettings.TransverseViewSecondPrefix + SheetInfo.PylonKeyName
                         + HorizontalSectionSettings.TransverseViewSecondSuffix;
-                    if(TypesSettings.SelectedTransverseViewTemplate != null) {
-                        viewSection.ViewTemplateId = TypesSettings.SelectedTransverseViewTemplate.Id;
+                    if(HorizontalSectionSettings.SelectedTransverseViewTemplate != null) {
+                        viewSection.ViewTemplateId = HorizontalSectionSettings.SelectedTransverseViewTemplate.Id;
                     }
                     SheetInfo.TransverseViewSecond.ViewElement = viewSection;
                 } else if(transverseViewNum == 3) {
                     viewSection.Name = HorizontalSectionSettings.TransverseViewThirdPrefix + SheetInfo.PylonKeyName
                         + HorizontalSectionSettings.TransverseViewThirdSuffix;
-                    if(TypesSettings.SelectedTransverseViewTemplate != null) {
-                        viewSection.ViewTemplateId = TypesSettings.SelectedTransverseViewTemplate.Id;
+                    if(HorizontalSectionSettings.SelectedTransverseViewTemplate != null) {
+                        viewSection.ViewTemplateId = HorizontalSectionSettings.SelectedTransverseViewTemplate.Id;
                     }
                     SheetInfo.TransverseViewThird.ViewElement = viewSection;
                 }
@@ -490,8 +490,8 @@ public class PylonViewSectionCreator {
                         + SheetInfo.PylonKeyName
                         + HorizontalSectionSettings.TransverseRebarViewFirstSuffix;
                     // Если был выбран шаблон вида, то назначаем
-                    if(TypesSettings.SelectedTransverseRebarViewTemplate != null) {
-                        viewSection.ViewTemplateId = TypesSettings.SelectedTransverseRebarViewTemplate.Id;
+                    if(HorizontalSectionSettings.SelectedTransverseRebarViewTemplate != null) {
+                        viewSection.ViewTemplateId = HorizontalSectionSettings.SelectedTransverseRebarViewTemplate.Id;
                     }
                     SheetInfo.TransverseViewFirstRebar.ViewElement = viewSection;
 
@@ -500,8 +500,8 @@ public class PylonViewSectionCreator {
                         HorizontalSectionSettings.TransverseRebarViewSecondPrefix
                         + SheetInfo.PylonKeyName
                         + HorizontalSectionSettings.TransverseRebarViewSecondSuffix;
-                    if(TypesSettings.SelectedTransverseRebarViewTemplate != null) {
-                        viewSection.ViewTemplateId = TypesSettings.SelectedTransverseRebarViewTemplate.Id;
+                    if(HorizontalSectionSettings.SelectedTransverseRebarViewTemplate != null) {
+                        viewSection.ViewTemplateId = HorizontalSectionSettings.SelectedTransverseRebarViewTemplate.Id;
                     }
                     SheetInfo.TransverseViewSecondRebar.ViewElement = viewSection;
 
@@ -510,8 +510,8 @@ public class PylonViewSectionCreator {
                         HorizontalSectionSettings.TransverseRebarViewThirdPrefix
                         + SheetInfo.PylonKeyName
                         + HorizontalSectionSettings.TransverseRebarViewThirdSuffix;
-                    if(TypesSettings.SelectedTransverseRebarViewTemplate != null) {
-                        viewSection.ViewTemplateId = TypesSettings.SelectedTransverseRebarViewTemplate.Id;
+                    if(HorizontalSectionSettings.SelectedTransverseRebarViewTemplate != null) {
+                        viewSection.ViewTemplateId = HorizontalSectionSettings.SelectedTransverseRebarViewTemplate.Id;
                     }
                     SheetInfo.TransverseViewThirdRebar.ViewElement = viewSection;
                 }

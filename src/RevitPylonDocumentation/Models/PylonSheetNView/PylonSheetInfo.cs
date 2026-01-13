@@ -104,8 +104,8 @@ internal class PylonSheetInfo {
             return false;
         }
 
-        PylonViewSheet = ViewSheet.Create(Repository.Document, Settings.TypesSettings.SelectedTitleBlock.Id);
-        PylonViewSheet.Name = Settings.ProjectSettings.SheetPrefix + PylonKeyName + Settings.ProjectSettings.SheetSuffix;
+        PylonViewSheet = ViewSheet.Create(Repository.Document, Settings.SheetSettings.SelectedTitleBlock.Id);
+        PylonViewSheet.Name = Settings.SheetSettings.SheetPrefix + PylonKeyName + Settings.SheetSettings.SheetSuffix;
 
         var viewSheetGroupingParameter = PylonViewSheet.LookupParameter(Settings.ProjectSettings.DispatcherGroupingFirst);
         if(viewSheetGroupingParameter == null) {
@@ -162,8 +162,8 @@ internal class PylonSheetInfo {
             return;
         }
         // Пытаемся задать габарит листа
-        var paramA = TitleBlock.LookupParameter(Settings.ProjectSettings.SheetSize);
-        var paramX = TitleBlock.LookupParameter(Settings.ProjectSettings.SheetCoefficient);
+        var paramA = TitleBlock.LookupParameter(Settings.SheetSettings.SheetSize);
+        var paramX = TitleBlock.LookupParameter(Settings.SheetSettings.SheetCoefficient);
 
         if(paramA != null && paramX != null) {
             paramA.Set(sheetSize);

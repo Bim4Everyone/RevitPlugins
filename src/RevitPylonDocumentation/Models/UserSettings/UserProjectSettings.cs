@@ -1,12 +1,7 @@
 namespace RevitPylonDocumentation.Models.UserSettings;
 internal class UserProjectSettings {
-    public string TitleBlockName { get; set; }
     public string DispatcherGroupingFirst { get; set; }
     public string DispatcherGroupingSecond { get; set; }
-    public string SheetSize { get; set; }
-    public string SheetCoefficient { get; set; }
-    public string SheetPrefix { get; set; }
-    public string SheetSuffix { get; set; }
     public string DimensionTypeName { get; set; }
     public string SpotDimensionTypeName { get; set; }
     public string SkeletonTagTypeName { get; set; }

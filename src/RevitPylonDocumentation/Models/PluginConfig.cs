@@ -32,6 +32,7 @@ internal class PluginConfig : ProjectConfig<PluginSettings> {
         var legendsAndAnnotationsSettings = mainViewModel.LegendsAndAnnotationsSettings;
         var pylonSettings = mainViewModel.PylonSettings;
         var projectSettings = mainViewModel.ProjectSettings;
+        var sheetSettings = mainViewModel.SheetSettings;
 
         selectionSettings.NeedWorkWithGeneralView = settings.NeedWorkWithGeneralView;
         selectionSettings.NeedWorkWithGeneralPerpendicularView = settings.NeedWorkWithGeneralPerpendicularView;
@@ -224,21 +225,10 @@ internal class PluginConfig : ProjectConfig<PluginSettings> {
         pylonSettings.TypicalPylonFilterValue = settings.TypicalPylonFilterValue;
         pylonSettings.TypicalPylonFilterValueTemp = settings.TypicalPylonFilterValue;
 
-        projectSettings.TitleBlockName = settings.TitleBlockName;
-        projectSettings.TitleBlockNameTemp = settings.TitleBlockName;
         projectSettings.DispatcherGroupingFirst = settings.DispatcherGroupingFirst;
         projectSettings.DispatcherGroupingFirstTemp = settings.DispatcherGroupingFirst;
         projectSettings.DispatcherGroupingSecond = settings.DispatcherGroupingSecond;
         projectSettings.DispatcherGroupingSecondTemp = settings.DispatcherGroupingSecond;
-
-        projectSettings.SheetSize = settings.SheetSize;
-        projectSettings.SheetSizeTemp = settings.SheetSize;
-        projectSettings.SheetCoefficient = settings.SheetCoefficient;
-        projectSettings.SheetCoefficientTemp = settings.SheetCoefficient;
-        projectSettings.SheetPrefix = settings.SheetPrefix;
-        projectSettings.SheetPrefixTemp = settings.SheetPrefix;
-        projectSettings.SheetSuffix = settings.SheetSuffix;
-        projectSettings.SheetSuffixTemp = settings.SheetSuffix;
 
         projectSettings.DimensionTypeName = settings.DimensionTypeName;
         projectSettings.DimensionTypeNameTemp = settings.DimensionTypeName;
@@ -260,6 +250,17 @@ internal class PluginConfig : ProjectConfig<PluginSettings> {
         projectSettings.BreakLineTypeNameTemp = settings.BreakLineTypeName;
         projectSettings.ConcretingJointTypeName = settings.ConcretingJointTypeName;
         projectSettings.ConcretingJointTypeNameTemp = settings.ConcretingJointTypeName;
+
+        sheetSettings.TitleBlockName = settings.TitleBlockName;
+        sheetSettings.TitleBlockNameTemp = settings.TitleBlockName;
+        sheetSettings.SheetSize = settings.SheetSize;
+        sheetSettings.SheetSizeTemp = settings.SheetSize;
+        sheetSettings.SheetCoefficient = settings.SheetCoefficient;
+        sheetSettings.SheetCoefficientTemp = settings.SheetCoefficient;
+        sheetSettings.SheetPrefix = settings.SheetPrefix;
+        sheetSettings.SheetPrefixTemp = settings.SheetPrefix;
+        sheetSettings.SheetSuffix = settings.SheetSuffix;
+        sheetSettings.SheetSuffixTemp = settings.SheetSuffix;
     }
 
     internal void SetConfigProps(PluginSettings settings, MainViewModel mainViewModel) {
@@ -271,6 +272,7 @@ internal class PluginConfig : ProjectConfig<PluginSettings> {
         var legendsAndAnnotationsSettings = mainViewModel.LegendsAndAnnotationsSettings;
         var pylonSettings = mainViewModel.PylonSettings;
         var projectSettings = mainViewModel.ProjectSettings;
+        var sheetSettings = mainViewModel.SheetSettings;
 
         settings.NeedWorkWithGeneralView = selectionSettings.NeedWorkWithGeneralView;
         settings.NeedWorkWithGeneralPerpendicularView = selectionSettings.NeedWorkWithGeneralPerpendicularView;
@@ -386,7 +388,6 @@ internal class PluginConfig : ProjectConfig<PluginSettings> {
         settings.PylonLengthParamName = pylonSettings.PylonLengthParamName;
         settings.PylonWidthParamName = pylonSettings.PylonWidthParamName;
 
-        settings.TitleBlockName = projectSettings.TitleBlockName;
         settings.DispatcherGroupingFirst = projectSettings.DispatcherGroupingFirst;
         settings.DispatcherGroupingSecond = projectSettings.DispatcherGroupingSecond;
         settings.DimensionTypeName = projectSettings.DimensionTypeName;
@@ -400,10 +401,11 @@ internal class PluginConfig : ProjectConfig<PluginSettings> {
         settings.BreakLineTypeName = projectSettings.BreakLineTypeName;
         settings.ConcretingJointTypeName = projectSettings.ConcretingJointTypeName;
 
-        settings.SheetSize = projectSettings.SheetSize;
-        settings.SheetCoefficient = projectSettings.SheetCoefficient;
-        settings.SheetPrefix = projectSettings.SheetPrefix;
-        settings.SheetSuffix = projectSettings.SheetSuffix;
+        settings.TitleBlockName = sheetSettings.TitleBlockName;
+        settings.SheetSize = sheetSettings.SheetSize;
+        settings.SheetCoefficient = sheetSettings.SheetCoefficient;
+        settings.SheetPrefix = sheetSettings.SheetPrefix;
+        settings.SheetSuffix = sheetSettings.SheetSuffix;
     }
 }
 

@@ -17,7 +17,6 @@ internal class UserTypesSettingsVM : ValidatableViewModel {
     private FamilySymbol _selectedConcretingJointType;
 
     private SpotDimensionType _selectedSpotDimensionType;
-    private FamilySymbol _selectedTitleBlock;
 
     public UserTypesSettingsVM(MainViewModel mainViewModel) {
         ViewModel = mainViewModel;
@@ -25,19 +24,6 @@ internal class UserTypesSettingsVM : ValidatableViewModel {
     }
 
     public MainViewModel ViewModel { get; set; }
-
-    /// <summary>
-    /// Выбранная пользователем рамка листа
-    /// </summary>
-    [Required]
-    public FamilySymbol SelectedTitleBlock {
-        get => _selectedTitleBlock;
-        set {
-            RaiseAndSetIfChanged(ref _selectedTitleBlock, value);
-            ViewModel.ProjectSettings.TitleBlockNameTemp = value?.Name;
-            ValidateProperty(value);
-        }
-    }
 
 
     /// <summary>
