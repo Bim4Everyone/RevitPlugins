@@ -26,4 +26,6 @@ internal class UserHorizontalViewSettings {
     public string TransverseViewYOffset { get; set; }
     public string TransverseViewFamilyTypeName { get; set; }
     public ViewFamilyType SelectedTransverseViewFamilyType { get; set; }
+    public View SelectedTransverseViewTemplate { get; set; }
+    public View SelectedTransverseRebarViewTemplate { get; set; }
 }

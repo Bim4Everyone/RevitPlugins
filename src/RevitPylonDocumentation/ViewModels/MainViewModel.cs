@@ -52,7 +52,7 @@ internal class MainViewModel : BaseViewModel {
         ProjectSettings = new UserProjectSettingsVM(this, _revitRepository, _localizationService);
         VerticalViewSettings = new UserVerticalViewSettingsPageVM(this, _localizationService);
         HorizontalViewSettings = new UserHorizontalViewSettingsPageVM(this, _localizationService);
-        SchedulesSettings = new UserSchedulesSettingsVM(this);
+        SchedulesSettings = new UserSchedulesSettingsPageVM(this);
         TypesSettings = new UserTypesSettingsVM(this);
         ReferenceScheduleSettings = new UserReferenceScheduleSettingsVM(this);
 
@@ -131,7 +131,7 @@ internal class MainViewModel : BaseViewModel {
     /// <summary>
     /// Настройки параметров и правил создания спек с предыдущего сеанса
     /// </summary>
-    public UserSchedulesSettingsVM SchedulesSettings { get; set; }
+    public UserSchedulesSettingsPageVM SchedulesSettings { get; set; }
 
     /// <summary>
     /// Настройки выбранных типоразмеров (не сохраняют с предыдущего сеанса, а получаются в текущем)

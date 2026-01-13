@@ -106,8 +106,15 @@
                         <ui:NavigationViewItem
                             Content="{me:LocalizationSource MainWindow.Schedules}"
                             Icon="{ui:SymbolIcon TableSettings24}"
-                            TargetPageType="{x:Type pages:SchedulesPage}" 
-                            ToolTip="{me:LocalizationSource MainWindow.SchedulesSettings}"/>
+                            TargetPageType="{x:Type pages:SchedulesPage}"
+                            ToolTip="{me:LocalizationSource MainWindow.SchedulesSettings}">
+                            <ui:NavigationViewItem.InfoBadge>
+                                <ui:InfoBadge
+                                    Style="{StaticResource RoundInfoBadgeStyle}"
+                                    Visibility="{Binding Path=SchedulesSettings.HasErrors, Converter={StaticResource BooleanToVisibilityConverter}}">
+                                </ui:InfoBadge>
+                            </ui:NavigationViewItem.InfoBadge>
+                        </ui:NavigationViewItem>
                         <ui:NavigationViewItem
                             Content="{me:LocalizationSource MainWindow.ScheduleFilters}"
                             Icon="{ui:SymbolIcon DataUsageSettings20}"

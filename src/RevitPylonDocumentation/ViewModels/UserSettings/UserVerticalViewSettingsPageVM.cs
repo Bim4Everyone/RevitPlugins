@@ -192,19 +192,6 @@ internal class UserVerticalViewSettingsPageVM : ValidatableViewModel {
     }
 
     /// <summary>
-    /// Выбранный пользователем шаблон вида основных видов армирования
-    /// </summary>
-    [Required]
-    public View SelectedGeneralRebarViewTemplate {
-        get => _selectedGeneralRebarViewTemplate;
-        set {
-            RaiseAndSetIfChanged(ref _selectedGeneralRebarViewTemplate, value);
-            GeneralRebarViewTemplateNameTemp = value?.Name;
-            ValidateProperty(value);
-        }
-    }
-
-    /// <summary>
     /// Выбранный пользователем шаблон вида основных видов
     /// </summary>
     [Required]
@@ -213,6 +200,19 @@ internal class UserVerticalViewSettingsPageVM : ValidatableViewModel {
         set {
             RaiseAndSetIfChanged(ref _selectedGeneralViewTemplate, value);
             GeneralViewTemplateNameTemp = value?.Name;
+            ValidateProperty(value);
+        }
+    }
+
+    /// <summary>
+    /// Выбранный пользователем шаблон вида основных видов армирования
+    /// </summary>
+    [Required]
+    public View SelectedGeneralRebarViewTemplate {
+        get => _selectedGeneralRebarViewTemplate;
+        set {
+            RaiseAndSetIfChanged(ref _selectedGeneralRebarViewTemplate, value);
+            GeneralRebarViewTemplateNameTemp = value?.Name;
             ValidateProperty(value);
         }
     }

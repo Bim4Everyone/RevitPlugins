@@ -1,20 +1,11 @@
 using System.Collections.ObjectModel;
-
-using dosymep.WPF.ViewModels;
+using System.ComponentModel.DataAnnotations;
 
 using RevitPylonDocumentation.Models;
 using RevitPylonDocumentation.Models.UserSettings;
-using RevitPylonDocumentation.ViewModels;
 
 namespace RevitPylonDocumentation.ViewModels.UserSettings;
-internal class UserSchedulesSettingsVM : BaseViewModel {
-    public UserSchedulesSettingsVM(MainViewModel mainViewModel) {
-
-        ViewModel = mainViewModel;
-    }
-
-    public MainViewModel ViewModel { get; set; }
-
+internal class UserSchedulesSettingsPageVM : ValidatableViewModel {
     // Префиксы и суффиксы для поиска и новых спек
     private string _materialSchedulePrefixTemp = "КЖ..._СМ_";
     private string _materialScheduleSuffixTemp = "";
@@ -58,6 +49,13 @@ internal class UserSchedulesSettingsVM : BaseViewModel {
         new ScheduleFilterParamHelper("обр_Метка основы", "Марка"),
         new ScheduleFilterParamHelper("Марка", "Марка")
     ];
+
+    public UserSchedulesSettingsPageVM(MainViewModel mainViewModel) {
+        ViewModel = mainViewModel;
+        ValidateAllProperties();
+    }
+
+    public MainViewModel ViewModel { get; set; }
 
     public string MaterialSchedulePrefix { get; set; }
     public string MaterialSchedulePrefixTemp {
@@ -119,93 +117,172 @@ internal class UserSchedulesSettingsVM : BaseViewModel {
     }
 
     public string SkeletonScheduleName { get; set; }
+    [Required]
+    [RegularExpression(@"^[^\\\/:*?""<>|\[\]\{\};~]+$")]
     public string SkeletonScheduleNameTemp {
         get => _skeletonScheduleNameTemp;
-        set => RaiseAndSetIfChanged(ref _skeletonScheduleNameTemp, value);
+        set {
+            RaiseAndSetIfChanged(ref _skeletonScheduleNameTemp, value);
+            ValidateProperty(value);
+        }
     }
+
     public string SkeletonByElemsScheduleName { get; set; }
+    [Required]
+    [RegularExpression(@"^[^\\\/:*?""<>|\[\]\{\};~]+$")]
     public string SkeletonByElemsScheduleNameTemp {
         get => _skeletonByElemsScheduleNameTemp;
-        set => RaiseAndSetIfChanged(ref _skeletonByElemsScheduleNameTemp, value);
+        set {
+            RaiseAndSetIfChanged(ref _skeletonByElemsScheduleNameTemp, value);
+            ValidateProperty(value);
+        }
     }
 
     public string MaterialScheduleName { get; set; }
+    [Required]
+    [RegularExpression(@"^[^\\\/:*?""<>|\[\]\{\};~]+$")]
     public string MaterialScheduleNameTemp {
         get => _materialScheduleNameTemp;
-        set => RaiseAndSetIfChanged(ref _materialScheduleNameTemp, value);
+        set {
+            RaiseAndSetIfChanged(ref _materialScheduleNameTemp, value);
+            ValidateProperty(value);
+        }
     }
 
     public string SystemPartsScheduleName { get; set; }
+    [Required]
+    [RegularExpression(@"^[^\\\/:*?""<>|\[\]\{\};~]+$")]
     public string SystemPartsScheduleNameTemp {
         get => _systemPartsScheduleNameTemp;
-        set => RaiseAndSetIfChanged(ref _systemPartsScheduleNameTemp, value);
+        set {
+            RaiseAndSetIfChanged(ref _systemPartsScheduleNameTemp, value);
+            ValidateProperty(value);
+        }
     }
 
     public string IfcPartsScheduleName { get; set; }
+    [Required]
+    [RegularExpression(@"^[^\\\/:*?""<>|\[\]\{\};~]+$")]
     public string IfcPartsScheduleNameTemp {
         get => _ifcPartsScheduleNameTemp;
-        set => RaiseAndSetIfChanged(ref _ifcPartsScheduleNameTemp, value);
+        set {
+            RaiseAndSetIfChanged(ref _ifcPartsScheduleNameTemp, value);
+            ValidateProperty(value);
+        }
     }
 
     public string MaterialScheduleDisp1 { get; set; }
+    [Required]
+    [RegularExpression(@"^[^\\\/:*?""<>|\[\]\{\};~]+$")]
     public string MaterialScheduleDisp1Temp {
         get => _materialScheduleDisp1Temp;
-        set => RaiseAndSetIfChanged(ref _materialScheduleDisp1Temp, value);
+        set {
+            RaiseAndSetIfChanged(ref _materialScheduleDisp1Temp, value);
+            ValidateProperty(value);
+        }
     }
     public string SystemPartsScheduleDisp1 { get; set; }
+    [Required]
+    [RegularExpression(@"^[^\\\/:*?""<>|\[\]\{\};~]+$")]
     public string SystemPartsScheduleDisp1Temp {
         get => _systemPartsScheduleDisp1Temp;
-        set => RaiseAndSetIfChanged(ref _systemPartsScheduleDisp1Temp, value);
+        set {
+            RaiseAndSetIfChanged(ref _systemPartsScheduleDisp1Temp, value);
+            ValidateProperty(value);
+        }
     }
     public string IfcPartsScheduleDisp1 { get; set; }
+    [Required]
+    [RegularExpression(@"^[^\\\/:*?""<>|\[\]\{\};~]+$")]
     public string IfcPartsScheduleDisp1Temp {
         get => _ifcPartsScheduleDisp1Temp;
-        set => RaiseAndSetIfChanged(ref _ifcPartsScheduleDisp1Temp, value);
+        set {
+            RaiseAndSetIfChanged(ref _ifcPartsScheduleDisp1Temp, value);
+            ValidateProperty(value);
+        }
     }
 
     public string SkeletonScheduleDisp1 { get; set; }
+    [Required]
+    [RegularExpression(@"^[^\\\/:*?""<>|\[\]\{\};~]+$")]
     public string SkeletonScheduleDisp1Temp {
         get => _skeletonScheduleDisp1Temp;
-        set => RaiseAndSetIfChanged(ref _skeletonScheduleDisp1Temp, value);
+        set {
+            RaiseAndSetIfChanged(ref _skeletonScheduleDisp1Temp, value);
+            ValidateProperty(value);
+        }
     }
     public string SkeletonByElemsScheduleDisp1 { get; set; }
+    [Required]
+    [RegularExpression(@"^[^\\\/:*?""<>|\[\]\{\};~]+$")]
     public string SkeletonByElemsScheduleDisp1Temp {
         get => _skeletonByElemsScheduleDisp1Temp;
-        set => RaiseAndSetIfChanged(ref _skeletonByElemsScheduleDisp1Temp, value);
+        set {
+            RaiseAndSetIfChanged(ref _skeletonByElemsScheduleDisp1Temp, value);
+            ValidateProperty(value);
+        }
     }
 
     public string MaterialScheduleDisp2 { get; set; }
+    [Required]
+    [RegularExpression(@"^[^\\\/:*?""<>|\[\]\{\};~]+$")]
     public string MaterialScheduleDisp2Temp {
         get => _materialScheduleDisp2Temp;
-        set => RaiseAndSetIfChanged(ref _materialScheduleDisp2Temp, value);
+        set {
+            RaiseAndSetIfChanged(ref _materialScheduleDisp2Temp, value);
+            ValidateProperty(value);
+        }
     }
     public string SystemPartsScheduleDisp2 { get; set; }
+    [Required]
+    [RegularExpression(@"^[^\\\/:*?""<>|\[\]\{\};~]+$")]
     public string SystemPartsScheduleDisp2Temp {
         get => _systemPartsScheduleDisp2Temp;
-        set => RaiseAndSetIfChanged(ref _systemPartsScheduleDisp2Temp, value);
+        set {
+            RaiseAndSetIfChanged(ref _systemPartsScheduleDisp2Temp, value);
+            ValidateProperty(value);
+        }
     }
 
     public string IfcPartsScheduleDisp2 { get; set; }
+    [Required]
+    [RegularExpression(@"^[^\\\/:*?""<>|\[\]\{\};~]+$")]
     public string IfcPartsScheduleDisp2Temp {
         get => _ifcPartsScheduleDisp2Temp;
-        set => RaiseAndSetIfChanged(ref _ifcPartsScheduleDisp2Temp, value);
+        set {
+            RaiseAndSetIfChanged(ref _ifcPartsScheduleDisp2Temp, value);
+            ValidateProperty(value);
+        }
     }
 
     public string SkeletonScheduleDisp2 { get; set; }
+    [Required]
+    [RegularExpression(@"^[^\\\/:*?""<>|\[\]\{\};~]+$")]
     public string SkeletonScheduleDisp2Temp {
         get => _skeletonScheduleDisp2Temp;
-        set => RaiseAndSetIfChanged(ref _skeletonScheduleDisp2Temp, value);
+        set {
+            RaiseAndSetIfChanged(ref _skeletonScheduleDisp2Temp, value);
+            ValidateProperty(value);
+        }
     }
     public string SkeletonByElemsScheduleDisp2 { get; set; }
+    [Required]
+    [RegularExpression(@"^[^\\\/:*?""<>|\[\]\{\};~]+$")]
     public string SkeletonByElemsScheduleDisp2Temp {
         get => _skeletonByElemsScheduleDisp2Temp;
-        set => RaiseAndSetIfChanged(ref _skeletonByElemsScheduleDisp2Temp, value);
+        set {
+            RaiseAndSetIfChanged(ref _skeletonByElemsScheduleDisp2Temp, value);
+            ValidateProperty(value);
+        }
     }
 
     public ObservableCollection<ScheduleFilterParamHelper> ParamsForScheduleFilters { get; set; } = [];
     public ObservableCollection<ScheduleFilterParamHelper> ParamsForScheduleFiltersTemp {
         get => _paramsForScheduleFiltersTemp;
-        set => RaiseAndSetIfChanged(ref _paramsForScheduleFiltersTemp, value);
+        set {
+            RaiseAndSetIfChanged(ref _paramsForScheduleFiltersTemp, value);
+            ValidateProperty(value);
+        }
     }
 
 

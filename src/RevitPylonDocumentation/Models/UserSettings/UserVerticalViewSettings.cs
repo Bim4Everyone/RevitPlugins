@@ -21,4 +21,6 @@ internal class UserVerticalViewSettings {
     public string GeneralViewPerpYBottomOffset { get; set; }
     public string GeneralViewFamilyTypeName { get; set; }
     public ViewFamilyType SelectedGeneralViewFamilyType { get; set; }
+    public View SelectedGeneralViewTemplate { get; set; }
+    public View SelectedGeneralRebarViewTemplate { get; set; }
 }
