@@ -52,6 +52,7 @@ internal class MainViewModel : BaseViewModel {
         VerticalViewSettings = new UserVerticalViewSettingsPageVM(this, _localizationService);
         HorizontalViewSettings = new UserHorizontalViewSettingsPageVM(this, _localizationService);
         SchedulesSettings = new UserSchedulesSettingsPageVM(this);
+        ScheduleFiltersSettings = new UserScheduleFiltersSettingsPageVM(this);
         LegendsAndAnnotationsSettings = new UserLegendsAndAnnotationsSettingsVM(this, _localizationService);
         ProjectSettings = new UserProjectSettingsVM(this, _revitRepository, _localizationService);
         TypesSettings = new UserTypesSettingsVM(this);
@@ -132,6 +133,11 @@ internal class MainViewModel : BaseViewModel {
     /// Настройки параметров и правил создания спек с предыдущего сеанса
     /// </summary>
     public UserSchedulesSettingsPageVM SchedulesSettings { get; set; }
+
+    /// <summary>
+    /// Настройки параметров и правил создания фильтров спек с предыдущего сеанса
+    /// </summary>
+    public UserScheduleFiltersSettingsPageVM ScheduleFiltersSettings { get; set; }
 
     /// <summary>
     /// Настройки параметров и правил создания легенд и типовых аннотаций с предыдущего сеанса
@@ -381,6 +387,7 @@ internal class MainViewModel : BaseViewModel {
         VerticalViewSettings.ApplyViewSectionsSettings();
         HorizontalViewSettings.ApplyViewSectionsSettings();
         SchedulesSettings.ApplySchedulesSettings();
+        ScheduleFiltersSettings.ApplySchedulesSettings();
         LegendsAndAnnotationsSettings.ApplyLegendsAndAnnotationsSettings();
         ProjectSettings.ApplyProjectSettings();
 
@@ -523,6 +530,7 @@ internal class MainViewModel : BaseViewModel {
         var settings = new CreationSettings(
             ProjectSettings.GetSettings(),
             SchedulesSettings.GetSettings(),
+            ScheduleFiltersSettings.GetSettings(),
             SelectionSettings.GetSettings(),
             VerticalViewSettings.GetSettings(),
             HorizontalViewSettings.GetSettings(),
@@ -740,7 +748,7 @@ internal class MainViewModel : BaseViewModel {
     /// Добавляет новое имя параметра фильтра спецификаций в настройках плагина
     /// </summary>
     private void AddScheduleFilterParam() {
-        SchedulesSettings.ParamsForScheduleFilters.Add(
+        ScheduleFiltersSettings.ParamsForScheduleFilters.Add(
             new ScheduleFilterParamHelper(
                 _localizationService.GetLocalizedString("VM.WriteName"),
                 _localizationService.GetLocalizedString("VM.WriteName")));
@@ -753,14 +761,14 @@ internal class MainViewModel : BaseViewModel {
     private void DeleteScheduleFilterParam() {
         List<ScheduleFilterParamHelper> forDel = [];
 
-        foreach(ScheduleFilterParamHelper param in SchedulesSettings.ParamsForScheduleFilters) {
+        foreach(ScheduleFilterParamHelper param in ScheduleFiltersSettings.ParamsForScheduleFilters) {
             if(param.IsCheck) {
                 forDel.Add(param);
             }
         }
 
         foreach(ScheduleFilterParamHelper param in forDel) {
-            SchedulesSettings.ParamsForScheduleFilters.Remove(param);
+            ScheduleFiltersSettings.ParamsForScheduleFilters.Remove(param);
         }
 
         SettingsChanged();
@@ -779,7 +787,7 @@ internal class MainViewModel : BaseViewModel {
     /// True, если выбрана штриховка в списке штриховок в настройках плагина
     /// </summary> 
     private bool CanChangeScheduleFilterParam() {
-        foreach(var param in SchedulesSettings.ParamsForScheduleFilters) {
+        foreach(var param in ScheduleFiltersSettings.ParamsForScheduleFilters) {
             if(param.IsCheck) { return true; }
         }
 

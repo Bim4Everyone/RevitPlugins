@@ -28,6 +28,7 @@ internal class PluginConfig : ProjectConfig<PluginSettings> {
         var verticalViewSectionSettings = mainViewModel.VerticalViewSettings;
         var horizontalViewSectionSettings = mainViewModel.HorizontalViewSettings;
         var schedulesSettings = mainViewModel.SchedulesSettings;
+        var scheduleFiltersSettings = mainViewModel.ScheduleFiltersSettings;
         var legendsAndAnnotationsSettings = mainViewModel.LegendsAndAnnotationsSettings;
         var projectSettings = mainViewModel.ProjectSettings;
 
@@ -199,8 +200,8 @@ internal class PluginConfig : ProjectConfig<PluginSettings> {
         schedulesSettings.IfcPartsScheduleDisp2 = settings.IfcPartsScheduleDisp2;
         schedulesSettings.IfcPartsScheduleDisp2Temp = settings.IfcPartsScheduleDisp2;
 
-        schedulesSettings.ParamsForScheduleFilters = settings.ParamsForScheduleFilters;
-        schedulesSettings.ParamsForScheduleFiltersTemp = settings.ParamsForScheduleFilters;
+        scheduleFiltersSettings.ParamsForScheduleFilters = settings.ParamsForScheduleFilters;
+        scheduleFiltersSettings.ParamsForScheduleFiltersTemp = settings.ParamsForScheduleFilters;
 
         legendsAndAnnotationsSettings.LegendName = settings.LegendName;
         legendsAndAnnotationsSettings.LegendNameTemp = settings.LegendName;
@@ -265,6 +266,7 @@ internal class PluginConfig : ProjectConfig<PluginSettings> {
         var verticalViewSectionSettings = mainViewModel.VerticalViewSettings;
         var horizontalViewSectionSettings = mainViewModel.HorizontalViewSettings;
         var schedulesSettings = mainViewModel.SchedulesSettings;
+        var scheduleFiltersSettings = mainViewModel.ScheduleFiltersSettings;
         var legendsAndAnnotationsSettings = mainViewModel.LegendsAndAnnotationsSettings;
         var projectSettings = mainViewModel.ProjectSettings;
 
@@ -369,7 +371,7 @@ internal class PluginConfig : ProjectConfig<PluginSettings> {
         settings.SystemPartsScheduleDisp2 = schedulesSettings.SystemPartsScheduleDisp2;
         settings.IfcPartsScheduleDisp2 = schedulesSettings.IfcPartsScheduleDisp2;
 
-        settings.ParamsForScheduleFilters = schedulesSettings.ParamsForScheduleFilters;
+        settings.ParamsForScheduleFilters = scheduleFiltersSettings.ParamsForScheduleFilters;
 
         settings.LegendName = legendsAndAnnotationsSettings.LegendName;
         settings.LegendXOffset = legendsAndAnnotationsSettings.LegendXOffset;

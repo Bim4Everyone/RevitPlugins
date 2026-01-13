@@ -53,19 +53,18 @@
 
                         <ui:ListView
                             Margin="0 5"
-                            ItemsSource="{Binding Path=SchedulesSettings.ParamsForScheduleFiltersTemp, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
+                            ItemsSource="{Binding 
+                                Path=ScheduleFiltersSettings.ParamsForScheduleFiltersTemp, 
+                                UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
                             SelectionMode="Multiple">
 
                             <ui:ListView.ItemTemplate>
                                 <DataTemplate>
                                     <Grid>
                                         <Grid.ColumnDefinitions>
-                                            <ColumnDefinition
-                                                Width="Auto" />
-                                            <ColumnDefinition
-                                                Width="*" />
-                                            <ColumnDefinition
-                                                Width="*" />
+                                            <ColumnDefinition Width="Auto" />
+                                            <ColumnDefinition Width="*" />
+                                            <ColumnDefinition Width="*" />
                                         </Grid.ColumnDefinitions>
 
                                         <CheckBox

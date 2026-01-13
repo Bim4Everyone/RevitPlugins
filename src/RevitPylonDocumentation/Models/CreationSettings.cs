@@ -2,14 +2,18 @@ using RevitPylonDocumentation.Models.UserSettings;
 
 namespace RevitPylonDocumentation.Models;
 internal class CreationSettings {
-    public CreationSettings(UserProjectSettings projectSettings, UserSchedulesSettings schedulesSettings,
-                            UserSelectionSettings selectionSettings, UserVerticalViewSettings verticalViewSettings,
+    public CreationSettings(UserProjectSettings projectSettings,
+                            UserSchedulesSettings schedulesSettings,
+                            UserScheduleFiltersSettings scheduleFiltersSettings,
+                            UserSelectionSettings selectionSettings,
+                            UserVerticalViewSettings verticalViewSettings,
                             UserHorizontalViewSettings horizontalViewSettings,
                             UserLegendsAndAnnotationsSettings legendsAndAnnotationsSettings,
                             UserTypesSettings typesSettings,
                             UserReferenceScheduleSettings referenceScheduleSettings) {
         ProjectSettings = projectSettings;
         SchedulesSettings = schedulesSettings;
+        ScheduleFiltersSettings = scheduleFiltersSettings;
         SelectionSettings = selectionSettings;
         VerticalViewSettings = verticalViewSettings;
         HorizontalViewSettings = horizontalViewSettings;
@@ -20,6 +24,7 @@ internal class CreationSettings {
 
     public UserProjectSettings ProjectSettings { get; private set; }
     public UserSchedulesSettings SchedulesSettings { get; private set; }
+    public UserScheduleFiltersSettings ScheduleFiltersSettings { get; private set; }
     public UserSelectionSettings SelectionSettings { get; private set; }
     public UserVerticalViewSettings VerticalViewSettings { get; private set; }
     public UserHorizontalViewSettings HorizontalViewSettings { get; private set; }

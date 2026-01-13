@@ -1,5 +1,3 @@
-using System.Collections.ObjectModel;
-
 namespace RevitPylonDocumentation.Models.UserSettings;
 internal class UserSchedulesSettings {
     public string MaterialSchedulePrefix { get; set; }
@@ -27,5 +25,4 @@ internal class UserSchedulesSettings {
     public string IfcPartsScheduleDisp2 { get; set; }
     public string SkeletonScheduleDisp2 { get; set; }
     public string SkeletonByElemsScheduleDisp2 { get; set; }
-    public ObservableCollection<ScheduleFilterParamHelper> ParamsForScheduleFilters { get; set; } = [];
 }

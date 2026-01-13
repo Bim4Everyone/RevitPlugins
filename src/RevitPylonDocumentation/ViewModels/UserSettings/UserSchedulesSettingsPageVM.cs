@@ -1,7 +1,5 @@
-using System.Collections.ObjectModel;
 using System.ComponentModel.DataAnnotations;
 
-using RevitPylonDocumentation.Models;
 using RevitPylonDocumentation.Models.UserSettings;
 
 namespace RevitPylonDocumentation.ViewModels.UserSettings;
@@ -37,18 +35,6 @@ internal class UserSchedulesSettingsPageVM : ValidatableViewModel {
     private string _skeletonByElemsScheduleDisp1Temp = "обр_ФОП_Раздел проекта";
     private string _skeletonByElemsScheduleDisp2Temp = "СА_Пилоны";
 
-    // Фильтрация спек
-    private ObservableCollection<ScheduleFilterParamHelper> _paramsForScheduleFiltersTemp = [
-        new ScheduleFilterParamHelper("обр_ФОП_Форма_номер", ""),
-        new ScheduleFilterParamHelper("обр_ФОП_Изделие_Марка", ""),
-        new ScheduleFilterParamHelper("обр_ФОП_Фильтрация 1", ""),
-        new ScheduleFilterParamHelper("обр_ФОП_Группа КР", ""),
-        new ScheduleFilterParamHelper("обр_ФОП_Раздел проекта", "обр_ФОП_Раздел проекта"),
-        new ScheduleFilterParamHelper("обр_ФОП_Орг. уровень", "обр_ФОП_Орг. уровень"),
-        new ScheduleFilterParamHelper("обр_Метка основы_универсальная", "Марка"),
-        new ScheduleFilterParamHelper("обр_Метка основы", "Марка"),
-        new ScheduleFilterParamHelper("Марка", "Марка")
-    ];
 
     public UserSchedulesSettingsPageVM(MainViewModel mainViewModel) {
         ViewModel = mainViewModel;
@@ -276,15 +262,6 @@ internal class UserSchedulesSettingsPageVM : ValidatableViewModel {
         }
     }
 
-    public ObservableCollection<ScheduleFilterParamHelper> ParamsForScheduleFilters { get; set; } = [];
-    public ObservableCollection<ScheduleFilterParamHelper> ParamsForScheduleFiltersTemp {
-        get => _paramsForScheduleFiltersTemp;
-        set {
-            RaiseAndSetIfChanged(ref _paramsForScheduleFiltersTemp, value);
-            ValidateProperty(value);
-        }
-    }
-
 
     public void ApplySchedulesSettings() {
         MaterialSchedulePrefix = MaterialSchedulePrefixTemp;
@@ -318,8 +295,6 @@ internal class UserSchedulesSettingsPageVM : ValidatableViewModel {
         IfcPartsScheduleDisp2 = IfcPartsScheduleDisp2Temp;
         SkeletonScheduleDisp2 = SkeletonScheduleDisp2Temp;
         SkeletonByElemsScheduleDisp2 = SkeletonByElemsScheduleDisp2Temp;
-
-        ParamsForScheduleFilters = ParamsForScheduleFiltersTemp;
     }
 
     public UserSchedulesSettings GetSettings() {
