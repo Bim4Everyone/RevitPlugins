@@ -3,7 +3,6 @@ using Autodesk.Revit.DB;
 namespace RevitPylonDocumentation.Models.UserSettings;
 internal class UserTypesSettings {
     public FamilySymbol SelectedTitleBlock { get; set; }
-    public View SelectedLegend { get; set; }
     public ViewFamilyType SelectedViewFamilyType { get; set; }
     public DimensionType SelectedDimensionType { get; set; }
     public FamilySymbol SelectedSkeletonTagType { get; set; }

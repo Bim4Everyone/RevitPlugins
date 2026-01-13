@@ -49,13 +49,13 @@ internal class MainViewModel : BaseViewModel {
         _resolutionRoot = resolutionRoot;
 
         SelectionSettings = new UserSelectionSettingsVM();
-        ProjectSettings = new UserProjectSettingsVM(this, _revitRepository, _localizationService);
         VerticalViewSettings = new UserVerticalViewSettingsPageVM(this, _localizationService);
         HorizontalViewSettings = new UserHorizontalViewSettingsPageVM(this, _localizationService);
         SchedulesSettings = new UserSchedulesSettingsPageVM(this);
+        LegendsAndAnnotationsSettings = new UserLegendsAndAnnotationsSettingsVM(this, _localizationService);
+        ProjectSettings = new UserProjectSettingsVM(this, _revitRepository, _localizationService);
         TypesSettings = new UserTypesSettingsVM(this);
         ReferenceScheduleSettings = new UserReferenceScheduleSettingsVM(this);
-
 
         ViewFamilyTypes = _revitRepository.ViewFamilyTypes;
         TitleBlocks = _revitRepository.TitleBlocksInProject;
@@ -132,6 +132,11 @@ internal class MainViewModel : BaseViewModel {
     /// Настройки параметров и правил создания спек с предыдущего сеанса
     /// </summary>
     public UserSchedulesSettingsPageVM SchedulesSettings { get; set; }
+
+    /// <summary>
+    /// Настройки параметров и правил создания легенд и типовых аннотаций с предыдущего сеанса
+    /// </summary>
+    public UserLegendsAndAnnotationsSettingsVM LegendsAndAnnotationsSettings { get; set; }
 
     /// <summary>
     /// Настройки выбранных типоразмеров (не сохраняют с предыдущего сеанса, а получаются в текущем)
@@ -373,10 +378,11 @@ internal class MainViewModel : BaseViewModel {
     private void ApplySettings() {
         ErrorText = string.Empty;
 
-        ProjectSettings.ApplyProjectSettings();
         VerticalViewSettings.ApplyViewSectionsSettings();
         HorizontalViewSettings.ApplyViewSectionsSettings();
         SchedulesSettings.ApplySchedulesSettings();
+        LegendsAndAnnotationsSettings.ApplyLegendsAndAnnotationsSettings();
+        ProjectSettings.ApplyProjectSettings();
 
         // Получаем заново список заполненных разделов проекта
         if(!_pylonSelectedManually) {
@@ -443,7 +449,7 @@ internal class MainViewModel : BaseViewModel {
             return;
         }
 
-        if(TypesSettings.SelectedLegend is null) {
+        if(LegendsAndAnnotationsSettings.SelectedLegend is null) {
             ErrorText = _localizationService.GetLocalizedString("VM.LegendNotSelected");
             return;
         }
@@ -493,9 +499,10 @@ internal class MainViewModel : BaseViewModel {
             return;
         }
 
-        ProjectSettings.CheckProjectSettings();
         VerticalViewSettings.CheckViewSectionsSettings();
         HorizontalViewSettings.CheckViewSectionsSettings();
+        LegendsAndAnnotationsSettings.CheckLegendsAndAnnotationsSettings();
+        ProjectSettings.CheckProjectSettings();
     }
 
     /// <summary>
@@ -519,6 +526,7 @@ internal class MainViewModel : BaseViewModel {
             SelectionSettings.GetSettings(),
             VerticalViewSettings.GetSettings(),
             HorizontalViewSettings.GetSettings(),
+            LegendsAndAnnotationsSettings.GetSettings(),
             TypesSettings.GetSettings(),
             ReferenceScheduleSettings.GetSettings());
 
@@ -711,9 +719,9 @@ internal class MainViewModel : BaseViewModel {
     /// Получает легенду примечания по имени
     /// </summary>
     public void FindLegend() {
-        if(!String.IsNullOrEmpty(ProjectSettings.LegendName)) {
-            TypesSettings.SelectedLegend = Legends
-                .FirstOrDefault(view => view.Name.Contains(ProjectSettings.LegendName));
+        if(!String.IsNullOrEmpty(LegendsAndAnnotationsSettings.LegendName)) {
+            LegendsAndAnnotationsSettings.SelectedLegend = Legends
+                .FirstOrDefault(view => view.Name.Contains(LegendsAndAnnotationsSettings.LegendName));
         }
     }
 

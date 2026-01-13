@@ -53,7 +53,10 @@
                         <controls:ComboBoxSettingControl
                             LabelText="{me:LocalizationSource LegendView.SelectNotesLegend}"
                             ItemsSource="{Binding Legends}"
-                            SelectedItem="{Binding TypesSettings.SelectedLegend, Mode=TwoWay}"
+                            SelectedItem="{Binding 
+                                Path=LegendsAndAnnotationsSettings.SelectedLegend, 
+                                UpdateSourceTrigger=PropertyChanged, Mode=TwoWay,
+                                ValidatesOnDataErrors=True, NotifyOnValidationError=True}"
                             ToolTipText="{me:LocalizationSource LegendViewsPage.SelectNotesLegendToolTip}"
                             SelectionChangedCommand="{Binding SettingsChangedCommand}"
                             ItemTemplate="{StaticResource WithoutFamilyNameItemTemplate}" />
@@ -67,14 +70,20 @@
                             <controls:TextBoxSettingControl
                                 Grid.Column="0"
                                 LabelText="{me:LocalizationSource LegendView.XOffsetFromBottomRightCorner}"
-                                TextBoxText="{Binding Path=ProjectSettings.LegendXOffsetTemp, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
+                                TextBoxText="{Binding 
+                                    Path=LegendsAndAnnotationsSettings.LegendXOffsetTemp, 
+                                    UpdateSourceTrigger=PropertyChanged, Mode=TwoWay,
+                                    ValidatesOnDataErrors=True, NotifyOnValidationError=True}"
                                 ToolTipText="{me:LocalizationSource LegendViewsPage.XOffsetFromBottomRightCornerToolTip}"
                                 TextChangedCommand="{Binding SettingsChangedCommand}" />
 
                             <controls:TextBoxSettingControl
                                 Grid.Column="1"
                                 LabelText="{me:LocalizationSource LegendView.YOffsetFromBottomRightCorner}"
-                                TextBoxText="{Binding Path=ProjectSettings.LegendYOffsetTemp, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
+                                TextBoxText="{Binding 
+                                    Path=LegendsAndAnnotationsSettings.LegendYOffsetTemp, 
+                                    UpdateSourceTrigger=PropertyChanged, Mode=TwoWay,
+                                    ValidatesOnDataErrors=True, NotifyOnValidationError=True}"
                                 ToolTipText="{me:LocalizationSource LegendViewsPage.YOffsetFromBottomRightCornerToolTip}"
                                 TextChangedCommand="{Binding SettingsChangedCommand}" />
                         </Grid>

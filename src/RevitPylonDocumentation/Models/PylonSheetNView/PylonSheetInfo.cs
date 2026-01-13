@@ -327,7 +327,7 @@ internal class PylonSheetInfo {
     /// Ищет и запоминает легенду, размещенную на листе
     /// </summary>
     public void FindNoteLegendOnSheet() {
-        if(Settings.TypesSettings.SelectedLegend is null) {
+        if(Settings.LegendsAndAnnotationsSettings.SelectedLegend is null) {
             return;
         }
         foreach(ElementId id in PylonViewSheet.GetAllViewports()) {
@@ -337,7 +337,7 @@ internal class PylonSheetInfo {
             View viewLegend = Repository.Document.GetElement(viewportLegend.ViewId) as View;
             if(viewLegend is null) { continue; }
 
-            if(LegendView.ViewElement is null && viewLegend.Name.Equals(Settings.TypesSettings.SelectedLegend.Name)) {
+            if(LegendView.ViewElement is null && viewLegend.Name.Equals(Settings.LegendsAndAnnotationsSettings.SelectedLegend.Name)) {
                 LegendView.ViewElement = viewLegend;
                 LegendView.ViewportElement = viewportLegend;
                 return;

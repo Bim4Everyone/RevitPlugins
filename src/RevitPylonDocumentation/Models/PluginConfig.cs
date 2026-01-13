@@ -25,10 +25,11 @@ internal class PluginConfig : ProjectConfig<PluginSettings> {
 
     internal void GetConfigProps(PluginSettings settings, MainViewModel mainViewModel) {
         var selectionSettings = mainViewModel.SelectionSettings;
-        var projectSettings = mainViewModel.ProjectSettings;
         var verticalViewSectionSettings = mainViewModel.VerticalViewSettings;
         var horizontalViewSectionSettings = mainViewModel.HorizontalViewSettings;
         var schedulesSettings = mainViewModel.SchedulesSettings;
+        var legendsAndAnnotationsSettings = mainViewModel.LegendsAndAnnotationsSettings;
+        var projectSettings = mainViewModel.ProjectSettings;
 
         selectionSettings.NeedWorkWithGeneralView = settings.NeedWorkWithGeneralView;
         selectionSettings.NeedWorkWithGeneralPerpendicularView = settings.NeedWorkWithGeneralPerpendicularView;
@@ -48,63 +49,6 @@ internal class PluginConfig : ProjectConfig<PluginSettings> {
         selectionSettings.NeedWorkWithSystemPartsSchedule = settings.NeedWorkWithSystemPartsSchedule;
         selectionSettings.NeedWorkWithIfcPartsSchedule = settings.NeedWorkWithIfcPartsSchedule;
         selectionSettings.NeedWorkWithLegend = settings.NeedWorkWithLegend;
-
-        projectSettings.ProjectSection = settings.ProjectSection;
-        projectSettings.ProjectSectionTemp = settings.ProjectSection;
-        projectSettings.Mark = settings.Mark;
-        projectSettings.MarkTemp = settings.Mark;
-        projectSettings.TitleBlockName = settings.TitleBlockName;
-        projectSettings.TitleBlockNameTemp = settings.TitleBlockName;
-        projectSettings.DispatcherGroupingFirst = settings.DispatcherGroupingFirst;
-        projectSettings.DispatcherGroupingFirstTemp = settings.DispatcherGroupingFirst;
-        projectSettings.DispatcherGroupingSecond = settings.DispatcherGroupingSecond;
-        projectSettings.DispatcherGroupingSecondTemp = settings.DispatcherGroupingSecond;
-        projectSettings.PylonLengthParamName = settings.PylonLengthParamName;
-        projectSettings.PylonLengthParamNameTemp = settings.PylonLengthParamName;
-        projectSettings.PylonWidthParamName = settings.PylonWidthParamName;
-        projectSettings.PylonWidthParamNameTemp = settings.PylonWidthParamName;
-
-        projectSettings.SheetSize = settings.SheetSize;
-        projectSettings.SheetSizeTemp = settings.SheetSize;
-        projectSettings.SheetCoefficient = settings.SheetCoefficient;
-        projectSettings.SheetCoefficientTemp = settings.SheetCoefficient;
-        projectSettings.SheetPrefix = settings.SheetPrefix;
-        projectSettings.SheetPrefixTemp = settings.SheetPrefix;
-        projectSettings.SheetSuffix = settings.SheetSuffix;
-        projectSettings.SheetSuffixTemp = settings.SheetSuffix;
-
-        projectSettings.TypicalPylonFilterParameter = settings.TypicalPylonFilterParameter;
-        projectSettings.TypicalPylonFilterParameterTemp = settings.TypicalPylonFilterParameter;
-        projectSettings.TypicalPylonFilterValue = settings.TypicalPylonFilterValue;
-        projectSettings.TypicalPylonFilterValueTemp = settings.TypicalPylonFilterValue;
-
-        projectSettings.LegendName = settings.LegendName;
-        projectSettings.LegendNameTemp = settings.LegendName;
-        projectSettings.LegendXOffset = settings.LegendXOffset;
-        projectSettings.LegendXOffsetTemp = settings.LegendXOffset;
-        projectSettings.LegendYOffset = settings.LegendYOffset;
-        projectSettings.LegendYOffsetTemp = settings.LegendYOffset;
-
-        projectSettings.DimensionTypeName = settings.DimensionTypeName;
-        projectSettings.DimensionTypeNameTemp = settings.DimensionTypeName;
-        projectSettings.SpotDimensionTypeName = settings.SpotDimensionTypeName;
-        projectSettings.SpotDimensionTypeNameTemp = settings.SpotDimensionTypeName;
-
-        projectSettings.SkeletonTagTypeName = settings.SkeletonTagTypeName;
-        projectSettings.SkeletonTagTypeNameTemp = settings.SkeletonTagTypeName;
-        projectSettings.RebarTagTypeWithSerifName = settings.RebarTagTypeWithSerifName;
-        projectSettings.RebarTagTypeWithSerifNameTemp = settings.RebarTagTypeWithSerifName;
-        projectSettings.RebarTagTypeWithStepName = settings.RebarTagTypeWithStepName;
-        projectSettings.RebarTagTypeWithStepNameTemp = settings.RebarTagTypeWithStepName;
-        projectSettings.RebarTagTypeWithCommentName = settings.RebarTagTypeWithCommentName;
-        projectSettings.RebarTagTypeWithCommentNameTemp = settings.RebarTagTypeWithCommentName;
-        projectSettings.UniversalTagTypeName = settings.UniversalTagTypeName;
-        projectSettings.UniversalTagTypeNameTemp = settings.UniversalTagTypeName;
-
-        projectSettings.BreakLineTypeName = settings.BreakLineTypeName;
-        projectSettings.BreakLineTypeNameTemp = settings.BreakLineTypeName;
-        projectSettings.ConcretingJointTypeName = settings.ConcretingJointTypeName;
-        projectSettings.ConcretingJointTypeNameTemp = settings.ConcretingJointTypeName;
 
         verticalViewSectionSettings.GeneralViewPrefix = settings.GeneralViewPrefix;
         verticalViewSectionSettings.GeneralViewPrefixTemp = settings.GeneralViewPrefix;
@@ -257,14 +201,72 @@ internal class PluginConfig : ProjectConfig<PluginSettings> {
 
         schedulesSettings.ParamsForScheduleFilters = settings.ParamsForScheduleFilters;
         schedulesSettings.ParamsForScheduleFiltersTemp = settings.ParamsForScheduleFilters;
+
+        legendsAndAnnotationsSettings.LegendName = settings.LegendName;
+        legendsAndAnnotationsSettings.LegendNameTemp = settings.LegendName;
+        legendsAndAnnotationsSettings.LegendXOffset = settings.LegendXOffset;
+        legendsAndAnnotationsSettings.LegendXOffsetTemp = settings.LegendXOffset;
+        legendsAndAnnotationsSettings.LegendYOffset = settings.LegendYOffset;
+        legendsAndAnnotationsSettings.LegendYOffsetTemp = settings.LegendYOffset;
+
+        projectSettings.ProjectSection = settings.ProjectSection;
+        projectSettings.ProjectSectionTemp = settings.ProjectSection;
+        projectSettings.Mark = settings.Mark;
+        projectSettings.MarkTemp = settings.Mark;
+        projectSettings.TitleBlockName = settings.TitleBlockName;
+        projectSettings.TitleBlockNameTemp = settings.TitleBlockName;
+        projectSettings.DispatcherGroupingFirst = settings.DispatcherGroupingFirst;
+        projectSettings.DispatcherGroupingFirstTemp = settings.DispatcherGroupingFirst;
+        projectSettings.DispatcherGroupingSecond = settings.DispatcherGroupingSecond;
+        projectSettings.DispatcherGroupingSecondTemp = settings.DispatcherGroupingSecond;
+        projectSettings.PylonLengthParamName = settings.PylonLengthParamName;
+        projectSettings.PylonLengthParamNameTemp = settings.PylonLengthParamName;
+        projectSettings.PylonWidthParamName = settings.PylonWidthParamName;
+        projectSettings.PylonWidthParamNameTemp = settings.PylonWidthParamName;
+
+        projectSettings.SheetSize = settings.SheetSize;
+        projectSettings.SheetSizeTemp = settings.SheetSize;
+        projectSettings.SheetCoefficient = settings.SheetCoefficient;
+        projectSettings.SheetCoefficientTemp = settings.SheetCoefficient;
+        projectSettings.SheetPrefix = settings.SheetPrefix;
+        projectSettings.SheetPrefixTemp = settings.SheetPrefix;
+        projectSettings.SheetSuffix = settings.SheetSuffix;
+        projectSettings.SheetSuffixTemp = settings.SheetSuffix;
+
+        projectSettings.TypicalPylonFilterParameter = settings.TypicalPylonFilterParameter;
+        projectSettings.TypicalPylonFilterParameterTemp = settings.TypicalPylonFilterParameter;
+        projectSettings.TypicalPylonFilterValue = settings.TypicalPylonFilterValue;
+        projectSettings.TypicalPylonFilterValueTemp = settings.TypicalPylonFilterValue;
+
+        projectSettings.DimensionTypeName = settings.DimensionTypeName;
+        projectSettings.DimensionTypeNameTemp = settings.DimensionTypeName;
+        projectSettings.SpotDimensionTypeName = settings.SpotDimensionTypeName;
+        projectSettings.SpotDimensionTypeNameTemp = settings.SpotDimensionTypeName;
+
+        projectSettings.SkeletonTagTypeName = settings.SkeletonTagTypeName;
+        projectSettings.SkeletonTagTypeNameTemp = settings.SkeletonTagTypeName;
+        projectSettings.RebarTagTypeWithSerifName = settings.RebarTagTypeWithSerifName;
+        projectSettings.RebarTagTypeWithSerifNameTemp = settings.RebarTagTypeWithSerifName;
+        projectSettings.RebarTagTypeWithStepName = settings.RebarTagTypeWithStepName;
+        projectSettings.RebarTagTypeWithStepNameTemp = settings.RebarTagTypeWithStepName;
+        projectSettings.RebarTagTypeWithCommentName = settings.RebarTagTypeWithCommentName;
+        projectSettings.RebarTagTypeWithCommentNameTemp = settings.RebarTagTypeWithCommentName;
+        projectSettings.UniversalTagTypeName = settings.UniversalTagTypeName;
+        projectSettings.UniversalTagTypeNameTemp = settings.UniversalTagTypeName;
+
+        projectSettings.BreakLineTypeName = settings.BreakLineTypeName;
+        projectSettings.BreakLineTypeNameTemp = settings.BreakLineTypeName;
+        projectSettings.ConcretingJointTypeName = settings.ConcretingJointTypeName;
+        projectSettings.ConcretingJointTypeNameTemp = settings.ConcretingJointTypeName;
     }
 
     internal void SetConfigProps(PluginSettings settings, MainViewModel mainViewModel) {
         var selectionSettings = mainViewModel.SelectionSettings;
-        var projectSettings = mainViewModel.ProjectSettings;
         var verticalViewSectionSettings = mainViewModel.VerticalViewSettings;
         var horizontalViewSectionSettings = mainViewModel.HorizontalViewSettings;
         var schedulesSettings = mainViewModel.SchedulesSettings;
+        var legendsAndAnnotationsSettings = mainViewModel.LegendsAndAnnotationsSettings;
+        var projectSettings = mainViewModel.ProjectSettings;
 
         settings.NeedWorkWithGeneralView = selectionSettings.NeedWorkWithGeneralView;
         settings.NeedWorkWithGeneralPerpendicularView = selectionSettings.NeedWorkWithGeneralPerpendicularView;
@@ -284,37 +286,6 @@ internal class PluginConfig : ProjectConfig<PluginSettings> {
         settings.NeedWorkWithSystemPartsSchedule = selectionSettings.NeedWorkWithSystemPartsSchedule;
         settings.NeedWorkWithIfcPartsSchedule = selectionSettings.NeedWorkWithIfcPartsSchedule;
         settings.NeedWorkWithLegend = selectionSettings.NeedWorkWithLegend;
-
-        settings.ProjectSection = projectSettings.ProjectSection;
-        settings.Mark = projectSettings.Mark;
-        settings.TitleBlockName = projectSettings.TitleBlockName;
-        settings.DispatcherGroupingFirst = projectSettings.DispatcherGroupingFirst;
-        settings.DispatcherGroupingSecond = projectSettings.DispatcherGroupingSecond;
-        settings.DimensionTypeName = projectSettings.DimensionTypeName;
-        settings.SpotDimensionTypeName = projectSettings.SpotDimensionTypeName;
-        settings.SkeletonTagTypeName = projectSettings.SkeletonTagTypeName;
-        settings.RebarTagTypeWithSerifName = projectSettings.RebarTagTypeWithSerifName;
-        settings.RebarTagTypeWithStepName = projectSettings.RebarTagTypeWithStepName;
-        settings.RebarTagTypeWithCommentName = projectSettings.RebarTagTypeWithCommentName;
-        settings.UniversalTagTypeName = projectSettings.UniversalTagTypeName;
-
-        settings.BreakLineTypeName = projectSettings.BreakLineTypeName;
-        settings.ConcretingJointTypeName = projectSettings.ConcretingJointTypeName;
-
-        settings.SheetSize = projectSettings.SheetSize;
-        settings.SheetCoefficient = projectSettings.SheetCoefficient;
-        settings.SheetPrefix = projectSettings.SheetPrefix;
-        settings.SheetSuffix = projectSettings.SheetSuffix;
-
-        settings.TypicalPylonFilterParameter = projectSettings.TypicalPylonFilterParameter;
-        settings.TypicalPylonFilterValue = projectSettings.TypicalPylonFilterValue;
-
-        settings.LegendName = projectSettings.LegendName;
-        settings.LegendXOffset = projectSettings.LegendXOffset;
-        settings.LegendYOffset = projectSettings.LegendYOffset;
-
-        settings.PylonLengthParamName = projectSettings.PylonLengthParamName;
-        settings.PylonWidthParamName = projectSettings.PylonWidthParamName;
 
         settings.GeneralViewPrefix = verticalViewSectionSettings.GeneralViewPrefix;
         settings.GeneralViewSuffix = verticalViewSectionSettings.GeneralViewSuffix;
@@ -399,6 +370,37 @@ internal class PluginConfig : ProjectConfig<PluginSettings> {
         settings.IfcPartsScheduleDisp2 = schedulesSettings.IfcPartsScheduleDisp2;
 
         settings.ParamsForScheduleFilters = schedulesSettings.ParamsForScheduleFilters;
+
+        settings.LegendName = legendsAndAnnotationsSettings.LegendName;
+        settings.LegendXOffset = legendsAndAnnotationsSettings.LegendXOffset;
+        settings.LegendYOffset = legendsAndAnnotationsSettings.LegendYOffset;
+
+        settings.ProjectSection = projectSettings.ProjectSection;
+        settings.Mark = projectSettings.Mark;
+        settings.TitleBlockName = projectSettings.TitleBlockName;
+        settings.DispatcherGroupingFirst = projectSettings.DispatcherGroupingFirst;
+        settings.DispatcherGroupingSecond = projectSettings.DispatcherGroupingSecond;
+        settings.DimensionTypeName = projectSettings.DimensionTypeName;
+        settings.SpotDimensionTypeName = projectSettings.SpotDimensionTypeName;
+        settings.SkeletonTagTypeName = projectSettings.SkeletonTagTypeName;
+        settings.RebarTagTypeWithSerifName = projectSettings.RebarTagTypeWithSerifName;
+        settings.RebarTagTypeWithStepName = projectSettings.RebarTagTypeWithStepName;
+        settings.RebarTagTypeWithCommentName = projectSettings.RebarTagTypeWithCommentName;
+        settings.UniversalTagTypeName = projectSettings.UniversalTagTypeName;
+
+        settings.BreakLineTypeName = projectSettings.BreakLineTypeName;
+        settings.ConcretingJointTypeName = projectSettings.ConcretingJointTypeName;
+
+        settings.SheetSize = projectSettings.SheetSize;
+        settings.SheetCoefficient = projectSettings.SheetCoefficient;
+        settings.SheetPrefix = projectSettings.SheetPrefix;
+        settings.SheetSuffix = projectSettings.SheetSuffix;
+
+        settings.TypicalPylonFilterParameter = projectSettings.TypicalPylonFilterParameter;
+        settings.TypicalPylonFilterValue = projectSettings.TypicalPylonFilterValue;
+
+        settings.PylonLengthParamName = projectSettings.PylonLengthParamName;
+        settings.PylonWidthParamName = projectSettings.PylonWidthParamName;
     }
 }
 

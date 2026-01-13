@@ -17,7 +17,6 @@ internal class UserTypesSettingsVM : ValidatableViewModel {
     private FamilySymbol _selectedConcretingJointType;
 
     private SpotDimensionType _selectedSpotDimensionType;
-    private View _selectedLegend;
     private FamilySymbol _selectedTitleBlock;
 
     public UserTypesSettingsVM(MainViewModel mainViewModel) {
@@ -39,20 +38,6 @@ internal class UserTypesSettingsVM : ValidatableViewModel {
             ValidateProperty(value);
         }
     }
-
-    /// <summary>
-    /// Выбранная пользователем легенда
-    /// </summary>
-    [Required]
-    public View SelectedLegend {
-        get => _selectedLegend;
-        set {
-            RaiseAndSetIfChanged(ref _selectedLegend, value);
-            ViewModel.ProjectSettings.LegendNameTemp = value?.Name;
-            ValidateProperty(value);
-        }
-    }
-
 
 
     /// <summary>

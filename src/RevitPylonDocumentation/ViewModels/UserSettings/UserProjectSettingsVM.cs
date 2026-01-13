@@ -7,14 +7,12 @@ using dosymep.SimpleServices;
 using dosymep.WPF.ViewModels;
 
 using RevitPylonDocumentation.Models;
-using RevitPylonDocumentation.Models.PylonSheetNView;
 using RevitPylonDocumentation.Models.UserSettings;
-using RevitPylonDocumentation.ViewModels;
 
 namespace RevitPylonDocumentation.ViewModels.UserSettings;
 internal class UserProjectSettingsVM : BaseViewModel {
     private readonly ILocalizationService _localizationService;
-    
+
     private string _projectSectionTemp = "обр_ФОП_Раздел проекта";
     private string _markTemp = "Марка";
     private string _titleBlockNameTemp = "Создать типы по комплектам";
@@ -29,10 +27,6 @@ internal class UserProjectSettingsVM : BaseViewModel {
     private string _typicalPylonFilterParameterTemp = "обр_ФОП_Фильтрация 1";
     private string _typicalPylonFilterValueTemp = "на 1 шт.";
 
-    private string _legendNameTemp = "Указания для пилонов корпуса";
-    private string _legendXOffsetTemp = "-100";
-    private string _legendYOffsetTemp = "130";
-
     private string _pylonLengthParamNameTemp = "ФОП_РАЗМ_Длина";
     private string _pylonWidthParamNameTemp = "ФОП_РАЗМ_Ширина";
 
@@ -44,11 +38,11 @@ internal class UserProjectSettingsVM : BaseViewModel {
     private string _rebarTagTypeWithStepNameTemp = "Поз., Диаметр / Шаг - Полка 10";
     private string _rebarTagTypeWithCommentNameTemp = "Поз., Диаметр / Комментарий - Полка 10";
     private string _universalTagTypeNameTemp = "Без засечки";
-    
+
     private string _breakLineTypeNameTemp = "Линейный обрыв";
     private string _concretingJointTypeNameTemp = "3 мм_М 20";
 
-    public UserProjectSettingsVM(MainViewModel mainViewModel, RevitRepository repository, 
+    public UserProjectSettingsVM(MainViewModel mainViewModel, RevitRepository repository,
                                  ILocalizationService localizationService) {
         ViewModel = mainViewModel;
         Repository = repository;
@@ -122,25 +116,6 @@ internal class UserProjectSettingsVM : BaseViewModel {
         get => _typicalPylonFilterValueTemp;
         set => RaiseAndSetIfChanged(ref _typicalPylonFilterValueTemp, value);
     }
-
-    public string LegendName { get; set; }
-    public string LegendNameTemp {
-        get => _legendNameTemp;
-        set => RaiseAndSetIfChanged(ref _legendNameTemp, value);
-    }
-
-    public string LegendXOffset { get; set; }
-    public string LegendXOffsetTemp {
-        get => _legendXOffsetTemp;
-        set => RaiseAndSetIfChanged(ref _legendXOffsetTemp, value);
-    }
-
-    public string LegendYOffset { get; set; }
-    public string LegendYOffsetTemp {
-        get => _legendYOffsetTemp;
-        set => RaiseAndSetIfChanged(ref _legendYOffsetTemp, value);
-    }
-
     public string PylonLengthParamName { get; set; }
     public string PylonLengthParamNameTemp {
         get => _pylonLengthParamNameTemp;
@@ -222,10 +197,6 @@ internal class UserProjectSettingsVM : BaseViewModel {
         TypicalPylonFilterParameter = TypicalPylonFilterParameterTemp;
         TypicalPylonFilterValue = TypicalPylonFilterValueTemp;
 
-        LegendName = LegendNameTemp;
-        LegendXOffset = LegendXOffsetTemp;
-        LegendYOffset = LegendYOffsetTemp;
-
         PylonLengthParamName = PylonLengthParamNameTemp;
         PylonWidthParamName = PylonWidthParamNameTemp;
 
@@ -256,11 +227,6 @@ internal class UserProjectSettingsVM : BaseViewModel {
         }
         if(Repository.AllScheduleViews.FirstOrDefault()?.LookupParameter(DispatcherGroupingSecond) is null) {
             ViewModel.ErrorText = _localizationService.GetLocalizedString("VM.DispatcherGroupingSecondParamInvalid");
-        }
-
-        // Проверяем, чтоб были заданы офсеты видового экрана легенды
-        if(LegendXOffset is null || LegendYOffset is null) {
-            ViewModel.ErrorText = _localizationService.GetLocalizedString("VM.LegendOffsetsNotSet");
         }
 
         using(var transaction = Repository.Document.StartTransaction("Checking parameters on sheet")) {

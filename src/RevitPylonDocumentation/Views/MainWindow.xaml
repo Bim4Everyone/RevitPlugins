@@ -63,7 +63,7 @@
             FrameMargin="0"
             PaneDisplayMode="Left"
             PaneTitle="{me:LocalizationSource MainWindow.Settings}"
-            OpenPaneLength="300"
+            OpenPaneLength="320"
             IsPaneOpen="True"
             IsBackButtonVisible="Collapsed"
             IsPaneVisible="True" 
@@ -123,8 +123,15 @@
                         <ui:NavigationViewItem
                             Content="{me:LocalizationSource MainWindow.LegendsAndAnnotations}"
                             Icon="{ui:SymbolIcon BarcodeScanner24}"
-                            TargetPageType="{x:Type pages:LegendViewsPage}" 
-                            ToolTip="{me:LocalizationSource MainWindow.LegendsAndAnnotationsSettings}"/>
+                            TargetPageType="{x:Type pages:LegendViewsPage}"
+                            ToolTip="{me:LocalizationSource MainWindow.LegendsAndAnnotationsSettings}">
+                            <ui:NavigationViewItem.InfoBadge>
+                                <ui:InfoBadge
+                                    Style="{StaticResource RoundInfoBadgeStyle}"
+                                    Visibility="{Binding Path=LegendsAndAnnotationsSettings.HasErrors, Converter={StaticResource BooleanToVisibilityConverter}}">
+                                </ui:InfoBadge>
+                            </ui:NavigationViewItem.InfoBadge>
+                        </ui:NavigationViewItem>
                         <ui:NavigationViewItem
                             Content="{me:LocalizationSource MainWindow.PylonParameters}"
                             Icon="{ui:SymbolIcon PauseSettings20}"

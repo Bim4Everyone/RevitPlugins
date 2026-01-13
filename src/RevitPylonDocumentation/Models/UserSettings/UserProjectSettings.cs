@@ -11,9 +11,6 @@ internal class UserProjectSettings {
     public string SheetSuffix { get; set; }
     public string TypicalPylonFilterParameter { get; set; }
     public string TypicalPylonFilterValue { get; set; }
-    public string LegendName { get; set; }
-    public string LegendXOffset { get; set; }
-    public string LegendYOffset { get; set; }
     public string PylonLengthParamName { get; set; }
     public string PylonWidthParamName { get; set; }
     public string DimensionTypeName { get; set; }
