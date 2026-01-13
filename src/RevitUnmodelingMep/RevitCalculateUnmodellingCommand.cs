@@ -74,8 +74,27 @@ namespace RevitUnmodelingMep {
             kernel.Bind<PluginConfig>()
                 .ToMethod(c => PluginConfig.GetPluginConfig(c.Kernel.Get<IConfigSerializer>()));
 
+            var localizationService = kernel.Get<ILocalizationService>();
+
+            var servise = GetPlatformService<IMessageBoxService>();
+            CheckDocument(uiApplication.ActiveUIDocument.Document, servise, localizationService);
+
             var repository = kernel.Get<RevitRepository>();
             repository.CalculateUnmodeling();
+        }
+
+        private void CheckDocument(
+            Document document,
+            IMessageBoxService service,
+            ILocalizationService localizationService) {
+
+            if(document.IsFamilyDocument) {
+                string report = localizationService.GetLocalizedString("MainWindow.DocTypeError");
+                service.Show(report, localizationService.GetLocalizedString("MainWindow.Title"),
+                    MessageBoxButton.OK,
+                    MessageBoxImage.Error);
+                throw new OperationCanceledException();
+            }
         }
     }
 }

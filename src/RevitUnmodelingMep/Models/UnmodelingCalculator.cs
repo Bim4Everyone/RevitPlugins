@@ -217,13 +217,19 @@ internal class UnmodelingCalculator {
         string noteFormula = config.Note ?? string.Empty;
 
         // учитываем только элементы у которых хоть одно значение не ноль
-        var filtered = calculationElements
-            .Where(r => (GetDoublePropertyValue(r, "Area") ?? 0) != 0 || (GetDoublePropertyValue(r, "Length") ?? 0) != 0)
-            .ToList();
+        //var filtered = calculationElements
+        //    .Where(r => (GetDoublePropertyValue(r, "Area") ?? 0) != 0 || (GetDoublePropertyValue(r, "Length") ?? 0) != 0)
+        //    .ToList();
 
-        double sumArea = filtered.Any() ? filtered.Sum(r => GetDoublePropertyValue(r, "Area") ?? 0) : 0;
-        double sumLength = filtered.Any() ? filtered.Sum(r => GetDoublePropertyValue(r, "Length") ?? 0) : 0;
-        double count = filtered.Count;
+        //double sumArea = filtered.Any() ? filtered.Sum(r => GetDoublePropertyValue(r, "Area") ?? 0) : 0;
+        //double sumLength = filtered.Any() ? filtered.Sum(r => GetDoublePropertyValue(r, "Length") ?? 0) : 0;
+        //double count = filtered.Count;
+
+        double sumArea = calculationElements.Any() 
+            ? calculationElements.Sum(r => GetDoublePropertyValue(r, "Area") ?? 0) : 0;
+        double sumLength = calculationElements.Any() 
+            ? calculationElements.Sum(r => GetDoublePropertyValue(r, "Length") ?? 0) : 0;
+        double count = calculationElements.Count;
 
         string FormatValue(double value) {
             double rounded = Math.Round(value, 2);
@@ -231,9 +237,9 @@ internal class UnmodelingCalculator {
         }
 
         string result = noteFormula
-            .Replace("sumArea", FormatValue(sumArea))
-            .Replace("sumLength", FormatValue(sumLength))
-            .Replace("count", FormatValue(count));
+            .Replace("SumArea", FormatValue(sumArea))
+            .Replace("SumLength", FormatValue(sumLength))
+            .Replace("Count", FormatValue(count));
 
         return result;
     }

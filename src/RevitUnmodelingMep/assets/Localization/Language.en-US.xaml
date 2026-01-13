@@ -5,6 +5,7 @@
     <!-- Пример перевода на английский американский язык (google translate) -->
 
     <system:String x:Key="MainWindow.Title">Unmodeling settings</system:String>
+    <system:String x:Key="MainWindow.DocTypeError">The plugin is not designed to work with families.</system:String>
     <system:String x:Key="MainWindow.TabTypesName">Consumable types</system:String>
     <system:String x:Key="MainWindow.TabDestinationName">Consumable assignment</system:String>
     

@@ -93,15 +93,13 @@ internal static class FormulaValidator {
             allowed.Select(a => a?.Trim())
                 .Where(a => !string.IsNullOrWhiteSpace(a)),
             StringComparer.OrdinalIgnoreCase);
-        HashSet<string> builtins = new HashSet<string>(StringComparer.OrdinalIgnoreCase) {
-            "PI", "E", "TRUE", "FALSE", "NAN", "INFINITY"
-        };
+
 
         string formulaNoStrings = Regex.Replace(item.Formula, "\"[^\"]*\"", " ");
 
         foreach(Match match in Regex.Matches(formulaNoStrings, @"[\p{L}_][\p{L}\p{Nd}_]*")) {
             string token = match.Value;
-            if(allowedSet.Contains(token) || builtins.Contains(token)) {
+            if(allowedSet.Contains(token)) {
                 continue;
             }
 

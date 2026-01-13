@@ -89,12 +89,13 @@ public class RevitUnmodelingMepCommand : BasePluginCommand {
 
         var servise = GetPlatformService<IMessageBoxService>();
         CheckDocument(uiApplication.ActiveUIDocument.Document, servise, localizationService);
-
+        CheckEdited(uiApplication.ActiveUIDocument.Document, servise, localizationService);
+        
         // Вызывает стандартное уведомление
         Notification(kernel.Get<MainWindow>());
     }
 
-    private void CheckDocument(Document document, IMessageBoxService service, ILocalizationService localizationService) {
+    private void CheckEdited(Document document, IMessageBoxService service, ILocalizationService localizationService) {
         EditorChecker editorChecker = new(document, localizationService);
         ProjectInfo info = document.ProjectInformation;
 
@@ -103,6 +104,20 @@ public class RevitUnmodelingMepCommand : BasePluginCommand {
         if(!string.IsNullOrEmpty(editorChecker.FinalReport)) {
             service.Show(editorChecker.FinalReport, "Настройки немоделируемых", 
                 MessageBoxButton.OK, 
+                MessageBoxImage.Error);
+            throw new OperationCanceledException();
+        }
+    }
+
+    private void CheckDocument(
+        Document document, 
+        IMessageBoxService service, 
+        ILocalizationService localizationService) {
+
+        if(document.IsFamilyDocument) {
+            string report = localizationService.GetLocalizedString("MainWindow.DocTypeError");
+            service.Show(report, localizationService.GetLocalizedString("MainWindow.Title"),
+                MessageBoxButton.OK,
                 MessageBoxImage.Error);
             throw new OperationCanceledException();
         }
