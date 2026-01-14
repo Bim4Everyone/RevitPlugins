@@ -57,7 +57,6 @@ internal class MainViewModel : BaseViewModel {
         PylonSettings = new UserPylonSettingsVM(this, _revitRepository, _localizationService);
         ProjectSettings = new UserProjectSettingsVM(this, _revitRepository, _localizationService);
         SheetSettings = new UserSheetSettingsVM(this, _revitRepository, _localizationService);
-        ReferenceScheduleSettings = new UserReferenceScheduleSettingsVM(this);
 
         ViewFamilyTypes = _revitRepository.ViewFamilyTypes;
         TitleBlocks = _revitRepository.TitleBlocksInProject;
@@ -154,11 +153,6 @@ internal class MainViewModel : BaseViewModel {
     /// Настройки параметров и правил создания легенд и типовых аннотаций с предыдущего сеанса
     /// </summary>
     public UserLegendsAndAnnotationsSettingsVM LegendsAndAnnotationsSettings { get; set; }
-
-    /// <summary>
-    /// Настройки выбранных эталонных спецификаций для копирования
-    /// </summary>
-    public UserReferenceScheduleSettingsVM ReferenceScheduleSettings { get; set; }
 
     /// <summary>
     /// Список всех комплектов документации (по ум. обр_ФОП_Раздел проекта)
@@ -538,16 +532,15 @@ internal class MainViewModel : BaseViewModel {
             _localizationService.GetLocalizedString("MainWindow.Title"));
 
         var settings = new CreationSettings(
-            ProjectSettings.GetSettings(),
-            SheetSettings.GetSettings(),
-            PylonSettings.GetSettings(),
-            SchedulesSettings.GetSettings(),
-            ScheduleFiltersSettings.GetSettings(),
             SelectionSettings.GetSettings(),
             VerticalViewSettings.GetSettings(),
             HorizontalViewSettings.GetSettings(),
+            SchedulesSettings.GetSettings(),
+            ScheduleFiltersSettings.GetSettings(),
             LegendsAndAnnotationsSettings.GetSettings(),
-            ReferenceScheduleSettings.GetSettings());
+            PylonSettings.GetSettings(),
+            ProjectSettings.GetSettings(),
+            SheetSettings.GetSettings());
 
         var paramValService = new ParamValueService(_revitRepository);
         var rebarFinder = new RebarFinderService(settings, _revitRepository, paramValService);
@@ -566,20 +559,20 @@ internal class MainViewModel : BaseViewModel {
     /// Ищет эталонные спецификации по указанным именам. На основе эталонных спек создаются спеки для пилонов путем копирования
     /// </summary>
     private void FindReferenceSchedules() {
-        ReferenceScheduleSettings.ReferenceMaterialSchedule =
+        SchedulesSettings.ReferenceMaterialSchedule =
             _revitRepository.AllScheduleViews.FirstOrDefault(sch =>
                 sch.Name.Equals(SchedulesSettings.MaterialScheduleName));
-        ReferenceScheduleSettings.ReferenceSystemPartsSchedule =
+        SchedulesSettings.ReferenceSystemPartsSchedule =
             _revitRepository.AllScheduleViews.FirstOrDefault(sch =>
                 sch.Name.Equals(SchedulesSettings.SystemPartsScheduleName));
-        ReferenceScheduleSettings.ReferenceIfcPartsSchedule =
+        SchedulesSettings.ReferenceIfcPartsSchedule =
             _revitRepository.AllScheduleViews.FirstOrDefault(sch =>
                 sch.Name.Equals(SchedulesSettings.IfcPartsScheduleName));
 
-        ReferenceScheduleSettings.ReferenceSkeletonSchedule =
+        SchedulesSettings.ReferenceSkeletonSchedule =
             _revitRepository.AllScheduleViews.FirstOrDefault(sch =>
                 sch.Name.Equals(SchedulesSettings.SkeletonScheduleName));
-        ReferenceScheduleSettings.ReferenceSkeletonByElemsSchedule =
+        SchedulesSettings.ReferenceSkeletonByElemsSchedule =
             _revitRepository.AllScheduleViews.FirstOrDefault(sch =>
                 sch.Name.Equals(SchedulesSettings.SkeletonByElemsScheduleName));
     }

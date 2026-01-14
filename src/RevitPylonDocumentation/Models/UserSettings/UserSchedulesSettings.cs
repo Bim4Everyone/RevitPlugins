@@ -1,3 +1,5 @@
+using Autodesk.Revit.DB;
+
 namespace RevitPylonDocumentation.Models.UserSettings;
 internal class UserSchedulesSettings {
     public string MaterialSchedulePrefix { get; set; }
@@ -25,4 +27,29 @@ internal class UserSchedulesSettings {
     public string IfcPartsScheduleDisp2 { get; set; }
     public string SkeletonScheduleDisp2 { get; set; }
     public string SkeletonByElemsScheduleDisp2 { get; set; }
+
+    /// <summary>
+    /// Эталонная спецификация материалов
+    /// </summary>
+    public ViewSchedule ReferenceMaterialSchedule { get; set; }
+
+    /// <summary>
+    /// Эталонная ведомость деталей для системной арматуры
+    /// </summary>
+    public ViewSchedule ReferenceSystemPartsSchedule { get; set; }
+
+    /// <summary>
+    /// Эталонная ведомость деталей для IFC арматуры
+    /// </summary>
+    public ViewSchedule ReferenceIfcPartsSchedule { get; set; }
+
+    /// <summary>
+    /// Эталонная спецификация арматуры
+    /// </summary>
+    public ViewSchedule ReferenceSkeletonSchedule { get; set; }
+
+    /// <summary>
+    /// Эталонная спецификация арматуры
+    /// </summary>
+    public ViewSchedule ReferenceSkeletonByElemsSchedule { get; set; }
 }

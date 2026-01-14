@@ -12,7 +12,6 @@ public class PylonViewScheduleCreator {
         ProjectSettings = settings.ProjectSettings;
         SchedulesSettings = settings.SchedulesSettings;
         ScheduleFiltersSettings = settings.ScheduleFiltersSettings;
-        RefSettings = settings.ReferenceScheduleSettings;
         Doc = document;
         SheetInfo = pylonSheetInfo;
     }
@@ -20,14 +19,13 @@ public class PylonViewScheduleCreator {
     internal UserProjectSettings ProjectSettings { get; set; }
     internal UserSchedulesSettings SchedulesSettings { get; set; }
     internal UserScheduleFiltersSettings ScheduleFiltersSettings { get; set; }
-    internal UserReferenceScheduleSettings RefSettings { get; set; }
     internal Document Doc { get; set; }
     internal PylonSheetInfo SheetInfo { get; set; }
 
 
     public bool TryCreateSkeletonSchedule() {
-        if(RefSettings.ReferenceSkeletonSchedule is null
-            || !RefSettings.ReferenceSkeletonSchedule
+        if(SchedulesSettings.ReferenceSkeletonSchedule is null
+            || !SchedulesSettings.ReferenceSkeletonSchedule
                     .CanViewBeDuplicated(ViewDuplicateOption.Duplicate)) {
             return false;
         }
@@ -35,7 +33,7 @@ public class PylonViewScheduleCreator {
         ElementId scheduleId = null;
         ViewSchedule viewSchedule;
         try {
-            scheduleId = RefSettings.ReferenceSkeletonSchedule.Duplicate(ViewDuplicateOption.Duplicate);
+            scheduleId = SchedulesSettings.ReferenceSkeletonSchedule.Duplicate(ViewDuplicateOption.Duplicate);
             viewSchedule = Doc.GetElement(scheduleId) as ViewSchedule;
             if(viewSchedule != null) {
                 viewSchedule.Name =
@@ -69,15 +67,15 @@ public class PylonViewScheduleCreator {
 
 
     public bool TryCreateSkeletonByElemsSchedule() {
-        if(RefSettings.ReferenceSkeletonByElemsSchedule is null
-            || !RefSettings.ReferenceSkeletonByElemsSchedule.CanViewBeDuplicated(ViewDuplicateOption.Duplicate)) {
+        if(SchedulesSettings.ReferenceSkeletonByElemsSchedule is null
+            || !SchedulesSettings.ReferenceSkeletonByElemsSchedule.CanViewBeDuplicated(ViewDuplicateOption.Duplicate)) {
             return false;
         }
 
         ElementId scheduleId = null;
         ViewSchedule viewSchedule;
         try {
-            scheduleId = RefSettings.ReferenceSkeletonByElemsSchedule.Duplicate(ViewDuplicateOption.Duplicate);
+            scheduleId = SchedulesSettings.ReferenceSkeletonByElemsSchedule.Duplicate(ViewDuplicateOption.Duplicate);
             viewSchedule = Doc.GetElement(scheduleId) as ViewSchedule;
             if(viewSchedule != null) {
                 viewSchedule.Name =
@@ -111,15 +109,15 @@ public class PylonViewScheduleCreator {
 
 
     public bool TryCreateMaterialSchedule() {
-        if(RefSettings.ReferenceMaterialSchedule is null
-            || !RefSettings.ReferenceMaterialSchedule.CanViewBeDuplicated(ViewDuplicateOption.Duplicate)) {
+        if(SchedulesSettings.ReferenceMaterialSchedule is null
+            || !SchedulesSettings.ReferenceMaterialSchedule.CanViewBeDuplicated(ViewDuplicateOption.Duplicate)) {
             return false;
         }
 
         ElementId scheduleId = null;
         ViewSchedule viewSchedule;
         try {
-            scheduleId = RefSettings.ReferenceMaterialSchedule.Duplicate(ViewDuplicateOption.Duplicate);
+            scheduleId = SchedulesSettings.ReferenceMaterialSchedule.Duplicate(ViewDuplicateOption.Duplicate);
             viewSchedule = Doc.GetElement(scheduleId) as ViewSchedule;
             if(viewSchedule is null) { return false; }
 
@@ -150,15 +148,15 @@ public class PylonViewScheduleCreator {
 
 
     public bool TryCreateSystemPartsSchedule() {
-        if(RefSettings.ReferenceSystemPartsSchedule is null
-            || !RefSettings.ReferenceSystemPartsSchedule.CanViewBeDuplicated(ViewDuplicateOption.Duplicate)) {
+        if(SchedulesSettings.ReferenceSystemPartsSchedule is null
+            || !SchedulesSettings.ReferenceSystemPartsSchedule.CanViewBeDuplicated(ViewDuplicateOption.Duplicate)) {
             return false;
         }
 
         ElementId scheduleId = null;
         ViewSchedule viewSchedule;
         try {
-            scheduleId = RefSettings.ReferenceSystemPartsSchedule.Duplicate(ViewDuplicateOption.Duplicate);
+            scheduleId = SchedulesSettings.ReferenceSystemPartsSchedule.Duplicate(ViewDuplicateOption.Duplicate);
             viewSchedule = Doc.GetElement(scheduleId) as ViewSchedule;
             if(viewSchedule is null) { return false; }
 
@@ -189,15 +187,15 @@ public class PylonViewScheduleCreator {
 
 
     public bool TryCreateIfcPartsSchedule() {
-        if(RefSettings.ReferenceIfcPartsSchedule is null
-            || !RefSettings.ReferenceIfcPartsSchedule.CanViewBeDuplicated(ViewDuplicateOption.Duplicate)) {
+        if(SchedulesSettings.ReferenceIfcPartsSchedule is null
+            || !SchedulesSettings.ReferenceIfcPartsSchedule.CanViewBeDuplicated(ViewDuplicateOption.Duplicate)) {
             return false;
         }
 
         ElementId scheduleId = null;
         ViewSchedule viewSchedule;
         try {
-            scheduleId = RefSettings.ReferenceIfcPartsSchedule.Duplicate(ViewDuplicateOption.Duplicate);
+            scheduleId = SchedulesSettings.ReferenceIfcPartsSchedule.Duplicate(ViewDuplicateOption.Duplicate);
             viewSchedule = Doc.GetElement(scheduleId) as ViewSchedule;
             if(viewSchedule is null) { return false; }
 

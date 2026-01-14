@@ -2,36 +2,33 @@ using RevitPylonDocumentation.Models.UserSettings;
 
 namespace RevitPylonDocumentation.Models;
 internal class CreationSettings {
-    public CreationSettings(UserProjectSettings projectSettings,
-                            UserSheetSettings sheetSettings,
-                            UserPylonSettings pylonSettings,
-                            UserSchedulesSettings schedulesSettings,
-                            UserScheduleFiltersSettings scheduleFiltersSettings,
-                            UserSelectionSettings selectionSettings,
+    public CreationSettings(UserSelectionSettings selectionSettings,
                             UserVerticalViewSettings verticalViewSettings,
                             UserHorizontalViewSettings horizontalViewSettings,
+                            UserSchedulesSettings schedulesSettings,
+                            UserScheduleFiltersSettings scheduleFiltersSettings,
                             UserLegendsAndAnnotationsSettings legendsAndAnnotationsSettings,
-                            UserReferenceScheduleSettings referenceScheduleSettings) {
-        ProjectSettings = projectSettings;
-        SheetSettings = sheetSettings;
-        PylonSettings = pylonSettings;
-        SchedulesSettings = schedulesSettings;
-        ScheduleFiltersSettings = scheduleFiltersSettings;
+                            UserPylonSettings pylonSettings,
+                            UserProjectSettings projectSettings,
+                            UserSheetSettings sheetSettings) {
         SelectionSettings = selectionSettings;
         VerticalViewSettings = verticalViewSettings;
         HorizontalViewSettings = horizontalViewSettings;
+        SchedulesSettings = schedulesSettings;
+        ScheduleFiltersSettings = scheduleFiltersSettings;
         LegendsAndAnnotationsSettings = legendsAndAnnotationsSettings;
-        ReferenceScheduleSettings = referenceScheduleSettings;
+        PylonSettings = pylonSettings;
+        ProjectSettings = projectSettings;
+        SheetSettings = sheetSettings;
     }
 
-    public UserProjectSettings ProjectSettings { get; private set; }
-    public UserSheetSettings SheetSettings { get; private set; }
-    public UserPylonSettings PylonSettings { get; private set; }
-    public UserSchedulesSettings SchedulesSettings { get; private set; }
-    public UserScheduleFiltersSettings ScheduleFiltersSettings { get; private set; }
     public UserSelectionSettings SelectionSettings { get; private set; }
     public UserVerticalViewSettings VerticalViewSettings { get; private set; }
     public UserHorizontalViewSettings HorizontalViewSettings { get; private set; }
+    public UserSchedulesSettings SchedulesSettings { get; private set; }
+    public UserScheduleFiltersSettings ScheduleFiltersSettings { get; private set; }
     public UserLegendsAndAnnotationsSettings LegendsAndAnnotationsSettings { get; private set; }
-    public UserReferenceScheduleSettings ReferenceScheduleSettings { get; private set; }
+    public UserPylonSettings PylonSettings { get; private set; }
+    public UserProjectSettings ProjectSettings { get; private set; }
+    public UserSheetSettings SheetSettings { get; private set; }
 }

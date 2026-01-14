@@ -1,5 +1,7 @@
 using System.ComponentModel.DataAnnotations;
 
+using Autodesk.Revit.DB;
+
 using RevitPylonDocumentation.Models.UserSettings;
 
 namespace RevitPylonDocumentation.ViewModels.UserSettings;
@@ -262,6 +264,30 @@ internal class UserSchedulesSettingsPageVM : ValidatableViewModel {
         }
     }
 
+    /// <summary>
+    /// Эталонная спецификация материалов
+    /// </summary>
+    public ViewSchedule ReferenceMaterialSchedule { get; set; }
+
+    /// <summary>
+    /// Эталонная ведомость деталей для системной арматуры
+    /// </summary>
+    public ViewSchedule ReferenceSystemPartsSchedule { get; set; }
+
+    /// <summary>
+    /// Эталонная ведомость деталей для IFC арматуры
+    /// </summary>
+    public ViewSchedule ReferenceIfcPartsSchedule { get; set; }
+
+    /// <summary>
+    /// Эталонная спецификация арматуры
+    /// </summary>
+    public ViewSchedule ReferenceSkeletonSchedule { get; set; }
+
+    /// <summary>
+    /// Эталонная спецификация арматуры
+    /// </summary>
+    public ViewSchedule ReferenceSkeletonByElemsSchedule { get; set; }
 
     public void ApplySchedulesSettings() {
         MaterialSchedulePrefix = MaterialSchedulePrefixTemp;
