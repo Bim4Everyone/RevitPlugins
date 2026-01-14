@@ -57,7 +57,6 @@ internal class MainViewModel : BaseViewModel {
         PylonSettings = new UserPylonSettingsVM(this, _revitRepository, _localizationService);
         ProjectSettings = new UserProjectSettingsVM(this, _revitRepository, _localizationService);
         SheetSettings = new UserSheetSettingsVM(this, _revitRepository, _localizationService);
-        TypesSettings = new UserTypesSettingsVM(this);
         ReferenceScheduleSettings = new UserReferenceScheduleSettingsVM(this);
 
         ViewFamilyTypes = _revitRepository.ViewFamilyTypes;
@@ -155,11 +154,6 @@ internal class MainViewModel : BaseViewModel {
     /// Настройки параметров и правил создания легенд и типовых аннотаций с предыдущего сеанса
     /// </summary>
     public UserLegendsAndAnnotationsSettingsVM LegendsAndAnnotationsSettings { get; set; }
-
-    /// <summary>
-    /// Настройки выбранных типоразмеров (не сохраняют с предыдущего сеанса, а получаются в текущем)
-    /// </summary>
-    public UserTypesSettingsVM TypesSettings { get; set; }
 
     /// <summary>
     /// Настройки выбранных эталонных спецификаций для копирования
@@ -475,47 +469,47 @@ internal class MainViewModel : BaseViewModel {
             return;
         }
 
-        if(TypesSettings.SelectedDimensionType is null) {
+        if(ProjectSettings.SelectedDimensionType is null) {
             ErrorText = _localizationService.GetLocalizedString("VM.DimensionTypeNotSelected");
             return;
         }
 
-        if(TypesSettings.SelectedSpotDimensionType is null) {
+        if(ProjectSettings.SelectedSpotDimensionType is null) {
             ErrorText = _localizationService.GetLocalizedString("VM.SpotDimensionTypeNotSelected");
             return;
         }
 
-        if(TypesSettings.SelectedSkeletonTagType is null) {
+        if(ProjectSettings.SelectedSkeletonTagType is null) {
             ErrorText = _localizationService.GetLocalizedString("VM.SkeletonTagTypeNotSelected");
             return;
         }
 
-        if(TypesSettings.SelectedRebarTagTypeWithSerif is null) {
+        if(ProjectSettings.SelectedRebarTagTypeWithSerif is null) {
             ErrorText = _localizationService.GetLocalizedString("VM.RebarTagWithSerifTypeNotSelected");
             return;
         }
 
-        if(TypesSettings.SelectedRebarTagTypeWithStep is null) {
+        if(ProjectSettings.SelectedRebarTagTypeWithStep is null) {
             ErrorText = _localizationService.GetLocalizedString("VM.RebarTagWithoutSerifTypeNotSelected");
             return;
         }
 
-        if(TypesSettings.SelectedRebarTagTypeWithComment is null) {
+        if(ProjectSettings.SelectedRebarTagTypeWithComment is null) {
             ErrorText = _localizationService.GetLocalizedString("VM.RebarTagWithCommentTypeNotSelected");
             return;
         }
 
-        if(TypesSettings.SelectedUniversalTagType is null) {
+        if(ProjectSettings.SelectedUniversalTagType is null) {
             ErrorText = _localizationService.GetLocalizedString("VM.UniversalTagTypeNotSelected");
             return;
         }
 
-        if(TypesSettings.SelectedBreakLineType is null) {
+        if(ProjectSettings.SelectedBreakLineType is null) {
             ErrorText = _localizationService.GetLocalizedString("VM.BreakLineTypeNotSelected");
             return;
         }
 
-        if(TypesSettings.SelectedConcretingJointType is null) {
+        if(ProjectSettings.SelectedConcretingJointType is null) {
             ErrorText = _localizationService.GetLocalizedString("VM.ConcretingJointTypeNotSelected");
             return;
         }
@@ -553,7 +547,6 @@ internal class MainViewModel : BaseViewModel {
             VerticalViewSettings.GetSettings(),
             HorizontalViewSettings.GetSettings(),
             LegendsAndAnnotationsSettings.GetSettings(),
-            TypesSettings.GetSettings(),
             ReferenceScheduleSettings.GetSettings());
 
         var paramValService = new ParamValueService(_revitRepository);
@@ -656,7 +649,7 @@ internal class MainViewModel : BaseViewModel {
     /// </summary>
     public void FindDimensionType() {
         if(!String.IsNullOrEmpty(ProjectSettings.DimensionTypeName)) {
-            TypesSettings.SelectedDimensionType = DimensionTypes
+            ProjectSettings.SelectedDimensionType = DimensionTypes
                 .FirstOrDefault(familyType => familyType.Name.Equals(ProjectSettings.DimensionTypeName));
         }
     }
@@ -666,7 +659,7 @@ internal class MainViewModel : BaseViewModel {
     /// </summary>
     public void FindSpotDimensionType() {
         if(!String.IsNullOrEmpty(ProjectSettings.SpotDimensionTypeName)) {
-            TypesSettings.SelectedSpotDimensionType = SpotDimensionTypes
+            ProjectSettings.SelectedSpotDimensionType = SpotDimensionTypes
                 .FirstOrDefault(familyType => familyType.Name.Equals(ProjectSettings.SpotDimensionTypeName));
         }
     }
@@ -676,7 +669,7 @@ internal class MainViewModel : BaseViewModel {
     /// </summary>
     public void FindSkeletonTagType() {
         if(!String.IsNullOrEmpty(ProjectSettings.SkeletonTagTypeName)) {
-            TypesSettings.SelectedSkeletonTagType = RebarTagTypes
+            ProjectSettings.SelectedSkeletonTagType = RebarTagTypes
                 .FirstOrDefault(familyType => familyType.Name.Equals(ProjectSettings.SkeletonTagTypeName));
         }
     }
@@ -686,7 +679,7 @@ internal class MainViewModel : BaseViewModel {
     /// </summary>
     public void FindRebarTagTypeWithSerif() {
         if(!String.IsNullOrEmpty(ProjectSettings.RebarTagTypeWithSerifName)) {
-            TypesSettings.SelectedRebarTagTypeWithSerif = RebarTagTypes
+            ProjectSettings.SelectedRebarTagTypeWithSerif = RebarTagTypes
                 .FirstOrDefault(familyType => familyType.Name.Equals(ProjectSettings.RebarTagTypeWithSerifName));
         }
     }
@@ -696,7 +689,7 @@ internal class MainViewModel : BaseViewModel {
     /// </summary>
     public void FindRebarTagTypeWithStep() {
         if(!String.IsNullOrEmpty(ProjectSettings.RebarTagTypeWithStepName)) {
-            TypesSettings.SelectedRebarTagTypeWithStep = RebarTagTypes
+            ProjectSettings.SelectedRebarTagTypeWithStep = RebarTagTypes
                 .FirstOrDefault(familyType => familyType.Name.Equals(ProjectSettings.RebarTagTypeWithStepName));
         }
     }
@@ -706,7 +699,7 @@ internal class MainViewModel : BaseViewModel {
     /// </summary>
     public void FindRebarTagTypeWithComment() {
         if(!String.IsNullOrEmpty(ProjectSettings.RebarTagTypeWithCommentName)) {
-            TypesSettings.SelectedRebarTagTypeWithComment = RebarTagTypes
+            ProjectSettings.SelectedRebarTagTypeWithComment = RebarTagTypes
                 .FirstOrDefault(familyType => familyType.Name.Equals(ProjectSettings.RebarTagTypeWithCommentName));
         }
     }
@@ -716,7 +709,7 @@ internal class MainViewModel : BaseViewModel {
     /// </summary>
     public void FindUniversalTagType() {
         if(!String.IsNullOrEmpty(ProjectSettings.UniversalTagTypeName)) {
-            TypesSettings.SelectedUniversalTagType = TypicalAnnotationsTypes
+            ProjectSettings.SelectedUniversalTagType = TypicalAnnotationsTypes
                 .FirstOrDefault(familyType => familyType.Name.Equals(ProjectSettings.UniversalTagTypeName));
         }
     }
@@ -726,7 +719,7 @@ internal class MainViewModel : BaseViewModel {
     /// </summary>
     public void FindBreakLineType() {
         if(!String.IsNullOrEmpty(ProjectSettings.BreakLineTypeName)) {
-            TypesSettings.SelectedBreakLineType = DetailComponentsTypes
+            ProjectSettings.SelectedBreakLineType = DetailComponentsTypes
                 .FirstOrDefault(familyType => familyType.Name.Equals(ProjectSettings.BreakLineTypeName));
         }
     }
@@ -736,7 +729,7 @@ internal class MainViewModel : BaseViewModel {
     /// </summary>
     public void FindConcretingJointType() {
         if(!String.IsNullOrEmpty(ProjectSettings.ConcretingJointTypeName)) {
-            TypesSettings.SelectedConcretingJointType = DetailComponentsTypes
+            ProjectSettings.SelectedConcretingJointType = DetailComponentsTypes
                 .FirstOrDefault(familyType => familyType.Name.Equals(ProjectSettings.ConcretingJointTypeName));
         }
     }

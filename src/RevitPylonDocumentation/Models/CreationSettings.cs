@@ -11,7 +11,6 @@ internal class CreationSettings {
                             UserVerticalViewSettings verticalViewSettings,
                             UserHorizontalViewSettings horizontalViewSettings,
                             UserLegendsAndAnnotationsSettings legendsAndAnnotationsSettings,
-                            UserTypesSettings typesSettings,
                             UserReferenceScheduleSettings referenceScheduleSettings) {
         ProjectSettings = projectSettings;
         SheetSettings = sheetSettings;
@@ -22,7 +21,6 @@ internal class CreationSettings {
         VerticalViewSettings = verticalViewSettings;
         HorizontalViewSettings = horizontalViewSettings;
         LegendsAndAnnotationsSettings = legendsAndAnnotationsSettings;
-        TypesSettings = typesSettings;
         ReferenceScheduleSettings = referenceScheduleSettings;
     }
 
@@ -35,6 +33,5 @@ internal class CreationSettings {
     public UserVerticalViewSettings VerticalViewSettings { get; private set; }
     public UserHorizontalViewSettings HorizontalViewSettings { get; private set; }
     public UserLegendsAndAnnotationsSettings LegendsAndAnnotationsSettings { get; private set; }
-    public UserTypesSettings TypesSettings { get; private set; }
     public UserReferenceScheduleSettings ReferenceScheduleSettings { get; private set; }
 }

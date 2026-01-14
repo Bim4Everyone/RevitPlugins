@@ -9,14 +9,14 @@ public class PylonViewSectionCreator {
     internal PylonViewSectionCreator(CreationSettings settings, Document document, PylonSheetInfo pylonSheetInfo) {
         VerticalSectionSettings = settings.VerticalViewSettings;
         HorizontalSectionSettings = settings.HorizontalViewSettings;
-        TypesSettings = settings.TypesSettings;
+        ProjectTypesSettings = settings.ProjectSettings;
         Doc = document;
         SheetInfo = pylonSheetInfo;
     }
 
     internal UserVerticalViewSettings VerticalSectionSettings { get; set; }
     internal UserHorizontalViewSettings HorizontalSectionSettings { get; set; }
-    internal UserTypesSettings TypesSettings { get; set; }
+    internal UserProjectSettings ProjectTypesSettings { get; set; }
     internal Document Doc { get; set; }
     internal PylonSheetInfo SheetInfo { get; set; }
 

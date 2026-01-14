@@ -22,7 +22,7 @@ internal class GeneralViewMarkService {
     private readonly ViewPointsAnalyzerService _viewPointsAnalyzer;
     private readonly TagCreationService _annotationService;
 
-    internal GeneralViewMarkService(CreationSettings settings, Document document, PylonSheetInfo pylonSheetInfo, 
+    internal GeneralViewMarkService(CreationSettings settings, Document document, PylonSheetInfo pylonSheetInfo,
                                     PylonView pylonView, DimensionBaseService dimensionBaseService) {
         _doc = document;
         _sheetInfo = pylonSheetInfo;
@@ -33,17 +33,17 @@ internal class GeneralViewMarkService {
         _annotationService = new TagCreationService(_viewOfPylon);
 
         // Находим типоразмер марки несущей арматуры для обозначения марки изделия
-        _tagSkeletonSymbol = settings.TypesSettings.SelectedSkeletonTagType;
+        _tagSkeletonSymbol = settings.ProjectSettings.SelectedSkeletonTagType;
 
         // Находим типоразмер марки несущей арматуры для обозначения позиции, диаметра и комментариев арматуры
         // Находим типоразмер типовой аннотации для метки ГОСТа сварки
-        _universalTagType = settings.TypesSettings.SelectedUniversalTagType;
+        _universalTagType = settings.ProjectSettings.SelectedUniversalTagType;
 
         // Находим типоразмер аннотации рабочего шва бетонирования
-        _concretingSeamSymbol = settings.TypesSettings.SelectedConcretingJointType;
+        _concretingSeamSymbol = settings.ProjectSettings.SelectedConcretingJointType;
 
         // Находим типоразмер аннотации высотной отметки
-        _spotDimensionType = settings.TypesSettings.SelectedSpotDimensionType;
+        _spotDimensionType = settings.ProjectSettings.SelectedSpotDimensionType;
     }
 
     /// <summary>
@@ -54,7 +54,7 @@ internal class GeneralViewMarkService {
     /// <param name="dimensionBaseService">Сервис по анализу основ размеров</param>
     internal void TryCreatePylonElevMark(List<Element> hostElems) {
         try {
-            var location = _dimensionBaseService.GetDimensionLine(hostElems.First() as FamilyInstance, 
+            var location = _dimensionBaseService.GetDimensionLine(hostElems.First() as FamilyInstance,
                                                                   DirectionType.Left, 2).Origin;
             foreach(var item in hostElems) {
                 if(item is not FamilyInstance hostElem) { return; }
@@ -133,10 +133,10 @@ internal class GeneralViewMarkService {
             // Если в пилоне есть семейство при помощи которого армируются пилоны паркинга, то выпусков снизу не будет
             // А это значит, что и данная марка не нужна
             if(_sheetInfo.RebarInfo.SkeletonParentRebarForParking) { return; }
-            
+
             var view = _viewOfPylon.ViewElement;
             // Определяем отступ от пилона по горизонтали
-            double horizOriginOffset = isForPerpView 
+            double horizOriginOffset = isForPerpView
                                             ? _sheetInfo.ElemsInfo.HostWidth * 0.5
                                             : _sheetInfo.ElemsInfo.HostLength * 0.5;
             var origin = _sheetInfo.ElemsInfo.HostOrigin;
@@ -150,8 +150,8 @@ internal class GeneralViewMarkService {
             var annotPoint = _viewPointsAnalyzer.GetPointByDirection(pylonRightMinPoint, DirectionType.RightBottom,
                                                                      1.8, 1.1);
             // Создаем типовую аннотацию для обозначения ГОСТа
-            var tagOption = new TagOption() { 
-                BodyPoint = annotPoint, 
+            var tagOption = new TagOption() {
+                BodyPoint = annotPoint,
                 TagSymbol = _universalTagType,
                 TagLength = UnitUtilsHelper.ConvertToInternalValue(40),
                 TopText = "Арматурные выпуски",

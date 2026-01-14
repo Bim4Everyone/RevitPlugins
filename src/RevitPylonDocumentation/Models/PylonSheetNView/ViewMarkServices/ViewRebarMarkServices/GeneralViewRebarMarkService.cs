@@ -32,7 +32,7 @@ internal class GeneralViewRebarMarkService {
 
         // Находим типоразмер марки несущей арматуры для обозначения позиции, диаметра и комментариев арматуры
         // Без засечки на конце
-        _tagSymbolWithStep = _settings.TypesSettings.SelectedRebarTagTypeWithStep;
+        _tagSymbolWithStep = _settings.ProjectSettings.SelectedRebarTagTypeWithStep;
     }
 
 

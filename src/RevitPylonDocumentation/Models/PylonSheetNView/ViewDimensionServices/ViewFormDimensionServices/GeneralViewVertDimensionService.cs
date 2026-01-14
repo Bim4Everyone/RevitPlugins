@@ -19,7 +19,7 @@ internal class GeneralViewVertDimensionService {
 
     internal GeneralViewVertDimensionService(CreationSettings settings, Document document, PylonSheetInfo pylonSheetInfo,
                                              PylonView pylonView, DimensionBaseService dimensionBaseService) {
-        _selectedDimensionType = settings.TypesSettings.SelectedDimensionType;
+        _selectedDimensionType = settings.ProjectSettings.SelectedDimensionType;
         _doc = document;
         _sheetInfo = pylonSheetInfo;
         _viewOfPylon = pylonView;
@@ -32,7 +32,7 @@ internal class GeneralViewVertDimensionService {
     /// <summary>
     /// Вертикальный размер для вертикального вида по опалубка + армирование
     /// </summary>
-    private Dimension TryCreateDimsForFormNRebar(FamilyInstance skeletonParentRebar, ReferenceArray refArrayFormwork, 
+    private Dimension TryCreateDimsForFormNRebar(FamilyInstance skeletonParentRebar, ReferenceArray refArrayFormwork,
                                                  string side) {
         Dimension dimension = null;
         try {
@@ -95,14 +95,14 @@ internal class GeneralViewVertDimensionService {
     /// <summary>
     /// Вертикальный размер для вертикального вида по опалубке
     /// </summary>
-    private void TryCreatePylonDimensions(FamilyInstance skeletonParentRebar, double formworkDimensionLineOffset, 
+    private void TryCreatePylonDimensions(FamilyInstance skeletonParentRebar, double formworkDimensionLineOffset,
                                            ReferenceArray refArrayFormwork) {
         try {
             var dimensionLineBottomThird = _dimensionBaseService.GetDimensionLine(skeletonParentRebar,
                                                                                   DirectionType.Bottom,
                                                                                   formworkDimensionLineOffset);
-            _doc.Create.NewDimension(_viewOfPylon.ViewElement, 
-                                                     dimensionLineBottomThird, 
+            _doc.Create.NewDimension(_viewOfPylon.ViewElement,
+                                                     dimensionLineBottomThird,
                                                      refArrayFormwork,
                                                      _selectedDimensionType);
         } catch(Exception) { }

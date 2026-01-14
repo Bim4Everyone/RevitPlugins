@@ -1,15 +1,16 @@
+using System.ComponentModel.DataAnnotations;
 using System.Linq;
 
+using Autodesk.Revit.DB;
+
 using dosymep.SimpleServices;
-using dosymep.WPF.ViewModels;
 
 using RevitPylonDocumentation.Models;
 using RevitPylonDocumentation.Models.UserSettings;
 
 namespace RevitPylonDocumentation.ViewModels.UserSettings;
-internal class UserProjectSettingsVM : BaseViewModel {
+internal class UserProjectSettingsVM : ValidatableViewModel {
     private readonly ILocalizationService _localizationService;
-
 
     private string _dispatcherGroupingFirstTemp = "_Группа видов 1";
     private string _dispatcherGroupingSecondTemp = "_Группа видов 2";
@@ -26,11 +27,24 @@ internal class UserProjectSettingsVM : BaseViewModel {
     private string _breakLineTypeNameTemp = "Линейный обрыв";
     private string _concretingJointTypeNameTemp = "3 мм_М 20";
 
+    private DimensionType _selectedDimensionType;
+    private FamilySymbol _selectedSkeletonTagType;
+    private FamilySymbol _selectedRebarTagTypeWithSerif;
+    private FamilySymbol _selectedRebarTagTypeWithStep;
+    private FamilySymbol _selectedRebarTagTypeWithComment;
+    private FamilySymbol _selectedUniversalTagType;
+
+    private FamilySymbol _selectedBreakLineType;
+    private FamilySymbol _selectedConcretingJointType;
+
+    private SpotDimensionType _selectedSpotDimensionType;
+
     public UserProjectSettingsVM(MainViewModel mainViewModel, RevitRepository repository,
                                  ILocalizationService localizationService) {
         ViewModel = mainViewModel;
         Repository = repository;
         _localizationService = localizationService;
+        ValidateAllProperties();
     }
 
     public MainViewModel ViewModel { get; set; }
@@ -38,14 +52,24 @@ internal class UserProjectSettingsVM : BaseViewModel {
 
 
     public string DispatcherGroupingFirst { get; set; }
+    [Required]
+    [RegularExpression(@"^[^\\\/:*?""<>|\[\]\{\};~]+$")]
     public string DispatcherGroupingFirstTemp {
         get => _dispatcherGroupingFirstTemp;
-        set => RaiseAndSetIfChanged(ref _dispatcherGroupingFirstTemp, value);
+        set {
+            RaiseAndSetIfChanged(ref _dispatcherGroupingFirstTemp, value);
+            ValidateProperty(value);
+        }
     }
     public string DispatcherGroupingSecond { get; set; }
+    [Required]
+    [RegularExpression(@"^[^\\\/:*?""<>|\[\]\{\};~]+$")]
     public string DispatcherGroupingSecondTemp {
         get => _dispatcherGroupingSecondTemp;
-        set => RaiseAndSetIfChanged(ref _dispatcherGroupingSecondTemp, value);
+        set {
+            RaiseAndSetIfChanged(ref _dispatcherGroupingSecondTemp, value);
+            ValidateProperty(value);
+        }
     }
 
     public string DimensionTypeName { get; set; }
@@ -101,6 +125,124 @@ internal class UserProjectSettingsVM : BaseViewModel {
         get => _concretingJointTypeNameTemp;
         set => RaiseAndSetIfChanged(ref _concretingJointTypeNameTemp, value);
     }
+
+    /// <summary>
+    /// Выбранный пользователем типоразмер высотной отметки
+    /// </summary>
+    [Required]
+    public DimensionType SelectedDimensionType {
+        get => _selectedDimensionType;
+        set {
+            RaiseAndSetIfChanged(ref _selectedDimensionType, value);
+            ViewModel.ProjectSettings.DimensionTypeNameTemp = value?.Name;
+            ValidateProperty(value);
+        }
+    }
+
+    /// <summary>
+    /// Выбранный пользователем типоразмер марки для обозначения каркаса
+    /// </summary>
+    [Required]
+    public FamilySymbol SelectedSkeletonTagType {
+        get => _selectedSkeletonTagType;
+        set {
+            RaiseAndSetIfChanged(ref _selectedSkeletonTagType, value);
+            ViewModel.ProjectSettings.SkeletonTagTypeNameTemp = value?.Name;
+            ValidateProperty(value);
+        }
+    }
+
+    /// <summary>
+    /// Выбранный пользователем типоразмер марки арматуры с засечкой
+    /// </summary>
+    [Required]
+    public FamilySymbol SelectedRebarTagTypeWithSerif {
+        get => _selectedRebarTagTypeWithSerif;
+        set {
+            RaiseAndSetIfChanged(ref _selectedRebarTagTypeWithSerif, value);
+            ViewModel.ProjectSettings.RebarTagTypeWithSerifNameTemp = value?.Name;
+            ValidateProperty(value);
+        }
+    }
+
+    /// <summary>
+    /// Выбранный пользователем типоразмер марки арматуры с шагом
+    /// </summary>
+    [Required]
+    public FamilySymbol SelectedRebarTagTypeWithStep {
+        get => _selectedRebarTagTypeWithStep;
+        set {
+            RaiseAndSetIfChanged(ref _selectedRebarTagTypeWithStep, value);
+            ViewModel.ProjectSettings.RebarTagTypeWithStepNameTemp = value?.Name;
+            ValidateProperty(value);
+        }
+    }
+
+    /// <summary>
+    /// Выбранный пользователем типоразмер марки арматуры с количеством
+    /// </summary>
+    [Required]
+    public FamilySymbol SelectedRebarTagTypeWithComment {
+        get => _selectedRebarTagTypeWithComment;
+        set {
+            RaiseAndSetIfChanged(ref _selectedRebarTagTypeWithComment, value);
+            ViewModel.ProjectSettings.RebarTagTypeWithCommentNameTemp = value?.Name;
+            ValidateProperty(value);
+        }
+    }
+
+    /// <summary>
+    /// Выбранный пользователем типоразмер аннотации рабочего шва бетонирования
+    /// </summary>
+    [Required]
+    public FamilySymbol SelectedUniversalTagType {
+        get => _selectedUniversalTagType;
+        set {
+            RaiseAndSetIfChanged(ref _selectedUniversalTagType, value);
+            ViewModel.ProjectSettings.UniversalTagTypeNameTemp = value?.Name;
+            ValidateProperty(value);
+        }
+    }
+
+    /// <summary>
+    /// Выбранный пользователем типоразмер марки арматуры с количеством
+    /// </summary>
+    [Required]
+    public FamilySymbol SelectedBreakLineType {
+        get => _selectedBreakLineType;
+        set {
+            RaiseAndSetIfChanged(ref _selectedBreakLineType, value);
+            ViewModel.ProjectSettings.BreakLineTypeNameTemp = value?.Name;
+            ValidateProperty(value);
+        }
+    }
+
+    /// <summary>
+    /// Выбранный пользователем типоразмер аннотации рабочего шва бетонирования
+    /// </summary>
+    [Required]
+    public FamilySymbol SelectedConcretingJointType {
+        get => _selectedConcretingJointType;
+        set {
+            RaiseAndSetIfChanged(ref _selectedConcretingJointType, value);
+            ViewModel.ProjectSettings.ConcretingJointTypeNameTemp = value?.Name;
+            ValidateProperty(value);
+        }
+    }
+
+    /// <summary>
+    /// Выбранный пользователем типоразмер высотной отметки
+    /// </summary>
+    [Required]
+    public SpotDimensionType SelectedSpotDimensionType {
+        get => _selectedSpotDimensionType;
+        set {
+            RaiseAndSetIfChanged(ref _selectedSpotDimensionType, value);
+            ViewModel.ProjectSettings.SpotDimensionTypeNameTemp = value?.Name;
+            ValidateProperty(value);
+        }
+    }
+
 
     public void ApplyProjectSettings() {
         DispatcherGroupingFirst = DispatcherGroupingFirstTemp;

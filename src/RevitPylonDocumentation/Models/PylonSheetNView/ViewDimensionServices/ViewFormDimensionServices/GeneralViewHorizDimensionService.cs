@@ -20,11 +20,11 @@ internal class GeneralViewHorizDimensionService {
     private readonly DimensionSegmentsService _dimSegmentsService;
     private readonly FloorAnalyzerService _floorAnalyzerService;
 
-    internal GeneralViewHorizDimensionService(CreationSettings settings, Document document, 
-                                              PylonSheetInfo pylonSheetInfo, PylonView pylonView, 
+    internal GeneralViewHorizDimensionService(CreationSettings settings, Document document,
+                                              PylonSheetInfo pylonSheetInfo, PylonView pylonView,
                                               DimensionBaseService dimensionBaseService) {
-        _selectedDimensionType = settings.TypesSettings.SelectedDimensionType;
-        _doc= document;
+        _selectedDimensionType = settings.ProjectSettings.SelectedDimensionType;
+        _doc = document;
         _sheetInfo = pylonSheetInfo;
         _viewOfPylon = pylonView;
 
@@ -57,7 +57,7 @@ internal class GeneralViewHorizDimensionService {
                 if(item is not FamilyInstance hostElem) { return; }
                 // Собираем опорные плоскости по опалубке, например:
                 // #_1_горизонт_край_низ
-                refArray = _dimensionBaseService.GetDimensionRefs(hostElem, ["горизонт", "край", "низ"], 
+                refArray = _dimensionBaseService.GetDimensionRefs(hostElem, ["горизонт", "край", "низ"],
                                                                   oldRefArray: refArray);
             }
             if(refArray != default) {
@@ -107,7 +107,7 @@ internal class GeneralViewHorizDimensionService {
                                          ? DirectionType.Right : DirectionType.Left;
             // Определяем размерную линию
             var dimensionLineLeft = _dimensionBaseService.GetDimensionLine(_sheetInfo.HostElems.First() as FamilyInstance,
-                                                                           dimensionLineDirection, 
+                                                                           dimensionLineDirection,
                                                                            1.1);
             // #1_горизонт_выпуск
             var refArray = _dimensionBaseService.GetDimensionRefs(rebar, ["горизонт", "выпуск"]);
@@ -128,8 +128,8 @@ internal class GeneralViewHorizDimensionService {
             ReferenceArray refArray = null;
             // #_1_горизонт_край_низ, #_1_горизонт_край_верх
             foreach(var host in _sheetInfo.HostElems) {
-                refArray = _dimensionBaseService.GetDimensionRefs(host as FamilyInstance, 
-                                                                  ["горизонт", "край"], 
+                refArray = _dimensionBaseService.GetDimensionRefs(host as FamilyInstance,
+                                                                  ["горизонт", "край"],
                                                                   oldRefArray: refArray);
             }
 
@@ -137,7 +137,7 @@ internal class GeneralViewHorizDimensionService {
             var textOffset = _dimSegmentsService.HorizSmallUpDirectDimTextOffset;
             var textOffsetInverted = _dimSegmentsService.HorizSmallUpInvertedDimTextOffset;
             // Если этот размер для перпендикулярного вида и Гэшка только справа, то размер нужно ставить слева
-            if(isForPerpView && !_sheetInfo.RebarInfo.AllRebarAreL 
+            if(isForPerpView && !_sheetInfo.RebarInfo.AllRebarAreL
                              && _sheetInfo.RebarInfo.HasLRebar
                              && _sheetInfo.RebarFinder.DirectionHasLRebar(_viewOfPylon.ViewElement,
                                                                           _sheetInfo.ProjectSection,
@@ -165,34 +165,34 @@ internal class GeneralViewHorizDimensionService {
                 // мод_ФОП_Доборный 1#2_горизонт_доборные_низ
                 // мод_ФОП_Доборный 1/мод_ФОП_Доборный 1_Массив#1_горизонт_доборные_низ_край
                 if(additionalFirst && additionalFirstArray) {
-                    refArray = _dimensionBaseService.GetDimensionRefs(clampsParentRebar, 
+                    refArray = _dimensionBaseService.GetDimensionRefs(clampsParentRebar,
                                                                       ["горизонт", "доборные", "низ", "край"],
                                                                       oldRefArray: refArray);
                 } else if(additionalFirst) {
-                    refArray = _dimensionBaseService.GetDimensionRefs(clampsParentRebar, 
-                                                                      ["горизонт", "доборные", "низ"], 
+                    refArray = _dimensionBaseService.GetDimensionRefs(clampsParentRebar,
+                                                                      ["горизонт", "доборные", "низ"],
                                                                       ["край"],
                                                                       oldRefArray: refArray);
                 } else {
-                    refArray = _dimensionBaseService.GetDimensionRefs(clampsParentRebar, 
+                    refArray = _dimensionBaseService.GetDimensionRefs(clampsParentRebar,
                                                                       ["горизонт", "низ"],
-                                                                      ["доборные", "край"], 
+                                                                      ["доборные", "край"],
                                                                       oldRefArray: refArray);
                 }
 
                 if(additionalSecond && additionalSecondArray) {
-                    refArray = _dimensionBaseService.GetDimensionRefs(clampsParentRebar, 
+                    refArray = _dimensionBaseService.GetDimensionRefs(clampsParentRebar,
                                                                       ["горизонт", "доборные", "верх", "край"],
                                                                       oldRefArray: refArray);
                 } else if(additionalSecond) {
-                    refArray = _dimensionBaseService.GetDimensionRefs(clampsParentRebar, 
-                                                                      ["горизонт", "доборные", "верх"], 
+                    refArray = _dimensionBaseService.GetDimensionRefs(clampsParentRebar,
+                                                                      ["горизонт", "доборные", "верх"],
                                                                       ["край"],
                                                                       oldRefArray: refArray);
                 } else {
-                    refArray = _dimensionBaseService.GetDimensionRefs(clampsParentRebar, 
+                    refArray = _dimensionBaseService.GetDimensionRefs(clampsParentRebar,
                                                                       ["горизонт", "верх"],
-                                                                      ["доборные", "край"], 
+                                                                      ["доборные", "край"],
                                                                       oldRefArray: refArray);
                 }
                 // Добавляем запись про размер низ пилона - низ хомутов

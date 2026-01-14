@@ -21,7 +21,7 @@ internal class GeneralViewBreakLineMarkService {
     private readonly double _breakLinesOffsetY = 0.3;
     private readonly double _breakLinesOffsetYBottom = 1;
 
-    internal GeneralViewBreakLineMarkService(CreationSettings settings, Document document, 
+    internal GeneralViewBreakLineMarkService(CreationSettings settings, Document document,
                                              PylonSheetInfo pylonSheetInfo, PylonView pylonView) {
         _doc = document;
         _sheetInfo = pylonSheetInfo;
@@ -39,7 +39,7 @@ internal class GeneralViewBreakLineMarkService {
             _breakLinesOffsetYBottom);
 
         _breakLineParameterService = new BreakLineParameterService();
-        _breakLineSymbol = settings.TypesSettings.SelectedBreakLineType;
+        _breakLineSymbol = settings.ProjectSettings.SelectedBreakLineType;
     }
 
 
@@ -121,7 +121,7 @@ internal class GeneralViewBreakLineMarkService {
         if(_breakLineSymbol is null) {
             throw new InvalidOperationException("Символ линии обрыва не задан.");
         }
-        
+
         foreach(var line in lines) {
             try {
                 var breakLine = _doc.Create.NewFamilyInstance(line, _breakLineSymbol, view);
