@@ -24,6 +24,8 @@ internal class ClashDetector {
                 clashes.AddRange(providerClashDetector.GetClashes());
             }
         }
+
+        clashes = clashes.Distinct().ToList();
         for(int i = 0; i < clashes.Count; i++) {
             clashes[i].Name = $"Конфликт{i + 1}";
         }
