@@ -1,11 +1,14 @@
 using System.ComponentModel.DataAnnotations;
+using System.Linq;
 
 using Autodesk.Revit.DB;
 
-using RevitPylonDocumentation.Models.UserSettings;
+using RevitPylonDocumentation.Models;
 
 namespace RevitPylonDocumentation.ViewModels.UserSettings;
 internal class UserSchedulesSettingsPageVM : ValidatableViewModel {
+    private readonly RevitRepository _revitRepository;
+
     // Префиксы и суффиксы для поиска и новых спек
     private string _materialSchedulePrefixTemp = "КЖ..._СМ_";
     private string _materialScheduleSuffixTemp = "";
@@ -38,12 +41,10 @@ internal class UserSchedulesSettingsPageVM : ValidatableViewModel {
     private string _skeletonByElemsScheduleDisp2Temp = "СА_Пилоны";
 
 
-    public UserSchedulesSettingsPageVM(MainViewModel mainViewModel) {
-        ViewModel = mainViewModel;
+    public UserSchedulesSettingsPageVM(RevitRepository repository) {
+        _revitRepository = repository;
         ValidateAllProperties();
     }
-
-    public MainViewModel ViewModel { get; set; }
 
     public string MaterialSchedulePrefix { get; set; }
     public string MaterialSchedulePrefixTemp {
@@ -289,52 +290,19 @@ internal class UserSchedulesSettingsPageVM : ValidatableViewModel {
     /// </summary>
     public ViewSchedule ReferenceSkeletonByElemsSchedule { get; set; }
 
-    public void ApplySchedulesSettings() {
-        MaterialSchedulePrefix = MaterialSchedulePrefixTemp;
-        MaterialScheduleSuffix = MaterialScheduleSuffixTemp;
-
-        SystemPartsSchedulePrefix = SystemPartsSchedulePrefixTemp;
-        SystemPartsScheduleSuffix = SystemPartsScheduleSuffixTemp;
-
-        IfcPartsSchedulePrefix = IfcPartsSchedulePrefixTemp;
-        IfcPartsScheduleSuffix = IfcPartsScheduleSuffixTemp;
-
-        SkeletonSchedulePrefix = SkeletonSchedulePrefixTemp;
-        SkeletonScheduleSuffix = SkeletonScheduleSuffixTemp;
-        SkeletonByElemsSchedulePrefix = SkeletonByElemsSchedulePrefixTemp;
-        SkeletonByElemsScheduleSuffix = SkeletonByElemsScheduleSuffixTemp;
-
-        MaterialScheduleName = MaterialScheduleNameTemp;
-        SystemPartsScheduleName = SystemPartsScheduleNameTemp;
-        IfcPartsScheduleName = IfcPartsScheduleNameTemp;
-        SkeletonScheduleName = SkeletonScheduleNameTemp;
-        SkeletonByElemsScheduleName = SkeletonByElemsScheduleNameTemp;
-
-        MaterialScheduleDisp1 = MaterialScheduleDisp1Temp;
-        SystemPartsScheduleDisp1 = SystemPartsScheduleDisp1Temp;
-        IfcPartsScheduleDisp1 = IfcPartsScheduleDisp1Temp;
-        SkeletonScheduleDisp1 = SkeletonScheduleDisp1Temp;
-        SkeletonByElemsScheduleDisp1 = SkeletonByElemsScheduleDisp1Temp;
-
-        MaterialScheduleDisp2 = MaterialScheduleDisp2Temp;
-        SystemPartsScheduleDisp2 = SystemPartsScheduleDisp2Temp;
-        IfcPartsScheduleDisp2 = IfcPartsScheduleDisp2Temp;
-        SkeletonScheduleDisp2 = SkeletonScheduleDisp2Temp;
-        SkeletonByElemsScheduleDisp2 = SkeletonByElemsScheduleDisp2Temp;
-    }
-
-    public UserSchedulesSettings GetSettings() {
-        var settings = new UserSchedulesSettings();
-        var vmType = this.GetType();
-        var modelType = typeof(UserSchedulesSettings);
-
-        foreach(var prop in modelType.GetProperties()) {
-            var vmProp = vmType.GetProperty(prop.Name);
-            if(vmProp != null && vmProp.CanRead && prop.CanWrite) {
-                var value = vmProp.GetValue(this);
-                prop.SetValue(settings, value);
-            }
-        }
-        return settings;
+    /// <summary>
+    /// Ищет эталонные спецификации по указанным именам. На основе эталонных спек создаются спеки для пилонов путем копирования
+    /// </summary>
+    public void FindReferenceSchedules() {
+        ReferenceMaterialSchedule = _revitRepository.AllScheduleViews.FirstOrDefault(sch =>
+            sch.Name.Equals(MaterialScheduleName));
+        ReferenceSystemPartsSchedule = _revitRepository.AllScheduleViews.FirstOrDefault(sch =>
+            sch.Name.Equals(SystemPartsScheduleName));
+        ReferenceIfcPartsSchedule = _revitRepository.AllScheduleViews.FirstOrDefault(sch =>
+            sch.Name.Equals(IfcPartsScheduleName));
+        ReferenceSkeletonSchedule = _revitRepository.AllScheduleViews.FirstOrDefault(sch =>
+            sch.Name.Equals(SkeletonScheduleName));
+        ReferenceSkeletonByElemsSchedule = _revitRepository.AllScheduleViews.FirstOrDefault(sch =>
+            sch.Name.Equals(SkeletonByElemsScheduleName));
     }
 }

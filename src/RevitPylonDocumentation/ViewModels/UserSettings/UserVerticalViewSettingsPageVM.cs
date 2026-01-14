@@ -1,14 +1,15 @@
+using System;
 using System.ComponentModel.DataAnnotations;
+using System.Linq;
 
 using Autodesk.Revit.DB;
 
 using dosymep.SimpleServices;
 
-using RevitPylonDocumentation.Models.UserSettings;
-
 namespace RevitPylonDocumentation.ViewModels.UserSettings;
 
 internal class UserVerticalViewSettingsPageVM : ValidatableViewModel {
+    private readonly MainViewModel _viewModel;
     private readonly ILocalizationService _localizationService;
 
     private string _generalViewPrefixTemp = "";
@@ -39,12 +40,11 @@ internal class UserVerticalViewSettingsPageVM : ValidatableViewModel {
 
 
     public UserVerticalViewSettingsPageVM(MainViewModel mainViewModel, ILocalizationService localizationService) {
-        ViewModel = mainViewModel;
+        _viewModel = mainViewModel;
         _localizationService = localizationService;
         ValidateAllProperties();
     }
 
-    public MainViewModel ViewModel { get; set; }
 
     public string GeneralViewPrefix { get; set; }
     public string GeneralViewPrefixTemp {
@@ -217,62 +217,74 @@ internal class UserVerticalViewSettingsPageVM : ValidatableViewModel {
         }
     }
 
-    public void ApplyViewSectionsSettings() {
-        GeneralViewPrefix = GeneralViewPrefixTemp;
-        GeneralViewSuffix = GeneralViewSuffixTemp;
-        GeneralViewPerpendicularPrefix = GeneralViewPerpendicularPrefixTemp;
-        GeneralViewPerpendicularSuffix = GeneralViewPerpendicularSuffixTemp;
-
-        GeneralRebarViewPrefix = GeneralRebarViewPrefixTemp;
-        GeneralRebarViewSuffix = GeneralRebarViewSuffixTemp;
-        GeneralRebarViewPerpendicularPrefix = GeneralRebarViewPerpendicularPrefixTemp;
-        GeneralRebarViewPerpendicularSuffix = GeneralRebarViewPerpendicularSuffixTemp;
-
-        GeneralViewTemplateName = GeneralViewTemplateNameTemp;
-        GeneralRebarViewTemplateName = GeneralRebarViewTemplateNameTemp;
-        GeneralViewXOffset = GeneralViewXOffsetTemp;
-        GeneralViewYTopOffset = GeneralViewYTopOffsetTemp;
-        GeneralViewYBottomOffset = GeneralViewYBottomOffsetTemp;
-        GeneralViewPerpXOffset = GeneralViewPerpXOffsetTemp;
-        GeneralViewPerpYTopOffset = GeneralViewPerpYTopOffsetTemp;
-        GeneralViewPerpYBottomOffset = GeneralViewPerpYBottomOffsetTemp;
-
-        GeneralViewFamilyTypeName = GeneralViewFamilyTypeNameTemp;
-    }
-
-    public void CheckViewSectionsSettings() {
+    public bool CheckSettings() {
         if(!int.TryParse(GeneralViewXOffset, out _)) {
-            ViewModel.ErrorText = _localizationService.GetLocalizedString("VM.MainViewXOffsetInvalid");
+            _viewModel.ErrorText = _localizationService.GetLocalizedString("VM.MainViewXOffsetInvalid");
+            return false;
         }
         if(!int.TryParse(GeneralViewYTopOffset, out _)) {
-            ViewModel.ErrorText = _localizationService.GetLocalizedString("VM.MainViewYTopOffsetInvalid");
+            _viewModel.ErrorText = _localizationService.GetLocalizedString("VM.MainViewYTopOffsetInvalid");
+            return false;
         }
         if(!int.TryParse(GeneralViewYBottomOffset, out _)) {
-            ViewModel.ErrorText = _localizationService.GetLocalizedString("VM.MainViewYBottomOffsetInvalid");
+            _viewModel.ErrorText = _localizationService.GetLocalizedString("VM.MainViewYBottomOffsetInvalid");
+            return false;
         }
         if(!int.TryParse(GeneralViewPerpXOffset, out _)) {
-            ViewModel.ErrorText = _localizationService.GetLocalizedString("VM.SideViewXOffsetInvalid");
+            _viewModel.ErrorText = _localizationService.GetLocalizedString("VM.SideViewXOffsetInvalid");
+            return false;
         }
         if(!int.TryParse(GeneralViewPerpYTopOffset, out _)) {
-            ViewModel.ErrorText = _localizationService.GetLocalizedString("VM.SideViewYTopOffsetInvalid");
+            _viewModel.ErrorText = _localizationService.GetLocalizedString("VM.SideViewYTopOffsetInvalid");
+            return false;
         }
         if(!int.TryParse(GeneralViewPerpYBottomOffset, out _)) {
-            ViewModel.ErrorText = _localizationService.GetLocalizedString("VM.SideViewYBottomOffsetInvalid");
+            _viewModel.ErrorText = _localizationService.GetLocalizedString("VM.SideViewYBottomOffsetInvalid");
+            return false;
+        }
+
+        if(SelectedGeneralViewTemplate is null) {
+            _viewModel.ErrorText = _localizationService.GetLocalizedString("VM.MainViewsTemplateNotSelected");
+            return false;
+        }
+        if(SelectedGeneralRebarViewTemplate is null) {
+            _viewModel.ErrorText = _localizationService.GetLocalizedString("VM.MainRebarViewsTemplateNotSelected");
+            return false;
+        }
+        if(SelectedGeneralViewFamilyType is null) {
+            _viewModel.ErrorText = _localizationService.GetLocalizedString("VM.ViewTypeNotSelected");
+            return false;
+        }
+        return true;
+    }
+
+    /// <summary>
+    /// Получает шаблон для основных видов по имени
+    /// </summary>
+    public void FindGeneralViewTemplate() {
+        if(!String.IsNullOrEmpty(GeneralViewTemplateName)) {
+            SelectedGeneralViewTemplate = _viewModel.ViewTemplatesInPj
+                .FirstOrDefault(view => view.Name.Equals(GeneralViewTemplateName));
         }
     }
 
-    public UserVerticalViewSettings GetSettings() {
-        var settings = new UserVerticalViewSettings();
-        var vmType = this.GetType();
-        var modelType = typeof(UserVerticalViewSettings);
-
-        foreach(var prop in modelType.GetProperties()) {
-            var vmProp = vmType.GetProperty(prop.Name);
-            if(vmProp != null && vmProp.CanRead && prop.CanWrite) {
-                var value = vmProp.GetValue(this);
-                prop.SetValue(settings, value);
-            }
+    /// <summary>
+    /// Получает шаблон для основных видов армирования по имени
+    /// </summary>
+    public void FindGeneralRebarViewTemplate() {
+        if(!String.IsNullOrEmpty(GeneralRebarViewTemplateName)) {
+            SelectedGeneralRebarViewTemplate = _viewModel.ViewTemplatesInPj
+                .FirstOrDefault(view => view.Name.Equals(GeneralRebarViewTemplateName));
         }
-        return settings;
+    }
+
+    /// <summary>
+    /// Получает типоразмер вида для создаваемых видов
+    /// </summary> 
+    public void FindVerticalViewFamilyType() {
+        if(!String.IsNullOrEmpty(GeneralViewFamilyTypeName)) {
+            SelectedGeneralViewFamilyType = _viewModel.ViewFamilyTypes
+                .FirstOrDefault(familyType => familyType.Name.Equals(GeneralViewFamilyTypeName));
+        }
     }
 }

@@ -1,3 +1,4 @@
+using System;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
 
@@ -7,10 +8,11 @@ using dosymep.Revit;
 using dosymep.SimpleServices;
 
 using RevitPylonDocumentation.Models;
-using RevitPylonDocumentation.Models.UserSettings;
 
 namespace RevitPylonDocumentation.ViewModels.UserSettings;
 internal class UserSheetSettingsVM : ValidatableViewModel {
+    private readonly MainViewModel _viewModel;
+    private readonly RevitRepository _revitRepository;
     private readonly ILocalizationService _localizationService;
 
     private string _sheetPrefixTemp = "Пилон ";
@@ -22,14 +24,11 @@ internal class UserSheetSettingsVM : ValidatableViewModel {
 
     public UserSheetSettingsVM(MainViewModel mainViewModel, RevitRepository repository,
                                ILocalizationService localizationService) {
-        ViewModel = mainViewModel;
-        Repository = repository;
+        _viewModel = mainViewModel;
+        _revitRepository = repository;
         _localizationService = localizationService;
         ValidateAllProperties();
     }
-
-    public MainViewModel ViewModel { get; set; }
-    internal RevitRepository Repository { get; set; }
 
     public string SheetPrefix { get; set; }
     public string SheetPrefixTemp {
@@ -85,53 +84,51 @@ internal class UserSheetSettingsVM : ValidatableViewModel {
         }
     }
 
-    public void ApplySheetSettings() {
-        TitleBlockName = TitleBlockNameTemp;
-        SheetSize = SheetSizeTemp;
-        SheetCoefficient = SheetCoefficientTemp;
-        SheetPrefix = SheetPrefixTemp;
-        SheetSuffix = SheetSuffixTemp;
-    }
+    public bool CheckSettings() {
+        if(SelectedTitleBlock is null) {
+            _viewModel.ErrorText = _localizationService.GetLocalizedString("VM.SheetTypeNotSelected");
+            return false;
+        }
 
-    public void CheckSheetSettings() {
-        using(var transaction = Repository.Document.StartTransaction("Checking parameters on sheet")) {
+        using(var transaction = _revitRepository.Document.StartTransaction("Checking parameters on sheet")) {
             // Листов в проекте может не быть или рамка может быть другая, поэтому создаем свой лист для тестов с нужной рамкой
-            var viewSheet = ViewSheet.Create(Repository.Document, ViewModel.SheetSettings.SelectedTitleBlock.Id);
-            if(viewSheet?.LookupParameter(ViewModel.ProjectSettings.DispatcherGroupingFirst) is null) {
-                ViewModel.ErrorText = _localizationService.GetLocalizedString("VM.DispatcherGroupingFirstParamInvalid");
+            var viewSheet = ViewSheet.Create(_revitRepository.Document, _viewModel.SheetSettings.SelectedTitleBlock.Id);
+            if(viewSheet?.LookupParameter(_viewModel.ProjectSettings.DispatcherGroupingFirst) is null) {
+                _viewModel.ErrorText = _localizationService.GetLocalizedString("VM.DispatcherGroupingFirstParamInvalid");
             }
 
             // Ищем рамку листа
-            var titleBlock = new FilteredElementCollector(Repository.Document, viewSheet.Id)
+            var titleBlock = new FilteredElementCollector(_revitRepository.Document, viewSheet.Id)
                 .OfCategory(BuiltInCategory.OST_TitleBlocks)
                 .WhereElementIsNotElementType()
                 .FirstOrDefault() as FamilyInstance;
 
+            bool hasError = false;
             if(titleBlock?.LookupParameter(SheetSize) is null) {
-                ViewModel.ErrorText = _localizationService.GetLocalizedString("VM.SheetSizeParamInvalid");
+                _viewModel.ErrorText = _localizationService.GetLocalizedString("VM.SheetSizeParamInvalid");
+                hasError = true;
             }
             if(titleBlock?.LookupParameter(SheetCoefficient) is null) {
-                ViewModel.ErrorText = _localizationService.GetLocalizedString("VM.SheetCoefficientParamInvalid");
+                _viewModel.ErrorText = _localizationService.GetLocalizedString("VM.SheetCoefficientParamInvalid");
+                hasError = true;
             }
 
             // Удаляем созданный лист
-            Repository.Document.Delete(viewSheet.Id);
+            _revitRepository.Document.Delete(viewSheet.Id);
             transaction.RollBack();
+
+            if(hasError) { return false; }
         }
+        return true;
     }
 
-    public UserSheetSettings GetSettings() {
-        var settings = new UserSheetSettings();
-        var vmType = this.GetType();
-        var modelType = typeof(UserSheetSettings);
-
-        foreach(var prop in modelType.GetProperties()) {
-            var vmProp = vmType.GetProperty(prop.Name);
-            if(vmProp != null && vmProp.CanRead && prop.CanWrite) {
-                var value = vmProp.GetValue(this);
-                prop.SetValue(settings, value);
-            }
+    /// <summary>
+    /// Получает типоразмер рамки листа по имени типа
+    /// </summary>
+    public void FindTitleBlock() {
+        if(!String.IsNullOrEmpty(TitleBlockName)) {
+            SelectedTitleBlock = _viewModel.TitleBlocks
+                .FirstOrDefault(titleBlock => titleBlock.Name.Contains(TitleBlockName));
         }
-        return settings;
     }
 }

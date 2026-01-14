@@ -1,13 +1,14 @@
+using System;
 using System.ComponentModel.DataAnnotations;
+using System.Linq;
 
 using Autodesk.Revit.DB;
 
 using dosymep.SimpleServices;
 
-using RevitPylonDocumentation.Models.UserSettings;
-
 namespace RevitPylonDocumentation.ViewModels.UserSettings;
 internal class UserLegendsAndAnnotationsSettingsVM : ValidatableViewModel {
+    private readonly MainViewModel _viewModel;
     private readonly ILocalizationService _localizationService;
 
     private string _legendXOffsetTemp = "-100";
@@ -16,12 +17,11 @@ internal class UserLegendsAndAnnotationsSettingsVM : ValidatableViewModel {
     private View _selectedLegend;
 
     public UserLegendsAndAnnotationsSettingsVM(MainViewModel mainViewModel, ILocalizationService localizationService) {
-        ViewModel = mainViewModel;
+        _viewModel = mainViewModel;
         _localizationService = localizationService;
         ValidateAllProperties();
     }
 
-    public MainViewModel ViewModel { get; set; }
 
     public string LegendXOffset { get; set; }
     [Required]
@@ -64,31 +64,26 @@ internal class UserLegendsAndAnnotationsSettingsVM : ValidatableViewModel {
         }
     }
 
-    public void ApplyLegendsAndAnnotationsSettings() {
-        LegendName = LegendNameTemp;
-        LegendXOffset = LegendXOffsetTemp;
-        LegendYOffset = LegendYOffsetTemp;
-    }
-
-    public void CheckLegendsAndAnnotationsSettings() {
+    public bool CheckSettings() {
         // Проверяем, чтоб были заданы офсеты видового экрана легенды
         if(LegendXOffset is null || LegendYOffset is null) {
-            ViewModel.ErrorText = _localizationService.GetLocalizedString("VM.LegendOffsetsNotSet");
+            _viewModel.ErrorText = _localizationService.GetLocalizedString("VM.LegendOffsetsNotSet");
+            return false;
         }
+        if(SelectedLegend is null) {
+            _viewModel.ErrorText = _localizationService.GetLocalizedString("VM.LegendNotSelected");
+            return false;
+        }
+        return true;
     }
 
-    public UserLegendsAndAnnotationsSettings GetSettings() {
-        var settings = new UserLegendsAndAnnotationsSettings();
-        var vmType = this.GetType();
-        var modelType = typeof(UserLegendsAndAnnotationsSettings);
-
-        foreach(var prop in modelType.GetProperties()) {
-            var vmProp = vmType.GetProperty(prop.Name);
-            if(vmProp != null && vmProp.CanRead && prop.CanWrite) {
-                var value = vmProp.GetValue(this);
-                prop.SetValue(settings, value);
-            }
+    /// <summary>
+    /// Получает легенду примечания по имени
+    /// </summary>
+    public void FindLegend() {
+        if(!String.IsNullOrEmpty(LegendName)) {
+            SelectedLegend = _viewModel.Legends
+                .FirstOrDefault(view => view.Name.Contains(LegendName));
         }
-        return settings;
     }
 }

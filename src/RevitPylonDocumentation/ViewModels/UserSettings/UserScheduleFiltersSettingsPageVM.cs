@@ -1,10 +1,14 @@
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 
+using dosymep.SimpleServices;
+
 using RevitPylonDocumentation.Models;
-using RevitPylonDocumentation.Models.UserSettings;
 
 namespace RevitPylonDocumentation.ViewModels.UserSettings;
 internal class UserScheduleFiltersSettingsPageVM : ValidatableViewModel {
+    private readonly MainViewModel _viewModel;
+    private readonly ILocalizationService _localizationService;
 
     private ObservableCollection<ScheduleFilterParamHelper> _paramsForScheduleFiltersTemp = [
         new ScheduleFilterParamHelper("обр_ФОП_Форма_номер", ""),
@@ -18,12 +22,12 @@ internal class UserScheduleFiltersSettingsPageVM : ValidatableViewModel {
         new ScheduleFilterParamHelper("Марка", "Марка")
     ];
 
-    public UserScheduleFiltersSettingsPageVM(MainViewModel mainViewModel) {
-        ViewModel = mainViewModel;
+    public UserScheduleFiltersSettingsPageVM(MainViewModel mainViewModel, ILocalizationService localizationService) {
+        _viewModel = mainViewModel;
+        _localizationService = localizationService;
         ValidateAllProperties();
     }
 
-    public MainViewModel ViewModel { get; set; }
 
     public ObservableCollection<ScheduleFilterParamHelper> ParamsForScheduleFilters { get; set; } = [];
     public ObservableCollection<ScheduleFilterParamHelper> ParamsForScheduleFiltersTemp {
@@ -34,22 +38,43 @@ internal class UserScheduleFiltersSettingsPageVM : ValidatableViewModel {
         }
     }
 
-    public void ApplyScheduleFiltersSettings() {
-        ParamsForScheduleFilters = ParamsForScheduleFiltersTemp;
+    /// <summary>
+    /// Добавляет новое имя параметра фильтра спецификаций в настройках плагина
+    /// </summary>
+    public void AddScheduleFilterParam() {
+        ParamsForScheduleFilters.Add(
+            new ScheduleFilterParamHelper(
+                _localizationService.GetLocalizedString("VM.WriteName"),
+                _localizationService.GetLocalizedString("VM.WriteName")));
+        _viewModel.SettingsChanged();
     }
 
-    public UserScheduleFiltersSettings GetSettings() {
-        var settings = new UserScheduleFiltersSettings();
-        var vmType = this.GetType();
-        var modelType = typeof(UserScheduleFiltersSettings);
+    /// <summary>
+    /// Удаляет выбранное имя параметра фильтра спецификаций в настройках плагина
+    /// </summary>
+    public void DeleteScheduleFilterParam() {
+        List<ScheduleFilterParamHelper> forDel = [];
 
-        foreach(var prop in modelType.GetProperties()) {
-            var vmProp = vmType.GetProperty(prop.Name);
-            if(vmProp != null && vmProp.CanRead && prop.CanWrite) {
-                var value = vmProp.GetValue(this);
-                prop.SetValue(settings, value);
+        foreach(ScheduleFilterParamHelper param in ParamsForScheduleFilters) {
+            if(param.IsCheck) {
+                forDel.Add(param);
             }
         }
-        return settings;
+
+        foreach(ScheduleFilterParamHelper param in forDel) {
+            ParamsForScheduleFilters.Remove(param);
+        }
+        _viewModel.SettingsChanged();
+    }
+
+    /// <summary>
+    /// Определяет можно ли удалить выбранное имя параметра фильтра спецификаций в настройках плагина
+    /// True, если выбрана штриховка в списке штриховок в настройках плагина
+    /// </summary> 
+    public bool CanChangeScheduleFilterParam() {
+        foreach(var param in ParamsForScheduleFilters) {
+            if(param.IsCheck) { return true; }
+        }
+        return false;
     }
 }

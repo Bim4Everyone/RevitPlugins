@@ -1,9 +1,5 @@
-using dosymep.WPF.ViewModels;
-
-using RevitPylonDocumentation.Models.UserSettings;
-
 namespace RevitPylonDocumentation.ViewModels.UserSettings;
-internal class UserSelectionSettingsVM : BaseViewModel {
+internal class UserSelectionSettingsVM : ValidatableViewModel {
     private bool _needWorkWithGeneralView = false;
     private bool _needWorkWithGeneralPerpendicularView = false;
     private bool _needWorkWithTransverseViewFirst = false;
@@ -104,27 +100,11 @@ internal class UserSelectionSettingsVM : BaseViewModel {
         set => RaiseAndSetIfChanged(ref _needWorkWithLegend, value);
     }
 
-
     /// <summary>
     /// Выбранный пользователем комплект документации
     /// </summary>
     public string SelectedProjectSection {
         get => _selectedProjectSection;
         set => RaiseAndSetIfChanged(ref _selectedProjectSection, value);
-    }
-
-    public UserSelectionSettings GetSettings() {
-        var settings = new UserSelectionSettings();
-        var vmType = this.GetType();
-        var modelType = typeof(UserSelectionSettings);
-
-        foreach(var prop in modelType.GetProperties()) {
-            var vmProp = vmType.GetProperty(prop.Name);
-            if(vmProp != null && vmProp.CanRead && prop.CanWrite) {
-                var value = vmProp.GetValue(this);
-                prop.SetValue(settings, value);
-            }
-        }
-        return settings;
     }
 }

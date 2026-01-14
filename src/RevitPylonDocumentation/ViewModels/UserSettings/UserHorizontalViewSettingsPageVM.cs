@@ -1,14 +1,15 @@
+using System;
 using System.ComponentModel.DataAnnotations;
+using System.Linq;
 
 using Autodesk.Revit.DB;
 
 using dosymep.SimpleServices;
 
-using RevitPylonDocumentation.Models.UserSettings;
-
 namespace RevitPylonDocumentation.ViewModels.UserSettings;
 
 internal class UserHorizontalViewSettingsPageVM : ValidatableViewModel {
+    private readonly MainViewModel _viewModel;
     private readonly ILocalizationService _localizationService;
 
     private string _transverseViewDepthTemp = "900";
@@ -42,12 +43,11 @@ internal class UserHorizontalViewSettingsPageVM : ValidatableViewModel {
     private View _selectedTransverseRebarViewTemplate;
 
     public UserHorizontalViewSettingsPageVM(MainViewModel mainViewModel, ILocalizationService localizationService) {
-        ViewModel = mainViewModel;
+        _viewModel = mainViewModel;
         _localizationService = localizationService;
         ValidateAllProperties();
     }
 
-    public MainViewModel ViewModel { get; set; }
 
     public string TransverseViewDepth { get; set; }
     [Required]
@@ -256,65 +256,73 @@ internal class UserHorizontalViewSettingsPageVM : ValidatableViewModel {
             ValidateProperty(value);
         }
     }
-    public void ApplyViewSectionsSettings() {
-        TransverseViewDepth = TransverseViewDepthTemp;
-        TransverseViewFirstPrefix = TransverseViewFirstPrefixTemp;
-        TransverseViewFirstSuffix = TransverseViewFirstSuffixTemp;
-        TransverseViewFirstElevation = TransverseViewFirstElevationTemp;
-        TransverseViewSecondPrefix = TransverseViewSecondPrefixTemp;
-        TransverseViewSecondSuffix = TransverseViewSecondSuffixTemp;
-        TransverseViewSecondElevation = TransverseViewSecondElevationTemp;
-        TransverseViewThirdPrefix = TransverseViewThirdPrefixTemp;
-        TransverseViewThirdSuffix = TransverseViewThirdSuffixTemp;
-        TransverseViewThirdElevation = TransverseViewThirdElevationTemp;
 
-        TransverseRebarViewDepth = TransverseRebarViewDepthTemp;
-        TransverseRebarViewFirstPrefix = TransverseRebarViewFirstPrefixTemp;
-        TransverseRebarViewFirstSuffix = TransverseRebarViewFirstSuffixTemp;
-        TransverseRebarViewSecondPrefix = TransverseRebarViewSecondPrefixTemp;
-        TransverseRebarViewSecondSuffix = TransverseRebarViewSecondSuffixTemp;
-        TransverseRebarViewThirdPrefix = TransverseRebarViewThirdPrefixTemp;
-        TransverseRebarViewThirdSuffix = TransverseRebarViewThirdSuffixTemp;
-
-        TransverseViewTemplateName = TransverseViewTemplateNameTemp;
-        TransverseRebarViewTemplateName = TransverseRebarViewTemplateNameTemp;
-        TransverseViewXOffset = TransverseViewXOffsetTemp;
-        TransverseViewYOffset = TransverseViewYOffsetTemp;
-
-        TransverseViewFamilyTypeName = TransverseViewFamilyTypeNameTemp;
-    }
-
-    public void CheckViewSectionsSettings() {
+    public bool CheckSettings() {
         if(!int.TryParse(TransverseViewXOffset, out _)) {
-            ViewModel.ErrorText = _localizationService.GetLocalizedString("VM.TransverseViewXOffsetInvalid");
+            _viewModel.ErrorText = _localizationService.GetLocalizedString("VM.TransverseViewXOffsetInvalid");
+            return false;
         }
         if(!int.TryParse(TransverseViewYOffsetTemp, out _)) {
-            ViewModel.ErrorText = _localizationService.GetLocalizedString("VM.TransverseViewYOffsetInvalid");
+            _viewModel.ErrorText = _localizationService.GetLocalizedString("VM.TransverseViewYOffsetInvalid");
+            return false;
         }
 
         if(!double.TryParse(TransverseViewFirstElevationTemp, out _)) {
-            ViewModel.ErrorText = _localizationService.GetLocalizedString("VM.FirstHorizontalViewElevationInvalid");
+            _viewModel.ErrorText = _localizationService.GetLocalizedString("VM.FirstHorizontalViewElevationInvalid");
+            return false;
         }
         if(!double.TryParse(TransverseViewSecondElevationTemp, out _)) {
-            ViewModel.ErrorText = _localizationService.GetLocalizedString("VM.SecondHorizontalViewElevationInvalid");
+            _viewModel.ErrorText = _localizationService.GetLocalizedString("VM.SecondHorizontalViewElevationInvalid");
+            return false;
         }
         if(!double.TryParse(TransverseViewThirdElevationTemp, out _)) {
-            ViewModel.ErrorText = _localizationService.GetLocalizedString("VM.ThirdHorizontalViewElevationInvalid");
+            _viewModel.ErrorText = _localizationService.GetLocalizedString("VM.ThirdHorizontalViewElevationInvalid");
+            return false;
+        }
+
+        if(SelectedTransverseViewTemplate is null) {
+            _viewModel.ErrorText = _localizationService.GetLocalizedString("VM.TransverseViewsTemplateNotSelected");
+            return false;
+        }
+        if(SelectedTransverseRebarViewTemplate is null) {
+            _viewModel.ErrorText = _localizationService.GetLocalizedString("VM.TransverseRebarViewsTemplateNotSelected");
+            return false;
+        }
+        if(SelectedTransverseViewFamilyType is null) {
+            _viewModel.ErrorText = _localizationService.GetLocalizedString("VM.ViewTypeNotSelected");
+            return false;
+        }
+        return true;
+    }
+
+    /// <summary>
+    /// Получает шаблон для поперечных видов по имени
+    /// </summary>
+    public void FindTransverseViewTemplate() {
+        if(!String.IsNullOrEmpty(TransverseViewTemplateName)) {
+            SelectedTransverseViewTemplate = _viewModel.ViewTemplatesInPj
+                .FirstOrDefault(view => view.Name.Equals(TransverseViewTemplateName));
         }
     }
 
-    public UserHorizontalViewSettings GetSettings() {
-        var settings = new UserHorizontalViewSettings();
-        var vmType = this.GetType();
-        var modelType = typeof(UserHorizontalViewSettings);
-
-        foreach(var prop in modelType.GetProperties()) {
-            var vmProp = vmType.GetProperty(prop.Name);
-            if(vmProp != null && vmProp.CanRead && prop.CanWrite) {
-                var value = vmProp.GetValue(this);
-                prop.SetValue(settings, value);
-            }
+    /// <summary>
+    /// Получает шаблон для поперечных видов армирования по имени
+    /// </summary>
+    public void FindTransverseRebarViewTemplate() {
+        if(!String.IsNullOrEmpty(TransverseRebarViewTemplateName)) {
+            SelectedTransverseRebarViewTemplate = _viewModel.ViewTemplatesInPj
+                .FirstOrDefault(view => view.Name.Equals(TransverseRebarViewTemplateName));
         }
-        return settings;
+    }
+
+
+    /// <summary>
+    /// Получает типоразмер вида для создаваемых видов
+    /// </summary>
+    public void FindHorizontalViewFamilyType() {
+        if(!String.IsNullOrEmpty(TransverseViewFamilyTypeName)) {
+            SelectedTransverseViewFamilyType = _viewModel.ViewFamilyTypes
+                .FirstOrDefault(familyType => familyType.Name.Equals(TransverseViewFamilyTypeName));
+        }
     }
 }

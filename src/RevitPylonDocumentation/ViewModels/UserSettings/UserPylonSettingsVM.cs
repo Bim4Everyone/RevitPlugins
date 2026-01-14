@@ -7,10 +7,11 @@ using dosymep.Revit;
 using dosymep.SimpleServices;
 
 using RevitPylonDocumentation.Models;
-using RevitPylonDocumentation.Models.UserSettings;
 
 namespace RevitPylonDocumentation.ViewModels.UserSettings;
 internal class UserPylonSettingsVM : ValidatableViewModel {
+    private readonly MainViewModel _viewModel;
+    private readonly RevitRepository _revitRepository;
     private readonly ILocalizationService _localizationService;
 
     private string _projectSectionTemp = "обр_ФОП_Раздел проекта";
@@ -24,15 +25,11 @@ internal class UserPylonSettingsVM : ValidatableViewModel {
 
     public UserPylonSettingsVM(MainViewModel mainViewModel, RevitRepository repository,
                                ILocalizationService localizationService) {
-        ViewModel = mainViewModel;
-        Repository = repository;
+        _viewModel = mainViewModel;
+        _revitRepository = repository;
         _localizationService = localizationService;
         ValidateAllProperties();
     }
-
-    public MainViewModel ViewModel { get; set; }
-    internal RevitRepository Repository { get; set; }
-
 
     public string ProjectSection { get; set; }
     [Required]
@@ -99,49 +96,24 @@ internal class UserPylonSettingsVM : ValidatableViewModel {
         }
     }
 
-    public void ApplyPylonSettings() {
-        ProjectSection = ProjectSectionTemp;
-        Mark = MarkTemp;
-
-        TypicalPylonFilterParameter = TypicalPylonFilterParameterTemp;
-        TypicalPylonFilterValue = TypicalPylonFilterValueTemp;
-
-        PylonLengthParamName = PylonLengthParamNameTemp;
-        PylonWidthParamName = PylonWidthParamNameTemp;
-    }
-
-    public void CheckPylonSettings() {
+    public bool CheckSettings() {
         // Перебираем пилоны, которые найдены в проекте для работы и проверяем у НесКлн параметры сечения
-        foreach(var sheetInfo in Repository.HostsInfo) {
+        foreach(var sheetInfo in _revitRepository.HostsInfo) {
             var pylon = sheetInfo.HostElems.FirstOrDefault();
             if(pylon?.Category.GetBuiltInCategory() != BuiltInCategory.OST_StructuralColumns) { continue; }
 
-            var pylonType = Repository.Document.GetElement(pylon?.GetTypeId()) as FamilySymbol;
+            var pylonType = _revitRepository.Document.GetElement(pylon?.GetTypeId()) as FamilySymbol;
 
             if(pylonType?.LookupParameter(PylonLengthParamName) is null) {
-                ViewModel.ErrorText = _localizationService.GetLocalizedString("VM.PylonLengthParamInvalid");
-                break;
+                _viewModel.ErrorText = _localizationService.GetLocalizedString("VM.PylonLengthParamInvalid");
+                return false;
             }
 
             if(pylonType?.LookupParameter(PylonWidthParamName) is null) {
-                ViewModel.ErrorText = _localizationService.GetLocalizedString("VM.PylonWidthParamInvalid");
-                break;
+                _viewModel.ErrorText = _localizationService.GetLocalizedString("VM.PylonWidthParamInvalid");
+                return false;
             }
         }
-    }
-
-    public UserPylonSettings GetSettings() {
-        var settings = new UserPylonSettings();
-        var vmType = this.GetType();
-        var modelType = typeof(UserPylonSettings);
-
-        foreach(var prop in modelType.GetProperties()) {
-            var vmProp = vmType.GetProperty(prop.Name);
-            if(vmProp != null && vmProp.CanRead && prop.CanWrite) {
-                var value = vmProp.GetValue(this);
-                prop.SetValue(settings, value);
-            }
-        }
-        return settings;
+        return true;
     }
 }

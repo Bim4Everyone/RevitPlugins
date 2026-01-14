@@ -456,7 +456,10 @@
                             Grid.Row="2"
                             LabelText="{me:LocalizationSource GeneralPage.SelectTitleBlockType}"
                             ItemsSource="{Binding TitleBlocks}"
-                            SelectedItem="{Binding TypesSettings.SelectedTitleBlock, Mode=TwoWay}"
+                            SelectedItem="{Binding 
+                                Path=SheetSettings.SelectedTitleBlock, 
+                                UpdateSourceTrigger=PropertyChanged, Mode=TwoWay,
+                                ValidatesOnDataErrors=True, NotifyOnValidationError=True}"
                             ToolTipText="Типоразмер рамки (штампа), которая будет размещена на новых листах"
                             SelectionChangedCommand="{Binding SettingsChangedCommand}"
                             ItemTemplate="{StaticResource WithFamilyNameItemTemplate}" />
@@ -480,7 +483,10 @@
                             <controls:ComboBoxSettingControl
                                 LabelText="{me:LocalizationSource GeneralPage.VerticalViews}"
                                 ItemsSource="{Binding ViewTemplatesInPj}"
-                                SelectedItem="{Binding TypesSettings.SelectedGeneralViewTemplate, Mode=TwoWay}"
+                                SelectedItem="{Binding 
+                                    Path=VerticalViewSettings.SelectedGeneralViewTemplate, 
+                                    UpdateSourceTrigger=PropertyChanged, Mode=TwoWay,
+                                    ValidatesOnDataErrors=True, NotifyOnValidationError=True}"
                                 ToolTipText="Шаблон вида, который необходимо применить к основному и боковому виду при их создании."
                                 SelectionChangedCommand="{Binding SettingsChangedCommand}"
                                 ItemTemplate="{StaticResource WithoutFamilyNameItemTemplate}" />
@@ -488,7 +494,10 @@
                             <controls:ComboBoxSettingControl
                                 LabelText="{me:LocalizationSource GeneralPage.HorizontalViews}"
                                 ItemsSource="{Binding ViewTemplatesInPj}"
-                                SelectedItem="{Binding TypesSettings.SelectedTransverseViewTemplate, Mode=TwoWay}"
+                                SelectedItem="{Binding 
+                                    Path=HorizontalViewSettings.SelectedTransverseViewTemplate, 
+                                    UpdateSourceTrigger=PropertyChanged, Mode=TwoWay,
+                                    ValidatesOnDataErrors=True, NotifyOnValidationError=True}"
                                 ToolTipText="Шаблон вида, который необходимо применить к горизонтальным видам при их создании."
                                 SelectionChangedCommand="{Binding SettingsChangedCommand}"
                                 ItemTemplate="{StaticResource WithoutFamilyNameItemTemplate}" />
@@ -505,7 +514,10 @@
                             <controls:ComboBoxSettingControl
                                 LabelText="{me:LocalizationSource GeneralPage.VerticalViews}"
                                 ItemsSource="{Binding ViewTemplatesInPj}"
-                                SelectedItem="{Binding TypesSettings.SelectedGeneralRebarViewTemplate, Mode=TwoWay}"
+                                SelectedItem="{Binding 
+                                    Path=VerticalViewSettings.SelectedGeneralRebarViewTemplate, 
+                                    UpdateSourceTrigger=PropertyChanged, Mode=TwoWay,
+                                    ValidatesOnDataErrors=True, NotifyOnValidationError=True}"
                                 ToolTipText="Шаблон вида, который необходимо применить к основному и боковому виду армирования при их создании."
                                 SelectionChangedCommand="{Binding SettingsChangedCommand}"
                                 ItemTemplate="{StaticResource WithoutFamilyNameItemTemplate}" />
@@ -513,7 +525,10 @@
                             <controls:ComboBoxSettingControl
                                 LabelText="{me:LocalizationSource GeneralPage.HorizontalViews}"
                                 ItemsSource="{Binding ViewTemplatesInPj}"
-                                SelectedItem="{Binding TypesSettings.SelectedTransverseRebarViewTemplate, Mode=TwoWay}"
+                                SelectedItem="{Binding 
+                                    Path=HorizontalViewSettings.SelectedTransverseRebarViewTemplate, 
+                                    UpdateSourceTrigger=PropertyChanged, Mode=TwoWay,
+                                    ValidatesOnDataErrors=True, NotifyOnValidationError=True}"
                                 ToolTipText="Шаблон вида, который необходимо применить к горизонтальным видам армирования при их создании."
                                 SelectionChangedCommand="{Binding SettingsChangedCommand}"
                                 ItemTemplate="{StaticResource WithoutFamilyNameItemTemplate}" />

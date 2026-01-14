@@ -1,3 +1,4 @@
+using System;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
 
@@ -6,10 +7,11 @@ using Autodesk.Revit.DB;
 using dosymep.SimpleServices;
 
 using RevitPylonDocumentation.Models;
-using RevitPylonDocumentation.Models.UserSettings;
 
 namespace RevitPylonDocumentation.ViewModels.UserSettings;
 internal class UserProjectSettingsVM : ValidatableViewModel {
+    private readonly MainViewModel _viewModel;
+    private readonly RevitRepository _revitRepository;
     private readonly ILocalizationService _localizationService;
 
     private string _dispatcherGroupingFirstTemp = "_Группа видов 1";
@@ -41,15 +43,11 @@ internal class UserProjectSettingsVM : ValidatableViewModel {
 
     public UserProjectSettingsVM(MainViewModel mainViewModel, RevitRepository repository,
                                  ILocalizationService localizationService) {
-        ViewModel = mainViewModel;
-        Repository = repository;
+        _viewModel = mainViewModel;
+        _revitRepository = repository;
         _localizationService = localizationService;
         ValidateAllProperties();
     }
-
-    public MainViewModel ViewModel { get; set; }
-    internal RevitRepository Repository { get; set; }
-
 
     public string DispatcherGroupingFirst { get; set; }
     [Required]
@@ -134,7 +132,7 @@ internal class UserProjectSettingsVM : ValidatableViewModel {
         get => _selectedDimensionType;
         set {
             RaiseAndSetIfChanged(ref _selectedDimensionType, value);
-            ViewModel.ProjectSettings.DimensionTypeNameTemp = value?.Name;
+            _viewModel.ProjectSettings.DimensionTypeNameTemp = value?.Name;
             ValidateProperty(value);
         }
     }
@@ -147,7 +145,7 @@ internal class UserProjectSettingsVM : ValidatableViewModel {
         get => _selectedSkeletonTagType;
         set {
             RaiseAndSetIfChanged(ref _selectedSkeletonTagType, value);
-            ViewModel.ProjectSettings.SkeletonTagTypeNameTemp = value?.Name;
+            _viewModel.ProjectSettings.SkeletonTagTypeNameTemp = value?.Name;
             ValidateProperty(value);
         }
     }
@@ -160,7 +158,7 @@ internal class UserProjectSettingsVM : ValidatableViewModel {
         get => _selectedRebarTagTypeWithSerif;
         set {
             RaiseAndSetIfChanged(ref _selectedRebarTagTypeWithSerif, value);
-            ViewModel.ProjectSettings.RebarTagTypeWithSerifNameTemp = value?.Name;
+            _viewModel.ProjectSettings.RebarTagTypeWithSerifNameTemp = value?.Name;
             ValidateProperty(value);
         }
     }
@@ -173,7 +171,7 @@ internal class UserProjectSettingsVM : ValidatableViewModel {
         get => _selectedRebarTagTypeWithStep;
         set {
             RaiseAndSetIfChanged(ref _selectedRebarTagTypeWithStep, value);
-            ViewModel.ProjectSettings.RebarTagTypeWithStepNameTemp = value?.Name;
+            _viewModel.ProjectSettings.RebarTagTypeWithStepNameTemp = value?.Name;
             ValidateProperty(value);
         }
     }
@@ -186,7 +184,7 @@ internal class UserProjectSettingsVM : ValidatableViewModel {
         get => _selectedRebarTagTypeWithComment;
         set {
             RaiseAndSetIfChanged(ref _selectedRebarTagTypeWithComment, value);
-            ViewModel.ProjectSettings.RebarTagTypeWithCommentNameTemp = value?.Name;
+            _viewModel.ProjectSettings.RebarTagTypeWithCommentNameTemp = value?.Name;
             ValidateProperty(value);
         }
     }
@@ -199,7 +197,7 @@ internal class UserProjectSettingsVM : ValidatableViewModel {
         get => _selectedUniversalTagType;
         set {
             RaiseAndSetIfChanged(ref _selectedUniversalTagType, value);
-            ViewModel.ProjectSettings.UniversalTagTypeNameTemp = value?.Name;
+            _viewModel.ProjectSettings.UniversalTagTypeNameTemp = value?.Name;
             ValidateProperty(value);
         }
     }
@@ -212,7 +210,7 @@ internal class UserProjectSettingsVM : ValidatableViewModel {
         get => _selectedBreakLineType;
         set {
             RaiseAndSetIfChanged(ref _selectedBreakLineType, value);
-            ViewModel.ProjectSettings.BreakLineTypeNameTemp = value?.Name;
+            _viewModel.ProjectSettings.BreakLineTypeNameTemp = value?.Name;
             ValidateProperty(value);
         }
     }
@@ -225,7 +223,7 @@ internal class UserProjectSettingsVM : ValidatableViewModel {
         get => _selectedConcretingJointType;
         set {
             RaiseAndSetIfChanged(ref _selectedConcretingJointType, value);
-            ViewModel.ProjectSettings.ConcretingJointTypeNameTemp = value?.Name;
+            _viewModel.ProjectSettings.ConcretingJointTypeNameTemp = value?.Name;
             ValidateProperty(value);
         }
     }
@@ -238,58 +236,158 @@ internal class UserProjectSettingsVM : ValidatableViewModel {
         get => _selectedSpotDimensionType;
         set {
             RaiseAndSetIfChanged(ref _selectedSpotDimensionType, value);
-            ViewModel.ProjectSettings.SpotDimensionTypeNameTemp = value?.Name;
+            _viewModel.ProjectSettings.SpotDimensionTypeNameTemp = value?.Name;
             ValidateProperty(value);
         }
     }
 
-
-    public void ApplyProjectSettings() {
-        DispatcherGroupingFirst = DispatcherGroupingFirstTemp;
-        DispatcherGroupingSecond = DispatcherGroupingSecondTemp;
-
-        DimensionTypeName = DimensionTypeNameTemp;
-        SpotDimensionTypeName = SpotDimensionTypeNameTemp;
-
-        SkeletonTagTypeName = SkeletonTagTypeNameTemp;
-        RebarTagTypeWithSerifName = RebarTagTypeWithSerifNameTemp;
-        RebarTagTypeWithStepName = RebarTagTypeWithStepNameTemp;
-        RebarTagTypeWithCommentName = RebarTagTypeWithCommentNameTemp;
-        UniversalTagTypeName = UniversalTagTypeNameTemp;
-        BreakLineTypeName = BreakLineTypeNameTemp;
-        ConcretingJointTypeName = ConcretingJointTypeNameTemp;
-    }
-
-    public void CheckProjectSettings() {
+    public bool CheckSettings() {
         // Пытаемся проверить виды
-        if(Repository.AllSectionViews.FirstOrDefault()?.LookupParameter(DispatcherGroupingFirst) is null) {
-            ViewModel.ErrorText = _localizationService.GetLocalizedString("VM.DispatcherGroupingFirstParamInvalid");
+        if(_revitRepository.AllSectionViews.FirstOrDefault()?.LookupParameter(DispatcherGroupingFirst) is null) {
+            _viewModel.ErrorText = _localizationService.GetLocalizedString("VM.DispatcherGroupingFirstParamInvalid");
+            return false;
         }
-        if(Repository.AllSectionViews.FirstOrDefault()?.LookupParameter(DispatcherGroupingSecond) is null) {
-            ViewModel.ErrorText = _localizationService.GetLocalizedString("VM.DispatcherGroupingSecondParamInvalid");
+        if(_revitRepository.AllSectionViews.FirstOrDefault()?.LookupParameter(DispatcherGroupingSecond) is null) {
+            _viewModel.ErrorText = _localizationService.GetLocalizedString("VM.DispatcherGroupingSecondParamInvalid");
+            return false;
         }
 
         // Пытаемся проверить спеки
-        if(Repository.AllScheduleViews.FirstOrDefault()?.LookupParameter(DispatcherGroupingFirst) is null) {
-            ViewModel.ErrorText = _localizationService.GetLocalizedString("VM.DispatcherGroupingFirstParamInvalid");
+        if(_revitRepository.AllScheduleViews.FirstOrDefault()?.LookupParameter(DispatcherGroupingFirst) is null) {
+            _viewModel.ErrorText = _localizationService.GetLocalizedString("VM.DispatcherGroupingFirstParamInvalid");
+            return false;
         }
-        if(Repository.AllScheduleViews.FirstOrDefault()?.LookupParameter(DispatcherGroupingSecond) is null) {
-            ViewModel.ErrorText = _localizationService.GetLocalizedString("VM.DispatcherGroupingSecondParamInvalid");
+        if(_revitRepository.AllScheduleViews.FirstOrDefault()?.LookupParameter(DispatcherGroupingSecond) is null) {
+            _viewModel.ErrorText = _localizationService.GetLocalizedString("VM.DispatcherGroupingSecondParamInvalid");
+            return false;
+        }
+
+        if(SelectedDimensionType is null) {
+            _viewModel.ErrorText = _localizationService.GetLocalizedString("VM.DimensionTypeNotSelected");
+            return false;
+        }
+        if(SelectedSpotDimensionType is null) {
+            _viewModel.ErrorText = _localizationService.GetLocalizedString("VM.SpotDimensionTypeNotSelected");
+            return false;
+        }
+        if(SelectedSkeletonTagType is null) {
+            _viewModel.ErrorText = _localizationService.GetLocalizedString("VM.SkeletonTagTypeNotSelected");
+            return false;
+        }
+        if(SelectedRebarTagTypeWithSerif is null) {
+            _viewModel.ErrorText = _localizationService.GetLocalizedString("VM.RebarTagWithSerifTypeNotSelected");
+            return false;
+        }
+        if(SelectedRebarTagTypeWithStep is null) {
+            _viewModel.ErrorText = _localizationService.GetLocalizedString("VM.RebarTagWithoutSerifTypeNotSelected");
+            return false;
+        }
+        if(SelectedRebarTagTypeWithComment is null) {
+            _viewModel.ErrorText = _localizationService.GetLocalizedString("VM.RebarTagWithCommentTypeNotSelected");
+            return false;
+        }
+        if(SelectedUniversalTagType is null) {
+            _viewModel.ErrorText = _localizationService.GetLocalizedString("VM.UniversalTagTypeNotSelected");
+            return false;
+        }
+        if(SelectedBreakLineType is null) {
+            _viewModel.ErrorText = _localizationService.GetLocalizedString("VM.BreakLineTypeNotSelected");
+            return false;
+        }
+        if(SelectedConcretingJointType is null) {
+            _viewModel.ErrorText = _localizationService.GetLocalizedString("VM.ConcretingJointTypeNotSelected");
+            return false;
+        }
+        return true;
+    }
+
+    /// <summary>
+    /// Получает типоразмер для расстановки размеров
+    /// </summary>
+    public void FindDimensionType() {
+        if(!String.IsNullOrEmpty(DimensionTypeName)) {
+            SelectedDimensionType = _viewModel.DimensionTypes
+                .FirstOrDefault(familyType => familyType.Name.Equals(DimensionTypeName));
         }
     }
 
-    public UserProjectSettings GetSettings() {
-        var settings = new UserProjectSettings();
-        var vmType = this.GetType();
-        var modelType = typeof(UserProjectSettings);
-
-        foreach(var prop in modelType.GetProperties()) {
-            var vmProp = vmType.GetProperty(prop.Name);
-            if(vmProp != null && vmProp.CanRead && prop.CanWrite) {
-                var value = vmProp.GetValue(this);
-                prop.SetValue(settings, value);
-            }
+    /// <summary>
+    /// Получает типоразмер высотной отметки
+    /// </summary>
+    public void FindSpotDimensionType() {
+        if(!String.IsNullOrEmpty(SpotDimensionTypeName)) {
+            SelectedSpotDimensionType = _viewModel.SpotDimensionTypes
+                .FirstOrDefault(familyType => familyType.Name.Equals(SpotDimensionTypeName));
         }
-        return settings;
+    }
+
+    /// <summary>
+    /// Получает типоразмер марки арматурного каркаса
+    /// </summary>
+    public void FindSkeletonTagType() {
+        if(!String.IsNullOrEmpty(SkeletonTagTypeName)) {
+            SelectedSkeletonTagType = _viewModel.RebarTagTypes
+                .FirstOrDefault(familyType => familyType.Name.Equals(SkeletonTagTypeName));
+        }
+    }
+
+    /// <summary>
+    /// Получает типоразмер марки арматуры с засечкой
+    /// </summary>
+    public void FindRebarTagTypeWithSerif() {
+        if(!String.IsNullOrEmpty(RebarTagTypeWithSerifName)) {
+            SelectedRebarTagTypeWithSerif = _viewModel.RebarTagTypes
+                .FirstOrDefault(familyType => familyType.Name.Equals(RebarTagTypeWithSerifName));
+        }
+    }
+
+    /// <summary>
+    /// Получает типоразмер марки арматуры с шагом
+    /// </summary>
+    public void FindRebarTagTypeWithStep() {
+        if(!String.IsNullOrEmpty(RebarTagTypeWithStepName)) {
+            SelectedRebarTagTypeWithStep = _viewModel.RebarTagTypes
+                .FirstOrDefault(familyType => familyType.Name.Equals(RebarTagTypeWithStepName));
+        }
+    }
+
+    /// <summary>
+    /// Получает типоразмер марки арматуры с количеством
+    /// </summary>
+    public void FindRebarTagTypeWithComment() {
+        if(!String.IsNullOrEmpty(RebarTagTypeWithCommentName)) {
+            SelectedRebarTagTypeWithComment = _viewModel.RebarTagTypes
+                .FirstOrDefault(familyType => familyType.Name.Equals(RebarTagTypeWithCommentName));
+        }
+    }
+
+    /// <summary>
+    /// Получает типоразмер универсальной марки
+    /// </summary>
+    public void FindUniversalTagType() {
+        if(!String.IsNullOrEmpty(UniversalTagTypeName)) {
+            SelectedUniversalTagType = _viewModel.TypicalAnnotationsTypes
+                .FirstOrDefault(familyType => familyType.Name.Equals(UniversalTagTypeName));
+        }
+    }
+
+    /// <summary>
+    /// Получает типоразмер аннотацию линии обрыва
+    /// </summary>
+    public void FindBreakLineType() {
+        if(!String.IsNullOrEmpty(BreakLineTypeName)) {
+            SelectedBreakLineType = _viewModel.DetailComponentsTypes
+                .FirstOrDefault(familyType => familyType.Name.Equals(BreakLineTypeName));
+        }
+    }
+
+    /// <summary>
+    /// Получает типоразмер аннотацию рабочего шва бетонирования
+    /// </summary>
+    public void FindConcretingJointType() {
+        if(!String.IsNullOrEmpty(ConcretingJointTypeName)) {
+            SelectedConcretingJointType = _viewModel.DetailComponentsTypes
+                .FirstOrDefault(familyType => familyType.Name.Equals(ConcretingJointTypeName));
+        }
     }
 }
