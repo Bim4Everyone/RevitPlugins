@@ -142,7 +142,7 @@
                     <TabItem Header="{me:LocalizationSource MainWindow.TabTypesName}">
                         <ScrollViewer VerticalScrollBarVisibility="Auto">
                             <StackPanel Margin="0 0 0 12">
-                                <Border Style="{StaticResource CardBorder}">
+                                <Border Style="{StaticResource CardBorder}" BorderThickness="0">
                                 <StackPanel>
                                         <ItemsControl
                                             ItemsSource="{Binding ConsumableTypes}">
@@ -154,28 +154,12 @@
                                                             <ColumnDefinition Width="Auto" />
                                                         </Grid.ColumnDefinitions>
 
-                                                        <Expander
-                                                            Grid.Column="0"
-                                                            MinHeight="36"
-                                                            IsExpanded="False"
-                                                            Padding="0">
-                                                            <Expander.Resources>
-                                                                <Style TargetType="ToggleButton">
-                                                                    <Setter Property="Height" Value="36" />
-                                                                    <Setter Property="MinHeight" Value="36" />
-                                                                    <Setter Property="Padding" Value="0" />
-                                                                </Style>
-                                                            </Expander.Resources>
+                                                        <Expander Grid.Column="0" IsExpanded="False">
                                                             <Expander.Header>
-                                                                <Grid
-                                                                    Height="36"
-                                                                    MinHeight="36"
-                                                                    VerticalAlignment="Center">
-                                                                    <TextBlock
-                                                                        Margin="0 0 8 0"
-                                                                        VerticalAlignment="Center"
-                                                                        Text="{Binding ConsumableTypeName}" />
-                                                                </Grid>
+                                                                <TextBlock
+                                                                    FontWeight="SemiBold"
+                                                                    VerticalAlignment="Center"
+                                                                    Text="{Binding ConsumableTypeName}" />
                                                             </Expander.Header>
 
                                                             <Border Padding="5">
@@ -268,7 +252,7 @@
                                                         <ui:Button
                                                             Grid.Column="1"
                                                             Width="36"
-                                                            Height="38"
+                                                            Height="46"
                                                             Margin="8 0 0 0"
                                                             Padding="0"
                                                             VerticalAlignment="Top"
