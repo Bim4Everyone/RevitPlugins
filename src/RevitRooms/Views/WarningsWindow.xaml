@@ -1,0 +1,158 @@
+﻿<core:WpfUIPlatformWindow
+    x:Class="RevitRooms.Views.WarningsWindow"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:base="clr-namespace:dosymep.WPF.Views"
+    xmlns:local="clr-namespace:RevitRooms.Views"
+    xmlns:edits="clr-namespace:RevitRooms.Views.Controls"    
+    xmlns:vms="clr-namespace:RevitRooms.ViewModels"
+    xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
+    xmlns:core="clr-namespace:dosymep.WpfUI.Core"
+    xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"    
+    xmlns:me="clr-namespace:dosymep.WpfCore.MarkupExtensions;assembly=dosymep.WpfCore"
+    
+    mc:Ignorable="d"
+    
+    Height="700"
+    Width="1150"
+    
+    MinHeight="700"
+    MinWidth="1150"
+    
+    d:DataContext="{d:DesignInstance vms:WarningsViewModel, IsDesignTimeCreatable=False}">
+
+    <core:WpfUIPlatformWindow.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary
+                    Source="Styles.xaml" />
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
+    </core:WpfUIPlatformWindow.Resources>
+
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
+
+        <ui:TitleBar
+            Grid.Row="0"
+            VerticalAlignment="Center"
+            Title="{me:LocalizationSource WarningsWindow.Title}" />
+
+        <TextBlock
+            Grid.Row="1" 
+            Margin="20,5"
+            TextWrapping="Wrap"
+            Text="{Binding Description}"/>
+
+        <ScrollViewer
+            Grid.Row="2"
+            VerticalScrollBarVisibility="Auto">
+            <ItemsControl
+                Padding="10"
+                VirtualizingPanel.IsVirtualizing="True"
+                VirtualizingPanel.VirtualizationMode="Recycling"
+                ScrollViewer.CanContentScroll="True"
+                ItemsSource="{Binding Warnings}">
+                <ItemsControl.ItemTemplate>
+                    <DataTemplate>
+                        <edits:CustomGroupEditControl
+                            Header="{Binding FullMessage}"
+                            Description="{Binding Description}"
+                            ExtraTextVisible="True"
+                            ExtraText="{Binding WarningQuantity}"
+                            IsChecked="True">
+                            <edits:CustomGroupEditControl.Icon>
+                                <ui:SymbolIcon
+                                    Symbol="{Binding TypeInfo, Converter={StaticResource WarningIconConverter}}"
+                                    FontSize="24" />
+                            </edits:CustomGroupEditControl.Icon>
+                            <edits:CustomGroupEditControl.EditControl>
+                                <ui:DataGrid
+                                    Style="{StaticResource CustomResizableDataGridStyle}"
+                                    ItemsSource="{Binding Elements}">
+                                    <ui:DataGrid.Columns>
+                                        <DataGridTemplateColumn>
+                                            <DataGridTemplateColumn.Header>
+                                                <!--В динамически-создаваемом UserControl работает только DynamicResource-->
+                                                <TextBlock
+                                                    Text="{DynamicResource WarningsWindow.HeaderId}" /> 
+                                            </DataGridTemplateColumn.Header>
+                                            <DataGridTemplateColumn.CellTemplate>
+                                                <DataTemplate>
+                                                    <Button
+                                                        Width="100"
+                                                        Content="{Binding ElementId}"
+                                                        Command="{Binding ShowElementCommand}" />
+                                                </DataTemplate>
+                                            </DataGridTemplateColumn.CellTemplate>
+                                        </DataGridTemplateColumn>
+                                    
+                                        <DataGridTextColumn
+                                            Width="120"
+                                            Binding="{Binding CategoryName}">
+                                            <DataGridTextColumn.Header>
+                                                <TextBlock
+                                                    Text="{DynamicResource WarningsWindow.HeaderCategory}" />
+                                            </DataGridTextColumn.Header>
+                                        </DataGridTextColumn>
+
+                                        <DataGridTextColumn
+                                            Width="270"
+                                            Binding="{Binding Name}">
+                                            <DataGridTextColumn.Header>
+                                                <TextBlock
+                                                    Text="{DynamicResource WarningsWindow.HeaderName}" />
+                                            </DataGridTextColumn.Header>
+                                        </DataGridTextColumn>
+
+                                        <DataGridTextColumn
+                                            Width="180"
+                                            Binding="{Binding LevelName}">
+                                            <DataGridTextColumn.Header>
+                                                <TextBlock
+                                                    Text="{DynamicResource WarningsWindow.HeaderLevel}" />
+                                            </DataGridTextColumn.Header>
+                                        </DataGridTextColumn>
+                                    
+                                        <DataGridTextColumn
+                                            Width="150"
+                                            Binding="{Binding PhaseName}">
+                                            <DataGridTextColumn.Header>
+                                                <TextBlock
+                                                    Text="{DynamicResource WarningsWindow.HeaderPhase}" />
+                                            </DataGridTextColumn.Header>
+                                        </DataGridTextColumn>
+
+                                        <DataGridTextColumn
+                                            Width="250"
+                                            Visibility="{Binding ShowDescription}"
+                                            Binding="{Binding Description}">
+                                            <DataGridTextColumn.Header>
+                                                <TextBlock
+                                                    Text="{DynamicResource WarningsWindow.HeaderDescription}" />
+                                            </DataGridTextColumn.Header>
+                                        </DataGridTextColumn>
+                                    </ui:DataGrid.Columns>
+                                </ui:DataGrid>
+                            </edits:CustomGroupEditControl.EditControl>
+                        </edits:CustomGroupEditControl>
+                    </DataTemplate>
+                </ItemsControl.ItemTemplate>
+
+                <ItemsControl.ItemsPanel>
+                    <ItemsPanelTemplate>
+                        <VirtualizingStackPanel
+                            IsVirtualizing="True"
+                            VirtualizationMode="Recycling" />
+                    </ItemsPanelTemplate>
+                </ItemsControl.ItemsPanel>
+        </ItemsControl>
+        </ScrollViewer>
+    </Grid>
+</core:WpfUIPlatformWindow>

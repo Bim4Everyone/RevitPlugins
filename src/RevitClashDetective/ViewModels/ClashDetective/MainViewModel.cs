@@ -300,7 +300,7 @@ internal class MainViewModel : BaseViewModel {
 
     private void AskForSave() {
         if(MessageBoxService.Show(
-               _localization.GetLocalizedString("Navigator.SavePrompt"),
+               _localization.GetLocalizedString("MainWindow.SavePrompt"),
                _localization.GetLocalizedString("BIM"),
                MessageBoxButton.YesNo,
                MessageBoxImage.Question)

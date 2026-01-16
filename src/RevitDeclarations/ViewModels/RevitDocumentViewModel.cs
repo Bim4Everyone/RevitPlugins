@@ -2,89 +2,77 @@ using System.Linq;
 
 using Autodesk.Revit.DB;
 using Autodesk.Revit.DB.Architecture;
-using RevitDeclarations.Models;
 
-using dosymep.WPF.ViewModels;
 using dosymep.Bim4Everyone;
 using dosymep.Revit;
+using dosymep.WPF.ViewModels;
 
-namespace RevitDeclarations.ViewModels {
-    internal class RevitDocumentViewModel : BaseViewModel {
-        private readonly Document _document;
-        private readonly DeclarationSettings _settings;
+using RevitDeclarations.Models;
 
-        private readonly string _name;
-        private readonly Room _room;
+namespace RevitDeclarations.ViewModels;
+internal class RevitDocumentViewModel : BaseViewModel {
+    private readonly DeclarationSettings _settings;
+    private bool _isChecked;
 
-        private bool _isChecked;
+    public RevitDocumentViewModel(Document document, DeclarationSettings settings) {
+        Document = document;
+        _settings = settings;
+        Name = $"{Document.Title} [текущий проект]";
 
-        public RevitDocumentViewModel(Document document, DeclarationSettings settings) {
-            _document = document;
-            _settings = settings;
-            _name = $"{_document.Title} [текущий проект]";
+        Room = new FilteredElementCollector(Document)
+            .OfCategory(BuiltInCategory.OST_Rooms)
+            .ToElements()
+            .Cast<Room>()
+            .FirstOrDefault();
+    }
 
-            _room = new FilteredElementCollector(_document)
-                .OfCategory(BuiltInCategory.OST_Rooms)
-                .ToElements()
-                .Cast<Room>()
-                .FirstOrDefault();
-        }
+    public RevitDocumentViewModel(RevitLinkInstance revitLinkInstance, DeclarationSettings settings) {
+        Document = revitLinkInstance.GetLinkDocument();
+        _settings = settings;
+        Name = $"{revitLinkInstance.Name} [связь]";
 
-        public RevitDocumentViewModel(RevitLinkInstance revitLinkInstance, DeclarationSettings settings) {
-            _document = revitLinkInstance.GetLinkDocument();
-            _settings = settings;
-            _name = $"{revitLinkInstance.Name} [связь]";
+        Room = new FilteredElementCollector(Document)
+            .OfCategory(BuiltInCategory.OST_Rooms)
+            .ToElements()
+            .Cast<Room>()
+            .FirstOrDefault();
+    }
 
-            _room = new FilteredElementCollector(_document)
-                .OfCategory(BuiltInCategory.OST_Rooms)
-                .ToElements()
-                .Cast<Room>()
-                .FirstOrDefault();
-        }
+    public Document Document { get; }
+    public string Name { get; }
+    public bool IsChecked {
+        get => _isChecked;
+        set => RaiseAndSetIfChanged(ref _isChecked, value);
+    }
+    public Room Room { get; }
 
-        public Document Document => _document;
-        public string Name => _name;
-        public bool IsChecked {
-            get => _isChecked;
-            set => RaiseAndSetIfChanged(ref _isChecked, value);
-        }
-        public Room Room => _room;
+    public bool HasPhase(Phase phase) {
+        bool checkPhase = Document
+            .Phases
+            .OfType<Phase>()
+            .Select(x => x.Name)
+            .Contains(phase.Name);
 
-        public bool HasPhase(Phase phase) {
-            bool checkPhase = _document
-                .Phases
-                .OfType<Phase>()
-                .Select(x => x.Name)
-                .Contains(phase.Name);
+        return checkPhase;
+    }
 
-            if(checkPhase) {
-                return true;
-            }
-            return false;
-        }
+    public bool HasRooms() {
+        return Room != null;
+    }
 
-        public bool HasRooms() {
-            if(_room != null) {
-                return true;
-            }
-            return false;
-        }
-
-        public ErrorsListViewModel CheckParameters() {
-            ErrorsListViewModel errorListVM = new ErrorsListViewModel() {
-                Message = "Ошибка",
-                Description = "В проекте отсутствует параметр, выбранный в исходных данных",
-                DocumentName = _name
-            };
-
-            errorListVM.Errors = _settings
+    public ErrorsListViewModel CheckParameters() {
+        var errorListVM = new ErrorsListViewModel {
+            Message = "Ошибка",
+            Description = "В проекте отсутствует параметр, выбранный в исходных данных",
+            DocumentName = Name,
+            Errors = _settings
                 .AllParameters
                 .Select(x => x.Definition.Name)
-                .Where(x => !_room.IsExistsParam(x))
+                .Where(x => !Room.IsExistsParam(x))
                 .Select(x => new ErrorElement(x, "Отсутствует параметр в проекте"))
-                .ToList();
+                .ToList()
+        };
 
-            return errorListVM;
-        }
+        return errorListVM;
     }
 }

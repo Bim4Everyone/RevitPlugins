@@ -1,8 +1,3 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
 
 using Autodesk.Revit.Attributes;
@@ -17,32 +12,30 @@ using RevitDeclarations.Models;
 using RevitDeclarations.ViewModels;
 using RevitDeclarations.Views;
 
-namespace RevitDeclarations {
-    [Transaction(TransactionMode.Manual)]
-    public class PublicAreasDeclarationCommand : BasePluginCommand {
-        public PublicAreasDeclarationCommand() {
-            PluginName = "16.1. О помещениях общего пользования";
-        }
+namespace RevitDeclarations;
+[Transaction(TransactionMode.Manual)]
+public class PublicAreasDeclarationCommand : BasePluginCommand {
+    public PublicAreasDeclarationCommand() {
+        PluginName = "16.1. О помещениях общего пользования";
+    }
 
-        protected override void Execute(UIApplication uiApplication) {
-            using(IKernel kernel = uiApplication.CreatePlatformServices()) {
-                kernel.Bind<RevitRepository>()
-                    .ToSelf()
-                    .InSingletonScope();
-                kernel.Bind<PublicAreasSettings>()
-                    .ToSelf()
-                    .InSingletonScope();
+    protected override void Execute(UIApplication uiApplication) {
+        using var kernel = uiApplication.CreatePlatformServices();
+        kernel.Bind<RevitRepository>()
+            .ToSelf()
+            .InSingletonScope();
+        kernel.Bind<PublicAreasSettings>()
+            .ToSelf()
+            .InSingletonScope();
 
-                kernel.Bind<PublicAreasConfig>()
-                    .ToMethod(c => PublicAreasConfig.GetPluginConfig());
+        kernel.Bind<PublicAreasConfig>()
+            .ToMethod(c => PublicAreasConfig.GetPluginConfig());
 
-                kernel.Bind<PublicAreasMainVM>().ToSelf();
-                kernel.Bind<PublicAreasMainWindow>().ToSelf()
-                    .WithPropertyValue(nameof(Window.Title), PluginName)
-                    .WithPropertyValue(nameof(Window.DataContext), c => c.Kernel.Get<PublicAreasMainVM>());
+        kernel.Bind<PublicAreasMainVM>().ToSelf();
+        kernel.Bind<PublicAreasMainWindow>().ToSelf()
+            .WithPropertyValue(nameof(Window.Title), PluginName)
+            .WithPropertyValue(nameof(Window.DataContext), c => c.Kernel.Get<PublicAreasMainVM>());
 
-                Notification(kernel.Get<PublicAreasMainWindow>());
-            }
-        }
+        Notification(kernel.Get<PublicAreasMainWindow>());
     }
 }

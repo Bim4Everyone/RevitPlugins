@@ -1,4 +1,3 @@
-﻿using System;
 using System.Collections.Generic;
 
 using Autodesk.Revit.DB;
@@ -7,29 +6,25 @@ using dosymep.WPF.ViewModels;
 
 using RevitVolumeOfWork.Models;
 
-namespace RevitVolumeOfWork.ViewModels {
-    internal class LevelViewModel : BaseViewModel {
+namespace RevitVolumeOfWork.ViewModels; 
+internal class LevelViewModel : BaseViewModel {
+    private readonly string _name;
+    private readonly Level _element;
+    private readonly IEnumerable<RoomElement> _rooms;
+    private bool _isChecked;
 
-        readonly Level _level;
-        readonly IEnumerable<RoomElement> _rooms;
+    public LevelViewModel(string name, Level level, IEnumerable<RoomElement> rooms) {
+        _name = name;
+        _element = level;
+        _rooms = rooms;
+    }
 
-        private bool _isSelected;
-                
-        public LevelViewModel(string name, Level level, IEnumerable<RoomElement> rooms) {
-            _level = level;
-            _rooms = rooms;
-            Name = name;
-        }
+    public string Name => _name;
+    public Level Element => _element;
+    public IEnumerable<RoomElement> Rooms => _rooms;
 
-        public string Name { get; set; }
-
-        public Level Element { get => _level;  }
-
-        public bool IsSelected {
-            get => _isSelected;
-            set => this.RaiseAndSetIfChanged(ref _isSelected, value);
-        }
-
-        public IEnumerable<RoomElement> Rooms { get => _rooms;  }
+    public bool IsChecked {
+        get => _isChecked;
+        set => RaiseAndSetIfChanged(ref _isChecked, value);
     }
 }

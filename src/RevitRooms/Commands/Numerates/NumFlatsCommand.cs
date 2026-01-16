@@ -3,9 +3,8 @@ using System.Linq;
 
 using Autodesk.Revit.DB;
 
-using DevExpress.Mvvm.Native;
-
 using dosymep.Bim4Everyone.SharedParams;
+using dosymep.SimpleServices;
 
 using RevitRooms.Comparators;
 using RevitRooms.Models;
@@ -18,10 +17,10 @@ internal class NumFlatsCommand : NumerateCommand {
     private ElementId _groupId;
     private ElementId _sectionId;
 
-    public NumFlatsCommand(RevitRepository revitRepository)
+    public NumFlatsCommand(RevitRepository revitRepository, ILocalizationService localizationService)
         : base(revitRepository) {
         RevitParam = SharedParamsConfig.Instance.ApartmentNumber;
-        TransactionName = "Нумерация групп помещений";
+        TransactionName = localizationService.GetLocalizedString("Transaction.NumByGroup");
     }
 
     protected override SpatialElementViewModel[] OrderElements(IEnumerable<SpatialElementViewModel> spatialElements) {

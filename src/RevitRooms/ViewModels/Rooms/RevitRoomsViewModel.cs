@@ -9,29 +9,54 @@ using Autodesk.Revit.UI;
 
 using dosymep.Bim4Everyone.ProjectParams;
 using dosymep.Bim4Everyone.SharedParams;
+using dosymep.Revit;
+using dosymep.SimpleServices;
 using dosymep.WPF.Commands;
 using dosymep.WPF.ViewModels;
 
 using RevitRooms.Models;
 using RevitRooms.Models.Calculation;
+using RevitRooms.Services;
 using RevitRooms.Views;
 
-namespace RevitRooms.ViewModels;
-internal abstract class RevitViewModel : BaseViewModel {
+namespace RevitRooms.ViewModels.Rooms;
+internal abstract class RevitRoomsViewModel : BaseViewModel {
     public Guid _id;
     protected readonly RevitRepository _revitRepository;
+    protected readonly RoomsConfig _roomsConfig;
+    protected readonly IMessageBoxService _messageBoxService;
+    protected readonly ILocalizationService _localizationService;
+    protected readonly ErrorWindowService _errorWindowService;
+    protected readonly PluginSettings _pluginSettings;
 
     private string _errorText;
     private bool _isAllowSelectLevels;
     private bool _isFillLevel;
 
-    public RevitViewModel(RevitRepository revitRepository) {
+    public RevitRoomsViewModel(RevitRepository revitRepository, 
+                               RoomsConfig roomsConfig,
+                               IMessageBoxService messageBoxService,
+                               ILocalizationService localizationService,
+                               ErrorWindowService errorWindowService) {
         _revitRepository = revitRepository;
+        _roomsConfig = roomsConfig;
+        _messageBoxService = messageBoxService;
+        _localizationService = localizationService;
+        _errorWindowService = errorWindowService;
+        _pluginSettings = _roomsConfig.PluginSettings;
 
-        Levels = [.. GetLevelViewModels().OrderBy(item => item.Element.Elevation).Where(item => item.SpatialElements.Count > 0)];
-        AdditionalPhases = [.. _revitRepository.GetAdditionalPhases().Select(item => new PhaseViewModel(item, _revitRepository))];
-
-        Phases = [.. Levels.SelectMany(item => item.SpatialElements).Select(item => item.Phase).Where(item => item != null).Distinct().Except(AdditionalPhases)];
+        Levels = [.. GetLevelViewModels()
+            .OrderBy(item => item.Element.Elevation)
+            .Where(item => item.SpatialElements.Count > 0)];
+        AdditionalPhases = [.. _revitRepository
+            .GetAdditionalPhases()
+            .Select(item => new PhaseViewModel(item, _revitRepository))];
+        Phases = [.. Levels
+            .SelectMany(item => item.SpatialElements)
+            .Select(item => item.Phase)
+            .Where(item => item != null)
+            .Distinct()
+            .Except(AdditionalPhases)];
         Phase = Phases.FirstOrDefault();
 
         RoundAccuracy = 1;
@@ -78,13 +103,12 @@ internal abstract class RevitViewModel : BaseViewModel {
     public ObservableCollection<LevelViewModel> Levels { get; }
     public ObservableCollection<PhaseViewModel> AdditionalPhases { get; }
 
-    private List<InfoElementViewModel> InfoElements { get; set; } = [];
+    private List<WarningViewModel> Warnings { get; set; } = [];
 
     protected abstract IEnumerable<LevelViewModel> GetLevelViewModels();
 
     private void SetRoomsConfig() {
-        var roomsConfig = RoomsConfig.GetRoomsConfig();
-        var settings = roomsConfig.GetSettings(_revitRepository.Document);
+        var settings = _roomsConfig.GetSettings(_revitRepository.Document);
         if(settings == null) {
             return;
         }
@@ -111,9 +135,8 @@ internal abstract class RevitViewModel : BaseViewModel {
     }
 
     private void SaveRoomsConfig() {
-        var roomsConfig = RoomsConfig.GetRoomsConfig();
-        var settings = roomsConfig.GetSettings(_revitRepository.Document);
-        settings ??= roomsConfig.AddSettings(_revitRepository.Document);
+        var settings = _roomsConfig.GetSettings(_revitRepository.Document);
+        settings ??= _roomsConfig.AddSettings(_revitRepository.Document);
 
         settings.IsFillLevel = IsFillLevel;
         settings.NotShowWarnings = NotShowWarnings;
@@ -129,7 +152,7 @@ internal abstract class RevitViewModel : BaseViewModel {
 
         settings.Levels = Levels.Where(item => item.IsSelected).Select(item => item.ElementId).ToList();
 
-        roomsConfig.SaveProjectConfig();
+        _roomsConfig.SaveProjectConfig();
     }
 
     private void CalculateAreas(object p) {
@@ -137,21 +160,22 @@ internal abstract class RevitViewModel : BaseViewModel {
         _revitRepository.RemoveUnplacedSpatialElements();
 
         // Обрабатываем все зоны
-        var errorElements = new Dictionary<string, InfoElementViewModel>();
+        var errorElements = new Dictionary<string, WarningViewModel>();
         var redundantAreas = GetAreas().Where(item => item.IsRedundant == true || item.NotEnclosed == true);
-        AddElements(InfoElement.RedundantAreas, redundantAreas, errorElements);
+        AddElements(WarningInfo.GetRedundantAreas(_localizationService), redundantAreas, errorElements);
 
-        InfoElements = errorElements.Values.ToList();
-        if(InfoElements.Count > 0) {
-            ShowInfoElementsWindow("Ошибки", InfoElements);
+        Warnings = errorElements.Values.ToList();
+        if(Warnings.Count > 0) {
+            _errorWindowService.ShowNoticeWindow(NotShowWarnings, Warnings);
             return;
         }
 
         // получаем уже обработанные имена уровней
         var levelNames = _revitRepository.GetLevelNames();
 
-        var bigChangesRooms = new Dictionary<string, InfoElementViewModel>();
-        using(var transaction = _revitRepository.StartTransaction("Расчет площадей")) {
+        var bigChangesRooms = new Dictionary<string, WarningViewModel>();
+        string transactionName = _localizationService.GetLocalizedString("Transaction.CalculateAreas");
+        using(var transaction = _revitRepository.Document.StartTransaction(transactionName)) {
             // Надеюсь будет достаточно быстро отрабатывать :)
             // Обновление параметра округления у зон
             foreach(var spatialElement in GetAreas()) {
@@ -176,16 +200,18 @@ internal abstract class RevitViewModel : BaseViewModel {
                 if(isChangedArea && IsCheckRoomsChanges) {
                     double differences = areaWithRatio.GetDifferences();
                     double percentChange = areaWithRatio.GetPercentChange();
-                    AddElement(InfoElement.BigChangesAreas, FormatMessage(differences, percentChange), spatialElement, bigChangesRooms);
+                    AddElement(WarningInfo.GetBigChangesAreas(_localizationService), FormatMessage(differences, percentChange), spatialElement, bigChangesRooms);
                 }
             }
 
             transaction.Commit();
         }
 
-        InfoElements.AddRange(bigChangesRooms.Values);
-        if(!ShowInfoElementsWindow("Информация", InfoElements)) {
-            TaskDialog.Show("Предупреждение!", "Расчет завершен!");
+        Warnings.AddRange(bigChangesRooms.Values);
+        if(!_errorWindowService.ShowNoticeWindow(NotShowWarnings, Warnings)) {
+            string message = _localizationService.GetLocalizedString("TaskDialog.Result");
+            string title = _localizationService.GetLocalizedString("TaskDialog.Information");
+            _messageBoxService.Show(message, title);
         }
     }
 
@@ -208,7 +234,7 @@ internal abstract class RevitViewModel : BaseViewModel {
         // Проверка всех элементов
         // на выделенных уровнях
         if(CheckElements(phases, levels)) {
-            ShowInfoElementsWindow("Ошибки", InfoElements);
+            _errorWindowService.ShowNoticeWindow(NotShowWarnings, Warnings);
             return;
         }
 
@@ -222,24 +248,24 @@ internal abstract class RevitViewModel : BaseViewModel {
 
     private bool CanCalculate(object p) {
         if(IsCheckRoomsChanges) {
-            if(!int.TryParse(RoomAccuracy, out int сheckRoomAccuracy)) {
-                ErrorText = "Точность проверки должна быть числом.";
+            if(!int.TryParse(RoomAccuracy, out int checkRoomAccuracy)) {
+                ErrorText = _localizationService.GetLocalizedString("RoomsWindow.WarningAccuracy");
                 return false;
             }
 
-            if(сheckRoomAccuracy <= 0 || сheckRoomAccuracy > 100) {
-                ErrorText = "Точность проверки должна быть от 1 до 100.";
+            if(checkRoomAccuracy <= 0 || checkRoomAccuracy > 100) {
+                ErrorText = _localizationService.GetLocalizedString("RoomsWindow.WarningAccuracyRange");
                 return false;
             }
         }
 
         if(Phase == null) {
-            ErrorText = "Выберите стадию.";
+            ErrorText = _localizationService.GetLocalizedString("RoomsWindow.WarningSelectPhase");
             return false;
         }
 
         if(!Levels.Any(item => item.IsSelected)) {
-            ErrorText = "Выберите хотя бы один уровень.";
+            ErrorText = _localizationService.GetLocalizedString("RoomsWindow.WarningSelectLevels");
             return false;
         }
 
@@ -248,32 +274,34 @@ internal abstract class RevitViewModel : BaseViewModel {
     }
 
     private bool CheckElements(List<PhaseViewModel> phases, IEnumerable<LevelViewModel> levels) {
-        var errorElements = new Dictionary<string, InfoElementViewModel>();
+        var errorElements = new Dictionary<string, WarningViewModel>();
+        string phaseName = _roomsConfig.PluginSettings.PhaseRoomsPartition;
+
         foreach(var level in levels) {
             var rooms = level.GetRooms(phases);
 
             // Все помещения которые
             // избыточные или не окруженные
             var redundantRooms = rooms.Where(item => item.IsRedundant == true || item.NotEnclosed == true);
-            AddElements(InfoElement.RedundantRooms, redundantRooms, errorElements);
+            AddElements(WarningInfo.GetRedundantRooms(_localizationService), redundantRooms, errorElements);
 
             // Все помещения у которых
             // не заполнены обязательные параметры
             foreach(var room in rooms) {
                 if(room.Room == null) {
-                    AddElement(InfoElement.RequiredParams.FormatMessage(ProjectParamsConfig.Instance.RoomName.Name),
+                    AddElement(WarningInfo.GetRequiredParams(_localizationService, ProjectParamsConfig.Instance.RoomName.Name),
                         null, room, errorElements);
                 }
 
                 if(room.RoomGroup == null) {
                     AddElement(
-                        InfoElement.RequiredParams.FormatMessage(ProjectParamsConfig.Instance.RoomGroupName.Name),
+                        WarningInfo.GetRequiredParams(_localizationService, ProjectParamsConfig.Instance.RoomGroupName.Name),
                         null, room, errorElements);
                 }
 
                 if(room.RoomSection == null) {
                     AddElement(
-                        InfoElement.RequiredParams.FormatMessage(ProjectParamsConfig.Instance.RoomSectionName.Name),
+                        WarningInfo.GetRequiredParams(_localizationService, ProjectParamsConfig.Instance.RoomSectionName.Name),
                         null, room, errorElements);
                 }
             }
@@ -281,7 +309,7 @@ internal abstract class RevitViewModel : BaseViewModel {
             // Все помещения у которых
             // не совпадают значения группы и типа группы
             var checksRooms = rooms.Where(room => room.RoomGroup != null && room.RoomSection != null)
-                .Where(room => room.Phase == Phase || room.PhaseName.Equals("Межквартирные перегородки",
+                .Where(room => room.Phase == Phase || room.PhaseName.Equals(phaseName,
                     StringComparison.CurrentCultureIgnoreCase))
                 .Where(ContainGroups);
 
@@ -292,22 +320,22 @@ internal abstract class RevitViewModel : BaseViewModel {
                 if(IsNotEqualGroupType(flat)) {
                     string roomGroup = flat.FirstOrDefault()?.RoomGroup.Name;
                     string roomSection = flat.FirstOrDefault()?.RoomSection.Name;
-                    AddElements(InfoElement.NotEqualGroupType.FormatMessage(roomGroup, roomSection), flat,
+                    AddElements(WarningInfo.GetNotEqualGroupType(_localizationService, roomGroup, roomSection), flat,
                         errorElements);
                 }
 
                 if(IsNotEqualMultiLevel(flat.Where(item => !string.IsNullOrEmpty(item.RoomMultilevelGroup)))) {
-                    AddElements(InfoElement.NotEqualMultiLevel, flat, errorElements);
+                    AddElements(WarningInfo.GetNotEqualMultiLevel(_localizationService), flat, errorElements);
                 }
             }
         }
 
         // Ошибки, которые не останавливают выполнение скрипта
-        var warningElements = new Dictionary<string, InfoElementViewModel>();
+        var warnings = new Dictionary<string, WarningViewModel>();
 
         var checkPhases = new List<PhaseViewModel>() { Phase };
         var customPhase = phases.FirstOrDefault(item =>
-            item.PhaseName?.Equals("Межквартирные перегородки", StringComparison.CurrentCultureIgnoreCase) == true);
+            item.PhaseName?.Equals(phaseName, StringComparison.CurrentCultureIgnoreCase) == true);
         if(customPhase != null) {
             checkPhases.Add(customPhase);
         }
@@ -315,24 +343,24 @@ internal abstract class RevitViewModel : BaseViewModel {
         foreach(var level in levels) {
             var rooms = level.GetRooms(checkPhases).ToArray();
 
-            CheckRoomSeparators(level, checkPhases, warningElements, rooms);
-            CheckDoorsAndWindows(level, checkPhases, warningElements, rooms);
+            CheckRoomSeparators(level, checkPhases, warnings, rooms);
+            CheckDoorsAndWindows(level, checkPhases, warnings, rooms);
 
             // Все помещений у которых
             // найдены самопересечения
-            var countourIntersectRooms = rooms
+            var contourIntersectRooms = rooms
                 .Where(item => item.IsCountourIntersect == true);
-            AddElements(InfoElement.CountourIntersectRooms, countourIntersectRooms, warningElements);
+            AddElements(WarningInfo.GetContourIntersectRooms(_localizationService), contourIntersectRooms, warnings);
         }
 
-        InfoElements = warningElements.Values.Union(errorElements.Values).ToList();
+        Warnings = warnings.Values.Union(errorElements.Values).ToList();
         return errorElements.Count > 0;
     }
 
     private void CheckRoomSeparators(
         LevelViewModel level,
         List<PhaseViewModel> checkPhases,
-        Dictionary<string, InfoElementViewModel> warningElements,
+        Dictionary<string, WarningViewModel> warningElements,
         SpatialElementViewModel[] rooms) {
         // добавляем разделители помещений
         var separators = level.GetRoomSeparators(checkPhases).ToArray();
@@ -345,20 +373,20 @@ internal abstract class RevitViewModel : BaseViewModel {
         var notEqualSectionDoors = separators
             .Where(item => !item.IsSectionNameEqual);
 
-        AddElements(InfoElement.NotEqualSectionDoors, notEqualSectionDoors, warningElements);
+        AddElements(WarningInfo.GetEqualSectionDoors(_localizationService), notEqualSectionDoors, warningElements);
 
         // Все разделители
         // с не совпадающей группой
         var notEqualGroup = separators
             .Where(item => !item.IsGroupNameEqual);
 
-        AddElements(InfoElement.NotEqualGroup, notEqualGroup, warningElements);
+        AddElements(WarningInfo.GetNotEqualGroup(_localizationService), notEqualGroup, warningElements);
     }
 
     private void CheckDoorsAndWindows(
         LevelViewModel level,
         List<PhaseViewModel> checkPhases,
-        Dictionary<string, InfoElementViewModel> warningElements,
+        Dictionary<string, WarningViewModel> warningElements,
         SpatialElementViewModel[] rooms) {
         var doors = level.GetDoors(checkPhases).ToArray();
         var doorsAndWindows = doors.Union(level.GetWindows(checkPhases)).ToArray();
@@ -368,84 +396,87 @@ internal abstract class RevitViewModel : BaseViewModel {
         var notEqualSectionDoors = doorsAndWindows
             .Where(item => !item.IsSectionNameEqual);
 
-        AddElements(InfoElement.NotEqualSectionDoors, notEqualSectionDoors, warningElements);
+        AddElements(WarningInfo.GetEqualSectionDoors(_localizationService), notEqualSectionDoors, warningElements);
 
         // Все окна и двери
         // с не совпадающей группой
         var notEqualGroup = doorsAndWindows
             .Where(item => !item.IsGroupNameEqual);
 
-        AddElements(InfoElement.NotEqualGroup, notEqualGroup, warningElements);
+        AddElements(WarningInfo.GetNotEqualGroup(_localizationService), notEqualGroup, warningElements);
     }
 
     private void CalculateAreas(List<PhaseViewModel> phases, IEnumerable<LevelViewModel> levels) {
-        using var transaction = _revitRepository.StartTransaction("Расчет площадей");
         // получаем обработанные имена уровней
         var levelNames = _revitRepository.GetLevelNames();
+        var bigChangesRooms = new Dictionary<string, WarningViewModel>();
 
-        var bigChangesRooms = new Dictionary<string, InfoElementViewModel>();
+        string transactionName = _localizationService.GetLocalizedString("Transaction.CalculateAreas");
+        using(var transaction = _revitRepository.Document.StartTransaction(transactionName)) {
+            // Надеюсь будет достаточно быстро отрабатывать :)
+            // Подсчет площадей помещений
+            foreach(var level in levels) {
+                foreach(var spatialElement in level.GetRooms(phases)) {
+                    if(IsFillLevel && !spatialElement.IsLevelFix) {
+                        // Заполняем параметр Этаж
+                        _revitRepository.UpdateLevelSharedParam(spatialElement.Element, levelNames);
+                    }
 
-        // Надеюсь будет достаточно быстро отрабатывать :)
-        // Подсчет площадей помещений
-        foreach(var level in levels) {
-            foreach(var spatialElement in level.GetRooms(phases)) {
-                if(IsFillLevel && !spatialElement.IsLevelFix) {
-                    // Заполняем параметр Этаж
-                    _revitRepository.UpdateLevelSharedParam(spatialElement.Element, levelNames);
-                }
+                    // Заполняем дублирующие
+                    // общие параметры
+                    spatialElement.UpdateSharedParams();
 
-                // Заполняем дублирующие
-                // общие параметры
-                spatialElement.UpdateSharedParams();
+                    // Обновление параметра площади 
+                    var area = new RoomAreaCalculation(GetRoomAccuracy(), RoundAccuracy) { Phase = Phase.Element };
+                    area.CalculateParam(spatialElement);
+                    bool isChangedRoomArea = area.SetParamValue(spatialElement);
 
-                // Обновление параметра площади 
-                var area = new RoomAreaCalculation(GetRoomAccuracy(), RoundAccuracy) { Phase = Phase.Element };
-                area.CalculateParam(spatialElement);
-                bool isChangedRoomArea = area.SetParamValue(spatialElement);
+                    // Площадь с коэффициентном зависит от площади без коэффициента
+                    var areaWithRatio = new AreaWithRatioCalculation(GetRoomAccuracy(), RoundAccuracy) { Phase = Phase.Element };
+                    areaWithRatio.CalculateParam(spatialElement);
+                    areaWithRatio.SetParamValue(spatialElement);
 
-                // Площадь с коэффициентном зависит от площади без коэффициента
-                var areaWithRatio = new AreaWithRatioCalculation(GetRoomAccuracy(), RoundAccuracy) { Phase = Phase.Element };
-                areaWithRatio.CalculateParam(spatialElement);
-                areaWithRatio.SetParamValue(spatialElement);
-
-                if(isChangedRoomArea && IsCheckRoomsChanges) {
-                    double differences = areaWithRatio.GetDifferences();
-                    double percentChange = areaWithRatio.GetPercentChange();
-                    AddElement(InfoElement.BigChangesRoomAreas, FormatMessage(differences, percentChange),
-                        spatialElement, bigChangesRooms);
+                    if(isChangedRoomArea && IsCheckRoomsChanges) {
+                        double differences = areaWithRatio.GetDifferences();
+                        double percentChange = areaWithRatio.GetPercentChange();
+                        AddElement(WarningInfo.GetBigChangesRoomAreas(_localizationService), FormatMessage(differences, percentChange),
+                            spatialElement, bigChangesRooms);
+                    }
                 }
             }
+
+            // Обработка параметров зависящих от квартир
+            var flats = levels
+                .SelectMany(item => item.GetRooms(phases))
+                .Where(item => string.IsNullOrEmpty(item.RoomMultilevelGroup))
+                .GroupBy(item => new { s = item.RoomSection.Id, g = item.RoomGroup.Id, item.LevelId });
+
+            foreach(var flat in flats) {
+                UpdateParam(flat.ToArray(), bigChangesRooms);
+            }
+
+            // многоуровневые квартиры
+            var multiLevels = levels
+                .SelectMany(item => item.GetRooms(phases))
+                .Where(item => !string.IsNullOrEmpty(item.RoomMultilevelGroup))
+                .GroupBy(item => new { item.RoomSection.Id, item.RoomMultilevelGroup });
+
+            foreach(var multiLevel in multiLevels) {
+                UpdateParam(multiLevel.ToArray(), bigChangesRooms);
+            }
+
+            transaction.Commit();
         }
 
-        // Обработка параметров зависящих от квартир
-        var flats = levels
-            .SelectMany(item => item.GetRooms(phases))
-            .Where(item => string.IsNullOrEmpty(item.RoomMultilevelGroup))
-            .GroupBy(item => new { s = item.RoomSection.Id, g = item.RoomGroup.Id, item.LevelId });
-
-        foreach(var flat in flats) {
-            UpdateParam(flat.ToArray(), bigChangesRooms);
-        }
-
-        // многоуровневые квартиры
-        var multiLevels = levels
-            .SelectMany(item => item.GetRooms(phases))
-            .Where(item => !string.IsNullOrEmpty(item.RoomMultilevelGroup))
-            .GroupBy(item => new { item.RoomSection.Id, item.RoomMultilevelGroup });
-
-        foreach(var multiLevel in multiLevels) {
-            UpdateParam(multiLevel.ToArray(), bigChangesRooms);
-        }
-
-
-        transaction.Commit();
-        InfoElements.AddRange(bigChangesRooms.Values);
-        if(!ShowInfoElementsWindow("Информация", InfoElements)) {
-            TaskDialog.Show("Предупреждение!", "Расчет завершен!");
+        Warnings.AddRange(bigChangesRooms.Values);
+        if(!_errorWindowService.ShowNoticeWindow(NotShowWarnings, Warnings)) {
+            string message = _localizationService.GetLocalizedString("TaskDialog.Result");
+            string title = _localizationService.GetLocalizedString("TaskDialog.Information");
+            _messageBoxService.Show(message, title);
         }
     }
 
-    private void UpdateParam(SpatialElementViewModel[] flat, Dictionary<string, InfoElementViewModel> bigChangesRooms) {
+    private void UpdateParam(SpatialElementViewModel[] flat, Dictionary<string, WarningViewModel> bigChangesRooms) {
         foreach(var calculation in GetParamCalculations()) {
             foreach(var room in flat) {
                 calculation.CalculateParam(room);
@@ -456,15 +487,18 @@ internal abstract class RevitViewModel : BaseViewModel {
                    calculation.RevitParam == SharedParamsConfig.Instance.ApartmentArea) {
                     double differences = calculation.GetDifferences();
                     double percentChange = calculation.GetPercentChange();
-                    AddElement(InfoElement.BigChangesFlatAreas, FormatMessage(differences, percentChange), room,
-                        bigChangesRooms);
+                    AddElement(WarningInfo.GetBigChangesFlatAreas(_localizationService), 
+                               FormatMessage(differences, percentChange), 
+                               room,
+                               bigChangesRooms);
                 }
             }
         }
     }
 
     private string FormatMessage(double differences, double percentChange) {
-        return $"Изменение: {percentChange:F0}% ({differences:F} {GetSquareMetersText()}).";
+        return _localizationService.GetLocalizedString(
+            "WarningsWindow.BigChangeDiff", $"{percentChange:F0}", $"{differences:F}", GetSquareMetersText());
     }
 
     private IEnumerable<IEnumerable<SpatialElementViewModel>> GetFlats(IEnumerable<SpatialElementViewModel> rooms) {
@@ -486,12 +520,23 @@ internal abstract class RevitViewModel : BaseViewModel {
         }
 
         if(IsSpotCalcArea) {
-            yield return new ApartmentFullAreaCalculation(GetRoomAccuracy(), RoundAccuracy) { Phase = Phase.Element };
+            string phaseName = _roomsConfig.PluginSettings.PhaseRoomsPartition;
+            yield return new ApartmentFullAreaCalculation(GetRoomAccuracy(), RoundAccuracy, phaseName) { Phase = Phase.Element };
         }
     }
 
     private IEnumerable<SpatialElementViewModel> GetAreas() {
         return Levels.Where(item => item.IsSelected).SelectMany(item => item.GetAreas());
+    }
+
+    private bool ContainGroups(SpatialElementViewModel item) {
+        return new[] {
+            _pluginSettings.ApartmentName,
+            _pluginSettings.RoomsName,
+            _pluginSettings.HotelRoom,
+            _pluginSettings.Penthouse 
+        }
+        .Any(group => Contains(item.RoomGroup.Name, group, StringComparison.CurrentCultureIgnoreCase));
     }
 
     private static bool IsNotEqualGroupType(IEnumerable<SpatialElementViewModel> rooms) {
@@ -506,11 +551,6 @@ internal abstract class RevitViewModel : BaseViewModel {
             .Distinct().Count() > 1;
     }
 
-    private static bool ContainGroups(SpatialElementViewModel item) {
-        return new[] { "апартаменты", "квартира", "гостиничный номер", "пентхаус" }
-            .Any(group => Contains(item.RoomGroup.Name, group, StringComparison.CurrentCultureIgnoreCase));
-    }
-
     private static bool Contains(string source, string toCheck, StringComparison comp) {
         return source?.IndexOf(toCheck, comp) >= 0;
     }
@@ -519,41 +559,51 @@ internal abstract class RevitViewModel : BaseViewModel {
         return int.TryParse(RoomAccuracy, out int result) ? result : 100;
     }
 
-    private void AddElements(InfoElement infoElement, IEnumerable<IElementViewModel<Element>> elements, Dictionary<string, InfoElementViewModel> infoElements) {
+    private void AddElements(WarningInfo infoElement, 
+                             IEnumerable<IElementViewModel<Element>> elements, 
+                             Dictionary<string, WarningViewModel> infoElements) {
         foreach(var element in elements) {
             AddElement(infoElement, null, element, infoElements);
         }
     }
 
-    private void AddElement(InfoElement infoElement, string message, IElementViewModel<Element> element, Dictionary<string, InfoElementViewModel> infoElements) {
+    private void AddElement(WarningInfo infoElement, 
+                            string message, 
+                            IElementViewModel<Element> element, 
+                            Dictionary<string, 
+                            WarningViewModel> infoElements) {
         if(!infoElements.TryGetValue(infoElement.Message, out var value)) {
-            value = new InfoElementViewModel() { Message = infoElement.Message, TypeInfo = infoElement.TypeInfo, Description = infoElement.Description, Elements = [] };
+            value = new WarningViewModel(_localizationService) { 
+                Message = infoElement.Message, 
+                TypeInfo = infoElement.TypeInfo, 
+                Description = infoElement.Description, 
+                Elements = [] };
             infoElements.Add(infoElement.Message, value);
         }
 
-        value.Elements.Add(new MessageElementViewModel() { Element = element, Description = message });
+        value.Elements.Add(new WarningElementViewModel() { Element = element, Description = message });
     }
 
-    private bool ShowInfoElementsWindow(string title, IEnumerable<InfoElementViewModel> infoElements) {
-        if(NotShowWarnings) {
-            infoElements = infoElements.Where(item => item.TypeInfo != TypeInfo.Warning);
-        }
+    //private bool ShowInfoElementsWindow(string title, IEnumerable<InfoElementViewModel> infoElements) {
+    //    if(NotShowWarnings) {
+    //        infoElements = infoElements.Where(item => item.TypeInfo != TypeInfo.Warning);
+    //    }
 
-        if(infoElements.Any()) {
-            var window = new InfoElementsWindow() {
-                Title = title,
-                DataContext = new InfoElementsViewModel() {
-                    InfoElement = infoElements.FirstOrDefault(),
-                    InfoElements = [.. infoElements]
-                }
-            };
+    //    if(infoElements.Any()) {
+    //        var window = new InfoElementsWindow() {
+    //            Title = title,
+    //            DataContext = new InfoElementsViewModel() {
+    //                InfoElement = infoElements.FirstOrDefault(),
+    //                InfoElements = [.. infoElements]
+    //            }
+    //        };
 
-            window.Show();
-            return true;
-        }
+    //        window.Show();
+    //        return true;
+    //    }
 
-        return false;
-    }
+    //    return false;
+    //}
 
     protected IEnumerable<SpatialElement> GetAdditionalElements(IList<SpatialElement> selectedElements) {
         var levelIds = selectedElements.Select(item => item.LevelId).Distinct().ToArray();

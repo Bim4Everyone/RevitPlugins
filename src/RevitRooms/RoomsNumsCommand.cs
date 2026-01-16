@@ -1,12 +1,21 @@
 using System;
+using System.Globalization;
+using System.Reflection;
 
 using Autodesk.Revit.Attributes;
 using Autodesk.Revit.DB;
 using Autodesk.Revit.UI;
 
 using dosymep.Bim4Everyone;
+using dosymep.Bim4Everyone.ProjectConfigs;
+using dosymep.Bim4Everyone.SimpleServices;
+using dosymep.WpfCore.Ninject;
+using dosymep.WpfUI.Core.Ninject;
+
+using Ninject;
 
 using RevitRooms.Models;
+using RevitRooms.Services;
 using RevitRooms.ViewModels;
 using RevitRooms.Views;
 
@@ -18,18 +27,52 @@ public class RoomsNumsCommand : BasePluginCommand {
     }
 
     protected override void Execute(UIApplication uiApplication) {
-        bool isChecked = new CheckProjectParams(uiApplication)
+        using IKernel kernel = uiApplication.CreatePlatformServices();
+
+        // Настройка доступа к Revit
+        kernel.Bind<RevitRepository>()
+            .ToSelf()
+            .InSingletonScope();
+
+        kernel.Bind<NumOrderWindowService>()
+            .ToSelf()
+            .InSingletonScope();
+
+        kernel.Bind<CheckProjectParams>()
+            .ToSelf()
+            .InSingletonScope();
+
+        // Настройка конфигурации плагина
+        kernel.Bind<RoomsNumsConfig>()
+            .ToMethod(c => RoomsNumsConfig.GetPluginConfig(c.Kernel.Get<IConfigSerializer>()));
+
+        // Используем сервис обновления тем для WinUI
+        kernel.UseWpfUIThemeUpdater();
+
+        // Настройка запуска окна
+        kernel.BindMainWindow<RoomNumsViewModel, RoomsNumsWindow>();
+
+        // Настройка локализации,
+        // получение имени сборки откуда брать текст
+        string assemblyName = Assembly.GetExecutingAssembly().GetName().Name;
+
+        // Настройка локализации,
+        // установка дефолтной локализации "ru-RU"
+        kernel.UseWpfLocalization(
+            $"/{assemblyName};component/assets/localization/language.xaml",
+            CultureInfo.GetCultureInfo("ru-RU"));
+
+        var checkProjectParams = kernel.Get<CheckProjectParams>();
+        bool isChecked = checkProjectParams
             .CopyProjectParams()
             .CopyKeySchedules()
             .CheckKeySchedules()
             .GetIsChecked();
 
         if(!isChecked) {
-            throw new OperationCanceledException();
+            Notification(false);
         }
 
-        var window = new RoomsNumsWindows() { Title = PluginName };
-        window.DataContext = new RoomNumsViewModel(new RevitRepository(uiApplication), window);
-        Notification(window);
+        Notification(kernel.Get<RoomsNumsWindow>());
     }
 }
