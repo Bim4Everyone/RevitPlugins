@@ -86,7 +86,7 @@ internal class UserSheetSettingsVM : ValidatableViewModel {
 
     public bool CheckSettings() {
         if(SelectedTitleBlock is null) {
-            _viewModel.ErrorText = _localizationService.GetLocalizedString("VM.SheetTypeNotSelected");
+            SetError(_localizationService.GetLocalizedString("VM.SheetTypeNotSelected"));
             return false;
         }
 
@@ -94,7 +94,7 @@ internal class UserSheetSettingsVM : ValidatableViewModel {
             // Листов в проекте может не быть или рамка может быть другая, поэтому создаем свой лист для тестов с нужной рамкой
             var viewSheet = ViewSheet.Create(_revitRepository.Document, _viewModel.SheetSettings.SelectedTitleBlock.Id);
             if(viewSheet?.LookupParameter(_viewModel.ProjectSettings.DispatcherGroupingFirst) is null) {
-                _viewModel.ErrorText = _localizationService.GetLocalizedString("VM.DispatcherGroupingFirstParamInvalid");
+                SetError(_localizationService.GetLocalizedString("VM.DispatcherGroupingFirstParamInvalid"));
             }
 
             // Ищем рамку листа
@@ -105,11 +105,11 @@ internal class UserSheetSettingsVM : ValidatableViewModel {
 
             bool hasError = false;
             if(titleBlock?.LookupParameter(SheetSize) is null) {
-                _viewModel.ErrorText = _localizationService.GetLocalizedString("VM.SheetSizeParamInvalid");
+                SetError(_localizationService.GetLocalizedString("VM.SheetSizeParamInvalid"));
                 hasError = true;
             }
             if(titleBlock?.LookupParameter(SheetCoefficient) is null) {
-                _viewModel.ErrorText = _localizationService.GetLocalizedString("VM.SheetCoefficientParamInvalid");
+                SetError(_localizationService.GetLocalizedString("VM.SheetCoefficientParamInvalid"));
                 hasError = true;
             }
 
@@ -130,5 +130,16 @@ internal class UserSheetSettingsVM : ValidatableViewModel {
             SelectedTitleBlock = _viewModel.TitleBlocks
                 .FirstOrDefault(titleBlock => titleBlock.Name.Contains(TitleBlockName));
         }
+    }
+
+    /// <summary>
+    /// Записывает ошибку для отображения в GUI, указывая наименование вкладки, на которой произошла ошибка
+    /// </summary>
+    /// <param name="error"></param>
+    private void SetError(string error) {
+        _viewModel.ErrorText = string.Format(
+            "{0} - {1}",
+            _localizationService.GetLocalizedString("MainWindow.SheetParameters"),
+            error);
     }
 }

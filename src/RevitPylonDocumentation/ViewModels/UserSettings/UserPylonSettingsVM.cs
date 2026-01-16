@@ -105,15 +105,26 @@ internal class UserPylonSettingsVM : ValidatableViewModel {
             var pylonType = _revitRepository.Document.GetElement(pylon?.GetTypeId()) as FamilySymbol;
 
             if(pylonType?.LookupParameter(PylonLengthParamName) is null) {
-                _viewModel.ErrorText = _localizationService.GetLocalizedString("VM.PylonLengthParamInvalid");
+                SetError(_localizationService.GetLocalizedString("VM.PylonLengthParamInvalid"));
                 return false;
             }
 
             if(pylonType?.LookupParameter(PylonWidthParamName) is null) {
-                _viewModel.ErrorText = _localizationService.GetLocalizedString("VM.PylonWidthParamInvalid");
+                SetError(_localizationService.GetLocalizedString("VM.PylonWidthParamInvalid"));
                 return false;
             }
         }
         return true;
+    }
+
+    /// <summary>
+    /// Записывает ошибку для отображения в GUI, указывая наименование вкладки, на которой произошла ошибка
+    /// </summary>
+    /// <param name="error"></param>
+    private void SetError(string error) {
+        _viewModel.ErrorText = string.Format(
+            "{0} - {1}",
+            _localizationService.GetLocalizedString("MainWindow.PylonParameters"),
+            error);
     }
 }

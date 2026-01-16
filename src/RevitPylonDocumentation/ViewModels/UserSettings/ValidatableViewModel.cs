@@ -123,5 +123,4 @@ internal abstract class ValidatableViewModel : BaseViewModel, INotifyDataErrorIn
             }
         }
     }
-
 }

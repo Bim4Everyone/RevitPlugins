@@ -67,11 +67,11 @@ internal class UserLegendsAndAnnotationsSettingsVM : ValidatableViewModel {
     public bool CheckSettings() {
         // Проверяем, чтоб были заданы офсеты видового экрана легенды
         if(LegendXOffset is null || LegendYOffset is null) {
-            _viewModel.ErrorText = _localizationService.GetLocalizedString("VM.LegendOffsetsNotSet");
+            SetError(_localizationService.GetLocalizedString("VM.LegendOffsetsNotSet"));
             return false;
         }
         if(SelectedLegend is null) {
-            _viewModel.ErrorText = _localizationService.GetLocalizedString("VM.LegendNotSelected");
+            SetError(_localizationService.GetLocalizedString("VM.LegendNotSelected"));
             return false;
         }
         return true;
@@ -85,5 +85,16 @@ internal class UserLegendsAndAnnotationsSettingsVM : ValidatableViewModel {
             SelectedLegend = _viewModel.Legends
                 .FirstOrDefault(view => view.Name.Contains(LegendName));
         }
+    }
+
+    /// <summary>
+    /// Записывает ошибку для отображения в GUI, указывая наименование вкладки, на которой произошла ошибка
+    /// </summary>
+    /// <param name="error"></param>
+    private void SetError(string error) {
+        _viewModel.ErrorText = string.Format(
+            "{0} - {1}",
+            _localizationService.GetLocalizedString("MainWindow.LegendsAndAnnotations"),
+            error);
     }
 }

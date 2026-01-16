@@ -219,40 +219,40 @@ internal class UserVerticalViewSettingsPageVM : ValidatableViewModel {
 
     public bool CheckSettings() {
         if(!int.TryParse(GeneralViewXOffset, out _)) {
-            _viewModel.ErrorText = _localizationService.GetLocalizedString("VM.MainViewXOffsetInvalid");
+            SetError(_localizationService.GetLocalizedString("VM.MainViewXOffsetInvalid"));
             return false;
         }
         if(!int.TryParse(GeneralViewYTopOffset, out _)) {
-            _viewModel.ErrorText = _localizationService.GetLocalizedString("VM.MainViewYTopOffsetInvalid");
+            SetError(_localizationService.GetLocalizedString("VM.MainViewYTopOffsetInvalid"));
             return false;
         }
         if(!int.TryParse(GeneralViewYBottomOffset, out _)) {
-            _viewModel.ErrorText = _localizationService.GetLocalizedString("VM.MainViewYBottomOffsetInvalid");
+            SetError(_localizationService.GetLocalizedString("VM.MainViewYBottomOffsetInvalid"));
             return false;
         }
         if(!int.TryParse(GeneralViewPerpXOffset, out _)) {
-            _viewModel.ErrorText = _localizationService.GetLocalizedString("VM.SideViewXOffsetInvalid");
+            SetError(_localizationService.GetLocalizedString("VM.SideViewXOffsetInvalid"));
             return false;
         }
         if(!int.TryParse(GeneralViewPerpYTopOffset, out _)) {
-            _viewModel.ErrorText = _localizationService.GetLocalizedString("VM.SideViewYTopOffsetInvalid");
+            SetError(_localizationService.GetLocalizedString("VM.SideViewYTopOffsetInvalid"));
             return false;
         }
         if(!int.TryParse(GeneralViewPerpYBottomOffset, out _)) {
-            _viewModel.ErrorText = _localizationService.GetLocalizedString("VM.SideViewYBottomOffsetInvalid");
+            SetError(_localizationService.GetLocalizedString("VM.SideViewYBottomOffsetInvalid"));
             return false;
         }
 
         if(SelectedGeneralViewTemplate is null) {
-            _viewModel.ErrorText = _localizationService.GetLocalizedString("VM.MainViewsTemplateNotSelected");
+            SetError(_localizationService.GetLocalizedString("VM.MainViewsTemplateNotSelected"));
             return false;
         }
         if(SelectedGeneralRebarViewTemplate is null) {
-            _viewModel.ErrorText = _localizationService.GetLocalizedString("VM.MainRebarViewsTemplateNotSelected");
+            SetError(_localizationService.GetLocalizedString("VM.MainRebarViewsTemplateNotSelected"));
             return false;
         }
         if(SelectedGeneralViewFamilyType is null) {
-            _viewModel.ErrorText = _localizationService.GetLocalizedString("VM.ViewTypeNotSelected");
+            SetError(_localizationService.GetLocalizedString("VM.ViewTypeNotSelected"));
             return false;
         }
         return true;
@@ -286,5 +286,16 @@ internal class UserVerticalViewSettingsPageVM : ValidatableViewModel {
             SelectedGeneralViewFamilyType = _viewModel.ViewFamilyTypes
                 .FirstOrDefault(familyType => familyType.Name.Equals(GeneralViewFamilyTypeName));
         }
+    }
+
+    /// <summary>
+    /// Записывает ошибку для отображения в GUI, указывая наименование вкладки, на которой произошла ошибка
+    /// </summary>
+    /// <param name="error"></param>
+    private void SetError(string error) {
+        _viewModel.ErrorText = string.Format(
+            "{0} - {1}",
+            _localizationService.GetLocalizedString("MainWindow.VerticalViews"),
+            error);
     }
 }

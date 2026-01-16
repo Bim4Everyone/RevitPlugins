@@ -259,37 +259,37 @@ internal class UserHorizontalViewSettingsPageVM : ValidatableViewModel {
 
     public bool CheckSettings() {
         if(!int.TryParse(TransverseViewXOffset, out _)) {
-            _viewModel.ErrorText = _localizationService.GetLocalizedString("VM.TransverseViewXOffsetInvalid");
+            SetError(_localizationService.GetLocalizedString("VM.TransverseViewXOffsetInvalid"));
             return false;
         }
         if(!int.TryParse(TransverseViewYOffsetTemp, out _)) {
-            _viewModel.ErrorText = _localizationService.GetLocalizedString("VM.TransverseViewYOffsetInvalid");
+            SetError(_localizationService.GetLocalizedString("VM.TransverseViewYOffsetInvalid"));
             return false;
         }
 
         if(!double.TryParse(TransverseViewFirstElevationTemp, out _)) {
-            _viewModel.ErrorText = _localizationService.GetLocalizedString("VM.FirstHorizontalViewElevationInvalid");
+            SetError(_localizationService.GetLocalizedString("VM.FirstHorizontalViewElevationInvalid"));
             return false;
         }
         if(!double.TryParse(TransverseViewSecondElevationTemp, out _)) {
-            _viewModel.ErrorText = _localizationService.GetLocalizedString("VM.SecondHorizontalViewElevationInvalid");
+            SetError(_localizationService.GetLocalizedString("VM.SecondHorizontalViewElevationInvalid"));
             return false;
         }
         if(!double.TryParse(TransverseViewThirdElevationTemp, out _)) {
-            _viewModel.ErrorText = _localizationService.GetLocalizedString("VM.ThirdHorizontalViewElevationInvalid");
+            SetError(_localizationService.GetLocalizedString("VM.ThirdHorizontalViewElevationInvalid"));
             return false;
         }
 
         if(SelectedTransverseViewTemplate is null) {
-            _viewModel.ErrorText = _localizationService.GetLocalizedString("VM.TransverseViewsTemplateNotSelected");
+            SetError(_localizationService.GetLocalizedString("VM.TransverseViewsTemplateNotSelected"));
             return false;
         }
         if(SelectedTransverseRebarViewTemplate is null) {
-            _viewModel.ErrorText = _localizationService.GetLocalizedString("VM.TransverseRebarViewsTemplateNotSelected");
+            SetError(_localizationService.GetLocalizedString("VM.TransverseRebarViewsTemplateNotSelected"));
             return false;
         }
         if(SelectedTransverseViewFamilyType is null) {
-            _viewModel.ErrorText = _localizationService.GetLocalizedString("VM.ViewTypeNotSelected");
+            SetError(_localizationService.GetLocalizedString("VM.ViewTypeNotSelected"));
             return false;
         }
         return true;
@@ -324,5 +324,16 @@ internal class UserHorizontalViewSettingsPageVM : ValidatableViewModel {
             SelectedTransverseViewFamilyType = _viewModel.ViewFamilyTypes
                 .FirstOrDefault(familyType => familyType.Name.Equals(TransverseViewFamilyTypeName));
         }
+    }
+
+    /// <summary>
+    /// Записывает ошибку для отображения в GUI, указывая наименование вкладки, на которой произошла ошибка
+    /// </summary>
+    /// <param name="error"></param>
+    private void SetError(string error) {
+        _viewModel.ErrorText = string.Format(
+            "{0} - {1}",
+            _localizationService.GetLocalizedString("MainWindow.HorizontalViews"),
+            error);
     }
 }

@@ -244,58 +244,58 @@ internal class UserProjectSettingsVM : ValidatableViewModel {
     public bool CheckSettings() {
         // Пытаемся проверить виды
         if(_revitRepository.AllSectionViews.FirstOrDefault()?.LookupParameter(DispatcherGroupingFirst) is null) {
-            _viewModel.ErrorText = _localizationService.GetLocalizedString("VM.DispatcherGroupingFirstParamInvalid");
+            SetError(_localizationService.GetLocalizedString("VM.DispatcherGroupingFirstParamInvalid"));
             return false;
         }
         if(_revitRepository.AllSectionViews.FirstOrDefault()?.LookupParameter(DispatcherGroupingSecond) is null) {
-            _viewModel.ErrorText = _localizationService.GetLocalizedString("VM.DispatcherGroupingSecondParamInvalid");
+            SetError(_localizationService.GetLocalizedString("VM.DispatcherGroupingSecondParamInvalid"));
             return false;
         }
 
         // Пытаемся проверить спеки
         if(_revitRepository.AllScheduleViews.FirstOrDefault()?.LookupParameter(DispatcherGroupingFirst) is null) {
-            _viewModel.ErrorText = _localizationService.GetLocalizedString("VM.DispatcherGroupingFirstParamInvalid");
+            SetError(_localizationService.GetLocalizedString("VM.DispatcherGroupingFirstParamInvalid"));
             return false;
         }
         if(_revitRepository.AllScheduleViews.FirstOrDefault()?.LookupParameter(DispatcherGroupingSecond) is null) {
-            _viewModel.ErrorText = _localizationService.GetLocalizedString("VM.DispatcherGroupingSecondParamInvalid");
+            SetError(_localizationService.GetLocalizedString("VM.DispatcherGroupingSecondParamInvalid"));
             return false;
         }
 
         if(SelectedDimensionType is null) {
-            _viewModel.ErrorText = _localizationService.GetLocalizedString("VM.DimensionTypeNotSelected");
+            SetError(_localizationService.GetLocalizedString("VM.DimensionTypeNotSelected"));
             return false;
         }
         if(SelectedSpotDimensionType is null) {
-            _viewModel.ErrorText = _localizationService.GetLocalizedString("VM.SpotDimensionTypeNotSelected");
+            SetError(_localizationService.GetLocalizedString("VM.SpotDimensionTypeNotSelected"));
             return false;
         }
         if(SelectedSkeletonTagType is null) {
-            _viewModel.ErrorText = _localizationService.GetLocalizedString("VM.SkeletonTagTypeNotSelected");
+            SetError(_localizationService.GetLocalizedString("VM.SkeletonTagTypeNotSelected"));
             return false;
         }
         if(SelectedRebarTagTypeWithSerif is null) {
-            _viewModel.ErrorText = _localizationService.GetLocalizedString("VM.RebarTagWithSerifTypeNotSelected");
+            SetError(_localizationService.GetLocalizedString("VM.RebarTagWithSerifTypeNotSelected"));
             return false;
         }
         if(SelectedRebarTagTypeWithStep is null) {
-            _viewModel.ErrorText = _localizationService.GetLocalizedString("VM.RebarTagWithoutSerifTypeNotSelected");
+            SetError(_localizationService.GetLocalizedString("VM.RebarTagWithoutSerifTypeNotSelected"));
             return false;
         }
         if(SelectedRebarTagTypeWithComment is null) {
-            _viewModel.ErrorText = _localizationService.GetLocalizedString("VM.RebarTagWithCommentTypeNotSelected");
+            SetError(_localizationService.GetLocalizedString("VM.RebarTagWithCommentTypeNotSelected"));
             return false;
         }
         if(SelectedUniversalTagType is null) {
-            _viewModel.ErrorText = _localizationService.GetLocalizedString("VM.UniversalTagTypeNotSelected");
+            SetError(_localizationService.GetLocalizedString("VM.UniversalTagTypeNotSelected"));
             return false;
         }
         if(SelectedBreakLineType is null) {
-            _viewModel.ErrorText = _localizationService.GetLocalizedString("VM.BreakLineTypeNotSelected");
+            SetError(_localizationService.GetLocalizedString("VM.BreakLineTypeNotSelected"));
             return false;
         }
         if(SelectedConcretingJointType is null) {
-            _viewModel.ErrorText = _localizationService.GetLocalizedString("VM.ConcretingJointTypeNotSelected");
+            SetError(_localizationService.GetLocalizedString("VM.ConcretingJointTypeNotSelected"));
             return false;
         }
         return true;
@@ -389,5 +389,16 @@ internal class UserProjectSettingsVM : ValidatableViewModel {
             SelectedConcretingJointType = _viewModel.DetailComponentsTypes
                 .FirstOrDefault(familyType => familyType.Name.Equals(ConcretingJointTypeName));
         }
+    }
+
+    /// <summary>
+    /// Записывает ошибку для отображения в GUI, указывая наименование вкладки, на которой произошла ошибка
+    /// </summary>
+    /// <param name="error"></param>
+    private void SetError(string error) {
+        _viewModel.ErrorText = string.Format(
+            "{0} - {1}",
+            _localizationService.GetLocalizedString("MainWindow.ProjectParameters"),
+            error);
     }
 }

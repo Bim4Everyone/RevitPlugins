@@ -19,8 +19,8 @@
     <system:String x:Key="VM.ViewTypeNotSelected">Не выбран типоразмер создаваемого вида</system:String>
     <system:String x:Key="VM.MainViewsTemplateNotSelected">Не выбран шаблон основных видов</system:String>
     <system:String x:Key="VM.MainRebarViewsTemplateNotSelected">Не выбран шаблон основных видов армирования</system:String>
-    <system:String x:Key="VM.TransverseViewsTemplateNotSelected">Не выбран шаблон поперечных видов</system:String>
-    <system:String x:Key="VM.TransverseRebarViewsTemplateNotSelected">Не выбран шаблон поперечных видов армирования</system:String>
+    <system:String x:Key="VM.TransverseViewsTemplateNotSelected">Не выбран шаблон горизонтальных видов</system:String>
+    <system:String x:Key="VM.TransverseRebarViewsTemplateNotSelected">Не выбран шаблон горизонтальных видов армирования</system:String>
     <system:String x:Key="VM.LegendNotSelected">Не выбрана легенда примечаний</system:String>
     <system:String x:Key="VM.ViewTypeSizeNotSelected">Не выбран типоразмер создаваемого вида</system:String>
     <system:String x:Key="VM.DimensionTypeNotSelected">Не выбран типоразмер для расстановки размеров</system:String>
