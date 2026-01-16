@@ -152,151 +152,170 @@
                     Background="Transparent"
                     BorderThickness="0"
                     SelectedIndex="0"
-                    SelectionChanged="ContentTabs_OnSelectionChanged">
-                    <TabItem Header="{me:LocalizationSource MainWindow.TabTypesName}">
-                        <ScrollViewer VerticalScrollBarVisibility="Auto" BorderThickness="0">
-                            <StackPanel>
-                                <ItemsControl
-                                    ItemsSource="{Binding ConsumableTypes}">
-                                            <ItemsControl.ItemTemplate>
-                                                <DataTemplate>
-                                                    <Grid Margin="0 0 0 8">
-                                                        <Grid.ColumnDefinitions>
-                                                            <ColumnDefinition Width="*" />
-                                                            <ColumnDefinition Width="Auto" />
-                                                        </Grid.ColumnDefinitions>
+                     SelectionChanged="ContentTabs_OnSelectionChanged">
+                     <TabItem Header="{me:LocalizationSource MainWindow.TabTypesName}">
+                        <Grid>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto" />
+                                <RowDefinition Height="*" />
+                            </Grid.RowDefinitions>
 
-                                                        <Expander Grid.Column="0" IsExpanded="False">
-                                                            <Expander.Header>
-                                                                <TextBlock
-                                                                    FontWeight="SemiBold"
-                                                                    VerticalAlignment="Center"
-                                                                    Text="{Binding ConsumableTypeName}" />
-                                                            </Expander.Header>
+                            <ui:Button
+                                Grid.Row="0"
+                                Width="36"
+                                Height="36"
+                                Margin="0 0 0 12"
+                                Padding="0"
+                                HorizontalAlignment="Left"
+                                VerticalAlignment="Top"
+                                Content="{ui:SymbolIcon Symbol=Add24}"
+                                Command="{Binding AddConsumableTypeCommand}" />
 
-                                                            <Border Padding="5">
-                                                                <StackPanel>
-                                                                    <StackPanel.Resources>
-                                                                        <Style TargetType="Control">
-                                                                            <Setter Property="Margin" Value="0 4 0 0" />
-                                                                        </Style>
-                                                                    </StackPanel.Resources>
-                                                                <TextBlock
-                                                                    Style="{StaticResource FieldLabel}"
+                            <ScrollViewer
+                                Grid.Row="1"
+                                VerticalScrollBarVisibility="Auto"
+                                BorderThickness="0">
+                                <ItemsControl ItemsSource="{Binding ConsumableTypes}">
+                                    <ItemsControl.ItemTemplate>
+                                        <DataTemplate>
+                                            <Grid Margin="0 0 0 8">
+                                                <Grid.ColumnDefinitions>
+                                                    <ColumnDefinition Width="*" />
+                                                    <ColumnDefinition Width="Auto" />
+                                                </Grid.ColumnDefinitions>
+
+                                                <Expander Grid.Column="0" IsExpanded="False">
+                                                    <Expander.Header>
+                                                        <TextBlock
+                                                            FontWeight="SemiBold"
+                                                            VerticalAlignment="Center"
+                                                            Text="{Binding ConsumableTypeName}" />
+                                                    </Expander.Header>
+
+                                                    <Border Padding="5">
+                                                        <StackPanel>
+                                                            <StackPanel.Resources>
+                                                                <Style TargetType="Control">
+                                                                    <Setter Property="Margin" Value="0 4 0 0" />
+                                                                </Style>
+                                                            </StackPanel.Resources>
+                                                            <TextBlock
+                                                                Style="{StaticResource FieldLabel}"
                                                                 Text="Название расходника" />
-                                                                <ui:TextBox
-                                                                    Text="{Binding ConsumableTypeName, UpdateSourceTrigger=PropertyChanged}" />
+                                                            <ui:TextBox
+                                                                Text="{Binding ConsumableTypeName, UpdateSourceTrigger=PropertyChanged}" />
 
-                                                                <TextBlock
-                                                                    Style="{StaticResource FieldLabel}"
-                                                                    Text="{DynamicResource MainWindow.Category}" />
-                                                                <ComboBox
-                                                                    MinHeight="32"
-                                                                    ItemsSource="{Binding DataContext.CategoryOptions, RelativeSource={RelativeSource AncestorType=Window}}"
-                                                                    DisplayMemberPath="Name"
-                                                                    SelectedItem="{Binding SelectedCategory, Mode=TwoWay}" />
+                                                            <TextBlock
+                                                                Style="{StaticResource FieldLabel}"
+                                                                Text="{DynamicResource MainWindow.Category}" />
+                                                            <ComboBox
+                                                                MinHeight="32"
+                                                                ItemsSource="{Binding DataContext.CategoryOptions, RelativeSource={RelativeSource AncestorType=Window}}"
+                                                                DisplayMemberPath="Name"
+                                                                SelectedItem="{Binding SelectedCategory, Mode=TwoWay}" />
 
-                                                                <TextBlock
-                                                                    Style="{StaticResource FieldLabel}"
-                                                                    Text="{DynamicResource MainWindow.Group}" />
-                                                                <ui:TextBox
-                                                                    MinHeight="32"
-                                                                    Text="{Binding Grouping, UpdateSourceTrigger=PropertyChanged}" />
+                                                            <TextBlock
+                                                                Style="{StaticResource FieldLabel}"
+                                                                Text="{DynamicResource MainWindow.Group}" />
+                                                            <ui:TextBox
+                                                                MinHeight="32"
+                                                                Text="{Binding Grouping, UpdateSourceTrigger=PropertyChanged}" />
 
-                                                                <TextBlock
-                                                                    Style="{StaticResource FieldLabel}"
-                                                                    Text="{DynamicResource MainWindow.FullName}" />
-                                                                <ui:TextBox
-                                                                    Text="{Binding Name, UpdateSourceTrigger=PropertyChanged}" />
+                                                            <TextBlock
+                                                                Style="{StaticResource FieldLabel}"
+                                                                Text="{DynamicResource MainWindow.FullName}" />
+                                                            <ui:TextBox
+                                                                Text="{Binding Name, UpdateSourceTrigger=PropertyChanged}" />
 
-                                                                <TextBlock
-                                                                    Style="{StaticResource FieldLabel}"
-                                                                    Text="{DynamicResource MainWindow.Mark}" />
-                                                                <ui:TextBox
-                                                                    Text="{Binding Mark, UpdateSourceTrigger=PropertyChanged}" />
+                                                            <TextBlock
+                                                                Style="{StaticResource FieldLabel}"
+                                                                Text="{DynamicResource MainWindow.Mark}" />
+                                                            <ui:TextBox
+                                                                Text="{Binding Mark, UpdateSourceTrigger=PropertyChanged}" />
 
-                                                                <TextBlock
-                                                                    Style="{StaticResource FieldLabel}"
-                                                                    Text="{DynamicResource MainWindow.Code}" />
-                                                                <ui:TextBox
-                                                                    Text="{Binding Code, UpdateSourceTrigger=PropertyChanged}" />
+                                                            <TextBlock
+                                                                Style="{StaticResource FieldLabel}"
+                                                                Text="{DynamicResource MainWindow.Code}" />
+                                                            <ui:TextBox
+                                                                Text="{Binding Code, UpdateSourceTrigger=PropertyChanged}" />
 
-                                                                <TextBlock
-                                                                    Style="{StaticResource FieldLabel}"
-                                                                    Text="{DynamicResource MainWindow.Unit}" />
-                                                                <ui:TextBox
-                                                                    Text="{Binding Unit, UpdateSourceTrigger=PropertyChanged}" />
+                                                            <TextBlock
+                                                                Style="{StaticResource FieldLabel}"
+                                                                Text="{DynamicResource MainWindow.Unit}" />
+                                                            <ui:TextBox
+                                                                Text="{Binding Unit, UpdateSourceTrigger=PropertyChanged}" />
 
-                                                                <TextBlock
-                                                                    Style="{StaticResource FieldLabel}"
-                                                                    Text="{DynamicResource MainWindow.Creator}" />
-                                                                <ui:TextBox
-                                                                    Text="{Binding Maker, UpdateSourceTrigger=PropertyChanged}" />
+                                                            <TextBlock
+                                                                Style="{StaticResource FieldLabel}"
+                                                                Text="{DynamicResource MainWindow.Creator}" />
+                                                            <ui:TextBox
+                                                                Text="{Binding Maker, UpdateSourceTrigger=PropertyChanged}" />
 
-                                                                <CheckBox
-                                                                    Margin="0 2 0 0"
-                                                                    Padding="0"
-                                                                    Content="{DynamicResource MainWindow.UseProjectStock}"
-                                                                    IsChecked="{Binding UseCategoryReserve, Mode=TwoWay}" />
+                                                            <CheckBox
+                                                                Margin="0 2 0 0"
+                                                                Padding="0"
+                                                                Content="{DynamicResource MainWindow.UseProjectStock}"
+                                                                IsChecked="{Binding UseCategoryReserve, Mode=TwoWay}" />
 
-                                                                <TextBlock
-                                                                    Style="{StaticResource FieldLabel}"
-                                                                    Text="{DynamicResource MainWindow.Formula}" />
-                                                                <ui:TextBox
-                                                                    AcceptsReturn="True"
-                                                                    Height="90"
-                                                                    TextWrapping="Wrap"
-                                                                    Text="{Binding Formula, UpdateSourceTrigger=PropertyChanged}" />
+                                                            <TextBlock
+                                                                Style="{StaticResource FieldLabel}"
+                                                                Text="{DynamicResource MainWindow.Formula}" />
+                                                            <ui:TextBox
+                                                                AcceptsReturn="True"
+                                                                Height="90"
+                                                                TextWrapping="Wrap"
+                                                                Text="{Binding Formula, UpdateSourceTrigger=PropertyChanged}" />
 
-                                                                <TextBlock
-                                                                    Style="{StaticResource FieldLabel}"
-                                                                    Text="{DynamicResource MainWindow.Note}" />
-                                                                <ui:TextBox
-                                                                    AcceptsReturn="True"
-                                                                    Height="60"
-                                                                    TextWrapping="Wrap"
-                                                                    Text="{Binding Note, UpdateSourceTrigger=PropertyChanged}" />
+                                                            <TextBlock
+                                                                Style="{StaticResource FieldLabel}"
+                                                                Text="{DynamicResource MainWindow.Note}" />
+                                                            <ui:TextBox
+                                                                AcceptsReturn="True"
+                                                                Height="60"
+                                                                TextWrapping="Wrap"
+                                                                Text="{Binding Note, UpdateSourceTrigger=PropertyChanged}" />
+                                                        </StackPanel>
+                                                    </Border>
+                                                </Expander>
 
-                                                            </StackPanel>
-                                                            </Border>
-                                                        </Expander>
-
-                                                        <ui:Button
-                                                            Grid.Column="1"
-                                                            Width="36"
-                                                            Height="44"
-                                                            Margin="8 0 0 0"
-                                                            Padding="0"
-                                                            VerticalAlignment="Top"
-                                                            HorizontalAlignment="Center"
-                                                            Appearance="Transparent"
-                                                            Content="{ui:SymbolIcon Symbol=Delete24}"
-                                                            Command="{Binding DataContext.RemoveConsumableTypeCommand, RelativeSource={RelativeSource AncestorType=Window}}"
-                                                            CommandParameter="{Binding}" />
-                                                    </Grid>
-                                                </DataTemplate>
-                                            </ItemsControl.ItemTemplate>
+                                                <ui:Button
+                                                    Grid.Column="1"
+                                                    Width="36"
+                                                    Height="44"
+                                                    Margin="8 0 0 0"
+                                                    Padding="0"
+                                                    VerticalAlignment="Top"
+                                                    HorizontalAlignment="Center"
+                                                    Appearance="Transparent"
+                                                    Content="{ui:SymbolIcon Symbol=Delete24}"
+                                                    Command="{Binding DataContext.RemoveConsumableTypeCommand, RelativeSource={RelativeSource AncestorType=Window}}"
+                                                    CommandParameter="{Binding}" />
+                                            </Grid>
+                                        </DataTemplate>
+                                    </ItemsControl.ItemTemplate>
                                 </ItemsControl>
-
-                                <StackPanel
-                                    Orientation="Horizontal"
-                                    HorizontalAlignment="Right"
-                                    Margin="0 12 0 0">
-                                    <ui:Button
-                                        Width="36"
-                                        Height="36"
-                                        Padding="0"
-                                        HorizontalAlignment="Center"
-                                        VerticalAlignment="Center"
-                                        Content="{ui:SymbolIcon Symbol=Add24}"
-                                        Command="{Binding AddConsumableTypeCommand}" />
-                                </StackPanel>
-                            </StackPanel>
-                        </ScrollViewer>
+                            </ScrollViewer>
+                        </Grid>
                     </TabItem>
                     <TabItem Header="{me:LocalizationSource MainWindow.TabDestinationName}">
-                        <ScrollViewer VerticalScrollBarVisibility="Auto" BorderThickness="0">
-                            <StackPanel>
+                        <Grid>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto" />
+                                <RowDefinition Height="*" />
+                            </Grid.RowDefinitions>
+
+                            <CheckBox
+                                Grid.Row="0"
+                                Margin="0 0 0 12"
+                                Padding="0"
+                                HorizontalAlignment="Left"
+                                Content="{DynamicResource MainWindow.CheckboxOnlyInstances}"
+                                IsChecked="{Binding OnlyPlacedInProject, Mode=TwoWay}" />
+
+                            <ScrollViewer
+                                Grid.Row="1"
+                                VerticalScrollBarVisibility="Auto"
+                                BorderThickness="0">
                                 <ItemsControl ItemsSource="{Binding CategoryAssignments}">
                                     <ItemsControl.ItemTemplate>
                                         <DataTemplate>
@@ -335,14 +354,8 @@
                                         </DataTemplate>
                                     </ItemsControl.ItemTemplate>
                                 </ItemsControl>
-
-                                <CheckBox
-                                    Margin="0 8 0 0"
-                                    HorizontalAlignment="Left"
-                                    Content="{DynamicResource MainWindow.CheckboxOnlyInstances}"
-                                    IsChecked="{Binding OnlyPlacedInProject, Mode=TwoWay}" />
-                            </StackPanel>
-                        </ScrollViewer>
+                            </ScrollViewer>
+                        </Grid>
                     </TabItem>
                 </TabControl>
             </Border>
