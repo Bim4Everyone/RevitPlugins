@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.IO;
 using System.Linq;
+using System.Windows;
 using System.Windows.Input;
 using System.Text.RegularExpressions;
 
@@ -55,7 +56,7 @@ internal class MainViewModel : BaseViewModel {
         RemoveConsumableTypeCommand = RelayCommand.Create<ConsumableTypeItem>(RemoveConsumableType, CanRemoveConsumableType);
         ImportConfigsCommand = RelayCommand.Create(ImportConfigs);
         ExportConfigsCommand = RelayCommand.Create(ExportConfigs);
-        ResetConfigsCommand = RelayCommand.Create(ResetConfigs);
+        ResetConfigsCommand = RelayCommand.Create<Window>(ResetConfigs);
 
         ConsumableTypes = new ObservableCollection<ConsumableTypeItem>();
         CategoryAssignments = new ObservableCollection<CategoryAssignmentItem>();
@@ -206,7 +207,13 @@ internal class MainViewModel : BaseViewModel {
         UpdateTypesLists();
     }
 
-    private void ResetConfigs() {
+    private void ResetConfigs(Window owner) {
+        string message = _localizationService.GetLocalizedString("MainWindow.ResetConfirmMessage");
+        string title = _localizationService.GetLocalizedString("MainWindow.Title");
+        if(MessageBox.Show(owner ?? Application.Current?.MainWindow, message, title, MessageBoxButton.OKCancel, MessageBoxImage.Question) != MessageBoxResult.OK) {
+            return;
+        }
+
         JObject defaults = _revitRepository.VisSettingsStorage.GetDefaultSettings();
         LoadConsumableTypesFromSettings(defaults);
     }

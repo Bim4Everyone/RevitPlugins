@@ -14,6 +14,7 @@
     <system:String x:Key="MainWindow.ButtonImport">Import</system:String>
     <system:String x:Key="MainWindow.ButtonExport">Export</system:String>
     <system:String x:Key="MainWindow.ButtonDefault">Reset</system:String>
+    <system:String x:Key="MainWindow.ResetConfirmMessage">Are you sure you want to reset to default values?</system:String>
     <system:String x:Key="MainWindow.CheckboxOnlyInstances">Only placed in project</system:String>
     <system:String x:Key="MainWindow.SelectAll">Select all</system:String>
 

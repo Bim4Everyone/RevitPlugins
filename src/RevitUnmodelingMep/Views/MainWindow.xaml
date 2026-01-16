@@ -264,7 +264,7 @@
                                                         <ui:Button
                                                             Grid.Column="1"
                                                             Width="36"
-                                                            Height="46"
+                                                            Height="44"
                                                             Margin="8 0 0 0"
                                                             Padding="0"
                                                             VerticalAlignment="Top"
@@ -373,7 +373,8 @@
                 <ui:Button
                     Width="100"
                     Content="{me:LocalizationSource MainWindow.ButtonDefault}"
-                    Command="{Binding ResetConfigsCommand}" />
+                    Command="{Binding ResetConfigsCommand}"
+                    CommandParameter="{Binding RelativeSource={RelativeSource AncestorType=Window}}" />
             </StackPanel>
 
             <ui:TextBlock
