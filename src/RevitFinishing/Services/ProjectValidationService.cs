@@ -78,7 +78,7 @@ internal class ProjectValidationService {
 
     public WarningsListViewModel CheckNameParam(IEnumerable<Room> selectedRooms, Phase phase) {
         var nameParam = SystemParamsConfig.Instance
-            .CreateRevitParam(_document, BuiltInParameter.ROOM_NUMBER);
+            .CreateRevitParam(_document, BuiltInParameter.ROOM_NAME);
 
         return new WarningsListViewModel(_localizationService) {
             Description =

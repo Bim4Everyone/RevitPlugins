@@ -40,7 +40,7 @@ internal class FinishingValidationService {
                                                                    ProjectParam projectParam, 
                                                                    Phase phase) {
         return rooms
-            .Where(x => !x.IsExistsParamValue(projectParam))
+            .Where(x => x.GetParamValueOrDefault<ElementId>(projectParam) == ElementId.InvalidElementId)
             .Select(x => new WarningElementViewModel(x, phase.Name, _localizationService))
             .ToList();
     }
