@@ -12,6 +12,7 @@
     d:DataContext="{d:DesignInstance vms:ApartmentsParamsVM, IsDesignTimeCreatable=False}"
     
     mc:Ignorable="d" 
+    x:ClassModifier="internal"
     Background="White">
     
     <core:WpfUIPlatformPage.Resources>

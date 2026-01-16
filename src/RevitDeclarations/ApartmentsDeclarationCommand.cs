@@ -5,6 +5,7 @@ using Autodesk.Revit.UI;
 
 using dosymep.Bim4Everyone;
 using dosymep.Bim4Everyone.SimpleServices;
+using dosymep.WpfCore.Ninject;
 using dosymep.WpfUI.Core.Ninject;
 
 using Ninject;
@@ -40,12 +41,10 @@ public class ApartmentsDeclarationCommand : BasePluginCommand {
         
         // Используем сервис обновления тем для WinUI
         kernel.UseWpfUIThemeUpdater();
-        
-        kernel.Bind<ApartmentsMainVM>().ToSelf();
-        kernel.Bind<ApartmentsMainWindow>().ToSelf()
-            .WithPropertyValue(nameof(Window.Title), PluginName)
-            .WithPropertyValue(nameof(Window.DataContext), c => c.Kernel.Get<ApartmentsMainVM>());
 
+        kernel.Bind<MainViewModel>().To<ApartmentsMainVM>();
+        kernel.BindMainWindow<ApartmentsMainVM, ApartmentsMainWindow>();
+        
         Notification(kernel.Get<ApartmentsMainWindow>());
     }
 }

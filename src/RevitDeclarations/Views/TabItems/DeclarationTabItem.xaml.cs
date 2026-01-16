@@ -1,10 +1,20 @@
 using System.Linq;
 using System.Windows.Input;
 
+using dosymep.SimpleServices;
+
+using RevitDeclarations.ViewModels;
+
 namespace RevitDeclarations.Views;
-public partial class DeclarationTabItem {
-    public DeclarationTabItem() {
+internal partial class DeclarationTabItem {
+    public DeclarationTabItem(MainViewModel viewModel, ILoggerService loggerService,
+        ILanguageService languageService, ILocalizationService localizationService,
+        IUIThemeService uiThemeService, IUIThemeUpdaterService themeUpdaterService) 
+        : base(loggerService,
+               languageService, localizationService,
+               uiThemeService, themeUpdaterService) {
         InitializeComponent();
+        DataContext = viewModel;
     }
 
     private void IndentValidation(object sender, TextCompositionEventArgs e) {

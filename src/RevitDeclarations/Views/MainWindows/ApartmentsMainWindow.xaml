@@ -14,6 +14,8 @@
 
     xmlns:tabData="clr-namespace:RevitDeclarations.Views"
     
+    x:Name="_this"
+    
     mc:Ignorable="d"
     WindowStartupLocation="CenterOwner"
 
@@ -65,6 +67,7 @@
                 <ui:NavigationViewItem
                     Content="Декларация"
                     Icon="{ui:SymbolIcon WindowBulletList20}"
+                    DataContext="{Binding}"
                     TargetPageType="{x:Type pages:DeclarationTabItem}" />
                 <ui:NavigationViewItem
                     Content="Параметры"

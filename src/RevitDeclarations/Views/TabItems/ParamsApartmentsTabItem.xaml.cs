@@ -1,8 +1,18 @@
 using System.Windows.Controls;
 
+using dosymep.SimpleServices;
+
+using RevitDeclarations.ViewModels;
+
 namespace RevitDeclarations.Views;
-public partial class ParamsApartmentsTabItem {
-    public ParamsApartmentsTabItem() {
+internal partial class ParamsApartmentsTabItem {
+    public ParamsApartmentsTabItem(ParametersViewModel viewModel, ILoggerService loggerService,
+                                    ILanguageService languageService, ILocalizationService localizationService,
+                                    IUIThemeService uiThemeService, IUIThemeUpdaterService themeUpdaterService) 
+            : base(loggerService,
+            languageService, localizationService,
+            uiThemeService, themeUpdaterService) {
         InitializeComponent();
+        DataContext = viewModel;
     }
 }

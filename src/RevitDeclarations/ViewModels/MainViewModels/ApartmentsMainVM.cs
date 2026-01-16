@@ -17,7 +17,8 @@ internal class ApartmentsMainVM : MainViewModel {
 
     private new readonly ApartmentsSettings _settings;
 
-    public ApartmentsMainVM(RevitRepository revitRepository, ApartmentsSettings settings)
+    public ApartmentsMainVM(RevitRepository revitRepository, 
+        ApartmentsSettings settings)
         : base(revitRepository, settings) {
         _settings = settings;
 

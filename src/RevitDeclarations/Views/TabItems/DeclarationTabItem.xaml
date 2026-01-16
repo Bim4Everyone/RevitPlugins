@@ -10,7 +10,7 @@
     xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
     
     Background="White"
-    
+    x:ClassModifier="internal"
     >
 
     <core:WpfUIPlatformPage.Resources>
