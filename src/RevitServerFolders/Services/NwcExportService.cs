@@ -140,20 +140,27 @@ internal class NwcExportService : IModelsExportService<FileModelObjectExportSett
             try {
                 var exportView = CreateExportView3d(document, sourceTemplate, exportViewSettings.WorksetHideTemplates);
 
-                bool hasElements = new FilteredElementCollector(document, exportView.Id)
-                        .WhereElementIsNotElementType()
+                var elementsOnView = new FilteredElementCollector(document, exportView.Id)
+                    .WhereElementIsNotElementType();
 #if REVIT_2021_OR_LESS
-                    .Where(item =>
+                var visibleElements = elementsOnView.Where(item =>
                         item.get_Geometry(new Options() { View = exportView })?.Any() == true)
+                    .ToArray();
 #else
-                        .WherePasses(new VisibleInViewFilter(document, exportView.Id))
+                var visibleElements = elementsOnView.WherePasses(new VisibleInViewFilter(document, exportView.Id));
 #endif
-                        .Any(e => e.Category != null && ElementHasGeometry(e)); // Ищем геометрию на виде
+                bool hasElements =
+                    visibleElements.Any(e => e.Category != null && ElementHasGeometry(e)); // Ищем геометрию на виде
 
                 if(!hasElements) {
                     _loggerService.Warning(
-                        "Экспортируемый вид в файле {@FileName} не содержит элементы. " +
-                        "Настройки генерации 3D вида: {@Settings}", fileName, exportViewSettings);
+                        "Экспортируемый вид в файле {@FileName} не содержит элементы с геометрией. "
+                        + "Элементов на виде: {@viewCount}, видимых элементов на виде: {@visibleElements} "
+                        + "Настройки генерации 3D вида: {@Settings}",
+                        fileName,
+                        elementsOnView.Count(),
+                        visibleElements.Count(),
+                        exportViewSettings);
                     _errorsService.AddError(fileName,
                         _localization.GetLocalizedString("Exceptions.ViewWithoutElements",
                             exportViewSettings.RvtFilePath,
