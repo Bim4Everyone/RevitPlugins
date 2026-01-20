@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Linq;
 
 using Autodesk.Revit.DB;
 
@@ -37,33 +38,86 @@ internal class RevitSettings : ProjectSettings {
 }
 
 internal class SystemPluginConfig {
-    // Утвержденные карты параметров, которые используются в проектах разных дисциплин
-    private readonly List<ParamMap> _allParamMaps = [
+
+    // Параметр описания зон
+    private static readonly RevitParam _descriptionParam = SharedParamsConfig.Instance.BuildingWorksDescription;
+    // Параметр блока СМР
+    private static readonly RevitParam _blockParam = SharedParamsConfig.Instance.BuildingWorksBlock;
+    // Параметр секции СМР
+    private static readonly RevitParam _sectionParam = SharedParamsConfig.Instance.BuildingWorksSection;
+    // Параметр этажа СМР
+    private static readonly RevitParam _floorParam = SharedParamsConfig.Instance.BuildingWorksLevel;
+    // Параметр этажа СМР - денежная единица
+    private static readonly RevitParam _floorDEParam = SharedParamsConfig.Instance.BuildingWorksLevelCurrency;
+    // Параметр зоны СМР
+    private static readonly RevitParam _zoneParam = SharedParamsConfig.Instance.BuildingWorksZone;
+    // Параметр низа СМР
+    private static readonly RevitParam _bottomZoneParam = SharedParamsConfig.Instance.BuildingWorksMarkBottom;
+    // Параметр верха СМР
+    private static readonly RevitParam _topZoneParam = SharedParamsConfig.Instance.BuildingWorksMarkTop;
+    // Параметр верха СМР
+    private static readonly RevitParam _volumeParam = SharedParamsConfig.Instance.SizeVolumeBuildingWorks;
+
+    // Утвержденные карты параметров, которые используются в расширенном алгоритме
+    private readonly List<ParamMap> _advancedParamMaps = [
         new ParamMap {
             Type = ParamType.DescriptionParam,
-            SourceParam = SharedParamsConfig.Instance.Description,
-            TargetParam = SharedParamsConfig.Instance.Description
+            TypeValue = ParamTypeValue.TextParam,
+            SourceParam = _descriptionParam,
+            TargetParam = _descriptionParam
         },
         new ParamMap {
             Type = ParamType.BlockParam,
-            SourceParam = SharedParamsConfig.Instance.BuildingWorksBlock,
-            TargetParam = SharedParamsConfig.Instance.BuildingWorksBlock
+            TypeValue = ParamTypeValue.TextParam,
+            SourceParam = _blockParam,
+            TargetParam = _blockParam
         },
         new ParamMap {
             Type = ParamType.SectionParam,
-            SourceParam = SharedParamsConfig.Instance.BuildingWorksSection,
-            TargetParam = SharedParamsConfig.Instance.BuildingWorksSection
+            TypeValue = ParamTypeValue.TextParam,
+            SourceParam = _sectionParam,
+            TargetParam = _sectionParam
         },
         new ParamMap {
             Type = ParamType.FloorParam,
-            SourceParam = SharedParamsConfig.Instance.BuildingWorksLevel,
-            TargetParam = SharedParamsConfig.Instance.BuildingWorksLevel
+            TypeValue = ParamTypeValue.TextParam,
+            SourceParam = _floorParam,
+            TargetParam = _floorParam
         },
         new ParamMap {
             Type = ParamType.FloorDEParam,
-            SourceParam = SharedParamsConfig.Instance.BuildingWorksLevelCurrency,
-            TargetParam = SharedParamsConfig.Instance.BuildingWorksLevelCurrency
+            TypeValue = ParamTypeValue.CurrencyParam,
+            SourceParam = _floorDEParam,
+            TargetParam = _floorDEParam
         },
+        new ParamMap {
+            Type = ParamType.ZoneParam,
+            TypeValue = ParamTypeValue.TextParam,
+            SourceParam = _zoneParam,
+            TargetParam = _zoneParam
+        },
+        new ParamMap {
+            Type = ParamType.VolumeParam,
+            TypeValue = ParamTypeValue.ValueParam,
+            SourceParam = null,
+            TargetParam = _volumeParam
+        },
+    ];
+
+    // Утвержденные карты параметров, которые используются в простом алгоритме
+    private readonly List<ParamMap> _simpleParamMaps = [
+        new ParamMap {
+            Type = ParamType.BottomZoneParam,
+            TypeValue = ParamTypeValue.TextParam,
+            SourceParam = _bottomZoneParam,
+            TargetParam = null
+        },
+        new ParamMap {
+            Type = ParamType.TopZoneParam,
+            TypeValue = ParamTypeValue.TextParam,
+            SourceParam = _topZoneParam,
+            TargetParam = null
+        }
     ];
 
     // Категории, обрабатываемые плагином в качестве основы для построения
@@ -89,12 +143,6 @@ internal class SystemPluginConfig {
     // Самое распространенное имя типа зоны для записи координат
     public string DefaultStringTypeZone => "Координаты СМР";
 
-    // Временное имя параметра низа зоны
-    public string BottomAreaParamName => "ФОП_Отметка низа СМР";
-
-    // Временное имя параметра низа зоны
-    public string UpAreaParamName => "ФОП_Отметка верха СМР";
-
     // Наиболее оптимальная сторона фигуры для поиска плиты в миллиметрах
     public double SquareSide => 200;
 
@@ -111,9 +159,19 @@ internal class SystemPluginConfig {
         "монолит"];
 
     /// <summary>
-    /// Метод получения карты параметров
+    /// Метод получения карты параметров для расширенного алгоритма
     /// </summary>
-    public List<ParamMap> GetDefaultParamMaps() {
-        return _allParamMaps;
+    public List<ParamMap> GetAdvancedParamMaps() {
+        return _advancedParamMaps;
+    }
+
+    /// <summary>
+    /// Метод получения карты параметров для простого алгоритма
+    /// </summary>
+    public List<ParamMap> GetSimpleParamMaps() {
+        var simpleParamMaps = _simpleParamMaps;
+        return _advancedParamMaps
+            .Concat(simpleParamMaps)
+            .ToList();
     }
 }

@@ -31,10 +31,10 @@
     <system:String x:Key="MainWindow.TypeSlabsDescription">Типоразмеры плит использующихся для определения основы</system:String>
     <system:String x:Key="MainWindow.SearchTextSlabs">Поиск по имени типоразмера</system:String>
 
-    <system:String x:Key="MainWindow.LevelBottomSlabs">Нижний уровень плит перекрытий</system:String>
+    <system:String x:Key="MainWindow.LevelBottomSlabs">Нижний уровень плит перекрытий (включительно)</system:String>
     <system:String x:Key="MainWindow.LevelBottomSlabsDescription">Нижний уровень плит использующихся для определения основы</system:String>
 
-    <system:String x:Key="MainWindow.LevelUpSlabs">Верхний уровень плит перекрытий</system:String>
+    <system:String x:Key="MainWindow.LevelUpSlabs">Верхний уровень плит перекрытий (включительно)</system:String>
     <system:String x:Key="MainWindow.LevelUpSlabsDescription">Верхний уровень плит использующихся для определения основы</system:String>
 
     <system:String x:Key="MainWindow.SquareSide">Длина стороны квадрата в мм</system:String>
@@ -48,9 +48,9 @@
 
     <system:String x:Key="MainViewModel.SimpleAreaExtrude">Простой алгоритм построения</system:String>
     <system:String x:Key="MainViewModel.AdvancedAreaExtrude">Расширенный алгоритм построения</system:String>
-
+    
     <system:String x:Key="MainViewModel.DescriptionParamDescription">Параметр типа зон</system:String>
-    <system:String x:Key="MainViewModel.DescriptionParamDetailDescription">Используется для определения типа зон</system:String>
+    <system:String x:Key="MainViewModel.DescriptionParamDetailDescription">Используется для определения типа зон</system:String>    
     <system:String x:Key="MainViewModel.BlockParamDescription">Параметр блока СМР</system:String>
     <system:String x:Key="MainViewModel.BlockParamDetailDescription">Используется для определения корпуса здания</system:String>
     <system:String x:Key="MainViewModel.SectionParamDescription">Параметр секции СМР</system:String>
@@ -59,14 +59,25 @@
     <system:String x:Key="MainViewModel.FloorParamDetailDescription">Используется для определения этажа здания</system:String>
     <system:String x:Key="MainViewModel.FloorDEParamDescription">Дополнительный параметр этажа СМР</system:String>
     <system:String x:Key="MainViewModel.FloorDEParamDetailDescription">Используется для определения этажа здания</system:String>
+    <system:String x:Key="MainViewModel.ZoneParamDescription">Параметр зоны СМР</system:String>
+    <system:String x:Key="MainViewModel.ZoneParamDetailDescription">Используется для определения зоны СМР</system:String>
+    <system:String x:Key="MainViewModel.BottomZoneParamDescription">Параметр низа СМР</system:String>
+    <system:String x:Key="MainViewModel.BottomZoneParamDetailDescription">Используется для построения простого объема</system:String>
+    <system:String x:Key="MainViewModel.TopZoneParamDescription">Параметр верха СМР</system:String>
+    <system:String x:Key="MainViewModel.TopZoneParamDetailDescription">Используется для построения простого объема</system:String>
+    <system:String x:Key="MainViewModel.VolumeParamDescription">Параметр объёма СМР</system:String>
+    <system:String x:Key="MainViewModel.VolumeParamDetailDescription">Используется для вычисления объёма</system:String>
 
     <system:String x:Key="MainViewModel.RequiredCheckArea">Требуется проверить зоны</system:String>
     <system:String x:Key="MainViewModel.NoMainParam">Параметр типа зон обязателен к использованию</system:String>
+    <system:String x:Key="MainViewModel.NoBottomZoneParam">Параметр низа СМР обязателен к использованию в данном алгоритме</system:String>
+    <system:String x:Key="MainViewModel.NoTopZoneParam">Параметр верха СМР обязателен к использованию в данном алгоритме</system:String>
+    <system:String x:Key="MainViewModel.NoVolumeParam">Параметр объёма СМР обязателен к использованию</system:String>
     <system:String x:Key="MainViewModel.NoDocuments">Не выбраны файлы с перекрытиями</system:String>
     <system:String x:Key="MainViewModel.NoParams">Не выбраны параметры</system:String>
     <system:String x:Key="MainViewModel.NoSlabs">Не выбраны плиты перекрытий</system:String>
     <system:String x:Key="MainViewModel.NoTypeZone">Не выбран тип зон</system:String>
-    <system:String x:Key="MainViewModel.ErrorParams">Ошибки в параметрах</system:String>
+    <system:String x:Key="MainViewModel.ErrorParams">Отсутствуют некоторые параметры</system:String>
     <system:String x:Key="MainViewModel.SquareSideNoDouble">Вводимые данные должны быть числом</system:String>
     <system:String x:Key="MainViewModel.SquareSideNoNegate">Вводимые данные должны быть положительными</system:String>
     <system:String x:Key="MainViewModel.SquareSideNoZero">Вводимые данные должны быть больше нуля</system:String>
@@ -75,14 +86,9 @@
     
     <system:String x:Key="MainViewModel.ProgressTitle">Построение объёмов... [{0}]\[{1}]</system:String>
 
-    <system:String x:Key="ParamViewModel.WarningStartString">Ошибочные параметры:</system:String>
+    <system:String x:Key="ParamViewModel.WarningStartString">Отсутствуют параметры:</system:String>
     <system:String x:Key="DocumentViewModel.CurrentFile">Текущий файл (открытый)</system:String>
 
     <system:String x:Key="BuildCoordVolumesProcessor.TransactionName">Построение объемов СМР</system:String>
-
-    <system:String x:Key="FamilyDocument.TransactionName">Категория, выдавливание, материал</system:String>
-    <system:String x:Key="FamilyDocument.MaterialName">стекло</system:String>
-    <system:String x:Key="FamilyDocument.FamilyName">{0}ОбщМд_Координаты СМР_{1}{2}</system:String>
-    <system:String x:Key="FamilyDocument.TemplateFamilyName">{0}\Метрическая система, типовая модель.rft</system:String>
 
 </ResourceDictionary>

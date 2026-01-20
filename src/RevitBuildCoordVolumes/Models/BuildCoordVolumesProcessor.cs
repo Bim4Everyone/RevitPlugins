@@ -16,7 +16,6 @@ internal class BuildCoordVolumesProcessor {
     private readonly ILocalizationService _localizationService;
     private readonly IExtrusionBuilder _builder;
     private readonly RevitRepository _revitRepository;
-    private readonly SystemPluginConfig _systemPluginConfig;
     private readonly BuildCoordVolumesSettings _settings;
     private readonly BuildCoordVolumesServices _services;
     private readonly BuilderFactory _builderFactory;
@@ -24,15 +23,13 @@ internal class BuildCoordVolumesProcessor {
     public BuildCoordVolumesProcessor(
         ILocalizationService localizationService,
         RevitRepository revitRepository,
-        SystemPluginConfig systemPluginConfig,
         BuildCoordVolumesSettings settings,
         BuildCoordVolumesServices services) {
         _localizationService = localizationService;
         _revitRepository = revitRepository;
-        _systemPluginConfig = systemPluginConfig;
         _settings = settings;
         _services = services;
-        _builderFactory = new BuilderFactory(_revitRepository, _systemPluginConfig, _settings, _services);
+        _builderFactory = new BuilderFactory(_revitRepository, _settings, _services);
         _builder = _builderFactory.Create(_settings.AlgorithmType);
     }
 
@@ -49,7 +46,7 @@ internal class BuildCoordVolumesProcessor {
 
             var geomElements = _builder.BuildVolumes(spatialObject);
 
-            var directShapeElements = _services.DirectShapeObjectFactory.GetDirectShapeElements(geomElements, _revitRepository);
+            var directShapeElements = _services.DirectShapeObjectFactory.GetDirectShapeObjects(geomElements, _revitRepository);
 
             _services.ParamSetter.SetParams(spatialObject.SpatialElement, directShapeElements, _settings);
 

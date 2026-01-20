@@ -18,7 +18,8 @@ internal class ParamViewModel : BaseViewModel {
     private string _sourceParamName;
     private string _targetParamName;
     private string _warnings;
-    private bool _isPair;
+    private bool _hasSourceParam;
+    private bool _hasTargetParam;
     private bool _isChecked;
     private bool _hasWarning;
 
@@ -49,9 +50,13 @@ internal class ParamViewModel : BaseViewModel {
         get => _warnings;
         set => RaiseAndSetIfChanged(ref _warnings, value);
     }
-    public bool IsPair {
-        get => _isPair;
-        set => RaiseAndSetIfChanged(ref _isPair, value);
+    public bool HasSourceParam {
+        get => _hasSourceParam;
+        set => RaiseAndSetIfChanged(ref _hasSourceParam, value);
+    }
+    public bool HasTargetParam {
+        get => _hasTargetParam;
+        set => RaiseAndSetIfChanged(ref _hasTargetParam, value);
     }
     public bool IsChecked {
         get => _isChecked;
@@ -72,7 +77,7 @@ internal class ParamViewModel : BaseViewModel {
         var warningString = new StringBuilder();
 
         if(IsChecked
-            && IsPair
+            && HasSourceParam
             && (!_buildCoordVolumesServices.ParamAvailabilityService.IsParamExist(document, SourceParamName)
             || !_buildCoordVolumesServices.CategoryAvailabilityService.IsParamAvailableInCategory(
                 SourceParamName, Category.GetCategory(document, BuiltInCategory.OST_Areas)))) {
@@ -81,6 +86,7 @@ internal class ParamViewModel : BaseViewModel {
             warningString.Append($"  • {SourceParamName} - {desc}\n");
         }
         if(IsChecked
+            && HasTargetParam
             && (!_buildCoordVolumesServices.ParamAvailabilityService.IsParamExist(document, TargetParamName)
             || !_buildCoordVolumesServices.CategoryAvailabilityService.IsParamAvailableInCategory(
                 TargetParamName, Category.GetCategory(document, BuiltInCategory.OST_GenericModel)))) {

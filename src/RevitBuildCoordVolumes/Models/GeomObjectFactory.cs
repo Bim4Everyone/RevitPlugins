@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Linq;
 
 using Autodesk.Revit.DB;
 
@@ -21,7 +22,8 @@ internal class GeomObjectFactory : IGeomObjectFactory {
 
         return solid != null
             ? new GeomObject {
-                GeometryObjects = [solid]
+                GeometryObjects = [solid],
+                Volume = solid.Volume
             }
             : null;
     }
@@ -37,13 +39,15 @@ internal class GeomObjectFactory : IGeomObjectFactory {
         return solid != null
             ? new GeomObject {
                 GeometryObjects = [solid],
-                FloorName = firstElement.FloorName
+                FloorName = firstElement.FloorName,
+                Volume = solid.Volume
             }
             : null;
     }
 
     public GeomObject GetSeparatedGeomObject(List<ColumnObject> columns, double spatialElementPosition) {
         var solids = new List<GeometryObject>();
+        var volumes = new List<double>();
         var firstElement = columns[0];
         foreach(var column in columns) {
             double startExtrudePosition = column.StartPosition;
@@ -53,12 +57,14 @@ internal class GeomObjectFactory : IGeomObjectFactory {
             var solid = SolidUtility.ExtrudeSolid(listCurveLoops, startExtrudePosition, finishExtrudePosition);
             if(solid != null) {
                 solids.Add(solid);
+                volumes.Add(solid.Volume);
             }
         }
-        return solids.Count != 0
+        return solids.Count != 0 && volumes.Count != 0
             ? new GeomObject {
                 GeometryObjects = solids,
-                FloorName = firstElement.FloorName
+                FloorName = firstElement.FloorName,
+                Volume = volumes.Sum()
             }
             : null;
     }

@@ -290,6 +290,16 @@ internal class MainViewModel : BaseViewModel {
                 .OrderBy(vm => vm.Name);
     }
 
+    // Метод обновления Params
+    private void UpdateParams() {
+        Params = new ObservableCollection<ParamViewModel>(GetParamViewModels());
+        // Подписка на события в ParamViewModel
+        foreach(var param in Params) {
+            param.PropertyChanged += OnParamChanged;
+        }
+        UpdateParamWarnings();
+    }
+
     // Метод подписанный на событие изменения ParamViewModel
     private void OnParamChanged(object sender, PropertyChangedEventArgs e) {
         if(sender is not ParamViewModel vm) {
@@ -333,15 +343,17 @@ internal class MainViewModel : BaseViewModel {
 
     // Метод получения коллекции ParamViewModel для Params
     private IEnumerable<ParamViewModel> GetParamViewModels() {
-        var defaultParamMaps = _systemPluginConfig.GetDefaultParamMaps();
+        var defaultParamMaps = SelectedTypeAlgorithm.AlgorithmType == AlgorithmType.AdvancedAreaExtrude
+            ? _systemPluginConfig.GetAdvancedParamMaps()
+            : _systemPluginConfig.GetSimpleParamMaps();
         var savedParamMaps = _buildCoordVolumesSettings.ParamMaps;
-
         var savedLookup = savedParamMaps.ToDictionary(paramMap => paramMap.Type, paramMap => paramMap);
 
         return defaultParamMaps.Select(defaultParamMap => {
             bool exists = savedLookup.TryGetValue(defaultParamMap.Type, out var savedParamMap);
             var paramMap = exists ? savedParamMap : defaultParamMap;
-            bool isPair = paramMap.SourceParam != null;
+            bool hasSourceParam = paramMap.SourceParam != null;
+            bool hasTargetParam = paramMap.TargetParam != null;
 
             return new ParamViewModel(_localizationService, _buildCoordVolumesServices) {
                 ParamMap = paramMap,
@@ -350,7 +362,8 @@ internal class MainViewModel : BaseViewModel {
                 SourceParamName = paramMap.SourceParam?.Name ?? string.Empty,
                 TargetParamName = paramMap.TargetParam?.Name ?? string.Empty,
                 IsChecked = exists,
-                IsPair = isPair
+                HasSourceParam = hasSourceParam,
+                HasTargetParam = hasTargetParam,
             };
         });
     }
@@ -364,6 +377,7 @@ internal class MainViewModel : BaseViewModel {
     private void OnPropertyChanged(object sender, PropertyChangedEventArgs e) {
         if(e.PropertyName == nameof(SelectedTypeAlgorithm)) {
             UpdateVisibilitySettings();
+            UpdateParams();
         }
         if(e.PropertyName == nameof(SelectedTypeZone)) {
             UpdateRequiredCheckArea();
@@ -454,7 +468,6 @@ internal class MainViewModel : BaseViewModel {
         var processor = new BuildCoordVolumesProcessor(
             _localizationService,
             _revitRepository,
-            _systemPluginConfig,
             _buildCoordVolumesSettings,
             _buildCoordVolumesServices);
 
@@ -476,9 +489,24 @@ internal class MainViewModel : BaseViewModel {
     // Метод проверки возможности выполнения основного метода
     private bool CanAcceptView() {
         if(Params != null) {
-            var firstParamMap = Params.FirstOrDefault();
-            if(firstParamMap != null && !firstParamMap.IsChecked && firstParamMap.ParamMap.Type == ParamType.DescriptionParam) {
+            var descriptionParamVM = Params.Where(pvm => pvm.ParamMap.Type == ParamType.DescriptionParam).FirstOrDefault();
+            if(descriptionParamVM != null && !descriptionParamVM.IsChecked) {
                 ErrorText = _localizationService.GetLocalizedString("MainViewModel.NoMainParam");
+                return false;
+            }
+            var topZoneParamVM = Params.Where(pvm => pvm.ParamMap.Type == ParamType.TopZoneParam).FirstOrDefault();
+            if(topZoneParamVM != null && !topZoneParamVM.IsChecked && !IsAdvancedAlgorithm) {
+                ErrorText = _localizationService.GetLocalizedString("MainViewModel.NoTopZoneParam");
+                return false;
+            }
+            var bottomZoneParamVM = Params.Where(pvm => pvm.ParamMap.Type == ParamType.BottomZoneParam).FirstOrDefault();
+            if(bottomZoneParamVM != null && !bottomZoneParamVM.IsChecked && !IsAdvancedAlgorithm) {
+                ErrorText = _localizationService.GetLocalizedString("MainViewModel.NoBottomZoneParam");
+                return false;
+            }
+            var volumeParamVM = Params.Where(pvm => pvm.ParamMap.Type == ParamType.VolumeParam).FirstOrDefault();
+            if(volumeParamVM != null && !volumeParamVM.IsChecked) {
+                ErrorText = _localizationService.GetLocalizedString("MainViewModel.NoVolumeParam");
                 return false;
             }
             var checkedParams = Params.Where(p => p.IsChecked).ToList();

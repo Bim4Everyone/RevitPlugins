@@ -90,7 +90,7 @@
                 Grid.Row="1"
                 Margin="0,15,0,0"
                 IsEnabled="{Binding IsChecked, ElementName=_this}"
-                Visibility="{Binding IsPair, 
+                Visibility="{Binding HasSourceParam, 
                     ElementName=_this, Converter={StaticResource StackPanelVisibility}}">
 
                 <ui:TextBlock
@@ -109,7 +109,9 @@
                 Grid.Column="2"
                 Grid.Row="1"
                 Margin="0,15,0,0"
-                IsEnabled="{Binding IsChecked, ElementName=_this}">
+                IsEnabled="{Binding IsChecked, ElementName=_this}"
+                Visibility="{Binding HasTargetParam, 
+                    ElementName=_this, Converter={StaticResource StackPanelVisibility}}">
 
                 <ui:TextBlock
                     Foreground="{DynamicResource TextFillColorSecondaryBrush}"

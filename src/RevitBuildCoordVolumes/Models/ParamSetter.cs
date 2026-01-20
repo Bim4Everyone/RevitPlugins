@@ -17,56 +17,65 @@ internal class ParamSetter : IParamSetter {
         _systemPluginConfig = systemPluginConfig;
     }
 
-    public void SetParams(SpatialElement spatialElement, List<DirectShapeObject> directShapeElements, BuildCoordVolumesSettings buildCoordVolumesSettings) {
-        foreach(var directShapeElement in directShapeElements) {
-            Set(spatialElement, directShapeElement, buildCoordVolumesSettings);
+    public void SetParams(SpatialElement spatialElement, List<DirectShapeObject> directShapeObjects, BuildCoordVolumesSettings buildCoordVolumesSettings) {
+        foreach(var directShapeObject in directShapeObjects) {
+            Set(spatialElement, directShapeObject, buildCoordVolumesSettings);
         }
     }
 
-    private void Set(SpatialElement spatialElement, DirectShapeObject directShapeElement, BuildCoordVolumesSettings buildCoordVolumesSettings) {
-        var directShape = directShapeElement.DirectShape;
+    private void Set(SpatialElement spatialElement, DirectShapeObject directShapeObject, BuildCoordVolumesSettings buildCoordVolumesSettings) {
+        var directShape = directShapeObject.DirectShape;
         var paramMaps = buildCoordVolumesSettings.ParamMaps;
         var algorithm = buildCoordVolumesSettings.AlgorithmType;
         foreach(var paramMap in paramMaps) {
-
-            if(spatialElement.IsExistsParam(paramMap.SourceParam.Name) && directShape.IsExistsParam(paramMap.TargetParam.Name)) {
-                if(paramMap.Type == ParamType.FloorDEParam) {
-                    SetFloorDEParam(spatialElement, directShapeElement, paramMap, algorithm);
-                } else if(paramMap.Type == ParamType.FloorParam) {
-                    SetFloorParam(spatialElement, directShapeElement, paramMap, algorithm);
-                } else {
-                    SetStringParam(spatialElement, directShapeElement, paramMap);
+            if(paramMap.Type == ParamType.VolumeParam) {
+                SetVolumeParam(directShapeObject, paramMap);
+            }
+            if(paramMap.SourceParam != null && paramMap.TargetParam != null) {
+                if(spatialElement.IsExistsParam(paramMap.SourceParam.Name) && directShape.IsExistsParam(paramMap.TargetParam.Name)) {
+                    if(paramMap.Type == ParamType.FloorDEParam) {
+                        SetFloorDEParam(spatialElement, directShapeObject, paramMap, algorithm);
+                    } else if(paramMap.Type == ParamType.FloorParam) {
+                        SetFloorParam(spatialElement, directShapeObject, paramMap, algorithm);
+                    } else {
+                        SetStringParam(spatialElement, directShapeObject, paramMap);
+                    }
                 }
             }
         }
     }
 
-    private void SetFloorDEParam(SpatialElement spatialElement, DirectShapeObject directShapeElement, ParamMap paramMap, AlgorithmType algorithm) {
+    private void SetFloorDEParam(SpatialElement spatialElement, DirectShapeObject directShapeObject, ParamMap paramMap, AlgorithmType algorithm) {
         if(algorithm == AlgorithmType.AdvancedAreaExtrude) {
-            double value = GetFloorDEValue(directShapeElement.FloorName);
-            directShapeElement.DirectShape.SetParamValue(paramMap.TargetParam.Name, value);
+            double value = GetFloorDEValue(directShapeObject.FloorName);
+            directShapeObject.DirectShape.SetParamValue(paramMap.TargetParam.Name, value);
         } else if(algorithm == AlgorithmType.SimpleAreaExtrude) {
-            SetDoubleParam(spatialElement, directShapeElement, paramMap);
+            SetDoubleParam(spatialElement, directShapeObject, paramMap);
         }
     }
 
-    private void SetFloorParam(SpatialElement spatialElement, DirectShapeObject directShapeElement, ParamMap paramMap, AlgorithmType algorithm) {
+    private void SetFloorParam(SpatialElement spatialElement, DirectShapeObject directShapeObject, ParamMap paramMap, AlgorithmType algorithm) {
         if(algorithm == AlgorithmType.AdvancedAreaExtrude) {
-            string value = directShapeElement.FloorName;
-            directShapeElement.DirectShape.SetParamValue(paramMap.TargetParam.Name, value);
+            string value = directShapeObject.FloorName;
+            directShapeObject.DirectShape.SetParamValue(paramMap.TargetParam.Name, value);
         } else if(algorithm == AlgorithmType.SimpleAreaExtrude) {
-            SetStringParam(spatialElement, directShapeElement, paramMap);
+            SetStringParam(spatialElement, directShapeObject, paramMap);
         }
     }
 
-    private void SetStringParam(SpatialElement spatialElement, DirectShapeObject directShapeElement, ParamMap paramMap) {
+    private void SetStringParam(SpatialElement spatialElement, DirectShapeObject directShapeObject, ParamMap paramMap) {
         string value = spatialElement.GetParamValueOrDefault<string>(paramMap.SourceParam.Name);
-        directShapeElement.DirectShape.SetParamValue(paramMap.TargetParam.Name, value);
+        directShapeObject.DirectShape.SetParamValue(paramMap.TargetParam.Name, value);
     }
 
-    private void SetDoubleParam(SpatialElement spatialElement, DirectShapeObject directShapeElement, ParamMap paramMap) {
+    private void SetDoubleParam(SpatialElement spatialElement, DirectShapeObject directShapeObject, ParamMap paramMap) {
         double value = spatialElement.GetParamValueOrDefault<double>(paramMap.SourceParam.Name);
-        directShapeElement.DirectShape.SetParamValue(paramMap.TargetParam.Name, value);
+        directShapeObject.DirectShape.SetParamValue(paramMap.TargetParam.Name, value);
+    }
+
+    private void SetVolumeParam(DirectShapeObject directShapeObject, ParamMap paramMap) {
+        double value = directShapeObject.Volume;
+        directShapeObject.DirectShape.SetParamValue(paramMap.TargetParam.Name, value);
     }
 
 

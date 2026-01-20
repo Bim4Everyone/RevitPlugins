@@ -13,8 +13,11 @@ public partial class ParamControl {
     public static readonly DependencyProperty IsCheckedProperty = DependencyProperty.Register(
         nameof(IsChecked), typeof(bool), typeof(ParamControl), new PropertyMetadata(true));
 
-    public static readonly DependencyProperty IsPairProperty = DependencyProperty.Register(
-        nameof(IsPair), typeof(bool), typeof(ParamControl), new PropertyMetadata(true));
+    public static readonly DependencyProperty HasSourceParamProperty = DependencyProperty.Register(
+        nameof(HasSourceParam), typeof(bool), typeof(ParamControl), new PropertyMetadata(true));
+
+    public static readonly DependencyProperty HasTargetParamProperty = DependencyProperty.Register(
+        nameof(HasTargetParam), typeof(bool), typeof(ParamControl), new PropertyMetadata(true));
 
     public static readonly DependencyProperty SourceParamNameProperty = DependencyProperty.Register(
         nameof(SourceParamName), typeof(string), typeof(ParamControl), new PropertyMetadata(default(string)));
@@ -48,9 +51,14 @@ public partial class ParamControl {
         set => SetValue(IsCheckedProperty, value);
     }
 
-    public bool IsPair {
-        get => (bool) GetValue(IsPairProperty);
-        set => SetValue(IsPairProperty, value);
+    public bool HasSourceParam {
+        get => (bool) GetValue(HasSourceParamProperty);
+        set => SetValue(HasSourceParamProperty, value);
+    }
+
+    public bool HasTargetParam {
+        get => (bool) GetValue(HasTargetParamProperty);
+        set => SetValue(HasTargetParamProperty, value);
     }
 
     public string SourceParamName {

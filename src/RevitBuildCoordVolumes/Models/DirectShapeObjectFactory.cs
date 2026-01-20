@@ -13,25 +13,28 @@ internal class DirectShapeObjectFactory : IDirectShapeObjectFactory {
         _systemPluginConfig = systemPluginConfig;
     }
 
-    public List<DirectShapeObject> GetDirectShapeElements(List<GeomObject> geomElements, RevitRepository revitRepository) {
+    public List<DirectShapeObject> GetDirectShapeObjects(List<GeomObject> geomObjects, RevitRepository revitRepository) {
         var directShapeElements = new List<DirectShapeObject>();
-        foreach(var geomElement in geomElements) {
-            var directShapeElement = GetDirectShapeElement(geomElement, revitRepository);
+        foreach(var geomObject in geomObjects) {
+            var directShapeElement = GetDirectShapeObject(geomObject, revitRepository);
             if(directShapeElement != null) {
                 directShapeElements.Add(directShapeElement);
             }
-            ;
         }
         return directShapeElements;
     }
 
-    private DirectShapeObject GetDirectShapeElement(GeomObject geomElement, RevitRepository revitRepository) {
-        var geometryObjects = geomElement.GeometryObjects;
+    private DirectShapeObject GetDirectShapeObject(GeomObject geomObject, RevitRepository revitRepository) {
+        var geometryObjects = geomObject.GeometryObjects;
         var directShape = DirectShape.CreateElement(revitRepository.Document, _systemPluginConfig.ElementIdDirectShape);
 
         if(directShape.IsValidShape(geometryObjects)) {
             directShape.SetShape(geometryObjects);
-            return new DirectShapeObject { DirectShape = directShape, FloorName = geomElement.FloorName };
+            return new DirectShapeObject {
+                DirectShape = directShape,
+                FloorName = geomObject.FloorName,
+                Volume = geomObject.Volume
+            };
         } else {
             return null;
         }

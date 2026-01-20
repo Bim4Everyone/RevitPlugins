@@ -15,7 +15,7 @@ internal class ConfigSettings {
     public void ApplyDefaultValues(SystemPluginConfig systemPluginConfig) {
         AlgorithmType = AlgorithmType.AdvancedAreaExtrude;
         TypeZone = string.Empty;
-        ParamMaps = systemPluginConfig.GetDefaultParamMaps();
+        ParamMaps = systemPluginConfig.GetAdvancedParamMaps();
         Documents = [];
         TypeSlabs = [];
         SquareSideMm = systemPluginConfig.SquareSide;
