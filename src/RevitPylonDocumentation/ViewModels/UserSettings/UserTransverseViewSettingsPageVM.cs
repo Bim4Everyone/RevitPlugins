@@ -8,7 +8,7 @@ using dosymep.SimpleServices;
 
 namespace RevitPylonDocumentation.ViewModels.UserSettings;
 
-internal class UserHorizontalViewSettingsPageVM : ValidatableViewModel {
+internal class UserTransverseViewSettingsPageVM : ValidatableViewModel {
     private readonly MainViewModel _viewModel;
     private readonly ILocalizationService _localizationService;
 
@@ -42,7 +42,7 @@ internal class UserHorizontalViewSettingsPageVM : ValidatableViewModel {
     private View _selectedTransverseViewTemplate;
     private View _selectedTransverseRebarViewTemplate;
 
-    public UserHorizontalViewSettingsPageVM(MainViewModel mainViewModel, ILocalizationService localizationService) {
+    public UserTransverseViewSettingsPageVM(MainViewModel mainViewModel, ILocalizationService localizationService) {
         _viewModel = mainViewModel;
         _localizationService = localizationService;
         ValidateAllProperties();
@@ -268,15 +268,15 @@ internal class UserHorizontalViewSettingsPageVM : ValidatableViewModel {
         }
 
         if(!double.TryParse(TransverseViewFirstElevationTemp, out _)) {
-            SetError(_localizationService.GetLocalizedString("VM.FirstHorizontalViewElevationInvalid"));
+            SetError(_localizationService.GetLocalizedString("VM.FirstTransverseViewElevationInvalid"));
             return false;
         }
         if(!double.TryParse(TransverseViewSecondElevationTemp, out _)) {
-            SetError(_localizationService.GetLocalizedString("VM.SecondHorizontalViewElevationInvalid"));
+            SetError(_localizationService.GetLocalizedString("VM.SecondTransverseViewElevationInvalid"));
             return false;
         }
         if(!double.TryParse(TransverseViewThirdElevationTemp, out _)) {
-            SetError(_localizationService.GetLocalizedString("VM.ThirdHorizontalViewElevationInvalid"));
+            SetError(_localizationService.GetLocalizedString("VM.ThirdTransverseViewElevationInvalid"));
             return false;
         }
 
@@ -319,7 +319,7 @@ internal class UserHorizontalViewSettingsPageVM : ValidatableViewModel {
     /// <summary>
     /// Получает типоразмер вида для создаваемых видов
     /// </summary>
-    public void FindHorizontalViewFamilyType() {
+    public void FindTransverseViewFamilyType() {
         if(!String.IsNullOrEmpty(TransverseViewFamilyTypeName)) {
             SelectedTransverseViewFamilyType = _viewModel.ViewFamilyTypes
                 .FirstOrDefault(familyType => familyType.Name.Equals(TransverseViewFamilyTypeName));
@@ -333,7 +333,7 @@ internal class UserHorizontalViewSettingsPageVM : ValidatableViewModel {
     private void SetError(string error) {
         _viewModel.ErrorText = string.Format(
             "{0} - {1}",
-            _localizationService.GetLocalizedString("MainWindow.HorizontalViews"),
+            _localizationService.GetLocalizedString("MainWindow.TransverseViews"),
             error);
     }
 }

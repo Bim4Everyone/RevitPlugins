@@ -6,12 +6,12 @@ using RevitPylonDocumentation.ViewModels;
 
 namespace RevitPylonDocumentation.Views.Pages;
 /// <summary>
-/// Логика взаимодействия для HorizontalViewSettingsPage.xaml
+/// Логика взаимодействия для TransverseViewSettingsPage.xaml
 /// </summary>
-internal partial class HorizontalViewSettingsPage {
-    public HorizontalViewSettingsPage() { }
+internal partial class TransverseViewSettingsPage {
+    public TransverseViewSettingsPage() { }
 
-    public HorizontalViewSettingsPage(MainViewModel viewModel,
+    public TransverseViewSettingsPage(MainViewModel viewModel,
         ILoggerService loggerService,
         ILanguageService languageService, ILocalizationService localizationService,
         IUIThemeService uiThemeService, IUIThemeUpdaterService themeUpdaterService)

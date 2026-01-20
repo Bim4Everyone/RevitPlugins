@@ -4,7 +4,7 @@ namespace RevitPylonDocumentation.Models;
 internal class CreationSettings {
     public CreationSettings(UserSelectionSettings selectionSettings,
                             UserVerticalViewSettings verticalViewSettings,
-                            UserHorizontalViewSettings horizontalViewSettings,
+                            UserTransverseViewSettings transverseViewSettings,
                             UserSchedulesSettings schedulesSettings,
                             UserScheduleFiltersSettings scheduleFiltersSettings,
                             UserLegendsAndAnnotationsSettings legendsAndAnnotationsSettings,
@@ -13,7 +13,7 @@ internal class CreationSettings {
                             UserSheetSettings sheetSettings) {
         SelectionSettings = selectionSettings;
         VerticalViewSettings = verticalViewSettings;
-        HorizontalViewSettings = horizontalViewSettings;
+        TransverseViewSettings = transverseViewSettings;
         SchedulesSettings = schedulesSettings;
         ScheduleFiltersSettings = scheduleFiltersSettings;
         LegendsAndAnnotationsSettings = legendsAndAnnotationsSettings;
@@ -24,7 +24,7 @@ internal class CreationSettings {
 
     public UserSelectionSettings SelectionSettings { get; private set; }
     public UserVerticalViewSettings VerticalViewSettings { get; private set; }
-    public UserHorizontalViewSettings HorizontalViewSettings { get; private set; }
+    public UserTransverseViewSettings TransverseViewSettings { get; private set; }
     public UserSchedulesSettings SchedulesSettings { get; private set; }
     public UserScheduleFiltersSettings ScheduleFiltersSettings { get; private set; }
     public UserLegendsAndAnnotationsSettings LegendsAndAnnotationsSettings { get; private set; }

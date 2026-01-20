@@ -492,10 +492,10 @@
                                 ItemTemplate="{StaticResource WithoutFamilyNameItemTemplate}" />
 
                             <controls:ComboBoxSettingControl
-                                LabelText="{me:LocalizationSource GeneralPage.HorizontalViews}"
+                                LabelText="{me:LocalizationSource GeneralPage.TransverseViews}"
                                 ItemsSource="{Binding ViewTemplatesInPj}"
                                 SelectedItem="{Binding 
-                                    Path=HorizontalViewSettings.SelectedTransverseViewTemplate, 
+                                    Path=TransverseViewSettings.SelectedTransverseViewTemplate, 
                                     UpdateSourceTrigger=PropertyChanged, Mode=TwoWay,
                                     ValidatesOnDataErrors=True, NotifyOnValidationError=True}"
                                 ToolTipText="Шаблон вида, который необходимо применить к горизонтальным видам при их создании."
@@ -523,10 +523,10 @@
                                 ItemTemplate="{StaticResource WithoutFamilyNameItemTemplate}" />
 
                             <controls:ComboBoxSettingControl
-                                LabelText="{me:LocalizationSource GeneralPage.HorizontalViews}"
+                                LabelText="{me:LocalizationSource GeneralPage.TransverseViews}"
                                 ItemsSource="{Binding ViewTemplatesInPj}"
                                 SelectedItem="{Binding 
-                                    Path=HorizontalViewSettings.SelectedTransverseRebarViewTemplate, 
+                                    Path=TransverseViewSettings.SelectedTransverseRebarViewTemplate, 
                                     UpdateSourceTrigger=PropertyChanged, Mode=TwoWay,
                                     ValidatesOnDataErrors=True, NotifyOnValidationError=True}"
                                 ToolTipText="Шаблон вида, который необходимо применить к горизонтальным видам армирования при их создании."

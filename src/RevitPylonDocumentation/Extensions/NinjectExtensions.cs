@@ -14,7 +14,7 @@ internal static class NinjectExtensions {
             .ToSelf()
             .InSingletonScope();
 
-        kernel.Bind<HorizontalViewSettingsPage>()
+        kernel.Bind<TransverseViewSettingsPage>()
             .ToSelf()
             .InSingletonScope();
 

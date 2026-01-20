@@ -26,7 +26,7 @@ internal class PluginConfig : ProjectConfig<PluginSettings> {
     internal void GetConfigProps(PluginSettings settings, MainViewModel mainViewModel) {
         var selectionSettings = mainViewModel.SelectionSettings;
         var verticalViewSectionSettings = mainViewModel.VerticalViewSettings;
-        var horizontalViewSectionSettings = mainViewModel.HorizontalViewSettings;
+        var transverseViewSectionSettings = mainViewModel.TransverseViewSettings;
         var schedulesSettings = mainViewModel.SchedulesSettings;
         var scheduleFiltersSettings = mainViewModel.ScheduleFiltersSettings;
         var legendsAndAnnotationsSettings = mainViewModel.LegendsAndAnnotationsSettings;
@@ -90,57 +90,57 @@ internal class PluginConfig : ProjectConfig<PluginSettings> {
         verticalViewSectionSettings.GeneralViewPerpYBottomOffset = settings.GeneralViewPerpYBottomOffset;
         verticalViewSectionSettings.GeneralViewPerpYBottomOffsetTemp = settings.GeneralViewPerpYBottomOffset;
 
-        horizontalViewSectionSettings.TransverseViewDepth = settings.TransverseViewDepth;
-        horizontalViewSectionSettings.TransverseViewDepthTemp = settings.TransverseViewDepth;
-        horizontalViewSectionSettings.TransverseViewFirstPrefix = settings.TransverseViewFirstPrefix;
-        horizontalViewSectionSettings.TransverseViewFirstPrefixTemp = settings.TransverseViewFirstPrefix;
-        horizontalViewSectionSettings.TransverseViewFirstSuffix = settings.TransverseViewFirstSuffix;
-        horizontalViewSectionSettings.TransverseViewFirstSuffixTemp = settings.TransverseViewFirstSuffix;
-        horizontalViewSectionSettings.TransverseViewFirstElevation = settings.TransverseViewFirstElevation;
-        horizontalViewSectionSettings.TransverseViewFirstElevationTemp = settings.TransverseViewFirstElevation;
-        horizontalViewSectionSettings.TransverseViewSecondPrefix = settings.TransverseViewSecondPrefix;
-        horizontalViewSectionSettings.TransverseViewSecondPrefixTemp = settings.TransverseViewSecondPrefix;
-        horizontalViewSectionSettings.TransverseViewSecondSuffix = settings.TransverseViewSecondSuffix;
-        horizontalViewSectionSettings.TransverseViewSecondSuffixTemp = settings.TransverseViewSecondSuffix;
-        horizontalViewSectionSettings.TransverseViewSecondElevation = settings.TransverseViewSecondElevation;
-        horizontalViewSectionSettings.TransverseViewSecondElevationTemp = settings.TransverseViewSecondElevation;
-        horizontalViewSectionSettings.TransverseViewThirdPrefix = settings.TransverseViewThirdPrefix;
-        horizontalViewSectionSettings.TransverseViewThirdPrefixTemp = settings.TransverseViewThirdPrefix;
-        horizontalViewSectionSettings.TransverseViewThirdSuffix = settings.TransverseViewThirdSuffix;
-        horizontalViewSectionSettings.TransverseViewThirdSuffixTemp = settings.TransverseViewThirdSuffix;
-        horizontalViewSectionSettings.TransverseViewThirdElevation = settings.TransverseViewThirdElevation;
-        horizontalViewSectionSettings.TransverseViewThirdElevationTemp = settings.TransverseViewThirdElevation;
-        horizontalViewSectionSettings.TransverseViewTemplateName = settings.TransverseViewTemplateName;
-        horizontalViewSectionSettings.TransverseViewTemplateNameTemp = settings.TransverseViewTemplateName;
+        transverseViewSectionSettings.TransverseViewDepth = settings.TransverseViewDepth;
+        transverseViewSectionSettings.TransverseViewDepthTemp = settings.TransverseViewDepth;
+        transverseViewSectionSettings.TransverseViewFirstPrefix = settings.TransverseViewFirstPrefix;
+        transverseViewSectionSettings.TransverseViewFirstPrefixTemp = settings.TransverseViewFirstPrefix;
+        transverseViewSectionSettings.TransverseViewFirstSuffix = settings.TransverseViewFirstSuffix;
+        transverseViewSectionSettings.TransverseViewFirstSuffixTemp = settings.TransverseViewFirstSuffix;
+        transverseViewSectionSettings.TransverseViewFirstElevation = settings.TransverseViewFirstElevation;
+        transverseViewSectionSettings.TransverseViewFirstElevationTemp = settings.TransverseViewFirstElevation;
+        transverseViewSectionSettings.TransverseViewSecondPrefix = settings.TransverseViewSecondPrefix;
+        transverseViewSectionSettings.TransverseViewSecondPrefixTemp = settings.TransverseViewSecondPrefix;
+        transverseViewSectionSettings.TransverseViewSecondSuffix = settings.TransverseViewSecondSuffix;
+        transverseViewSectionSettings.TransverseViewSecondSuffixTemp = settings.TransverseViewSecondSuffix;
+        transverseViewSectionSettings.TransverseViewSecondElevation = settings.TransverseViewSecondElevation;
+        transverseViewSectionSettings.TransverseViewSecondElevationTemp = settings.TransverseViewSecondElevation;
+        transverseViewSectionSettings.TransverseViewThirdPrefix = settings.TransverseViewThirdPrefix;
+        transverseViewSectionSettings.TransverseViewThirdPrefixTemp = settings.TransverseViewThirdPrefix;
+        transverseViewSectionSettings.TransverseViewThirdSuffix = settings.TransverseViewThirdSuffix;
+        transverseViewSectionSettings.TransverseViewThirdSuffixTemp = settings.TransverseViewThirdSuffix;
+        transverseViewSectionSettings.TransverseViewThirdElevation = settings.TransverseViewThirdElevation;
+        transverseViewSectionSettings.TransverseViewThirdElevationTemp = settings.TransverseViewThirdElevation;
+        transverseViewSectionSettings.TransverseViewTemplateName = settings.TransverseViewTemplateName;
+        transverseViewSectionSettings.TransverseViewTemplateNameTemp = settings.TransverseViewTemplateName;
 
-        horizontalViewSectionSettings.TransverseRebarViewDepth = settings.TransverseRebarViewDepth;
-        horizontalViewSectionSettings.TransverseRebarViewDepthTemp = settings.TransverseRebarViewDepth;
-        horizontalViewSectionSettings.TransverseRebarViewFirstPrefix = settings.TransverseRebarViewFirstPrefix;
-        horizontalViewSectionSettings.TransverseRebarViewFirstPrefixTemp = settings.TransverseRebarViewFirstPrefix;
-        horizontalViewSectionSettings.TransverseRebarViewFirstSuffix = settings.TransverseRebarViewFirstSuffix;
-        horizontalViewSectionSettings.TransverseRebarViewFirstSuffixTemp = settings.TransverseRebarViewFirstSuffix;
-        horizontalViewSectionSettings.TransverseRebarViewSecondPrefix = settings.TransverseRebarViewSecondPrefix;
-        horizontalViewSectionSettings.TransverseRebarViewSecondPrefixTemp = settings.TransverseRebarViewSecondPrefix;
-        horizontalViewSectionSettings.TransverseRebarViewSecondSuffix = settings.TransverseRebarViewSecondSuffix;
-        horizontalViewSectionSettings.TransverseRebarViewSecondSuffixTemp = settings.TransverseRebarViewSecondSuffix;
-        horizontalViewSectionSettings.TransverseRebarViewThirdPrefix = settings.TransverseRebarViewThirdPrefix;
-        horizontalViewSectionSettings.TransverseRebarViewThirdPrefixTemp = settings.TransverseRebarViewThirdPrefix;
-        horizontalViewSectionSettings.TransverseRebarViewThirdSuffix = settings.TransverseRebarViewThirdSuffix;
-        horizontalViewSectionSettings.TransverseRebarViewThirdSuffixTemp = settings.TransverseRebarViewThirdSuffix;
+        transverseViewSectionSettings.TransverseRebarViewDepth = settings.TransverseRebarViewDepth;
+        transverseViewSectionSettings.TransverseRebarViewDepthTemp = settings.TransverseRebarViewDepth;
+        transverseViewSectionSettings.TransverseRebarViewFirstPrefix = settings.TransverseRebarViewFirstPrefix;
+        transverseViewSectionSettings.TransverseRebarViewFirstPrefixTemp = settings.TransverseRebarViewFirstPrefix;
+        transverseViewSectionSettings.TransverseRebarViewFirstSuffix = settings.TransverseRebarViewFirstSuffix;
+        transverseViewSectionSettings.TransverseRebarViewFirstSuffixTemp = settings.TransverseRebarViewFirstSuffix;
+        transverseViewSectionSettings.TransverseRebarViewSecondPrefix = settings.TransverseRebarViewSecondPrefix;
+        transverseViewSectionSettings.TransverseRebarViewSecondPrefixTemp = settings.TransverseRebarViewSecondPrefix;
+        transverseViewSectionSettings.TransverseRebarViewSecondSuffix = settings.TransverseRebarViewSecondSuffix;
+        transverseViewSectionSettings.TransverseRebarViewSecondSuffixTemp = settings.TransverseRebarViewSecondSuffix;
+        transverseViewSectionSettings.TransverseRebarViewThirdPrefix = settings.TransverseRebarViewThirdPrefix;
+        transverseViewSectionSettings.TransverseRebarViewThirdPrefixTemp = settings.TransverseRebarViewThirdPrefix;
+        transverseViewSectionSettings.TransverseRebarViewThirdSuffix = settings.TransverseRebarViewThirdSuffix;
+        transverseViewSectionSettings.TransverseRebarViewThirdSuffixTemp = settings.TransverseRebarViewThirdSuffix;
 
-        horizontalViewSectionSettings.TransverseRebarViewTemplateName = settings.TransverseRebarViewTemplateName;
-        horizontalViewSectionSettings.TransverseRebarViewTemplateNameTemp = settings.TransverseRebarViewTemplateName;
+        transverseViewSectionSettings.TransverseRebarViewTemplateName = settings.TransverseRebarViewTemplateName;
+        transverseViewSectionSettings.TransverseRebarViewTemplateNameTemp = settings.TransverseRebarViewTemplateName;
 
-        horizontalViewSectionSettings.TransverseViewXOffset = settings.TransverseViewXOffset;
-        horizontalViewSectionSettings.TransverseViewXOffsetTemp = settings.TransverseViewXOffset;
-        horizontalViewSectionSettings.TransverseViewYOffset = settings.TransverseViewYOffset;
-        horizontalViewSectionSettings.TransverseViewYOffsetTemp = settings.TransverseViewYOffset;
+        transverseViewSectionSettings.TransverseViewXOffset = settings.TransverseViewXOffset;
+        transverseViewSectionSettings.TransverseViewXOffsetTemp = settings.TransverseViewXOffset;
+        transverseViewSectionSettings.TransverseViewYOffset = settings.TransverseViewYOffset;
+        transverseViewSectionSettings.TransverseViewYOffsetTemp = settings.TransverseViewYOffset;
 
         verticalViewSectionSettings.GeneralViewFamilyTypeName = settings.GeneralViewFamilyTypeName;
         verticalViewSectionSettings.GeneralViewFamilyTypeNameTemp = settings.GeneralViewFamilyTypeName;
 
-        horizontalViewSectionSettings.TransverseViewFamilyTypeName = settings.TransverseViewFamilyTypeName;
-        horizontalViewSectionSettings.TransverseViewFamilyTypeNameTemp = settings.TransverseViewFamilyTypeName;
+        transverseViewSectionSettings.TransverseViewFamilyTypeName = settings.TransverseViewFamilyTypeName;
+        transverseViewSectionSettings.TransverseViewFamilyTypeNameTemp = settings.TransverseViewFamilyTypeName;
 
         schedulesSettings.SkeletonSchedulePrefix = settings.SkeletonSchedulePrefix;
         schedulesSettings.SkeletonSchedulePrefixTemp = settings.SkeletonSchedulePrefix;
@@ -266,7 +266,7 @@ internal class PluginConfig : ProjectConfig<PluginSettings> {
     internal void SetConfigProps(PluginSettings settings, MainViewModel mainViewModel) {
         var selectionSettings = mainViewModel.SelectionSettings;
         var verticalViewSectionSettings = mainViewModel.VerticalViewSettings;
-        var horizontalViewSectionSettings = mainViewModel.HorizontalViewSettings;
+        var transverseViewSectionSettings = mainViewModel.TransverseViewSettings;
         var schedulesSettings = mainViewModel.SchedulesSettings;
         var scheduleFiltersSettings = mainViewModel.ScheduleFiltersSettings;
         var legendsAndAnnotationsSettings = mainViewModel.LegendsAndAnnotationsSettings;
@@ -312,33 +312,33 @@ internal class PluginConfig : ProjectConfig<PluginSettings> {
         settings.GeneralViewPerpYTopOffset = verticalViewSectionSettings.GeneralViewPerpYTopOffset;
         settings.GeneralViewPerpYBottomOffset = verticalViewSectionSettings.GeneralViewPerpYBottomOffset;
 
-        settings.TransverseViewDepth = horizontalViewSectionSettings.TransverseViewDepth;
-        settings.TransverseViewFirstPrefix = horizontalViewSectionSettings.TransverseViewFirstPrefix;
-        settings.TransverseViewFirstSuffix = horizontalViewSectionSettings.TransverseViewFirstSuffix;
-        settings.TransverseViewFirstElevation = horizontalViewSectionSettings.TransverseViewFirstElevation;
-        settings.TransverseViewSecondPrefix = horizontalViewSectionSettings.TransverseViewSecondPrefix;
-        settings.TransverseViewSecondSuffix = horizontalViewSectionSettings.TransverseViewSecondSuffix;
-        settings.TransverseViewSecondElevation = horizontalViewSectionSettings.TransverseViewSecondElevation;
-        settings.TransverseViewThirdPrefix = horizontalViewSectionSettings.TransverseViewThirdPrefix;
-        settings.TransverseViewThirdSuffix = horizontalViewSectionSettings.TransverseViewThirdSuffix;
-        settings.TransverseViewThirdElevation = horizontalViewSectionSettings.TransverseViewThirdElevation;
+        settings.TransverseViewDepth = transverseViewSectionSettings.TransverseViewDepth;
+        settings.TransverseViewFirstPrefix = transverseViewSectionSettings.TransverseViewFirstPrefix;
+        settings.TransverseViewFirstSuffix = transverseViewSectionSettings.TransverseViewFirstSuffix;
+        settings.TransverseViewFirstElevation = transverseViewSectionSettings.TransverseViewFirstElevation;
+        settings.TransverseViewSecondPrefix = transverseViewSectionSettings.TransverseViewSecondPrefix;
+        settings.TransverseViewSecondSuffix = transverseViewSectionSettings.TransverseViewSecondSuffix;
+        settings.TransverseViewSecondElevation = transverseViewSectionSettings.TransverseViewSecondElevation;
+        settings.TransverseViewThirdPrefix = transverseViewSectionSettings.TransverseViewThirdPrefix;
+        settings.TransverseViewThirdSuffix = transverseViewSectionSettings.TransverseViewThirdSuffix;
+        settings.TransverseViewThirdElevation = transverseViewSectionSettings.TransverseViewThirdElevation;
 
-        settings.TransverseRebarViewDepth = horizontalViewSectionSettings.TransverseRebarViewDepth;
-        settings.TransverseRebarViewFirstPrefix = horizontalViewSectionSettings.TransverseRebarViewFirstPrefix;
-        settings.TransverseRebarViewFirstSuffix = horizontalViewSectionSettings.TransverseRebarViewFirstSuffix;
-        settings.TransverseRebarViewSecondPrefix = horizontalViewSectionSettings.TransverseRebarViewSecondPrefix;
-        settings.TransverseRebarViewSecondSuffix = horizontalViewSectionSettings.TransverseRebarViewSecondSuffix;
-        settings.TransverseRebarViewThirdPrefix = horizontalViewSectionSettings.TransverseRebarViewThirdPrefix;
-        settings.TransverseRebarViewThirdSuffix = horizontalViewSectionSettings.TransverseRebarViewThirdSuffix;
+        settings.TransverseRebarViewDepth = transverseViewSectionSettings.TransverseRebarViewDepth;
+        settings.TransverseRebarViewFirstPrefix = transverseViewSectionSettings.TransverseRebarViewFirstPrefix;
+        settings.TransverseRebarViewFirstSuffix = transverseViewSectionSettings.TransverseRebarViewFirstSuffix;
+        settings.TransverseRebarViewSecondPrefix = transverseViewSectionSettings.TransverseRebarViewSecondPrefix;
+        settings.TransverseRebarViewSecondSuffix = transverseViewSectionSettings.TransverseRebarViewSecondSuffix;
+        settings.TransverseRebarViewThirdPrefix = transverseViewSectionSettings.TransverseRebarViewThirdPrefix;
+        settings.TransverseRebarViewThirdSuffix = transverseViewSectionSettings.TransverseRebarViewThirdSuffix;
 
-        settings.TransverseViewTemplateName = horizontalViewSectionSettings.TransverseViewTemplateName;
-        settings.TransverseRebarViewTemplateName = horizontalViewSectionSettings.TransverseRebarViewTemplateName;
+        settings.TransverseViewTemplateName = transverseViewSectionSettings.TransverseViewTemplateName;
+        settings.TransverseRebarViewTemplateName = transverseViewSectionSettings.TransverseRebarViewTemplateName;
 
-        settings.TransverseViewXOffset = horizontalViewSectionSettings.TransverseViewXOffset;
-        settings.TransverseViewYOffset = horizontalViewSectionSettings.TransverseViewYOffset;
+        settings.TransverseViewXOffset = transverseViewSectionSettings.TransverseViewXOffset;
+        settings.TransverseViewYOffset = transverseViewSectionSettings.TransverseViewYOffset;
 
         settings.GeneralViewFamilyTypeName = verticalViewSectionSettings.GeneralViewFamilyTypeName;
-        settings.TransverseViewFamilyTypeName = horizontalViewSectionSettings.TransverseViewFamilyTypeName;
+        settings.TransverseViewFamilyTypeName = transverseViewSectionSettings.TransverseViewFamilyTypeName;
 
         settings.SkeletonSchedulePrefix = schedulesSettings.SkeletonSchedulePrefix;
         settings.SkeletonScheduleSuffix = schedulesSettings.SkeletonScheduleSuffix;

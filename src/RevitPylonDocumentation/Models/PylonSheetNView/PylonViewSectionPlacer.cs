@@ -26,14 +26,14 @@ public class PylonViewSectionPlacer {
 
     internal PylonViewSectionPlacer(CreationSettings settings, Document document, PylonSheetInfo pylonSheetInfo) {
         VerticalSectionSettings = settings.VerticalViewSettings;
-        HorizontalSectionSettings = settings.HorizontalViewSettings;
+        TransverseSectionSettings = settings.TransverseViewSettings;
         SelectionSettings = settings.SelectionSettings;
         Doc = document;
         SheetInfo = pylonSheetInfo;
     }
 
     internal UserVerticalViewSettings VerticalSectionSettings { get; set; }
-    internal UserHorizontalViewSettings HorizontalSectionSettings { get; set; }
+    internal UserTransverseViewSettings TransverseSectionSettings { get; set; }
     internal UserSelectionSettings SelectionSettings { get; set; }
     internal Document Doc { get; set; }
     internal PylonSheetInfo SheetInfo { get; set; }

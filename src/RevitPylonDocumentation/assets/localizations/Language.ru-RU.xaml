@@ -55,9 +55,9 @@
     <system:String x:Key="VM.TransverseViewXOffsetInvalid">Значение отступа поперечного вида по X некорректно</system:String>
     <system:String x:Key="VM.TransverseViewYOffsetInvalid">Значение отступа поперечного вида по Y некорректно</system:String>
 
-    <system:String x:Key="VM.FirstHorizontalViewElevationInvalid">Значение возвышения первого горизонтального вида некорректно</system:String>
-    <system:String x:Key="VM.SecondHorizontalViewElevationInvalid">Значение возвышения второго горизонтального вида некорректно</system:String>
-    <system:String x:Key="VM.ThirdHorizontalViewElevationInvalid">Значение возвышения третьего горизонтального вида некорректно</system:String>
+    <system:String x:Key="VM.FirstTransverseViewElevationInvalid">Значение возвышения первого горизонтального вида некорректно</system:String>
+    <system:String x:Key="VM.SecondTransverseViewElevationInvalid">Значение возвышения второго горизонтального вида некорректно</system:String>
+    <system:String x:Key="VM.ThirdTransverseViewElevationInvalid">Значение возвышения третьего горизонтального вида некорректно</system:String>
 
     <!-- MainWindow -->
     <system:String x:Key="MainWindow.Title">Документация пилонов</system:String>
@@ -67,7 +67,7 @@
     <system:String x:Key="MainWindow.SettingsMenu">Настройки</system:String>
 
     <system:String x:Key="MainWindow.VerticalViews">Вертикальные виды</system:String>
-    <system:String x:Key="MainWindow.HorizontalViews">Горизонтальные виды</system:String>
+    <system:String x:Key="MainWindow.TransverseViews">Горизонтальные виды</system:String>
     <system:String x:Key="MainWindow.Schedules">Спецификации</system:String>
     <system:String x:Key="MainWindow.ScheduleFilters">Спецификации. Фильтрация</system:String>
     <system:String x:Key="MainWindow.LegendsAndAnnotations">Легенды и типовые аннотации</system:String>
@@ -81,7 +81,7 @@
 
     <system:String x:Key="MainWindow.VerticalViewsSettings">Вкладка с настройками вертикальных видов 
         - видов опалубки и армирования, которые смотрят на пилон сбоку</system:String>
-    <system:String x:Key="MainWindow.HorizontalViewsSettings">Вкладка с настройками горизонтальных видов 
+    <system:String x:Key="MainWindow.TransverseViewsSettings">Вкладка с настройками горизонтальных видов 
         - видов опалубки и армирования, которые разрезают пилон поперек и смотрят сверху вниз</system:String>
     <system:String x:Key="MainWindow.SchedulesSettings">Вкладка с настройками спецификаций 
         - таблиц с данными о пилоне и его армировании</system:String>
@@ -134,7 +134,7 @@
     <system:String x:Key="GeneralPage.RebarViewTemplates">Шаблоны видов армирования</system:String>
     <system:String x:Key="GeneralPage.RebarViewTemplatesTooltip">Шаблоны видов армирования</system:String>
     <system:String x:Key="GeneralPage.VerticalViews">Вертикальных видов</system:String>
-    <system:String x:Key="GeneralPage.HorizontalViews">Горизонтальных видов</system:String>
+    <system:String x:Key="GeneralPage.TransverseViews">Горизонтальных видов</system:String>
 
     <system:String x:Key="GeneralPage.Run">Запуск</system:String>
     <system:String x:Key="GeneralPage.Cancel">Отмена</system:String>
@@ -176,46 +176,46 @@
     <system:String x:Key="VerticalView.SelectViewTypeSizeForMainAndSideViews">Выберите типоразмер для основного и бокового видов:</system:String>
     <system:String x:Key="VerticalView.SelectViewTypeSizeForMainAndSideViewsTooltip">Выберите типоразмер для основного и бокового видов</system:String>
     
-    <!-- HorizontalViewSettingsPage -->
-    <system:String x:Key="HorizontalView.FormworkHorizontalView">Горизонтальный вид опалубки</system:String>
-    <system:String x:Key="HorizontalView.FirstHorizontalViewNameMask">Маска имени первого горизонтального вида пилона:</system:String>
-    <system:String x:Key="HorizontalView.FirstHorizontalViewNameMaskTooltip">Маска имени первого горизонтального вида пилона</system:String>
-    <system:String x:Key="HorizontalView.SecondHorizontalViewNameMask">Маска имени второго горизонтального вида пилона:</system:String>
-    <system:String x:Key="HorizontalView.SecondHorizontalViewNameMaskTooltip">Маска имени второго горизонтального вида пилона</system:String>
-    <system:String x:Key="HorizontalView.ThirdHorizontalViewNameMask">Маска имени третьего горизонтального вида пилона:</system:String>
-    <system:String x:Key="HorizontalView.ThirdHorizontalViewNameMaskTooltip">Маска имени третьего горизонтального вида пилона</system:String>
-    <system:String x:Key="HorizontalView.SelectHorizontalViewTemplate">Выберите шаблон горизонтального вида:</system:String>
-    <system:String x:Key="HorizontalView.SelectHorizontalViewTemplateTooltip">Выберите шаблон горизонтального вида</system:String>
-    <system:String x:Key="HorizontalView.HorizontalViewDepth">Глубина горизонтального вида</system:String>
-    <system:String x:Key="HorizontalView.HorizontalViewDepthTooltip">Глубина горизонтального вида</system:String>
+    <!-- TransverseViewSettingsPage -->
+    <system:String x:Key="TransverseView.FormworkTransverseView">Горизонтальный вид опалубки</system:String>
+    <system:String x:Key="TransverseView.FirstTransverseViewNameMask">Маска имени первого горизонтального вида пилона:</system:String>
+    <system:String x:Key="TransverseView.FirstTransverseViewNameMaskTooltip">Маска имени первого горизонтального вида пилона</system:String>
+    <system:String x:Key="TransverseView.SecondTransverseViewNameMask">Маска имени второго горизонтального вида пилона:</system:String>
+    <system:String x:Key="TransverseView.SecondTransverseViewNameMaskTooltip">Маска имени второго горизонтального вида пилона</system:String>
+    <system:String x:Key="TransverseView.ThirdTransverseViewNameMask">Маска имени третьего горизонтального вида пилона:</system:String>
+    <system:String x:Key="TransverseView.ThirdTransverseViewNameMaskTooltip">Маска имени третьего горизонтального вида пилона</system:String>
+    <system:String x:Key="TransverseView.SelectTransverseViewTemplate">Выберите шаблон горизонтального вида:</system:String>
+    <system:String x:Key="TransverseView.SelectTransverseViewTemplateTooltip">Выберите шаблон горизонтального вида</system:String>
+    <system:String x:Key="TransverseView.TransverseViewDepth">Глубина горизонтального вида</system:String>
+    <system:String x:Key="TransverseView.TransverseViewDepthTooltip">Глубина горизонтального вида</system:String>
 
-    <system:String x:Key="HorizontalView.RebarHorizontalView">Горизонтальный вид армирования</system:String>
-    <system:String x:Key="HorizontalView.FirstRebarHorizontalViewNameMask">Маска имени первого горизонтального вида армирования пилона:</system:String>
-    <system:String x:Key="HorizontalView.FirstRebarHorizontalViewNameMaskTooltip">Маска имени первого горизонтального вида пилона</system:String>
-    <system:String x:Key="HorizontalView.SecondRebarHorizontalViewNameMask">Маска имени второго горизонтального вида армирования пилона:</system:String>
-    <system:String x:Key="HorizontalView.SecondRebarHorizontalViewNameMaskTooltip">Маска имени второго горизонтального вида пилона</system:String>
-    <system:String x:Key="HorizontalView.ThirdRebarHorizontalViewNameMask">Маска имени третьего горизонтального вида армирования пилона:</system:String>
-    <system:String x:Key="HorizontalView.ThirdRebarHorizontalViewNameMaskTooltip">Маска имени третьего горизонтального вида пилона</system:String>
-    <system:String x:Key="HorizontalView.SelectRebarHorizontalViewTemplate">Выберите шаблон горизонтального вида армирования:</system:String>
-    <system:String x:Key="HorizontalView.SelectRebarHorizontalViewTemplateTooltip">Выберите шаблон горизонтального вида армирования</system:String>
-    <system:String x:Key="HorizontalView.RebarHorizontalViewDepth">Глубина горизонтального вида армирования</system:String>
-    <system:String x:Key="HorizontalView.RebarHorizontalViewDepthTooltip">Глубина горизонтального вида</system:String>
+    <system:String x:Key="TransverseView.RebarTransverseView">Горизонтальный вид армирования</system:String>
+    <system:String x:Key="TransverseView.FirstRebarTransverseViewNameMask">Маска имени первого горизонтального вида армирования пилона:</system:String>
+    <system:String x:Key="TransverseView.FirstRebarTransverseViewNameMaskTooltip">Маска имени первого горизонтального вида пилона</system:String>
+    <system:String x:Key="TransverseView.SecondRebarTransverseViewNameMask">Маска имени второго горизонтального вида армирования пилона:</system:String>
+    <system:String x:Key="TransverseView.SecondRebarTransverseViewNameMaskTooltip">Маска имени второго горизонтального вида пилона</system:String>
+    <system:String x:Key="TransverseView.ThirdRebarTransverseViewNameMask">Маска имени третьего горизонтального вида армирования пилона:</system:String>
+    <system:String x:Key="TransverseView.ThirdRebarTransverseViewNameMaskTooltip">Маска имени третьего горизонтального вида пилона</system:String>
+    <system:String x:Key="TransverseView.SelectRebarTransverseViewTemplate">Выберите шаблон горизонтального вида армирования:</system:String>
+    <system:String x:Key="TransverseView.SelectRebarTransverseViewTemplateTooltip">Выберите шаблон горизонтального вида армирования</system:String>
+    <system:String x:Key="TransverseView.RebarTransverseViewDepth">Глубина горизонтального вида армирования</system:String>
+    <system:String x:Key="TransverseView.RebarTransverseViewDepthTooltip">Глубина горизонтального вида</system:String>
 
-    <system:String x:Key="HorizontalView.HorizontalViewBottomOffsets">Отступы горизонтального вида</system:String>
-    <system:String x:Key="HorizontalView.FirstHorizontalViewBottomOffset">Отступ снизу до первого горизонтального вида</system:String>
-    <system:String x:Key="HorizontalView.FirstHorizontalViewBottomOffsetTooltip">Отступ снизу до первого горизонтального вида</system:String>
-    <system:String x:Key="HorizontalView.SecondHorizontalViewTopOffset">Отступ сверху до второго горизонтального вида</system:String>
-    <system:String x:Key="HorizontalView.SecondHorizontalViewTopOffsetTooltip">Отступ сверху до второго горизонтального вида</system:String>
-    <system:String x:Key="HorizontalView.ThirdHorizontalViewTopOffset">Отступ сверху до третьего горизонтального вида</system:String>
-    <system:String x:Key="HorizontalView.ThirdHorizontalViewTopOffsetTooltip">Отступ сверху до третьего горизонтального вида</system:String>
+    <system:String x:Key="TransverseView.TransverseViewBottomOffsets">Отступы горизонтального вида</system:String>
+    <system:String x:Key="TransverseView.FirstTransverseViewBottomOffset">Отступ снизу до первого горизонтального вида</system:String>
+    <system:String x:Key="TransverseView.FirstTransverseViewBottomOffsetTooltip">Отступ снизу до первого горизонтального вида</system:String>
+    <system:String x:Key="TransverseView.SecondTransverseViewTopOffset">Отступ сверху до второго горизонтального вида</system:String>
+    <system:String x:Key="TransverseView.SecondTransverseViewTopOffsetTooltip">Отступ сверху до второго горизонтального вида</system:String>
+    <system:String x:Key="TransverseView.ThirdTransverseViewTopOffset">Отступ сверху до третьего горизонтального вида</system:String>
+    <system:String x:Key="TransverseView.ThirdTransverseViewTopOffsetTooltip">Отступ сверху до третьего горизонтального вида</system:String>
 
-    <system:String x:Key="HorizontalView.HorizontalViewXOffset">Отступ по X у горизонтального вида от пилона</system:String>
-    <system:String x:Key="HorizontalView.HorizontalViewXOffsetTooltip">Отступ по X у горизонтального вида от пилона</system:String>
-    <system:String x:Key="HorizontalView.HorizontalViewYOffset">Отступ по Y у горизонтального вида от пилона</system:String>
-    <system:String x:Key="HorizontalView.HorizontalViewYOffsetTooltip">Отступ по X у горизонтального вида от пилона</system:String>
+    <system:String x:Key="TransverseView.TransverseViewXOffset">Отступ по X у горизонтального вида от пилона</system:String>
+    <system:String x:Key="TransverseView.TransverseViewXOffsetTooltip">Отступ по X у горизонтального вида от пилона</system:String>
+    <system:String x:Key="TransverseView.TransverseViewYOffset">Отступ по Y у горизонтального вида от пилона</system:String>
+    <system:String x:Key="TransverseView.TransverseViewYOffsetTooltip">Отступ по X у горизонтального вида от пилона</system:String>
 
-    <system:String x:Key="HorizontalView.SelectViewTypeSizeForHorizontalViews">Выберите типоразмер для горизонтальных видов:</system:String>
-    <system:String x:Key="HorizontalView.SelectViewTypeSizeForHorizontalViewsTooltip">Выберите типоразмер для горизонтальных видов</system:String>
+    <system:String x:Key="TransverseView.SelectViewTypeSizeForTransverseViews">Выберите типоразмер для горизонтальных видов:</system:String>
+    <system:String x:Key="TransverseView.SelectViewTypeSizeForTransverseViewsTooltip">Выберите типоразмер для горизонтальных видов</system:String>
 
     <!-- LegendViewsPage -->
     <system:String x:Key="LegendView.NotesLegend">Легенда примечания</system:String>
@@ -365,32 +365,32 @@
     <system:String x:Key="GeneralPage.IfcPartsScheduleToolTip">Передвиньте тумблер вправо, если хотите, чтобы плагин создал и разместил на листах у выбранных пилонов ведомость IFC арматуры</system:String>
     <system:String x:Key="GeneralPage.NotesLegendToolTip">Передвиньте тумблер вправо, если хотите, чтобы плагин разместил на листах у выбранных пилонов легенду примечания</system:String>
 
-    <!-- Horizontal View Settings Page ToolTips -->
-    <system:String x:Key="HorizontalViewSettingsPage.FormworkHorizontalViewToolTip">Правила, по которым будут создаваться горизонтальные разрезы для пилонов в проекте</system:String>
-    <system:String x:Key="HorizontalViewSettingsPage.FirstHorizontalViewNameMaskToolTip">Префикс и суффикс имени первого горизонтального вида пилона, т.е. то, что должно идти в названии вида перед указанием марки пилона и после нее.&#10;Например, в имени первого горизонтального вида пилона:&#10;&quot;Пилон 12.30.25-12⌀20-П1_Сеч.1-1&quot;,&#10;где &quot;12.30.25-12⌀20-П1&quot; - это марка пилона,&#10;&quot;Пилон &quot; - это префикс,&#10;&quot;_Сеч.1-1&quot; - это суффикс.</system:String>
-    <system:String x:Key="HorizontalViewSettingsPage.SecondHorizontalViewNameMaskToolTip">Префикс и суффикс имени второго горизонтального вида пилона, т.е. то, что должно идти в названии вида перед указанием марки пилона и после нее.&#10;Например, в имени второго горизонтального вида пилона:&#10;&quot;Пилон 12.30.25-12⌀20-П1_Сеч.2-2&quot;,&#10;где &quot;12.30.25-12⌀20-П1&quot; - это марка пилона,&#10;&quot;Пилон &quot; - это префикс,&#10;&quot;_Сеч.2-2&quot; - это суффикс.</system:String>
-    <system:String x:Key="HorizontalViewSettingsPage.ThirdHorizontalViewNameMaskToolTip">Префикс и суффикс имени третьего горизонтального вида пилона, т.е. то, что должно идти в названии вида перед указанием марки пилона и после нее.&#10;Например, в имени третьего горизонтального вида пилона:&#10;&quot;Пилон 12.30.25-12⌀20-П1_Сеч.3-3&quot;,&#10;где &quot;12.30.25-12⌀20-П1&quot; - это марка пилона,&#10;&quot;Пилон &quot; - это префикс,&#10;&quot;_Сеч.3-3&quot; - это суффикс.</system:String>
-    <system:String x:Key="HorizontalViewSettingsPage.SelectHorizontalViewTemplateToolTip">Шаблон вида, который необходимо применить к горизонтальным видам при их создании.</system:String>
-    <system:String x:Key="HorizontalViewSettingsPage.HorizontalViewDepthToolTip">Глубина проецирования горизонтального разреза</system:String>
+    <!-- Transverse View Settings Page ToolTips -->
+    <system:String x:Key="TransverseViewSettingsPage.FormworkTransverseViewToolTip">Правила, по которым будут создаваться горизонтальные разрезы для пилонов в проекте</system:String>
+    <system:String x:Key="TransverseViewSettingsPage.FirstTransverseViewNameMaskToolTip">Префикс и суффикс имени первого горизонтального вида пилона, т.е. то, что должно идти в названии вида перед указанием марки пилона и после нее.&#10;Например, в имени первого горизонтального вида пилона:&#10;&quot;Пилон 12.30.25-12⌀20-П1_Сеч.1-1&quot;,&#10;где &quot;12.30.25-12⌀20-П1&quot; - это марка пилона,&#10;&quot;Пилон &quot; - это префикс,&#10;&quot;_Сеч.1-1&quot; - это суффикс.</system:String>
+    <system:String x:Key="TransverseViewSettingsPage.SecondTransverseViewNameMaskToolTip">Префикс и суффикс имени второго горизонтального вида пилона, т.е. то, что должно идти в названии вида перед указанием марки пилона и после нее.&#10;Например, в имени второго горизонтального вида пилона:&#10;&quot;Пилон 12.30.25-12⌀20-П1_Сеч.2-2&quot;,&#10;где &quot;12.30.25-12⌀20-П1&quot; - это марка пилона,&#10;&quot;Пилон &quot; - это префикс,&#10;&quot;_Сеч.2-2&quot; - это суффикс.</system:String>
+    <system:String x:Key="TransverseViewSettingsPage.ThirdTransverseViewNameMaskToolTip">Префикс и суффикс имени третьего горизонтального вида пилона, т.е. то, что должно идти в названии вида перед указанием марки пилона и после нее.&#10;Например, в имени третьего горизонтального вида пилона:&#10;&quot;Пилон 12.30.25-12⌀20-П1_Сеч.3-3&quot;,&#10;где &quot;12.30.25-12⌀20-П1&quot; - это марка пилона,&#10;&quot;Пилон &quot; - это префикс,&#10;&quot;_Сеч.3-3&quot; - это суффикс.</system:String>
+    <system:String x:Key="TransverseViewSettingsPage.SelectTransverseViewTemplateToolTip">Шаблон вида, который необходимо применить к горизонтальным видам при их создании.</system:String>
+    <system:String x:Key="TransverseViewSettingsPage.TransverseViewDepthToolTip">Глубина проецирования горизонтального разреза</system:String>
 
-    <system:String x:Key="HorizontalViewSettingsPage.RebarHorizontalViewToolTip">Правила, по которым будут создаваться горизонтальные разрезы армирования для пилонов в проекте</system:String>
-    <system:String x:Key="HorizontalViewSettingsPage.FirstRebarHorizontalViewNameMaskToolTip">Префикс и суффикс имени первого горизонтального вида армирования пилона, т.е. то, что должно идти в названии вида перед указанием марки пилона и после нее.&#10;Например, в имени первого горизонтального вида армирования пилона:&#10;&quot;Пилон 12.30.25-12⌀20-П1_Сеч.1-1&quot;,&#10;где &quot;12.30.25-12⌀20-П1&quot; - это марка пилона,&#10;&quot;Пилон &quot; - это префикс,&#10;&quot;_Сеч.1-1&quot; - это суффикс.</system:String>
-    <system:String x:Key="HorizontalViewSettingsPage.SecondRebarHorizontalViewNameMaskToolTip">Префикс и суффикс имени второго горизонтального вида армирования пилона, т.е. то, что должно идти в названии вида перед указанием марки пилона и после нее.&#10;Например, в имени второго горизонтального вида армирования пилона:&#10;&quot;Пилон 12.30.25-12⌀20-П1_Сеч.2-2&quot;,&#10;где &quot;12.30.25-12⌀20-П1&quot; - это марка пилона,&#10;&quot;Пилон &quot; - это префикс,&#10;&quot;_Сеч.2-2&quot; - это суффикс.</system:String>
-    <system:String x:Key="HorizontalViewSettingsPage.ThirdRebarHorizontalViewNameMaskToolTip">Префикс и суффикс имени третьего горизонтального вида армирования пилона, т.е. то, что должно идти в названии вида перед указанием марки пилона и после нее.&#10;Например, в имени третьего горизонтального вида армирования пилона:&#10;&quot;Пилон 12.30.25-12⌀20-П1_Сеч.3-3&quot;,&#10;где &quot;12.30.25-12⌀20-П1&quot; - это марка пилона,&#10;&quot;Пилон &quot; - это префикс,&#10;&quot;_Сеч.3-3&quot; - это суффикс.</system:String>
-    <system:String x:Key="HorizontalViewSettingsPage.SelectRebarHorizontalViewTemplateToolTip">Шаблон вида, который необходимо применить к горизонтальным видам армирования при их создании.</system:String>
-    <system:String x:Key="HorizontalViewSettingsPage.RebarHorizontalViewDepthToolTip">Глубина проецирования горизонтального разреза армирования</system:String>
+    <system:String x:Key="TransverseViewSettingsPage.RebarTransverseViewToolTip">Правила, по которым будут создаваться горизонтальные разрезы армирования для пилонов в проекте</system:String>
+    <system:String x:Key="TransverseViewSettingsPage.FirstRebarTransverseViewNameMaskToolTip">Префикс и суффикс имени первого горизонтального вида армирования пилона, т.е. то, что должно идти в названии вида перед указанием марки пилона и после нее.&#10;Например, в имени первого горизонтального вида армирования пилона:&#10;&quot;Пилон 12.30.25-12⌀20-П1_Сеч.1-1&quot;,&#10;где &quot;12.30.25-12⌀20-П1&quot; - это марка пилона,&#10;&quot;Пилон &quot; - это префикс,&#10;&quot;_Сеч.1-1&quot; - это суффикс.</system:String>
+    <system:String x:Key="TransverseViewSettingsPage.SecondRebarTransverseViewNameMaskToolTip">Префикс и суффикс имени второго горизонтального вида армирования пилона, т.е. то, что должно идти в названии вида перед указанием марки пилона и после нее.&#10;Например, в имени второго горизонтального вида армирования пилона:&#10;&quot;Пилон 12.30.25-12⌀20-П1_Сеч.2-2&quot;,&#10;где &quot;12.30.25-12⌀20-П1&quot; - это марка пилона,&#10;&quot;Пилон &quot; - это префикс,&#10;&quot;_Сеч.2-2&quot; - это суффикс.</system:String>
+    <system:String x:Key="TransverseViewSettingsPage.ThirdRebarTransverseViewNameMaskToolTip">Префикс и суффикс имени третьего горизонтального вида армирования пилона, т.е. то, что должно идти в названии вида перед указанием марки пилона и после нее.&#10;Например, в имени третьего горизонтального вида армирования пилона:&#10;&quot;Пилон 12.30.25-12⌀20-П1_Сеч.3-3&quot;,&#10;где &quot;12.30.25-12⌀20-П1&quot; - это марка пилона,&#10;&quot;Пилон &quot; - это префикс,&#10;&quot;_Сеч.3-3&quot; - это суффикс.</system:String>
+    <system:String x:Key="TransverseViewSettingsPage.SelectRebarTransverseViewTemplateToolTip">Шаблон вида, который необходимо применить к горизонтальным видам армирования при их создании.</system:String>
+    <system:String x:Key="TransverseViewSettingsPage.RebarTransverseViewDepthToolTip">Глубина проецирования горизонтального разреза армирования</system:String>
 
-    <system:String x:Key="HorizontalViewSettingsPage.HorizontalViewBottomOffsetsToolTip">Положение горизонтальных разрезов относительно высоты пилона</system:String>
-    <system:String x:Key="HorizontalViewSettingsPage.FirstHorizontalViewBottomOffsetToolTip">Положение горизонтального разреза относительно пилона задается при помощи отступа от нижней части пилона в мм</system:String>
-    <system:String x:Key="HorizontalViewSettingsPage.SecondHorizontalViewTopOffsetToolTip">Положение горизонтального разреза относительно пилона задается при помощи отступа от верхней части пилона в мм</system:String>
-    <system:String x:Key="HorizontalViewSettingsPage.ThirdHorizontalViewTopOffsetToolTip">Положение горизонтального разреза относительно пилона задается при помощи отступа от верхней части пилона в мм</system:String>
+    <system:String x:Key="TransverseViewSettingsPage.TransverseViewBottomOffsetsToolTip">Положение горизонтальных разрезов относительно высоты пилона</system:String>
+    <system:String x:Key="TransverseViewSettingsPage.FirstTransverseViewBottomOffsetToolTip">Положение горизонтального разреза относительно пилона задается при помощи отступа от нижней части пилона в мм</system:String>
+    <system:String x:Key="TransverseViewSettingsPage.SecondTransverseViewTopOffsetToolTip">Положение горизонтального разреза относительно пилона задается при помощи отступа от верхней части пилона в мм</system:String>
+    <system:String x:Key="TransverseViewSettingsPage.ThirdTransverseViewTopOffsetToolTip">Положение горизонтального разреза относительно пилона задается при помощи отступа от верхней части пилона в мм</system:String>
 
-    <system:String x:Key="HorizontalViewSettingsPage.HorizontalViewPylonOffsetsToolTip">Отступы горизонтальных видов от границ пилона на листе</system:String>
-    <system:String x:Key="HorizontalViewSettingsPage.HorizontalViewXOffsetToolTip">Укажите отступ от пилона вправо и влево у горизонтальных видов</system:String>
-    <system:String x:Key="HorizontalViewSettingsPage.HorizontalViewYOffsetToolTip">Укажите отступ от пилона сверху и снизу у горизонтальных видов</system:String>
+    <system:String x:Key="TransverseViewSettingsPage.TransverseViewPylonOffsetsToolTip">Отступы горизонтальных видов от границ пилона на листе</system:String>
+    <system:String x:Key="TransverseViewSettingsPage.TransverseViewXOffsetToolTip">Укажите отступ от пилона вправо и влево у горизонтальных видов</system:String>
+    <system:String x:Key="TransverseViewSettingsPage.TransverseViewYOffsetToolTip">Укажите отступ от пилона сверху и снизу у горизонтальных видов</system:String>
 
-    <system:String x:Key="HorizontalViewSettingsPage.ViewTypeSizeToolTip">Типоразмеры видов для горизонтальных разрезов</system:String>
-    <system:String x:Key="HorizontalViewSettingsPage.SelectViewTypeSizeForHorizontalViewsToolTip">Типоразмер вида, который необходимо применить к горизонтальным видам при их создании.</system:String>
+    <system:String x:Key="TransverseViewSettingsPage.ViewTypeSizeToolTip">Типоразмеры видов для горизонтальных разрезов</system:String>
+    <system:String x:Key="TransverseViewSettingsPage.SelectViewTypeSizeForTransverseViewsToolTip">Типоразмер вида, который необходимо применить к горизонтальным видам при их создании.</system:String>
 
     <!-- LegendViewsPage ToolTips -->
     <system:String x:Key="LegendViewsPage.NotesLegendToolTip">Правила, по которым будут размещаться на листах легенды примечаний для пилонов</system:String>

@@ -89,14 +89,14 @@
                             </ui:NavigationViewItem.InfoBadge>
                         </ui:NavigationViewItem>
                         <ui:NavigationViewItem
-                            Content="{me:LocalizationSource MainWindow.HorizontalViews}"
+                            Content="{me:LocalizationSource MainWindow.TransverseViews}"
                             Icon="{ui:SymbolIcon CenterVertical24}"
-                            TargetPageType="{x:Type pages:HorizontalViewSettingsPage}"
-                            ToolTip="{me:LocalizationSource MainWindow.HorizontalViewsSettings}">
+                            TargetPageType="{x:Type pages:TransverseViewSettingsPage}"
+                            ToolTip="{me:LocalizationSource MainWindow.TransverseViewsSettings}">
                             <ui:NavigationViewItem.InfoBadge>
                                 <ui:InfoBadge
                                     Style="{StaticResource RoundInfoBadgeStyle}"
-                                    Visibility="{Binding Path=HorizontalViewSettings.HasErrors, Converter={StaticResource BooleanToVisibilityConverter}}">
+                                    Visibility="{Binding Path=TransverseViewSettings.HasErrors, Converter={StaticResource BooleanToVisibilityConverter}}">
                                 </ui:InfoBadge>
                             </ui:NavigationViewItem.InfoBadge>
                         </ui:NavigationViewItem>

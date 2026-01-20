@@ -55,9 +55,9 @@
     <system:String x:Key="VM.TransverseViewXOffsetInvalid">Transverse view X offset value is incorrect</system:String>
     <system:String x:Key="VM.TransverseViewYOffsetInvalid">Transverse view Y offset value is incorrect</system:String>
 
-    <system:String x:Key="VM.FirstHorizontalViewElevationInvalid">First horizontal view elevation value is incorrect</system:String>
-    <system:String x:Key="VM.SecondHorizontalViewElevationInvalid">Second horizontal view elevation value is incorrect</system:String>
-    <system:String x:Key="VM.ThirdHorizontalViewElevationInvalid">Third horizontal view elevation value is incorrect</system:String>
+    <system:String x:Key="VM.FirstTransverseViewElevationInvalid">First transverse view elevation value is incorrect</system:String>
+    <system:String x:Key="VM.SecondTransverseViewElevationInvalid">Second transverse view elevation value is incorrect</system:String>
+    <system:String x:Key="VM.ThirdTransverseViewElevationInvalid">Third transverse view elevation value is incorrect</system:String>
     
     <!-- MainWindow -->
     <system:String x:Key="MainWindow.Title">Pylon Documentation Automation</system:String>
@@ -67,7 +67,7 @@
     <system:String x:Key="MainWindow.SettingsMenu">Settings</system:String>
 
     <system:String x:Key="MainWindow.VerticalViews">Vertical Views</system:String>
-    <system:String x:Key="MainWindow.HorizontalViews">Horizontal Views</system:String>
+    <system:String x:Key="MainWindow.TransverseViews">Transverse Views</system:String>
     <system:String x:Key="MainWindow.Schedules">Schedules</system:String>
     <system:String x:Key="MainWindow.ScheduleFilters">Schedules. Filtration</system:String>
 
@@ -82,7 +82,7 @@
 
     <system:String x:Key="MainWindow.VerticalViewsSettings">A tab with settings for vertical views 
         - views of formwork and reinforcement that look at the pylon from the side</system:String>
-    <system:String x:Key="MainWindow.HorizontalViewsSettings">A tab with settings for horizontal views 
+    <system:String x:Key="MainWindow.TransverseViewsSettings">A tab with settings for transverse views 
         - views of formwork and reinforcement that cut the pylon crosswise and look from top to bottom</system:String>
     <system:String x:Key="MainWindow.SchedulesSettings">A tab with specification settings 
         - tables with data on the pylon and its reinforcement</system:String>
@@ -135,7 +135,7 @@
     <system:String x:Key="GeneralPage.RebarViewTemplates">Rebar View Templates</system:String>
     <system:String x:Key="GeneralPage.RebarViewTemplatesTooltip">Rebar View Templates</system:String>
     <system:String x:Key="GeneralPage.VerticalViews">Vertical Views</system:String>
-    <system:String x:Key="GeneralPage.HorizontalViews">Horizontal Views</system:String>
+    <system:String x:Key="GeneralPage.TransverseViews">Transverse Views</system:String>
 
     <system:String x:Key="GeneralPage.Run">Run</system:String>
     <system:String x:Key="GeneralPage.Cancel">Cancel</system:String>
@@ -177,46 +177,46 @@
     <system:String x:Key="VerticalView.SelectViewTypeSizeForMainAndSideViews">Select view type size for main and side views:</system:String>
     <system:String x:Key="VerticalView.SelectViewTypeSizeForMainAndSideViewsTooltip">Select view type size for main and side views</system:String>
 
-    <!-- HorizontalViewSettingsPage -->
-    <system:String x:Key="HorizontalView.FormworkHorizontalView">Horizontal Formwork View</system:String>
-    <system:String x:Key="HorizontalView.FirstHorizontalViewNameMask">First horizontal view name mask:</system:String>
-    <system:String x:Key="HorizontalView.FirstHorizontalViewNameMaskTooltip">First horizontal view name mask</system:String>
-    <system:String x:Key="HorizontalView.SecondHorizontalViewNameMask">Second horizontal view name mask:</system:String>
-    <system:String x:Key="HorizontalView.SecondHorizontalViewNameMaskTooltip">Second horizontal view name mask</system:String>
-    <system:String x:Key="HorizontalView.ThirdHorizontalViewNameMask">Third horizontal view name mask:</system:String>
-    <system:String x:Key="HorizontalView.ThirdHorizontalViewNameMaskTooltip">Third horizontal view name mask</system:String>
-    <system:String x:Key="HorizontalView.SelectHorizontalViewTemplate">Select horizontal view template:</system:String>
-    <system:String x:Key="HorizontalView.SelectHorizontalViewTemplateTooltip">Select horizontal view template</system:String>
-    <system:String x:Key="HorizontalView.HorizontalViewDepth">Horizontal view depth</system:String>
-    <system:String x:Key="HorizontalView.HorizontalViewDepthTooltip">Horizontal view depth</system:String>
+    <!-- TransverseViewSettingsPage -->
+    <system:String x:Key="TransverseView.FormworkTransverseView">Transverse Formwork View</system:String>
+    <system:String x:Key="TransverseView.FirstTransverseViewNameMask">First transverse view name mask:</system:String>
+    <system:String x:Key="TransverseView.FirstTransverseViewNameMaskTooltip">First transverse view name mask</system:String>
+    <system:String x:Key="TransverseView.SecondTransverseViewNameMask">Second transverse view name mask:</system:String>
+    <system:String x:Key="TransverseView.SecondTransverseViewNameMaskTooltip">Second transverse view name mask</system:String>
+    <system:String x:Key="TransverseView.ThirdTransverseViewNameMask">Third transverse view name mask:</system:String>
+    <system:String x:Key="TransverseView.ThirdTransverseViewNameMaskTooltip">Third transverse view name mask</system:String>
+    <system:String x:Key="TransverseView.SelectTransverseViewTemplate">Select transverse view template:</system:String>
+    <system:String x:Key="TransverseView.SelectTransverseViewTemplateTooltip">Select transverse view template</system:String>
+    <system:String x:Key="TransverseView.TransverseViewDepth">Transverse view depth</system:String>
+    <system:String x:Key="TransverseView.TransverseViewDepthTooltip">Transverse view depth</system:String>
 
-    <system:String x:Key="HorizontalView.RebarHorizontalView">Horizontal Rebar View</system:String>
-    <system:String x:Key="HorizontalView.FirstRebarHorizontalViewNameMask">First horizontal rebar view name mask:</system:String>
-    <system:String x:Key="HorizontalView.FirstRebarHorizontalViewNameMaskTooltip">First horizontal view name mask</system:String>
-    <system:String x:Key="HorizontalView.SecondRebarHorizontalViewNameMask">Second horizontal rebar view name mask:</system:String>
-    <system:String x:Key="HorizontalView.SecondRebarHorizontalViewNameMaskTooltip">Second horizontal view name mask</system:String>
-    <system:String x:Key="HorizontalView.ThirdRebarHorizontalViewNameMask">Third horizontal rebar view name mask:</system:String>
-    <system:String x:Key="HorizontalView.ThirdRebarHorizontalViewNameMaskTooltip">Third horizontal view name mask</system:String>
-    <system:String x:Key="HorizontalView.SelectRebarHorizontalViewTemplate">Select horizontal rebar view template:</system:String>
-    <system:String x:Key="HorizontalView.SelectRebarHorizontalViewTemplateTooltip">Select horizontal rebar view template</system:String>
-    <system:String x:Key="HorizontalView.RebarHorizontalViewDepth">Horizontal rebar view depth</system:String>
-    <system:String x:Key="HorizontalView.RebarHorizontalViewDepthTooltip">Horizontal view depth</system:String>
+    <system:String x:Key="TransverseView.RebarTransverseView">Transverse Rebar View</system:String>
+    <system:String x:Key="TransverseView.FirstRebarTransverseViewNameMask">First transverse rebar view name mask:</system:String>
+    <system:String x:Key="TransverseView.FirstRebarTransverseViewNameMaskTooltip">First transverse view name mask</system:String>
+    <system:String x:Key="TransverseView.SecondRebarTransverseViewNameMask">Second transverse rebar view name mask:</system:String>
+    <system:String x:Key="TransverseView.SecondRebarTransverseViewNameMaskTooltip">Second transverse view name mask</system:String>
+    <system:String x:Key="TransverseView.ThirdRebarTransverseViewNameMask">Third transverse rebar view name mask:</system:String>
+    <system:String x:Key="TransverseView.ThirdRebarTransverseViewNameMaskTooltip">Third transverse view name mask</system:String>
+    <system:String x:Key="TransverseView.SelectRebarTransverseViewTemplate">Select transverse rebar view template:</system:String>
+    <system:String x:Key="TransverseView.SelectRebarTransverseViewTemplateTooltip">Select transverse rebar view template</system:String>
+    <system:String x:Key="TransverseView.RebarTransverseViewDepth">Transverse rebar view depth</system:String>
+    <system:String x:Key="TransverseView.RebarTransverseViewDepthTooltip">Transverse view depth</system:String>
 
-    <system:String x:Key="HorizontalView.HorizontalViewBottomOffsets">Horizontal view offsets</system:String>
-    <system:String x:Key="HorizontalView.FirstHorizontalViewBottomOffset">Bottom offset to first horizontal view</system:String>
-    <system:String x:Key="HorizontalView.FirstHorizontalViewBottomOffsetTooltip">Bottom offset to first horizontal view</system:String>
-    <system:String x:Key="HorizontalView.SecondHorizontalViewTopOffset">Top offset to second horizontal view</system:String>
-    <system:String x:Key="HorizontalView.SecondHorizontalViewTopOffsetTooltip">Top offset to second horizontal view</system:String>
-    <system:String x:Key="HorizontalView.ThirdHorizontalViewTopOffset">Top offset to third horizontal view</system:String>
-    <system:String x:Key="HorizontalView.ThirdHorizontalViewTopOffsetTooltip">Top offset to third horizontal view</system:String>
+    <system:String x:Key="TransverseView.TransverseViewBottomOffsets">Transverse view offsets</system:String>
+    <system:String x:Key="TransverseView.FirstTransverseViewBottomOffset">Bottom offset to first transverse view</system:String>
+    <system:String x:Key="TransverseView.FirstTransverseViewBottomOffsetTooltip">Bottom offset to first transverse view</system:String>
+    <system:String x:Key="TransverseView.SecondTransverseViewTopOffset">Top offset to second transverse view</system:String>
+    <system:String x:Key="TransverseView.SecondTransverseViewTopOffsetTooltip">Top offset to second transverse view</system:String>
+    <system:String x:Key="TransverseView.ThirdTransverseViewTopOffset">Top offset to third transverse view</system:String>
+    <system:String x:Key="TransverseView.ThirdTransverseViewTopOffsetTooltip">Top offset to third transverse view</system:String>
 
-    <system:String x:Key="HorizontalView.HorizontalViewXOffset">Horizontal view X offset from pylon</system:String>
-    <system:String x:Key="HorizontalView.HorizontalViewXOffsetTooltip">Horizontal view X offset from pylon</system:String>
-    <system:String x:Key="HorizontalView.HorizontalViewYOffset">Horizontal view Y offset from pylon</system:String>
-    <system:String x:Key="HorizontalView.HorizontalViewYOffsetTooltip">Horizontal view X offset from pylon</system:String>
+    <system:String x:Key="TransverseView.TransverseViewXOffset">Transverse view X offset from pylon</system:String>
+    <system:String x:Key="TransverseView.TransverseViewXOffsetTooltip">Transverse view X offset from pylon</system:String>
+    <system:String x:Key="TransverseView.TransverseViewYOffset">Transverse view Y offset from pylon</system:String>
+    <system:String x:Key="TransverseView.TransverseViewYOffsetTooltip">Transverse view X offset from pylon</system:String>
 
-    <system:String x:Key="HorizontalView.SelectViewTypeSizeForHorizontalViews">Select view type size for horizontal views:</system:String>
-    <system:String x:Key="HorizontalView.SelectViewTypeSizeForHorizontalViewsTooltip">Select view type size for horizontal views</system:String>
+    <system:String x:Key="TransverseView.SelectViewTypeSizeForTransverseViews">Select view type size for transverse views:</system:String>
+    <system:String x:Key="TransverseView.SelectViewTypeSizeForTransverseViewsTooltip">Select view type size for transverse views</system:String>
     
     <!-- LegendViewsPage -->
     <system:String x:Key="LegendView.NotesLegend">Notes Legend</system:String>
@@ -366,37 +366,37 @@
     <system:String x:Key="GeneralPage.IfcPartsScheduleToolTip">Move the switch to the right if you want the plugin to create and place on sheets for selected pylons the IFC reinforcement parts schedule</system:String>
     <system:String x:Key="GeneralPage.NotesLegendToolTip">Move the switch to the right if you want the plugin to place the notes legend on sheets for selected pylons</system:String>
 
-    <!-- Horizontal View Settings Page ToolTips -->
-    <system:String x:Key="HorizontalViewSettingsPage.FormworkHorizontalViewToolTip">Rules for creating horizontal sections for pylons in the project</system:String>
-    <system:String x:Key="HorizontalViewSettingsPage.FirstHorizontalViewNameMaskToolTip">Prefix and suffix of the first horizontal pylon view name, i.e., what should go in the view name before and after the pylon mark.&#10;For example, in the name of the first horizontal pylon view:&#10;&quot;Pylon 12.30.25-12?20-P1_Sec.1-1&quot;,&#10;where &quot;12.30.25-12?20-P1&quot; is the pylon mark,&#10;&quot;Pylon &quot; is the prefix,&#10;&quot;_Sec.1-1&quot; is the suffix.</system:String>
-    <system:String x:Key="HorizontalViewSettingsPage.SecondHorizontalViewNameMaskToolTip">Prefix and suffix of the second horizontal pylon view name, i.e., what should go in the view name before and after the pylon mark.&#10;For example, in the name of the second horizontal pylon view:&#10;&quot;Pylon 12.30.25-12?20-P1_Sec.2-2&quot;,&#10;where &quot;12.30.25-12?20-P1&quot; is the pylon mark,&#10;&quot;Pylon &quot; is the prefix,&#10;&quot;_Sec.2-2&quot; is the suffix.</system:String>
-    <system:String x:Key="HorizontalViewSettingsPage.ThirdHorizontalViewNameMaskToolTip">Prefix and suffix of the third horizontal pylon view name, i.e., what should go in the view name before and after the pylon mark.&#10;For example, in the name of the third horizontal pylon view:&#10;&quot;Pylon 12.30.25-12?20-P1_Sec.3-3&quot;,&#10;where &quot;12.30.25-12?20-P1&quot; is the pylon mark,&#10;&quot;Pylon &quot; is the prefix,&#10;&quot;_Sec.3-3&quot; is the suffix.</system:String>
-    <system:String x:Key="HorizontalViewSettingsPage.SelectHorizontalViewTemplateToolTip">View template to be applied to horizontal views when creating them.</system:String>
-    <system:String x:Key="HorizontalViewSettingsPage.HorizontalViewDepthToolTip">Projection depth of the horizontal section</system:String>
+    <!-- Transverse View Settings Page ToolTips -->
+    <system:String x:Key="TransverseViewSettingsPage.FormworkTransverseViewToolTip">Rules for creating transverse sections for pylons in the project</system:String>
+    <system:String x:Key="TransverseViewSettingsPage.FirstTransverseViewNameMaskToolTip">Prefix and suffix of the first transverse pylon view name, i.e., what should go in the view name before and after the pylon mark.&#10;For example, in the name of the first transverse pylon view:&#10;&quot;Pylon 12.30.25-12?20-P1_Sec.1-1&quot;,&#10;where &quot;12.30.25-12?20-P1&quot; is the pylon mark,&#10;&quot;Pylon &quot; is the prefix,&#10;&quot;_Sec.1-1&quot; is the suffix.</system:String>
+    <system:String x:Key="TransverseViewSettingsPage.SecondTransverseViewNameMaskToolTip">Prefix and suffix of the second transverse pylon view name, i.e., what should go in the view name before and after the pylon mark.&#10;For example, in the name of the second transverse pylon view:&#10;&quot;Pylon 12.30.25-12?20-P1_Sec.2-2&quot;,&#10;where &quot;12.30.25-12?20-P1&quot; is the pylon mark,&#10;&quot;Pylon &quot; is the prefix,&#10;&quot;_Sec.2-2&quot; is the suffix.</system:String>
+    <system:String x:Key="TransverseViewSettingsPage.ThirdTransverseViewNameMaskToolTip">Prefix and suffix of the third transverse pylon view name, i.e., what should go in the view name before and after the pylon mark.&#10;For example, in the name of the third transverse pylon view:&#10;&quot;Pylon 12.30.25-12?20-P1_Sec.3-3&quot;,&#10;where &quot;12.30.25-12?20-P1&quot; is the pylon mark,&#10;&quot;Pylon &quot; is the prefix,&#10;&quot;_Sec.3-3&quot; is the suffix.</system:String>
+    <system:String x:Key="TransverseViewSettingsPage.SelectTransverseViewTemplateToolTip">View template to be applied to transverse views when creating them.</system:String>
+    <system:String x:Key="TransverseViewSettingsPage.TransverseViewDepthToolTip">Projection depth of the transverse section</system:String>
 
-    <system:String x:Key="HorizontalViewSettingsPage.RebarHorizontalViewToolTip">Rules for creating horizontal rebar sections for pylons in the project</system:String>
-    <system:String x:Key="HorizontalViewSettingsPage.FirstRebarHorizontalViewNameMaskToolTip">Prefix and suffix of the first horizontal pylon rebar view name, i.e., what should go in the view name before and after the pylon mark.&#10;For example, in the name of the first horizontal pylon rebar view:&#10;&quot;Pylon 12.30.25-12?20-P1_Sec.1-1&quot;,&#10;where &quot;12.30.25-12?20-P1&quot; is the pylon mark,&#10;&quot;Pylon &quot; is the prefix,&#10;&quot;_Sec.1-1&quot; is the suffix.</system:String>
-    <system:String x:Key="HorizontalViewSettingsPage.SecondRebarHorizontalViewNameMaskToolTip">Prefix and suffix of the second horizontal pylon rebar view name, i.e., what should go in the view name before and after the pylon mark.&#10;For example, in the name of the second horizontal pylon rebar view:&#10;&quot;Pylon 12.30.25-12?20-P1_Sec.2-2&quot;,&#10;where &quot;12.30.25-12?20-P1&quot; is the pylon mark,&#10;&quot;Pylon &quot; is the prefix,&#10;&quot;_Sec.2-2&quot; is the suffix.</system:String>
-    <system:String x:Key="HorizontalViewSettingsPage.ThirdRebarHorizontalViewNameMaskToolTip">Prefix and suffix of the third horizontal pylon rebar view name, i.e., what should go in the view name before and after the pylon mark.&#10;For example, in the name of the third horizontal pylon rebar view:&#10;&quot;Pylon 12.30.25-12?20-P1_Sec.3-3&quot;,&#10;where &quot;12.30.25-12?20-P1&quot; is the pylon mark,&#10;&quot;Pylon &quot; is the prefix,&#10;&quot;_Sec.3-3&quot; is the suffix.</system:String>
-    <system:String x:Key="HorizontalViewSettingsPage.SelectRebarHorizontalViewTemplateToolTip">View template to be applied to horizontal rebar views when creating them.</system:String>
-    <system:String x:Key="HorizontalViewSettingsPage.RebarHorizontalViewDepthToolTip">Projection depth of the horizontal rebar section</system:String>
+    <system:String x:Key="TransverseViewSettingsPage.RebarTransverseViewToolTip">Rules for creating transverse rebar sections for pylons in the project</system:String>
+    <system:String x:Key="TransverseViewSettingsPage.FirstRebarTransverseViewNameMaskToolTip">Prefix and suffix of the first transverse pylon rebar view name, i.e., what should go in the view name before and after the pylon mark.&#10;For example, in the name of the first transverse pylon rebar view:&#10;&quot;Pylon 12.30.25-12?20-P1_Sec.1-1&quot;,&#10;where &quot;12.30.25-12?20-P1&quot; is the pylon mark,&#10;&quot;Pylon &quot; is the prefix,&#10;&quot;_Sec.1-1&quot; is the suffix.</system:String>
+    <system:String x:Key="TransverseViewSettingsPage.SecondRebarTransverseViewNameMaskToolTip">Prefix and suffix of the second transverse pylon rebar view name, i.e., what should go in the view name before and after the pylon mark.&#10;For example, in the name of the second transverse pylon rebar view:&#10;&quot;Pylon 12.30.25-12?20-P1_Sec.2-2&quot;,&#10;where &quot;12.30.25-12?20-P1&quot; is the pylon mark,&#10;&quot;Pylon &quot; is the prefix,&#10;&quot;_Sec.2-2&quot; is the suffix.</system:String>
+    <system:String x:Key="TransverseViewSettingsPage.ThirdRebarTransverseViewNameMaskToolTip">Prefix and suffix of the third transverse pylon rebar view name, i.e., what should go in the view name before and after the pylon mark.&#10;For example, in the name of the third transverse pylon rebar view:&#10;&quot;Pylon 12.30.25-12?20-P1_Sec.3-3&quot;,&#10;where &quot;12.30.25-12?20-P1&quot; is the pylon mark,&#10;&quot;Pylon &quot; is the prefix,&#10;&quot;_Sec.3-3&quot; is the suffix.</system:String>
+    <system:String x:Key="TransverseViewSettingsPage.SelectRebarTransverseViewTemplateToolTip">View template to be applied to transverse rebar views when creating them.</system:String>
+    <system:String x:Key="TransverseViewSettingsPage.RebarTransverseViewDepthToolTip">Projection depth of the transverse rebar section</system:String>
 
-    <system:String x:Key="HorizontalViewSettingsPage.HorizontalViewBottomOffsetsToolTip">Position of horizontal sections relative to pylon height</system:String>
-    <system:String x:Key="HorizontalViewSettingsPage.FirstHorizontalViewBottomOffsetToolTip">The position of the horizontal section relative to the pylon is set using an offset from the bottom of the pylon in mm</system:String>
-    <system:String x:Key="HorizontalViewSettingsPage.SecondHorizontalViewTopOffsetToolTip">The position of the horizontal section relative to the pylon is set using an offset from the top of the pylon in mm</system:String>
-    <system:String x:Key="HorizontalViewSettingsPage.ThirdHorizontalViewTopOffsetToolTip">The position of the horizontal section relative to the pylon is set using an offset from the top of the pylon in mm</system:String>
+    <system:String x:Key="TransverseViewSettingsPage.TransverseViewBottomOffsetsToolTip">Position of transverse sections relative to pylon height</system:String>
+    <system:String x:Key="TransverseViewSettingsPage.FirstTransverseViewBottomOffsetToolTip">The position of the transverse section relative to the pylon is set using an offset from the bottom of the pylon in mm</system:String>
+    <system:String x:Key="TransverseViewSettingsPage.SecondTransverseViewTopOffsetToolTip">The position of the transverse section relative to the pylon is set using an offset from the top of the pylon in mm</system:String>
+    <system:String x:Key="TransverseViewSettingsPage.ThirdTransverseViewTopOffsetToolTip">The position of the transverse section relative to the pylon is set using an offset from the top of the pylon in mm</system:String>
 
-    <system:String x:Key="HorizontalViewSettingsPage.HorizontalViewPylonOffsetsToolTip">Offsets of horizontal views from pylon boundaries on the sheet</system:String>
-    <system:String x:Key="HorizontalViewSettingsPage.HorizontalViewXOffsetToolTip">Specify the offset from the pylon to the right and left for horizontal views</system:String>
-    <system:String x:Key="HorizontalViewSettingsPage.HorizontalViewYOffsetToolTip">Specify the offset from the pylon to the top and bottom for horizontal views</system:String>
+    <system:String x:Key="TransverseViewSettingsPage.TransverseViewPylonOffsetsToolTip">Offsets of transverse views from pylon boundaries on the sheet</system:String>
+    <system:String x:Key="TransverseViewSettingsPage.TransverseViewXOffsetToolTip">Specify the offset from the pylon to the right and left for transverse views</system:String>
+    <system:String x:Key="TransverseViewSettingsPage.TransverseViewYOffsetToolTip">Specify the offset from the pylon to the top and bottom for transverse views</system:String>
 
-    <system:String x:Key="HorizontalViewSettingsPage.ViewTypeSizeToolTip">View type sizes for horizontal sections</system:String>
-    <system:String x:Key="HorizontalViewSettingsPage.SelectViewTypeSizeForHorizontalViewsToolTip">View type size to be applied to horizontal views when creating them.</system:String>
+    <system:String x:Key="TransverseViewSettingsPage.ViewTypeSizeToolTip">View type sizes for transverse sections</system:String>
+    <system:String x:Key="TransverseViewSettingsPage.SelectViewTypeSizeForTransverseViewsToolTip">View type size to be applied to transverse views when creating them.</system:String>
 
     <!-- LegendViewsPage ToolTips -->
     <system:String x:Key="LegendViewsPage.NotesLegendToolTip">Rules according to which note legends for pylons will be placed on sheets</system:String>
     <system:String x:Key="LegendViewsPage.SelectNotesLegendToolTip">Select from the list a legend containing pylon sheet notes that need to be placed on the sheet.</system:String>
-    <system:String x:Key="LegendViewsPage.XOffsetFromBottomRightCornerToolTip">Specify the horizontal offset (X-axis) from the bottom right corner of the sheet frame to the center of the note legend viewport</system:String>
+    <system:String x:Key="LegendViewsPage.XOffsetFromBottomRightCornerToolTip">Specify the transverse offset (X-axis) from the bottom right corner of the sheet frame to the center of the note legend viewport</system:String>
     <system:String x:Key="LegendViewsPage.YOffsetFromBottomRightCornerToolTip">Specify the vertical offset (Y-axis) from the bottom right corner of the sheet frame to the center of the note legend viewport</system:String>
 
     <!-- ProjectParamsPage ToolTips -->

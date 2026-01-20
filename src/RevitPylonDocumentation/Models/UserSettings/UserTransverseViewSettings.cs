@@ -2,7 +2,7 @@ using Autodesk.Revit.DB;
 
 namespace RevitPylonDocumentation.Models.UserSettings;
 
-internal class UserHorizontalViewSettings {
+internal class UserTransverseViewSettings {
     public string TransverseViewDepth { get; set; }
     public string TransverseViewFirstPrefix { get; set; }
     public string TransverseViewFirstSuffix { get; set; }

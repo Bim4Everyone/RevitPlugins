@@ -106,7 +106,7 @@ internal class PylonSheetInfoManager {
                 // Если вид не найден, то сначала пытаемся создать вид, а потом, если создание не успешно -
                 // будем искать в проекте
                 if(!SheetInfo.TransverseViewFirst.ViewSectionCreator.TryCreateTransverseView(
-                        Settings.HorizontalViewSettings.SelectedTransverseViewFamilyType,
+                        Settings.TransverseViewSettings.SelectedTransverseViewFamilyType,
                         1)) {
                     Repository.FindViewSectionInPj(SheetInfo.TransverseViewFirst);
                 }
@@ -121,7 +121,7 @@ internal class PylonSheetInfoManager {
                 // Если вид не найден, то сначала пытаемся создать вид, а потом, если создание не успешно -
                 // будем искать в проекте
                 if(!SheetInfo.TransverseViewSecond.ViewSectionCreator.TryCreateTransverseView(
-                        Settings.HorizontalViewSettings.SelectedTransverseViewFamilyType,
+                        Settings.TransverseViewSettings.SelectedTransverseViewFamilyType,
                         2)) {
                     Repository.FindViewSectionInPj(SheetInfo.TransverseViewSecond);
                 }
@@ -136,7 +136,7 @@ internal class PylonSheetInfoManager {
                 // Если вид не найден, то сначала пытаемся создать вид, а потом, если создание не успешно -
                 // будем искать в проекте
                 if(!SheetInfo.TransverseViewThird.ViewSectionCreator.TryCreateTransverseView(
-                        Settings.HorizontalViewSettings.SelectedTransverseViewFamilyType,
+                        Settings.TransverseViewSettings.SelectedTransverseViewFamilyType,
                         3)) {
                     Repository.FindViewSectionInPj(SheetInfo.TransverseViewThird);
                 }
@@ -151,7 +151,7 @@ internal class PylonSheetInfoManager {
                 // Если вид не найден, то сначала пытаемся создать вид, а потом, если создание не успешно -
                 // будем искать в проекте
                 if(!SheetInfo.TransverseViewFirstRebar.ViewSectionCreator.TryCreateTransverseRebarView(
-                        Settings.HorizontalViewSettings.SelectedTransverseViewFamilyType,
+                        Settings.TransverseViewSettings.SelectedTransverseViewFamilyType,
                         1)) {
                     Repository.FindViewSectionInPj(SheetInfo.TransverseViewFirstRebar);
                 }
@@ -166,7 +166,7 @@ internal class PylonSheetInfoManager {
                 // Если вид не найден, то сначала пытаемся создать вид, а потом, если создание не успешно -
                 // будем искать в проекте
                 if(!SheetInfo.TransverseViewSecondRebar.ViewSectionCreator.TryCreateTransverseRebarView(
-                        Settings.HorizontalViewSettings.SelectedTransverseViewFamilyType,
+                        Settings.TransverseViewSettings.SelectedTransverseViewFamilyType,
                         2)) {
                     Repository.FindViewSectionInPj(SheetInfo.TransverseViewSecondRebar);
                 }
@@ -181,7 +181,7 @@ internal class PylonSheetInfoManager {
                 // Если вид не найден, то сначала пытаемся создать вид, а потом, если создание не успешно -
                 // будем искать в проекте
                 if(!SheetInfo.TransverseViewThirdRebar.ViewSectionCreator.TryCreateTransverseRebarView(
-                        Settings.HorizontalViewSettings.SelectedTransverseViewFamilyType,
+                        Settings.TransverseViewSettings.SelectedTransverseViewFamilyType,
                         3)) {
                     Repository.FindViewSectionInPj(SheetInfo.TransverseViewThirdRebar);
                 }

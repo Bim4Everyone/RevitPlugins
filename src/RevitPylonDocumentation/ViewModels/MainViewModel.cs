@@ -51,7 +51,7 @@ internal class MainViewModel : BaseViewModel {
 
         SelectionSettings = new UserSelectionSettingsVM();
         VerticalViewSettings = new UserVerticalViewSettingsPageVM(this, _localizationService);
-        HorizontalViewSettings = new UserHorizontalViewSettingsPageVM(this, _localizationService);
+        TransverseViewSettings = new UserTransverseViewSettingsPageVM(this, _localizationService);
         SchedulesSettings = new UserSchedulesSettingsPageVM(this);
         ScheduleFiltersSettings = new UserScheduleFiltersSettingsPageVM(this, _localizationService);
         LegendsAndAnnotationsSettings = new UserLegendsAndAnnotationsSettingsVM(this, _localizationService);
@@ -140,7 +140,7 @@ internal class MainViewModel : BaseViewModel {
     /// <summary>
     /// Настройки параметров и правил создания горизонтальных разрезов с предыдущего сеанса
     /// </summary>
-    public UserHorizontalViewSettingsPageVM HorizontalViewSettings { get; set; }
+    public UserTransverseViewSettingsPageVM TransverseViewSettings { get; set; }
 
     /// <summary>
     /// Настройки параметров и правил создания спек с предыдущего сеанса
@@ -394,7 +394,7 @@ internal class MainViewModel : BaseViewModel {
         ErrorText = string.Empty;
 
         VerticalViewSettings.ApplySettings();
-        HorizontalViewSettings.ApplySettings();
+        TransverseViewSettings.ApplySettings();
         SchedulesSettings.ApplySettings();
         ScheduleFiltersSettings.ApplySettings();
         LegendsAndAnnotationsSettings.ApplySettings();
@@ -407,13 +407,12 @@ internal class MainViewModel : BaseViewModel {
             GetRebarProjectSections();
         }
 
-
         VerticalViewSettings.FindGeneralViewTemplate();
         VerticalViewSettings.FindGeneralRebarViewTemplate();
         VerticalViewSettings.FindVerticalViewFamilyType();
-        HorizontalViewSettings.FindTransverseViewTemplate();
-        HorizontalViewSettings.FindTransverseRebarViewTemplate();
-        HorizontalViewSettings.FindHorizontalViewFamilyType();
+        TransverseViewSettings.FindTransverseViewTemplate();
+        TransverseViewSettings.FindTransverseRebarViewTemplate();
+        TransverseViewSettings.FindTransverseViewFamilyType();
 
         SchedulesSettings.FindSkeletonSchedule();
         SchedulesSettings.FindSkeletonByElemsSchedule();
@@ -448,7 +447,7 @@ internal class MainViewModel : BaseViewModel {
     private void CheckSettings() {
         if(!VerticalViewSettings.CheckSettings())
             return;
-        if(!HorizontalViewSettings.CheckSettings())
+        if(!TransverseViewSettings.CheckSettings())
             return;
         if(!LegendsAndAnnotationsSettings.CheckSettings())
             return;
@@ -470,7 +469,7 @@ internal class MainViewModel : BaseViewModel {
         var settings = new CreationSettings(
             SelectionSettings.GetSettings<UserSelectionSettings>(),
             VerticalViewSettings.GetSettings<UserVerticalViewSettings>(),
-            HorizontalViewSettings.GetSettings<UserHorizontalViewSettings>(),
+            TransverseViewSettings.GetSettings<UserTransverseViewSettings>(),
             SchedulesSettings.GetSettings<UserSchedulesSettings>(),
             ScheduleFiltersSettings.GetSettings<UserScheduleFiltersSettings>(),
             LegendsAndAnnotationsSettings.GetSettings<UserLegendsAndAnnotationsSettings>(),
