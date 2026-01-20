@@ -57,6 +57,7 @@ internal class RevitRepository {
         .WhereElementIsNotElementType()
         .OfType<ViewSchedule>()
         .Where(view => !view.IsTemplate)
+        .OrderBy(a => a.Name)
         .ToList();
 
     /// <summary>
@@ -103,7 +104,8 @@ internal class RevitRepository {
     public List<DimensionType> DimensionTypes => new FilteredElementCollector(Document)
         .OfClass(typeof(DimensionType))
         .OfType<DimensionType>()
-        .OrderBy(a => a.Name)
+        .OrderBy(a => a.FamilyName)
+        .ThenBy(a => a.Name)
         .ToList();
 
     /// <summary>
@@ -112,7 +114,8 @@ internal class RevitRepository {
     public List<SpotDimensionType> SpotDimensionTypes => new FilteredElementCollector(Document)
         .OfClass(typeof(SpotDimensionType))
         .OfType<SpotDimensionType>()
-        .OrderBy(a => a.Name)
+        .OrderBy(a => a.FamilyName)
+        .ThenBy(a => a.Name)
         .ToList();
 
     /// <summary>
@@ -122,7 +125,8 @@ internal class RevitRepository {
         .OfCategory(BuiltInCategory.OST_RebarTags)
         .WhereElementIsElementType()
         .OfType<FamilySymbol>()
-        .OrderBy(a => a.Name)
+        .OrderBy(a => a.FamilyName)
+        .ThenBy(a => a.Name)
         .ToList();
 
     /// <summary>
@@ -132,7 +136,8 @@ internal class RevitRepository {
         .OfCategory(BuiltInCategory.OST_DetailComponents)
         .WhereElementIsElementType()
         .OfType<FamilySymbol>()
-        .OrderBy(a => a.Name)
+        .OrderBy(a => a.FamilyName)
+        .ThenBy(a => a.Name)
         .ToList();
 
     /// <summary>
@@ -142,7 +147,8 @@ internal class RevitRepository {
         .OfCategory(BuiltInCategory.OST_GenericAnnotation)
         .WhereElementIsElementType()
         .OfType<FamilySymbol>()
-        .OrderBy(a => a.Name)
+        .OrderBy(a => a.FamilyName)
+        .ThenBy(a => a.Name)
         .ToList();
 
     /// <summary>

@@ -52,7 +52,7 @@ internal class MainViewModel : BaseViewModel {
         SelectionSettings = new UserSelectionSettingsVM();
         VerticalViewSettings = new UserVerticalViewSettingsPageVM(this, _localizationService);
         HorizontalViewSettings = new UserHorizontalViewSettingsPageVM(this, _localizationService);
-        SchedulesSettings = new UserSchedulesSettingsPageVM(_revitRepository);
+        SchedulesSettings = new UserSchedulesSettingsPageVM(this);
         ScheduleFiltersSettings = new UserScheduleFiltersSettingsPageVM(this, _localizationService);
         LegendsAndAnnotationsSettings = new UserLegendsAndAnnotationsSettingsVM(this, _localizationService);
         PylonSettings = new UserPylonSettingsVM(this, _revitRepository, _localizationService);
@@ -63,6 +63,7 @@ internal class MainViewModel : BaseViewModel {
         TitleBlocks = _revitRepository.TitleBlocksInProject;
         Legends = _revitRepository.LegendsInProject;
         ViewTemplatesInPj = _revitRepository.AllViewTemplates;
+        SchedulesInPj = _revitRepository.AllScheduleViews;
 
         DimensionTypes = _revitRepository.DimensionTypes;
         SpotDimensionTypes = _revitRepository.SpotDimensionTypes;
@@ -219,6 +220,11 @@ internal class MainViewModel : BaseViewModel {
     /// Перечень шаблонов видов в проекте
     /// </summary>
     public List<ViewSection> ViewTemplatesInPj { get; set; } = [];
+
+    /// <summary>
+    /// Перечень видов спецификаций в проекте
+    /// </summary>
+    public List<ViewSchedule> SchedulesInPj { get; set; } = [];
 
     // Инфо по пилонам
     /// <summary>
@@ -401,7 +407,6 @@ internal class MainViewModel : BaseViewModel {
             GetRebarProjectSections();
         }
 
-        SchedulesSettings.FindReferenceSchedules();
 
         VerticalViewSettings.FindGeneralViewTemplate();
         VerticalViewSettings.FindGeneralRebarViewTemplate();
@@ -409,6 +414,13 @@ internal class MainViewModel : BaseViewModel {
         HorizontalViewSettings.FindTransverseViewTemplate();
         HorizontalViewSettings.FindTransverseRebarViewTemplate();
         HorizontalViewSettings.FindHorizontalViewFamilyType();
+
+        SchedulesSettings.FindSkeletonSchedule();
+        SchedulesSettings.FindSkeletonByElemsSchedule();
+        SchedulesSettings.FindMaterialSchedule();
+        SchedulesSettings.FindSystemPartsSchedule();
+        SchedulesSettings.FindIfcPartsSchedule();
+
         ProjectSettings.FindDimensionType();
         ProjectSettings.FindSpotDimensionType();
         ProjectSettings.FindSkeletonTagType();

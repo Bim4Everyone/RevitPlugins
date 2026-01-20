@@ -63,14 +63,16 @@
                                 ToolTipText="{me:LocalizationSource SchedulesPage.SkeletonSpecNameMaskToolTip}"
                                 TextChangedCommand="{Binding SettingsChangedCommand}" />
 
-                            <controls:TextBoxSettingControl
+                            <controls:ComboBoxSettingControl
                                 LabelText="{me:LocalizationSource Schedules.ReferenceSkeletonSpecSearchName}"
-                                TextBoxText="{Binding 
-                                    Path=SchedulesSettings.SkeletonScheduleNameTemp, 
+                                ItemsSource="{Binding Path=SchedulesInPj}"
+                                SelectedItem="{Binding 
+                                    Path=SchedulesSettings.SelectedSkeletonSchedule, 
                                     UpdateSourceTrigger=PropertyChanged, Mode=TwoWay,
                                     ValidatesOnDataErrors=True, NotifyOnValidationError=True}"
                                 ToolTipText="{me:LocalizationSource SchedulesPage.ReferenceSkeletonSpecSearchNameToolTip}"
-                                TextChangedCommand="{Binding SettingsChangedCommand}" />
+                                SelectionChangedCommand="{Binding SettingsChangedCommand}"
+                                ItemTemplate="{StaticResource WithoutFamilyNameItemTemplate}" />
 
                             <controls:TextBoxSettingControl
                                 LabelText="{me:LocalizationSource Schedules.DispatcherGroupingFirstParameterForSpec}"
@@ -109,14 +111,16 @@
                                 ToolTipText="{me:LocalizationSource SchedulesPage.SkeletonElementsSpecNameMaskToolTip}"
                                 TextChangedCommand="{Binding SettingsChangedCommand}" />
 
-                            <controls:TextBoxSettingControl
+                            <controls:ComboBoxSettingControl
                                 LabelText="{me:LocalizationSource Schedules.ReferenceSkeletonElementsSpecSearchName}"
-                                TextBoxText="{Binding 
-                                    Path=SchedulesSettings.SkeletonByElemsScheduleNameTemp, 
+                                ItemsSource="{Binding Path=SchedulesInPj}"
+                                SelectedItem="{Binding 
+                                    Path=SchedulesSettings.SelectedSkeletonByElemsSchedule, 
                                     UpdateSourceTrigger=PropertyChanged, Mode=TwoWay,
                                     ValidatesOnDataErrors=True, NotifyOnValidationError=True}"
                                 ToolTipText="{me:LocalizationSource SchedulesPage.ReferenceSkeletonElementsSpecSearchNameToolTip}"
-                                TextChangedCommand="{Binding SettingsChangedCommand}" />
+                                SelectionChangedCommand="{Binding SettingsChangedCommand}"
+                                ItemTemplate="{StaticResource WithoutFamilyNameItemTemplate}" />
 
                             <controls:TextBoxSettingControl
                                 LabelText="{me:LocalizationSource Schedules.DispatcherGroupingFirstParameterForSpecElements}"
@@ -155,14 +159,16 @@
                                 ToolTipText="{me:LocalizationSource SchedulesPage.SystemPartsScheduleNameMaskToolTip}"
                                 TextChangedCommand="{Binding SettingsChangedCommand}" />
 
-                            <controls:TextBoxSettingControl
+                            <controls:ComboBoxSettingControl
                                 LabelText="{me:LocalizationSource Schedules.ReferenceSystemPartsScheduleSearchName}"
-                                TextBoxText="{Binding 
-                                    Path=SchedulesSettings.SystemPartsScheduleNameTemp, 
+                                ItemsSource="{Binding Path=SchedulesInPj}"
+                                SelectedItem="{Binding 
+                                    Path=SchedulesSettings.SelectedSystemPartsSchedule, 
                                     UpdateSourceTrigger=PropertyChanged, Mode=TwoWay,
                                     ValidatesOnDataErrors=True, NotifyOnValidationError=True}"
                                 ToolTipText="{me:LocalizationSource SchedulesPage.ReferenceSystemPartsScheduleSearchNameToolTip}"
-                                TextChangedCommand="{Binding SettingsChangedCommand}" />
+                                SelectionChangedCommand="{Binding SettingsChangedCommand}"
+                                ItemTemplate="{StaticResource WithoutFamilyNameItemTemplate}" />
 
                             <controls:TextBoxSettingControl
                                 LabelText="{me:LocalizationSource Schedules.DispatcherGroupingFirstParameterForSchedule}"
@@ -201,14 +207,16 @@
                                 ToolTipText="{me:LocalizationSource SchedulesPage.IfcPartsScheduleNameMaskToolTip}"
                                 TextChangedCommand="{Binding SettingsChangedCommand}" />
 
-                            <controls:TextBoxSettingControl
+                            <controls:ComboBoxSettingControl
                                 LabelText="{me:LocalizationSource Schedules.ReferenceIfcPartsScheduleSearchName}"
-                                TextBoxText="{Binding 
-                                    Path=SchedulesSettings.IfcPartsScheduleNameTemp, 
+                                ItemsSource="{Binding Path=SchedulesInPj}"
+                                SelectedItem="{Binding 
+                                    Path=SchedulesSettings.SelectedIfcPartsSchedule, 
                                     UpdateSourceTrigger=PropertyChanged, Mode=TwoWay,
                                     ValidatesOnDataErrors=True, NotifyOnValidationError=True}"
                                 ToolTipText="{me:LocalizationSource SchedulesPage.ReferenceIfcPartsScheduleSearchNameToolTip}"
-                                TextChangedCommand="{Binding SettingsChangedCommand}" />
+                                SelectionChangedCommand="{Binding SettingsChangedCommand}"
+                                ItemTemplate="{StaticResource WithoutFamilyNameItemTemplate}" />
 
                             <controls:TextBoxSettingControl
                                 LabelText="{me:LocalizationSource Schedules.DispatcherGroupingFirstParameterForIfcSchedule}"
@@ -247,14 +255,16 @@
                                 ToolTipText="{me:LocalizationSource SchedulesPage.MaterialsSpecNameMaskToolTip}"
                                 TextChangedCommand="{Binding SettingsChangedCommand}" />
 
-                            <controls:TextBoxSettingControl
+                            <controls:ComboBoxSettingControl
                                 LabelText="{me:LocalizationSource Schedules.ReferenceMaterialsSpecSearchName}"
-                                TextBoxText="{Binding 
-                                    Path=SchedulesSettings.MaterialScheduleNameTemp, 
+                                ItemsSource="{Binding Path=SchedulesInPj}"
+                                SelectedItem="{Binding 
+                                    Path=SchedulesSettings.SelectedMaterialSchedule, 
                                     UpdateSourceTrigger=PropertyChanged, Mode=TwoWay,
                                     ValidatesOnDataErrors=True, NotifyOnValidationError=True}"
                                 ToolTipText="{me:LocalizationSource SchedulesPage.ReferenceMaterialsSpecSearchNameToolTip}"
-                                TextChangedCommand="{Binding SettingsChangedCommand}" />
+                                SelectionChangedCommand="{Binding SettingsChangedCommand}"
+                                ItemTemplate="{StaticResource WithoutFamilyNameItemTemplate}" />
 
                             <controls:TextBoxSettingControl
                                 LabelText="{me:LocalizationSource Schedules.DispatcherGroupingFirstParameterForMaterials}"

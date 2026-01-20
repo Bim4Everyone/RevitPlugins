@@ -1,13 +1,12 @@
+using System;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
 
 using Autodesk.Revit.DB;
 
-using RevitPylonDocumentation.Models;
-
 namespace RevitPylonDocumentation.ViewModels.UserSettings;
 internal class UserSchedulesSettingsPageVM : ValidatableViewModel {
-    private readonly RevitRepository _revitRepository;
+    private readonly MainViewModel _viewModel;
 
     // Префиксы и суффиксы для поиска и новых спек
     private string _materialSchedulePrefixTemp = "КЖ..._СМ_";
@@ -28,6 +27,13 @@ internal class UserSchedulesSettingsPageVM : ValidatableViewModel {
     private string _skeletonScheduleNameTemp = "01_(КЖ...)_Изделия_(Марка)";
     private string _skeletonByElemsScheduleNameTemp = "01_(КЖ...)_Изделия_(Марка)_Поэлементная";
 
+    // Выбранные эталонные спецификации
+    private ViewSchedule _selectedSkeletonSchedule;
+    private ViewSchedule _selectedSkeletonByElemsSchedule;
+    private ViewSchedule _selectedMaterialSchedule;
+    private ViewSchedule _selectedSystemPartsSchedule;
+    private ViewSchedule _selectedIfcPartsSchedule;
+
     // Заполнение параметров диспетчера
     private string _materialScheduleDisp1Temp = "обр_ФОП_Раздел проекта";
     private string _materialScheduleDisp2Temp = "СМ_Пилоны";
@@ -41,8 +47,8 @@ internal class UserSchedulesSettingsPageVM : ValidatableViewModel {
     private string _skeletonByElemsScheduleDisp2Temp = "СА_Пилоны";
 
 
-    public UserSchedulesSettingsPageVM(RevitRepository repository) {
-        _revitRepository = repository;
+    public UserSchedulesSettingsPageVM(MainViewModel mainViewModel) {
+        _viewModel = mainViewModel;
         ValidateAllProperties();
     }
 
@@ -105,57 +111,120 @@ internal class UserSchedulesSettingsPageVM : ValidatableViewModel {
         set => RaiseAndSetIfChanged(ref _skeletonByElemsScheduleSuffixTemp, value);
     }
 
+
     public string SkeletonScheduleName { get; set; }
-    [Required]
-    [RegularExpression(@"^[^\\\/:*?""<>|\[\]\{\};~]+$")]
     public string SkeletonScheduleNameTemp {
         get => _skeletonScheduleNameTemp;
-        set {
-            RaiseAndSetIfChanged(ref _skeletonScheduleNameTemp, value);
-            ValidateProperty(value);
-        }
+        set => RaiseAndSetIfChanged(ref _skeletonScheduleNameTemp, value);
     }
 
     public string SkeletonByElemsScheduleName { get; set; }
-    [Required]
-    [RegularExpression(@"^[^\\\/:*?""<>|\[\]\{\};~]+$")]
     public string SkeletonByElemsScheduleNameTemp {
         get => _skeletonByElemsScheduleNameTemp;
-        set {
-            RaiseAndSetIfChanged(ref _skeletonByElemsScheduleNameTemp, value);
-            ValidateProperty(value);
-        }
+        set => RaiseAndSetIfChanged(ref _skeletonByElemsScheduleNameTemp, value);
     }
 
     public string MaterialScheduleName { get; set; }
-    [Required]
-    [RegularExpression(@"^[^\\\/:*?""<>|\[\]\{\};~]+$")]
     public string MaterialScheduleNameTemp {
         get => _materialScheduleNameTemp;
-        set {
-            RaiseAndSetIfChanged(ref _materialScheduleNameTemp, value);
-            ValidateProperty(value);
-        }
+        set => RaiseAndSetIfChanged(ref _materialScheduleNameTemp, value);
     }
 
     public string SystemPartsScheduleName { get; set; }
-    [Required]
-    [RegularExpression(@"^[^\\\/:*?""<>|\[\]\{\};~]+$")]
     public string SystemPartsScheduleNameTemp {
         get => _systemPartsScheduleNameTemp;
+        set => RaiseAndSetIfChanged(ref _systemPartsScheduleNameTemp, value);
+    }
+
+    public string IfcPartsScheduleName { get; set; }
+    public string IfcPartsScheduleNameTemp {
+        get => _ifcPartsScheduleNameTemp;
+        set => RaiseAndSetIfChanged(ref _ifcPartsScheduleNameTemp, value);
+    }
+
+
+    /// <summary>
+    /// Выбранная эталонная спецификация каркасов
+    /// </summary>
+    [Required]
+    public ViewSchedule SelectedSkeletonSchedule {
+        get => _selectedSkeletonSchedule;
         set {
-            RaiseAndSetIfChanged(ref _systemPartsScheduleNameTemp, value);
+            RaiseAndSetIfChanged(ref _selectedSkeletonSchedule, value);
+            SkeletonScheduleNameTemp = value?.Name;
             ValidateProperty(value);
         }
     }
 
-    public string IfcPartsScheduleName { get; set; }
+    /// <summary>
+    /// Выбранная эталонная спецификация элементов каркаса
+    /// </summary>
+    [Required]
+    public ViewSchedule SelectedSkeletonByElemsSchedule {
+        get => _selectedSkeletonByElemsSchedule;
+        set {
+            RaiseAndSetIfChanged(ref _selectedSkeletonByElemsSchedule, value);
+            SkeletonByElemsScheduleNameTemp = value?.Name;
+            ValidateProperty(value);
+        }
+    }
+
+    /// <summary>
+    /// Выбранная эталонная спецификация материалов
+    /// </summary>
+    [Required]
+    public ViewSchedule SelectedMaterialSchedule {
+        get => _selectedMaterialSchedule;
+        set {
+            RaiseAndSetIfChanged(ref _selectedMaterialSchedule, value);
+            MaterialScheduleNameTemp = value?.Name;
+            ValidateProperty(value);
+        }
+    }
+
+    /// <summary>
+    /// Выбранная эталонная ведомость деталей для системной арматуры
+    /// </summary>
+    [Required]
+    public ViewSchedule SelectedSystemPartsSchedule {
+        get => _selectedSystemPartsSchedule;
+        set {
+            RaiseAndSetIfChanged(ref _selectedSystemPartsSchedule, value);
+            SystemPartsScheduleNameTemp = value?.Name;
+            ValidateProperty(value);
+        }
+    }
+
+    /// <summary>
+    /// Выбранная эталонная ведомость деталей для IFC арматуры
+    /// </summary>
+    [Required]
+    public ViewSchedule SelectedIfcPartsSchedule {
+        get => _selectedIfcPartsSchedule;
+        set {
+            RaiseAndSetIfChanged(ref _selectedIfcPartsSchedule, value);
+            IfcPartsScheduleNameTemp = value?.Name;
+            ValidateProperty(value);
+        }
+    }
+
+    public string SkeletonScheduleDisp1 { get; set; }
     [Required]
     [RegularExpression(@"^[^\\\/:*?""<>|\[\]\{\};~]+$")]
-    public string IfcPartsScheduleNameTemp {
-        get => _ifcPartsScheduleNameTemp;
+    public string SkeletonScheduleDisp1Temp {
+        get => _skeletonScheduleDisp1Temp;
         set {
-            RaiseAndSetIfChanged(ref _ifcPartsScheduleNameTemp, value);
+            RaiseAndSetIfChanged(ref _skeletonScheduleDisp1Temp, value);
+            ValidateProperty(value);
+        }
+    }
+    public string SkeletonByElemsScheduleDisp1 { get; set; }
+    [Required]
+    [RegularExpression(@"^[^\\\/:*?""<>|\[\]\{\};~]+$")]
+    public string SkeletonByElemsScheduleDisp1Temp {
+        get => _skeletonByElemsScheduleDisp1Temp;
+        set {
+            RaiseAndSetIfChanged(ref _skeletonByElemsScheduleDisp1Temp, value);
             ValidateProperty(value);
         }
     }
@@ -191,23 +260,23 @@ internal class UserSchedulesSettingsPageVM : ValidatableViewModel {
         }
     }
 
-    public string SkeletonScheduleDisp1 { get; set; }
+    public string SkeletonScheduleDisp2 { get; set; }
     [Required]
     [RegularExpression(@"^[^\\\/:*?""<>|\[\]\{\};~]+$")]
-    public string SkeletonScheduleDisp1Temp {
-        get => _skeletonScheduleDisp1Temp;
+    public string SkeletonScheduleDisp2Temp {
+        get => _skeletonScheduleDisp2Temp;
         set {
-            RaiseAndSetIfChanged(ref _skeletonScheduleDisp1Temp, value);
+            RaiseAndSetIfChanged(ref _skeletonScheduleDisp2Temp, value);
             ValidateProperty(value);
         }
     }
-    public string SkeletonByElemsScheduleDisp1 { get; set; }
+    public string SkeletonByElemsScheduleDisp2 { get; set; }
     [Required]
     [RegularExpression(@"^[^\\\/:*?""<>|\[\]\{\};~]+$")]
-    public string SkeletonByElemsScheduleDisp1Temp {
-        get => _skeletonByElemsScheduleDisp1Temp;
+    public string SkeletonByElemsScheduleDisp2Temp {
+        get => _skeletonByElemsScheduleDisp2Temp;
         set {
-            RaiseAndSetIfChanged(ref _skeletonByElemsScheduleDisp1Temp, value);
+            RaiseAndSetIfChanged(ref _skeletonByElemsScheduleDisp2Temp, value);
             ValidateProperty(value);
         }
     }
@@ -244,65 +313,55 @@ internal class UserSchedulesSettingsPageVM : ValidatableViewModel {
         }
     }
 
-    public string SkeletonScheduleDisp2 { get; set; }
-    [Required]
-    [RegularExpression(@"^[^\\\/:*?""<>|\[\]\{\};~]+$")]
-    public string SkeletonScheduleDisp2Temp {
-        get => _skeletonScheduleDisp2Temp;
-        set {
-            RaiseAndSetIfChanged(ref _skeletonScheduleDisp2Temp, value);
-            ValidateProperty(value);
-        }
-    }
-    public string SkeletonByElemsScheduleDisp2 { get; set; }
-    [Required]
-    [RegularExpression(@"^[^\\\/:*?""<>|\[\]\{\};~]+$")]
-    public string SkeletonByElemsScheduleDisp2Temp {
-        get => _skeletonByElemsScheduleDisp2Temp;
-        set {
-            RaiseAndSetIfChanged(ref _skeletonByElemsScheduleDisp2Temp, value);
-            ValidateProperty(value);
+
+
+    /// <summary>
+    /// Получает эталонную спецификацию каркасов по имени
+    /// </summary>
+    public void FindSkeletonSchedule() {
+        if(!String.IsNullOrEmpty(SkeletonScheduleName)) {
+            SelectedSkeletonSchedule = _viewModel.SchedulesInPj
+                .FirstOrDefault(view => view.Name.Equals(SkeletonScheduleName));
         }
     }
 
     /// <summary>
-    /// Эталонная спецификация материалов
+    /// Получает эталонную спецификацию элементов каркасов по имени
     /// </summary>
-    public ViewSchedule ReferenceMaterialSchedule { get; set; }
+    public void FindSkeletonByElemsSchedule() {
+        if(!String.IsNullOrEmpty(SkeletonByElemsScheduleName)) {
+            SelectedSkeletonByElemsSchedule = _viewModel.SchedulesInPj
+                .FirstOrDefault(view => view.Name.Equals(SkeletonByElemsScheduleName));
+        }
+    }
 
     /// <summary>
-    /// Эталонная ведомость деталей для системной арматуры
+    /// Получает эталонную спецификацию материалов по имени
     /// </summary>
-    public ViewSchedule ReferenceSystemPartsSchedule { get; set; }
+    public void FindMaterialSchedule() {
+        if(!String.IsNullOrEmpty(MaterialScheduleName)) {
+            SelectedMaterialSchedule = _viewModel.SchedulesInPj
+                .FirstOrDefault(view => view.Name.Equals(MaterialScheduleName));
+        }
+    }
 
     /// <summary>
-    /// Эталонная ведомость деталей для IFC арматуры
+    /// Получает эталонную ведомость деталей для системной арматуры по имени
     /// </summary>
-    public ViewSchedule ReferenceIfcPartsSchedule { get; set; }
+    public void FindSystemPartsSchedule() {
+        if(!String.IsNullOrEmpty(SystemPartsScheduleName)) {
+            SelectedSystemPartsSchedule = _viewModel.SchedulesInPj
+                .FirstOrDefault(view => view.Name.Equals(SystemPartsScheduleName));
+        }
+    }
 
     /// <summary>
-    /// Эталонная спецификация арматуры
+    /// Получает эталонную ведомость деталей для IFC арматуры по имени
     /// </summary>
-    public ViewSchedule ReferenceSkeletonSchedule { get; set; }
-
-    /// <summary>
-    /// Эталонная спецификация арматуры
-    /// </summary>
-    public ViewSchedule ReferenceSkeletonByElemsSchedule { get; set; }
-
-    /// <summary>
-    /// Ищет эталонные спецификации по указанным именам. На основе эталонных спек создаются спеки для пилонов путем копирования
-    /// </summary>
-    public void FindReferenceSchedules() {
-        ReferenceMaterialSchedule = _revitRepository.AllScheduleViews.FirstOrDefault(sch =>
-            sch.Name.Equals(MaterialScheduleName));
-        ReferenceSystemPartsSchedule = _revitRepository.AllScheduleViews.FirstOrDefault(sch =>
-            sch.Name.Equals(SystemPartsScheduleName));
-        ReferenceIfcPartsSchedule = _revitRepository.AllScheduleViews.FirstOrDefault(sch =>
-            sch.Name.Equals(IfcPartsScheduleName));
-        ReferenceSkeletonSchedule = _revitRepository.AllScheduleViews.FirstOrDefault(sch =>
-            sch.Name.Equals(SkeletonScheduleName));
-        ReferenceSkeletonByElemsSchedule = _revitRepository.AllScheduleViews.FirstOrDefault(sch =>
-            sch.Name.Equals(SkeletonByElemsScheduleName));
+    public void FindIfcPartsSchedule() {
+        if(!String.IsNullOrEmpty(IfcPartsScheduleName)) {
+            SelectedIfcPartsSchedule = _viewModel.SchedulesInPj
+                .FirstOrDefault(view => view.Name.Equals(IfcPartsScheduleName));
+        }
     }
 }

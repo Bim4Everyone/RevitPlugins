@@ -2,16 +2,16 @@ using Autodesk.Revit.DB;
 
 namespace RevitPylonDocumentation.Models.UserSettings;
 internal class UserSchedulesSettings {
+    public string SkeletonSchedulePrefix { get; set; }
+    public string SkeletonScheduleSuffix { get; set; }
+    public string SkeletonByElemsSchedulePrefix { get; set; }
+    public string SkeletonByElemsScheduleSuffix { get; set; }
     public string MaterialSchedulePrefix { get; set; }
     public string MaterialScheduleSuffix { get; set; }
     public string SystemPartsSchedulePrefix { get; set; }
     public string SystemPartsScheduleSuffix { get; set; }
     public string IfcPartsSchedulePrefix { get; set; }
     public string IfcPartsScheduleSuffix { get; set; }
-    public string SkeletonSchedulePrefix { get; set; }
-    public string SkeletonScheduleSuffix { get; set; }
-    public string SkeletonByElemsSchedulePrefix { get; set; }
-    public string SkeletonByElemsScheduleSuffix { get; set; }
     public string SkeletonScheduleName { get; set; }
     public string SkeletonByElemsScheduleName { get; set; }
     public string MaterialScheduleName { get; set; }
@@ -29,27 +29,27 @@ internal class UserSchedulesSettings {
     public string SkeletonByElemsScheduleDisp2 { get; set; }
 
     /// <summary>
+    /// Эталонная спецификация арматуры
+    /// </summary>
+    public ViewSchedule SelectedSkeletonSchedule { get; set; }
+
+    /// <summary>
+    /// Эталонная спецификация арматуры
+    /// </summary>
+    public ViewSchedule SelectedSkeletonByElemsSchedule { get; set; }
+
+    /// <summary>
     /// Эталонная спецификация материалов
     /// </summary>
-    public ViewSchedule ReferenceMaterialSchedule { get; set; }
+    public ViewSchedule SelectedMaterialSchedule { get; set; }
 
     /// <summary>
     /// Эталонная ведомость деталей для системной арматуры
     /// </summary>
-    public ViewSchedule ReferenceSystemPartsSchedule { get; set; }
+    public ViewSchedule SelectedSystemPartsSchedule { get; set; }
 
     /// <summary>
     /// Эталонная ведомость деталей для IFC арматуры
     /// </summary>
-    public ViewSchedule ReferenceIfcPartsSchedule { get; set; }
-
-    /// <summary>
-    /// Эталонная спецификация арматуры
-    /// </summary>
-    public ViewSchedule ReferenceSkeletonSchedule { get; set; }
-
-    /// <summary>
-    /// Эталонная спецификация арматуры
-    /// </summary>
-    public ViewSchedule ReferenceSkeletonByElemsSchedule { get; set; }
+    public ViewSchedule SelectedIfcPartsSchedule { get; set; }
 }

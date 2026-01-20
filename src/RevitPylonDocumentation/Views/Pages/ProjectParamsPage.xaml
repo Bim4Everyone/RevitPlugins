@@ -83,7 +83,7 @@
                                 ValidatesOnDataErrors=True, NotifyOnValidationError=True}"
                             ToolTipText="{me:LocalizationSource ProjectParams.SelectDimensionTypeSizeToolTip}"
                             SelectionChangedCommand="{Binding SettingsChangedCommand}"
-                            ItemTemplate="{StaticResource WithoutFamilyNameItemTemplate}" />
+                            ItemTemplate="{StaticResource WithFamilyNameItemTemplate}" />
 
                         <controls:ComboBoxSettingControl
                             LabelText="{me:LocalizationSource ProjectParams.SelectSpotDimensionTypeSize}"
@@ -94,7 +94,7 @@
                                 ValidatesOnDataErrors=True, NotifyOnValidationError=True}"
                             ToolTipText="{me:LocalizationSource ProjectParams.SelectSpotDimensionTypeSizeToolTip}"
                             SelectionChangedCommand="{Binding SettingsChangedCommand}"
-                            ItemTemplate="{StaticResource WithoutFamilyNameItemTemplate}" />
+                            ItemTemplate="{StaticResource WithFamilyNameItemTemplate}" />
 
                         <controls:ComboBoxSettingControl
                             Grid.Column="0"
@@ -106,7 +106,7 @@
                                 ValidatesOnDataErrors=True, NotifyOnValidationError=True}"
                             ToolTipText="{me:LocalizationSource ProjectParams.SelectRebarProductMarkTypeSizeToolTip}"
                             SelectionChangedCommand="{Binding SettingsChangedCommand}"
-                            ItemTemplate="{StaticResource WithoutFamilyNameItemTemplate}" />
+                            ItemTemplate="{StaticResource WithFamilyNameItemTemplate}" />
 
                         <controls:ComboBoxSettingControl
                             LabelText="{me:LocalizationSource ProjectParams.SelectRebarMarkWithSerifTypeSize}"
@@ -117,7 +117,7 @@
                                 ValidatesOnDataErrors=True, NotifyOnValidationError=True}"
                             ToolTipText="{me:LocalizationSource ProjectParams.SelectRebarMarkWithSerifTypeSizeToolTip}"
                             SelectionChangedCommand="{Binding SettingsChangedCommand}"
-                            ItemTemplate="{StaticResource WithoutFamilyNameItemTemplate}" />
+                            ItemTemplate="{StaticResource WithFamilyNameItemTemplate}" />
 
                         <controls:ComboBoxSettingControl
                             LabelText="{me:LocalizationSource ProjectParams.SelectRebarMarkWithStepTypeSize}"
@@ -128,7 +128,7 @@
                                 ValidatesOnDataErrors=True, NotifyOnValidationError=True}"
                             ToolTipText="{me:LocalizationSource ProjectParams.SelectRebarMarkWithStepTypeSizeToolTip}"
                             SelectionChangedCommand="{Binding SettingsChangedCommand}"
-                            ItemTemplate="{StaticResource WithoutFamilyNameItemTemplate}" />
+                            ItemTemplate="{StaticResource WithFamilyNameItemTemplate}" />
 
                         <controls:ComboBoxSettingControl
                             LabelText="{me:LocalizationSource ProjectParams.SelectRebarMarkWithCommentTypeSize}"
@@ -139,7 +139,7 @@
                                 ValidatesOnDataErrors=True, NotifyOnValidationError=True}"
                             ToolTipText="{me:LocalizationSource ProjectParams.SelectRebarMarkWithCommentTypeSizeToolTip}"
                             SelectionChangedCommand="{Binding SettingsChangedCommand}"
-                            ItemTemplate="{StaticResource WithoutFamilyNameItemTemplate}" />
+                            ItemTemplate="{StaticResource WithFamilyNameItemTemplate}" />
 
                         <controls:ComboBoxSettingControl
                             LabelText="{me:LocalizationSource ProjectParams.SelectUniversalMarkWithTextTypeSize}"
@@ -150,7 +150,7 @@
                                 ValidatesOnDataErrors=True, NotifyOnValidationError=True}"
                             ToolTipText="{me:LocalizationSource ProjectParams.SelectUniversalMarkWithTextTypeSizeToolTip}"
                             SelectionChangedCommand="{Binding SettingsChangedCommand}"
-                            ItemTemplate="{StaticResource WithoutFamilyNameItemTemplate}" />
+                            ItemTemplate="{StaticResource WithFamilyNameItemTemplate}" />
 
                         <controls:ComboBoxSettingControl
                             LabelText="{me:LocalizationSource ProjectParams.SelectBreakLineTypeSize}"
@@ -161,7 +161,7 @@
                                 ValidatesOnDataErrors=True, NotifyOnValidationError=True}"
                             ToolTipText="{me:LocalizationSource ProjectParams.SelectBreakLineTypeSizeToolTip}"
                             SelectionChangedCommand="{Binding SettingsChangedCommand}"
-                            ItemTemplate="{StaticResource WithoutFamilyNameItemTemplate}" />
+                            ItemTemplate="{StaticResource WithFamilyNameItemTemplate}" />
 
                         <controls:ComboBoxSettingControl
                             LabelText="{me:LocalizationSource ProjectParams.SelectConcretingJointTypeSize}"
@@ -172,7 +172,7 @@
                                 ValidatesOnDataErrors=True, NotifyOnValidationError=True}"
                             ToolTipText="{me:LocalizationSource ProjectParams.SelectConcretingJointTypeSizeToolTip}"
                             SelectionChangedCommand="{Binding SettingsChangedCommand}"
-                            ItemTemplate="{StaticResource WithoutFamilyNameItemTemplate}" />
+                            ItemTemplate="{StaticResource WithFamilyNameItemTemplate}" />
                     </UniformGrid>
                 </Grid>
             </Border>
