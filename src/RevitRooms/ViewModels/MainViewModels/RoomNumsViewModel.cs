@@ -21,6 +21,7 @@ internal class RoomNumsViewModel : BaseViewModel {
     private readonly NumOrderWindowService _numberingWindowService;
     private readonly RevitRepository _revitRepository;
     private readonly IMessageBoxService _messageBoxService;
+    private readonly ErrorWindowService _errorWindowService;
     private readonly ILocalizationService _localizationService;
     private readonly RoomsNumsWindow _window;
 
@@ -32,12 +33,14 @@ internal class RoomNumsViewModel : BaseViewModel {
                              ILocalizationService localizationService,
                              IMessageBoxService messageBoxService,
                              RoomsNumsWindow window,
-                             NumOrderWindowService numberingWindowService) {
+                             NumOrderWindowService numberingWindowService,
+                             ErrorWindowService errorWindowService) {
         _numberingWindowService = numberingWindowService;
         _roomsNumsConfig = roomsNumsConfig;
         _revitRepository = revitRepository;
         _localizationService = localizationService;
         _messageBoxService = messageBoxService;
+        _errorWindowService = errorWindowService;
         _window = window;
 
         LoadViewCommand = RelayCommand.Create(LoadView);
@@ -61,17 +64,17 @@ internal class RoomNumsViewModel : BaseViewModel {
     private void LoadView() {
         RoomsNumsViewModels = [
             new ViewRevitViewModel(_revitRepository, _roomsNumsConfig, _messageBoxService, 
-                                   _localizationService, _numberingWindowService) { 
+                                   _localizationService, _numberingWindowService, _errorWindowService) { 
                 Name = _localizationService.GetLocalizedString("MainWindow.SelectView"),
                 ParentWindow = _window
             },
             new ElementsRevitViewModel(_revitRepository, _roomsNumsConfig, _messageBoxService, 
-                                       _localizationService, _numberingWindowService) {
+                                       _localizationService, _numberingWindowService, _errorWindowService) {
                 Name = _localizationService.GetLocalizedString("MainWindow.SelectAll"),
                 ParentWindow = _window
             },
             new SelectedRevitViewModel(_revitRepository, _roomsNumsConfig, _messageBoxService, 
-                                       _localizationService, _numberingWindowService) { 
+                                       _localizationService, _numberingWindowService, _errorWindowService) { 
                 Name = _localizationService.GetLocalizedString("MainWindow.SelectSelected"),
                 ParentWindow = _window
             }

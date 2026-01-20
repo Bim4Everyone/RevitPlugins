@@ -25,6 +25,7 @@ internal abstract class RevitRoomNumsViewModel : BaseViewModel, INumberingOrder 
     protected readonly RoomsNumsConfig _roomsNumsConfig;
     protected readonly IMessageBoxService _messageBoxService;
     protected readonly ILocalizationService _localizationService;
+    protected readonly ErrorWindowService _errorWindowService;
     protected readonly PluginSettings _pluginSettings;
 
     private string _errorText;
@@ -52,11 +53,13 @@ internal abstract class RevitRoomNumsViewModel : BaseViewModel, INumberingOrder 
                                   RoomsNumsConfig roomsNumsConfig,
                                   IMessageBoxService messageBoxService,
                                   ILocalizationService localizationService,
-                                  NumOrderWindowService numOrderWindowService) {
+                                  NumOrderWindowService numOrderWindowService,
+                                  ErrorWindowService errorWindowService) {
         _revitRepository = revitRepository;
         _roomsNumsConfig = roomsNumsConfig;
         _messageBoxService = messageBoxService;
         _localizationService = localizationService;
+        _errorWindowService = errorWindowService;
         _pluginSettings = _roomsNumsConfig.PluginSettings;
 
         var additionalPhases = _revitRepository.GetAdditionalPhases()
@@ -258,6 +261,7 @@ internal abstract class RevitRoomNumsViewModel : BaseViewModel, INumberingOrder 
             .ToArray();
 
         if(CheckWorkingObjects(workingObjects)) {
+            ParentWindow.Close();
             return;
         }
 
@@ -443,8 +447,9 @@ internal abstract class RevitRoomNumsViewModel : BaseViewModel, INumberingOrder 
                 AddElements(WarningInfo.GetErrorMultiLevelRoom(_localizationService), multiLevelRoomGroup, errors);
             }
         }
-        string title = _localizationService.GetLocalizedString("TaskDialog.Information");
-        return ShowInfoElementsWindow(title, errors.Values);
+
+        bool showWarnings = true;
+        return _errorWindowService.ShowNoticeWindow(showWarnings, [.. errors.Values]);
     }
 
     private bool CanNumerateRooms(object param) {
@@ -526,23 +531,6 @@ internal abstract class RevitRoomNumsViewModel : BaseViewModel, INumberingOrder 
         }
 
         value.Elements.Add(new WarningElementViewModel() { Element = element, Description = message });
-    }
-
-    private bool ShowInfoElementsWindow(string title, ICollection<WarningViewModel> infoElements) {
-        if(infoElements.Any()) {
-            //var window = new InfoElementsWindow() {
-            //    Title = title,
-            //    DataContext = new InfoElementsViewModel() {
-            //        InfoElement = infoElements.FirstOrDefault(),
-            //        InfoElements = [.. infoElements]
-            //    }
-            //};
-
-            //window.Show();
-            return true;
-        }
-
-        return false;
     }
 
     private void LoadPluginConfig() {
