@@ -3,11 +3,13 @@ using System.Linq;
 
 using Autodesk.Revit.ApplicationServices;
 using Autodesk.Revit.DB;
+using Autodesk.Revit.DB.Architecture;
 using Autodesk.Revit.UI;
 
 using dosymep.Bim4Everyone;
 using dosymep.Revit;
 
+using RevitBuildCoordVolumes.Models.Geometry;
 using RevitBuildCoordVolumes.Models.Interfaces;
 using RevitBuildCoordVolumes.Models.Services;
 
@@ -16,18 +18,19 @@ namespace RevitBuildCoordVolumes.Models;
 internal class RevitRepository {
     private readonly IDocumentsService _documentsService;
     private readonly ISlabsService _slabsService;
+    private readonly SystemPluginConfig _systemPluginConfig;
 
-    public RevitRepository(UIApplication uiApp) {
+    public RevitRepository(UIApplication uiApp, SystemPluginConfig systemPluginConfig) {
         UIApplication = uiApp;
+        _systemPluginConfig = systemPluginConfig;
         _documentsService = new DocumentsService(Document);
-        _slabsService = new SlabsService(_documentsService);
+        _slabsService = new SlabsService(_documentsService, _systemPluginConfig);
     }
 
     public UIApplication UIApplication { get; }
     public UIDocument ActiveUIDocument => UIApplication.ActiveUIDocument;
     public Application Application => UIApplication.Application;
     public Document Document => ActiveUIDocument.Document;
-    public double MinimalSide => Application.ShortCurveTolerance;
 
     /// <summary>
     /// Метод получения всех документов
@@ -66,7 +69,7 @@ internal class RevitRepository {
     public IEnumerable<string> GetTypeZones(RevitParam revitParam) {
         return revitParam == null
             ? []
-            : GetAreas()
+            : GetSpatialElements()
                 .Select(area => area.GetParamValueOrDefault<string>(revitParam.Name))
                 .Where(str => !string.IsNullOrEmpty(str))
                 .Distinct();
@@ -75,27 +78,29 @@ internal class RevitRepository {
     /// <summary>
     /// Метод получения зон RevitArea по заданному типу и параметру
     /// </summary>
-    public IEnumerable<RevitArea> GetRevitAreas(string areaType, RevitParam revitParam) {
-        return GetAreas()
-            .Select(area => new RevitArea { Area = area })
-            .Where(area => areaType.Equals(area.Area.GetParamValueOrDefault<string>(revitParam.Name)));
+    public IEnumerable<SpatialObject> GetSpatialObjects(string areaType, RevitParam revitParam) {
+        return GetSpatialElements()
+            .Select(spatialElement => new SpatialObject { SpatialElement = spatialElement })
+            .Where(spatialObject => areaType.Equals(spatialObject.SpatialElement.GetParamValueOrDefault<string>(revitParam.Name)));
     }
 
-    // Метод получения системных зон
-    private IEnumerable<Area> GetAreas() {
+    /// <summary>
+    /// Метод получения параметра зоны для выдавливания в простом алгоритме
+    /// </summary>
+    public double GetPositionInFeet(Element element, string paramName) {
+        string positionString = element.GetParamValueOrDefault<string>(paramName);
+        return double.TryParse(positionString, out double positionDouble)
+            ? UnitUtils.ConvertToInternalUnits(positionDouble, UnitTypeId.Millimeters)
+            : double.NaN;
+    }
+
+    // Метод получения системных зон или помещений
+    private IEnumerable<SpatialElement> GetSpatialElements() {
         return new FilteredElementCollector(Document)
-            .OfCategory(BuiltInCategory.OST_Areas)
+            .OfClass(typeof(SpatialElement))
             .WhereElementIsNotElementType()
-            .OfType<Area>();
-    }
-
-    // Метод получения типа семейства
-    public FamilySymbol GetFamilySymbol(Family family) {
-        ElementFilter filter = new FamilySymbolFilter(family.Id);
-        return new FilteredElementCollector(Document)
-            .WherePasses(filter)
-            .Cast<FamilySymbol>()
-            .First();
+            .Cast<SpatialElement>()
+            .Where(se => se is Area or Room);
     }
 }
 

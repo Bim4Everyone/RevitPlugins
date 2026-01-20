@@ -13,7 +13,6 @@ using dosymep.WPF.ViewModels;
 
 using RevitBuildCoordVolumes.Models;
 using RevitBuildCoordVolumes.Models.Enums;
-using RevitBuildCoordVolumes.Models.Interfaces;
 using RevitBuildCoordVolumes.Models.Services;
 using RevitBuildCoordVolumes.Models.Settings;
 
@@ -21,10 +20,10 @@ namespace RevitBuildCoordVolumes.ViewModels;
 
 internal class MainViewModel : BaseViewModel {
     private readonly PluginConfig _pluginConfig;
+    private readonly SystemPluginConfig _systemPluginConfig;
     private readonly RevitRepository _revitRepository;
+    private readonly BuildCoordVolumesServices _buildCoordVolumesServices;
     private readonly ILocalizationService _localizationService;
-    private readonly IParamAvailabilityService _paramAvailabilityService;
-    private readonly ICategoryAvailabilityService _categoryAvailabilityService;
     private readonly IRevitParamFactory _revitParamFactory;
     private BuildCoordVolumesSettings _buildCoordVolumesSettings;
     private ObservableCollection<AlgorithmViewModel> _typeAlgorithms;
@@ -33,7 +32,7 @@ internal class MainViewModel : BaseViewModel {
     private ObservableCollection<TypeZoneViewModel> _typeZones;
     private AlgorithmViewModel _selectedTypeAlgorithm;
     private TypeZoneViewModel _selectedTypeZone;
-    private string _searchSide;
+    private string _squareSide;
     private ObservableCollection<ParamViewModel> _params;
     private ObservableCollection<SlabViewModel> _slabs;
     private ObservableCollection<SlabViewModel> _filteredSlabs;
@@ -46,16 +45,18 @@ internal class MainViewModel : BaseViewModel {
 
     public MainViewModel(
         PluginConfig pluginConfig,
+        SystemPluginConfig systemPluginConfig,
         RevitRepository revitRepository,
+        BuildCoordVolumesServices buildCoordVolumesServices,
         ILocalizationService localizationService,
         IProgressDialogFactory progressDialogFactory,
         IRevitParamFactory revitParamFactory) {
 
         _pluginConfig = pluginConfig;
+        _systemPluginConfig = systemPluginConfig;
         _revitRepository = revitRepository;
+        _buildCoordVolumesServices = buildCoordVolumesServices;
         _localizationService = localizationService;
-        _paramAvailabilityService = new ParamAvailabilityService();
-        _categoryAvailabilityService = new CategoryAvailabilityService(_revitRepository.Document);
         _revitParamFactory = revitParamFactory;
 
         LoadViewCommand = RelayCommand.Create(LoadView);
@@ -100,9 +101,9 @@ internal class MainViewModel : BaseViewModel {
         get => _selectedTypeZone;
         set => RaiseAndSetIfChanged(ref _selectedTypeZone, value);
     }
-    public string SearchSide {
-        get => _searchSide;
-        set => RaiseAndSetIfChanged(ref _searchSide, value);
+    public string SquareSide {
+        get => _squareSide;
+        set => RaiseAndSetIfChanged(ref _squareSide, value);
     }
     public ObservableCollection<ParamViewModel> Params {
         get => _params;
@@ -213,8 +214,11 @@ internal class MainViewModel : BaseViewModel {
     // Метод получения коллекции DocumentViewModel для Documents
     private IEnumerable<DocumentViewModel> GetDocumentViewModels() {
         var allDocuments = _revitRepository.GetAllDocuments();
-        var savedDocumentsNames = _buildCoordVolumesSettings.Documents
-            .Select(doc => doc.GetUniqId());
+        var savedDocuments = _buildCoordVolumesSettings.Documents;
+        var savedDocumentsNames = savedDocuments.Count == 0
+            ? []
+            : savedDocuments
+                .Select(doc => doc.GetUniqId());
 
         return !allDocuments.Any()
             ? []
@@ -234,7 +238,7 @@ internal class MainViewModel : BaseViewModel {
             case nameof(ParamViewModel.SourceParamName):
                 UpdateParamWarnings();
                 if(!vm.HasWarning) {
-                    var def = _paramAvailabilityService.GetDefinitionByName(_revitRepository.Document, vm.SourceParamName);
+                    var def = _buildCoordVolumesServices.ParamAvailabilityService.GetDefinitionByName(_revitRepository.Document, vm.SourceParamName);
                     var newParam = _revitParamFactory.Create(_revitRepository.Document, def.GetElementId());
                     vm.ParamMap.SourceParam = newParam;
                     if(vm.ParamMap.Type == ParamType.DescriptionParam) {
@@ -246,7 +250,7 @@ internal class MainViewModel : BaseViewModel {
             case nameof(ParamViewModel.TargetParamName):
                 UpdateParamWarnings();
                 if(!vm.HasWarning) {
-                    var def = _paramAvailabilityService.GetDefinitionByName(_revitRepository.Document, vm.TargetParamName);
+                    var def = _buildCoordVolumesServices.ParamAvailabilityService.GetDefinitionByName(_revitRepository.Document, vm.TargetParamName);
                     var newParam = _revitParamFactory.Create(_revitRepository.Document, def.GetElementId());
                     vm.ParamMap.TargetParam = newParam;
                 }
@@ -268,7 +272,7 @@ internal class MainViewModel : BaseViewModel {
 
     // Метод получения коллекции ParamViewModel для Params
     private IEnumerable<ParamViewModel> GetParamViewModels() {
-        var defaultParamMaps = RevitConstants.GetDefaultParamMaps();
+        var defaultParamMaps = _systemPluginConfig.GetDefaultParamMaps();
         var savedParamMaps = _buildCoordVolumesSettings.ParamMaps;
 
         var savedLookup = savedParamMaps.ToDictionary(paramMap => paramMap.Type, paramMap => paramMap);
@@ -278,7 +282,7 @@ internal class MainViewModel : BaseViewModel {
             var paramMap = exists ? savedParamMap : defaultParamMap;
             bool isPair = paramMap.SourceParam != null;
 
-            return new ParamViewModel(_localizationService, _paramAvailabilityService, _categoryAvailabilityService) {
+            return new ParamViewModel(_localizationService, _buildCoordVolumesServices) {
                 ParamMap = paramMap,
                 Description = _localizationService.GetLocalizedString($"MainViewModel.{paramMap.Type}Description"),
                 DetailDescription = _localizationService.GetLocalizedString($"MainViewModel.{paramMap.Type}DetailDescription"),
@@ -354,7 +358,7 @@ internal class MainViewModel : BaseViewModel {
         Slabs = new ObservableCollection<SlabViewModel>(GetSlabViewModels());
         FilteredSlabs = new ObservableCollection<SlabViewModel>(Slabs);
 
-        SearchSide = Convert.ToString(_buildCoordVolumesSettings.SearchSide);
+        SquareSide = Convert.ToString(_buildCoordVolumesSettings.SquareSideMm);
 
         UpdateRequiredCheckArea();
     }
@@ -375,8 +379,14 @@ internal class MainViewModel : BaseViewModel {
         SaveConfig();
 
         // Экземпляр процессора
-        var processor = new BuildCoordVolumesProcessor(_localizationService, _revitRepository, _buildCoordVolumesSettings);
-        int count = processor.RevitAreas.Count;
+        var processor = new BuildCoordVolumesProcessor(
+            _localizationService,
+            _revitRepository,
+            _systemPluginConfig,
+            _buildCoordVolumesSettings,
+            _buildCoordVolumesServices);
+
+        int count = processor.SpatialObjects.Count;
         using var progressDialogService = ProgressDialogFactory.CreateDialog();
         var progress = progressDialogService.CreateProgress();
         var ct = progressDialogService.CreateCancellationToken();
@@ -391,20 +401,8 @@ internal class MainViewModel : BaseViewModel {
         processor.Run(progress, ct);
     }
 
-
     // Метод проверки возможности выполнения основного метода
     private bool CanAcceptView() {
-        if(RequiredCheckArea) {
-            ErrorText = _localizationService.GetLocalizedString("MainViewModel.RequiredCheckArea");
-            return false;
-        }
-        if(FilteredDocuments != null) {
-            var checkedDocs = FilteredDocuments.Where(p => p.IsChecked).ToList();
-            if(checkedDocs.Count == 0) {
-                ErrorText = _localizationService.GetLocalizedString("MainViewModel.NoDocuments");
-                return false;
-            }
-        }
         if(Params != null) {
             var firstParamMap = Params.FirstOrDefault();
             if(firstParamMap != null && !firstParamMap.IsChecked && firstParamMap.ParamMap.Type == ParamType.DescriptionParam) {
@@ -417,6 +415,21 @@ internal class MainViewModel : BaseViewModel {
                 return false;
             }
         }
+        if(HasParamWarning) {
+            ErrorText = _localizationService.GetLocalizedString("MainViewModel.ErrorParams");
+            return false;
+        }
+        if(SelectedTypeZone == null) {
+            ErrorText = _localizationService.GetLocalizedString("MainViewModel.NoTypeZone");
+            return false;
+        }
+        if(FilteredDocuments != null) {
+            var checkedDocs = FilteredDocuments.Where(p => p.IsChecked).ToList();
+            if(checkedDocs.Count == 0) {
+                ErrorText = _localizationService.GetLocalizedString("MainViewModel.NoDocuments");
+                return false;
+            }
+        }
         if(FilteredSlabs != null) {
             var checkedSlabs = FilteredSlabs.Where(p => p.IsChecked).ToList();
             if(checkedSlabs.Count == 0) {
@@ -424,29 +437,25 @@ internal class MainViewModel : BaseViewModel {
                 return false;
             }
         }
-        if(SelectedTypeZone == null) {
-            ErrorText = _localizationService.GetLocalizedString("MainViewModel.NoTypeZone");
-            return false;
-        }
-        if(HasParamWarning) {
-            ErrorText = _localizationService.GetLocalizedString("MainViewModel.ErrorParams");
-            return false;
-        }
-        if(!double.TryParse(SearchSide, out double result)) {
-            ErrorText = _localizationService.GetLocalizedString("MainViewModel.SearchSideNoDouble");
+        if(!double.TryParse(SquareSide, out double result)) {
+            ErrorText = _localizationService.GetLocalizedString("MainViewModel.SquareSideNoDouble");
             return false;
         }
         if(result < 0) {
-            ErrorText = _localizationService.GetLocalizedString("MainViewModel.SearchSideNoNegate");
+            ErrorText = _localizationService.GetLocalizedString("MainViewModel.SquareSideNoNegate");
             return false;
         } else if(result == 0) {
-            ErrorText = _localizationService.GetLocalizedString("MainViewModel.SearchSideNoZero");
+            ErrorText = _localizationService.GetLocalizedString("MainViewModel.SquareSideNoZero");
             return false;
         } else if(result > 500) {
-            ErrorText = _localizationService.GetLocalizedString("MainViewModel.SearchSideBig");
+            ErrorText = _localizationService.GetLocalizedString("MainViewModel.SquareSideBig");
             return false;
         } else if(result < 10) {
-            ErrorText = _localizationService.GetLocalizedString("MainViewModel.SearchSideSmall");
+            ErrorText = _localizationService.GetLocalizedString("MainViewModel.SquareSideSmall");
+            return false;
+        }
+        if(RequiredCheckArea) {
+            ErrorText = _localizationService.GetLocalizedString("MainViewModel.RequiredCheckArea");
             return false;
         }
         ErrorText = null;
@@ -459,27 +468,61 @@ internal class MainViewModel : BaseViewModel {
         ConfigSettings configSettings;
         if(projectConfig == null) {
             configSettings = new ConfigSettings();
-            configSettings.ApplyDefaultValues();
+            configSettings.ApplyDefaultValues(_systemPluginConfig);
         } else {
             configSettings = projectConfig.ConfigSettings;
         }
-        _buildCoordVolumesSettings = new BuildCoordVolumesSettings(_revitRepository, configSettings);
-        _buildCoordVolumesSettings.LoadConfigSettings();
+
+        var documents = configSettings.Documents.Count == 0
+            ? _revitRepository.GetAllDocuments().ToList()
+            : configSettings.Documents
+                .Select(_revitRepository.FindDocumentsByName)
+                .ToList();
+
+        var typeSlabs = configSettings.TypeSlabs.Count == 0
+            ? _revitRepository.GetTypeSlabsByDocs(documents)
+                .Where(name => _systemPluginConfig.DefaultSlabTypeNames.Any(type => name.Contains(type)))
+                .ToList()
+            : configSettings.TypeSlabs;
+
+        _buildCoordVolumesSettings = new BuildCoordVolumesSettings {
+            AlgorithmType = configSettings.AlgorithmType,
+            TypeZone = configSettings.TypeZone,
+            ParamMaps = configSettings.ParamMaps,
+            Documents = documents,
+            TypeSlabs = typeSlabs,
+            SquareSideMm = configSettings.SquareSideMm
+        };
     }
 
     // Метод сохранения конфигурации пользователя
     private void SaveConfig() {
-        _buildCoordVolumesSettings.AlgorithmType = SelectedTypeAlgorithm.AlgorithmType;
-        _buildCoordVolumesSettings.Documents = FilteredDocuments.Where(vm => vm.IsChecked).Select(d => d.Document).ToList();
-        _buildCoordVolumesSettings.TypeSlabs = FilteredSlabs.Where(vm => vm.IsChecked).Select(vm => vm.Name).ToList();
-        _buildCoordVolumesSettings.TypeZone = SelectedTypeZone.Name;
-        _buildCoordVolumesSettings.ParamMaps = Params.Where(vm => vm.IsChecked).Select(vm => vm.ParamMap).ToList();
-        _buildCoordVolumesSettings.SearchSide = Convert.ToDouble(SearchSide);
-        _buildCoordVolumesSettings.UpdateConfigSettings();
+        var algorithmType = SelectedTypeAlgorithm.AlgorithmType;
+        var documents = FilteredDocuments.Where(vm => vm.IsChecked).Select(d => d.Document).ToList();
+        var typeSlabs = FilteredSlabs.Where(vm => vm.IsChecked).Select(vm => vm.Name).ToList();
+        string typeZone = SelectedTypeZone.Name;
+        var paramMaps = Params.Where(vm => vm.IsChecked).Select(vm => vm.ParamMap).ToList();
+        double squareSide = Convert.ToDouble(SquareSide);
+
+        _buildCoordVolumesSettings.AlgorithmType = algorithmType;
+        _buildCoordVolumesSettings.Documents = documents;
+        _buildCoordVolumesSettings.TypeSlabs = typeSlabs;
+        _buildCoordVolumesSettings.TypeZone = typeZone;
+        _buildCoordVolumesSettings.ParamMaps = paramMaps;
+        _buildCoordVolumesSettings.SquareSideMm = squareSide;
+
+        var configSettings = new ConfigSettings {
+            AlgorithmType = algorithmType,
+            Documents = documents.Select(doc => doc.GetUniqId()).ToList(),
+            TypeZone = typeZone,
+            ParamMaps = paramMaps,
+            TypeSlabs = typeSlabs,
+            SquareSideMm = squareSide
+        };
 
         var setting = _pluginConfig.GetSettings(_revitRepository.Document)
             ?? _pluginConfig.AddSettings(_revitRepository.Document);
-        setting.ConfigSettings = _buildCoordVolumesSettings.ConfigSettings;
+        setting.ConfigSettings = configSettings;
         _pluginConfig.SaveProjectConfig();
     }
 }

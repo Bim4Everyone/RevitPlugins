@@ -47,7 +47,7 @@
             TargetType="ToolTip">
             <Setter
                 Property="MaxWidth"
-                Value="500" />
+                Value="650" />            
         </Style>
     </Window.Resources>
 
@@ -170,7 +170,7 @@
                             <edits:CustomGroupEditControl.EditControl>
                                 <StackPanel>
                                     <ui:AutoSuggestBox
-                                        Margin="5,0,5,5"
+                                        Margin="5,0,5,20"
                                         Icon="{ui:SymbolIcon Search24}"
                                         Text="{Binding SearchTextDocs, Mode=TwoWay}"
                                         PlaceholderText="{me:LocalizationSource MainWindow.SearchTextDocs}">
@@ -201,7 +201,7 @@
                                                     Columns="1" />
                                             </ItemsPanelTemplate>
                                         </ItemsControl.ItemsPanel>
-                                    </ItemsControl>
+                                    </ItemsControl> 
                                 </StackPanel>
                             </edits:CustomGroupEditControl.EditControl>
                         </edits:CustomGroupEditControl>
@@ -253,12 +253,12 @@
 
                         <edits:CustomEditControl
                             Icon="{ui:SymbolIcon fullScreenMaximize24}"
-                            Header="{me:LocalizationSource MainWindow.SearchSide}"
-                            Description="{me:LocalizationSource MainWindow.SearchSideDescription}">
+                            Header="{me:LocalizationSource MainWindow.SquareSide}"
+                            Description="{me:LocalizationSource MainWindow.SquareSideDescription}">
 
                             <ui:TextBox
-                                Text="{Binding SearchSide, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-                                ToolTip="{me:LocalizationSource MainWindow.SearchSideTooltip}" />
+                                Text="{Binding SquareSide, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                ToolTip="{me:LocalizationSource MainWindow.SquareSideTooltip}" />
                         </edits:CustomEditControl>
                     </StackPanel>
                 </GroupBox>                

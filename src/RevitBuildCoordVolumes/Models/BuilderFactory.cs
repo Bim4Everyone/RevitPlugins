@@ -6,15 +6,19 @@ using RevitBuildCoordVolumes.Models.Settings;
 namespace RevitBuildCoordVolumes.Models;
 internal sealed class BuilderFactory {
     private readonly RevitRepository _revitRepository;
+    private readonly SystemPluginConfig _systemPluginConfig;
     private readonly BuildCoordVolumesServices _services;
     private readonly BuildCoordVolumesSettings _settings;
 
     public BuilderFactory(
         RevitRepository revitRepository,
-        BuildCoordVolumesSettings settings) {
+         SystemPluginConfig systemPluginConfig,
+        BuildCoordVolumesSettings settings,
+        BuildCoordVolumesServices services) {
         _revitRepository = revitRepository;
-        _services = new BuildCoordVolumesServices();
+        _systemPluginConfig = systemPluginConfig;
         _settings = settings;
+        _services = services;
     }
 
     public IExtrusionBuilder Create(AlgorithmType algorithmType) {
@@ -27,7 +31,7 @@ internal sealed class BuilderFactory {
                 _revitRepository,
                 _settings)
             : algorithmType == AlgorithmType.SimpleAreaExtrude
-            ? new ExtrusionSimpleBuilder()
-            : new ExtrusionSimpleBuilder();
+            ? new ExtrusionSimpleBuilder(_services.GeomElementFactory, _revitRepository, _systemPluginConfig)
+            : new ExtrusionSimpleBuilder(_services.GeomElementFactory, _revitRepository, _systemPluginConfig);
     }
 }

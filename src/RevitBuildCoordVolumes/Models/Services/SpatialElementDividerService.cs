@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -12,7 +11,7 @@ namespace RevitBuildCoordVolumes.Models.Services;
 
 internal class SpatialElementDividerService : ISpatialElementDividerService {
 
-    public List<Polygon> DivideSpatialElement(SpatialElement spatialElement, double side) {
+    public List<PolygonObject> DivideSpatialElement(SpatialElement spatialElement, double side) {
         var opt = new SpatialElementBoundaryOptions();
         var loops = spatialElement.GetBoundarySegments(opt);
         if(loops == null || loops.Count == 0) {
@@ -29,7 +28,7 @@ internal class SpatialElementDividerService : ISpatialElementDividerService {
         double minY = contour.Min(p => p.Y);
         double maxY = contour.Max(p => p.Y);
 
-        var polygons = new List<Polygon>();
+        var polygons = new List<PolygonObject>();
 
         for(double x = minX; x + side <= maxX; x += side) {
             for(double y = minY; y + side <= maxY; y += side) {
@@ -65,10 +64,9 @@ internal class SpatialElementDividerService : ISpatialElementDividerService {
                 .ToList();
 
                 if(sides.Count == 4) {
-                    polygons.Add(new Polygon {
+                    polygons.Add(new PolygonObject {
                         Sides = sides,
-                        Center = center,
-                        Guid = Guid.NewGuid()
+                        Center = center
                     });
                 }
             }

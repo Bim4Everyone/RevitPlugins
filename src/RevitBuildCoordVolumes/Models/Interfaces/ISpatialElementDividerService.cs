@@ -13,5 +13,5 @@ internal interface ISpatialElementDividerService {
     /// В данном методе производится разбивка зоны на отдельные участки с заданной длиной стороны и допуском Revit
     /// </remarks>
     /// <returns>List Polygon</returns>
-    List<Polygon> DivideSpatialElement(SpatialElement spatialElement, double side);
+    List<PolygonObject> DivideSpatialElement(SpatialElement spatialElement, double side);
 }

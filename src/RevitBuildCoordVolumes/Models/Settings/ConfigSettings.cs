@@ -10,18 +10,14 @@ internal class ConfigSettings {
     public List<ParamMap> ParamMaps { get; set; }
     public List<string> Documents { get; set; }
     public List<string> TypeSlabs { get; set; }
-    public double SearchSide { get; set; }
+    public double SquareSideMm { get; set; }
 
-    public void ApplyDefaultValues() {
+    public void ApplyDefaultValues(SystemPluginConfig systemPluginConfig) {
         AlgorithmType = AlgorithmType.AdvancedAreaExtrude;
         TypeZone = string.Empty;
-        ParamMaps = GetDefaultParamMaps();
+        ParamMaps = systemPluginConfig.GetDefaultParamMaps();
         Documents = [];
         TypeSlabs = [];
-        SearchSide = RevitConstants.SearchSide;
-    }
-
-    private List<ParamMap> GetDefaultParamMaps() {
-        return RevitConstants.GetDefaultParamMaps();
+        SquareSideMm = systemPluginConfig.SquareSide;
     }
 }

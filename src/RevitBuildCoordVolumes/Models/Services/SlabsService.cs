@@ -12,9 +12,11 @@ namespace RevitBuildCoordVolumes.Models.Services;
 internal class SlabsService : ISlabsService {
     private readonly Dictionary<string, IEnumerable<SlabElement>> _slabsByDocName = [];
     private readonly IDocumentsService _documentsService;
+    private readonly SystemPluginConfig _systemPluginConfig;
 
-    public SlabsService(IDocumentsService documentsService) {
+    public SlabsService(IDocumentsService documentsService, SystemPluginConfig systemPluginConfig) {
         _documentsService = documentsService;
+        _systemPluginConfig = systemPluginConfig;
     }
 
     public IEnumerable<SlabElement> GetSlabsByTypesAndDocs(IEnumerable<string> typeSlabs, IEnumerable<Document> documents) {
@@ -43,7 +45,7 @@ internal class SlabsService : ISlabsService {
 
     // Метод получения перекрытий и плит из одного документа   
     private IEnumerable<SlabElement> LoadSlabsFromDocument(Document doc) {
-        var categoryFilters = RevitConstants.SlabCategories
+        var categoryFilters = _systemPluginConfig.SlabCategories
             .Select(cat => (ElementFilter) new ElementCategoryFilter(cat))
             .ToList();
 

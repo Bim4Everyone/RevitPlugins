@@ -7,7 +7,7 @@ using RevitBuildCoordVolumes.Models.Interfaces;
 namespace RevitBuildCoordVolumes.Models;
 internal class ColumnFactory : IColumnFactory {
 
-    public IEnumerable<IGrouping<string, Column>> GenerateColumnGroups(List<Polygon> polygons, List<SlabElement> slabs) {
+    public IEnumerable<IGrouping<string, ColumnObject>> GenerateColumnGroups(List<PolygonObject> polygons, List<SlabElement> slabs) {
         var columns = GetColumns(polygons, slabs);
 
         // Группируем по GUID плит - низ + верх      
@@ -15,15 +15,15 @@ internal class ColumnFactory : IColumnFactory {
             .GroupBy(col => col.StartSlabGuid.ToString() + "_" + col.FinishSlabGuid.ToString());
     }
 
-    private List<Column> GetColumns(List<Polygon> polygons, List<SlabElement> slabs) {
+    private List<ColumnObject> GetColumns(List<PolygonObject> polygons, List<SlabElement> slabs) {
         if(polygons.Count == 0 || slabs.Count < 2) {
             return [];
         }
-        var columns = new List<Column>();
+        var columns = new List<ColumnObject>();
 
         foreach(var polygon in polygons) {
             var center = polygon.Center;
-            var points = new List<SlabInfo>(slabs.Count);
+            var points = new List<SlabObject>(slabs.Count);
 
             foreach(var slab in slabs) {
                 double z = double.NaN;
@@ -37,9 +37,9 @@ internal class ColumnFactory : IColumnFactory {
                 }
 
                 if(!double.IsNaN(z)) {
-                    points.Add(new SlabInfo {
+                    points.Add(new SlabObject {
                         Position = z,
-                        SlabLevelName = slab.LevelName,
+                        FloorName = slab.LevelName,
                         SlabGuid = slab.Guid,
                         IsSloped = slab.IsSloped
                     });
@@ -60,9 +60,9 @@ internal class ColumnFactory : IColumnFactory {
                     continue;
                 }
 
-                columns.Add(new Column {
-                    Polygon = polygon,
-                    LevelName = start.SlabLevelName,
+                columns.Add(new ColumnObject {
+                    PolygonObject = polygon,
+                    FloorName = start.FloorName,
                     StartPosition = start.Position,
                     FinishPosition = end.Position,
                     StartSlabGuid = start.SlabGuid,

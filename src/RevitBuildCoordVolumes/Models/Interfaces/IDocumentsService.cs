@@ -27,6 +27,6 @@ internal interface IDocumentsService {
     /// <remarks>
     /// В данном методе производится получение всех документов. Как связанных так и текущего
     /// </remarks>
-    /// <returns>IEnumerable Document</returns>    
+    /// <returns>IEnumerable Document</returns> 
     IEnumerable<Document> GetAllDocuments();
 }

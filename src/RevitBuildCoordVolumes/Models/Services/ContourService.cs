@@ -11,10 +11,10 @@ using RevitBuildCoordVolumes.Models.Utilites;
 namespace RevitBuildCoordVolumes.Models.Services;
 internal class ContourService : IContourService {
 
-    public List<CurveLoop> GetColumnsCurveLoops(List<Column> columns, double spatialElementPosition, double startExtrudePosition) {
+    public List<CurveLoop> GetColumnsCurveLoops(List<ColumnObject> columns, double spatialElementPosition, double startExtrudePosition) {
         // Получаем все линии полигонов
         var allLines = columns
-            .SelectMany(column => column.Polygon.Sides)
+            .SelectMany(column => column.PolygonObject.Sides)
             .ToList();
 
         // Удаляем дубликаты
@@ -28,9 +28,9 @@ internal class ContourService : IContourService {
         return GetCurveLoopsContour(uniqueLines, transform);
     }
 
-    public List<CurveLoop> GetColumnListCurveLoops(Column column, double spatialElementPosition, double startExtrudePosition) {
+    public List<CurveLoop> GetColumnCurveLoops(ColumnObject column, double spatialElementPosition, double startExtrudePosition) {
         // Получаем все линии полигонов
-        var allLines = column.Polygon.Sides
+        var allLines = column.PolygonObject.Sides
             .Cast<Curve>()
             .ToList();
 
@@ -40,7 +40,26 @@ internal class ContourService : IContourService {
         return GetCurveLoopsContour(allLines, transform);
     }
 
-    public List<CurveLoop> GetCurveLoopsContour(List<Curve> allCurves, Transform transform) {
+    public List<CurveLoop> GetSimpleCurveLoops(SpatialElement spatialElement, double startExtrudePosition) {
+        var opt = new SpatialElementBoundaryOptions();
+        var loops = spatialElement.GetBoundarySegments(opt);
+        if(loops == null || loops.Count == 0) {
+            return [];
+        }
+
+        var segs = loops[0];
+        var contour = segs.Select(s => s.GetCurve()).ToList();
+
+        // Получаем ориентацию полигона для Transform
+        double spatialElementPosition = contour[0].GetEndPoint(0).Z;
+
+        // Получаем актуальную трансформацию
+        var transform = GetTransform(spatialElementPosition, startExtrudePosition);
+
+        return GetCurveLoopsContour(contour, transform);
+    }
+
+    private List<CurveLoop> GetCurveLoopsContour(List<Curve> allCurves, Transform transform) {
         var devidedCurves = SplitToLoopsOptimized(allCurves);
         var curveLoops = new List<CurveLoop>();
         foreach(var listCurve in devidedCurves) {

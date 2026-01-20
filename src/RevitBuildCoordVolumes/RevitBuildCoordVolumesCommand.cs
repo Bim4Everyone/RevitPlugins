@@ -13,6 +13,7 @@ using dosymep.WpfUI.Core.Ninject;
 using Ninject;
 
 using RevitBuildCoordVolumes.Models;
+using RevitBuildCoordVolumes.Models.Services;
 using RevitBuildCoordVolumes.ViewModels;
 using RevitBuildCoordVolumes.Views;
 
@@ -45,8 +46,18 @@ public class RevitBuildCoordVolumesCommand : BasePluginCommand {
         // Создание контейнера зависимостей плагина с сервисами из платформы
         using var kernel = uiApplication.CreatePlatformServices();
 
+        // Создание системных настроек
+        kernel.Bind<SystemPluginConfig>()
+            .ToSelf()
+            .InSingletonScope();
+
         // Настройка доступа к Revit
         kernel.Bind<RevitRepository>()
+            .ToSelf()
+            .InSingletonScope();
+
+        // Создание сервисов
+        kernel.Bind<BuildCoordVolumesServices>()
             .ToSelf()
             .InSingletonScope();
 

@@ -10,6 +10,10 @@ internal static class SolidUtility {
     private static readonly XYZ _directionDown = new(0, 0, -10);
 
     public static Solid ExtrudeSolid(List<CurveLoop> listCurveLoops, double start, double finish, bool up = true) {
+        if(start == double.NaN || finish == double.NaN) {
+            return null;
+        }
+
         var direction = up ? _directionUp : _directionDown;
 
         double amountToExtrude = finish - start;

@@ -12,7 +12,7 @@ internal class ExtrusionContourBuilder : IExtrusionBuilder {
     private readonly ISpatialElementDividerService _spatialElementDividerService;
     private readonly ISlabNormalizeService _slabNormalizeService;
     private readonly IColumnFactory _columnFactory;
-    private readonly IGeomElementFactory _geomElementFactory;
+    private readonly IGeomObjectFactory _geomElementFactory;
     private readonly RevitRepository _revitRepository;
     private readonly BuildCoordVolumesSettings _settings;
 
@@ -20,7 +20,7 @@ internal class ExtrusionContourBuilder : IExtrusionBuilder {
         ISpatialElementDividerService spatialElementDividerService,
         ISlabNormalizeService slabNormalizeService,
         IColumnFactory columnFactory,
-        IGeomElementFactory geomElementFactory,
+        IGeomObjectFactory geomElementFactory,
         RevitRepository revitRepository,
         BuildCoordVolumesSettings settings) {
         _spatialElementDividerService = spatialElementDividerService;
@@ -31,10 +31,10 @@ internal class ExtrusionContourBuilder : IExtrusionBuilder {
         _settings = settings;
     }
 
-    public List<GeomElement> BuildVolumes(RevitArea revitArea) {
+    public List<GeomObject> BuildVolumes(SpatialObject spatialObject) {
         // Разделяем зону на полигоны
-        double sidePolygon = UnitUtils.ConvertToInternalUnits(_settings.SearchSide, UnitTypeId.Millimeters);
-        var polygons = _spatialElementDividerService.DivideSpatialElement(revitArea.Area, sidePolygon);
+        double sidePolygon = UnitUtils.ConvertToInternalUnits(_settings.SquareSideMm, UnitTypeId.Millimeters);
+        var polygons = _spatialElementDividerService.DivideSpatialElement(spatialObject.SpatialElement, sidePolygon);
 
         // Получаем все плиты перекрытия из настроек
         var allSlabs = _revitRepository.GetSlabsByTypesAndDocs(_settings.TypeSlabs, _settings.Documents).ToList();
@@ -48,14 +48,14 @@ internal class ExtrusionContourBuilder : IExtrusionBuilder {
         // Получаем ориентацию полигона для Transform
         double spatialElementPosition = polygons[0].Sides[0].GetEndPoint(0).Z;
 
-        var geomElements = new List<GeomElement>();
+        var geomElements = new List<GeomObject>();
         foreach(var columnGroup in columnGroups) {
             var listColumns = columnGroup.ToList();
             var firstElement = listColumns[0];
 
             var element = firstElement.IsSloped || listColumns.Count == 1
-                ? _geomElementFactory.GetSeparatedGeomElement(listColumns, spatialElementPosition)
-                : _geomElementFactory.GetUnitedGeomElement(listColumns, spatialElementPosition);
+                ? _geomElementFactory.GetSeparatedGeomObject(listColumns, spatialElementPosition)
+                : _geomElementFactory.GetUnitedGeomObject(listColumns, spatialElementPosition);
 
             if(element != null) {
                 geomElements.Add(element);

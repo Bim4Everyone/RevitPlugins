@@ -31,9 +31,9 @@
     <system:String x:Key="MainWindow.TypeSlabsDescription">Типоразмеры плит использующиеся для определения основы</system:String>
     <system:String x:Key="MainWindow.SearchTextSlabs">Поиск по имени типоразмера</system:String>
 
-    <system:String x:Key="MainWindow.SearchSide">Длина стороны поисковой фигуры в мм</system:String>
-    <system:String x:Key="MainWindow.SearchSideDescription">Фигуры, на которые разбивается зона для построения объема</system:String>
-    <system:String x:Key="MainWindow.SearchSideTooltip">Влияет на производительность. Меньше значение - меньше производительность</system:String>
+    <system:String x:Key="MainWindow.SquareSide">Длина стороны квадрата в мм</system:String>
+    <system:String x:Key="MainWindow.SquareSideDescription">Квадраты, на которые разбивается зона для построения объема</system:String>
+    <system:String x:Key="MainWindow.SquareSideTooltip">Влияет на производительность и точность. Меньше значение - меньше производительность, но больше точность</system:String>
         
     
     <system:String x:Key="MainWindow.ButtonCheckArea">Проверить зоны</system:String>
@@ -61,11 +61,11 @@
     <system:String x:Key="MainViewModel.NoSlabs">Не выбраны плиты перекрытий</system:String>
     <system:String x:Key="MainViewModel.NoTypeZone">Не выбран тип зон</system:String>
     <system:String x:Key="MainViewModel.ErrorParams">Ошибки в параметрах</system:String>
-    <system:String x:Key="MainViewModel.SearchSideNoDouble">Вводимые данные должны быть числом</system:String>
-    <system:String x:Key="MainViewModel.SearchSideNoNegate">Вводимые данные должны быть положительными</system:String>
-    <system:String x:Key="MainViewModel.SearchSideNoZero">Вводимые данные должны быть больше нуля</system:String>
-    <system:String x:Key="MainViewModel.SearchSideBig">Вводимые данные не должны превышать 500 мм</system:String>
-    <system:String x:Key="MainViewModel.SearchSideSmall">Вводимые данные не должны быть меньше 10 мм</system:String>     
+    <system:String x:Key="MainViewModel.SquareSideNoDouble">Вводимые данные должны быть числом</system:String>
+    <system:String x:Key="MainViewModel.SquareSideNoNegate">Вводимые данные должны быть положительными</system:String>
+    <system:String x:Key="MainViewModel.SquareSideNoZero">Вводимые данные должны быть больше нуля</system:String>
+    <system:String x:Key="MainViewModel.SquareSideBig">Вводимые данные не должны превышать 500 мм</system:String>
+    <system:String x:Key="MainViewModel.SquareSideSmall">Вводимые данные не должны быть меньше 10 мм</system:String>     
     
     <system:String x:Key="MainViewModel.ProgressTitle">Построение объёмов... [{0}]\[{1}]</system:String>
 
