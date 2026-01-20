@@ -66,7 +66,7 @@ public class RevitParamsCheckerCommand : BasePluginCommand {
         BindConverters(kernel);
 #if REVIT_2022
 // TODO
-        kernel.UseDefaultFactory();
+        kernel.UseLogicalFilterFactory();
 #endif
         kernel.UseDefaultProviderFactory();
         kernel.UseDefaultContextParser();
@@ -94,8 +94,8 @@ public class RevitParamsCheckerCommand : BasePluginCommand {
             $"/{assemblyName};component/assets/localization/language.xaml",
             CultureInfo.GetCultureInfo("ru-RU"));
 
-        // kernel.Get<MainWindow>().Show();
-        kernel.Get<MainWindow>().ShowDialog();
+        kernel.Get<MainWindow>().Show();
+        // kernel.Get<MainWindow>().ShowDialog();
     }
 
     private void BindPages(IKernel kernel) {
