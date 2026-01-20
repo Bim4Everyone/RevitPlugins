@@ -16,9 +16,9 @@
     xmlns:wpfbehaviors="clr-namespace:dosymep.WpfCore.Behaviors;assembly=dosymep.WpfCore"
     mc:Ignorable="d"
     Title="{me:LocalizationSource MainWindow.Title}"
-    Height="700"
+    Height="870"
     Width="900"
-    MinHeight="700"
+    MinHeight="870"
     MinWidth="900"
     d:DataContext="{d:DesignInstance vms:MainViewModel, IsDesignTimeCreatable=False}">
 
@@ -35,11 +35,6 @@
         
         <converters:BoolToVisibilityConverter
             x:Key="SlabWarningIconVisible"
-            TrueValue="Visible"
-            FalseValue="Collapsed" />
-
-        <converters:BoolToVisibilityConverter
-            x:Key="AdvancedAlgorithmSettingsVisible"
             TrueValue="Visible"
             FalseValue="Collapsed" />
 
@@ -90,7 +85,7 @@
                     FontWeight="DemiBold">                    
                     <StackPanel>
                         <edits:CustomEditControl
-                            Icon="{ui:SymbolIcon grid24}"
+                            Icon="{ui:SymbolIcon shapeSubtract24}"
                             Header="{me:LocalizationSource MainWindow.TypeAlgorithm}"
                             Description="{me:LocalizationSource MainWindow.TypeAlgorithmDescription}">
 
@@ -160,10 +155,10 @@
                     BorderThickness="0"
                     Header="{me:LocalizationSource MainWindow.GroupBoxAdvancedAlgorythmSettings}"
                     FontWeight="DemiBold"
-                    Visibility="{Binding IsAdvancedAlgorithm, Converter={StaticResource AdvancedAlgorithmSettingsVisible}}">
+                    IsEnabled="{Binding IsAdvancedAlgorithm}">
                     <StackPanel>
                         <edits:CustomGroupEditControl
-                            Icon="{ui:SymbolIcon form24}"
+                            Icon="{ui:SymbolIcon scanText24}"
                             Header="{me:LocalizationSource MainWindow.SourceFiles}"
                             Description="{me:LocalizationSource MainWindow.SourceFilesDescription}"
                             ExtraIconVisible="False">
@@ -250,6 +245,28 @@
                                 </StackPanel>
                             </edits:CustomGroupEditControl.EditControl>
                         </edits:CustomGroupEditControl>
+
+                        <edits:CustomEditControl
+                            Icon="{ui:SymbolIcon paddingTop24}"
+                            Header="{me:LocalizationSource MainWindow.LevelUpSlabs}"
+                            Description="{me:LocalizationSource MainWindow.LevelUpSlabsDescription}">
+
+                            <ComboBox
+                                ItemsSource="{Binding UpLevels}"
+                                SelectedValue="{Binding SelectedUpLevel}"
+                                DisplayMemberPath="Name" />
+                        </edits:CustomEditControl>
+
+                        <edits:CustomEditControl
+                            Icon="{ui:SymbolIcon paddingDown24}"
+                            Header="{me:LocalizationSource MainWindow.LevelBottomSlabs}"
+                            Description="{me:LocalizationSource MainWindow.LevelBottomSlabsDescription}">
+
+                            <ComboBox
+                                ItemsSource="{Binding BottomLevels}"
+                                SelectedValue="{Binding SelectedBottomLevel}"
+                                DisplayMemberPath="Name" />
+                        </edits:CustomEditControl>                        
 
                         <edits:CustomEditControl
                             Icon="{ui:SymbolIcon fullScreenMaximize24}"

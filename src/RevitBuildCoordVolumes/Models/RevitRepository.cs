@@ -51,15 +51,26 @@ internal class RevitRepository {
     /// </summary>
     public IEnumerable<string> GetTypeSlabsByDocs(IEnumerable<Document> documents) {
         return _slabsService.GetSlabsByDocs(documents)
-            .Select(slab => slab.Name)
+            .Select(slab => slab.FloorName)
             .Distinct();
     }
 
     /// <summary>
-    /// Получение всех типов перекрытий и фундаментных плит
+    /// Получение всех типов перекрытий и фундаментных плит по именам типов и документам
     /// </summary>
     public IEnumerable<SlabElement> GetSlabsByTypesAndDocs(IEnumerable<string> typeSlabs, IEnumerable<Document> documents) {
         return _slabsService.GetSlabsByTypesAndDocs(typeSlabs, documents);
+    }
+
+    /// <summary>
+    /// Получение всех типов перекрытий и фундаментных плит по именам типов, документам и уровням
+    /// </summary>
+    public IEnumerable<SlabElement> GetSlabsByTypesDocsAndLevels(
+        IEnumerable<string> typeSlabs,
+        IEnumerable<Document> documents,
+        Level upLevel,
+        Level bottomLevel) {
+        return _slabsService.GetSlabsByTypesDocsAndLevels(typeSlabs, documents, upLevel, bottomLevel);
     }
 
 

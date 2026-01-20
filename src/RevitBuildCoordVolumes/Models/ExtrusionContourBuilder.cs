@@ -37,7 +37,8 @@ internal class ExtrusionContourBuilder : IExtrusionBuilder {
         var polygons = _spatialElementDividerService.DivideSpatialElement(spatialObject.SpatialElement, sidePolygon);
 
         // Получаем все плиты перекрытия из настроек
-        var allSlabs = _revitRepository.GetSlabsByTypesAndDocs(_settings.TypeSlabs, _settings.Documents).ToList();
+        var allSlabs = _revitRepository.GetSlabsByTypesDocsAndLevels(
+            _settings.TypeSlabs, _settings.Documents, _settings.UpLevel, _settings.BottomLevel).ToList();
 
         // Получаем все плиты с чистыми поверхностями
         var normalizedSlabs = _slabNormalizeService.GetNormalizeSlabs(allSlabs);

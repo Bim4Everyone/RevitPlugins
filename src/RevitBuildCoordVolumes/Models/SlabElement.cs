@@ -9,7 +9,8 @@ namespace RevitBuildCoordVolumes.Models;
 /// </summary>
 internal class SlabElement {
     public Floor Floor { get; set; }
-    public string Name { get; set; }
+    public Level Level { get; set; }
+    public string FloorName { get; set; }
     public string LevelName { get; set; }
     public Guid Guid { get; set; }
     public List<Face> UpFaces { get; set; }

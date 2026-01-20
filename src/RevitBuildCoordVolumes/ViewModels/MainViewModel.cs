@@ -30,8 +30,12 @@ internal class MainViewModel : BaseViewModel {
     private ObservableCollection<DocumentViewModel> _documents;
     private ObservableCollection<DocumentViewModel> _filteredDocuments;
     private ObservableCollection<TypeZoneViewModel> _typeZones;
+    private ObservableCollection<LevelViewModel> _upLevels;
+    private ObservableCollection<LevelViewModel> _bottomLevels;
     private AlgorithmViewModel _selectedTypeAlgorithm;
     private TypeZoneViewModel _selectedTypeZone;
+    private LevelViewModel _selectedUpLevel;
+    private LevelViewModel _selectedBottomLevel;
     private string _squareSide;
     private ObservableCollection<ParamViewModel> _params;
     private ObservableCollection<SlabViewModel> _slabs;
@@ -97,9 +101,25 @@ internal class MainViewModel : BaseViewModel {
         get => _typeZones;
         set => RaiseAndSetIfChanged(ref _typeZones, value);
     }
+    public ObservableCollection<LevelViewModel> UpLevels {
+        get => _upLevels;
+        set => RaiseAndSetIfChanged(ref _upLevels, value);
+    }
+    public ObservableCollection<LevelViewModel> BottomLevels {
+        get => _bottomLevels;
+        set => RaiseAndSetIfChanged(ref _bottomLevels, value);
+    }
     public TypeZoneViewModel SelectedTypeZone {
         get => _selectedTypeZone;
         set => RaiseAndSetIfChanged(ref _selectedTypeZone, value);
+    }
+    public LevelViewModel SelectedUpLevel {
+        get => _selectedUpLevel;
+        set => RaiseAndSetIfChanged(ref _selectedUpLevel, value);
+    }
+    public LevelViewModel SelectedBottomLevel {
+        get => _selectedBottomLevel;
+        set => RaiseAndSetIfChanged(ref _selectedBottomLevel, value);
     }
     public string SquareSide {
         get => _squareSide;
@@ -142,7 +162,33 @@ internal class MainViewModel : BaseViewModel {
         set => RaiseAndSetIfChanged(ref _errorText, value);
     }
 
-    // Метод обновления параметра в TypeZones
+    // Метод обновления UpLevels и BottomLevels
+    private void UpdateLevels() {
+        UpLevels = new ObservableCollection<LevelViewModel>(GetLevelViewModels());
+        SelectedUpLevel = UpLevels.FirstOrDefault();
+        BottomLevels = new ObservableCollection<LevelViewModel>(UpLevels);
+        SelectedBottomLevel = BottomLevels.LastOrDefault();
+    }
+
+    // Метод получения коллекции LevelViewModel для UpLevels и BottomLevels
+    public IEnumerable<LevelViewModel> GetLevelViewModels() {
+        var typeSlabs = FilteredSlabs.Where(vm => vm.IsChecked).Select(vm => vm.Name);
+        var documents = FilteredDocuments.Where(vm => vm.IsChecked).Select(vm => vm.Document);
+
+        if(!typeSlabs.Any() || !documents.Any()) {
+            return [];
+        }
+        var slabs = _revitRepository.GetSlabsByTypesAndDocs(typeSlabs, documents);
+        var levels = slabs
+            .Select(slab => slab.Level)
+            .GroupBy(lvl => lvl.Id)
+            .Select(g => g.First())
+            .OrderByDescending(lvl => lvl.Elevation);
+        return levels
+            .Select(lvl => new LevelViewModel { Level = lvl, Name = lvl.Name });
+    }
+
+    // Метод обновления TypeZones
     private void UpdateTypeZones() {
         TypeZones = new ObservableCollection<TypeZoneViewModel>(GetTypeZoneViewModels());
         SelectedTypeZone = TypeZones.FirstOrDefault();
@@ -162,10 +208,14 @@ internal class MainViewModel : BaseViewModel {
                 .ThenBy(vm => vm.Name);
     }
 
-    // Метод обновления параметра в FilteredSlabs
+    // Метод обновления FilteredSlabs
     private void UpdateFilteredSlabs() {
         Slabs = new ObservableCollection<SlabViewModel>(GetSlabViewModels());
         FilteredSlabs = new ObservableCollection<SlabViewModel>(Slabs);
+        // Подписка на события в SlabViewModel
+        foreach(var slabVM in FilteredSlabs) {
+            slabVM.PropertyChanged += OnSlabChanged;
+        }
     }
 
     // Метод для реализации поиска в плитах перекрытия
@@ -175,6 +225,16 @@ internal class MainViewModel : BaseViewModel {
             : new ObservableCollection<SlabViewModel>(Slabs
                 .Where(item => item.Name
                 .IndexOf(SearchTextSlabs, StringComparison.OrdinalIgnoreCase) >= 0));
+    }
+
+    // Метод подписанный на событие изменения SlabViewModel
+    private void OnSlabChanged(object sender, PropertyChangedEventArgs e) {
+        if(sender is not SlabViewModel vm) {
+            return;
+        }
+        if(e.PropertyName == nameof(vm.IsChecked)) {
+            UpdateLevels();
+        }
     }
 
     // Метод получения коллекции SlabViewModel для Slabs
@@ -208,6 +268,7 @@ internal class MainViewModel : BaseViewModel {
         }
         if(e.PropertyName == nameof(vm.IsChecked)) {
             UpdateFilteredSlabs();
+            UpdateLevels();
         }
     }
 
@@ -299,7 +360,7 @@ internal class MainViewModel : BaseViewModel {
         IsAdvancedAlgorithm = SelectedTypeAlgorithm.AlgorithmType == AlgorithmType.AdvancedAreaExtrude;
     }
 
-    // Метод подписанный на события
+    // Метод подписанный на события MainViewModel
     private void OnPropertyChanged(object sender, PropertyChangedEventArgs e) {
         if(e.PropertyName == nameof(SelectedTypeAlgorithm)) {
             UpdateVisibilitySettings();
@@ -323,6 +384,7 @@ internal class MainViewModel : BaseViewModel {
             .ThenBy(vm => vm.Name);
     }
 
+    // Метод обновления свойства необходимости проверки зоны
     private void UpdateRequiredCheckArea() {
         RequiredCheckArea = true;
     }
@@ -348,8 +410,8 @@ internal class MainViewModel : BaseViewModel {
         Documents = new ObservableCollection<DocumentViewModel>(GetDocumentViewModels());
         FilteredDocuments = new ObservableCollection<DocumentViewModel>(Documents);
         // Подписка на события в DocumentViewModel
-        foreach(var document in FilteredDocuments) {
-            document.PropertyChanged += OnDocumentChanged;
+        foreach(var documentVM in FilteredDocuments) {
+            documentVM.PropertyChanged += OnDocumentChanged;
         }
 
         TypeZones = new ObservableCollection<TypeZoneViewModel>(GetTypeZoneViewModels());
@@ -357,6 +419,16 @@ internal class MainViewModel : BaseViewModel {
 
         Slabs = new ObservableCollection<SlabViewModel>(GetSlabViewModels());
         FilteredSlabs = new ObservableCollection<SlabViewModel>(Slabs);
+        // Подписка на события в SlabViewModel
+        foreach(var slabVM in FilteredSlabs) {
+            slabVM.PropertyChanged += OnSlabChanged;
+        }
+
+        UpLevels = new ObservableCollection<LevelViewModel>(GetLevelViewModels());
+        SelectedUpLevel = UpLevels.FirstOrDefault();
+
+        BottomLevels = new ObservableCollection<LevelViewModel>(UpLevels);
+        SelectedBottomLevel = BottomLevels.LastOrDefault();
 
         SquareSide = Convert.ToString(_buildCoordVolumesSettings.SquareSideMm);
 
@@ -423,14 +495,14 @@ internal class MainViewModel : BaseViewModel {
             ErrorText = _localizationService.GetLocalizedString("MainViewModel.NoTypeZone");
             return false;
         }
-        if(FilteredDocuments != null) {
+        if(FilteredDocuments != null && IsAdvancedAlgorithm) {
             var checkedDocs = FilteredDocuments.Where(p => p.IsChecked).ToList();
             if(checkedDocs.Count == 0) {
                 ErrorText = _localizationService.GetLocalizedString("MainViewModel.NoDocuments");
                 return false;
             }
         }
-        if(FilteredSlabs != null) {
+        if(FilteredSlabs != null && IsAdvancedAlgorithm) {
             var checkedSlabs = FilteredSlabs.Where(p => p.IsChecked).ToList();
             if(checkedSlabs.Count == 0) {
                 ErrorText = _localizationService.GetLocalizedString("MainViewModel.NoSlabs");
@@ -441,16 +513,16 @@ internal class MainViewModel : BaseViewModel {
             ErrorText = _localizationService.GetLocalizedString("MainViewModel.SquareSideNoDouble");
             return false;
         }
-        if(result < 0) {
+        if(result < 0 && IsAdvancedAlgorithm) {
             ErrorText = _localizationService.GetLocalizedString("MainViewModel.SquareSideNoNegate");
             return false;
-        } else if(result == 0) {
+        } else if(result == 0 && IsAdvancedAlgorithm) {
             ErrorText = _localizationService.GetLocalizedString("MainViewModel.SquareSideNoZero");
             return false;
-        } else if(result > 500) {
+        } else if(result > 500 && IsAdvancedAlgorithm) {
             ErrorText = _localizationService.GetLocalizedString("MainViewModel.SquareSideBig");
             return false;
-        } else if(result < 10) {
+        } else if(result < 10 && IsAdvancedAlgorithm) {
             ErrorText = _localizationService.GetLocalizedString("MainViewModel.SquareSideSmall");
             return false;
         }
@@ -495,12 +567,14 @@ internal class MainViewModel : BaseViewModel {
         };
     }
 
-    // Метод сохранения конфигурации пользователя
+    // Метод сохранения конфигурации пользователя и основных настроек программы
     private void SaveConfig() {
         var algorithmType = SelectedTypeAlgorithm.AlgorithmType;
         var documents = FilteredDocuments.Where(vm => vm.IsChecked).Select(d => d.Document).ToList();
         var typeSlabs = FilteredSlabs.Where(vm => vm.IsChecked).Select(vm => vm.Name).ToList();
         string typeZone = SelectedTypeZone.Name;
+        var upLevel = SelectedUpLevel.Level;
+        var bottomLevel = SelectedBottomLevel.Level;
         var paramMaps = Params.Where(vm => vm.IsChecked).Select(vm => vm.ParamMap).ToList();
         double squareSide = Convert.ToDouble(SquareSide);
 
@@ -509,6 +583,8 @@ internal class MainViewModel : BaseViewModel {
         _buildCoordVolumesSettings.TypeSlabs = typeSlabs;
         _buildCoordVolumesSettings.TypeZone = typeZone;
         _buildCoordVolumesSettings.ParamMaps = paramMaps;
+        _buildCoordVolumesSettings.UpLevel = upLevel;
+        _buildCoordVolumesSettings.BottomLevel = bottomLevel;
         _buildCoordVolumesSettings.SquareSideMm = squareSide;
 
         var configSettings = new ConfigSettings {

@@ -24,8 +24,25 @@ internal class SlabsService : ISlabsService {
             return [];
         }
         var foundSlabs = GetSlabsByDocs(documents)
-            .Where(slab => typeSlabs.Contains(slab.Name));
+            .Where(slab => typeSlabs.Contains(slab.FloorName));
         return foundSlabs;
+    }
+
+    public IEnumerable<SlabElement> GetSlabsByTypesDocsAndLevels(
+        IEnumerable<string> typeSlabs,
+        IEnumerable<Document> documents,
+        Level upLevel,
+        Level bottomLevel) {
+
+        double minElevation = Math.Min(bottomLevel.Elevation, upLevel.Elevation);
+        double maxElevation = Math.Max(bottomLevel.Elevation, upLevel.Elevation);
+
+        var slabs = GetSlabsByTypesAndDocs(typeSlabs, documents);
+
+        return slabs.Where(slab => {
+            double elev = slab.Level.Elevation;
+            return elev >= minElevation && elev <= maxElevation;
+        });
     }
 
     public IEnumerable<SlabElement> GetSlabsByDocs(IEnumerable<Document> documents) {
@@ -58,10 +75,12 @@ internal class SlabsService : ISlabsService {
             .Where(floor => !string.IsNullOrWhiteSpace(floor.Name))
             .Select(floor => {
                 var tansform = _documentsService.GetTransformByName(doc.GetUniqId());
+                var level = GetLevel(doc, floor);
                 return new SlabElement {
                     Floor = floor,
-                    Name = floor.Name,
-                    LevelName = GetLevelName(doc, floor),
+                    Level = level,
+                    FloorName = floor.Name,
+                    LevelName = GetLevelName(level),
                     Guid = Guid.NewGuid(),
                     Transform = tansform
                 };
@@ -69,9 +88,13 @@ internal class SlabsService : ISlabsService {
     }
 
     // Метод получения имени уровня, на котором расположена плита
-    private string GetLevelName(Document doc, Floor floor) {
+    private Level GetLevel(Document doc, Floor floor) {
         var elementId = floor.GetParamValueOrDefault<ElementId>(BuiltInParameter.LEVEL_PARAM);
-        var level = doc.GetElement(elementId) as Level;
+        return doc.GetElement(elementId) as Level;
+    }
+
+    // Метод получения имени уровня, на котором расположена плита
+    private string GetLevelName(Level level) {
         string levelName = level.Name;
         string modifyLevelName = levelName.Split(['_']).FirstOrDefault();
         return modifyLevelName ?? string.Empty;

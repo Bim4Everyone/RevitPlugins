@@ -28,8 +28,14 @@
     <system:String x:Key="MainWindow.SearchTextDocs">Поиск по имени файла</system:String>
 
     <system:String x:Key="MainWindow.TypeSlabs">Типоразмеры плит перекрытий</system:String>
-    <system:String x:Key="MainWindow.TypeSlabsDescription">Типоразмеры плит использующиеся для определения основы</system:String>
+    <system:String x:Key="MainWindow.TypeSlabsDescription">Типоразмеры плит использующихся для определения основы</system:String>
     <system:String x:Key="MainWindow.SearchTextSlabs">Поиск по имени типоразмера</system:String>
+
+    <system:String x:Key="MainWindow.LevelBottomSlabs">Нижний уровень плит перекрытий</system:String>
+    <system:String x:Key="MainWindow.LevelBottomSlabsDescription">Нижний уровень плит использующихся для определения основы</system:String>
+
+    <system:String x:Key="MainWindow.LevelUpSlabs">Верхний уровень плит перекрытий</system:String>
+    <system:String x:Key="MainWindow.LevelUpSlabsDescription">Верхний уровень плит использующихся для определения основы</system:String>
 
     <system:String x:Key="MainWindow.SquareSide">Длина стороны квадрата в мм</system:String>
     <system:String x:Key="MainWindow.SquareSideDescription">Квадраты, на которые разбивается зона для построения объема</system:String>
