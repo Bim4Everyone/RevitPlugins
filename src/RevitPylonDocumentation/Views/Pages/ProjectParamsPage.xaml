@@ -44,6 +44,7 @@
                     <Grid.RowDefinitions>
                         <RowDefinition Height="Auto" />
                         <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
                     </Grid.RowDefinitions>
 
                     <controls:SettingsTitleControl
@@ -174,6 +175,28 @@
                             SelectionChangedCommand="{Binding SettingsChangedCommand}"
                             ItemTemplate="{StaticResource WithFamilyNameItemTemplate}" />
                     </UniformGrid>
+
+
+                    <CheckBox
+                        Grid.Row="2"
+                        Margin="-5 10 0 5"
+                        Content="{me:LocalizationSource ProjectParams.DimensionGrouping}"
+                        IsChecked="{Binding Path=ProjectSettings.DimensionGrouping, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
+                        ToolTip="{me:LocalizationSource ProjectParams.DimensionGroupingTooltip}">
+                        <i:Interaction.Triggers>
+                            <i:EventTrigger
+                                EventName="Checked">
+                                <i:InvokeCommandAction
+                                    Command="{Binding SettingsChangedCommand}" />
+                            </i:EventTrigger>
+
+                            <i:EventTrigger
+                                EventName="Unchecked">
+                                <i:InvokeCommandAction
+                                    Command="{Binding SettingsChangedCommand}" />
+                            </i:EventTrigger>
+                        </i:Interaction.Triggers>
+                    </CheckBox>
                 </Grid>
             </Border>
         </ScrollViewer>

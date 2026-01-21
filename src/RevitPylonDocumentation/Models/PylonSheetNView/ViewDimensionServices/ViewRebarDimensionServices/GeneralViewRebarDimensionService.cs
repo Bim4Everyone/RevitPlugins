@@ -11,6 +11,7 @@ using RevitPylonDocumentation.Models.Services;
 
 namespace RevitPylonDocumentation.Models.PylonSheetNView.ViewDimensionServices.ViewRebarDimensionServices;
 internal class GeneralViewRebarDimensionService {
+    private readonly CreationSettings _settings;
     private readonly DimensionType _selectedDimensionType;
     private readonly Document _doc;
     private readonly PylonSheetInfo _sheetInfo;
@@ -22,6 +23,7 @@ internal class GeneralViewRebarDimensionService {
     internal GeneralViewRebarDimensionService(CreationSettings settings, Document document,
                                               PylonSheetInfo pylonSheetInfo, PylonView pylonView,
                                               DimensionBaseService dimensionBaseService) {
+        _settings = settings;
         _selectedDimensionType = settings.ProjectSettings.SelectedDimensionType;
         _doc = document;
         _sheetInfo = pylonSheetInfo;
@@ -42,7 +44,9 @@ internal class GeneralViewRebarDimensionService {
             var refArrayTop = _dimensionBaseService.GetDimensionRefs(skeletonParentRebar, ["верх", "фронт"]);
             var dimension = _doc.Create.NewDimension(_viewOfPylon.ViewElement, dimensionLineTop,
                                                                      refArrayTop, _selectedDimensionType);
-            dimension.SetParamValue(BuiltInParameter.DIM_DISPLAY_EQ, 2);
+            if(_settings.ProjectSettings.DimensionGrouping) {
+                dimension.SetParamValue(BuiltInParameter.DIM_DISPLAY_EQ, 2);
+            }
         } catch(Exception) { }
     }
 
@@ -56,7 +60,9 @@ internal class GeneralViewRebarDimensionService {
             var refArrayBottom = _dimensionBaseService.GetDimensionRefs(skeletonParentRebar, ["низ", "фронт"]);
             var dimension = _doc.Create.NewDimension(_viewOfPylon.ViewElement, dimensionLineBottom,
                                                                      refArrayBottom, _selectedDimensionType);
-            dimension.SetParamValue(BuiltInParameter.DIM_DISPLAY_EQ, 2);
+            if(_settings.ProjectSettings.DimensionGrouping) {
+                dimension.SetParamValue(BuiltInParameter.DIM_DISPLAY_EQ, 2);
+            }
         } catch(Exception) { }
     }
 

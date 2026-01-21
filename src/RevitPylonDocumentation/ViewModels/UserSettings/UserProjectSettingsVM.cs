@@ -29,6 +29,8 @@ internal class UserProjectSettingsVM : ValidatableViewModel {
     private string _breakLineTypeNameTemp = "Линейный обрыв";
     private string _concretingJointTypeNameTemp = "3 мм_М 20";
 
+    private bool _dimensionGrouping = true;
+
     private DimensionType _selectedDimensionType;
     private FamilySymbol _selectedSkeletonTagType;
     private FamilySymbol _selectedRebarTagTypeWithSerif;
@@ -122,6 +124,11 @@ internal class UserProjectSettingsVM : ValidatableViewModel {
     public string ConcretingJointTypeNameTemp {
         get => _concretingJointTypeNameTemp;
         set => RaiseAndSetIfChanged(ref _concretingJointTypeNameTemp, value);
+    }
+
+    public bool DimensionGrouping {
+        get => _dimensionGrouping;
+        set => RaiseAndSetIfChanged(ref _dimensionGrouping, value);
     }
 
     /// <summary>
@@ -240,6 +247,7 @@ internal class UserProjectSettingsVM : ValidatableViewModel {
             ValidateProperty(value);
         }
     }
+
 
     public bool CheckSettings() {
         // Пытаемся проверить виды

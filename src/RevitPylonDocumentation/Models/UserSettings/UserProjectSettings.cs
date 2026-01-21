@@ -13,6 +13,7 @@ internal class UserProjectSettings {
     public string UniversalTagTypeName { get; set; }
     public string BreakLineTypeName { get; set; }
     public string ConcretingJointTypeName { get; set; }
+    public bool DimensionGrouping { get; set; }
     public DimensionType SelectedDimensionType { get; set; }
     public FamilySymbol SelectedSkeletonTagType { get; set; }
     public FamilySymbol SelectedRebarTagTypeWithSerif { get; set; }

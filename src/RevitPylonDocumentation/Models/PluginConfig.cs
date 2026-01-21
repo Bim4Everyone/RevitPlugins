@@ -250,6 +250,7 @@ internal class PluginConfig : ProjectConfig<PluginSettings> {
         projectSettings.BreakLineTypeNameTemp = settings.BreakLineTypeName;
         projectSettings.ConcretingJointTypeName = settings.ConcretingJointTypeName;
         projectSettings.ConcretingJointTypeNameTemp = settings.ConcretingJointTypeName;
+        projectSettings.DimensionGrouping = settings.DimensionGrouping;
 
         sheetSettings.TitleBlockName = settings.TitleBlockName;
         sheetSettings.TitleBlockNameTemp = settings.TitleBlockName;
@@ -406,6 +407,7 @@ internal class PluginConfig : ProjectConfig<PluginSettings> {
 
         settings.BreakLineTypeName = projectSettings.BreakLineTypeName;
         settings.ConcretingJointTypeName = projectSettings.ConcretingJointTypeName;
+        settings.DimensionGrouping = projectSettings.DimensionGrouping;
 
         settings.TitleBlockName = sheetSettings.TitleBlockName;
         settings.SheetSize = sheetSettings.SheetSize;
@@ -454,6 +456,7 @@ internal class PluginSettings : ProjectSettings {
     public string UniversalTagTypeName { get; set; }
     public string BreakLineTypeName { get; set; }
     public string ConcretingJointTypeName { get; set; }
+    public bool DimensionGrouping { get; set; }
     public string SheetSize { get; set; }
     public string SheetCoefficient { get; set; }
     public bool CustomTitleBlockIsCheck { get; set; }

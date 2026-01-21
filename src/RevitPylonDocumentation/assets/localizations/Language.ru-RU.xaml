@@ -237,6 +237,8 @@
     <system:String x:Key="ProjectParams.DispatcherGroupingFirstParameterTooltip">Параметр для группировки диспетчера 1</system:String>
     <system:String x:Key="ProjectParams.DispatcherGroupingSecondParameter">Параметр для группировки диспетчера 2:</system:String>
     <system:String x:Key="ProjectParams.DispatcherGroupingSecondParameterTooltip">Параметр для группировки диспетчера 2</system:String>
+    <system:String x:Key="ProjectParams.DimensionGrouping">Необходимо выполнять группировку размеров</system:String>
+    <system:String x:Key="ProjectParams.DimensionGroupingTooltip">Если стоит галочка, то в создаваемых размерах в параметр "Отображение равенства" будет ставиться значение "Формула равенства"</system:String>
 
     <system:String x:Key="ProjectParams.SelectDimensionTypeSize">Выберите типоразмер размера:</system:String>
     <system:String x:Key="ProjectParams.SelectDimensionTypeSizeTooltip">Выберите типоразмер размера</system:String>
@@ -344,7 +346,7 @@
     <system:String x:Key="SheetParams.SheetCoefficientParameter">Параметр для множителя формата рамки листа:</system:String>
     <system:String x:Key="SheetParams.SheetCoefficientParameterTooltip">Параметр для множителя формата рамки листа</system:String>
     
-    <system:String x:Key="SheetParams.SetCustomTitleBlock">Задать пользовательский размер рамки листа:</system:String>
+    <system:String x:Key="SheetParams.SetCustomTitleBlock">Задать пользовательский размер ра:</system:String>
     <system:String x:Key="SheetParams.CustomSheetSizeParameterValue">Пользовательское значение параметра формата рамки листа:</system:String>
     <system:String x:Key="SheetParams.CustomSheetSizeParameterValueTooltip">Пользовательское значение параметра формата рамки листа</system:String>
     <system:String x:Key="SheetParams.CustomSheetCoefficientParameterValue">Пользовательское значение параметра множителя формата рамки листа:</system:String>

@@ -238,6 +238,8 @@
     <system:String x:Key="ProjectParams.DispatcherGroupingFirstParameterTooltip">Parameter for dispatcher grouping 1</system:String>
     <system:String x:Key="ProjectParams.DispatcherGroupingSecondParameter">Parameter for dispatcher grouping 2:</system:String>
     <system:String x:Key="ProjectParams.DispatcherGroupingSecondParameterTooltip">Parameter for dispatcher grouping 2</system:String>
+    <system:String x:Key="ProjectParams.DimensionGrouping">Dimensions grouping is needed</system:String>
+    <system:String x:Key="ProjectParams.DimensionGroupingTooltip">If the checkbox is checked, then the "Equality Formula" value will be set in the "Equality Display" parameter in the dimensions created.</system:String>
 
     <system:String x:Key="ProjectParams.SelectDimensionTypeSize">Select dimension type size:</system:String>
     <system:String x:Key="ProjectParams.SelectDimensionTypeSizeTooltip">Select dimension type size</system:String>
