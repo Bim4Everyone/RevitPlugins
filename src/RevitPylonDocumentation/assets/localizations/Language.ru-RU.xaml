@@ -59,6 +59,10 @@
     <system:String x:Key="VM.SecondTransverseViewElevationInvalid">Значение возвышения второго горизонтального вида некорректно</system:String>
     <system:String x:Key="VM.ThirdTransverseViewElevationInvalid">Значение возвышения третьего горизонтального вида некорректно</system:String>
 
+    <!-- View Sections Settings Validation Error Messages -->
+    <system:String x:Key="VM.CustomSheetSizeValueInvalid">Значение пользовательского формата рамки листа некорректно</system:String>
+    <system:String x:Key="VM.CustomSheetCoefficientValueInvalid">Значение пользовательского коэффициента формата рамки листа некорректно</system:String>
+
     <!-- MainWindow -->
     <system:String x:Key="MainWindow.Title">Документация пилонов</system:String>
     <system:String x:Key="MainWindow.Settings">Настройки</system:String>
@@ -339,9 +343,15 @@
     <system:String x:Key="SheetParams.SheetSizeParameterTooltip">Параметр для формата рамки листа</system:String>
     <system:String x:Key="SheetParams.SheetCoefficientParameter">Параметр для множителя формата рамки листа:</system:String>
     <system:String x:Key="SheetParams.SheetCoefficientParameterTooltip">Параметр для множителя формата рамки листа</system:String>
+    
+    <system:String x:Key="SheetParams.SetCustomTitleBlock">Задать пользовательский размер рамки листа:</system:String>
+    <system:String x:Key="SheetParams.CustomSheetSizeParameterValue">Пользовательское значение параметра формата рамки листа:</system:String>
+    <system:String x:Key="SheetParams.CustomSheetSizeParameterValueTooltip">Пользовательское значение параметра формата рамки листа</system:String>
+    <system:String x:Key="SheetParams.CustomSheetCoefficientParameterValue">Пользовательское значение параметра множителя формата рамки листа:</system:String>
+    <system:String x:Key="SheetParams.CustomSheetCoefficientParameterValueTooltip">Пользовательское значение параметра множителя формата рамки листа</system:String>
 
     <!-- GeneralPage ToolTips -->
-    <system:String x:Key="GeneralPage.DocumentationSetToolTip">Выберите комплект документации, с пилонами которого желаете поработать. Если вы хотите поработать с каким то конкретным пилоном, то нажмите кнопку справа "Выбрать пилон".&#10;После этого выберите в списке ниже нужные марки пилонов, и в списке справа виды/спецификации, которые хотите создать/разместить. Затем нажмите "Ок"&#10;Если в списке ничего не отображается или внизу окна написана ошибка оранжевым текстом - отредактируйте "Настройки" в правом верхем углу.</system:String>
+    <system:String x:Key="GeneralPage.DocumentationSetToolTip">Выберите комплект документации, с пилонами которого желаете поработать. Если вы хотите поработать с каким то конкретным пилоном, то нажмите кнопку справа "Выбрать пилон".&#10;После этого выберите в списке ниже нужные марки пилонов, и в списке справа виды/спецификации, которые хотите создать/разместить. Затем нажмите "Ок"&#10;Если в списке ничего не отображается или внизу окна написана ошибка оранжевым текстом - отредактируйте "Настройки" в правом верхнем углу.</system:String>
     <system:String x:Key="GeneralPage.SelectPylonToolTip">Чтобы выбрать какой то конкретный пилон вручную:&#10;1) нажмите эту кнопку;&#10;2) окно плагина закроется и вам будет предоставлена возможность выбора элемента - кликните на нужный пилон;&#10;3) окно плагина снова откроется и вы сможете продолжить настройки.</system:String>
     <system:String x:Key="GeneralPage.SearchPylonsToolTip">Введите текст для поиска в списке ниже</system:String>
     <system:String x:Key="GeneralPage.SelectAllPylonsToolTip">Нажмите, чтобы выбрать все марки пилонов, видимые в списке ниже</system:String>

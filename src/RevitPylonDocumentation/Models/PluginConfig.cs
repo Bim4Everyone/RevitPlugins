@@ -261,6 +261,12 @@ internal class PluginConfig : ProjectConfig<PluginSettings> {
         sheetSettings.SheetPrefixTemp = settings.SheetPrefix;
         sheetSettings.SheetSuffix = settings.SheetSuffix;
         sheetSettings.SheetSuffixTemp = settings.SheetSuffix;
+
+        sheetSettings.CustomTitleBlockIsCheck = settings.CustomTitleBlockIsCheck;
+        sheetSettings.CustomSheetSizeValue = settings.CustomSheetSizeValue;
+        sheetSettings.CustomSheetSizeValueTemp = settings.CustomSheetSizeValue;
+        sheetSettings.CustomSheetCoefficientValue = settings.CustomSheetCoefficientValue;
+        sheetSettings.CustomSheetCoefficientValueTemp = settings.CustomSheetCoefficientValue;
     }
 
     internal void SetConfigProps(PluginSettings settings, MainViewModel mainViewModel) {
@@ -406,6 +412,10 @@ internal class PluginConfig : ProjectConfig<PluginSettings> {
         settings.SheetCoefficient = sheetSettings.SheetCoefficient;
         settings.SheetPrefix = sheetSettings.SheetPrefix;
         settings.SheetSuffix = sheetSettings.SheetSuffix;
+
+        settings.CustomTitleBlockIsCheck = sheetSettings.CustomTitleBlockIsCheck;
+        settings.CustomSheetSizeValue = sheetSettings.CustomSheetSizeValue;
+        settings.CustomSheetCoefficientValue = sheetSettings.CustomSheetCoefficientValue;
     }
 }
 
@@ -446,6 +456,9 @@ internal class PluginSettings : ProjectSettings {
     public string ConcretingJointTypeName { get; set; }
     public string SheetSize { get; set; }
     public string SheetCoefficient { get; set; }
+    public bool CustomTitleBlockIsCheck { get; set; }
+    public string CustomSheetSizeValue { get; set; }
+    public string CustomSheetCoefficientValue { get; set; }
     public string SheetPrefix { get; set; }
     public string SheetSuffix { get; set; }
     public string TypicalPylonFilterParameter { get; set; }

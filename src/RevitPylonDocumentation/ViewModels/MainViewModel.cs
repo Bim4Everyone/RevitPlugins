@@ -281,7 +281,7 @@ internal class MainViewModel : BaseViewModel {
     /// Определяет можно ли запустить работу плагина
     /// </summary>
     private bool CanAcceptView() {
-        return ErrorText == string.Empty;
+        return SelectedHostsInfoVM.Any(item => item.IsCheck == true) && ErrorText == string.Empty;
     }
 
     /// <summary>

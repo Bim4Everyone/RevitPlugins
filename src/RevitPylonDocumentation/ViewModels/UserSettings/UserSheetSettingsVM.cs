@@ -21,6 +21,9 @@ internal class UserSheetSettingsVM : ValidatableViewModel {
     private string _sheetCoefficientTemp = "х";
     private string _titleBlockNameTemp = "Создать типы по комплектам";
     private FamilySymbol _selectedTitleBlock;
+    private bool _customTitleBlockIsCheck = false;
+    private string _customSheetSizeValueTemp = "1";
+    private string _customSheetCoefficientValueTemp = "1";
 
     public UserSheetSettingsVM(MainViewModel mainViewModel, RevitRepository repository,
                                ILocalizationService localizationService) {
@@ -64,7 +67,6 @@ internal class UserSheetSettingsVM : ValidatableViewModel {
         }
     }
 
-
     public string TitleBlockName { get; set; }
     public string TitleBlockNameTemp {
         get => _titleBlockNameTemp;
@@ -83,6 +85,34 @@ internal class UserSheetSettingsVM : ValidatableViewModel {
             ValidateProperty(value);
         }
     }
+
+    public bool CustomTitleBlockIsCheck {
+        get => _customTitleBlockIsCheck;
+        set => RaiseAndSetIfChanged(ref _customTitleBlockIsCheck, value);
+    }
+
+    public string CustomSheetSizeValue { get; set; }
+    [Required]
+    [RegularExpression(@"^-?\d+$")]
+    public string CustomSheetSizeValueTemp {
+        get => _customSheetSizeValueTemp;
+        set {
+            RaiseAndSetIfChanged(ref _customSheetSizeValueTemp, value);
+            ValidateProperty(value);
+        }
+    }
+
+    public string CustomSheetCoefficientValue { get; set; }
+    [Required]
+    [RegularExpression(@"^-?\d+$")]
+    public string CustomSheetCoefficientValueTemp {
+        get => _customSheetCoefficientValueTemp;
+        set {
+            RaiseAndSetIfChanged(ref _customSheetCoefficientValueTemp, value);
+            ValidateProperty(value);
+        }
+    }
+
 
     public bool CheckSettings() {
         if(SelectedTitleBlock is null) {
@@ -118,6 +148,15 @@ internal class UserSheetSettingsVM : ValidatableViewModel {
             transaction.RollBack();
 
             if(hasError) { return false; }
+        }
+
+        if(!int.TryParse(CustomSheetSizeValue, out _)) {
+            SetError(_localizationService.GetLocalizedString("VM.CustomSheetSizeValueInvalid"));
+            return false;
+        }
+        if(!int.TryParse(CustomSheetCoefficientValue, out _)) {
+            SetError(_localizationService.GetLocalizedString("VM.CustomSheetCoefficientValueInvalid"));
+            return false;
         }
         return true;
     }

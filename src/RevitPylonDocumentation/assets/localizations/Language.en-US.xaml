@@ -59,6 +59,10 @@
     <system:String x:Key="VM.SecondTransverseViewElevationInvalid">Second transverse view elevation value is incorrect</system:String>
     <system:String x:Key="VM.ThirdTransverseViewElevationInvalid">Third transverse view elevation value is incorrect</system:String>
     
+    <!-- View Sections Settings Validation Error Messages -->
+    <system:String x:Key="VM.CustomSheetSizeValueInvalid">The custom sheet frame format value is incorrect</system:String>
+    <system:String x:Key="VM.CustomSheetCoefficientValueInvalid">The custom sheet frame format factor value is incorrect</system:String>
+    
     <!-- MainWindow -->
     <system:String x:Key="MainWindow.Title">Pylon Documentation Automation</system:String>
     <system:String x:Key="MainWindow.Settings">Settings</system:String>
@@ -340,6 +344,12 @@
     <system:String x:Key="SheetParams.SheetSizeParameterTooltip">Parameter for sheet frame format</system:String>
     <system:String x:Key="SheetParams.SheetCoefficientParameter">Parameter for sheet frame format multiplier:</system:String>
     <system:String x:Key="SheetParams.SheetCoefficientParameterTooltip">Parameter for sheet frame format multiplier</system:String>
+
+    <system:String x:Key="SheetParams.SetCustomTitleBlock">Set a custom title block size:</system:String>
+    <system:String x:Key="SheetParams.CustomSheetSizeParameterValue">Custom value for sheet frame format parameter:</system:String>
+    <system:String x:Key="SheetParams.CustomSheetSizeParameterValueTooltip">Custom value for sheet frame format parameter</system:String>
+    <system:String x:Key="SheetParams.CustomSheetCoefficientParameterValue">Custom value for sheet frame format multiplier parameter:</system:String>
+    <system:String x:Key="SheetParams.CustomSheetCoefficientParameterValueTooltip">Custom value for sheet frame format multiplier parameter</system:String>
 
     <!-- GeneralPage ToolTips -->
     <system:String x:Key="GeneralPage.DocumentationSetToolTip">Select the documentation set with whose pylons you want to work. If you want to work with a specific pylon, click the "Select Pylon" button on the right.&#10;Then select the required pylon marks in the list below, and in the list on the right, select the views/schedules you want to create/place. Then click "OK".&#10;If nothing is displayed in the list or there is an error in orange text at the bottom of the window, edit the "Settings" in the upper right corner.</system:String>

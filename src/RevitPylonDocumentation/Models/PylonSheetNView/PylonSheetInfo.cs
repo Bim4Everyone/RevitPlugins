@@ -165,6 +165,11 @@ internal class PylonSheetInfo {
         var paramA = TitleBlock.LookupParameter(Settings.SheetSettings.SheetSize);
         var paramX = TitleBlock.LookupParameter(Settings.SheetSettings.SheetCoefficient);
 
+        if(Settings.SheetSettings.CustomTitleBlockIsCheck) {
+            sheetSize = int.Parse(Settings.SheetSettings.CustomSheetSizeValue);
+            sheetCoefficient = int.Parse(Settings.SheetSettings.CustomSheetCoefficientValue);
+        }
+
         if(paramA != null && paramX != null) {
             paramA.Set(sheetSize);
             paramX.Set(sheetCoefficient);
