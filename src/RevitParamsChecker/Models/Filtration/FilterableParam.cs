@@ -4,7 +4,7 @@ using Bim4Everyone.RevitFiltration.Controls;
 
 using dosymep.Bim4Everyone;
 
-namespace RevitParamsChecker.ViewModels.Filtration;
+namespace RevitParamsChecker.Models.Filtration;
 
 internal class FilterableParam : IParam {
     public FilterableParam(RevitParam revitParam, ElementId id) {

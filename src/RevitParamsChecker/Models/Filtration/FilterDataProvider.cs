@@ -12,9 +12,8 @@ using dosymep.Bim4Everyone.SystemParams;
 using dosymep.Revit;
 
 using RevitParamsChecker.Models.Revit;
-using RevitParamsChecker.ViewModels.Filtration;
 
-namespace RevitParamsChecker.Services;
+namespace RevitParamsChecker.Models.Filtration;
 
 internal class FilterDataProvider : IDataProvider {
     private readonly RevitRepository _revitRepository;
@@ -51,24 +50,24 @@ internal class FilterDataProvider : IDataProvider {
                         _revitRepository.Document,
                         (BuiltInParameter) paramId.GetIdValue()),
                     paramId);
-            } else {
-                var element = _revitRepository.Document.GetElement(paramId);
-                if(element is SharedParameterElement sharedParameterElement) {
-                    return new FilterableParam(
-                        SharedParamsConfig.Instance.CreateRevitParam(
-                            _revitRepository.Document,
-                            sharedParameterElement.Name),
-                        paramId);
-                }
-
-                if(element is ParameterElement parameterElement) {
-                    return new FilterableParam(
-                        ProjectParamsConfig.Instance.CreateRevitParam(_revitRepository.Document, parameterElement.Name),
-                        paramId);
-                }
-
-                return null;
             }
+
+            var element = _revitRepository.Document.GetElement(paramId);
+            if(element is SharedParameterElement sharedParameterElement) {
+                return new FilterableParam(
+                    SharedParamsConfig.Instance.CreateRevitParam(
+                        _revitRepository.Document,
+                        sharedParameterElement.Name),
+                    paramId);
+            }
+
+            if(element is ParameterElement parameterElement) {
+                return new FilterableParam(
+                    ProjectParamsConfig.Instance.CreateRevitParam(_revitRepository.Document, parameterElement.Name),
+                    paramId);
+            }
+
+            return null;
         } catch(Exception) {
             return null;
         }
