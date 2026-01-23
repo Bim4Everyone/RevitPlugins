@@ -8,6 +8,8 @@
     <system:String x:Key="MainWindow.DocTypeError">The plugin is not designed to work with families.</system:String>
     <system:String x:Key="MainWindow.TabTypesName">Consumable types</system:String>
     <system:String x:Key="MainWindow.TabDestinationName">Consumable assignment</system:String>
+    <system:String x:Key="MainWindow.FormulaVariables">Available variables</system:String>
+    <system:String x:Key="MainWindow.PlaceholderBracesHint">Use curly braces for variables: {Variable}</system:String>
     
     <system:String x:Key="MainWindow.ButtonOk">OK</system:String>
     <system:String x:Key="MainWindow.ButtonCancel">Cancel</system:String>

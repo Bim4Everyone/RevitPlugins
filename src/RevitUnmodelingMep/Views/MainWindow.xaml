@@ -130,8 +130,13 @@
                 Grid.Column="0"
                 Style="{StaticResource CardBorder}"
                 Padding="12">
-                <StackPanel>
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="*" />
+                    </Grid.RowDefinitions>
                     <ListBox
+                        Grid.Row="0"
                         x:Name="NavigationList"
                         BorderThickness="0"
                         Background="Transparent"
@@ -140,7 +145,70 @@
                         <ListBoxItem Content="{me:LocalizationSource MainWindow.TabTypesName}" />
                         <ListBoxItem Content="{me:LocalizationSource MainWindow.TabDestinationName}" />
                     </ListBox>
-                </StackPanel>
+
+                    <Border
+                        Grid.Row="1"
+                        Margin="0 12 0 0"
+                        IsHitTestVisible="False">
+                        <Border.Style>
+                            <Style TargetType="Border" BasedOn="{StaticResource CardBorder}">
+                                <Setter Property="Visibility" Value="Collapsed" />
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding IsHintVisible}" Value="True">
+                                        <Setter Property="Visibility" Value="Visible" />
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </Border.Style>
+
+                        <Grid>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto" />
+                                <RowDefinition Height="Auto" />
+                                <RowDefinition Height="*" />
+                            </Grid.RowDefinitions>
+
+                            <TextBlock
+                                Grid.Row="0"
+                                FontWeight="SemiBold"
+                                Text="{Binding HintTitle}" />
+
+                            <TextBlock
+                                Grid.Row="1"
+                                Margin="0 8 0 0"
+                                TextWrapping="Wrap"
+                                Opacity="0.8"
+                                Text="{Binding HintInfoText}">
+                                <TextBlock.Style>
+                                    <Style TargetType="TextBlock">
+                                        <Setter Property="Visibility" Value="Collapsed" />
+                                        <Style.Triggers>
+                                            <DataTrigger Binding="{Binding IsHintInfoVisible}" Value="True">
+                                                <Setter Property="Visibility" Value="Visible" />
+                                            </DataTrigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </TextBlock.Style>
+                            </TextBlock>
+
+                            <ScrollViewer
+                                Grid.Row="2"
+                                Margin="0 8 0 0"
+                                VerticalScrollBarVisibility="Auto">
+                                <ItemsControl ItemsSource="{Binding ActiveHintItems}">
+                                    <ItemsControl.ItemTemplate>
+                                        <DataTemplate>
+                                            <TextBlock
+                                                Margin="0 2 0 0"
+                                                FontFamily="Consolas"
+                                                Text="{Binding}" />
+                                        </DataTemplate>
+                                    </ItemsControl.ItemTemplate>
+                                </ItemsControl>
+                            </ScrollViewer>
+                        </Grid>
+                    </Border>
+                </Grid>
             </Border>
 
             <Border
@@ -221,11 +289,14 @@
                                                                 MinHeight="32"
                                                                 Text="{Binding Grouping, UpdateSourceTrigger=PropertyChanged}" />
 
-                                                            <TextBlock
-                                                                Style="{StaticResource FieldLabel}"
-                                                                Text="{DynamicResource MainWindow.FullName}" />
-                                                            <ui:TextBox
-                                                                Text="{Binding Name, UpdateSourceTrigger=PropertyChanged}" />
+                                    <TextBlock
+                                        Style="{StaticResource FieldLabel}"
+                                        Text="{DynamicResource MainWindow.FullName}"
+                                        PreviewMouseLeftButtonDown="FullNameLabel_PreviewMouseLeftButtonDown" />
+                                    <ui:TextBox
+                                        Text="{Binding Name, UpdateSourceTrigger=PropertyChanged}"
+                                        GotKeyboardFocus="FullNameTextBox_GotKeyboardFocus"
+                                        LostKeyboardFocus="FullNameTextBox_LostKeyboardFocus" />
 
                                                             <TextBlock
                                                                 Style="{StaticResource FieldLabel}"
@@ -258,7 +329,9 @@
                                                                 AcceptsReturn="True"
                                                                 Height="90"
                                                                 TextWrapping="Wrap"
-                                                                Text="{Binding Formula, UpdateSourceTrigger=PropertyChanged}" />
+                                                                Text="{Binding Formula, UpdateSourceTrigger=PropertyChanged}"
+                                                                GotKeyboardFocus="FormulaTextBox_GotKeyboardFocus"
+                                                                LostKeyboardFocus="FormulaTextBox_LostKeyboardFocus" />
 
                                                             <TextBlock
                                                                 Style="{StaticResource FieldLabel}"
@@ -267,7 +340,9 @@
                                                                 AcceptsReturn="True"
                                                                 Height="60"
                                                                 TextWrapping="Wrap"
-                                                                Text="{Binding Note, UpdateSourceTrigger=PropertyChanged}" />
+                                                                Text="{Binding Note, UpdateSourceTrigger=PropertyChanged}"
+                                                                GotKeyboardFocus="NoteTextBox_GotKeyboardFocus"
+                                                                LostKeyboardFocus="NoteTextBox_LostKeyboardFocus" />
                                                         </StackPanel>
                                                     </Border>
                                                 </Expander>

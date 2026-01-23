@@ -8,6 +8,8 @@
     <system:String x:Key="MainWindow.DocTypeError">Плагин не предназначен для работы с семействами</system:String>
     <system:String x:Key="MainWindow.TabTypesName">Типы расходников</system:String>
     <system:String x:Key="MainWindow.TabDestinationName">Назначение расходников</system:String>
+    <system:String x:Key="MainWindow.FormulaVariables">Доступные переменные</system:String>
+    <system:String x:Key="MainWindow.PlaceholderBracesHint">Переменные нужно писать внутри фигурных скобок: {Переменная}</system:String>
     
     <system:String x:Key="MainWindow.ButtonOk">ОК</system:String>
     <system:String x:Key="MainWindow.ButtonCancel">Отмена</system:String>

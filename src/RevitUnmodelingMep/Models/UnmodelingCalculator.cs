@@ -256,10 +256,10 @@ internal class UnmodelingCalculator {
         string result = noteFormula;
 
         var tokens = new Dictionary<string, string> {
-            { "SumArea_m2", FormatValue(sumArea) },
-            { "SumLength_mm", FormatValue(sumLength_mm) },
-            { "SumLength_m", FormatValue(sumLength_m) },
-            { "Count", FormatValue(count) }
+            { FormulaValidator.NoteTokenSumArea_m2, FormatValue(sumArea) },
+            { FormulaValidator.NoteTokenSumLength_mm, FormatValue(sumLength_mm) },
+            { FormulaValidator.NoteTokenSumLength_m, FormatValue(sumLength_m) },
+            { FormulaValidator.NoteTokenCount, FormatValue(count) }
         };
 
         foreach(var token in tokens) {

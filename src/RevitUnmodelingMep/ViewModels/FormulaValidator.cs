@@ -15,6 +15,20 @@ using RevitUnmodelingMep.Models.Entities;
 namespace RevitUnmodelingMep.ViewModels;
 
 internal static class FormulaValidator {
+    public const string NoteTokenSumArea_m2 = "SumArea_m2";
+    public const string NoteTokenSumLength_mm = "SumLength_mm";
+    public const string NoteTokenSumLength_m = "SumLength_m";
+    public const string NoteTokenCount = "Count";
+
+    public static IReadOnlyList<string> GetAllowedNoteTokens() {
+        return new[] {
+            NoteTokenSumArea_m2,
+            NoteTokenSumLength_mm,
+            NoteTokenSumLength_m,
+            NoteTokenCount
+        };
+    }
+
     public static string NormalizeFormula(string formula) {
         if(string.IsNullOrEmpty(formula))
             return formula;
