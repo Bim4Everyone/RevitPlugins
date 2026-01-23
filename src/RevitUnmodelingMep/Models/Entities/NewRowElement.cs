@@ -10,6 +10,7 @@ namespace RevitUnmodelingMep.Models.Entities;
 
 internal class NewRowElement {
     private Element _element;
+    private CalculationElementBase _calculationElement;
     private string _system;
     private string _function;
     private string _group;
@@ -106,6 +107,12 @@ internal class NewRowElement {
         get => _smrFloorDE;
         set => _smrFloorDE = value;
     }
+
+    public CalculationElementBase CalculationElement {
+        get => _calculationElement;
+        set => _calculationElement = value;
+    }
+
     public Element Element { 
         get => _element; 
         set => _element = value; 

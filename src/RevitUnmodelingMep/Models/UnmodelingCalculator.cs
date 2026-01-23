@@ -137,8 +137,9 @@ internal class UnmodelingCalculator {
                         element.GetParamValueOrDefault<string>(SharedParamsConfig.Instance.VISSystemName, "");
                 }
 
+                CalculationElementBase calcElement = GetGeometricDescription(element);
 
-                string name = config.Name;
+                string name = CreateName(config.Name, calcElement);
                 string mark = config.Mark;
                 string code = config.Code;
                 string maker = config.Maker;
@@ -146,10 +147,13 @@ internal class UnmodelingCalculator {
 
                 string group = $"{config.Grouping}_{name}_{mark}_{code}_{maker}";
 
+                
+
                 NewRowElement newRow = new NewRowElement {
                     System = system,
                     Function = economicFunction,
                     Element = element,
+                    CalculationElement = calcElement,
                     Group = group,
                     SmrBlock = smrBlock,
                     SmrSection = smrSection,
@@ -176,6 +180,25 @@ internal class UnmodelingCalculator {
         return elementsByGrouping;
     }
 
+    private string CreateName(string baseName, CalculationElementBase calculationElement) {
+        foreach(var property in calculationElement.GetType().GetProperties()) {
+            if(!property.CanRead)
+                continue;
+
+            object value = property.GetValue(calculationElement);
+
+            string placeholder = "{" + property.Name + "}";
+            if(baseName.Contains(placeholder)) {
+                baseName = baseName.Replace(
+                    placeholder,
+                    value != null ? value.ToString() : string.Empty
+                );
+            }
+        }
+
+        return baseName;
+    }
+
     private NewRowElement GetFinalRow(List<NewRowElement> draftRows, ConsumableTypeItem config) {
         if(draftRows == null || draftRows.Count == 0) {
             return new NewRowElement();
@@ -184,7 +207,8 @@ internal class UnmodelingCalculator {
         List<CalculationElementBase> calculationElements = new List<CalculationElementBase>();
 
         foreach(NewRowElement draftRow in draftRows) {
-            CalculationElementBase calcElement = GetGeometricDescription(draftRow.Element);
+            CalculationElementBase calcElement = draftRow.CalculationElement ?? GetGeometricDescription(draftRow.Element);
+            draftRow.CalculationElement = calcElement;
             draftRow.Number = CalculateFormula(config, calcElement);
             calculationElements.Add(calcElement);
         }
@@ -229,11 +253,21 @@ internal class UnmodelingCalculator {
             return rounded.ToString("0.##", CultureInfo.InvariantCulture);
         }
 
-        string result = noteFormula
-            .Replace("SumArea_m2", FormatValue(sumArea))
-            .Replace("SumLength_mm", FormatValue(sumLength_mm))
-            .Replace("SumLength_m", FormatValue(sumLength_m))
-            .Replace("Count", FormatValue(count));
+        string result = noteFormula;
+
+        var tokens = new Dictionary<string, string> {
+            { "SumArea_m2", FormatValue(sumArea) },
+            { "SumLength_mm", FormatValue(sumLength_mm) },
+            { "SumLength_m", FormatValue(sumLength_m) },
+            { "Count", FormatValue(count) }
+        };
+
+        foreach(var token in tokens) {
+            string placeholder = "{" + token.Key + "}";
+            if(result.Contains(placeholder)) {
+                result = result.Replace(placeholder, token.Value);
+            }
+        }
 
         return result;
     }
