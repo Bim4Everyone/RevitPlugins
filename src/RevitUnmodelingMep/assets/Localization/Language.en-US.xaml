@@ -26,7 +26,6 @@
     <system:String x:Key="MainWindow.Code">Product code</system:String>
     <system:String x:Key="MainWindow.Unit">Unit</system:String>
     <system:String x:Key="MainWindow.Creator">Manufacturer</system:String>
-    <system:String x:Key="MainWindow.UseProjectStock">Use project category stock</system:String>
     <system:String x:Key="MainWindow.Formula">Formula</system:String>
     <system:String x:Key="MainWindow.Note">Note formula</system:String>
 

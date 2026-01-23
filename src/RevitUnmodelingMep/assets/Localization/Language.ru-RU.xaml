@@ -26,7 +26,6 @@
     <system:String x:Key="MainWindow.Code">Код изделия</system:String>
     <system:String x:Key="MainWindow.Unit">Ед. изм.</system:String>
     <system:String x:Key="MainWindow.Creator">Производитель</system:String>
-    <system:String x:Key="MainWindow.UseProjectStock">Использовать проектные запасы по категории</system:String>
     <system:String x:Key="MainWindow.Formula">Формула</system:String>
     <system:String x:Key="MainWindow.Note">Формула примечания</system:String>
 
