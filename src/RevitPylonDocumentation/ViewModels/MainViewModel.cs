@@ -52,11 +52,12 @@ internal class MainViewModel : BaseViewModel {
         SelectionSettings = new UserSelectionSettingsVM();
         VerticalViewSettings = new UserVerticalViewSettingsPageVM(this, _localizationService);
         TransverseViewSettings = new UserTransverseViewSettingsPageVM(this, _localizationService);
-        SchedulesSettings = new UserSchedulesSettingsPageVM(this);
+        SchedulesSettings = new UserSchedulesSettingsPageVM(this, _localizationService);
         ScheduleFiltersSettings = new UserScheduleFiltersSettingsPageVM(this, _localizationService);
         LegendsAndAnnotationsSettings = new UserLegendsAndAnnotationsSettingsVM(this, _localizationService);
         PylonSettings = new UserPylonSettingsVM(this, _revitRepository, _localizationService);
-        ProjectSettings = new UserProjectSettingsVM(this, _revitRepository, _localizationService);
+        AnnotationSettings = new UserAnnotationSettingsVM(this, _revitRepository, _localizationService);
+        DispatcherSettings = new UserDispatcherSettingsVM(this, _revitRepository, _localizationService);
         SheetSettings = new UserSheetSettingsVM(this, _revitRepository, _localizationService);
 
         ViewFamilyTypes = _revitRepository.ViewFamilyTypes;
@@ -118,9 +119,14 @@ internal class MainViewModel : BaseViewModel {
     public UserSelectionSettingsVM SelectionSettings { get; set; }
 
     /// <summary>
-    /// Настройки параметров проекта с предыдущего сеанса
+    /// Настройки параметров типоразмеров проекта с предыдущего сеанса
     /// </summary>
-    public UserProjectSettingsVM ProjectSettings { get; set; }
+    public UserAnnotationSettingsVM AnnotationSettings { get; set; }
+
+    /// <summary>
+    /// Настройки параметров диспетчера проекта с предыдущего сеанса
+    /// </summary>
+    public UserDispatcherSettingsVM DispatcherSettings { get; set; }
 
     /// <summary>
     /// Настройки параметров листов с предыдущего сеанса
@@ -399,7 +405,8 @@ internal class MainViewModel : BaseViewModel {
         ScheduleFiltersSettings.ApplySettings();
         LegendsAndAnnotationsSettings.ApplySettings();
         PylonSettings.ApplySettings();
-        ProjectSettings.ApplySettings();
+        AnnotationSettings.ApplySettings();
+        DispatcherSettings.ApplySettings();
         SheetSettings.ApplySettings();
 
         // Получаем заново список заполненных разделов проекта
@@ -420,15 +427,15 @@ internal class MainViewModel : BaseViewModel {
         SchedulesSettings.FindSystemPartsSchedule();
         SchedulesSettings.FindIfcPartsSchedule();
 
-        ProjectSettings.FindDimensionType();
-        ProjectSettings.FindSpotDimensionType();
-        ProjectSettings.FindSkeletonTagType();
-        ProjectSettings.FindRebarTagTypeWithSerif();
-        ProjectSettings.FindRebarTagTypeWithStep();
-        ProjectSettings.FindRebarTagTypeWithComment();
-        ProjectSettings.FindUniversalTagType();
-        ProjectSettings.FindBreakLineType();
-        ProjectSettings.FindConcretingJointType();
+        AnnotationSettings.FindDimensionType();
+        AnnotationSettings.FindSpotDimensionType();
+        AnnotationSettings.FindSkeletonTagType();
+        AnnotationSettings.FindRebarTagTypeWithSerif();
+        AnnotationSettings.FindRebarTagTypeWithStep();
+        AnnotationSettings.FindRebarTagTypeWithComment();
+        AnnotationSettings.FindUniversalTagType();
+        AnnotationSettings.FindBreakLineType();
+        AnnotationSettings.FindConcretingJointType();
         LegendsAndAnnotationsSettings.FindLegend();
         SheetSettings.FindTitleBlock();
 
@@ -449,11 +456,15 @@ internal class MainViewModel : BaseViewModel {
             return;
         if(!TransverseViewSettings.CheckSettings())
             return;
+        if(!SchedulesSettings.CheckSettings())
+            return;
         if(!LegendsAndAnnotationsSettings.CheckSettings())
             return;
         if(!PylonSettings.CheckSettings())
             return;
-        if(!ProjectSettings.CheckSettings())
+        if(!AnnotationSettings.CheckSettings())
+            return;
+        if(!DispatcherSettings.CheckSettings())
             return;
         if(!SheetSettings.CheckSettings())
             return;
@@ -474,7 +485,8 @@ internal class MainViewModel : BaseViewModel {
             ScheduleFiltersSettings.GetSettings<UserScheduleFiltersSettings>(),
             LegendsAndAnnotationsSettings.GetSettings<UserLegendsAndAnnotationsSettings>(),
             PylonSettings.GetSettings<UserPylonSettings>(),
-            ProjectSettings.GetSettings<UserProjectSettings>(),
+            AnnotationSettings.GetSettings<UserAnnotationSettings>(),
+            DispatcherSettings.GetSettings<UserDispatcherSettings>(),
             SheetSettings.GetSettings<UserSheetSettings>());
 
         var paramValService = new ParamValueService(_revitRepository);

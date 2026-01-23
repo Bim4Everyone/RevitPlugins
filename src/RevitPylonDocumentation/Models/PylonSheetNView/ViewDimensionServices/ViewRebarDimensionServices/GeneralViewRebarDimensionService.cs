@@ -24,7 +24,7 @@ internal class GeneralViewRebarDimensionService {
                                               PylonSheetInfo pylonSheetInfo, PylonView pylonView,
                                               DimensionBaseService dimensionBaseService) {
         _settings = settings;
-        _selectedDimensionType = settings.ProjectSettings.SelectedDimensionType;
+        _selectedDimensionType = settings.AnnotationSettings.SelectedDimensionType;
         _doc = document;
         _sheetInfo = pylonSheetInfo;
         _viewOfPylon = pylonView;
@@ -44,7 +44,7 @@ internal class GeneralViewRebarDimensionService {
             var refArrayTop = _dimensionBaseService.GetDimensionRefs(skeletonParentRebar, ["верх", "фронт"]);
             var dimension = _doc.Create.NewDimension(_viewOfPylon.ViewElement, dimensionLineTop,
                                                                      refArrayTop, _selectedDimensionType);
-            if(_settings.ProjectSettings.DimensionGrouping) {
+            if(_settings.AnnotationSettings.DimensionGrouping) {
                 dimension.SetParamValue(BuiltInParameter.DIM_DISPLAY_EQ, 2);
             }
         } catch(Exception) { }
@@ -60,7 +60,7 @@ internal class GeneralViewRebarDimensionService {
             var refArrayBottom = _dimensionBaseService.GetDimensionRefs(skeletonParentRebar, ["низ", "фронт"]);
             var dimension = _doc.Create.NewDimension(_viewOfPylon.ViewElement, dimensionLineBottom,
                                                                      refArrayBottom, _selectedDimensionType);
-            if(_settings.ProjectSettings.DimensionGrouping) {
+            if(_settings.AnnotationSettings.DimensionGrouping) {
                 dimension.SetParamValue(BuiltInParameter.DIM_DISPLAY_EQ, 2);
             }
         } catch(Exception) { }

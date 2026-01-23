@@ -142,7 +142,7 @@ internal class TransViewVertDimensionService {
         var formworkFrontDimOffset = new DimensionLineOffsetOption(dimensionLineHostRef, DirectionType.Bottom,
                                                                    formworkFrontDimensionLineOffset);
         _dimCreationService.CreateDimension(refArrayFormworkFront, formworkFrontDimOffset,
-                                            needEqualityFormula: _settings.ProjectSettings.DimensionGrouping);
+                                            needEqualityFormula: _settings.AnnotationSettings.DimensionGrouping);
     }
 
     /// <summary>

@@ -1,9 +1,7 @@
 using Autodesk.Revit.DB;
 
 namespace RevitPylonDocumentation.Models.UserSettings;
-internal class UserProjectSettings {
-    public string DispatcherGroupingFirst { get; set; }
-    public string DispatcherGroupingSecond { get; set; }
+internal class UserAnnotationSettings {
     public string DimensionTypeName { get; set; }
     public string SpotDimensionTypeName { get; set; }
     public string SkeletonTagTypeName { get; set; }

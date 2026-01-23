@@ -107,7 +107,7 @@ internal class PylonSheetInfo {
         PylonViewSheet = ViewSheet.Create(Repository.Document, Settings.SheetSettings.SelectedTitleBlock.Id);
         PylonViewSheet.Name = Settings.SheetSettings.SheetPrefix + PylonKeyName + Settings.SheetSettings.SheetSuffix;
 
-        var viewSheetGroupingParameter = PylonViewSheet.LookupParameter(Settings.ProjectSettings.DispatcherGroupingFirst);
+        var viewSheetGroupingParameter = PylonViewSheet.LookupParameter(Settings.DispatcherSettings.DispatcherGroupingFirst);
         if(viewSheetGroupingParameter == null) {
         } else {
             viewSheetGroupingParameter.Set(ProjectSection);

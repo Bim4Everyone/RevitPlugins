@@ -123,7 +123,7 @@ internal class UserSheetSettingsVM : ValidatableViewModel {
         using(var transaction = _revitRepository.Document.StartTransaction("Checking parameters on sheet")) {
             // Листов в проекте может не быть или рамка может быть другая, поэтому создаем свой лист для тестов с нужной рамкой
             var viewSheet = ViewSheet.Create(_revitRepository.Document, _viewModel.SheetSettings.SelectedTitleBlock.Id);
-            if(viewSheet?.LookupParameter(_viewModel.ProjectSettings.DispatcherGroupingFirst) is null) {
+            if(viewSheet?.LookupParameter(_viewModel.DispatcherSettings.DispatcherGroupingFirst) is null) {
                 SetError(_localizationService.GetLocalizedString("VM.DispatcherGroupingFirstParamInvalid"));
             }
 

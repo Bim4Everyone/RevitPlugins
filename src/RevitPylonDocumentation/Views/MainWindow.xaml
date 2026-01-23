@@ -72,10 +72,12 @@
                     TargetPageType="{x:Type pages:GeneralPage}" />
 
                 <ui:NavigationViewItem
-                    Content="{me:LocalizationSource MainWindow.SettingsMenu}"
-                    Icon="{ui:SymbolIcon Settings24}"
+                    Content="{me:LocalizationSource MainWindow.SheetComponentsMenu}"
+                    Icon="{ui:SymbolIcon SlideSettings24}"
                     IsExpanded="True">
-                    <ui:NavigationViewItem.MenuItems >
+
+                    <ui:NavigationViewItem.MenuItems>
+
                         <ui:NavigationViewItem
                             Content="{me:LocalizationSource MainWindow.VerticalViews}"
                             Icon="{ui:SymbolIcon CenterHorizontal24}"
@@ -88,6 +90,7 @@
                                 </ui:InfoBadge>
                             </ui:NavigationViewItem.InfoBadge>
                         </ui:NavigationViewItem>
+
                         <ui:NavigationViewItem
                             Content="{me:LocalizationSource MainWindow.TransverseViews}"
                             Icon="{ui:SymbolIcon CenterVertical24}"
@@ -100,6 +103,7 @@
                                 </ui:InfoBadge>
                             </ui:NavigationViewItem.InfoBadge>
                         </ui:NavigationViewItem>
+
                         <ui:NavigationViewItem
                             Content="{me:LocalizationSource MainWindow.Schedules}"
                             Icon="{ui:SymbolIcon TableSettings24}"
@@ -112,11 +116,13 @@
                                 </ui:InfoBadge>
                             </ui:NavigationViewItem.InfoBadge>
                         </ui:NavigationViewItem>
+
                         <ui:NavigationViewItem
                             Content="{me:LocalizationSource MainWindow.ScheduleFilters}"
                             Icon="{ui:SymbolIcon DataUsageSettings20}"
                             TargetPageType="{x:Type pages:ScheduleFiltersPage}"
-                            ToolTip="{me:LocalizationSource MainWindow.ScheduleFiltersSettings}"/>
+                            ToolTip="{me:LocalizationSource MainWindow.ScheduleFiltersSettings}" />
+
                         <ui:NavigationViewItem
                             Content="{me:LocalizationSource MainWindow.LegendsAndAnnotations}"
                             Icon="{ui:SymbolIcon BarcodeScanner24}"
@@ -129,6 +135,15 @@
                                 </ui:InfoBadge>
                             </ui:NavigationViewItem.InfoBadge>
                         </ui:NavigationViewItem>
+                    </ui:NavigationViewItem.MenuItems>
+                </ui:NavigationViewItem>
+
+                <ui:NavigationViewItem
+                    Content="{me:LocalizationSource MainWindow.ProjectParametersMenu}"
+                    Icon="{ui:SymbolIcon ContentSettings24}"
+                    IsExpanded="True">
+                    <ui:NavigationViewItem.MenuItems>
+
                         <ui:NavigationViewItem
                             Content="{me:LocalizationSource MainWindow.PylonParameters}"
                             Icon="{ui:SymbolIcon PauseSettings20}"
@@ -141,18 +156,33 @@
                                 </ui:InfoBadge>
                             </ui:NavigationViewItem.InfoBadge>
                         </ui:NavigationViewItem>
+
                         <ui:NavigationViewItem
-                            Content="{me:LocalizationSource MainWindow.ProjectParameters}"
-                            Icon="{ui:SymbolIcon ArchiveSettings24}"
-                            TargetPageType="{x:Type pages:ProjectParamsPage}"
-                            ToolTip="{me:LocalizationSource MainWindow.ProjectParametersSettings}">
+                            Content="{me:LocalizationSource MainWindow.AnnotationParameters}"
+                            Icon="{ui:SymbolIcon MoneySettings20}"
+                            TargetPageType="{x:Type pages:AnnotationParamsPage}"
+                            ToolTip="{me:LocalizationSource MainWindow.AnnotationParametersSettings}">
                             <ui:NavigationViewItem.InfoBadge>
                                 <ui:InfoBadge
                                     Style="{StaticResource RoundInfoBadgeStyle}"
-                                    Visibility="{Binding Path=ProjectSettings.HasErrors, Converter={StaticResource BooleanToVisibilityConverter}}">
+                                    Visibility="{Binding Path=AnnotationSettings.HasErrors, Converter={StaticResource BooleanToVisibilityConverter}}">
                                 </ui:InfoBadge>
                             </ui:NavigationViewItem.InfoBadge>
                         </ui:NavigationViewItem>
+
+                        <ui:NavigationViewItem
+                            Content="{me:LocalizationSource MainWindow.DispatcherParameters}"
+                            Icon="{ui:SymbolIcon TextGrammarSettings24}"
+                            TargetPageType="{x:Type pages:DispatcherParamsPage}"
+                            ToolTip="{me:LocalizationSource MainWindow.DispatcherParametersSettings}">
+                            <ui:NavigationViewItem.InfoBadge>
+                                <ui:InfoBadge
+                                    Style="{StaticResource RoundInfoBadgeStyle}"
+                                    Visibility="{Binding Path=DispatcherSettings.HasErrors, Converter={StaticResource BooleanToVisibilityConverter}}">
+                                </ui:InfoBadge>
+                            </ui:NavigationViewItem.InfoBadge>
+                        </ui:NavigationViewItem>
+
                         <ui:NavigationViewItem
                             Content="{me:LocalizationSource MainWindow.SheetParameters}"
                             Icon="{ui:SymbolIcon DocumentSettings20}"
@@ -165,6 +195,7 @@
                                 </ui:InfoBadge>
                             </ui:NavigationViewItem.InfoBadge>
                         </ui:NavigationViewItem>
+
                     </ui:NavigationViewItem.MenuItems>
                 </ui:NavigationViewItem>
             </ui:NavigationView.MenuItems>

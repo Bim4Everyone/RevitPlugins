@@ -34,9 +34,18 @@
     <system:String x:Key="VM.ConcretingJointTypeNotSelected">Concreting joint type size not set</system:String>
     <system:String x:Key="VM.WriteName">Enter the name</system:String>
 
-    <!-- Project Settings Validation Error Messages -->
+    <!-- Schedule Settings Validation Error Messages -->
+    <system:String x:Key="VM.SkeletonScheduleNameInvalid">The name of the skeletons schedule is incorrect.</system:String>
+    <system:String x:Key="VM.SkeletonByElemsScheduleNameInvalid">The name of the element-wise skeletons schedule is incorrect</system:String>
+    <system:String x:Key="VM.MaterialScheduleNameInvalid">The name of the material schedule is incorrect.</system:String>
+    <system:String x:Key="VM.SystemPartsScheduleNameInvalid">The system parts schedule name is incorrect.</system:String>
+    <system:String x:Key="VM.IfcPartsScheduleNameInvalid">The IFC parts schedule name is incorrect</system:String>
+    
+    <!-- Dispatcher Settings Validation Error Messages -->
     <system:String x:Key="VM.DispatcherGroupingFirstParamInvalid">Dispatcher grouping 1 parameter name is incorrect</system:String>
     <system:String x:Key="VM.DispatcherGroupingSecondParamInvalid">Dispatcher grouping 2 parameter name is incorrect</system:String>
+
+    <!-- Annotation Settings Validation Error Messages -->
     <system:String x:Key="VM.LegendOffsetsNotSet">Legend offsets on sheet are not set</system:String>
     <system:String x:Key="VM.SheetSizeParamInvalid">Sheet frame format parameter name is incorrect</system:String>
     <system:String x:Key="VM.SheetCoefficientParamInvalid">Sheet frame format multiplier parameter name is incorrect</system:String>
@@ -68,17 +77,19 @@
     <system:String x:Key="MainWindow.Settings">Settings</system:String>
 
     <system:String x:Key="MainWindow.PluginRun">Plugin Run</system:String>
-    <system:String x:Key="MainWindow.SettingsMenu">Settings</system:String>
-
-    <system:String x:Key="MainWindow.VerticalViews">Vertical Views</system:String>
-    <system:String x:Key="MainWindow.TransverseViews">Transverse Views</system:String>
+    <system:String x:Key="MainWindow.SheetComponentsMenu">Settings. Sheet Components</system:String>
+    <system:String x:Key="MainWindow.ProjectParametersMenu">Settings. Project parameters</system:String>
+    
+    <system:String x:Key="MainWindow.VerticalViews">Vertical views</system:String>
+    <system:String x:Key="MainWindow.TransverseViews">Transverse views</system:String>
     <system:String x:Key="MainWindow.Schedules">Schedules</system:String>
     <system:String x:Key="MainWindow.ScheduleFilters">Schedules. Filtration</system:String>
 
     <system:String x:Key="MainWindow.LegendsAndAnnotations">Legends and Annotations</system:String>
-    <system:String x:Key="MainWindow.PylonParameters">Pylon Parameters</system:String>
-    <system:String x:Key="MainWindow.ProjectParameters">Project Parameters</system:String>
-    <system:String x:Key="MainWindow.SheetParameters">Sheet Parameters</system:String>
+    <system:String x:Key="MainWindow.PylonParameters">Pylon parameters</system:String>
+    <system:String x:Key="MainWindow.AnnotationParameters">Annotation parameters</system:String>
+    <system:String x:Key="MainWindow.DispatcherParameters">Dispatcher parameters</system:String>
+    <system:String x:Key="MainWindow.SheetParameters">Sheet parameters</system:String>
 
     <system:String x:Key="MainWindow.BimTipTitle">BIM Tip</system:String>
     <system:String x:Key="MainWindow.BimTip1">1. Make sure that the required pylons have the parameter 'Filtration 1' filled with 'per 1 piece'</system:String>
@@ -96,8 +107,10 @@
         here you can set up the legend of the note and the rules for its placement on the view</system:String>
     <system:String x:Key="MainWindow.PylonParametersSettings">A tab with pylon parameter settings 
         - parameters that relate to the pylon formwork model, such as its length and section width</system:String>
-    <system:String x:Key="MainWindow.ProjectParametersSettings">A tab with project parameter settings 
-        - parameters that determine the grouping in the manager, as well as the sizes that should be used for annotation</system:String>
+    <system:String x:Key="MainWindow.AnnotationParametersSettings">Annotation settings tab
+        - parameters and types that will be used when creating annotations</system:String>
+    <system:String x:Key="MainWindow.DispatcherParametersSettings">A tab with dispatcher parameter settings 
+        - parameters that determine the grouping in the project manager</system:String>
     <system:String x:Key="MainWindow.SheetParametersSettings">A tab with sheet parameters settings 
         - parameters that determine the characteristics of the sheet, such as its format</system:String>
     
@@ -230,37 +243,39 @@
     <system:String x:Key="LegendView.XOffsetFromBottomRightCornerTooltip">X offset from bottom right corner of frame</system:String>
     <system:String x:Key="LegendView.YOffsetFromBottomRightCorner">Y offset from bottom right corner of frame:</system:String>
     <system:String x:Key="LegendView.YOffsetFromBottomRightCornerTooltip">Y offset from bottom right corner of frame</system:String>
-    
-    <!-- ProjectParamsPage -->
-    <system:String x:Key="ProjectParams.ProjectRelatedParameters">Parameters related to the project you are working in</system:String>
 
-    <system:String x:Key="ProjectParams.DispatcherGroupingFirstParameter">Parameter for dispatcher grouping 1:</system:String>
-    <system:String x:Key="ProjectParams.DispatcherGroupingFirstParameterTooltip">Parameter for dispatcher grouping 1</system:String>
-    <system:String x:Key="ProjectParams.DispatcherGroupingSecondParameter">Parameter for dispatcher grouping 2:</system:String>
-    <system:String x:Key="ProjectParams.DispatcherGroupingSecondParameterTooltip">Parameter for dispatcher grouping 2</system:String>
-    <system:String x:Key="ProjectParams.DimensionGrouping">Dimensions grouping is needed</system:String>
-    <system:String x:Key="ProjectParams.DimensionGroupingTooltip">If the checkbox is checked, then the "Equality Formula" value will be set in the "Equality Display" parameter in the dimensions created.</system:String>
+    <!-- DispatcherParamsPage -->
+    <system:String x:Key="DispatcherParams.DispatcherRelatedParameters">The settings for the project manager you are working in</system:String>
+    <system:String x:Key="DispatcherParams.DispatcherGroupingFirstParameter">Parameter for dispatcher grouping 1:</system:String>
+    <system:String x:Key="DispatcherParams.DispatcherGroupingFirstParameterTooltip">Parameter for dispatcher grouping 1</system:String>
+    <system:String x:Key="DispatcherParams.DispatcherGroupingSecondParameter">Parameter for dispatcher grouping 2:</system:String>
+    <system:String x:Key="DispatcherParams.DispatcherGroupingSecondParameterTooltip">Parameter for dispatcher grouping 2</system:String>
 
-    <system:String x:Key="ProjectParams.SelectDimensionTypeSize">Select dimension type size:</system:String>
-    <system:String x:Key="ProjectParams.SelectDimensionTypeSizeTooltip">Select dimension type size</system:String>
-    <system:String x:Key="ProjectParams.SelectSpotDimensionTypeSize">Select spot dimension type size:</system:String>
-    <system:String x:Key="ProjectParams.SelectSpotDimensionTypeSizeTooltip">Select spot dimension type size</system:String>
+    <!-- AnnotationParamsPage -->
+    <system:String x:Key="AnnotationParams.AnnotationRelatedParameters">Annotation settings for the project you are working on</system:String>
+    <system:String x:Key="AnnotationParams.DimensionGrouping">Dimensions grouping is needed</system:String>
+    <system:String x:Key="AnnotationParams.DimensionGroupingTooltip">If the checkbox is checked, then the "Equality Formula" value will be set in the "Equality Display" parameter in the dimensions created.</system:String>
 
-    <system:String x:Key="ProjectParams.SelectRebarProductMarkTypeSize">Select rebar product mark type size:</system:String>
-    <system:String x:Key="ProjectParams.SelectRebarProductMarkTypeSizeTooltip">Select rebar product mark type size</system:String>
-    <system:String x:Key="ProjectParams.SelectRebarMarkWithSerifTypeSize">Select rebar mark with serif type size:</system:String>
-    <system:String x:Key="ProjectParams.SelectRebarMarkWithSerifTypeSizeTooltip">Select rebar mark with serif type size</system:String>
-    <system:String x:Key="ProjectParams.SelectRebarMarkWithStepTypeSize">Select rebar mark with step type size:</system:String>
-    <system:String x:Key="ProjectParams.SelectRebarMarkWithStepTypeSizeTooltip">Select rebar mark with step type size</system:String>
-    <system:String x:Key="ProjectParams.SelectRebarMarkWithCommentTypeSize">Select rebar mark with comment type size:</system:String>
-    <system:String x:Key="ProjectParams.SelectRebarMarkWithCommentTypeSizeTooltip">Select rebar mark with comment type size</system:String>
+    <system:String x:Key="AnnotationParams.SelectDimensionTypeSize">Select dimension type size:</system:String>
+    <system:String x:Key="AnnotationParams.SelectDimensionTypeSizeTooltip">Select dimension type size</system:String>
+    <system:String x:Key="AnnotationParams.SelectSpotDimensionTypeSize">Select spot dimension type size:</system:String>
+    <system:String x:Key="AnnotationParams.SelectSpotDimensionTypeSizeTooltip">Select spot dimension type size</system:String>
 
-    <system:String x:Key="ProjectParams.SelectUniversalMarkWithTextTypeSize">Select universal mark with text type size:</system:String>
-    <system:String x:Key="ProjectParams.SelectUniversalMarkWithTextTypeSizeTooltip">Select universal mark with text type size</system:String>
-    <system:String x:Key="ProjectParams.SelectBreakLineTypeSize">Select break line type size:</system:String>
-    <system:String x:Key="ProjectParams.SelectBreakLineTypeSizeTooltip">Select break line type size</system:String>
-    <system:String x:Key="ProjectParams.SelectConcretingJointTypeSize">Select concreting joint type size:</system:String>
-    <system:String x:Key="ProjectParams.SelectConcretingJointTypeSizeTooltip">Select concreting joint type size</system:String>
+    <system:String x:Key="AnnotationParams.SelectRebarProductMarkTypeSize">Select rebar product mark type size:</system:String>
+    <system:String x:Key="AnnotationParams.SelectRebarProductMarkTypeSizeTooltip">Select rebar product mark type size</system:String>
+    <system:String x:Key="AnnotationParams.SelectRebarMarkWithSerifTypeSize">Select rebar mark with serif type size:</system:String>
+    <system:String x:Key="AnnotationParams.SelectRebarMarkWithSerifTypeSizeTooltip">Select rebar mark with serif type size</system:String>
+    <system:String x:Key="AnnotationParams.SelectRebarMarkWithStepTypeSize">Select rebar mark with step type size:</system:String>
+    <system:String x:Key="AnnotationParams.SelectRebarMarkWithStepTypeSizeTooltip">Select rebar mark with step type size</system:String>
+    <system:String x:Key="AnnotationParams.SelectRebarMarkWithCommentTypeSize">Select rebar mark with comment type size:</system:String>
+    <system:String x:Key="AnnotationParams.SelectRebarMarkWithCommentTypeSizeTooltip">Select rebar mark with comment type size</system:String>
+
+    <system:String x:Key="AnnotationParams.SelectUniversalMarkWithTextTypeSize">Select universal mark with text type size:</system:String>
+    <system:String x:Key="AnnotationParams.SelectUniversalMarkWithTextTypeSizeTooltip">Select universal mark with text type size</system:String>
+    <system:String x:Key="AnnotationParams.SelectBreakLineTypeSize">Select break line type size:</system:String>
+    <system:String x:Key="AnnotationParams.SelectBreakLineTypeSizeTooltip">Select break line type size</system:String>
+    <system:String x:Key="AnnotationParams.SelectConcretingJointTypeSize">Select concreting joint type size:</system:String>
+    <system:String x:Key="AnnotationParams.SelectConcretingJointTypeSizeTooltip">Select concreting joint type size</system:String>
 
     <!-- PylonParamsPage -->
     <system:String x:Key="PylonParams.FormworkElementParameters">Parameters belonging to the pylon formwork element</system:String>
@@ -410,20 +425,23 @@
     <system:String x:Key="LegendViewsPage.SelectNotesLegendToolTip">Select from the list a legend containing pylon sheet notes that need to be placed on the sheet.</system:String>
     <system:String x:Key="LegendViewsPage.XOffsetFromBottomRightCornerToolTip">Specify the transverse offset (X-axis) from the bottom right corner of the sheet frame to the center of the note legend viewport</system:String>
     <system:String x:Key="LegendViewsPage.YOffsetFromBottomRightCornerToolTip">Specify the vertical offset (Y-axis) from the bottom right corner of the sheet frame to the center of the note legend viewport</system:String>
-
-    <!-- ProjectParamsPage ToolTips -->
-    <system:String x:Key="ProjectParams.ProjectRelatedParametersToolTip">Parameters related to the project you are working in</system:String>
-    <system:String x:Key="ProjectParams.DispatcherGroupingFirstParameterToolTip">Name of the parameter used in the project for dispatcher grouping at the first level</system:String>
-    <system:String x:Key="ProjectParams.DispatcherGroupingSecondParameterToolTip">Name of the parameter used in the project for dispatcher grouping at the second level</system:String>
-    <system:String x:Key="ProjectParams.SelectDimensionTypeSizeToolTip">Select dimension type for placing dimensions on views</system:String>
-    <system:String x:Key="ProjectParams.SelectSpotDimensionTypeSizeToolTip">Select spot dimension type for placing elevation marks</system:String>
-    <system:String x:Key="ProjectParams.SelectRebarProductMarkTypeSizeToolTip">Select rebar product mark type for marking reinforcement cages</system:String>
-    <system:String x:Key="ProjectParams.SelectRebarMarkWithSerifTypeSizeToolTip">Select rebar mark with serif type for marking individual bars</system:String>
-    <system:String x:Key="ProjectParams.SelectRebarMarkWithStepTypeSizeToolTip">Select rebar mark with step type for marking bars with step indication</system:String>
-    <system:String x:Key="ProjectParams.SelectRebarMarkWithCommentTypeSizeToolTip">Select rebar mark with comment type for marking with additional comments</system:String>
-    <system:String x:Key="ProjectParams.SelectUniversalMarkWithTextTypeSizeToolTip">Select universal mark with text type for other designations</system:String>
-    <system:String x:Key="ProjectParams.SelectBreakLineTypeSizeToolTip">Select break line type for indicating breaks on views</system:String>
-    <system:String x:Key="ProjectParams.SelectConcretingJointTypeSizeToolTip">Select concreting joint type for indicating concreting joints</system:String>
+    
+    <!-- DispatcherParamsPage ToolTips -->
+    <system:String x:Key="DispatcherParams.DispatcherRelatedParametersToolTip">Settings specific to the project manager you are working in</system:String>
+    <system:String x:Key="DispatcherParams.DispatcherGroupingFirstParameterToolTip">Name of the parameter used in the project for dispatcher grouping at the first level</system:String>
+    <system:String x:Key="DispatcherParams.DispatcherGroupingSecondParameterToolTip">Name of the parameter used in the project for dispatcher grouping at the second level</system:String>
+    
+    <!-- AnnotationParamsPage ToolTips -->
+    <system:String x:Key="AnnotationParams.AnnotationRelatedParametersToolTip">The settings and annotation types for the project you are working on</system:String>
+    <system:String x:Key="AnnotationParams.SelectDimensionTypeSizeToolTip">Select dimension type for placing dimensions on views</system:String>
+    <system:String x:Key="AnnotationParams.SelectSpotDimensionTypeSizeToolTip">Select spot dimension type for placing elevation marks</system:String>
+    <system:String x:Key="AnnotationParams.SelectRebarProductMarkTypeSizeToolTip">Select rebar product mark type for marking reinforcement cages</system:String>
+    <system:String x:Key="AnnotationParams.SelectRebarMarkWithSerifTypeSizeToolTip">Select rebar mark with serif type for marking individual bars</system:String>
+    <system:String x:Key="AnnotationParams.SelectRebarMarkWithStepTypeSizeToolTip">Select rebar mark with step type for marking bars with step indication</system:String>
+    <system:String x:Key="AnnotationParams.SelectRebarMarkWithCommentTypeSizeToolTip">Select rebar mark with comment type for marking with additional comments</system:String>
+    <system:String x:Key="AnnotationParams.SelectUniversalMarkWithTextTypeSizeToolTip">Select universal mark with text type for other designations</system:String>
+    <system:String x:Key="AnnotationParams.SelectBreakLineTypeSizeToolTip">Select break line type for indicating breaks on views</system:String>
+    <system:String x:Key="AnnotationParams.SelectConcretingJointTypeSizeToolTip">Select concreting joint type for indicating concreting joints</system:String>
 
     <!-- PylonParamsPage ToolTips -->
     <system:String x:Key="PylonParamsPage.FormworkElementParametersToolTip">Parameters belonging to the pylon formwork element</system:String>

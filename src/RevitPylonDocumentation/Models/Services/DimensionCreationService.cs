@@ -21,7 +21,7 @@ internal class DimensionCreationService {
 
     public DimensionCreationService(CreationSettings settings, Document document, PylonView pylonView,
                                     DimensionBaseService dimensionBaseService) {
-        _selectedDimensionType = settings.ProjectSettings.SelectedDimensionType;
+        _selectedDimensionType = settings.AnnotationSettings.SelectedDimensionType;
         _doc = document;
         _viewOfPylon = pylonView;
         _dimensionBaseService = dimensionBaseService;

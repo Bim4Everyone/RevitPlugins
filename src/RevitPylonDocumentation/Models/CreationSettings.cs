@@ -9,7 +9,8 @@ internal class CreationSettings {
                             UserScheduleFiltersSettings scheduleFiltersSettings,
                             UserLegendsAndAnnotationsSettings legendsAndAnnotationsSettings,
                             UserPylonSettings pylonSettings,
-                            UserProjectSettings projectSettings,
+                            UserAnnotationSettings annotationSettings,
+                            UserDispatcherSettings dispatcherSettings,
                             UserSheetSettings sheetSettings) {
         SelectionSettings = selectionSettings;
         VerticalViewSettings = verticalViewSettings;
@@ -18,7 +19,8 @@ internal class CreationSettings {
         ScheduleFiltersSettings = scheduleFiltersSettings;
         LegendsAndAnnotationsSettings = legendsAndAnnotationsSettings;
         PylonSettings = pylonSettings;
-        ProjectSettings = projectSettings;
+        AnnotationSettings = annotationSettings;
+        DispatcherSettings = dispatcherSettings;
         SheetSettings = sheetSettings;
     }
 
@@ -29,6 +31,7 @@ internal class CreationSettings {
     public UserScheduleFiltersSettings ScheduleFiltersSettings { get; private set; }
     public UserLegendsAndAnnotationsSettings LegendsAndAnnotationsSettings { get; private set; }
     public UserPylonSettings PylonSettings { get; private set; }
-    public UserProjectSettings ProjectSettings { get; private set; }
+    public UserAnnotationSettings AnnotationSettings { get; private set; }
+    public UserDispatcherSettings DispatcherSettings { get; private set; }
     public UserSheetSettings SheetSettings { get; private set; }
 }

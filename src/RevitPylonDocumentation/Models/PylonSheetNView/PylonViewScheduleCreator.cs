@@ -9,14 +9,14 @@ using RevitPylonDocumentation.Models.UserSettings;
 namespace RevitPylonDocumentation.Models.PylonSheetNView;
 public class PylonViewScheduleCreator {
     internal PylonViewScheduleCreator(CreationSettings settings, Document document, PylonSheetInfo pylonSheetInfo) {
-        ProjectSettings = settings.ProjectSettings;
+        DispatcherSettings = settings.DispatcherSettings;
         SchedulesSettings = settings.SchedulesSettings;
         ScheduleFiltersSettings = settings.ScheduleFiltersSettings;
         Doc = document;
         SheetInfo = pylonSheetInfo;
     }
 
-    internal UserProjectSettings ProjectSettings { get; set; }
+    internal UserDispatcherSettings DispatcherSettings { get; set; }
     internal UserSchedulesSettings SchedulesSettings { get; set; }
     internal UserScheduleFiltersSettings ScheduleFiltersSettings { get; set; }
     internal Document Doc { get; set; }
@@ -44,11 +44,11 @@ public class PylonViewScheduleCreator {
                 // Задаем сортировку
                 SetScheduleDispatcherParameter(
                     viewSchedule,
-                    ProjectSettings.DispatcherGroupingFirst,
+                    DispatcherSettings.DispatcherGroupingFirst,
                     SchedulesSettings.SkeletonScheduleDisp1);
                 SetScheduleDispatcherParameter(
                     viewSchedule,
-                    ProjectSettings.DispatcherGroupingSecond,
+                    DispatcherSettings.DispatcherGroupingSecond,
                     SchedulesSettings.SkeletonScheduleDisp2);
 
                 // Задаем фильтры спецификации
@@ -86,11 +86,11 @@ public class PylonViewScheduleCreator {
                 // Задаем сортировку
                 SetScheduleDispatcherParameter(
                     viewSchedule,
-                    ProjectSettings.DispatcherGroupingFirst,
+                    DispatcherSettings.DispatcherGroupingFirst,
                     SchedulesSettings.SkeletonByElemsScheduleDisp1);
                 SetScheduleDispatcherParameter(
                     viewSchedule,
-                    ProjectSettings.DispatcherGroupingSecond,
+                    DispatcherSettings.DispatcherGroupingSecond,
                     SchedulesSettings.SkeletonByElemsScheduleDisp2);
 
                 // Задаем фильтры спецификации
@@ -127,10 +127,10 @@ public class PylonViewScheduleCreator {
 
             // Задаем сортировку
             SetScheduleDispatcherParameter(viewSchedule,
-                                           ProjectSettings.DispatcherGroupingFirst,
+                                           DispatcherSettings.DispatcherGroupingFirst,
                                            SchedulesSettings.MaterialScheduleDisp1);
             SetScheduleDispatcherParameter(viewSchedule,
-                                           ProjectSettings.DispatcherGroupingSecond,
+                                           DispatcherSettings.DispatcherGroupingSecond,
                                            SchedulesSettings.MaterialScheduleDisp2);
 
             // Задаем фильтры спецификации
@@ -166,10 +166,10 @@ public class PylonViewScheduleCreator {
 
             // Задаем сортировку
             SetScheduleDispatcherParameter(viewSchedule,
-                                           ProjectSettings.DispatcherGroupingFirst,
+                                           DispatcherSettings.DispatcherGroupingFirst,
                                            SchedulesSettings.SystemPartsScheduleDisp1);
             SetScheduleDispatcherParameter(viewSchedule,
-                                           ProjectSettings.DispatcherGroupingSecond,
+                                           DispatcherSettings.DispatcherGroupingSecond,
                                            SchedulesSettings.SystemPartsScheduleDisp2);
 
             // Задаем фильтры спецификации
@@ -205,10 +205,10 @@ public class PylonViewScheduleCreator {
 
             // Задаем сортировку
             SetScheduleDispatcherParameter(viewSchedule,
-                                           ProjectSettings.DispatcherGroupingFirst,
+                                           DispatcherSettings.DispatcherGroupingFirst,
                                            SchedulesSettings.IfcPartsScheduleDisp1);
             SetScheduleDispatcherParameter(viewSchedule,
-                                           ProjectSettings.DispatcherGroupingSecond,
+                                           DispatcherSettings.DispatcherGroupingSecond,
                                            SchedulesSettings.IfcPartsScheduleDisp2);
 
             // Задаем фильтры спецификации

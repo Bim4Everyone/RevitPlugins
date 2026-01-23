@@ -69,7 +69,7 @@ internal class TransViewRebarHorizDimensionService {
 
             var rebarSideOffset = new DimensionLineOffsetOption(pylon, DirectionType.Right, formDimensionLineOffset);
             _dimCreationService.CreateDimension(skeletonParentRebar, rebarSideOffset, ["низ", "торец", "край"],
-                                                needEqualityFormula: _settings.ProjectSettings.DimensionGrouping);
+                                                needEqualityFormula: _settings.AnnotationSettings.DimensionGrouping);
         } catch(Exception) { }
     }
 }

@@ -29,7 +29,7 @@ internal class TransViewMarkService {
         _annotationService = new TagCreationService(pylonView);
 
         // Находим типоразмер марки несущей арматуры для обозначения марки изделия
-        _tagSkeletonSymbol = _settings.ProjectSettings.SelectedSkeletonTagType;
+        _tagSkeletonSymbol = _settings.AnnotationSettings.SelectedSkeletonTagType;
     }
 
 

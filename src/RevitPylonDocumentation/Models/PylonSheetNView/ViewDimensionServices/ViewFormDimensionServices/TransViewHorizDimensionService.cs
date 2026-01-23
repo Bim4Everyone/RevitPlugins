@@ -89,7 +89,7 @@ internal class TransViewHorizDimensionService {
     private void CreateHorizDimensionForForm(Element pylon, ReferenceArray refArrayFormworkSide) {
         var formworkSideDimOffset = new DimensionLineOffsetOption(pylon, DirectionType.Right, 1);
         _dimCreationService.CreateDimension(refArrayFormworkSide, formworkSideDimOffset,
-                                            needEqualityFormula: _settings.ProjectSettings.DimensionGrouping);
+                                            needEqualityFormula: _settings.AnnotationSettings.DimensionGrouping);
     }
 
 

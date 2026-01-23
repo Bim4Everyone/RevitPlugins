@@ -19,7 +19,7 @@ internal class GeneralViewVertDimensionService {
 
     internal GeneralViewVertDimensionService(CreationSettings settings, Document document, PylonSheetInfo pylonSheetInfo,
                                              PylonView pylonView, DimensionBaseService dimensionBaseService) {
-        _selectedDimensionType = settings.ProjectSettings.SelectedDimensionType;
+        _selectedDimensionType = settings.AnnotationSettings.SelectedDimensionType;
         _doc = document;
         _sheetInfo = pylonSheetInfo;
         _viewOfPylon = pylonView;

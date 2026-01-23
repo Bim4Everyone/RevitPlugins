@@ -6,12 +6,12 @@ using RevitPylonDocumentation.ViewModels;
 
 namespace RevitPylonDocumentation.Views.Pages;
 /// <summary>
-/// Логика взаимодействия для ProjectParamsPage.xaml
+/// Логика взаимодействия для AnnotationParamsPage.xaml
 /// </summary>
-internal partial class ProjectParamsPage {
-    public ProjectParamsPage() { }
+internal partial class AnnotationParamsPage {
+    public AnnotationParamsPage() { }
 
-    public ProjectParamsPage(MainViewModel viewModel,
+    public AnnotationParamsPage(MainViewModel viewModel,
         ILoggerService loggerService,
         ILanguageService languageService, ILocalizationService localizationService,
         IUIThemeService uiThemeService, IUIThemeUpdaterService themeUpdaterService)

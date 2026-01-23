@@ -22,6 +22,10 @@ internal static class NinjectExtensions {
             .ToSelf()
             .InSingletonScope();
 
+        kernel.Bind<ScheduleFiltersPage>()
+            .ToSelf()
+            .InSingletonScope();
+
         kernel.Bind<LegendViewsPage>()
             .ToSelf()
             .InSingletonScope();
@@ -30,7 +34,11 @@ internal static class NinjectExtensions {
             .ToSelf()
             .InSingletonScope();
 
-        kernel.Bind<ProjectParamsPage>()
+        kernel.Bind<DispatcherParamsPage>()
+            .ToSelf()
+            .InSingletonScope();
+
+        kernel.Bind<AnnotationParamsPage>()
             .ToSelf()
             .InSingletonScope();
 

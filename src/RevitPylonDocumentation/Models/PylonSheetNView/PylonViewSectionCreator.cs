@@ -9,14 +9,14 @@ public class PylonViewSectionCreator {
     internal PylonViewSectionCreator(CreationSettings settings, Document document, PylonSheetInfo pylonSheetInfo) {
         VerticalSectionSettings = settings.VerticalViewSettings;
         TransverseSectionSettings = settings.TransverseViewSettings;
-        ProjectTypesSettings = settings.ProjectSettings;
+        AnnotationTypesSettings = settings.AnnotationSettings;
         Doc = document;
         SheetInfo = pylonSheetInfo;
     }
 
     internal UserVerticalViewSettings VerticalSectionSettings { get; set; }
     internal UserTransverseViewSettings TransverseSectionSettings { get; set; }
-    internal UserProjectSettings ProjectTypesSettings { get; set; }
+    internal UserAnnotationSettings AnnotationTypesSettings { get; set; }
     internal Document Doc { get; set; }
     internal PylonSheetInfo SheetInfo { get; set; }
 

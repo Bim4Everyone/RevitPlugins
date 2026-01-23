@@ -42,11 +42,11 @@ internal class TransViewRebarMarkService {
 
         // Находим типоразмер марки несущей арматуры для обозначения позиции, диаметра и комментариев арматуры
         // Без засечки на конце
-        _tagSymbolWithComment = settings.ProjectSettings.SelectedRebarTagTypeWithComment;
+        _tagSymbolWithComment = settings.AnnotationSettings.SelectedRebarTagTypeWithComment;
         // Без засечки на конце
-        _tagSymbolWithStep = settings.ProjectSettings.SelectedRebarTagTypeWithStep;
+        _tagSymbolWithStep = settings.AnnotationSettings.SelectedRebarTagTypeWithStep;
         // С засечкой на конце
-        _tagSymbolWithSerif = settings.ProjectSettings.SelectedRebarTagTypeWithSerif;
+        _tagSymbolWithSerif = settings.AnnotationSettings.SelectedRebarTagTypeWithSerif;
     }
 
     /// <summary>

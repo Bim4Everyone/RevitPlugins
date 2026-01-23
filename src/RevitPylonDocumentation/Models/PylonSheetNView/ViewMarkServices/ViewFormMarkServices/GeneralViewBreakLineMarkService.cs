@@ -39,7 +39,7 @@ internal class GeneralViewBreakLineMarkService {
             _breakLinesOffsetYBottom);
 
         _breakLineParameterService = new BreakLineParameterService();
-        _breakLineSymbol = settings.ProjectSettings.SelectedBreakLineType;
+        _breakLineSymbol = settings.AnnotationSettings.SelectedBreakLineType;
     }
 
 

@@ -34,9 +34,18 @@
     <system:String x:Key="VM.ConcretingJointTypeNotSelected">Не задан типоразмер рабочего шва бетонирования</system:String>
     <system:String x:Key="VM.WriteName">Введите название</system:String>
 
-    <!-- Project Settings Validation Error Messages -->
+    <!-- Schedule Settings Validation Error Messages -->
+    <system:String x:Key="VM.SkeletonScheduleNameInvalid">Имя спецификации каркасов некорректно</system:String>
+    <system:String x:Key="VM.SkeletonByElemsScheduleNameInvalid">Имя поэлементной спецификации каркасов некорректно</system:String>
+    <system:String x:Key="VM.MaterialScheduleNameInvalid">Имя спецификации материалов некорректно</system:String>
+    <system:String x:Key="VM.SystemPartsScheduleNameInvalid">Имя ведомости системных деталей некорректно</system:String>
+    <system:String x:Key="VM.IfcPartsScheduleNameInvalid">Имя ведомости IFC деталей некорректно</system:String>
+    
+    <!-- Dispatcher Settings Validation Error Messages -->
     <system:String x:Key="VM.DispatcherGroupingFirstParamInvalid">Наименование параметра диспетчера 1 некорректно</system:String>
     <system:String x:Key="VM.DispatcherGroupingSecondParamInvalid">Наименование параметра диспетчера 2 некорректно</system:String>
+
+    <!-- Annotation Settings Validation Error Messages -->
     <system:String x:Key="VM.LegendOffsetsNotSet">Не заданы отступы на листе для легенды примечаний</system:String>
     <system:String x:Key="VM.SheetSizeParamInvalid">Наименование параметра формата рамки листа некорректно</system:String>
     <system:String x:Key="VM.SheetCoefficientParamInvalid">Наименование параметра множителя формата рамки листа некорректно</system:String>
@@ -68,15 +77,18 @@
     <system:String x:Key="MainWindow.Settings">Настройки</system:String>
 
     <system:String x:Key="MainWindow.PluginRun">Запуск плагина</system:String>
-    <system:String x:Key="MainWindow.SettingsMenu">Настройки</system:String>
+    <system:String x:Key="MainWindow.SheetComponentsMenu">Настройки. Компоненты листа</system:String>
+    <system:String x:Key="MainWindow.ProjectParametersMenu">Настройки. Параметры проекта</system:String>
 
     <system:String x:Key="MainWindow.VerticalViews">Вертикальные виды</system:String>
     <system:String x:Key="MainWindow.TransverseViews">Горизонтальные виды</system:String>
     <system:String x:Key="MainWindow.Schedules">Спецификации</system:String>
     <system:String x:Key="MainWindow.ScheduleFilters">Спецификации. Фильтрация</system:String>
+    
     <system:String x:Key="MainWindow.LegendsAndAnnotations">Легенды и типовые аннотации</system:String>
     <system:String x:Key="MainWindow.PylonParameters">Параметры пилона</system:String>
-    <system:String x:Key="MainWindow.ProjectParameters">Параметры проекта</system:String>
+    <system:String x:Key="MainWindow.AnnotationParameters">Параметры аннотаций</system:String>
+    <system:String x:Key="MainWindow.DispatcherParameters">Параметры диспетчера</system:String>
     <system:String x:Key="MainWindow.SheetParameters">Параметры листов</system:String>
 
     <system:String x:Key="MainWindow.BimTipTitle">💡  BIM-Совет</system:String>
@@ -95,8 +107,10 @@
         например, здесь вы можете настроить легенду примечания и правила ее размещения на виде</system:String>
     <system:String x:Key="MainWindow.PylonParametersSettings">Вкладка с настройками параметров пилона 
         - параметров, которые относятся к опалубочной модели пилона, например, его длина и ширина сечения</system:String>
-    <system:String x:Key="MainWindow.ProjectParametersSettings">Вкладка с настройками параметров проекта 
-        - параметров, которые определяют группировку в диспетчере, а также типоразмеры, которые необходимо использовать для аннотации</system:String>
+    <system:String x:Key="MainWindow.AnnotationParametersSettings">Вкладка с настройками аннотаций 
+        - параметров и типов, которые будут использованы при создании аннотации</system:String>
+    <system:String x:Key="MainWindow.DispatcherParametersSettings">Вкладка с настройками параметров диспетчера 
+        - параметров, которые определяют группировку в диспетчере</system:String>
     <system:String x:Key="MainWindow.SheetParametersSettings">Вкладка с настройками параметров листа 
         - параметров, которые определяют характеристики листа, например, его формат</system:String>
     
@@ -230,36 +244,38 @@
     <system:String x:Key="LegendView.YOffsetFromBottomRightCorner">Смещение по Y от нижнего правого угла рамки:</system:String>
     <system:String x:Key="LegendView.YOffsetFromBottomRightCornerTooltip">Смещение по Y от нижнего правого угла рамки</system:String>
 
-    <!-- ProjectParamsPage -->
-    <system:String x:Key="ProjectParams.ProjectRelatedParameters">Параметры, относящиеся к проекту, в котором вы работаете</system:String>
+    <!-- DispatcherParamsPage -->
+    <system:String x:Key="DispatcherParams.DispatcherRelatedParameters">Параметры диспетчера проекта, в котором вы работаете</system:String>
+    <system:String x:Key="DispatcherParams.DispatcherGroupingFirstParameter">Параметр для группировки диспетчера 1:</system:String>
+    <system:String x:Key="DispatcherParams.DispatcherGroupingFirstParameterTooltip">Параметр для группировки диспетчера 1</system:String>
+    <system:String x:Key="DispatcherParams.DispatcherGroupingSecondParameter">Параметр для группировки диспетчера 2:</system:String>
+    <system:String x:Key="DispatcherParams.DispatcherGroupingSecondParameterTooltip">Параметр для группировки диспетчера 2</system:String>
 
-    <system:String x:Key="ProjectParams.DispatcherGroupingFirstParameter">Параметр для группировки диспетчера 1:</system:String>
-    <system:String x:Key="ProjectParams.DispatcherGroupingFirstParameterTooltip">Параметр для группировки диспетчера 1</system:String>
-    <system:String x:Key="ProjectParams.DispatcherGroupingSecondParameter">Параметр для группировки диспетчера 2:</system:String>
-    <system:String x:Key="ProjectParams.DispatcherGroupingSecondParameterTooltip">Параметр для группировки диспетчера 2</system:String>
-    <system:String x:Key="ProjectParams.DimensionGrouping">Необходимо выполнять группировку размеров</system:String>
-    <system:String x:Key="ProjectParams.DimensionGroupingTooltip">Если стоит галочка, то в создаваемых размерах в параметр "Отображение равенства" будет ставиться значение "Формула равенства"</system:String>
+    <!-- AnnotationParamsPage -->
+    <system:String x:Key="AnnotationParams.AnnotationRelatedParameters">Настройки аннотаций проекта, в котором вы работаете</system:String>
+    <system:String x:Key="AnnotationParams.DimensionGrouping">Необходимо выполнять группировку размеров</system:String>
+    <system:String x:Key="AnnotationParams.DimensionGroupingTooltip">Если стоит галочка, то в создаваемых размерах в параметр "Отображение равенства" будет ставиться значение "Формула равенства"</system:String>
 
-    <system:String x:Key="ProjectParams.SelectDimensionTypeSize">Выберите типоразмер размера:</system:String>
-    <system:String x:Key="ProjectParams.SelectDimensionTypeSizeTooltip">Выберите типоразмер размера</system:String>
-    <system:String x:Key="ProjectParams.SelectSpotDimensionTypeSize">Выберите типоразмер высотной отметки:</system:String>
-    <system:String x:Key="ProjectParams.SelectSpotDimensionTypeSizeTooltip">Выберите типоразмер высотной отметки</system:String>
+    <system:String x:Key="AnnotationParams.SelectDimensionTypeSize">Выберите типоразмер размера:</system:String>
+    <system:String x:Key="AnnotationParams.SelectDimensionTypeSizeTooltip">Выберите типоразмер размера</system:String>
+    <system:String x:Key="AnnotationParams.SelectSpotDimensionTypeSize">Выберите типоразмер высотной отметки:</system:String>
+    <system:String x:Key="AnnotationParams.SelectSpotDimensionTypeSizeTooltip">Выберите типоразмер высотной отметки</system:String>
 
-    <system:String x:Key="ProjectParams.SelectRebarProductMarkTypeSize">Выберите типоразмер марки арматурного изделия:</system:String>
-    <system:String x:Key="ProjectParams.SelectRebarProductMarkTypeSizeTooltip">Выберите типоразмер марки арматурного изделия</system:String>
-    <system:String x:Key="ProjectParams.SelectRebarMarkWithSerifTypeSize">Выберите типоразмер марки арматуры с засечкой:</system:String>
-    <system:String x:Key="ProjectParams.SelectRebarMarkWithSerifTypeSizeTooltip">Выберите типоразмер марки арматуры с засечкой</system:String>
-    <system:String x:Key="ProjectParams.SelectRebarMarkWithStepTypeSize">Выберите типоразмер марки арматуры с шагом:</system:String>
-    <system:String x:Key="ProjectParams.SelectRebarMarkWithStepTypeSizeTooltip">Выберите типоразмер марки арматуры с шагом</system:String>
-    <system:String x:Key="ProjectParams.SelectRebarMarkWithCommentTypeSize">Выберите типоразмер марки арматуры с комментарием:</system:String>
-    <system:String x:Key="ProjectParams.SelectRebarMarkWithCommentTypeSizeTooltip">Выберите типоразмер марки арматуры с комментарием</system:String>
+    <system:String x:Key="AnnotationParams.SelectRebarProductMarkTypeSize">Выберите типоразмер марки арматурного изделия:</system:String>
+    <system:String x:Key="AnnotationParams.SelectRebarProductMarkTypeSizeTooltip">Выберите типоразмер марки арматурного изделия</system:String>
+    <system:String x:Key="AnnotationParams.SelectRebarMarkWithSerifTypeSize">Выберите типоразмер марки арматуры с засечкой:</system:String>
+    <system:String x:Key="AnnotationParams.SelectRebarMarkWithSerifTypeSizeTooltip">Выберите типоразмер марки арматуры с засечкой</system:String>
+    <system:String x:Key="AnnotationParams.SelectRebarMarkWithStepTypeSize">Выберите типоразмер марки арматуры с шагом:</system:String>
+    <system:String x:Key="AnnotationParams.SelectRebarMarkWithStepTypeSizeTooltip">Выберите типоразмер марки арматуры с шагом</system:String>
+    <system:String x:Key="AnnotationParams.SelectRebarMarkWithCommentTypeSize">Выберите типоразмер марки арматуры с комментарием:</system:String>
+    <system:String x:Key="AnnotationParams.SelectRebarMarkWithCommentTypeSizeTooltip">Выберите типоразмер марки арматуры с комментарием</system:String>
 
-    <system:String x:Key="ProjectParams.SelectUniversalMarkWithTextTypeSize">Выберите типоразмер универсальной марки с текстом:</system:String>
-    <system:String x:Key="ProjectParams.SelectUniversalMarkWithTextTypeSizeTooltip">Выберите типоразмер универсальной марки с текстом</system:String>
-    <system:String x:Key="ProjectParams.SelectBreakLineTypeSize">Выберите типоразмер линии обрыва:</system:String>
-    <system:String x:Key="ProjectParams.SelectBreakLineTypeSizeTooltip">Выберите типоразмер линии обрыва</system:String>
-    <system:String x:Key="ProjectParams.SelectConcretingJointTypeSize">Выберите типоразмер рабочего шва бетонирования:</system:String>
-    <system:String x:Key="ProjectParams.SelectConcretingJointTypeSizeTooltip">Выберите типоразмер рабочего шва бетонирования</system:String>
+    <system:String x:Key="AnnotationParams.SelectUniversalMarkWithTextTypeSize">Выберите типоразмер универсальной марки с текстом:</system:String>
+    <system:String x:Key="AnnotationParams.SelectUniversalMarkWithTextTypeSizeTooltip">Выберите типоразмер универсальной марки с текстом</system:String>
+    <system:String x:Key="AnnotationParams.SelectBreakLineTypeSize">Выберите типоразмер линии обрыва:</system:String>
+    <system:String x:Key="AnnotationParams.SelectBreakLineTypeSizeTooltip">Выберите типоразмер линии обрыва</system:String>
+    <system:String x:Key="AnnotationParams.SelectConcretingJointTypeSize">Выберите типоразмер рабочего шва бетонирования:</system:String>
+    <system:String x:Key="AnnotationParams.SelectConcretingJointTypeSizeTooltip">Выберите типоразмер рабочего шва бетонирования</system:String>
 
     <!-- PylonParamsPage -->
     <system:String x:Key="PylonParams.FormworkElementParameters">Параметры, принадлежащие опалубочному элементу пилона</system:String>
@@ -410,19 +426,22 @@
     <system:String x:Key="LegendViewsPage.XOffsetFromBottomRightCornerToolTip">Укажите смещение по горизонтали (по оси Х) от нижнего правого угла рамки листа до середины видового экрана легенды примечания</system:String>
     <system:String x:Key="LegendViewsPage.YOffsetFromBottomRightCornerToolTip">Укажите смещение по вертикали (по оси Y) от нижнего правого угла рамки листа до середины видового экрана легенды примечания</system:String>
 
-    <!-- ProjectParamsPage ToolTips -->
-    <system:String x:Key="ProjectParams.ProjectRelatedParametersToolTip">Параметры, относящиеся к проекту, в котором вы работаете</system:String>
-    <system:String x:Key="ProjectParams.DispatcherGroupingFirstParameterToolTip">Имя параметра, который используется в проекте для группировки диспетчера на первом уровне</system:String>
-    <system:String x:Key="ProjectParams.DispatcherGroupingSecondParameterToolTip">Имя параметра, который используется в проекте для группировки диспетчера на втором уровне</system:String>
-    <system:String x:Key="ProjectParams.SelectDimensionTypeSizeToolTip">Выберите типоразмер размера для расстановки размеров на видах</system:String>
-    <system:String x:Key="ProjectParams.SelectSpotDimensionTypeSizeToolTip">Выберите типоразмер высотной отметки для расстановки отметок высот</system:String>
-    <system:String x:Key="ProjectParams.SelectRebarProductMarkTypeSizeToolTip">Выберите типоразмер марки арматурного изделия для маркировки каркасов</system:String>
-    <system:String x:Key="ProjectParams.SelectRebarMarkWithSerifTypeSizeToolTip">Выберите типоразмер марки арматуры с засечкой для маркировки отдельных стержней</system:String>
-    <system:String x:Key="ProjectParams.SelectRebarMarkWithStepTypeSizeToolTip">Выберите типоразмер марки арматуры с шагом для маркировки стержней с указанием шага</system:String>
-    <system:String x:Key="ProjectParams.SelectRebarMarkWithCommentTypeSizeToolTip">Выберите типоразмер марки арматуры с комментарием для маркировки с дополнительными комментариями</system:String>
-    <system:String x:Key="ProjectParams.SelectUniversalMarkWithTextTypeSizeToolTip">Выберите типоразмер универсальной марки с текстом для прочих обозначений</system:String>
-    <system:String x:Key="ProjectParams.SelectBreakLineTypeSizeToolTip">Выберите типоразмер линии обрыва для обозначения обрывов на видах</system:String>
-    <system:String x:Key="ProjectParams.SelectConcretingJointTypeSizeToolTip">Выберите типоразмер рабочего шва бетонирования для обозначения швов бетонирования</system:String>
+    <!-- DispatcherParamsPage ToolTips -->
+    <system:String x:Key="DispatcherParams.DispatcherRelatedParametersToolTip">Параметры, относящиеся к диспетчеру проекта, в котором вы работаете</system:String>
+    <system:String x:Key="DispatcherParams.DispatcherGroupingFirstParameterToolTip">Имя параметра, который используется в проекте для группировки диспетчера на первом уровне</system:String>
+    <system:String x:Key="DispatcherParams.DispatcherGroupingSecondParameterToolTip">Имя параметра, который используется в проекте для группировки диспетчера на втором уровне</system:String>
+    
+    <!-- AnnotationParamsPage ToolTips -->
+    <system:String x:Key="AnnotationParams.AnnotationRelatedParametersToolTip">Настройки и типы аннотаций проекта, над которым вы работаете</system:String>
+    <system:String x:Key="AnnotationParams.SelectDimensionTypeSizeToolTip">Выберите типоразмер размера для расстановки размеров на видах</system:String>
+    <system:String x:Key="AnnotationParams.SelectSpotDimensionTypeSizeToolTip">Выберите типоразмер высотной отметки для расстановки отметок высот</system:String>
+    <system:String x:Key="AnnotationParams.SelectRebarProductMarkTypeSizeToolTip">Выберите типоразмер марки арматурного изделия для маркировки каркасов</system:String>
+    <system:String x:Key="AnnotationParams.SelectRebarMarkWithSerifTypeSizeToolTip">Выберите типоразмер марки арматуры с засечкой для маркировки отдельных стержней</system:String>
+    <system:String x:Key="AnnotationParams.SelectRebarMarkWithStepTypeSizeToolTip">Выберите типоразмер марки арматуры с шагом для маркировки стержней с указанием шага</system:String>
+    <system:String x:Key="AnnotationParams.SelectRebarMarkWithCommentTypeSizeToolTip">Выберите типоразмер марки арматуры с комментарием для маркировки с дополнительными комментариями</system:String>
+    <system:String x:Key="AnnotationParams.SelectUniversalMarkWithTextTypeSizeToolTip">Выберите типоразмер универсальной марки с текстом для прочих обозначений</system:String>
+    <system:String x:Key="AnnotationParams.SelectBreakLineTypeSizeToolTip">Выберите типоразмер линии обрыва для обозначения обрывов на видах</system:String>
+    <system:String x:Key="AnnotationParams.SelectConcretingJointTypeSizeToolTip">Выберите типоразмер рабочего шва бетонирования для обозначения швов бетонирования</system:String>
 
     <!-- PylonParamsPage ToolTips -->
     <system:String x:Key="PylonParamsPage.FormworkElementParametersToolTip">Параметры, принадлежащие опалубочному элементу пилона</system:String>

@@ -31,7 +31,8 @@ internal class PluginConfig : ProjectConfig<PluginSettings> {
         var scheduleFiltersSettings = mainViewModel.ScheduleFiltersSettings;
         var legendsAndAnnotationsSettings = mainViewModel.LegendsAndAnnotationsSettings;
         var pylonSettings = mainViewModel.PylonSettings;
-        var projectSettings = mainViewModel.ProjectSettings;
+        var projectSettings = mainViewModel.AnnotationSettings;
+        var dispatcherSettings = mainViewModel.DispatcherSettings;
         var sheetSettings = mainViewModel.SheetSettings;
 
         selectionSettings.NeedWorkWithGeneralView = settings.NeedWorkWithGeneralView;
@@ -225,10 +226,10 @@ internal class PluginConfig : ProjectConfig<PluginSettings> {
         pylonSettings.TypicalPylonFilterValue = settings.TypicalPylonFilterValue;
         pylonSettings.TypicalPylonFilterValueTemp = settings.TypicalPylonFilterValue;
 
-        projectSettings.DispatcherGroupingFirst = settings.DispatcherGroupingFirst;
-        projectSettings.DispatcherGroupingFirstTemp = settings.DispatcherGroupingFirst;
-        projectSettings.DispatcherGroupingSecond = settings.DispatcherGroupingSecond;
-        projectSettings.DispatcherGroupingSecondTemp = settings.DispatcherGroupingSecond;
+        dispatcherSettings.DispatcherGroupingFirst = settings.DispatcherGroupingFirst;
+        dispatcherSettings.DispatcherGroupingFirstTemp = settings.DispatcherGroupingFirst;
+        dispatcherSettings.DispatcherGroupingSecond = settings.DispatcherGroupingSecond;
+        dispatcherSettings.DispatcherGroupingSecondTemp = settings.DispatcherGroupingSecond;
 
         projectSettings.DimensionTypeName = settings.DimensionTypeName;
         projectSettings.DimensionTypeNameTemp = settings.DimensionTypeName;
@@ -278,7 +279,8 @@ internal class PluginConfig : ProjectConfig<PluginSettings> {
         var scheduleFiltersSettings = mainViewModel.ScheduleFiltersSettings;
         var legendsAndAnnotationsSettings = mainViewModel.LegendsAndAnnotationsSettings;
         var pylonSettings = mainViewModel.PylonSettings;
-        var projectSettings = mainViewModel.ProjectSettings;
+        var projectSettings = mainViewModel.AnnotationSettings;
+        var dispatcherSettings = mainViewModel.DispatcherSettings;
         var sheetSettings = mainViewModel.SheetSettings;
 
         settings.NeedWorkWithGeneralView = selectionSettings.NeedWorkWithGeneralView;
@@ -395,8 +397,8 @@ internal class PluginConfig : ProjectConfig<PluginSettings> {
         settings.PylonLengthParamName = pylonSettings.PylonLengthParamName;
         settings.PylonWidthParamName = pylonSettings.PylonWidthParamName;
 
-        settings.DispatcherGroupingFirst = projectSettings.DispatcherGroupingFirst;
-        settings.DispatcherGroupingSecond = projectSettings.DispatcherGroupingSecond;
+        settings.DispatcherGroupingFirst = dispatcherSettings.DispatcherGroupingFirst;
+        settings.DispatcherGroupingSecond = dispatcherSettings.DispatcherGroupingSecond;
         settings.DimensionTypeName = projectSettings.DimensionTypeName;
         settings.SpotDimensionTypeName = projectSettings.SpotDimensionTypeName;
         settings.SkeletonTagTypeName = projectSettings.SkeletonTagTypeName;

@@ -9,13 +9,10 @@ using dosymep.SimpleServices;
 using RevitPylonDocumentation.Models;
 
 namespace RevitPylonDocumentation.ViewModels.UserSettings;
-internal class UserProjectSettingsVM : ValidatableViewModel {
+internal class UserAnnotationSettingsVM : ValidatableViewModel {
     private readonly MainViewModel _viewModel;
     private readonly RevitRepository _revitRepository;
     private readonly ILocalizationService _localizationService;
-
-    private string _dispatcherGroupingFirstTemp = "_Группа видов 1";
-    private string _dispatcherGroupingSecondTemp = "_Группа видов 2";
 
     private string _dimensionTypeNameTemp = "я_Основной_Плагин_2.5 мм";
     private string _spotDimensionTypeNameTemp = "Стрелка_Проектная_Верх";
@@ -43,33 +40,12 @@ internal class UserProjectSettingsVM : ValidatableViewModel {
 
     private SpotDimensionType _selectedSpotDimensionType;
 
-    public UserProjectSettingsVM(MainViewModel mainViewModel, RevitRepository repository,
-                                 ILocalizationService localizationService) {
+    public UserAnnotationSettingsVM(MainViewModel mainViewModel, RevitRepository repository,
+                                    ILocalizationService localizationService) {
         _viewModel = mainViewModel;
         _revitRepository = repository;
         _localizationService = localizationService;
         ValidateAllProperties();
-    }
-
-    public string DispatcherGroupingFirst { get; set; }
-    [Required]
-    [RegularExpression(@"^[^\\\/:*?""<>|\[\]\{\};~]+$")]
-    public string DispatcherGroupingFirstTemp {
-        get => _dispatcherGroupingFirstTemp;
-        set {
-            RaiseAndSetIfChanged(ref _dispatcherGroupingFirstTemp, value);
-            ValidateProperty(value);
-        }
-    }
-    public string DispatcherGroupingSecond { get; set; }
-    [Required]
-    [RegularExpression(@"^[^\\\/:*?""<>|\[\]\{\};~]+$")]
-    public string DispatcherGroupingSecondTemp {
-        get => _dispatcherGroupingSecondTemp;
-        set {
-            RaiseAndSetIfChanged(ref _dispatcherGroupingSecondTemp, value);
-            ValidateProperty(value);
-        }
     }
 
     public string DimensionTypeName { get; set; }
@@ -139,7 +115,7 @@ internal class UserProjectSettingsVM : ValidatableViewModel {
         get => _selectedDimensionType;
         set {
             RaiseAndSetIfChanged(ref _selectedDimensionType, value);
-            _viewModel.ProjectSettings.DimensionTypeNameTemp = value?.Name;
+            _viewModel.AnnotationSettings.DimensionTypeNameTemp = value?.Name;
             ValidateProperty(value);
         }
     }
@@ -152,7 +128,7 @@ internal class UserProjectSettingsVM : ValidatableViewModel {
         get => _selectedSkeletonTagType;
         set {
             RaiseAndSetIfChanged(ref _selectedSkeletonTagType, value);
-            _viewModel.ProjectSettings.SkeletonTagTypeNameTemp = value?.Name;
+            _viewModel.AnnotationSettings.SkeletonTagTypeNameTemp = value?.Name;
             ValidateProperty(value);
         }
     }
@@ -165,7 +141,7 @@ internal class UserProjectSettingsVM : ValidatableViewModel {
         get => _selectedRebarTagTypeWithSerif;
         set {
             RaiseAndSetIfChanged(ref _selectedRebarTagTypeWithSerif, value);
-            _viewModel.ProjectSettings.RebarTagTypeWithSerifNameTemp = value?.Name;
+            _viewModel.AnnotationSettings.RebarTagTypeWithSerifNameTemp = value?.Name;
             ValidateProperty(value);
         }
     }
@@ -178,7 +154,7 @@ internal class UserProjectSettingsVM : ValidatableViewModel {
         get => _selectedRebarTagTypeWithStep;
         set {
             RaiseAndSetIfChanged(ref _selectedRebarTagTypeWithStep, value);
-            _viewModel.ProjectSettings.RebarTagTypeWithStepNameTemp = value?.Name;
+            _viewModel.AnnotationSettings.RebarTagTypeWithStepNameTemp = value?.Name;
             ValidateProperty(value);
         }
     }
@@ -191,7 +167,7 @@ internal class UserProjectSettingsVM : ValidatableViewModel {
         get => _selectedRebarTagTypeWithComment;
         set {
             RaiseAndSetIfChanged(ref _selectedRebarTagTypeWithComment, value);
-            _viewModel.ProjectSettings.RebarTagTypeWithCommentNameTemp = value?.Name;
+            _viewModel.AnnotationSettings.RebarTagTypeWithCommentNameTemp = value?.Name;
             ValidateProperty(value);
         }
     }
@@ -204,7 +180,7 @@ internal class UserProjectSettingsVM : ValidatableViewModel {
         get => _selectedUniversalTagType;
         set {
             RaiseAndSetIfChanged(ref _selectedUniversalTagType, value);
-            _viewModel.ProjectSettings.UniversalTagTypeNameTemp = value?.Name;
+            _viewModel.AnnotationSettings.UniversalTagTypeNameTemp = value?.Name;
             ValidateProperty(value);
         }
     }
@@ -217,7 +193,7 @@ internal class UserProjectSettingsVM : ValidatableViewModel {
         get => _selectedBreakLineType;
         set {
             RaiseAndSetIfChanged(ref _selectedBreakLineType, value);
-            _viewModel.ProjectSettings.BreakLineTypeNameTemp = value?.Name;
+            _viewModel.AnnotationSettings.BreakLineTypeNameTemp = value?.Name;
             ValidateProperty(value);
         }
     }
@@ -230,7 +206,7 @@ internal class UserProjectSettingsVM : ValidatableViewModel {
         get => _selectedConcretingJointType;
         set {
             RaiseAndSetIfChanged(ref _selectedConcretingJointType, value);
-            _viewModel.ProjectSettings.ConcretingJointTypeNameTemp = value?.Name;
+            _viewModel.AnnotationSettings.ConcretingJointTypeNameTemp = value?.Name;
             ValidateProperty(value);
         }
     }
@@ -243,33 +219,13 @@ internal class UserProjectSettingsVM : ValidatableViewModel {
         get => _selectedSpotDimensionType;
         set {
             RaiseAndSetIfChanged(ref _selectedSpotDimensionType, value);
-            _viewModel.ProjectSettings.SpotDimensionTypeNameTemp = value?.Name;
+            _viewModel.AnnotationSettings.SpotDimensionTypeNameTemp = value?.Name;
             ValidateProperty(value);
         }
     }
 
 
     public bool CheckSettings() {
-        // Пытаемся проверить виды
-        if(_revitRepository.AllSectionViews.FirstOrDefault()?.LookupParameter(DispatcherGroupingFirst) is null) {
-            SetError(_localizationService.GetLocalizedString("VM.DispatcherGroupingFirstParamInvalid"));
-            return false;
-        }
-        if(_revitRepository.AllSectionViews.FirstOrDefault()?.LookupParameter(DispatcherGroupingSecond) is null) {
-            SetError(_localizationService.GetLocalizedString("VM.DispatcherGroupingSecondParamInvalid"));
-            return false;
-        }
-
-        // Пытаемся проверить спеки
-        if(_revitRepository.AllScheduleViews.FirstOrDefault()?.LookupParameter(DispatcherGroupingFirst) is null) {
-            SetError(_localizationService.GetLocalizedString("VM.DispatcherGroupingFirstParamInvalid"));
-            return false;
-        }
-        if(_revitRepository.AllScheduleViews.FirstOrDefault()?.LookupParameter(DispatcherGroupingSecond) is null) {
-            SetError(_localizationService.GetLocalizedString("VM.DispatcherGroupingSecondParamInvalid"));
-            return false;
-        }
-
         if(SelectedDimensionType is null) {
             SetError(_localizationService.GetLocalizedString("VM.DimensionTypeNotSelected"));
             return false;

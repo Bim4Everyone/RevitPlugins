@@ -55,9 +55,9 @@ internal class TransViewRebarVertDimensionService {
             if(onTopOfRebar) {
                 if(_sheetInfo.RebarInfo.AllRebarAreL) {
                     _dimCreationService.CreateDimension(skeletonParentRebar, bottomSmallOffset, ["низ", "фронт"],
-                                                        needEqualityFormula: _settings.ProjectSettings.DimensionGrouping);
+                                                        needEqualityFormula: _settings.AnnotationSettings.DimensionGrouping);
                     _dimCreationService.CreateDimension(skeletonParentRebar, bottomBigOffset, ["низ", "фронт", "край"],
-                                                        needEqualityFormula: _settings.ProjectSettings.DimensionGrouping);
+                                                        needEqualityFormula: _settings.AnnotationSettings.DimensionGrouping);
                 } else if(_sheetInfo.RebarInfo.HasLRebar) {
                     var rebarFinder = _sheetInfo.RebarFinder;
                     var view = _viewOfPylon.ViewElement;
@@ -65,59 +65,59 @@ internal class TransViewRebarVertDimensionService {
                         _dimCreationService.CreateDimension(skeletonParentRebar,
                                                             topSmallOffset,
                                                             ["низ", "фронт"],
-                                                            needEqualityFormula: _settings.ProjectSettings.DimensionGrouping);
+                                                            needEqualityFormula: _settings.AnnotationSettings.DimensionGrouping);
                         _dimCreationService.CreateDimension(skeletonParentRebar,
                                                             topBigOffset,
                                                             ["низ", "фронт", "край"],
-                                                            needEqualityFormula: _settings.ProjectSettings.DimensionGrouping);
+                                                            needEqualityFormula: _settings.AnnotationSettings.DimensionGrouping);
                         _dimCreationService.CreateDimension(skeletonParentRebar,
                                                             bottomSmallOffset,
                                                             ["верх", "фронт"],
                                                             edgeBottomFrontRefArray,
-                                                            needEqualityFormula: _settings.ProjectSettings.DimensionGrouping);
+                                                            needEqualityFormula: _settings.AnnotationSettings.DimensionGrouping);
                         _dimCreationService.CreateDimension(skeletonParentRebar,
                                                             bottomBigOffset,
                                                             ["верх", "фронт", "край"],
-                                                            needEqualityFormula: _settings.ProjectSettings.DimensionGrouping);
+                                                            needEqualityFormula: _settings.AnnotationSettings.DimensionGrouping);
                     } else {
                         _dimCreationService.CreateDimension(skeletonParentRebar,
                                                             topSmallOffset,
                                                             ["верх", "фронт"],
                                                             edgeBottomFrontRefArray,
-                                                            needEqualityFormula: _settings.ProjectSettings.DimensionGrouping);
+                                                            needEqualityFormula: _settings.AnnotationSettings.DimensionGrouping);
                         _dimCreationService.CreateDimension(skeletonParentRebar,
                                                             topBigOffset,
                                                             ["верх", "фронт", "край"],
-                                                            needEqualityFormula: _settings.ProjectSettings.DimensionGrouping);
+                                                            needEqualityFormula: _settings.AnnotationSettings.DimensionGrouping);
                         _dimCreationService.CreateDimension(skeletonParentRebar,
                                                             bottomSmallOffset,
                                                             ["низ", "фронт"],
-                                                            needEqualityFormula: _settings.ProjectSettings.DimensionGrouping);
+                                                            needEqualityFormula: _settings.AnnotationSettings.DimensionGrouping);
                         _dimCreationService.CreateDimension(skeletonParentRebar,
                                                             bottomBigOffset,
                                                             ["низ", "фронт", "край"],
-                                                            needEqualityFormula: _settings.ProjectSettings.DimensionGrouping);
+                                                            needEqualityFormula: _settings.AnnotationSettings.DimensionGrouping);
                     }
                 } else {
                     _dimCreationService.CreateDimension(skeletonParentRebar,
                                                         bottomSmallOffset,
                                                         ["верх", "фронт"],
                                                         edgeBottomFrontRefArray,
-                                                        needEqualityFormula: _settings.ProjectSettings.DimensionGrouping);
+                                                        needEqualityFormula: _settings.AnnotationSettings.DimensionGrouping);
                     _dimCreationService.CreateDimension(skeletonParentRebar,
                                                         bottomBigOffset,
                                                         ["низ", "фронт", "край"],
-                                                        needEqualityFormula: _settings.ProjectSettings.DimensionGrouping);
+                                                        needEqualityFormula: _settings.AnnotationSettings.DimensionGrouping);
                 }
             } else {
                 _dimCreationService.CreateDimension(skeletonParentRebar,
                                                     bottomSmallOffset,
                                                     ["низ", "фронт"],
-                                                    needEqualityFormula: _settings.ProjectSettings.DimensionGrouping);
+                                                    needEqualityFormula: _settings.AnnotationSettings.DimensionGrouping);
                 _dimCreationService.CreateDimension(skeletonParentRebar,
                                                     bottomBigOffset,
                                                     ["низ", "фронт", "край"],
-                                                    needEqualityFormula: _settings.ProjectSettings.DimensionGrouping);
+                                                    needEqualityFormula: _settings.AnnotationSettings.DimensionGrouping);
             }
         } catch(Exception) { }
     }

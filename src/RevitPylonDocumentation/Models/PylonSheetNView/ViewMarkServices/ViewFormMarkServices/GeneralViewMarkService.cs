@@ -33,17 +33,17 @@ internal class GeneralViewMarkService {
         _annotationService = new TagCreationService(_viewOfPylon);
 
         // Находим типоразмер марки несущей арматуры для обозначения марки изделия
-        _tagSkeletonSymbol = settings.ProjectSettings.SelectedSkeletonTagType;
+        _tagSkeletonSymbol = settings.AnnotationSettings.SelectedSkeletonTagType;
 
         // Находим типоразмер марки несущей арматуры для обозначения позиции, диаметра и комментариев арматуры
         // Находим типоразмер типовой аннотации для метки ГОСТа сварки
-        _universalTagType = settings.ProjectSettings.SelectedUniversalTagType;
+        _universalTagType = settings.AnnotationSettings.SelectedUniversalTagType;
 
         // Находим типоразмер аннотации рабочего шва бетонирования
-        _concretingSeamSymbol = settings.ProjectSettings.SelectedConcretingJointType;
+        _concretingSeamSymbol = settings.AnnotationSettings.SelectedConcretingJointType;
 
         // Находим типоразмер аннотации высотной отметки
-        _spotDimensionType = settings.ProjectSettings.SelectedSpotDimensionType;
+        _spotDimensionType = settings.AnnotationSettings.SelectedSpotDimensionType;
     }
 
     /// <summary>

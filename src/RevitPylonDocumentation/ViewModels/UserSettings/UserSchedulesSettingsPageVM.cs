@@ -4,9 +4,12 @@ using System.Linq;
 
 using Autodesk.Revit.DB;
 
+using dosymep.SimpleServices;
+
 namespace RevitPylonDocumentation.ViewModels.UserSettings;
 internal class UserSchedulesSettingsPageVM : ValidatableViewModel {
     private readonly MainViewModel _viewModel;
+    private readonly ILocalizationService _localizationService;
 
     // Префиксы и суффиксы для поиска и новых спек
     private string _materialSchedulePrefixTemp = "КЖ..._СМ_";
@@ -21,11 +24,11 @@ internal class UserSchedulesSettingsPageVM : ValidatableViewModel {
     private string _skeletonByElemsScheduleSuffixTemp = "_Изделия_Поэлементная";
 
     // Названия эталонных спек
+    private string _skeletonScheduleNameTemp = "01_(КЖ...)_Изделия_(Марка)";
+    private string _skeletonByElemsScheduleNameTemp = "01_(КЖ...)_Изделия_(Марка)_Поэлементная";
     private string _materialScheduleNameTemp = "01_(КЖ...)_СМ_Базовая_(Марка пилона)_Одноэтажный";
     private string _systemPartsScheduleNameTemp = "01_(КЖ...)_ВД_(Марка пилона)_Системная";
     private string _ifcPartsScheduleNameTemp = "01_(КЖ...)_ВД_(Марка пилона)_IFC";
-    private string _skeletonScheduleNameTemp = "01_(КЖ...)_Изделия_(Марка)";
-    private string _skeletonByElemsScheduleNameTemp = "01_(КЖ...)_Изделия_(Марка)_Поэлементная";
 
     // Выбранные эталонные спецификации
     private ViewSchedule _selectedSkeletonSchedule;
@@ -47,8 +50,9 @@ internal class UserSchedulesSettingsPageVM : ValidatableViewModel {
     private string _skeletonByElemsScheduleDisp2Temp = "СА_Пилоны";
 
 
-    public UserSchedulesSettingsPageVM(MainViewModel mainViewModel) {
+    public UserSchedulesSettingsPageVM(MainViewModel mainViewModel, ILocalizationService localizationService) {
         _viewModel = mainViewModel;
+        _localizationService = localizationService;
         ValidateAllProperties();
     }
 
@@ -314,6 +318,29 @@ internal class UserSchedulesSettingsPageVM : ValidatableViewModel {
     }
 
 
+    public bool CheckSettings() {
+        if(!int.TryParse(SkeletonScheduleName, out _)) {
+            SetError(_localizationService.GetLocalizedString("VM.SkeletonScheduleNameInvalid"));
+            return false;
+        }
+        if(!int.TryParse(SkeletonByElemsScheduleName, out _)) {
+            SetError(_localizationService.GetLocalizedString("VM.SkeletonByElemsScheduleNameInvalid"));
+            return false;
+        }
+        if(!int.TryParse(MaterialScheduleName, out _)) {
+            SetError(_localizationService.GetLocalizedString("VM.MaterialScheduleNameInvalid"));
+            return false;
+        }
+        if(!int.TryParse(SystemPartsScheduleName, out _)) {
+            SetError(_localizationService.GetLocalizedString("VM.SystemPartsScheduleNameInvalid"));
+            return false;
+        }
+        if(!int.TryParse(IfcPartsScheduleName, out _)) {
+            SetError(_localizationService.GetLocalizedString("VM.IfcPartsScheduleNameInvalid"));
+            return false;
+        }
+        return true;
+    }
 
     /// <summary>
     /// Получает эталонную спецификацию каркасов по имени
@@ -363,5 +390,17 @@ internal class UserSchedulesSettingsPageVM : ValidatableViewModel {
             SelectedIfcPartsSchedule = _viewModel.SchedulesInPj
                 .FirstOrDefault(view => view.Name.Equals(IfcPartsScheduleName));
         }
+    }
+
+
+    /// <summary>
+    /// Записывает ошибку для отображения в GUI, указывая наименование вкладки, на которой произошла ошибка
+    /// </summary>
+    /// <param name="error"></param>
+    private void SetError(string error) {
+        _viewModel.ErrorText = string.Format(
+            "{0} - {1}",
+            _localizationService.GetLocalizedString("MainWindow.Schedules"),
+            error);
     }
 }
