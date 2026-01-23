@@ -33,16 +33,10 @@ namespace RevitUnmodelingMep.Models;
 internal class UnmodelingCalculator {
     private readonly Document _doc;
     private readonly ILocalizationService _localizationService;
-    private readonly double _stockDuctPipe;
-    private readonly double _stockDuctIns;
-    private readonly double _stockPipeIns;
 
     public UnmodelingCalculator(Document doc, ILocalizationService localizationService) {
         _doc = doc;
         _localizationService = localizationService;
-        _stockDuctPipe = GetStocks(BuiltInCategory.OST_DuctCurves);
-        _stockPipeIns = GetStocks(BuiltInCategory.OST_PipeInsulations);
-        _stockDuctIns = GetStocks(BuiltInCategory.OST_DuctInsulations);
     }
 
     public List<NewRowElement> GetElementsToGenerate(ConsumableTypeItem config) {
@@ -298,13 +292,12 @@ internal class UnmodelingCalculator {
            $"GetGeometricDescription unexpected element type: (Id {element?.Id})");
     }
 
-    private void BuildDebugLog(CalculationElementBase calcElement, string formula, double projectStock) {
+    private void BuildDebugLog(CalculationElementBase calcElement, string formula) {
         StringBuilder logBuilder = new StringBuilder();
         string errorMessage = _localizationService.GetLocalizedString("UnmodelingCalculator.Error");
         logBuilder.AppendLine(errorMessage);
         logBuilder.AppendLine($"ElementId: {calcElement.Element.Id}");
         logBuilder.AppendLine($"Formula: {formula}");
-        logBuilder.AppendLine($"ProjectStock: {projectStock}");
 
         foreach(var property in calcElement.GetType().GetProperties()) {
             if(!property.CanRead) {
@@ -334,20 +327,6 @@ internal class UnmodelingCalculator {
     }
 
     private double CalculateFormula(ConsumableTypeItem config, CalculationElementBase calElement) {
-        double projectStock = 1;
-        BuiltInCategory category = ParseCategory(config);
-
-        if(
-        category == BuiltInCategory.OST_PipeCurves || category == BuiltInCategory.OST_DuctCurves) {
-            projectStock = _stockDuctPipe;
-        }
-        if(category == BuiltInCategory.OST_PipeInsulations) {
-            projectStock = _stockPipeIns;
-        }
-        if(category == BuiltInCategory.OST_DuctInsulations) {
-            projectStock = _stockDuctIns;
-        }
-
         string formula = config.Formula;
         var evaluator = new ExpressionEvaluator();
 
@@ -360,13 +339,11 @@ internal class UnmodelingCalculator {
             evaluator.Variables[property.Name] = value;
         }
 
-        evaluator.Variables["ProjectStock"] = projectStock;
-
         try {
             object result = evaluator.Evaluate(formula);
             return Convert.ToDouble(result);
         } catch(Exception) {
-            BuildDebugLog(calElement, formula, projectStock);
+            BuildDebugLog(calElement, formula);
             throw;
         }
     }
@@ -374,6 +351,7 @@ internal class UnmodelingCalculator {
     private CalculationElementBase GetDuctGeoDesc(MEPCurve duct) {
         DuctType ductType = (DuctType) duct.GetElementType();
         CalculationElementDuct calculationElement = new CalculationElementDuct(duct);
+        calculationElement.ProjectStock = GetStocks(BuiltInCategory.OST_DuctCurves);
 
         calculationElement.SystemSharedName = 
             duct.GetParamValueOrDefault<string>(SharedParamsConfig.Instance.VISSystemName, "");
@@ -426,6 +404,7 @@ internal class UnmodelingCalculator {
 
     private CalculationElementBase GetPipeGeoDesc(Pipe pipe) {
         CalculationElementPipe calculationElement = new CalculationElementPipe(pipe);
+        calculationElement.ProjectStock = GetStocks(BuiltInCategory.OST_PipeCurves);
 
         calculationElement.SystemSharedName =
             pipe.GetParamValueOrDefault<string>(SharedParamsConfig.Instance.VISSystemName, "");
@@ -468,6 +447,7 @@ internal class UnmodelingCalculator {
 
     private CalculationElementBase GetPipeInsGeoDes(PipeInsulation pipeIns) {
         CalculationElementPipeIns calculationElement = new CalculationElementPipeIns(pipeIns);
+        calculationElement.ProjectStock = GetStocks(BuiltInCategory.OST_PipeInsulations);
         Pipe pipe = (Pipe) _doc.GetElement(pipeIns.HostElementId);
         double inDiameter = pipe.Diameter;
 
@@ -494,6 +474,7 @@ internal class UnmodelingCalculator {
         MEPCurve duct = (MEPCurve) _doc.GetElement(ductIns.HostElementId);
         DuctType ductType = (DuctType) duct.GetElementType();
         CalculationElementDuctIns calculationElement = new CalculationElementDuctIns(ductIns);
+        calculationElement.ProjectStock = GetStocks(BuiltInCategory.OST_DuctInsulations);
         if(ductType.Shape == ConnectorProfileType.Round) {
             calculationElement.IsRound = true;
             calculationElement.Diameter_mm = ductIns.Diameter;

@@ -108,7 +108,7 @@ internal static class FormulaValidator {
             StringComparer.OrdinalIgnoreCase);
 
         HashSet<string> mathOperators = new HashSet<string> {
-            "Floor", "Ceiling", "ProjectStock"
+            "Floor", "Ceiling"
         };
 
 

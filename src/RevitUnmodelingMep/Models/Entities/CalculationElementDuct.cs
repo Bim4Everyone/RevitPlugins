@@ -20,6 +20,8 @@ internal sealed class CalculationElementDuct : CalculationElementBase {
 
     public bool IsInsulated { get; set; }
 
+    public double ProjectStock { get; set; }
+
     public double? InsulationThikness_mm {
         get => _insulationThikness_mm;
         set => _insulationThikness_mm = ToMillimeters(value);
