@@ -43,7 +43,7 @@
     <system:String x:Key="MainViewModel.PipeSysName">Pipe systems</system:String>
 
     <system:String x:Key="FormulaValidator.FormulaError">Please fill in the formula</system:String>
-    <system:String x:Key="FormulaValidator.DotError">The formula uses a comma instead of a dot</system:String>
+    <system:String x:Key="FormulaValidator.DotError">Replace commas with dots in the formula</system:String>
     <system:String x:Key="FormulaValidator.VariableError">Invalid variable in the formula</system:String>
 
     <system:String x:Key="VisSettingsStorage.TransactionName">Update settings</system:String>

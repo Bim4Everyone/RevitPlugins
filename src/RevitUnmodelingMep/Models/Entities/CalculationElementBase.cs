@@ -21,6 +21,13 @@ internal abstract class CalculationElementBase {
             : null;
     }
 
+    protected static double? ToMeters(double? value) {
+        return value.HasValue
+            ? UnitUtils.ConvertFromInternalUnits(value.Value, UnitTypeId.Meters)
+            : null;
+    }
+
+
     protected static double? ToSquareMeters(double? value) {
         return value.HasValue
             ? UnitUtils.ConvertFromInternalUnits(value.Value, UnitTypeId.SquareMeters)
@@ -30,6 +37,12 @@ internal abstract class CalculationElementBase {
     protected static double? ToCubicMeters(double? value) {
         return value.HasValue
             ? UnitUtils.ConvertFromInternalUnits(value.Value, UnitTypeId.CubicMeters)
+            : null;
+    }
+
+    protected static double? MillimetersToMeters(double? valueMm) {
+        return valueMm.HasValue
+            ? valueMm.Value / 1000d
             : null;
     }
 }

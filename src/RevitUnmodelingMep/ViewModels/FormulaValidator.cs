@@ -15,12 +15,11 @@ using RevitUnmodelingMep.Models.Entities;
 namespace RevitUnmodelingMep.ViewModels;
 
 internal static class FormulaValidator {
-
     public static string NormalizeFormula(string formula) {
         if(string.IsNullOrEmpty(formula))
             return formula;
 
-        return formula.Replace(',', '.');
+        return formula;
     }
 
     public static bool ValidateFormulas(
@@ -99,7 +98,8 @@ internal static class FormulaValidator {
         };
 
 
-        string formulaNoStrings = Regex.Replace(item.Formula, "\"[^\"]*\"", " ");
+        string normalizedFormula = NormalizeFormula(item.Formula);
+        string formulaNoStrings = Regex.Replace(normalizedFormula, "\"[^\"]*\"", " ");
 
         foreach(Match match in Regex.Matches(formulaNoStrings, @"[\p{L}_][\p{L}\p{Nd}_]*")) {
             string token = match.Value;

@@ -216,19 +216,12 @@ internal class UnmodelingCalculator {
     private string CreateNote(ConsumableTypeItem config, List<CalculationElementBase> calculationElements) {
         string noteFormula = config.Note ?? string.Empty;
 
-        // учитываем только элементы у которых хоть одно значение не ноль
-        //var filtered = calculationElements
-        //    .Where(r => (GetDoublePropertyValue(r, "Area") ?? 0) != 0 || (GetDoublePropertyValue(r, "Length") ?? 0) != 0)
-        //    .ToList();
-
-        //double sumArea = filtered.Any() ? filtered.Sum(r => GetDoublePropertyValue(r, "Area") ?? 0) : 0;
-        //double sumLength = filtered.Any() ? filtered.Sum(r => GetDoublePropertyValue(r, "Length") ?? 0) : 0;
-        //double count = filtered.Count;
-
         double sumArea = calculationElements.Any() 
-            ? calculationElements.Sum(r => GetDoublePropertyValue(r, "Area") ?? 0) : 0;
-        double sumLength = calculationElements.Any() 
-            ? calculationElements.Sum(r => GetDoublePropertyValue(r, "Length") ?? 0) : 0;
+            ? calculationElements.Sum(r => GetDoublePropertyValue(r, "Area_m2") ?? 0) : 0;
+        double sumLength_mm = calculationElements.Any() 
+            ? calculationElements.Sum(r => GetDoublePropertyValue(r, "Length_mm") ?? 0) : 0;
+        double sumLength_m = calculationElements.Any()
+            ? calculationElements.Sum(r => GetDoublePropertyValue(r, "Length_m") ?? 0) : 0;
         double count = calculationElements.Count;
 
         string FormatValue(double value) {
@@ -237,8 +230,9 @@ internal class UnmodelingCalculator {
         }
 
         string result = noteFormula
-            .Replace("SumArea", FormatValue(sumArea))
-            .Replace("SumLength", FormatValue(sumLength))
+            .Replace("SumArea_m2", FormatValue(sumArea))
+            .Replace("SumLength_mm", FormatValue(sumLength_mm))
+            .Replace("SumLength_m", FormatValue(sumLength_m))
             .Replace("Count", FormatValue(count));
 
         return result;
@@ -353,30 +347,30 @@ internal class UnmodelingCalculator {
         double length = duct.GetParamValueOrDefault<double>(BuiltInParameter.CURVE_ELEM_LENGTH);
         if(ductType.Shape == ConnectorProfileType.Round) {
             calculationElement.IsRound = true;
-            calculationElement.Diameter = duct.Diameter;
-            calculationElement.Perimeter = Math.PI * 2 * duct.Diameter;
+            calculationElement.Diameter_mm = duct.Diameter;
+            calculationElement.Perimeter_mm = Math.PI * 2 * duct.Diameter;
             double crossSectionArea = Math.PI * Math.Pow(duct.Diameter / 2, 2);
             double volume = crossSectionArea * length;
-            calculationElement.Volume = volume;
+            calculationElement.Volume_m3 = volume;
 
         } else {
             calculationElement.IsRound = false;
-            calculationElement.Width = duct.Width;
-            calculationElement.Height = duct.Height;
-            calculationElement.Perimeter = duct.Width * 2 + duct.Height * 2;
+            calculationElement.Width_mm = duct.Width;
+            calculationElement.Height_mm = duct.Height;
+            calculationElement.Perimeter_mm = duct.Width * 2 + duct.Height * 2;
             double crossSectionArea = duct.Width * duct.Height;
             double volume = crossSectionArea * length;
-            calculationElement.Volume = volume;
+            calculationElement.Volume_m3 = volume;
         }
 
         
         double area = duct.GetParamValueOrDefault<double>(BuiltInParameter.RBS_CURVE_SURFACE_AREA);
 
-        calculationElement.Area = area;
-        calculationElement.Length = length;
-        calculationElement.InsulationThikness =
+        calculationElement.Area_m2 = area;
+        calculationElement.Length_mm = length;
+        calculationElement.InsulationThikness_mm =
             duct.GetParamValueOrDefault<double>(BuiltInParameter.RBS_REFERENCE_INSULATION_THICKNESS);
-        if(calculationElement.InsulationThikness == 0) {
+        if(calculationElement.InsulationThikness_mm == 0) {
             calculationElement.IsInsulated = false;
         } else {
             calculationElement.IsInsulated = true;
@@ -389,7 +383,7 @@ internal class UnmodelingCalculator {
                     insulation.GetParamValueOrDefault<double>(BuiltInParameter.RBS_CURVE_SURFACE_AREA);
                 sumInsulationArea += insArea;
             }
-            calculationElement.InsulationArea = sumInsulationArea;
+            calculationElement.InsulationArea_m2 = sumInsulationArea;
         }
 
         
@@ -410,16 +404,16 @@ internal class UnmodelingCalculator {
         double volume = crossSectionArea * length;
 
         calculationElement.IsRound = true;
-        calculationElement.Diameter = pipe.Diameter;
-        calculationElement.OutDiameter = outDiameter;
-        calculationElement.Area = surfaceArea;
-        calculationElement.Volume = volume;
-        calculationElement.Perimeter = Math.PI * 2 * pipe.Diameter;
-        calculationElement.Length = length;
+        calculationElement.Diameter_mm = pipe.Diameter;
+        calculationElement.OutDiameter_mm = outDiameter;
+        calculationElement.Area_m2 = surfaceArea;
+        calculationElement.Volume_m3 = volume;
+        calculationElement.Perimeter_mm = Math.PI * 2 * pipe.Diameter;
+        calculationElement.Length_mm = length;
 
-        calculationElement.InsulationThikness = 
+        calculationElement.InsulationThikness_mm = 
             pipe.GetParamValueOrDefault<double>(BuiltInParameter.RBS_REFERENCE_INSULATION_THICKNESS);
-        if(calculationElement.InsulationThikness == 0) {
+        if(calculationElement.InsulationThikness_mm == 0) {
             calculationElement.IsInsulated = false;
         } else {
             calculationElement.IsInsulated = true;
@@ -432,7 +426,7 @@ internal class UnmodelingCalculator {
                     insulation.GetParamValueOrDefault<double>(BuiltInParameter.RBS_CURVE_SURFACE_AREA);
                 sumInsulationArea += insArea;
             }
-            calculationElement.InsulationArea = sumInsulationArea;
+            calculationElement.InsulationArea_m2 = sumInsulationArea;
         }
 
         return calculationElement;
@@ -447,16 +441,16 @@ internal class UnmodelingCalculator {
             pipeIns.GetParamValueOrDefault<string>(SharedParamsConfig.Instance.VISSystemName, "");
         calculationElement.SystemTypeName = pipeIns.MEPSystem.GetElementType().Name;
 
-        calculationElement.InsulationThikness = pipeIns.Thickness;
+        calculationElement.InsulationThikness_mm = pipeIns.Thickness;
         calculationElement.IsRound = true;
-        calculationElement.Diameter = pipe.Diameter;
-        calculationElement.OutDiameter = pipeIns.Diameter;
+        calculationElement.Diameter_mm = pipe.Diameter;
+        calculationElement.OutDiameter_mm = pipeIns.Diameter;
         ;
-        calculationElement.Area 
+        calculationElement.Area_m2 
             = pipeIns.GetParamValueOrDefault<double>(BuiltInParameter.RBS_CURVE_SURFACE_AREA);
 
-        calculationElement.Perimeter = Math.PI * 2 * pipeIns.Diameter;
-        calculationElement.Length = pipeIns.GetParamValueOrDefault<double>(BuiltInParameter.CURVE_ELEM_LENGTH);
+        calculationElement.Perimeter_mm = Math.PI * 2 * pipeIns.Diameter;
+        calculationElement.Length_mm = pipeIns.GetParamValueOrDefault<double>(BuiltInParameter.CURVE_ELEM_LENGTH);
 
         return calculationElement;
 
@@ -468,21 +462,21 @@ internal class UnmodelingCalculator {
         CalculationElementDuctIns calculationElement = new CalculationElementDuctIns(ductIns);
         if(ductType.Shape == ConnectorProfileType.Round) {
             calculationElement.IsRound = true;
-            calculationElement.Diameter = ductIns.Diameter;
-            calculationElement.Perimeter = Math.PI * 2 * ductIns.Diameter;
+            calculationElement.Diameter_mm = ductIns.Diameter;
+            calculationElement.Perimeter_mm = Math.PI * 2 * ductIns.Diameter;
 
         } else {
             calculationElement.IsRound = false;
-            calculationElement.Width = ductIns.Width;
-            calculationElement.Height = ductIns.Height;
-            calculationElement.Perimeter = ductIns.Width * 2 + ductIns.Height * 2;
+            calculationElement.Width_mm = ductIns.Width;
+            calculationElement.Height_mm = ductIns.Height;
+            calculationElement.Perimeter_mm = ductIns.Width * 2 + ductIns.Height * 2;
         }
 
         calculationElement.SystemSharedName =
             ductIns.GetParamValueOrDefault<string>(SharedParamsConfig.Instance.VISSystemName, "");
         calculationElement.SystemTypeName = ductIns.MEPSystem.GetElementType().Name;
-        calculationElement.Area = ductIns.GetParamValueOrDefault<double>(BuiltInParameter.RBS_CURVE_SURFACE_AREA);
-        calculationElement.Length = ductIns.GetParamValueOrDefault<double>(BuiltInParameter.CURVE_ELEM_LENGTH);
+        calculationElement.Area_m2 = ductIns.GetParamValueOrDefault<double>(BuiltInParameter.RBS_CURVE_SURFACE_AREA);
+        calculationElement.Length_mm = ductIns.GetParamValueOrDefault<double>(BuiltInParameter.CURVE_ELEM_LENGTH);
 
 
         return calculationElement;

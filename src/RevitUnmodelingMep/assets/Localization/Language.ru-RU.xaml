@@ -44,7 +44,7 @@
     <system:String x:Key="MainViewModel.PipeSysName">Системы трубопроводов</system:String>
 
     <system:String x:Key="FormulaValidator.FormulaError">Заполните формулу</system:String>
-    <system:String x:Key="FormulaValidator.DotError">В формуле используется запятая вместо точки</system:String>
+    <system:String x:Key="FormulaValidator.DotError">Замените запятые на точки в формуле</system:String>
     <system:String x:Key="FormulaValidator.VariableError">Недопустимая переменная в формуле</system:String>
 
     <system:String x:Key="VisSettingsStorage.TransactionName">Обновление настроек</system:String>
