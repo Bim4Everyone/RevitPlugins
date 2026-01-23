@@ -94,6 +94,10 @@ internal static class FormulaValidator {
                 .Where(a => !string.IsNullOrWhiteSpace(a)),
             StringComparer.OrdinalIgnoreCase);
 
+        HashSet<string> mathOperators = new HashSet<string> {
+            "Floor", "Ceiling", "ProjectStock"
+        };
+
 
         string formulaNoStrings = Regex.Replace(item.Formula, "\"[^\"]*\"", " ");
 
@@ -101,6 +105,10 @@ internal static class FormulaValidator {
             string token = match.Value;
             if(allowedSet.Contains(token)) {
                 continue;
+            }
+
+            if(mathOperators.Contains(token)) { 
+                continue; 
             }
 
             invalidToken = token;

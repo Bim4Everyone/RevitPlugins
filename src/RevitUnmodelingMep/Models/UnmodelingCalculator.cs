@@ -270,12 +270,13 @@ internal class UnmodelingCalculator {
            $"GetGeometricDescription unexpected element type: (Id {element?.Id})");
     }
 
-    private void BuildDebugLog(CalculationElementBase calcElement, string formula) {
+    private void BuildDebugLog(CalculationElementBase calcElement, string formula, double projectStock) {
         StringBuilder logBuilder = new StringBuilder();
         string errorMessage = _localizationService.GetLocalizedString("UnmodelingCalculator.Error");
         logBuilder.AppendLine(errorMessage);
         logBuilder.AppendLine($"ElementId: {calcElement.Element.Id}");
         logBuilder.AppendLine($"Formula: {formula}");
+        logBuilder.AppendLine($"ProjectStock: {projectStock}");
 
         foreach(var property in calcElement.GetType().GetProperties()) {
             if(!property.CanRead) {
@@ -331,14 +332,13 @@ internal class UnmodelingCalculator {
             evaluator.Variables[property.Name] = value;
         }
 
+        evaluator.Variables["ProjectStock"] = projectStock;
+
         try {
             object result = evaluator.Evaluate(formula);
-            if(config.UseCategoryReserve) {
-                return Convert.ToDouble(result) * projectStock;
-            }
             return Convert.ToDouble(result);
         } catch(Exception) {
-            BuildDebugLog(calElement, formula);
+            BuildDebugLog(calElement, formula, projectStock);
             throw;
         }
     }
