@@ -24,6 +24,7 @@
             <ColumnDefinition Width="*" />
             <ColumnDefinition Width="Auto" />
             <ColumnDefinition Width="Auto" />
+            <ColumnDefinition Width="Auto" />
         </Grid.ColumnDefinitions>
 
         <TextBlock
@@ -39,6 +40,16 @@
             Grid.Column="1"
             Margin="10 5 10 15"
             MinWidth="150"
+            Content="{Binding ShowErrorElemsButtonText, ElementName=_this}"
+            Appearance="Info"
+            Visibility="{Binding ShowErrorElemsButton, ElementName=_this, Converter={StaticResource BooleanToVisibilityConverter}}"
+            Command="{Binding ShowErrorElemsCommand, ElementName=_this}"
+            Click="ButtonCancel_Click" />
+
+        <ui:Button
+            Grid.Column="2"
+            Margin="10 5 10 15"
+            MinWidth="150"
             Content="{Binding OkButtonText, ElementName=_this}"
             Appearance="Info"
             Visibility="{Binding ShowOkButton, ElementName=_this, Converter={StaticResource BooleanToVisibilityConverter}}"
@@ -46,7 +57,7 @@
             Click="ButtonOk_Click" />
 
         <ui:Button
-            Grid.Column="2"
+            Grid.Column="3"
             Margin="10 5 15 15"
             MinWidth="150"
             Content="{Binding CancelButtonText, ElementName=_this}"

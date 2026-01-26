@@ -156,6 +156,7 @@
 
     <system:String x:Key="GeneralPage.Run">Запуск</system:String>
     <system:String x:Key="GeneralPage.Cancel">Отмена</system:String>
+    <system:String x:Key="GeneralPage.Show">Показать</system:String>
 
     <!-- VerticalViewSettingsPage -->
     <system:String x:Key="VerticalView.FormworkMainView">Основной вид опалубки</system:String>
@@ -362,7 +363,7 @@
     <system:String x:Key="SheetParams.SheetCoefficientParameter">Параметр для множителя формата рамки листа:</system:String>
     <system:String x:Key="SheetParams.SheetCoefficientParameterTooltip">Параметр для множителя формата рамки листа</system:String>
     
-    <system:String x:Key="SheetParams.SetCustomTitleBlock">Задать пользовательский размер ра:</system:String>
+    <system:String x:Key="SheetParams.SetCustomTitleBlock">Задать пользовательский размер рамки листа:</system:String>
     <system:String x:Key="SheetParams.CustomSheetSizeParameterValue">Пользовательское значение параметра формата рамки листа:</system:String>
     <system:String x:Key="SheetParams.CustomSheetSizeParameterValueTooltip">Пользовательское значение параметра формата рамки листа</system:String>
     <system:String x:Key="SheetParams.CustomSheetCoefficientParameterValue">Пользовательское значение параметра множителя формата рамки листа:</system:String>

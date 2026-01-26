@@ -15,6 +15,7 @@
     xmlns:local="clr-namespace:RevitPylonDocumentation.Views.Pages"
     xmlns:views="clr-namespace:RevitPylonDocumentation.Views"
     xmlns:controls="clr-namespace:RevitPylonDocumentation.Views.Controls"
+    xmlns:converters="clr-namespace:RevitPylonDocumentation.Views.Converters"
     
     mc:Ignorable="d"
     ScrollViewer.CanContentScroll="False"
@@ -27,6 +28,8 @@
                 <ResourceDictionary
                     Source="../CustomStyles.xaml" />
             </ResourceDictionary.MergedDictionaries>
+            <converters:CollectionNotEmptyToBoolConverter
+                x:Key="CollectionNotEmptyToBoolConverter" />
         </ResourceDictionary>
     </core:WpfUIPlatformPage.Resources>
 
@@ -543,6 +546,9 @@
             Grid.ColumnSpan="2"
             HorizontalAlignment="Right"
             ErrorText="{Binding ErrorText}"
+            ShowErrorElemsButtonText="{me:LocalizationSource GeneralPage.Show}"
+            ShowErrorElemsButton="{Binding Path=ErrorElements, Converter={StaticResource CollectionNotEmptyToBoolConverter}}"
+            ShowErrorElemsCommand="{Binding ShowErrorElementsCommand}"
             OkButtonText="{me:LocalizationSource GeneralPage.Run}"
             OkCommand="{Binding AcceptViewCommand}"
             CancelButtonText="{me:LocalizationSource GeneralPage.Cancel}"/>

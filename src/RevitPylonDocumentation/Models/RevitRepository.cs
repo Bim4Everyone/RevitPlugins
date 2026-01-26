@@ -278,6 +278,7 @@ internal class RevitRepository {
 
                 if(pt1.DistanceTo(pt2) > _maxDistanceBetweenPylon) {
                     mainViewModel.ErrorText = _localizationService.GetLocalizedString("VM.DuplicatePylonMarksFound");
+                    mainViewModel.ErrorElements = [elem.Id, elemForCompareByDistance.Id];
                 }
             }
         }

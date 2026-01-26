@@ -33,6 +33,7 @@ internal class MainViewModel : BaseViewModel {
     private readonly IResolutionRoot _resolutionRoot;
 
     private string _errorText;
+    private List<ElementId> _errorElements = [];
     private bool _pylonSelectedManually = false;
 
     private List<PylonSheetInfoVM> _selectedHostsInfoVM = [];
@@ -95,6 +96,8 @@ internal class MainViewModel : BaseViewModel {
         SelectAllFuncInGUICommand = RelayCommand.Create(SelectAllFuncInGUI);
         UnselectAllFuncInGUICommand = RelayCommand.Create(UnselectAllFuncInGUI);
         InvertAllFuncInGUICommand = RelayCommand.Create(InvertAllFuncInGUI);
+
+        ShowErrorElementsCommand = RelayCommand.Create(ShowErrorElements);
     }
 
     public ICommand LoadViewCommand { get; }
@@ -112,6 +115,7 @@ internal class MainViewModel : BaseViewModel {
     public ICommand SelectAllFuncInGUICommand { get; }
     public ICommand UnselectAllFuncInGUICommand { get; }
     public ICommand InvertAllFuncInGUICommand { get; }
+    public ICommand ShowErrorElementsCommand { get; }
 
     /// <summary>
     /// Настройки выбора пользователя (с какими компонентами должен работать плагин) с предыдущего сеанса
@@ -263,6 +267,10 @@ internal class MainViewModel : BaseViewModel {
         set => RaiseAndSetIfChanged(ref _errorText, value);
     }
 
+    public List<ElementId> ErrorElements {
+        get => _errorElements;
+        set => RaiseAndSetIfChanged(ref _errorElements, value);
+    }
 
 
     /// <summary>
@@ -641,5 +649,10 @@ internal class MainViewModel : BaseViewModel {
         SelectionSettings.NeedWorkWithSystemPartsSchedule = !SelectionSettings.NeedWorkWithSystemPartsSchedule;
         SelectionSettings.NeedWorkWithIfcPartsSchedule = !SelectionSettings.NeedWorkWithIfcPartsSchedule;
         SelectionSettings.NeedWorkWithLegend = !SelectionSettings.NeedWorkWithLegend;
+    }
+
+
+    private void ShowErrorElements() {
+        _revitRepository.ActiveUIDocument.Selection.SetElementIds(ErrorElements);
     }
 }

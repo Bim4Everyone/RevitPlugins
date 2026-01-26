@@ -8,6 +8,15 @@ public partial class AppFooterControl : UserControl {
     public static readonly DependencyProperty ErrorTextProperty = DependencyProperty.Register(
         nameof(ErrorText), typeof(string), typeof(AppFooterControl), new PropertyMetadata(default(string)));
 
+    public static readonly DependencyProperty ShowErrorElemsButtonTextProperty = DependencyProperty.Register(
+        nameof(ShowErrorElemsButtonText), typeof(string), typeof(AppFooterControl), new PropertyMetadata("ShowErrorElems"));
+
+    public static readonly DependencyProperty ShowErrorElemsCommandProperty = DependencyProperty.Register(
+        nameof(ShowErrorElemsCommand), typeof(ICommand), typeof(AppFooterControl), new PropertyMetadata(default(ICommand)));
+
+    public static readonly DependencyProperty ShowErrorElemsButtonProperty = DependencyProperty.Register(
+        nameof(ShowErrorElemsButton), typeof(bool), typeof(AppFooterControl), new PropertyMetadata(false));
+
     public static readonly DependencyProperty OkButtonTextProperty = DependencyProperty.Register(
         nameof(OkButtonText), typeof(string), typeof(AppFooterControl), new PropertyMetadata("Ok"));
 
@@ -29,6 +38,21 @@ public partial class AppFooterControl : UserControl {
     public string ErrorText {
         get => (string) GetValue(ErrorTextProperty);
         set => SetValue(ErrorTextProperty, value);
+    }
+
+    public string ShowErrorElemsButtonText {
+        get => (string) GetValue(ShowErrorElemsButtonTextProperty);
+        set => SetValue(ShowErrorElemsButtonTextProperty, value);
+    }
+
+    public ICommand ShowErrorElemsCommand {
+        get => (ICommand) GetValue(ShowErrorElemsCommandProperty);
+        set => SetValue(ShowErrorElemsCommandProperty, value);
+    }
+
+    public bool ShowErrorElemsButton {
+        get => (bool) GetValue(ShowErrorElemsButtonProperty);
+        set => SetValue(ShowErrorElemsButtonProperty, value);
     }
 
     public string OkButtonText {
@@ -59,8 +83,7 @@ public partial class AppFooterControl : UserControl {
     }
 
     private void ButtonCancel_Click(object sender, RoutedEventArgs e) {
-        var window = Window.GetWindow(this) as MainWindow;
-        if(window != null) {
+        if(Window.GetWindow(this) is MainWindow window) {
             window.DialogResult = false;
         }
     }
