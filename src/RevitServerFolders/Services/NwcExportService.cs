@@ -139,7 +139,10 @@ internal class NwcExportService : IModelsExportService<FileModelObjectExportSett
             using var document = _revitRepository.OpenDocumentFile(fileName);
             try {
                 var exportView = CreateExportView3d(document, sourceTemplate, exportViewSettings.WorksetHideTemplates);
+                using var t = document.StartTransaction("Regenerate");
                 document.Regenerate();
+                t.Commit();
+                
                 var elementsOnView = new FilteredElementCollector(document, exportView.Id)
                     .WhereElementIsNotElementType();
 #if REVIT_2021_OR_LESS
