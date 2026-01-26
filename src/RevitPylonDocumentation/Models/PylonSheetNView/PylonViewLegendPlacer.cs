@@ -7,14 +7,12 @@ using RevitPylonDocumentation.Models.UserSettings;
 namespace RevitPylonDocumentation.Models.PylonSheetNView;
 public class PylonViewLegendPlacer {
     internal PylonViewLegendPlacer(CreationSettings settings, Document document, PylonSheetInfo pylonSheetInfo) {
-        ProjectSettings = settings.ProjectSettings;
-        TypesSettings = settings.TypesSettings;
+        LegendsAndAnnotSettings = settings.LegendsAndAnnotationsSettings;
         Doc = document;
         SheetInfo = pylonSheetInfo;
     }
 
-    internal UserProjectSettings ProjectSettings { get; set; }
-    internal UserTypesSettings TypesSettings { get; set; }
+    internal UserLegendsAndAnnotationsSettings LegendsAndAnnotSettings { get; set; }
 
     internal Document Doc { get; set; }
     internal PylonSheetInfo SheetInfo { get; set; }
@@ -25,27 +23,27 @@ public class PylonViewLegendPlacer {
     /// </summary>
     internal bool PlaceNoteLegend() {
         // Проверяем вдруг легенда не выбрана
-        if(TypesSettings.SelectedLegend is null) {
+        if(LegendsAndAnnotSettings.SelectedLegend is null) {
             return false;
         } else {
             // Заполняем данные для задания
             SheetInfo.LegendView.ViewportTypeName = "Без названия";
 
-            double coordinateX = UnitUtilsHelper.ConvertToInternalValue(int.Parse(ProjectSettings.LegendXOffset));
-            double coordinateY = UnitUtilsHelper.ConvertToInternalValue(int.Parse(ProjectSettings.LegendYOffset));
+            double coordinateX = UnitUtilsHelper.ConvertToInternalValue(int.Parse(LegendsAndAnnotSettings.LegendXOffset));
+            double coordinateY = UnitUtilsHelper.ConvertToInternalValue(int.Parse(LegendsAndAnnotSettings.LegendYOffset));
 
             SheetInfo.LegendView.ViewportCenter = new XYZ(coordinateX, coordinateY, 0);
         }
 
         // Проверяем можем ли разместить на листе легенду
-        if(!Viewport.CanAddViewToSheet(Doc, SheetInfo.PylonViewSheet.Id, TypesSettings.SelectedLegend.Id)) { 
-            return false; 
+        if(!Viewport.CanAddViewToSheet(Doc, SheetInfo.PylonViewSheet.Id, LegendsAndAnnotSettings.SelectedLegend.Id)) {
+            return false;
         }
 
         // Размещаем легенду на листе
-        var viewPort = Viewport.Create(Doc, 
-                                       SheetInfo.PylonViewSheet.Id, 
-                                       TypesSettings.SelectedLegend.Id, 
+        var viewPort = Viewport.Create(Doc,
+                                       SheetInfo.PylonViewSheet.Id,
+                                       LegendsAndAnnotSettings.SelectedLegend.Id,
                                        SheetInfo.LegendView.ViewportCenter);
         SheetInfo.LegendView.ViewportElement = viewPort;
 
