@@ -319,23 +319,23 @@ internal class UserSchedulesSettingsPageVM : ValidatableViewModel {
 
 
     public bool CheckSettings() {
-        if(!int.TryParse(SkeletonScheduleName, out _)) {
+        if(String.IsNullOrEmpty(SkeletonScheduleName)) {
             SetError(_localizationService.GetLocalizedString("VM.SkeletonScheduleNameInvalid"));
             return false;
         }
-        if(!int.TryParse(SkeletonByElemsScheduleName, out _)) {
+        if(String.IsNullOrEmpty(SkeletonByElemsScheduleName)) {
             SetError(_localizationService.GetLocalizedString("VM.SkeletonByElemsScheduleNameInvalid"));
             return false;
         }
-        if(!int.TryParse(MaterialScheduleName, out _)) {
+        if(String.IsNullOrEmpty(MaterialScheduleName)) {
             SetError(_localizationService.GetLocalizedString("VM.MaterialScheduleNameInvalid"));
             return false;
         }
-        if(!int.TryParse(SystemPartsScheduleName, out _)) {
+        if(String.IsNullOrEmpty(SystemPartsScheduleName)) {
             SetError(_localizationService.GetLocalizedString("VM.SystemPartsScheduleNameInvalid"));
             return false;
         }
-        if(!int.TryParse(IfcPartsScheduleName, out _)) {
+        if(String.IsNullOrEmpty(IfcPartsScheduleName)) {
             SetError(_localizationService.GetLocalizedString("VM.IfcPartsScheduleNameInvalid"));
             return false;
         }
