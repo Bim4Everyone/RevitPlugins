@@ -26,7 +26,7 @@ internal static class RevitConstants {
     // Ключевая строка, по которому ищется координационный файл
     public const string CoordFilePartName = "KOORD";
     // Параметр, значения которого используется дли идентификации объемных элементов
-    public static RevitParam SourceVolumeParam = SharedParamsConfig.Instance.Description;
+    public static RevitParam SourceVolumeParam = SharedParamsConfig.Instance.BuildingWorksDescription;
     // Категория объемных элементов
     public static BuiltInCategory SourceVolumeCategory = BuiltInCategory.OST_GenericModel;
 
@@ -47,6 +47,9 @@ internal static class RevitConstants {
         BuiltInCategory.OST_DuctFitting,
         BuiltInCategory.OST_DuctAccessory,
         BuiltInCategory.OST_DuctInsulations,
+        BuiltInCategory.OST_DuctFittingInsulation,
+        BuiltInCategory.OST_DuctCurvesInsulation,
+        BuiltInCategory.OST_FlexDuctCurvesInsulation,
         BuiltInCategory.OST_DuctTerminal,
         BuiltInCategory.OST_ElectricalEquipment,
         BuiltInCategory.OST_ElectricalFixtures,
@@ -63,6 +66,9 @@ internal static class RevitConstants {
         BuiltInCategory.OST_PipeFitting,
         BuiltInCategory.OST_PipeAccessory,
         BuiltInCategory.OST_PipeInsulations,
+        BuiltInCategory.OST_PipeFittingInsulation,
+        BuiltInCategory.OST_PipeCurvesInsulation,
+        BuiltInCategory.OST_FlexPipeCurvesInsulation,
         BuiltInCategory.OST_Parking,
         BuiltInCategory.OST_Planting,
         BuiltInCategory.OST_PlumbingFixtures,
