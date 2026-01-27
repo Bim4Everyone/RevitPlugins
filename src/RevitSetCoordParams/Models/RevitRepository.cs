@@ -140,7 +140,7 @@ internal class RevitRepository {
             ? []
             : collector
                 .Select(sourceVolume => sourceVolume.GetParamValueOrDefault<string>(RevitConstants.SourceVolumeParam.Name))
-                .Where(s => !string.IsNullOrEmpty(s) && s.Contains(RevitConstants.TypeModelPartName))
+                .Where(s => !string.IsNullOrEmpty(s))
                 .Distinct();
     }
 
