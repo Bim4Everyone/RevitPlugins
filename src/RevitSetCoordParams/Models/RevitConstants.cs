@@ -26,7 +26,7 @@ internal static class RevitConstants {
     // Ключевая строка, по которому ищется координационный файл
     public const string CoordFilePartName = "KOORD";
     // Параметр, значения которого используется дли идентификации объемных элементов
-    public static RevitParam SourceVolumeParam = SharedParamsConfig.Instance.Description;
+    public static RevitParam SourceVolumeParam = SharedParamsConfig.Instance.BuildingWorksDescription;
     // Категория объемных элементов
     public static BuiltInCategory SourceVolumeCategory = BuiltInCategory.OST_GenericModel;
 
