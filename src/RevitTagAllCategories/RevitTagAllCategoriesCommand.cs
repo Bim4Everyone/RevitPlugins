@@ -5,6 +5,10 @@ using System.Windows;
 using Autodesk.Revit.Attributes;
 using Autodesk.Revit.UI;
 
+using Bim4Everyone.RevitFiltration.Controls;
+using Bim4Everyone.RevitFiltration.Controls.Extensions;
+using Bim4Everyone.RevitFiltration.Extensions;
+
 using dosymep.Bim4Everyone;
 using dosymep.Bim4Everyone.ProjectConfigs;
 using dosymep.Bim4Everyone.SimpleServices;
@@ -17,6 +21,7 @@ using dosymep.Xpf.Core.Ninject;
 using Ninject;
 
 using RevitTagAllCategories.Models;
+using RevitTagAllCategories.Models.Filtration;
 using RevitTagAllCategories.ViewModels;
 using RevitTagAllCategories.Views;
 
@@ -49,9 +54,17 @@ public class RevitTagAllCategoriesCommand : BasePluginCommand {
         // Создание контейнера зависимостей плагина с сервисами из платформы
         using IKernel kernel = uiApplication.CreatePlatformServices();
 
+        kernel.UseLogicalFilterFactory(); // сервис для создания фильтра (обязательно)
+        kernel.UseDefaultProviderFactory(); // сервис для привязки фильтра из UI к ViewModel (обязательно)
+        kernel.UseDefaultContextParser(); // сервис для сохранения и загрузки фильтра UI (опционально)
+
         // Настройка доступа к Revit
         kernel.Bind<RevitRepository>()
             .ToSelf()
+            .InSingletonScope();
+
+        kernel.Bind<IDataProvider>()
+            .To<DataProvider>()
             .InSingletonScope();
 
         // Настройка конфигурации плагина

@@ -1,5 +1,7 @@
 using System.Windows.Input;
 
+using Bim4Everyone.RevitFiltration.Controls;
+
 using dosymep.SimpleServices;
 using dosymep.WPF.Commands;
 using dosymep.WPF.ViewModels;
@@ -28,26 +30,23 @@ internal class MainViewModel : BaseViewModel {
     public MainViewModel(
         PluginConfig pluginConfig,
         RevitRepository revitRepository,
-        ILocalizationService localizationService) {
+        ILocalizationService localizationService, 
+        ILogicalFilterProviderFactory filterProviderFactory, 
+        IDataProvider dataProvider) {
         
         _pluginConfig = pluginConfig;
         _revitRepository = revitRepository;
         _localizationService = localizationService;
+        FilterProvider = filterProviderFactory.Create(dataProvider);
 
         LoadViewCommand = RelayCommand.Create(LoadView);
         AcceptViewCommand = RelayCommand.Create(AcceptView, CanAcceptView);
     }
 
-    /// <summary>
-    /// Команда загрузки главного окна.
-    /// </summary>
     public ICommand LoadViewCommand { get; }
-    
-    /// <summary>
-    /// Команда применения настроек главного окна. (запуск плагина)
-    /// </summary>
-    /// <remarks>В случаях, когда используется немодальное окно, требуется данную команду удалять.</remarks>
     public ICommand AcceptViewCommand { get; }
+
+    public ILogicalFilterProvider FilterProvider { get; }
 
     /// <summary>
     /// Текст ошибки, который отображается при неверном вводе пользователя.
