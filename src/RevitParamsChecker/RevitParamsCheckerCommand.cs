@@ -68,8 +68,8 @@ public class RevitParamsCheckerCommand : BasePluginCommand {
 // TODO
         kernel.UseLogicalFilterFactory();
 #endif
-        kernel.UseDefaultProviderFactory();
-        kernel.UseDefaultContextParser();
+        kernel.UseLogicalFilterProviderFactory();
+        kernel.UseFilterContextParser();
         kernel.Bind<IDataProvider>()
             .To<FilterDataProvider>()
             .InSingletonScope();

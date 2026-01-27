@@ -33,6 +33,7 @@ internal class FiltrationPageViewModel : BaseViewModel {
 
     public FiltrationPageViewModel(
         ILocalizationService localization,
+        ILanguageService languageService,
         IOpenFileDialogService openFileDialogService,
         ISaveFileDialogService saveFileDialogService,
         IMessageBoxService messageBoxService,
@@ -42,6 +43,7 @@ internal class FiltrationPageViewModel : BaseViewModel {
         FiltersRepository filtersRepo,
         FiltersConverter filtersConverter,
         NamesService namesService) {
+        LanguageService = languageService ?? throw new ArgumentNullException(nameof(languageService));
         OpenFileDialogService = openFileDialogService ?? throw new ArgumentNullException(nameof(openFileDialogService));
         SaveFileDialogService = saveFileDialogService ?? throw new ArgumentNullException(nameof(saveFileDialogService));
         MessageBoxService = messageBoxService ?? throw new ArgumentNullException(nameof(messageBoxService));
@@ -74,9 +76,11 @@ internal class FiltrationPageViewModel : BaseViewModel {
     public ICommand RenameFilterCommand { get; }
     public ICommand CopyFilterCommand { get; }
     public ICommand RemoveFiltersCommand { get; }
+    public ILanguageService LanguageService { get; }
     public IOpenFileDialogService OpenFileDialogService { get; }
     public ISaveFileDialogService SaveFileDialogService { get; }
     public IMessageBoxService MessageBoxService { get; }
+    public ILocalizationService LocalizationService => _localization;
 
     public ObservableCollection<FilterViewModel> Filters { get; }
 

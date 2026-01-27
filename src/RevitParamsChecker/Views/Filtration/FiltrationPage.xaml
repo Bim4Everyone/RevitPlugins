@@ -80,6 +80,7 @@
         <filtration:DynamicCategoriesFilterControl
             Grid.Row="1"
             Grid.Column="2"
+            LanguageService="{Binding LanguageService}"
             LogicalFilterProvider="{Binding SelectedFilter.FilterProvider}" />
     </Grid>
 </core:WpfUIPlatformPage>

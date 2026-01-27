@@ -6,6 +6,7 @@ using Autodesk.Revit.DB;
 
 using Bim4Everyone.RevitFiltration.Controls;
 
+using dosymep.Bim4Everyone;
 using dosymep.Bim4Everyone.ProjectParams;
 using dosymep.Bim4Everyone.SharedParams;
 using dosymep.Bim4Everyone.SystemParams;
@@ -22,7 +23,7 @@ internal class FilterDataProvider : IDataProvider {
         _revitRepository = revitRepository ?? throw new ArgumentNullException(nameof(revitRepository));
     }
 
-    public ICollection<IParam> GetParams(ICollection<Category> categories) {
+    public ICollection<RevitParam> GetParams(ICollection<Category> categories) {
         return ParameterFilterUtilities
             .GetFilterableParametersInCommon(_revitRepository.Document, [..categories.Select(c => c.Id)])
             .Select(GetFilterableParam)
@@ -42,29 +43,24 @@ internal class FilterDataProvider : IDataProvider {
         return _revitRepository.GetDocuments().Select(d => d.Document).ToArray();
     }
 
-    private IParam GetFilterableParam(ElementId paramId) {
+    private RevitParam GetFilterableParam(ElementId paramId) {
         try {
             if(paramId.IsSystemId()) {
-                return new FilterableParam(
+                return
                     SystemParamsConfig.Instance.CreateRevitParam(
                         _revitRepository.Document,
-                        (BuiltInParameter) paramId.GetIdValue()),
-                    paramId);
+                        (BuiltInParameter) paramId.GetIdValue());
             }
 
             var element = _revitRepository.Document.GetElement(paramId);
             if(element is SharedParameterElement sharedParameterElement) {
-                return new FilterableParam(
                     SharedParamsConfig.Instance.CreateRevitParam(
                         _revitRepository.Document,
-                        sharedParameterElement.Name),
-                    paramId);
+                        sharedParameterElement.Name);
             }
 
             if(element is ParameterElement parameterElement) {
-                return new FilterableParam(
-                    ProjectParamsConfig.Instance.CreateRevitParam(_revitRepository.Document, parameterElement.Name),
-                    paramId);
+                return ProjectParamsConfig.Instance.CreateRevitParam(_revitRepository.Document, parameterElement.Name);
             }
 
             return null;
