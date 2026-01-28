@@ -11,6 +11,7 @@
     xmlns:core="clr-namespace:dosymep.WpfUI.Core"
     xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
     xmlns:me="clr-namespace:dosymep.WpfCore.MarkupExtensions;assembly=dosymep.WpfCore"
+    xmlns:beh="clr-namespace:RevitUnmodelingMep.Views.Behaviors"
    
     mc:Ignorable="d"
     Title="{me:LocalizationSource MainWindow.Title}"
@@ -154,7 +155,7 @@
                             <Style TargetType="Border" BasedOn="{StaticResource CardBorder}">
                                 <Setter Property="Visibility" Value="Collapsed" />
                                 <Style.Triggers>
-                                    <DataTrigger Binding="{Binding IsHintVisible}" Value="True">
+                                    <DataTrigger Binding="{Binding Hint.IsHintVisible}" Value="True">
                                         <Setter Property="Visibility" Value="Visible" />
                                     </DataTrigger>
                                 </Style.Triggers>
@@ -171,19 +172,19 @@
                             <TextBlock
                                 Grid.Row="0"
                                 FontWeight="SemiBold"
-                                Text="{Binding HintTitle}" />
+                                Text="{Binding Hint.HintTitle}" />
 
                             <TextBlock
                                 Grid.Row="1"
                                 Margin="0 8 0 0"
                                 TextWrapping="Wrap"
                                 Opacity="0.8"
-                                Text="{Binding HintInfoText}">
+                                Text="{Binding Hint.HintInfoText}">
                                 <TextBlock.Style>
                                     <Style TargetType="TextBlock">
                                         <Setter Property="Visibility" Value="Collapsed" />
                                         <Style.Triggers>
-                                            <DataTrigger Binding="{Binding IsHintInfoVisible}" Value="True">
+                                            <DataTrigger Binding="{Binding Hint.IsHintInfoVisible}" Value="True">
                                                 <Setter Property="Visibility" Value="Visible" />
                                             </DataTrigger>
                                         </Style.Triggers>
@@ -195,14 +196,14 @@
                                 Grid.Row="2"
                                 Margin="0 8 0 0"
                                 VerticalScrollBarVisibility="Auto">
-                                <ItemsControl ItemsSource="{Binding ActiveHintItems}">
+                                <ItemsControl ItemsSource="{Binding Hint.ActiveHintItems}">
                                     <ItemsControl.ItemTemplate>
                                         <DataTemplate>
                                             <TextBlock
                                                 Margin="0 2 0 0"
                                                 FontFamily="Consolas"
                                                 Cursor="Hand"
-                                                MouseLeftButtonDown="HintItem_MouseLeftButtonDown"
+                                                beh:HintInsert.InsertOnClick="True"
                                                 Text="{Binding}">
                                                 <TextBlock.Style>
                                                     <Style TargetType="TextBlock">
@@ -305,11 +306,20 @@
                                     <TextBlock
                                         Style="{StaticResource FieldLabel}"
                                         Text="{DynamicResource MainWindow.FullName}"
-                                        PreviewMouseLeftButtonDown="FullNameLabel_PreviewMouseLeftButtonDown" />
+                                        beh:HintInsert.FocusNextOnClick="True" />
                                     <ui:TextBox
-                                        Text="{Binding Name, UpdateSourceTrigger=PropertyChanged}"
-                                        GotKeyboardFocus="FullNameTextBox_GotKeyboardFocus"
-                                        LostKeyboardFocus="FullNameTextBox_LostKeyboardFocus" />
+                                        beh:HintInsert.TrackActive="True"
+                                        beh:HintInsert.Target="FullName"
+                                        Text="{Binding Name, UpdateSourceTrigger=PropertyChanged}">
+                                        <i:Interaction.Triggers>
+                                            <i:EventTrigger EventName="GotKeyboardFocus">
+                                                <i:InvokeCommandAction Command="{Binding DataContext.Hint.BeginNameEditCommand, RelativeSource={RelativeSource AncestorType=Window}}" CommandParameter="{Binding}" />
+                                            </i:EventTrigger>
+                                            <i:EventTrigger EventName="LostKeyboardFocus">
+                                                <i:InvokeCommandAction Command="{Binding DataContext.Hint.EndNameEditCommand, RelativeSource={RelativeSource AncestorType=Window}}" CommandParameter="{Binding}" />
+                                            </i:EventTrigger>
+                                        </i:Interaction.Triggers>
+                                    </ui:TextBox>
 
                                                             <TextBlock
                                                                 Style="{StaticResource FieldLabel}"
@@ -342,9 +352,18 @@
                                                                 AcceptsReturn="True"
                                                                 Height="90"
                                                                 TextWrapping="Wrap"
-                                                                Text="{Binding Formula, UpdateSourceTrigger=PropertyChanged}"
-                                                                GotKeyboardFocus="FormulaTextBox_GotKeyboardFocus"
-                                                                LostKeyboardFocus="FormulaTextBox_LostKeyboardFocus" />
+                                                                beh:HintInsert.TrackActive="True"
+                                                                beh:HintInsert.Target="Formula"
+                                                                Text="{Binding Formula, UpdateSourceTrigger=PropertyChanged}">
+                                                                <i:Interaction.Triggers>
+                                                                    <i:EventTrigger EventName="GotKeyboardFocus">
+                                                                        <i:InvokeCommandAction Command="{Binding DataContext.Hint.BeginFormulaEditCommand, RelativeSource={RelativeSource AncestorType=Window}}" CommandParameter="{Binding}" />
+                                                                    </i:EventTrigger>
+                                                                    <i:EventTrigger EventName="LostKeyboardFocus">
+                                                                        <i:InvokeCommandAction Command="{Binding DataContext.Hint.EndFormulaEditCommand, RelativeSource={RelativeSource AncestorType=Window}}" CommandParameter="{Binding}" />
+                                                                    </i:EventTrigger>
+                                                                </i:Interaction.Triggers>
+                                                            </ui:TextBox>
 
                                                             <TextBlock
                                                                 Style="{StaticResource FieldLabel}"
@@ -353,9 +372,18 @@
                                                                 AcceptsReturn="True"
                                                                 Height="60"
                                                                 TextWrapping="Wrap"
-                                                                Text="{Binding Note, UpdateSourceTrigger=PropertyChanged}"
-                                                                GotKeyboardFocus="NoteTextBox_GotKeyboardFocus"
-                                                                LostKeyboardFocus="NoteTextBox_LostKeyboardFocus" />
+                                                                beh:HintInsert.TrackActive="True"
+                                                                beh:HintInsert.Target="Note"
+                                                                Text="{Binding Note, UpdateSourceTrigger=PropertyChanged}">
+                                                                <i:Interaction.Triggers>
+                                                                    <i:EventTrigger EventName="GotKeyboardFocus">
+                                                                        <i:InvokeCommandAction Command="{Binding DataContext.Hint.BeginNoteEditCommand, RelativeSource={RelativeSource AncestorType=Window}}" CommandParameter="{Binding}" />
+                                                                    </i:EventTrigger>
+                                                                    <i:EventTrigger EventName="LostKeyboardFocus">
+                                                                        <i:InvokeCommandAction Command="{Binding DataContext.Hint.EndNoteEditCommand, RelativeSource={RelativeSource AncestorType=Window}}" CommandParameter="{Binding}" />
+                                                                    </i:EventTrigger>
+                                                                </i:Interaction.Triggers>
+                                                            </ui:TextBox>
                                                         </StackPanel>
                                                     </Border>
                                                 </Expander>

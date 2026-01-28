@@ -6,6 +6,7 @@
 
     <system:String x:Key="MainWindow.Title">Настройки немоделируемых</system:String>
     <system:String x:Key="MainWindow.DocTypeError">Плагин не предназначен для работы с семействами</system:String>
+    <system:String x:Key="MainWindow.WorkSharedError">Документ должен быть настроен для общей работы</system:String>
     <system:String x:Key="MainWindow.TabTypesName">Типы расходников</system:String>
     <system:String x:Key="MainWindow.TabDestinationName">Назначение расходников</system:String>
     <system:String x:Key="MainWindow.FormulaVariables">Доступные переменные</system:String>

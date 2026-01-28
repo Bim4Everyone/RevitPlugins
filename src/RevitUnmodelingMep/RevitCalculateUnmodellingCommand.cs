@@ -32,7 +32,7 @@ namespace RevitUnmodelingMep {
     [Transaction(TransactionMode.Manual)]
     public class RevitCalculateUnmodellingCommand : BasePluginCommand {
         public RevitCalculateUnmodellingCommand() {
-            PluginName = "Полное обновление видимого";
+            PluginName = "Расчет расходников";
         }
 
         protected override void Execute(UIApplication uiApplication) {
@@ -87,14 +87,27 @@ namespace RevitUnmodelingMep {
             Document document,
             IMessageBoxService service,
             ILocalizationService localizationService) {
+            if(!document.IsWorkshared)
+                ShowErrorAndCancel("MainWindow.WorkSharedError", service, localizationService);
 
-            if(document.IsFamilyDocument) {
-                string report = localizationService.GetLocalizedString("MainWindow.DocTypeError");
-                service.Show(report, localizationService.GetLocalizedString("MainWindow.Title"),
-                    MessageBoxButton.OK,
-                    MessageBoxImage.Error);
-                throw new OperationCanceledException();
-            }
+            if(document.IsFamilyDocument)
+                ShowErrorAndCancel("MainWindow.DocTypeError", service, localizationService);
+        }
+
+        private void ShowErrorAndCancel(
+            string messageKey,
+            IMessageBoxService service,
+            ILocalizationService localizationService) {
+            string report = localizationService.GetLocalizedString(messageKey);
+            string title = localizationService.GetLocalizedString("MainWindow.Title");
+
+            service.Show(
+                report,
+                title,
+                MessageBoxButton.OK,
+                MessageBoxImage.Error);
+
+            throw new OperationCanceledException();
         }
     }
 }

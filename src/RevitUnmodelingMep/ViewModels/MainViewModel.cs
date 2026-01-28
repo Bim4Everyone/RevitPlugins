@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.ComponentModel;
 using System.IO;
 using System.Linq;
 using System.Windows;
@@ -39,12 +38,7 @@ internal class MainViewModel : BaseViewModel {
     private int _lastConfigIndex;
     private readonly IReadOnlyList<CategoryOption> _categoryOptions;
     private bool _isViewLoaded;
-    private bool _isFormulaEditing;
-    private bool _isNameEditing;
-    private bool _isNoteEditing;
-    private ConsumableTypeItem _activeFormulaItem;
-    private ObservableCollection<string> _activeHintItems = new ObservableCollection<string>();
-    
+     
 
     public MainViewModel(
         PluginConfig pluginConfig,
@@ -66,6 +60,8 @@ internal class MainViewModel : BaseViewModel {
 
         ConsumableTypes = new ObservableCollection<ConsumableTypeItem>();
         CategoryAssignments = new ObservableCollection<CategoryAssignmentItem>();
+
+        Hint = new HintPanelViewModel(_localizationService, ResolveCategoryId);
     }
 
 
@@ -83,6 +79,8 @@ internal class MainViewModel : BaseViewModel {
     public ICommand ExportConfigsCommand { get; }
 
     public ICommand ResetConfigsCommand { get; }
+
+    public HintPanelViewModel Hint { get; }
 
 
     public string ErrorText {
@@ -104,54 +102,6 @@ internal class MainViewModel : BaseViewModel {
     public ObservableCollection<CategoryAssignmentItem> CategoryAssignments {
         get => _categoryAssignments;
         set => RaiseAndSetIfChanged(ref _categoryAssignments, value);
-    }
-
-    public bool IsFormulaEditing {
-        get => _isFormulaEditing;
-        set {
-            RaiseAndSetIfChanged(ref _isFormulaEditing, value);
-            RaisePropertyChanged(nameof(IsHintVisible));
-            RaisePropertyChanged(nameof(HintTitle));
-            RaisePropertyChanged(nameof(IsHintInfoVisible));
-            RaisePropertyChanged(nameof(HintInfoText));
-        }
-    }
-
-    public bool IsNameEditing {
-        get => _isNameEditing;
-        set {
-            RaiseAndSetIfChanged(ref _isNameEditing, value);
-            RaisePropertyChanged(nameof(IsHintVisible));
-            RaisePropertyChanged(nameof(HintTitle));
-            RaisePropertyChanged(nameof(IsHintInfoVisible));
-            RaisePropertyChanged(nameof(HintInfoText));
-        }
-    }
-
-    public bool IsNoteEditing {
-        get => _isNoteEditing;
-        set {
-            RaiseAndSetIfChanged(ref _isNoteEditing, value);
-            RaisePropertyChanged(nameof(IsHintVisible));
-            RaisePropertyChanged(nameof(HintTitle));
-            RaisePropertyChanged(nameof(IsHintInfoVisible));
-            RaisePropertyChanged(nameof(HintInfoText));
-        }
-    }
-
-    public bool IsHintVisible => IsFormulaEditing || IsNameEditing || IsNoteEditing;
-
-    public string HintTitle => _localizationService.GetLocalizedString("MainWindow.FormulaVariables");
-
-    public bool IsHintInfoVisible => IsNameEditing || IsNoteEditing;
-
-    public string HintInfoText => IsHintInfoVisible
-        ? _localizationService.GetLocalizedString("MainWindow.PlaceholderBracesHint")
-        : string.Empty;
-
-    public ObservableCollection<string> ActiveHintItems {
-        get => _activeHintItems;
-        private set => RaiseAndSetIfChanged(ref _activeHintItems, value);
     }
 
     public IReadOnlyList<CategoryOption> CategoryOptions => _categoryOptions;
@@ -213,110 +163,6 @@ internal class MainViewModel : BaseViewModel {
         setting.SaveProperty = SaveProperty;
         SaveUnmodelingConfigs();
         _pluginConfig.SaveProjectConfig();
-    }
-
-    public void BeginFormulaEdit(ConsumableTypeItem item) {
-        IsFormulaEditing = item != null;
-        IsNameEditing = false;
-        IsNoteEditing = false;
-        SetActiveFormulaItem(item);
-    }
-
-    public void EndFormulaEdit(ConsumableTypeItem item) {
-        if(_activeFormulaItem != item) {
-            return;
-        }
-
-        IsFormulaEditing = false;
-        if(!IsNameEditing && !IsNoteEditing) {
-            SetActiveFormulaItem(null);
-        }
-    }
-
-    public void BeginNameEdit(ConsumableTypeItem item) {
-        IsNameEditing = item != null;
-        IsFormulaEditing = false;
-        IsNoteEditing = false;
-        SetActiveFormulaItem(item);
-    }
-
-    public void EndNameEdit(ConsumableTypeItem item) {
-        if(_activeFormulaItem != item) {
-            return;
-        }
-
-        IsNameEditing = false;
-        if(!IsFormulaEditing && !IsNoteEditing) {
-            SetActiveFormulaItem(null);
-        }
-    }
-
-    public void BeginNoteEdit(ConsumableTypeItem item) {
-        IsNoteEditing = item != null;
-        IsFormulaEditing = false;
-        IsNameEditing = false;
-        SetActiveFormulaItem(item);
-    }
-
-    public void EndNoteEdit(ConsumableTypeItem item) {
-        if(_activeFormulaItem != item) {
-            return;
-        }
-
-        IsNoteEditing = false;
-        if(!IsFormulaEditing && !IsNameEditing) {
-            SetActiveFormulaItem(null);
-        }
-    }
-
-    private void SetActiveFormulaItem(ConsumableTypeItem item) {
-        if(ReferenceEquals(_activeFormulaItem, item)) {
-            UpdateActiveHintItems();
-            return;
-        }
-
-        if(_activeFormulaItem != null) {
-            _activeFormulaItem.PropertyChanged -= ActiveFormulaItemOnPropertyChanged;
-        }
-
-        _activeFormulaItem = item;
-
-        if(_activeFormulaItem != null) {
-            _activeFormulaItem.PropertyChanged += ActiveFormulaItemOnPropertyChanged;
-        }
-
-        UpdateActiveHintItems();
-    }
-
-    private void ActiveFormulaItemOnPropertyChanged(object sender, PropertyChangedEventArgs e) {
-        if(e.PropertyName == nameof(ConsumableTypeItem.SelectedCategory)
-           || e.PropertyName == nameof(ConsumableTypeItem.CategoryId)) {
-            UpdateActiveHintItems();
-        }
-    }
-
-    private void UpdateActiveHintItems() {
-        if(IsNoteEditing) {
-            ActiveHintItems = new ObservableCollection<string>(FormulaValidator.GetAllowedNoteTokens());
-            return;
-        }
-
-        if(_activeFormulaItem == null) {
-            ActiveHintItems = new ObservableCollection<string>();
-            return;
-        }
-
-        if(!TryGetCategoryId(_activeFormulaItem, out int categoryId)) {
-            ActiveHintItems = new ObservableCollection<string>();
-            return;
-        }
-
-        var props = FormulaValidator.GetAllowedPropertyNames(categoryId)
-            .Distinct(StringComparer.OrdinalIgnoreCase)
-            .OrderBy(p => p, StringComparer.OrdinalIgnoreCase)
-            .ToList();
-
-        ActiveHintItems = new ObservableCollection<string>(props);
     }
 
     public void RefreshAssignmentsFromConsumableTypes() {
@@ -610,6 +456,10 @@ internal class MainViewModel : BaseViewModel {
 
         categoryId = 0;
         return false;
+    }
+
+    private int? ResolveCategoryId(ConsumableTypeItem item) {
+        return TryGetCategoryId(item, out int cid) ? cid : (int?) null;
     }
 
     private IReadOnlyList<CategoryOption> CreateCategoryOptions() {
