@@ -121,8 +121,13 @@ internal class RevitRepository {
                 return value != null && value.Equals(typeModel);
             })
             .Select(instance => {
-                var transform = document.IsLinked ? _documentsService.GetTransformByName(document.GetUniqId()) : null;
-                var transSolid = SolidUtils.CreateTransformed(GetUnitedSolid(instance), transform);
+                var transform = document.IsLinked
+                    ? _documentsService.GetTransformByName(document.GetUniqId())
+                    : null;
+                var unitedSolid = GetUnitedSolid(instance);
+                var transSolid = transform != null
+                    ? SolidUtils.CreateTransformed(unitedSolid, transform)
+                    : unitedSolid;
                 return new RevitElement { Element = instance, Solid = transSolid };
             })
             .ToList();
