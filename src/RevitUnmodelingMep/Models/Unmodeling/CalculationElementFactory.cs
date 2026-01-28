@@ -61,7 +61,7 @@ internal sealed class CalculationElementFactory {
         if(ductType.Shape == ConnectorProfileType.Round) {
             calculationElement.IsRound = true;
             calculationElement.Diameter_mm = duct.Diameter;
-            calculationElement.Perimeter_mm = Math.PI * 2 * duct.Diameter;
+            calculationElement.Perimeter_mm = Math.PI * duct.Diameter;
             double crossSectionArea = Math.PI * Math.Pow(duct.Diameter / 2, 2);
             double volume = crossSectionArea * length;
             calculationElement.Volume_m3 = volume;
