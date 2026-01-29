@@ -1,3 +1,6 @@
+using System.Collections.Generic;
+using System.Linq;
+
 using Autodesk.Revit.ApplicationServices;
 using Autodesk.Revit.DB;
 using Autodesk.Revit.UI;
@@ -38,4 +41,33 @@ internal class RevitRepository {
     /// Класс доступа к документу Revit.
     /// </summary>
     public Document Document => ActiveUIDocument.Document;
+
+    public IEnumerable<Category> GetFilterableCategories() {
+        List<ElementId> allCategories = Document.Settings.Categories
+            .Cast<Category>()
+            .Select(x => x.Id)
+            .ToList();
+
+        var vv = ParameterFilterUtilities.RemoveUnfilterableCategories(allCategories);
+
+        return vv.Select(x => Category.GetCategory(Document, x));
+    }
+
+    public IList<RevitLinkInstance> GetLinks() {
+        IEnumerable<RevitLinkType> loadedLinkTypes = new FilteredElementCollector(Document)
+            .OfClass(typeof(RevitLinkType))
+            .Cast<RevitLinkType>()
+            .Where(x => !x.IsNestedLink)
+            .Where(x => x.GetLinkedFileStatus() == LinkedFileStatus.Loaded);
+
+        var temp = loadedLinkTypes.ToList();
+
+        ElementClassFilter filter = new ElementClassFilter(typeof(RevitLinkInstance));
+
+        return loadedLinkTypes
+            .SelectMany(x => x.GetDependentElements(filter))
+            .Select(x => Document.GetElement(x))
+            .Cast<RevitLinkInstance>()
+            .ToList();
+    }
 }

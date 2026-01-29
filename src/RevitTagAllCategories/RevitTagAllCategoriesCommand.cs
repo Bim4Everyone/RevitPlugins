@@ -9,6 +9,8 @@ using Bim4Everyone.RevitFiltration.Controls;
 using Bim4Everyone.RevitFiltration.Controls.Extensions;
 using Bim4Everyone.RevitFiltration.Extensions;
 
+//using Bim4Everyone.RevitFiltration.Extensions;
+
 using dosymep.Bim4Everyone;
 using dosymep.Bim4Everyone.ProjectConfigs;
 using dosymep.Bim4Everyone.SimpleServices;
@@ -55,8 +57,8 @@ public class RevitTagAllCategoriesCommand : BasePluginCommand {
         using IKernel kernel = uiApplication.CreatePlatformServices();
 
         kernel.UseLogicalFilterFactory(); // сервис для создания фильтра (обязательно)
-        kernel.UseDefaultProviderFactory(); // сервис для привязки фильтра из UI к ViewModel (обязательно)
-        kernel.UseDefaultContextParser(); // сервис для сохранения и загрузки фильтра UI (опционально)
+        kernel.UseLogicalFilterProviderFactory(); // сервис для привязки фильтра из UI к ViewModel (обязательно)
+        kernel.UseFilterContextParser(); // сервис для сохранения и загрузки фильтра UI (опционально)
 
         // Настройка доступа к Revit
         kernel.Bind<RevitRepository>()
@@ -76,6 +78,7 @@ public class RevitTagAllCategoriesCommand : BasePluginCommand {
 
         // Настройка запуска окна
         kernel.BindMainWindow<MainViewModel, MainWindow>();
+        kernel.BindOtherWindow<CategoriesWindowVM, CategoriesWindow>();
 
         // Настройка локализации,
         // получение имени сборки откуда брать текст
@@ -87,7 +90,8 @@ public class RevitTagAllCategoriesCommand : BasePluginCommand {
             $"/{assemblyName};component/assets/localization/language.xaml",
             CultureInfo.GetCultureInfo("ru-RU"));
 
-        // Вызывает стандартное уведомление
-        Notification(kernel.Get<MainWindow>());
+        if(kernel.Get<CategoriesWindow>().ShowDialog() == true) {
+            Notification(kernel.Get<MainWindow>());
+        }
     }
 }
