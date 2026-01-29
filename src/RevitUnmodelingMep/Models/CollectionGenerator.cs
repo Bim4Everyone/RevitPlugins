@@ -92,8 +92,8 @@ internal static class CollectionGenerator {
                 if(host?.Category == null)
                     return false;
 
-                return host.Category.IsId(BuiltInCategory.OST_PipeFitting)
-                       || host.Category.IsId(BuiltInCategory.OST_DuctFitting);
+                return host.Category.IsId(BuiltInCategory.OST_PipeCurves)
+                       || host.Category.IsId(BuiltInCategory.OST_DuctCurves);
             }
 
             elements = elements

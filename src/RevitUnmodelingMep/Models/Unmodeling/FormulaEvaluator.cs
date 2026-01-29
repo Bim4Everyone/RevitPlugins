@@ -20,8 +20,56 @@ internal sealed class FormulaEvaluator {
     }
 
     public double Evaluate(string formula, CalculationElementBase calcElement) {
-        var evaluator = new ExpressionEvaluator();
+        try {
+            // При необходимости проверок расчета включаем LogEvaluation и подаем туда айди элемента который проверяем
+            // LogEvaluation(formula, calcElement, 5375862);
+            return EvaluateInternal(formula, calcElement);
+        } catch(Exception) {
+            BuildDebugLog(calcElement, formula);
+            throw;
+        }
+    }
 
+    public void LogEvaluation(string formula, CalculationElementBase calcElement, int? elementIdInt = null) {
+        if(calcElement == null) {
+            return;
+        }
+
+        if(elementIdInt.HasValue && elementIdInt.Value != 0) {
+            ElementId elementId;
+#if REVIT_2024_OR_GREATER
+            elementId = new ElementId((long) elementIdInt.Value);
+#else
+            elementId = new ElementId(elementIdInt.Value);
+#endif
+
+            if(calcElement.Element.Id != elementId) {
+                return;
+            }
+        }
+
+        double result = EvaluateInternal(formula, calcElement);
+        string log = BuildDebugLogMessage(calcElement, formula, result);
+        Console.WriteLine(log);
+    }
+
+    public void LogEvaluation(string formula, CalculationElementBase calcElement, string elementIdText) {
+        int? elementId = null;
+        if(!string.IsNullOrWhiteSpace(elementIdText) && int.TryParse(elementIdText, out int parsed)) {
+            elementId = parsed;
+        }
+
+        LogEvaluation(formula, calcElement, elementId);
+    }
+
+    private double EvaluateInternal(string formula, CalculationElementBase calcElement) {
+        var evaluator = CreateEvaluator(calcElement);
+        object result = evaluator.Evaluate(formula);
+        return Convert.ToDouble(result);
+    }
+
+    private static ExpressionEvaluator CreateEvaluator(CalculationElementBase calcElement) {
+        var evaluator = new ExpressionEvaluator();
         foreach(var property in calcElement.GetType().GetProperties()) {
             if(!property.CanRead) {
                 continue;
@@ -31,21 +79,32 @@ internal sealed class FormulaEvaluator {
             evaluator.Variables[property.Name] = value;
         }
 
-        try {
-            object result = evaluator.Evaluate(formula);
-            return Convert.ToDouble(result);
-        } catch(Exception) {
-            BuildDebugLog(calcElement, formula);
-            throw;
-        }
+        return evaluator;
     }
 
     private void BuildDebugLog(CalculationElementBase calcElement, string formula) {
-        StringBuilder logBuilder = new StringBuilder();
         string errorMessage = _localizationService.GetLocalizedString("UnmodelingCalculator.Error");
-        logBuilder.AppendLine(errorMessage);
+        string log = BuildDebugLogMessage(calcElement, formula, null, errorMessage);
+        Console.WriteLine(log);
+        throw new OperationCanceledException(errorMessage);
+    }
+
+    private string BuildDebugLogMessage(
+        CalculationElementBase calcElement,
+        string formula,
+        double? result,
+        string header = null) {
+
+        StringBuilder logBuilder = new StringBuilder();
+        if(!string.IsNullOrWhiteSpace(header)) {
+            logBuilder.AppendLine(header);
+        }
+
         logBuilder.AppendLine($"ElementId: {calcElement.Element.Id}");
         logBuilder.AppendLine($"Formula: {formula}");
+        if(result.HasValue) {
+            logBuilder.AppendLine($"Result: {result.Value.ToString(CultureInfo.InvariantCulture)}");
+        }
 
         foreach(var property in calcElement.GetType().GetProperties()) {
             if(!property.CanRead) {
@@ -62,8 +121,7 @@ internal sealed class FormulaEvaluator {
             logBuilder.AppendLine($"{property.Name} = {valueText}");
         }
 
-        Console.WriteLine(logBuilder.ToString());
-        throw new OperationCanceledException(errorMessage);
+        logBuilder.AppendLine("__________________________________");
+        return logBuilder.ToString();
     }
 }
-
