@@ -8,8 +8,6 @@
             Source="pack://application:,,,/Wpf.Ui;component/Controls/ListView/ListViewItem.xaml" />
         <ResourceDictionary
             Source="pack://application:,,,/Wpf.Ui;component/Controls/ListView/ListView.xaml" />
-        <ui:ThemesDictionary />
-        <ui:ControlsDictionary />
     </ResourceDictionary.MergedDictionaries>
     <!-- Стиль для ListView, в котором у выделенного элемента появляется синяя граница по периметру 
     вместо вертикального синего штриха слева как по дефолту в wpf ui -->

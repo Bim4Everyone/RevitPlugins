@@ -6,8 +6,6 @@
     <ResourceDictionary.MergedDictionaries>
         <ResourceDictionary
             Source="pack://application:,,,/Wpf.Ui;component/Controls/CardExpander/CardExpander.xaml"></ResourceDictionary>
-        <ui:ThemesDictionary />
-        <ui:ControlsDictionary />
     </ResourceDictionary.MergedDictionaries>
     <!-- Стиль для экспандера без анимации -->
 

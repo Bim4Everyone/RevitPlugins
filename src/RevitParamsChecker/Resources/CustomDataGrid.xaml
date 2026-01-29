@@ -8,8 +8,6 @@
             Source="pack://application:,,,/Wpf.Ui;component/Controls/DataGrid/DataGrid.xaml" />
         <ResourceDictionary
             Source="./CustomExpanderStyle.xaml" />
-        <ui:ThemesDictionary />
-        <ui:ControlsDictionary />
     </ResourceDictionary.MergedDictionaries>
     <Style
         x:Key="CustomResizableDataGridStyle"

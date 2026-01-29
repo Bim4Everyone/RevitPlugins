@@ -63,162 +63,166 @@
     </core:WpfUIPlatformUserControl.Resources>
     <Border
         Style="{StaticResource CustomBorder}">
-        <DockPanel
-            LastChildFill="True">
-            <Label
-                DockPanel.Dock="Top"
-                FontSize="{StaticResource HeaderLabelFontSize}"
-                Content="{Binding Name}" />
+        <ScrollViewer
+            HorizontalScrollBarVisibility="Auto"
+            VerticalScrollBarVisibility="Auto">
             <DockPanel
-                Margin="0 0 0 4"
-                Dock="Top">
+                LastChildFill="True">
                 <Label
-                    Padding="0"
-                    VerticalAlignment="Center"
-                    FontSize="{DynamicResource ControlContentThemeFontSize}"
-                    Content="{me:LocalizationSource ResultsPage.ElementsHeader}" />
-                <ui:TextBox
-                    DockPanel.Dock="Right"
-                    MinWidth="300"
-                    MaxWidth="300"
-                    HorizontalAlignment="Right"
-                    Text="{Binding ElementsFilter, UpdateSourceTrigger=PropertyChanged}"
-                    PlaceholderText="{me:LocalizationSource ResultsPage.ElementsSearchPlaceholder}" />
+                    DockPanel.Dock="Top"
+                    FontSize="{StaticResource HeaderLabelFontSize}"
+                    Content="{Binding Name}" />
+                <DockPanel
+                    Margin="0 0 0 4"
+                    Dock="Top">
+                    <Label
+                        Padding="0"
+                        VerticalAlignment="Center"
+                        FontSize="{DynamicResource ControlContentThemeFontSize}"
+                        Content="{me:LocalizationSource ResultsPage.ElementsHeader}" />
+                    <ui:TextBox
+                        DockPanel.Dock="Right"
+                        MinWidth="300"
+                        MaxWidth="300"
+                        HorizontalAlignment="Right"
+                        Text="{Binding ElementsFilter, UpdateSourceTrigger=PropertyChanged}"
+                        PlaceholderText="{me:LocalizationSource ResultsPage.ElementsSearchPlaceholder}" />
+                </DockPanel>
+                <DockPanel
+                    Dock="Top">
+                    <local:GroupsEditorControl
+                        UpdateCommand="{Binding DataContext.RegroupElementsCommand, ElementName=_this}"
+                        DataContext="{Binding GroupingProperties}"></local:GroupsEditorControl>
+                </DockPanel>
+                <ui:DataGrid
+                    x:Name="_elements"
+                    SelectionMode="Extended"
+                    AutoGenerateColumns="False"
+                    CanUserAddRows="False"
+                    CanUserDeleteRows="False"
+                    CanUserReorderColumns="True"
+                    CanUserSortColumns="True"
+                    GridLinesVisibility="All"
+                    IsReadOnly="False"
+                    RowHeight="26"
+                    SelectedItem="{Binding SelectedElementResult, UpdateSourceTrigger=PropertyChanged}"
+                    CellStyle="{StaticResource CustomTooltipDataGridCell}"
+                    Style="{StaticResource CustomResizableDataGridStyle}"
+                    ItemsSource="{Binding ElementResults.View}">
+                    <DataGrid.GroupStyle>
+                        <GroupStyle
+                            ContainerStyle="{StaticResource CustomGroupHeaderStyle}">
+                        </GroupStyle>
+                    </DataGrid.GroupStyle>
+                    <ui:DataGrid.Columns>
+                        <DataGridTextColumn
+                            Width="Auto"
+                            Header="№"
+                            IsReadOnly="True"
+                            CanUserReorder="False"
+                            Binding="{Binding ItemNumber}">
+
+                        </DataGridTextColumn>
+                        <DataGridTemplateColumn
+                            Width="Auto"
+                            CanUserReorder="False"
+                            CanUserResize="False">
+                            <DataGridTemplateColumn.CellTemplate>
+                                <DataTemplate>
+                                    <ui:Button
+                                        Height="Auto"
+                                        Padding="6 2"
+                                        VerticalContentAlignment="Center"
+                                        Content="{ui:SymbolIcon Symbol=Search20}"
+                                        CommandParameter="{Binding SelectedItems, ElementName=_elements}"
+                                        Command="{Binding DataContext.SelectElementsCommand, ElementName=_this}" />
+                                </DataTemplate>
+                            </DataGridTemplateColumn.CellTemplate>
+                        </DataGridTemplateColumn>
+
+                        <DataGridTemplateColumn
+                            Width="8"
+                            CanUserReorder="False"
+                            CanUserResize="False">
+                            <DataGridTemplateColumn.CellTemplate>
+                                <DataTemplate>
+                                    <Rectangle
+                                        Height="20"
+                                        Width="6"
+                                        VerticalAlignment="Center"
+                                        ToolTip="{Binding ElementResult.Error}"
+                                        Fill="{Binding ElementResult.Status, Converter={StaticResource StatusToColorConverter}}">
+                                    </Rectangle>
+                                </DataTemplate>
+                            </DataGridTemplateColumn.CellTemplate>
+                        </DataGridTemplateColumn>
+
+                        <DataGridTextColumn
+                            MinWidth="50"
+                            Width="150"
+                            IsReadOnly="True"
+                            Binding="{Binding FileName}">
+                            <DataGridTextColumn.Header>
+                                <ui:TextBlock
+                                    Text="{DynamicResource ResultsPage.FileNameHeader}" />
+                            </DataGridTextColumn.Header>
+                        </DataGridTextColumn>
+                        <DataGridTextColumn
+                            MinWidth="50"
+                            Width="150"
+                            IsReadOnly="True"
+                            Binding="{Binding CategoryName}">
+                            <DataGridTextColumn.Header>
+                                <ui:TextBlock
+                                    Text="{DynamicResource ResultsPage.CategoryNameHeader}" />
+                            </DataGridTextColumn.Header>
+                        </DataGridTextColumn>
+
+                        <DataGridTextColumn
+                            MinWidth="50"
+                            Width="150"
+                            IsReadOnly="True"
+                            Binding="{Binding FamilyTypeName}">
+                            <DataGridTextColumn.Header>
+                                <ui:TextBlock
+                                    Text="{DynamicResource ResultsPage.FamilyTypeNameHeader}" />
+                            </DataGridTextColumn.Header>
+                        </DataGridTextColumn>
+
+                        <DataGridTextColumn
+                            MinWidth="50"
+                            Width="150"
+                            IsReadOnly="True"
+                            Binding="{Binding RuleName}">
+                            <DataGridTextColumn.Header>
+                                <ui:TextBlock
+                                    Text="{DynamicResource ResultsPage.RuleNameHeader}" />
+                            </DataGridTextColumn.Header>
+                        </DataGridTextColumn>
+
+                        <DataGridTextColumn
+                            MinWidth="50"
+                            Width="Auto"
+                            IsReadOnly="True"
+                            Binding="{Binding Status}">
+                            <DataGridTextColumn.Header>
+                                <ui:TextBlock
+                                    Text="{DynamicResource ResultsPage.StatusHeader}" />
+                            </DataGridTextColumn.Header>
+                        </DataGridTextColumn>
+
+                        <DataGridTextColumn
+                            MinWidth="50"
+                            Width="100"
+                            Binding="{Binding UserMark, UpdateSourceTrigger=PropertyChanged}">
+                            <DataGridTextColumn.Header>
+                                <ui:TextBlock
+                                    Text="{DynamicResource ResultsPage.UserMarkHeader}" />
+                            </DataGridTextColumn.Header>
+                        </DataGridTextColumn>
+                    </ui:DataGrid.Columns>
+                </ui:DataGrid>
             </DockPanel>
-            <DockPanel
-                Dock="Top">
-                <local:GroupsEditorControl
-                    UpdateCommand="{Binding DataContext.RegroupElementsCommand, ElementName=_this}"
-                    DataContext="{Binding GroupingProperties}"></local:GroupsEditorControl>
-            </DockPanel>
-            <ui:DataGrid
-                x:Name="_elements"
-                SelectionMode="Extended"
-                AutoGenerateColumns="False"
-                CanUserAddRows="False"
-                CanUserDeleteRows="False"
-                CanUserReorderColumns="True"
-                CanUserSortColumns="True"
-                GridLinesVisibility="All"
-                IsReadOnly="False"
-                RowHeight="26"
-                SelectedItem="{Binding SelectedElementResult, UpdateSourceTrigger=PropertyChanged}"
-                CellStyle="{StaticResource CustomTooltipDataGridCell}"
-                Style="{StaticResource CustomResizableDataGridStyle}"
-                ItemsSource="{Binding ElementResults.View}">
-                <DataGrid.GroupStyle>
-                    <GroupStyle
-                        ContainerStyle="{StaticResource CustomGroupHeaderStyle}">
-                    </GroupStyle>
-                </DataGrid.GroupStyle>
-                <ui:DataGrid.Columns>
-                    <DataGridTextColumn
-                        Width="Auto"
-                        Header="№"
-                        IsReadOnly="True"
-                        CanUserReorder="False"
-                        Binding="{Binding ItemNumber}">
-
-                    </DataGridTextColumn>
-                    <DataGridTemplateColumn
-                        Width="Auto"
-                        CanUserReorder="False"
-                        CanUserResize="False">
-                        <DataGridTemplateColumn.CellTemplate>
-                            <DataTemplate>
-                                <ui:Button
-                                    Height="Auto"
-                                    Padding="6 2"
-                                    VerticalContentAlignment="Center"
-                                    Content="{ui:SymbolIcon Symbol=Search20}"
-                                    CommandParameter="{Binding SelectedItems, ElementName=_elements}"
-                                    Command="{Binding DataContext.SelectElementsCommand, ElementName=_this}" />
-                            </DataTemplate>
-                        </DataGridTemplateColumn.CellTemplate>
-                    </DataGridTemplateColumn>
-
-                    <DataGridTemplateColumn
-                        Width="8"
-                        CanUserReorder="False"
-                        CanUserResize="False">
-                        <DataGridTemplateColumn.CellTemplate>
-                            <DataTemplate>
-                                <Rectangle
-                                    Height="20"
-                                    Width="6"
-                                    VerticalAlignment="Center"
-                                    ToolTip="{Binding ElementResult.Error}"
-                                    Fill="{Binding ElementResult.Status, Converter={StaticResource StatusToColorConverter}}">
-                                </Rectangle>
-                            </DataTemplate>
-                        </DataGridTemplateColumn.CellTemplate>
-                    </DataGridTemplateColumn>
-
-                    <DataGridTextColumn
-                        MinWidth="50"
-                        Width="150"
-                        IsReadOnly="True"
-                        Binding="{Binding FileName}">
-                        <DataGridTextColumn.Header>
-                            <ui:TextBlock
-                                Text="{DynamicResource ResultsPage.FileNameHeader}" />
-                        </DataGridTextColumn.Header>
-                    </DataGridTextColumn>
-                    <DataGridTextColumn
-                        MinWidth="50"
-                        Width="150"
-                        IsReadOnly="True"
-                        Binding="{Binding CategoryName}">
-                        <DataGridTextColumn.Header>
-                            <ui:TextBlock
-                                Text="{DynamicResource ResultsPage.CategoryNameHeader}" />
-                        </DataGridTextColumn.Header>
-                    </DataGridTextColumn>
-
-                    <DataGridTextColumn
-                        MinWidth="50"
-                        Width="150"
-                        IsReadOnly="True"
-                        Binding="{Binding FamilyTypeName}">
-                        <DataGridTextColumn.Header>
-                            <ui:TextBlock
-                                Text="{DynamicResource ResultsPage.FamilyTypeNameHeader}" />
-                        </DataGridTextColumn.Header>
-                    </DataGridTextColumn>
-
-                    <DataGridTextColumn
-                        MinWidth="50"
-                        Width="150"
-                        IsReadOnly="True"
-                        Binding="{Binding RuleName}">
-                        <DataGridTextColumn.Header>
-                            <ui:TextBlock
-                                Text="{DynamicResource ResultsPage.RuleNameHeader}" />
-                        </DataGridTextColumn.Header>
-                    </DataGridTextColumn>
-
-                    <DataGridTextColumn
-                        MinWidth="50"
-                        Width="Auto"
-                        IsReadOnly="True"
-                        Binding="{Binding Status}">
-                        <DataGridTextColumn.Header>
-                            <ui:TextBlock
-                                Text="{DynamicResource ResultsPage.StatusHeader}" />
-                        </DataGridTextColumn.Header>
-                    </DataGridTextColumn>
-
-                    <DataGridTextColumn
-                        MinWidth="50"
-                        Width="100"
-                        Binding="{Binding UserMark, UpdateSourceTrigger=PropertyChanged}">
-                        <DataGridTextColumn.Header>
-                            <ui:TextBlock
-                                Text="{DynamicResource ResultsPage.UserMarkHeader}" />
-                        </DataGridTextColumn.Header>
-                    </DataGridTextColumn>
-                </ui:DataGrid.Columns>
-            </ui:DataGrid>
-        </DockPanel>
+        </ScrollViewer>
     </Border>
 </core:WpfUIPlatformUserControl>

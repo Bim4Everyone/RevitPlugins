@@ -11,8 +11,6 @@
             Source="pack://application:,,,/Wpf.Ui;component/Controls/ToggleSwitch/ToggleSwitch.xaml" />
         <ResourceDictionary
             Source="pack://application:,,,/Wpf.Ui;component/Controls/TextBlock/TextBlock.xaml" />
-        <ui:ThemesDictionary />
-        <ui:ControlsDictionary />
     </ResourceDictionary.MergedDictionaries>
     <Style
         TargetType="Border"
