@@ -22,7 +22,7 @@ internal sealed class FormulaEvaluator {
     public double Evaluate(string formula, CalculationElementBase calcElement) {
         try {
             // При необходимости проверок расчета включаем LogEvaluation и подаем туда айди элемента который проверяем
-            // LogEvaluation(formula, calcElement, 5375862);
+            // LogEvaluation(formula, calcElement);
             return EvaluateInternal(formula, calcElement);
         } catch(Exception) {
             BuildDebugLog(calcElement, formula);

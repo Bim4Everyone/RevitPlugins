@@ -256,7 +256,9 @@
                             <ScrollViewer
                                 Grid.Row="1"
                                 VerticalScrollBarVisibility="Auto"
-                                BorderThickness="0">
+                                BorderThickness="0"
+                                Padding="0 0 20 0"
+                                Margin="0 0 -20 0">
                                 <ItemsControl ItemsSource="{Binding ConsumableTypes}">
                                     <ItemsControl.ItemTemplate>
                                         <DataTemplate>
@@ -425,7 +427,9 @@
                             <ScrollViewer
                                 Grid.Row="1"
                                 VerticalScrollBarVisibility="Auto"
-                                BorderThickness="0">
+                                BorderThickness="0"
+                                Padding="0 0 20 0"
+                                Margin="0 0 -20 0">
                                 <ItemsControl ItemsSource="{Binding CategoryAssignments}">
                                     <ItemsControl.ItemTemplate>
                                         <DataTemplate>
