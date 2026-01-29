@@ -65,7 +65,7 @@
         Style="{StaticResource CustomBorder}">
         <ScrollViewer
             HorizontalScrollBarVisibility="Auto"
-            VerticalScrollBarVisibility="Auto">
+            VerticalScrollBarVisibility="Disabled">
             <DockPanel
                 LastChildFill="True">
                 <Label
