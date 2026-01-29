@@ -5,7 +5,6 @@ using Autodesk.Revit.DB;
 
 using RevitPylonDocumentation.Models.PluginOptions;
 using RevitPylonDocumentation.Models.Services;
-using RevitPylonDocumentation.ViewModels;
 
 using Grid = Autodesk.Revit.DB.Grid;
 
@@ -89,7 +88,8 @@ internal class TransViewHorizDimensionService {
     /// </summary>
     private void CreateHorizDimensionForForm(Element pylon, ReferenceArray refArrayFormworkSide) {
         var formworkSideDimOffset = new DimensionLineOffsetOption(pylon, DirectionType.Right, 1);
-        _dimCreationService.CreateDimension(refArrayFormworkSide, formworkSideDimOffset);
+        _dimCreationService.CreateDimension(refArrayFormworkSide, formworkSideDimOffset,
+                                            needEqualityFormula: _settings.AnnotationSettings.DimensionGrouping);
     }
 
 

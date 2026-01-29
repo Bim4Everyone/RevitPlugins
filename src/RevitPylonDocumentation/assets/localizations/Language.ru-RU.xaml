@@ -1,0 +1,519 @@
+<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:system="clr-namespace:System;assembly=mscorlib">
+
+    <system:String x:Key="VM.NeedSaveSettings">Сохраните настройки</system:String>
+    
+    <system:String x:Key="MainWindow.MustBeInteger">Введите целое число</system:String>
+    
+    
+    <!-- Pylon Analysis Error Messages -->
+    <system:String x:Key="VM.TypicalPylonFilterParamNotFound">Параметр фильтрации типовых пилонов не найден</system:String>
+    <system:String x:Key="VM.ProjectSectionParamNotFound">Параметр раздела не найден у элементов Стен или Несущих колонн</system:String>
+    <system:String x:Key="VM.HostMarkParamNotFound">Параметр марки не найден у элементов Стен или Несущих колонн</system:String>
+    <system:String x:Key="VM.DuplicatePylonMarksFound">Найдены пилоны с одинаковой маркой</system:String>
+
+    <!-- ViewModel Error Messages -->
+    <system:String x:Key="VM.SelectPylon">Выберите пилон</system:String>
+    <system:String x:Key="VM.SheetTypeNotSelected">Не выбран типоразмер рамки листа</system:String>
+    <system:String x:Key="VM.ViewTypeNotSelected">Не выбран типоразмер создаваемого вида</system:String>
+    <system:String x:Key="VM.MainViewsTemplateNotSelected">Не выбран шаблон основных видов</system:String>
+    <system:String x:Key="VM.MainRebarViewsTemplateNotSelected">Не выбран шаблон основных видов армирования</system:String>
+    <system:String x:Key="VM.TransverseViewsTemplateNotSelected">Не выбран шаблон горизонтальных видов</system:String>
+    <system:String x:Key="VM.TransverseRebarViewsTemplateNotSelected">Не выбран шаблон горизонтальных видов армирования</system:String>
+    <system:String x:Key="VM.LegendNotSelected">Не выбрана легенда примечаний</system:String>
+    <system:String x:Key="VM.ViewTypeSizeNotSelected">Не выбран типоразмер создаваемого вида</system:String>
+    <system:String x:Key="VM.DimensionTypeNotSelected">Не выбран типоразмер для расстановки размеров</system:String>
+    <system:String x:Key="VM.SpotDimensionTypeNotSelected">Не выбран типоразмер высотной отметки</system:String>
+    <system:String x:Key="VM.SkeletonTagTypeNotSelected">Не задан типоразмер марки каркаса</system:String>
+    <system:String x:Key="VM.RebarTagWithSerifTypeNotSelected">Не задан типоразмер марки арматуры с засечкой</system:String>
+    <system:String x:Key="VM.RebarTagWithoutSerifTypeNotSelected">Не задан типоразмер марки арматуры без засечки</system:String>
+    <system:String x:Key="VM.RebarTagWithCommentTypeNotSelected">Не задан типоразмер марки арматуры с комментарием</system:String>
+    <system:String x:Key="VM.UniversalTagTypeNotSelected">Не задан типоразмер универсальной марки</system:String>
+    <system:String x:Key="VM.BreakLineTypeNotSelected">Не задан типоразмер линии обрыва</system:String>
+    <system:String x:Key="VM.ConcretingJointTypeNotSelected">Не задан типоразмер рабочего шва бетонирования</system:String>
+    <system:String x:Key="VM.WriteName">Введите название</system:String>
+
+    <!-- Schedule Settings Validation Error Messages -->
+    <system:String x:Key="VM.SkeletonScheduleNameInvalid">Имя спецификации каркасов некорректно</system:String>
+    <system:String x:Key="VM.SkeletonByElemsScheduleNameInvalid">Имя поэлементной спецификации каркасов некорректно</system:String>
+    <system:String x:Key="VM.MaterialScheduleNameInvalid">Имя спецификации материалов некорректно</system:String>
+    <system:String x:Key="VM.SystemPartsScheduleNameInvalid">Имя ведомости системных деталей некорректно</system:String>
+    <system:String x:Key="VM.IfcPartsScheduleNameInvalid">Имя ведомости IFC деталей некорректно</system:String>
+    
+    <!-- Dispatcher Settings Validation Error Messages -->
+    <system:String x:Key="VM.DispatcherGroupingFirstParamInvalid">Наименование параметра диспетчера 1 некорректно</system:String>
+    <system:String x:Key="VM.DispatcherGroupingSecondParamInvalid">Наименование параметра диспетчера 2 некорректно</system:String>
+
+    <!-- Annotation Settings Validation Error Messages -->
+    <system:String x:Key="VM.LegendOffsetsNotSet">Не заданы отступы на листе для легенды примечаний</system:String>
+    <system:String x:Key="VM.SheetSizeParamInvalid">Наименование параметра формата рамки листа некорректно</system:String>
+    <system:String x:Key="VM.SheetCoefficientParamInvalid">Наименование параметра множителя формата рамки листа некорректно</system:String>
+    <system:String x:Key="VM.PylonLengthParamInvalid">Наименование параметра длины сечения пилона некорректно</system:String>
+    <system:String x:Key="VM.PylonWidthParamInvalid">Наименование параметра ширины сечения пилона некорректно</system:String>
+
+    <!-- View Sections Settings Validation Error Messages -->
+    <system:String x:Key="VM.MainViewXOffsetInvalid">Значение отступа основного вида по X некорректно</system:String>
+    <system:String x:Key="VM.MainViewYTopOffsetInvalid">Значение отступа основного вида по Y сверху некорректно</system:String>
+    <system:String x:Key="VM.MainViewYBottomOffsetInvalid">Значение отступа основного вида по Y снизу некорректно</system:String>
+
+    <system:String x:Key="VM.SideViewXOffsetInvalid">Значение отступа бокового вида по X некорректно</system:String>
+    <system:String x:Key="VM.SideViewYTopOffsetInvalid">Значение отступа бокового вида по Y сверху некорректно</system:String>
+    <system:String x:Key="VM.SideViewYBottomOffsetInvalid">Значение отступа бокового вида по Y снизу некорректно</system:String>
+
+    <system:String x:Key="VM.TransverseViewXOffsetInvalid">Значение отступа поперечного вида по X некорректно</system:String>
+    <system:String x:Key="VM.TransverseViewYOffsetInvalid">Значение отступа поперечного вида по Y некорректно</system:String>
+
+    <system:String x:Key="VM.FirstTransverseViewElevationInvalid">Значение возвышения первого горизонтального вида некорректно</system:String>
+    <system:String x:Key="VM.SecondTransverseViewElevationInvalid">Значение возвышения второго горизонтального вида некорректно</system:String>
+    <system:String x:Key="VM.ThirdTransverseViewElevationInvalid">Значение возвышения третьего горизонтального вида некорректно</system:String>
+
+    <!-- View Sections Settings Validation Error Messages -->
+    <system:String x:Key="VM.CustomSheetSizeValueInvalid">Значение пользовательского формата рамки листа некорректно</system:String>
+    <system:String x:Key="VM.CustomSheetCoefficientValueInvalid">Значение пользовательского коэффициента формата рамки листа некорректно</system:String>
+
+    <!-- MainWindow -->
+    <system:String x:Key="MainWindow.Title">Документация пилонов</system:String>
+    <system:String x:Key="MainWindow.Settings">Настройки</system:String>
+
+    <system:String x:Key="MainWindow.PluginRun">Запуск плагина</system:String>
+    <system:String x:Key="MainWindow.SheetComponentsMenu">Настройки. Компоненты листа</system:String>
+    <system:String x:Key="MainWindow.ProjectParametersMenu">Настройки. Параметры проекта</system:String>
+
+    <system:String x:Key="MainWindow.VerticalViews">Вертикальные виды</system:String>
+    <system:String x:Key="MainWindow.TransverseViews">Горизонтальные виды</system:String>
+    <system:String x:Key="MainWindow.Schedules">Спецификации</system:String>
+    <system:String x:Key="MainWindow.ScheduleFilters">Спецификации. Фильтрация</system:String>
+    
+    <system:String x:Key="MainWindow.LegendsAndAnnotations">Легенды и типовые аннотации</system:String>
+    <system:String x:Key="MainWindow.PylonParameters">Параметры пилона</system:String>
+    <system:String x:Key="MainWindow.AnnotationParameters">Параметры аннотаций</system:String>
+    <system:String x:Key="MainWindow.DispatcherParameters">Параметры диспетчера</system:String>
+    <system:String x:Key="MainWindow.SheetParameters">Параметры листов</system:String>
+
+    <system:String x:Key="MainWindow.BimTipTitle">💡  BIM-Совет</system:String>
+    <system:String x:Key="MainWindow.BimTip1">1. Убедитесь, что у нужных пилонов параметр 'обр_ФОП_Фильтрация 1' заполнен 'на 1 шт.'</system:String>
+    <system:String x:Key="MainWindow.BimTip2">2. Убедитесь, что загрузили последние версии семейств опалубки и армирования из библиотеки</system:String>
+
+    <system:String x:Key="MainWindow.VerticalViewsSettings">Вкладка с настройками вертикальных видов 
+        - видов опалубки и армирования, которые смотрят на пилон сбоку</system:String>
+    <system:String x:Key="MainWindow.TransverseViewsSettings">Вкладка с настройками горизонтальных видов 
+        - видов опалубки и армирования, которые разрезают пилон поперек и смотрят сверху вниз</system:String>
+    <system:String x:Key="MainWindow.SchedulesSettings">Вкладка с настройками спецификаций 
+        - таблиц с данными о пилоне и его армировании</system:String>
+    <system:String x:Key="MainWindow.ScheduleFiltersSettings">Вкладка с настройками фильтрации спецификаций 
+        - правила изменения фильтров после копирования спецификаций</system:String>
+    <system:String x:Key="MainWindow.LegendsAndAnnotationsSettings">Вкладка с настройками иных видов, 
+        например, здесь вы можете настроить легенду примечания и правила ее размещения на виде</system:String>
+    <system:String x:Key="MainWindow.PylonParametersSettings">Вкладка с настройками параметров пилона 
+        - параметров, которые относятся к опалубочной модели пилона, например, его длина и ширина сечения</system:String>
+    <system:String x:Key="MainWindow.AnnotationParametersSettings">Вкладка с настройками аннотаций 
+        - параметров и типов, которые будут использованы при создании аннотации</system:String>
+    <system:String x:Key="MainWindow.DispatcherParametersSettings">Вкладка с настройками параметров диспетчера 
+        - параметров, которые определяют группировку в диспетчере</system:String>
+    <system:String x:Key="MainWindow.SheetParametersSettings">Вкладка с настройками параметров листа 
+        - параметров, которые определяют характеристики листа, например, его формат</system:String>
+    
+    <!-- GeneralPage -->
+    <system:String x:Key="GeneralPage.PylonSelection">Выбор пилонов</system:String>
+    <system:String x:Key="GeneralPage.DocumentationSet">Комплект документации:</system:String>
+    <system:String x:Key="GeneralPage.SelectPylon">Выбрать пилон</system:String>
+    <system:String x:Key="GeneralPage.SelectPylonMarks">Выберите марки пилонов для обработки:</system:String>
+    <system:String x:Key="GeneralPage.SearchPlaceholder">Поиск...</system:String>
+
+    <system:String x:Key="GeneralPage.SheetElements">Элементы листа</system:String>
+
+    <system:String x:Key="GeneralPage.FormworkViews">Виды опалубки</system:String>
+    <system:String x:Key="GeneralPage.Main">Основной</system:String>
+    <system:String x:Key="GeneralPage.Side">Боковой</system:String>
+    <system:String x:Key="GeneralPage.Transverse1">Поперечный 1</system:String>
+    <system:String x:Key="GeneralPage.Transverse2">Поперечный 2</system:String>
+    <system:String x:Key="GeneralPage.Transverse3">Поперечный 3</system:String>
+
+    <system:String x:Key="GeneralPage.RebarViews">Виды армирования</system:String>
+
+    <system:String x:Key="GeneralPage.ScheduleViews">Виды спецификаций</system:String>
+    <system:String x:Key="GeneralPage.Skeleton">Каркас</system:String>
+    <system:String x:Key="GeneralPage.SkeletonElements">Элементы каркаса</system:String>
+    <system:String x:Key="GeneralPage.Materials">Материалы</system:String>
+    <system:String x:Key="GeneralPage.SystemParts">Системные детали</system:String>
+    <system:String x:Key="GeneralPage.IfcParts">IFC детали</system:String>
+
+    <system:String x:Key="GeneralPage.OtherViews">Другие виды</system:String>
+    <system:String x:Key="GeneralPage.NotesLegend">Легенда примечания</system:String>
+
+    <system:String x:Key="GeneralPage.Sheet">Лист</system:String>
+    <system:String x:Key="GeneralPage.SheetParameters">Параметры листа</system:String>
+    <system:String x:Key="GeneralPage.SelectTitleBlockType">Выберите типоразмер рамки листа:</system:String>
+    <system:String x:Key="GeneralPage.SelectTitleBlockTypeTooltip">Выберите типоразмер рамки листа</system:String>
+
+    <system:String x:Key="GeneralPage.FormworkViewTemplates">Шаблоны видов опалубки</system:String>
+    <system:String x:Key="GeneralPage.FormworkViewTemplatesTooltip">Шаблоны видов опалубки</system:String>
+    <system:String x:Key="GeneralPage.RebarViewTemplates">Шаблоны видов армирования</system:String>
+    <system:String x:Key="GeneralPage.RebarViewTemplatesTooltip">Шаблоны видов армирования</system:String>
+    <system:String x:Key="GeneralPage.VerticalViews">Вертикальных видов</system:String>
+    <system:String x:Key="GeneralPage.TransverseViews">Горизонтальных видов</system:String>
+
+    <system:String x:Key="GeneralPage.Run">Запуск</system:String>
+    <system:String x:Key="GeneralPage.Cancel">Отмена</system:String>
+    <system:String x:Key="GeneralPage.Show">Показать</system:String>
+
+    <!-- VerticalViewSettingsPage -->
+    <system:String x:Key="VerticalView.FormworkMainView">Основной вид опалубки</system:String>
+    <system:String x:Key="VerticalView.PylonMainViewNameMask">Маска имени основного вида пилона:</system:String>
+    <system:String x:Key="VerticalView.PylonMainViewNameMaskTooltip">Маска имени основного вида пилона</system:String>
+    <system:String x:Key="VerticalView.PylonSideViewNameMask">Маска имени бокового вида пилона:</system:String>
+    <system:String x:Key="VerticalView.PylonSideViewNameMaskTooltip">Маска имени бокового вида пилона</system:String>
+    <system:String x:Key="VerticalView.SelectMainAndSideViewTemplate">Выберите шаблон основного и бокового вида:</system:String>
+    <system:String x:Key="VerticalView.SelectMainAndSideViewTemplateTooltip">Выберите шаблон основного и бокового вида</system:String>
+
+    <system:String x:Key="VerticalView.RebarMainView">Основной вид армирования</system:String>
+    <system:String x:Key="VerticalView.PylonMainRebarViewNameMask">Маска имени основного вида армирования пилона:</system:String>
+    <system:String x:Key="VerticalView.PylonMainRebarViewNameMaskTooltip">Маска имени основного вида армирования пилона</system:String>
+    <system:String x:Key="VerticalView.PylonSideRebarViewNameMask">Маска имени бокового вида армирования пилона:</system:String>
+    <system:String x:Key="VerticalView.PylonSideRebarViewNameMaskTooltip">Маска имени бокового вида армирования пилона</system:String>
+    <system:String x:Key="VerticalView.SelectMainAndSideRebarViewTemplate">Выберите шаблон основного и бокового вида армирования:</system:String>
+    <system:String x:Key="VerticalView.SelectMainAndSideRebarViewTemplateTooltip">Выберите шаблон основного и бокового вида армирования</system:String>
+
+    <system:String x:Key="VerticalView.MainViewOffsets">Отступы основного вида</system:String>
+    <system:String x:Key="VerticalView.MainViewXOffset">Отступ по X у основного вида</system:String>
+    <system:String x:Key="VerticalView.MainViewXOffsetTooltip">Отступ по X у основного вида</system:String>
+    <system:String x:Key="VerticalView.MainViewYTopOffset">Отступ по Y сверху у основного вида</system:String>
+    <system:String x:Key="VerticalView.MainViewYTopOffsetTooltip">Отступ по Y сверху у основного вида</system:String>
+    <system:String x:Key="VerticalView.MainViewYBottomOffset">Отступ по Y снизу у основного вида</system:String>
+    <system:String x:Key="VerticalView.MainViewYBottomOffsetTooltip">Отступ по Y снизу у основного вида</system:String>
+
+    <system:String x:Key="VerticalView.SideViewOffsets">Отступы бокового вида</system:String>
+    <system:String x:Key="VerticalView.SideViewXOffset">Отступ по X у бокового вида</system:String>
+    <system:String x:Key="VerticalView.SideViewXOffsetTooltip">Отступ по X у бокового вида</system:String>
+    <system:String x:Key="VerticalView.SideViewYTopOffset">Отступ по Y сверху у бокового вида</system:String>
+    <system:String x:Key="VerticalView.SideViewYTopOffsetTooltip">Отступ по Y сверху у бокового вида</system:String>
+    <system:String x:Key="VerticalView.SideViewYBottomOffset">Отступ по Y снизу у бокового вида</system:String>
+    <system:String x:Key="VerticalView.SideViewYBottomOffsetTooltip">Отступ по Y снизу у бокового вида</system:String>
+
+    <system:String x:Key="VerticalView.ViewTypeSize">Типоразмер вида</system:String>
+    <system:String x:Key="VerticalView.SelectViewTypeSizeForMainAndSideViews">Выберите типоразмер для основного и бокового видов:</system:String>
+    <system:String x:Key="VerticalView.SelectViewTypeSizeForMainAndSideViewsTooltip">Выберите типоразмер для основного и бокового видов</system:String>
+    
+    <!-- TransverseViewSettingsPage -->
+    <system:String x:Key="TransverseView.FormworkTransverseView">Горизонтальный вид опалубки</system:String>
+    <system:String x:Key="TransverseView.FirstTransverseViewNameMask">Маска имени первого горизонтального вида пилона:</system:String>
+    <system:String x:Key="TransverseView.FirstTransverseViewNameMaskTooltip">Маска имени первого горизонтального вида пилона</system:String>
+    <system:String x:Key="TransverseView.SecondTransverseViewNameMask">Маска имени второго горизонтального вида пилона:</system:String>
+    <system:String x:Key="TransverseView.SecondTransverseViewNameMaskTooltip">Маска имени второго горизонтального вида пилона</system:String>
+    <system:String x:Key="TransverseView.ThirdTransverseViewNameMask">Маска имени третьего горизонтального вида пилона:</system:String>
+    <system:String x:Key="TransverseView.ThirdTransverseViewNameMaskTooltip">Маска имени третьего горизонтального вида пилона</system:String>
+    <system:String x:Key="TransverseView.SelectTransverseViewTemplate">Выберите шаблон горизонтального вида:</system:String>
+    <system:String x:Key="TransverseView.SelectTransverseViewTemplateTooltip">Выберите шаблон горизонтального вида</system:String>
+    <system:String x:Key="TransverseView.TransverseViewDepth">Глубина горизонтального вида</system:String>
+    <system:String x:Key="TransverseView.TransverseViewDepthTooltip">Глубина горизонтального вида</system:String>
+
+    <system:String x:Key="TransverseView.RebarTransverseView">Горизонтальный вид армирования</system:String>
+    <system:String x:Key="TransverseView.FirstRebarTransverseViewNameMask">Маска имени первого горизонтального вида армирования пилона:</system:String>
+    <system:String x:Key="TransverseView.FirstRebarTransverseViewNameMaskTooltip">Маска имени первого горизонтального вида пилона</system:String>
+    <system:String x:Key="TransverseView.SecondRebarTransverseViewNameMask">Маска имени второго горизонтального вида армирования пилона:</system:String>
+    <system:String x:Key="TransverseView.SecondRebarTransverseViewNameMaskTooltip">Маска имени второго горизонтального вида пилона</system:String>
+    <system:String x:Key="TransverseView.ThirdRebarTransverseViewNameMask">Маска имени третьего горизонтального вида армирования пилона:</system:String>
+    <system:String x:Key="TransverseView.ThirdRebarTransverseViewNameMaskTooltip">Маска имени третьего горизонтального вида пилона</system:String>
+    <system:String x:Key="TransverseView.SelectRebarTransverseViewTemplate">Выберите шаблон горизонтального вида армирования:</system:String>
+    <system:String x:Key="TransverseView.SelectRebarTransverseViewTemplateTooltip">Выберите шаблон горизонтального вида армирования</system:String>
+    <system:String x:Key="TransverseView.RebarTransverseViewDepth">Глубина горизонтального вида армирования</system:String>
+    <system:String x:Key="TransverseView.RebarTransverseViewDepthTooltip">Глубина горизонтального вида</system:String>
+
+    <system:String x:Key="TransverseView.TransverseViewBottomOffsets">Отступы горизонтального вида</system:String>
+    <system:String x:Key="TransverseView.FirstTransverseViewBottomOffset">Отступ снизу до первого горизонтального вида</system:String>
+    <system:String x:Key="TransverseView.FirstTransverseViewBottomOffsetTooltip">Отступ снизу до первого горизонтального вида</system:String>
+    <system:String x:Key="TransverseView.SecondTransverseViewTopOffset">Отступ сверху до второго горизонтального вида</system:String>
+    <system:String x:Key="TransverseView.SecondTransverseViewTopOffsetTooltip">Отступ сверху до второго горизонтального вида</system:String>
+    <system:String x:Key="TransverseView.ThirdTransverseViewTopOffset">Отступ сверху до третьего горизонтального вида</system:String>
+    <system:String x:Key="TransverseView.ThirdTransverseViewTopOffsetTooltip">Отступ сверху до третьего горизонтального вида</system:String>
+
+    <system:String x:Key="TransverseView.TransverseViewXOffset">Отступ по X у горизонтального вида от пилона</system:String>
+    <system:String x:Key="TransverseView.TransverseViewXOffsetTooltip">Отступ по X у горизонтального вида от пилона</system:String>
+    <system:String x:Key="TransverseView.TransverseViewYOffset">Отступ по Y у горизонтального вида от пилона</system:String>
+    <system:String x:Key="TransverseView.TransverseViewYOffsetTooltip">Отступ по X у горизонтального вида от пилона</system:String>
+
+    <system:String x:Key="TransverseView.SelectViewTypeSizeForTransverseViews">Выберите типоразмер для горизонтальных видов:</system:String>
+    <system:String x:Key="TransverseView.SelectViewTypeSizeForTransverseViewsTooltip">Выберите типоразмер для горизонтальных видов</system:String>
+
+    <!-- LegendViewsPage -->
+    <system:String x:Key="LegendView.NotesLegend">Легенда примечания</system:String>
+    <system:String x:Key="LegendView.SelectNotesLegend">Выберите легенду примечания:</system:String>
+    <system:String x:Key="LegendView.SelectNotesLegendTooltip">Выберите легенду примечания</system:String>
+    <system:String x:Key="LegendView.XOffsetFromBottomRightCorner">Смещение по X от нижнего правого угла рамки:</system:String>
+    <system:String x:Key="LegendView.XOffsetFromBottomRightCornerTooltip">Смещение по X от нижнего правого угла рамки</system:String>
+    <system:String x:Key="LegendView.YOffsetFromBottomRightCorner">Смещение по Y от нижнего правого угла рамки:</system:String>
+    <system:String x:Key="LegendView.YOffsetFromBottomRightCornerTooltip">Смещение по Y от нижнего правого угла рамки</system:String>
+
+    <!-- DispatcherParamsPage -->
+    <system:String x:Key="DispatcherParams.DispatcherRelatedParameters">Параметры диспетчера проекта, в котором вы работаете</system:String>
+    <system:String x:Key="DispatcherParams.DispatcherGroupingFirstParameter">Параметр для группировки диспетчера 1:</system:String>
+    <system:String x:Key="DispatcherParams.DispatcherGroupingFirstParameterTooltip">Параметр для группировки диспетчера 1</system:String>
+    <system:String x:Key="DispatcherParams.DispatcherGroupingSecondParameter">Параметр для группировки диспетчера 2:</system:String>
+    <system:String x:Key="DispatcherParams.DispatcherGroupingSecondParameterTooltip">Параметр для группировки диспетчера 2</system:String>
+
+    <!-- AnnotationParamsPage -->
+    <system:String x:Key="AnnotationParams.AnnotationRelatedParameters">Настройки аннотаций проекта, в котором вы работаете</system:String>
+    <system:String x:Key="AnnotationParams.DimensionGrouping">Необходимо выполнять группировку размеров</system:String>
+    <system:String x:Key="AnnotationParams.DimensionGroupingTooltip">Если стоит галочка, то в создаваемых размерах в параметр "Отображение равенства" будет ставиться значение "Формула равенства"</system:String>
+
+    <system:String x:Key="AnnotationParams.SelectDimensionTypeSize">Выберите типоразмер размера:</system:String>
+    <system:String x:Key="AnnotationParams.SelectDimensionTypeSizeTooltip">Выберите типоразмер размера</system:String>
+    <system:String x:Key="AnnotationParams.SelectSpotDimensionTypeSize">Выберите типоразмер высотной отметки:</system:String>
+    <system:String x:Key="AnnotationParams.SelectSpotDimensionTypeSizeTooltip">Выберите типоразмер высотной отметки</system:String>
+
+    <system:String x:Key="AnnotationParams.SelectRebarProductMarkTypeSize">Выберите типоразмер марки арматурного изделия:</system:String>
+    <system:String x:Key="AnnotationParams.SelectRebarProductMarkTypeSizeTooltip">Выберите типоразмер марки арматурного изделия</system:String>
+    <system:String x:Key="AnnotationParams.SelectRebarMarkWithSerifTypeSize">Выберите типоразмер марки арматуры с засечкой:</system:String>
+    <system:String x:Key="AnnotationParams.SelectRebarMarkWithSerifTypeSizeTooltip">Выберите типоразмер марки арматуры с засечкой</system:String>
+    <system:String x:Key="AnnotationParams.SelectRebarMarkWithStepTypeSize">Выберите типоразмер марки арматуры с шагом:</system:String>
+    <system:String x:Key="AnnotationParams.SelectRebarMarkWithStepTypeSizeTooltip">Выберите типоразмер марки арматуры с шагом</system:String>
+    <system:String x:Key="AnnotationParams.SelectRebarMarkWithCommentTypeSize">Выберите типоразмер марки арматуры с комментарием:</system:String>
+    <system:String x:Key="AnnotationParams.SelectRebarMarkWithCommentTypeSizeTooltip">Выберите типоразмер марки арматуры с комментарием</system:String>
+
+    <system:String x:Key="AnnotationParams.SelectUniversalMarkWithTextTypeSize">Выберите типоразмер универсальной марки с текстом:</system:String>
+    <system:String x:Key="AnnotationParams.SelectUniversalMarkWithTextTypeSizeTooltip">Выберите типоразмер универсальной марки с текстом</system:String>
+    <system:String x:Key="AnnotationParams.SelectBreakLineTypeSize">Выберите типоразмер линии обрыва:</system:String>
+    <system:String x:Key="AnnotationParams.SelectBreakLineTypeSizeTooltip">Выберите типоразмер линии обрыва</system:String>
+    <system:String x:Key="AnnotationParams.SelectConcretingJointTypeSize">Выберите типоразмер рабочего шва бетонирования:</system:String>
+    <system:String x:Key="AnnotationParams.SelectConcretingJointTypeSizeTooltip">Выберите типоразмер рабочего шва бетонирования</system:String>
+
+    <!-- PylonParamsPage -->
+    <system:String x:Key="PylonParams.FormworkElementParameters">Параметры, принадлежащие опалубочному элементу пилона</system:String>
+
+    <system:String x:Key="PylonParams.PylonMarkParameter">Параметр марки пилона:</system:String>
+    <system:String x:Key="PylonParams.PylonMarkParameterTooltip">Параметр марки пилона</system:String>
+    <system:String x:Key="PylonParams.PylonDocumentationSetParameter">Параметр комплекта документации пилона:</system:String>
+    <system:String x:Key="PylonParams.PylonDocumentationSetParameterTooltip">Параметр комплекта документации пилона</system:String>
+
+    <system:String x:Key="PylonParams.TypicalPylonFilterParameter">Параметр фильтрации типовых пилонов и его значение:</system:String>
+    <system:String x:Key="PylonParams.TypicalPylonFilterParameterTooltip">Параметр фильтрации типовых пилонов и его значение</system:String>
+    <system:String x:Key="PylonParams.TypicalPylonFilterValue">Значение параметра фильтрации типовых пилонов:</system:String>
+    <system:String x:Key="PylonParams.TypicalPylonFilterValueTooltip">Значение параметра фильтрации типовых пилонов</system:String>
+
+    <system:String x:Key="PylonParams.PylonSectionLengthParameter">Параметр длины сечения пилона:</system:String>
+    <system:String x:Key="PylonParams.PylonSectionLengthParameterTooltip">Параметр длины сечения пилона</system:String>
+    <system:String x:Key="PylonParams.PylonSectionWidthParameter">Параметр ширины сечения пилона:</system:String>
+    <system:String x:Key="PylonParams.PylonSectionWidthParameterTooltip">Параметр ширины сечения пилона</system:String>
+
+    <!-- SchedulesPage -->
+    <system:String x:Key="Schedules.SkeletonSpecification">Спецификация каркасов</system:String>
+    <system:String x:Key="Schedules.SkeletonSpecNameMask">Маска имени спецификации каркасов:</system:String>
+    <system:String x:Key="Schedules.SkeletonSpecNameMaskTooltip">Маска имени спецификации каркасов</system:String>
+    <system:String x:Key="Schedules.ReferenceSkeletonSpecSearchName">Имя для поиска эталонной спецификации каркасов:</system:String>
+    <system:String x:Key="Schedules.ReferenceSkeletonSpecSearchNameTooltip">Имя для поиска эталонной спецификации каркасов</system:String>
+    <system:String x:Key="Schedules.DispatcherGroupingFirstParameterForSpec">В параметр для группировки диспетчера 1:</system:String>
+    <system:String x:Key="Schedules.DispatcherGroupingFirstParameterForSpecTooltip">В параметр для группировки диспетчера 1</system:String>
+    <system:String x:Key="Schedules.DispatcherGroupingSecondParameterForSpec">В параметр для группировки диспетчера 2:</system:String>
+    <system:String x:Key="Schedules.DispatcherGroupingSecondParameterForSpecTooltip">В параметр для группировки диспетчера 2</system:String>
+
+    <system:String x:Key="Schedules.SystemPartsSchedule">Ведомость системных деталей</system:String>
+    <system:String x:Key="Schedules.SystemPartsScheduleNameMask">Маска имени ведомости системных деталей:</system:String>
+    <system:String x:Key="Schedules.SystemPartsScheduleNameMaskTooltip">Маска имени ведомости системных деталей</system:String>
+    <system:String x:Key="Schedules.ReferenceSystemPartsScheduleSearchName">Имя для поиска эталонной ведомости системных деталей:</system:String>
+    <system:String x:Key="Schedules.ReferenceSystemPartsScheduleSearchNameTooltip">Имя для поиска эталонной ведомости системных деталей</system:String>
+    <system:String x:Key="Schedules.DispatcherGroupingFirstParameterForSchedule">В параметр для группировки диспетчера 1:</system:String>
+    <system:String x:Key="Schedules.DispatcherGroupingFirstParameterForScheduleTooltip">В параметр для группировки диспетчера 1</system:String>
+    <system:String x:Key="Schedules.DispatcherGroupingSecondParameterForSchedule">В параметр для группировки диспетчера 2:</system:String>
+    <system:String x:Key="Schedules.DispatcherGroupingSecondParameterForScheduleTooltip">В параметр для группировки диспетчера 2</system:String>
+
+    <system:String x:Key="Schedules.SkeletonElementsSpecification">Спецификация элементов каркасов</system:String>
+    <system:String x:Key="Schedules.SkeletonElementsSpecNameMask">Маска имени спецификации элементов каркасов:</system:String>
+    <system:String x:Key="Schedules.SkeletonElementsSpecNameMaskTooltip">Маска имени спецификации элементов каркасов</system:String>
+    <system:String x:Key="Schedules.ReferenceSkeletonElementsSpecSearchName">Имя для поиска эталонной спецификации элементов каркасов:</system:String>
+    <system:String x:Key="Schedules.ReferenceSkeletonElementsSpecSearchNameTooltip">Имя для поиска эталонной спецификации элементов каркасов</system:String>
+    <system:String x:Key="Schedules.DispatcherGroupingFirstParameterForSpecElements">В параметр для группировки диспетчера 1:</system:String>
+    <system:String x:Key="Schedules.DispatcherGroupingFirstParameterForSpecElementsTooltip">В параметр для группировки диспетчера 1</system:String>
+    <system:String x:Key="Schedules.DispatcherGroupingSecondParameterForSpecElements">В параметр для группировки диспетчера 2:</system:String>
+    <system:String x:Key="Schedules.DispatcherGroupingSecondParameterForSpecElementsTooltip">В параметр для группировки диспетчера 2</system:String>
+
+    <system:String x:Key="Schedules.IfcPartsSchedule">Ведомость IFC деталей</system:String>
+    <system:String x:Key="Schedules.IfcPartsScheduleNameMask">Маска имени ведомости IFC деталей:</system:String>
+    <system:String x:Key="Schedules.IfcPartsScheduleNameMaskTooltip">Маска имени ведомости IFC деталей</system:String>
+    <system:String x:Key="Schedules.ReferenceIfcPartsScheduleSearchName">Имя для поиска эталонной ведомости IFC деталей:</system:String>
+    <system:String x:Key="Schedules.ReferenceIfcPartsScheduleSearchNameTooltip">Имя для поиска эталонной ведомости IFC деталей</system:String>
+    <system:String x:Key="Schedules.DispatcherGroupingFirstParameterForIfcSchedule">В параметр для группировки диспетчера 1:</system:String>
+    <system:String x:Key="Schedules.DispatcherGroupingFirstParameterForIfcScheduleTooltip">В параметр для группировки диспетчера 1</system:String>
+    <system:String x:Key="Schedules.DispatcherGroupingSecondParameterForIfcSchedule">В параметр для группировки диспетчера 2:</system:String>
+    <system:String x:Key="Schedules.DispatcherGroupingSecondParameterForIfcScheduleTooltip">В параметр для группировки диспетчера 2</system:String>
+
+    <system:String x:Key="Schedules.MaterialsSpecification">Спецификация материалов</system:String>
+    <system:String x:Key="Schedules.MaterialsSpecNameMask">Маска имени спецификации материалов:</system:String>
+    <system:String x:Key="Schedules.MaterialsSpecNameMaskTooltip">Маска имени спецификации материалов</system:String>
+    <system:String x:Key="Schedules.ReferenceMaterialsSpecSearchName">Имя для поиска эталонной спецификации материалов:</system:String>
+    <system:String x:Key="Schedules.ReferenceMaterialsSpecSearchNameTooltip">Имя для поиска эталонной спецификации материалов</system:String>
+    <system:String x:Key="Schedules.DispatcherGroupingFirstParameterForMaterials">В параметр для группировки диспетчера 1:</system:String>
+    <system:String x:Key="Schedules.DispatcherGroupingFirstParameterForMaterialsTooltip">В параметр для группировки диспетчера 1</system:String>
+    <system:String x:Key="Schedules.DispatcherGroupingSecondParameterForMaterials">В параметр для группировки диспетчера 2:</system:String>
+    <system:String x:Key="Schedules.DispatcherGroupingSecondParameterForMaterialsTooltip">В параметр для группировки диспетчера 2</system:String>
+
+    <system:String x:Key="Schedules.ScheduleFilterParametersList">Список параметров фильтрации для спецификаций</system:String>
+
+    <system:String x:Key="Schedules.Add">Добавить</system:String>
+    <system:String x:Key="Schedules.Delete">Удалить</system:String>
+
+    <!-- SheetParamsPage -->
+    <system:String x:Key="SheetParams.SheetCreationRules">Правила, по которым будут создаваться новые листы в проекте</system:String>
+
+    <system:String x:Key="SheetParams.PylonSheetNameMask">Маска имени листа пилона:</system:String>
+    <system:String x:Key="SheetParams.PylonSheetNameMaskTooltip">Маска имени листа пилона</system:String>
+
+    <system:String x:Key="SheetParams.SheetSizeParameter">Параметр для формата рамки листа:</system:String>
+    <system:String x:Key="SheetParams.SheetSizeParameterTooltip">Параметр для формата рамки листа</system:String>
+    <system:String x:Key="SheetParams.SheetCoefficientParameter">Параметр для множителя формата рамки листа:</system:String>
+    <system:String x:Key="SheetParams.SheetCoefficientParameterTooltip">Параметр для множителя формата рамки листа</system:String>
+    
+    <system:String x:Key="SheetParams.SetCustomTitleBlock">Задать пользовательский размер рамки листа:</system:String>
+    <system:String x:Key="SheetParams.CustomSheetSizeParameterValue">Пользовательское значение параметра формата рамки листа:</system:String>
+    <system:String x:Key="SheetParams.CustomSheetSizeParameterValueTooltip">Пользовательское значение параметра формата рамки листа</system:String>
+    <system:String x:Key="SheetParams.CustomSheetCoefficientParameterValue">Пользовательское значение параметра множителя формата рамки листа:</system:String>
+    <system:String x:Key="SheetParams.CustomSheetCoefficientParameterValueTooltip">Пользовательское значение параметра множителя формата рамки листа</system:String>
+
+    <!-- GeneralPage ToolTips -->
+    <system:String x:Key="GeneralPage.DocumentationSetToolTip">Выберите комплект документации, с пилонами которого желаете поработать. Если вы хотите поработать с каким то конкретным пилоном, то нажмите кнопку справа "Выбрать пилон".&#10;После этого выберите в списке ниже нужные марки пилонов, и в списке справа виды/спецификации, которые хотите создать/разместить. Затем нажмите "Ок"&#10;Если в списке ничего не отображается или внизу окна написана ошибка оранжевым текстом - отредактируйте "Настройки" в правом верхнем углу.</system:String>
+    <system:String x:Key="GeneralPage.SelectPylonToolTip">Чтобы выбрать какой то конкретный пилон вручную:&#10;1) нажмите эту кнопку;&#10;2) окно плагина закроется и вам будет предоставлена возможность выбора элемента - кликните на нужный пилон;&#10;3) окно плагина снова откроется и вы сможете продолжить настройки.</system:String>
+    <system:String x:Key="GeneralPage.SearchPylonsToolTip">Введите текст для поиска в списке ниже</system:String>
+    <system:String x:Key="GeneralPage.SelectAllPylonsToolTip">Нажмите, чтобы выбрать все марки пилонов, видимые в списке ниже</system:String>
+    <system:String x:Key="GeneralPage.UnselectAllPylonsToolTip">Нажмите, чтобы отменить выбор всех марок пилонов, видимые в списке ниже</system:String>
+    <system:String x:Key="GeneralPage.SelectAllViewsToolTip">Нажмите, чтобы передвинуть тумблеры вправо у всех видов/спецификаций ниже</system:String>
+    <system:String x:Key="GeneralPage.UnselectAllViewsToolTip">Нажмите, чтобы передвинуть тумблеры влево у всех видов/спецификаций ниже</system:String>
+    <system:String x:Key="GeneralPage.FormworkMainViewToolTip">Передвиньте тумблер вправо, если хотите, чтобы плагин создал и разместил на листах у выбранных пилонов основной вид пилона (вертикальный вид, который смотрит на большую сторону пилона)</system:String>
+    <system:String x:Key="GeneralPage.FormworkSideViewToolTip">Передвиньте тумблер вправо, если хотите, чтобы плагин создал и разместил на листах у выбранных пилонов боковой вид пилона (вертикальный вид, который смотрит на меньшую сторону пилона)</system:String>
+    <system:String x:Key="GeneralPage.FormworkTransverse1ToolTip">Передвиньте тумблер вправо, если хотите, чтобы плагин создал и разместил на листах у выбранных пилонов поперечный разрез на уровне 1/4 высоты пилона</system:String>
+    <system:String x:Key="GeneralPage.FormworkTransverse2ToolTip">Передвиньте тумблер вправо, если хотите, чтобы плагин создал и разместил на листах у выбранных пилонов поперечный разрез на уровне 1/2 высоты пилона</system:String>
+    <system:String x:Key="GeneralPage.FormworkTransverse3ToolTip">Передвиньте тумблер вправо, если хотите, чтобы плагин создал и разместил на листах у выбранных пилонов поперечный разрез на уровне на 5/4 высоты пилона</system:String>
+    <system:String x:Key="GeneralPage.RebarMainViewToolTip">Передвиньте тумблер вправо, если хотите, чтобы плагин создал и разместил на листах у выбранных пилонов основной вид каркаса</system:String>
+    <system:String x:Key="GeneralPage.RebarSideViewToolTip">Передвиньте тумблер вправо, если хотите, чтобы плагин создал и разместил на листах у выбранных пилонов боковой вид каркаса</system:String>
+    <system:String x:Key="GeneralPage.RebarTransverse1ToolTip">Передвиньте тумблер вправо, если хотите, чтобы плагин создал и разместил на листах у выбранных пилонов первый поперечный разрез каркаса</system:String>
+    <system:String x:Key="GeneralPage.RebarTransverse2ToolTip">Передвиньте тумблер вправо, если хотите, чтобы плагин создал и разместил на листах у выбранных пилонов второй поперечный разрез каркаса</system:String>
+    <system:String x:Key="GeneralPage.RebarTransverse3ToolTip">Передвиньте тумблер вправо, если хотите, чтобы плагин создал и разместил на листах у выбранных пилонов третий поперечный разрез каркаса</system:String>
+    <system:String x:Key="GeneralPage.SkeletonScheduleToolTip">Передвиньте тумблер вправо, если хотите, чтобы плагин создал и разместил на листах у выбранных пилонов общую спецификацию каркаса</system:String>
+    <system:String x:Key="GeneralPage.SkeletonElementsScheduleToolTip">Передвиньте тумблер вправо, если хотите, чтобы плагин создал и разместил на листах у выбранных пилонов поэлементную спецификацию каркаса</system:String>
+    <system:String x:Key="GeneralPage.MaterialsScheduleToolTip">Передвиньте тумблер вправо, если хотите, чтобы плагин создал и разместил на листах у выбранных пилонов спецификацию материалов</system:String>
+    <system:String x:Key="GeneralPage.SystemPartsScheduleToolTip">Передвиньте тумблер вправо, если хотите, чтобы плагин создал и разместил на листах у выбранных пилонов ведомость системной арматуры</system:String>
+    <system:String x:Key="GeneralPage.IfcPartsScheduleToolTip">Передвиньте тумблер вправо, если хотите, чтобы плагин создал и разместил на листах у выбранных пилонов ведомость IFC арматуры</system:String>
+    <system:String x:Key="GeneralPage.NotesLegendToolTip">Передвиньте тумблер вправо, если хотите, чтобы плагин разместил на листах у выбранных пилонов легенду примечания</system:String>
+
+    <!-- Transverse View Settings Page ToolTips -->
+    <system:String x:Key="TransverseViewSettingsPage.FormworkTransverseViewToolTip">Правила, по которым будут создаваться горизонтальные разрезы для пилонов в проекте</system:String>
+    <system:String x:Key="TransverseViewSettingsPage.FirstTransverseViewNameMaskToolTip">Префикс и суффикс имени первого горизонтального вида пилона, т.е. то, что должно идти в названии вида перед указанием марки пилона и после нее.&#10;Например, в имени первого горизонтального вида пилона:&#10;&quot;Пилон 12.30.25-12⌀20-П1_Сеч.1-1&quot;,&#10;где &quot;12.30.25-12⌀20-П1&quot; - это марка пилона,&#10;&quot;Пилон &quot; - это префикс,&#10;&quot;_Сеч.1-1&quot; - это суффикс.</system:String>
+    <system:String x:Key="TransverseViewSettingsPage.SecondTransverseViewNameMaskToolTip">Префикс и суффикс имени второго горизонтального вида пилона, т.е. то, что должно идти в названии вида перед указанием марки пилона и после нее.&#10;Например, в имени второго горизонтального вида пилона:&#10;&quot;Пилон 12.30.25-12⌀20-П1_Сеч.2-2&quot;,&#10;где &quot;12.30.25-12⌀20-П1&quot; - это марка пилона,&#10;&quot;Пилон &quot; - это префикс,&#10;&quot;_Сеч.2-2&quot; - это суффикс.</system:String>
+    <system:String x:Key="TransverseViewSettingsPage.ThirdTransverseViewNameMaskToolTip">Префикс и суффикс имени третьего горизонтального вида пилона, т.е. то, что должно идти в названии вида перед указанием марки пилона и после нее.&#10;Например, в имени третьего горизонтального вида пилона:&#10;&quot;Пилон 12.30.25-12⌀20-П1_Сеч.3-3&quot;,&#10;где &quot;12.30.25-12⌀20-П1&quot; - это марка пилона,&#10;&quot;Пилон &quot; - это префикс,&#10;&quot;_Сеч.3-3&quot; - это суффикс.</system:String>
+    <system:String x:Key="TransverseViewSettingsPage.SelectTransverseViewTemplateToolTip">Шаблон вида, который необходимо применить к горизонтальным видам при их создании.</system:String>
+    <system:String x:Key="TransverseViewSettingsPage.TransverseViewDepthToolTip">Глубина проецирования горизонтального разреза</system:String>
+
+    <system:String x:Key="TransverseViewSettingsPage.RebarTransverseViewToolTip">Правила, по которым будут создаваться горизонтальные разрезы армирования для пилонов в проекте</system:String>
+    <system:String x:Key="TransverseViewSettingsPage.FirstRebarTransverseViewNameMaskToolTip">Префикс и суффикс имени первого горизонтального вида армирования пилона, т.е. то, что должно идти в названии вида перед указанием марки пилона и после нее.&#10;Например, в имени первого горизонтального вида армирования пилона:&#10;&quot;Пилон 12.30.25-12⌀20-П1_Сеч.1-1&quot;,&#10;где &quot;12.30.25-12⌀20-П1&quot; - это марка пилона,&#10;&quot;Пилон &quot; - это префикс,&#10;&quot;_Сеч.1-1&quot; - это суффикс.</system:String>
+    <system:String x:Key="TransverseViewSettingsPage.SecondRebarTransverseViewNameMaskToolTip">Префикс и суффикс имени второго горизонтального вида армирования пилона, т.е. то, что должно идти в названии вида перед указанием марки пилона и после нее.&#10;Например, в имени второго горизонтального вида армирования пилона:&#10;&quot;Пилон 12.30.25-12⌀20-П1_Сеч.2-2&quot;,&#10;где &quot;12.30.25-12⌀20-П1&quot; - это марка пилона,&#10;&quot;Пилон &quot; - это префикс,&#10;&quot;_Сеч.2-2&quot; - это суффикс.</system:String>
+    <system:String x:Key="TransverseViewSettingsPage.ThirdRebarTransverseViewNameMaskToolTip">Префикс и суффикс имени третьего горизонтального вида армирования пилона, т.е. то, что должно идти в названии вида перед указанием марки пилона и после нее.&#10;Например, в имени третьего горизонтального вида армирования пилона:&#10;&quot;Пилон 12.30.25-12⌀20-П1_Сеч.3-3&quot;,&#10;где &quot;12.30.25-12⌀20-П1&quot; - это марка пилона,&#10;&quot;Пилон &quot; - это префикс,&#10;&quot;_Сеч.3-3&quot; - это суффикс.</system:String>
+    <system:String x:Key="TransverseViewSettingsPage.SelectRebarTransverseViewTemplateToolTip">Шаблон вида, который необходимо применить к горизонтальным видам армирования при их создании.</system:String>
+    <system:String x:Key="TransverseViewSettingsPage.RebarTransverseViewDepthToolTip">Глубина проецирования горизонтального разреза армирования</system:String>
+
+    <system:String x:Key="TransverseViewSettingsPage.TransverseViewBottomOffsetsToolTip">Положение горизонтальных разрезов относительно высоты пилона</system:String>
+    <system:String x:Key="TransverseViewSettingsPage.FirstTransverseViewBottomOffsetToolTip">Положение горизонтального разреза относительно пилона задается при помощи отступа от нижней части пилона в мм</system:String>
+    <system:String x:Key="TransverseViewSettingsPage.SecondTransverseViewTopOffsetToolTip">Положение горизонтального разреза относительно пилона задается при помощи отступа от верхней части пилона в мм</system:String>
+    <system:String x:Key="TransverseViewSettingsPage.ThirdTransverseViewTopOffsetToolTip">Положение горизонтального разреза относительно пилона задается при помощи отступа от верхней части пилона в мм</system:String>
+
+    <system:String x:Key="TransverseViewSettingsPage.TransverseViewPylonOffsetsToolTip">Отступы горизонтальных видов от границ пилона на листе</system:String>
+    <system:String x:Key="TransverseViewSettingsPage.TransverseViewXOffsetToolTip">Укажите отступ от пилона вправо и влево у горизонтальных видов</system:String>
+    <system:String x:Key="TransverseViewSettingsPage.TransverseViewYOffsetToolTip">Укажите отступ от пилона сверху и снизу у горизонтальных видов</system:String>
+
+    <system:String x:Key="TransverseViewSettingsPage.ViewTypeSizeToolTip">Типоразмеры видов для горизонтальных разрезов</system:String>
+    <system:String x:Key="TransverseViewSettingsPage.SelectViewTypeSizeForTransverseViewsToolTip">Типоразмер вида, который необходимо применить к горизонтальным видам при их создании.</system:String>
+
+    <!-- LegendViewsPage ToolTips -->
+    <system:String x:Key="LegendViewsPage.NotesLegendToolTip">Правила, по которым будут размещаться на листах легенды примечаний для пилонов</system:String>
+    <system:String x:Key="LegendViewsPage.SelectNotesLegendToolTip">Выберите из представленного списка легенду, содержащую примечания листа пилона, которую необходимо разместить на листе.</system:String>
+    <system:String x:Key="LegendViewsPage.XOffsetFromBottomRightCornerToolTip">Укажите смещение по горизонтали (по оси Х) от нижнего правого угла рамки листа до середины видового экрана легенды примечания</system:String>
+    <system:String x:Key="LegendViewsPage.YOffsetFromBottomRightCornerToolTip">Укажите смещение по вертикали (по оси Y) от нижнего правого угла рамки листа до середины видового экрана легенды примечания</system:String>
+
+    <!-- DispatcherParamsPage ToolTips -->
+    <system:String x:Key="DispatcherParams.DispatcherRelatedParametersToolTip">Параметры, относящиеся к диспетчеру проекта, в котором вы работаете</system:String>
+    <system:String x:Key="DispatcherParams.DispatcherGroupingFirstParameterToolTip">Имя параметра, который используется в проекте для группировки диспетчера на первом уровне</system:String>
+    <system:String x:Key="DispatcherParams.DispatcherGroupingSecondParameterToolTip">Имя параметра, который используется в проекте для группировки диспетчера на втором уровне</system:String>
+    
+    <!-- AnnotationParamsPage ToolTips -->
+    <system:String x:Key="AnnotationParams.AnnotationRelatedParametersToolTip">Настройки и типы аннотаций проекта, над которым вы работаете</system:String>
+    <system:String x:Key="AnnotationParams.SelectDimensionTypeSizeToolTip">Выберите типоразмер размера для расстановки размеров на видах</system:String>
+    <system:String x:Key="AnnotationParams.SelectSpotDimensionTypeSizeToolTip">Выберите типоразмер высотной отметки для расстановки отметок высот</system:String>
+    <system:String x:Key="AnnotationParams.SelectRebarProductMarkTypeSizeToolTip">Выберите типоразмер марки арматурного изделия для маркировки каркасов</system:String>
+    <system:String x:Key="AnnotationParams.SelectRebarMarkWithSerifTypeSizeToolTip">Выберите типоразмер марки арматуры с засечкой для маркировки отдельных стержней</system:String>
+    <system:String x:Key="AnnotationParams.SelectRebarMarkWithStepTypeSizeToolTip">Выберите типоразмер марки арматуры с шагом для маркировки стержней с указанием шага</system:String>
+    <system:String x:Key="AnnotationParams.SelectRebarMarkWithCommentTypeSizeToolTip">Выберите типоразмер марки арматуры с комментарием для маркировки с дополнительными комментариями</system:String>
+    <system:String x:Key="AnnotationParams.SelectUniversalMarkWithTextTypeSizeToolTip">Выберите типоразмер универсальной марки с текстом для прочих обозначений</system:String>
+    <system:String x:Key="AnnotationParams.SelectBreakLineTypeSizeToolTip">Выберите типоразмер линии обрыва для обозначения обрывов на видах</system:String>
+    <system:String x:Key="AnnotationParams.SelectConcretingJointTypeSizeToolTip">Выберите типоразмер рабочего шва бетонирования для обозначения швов бетонирования</system:String>
+
+    <!-- PylonParamsPage ToolTips -->
+    <system:String x:Key="PylonParamsPage.FormworkElementParametersToolTip">Параметры, принадлежащие опалубочному элементу пилона</system:String>
+    <system:String x:Key="PylonParamsPage.PylonMarkParameterToolTip">Имя параметра, в котором у пилона прописывается значение марки пилона</system:String>
+    <system:String x:Key="PylonParamsPage.PylonDocumentationSetParameterToolTip">Имя параметра, в котором у пилона прописывается комплект документации</system:String>
+    <system:String x:Key="PylonParamsPage.TypicalPylonFilterParameterToolTip">Имя параметра, в котором у пилона прописывается отличительная черта типовых пилонов</system:String>
+    <system:String x:Key="PylonParamsPage.TypicalPylonFilterValueToolTip">Значение параметра, в котором у пилона прописывается отличительная черта типовых пилонов</system:String>
+    <system:String x:Key="PylonParamsPage.PylonSectionLengthParameterToolTip">Имя параметра, в котором у пилона на уровне типоразмера прописывается длина сечения</system:String>
+    <system:String x:Key="PylonParamsPage.PylonSectionWidthParameterToolTip">Имя параметра, в котором у пилона на уровне типоразмера прописывается ширина сечения</system:String>
+
+    <!-- Schedules Page ToolTips -->
+    <system:String x:Key="SchedulesPage.SkeletonSpecificationToolTip">Правила, по которым будет создаваться спецификация каркасов для пилонов</system:String>
+    <system:String x:Key="SchedulesPage.SkeletonSpecNameMaskToolTip">Префикс и суффикс имени спецификации каркасов пилона, т.е. то, что должно идти в названии спецификации перед указанием марки пилона и после нее.&#10;Например, в имени спецификации каркасов пилона:&#10;&quot;Пилон 12.30.25-12⌀20-П1_ВД_IFC&quot;,&#10;где &quot;12.30.25-12⌀20-П1&quot; - это марка пилона,&#10;&quot;Пилон &quot; - это префикс,&#10;&quot;_ВД_IFC&quot; - это суффикс.</system:String>
+    <system:String x:Key="SchedulesPage.ReferenceSkeletonSpecSearchNameToolTip">Имя эталонной спецификации каркасов, которая будет копироваться для получения спецификации каркасов пилона.</system:String>
+    <system:String x:Key="SchedulesPage.DispatcherGroupingFirstParameterForSpecToolTip">Значение, которое будет использовано для заполнения параметра группировки диспетчера на первом уровне у спецификации каркасов.&#10;В зависимости от того, какое значение будет здесь указано возможны следующие варианты:&#10;1) если указать название параметра, который имеется у пилона, то плагин возьмет значение этого параметра из пилона и запишет в параметр для группировки диспетчера на первом уровне у спецификации каркасов.&#10;Пример: если записать значение &quot;Марка&quot;, то плагин обратиться к перечню параметров пилона и поймет, что параметр с именем &quot;Марка&quot; у пилона есть. Далее он считает значение из параметра &quot;Марка&quot; у пилона и запишет в параметр для группировки диспетчера на первом уровне у спецификации каркасов.&#10;2) если параметр с указанным значением не будет найден у пилона, то данное значение просто запишется в параметр для группировки диспетчера на первом уровне у спецификации каркасов.&#10;Пример: если записать значение &quot;ВД&quot;, то плагин обратиться к перечню параметров пилона и поймет, что параметра с именем &quot;ВД&quot; у пилона нет. Тогда он просто запишет &quot;ВД&quot; в параметр для группировки диспетчера на первом уровне у спецификации каркасов.</system:String>
+    <system:String x:Key="SchedulesPage.DispatcherGroupingSecondParameterForSpecToolTip">Значение, которое будет использовано для заполнения параметра группировки диспетчера на втором уровне у спецификации каркасов.&#10;В зависимости от того, какое значение будет здесь указано возможны следующие варианты:&#10;1) если указать название параметра, который имеется у пилона, то плагин возьмет значение этого параметра из пилона и запишет в параметр для группировки диспетчера на втором уровне у спецификации каркасов.&#10;Пример: если записать значение &quot;Марка&quot;, то плагин обратиться к перечню параметров пилона и поймет, что параметр с именем &quot;Марка&quot; у пилона есть. Далее он считает значение из параметра &quot;Марка&quot; у пилона и запишет в параметр для группировки диспетчера на втором уровне у спецификации каркасов.&#10;2) если параметр с указанным значением не будет найден у пилона, то данное значение просто запишется в параметр для группировки диспетчера на втором уровне у спецификации каркасов.&#10;Пример: если записать значение &quot;ВД&quot;, то плагин обратиться к перечню параметров пилона и поймет, что параметра с именем &quot;ВД&quot; у пилона нет. Тогда он просто запишет &quot;ВД&quot; в параметр для группировки диспетчера на втором уровне у спецификации каркасов.</system:String>
+
+    <system:String x:Key="SchedulesPage.SystemPartsScheduleToolTip">Правила, по которым будет создаваться ведомость системных деталей для пилонов</system:String>
+    <system:String x:Key="SchedulesPage.SystemPartsScheduleNameMaskToolTip">Префикс и суффикс имени ведомости системных деталей пилона, т.е. то, что должно идти в названии ведомости перед указанием марки пилона и после нее.&#10;Например, в имени ведомости системных деталей пилона:&#10;&quot;Пилон 12.30.25-12⌀20-П1_ВД_СИС&quot;,&#10;где &quot;12.30.25-12⌀20-П1&quot; - это марка пилона,&#10;&quot;Пилон &quot; - это префикс,&#10;&quot;_ВД_СИС&quot; - это суффикс.</system:String>
+    <system:String x:Key="SchedulesPage.ReferenceSystemPartsScheduleSearchNameToolTip">Имя эталонной ведомости системных деталей, которая будет копироваться для получения ведомости системных деталей пилона.</system:String>
+    <system:String x:Key="SchedulesPage.DispatcherGroupingFirstParameterForScheduleToolTip">Значение, которое будет использовано для заполнения параметра группировки диспетчера на первом уровне у ведомости системных деталей.&#10;В зависимости от того, какое значение будет здесь указано возможны следующие варианты:&#10;1) если указать название параметра, который имеется у пилона, то плагин возьмет значение этого параметра из пилона и запишет в параметр для группировки диспетчера на первом уровне у ведомости системных деталей.&#10;Пример: если записать значение &quot;Марка&quot;, то плагин обратиться к перечню параметров пилона и поймет, что параметр с именем &quot;Марка&quot; у пилона есть. Далее он считает значение из параметра &quot;Марка&quot; у пилона и запишет в параметр для группировки диспетчера на первом уровне у ведомости системных деталей.&#10;2) если параметр с указанным значением не будет найден у пилона, то данное значение просто запишется в параметр для группировки диспетчера на первом уровне у ведомости системных деталей.&#10;Пример: если записать значение &quot;ВД&quot;, то плагин обратиться к перечню параметров пилона и поймет, что параметра с именем &quot;ВД&quot; у пилона нет. Тогда он просто запишет &quot;ВД&quot; в параметр для группировки диспетчера на первом уровне у ведомости системных деталей.</system:String>
+    <system:String x:Key="SchedulesPage.DispatcherGroupingSecondParameterForScheduleToolTip">Значение, которое будет использовано для заполнения параметра группировки диспетчера на втором уровне у ведомости системных деталей.&#10;В зависимости от того, какое значение будет здесь указано возможны следующие варианты:&#10;1) если указать название параметра, который имеется у пилона, то плагин возьмет значение этого параметра из пилона и запишет в параметр для группировки диспетчера на втором уровне у ведомости системных деталей.&#10;Пример: если записать значение &quot;Марка&quot;, то плагин обратиться к перечню параметров пилона и поймет, что параметр с именем &quot;Марка&quot; у пилона есть. Далее он считает значение из параметра &quot;Марка&quot; у пилона и запишет в параметр для группировки диспетчера на втором уровне у ведомости системных деталей.&#10;2) если параметр с указанным значением не будет найден у пилона, то данное значение просто запишется в параметр для группировки диспетчера на втором уровне у ведомости системных деталей.&#10;Пример: если записать значение &quot;ВД&quot;, то плагин обратиться к перечню параметров пилона и поймет, что параметра с именем &quot;ВД&quot; у пилона нет. Тогда он просто запишет &quot;ВД&quot; в параметр для группировки диспетчера на втором уровне у ведомости системных деталей.</system:String>
+
+    <system:String x:Key="SchedulesPage.SkeletonElementsSpecificationToolTip">Правила, по которым будет создаваться спецификация элементов каркасов для пилонов</system:String>
+    <system:String x:Key="SchedulesPage.SkeletonElementsSpecNameMaskToolTip">Префикс и суффикс имени спецификации элементов каркасов пилона, т.е. то, что должно идти в названии спецификации перед указанием марки пилона и после нее.&#10;Например, в имени спецификации элементов каркасов пилона:&#10;&quot;Пилон 12.30.25-12⌀20-П1_ВД_IFC&quot;,&#10;где &quot;12.30.25-12⌀20-П1&quot; - это марка пилона,&#10;&quot;Пилон &quot; - это префикс,&#10;&quot;_ВД_IFC&quot; - это суффикс.</system:String>
+    <system:String x:Key="SchedulesPage.ReferenceSkeletonElementsSpecSearchNameToolTip">Имя эталонной спецификации элементов каркасов, которая будет копироваться для получения спецификации элементов каркасов пилона.</system:String>
+    <system:String x:Key="SchedulesPage.DispatcherGroupingFirstParameterForSpecElementsToolTip">Значение, которое будет использовано для заполнения параметра группировки диспетчера на первом уровне у спецификации элементов каркасов.&#10;В зависимости от того, какое значение будет здесь указано возможны следующие варианты:&#10;1) если указать название параметра, который имеется у пилона, то плагин возьмет значение этого параметра из пилона и запишет в параметр для группировки диспетчера на первом уровне у спецификации элементов каркасов.&#10;Пример: если записать значение &quot;Марка&quot;, то плагин обратиться к перечню параметров пилона и поймет, что параметр с именем &quot;Марка&quot; у пилона есть. Далее он считает значение из параметра &quot;Марка&quot; у пилона и запишет в параметр для группировки диспетчера на первом уровне у спецификации элементов каркасов.&#10;2) если параметр с указанным значением не будет найден у пилона, то данное значение просто запишется в параметр для группировки диспетчера на первом уровне у спецификации элементов каркасов.&#10;Пример: если записать значение &quot;ВД&quot;, то плагин обратиться к перечню параметров пилона и поймет, что параметра с именем &quot;ВД&quot; у пилона нет. Тогда он просто запишет &quot;ВД&quot; в параметр для группировки диспетчера на первом уровне у спецификации элементов каркасов.</system:String>
+    <system:String x:Key="SchedulesPage.DispatcherGroupingSecondParameterForSpecElementsToolTip">Значение, которое будет использовано для заполнения параметра группировки диспетчера на втором уровне у спецификации элементов каркасов.&#10;В зависимости от того, какое значение будет здесь указано возможны следующие варианты:&#10;1) если указать название параметра, который имеется у пилона, то плагин возьмет значение этого параметра из пилона и запишет в параметр для группировки диспетчера на втором уровне у спецификации элементов каркасов.&#10;Пример: если записать значение &quot;Марка&quot;, то плагин обратиться к перечню параметров пилона и поймет, что параметр с именем &quot;Марка&quot; у пилона есть. Далее он считает значение из параметра &quot;Марка&quot; у пилона и запишет в параметр для группировки диспетчера на втором уровне у спецификации элементов каркасов.&#10;2) если параметр с указанным значением не будет найден у пилона, то данное значение просто запишется в параметр для группировки диспетчера на втором уровне у спецификации элементов каркасов.&#10;Пример: если записать значение &quot;ВД&quot;, то плагин обратиться к перечню параметров пилона и поймет, что параметра с именем &quot;ВД&quot; у пилона нет. Тогда он просто запишет &quot;ВД&quot; в параметр для группировки диспетчера на втором уровне у спецификации элементов каркасов.</system:String>
+
+    <system:String x:Key="SchedulesPage.IfcPartsScheduleToolTip">Правила, по которым будет создаваться ведомость IFC деталей для пилонов</system:String>
+    <system:String x:Key="SchedulesPage.IfcPartsScheduleNameMaskToolTip">Префикс и суффикс имени ведомости IFC деталей пилона, т.е. то, что должно идти в названии ведомости перед указанием марки пилона и после нее.&#10;Например, в имени ведомости IFC деталей пилона:&#10;&quot;Пилон 12.30.25-12⌀20-П1_ВД_IFC&quot;,&#10;где &quot;12.30.25-12⌀20-П1&quot; - это марка пилона,&#10;&quot;Пилон &quot; - это префикс,&#10;&quot;_ВД_IFC&quot; - это суффикс.</system:String>
+    <system:String x:Key="SchedulesPage.ReferenceIfcPartsScheduleSearchNameToolTip">Имя эталонной ведомости IFC деталей, которая будет копироваться для получения ведомости IFC деталей пилона.</system:String>
+    <system:String x:Key="SchedulesPage.DispatcherGroupingFirstParameterForIfcScheduleToolTip">Значение, которое будет использовано для заполнения параметра группировки диспетчера на первом уровне у ведомости IFC деталей.&#10;В зависимости от того, какое значение будет здесь указано возможны следующие варианты:&#10;1) если указать название параметра, который имеется у пилона, то плагин возьмет значение этого параметра из пилона и запишет в параметр для группировки диспетчера на первом уровне у ведомости IFC деталей.&#10;Пример: если записать значение &quot;Марка&quot;, то плагин обратиться к перечню параметров пилона и поймет, что параметр с именем &quot;Марка&quot; у пилона есть. Далее он считает значение из параметра &quot;Марка&quot; у пилона и запишет в параметр для группировки диспетчера на первом уровне у ведомости IFC деталей.&#10;2) если параметр с указанным значением не будет найден у пилона, то данное значение просто запишется в параметр для группировки диспетчера на первом уровне у ведомости IFC деталей.&#10;Пример: если записать значение &quot;ВД&quot;, то плагин обратиться к перечню параметров пилона и поймет, что параметра с именем &quot;ВД&quot; у пилона нет. Тогда он просто запишет &quot;ВД&quot; в параметр для группировки диспетчера на первом уровне у ведомости IFC деталей.</system:String>
+    <system:String x:Key="SchedulesPage.DispatcherGroupingSecondParameterForIfcScheduleToolTip">Значение, которое будет использовано для заполнения параметра группировки диспетчера на втором уровне у ведомости IFC деталей.&#10;В зависимости от того, какое значение будет здесь указано возможны следующие варианты:&#10;1) если указать название параметра, который имеется у пилона, то плагин возьмет значение этого параметра из пилона и запишет в параметр для группировки диспетчера на втором уровне у ведомости IFC деталей.&#10;Пример: если записать значение &quot;Марка&quot;, то плагин обратиться к перечню параметров пилона и поймет, что параметр с именем &quot;Марка&quot; у пилона есть. Далее он считает значение из параметра &quot;Марка&quot; у пилона и запишет в параметр для группировки диспетчера на втором уровне у ведомости IFC деталей.&#10;2) если параметр с указанным значением не будет найден у пилона, то данное значение просто запишется в параметр для группировки диспетчера на втором уровне у ведомости IFC деталей.&#10;Пример: если записать значение &quot;ВД&quot;, то плагин обратиться к перечню параметров пилона и поймет, что параметра с именем &quot;ВД&quot; у пилона нет. Тогда он просто запишет &quot;ВД&quot; в параметр для группировки диспетчера на втором уровне у ведомости IFC деталей.</system:String>
+
+    <system:String x:Key="SchedulesPage.MaterialsSpecificationToolTip">Правила, по которым будет создаваться спецификация материалов для пилонов</system:String>
+    <system:String x:Key="SchedulesPage.MaterialsSpecNameMaskToolTip">Префикс и суффикс имени спецификации материалов пилона, т.е. то, что должно идти в названии спецификации перед указанием марки пилона и после нее.&#10;Например, в имени спецификации материалов пилона:&#10;&quot;Пилон 12.30.25-12⌀20-П1_СМ&quot;,&#10;где &quot;12.30.25-12⌀20-П1&quot; - это марка пилона,&#10;&quot;Пилон &quot; - это префикс,&#10;&quot;_СМ&quot; - это суффикс.</system:String>
+    <system:String x:Key="SchedulesPage.ReferenceMaterialsSpecSearchNameToolTip">Имя эталонной спецификации материалов, которая будет копироваться для получения спецификации материалов пилона.</system:String>
+    <system:String x:Key="SchedulesPage.DispatcherGroupingFirstParameterForMaterialsToolTip">Значение, которое будет использовано для заполнения параметра группировки диспетчера на первом уровне у спецификации материалов.&#10;В зависимости от того, какое значение будет здесь указано возможны следующие варианты:&#10;1) если указать название параметра, который имеется у пилона, то плагин возьмет значение этого параметра из пилона и запишет в параметр для группировки диспетчера на первом уровне у спецификации материалов.&#10;Пример: если записать значение &quot;Марка&quot;, то плагин обратиться к перечню параметров пилона и поймет, что параметр с именем &quot;Марка&quot; у пилона есть. Далее он считает значение из параметра &quot;Марка&quot; у пилона и запишет в параметр для группировки диспетчера на первом уровне у спецификации материалов.&#10;2) если параметр с указанным значением не будет найден у пилона, то данное значение просто запишется в параметр для группировки диспетчера на первом уровне у спецификации материалов.&#10;Пример: если записать значение &quot;СМ&quot;, то плагин обратиться к перечню параметров пилона и поймет, что параметра с именем &quot;СМ&quot; у пилона нет. Тогда он просто запишет &quot;СМ&quot; в параметр для группировки диспетчера на первом уровне у спецификации материалов.</system:String>
+    <system:String x:Key="SchedulesPage.DispatcherGroupingSecondParameterForMaterialsToolTip">Значение, которое будет использовано для заполнения параметра группировки диспетчера на втором уровне у спецификации материалов.&#10;В зависимости от того, какое значение будет здесь указано возможны следующие варианты:&#10;1) если указать название параметра, который имеется у пилона, то плагин возьмет значение этого параметра из пилона и запишет в параметр для группировки диспетчера на втором уровне у спецификации материалов.&#10;Пример: если записать значение &quot;Марка&quot;, то плагин обратиться к перечню параметров пилона и поймет, что параметр с именем &quot;Марка&quot; у пилона есть. Далее он считает значение из параметра &quot;Марка&quot; у пилона и запишет в параметр для группировки диспетчера на втором уровне у спецификации материалов.&#10;2) если параметр с указанным значением не будет найден у пилона, то данное значение просто запишется в параметр для группировки диспетчера на втором уровне у спецификации материалов.&#10;Пример: если записать значение &quot;СМ&quot;, то плагин обратиться к перечню параметров пилона и поймет, что параметра с именем &quot;СМ&quot; у пилона нет. Тогда он просто запишет &quot;СМ&quot; в параметр для группировки диспетчера на втором уровне у спецификации материалов.</system:String>
+
+    <system:String x:Key="SchedulesPage.ScheduleFilterParametersListToolTip">Правила, по которым будут формироваться фильтры в спецификациях и ведомостях</system:String>
+    <system:String x:Key="SchedulesPage.ParamNameInScheduleToolTip">Название параметра в фильтре спецификации</system:String>
+    <system:String x:Key="SchedulesPage.ParamNameInHostToolTip">Название параметра у пилона или значение для фильтра</system:String>
+    <system:String x:Key="SchedulesPage.AddButtonToolTip">Добавляет новую строку в списке выше</system:String>
+    <system:String x:Key="SchedulesPage.DeleteButtonToolTip">Удаляет отмеченные галочкой строки из списка выше</system:String>
+
+    <!-- SheetParamsPage ToolTips -->
+    <system:String x:Key="SheetParams.SheetCreationRulesToolTip">Правила, по которым будут создаваться новые листы в проекте</system:String>
+    <system:String x:Key="SheetParams.PylonSheetNameMaskToolTip">Префикс и суффикс имени листа, т.е. то, что должно идти в названии листа перед указанием марки пилона и после нее.&#10;Например, в имени листа:&#10;"Пилон 12.30.25-12⌀20-П1_ЖБ",&#10;где "12.30.25-12⌀20-П1" - это марка пилона,&#10;"Пилон " - это префикс,&#10;"_ЖБ" - это суффикс.</system:String>
+    <system:String x:Key="SheetParams.SelectTitleBlockTypeToolTip">Типоразмер рамки (штампа), которая будет размещена на новых листах</system:String>
+    <system:String x:Key="SheetParams.SheetSizeParameterToolTip">Имя параметра рамки листа, в котором задается значение формата листа.&#10;Например, если вам необходимо задать рамке листа формат "А3", то в данный параметр вы будете записывать "3"&#10;В этом поле нужно указать имя этого параметра.</system:String>
+    <system:String x:Key="SheetParams.SheetCoefficientParameterToolTip">Имя параметра рамки листа, в котором задается значение множителя формата листа.&#10;Например, если вам необходимо задать рамке листа формат "А2х3", то в данный параметр вы будете записывать "3", чтобы указать, что формат "А2" умножен на 3.&#10;В этом поле нужно указать имя этого параметра.</system:String>
+
+    <!-- VerticalViewSettingsPage ToolTips -->
+    <system:String x:Key="VerticalViewSettingsPage.FormworkMainViewToolTip">Правила, по которым будут создаваться вертикальные разрезы для пилонов в проекте</system:String>
+    <system:String x:Key="VerticalViewSettingsPage.PylonMainViewNameMaskToolTip">Префикс и суффикс имени основного вида пилона, т.е. то, что должно идти в названии вида перед указанием марки пилона и после нее.&#10;Например, в имени основного вида пилона:&#10;&quot;Пилон 12.30.25-12⌀20-П1_ЖБ&quot;,&#10;где &quot;12.30.25-12⌀20-П1&quot; - это марка пилона,&#10;&quot;Пилон &quot; - это префикс,&#10;&quot;_ЖБ&quot; - это суффикс.</system:String>
+    <system:String x:Key="VerticalViewSettingsPage.PylonSideViewNameMaskToolTip">Префикс и суффикс имени бокового вида пилона, т.е. то, что должно идти в названии вида перед указанием марки пилона и после нее.&#10;Например, в имени бокового вида пилона:&#10;&quot;Пилон 12.30.25-12⌀20-П1_ЖБ&quot;,&#10;где &quot;12.30.25-12⌀20-П1&quot; - это марка пилона,&#10;&quot;Пилон &quot; - это префикс,&#10;&quot;_ЖБ&quot; - это суффикс.</system:String>
+    <system:String x:Key="VerticalViewSettingsPage.SelectMainAndSideViewTemplateToolTip">Шаблон вида, который необходимо применить к основному и боковому виду при их создании.</system:String>
+    <system:String x:Key="VerticalViewSettingsPage.RebarMainViewToolTip">Правила, по которым будут создаваться вертикальные разрезы армирования для пилонов в проекте</system:String>
+    <system:String x:Key="VerticalViewSettingsPage.PylonMainRebarViewNameMaskToolTip">Префикс и суффикс имени основного вида армирования пилона, т.е. то, что должно идти в названии вида перед указанием марки пилона и после нее.&#10;Например, в имени основного армирования вида пилона:&#10;&quot;Пилон 12.30.25-12⌀20-П1_ЖБ&quot;,&#10;где &quot;12.30.25-12⌀20-П1&quot; - это марка пилона,&#10;&quot;Пилон &quot; - это префикс,&#10;&quot;_ЖБ&quot; - это суффикс.</system:String>
+    <system:String x:Key="VerticalViewSettingsPage.PylonSideRebarViewNameMaskToolTip">Префикс и суффикс имени бокового вида армирования пилона, т.е. то, что должно идти в названии вида перед указанием марки пилона и после нее.&#10;Например, в имени бокового вида пилона:&#10;&quot;Пилон 12.30.25-12⌀20-П1_ЖБ&quot;,&#10;где &quot;12.30.25-12⌀20-П1&quot; - это марка пилона,&#10;&quot;Пилон &quot; - это префикс,&#10;&quot;_ЖБ&quot; - это суффикс.</system:String>
+    <system:String x:Key="VerticalViewSettingsPage.SelectMainAndSideRebarViewTemplateToolTip">Шаблон вида, который необходимо применить к основному и боковому виду армирования при их создании.</system:String>
+    <system:String x:Key="VerticalViewSettingsPage.MainViewOffsetsToolTip">Отступы основного вертикального вида от границ пилона на листе</system:String>
+    <system:String x:Key="VerticalViewSettingsPage.MainViewXOffsetToolTip">Укажите отступ от пилона вправо и влево у основного вида</system:String>
+    <system:String x:Key="VerticalViewSettingsPage.MainViewYTopOffsetToolTip">Укажите отступ от пилона сверху у основного вида</system:String>
+    <system:String x:Key="VerticalViewSettingsPage.MainViewYBottomOffsetToolTip">Укажите отступ от пилона снизу у основного вида</system:String>
+    <system:String x:Key="VerticalViewSettingsPage.SideViewOffsetsToolTip">Отступы бокового вертикального вида от границ пилона на листе</system:String>
+    <system:String x:Key="VerticalViewSettingsPage.SideViewXOffsetToolTip">Укажите отступ от пилона вправо и влево у бокового вида</system:String>
+    <system:String x:Key="VerticalViewSettingsPage.SideViewYTopOffsetToolTip">Укажите отступ от пилона сверху у бокового вида</system:String>
+    <system:String x:Key="VerticalViewSettingsPage.SideViewYBottomOffsetToolTip">Укажите отступ от пилона снизу у бокового вида</system:String>
+    <system:String x:Key="VerticalViewSettingsPage.ViewTypeSizeToolTip">Типоразмеры видов для вертикальных разрезов</system:String>
+    <system:String x:Key="VerticalViewSettingsPage.SelectViewTypeSizeForMainAndSideViewsToolTip">Типоразмер вида, который необходимо применить к основному и боковому виду при их создании.</system:String>
+</ResourceDictionary>
