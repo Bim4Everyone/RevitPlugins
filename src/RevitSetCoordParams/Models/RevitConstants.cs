@@ -19,8 +19,6 @@ internal static class RevitConstants {
     public const bool Search = true;
     // Самое распространенное значения для записи координат
     public const string TypeModel = "Координаты СМР";
-    // Ключевое слово, для фильтрации объемных элементов
-    public const string TypeModelPartName = "СМР";
     // Имя рабочего набора, элементы которого не будут обработаны
     public const string WorksetExcludeName = "99_Немоделируемые элементы";
     // Ключевая строка, по которому ищется координационный файл
