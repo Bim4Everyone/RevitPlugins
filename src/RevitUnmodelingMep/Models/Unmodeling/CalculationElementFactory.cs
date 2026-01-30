@@ -119,7 +119,7 @@ internal sealed class CalculationElementFactory {
         calculationElement.OutDiameter_mm = outDiameter;
         calculationElement.Area_m2 = surfaceArea;
         calculationElement.Volume_m3 = volume;
-        calculationElement.Perimeter_mm = Math.PI * 2 * pipe.Diameter;
+        calculationElement.Perimeter_mm = Math.PI * pipe.Diameter;
         calculationElement.Length_mm = length;
 
         calculationElement.InsulationThikness_mm =

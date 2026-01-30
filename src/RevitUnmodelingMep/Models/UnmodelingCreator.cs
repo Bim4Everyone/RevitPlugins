@@ -218,20 +218,12 @@ internal class UnmodelingCreator {
             throw new InvalidOperationException("_ws_id is null");
         instWorkset.Set(_ws_id.IntegerValue);
 
-        string group = $"{newRowElement.Group}" +
-            $"_{newRowElement.Name}" +
-            $"_{newRowElement.Mark}" +
-            $"_{newRowElement.Maker}" +
-            $"_{newRowElement.Code}";
-
         SharedParam numberParam;
         if(_doc.IsExistsParam(SharedParamsConfig.Instance.VISSpecNumbersCurrency)) {
             numberParam = SharedParamsConfig.Instance.VISSpecNumbersCurrency;
         } else {
             numberParam = SharedParamsConfig.Instance.VISSpecNumbers;
         }
-
-        Parameter descriptionParam = familyInstance.GetParam(SharedParamsConfig.Instance.Description);
 
         void SetUnmodelingValue(FamilyInstance familyInstance, SharedParam sharedParam, object? value) {
             if(value is null)
@@ -253,7 +245,7 @@ internal class UnmodelingCreator {
         }
 
         SetUnmodelingValue(familyInstance, SharedParamsConfig.Instance.VISSystemName, newRowElement.System);
-        SetUnmodelingValue(familyInstance, SharedParamsConfig.Instance.VISGrouping, group);
+        SetUnmodelingValue(familyInstance, SharedParamsConfig.Instance.VISGrouping, newRowElement.Group);
         SetUnmodelingValue(familyInstance, SharedParamsConfig.Instance.VISCombinedName, newRowElement.Name);
         SetUnmodelingValue(familyInstance, SharedParamsConfig.Instance.VISMarkNumber, newRowElement.Mark);
         SetUnmodelingValue(familyInstance, SharedParamsConfig.Instance.VISItemCode, newRowElement.Code);
