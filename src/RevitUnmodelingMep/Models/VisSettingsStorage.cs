@@ -56,11 +56,9 @@ internal class VisSettingsStorage {
             string dllDir = Path.GetDirectoryName(assemblyPath)
                             ?? AppDomain.CurrentDomain.BaseDirectory;
 
-            // Р?С?Р?Р?Р?Р?Р?Р№ РїС?С'С?: РїС?Р?С"РёР>С? pyRevit -> Extensions -> 04.OV-VK.extension -> lib
             string appData = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
             string defaultLibPath = Path.Combine(appData, "pyRevit", "Extensions", "04.OV-VK.extension", "lib");
 
-            // Fallback: РчС?Р>Рё dll Р?РчР№С?С'Р?РёС'РчР>С?Р?Р? Р>РчРРёС' Р? ...\Р?Р'РёР'Р?.tab\bin, РїР?Р?Р?РёР?Р°РчР?С?С? Р?Р° Р?Р?Рч Р?РёС?РчРєС'Р?С?РёРё Р?Р?РчС?С: Рё Р·Р°С:Р?Р?РёР? Р? lib
             string fallbackLibPath = Path.GetFullPath(Path.Combine(dllDir, "..", "..", "lib"));
 
             string libDir = Directory.Exists(defaultLibPath) ? defaultLibPath : fallbackLibPath;
@@ -249,7 +247,8 @@ internal class VisSettingsStorage {
     }
 
     private void SaveSettings(string settingsText) {
-        using(var tr = new Transaction(_doc, _localizationService.GetLocalizedString("VisSettingsStorage.TransactionName"))) {
+        using(var tr = new Transaction(_doc, 
+            _localizationService.GetLocalizedString("VisSettingsStorage.TransactionName"))) {
             tr.Start();
 
             _doc.ProjectInformation.SetParamValue(
