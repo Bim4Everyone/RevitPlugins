@@ -16,6 +16,7 @@ internal class ConsumableTypeItem : BaseViewModel {
     private string _maker;
     private string _formula;
     private string _note;
+    private bool _roundUpTotal;
     private CategoryOption _selectedCategory;
 
     public string Title {
@@ -77,6 +78,11 @@ internal class ConsumableTypeItem : BaseViewModel {
         set => RaiseAndSetIfChanged(ref _note, value);
     }
 
+    public bool RoundUpTotal {
+        get => _roundUpTotal;
+        set => RaiseAndSetIfChanged(ref _roundUpTotal, value);
+    }
+
     public CategoryOption SelectedCategory {
         get => _selectedCategory;
         set {
@@ -107,6 +113,7 @@ internal class ConsumableTypeItem : BaseViewModel {
             Maker = (string) value["CREATOR"],
             Formula = (string) value["VALUE_FORMULA"],
             Note = (string) value["NOTE_FORMAT"],
+            RoundUpTotal = (bool?) value["ROUND_UP_TOTAL"] ?? false,
             AssignedElementIds = new JArray(assignedIds),
             RawConfig = clonedValue
         };
@@ -128,6 +135,7 @@ internal class ConsumableTypeItem : BaseViewModel {
         result.Remove("USE_CATEGORY_RESERVE");
         result["VALUE_FORMULA"] = Formula ?? string.Empty;
         result["NOTE_FORMAT"] = Note ?? string.Empty;
+        result["ROUND_UP_TOTAL"] = RoundUpTotal;
         result["ASSIGNED_ELEMENT_IDS"] = AssignedElementIds ?? new JArray();
 
         return result;

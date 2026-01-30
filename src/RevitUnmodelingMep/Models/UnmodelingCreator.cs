@@ -201,9 +201,6 @@ internal class UnmodelingCreator {
     }
 
     public void CreateNewPosition(NewRowElement newRowElement) {
-
-        newRowElement.Number = Math.Round(newRowElement.Number, 2, MidpointRounding.AwayFromZero);
-
         if(newRowElement.Number == 0) {
             return;
         }

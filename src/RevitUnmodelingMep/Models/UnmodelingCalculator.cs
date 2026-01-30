@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -50,6 +51,11 @@ internal class UnmodelingCalculator {
         NewRowElement baseRow = draftRows[0];
         double totalNumber = draftRows.Sum(r => r.Number);
 
+        totalNumber = Math.Round(totalNumber, 2, MidpointRounding.AwayFromZero);
+        if(config.RoundUpTotal) {
+            totalNumber = System.Math.Ceiling(totalNumber);
+        }
+
         return new NewRowElement {
             Element = baseRow.Element,
             Group = baseRow.Group,
@@ -71,4 +77,3 @@ internal class UnmodelingCalculator {
         };
     }
 }
-

@@ -30,6 +30,7 @@
     <system:String x:Key="MainWindow.Unit">Ед. изм.</system:String>
     <system:String x:Key="MainWindow.Creator">Производитель</system:String>
     <system:String x:Key="MainWindow.Formula">Формула</system:String>
+    <system:String x:Key="MainWindow.RoundUpTotal">Округлять итог вверх до ближайшего целого</system:String>
     <system:String x:Key="MainWindow.Note">Формула примечания</system:String>
 
     <system:String x:Key="MainViewModel.SavePropertyDefault">по умолчанию</system:String>
