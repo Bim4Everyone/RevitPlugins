@@ -52,7 +52,7 @@
         <ui:TitleBar
             VerticalAlignment="Center"
             Grid.Row="0"
-            Title="{me:LocalizationSource MainWindow.Title}"/>
+            Title="{me:LocalizationSource RoomsWindow.Title}"/>
         
         <Border
             Grid.Row="1"
