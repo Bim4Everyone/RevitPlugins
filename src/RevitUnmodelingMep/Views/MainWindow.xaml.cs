@@ -43,6 +43,12 @@ public partial class MainWindow {
     public override string ProjectConfigName => nameof(MainWindow);
     
     private void ButtonOk_Click(object sender, RoutedEventArgs e) {
+        if(DataContext is MainViewModel viewModel) {
+            if(!viewModel.AcceptViewCommand.CanExecute(null)) {
+                return;
+            }
+        }
+
         DialogResult = true;
     }
 

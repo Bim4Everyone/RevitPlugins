@@ -106,6 +106,10 @@ internal class VisSettingsStorage {
         JObject settingsBeforeMerge =
             (JObject) currentSettings.DeepClone();
 
+        if(currentSettings.ContainsKey(UnmodelingConfigReader.UnmodelingConfigKey)) {
+            defaultSettings.Remove(UnmodelingConfigReader.UnmodelingConfigKey);
+        }
+
         JObject mergedSettings =
             MergeSettings(currentSettings, defaultSettings);
 

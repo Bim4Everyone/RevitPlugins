@@ -197,15 +197,20 @@ internal class MainViewModel : BaseViewModel {
     }
 
     private void RemoveConsumableType(ConsumableTypeItem item) {
-        if(ConsumableTypes == null || ConsumableTypes.Count == 0) {
+        if(ConsumableTypes == null || ConsumableTypes.Count == 0 || item == null) {
             return;
         }
 
-        if(item != null && ConsumableTypes.Contains(item)) {
-            ConsumableTypes.Remove(item);
-        } else {
-            ConsumableTypes.RemoveAt(ConsumableTypes.Count - 1);
+        ConsumableTypeItem target = ConsumableTypes.FirstOrDefault(c => ReferenceEquals(c, item));
+        if(target == null && !string.IsNullOrWhiteSpace(item.ConfigKey)) {
+            target = ConsumableTypes.FirstOrDefault(c => string.Equals(c.ConfigKey, item.ConfigKey, StringComparison.OrdinalIgnoreCase));
         }
+
+        if(target == null) {
+            return;
+        }
+
+        ConsumableTypes.Remove(target);
 
         CommandManager.InvalidateRequerySuggested();
         UpdateTypesLists();
