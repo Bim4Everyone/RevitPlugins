@@ -15,11 +15,8 @@
     mc:Ignorable="d"
     WindowStartupLocation="CenterOwner"
 
-    Height="900" 
-    Width="1000"
-    
-    MinHeight="900"
-    MinWidth="1000"
+    Height="750" Width="1000"    
+    MinHeight="750" MinWidth="1000"
     
     d:DataContext="{d:DesignInstance vms:RoomsViewModel, IsDesignTimeCreatable=False}">
 
@@ -190,7 +187,7 @@
                     </DataGridCheckBoxColumn>
                     <DataGridTextColumn
                         Binding="{Binding Path=Name}"
-                        Width="500"
+                        Width="400"
                         IsReadOnly="True">
                         <DataGridTextColumn.Header>
                             <TextBlock
@@ -199,7 +196,7 @@
                     </DataGridTextColumn>
                     <DataGridTextColumn
                         Binding="{Binding Path=LevelNames}"
-                        Width="300"
+                        Width="250"
                         IsReadOnly="True">
                         <DataGridTextColumn.Header>
                             <TextBlock
@@ -230,7 +227,8 @@
 
             <ui:Button
                 Content="{me:LocalizationSource RoomsWindow.ButtonCalculateAreas}"
-                Margin="4,0" 
+                Margin="4,0"
+                Appearance="Info"
                 Click="ButtonOK_Click"
                 Command="{Binding RevitViewModel.CalculateAreasCommand}" />
 
@@ -238,6 +236,7 @@
                 Content="{me:LocalizationSource RoomsWindow.ButtonCalculateRooms}"
                 Margin="4,0" 
                 IsDefault="True"
+                Appearance="Info"
                 Click="ButtonOK_Click" 
                 Command="{Binding RevitViewModel.CalculateCommand}" />
 
