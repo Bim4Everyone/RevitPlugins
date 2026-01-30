@@ -68,8 +68,20 @@
             Grid.Row="2"
             Margin="14,4"
             Style="{StaticResource CustomBorder}">
-            <StackPanel>
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                </Grid.RowDefinitions>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition />
+                    <ColumnDefinition />
+                </Grid.ColumnDefinitions>
+                
                 <CheckBox
+                    Grid.Row="0"
+                    Grid.Column="0"
                     Margin="0,4"
                     IsChecked="{Binding RevitViewModel.IsFillLevel}">
                     <TextBlock>
@@ -79,23 +91,30 @@
                 </CheckBox>
 
                 <CheckBox
+                    Grid.Row="0"
+                    Grid.Column="1"
                     Margin="0,4"
                     Content="{me:LocalizationSource RoomsWindow.CalculateContourArea}"
                     IsChecked="{Binding RevitViewModel.IsSpotCalcArea}" />
 
                 <CheckBox
+                    Grid.Row="1"
+                    Grid.Column="1"
                     Margin="0,4"
                     Content="{me:LocalizationSource RoomsWindow.CountRooms}"
                     IsChecked="{Binding RevitViewModel.IsCountRooms}" />
 
                 <CheckBox
+                    Grid.Row="1"
+                    Grid.Column="0"
                     x:Name="_checkArea"
                     Margin="0,4"
                     Content="{me:LocalizationSource RoomsWindow.CheckChanges}"
                     IsChecked="{Binding RevitViewModel.IsCheckRoomsChanges}" />
 
                 <StackPanel
-                    Grid.Row="6"
+                    Grid.Row="2"
+                    Grid.Column="0"
                     Margin="0,4"
                     Orientation="Horizontal"
                     Visibility="{Binding ElementName=_checkArea,Path=IsChecked, Converter={StaticResource BoolToVis}}">
@@ -111,7 +130,7 @@
                         VerticalAlignment="Center"
                         Text="%" />
                 </StackPanel>
-            </StackPanel>
+            </Grid>
         </Border>
 
         <Border
