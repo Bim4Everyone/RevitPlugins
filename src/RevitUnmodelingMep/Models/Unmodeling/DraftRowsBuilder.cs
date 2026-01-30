@@ -55,8 +55,8 @@ internal sealed class DraftRowsBuilder {
                     element.GetParamValueOrDefault<string>(SharedParamsConfig.Instance.BuildingWorksSection, "");
                 string smrFloor =
                     element.GetParamValueOrDefault<string>(SharedParamsConfig.Instance.BuildingWorksLevel, "");
-                string smrFloorCurrnecy =
-                    element.GetParamValueOrDefault<string>(SharedParamsConfig.Instance.BuildingWorksLevelCurrency, "");
+                double smrFloorCurrnecy =
+                    element.GetParamValueOrDefault<double>(SharedParamsConfig.Instance.BuildingWorksLevelCurrency, 0);
 
                 CalculationElementBase calcElement = _calculationElementFactory.Create(element);
 

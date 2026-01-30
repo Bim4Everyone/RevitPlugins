@@ -26,7 +26,7 @@ internal class NewRowElement {
     private string _smrBlock;
     private string _smrSection;
     private string _smrFloor;
-    private string _smrFloorDE;
+    private double _smrFloorDE;
 
     public string System {
         get => _system;
@@ -103,7 +103,7 @@ internal class NewRowElement {
         set => _smrFloor = value;
     }
 
-    public string SmrFloorCurrency {
+    public double SmrFloorCurrency {
         get => _smrFloorDE;
         set => _smrFloorDE = value;
     }
