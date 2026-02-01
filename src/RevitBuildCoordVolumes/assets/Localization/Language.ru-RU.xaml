@@ -4,11 +4,14 @@
 
     <system:String x:Key="MainWindow.Title">Построить объемы СМР</system:String>
 
-    <system:String x:Key="MainWindow.GroupBoxCommonSettings">Общие настройки</system:String>
+    <system:String x:Key="MainWindow.CommonSettings">Общие настройки</system:String>
     
     <system:String x:Key="MainWindow.TypeAlgorithm">Тип алгоритма</system:String>
     <system:String x:Key="MainWindow.TypeAlgorithmDescription">Выбор типа алгоритма для построения объемных элементов</system:String>
-    
+
+    <system:String x:Key="MainWindow.BuilderMode">Режим работы алгоритма</system:String>
+    <system:String x:Key="MainWindow.BuilderModeDescription">Выбор режима работы алгоритма на основе перекрытий</system:String>
+
     <system:String x:Key="MainWindow.TypeZones">Тип зоны</system:String>
     <system:String x:Key="MainWindow.TypeZonesDescription">Выбор типа зоны для построения объемных элементов</system:String>
     
@@ -21,7 +24,7 @@
     <system:String x:Key="MainWindow.SourceParamHeader">Параметр зон</system:String>
     <system:String x:Key="MainWindow.TargetParamHeader">Параметр объемных элементов</system:String>
 
-    <system:String x:Key="MainWindow.GroupBoxAdvancedAlgorythmSettings">Настройки расширенного алгоритма</system:String>
+    <system:String x:Key="MainWindow.SlabBasedAlgorythmSettings">Настройки алгоритма на основе перекрытий</system:String>
 
     <system:String x:Key="MainWindow.SourceFiles">Файлы с плитами перекрытий</system:String>
     <system:String x:Key="MainWindow.SourceFilesDescription">Файлы, где расположены плиты перекрытий</system:String>
@@ -31,24 +34,28 @@
     <system:String x:Key="MainWindow.TypeSlabsDescription">Типоразмеры плит использующихся для определения основы</system:String>
     <system:String x:Key="MainWindow.SearchTextSlabs">Поиск по имени типоразмера</system:String>
 
-    <system:String x:Key="MainWindow.LevelBottomSlabs">Нижний уровень плит перекрытий (включительно)</system:String>
-    <system:String x:Key="MainWindow.LevelBottomSlabsDescription">Нижний уровень плит использующихся для определения основы</system:String>
-
-    <system:String x:Key="MainWindow.LevelUpSlabs">Верхний уровень плит перекрытий (включительно)</system:String>
-    <system:String x:Key="MainWindow.LevelUpSlabsDescription">Верхний уровень плит использующихся для определения основы</system:String>
+    <system:String x:Key="MainWindow.Levels">Уровни плит перекрытий</system:String>
+    <system:String x:Key="MainWindow.LevelsDescription">Уровни плит использующихся для определения основы</system:String>
 
     <system:String x:Key="MainWindow.SquareSide">Длина стороны квадрата в мм</system:String>
-    <system:String x:Key="MainWindow.SquareSideDescription">Квадраты, на которые разбивается зона для построения объема</system:String>
+    <system:String x:Key="MainWindow.SquareSideDescription">Зона разбивается на сетку квадратов с заданной стороной</system:String>
     <system:String x:Key="MainWindow.SquareSideTooltip">Влияет на производительность и точность. Меньше значение - меньше производительность, но больше точность</system:String>
-        
-    
+
+    <system:String x:Key="MainWindow.SquareAngle">Угол поворота квадрата в градусах</system:String>
+    <system:String x:Key="MainWindow.SquareAngleDescription">Сетка квадратов поворачивается на заданный угол</system:String>
+    <system:String x:Key="MainWindow.SquareAngleTooltip">Поворот налево - положительное значение, направо - отрицательное</system:String>
+
     <system:String x:Key="MainWindow.ButtonCheckArea">Проверить зоны</system:String>
     <system:String x:Key="MainWindow.ButtonOk">Построить</system:String>
     <system:String x:Key="MainWindow.ButtonCancel">Отменить</system:String>
 
-    <system:String x:Key="MainViewModel.SimpleAreaExtrude">Простой алгоритм построения</system:String>
-    <system:String x:Key="MainViewModel.AdvancedAreaExtrude">Расширенный алгоритм построения</system:String>
-    
+    <system:String x:Key="MainViewModel.SlabBasedAlgorithm">На основе перекрытий (автоматический)</system:String>
+    <system:String x:Key="MainViewModel.ParamBasedAlgorithm">На основе параметров (низа и верха)</system:String>
+
+    <system:String x:Key="MainViewModel.AutomaticBuilder">Автоматический выбор по перекрытию</system:String>
+    <system:String x:Key="MainViewModel.ContourBuilder">Экструзия квадратов с объединением</system:String>
+    <system:String x:Key="MainViewModel.ColumnBuilder">Экструзия квадратов без объединения</system:String>    
+
     <system:String x:Key="MainViewModel.DescriptionParamDescription">Параметр типа зон</system:String>
     <system:String x:Key="MainViewModel.DescriptionParamDetailDescription">Используется для определения типа зон</system:String>    
     <system:String x:Key="MainViewModel.BlockParamDescription">Параметр блока СМР</system:String>
@@ -78,7 +85,7 @@
     <system:String x:Key="MainViewModel.NoSlabs">Не выбраны плиты перекрытий</system:String>
     <system:String x:Key="MainViewModel.NoTypeZone">Не выбран тип зон</system:String>
     <system:String x:Key="MainViewModel.ErrorParams">Отсутствуют некоторые параметры</system:String>
-    <system:String x:Key="MainViewModel.SquareSideNoDouble">Вводимые данные должны быть числом</system:String>
+    <system:String x:Key="MainViewModel.SquareValueNoDouble">Вводимые данные должны быть числом</system:String>
     <system:String x:Key="MainViewModel.SquareSideNoNegate">Вводимые данные должны быть положительными</system:String>
     <system:String x:Key="MainViewModel.SquareSideNoZero">Вводимые данные должны быть больше нуля</system:String>
     <system:String x:Key="MainViewModel.SquareSideBig">Вводимые данные не должны превышать 500 мм</system:String>
@@ -90,5 +97,10 @@
     <system:String x:Key="DocumentViewModel.CurrentFile">Текущий файл (открытый)</system:String>
 
     <system:String x:Key="BuildCoordVolumesProcessor.TransactionName">Построение объемов СМР</system:String>
+
+    <system:String x:Key="Common.ParamErrorMessageBody">Ошибка загрузки параметров</system:String>
+    <system:String x:Key="Common.ConfigErrorMessageTitle">Ошибка настройки плагина</system:String>
+
+    <system:String x:Key="SystemPluginConfig.SlopeLineName">Направление уклона</system:String>
 
 </ResourceDictionary>

@@ -1,5 +1,7 @@
+using System;
 using System.Globalization;
 using System.Reflection;
+using System.Windows;
 
 using Autodesk.Revit.Attributes;
 using Autodesk.Revit.UI;
@@ -7,6 +9,7 @@ using Autodesk.Revit.UI;
 using dosymep.Bim4Everyone;
 using dosymep.Bim4Everyone.ProjectConfigs;
 using dosymep.Bim4Everyone.SimpleServices;
+using dosymep.SimpleServices;
 using dosymep.WpfCore.Ninject;
 using dosymep.WpfUI.Core.Ninject;
 
@@ -57,7 +60,7 @@ public class RevitBuildCoordVolumesCommand : BasePluginCommand {
             .InSingletonScope();
 
         // Создание сервисов
-        kernel.Bind<BuildCoordVolumesServices>()
+        kernel.Bind<BuildCoordVolumeServices>()
             .ToSelf()
             .InSingletonScope();
 
@@ -82,6 +85,25 @@ public class RevitBuildCoordVolumesCommand : BasePluginCommand {
         kernel.UseWpfLocalization(
             $"/{assemblyName};component/assets/localization/language.xaml",
             CultureInfo.GetCultureInfo("ru-RU"));
+
+        var messageBoxService = kernel.Get<IMessageBoxService>();
+        var localizationService = kernel.Get<ILocalizationService>();
+        var systemPluginConfig = kernel.Get<SystemPluginConfig>();
+
+        // Загрузка параметров проекта        
+        bool isParamChecked = new CheckProjectParams(
+            uiApplication.Application, uiApplication.ActiveUIDocument.Document, systemPluginConfig)
+            .CopyProjectParams()
+            .GetIsChecked();
+
+        if(!isParamChecked) {
+            messageBoxService.Show(
+                localizationService.GetLocalizedString("Common.ParamErrorMessageBody"),
+                localizationService.GetLocalizedString("Common.ConfigErrorMessageTitle"),
+                MessageBoxButton.OK,
+                MessageBoxImage.Exclamation);
+            throw new OperationCanceledException();
+        }
 
         // Вызывает стандартное уведомление
         Notification(kernel.Get<MainWindow>());

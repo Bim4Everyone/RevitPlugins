@@ -55,7 +55,7 @@
 
             <ContentControl
                 Grid.Column="2"
-                Width="300"
+                Width="330"
                 VerticalAlignment="Center"
                 Margin="{DynamicResource CardControlContentMargin}"
                 Content="{Binding EditControl, ElementName=_this}" />

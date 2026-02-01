@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using Autodesk.Revit.DB;
 
 namespace RevitBuildCoordVolumes.Models.Interfaces;
-internal interface ISlabsService {
+internal interface ISlabService {
     /// <summary>
     /// Метод получения плит
     /// </summary>    
@@ -16,14 +16,11 @@ internal interface ISlabsService {
     /// Метод получения плит
     /// </summary>    
     /// <remarks>
-    /// В данном методе производится получения плит перекрытий по их именам типов, документам и диапазону уровней
+    /// В данном методе производится получения плит перекрытий по их именам типов, документам и уровням
     /// </remarks>
     /// <returns>IEnumerable SlabElement</returns>
     IEnumerable<SlabElement> GetSlabsByTypesDocsAndLevels(
-        IEnumerable<string> typeSlabs,
-        IEnumerable<Document> documents,
-        Level upLevel,
-        Level bottomLevel);
+        IEnumerable<string> typeSlabs, IEnumerable<Document> documents, List<Level> levels);
     /// <summary>
     /// Метод получения плит по документам
     /// </summary>    

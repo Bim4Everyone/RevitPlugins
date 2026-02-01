@@ -4,7 +4,7 @@ using Autodesk.Revit.DB;
 
 namespace RevitBuildCoordVolumes.Models.Interfaces;
 
-internal interface IDocumentsService {
+internal interface IDocumentService {
     /// <summary>
     /// Метод получения документа
     /// </summary>    

@@ -7,42 +7,38 @@ using RevitBuildCoordVolumes.Models.Interfaces;
 using RevitBuildCoordVolumes.Models.Settings;
 
 namespace RevitBuildCoordVolumes.Models;
-internal class ExtrusionSimpleBuilder : IExtrusionBuilder {
+internal class ParamBasedCoordVolumeBuilder : ICoordVolumeBuilder {
     private readonly IGeomObjectFactory _geomElementFactory;
     private readonly RevitRepository _revitRepository;
-    private readonly BuildCoordVolumesSettings _settings;
+    private readonly BuildCoordVolumeSettings _settings;
 
-    public ExtrusionSimpleBuilder(
+    public ParamBasedCoordVolumeBuilder(
         IGeomObjectFactory geomElementFactory,
         RevitRepository revitRepository,
-        BuildCoordVolumesSettings settings) {
+        BuildCoordVolumeSettings settings) {
         _geomElementFactory = geomElementFactory;
         _revitRepository = revitRepository;
         _settings = settings;
     }
 
-    public List<GeomObject> BuildVolumes(SpatialObject spatialObject) {
+    public List<GeomObject> Build(SpatialObject spatialObject) {
         var spatialElement = spatialObject.SpatialElement;
 
-        var topPositionParam = _settings.ParamMaps
+        var topZoneParam = _settings.ParamMaps
             .Where(param => param.Type == ParamType.TopZoneParam)
             .Select(param => param.SourceParam).First();
 
-        var bottomPositionParam = _settings.ParamMaps
+        var bottomZoneParam = _settings.ParamMaps
             .Where(param => param.Type == ParamType.BottomZoneParam)
             .Select(param => param.SourceParam).First();
 
-        double topPosition = _revitRepository.GetPositionInFeet(spatialElement, topPositionParam.Name);
-        double bottomPosition = _revitRepository.GetPositionInFeet(spatialElement, bottomPositionParam.Name);
+        double topPosition = _revitRepository.GetPositionInFeet(spatialElement, topZoneParam.Name);
+        double bottomPosition = _revitRepository.GetPositionInFeet(spatialElement, bottomZoneParam.Name);
 
-        var geomElements = new List<GeomObject>();
+        var listGeomObjects = _geomElementFactory.GetSimpleGeomObjects(spatialElement, bottomPosition, topPosition);
 
-        var element = _geomElementFactory.GetSimpleGeomObject(spatialElement, bottomPosition, topPosition);
-
-        if(element != null) {
-            geomElements.Add(element);
-        }
-
-        return geomElements;
+        return listGeomObjects.Count > 0
+            ? listGeomObjects
+            : [];
     }
 }

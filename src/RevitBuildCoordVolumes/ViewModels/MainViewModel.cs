@@ -22,27 +22,27 @@ internal class MainViewModel : BaseViewModel {
     private readonly PluginConfig _pluginConfig;
     private readonly SystemPluginConfig _systemPluginConfig;
     private readonly RevitRepository _revitRepository;
-    private readonly BuildCoordVolumesServices _buildCoordVolumesServices;
+    private readonly BuildCoordVolumeServices _buildCoordVolumeServices;
     private readonly ILocalizationService _localizationService;
     private readonly IRevitParamFactory _revitParamFactory;
-    private BuildCoordVolumesSettings _buildCoordVolumesSettings;
+    private BuildCoordVolumeSettings _buildCoordVolumeSettings;
     private ObservableCollection<AlgorithmViewModel> _typeAlgorithms;
+    private ObservableCollection<BuilderModeViewModel> _builderModes;
     private ObservableCollection<DocumentViewModel> _documents;
     private ObservableCollection<DocumentViewModel> _filteredDocuments;
     private ObservableCollection<TypeZoneViewModel> _typeZones;
-    private ObservableCollection<LevelViewModel> _upLevels;
-    private ObservableCollection<LevelViewModel> _bottomLevels;
+    private ObservableCollection<LevelViewModel> _levels;
     private AlgorithmViewModel _selectedTypeAlgorithm;
+    private BuilderModeViewModel _selectedBuilderMode;
     private TypeZoneViewModel _selectedTypeZone;
-    private LevelViewModel _selectedUpLevel;
-    private LevelViewModel _selectedBottomLevel;
-    private string _squareSide;
+    private string _squareSideMm;
+    private string _squareAngleDeg;
     private ObservableCollection<ParamViewModel> _params;
     private ObservableCollection<SlabViewModel> _slabs;
     private ObservableCollection<SlabViewModel> _filteredSlabs;
     private bool _hasParamWarning;
     private bool _requiredCheckArea;
-    private bool _isAdvancedAlgorithm;
+    private bool _isSlabBasedAlgorithm;
     private string _errorText;
     private string _searchTextDocs;
     private string _searchTextSlabs;
@@ -51,7 +51,7 @@ internal class MainViewModel : BaseViewModel {
         PluginConfig pluginConfig,
         SystemPluginConfig systemPluginConfig,
         RevitRepository revitRepository,
-        BuildCoordVolumesServices buildCoordVolumesServices,
+        BuildCoordVolumeServices buildCoordVolumeServices,
         ILocalizationService localizationService,
         IProgressDialogFactory progressDialogFactory,
         IRevitParamFactory revitParamFactory) {
@@ -59,7 +59,7 @@ internal class MainViewModel : BaseViewModel {
         _pluginConfig = pluginConfig;
         _systemPluginConfig = systemPluginConfig;
         _revitRepository = revitRepository;
-        _buildCoordVolumesServices = buildCoordVolumesServices;
+        _buildCoordVolumeServices = buildCoordVolumeServices;
         _localizationService = localizationService;
         _revitParamFactory = revitParamFactory;
 
@@ -97,33 +97,33 @@ internal class MainViewModel : BaseViewModel {
         get => _selectedTypeAlgorithm;
         set => RaiseAndSetIfChanged(ref _selectedTypeAlgorithm, value);
     }
+    public ObservableCollection<BuilderModeViewModel> BuilderModes {
+        get => _builderModes;
+        set => RaiseAndSetIfChanged(ref _builderModes, value);
+    }
+    public BuilderModeViewModel SelectedBuilderMode {
+        get => _selectedBuilderMode;
+        set => RaiseAndSetIfChanged(ref _selectedBuilderMode, value);
+    }
     public ObservableCollection<TypeZoneViewModel> TypeZones {
         get => _typeZones;
         set => RaiseAndSetIfChanged(ref _typeZones, value);
-    }
-    public ObservableCollection<LevelViewModel> UpLevels {
-        get => _upLevels;
-        set => RaiseAndSetIfChanged(ref _upLevels, value);
-    }
-    public ObservableCollection<LevelViewModel> BottomLevels {
-        get => _bottomLevels;
-        set => RaiseAndSetIfChanged(ref _bottomLevels, value);
     }
     public TypeZoneViewModel SelectedTypeZone {
         get => _selectedTypeZone;
         set => RaiseAndSetIfChanged(ref _selectedTypeZone, value);
     }
-    public LevelViewModel SelectedUpLevel {
-        get => _selectedUpLevel;
-        set => RaiseAndSetIfChanged(ref _selectedUpLevel, value);
+    public ObservableCollection<LevelViewModel> Levels {
+        get => _levels;
+        set => RaiseAndSetIfChanged(ref _levels, value);
     }
-    public LevelViewModel SelectedBottomLevel {
-        get => _selectedBottomLevel;
-        set => RaiseAndSetIfChanged(ref _selectedBottomLevel, value);
+    public string SquareSideMm {
+        get => _squareSideMm;
+        set => RaiseAndSetIfChanged(ref _squareSideMm, value);
     }
-    public string SquareSide {
-        get => _squareSide;
-        set => RaiseAndSetIfChanged(ref _squareSide, value);
+    public string SquareAngleDeg {
+        get => _squareAngleDeg;
+        set => RaiseAndSetIfChanged(ref _squareAngleDeg, value);
     }
     public ObservableCollection<ParamViewModel> Params {
         get => _params;
@@ -145,9 +145,9 @@ internal class MainViewModel : BaseViewModel {
         get => _requiredCheckArea;
         set => RaiseAndSetIfChanged(ref _requiredCheckArea, value);
     }
-    public bool IsAdvancedAlgorithm {
-        get => _isAdvancedAlgorithm;
-        set => RaiseAndSetIfChanged(ref _isAdvancedAlgorithm, value);
+    public bool IsSlabBasedAlgorithm {
+        get => _isSlabBasedAlgorithm;
+        set => RaiseAndSetIfChanged(ref _isSlabBasedAlgorithm, value);
     }
     public string SearchTextDocs {
         get => _searchTextDocs;
@@ -164,10 +164,7 @@ internal class MainViewModel : BaseViewModel {
 
     // Метод обновления UpLevels и BottomLevels
     private void UpdateLevels() {
-        UpLevels = new ObservableCollection<LevelViewModel>(GetLevelViewModels());
-        SelectedUpLevel = UpLevels.FirstOrDefault();
-        BottomLevels = new ObservableCollection<LevelViewModel>(UpLevels);
-        SelectedBottomLevel = BottomLevels.LastOrDefault();
+        Levels = new ObservableCollection<LevelViewModel>(GetLevelViewModels());
     }
 
     // Метод получения коллекции LevelViewModel для UpLevels и BottomLevels
@@ -183,9 +180,9 @@ internal class MainViewModel : BaseViewModel {
             .Select(slab => slab.Level)
             .GroupBy(lvl => lvl.Id)
             .Select(g => g.First())
-            .OrderByDescending(lvl => lvl.Elevation);
+            .OrderBy(lvl => lvl.Elevation);
         return levels
-            .Select(lvl => new LevelViewModel { Level = lvl, Name = lvl.Name });
+            .Select(lvl => new LevelViewModel { Level = lvl, Name = lvl.Name, IsChecked = true });
     }
 
     // Метод обновления TypeZones
@@ -204,7 +201,7 @@ internal class MainViewModel : BaseViewModel {
             ? []
             : typeZones
                 .Select(value => new TypeZoneViewModel { Name = value })
-                .OrderByDescending(vm => vm.Name.Equals(_buildCoordVolumesSettings.TypeZone))
+                .OrderByDescending(vm => vm.Name.Equals(_buildCoordVolumeSettings.TypeZone))
                 .ThenBy(vm => vm.Name);
     }
 
@@ -241,7 +238,7 @@ internal class MainViewModel : BaseViewModel {
     private IEnumerable<SlabViewModel> GetSlabViewModels() {
         var documents = FilteredDocuments.Where(vm => vm.IsChecked).Select(vm => vm.Document);
         var allSlabs = _revitRepository.GetTypeSlabsByDocs(documents);
-        var savedSlabs = _buildCoordVolumesSettings.TypeSlabs;
+        var savedSlabs = _buildCoordVolumeSettings.TypeSlabs;
         return !allSlabs.Any()
             ? []
             : allSlabs
@@ -249,7 +246,8 @@ internal class MainViewModel : BaseViewModel {
                     Name = slabType,
                     IsChecked = savedSlabs.Contains(slabType),
                 })
-                .OrderBy(vm => vm.Name);
+                .OrderByDescending(vm => _systemPluginConfig.DefaultSlabTypeNames.Any(part => vm.Name.Contains(part)))
+                .ThenBy(vm => vm.Name);
     }
 
     // Метод для реализации поиска в документах
@@ -275,7 +273,7 @@ internal class MainViewModel : BaseViewModel {
     // Метод получения коллекции DocumentViewModel для Documents
     private IEnumerable<DocumentViewModel> GetDocumentViewModels() {
         var allDocuments = _revitRepository.GetAllDocuments();
-        var savedDocuments = _buildCoordVolumesSettings.Documents;
+        var savedDocuments = _buildCoordVolumeSettings.Documents;
         var savedDocumentsNames = savedDocuments.Count == 0
             ? []
             : savedDocuments
@@ -309,7 +307,7 @@ internal class MainViewModel : BaseViewModel {
             case nameof(ParamViewModel.SourceParamName):
                 UpdateParamWarnings();
                 if(!vm.HasWarning) {
-                    var def = _buildCoordVolumesServices.ParamAvailabilityService.GetDefinitionByName(_revitRepository.Document, vm.SourceParamName);
+                    var def = _buildCoordVolumeServices.ParamAvailabilityService.GetDefinitionByName(_revitRepository.Document, vm.SourceParamName);
                     var newParam = _revitParamFactory.Create(_revitRepository.Document, def.GetElementId());
                     vm.ParamMap.SourceParam = newParam;
                     if(vm.ParamMap.Type == ParamType.DescriptionParam) {
@@ -321,7 +319,7 @@ internal class MainViewModel : BaseViewModel {
             case nameof(ParamViewModel.TargetParamName):
                 UpdateParamWarnings();
                 if(!vm.HasWarning) {
-                    var def = _buildCoordVolumesServices.ParamAvailabilityService.GetDefinitionByName(_revitRepository.Document, vm.TargetParamName);
+                    var def = _buildCoordVolumeServices.ParamAvailabilityService.GetDefinitionByName(_revitRepository.Document, vm.TargetParamName);
                     var newParam = _revitParamFactory.Create(_revitRepository.Document, def.GetElementId());
                     vm.ParamMap.TargetParam = newParam;
                 }
@@ -343,10 +341,10 @@ internal class MainViewModel : BaseViewModel {
 
     // Метод получения коллекции ParamViewModel для Params
     private IEnumerable<ParamViewModel> GetParamViewModels() {
-        var defaultParamMaps = SelectedTypeAlgorithm.AlgorithmType == AlgorithmType.AdvancedAreaExtrude
+        var defaultParamMaps = SelectedTypeAlgorithm.AlgorithmType == AlgorithmType.SlabBasedAlgorithm
             ? _systemPluginConfig.GetAdvancedParamMaps()
             : _systemPluginConfig.GetSimpleParamMaps();
-        var savedParamMaps = _buildCoordVolumesSettings.ParamMaps;
+        var savedParamMaps = _buildCoordVolumeSettings.ParamMaps;
         var savedLookup = savedParamMaps.ToDictionary(paramMap => paramMap.Type, paramMap => paramMap);
 
         return defaultParamMaps.Select(defaultParamMap => {
@@ -355,7 +353,7 @@ internal class MainViewModel : BaseViewModel {
             bool hasSourceParam = paramMap.SourceParam != null;
             bool hasTargetParam = paramMap.TargetParam != null;
 
-            return new ParamViewModel(_localizationService, _buildCoordVolumesServices) {
+            return new ParamViewModel(_localizationService, _buildCoordVolumeServices) {
                 ParamMap = paramMap,
                 Description = _localizationService.GetLocalizedString($"MainViewModel.{paramMap.Type}Description"),
                 DetailDescription = _localizationService.GetLocalizedString($"MainViewModel.{paramMap.Type}DetailDescription"),
@@ -370,7 +368,7 @@ internal class MainViewModel : BaseViewModel {
 
     // Метод обновляющий состояние свойства для скрытия/отображения дополнительных настроек основного окна
     private void UpdateVisibilitySettings() {
-        IsAdvancedAlgorithm = SelectedTypeAlgorithm.AlgorithmType == AlgorithmType.AdvancedAreaExtrude;
+        IsSlabBasedAlgorithm = SelectedTypeAlgorithm.AlgorithmType == AlgorithmType.SlabBasedAlgorithm;
     }
 
     // Метод подписанный на события MainViewModel
@@ -382,12 +380,23 @@ internal class MainViewModel : BaseViewModel {
         if(e.PropertyName == nameof(SelectedTypeZone)) {
             UpdateRequiredCheckArea();
         }
+    }
 
+    // Метод получения коллекции BuilderModeViewModel для BuilderModes
+    private IEnumerable<BuilderModeViewModel> GetTypeBuilderModeViewModels() {
+        var currentBuilderMode = _buildCoordVolumeSettings.BuilderMode;
+        var builderModes = Enum.GetValues(typeof(BuilderMode)).Cast<BuilderMode>();
+        return builderModes
+            .Select(builderMode => new BuilderModeViewModel {
+                Name = _localizationService.GetLocalizedString($"MainViewModel.{builderMode}"),
+                BuilderMode = builderMode
+            })
+            .OrderByDescending(vm => vm.BuilderMode == currentBuilderMode);
     }
 
     // Метод получения коллекции AlgorithmViewModel для TypeAlgorithms
     private IEnumerable<AlgorithmViewModel> GetTypeAlgorithmsViewModels() {
-        var currentAlgorithmType = _buildCoordVolumesSettings.AlgorithmType;
+        var currentAlgorithmType = _buildCoordVolumeSettings.AlgorithmType;
         var algorithmTypes = Enum.GetValues(typeof(AlgorithmType)).Cast<AlgorithmType>();
         return algorithmTypes
             .Select(algorithmType => new AlgorithmViewModel {
@@ -410,6 +419,9 @@ internal class MainViewModel : BaseViewModel {
         SelectedTypeAlgorithm = TypeAlgorithms.FirstOrDefault();
 
         UpdateVisibilitySettings();
+
+        BuilderModes = new ObservableCollection<BuilderModeViewModel>(GetTypeBuilderModeViewModels());
+        SelectedBuilderMode = BuilderModes.FirstOrDefault();
 
         // Подписка на события для обновления IsAdvancedAlgorithm
         PropertyChanged += OnPropertyChanged;
@@ -438,13 +450,10 @@ internal class MainViewModel : BaseViewModel {
             slabVM.PropertyChanged += OnSlabChanged;
         }
 
-        UpLevels = new ObservableCollection<LevelViewModel>(GetLevelViewModels());
-        SelectedUpLevel = UpLevels.FirstOrDefault();
+        Levels = new ObservableCollection<LevelViewModel>(GetLevelViewModels());
 
-        BottomLevels = new ObservableCollection<LevelViewModel>(UpLevels);
-        SelectedBottomLevel = BottomLevels.LastOrDefault();
-
-        SquareSide = Convert.ToString(_buildCoordVolumesSettings.SquareSideMm);
+        SquareSideMm = Convert.ToString(_buildCoordVolumeSettings.SquareSideMm);
+        SquareAngleDeg = Convert.ToString(_buildCoordVolumeSettings.SquareAngleDeg);
 
         UpdateRequiredCheckArea();
     }
@@ -468,8 +477,8 @@ internal class MainViewModel : BaseViewModel {
         var processor = new BuildCoordVolumesProcessor(
             _localizationService,
             _revitRepository,
-            _buildCoordVolumesSettings,
-            _buildCoordVolumesServices);
+            _buildCoordVolumeSettings,
+            _buildCoordVolumeServices);
 
         int count = processor.SpatialObjects.Count;
         using var progressDialogService = ProgressDialogFactory.CreateDialog();
@@ -495,12 +504,12 @@ internal class MainViewModel : BaseViewModel {
                 return false;
             }
             var topZoneParamVM = Params.Where(pvm => pvm.ParamMap.Type == ParamType.TopZoneParam).FirstOrDefault();
-            if(topZoneParamVM != null && !topZoneParamVM.IsChecked && !IsAdvancedAlgorithm) {
+            if(topZoneParamVM != null && !topZoneParamVM.IsChecked && !IsSlabBasedAlgorithm) {
                 ErrorText = _localizationService.GetLocalizedString("MainViewModel.NoTopZoneParam");
                 return false;
             }
             var bottomZoneParamVM = Params.Where(pvm => pvm.ParamMap.Type == ParamType.BottomZoneParam).FirstOrDefault();
-            if(bottomZoneParamVM != null && !bottomZoneParamVM.IsChecked && !IsAdvancedAlgorithm) {
+            if(bottomZoneParamVM != null && !bottomZoneParamVM.IsChecked && !IsSlabBasedAlgorithm) {
                 ErrorText = _localizationService.GetLocalizedString("MainViewModel.NoBottomZoneParam");
                 return false;
             }
@@ -523,34 +532,38 @@ internal class MainViewModel : BaseViewModel {
             ErrorText = _localizationService.GetLocalizedString("MainViewModel.NoTypeZone");
             return false;
         }
-        if(FilteredDocuments != null && IsAdvancedAlgorithm) {
+        if(FilteredDocuments != null && IsSlabBasedAlgorithm) {
             var checkedDocs = FilteredDocuments.Where(p => p.IsChecked).ToList();
             if(checkedDocs.Count == 0) {
                 ErrorText = _localizationService.GetLocalizedString("MainViewModel.NoDocuments");
                 return false;
             }
         }
-        if(FilteredSlabs != null && IsAdvancedAlgorithm) {
+        if(FilteredSlabs != null && IsSlabBasedAlgorithm) {
             var checkedSlabs = FilteredSlabs.Where(p => p.IsChecked).ToList();
             if(checkedSlabs.Count == 0) {
                 ErrorText = _localizationService.GetLocalizedString("MainViewModel.NoSlabs");
                 return false;
             }
         }
-        if(!double.TryParse(SquareSide, out double result)) {
-            ErrorText = _localizationService.GetLocalizedString("MainViewModel.SquareSideNoDouble");
+        if(!double.TryParse(SquareAngleDeg, out double resultAngleDeg) && IsSlabBasedAlgorithm) {
+            ErrorText = _localizationService.GetLocalizedString("MainViewModel.SquareValueNoDouble");
             return false;
         }
-        if(result < 0 && IsAdvancedAlgorithm) {
+        if(!double.TryParse(SquareSideMm, out double resultSideMm) && IsSlabBasedAlgorithm) {
+            ErrorText = _localizationService.GetLocalizedString("MainViewModel.SquareValueNoDouble");
+            return false;
+        }
+        if(resultSideMm < 0 && IsSlabBasedAlgorithm) {
             ErrorText = _localizationService.GetLocalizedString("MainViewModel.SquareSideNoNegate");
             return false;
-        } else if(result == 0 && IsAdvancedAlgorithm) {
+        } else if(resultSideMm == 0 && IsSlabBasedAlgorithm) {
             ErrorText = _localizationService.GetLocalizedString("MainViewModel.SquareSideNoZero");
             return false;
-        } else if(result > 500 && IsAdvancedAlgorithm) {
+        } else if(resultSideMm > 500 && IsSlabBasedAlgorithm) {
             ErrorText = _localizationService.GetLocalizedString("MainViewModel.SquareSideBig");
             return false;
-        } else if(result < 10 && IsAdvancedAlgorithm) {
+        } else if(resultSideMm < 10 && IsSlabBasedAlgorithm) {
             ErrorText = _localizationService.GetLocalizedString("MainViewModel.SquareSideSmall");
             return false;
         }
@@ -572,11 +585,11 @@ internal class MainViewModel : BaseViewModel {
         } else {
             configSettings = projectConfig.ConfigSettings;
         }
-
         var documents = configSettings.Documents.Count == 0
             ? _revitRepository.GetAllDocuments().ToList()
             : configSettings.Documents
                 .Select(_revitRepository.FindDocumentsByName)
+                .Where(doc => doc != null)
                 .ToList();
 
         var typeSlabs = configSettings.TypeSlabs.Count == 0
@@ -585,43 +598,49 @@ internal class MainViewModel : BaseViewModel {
                 .ToList()
             : configSettings.TypeSlabs;
 
-        _buildCoordVolumesSettings = new BuildCoordVolumesSettings {
+        _buildCoordVolumeSettings = new BuildCoordVolumeSettings {
             AlgorithmType = configSettings.AlgorithmType,
+            BuilderMode = configSettings.BuilderMode,
             TypeZone = configSettings.TypeZone,
             ParamMaps = configSettings.ParamMaps,
             Documents = documents,
             TypeSlabs = typeSlabs,
-            SquareSideMm = configSettings.SquareSideMm
+            SquareSideMm = configSettings.SquareSideMm,
+            SquareAngleDeg = configSettings.SquareAngleDeg
         };
     }
 
     // Метод сохранения конфигурации пользователя и основных настроек программы
     private void SaveConfig() {
         var algorithmType = SelectedTypeAlgorithm.AlgorithmType;
+        string typeZone = SelectedTypeZone.Name;
+        var paramMaps = Params.Where(vm => vm.IsChecked).Select(vm => vm.ParamMap).ToList();
+        var builderMode = SelectedBuilderMode.BuilderMode;
         var documents = FilteredDocuments.Where(vm => vm.IsChecked).Select(d => d.Document).ToList();
         var typeSlabs = FilteredSlabs.Where(vm => vm.IsChecked).Select(vm => vm.Name).ToList();
-        string typeZone = SelectedTypeZone.Name;
-        var upLevel = SelectedUpLevel.Level;
-        var bottomLevel = SelectedBottomLevel.Level;
-        var paramMaps = Params.Where(vm => vm.IsChecked).Select(vm => vm.ParamMap).ToList();
-        double squareSide = Convert.ToDouble(SquareSide);
+        var levels = Levels.Where(vm => vm.IsChecked).Select(vm => vm.Level).ToList();
+        double squareSide = Convert.ToDouble(SquareSideMm);
+        double squareAngle = Convert.ToDouble(SquareAngleDeg);
 
-        _buildCoordVolumesSettings.AlgorithmType = algorithmType;
-        _buildCoordVolumesSettings.Documents = documents;
-        _buildCoordVolumesSettings.TypeSlabs = typeSlabs;
-        _buildCoordVolumesSettings.TypeZone = typeZone;
-        _buildCoordVolumesSettings.ParamMaps = paramMaps;
-        _buildCoordVolumesSettings.UpLevel = upLevel;
-        _buildCoordVolumesSettings.BottomLevel = bottomLevel;
-        _buildCoordVolumesSettings.SquareSideMm = squareSide;
+        _buildCoordVolumeSettings.AlgorithmType = algorithmType;
+        _buildCoordVolumeSettings.BuilderMode = builderMode;
+        _buildCoordVolumeSettings.Documents = documents;
+        _buildCoordVolumeSettings.TypeSlabs = typeSlabs;
+        _buildCoordVolumeSettings.TypeZone = typeZone;
+        _buildCoordVolumeSettings.ParamMaps = paramMaps;
+        _buildCoordVolumeSettings.Levels = levels;
+        _buildCoordVolumeSettings.SquareSideMm = squareSide;
+        _buildCoordVolumeSettings.SquareAngleDeg = squareAngle;
 
         var configSettings = new ConfigSettings {
             AlgorithmType = algorithmType,
+            BuilderMode = builderMode,
             Documents = documents.Select(doc => doc.GetUniqId()).ToList(),
             TypeZone = typeZone,
             ParamMaps = paramMaps,
             TypeSlabs = typeSlabs,
-            SquareSideMm = squareSide
+            SquareSideMm = squareSide,
+            SquareAngleDeg = squareAngle
         };
 
         var setting = _pluginConfig.GetSettings(_revitRepository.Document)

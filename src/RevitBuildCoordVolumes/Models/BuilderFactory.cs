@@ -6,34 +6,34 @@ using RevitBuildCoordVolumes.Models.Settings;
 namespace RevitBuildCoordVolumes.Models;
 internal sealed class BuilderFactory {
     private readonly RevitRepository _revitRepository;
-    private readonly BuildCoordVolumesServices _services;
-    private readonly BuildCoordVolumesSettings _settings;
+    private readonly BuildCoordVolumeServices _services;
+    private readonly BuildCoordVolumeSettings _settings;
 
     public BuilderFactory(
         RevitRepository revitRepository,
-        BuildCoordVolumesSettings settings,
-        BuildCoordVolumesServices services) {
+        BuildCoordVolumeSettings settings,
+        BuildCoordVolumeServices services) {
         _revitRepository = revitRepository;
         _settings = settings;
         _services = services;
     }
 
-    public IExtrusionBuilder Create(AlgorithmType algorithmType) {
-        return algorithmType == AlgorithmType.AdvancedAreaExtrude
-            ? new ExtrusionContourBuilder(
+    public ICoordVolumeBuilder Create(AlgorithmType algorithmType) {
+        return algorithmType == AlgorithmType.SlabBasedAlgorithm
+            ? new SlabBasedCoordVolumeBuilder(
                 _services.SpatialDivider,
                 _services.SlabNormalizer,
                 _services.ColumnFactory,
-                _services.GeomElementFactory,
+                _services.GeomObjectFactory,
                 _revitRepository,
                 _settings)
-            : algorithmType == AlgorithmType.SimpleAreaExtrude
-            ? new ExtrusionSimpleBuilder(
-                _services.GeomElementFactory,
+            : algorithmType == AlgorithmType.ParamBasedAlgorithm
+            ? new ParamBasedCoordVolumeBuilder(
+                _services.GeomObjectFactory,
                 _revitRepository,
                 _settings)
-            : new ExtrusionSimpleBuilder(
-                _services.GeomElementFactory,
+            : new ParamBasedCoordVolumeBuilder(
+                _services.GeomObjectFactory,
                 _revitRepository,
                 _settings);
     }

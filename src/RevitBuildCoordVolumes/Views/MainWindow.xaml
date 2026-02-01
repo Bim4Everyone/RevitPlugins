@@ -15,11 +15,11 @@
     xmlns:converters="clr-namespace:dosymep.WpfCore.Converters;assembly=dosymep.WpfCore"
     xmlns:wpfbehaviors="clr-namespace:dosymep.WpfCore.Behaviors;assembly=dosymep.WpfCore"
     mc:Ignorable="d"
-    Title="{me:LocalizationSource MainWindow.Title}"
-    Height="870"
+    Title="{me:LocalizationSource MainWindow.Title}"    
     Width="900"
-    MinHeight="870"
     MinWidth="900"
+    Height="950"       
+    MinHeight="460"
     d:DataContext="{d:DesignInstance vms:MainViewModel, IsDesignTimeCreatable=False}">
 
     <i:Interaction.Behaviors>
@@ -35,6 +35,11 @@
         
         <converters:BoolToVisibilityConverter
             x:Key="SlabWarningIconVisible"
+            TrueValue="Visible"
+            FalseValue="Collapsed" />
+
+        <converters:BoolToVisibilityConverter
+            x:Key="SlabSettingsVisible"
             TrueValue="Visible"
             FalseValue="Collapsed" />
 
@@ -66,7 +71,7 @@
 
         <ui:TitleBar
             Grid.Row="0"
-            Icon="{ui:SymbolIcon clipboardTaskListLtr24, FontSize=20}"
+            Icon="{ui:SymbolIcon boardSplit24, FontSize=20}"
             Title="{me:LocalizationSource MainWindow.Title}"
             FontSize="14"
             FontWeight="DemiBold" />
@@ -81,7 +86,7 @@
                 <GroupBox
                     Margin="0,0,0,10"                                        
                     BorderThickness="0"
-                    Header="{me:LocalizationSource MainWindow.GroupBoxCommonSettings}"
+                    Header="{me:LocalizationSource MainWindow.CommonSettings}"
                     FontWeight="DemiBold">                    
                     <StackPanel>
                         <edits:CustomEditControl
@@ -154,10 +159,22 @@
                 <GroupBox
                     Margin="0,0,0,10"
                     BorderThickness="0"
-                    Header="{me:LocalizationSource MainWindow.GroupBoxAdvancedAlgorythmSettings}"
+                    Header="{me:LocalizationSource MainWindow.SlabBasedAlgorythmSettings}"
                     FontWeight="DemiBold"
-                    IsEnabled="{Binding IsAdvancedAlgorithm}">
+                    Visibility="{Binding IsSlabBasedAlgorithm, Converter={StaticResource SlabSettingsVisible}}">
+
                     <StackPanel>
+                        <edits:CustomEditControl
+                            Icon="{ui:SymbolIcon brainCircuit24}"
+                            Header="{me:LocalizationSource MainWindow.BuilderMode}"
+                            Description="{me:LocalizationSource MainWindow.BuilderModeDescription}">
+
+                            <ComboBox
+                                ItemsSource="{Binding BuilderModes}"
+                                SelectedValue="{Binding SelectedBuilderMode}"
+                                DisplayMemberPath="Name" />
+                        </edits:CustomEditControl>
+
                         <edits:CustomGroupEditControl
                             Icon="{ui:SymbolIcon scanText24}"
                             Header="{me:LocalizationSource MainWindow.SourceFiles}"
@@ -197,7 +214,7 @@
                                                     Columns="1" />
                                             </ItemsPanelTemplate>
                                         </ItemsControl.ItemsPanel>
-                                    </ItemsControl> 
+                                    </ItemsControl>
                                 </StackPanel>
                             </edits:CustomGroupEditControl.EditControl>
                         </edits:CustomGroupEditControl>
@@ -207,7 +224,6 @@
                             Header="{me:LocalizationSource MainWindow.TypeSlabs}"
                             Description="{me:LocalizationSource MainWindow.TypeSlabsDescription}"
                             ExtraIconVisible="False">
-
                             <edits:CustomGroupEditControl.EditControl>
                                 <StackPanel>
                                     <ui:AutoSuggestBox
@@ -247,27 +263,35 @@
                             </edits:CustomGroupEditControl.EditControl>
                         </edits:CustomGroupEditControl>
 
-                        <edits:CustomEditControl
-                            Icon="{ui:SymbolIcon paddingTop24}"
-                            Header="{me:LocalizationSource MainWindow.LevelUpSlabs}"
-                            Description="{me:LocalizationSource MainWindow.LevelUpSlabsDescription}">
+                        <edits:CustomGroupEditControl
+                            Icon="{ui:SymbolIcon tableResizeRow24}"
+                            Header="{me:LocalizationSource MainWindow.Levels}"
+                            Description="{me:LocalizationSource MainWindow.LevelsDescription}"
+                            ExtraIconVisible="False">
+                            <edits:CustomGroupEditControl.EditControl>
+                                <StackPanel>
+                                    <ItemsControl
+                                        ItemsSource="{Binding Levels}">
+                                        <ItemsControl.ItemTemplate>
+                                            <DataTemplate
+                                                DataType="{x:Type vms:LevelViewModel}">
+                                                <edits:SlabControl
+                                                    SlabName="{Binding Name}"
+                                                    IsChecked="{Binding IsChecked, Mode=TwoWay}"
+                                                    HasWarning="False" />
+                                            </DataTemplate>
+                                        </ItemsControl.ItemTemplate>
 
-                            <ComboBox
-                                ItemsSource="{Binding UpLevels}"
-                                SelectedValue="{Binding SelectedUpLevel}"
-                                DisplayMemberPath="Name" />
-                        </edits:CustomEditControl>
-
-                        <edits:CustomEditControl
-                            Icon="{ui:SymbolIcon paddingDown24}"
-                            Header="{me:LocalizationSource MainWindow.LevelBottomSlabs}"
-                            Description="{me:LocalizationSource MainWindow.LevelBottomSlabsDescription}">
-
-                            <ComboBox
-                                ItemsSource="{Binding BottomLevels}"
-                                SelectedValue="{Binding SelectedBottomLevel}"
-                                DisplayMemberPath="Name" />
-                        </edits:CustomEditControl>                        
+                                        <ItemsControl.ItemsPanel>
+                                            <ItemsPanelTemplate>
+                                                <UniformGrid
+                                                    Columns="1" />
+                                            </ItemsPanelTemplate>
+                                        </ItemsControl.ItemsPanel>
+                                    </ItemsControl>
+                                </StackPanel>
+                            </edits:CustomGroupEditControl.EditControl>
+                        </edits:CustomGroupEditControl>
 
                         <edits:CustomEditControl
                             Icon="{ui:SymbolIcon fullScreenMaximize24}"
@@ -275,8 +299,18 @@
                             Description="{me:LocalizationSource MainWindow.SquareSideDescription}">
 
                             <ui:TextBox
-                                Text="{Binding SquareSide, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                Text="{Binding SquareSideMm, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                                 ToolTip="{me:LocalizationSource MainWindow.SquareSideTooltip}" />
+                        </edits:CustomEditControl>
+
+                        <edits:CustomEditControl
+                            Icon="{ui:SymbolIcon cropInterim24}"
+                            Header="{me:LocalizationSource MainWindow.SquareAngle}"
+                            Description="{me:LocalizationSource MainWindow.SquareAngleDescription}">
+
+                            <ui:TextBox
+                                Text="{Binding SquareAngleDeg, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                ToolTip="{me:LocalizationSource MainWindow.SquareAngleTooltip}" />
                         </edits:CustomEditControl>
                     </StackPanel>
                 </GroupBox>                

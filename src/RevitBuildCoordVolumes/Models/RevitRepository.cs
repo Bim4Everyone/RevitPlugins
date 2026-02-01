@@ -16,15 +16,15 @@ using RevitBuildCoordVolumes.Models.Services;
 namespace RevitBuildCoordVolumes.Models;
 
 internal class RevitRepository {
-    private readonly IDocumentsService _documentsService;
-    private readonly ISlabsService _slabsService;
+    private readonly IDocumentService _documentsService;
+    private readonly ISlabService _slabsService;
     private readonly SystemPluginConfig _systemPluginConfig;
 
     public RevitRepository(UIApplication uiApp, SystemPluginConfig systemPluginConfig) {
         UIApplication = uiApp;
         _systemPluginConfig = systemPluginConfig;
-        _documentsService = new DocumentsService(Document);
-        _slabsService = new SlabsService(_documentsService, _systemPluginConfig);
+        _documentsService = new DocumentService(Document);
+        _slabsService = new SlabService(_documentsService, _systemPluginConfig);
     }
 
     public UIApplication UIApplication { get; }
@@ -66,11 +66,8 @@ internal class RevitRepository {
     /// Получение всех типов перекрытий и фундаментных плит по именам типов, документам и уровням
     /// </summary>
     public IEnumerable<SlabElement> GetSlabsByTypesDocsAndLevels(
-        IEnumerable<string> typeSlabs,
-        IEnumerable<Document> documents,
-        Level upLevel,
-        Level bottomLevel) {
-        return _slabsService.GetSlabsByTypesDocsAndLevels(typeSlabs, documents, upLevel, bottomLevel);
+        IEnumerable<string> typeSlabs, IEnumerable<Document> documents, List<Level> levels) {
+        return _slabsService.GetSlabsByTypesDocsAndLevels(typeSlabs, documents, levels);
     }
 
 

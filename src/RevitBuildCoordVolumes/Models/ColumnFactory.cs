@@ -1,6 +1,8 @@
 using System.Collections.Generic;
 using System.Linq;
 
+using Autodesk.Revit.DB;
+
 using RevitBuildCoordVolumes.Models.Geometry;
 using RevitBuildCoordVolumes.Models.Interfaces;
 
@@ -28,12 +30,24 @@ internal class ColumnFactory : IColumnFactory {
             foreach(var slab in slabs) {
                 double z = double.NaN;
 
-                foreach(var face in slab.UpFaces) {
-                    var proj = face.Project(center);
-                    if(proj != null) {
-                        z = proj.XYZPoint.Z;
-                        break;
+                foreach(var face in slab.TopFaces) {
+
+                    var line = Line.CreateBound(center + XYZ.BasisZ * 10000, center - XYZ.BasisZ * 10000);
+
+                    var result = face.Intersect(line, out var ira);
+
+                    if(result == SetComparisonResult.Overlap && ira != null && ira.Size > 0) {
+                        var hit = ira.get_Item(0).XYZPoint;
+                        z = hit.Z;
                     }
+
+                    //var proj = face.Project(center);
+                    //if(proj != null) {
+                    //    var uv = proj.UVPoint;
+                    //    var xyz = proj.XYZPoint;
+                    //    z = xyz.Z;
+                    //    break;
+                    //}
                 }
 
                 if(!double.IsNaN(z)) {

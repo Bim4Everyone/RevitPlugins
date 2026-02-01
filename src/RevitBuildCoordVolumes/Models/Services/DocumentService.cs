@@ -7,10 +7,10 @@ using RevitBuildCoordVolumes.Models.Interfaces;
 
 namespace RevitBuildCoordVolumes.Models.Services;
 
-internal class DocumentsService : IDocumentsService {
+internal class DocumentService : IDocumentService {
     private readonly Dictionary<string, (Document, Transform)> _documentsByName = [];
 
-    public DocumentsService(Document mainDocument) {
+    public DocumentService(Document mainDocument) {
         BuildDocumentsDictionary(mainDocument);
     }
 
@@ -70,9 +70,7 @@ internal class DocumentsService : IDocumentsService {
             Instance = instance,
             LinkType = doc.GetElement(instance.GetTypeId()) as RevitLinkType
         })
-        .Where(x => x.LinkType != null
-                    //&& !x.LinkType.IsNestedLink
-                    && x.LinkType.GetLinkedFileStatus() == LinkedFileStatus.Loaded)
+        .Where(x => x.LinkType != null && x.LinkType.GetLinkedFileStatus() == LinkedFileStatus.Loaded)
         .Select(x => x.Instance);
     }
 }

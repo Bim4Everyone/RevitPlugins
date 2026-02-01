@@ -12,7 +12,7 @@ namespace RevitBuildCoordVolumes.ViewModels;
 
 internal class ParamViewModel : BaseViewModel {
     private readonly ILocalizationService _localizationService;
-    private readonly BuildCoordVolumesServices _buildCoordVolumesServices;
+    private readonly BuildCoordVolumeServices _buildCoordVolumeServices;
     private string _description;
     private string _detailDescription;
     private string _sourceParamName;
@@ -23,9 +23,9 @@ internal class ParamViewModel : BaseViewModel {
     private bool _isChecked;
     private bool _hasWarning;
 
-    public ParamViewModel(ILocalizationService localizationService, BuildCoordVolumesServices buildCoordVolumesServices) {
+    public ParamViewModel(ILocalizationService localizationService, BuildCoordVolumeServices buildCoordVolumeServices) {
         _localizationService = localizationService;
-        _buildCoordVolumesServices = buildCoordVolumesServices;
+        _buildCoordVolumeServices = buildCoordVolumeServices;
     }
 
     public ParamMap ParamMap { get; set; }
@@ -78,8 +78,8 @@ internal class ParamViewModel : BaseViewModel {
 
         if(IsChecked
             && HasSourceParam
-            && (!_buildCoordVolumesServices.ParamAvailabilityService.IsParamExist(document, SourceParamName)
-            || !_buildCoordVolumesServices.CategoryAvailabilityService.IsParamAvailableInCategory(
+            && (!_buildCoordVolumeServices.ParamAvailabilityService.IsParamExist(document, SourceParamName)
+            || !_buildCoordVolumeServices.CategoryAvailabilityService.IsParamAvailableInCategory(
                 SourceParamName, Category.GetCategory(document, BuiltInCategory.OST_Areas)))) {
 
             string desc = _localizationService.GetLocalizedString("MainWindow.SourceParamHeader");
@@ -87,8 +87,8 @@ internal class ParamViewModel : BaseViewModel {
         }
         if(IsChecked
             && HasTargetParam
-            && (!_buildCoordVolumesServices.ParamAvailabilityService.IsParamExist(document, TargetParamName)
-            || !_buildCoordVolumesServices.CategoryAvailabilityService.IsParamAvailableInCategory(
+            && (!_buildCoordVolumeServices.ParamAvailabilityService.IsParamExist(document, TargetParamName)
+            || !_buildCoordVolumeServices.CategoryAvailabilityService.IsParamAvailableInCategory(
                 TargetParamName, Category.GetCategory(document, BuiltInCategory.OST_GenericModel)))) {
             string desc = _localizationService.GetLocalizedString("MainWindow.TargetParamHeader");
             warningString.Append($"  • {TargetParamName} - {desc}\n");

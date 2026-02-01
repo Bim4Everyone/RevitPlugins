@@ -1,6 +1,9 @@
 using System.Collections.Generic;
 
+using Autodesk.Revit.DB;
+
 namespace RevitBuildCoordVolumes.Models.Interfaces;
 internal interface ISlabNormalizeService {
-    List<SlabElement> GetNormalizeSlabs(List<SlabElement> slabElements);
+    List<Face> GetTopFaces(SlabElement slabElement);
+    List<Face> GetTopFacesClean(SlabElement slabElement, List<Face> topFaces);
 }

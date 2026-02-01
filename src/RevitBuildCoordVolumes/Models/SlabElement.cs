@@ -12,8 +12,9 @@ internal class SlabElement {
     public Level Level { get; set; }
     public string FloorName { get; set; }
     public string LevelName { get; set; }
+    public CurveArrArray Profile { get; set; }
     public Guid Guid { get; set; }
-    public List<Face> UpFaces { get; set; }
+    public List<Face> TopFaces { get; set; }
     public Transform Transform { get; set; }
     public bool IsSloped { get; set; }
 }

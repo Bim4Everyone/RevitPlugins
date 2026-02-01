@@ -3,6 +3,6 @@ using System.Collections.Generic;
 using RevitBuildCoordVolumes.Models.Geometry;
 
 namespace RevitBuildCoordVolumes.Models.Interfaces;
-internal interface IExtrusionBuilder {
-    List<GeomObject> BuildVolumes(SpatialObject spatialElement);
+internal interface ICoordVolumeBuilder {
+    List<GeomObject> Build(SpatialObject spatialElement);
 }

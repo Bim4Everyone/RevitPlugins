@@ -6,13 +6,14 @@ using RevitBuildCoordVolumes.Models.Enums;
 
 namespace RevitBuildCoordVolumes.Models.Settings;
 
-internal class BuildCoordVolumesSettings {
+internal class BuildCoordVolumeSettings {
     public AlgorithmType AlgorithmType { get; set; }
+    public BuilderMode BuilderMode { get; set; }
     public string TypeZone { get; set; }
     public List<ParamMap> ParamMaps { get; set; }
     public List<Document> Documents { get; set; }
     public List<string> TypeSlabs { get; set; }
-    public Level UpLevel { get; set; }
-    public Level BottomLevel { get; set; }
+    public List<Level> Levels { get; set; }
     public double SquareSideMm { get; set; }
+    public double SquareAngleDeg { get; set; }
 }

@@ -14,17 +14,17 @@ using RevitBuildCoordVolumes.Models.Settings;
 namespace RevitBuildCoordVolumes.Models;
 internal class BuildCoordVolumesProcessor {
     private readonly ILocalizationService _localizationService;
-    private readonly IExtrusionBuilder _builder;
+    private readonly ICoordVolumeBuilder _builder;
     private readonly RevitRepository _revitRepository;
-    private readonly BuildCoordVolumesSettings _settings;
-    private readonly BuildCoordVolumesServices _services;
+    private readonly BuildCoordVolumeSettings _settings;
+    private readonly BuildCoordVolumeServices _services;
     private readonly BuilderFactory _builderFactory;
 
     public BuildCoordVolumesProcessor(
         ILocalizationService localizationService,
         RevitRepository revitRepository,
-        BuildCoordVolumesSettings settings,
-        BuildCoordVolumesServices services) {
+        BuildCoordVolumeSettings settings,
+        BuildCoordVolumeServices services) {
         _localizationService = localizationService;
         _revitRepository = revitRepository;
         _settings = settings;
@@ -44,7 +44,7 @@ internal class BuildCoordVolumesProcessor {
         foreach(var spatialObject in SpatialObjects) {
             ct.ThrowIfCancellationRequested();
 
-            var geomElements = _builder.BuildVolumes(spatialObject);
+            var geomElements = _builder.Build(spatialObject);
 
             var directShapeElements = _services.DirectShapeObjectFactory.GetDirectShapeObjects(geomElements, _revitRepository);
 

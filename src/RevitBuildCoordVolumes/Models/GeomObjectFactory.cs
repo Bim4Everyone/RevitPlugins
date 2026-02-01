@@ -16,19 +16,19 @@ internal class GeomObjectFactory : IGeomObjectFactory {
         _contourService = contourService;
     }
 
-    public GeomObject GetSimpleGeomObject(SpatialElement spatialElement, double startExtrudePosition, double finishExtrudePosition) {
+    public List<GeomObject> GetSimpleGeomObjects(SpatialElement spatialElement, double startExtrudePosition, double finishExtrudePosition) {
         var listCurveLoops = _contourService.GetSimpleCurveLoops(spatialElement, startExtrudePosition);
         var solid = SolidUtility.ExtrudeSolid(listCurveLoops, startExtrudePosition, finishExtrudePosition);
 
-        return solid != null
-            ? new GeomObject {
+        return solid == null
+            ? []
+            : [new GeomObject {
                 GeometryObjects = [solid],
                 Volume = solid.Volume
-            }
-            : null;
+            }];
     }
 
-    public GeomObject GetUnitedGeomObject(List<ColumnObject> columns, double spatialElementPosition) {
+    public List<GeomObject> GetUnitedGeomObjects(List<ColumnObject> columns, double spatialElementPosition) {
         var firstElement = columns[0];
         double startExtrudePosition = firstElement.StartPosition;
         double finishExtrudePosition = firstElement.FinishPosition;
@@ -36,16 +36,21 @@ internal class GeomObjectFactory : IGeomObjectFactory {
         var listCurveLoops = _contourService.GetColumnsCurveLoops(columns, spatialElementPosition, startExtrudePosition);
         var solid = SolidUtility.ExtrudeSolid(listCurveLoops, startExtrudePosition, finishExtrudePosition);
 
-        return solid != null
-            ? new GeomObject {
+        if(solid == null) {
+            return [];
+        }
+
+        var splittedSolid = SolidUtils.SplitVolumes(solid);
+
+        return [.. splittedSolid
+            .Select(solid => new GeomObject {
                 GeometryObjects = [solid],
                 FloorName = firstElement.FloorName,
                 Volume = solid.Volume
-            }
-            : null;
+            })];
     }
 
-    public GeomObject GetSeparatedGeomObject(List<ColumnObject> columns, double spatialElementPosition) {
+    public List<GeomObject> GetSeparatedGeomObjects(List<ColumnObject> columns, double spatialElementPosition) {
         var solids = new List<GeometryObject>();
         var volumes = new List<double>();
         var firstElement = columns[0];
@@ -60,12 +65,13 @@ internal class GeomObjectFactory : IGeomObjectFactory {
                 volumes.Add(solid.Volume);
             }
         }
-        return solids.Count != 0 && volumes.Count != 0
-            ? new GeomObject {
-                GeometryObjects = solids,
-                FloorName = firstElement.FloorName,
-                Volume = volumes.Sum()
-            }
-            : null;
+
+        return solids.Count == 0 || volumes.Count == 0
+            ? []
+            : [new GeomObject {
+            GeometryObjects = solids,
+            FloorName = firstElement.FloorName,
+            Volume = volumes.Sum()
+        }];
     }
 }

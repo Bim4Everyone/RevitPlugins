@@ -6,6 +6,7 @@ using Autodesk.Revit.DB;
 using dosymep.Bim4Everyone;
 using dosymep.Bim4Everyone.ProjectConfigs;
 using dosymep.Bim4Everyone.SharedParams;
+using dosymep.SimpleServices;
 
 using pyRevitLabs.Json;
 
@@ -120,6 +121,13 @@ internal class SystemPluginConfig {
         }
     ];
 
+    private readonly ILocalizationService _localizationService;
+
+    public SystemPluginConfig(ILocalizationService localizationService) {
+        _localizationService = localizationService;
+        SlopeLineName = _localizationService.GetLocalizedString("SystemPluginConfig.SlopeLineName");
+    }
+
     // Категории, обрабатываемые плагином в качестве основы для построения
     public ICollection<BuiltInCategory> SlabCategories => [
         BuiltInCategory.OST_StructuralFoundation,
@@ -127,6 +135,12 @@ internal class SystemPluginConfig {
 
     // ID категории для построения DirectShape
     public ElementId ElementIdDirectShape => new(BuiltInCategory.OST_GenericModel);
+
+    // Строка для поиска линии наклона. По другому идентифицировать эту линию невозможно
+    public string SlopeLineName { get; private set; }
+
+    // Допуск для сравнения точек
+    public double Tolerance => 1e-6;
 
     // Строка в имени уровня, определяющая кровлю
     public string DefaultStringRoof => "К";
@@ -144,7 +158,10 @@ internal class SystemPluginConfig {
     public string DefaultStringTypeZone => "Координаты СМР";
 
     // Наиболее оптимальная сторона фигуры для поиска плиты в миллиметрах
-    public double SquareSide => 200;
+    public double SquareSideMm => 100;
+
+    // Угол поворота квадрата по умолчанию
+    public double SquareAngleDeg => 0;
 
     // Части имен типоразмеров плит перекрытий КР
     public List<string> DefaultSlabTypeNames => [
@@ -172,6 +189,13 @@ internal class SystemPluginConfig {
         var simpleParamMaps = _simpleParamMaps;
         return _advancedParamMaps
             .Concat(simpleParamMaps)
+            .ToList();
+    }
+
+    public List<RevitParam> GetAllParameters() {
+        return _advancedParamMaps.Concat(_simpleParamMaps)
+            .Select(pm => pm.SourceParam ?? pm.TargetParam)
+            .Where(p => p != null)
             .ToList();
     }
 }

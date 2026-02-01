@@ -9,12 +9,12 @@ using dosymep.Revit;
 using RevitBuildCoordVolumes.Models.Interfaces;
 
 namespace RevitBuildCoordVolumes.Models.Services;
-internal class SlabsService : ISlabsService {
+internal class SlabService : ISlabService {
     private readonly Dictionary<string, IEnumerable<SlabElement>> _slabsByDocName = [];
-    private readonly IDocumentsService _documentsService;
+    private readonly IDocumentService _documentsService;
     private readonly SystemPluginConfig _systemPluginConfig;
 
-    public SlabsService(IDocumentsService documentsService, SystemPluginConfig systemPluginConfig) {
+    public SlabService(IDocumentService documentsService, SystemPluginConfig systemPluginConfig) {
         _documentsService = documentsService;
         _systemPluginConfig = systemPluginConfig;
     }
@@ -29,20 +29,12 @@ internal class SlabsService : ISlabsService {
     }
 
     public IEnumerable<SlabElement> GetSlabsByTypesDocsAndLevels(
-        IEnumerable<string> typeSlabs,
-        IEnumerable<Document> documents,
-        Level upLevel,
-        Level bottomLevel) {
-
-        double minElevation = Math.Min(bottomLevel.Elevation, upLevel.Elevation);
-        double maxElevation = Math.Max(bottomLevel.Elevation, upLevel.Elevation);
+        IEnumerable<string> typeSlabs, IEnumerable<Document> documents, List<Level> levels) {
 
         var slabs = GetSlabsByTypesAndDocs(typeSlabs, documents);
-
-        return slabs.Where(slab => {
-            double elev = slab.Level.Elevation;
-            return elev >= minElevation && elev <= maxElevation;
-        });
+        var levelIds = levels.Select(level => level.Id);
+        return slabs
+            .Where(slab => levelIds.Contains(slab.Level.Id));
     }
 
     public IEnumerable<SlabElement> GetSlabsByDocs(IEnumerable<Document> documents) {
@@ -78,25 +70,82 @@ internal class SlabsService : ISlabsService {
                 var level = GetLevel(doc, floor);
                 return new SlabElement {
                     Floor = floor,
-                    Level = level,
                     FloorName = floor.Name,
+                    Level = level,
                     LevelName = GetLevelName(level),
+                    Profile = GetProfile(doc, floor),
                     Guid = Guid.NewGuid(),
-                    Transform = tansform
+                    Transform = tansform,
+                    IsSloped = IsSloped(doc, floor)
                 };
             });
     }
 
-    // Метод получения имени уровня, на котором расположена плита
+    // Метод получения уровня, на котором расположена плита
     private Level GetLevel(Document doc, Floor floor) {
         var elementId = floor.GetParamValueOrDefault<ElementId>(BuiltInParameter.LEVEL_PARAM);
         return doc.GetElement(elementId) as Level;
     }
 
-    // Метод получения имени уровня, на котором расположена плита
+    // Метод получения имени уровня
     private string GetLevelName(Level level) {
         string levelName = level.Name;
         string modifyLevelName = levelName.Split(['_']).FirstOrDefault();
         return modifyLevelName ?? string.Empty;
+    }
+
+    // Метод получения профиля плиты
+    private CurveArrArray GetProfile(Document doc, Floor floor) {
+        var profileId = floor.SketchId;
+        var sketch = doc.GetElement(profileId) as Sketch;
+        return sketch.Profile;
+    }
+
+    // Метод определения наклонная ли плита
+    private bool IsSloped(Document doc, Floor floor) {
+        return IsShapeEdited(doc, floor) || HasSlopeBySlopeLine(doc, floor);
+    }
+
+    // Метод проверки редактирована ли плита
+    private bool IsShapeEdited(Document doc, Floor floor) {
+#if REVIT_2023_OR_LESS
+        var slabShapeEditor = floor.SlabShapeEditor;
+#else
+        var slabShapeEditor = floor.GetSlabShapeEditor();
+#endif
+        if(slabShapeEditor == null) {
+            return false;
+        }
+        var vertices = slabShapeEditor.SlabShapeVertices
+        .Cast<SlabShapeVertex>()
+        .ToList();
+
+        if(vertices.Count == 0) {
+            return false;
+        }
+
+        double firstZ = vertices[0].Position.Z;
+
+        return vertices.Any(v =>
+            Math.Abs(v.Position.Z - firstZ) > _systemPluginConfig.Tolerance);
+    }
+
+    // Метод проверки наклонена ли плита линией уклона
+    private bool HasSlopeBySlopeLine(Document doc, Floor floor) {
+        var filter = new ElementCategoryFilter(BuiltInCategory.OST_SketchLines);
+        var depIds = floor.GetDependentElements(filter);
+
+        var lines = depIds
+            .Select(doc.GetElement)
+            .Where(element => element.Name.Equals(_systemPluginConfig.SlopeLineName));
+
+        if(!lines.Any()) {
+            return false;
+        }
+        var slopeLine = lines.First();
+        double start = slopeLine.GetParamValueOrDefault<double>(BuiltInParameter.SLOPE_START_HEIGHT);
+        double end = slopeLine.GetParamValueOrDefault<double>(BuiltInParameter.SLOPE_END_HEIGHT);
+
+        return Math.Abs(start - end) < _systemPluginConfig.Tolerance;
     }
 }
