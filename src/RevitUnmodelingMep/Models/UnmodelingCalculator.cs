@@ -56,6 +56,8 @@ internal class UnmodelingCalculator {
             totalNumber = System.Math.Ceiling(totalNumber);
         }
 
+        string finalDescription = $"{baseRow.Description}_{baseRow.Element.Id.ToString()}";
+
         return new NewRowElement {
             Element = baseRow.Element,
             Group = baseRow.Group,

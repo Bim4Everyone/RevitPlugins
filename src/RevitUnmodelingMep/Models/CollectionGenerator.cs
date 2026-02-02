@@ -109,6 +109,25 @@ internal static class CollectionGenerator {
                 .ToList();
         }
 
+        if(type.Category.IsId(BuiltInCategory.OST_DuctCurves)) {
+            bool IsValidForm(MEPCurve duct) {
+                DuctType ductType = (DuctType) duct.GetElementType();
+                if(ductType.Shape == ConnectorProfileType.Oval) {
+                    return false;
+                }
+                return true;
+            }
+
+            elements = elements
+                .Where(e => {
+                    if(e is Duct duct)
+                        return IsValidForm(duct);
+
+                    return false;
+                })
+                .ToList();
+        }
+
         return elements;
     }
 

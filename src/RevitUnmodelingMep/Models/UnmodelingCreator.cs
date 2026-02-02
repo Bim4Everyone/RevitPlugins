@@ -243,6 +243,7 @@ internal class UnmodelingCreator {
                         "Unsupported value type");
             }
         }
+        string finalDescription = $"{_conumableDescription}_{newRowElement.Element.Id.ToString()}";
 
         SetUnmodelingValue(familyInstance, SharedParamsConfig.Instance.VISSystemName, newRowElement.System);
         SetUnmodelingValue(familyInstance, SharedParamsConfig.Instance.VISGrouping, newRowElement.Group);
@@ -261,7 +262,7 @@ internal class UnmodelingCreator {
         SetUnmodelingValue(familyInstance,
             SharedParamsConfig.Instance.BuildingWorksLevelCurrency,
             newRowElement.SmrFloorCurrency);
-        SetUnmodelingValue(familyInstance, SharedParamsConfig.Instance.Description, _conumableDescription);
+        SetUnmodelingValue(familyInstance, SharedParamsConfig.Instance.Description, finalDescription);
     }
 
 
@@ -331,7 +332,7 @@ internal class UnmodelingCreator {
                 : familyInstance.GetParamValueOrDefault<string>(_obsoletteConsumableDescriptionName);
 
 
-            if(currentDescription == _conumableDescription
+            if(currentDescription.Contains(_conumableDescription) 
                 || _obsoletteConsumableDescriptions.Contains(currentDescription)) {
                 _doc.Delete(familyInstance.Id);
             }
