@@ -37,6 +37,7 @@
     <system:String x:Key="MainViewModel.SavePropertyEmpty">Ошибка конфигурации: не задано обязательное значение.</system:String>
     
 
+    <system:String x:Key="Repository.PrepareConfigsTitle">Подготовка конфигурации</system:String>
     <system:String x:Key="Repository.TransactionName">Расчет расходников</system:String>
 
     <system:String x:Key="MainViewModel.ImportError">Не удалось импортировать настройки из выбранного файла.</system:String>

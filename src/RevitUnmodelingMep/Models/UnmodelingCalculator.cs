@@ -33,6 +33,13 @@ internal class UnmodelingCalculator {
             .ToList();
     }
 
+    public List<NewRowElement> GetElementsToGenerate(ConsumableTypeItem config, UnmodelingCalcCache cache) {
+        Dictionary<string, List<NewRowElement>> rowsByKey = _draftRowsBuilder.Build(config, cache);
+        return rowsByKey.Values
+            .Select(rows => CreateFinalRow(rows, config))
+            .ToList();
+    }
+
     private NewRowElement CreateFinalRow(IReadOnlyList<NewRowElement> draftRows, ConsumableTypeItem config) {
         if(draftRows == null || draftRows.Count == 0) {
             return new NewRowElement();

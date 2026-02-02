@@ -29,12 +29,19 @@ internal sealed class DraftRowsBuilder {
     }
 
     public Dictionary<string, List<NewRowElement>> Build(ConsumableTypeItem config) {
+        return Build(config, null);
+    }
+
+    public Dictionary<string, List<NewRowElement>> Build(
+        ConsumableTypeItem config,
+        UnmodelingCalcCache cache) {
         if(config == null) {
             throw new ArgumentNullException(nameof(config));
         }
 
         JArray assignedTypes = config.AssignedElementIds;
         Dictionary<string, List<NewRowElement>> elementsByGrouping = new();
+        UnmodelingCalcCache localCache = cache ?? new UnmodelingCalcCache();
 
         foreach(JToken assignedTypeId in assignedTypes) {
 #if REVIT_2024_OR_GREATER
@@ -45,20 +52,27 @@ internal sealed class DraftRowsBuilder {
             ElementId typeId = new ElementId(idValue);
 #endif
 
-            List<Element> elements = CollectionGenerator.GetTypeInstances(_doc, typeId);
+            if(!localCache.ElementsByTypeId.TryGetValue(typeId, out List<Element> elements)) {
+                elements = CollectionGenerator.GetTypeInstances(_doc, typeId);
+                localCache.ElementsByTypeId[typeId] = elements;
+            }
             foreach(Element element in elements) {
-                (string system, string economicFunction) = ResolveSystemAndFunction(element);
+                (string system, string economicFunction) = ResolveSystemAndFunction(element, localCache);
 
-                string smrBlock =
-                    element.GetParamValueOrDefault<string>(SharedParamsConfig.Instance.BuildingWorksBlock, "");
-                string smrSection =
-                    element.GetParamValueOrDefault<string>(SharedParamsConfig.Instance.BuildingWorksSection, "");
-                string smrFloor =
-                    element.GetParamValueOrDefault<string>(SharedParamsConfig.Instance.BuildingWorksLevel, "");
-                double smrFloorCurrnecy =
-                    element.GetParamValueOrDefault<double>(SharedParamsConfig.Instance.BuildingWorksLevelCurrency, 0);
+                ElementId elementId = element.Id;
+                if(!localCache.SmrParamsById.TryGetValue(elementId, out var smrParams)) {
+                    smrParams = (
+                        element.GetParamValueOrDefault<string>(SharedParamsConfig.Instance.BuildingWorksBlock, ""),
+                        element.GetParamValueOrDefault<string>(SharedParamsConfig.Instance.BuildingWorksSection, ""),
+                        element.GetParamValueOrDefault<string>(SharedParamsConfig.Instance.BuildingWorksLevel, ""),
+                        element.GetParamValueOrDefault<double>(SharedParamsConfig.Instance.BuildingWorksLevelCurrency, 0));
+                    localCache.SmrParamsById[elementId] = smrParams;
+                }
 
-                CalculationElementBase calcElement = _calculationElementFactory.Create(element);
+                if(!localCache.CalcElementsById.TryGetValue(elementId, out CalculationElementBase calcElement)) {
+                    calcElement = _calculationElementFactory.Create(element);
+                    localCache.CalcElementsById[elementId] = calcElement;
+                }
 
                 string name = _placeholderReplacer.Replace(config.Name, calcElement);
                 string mark = config.Mark;
@@ -74,10 +88,10 @@ internal sealed class DraftRowsBuilder {
                     Element = element,
                     CalculationElement = calcElement,
                     Group = group,
-                    SmrBlock = smrBlock,
-                    SmrSection = smrSection,
-                    SmrFloor = smrFloor,
-                    SmrFloorCurrency = smrFloorCurrnecy,
+                    SmrBlock = smrParams.Block,
+                    SmrSection = smrParams.Section,
+                    SmrFloor = smrParams.Floor,
+                    SmrFloorCurrency = smrParams.Currency,
                     Name = name,
                     Code = code,
                     Mark = mark,
@@ -98,7 +112,13 @@ internal sealed class DraftRowsBuilder {
         return elementsByGrouping;
     }
 
-    private (string System, string EconomicFunction) ResolveSystemAndFunction(Element element) {
+    private (string System, string EconomicFunction) ResolveSystemAndFunction(
+        Element element,
+        UnmodelingCalcCache cache) {
+        if(cache != null && cache.SystemInfoById.TryGetValue(element.Id, out var cached)) {
+            return cached;
+        }
+
         if(element.InAnyCategory([BuiltInCategory.OST_PipingSystem, BuiltInCategory.OST_DuctSystem])) {
             MEPSystem mepSystem = element as MEPSystem;
             ElementSet network = new ElementSet();
@@ -118,7 +138,11 @@ internal sealed class DraftRowsBuilder {
                     firstCurve.GetParamValueOrDefault<string>(SharedParamsConfig.Instance.EconomicFunction, "");
                 string system =
                     firstCurve.GetParamValueOrDefault<string>(SharedParamsConfig.Instance.VISSystemName, "");
-                return (system, economicFunction);
+                var result = (system, economicFunction);
+                if(cache != null && !cache.SystemInfoById.ContainsKey(element.Id)) {
+                    cache.SystemInfoById[element.Id] = result;
+                }
+                return result;
             }
 
             return (string.Empty, string.Empty);
@@ -126,6 +150,9 @@ internal sealed class DraftRowsBuilder {
 
         string ef = element.GetParamValueOrDefault<string>(SharedParamsConfig.Instance.EconomicFunction, "");
         string sys = element.GetParamValueOrDefault<string>(SharedParamsConfig.Instance.VISSystemName, "");
+        if(cache != null && !cache.SystemInfoById.ContainsKey(element.Id)) {
+            cache.SystemInfoById[element.Id] = (sys, ef);
+        }
         return (sys, ef);
     }
 }

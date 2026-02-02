@@ -1,5 +1,7 @@
 using System;
+using System.Collections.Generic;
 using System.Globalization;
+using System.Reflection;
 using System.Text;
 
 using Autodesk.Revit.DB;
@@ -14,6 +16,8 @@ namespace RevitUnmodelingMep.Models.Unmodeling;
 
 internal sealed class FormulaEvaluator {
     private readonly ILocalizationService _localizationService;
+    private readonly Dictionary<Type, ExpressionEvaluator> _evaluators = new();
+    private readonly Dictionary<Type, PropertyInfo[]> _propertiesByType = new();
 
     public FormulaEvaluator(ILocalizationService localizationService) {
         _localizationService = localizationService;
@@ -63,14 +67,20 @@ internal sealed class FormulaEvaluator {
     }
 
     private double EvaluateInternal(string formula, CalculationElementBase calcElement) {
-        var evaluator = CreateEvaluator(calcElement);
+        var evaluator = GetEvaluator(calcElement);
         object result = evaluator.Evaluate(formula);
         return Convert.ToDouble(result);
     }
 
-    private static ExpressionEvaluator CreateEvaluator(CalculationElementBase calcElement) {
-        var evaluator = new ExpressionEvaluator();
-        foreach(var property in calcElement.GetType().GetProperties()) {
+    private ExpressionEvaluator GetEvaluator(CalculationElementBase calcElement) {
+        Type elementType = calcElement.GetType();
+        if(!_evaluators.TryGetValue(elementType, out ExpressionEvaluator evaluator)) {
+            evaluator = new ExpressionEvaluator();
+            _evaluators[elementType] = evaluator;
+        }
+
+        PropertyInfo[] properties = GetCachedProperties(elementType);
+        foreach(var property in properties) {
             if(!property.CanRead) {
                 continue;
             }
@@ -80,6 +90,15 @@ internal sealed class FormulaEvaluator {
         }
 
         return evaluator;
+    }
+
+    private PropertyInfo[] GetCachedProperties(Type elementType) {
+        if(!_propertiesByType.TryGetValue(elementType, out PropertyInfo[] properties)) {
+            properties = elementType.GetProperties(BindingFlags.Instance | BindingFlags.Public);
+            _propertiesByType[elementType] = properties;
+        }
+
+        return properties;
     }
 
     private void BuildDebugLog(CalculationElementBase calcElement, string formula) {

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Windows;
+using System.Windows.Threading;
 
 using Autodesk.Revit.ApplicationServices;
 using Autodesk.Revit.DB;
@@ -17,6 +18,7 @@ using dosymep.Xpf.Core.SimpleServices;
 using Newtonsoft.Json.Linq;
 
 using RevitUnmodelingMep.Models.Entities;
+using RevitUnmodelingMep.Models.Unmodeling;
 
 using Wpf.Ui.Controls;
 
@@ -74,10 +76,31 @@ internal class RevitRepository {
 
         var rowsByConfig = new List<List<NewRowElement>>();
         int totalRows = 0;
-        foreach(var config in configs) {
-            List<NewRowElement> newRowElements = Calculator.GetElementsToGenerate(config);
-            rowsByConfig.Add(newRowElements);
-            totalRows += newRowElements.Count;
+        using(IProgressDialogService dialog = ServicesProvider.GetPlatformService<IProgressDialogService>()) {
+            dialog.StepValue = 1;
+            dialog.DisplayTitleFormat =
+                $"{_localizationService.GetLocalizedString("Repository.PrepareConfigsTitle")} [{{0}}%]";
+            var progress = dialog.CreateProgress();
+            dialog.MaxValue = 100;
+            CancellationToken ct = dialog.CreateCancellationToken();
+            dialog.Show();
+
+            var cache = new UnmodelingCalcCache();
+            int totalConfigs = configs.Count();
+            int preparedConfigs = 0;
+            foreach(var config in configs) {
+                ct.ThrowIfCancellationRequested();
+                PumpUi();
+                List<NewRowElement> newRowElements = Calculator.GetElementsToGenerate(config, cache);
+                rowsByConfig.Add(newRowElements);
+                totalRows += newRowElements.Count;
+                preparedConfigs++;
+
+                if(totalConfigs > 0) {
+                    int percent = (int) System.Math.Floor(preparedConfigs * 100d / totalConfigs);
+                    progress.Report(percent);
+                }
+            }
         }
 
         using(IProgressDialogService dialog = ServicesProvider.GetPlatformService<IProgressDialogService>()) {
@@ -139,4 +162,9 @@ internal class RevitRepository {
     /// Класс доступа к документу Revit.
     /// </summary>
     public Document Document => ActiveUIDocument.Document;
+
+    private static void PumpUi() {
+        var dispatcher = System.Windows.Application.Current?.Dispatcher ?? Dispatcher.CurrentDispatcher;
+        dispatcher.Invoke(() => { }, DispatcherPriority.Background);
+    }
 }
