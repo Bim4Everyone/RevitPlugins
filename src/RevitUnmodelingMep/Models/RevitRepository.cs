@@ -1,15 +1,18 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using System.Windows;
 
 using Autodesk.Revit.ApplicationServices;
 using Autodesk.Revit.DB;
 using Autodesk.Revit.UI;
 
+using dosymep.Bim4Everyone.SimpleServices;
 using dosymep.Bim4Everyone.SharedParams;
 using dosymep.Revit;
 using dosymep.SimpleServices;
+using dosymep.Xpf.Core.SimpleServices;
 
 using Newtonsoft.Json.Linq;
 
@@ -69,22 +72,51 @@ internal class RevitRepository {
             resolveCategoryOption: null,
             out lastIndex);
 
-        using(var t = Doc.StartTransaction(_localizationService.GetLocalizedString("Repository.TransactionName"))) {
-            Creator.RemoveUnmodeling();
+        var rowsByConfig = new List<List<NewRowElement>>();
+        int totalRows = 0;
+        foreach(var config in configs) {
+            List<NewRowElement> newRowElements = Calculator.GetElementsToGenerate(config);
+            rowsByConfig.Add(newRowElements);
+            totalRows += newRowElements.Count;
+        }
 
-            if(!Creator.Symbol.IsActive) {
-                Creator.Symbol.Activate();
-                Doc.Regenerate();
-            }
+        using(IProgressDialogService dialog = ServicesProvider.GetPlatformService<IProgressDialogService>()) {
+            dialog.StepValue = 1;
+            dialog.DisplayTitleFormat =
+                $"{_localizationService.GetLocalizedString("Repository.TransactionName")} [{{0}}%]";
+            var progress = dialog.CreateProgress();
+            dialog.MaxValue = 100;
+            CancellationToken ct = dialog.CreateCancellationToken();
+            dialog.Show();
 
-            foreach(var config in configs) {
-                List <NewRowElement> newRowElements = Calculator.GetElementsToGenerate(config);
-                foreach(var newRowElement in newRowElements) {
-                    Creator.CreateNewPosition(newRowElement);
+            using(var t = Doc.StartTransaction(_localizationService.GetLocalizedString("Repository.TransactionName"))) {
+                Creator.RemoveUnmodeling();
+
+                if(!Creator.Symbol.IsActive) {
+                    Creator.Symbol.Activate();
+                    Doc.Regenerate();
                 }
-            }
 
-            t.Commit();
+                int createdCount = 0;
+                int lastPercent = 0;
+                foreach(var newRowElements in rowsByConfig) {
+                    foreach(var newRowElement in newRowElements) {
+                        ct.ThrowIfCancellationRequested();
+                        Creator.CreateNewPosition(newRowElement);
+
+                        if(totalRows > 0) {
+                            createdCount++;
+                            int percent = (int) System.Math.Floor(createdCount * 100d / totalRows);
+                            if(percent > lastPercent) {
+                                lastPercent = percent;
+                                progress.Report(percent);
+                            }
+                        }
+                    }
+                }
+
+                t.Commit();
+            }
         }
     }
 
