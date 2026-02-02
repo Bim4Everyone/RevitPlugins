@@ -57,8 +57,7 @@
                             <controls:SettingsTitleControl
                                 LabelText="{me:LocalizationSource TransverseView.FormworkTransverseView}"
                                 ToolTipText="{me:LocalizationSource TransverseViewSettingsPage.FormworkTransverseViewToolTip}"
-                                ButtonCommand="{Binding ApplySettingsCommand}"
-                                ButtonMouseLeaveCommand="{Binding CheckSettingsCommand}" />
+                                ButtonCommand="{Binding SaveSettingsCommand}" />
 
                             <controls:DoubleTextBoxSettingControl
                                 LabelText="{me:LocalizationSource TransverseView.FirstTransverseViewNameMask}"
@@ -110,8 +109,7 @@
                             <controls:SettingsTitleControl
                                 LabelText="{me:LocalizationSource TransverseView.RebarTransverseView}"
                                 ToolTipText="{me:LocalizationSource TransverseViewSettingsPage.RebarTransverseViewToolTip}"
-                                ButtonCommand="{Binding ApplySettingsCommand}"
-                                ButtonMouseLeaveCommand="{Binding CheckSettingsCommand}" />
+                                ButtonCommand="{Binding SaveSettingsCommand}" />
 
                             <controls:DoubleTextBoxSettingControl
                                 LabelText="{me:LocalizationSource TransverseView.FirstRebarTransverseViewNameMask}"
@@ -163,8 +161,7 @@
                             <controls:SettingsTitleControl
                                 LabelText="{me:LocalizationSource TransverseView.TransverseViewBottomOffsets}"
                                 ToolTipText="{me:LocalizationSource TransverseViewSettingsPage.TransverseViewBottomOffsetsToolTip}"
-                                ButtonCommand="{Binding ApplySettingsCommand}"
-                                ButtonMouseLeaveCommand="{Binding CheckSettingsCommand}" />
+                                ButtonCommand="{Binding SaveSettingsCommand}" />
 
                             <controls:TextBoxSettingControl
                                 LabelText="{me:LocalizationSource TransverseView.FirstTransverseViewBottomOffset}"
@@ -220,8 +217,7 @@
                             <controls:SettingsTitleControl
                                 LabelText="{me:LocalizationSource VerticalView.ViewTypeSize}"
                                 ToolTipText="{me:LocalizationSource TransverseViewSettingsPage.ViewTypeSizeToolTip}"
-                                ButtonCommand="{Binding ApplySettingsCommand}"
-                                ButtonMouseLeaveCommand="{Binding CheckSettingsCommand}" />
+                                ButtonCommand="{Binding SaveSettingsCommand}" />
 
                             <controls:ComboBoxSettingControl
                                 LabelText="{me:LocalizationSource TransverseView.SelectViewTypeSizeForTransverseViews}"

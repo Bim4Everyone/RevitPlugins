@@ -80,9 +80,11 @@ internal class MainViewModel : BaseViewModel {
 
         SelectPylonCommand = RelayCommand.Create(SelectPylon);
 
-        ApplySettingsCommand = RelayCommand.Create(ApplySettings, CanApplySettings);
-        CheckSettingsCommand = RelayCommand.Create(CheckSettings);
+        //ApplySettingsCommand = RelayCommand.Create(ApplySettings, CanApplySettings);
+        //CheckSettingsCommand = RelayCommand.Create(CheckSettings);
         GetHostMarksInGUICommand = RelayCommand.Create(GetHostMarksInGUI);
+
+        SaveSettingsCommand = RelayCommand.Create(SaveSettings, CanSaveSettings);
 
         AddScheduleFilterParamCommand = RelayCommand.Create(ScheduleFiltersSettings.AddScheduleFilterParam);
         DeleteScheduleFilterParamCommand = RelayCommand.Create(ScheduleFiltersSettings.DeleteScheduleFilterParam,
@@ -102,8 +104,9 @@ internal class MainViewModel : BaseViewModel {
 
     public ICommand LoadViewCommand { get; }
     public ICommand AcceptViewCommand { get; }
-    public ICommand ApplySettingsCommand { get; }
-    public ICommand CheckSettingsCommand { get; }
+    public ICommand SaveSettingsCommand { get; }
+    //public ICommand ApplySettingsCommand { get; }
+    //public ICommand CheckSettingsCommand { get; }
     public ICommand GetHostMarksInGUICommand { get; }
     public ICommand AddScheduleFilterParamCommand { get; }
     public ICommand DeleteScheduleFilterParamCommand { get; }
@@ -278,9 +281,24 @@ internal class MainViewModel : BaseViewModel {
     /// </summary>
     private void LoadView() {
         LoadConfig();
+        SaveSettings();
+    }
 
+    // Применение настроек с предыдщуего запуска
+    private void SaveSettings() {
         ApplySettings();
-        CheckSettings();
+        if(CheckSettings() && !_pylonSelectedManually) {
+            // Получаем заново список заполненных разделов проекта, если проверки успешно прошли
+            GetRebarProjectSections();
+        }
+    }
+
+    /// <summary>
+    /// Определяет можно ли сохранить изменения настроек плагина (передать данные из временных переменных в постоянные, 
+    /// по которым работает плагин). Доступно при изменении одного из параметров настроек
+    /// </summary>
+    private bool CanSaveSettings() {
+        return _settingsEdited;
     }
 
     /// <summary>
@@ -417,11 +435,6 @@ internal class MainViewModel : BaseViewModel {
         DispatcherSettings.ApplySettings();
         SheetSettings.ApplySettings();
 
-        // Получаем заново список заполненных разделов проекта
-        if(!_pylonSelectedManually) {
-            GetRebarProjectSections();
-        }
-
         VerticalViewSettings.FindGeneralViewTemplate();
         VerticalViewSettings.FindGeneralRebarViewTemplate();
         VerticalViewSettings.FindVerticalViewFamilyType();
@@ -451,31 +464,15 @@ internal class MainViewModel : BaseViewModel {
         SaveConfig();
     }
 
-    /// <summary>
-    /// Определяет можно ли применить изменения настроек плагина (передать данные из временные переменных в постоянные, 
-    /// по которым работает плагин). Доступно при изменении одного из параметров настроек
-    /// </summary>
-    private bool CanApplySettings() {
-        return _settingsEdited;
-    }
-
-    private void CheckSettings() {
-        if(!VerticalViewSettings.CheckSettings())
-            return;
-        if(!TransverseViewSettings.CheckSettings())
-            return;
-        if(!SchedulesSettings.CheckSettings())
-            return;
-        if(!LegendsAndAnnotationsSettings.CheckSettings())
-            return;
-        if(!PylonSettings.CheckSettings())
-            return;
-        if(!AnnotationSettings.CheckSettings())
-            return;
-        if(!DispatcherSettings.CheckSettings())
-            return;
-        if(!SheetSettings.CheckSettings())
-            return;
+    private bool CheckSettings() {
+        return VerticalViewSettings.CheckSettings() &&
+               TransverseViewSettings.CheckSettings() &&
+               SchedulesSettings.CheckSettings() &&
+               LegendsAndAnnotationsSettings.CheckSettings() &&
+               PylonSettings.CheckSettings() &&
+               AnnotationSettings.CheckSettings() &&
+               DispatcherSettings.CheckSettings() &&
+               SheetSettings.CheckSettings();
     }
 
     /// <summary>

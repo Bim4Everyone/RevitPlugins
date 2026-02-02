@@ -53,8 +53,7 @@
                     <controls:SettingsTitleControl
                         LabelText="{me:LocalizationSource AnnotationParams.AnnotationRelatedParameters}"
                         ToolTipText="{me:LocalizationSource AnnotationParams.AnnotationRelatedParametersToolTip}"
-                        ButtonCommand="{Binding ApplySettingsCommand}"
-                        ButtonMouseLeaveCommand="{Binding CheckSettingsCommand}" />
+                        ButtonCommand="{Binding SaveSettingsCommand}" />
 
                     <UniformGrid
                         Grid.Row="1"

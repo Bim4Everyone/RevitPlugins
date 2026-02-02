@@ -52,8 +52,7 @@
                     <controls:SettingsTitleControl
                         LabelText="{me:LocalizationSource DispatcherParams.DispatcherRelatedParameters}"
                         ToolTipText="{me:LocalizationSource DispatcherParams.DispatcherRelatedParametersToolTip}"
-                        ButtonCommand="{Binding ApplySettingsCommand}"
-                        ButtonMouseLeaveCommand="{Binding CheckSettingsCommand}" />
+                        ButtonCommand="{Binding SaveSettingsCommand}"/>
 
                     <UniformGrid
                         Grid.Row="1"

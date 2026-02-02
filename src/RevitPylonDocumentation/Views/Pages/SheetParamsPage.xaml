@@ -54,8 +54,7 @@
                     <controls:SettingsTitleControl
                         LabelText="{me:LocalizationSource SheetParams.SheetCreationRules}"
                         ToolTipText="{me:LocalizationSource SheetParams.SheetCreationRulesToolTip}"
-                        ButtonCommand="{Binding ApplySettingsCommand}"
-                        ButtonMouseLeaveCommand="{Binding CheckSettingsCommand}" />
+                        ButtonCommand="{Binding SaveSettingsCommand}" />
 
                     <UniformGrid
                         Grid.Row="1"

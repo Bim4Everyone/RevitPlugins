@@ -31,7 +31,7 @@ internal class UserPylonSettingsVM : ValidatableViewModel {
         ValidateAllProperties();
     }
 
-    public string ProjectSection { get; set; }
+    public string ProjectSection { get; set; }  
     [Required]
     [RegularExpression(@"^[^\\\/:*?""<>|\[\]\{\};~]+$")]
     public string ProjectSectionTemp {
@@ -100,6 +100,25 @@ internal class UserPylonSettingsVM : ValidatableViewModel {
         // Перебираем пилоны, которые найдены в проекте для работы и проверяем у НесКлн параметры сечения
         foreach(var sheetInfo in _revitRepository.HostsInfo) {
             var pylon = sheetInfo.HostElems.FirstOrDefault();
+
+            // def "обр_ФОП_Раздел проекта"
+            if(pylon?.LookupParameter(ProjectSection) is null) {
+                SetError(_localizationService.GetLocalizedString("VM.ProjectSectionParamNotFound"));
+                return false;
+            }
+
+            // def "Марка"
+            if(pylon?.LookupParameter(Mark) is null) {
+                SetError(_localizationService.GetLocalizedString("VM.HostMarkParamNotFound"));
+                return false;
+            }
+
+            // def "обр_ФОП_Фильтрация 1"
+            if(pylon?.LookupParameter(TypicalPylonFilterParameter) is null) {
+                SetError(_localizationService.GetLocalizedString("VM.TypicalPylonFilterParamNotFound"));
+                return false;
+            }
+
             if(pylon?.Category.GetBuiltInCategory() != BuiltInCategory.OST_StructuralColumns) { continue; }
 
             var pylonType = _revitRepository.Document.GetElement(pylon?.GetTypeId()) as FamilySymbol;

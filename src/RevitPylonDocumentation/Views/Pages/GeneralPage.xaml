@@ -452,8 +452,7 @@
                         <controls:SettingsTitleControl
                             LabelText="{me:LocalizationSource GeneralPage.Sheet}"
                             ToolTipText="{me:LocalizationSource GeneralPage.SheetParameters}"
-                            ButtonCommand="{Binding ApplySettingsCommand}"
-                            ButtonMouseLeaveCommand="{Binding CheckSettingsCommand}" />
+                            ButtonCommand="{Binding SaveSettingsCommand}" />
 
                         <controls:ComboBoxSettingControl
                             Grid.Row="2"
@@ -480,8 +479,7 @@
                             <controls:SettingsTitleControl
                                 LabelText="{me:LocalizationSource GeneralPage.FormworkViewTemplates}"
                                 ToolTipText="{me:LocalizationSource GeneralPage.FormworkViewTemplatesTooltip}"
-                                ButtonCommand="{Binding ApplySettingsCommand}"
-                                ButtonMouseLeaveCommand="{Binding CheckSettingsCommand}" />
+                                ButtonCommand="{Binding SaveSettingsCommand}" />
 
                             <controls:ComboBoxSettingControl
                                 LabelText="{me:LocalizationSource GeneralPage.VerticalViews}"
@@ -511,8 +509,7 @@
                             <controls:SettingsTitleControl
                                 LabelText="{me:LocalizationSource GeneralPage.RebarViewTemplates}"
                                 ToolTipText="{me:LocalizationSource GeneralPage.RebarViewTemplatesTooltip}"
-                                ButtonCommand="{Binding ApplySettingsCommand}"
-                                ButtonMouseLeaveCommand="{Binding CheckSettingsCommand}" />
+                                ButtonCommand="{Binding SaveSettingsCommand}" />
 
                             <controls:ComboBoxSettingControl
                                 LabelText="{me:LocalizationSource GeneralPage.VerticalViews}"

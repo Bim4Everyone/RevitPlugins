@@ -51,8 +51,7 @@
                     <controls:SettingsTitleControl
                         LabelText="{me:LocalizationSource PylonParams.FormworkElementParameters}"
                         ToolTipText="{me:LocalizationSource PylonParamsPage.FormworkElementParametersToolTip}"
-                        ButtonCommand="{Binding ApplySettingsCommand}"
-                        ButtonMouseLeaveCommand="{Binding CheckSettingsCommand}" />
+                        ButtonCommand="{Binding SaveSettingsCommand}" />
                     
                     <UniformGrid
                         Grid.Row="1"
@@ -109,6 +108,15 @@
                                 UpdateSourceTrigger=PropertyChanged, Mode=TwoWay,
                                 ValidatesOnDataErrors=True, NotifyOnValidationError=True}"
                             ToolTipText="{me:LocalizationSource PylonParamsPage.PylonSectionWidthParameterToolTip}"
+                            TextChangedCommand="{Binding SettingsChangedCommand}" />
+
+                        <controls:TextBoxSettingControl
+                            LabelText="{me:LocalizationSource PylonParams.PylonSectionParameter}"
+                            TextBoxText="{Binding 
+                                Path=PylonSettings.PylonSectionParamNameTemp, 
+                                UpdateSourceTrigger=PropertyChanged, Mode=TwoWay,
+                                ValidatesOnDataErrors=True, NotifyOnValidationError=True}"
+                            ToolTipText="{me:LocalizationSource PylonParamsPage.PylonSectionParameterToolTip}"
                             TextChangedCommand="{Binding SettingsChangedCommand}" />
                     </UniformGrid>
                 </Grid>

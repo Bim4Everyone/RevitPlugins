@@ -52,8 +52,7 @@
                         <controls:SettingsTitleControl
                             LabelText="{me:LocalizationSource Schedules.ScheduleFilterParametersList}"
                             ToolTipText="{me:LocalizationSource SchedulesPage.ScheduleFilterParametersListToolTip}"
-                            ButtonCommand="{Binding ApplySettingsCommand}"
-                            ButtonMouseLeaveCommand="{Binding CheckSettingsCommand}" />
+                            ButtonCommand="{Binding SaveSettingsCommand}" />
 
                         <ui:ListView
                             Margin="0 5"

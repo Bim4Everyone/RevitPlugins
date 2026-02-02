@@ -18,7 +18,7 @@ internal class UserTransverseViewSettingsPageVM : ValidatableViewModel {
     private string _transverseViewFirstElevationTemp = "800";
     private string _transverseViewSecondPrefixTemp = "";
     private string _transverseViewSecondSuffixTemp = "_Сеч.2-2";
-    private string _transverseViewSecondElevationTemp = "2000";
+    private string _transverseViewSecondElevationTemp = "1500";
     private string _transverseViewThirdPrefixTemp = "";
     private string _transverseViewThirdSuffixTemp = "_Сеч.3-3";
     private string _transverseViewThirdElevationTemp = "600";

@@ -56,8 +56,7 @@
                             <controls:SettingsTitleControl
                                 LabelText="{me:LocalizationSource VerticalView.FormworkMainView}"
                                 ToolTipText="{me:LocalizationSource VerticalViewSettingsPage.FormworkMainViewToolTip}"
-                                ButtonCommand="{Binding ApplySettingsCommand}"
-                                ButtonMouseLeaveCommand="{Binding CheckSettingsCommand}" />
+                                ButtonCommand="{Binding SaveSettingsCommand}" />
 
                             <controls:DoubleTextBoxSettingControl
                                 LabelText="{me:LocalizationSource VerticalView.PylonMainViewNameMask}"
@@ -93,8 +92,7 @@
                             <controls:SettingsTitleControl
                                 LabelText="{me:LocalizationSource VerticalView.RebarMainView}"
                                 ToolTipText="{me:LocalizationSource VerticalViewSettingsPage.RebarMainViewToolTip}"
-                                ButtonCommand="{Binding ApplySettingsCommand}"
-                                ButtonMouseLeaveCommand="{Binding CheckSettingsCommand}" />
+                                ButtonCommand="{Binding SaveSettingsCommand}" />
 
                             <controls:DoubleTextBoxSettingControl
                                 LabelText="{me:LocalizationSource VerticalView.PylonMainRebarViewNameMask}"
@@ -130,8 +128,7 @@
                             <controls:SettingsTitleControl
                                 LabelText="{me:LocalizationSource VerticalView.MainViewOffsets}"
                                 ToolTipText="{me:LocalizationSource VerticalViewSettingsPage.MainViewOffsetsToolTip}"
-                                ButtonCommand="{Binding ApplySettingsCommand}"
-                                ButtonMouseLeaveCommand="{Binding CheckSettingsCommand}" />
+                                ButtonCommand="{Binding SaveSettingsCommand}" />
 
                             <controls:TextBoxSettingControl
                                 LabelText="{me:LocalizationSource VerticalView.MainViewXOffset}"
@@ -172,8 +169,7 @@
                             <controls:SettingsTitleControl
                                 LabelText="{me:LocalizationSource VerticalView.SideViewOffsets}"
                                 ToolTipText="{me:LocalizationSource VerticalViewSettingsPage.SideViewOffsetsToolTip}"
-                                ButtonCommand="{Binding ApplySettingsCommand}"
-                                ButtonMouseLeaveCommand="{Binding CheckSettingsCommand}" />
+                                ButtonCommand="{Binding SaveSettingsCommand}" />
 
                             <controls:TextBoxSettingControl
                                 LabelText="{me:LocalizationSource VerticalView.SideViewXOffset}"
@@ -214,8 +210,7 @@
                             <controls:SettingsTitleControl
                                 LabelText="{me:LocalizationSource VerticalView.ViewTypeSize}"
                                 ToolTipText="{me:LocalizationSource VerticalViewSettingsPage.ViewTypeSizeToolTip}"
-                                ButtonCommand="{Binding ApplySettingsCommand}"
-                                ButtonMouseLeaveCommand="{Binding CheckSettingsCommand}" />
+                                ButtonCommand="{Binding SaveSettingsCommand}" />
 
                             <controls:ComboBoxSettingControl
                                 Grid.Row="2"

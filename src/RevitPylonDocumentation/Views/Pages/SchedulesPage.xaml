@@ -56,8 +56,7 @@
                             <controls:SettingsTitleControl
                                 LabelText="{me:LocalizationSource Schedules.SkeletonSpecification}"
                                 ToolTipText="{me:LocalizationSource SchedulesPage.SkeletonSpecificationToolTip}"
-                                ButtonCommand="{Binding ApplySettingsCommand}"
-                                ButtonMouseLeaveCommand="{Binding CheckSettingsCommand}" />
+                                ButtonCommand="{Binding SaveSettingsCommand}" />
 
                             <controls:DoubleTextBoxSettingControl
                                 LabelText="{me:LocalizationSource Schedules.SkeletonSpecNameMask}"
@@ -104,8 +103,7 @@
                             <controls:SettingsTitleControl
                                 LabelText="{me:LocalizationSource Schedules.SkeletonElementsSpecification}"
                                 ToolTipText="{me:LocalizationSource SchedulesPage.SkeletonElementsSpecificationToolTip}"
-                                ButtonCommand="{Binding ApplySettingsCommand}"
-                                ButtonMouseLeaveCommand="{Binding CheckSettingsCommand}" />
+                                ButtonCommand="{Binding SaveSettingsCommand}" />
 
                             <controls:DoubleTextBoxSettingControl
                                 LabelText="{me:LocalizationSource Schedules.SkeletonElementsSpecNameMask}"
@@ -152,8 +150,7 @@
                             <controls:SettingsTitleControl
                                 LabelText="{me:LocalizationSource Schedules.SystemPartsSchedule}"
                                 ToolTipText="{me:LocalizationSource SchedulesPage.SystemPartsScheduleToolTip}"
-                                ButtonCommand="{Binding ApplySettingsCommand}"
-                                ButtonMouseLeaveCommand="{Binding CheckSettingsCommand}" />
+                                ButtonCommand="{Binding SaveSettingsCommand}" />
 
                             <controls:DoubleTextBoxSettingControl
                                 LabelText="{me:LocalizationSource Schedules.SystemPartsScheduleNameMask}"
@@ -200,8 +197,7 @@
                             <controls:SettingsTitleControl
                                 LabelText="{me:LocalizationSource Schedules.IfcPartsSchedule}"
                                 ToolTipText="{me:LocalizationSource SchedulesPage.IfcPartsScheduleToolTip}"
-                                ButtonCommand="{Binding ApplySettingsCommand}"
-                                ButtonMouseLeaveCommand="{Binding CheckSettingsCommand}" />
+                                ButtonCommand="{Binding SaveSettingsCommand}" />
 
                             <controls:DoubleTextBoxSettingControl
                                 LabelText="{me:LocalizationSource Schedules.IfcPartsScheduleNameMask}"
@@ -248,8 +244,7 @@
                             <controls:SettingsTitleControl
                                 LabelText="{me:LocalizationSource Schedules.MaterialsSpecification}"
                                 ToolTipText="{me:LocalizationSource SchedulesPage.MaterialsSpecificationToolTip}"
-                                ButtonCommand="{Binding ApplySettingsCommand}"
-                                ButtonMouseLeaveCommand="{Binding CheckSettingsCommand}" />
+                                ButtonCommand="{Binding SaveSettingsCommand}" />
 
                             <controls:DoubleTextBoxSettingControl
                                 LabelText="{me:LocalizationSource Schedules.MaterialsSpecNameMask}"

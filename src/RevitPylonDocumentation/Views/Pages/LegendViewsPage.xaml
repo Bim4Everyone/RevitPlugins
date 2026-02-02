@@ -50,8 +50,7 @@
                         <controls:SettingsTitleControl
                             LabelText="{me:LocalizationSource LegendView.NotesLegend}"
                             ToolTipText="{me:LocalizationSource LegendViewsPage.NotesLegendToolTip}"
-                            ButtonCommand="{Binding ApplySettingsCommand}"
-                            ButtonMouseLeaveCommand="{Binding CheckSettingsCommand}" />
+                            ButtonCommand="{Binding SaveSettingsCommand}" />
 
                         <controls:ComboBoxSettingControl
                             LabelText="{me:LocalizationSource LegendView.SelectNotesLegend}"

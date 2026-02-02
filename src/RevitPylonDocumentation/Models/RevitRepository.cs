@@ -215,34 +215,28 @@ internal class RevitRepository {
         foreach(var elem in elems) {
             if(!elem.Name.Contains("Пилон") && !elem.Name.Contains("Колонна")) { continue; }
 
-            // Запрашиваем параметр фильтрации типовых пилонов. Если он не равен заданному, то отсеиваем этот пилон
-            var typicalPylonParameter = elem.LookupParameter(mainViewModel.PylonSettings.TypicalPylonFilterParameter);
-            if(typicalPylonParameter == null) {
-                mainViewModel.ErrorText = _localizationService.GetLocalizedString("VM.TypicalPylonFilterParamNotFound");
-                return;
-            }
+            // Могут быть следующие состояния:
+            // - параметр не найден - LookupParameter вернет null
+            // - значение параметра ни разу не задавалось - AsString() вернет null
+            // - значение найдено - AsString() вернет значение
 
-            if(typicalPylonParameter.AsString() is null
-                || typicalPylonParameter.AsString() != mainViewModel.PylonSettings.TypicalPylonFilterValue) { continue; }
+            // Запрашиваем параметр фильтрации типовых пилонов. Если он не равен заданному, то отсеиваем этот пилон
+            // def "обр_ФОП_Фильтрация 1"
+            var typicalPylonParameter = elem.LookupParameter(mainViewModel.PylonSettings.TypicalPylonFilterParameter);
+            if(typicalPylonParameter?.AsString() is null
+                || typicalPylonParameter?.AsString() != mainViewModel.PylonSettings.TypicalPylonFilterValue) { continue; }
 
             // Запрашиваем Раздел проекта
-            var projectSectionParameter = elem.LookupParameter(mainViewModel.PylonSettings.ProjectSection);
-            if(projectSectionParameter == null) {
-                mainViewModel.ErrorText = _localizationService.GetLocalizedString("VM.ProjectSectionParamNotFound");
-                return;
+            // def "обр_ФОП_Раздел проекта"
+            if(elem.LookupParameter(mainViewModel.PylonSettings.ProjectSection)?.AsString() is not string projectSection) {
+                continue;
             }
-            string projectSection = projectSectionParameter.AsString();
-            if(projectSection is null) { continue; }
-
 
             // Запрашиваем Марку пилона
-            var hostMarkParameter = elem.LookupParameter(mainViewModel.PylonSettings.Mark);
-            if(hostMarkParameter == null) {
-                mainViewModel.ErrorText = _localizationService.GetLocalizedString("VM.HostMarkParamNotFound");
-                return;
+            // def "Марка"
+            if(elem.LookupParameter(mainViewModel.PylonSettings.Mark)?.AsString() is not string hostMark) {
+                continue;
             }
-            string hostMark = hostMarkParameter.AsString();
-            if(hostMark is null) { continue; }
 
             var testPylonSheetInfo = HostsInfo
                 .Where(item => item.PylonKeyName.Equals(hostMark) && item.ProjectSection.Equals(projectSection))
