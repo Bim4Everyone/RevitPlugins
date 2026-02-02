@@ -55,7 +55,8 @@ internal sealed class CalculationElementFactory {
 
         calculationElement.SystemSharedName =
             duct.GetParamValueOrDefault<string>(SharedParamsConfig.Instance.VISSystemName, "");
-        calculationElement.SystemTypeName = duct.MEPSystem.GetElementType().Name;
+
+        calculationElement.SystemTypeName = duct.MEPSystem?.GetElementType()?.Name ?? string.Empty;
 
         double length = duct.GetParamValueOrDefault<double>(BuiltInParameter.CURVE_ELEM_LENGTH);
         if(ductType.Shape == ConnectorProfileType.Round) {
@@ -106,7 +107,7 @@ internal sealed class CalculationElementFactory {
 
         calculationElement.SystemSharedName =
             pipe.GetParamValueOrDefault<string>(SharedParamsConfig.Instance.VISSystemName, "");
-        calculationElement.SystemTypeName = pipe.MEPSystem.GetElementType().Name;
+        calculationElement.SystemTypeName = pipe.MEPSystem?.GetElementType()?.Name ?? string.Empty;
 
         double length = pipe.GetParamValueOrDefault<double>(BuiltInParameter.CURVE_ELEM_LENGTH);
         double outDiameter = pipe.GetParamValueOrDefault<double>(BuiltInParameter.RBS_PIPE_OUTER_DIAMETER);
@@ -150,7 +151,7 @@ internal sealed class CalculationElementFactory {
         Pipe pipe = (Pipe) _doc.GetElement(pipeIns.HostElementId);
         calculationElement.SystemSharedName =
             pipeIns.GetParamValueOrDefault<string>(SharedParamsConfig.Instance.VISSystemName, "");
-        calculationElement.SystemTypeName = pipe.MEPSystem.GetElementType().Name;
+        calculationElement.SystemTypeName = pipe?.MEPSystem?.GetElementType()?.Name ?? string.Empty;
 
         calculationElement.InsulationThikness_mm = pipeIns.Thickness;
         calculationElement.IsRound = true;
@@ -184,7 +185,7 @@ internal sealed class CalculationElementFactory {
 
         calculationElement.SystemSharedName =
             ductIns.GetParamValueOrDefault<string>(SharedParamsConfig.Instance.VISSystemName, "");
-        calculationElement.SystemTypeName = duct.MEPSystem.GetElementType().Name;
+        calculationElement.SystemTypeName = duct?.MEPSystem?.GetElementType()?.Name ?? string.Empty;
         calculationElement.Area_m2 = ductIns.GetParamValueOrDefault<double>(BuiltInParameter.RBS_CURVE_SURFACE_AREA);
         calculationElement.Length_mm = ductIns.GetParamValueOrDefault<double>(BuiltInParameter.CURVE_ELEM_LENGTH);
 

@@ -322,7 +322,7 @@ internal class UnmodelingCreator {
             }
         }
 
-
+        
         foreach(FamilyInstance familyInstance in genericCollection) {
             string currentDescription =
                 familyInstance.GetParamValueOrDefault<string>(SharedParamsConfig.Instance.Description);
@@ -330,9 +330,9 @@ internal class UnmodelingCreator {
             currentDescription = !string.IsNullOrEmpty(currentDescription)
                 ? currentDescription
                 : familyInstance.GetParamValueOrDefault<string>(_obsoletteConsumableDescriptionName);
+            
 
-
-            if(currentDescription.Contains(_conumableDescription) 
+            if(string.IsNullOrEmpty(currentDescription) || currentDescription.Contains(_conumableDescription) 
                 || _obsoletteConsumableDescriptions.Contains(currentDescription)) {
                 _doc.Delete(familyInstance.Id);
             }
