@@ -8,6 +8,8 @@ using RevitBuildCoordVolumes.Models.Interfaces;
 
 namespace RevitBuildCoordVolumes.Models;
 internal class ColumnFactory : IColumnFactory {
+    // Длина линии для пресечения, примерно 100 этажей
+    private const double _rayHeight = 1000;
 
     public IEnumerable<IGrouping<string, ColumnObject>> GenerateColumnGroups(List<PolygonObject> polygons, List<SlabElement> slabs) {
         var columns = GetColumns(polygons, slabs);
@@ -26,28 +28,18 @@ internal class ColumnFactory : IColumnFactory {
         foreach(var polygon in polygons) {
             var center = polygon.Center;
             var points = new List<SlabObject>(slabs.Count);
+            var line = Line.CreateBound(center + XYZ.BasisZ * _rayHeight, center - XYZ.BasisZ * _rayHeight);
 
             foreach(var slab in slabs) {
                 double z = double.NaN;
 
                 foreach(var face in slab.TopFaces) {
-
-                    var line = Line.CreateBound(center + XYZ.BasisZ * 10000, center - XYZ.BasisZ * 10000);
-
                     var result = face.Intersect(line, out var ira);
 
                     if(result == SetComparisonResult.Overlap && ira != null && ira.Size > 0) {
                         var hit = ira.get_Item(0).XYZPoint;
                         z = hit.Z;
                     }
-
-                    //var proj = face.Project(center);
-                    //if(proj != null) {
-                    //    var uv = proj.UVPoint;
-                    //    var xyz = proj.XYZPoint;
-                    //    z = xyz.Z;
-                    //    break;
-                    //}
                 }
 
                 if(!double.IsNaN(z)) {

@@ -1,9 +1,18 @@
+using dosymep.Bim4Everyone.SimpleServices;
+using dosymep.SimpleServices;
+
 using RevitBuildCoordVolumes.Models.Interfaces;
 
 namespace RevitBuildCoordVolumes.Models.Services;
 internal sealed class BuildCoordVolumeServices {
 
-    public BuildCoordVolumeServices(RevitRepository revitRepository, SystemPluginConfig systemPluginConfig) {
+    public BuildCoordVolumeServices(
+        SystemPluginConfig systemPluginConfig,
+        RevitRepository revitRepository,
+        ILocalizationService localizationService,
+        IRevitParamFactory revitParamFactory) {
+        LocalizationService = localizationService;
+        RevitParamFactory = revitParamFactory;
         GeomObjectFactory = new GeomObjectFactory(ContourService);
         CategoryAvailabilityService = new CategoryAvailabilityService(revitRepository.Document);
         DirectShapeObjectFactory = new DirectShapeObjectFactory(systemPluginConfig);
@@ -19,4 +28,6 @@ internal sealed class BuildCoordVolumeServices {
     public IDirectShapeObjectFactory DirectShapeObjectFactory { get; }
     public ICategoryAvailabilityService CategoryAvailabilityService { get; }
     public IParamAvailabilityService ParamAvailabilityService { get; } = new ParamAvailabilityService();
+    public ILocalizationService LocalizationService { get; }
+    public IRevitParamFactory RevitParamFactory { get; }
 }

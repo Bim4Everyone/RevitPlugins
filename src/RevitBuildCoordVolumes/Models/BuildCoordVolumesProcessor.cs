@@ -13,22 +13,21 @@ using RevitBuildCoordVolumes.Models.Settings;
 
 namespace RevitBuildCoordVolumes.Models;
 internal class BuildCoordVolumesProcessor {
-    private readonly ILocalizationService _localizationService;
-    private readonly ICoordVolumeBuilder _builder;
     private readonly RevitRepository _revitRepository;
     private readonly BuildCoordVolumeSettings _settings;
     private readonly BuildCoordVolumeServices _services;
+    private readonly ILocalizationService _localizationService;
+    private readonly ICoordVolumeBuilder _builder;
     private readonly BuilderFactory _builderFactory;
 
     public BuildCoordVolumesProcessor(
-        ILocalizationService localizationService,
         RevitRepository revitRepository,
         BuildCoordVolumeSettings settings,
         BuildCoordVolumeServices services) {
-        _localizationService = localizationService;
         _revitRepository = revitRepository;
         _settings = settings;
         _services = services;
+        _localizationService = _services.LocalizationService;
         _builderFactory = new BuilderFactory(_revitRepository, _settings, _services);
         _builder = _builderFactory.Create(_settings.AlgorithmType);
     }

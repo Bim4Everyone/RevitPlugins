@@ -71,8 +71,8 @@
                 Grid.Column="2"
                 Grid.Row="0"
                 VerticalAlignment="Top"
-                OnContent="{me:LocalizationSource MainWindow.ParamsToggleSwitchOn}"
-                OffContent="{me:LocalizationSource MainWindow.ParamsToggleSwitchOff}"
+                OnContent="{me:LocalizationSource ParamControl.ParamsToggleSwitchOn}"
+                OffContent="{me:LocalizationSource ParamControl.ParamsToggleSwitchOff}"
                 IsChecked="{Binding IsChecked, ElementName=_this, Mode=TwoWay}" />
 
             <ui:SymbolIcon
@@ -95,7 +95,7 @@
 
                 <ui:TextBlock
                     Foreground="{DynamicResource TextFillColorSecondaryBrush}"
-                    Text="{me:LocalizationSource MainWindow.SourceParamHeader}"
+                    Text="{me:LocalizationSource ParamControl.SourceParamHeader}"
                     TextWrapping="WrapWithOverflow" />
                 <ui:TextBox
                     Margin="0,5,0,0"
@@ -115,7 +115,7 @@
 
                 <ui:TextBlock
                     Foreground="{DynamicResource TextFillColorSecondaryBrush}"
-                    Text="{me:LocalizationSource MainWindow.TargetParamHeader}"
+                    Text="{me:LocalizationSource ParamControl.TargetParamHeader}"
                     TextWrapping="WrapWithOverflow" />
                 <ui:TextBox
                     Margin="0,5,0,0"
