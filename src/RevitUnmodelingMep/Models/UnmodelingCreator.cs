@@ -38,6 +38,8 @@ internal class UnmodelingCreator {
     private WorksetId? _ws_id;
     private FamilySymbol? _famylySymbol;
     private readonly string _libDir;
+    private bool _numberParamInitialized;
+    private SharedParam? _numberParam;
     
     private const double _coordinateStep = 0.001;
     private double _maxLocationY = 0;
@@ -218,11 +220,14 @@ internal class UnmodelingCreator {
             throw new InvalidOperationException("_ws_id is null");
         instWorkset.Set(_ws_id.IntegerValue);
 
-        SharedParam numberParam;
-        if(_doc.IsExistsParam(SharedParamsConfig.Instance.VISSpecNumbersCurrency)) {
-            numberParam = SharedParamsConfig.Instance.VISSpecNumbersCurrency;
-        } else {
-            numberParam = SharedParamsConfig.Instance.VISSpecNumbers;
+        if(!_numberParamInitialized) {
+            _numberParam = _doc.IsExistsParam(SharedParamsConfig.Instance.VISSpecNumbersCurrency)
+                ? SharedParamsConfig.Instance.VISSpecNumbersCurrency
+                : SharedParamsConfig.Instance.VISSpecNumbers;
+            _numberParamInitialized = true;
+        }
+        if(_numberParam is null) {
+            throw new InvalidOperationException("_numberParam is null");
         }
 
         void SetUnmodelingValue(FamilyInstance familyInstance, SharedParam sharedParam, object? value) {
@@ -252,7 +257,7 @@ internal class UnmodelingCreator {
         SetUnmodelingValue(familyInstance, SharedParamsConfig.Instance.VISItemCode, newRowElement.Code);
         SetUnmodelingValue(familyInstance, SharedParamsConfig.Instance.VISManufacturer, newRowElement.Maker);
         SetUnmodelingValue(familyInstance, SharedParamsConfig.Instance.VISUnit, newRowElement.Unit);
-        SetUnmodelingValue(familyInstance, numberParam, newRowElement.Number);
+        SetUnmodelingValue(familyInstance, _numberParam, newRowElement.Number);
         SetUnmodelingValue(familyInstance, SharedParamsConfig.Instance.VISMass, newRowElement.Mass);
         SetUnmodelingValue(familyInstance, SharedParamsConfig.Instance.VISNote, newRowElement.Note);
         SetUnmodelingValue(familyInstance, SharedParamsConfig.Instance.EconomicFunction, newRowElement.Function);
