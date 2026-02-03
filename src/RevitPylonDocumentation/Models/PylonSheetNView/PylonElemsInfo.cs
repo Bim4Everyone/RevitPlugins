@@ -31,6 +31,7 @@ internal class PylonElemsInfo {
     public double ElemsBoundingBoxWidthToMin { get; set; }
     public double ElemsBoundingBoxMinZ { get; set; }
     public double ElemsBoundingBoxMaxZ { get; set; }
+    public double ElemsBoundingBoxHeight { get; set; }
     public double LastPylonMinZ { get; set; }
     public double LastPylonMaxZ { get; set; }
 
@@ -244,6 +245,7 @@ internal class PylonElemsInfo {
         }
         ElemsBoundingBoxMinZ = ElemsBoundingBox.Min.Z;
         ElemsBoundingBoxMaxZ = ElemsBoundingBox.Max.Z;
+        ElemsBoundingBoxHeight = ElemsBoundingBoxMaxZ - ElemsBoundingBoxMinZ;
     }
 
 

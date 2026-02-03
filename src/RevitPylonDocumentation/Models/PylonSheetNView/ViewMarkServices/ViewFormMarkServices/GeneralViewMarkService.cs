@@ -94,10 +94,16 @@ internal class GeneralViewMarkService {
             // Получаем точку в которую нужно поставить аннотацию
             var point = _viewPointsAnalyzer.GetPointByDirection(rightVerticalBar, DirectionType.Right, 0, 0, true);
             // Корректируем положение точки, куда будет установлена марка (текст)
-            point = _viewPointsAnalyzer.GetPointByDirection(point, DirectionType.RightBottom, 0.8, 3.2);
+            // Смещение по верикали привязываем к высоте армирования, т.к. нужно соблюсти баланс между 
+            // одноэтажным и двухэтажным пилоном
+            point = _viewPointsAnalyzer.GetPointByDirection(
+                point,
+                DirectionType.RightBottom,
+                0.8,
+                _sheetInfo.ElemsInfo.ElemsBoundingBoxHeight / 8);
             // Корректируем положение точки, если она слишком удалена от пилона (из-за семейства Гэшки)
-            if(isForPerpView) {
 #if REVIT_2022_OR_GREATER
+            if(isForPerpView) {
                 var hostOrigin = _sheetInfo.ElemsInfo.HostOrigin;
                 var hostOriginProjected = _viewPointsAnalyzer.ProjectPointToViewFront(hostOrigin);
 
@@ -110,19 +116,24 @@ internal class GeneralViewMarkService {
                     point = _viewPointsAnalyzer.GetPointByDirection(
                         new XYZ(hostOriginProjected.X, hostOriginProjected.Y, point.Z), DirectionType.Right, hostWidth, 0);
                 }
-#endif
             }
+#endif
             // Создаем марку арматуры
             var tagOption = new TagOption() { BodyPoint = point, TagSymbol = _tagSkeletonSymbol };
             var rightTag = _annotationService.CreateRebarTag(tagOption, rightVerticalBar);
             rightTag.LeaderEndCondition = LeaderEndCondition.Free;
 
 #if REVIT_2022_OR_GREATER
-            rightTag.LeaderEndCondition = LeaderEndCondition.Free;
             var rightVerticalBarRef = new Reference(rightVerticalBar);
-
             var tagLeaderEnd = rightTag.GetLeaderEnd(rightVerticalBarRef);
-            tagLeaderEnd = _viewPointsAnalyzer.GetPointByDirection(tagLeaderEnd, DirectionType.Bottom, 0, 3);
+
+            // Смещение по верикали привязываем к высоте армирования, т.к. нужно соблюсти баланс между 
+            // одноэтажным и двухэтажным пилоном
+            tagLeaderEnd = _viewPointsAnalyzer.GetPointByDirection(
+                tagLeaderEnd,
+                DirectionType.Bottom,
+                0,
+                _sheetInfo.ElemsInfo.ElemsBoundingBoxHeight / 9);
             rightTag.SetLeaderEnd(rightVerticalBarRef, tagLeaderEnd);
 #endif
         } catch(Exception) { }

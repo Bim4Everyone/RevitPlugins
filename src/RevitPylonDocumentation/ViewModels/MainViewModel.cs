@@ -371,14 +371,19 @@ internal class MainViewModel : BaseViewModel {
     /// Дает возможность пользователю выбрать вручную нужный для работы пилон
     /// </summary>
     private void SelectPylon() {
+        var categoryIds = new List<ElementId> { new(BuiltInCategory.OST_Walls), new(BuiltInCategory.OST_StructuralColumns) };
+
         var elementid = _revitRepository.ActiveUIDocument.Selection
-            .PickObject(ObjectType.Element, _localizationService.GetLocalizedString("VM.SelectPylon")).ElementId;
+            .PickObject(
+                ObjectType.Element,
+                new SelectionFilterByCategory(categoryIds),
+                _localizationService.GetLocalizedString("VM.SelectPylon")).ElementId;
         var element = _revitRepository.Document.GetElement(elementid);
 
         if(element != null) {
             HostsInfoVM.Clear();
             SelectedHostsInfoVM.Clear();
-            ErrorElements = new List<ElementId>();
+            ErrorElements = [];
             SelectionSettings.SelectedProjectSection = string.Empty;
             _pylonSelectedManually = true;
 
