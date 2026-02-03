@@ -29,6 +29,18 @@ internal class VisSettingsStorage {
         _localizationService = localizationService;
     }
 
+    internal static string GetLibFolder() {
+        string dllDir = GetAssemblyDirectory();
+        string fallbackLibPath = Path.GetFullPath(Path.Combine(
+            dllDir,
+            "..",
+            "Extensions",
+            "04.OV-VK.extension",
+            "lib"));
+
+        return fallbackLibPath;
+    }
+
     public JObject GetUnmodelingConfig() {
         string value = (string) _doc.ProjectInformation
             .GetSharedParamValue(SharedParamsConfig.Instance.VISSettings.Name);
@@ -38,32 +50,7 @@ internal class VisSettingsStorage {
 
     public void PrepareSettings() {
         JObject LoadDefaultSettings() {
-            var assembly = Assembly.GetExecutingAssembly();
-            string assemblyPath = string.Empty;
-
-            if(!string.IsNullOrWhiteSpace(assembly.CodeBase)) {
-                assemblyPath = new Uri(assembly.CodeBase).LocalPath;
-            }
-
-            if(string.IsNullOrWhiteSpace(assemblyPath) && !string.IsNullOrWhiteSpace(assembly.Location)) {
-                assemblyPath = assembly.Location;
-            }
-
-            if(string.IsNullOrWhiteSpace(assemblyPath)) {
-                assemblyPath = AppDomain.CurrentDomain.BaseDirectory;
-            }
-
-            string dllDir = Path.GetDirectoryName(assemblyPath)
-                            ?? AppDomain.CurrentDomain.BaseDirectory;
-
-            string appData = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
-            string defaultLibPath = Path.Combine(appData, "pyRevit", "Extensions", "04.OV-VK.extension", "lib");
-
-            string fallbackLibPath = Path.GetFullPath(Path.Combine(dllDir, "..", "..", "lib"));
-
-            string libDir = Directory.Exists(defaultLibPath) ? defaultLibPath : fallbackLibPath;
-            string defaultsPath = Path.Combine(libDir, "default_spec_settings.json");
-
+            string defaultsPath = Path.Combine(GetLibFolder(), "default_spec_settings.json");
             return JObject.Parse(File.ReadAllText(defaultsPath));
         }
 
@@ -181,31 +168,7 @@ internal class VisSettingsStorage {
     }
 
     public JObject GetDefaultSettings() {
-        var assembly = Assembly.GetExecutingAssembly();
-        string assemblyPath = string.Empty;
-
-        if(!string.IsNullOrWhiteSpace(assembly.CodeBase)) {
-            assemblyPath = new Uri(assembly.CodeBase).LocalPath;
-        }
-
-        if(string.IsNullOrWhiteSpace(assemblyPath) && !string.IsNullOrWhiteSpace(assembly.Location)) {
-            assemblyPath = assembly.Location;
-        }
-
-        if(string.IsNullOrWhiteSpace(assemblyPath)) {
-            assemblyPath = AppDomain.CurrentDomain.BaseDirectory;
-        }
-
-        string dllDir = Path.GetDirectoryName(assemblyPath)
-                        ?? AppDomain.CurrentDomain.BaseDirectory;
-
-        string appData = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
-        string defaultLibPath = Path.Combine(appData, "pyRevit", "Extensions", "04.OV-VK.extension", "lib");
-        string fallbackLibPath = Path.GetFullPath(Path.Combine(dllDir, "..", "..", "lib"));
-
-        string libDir = Directory.Exists(defaultLibPath) ? defaultLibPath : fallbackLibPath;
-        string defaultsPath = Path.Combine(libDir, "default_spec_settings.json");
-
+        string defaultsPath = Path.Combine(GetLibFolder(), "default_spec_settings.json");
         return JObject.Parse(File.ReadAllText(defaultsPath));
     }
 
@@ -244,6 +207,26 @@ internal class VisSettingsStorage {
         } catch {
             return new JObject();
         }
+    }
+
+    private static string GetAssemblyDirectory() {
+        var assembly = Assembly.GetExecutingAssembly();
+        string assemblyPath = string.Empty;
+
+        if(!string.IsNullOrWhiteSpace(assembly.CodeBase)) {
+            assemblyPath = new Uri(assembly.CodeBase).LocalPath;
+        }
+
+        if(string.IsNullOrWhiteSpace(assemblyPath) && !string.IsNullOrWhiteSpace(assembly.Location)) {
+            assemblyPath = assembly.Location;
+        }
+
+        if(string.IsNullOrWhiteSpace(assemblyPath)) {
+            assemblyPath = AppDomain.CurrentDomain.BaseDirectory;
+        }
+
+        return Path.GetDirectoryName(assemblyPath)
+               ?? AppDomain.CurrentDomain.BaseDirectory;
     }
 
     private void SaveSettings(string settingsText) {

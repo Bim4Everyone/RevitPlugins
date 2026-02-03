@@ -1,9 +1,7 @@
 using System;
 using System.Collections.Generic;
-using System.Configuration.Assemblies;
 using System.IO;
 using System.Linq;
-using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
@@ -119,34 +117,7 @@ internal class UnmodelingCreator {
     }
 
     private string GetLibFolder() {
-        var assembly = Assembly.GetExecutingAssembly();
-        string assemblyPath = string.Empty;
-
-        if(!string.IsNullOrWhiteSpace(assembly.CodeBase)) {
-            assemblyPath = new Uri(assembly.CodeBase).LocalPath;
-        }
-
-        if(string.IsNullOrWhiteSpace(assemblyPath) && !string.IsNullOrWhiteSpace(assembly.Location)) {
-            assemblyPath = assembly.Location;
-        }
-
-        if(string.IsNullOrWhiteSpace(assemblyPath)) {
-            assemblyPath = AppDomain.CurrentDomain.BaseDirectory;
-        }
-
-        string dllDir = Path.GetDirectoryName(assemblyPath)
-                ?? AppDomain.CurrentDomain.BaseDirectory;
-
-        // Основной путь: профиль pyRevit -> Extensions -> 04.OV-VK.extension -> lib
-        string appData = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
-        string defaultLibPath = Path.Combine(appData, "pyRevit", "Extensions", "04.OV-VK.extension", "lib");
-
-        // Fallback: если dll действительно лежит в ...\ОВиВК.tab\bin, поднимаемся на две директории вверх и заходим в lib
-        string fallbackLibPath = Path.GetFullPath(Path.Combine(dllDir, "..", "..", "lib"));
-
-        string libDir = Directory.Exists(defaultLibPath) ? defaultLibPath : fallbackLibPath;
-        //string defaultsPath = Path.Combine(libDir, "default_spec_settings.json");
-        return libDir;
+        return VisSettingsStorage.GetLibFolder();
     }
 
     private void CheckWorksets() {
@@ -360,3 +331,5 @@ internal class UnmodelingCreator {
         return genericModels;
     }
 }
+
+
