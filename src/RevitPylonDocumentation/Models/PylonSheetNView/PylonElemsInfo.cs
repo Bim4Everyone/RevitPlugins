@@ -80,10 +80,15 @@ internal class PylonElemsInfo {
 
             // В случае FamilyInstance этого недостаточно, т.к. отметка по высоте будет на уровне 0
             // Поэтому берем высотную отметку уровня элемента, смещение элемента от этого уровня и складываем для Z
+            // При этом нужно добавить смещение базовой точки проекта относительного истинного начала
             var level = _doc.GetElement(column.LevelId) as Level;
             var levelElevation = level.Elevation;
             var levelOffset = column.GetParamValue<double>(BuiltInParameter.FAMILY_BASE_LEVEL_OFFSET_PARAM);
-            HostOrigin = new XYZ(HostOrigin.X, HostOrigin.Y, HostOrigin.Z + levelElevation + levelOffset);
+
+            HostOrigin = new XYZ(
+                HostOrigin.X, 
+                HostOrigin.Y, 
+                HostOrigin.Z + levelElevation + levelOffset + BasePoint.GetProjectBasePoint(_doc).Position.Z);
         }
     }
 

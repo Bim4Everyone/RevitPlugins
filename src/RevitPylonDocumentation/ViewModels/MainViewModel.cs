@@ -80,10 +80,7 @@ internal class MainViewModel : BaseViewModel {
 
         SelectPylonCommand = RelayCommand.Create(SelectPylon);
 
-        //ApplySettingsCommand = RelayCommand.Create(ApplySettings, CanApplySettings);
-        //CheckSettingsCommand = RelayCommand.Create(CheckSettings);
         GetHostMarksInGUICommand = RelayCommand.Create(GetHostMarksInGUI);
-
         SaveSettingsCommand = RelayCommand.Create(SaveSettings, CanSaveSettings);
 
         AddScheduleFilterParamCommand = RelayCommand.Create(ScheduleFiltersSettings.AddScheduleFilterParam);
@@ -105,8 +102,6 @@ internal class MainViewModel : BaseViewModel {
     public ICommand LoadViewCommand { get; }
     public ICommand AcceptViewCommand { get; }
     public ICommand SaveSettingsCommand { get; }
-    //public ICommand ApplySettingsCommand { get; }
-    //public ICommand CheckSettingsCommand { get; }
     public ICommand GetHostMarksInGUICommand { get; }
     public ICommand AddScheduleFilterParamCommand { get; }
     public ICommand DeleteScheduleFilterParamCommand { get; }
@@ -383,6 +378,7 @@ internal class MainViewModel : BaseViewModel {
         if(element != null) {
             HostsInfoVM.Clear();
             SelectedHostsInfoVM.Clear();
+            ErrorElements = new List<ElementId>();
             SelectionSettings.SelectedProjectSection = string.Empty;
             _pylonSelectedManually = true;
 
