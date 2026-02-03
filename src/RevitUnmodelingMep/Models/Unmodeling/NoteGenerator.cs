@@ -14,7 +14,7 @@ internal sealed class NoteGenerator {
         if(string.IsNullOrEmpty(template)) {
             return string.Empty;
         }
-
+        
         string FormatValue(double value) {
             double rounded = Math.Round(value, 2);
             return rounded.ToString("0.##", CultureInfo.InvariantCulture);

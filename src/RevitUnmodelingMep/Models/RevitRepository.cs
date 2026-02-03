@@ -10,17 +10,12 @@ using Autodesk.Revit.DB;
 using Autodesk.Revit.UI;
 
 using dosymep.Bim4Everyone.SimpleServices;
-using dosymep.Bim4Everyone.SharedParams;
 using dosymep.Revit;
 using dosymep.SimpleServices;
-using dosymep.Xpf.Core.SimpleServices;
-
 using Newtonsoft.Json.Linq;
 
 using RevitUnmodelingMep.Models.Entities;
 using RevitUnmodelingMep.Models.Unmodeling;
-
-using Wpf.Ui.Controls;
 
 using Application = Autodesk.Revit.ApplicationServices.Application;
 
