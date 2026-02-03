@@ -4,19 +4,27 @@ namespace RevitBuildCoordVolumes.Models.Interfaces;
 
 internal interface IParamAvailabilityService {
     /// <summary>
-    /// Метод проверки наличия параметров в проекте
-    /// </summary>    
+    /// Метод проверки наличия параметров в проекте.
+    /// </summary>
     /// <remarks>
-    /// В данном методе производится проверка наличия параметра в проекте
+    /// В данном методе производится проверка наличия параметра в проекте.
     /// </remarks>
-    /// <returns>true - если параметр есть, false - если параметра нет</returns>
+    /// <param name="doc">Документ, где проводится проверка.</param>   
+    /// <param name="paramName">Имя проверяемого параметра.</param> 
+    /// <returns>
+    /// True - если параметр есть, False - если параметра нет.
+    /// </returns>
     bool IsParamExist(Document doc, string paramName);
     /// <summary>
-    /// Метод получения описания параметра по имени параметра 
-    /// </summary>    
+    /// Метод получения описания параметра по имени параметра.
+    /// </summary>
     /// <remarks>
-    /// В данном методе производится получения описания
+    /// В данном методе производится получения информации о параметре.
     /// </remarks>
-    /// <returns>Definition параметра</returns>
+    /// <param name="doc">Документ, где ищется описание.</param>   
+    /// <param name="paramName">Имя параметра.</param> 
+    /// <returns>
+    /// Definition.
+    /// </returns>
     Definition GetDefinitionByName(Document doc, string paramName);
 }

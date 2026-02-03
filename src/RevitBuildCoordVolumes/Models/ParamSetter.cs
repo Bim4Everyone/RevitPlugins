@@ -11,6 +11,7 @@ using RevitBuildCoordVolumes.Models.Interfaces;
 using RevitBuildCoordVolumes.Models.Settings;
 
 namespace RevitBuildCoordVolumes.Models;
+
 internal class ParamSetter : IParamSetter {
     private readonly SystemPluginConfig _systemPluginConfig;
     public ParamSetter(SystemPluginConfig systemPluginConfig) {
@@ -23,6 +24,7 @@ internal class ParamSetter : IParamSetter {
         }
     }
 
+    // Метод назначения параметров DirectShapeObject
     private void Set(SpatialElement spatialElement, DirectShapeObject directShapeObject, BuildCoordVolumeSettings buildCoordVolumeSettings) {
         var directShape = directShapeObject.DirectShape;
         var paramMaps = buildCoordVolumeSettings.ParamMaps;
@@ -45,6 +47,7 @@ internal class ParamSetter : IParamSetter {
         }
     }
 
+    // Метод назначения параметра этажа "Денежная единица" DirectShapeObject
     private void SetFloorDEParam(SpatialElement spatialElement, DirectShapeObject directShapeObject, ParamMap paramMap, AlgorithmType algorithm) {
         if(algorithm == AlgorithmType.SlabBasedAlgorithm) {
             double value = GetFloorDEValue(directShapeObject.FloorName);
@@ -54,6 +57,7 @@ internal class ParamSetter : IParamSetter {
         }
     }
 
+    // Метод назначения параметра этажа DirectShapeObject
     private void SetFloorParam(SpatialElement spatialElement, DirectShapeObject directShapeObject, ParamMap paramMap, AlgorithmType algorithm) {
         if(algorithm == AlgorithmType.SlabBasedAlgorithm) {
             string value = directShapeObject.FloorName;
@@ -63,22 +67,25 @@ internal class ParamSetter : IParamSetter {
         }
     }
 
+    // Метод назначения текстового параметра DirectShapeObject
     private void SetStringParam(SpatialElement spatialElement, DirectShapeObject directShapeObject, ParamMap paramMap) {
         string value = spatialElement.GetParamValueOrDefault<string>(paramMap.SourceParam.Name);
         directShapeObject.DirectShape.SetParamValue(paramMap.TargetParam.Name, value);
     }
 
+    // Метод назначения числового параметра DirectShapeObject
     private void SetDoubleParam(SpatialElement spatialElement, DirectShapeObject directShapeObject, ParamMap paramMap) {
         double value = spatialElement.GetParamValueOrDefault<double>(paramMap.SourceParam.Name);
         directShapeObject.DirectShape.SetParamValue(paramMap.TargetParam.Name, value);
     }
 
+    // Метод назначения параметра объема DirectShapeObject
     private void SetVolumeParam(DirectShapeObject directShapeObject, ParamMap paramMap) {
         double value = directShapeObject.Volume;
         directShapeObject.DirectShape.SetParamValue(paramMap.TargetParam.Name, value);
     }
 
-
+    // Метод получения значения для параметра этажа "Денежная единица"
     private double GetFloorDEValue(string stringValue) {
         if(string.IsNullOrWhiteSpace(stringValue)) {
             return 0;

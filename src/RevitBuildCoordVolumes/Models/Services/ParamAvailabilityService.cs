@@ -11,17 +11,12 @@ namespace RevitBuildCoordVolumes.Models.Services;
 internal class ParamAvailabilityService : IParamAvailabilityService {
 
     private readonly Dictionary<string, ParamAvailabilityCache> _cacheByDocId = [];
-    /// <summary>
-    /// Проверяет, существует ли параметр в данном документе.
-    /// </summary>
+
     public bool IsParamExist(Document doc, string paramName) {
         var cache = GetOrBuildCache(doc);
         return cache.ParamDefinitions.ContainsKey(paramName);
     }
 
-    /// <summary>
-    /// Возвращает Definition по имени параметра (если существует).
-    /// </summary>
     public Definition GetDefinitionByName(Document doc, string paramName) {
         var cache = GetOrBuildCache(doc);
         return cache.ParamDefinitions.TryGetValue(paramName, out var def)
@@ -29,6 +24,7 @@ internal class ParamAvailabilityService : IParamAvailabilityService {
             : null;
     }
 
+    // Метод получения кэша
     private ParamAvailabilityCache GetOrBuildCache(Document doc) {
         string docId = doc.GetUniqId();
         if(_cacheByDocId.TryGetValue(docId, out var cache)) {
@@ -40,6 +36,7 @@ internal class ParamAvailabilityService : IParamAvailabilityService {
         return cache;
     }
 
+    // Метод построения кэша
     private ParamAvailabilityCache BuildCache(Document doc) {
         var cache = new ParamAvailabilityCache();
         var bindings = doc.ParameterBindings;

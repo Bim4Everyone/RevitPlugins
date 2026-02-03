@@ -4,6 +4,7 @@ using Autodesk.Revit.DB;
 using dosymep.Bim4Everyone.Templates;
 
 namespace RevitBuildCoordVolumes.Models;
+
 internal class CheckProjectParams {
     private readonly Application _application;
     private readonly Document _document;

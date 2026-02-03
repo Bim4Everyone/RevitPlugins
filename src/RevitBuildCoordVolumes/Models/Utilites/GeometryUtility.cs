@@ -4,11 +4,22 @@ using Autodesk.Revit.DB;
 
 namespace RevitBuildCoordVolumes.Models.Utilites;
 internal static class GeometryUtility {
-    public static bool IsPointInsidePolygon(XYZ p, List<XYZ> polygon) {
+    /// <summary>
+    /// Метод проверки точки.
+    /// </summary>
+    /// <remarks>
+    /// В данном методе производится проверка, находится ли точка внутри полигона точек.
+    /// </remarks>
+    /// <param name="point">Искомая точка.</param>
+    /// <param name="polygon">Список точек внутри которых ведется поиск (полигон точек).</param>
+    /// <returns>
+    /// True - точка внутри, False - точки внутри нет.
+    /// </returns>
+    public static bool IsPointInsidePolygon(XYZ point, List<XYZ> polygon) {
         bool inside = false;
         for(int i = 0, j = polygon.Count - 1; i < polygon.Count; j = i++) {
-            if((polygon[i].Y > p.Y) != (polygon[j].Y > p.Y) &&
-                p.X < (polygon[j].X - polygon[i].X) * (p.Y - polygon[i].Y) /
+            if((polygon[i].Y > point.Y) != (polygon[j].Y > point.Y) &&
+                point.X < (polygon[j].X - polygon[i].X) * (point.Y - polygon[i].Y) /
                  (polygon[j].Y - polygon[i].Y) + polygon[i].X) {
                 inside = !inside;
             }
@@ -16,6 +27,17 @@ internal static class GeometryUtility {
         return inside;
     }
 
+    /// <summary>
+    /// Метод сортировки кривых.
+    /// </summary>
+    /// <remarks>
+    /// В данном методе производится сортировка кривых для дальнейшего построения замкнутого контура, 
+    /// кривые при необходимости разворачиваются.
+    /// </remarks>
+    /// <param name="curves">Список исходных кривых для сортировки.</param>    
+    /// <returns>
+    /// Список отсортированных кривых.
+    /// </returns>
     public static List<Curve> SortCurvesToLoop(List<Curve> curves) {
         if(curves.Count == 0) {
             return [];

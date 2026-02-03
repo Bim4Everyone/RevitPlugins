@@ -4,9 +4,7 @@ using System.Collections.Generic;
 using Autodesk.Revit.DB;
 
 namespace RevitBuildCoordVolumes.Models;
-/// <summary>
-/// Представление плиты с необходимой информацией для построения колонн
-/// </summary>
+
 internal class SlabElement {
     public Floor Floor { get; set; }
     public Level Level { get; set; }

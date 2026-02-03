@@ -9,8 +9,8 @@ using RevitBuildCoordVolumes.Models.Interfaces;
 using RevitBuildCoordVolumes.Models.Utilites;
 
 namespace RevitBuildCoordVolumes.Models.Services;
-internal class ContourService : IContourService {
 
+internal class ContourService : IContourService {
     public List<CurveLoop> GetColumnsCurveLoops(List<ColumnObject> columns, double spatialElementPosition, double startExtrudePosition) {
         // Получаем все линии полигонов
         var allLines = columns
@@ -40,18 +40,15 @@ internal class ContourService : IContourService {
         return GetCurveLoopsContour(allLines, transform);
     }
 
-    public List<CurveLoop> GetSimpleCurveLoops(SpatialElement spatialElement, double startExtrudePosition) {
-        var opt = new SpatialElementBoundaryOptions();
-        var loops = spatialElement.GetBoundarySegments(opt);
-        if(loops == null || loops.Count == 0) {
+    public List<CurveLoop> GetSimpleCurveLoops(SpatialElement spatialElement, double startExtrudePosition, double basePointOffset) {
+        var contour = GetOuterContour(spatialElement);
+
+        if(contour.Count == 0) {
             return [];
         }
 
-        var segs = loops[0];
-        var contour = segs.Select(s => s.GetCurve()).ToList();
-
         // Получаем ориентацию полигона для Transform
-        double spatialElementPosition = contour[0].GetEndPoint(0).Z;
+        double spatialElementPosition = contour[0].GetEndPoint(0).Z - basePointOffset;
 
         // Получаем актуальную трансформацию
         var transform = GetTransform(spatialElementPosition, startExtrudePosition);
@@ -59,7 +56,15 @@ internal class ContourService : IContourService {
         return GetCurveLoopsContour(contour, transform);
     }
 
-    private List<CurveLoop> GetCurveLoopsContour(List<Curve> allCurves, Transform transform) {
+    public List<Curve> GetOuterContour(SpatialElement spatialElement) {
+        var opt = new SpatialElementBoundaryOptions();
+        var loops = spatialElement.GetBoundarySegments(opt);
+        return loops == null || loops.Count == 0
+            ? []
+            : loops[0].Select(s => s.GetCurve()).ToList();
+    }
+
+    public List<CurveLoop> GetCurveLoopsContour(List<Curve> allCurves, Transform transform) {
         var devidedCurves = SplitToLoopsOptimized(allCurves);
         var curveLoops = new List<CurveLoop>();
         foreach(var listCurve in devidedCurves) {
@@ -68,17 +73,21 @@ internal class ContourService : IContourService {
                 curveLoop.Append(curve);
             }
             if(!curveLoop.IsOpen()) {
-                curveLoop.Transform(transform);
+                if(transform != null) {
+                    curveLoop.Transform(transform);
+                }
                 curveLoops.Add(curveLoop);
             }
         }
         return curveLoops;
     }
 
+    // Метод получения трансформации по старой и новой позициям
     private Transform GetTransform(double oldPosition, double newPosition) {
         return Transform.CreateTranslation(new XYZ(0, 0, newPosition - oldPosition));
     }
 
+    // Метод получения списка уникальных линий (удаление дубликатов квадратов)
     private List<Line> GetUniqueLines(List<Line> lines) {
         var map = new Dictionary<string, Line>(lines.Count);
 
@@ -117,6 +126,7 @@ internal class ContourService : IContourService {
         return map.Values.ToList();
     }
 
+    // Метод поиска контуров из общего массива кривых
     private List<List<Curve>> SplitToLoopsOptimized(List<Curve> allCurves) {
         var remaining = new HashSet<Curve>(allCurves);
         var pointMap = new Dictionary<string, List<Curve>>();

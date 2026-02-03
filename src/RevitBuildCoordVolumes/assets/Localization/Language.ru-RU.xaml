@@ -99,4 +99,18 @@
 
     <system:String x:Key="SystemPluginConfig.SlopeLineName">Направление уклона</system:String>
 
+    <system:String x:Key="WarningWindow.Title">Предупреждения</system:String>
+    <system:String x:Key="WarningWindow.ElementIdHeader">ID зоны</system:String>
+    <system:String x:Key="WarningWindow.NameHeader">Имя зоны</system:String>
+    <system:String x:Key="WarningWindow.LevelNameHeader">Уровень зоны</system:String>
+    <system:String x:Key="WarningWindow.DescriptionHeader">Описание зоны</system:String>
+
+    <system:String x:Key="WarningsViewModel.Redundant">Избыточные зоны</system:String>
+    <system:String x:Key="WarningsViewModel.RedundantDescription">Зоны, находящиеся в одной окруженной области</system:String>
+    <system:String x:Key="WarningsViewModel.NotEnclosed">Не окруженные зоны / Не размещенные зоны</system:String>
+    <system:String x:Key="WarningsViewModel.NotEnclosedDescription">Зоны, не имеющие границ или не размещенные на плане</system:String>
+    <system:String x:Key="WarningsViewModel.BrokenContour">Зоны с поврежденным контуром</system:String>
+    <system:String x:Key="WarningsViewModel.BrokenContourDescription">Зоны, имеющие поврежденный контур (ограничить разделителями)</system:String>
+    <system:String x:Key="WarningsViewModel.NotFilledParam">Зоны с не заполненными параметрами</system:String>
+    <system:String x:Key="WarningsViewModel.NotFilledParamDescription">Зоны с не заполненными параметрами, необходимыми для построения</system:String> 
 </ResourceDictionary>

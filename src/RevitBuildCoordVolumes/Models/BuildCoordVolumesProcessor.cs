@@ -1,17 +1,15 @@
 using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Threading;
 
 using dosymep.Revit;
 using dosymep.SimpleServices;
 
-using RevitBuildCoordVolumes.Models.Geometry;
 using RevitBuildCoordVolumes.Models.Interfaces;
 using RevitBuildCoordVolumes.Models.Services;
 using RevitBuildCoordVolumes.Models.Settings;
 
 namespace RevitBuildCoordVolumes.Models;
+
 internal class BuildCoordVolumesProcessor {
     private readonly RevitRepository _revitRepository;
     private readonly BuildCoordVolumeSettings _settings;
@@ -31,16 +29,24 @@ internal class BuildCoordVolumesProcessor {
         _builderFactory = new BuilderFactory(_revitRepository, _settings, _services);
         _builder = _builderFactory.Create(_settings.AlgorithmType);
     }
-
-    public List<SpatialObject> SpatialObjects => GetSpatialObjects();
-
+    /// <summary>
+    /// Основной метод построения и обработки объемных элементов.
+    /// </summary>
+    /// <remarks>
+    /// В данном методе происходит транзакция, экструзия объемных элементов и назначения им параметров по исходным зонам.
+    /// </remarks>
+    /// <param name="progress">Прогресс.</param>
+    /// <param name="ct">Токен отмены.</param>
+    /// <returns>
+    /// Void.
+    /// </returns>
     public void Run(IProgress<int> progress = null, CancellationToken ct = default) {
 
         string transactionName = _localizationService.GetLocalizedString("BuildCoordVolumesProcessor.TransactionName");
         using var t = _revitRepository.Document.StartTransaction(transactionName);
 
         int pro = 0;
-        foreach(var spatialObject in SpatialObjects) {
+        foreach(var spatialObject in _settings.SpatialObjects) {
             ct.ThrowIfCancellationRequested();
 
             var geomElements = _builder.Build(spatialObject);
@@ -52,11 +58,5 @@ internal class BuildCoordVolumesProcessor {
             progress?.Report(++pro);
         }
         t.Commit();
-    }
-
-    private List<SpatialObject> GetSpatialObjects() {
-        string areaType = _settings.TypeZone;
-        var areaTypeParam = _settings.ParamMaps.First().SourceParam;
-        return _revitRepository.GetSpatialObjects(areaType, areaTypeParam).ToList();
     }
 }

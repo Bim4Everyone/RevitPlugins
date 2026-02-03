@@ -16,8 +16,13 @@ internal class GeomObjectFactory : IGeomObjectFactory {
         _contourService = contourService;
     }
 
-    public List<GeomObject> GetSimpleGeomObjects(SpatialElement spatialElement, double startExtrudePosition, double finishExtrudePosition) {
-        var listCurveLoops = _contourService.GetSimpleCurveLoops(spatialElement, startExtrudePosition);
+    public List<GeomObject> GetSimpleGeomObjects(
+        SpatialElement spatialElement,
+        double startExtrudePosition,
+        double finishExtrudePosition,
+        double basePointOffset) {
+
+        var listCurveLoops = _contourService.GetSimpleCurveLoops(spatialElement, startExtrudePosition, basePointOffset);
         var solid = SolidUtility.ExtrudeSolid(listCurveLoops, startExtrudePosition, finishExtrudePosition);
 
         return solid == null

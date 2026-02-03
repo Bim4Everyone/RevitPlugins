@@ -3,6 +3,7 @@ using Autodesk.Revit.DB;
 using dosymep.WPF.ViewModels;
 
 namespace RevitBuildCoordVolumes.ViewModels;
+
 internal class LevelViewModel : BaseViewModel {
     private string _name;
     private bool _isChecked;

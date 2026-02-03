@@ -2,12 +2,116 @@
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
                     xmlns:system="clr-namespace:System;assembly=mscorlib">
 
-    <!-- Пример перевода на английский американский язык (google translate) -->
-
-    <system:String x:Key="MainWindow.Title">Sample command</system:String>
-    <system:String x:Key="MainWindow.Hello">Hello Revit!</system:String>
-    <system:String x:Key="MainWindow.HelloCheck">Enter a value for the property to save.</system:String>
-
-    <system:String x:Key="MainWindow.ButtonOk">OK</system:String>
+    <system:String x:Key="MainWindow.Title">Build CMR Volumes</system:String>
+    <system:String x:Key="MainWindow.CommonSettings">General settings</system:String>
+    <system:String x:Key="MainWindow.SlabBasedAlgorythmSettings">Slab-Based algorithm settings</system:String>
+    <system:String x:Key="MainWindow.ButtonCheckArea">Check zones</system:String>
+    <system:String x:Key="MainWindow.ButtonOk">Build</system:String>
     <system:String x:Key="MainWindow.ButtonCancel">Cancel</system:String>
+
+    <system:String x:Key="CommonSettingsEditControl.TypeAlgorithm">Algorithm type</system:String>
+    <system:String x:Key="CommonSettingsEditControl.TypeAlgorithmDescription">Select the algorithm type for building volume elements</system:String>
+    <system:String x:Key="CommonSettingsEditControl.TypeZones">Zone type</system:String>
+    <system:String x:Key="CommonSettingsEditControl.TypeZonesDescription">Select the zone type for building volume elements</system:String>
+    <system:String x:Key="CommonSettingsEditControl.Params">CMR parameters</system:String>
+    <system:String x:Key="CommonSettingsEditControl.ParamsDescription">Select CMR parameters for reading and writing</system:String>
+    <system:String x:Key="CommonSettingsEditControl.ParamWarningTooltip">Some parameters contain errors</system:String>
+
+    <system:String x:Key="ParamControl.ParamsToggleSwitchOn">Use parameter</system:String>
+    <system:String x:Key="ParamControl.ParamsToggleSwitchOff">Do not use parameter</system:String>
+    <system:String x:Key="ParamControl.SourceParamHeader">Zone parameter</system:String>
+    <system:String x:Key="ParamControl.TargetParamHeader">Volume element parameter</system:String>
+
+    <system:String x:Key="SlabBasedSettingEditControl.BuilderMode">Algorithm builder mode</system:String>
+    <system:String x:Key="SlabBasedSettingEditControl.BuilderModeDescription">Select the slab-based algorithm builder mode</system:String>
+
+    <system:String x:Key="SlabBasedSettingEditControl.SourceFiles">Source files</system:String>
+    <system:String x:Key="SlabBasedSettingEditControl.SourceFilesDescription">Files containing floor slabs</system:String>
+    <system:String x:Key="SlabBasedSettingEditControl.SearchTextDocs">Search by file name</system:String>
+
+    <system:String x:Key="SlabBasedSettingEditControl.TypeSlabs">Slab types</system:String>
+    <system:String x:Key="SlabBasedSettingEditControl.TypeSlabsDescription">Slab types used to define the base</system:String>
+    <system:String x:Key="SlabBasedSettingEditControl.SearchTextSlabs">Search by type name</system:String>
+
+    <system:String x:Key="SlabBasedSettingEditControl.Levels">Slab levels</system:String>
+    <system:String x:Key="SlabBasedSettingEditControl.LevelsDescription">Slab levels used to define the base</system:String>
+    <system:String x:Key="SlabBasedSettingEditControl.CheckedAllLevels">Select all levels</system:String>
+    <system:String x:Key="SlabBasedSettingEditControl.NotCheckedAllLevels">Clear level selection</system:String>
+    <system:String x:Key="SlabBasedSettingEditControl.SearchTextLevels">Search by level name</system:String>
+    
+
+    <system:String x:Key="SlabBasedSettingEditControl.SquareSide">Square side length (mm)</system:String>
+    <system:String x:Key="SlabBasedSettingEditControl.SquareSideDescription">The zone is divided into a grid of squares with the specified side length</system:String>
+    <system:String x:Key="SlabBasedSettingEditControl.SquareSideTooltip">Affects performance and accuracy. Smaller values reduce performance but increase accuracy</system:String>
+
+    <system:String x:Key="SlabBasedSettingEditControl.SquareAngle">Square rotation angle (degrees)</system:String>
+    <system:String x:Key="SlabBasedSettingEditControl.SquareAngleDescription">The square grid is rotated by the specified angle</system:String>
+    <system:String x:Key="SlabBasedSettingEditControl.SquareAngleTooltip">Left rotation is positive, right rotation is negative</system:String>
+
+    <system:String x:Key="CommonSettingViewModel.SlabBasedAlgorithm">Slab-Based (Automatic)</system:String>
+    <system:String x:Key="CommonSettingViewModel.ParamBasedAlgorithm">Parameter-Based (Bottom and Top)</system:String>
+    <system:String x:Key="CommonSettingViewModel.DescriptionParamDescription">Zone type parameter</system:String>
+    <system:String x:Key="CommonSettingViewModel.DescriptionParamDetailDescription">Used to determine the zone type</system:String>
+    <system:String x:Key="CommonSettingViewModel.BlockParamDescription">CMR block parameter</system:String>
+    <system:String x:Key="CommonSettingViewModel.BlockParamDetailDescription">Used to determine the building block</system:String>
+    <system:String x:Key="CommonSettingViewModel.SectionParamDescription">CMR section parameter</system:String>
+    <system:String x:Key="CommonSettingViewModel.SectionParamDetailDescription">Used to determine the building section</system:String>
+    <system:String x:Key="CommonSettingViewModel.FloorParamDescription">CMR floor parameter</system:String>
+    <system:String x:Key="CommonSettingViewModel.FloorParamDetailDescription">Used to determine the building floor</system:String>
+    <system:String x:Key="CommonSettingViewModel.FloorDEParamDescription">Additional CMR floor parameter</system:String>
+    <system:String x:Key="CommonSettingViewModel.FloorDEParamDetailDescription">Used to determine the building floor</system:String>
+    <system:String x:Key="CommonSettingViewModel.ZoneParamDescription">CMR zone parameter</system:String>
+    <system:String x:Key="CommonSettingViewModel.ZoneParamDetailDescription">Used to determine the CMR zone</system:String>
+    <system:String x:Key="CommonSettingViewModel.BottomZoneParamDescription">CMR bottom parameter</system:String>
+    <system:String x:Key="CommonSettingViewModel.BottomZoneParamDetailDescription">Used to build a simple volume</system:String>
+    <system:String x:Key="CommonSettingViewModel.TopZoneParamDescription">CMR Top Parameter</system:String>
+    <system:String x:Key="CommonSettingViewModel.TopZoneParamDetailDescription">Used to build a simple volume</system:String>
+    <system:String x:Key="CommonSettingViewModel.VolumeParamDescription">CMR volume parameter</system:String>
+    <system:String x:Key="CommonSettingViewModel.VolumeParamDetailDescription">Used to calculate volume</system:String>
+
+    <system:String x:Key="SlabBasedSettingViewModel.AutomaticBuilder">Automatic selection by slab</system:String>
+    <system:String x:Key="SlabBasedSettingViewModel.ContourBuilder">Square extrusion with merging</system:String>
+    <system:String x:Key="SlabBasedSettingViewModel.ColumnBuilder">Square extrusion without merging</system:String>
+
+    <system:String x:Key="MainViewModel.RequiredCheckArea">Zone check required</system:String>
+    <system:String x:Key="MainViewModel.NoMainParam">Zone type parameter must be enabled</system:String>
+    <system:String x:Key="MainViewModel.NoBottomZoneParam">Bottom CMR parameter is required for this algorithm</system:String>
+    <system:String x:Key="MainViewModel.NoTopZoneParam">Top CMR parameter is required for this algorithm</system:String>
+    <system:String x:Key="MainViewModel.NoVolumeParam">CMR volume parameter is required</system:String>
+    <system:String x:Key="MainViewModel.NoDocuments">No slab files selected</system:String>
+    <system:String x:Key="MainViewModel.NoParams">No parameters selected</system:String>
+    <system:String x:Key="MainViewModel.NoSlabs">No floor slabs selected</system:String>
+    <system:String x:Key="MainViewModel.NoLevels">No slab levels selected</system:String>
+    <system:String x:Key="MainViewModel.NoTypeZone">No zone type selected</system:String>
+    <system:String x:Key="MainViewModel.ErrorParams">Some parameters are missing</system:String>
+    <system:String x:Key="MainViewModel.SquareValueNoDouble">Input must be a number</system:String>
+    <system:String x:Key="MainViewModel.SquareSideNoNegate">Input must be positive</system:String>
+    <system:String x:Key="MainViewModel.SquareSideBig">Input must not exceed 1000 mm</system:String>
+    <system:String x:Key="MainViewModel.SquareSideSmall">Input must not be less than 10 mm</system:String>
+    <system:String x:Key="MainViewModel.ProgressTitle">Building volumes... [{0}]\[{1}]</system:String>
+
+    <system:String x:Key="ParamViewModel.WarningStartString">Missing parameters:</system:String>
+    <system:String x:Key="DocumentViewModel.CurrentFile">Current file (open)</system:String>
+
+    <system:String x:Key="BuildCoordVolumesProcessor.TransactionName">Build CMR volumes</system:String>
+
+    <system:String x:Key="Common.ParamErrorMessageBody">Parameter loading error</system:String>
+    <system:String x:Key="Common.ConfigErrorMessageTitle">Plugin configuration error</system:String>
+
+    <system:String x:Key="SystemPluginConfig.SlopeLineName">Slope Arrow</system:String>
+
+    <system:String x:Key="WarningWindow.Title">Warnings</system:String>
+    <system:String x:Key="WarningWindow.ElementIdHeader">Zone ID</system:String>
+    <system:String x:Key="WarningWindow.NameHeader">Zone Name</system:String>
+    <system:String x:Key="WarningWindow.LevelNameHeader">Zone Level</system:String>
+    <system:String x:Key="WarningWindow.DescriptionHeader">Zone Description</system:String>
+
+    <system:String x:Key="WarningsViewModel.Redundant">Redundant zones</system:String>
+    <system:String x:Key="WarningsViewModel.RedundantDescription">Zones located within the same enclosed area</system:String>
+    <system:String x:Key="WarningsViewModel.NotEnclosed">Not enclosed / Not placed zones</system:String>
+    <system:String x:Key="WarningsViewModel.NotEnclosedDescription">Zones without boundaries or not placed in the plan</system:String>
+    <system:String x:Key="WarningsViewModel.BrokenContour">Zones with broken contours</system:String>
+    <system:String x:Key="WarningsViewModel.BrokenContourDescription">Zones with broken contours (should be bounded by separators)</system:String>
+    <system:String x:Key="WarningsViewModel.NotFilledParam">Zones with unfilled parameters</system:String>
+    <system:String x:Key="WarningsViewModel.NotFilledParamDescription">Zones missing parameters required for building</system:String>
 </ResourceDictionary>

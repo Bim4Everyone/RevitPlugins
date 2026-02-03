@@ -5,6 +5,7 @@ using Autodesk.Revit.DB;
 using RevitBuildCoordVolumes.Models.Interfaces;
 
 namespace RevitBuildCoordVolumes.Models.Services;
+
 internal class CategoryAvailabilityService : ICategoryAvailabilityService {
     private readonly Dictionary<string, HashSet<ElementId>> _paramToCategories = [];
 
@@ -17,6 +18,7 @@ internal class CategoryAvailabilityService : ICategoryAvailabilityService {
             && cats.Contains(category.Id);
     }
 
+    // Метод построение кэша документов
     private void BuildCache(Document doc) {
         var bindingMap = doc.ParameterBindings;
         var it = bindingMap.ForwardIterator();

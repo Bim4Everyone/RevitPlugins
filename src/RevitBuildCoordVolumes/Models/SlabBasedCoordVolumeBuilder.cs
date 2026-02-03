@@ -9,6 +9,7 @@ using RevitBuildCoordVolumes.Models.Interfaces;
 using RevitBuildCoordVolumes.Models.Settings;
 
 namespace RevitBuildCoordVolumes.Models;
+
 internal class SlabBasedCoordVolumeBuilder : ICoordVolumeBuilder {
     private readonly ISpatialElementDividerService _spatialElementDividerService;
     private readonly ISlabNormalizeService _slabNormalizeService;
@@ -78,7 +79,7 @@ internal class SlabBasedCoordVolumeBuilder : ICoordVolumeBuilder {
         return geomObjects;
     }
 
-    // Метод получения всех плит без отверстий (для плоских)
+    // Метод получения всех перекрытий без отверстий и вырезов (для плоских)
     private List<SlabElement> GetNormalizeSlabs(List<SlabElement> slabElements) {
         foreach(var slab in slabElements) {
             var topFaces = _slabNormalizeService.GetTopFaces(slab);

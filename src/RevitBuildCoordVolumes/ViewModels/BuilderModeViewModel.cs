@@ -3,6 +3,7 @@ using dosymep.WPF.ViewModels;
 using RevitBuildCoordVolumes.Models.Enums;
 
 namespace RevitBuildCoordVolumes.ViewModels;
+
 internal class BuilderModeViewModel : BaseViewModel {
     private string _name;
 

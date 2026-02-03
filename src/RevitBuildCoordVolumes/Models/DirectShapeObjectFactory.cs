@@ -6,6 +6,7 @@ using RevitBuildCoordVolumes.Models.Geometry;
 using RevitBuildCoordVolumes.Models.Interfaces;
 
 namespace RevitBuildCoordVolumes.Models;
+
 internal class DirectShapeObjectFactory : IDirectShapeObjectFactory {
     private readonly SystemPluginConfig _systemPluginConfig;
 
@@ -24,6 +25,7 @@ internal class DirectShapeObjectFactory : IDirectShapeObjectFactory {
         return directShapeElements;
     }
 
+    // Метод построения DirectShapeObject
     private DirectShapeObject GetDirectShapeObject(GeomObject geomObject, RevitRepository revitRepository) {
         var geometryObjects = geomObject.GeometryObjects;
         var directShape = DirectShape.CreateElement(revitRepository.Document, _systemPluginConfig.ElementIdDirectShape);

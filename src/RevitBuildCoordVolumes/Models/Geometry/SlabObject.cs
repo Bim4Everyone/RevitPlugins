@@ -1,6 +1,7 @@
 using System;
 
 namespace RevitBuildCoordVolumes.Models.Geometry;
+
 internal class SlabObject {
     public double Position { get; set; }
     public string FloorName { get; set; }

@@ -16,6 +16,7 @@ using dosymep.WpfUI.Core.Ninject;
 using Ninject;
 
 using RevitBuildCoordVolumes.Models;
+using RevitBuildCoordVolumes.Models.Interfaces;
 using RevitBuildCoordVolumes.Models.Services;
 using RevitBuildCoordVolumes.ViewModels;
 using RevitBuildCoordVolumes.Views;
@@ -59,6 +60,11 @@ public class RevitBuildCoordVolumesCommand : BasePluginCommand {
             .ToSelf()
             .InSingletonScope();
 
+        // Создание сервиса по управлению окнами
+        kernel.Bind<IWindowService>()
+            .To<WindowService>()
+            .InSingletonScope();
+
         // Создание сервисов
         kernel.Bind<BuildCoordVolumeServices>()
             .ToSelf()
@@ -75,6 +81,9 @@ public class RevitBuildCoordVolumesCommand : BasePluginCommand {
 
         // Настройка запуска окна
         kernel.BindMainWindow<MainViewModel, MainWindow>();
+
+        // Настройка запуска окна предупреждений
+        kernel.BindOtherWindow<WarningsViewModel, WarningsWindow>();
 
         // Настройка локализации,
         // получение имени сборки откуда брать текст

@@ -10,8 +10,8 @@ using RevitBuildCoordVolumes.Models.Interfaces;
 using RevitBuildCoordVolumes.Models.Utilites;
 
 namespace RevitBuildCoordVolumes.Models.Services;
-internal class SlabNormalizeService : ISlabNormalizeService {
 
+internal class SlabNormalizeService : ISlabNormalizeService {
     public List<Face> GetTopFaces(SlabElement slabElement) {
         var floor = slabElement.Floor;
         var transform = slabElement.Transform;
@@ -53,17 +53,20 @@ internal class SlabNormalizeService : ISlabNormalizeService {
         }
     }
 
+    // Метод определения входит ли значение нормали Face в заданный диапазон
     private bool IsFaceNormalWithinZRange(Face face, double minValue, double maxValue) {
         double normalZ = face.ComputeNormal(new UV(0.5, 0.5)).Normalize().Z;
         return normalZ > minValue && normalZ <= maxValue;
     }
 
+    // Метод построения внешних контуров
     private List<CurveLoop> GetOuterContours(CurveArrArray curveArrArray, List<Face> topFaces, Transform linkTransform) {
         var outerContours = ExtractOuterCurveArrays(curveArrArray);
         double maxZ = GetTopFacesMaxZ(topFaces);
         return BuildCurveLoops(outerContours, linkTransform, maxZ);
     }
 
+    // Метод получения внешних контуров (исключение внутренних)
     private List<CurveArray> ExtractOuterCurveArrays(CurveArrArray curveArrArray) {
         var outerContours = new List<CurveArray>();
 
@@ -79,19 +82,7 @@ internal class SlabNormalizeService : ISlabNormalizeService {
         return outerContours;
     }
 
-    private bool IsInsideAnyOtherLoop(XYZ point, CurveArrArray allLoops, int currentIndex) {
-        for(int j = 0; j < allLoops.Size; j++) {
-            if(j == currentIndex) {
-                continue;
-            }
-
-            if(IsPointInsideCurveArray(point, allLoops.get_Item(j))) {
-                return true;
-            }
-        }
-        return false;
-    }
-
+    // Метод получения самой верхней точки Face
     private double GetTopFacesMaxZ(List<Face> topFaces) {
         double maxZ = double.MinValue;
 
@@ -107,6 +98,7 @@ internal class SlabNormalizeService : ISlabNormalizeService {
         return maxZ;
     }
 
+    // Метод получения самой верхней точки EdgeArray
     private double GetEdgeLoopZ(EdgeArray edgeArray) {
         var enumerator = edgeArray.GetEnumerator();
         try {
@@ -121,6 +113,7 @@ internal class SlabNormalizeService : ISlabNormalizeService {
         return double.MinValue;
     }
 
+    // Метод построения контура
     private List<CurveLoop> BuildCurveLoops(
     List<CurveArray> outerContours,
     Transform linkTransform,
@@ -142,6 +135,7 @@ internal class SlabNormalizeService : ISlabNormalizeService {
         return result;
     }
 
+    // Метод построения трансформированных кривых
     private List<Curve> TransformAndProjectCurves(
     CurveArray curveArray,
     Transform transform,
@@ -164,6 +158,21 @@ internal class SlabNormalizeService : ISlabNormalizeService {
         return curves;
     }
 
+    // Метод определения, является ли искомая точка внутри контура
+    private bool IsInsideAnyOtherLoop(XYZ point, CurveArrArray allLoops, int currentIndex) {
+        for(int j = 0; j < allLoops.Size; j++) {
+            if(j == currentIndex) {
+                continue;
+            }
+
+            if(IsPointInsideCurveArray(point, allLoops.get_Item(j))) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    // Метод проверки, является ли точка частью контура
     private bool IsPointInsideCurveArray(XYZ point3d, CurveArray curveArray) {
         List<XYZ> poly = [];
         foreach(Curve item in curveArray) {

@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
 using System.Windows.Input;
@@ -11,6 +12,7 @@ using dosymep.WPF.ViewModels;
 
 using RevitBuildCoordVolumes.Models;
 using RevitBuildCoordVolumes.Models.Enums;
+using RevitBuildCoordVolumes.Models.Geometry;
 using RevitBuildCoordVolumes.Models.Services;
 using RevitBuildCoordVolumes.Models.Settings;
 
@@ -88,6 +90,7 @@ internal class MainViewModel : BaseViewModel {
         RequiredCheckArea = true;
     }
 
+    // Метод подписанный на обновление CommonSettingViewModel
     private void OnCommonSettingsChanged(object sender, PropertyChangedEventArgs e) {
         switch(e.PropertyName) {
             case nameof(CommonSettingViewModel.TypeAlgorithms):
@@ -105,6 +108,7 @@ internal class MainViewModel : BaseViewModel {
         }
     }
 
+    // Метод подписанный на обновление SlabBasedSettingViewModel
     private void OnSlabBasedSettingsChanged(object sender, PropertyChangedEventArgs e) {
         if(!IsSlabBasedAlgorithm) {
             return;
@@ -134,10 +138,25 @@ internal class MainViewModel : BaseViewModel {
         UpdateRequiredCheckArea();
     }
 
+    // Метод получения всех зон
+    private List<SpatialObject> GetSpatialObjects() {
+        string areaType = _settings.TypeZone;
+        var areaTypeParam = _settings.ParamMaps.First().SourceParam;
+        return _revitRepository.GetSpatialObjects(areaType, areaTypeParam).ToList();
+    }
+
     // Метод проверки зон
     private void CheckArea() {
-        // реализация проверки зон
-        RequiredCheckArea = false;
+        SaveSettings();
+        _settings.SpatialObjects = GetSpatialObjects();
+        var warningElements = _services.SpatialElementCheckService.CheckSpatialObjects(_settings, _revitRepository);
+        if(!warningElements.Any()) {
+            RequiredCheckArea = false;
+            return;
+        }
+        SaveConfig();
+        _services.WindowService.CloseMainWindow();
+        _services.WindowService.ShowWarningWindow(warningElements);
     }
 
     // Метод проверки возможности выполнения метода проверки зон
@@ -149,10 +168,13 @@ internal class MainViewModel : BaseViewModel {
 
     //Основной метод
     private void AcceptView() {
+
+        SaveSettings();
         SaveConfig();
+
         var processor = new BuildCoordVolumesProcessor(_revitRepository, _settings, _services);
 
-        int count = processor.SpatialObjects.Count;
+        int count = _settings.SpatialObjects.Count;
         using var progressDialogService = ProgressDialogFactory.CreateDialog();
         var progress = progressDialogService.CreateProgress();
         var ct = progressDialogService.CreateCancellationToken();
@@ -266,7 +288,7 @@ internal class MainViewModel : BaseViewModel {
             configSettings = projectConfig.ConfigSettings;
         }
         var documents = configSettings.Documents.Count == 0
-            ? _revitRepository.GetAllDocuments().ToList()
+            ? []
             : configSettings.Documents
                 .Select(_revitRepository.FindDocumentsByName)
                 .Where(doc => doc != null)
@@ -290,8 +312,8 @@ internal class MainViewModel : BaseViewModel {
         };
     }
 
-    // Метод сохранения конфигурации пользователя и основных настроек программы
-    private void SaveConfig() {
+    // Метод сохранения настроек
+    private void SaveSettings() {
         var algorithmType = CommonSettingViewModel.SelectedTypeAlgorithm.AlgorithmType;
         string typeZone = CommonSettingViewModel.SelectedTypeZone.Name;
         var paramMaps = CommonSettingViewModel.Params.Where(vm => vm.IsChecked).Select(vm => vm.ParamMap).ToList();
@@ -311,16 +333,19 @@ internal class MainViewModel : BaseViewModel {
         _settings.Levels = levels;
         _settings.SquareSideMm = squareSide;
         _settings.SquareAngleDeg = squareAngle;
+    }
 
+    // Метод сохранения конфигурации пользователя
+    private void SaveConfig() {
         var configSettings = new ConfigSettings {
-            AlgorithmType = algorithmType,
-            BuilderMode = builderMode,
-            Documents = documents.Select(doc => doc.GetUniqId()).ToList(),
-            TypeZone = typeZone,
-            ParamMaps = paramMaps,
-            TypeSlabs = typeSlabs,
-            SquareSideMm = squareSide,
-            SquareAngleDeg = squareAngle
+            AlgorithmType = _settings.AlgorithmType,
+            BuilderMode = _settings.BuilderMode,
+            Documents = _settings.Documents.Select(doc => doc.GetUniqId()).ToList(),
+            TypeZone = _settings.TypeZone,
+            ParamMaps = _settings.ParamMaps,
+            TypeSlabs = _settings.TypeSlabs,
+            SquareSideMm = _settings.SquareSideMm,
+            SquareAngleDeg = _settings.SquareAngleDeg
         };
 
         var setting = _pluginConfig.GetSettings(_revitRepository.Document)

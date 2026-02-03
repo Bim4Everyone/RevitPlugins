@@ -14,7 +14,6 @@ internal class DocumentService : IDocumentService {
         BuildDocumentsDictionary(mainDocument);
     }
 
-    // Метод поиска документа в словаре имени
     public Document GetDocumentByName(string name) {
         if(string.IsNullOrWhiteSpace(name)) {
             return null;
@@ -25,7 +24,6 @@ internal class DocumentService : IDocumentService {
         return foundDoc ?? null;
     }
 
-    // Метод поиска трансформации в словаре по имени
     public Transform GetTransformByName(string name) {
         if(string.IsNullOrWhiteSpace(name)) {
             return null;
@@ -36,7 +34,6 @@ internal class DocumentService : IDocumentService {
         return foundTrans ?? null;
     }
 
-    // Метод получения всех документов из словаря
     public IEnumerable<Document> GetAllDocuments() {
         return _documentsByName.Values
             .Select(cort => cort.Item1);

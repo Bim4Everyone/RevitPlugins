@@ -192,6 +192,9 @@ internal class SystemPluginConfig {
             .ToList();
     }
 
+    /// <summary>
+    /// Метод получения всех параметров для загрузки в проект
+    /// </summary>
     public List<RevitParam> GetAllParameters() {
         return _advancedParamMaps.Concat(_simpleParamMaps)
             .Select(pm => pm.SourceParam ?? pm.TargetParam)

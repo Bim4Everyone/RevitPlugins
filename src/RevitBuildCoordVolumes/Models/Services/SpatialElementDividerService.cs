@@ -11,27 +11,32 @@ using RevitBuildCoordVolumes.Models.Utilites;
 namespace RevitBuildCoordVolumes.Models.Services;
 
 internal class SpatialElementDividerService : ISpatialElementDividerService {
-    public List<PolygonObject> DivideSpatialElement(SpatialElement spatialElement, double side, double angleRad) {
-        var opt = new SpatialElementBoundaryOptions();
-        var loops = spatialElement.GetBoundarySegments(opt);
+    private readonly IContourService _contourService;
 
-        if(loops == null || loops.Count == 0) {
+    public SpatialElementDividerService(IContourService contourService) {
+        _contourService = contourService;
+    }
+
+    public List<PolygonObject> DivideSpatialElement(SpatialElement spatialElement, double side, double angleDeg) {
+        var contour = _contourService.GetOuterContour(spatialElement);
+
+        if(contour.Count == 0) {
             return [];
         }
 
-        var contour = loops[0]
-            .Select(s => s.GetCurve().GetEndPoint(0))
+        var contourDots = contour
+            .Select(curve => curve.GetEndPoint(0))
             .ToList();
 
-        double minX = contour.Min(p => p.X);
-        double maxX = contour.Max(p => p.X);
-        double minY = contour.Min(p => p.Y);
-        double maxY = contour.Max(p => p.Y);
+        double minX = contourDots.Min(p => p.X);
+        double maxX = contourDots.Max(p => p.X);
+        double minY = contourDots.Min(p => p.Y);
+        double maxY = contourDots.Max(p => p.Y);
 
         var origin = new XYZ((minX + maxX) / 2, (minY + maxY) / 2, 0);
 
-        var ux = new XYZ(Math.Cos(angleRad), Math.Sin(angleRad), 0);
-        var uy = new XYZ(-Math.Sin(angleRad), Math.Cos(angleRad), 0);
+        var ux = new XYZ(Math.Cos(angleDeg), Math.Sin(angleDeg), 0);
+        var uy = new XYZ(-Math.Sin(angleDeg), Math.Cos(angleDeg), 0);
 
         double halfWidth = (maxX - minX) / 2;
         double halfHeight = (maxY - minY) / 2;
@@ -51,16 +56,16 @@ internal class SpatialElementDividerService : ISpatialElementDividerService {
                 var p3 = basePoint + ux * side + uy * side;
                 var p4 = basePoint + uy * side;
 
-                if(!GeometryUtility.IsPointInsidePolygon(p1, contour)
-                    || !GeometryUtility.IsPointInsidePolygon(p2, contour)
-                    || !GeometryUtility.IsPointInsidePolygon(p3, contour)
-                    || !GeometryUtility.IsPointInsidePolygon(p4, contour)) {
+                if(!GeometryUtility.IsPointInsidePolygon(p1, contourDots)
+                    || !GeometryUtility.IsPointInsidePolygon(p2, contourDots)
+                    || !GeometryUtility.IsPointInsidePolygon(p3, contourDots)
+                    || !GeometryUtility.IsPointInsidePolygon(p4, contourDots)) {
                     continue;
                 }
 
                 var center = (p1 + p3) / 2;
 
-                if(!GeometryUtility.IsPointInsidePolygon(center, contour)) {
+                if(!GeometryUtility.IsPointInsidePolygon(center, contourDots)) {
                     continue;
                 }
 

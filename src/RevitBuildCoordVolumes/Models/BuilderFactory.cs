@@ -4,6 +4,7 @@ using RevitBuildCoordVolumes.Models.Services;
 using RevitBuildCoordVolumes.Models.Settings;
 
 namespace RevitBuildCoordVolumes.Models;
+
 internal sealed class BuilderFactory {
     private readonly RevitRepository _revitRepository;
     private readonly BuildCoordVolumeServices _services;
@@ -17,7 +18,16 @@ internal sealed class BuilderFactory {
         _settings = settings;
         _services = services;
     }
-
+    /// <summary>
+    /// Метод создания билдеров ICoordVolumeBuilder.
+    /// </summary>
+    /// <remarks>
+    /// В данном методе создаются билдеры, исходя из выбранного пользователем алгоритма.
+    /// </remarks>
+    /// <param name="algorithmType">Тип алгоритма.</param>
+    /// <returns>
+    /// ICoordVolumeBuilder.
+    /// </returns>
     public ICoordVolumeBuilder Create(AlgorithmType algorithmType) {
         return algorithmType == AlgorithmType.SlabBasedAlgorithm
             ? new SlabBasedCoordVolumeBuilder(

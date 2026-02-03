@@ -1,6 +1,7 @@
 using System;
 
 namespace RevitBuildCoordVolumes.Models.Geometry;
+
 internal class ColumnObject {
     public PolygonObject PolygonObject { get; set; }
     public string FloorName { get; set; }

@@ -7,6 +7,7 @@ using RevitBuildCoordVolumes.Models.Geometry;
 using RevitBuildCoordVolumes.Models.Interfaces;
 
 namespace RevitBuildCoordVolumes.Models;
+
 internal class ColumnFactory : IColumnFactory {
     // Длина линии для пресечения, примерно 100 этажей
     private const double _rayHeight = 1000;
@@ -19,6 +20,7 @@ internal class ColumnFactory : IColumnFactory {
             .GroupBy(col => col.StartSlabGuid.ToString() + "_" + col.FinishSlabGuid.ToString());
     }
 
+    // Метод генерации колонн
     private List<ColumnObject> GetColumns(List<PolygonObject> polygons, List<SlabElement> slabs) {
         if(polygons.Count == 0 || slabs.Count < 2) {
             return [];

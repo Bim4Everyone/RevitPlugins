@@ -7,6 +7,7 @@ using RevitBuildCoordVolumes.Models.Interfaces;
 using RevitBuildCoordVolumes.Models.Settings;
 
 namespace RevitBuildCoordVolumes.Models;
+
 internal class ParamBasedCoordVolumeBuilder : ICoordVolumeBuilder {
     private readonly IGeomObjectFactory _geomElementFactory;
     private readonly RevitRepository _revitRepository;
@@ -35,7 +36,13 @@ internal class ParamBasedCoordVolumeBuilder : ICoordVolumeBuilder {
         double topPosition = _revitRepository.GetPositionInFeet(spatialElement, topZoneParam.Name);
         double bottomPosition = _revitRepository.GetPositionInFeet(spatialElement, bottomZoneParam.Name);
 
-        var listGeomObjects = _geomElementFactory.GetSimpleGeomObjects(spatialElement, bottomPosition, topPosition);
+        double basePointOffset = _revitRepository.GetBasePointOffset();
+
+        var listGeomObjects = _geomElementFactory.GetSimpleGeomObjects(
+            spatialElement,
+            bottomPosition,
+            topPosition,
+            basePointOffset);
 
         return listGeomObjects.Count > 0
             ? listGeomObjects

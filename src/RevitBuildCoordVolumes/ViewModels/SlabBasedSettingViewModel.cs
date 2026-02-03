@@ -16,6 +16,7 @@ using RevitBuildCoordVolumes.Models.Services;
 using RevitBuildCoordVolumes.Models.Settings;
 
 namespace RevitBuildCoordVolumes.ViewModels;
+
 internal class SlabBasedSettingViewModel : BaseViewModel {
     private readonly SystemPluginConfig _systemPluginConfig;
     private readonly RevitRepository _revitRepository;
@@ -193,17 +194,24 @@ internal class SlabBasedSettingViewModel : BaseViewModel {
     // Метод получения коллекции SlabViewModel для Slabs
     private IEnumerable<SlabViewModel> GetSlabViewModels() {
         var documents = FilteredDocuments.Where(vm => vm.IsChecked).Select(vm => vm.Document);
-        var allSlabs = _revitRepository.GetTypeSlabsByDocs(documents);
-        var savedSlabs = _settings.TypeSlabs;
-        return !allSlabs.Any()
-            ? []
-            : allSlabs
-                .Select(slabType => new SlabViewModel {
-                    Name = slabType,
-                    IsChecked = savedSlabs.Contains(slabType),
-                })
-                .OrderByDescending(vm => _systemPluginConfig.DefaultSlabTypeNames.Any(part => vm.Name.Contains(part)))
-                .ThenBy(vm => vm.Name);
+        var allSlabs = _revitRepository.GetTypeSlabsByDocs(documents)?.ToList() ?? [];
+        if(!allSlabs.Any()) {
+            return [];
+        }
+        var savedSlabs = _settings.TypeSlabs?.ToHashSet() ?? [];
+        var defaultNames = _systemPluginConfig.DefaultSlabTypeNames ?? [];
+
+        bool hasSaved = savedSlabs.Any();
+
+        return allSlabs
+            .Select(slabType => new SlabViewModel {
+                Name = slabType,
+                IsChecked = hasSaved
+                    ? savedSlabs.Contains(slabType)
+                    : defaultNames.Any(def => slabType.Contains(def))
+            })
+            .OrderByDescending(vm => defaultNames.Any(def => vm.Name.Contains(def)))
+            .ThenBy(vm => vm.Name);
     }
 
     // Метод для реализации поиска в документах

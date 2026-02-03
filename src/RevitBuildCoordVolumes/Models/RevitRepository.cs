@@ -88,8 +88,17 @@ internal class RevitRepository {
     /// </summary>
     public IEnumerable<SpatialObject> GetSpatialObjects(string areaType, RevitParam revitParam) {
         return GetSpatialElements()
-            .Select(spatialElement => new SpatialObject { SpatialElement = spatialElement })
-            .Where(spatialObject => areaType.Equals(spatialObject.SpatialElement.GetParamValueOrDefault<string>(revitParam.Name)));
+            .Select(spatialElement => {
+                string levelName = GetLevelName(spatialElement);
+                string description = GetDescription(spatialElement, revitParam);
+                return new SpatialObject {
+                    SpatialElement = spatialElement,
+                    LevelName = levelName,
+                    Description = description
+                };
+            })
+            .Where(spatialObject => areaType
+                .Equals(spatialObject.SpatialElement.GetParamValueOrDefault<string>(revitParam.Name)));
     }
 
     /// <summary>
@@ -102,6 +111,28 @@ internal class RevitRepository {
             : double.NaN;
     }
 
+    /// <summary>
+    /// Метод выделения элементов в документе
+    /// </summary>
+    public void SetSelected(ElementId elementId) {
+        List<ElementId> listElements = [elementId];
+        ActiveUIDocument.SetSelectedElements(listElements);
+    }
+
+    /// <summary>
+    /// Метод получения смещения базовой точки
+    /// </summary>
+    public double GetBasePointOffset() {
+        var basePoint = new FilteredElementCollector(Document)
+            .OfCategory(BuiltInCategory.OST_ProjectBasePoint)
+            .WhereElementIsNotElementType()
+            .Cast<BasePoint>()
+            .FirstOrDefault();
+        return (basePoint == null)
+            ? 0
+            : basePoint.Position.Z;
+    }
+
     // Метод получения системных зон или помещений
     private IEnumerable<SpatialElement> GetSpatialElements() {
         return new FilteredElementCollector(Document)
@@ -109,6 +140,18 @@ internal class RevitRepository {
             .WhereElementIsNotElementType()
             .Cast<SpatialElement>()
             .Where(se => se is Area or Room);
+    }
+
+    // Метод получения имени уровня зоны
+    private string GetLevelName(SpatialElement spatialElement) {
+        var levelId = spatialElement.LevelId;
+        return Document.GetElement(levelId).Name;
+    }
+
+    // Метод получения описание зоны
+    private string GetDescription(SpatialElement spatialElement, RevitParam revitParam) {
+        string value = spatialElement.GetParamValueOrDefault<string>(revitParam.Name);
+        return value ?? string.Empty;
     }
 }
 
