@@ -4,8 +4,6 @@ using System.Globalization;
 using System.Reflection;
 using System.Text;
 
-using Autodesk.Revit.DB;
-
 using CodingSeb.ExpressionEvaluator;
 
 using dosymep.SimpleServices;
@@ -27,45 +25,11 @@ internal sealed class FormulaEvaluator {
 
     public double Evaluate(string formula, CalculationElementBase calcElement) {
         try {
-            // При необходимости проверок расчета включаем LogEvaluation и подаем туда айди элемента который проверяем
-            // LogEvaluation(formula, calcElement);
             return EvaluateInternal(formula, calcElement);
         } catch(Exception) {
             BuildDebugLog(calcElement, formula);
             throw;
         }
-    }
-
-    public void LogEvaluation(string formula, CalculationElementBase calcElement, int? elementIdInt = null) {
-        if(calcElement == null) {
-            return;
-        }
-
-        if(elementIdInt.HasValue && elementIdInt.Value != 0) {
-            ElementId elementId;
-#if REVIT_2024_OR_GREATER
-            elementId = new ElementId((long) elementIdInt.Value);
-#else
-            elementId = new ElementId(elementIdInt.Value);
-#endif
-
-            if(calcElement.Element.Id != elementId) {
-                return;
-            }
-        }
-
-        double result = EvaluateInternal(formula, calcElement);
-        string log = BuildDebugLogMessage(calcElement, formula, result);
-        Console.WriteLine(log);
-    }
-
-    public void LogEvaluation(string formula, CalculationElementBase calcElement, string elementIdText) {
-        int? elementId = null;
-        if(!string.IsNullOrWhiteSpace(elementIdText) && int.TryParse(elementIdText, out int parsed)) {
-            elementId = parsed;
-        }
-
-        LogEvaluation(formula, calcElement, elementId);
     }
 
     private double EvaluateInternal(string formula, CalculationElementBase calcElement) {
@@ -144,3 +108,4 @@ internal sealed class FormulaEvaluator {
         return logBuilder.ToString();
     }
 }
+
