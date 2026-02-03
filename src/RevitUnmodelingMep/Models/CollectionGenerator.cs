@@ -1,9 +1,5 @@
-using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows.Controls;
 
 using Autodesk.Revit.DB;
 using Autodesk.Revit.DB.Mechanical;
@@ -13,7 +9,6 @@ using dosymep.Bim4Everyone;
 using dosymep.Bim4Everyone.SharedParams;
 using dosymep.Revit;
 
-using static Microsoft.WindowsAPICodePack.Shell.PropertySystem.SystemProperties;
 
 namespace RevitUnmodelingMep.Models;
 
