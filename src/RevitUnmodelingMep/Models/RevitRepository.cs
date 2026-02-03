@@ -1,21 +1,19 @@
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading;
-using System.Windows;
 using System.Windows.Threading;
 
 using Autodesk.Revit.ApplicationServices;
 using Autodesk.Revit.DB;
 using Autodesk.Revit.UI;
 
-using dosymep.Bim4Everyone.SimpleServices;
 using dosymep.Revit;
 using dosymep.SimpleServices;
 using Newtonsoft.Json.Linq;
 
 using RevitUnmodelingMep.Models.Entities;
 using RevitUnmodelingMep.Models.Unmodeling;
+using RevitUnmodelingMep.ViewModels;
 
 using Application = Autodesk.Revit.ApplicationServices.Application;
 
@@ -63,78 +61,100 @@ internal class RevitRepository {
     }
 
     public void CalculateUnmodeling() {
+        int totalRows;
+        var rowsByConfig = PrepareUnmodelingRows(null, CancellationToken.None, out totalRows);
+        CreateUnmodelingRows(rowsByConfig, totalRows, null, CancellationToken.None);
+    }
+
+    public void CalculateUnmodeling(Func<string, IProgressDialogService> createPercentProgressDialog) {
+        if(createPercentProgressDialog == null) {
+            CalculateUnmodeling();
+            return;
+        }
+
+        int totalRows;
+        List<List<NewRowElement>> rowsByConfig;
+
+        using(var dialog = createPercentProgressDialog("Repository.PrepareConfigsTitle")) {
+            var progress = dialog.CreateProgress();
+            var ct = dialog.CreateCancellationToken();
+            rowsByConfig = PrepareUnmodelingRows(progress, ct, out totalRows);
+        }
+
+        using(var dialog = createPercentProgressDialog("Repository.TransactionName")) {
+            var progress = dialog.CreateProgress();
+            var ct = dialog.CreateCancellationToken();
+            CreateUnmodelingRows(rowsByConfig, totalRows, progress, ct);
+        }
+    }
+
+    private List<List<NewRowElement>> PrepareUnmodelingRows(
+        IProgress<int> progress,
+        CancellationToken ct,
+        out int totalRows) {
+
         int lastIndex;
-        var configs = UnmodelingConfigReader.LoadUnmodelingConfigs(
+        IReadOnlyList<ConsumableTypeItem> configs = UnmodelingConfigReader.LoadUnmodelingConfigs(
             VisSettingsStorage,
             resolveCategoryOption: null,
             out lastIndex);
 
         var rowsByConfig = new List<List<NewRowElement>>();
-        int totalRows = 0;
-        using(IProgressDialogService dialog = ServicesProvider.GetPlatformService<IProgressDialogService>()) {
-            dialog.StepValue = 1;
-            dialog.DisplayTitleFormat =
-                $"{_localizationService.GetLocalizedString("Repository.PrepareConfigsTitle")} [{{0}}%]";
-            var progress = dialog.CreateProgress();
-            dialog.MaxValue = 100;
-            CancellationToken ct = dialog.CreateCancellationToken();
-            dialog.Show();
+        totalRows = 0;
 
-            var cache = new UnmodelingCalcCache();
-            int totalConfigs = configs.Count();
-            int preparedConfigs = 0;
-            foreach(var config in configs) {
-                ct.ThrowIfCancellationRequested();
-                PumpUi();
-                List<NewRowElement> newRowElements = Calculator.GetElementsToGenerate(config, cache);
-                rowsByConfig.Add(newRowElements);
-                totalRows += newRowElements.Count;
-                preparedConfigs++;
+        var cache = new UnmodelingCalcCache();
+        int totalConfigs = configs.Count;
+        int preparedConfigs = 0;
+        foreach(var config in configs) {
+            ct.ThrowIfCancellationRequested();
+            PumpUi();
+            List<NewRowElement> newRowElements = Calculator.GetElementsToGenerate(config, cache);
+            rowsByConfig.Add(newRowElements);
+            totalRows += newRowElements.Count;
+            preparedConfigs++;
 
-                if(totalConfigs > 0) {
-                    int percent = (int) System.Math.Floor(preparedConfigs * 100d / totalConfigs);
-                    progress.Report(percent);
-                }
+            if(totalConfigs > 0) {
+                int percent = (int) System.Math.Floor(preparedConfigs * 100d / totalConfigs);
+                progress?.Report(percent);
             }
         }
 
-        using(IProgressDialogService dialog = ServicesProvider.GetPlatformService<IProgressDialogService>()) {
-            dialog.StepValue = 1;
-            dialog.DisplayTitleFormat =
-                $"{_localizationService.GetLocalizedString("Repository.TransactionName")} [{{0}}%]";
-            var progress = dialog.CreateProgress();
-            dialog.MaxValue = 100;
-            CancellationToken ct = dialog.CreateCancellationToken();
-            dialog.Show();
+        return rowsByConfig;
+    }
 
-            using(var t = Doc.StartTransaction(_localizationService.GetLocalizedString("Repository.TransactionName"))) {
-                Creator.RemoveUnmodeling();
+    private void CreateUnmodelingRows(
+        IReadOnlyList<List<NewRowElement>> rowsByConfig,
+        int totalRows,
+        IProgress<int> progress,
+        CancellationToken ct) {
 
-                if(!Creator.Symbol.IsActive) {
-                    Creator.Symbol.Activate();
-                    Doc.Regenerate();
-                }
+        using(var t = Doc.StartTransaction(_localizationService.GetLocalizedString("Repository.TransactionName"))) {
+            Creator.RemoveUnmodeling();
 
-                int createdCount = 0;
-                int lastPercent = 0;
-                foreach(var newRowElements in rowsByConfig) {
-                    foreach(var newRowElement in newRowElements) {
-                        ct.ThrowIfCancellationRequested();
-                        Creator.CreateNewPosition(newRowElement);
+            if(!Creator.Symbol.IsActive) {
+                Creator.Symbol.Activate();
+                Doc.Regenerate();
+            }
 
-                        if(totalRows > 0) {
-                            createdCount++;
-                            int percent = (int) System.Math.Floor(createdCount * 100d / totalRows);
-                            if(percent > lastPercent) {
-                                lastPercent = percent;
-                                progress.Report(percent);
-                            }
+            int createdCount = 0;
+            int lastPercent = 0;
+            foreach(var newRowElements in rowsByConfig) {
+                foreach(var newRowElement in newRowElements) {
+                    ct.ThrowIfCancellationRequested();
+                    Creator.CreateNewPosition(newRowElement);
+
+                    if(totalRows > 0) {
+                        createdCount++;
+                        int percent = (int) System.Math.Floor(createdCount * 100d / totalRows);
+                        if(percent > lastPercent) {
+                            lastPercent = percent;
+                            progress?.Report(percent);
                         }
                     }
                 }
-
-                t.Commit();
             }
+
+            t.Commit();
         }
     }
 

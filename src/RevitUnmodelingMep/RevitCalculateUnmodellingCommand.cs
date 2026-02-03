@@ -70,8 +70,9 @@ namespace RevitUnmodelingMep {
             var servise = GetPlatformService<IMessageBoxService>();
             CheckDocument(uiApplication.ActiveUIDocument.Document, servise, localizationService);
 
+            var viewModel = kernel.Get<MainViewModel>();
             var repository = kernel.Get<RevitRepository>();
-            repository.CalculateUnmodeling();
+            repository.CalculateUnmodeling(viewModel.CreatePercentProgressDialog);
         }
 
         private void CheckDocument(
