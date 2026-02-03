@@ -18,11 +18,14 @@ internal class UnmodelingCalculator {
     private readonly FormulaEvaluator _formulaEvaluator;
     private readonly NoteGenerator _noteGenerator;
 
-    public UnmodelingCalculator(Document doc, ILocalizationService localizationService) {
+    public UnmodelingCalculator(
+        Document doc,
+        ILocalizationService localizationService,
+        IMessageBoxService messageBoxService) {
         var projectStockProvider = new ProjectStockProvider(doc);
         _calculationElementFactory = new CalculationElementFactory(doc, projectStockProvider);
         _draftRowsBuilder = new DraftRowsBuilder(doc, _calculationElementFactory, new PlaceholderReplacer());
-        _formulaEvaluator = new FormulaEvaluator(localizationService);
+        _formulaEvaluator = new FormulaEvaluator(localizationService, messageBoxService);
         _noteGenerator = new NoteGenerator();
     }
 

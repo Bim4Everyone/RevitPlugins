@@ -16,11 +16,13 @@ namespace RevitUnmodelingMep.Models.Unmodeling;
 
 internal sealed class FormulaEvaluator {
     private readonly ILocalizationService _localizationService;
+    public IMessageBoxService MessageBoxService { get; }
     private readonly Dictionary<Type, ExpressionEvaluator> _evaluators = new();
     private readonly Dictionary<Type, PropertyInfo[]> _propertiesByType = new();
 
-    public FormulaEvaluator(ILocalizationService localizationService) {
+    public FormulaEvaluator(ILocalizationService localizationService, IMessageBoxService messageBoxService) {
         _localizationService = localizationService;
+        MessageBoxService = messageBoxService;
     }
 
     public double Evaluate(string formula, CalculationElementBase calcElement) {
@@ -104,8 +106,7 @@ internal sealed class FormulaEvaluator {
     private void BuildDebugLog(CalculationElementBase calcElement, string formula) {
         string errorMessage = _localizationService.GetLocalizedString("UnmodelingCalculator.Error");
         string log = BuildDebugLogMessage(calcElement, formula, null, errorMessage);
-        Console.WriteLine(log);
-        throw new OperationCanceledException(errorMessage);
+        UserMessageException.Throw(MessageBoxService, errorMessage, log);
     }
 
     private string BuildDebugLogMessage(
@@ -140,7 +141,6 @@ internal sealed class FormulaEvaluator {
             logBuilder.AppendLine($"{property.Name} = {valueText}");
         }
 
-        logBuilder.AppendLine("__________________________________");
         return logBuilder.ToString();
     }
 }

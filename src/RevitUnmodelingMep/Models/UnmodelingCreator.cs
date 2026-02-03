@@ -18,6 +18,7 @@ using dosymep.Revit;
 using dosymep.SimpleServices;
 
 using RevitUnmodelingMep.Models.Entities;
+using RevitUnmodelingMep.Models.Unmodeling;
 
 
 #nullable enable
@@ -33,6 +34,7 @@ internal class UnmodelingCreator {
 
     private readonly Document _doc;
     private readonly ILocalizationService _localizationService;
+    public IMessageBoxService MessageBoxService { get; }
     private WorksetId? _ws_id;
     private FamilySymbol? _famylySymbol;
     private readonly string _libDir;
@@ -42,9 +44,13 @@ internal class UnmodelingCreator {
     private const double _coordinateStep = 0.001;
     private double _maxLocationY = 0;
 
-    public UnmodelingCreator(Document doc, ILocalizationService localizationService) {
+    public UnmodelingCreator(
+        Document doc,
+        ILocalizationService localizationService,
+        IMessageBoxService messageBoxService) {
         _doc = doc;
         _localizationService = localizationService;
+        MessageBoxService = messageBoxService;
         _libDir = GetLibFolder();
     }
 
@@ -80,8 +86,9 @@ internal class UnmodelingCreator {
         _famylySymbol = GetFamilySymbol();
 
         if(CheckSymbol(_famylySymbol) == false) {
-            MessageBox.Show(_localizationService.GetLocalizedString("UnmodelingCreator.FamilyOutdatedError"));
-            throw new OperationCanceledException();
+            string title = _localizationService.GetLocalizedString("MainWindow.Title");
+            string message = _localizationService.GetLocalizedString("UnmodelingCreator.FamilyOutdatedError");
+            UserMessageException.Throw(MessageBoxService, title, message);
         }
     }
 
