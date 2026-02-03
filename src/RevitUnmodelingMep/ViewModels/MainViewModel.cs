@@ -7,8 +7,6 @@ using System.Windows;
 using System.Windows.Input;
 using System.Text.RegularExpressions;
 
-using Microsoft.Win32;
-
 using dosymep.SimpleServices;
 using dosymep.WPF.Commands;
 using dosymep.WPF.ViewModels;
@@ -29,6 +27,8 @@ internal class MainViewModel : BaseViewModel {
     private readonly PluginConfig _pluginConfig;
     private readonly RevitRepository _revitRepository;
     private readonly ILocalizationService _localizationService;
+    private readonly IOpenFileDialogService _openFileDialogService;
+    private readonly ISaveFileDialogService _saveFileDialogService;
 
     private string _errorText;
     private string _saveProperty;
@@ -43,11 +43,15 @@ internal class MainViewModel : BaseViewModel {
     public MainViewModel(
         PluginConfig pluginConfig,
         RevitRepository revitRepository,
-        ILocalizationService localizationService) {
+        ILocalizationService localizationService,
+        IOpenFileDialogService openFileDialogService,
+        ISaveFileDialogService saveFileDialogService) {
         
         _pluginConfig = pluginConfig;
         _revitRepository = revitRepository;
         _localizationService = localizationService;
+        _openFileDialogService = openFileDialogService;
+        _saveFileDialogService = saveFileDialogService;
         _categoryOptions = CreateCategoryOptions();
 
         LoadViewCommand = RelayCommand.Create(LoadView);
@@ -238,16 +242,13 @@ internal class MainViewModel : BaseViewModel {
     }
 
     private void ImportConfigs() {
-        var dialog = new OpenFileDialog {
-            Filter = "JSON files (*.json)|*.json|All files (*.*)|*.*"
-        };
-
-        if(dialog.ShowDialog() != true) {
+        _openFileDialogService.Filter = "JSON files | *.json";
+        if(!_openFileDialogService.ShowDialog()) {
             return;
         }
 
         try {
-            string fileContent = File.ReadAllText(dialog.FileName);
+            string fileContent = File.ReadAllText(_openFileDialogService.File.FullName);
             JObject imported = JObject.Parse(fileContent);
             LoadConsumableTypesFromSettings(imported);
         } catch {
@@ -256,12 +257,13 @@ internal class MainViewModel : BaseViewModel {
     }
 
     private void ExportConfigs() {
-        var dialog = new SaveFileDialog {
-            Filter = "JSON files (*.json)|*.json|All files (*.*)|*.*",
-            FileName = "unmodeling_configs.json"
-        };
+        _saveFileDialogService.AddExtension = true;
+        _saveFileDialogService.Filter = "JSON files | *.json";
+        _saveFileDialogService.FilterIndex = 1;
 
-        if(dialog.ShowDialog() != true) {
+        if(!_saveFileDialogService.ShowDialog(
+            _saveFileDialogService.InitialDirectory,
+            "unmodeling_configs.json")) {
             return;
         }
 
@@ -269,7 +271,7 @@ internal class MainViewModel : BaseViewModel {
             [UnmodelingConfigReader.UnmodelingConfigKey] = BuildUnmodelingConfigs(),
             [_unmodelingSettingsKey] = BuildUnmodelingSettings()
         };
-        File.WriteAllText(dialog.FileName, exported.ToString());
+        File.WriteAllText(_saveFileDialogService.File.FullName, exported.ToString());
     }
 
     private void LoadConsumableTypesFromSettings(JObject settings) {
