@@ -2,8 +2,6 @@ using System;
 using System.Collections.Generic;
 using System.Text.RegularExpressions;
 
-using Newtonsoft.Json.Linq;
-
 using RevitUnmodelingMep.ViewModels;
 
 namespace RevitUnmodelingMep.Models;
@@ -20,12 +18,12 @@ internal static class UnmodelingConfigReader {
             throw new ArgumentNullException(nameof(settingsUpdater));
         }
 
-        JObject settings = settingsUpdater.GetUnmodelingConfig();
-        return GetConsumableItems(settings, resolveCategoryOption, out lastConfigIndex);
+        UnmodelingSettingsDocument settings = settingsUpdater.GetUnmodelingSettings();
+        return GetConsumableItems(settings?.UnmodelingConfig, resolveCategoryOption, out lastConfigIndex);
     }
 
     public static IReadOnlyList<ConsumableTypeItem> GetConsumableItems(
-        JObject settings,
+        IReadOnlyDictionary<string, UnmodelingConfigItem> settings,
         Func<string, CategoryOption> resolveCategoryOption,
         out int lastConfigIndex) {
 
@@ -35,18 +33,15 @@ internal static class UnmodelingConfigReader {
             return result;
         }
 
-        if(settings.TryGetValue(UnmodelingConfigKey, out JToken configToken)
-           && configToken is JObject configObj) {
-            foreach(JProperty property in configObj.Properties()) {
-                lastConfigIndex = UpdateConfigIndex(lastConfigIndex, property.Name);
+        foreach(var config in settings) {
+            lastConfigIndex = UpdateConfigIndex(lastConfigIndex, config.Key);
 
-                ConsumableTypeItem item = ConsumableTypeItem.FromConfig(property);
-                if(resolveCategoryOption != null) {
-                    item.SelectedCategory = resolveCategoryOption(item.CategoryId);
-                }
-
-                result.Add(item);
+            ConsumableTypeItem item = ConsumableTypeItem.FromConfig(config.Key, config.Value);
+            if(resolveCategoryOption != null) {
+                item.SelectedCategory = resolveCategoryOption(item.CategoryId);
             }
+
+            result.Add(item);
         }
 
         return result;

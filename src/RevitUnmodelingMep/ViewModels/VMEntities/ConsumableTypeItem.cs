@@ -1,6 +1,11 @@
+using System;
+using System.Collections.Generic;
+
 using dosymep.WPF.ViewModels;
 
-using Newtonsoft.Json.Linq;
+using pyRevitLabs.Json.Linq;
+
+using RevitUnmodelingMep.Models;
 
 namespace RevitUnmodelingMep.ViewModels;
 
@@ -95,6 +100,35 @@ internal class ConsumableTypeItem : BaseViewModel {
 
     public JObject RawConfig { get; set; } = new JObject();
 
+    public static ConsumableTypeItem FromConfig(string configKey, UnmodelingConfigItem config) {
+        config ??= new UnmodelingConfigItem();
+        var item = new ConsumableTypeItem {
+            ConfigKey = configKey,
+            Title = config.ConfigName,
+            ConsumableTypeName = config.ConfigName,
+            Name = config.Name,
+            CategoryId = config.Category,
+            Grouping = config.Group,
+            Mark = config.Mark,
+            Code = config.Code,
+            Unit = config.Unit,
+            Maker = config.Creator,
+            Formula = config.ValueFormula,
+            Note = config.NoteFormat,
+            RoundUpTotal = config.RoundUpTotal,
+            AssignedElementIds = new JArray(config.AssignedElementIds ?? new List<int>()),
+            RawConfig = new JObject()
+        };
+
+        if(config.ExtensionData != null) {
+            foreach(var kvp in config.ExtensionData) {
+                item.RawConfig[kvp.Key] = kvp.Value?.DeepClone();
+            }
+        }
+
+        return item;
+    }
+
     public static ConsumableTypeItem FromConfig(JProperty configProperty) {
         JObject value = configProperty.Value as JObject ?? new JObject();
         JObject clonedValue = (JObject) value.DeepClone();
@@ -139,5 +173,72 @@ internal class ConsumableTypeItem : BaseViewModel {
         result["ASSIGNED_ELEMENT_IDS"] = AssignedElementIds ?? new JArray();
 
         return result;
+    }
+
+    public UnmodelingConfigItem ToConfigItem() {
+        var result = new UnmodelingConfigItem {
+            ConfigName = ConsumableTypeName ?? string.Empty,
+            Name = Name ?? string.Empty,
+            Category = CategoryId ?? string.Empty,
+            Group = Grouping ?? string.Empty,
+            Mark = Mark ?? string.Empty,
+            Code = Code ?? string.Empty,
+            Unit = Unit ?? string.Empty,
+            Creator = Maker ?? string.Empty,
+            ValueFormula = Formula ?? string.Empty,
+            NoteFormat = Note ?? string.Empty,
+            RoundUpTotal = RoundUpTotal,
+            AssignedElementIds = ConvertAssignedElementIds()
+        };
+
+        if(RawConfig != null && RawConfig.HasValues) {
+            var extensionData = new Dictionary<string, JToken>(StringComparer.OrdinalIgnoreCase);
+            foreach(var property in RawConfig.Properties()) {
+                if(!IsStandardConfigKey(property.Name)) {
+                    extensionData[property.Name] = property.Value?.DeepClone();
+                }
+            }
+
+            if(extensionData.Count > 0) {
+                result.ExtensionData = extensionData;
+            }
+        }
+
+        return result;
+    }
+
+    private List<int> ConvertAssignedElementIds() {
+        var result = new List<int>();
+        if(AssignedElementIds == null) {
+            return result;
+        }
+
+        foreach(var token in AssignedElementIds) {
+            if(token != null && int.TryParse(token.ToString(), out int value)) {
+                result.Add(value);
+            }
+        }
+
+        return result;
+    }
+
+    private static bool IsStandardConfigKey(string key) {
+        switch(key) {
+            case "CONFIG_NAME":
+            case "NAME":
+            case "CATEGORY":
+            case "GROUP":
+            case "MARK":
+            case "CODE":
+            case "UNIT":
+            case "CREATOR":
+            case "VALUE_FORMULA":
+            case "NOTE_FORMAT":
+            case "ROUND_UP_TOTAL":
+            case "ASSIGNED_ELEMENT_IDS":
+                return true;
+            default:
+                return false;
+        }
     }
 }

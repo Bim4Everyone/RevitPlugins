@@ -9,8 +9,6 @@ using Autodesk.Revit.UI;
 
 using dosymep.Revit;
 using dosymep.SimpleServices;
-using Newtonsoft.Json.Linq;
-
 using RevitUnmodelingMep.Models.Entities;
 using RevitUnmodelingMep.Models.Unmodeling;
 using RevitUnmodelingMep.ViewModels;
@@ -55,8 +53,6 @@ internal class RevitRepository {
         VisSettingsStorage.PrepareSettings();
         Creator.StartupChecks();
         
-
-        JObject unmodelingSettings = settingsUpdaterWorker.GetUnmodelingConfig();
 
     }
 

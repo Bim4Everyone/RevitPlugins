@@ -2,31 +2,32 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Reflection;
-using System.Windows;
-using System.Windows.Controls;
 
 using Autodesk.Revit.DB;
 
 using dosymep.Bim4Everyone;
+using dosymep.Bim4Everyone.ProjectConfigs;
 using dosymep.Bim4Everyone.SharedParams;
 using dosymep.Bim4Everyone.Templates;
 using dosymep.Revit;
 using dosymep.SimpleServices;
 
-using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
-
-using Wpf.Ui.Controls;
+using pyRevitLabs.Json.Linq;
 
 namespace RevitUnmodelingMep.Models;
 
 internal class VisSettingsStorage {
     private readonly Document _doc;
     private readonly ILocalizationService _localizationService;
+    private readonly IConfigSerializer _configSerializer;
 
-    public VisSettingsStorage(Document doc, ILocalizationService localizationService) {
+    public VisSettingsStorage(
+        Document doc,
+        ILocalizationService localizationService,
+        IConfigSerializer configSerializer) {
         _doc = doc;
         _localizationService = localizationService;
+        _configSerializer = configSerializer;
     }
 
     internal static string GetLibFolder() {
@@ -38,10 +39,16 @@ internal class VisSettingsStorage {
             "04.OV-VK.extension",
             "lib"));
 
+        if(!Directory.Exists(fallbackLibPath)) {
+            throw new DirectoryNotFoundException(
+                $"lib folder not found at expected path: \"{fallbackLibPath}\". " +
+                "Expected structure: ...\\pyRevit\\2022 with ..\\Extensions\\04.OV-VK.extension\\lib.");
+        }
+
         return fallbackLibPath;
     }
 
-    public JObject GetUnmodelingConfig() {
+    public UnmodelingSettingsDocument GetUnmodelingSettings() {
         string value = (string) _doc.ProjectInformation
             .GetSharedParamValue(SharedParamsConfig.Instance.VISSettings.Name);
 
@@ -49,25 +56,9 @@ internal class VisSettingsStorage {
     }
 
     public void PrepareSettings() {
-        JObject LoadDefaultSettings() {
+        UnmodelingSettingsDocument LoadDefaultSettings() {
             string defaultsPath = Path.Combine(GetLibFolder(), "default_spec_settings.json");
-            return JObject.Parse(File.ReadAllText(defaultsPath));
-        }
-
-        JObject MergeSettings(JObject current, JObject defaults) {
-            foreach(var prop in defaults.Properties()) {
-                if(!current.ContainsKey(prop.Name)) {
-                    current[prop.Name] = prop.Value.DeepClone();
-                } else {
-                    if(prop.Value.Type == JTokenType.Object
-                       && current[prop.Name].Type == JTokenType.Object) {
-                        MergeSettings(
-                            (JObject) current[prop.Name],
-                            (JObject) prop.Value);
-                    }
-                }
-            }
-            return current;
+            return ParseSettings(File.ReadAllText(defaultsPath));
         }
 
         ProjectParameters projectParameters = ProjectParameters.Create(_doc.Application);
@@ -77,135 +68,41 @@ internal class VisSettingsStorage {
             _doc.ProjectInformation.GetParamValueOrDefault(
                 SharedParamsConfig.Instance.VISSettings, string.Empty);
 
-        JObject defaultSettings = LoadDefaultSettings();
-
-        JObject currentSettings;
-        try {
-            currentSettings = string.IsNullOrWhiteSpace(settingsText)
-                ? new JObject()
-                : JObject.Parse(settingsText);
-        } catch {
-            currentSettings = new JObject();
-        }
-
-        JObject settingsBeforeMerge =
-            (JObject) currentSettings.DeepClone();
-
-        if(currentSettings.ContainsKey(UnmodelingConfigReader.UnmodelingConfigKey)) {
-            defaultSettings.Remove(UnmodelingConfigReader.UnmodelingConfigKey);
-        }
-
-        JObject mergedSettings =
-            MergeSettings(currentSettings, defaultSettings);
-
-        bool settingsChanged =
-            !JToken.DeepEquals(settingsBeforeMerge, mergedSettings)
-            || string.IsNullOrWhiteSpace(settingsText);
-
-        if(settingsChanged) {
+        if(string.IsNullOrWhiteSpace(settingsText)) {
+            UnmodelingSettingsDocument defaultSettings = LoadDefaultSettings();
             using(var tr =
                 new Transaction(_doc, _localizationService.GetLocalizedString("VisSettingsStorage.TransactionName"))) {
                 tr.Start();
 
                 _doc.ProjectInformation.SetParamValue(
                     SharedParamsConfig.Instance.VISSettings,
-                    JsonConvert.SerializeObject(
-                        mergedSettings,
-                        Formatting.Indented));
+                    _configSerializer.Serialize(defaultSettings));
 
                 tr.Commit();
             }
         }
     }
 
-    public JToken GetSettingValue(IEnumerable<string> keyPath) {
-        string settingsText =
-            _doc.ProjectInformation.GetParamValueOrDefault(
-                SharedParamsConfig.Instance.VISSettings, string.Empty);
-
-        JObject data = ParseSettings(settingsText);
-        JToken node = data;
-        foreach(string key in keyPath) {
-            if(node is JObject obj && obj.ContainsKey(key)) {
-                node = obj[key];
-            } else {
-                return null;
-            }
-        }
-
-        return node;
-    }
-
-    public string SetSettingValue(
-        string settingsText,
-        IList<string> keyPath,
-        JToken newValue) {
-
-        JObject data = ParseSettings(settingsText);
-
-        JObject node = data;
-        for(int i = 0; i < keyPath.Count - 1; i++) {
-            string key = keyPath[i];
-            if(!node.ContainsKey(key) || node[key].Type != JTokenType.Object) {
-                node[key] = new JObject();
-            }
-            node = (JObject) node[key];
-        }
-
-        node[keyPath[keyPath.Count - 1]] = newValue;
-
-        return JsonConvert.SerializeObject(data, Formatting.Indented);
-    }
-
-    public string SetSettingValue(IList<string> keyPath, JToken newValue) {
-        string settingsText =
-            _doc.ProjectInformation.GetParamValueOrDefault(
-                SharedParamsConfig.Instance.VISSettings, string.Empty);
-
-        string updatedSettings = SetSettingValue(settingsText, keyPath, newValue);
-        SaveSettings(updatedSettings);
-        return updatedSettings;
-    }
-
-    public JObject GetDefaultSettings() {
+    public UnmodelingSettingsDocument GetDefaultSettings() {
         string defaultsPath = Path.Combine(GetLibFolder(), "default_spec_settings.json");
-        return JObject.Parse(File.ReadAllText(defaultsPath));
+        return ParseSettings(File.ReadAllText(defaultsPath));
     }
 
-    public string RemoveSettingValue(string settingsText, IList<string> keyPath) {
-        JObject data = ParseSettings(settingsText);
-
-        JObject node = data;
-        for(int i = 0; i < keyPath.Count - 1; i++) {
-            string key = keyPath[i];
-            if(node.ContainsKey(key) && node[key] is JObject nested) {
-                node = nested;
-            } else {
-                return JsonConvert.SerializeObject(data, Formatting.Indented);
-            }
-        }
-
-        node.Remove(keyPath[keyPath.Count - 1]);
-        return JsonConvert.SerializeObject(data, Formatting.Indented);
+    public void SaveUnmodelingSettings(UnmodelingSettingsDocument settings) {
+        string settingsText = _configSerializer.Serialize(settings ?? new UnmodelingSettingsDocument());
+        SaveSettings(settingsText);
     }
 
-    public string RemoveSettingValue(IList<string> keyPath) {
-        string settingsText =
-            _doc.ProjectInformation.GetParamValueOrDefault(
-                SharedParamsConfig.Instance.VISSettings, string.Empty);
-
-        string updatedSettings = RemoveSettingValue(settingsText, keyPath);
-        SaveSettings(updatedSettings);
-        return updatedSettings;
-    }
-
-    private static JObject ParseSettings(string settingsText) {
+    private UnmodelingSettingsDocument ParseSettings(string settingsText) {
         try {
-            return string.IsNullOrWhiteSpace(settingsText)
-                ? new JObject()
-                : JObject.Parse(settingsText);
+            if(string.IsNullOrWhiteSpace(settingsText)) {
+                return new UnmodelingSettingsDocument();
+            }
+
+            return _configSerializer.Deserialize<UnmodelingSettingsDocument>(settingsText)
+                   ?? new UnmodelingSettingsDocument();
         } catch {
-            return new JObject();
+            return new UnmodelingSettingsDocument();
         }
     }
 
@@ -230,7 +127,7 @@ internal class VisSettingsStorage {
     }
 
     private void SaveSettings(string settingsText) {
-        using(var tr = new Transaction(_doc, 
+        using(var tr = new Transaction(_doc,
             _localizationService.GetLocalizedString("VisSettingsStorage.TransactionName"))) {
             tr.Start();
 

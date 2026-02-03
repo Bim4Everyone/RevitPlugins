@@ -10,7 +10,7 @@ using dosymep.Bim4Everyone;
 using dosymep.Bim4Everyone.SharedParams;
 using dosymep.Revit;
 
-using Newtonsoft.Json.Linq;
+using pyRevitLabs.Json.Linq;
 
 using RevitUnmodelingMep.Models.Entities;
 using RevitUnmodelingMep.ViewModels;

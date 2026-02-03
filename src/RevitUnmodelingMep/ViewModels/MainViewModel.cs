@@ -7,11 +7,13 @@ using System.Windows;
 using System.Windows.Input;
 using System.Text.RegularExpressions;
 
+using dosymep.Bim4Everyone.ProjectConfigs;
 using dosymep.SimpleServices;
 using dosymep.WPF.Commands;
 using dosymep.WPF.ViewModels;
 
-using Newtonsoft.Json.Linq;
+using pyRevitLabs.Json;
+using pyRevitLabs.Json.Linq;
 
 using Autodesk.Revit.DB;
 
@@ -21,14 +23,12 @@ namespace RevitUnmodelingMep.ViewModels;
 
 
 internal class MainViewModel : BaseViewModel {
-    private const string _unmodelingSettingsKey = "UNMODELING_SETTINGS";
-    private const string _onlyProjectInstancesKey = "ONLY_PROJECT_INSTANCES";
-
     private readonly PluginConfig _pluginConfig;
     private readonly RevitRepository _revitRepository;
     private readonly ILocalizationService _localizationService;
     private readonly IOpenFileDialogService _openFileDialogService;
     private readonly ISaveFileDialogService _saveFileDialogService;
+    private readonly IConfigSerializer _configSerializer;
 
     private string _errorText;
     private string _saveProperty;
@@ -45,13 +45,15 @@ internal class MainViewModel : BaseViewModel {
         RevitRepository revitRepository,
         ILocalizationService localizationService,
         IOpenFileDialogService openFileDialogService,
-        ISaveFileDialogService saveFileDialogService) {
+        ISaveFileDialogService saveFileDialogService,
+        IConfigSerializer configSerializer) {
         
         _pluginConfig = pluginConfig;
         _revitRepository = revitRepository;
         _localizationService = localizationService;
         _openFileDialogService = openFileDialogService;
         _saveFileDialogService = saveFileDialogService;
+        _configSerializer = configSerializer;
         _categoryOptions = CreateCategoryOptions();
 
         LoadViewCommand = RelayCommand.Create(LoadView);
@@ -237,7 +239,7 @@ internal class MainViewModel : BaseViewModel {
             return;
         }
 
-        JObject defaults = _revitRepository.VisSettingsStorage.GetDefaultSettings();
+        UnmodelingSettingsDocument defaults = _revitRepository.VisSettingsStorage.GetDefaultSettings();
         LoadConsumableTypesFromSettings(defaults);
     }
 
@@ -249,9 +251,15 @@ internal class MainViewModel : BaseViewModel {
 
         try {
             string fileContent = File.ReadAllText(_openFileDialogService.File.FullName);
-            JObject imported = JObject.Parse(fileContent);
+            UnmodelingSettingsDocument imported =
+                _configSerializer.Deserialize<UnmodelingSettingsDocument>(fileContent);
+            if(imported == null) {
+                ErrorText = _localizationService.GetLocalizedString("MainViewModel.ImportError");
+                return;
+            }
+
             LoadConsumableTypesFromSettings(imported);
-        } catch {
+        } catch(JsonException) {
             ErrorText = _localizationService.GetLocalizedString("MainViewModel.ImportError");
         }
     }
@@ -267,20 +275,25 @@ internal class MainViewModel : BaseViewModel {
             return;
         }
 
-        var exported = new JObject {
-            [UnmodelingConfigReader.UnmodelingConfigKey] = BuildUnmodelingConfigs(),
-            [_unmodelingSettingsKey] = BuildUnmodelingSettings()
+        var exported = new UnmodelingSettingsDocument {
+            UnmodelingConfig = BuildUnmodelingConfigs(),
+            UnmodelingSettings = BuildUnmodelingSettings(),
+            Unmodeling = _revitRepository.VisSettingsStorage.GetUnmodelingSettings()?.Unmodeling
+                         ?? new Dictionary<string, UnmodelingLegacyItem>()
         };
-        File.WriteAllText(_saveFileDialogService.File.FullName, exported.ToString());
+
+        File.WriteAllText(
+            _saveFileDialogService.File.FullName,
+            _configSerializer.Serialize(exported));
     }
 
-    private void LoadConsumableTypesFromSettings(JObject settings) {
-        JObject settingsWithKey = NormalizeSettings(settings);
-        ApplySettings(settingsWithKey);
+    private void LoadConsumableTypesFromSettings(UnmodelingSettingsDocument settings) {
+        settings ??= new UnmodelingSettingsDocument();
+        ApplySettings(settings);
 
         IReadOnlyList<ConsumableTypeItem> consumableTypes =
             UnmodelingConfigReader.GetConsumableItems(
-                settingsWithKey,
+                settings.UnmodelingConfig,
                 ResolveCategoryOption,
                 out _lastConfigIndex);
 
@@ -289,13 +302,12 @@ internal class MainViewModel : BaseViewModel {
     }
 
     private void LoadUnmodelingConfigs() {
-        JObject settings = _revitRepository.VisSettingsStorage.GetUnmodelingConfig();
-        settings = NormalizeSettings(settings);
+        UnmodelingSettingsDocument settings = _revitRepository.VisSettingsStorage.GetUnmodelingSettings();
         ApplySettings(settings);
 
         IReadOnlyList<ConsumableTypeItem> consumableTypes =
             UnmodelingConfigReader.GetConsumableItems(
-                settings,
+                settings?.UnmodelingConfig,
                 ResolveCategoryOption,
                 out _lastConfigIndex);
 
@@ -303,18 +315,15 @@ internal class MainViewModel : BaseViewModel {
     }
 
     private void SaveUnmodelingConfigs() {
-        JObject configs = BuildUnmodelingConfigs();
-        _revitRepository.VisSettingsStorage.SetSettingValue(
-            new List<string> { UnmodelingConfigReader.UnmodelingConfigKey },
-            configs);
-
-        _revitRepository.VisSettingsStorage.SetSettingValue(
-            new List<string> { _unmodelingSettingsKey },
-            BuildUnmodelingSettings());
+        UnmodelingSettingsDocument settings = _revitRepository.VisSettingsStorage.GetUnmodelingSettings();
+        settings ??= new UnmodelingSettingsDocument();
+        settings.UnmodelingConfig = BuildUnmodelingConfigs();
+        settings.UnmodelingSettings = BuildUnmodelingSettings();
+        _revitRepository.VisSettingsStorage.SaveUnmodelingSettings(settings);
     }
 
-    private JObject BuildUnmodelingConfigs() {
-        JObject configs = new JObject();
+    private Dictionary<string, UnmodelingConfigItem> BuildUnmodelingConfigs() {
+        var configs = new Dictionary<string, UnmodelingConfigItem>();
         if(ConsumableTypes == null) {
             return configs;
         }
@@ -324,38 +333,21 @@ internal class MainViewModel : BaseViewModel {
                 item.ConfigKey = GetNextConfigKey();
             }
 
-            configs[item.ConfigKey] = item.ToJObject();
+            configs[item.ConfigKey] = item.ToConfigItem();
         }
 
         return configs;
     }
 
-    private JObject BuildUnmodelingSettings() {
-        return new JObject {
-            [_onlyProjectInstancesKey] = OnlyPlacedInProject
+    private UnmodelingSettingsOptions BuildUnmodelingSettings() {
+        return new UnmodelingSettingsOptions {
+            OnlyProjectInstances = OnlyPlacedInProject
         };
     }
 
-    private static JObject NormalizeSettings(JObject settings) {
-        if(settings?.ContainsKey(UnmodelingConfigReader.UnmodelingConfigKey) == true) {
-            return settings;
-        }
-
-        return new JObject {
-            [UnmodelingConfigReader.UnmodelingConfigKey] = settings ?? new JObject()
-        };
-    }
-
-    private void ApplySettings(JObject settings) {
-        if(settings == null) {
-            return;
-        }
-
-        if(settings.TryGetValue(_unmodelingSettingsKey, out JToken settingsToken)
-           && settingsToken is JObject settingsObj
-           && settingsObj.TryGetValue(_onlyProjectInstancesKey, out JToken onlyProjectToken)
-           && onlyProjectToken.Type == JTokenType.Boolean) {
-            OnlyPlacedInProject = (bool) onlyProjectToken;
+    private void ApplySettings(UnmodelingSettingsDocument settings) {
+        if(settings?.UnmodelingSettings != null) {
+            OnlyPlacedInProject = settings.UnmodelingSettings.OnlyProjectInstances;
         }
     }
 
