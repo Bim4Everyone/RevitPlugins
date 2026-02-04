@@ -28,6 +28,7 @@ internal class MainViewModel : BaseViewModel {
     private readonly ILocalizationService _localizationService;
     private readonly IOpenFileDialogService _openFileDialogService;
     private readonly ISaveFileDialogService _saveFileDialogService;
+    public IMessageBoxService MessageBoxService { get; }
     private readonly IConfigSerializer _configSerializer;
 
     private string _errorText;
@@ -46,6 +47,7 @@ internal class MainViewModel : BaseViewModel {
         ILocalizationService localizationService,
         IOpenFileDialogService openFileDialogService,
         ISaveFileDialogService saveFileDialogService,
+        IMessageBoxService messageBoxService,
         IConfigSerializer configSerializer) {
         
         _pluginConfig = pluginConfig;
@@ -53,6 +55,7 @@ internal class MainViewModel : BaseViewModel {
         _localizationService = localizationService;
         _openFileDialogService = openFileDialogService;
         _saveFileDialogService = saveFileDialogService;
+        MessageBoxService = messageBoxService;
         _configSerializer = configSerializer;
         _categoryOptions = CreateCategoryOptions();
 
@@ -237,7 +240,9 @@ internal class MainViewModel : BaseViewModel {
     private void ResetConfigs(Window owner) {
         string message = _localizationService.GetLocalizedString("MainWindow.ResetConfirmMessage");
         string title = _localizationService.GetLocalizedString("MainWindow.Title");
-        if(MessageBox.Show(owner ?? Application.Current?.MainWindow, message, title, MessageBoxButton.OKCancel, MessageBoxImage.Question) != MessageBoxResult.OK) {
+        if(MessageBoxService.Show(message, 
+            title, MessageBoxButton.OKCancel, 
+            MessageBoxImage.Question) != MessageBoxResult.OK) {
             return;
         }
 

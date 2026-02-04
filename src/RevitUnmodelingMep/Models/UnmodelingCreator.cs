@@ -5,7 +5,6 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
-using System.Windows.Controls;
 
 using Autodesk.Revit;
 using Autodesk.Revit.DB;
@@ -139,7 +138,7 @@ internal class UnmodelingCreator {
                 Workset newWS = Workset.Create(_doc, targetName);
                 _ws_id = newWS.Id;
 
-                MessageBox.Show(warningText, warningCaption, MessageBoxButton.OK, MessageBoxImage.Warning);
+                MessageBoxService.Show(warningText, warningCaption, MessageBoxButton.OK, MessageBoxImage.Warning);
 
                 t.Commit();
             }
@@ -150,7 +149,7 @@ internal class UnmodelingCreator {
                 if(ws.Name == targetName) {
                     _ws_id = ws.Id;
                     if(ws.IsVisibleByDefault) {
-                        MessageBox.Show(warningText, warningCaption, MessageBoxButton.OK, MessageBoxImage.Warning);
+                        MessageBoxService.Show(warningText, warningCaption, MessageBoxButton.OK, MessageBoxImage.Warning);
                         }
                     }
                 }
@@ -277,8 +276,10 @@ internal class UnmodelingCreator {
                 t.Commit();
             }
         }
-        MessageBox.Show(_localizationService.GetLocalizedString("UnmodelingCreator.LoadFamilyError"));
-        throw new OperationCanceledException();
+        string title = _localizationService.GetLocalizedString("MainWindow.Title");
+        string message = _localizationService.GetLocalizedString("UnmodelingCreator.LoadFamilyError");
+        UserMessageException.Throw(MessageBoxService, title, message);
+        throw new UserMessageException("Unreachable");
     }
 
     private FamilySymbol? FindFamilySymbol(string familyName) {
@@ -298,10 +299,8 @@ internal class UnmodelingCreator {
             editorChecker.GetReport(familyInstance);
 
             if(!string.IsNullOrEmpty(editorChecker.FinalReport)) {
-                MessageBox.Show(editorChecker.FinalReport, "Настройки немоделируемых",
-                    MessageBoxButton.OK,
-                    MessageBoxImage.Error);
-                throw new OperationCanceledException();
+                UserMessageException.Throw(MessageBoxService, "Настройки немоделируемых",
+                    editorChecker.FinalReport);
             }
         }
 
