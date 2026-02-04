@@ -1,7 +1,3 @@
-using System.Linq;
-
-using pyRevitLabs.Json.Linq;
-
 using dosymep.WPF.ViewModels;
 
 namespace RevitUnmodelingMep.ViewModels;
@@ -43,18 +39,12 @@ internal class ConfigAssignmentItem : BaseViewModel {
             return false;
         }
 
-        return config.AssignedElementIds
-            .Select(token => token.Type switch {
-                JTokenType.Integer => (int?) token,
-                JTokenType.String => int.TryParse(token.ToString(), out int val) ? val : (int?) null,
-                _ => null
-            })
-            .Any(val => val == systemTypeId);
+        return config.AssignedElementIds.Contains(systemTypeId);
     }
 
     private static void AddAssignment(ConsumableTypeItem config, int systemTypeId) {
         if(config.AssignedElementIds == null) {
-            config.AssignedElementIds = new JArray();
+            config.AssignedElementIds = [];
         }
 
         if(!HasAssignment(config, systemTypeId)) {
@@ -67,16 +57,6 @@ internal class ConfigAssignmentItem : BaseViewModel {
             return;
         }
 
-        JToken tokenToRemove = config.AssignedElementIds
-            .FirstOrDefault(token => {
-                int? val = token.Type switch {
-                    JTokenType.Integer => (int?) token,
-                    JTokenType.String => int.TryParse(token.ToString(), out int parsed) ? parsed : (int?) null,
-                    _ => null
-                };
-                return val == systemTypeId;
-            });
-
-        tokenToRemove?.Remove();
+        config.AssignedElementIds.Remove(systemTypeId);
     }
 }

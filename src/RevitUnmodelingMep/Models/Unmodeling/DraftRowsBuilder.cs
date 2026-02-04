@@ -10,8 +10,6 @@ using dosymep.Bim4Everyone;
 using dosymep.Bim4Everyone.SharedParams;
 using dosymep.Revit;
 
-using pyRevitLabs.Json.Linq;
-
 using RevitUnmodelingMep.Models.Entities;
 using RevitUnmodelingMep.ViewModels;
 
@@ -39,17 +37,15 @@ internal sealed class DraftRowsBuilder {
             throw new ArgumentNullException(nameof(config));
         }
 
-        JArray assignedTypes = config.AssignedElementIds;
+        IEnumerable<int> assignedTypes = config.AssignedElementIds ?? Enumerable.Empty<int>();
         Dictionary<string, List<NewRowElement>> elementsByGrouping = new();
         UnmodelingCalcCache localCache = cache ?? new UnmodelingCalcCache();
 
-        foreach(JToken assignedTypeId in assignedTypes) {
+        foreach(int assignedTypeId in assignedTypes) {
 #if REVIT_2024_OR_GREATER
-            long idValue = assignedTypeId.Value<long>();
-            ElementId typeId = new ElementId(idValue);
+            ElementId typeId = new ElementId((long) assignedTypeId);
 #else
-            int idValue = assignedTypeId.Value<int>();
-            ElementId typeId = new ElementId(idValue);
+            ElementId typeId = new ElementId(assignedTypeId);
 #endif
 
             if(!localCache.ElementsByTypeId.TryGetValue(typeId, out List<Element> elements)) {

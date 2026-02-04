@@ -5,16 +5,12 @@ using System.IO;
 using System.Linq;
 using System.Windows;
 using System.Windows.Input;
-using System.Text.RegularExpressions;
-
 using dosymep.Bim4Everyone.ProjectConfigs;
 using dosymep.SimpleServices;
 using dosymep.WPF.Commands;
 using dosymep.WPF.ViewModels;
 
 using pyRevitLabs.Json;
-using pyRevitLabs.Json.Linq;
-
 using Autodesk.Revit.DB;
 
 using RevitUnmodelingMep.Models;
@@ -194,8 +190,6 @@ internal class MainViewModel : BaseViewModel {
             Title = $"Config {index}",
             ConsumableTypeName = configKey,
             ConfigKey = configKey,
-            RawConfig = new JObject(),
-            AssignedElementIds = new JArray(),
             SelectedCategory = defaultCategory,
             CategoryId = defaultCategory?.Id.ToString()
         });

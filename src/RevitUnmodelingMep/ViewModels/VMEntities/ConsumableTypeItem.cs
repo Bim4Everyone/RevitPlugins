@@ -3,8 +3,6 @@ using System.Collections.Generic;
 
 using dosymep.WPF.ViewModels;
 
-using pyRevitLabs.Json.Linq;
-
 using RevitUnmodelingMep.Models;
 
 namespace RevitUnmodelingMep.ViewModels;
@@ -96,9 +94,9 @@ internal class ConsumableTypeItem : BaseViewModel {
         }
     }
 
-    public JArray AssignedElementIds { get; set; } = new JArray();
+    public List<int> AssignedElementIds { get; set; } = new List<int>();
 
-    public JObject RawConfig { get; set; } = new JObject();
+    public IDictionary<string, object> ExtensionData { get; set; }
 
     public static ConsumableTypeItem FromConfig(string configKey, UnmodelingConfigItem config) {
         config ??= new UnmodelingConfigItem();
@@ -116,63 +114,15 @@ internal class ConsumableTypeItem : BaseViewModel {
             Formula = config.ValueFormula,
             Note = config.NoteFormat,
             RoundUpTotal = config.RoundUpTotal,
-            AssignedElementIds = new JArray(config.AssignedElementIds ?? new List<int>()),
-            RawConfig = new JObject()
+            AssignedElementIds = config.AssignedElementIds != null
+                ? new List<int>(config.AssignedElementIds)
+                : new List<int>(),
+            ExtensionData = config.ExtensionData != null
+                ? new Dictionary<string, object>(config.ExtensionData)
+                : null
         };
-
-        if(config.ExtensionData != null) {
-            foreach(var kvp in config.ExtensionData) {
-                item.RawConfig[kvp.Key] = kvp.Value?.DeepClone();
-            }
-        }
 
         return item;
-    }
-
-    public static ConsumableTypeItem FromConfig(JProperty configProperty) {
-        JObject value = configProperty.Value as JObject ?? new JObject();
-        JObject clonedValue = (JObject) value.DeepClone();
-        JArray assignedIds = value["ASSIGNED_ELEMENT_IDS"] as JArray ?? new JArray();
-
-        return new ConsumableTypeItem {
-            ConfigKey = configProperty.Name,
-            Title = (string) value["CONFIG_NAME"],
-            ConsumableTypeName = (string) value["CONFIG_NAME"],
-            Name = (string) value["NAME"],
-            CategoryId = (string) value["CATEGORY"],
-            Grouping = (string) value["GROUP"],
-            Mark = (string) value["MARK"],
-            Code = (string) value["CODE"],
-            Unit = (string) value["UNIT"],
-            Maker = (string) value["CREATOR"],
-            Formula = (string) value["VALUE_FORMULA"],
-            Note = (string) value["NOTE_FORMAT"],
-            RoundUpTotal = (bool?) value["ROUND_UP_TOTAL"] ?? false,
-            AssignedElementIds = new JArray(assignedIds),
-            RawConfig = clonedValue
-        };
-    }
-
-    public JObject ToJObject() {
-        JObject result = RawConfig != null
-            ? (JObject) RawConfig.DeepClone()
-            : new JObject();
-
-        result["CONFIG_NAME"] = ConsumableTypeName ?? string.Empty;
-        result["NAME"] = Name ?? string.Empty;
-        result["CATEGORY"] = CategoryId ?? string.Empty;
-        result["GROUP"] = Grouping ?? string.Empty;
-        result["MARK"] = Mark ?? string.Empty;
-        result["CODE"] = Code ?? string.Empty;
-        result["UNIT"] = Unit ?? string.Empty;
-        result["CREATOR"] = Maker ?? string.Empty;
-        result.Remove("USE_CATEGORY_RESERVE");
-        result["VALUE_FORMULA"] = Formula ?? string.Empty;
-        result["NOTE_FORMAT"] = Note ?? string.Empty;
-        result["ROUND_UP_TOTAL"] = RoundUpTotal;
-        result["ASSIGNED_ELEMENT_IDS"] = AssignedElementIds ?? new JArray();
-
-        return result;
     }
 
     public UnmodelingConfigItem ToConfigItem() {
@@ -188,57 +138,14 @@ internal class ConsumableTypeItem : BaseViewModel {
             ValueFormula = Formula ?? string.Empty,
             NoteFormat = Note ?? string.Empty,
             RoundUpTotal = RoundUpTotal,
-            AssignedElementIds = ConvertAssignedElementIds()
+            AssignedElementIds = AssignedElementIds != null
+                ? new List<int>(AssignedElementIds)
+                : new List<int>(),
+            ExtensionData = ExtensionData != null
+                ? new Dictionary<string, object>(ExtensionData)
+                : null
         };
 
-        if(RawConfig != null && RawConfig.HasValues) {
-            var extensionData = new Dictionary<string, JToken>(StringComparer.OrdinalIgnoreCase);
-            foreach(var property in RawConfig.Properties()) {
-                if(!IsStandardConfigKey(property.Name)) {
-                    extensionData[property.Name] = property.Value?.DeepClone();
-                }
-            }
-
-            if(extensionData.Count > 0) {
-                result.ExtensionData = extensionData;
-            }
-        }
-
         return result;
-    }
-
-    private List<int> ConvertAssignedElementIds() {
-        var result = new List<int>();
-        if(AssignedElementIds == null) {
-            return result;
-        }
-
-        foreach(var token in AssignedElementIds) {
-            if(token != null && int.TryParse(token.ToString(), out int value)) {
-                result.Add(value);
-            }
-        }
-
-        return result;
-    }
-
-    private static bool IsStandardConfigKey(string key) {
-        switch(key) {
-            case "CONFIG_NAME":
-            case "NAME":
-            case "CATEGORY":
-            case "GROUP":
-            case "MARK":
-            case "CODE":
-            case "UNIT":
-            case "CREATOR":
-            case "VALUE_FORMULA":
-            case "NOTE_FORMAT":
-            case "ROUND_UP_TOTAL":
-            case "ASSIGNED_ELEMENT_IDS":
-                return true;
-            default:
-                return false;
-        }
     }
 }

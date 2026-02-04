@@ -12,8 +12,6 @@ using dosymep.Bim4Everyone.Templates;
 using dosymep.Revit;
 using dosymep.SimpleServices;
 
-using pyRevitLabs.Json.Linq;
-
 namespace RevitUnmodelingMep.Models;
 
 internal class VisSettingsStorage {
