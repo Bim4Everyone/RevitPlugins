@@ -38,7 +38,7 @@
             Grid.Column="1"
             Margin="5"
             Padding="5"
-            Icon="{ui:SymbolIcon EditSettings24}"
+            Icon="{ui:SymbolIcon Save28}"
             Appearance="Info"
             Command="{Binding ButtonCommand, ElementName=_this}">
             <i:Interaction.Triggers>
