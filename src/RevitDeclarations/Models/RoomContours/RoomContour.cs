@@ -44,7 +44,10 @@ internal class RoomContour {
             var curve = boundary.GetCurve();
             double distance = prevCurve.GetEndPoint(1).DistanceTo(curve.GetEndPoint(1));
 
-            if(distance > _curveTolerance) {
+            // evaluateCoef определяет минимальную часть арки при делении на прямые линии.
+            // При проверке _curveTolerance необходимо учитывать именно минимальную часть арки.
+            double evaluateCoef = 0.5;
+            if(distance > _curveTolerance / evaluateCoef) {
                 if(curve is Arc) {
                     var midPoint = curve.Evaluate(0.5, true);
                     Curve straightCurveLeft = Line.CreateBound(prevCurve.GetEndPoint(1), midPoint);
