@@ -18,6 +18,7 @@ using dosymep.WpfUI.Core.Ninject;
 using Ninject;
 
 using RevitUnmodelingMep.Models;
+using RevitUnmodelingMep.ViewModels;
 
 namespace RevitUnmodelingMep {
     [Transaction(TransactionMode.Manual)]
@@ -48,6 +49,8 @@ namespace RevitUnmodelingMep {
             kernel.Bind<Document>()
                 .ToMethod(ctx => ctx.Kernel.Get<UIApplication>().ActiveUIDocument.Document)
                 .InSingletonScope();
+
+            kernel.UseWpfUIMessageBox<MainViewModel>();
 
             kernel.Bind<VisSettingsStorage>()
                 .ToSelf()
