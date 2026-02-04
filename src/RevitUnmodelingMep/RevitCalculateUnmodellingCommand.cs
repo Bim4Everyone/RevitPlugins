@@ -16,8 +16,6 @@ using dosymep.WpfCore.Ninject;
 using Ninject;
 
 using RevitUnmodelingMep.Models;
-using RevitUnmodelingMep.ViewModels;
-using RevitUnmodelingMep.Views;
 
 namespace RevitUnmodelingMep {
     [Transaction(TransactionMode.Manual)]
@@ -39,6 +37,7 @@ namespace RevitUnmodelingMep {
             kernel.UseWpfLocalization(
                 $"/{assemblyName};component/assets/Localization/Language.xaml",
                 CultureInfo.GetCultureInfo("ru-RU"));
+            kernel.UseWpfUIProgressDialog();
 
             // Настройка доступа к Revit
             kernel.Bind<RevitRepository>()
@@ -70,9 +69,8 @@ namespace RevitUnmodelingMep {
             var servise = GetPlatformService<IMessageBoxService>();
             CheckDocument(uiApplication.ActiveUIDocument.Document, servise, localizationService);
 
-            var viewModel = kernel.Get<MainViewModel>();
             var repository = kernel.Get<RevitRepository>();
-            repository.CalculateUnmodeling(viewModel.CreatePercentProgressDialog);
+            repository.CalculateUnmodeling(titleKey => CreatePercentProgressDialog(titleKey, localizationService));
         }
 
         private void CheckDocument(
@@ -100,6 +98,18 @@ namespace RevitUnmodelingMep {
                 MessageBoxImage.Error);
 
             throw new OperationCanceledException();
+        }
+
+        private IProgressDialogService CreatePercentProgressDialog(
+            string titleKey,
+            ILocalizationService localizationService) {
+            var dialog = GetPlatformService<IProgressDialogService>();
+            dialog.StepValue = 1;
+            dialog.DisplayTitleFormat =
+                $"{localizationService.GetLocalizedString(titleKey)} [{{0}}%]";
+            dialog.MaxValue = 100;
+            dialog.Show();
+            return dialog;
         }
     }
 }
