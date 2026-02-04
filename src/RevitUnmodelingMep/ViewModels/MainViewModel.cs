@@ -176,16 +176,6 @@ internal class MainViewModel : BaseViewModel {
         _pluginConfig.SaveProjectConfig();
     }
 
-    internal IProgressDialogService CreatePercentProgressDialog(string titleKey) {
-        var dialog = GetPlatformService<IProgressDialogService>();
-        dialog.StepValue = 1;
-        dialog.DisplayTitleFormat =
-            $"{_localizationService.GetLocalizedString(titleKey)} [{{0}}%]";
-        dialog.MaxValue = 100;
-        dialog.Show();
-        return dialog;
-    }
-
     public void RefreshAssignmentsFromConsumableTypes() {
         if(!_isViewLoaded) {
             return;
