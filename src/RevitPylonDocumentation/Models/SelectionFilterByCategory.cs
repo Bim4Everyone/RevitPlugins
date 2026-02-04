@@ -13,7 +13,7 @@ internal class SelectionFilterByCategory : ISelectionFilter {
 
     public bool AllowElement(Element elem) {
         // Проверяем, принадлежит ли элемент к разрешенным категориям
-        if(_categoryIds.Contains(elem.Category.Id)) {
+        if(elem.Category is null || _categoryIds.Contains(elem.Category.Id)) {
             return true;
         }
         return false;

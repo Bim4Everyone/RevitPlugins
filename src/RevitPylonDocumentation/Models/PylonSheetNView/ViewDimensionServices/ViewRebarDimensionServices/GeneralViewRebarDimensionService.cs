@@ -39,7 +39,7 @@ internal class GeneralViewRebarDimensionService {
     internal void TryCreateAllTopRebarDimensions(FamilyInstance skeletonParentRebar) {
         try {
             // Если все стержни Г-образные,тогда нет смысла ставить этот размер
-            if(_sheetInfo.RebarInfo.AllRebarAreL) { return; }
+            if(_sheetInfo.RebarInfo.AllRebarAreL && !_sheetInfo.RebarInfo.SkeletonParentRebarForParking) { return; }
             var dimensionLineTop = _dimensionBaseService.GetDimensionLine(skeletonParentRebar, DirectionType.Top, 0.5);
             var refArrayTop = _dimensionBaseService.GetDimensionRefs(skeletonParentRebar, ["верх", "фронт"]);
             var dimension = _doc.Create.NewDimension(_viewOfPylon.ViewElement, dimensionLineTop,
@@ -107,7 +107,7 @@ internal class GeneralViewRebarDimensionService {
                 dimSegmentOpts.Add(new DimensionSegmentOption(false));
             }
 
-            if(_sheetInfo.RebarInfo.AllRebarAreL) {
+            if(_sheetInfo.RebarInfo.AllRebarAreL || _sheetInfo.RebarInfo.SkeletonParentRebarForParking) {
                 // Дополняем плоскостью на Гэшках вертикальных стержней "#1_горизонт_Г-стержень"
                 refArraySide = _dimensionBaseService.GetDimensionRefs(skeletonParentRebar,
                                                                       ["горизонт", "Г-стержень"],

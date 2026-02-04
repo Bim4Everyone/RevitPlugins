@@ -63,7 +63,7 @@ internal class GeneralViewRebarPerpDimensionService {
     /// </summary>
     internal void TryCreateVertLRebarDimension(FamilyInstance skeletonParentRebar) {
         try {
-            if(!_sheetInfo.RebarInfo.HasLRebar) { return; }
+            if(!_sheetInfo.RebarInfo.HasLRebar && !_sheetInfo.RebarInfo.SkeletonParentRebarForParking) { return; }
             var refArraySideBottom = _dimensionBaseService.GetDimensionRefs(skeletonParentRebar,
                                                                             ["горизонт", "край", "низ"]);
             var refArraySide = _dimensionBaseService.GetDimensionRefs(skeletonParentRebar,
@@ -89,16 +89,17 @@ internal class GeneralViewRebarPerpDimensionService {
     /// </summary>
     internal void TryCreateHorizLRebarDimension(FamilyInstance skeletonParentRebar) {
         try {
-            if(!_sheetInfo.RebarInfo.HasLRebar) { return; }
-            // Г-образный стержень
-            var lRebar = _sheetInfo.RebarFinder.GetSimpleRebars(_viewOfPylon.ViewElement, _sheetInfo.ProjectSection, 1101)
+            if(!_sheetInfo.RebarInfo.HasLRebar && !_sheetInfo.RebarInfo.SkeletonParentRebarForParking) { return; }
+            // П-образный стержень / Г-образный стержень
+            int formNum = _sheetInfo.RebarInfo.SkeletonParentRebarForParking ? 1201 : 1101;
+            var lRebar = _sheetInfo.RebarFinder.GetSimpleRebars(_viewOfPylon.ViewElement, _sheetInfo.ProjectSection, formNum)
                                                .FirstOrDefault();
             var dimensionLine = _dimensionBaseService.GetDimensionLine(lRebar, DirectionType.Top, 0.5);
             //"#1_торец_Г_нутрь"
             //"#1_торец_Г_край"
-            if(_sheetInfo.RebarInfo.AllRebarAreL) {
-                CreateLRebarDimension(skeletonParentRebar, dimensionLine, ["1_торец", "Г"]);
-                CreateLRebarDimension(skeletonParentRebar, dimensionLine, ["2_торец", "Г"]);
+            if(_sheetInfo.RebarInfo.AllRebarAreL || _sheetInfo.RebarInfo.SkeletonParentRebarForParking) {
+                CreateLRebarDimension(skeletonParentRebar, dimensionLine, ["1_торец", "Г"], ["низ"]);
+                CreateLRebarDimension(skeletonParentRebar, dimensionLine, ["2_торец", "Г"], ["низ"]);
             } else if(_sheetInfo.RebarInfo.HasLRebar) {
                 if(_sheetInfo.RebarFinder.DirectionHasLRebar(_viewOfPylon.ViewElement, _sheetInfo.ProjectSection,
                                                              DirectionType.Right)
