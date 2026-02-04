@@ -73,6 +73,8 @@ public class RevitUnmodelingMepCommand : BasePluginCommand {
 
         // Настройка запуска окна
         kernel.BindMainWindow<MainViewModel, MainWindow>();
+        kernel.UseWpfOpenFileDialog<MainViewModel>()
+            .UseWpfSaveFileDialog<MainViewModel>();
 
         // Настройка локализации,
         // получение имени сборки откуда брать текст
@@ -135,3 +137,5 @@ public class RevitUnmodelingMepCommand : BasePluginCommand {
         throw new OperationCanceledException();
     }
 }
+
+

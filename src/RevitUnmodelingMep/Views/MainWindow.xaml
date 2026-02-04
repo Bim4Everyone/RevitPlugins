@@ -8,10 +8,12 @@
     xmlns:local="clr-namespace:RevitUnmodelingMep.Views"
     xmlns:vms="clr-namespace:RevitUnmodelingMep.ViewModels"
     xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
+    xmlns:b="http://schemas.microsoft.com/xaml/behaviors"
     xmlns:core="clr-namespace:dosymep.WpfUI.Core"
     xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
     xmlns:me="clr-namespace:dosymep.WpfCore.MarkupExtensions;assembly=dosymep.WpfCore"
     xmlns:beh="clr-namespace:RevitUnmodelingMep.Views.Behaviors"
+    xmlns:wpfbehaviors="clr-namespace:dosymep.WpfCore.Behaviors;assembly=dosymep.WpfCore"
    
     mc:Ignorable="d"
     Title="{me:LocalizationSource MainWindow.Title}"
@@ -100,6 +102,15 @@
             </Setter>
         </Style>
     </core:WpfUIPlatformWindow.Resources>
+
+    <b:Interaction.Behaviors>
+        <wpfbehaviors:WpfAttachServiceBehavior
+            AttachableService="{Binding OpenFileDialogService}">
+        </wpfbehaviors:WpfAttachServiceBehavior>
+        <wpfbehaviors:WpfAttachServiceBehavior
+            AttachableService="{Binding SaveFileDialogService}">
+        </wpfbehaviors:WpfAttachServiceBehavior>
+    </b:Interaction.Behaviors>
 
     <i:Interaction.Triggers>
         <i:EventTrigger EventName="Loaded">

@@ -87,6 +87,8 @@ internal class MainViewModel : BaseViewModel {
     public ICommand ResetConfigsCommand { get; }
 
     public HintPanelViewModel Hint { get; }
+    public IOpenFileDialogService OpenFileDialogService => _openFileDialogService;
+    public ISaveFileDialogService SaveFileDialogService => _saveFileDialogService;
 
 
     public string ErrorText {
