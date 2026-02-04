@@ -49,7 +49,7 @@ internal class RoomContour {
             double evaluateCoef = 0.5;
             if(distance > _curveTolerance / evaluateCoef) {
                 if(curve is Arc) {
-                    var midPoint = curve.Evaluate(0.5, true);
+                    var midPoint = curve.Evaluate(evaluateCoef, true);
                     Curve straightCurveLeft = Line.CreateBound(prevCurve.GetEndPoint(1), midPoint);
                     contour.Add(straightCurveLeft);
 
