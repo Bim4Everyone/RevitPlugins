@@ -39,7 +39,6 @@ internal class RevitSettings : ProjectSettings {
 }
 
 internal class SystemPluginConfig {
-
     // Параметр описания зон
     private static readonly RevitParam _descriptionParam = SharedParamsConfig.Instance.BuildingWorksDescription;
     // Параметр блока СМР
@@ -138,9 +137,6 @@ internal class SystemPluginConfig {
 
     // Строка для поиска линии наклона. По другому идентифицировать эту линию невозможно
     public string SlopeLineName { get; private set; }
-
-    // Допуск для сравнения точек
-    public double Tolerance => 1e-6;
 
     // Строка в имени уровня, определяющая кровлю
     public string DefaultStringRoof => "К";

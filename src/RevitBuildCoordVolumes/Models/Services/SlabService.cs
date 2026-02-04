@@ -7,6 +7,7 @@ using Autodesk.Revit.DB;
 using dosymep.Revit;
 
 using RevitBuildCoordVolumes.Models.Interfaces;
+using RevitBuildCoordVolumes.Models.Utilites;
 
 namespace RevitBuildCoordVolumes.Models.Services;
 
@@ -128,7 +129,7 @@ internal class SlabService : ISlabService {
         double firstZ = vertices[0].Position.Z;
 
         return vertices.Any(v =>
-            Math.Abs(v.Position.Z - firstZ) > _systemPluginConfig.Tolerance);
+            Math.Abs(v.Position.Z - firstZ) > GeometryTolerance.Model);
     }
 
     // Метод проверки наклонена ли плита линией уклона
@@ -147,6 +148,6 @@ internal class SlabService : ISlabService {
         double start = slopeLine.GetParamValueOrDefault<double>(BuiltInParameter.SLOPE_START_HEIGHT);
         double end = slopeLine.GetParamValueOrDefault<double>(BuiltInParameter.SLOPE_END_HEIGHT);
 
-        return Math.Abs(start - end) < _systemPluginConfig.Tolerance;
+        return Math.Abs(start - end) < GeometryTolerance.Model;
     }
 }

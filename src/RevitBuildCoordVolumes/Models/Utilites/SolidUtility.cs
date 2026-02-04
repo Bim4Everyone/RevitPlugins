@@ -31,13 +31,13 @@ internal static class SolidUtility {
 
         double amountToExtrude = finish - start;
 
-        if(listCurveLoops.Count == 0 && amountToExtrude <= 1e-6) {
+        if(listCurveLoops.Count == 0 && amountToExtrude <= GeometryTolerance.Model) {
             return null;
         }
 
         try {
             var solid = GeometryCreationUtilities.CreateExtrusionGeometry(listCurveLoops, direction, amountToExtrude);
-            return solid != null && solid.Volume > 1e-6 ? solid : null;
+            return solid != null && solid.Volume > GeometryTolerance.Model ? solid : null;
         } catch {
             return null;
         }

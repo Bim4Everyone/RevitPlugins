@@ -101,7 +101,7 @@ internal class ContourService : IContourService {
             }
 
             // округление координат для стабильности
-            const double tol = 1e-6;
+            double tol = GeometryTolerance.Model;
             long qx1 = (long) Math.Round(x1 / tol);
             long qy1 = (long) Math.Round(y1 / tol);
             long qx2 = (long) Math.Round(x2 / tol);
@@ -131,9 +131,8 @@ internal class ContourService : IContourService {
         var remaining = new HashSet<Curve>(allCurves);
         var pointMap = new Dictionary<string, List<Curve>>();
 
-        const double tol = 1e-6;
-
         static string GetPointKey(XYZ pt) {
+            double tol = GeometryTolerance.Model;
             long x = (long) Math.Round(pt.X / tol);
             long y = (long) Math.Round(pt.Y / tol);
             long z = (long) Math.Round(pt.Z / tol);
