@@ -68,10 +68,14 @@ internal class RevitElement {
             string paramName = match.Value.Replace("{", "").Replace("}", "");
             var param = Parameters
                 .FirstOrDefault(parameter => parameter.Definition.Name == paramName);
-            if(param == null) { return; }
+            string val;
+            if(param == null) {
+                val = string.Empty;
+            } else {
+                val = GetValueByParameter(param);
+            }
 
             regexForParam = new Regex(match.Value);
-            string val = GetValueByParameter(param);
             ParamValue = regexForParam.Replace(ParamValue, val, 1);
         }
     }

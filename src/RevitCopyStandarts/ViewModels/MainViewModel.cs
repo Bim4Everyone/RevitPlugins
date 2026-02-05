@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.IO;
 using System.Linq;
@@ -21,6 +21,7 @@ internal sealed class MainViewModel : BaseViewModel {
     private readonly RevitRepository _revitRepository;
     private readonly IStandartsService _standarts;
     private readonly ILocalizationService _localizationService;
+    private readonly IMessageBoxService _messageBoxService;
     private readonly INotificationService _notificationService;
 
     private ObservableCollection<BimPartsViewModel> _bimParts;
@@ -33,12 +34,14 @@ internal sealed class MainViewModel : BaseViewModel {
         RevitRepository revitRepository,
         IStandartsService standarts,
         ILocalizationService localizationService,
+        IMessageBoxService messageBoxService,
         INotificationService notificationService,
         IProgressDialogFactory progressDialogFactory) {
         _pluginConfig = pluginConfig;
         _revitRepository = revitRepository;
         _standarts = standarts;
         _localizationService = localizationService;
+        _messageBoxService = messageBoxService;
         _notificationService = notificationService;
         ProgressDialogFactory = progressDialogFactory;
 
@@ -78,6 +81,7 @@ internal sealed class MainViewModel : BaseViewModel {
                     item,
                     _revitRepository,
                     _localizationService,
+                    _messageBoxService,
                     _notificationService,
                     ProgressDialogFactory))
             .ToArray();

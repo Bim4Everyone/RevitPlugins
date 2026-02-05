@@ -1,0 +1,296 @@
+<core:WpfUIPlatformWindow
+    x:Class="RevitSetCoordParams.Views.MainWindow"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:base="clr-namespace:dosymep.WPF.Views"
+    xmlns:local="clr-namespace:RevitSetCoordParams.Views"
+    xmlns:edits="clr-namespace:RevitSetCoordParams.Views.Edits"
+    xmlns:vms="clr-namespace:RevitSetCoordParams.ViewModels"
+    xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
+    xmlns:core="clr-namespace:dosymep.WpfUI.Core"
+    xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
+    xmlns:me="clr-namespace:dosymep.WpfCore.MarkupExtensions;assembly=dosymep.WpfCore"
+    xmlns:converters="clr-namespace:dosymep.WpfCore.Converters;assembly=dosymep.WpfCore"
+    xmlns:wpfbehaviors="clr-namespace:dosymep.WpfCore.Behaviors;assembly=dosymep.WpfCore"
+   
+    mc:Ignorable="d"
+    Title="{me:LocalizationSource MainWindow.Title}"
+    
+    Height="710"
+    Width="900"
+    
+    MinHeight="710"
+    MinWidth="900"
+   
+    d:DataContext="{d:DesignInstance vms:MainViewModel, IsDesignTimeCreatable=False}">
+
+    <i:Interaction.Behaviors>        
+        <wpfbehaviors:WpfAttachServiceBehavior
+            AttachableService="{Binding ProgressDialogFactory}" />
+    </i:Interaction.Behaviors>
+
+    <Window.Resources>
+        <converters:BoolToVisibilityConverter
+            x:Key="CategoryWarningIconVisible"
+            TrueValue="Visible"
+            FalseValue="Collapsed" />
+        
+        <converters:BoolToVisibilityConverter
+            x:Key="ParamWarningIconVisible"
+            TrueValue="Visible"
+            FalseValue="Collapsed" />
+        
+        <Style
+            TargetType="ToolTip">
+            <Setter
+                Property="MaxWidth"
+                Value="500" />            
+        </Style>        
+    </Window.Resources>
+
+    <i:Interaction.Triggers>
+        <i:EventTrigger EventName="Loaded">
+            <i:InvokeCommandAction Command="{Binding LoadViewCommand}" />
+        </i:EventTrigger>
+    </i:Interaction.Triggers>
+
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+        
+        <ui:TitleBar
+            Grid.Row="0"
+            Icon="{ui:SymbolIcon clipboardTaskListLtr24, FontSize=20}"
+            Title="{me:LocalizationSource MainWindow.Title}" 
+            FontSize="14"
+            FontWeight="DemiBold"/>        
+
+        <ScrollViewer
+            Grid.Row="1"
+            VerticalScrollBarVisibility="Auto"
+            HorizontalScrollBarVisibility="Disabled">
+            
+            <StackPanel
+                Margin="10">
+
+                <edits:CustomEditControl
+                    Icon="{ui:SymbolIcon fullScreenMaximize24}"
+                    Header="{me:LocalizationSource MainWindow.RangeElements}"
+                    Description="{me:LocalizationSource MainWindow.RangeElementsDescription}">
+
+                    <ComboBox
+                        ItemsSource="{Binding RangeElements}"
+                        SelectedValue="{Binding SelectedRangeElements}"
+                        DisplayMemberPath="Name"/>
+                </edits:CustomEditControl>
+
+                <edits:CustomEditControl
+                    Icon="{ui:SymbolIcon mobileOptimized24}"
+                    Header="{me:LocalizationSource MainWindow.SourceFiles}"
+                    Description="{me:LocalizationSource MainWindow.SourceFilesDescription}">
+
+                    <ComboBox
+                        ItemsSource="{Binding SourceFiles}"
+                        SelectedValue="{Binding SelectedSourceFile}"
+                        DisplayMemberPath="FileName"/>
+                </edits:CustomEditControl>
+
+                <edits:CustomEditControl
+                    Icon="{ui:SymbolIcon grid24}"
+                    Header="{me:LocalizationSource MainWindow.TypeModels}"
+                    Description="{me:LocalizationSource MainWindow.TypeModelsDescription}">
+
+                    <ComboBox
+                        ItemsSource="{Binding TypeModels}"
+                        SelectedValue="{Binding SelectedTypeModel}"
+                        DisplayMemberPath="Name" />
+                </edits:CustomEditControl>
+
+                <edits:CustomEditControl
+                    Icon="{ui:SymbolIcon fullScreenMinimize24}"
+                    Header="{me:LocalizationSource MainWindow.Positions}"
+                    Description="{me:LocalizationSource MainWindow.PositionsDescription}">
+                    
+                    <ComboBox
+                        ItemsSource="{Binding Positions}"
+                        SelectedValue="{Binding SelectedPosition}"
+                        DisplayMemberPath="Name" />
+                </edits:CustomEditControl>
+
+                <edits:CustomGroupEditControl
+                    Icon="{ui:SymbolIcon clipboardTaskListLtr24}"
+                    Header="{me:LocalizationSource MainWindow.Params}"
+                    Description="{me:LocalizationSource MainWindow.ParamsDescription}"
+                    ExtraIconVisible="True">
+                    <edits:CustomGroupEditControl.ExtraIcon>
+                        <ui:SymbolIcon
+                            Symbol="Warning24"
+                            Foreground="OrangeRed"
+                            FontSize="24"
+                            ToolTip="{me:LocalizationSource MainWindow.ParamWarningTooltip}"
+                            Visibility="{Binding HasParamWarning, Converter={StaticResource ParamWarningIconVisible}}" />
+                    </edits:CustomGroupEditControl.ExtraIcon>
+
+                    <edits:CustomGroupEditControl.EditControl>
+                        <ItemsControl
+                            ItemsSource="{Binding Params}">
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate
+                                    DataType="{x:Type vms:ParamViewModel}">
+                                    <edits:ParamControl
+                                        Description="{Binding Description}"
+                                        DetailDescription="{Binding DetailDescription}"
+                                        SourceParamName="{Binding SourceParamName, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
+                                        TargetParamName="{Binding TargetParamName, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
+                                        IsChecked="{Binding IsChecked, Mode=TwoWay}"
+                                        IsPair="{Binding IsPair, Mode=TwoWay}"
+                                        HasWarning="{Binding HasWarning, Mode=TwoWay}"
+                                        WarningDescription="{Binding Warnings}"/>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                            
+                            <ItemsControl.ItemsPanel>
+                                <ItemsPanelTemplate>
+                                    <StackPanel />
+                                </ItemsPanelTemplate>
+                            </ItemsControl.ItemsPanel>
+                        </ItemsControl>
+                    </edits:CustomGroupEditControl.EditControl>
+
+                </edits:CustomGroupEditControl>
+
+                <edits:CustomGroupEditControl
+                    Icon="{ui:SymbolIcon form24}"                     
+                    Header="{me:LocalizationSource MainWindow.Categories}"
+                    Description="{me:LocalizationSource MainWindow.CategoriesDescription}"
+                    ExtraIconVisible="True">                    
+                    <edits:CustomGroupEditControl.ExtraIcon>
+                        <ui:SymbolIcon                            
+                            Symbol="Warning24"
+                            Foreground="OrangeRed"
+                            FontSize="24"
+                            ToolTip="{me:LocalizationSource MainWindow.CategoryWarningTooltip}"
+                            Visibility="{Binding HasCategoryWarning, Converter={StaticResource CategoryWarningIconVisible}}"/>
+                    </edits:CustomGroupEditControl.ExtraIcon>
+
+                    <edits:CustomGroupEditControl.EditControl>
+                        <StackPanel>
+                            <Border
+                                Margin="5"
+                                VerticalAlignment="Center"
+                                HorizontalAlignment="Stretch"
+                                Background="{DynamicResource CardBackground}"
+                                BorderBrush="{DynamicResource CardBorderBrush}"
+                                CornerRadius="{DynamicResource ControlCornerRadius}"
+                                BorderThickness="{DynamicResource CardControlBorderThemeThickness}">
+                                <StackPanel
+                                    Orientation="Horizontal"
+                                    VerticalAlignment="Center"
+                                    HorizontalAlignment="Center">
+                                    <RadioButton
+                                        Margin="20,0,0,0"
+                                        GroupName="Choise"
+                                        Content="{me:LocalizationSource MainWindow.CheckedAllCats}"                                        
+                                        IsChecked="{Binding IsCheckedAllCats, Mode=TwoWay}"
+                                        Command="{Binding CheckAllCatsCommand}" />
+                                    <RadioButton
+                                        Margin="20,0,0,0"
+                                        GroupName="Choise"
+                                        Content="{me:LocalizationSource MainWindow.NotCheckedAllCats}"                                        
+                                        Command="{Binding UncheckAllCatsCommand}" />
+                                </StackPanel>
+                            </Border>
+                            
+                            <ItemsControl
+                                ItemsSource="{Binding Categories}">
+                                <ItemsControl.ItemTemplate>
+                                    <DataTemplate
+                                        DataType="{x:Type vms:CategoryViewModel}">
+                                        <edits:CategoryControl
+                                            CategoryName="{Binding CategoryName}"
+                                            IsChecked="{Binding IsChecked, Mode=TwoWay}"
+                                            HasWarning="{Binding HasWarning, Mode=TwoWay}"
+                                            WarningDescription="{Binding Warnings}" />
+                                    </DataTemplate>
+                                </ItemsControl.ItemTemplate>
+
+                                <ItemsControl.ItemsPanel>
+                                    <ItemsPanelTemplate>
+                                        <UniformGrid
+                                            Columns="3" />
+                                    </ItemsPanelTemplate>
+                                </ItemsControl.ItemsPanel>
+                            </ItemsControl>
+                        </StackPanel>                        
+                    </edits:CustomGroupEditControl.EditControl> 
+                </edits:CustomGroupEditControl>
+                
+                <edits:CustomGroupEditControl                    
+                    Icon="{ui:SymbolIcon search24}"
+                    Header="{me:LocalizationSource MainWindow.Search}"
+                    Description="{me:LocalizationSource MainWindow.SearchDescription}"                    
+                    ToggleSwitchVisible="True"
+                    IsChecked="{Binding Search, Mode=TwoWay}"
+                    SwitchOnContent="{me:LocalizationSource MainWindow.SearchToggleSwitchOn}"
+                    SwitchOffContent="{me:LocalizationSource MainWindow.SearchToggleSwitchOff}">
+
+                    <StackPanel>
+                        
+                        <edits:CustomEditControl
+                            Icon="{ui:SymbolIcon addCircle24}"
+                            Header="{me:LocalizationSource MainWindow.MaxDiameterSearchSphere}"
+                            Description="{me:LocalizationSource MainWindow.MaxDiameterSearchSphereDescription}">
+
+                            <ui:TextBox
+                                Text="{Binding MaxDiameterSearchSphereMm, UpdateSourceTrigger=PropertyChanged}"
+                                ToolTip="{me:LocalizationSource MainWindow.SearchSphereTooltip}"/>
+                        </edits:CustomEditControl>
+
+                        <edits:CustomEditControl
+                            Icon="{ui:SymbolIcon addSubtractCircle24}"
+                            Header="{me:LocalizationSource MainWindow.StepSearchSphere}"
+                            Description="{me:LocalizationSource MainWindow.StepSearchSphereDescription}">
+
+                            <ui:TextBox
+                                Text="{Binding StepDiameterSearchSphereMm, UpdateSourceTrigger=PropertyChanged}"
+                                ToolTip="{me:LocalizationSource MainWindow.StepSearchSphereTooltip}" />
+                        </edits:CustomEditControl>                        
+                    </StackPanel>                    
+                </edits:CustomGroupEditControl>                
+            </StackPanel>            
+        </ScrollViewer>        
+
+        <StackPanel
+            Grid.Row="2"
+            Orientation="Horizontal"
+            HorizontalAlignment="Right">
+
+            <ui:TextBlock
+                Margin="10"
+                Foreground="Orange"
+                VerticalAlignment="Center"
+                Text="{Binding ErrorText}" />
+
+            <ui:Button
+                Margin="10"
+                Width="110"
+                Appearance="Info"
+                Content="{me:LocalizationSource MainWindow.ButtonOk}"
+                Click="ButtonOk_Click"
+                Command="{Binding AcceptViewCommand}" />
+
+            <ui:Button
+                Margin="10"
+                Width="110"
+                Content="{me:LocalizationSource MainWindow.ButtonCancel}"
+                IsCancel="True"
+                Click="ButtonCancel_Click" />
+            
+        </StackPanel>        
+    </Grid>    
+</core:WpfUIPlatformWindow>

@@ -1,55 +1,80 @@
 ﻿using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 using System.Windows.Input;
 
 using Autodesk.Revit.DB;
 
 using dosymep.Revit;
+using dosymep.SimpleServices;
 using dosymep.WPF.Commands;
 using dosymep.WPF.ViewModels;
 
 using RevitMarkPlacement.Models;
+using RevitMarkPlacement.Models.AnnotationTemplates;
+using RevitMarkPlacement.Models.SelectionModes;
+using RevitMarkPlacement.Services;
+using RevitMarkPlacement.Services.AnnotationServices;
+using RevitMarkPlacement.ViewModels.FloorHeight;
+using RevitMarkPlacement.ViewModels.ReportViewModels;
 
 namespace RevitMarkPlacement.ViewModels;
 
 internal class MainViewModel : BaseViewModel {
-    private const string _allElementsSelection = "Создать по всему проекту";
-    private const string _selectedElements = "Создать по выбранным элементам";
-    private readonly AnnotationsConfig _config;
+    private readonly PluginConfig _pluginConfig;
+    private readonly SystemPluginConfig _systemPluginConfig;
     private readonly RevitRepository _revitRepository;
-    private readonly AnnotationsSettings _settings;
+    private readonly ILocalizationService _localizationService;
+
+    private readonly IUnitProvider _unitProvider;
+    private readonly IDocumentProvider _documentProvider;
+    private readonly IGlobalParamSelection _globalSelection;
+    private readonly ISpotDimensionSelection[] _spotSelections;
+
+    private ReportElementsViewModel _reportElementsViewModel;
+
     private string _errorText;
-    private string _floorCount;
-    private List<IFloorHeightProvider> _floorHeightProviders;
-    private InfoElementsViewModel _infoElementsViewModel;
-    private IFloorHeightProvider _selectedFloorHeightProvider;
-    private SelectionModeViewModel _selectedMode;
-    private string _selectedParameterName;
-    private List<SelectionModeViewModel> _selectionModes;
+    private string _levelCount;
 
-    public MainViewModel(RevitRepository revitRepository, AnnotationsConfig config) {
+    private SelectionModeViewModel _selection;
+    private ObservableCollection<SelectionModeViewModel> _selections;
+
+    private IFloorHeightProvider _levelHeight;
+    private ObservableCollection<IFloorHeightProvider> _floorHeights;
+
+    public MainViewModel(
+        PluginConfig pluginConfig,
+        SystemPluginConfig systemPluginConfig,
+        RevitRepository revitRepository,
+        ILocalizationService localizationService,
+        IUnitProvider unitProvider,
+        IDocumentProvider documentProvider,
+        IGlobalParamSelection globalSelection,
+        ISpotDimensionSelection[] spotSelections) {
+        _pluginConfig = pluginConfig;
+        _systemPluginConfig = systemPluginConfig;
+
         _revitRepository = revitRepository;
-        _config = config;
-        _settings = _revitRepository.GetSettings(_config);
-        if(_settings == null) {
-            _settings = _revitRepository.AddSettings(_config);
-        }
+        _localizationService = localizationService;
 
-        FloorCount = _settings.LevelCount.ToString();
-        InitializeSelectionModes();
-        InitializeFloorHeightProvider();
-        InfoElementsViewModel = new InfoElementsViewModel();
-        PlaceAnnotationCommand = new RelayCommand(PlaceAnnotation, CanPlaceAnnotation);
+        _unitProvider = unitProvider;
+        _documentProvider = documentProvider;
+
+        _globalSelection = globalSelection;
+        _spotSelections = spotSelections;
+
+        ReportElementsViewModel = new ReportElementsViewModel();
+
+        LoadViewCommand = RelayCommand.Create(LoadView);
+        AcceptViewCommand = RelayCommand.Create(AcceptView, CanAcceptView);
     }
 
-    public string FloorCount {
-        get => _floorCount;
-        set => RaiseAndSetIfChanged(ref _floorCount, value);
-    }
+    public ICommand LoadViewCommand { get; set; }
+    public ICommand AcceptViewCommand { get; set; }
 
-    public string SelectedParameterName {
-        get => _selectedParameterName;
-        set => RaiseAndSetIfChanged(ref _selectedParameterName, value);
+    public string LevelCount {
+        get => _levelCount;
+        set => RaiseAndSetIfChanged(ref _levelCount, value);
     }
 
     public string ErrorText {
@@ -57,82 +82,127 @@ internal class MainViewModel : BaseViewModel {
         set => RaiseAndSetIfChanged(ref _errorText, value);
     }
 
-    public SelectionModeViewModel SelectedMode {
-        get => _selectedMode;
-        set => RaiseAndSetIfChanged(ref _selectedMode, value);
+    public SelectionModeViewModel Selection {
+        get => _selection;
+        set => RaiseAndSetIfChanged(ref _selection, value);
     }
 
-    public List<IFloorHeightProvider> FloorHeightProviders {
-        get => _floorHeightProviders;
-        set => RaiseAndSetIfChanged(ref _floorHeightProviders, value);
+    public ObservableCollection<SelectionModeViewModel> Selections {
+        get => _selections;
+        set => RaiseAndSetIfChanged(ref _selections, value);
     }
 
-    public IFloorHeightProvider SelectedFloorHeightProvider {
-        get => _selectedFloorHeightProvider;
-        set => RaiseAndSetIfChanged(ref _selectedFloorHeightProvider, value);
+    public IFloorHeightProvider LevelHeight {
+        get => _levelHeight;
+        set => RaiseAndSetIfChanged(ref _levelHeight, value);
     }
 
-    public InfoElementsViewModel InfoElementsViewModel {
-        get => _infoElementsViewModel;
-        set => RaiseAndSetIfChanged(ref _infoElementsViewModel, value);
+    public ObservableCollection<IFloorHeightProvider> FloorHeights {
+        get => _floorHeights;
+        set => RaiseAndSetIfChanged(ref _floorHeights, value);
     }
 
-    public List<SelectionModeViewModel> SelectionModes {
-        get => _selectionModes;
-        set => RaiseAndSetIfChanged(ref _selectionModes, value);
+    public ReportElementsViewModel ReportElementsViewModel {
+        get => _reportElementsViewModel;
+        set => RaiseAndSetIfChanged(ref _reportElementsViewModel, value);
     }
 
-    public ICommand PlaceAnnotationCommand { get; set; }
+    private void LoadView() {
+        var settings = _pluginConfig.GetSettings(_documentProvider.GetDocument());
 
-    private void InitializeSelectionModes() {
-        SelectionModes = new List<SelectionModeViewModel> {
-            new(_revitRepository, new AllElementsSelection(), _allElementsSelection),
-            new(_revitRepository, new ElementsSelection(), _selectedElements)
-        };
-        if(_settings.SelectionMode == SelectionMode.AllElements) {
-            SelectedMode = SelectionModes[0];
-        } else {
-            SelectedMode = SelectionModes[1];
+        LoadSelections(settings);
+        LoadFloorHeights(settings);
+
+        LevelCount = settings?.LevelCount.ToString();
+    }
+
+    private void LoadSelections(RevitSettings settings) {
+        Selections = [.._spotSelections.Select(item => new SelectionModeViewModel(item, _revitRepository))];
+
+        foreach(var selection in Selections) {
+            selection.LoadSpotDimensionTypes();
         }
+
+        Selection = Selections
+                        .FirstOrDefault(item => item.Selections == settings?.SelectionMode)
+                    ?? Selections.FirstOrDefault();
     }
 
-    private void InitializeFloorHeightProvider() {
-        FloorHeightProviders = new List<IFloorHeightProvider> {
-            new UserFloorHeightViewModel("Индивидуальная настройка", _settings),
-            new GlobalFloorHeightViewModel(_revitRepository, "По глобальному параметру", _settings)
-        };
-        if(_settings.LevelHeightProvider == LevelHeightProvider.UserSettings
-           || !FloorHeightProviders[1].IsEnabled) {
-            SelectedFloorHeightProvider = FloorHeightProviders[0];
-        } else {
-            SelectedFloorHeightProvider = FloorHeightProviders[1];
+    private void LoadFloorHeights(RevitSettings settings) {
+        FloorHeights = [
+            new UserFloorHeightViewModel(_localizationService),
+            new GlobalParamsViewModel(_unitProvider, _globalSelection, _localizationService)
+        ];
+
+        foreach(var provider in FloorHeights) {
+            provider.LoadConfig(settings);
         }
+
+        LevelHeight = FloorHeights
+                          .FirstOrDefault(item =>
+                              item.IsEnabled
+                              && item.LevelHeightProvider == settings?.LevelHeightProvider)
+                      ?? FloorHeights.FirstOrDefault();
     }
 
-    private void PlaceAnnotation(object p) {
-        var marks = new TemplateLevelMarkCollection(_revitRepository, SelectedMode.SelectionMode);
-        marks.CreateAnnotation(int.Parse(FloorCount), double.Parse(SelectedFloorHeightProvider.GetFloorHeight()));
+    private void AcceptView() {
         SaveConfig();
+
+        using TransactionGroup transaction = _revitRepository.StartTransactionGroup(
+            _localizationService.GetLocalizedString("MainWindow.CreateAnnotationsTransactionName"));
+
+        var service = new CreateAnnotationService(_revitRepository, _systemPluginConfig);
+
+        service.LoadAnnotations(Selection.Selection.GetElements().ToArray());
+
+        service.ProcessAnnotations(
+            new CreateAnnotationTemplateOptions() {
+                LevelCount = int.Parse(LevelCount),
+                LevelHeightMm = LevelHeight.GetFloorHeight() ?? 0
+            });
+
+        transaction.Assimilate();
     }
 
-    private bool CanPlaceAnnotation(object p) {
-        if(!int.TryParse(FloorCount, out int levelCount)) {
-            ErrorText = "Количество типовых этажей должно быть числом.";
+    private bool CanAcceptView() {
+        if(Selection is null) {
+            ErrorText = _localizationService.GetLocalizedString("MainWindow.EmptySelectionMode");
+            return false;
+        }
+
+        if(Selection?.SpotDimensionTypes.Count == 0) {
+            ErrorText = _localizationService.GetLocalizedString("MainWindow.EmptySpotDimensionTypes");
+            return false;
+        }
+
+        if(string.IsNullOrEmpty(LevelCount)) {
+            ErrorText = _localizationService.GetLocalizedString("MainWindow.EmptyFloorCount");
+            return false;
+        }
+
+        if(!int.TryParse(LevelCount, out int levelCount)) {
+            ErrorText = _localizationService.GetLocalizedString("MainWindow.TextFloorCount");
             return false;
         }
 
         if(levelCount < 1) {
-            ErrorText = "Количество типовых этажей должно быть неотрицательным.";
+            ErrorText = _localizationService.GetLocalizedString("MainWindow.NegativeFloorCount");
+            return false;
+        }
+        
+        if(levelCount > _systemPluginConfig.MaxLevelCount) {
+            ErrorText = _localizationService.GetLocalizedString("MainWindow.MaxFloorCount", _systemPluginConfig.MaxLevelCount);
             return false;
         }
 
-        if(!double.TryParse(SelectedFloorHeightProvider.GetFloorHeight(), out double floorHeight)) {
-            ErrorText = "Высота типового этажа должна быть числом.";
+        if(LevelHeight is null) {
+            ErrorText = _localizationService.GetLocalizedString("MainWindow.EmptyFloorHeight");
             return false;
         }
 
-        if(floorHeight < 1) {
-            ErrorText = "Высота типового этажа должна быть неотрицательной.";
+        string errorText = LevelHeight.GetErrorText(_systemPluginConfig);
+        if(!string.IsNullOrEmpty(errorText)) {
+            ErrorText = errorText;
             return false;
         }
 
@@ -141,113 +211,18 @@ internal class MainViewModel : BaseViewModel {
     }
 
     private void SaveConfig() {
-        if(SelectedMode.Description == _allElementsSelection) {
-            _settings.SelectionMode = SelectionMode.AllElements;
-        } else {
-            _settings.SelectionMode = SelectionMode.SelectedElements;
+        Document document = _documentProvider.GetDocument();
+        RevitSettings setting = _pluginConfig.GetSettings(document)
+                                ?? _pluginConfig.AddSettings(document);
+
+        setting.LevelCount = int.Parse(LevelCount);
+        setting.SelectionMode = Selection?.Selections;
+        setting.LevelHeightProvider = LevelHeight?.LevelHeightProvider;
+
+        foreach(var provider in FloorHeights) {
+            provider.SaveConfig(setting);
         }
 
-        _settings.LevelCount = int.Parse(FloorCount);
-        if(SelectedFloorHeightProvider is UserFloorHeightViewModel) {
-            _settings.LevelHeightProvider = LevelHeightProvider.UserSettings;
-        } else {
-            _settings.LevelHeightProvider = LevelHeightProvider.GlobalParameter;
-        }
-
-        foreach(var provider in FloorHeightProviders) {
-            if(provider is UserFloorHeightViewModel userFloorHeight) {
-                _settings.LevelHeight = double.Parse(userFloorHeight.FloorHeight);
-            }
-
-            if(provider is GlobalFloorHeightViewModel globalFloorHeight) {
-                _settings.GlobalParameterId = globalFloorHeight?.SelectedGlobalParameter?.ElementId;
-            }
-        }
-
-        _config.SaveProjectConfig();
-    }
-
-    public bool CanPlaceAnnotation() {
-        var families = CheckFamilyAnnotations();
-        CheckAnnotationParameters(families);
-        CheckElevationSymbols();
-        return InfoElementsViewModel.InfoElements.Count == 0;
-    }
-
-    private IEnumerable<Family> CheckFamilyAnnotations() {
-        var topFamily = _revitRepository.GetTopAnnotaionFamily();
-        if(topFamily != null) {
-            yield return topFamily;
-        } else {
-            InfoElementsViewModel.InfoElements.Add(
-                new InfoElementViewModel(InfoElement.FamilyAnnotationMissing, RevitRepository.FamilyTop));
-        }
-
-        var bottomFamily = _revitRepository.GetBottomAnnotaionFamily();
-        if(bottomFamily != null) {
-            yield return bottomFamily;
-        } else {
-            InfoElementsViewModel.InfoElements.Add(
-                new InfoElementViewModel(InfoElement.FamilyAnnotationMissing, RevitRepository.FamilyBottom));
-        }
-    }
-
-    private bool CheckAnnotationParameters(IEnumerable<Family> families) {
-        var parameters = new List<string> {
-            RevitRepository.LevelCountParam,
-            RevitRepository.FirstLevelOnParam,
-            RevitRepository.SpotDimensionIdParam,
-            RevitRepository.TemplateLevelHeightParam,
-            RevitRepository.FirstLevelParam
-        };
-        bool result = true;
-        foreach(var family in families) {
-            var document = _revitRepository.GetFamilyDocument(family);
-            var familyManager = document.FamilyManager;
-            try {
-                var notExistedParams = parameters
-                    .Except(familyManager.GetParameters().Select(item => item.Definition.Name))
-                    .ToList();
-
-                if(notExistedParams.Count > 0) {
-                    foreach(string param in notExistedParams) {
-                        InfoElementsViewModel.InfoElements.Add(
-                            new InfoElementViewModel(InfoElement.AnnotationParameterMissing, family.Name, param));
-                    }
-
-                    result = false;
-                }
-            } finally {
-                document.Close(false);
-            }
-        }
-
-        return result;
-    }
-
-    private bool CheckElevationSymbols() {
-        var symbols = _revitRepository.GetElevationSymbols();
-        bool result = true;
-        foreach(var symbol in symbols) {
-            if(!symbol.IsExistsParam(RevitRepository.ElevSymbolWidth)) {
-                InfoElementsViewModel.InfoElements.Add(
-                    new InfoElementViewModel(
-                        InfoElement.ElevationParameterMissing,
-                        symbol.Name,
-                        RevitRepository.ElevSymbolWidth));
-                result = false;
-            }
-
-            if(!symbol.IsExistsParam(RevitRepository.ElevSymbolHeight)) {
-                InfoElementsViewModel.InfoElements.Add(
-                    new InfoElementViewModel(
-                        InfoElement.ElevationParameterMissing,
-                        symbol.Name,
-                        RevitRepository.ElevSymbolHeight));
-                result = false;
-            }
-        }
-
-        return result;
+        _pluginConfig.SaveProjectConfig();
     }
 }

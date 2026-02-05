@@ -3,9 +3,8 @@ using System.Linq;
 
 using Autodesk.Revit.DB;
 
-using DevExpress.Utils.Extensions;
-
 using dosymep.Bim4Everyone.SystemParams;
+using dosymep.SimpleServices;
 
 using RevitRooms.Models;
 using RevitRooms.ViewModels;
@@ -19,13 +18,15 @@ internal class NumSectionGroup : NumerateCommand {
     private ElementId _groupId;
     private ElementId _sectionId;
 
-    public NumSectionGroup(RevitRepository revitRepository, IDictionary<ElementId, int> ordering)
+    public NumSectionGroup(RevitRepository revitRepository,
+                           ILocalizationService localizationService,
+                           IDictionary<ElementId, int> ordering)
         : base(revitRepository) {
         _ordering = ordering;
 
-        RevitParam =
-            SystemParamsConfig.Instance.CreateRevitParam(revitRepository.Document, BuiltInParameter.ROOM_NUMBER);
-        TransactionName = "Нумерация помещений в пределах каждой секции, этажа и группы";
+        RevitParam = SystemParamsConfig.Instance
+            .CreateRevitParam(revitRepository.Document, BuiltInParameter.ROOM_NUMBER);
+        TransactionName = localizationService.GetLocalizedString("Transaction.NumBySectionGroupLevel");
     }
 
     protected override SpatialElementViewModel[] OrderElements(IEnumerable<SpatialElementViewModel> spatialElements) {
@@ -34,7 +35,7 @@ internal class NumSectionGroup : NumerateCommand {
             .OrderBy(item => item.RoomSection, _elementComparer)
             .ThenBy(item => item.RoomGroup, _elementComparer)
             .ThenBy(item => item.LevelElevation)
-            .ThenBy(item => _ordering.GetValueOrDefault(item.Room.Id, 0))
+            .ThenBy(item => _ordering.TryGetValue(item.Room.Id, out var value) ? value : 0)
             .ThenBy(item => GetDistance(item.Element)) // в одной группе может быть несколько гостиных и тп
             .ToArray();
     }

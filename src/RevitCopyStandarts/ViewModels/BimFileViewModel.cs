@@ -1,11 +1,10 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Windows.Input;
 
-using Autodesk.Revit.ApplicationServices;
 using Autodesk.Revit.DB;
 
 using dosymep.SimpleServices;
@@ -69,6 +68,7 @@ internal class BimFileViewModel : BaseViewModel {
     private readonly FileInfo _fileInfo;
     private readonly RevitRepository _revitRepository;
     private readonly ILocalizationService _localizationService;
+    private readonly IMessageBoxService _messageBoxService;
     private readonly INotificationService _notificationService;
     private readonly IProgressDialogFactory _progressDialogFactory;
 
@@ -77,6 +77,7 @@ internal class BimFileViewModel : BaseViewModel {
         FileInfo fileInfo, 
         RevitRepository revitRepository,
         ILocalizationService localizationService,
+        IMessageBoxService messageBoxService,
         INotificationService notificationService,
         IProgressDialogFactory progressDialogFactory) {
         Name = name;
@@ -84,6 +85,7 @@ internal class BimFileViewModel : BaseViewModel {
         _fileInfo = fileInfo;
         _revitRepository = revitRepository;
         _localizationService = localizationService;
+        _messageBoxService = messageBoxService;
         _notificationService = notificationService;
         _progressDialogFactory = progressDialogFactory;
 
@@ -111,10 +113,11 @@ internal class BimFileViewModel : BaseViewModel {
 
             commands.AddRange(GetOptionalStandarts(sourceDocument));
             commands.AddRange(GetIdOptionalStandarts(sourceDocument));
+            commands.AddRange(GetFamilyStandarts(sourceDocument));
 
             using(var window = _progressDialogFactory.CreateDialog()) {
                 window.MaxValue = commands.Count;
-                window.DisplayTitleFormat = _localizationService.GetLocalizedString("ProgressDialog.Title");;
+                window.DisplayTitleFormat = _localizationService.GetLocalizedString("ProgressDialog.Title");
                 window.Show();
 
                 int counter = 1;
@@ -123,7 +126,7 @@ internal class BimFileViewModel : BaseViewModel {
                 foreach(var command in commands) {
                     progress.Report(counter++);
                     cancellationToken.ThrowIfCancellationRequested();
-                    
+
                     command.Execute();
                 }
             }
@@ -132,7 +135,15 @@ internal class BimFileViewModel : BaseViewModel {
                     _localizationService.GetLocalizedString("Notification.Title"),
                     _localizationService.GetLocalizedString("Notification.Message"))
                 .ShowAsync();
-        } finally {
+        } 
+        catch(Exception e) {
+            _messageBoxService
+                .Show(e.Message,
+                      _localizationService.GetLocalizedString("MessageBox.Title.Error"),
+                      System.Windows.MessageBoxButton.OK,
+                      System.Windows.MessageBoxImage.Warning);
+        }
+        finally {
             sourceDocument.Close(false);
         }
     }
@@ -196,6 +207,31 @@ internal class BimFileViewModel : BaseViewModel {
 
         return sourceDocument.GetElement(new ElementId(result));
 #endif
+    }
+
+    private IEnumerable<ICopyStandartsCommand> GetFamilyStandarts(Document sourceDocument) {
+        if(string.IsNullOrEmpty(sourceDocument.ProjectInformation.Address)
+            || !sourceDocument.ProjectInformation.Address.Contains(':')) {
+            return [];
+        }
+        var command = GetLoadFamiliesCommand(
+            sourceDocument.ProjectInformation.Address
+                .Split(['\n'], StringSplitOptions.RemoveEmptyEntries)
+                .Select(item => item.Trim())
+                .ToList());
+
+        return [command];
+    }
+
+    private ICopyStandartsCommand GetLoadFamiliesCommand(List<string> paths) {
+        foreach(var path in paths) {
+            if(!File.Exists(path)) {
+                throw new ArgumentException(
+                    _localizationService.GetLocalizedString("Exceptions.PathToFamlyFilyNotExists", path));
+            }
+        }
+        
+        return new LoadFamiliesCommand(paths, _revitRepository.Document, _localizationService);
     }
 }
 

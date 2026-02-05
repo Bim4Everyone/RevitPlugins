@@ -1,4 +1,8 @@
+using System;
 using System.Collections.ObjectModel;
+using System.ComponentModel;
+using System.Globalization;
+using System.Windows.Data;
 using System.Windows.Input;
 
 using dosymep.SimpleServices;
@@ -17,6 +21,8 @@ internal class NavigatorViewModel : BaseViewModel {
     private readonly ILocalizationService _localizationService;
     private readonly SleevePlacementSettingsConfig _config;
     private readonly RevitRepository _revitRepository;
+
+    private string _sleevesFilter;
 
     public NavigatorViewModel(
         IProgressDialogFactory progressFactory,
@@ -41,9 +47,18 @@ internal class NavigatorViewModel : BaseViewModel {
 
         SettingsNameHeader = string.Format(
             _localizationService.GetLocalizedString("Navigator.SettingsNamePrefix"), _config.Name);
-        Sleeves = [];
+        AllSleeves = [];
+        Sleeves = new CollectionViewSource() { Source = AllSleeves };
+        Sleeves.Filter += SleevesFilterHandler;
+        Sleeves.SortDescriptions.Add(
+            new SortDescription(
+                nameof(SleeveViewModel.StatusValue),
+                ListSortDirection.Ascending));
+        Sleeves.GroupDescriptions.Add(new PropertyGroupDescription(nameof(SleeveViewModel.Status)));
         LoadViewCommand = RelayCommand.Create(LoadView);
         SelectSleeveCommand = RelayCommand.Create<SleeveViewModel>(SelectSleeve, CanSelectSleeve);
+
+        PropertyChanged += SleevesFilterPropertyChanged;
     }
 
 
@@ -57,7 +72,14 @@ internal class NavigatorViewModel : BaseViewModel {
 
     public string SettingsNameHeader { get; }
 
-    public ObservableCollection<SleeveViewModel> Sleeves { get; }
+    public CollectionViewSource Sleeves { get; }
+
+    public string SleevesFilter {
+        get => _sleevesFilter;
+        set => RaiseAndSetIfChanged(ref _sleevesFilter, value);
+    }
+
+    private ObservableCollection<SleeveViewModel> AllSleeves { get; }
 
 
     private void SelectSleeve(SleeveViewModel sleeve) {
@@ -69,6 +91,25 @@ internal class NavigatorViewModel : BaseViewModel {
 
     private bool CanSelectSleeve(SleeveViewModel sleeve) {
         return sleeve is not null;
+    }
+
+    private void SleevesFilterPropertyChanged(object sender, PropertyChangedEventArgs e) {
+        if(e.PropertyName == nameof(SleevesFilter)) {
+            Sleeves?.View.Refresh();
+        }
+    }
+
+    private void SleevesFilterHandler(object sender, FilterEventArgs e) {
+        if(e.Item is SleeveViewModel sleeve
+           && !string.IsNullOrWhiteSpace(SleevesFilter)) {
+            e.Accepted = true;
+            string str = SleevesFilter.Trim();
+            e.Accepted = sleeve.Status.IndexOf(str, StringComparison.OrdinalIgnoreCase) >= 0
+                         || sleeve.Comment.IndexOf(str, StringComparison.OrdinalIgnoreCase) >= 0
+                         || sleeve.Id.ToString().IndexOf(str, StringComparison.OrdinalIgnoreCase) >= 0
+                         || sleeve.Diameter.ToString(CultureInfo.InvariantCulture).IndexOf(str) >= 0
+                         || sleeve.Length.ToString(CultureInfo.InvariantCulture).IndexOf(str) >= 0;
+        }
     }
 
     private void LoadView() {
@@ -85,7 +126,7 @@ internal class NavigatorViewModel : BaseViewModel {
             ct.ThrowIfCancellationRequested();
             progress.Report(++i);
             sleeve.Status = _sleeveStatusFinder.GetStatus(sleeve);
-            Sleeves.Add(new SleeveViewModel(_revitRepository, _localizationService, sleeve));
+            AllSleeves.Add(new SleeveViewModel(_revitRepository, _localizationService, sleeve));
         }
     }
 }

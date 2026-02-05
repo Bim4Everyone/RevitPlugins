@@ -9,7 +9,7 @@
     <system:String
         x:Key="MainWindow.Settings">Settings</system:String>
     <system:String
-        x:Key="MainWindow.GroupParameters">Grouping parameter:</system:String>
+        x:Key="MainWindow.GroupParameters">Grouping parameter</system:String>
     <system:String
         x:Key="MainWindow.GroupParametersTooltip">Parameter used in sheet grouping</system:String>
     <system:String
@@ -74,4 +74,6 @@
         x:Key="GroupParameter.NoParameter">No group parameter</system:String>
     <system:String
         x:Key="GroupValue.NoValue">No value</system:String>
+    <system:String
+        x:Key="InstancesAssembly.ApprovedLines">schedule,specification,list,summary</system:String>
 </ResourceDictionary>

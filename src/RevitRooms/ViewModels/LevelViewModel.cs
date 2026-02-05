@@ -9,22 +9,25 @@ using Autodesk.Revit.DB.Architecture;
 
 using RevitRooms.Models;
 
-using Element = DevExpress.Map.Kml.Model.Element;
-
 namespace RevitRooms.ViewModels;
 internal class LevelViewModel : ElementViewModel<Level> {
+    private readonly PluginSettings _pluginSettings;
     private readonly string _name;
-    public List<Level> Levels { get; }
 
-    public LevelViewModel(string name, List<Level> levels, RevitRepository revitRepository,
-        IEnumerable<SpatialElement> spatialElements)
-        : base(levels.FirstOrDefault(), revitRepository) {
+    public LevelViewModel(string name, 
+                          List<Level> levels, 
+                          RevitRepository revitRepository,
+                          IEnumerable<SpatialElement> spatialElements,
+                          PluginSettings pluginSettings)
+            : base(levels.FirstOrDefault(), revitRepository) {
+        _pluginSettings = pluginSettings;
         _name = name;
         Levels = levels;
         SpatialElements =
             [.. GetSpatialElements(revitRepository, spatialElements)];
     }
 
+    public List<Level> Levels { get; }
     public override string Name => _name;
 
     public string LevelNames => string.Join(Environment.NewLine,
@@ -60,7 +63,7 @@ internal class LevelViewModel : ElementViewModel<Level> {
             .Where(item => item.LevelId == Element.Id)
             .Where(item => phaseElements.Contains(item.CreatedPhaseId))
             .Select(item => new RoomSeparatorViewModel(item,
-                new PhaseViewModel((Phase) RevitRepository.GetElement(item.CreatedPhaseId), RevitRepository), RevitRepository));
+                new PhaseViewModel((Phase) RevitRepository.GetElement(item.CreatedPhaseId), RevitRepository), RevitRepository, _pluginSettings));
     }
 
     public IEnumerable<FamilyInstanceViewModel> GetDoors(IEnumerable<PhaseViewModel> phases) {
@@ -72,7 +75,7 @@ internal class LevelViewModel : ElementViewModel<Level> {
             .Where(item => item.LevelId == Element.Id)
             .Where(item => phaseElements.Contains(item.CreatedPhaseId))
             .Select(item => new FamilyInstanceViewModel(item,
-                new PhaseViewModel((Phase) RevitRepository.GetElement(item.CreatedPhaseId), RevitRepository), RevitRepository))
+                new PhaseViewModel((Phase) RevitRepository.GetElement(item.CreatedPhaseId), RevitRepository), RevitRepository, _pluginSettings))
             .Where(item => spatialElements.Contains(item.ToRoom?.ElementId)
                            && spatialElements.Contains(item.FromRoom?.ElementId));
     }
@@ -85,10 +88,10 @@ internal class LevelViewModel : ElementViewModel<Level> {
         return RevitRepository.GetWindows()
             .Where(item => item.LevelId == Element.Id)
             .Where(item =>
-                item.Symbol.FamilyName.IndexOf("Окн_ББлок_", StringComparison.CurrentCultureIgnoreCase) >= 0)
+                item.Symbol.FamilyName.IndexOf(_pluginSettings.BalconyDoorFamilyName, StringComparison.CurrentCultureIgnoreCase) >= 0)
             .Where(item => phaseElements.Contains(item.CreatedPhaseId))
             .Select(item => new FamilyInstanceViewModel(item,
-                new PhaseViewModel((Phase) RevitRepository.GetElement(item.CreatedPhaseId), RevitRepository), RevitRepository))
+                new PhaseViewModel((Phase) RevitRepository.GetElement(item.CreatedPhaseId), RevitRepository), RevitRepository, _pluginSettings))
             .Where(item => spatialElements.Contains(item.ToRoom?.ElementId)
                            && spatialElements.Contains(item.FromRoom?.ElementId));
     }

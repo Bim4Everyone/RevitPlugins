@@ -1,0 +1,16 @@
+<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:system="clr-namespace:System;assembly=mscorlib">
+    <system:String x:Key="MainWindow.Title">Кладка ВОР</system:String>
+    <system:String x:Key="MainWindow.Check">Выбрать</system:String>
+    <system:String x:Key="MainWindow.Levels">Уровни</system:String>
+    <system:String x:Key="MainWindow.ClearParams">Очистить параметры всех стен перед запуском</system:String>
+    <system:String x:Key="MainWindow.ErrorNoRooms">Помещения отсутствуют в проекте</system:String>
+    <system:String x:Key="MainWindow.ErrorSelectLevels">Выберите уровни</system:String>
+    <system:String x:Key="MainWindow.Ok">ОК</system:String>
+    <system:String x:Key="MainWindow.Cancel">Отмена</system:String>
+    
+    <system:String x:Key="Transaction.ClearParams">Очистить параметры ВОР стен</system:String>
+    <system:String x:Key="Transaction.SetParams">Заполнить параметры ВОР стен</system:String>
+    <system:String x:Key="DefaultParamValue">&lt;Пусто&gt;</system:String>
+</ResourceDictionary>

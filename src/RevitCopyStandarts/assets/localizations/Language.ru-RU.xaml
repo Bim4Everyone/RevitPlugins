@@ -17,9 +17,12 @@
     <system:String x:Key="Notification.Title">Копирование стандартов</system:String>
     <system:String x:Key="Notification.Message">Копирование стандартов завершено успешно.</system:String>
     
-    <system:String x:Key="Exceptions.UnknownClassName">Неизвестное наименование команды \"{0}\".</system:String>
+    <system:String x:Key="MessageBox.Title.Error">Ошибка</system:String>
+    
+    <system:String x:Key="Exceptions.UnknownClassName">Неизвестное наименование команды "{0}".</system:String>
     <system:String x:Key="Exceptions.NullElementId">Идентификатор элемента не может быть пустым или null.</system:String>
     <system:String x:Key="Exceptions.NumElementId">Идентификатор элемента должен быть числом.</system:String>
+    <system:String x:Key="Exceptions.PathToFamlyFilyNotExists">Путь до файла семейства не существует: "{0}".</system:String>
     
     <system:String x:Key="CopyViewTemplatesCommandName">Шаблон</system:String>
     <system:String x:Key="CopyViewSchedulesCommandName">Спецификация</system:String>
@@ -32,11 +35,13 @@
     <system:String x:Key="CopyFoundationSlabCommandName">Параметры ребра плиты</system:String>
     <system:String x:Key="CopyWallTypesCommandName">Типы стен</system:String>
     
-    <system:String x:Key="CopyColorFillSchemesCommandTransaction">Копирование \"Схема цветов\"</system:String>
-    <system:String x:Key="CopyCurtainTypesCommandTransaction">Копирование \"Типы витражей\"</system:String>
-    <system:String x:Key="CopyObjectStylesCommandTransactionGroup">Копирование \"Стили объектов\"</system:String>
-    <system:String x:Key="CopyObjectStylesCommandTransaction">Копирование \"Стили объектов - {0}\"</system:String>
+    <system:String x:Key="CopyColorFillSchemesCommandTransaction">Копирование "Схема цветов"</system:String>
+    <system:String x:Key="CopyCurtainTypesCommandTransaction">Копирование "Типы витражей"</system:String>
+    <system:String x:Key="CopyObjectStylesCommandTransactionGroup">Копирование "Стили объектов"</system:String>
+    <system:String x:Key="CopyObjectStylesCommandTransaction">Копирование "Стили объектов - {0}"</system:String>
+
+    <system:String x:Key="LoadFamilyCommandTransaction">Загрузка семейств</system:String>
     
-    <system:String x:Key="CopyStandartsCommandTransactionGroup">Копирование \"{0}\"</system:String>
-    <system:String x:Key="CopyStandartsCommandTransaction">Копирование \"{0} - {1}\"</system:String>
+    <system:String x:Key="CopyStandartsCommandTransactionGroup">Копирование "{0}"</system:String>
+    <system:String x:Key="CopyStandartsCommandTransaction">Копирование "{0} - {1}"</system:String>
 </ResourceDictionary>

@@ -3,6 +3,7 @@ using System.Collections.ObjectModel;
 using System.Linq;
 using System.Windows.Input;
 
+using dosymep.SimpleServices;
 using dosymep.WPF.Commands;
 using dosymep.WPF.ViewModels;
 
@@ -15,22 +16,29 @@ using RevitOpeningPlacement.ViewModels.OpeningConfig.Interfaces;
 namespace RevitOpeningPlacement.ViewModels.OpeningConfig;
 internal class SetViewModel : BaseViewModel, ICriterionViewModel {
     private readonly RevitRepository _revitRepository;
+    private readonly ILocalizationService _localization;
     private ObservableCollection<ICriterionViewModel> _criterions;
     private CategoriesInfoViewModel _categoryInfo;
     private EvaluatorViewModel _selectedEvaluator;
     private ObservableCollection<EvaluatorViewModel> _evaluators;
 
-    public SetViewModel(RevitRepository revitRepository, CategoriesInfoViewModel categoriesInfo, Set set = null) {
-        _revitRepository = revitRepository;
-        CategoryInfo = categoriesInfo;
-
+    public SetViewModel(RevitRepository revitRepository,
+        ILocalizationService localization,
+        CategoriesInfoViewModel categoriesInfo,
+        Set set = null) {
+        _revitRepository = revitRepository ?? throw new System.ArgumentNullException(nameof(revitRepository));
+        CategoryInfo = categoriesInfo ?? throw new System.ArgumentNullException(nameof(categoriesInfo));
+        _localization = localization ?? throw new System.ArgumentNullException(nameof(localization));
         AddRuleCommand = RelayCommand.Create(AddRule);
         RemoveRuleCommand = RelayCommand.Create<RuleViewModel>(RemoveRule, CanRemoveRule);
 
         AddSetCommand = RelayCommand.Create(AddSet);
         RemoveSetCommand = RelayCommand.Create<SetViewModel>(RemoveSet, CanRemoveSet);
 
-        Evaluators = new ObservableCollection<EvaluatorViewModel>(SetEvaluatorUtils.GetEvaluators().Select(item => new EvaluatorViewModel() { SetEvaluator = item }));
+        Evaluators = new ObservableCollection<EvaluatorViewModel>(
+            SetEvaluatorUtils.GetEvaluators().Select(item => new EvaluatorViewModel(_localization, item)));
+        AddRuleCommandName = _localization.GetLocalizedString("FilterCreation.AddRule");
+        AddSetCommandName = _localization.GetLocalizedString("FilterCreation.AddSet");
         if(set == null) {
             Criterions = [];
             SelectedEvaluator = Evaluators.FirstOrDefault();
@@ -44,6 +52,8 @@ internal class SetViewModel : BaseViewModel, ICriterionViewModel {
     public ICommand AddSetCommand { get; }
     public ICommand RemoveSetCommand { get; }
     public ICommand RemoveRuleCommand { get; }
+    public string AddRuleCommandName { get; }
+    public string AddSetCommandName { get; }
 
     public CategoriesInfoViewModel CategoryInfo {
         get => _categoryInfo;
@@ -66,16 +76,23 @@ internal class SetViewModel : BaseViewModel, ICriterionViewModel {
     }
 
     public void InitializeEmptyRule() {
-        Criterions.Add(new RuleViewModel(_categoryInfo));
+        Criterions.Add(new RuleViewModel(_localization, _categoryInfo));
     }
 
     private void InitializeCriterions(IEnumerable<Criterion> criterions) {
         Criterions = [];
         SetCriterionsRevitRepository(criterions);
-        foreach(var set in criterions.OfType<Set>().Select(item => new SetViewModel(_revitRepository, _categoryInfo, item))) {
+        foreach(var set in criterions.OfType<Set>().Select(item => new SetViewModel(
+            _revitRepository,
+            _localization,
+            _categoryInfo,
+            item))) {
             Criterions.Add(set);
         }
-        foreach(var rule in criterions.OfType<Rule>().Select(item => new RuleViewModel(_categoryInfo, item))) {
+        foreach(var rule in criterions.OfType<Rule>().Select(item => new RuleViewModel(
+            _localization,
+            _categoryInfo,
+            item))) {
             Criterions.Add(rule);
         }
     }
@@ -87,11 +104,11 @@ internal class SetViewModel : BaseViewModel, ICriterionViewModel {
     }
 
     private void AddRule() {
-        Criterions.Add(new RuleViewModel(_categoryInfo));
+        Criterions.Add(new RuleViewModel(_localization, _categoryInfo));
     }
 
     private void AddSet() {
-        Criterions.Add(new SetViewModel(_revitRepository, _categoryInfo));
+        Criterions.Add(new SetViewModel(_revitRepository, _localization, _categoryInfo));
     }
 
     private void RemoveSet(SetViewModel p) {

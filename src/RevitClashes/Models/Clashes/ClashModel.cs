@@ -46,6 +46,7 @@ internal class ClashModel : IEquatable<ClashModel> {
     public ElementModel MainElement { get; set; }
     public ElementModel OtherElement { get; set; }
 
+    public HashSet<ClashComment> Comments { get; set; } = [];
 
     public ClashModel SetRevitRepository(RevitRepository revitRepository) {
         _revitRepository = revitRepository;
@@ -73,16 +74,17 @@ internal class ClashModel : IEquatable<ClashModel> {
 
     public override int GetHashCode() {
         int hashCode = 2096115351;
-        hashCode = hashCode * -1521134295 + EqualityComparer<ElementModel>.Default.GetHashCode(MainElement);
-        hashCode = hashCode * -1521134295 + EqualityComparer<ElementModel>.Default.GetHashCode(OtherElement);
+        hashCode = hashCode * -1521134295
+                   + EqualityComparer<ElementModel>.Default.GetHashCode(MainElement)
+                   + EqualityComparer<ElementModel>.Default.GetHashCode(OtherElement);
         return hashCode;
     }
 
     public bool Equals(ClashModel other) {
-        return other is not null && (ReferenceEquals(this, other) || (Equals(MainElement, other.MainElement)
-            && Equals(OtherElement, other.OtherElement))
-            || (Equals(MainElement, other.OtherElement)
-            && Equals(OtherElement, other.MainElement)));
+        return other is not null
+               && (ReferenceEquals(this, other)
+                   || (Equals(MainElement, other.MainElement) && Equals(OtherElement, other.OtherElement))
+                   || (Equals(MainElement, other.OtherElement) && Equals(OtherElement, other.MainElement)));
     }
 
     /// <summary>

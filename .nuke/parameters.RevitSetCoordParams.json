@@ -1,0 +1,15 @@
+{
+  "$schema": "./build.schema.json",
+  "Solution": "RevitPlugins.slnx",
+  "PluginName": "RevitSetCoordParams",
+  "PublishDirectory": "01.BIM.extension\\BIM.tab\\bin",
+  "RevitVersions": [
+    "Rv2022",
+    "Rv2023",
+    "Rv2024"
+  ],
+  "IconUrl": "https://icons8.com/icon/pOOiCxeiUk4q/element-level",
+  "BundleName": "Заполнить параметры СМР",
+  "BundleType": "InvokeButton",
+  "BundleOutput": "01.BIM.extension\\BIM.tab\\СМР.panel\\СМР.pulldown"
+}

@@ -11,6 +11,9 @@
     <system:String x:Key="MainWindow.OverrideColor">Override color</system:String>
     <system:String x:Key="MainWindow.OverrideColorToolTip">The graphics will be redefined by setting the color.</system:String>
     
+    <system:String x:Key="MainWindow.OverrideLines">Override line color</system:String>
+    <system:String x:Key="MainWindow.OverrideLinesToolTip">The graphics will be redefined by setting the color of the lines.</system:String>
+    
     <system:String x:Key="MainWindow.OverrideHatching">Override hatching</system:String>
     <system:String x:Key="MainWindow.OverrideHatchingToolTip">The graphics will be redefined by specifying the hatching</system:String>
     

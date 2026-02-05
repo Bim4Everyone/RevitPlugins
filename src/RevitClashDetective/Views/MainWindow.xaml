@@ -27,6 +27,13 @@
         <wpfbehaviors:WpfAttachServiceBehavior
             AttachableService="{Binding SaveFileDialogService}" />
     </i:Interaction.Behaviors>
+    <i:Interaction.Triggers>
+        <i:EventTrigger
+            EventName="Closing">
+            <i:InvokeCommandAction
+                Command="{Binding AskForSaveCommand}" />
+        </i:EventTrigger>
+    </i:Interaction.Triggers>
 
     <core:WpfUIPlatformWindow.Resources>
         <ResourceDictionary>
@@ -48,7 +55,7 @@
                 x:Key="SecondSelectionLabel"
                 Text="{me:LocalizationSource MainWindow.SecondSelectionLabel}" />
             <ui:TextBlock
-                x:Key="ShowCleshesTooltip"
+                x:Key="ShowClashesTooltip"
                 Text="{me:LocalizationSource MainWindow.ShowClashes}" />
             <converters:StringToVisibilityConverter
                 x:Key="StringToVisibilityConverter" />
@@ -103,7 +110,7 @@
                     <ui:Button
                         Appearance="Danger"
                         ToolTip="{me:LocalizationSource MainWindow.DeleteCheck}"
-                        CommandParameter="{Binding SelectedCheck}"
+                        CommandParameter="{Binding SelectedItems, ElementName=ChecksGrid}"
                         Command="{Binding RemoveCheckCommand}"
                         Content="{ui:SymbolIcon Symbol=Delete20}" />
 
@@ -117,7 +124,7 @@
                 </DockPanel>
                 <ui:DataGrid
                     x:Name="ChecksGrid"
-                    SelectionMode="Single"
+                    SelectionMode="Extended"
                     AutoGenerateColumns="False"
                     CanUserDeleteRows="False"
                     CanUserReorderColumns="False"
@@ -218,7 +225,7 @@
                                     <ui:Button
                                         Click="ButtonOk_Click"
                                         Command="{Binding ShowClashesCommand}"
-                                        ToolTip="{StaticResource ShowCleshesTooltip}"
+                                        ToolTip="{StaticResource ShowClashesTooltip}"
                                         Content="{ui:SymbolIcon Symbol=Notebook20}" />
                                 </DataTemplate>
                             </DataGridTemplateColumn.CellTemplate>

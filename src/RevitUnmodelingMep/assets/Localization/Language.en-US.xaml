@@ -1,0 +1,73 @@
+<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:system="clr-namespace:System;assembly=mscorlib">
+
+    <!-- Пример перевода на английский американский язык (google translate) -->
+
+    <system:String x:Key="MainWindow.Title">Unmodeling settings</system:String>
+    <system:String x:Key="MainWindow.DocTypeError">The plugin is not designed to work with families.</system:String>
+    <system:String x:Key="MainWindow.WorkSharedError">Document must be workshared.</system:String>
+    <system:String x:Key="MainWindow.TabTypesName">Consumable types</system:String>
+    <system:String x:Key="MainWindow.TabDestinationName">Consumable assignment</system:String>
+    <system:String x:Key="MainWindow.FormulaVariables">Available variables</system:String>
+    <system:String x:Key="MainWindow.PlaceholderBracesHint">Use curly braces for variables: {Variable}</system:String>
+    
+    <system:String x:Key="MainWindow.ButtonOk">OK</system:String>
+    <system:String x:Key="MainWindow.ButtonCancel">Cancel</system:String>
+    <system:String x:Key="MainWindow.ButtonImport">Import</system:String>
+    <system:String x:Key="MainWindow.ButtonExport">Export</system:String>
+    <system:String x:Key="MainWindow.ButtonDefault">Reset</system:String>
+    <system:String x:Key="MainWindow.ResetConfirmMessage">Are you sure you want to reset to default values?</system:String>
+    <system:String x:Key="MainWindow.CheckboxOnlyInstances">Only placed in project</system:String>
+    <system:String x:Key="MainWindow.SelectAll">Select all</system:String>
+
+    <system:String x:Key="MainWindow.ConsName">Consumable name</system:String>
+    <system:String x:Key="MainWindow.Category">Category</system:String>
+    <system:String x:Key="MainWindow.Group">Grouping</system:String>
+    <system:String x:Key="MainWindow.FullName">Full name</system:String>
+    <system:String x:Key="MainWindow.Mark">Mark</system:String>
+    <system:String x:Key="MainWindow.Code">Product code</system:String>
+    <system:String x:Key="MainWindow.Unit">Unit</system:String>
+    <system:String x:Key="MainWindow.Creator">Manufacturer</system:String>
+    <system:String x:Key="MainWindow.Formula">Formula</system:String>
+    <system:String x:Key="MainWindow.RoundUpTotal">Round total up to the nearest integer</system:String>
+    <system:String x:Key="MainWindow.Note">Note formula</system:String>
+
+    <system:String x:Key="MainViewModel.SavePropertyDefault">default</system:String>
+    <system:String x:Key="MainViewModel.SavePropertyEmpty">Configuration error: required setting is empty.</system:String>
+
+    <system:String x:Key="Repository.PrepareConfigsTitle">Preparing configuration</system:String>
+    <system:String x:Key="Repository.TransactionName">Consumables calculation</system:String>
+
+    <system:String x:Key="MainViewModel.ImportError">Unable to import settings from selected file.</system:String>
+    <system:String x:Key="MainViewModel.DuctsName">Ducts</system:String>
+    <system:String x:Key="MainViewModel.PipesName">Pipes</system:String>
+    <system:String x:Key="MainViewModel.PipeInsName">Pipe insulation materials</system:String>
+    <system:String x:Key="MainViewModel.DuctInsName">Duct insulation materials</system:String>
+    <system:String x:Key="MainViewModel.DuctSysName">Duct systems</system:String>
+    <system:String x:Key="MainViewModel.PipeSysName">Pipe systems</system:String>
+
+    <system:String x:Key="FormulaValidator.FormulaError">Please fill in the formula</system:String>
+    <system:String x:Key="FormulaValidator.DotError">Replace commas with dots in the formula</system:String>
+    <system:String x:Key="FormulaValidator.VariableError">Invalid variable in the formula</system:String>
+
+    <system:String x:Key="VisSettingsStorage.TransactionName">Update settings</system:String>
+
+    <system:String x:Key="UnmodelingCreator.VisibilityWarning" xml:space="preserve">
+    The workset "99_Unmodeling elements" is currently visible in all views.
+
+    Open the Worksets dialog and uncheck the "Visible in all views" option.
+
+    Unmodeling elements will be created in this workset and its visibility must be excluded.
+    </system:String>
+    <system:String x:Key="UnmodelingCreator.WSSetup">Worksets setup</system:String>
+    <system:String x:Key="UnmodelingCreator.VisibilityCaption">Worksets</system:String>
+    <system:String x:Key="UnmodelingCreator.LoadFamilyTransactionName">Load family</system:String>
+    <system:String x:Key="UnmodelingCreator.LoadFamilyError">Failed to load anchor element family</system:String>
+    <system:String x:Key="UnmodelingCreator.FamilyOutdatedError">Update the anchor element family.</system:String>
+
+    <system:String x:Key="UnmodelingCalculator.Error">Error while calculating element</system:String>
+
+    <system:String x:Key="EditorChecker.SettigsIsBusy">Project information is editing by user: </system:String>
+    <system:String x:Key="EditorChecker.SettigsIsOutDated">You own the items, but your file is out of date. Please sync.</system:String>
+</ResourceDictionary>

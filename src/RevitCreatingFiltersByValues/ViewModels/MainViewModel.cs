@@ -23,6 +23,7 @@ internal class MainViewModel : BaseViewModel {
     private string _errorText;
     private bool _overrideByColor = true;
     private bool _overrideByPattern;
+    private bool _overrideLines = false;
     private bool _overridingWithFilters = true;
     private bool _overridingWithRepaint = false;
     private ICollectionView _categoriesView;
@@ -148,6 +149,10 @@ internal class MainViewModel : BaseViewModel {
     public bool OverrideByPattern {
         get => _overrideByPattern;
         set => RaiseAndSetIfChanged(ref _overrideByPattern, value);
+    }
+    public bool OverrideLines {
+        get => _overrideLines;
+        set => RaiseAndSetIfChanged(ref _overrideLines, value);
     }
 
     public bool OverridingWithFilters {
@@ -486,6 +491,11 @@ internal class MainViewModel : BaseViewModel {
 
             settings.SetCutForegroundPatternId(SolidFillPattern.Id);
             settings.SetCutForegroundPatternColor(Colors[c].UserColor);
+
+            if(OverrideLines) {
+                settings.SetProjectionLineColor(Colors[c].UserColor);
+                settings.SetCutLineColor(Colors[c].UserColor);
+            }
         }
 
         // Если пользователь поставил галку смены штриховки

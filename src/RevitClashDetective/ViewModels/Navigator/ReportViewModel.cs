@@ -128,6 +128,8 @@ internal class ReportViewModel : BaseViewModel, INamedEntity, IEquatable<ReportV
 
     public ICommand PickSecondElementsCommand { get; private set; }
 
+    public ICommand PickBothElementsCommand { get; private set; }
+
     public IOpenFileDialogService OpenFileDialogService { get; }
 
     public ISaveFileDialogService SaveFileDialogService { get; }
@@ -181,6 +183,8 @@ internal class ReportViewModel : BaseViewModel, INamedEntity, IEquatable<ReportV
             PickFirstElements, CanPickElements);
         PickSecondElementsCommand = RelayCommand.Create(
             PickSecondElements, CanPickElements);
+        PickBothElementsCommand = RelayCommand.Create(
+            PickBothElements, CanPickElements);
     }
 
     private void Save() {
@@ -389,6 +393,14 @@ internal class ReportViewModel : BaseViewModel, INamedEntity, IEquatable<ReportV
             } catch(NotSupportedException) {
                 continue;
             }
+        }
+        _revitRepository.SelectElements(elements);
+    }
+
+    private void PickBothElements() {
+        List<ElementModel> elements = [];
+        foreach(var clash in SelectedGuiClashes) {
+            elements.AddRange(clash.GetElements());
         }
         _revitRepository.SelectElements(elements);
     }

@@ -53,9 +53,11 @@ internal class RevitRepository {
 
     // Метод получения списка SheetElement по Document (основной или связанный)
     public IList<SheetElement> GetSheetElements(Document document) {
+        var comparer = Comparer<string>.Create((a, b) =>
+        NamingUtils.CompareNames(a ?? string.Empty, b ?? string.Empty));
         return new Collection<SheetElement>(GetViewSheets(document)
             .Select(sheet => new SheetElement(_paramFactory, sheet))
-            .OrderBy(sheet => Convert.ToInt32(sheet.Number))
+            .OrderBy(sheet => sheet.Number, comparer)
             .ToList());
     }
 
