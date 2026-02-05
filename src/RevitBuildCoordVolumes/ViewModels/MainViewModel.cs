@@ -22,7 +22,6 @@ internal class MainViewModel : BaseViewModel {
     private readonly SystemPluginConfig _systemPluginConfig;
     private readonly RevitRepository _revitRepository;
     private readonly BuildCoordVolumeServices _services;
-    private readonly IMessageBoxService _messageBoxServiceService;
     private BuildCoordVolumeSettings _settings;
     private CommonSettingViewModel _commonSettingViewModel;
     private SlabBasedSettingViewModel _slabBasedSettingViewModel;
@@ -41,7 +40,9 @@ internal class MainViewModel : BaseViewModel {
         _systemPluginConfig = systemPluginConfig;
         _revitRepository = revitRepository;
         _services = buildCoordVolumeServices;
-        _messageBoxServiceService = messageBoxService;
+
+        MessageBoxService = messageBoxService
+            ?? throw new ArgumentNullException(nameof(messageBoxService));
 
         ProgressDialogFactory = progressDialogFactory
             ?? throw new System.ArgumentNullException(nameof(progressDialogFactory));
@@ -56,6 +57,7 @@ internal class MainViewModel : BaseViewModel {
     public ICommand AcceptViewCommand { get; }
 
     public IProgressDialogFactory ProgressDialogFactory { get; }
+    public IMessageBoxService MessageBoxService { get; }
 
     public CommonSettingViewModel CommonSettingViewModel {
         get => _commonSettingViewModel;
@@ -150,7 +152,7 @@ internal class MainViewModel : BaseViewModel {
         var warningElements = _services.SpatialElementCheckService.CheckSpatialObjects(_settings, _revitRepository);
         if(!warningElements.Any()) {
             string o = _services.LocalizationService.GetLocalizedString("MainViewModel.MessageBoxTitle");
-            _messageBoxServiceService.Show(
+            MessageBoxService.Show(
                 _services.LocalizationService.GetLocalizedString("MainViewModel.MessageBoxText"),
                 _services.LocalizationService.GetLocalizedString("MainViewModel.MessageBoxTitle"));
             RequiredCheckArea = false;
