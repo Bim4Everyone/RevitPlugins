@@ -1,0 +1,108 @@
+﻿<core:WpfUIPlatformPage
+    x:Class="RevitPylonDocumentation.Views.Pages.LegendViewsPage"
+    x:ClassModifier="internal"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
+    
+    xmlns:core="clr-namespace:dosymep.WpfUI.Core"
+    xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
+    xmlns:me="clr-namespace:dosymep.WpfCore.MarkupExtensions;assembly=dosymep.WpfCore"
+    xmlns:vms="clr-namespace:RevitPylonDocumentation.ViewModels"
+    xmlns:local="clr-namespace:RevitPylonDocumentation.Views.Pages"
+    xmlns:views="clr-namespace:RevitPylonDocumentation.Views"
+    xmlns:controls="clr-namespace:RevitPylonDocumentation.Views.Controls"
+    xmlns:converters="clr-namespace:RevitPylonDocumentation.Views.Converters"
+    
+    mc:Ignorable="d"
+    ScrollViewer.CanContentScroll="False"
+    Title="LegendViewsPage"
+    d:DesignHeight="700"
+    d:DesignWidth="600"
+    d:DataContext="{d:DesignInstance vms:MainViewModel, IsDesignTimeCreatable=False}">
+    <core:WpfUIPlatformPage.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary
+                    Source="../CustomStyles.xaml" />
+            </ResourceDictionary.MergedDictionaries>
+            <converters:CollectionNotEmptyToBoolConverter
+                x:Key="CollectionNotEmptyToBoolConverter" />
+        </ResourceDictionary>
+    </core:WpfUIPlatformPage.Resources>
+
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+
+        <ScrollViewer>
+            <UniformGrid
+                Margin="7"
+                Columns="1">
+                <Border Name="LegendsProps"
+                    Margin="7"
+                    Style="{StaticResource CustomBorder}">
+                    <StackPanel>
+                        <controls:SettingsTitleControl
+                            LabelText="{me:LocalizationSource LegendView.NotesLegend}"
+                            ToolTipText="{me:LocalizationSource LegendViewsPage.NotesLegendToolTip}"
+                            ButtonCommand="{Binding SaveSettingsCommand}" />
+
+                        <controls:ComboBoxSettingControl
+                            LabelText="{me:LocalizationSource LegendView.SelectNotesLegend}"
+                            ItemsSource="{Binding Legends}"
+                            SelectedItem="{Binding 
+                                Path=LegendsAndAnnotationsSettings.SelectedLegend, 
+                                UpdateSourceTrigger=PropertyChanged, Mode=TwoWay,
+                                ValidatesOnDataErrors=True, NotifyOnValidationError=True}"
+                            ToolTipText="{me:LocalizationSource LegendViewsPage.SelectNotesLegendToolTip}"
+                            SelectionChangedCommand="{Binding SettingsChangedCommand}"
+                            ItemTemplate="{StaticResource WithoutFamilyNameItemTemplate}" />
+
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="*" />
+                            </Grid.ColumnDefinitions>
+
+                            <controls:TextBoxSettingControl
+                                Grid.Column="0"
+                                LabelText="{me:LocalizationSource LegendView.XOffsetFromBottomRightCorner}"
+                                TextBoxText="{Binding 
+                                    Path=LegendsAndAnnotationsSettings.LegendXOffsetTemp, 
+                                    UpdateSourceTrigger=PropertyChanged, Mode=TwoWay,
+                                    ValidatesOnDataErrors=True, NotifyOnValidationError=True}"
+                                ToolTipText="{me:LocalizationSource LegendViewsPage.XOffsetFromBottomRightCornerToolTip}"
+                                TextChangedCommand="{Binding SettingsChangedCommand}" />
+
+                            <controls:TextBoxSettingControl
+                                Grid.Column="1"
+                                LabelText="{me:LocalizationSource LegendView.YOffsetFromBottomRightCorner}"
+                                TextBoxText="{Binding 
+                                    Path=LegendsAndAnnotationsSettings.LegendYOffsetTemp, 
+                                    UpdateSourceTrigger=PropertyChanged, Mode=TwoWay,
+                                    ValidatesOnDataErrors=True, NotifyOnValidationError=True}"
+                                ToolTipText="{me:LocalizationSource LegendViewsPage.YOffsetFromBottomRightCornerToolTip}"
+                                TextChangedCommand="{Binding SettingsChangedCommand}" />
+                        </Grid>
+                    </StackPanel>
+                </Border>
+
+            </UniformGrid>
+        </ScrollViewer>
+
+        <controls:AppFooterControl
+            Grid.Row="1"
+            HorizontalAlignment="Right"
+            ErrorText="{Binding ErrorText}"
+            ShowErrorElemsButtonText="{me:LocalizationSource GeneralPage.Show}"
+            ShowErrorElemsButton="{Binding Path=ErrorElements, Converter={StaticResource CollectionNotEmptyToBoolConverter}}"
+            ShowErrorElemsCommand="{Binding ShowErrorElementsCommand}"
+            ShowOkButton="False"
+            CancelButtonText="{me:LocalizationSource GeneralPage.Cancel}" />
+    </Grid>
+</core:WpfUIPlatformPage>

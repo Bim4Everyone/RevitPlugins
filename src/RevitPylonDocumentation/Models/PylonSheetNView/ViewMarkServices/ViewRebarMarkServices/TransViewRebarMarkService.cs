@@ -13,8 +13,8 @@ internal class TransViewRebarMarkService {
     private readonly CreationSettings _settings;
     private readonly Document _doc;
     private readonly PylonSheetInfo _sheetInfo;
-    private readonly PylonView _viewOfPylon; 
-    
+    private readonly PylonView _viewOfPylon;
+
     private readonly int _formNumberForVerticalRebarMax = 1499;
     private readonly int _formNumberForVerticalRebarMin = 1101;
 
@@ -30,7 +30,7 @@ internal class TransViewRebarMarkService {
     private readonly FamilySymbol _tagSymbolWithSerif;
     private readonly FamilySymbol _tagSymbolWithStep;
 
-    internal TransViewRebarMarkService(CreationSettings settings, Document document, PylonSheetInfo pylonSheetInfo, 
+    internal TransViewRebarMarkService(CreationSettings settings, Document document, PylonSheetInfo pylonSheetInfo,
                                        PylonView pylonView) {
         _settings = settings;
         _doc = document;
@@ -42,11 +42,11 @@ internal class TransViewRebarMarkService {
 
         // Находим типоразмер марки несущей арматуры для обозначения позиции, диаметра и комментариев арматуры
         // Без засечки на конце
-        _tagSymbolWithComment = settings.TypesSettings.SelectedRebarTagTypeWithComment;
+        _tagSymbolWithComment = settings.AnnotationSettings.SelectedRebarTagTypeWithComment;
         // Без засечки на конце
-        _tagSymbolWithStep = settings.TypesSettings.SelectedRebarTagTypeWithStep;
+        _tagSymbolWithStep = settings.AnnotationSettings.SelectedRebarTagTypeWithStep;
         // С засечкой на конце
-        _tagSymbolWithSerif = settings.TypesSettings.SelectedRebarTagTypeWithSerif;
+        _tagSymbolWithSerif = settings.AnnotationSettings.SelectedRebarTagTypeWithSerif;
     }
 
     /// <summary>
@@ -64,7 +64,7 @@ internal class TransViewRebarMarkService {
         var pointLeftTop = _viewPointsAnalyzer.GetPointByDirection(pylonPoint, DirectionType.LeftTop, 0.7, 0.25);
 
         // Создаем марку арматуры
-        var tagOption = new TagOption() { BodyPoint = pointLeftTop, TagSymbol = _tagSymbolWithComment};
+        var tagOption = new TagOption() { BodyPoint = pointLeftTop, TagSymbol = _tagSymbolWithComment };
         _annotationService.CreateRebarTag(tagOption, leftTopElement);
     }
 
