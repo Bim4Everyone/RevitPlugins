@@ -65,6 +65,9 @@
     <system:String x:Key="VM.TransverseViewXOffsetInvalid">Transverse view X offset value is incorrect</system:String>
     <system:String x:Key="VM.TransverseViewYOffsetInvalid">Transverse view Y offset value is incorrect</system:String>
 
+    <system:String x:Key="VM.TransverseViewDepthInvalid">The transverse view depth value is incorrect</system:String>
+    <system:String x:Key="VM.TransverseRebarViewDepthInvalid">The transverse reinforcement view depth value is incorrect</system:String>
+    
     <system:String x:Key="VM.FirstTransverseViewElevationInvalid">First transverse view elevation value is incorrect</system:String>
     <system:String x:Key="VM.SecondTransverseViewElevationInvalid">Second transverse view elevation value is incorrect</system:String>
     <system:String x:Key="VM.ThirdTransverseViewElevationInvalid">Third transverse view elevation value is incorrect</system:String>

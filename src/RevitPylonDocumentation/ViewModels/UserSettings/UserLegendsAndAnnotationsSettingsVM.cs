@@ -66,7 +66,7 @@ internal class UserLegendsAndAnnotationsSettingsVM : ValidatableViewModel {
 
     public bool CheckSettings() {
         // Проверяем, чтоб были заданы офсеты видового экрана легенды
-        if(LegendXOffset is null || LegendYOffset is null) {
+        if(!int.TryParse(LegendXOffset, out _) || !int.TryParse(LegendYOffset, out _)) {
             SetError(_localizationService.GetLocalizedString("VM.LegendOffsetsNotSet"));
             return false;
         }

@@ -258,6 +258,15 @@ internal class UserTransverseViewSettingsPageVM : ValidatableViewModel {
     }
 
     public bool CheckSettings() {
+        if(!int.TryParse(TransverseViewDepth, out _)) {
+            SetError(_localizationService.GetLocalizedString("VM.TransverseViewDepthInvalid"));
+            return false;
+        }
+        if(!int.TryParse(TransverseRebarViewDepth, out _)) {
+            SetError(_localizationService.GetLocalizedString("VM.TransverseRebarViewDepthInvalid"));
+            return false;
+        }
+
         if(!int.TryParse(TransverseViewXOffset, out _)) {
             SetError(_localizationService.GetLocalizedString("VM.TransverseViewXOffsetInvalid"));
             return false;

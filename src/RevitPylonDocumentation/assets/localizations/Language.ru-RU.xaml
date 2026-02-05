@@ -36,11 +36,11 @@
     <system:String x:Key="VM.WriteName">Введите название</system:String>
 
     <!-- Schedule Settings Validation Error Messages -->
-    <system:String x:Key="VM.SkeletonScheduleNameInvalid">Имя спецификации каркасов некорректно</system:String>
-    <system:String x:Key="VM.SkeletonByElemsScheduleNameInvalid">Имя поэлементной спецификации каркасов некорректно</system:String>
-    <system:String x:Key="VM.MaterialScheduleNameInvalid">Имя спецификации материалов некорректно</system:String>
-    <system:String x:Key="VM.SystemPartsScheduleNameInvalid">Имя ведомости системных деталей некорректно</system:String>
-    <system:String x:Key="VM.IfcPartsScheduleNameInvalid">Имя ведомости IFC деталей некорректно</system:String>
+    <system:String x:Key="VM.SkeletonScheduleNameInvalid">Имя эталонной спецификации каркасов некорректно</system:String>
+    <system:String x:Key="VM.SkeletonByElemsScheduleNameInvalid">Имя эталонной поэлементной спецификации каркасов некорректно</system:String>
+    <system:String x:Key="VM.MaterialScheduleNameInvalid">Имя эталонной спецификации материалов некорректно</system:String>
+    <system:String x:Key="VM.SystemPartsScheduleNameInvalid">Имя эталонной ведомости системных деталей некорректно</system:String>
+    <system:String x:Key="VM.IfcPartsScheduleNameInvalid">Имя эталонной ведомости IFC деталей некорректно</system:String>
     
     <!-- Dispatcher Settings Validation Error Messages -->
     <system:String x:Key="VM.DispatcherGroupingFirstParamInvalid">Наименование параметра диспетчера 1 некорректно</system:String>
@@ -64,6 +64,9 @@
 
     <system:String x:Key="VM.TransverseViewXOffsetInvalid">Значение отступа поперечного вида по X некорректно</system:String>
     <system:String x:Key="VM.TransverseViewYOffsetInvalid">Значение отступа поперечного вида по Y некорректно</system:String>
+    
+    <system:String x:Key="VM.TransverseViewDepthInvalid">Значение глубины поперечного вида некорректно</system:String>
+    <system:String x:Key="VM.TransverseRebarViewDepthInvalid">Значение глубины поперечного вида армирования некорректно</system:String>
 
     <system:String x:Key="VM.FirstTransverseViewElevationInvalid">Значение возвышения первого горизонтального вида некорректно</system:String>
     <system:String x:Key="VM.SecondTransverseViewElevationInvalid">Значение возвышения второго горизонтального вида некорректно</system:String>
