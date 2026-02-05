@@ -68,13 +68,13 @@ internal class SlabService : ISlabService {
             .Where(floor => !string.IsNullOrWhiteSpace(floor.Name))
             .Select(floor => {
                 var tansform = _documentsService.GetTransformByName(doc.GetUniqId());
-                var level = GetLevel(floor);
+                var level = GetLevel(doc, floor);
                 return new SlabElement {
                     Floor = floor,
                     FloorName = floor.Name,
                     Level = level,
                     LevelName = GetLevelName(level),
-                    Profile = GetProfile(floor),
+                    Profile = GetProfile(doc, floor),
                     Guid = Guid.NewGuid(),
                     Transform = tansform
                 };
@@ -82,8 +82,7 @@ internal class SlabService : ISlabService {
     }
 
     // Метод получения уровня, на котором расположена плита
-    private Level GetLevel(Floor floor) {
-        var doc = floor.Document;
+    private Level GetLevel(Document doc, Floor floor) {
         var elementId = floor.GetParamValueOrDefault<ElementId>(BuiltInParameter.LEVEL_PARAM);
         return doc.GetElement(elementId) as Level;
     }
@@ -96,8 +95,7 @@ internal class SlabService : ISlabService {
     }
 
     // Метод получения профиля плиты
-    private CurveArrArray GetProfile(Floor floor) {
-        var doc = floor.Document;
+    private CurveArrArray GetProfile(Document doc, Floor floor) {
         var profileId = floor.SketchId;
         var sketch = doc.GetElement(profileId) as Sketch;
         return sketch.Profile;
