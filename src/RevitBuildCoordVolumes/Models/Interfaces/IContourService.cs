@@ -57,11 +57,11 @@ internal interface IContourService {
     /// Список Curve для построения CurveLoop.
     /// </returns>
     List<Curve> GetOuterContour(SpatialElement spatialElement);
-    /// <summary>
-    /// Метод получения контура из набора кривых.
+    /// <summary>    
+    /// Метод получения списка контуров из списка кривых.
     /// </summary>
-    /// <remarks>
-    /// В данном методе производится получение замкнутого контура из исходных кривых.
+    /// <remarks>    
+    /// В данном методе производится разбитие списка кривых на отдельные контура и получение списка замкнутых контуров из списка кривых.
     /// </remarks>
     /// <param name="allCurves">Исходный список кривых.</param>
     /// <param name="transform">Трансформация - разница реальной точки кривой и точки для экструзии.</param>
@@ -69,4 +69,16 @@ internal interface IContourService {
     /// Список CurveLoop для построения Solid.
     /// </returns>
     List<CurveLoop> GetCurveLoopsContour(List<Curve> allCurves, Transform transform);
+    /// <summary>
+    /// Метод получения контура из списка кривых.
+    /// </summary>
+    /// <remarks>
+    /// В данном методе производится получение замкнутого контура из списка кривых и трансформации.
+    /// </remarks>
+    /// <param name="allCurves">Исходный список кривых.</param>
+    /// <param name="transform">Трансформация - разница реальной точки кривой и точки для экструзии.</param>
+    /// <returns>
+    /// CurveLoop для построения добавление в список.
+    /// </returns>
+    CurveLoop GetCurveLoop(List<Curve> allCurves, Transform transform = null);
 }

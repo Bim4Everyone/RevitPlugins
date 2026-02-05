@@ -3,5 +3,6 @@ internal enum WarningType {
     NotEnclosed,
     Redundant,
     BrokenContour,
-    NotFilledParam
+    NotFilledParam,
+    WrongFilledParam
 }

@@ -29,4 +29,16 @@ internal interface ISlabNormalizeService {
     /// Список верхних граней Face без отверстий и вырезов.
     /// </returns>
     List<Face> GetTopFacesClean(SlabElement slabElement, List<Face> topFaces);
+    /// <summary>
+    /// Метод определения, наклонное ли перекрытие.
+    /// </summary>
+    /// <remarks>
+    /// В данном методе производится проверка является ли плита наклонной или плоской. 
+    /// Проверяется изменение формы и уклон с помощью стрелки уклона.
+    /// </remarks>           
+    /// <param name="slabElement">Перекрытие, которое нужно определить.</param>        
+    /// <returns>
+    /// True - перекрытие наклонное, False - горизонтальное
+    /// </returns>
+    bool IsSloped(SlabElement slabElement);
 }

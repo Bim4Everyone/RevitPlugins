@@ -22,10 +22,11 @@ internal sealed class BuildCoordVolumeServices {
         WindowService = windowService;
         SpatialElementCheckService = new SpatialElementCheckService(ContourService);
         SpatialDivider = new SpatialElementDividerService(ContourService);
+        SlabNormalizer = new SlabNormalizeService(systemPluginConfig);
     }
 
     public ISpatialElementDividerService SpatialDivider { get; }
-    public ISlabNormalizeService SlabNormalizer { get; } = new SlabNormalizeService();
+    public ISlabNormalizeService SlabNormalizer { get; }
     public IColumnFactory ColumnFactory { get; } = new ColumnFactory();
     public IContourService ContourService { get; } = new ContourService();
     public IGeomObjectFactory GeomObjectFactory { get; }

@@ -89,6 +89,8 @@
     <system:String x:Key="MainViewModel.SquareSideBig">Input must not exceed 1000 mm</system:String>
     <system:String x:Key="MainViewModel.SquareSideSmall">Input must not be less than 10 mm</system:String>
     <system:String x:Key="MainViewModel.ProgressTitle">Building volumes... [{0}]\[{1}]</system:String>
+    <system:String x:Key="MainViewModel.MessageBoxTitle">Checking zones</system:String>
+    <system:String x:Key="MainViewModel.MessageBoxText">Zones checked. No issues found.</system:String>
 
     <system:String x:Key="ParamViewModel.WarningStartString">Missing parameters:</system:String>
     <system:String x:Key="DocumentViewModel.CurrentFile">Current file (open)</system:String>
@@ -114,4 +116,6 @@
     <system:String x:Key="WarningsViewModel.BrokenContourDescription">Zones with broken contours (should be bounded by separators)</system:String>
     <system:String x:Key="WarningsViewModel.NotFilledParam">Zones with unfilled parameters</system:String>
     <system:String x:Key="WarningsViewModel.NotFilledParamDescription">Zones missing parameters required for building</system:String>
+    <system:String x:Key="WarningsViewModel.WrongFilledParam">Zones with incorrectly filled parameters</system:String>
+    <system:String x:Key="WarningsViewModel.WrongFilledParamDescription">Bottom elevation is higher than or equal to top elevation</system:String>
 </ResourceDictionary>

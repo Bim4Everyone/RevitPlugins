@@ -82,7 +82,9 @@ internal class SlabBasedCoordVolumeBuilder : ICoordVolumeBuilder {
     // Метод получения всех перекрытий без отверстий и вырезов (для плоских)
     private List<SlabElement> GetNormalizeSlabs(List<SlabElement> slabElements) {
         foreach(var slab in slabElements) {
+            bool isSloped = _slabNormalizeService.IsSloped(slab);
             var topFaces = _slabNormalizeService.GetTopFaces(slab);
+            slab.IsSloped = isSloped;
             slab.TopFaces = slab.IsSloped
                 ? topFaces
                 : _slabNormalizeService.GetTopFacesClean(slab, topFaces);

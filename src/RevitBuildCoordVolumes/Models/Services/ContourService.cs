@@ -68,18 +68,23 @@ internal class ContourService : IContourService {
         var devidedCurves = SplitToLoopsOptimized(allCurves);
         var curveLoops = new List<CurveLoop>();
         foreach(var listCurve in devidedCurves) {
-            var curveLoop = new CurveLoop();
-            foreach(var curve in listCurve) {
-                curveLoop.Append(curve);
-            }
+            var curveLoop = GetCurveLoop(listCurve, transform);
             if(!curveLoop.IsOpen()) {
-                if(transform != null) {
-                    curveLoop.Transform(transform);
-                }
                 curveLoops.Add(curveLoop);
             }
         }
         return curveLoops;
+    }
+
+    public CurveLoop GetCurveLoop(List<Curve> listCurve, Transform transform = null) {
+        var curveLoop = new CurveLoop();
+        foreach(var curve in listCurve) {
+            curveLoop.Append(curve);
+        }
+        if(transform != null) {
+            curveLoop.Transform(transform);
+        }
+        return curveLoop;
     }
 
     // Метод получения трансформации по старой и новой позициям

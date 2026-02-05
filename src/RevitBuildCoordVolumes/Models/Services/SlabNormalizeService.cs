@@ -4,6 +4,8 @@ using System.Linq;
 
 using Autodesk.Revit.DB;
 
+using dosymep.Bim4Everyone;
+using dosymep.Revit;
 using dosymep.Revit.Geometry;
 
 using RevitBuildCoordVolumes.Models.Interfaces;
@@ -12,6 +14,12 @@ using RevitBuildCoordVolumes.Models.Utilites;
 namespace RevitBuildCoordVolumes.Models.Services;
 
 internal class SlabNormalizeService : ISlabNormalizeService {
+    private readonly SystemPluginConfig _systemPluginConfig;
+
+    public SlabNormalizeService(SystemPluginConfig systemPluginConfig) {
+        _systemPluginConfig = systemPluginConfig;
+    }
+
     public List<Face> GetTopFaces(SlabElement slabElement) {
         var floor = slabElement.Floor;
         var transform = slabElement.Transform;
@@ -35,7 +43,7 @@ internal class SlabNormalizeService : ISlabNormalizeService {
         var linkTransform = slabElement.Transform;
         try {
             var contour = GetOuterContours(floorProfile, topFaces, linkTransform);
-            var solid = SolidUtility.ExtrudeSolid(contour, start: 0, finish: 1, up: false);
+            var solid = SolidUtility.ExtrudeSolid(contour, up: false);
 
             if(solid == null) {
                 return topFaces;
@@ -51,6 +59,12 @@ internal class SlabNormalizeService : ISlabNormalizeService {
         } catch {
             return topFaces;
         }
+    }
+
+    public bool IsSloped(SlabElement slabElement) {
+        var floor = slabElement.Floor;
+        var doc = floor.Document;
+        return IsShapeEdited(doc, floor) || HasSlopeBySlopeLine(doc, floor);
     }
 
     // Метод определения входит ли значение нормали Face в заданный диапазон
@@ -181,5 +195,50 @@ internal class SlabNormalizeService : ISlabNormalizeService {
         }
         var p = new XYZ(point3d.X, point3d.Y, 0.0);
         return GeometryUtility.IsPointInsidePolygon(p, poly);
+    }
+
+
+
+    // Метод проверки редактирована ли плита
+    private bool IsShapeEdited(Document doc, Floor floor) {
+#if REVIT_2023_OR_LESS
+        var slabShapeEditor = floor.SlabShapeEditor;
+#else
+        var slabShapeEditor = floor.GetSlabShapeEditor();
+#endif
+        if(slabShapeEditor == null) {
+            return false;
+        }
+        var vertices = slabShapeEditor.SlabShapeVertices
+        .Cast<SlabShapeVertex>()
+        .ToList();
+
+        if(vertices.Count == 0) {
+            return false;
+        }
+
+        double firstZ = vertices[0].Position.Z;
+
+        return vertices.Any(v =>
+            Math.Abs(v.Position.Z - firstZ) > GeometryTolerance.Model);
+    }
+
+    // Метод проверки наклонена ли плита линией уклона
+    private bool HasSlopeBySlopeLine(Document doc, Floor floor) {
+        var filter = new ElementCategoryFilter(BuiltInCategory.OST_SketchLines);
+        var depIds = floor.GetDependentElements(filter);
+
+        var lines = depIds
+            .Select(doc.GetElement)
+            .Where(element => element.Name.Equals(_systemPluginConfig.SlopeLineName));
+
+        if(!lines.Any()) {
+            return false;
+        }
+        var slopeLine = lines.First();
+        double start = slopeLine.GetParamValueOrDefault<double>(BuiltInParameter.SLOPE_START_HEIGHT);
+        double end = slopeLine.GetParamValueOrDefault<double>(BuiltInParameter.SLOPE_END_HEIGHT);
+
+        return Math.Abs(start - end) < GeometryTolerance.Model;
     }
 }

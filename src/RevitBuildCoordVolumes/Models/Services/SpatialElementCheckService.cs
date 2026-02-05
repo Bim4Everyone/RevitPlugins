@@ -8,6 +8,7 @@ using dosymep.Revit;
 using RevitBuildCoordVolumes.Models.Enums;
 using RevitBuildCoordVolumes.Models.Interfaces;
 using RevitBuildCoordVolumes.Models.Settings;
+using RevitBuildCoordVolumes.Models.Utilites;
 
 namespace RevitBuildCoordVolumes.Models.Services;
 
@@ -41,9 +42,10 @@ internal class SpatialElementCheckService : ISpatialElementCheckService {
                     });
                 } else {
                     var contourCurves = _contourService.GetOuterContour(spatialElement);
-                    var loops = _contourService.GetCurveLoopsContour(contourCurves, null);
-                    bool isBrokenContour = !loops.Any();
-                    if(isBrokenContour) {
+                    //var loop = _contourService.GetCurveLoop(contourCurves, null);
+                    var l = _contourService.GetCurveLoopsContour(contourCurves, null);
+                    var testSolid = SolidUtility.ExtrudeSolid(l);
+                    if(testSolid == null) {
                         warnings.Add(new WarningBrokenContourElement {
                             WarningType = WarningType.BrokenContour,
                             SpatialObject = spatialObject
@@ -53,11 +55,13 @@ internal class SpatialElementCheckService : ISpatialElementCheckService {
             }
 
             if(settings.AlgorithmType == AlgorithmType.ParamBasedAlgorithm) {
+                double topParamValue = double.NaN;
+                double bottomParamValue = double.NaN;
                 foreach(var paramMap in settings.ParamMaps) {
                     if(paramMap.Type == ParamType.TopZoneParam) {
                         var param = paramMap.SourceParam;
-                        double paramValue = revitRepository.GetPositionInFeet(spatialElement, param.Name);
-                        if(double.IsNaN(paramValue)) {
+                        topParamValue = revitRepository.GetPositionInFeet(spatialElement, param.Name);
+                        if(double.IsNaN(topParamValue)) {
                             warnings.Add(new WarningNotFilledParamElement {
                                 WarningType = WarningType.NotFilledParam,
                                 RevitParam = param,
@@ -67,14 +71,22 @@ internal class SpatialElementCheckService : ISpatialElementCheckService {
                     }
                     if(paramMap.Type == ParamType.BottomZoneParam) {
                         var param = paramMap.SourceParam;
-                        double paramValue = revitRepository.GetPositionInFeet(spatialElement, param.Name);
-                        if(double.IsNaN(paramValue)) {
+                        bottomParamValue = revitRepository.GetPositionInFeet(spatialElement, param.Name);
+                        if(double.IsNaN(bottomParamValue)) {
                             warnings.Add(new WarningNotFilledParamElement {
                                 WarningType = WarningType.NotFilledParam,
                                 RevitParam = param,
                                 SpatialObject = spatialObject
                             });
                         }
+                    }
+                }
+                if(!double.IsNaN(topParamValue) && !double.IsNaN(bottomParamValue)) {
+                    if(bottomParamValue >= topParamValue) {
+                        warnings.Add(new WarningWrongFilledParamElement {
+                            WarningType = WarningType.WrongFilledParam,
+                            SpatialObject = spatialObject
+                        });
                     }
                 }
             }

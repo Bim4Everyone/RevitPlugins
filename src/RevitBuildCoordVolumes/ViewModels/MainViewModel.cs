@@ -4,7 +4,6 @@ using System.ComponentModel;
 using System.Linq;
 using System.Windows.Input;
 
-using dosymep.Bim4Everyone.SimpleServices;
 using dosymep.Revit;
 using dosymep.SimpleServices;
 using dosymep.WPF.Commands;
@@ -23,8 +22,7 @@ internal class MainViewModel : BaseViewModel {
     private readonly SystemPluginConfig _systemPluginConfig;
     private readonly RevitRepository _revitRepository;
     private readonly BuildCoordVolumeServices _services;
-    private readonly IRevitParamFactory _revitParamFactory;
-    private readonly ILocalizationService _localizationService;
+    private readonly IMessageBoxService _messageBoxServiceService;
     private BuildCoordVolumeSettings _settings;
     private CommonSettingViewModel _commonSettingViewModel;
     private SlabBasedSettingViewModel _slabBasedSettingViewModel;
@@ -37,13 +35,13 @@ internal class MainViewModel : BaseViewModel {
         SystemPluginConfig systemPluginConfig,
         RevitRepository revitRepository,
         BuildCoordVolumeServices buildCoordVolumeServices,
-        IProgressDialogFactory progressDialogFactory) {
+        IProgressDialogFactory progressDialogFactory,
+        IMessageBoxService messageBoxService) {
         _pluginConfig = pluginConfig;
         _systemPluginConfig = systemPluginConfig;
         _revitRepository = revitRepository;
         _services = buildCoordVolumeServices;
-        _localizationService = _services.LocalizationService;
-        _revitParamFactory = _services.RevitParamFactory;
+        _messageBoxServiceService = messageBoxService;
 
         ProgressDialogFactory = progressDialogFactory
             ?? throw new System.ArgumentNullException(nameof(progressDialogFactory));
@@ -151,6 +149,10 @@ internal class MainViewModel : BaseViewModel {
         _settings.SpatialObjects = GetSpatialObjects();
         var warningElements = _services.SpatialElementCheckService.CheckSpatialObjects(_settings, _revitRepository);
         if(!warningElements.Any()) {
+            string o = _services.LocalizationService.GetLocalizedString("MainViewModel.MessageBoxTitle");
+            _messageBoxServiceService.Show(
+                _services.LocalizationService.GetLocalizedString("MainViewModel.MessageBoxText"),
+                _services.LocalizationService.GetLocalizedString("MainViewModel.MessageBoxTitle"));
             RequiredCheckArea = false;
             return;
         }
@@ -181,7 +183,7 @@ internal class MainViewModel : BaseViewModel {
 
         progressDialogService.MaxValue = count;
         progressDialogService.StepValue = count / 10;
-        progressDialogService.DisplayTitleFormat = _localizationService.GetLocalizedString("MainViewModel.ProgressTitle");
+        progressDialogService.DisplayTitleFormat = _services.LocalizationService.GetLocalizedString("MainViewModel.ProgressTitle");
 
         progressDialogService.Show();
 
@@ -195,36 +197,36 @@ internal class MainViewModel : BaseViewModel {
             if(CommonSettingViewModel.Params != null) {
                 var descriptionParamVM = CommonSettingViewModel.Params.Where(pvm => pvm.ParamMap.Type == ParamType.DescriptionParam).FirstOrDefault();
                 if(descriptionParamVM != null && !descriptionParamVM.IsChecked) {
-                    ErrorText = _localizationService.GetLocalizedString("MainViewModel.NoMainParam");
+                    ErrorText = _services.LocalizationService.GetLocalizedString("MainViewModel.NoMainParam");
                     return false;
                 }
                 var topZoneParamVM = CommonSettingViewModel.Params.Where(pvm => pvm.ParamMap.Type == ParamType.TopZoneParam).FirstOrDefault();
                 if(topZoneParamVM != null && !topZoneParamVM.IsChecked && !IsSlabBasedAlgorithm) {
-                    ErrorText = _localizationService.GetLocalizedString("MainViewModel.NoTopZoneParam");
+                    ErrorText = _services.LocalizationService.GetLocalizedString("MainViewModel.NoTopZoneParam");
                     return false;
                 }
                 var bottomZoneParamVM = CommonSettingViewModel.Params.Where(pvm => pvm.ParamMap.Type == ParamType.BottomZoneParam).FirstOrDefault();
                 if(bottomZoneParamVM != null && !bottomZoneParamVM.IsChecked && !IsSlabBasedAlgorithm) {
-                    ErrorText = _localizationService.GetLocalizedString("MainViewModel.NoBottomZoneParam");
+                    ErrorText = _services.LocalizationService.GetLocalizedString("MainViewModel.NoBottomZoneParam");
                     return false;
                 }
                 var volumeParamVM = CommonSettingViewModel.Params.Where(pvm => pvm.ParamMap.Type == ParamType.VolumeParam).FirstOrDefault();
                 if(volumeParamVM != null && !volumeParamVM.IsChecked) {
-                    ErrorText = _localizationService.GetLocalizedString("MainViewModel.NoVolumeParam");
+                    ErrorText = _services.LocalizationService.GetLocalizedString("MainViewModel.NoVolumeParam");
                     return false;
                 }
                 var checkedParams = CommonSettingViewModel.Params.Where(p => p.IsChecked).ToList();
                 if(checkedParams.Count == 0) {
-                    ErrorText = _localizationService.GetLocalizedString("MainViewModel.NoParams");
+                    ErrorText = _services.LocalizationService.GetLocalizedString("MainViewModel.NoParams");
                     return false;
                 }
             }
             if(CommonSettingViewModel.HasParamWarning) {
-                ErrorText = _localizationService.GetLocalizedString("MainViewModel.ErrorParams");
+                ErrorText = _services.LocalizationService.GetLocalizedString("MainViewModel.ErrorParams");
                 return false;
             }
             if(CommonSettingViewModel.SelectedTypeZone == null) {
-                ErrorText = _localizationService.GetLocalizedString("MainViewModel.NoTypeZone");
+                ErrorText = _services.LocalizationService.GetLocalizedString("MainViewModel.NoTypeZone");
                 return false;
             }
         }
@@ -232,45 +234,45 @@ internal class MainViewModel : BaseViewModel {
             if(SlabBasedSettingViewModel.FilteredDocuments != null) {
                 var checkedDocs = SlabBasedSettingViewModel.FilteredDocuments.Where(p => p.IsChecked).ToList();
                 if(checkedDocs.Count == 0) {
-                    ErrorText = _localizationService.GetLocalizedString("MainViewModel.NoDocuments");
+                    ErrorText = _services.LocalizationService.GetLocalizedString("MainViewModel.NoDocuments");
                     return false;
                 }
             }
             if(SlabBasedSettingViewModel.FilteredSlabs != null) {
                 var checkedSlabs = SlabBasedSettingViewModel.FilteredSlabs.Where(p => p.IsChecked).ToList();
                 if(checkedSlabs.Count == 0) {
-                    ErrorText = _localizationService.GetLocalizedString("MainViewModel.NoSlabs");
+                    ErrorText = _services.LocalizationService.GetLocalizedString("MainViewModel.NoSlabs");
                     return false;
                 }
             }
             if(SlabBasedSettingViewModel.FilteredLevels != null) {
                 var checkedLevels = SlabBasedSettingViewModel.FilteredLevels.Where(p => p.IsChecked).ToList();
                 if(checkedLevels.Count == 0) {
-                    ErrorText = _localizationService.GetLocalizedString("MainViewModel.NoLevels");
+                    ErrorText = _services.LocalizationService.GetLocalizedString("MainViewModel.NoLevels");
                     return false;
                 }
             }
             if(!double.TryParse(SlabBasedSettingViewModel.SquareAngleDeg, out double resultAngleDeg)) {
-                ErrorText = _localizationService.GetLocalizedString("MainViewModel.SquareValueNoDouble");
+                ErrorText = _services.LocalizationService.GetLocalizedString("MainViewModel.SquareValueNoDouble");
                 return false;
             }
             if(!double.TryParse(SlabBasedSettingViewModel.SquareSideMm, out double resultSideMm)) {
-                ErrorText = _localizationService.GetLocalizedString("MainViewModel.SquareValueNoDouble");
+                ErrorText = _services.LocalizationService.GetLocalizedString("MainViewModel.SquareValueNoDouble");
                 return false;
             }
             if(resultSideMm <= 0) {
-                ErrorText = _localizationService.GetLocalizedString("MainViewModel.SquareSideNoNegate");
+                ErrorText = _services.LocalizationService.GetLocalizedString("MainViewModel.SquareSideNoNegate");
                 return false;
             } else if(resultSideMm > 1000) {
-                ErrorText = _localizationService.GetLocalizedString("MainViewModel.SquareSideBig");
+                ErrorText = _services.LocalizationService.GetLocalizedString("MainViewModel.SquareSideBig");
                 return false;
             } else if(resultSideMm < 10) {
-                ErrorText = _localizationService.GetLocalizedString("MainViewModel.SquareSideSmall");
+                ErrorText = _services.LocalizationService.GetLocalizedString("MainViewModel.SquareSideSmall");
                 return false;
             }
         }
         if(RequiredCheckArea) {
-            ErrorText = _localizationService.GetLocalizedString("MainViewModel.RequiredCheckArea");
+            ErrorText = _services.LocalizationService.GetLocalizedString("MainViewModel.RequiredCheckArea");
             return false;
         }
         ErrorText = null;

@@ -88,6 +88,8 @@
     <system:String x:Key="MainViewModel.SquareSideBig">Вводимые данные не должны превышать 1000 мм</system:String>
     <system:String x:Key="MainViewModel.SquareSideSmall">Вводимые данные не должны быть меньше 10 мм</system:String>    
     <system:String x:Key="MainViewModel.ProgressTitle">Построение объёмов... [{0}]\[{1}]</system:String>
+    <system:String x:Key="MainViewModel.MessageBoxTitle">Проверка зон</system:String>
+    <system:String x:Key="MainViewModel.MessageBoxText">Зоны проверены. Проблем не обнаружено</system:String>
 
     <system:String x:Key="ParamViewModel.WarningStartString">Отсутствуют параметры:</system:String>
     <system:String x:Key="DocumentViewModel.CurrentFile">Текущий файл (открытый)</system:String>
@@ -112,5 +114,7 @@
     <system:String x:Key="WarningsViewModel.BrokenContour">Зоны с поврежденным контуром</system:String>
     <system:String x:Key="WarningsViewModel.BrokenContourDescription">Зоны, имеющие поврежденный контур (ограничить разделителями)</system:String>
     <system:String x:Key="WarningsViewModel.NotFilledParam">Зоны с не заполненными параметрами</system:String>
-    <system:String x:Key="WarningsViewModel.NotFilledParamDescription">Зоны с не заполненными параметрами, необходимыми для построения</system:String> 
+    <system:String x:Key="WarningsViewModel.NotFilledParamDescription">Зоны с не заполненными параметрами, необходимыми для построения</system:String>
+    <system:String x:Key="WarningsViewModel.WrongFilledParam">Зоны с неверно заполненными параметрами</system:String>
+    <system:String x:Key="WarningsViewModel.WrongFilledParamDescription">Отметка низа находится выше или равна отметке верха</system:String>
 </ResourceDictionary>
