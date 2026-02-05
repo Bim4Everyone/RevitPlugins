@@ -25,7 +25,9 @@
     <i:Interaction.Behaviors>
         <wpfbehaviors:WpfAttachServiceBehavior
             AttachableService="{Binding ProgressDialogFactory}" />
-    </i:Interaction.Behaviors>
+        <wpfbehaviors:WpfAttachServiceBehavior
+            AttachableService="{Binding MessageBoxService}" />
+    </i:Interaction.Behaviors>     
 
     <Window.Resources>
         <converters:BoolToVisibilityConverter

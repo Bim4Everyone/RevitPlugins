@@ -79,8 +79,8 @@ public class RevitBuildCoordVolumesCommand : BasePluginCommand {
         // Используем сервис обновления тем для WinUI
         kernel.UseWpfUIThemeUpdater();
 
-        // Используем сервис MessageBox
-        kernel.UseWpfUIMessageBox();
+        // Настройка сервиса окошек сообщений
+        kernel.UseWpfUIMessageBox<MainViewModel>();
 
         // Настройка запуска окна
         kernel.BindMainWindow<MainViewModel, MainWindow>();
