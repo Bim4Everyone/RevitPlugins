@@ -15,6 +15,7 @@
 
     <!-- ViewModel Error Messages -->
     <system:String x:Key="VM.SelectPylon">Выберите пилон</system:String>
+    <system:String x:Key="VM.SelectProjectSection">Выберите комплект документации</system:String>
     <system:String x:Key="VM.SheetTypeNotSelected">Не выбран типоразмер рамки листа</system:String>
     <system:String x:Key="VM.ViewTypeNotSelected">Не выбран типоразмер создаваемого вида</system:String>
     <system:String x:Key="VM.MainViewsTemplateNotSelected">Не выбран шаблон основных видов</system:String>

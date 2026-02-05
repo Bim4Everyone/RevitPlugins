@@ -15,6 +15,7 @@
 
     <!-- ViewModel Error Messages -->
     <system:String x:Key="VM.SelectPylon">Select a pylon</system:String>
+    <system:String x:Key="VM.SelectProjectSection">Select a set of documentation</system:String>
     <system:String x:Key="VM.SheetTypeNotSelected">The sheet frame size is not selected</system:String>
     <system:String x:Key="VM.ViewTypeNotSelected">View type size not selected</system:String>
     <system:String x:Key="VM.MainViewsTemplateNotSelected">Main views template not selected</system:String>

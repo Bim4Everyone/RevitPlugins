@@ -31,7 +31,8 @@ internal class MainViewModel : BaseViewModel {
     private readonly RevitRepository _revitRepository;
     private readonly ILocalizationService _localizationService;
     private readonly IResolutionRoot _resolutionRoot;
-
+    private readonly string _selectPylonError;
+    private readonly string _selectProjectSectionError;
     private string _errorText;
     private List<ElementId> _errorElements = [];
     private bool _pylonSelectedManually = false;
@@ -49,6 +50,9 @@ internal class MainViewModel : BaseViewModel {
         _revitRepository = revitRepository;
         _localizationService = localizationService;
         _resolutionRoot = resolutionRoot;
+
+        _selectPylonError = _localizationService.GetLocalizedString("VM.SelectPylon");
+        _selectProjectSectionError = _localizationService.GetLocalizedString("VM.SelectProjectSection");
 
         SelectionSettings = new UserSelectionSettingsVM();
         VerticalViewSettings = new UserVerticalViewSettingsPageVM(this, _localizationService);
@@ -308,7 +312,24 @@ internal class MainViewModel : BaseViewModel {
     /// Определяет можно ли запустить работу плагина
     /// </summary>
     private bool CanAcceptView() {
-        return SelectedHostsInfoVM.Any(item => item.IsCheck == true) && ErrorText == string.Empty;
+        if(!string.IsNullOrEmpty(ErrorText) &&
+            ErrorText != _selectPylonError &&
+            ErrorText != _selectProjectSectionError) {
+            return false;
+        }
+
+        if(string.IsNullOrEmpty(SelectionSettings.SelectedProjectSection)) {
+            ErrorText = _selectProjectSectionError;
+            return false;
+        }
+
+        if(SelectedHostsInfoVM.All(item => !item.IsCheck)) {
+            ErrorText = _selectPylonError;
+            return false;
+        }
+
+        ErrorText = string.Empty;
+        return true;
     }
 
     /// <summary>
@@ -377,7 +398,8 @@ internal class MainViewModel : BaseViewModel {
             .PickObject(
                 ObjectType.Element,
                 new SelectionFilterByCategory(categoryIds),
-                _localizationService.GetLocalizedString("VM.SelectPylon")).ElementId;
+                _selectPylonError)
+            .ElementId;
         var element = _revitRepository.Document.GetElement(elementid);
 
         if(element != null) {
