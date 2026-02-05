@@ -75,6 +75,7 @@ public class RevitUnmodelingMepCommand : BasePluginCommand {
         kernel.BindMainWindow<MainViewModel, MainWindow>();
         kernel.UseWpfOpenFileDialog<MainViewModel>()
             .UseWpfSaveFileDialog<MainViewModel>();
+        kernel.UseWpfUIMessageBox<MainViewModel>();
 
         // Настройка локализации,
         // получение имени сборки откуда брать текст
@@ -88,9 +89,9 @@ public class RevitUnmodelingMepCommand : BasePluginCommand {
 
         var localizationService = kernel.Get<ILocalizationService>();
 
-        var servise = GetPlatformService<IMessageBoxService>();
-        CheckDocument(uiApplication.ActiveUIDocument.Document, servise, localizationService);
-        CheckEdited(uiApplication.ActiveUIDocument.Document, servise, localizationService);
+        var messageBoxService = kernel.Get<IMessageBoxService>();
+        CheckDocument(uiApplication.ActiveUIDocument.Document, messageBoxService, localizationService);
+        CheckEdited(uiApplication.ActiveUIDocument.Document, messageBoxService, localizationService);
         
         // Вызывает стандартное уведомление
         Notification(kernel.Get<MainWindow>());

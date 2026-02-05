@@ -110,6 +110,9 @@
         <wpfbehaviors:WpfAttachServiceBehavior
             AttachableService="{Binding SaveFileDialogService}">
         </wpfbehaviors:WpfAttachServiceBehavior>
+        <wpfbehaviors:WpfAttachServiceBehavior
+            AttachableService="{Binding MessageBoxService}">
+        </wpfbehaviors:WpfAttachServiceBehavior>
     </b:Interaction.Behaviors>
 
     <i:Interaction.Triggers>

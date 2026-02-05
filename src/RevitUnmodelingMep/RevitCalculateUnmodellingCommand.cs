@@ -11,7 +11,6 @@ using dosymep.Bim4Everyone;
 using dosymep.Bim4Everyone.ProjectConfigs;
 using dosymep.Bim4Everyone.SimpleServices;
 using dosymep.SimpleServices;
-using dosymep.WPF.ViewModels;
 using dosymep.WpfCore.Ninject;
 using dosymep.WpfUI.Core.Ninject;
 
@@ -19,6 +18,7 @@ using Ninject;
 
 using RevitUnmodelingMep.Models;
 using RevitUnmodelingMep.ViewModels;
+using RevitUnmodelingMep.Views;
 
 namespace RevitUnmodelingMep {
     [Transaction(TransactionMode.Manual)]
@@ -41,6 +41,15 @@ namespace RevitUnmodelingMep {
                 $"/{assemblyName};component/assets/Localization/Language.xaml",
                 CultureInfo.GetCultureInfo("ru-RU"));
 
+            kernel.UseWpfWindowsTheme();
+            kernel.UseWpfUIThemeUpdater();
+            kernel.Bind<IHasTheme>().To<HasTheme>().InSingletonScope();
+            kernel.Bind<IHasLocalization>().To<HasLocalization>().InSingletonScope();
+            kernel.UseWpfUIMessageBox();
+
+            kernel.UseWpfUIProgressDialog();
+
+
             // Настройка доступа к Revit
             kernel.Bind<RevitRepository>()
                 .ToSelf()
@@ -49,8 +58,6 @@ namespace RevitUnmodelingMep {
             kernel.Bind<Document>()
                 .ToMethod(ctx => ctx.Kernel.Get<UIApplication>().ActiveUIDocument.Document)
                 .InSingletonScope();
-
-            kernel.UseWpfUIMessageBox<MainViewModel>();
 
             kernel.Bind<VisSettingsStorage>()
                 .ToSelf()
@@ -70,8 +77,8 @@ namespace RevitUnmodelingMep {
 
             var localizationService = kernel.Get<ILocalizationService>();
 
-            var servise = GetPlatformService<IMessageBoxService>();
-            CheckDocument(uiApplication.ActiveUIDocument.Document, servise, localizationService);
+            var messageBoxService = kernel.Get<IMessageBoxService>();
+            CheckDocument(uiApplication.ActiveUIDocument.Document, messageBoxService, localizationService);
 
             var repository = kernel.Get<RevitRepository>();
             repository.CalculateUnmodeling(titleKey => CreatePercentProgressDialog(titleKey, localizationService));
@@ -116,4 +123,30 @@ namespace RevitUnmodelingMep {
             return dialog;
         }
     }
+}
+
+internal class HasTheme : IHasTheme {
+    public HasTheme(IUIThemeService uiThemeService, IUIThemeUpdaterService themeUpdaterService) {
+        UIThemeService = uiThemeService ?? throw new ArgumentNullException(nameof(uiThemeService));
+        ThemeUpdaterService = themeUpdaterService ?? throw new ArgumentNullException(nameof(themeUpdaterService));
+        UIThemeService.UIThemeChanged += _ => ThemeChanged?.Invoke(_);
+    }
+
+    public IUIThemeService UIThemeService { get; }
+    public UIThemes HostTheme => UIThemeService.HostTheme;
+    public IUIThemeUpdaterService ThemeUpdaterService { get; }
+    public event Action<UIThemes> ThemeChanged;
+}
+
+internal class HasLocalization : IHasLocalization {
+    public HasLocalization(ILocalizationService localizationService, ILanguageService languageService) {
+        LocalizationService = localizationService ?? throw new ArgumentNullException(nameof(localizationService));
+        LanguageService = languageService ?? throw new ArgumentNullException(nameof(languageService));
+        LanguageService.LanguageChanged += _ => LanguageChanged?.Invoke(_);
+    }
+
+    public CultureInfo HostLanguage => LanguageService.HostLanguage;
+    public ILocalizationService LocalizationService { get; }
+    public ILanguageService LanguageService { get; }
+    public event Action<CultureInfo> LanguageChanged;
 }
