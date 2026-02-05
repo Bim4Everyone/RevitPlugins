@@ -1,2 +1,6 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
+	<PropertyGroup>
+		<UseWpfUI>true</UseWpfUI>
+		<LangVersion>12</LangVersion>
+	</PropertyGroup>
 </Project>

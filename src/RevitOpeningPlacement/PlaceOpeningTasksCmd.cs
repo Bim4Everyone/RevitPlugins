@@ -1,6 +1,8 @@
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
+using System.Reflection;
 using System.Threading;
 using System.Windows;
 using System.Windows.Interop;
@@ -14,6 +16,8 @@ using dosymep.Bim4Everyone;
 using dosymep.Bim4Everyone.SimpleServices;
 using dosymep.Revit;
 using dosymep.SimpleServices;
+using dosymep.WpfCore.Ninject;
+using dosymep.WpfUI.Core.Ninject;
 
 using Ninject;
 
@@ -30,7 +34,7 @@ using RevitOpeningPlacement.OpeningModels;
 using RevitOpeningPlacement.Services;
 using RevitOpeningPlacement.ViewModels.Links;
 using RevitOpeningPlacement.ViewModels.ReportViewModel;
-using RevitOpeningPlacement.Views;
+using RevitOpeningPlacement.Views.Utils;
 
 namespace RevitOpeningPlacement;
 /// <summary>
@@ -84,16 +88,21 @@ public class PlaceOpeningTasksCmd : BasePluginCommand {
             .InTransientScope()
             .WithPropertyValue(nameof(Window.DataContext),
                 c => c.Kernel.Get<LinksSelectorViewModel>());
+        kernel.UseWpfUIThemeUpdater();
+        string assemblyName = Assembly.GetExecutingAssembly().GetName().Name;
+        kernel.UseWpfLocalization($"/{assemblyName};component/assets/localization/Language.xaml",
+            CultureInfo.GetCultureInfo("ru-RU"));
 
         kernel.Get<IRevitLinkTypesSetter>().SetRevitLinkTypes();
 
         var revitRepository = kernel.Get<RevitRepository>();
-        PlaceOpeningTasks(uiApplication, revitRepository, Array.Empty<ElementId>());
+        PlaceOpeningTasks(uiApplication, revitRepository, kernel.Get<ILocalizationService>(), Array.Empty<ElementId>());
     }
 
     private protected void PlaceOpeningTasks(
         UIApplication uiApplication,
         RevitRepository revitRepository,
+        ILocalizationService localization,
         ElementId[] mepElements) {
 
         _duplicatedInstancesToRemoveIds.Clear();
@@ -110,7 +119,7 @@ public class PlaceOpeningTasksCmd : BasePluginCommand {
                                                .ToList();
             uiApplication.Application.FailuresProcessing += FailureProcessor;
             try {
-                var unplacedClashes = InitializePlacing(revitRepository, placers, openingConfig)
+                var unplacedClashes = InitializePlacing(revitRepository, placers, openingConfig, localization)
                     .Concat(placementConfigurator.GetUnplacedClashes());
                 if(openingConfig.ShowPlacingErrors) {
                     InitializeReport(revitRepository, unplacedClashes);
@@ -133,31 +142,42 @@ public class PlaceOpeningTasksCmd : BasePluginCommand {
         return false;
     }
 
-    private IList<UnplacedClashModel> InitializePlacing(RevitRepository revitRepository, IEnumerable<OpeningPlacer> placers, OpeningConfig config) {
+    private IList<UnplacedClashModel> InitializePlacing(RevitRepository revitRepository,
+        IEnumerable<OpeningPlacer> placers,
+        OpeningConfig config,
+        ILocalizationService localization) {
         if(placers.Count() == 0) {
             return [];
         }
         using var pb = GetPlatformService<IProgressDialogService>();
         pb.StepValue = _progressBarStepValue;
-        pb.DisplayTitleFormat = "Расстановка отверстий... [{0}\\{1}]";
+        pb.DisplayTitleFormat = localization.GetLocalizedString("Progress.TasksPlacing");
         var progress = pb.CreateProgress();
         pb.MaxValue = placers.Count();
         var ct = pb.CreateCancellationToken();
         pb.Show();
 
-        return PlaceOpenings(progress, ct, revitRepository, placers, config);
+        return PlaceOpenings(revitRepository, placers, config, localization, progress, ct);
     }
 
-    private IList<UnplacedClashModel> PlaceOpenings(IProgress<int> progress, CancellationToken ct, RevitRepository revitRepository, IEnumerable<OpeningPlacer> placers, OpeningConfig config) {
+    private IList<UnplacedClashModel> PlaceOpenings(
+        RevitRepository revitRepository,
+        IEnumerable<OpeningPlacer> placers,
+        OpeningConfig config,
+        ILocalizationService localization,
+        IProgress<int> progress = null,
+        CancellationToken ct = default) {
+
         var placedOpeningTasks = revitRepository.GetPlacedOutcomingTasks();
         HashSet<FamilyInstance> placedFamInstances = [];
         List<UnplacedClashModel> unplacedClashes = [];
 
-        using(var t = revitRepository.GetTransaction("Расстановка заданий")) {
+        using(var t = revitRepository.GetTransaction(
+            localization.GetLocalizedString("Transaction.TaskPlacing"))) {
             int count = 0;
             foreach(var p in placers) {
                 ct.ThrowIfCancellationRequested();
-                progress.Report(count);
+                progress?.Report(count);
                 try {
                     var newOpening = p.Place();
                     placedFamInstances.Add(newOpening);
@@ -182,14 +202,14 @@ public class PlaceOpeningTasksCmd : BasePluginCommand {
         //т.к. свойство Location у элемента FamilyInstance, созданного внутри транзакции, может быть не актуально (установлено в (0,0,0) несмотря на реальное расположение),
         //а после завершения транзакции актуализируется
         if(placedOpeningTasks.Count > 0) {
-            var newOpeningsNotDeleted = InitializeRemoving(revitRepository, newOpenings, placedOpeningTasks);
+            var newOpeningsNotDeleted = InitializeRemoving(revitRepository, newOpenings, placedOpeningTasks, localization);
             if(newOpeningsNotDeleted.Count > 1) {
-                InitializeUnion(revitRepository, newOpeningsNotDeleted, config);
+                InitializeUnion(revitRepository, newOpeningsNotDeleted, config, localization);
             }
         } else {
             // инициализация удаления дубликатов только что созданных заданий на отверстия здесь не запускается,
             // потому что дубликаты будут объединены в одно задание
-            InitializeUnion(revitRepository, newOpenings, config);
+            InitializeUnion(revitRepository, newOpenings, config, localization);
         }
         return unplacedClashes;
     }
@@ -197,10 +217,12 @@ public class PlaceOpeningTasksCmd : BasePluginCommand {
     private ICollection<OpeningMepTaskOutcoming> InitializeRemoving(
         RevitRepository revitRepository,
         ICollection<OpeningMepTaskOutcoming> newOpenings,
-        ICollection<OpeningMepTaskOutcoming> alreadyPlacedOpenings) {
+        ICollection<OpeningMepTaskOutcoming> alreadyPlacedOpenings,
+        ILocalizationService localization) {
+
         using var pb = GetPlatformService<IProgressDialogService>();
         pb.StepValue = _progressBarStepValue;
-        pb.DisplayTitleFormat = "Проверка дублей... [{0}\\{1}]";
+        pb.DisplayTitleFormat = localization.GetLocalizedString("Progress.CheckDuplicates");
         var progressRemove = pb.CreateProgress();
         pb.MaxValue = newOpenings.Count;
         var ctRemove = pb.CreateCancellationToken();
@@ -210,6 +232,7 @@ public class PlaceOpeningTasksCmd : BasePluginCommand {
             revitRepository,
             newOpenings,
             alreadyPlacedOpenings,
+            localization,
             progressRemove,
             ctRemove);
     }
@@ -218,16 +241,18 @@ public class PlaceOpeningTasksCmd : BasePluginCommand {
         RevitRepository revitRepository,
         ICollection<OpeningMepTaskOutcoming> newOpenings,
         ICollection<OpeningMepTaskOutcoming> alreadyPlacedOpenings,
-        IProgress<int> progress,
-        CancellationToken ct) {
+        ILocalizationService localization,
+        IProgress<int> progress = null,
+        CancellationToken ct = default) {
 
         HashSet<OpeningMepTaskOutcoming> newOpeningsNotDeleted = [];
         if(alreadyPlacedOpenings.Count > 0) {
-            using(var t = revitRepository.GetTransaction("Удаление дублирующих заданий")) {
+            using(var t = revitRepository.GetTransaction(
+                localization.GetLocalizedString("Transaction.DeleteDuplicated"))) {
                 int count = 0;
                 foreach(var newOpening in newOpenings) {
                     ct.ThrowIfCancellationRequested();
-                    progress.Report(count);
+                    progress?.Report(count);
                     bool deleteNewOpening = _duplicatedInstancesToRemoveIds.Contains(newOpening.Id) || newOpening.IsAlreadyPlaced(alreadyPlacedOpenings);
                     if(deleteNewOpening) {
                         revitRepository.DeleteElement(newOpening.Id);
@@ -248,22 +273,30 @@ public class PlaceOpeningTasksCmd : BasePluginCommand {
     private void InitializeUnion(
         RevitRepository revitRepository,
         ICollection<OpeningMepTaskOutcoming> newOpeningsForUnion,
-        OpeningConfig config
-        ) {
+        OpeningConfig config,
+        ILocalizationService localization) {
         using var pb = GetPlatformService<IProgressDialogService>();
         pb.StepValue = _progressBarStepValue;
-        pb.DisplayTitleFormat = "Объединение касающихся... [{0}\\{1}]";
+        pb.DisplayTitleFormat = localization.GetLocalizedString("Progress.UniteTouching");
         var progressUnite = pb.CreateProgress();
         pb.MaxValue = newOpeningsForUnion.Count;
         var ctUnite = pb.CreateCancellationToken();
         pb.Show();
 
-        UniteTouchingOpenings(progressUnite, ctUnite, revitRepository, newOpeningsForUnion, config);
+        UniteTouchingOpenings(revitRepository, newOpeningsForUnion, config, localization, progressUnite, ctUnite);
     }
 
-    private void UniteTouchingOpenings(IProgress<int> progress, CancellationToken ct, RevitRepository revitRepository, ICollection<OpeningMepTaskOutcoming> newOpeningsForUnion, OpeningConfig config) {
+    private void UniteTouchingOpenings(
+        RevitRepository revitRepository,
+        ICollection<OpeningMepTaskOutcoming> newOpeningsForUnion,
+        OpeningConfig config,
+        ILocalizationService localization,
+        IProgress<int> progress = null,
+        CancellationToken ct = default) {
+
         var groups = new MultilayerOpeningsGroupsProvider(revitRepository).GetOpeningsGroups(newOpeningsForUnion);
-        using var t = revitRepository.GetTransaction("Объединение многослойных заданий");
+        using var t = revitRepository.GetTransaction(
+            localization.GetLocalizedString("Transaction.UniteMultilayers"));
 
         int count = 0;
         foreach(var group in groups) {

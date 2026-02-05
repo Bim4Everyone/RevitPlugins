@@ -11,6 +11,7 @@
     xmlns:me="clr-namespace:dosymep.WpfCore.MarkupExtensions;assembly=dosymep.WpfCore"
     xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
     xmlns:wpfbehaviors="clr-namespace:dosymep.WpfCore.Behaviors;assembly=dosymep.WpfCore"
+    xmlns:res="clr-namespace:RevitClashDetective.Resources"
     mc:Ignorable="d"
     Height="600"
     Width="1000"
@@ -25,6 +26,8 @@
             AttachableService="{Binding OpenFileDialogService}" />
         <wpfbehaviors:WpfAttachServiceBehavior
             AttachableService="{Binding SaveFileDialogService}" />
+        <res:WindowClosingBehavior
+            Handler="{Binding}" />
     </i:Interaction.Behaviors>
 
     <core:WpfUIPlatformWindow.Resources>
@@ -40,8 +43,7 @@
         </ResourceDictionary>
     </core:WpfUIPlatformWindow.Resources>
 
-    <Grid
-        Margin="8 0">
+    <Grid>
         <Grid.RowDefinitions>
             <RowDefinition
                 Height="Auto" />
@@ -79,7 +81,7 @@
             Grid.Row="1"
             Grid.Column="0"
             Grid.ColumnSpan="5"
-            Margin="0 0 0 8"
+            Margin="8 0"
             Style="{StaticResource CustomBorder}">
             <DockPanel>
                 <ui:Button
@@ -101,6 +103,7 @@
         <Border
             Grid.Row="2"
             Grid.Column="0"
+            Margin="8 0 0 0"
             Style="{StaticResource CustomBorder}">
             <DockPanel
                 LastChildFill="True">
@@ -114,22 +117,28 @@
                     <ui:Button
                         ToolTip="{me:LocalizationSource FilterCreation.AddSearchSet}"
                         Command="{Binding CreateCommand}"
-                        CommandParameter="{Binding RelativeSource={RelativeSource AncestorType=Window}}"
                         Content="{ui:SymbolIcon Symbol=Add20}" />
                     <ui:Button
                         Margin="4 0"
                         ToolTip="{me:LocalizationSource FilterCreation.RenameSearchSet}"
                         Command="{Binding RenameCommand}"
-                        CommandParameter="{Binding RelativeSource={RelativeSource AncestorType=Window}}"
                         Content="{ui:SymbolIcon Symbol=Rename20}" />
                     <ui:Button
+                        ToolTip="{me:LocalizationSource FilterCreation.CopySearchSet}"
+                        Command="{Binding CopyCommand}"
+                        Content="{ui:SymbolIcon Symbol=Copy20}" />
+                    <ui:Button
                         Appearance="Danger"
+                        Margin="4 0 0 0"
                         ToolTip="{me:LocalizationSource FilterCreation.DeleteSearchSet}"
                         Command="{Binding DeleteCommand}"
+                        CommandParameter="{Binding Path=SelectedItems, ElementName=_filtersList}"
                         Content="{ui:SymbolIcon Symbol=Delete20}" />
                 </DockPanel>
                 <ui:ListView
+                    x:Name="_filtersList"
                     Margin="0 4 0 0"
+                    SelectionMode="Extended"
                     ItemsSource="{Binding Filters}"
                     SelectedItem="{Binding SelectedFilter, UpdateSourceTrigger=PropertyChanged}">
                     <ui:ListView.ItemTemplate>
@@ -175,6 +184,7 @@
         <Border
             Grid.Row="2"
             Grid.Column="4"
+            Margin="0 0 8 0"
             Style="{StaticResource CustomBorder}">
             <DockPanel
                 LastChildFill="True">
@@ -189,6 +199,7 @@
         </Border>
 
         <StackPanel
+            Grid.Column="0"
             Grid.Row="3"
             Grid.ColumnSpan="5"
             Orientation="Horizontal"
@@ -216,7 +227,7 @@
                 Content="{me:LocalizationSource Ok}"
                 Command="{Binding SaveCommand}" />
             <ui:Button
-                Margin="8 8 0 8"
+                Margin="8"
                 Width="80"
                 IsCancel="true"
                 Click="ButtonCancel_Click"

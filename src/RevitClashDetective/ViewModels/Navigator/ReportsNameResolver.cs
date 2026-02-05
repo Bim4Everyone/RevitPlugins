@@ -29,7 +29,7 @@ internal class ReportsNameResolver {
         if(intersections.Length > 0) {
             switch(GetResult(string.Join(", ", intersections))) {
                 case TaskDialogResult.CommandLink1: {
-                    return ReplaceAndKeepStatuses(oldReports, addedReports);
+                    return ReplaceAndKeepData(oldReports, addedReports);
                 }
                 case TaskDialogResult.CommandLink2: {
                     return Replace(oldReports, addedReports);
@@ -74,7 +74,7 @@ internal class ReportsNameResolver {
             .ToArray();
     }
 
-    private ICollection<ReportViewModel> ReplaceAndKeepStatuses(
+    private ICollection<ReportViewModel> ReplaceAndKeepData(
         ICollection<ReportViewModel> oldReports,
         ICollection<ReportViewModel> addedReports) {
         var intersectionOld = oldReports
@@ -90,10 +90,21 @@ internal class ReportsNameResolver {
                 var oldClash = oldClashes.FirstOrDefault(c => _clashesComparer.Equals(c, newClash));
                 if(oldClash != null) {
                     newClash.ClashStatus = oldClash.ClashStatus;
+                    SetOldComments(newClash, oldClash);
                 }
             }
         }
         return Replace(oldReports, addedReports);
+    }
+
+    private void SetOldComments(IClashViewModel newClash, IClashViewModel oldClash) {
+        if(newClash is ClashViewModel newRealClash
+           && oldClash is ClashViewModel oldRealClash) {
+            newRealClash.Comments.Clear();
+            foreach(var comment in oldRealClash.Comments) {
+                newRealClash.Comments.Add(comment);
+            }
+        }
     }
 
     private ICollection<ReportViewModel> KeepOnlyOld(

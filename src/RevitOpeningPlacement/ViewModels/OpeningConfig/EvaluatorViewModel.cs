@@ -1,13 +1,22 @@
+using dosymep.SimpleServices;
 using dosymep.WPF.ViewModels;
 
 using RevitClashDetective.Models.Evaluators;
 
 namespace RevitOpeningPlacement.ViewModels.OpeningConfig;
 internal class EvaluatorViewModel : BaseViewModel {
-    private SetEvaluator _setEvaluator;
+    private readonly ILocalizationService _localizationService;
 
-    public SetEvaluator SetEvaluator {
-        get => _setEvaluator;
-        set => RaiseAndSetIfChanged(ref _setEvaluator, value);
+    public EvaluatorViewModel(ILocalizationService localizationService, SetEvaluator setEvaluator) {
+        _localizationService = localizationService
+            ?? throw new System.ArgumentNullException(nameof(localizationService));
+        SetEvaluator = setEvaluator
+            ?? throw new System.ArgumentNullException(nameof(setEvaluator));
+        Name = _localizationService.GetLocalizedString($"{nameof(SetEvaluators)}.{SetEvaluator.Evaluator}");
     }
+
+
+    public string Name { get; }
+
+    public SetEvaluator SetEvaluator { get; }
 }

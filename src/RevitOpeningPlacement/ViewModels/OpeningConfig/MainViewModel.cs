@@ -11,6 +11,9 @@ using dosymep.SimpleServices;
 using dosymep.WPF.Commands;
 using dosymep.WPF.ViewModels;
 
+using Ninject;
+using Ninject.Syntax;
+
 using RevitClashDetective.Models.FilterModel;
 
 using RevitOpeningPlacement.Models;
@@ -18,7 +21,8 @@ using RevitOpeningPlacement.Models.Configs;
 using RevitOpeningPlacement.Models.OpeningPlacement;
 using RevitOpeningPlacement.Services;
 using RevitOpeningPlacement.ViewModels.Services;
-using RevitOpeningPlacement.Views;
+using RevitOpeningPlacement.Views.Settings;
+using RevitOpeningPlacement.Views.Utils;
 
 namespace RevitOpeningPlacement.ViewModels.OpeningConfig;
 internal class MainViewModel : BaseViewModel {
@@ -28,18 +32,24 @@ internal class MainViewModel : BaseViewModel {
     private DispatcherTimer _timer;
     private readonly RevitRepository _revitRepository;
     private readonly ConfigFileService _configFileService;
+    private readonly IResolutionRoot _root;
+    private readonly ILocalizationService _localization;
     private string _configName;
 
     public MainViewModel(
         RevitRepository revitRepository,
         ConfigFileService configFileService,
         Models.Configs.OpeningConfig openingConfig,
+        IResolutionRoot root,
+        ILocalizationService localization,
         IOpenFileDialogService openFileDialogService,
         ISaveFileDialogService saveFileDialogService,
         IMessageBoxService messageBoxService) {
 
         _revitRepository = revitRepository ?? throw new ArgumentNullException(nameof(revitRepository));
         _configFileService = configFileService ?? throw new ArgumentNullException(nameof(configFileService));
+        _root = root ?? throw new ArgumentNullException(nameof(root));
+        _localization = localization ?? throw new ArgumentNullException(nameof(localization));
         OpenFileDialogService = openFileDialogService ?? throw new ArgumentNullException(nameof(openFileDialogService));
         SaveFileDialogService = saveFileDialogService ?? throw new ArgumentNullException(nameof(saveFileDialogService));
         MessageBoxService = messageBoxService ?? throw new ArgumentNullException(nameof(messageBoxService));
@@ -47,7 +57,7 @@ internal class MainViewModel : BaseViewModel {
             throw new ArgumentNullException(nameof(openingConfig));
         }
         MepCategories = new ObservableCollection<MepCategoryViewModel>(
-            openingConfig.Categories.Select(item => new MepCategoryViewModel(_revitRepository, item)));
+            openingConfig.Categories.Select(item => new MepCategoryViewModel(_revitRepository, _localization, item)));
         ConfigName = openingConfig.Name;
         RoundUnitedTaskSize = openingConfig.UnitedTasksSizeRounding > 0;
         SelectedSizeRoundForUnitedTask = openingConfig.UnitedTasksSizeRounding;
@@ -258,7 +268,7 @@ internal class MainViewModel : BaseViewModel {
         if(config != null) {
             ShowPlacingErrors = config.ShowPlacingErrors;
             MepCategories = new ObservableCollection<MepCategoryViewModel>(
-                config.Categories.Select(item => new MepCategoryViewModel(_revitRepository, item)));
+                config.Categories.Select(item => new MepCategoryViewModel(_revitRepository, _localization, item)));
             SelectedMepCategoryViewModel = MepCategories.FirstOrDefault(category => category.IsSelected)
                 ?? MepCategories.First();
             ConfigName = config.Name;
@@ -314,7 +324,6 @@ internal class MainViewModel : BaseViewModel {
     }
 
     private void OpenUnionTaskSettings() {
-        var window = new UnionTaskSettingsView() { DataContext = this };
-        window.ShowDialog();
+        _root.Get<UnionTaskSettingsView>().ShowDialog();
     }
 }

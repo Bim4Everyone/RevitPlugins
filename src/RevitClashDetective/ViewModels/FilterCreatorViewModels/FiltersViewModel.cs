@@ -1,4 +1,5 @@
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
@@ -18,12 +19,14 @@ using Ninject.Syntax;
 
 using RevitClashDetective.Models;
 using RevitClashDetective.Models.FilterModel;
+using RevitClashDetective.Resources;
 using RevitClashDetective.ViewModels.SearchSet;
 using RevitClashDetective.ViewModels.Services;
 using RevitClashDetective.Views;
 
 namespace RevitClashDetective.ViewModels.FilterCreatorViewModels;
-internal class FiltersViewModel : BaseViewModel {
+
+internal class FiltersViewModel : BaseViewModel, IWindowClosingHandler {
     private readonly RevitRepository _revitRepository;
     private readonly ILocalizationService _localization;
     private readonly IResolutionRoot _resolutionRoot;
@@ -54,9 +57,10 @@ internal class FiltersViewModel : BaseViewModel {
         InitializeFilters();
         InitializeTimer();
 
-        CreateCommand = RelayCommand.Create<Window>(Create);
-        DeleteCommand = RelayCommand.Create(Delete, CanDelete);
-        RenameCommand = RelayCommand.Create<Window>(Rename, CanRename);
+        CreateCommand = RelayCommand.Create(Create);
+        DeleteCommand = RelayCommand.Create<IList>(Delete, CanDelete);
+        RenameCommand = RelayCommand.Create(Rename, CanRename);
+        CopyCommand = RelayCommand.Create(Copy, CanCopy);
         SaveCommand = RelayCommand.Create(Save, CanSave);
         SaveAsCommand = RelayCommand.Create(SaveAs, CanSave);
         LoadCommand = RelayCommand.Create(Load);
@@ -79,6 +83,7 @@ internal class FiltersViewModel : BaseViewModel {
     }
 
     public ICommand CreateCommand { get; }
+    public ICommand CopyCommand { get; }
     public ICommand DeleteCommand { get; }
     public ICommand RenameCommand { get; }
     public ICommand SaveCommand { get; }
@@ -122,11 +127,10 @@ internal class FiltersViewModel : BaseViewModel {
         }
     }
 
-    private void Create(Window p) {
+    private void Create() {
         var newFilterName = new FilterNameViewModel(_localization, Filters.Select(f => f.Name));
         var view = _resolutionRoot.Get<FilterNameView>();
         view.DataContext = newFilterName;
-        view.Owner = p;
         if(view.ShowDialog() == true) {
             var newFilter = new FilterViewModel(_revitRepository, _localization) { Name = newFilterName.Name, IsInitialized = true };
             Filters.Add(newFilter);
@@ -136,27 +140,33 @@ internal class FiltersViewModel : BaseViewModel {
         }
     }
 
-    private void Delete() {
+    private void Delete(IList selectedItems) {
+        var filters = selectedItems.OfType<FilterViewModel>().ToArray();
         if(MessageBoxService.Show(
-            _localization.GetLocalizedString("FilterCreation.DeleteFilterPrompt", SelectedFilter.Name),
+               _localization.GetLocalizedString(
+                   "FilterCreation.DeleteFilterPrompt",
+                   string.Join(", ", filters.Select(item => item.Name))),
             _localization.GetLocalizedString("BIM"),
             MessageBoxButton.YesNo,
             MessageBoxImage.Warning,
             MessageBoxResult.No) == MessageBoxResult.Yes) {
-            Filters.Remove(SelectedFilter);
+            foreach(var item in filters) {
+                Filters.Remove(item);
+            }
+
             SelectedFilter = Filters.FirstOrDefault();
         }
     }
 
-    private bool CanDelete() {
-        return SelectedFilter != null;
+    private bool CanDelete(IList selectedItems) {
+        return selectedItems != null
+               && selectedItems.OfType<FilterViewModel>().Count() != 0;
     }
 
-    private void Rename(Window p) {
+    private void Rename() {
         var newFilterName = new FilterNameViewModel(_localization, Filters.Select(f => f.Name), SelectedFilter.Name);
         var view = _resolutionRoot.Get<FilterNameView>();
         view.DataContext = newFilterName;
-        view.Owner = p;
         if(view.ShowDialog() == true) {
             SelectedFilter.Name = newFilterName.Name;
             Filters = new ObservableCollection<FilterViewModel>(Filters.OrderBy(item => item.Name));
@@ -164,8 +174,27 @@ internal class FiltersViewModel : BaseViewModel {
         }
     }
 
-    private bool CanRename(Window p) {
-        return p is not null && SelectedFilter is not null;
+    private bool CanRename() {
+        return SelectedFilter is not null;
+    }
+
+    private void Copy() {
+        var newFilterName = new FilterNameViewModel(_localization, Filters.Select(f => f.Name), SelectedFilter.Name);
+        var view = _resolutionRoot.Get<FilterNameView>();
+        view.DataContext = newFilterName;
+        if(view.ShowDialog() == true) {
+            var newFilter = new FilterViewModel(_revitRepository, _localization, SelectedFilter.GetFilter()) {
+                Name = newFilterName.Name
+            };
+            Filters.Add(newFilter);
+
+            Filters = new ObservableCollection<FilterViewModel>(Filters.OrderBy(item => item.Name));
+            SelectedFilter = newFilter;
+        }
+    }
+
+    private bool CanCopy() {
+        return SelectedFilter is not null;
     }
 
     private void Save() {
@@ -244,5 +273,25 @@ internal class FiltersViewModel : BaseViewModel {
 
     private void RefreshMessage() {
         _timer.Start();
+    }
+
+    public void OnWindowClosing(CancelEventArgs e) {
+        if(SaveCommand.CanExecute(default)
+           && MessageBoxService.Show(
+               _localization.GetLocalizedString("FilterCreation.SavePrompt"),
+               _localization.GetLocalizedString("BIM"),
+               MessageBoxButton.YesNo,
+               MessageBoxImage.Question)
+           == MessageBoxResult.Yes) {
+            SaveCommand.Execute(default);
+        } else if(!SaveCommand.CanExecute(default)
+                  && MessageBoxService.Show(
+                      _localization.GetLocalizedString("FilterCreation.CannotSavePrompt"),
+                      _localization.GetLocalizedString("BIM"),
+                      MessageBoxButton.OKCancel,
+                      MessageBoxImage.Warning)
+                  == MessageBoxResult.Cancel) {
+            e.Cancel = true;
+        }
     }
 }

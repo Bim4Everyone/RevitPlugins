@@ -1,8 +1,10 @@
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Linq;
+using System.Windows;
 using System.Windows.Data;
 using System.Windows.Input;
 using System.Windows.Threading;
@@ -62,12 +64,13 @@ internal class MainViewModel : BaseViewModel {
             InitializeEmptyCheck();
         }
         AddCheckCommand = RelayCommand.Create(AddCheck);
-        RemoveCheckCommand = RelayCommand.Create<CheckViewModel>(RemoveCheck, CanRemove);
+        RemoveCheckCommand = RelayCommand.Create<IList>(RemoveCheck, CanRemove);
         FindClashesCommand = RelayCommand.Create(FindClashes, CanFindClashes);
 
         SaveClashesCommand = RelayCommand.Create(SaveConfig);
         SaveAsClashesCommand = RelayCommand.Create(SaveAsConfig);
         LoadClashCommand = RelayCommand.Create(LoadConfig);
+        AskForSaveCommand = RelayCommand.Create(AskForSave);
 
         PropertyChanged += ChecksFilterPropertyChanged;
     }
@@ -97,6 +100,7 @@ internal class MainViewModel : BaseViewModel {
         set => RaiseAndSetIfChanged(ref _selectedCheck, value);
     }
 
+    public ICommand AskForSaveCommand { get; }
     public ICommand AddCheckCommand { get; }
     public ICommand RemoveCheckCommand { get; }
     public ICommand FindClashesCommand { get; }
@@ -119,8 +123,7 @@ internal class MainViewModel : BaseViewModel {
     }
 
     private void InitializeChecks() {
-        AllChecks = new ObservableCollection<CheckViewModel>(InitializeChecks(_checksConfig).OrderBy(c => c.Name));
-        SetChecks(AllChecks);
+        SetAllChecks(InitializeChecks(_checksConfig).OrderBy(c => c.Name));
     }
 
     private IEnumerable<CheckViewModel> InitializeChecks(ChecksConfig config) {
@@ -144,7 +147,7 @@ internal class MainViewModel : BaseViewModel {
     }
 
     private void InitializeEmptyCheck() {
-        AllChecks = [
+        SetAllChecks([
             new CheckViewModel(_revitRepository,
             _localization,
             OpenFileDialogService,
@@ -152,8 +155,11 @@ internal class MainViewModel : BaseViewModel {
             MessageBoxService,
             _settingsConfig,
             _filtersConfig,
-            _contentDialogService)
-        ];
+            _contentDialogService)]);
+    }
+
+    private void SetAllChecks(IEnumerable<CheckViewModel> checks) {
+        AllChecks = [..checks];
         SetChecks(AllChecks);
     }
 
@@ -188,12 +194,15 @@ internal class MainViewModel : BaseViewModel {
             _contentDialogService));
     }
 
-    private void RemoveCheck(CheckViewModel p) {
-        AllChecks.Remove(p);
+    private void RemoveCheck(IList selectedItems) {
+        var checks = selectedItems.OfType<CheckViewModel>().ToArray();
+        foreach(var check in checks) {
+            AllChecks.Remove(check);
+        }
     }
 
-    private bool CanRemove(CheckViewModel p) {
-        return AllChecks?.Count > 0 && p is not null;
+    private bool CanRemove(IList selectedItems) {
+        return selectedItems is not null && AllChecks?.Count > selectedItems.Count;
     }
 
     private void FindClashes() {
@@ -251,7 +260,7 @@ internal class MainViewModel : BaseViewModel {
 
         var newChecks = InitializeChecks(config).ToList();
         var nameResolver = new NameResolver<CheckViewModel>(AllChecks, newChecks);
-        AllChecks = new ObservableCollection<CheckViewModel>(nameResolver.GetCollection().OrderBy(c => c.Name));
+        SetAllChecks(nameResolver.GetCollection().OrderBy(c => c.Name));
         MessageText = _localization.GetLocalizedString("MainWindow.SuccessLoad");
         Wait(() => { MessageText = null; });
     }
@@ -267,24 +276,37 @@ internal class MainViewModel : BaseViewModel {
             ErrorText = _localization.GetLocalizedString("MainWindow.Validation.NamesDuplicated");
             return false;
         }
-        var emptyCheck = AllChecks.FirstOrDefault(item => !item.IsFilterSelected);
+
+        var selectedChecks = AllChecks.Where(item => item.IsSelected).ToArray();
+        if(selectedChecks.Length == 0) {
+            ErrorText = _localization.GetLocalizedString("MainWindow.Validation.SelectAnyCheck");
+            return false;
+        }
+
+        var emptyCheck = selectedChecks.FirstOrDefault(item => !item.IsFilterSelected);
         if(emptyCheck != null) {
             ErrorText = _localization.GetLocalizedString("MainWindow.Validation.EmptyFilterInCheck", emptyCheck.Name);
             return false;
         }
 
-        emptyCheck = AllChecks.FirstOrDefault(item => !item.IsFilesSelected);
+        emptyCheck = selectedChecks.FirstOrDefault(item => !item.IsFilesSelected);
         if(emptyCheck != null) {
             ErrorText = _localization.GetLocalizedString("MainWindow.Validation.EmptyFileInCheck", emptyCheck.Name);
             return false;
         }
-        if(AllChecks.All(item => !item.IsSelected)) {
-            ErrorText = _localization.GetLocalizedString("MainWindow.Validation.SelectAnyCheck");
-            return false;
-        }
-
         ErrorText = null;
         return true;
+    }
+
+    private void AskForSave() {
+        if(MessageBoxService.Show(
+               _localization.GetLocalizedString("MainWindow.SavePrompt"),
+               _localization.GetLocalizedString("BIM"),
+               MessageBoxButton.YesNo,
+               MessageBoxImage.Question)
+           == MessageBoxResult.Yes) {
+            SaveClashesCommand.Execute(default);
+        }
     }
 
     private void Wait(Action action) {

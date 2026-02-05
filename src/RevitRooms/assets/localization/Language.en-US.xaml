@@ -1,0 +1,158 @@
+<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:system="clr-namespace:System;assembly=mscorlib">
+
+    <system:String x:Key="RoomsWindow.Title">Rooms</system:String>
+    <system:String x:Key="RoomsNumsWindow.Title">Rooms numbering</system:String>
+    <system:String x:Key="WarningsWindow.Title">Errors and warnings</system:String>
+    <system:String x:Key="NumberingOrderWindow.Title">Priorities</system:String>
+
+    <system:String x:Key="Button.Ok">OK</system:String>
+    <system:String x:Key="Button.Cancel">Cancel</system:String>
+
+    <system:String x:Key="Transaction.NumByGroup">Numbering by room groups</system:String>
+    <system:String x:Key="Transaction.NumBySection">Room numbering by section</system:String>
+    <system:String x:Key="Transaction.NumBySectionGroup">Room numbering by section and floor</system:String>
+    <system:String x:Key="Transaction.NumBySectionGroupLevel">Room numbering by section, floor, and group</system:String>
+    <system:String x:Key="Transaction.UpdateNumOrder">Change numbering Priority</system:String>
+    <system:String x:Key="Transaction.DeleteRoomsAndAreas">Delete unplaced rooms and areas</system:String>
+    <system:String x:Key="Transaction.CalculateAreas">Calculate areas</system:String>
+
+    <system:String x:Key="Exception.CopySchedule">To copy the schedule, close the schedule "{0}".</system:String>
+    <system:String x:Key="Exception.UnknownSettings">Unknown operating mode selected.</system:String>
+
+    <system:String x:Key="WarningType.Error">Error</system:String>
+    <system:String x:Key="WarningType.Info">Information</system:String>
+    <system:String x:Key="WarningType.Warning">Warning</system:String>
+    <system:String x:Key="WarningType.Unknown">Unknown</system:String>
+
+    
+    <system:String x:Key="MainWindow.SelectView">Selection by current view</system:String>
+    <system:String x:Key="MainWindow.SelectAll">Selection by all elements</system:String>
+    <system:String x:Key="MainWindow.SelectSelected">Selection by selected elements</system:String>
+    <system:String x:Key="MainWindow.HeaderCheck">Select</system:String>
+    <system:String x:Key="MainWindow.HeaderLevels">Floors</system:String>
+    <system:String x:Key="MainWindow.HeaderFloors">Levels</system:String>
+    <system:String x:Key="MainWindow.Phase">Phase:</system:String>
+
+    
+    <system:String x:Key="RoomsWindow.SetLevel">Set</system:String>
+    <system:String x:Key="RoomsWindow.CalculateContourArea">Calculate area by contour</system:String>
+    <system:String x:Key="RoomsWindow.CountRooms">Calculate number of rooms</system:String>
+    <system:String x:Key="RoomsWindow.CheckChanges">Check room area changes</system:String>
+    <system:String x:Key="RoomsWindow.CheckAccuracy">Check precision:</system:String>
+    <system:String x:Key="RoomsWindow.Accuracy">Number of decimal places:</system:String>
+    <system:String x:Key="RoomsWindow.NotShowWarnings">Do not show warnings</system:String>
+    <system:String x:Key="RoomsWindow.WarningAccuracy">Precision must be a number</system:String>
+    <system:String x:Key="RoomsWindow.WarningAccuracyRange">Precision must be from 1 to 100</system:String>
+    <system:String x:Key="RoomsWindow.WarningSelectPhase">Select a phase</system:String>
+    <system:String x:Key="RoomsWindow.WarningSelectLevels">Select at least one level</system:String>
+    <system:String x:Key="RoomsWindow.ButtonCalculateAreas">Calculate areas</system:String>
+    <system:String x:Key="RoomsWindow.ButtonCalculateRooms">Calculate rooms</system:String>
+
+    
+    <system:String x:Key="RoomNumsWindow.Numerating">Numbering [{0}\\{1}]</system:String>
+    <system:String x:Key="RoomNumsWindow.Suffix">Suffix:</system:String>
+    <system:String x:Key="RoomNumsWindow.Prefix">Prefix:</system:String>
+    <system:String x:Key="RoomNumsWindow.StartNumber">Start number:</system:String>
+    <system:String x:Key="RoomNumsWindow.Aparts">Apartment numbering</system:String>
+    <system:String x:Key="RoomNumsWindow.Rooms">Room nmbering</system:String>
+    <system:String x:Key="RoomNumsWindow.NumByGroup">Numbering by section, floor, and group</system:String>
+    <system:String x:Key="RoomNumsWindow.NumByLevel">Numbering by section and floor</system:String>
+    <system:String x:Key="RoomNumsWindow.NumBySection">Numbering by section</system:String>
+    <system:String x:Key="RoomNumsWindow.Sections">Sections for numbering</system:String>
+    <system:String x:Key="RoomNumsWindow.Groups">Groups for numbering</system:String>
+    <system:String x:Key="RoomNumsWindow.Levels">Levels for numbering</system:String>
+    <system:String x:Key="RoomNumsWindow.Priorities">Room priorities</system:String>
+    <system:String x:Key="RoomNumsWindow.WarningStartNumber">Start number must be a number</system:String>
+    <system:String x:Key="RoomNumsWindow.WarningPositiveStartNumber">Start number must be a positive number</system:String>
+    <system:String x:Key="RoomNumsWindow.WarningSelectPhase">Select a phase</system:String>
+    <system:String x:Key="RoomNumsWindow.WarningSelectMode">Select a mode</system:String>
+    <system:String x:Key="RoomNumsWindow.WarningSelectModeRooms">Select a room numbering mode</system:String>
+    <system:String x:Key="RoomNumsWindow.WarningSelectSection">Select at least one section</system:String>
+    <system:String x:Key="RoomNumsWindow.WarningSelectGroup">Select at least one group</system:String>
+    <system:String x:Key="RoomNumsWindow.WarningSelectLevel">Select at least one level</system:String>
+    <system:String x:Key="RoomNumsWindow.WarningSetPriorities">Configure the numbering priority list</system:String>
+    <system:String x:Key="RoomNumsWindow.ButtonUpToolTip">Up</system:String>
+    <system:String x:Key="RoomNumsWindow.ButtonDownToolTip">Down</system:String>
+    <system:String x:Key="RoomNumsWindow.ButtonAddToolTip">Add</system:String>
+    <system:String x:Key="RoomNumsWindow.ButtonDeleteToolTip">Delete</system:String>
+    <system:String x:Key="RoomNumsWindow.ButtonSaveToolTip">Save</system:String>
+
+    
+    <system:String x:Key="WarningsWindow.HeaderId">Id</system:String>
+    <system:String x:Key="WarningsWindow.HeaderCategory">Category</system:String>
+    <system:String x:Key="WarningsWindow.HeaderName">Name</system:String>
+    <system:String x:Key="WarningsWindow.HeaderLevel">Level</system:String>
+    <system:String x:Key="WarningsWindow.HeaderPhase">Phase</system:String>
+    <system:String x:Key="WarningsWindow.HeaderDescription">Description</system:String>
+    <system:String x:Key="WarningsWindow.RedundantRooms">Redundant or not enclosed rooms.</system:String>
+    <system:String x:Key="WarningsWindow.RedundantRoomsDescription">To run the plugin, fix or delete all not enclosed and redundant rooms.</system:String>
+    <system:String x:Key="WarningsWindow.RedundantAreas">Redundant or not enclosed areas.</system:String>
+    <system:String x:Key="WarningsWindow.RedundantAreasDescription">To run the plugin, fix or delete all not enclosed and redundant areas.</system:String>
+    <system:String x:Key="WarningsWindow.RequiredParams">Required parameter "{0}" is not filled.</system:String>
+    <system:String x:Key="WarningsWindow.RequiredParamsDescription">These rooms have missing key parameters. 
+        Fill this parameter for each room to run the plugin.</system:String>
+    <system:String x:Key="WarningsWindow.NotEqualGroupType">Parameter values for groups "{0} - {1}" do not match the group type.</system:String>
+    <system:String x:Key="WarningsWindow.NotEqualGroupTypeDescription">
+        For rooms of this group on the specified floors, the value of parameter {0} does not match.
+
+        For all rooms within the same group and floor, parameters "{1}" and "{2}" must correspond to each other.
+    </system:String>
+    <system:String x:Key="WarningsWindow.NotEqualMultiLevel">Mismatch in parameters of multi-level apartments.</system:String>
+    <system:String x:Key="WarningsWindow.NotEqualMultiLevelDescription">Rooms have mismatched values for parameters "{0}" and "{1}".</system:String>
+    <system:String x:Key="WarningsWindow.ErrorMultiLevelRoom">Error in filling parameter "{0}".</system:String>
+    <system:String x:Key="WarningsWindow.ErrorMultiLevelRoomDescription">Error in filling parameter "{0}". 
+        The parameter should be filled only for rooms of one floor of the group.</system:String>
+    <system:String x:Key="WarningsWindow.EqualSectionDoors">Checking parameter "{0}" by doors.</system:String>
+    <system:String x:Key="WarningsWindow.EqualSectionDoorsDescription">Rooms belonging to different sections 
+        but having access to each other via doors, windows (balcony doors), or room separators were detected. 
+        Check parameter "{0}" for rooms connected by these elements.</system:String>
+    <system:String x:Key="WarningsWindow.NotEqualGroup">Checking parameter "{0}" by doors and windows.</system:String>
+    <system:String x:Key="WarningsWindow.NotEqualGroupDescription">Rooms belonging to different apartments 
+        but having access to each other via doors, windows (balcony units), or room separators were detected. 
+        Check parameter "{0}" for rooms connected by these elements.</system:String>
+    <system:String x:Key="WarningsWindow.ContourIntersectRooms">Self-intersections of room contours detected.</system:String>
+    <system:String x:Key="WarningsWindow.ContourIntersectRoomsDescription">These rooms have self-intersecting contours. 
+        Fix them with room separators when possible, as self-intersections may cause incorrect area calculations.</system:String>
+    <system:String x:Key="WarningsWindow.BigChangesRoomAreas">Large changes in room areas.</system:String>
+    <system:String x:Key="WarningsWindow.BigChangesFlatAreas">Large changes in apartment areas.</system:String>
+    <system:String x:Key="WarningsWindow.BigChangesAreas">Large changes in area areas.</system:String>
+    <system:String x:Key="WarningsWindow.BigChangesDescription">New calculated areas exceed the allowed difference 
+        compared to previous values.</system:String>
+    <system:String x:Key="WarningsWindow.BigChangeDiff">Change: {0}% ({1} {2}).</system:String>
+    <system:String x:Key="WarningsWindow.MainInfoErrorsAndWarnings">
+        Calculation not completed due to errors and warnings.
+        Errors must be fixed.
+        Warnings should be reviewed and corrected if necessary.
+    </system:String>
+    <system:String x:Key="WarningsWindow.MainInfoErrors">
+        Calculation not completed due to errors.
+        Errors must be fixed.
+    </system:String>
+    <system:String x:Key="WarningsWindow.MainInfoWarnings">
+        Calculation completed with warnings.
+        Warnings should be reviewed and corrected if necessary.
+    </system:String>
+    <system:String x:Key="WarningsWindow.StatusError">Error</system:String>
+    <system:String x:Key="WarningsWindow.StatusWarning">Warning</system:String>
+    <system:String x:Key="WarningsWindow.NoPriorities">The priorities list does not contain room names.</system:String>
+    <system:String x:Key="WarningsWindow.AddPriorities">Add missing items?</system:String>
+    <system:String x:Key="WarningsWindow.Exit">Exit</system:String>
+
+    <system:String x:Key="TaskDialogWarning.ScheduleErrors">Invalid key schedules were found.</system:String>
+    <system:String x:Key="TaskDialogWarning.ScheduleErrorsDescription">
+        {0}
+        
+
+        Check the key parameter name and the number of schedule columns.
+        
+
+        WARNING! Replacing the key schedule will remove the corresponding key values from rooms and the key parameter from schedules!
+    </system:String>
+    <system:String x:Key="TaskDialogWarning.UpdateSchedule">Replace with schedules from template?</system:String>
+    <system:String x:Key="TaskDialogWarning.Exit">Exit without modifying schedules</system:String>
+    <system:String x:Key="TaskDialogWarning.NotFilledSchedules">Unfilled key schedules were found:</system:String>
+    <system:String x:Key="TaskDialog.Information">Information</system:String>
+    <system:String x:Key="TaskDialog.Result">Calculation completed successfully!</system:String>
+</ResourceDictionary>

@@ -1,0 +1,47 @@
+<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:system="clr-namespace:System;assembly=mscorlib">
+
+    <system:String x:Key="MainWindow.Title">Копирование спецификаций АИ</system:String>
+
+    <system:String x:Key="MainWindow.Settings">Настройки</system:String>
+
+    <system:String x:Key="MainWindow.NoSpecsSelected">Не выбрано ни одной спецификации</system:String>
+    <system:String x:Key="MainWindow.NoTasksCreated">Не создано ни одной задачи</system:String>
+    <system:String x:Key="MainWindow.NotAllLevelsSelected">Не во всех задачах выбран уровень</system:String>
+    <system:String x:Key="MainWindow.NotAllPhasesSelected">Не во всех задачах выбрана стадия</system:String>
+
+    <system:String x:Key="MainWindow.GroupTypeParamNameEmpty">Не указано имя параметра для типа группы</system:String>
+    <system:String x:Key="MainWindow.LevelParamNameEmpty">Не указано имя параметра для уровня</system:String>
+    <system:String x:Key="MainWindow.LevelShortNameParamNameEmpty">Не указано имя параметра для этажа</system:String>
+    <system:String x:Key="MainWindow.PhaseParamNameEmpty">Не указано имя параметра для стадии</system:String>
+    <system:String x:Key="MainWindow.FirstDispatcherGroupingLevelParamNameEmpty">Не указано имя параметра для группировки диспетчера 1</system:String>
+    <system:String x:Key="MainWindow.SecondDispatcherGroupingLevelParamNameEmpty">Не указано имя параметра для группировки диспетчера 2</system:String>
+    <system:String x:Key="MainWindow.ThirdDispatcherGroupingLevelParamNameEmpty">Не указано имя параметра для группировки диспетчера 3</system:String>
+    
+    <system:String x:Key="MainWindow.ButtonOk">Ок</system:String>
+    <system:String x:Key="MainWindow.ButtonCancel">Отмена</system:String>
+
+    <system:String x:Key="MainWindow.SelectedSpecs">Выбрано спецификаций для копирования:</system:String>
+    <system:String x:Key="MainWindow.SimultaneousFillingFields">Область для заполнения полей всех задач одновременно: </system:String>
+
+    <system:String x:Key="MainWindow.Tasks">Задачи для работы плагина</system:String>
+    <system:String x:Key="MainWindow.TaskRows">Строки заданий:</system:String>
+    <system:String x:Key="MainWindow.GroupType">Тип группы</system:String>
+    <system:String x:Key="MainWindow.Level">Уровень</system:String>
+    <system:String x:Key="MainWindow.LevelShortName">Этаж</system:String>
+    <system:String x:Key="MainWindow.Phase">Стадия</system:String>
+    <system:String x:Key="MainWindow.FirstDispatcherGroupingLevel">Группировка 1</system:String>
+    <system:String x:Key="MainWindow.SecondDispatcherGroupingLevel">Группировка 2</system:String>
+    <system:String x:Key="MainWindow.ThirdDispatcherGroupingLevel">Группировка 3</system:String>
+    
+    <system:String x:Key="MainWindow.AddTask">Добавить задачу</system:String>
+    <system:String x:Key="MainWindow.DeleteTask">Удалить задачу</system:String>
+
+    <system:String x:Key="MainWindow.Parameters">Параметры</system:String>
+    <system:String x:Key="MainWindow.ProjectParametersSettings">Настройка параметров проекта</system:String>
+
+    <system:String x:Key="MainWindow.SpecificationAlreadyExists">В проекте уже есть спецификация с именем</system:String>
+    <system:String x:Key="MainWindow.ErrorReport">Отчет по ошибкам</system:String>
+    <system:String x:Key="MainWindow.TransactionName">Копирование спецификаций АИ</system:String>
+</ResourceDictionary>

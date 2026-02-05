@@ -2,45 +2,41 @@ using System;
 
 using pyRevitLabs.Json;
 
-namespace RevitDeclarations.Models {
-    public class RoomPriority : IEquatable<RoomPriority> {
-        public RoomPriority(int number, string name) {
-            OrdinalNumber = number;
-            Name = name;
-            IsSummer = false;
-            IsLiving = false;
-            IsNonConfig = false;
-            AreaCoefficient = 1;
-        }
+namespace RevitDeclarations.Models;
+public class RoomPriority : IEquatable<RoomPriority> {
+    public RoomPriority(int number, string name) {
+        OrdinalNumber = number;
+        Name = name;
+        IsSummer = false;
+        IsLiving = false;
+        IsNonConfig = false;
+        AreaCoefficient = 1;
+    }
 
-        public int OrdinalNumber { get; set; }
-        public string Name { get; set; }
-        public bool IsSummer { get; set; }
-        public bool IsLiving { get; set; }
-        [JsonIgnore]
-        public bool IsNonConfig { get; set; } = false;
-        public double AreaCoefficient { get; set; }
-        [JsonIgnore]
-        public int MaxRoomAmount { get; set; }
+    public int OrdinalNumber { get; set; }
+    public string Name { get; set; }
+    public bool IsSummer { get; set; }
+    public bool IsLiving { get; set; }
+    [JsonIgnore]
+    public bool IsNonConfig { get; set; } = false;
+    public double AreaCoefficient { get; set; }
+    [JsonIgnore]
+    public int MaxRoomAmount { get; set; }
 
-        public bool CheckName(string name) {
-            return string.Equals(name, Name, StringComparison.OrdinalIgnoreCase);
-        }
+    public bool CheckName(string name) {
+        return string.Equals(name, Name, StringComparison.OrdinalIgnoreCase);
+    }
 
-        public bool Equals(RoomPriority other) {
-            if(ReferenceEquals(null, other)) { return false; }
-            if(ReferenceEquals(this, other)) { return true; }
+    public bool Equals(RoomPriority other) {
+        return other is not null && (ReferenceEquals(this, other) || CheckName(other.Name));
+    }
 
-            return CheckName(other.Name);
-        }
-
-        public override bool Equals(object obj) {
-            return Equals(obj as RoomPriority);
-        }
+    public override bool Equals(object obj) {
+        return Equals(obj as RoomPriority);
+    }
 
 
-        public override int GetHashCode() {
-            return Name?.GetHashCode() ?? 0;
-        }
+    public override int GetHashCode() {
+        return Name?.GetHashCode() ?? 0;
     }
 }

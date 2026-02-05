@@ -27,14 +27,11 @@ namespace RevitMechanicalSpecification.Models.Fillers {
         /// </summary>
         /// <param name="specificationElement"></param>
         public override void SetParamValue(SpecificationElement specificationElement) {
-            var group = specificationElement.ManifoldSpElement != null
-                ? GetManifoldGroup(specificationElement)
-                : specificationElement.Element
-                    .GetSharedParamValueOrDefault(Config.ForcedGroup, GetGroup(specificationElement));
+            var group = GetGroup(specificationElement);
 
-            
             TargetParam.Set(group);
         }
+
 
         /// <summary>
         /// Базовая + детализированная группа
@@ -42,7 +39,15 @@ namespace RevitMechanicalSpecification.Models.Fillers {
         /// <param name="element"></param>
         /// <returns></returns>
         private string GetGroup(SpecificationElement specificationElement) {
-            return $"{GetBaseGroup(specificationElement.Element)}{GetDetailedGroup(specificationElement)}";
+            var manifold = specificationElement.ManifoldSpElement;
+            var targetElement = manifold?.Element ?? specificationElement.Element;
+
+            string baseGroup = GetBaseGroup(targetElement);
+            string detailedGroup = manifold == null
+                ? GetDetailedGroup(specificationElement)
+                : GetManifoldElementDetailedGroup(specificationElement);
+
+            return $"{baseGroup}{detailedGroup}";
         }
 
         /// <summary>
@@ -52,13 +57,12 @@ namespace RevitMechanicalSpecification.Models.Fillers {
         /// <param name="familyInstance"></param>
         /// <param name="element"></param>
         /// <returns></returns>
-        private string GetManifoldGroup(SpecificationElement specificationElement) {
+        private string GetManifoldElementDetailedGroup(SpecificationElement specificationElement) {
             string manifoldFamylyTypeName = specificationElement.ManifoldInstance
                 .GetParam(BuiltInParameter.ELEM_FAMILY_AND_TYPE_PARAM).AsValueString();
 
             return
-                    $"{GetBaseGroup(specificationElement.ManifoldSpElement.Element)}" +
-                    $"{GetDetailedGroup(specificationElement.ManifoldSpElement)}"+
+                    $"{GetDetailedGroup(specificationElement.ManifoldSpElement)}" +
                     $"_Узел_" +
                     $"{manifoldFamylyTypeName}" +
                     $"{GetDetailedGroup(specificationElement)}";
@@ -70,6 +74,12 @@ namespace RevitMechanicalSpecification.Models.Fillers {
         /// <param name="element"></param>
         /// <returns></returns>
         private string GetBaseGroup(Element element) {
+            string forcedGroup = element.GetSharedParamValueOrDefault(Config.ForcedGroup, string.Empty);
+
+            if(forcedGroup != string.Empty) {
+                return $"{forcedGroup}_";
+            }
+
             Category category = element.Category;
             switch(category.GetBuiltInCategory()) {
                 case BuiltInCategory.OST_MechanicalEquipment:

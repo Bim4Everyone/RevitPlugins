@@ -3,6 +3,7 @@ using System.Collections.Generic;
 
 using Autodesk.Revit.DB;
 
+using dosymep.SimpleServices;
 using dosymep.WPF.ViewModels;
 
 using RevitClashDetective.Models.Evaluators;
@@ -13,6 +14,14 @@ namespace RevitOpeningPlacement.ViewModels.OpeningConfig;
 internal class ParameterViewModel : BaseViewModel, IEquatable<ParameterViewModel> {
     private ProviderViewModel _filterableValueProvider;
     private string _name;
+    private readonly ILocalizationService _localization;
+
+    public ParameterViewModel(ILocalizationService localization, IFilterableValueProvider filterableValueProvider) {
+        _localization = localization ?? throw new ArgumentNullException(nameof(localization));
+        FilterableValueProvider = new ProviderViewModel(_localization, filterableValueProvider);
+        Name = FilterableValueProvider.DisplayValue;
+    }
+
 
     public ProviderViewModel FilterableValueProvider {
         get => _filterableValueProvider;
@@ -22,11 +31,6 @@ internal class ParameterViewModel : BaseViewModel, IEquatable<ParameterViewModel
     public string Name {
         get => _name;
         set => RaiseAndSetIfChanged(ref _name, value);
-    }
-
-    public ParameterViewModel(IFilterableValueProvider filterableValueProvider) {
-        FilterableValueProvider = new ProviderViewModel(filterableValueProvider);
-        Name = FilterableValueProvider.DisplayValue;
     }
 
     public IEnumerable<RuleEvaluator> GetEvaluators() {

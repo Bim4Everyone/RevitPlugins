@@ -190,6 +190,9 @@
   <Project Path="src/RevitServerFolders/RevitServerFolders.csproj">
     <Platform Project="x64" />
   </Project>
+  <Project Path="src/RevitSetCoordParams/RevitSetCoordParams.csproj">
+    <Platform Project="x64" />
+  </Project>
   <Project Path="src/RevitSetLevelSection/RevitSetLevelSection.csproj">
     <Platform Project="x64" />
   </Project>
@@ -200,6 +203,9 @@
     <Platform Project="x64" />
   </Project>
   <Project Path="src/RevitSuperfilter/RevitSuperfilter.csproj">
+    <Platform Project="x64" />
+  </Project>
+  <Project Path="src/RevitUnmodelingMep/RevitUnmodelingMep.csproj">
     <Platform Project="x64" />
   </Project>
   <Project Path="src/RevitValueModifier/RevitValueModifier.csproj">

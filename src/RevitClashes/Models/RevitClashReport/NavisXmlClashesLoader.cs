@@ -145,9 +145,13 @@ internal class NavisXmlClashesLoader : BaseClashesLoader, IClashesLoader {
             .Take(2)
             .Select(GetElementModel)
             .ToArray();
+        var comments = clashResult.Descendants("comment")
+            .Select(GetClashComment)
+            .ToHashSet();
         var clash = new ClashModel() {
             Name = name,
-            ClashStatus = status
+            ClashStatus = status,
+            Comments = comments
         };
         if(elements.Length == 2) {
             clash.MainElement = elements[0];
@@ -175,6 +179,53 @@ internal class NavisXmlClashesLoader : BaseClashesLoader, IClashesLoader {
                 FamilyName = tags.TryGetValue("объект семейство", out string famName) ? famName : string.Empty,
                 Level = clashObject.Element("layer")?.Value ?? string.Empty
             };
+    }
+
+    private ClashComment GetClashComment(XElement comment) {
+        if(comment == null) {
+            throw new ArgumentNullException(nameof(comment));
+        }
+
+        int id = (int?) comment.Attribute("id") ?? 0;
+        string author = (string) comment.Element("user") ?? string.Empty;
+        string body = (string) comment.Element("body") ?? string.Empty;
+        DateTime date = GetDate(comment.Element("createddate"));
+
+        return new ClashComment {
+            Id = id,
+            Author = author,
+            Body = body,
+            CreatedDate = date
+        };
+    }
+
+    private DateTime GetDate(XElement createddate) {
+        XElement dateElement = createddate?.Element("date");
+
+        if(dateElement == null) {
+            return DateTime.Now;
+        }
+
+        int year = (int?) dateElement.Attribute("year") ?? 0;
+        int month = (int?) dateElement.Attribute("month") ?? 0;
+        int day = (int?) dateElement.Attribute("day") ?? 0;
+        int hour = (int?) dateElement.Attribute("hour") ?? 0;
+        int minute = (int?) dateElement.Attribute("minute") ?? 0;
+        int second = (int?) dateElement.Attribute("second") ?? 0;
+
+        if(year <= 0) {
+            return DateTime.Now;
+        }
+
+        return new DateTime(
+            year,
+            month,
+            day,
+            hour,
+            minute,
+            second,
+            DateTimeKind.Local
+        );
     }
 
     private ElementModel GetElementModel(string fileName, ElementId id) {

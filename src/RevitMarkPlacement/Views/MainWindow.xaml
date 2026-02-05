@@ -1,135 +1,225 @@
-﻿<base:PlatformWindow
-    xmlns:base="clr-namespace:dosymep.WPF.Views"
+﻿<core:WpfUIPlatformWindow
     x:Class="RevitMarkPlacement.Views.MainWindow"
+    xmlns:base="clr-namespace:dosymep.WPF.Views"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-    xmlns:vm="clr-namespace:RevitMarkPlacement.ViewModels"
-    xmlns:converters="clr-namespace:dosymep.WPF.Converters"
+    xmlns:vms="clr-namespace:RevitMarkPlacement.ViewModels"
     xmlns:b="http://schemas.microsoft.com/xaml/behaviors"
+    xmlns:floorHeight="clr-namespace:RevitMarkPlacement.ViewModels.FloorHeight"
+    xmlns:core="clr-namespace:dosymep.WpfUI.Core"
+    xmlns:me="clr-namespace:dosymep.WpfCore.MarkupExtensions;assembly=dosymep.WpfCore"
+    xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
+    xmlns:markupExtensions="clr-namespace:RevitMarkPlacement.MarkupExtensions"
+    xmlns:controls="clr-namespace:RevitMarkPlacement.Controls"
+    xmlns:converters="clr-namespace:dosymep.WpfCore.Converters;assembly=dosymep.WpfCore"
+
     mc:Ignorable="d"
-    Title="Отметки типовых этажей" Height="500" Width="400"
-    d:DataContext="{d:DesignInstance vm:MainViewModel, IsDesignTimeCreatable=False}">
+    WindowStartupLocation="CenterOwner"
+
+    Title="{me:LocalizationSource MainWindow.Title}"
+
+    Width="800"
+    Height="650"
+
+    MinWidth="800"
+    MinHeight="650"
+
+    d:DataContext="{d:DesignInstance vms:MainViewModel, IsDesignTimeCreatable=False}">
+
+
     <Window.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="../ViewsTemplates/BorderStyles.xaml" />
+                <ResourceDictionary Source="../ViewsTemplates/SpotDimensionTemplate.xaml" />
+            </ResourceDictionary.MergedDictionaries>
+
+            <converters:BoolToVisibilityConverter
+                x:Key="ShowSpotDimension"
+                TrueValue="Visible"
+                FalseValue="Collapsed" />
+
+            <converters:BoolToVisibilityConverter
+                x:Key="CollapseSpotDimension"
+                TrueValue="Collapsed"
+                FalseValue="Visible" />
+
+            <DataTemplate DataType="{x:Type floorHeight:UserFloorHeightViewModel}">
+                <Grid
+                    IsEnabled="{Binding IsEnabled}">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="300" />
+                        <ColumnDefinition Width="*" />
+                    </Grid.ColumnDefinitions>
+
+                    <RadioButton
+                        Grid.Column="0"
+                        Margin="5 0 0 0"
+                        GroupName="123"
+                        IsChecked="{Binding IsSelected, 
+                            RelativeSource={RelativeSource AncestorType=ListBoxItem}, Mode=TwoWay}"
+                        Content="{Binding Path=LevelHeightProvider, Converter={markupExtensions:EnumToLocale}}" />
+
+                    <ui:TextBox
+                        Grid.Column="1"
+                        Text="{Binding FloorHeight, UpdateSourceTrigger=PropertyChanged}" />
+                </Grid>
+            </DataTemplate>
+
+            <DataTemplate DataType="{x:Type floorHeight:GlobalParamsViewModel}">
+                <Grid
+                    IsEnabled="{Binding IsEnabled}">
+                    
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="300" />
+                        <ColumnDefinition Width="*" />
+                    </Grid.ColumnDefinitions>
+
+                    <RadioButton
+                        Grid.Column="0"
+                        Margin="5 0 0 0"
+                        GroupName="123"
+                        IsChecked="{Binding IsSelected,
+                            RelativeSource={RelativeSource AncestorType=ListBoxItem}, Mode=TwoWay}"
+                        Content="{Binding Path=LevelHeightProvider, Converter={markupExtensions:EnumToLocale}}" />
+
+                    <ComboBox
+                        Grid.Column="1"
+                        ItemsSource="{Binding GlobalParams}"
+                        SelectedItem="{Binding GlobalParam}">
+
+                        <ComboBox.ItemTemplate>
+                            <DataTemplate>
+                                <ui:TextBlock Text="{Binding DisplayName}" />
+                            </DataTemplate>
+                        </ComboBox.ItemTemplate>
+
+                    </ComboBox>
+                </Grid>
+            </DataTemplate>
+
+            <DataTemplate x:Key="SelectionItemTemplate" DataType="{x:Type vms:SelectionModeViewModel}">
+                <RadioButton
+                    Margin="5 0 0 0"
+                    IsChecked="{Binding IsSelected, 
+                        RelativeSource={RelativeSource AncestorType=ListBoxItem}, Mode=TwoWay}"
+                    Content="{Binding Selections, Converter={markupExtensions:EnumToLocale}}" />
+            </DataTemplate>
+
+        </ResourceDictionary>
     </Window.Resources>
+
+    <b:Interaction.Triggers>
+        <b:EventTrigger
+            EventName="Loaded">
+            <b:InvokeCommandAction
+                Command="{Binding LoadViewCommand}" />
+        </b:EventTrigger>
+    </b:Interaction.Triggers>
+
     <Grid>
         <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
             <RowDefinition Height="Auto" />
             <RowDefinition Height="Auto" />
             <RowDefinition Height="*" />
             <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
-        <ListBox Grid.Row="0" BorderThickness="0" BorderBrush="Transparent"
-                 ItemsSource="{Binding SelectionModes}"
-                 SelectedItem="{Binding SelectedMode}">
-            <ListBox.ItemTemplate>
-                <DataTemplate DataType="{x:Type vm:SelectionModeViewModel}">
-                    <RadioButton Margin="5" FontSize="14"
-                                 IsChecked="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type ListBoxItem}}, 
-                        Path=IsSelected, Mode=TwoWay}"
-                                 Content="{Binding Description}" />
-                </DataTemplate>
-            </ListBox.ItemTemplate>
-            <ListBox.ItemContainerStyle>
-                <Style TargetType="{x:Type ListBoxItem}">
-                    <Setter Property="Template">
-                        <Setter.Value>
-                            <ControlTemplate TargetType="{x:Type ListBoxItem}">
-                                <ContentPresenter />
-                            </ControlTemplate>
-                        </Setter.Value>
-                    </Setter>
-                </Style>
-            </ListBox.ItemContainerStyle>
-            <b:Interaction.Triggers>
-                <b:EventTrigger EventName="SelectionChanged">
-                    <b:InvokeCommandAction Command="{Binding SelectedMode.GetSpotDimentionTypesCommand}" />
-                </b:EventTrigger>
-            </b:Interaction.Triggers>
-        </ListBox>
-        <GroupBox Grid.Row="1" Margin="5 10" FontSize="14" Header="Типоразмеры высотных отметок">
-            <ListBox Margin="5" Height="50" MaxHeight="100" BorderThickness="0" Focusable="False"
-                     ItemsSource="{Binding SelectedMode.SpotDimentionTypes}">
-                <ListBox.ItemContainerStyle>
-                    <Style TargetType="{x:Type ListBoxItem}">
-                        <Setter Property="Template">
-                            <Setter.Value>
-                                <ControlTemplate TargetType="{x:Type ListBoxItem}">
-                                    <ContentPresenter />
-                                </ControlTemplate>
-                            </Setter.Value>
-                        </Setter>
-                    </Style>
-                </ListBox.ItemContainerStyle>
-                <ListBox.ItemTemplate>
-                    <DataTemplate DataType="{x:Type vm:SpotDimensionTypeViewModel}">
-                        <TextBlock Text="{Binding Name}" />
-                    </DataTemplate>
-                </ListBox.ItemTemplate>
-            </ListBox>
-        </GroupBox>
-        <Grid Grid.Row="2">
-            <Grid.RowDefinitions>
-                <RowDefinition Height="Auto" />
-                <RowDefinition Height="*" />
-            </Grid.RowDefinitions>
-            <GroupBox Grid.Row="0" Margin="5" FontSize="14" Header="Количество этажей">
-                <TextBox Margin="5" Text="{Binding FloorCount, UpdateSourceTrigger=PropertyChanged}" />
-            </GroupBox>
-            <GroupBox Grid.Row="1" Margin="5" FontSize="14" Header="Высота этажа">
-                <ListBox BorderThickness="0" ItemsSource="{Binding FloorHeightProviders}"
-                         SelectedItem="{Binding SelectedFloorHeightProvider}">
-                    <ListBox.ItemContainerStyle>
-                        <Style TargetType="{x:Type ListBoxItem}">
-                            <Setter Property="Template">
-                                <Setter.Value>
-                                    <ControlTemplate TargetType="{x:Type ListBoxItem}">
-                                        <ContentPresenter />
-                                    </ControlTemplate>
-                                </Setter.Value>
-                            </Setter>
-                            <Setter Property="IsEnabled" Value="{Binding IsEnabled}" />
-                        </Style>
-                    </ListBox.ItemContainerStyle>
-                    <ListBox.Resources>
-                        <DataTemplate DataType="{x:Type vm:UserFloorHeightViewModel}">
-                            <StackPanel>
-                                <RadioButton Margin="5" FontSize="14" Content="{Binding Description}"
-                                             IsChecked="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type ListBoxItem}}, Path=IsSelected}" />
-                                <TextBox Text="{Binding FloorHeight, UpdateSourceTrigger=PropertyChanged}" />
-                            </StackPanel>
-                        </DataTemplate>
-                        <DataTemplate DataType="{x:Type vm:GlobalFloorHeightViewModel}">
-                            <StackPanel IsEnabled="{Binding IsEnabled}">
-                                <RadioButton Margin="5" FontSize="14" Content="{Binding Description}"
-                                             IsChecked="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type ListBoxItem}}, Path=IsSelected}" />
-                                <ComboBox ItemsSource="{Binding GlobalParameters}"
-                                          SelectedItem="{Binding SelectedGlobalParameter}">
-                                    <ComboBox.ItemTemplate>
-                                        <DataTemplate DataType="{x:Type vm:GlobalParameterViewModel}">
-                                            <StackPanel Orientation="Horizontal">
-                                                <TextBlock Text="{Binding Name}" />
-                                                <TextBlock Margin="5 0" Text="{Binding Value, StringFormat=({0} мм)}" />
-                                            </StackPanel>
-                                        </DataTemplate>
-                                    </ComboBox.ItemTemplate>
-                                </ComboBox>
-                            </StackPanel>
-                        </DataTemplate>
-                    </ListBox.Resources>
-                </ListBox>
-            </GroupBox>
-        </Grid>
-        <StackPanel Grid.Row="3">
-            <TextBlock Margin="20 0" Foreground="Orange" Text="{Binding ErrorText}" />
-            <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
-                <Button Margin="5" Width="120" Height="30" Command="{Binding PlaceAnnotationCommand}"
-                        Click="ButtonOk_Click">
-                    Создать/Обновить
-                </Button>
-                <Button Margin="5" Width="120" Height="30" Click="ButtonCancel_Click">Отмена</Button>
-            </StackPanel>
+
+        <ui:TitleBar
+            Grid.Row="0"
+            Title="{me:LocalizationSource MainWindow.Title}" />
+
+        <controls:GroupControl
+            Grid.Row="1"
+            Margin="14 8"
+            HeaderText="{me:LocalizationSource MainWindow.CreateText}">
+
+            <Border>
+                <ui:ListView
+                    SelectionMode="Single"
+                    ItemsSource="{Binding Selections}"
+                    SelectedItem="{Binding Selection}"
+                    ItemTemplate="{StaticResource SelectionItemTemplate}" />
+            </Border>
+
+            <Border>
+                <StackPanel>
+                    <ui:TextBlock
+                        VerticalAlignment="Center"
+                        HorizontalAlignment="Center"
+                        FontTypography="BodyStrong"
+
+                        Visibility="{Binding Selection.HasSpotDimensionTypes,
+                             Converter={StaticResource CollapseSpotDimension}}"
+                        Text="{me:LocalizationSource MainWindow.EmptySpotDimensions}" />
+
+                    <ui:ListView
+                        SelectionMode="Single"
+                        Visibility="{Binding Selection.HasSpotDimensionTypes,
+                             Converter={StaticResource ShowSpotDimension}}"
+                        ItemsSource="{Binding Selection.SpotDimensionTypes}"
+                        ItemTemplate="{StaticResource SpotDimensionTemplate}" />
+                </StackPanel>
+            </Border>
+
+        </controls:GroupControl>
+
+        <controls:GroupControl
+            Grid.Row="2"
+            Margin="14 8"
+            HeaderText="{me:LocalizationSource MainWindow.SettingsText}">
+
+            <Border>
+                <controls:CustomEditControl
+                    HeaderText="{me:LocalizationSource MainWindow.FloorCount}">
+                    <ui:TextBox
+                        Text="{Binding LevelCount, UpdateSourceTrigger=PropertyChanged}" />
+                </controls:CustomEditControl>
+            </Border>
+
+            <Border>
+                <StackPanel Orientation="Vertical">
+                    <ui:TextBlock
+                        Margin="0 0 0 8"
+                        VerticalAlignment="Center"
+                        Text="{me:LocalizationSource MainWindow.FloorHeight}" />
+
+                    <ui:ListView
+                        SelectedItem="{Binding LevelHeight}"
+                        ItemsSource="{Binding FloorHeights}" />
+                </StackPanel>
+            </Border>
+
+        </controls:GroupControl>
+
+        <StackPanel
+            Grid.Row="4"
+            Orientation="Horizontal"
+            HorizontalAlignment="Right">
+
+            <ui:TextBlock
+                Margin="10"
+                Foreground="Orange"
+                VerticalAlignment="Center"
+                Text="{Binding ErrorText}" />
+
+            <ui:Button
+                Margin="10"
+                Width="80"
+                Appearance="Info"
+                Content="{me:LocalizationSource MainWindow.ButtonOk}"
+                Click="ButtonOk_Click"
+                Command="{Binding AcceptViewCommand}" />
+
+            <ui:Button
+                Margin="10"
+                Width="80"
+                Content="{me:LocalizationSource MainWindow.ButtonCancel}"
+                IsCancel="True"
+                Click="ButtonCancel_Click" />
         </StackPanel>
     </Grid>
-</base:PlatformWindow>
+</core:WpfUIPlatformWindow>

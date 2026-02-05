@@ -1,41 +1,37 @@
-﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Reflection;
 
 using Autodesk.Revit.DB;
 
-namespace RevitVolumeOfWork.Models {
-    internal class WallElement {
+namespace RevitVolumeOfWork.Models; 
+internal class WallElement {
+    private readonly Element _wall;
+    
+    public WallElement(Element wall) {
+        _wall = wall;
+    }
+    
+    public Element Wall => _wall;
+    public List<RoomElement> Rooms { get; set; }
 
-        Element _wall;
+    public string GetRoomsParameters(string fieldName) {
+        var typeField = typeof(RoomElement).GetProperty(fieldName);
+        var values = Rooms
+            .Select(x => (string) typeField?.GetValue(x))
+            .Distinct();
 
-        public WallElement(Element wall) {
-            _wall = wall;
+        return string.Join("; ", values);
+    }
 
-        }
-        public Element Wall { get => _wall ;  }
-        public List<RoomElement> Rooms { get; set; }
+    public override bool Equals(object obj) {
+        return Equals(obj as WallElement);
+    }
 
-        public string GetRoomsParameters(string fieldName) {
-            PropertyInfo typeField = typeof(RoomElement).GetProperty(fieldName);
-            IEnumerable<string> values = Rooms
-                .Select(x => (string) typeField?.GetValue(x))
-                .Distinct();
+    public bool Equals(WallElement wallElement) {
+        return Wall.Id == wallElement.Wall.Id;
+    }
 
-            return string.Join("; ", values);
-        }
-
-        public override bool Equals(object obj) {
-            return Equals(obj as WallElement);
-        }
-
-        public bool Equals(WallElement wallElement) {
-            return _wall.Id == wallElement.Wall.Id;
-        }
-
-        public override int GetHashCode() {
-            return _wall.Id.GetHashCode();
-        }
+    public override int GetHashCode() {
+        return Wall.Id.GetHashCode();
     }
 }
