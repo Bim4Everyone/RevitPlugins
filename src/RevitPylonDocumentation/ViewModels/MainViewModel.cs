@@ -31,8 +31,8 @@ internal class MainViewModel : BaseViewModel {
     private readonly RevitRepository _revitRepository;
     private readonly ILocalizationService _localizationService;
     private readonly IResolutionRoot _resolutionRoot;
-    private readonly string _selectPylonError;
-    private readonly string _selectProjectSectionError;
+    private string _selectPylonError;
+    private string _selectProjectSectionError;
     private string _errorText;
     private List<ElementId> _errorElements = [];
     private bool _pylonSelectedManually = false;
@@ -51,8 +51,7 @@ internal class MainViewModel : BaseViewModel {
         _localizationService = localizationService;
         _resolutionRoot = resolutionRoot;
 
-        _selectPylonError = _localizationService.GetLocalizedString("VM.SelectPylon");
-        _selectProjectSectionError = _localizationService.GetLocalizedString("VM.SelectProjectSection");
+        PrepareSelectionErrorsText();
 
         SelectionSettings = new UserSelectionSettingsVM();
         VerticalViewSettings = new UserVerticalViewSettingsPageVM(this, _localizationService);
@@ -674,5 +673,17 @@ internal class MainViewModel : BaseViewModel {
 
     private void ShowErrorElements() {
         _revitRepository.ActiveUIDocument.Selection.SetElementIds(ErrorElements);
+    }
+
+    // Подготовка текста ошибки для ситуации,когда пользователь не выбрал комплект документации и пилоны перед запуском
+    private void PrepareSelectionErrorsText() {
+        _selectPylonError = string.Format(
+            "{0} - {1}",
+            _localizationService.GetLocalizedString("MainWindow.PluginRun"),
+            _localizationService.GetLocalizedString("VM.SelectPylon"));
+        _selectProjectSectionError = string.Format(
+            "{0} - {1}",
+            _localizationService.GetLocalizedString("MainWindow.PluginRun"),
+            _localizationService.GetLocalizedString("VM.SelectProjectSection"));
     }
 }
