@@ -7,11 +7,7 @@ using Autodesk.Revit.Attributes;
 using Autodesk.Revit.UI;
 
 using Bim4Everyone.RevitFiltration.Controls;
-using Bim4Everyone.RevitFiltration.Controls.Extensions;
-#if REVIT_2022
-// TODO
-using Bim4Everyone.RevitFiltration.Extensions;
-#endif
+using Bim4Everyone.RevitFiltration.Ninject;
 
 using dosymep.Bim4Everyone;
 using dosymep.Bim4Everyone.SimpleServices;
@@ -64,10 +60,7 @@ public class RevitParamsCheckerCommand : BasePluginCommand {
         BindRepos(kernel);
         BindServices(kernel);
         BindConverters(kernel);
-#if REVIT_2022
-// TODO
         kernel.UseLogicalFilterFactory();
-#endif
         kernel.UseLogicalFilterProviderFactory();
         kernel.UseFilterContextParser();
         kernel.Bind<IDataProvider>()
@@ -95,7 +88,6 @@ public class RevitParamsCheckerCommand : BasePluginCommand {
             CultureInfo.GetCultureInfo("ru-RU"));
 
         kernel.Get<MainWindow>().Show();
-        // kernel.Get<MainWindow>().ShowDialog();
     }
 
     private void BindPages(IKernel kernel) {
