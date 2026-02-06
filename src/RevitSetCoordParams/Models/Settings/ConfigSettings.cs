@@ -10,7 +10,7 @@ internal class ConfigSettings {
     public ElementsProviderType ElementsProvider { get; set; }
     public PositionProviderType PositionProvider { get; set; }
     public string SourceFile { get; set; }
-    public string TypeModel { get; set; }
+    public List<string> TypeModels { get; set; }
     public List<ParamMap> ParamMaps { get; set; }
     public List<BuiltInCategory> Categories { get; set; }
     public double MaxDiameterSearchSphereMm { get; set; }
@@ -21,7 +21,7 @@ internal class ConfigSettings {
         ElementsProvider = ElementsProviderType.AllElementsProvider;
         PositionProvider = PositionProviderType.CenterPositionProvider;
         SourceFile = RevitConstants.CoordFilePartName;
-        TypeModel = RevitConstants.TypeModel;
+        TypeModels = [];
         ParamMaps = GetDefaultParamMaps();
         Categories = GetDefaultCategories();
         MaxDiameterSearchSphereMm = RevitConstants.MaxDiameterSearchSphereMm;

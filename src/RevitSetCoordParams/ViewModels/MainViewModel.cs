@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
+using System.Data;
 using System.Linq;
 using System.Windows.Input;
 
@@ -40,7 +41,8 @@ internal class MainViewModel : BaseViewModel {
     private ObservableCollection<SourceFileViewModel> _sourceFiles;
     private SourceFileViewModel _selectedSourceFile;
     private ObservableCollection<TypeModelViewModel> _typeModels;
-    private TypeModelViewModel _selectedTypeModel;
+    private ObservableCollection<TypeModelViewModel> _filteredTypeModels;
+    private string _searchTextTypeModels;
     private ObservableCollection<PositionViewModel> _positions;
     private PositionViewModel _selectedPosition;
     private ObservableCollection<ParamViewModel> _params;
@@ -73,6 +75,9 @@ internal class MainViewModel : BaseViewModel {
         CheckAllCatsCommand = RelayCommand.Create(CheckAllCategories);
         UncheckAllCatsCommand = RelayCommand.Create(UncheckAllCategories);
         AcceptViewCommand = RelayCommand.Create(AcceptView, CanAcceptView);
+        SearchTypeModelsCommand = RelayCommand.Create(ApplySearchTypeModels);
+        CheckAllTypeModelsCommand = RelayCommand.Create(CheckAllTypeModels);
+        UncheckAllTypeModelsCommand = RelayCommand.Create(UncheckAllTypeModels);
 
         ProgressDialogFactory = progressDialogFactory
             ?? throw new System.ArgumentNullException(nameof(progressDialogFactory));
@@ -82,6 +87,9 @@ internal class MainViewModel : BaseViewModel {
     public ICommand CheckAllCatsCommand { get; }
     public ICommand UncheckAllCatsCommand { get; }
     public ICommand AcceptViewCommand { get; }
+    public ICommand SearchTypeModelsCommand { get; }
+    public ICommand CheckAllTypeModelsCommand { get; }
+    public ICommand UncheckAllTypeModelsCommand { get; }
 
     public IProgressDialogFactory ProgressDialogFactory { get; }
 
@@ -105,9 +113,13 @@ internal class MainViewModel : BaseViewModel {
         get => _typeModels;
         set => RaiseAndSetIfChanged(ref _typeModels, value);
     }
-    public TypeModelViewModel SelectedTypeModel {
-        get => _selectedTypeModel;
-        set => RaiseAndSetIfChanged(ref _selectedTypeModel, value);
+    public ObservableCollection<TypeModelViewModel> FilteredTypeModels {
+        get => _filteredTypeModels;
+        set => RaiseAndSetIfChanged(ref _filteredTypeModels, value);
+    }
+    public string SearchTextTypeModels {
+        get => _searchTextTypeModels;
+        set => RaiseAndSetIfChanged(ref _searchTextTypeModels, value);
     }
     public ObservableCollection<PositionViewModel> Positions {
         get => _positions;
@@ -154,16 +166,42 @@ internal class MainViewModel : BaseViewModel {
         set => RaiseAndSetIfChanged(ref _errorText, value);
     }
 
+    // Метод для реализации поиска типов моделей
+    private void ApplySearchTypeModels() {
+        FilteredTypeModels = string.IsNullOrEmpty(SearchTextTypeModels)
+            ? new ObservableCollection<TypeModelViewModel>(TypeModels)
+            : new ObservableCollection<TypeModelViewModel>(TypeModels
+                .Where(item => item.Name
+                .IndexOf(SearchTextTypeModels, StringComparison.OrdinalIgnoreCase) >= 0));
+    }
+
+    // Метод команды на выделение всех типов моделей
+    private void CheckAllTypeModels() {
+        foreach(var catVM in FilteredTypeModels) {
+            catVM.IsChecked = true;
+        }
+    }
+
+    // Метод команды на снятие выделения всех типов моделей
+    private void UncheckAllTypeModels() {
+        foreach(var catVM in FilteredTypeModels) {
+            catVM.IsChecked = false;
+        }
+    }
+
     // Метод получения коллекции TypeModelViewModel для TypeModels
     private IEnumerable<TypeModelViewModel> GetTypeModelViewModels() {
         var currentDocument = SelectedSourceFile.FileProvider.Document;
-        var sourceElementsValues = _revitRepository.GetSourceElementsValues(currentDocument);
-        return !sourceElementsValues.Any()
+        var allTypeModels = _revitRepository.GetSourceElementsValues(currentDocument);
+        var savedTypeModels = _setCoordParamsSettings.TypeModels;
+        return !allTypeModels.Any()
             ? []
-            : sourceElementsValues
-                .Select(value => new TypeModelViewModel { Name = value })
-                .OrderByDescending(vm => vm.Name.Equals(_setCoordParamsSettings.TypeModel))
-                .ThenBy(vm => vm.Name);
+            : allTypeModels
+                .Select(value => new TypeModelViewModel {
+                    Name = value,
+                    IsChecked = savedTypeModels.Contains(value)
+                })
+                .OrderBy(vm => vm.Name);
     }
 
     // Метод получения коллекции SourceFilesViewModel для SourceFiles
@@ -246,7 +284,7 @@ internal class MainViewModel : BaseViewModel {
     private void OnPropertyChanged(object sender, PropertyChangedEventArgs e) {
         if(e.PropertyName == nameof(SelectedSourceFile)) {
             TypeModels = new ObservableCollection<TypeModelViewModel>(GetTypeModelViewModels());
-            SelectedTypeModel = TypeModels.FirstOrDefault();
+            FilteredTypeModels = new ObservableCollection<TypeModelViewModel>(TypeModels);
             UpdateParamWarnings();
         }
     }
@@ -336,7 +374,7 @@ internal class MainViewModel : BaseViewModel {
         SourceFiles = new ObservableCollection<SourceFileViewModel>(GetSourceFilesViewModels());
         SelectedSourceFile = SourceFiles.FirstOrDefault();
         TypeModels = new ObservableCollection<TypeModelViewModel>(GetTypeModelViewModels());
-        SelectedTypeModel = TypeModels.FirstOrDefault();
+        FilteredTypeModels = new ObservableCollection<TypeModelViewModel>(TypeModels);
         Positions = new ObservableCollection<PositionViewModel>(GetPositionViewModels());
         SelectedPosition = Positions.FirstOrDefault();
         Params = new ObservableCollection<ParamViewModel>(GetParamViewModels());
@@ -398,9 +436,11 @@ internal class MainViewModel : BaseViewModel {
                 }
             }
         }
-        if(SelectedTypeModel == null) {
-            ErrorText = _localizationService.GetLocalizedString("MainViewModel.NoTypeModel");
-            return false;
+        if(FilteredTypeModels != null) {
+            if(FilteredTypeModels.Count == 0) {
+                ErrorText = _localizationService.GetLocalizedString("MainViewModel.NoTypeModel");
+                return false;
+            }
         }
         if(Params != null) {
             var checkedParams = Params.Where(p => p.IsChecked).ToList();
@@ -472,7 +512,7 @@ internal class MainViewModel : BaseViewModel {
         _setCoordParamsSettings.ElementsProvider = SelectedRangeElements.ElementsProvider;
         _setCoordParamsSettings.PositionProvider = SelectedPosition.PositionProvider;
         _setCoordParamsSettings.FileProvider = SelectedSourceFile.FileProvider;
-        _setCoordParamsSettings.TypeModel = SelectedTypeModel.Name;
+        _setCoordParamsSettings.TypeModels = FilteredTypeModels.Where(vm => vm.IsChecked).Select(vm => vm.Name).ToList();
         _setCoordParamsSettings.Search = Search;
         _setCoordParamsSettings.MaxDiameterSearchSphereMm = Convert.ToDouble(MaxDiameterSearchSphereMm);
         _setCoordParamsSettings.StepDiameterSearchSphereMm = Convert.ToDouble(StepDiameterSearchSphereMm);

@@ -10,6 +10,9 @@
     
     <system:String x:Key="MainWindow.TypeModels">Type of common models SMR</system:String>
     <system:String x:Key="MainWindow.TypeModelsDescription">Only common models of this type will be processed</system:String>
+    <system:String x:Key="MainWindow.SearchTextTypeModels">Search by name of common models</system:String>
+    <system:String x:Key="MainWindow.CheckedAllTypeModels">Select all types</system:String>
+    <system:String x:Key="MainWindow.NotCheckedAllTypeModels">Clear type selection</system:String>
     <system:String x:Key="MainWindow.Positions">Element position</system:String>
     <system:String x:Key="MainWindow.PositionsDescription">Specifies relative position for element search</system:String>
     <system:String x:Key="MainWindow.Params">Parameters SMR</system:String>

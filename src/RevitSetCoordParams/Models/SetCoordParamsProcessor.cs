@@ -42,7 +42,8 @@ internal class SetCoordParamsProcessor {
     /// </remarks>
     /// <returns>Возвращает коллекцию предупреждений WarningModel</returns>
     public IReadOnlyCollection<WarningElement> Run(IProgress<int> progress = null, CancellationToken ct = default) {
-        var sourceModels = _settings.FileProvider.GetRevitElements(_settings.TypeModel);
+        var sourceModels = _settings.TypeModels
+            .SelectMany(_settings.FileProvider.GetRevitElements).ToArray();
         var targetElements = RevitElements;
         var positionProvider = _settings.PositionProvider;
         var sphereProvider = _settings.SphereProvider;
@@ -95,7 +96,6 @@ internal class SetCoordParamsProcessor {
                     }
                 }
             }
-
 
             if(intersector.HasIntersection && sourceModel != null) {
                 foreach(var paramMap in pairParamMaps) {
