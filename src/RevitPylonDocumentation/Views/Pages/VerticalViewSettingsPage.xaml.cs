@@ -1,7 +1,6 @@
-using System.Windows.Controls.Primitives;
-
 using dosymep.SimpleServices;
 
+using RevitPylonDocumentation.Models;
 using RevitPylonDocumentation.ViewModels;
 
 namespace RevitPylonDocumentation.Views.Pages;
@@ -23,15 +22,6 @@ internal partial class VerticalViewSettingsPage {
     }
 
     private void UniformGrid_SizeChanged(object sender, System.Windows.SizeChangedEventArgs e) {
-        UniformGrid uniformGrid = sender as UniformGrid;
-        if(uniformGrid is null) { return; }
-
-        if(uniformGrid.ActualWidth > 1300) {
-            uniformGrid.Columns = 3;
-        } else if(uniformGrid.ActualWidth > 900) {
-            uniformGrid.Columns = 2;
-        } else {
-            uniformGrid.Columns = 1;
-        }
+        UniformGridHelper.HandleSizeChanged(sender);
     }
 }

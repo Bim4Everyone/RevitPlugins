@@ -1,8 +1,8 @@
 using System.Windows;
-using System.Windows.Controls.Primitives;
 
 using dosymep.SimpleServices;
 
+using RevitPylonDocumentation.Models;
 using RevitPylonDocumentation.ViewModels;
 
 namespace RevitPylonDocumentation.Views.Pages;
@@ -29,13 +29,6 @@ internal partial class GeneralPage {
     }
 
     private void UniformGrid_SizeChanged(object sender, System.Windows.SizeChangedEventArgs e) {
-        UniformGrid uniformGrid = sender as UniformGrid;
-        if(uniformGrid is null) { return; }
-
-        if(uniformGrid.ActualWidth > 500) {
-            uniformGrid.Columns = 2;
-        } else {
-            uniformGrid.Columns = 1;
-        }
+        UniformGridHelper.HandleSizeChanged(sender);
     }
 }

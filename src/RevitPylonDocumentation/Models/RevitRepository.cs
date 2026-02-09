@@ -284,10 +284,9 @@ internal class RevitRepository {
     /// </summary>
     public void FindSheetInPj(MainViewModel mainViewModel, PylonSheetInfoVM pylonSheetInfoVM) {
         var sheet = AllSheets
-            .Where(item => item.Name.Equals(mainViewModel.SheetSettings.SheetPrefix
-                                            + pylonSheetInfoVM.PylonKeyName
-                                            + mainViewModel.SheetSettings.SheetSuffix))
-            .FirstOrDefault();
+            .FirstOrDefault(item => item.Name.Equals(mainViewModel.SheetSettings.SheetPrefix
+                                                    + pylonSheetInfoVM.PylonKeyName
+                                                    + mainViewModel.SheetSettings.SheetSuffix));
 
         if(sheet != null) {
             pylonSheetInfoVM.SheetInProject = true;
