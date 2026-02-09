@@ -21,7 +21,7 @@
     Title="{me:LocalizationSource MainWindow.Title}"
     Height="700"
     Width="1100"
-    MinHeight="600"
+    MinHeight="500"
     MinWidth="700"
     Closed="MainWindow_OnClosed"
     d:DataContext="{d:DesignInstance vms:MainViewModel, IsDesignTimeCreatable=False}"
