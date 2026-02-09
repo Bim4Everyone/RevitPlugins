@@ -2,7 +2,6 @@ using System.Windows;
 
 using dosymep.SimpleServices;
 
-using RevitPylonDocumentation.Models;
 using RevitPylonDocumentation.ViewModels;
 
 namespace RevitPylonDocumentation.Views.Pages;
@@ -26,9 +25,5 @@ internal partial class GeneralPage {
         if(window != null) {
             window.DialogResult = false;
         }
-    }
-
-    private void UniformGrid_SizeChanged(object sender, System.Windows.SizeChangedEventArgs e) {
-        UniformGridHelper.HandleSizeChanged(sender);
     }
 }

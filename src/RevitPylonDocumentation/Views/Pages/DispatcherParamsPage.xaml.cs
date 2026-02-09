@@ -1,6 +1,5 @@
 using dosymep.SimpleServices;
 
-using RevitPylonDocumentation.Models;
 using RevitPylonDocumentation.ViewModels;
 
 namespace RevitPylonDocumentation.Views.Pages;
@@ -19,9 +18,5 @@ internal partial class DispatcherParamsPage {
             uiThemeService, themeUpdaterService) {
         InitializeComponent();
         DataContext = viewModel;
-    }
-
-    private void UniformGrid_SizeChanged(object sender, System.Windows.SizeChangedEventArgs e) {
-        UniformGridHelper.HandleSizeChanged(sender);
     }
 }

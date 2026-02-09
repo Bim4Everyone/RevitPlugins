@@ -16,6 +16,7 @@
     xmlns:views="clr-namespace:RevitPylonDocumentation.Views"
     xmlns:controls="clr-namespace:RevitPylonDocumentation.Views.Controls"
     xmlns:converters="clr-namespace:RevitPylonDocumentation.Views.Converters"
+    xmlns:extensions="clr-namespace:RevitPylonDocumentation.Views.Extensions"
     
     mc:Ignorable="d"
     ScrollViewer.CanContentScroll="False"
@@ -48,7 +49,7 @@
 
                 <UniformGrid
                     Margin="7"
-                    SizeChanged="UniformGrid_SizeChanged">
+                    extensions:UniformGridExtensions.AutoColumns="True">
                     <Border Name="SkeletonSpec"
                         Margin="7"
                         Style="{StaticResource CustomBorder}">

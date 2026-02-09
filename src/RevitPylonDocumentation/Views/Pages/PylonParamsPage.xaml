@@ -14,6 +14,7 @@
     xmlns:views="clr-namespace:RevitPylonDocumentation.Views"
     xmlns:controls="clr-namespace:RevitPylonDocumentation.Views.Controls"
     xmlns:converters="clr-namespace:RevitPylonDocumentation.Views.Converters"
+    xmlns:extensions="clr-namespace:RevitPylonDocumentation.Views.Extensions"
     
     mc:Ignorable="d"
     ScrollViewer.CanContentScroll="False"
@@ -55,7 +56,7 @@
                     
                     <UniformGrid
                         Grid.Row="1"
-                        SizeChanged="UniformGrid_SizeChanged">
+                        extensions:UniformGridExtensions.AutoColumns="True">
                         <controls:TextBoxSettingControl
                             LabelText="{me:LocalizationSource PylonParams.PylonMarkParameter}"
                             TextBoxText="{Binding 
@@ -108,15 +109,6 @@
                                 UpdateSourceTrigger=PropertyChanged, Mode=TwoWay,
                                 ValidatesOnDataErrors=True, NotifyOnValidationError=True}"
                             ToolTipText="{me:LocalizationSource PylonParamsPage.PylonSectionWidthParameterToolTip}"
-                            TextChangedCommand="{Binding SettingsChangedCommand}" />
-
-                        <controls:TextBoxSettingControl
-                            LabelText="{me:LocalizationSource PylonParams.PylonSectionParameter}"
-                            TextBoxText="{Binding 
-                                Path=PylonSettings.PylonSectionParamNameTemp, 
-                                UpdateSourceTrigger=PropertyChanged, Mode=TwoWay,
-                                ValidatesOnDataErrors=True, NotifyOnValidationError=True}"
-                            ToolTipText="{me:LocalizationSource PylonParamsPage.PylonSectionParameterToolTip}"
                             TextChangedCommand="{Binding SettingsChangedCommand}" />
                     </UniformGrid>
                 </Grid>

@@ -11,10 +11,12 @@
     xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
     xmlns:me="clr-namespace:dosymep.WpfCore.MarkupExtensions;assembly=dosymep.WpfCore"
     xmlns:vms="clr-namespace:RevitPylonDocumentation.ViewModels"
+    
     xmlns:local="clr-namespace:RevitPylonDocumentation.Views.Pages"
     xmlns:views="clr-namespace:RevitPylonDocumentation.Views"
     xmlns:controls="clr-namespace:RevitPylonDocumentation.Views.Controls"
     xmlns:converters="clr-namespace:RevitPylonDocumentation.Views.Converters"
+    xmlns:extensions="clr-namespace:RevitPylonDocumentation.Views.Extensions"
     
     mc:Ignorable="d"
     ScrollViewer.CanContentScroll="False"
@@ -57,7 +59,7 @@
 
                     <UniformGrid
                         Grid.Row="1"
-                        SizeChanged="UniformGrid_SizeChanged">
+                        extensions:UniformGridExtensions.AutoColumns="True">
 
                         <controls:ComboBoxSettingControl
                             LabelText="{me:LocalizationSource AnnotationParams.SelectDimensionTypeSize}"
