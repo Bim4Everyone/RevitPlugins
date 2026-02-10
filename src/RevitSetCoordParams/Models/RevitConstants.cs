@@ -86,33 +86,39 @@ internal static class RevitConstants {
         BuiltInCategory.OST_Walls,
         BuiltInCategory.OST_Windows];
 
+    public static readonly ParamMap BlockParamMap = new() {
+        Type = ParamType.BlockParam,
+        SourceParam = SharedParamsConfig.Instance.BuildingWorksBlock,
+        TargetParam = SharedParamsConfig.Instance.BuildingWorksBlock
+    };
+    public static readonly ParamMap SectionParamMap = new() {
+        Type = ParamType.SectionParam,
+        SourceParam = SharedParamsConfig.Instance.BuildingWorksSection,
+        TargetParam = SharedParamsConfig.Instance.BuildingWorksSection
+    };
+    public static readonly ParamMap FloorParamMap = new() {
+        Type = ParamType.FloorParam,
+        SourceParam = SharedParamsConfig.Instance.BuildingWorksLevel,
+        TargetParam = SharedParamsConfig.Instance.BuildingWorksLevel
+    };
+    public static readonly ParamMap FloorDEParamMap = new() {
+        Type = ParamType.FloorDEParam,
+        SourceParam = SharedParamsConfig.Instance.BuildingWorksLevelCurrency,
+        TargetParam = SharedParamsConfig.Instance.BuildingWorksLevelCurrency
+    };
+    public static readonly ParamMap BlockingParamMap = new() {
+        Type = ParamType.BlockingParam,
+        SourceParam = null,
+        TargetParam = SharedParamsConfig.Instance.FixBuildingWorks
+    };
+
     // Утвержденные карты параметров, которые используются в проектах разных дисциплин
     private static readonly List<ParamMap> _allParamMaps = [
-        new ParamMap {
-            Type = ParamType.BlockParam,
-            SourceParam = SharedParamsConfig.Instance.BuildingWorksBlock,
-            TargetParam = SharedParamsConfig.Instance.BuildingWorksBlock
-        },
-        new ParamMap {
-            Type = ParamType.SectionParam,
-            SourceParam = SharedParamsConfig.Instance.BuildingWorksSection,
-            TargetParam = SharedParamsConfig.Instance.BuildingWorksSection
-        },
-        new ParamMap {
-            Type = ParamType.FloorParam,
-            SourceParam = SharedParamsConfig.Instance.BuildingWorksLevel,
-            TargetParam = SharedParamsConfig.Instance.BuildingWorksLevel
-        },
-        new ParamMap {
-            Type = ParamType.FloorDEParam,
-            SourceParam = SharedParamsConfig.Instance.BuildingWorksLevelCurrency,
-            TargetParam = SharedParamsConfig.Instance.BuildingWorksLevelCurrency
-        },
-        new ParamMap {
-            Type = ParamType.BlockingParam,
-            SourceParam = null,
-            TargetParam = SharedParamsConfig.Instance.FixBuildingWorks
-        },
+        BlockParamMap,
+        SectionParamMap,
+        FloorParamMap,
+        FloorDEParamMap,
+        BlockingParamMap
     ];
 
     /// <summary>

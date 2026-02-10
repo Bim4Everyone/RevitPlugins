@@ -497,7 +497,7 @@ internal class MainViewModel : BaseViewModel {
         ConfigSettings configSettings;
         if(projectConfig == null) {
             configSettings = new ConfigSettings();
-            configSettings.ApplyDefaultValues();
+            configSettings.ApplyDefaultValues(_revitRepository);
         } else {
             configSettings = projectConfig.ConfigSettings;
         }

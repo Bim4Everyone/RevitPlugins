@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Linq;
 
 using Autodesk.Revit.DB;
 
@@ -17,23 +18,16 @@ internal class ConfigSettings {
     public double StepDiameterSearchSphereMm { get; set; }
     public bool Search { get; set; }
 
-    public void ApplyDefaultValues() {
+    public void ApplyDefaultValues(RevitRepository revitRepository) {
         ElementsProvider = ElementsProviderType.AllElementsProvider;
         PositionProvider = PositionProviderType.CenterPositionProvider;
         SourceFile = RevitConstants.CoordFilePartName;
-        TypeModels = [];
-        ParamMaps = GetDefaultParamMaps();
-        Categories = GetDefaultCategories();
+        var doc = revitRepository.FindDocumentsByName(SourceFile);
+        TypeModels = revitRepository.GetSourceElementsValues(doc).ToList();
+        ParamMaps = RevitConstants.GetDefaultParamMaps();
+        Categories = RevitConstants.GetDefaultBuiltInCategories();
         MaxDiameterSearchSphereMm = RevitConstants.MaxDiameterSearchSphereMm;
         StepDiameterSearchSphereMm = RevitConstants.StepDiameterSearchSphereMm;
         Search = RevitConstants.Search;
-    }
-
-    private List<ParamMap> GetDefaultParamMaps() {
-        return RevitConstants.GetDefaultParamMaps();
-    }
-
-    private List<BuiltInCategory> GetDefaultCategories() {
-        return RevitConstants.GetDefaultBuiltInCategories();
     }
 }

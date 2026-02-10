@@ -134,7 +134,7 @@ internal class RevitRepository {
     }
 
     /// <summary>
-    /// Метод получения все вариантов значений объемных элементов по заданному параметру
+    /// Метод получения всех вариантов значений объемных элементов по заданному параметру
     /// </summary>
     public IEnumerable<string> GetSourceElementsValues(Document document) {
         var collector = new FilteredElementCollector(document)
