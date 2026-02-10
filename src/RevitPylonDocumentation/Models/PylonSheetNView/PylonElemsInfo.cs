@@ -31,6 +31,7 @@ internal class PylonElemsInfo {
     public double ElemsBoundingBoxWidthToMin { get; set; }
     public double ElemsBoundingBoxMinZ { get; set; }
     public double ElemsBoundingBoxMaxZ { get; set; }
+    public double ElemsBoundingBoxHeight { get; set; }
     public double LastPylonMinZ { get; set; }
     public double LastPylonMaxZ { get; set; }
 
@@ -77,13 +78,18 @@ internal class PylonElemsInfo {
             var column = bottomHost as FamilyInstance;
             var locationPoint = column.Location as LocationPoint;
             HostOrigin = locationPoint.Point;
-            
+
             // В случае FamilyInstance этого недостаточно, т.к. отметка по высоте будет на уровне 0
             // Поэтому берем высотную отметку уровня элемента, смещение элемента от этого уровня и складываем для Z
+            // При этом нужно добавить смещение базовой точки проекта относительного истинного начала
             var level = _doc.GetElement(column.LevelId) as Level;
             var levelElevation = level.Elevation;
             var levelOffset = column.GetParamValue<double>(BuiltInParameter.FAMILY_BASE_LEVEL_OFFSET_PARAM);
-            HostOrigin = new XYZ(HostOrigin.X, HostOrigin.Y, HostOrigin.Z + levelElevation + levelOffset);
+
+            HostOrigin = new XYZ(
+                HostOrigin.X, 
+                HostOrigin.Y, 
+                HostOrigin.Z + levelElevation + levelOffset + BasePoint.GetProjectBasePoint(_doc).Position.Z);
         }
     }
 
@@ -110,9 +116,9 @@ internal class PylonElemsInfo {
             if(elemForWork is not FamilyInstance column) { return; }
 
             HostLength = _sheetInfo.ParamValService
-                            .GetParamValueAnywhere<double>(column, _settings.ProjectSettings.PylonLengthParamName);
+                            .GetParamValueAnywhere<double>(column, _settings.PylonSettings.PylonLengthParamName);
             HostWidth = _sheetInfo.ParamValService
-                            .GetParamValueAnywhere<double>(column, _settings.ProjectSettings.PylonWidthParamName);
+                            .GetParamValueAnywhere<double>(column, _settings.PylonSettings.PylonWidthParamName);
         }
     }
 
@@ -169,15 +175,15 @@ internal class PylonElemsInfo {
             .WherePasses(multiCategoryFilter)
             .WhereElementIsNotElementType()
             .Where(e =>
-                _sheetInfo.ParamValService.GetParamValueAnywhere<string>(e, _settings.ProjectSettings.ProjectSection)
+                _sheetInfo.ParamValService.GetParamValueAnywhere<string>(e, _settings.PylonSettings.ProjectSection)
                     == _sheetInfo.ProjectSection)
             .Where(e =>
-                _sheetInfo.ParamValService.GetParamValueAnywhere<string>(e, _settings.ProjectSettings.TypicalPylonFilterParameter)
-                    == _settings.ProjectSettings.TypicalPylonFilterValue)
+                _sheetInfo.ParamValService.GetParamValueAnywhere<string>(e, _settings.PylonSettings.TypicalPylonFilterParameter)
+                    == _settings.PylonSettings.TypicalPylonFilterValue)
             .Where(e => e.Category.GetBuiltInCategory().Equals(BuiltInCategory.OST_Rebar) ?
                 _sheetInfo.ParamValService.GetParamValueAnywhere<string>(e, "обр_ФОП_Метка основы IFC")
                     == _sheetInfo.PylonKeyName :
-                _sheetInfo.ParamValService.GetParamValueAnywhere<string>(e, _settings.ProjectSettings.Mark)
+                _sheetInfo.ParamValService.GetParamValueAnywhere<string>(e, _settings.PylonSettings.Mark)
                     == _sheetInfo.PylonKeyName)
             .ToList();
 
@@ -239,6 +245,7 @@ internal class PylonElemsInfo {
         }
         ElemsBoundingBoxMinZ = ElemsBoundingBox.Min.Z;
         ElemsBoundingBoxMaxZ = ElemsBoundingBox.Max.Z;
+        ElemsBoundingBoxHeight = ElemsBoundingBoxMaxZ - ElemsBoundingBoxMinZ;
     }
 
 

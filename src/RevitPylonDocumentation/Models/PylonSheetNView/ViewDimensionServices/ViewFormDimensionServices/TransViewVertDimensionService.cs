@@ -19,7 +19,7 @@ internal class TransViewVertDimensionService {
     private readonly DimensionCreationService _dimCreationService;
     private bool _longGridsWillBeNeeded;
 
-    internal TransViewVertDimensionService(CreationSettings settings, Document document, PylonSheetInfo pylonSheetInfo, 
+    internal TransViewVertDimensionService(CreationSettings settings, Document document, PylonSheetInfo pylonSheetInfo,
                                            PylonView pylonView, DimensionBaseService dimensionBaseService) {
         _settings = settings;
         _doc = document;
@@ -92,7 +92,7 @@ internal class TransViewVertDimensionService {
         } else {
             // Если нужно брать опорные плоскости по низу
             vertDimensionsForEdit.Add(
-                _dimCreationService.CreateDimension(skeletonParentRebar, 
+                _dimCreationService.CreateDimension(skeletonParentRebar,
                                                     bottomSmallOffset,
                                                     ["низ", "фронт", "край"],
                                                     refArrayFormworkFront,
@@ -135,13 +135,14 @@ internal class TransViewVertDimensionService {
     /// <summary>
     /// Создает вертикальные размеры по опалубке
     /// </summary>
-    private void CreateVertDimensionByForm(Element dimensionLineHostRef, 
+    private void CreateVertDimensionByForm(Element dimensionLineHostRef,
                                            double formworkFrontDimensionLineOffset,
                                            ReferenceArray refArrayFormworkFront) {
         // Размер по ФРОНТУ опалубка (положение снизу 1.5)
         var formworkFrontDimOffset = new DimensionLineOffsetOption(dimensionLineHostRef, DirectionType.Bottom,
                                                                    formworkFrontDimensionLineOffset);
-        _dimCreationService.CreateDimension(refArrayFormworkFront, formworkFrontDimOffset);
+        _dimCreationService.CreateDimension(refArrayFormworkFront, formworkFrontDimOffset,
+                                            needEqualityFormula: _settings.AnnotationSettings.DimensionGrouping);
     }
 
     /// <summary>

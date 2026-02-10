@@ -30,7 +30,7 @@ public class RebarFinderService {
 
     private bool CheckRebarByBaseParams(Element rebar, string projectSection, string pylonKeyName) {
         // Фильтрация по комплекту документации
-        if(rebar.GetParamValue<string>(_settings.ProjectSettings.ProjectSection) != projectSection) {
+        if(rebar.GetParamValue<string>(_settings.PylonSettings.ProjectSection) != projectSection) {
             return false;
         }
         // Фильтрация по марке пилона
@@ -38,8 +38,8 @@ public class RebarFinderService {
             return false;
         }
         // Фильтрация по обр_ФОП_Фильтрации 1
-        if(rebar.GetParamValue<string>(_settings.ProjectSettings.TypicalPylonFilterParameter) !=
-            _settings.ProjectSettings.TypicalPylonFilterValue) {
+        if(rebar.GetParamValue<string>(_settings.PylonSettings.TypicalPylonFilterParameter) !=
+            _settings.PylonSettings.TypicalPylonFilterValue) {
             return false;
         }
         return true;
@@ -81,9 +81,9 @@ public class RebarFinderService {
     /// <param name="formNumberMinException">Минимальный номер формы арматурного стержня, который нужно исключить</param>
     /// <param name="formNumberMaxException">Максимальный номер формы арматурного стержня, который нужно исключить</param>
     /// <returns></returns>
-    public List<Element> GetSimpleRebars(string projectSection, string pylonKeyName, 
+    public List<Element> GetSimpleRebars(string projectSection, string pylonKeyName,
                                          int formNumberMin, int formNumberMax,
-                                         int formNumberMinException = int.MinValue, 
+                                         int formNumberMinException = int.MinValue,
                                          int formNumberMaxException = int.MinValue) {
         var rebars = new FilteredElementCollector(_repository.Document)
             .OfCategory(BuiltInCategory.OST_Rebar)
@@ -119,7 +119,7 @@ public class RebarFinderService {
 
         foreach(var rebar in rebars) {
             // Фильтрация по комплекту документации
-            if(rebar.GetParamValue<string>(_settings.ProjectSettings.ProjectSection) != projectSection) {
+            if(rebar.GetParamValue<string>(_settings.PylonSettings.ProjectSection) != projectSection) {
                 continue;
             }
             // Фильтрация по имени семейства
@@ -142,7 +142,7 @@ public class RebarFinderService {
         var simpleRebars = new List<Element>();
         foreach(var rebar in rebars) {
             // Фильтрация по комплекту документации
-            if(rebar.GetParamValue<string>(_settings.ProjectSettings.ProjectSection) != projectSection) {
+            if(rebar.GetParamValue<string>(_settings.PylonSettings.ProjectSection) != projectSection) {
                 continue;
             }
             // Фильтрация по номеру формы - отсев вертикальных стержней армирования
@@ -165,7 +165,7 @@ public class RebarFinderService {
         var simpleRebars = new List<Element>();
         foreach(var rebar in rebars) {
             // Фильтрация по комплекту документации
-            if(rebar.GetParamValue<string>(_settings.ProjectSettings.ProjectSection) != projectSection) {
+            if(rebar.GetParamValue<string>(_settings.PylonSettings.ProjectSection) != projectSection) {
                 continue;
             }
             // Фильтрация по номеру формы - отсев вертикальных стержней армирования
@@ -190,7 +190,7 @@ public class RebarFinderService {
         var simpleRebars = new List<Element>();
         foreach(var rebar in rebars) {
             // Фильтрация по комплекту документации
-            if(rebar.GetParamValue<string>(_settings.ProjectSettings.ProjectSection) != projectSection) {
+            if(rebar.GetParamValue<string>(_settings.PylonSettings.ProjectSection) != projectSection) {
                 continue;
             }
             // Фильтрация по номеру формы - отсев вертикальных стержней армирования

@@ -7,7 +7,6 @@ using dosymep.Revit;
 
 using RevitPylonDocumentation.Models.PluginOptions;
 using RevitPylonDocumentation.Models.PylonSheetNView;
-using RevitPylonDocumentation.ViewModels;
 
 namespace RevitPylonDocumentation.Models.Services;
 internal class DimensionCreationService {
@@ -20,9 +19,9 @@ internal class DimensionCreationService {
     //  Значения параметра способа отображения размера через формулу равенства
     private readonly int _dimEqualityFormulaIndex = 2;
 
-    public DimensionCreationService(CreationSettings settings, Document document, PylonView pylonView, 
+    public DimensionCreationService(CreationSettings settings, Document document, PylonView pylonView,
                                     DimensionBaseService dimensionBaseService) {
-        _selectedDimensionType = settings.TypesSettings.SelectedDimensionType;
+        _selectedDimensionType = settings.AnnotationSettings.SelectedDimensionType;
         _doc = document;
         _viewOfPylon = pylonView;
         _dimensionBaseService = dimensionBaseService;
@@ -44,7 +43,7 @@ internal class DimensionCreationService {
         if((grids?.Count ?? 0) == 0) { return; }
         var view = _viewOfPylon.ViewElement;
         var dimensionLine = _dimensionBaseService.GetDimensionLine(dimLineOffsetOption.ElemForOffset,
-                                                                   dimLineOffsetOption.OffsetDirectionType, 
+                                                                   dimLineOffsetOption.OffsetDirectionType,
                                                                    dimLineOffsetOption.OffsetCoefficient);
         var refArrayFormworkGridSide = _dimensionBaseService.GetDimensionRefs(grids, gridsDirection, oldRefArray);
         if(refArrayFormworkGridSide.Size != oldRefArray.Size) {
@@ -69,11 +68,11 @@ internal class DimensionCreationService {
         if(dimensioningElement is null) {
             throw new ArgumentNullException(nameof(dimensioningElement));
         }
-        if(importantRefNameParts.Count == 0) { 
-            throw new ArgumentException(nameof(dimensioningElement)); 
+        if(importantRefNameParts.Count == 0) {
+            throw new ArgumentException(nameof(dimensioningElement));
         }
 
-        var dimensionLine = _dimensionBaseService.GetDimensionLine(dimLineOffsetOption.ElemForOffset, 
+        var dimensionLine = _dimensionBaseService.GetDimensionLine(dimLineOffsetOption.ElemForOffset,
                                                                    dimLineOffsetOption.OffsetDirectionType,
                                                                    dimLineOffsetOption.OffsetCoefficient);
         ReferenceArray refArray = _dimensionBaseService.GetDimensionRefs(dimensioningElement as FamilyInstance,
@@ -81,7 +80,7 @@ internal class DimensionCreationService {
                                                                          oldRefArray: oldRefArray);
         var dimension = _doc.Create.NewDimension(_viewOfPylon.ViewElement, dimensionLine, refArray,
                                                                  _selectedDimensionType);
-        
+
         if(needEqualityFormula) {
             dimension.SetParamValue(BuiltInParameter.DIM_DISPLAY_EQ, _dimEqualityFormulaIndex);
         }
