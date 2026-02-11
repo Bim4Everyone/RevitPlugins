@@ -129,19 +129,19 @@ public class GetOpeningTasksCmd : BasePluginCommand {
         kernel.Bind<IConstantsProvider>()
             .To<ConstantsProvider>()
             .InSingletonScope();
-        kernel.Bind<ArchitectureNavigatorForIncomingTasksViewModel>()
+        kernel.Bind<NavigatorArViewModel>()
             .ToSelf()
             .InSingletonScope();
-        kernel.Bind<NavigatorMepIncomingView>()
+        kernel.Bind<NavigatorMepToArIncomingView>()
             .ToSelf()
             .InSingletonScope()
             .WithPropertyValue(nameof(Window.DataContext),
-                c => c.Kernel.Get<ArchitectureNavigatorForIncomingTasksViewModel>())
+                c => c.Kernel.Get<NavigatorArViewModel>())
             .WithPropertyValue(nameof(Window.Title), PluginName);
 
         kernel.Get<IRevitLinkTypesSetter>().SetRevitLinkTypes();
 
-        var window = kernel.Get<NavigatorMepIncomingView>();
+        var window = kernel.Get<NavigatorMepToArIncomingView>();
         var uiApplication = kernel.Get<UIApplication>();
         var helper = new WindowInteropHelper(window) { Owner = uiApplication.MainWindowHandle };
         window.Show();
@@ -215,26 +215,26 @@ public class GetOpeningTasksCmd : BasePluginCommand {
         kernel.Bind<IConstantsProvider>()
             .To<ConstantsProvider>()
             .InSingletonScope();
-        kernel.Bind<ConstructureNavigatorForIncomingTasksViewModel>()
+        kernel.Bind<NavigatorKrViewModel>()
             .ToSelf()
             .InSingletonScope();
-        kernel.Bind<NavigatorArIncomingView>()
+        kernel.Bind<NavigatorArToKrIncomingView>()
             .ToSelf()
             .InSingletonScope()
             .WithPropertyValue(nameof(Window.DataContext),
-                c => c.Kernel.Get<ConstructureNavigatorForIncomingTasksViewModel>())
+                c => c.Kernel.Get<NavigatorKrViewModel>())
             .WithPropertyValue(nameof(Window.Title), PluginName);
         kernel.Bind<NavigatorMepToKrIncomingView>()
             .ToSelf()
             .InSingletonScope()
             .WithPropertyValue(nameof(Window.DataContext),
-                c => c.Kernel.Get<ConstructureNavigatorForIncomingTasksViewModel>())
+                c => c.Kernel.Get<NavigatorKrViewModel>())
             .WithPropertyValue(nameof(Window.Title), PluginName);
 
         kernel.Get<IRevitLinkTypesSetter>().SetRevitLinkTypes();
 
         var window = navigatorMode == KrNavigatorMode.IncomingAr
-            ? kernel.Get<NavigatorArIncomingView>()
+            ? kernel.Get<NavigatorArToKrIncomingView>()
             : (Window) kernel.Get<NavigatorMepToKrIncomingView>();
         var uiApplication = kernel.Get<UIApplication>();
         var helper = new WindowInteropHelper(window) { Owner = uiApplication.MainWindowHandle };
@@ -292,14 +292,14 @@ public class GetOpeningTasksCmd : BasePluginCommand {
             .To<ElementOffsetFinder>()
             .InTransientScope();
 
-        kernel.Bind<MepNavigatorForOutcomingTasksViewModel>()
+        kernel.Bind<NavigatorMepViewModel>()
             .ToSelf()
             .InSingletonScope();
         kernel.Bind<NavigatorMepOutcomingView>()
             .ToSelf()
             .InSingletonScope()
             .WithPropertyValue(nameof(Window.DataContext),
-                c => c.Kernel.Get<MepNavigatorForOutcomingTasksViewModel>())
+                c => c.Kernel.Get<NavigatorMepViewModel>())
             .WithPropertyValue(nameof(Window.Title), PluginName);
 
         kernel.Get<IRevitLinkTypesSetter>().SetRevitLinkTypes();

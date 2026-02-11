@@ -17,7 +17,9 @@ namespace RevitOpeningPlacement.ViewModels.Navigator;
 /// <summary>
 /// Модель представления входящего задания на отверстие от архитектора в файле активном конструктора
 /// </summary>
-internal class OpeningArTaskIncomingViewModel : BaseViewModel, IOpeningTaskIncomingForKrViewModel, IEquatable<OpeningArTaskIncomingViewModel> {
+internal class OpeningArTaskIncomingViewModel : BaseViewModel,
+    IOpeningTaskIncomingToKrViewModel,
+    IEquatable<OpeningArTaskIncomingViewModel> {
     /// <summary>
     /// Экземпляр семейства проема АР, являющегося входящим заданием на отверстие для КР
     /// </summary>

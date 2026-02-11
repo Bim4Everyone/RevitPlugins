@@ -1,11 +1,13 @@
 using Autodesk.Revit.DB;
 
-namespace RevitOpeningPlacement.Models.Interfaces;
+using RevitOpeningPlacement.Models.Interfaces;
+
+namespace RevitOpeningPlacement.ViewModels.Navigator;
 /// <summary>
 /// Модель представления входящего задания на отверстие для КР.
 /// Использовать для моделей представления входящих заданий из АР и из ВИС в КР.
 /// </summary>
-internal interface IOpeningTaskIncomingForKrViewModel : ISelectorAndHighlighter {
+internal interface IOpeningTaskIncomingToKrViewModel : ISelectorAndHighlighter {
     /// <summary>
     /// Id входящего задания на отверстие
     /// </summary>
@@ -82,7 +84,7 @@ internal interface IOpeningTaskIncomingForKrViewModel : ISelectorAndHighlighter 
     string Description { get; }
 
     /// <summary>
-    /// Хост задания на отверстие из активного файла
+    /// Хост задания на отверстие из активного файла КР
     /// </summary>
     IOpeningKrHost Host { get; }
 }

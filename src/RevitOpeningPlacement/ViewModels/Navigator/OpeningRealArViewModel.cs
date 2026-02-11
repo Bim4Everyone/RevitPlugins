@@ -18,7 +18,7 @@ namespace RevitOpeningPlacement.ViewModels.Navigator;
 /// Модель представления чистового отверстия в навигаторе АР по входящим заданиям на отверстия.
 /// Использовать для отображения чистовых отверстий АР из активного документа, которые требуют внимания архитектора
 /// </summary>
-internal class OpeningRealArViewModel : BaseViewModel, ISelectorAndHighlighter, IEquatable<OpeningRealArViewModel> {
+internal class OpeningRealArViewModel : BaseViewModel, IOpeningRealArViewModel, IEquatable<OpeningRealArViewModel> {
     private readonly OpeningRealAr _openingReal;
 
 
@@ -36,51 +36,23 @@ internal class OpeningRealArViewModel : BaseViewModel, ISelectorAndHighlighter, 
         FamilyName = GetFamilyName(openingReal);
     }
 
+    public ElementId OpeningId { get; }
 
-    /// <summary>
-    /// Id экземпляра семейства чистового на отверстия
-    /// </summary>
-    public ElementId OpeningId { get; } = ElementId.InvalidElementId;
+    public string Diameter { get; }
 
-    /// <summary>
-    /// Диаметр
-    /// </summary>
-    public string Diameter { get; } = string.Empty;
+    public string Width { get; }
 
-    /// <summary>
-    /// Ширина
-    /// </summary>
-    public string Width { get; } = string.Empty;
+    public string Height { get; }
 
-    /// <summary>
-    /// Высота
-    /// </summary>
-    public string Height { get; } = string.Empty;
+    public string Status { get; }
 
-    /// <summary>
-    /// Статус чистового отверстия
-    /// </summary>
-    public string Status { get; } = string.Empty;
+    public string Comment { get; }
 
-    /// <summary>
-    /// Комментарий
-    /// </summary>
-    public string Comment { get; } = string.Empty;
+    public string LevelName { get; }
 
-    /// <summary>
-    /// Название уровня
-    /// </summary>
-    public string LevelName { get; } = string.Empty;
+    public string TaskInfo { get; }
 
-    /// <summary>
-    /// Информация о задании, по которому было создано данное чистовое отверстие
-    /// </summary>
-    public string TaskInfo { get; } = string.Empty;
-
-    /// <summary>
-    /// Название семейства
-    /// </summary>
-    public string FamilyName { get; } = string.Empty;
+    public string FamilyName { get; }
 
 
     public override bool Equals(object obj) {

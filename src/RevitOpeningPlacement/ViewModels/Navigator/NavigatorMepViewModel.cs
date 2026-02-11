@@ -23,14 +23,12 @@ namespace RevitOpeningPlacement.ViewModels.Navigator;
 /// <summary>
 /// Модель представления окна для просмотра исходящих заданий на отверстия в файле инженера
 /// </summary>
-internal class MepNavigatorForOutcomingTasksViewModel : BaseViewModel {
+internal class NavigatorMepViewModel : BaseViewModel {
     private readonly RevitRepository _revitRepository;
     private readonly IConstantsProvider _constantsProvider;
     private readonly IResolutionRoot _resolutionRoot;
-    private OpeningMepTaskOutcomingViewModel _selectedOpeningMepTaskOutcoming;
 
-
-    public MepNavigatorForOutcomingTasksViewModel(
+    public NavigatorMepViewModel(
         Models.Configs.OpeningConfig openingConfig,
         RevitRepository revitRepository,
         IResolutionRoot resolutionRoot,
@@ -48,15 +46,9 @@ internal class MepNavigatorForOutcomingTasksViewModel : BaseViewModel {
         LoadViewCommand = RelayCommand.Create(LoadView);
     }
 
+    public ObservableCollection<IOpeningMepTaskOutcomingViewModel> OpeningsMepTaskOutcoming { get; }
 
-    public ObservableCollection<OpeningMepTaskOutcomingViewModel> OpeningsMepTaskOutcoming { get; }
-
-    public CollectionViewSource OpeningsMepTasksOutcomingViewSource { get; private set; }
-
-    public OpeningMepTaskOutcomingViewModel SelectedOpeningMepTaskOutcoming {
-        get => _selectedOpeningMepTaskOutcoming;
-        set => RaiseAndSetIfChanged(ref _selectedOpeningMepTaskOutcoming, value);
-    }
+    public CollectionViewSource OpeningsMepTasksOutcomingViewSource { get; }
 
     public string ConfigName { get; }
 
@@ -86,8 +78,6 @@ internal class MepNavigatorForOutcomingTasksViewModel : BaseViewModel {
 
     private void LoadView() {
         var outcomingTasks = _revitRepository.GetOpeningsMepTasksOutcoming();
-        IList<ElementId> outcomingTasksIds = outcomingTasks.Select(task => task.Id).ToList();
-        var mepElementsIds = _revitRepository.GetMepElementsIds();
         var openingTaskOutcomingViewModels = GetMepTaskOutcomingViewModels(outcomingTasks);
 
         OpeningsMepTaskOutcoming.Clear();

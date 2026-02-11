@@ -17,18 +17,17 @@ using RevitOpeningPlacement.OpeningModels;
 using RevitOpeningPlacement.Services;
 
 namespace RevitOpeningPlacement.ViewModels.Navigator;
+
 /// <summary>
 /// Модель представления окна для просмотра входящих заданий на отверстия от инженера в файле архитектора или конструктора
 /// </summary>
-internal class ArchitectureNavigatorForIncomingTasksViewModel : BaseViewModel {
+internal class NavigatorArViewModel : BaseViewModel {
     private readonly RevitRepository _revitRepository;
     private readonly IConstantsProvider _constantsProvider;
 
-
-    public ArchitectureNavigatorForIncomingTasksViewModel(
+    public NavigatorArViewModel(
         RevitRepository revitRepository,
         IConstantsProvider constantsProvider) {
-
         _revitRepository = revitRepository ?? throw new ArgumentNullException(nameof(revitRepository));
         _constantsProvider = constantsProvider ?? throw new ArgumentNullException(nameof(constantsProvider));
         OpeningsMepTaskIncoming = [];
@@ -53,31 +52,16 @@ internal class ArchitectureNavigatorForIncomingTasksViewModel : BaseViewModel {
             = RelayCommand.Create(PlaceManyRealOpeningsByManyTasksInManyHosts);
     }
 
-
     // Входящие задания на отверстия
-    public ObservableCollection<OpeningMepTaskIncomingViewModel> OpeningsMepTaskIncoming { get; }
+    public ObservableCollection<IOpeningMepTaskIncomingToArViewModel> OpeningsMepTaskIncoming { get; }
 
-    public CollectionViewSource OpeningsMepTasksIncomingViewSource { get; private set; }
-
-    private OpeningMepTaskIncomingViewModel _selectedOpeningMepTaskIncoming;
-    public OpeningMepTaskIncomingViewModel SelectedOpeningMepTaskIncoming {
-        get => _selectedOpeningMepTaskIncoming;
-        set => RaiseAndSetIfChanged(ref _selectedOpeningMepTaskIncoming, value);
-    }
-
+    public CollectionViewSource OpeningsMepTasksIncomingViewSource { get; }
 
     // Чистовые отверстия из активного документа
     public bool ShowOpeningsReal => OpeningsReal.Count > 0;
-    public ObservableCollection<OpeningRealArViewModel> OpeningsReal { get; }
+    public ObservableCollection<IOpeningRealArViewModel> OpeningsReal { get; }
 
-    public CollectionViewSource OpeningsRealViewSource { get; private set; }
-
-    private OpeningRealArViewModel _selectedOpeningReal;
-    public OpeningRealArViewModel SelectedOpeningReal {
-        get => _selectedOpeningReal;
-        set => RaiseAndSetIfChanged(ref _selectedOpeningReal, value);
-    }
-
+    public CollectionViewSource OpeningsRealViewSource { get; }
 
     public ICommand LoadViewCommand { get; }
 
@@ -93,7 +77,6 @@ internal class ArchitectureNavigatorForIncomingTasksViewModel : BaseViewModel {
 
     public ICommand PlaceManyRealOpeningsByManyTasksInManyHostsCommand { get; }
 
-
     private void SelectElement(ISelectorAndHighlighter famInstanceProvider) {
         _revitRepository.SelectAndShowElement(famInstanceProvider);
     }
@@ -107,6 +90,7 @@ internal class ArchitectureNavigatorForIncomingTasksViewModel : BaseViewModel {
             var command = new GetOpeningTasksCmd();
             command.ExecuteCommand(_revitRepository.UIApplication);
         }
+
         _revitRepository.DoAction(action);
     }
 
@@ -115,6 +99,7 @@ internal class ArchitectureNavigatorForIncomingTasksViewModel : BaseViewModel {
             var cmd = new PlaceOneOpeningRealByOneTaskCmd();
             cmd.ExecuteCommand(_revitRepository.UIApplication);
         }
+
         _revitRepository.DoAction(action);
     }
 
@@ -123,6 +108,7 @@ internal class ArchitectureNavigatorForIncomingTasksViewModel : BaseViewModel {
             var cmd = new PlaceOneOpeningRealByManyTasksCmd();
             cmd.ExecuteCommand(_revitRepository.UIApplication);
         }
+
         _revitRepository.DoAction(action);
     }
 
@@ -131,6 +117,7 @@ internal class ArchitectureNavigatorForIncomingTasksViewModel : BaseViewModel {
             var cmd = new PlaceManyOpeningRealsByManyTasksInOneHostCmd();
             cmd.ExecuteCommand(_revitRepository.UIApplication);
         }
+
         _revitRepository.DoAction(action);
     }
 
@@ -139,6 +126,7 @@ internal class ArchitectureNavigatorForIncomingTasksViewModel : BaseViewModel {
             var cmd = new PlaceManyOpeningRealsByManyTasksInManyHostsCmd();
             cmd.ExecuteCommand(_revitRepository.UIApplication);
         }
+
         _revitRepository.DoAction(action);
     }
 
@@ -172,6 +160,7 @@ internal class ArchitectureNavigatorForIncomingTasksViewModel : BaseViewModel {
         foreach(var openingReal in openingsRealViewModels) {
             OpeningsReal.Add(openingReal);
         }
+
         OnPropertyChanged(nameof(ShowOpeningsReal));
     }
 
@@ -185,7 +174,6 @@ internal class ArchitectureNavigatorForIncomingTasksViewModel : BaseViewModel {
         ICollection<OpeningMepTaskIncoming> incomingTasks,
         ICollection<IOpeningReal> realOpenings,
         ICollection<ElementId> constructureElementsIds) {
-
         var incomingTasksViewModels = new HashSet<OpeningMepTaskIncomingViewModel>();
 
         using(var pb = GetPlatformService<IProgressDialogService>()) {
@@ -203,13 +191,15 @@ internal class ArchitectureNavigatorForIncomingTasksViewModel : BaseViewModel {
                 try {
                     incomingTask.UpdateStatusAndHostName(realOpenings, constructureElementsIds);
                 } catch(ArgumentException) {
-                    //не удалось получить солид у задания на отверстие. Например, если его толщина равна 0
+                    // не удалось получить солид у задания на отверстие. Например, если его толщина равна 0
                     continue;
                 }
+
                 incomingTasksViewModels.Add(new OpeningMepTaskIncomingViewModel(incomingTask));
                 i++;
             }
         }
+
         return incomingTasksViewModels;
     }
 
@@ -221,7 +211,6 @@ internal class ArchitectureNavigatorForIncomingTasksViewModel : BaseViewModel {
     private ICollection<OpeningRealArViewModel> GetOpeningsRealArViewModels(
         ICollection<IMepLinkElementsProvider> mepLinks,
         ICollection<OpeningRealAr> openingsReal) {
-
         var openingsRealViewModels = new HashSet<OpeningRealArViewModel>();
 
         using(var pb = GetPlatformService<IProgressDialogService>()) {
@@ -241,6 +230,7 @@ internal class ArchitectureNavigatorForIncomingTasksViewModel : BaseViewModel {
                 i++;
             }
         }
+
         return openingsRealViewModels;
     }
 }

@@ -19,7 +19,7 @@
     Width="800"
     MinHeight="150"
     MinWidth="150"
-    d:DataContext="{d:DesignInstance {x:Type vm:MepNavigatorForOutcomingTasksViewModel}, IsDesignTimeCreatable=False}">
+    d:DataContext="{d:DesignInstance {x:Type vm:NavigatorMepViewModel}, IsDesignTimeCreatable=False}">
     <dxmvvm:Interaction.Behaviors>
         <dxmvvm:EventToCommand
             EventName="Loaded"
@@ -144,8 +144,7 @@
             BorderThickness="0"
             SelectionMode="Row"
             Grid.Row="1"
-            CurrentItem="RevitOpeningPlacement.ViewModels.Navigator.OpeningMepTaskOutcomingViewModel"
-            SelectedItem="{Binding SelectedOpeningMepTaskOutcoming}">
+            CurrentItem="RevitOpeningPlacement.ViewModels.Navigator.OpeningMepTaskOutcomingViewModel">
             <dxg:GridControl.GroupSummary>
                 <dxg:GridSummaryItem
                     SummaryType="Count" />

@@ -3,18 +3,18 @@ using System.Windows;
 using DevExpress.Xpf.Grid;
 
 namespace RevitOpeningPlacement.Views.Navigator;
+
 /// <summary>
 /// Класс окна навигатора по входящим заданиям на отверстия от архитектора в файле конструктора
 /// </summary>
-public partial class NavigatorArIncomingView {
-    public NavigatorArIncomingView() {
+public partial class NavigatorArToKrIncomingView {
+    public NavigatorArToKrIncomingView() {
         InitializeComponent();
         Loaded += NavigatorView_Loaded;
     }
 
     public override string PluginName => nameof(RevitOpeningPlacement);
-    public override string ProjectConfigName => nameof(NavigatorArIncomingView);
-
+    public override string ProjectConfigName => nameof(NavigatorArToKrIncomingView);
 
     private void SimpleButton_Click(object sender, RoutedEventArgs e) {
         Close();

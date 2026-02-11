@@ -22,7 +22,7 @@
     Width="1000"
     MinHeight="150"
     MinWidth="150"
-    d:DataContext="{d:DesignInstance {x:Type vm:ConstructureNavigatorForIncomingTasksViewModel}, IsDesignTimeCreatable=False}"
+    d:DataContext="{d:DesignInstance {x:Type vm:NavigatorKrViewModel}, IsDesignTimeCreatable=False}"
     WindowStartupLocation="Manual"
     Left="50"
     Top="50">
@@ -168,8 +168,6 @@
                         ItemsSource="{Binding OpeningsTasksIncomingViewSource.View}"
                         BorderThickness="0"
                         SelectionMode="Row"
-                        CurrentItem="RevitOpeningPlacement.Models.Interfaces.IOpeningTaskIncomingForKrViewModel"
-                        SelectedItem="{Binding SelectedOpeningTaskIncoming}"
                         MaxHeight="2000">
                         <dxg:GridControl.GroupSummary>
                             <dxg:GridSummaryItem
@@ -325,8 +323,6 @@
                         DefaultSorting="Diameter"
                         BorderThickness="0"
                         SelectionMode="Row"
-                        CurrentItem="RevitOpeningPlacement.ViewModels.Navigator.OpeningRealKrViewModel"
-                        SelectedItem="{Binding SelectedOpeningReal}"
                         MaxHeight="2000">
                         <dxg:GridControl.GroupSummary>
                             <dxg:GridSummaryItem
