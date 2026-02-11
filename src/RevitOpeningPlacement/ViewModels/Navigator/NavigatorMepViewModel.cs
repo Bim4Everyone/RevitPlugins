@@ -26,20 +26,22 @@ namespace RevitOpeningPlacement.ViewModels.Navigator;
 internal class NavigatorMepViewModel : BaseViewModel {
     private readonly RevitRepository _revitRepository;
     private readonly IConstantsProvider _constantsProvider;
+    private readonly ILocalizationService _localization;
     private readonly IResolutionRoot _resolutionRoot;
 
     public NavigatorMepViewModel(
         Models.Configs.OpeningConfig openingConfig,
         RevitRepository revitRepository,
         IResolutionRoot resolutionRoot,
-        IConstantsProvider constantsProvider) {
+        IConstantsProvider constantsProvider,
+        ILocalizationService localization) {
         _revitRepository = revitRepository ?? throw new ArgumentNullException(nameof(revitRepository));
         _constantsProvider = constantsProvider ?? throw new ArgumentNullException(nameof(constantsProvider));
+        _localization = localization ?? throw new ArgumentNullException(nameof(localization));
         _resolutionRoot = resolutionRoot ?? throw new ArgumentNullException(nameof(resolutionRoot));
 
         ConfigName = openingConfig.Name;
         OpeningsMepTaskOutcoming = [];
-        OpeningsMepTasksOutcomingViewSource = new CollectionViewSource() { Source = OpeningsMepTaskOutcoming };
 
         SelectCommand = RelayCommand.Create<ISelectorAndHighlighter>(SelectElement, CanSelect);
         RenewCommand = RelayCommand.Create(Renew);
@@ -47,8 +49,6 @@ internal class NavigatorMepViewModel : BaseViewModel {
     }
 
     public ObservableCollection<IOpeningMepTaskOutcomingViewModel> OpeningsMepTaskOutcoming { get; }
-
-    public CollectionViewSource OpeningsMepTasksOutcomingViewSource { get; }
 
     public string ConfigName { get; }
 
@@ -83,6 +83,12 @@ internal class NavigatorMepViewModel : BaseViewModel {
         OpeningsMepTaskOutcoming.Clear();
         foreach(var item in openingTaskOutcomingViewModels) {
             OpeningsMepTaskOutcoming.Add(item);
+        }
+
+        var uniqueTasks = _revitRepository.GetOpeningsMepTasksOutcomingUnique();
+        foreach(var item in uniqueTasks) {
+            OpeningsMepTaskOutcoming.Add(
+                new OpeningMepTaskOutcomingUniqueViewModel(item, _localization.GetLocalizedString("Unique")));
         }
     }
 

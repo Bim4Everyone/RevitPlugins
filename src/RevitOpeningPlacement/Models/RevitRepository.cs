@@ -477,6 +477,22 @@ internal class RevitRepository {
     }
 
     /// <summary>
+    /// Возвращает коллекцию экземпляров уникальных исходящих заданий на отверстия
+    /// из текущего файла инженерных систем
+    /// </summary>
+    public ICollection<FamilyInstance> GetOpeningsMepTasksOutcomingUnique() {
+        const string famName = "ОбщМд_Отв_Отверстие_Уникальное_В перекрытии";
+
+        return new FilteredElementCollector(Doc)
+            .WhereElementIsNotElementType()
+            .OfClass(typeof(FamilyInstance))
+            .OfCategory(BuiltInCategory.OST_GenericModel)
+            .OfType<FamilyInstance>()
+            .Where(f => f.Symbol.FamilyName.Equals(famName, StringComparison.CurrentCultureIgnoreCase))
+            .ToArray();
+    }
+
+    /// <summary>
     /// Возвращает исходящие задания на отверстия в стенах от инженера из текущего файла Revit
     /// </summary>
     public List<FamilyInstance> GetWallOpeningsMepTasksOutcoming() {

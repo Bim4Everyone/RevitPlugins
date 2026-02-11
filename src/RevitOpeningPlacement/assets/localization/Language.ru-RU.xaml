@@ -34,6 +34,9 @@
         x:Key="Progress.UniteTouching">Объединение касающихся... [{0}\{1}]</system:String>
 
     <system:String
+        x:Key="Unique">Уникальное</system:String>
+
+    <system:String
         x:Key="Transaction.PlaceSingleOpening">Размещение одиночного отверстия</system:String>
     <system:String
         x:Key="Transaction.PlaceSingleOpeningsInOneHost">Одиночные отверстия в одном хосте</system:String>

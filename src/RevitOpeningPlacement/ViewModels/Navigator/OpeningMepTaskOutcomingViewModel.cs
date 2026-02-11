@@ -68,11 +68,11 @@ internal class OpeningMepTaskOutcomingViewModel : BaseViewModel,
             && (obj is OpeningMepTaskOutcomingViewModel otherVM)
             && Equals(otherVM);
     }
-
+    
     public override int GetHashCode() {
         return (int) _openingTask.Id.GetIdValue();
     }
-
+    
     public bool Equals(OpeningMepTaskOutcomingViewModel other) {
         return (other != null)
             && (_openingTask.Id == other._openingTask.Id);
