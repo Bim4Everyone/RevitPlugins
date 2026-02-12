@@ -397,7 +397,7 @@ internal class MainViewModel : BaseViewModel {
     private void AcceptView() {
         SaveConfig();
 
-        var processor = new SetCoordParamsProcessor(_localizationService, _revitRepository, _setCoordParamsSettings);
+        IIntersectProcessor processor = new IntersectCurveProcessor(_localizationService, _revitRepository, _setCoordParamsSettings);
 
         using var progressDialogService = ProgressDialogFactory.CreateDialog();
         progressDialogService.MaxValue = processor.RevitElements.Count();

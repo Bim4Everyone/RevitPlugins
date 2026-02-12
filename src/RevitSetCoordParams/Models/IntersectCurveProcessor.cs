@@ -10,16 +10,17 @@ using dosymep.Revit;
 using dosymep.SimpleServices;
 
 using RevitSetCoordParams.Models.Enums;
+using RevitSetCoordParams.Models.Interfaces;
 using RevitSetCoordParams.Models.Settings;
 
 
 namespace RevitSetCoordParams.Models;
-internal class SetCoordParamsProcessor {
+internal class IntersectCurveProcessor : IIntersectProcessor {
     private readonly ILocalizationService _localizationService;
     private readonly RevitRepository _revitRepository;
     private readonly SetCoordParamsSettings _settings;
 
-    public SetCoordParamsProcessor(
+    public IntersectCurveProcessor(
         ILocalizationService localizationService,
         RevitRepository revitRepository,
         SetCoordParamsSettings settings) {
@@ -52,65 +53,68 @@ internal class SetCoordParamsProcessor {
         double stepDiam = UnitUtils.ConvertToInternalUnits(_settings.StepDiameterSearchSphereMm, UnitTypeId.Millimeters);
 
         var allParamMaps = _settings.ParamMaps;
-        var blockingParam = allParamMaps
+        var blockingParamMap = allParamMaps
             .FirstOrDefault(paramMap => paramMap.Type == ParamType.BlockingParam);
 
         var pairParamMaps = allParamMaps
             .Where(paramMap => paramMap.Type != ParamType.BlockingParam);
 
+        double intersectCurveLength = UnitUtils.ConvertToInternalUnits(RevitConstants.IntersectCurveLengthMm, UnitTypeId.Millimeters);
+        var offsetIntersectLine = new XYZ(0, 0, intersectCurveLength);
+
         string transactionName = _localizationService.GetLocalizedString("SetCoordParamsProcessor.TransactionName");
         using var t = _revitRepository.Document.StartTransaction(transactionName);
-        List<WarningElement> warnings = [];
+
+        var intersector = new Intersector(sourceModels);
+
         int i = 0;
+        List<WarningElement> warnings = [];
         foreach(var targetElement in targetElements) {
             ct.ThrowIfCancellationRequested();
-            if(blockingParam != null) {
-                if(targetElement.Element.IsExistsParam(blockingParam.TargetParam.Name)) {
-                    int blockValue = targetElement.Element.GetParamValueOrDefault<int>(blockingParam.TargetParam.Name);
-                    if(blockValue == 1) {
-                        warnings.Add(new WarningSkipElement {
-                            WarningType = WarningType.SkipElement,
-                            RevitElement = targetElement
-                        });
-                        continue;
-                    }
-                }
+
+            if(IsBlocked(blockingParamMap, targetElement)) {
+                warnings.Add(new WarningSkipElement {
+                    WarningType = WarningType.SkipElement,
+                    RevitElement = targetElement
+                });
+                continue;
             }
 
             var position = positionProvider.GetPositionElement(targetElement);
-            var sphere = sphereProvider.GetSphere(position, startDiam);
-
-            var intersector = new Intersector();
-            var sourceModel = intersector.Intersect(sphere, sourceModels);
+            var curve = GetIntersectCurve(position, offsetIntersectLine);
+            var sourceModel = intersector.IntersectWithCurve(curve);
 
             double currentDiam = startDiam;
-            if(!intersector.HasIntersection && _settings.Search) {
+            if(sourceModel == null && _settings.Search) {
 
                 while(currentDiam < maxDiam) {
                     currentDiam += stepDiam;
-                    sphere = sphereProvider.GetSphere(position, currentDiam);
-                    sourceModel = intersector.Intersect(sphere, sourceModels);
-
-                    if(intersector.HasIntersection) {
+                    var curves = CreateBoundCircles(position, currentDiam);
+                    sourceModel = intersector.IntersectWithCurves(curves);
+                    if(sourceModel != null) {
                         break;
                     }
                 }
             }
 
-            if(intersector.HasIntersection && sourceModel != null) {
+            if(sourceModel is not null and not null) {
                 foreach(var paramMap in pairParamMaps) {
+                    string targetParamName = paramMap.TargetParam.Name;
+                    string sourceParamName = paramMap.SourceParam.Name;
 
-                    if(targetElement.Element.IsExistsParam(paramMap.TargetParam.Name)
-                        && sourceModel.Element.IsExistsParam(paramMap.SourceParam.Name)) {
-
+                    if(targetElement.Element.IsExistsParam(targetParamName)
+                        && sourceModel.Element.IsExistsParam(sourceParamName)) {
                         if(paramMap.Type == ParamType.FloorDEParam) {
-                            double value = sourceModel.Element.GetParamValueOrDefault<double>(paramMap.SourceParam.Name);
-                            targetElement.Element.SetParamValue(paramMap.TargetParam.Name, value);
+                            double value = sourceModel.Element.GetParamValueOrDefault<double>(sourceParamName);
+                            if(value != default) {
+                                targetElement.Element.SetParamValue(targetParamName, value);
+                            }
                         } else {
-                            string value = sourceModel.Element.GetParamValueOrDefault<string>(paramMap.SourceParam.Name);
-                            targetElement.Element.SetParamValue(paramMap.TargetParam.Name, value);
+                            string value = sourceModel.Element.GetParamValueOrDefault<string>(sourceParamName);
+                            if(value != null) {
+                                targetElement.Element.SetParamValue(targetParamName, value);
+                            }
                         }
-
                     } else {
                         warnings.Add(new WarningNotFoundParamElement {
                             WarningType = WarningType.NotFoundParameter,
@@ -131,8 +135,64 @@ internal class SetCoordParamsProcessor {
         return warnings;
     }
 
+    private bool IsBlocked(ParamMap blockingParamMap, RevitElement targetElement) {
+        if(blockingParamMap != null) {
+            string targetParamNane = blockingParamMap.TargetParam.Name;
+            if(targetElement.Element.IsExistsParam(targetParamNane)) {
+                int blockValue = targetElement.Element.GetParamValueOrDefault<int>(targetParamNane);
+                if(blockValue is not default(int) and 1) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
     // Метод получения элементов модели для основного метода и прогресс-бара  
     private IEnumerable<RevitElement> GetRevitElements() {
         return _settings.ElementsProvider.GetRevitElements(_settings.Categories);
+    }
+
+    // Метод получения кривой для пересечения с солидом
+    private Curve GetIntersectCurve(XYZ origin, XYZ offset) {
+        return Line.CreateBound(origin, origin + offset);
+    }
+
+    public List<Curve> CreateBoundCircles(XYZ origin, double diameter) {
+        double r = diameter / 2.0;
+
+        var curves = new List<Curve>(6);
+
+        {
+            var top = new XYZ(origin.X, origin.Y, origin.Z + r);
+            var bottom = new XYZ(origin.X, origin.Y, origin.Z - r);
+            var right = new XYZ(origin.X + r, origin.Y, origin.Z);
+            var left = new XYZ(origin.X - r, origin.Y, origin.Z);
+
+            curves.Add(Arc.Create(bottom, top, right));
+            curves.Add(Arc.Create(top, bottom, left));
+        }
+
+        {
+            var top = new XYZ(origin.X, origin.Y, origin.Z + r);
+            var bottom = new XYZ(origin.X, origin.Y, origin.Z - r);
+            var front = new XYZ(origin.X, origin.Y + r, origin.Z);
+            var back = new XYZ(origin.X, origin.Y - r, origin.Z);
+
+            curves.Add(Arc.Create(bottom, top, front));
+            curves.Add(Arc.Create(top, bottom, back));
+        }
+
+        {
+            var right = new XYZ(origin.X + r, origin.Y, origin.Z);
+            var left = new XYZ(origin.X - r, origin.Y, origin.Z);
+            var front = new XYZ(origin.X, origin.Y + r, origin.Z);
+            var back = new XYZ(origin.X, origin.Y - r, origin.Z);
+
+            curves.Add(Arc.Create(left, right, front));
+            curves.Add(Arc.Create(right, left, back));
+        }
+
+        return curves;
     }
 }

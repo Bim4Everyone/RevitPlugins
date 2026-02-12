@@ -11,6 +11,8 @@ namespace RevitSetCoordParams.Models;
 internal static class RevitConstants {
     // Начальный диаметр сферы в миллиметрах
     public static double StartDiameterSearchSphereMm = 30;
+    // Длина линии для пересечения
+    public static double IntersectCurveLengthMm = 30;
     // Средне-статистическое максимальное расстояние от удаленных элементов в моделях
     public const double MaxDiameterSearchSphereMm = 2000;
     // Наиболее оптимальный шаг увеличения поисковой сферы

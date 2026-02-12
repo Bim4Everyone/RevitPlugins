@@ -123,6 +123,11 @@ public class RevitSetCoordParamsCommandHeadless : BasePluginCommand {
                 SaveConfig(pluginConfig, revitRepository.Document, finalSettings);
             }
 
+            var setCoordParamsSettings = new SetCoordParamsSettings(revitRepository, finalSettings);
+            IIntersectProcessor processor = new IntersectCurveProcessor(localizationService, revitRepository, setCoordParamsSettings);
+
+            processor.Run();
+
         } catch(Exception ex) {
             string errorText = localizationService.GetLocalizedString("RevitSetCoordParamsCommandHeadless.Error");
             PluginLoggerService.Error(ex, errorText);
