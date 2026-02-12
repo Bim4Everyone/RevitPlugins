@@ -32,6 +32,9 @@ using ParameterValueProvider = RevitClashDetective.Models.FilterableValueProvide
 
 namespace RevitOpeningPlacement.Models;
 internal class RevitRepository {
+    public const string MepUniqueFamilyName = "ОбщМд_Отв_Отверстие_Уникальное_В перекрытии";
+    public const string ArUniqueFamilyName = "Окн_Отв_Уникальное_Перекрытие";
+    public const string KrUniqueFamilyName = "ОбщМд_Отверстие_Перекрытие_Уникальное";
     private readonly Application _application;
     private readonly UIDocument _uiDocument;
 
@@ -477,16 +480,16 @@ internal class RevitRepository {
     }
 
     /// <summary>
-    /// Возвращает коллекцию экземпляров уникальных исходящих заданий на отверстия
-    /// из текущего файла инженерных систем
+    /// Возвращает коллекцию экземпляров уникальных отверстий
+    /// из активного файла
     /// </summary>
-    public ICollection<FamilyInstance> GetOpeningsMepTasksOutcomingUnique() {
-        const string famName = "ОбщМд_Отв_Отверстие_Уникальное_В перекрытии";
-
+    /// <param name="famName">Название семейства</param>
+    /// <param name="category">Категория семейства</param>
+    public ICollection<FamilyInstance> GetOpeningsOutcomingUnique(string famName, BuiltInCategory category) {
         return new FilteredElementCollector(Doc)
             .WhereElementIsNotElementType()
             .OfClass(typeof(FamilyInstance))
-            .OfCategory(BuiltInCategory.OST_GenericModel)
+            .OfCategory(category)
             .OfType<FamilyInstance>()
             .Where(f => f.Symbol.FamilyName.Equals(famName, StringComparison.CurrentCultureIgnoreCase))
             .ToArray();
@@ -785,6 +788,32 @@ internal class RevitRepository {
             genericModelsInLinks.UnionWith(genericModelsInLink);
         }
         return genericModelsInLinks;
+    }
+
+    /// <summary>
+    /// Возвращает коллекцию экземпляров уникальных входящих заданий на отверстия
+    /// из связанных файлов
+    /// </summary>
+    /// <param name="famName">Название семейства уникального задания на отверстие</param>
+    /// <param name="category">Категория семейства уникального задания на отверстие</param>
+    public ICollection<(FamilyInstance Opening, Transform transform)> GetOpeningsIncomingUnique(
+        string famName,
+        BuiltInCategory category) {
+        var links = GetSelectedRevitLinks();
+        List<(FamilyInstance, Transform)> openings = [];
+        foreach(var link in links) {
+            var transform = link.GetTransform();
+            var instances = new FilteredElementCollector(link.GetLinkDocument())
+                .WhereElementIsNotElementType()
+                .OfClass(typeof(FamilyInstance))
+                .OfCategory(category)
+                .OfType<FamilyInstance>()
+                .Where(f => f.Symbol.FamilyName.Equals(famName, StringComparison.CurrentCultureIgnoreCase))
+                .ToArray();
+            openings.AddRange(instances.Select(i => (i, transform)));
+        }
+
+        return openings;
     }
 
     /// <summary>

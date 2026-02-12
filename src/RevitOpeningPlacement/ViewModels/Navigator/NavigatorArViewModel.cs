@@ -24,17 +24,17 @@ namespace RevitOpeningPlacement.ViewModels.Navigator;
 internal class NavigatorArViewModel : BaseViewModel {
     private readonly RevitRepository _revitRepository;
     private readonly IConstantsProvider _constantsProvider;
+    private readonly ILocalizationService _localization;
 
     public NavigatorArViewModel(
         RevitRepository revitRepository,
-        IConstantsProvider constantsProvider) {
+        IConstantsProvider constantsProvider,
+        ILocalizationService localization) {
         _revitRepository = revitRepository ?? throw new ArgumentNullException(nameof(revitRepository));
         _constantsProvider = constantsProvider ?? throw new ArgumentNullException(nameof(constantsProvider));
+        _localization = localization ?? throw new ArgumentNullException(nameof(localization));
         OpeningsMepTaskIncoming = [];
-        OpeningsMepTasksIncomingViewSource = new CollectionViewSource() { Source = OpeningsMepTaskIncoming };
-
         OpeningsReal = [];
-        OpeningsRealViewSource = new CollectionViewSource() { Source = OpeningsReal };
 
         LoadViewCommand
             = RelayCommand.Create(LoadView);
@@ -55,13 +55,9 @@ internal class NavigatorArViewModel : BaseViewModel {
     // Входящие задания на отверстия
     public ObservableCollection<IOpeningMepTaskIncomingToArViewModel> OpeningsMepTaskIncoming { get; }
 
-    public CollectionViewSource OpeningsMepTasksIncomingViewSource { get; }
-
     // Чистовые отверстия из активного документа
     public bool ShowOpeningsReal => OpeningsReal.Count > 0;
     public ObservableCollection<IOpeningRealArViewModel> OpeningsReal { get; }
-
-    public CollectionViewSource OpeningsRealViewSource { get; }
 
     public ICommand LoadViewCommand { get; }
 
@@ -148,6 +144,18 @@ internal class NavigatorArViewModel : BaseViewModel {
         foreach(var incomingTask in incomingTasksViewModels) {
             OpeningsMepTaskIncoming.Add(incomingTask);
         }
+
+        ICollection<(FamilyInstance Opening, Transform Transform)> uniqueTasks =
+            _revitRepository.GetOpeningsIncomingUnique(
+                RevitRepository.MepUniqueFamilyName,
+                BuiltInCategory.OST_GenericModel);
+        foreach(var item in uniqueTasks) {
+            OpeningsMepTaskIncoming.Add(
+                new OpeningMepTaskIncomingUniqueViewModel(
+                    item.Opening,
+                    item.Transform,
+                    _localization.GetLocalizedString("Unique")));
+        }
     }
 
     private void LoadOpeningsReal(ICollection<OpeningRealAr> realOpenings) {
@@ -159,6 +167,13 @@ internal class NavigatorArViewModel : BaseViewModel {
         OpeningsReal.Clear();
         foreach(var openingReal in openingsRealViewModels) {
             OpeningsReal.Add(openingReal);
+        }
+
+        var uniqueOpenings = _revitRepository.GetOpeningsOutcomingUnique(
+            RevitRepository.ArUniqueFamilyName,
+            BuiltInCategory.OST_Windows);
+        foreach(var item in uniqueOpenings) {
+            OpeningsReal.Add(new OpeningRealArUniqueViewModel(item, _localization.GetLocalizedString("Unique")));
         }
 
         OnPropertyChanged(nameof(ShowOpeningsReal));

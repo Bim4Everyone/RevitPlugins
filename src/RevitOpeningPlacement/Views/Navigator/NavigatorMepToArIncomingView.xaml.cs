@@ -30,18 +30,6 @@ public partial class NavigatorMepToArIncomingView {
     public override string PluginName => nameof(RevitOpeningPlacement);
     public override string ProjectConfigName => nameof(NavigatorMepToArIncomingView);
 
-    private void viewTasks_FocusedRowHandleChanged(object sender, FocusedRowHandleChangedEventArgs e) {
-        int handle = _dgIncomingTasks.View.FocusedRowHandle;
-        _dgIncomingTasks.UnselectAll();
-        _dgIncomingTasks.SelectItem(handle);
-    }
-
-    private void viewOpenings_FocusedRowHandleChanged(object sender, FocusedRowHandleChangedEventArgs e) {
-        int handle = _dgOpeningsReal.View.FocusedRowHandle;
-        _dgOpeningsReal.UnselectAll();
-        _dgOpeningsReal.SelectItem(handle);
-    }
-
     private void SimpleButton_Click(object sender, RoutedEventArgs e) {
         Close();
     }

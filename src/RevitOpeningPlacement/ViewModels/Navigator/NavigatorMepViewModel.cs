@@ -85,7 +85,9 @@ internal class NavigatorMepViewModel : BaseViewModel {
             OpeningsMepTaskOutcoming.Add(item);
         }
 
-        var uniqueTasks = _revitRepository.GetOpeningsMepTasksOutcomingUnique();
+        var uniqueTasks = _revitRepository.GetOpeningsOutcomingUnique(
+            RevitRepository.MepUniqueFamilyName,
+            BuiltInCategory.OST_GenericModel);
         foreach(var item in uniqueTasks) {
             OpeningsMepTaskOutcoming.Add(
                 new OpeningMepTaskOutcomingUniqueViewModel(item, _localization.GetLocalizedString("Unique")));
