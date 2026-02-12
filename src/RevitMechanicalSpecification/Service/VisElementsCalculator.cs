@@ -366,7 +366,7 @@ namespace RevitMechanicalSpecification.Service {
         /// <returns></returns>
         private string GetDuctFittingThikness(Element element) {
             List<Connector> connectors = GetConnectors(element);
-            double maxValue = double.MinValue;
+            double maxValue = 0;
             bool hasValue = false;
 
             foreach(Connector connector in connectors) {
