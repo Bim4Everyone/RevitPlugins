@@ -104,10 +104,10 @@ internal class PylonSheetInfo {
             return false;
         }
 
-        PylonViewSheet = ViewSheet.Create(Repository.Document, Settings.TypesSettings.SelectedTitleBlock.Id);
-        PylonViewSheet.Name = Settings.ProjectSettings.SheetPrefix + PylonKeyName + Settings.ProjectSettings.SheetSuffix;
+        PylonViewSheet = ViewSheet.Create(Repository.Document, Settings.SheetSettings.SelectedTitleBlock.Id);
+        PylonViewSheet.Name = Settings.SheetSettings.SheetPrefix + PylonKeyName + Settings.SheetSettings.SheetSuffix;
 
-        var viewSheetGroupingParameter = PylonViewSheet.LookupParameter(Settings.ProjectSettings.DispatcherGroupingFirst);
+        var viewSheetGroupingParameter = PylonViewSheet.LookupParameter(Settings.DispatcherSettings.DispatcherGroupingFirst);
         if(viewSheetGroupingParameter == null) {
         } else {
             viewSheetGroupingParameter.Set(ProjectSection);
@@ -162,8 +162,13 @@ internal class PylonSheetInfo {
             return;
         }
         // Пытаемся задать габарит листа
-        var paramA = TitleBlock.LookupParameter(Settings.ProjectSettings.SheetSize);
-        var paramX = TitleBlock.LookupParameter(Settings.ProjectSettings.SheetCoefficient);
+        var paramA = TitleBlock.LookupParameter(Settings.SheetSettings.SheetSize);
+        var paramX = TitleBlock.LookupParameter(Settings.SheetSettings.SheetCoefficient);
+
+        if(Settings.SheetSettings.CustomTitleBlockIsCheck) {
+            sheetSize = int.Parse(Settings.SheetSettings.CustomSheetSizeValue);
+            sheetCoefficient = int.Parse(Settings.SheetSettings.CustomSheetCoefficientValue);
+        }
 
         if(paramA != null && paramX != null) {
             paramA.Set(sheetSize);
@@ -187,21 +192,21 @@ internal class PylonSheetInfo {
     /// Получает и сохраняет имена видов в соответствии с префиксами/суффиксами, которые указал пользователь
     /// </summary>
     public void GetViewNamesForWork() {
-        GeneralView.ViewName = Settings.ViewSectionSettings.GeneralViewPrefix + PylonKeyName + Settings.ViewSectionSettings.GeneralViewSuffix;
-        GeneralViewPerpendicular.ViewName = Settings.ViewSectionSettings.GeneralViewPerpendicularPrefix + PylonKeyName + Settings.ViewSectionSettings.GeneralViewPerpendicularSuffix;
-        TransverseViewFirst.ViewName = Settings.ViewSectionSettings.TransverseViewFirstPrefix + PylonKeyName + Settings.ViewSectionSettings.TransverseViewFirstSuffix;
-        TransverseViewSecond.ViewName = Settings.ViewSectionSettings.TransverseViewSecondPrefix + PylonKeyName + Settings.ViewSectionSettings.TransverseViewSecondSuffix;
-        TransverseViewThird.ViewName = Settings.ViewSectionSettings.TransverseViewThirdPrefix + PylonKeyName + Settings.ViewSectionSettings.TransverseViewThirdSuffix;
+        GeneralView.ViewName = Settings.VerticalViewSettings.GeneralViewPrefix + PylonKeyName + Settings.VerticalViewSettings.GeneralViewSuffix;
+        GeneralViewPerpendicular.ViewName = Settings.VerticalViewSettings.GeneralViewPerpendicularPrefix + PylonKeyName + Settings.VerticalViewSettings.GeneralViewPerpendicularSuffix;
+        TransverseViewFirst.ViewName = Settings.TransverseViewSettings.TransverseViewFirstPrefix + PylonKeyName + Settings.TransverseViewSettings.TransverseViewFirstSuffix;
+        TransverseViewSecond.ViewName = Settings.TransverseViewSettings.TransverseViewSecondPrefix + PylonKeyName + Settings.TransverseViewSettings.TransverseViewSecondSuffix;
+        TransverseViewThird.ViewName = Settings.TransverseViewSettings.TransverseViewThirdPrefix + PylonKeyName + Settings.TransverseViewSettings.TransverseViewThirdSuffix;
 
         MaterialSchedule.ViewName = Settings.SchedulesSettings.MaterialSchedulePrefix + PylonKeyName + Settings.SchedulesSettings.MaterialScheduleSuffix;
         SystemPartsSchedule.ViewName = Settings.SchedulesSettings.SystemPartsSchedulePrefix + PylonKeyName + Settings.SchedulesSettings.SystemPartsScheduleSuffix;
         IfcPartsSchedule.ViewName = Settings.SchedulesSettings.IfcPartsSchedulePrefix + PylonKeyName + Settings.SchedulesSettings.IfcPartsScheduleSuffix;
 
-        GeneralViewRebar.ViewName = Settings.ViewSectionSettings.GeneralRebarViewPrefix + PylonKeyName + Settings.ViewSectionSettings.GeneralRebarViewSuffix;
-        GeneralViewPerpendicularRebar.ViewName = Settings.ViewSectionSettings.GeneralRebarViewPerpendicularPrefix + PylonKeyName + Settings.ViewSectionSettings.GeneralRebarViewPerpendicularSuffix;
-        TransverseViewFirstRebar.ViewName = Settings.ViewSectionSettings.TransverseRebarViewFirstPrefix + PylonKeyName + Settings.ViewSectionSettings.TransverseRebarViewFirstSuffix;
-        TransverseViewSecondRebar.ViewName = Settings.ViewSectionSettings.TransverseRebarViewSecondPrefix + PylonKeyName + Settings.ViewSectionSettings.TransverseRebarViewSecondSuffix;
-        TransverseViewThirdRebar.ViewName = Settings.ViewSectionSettings.TransverseRebarViewThirdPrefix + PylonKeyName + Settings.ViewSectionSettings.TransverseRebarViewThirdSuffix;
+        GeneralViewRebar.ViewName = Settings.VerticalViewSettings.GeneralRebarViewPrefix + PylonKeyName + Settings.VerticalViewSettings.GeneralRebarViewSuffix;
+        GeneralViewPerpendicularRebar.ViewName = Settings.VerticalViewSettings.GeneralRebarViewPerpendicularPrefix + PylonKeyName + Settings.VerticalViewSettings.GeneralRebarViewPerpendicularSuffix;
+        TransverseViewFirstRebar.ViewName = Settings.TransverseViewSettings.TransverseRebarViewFirstPrefix + PylonKeyName + Settings.TransverseViewSettings.TransverseRebarViewFirstSuffix;
+        TransverseViewSecondRebar.ViewName = Settings.TransverseViewSettings.TransverseRebarViewSecondPrefix + PylonKeyName + Settings.TransverseViewSettings.TransverseRebarViewSecondSuffix;
+        TransverseViewThirdRebar.ViewName = Settings.TransverseViewSettings.TransverseRebarViewThirdPrefix + PylonKeyName + Settings.TransverseViewSettings.TransverseRebarViewThirdSuffix;
 
         SkeletonSchedule.ViewName = Settings.SchedulesSettings.SkeletonSchedulePrefix + PylonKeyName + Settings.SchedulesSettings.SkeletonScheduleSuffix;
         SkeletonByElemsSchedule.ViewName = Settings.SchedulesSettings.SkeletonByElemsSchedulePrefix + PylonKeyName + Settings.SchedulesSettings.SkeletonByElemsScheduleSuffix;
@@ -327,7 +332,7 @@ internal class PylonSheetInfo {
     /// Ищет и запоминает легенду, размещенную на листе
     /// </summary>
     public void FindNoteLegendOnSheet() {
-        if(Settings.TypesSettings.SelectedLegend is null) {
+        if(Settings.LegendsAndAnnotationsSettings.SelectedLegend is null) {
             return;
         }
         foreach(ElementId id in PylonViewSheet.GetAllViewports()) {
@@ -337,7 +342,7 @@ internal class PylonSheetInfo {
             View viewLegend = Repository.Document.GetElement(viewportLegend.ViewId) as View;
             if(viewLegend is null) { continue; }
 
-            if(LegendView.ViewElement is null && viewLegend.Name.Equals(Settings.TypesSettings.SelectedLegend.Name)) {
+            if(LegendView.ViewElement is null && viewLegend.Name.Equals(Settings.LegendsAndAnnotationsSettings.SelectedLegend.Name)) {
                 LegendView.ViewElement = viewLegend;
                 LegendView.ViewportElement = viewportLegend;
                 return;

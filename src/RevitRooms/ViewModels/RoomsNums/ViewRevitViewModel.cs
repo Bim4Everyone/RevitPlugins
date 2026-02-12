@@ -13,8 +13,10 @@ internal class ViewRevitViewModel : RevitRoomNumsViewModel {
                               RoomsNumsConfig roomsNumsConfig,
                               IMessageBoxService messageBoxService,
                               ILocalizationService localizationService,
-                              NumOrderWindowService numOrderWindowService)
-        : base(revitRepository, roomsNumsConfig, messageBoxService, localizationService, numOrderWindowService) {
+                              NumOrderWindowService numOrderWindowService,
+                              ErrorWindowService errorWindowService)
+        : base(revitRepository, roomsNumsConfig, messageBoxService, localizationService, 
+            numOrderWindowService, errorWindowService) {
         _id = new Guid("38DF60C2-1D99-4256-9D41-0CB34A95E0AE");
     }
 

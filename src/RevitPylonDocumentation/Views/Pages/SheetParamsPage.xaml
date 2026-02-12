@@ -1,0 +1,158 @@
+﻿<core:WpfUIPlatformPage
+    x:Class="RevitPylonDocumentation.Views.Pages.SheetParamsPage"
+    x:ClassModifier="internal"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
+    
+    xmlns:core="clr-namespace:dosymep.WpfUI.Core"
+    xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
+    xmlns:me="clr-namespace:dosymep.WpfCore.MarkupExtensions;assembly=dosymep.WpfCore"
+    xmlns:vms="clr-namespace:RevitPylonDocumentation.ViewModels"
+    xmlns:local="clr-namespace:RevitPylonDocumentation.Views.Pages"
+    xmlns:views="clr-namespace:RevitPylonDocumentation.Views"
+    xmlns:controls="clr-namespace:RevitPylonDocumentation.Views.Controls"
+    xmlns:converters="clr-namespace:RevitPylonDocumentation.Views.Converters"
+    xmlns:extensions="clr-namespace:RevitPylonDocumentation.Views.Extensions"
+    
+    mc:Ignorable="d"
+    ScrollViewer.CanContentScroll="False"
+    Title="SheetParamsPage"
+    d:DesignHeight="700"
+    d:DesignWidth="600"
+    d:DataContext="{d:DesignInstance vms:MainViewModel, IsDesignTimeCreatable=False}">
+    <core:WpfUIPlatformPage.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary
+                    Source="../CustomStyles.xaml" />
+            </ResourceDictionary.MergedDictionaries>
+            <converters:CollectionNotEmptyToBoolConverter
+                x:Key="CollectionNotEmptyToBoolConverter" />
+        </ResourceDictionary>
+    </core:WpfUIPlatformPage.Resources>
+
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+
+        <ScrollViewer>
+            <Border Name="SheetProps"
+                Margin="15"
+                Style="{StaticResource CustomBorder}">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
+                    </Grid.RowDefinitions>
+                    
+                    <controls:SettingsTitleControl
+                        LabelText="{me:LocalizationSource SheetParams.SheetCreationRules}"
+                        ToolTipText="{me:LocalizationSource SheetParams.SheetCreationRulesToolTip}"
+                        ButtonCommand="{Binding SaveSettingsCommand}" />
+
+                    <UniformGrid
+                        Grid.Row="1"
+                        extensions:UniformGridExtensions.AutoColumns="True">
+                        <controls:DoubleTextBoxSettingControl
+                            LabelText="{me:LocalizationSource SheetParams.PylonSheetNameMask}"
+                            FirstTextBoxText="{Binding Path=SheetSettings.SheetPrefixTemp, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
+                            SecondTextBoxText="{Binding Path=SheetSettings.SheetSuffixTemp, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
+                            ToolTipText="{me:LocalizationSource SheetParams.PylonSheetNameMaskToolTip}"
+                            TextChangedCommand="{Binding SettingsChangedCommand}" />
+
+                        <controls:ComboBoxSettingControl
+                            LabelText="{me:LocalizationSource GeneralPage.SelectTitleBlockType}"
+                            ItemsSource="{Binding TitleBlocks}"
+                            SelectedItem="{Binding 
+                                Path=SheetSettings.SelectedTitleBlock, 
+                                UpdateSourceTrigger=PropertyChanged, Mode=TwoWay,
+                                ValidatesOnDataErrors=True, NotifyOnValidationError=True}"
+                            ToolTipText="{me:LocalizationSource SheetParams.SelectTitleBlockTypeToolTip}"
+                            SelectionChangedCommand="{Binding SettingsChangedCommand}"
+                            ItemTemplate="{StaticResource WithFamilyNameItemTemplate}" />
+
+                        <controls:TextBoxSettingControl
+                            LabelText="{me:LocalizationSource SheetParams.SheetSizeParameter}"
+                            TextBoxText="{Binding 
+                                Path=SheetSettings.SheetSizeTemp, 
+                                UpdateSourceTrigger=PropertyChanged, Mode=TwoWay,
+                                ValidatesOnDataErrors=True, NotifyOnValidationError=True}"
+                            ToolTipText="{me:LocalizationSource SheetParams.SheetSizeParameterToolTip}"
+                            TextChangedCommand="{Binding SettingsChangedCommand}" />
+
+                        <controls:TextBoxSettingControl
+                            LabelText="{me:LocalizationSource SheetParams.SheetCoefficientParameter}"
+                            TextBoxText="{Binding
+                                Path=SheetSettings.SheetCoefficientTemp, 
+                                UpdateSourceTrigger=PropertyChanged, Mode=TwoWay,
+                                ValidatesOnDataErrors=True, NotifyOnValidationError=True}"
+                            ToolTipText="{me:LocalizationSource SheetParams.SheetCoefficientParameterToolTip}"
+                            TextChangedCommand="{Binding SettingsChangedCommand}" />
+                    </UniformGrid>
+
+                    <CheckBox
+                        x:Name="SetCustomTitleBlock"
+                        Grid.Row="2"
+                        Margin="-5 10 0 5"
+                        Content="{me:LocalizationSource SheetParams.SetCustomTitleBlock}"
+                        IsChecked="{Binding Path=SheetSettings.CustomTitleBlockIsCheck, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" >
+                        <i:Interaction.Triggers>
+                            <i:EventTrigger
+                                EventName="Checked">
+                                <i:InvokeCommandAction
+                                    Command="{Binding SettingsChangedCommand}" />
+                            </i:EventTrigger>
+
+                            <i:EventTrigger
+                                EventName="Unchecked">
+                                <i:InvokeCommandAction
+                                    Command="{Binding SettingsChangedCommand}" />
+                            </i:EventTrigger>
+                        </i:Interaction.Triggers>
+                    </CheckBox>
+
+                    <UniformGrid
+                        Grid.Row="3"
+                        extensions:UniformGridExtensions.AutoColumns="True">
+                        <controls:TextBoxSettingControl
+                            IsEnabled="{Binding ElementName=SetCustomTitleBlock, Path=IsChecked}"
+                            LabelText="{me:LocalizationSource SheetParams.CustomSheetSizeParameterValue}"
+                            TextBoxText="{Binding
+                                Path=SheetSettings.CustomSheetSizeValueTemp, 
+                                UpdateSourceTrigger=PropertyChanged, Mode=TwoWay,
+                                ValidatesOnDataErrors=True, NotifyOnValidationError=True}"
+                            ToolTipText="{me:LocalizationSource SheetParams.CustomSheetSizeParameterValueToolTip}"
+                            TextChangedCommand="{Binding SettingsChangedCommand}" />
+
+                        <controls:TextBoxSettingControl
+                            IsEnabled="{Binding ElementName=SetCustomTitleBlock, Path=IsChecked}"
+                            LabelText="{me:LocalizationSource SheetParams.CustomSheetCoefficientParameterValue}"
+                            TextBoxText="{Binding
+                                Path=SheetSettings.CustomSheetCoefficientValueTemp, 
+                                UpdateSourceTrigger=PropertyChanged, Mode=TwoWay,
+                                ValidatesOnDataErrors=True, NotifyOnValidationError=True}"
+                            ToolTipText="{me:LocalizationSource SheetParams.CustomSheetCoefficientParameterValueToolTip}"
+                            TextChangedCommand="{Binding SettingsChangedCommand}" />
+                    </UniformGrid>
+                </Grid>
+            </Border>
+        </ScrollViewer>
+        
+        <controls:AppFooterControl
+            Grid.Row="1"
+            HorizontalAlignment="Right"
+            ErrorText="{Binding ErrorText}"
+            ShowErrorElemsButtonText="{me:LocalizationSource GeneralPage.Show}"
+            ShowErrorElemsButton="{Binding Path=ErrorElements, Converter={StaticResource CollectionNotEmptyToBoolConverter}}"
+            ShowErrorElemsCommand="{Binding ShowErrorElementsCommand}"
+            ShowOkButton="False"
+            CancelButtonText="{me:LocalizationSource GeneralPage.Cancel}" />
+    </Grid>
+</core:WpfUIPlatformPage>

@@ -1,0 +1,125 @@
+<core:WpfUIPlatformWindow
+    x:Class="RevitBuildCoordVolumes.Views.MainWindow"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:base="clr-namespace:dosymep.WPF.Views"
+    xmlns:local="clr-namespace:RevitBuildCoordVolumes.Views"
+    xmlns:edits="clr-namespace:RevitBuildCoordVolumes.Views.Edits"
+    xmlns:vms="clr-namespace:RevitBuildCoordVolumes.ViewModels"
+    xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
+    xmlns:core="clr-namespace:dosymep.WpfUI.Core"
+    xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
+    xmlns:me="clr-namespace:dosymep.WpfCore.MarkupExtensions;assembly=dosymep.WpfCore"
+    xmlns:converters="clr-namespace:dosymep.WpfCore.Converters;assembly=dosymep.WpfCore"
+    xmlns:wpfbehaviors="clr-namespace:dosymep.WpfCore.Behaviors;assembly=dosymep.WpfCore"
+    mc:Ignorable="d"       
+    Width="900"
+    MinWidth="900"
+    Height="950"       
+    MinHeight="460"
+    Title="{me:LocalizationSource MainWindow.Title}"
+    d:DataContext="{d:DesignInstance vms:MainViewModel, IsDesignTimeCreatable=False}">
+
+    <i:Interaction.Behaviors>
+        <wpfbehaviors:WpfAttachServiceBehavior
+            AttachableService="{Binding ProgressDialogFactory}" />
+        <wpfbehaviors:WpfAttachServiceBehavior
+            AttachableService="{Binding MessageBoxService}" />
+    </i:Interaction.Behaviors>     
+
+    <Window.Resources>
+        <converters:BoolToVisibilityConverter
+            x:Key="SlabSettingsVisible"
+            TrueValue="Visible"
+            FalseValue="Collapsed" />
+        <Style
+            TargetType="ToolTip">
+            <Setter
+                Property="MaxWidth"
+                Value="650" />            
+        </Style>
+    </Window.Resources>
+
+    <i:Interaction.Triggers>
+        <i:EventTrigger
+            EventName="Loaded">
+            <i:InvokeCommandAction
+                Command="{Binding LoadViewCommand}" />
+        </i:EventTrigger>
+    </i:Interaction.Triggers>
+
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition
+                Height="Auto" />
+            <RowDefinition
+                Height="*" />
+            <RowDefinition
+                Height="Auto" />
+        </Grid.RowDefinitions>
+
+        <ui:TitleBar
+            Grid.Row="0"
+            Icon="{ui:SymbolIcon boardSplit24, FontSize=20}"
+            Title="{me:LocalizationSource MainWindow.Title}"
+            FontSize="14"
+            FontWeight="DemiBold" />
+
+        <ScrollViewer
+            Grid.Row="1"
+            VerticalScrollBarVisibility="Auto"
+            HorizontalScrollBarVisibility="Disabled">            
+            <StackPanel
+                Margin="10">
+                <GroupBox
+                    Margin="0,0,0,10"                                        
+                    BorderThickness="0"
+                    Header="{me:LocalizationSource MainWindow.CommonSettings}"
+                    FontWeight="DemiBold">
+                    <edits:CommonSettingsEditControl
+                        DataContext="{Binding CommonSettingViewModel}" />
+                </GroupBox>
+                <GroupBox
+                    Margin="0,0,0,10"
+                    BorderThickness="0"
+                    Header="{me:LocalizationSource MainWindow.SlabBasedAlgorythmSettings}"
+                    FontWeight="DemiBold"
+                    Visibility="{Binding IsSlabBasedAlgorithm, Converter={StaticResource SlabSettingsVisible}}">
+                    <edits:SlabBasedSettingEditControl
+                        DataContext="{Binding SlabBasedSettingViewModel}" />
+                </GroupBox>                 
+            </StackPanel>            
+        </ScrollViewer>
+
+        <StackPanel
+            Grid.Row="2"
+            Orientation="Horizontal"
+            HorizontalAlignment="Right">
+            <ui:TextBlock
+                Margin="10"
+                Foreground="Orange"
+                VerticalAlignment="Center"
+                Text="{Binding ErrorText}" />
+            <ui:Button
+                Margin="10"
+                Width="130"
+                Content="{me:LocalizationSource MainWindow.ButtonCheckArea}"
+                Command="{Binding CheckAreaCommand}" />
+            <ui:Button
+                Margin="10"
+                Width="110"
+                Appearance="Info"
+                Content="{me:LocalizationSource MainWindow.ButtonOk}"
+                Click="ButtonOk_Click"
+                Command="{Binding AcceptViewCommand}" />
+            <ui:Button
+                Margin="10"
+                Width="110"
+                Content="{me:LocalizationSource MainWindow.ButtonCancel}"
+                IsCancel="True"
+                Click="ButtonCancel_Click" />
+        </StackPanel>
+    </Grid>
+</core:WpfUIPlatformWindow>

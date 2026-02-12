@@ -1,0 +1,552 @@
+﻿<core:WpfUIPlatformWindow
+    x:Class="RevitUnmodelingMep.Views.MainWindow"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:base="clr-namespace:dosymep.WPF.Views"
+    xmlns:local="clr-namespace:RevitUnmodelingMep.Views"
+    xmlns:vms="clr-namespace:RevitUnmodelingMep.ViewModels"
+    xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
+    xmlns:b="http://schemas.microsoft.com/xaml/behaviors"
+    xmlns:core="clr-namespace:dosymep.WpfUI.Core"
+    xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
+    xmlns:me="clr-namespace:dosymep.WpfCore.MarkupExtensions;assembly=dosymep.WpfCore"
+    xmlns:beh="clr-namespace:RevitUnmodelingMep.Views.Behaviors"
+    xmlns:wpfbehaviors="clr-namespace:dosymep.WpfCore.Behaviors;assembly=dosymep.WpfCore"
+   
+    mc:Ignorable="d"
+    Title="{me:LocalizationSource MainWindow.Title}"
+    
+    Height="720"
+    Width="1100"
+    
+    MinHeight="640"
+    MinWidth="960"
+   
+    d:DataContext="{d:DesignInstance vms:MainViewModel, IsDesignTimeCreatable=False}">
+
+    <core:WpfUIPlatformWindow.Resources>
+        <Style
+            TargetType="Border"
+            x:Key="CardBorder">
+            <Setter Property="Background" Value="{DynamicResource CardBackground}" />
+            <Setter Property="BorderBrush" Value="{DynamicResource CardBorderBrush}" />
+            <Setter Property="BorderThickness" Value="{DynamicResource CardControlBorderThemeThickness}" />
+            <Setter Property="CornerRadius" Value="{DynamicResource ControlCornerRadius}" />
+            <Setter Property="Padding" Value="16" />
+        </Style>
+
+        <Style
+            TargetType="TextBlock"
+            x:Key="FieldLabel">
+            <Setter Property="FontSize" Value="12" />
+            <Setter Property="Opacity" Value="0.8" />
+            <Setter Property="Margin" Value="0 6 0 2" />
+        </Style>
+
+        <Style
+            TargetType="ListBoxItem"
+            x:Key="NavItemStyle">
+            <Setter Property="MinHeight" Value="48" />
+            <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+            <Setter Property="Margin" Value="0 4 0 0" />
+            <Setter Property="Padding" Value="12" />
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="ListBoxItem">
+                        <Border
+                            x:Name="NavBorder"
+                            Background="{DynamicResource CardBackground}"
+                            BorderBrush="{DynamicResource CardBorderBrush}"
+                            BorderThickness="{DynamicResource CardControlBorderThemeThickness}"
+                            CornerRadius="{DynamicResource ControlCornerRadius}"
+                            SnapsToDevicePixels="True">
+                            <ContentPresenter
+                                Margin="6 0"
+                                VerticalAlignment="Center"
+                                RecognizesAccessKey="True" />
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="NavBorder" Property="Background" Value="{DynamicResource SubtleFillColorTertiaryBrush}" />
+                            </Trigger>
+                            <Trigger Property="IsSelected" Value="True">
+                                <Setter TargetName="NavBorder" Property="Background" Value="{DynamicResource SubtleFillColorTertiaryBrush}" />
+                                <Setter TargetName="NavBorder" Property="BorderBrush" Value="{DynamicResource CardBorderBrush}" />
+                            </Trigger>
+                            <Trigger Property="IsEnabled" Value="False">
+                                <Setter Property="Opacity" Value="0.5" />
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <Style
+            TargetType="TabControl"
+            x:Key="ContentTabControlStyle">
+            <Setter Property="BorderThickness" Value="0" />
+            <Setter Property="Padding" Value="0" />
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="TabControl">
+                        <ContentPresenter
+                            Content="{TemplateBinding SelectedContent}"
+                            ContentTemplate="{TemplateBinding SelectedContentTemplate}"
+                            ContentTemplateSelector="{TemplateBinding SelectedContentTemplateSelector}"
+                            SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}" />
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+    </core:WpfUIPlatformWindow.Resources>
+
+    <b:Interaction.Behaviors>
+        <wpfbehaviors:WpfAttachServiceBehavior
+            AttachableService="{Binding OpenFileDialogService}">
+        </wpfbehaviors:WpfAttachServiceBehavior>
+        <wpfbehaviors:WpfAttachServiceBehavior
+            AttachableService="{Binding SaveFileDialogService}">
+        </wpfbehaviors:WpfAttachServiceBehavior>
+        <wpfbehaviors:WpfAttachServiceBehavior
+            AttachableService="{Binding MessageBoxService}">
+        </wpfbehaviors:WpfAttachServiceBehavior>
+    </b:Interaction.Behaviors>
+
+    <i:Interaction.Triggers>
+        <i:EventTrigger EventName="Loaded">
+            <i:InvokeCommandAction Command="{Binding LoadViewCommand}" />
+        </i:EventTrigger>
+    </i:Interaction.Triggers>
+
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+        
+        <ui:TitleBar
+            Grid.Row="0"
+            Title="{me:LocalizationSource MainWindow.Title}" />
+
+        <Grid
+            Grid.Row="1"
+            Margin="12">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="240" />
+                <ColumnDefinition Width="16" />
+                <ColumnDefinition Width="*" />
+            </Grid.ColumnDefinitions>
+
+            <Border
+                Grid.Column="0"
+                Style="{StaticResource CardBorder}"
+                Padding="12">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="*" />
+                    </Grid.RowDefinitions>
+                    <ListBox
+                        Grid.Row="0"
+                        x:Name="NavigationList"
+                        BorderThickness="0"
+                        Background="Transparent"
+                        SelectedIndex="{Binding SelectedIndex, ElementName=ContentTabs, Mode=TwoWay}"
+                        ItemContainerStyle="{StaticResource NavItemStyle}">
+                        <ListBoxItem Content="{me:LocalizationSource MainWindow.TabTypesName}" />
+                        <ListBoxItem Content="{me:LocalizationSource MainWindow.TabDestinationName}" />
+                    </ListBox>
+
+                    <Border
+                        Grid.Row="1"
+                        Margin="0 12 0 0"
+                        IsHitTestVisible="True">
+                        <Border.Style>
+                            <Style TargetType="Border" BasedOn="{StaticResource CardBorder}">
+                                <Setter Property="Visibility" Value="Collapsed" />
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding Hint.IsHintVisible}" Value="True">
+                                        <Setter Property="Visibility" Value="Visible" />
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </Border.Style>
+
+                        <Grid>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto" />
+                                <RowDefinition Height="Auto" />
+                                <RowDefinition Height="*" />
+                            </Grid.RowDefinitions>
+
+                            <TextBlock
+                                Grid.Row="0"
+                                FontWeight="SemiBold"
+                                Text="{Binding Hint.HintTitle}" />
+
+                            <TextBlock
+                                Grid.Row="1"
+                                Margin="0 8 0 0"
+                                TextWrapping="Wrap"
+                                Opacity="0.8"
+                                Text="{Binding Hint.HintInfoText}">
+                                <TextBlock.Style>
+                                    <Style TargetType="TextBlock">
+                                        <Setter Property="Visibility" Value="Collapsed" />
+                                        <Style.Triggers>
+                                            <DataTrigger Binding="{Binding Hint.IsHintInfoVisible}" Value="True">
+                                                <Setter Property="Visibility" Value="Visible" />
+                                            </DataTrigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </TextBlock.Style>
+                            </TextBlock>
+
+                            <ScrollViewer
+                                Grid.Row="2"
+                                Margin="0 8 0 0"
+                                VerticalScrollBarVisibility="Auto">
+                                <ItemsControl ItemsSource="{Binding Hint.ActiveHintItems}">
+                                    <ItemsControl.ItemTemplate>
+                                        <DataTemplate>
+                                            <TextBlock
+                                                Margin="0 2 0 0"
+                                                FontFamily="Consolas"
+                                                Cursor="Hand"
+                                                beh:HintInsert.InsertOnClick="True"
+                                                Text="{Binding}">
+                                                <TextBlock.Style>
+                                                    <Style TargetType="TextBlock">
+                                                        <Setter Property="TextDecorations" Value="{x:Null}" />
+                                                        <Style.Triggers>
+                                                            <Trigger Property="IsMouseOver" Value="True">
+                                                                <Setter Property="TextDecorations" Value="Underline" />
+                                                            </Trigger>
+                                                        </Style.Triggers>
+                                                    </Style>
+                                                </TextBlock.Style>
+                                            </TextBlock>
+                                        </DataTemplate>
+                                    </ItemsControl.ItemTemplate>
+                                </ItemsControl>
+                            </ScrollViewer>
+                        </Grid>
+                    </Border>
+                </Grid>
+            </Border>
+
+            <Border
+                Grid.Column="2"
+                Style="{StaticResource CardBorder}">
+                <TabControl
+                    x:Name="ContentTabs"
+                    Style="{StaticResource ContentTabControlStyle}"
+                    Background="Transparent"
+                    BorderThickness="0"
+                    SelectedIndex="0"
+                     SelectionChanged="ContentTabs_OnSelectionChanged">
+                     <TabItem Header="{me:LocalizationSource MainWindow.TabTypesName}">
+                        <Grid>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto" />
+                                <RowDefinition Height="*" />
+                            </Grid.RowDefinitions>
+
+                            <ui:Button
+                                Grid.Row="0"
+                                Width="36"
+                                Height="36"
+                                Margin="0 0 0 12"
+                                Padding="0"
+                                HorizontalAlignment="Left"
+                                VerticalAlignment="Top"
+                                Content="{ui:SymbolIcon Symbol=Add24}"
+                                Command="{Binding AddConsumableTypeCommand}" />
+
+                            <ScrollViewer
+                                Grid.Row="1"
+                                VerticalScrollBarVisibility="Auto"
+                                BorderThickness="0"
+                                Padding="0 0 20 0"
+                                Margin="0 0 -20 0">
+                                <ItemsControl ItemsSource="{Binding ConsumableTypes}">
+                                    <ItemsControl.ItemTemplate>
+                                        <DataTemplate>
+                                            <Grid Margin="0 0 0 8">
+                                                <Grid.ColumnDefinitions>
+                                                    <ColumnDefinition Width="*" />
+                                                    <ColumnDefinition Width="Auto" />
+                                                </Grid.ColumnDefinitions>
+
+                                                <Expander Grid.Column="0" IsExpanded="False">
+                                                    <Expander.Header>
+                                                        <TextBlock
+                                                            FontWeight="SemiBold"
+                                                            VerticalAlignment="Center"
+                                                            Text="{Binding ConsumableTypeName}" />
+                                                    </Expander.Header>
+
+                                                    <Border Padding="5">
+                                                        <StackPanel>
+                                                            <StackPanel.Resources>
+                                                                <Style TargetType="Control">
+                                                                    <Setter Property="Margin" Value="0 4 0 0" />
+                                                                </Style>
+                                                            </StackPanel.Resources>
+                                                            <TextBlock
+                                                                Style="{StaticResource FieldLabel}"
+                                                                Text="Название расходника" />
+                                                            <ui:TextBox
+                                                                Text="{Binding ConsumableTypeName, UpdateSourceTrigger=PropertyChanged}" />
+
+                                                            <TextBlock
+                                                                Style="{StaticResource FieldLabel}"
+                                                                Text="{DynamicResource MainWindow.Category}" />
+                                                            <ComboBox
+                                                                MinHeight="32"
+                                                                ItemsSource="{Binding DataContext.CategoryOptions, RelativeSource={RelativeSource AncestorType=Window}}"
+                                                                DisplayMemberPath="Name"
+                                                                SelectedItem="{Binding SelectedCategory, Mode=TwoWay}" />
+
+                                                            <TextBlock
+                                                                Style="{StaticResource FieldLabel}"
+                                                                Text="{DynamicResource MainWindow.Group}" />
+                                                            <ui:TextBox
+                                                                MinHeight="32"
+                                                                Text="{Binding Grouping, UpdateSourceTrigger=PropertyChanged}" />
+
+                                    <TextBlock
+                                        Style="{StaticResource FieldLabel}"
+                                        Text="{DynamicResource MainWindow.FullName}"
+                                        beh:HintInsert.FocusNextOnClick="True" />
+                                    <ui:TextBox
+                                        beh:HintInsert.TrackActive="True"
+                                        beh:HintInsert.Target="FullName"
+                                        Text="{Binding Name, UpdateSourceTrigger=PropertyChanged}">
+                                        <i:Interaction.Triggers>
+                                            <i:EventTrigger EventName="GotKeyboardFocus">
+                                                <i:InvokeCommandAction Command="{Binding DataContext.Hint.BeginNameEditCommand, RelativeSource={RelativeSource AncestorType=Window}}" CommandParameter="{Binding}" />
+                                            </i:EventTrigger>
+                                            <i:EventTrigger EventName="LostKeyboardFocus">
+                                                <i:InvokeCommandAction Command="{Binding DataContext.Hint.EndNameEditCommand, RelativeSource={RelativeSource AncestorType=Window}}" CommandParameter="{Binding}" />
+                                            </i:EventTrigger>
+                                        </i:Interaction.Triggers>
+                                    </ui:TextBox>
+
+                                                            <TextBlock
+                                                                Style="{StaticResource FieldLabel}"
+                                                                Text="{DynamicResource MainWindow.Mark}" />
+                                                            <ui:TextBox
+                                                                Text="{Binding Mark, UpdateSourceTrigger=PropertyChanged}" />
+
+                                                            <TextBlock
+                                                                Style="{StaticResource FieldLabel}"
+                                                                Text="{DynamicResource MainWindow.Code}" />
+                                                            <ui:TextBox
+                                                                Text="{Binding Code, UpdateSourceTrigger=PropertyChanged}" />
+
+                                                            <TextBlock
+                                                                Style="{StaticResource FieldLabel}"
+                                                                Text="{DynamicResource MainWindow.Unit}" />
+                                                            <ui:TextBox
+                                                                Text="{Binding Unit, UpdateSourceTrigger=PropertyChanged}" />
+
+                                                            <TextBlock
+                                                                Style="{StaticResource FieldLabel}"
+                                                                Text="{DynamicResource MainWindow.Creator}" />
+                                                            <ui:TextBox
+                                                                Text="{Binding Maker, UpdateSourceTrigger=PropertyChanged}" />
+
+                                                            <TextBlock
+                                                                Style="{StaticResource FieldLabel}"
+                                                                Text="{DynamicResource MainWindow.Formula}" />
+                                                            <ui:TextBox
+                                                                AcceptsReturn="True"
+                                                                Height="90"
+                                                                TextWrapping="Wrap"
+                                                                beh:HintInsert.TrackActive="True"
+                                                                beh:HintInsert.Target="Formula"
+                                                                Text="{Binding Formula, UpdateSourceTrigger=PropertyChanged}">
+                                                                <i:Interaction.Triggers>
+                                                                    <i:EventTrigger EventName="GotKeyboardFocus">
+                                                                        <i:InvokeCommandAction Command="{Binding DataContext.Hint.BeginFormulaEditCommand, RelativeSource={RelativeSource AncestorType=Window}}" CommandParameter="{Binding}" />
+                                                                    </i:EventTrigger>
+                                                                    <i:EventTrigger EventName="LostKeyboardFocus">
+                                                                        <i:InvokeCommandAction Command="{Binding DataContext.Hint.EndFormulaEditCommand, RelativeSource={RelativeSource AncestorType=Window}}" CommandParameter="{Binding}" />
+                                                                    </i:EventTrigger>
+                                                                </i:Interaction.Triggers>
+                                                            </ui:TextBox>
+                                                            <CheckBox
+                                                                Margin="0 6 0 0"
+                                                                Content="{DynamicResource MainWindow.RoundUpTotal}"
+                                                                IsChecked="{Binding RoundUpTotal, Mode=TwoWay}" />
+
+                                                            <TextBlock
+                                                                Style="{StaticResource FieldLabel}"
+                                                                Text="{DynamicResource MainWindow.Note}" />
+                                                            <ui:TextBox
+                                                                AcceptsReturn="True"
+                                                                Height="60"
+                                                                TextWrapping="Wrap"
+                                                                beh:HintInsert.TrackActive="True"
+                                                                beh:HintInsert.Target="Note"
+                                                                Text="{Binding Note, UpdateSourceTrigger=PropertyChanged}">
+                                                                <i:Interaction.Triggers>
+                                                                    <i:EventTrigger EventName="GotKeyboardFocus">
+                                                                        <i:InvokeCommandAction Command="{Binding DataContext.Hint.BeginNoteEditCommand, RelativeSource={RelativeSource AncestorType=Window}}" CommandParameter="{Binding}" />
+                                                                    </i:EventTrigger>
+                                                                    <i:EventTrigger EventName="LostKeyboardFocus">
+                                                                        <i:InvokeCommandAction Command="{Binding DataContext.Hint.EndNoteEditCommand, RelativeSource={RelativeSource AncestorType=Window}}" CommandParameter="{Binding}" />
+                                                                    </i:EventTrigger>
+                                                                </i:Interaction.Triggers>
+                                                            </ui:TextBox>
+                                                        </StackPanel>
+                                                    </Border>
+                                                </Expander>
+
+                                                <ui:Button
+                                                    Grid.Column="1"
+                                                    Width="36"
+                                                    Height="44"
+                                                    Margin="8 0 0 0"
+                                                    Padding="0"
+                                                    VerticalAlignment="Top"
+                                                    HorizontalAlignment="Center"
+                                                    Appearance="Transparent"
+                                                    Content="{ui:SymbolIcon Symbol=Delete24}"
+                                                    Command="{Binding DataContext.RemoveConsumableTypeCommand, RelativeSource={RelativeSource AncestorType=Window}}"
+                                                    CommandParameter="{Binding}" />
+                                            </Grid>
+                                        </DataTemplate>
+                                    </ItemsControl.ItemTemplate>
+                                </ItemsControl>
+                            </ScrollViewer>
+                        </Grid>
+                    </TabItem>
+                    <TabItem Header="{me:LocalizationSource MainWindow.TabDestinationName}">
+                        <Grid>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto" />
+                                <RowDefinition Height="*" />
+                            </Grid.RowDefinitions>
+
+                            <CheckBox
+                                Grid.Row="0"
+                                Margin="0 0 0 12"
+                                Padding="0"
+                                HorizontalAlignment="Left"
+                                Content="{DynamicResource MainWindow.CheckboxOnlyInstances}"
+                                IsChecked="{Binding OnlyPlacedInProject, Mode=TwoWay}" />
+
+                            <ScrollViewer
+                                Grid.Row="1"
+                                VerticalScrollBarVisibility="Auto"
+                                BorderThickness="0"
+                                Padding="0 0 20 0"
+                                Margin="0 0 -20 0">
+                                <ItemsControl ItemsSource="{Binding CategoryAssignments}">
+                                    <ItemsControl.ItemTemplate>
+                                        <DataTemplate>
+                                            <Expander Margin="0 0 0 8" IsExpanded="False">
+                                                <Expander.Header>
+                                                    <TextBlock FontWeight="SemiBold" Text="{Binding Name}" />
+                                                </Expander.Header>
+                                                <StackPanel Margin="0 8 0 0">
+                                                    <ItemsControl ItemsSource="{Binding SystemTypes}">
+                                                        <ItemsControl.ItemTemplate>
+                                                            <DataTemplate>
+                                                                <Expander Margin="0 0 0 8" IsExpanded="False">
+                                                                    <Expander.Header>
+                                                                        <Grid>
+                                                                            <Grid.ColumnDefinitions>
+                                                                                <ColumnDefinition Width="*" />
+                                                                                <ColumnDefinition Width="Auto" />
+                                                                            </Grid.ColumnDefinitions>
+                                                                            <TextBlock VerticalAlignment="Center" Text="{Binding Name}" />
+                                                                            <CheckBox Grid.Column="1" VerticalAlignment="Center" Content="{DynamicResource MainWindow.SelectAll}" IsChecked="{Binding IsAllSelected, Mode=TwoWay}" />
+                                                                        </Grid>
+                                                                    </Expander.Header>
+                                                                    <ItemsControl ItemsSource="{Binding Configs}">
+                                                                        <ItemsControl.ItemTemplate>
+                                                                            <DataTemplate>
+                                                                                <CheckBox Margin="0 4 0 0" Content="{Binding Name}" IsChecked="{Binding IsChecked, Mode=TwoWay}" />
+                                                                            </DataTemplate>
+                                                                        </ItemsControl.ItemTemplate>
+                                                                    </ItemsControl>
+                                                                </Expander>
+                                                            </DataTemplate>
+                                                        </ItemsControl.ItemTemplate>
+                                                    </ItemsControl>
+                                                </StackPanel>
+                                            </Expander>
+                                        </DataTemplate>
+                                    </ItemsControl.ItemTemplate>
+                                </ItemsControl>
+                            </ScrollViewer>
+                        </Grid>
+                    </TabItem>
+                </TabControl>
+            </Border>
+        </Grid>
+
+        <Grid
+            Grid.Row="2"
+            Margin="12">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="Auto" />
+            </Grid.ColumnDefinitions>
+
+            <StackPanel
+                Orientation="Horizontal"
+                HorizontalAlignment="Left">
+                <ui:Button
+                    Margin="0 0 8 0"
+                    Width="100"
+                    Content="{me:LocalizationSource MainWindow.ButtonImport}"
+                    Command="{Binding ImportConfigsCommand}" />
+                <ui:Button
+                    Margin="0 0 8 0"
+                    Width="100"
+                    Content="{me:LocalizationSource MainWindow.ButtonExport}"
+                    Command="{Binding ExportConfigsCommand}" />
+                <ui:Button
+                    Width="100"
+                    Content="{me:LocalizationSource MainWindow.ButtonDefault}"
+                    Command="{Binding ResetConfigsCommand}"
+                    CommandParameter="{Binding RelativeSource={RelativeSource AncestorType=Window}}" />
+            </StackPanel>
+
+            <ui:TextBlock
+                Grid.Column="1"
+                Margin="12 0"
+                VerticalAlignment="Center"
+                Foreground="Orange"
+                Text="{Binding ErrorText}" />
+
+            <StackPanel
+                Grid.Column="2"
+                Orientation="Horizontal"
+                HorizontalAlignment="Right">
+                <ui:Button
+                    Margin="0 0 8 0"
+                    Width="90"
+                    Appearance="Info"
+                    Content="{me:LocalizationSource MainWindow.ButtonOk}"
+                    Click="ButtonOk_Click"
+                    Command="{Binding AcceptViewCommand}" />
+
+                <ui:Button
+                    Width="90"
+                    Content="{me:LocalizationSource MainWindow.ButtonCancel}"
+                    IsCancel="True"
+                    Click="ButtonCancel_Click" />
+            </StackPanel>
+        </Grid>
+    </Grid>
+</core:WpfUIPlatformWindow>

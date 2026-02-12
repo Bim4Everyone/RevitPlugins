@@ -19,14 +19,12 @@ internal static class RevitConstants {
     public const bool Search = true;
     // Самое распространенное значения для записи координат
     public const string TypeModel = "Координаты СМР";
-    // Ключевое слово, для фильтрации объемных элементов
-    public const string TypeModelPartName = "СМР";
     // Имя рабочего набора, элементы которого не будут обработаны
     public const string WorksetExcludeName = "99_Немоделируемые элементы";
     // Ключевая строка, по которому ищется координационный файл
     public const string CoordFilePartName = "KOORD";
     // Параметр, значения которого используется дли идентификации объемных элементов
-    public static RevitParam SourceVolumeParam = SharedParamsConfig.Instance.Description;
+    public static RevitParam SourceVolumeParam = SharedParamsConfig.Instance.BuildingWorksDescription;
     // Категория объемных элементов
     public static BuiltInCategory SourceVolumeCategory = BuiltInCategory.OST_GenericModel;
 
@@ -47,6 +45,9 @@ internal static class RevitConstants {
         BuiltInCategory.OST_DuctFitting,
         BuiltInCategory.OST_DuctAccessory,
         BuiltInCategory.OST_DuctInsulations,
+        BuiltInCategory.OST_DuctFittingInsulation,
+        BuiltInCategory.OST_DuctCurvesInsulation,
+        BuiltInCategory.OST_FlexDuctCurvesInsulation,
         BuiltInCategory.OST_DuctTerminal,
         BuiltInCategory.OST_ElectricalEquipment,
         BuiltInCategory.OST_ElectricalFixtures,
@@ -63,6 +64,9 @@ internal static class RevitConstants {
         BuiltInCategory.OST_PipeFitting,
         BuiltInCategory.OST_PipeAccessory,
         BuiltInCategory.OST_PipeInsulations,
+        BuiltInCategory.OST_PipeFittingInsulation,
+        BuiltInCategory.OST_PipeCurvesInsulation,
+        BuiltInCategory.OST_FlexPipeCurvesInsulation,
         BuiltInCategory.OST_Parking,
         BuiltInCategory.OST_Planting,
         BuiltInCategory.OST_PlumbingFixtures,

@@ -1,0 +1,76 @@
+<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:system="clr-namespace:System;assembly=mscorlib">
+
+    <!-- Пример перевода на русский язык (google translate) -->
+
+    <system:String x:Key="MainWindow.Title">Настройки немоделируемых</system:String>
+    <system:String x:Key="MainWindow.DocTypeError">Плагин не предназначен для работы с семействами</system:String>
+    <system:String x:Key="MainWindow.WorkSharedError">Документ должен быть настроен для общей работы</system:String>
+    <system:String x:Key="MainWindow.TabTypesName">Типы расходников</system:String>
+    <system:String x:Key="MainWindow.TabDestinationName">Назначение расходников</system:String>
+    <system:String x:Key="MainWindow.FormulaVariables">Доступные переменные</system:String>
+    <system:String x:Key="MainWindow.PlaceholderBracesHint">Переменные нужно писать внутри фигурных скобок: {Переменная}</system:String>
+    
+    <system:String x:Key="MainWindow.ButtonOk">ОК</system:String>
+    <system:String x:Key="MainWindow.ButtonCancel">Отмена</system:String>
+    <system:String x:Key="MainWindow.ButtonImport">Импорт</system:String>
+    <system:String x:Key="MainWindow.ButtonExport">Экспорт</system:String>
+    <system:String x:Key="MainWindow.ButtonDefault">Сброс</system:String>
+    <system:String x:Key="MainWindow.ResetConfirmMessage">Вы уверены что хотите сбросить до значений по умолчанию?</system:String>
+    <system:String x:Key="MainWindow.CheckboxOnlyInstances">Только размещенные в проекте</system:String>
+    <system:String x:Key="MainWindow.SelectAll">Выбрать все</system:String>
+    
+    <system:String x:Key="MainWindow.ConsName">Название расходника</system:String>
+    <system:String x:Key="MainWindow.Category">Категория</system:String>
+    <system:String x:Key="MainWindow.Group">Группирование</system:String>
+    <system:String x:Key="MainWindow.FullName">Полное наименование</system:String>
+    <system:String x:Key="MainWindow.Mark">Марка</system:String>
+    <system:String x:Key="MainWindow.Code">Код изделия</system:String>
+    <system:String x:Key="MainWindow.Unit">Ед. изм.</system:String>
+    <system:String x:Key="MainWindow.Creator">Производитель</system:String>
+    <system:String x:Key="MainWindow.Formula">Формула</system:String>
+    <system:String x:Key="MainWindow.RoundUpTotal">Округлять итог вверх до ближайшего целого</system:String>
+    <system:String x:Key="MainWindow.Note">Формула примечания</system:String>
+
+    <system:String x:Key="MainViewModel.SavePropertyDefault">по умолчанию</system:String>
+    <system:String x:Key="MainViewModel.SavePropertyEmpty">Ошибка конфигурации: не задано обязательное значение.</system:String>
+    
+
+    <system:String x:Key="Repository.PrepareConfigsTitle">Подготовка конфигурации</system:String>
+    <system:String x:Key="Repository.TransactionName">Расчет расходников</system:String>
+
+    <system:String x:Key="MainViewModel.ImportError">Не удалось импортировать настройки из выбранного файла.</system:String>
+    <system:String x:Key="MainViewModel.DuctsName">Воздуховоды</system:String>
+    <system:String x:Key="MainViewModel.PipesName">Трубы</system:String>
+    <system:String x:Key="MainViewModel.PipeInsName">Материалы изоляции трубопроводов</system:String>
+    <system:String x:Key="MainViewModel.DuctInsName">Материалы изоляции воздуховодов</system:String>
+    <system:String x:Key="MainViewModel.DuctSysName">Системы воздуховодов</system:String>
+    <system:String x:Key="MainViewModel.PipeSysName">Системы трубопроводов</system:String>
+
+    <system:String x:Key="FormulaValidator.FormulaError">Заполните формулу</system:String>
+    <system:String x:Key="FormulaValidator.DotError">Замените запятые на точки в формуле</system:String>
+    <system:String x:Key="FormulaValidator.VariableError">Недопустимая переменная в формуле</system:String>
+
+    <system:String x:Key="VisSettingsStorage.TransactionName">Обновление настроек</system:String>
+
+    <system:String x:Key="UnmodelingCreator.VisibilityWarning" xml:space="preserve">
+    Рабочий набор "99_Немоделируемые элементы" на данный момент отображается на всех видах.
+
+    Откройте диспетчер рабочих наборов и снимите галочку с параметра "Видимый на всех видах".
+
+    В данном рабочем наборе будут создаваться немоделируемые элементы и требуется исключить их видимость.
+    </system:String>
+    <system:String x:Key="UnmodelingCreator.WSSetup">Настройка рабочих наборов</system:String>
+    <system:String x:Key="UnmodelingCreator.VisibilityCaption">Рабочие наборы</system:String>
+    <system:String x:Key="UnmodelingCreator.LoadFamilyTransactionName">Загрузка семейства</system:String>
+    <system:String x:Key="UnmodelingCreator.LoadFamilyError">Не удалось загрузить семейство якорного элемента</system:String>
+    <system:String x:Key="UnmodelingCreator.FamilyOutdatedError">Обновите семейство якорного элемента.</system:String>
+
+    <system:String x:Key="UnmodelingCalculator.Error">Ошибка в расчете элемента</system:String>
+
+
+    <system:String x:Key="EditorChecker.SettigsIsBusy">Сведения о проекте сейчас редактирует пользователь: </system:String>
+    <system:String x:Key="EditorChecker.SettigsIsOutDated">Элемент принадлежит вам, но файл устарел. Выполните синхронизацию с центральным файлом.</system:String>
+
+</ResourceDictionary>
