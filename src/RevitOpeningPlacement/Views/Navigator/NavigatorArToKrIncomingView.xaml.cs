@@ -20,18 +20,6 @@ public partial class NavigatorArToKrIncomingView {
         Close();
     }
 
-    private void viewTasks_FocusedRowHandleChanged(object sender, FocusedRowHandleChangedEventArgs e) {
-        int handle = _dgIncomingTasks.View.FocusedRowHandle;
-        _dgIncomingTasks.UnselectAll();
-        _dgIncomingTasks.SelectItem(handle);
-    }
-
-    private void viewOpenings_FocusedRowHandleChanged(object sender, FocusedRowHandleChangedEventArgs e) {
-        int handle = _dgOpeningsReal.View.FocusedRowHandle;
-        _dgOpeningsReal.UnselectAll();
-        _dgOpeningsReal.SelectItem(handle);
-    }
-
     private void NavigatorView_Loaded(object sender, RoutedEventArgs e) {
         _dgIncomingTasks.GroupBy(_dgIncomingTasks.Columns[1]);
         _dgIncomingTasks.GroupBy(_dgIncomingTasks.Columns[2]);

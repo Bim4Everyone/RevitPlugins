@@ -165,7 +165,7 @@
                     <dxg:GridControl
                         x:Name="_dgIncomingTasks"
                         Grid.Row="0"
-                        ItemsSource="{Binding OpeningsTasksIncomingViewSource.View}"
+                        ItemsSource="{Binding OpeningsTasksIncoming}"
                         BorderThickness="0"
                         SelectionMode="Row"
                         MaxHeight="2000">
@@ -180,7 +180,6 @@
                                 ShowDataNavigator="True"
                                 ShowSearchPanelMode="Always"
                                 IndicatorWidth="0"
-                                FocusedRowHandleChanged="viewTasks_FocusedRowHandleChanged"
                                 NavigationStyle="Cell"
                                 VirtualizingPanel.IsVirtualizingWhenGrouping="True"
                                 VirtualizingPanel.VirtualizationMode="Recycling"
@@ -319,7 +318,7 @@
                     ShowCloseButton="False">
                     <dxg:GridControl
                         x:Name="_dgOpeningsReal"
-                        ItemsSource="{Binding OpeningsRealViewSource.View}"
+                        ItemsSource="{Binding OpeningsReal}"
                         DefaultSorting="Diameter"
                         BorderThickness="0"
                         SelectionMode="Row"
@@ -335,7 +334,6 @@
                                 ShowDataNavigator="True"
                                 ShowSearchPanelMode="Always"
                                 IndicatorWidth="0"
-                                FocusedRowHandleChanged="viewOpenings_FocusedRowHandleChanged"
                                 NavigationStyle="Cell"
                                 VirtualizingPanel.IsVirtualizingWhenGrouping="True"
                                 VirtualizingPanel.VirtualizationMode="Recycling"

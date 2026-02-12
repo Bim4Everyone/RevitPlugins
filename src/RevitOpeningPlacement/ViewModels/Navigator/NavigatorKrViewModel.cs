@@ -26,19 +26,19 @@ internal class NavigatorKrViewModel : BaseViewModel {
     private readonly RevitRepository _revitRepository;
     private readonly OpeningRealsKrConfig _config;
     private readonly IConstantsProvider _constantsProvider;
+    private readonly ILocalizationService _localization;
 
     public NavigatorKrViewModel(
         RevitRepository revitRepository,
         OpeningRealsKrConfig config,
-        IConstantsProvider constantsProvider) {
+        IConstantsProvider constantsProvider,
+        ILocalizationService localization) {
         _revitRepository = revitRepository ?? throw new ArgumentNullException(nameof(revitRepository));
         _config = config ?? throw new ArgumentNullException(nameof(config));
         _constantsProvider = constantsProvider ?? throw new ArgumentNullException(nameof(constantsProvider));
+        _localization = localization ?? throw new ArgumentNullException(nameof(localization));
         OpeningsTasksIncoming = [];
-        OpeningsTasksIncomingViewSource = new CollectionViewSource() { Source = OpeningsTasksIncoming };
-
         OpeningsReal = [];
-        OpeningsRealViewSource = new CollectionViewSource() { Source = OpeningsReal };
 
         LoadViewCommand
             = RelayCommand.Create(LoadView);
@@ -59,14 +59,10 @@ internal class NavigatorKrViewModel : BaseViewModel {
     // Входящие задания на отверстия из АР/ВИС
     public ObservableCollection<IOpeningTaskIncomingToKrViewModel> OpeningsTasksIncoming { get; }
 
-    public CollectionViewSource OpeningsTasksIncomingViewSource { get; }
-
     // Чистовые отверстия из активного документа КР
     public ObservableCollection<IOpeningRealKrViewModel> OpeningsReal { get; }
 
     public bool ShowOpeningsReal => OpeningsReal.Count > 0;
-
-    public CollectionViewSource OpeningsRealViewSource { get; }
 
     public ICommand LoadViewCommand { get; }
 
@@ -162,13 +158,17 @@ internal class NavigatorKrViewModel : BaseViewModel {
         var incomingTasksViewModels = GetOpeningsArIncomingTasksViewModels(
             incomingTasks,
             realOpenings,
-            constructureElementsIds);
-        UpdateOpeningsTasksIncoming(incomingTasksViewModels);
+            constructureElementsIds)
+            .ToList();
+        incomingTasksViewModels.AddRange(GetUniqueArIncomingTasks());
+        LoadOpeningsTasksIncoming(incomingTasksViewModels);
 
         var openingsRealViewModels = GetOpeningsRealKrViewModels(
             realOpenings,
-            (OpeningRealKr opening) => { opening.UpdateStatus(arLinks); });
-        UpdateOpeningsReal(openingsRealViewModels);
+            (OpeningRealKr opening) => { opening.UpdateStatus(arLinks); })
+            .ToList<IOpeningRealKrViewModel>();
+        openingsRealViewModels.AddRange(GetUniqueKrOpenings());
+        LoadOpeningsReal(openingsRealViewModels);
     }
 
     private void LoadIncomingMepTasks() {
@@ -184,29 +184,71 @@ internal class NavigatorKrViewModel : BaseViewModel {
                 incomingTasks,
                 realOpenings.ToArray<IOpeningReal>(),
                 constructureElementsIds)
-            .ToArray<IOpeningTaskIncomingToKrViewModel>();
-        UpdateOpeningsTasksIncoming(incomingTasksViewModels);
+            .ToList<IOpeningTaskIncomingToKrViewModel>();
+        incomingTasksViewModels.AddRange(GetUniqueMepIncomingTasks());
+        LoadOpeningsTasksIncoming(incomingTasksViewModels);
 
         var openingsRealViewModels = GetOpeningsRealKrViewModels(
             realOpenings,
-            (OpeningRealKr opening) => { opening.UpdateStatus(mepLinks); });
-        UpdateOpeningsReal(openingsRealViewModels);
+            (OpeningRealKr opening) => { opening.UpdateStatus(mepLinks); })
+            .ToList<IOpeningRealKrViewModel>();
+        openingsRealViewModels.AddRange(GetUniqueKrOpenings());
+        LoadOpeningsReal(openingsRealViewModels);
     }
 
-    private void UpdateOpeningsTasksIncoming(ICollection<IOpeningTaskIncomingToKrViewModel> incomingTasks) {
+    private void LoadOpeningsTasksIncoming(ICollection<IOpeningTaskIncomingToKrViewModel> incomingTasks) {
         OpeningsTasksIncoming.Clear();
         foreach(var incomingTask in incomingTasks) {
             OpeningsTasksIncoming.Add(incomingTask);
         }
     }
 
-    private void UpdateOpeningsReal(ICollection<OpeningRealKrViewModel> openingsReal) {
+    private void LoadOpeningsReal(ICollection<IOpeningRealKrViewModel> openingsReal) {
         OpeningsReal.Clear();
         foreach(var openingReal in openingsReal) {
             OpeningsReal.Add(openingReal);
         }
 
         OnPropertyChanged(nameof(ShowOpeningsReal));
+    }
+
+    /// <summary>
+    /// Возвращает коллекцию уникальных чистовых отверстий КР из активного файла
+    /// </summary>
+    private ICollection<IOpeningRealKrViewModel> GetUniqueKrOpenings() {
+        return _revitRepository.GetOpeningsOutcomingUnique(
+                RevitRepository.KrUniqueFamilyName,
+                BuiltInCategory.OST_GenericModel)
+            .Select(o => new OpeningRealKrUniqueViewModel(o, _localization.GetLocalizedString("Unique")))
+            .ToArray();
+    }
+
+    /// <summary>
+    /// Возвращает коллекцию уникальных входящих заданий на отверстия от ВИС
+    /// </summary>
+    private ICollection<IOpeningTaskIncomingToKrViewModel> GetUniqueMepIncomingTasks() {
+        return _revitRepository.GetOpeningsIncomingUnique(
+                RevitRepository.MepUniqueFamilyName,
+                BuiltInCategory.OST_GenericModel)
+            .Select(i => new OpeningMepTaskIncomingUniqueViewModel(
+                i.Opening,
+                i.Transform,
+                _localization.GetLocalizedString("Unique")))
+            .ToArray();
+    }
+
+    /// <summary>
+    /// Возвращает коллекцию уникальных входящих заданий на отверстия от АР
+    /// </summary>
+    private ICollection<IOpeningTaskIncomingToKrViewModel> GetUniqueArIncomingTasks() {
+        return _revitRepository.GetOpeningsIncomingUnique(
+                RevitRepository.ArUniqueFamilyName,
+                BuiltInCategory.OST_Windows)
+            .Select(i => new OpeningArTaskIncomingUniqueViewModel(
+                i.Opening,
+                i.Transform,
+                _localization.GetLocalizedString("Unique")))
+            .ToArray();
     }
 
     /// <summary>

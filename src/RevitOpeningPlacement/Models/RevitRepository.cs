@@ -796,7 +796,7 @@ internal class RevitRepository {
     /// </summary>
     /// <param name="famName">Название семейства уникального задания на отверстие</param>
     /// <param name="category">Категория семейства уникального задания на отверстие</param>
-    public ICollection<(FamilyInstance Opening, Transform transform)> GetOpeningsIncomingUnique(
+    public ICollection<(FamilyInstance Opening, Transform Transform)> GetOpeningsIncomingUnique(
         string famName,
         BuiltInCategory category) {
         var links = GetSelectedRevitLinks();
