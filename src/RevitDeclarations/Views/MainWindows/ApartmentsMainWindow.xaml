@@ -19,8 +19,8 @@
     mc:Ignorable="d"
     WindowStartupLocation="CenterOwner"
 
-    MinHeight="880" MinWidth="650"
-    Height="880" Width="650"
+    MinHeight="700" MinWidth="1000"
+    Height="700" Width="1000"
 
     d:DataContext="{d:DesignInstance vms:MainViewModel, IsDesignTimeCreatable=False}">
 
@@ -52,17 +52,12 @@
             OpenPaneLength="200"
             IsPaneOpen="True"
             PaneDisplayMode="Left"
-            IsBackButtonVisible="Visible"
+            IsBackButtonVisible="Collapsed"
             IsPaneVisible="True"
             IsPaneToggleVisible="True"
-            TitleBar="{Binding ElementName=_titleBar}"
+            PaneTitle="Декларации"
             BreadcrumbBar="{Binding ElementName=_breadcrumbBar}">
             
-            <ui:NavigationView.Header>
-                <StackPanel Margin="42,20,42,20">
-                    <ui:BreadcrumbBar x:Name="_breadcrumbBar" />
-                </StackPanel>
-            </ui:NavigationView.Header>
             <ui:NavigationView.MenuItems>
                 <ui:NavigationViewItem
                     Content="Декларация"
@@ -79,8 +74,7 @@
                     Icon="{ui:SymbolIcon WindowBulletList20}"
                     DataContext="{Binding PrioritiesViewModel}"
                     TargetPageType="{x:Type pages:PrioritiesTabItem}" />
-            </ui:NavigationView.MenuItems>
-            
+            </ui:NavigationView.MenuItems>            
         </ui:NavigationView>
 
         <StackPanel

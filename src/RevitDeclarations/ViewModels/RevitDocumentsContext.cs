@@ -19,10 +19,8 @@ internal class RevitDocumentsContext : BaseViewModel, IRevitDocumentsContext {
         set => RaiseAndSetIfChanged(ref _selectedPhase, value);
     }
 
-    public RevitDocumentsContext(
-        RevitRepository revitRepository,
-        DeclarationSettings settings) {
-
+    public RevitDocumentsContext(RevitRepository revitRepository,
+                                 DeclarationSettings settings) {
         Phases = revitRepository.GetPhases();
         SelectedPhase = Phases.Last();
 
