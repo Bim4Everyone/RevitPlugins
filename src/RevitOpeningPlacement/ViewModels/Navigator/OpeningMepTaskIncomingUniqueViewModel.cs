@@ -1,11 +1,9 @@
 using System;
 using System.Collections.Generic;
-using System.Linq;
 
 using Autodesk.Revit.DB;
 
-using dosymep.Bim4Everyone;
-using dosymep.Bim4Everyone.SystemParams;
+using dosymep.Revit;
 using dosymep.WPF.ViewModels;
 
 using RevitClashDetective.Models.Clashes;
@@ -33,11 +31,7 @@ internal class OpeningMepTaskIncomingUniqueViewModel : BaseViewModel,
         OpeningId = _opening.Id;
         FileName = _opening.Document.Title;
         Status = status;
-        Comment = _opening.GetParamValueStringOrDefault(
-            SystemParamsConfig.Instance.CreateRevitParam(
-                _opening.Document,
-                BuiltInParameter.ALL_MODEL_INSTANCE_COMMENTS),
-            string.Empty);
+        Comment = _opening.GetParamValueOrDefault(BuiltInParameter.ALL_MODEL_INSTANCE_COMMENTS, string.Empty);
         Host = new OpeningKrHost();
         FamilyShortName = string.Empty;
         Diameter = string.Empty;
@@ -108,8 +102,8 @@ internal class OpeningMepTaskIncomingUniqueViewModel : BaseViewModel,
 
     public override int GetHashCode() {
         unchecked {
-            return ((OpeningId != null ? OpeningId.GetHashCode() : 0) * 397)
-                   ^ (FileName != null ? FileName.GetHashCode() : 0);
+            return ((OpeningId?.GetHashCode() ?? 0) * 397)
+                   ^ (FileName?.GetHashCode() ?? 0);
         }
     }
 }

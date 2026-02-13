@@ -3,10 +3,6 @@ using System.Collections.Generic;
 
 using Autodesk.Revit.DB;
 
-using DevExpress.XtraEditors.Mask;
-
-using dosymep.Bim4Everyone;
-using dosymep.Bim4Everyone.SystemParams;
 using dosymep.Revit;
 using dosymep.WPF.ViewModels;
 
@@ -33,11 +29,7 @@ internal class OpeningMepTaskOutcomingUniqueViewModel : BaseViewModel,
 
         OpeningId = _opening.Id.ToString();
         Status = status;
-        Comment = opening.GetParamValueStringOrDefault(
-            SystemParamsConfig.Instance.CreateRevitParam(
-                _opening.Document,
-                BuiltInParameter.ALL_MODEL_INSTANCE_COMMENTS),
-            string.Empty);
+        Comment = opening.GetParamValueOrDefault(BuiltInParameter.ALL_MODEL_INSTANCE_COMMENTS, string.Empty);
         Date = string.Empty;
         MepSystem = string.Empty;
         Description = string.Empty;

@@ -90,7 +90,7 @@ internal class NavigatorMepViewModel : BaseViewModel {
             BuiltInCategory.OST_GenericModel);
         foreach(var item in uniqueTasks) {
             OpeningsMepTaskOutcoming.Add(
-                new OpeningMepTaskOutcomingUniqueViewModel(item, _localization.GetLocalizedString("Unique")));
+                new OpeningMepTaskOutcomingUniqueViewModel(item, _localization.GetLocalizedString("AllOpeningStatus.Unique")));
         }
     }
 

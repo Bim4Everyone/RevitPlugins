@@ -3,8 +3,7 @@ using System.Collections.Generic;
 
 using Autodesk.Revit.DB;
 
-using dosymep.Bim4Everyone;
-using dosymep.Bim4Everyone.SystemParams;
+using dosymep.Revit;
 using dosymep.WPF.ViewModels;
 
 using RevitClashDetective.Models.Clashes;
@@ -30,11 +29,7 @@ internal class OpeningArTaskIncomingUniqueViewModel : BaseViewModel, IOpeningTas
         Host = new OpeningKrHost();
         FileName = _opening.Document.Title;
         Status = status;
-        Comment = _opening.GetParamValueStringOrDefault(
-            SystemParamsConfig.Instance.CreateRevitParam(
-                _opening.Document,
-                BuiltInParameter.ALL_MODEL_INSTANCE_COMMENTS),
-            string.Empty);
+        Comment = _opening.GetParamValueOrDefault(BuiltInParameter.ALL_MODEL_INSTANCE_COMMENTS, string.Empty);
         FamilyShortName = string.Empty;
         Diameter = string.Empty;
         Height = string.Empty;

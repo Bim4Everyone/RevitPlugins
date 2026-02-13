@@ -154,7 +154,7 @@ internal class NavigatorArViewModel : BaseViewModel {
                 new OpeningMepTaskIncomingUniqueViewModel(
                     item.Opening,
                     item.Transform,
-                    _localization.GetLocalizedString("Unique")));
+                    _localization.GetLocalizedString("AllOpeningStatus.Unique")));
         }
     }
 
@@ -173,7 +173,7 @@ internal class NavigatorArViewModel : BaseViewModel {
             RevitRepository.ArUniqueFamilyName,
             BuiltInCategory.OST_Windows);
         foreach(var item in uniqueOpenings) {
-            OpeningsReal.Add(new OpeningRealArUniqueViewModel(item, _localization.GetLocalizedString("Unique")));
+            OpeningsReal.Add(new OpeningRealArUniqueViewModel(item, _localization.GetLocalizedString("AllOpeningStatus.Unique")));
         }
 
         OnPropertyChanged(nameof(ShowOpeningsReal));

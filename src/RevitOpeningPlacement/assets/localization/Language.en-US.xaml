@@ -34,7 +34,7 @@
         x:Key="Progress.UniteTouching">Merging touching... [{0}\{1}]</system:String>
 
     <system:String
-        x:Key="Unique">Unique</system:String>
+        x:Key="AllOpeningStatus.Unique">Unique</system:String>
 
     <system:String
         x:Key="Transaction.PlaceSingleOpening">Placing single opening</system:String>

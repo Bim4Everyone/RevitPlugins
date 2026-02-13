@@ -3,8 +3,6 @@ using System.Collections.Generic;
 
 using Autodesk.Revit.DB;
 
-using dosymep.Bim4Everyone;
-using dosymep.Bim4Everyone.SystemParams;
 using dosymep.Revit;
 using dosymep.WPF.ViewModels;
 
@@ -27,11 +25,7 @@ internal class OpeningRealArUniqueViewModel : BaseViewModel, IOpeningRealArViewM
         _opening = opening ?? throw new ArgumentNullException(nameof(opening));
         Status = status;
         OpeningId = opening.Id;
-        Comment = opening.GetParamValueStringOrDefault(
-            SystemParamsConfig.Instance.CreateRevitParam(
-                _opening.Document,
-                BuiltInParameter.ALL_MODEL_INSTANCE_COMMENTS),
-            string.Empty);
+        Comment = opening.GetParamValueOrDefault(BuiltInParameter.ALL_MODEL_INSTANCE_COMMENTS, string.Empty);
         LevelName = _opening.LevelId.IsNotNull() ? _opening.Document.GetElement(_opening.LevelId).Name : string.Empty;
         FamilyName = _opening.Symbol.FamilyName;
         TaskInfo = string.Empty;

@@ -3,8 +3,6 @@ using System.Collections.Generic;
 
 using Autodesk.Revit.DB;
 
-using dosymep.Bim4Everyone;
-using dosymep.Bim4Everyone.SystemParams;
 using dosymep.Revit;
 using dosymep.WPF.ViewModels;
 
@@ -31,11 +29,7 @@ internal class OpeningRealKrUniqueViewModel : BaseViewModel, IOpeningRealKrViewM
 
         OpeningId = _opening.Id;
         Status = status;
-        Comment = opening.GetParamValueStringOrDefault(
-            SystemParamsConfig.Instance.CreateRevitParam(
-                _opening.Document,
-                BuiltInParameter.ALL_MODEL_INSTANCE_COMMENTS),
-            string.Empty);
+        Comment = opening.GetParamValueOrDefault(BuiltInParameter.ALL_MODEL_INSTANCE_COMMENTS, string.Empty);
         LevelName = _opening.LevelId.IsNotNull() ? _opening.Document.GetElement(_opening.LevelId).Name : string.Empty;
         FamilyName = _opening.Symbol.FamilyName;
         Host = new OpeningKrHost(_opening.Host);

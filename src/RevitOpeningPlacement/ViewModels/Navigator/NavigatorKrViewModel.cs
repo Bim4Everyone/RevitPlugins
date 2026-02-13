@@ -219,7 +219,7 @@ internal class NavigatorKrViewModel : BaseViewModel {
         return _revitRepository.GetOpeningsOutcomingUnique(
                 RevitRepository.KrUniqueFamilyName,
                 BuiltInCategory.OST_GenericModel)
-            .Select(o => new OpeningRealKrUniqueViewModel(o, _localization.GetLocalizedString("Unique")))
+            .Select(o => new OpeningRealKrUniqueViewModel(o, _localization.GetLocalizedString("AllOpeningStatus.Unique")))
             .ToArray();
     }
 
@@ -233,7 +233,7 @@ internal class NavigatorKrViewModel : BaseViewModel {
             .Select(i => new OpeningMepTaskIncomingUniqueViewModel(
                 i.Opening,
                 i.Transform,
-                _localization.GetLocalizedString("Unique")))
+                _localization.GetLocalizedString("AllOpeningStatus.Unique")))
             .ToArray();
     }
 
@@ -247,7 +247,7 @@ internal class NavigatorKrViewModel : BaseViewModel {
             .Select(i => new OpeningArTaskIncomingUniqueViewModel(
                 i.Opening,
                 i.Transform,
-                _localization.GetLocalizedString("Unique")))
+                _localization.GetLocalizedString("AllOpeningStatus.Unique")))
             .ToArray();
     }
 

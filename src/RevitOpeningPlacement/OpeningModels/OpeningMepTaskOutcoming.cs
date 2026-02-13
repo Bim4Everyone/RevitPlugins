@@ -54,11 +54,7 @@ internal class OpeningMepTaskOutcoming : ISolidProvider, IEquatable<OpeningMepTa
         Description = GetFamilyInstanceStringParamValueOrEmpty(RevitRepository.OpeningDescription);
         CenterOffset = GetFamilyInstanceStringParamValueOrEmpty(RevitRepository.OpeningOffsetCenter);
         BottomOffset = GetFamilyInstanceStringParamValueOrEmpty(RevitRepository.OpeningOffsetBottom);
-        Comment = _familyInstance.GetParamValueStringOrDefault(
-            SystemParamsConfig.Instance.CreateRevitParam(
-                _familyInstance.Document,
-                BuiltInParameter.ALL_MODEL_INSTANCE_COMMENTS),
-            string.Empty);
+        Comment = _familyInstance.GetParamValueOrDefault(BuiltInParameter.ALL_MODEL_INSTANCE_COMMENTS, string.Empty);
         Username = GetFamilyInstanceStringParamValueOrEmpty(RevitRepository.OpeningAuthor);
     }
 
