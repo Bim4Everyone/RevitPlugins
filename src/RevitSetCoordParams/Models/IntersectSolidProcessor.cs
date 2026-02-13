@@ -10,16 +10,17 @@ using dosymep.Revit;
 using dosymep.SimpleServices;
 
 using RevitSetCoordParams.Models.Enums;
+using RevitSetCoordParams.Models.Interfaces;
 using RevitSetCoordParams.Models.Settings;
 
 
 namespace RevitSetCoordParams.Models;
-internal class SetCoordParamsProcessor {
+internal class IntersectSolidProcessor : IIntersectProcessor {
     private readonly ILocalizationService _localizationService;
     private readonly RevitRepository _revitRepository;
     private readonly SetCoordParamsSettings _settings;
 
-    public SetCoordParamsProcessor(
+    public IntersectSolidProcessor(
         ILocalizationService localizationService,
         RevitRepository revitRepository,
         SetCoordParamsSettings settings) {
@@ -42,20 +43,21 @@ internal class SetCoordParamsProcessor {
     /// </remarks>
     /// <returns>Возвращает коллекцию предупреждений WarningModel</returns>
     public IReadOnlyCollection<WarningElement> Run(IProgress<int> progress = null, CancellationToken ct = default) {
-        var sourceModels = _settings.FileProvider.GetRevitElements(_settings.TypeModel);
+        var sourceModels = _settings.TypeModels
+            .SelectMany(_settings.FileProvider.GetRevitElements).ToArray();
         var targetElements = RevitElements;
         var positionProvider = _settings.PositionProvider;
-        var sphereProvider = _settings.SphereProvider;
         double startDiam = UnitUtils.ConvertToInternalUnits(RevitConstants.StartDiameterSearchSphereMm, UnitTypeId.Millimeters);
         double maxDiam = UnitUtils.ConvertToInternalUnits(_settings.MaxDiameterSearchSphereMm, UnitTypeId.Millimeters);
         double stepDiam = UnitUtils.ConvertToInternalUnits(_settings.StepDiameterSearchSphereMm, UnitTypeId.Millimeters);
 
         var allParamMaps = _settings.ParamMaps;
-        var blockingParam = allParamMaps
+        var blockingParamMap = allParamMaps
             .FirstOrDefault(paramMap => paramMap.Type == ParamType.BlockingParam);
-
         var pairParamMaps = allParamMaps
             .Where(paramMap => paramMap.Type != ParamType.BlockingParam);
+
+        var intersector = new SolidIntersector(sourceModels);
 
         string transactionName = _localizationService.GetLocalizedString("SetCoordParamsProcessor.TransactionName");
         using var t = _revitRepository.Document.StartTransaction(transactionName);
@@ -63,52 +65,48 @@ internal class SetCoordParamsProcessor {
         int i = 0;
         foreach(var targetElement in targetElements) {
             ct.ThrowIfCancellationRequested();
-            if(blockingParam != null) {
-                if(targetElement.Element.IsExistsParam(blockingParam.TargetParam.Name)) {
-                    int blockValue = targetElement.Element.GetParamValueOrDefault<int>(blockingParam.TargetParam.Name);
-                    if(blockValue == 1) {
-                        warnings.Add(new WarningSkipElement {
-                            WarningType = WarningType.SkipElement,
-                            RevitElement = targetElement
-                        });
-                        continue;
-                    }
-                }
+
+            if(IsBlocked(blockingParamMap, targetElement)) {
+                warnings.Add(new WarningSkipElement {
+                    WarningType = WarningType.SkipElement,
+                    RevitElement = targetElement
+                });
+                continue;
             }
 
             var position = positionProvider.GetPositionElement(targetElement);
-            var sphere = sphereProvider.GetSphere(position, startDiam);
+            var sphere = _revitRepository.GetSphereSolid(position, startDiam);
 
-            var intersector = new Intersector();
-            var sourceModel = intersector.Intersect(sphere, sourceModels);
+            var sourceModel = intersector.Intersect(sphere);
 
             double currentDiam = startDiam;
-            if(!intersector.HasIntersection && _settings.Search) {
-
+            if(sourceModel == null && _settings.Search) {
                 while(currentDiam < maxDiam) {
                     currentDiam += stepDiam;
-                    sphere = sphereProvider.GetSphere(position, currentDiam);
-                    sourceModel = intersector.Intersect(sphere, sourceModels);
+                    sphere = _revitRepository.GetSphereSolid(position, startDiam);
 
-                    if(intersector.HasIntersection) {
+                    sourceModel = intersector.Intersect(sphere);
+
+                    if(sourceModel is not null) {
                         break;
                     }
                 }
             }
 
-
-            if(intersector.HasIntersection && sourceModel != null) {
+            if(sourceModel is not null) {
                 foreach(var paramMap in pairParamMaps) {
+                    string targetParamName = paramMap.TargetParam.Name;
+                    string sourceParamName = paramMap.SourceParam.Name;
 
-                    if(targetElement.Element.IsExistsParam(paramMap.TargetParam.Name)
-                        && sourceModel.Element.IsExistsParam(paramMap.SourceParam.Name)) {
+                    if(targetElement.Element.IsExistsParam(targetParamName)
+                        && sourceModel.Element.IsExistsParam(sourceParamName)) {
 
                         if(paramMap.Type == ParamType.FloorDEParam) {
-                            double value = sourceModel.Element.GetParamValueOrDefault<double>(paramMap.SourceParam.Name);
-                            targetElement.Element.SetParamValue(paramMap.TargetParam.Name, value);
+                            double value = sourceModel.Element.GetParamValueOrDefault<double>(sourceParamName);
+                            targetElement.Element.SetParamValue(targetParamName, value);
                         } else {
-                            string value = sourceModel.Element.GetParamValueOrDefault<string>(paramMap.SourceParam.Name);
-                            targetElement.Element.SetParamValue(paramMap.TargetParam.Name, value);
+                            string value = sourceModel.Element.GetParamValueOrDefault<string>(sourceParamName);
+                            targetElement.Element.SetParamValue(targetParamName, value);
                         }
 
                     } else {
@@ -129,6 +127,19 @@ internal class SetCoordParamsProcessor {
         }
         t.Commit();
         return warnings;
+    }
+
+    private bool IsBlocked(ParamMap blockingParamMap, RevitElement targetElement) {
+        if(blockingParamMap != null) {
+            string targetParamNane = blockingParamMap.TargetParam.Name;
+            if(targetElement.Element.IsExistsParam(targetParamNane)) {
+                int blockValue = targetElement.Element.GetParamValueOrDefault<int>(targetParamNane);
+                if(blockValue is not default(int) and 1) {
+                    return true;
+                }
+            }
+        }
+        return false;
     }
 
     // Метод получения элементов модели для основного метода и прогресс-бара  
