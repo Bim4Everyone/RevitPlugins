@@ -9,7 +9,24 @@
             Source="pack://application:,,,/Wpf.Ui;component/Controls/DataGrid/DataGrid.xaml" />
         <ResourceDictionary
             Source="pack://application:,,,/Wpf.Ui;component/Controls/ComboBox/ComboBox.xaml" />
+        <ResourceDictionary
+            Source="pack://application:,,,/Wpf.Ui;component/Controls/Button/Button.xaml" />
     </ResourceDictionary.MergedDictionaries>
+
+    <Style
+        x:Key="ToolTipButton"
+        TargetType="ui:Button"
+        BasedOn="{StaticResource DefaultUiButtonStyle}">
+        <Setter
+            Property="Content"
+            Value="?" />
+        <Setter
+            Property="Padding"
+            Value="6,2" />
+        <Setter
+            Property="FontSize"
+            Value="14" />
+    </Style>
 
     <Style
         TargetType="Border"
