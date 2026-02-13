@@ -29,13 +29,13 @@
 
         <Border
             Grid.Row="0"
-            Margin="14,0,14,4"
+            Margin="14,4"
             Style="{StaticResource CustomBorder}">
             <Grid>
                 <Grid.RowDefinitions>
                     <RowDefinition Height="Auto"/>
-                    <RowDefinition Height="Auto"/>
-                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="43"/>
+                    <RowDefinition Height="43"/>
                     <RowDefinition Height="Auto"/>
                 </Grid.RowDefinitions>
 
@@ -45,49 +45,52 @@
                     <ColumnDefinition/>
                 </Grid.ColumnDefinitions>
                 <TextBlock
-                    Grid.Row="1"
+                    Grid.Row="0"
                     Grid.Column="0"
                     Grid.ColumnSpan="3"
-                    Margin="10, 5">
-            <Run
-                        Text="Имена помещений квартир в проекте должны соответствовать следующему списку приоритетов." />
-            <LineBreak />
-            <Run
-                        Text="Столбцы в декларации будут созданы в соответствии с порядковым номером приоритета." />
-            <LineBreak />
-            <Run
-                        Text="Помещения, для которых не найден приоритет, будут добавлены в конце таблицы." />
-            <LineBreak />
-            <Run
-                        Text="Приоритеты настраиваются в файле JSON. Вы можете использовать ваш собственный файл приоритетов." />
+                    Margin="0,0,0,4">
+                    <Run Text="Имена помещений квартир в проекте должны соответствовать следующему списку приоритетов." />
+                    <LineBreak />
+                    <Run Text="Столбцы в декларации будут созданы в соответствии с порядковым номером приоритета." />
+                    <LineBreak />
+                    <Run Text="Помещения, для которых не найден приоритет, будут добавлены в конце таблицы." />
+                    <LineBreak />
+                    <Run Text="Приоритеты настраиваются в файле JSON. Вы можете использовать ваш собственный файл приоритетов." />
                 </TextBlock>
 
-                <Button
-                    Grid.Row="2"
+                <ui:Button
+                    Grid.Row="1"
                     Grid.Column="0"
+                    Margin="0,4,4,4"
+                    HorizontalAlignment="Stretch"
+                    Appearance="Info"
                     Content="Корпоративные приоритеты"
-                    Margin="10, 5"
                     Command="{Binding SetDefaultConfigCommand}" />
-                <Button
-                    Grid.Row="2"
+                <ui:Button
+                    Grid.Row="1"
                     Grid.Column="1"
+                    Margin="4"
+                    HorizontalAlignment="Stretch"
+                    Appearance="Info"
                     Content="Экспорт приоритетов"
-                    Margin="10, 5"
                     Command="{Binding ExportConfigCommand}" />
-                <Button
-                    Grid.Row="2"
+                <ui:Button
+                    Grid.Row="1"
                     Grid.Column="2"
+                    Margin="4,4,0,4"
                     Content="Импорт приоритетов"
-                    Margin="10, 5"
+                    Appearance="Info"
+                    HorizontalAlignment="Stretch"
                     Command="{Binding ImportConfigCommand}" />
 
                 <TextBlock
-                    Grid.Row="3"
+                    Grid.Row="2"
                     Grid.Column="0"
-                    Margin="10,0"
+                    Margin="4,8"
+                    VerticalAlignment="Center"
                     Text="Путь к файлу приоритетов:" />
                 <TextBlock
-                    Grid.Row="3"
+                    Grid.Row="2"
                     Grid.Column="1"
                     Grid.ColumnSpan="2"
                     Margin="0, 5, 10, 5"
@@ -106,6 +109,7 @@
                 Grid.Column="0"
                 Grid.ColumnSpan="3"
                 Margin="10"
+                GridLinesVisibility="All"
                 AutoGenerateColumns="False"
                 CanUserAddRows="False"
                 CanUserDeleteRows="False"
@@ -113,7 +117,7 @@
                 <DataGrid.Columns>
                     <DataGridTextColumn
                         Header="Номер"
-                        Width="50"
+                        Width="80"
                         IsReadOnly="True"
                         Binding="{Binding OrdinalNumber}" />
                     <DataGridTextColumn

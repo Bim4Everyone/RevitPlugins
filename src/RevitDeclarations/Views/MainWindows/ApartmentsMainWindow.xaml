@@ -56,11 +56,11 @@
                     TargetPageType="{x:Type pages:DeclarationTabItem}" />
                 <ui:NavigationViewItem
                     Content="Параметры"
-                    Icon="{ui:SymbolIcon WindowBulletList20}"
+                    Icon="{ui:SymbolIcon TextBulletListSquare20}"
                     TargetPageType="{x:Type pages:ParamsApartmentsTabItem}" />
                 <ui:NavigationViewItem
                     Content="Приоритеты"
-                    Icon="{ui:SymbolIcon WindowBulletList20}"
+                    Icon="{ui:SymbolIcon NumberSymbolSquare20}"
                     TargetPageType="{x:Type pages:PrioritiesTabItem}" />
             </ui:NavigationView.MenuItems>            
         </ui:NavigationView>
