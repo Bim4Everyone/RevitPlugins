@@ -53,17 +53,14 @@
                 <ui:NavigationViewItem
                     Content="Декларация"
                     Icon="{ui:SymbolIcon WindowBulletList20}"
-                    DataContext="{Binding}"
                     TargetPageType="{x:Type pages:DeclarationTabItem}" />
                 <ui:NavigationViewItem
                     Content="Параметры"
                     Icon="{ui:SymbolIcon WindowBulletList20}"
-                    DataContext="{Binding ParametersViewModel}"
                     TargetPageType="{x:Type pages:ParamsApartmentsTabItem}" />
                 <ui:NavigationViewItem
                     Content="Приоритеты"
                     Icon="{ui:SymbolIcon WindowBulletList20}"
-                    DataContext="{Binding PrioritiesViewModel}"
                     TargetPageType="{x:Type pages:PrioritiesTabItem}" />
             </ui:NavigationView.MenuItems>            
         </ui:NavigationView>
@@ -83,6 +80,7 @@
                 Width="80"
                 Content="ОК"
                 IsDefault="True"
+                Appearance="Info"
                 Click="ButtonOk_Click"
                 Command="{Binding ExportDeclarationCommand}"/>
 

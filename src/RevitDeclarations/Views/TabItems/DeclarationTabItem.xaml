@@ -34,71 +34,73 @@
 
             <Border
                 Grid.Row="0"
-                Margin="14,0,14,4"
+                Margin="14,4"
                 Style="{StaticResource CustomBorder}">
                 <Grid>
                     <Grid.RowDefinitions>
-                        <RowDefinition Height="*"/>
-                        <RowDefinition Height="*"/>
-                        <RowDefinition Height="*"/>
-                        <RowDefinition Height="*"/>
+                        <RowDefinition Height="43"/>
+                        <RowDefinition Height="43"/>
+                        <RowDefinition Height="Auto" MinHeight="44"/>
+                        <RowDefinition Height="43"/>
                     </Grid.RowDefinitions>
                     <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="180"/>
+                        <ColumnDefinition Width="230"/>
                         <ColumnDefinition />
-                        <ColumnDefinition Width="150"/>
+                        <ColumnDefinition Width="Auto"/>
                     </Grid.ColumnDefinitions>
-                    
-                <TextBlock 
-                    Grid.Row="0"
-                    Grid.Column="0"
-                    Grid.ColumnSpan="3"
-                    Style="{StaticResource HeaderName}"
-                    Text="Формат выгрузки"/>
 
-                <TextBlock
-                    Grid.Row="1"
-                    Grid.Column="0"
-                    Margin="10, 0"
-                    Text="Название файла:"/>
-                <ui:TextBox
-                    Grid.Row="1"
-                    Grid.Column="1"
-                    Text="{Binding FileName, UpdateSourceTrigger=PropertyChanged}"/>
-                <ui:Button
-                    Grid.Row="1"
-                    Grid.Column="2"
-                    Margin="0, 0, 10, 0"
-                    Content = "Выбрать папку"
-                    Command="{Binding SelectFolderCommand}"/>
+                    <ui:TextBlock 
+                        Grid.Row="0"
+                        Grid.Column="0"
+                        Grid.ColumnSpan="3"
+                        Style="{StaticResource HeaderName}"
+                        Text="Формат выгрузки"/>
 
-                <TextBlock
-                    Grid.Row="2"  
-                    Grid.Column="0"
-                    Margin="10,0"
-                    Text="Папка выгрузки:"/>
-                <TextBlock
-                    Grid.Row="2"
-                    Grid.Column="1"
-                    Grid.ColumnSpan="2"
-                    Margin="0, 5, 10, 5"
-                    VerticalAlignment="Center"
-                    TextWrapping="Wrap"
-                    Text="{Binding FilePath}"/>
+                    <TextBlock
+                        Grid.Row="1"
+                        Grid.Column="0"
+                        Style="{StaticResource PropertyName}"
+                        Text="Название файла:"/>
+                    <ui:TextBox
+                        Grid.Row="1"
+                        Grid.Column="1"
+                        Height="35"
+                        Text="{Binding FileName, UpdateSourceTrigger=PropertyChanged}"/>
+                    <ui:Button
+                        Grid.Row="1"
+                        Grid.Column="2"
+                        Margin="4,0,0,0"
+                        Appearance="Info"
+                        Height="35"
+                        Content = "Выбрать папку"
+                        Command="{Binding SelectFolderCommand}"/>
 
-                <TextBlock
-                    Grid.Row="3"
-                    Grid.Column="0"
-                    Margin="10, 0"
-                    Text="Формат файла:"/>
-                <ComboBox
-                    Grid.Row="3"
-                    Grid.Column="1"
-                    Grid.ColumnSpan="2"
-                    Margin="0, 0, 10, 0"
-                    ItemsSource="{Binding ExportFormats}"
-                    DisplayMemberPath="Name"
-                    SelectedItem="{Binding SelectedFormat}"/>
+                    <TextBlock
+                        Grid.Row="2"  
+                        Grid.Column="0"
+                        Style="{StaticResource PropertyName}"
+                        Text="Папка выгрузки:"/>
+                    <TextBlock
+                        Grid.Row="2"
+                        Grid.Column="1"
+                        Grid.ColumnSpan="2"
+                        Margin="2,0,0,0"
+                        VerticalAlignment="Center"
+                        TextWrapping="Wrap"
+                        Text="{Binding FilePath}"/>
+
+                    <TextBlock
+                        Grid.Row="3"
+                        Grid.Column="0"
+                        Style="{StaticResource PropertyName}"
+                        Text="Формат файла:"/>
+                    <ComboBox
+                        Grid.Row="3"
+                        Grid.Column="1"
+                        Grid.ColumnSpan="2"
+                        ItemsSource="{Binding ExportFormats}"
+                        DisplayMemberPath="Name"
+                        SelectedItem="{Binding SelectedFormat}"/>
                 </Grid>
             </Border>
 
@@ -108,13 +110,13 @@
                 Style="{StaticResource CustomBorder}">
                 <Grid>
                     <Grid.RowDefinitions>
-                        <RowDefinition/>
-                        <RowDefinition/>
-                        <RowDefinition/>
-                        <RowDefinition/>
+                        <RowDefinition Height="43"/>
+                        <RowDefinition Height="43"/>
+                        <RowDefinition Height="43"/>
+                        <RowDefinition Height="43"/>
                     </Grid.RowDefinitions>
                     <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="200" />
+                        <ColumnDefinition Width="230" />
                         <ColumnDefinition />
                         <ColumnDefinition />
                     </Grid.ColumnDefinitions>
@@ -128,27 +130,26 @@
                     <TextBlock 
                         Grid.Row="1"
                         Grid.Column="0"
-                        Margin="10, 0"
+                        Style="{StaticResource PropertyName}"
                         Text="Стадия:"/>
                     <ComboBox
                         Grid.Row="1"
                         Grid.Column="1"
                         Grid.ColumnSpan="2"
-                        Margin="0, 0, 10, 0"
                         ItemsSource="{Binding Phases}"
                         DisplayMemberPath="Name"
                         SelectedItem="{Binding SelectedPhase}"/>
 
                     <TextBlock 
                         Grid.Row="2"
-                        Grid.Column="0"                    
-                        Margin="10, 0"
+                        Grid.Column="0"
+                        Style="{StaticResource PropertyName}"
                         Text="Количество знаков после запятой:"/>
                     <TextBox
                         Grid.Row="2"
                         Grid.Column="1"
                         Grid.ColumnSpan="2"
-                        Margin="0, 0, 10, 0"
+                        Height="35"
                         PreviewTextInput="IndentValidation"
                         PreviewKeyDown="TextBox_PreviewKeyDown"
                         Text="{Binding Accuracy}"/>
@@ -156,7 +157,7 @@
                     <TextBlock
                         Grid.Row="3"
                         Grid.Column="0"
-                        Margin="10, 0"
+                        Style="{StaticResource PropertyName}"
                         Text="Рассчитывать УТП:"/>
                     <StackPanel
                         Grid.Row="3"
@@ -164,6 +165,7 @@
                         Orientation="Horizontal">
                         <CheckBox
                             VerticalAlignment="Center"
+                            HorizontalAlignment="Left"
                             IsEnabled="{Binding CanLoadUtp}"
                             IsChecked="{Binding LoadUtp}"/>
                         <TextBlock
@@ -182,7 +184,7 @@
                 Style="{StaticResource CustomBorder}">
                 <Grid>
                     <Grid.RowDefinitions>
-                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="43"/>
                         <RowDefinition />
                     </Grid.RowDefinitions>
                     <TextBlock 
@@ -193,7 +195,6 @@
                         Grid.Row="1"
                         Style="{StaticResource CustomBorder}">
                         <ListBox                    
-                            Margin="10, 0, 10, 10"
                             ItemsSource="{Binding RevitDocuments}">
                             <ListBox.ItemTemplate>
                                 <DataTemplate>
