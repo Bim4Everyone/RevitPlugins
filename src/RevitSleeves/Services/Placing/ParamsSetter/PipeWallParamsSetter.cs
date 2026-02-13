@@ -31,7 +31,11 @@ internal class PipeWallParamsSetter : PipeParamsSetter, IParamsSetter<ClashModel
 
     public void SetParamValues(FamilyInstance sleeve) {
         SetElevation(sleeve, _pointFinder.GetPoint(_clash));
-        SetInclineAngle(sleeve, _clash.MepElement.GetParamValue<double>(BuiltInParameter.RBS_PIPE_SLOPE));
+        SetInclineAngle(
+            sleeve,
+            Math.Atan(
+                _clash.MepElement.GetParamValue<double>(
+                    BuiltInParameter.RBS_PIPE_SLOPE))); // у труб уклон в процентах, у гильзы в радианах
         var diameterRange = GetSleeveDiameterRange(_clash.MepElement);
         if(diameterRange is null) {
             _errorsService.AddError([_clash.MepElement], "Exceptions.CannotFindDiameterRange");
