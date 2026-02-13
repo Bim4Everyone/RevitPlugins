@@ -3,14 +3,15 @@ using System.Windows;
 using DevExpress.Xpf.Grid;
 
 namespace RevitOpeningPlacement.Views.Navigator;
+
 /// <summary>
 /// Класс окна для отображения входящих заданий на отверстия в файле архитектора или конструктора
 /// </summary>
-public partial class NavigatorMepIncomingView {
+public partial class NavigatorMepToArIncomingView {
     /// <summary>
     /// Конструктор окна для отображения входящих заданий на отверстия в файле архитектора или конструктора
     /// </summary>
-    public NavigatorMepIncomingView() {
+    public NavigatorMepToArIncomingView() {
         InitializeComponent();
         Loaded += NavigatorView_Loaded;
     }
@@ -27,19 +28,7 @@ public partial class NavigatorMepIncomingView {
     }
 
     public override string PluginName => nameof(RevitOpeningPlacement);
-    public override string ProjectConfigName => nameof(NavigatorMepIncomingView);
-
-
-    private void viewTasks_FocusedRowHandleChanged(object sender, FocusedRowHandleChangedEventArgs e) {
-        int handle = _dgIncomingTasks.View.FocusedRowHandle;
-        _dgIncomingTasks.UnselectAll();
-        _dgIncomingTasks.SelectItem(handle);
-    }
-    private void viewOpenings_FocusedRowHandleChanged(object sender, FocusedRowHandleChangedEventArgs e) {
-        int handle = _dgOpeningsReal.View.FocusedRowHandle;
-        _dgOpeningsReal.UnselectAll();
-        _dgOpeningsReal.SelectItem(handle);
-    }
+    public override string ProjectConfigName => nameof(NavigatorMepToArIncomingView);
 
     private void SimpleButton_Click(object sender, RoutedEventArgs e) {
         Close();

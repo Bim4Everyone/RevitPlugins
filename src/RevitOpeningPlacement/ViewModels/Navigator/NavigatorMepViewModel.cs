@@ -23,40 +23,32 @@ namespace RevitOpeningPlacement.ViewModels.Navigator;
 /// <summary>
 /// Модель представления окна для просмотра исходящих заданий на отверстия в файле инженера
 /// </summary>
-internal class MepNavigatorForOutcomingTasksViewModel : BaseViewModel {
+internal class NavigatorMepViewModel : BaseViewModel {
     private readonly RevitRepository _revitRepository;
     private readonly IConstantsProvider _constantsProvider;
+    private readonly ILocalizationService _localization;
     private readonly IResolutionRoot _resolutionRoot;
-    private OpeningMepTaskOutcomingViewModel _selectedOpeningMepTaskOutcoming;
 
-
-    public MepNavigatorForOutcomingTasksViewModel(
+    public NavigatorMepViewModel(
         Models.Configs.OpeningConfig openingConfig,
         RevitRepository revitRepository,
         IResolutionRoot resolutionRoot,
-        IConstantsProvider constantsProvider) {
+        IConstantsProvider constantsProvider,
+        ILocalizationService localization) {
         _revitRepository = revitRepository ?? throw new ArgumentNullException(nameof(revitRepository));
         _constantsProvider = constantsProvider ?? throw new ArgumentNullException(nameof(constantsProvider));
+        _localization = localization ?? throw new ArgumentNullException(nameof(localization));
         _resolutionRoot = resolutionRoot ?? throw new ArgumentNullException(nameof(resolutionRoot));
 
         ConfigName = openingConfig.Name;
         OpeningsMepTaskOutcoming = [];
-        OpeningsMepTasksOutcomingViewSource = new CollectionViewSource() { Source = OpeningsMepTaskOutcoming };
 
         SelectCommand = RelayCommand.Create<ISelectorAndHighlighter>(SelectElement, CanSelect);
         RenewCommand = RelayCommand.Create(Renew);
         LoadViewCommand = RelayCommand.Create(LoadView);
     }
 
-
-    public ObservableCollection<OpeningMepTaskOutcomingViewModel> OpeningsMepTaskOutcoming { get; }
-
-    public CollectionViewSource OpeningsMepTasksOutcomingViewSource { get; private set; }
-
-    public OpeningMepTaskOutcomingViewModel SelectedOpeningMepTaskOutcoming {
-        get => _selectedOpeningMepTaskOutcoming;
-        set => RaiseAndSetIfChanged(ref _selectedOpeningMepTaskOutcoming, value);
-    }
+    public ObservableCollection<IOpeningMepTaskOutcomingViewModel> OpeningsMepTaskOutcoming { get; }
 
     public string ConfigName { get; }
 
@@ -86,13 +78,19 @@ internal class MepNavigatorForOutcomingTasksViewModel : BaseViewModel {
 
     private void LoadView() {
         var outcomingTasks = _revitRepository.GetOpeningsMepTasksOutcoming();
-        IList<ElementId> outcomingTasksIds = outcomingTasks.Select(task => task.Id).ToList();
-        var mepElementsIds = _revitRepository.GetMepElementsIds();
         var openingTaskOutcomingViewModels = GetMepTaskOutcomingViewModels(outcomingTasks);
 
         OpeningsMepTaskOutcoming.Clear();
         foreach(var item in openingTaskOutcomingViewModels) {
             OpeningsMepTaskOutcoming.Add(item);
+        }
+
+        var uniqueTasks = _revitRepository.GetOpeningsOutcomingUnique(
+            RevitRepository.MepUniqueFamilyName,
+            BuiltInCategory.OST_GenericModel);
+        foreach(var item in uniqueTasks) {
+            OpeningsMepTaskOutcoming.Add(
+                new OpeningMepTaskOutcomingUniqueViewModel(item, _localization.GetLocalizedString("AllOpeningStatus.Unique")));
         }
     }
 

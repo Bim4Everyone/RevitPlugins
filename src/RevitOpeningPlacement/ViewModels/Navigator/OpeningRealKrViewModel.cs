@@ -18,7 +18,7 @@ namespace RevitOpeningPlacement.ViewModels.Navigator;
 /// Модель представления чистового отверстия в навигаторе КР по входящим заданиям на отверстия.
 /// Использовать для отображения чистовых отверстий КР из активного документа, которые требуют внимания конструктора
 /// </summary>
-internal class OpeningRealKrViewModel : BaseViewModel, ISelectorAndHighlighter, IEquatable<OpeningRealKrViewModel> {
+internal class OpeningRealKrViewModel : BaseViewModel, IOpeningRealKrViewModel, IEquatable<OpeningRealKrViewModel> {
     private readonly OpeningRealKr _openingReal;
 
 
@@ -37,55 +37,24 @@ internal class OpeningRealKrViewModel : BaseViewModel, ISelectorAndHighlighter, 
         Host = new OpeningKrHost(openingReal.GetFamilyInstance().Host);
     }
 
+    public ElementId OpeningId { get; }
 
-    /// <summary>
-    /// Id экземпляра семейства чистового на отверстия
-    /// </summary>
-    public ElementId OpeningId { get; } = ElementId.InvalidElementId;
+    public string Diameter { get; }
 
-    /// <summary>
-    /// Диаметр
-    /// </summary>
-    public string Diameter { get; } = string.Empty;
+    public string Width { get; }
 
-    /// <summary>
-    /// Ширина
-    /// </summary>
-    public string Width { get; } = string.Empty;
+    public string Height { get; }
 
-    /// <summary>
-    /// Высота
-    /// </summary>
-    public string Height { get; } = string.Empty;
+    public string Status { get; }
 
-    /// <summary>
-    /// Статус чистового отверстия
-    /// </summary>
-    public string Status { get; } = string.Empty;
+    public string Comment { get; }
 
-    /// <summary>
-    /// Комментарий
-    /// </summary>
-    public string Comment { get; } = string.Empty;
+    public string LevelName { get; }
 
-    /// <summary>
-    /// Название уровня
-    /// </summary>
-    public string LevelName { get; } = string.Empty;
+    public string TaskInfo { get; }
 
-    /// <summary>
-    /// Информация о задании, по которому было создано данное чистовое отверстие
-    /// </summary>
-    public string TaskInfo { get; } = string.Empty;
+    public string FamilyName { get; }
 
-    /// <summary>
-    /// Название семейства
-    /// </summary>
-    public string FamilyName { get; } = string.Empty;
-
-    /// <summary>
-    /// Основа чистового отверстия
-    /// </summary>
     public IOpeningKrHost Host { get; }
 
     public override bool Equals(object obj) {

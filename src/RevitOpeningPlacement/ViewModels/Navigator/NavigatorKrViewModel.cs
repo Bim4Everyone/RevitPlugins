@@ -18,28 +18,27 @@ using RevitOpeningPlacement.OpeningModels;
 using RevitOpeningPlacement.Services;
 
 namespace RevitOpeningPlacement.ViewModels.Navigator;
+
 /// <summary>
 /// Модель представления окна для просмотра входящих заданий на отверстия от архитектора в файле конструктора
 /// </summary>
-internal class ConstructureNavigatorForIncomingTasksViewModel : BaseViewModel {
+internal class NavigatorKrViewModel : BaseViewModel {
     private readonly RevitRepository _revitRepository;
     private readonly OpeningRealsKrConfig _config;
     private readonly IConstantsProvider _constantsProvider;
+    private readonly ILocalizationService _localization;
 
-
-    public ConstructureNavigatorForIncomingTasksViewModel(
+    public NavigatorKrViewModel(
         RevitRepository revitRepository,
         OpeningRealsKrConfig config,
-        IConstantsProvider constantsProvider) {
-
+        IConstantsProvider constantsProvider,
+        ILocalizationService localization) {
         _revitRepository = revitRepository ?? throw new ArgumentNullException(nameof(revitRepository));
         _config = config ?? throw new ArgumentNullException(nameof(config));
         _constantsProvider = constantsProvider ?? throw new ArgumentNullException(nameof(constantsProvider));
+        _localization = localization ?? throw new ArgumentNullException(nameof(localization));
         OpeningsTasksIncoming = [];
-        OpeningsTasksIncomingViewSource = new CollectionViewSource() { Source = OpeningsTasksIncoming };
-
         OpeningsReal = [];
-        OpeningsRealViewSource = new CollectionViewSource() { Source = OpeningsReal };
 
         LoadViewCommand
             = RelayCommand.Create(LoadView);
@@ -57,34 +56,13 @@ internal class ConstructureNavigatorForIncomingTasksViewModel : BaseViewModel {
             = RelayCommand.Create(PlaceManyRealOpeningsByManyTasksInManyHosts);
     }
 
-
     // Входящие задания на отверстия из АР/ВИС
-    public ObservableCollection<IOpeningTaskIncomingForKrViewModel> OpeningsTasksIncoming { get; }
-
-    public CollectionViewSource OpeningsTasksIncomingViewSource { get; private set; }
-
-    private IOpeningTaskIncomingForKrViewModel _selectedOpeningTaskIncoming;
-
-    public IOpeningTaskIncomingForKrViewModel SelectedOpeningTaskIncoming {
-        get => _selectedOpeningTaskIncoming;
-        set => RaiseAndSetIfChanged(ref _selectedOpeningTaskIncoming, value);
-    }
-
+    public ObservableCollection<IOpeningTaskIncomingToKrViewModel> OpeningsTasksIncoming { get; }
 
     // Чистовые отверстия из активного документа КР
-    public ObservableCollection<OpeningRealKrViewModel> OpeningsReal { get; }
+    public ObservableCollection<IOpeningRealKrViewModel> OpeningsReal { get; }
 
     public bool ShowOpeningsReal => OpeningsReal.Count > 0;
-
-    public CollectionViewSource OpeningsRealViewSource { get; private set; }
-
-    private OpeningRealKrViewModel _selectedOpeningReal;
-
-    public OpeningRealKrViewModel SelectedOpeningReal {
-        get => _selectedOpeningReal;
-        set => RaiseAndSetIfChanged(ref _selectedOpeningReal, value);
-    }
-
 
     public ICommand LoadViewCommand { get; }
 
@@ -100,7 +78,6 @@ internal class ConstructureNavigatorForIncomingTasksViewModel : BaseViewModel {
 
     public ICommand PlaceManyRealOpeningsByManyTasksInManyHostsCommand { get; }
 
-
     private void SelectElement(ISelectorAndHighlighter p) {
         _revitRepository.SelectAndShowElement(p);
     }
@@ -114,6 +91,7 @@ internal class ConstructureNavigatorForIncomingTasksViewModel : BaseViewModel {
             var cmd = new GetOpeningTasksCmd();
             cmd.ExecuteCommand(_revitRepository.UIApplication);
         }
+
         _revitRepository.DoAction(action);
     }
 
@@ -122,6 +100,7 @@ internal class ConstructureNavigatorForIncomingTasksViewModel : BaseViewModel {
             var cmd = new PlaceOneOpeningRealByOneTaskCmd();
             cmd.ExecuteCommand(_revitRepository.UIApplication);
         }
+
         _revitRepository.DoAction(action);
     }
 
@@ -130,6 +109,7 @@ internal class ConstructureNavigatorForIncomingTasksViewModel : BaseViewModel {
             var cmd = new PlaceOneOpeningRealByManyTasksCmd();
             cmd.ExecuteCommand(_revitRepository.UIApplication);
         }
+
         _revitRepository.DoAction(action);
     }
 
@@ -138,6 +118,7 @@ internal class ConstructureNavigatorForIncomingTasksViewModel : BaseViewModel {
             var cmd = new PlaceManyOpeningRealsByManyTasksInOneHostCmd();
             cmd.ExecuteCommand(_revitRepository.UIApplication);
         }
+
         _revitRepository.DoAction(action);
     }
 
@@ -146,6 +127,7 @@ internal class ConstructureNavigatorForIncomingTasksViewModel : BaseViewModel {
             var cmd = new PlaceManyOpeningRealsByManyTasksInManyHostsCmd();
             cmd.ExecuteCommand(_revitRepository.UIApplication);
         }
+
         _revitRepository.DoAction(action);
     }
 
@@ -176,13 +158,17 @@ internal class ConstructureNavigatorForIncomingTasksViewModel : BaseViewModel {
         var incomingTasksViewModels = GetOpeningsArIncomingTasksViewModels(
             incomingTasks,
             realOpenings,
-            constructureElementsIds);
-        UpdateOpeningsTasksIncoming(incomingTasksViewModels);
+            constructureElementsIds)
+            .ToList();
+        incomingTasksViewModels.AddRange(GetUniqueArIncomingTasks());
+        LoadOpeningsTasksIncoming(incomingTasksViewModels);
 
         var openingsRealViewModels = GetOpeningsRealKrViewModels(
             realOpenings,
-            (OpeningRealKr opening) => { opening.UpdateStatus(arLinks); });
-        UpdateOpeningsReal(openingsRealViewModels);
+            (OpeningRealKr opening) => { opening.UpdateStatus(arLinks); })
+            .ToList<IOpeningRealKrViewModel>();
+        openingsRealViewModels.AddRange(GetUniqueKrOpenings());
+        LoadOpeningsReal(openingsRealViewModels);
     }
 
     private void LoadIncomingMepTasks() {
@@ -195,31 +181,74 @@ internal class ConstructureNavigatorForIncomingTasksViewModel : BaseViewModel {
             .ToArray();
 
         var incomingTasksViewModels = GetOpeningsMepIncomingTasksViewModels(
-            incomingTasks,
-            realOpenings.ToArray<IOpeningReal>(),
-            constructureElementsIds)
-            .ToArray<IOpeningTaskIncomingForKrViewModel>();
-        UpdateOpeningsTasksIncoming(incomingTasksViewModels);
+                incomingTasks,
+                realOpenings.ToArray<IOpeningReal>(),
+                constructureElementsIds)
+            .ToList<IOpeningTaskIncomingToKrViewModel>();
+        incomingTasksViewModels.AddRange(GetUniqueMepIncomingTasks());
+        LoadOpeningsTasksIncoming(incomingTasksViewModels);
 
         var openingsRealViewModels = GetOpeningsRealKrViewModels(
             realOpenings,
-            (OpeningRealKr opening) => { opening.UpdateStatus(mepLinks); });
-        UpdateOpeningsReal(openingsRealViewModels);
+            (OpeningRealKr opening) => { opening.UpdateStatus(mepLinks); })
+            .ToList<IOpeningRealKrViewModel>();
+        openingsRealViewModels.AddRange(GetUniqueKrOpenings());
+        LoadOpeningsReal(openingsRealViewModels);
     }
 
-    private void UpdateOpeningsTasksIncoming(ICollection<IOpeningTaskIncomingForKrViewModel> incomingTasks) {
+    private void LoadOpeningsTasksIncoming(ICollection<IOpeningTaskIncomingToKrViewModel> incomingTasks) {
         OpeningsTasksIncoming.Clear();
         foreach(var incomingTask in incomingTasks) {
             OpeningsTasksIncoming.Add(incomingTask);
         }
     }
 
-    private void UpdateOpeningsReal(ICollection<OpeningRealKrViewModel> openingsReal) {
+    private void LoadOpeningsReal(ICollection<IOpeningRealKrViewModel> openingsReal) {
         OpeningsReal.Clear();
         foreach(var openingReal in openingsReal) {
             OpeningsReal.Add(openingReal);
         }
+
         OnPropertyChanged(nameof(ShowOpeningsReal));
+    }
+
+    /// <summary>
+    /// Возвращает коллекцию уникальных чистовых отверстий КР из активного файла
+    /// </summary>
+    private ICollection<IOpeningRealKrViewModel> GetUniqueKrOpenings() {
+        return _revitRepository.GetOpeningsOutcomingUnique(
+                RevitRepository.KrUniqueFamilyName,
+                BuiltInCategory.OST_GenericModel)
+            .Select(o => new OpeningRealKrUniqueViewModel(o, _localization.GetLocalizedString("AllOpeningStatus.Unique")))
+            .ToArray();
+    }
+
+    /// <summary>
+    /// Возвращает коллекцию уникальных входящих заданий на отверстия от ВИС
+    /// </summary>
+    private ICollection<IOpeningTaskIncomingToKrViewModel> GetUniqueMepIncomingTasks() {
+        return _revitRepository.GetOpeningsIncomingUnique(
+                RevitRepository.MepUniqueFamilyName,
+                BuiltInCategory.OST_GenericModel)
+            .Select(i => new OpeningMepTaskIncomingUniqueViewModel(
+                i.Opening,
+                i.Transform,
+                _localization.GetLocalizedString("AllOpeningStatus.Unique")))
+            .ToArray();
+    }
+
+    /// <summary>
+    /// Возвращает коллекцию уникальных входящих заданий на отверстия от АР
+    /// </summary>
+    private ICollection<IOpeningTaskIncomingToKrViewModel> GetUniqueArIncomingTasks() {
+        return _revitRepository.GetOpeningsIncomingUnique(
+                RevitRepository.ArUniqueFamilyName,
+                BuiltInCategory.OST_Windows)
+            .Select(i => new OpeningArTaskIncomingUniqueViewModel(
+                i.Opening,
+                i.Transform,
+                _localization.GetLocalizedString("AllOpeningStatus.Unique")))
+            .ToArray();
     }
 
     /// <summary>
@@ -228,12 +257,11 @@ internal class ConstructureNavigatorForIncomingTasksViewModel : BaseViewModel {
     /// <param name="incomingTasks">Входящие задания на отверстия из связей</param>
     /// <param name="realOpenings">Чистовые отверстия из текущего документа</param>
     /// <param name="constructureElementsIds">Элементы конструкций из текущего документа</param>
-    private ICollection<IOpeningTaskIncomingForKrViewModel> GetOpeningsArIncomingTasksViewModels(
+    private ICollection<IOpeningTaskIncomingToKrViewModel> GetOpeningsArIncomingTasksViewModels(
         ICollection<OpeningArTaskIncoming> incomingTasks,
         ICollection<OpeningRealKr> realOpenings,
         ICollection<ElementId> constructureElementsIds) {
-
-        var incomintTasksViewModels = new HashSet<IOpeningTaskIncomingForKrViewModel>();
+        var incomintTasksViewModels = new HashSet<IOpeningTaskIncomingToKrViewModel>();
 
         using(var pb = GetPlatformService<IProgressDialogService>()) {
             pb.StepValue = _constantsProvider.ProgressBarStepSmall;
@@ -252,6 +280,7 @@ internal class ConstructureNavigatorForIncomingTasksViewModel : BaseViewModel {
                 i++;
             }
         }
+
         return incomintTasksViewModels;
     }
 
@@ -265,7 +294,6 @@ internal class ConstructureNavigatorForIncomingTasksViewModel : BaseViewModel {
         ICollection<OpeningMepTaskIncoming> incomingTasks,
         ICollection<IOpeningReal> realOpenings,
         ICollection<ElementId> constructureElementsIds) {
-
         var incomingTasksViewModels = new HashSet<OpeningMepTaskIncomingViewModel>();
 
         using(var pb = GetPlatformService<IProgressDialogService>()) {
@@ -283,13 +311,15 @@ internal class ConstructureNavigatorForIncomingTasksViewModel : BaseViewModel {
                 try {
                     incomingTask.UpdateStatusAndHostName(realOpenings, constructureElementsIds);
                 } catch(ArgumentException) {
-                    //не удалось получить солид у задания на отверстие. Например, если его толщина равна 0
+                    // не удалось получить солид у задания на отверстие. Например, если его толщина равна 0
                     continue;
                 }
+
                 incomingTasksViewModels.Add(new OpeningMepTaskIncomingViewModel(incomingTask));
                 i++;
             }
         }
+
         return incomingTasksViewModels;
     }
 
@@ -301,7 +331,6 @@ internal class ConstructureNavigatorForIncomingTasksViewModel : BaseViewModel {
     private ICollection<OpeningRealKrViewModel> GetOpeningsRealKrViewModels(
         ICollection<OpeningRealKr> openingsReal,
         Action<OpeningRealKr> updateStatus) {
-
         var openingsRealViewModels = new HashSet<OpeningRealKrViewModel>();
 
         using(var pb = GetPlatformService<IProgressDialogService>()) {
@@ -321,6 +350,7 @@ internal class ConstructureNavigatorForIncomingTasksViewModel : BaseViewModel {
                 i++;
             }
         }
+
         return openingsRealViewModels;
     }
 }

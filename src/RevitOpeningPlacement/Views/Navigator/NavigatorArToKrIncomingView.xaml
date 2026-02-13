@@ -1,6 +1,6 @@
 ﻿<base:ThemedPlatformWindow
     xmlns:base="clr-namespace:dosymep.WPF.Views"
-    x:Class="RevitOpeningPlacement.Views.Navigator.NavigatorMepIncomingView"
+    x:Class="RevitOpeningPlacement.Views.Navigator.NavigatorArToKrIncomingView"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
@@ -15,14 +15,14 @@
     xmlns:dxmvvm="http://schemas.devexpress.com/winfx/2008/xaml/mvvm"
     x:Name="_this"
     mc:Ignorable="d"
-    Title="NavigatorMepIncomingView"
-    d:Width="1000"
+    Title="NavigatorArIncomingView"
     d:Height="600"
+    d:Width="1000"
     Height="500"
     Width="1000"
     MinHeight="150"
     MinWidth="150"
-    d:DataContext="{d:DesignInstance {x:Type vm:ArchitectureNavigatorForIncomingTasksViewModel}, IsDesignTimeCreatable=False}"
+    d:DataContext="{d:DesignInstance {x:Type vm:NavigatorKrViewModel}, IsDesignTimeCreatable=False}"
     WindowStartupLocation="Manual"
     Left="50"
     Top="50">
@@ -159,18 +159,15 @@
                 AllowSplitters="True"
                 Orientation="Vertical">
                 <dxdo:LayoutPanel
-                    Caption="Входящие задания на отверстия"
+                    Caption="Входящие задания на отверстия из АР"
                     ShowPinButton="False"
                     ShowCloseButton="False">
                     <dxg:GridControl
                         x:Name="_dgIncomingTasks"
                         Grid.Row="0"
-                        ItemsSource="{Binding OpeningsMepTasksIncomingViewSource.View}"
-                        DefaultSorting="MepSystem"
+                        ItemsSource="{Binding OpeningsTasksIncoming}"
                         BorderThickness="0"
                         SelectionMode="Row"
-                        CurrentItem="RevitOpeningPlacement.ViewModels.Navigator.OpeningMepTaskIncomingViewModel"
-                        SelectedItem="{Binding SelectedOpeningMepTaskIncoming}"
                         MaxHeight="2000">
                         <dxg:GridControl.GroupSummary>
                             <dxg:GridSummaryItem
@@ -183,7 +180,6 @@
                                 ShowDataNavigator="True"
                                 ShowSearchPanelMode="Always"
                                 IndicatorWidth="0"
-                                FocusedRowHandleChanged="viewTasks_FocusedRowHandleChanged"
                                 NavigationStyle="Cell"
                                 VirtualizingPanel.IsVirtualizingWhenGrouping="True"
                                 VirtualizingPanel.VirtualizationMode="Recycling"
@@ -219,12 +215,6 @@
                                 FieldName="Status" />
                             <dxg:GridColumn
                                 ReadOnly="True"
-                                Width="60"
-                                Header="Дата"
-                                IsSmart="True"
-                                FieldName="Date" />
-                            <dxg:GridColumn
-                                ReadOnly="True"
                                 Width="40"
                                 Header="Диаметр"
                                 FieldName="Diameter" />
@@ -240,32 +230,17 @@
                                 FieldName="Height" />
                             <dxg:GridColumn
                                 ReadOnly="True"
-                                Width="40"
-                                Header="Толщина"
-                                FieldName="Thickness" />
-                            <dxg:GridColumn
-                                ReadOnly="True"
-                                Width="60"
-                                Header="Отм. оси"
-                                FieldName="CenterOffset" />
-                            <dxg:GridColumn
-                                ReadOnly="True"
-                                Width="60"
-                                Header="Отм. низа"
-                                FieldName="BottomOffset" />
-                            <dxg:GridColumn
-                                ReadOnly="True"
                                 Width="60"
                                 Header="Id"
                                 FieldName="OpeningId" />
                             <dxg:GridColumn
                                 ReadOnly="True"
-                                Width="60"
+                                Width="*"
                                 Header="Основа"
                                 FieldName="Host.Name" />
                             <dxg:GridColumn
                                 ReadOnly="True"
-                                Width="50"
+                                Width="60"
                                 Header="Id основы"
                                 FieldName="Host.Id" />
                             <dxg:GridColumn
@@ -284,29 +259,14 @@
                             </dxg:GridColumn>
                             <dxg:GridColumn
                                 ReadOnly="True"
-                                Width="50"
-                                Header="Система ВИС"
-                                FieldName="MepSystem" />
-                            <dxg:GridColumn
-                                ReadOnly="True"
-                                Width="*"
-                                Header="Комментарий"
-                                FieldName="Comment" />
-                            <dxg:GridColumn
-                                ReadOnly="True"
-                                Width="50"
-                                Header="Создатель"
-                                FieldName="Username" />
-                            <dxg:GridColumn
-                                ReadOnly="True"
-                                Width="50"
-                                Header="Тип отверстия"
-                                FieldName="FamilyShortName" />
+                                Width="70"
+                                Header="Раздел КР"
+                                FieldName="Host.KrModelPart" />
                             <dxg:GridColumn
                                 ReadOnly="True"
                                 Width="60"
-                                Header="Описание пересечения"
-                                FieldName="Description" />
+                                Header="Комментарий"
+                                FieldName="Comment" />
                         </dxg:GridControl.Columns>
                     </dxg:GridControl>
                 </dxdo:LayoutPanel>
@@ -317,12 +277,10 @@
                     ShowCloseButton="False">
                     <dxg:GridControl
                         x:Name="_dgOpeningsReal"
-                        ItemsSource="{Binding OpeningsRealViewSource.View}"
+                        ItemsSource="{Binding OpeningsReal}"
                         DefaultSorting="Diameter"
                         BorderThickness="0"
                         SelectionMode="Row"
-                        CurrentItem="RevitOpeningPlacement.ViewModels.Navigator.OpeningRealArViewModel"
-                        SelectedItem="{Binding SelectedOpeningReal}"
                         MaxHeight="2000">
                         <dxg:GridControl.GroupSummary>
                             <dxg:GridSummaryItem
@@ -335,7 +293,6 @@
                                 ShowDataNavigator="True"
                                 ShowSearchPanelMode="Always"
                                 IndicatorWidth="0"
-                                FocusedRowHandleChanged="viewOpenings_FocusedRowHandleChanged"
                                 NavigationStyle="Cell"
                                 VirtualizingPanel.IsVirtualizingWhenGrouping="True"
                                 VirtualizingPanel.VirtualizationMode="Recycling"
@@ -400,6 +357,30 @@
                                 Header="Уровень"
                                 IsSmart="True"
                                 FieldName="LevelName" />
+                            <dxg:GridColumn
+                                ReadOnly="True"
+                                Width="*"
+                                Header="Основа"
+                                FieldName="Host.Name" />
+                            <dxg:GridColumn
+                                Width="30"
+                                ReadOnly="True"
+                                SortMode="Custom"
+                                AllowResizing="False">
+                                <dxg:GridColumn.CellTemplate>
+                                    <DataTemplate>
+                                        <dx:SimpleButton
+                                            Glyph="{dx:DXImage 'DevAV/Actions/Search_16x16.png'}"
+                                            Command="{Binding ElementName=_this, Path=DataContext.SelectCommand}"
+                                            CommandParameter="{Binding Row.Host}" />
+                                    </DataTemplate>
+                                </dxg:GridColumn.CellTemplate>
+                            </dxg:GridColumn>
+                            <dxg:GridColumn
+                                ReadOnly="True"
+                                Width="70"
+                                Header="Раздел КР"
+                                FieldName="Host.KrModelPart" />
                             <dxg:GridColumn
                                 ReadOnly="True"
                                 Width="200"
