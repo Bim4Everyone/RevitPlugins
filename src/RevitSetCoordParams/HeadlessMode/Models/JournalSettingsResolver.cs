@@ -36,6 +36,9 @@ internal class JournalSettingsResolver {
         _revitRepository = revitRepository;
     }
 
+    /// <summary>
+    /// Метод получения Enum данных
+    /// </summary>
     public TEnum ResolveEnum<TEnum>(JournalContainer journalContainer, Func<ConfigSettings, TEnum> selector)
     where TEnum : struct, Enum {
         return journalContainer == null
@@ -45,12 +48,18 @@ internal class JournalSettingsResolver {
             : selector(_defaults));
     }
 
+    /// <summary>
+    /// Метод получения строковых данных
+    /// </summary>
     public string ResolveString(JournalContainer journalContainer, Func<ConfigSettings, string> selector) {
         return journalContainer == null
             ? selector(_defaults)
             : ResolveValue(journalContainer, selector, s => s);
     }
 
+    /// <summary>
+    /// Метод получения списка строк
+    /// </summary>
     public List<string> ResolveListString(JournalContainer journalContainer, Func<ConfigSettings, List<string>> selector) {
         return journalContainer == null
             ? selector(_defaults)
@@ -63,6 +72,9 @@ internal class JournalSettingsResolver {
             });
     }
 
+    /// <summary>
+    /// Метод получения списка Enum
+    /// </summary>
     public List<TEnum> ResolveListEnum<TEnum>(JournalContainer journalContainer, Func<ConfigSettings, List<TEnum>> selector)
     where TEnum : struct, Enum {
         return journalContainer == null
@@ -88,6 +100,9 @@ internal class JournalSettingsResolver {
             });
     }
 
+    /// <summary>
+    /// Метод получения списка ParamMap с проверкой сервисом на существование параметра в проектах
+    /// </summary>
     public List<ParamMap> ResolveParamMaps(JournalContainer journalContainer, Func<ConfigSettings, List<ParamMap>> selector, Document document) {
         return journalContainer == null
             ? selector(_defaults)
@@ -128,10 +143,10 @@ internal class JournalSettingsResolver {
 
                     if(source == null && paramType != ParamType.BlockingParam) {
                         var paramMap = paramType switch {
-                            ParamType.BlockParam => RevitConstants.BlockParamMap,
-                            ParamType.SectionParam => RevitConstants.SectionParamMap,
-                            ParamType.FloorParam => RevitConstants.FloorParamMap,
-                            ParamType.FloorDEParam => RevitConstants.FloorDEParamMap,
+                            ParamType.BlockParam => RevitConstants.GetBlockParamMap(),
+                            ParamType.SectionParam => RevitConstants.GetSectionParamMap(),
+                            ParamType.FloorParam => RevitConstants.GetFloorParamMap(),
+                            ParamType.FloorDEParam => RevitConstants.GetFloorDEParamMap(),
                             _ => null
                         };
                         if(paramMap == null) {
@@ -142,11 +157,11 @@ internal class JournalSettingsResolver {
 
                     if(target == null) {
                         var paramMap = paramType switch {
-                            ParamType.BlockParam => RevitConstants.BlockParamMap,
-                            ParamType.SectionParam => RevitConstants.SectionParamMap,
-                            ParamType.FloorParam => RevitConstants.FloorParamMap,
-                            ParamType.FloorDEParam => RevitConstants.FloorDEParamMap,
-                            ParamType.BlockingParam => RevitConstants.BlockingParamMap,
+                            ParamType.BlockParam => RevitConstants.GetBlockParamMap(),
+                            ParamType.SectionParam => RevitConstants.GetSectionParamMap(),
+                            ParamType.FloorParam => RevitConstants.GetFloorParamMap(),
+                            ParamType.FloorDEParam => RevitConstants.GetFloorDEParamMap(),
+                            ParamType.BlockingParam => RevitConstants.GetBlockingParamMap(),
                             _ => null
                         };
                         if(paramMap == null) {
@@ -168,6 +183,9 @@ internal class JournalSettingsResolver {
             });
     }
 
+    /// <summary>
+    /// Метод получения числовых данных
+    /// </summary>
     public double ResolveDouble(JournalContainer journalContainer, Func<ConfigSettings, double> selector) {
         return journalContainer == null
             ? selector(_defaults)
@@ -180,6 +198,9 @@ internal class JournalSettingsResolver {
                         : selector(_defaults));
     }
 
+    /// <summary>
+    /// Метод получения булевых данных
+    /// </summary>
     public bool ResolveBool(JournalContainer journalContainer, Func<ConfigSettings, bool> selector) {
         return journalContainer == null
             ? selector(_defaults)
@@ -192,6 +213,7 @@ internal class JournalSettingsResolver {
                             : selector(_defaults));
     }
 
+    // Метод получения явных данных
     private T ResolveValue<T>(JournalContainer journalContainer, Func<ConfigSettings, T> selector, Func<string, T> parseExplicit) {
         return journalContainer.JournalValue == null
             ? selector(_defaults)
@@ -203,6 +225,7 @@ internal class JournalSettingsResolver {
             };
     }
 
+    // Метод получения параметра RevitParam
     private RevitParam GetParam(Document document, string paramName) {
         var def = _paramAvailabilityService.GetDefinitionByName(document, paramName);
         return def != null

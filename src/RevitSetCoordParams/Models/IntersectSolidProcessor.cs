@@ -15,12 +15,12 @@ using RevitSetCoordParams.Models.Settings;
 
 
 namespace RevitSetCoordParams.Models;
-internal class IntersectCurveProcessor : IIntersectProcessor {
+internal class IntersectSolidProcessor : IIntersectProcessor {
     private readonly ILocalizationService _localizationService;
     private readonly RevitRepository _revitRepository;
     private readonly SetCoordParamsSettings _settings;
 
-    public IntersectCurveProcessor(
+    public IntersectSolidProcessor(
         ILocalizationService localizationService,
         RevitRepository revitRepository,
         SetCoordParamsSettings settings) {
@@ -57,16 +57,12 @@ internal class IntersectCurveProcessor : IIntersectProcessor {
         var pairParamMaps = allParamMaps
             .Where(paramMap => paramMap.Type != ParamType.BlockingParam);
 
-        double intersectCurveLength = UnitUtils.ConvertToInternalUnits(RevitConstants.IntersectCurveLengthMm, UnitTypeId.Millimeters);
-        var offsetIntersectLine = new XYZ(0, 0, intersectCurveLength);
+        var intersector = new SolidIntersector(sourceModels);
 
         string transactionName = _localizationService.GetLocalizedString("SetCoordParamsProcessor.TransactionName");
         using var t = _revitRepository.Document.StartTransaction(transactionName);
-
-        var intersector = new CurveIntersector(sourceModels);
-
-        int i = 0;
         List<WarningElement> warnings = [];
+        int i = 0;
         foreach(var targetElement in targetElements) {
             ct.ThrowIfCancellationRequested();
 
@@ -79,17 +75,17 @@ internal class IntersectCurveProcessor : IIntersectProcessor {
             }
 
             var position = positionProvider.GetPositionElement(targetElement);
-            var curve = _revitRepository.GetIntersectCurve(position, offsetIntersectLine);
+            var sphere = _revitRepository.GetSphereSolid(position, startDiam);
 
-            var sourceModel = intersector.IntersectWithCurve(curve);
+            var sourceModel = intersector.Intersect(sphere);
 
             double currentDiam = startDiam;
             if(sourceModel == null && _settings.Search) {
                 while(currentDiam < maxDiam) {
                     currentDiam += stepDiam;
-                    var curves = _revitRepository.GetSphereLine(position, currentDiam);
+                    sphere = _revitRepository.GetSphereSolid(position, startDiam);
 
-                    sourceModel = intersector.IntersectWithCurves(curves);
+                    sourceModel = intersector.Intersect(sphere);
 
                     if(sourceModel is not null) {
                         break;
@@ -104,17 +100,15 @@ internal class IntersectCurveProcessor : IIntersectProcessor {
 
                     if(targetElement.Element.IsExistsParam(targetParamName)
                         && sourceModel.Element.IsExistsParam(sourceParamName)) {
+
                         if(paramMap.Type == ParamType.FloorDEParam) {
                             double value = sourceModel.Element.GetParamValueOrDefault<double>(sourceParamName);
-                            if(value != default) {
-                                targetElement.Element.SetParamValue(targetParamName, value);
-                            }
+                            targetElement.Element.SetParamValue(targetParamName, value);
                         } else {
                             string value = sourceModel.Element.GetParamValueOrDefault<string>(sourceParamName);
-                            if(value != null) {
-                                targetElement.Element.SetParamValue(targetParamName, value);
-                            }
+                            targetElement.Element.SetParamValue(targetParamName, value);
                         }
+
                     } else {
                         warnings.Add(new WarningNotFoundParamElement {
                             WarningType = WarningType.NotFoundParameter,

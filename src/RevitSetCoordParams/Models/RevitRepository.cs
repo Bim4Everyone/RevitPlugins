@@ -82,11 +82,8 @@ internal class RevitRepository {
         }
 
         var categorySet = new HashSet<BuiltInCategory>(categories);
-
         var nested = GetAllNestedFamilyInstances(selectedElements);
-
         var dependent = GetAllDependentElements(selectedElements);
-
         var allElements = selectedElements
             .Concat(nested)
             .Concat(dependent)
@@ -128,7 +125,7 @@ internal class RevitRepository {
                 var transSolid = transform != null
                     ? SolidUtils.CreateTransformed(unitedSolid, transform)
                     : unitedSolid;
-                return new RevitElement { Element = instance, Solid = transSolid };
+                return new RevitElement { Element = instance, Solid = transSolid, Faces = transSolid.Faces.Cast<Face>().ToList() };
             })
             .ToList();
     }
@@ -215,11 +212,54 @@ internal class RevitRepository {
     }
 
     /// <summary>
+    /// Метод получения кривой для пересечения с солидом
+    /// </summary>    
+    public Curve GetIntersectCurve(XYZ origin, XYZ offset) {
+        return Line.CreateBound(origin, origin + offset);
+    }
+
+    /// <summary>
+    /// Метод получения сферы-солида
+    /// </summary>
+    public List<Curve> GetSphereLine(XYZ origin, double diameter) {
+        double r = diameter / 2.0;
+        var curves = new List<Curve>(6);
+        {
+            var top = new XYZ(origin.X, origin.Y, origin.Z + r);
+            var bottom = new XYZ(origin.X, origin.Y, origin.Z - r);
+            var right = new XYZ(origin.X + r, origin.Y, origin.Z);
+            var left = new XYZ(origin.X - r, origin.Y, origin.Z);
+
+            curves.Add(Arc.Create(bottom, top, right));
+            curves.Add(Arc.Create(top, bottom, left));
+        }
+        {
+            var top = new XYZ(origin.X, origin.Y, origin.Z + r);
+            var bottom = new XYZ(origin.X, origin.Y, origin.Z - r);
+            var front = new XYZ(origin.X, origin.Y + r, origin.Z);
+            var back = new XYZ(origin.X, origin.Y - r, origin.Z);
+
+            curves.Add(Arc.Create(bottom, top, front));
+            curves.Add(Arc.Create(top, bottom, back));
+        }
+        {
+            var right = new XYZ(origin.X + r, origin.Y, origin.Z);
+            var left = new XYZ(origin.X - r, origin.Y, origin.Z);
+            var front = new XYZ(origin.X, origin.Y + r, origin.Z);
+            var back = new XYZ(origin.X, origin.Y - r, origin.Z);
+
+            curves.Add(Arc.Create(left, right, front));
+            curves.Add(Arc.Create(right, left, back));
+        }
+
+        return curves;
+    }
+
+    /// <summary>
     /// Метод выделения элементов в документе
     /// </summary>
-    public void SetSelected(ElementId elementId) {
-        List<ElementId> listElements = [elementId];
-        ActiveUIDocument.SetSelectedElements(listElements);
+    public void SetSelected(List<ElementId> elementIds) {
+        ActiveUIDocument.SetSelectedElements(elementIds);
     }
 
     // Метод получения объединенного солида

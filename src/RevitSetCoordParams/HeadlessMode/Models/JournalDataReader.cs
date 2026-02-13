@@ -4,6 +4,7 @@ using RevitSetCoordParams.HeadlessMode.Enums;
 
 namespace RevitSetCoordParams.HeadlessMode.Models;
 internal class JournalDataReader {
+    // Поля соответствующие свойствам класса GonfigSettings
     private const string _defaultsSettingsValue = "DefaultSettings";
     private const string _configSettingsValue = "ConfigSettings";
     private const string _elementsProviderKey = "ElementsProvider";
@@ -32,6 +33,7 @@ internal class JournalDataReader {
     public JournalContainer StepDiameterSearchSphereMm => GetValue(_stepDiameterSearchSphereMmKey);
     public JournalContainer Search => GetValue(_searchKey);
 
+    // Метод получения JournalContainer и распределения по типам настроек
     private JournalContainer GetValue(string key) {
         return !_journalData.TryGetValue(key, out string value)
             ? null

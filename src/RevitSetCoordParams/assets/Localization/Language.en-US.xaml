@@ -100,7 +100,9 @@
     <system:String x:Key="WarningsViewModel.NotFoundElementDescription">Elements are too far away or cannot be processed</system:String>
     <system:String x:Key="WarningsViewModel.NotFoundParam">Elements with unfilled parameters</system:String>
     <system:String x:Key="WarningsViewModel.NotFoundParamDescription">These parameters are not added to the categories of these elements and were not filled in</system:String>
-
+    
+    <system:String x:Key="WarningGroupViewModel.SelectAll">Select all elements</system:String>
+    
     <system:String x:Key="RevitRepository.DefaultFamilyName">No Family Name</system:String>
     <system:String x:Key="RevitRepository.DefaultTypeName">No Type Name</system:String>
     <system:String x:Key="RevitRepository.DefaultLevelName">No Level</system:String>

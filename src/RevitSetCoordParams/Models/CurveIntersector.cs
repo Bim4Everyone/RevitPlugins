@@ -4,11 +4,10 @@ using System.Linq;
 using Autodesk.Revit.DB;
 
 namespace RevitSetCoordParams.Models;
-internal class Intersector {
-
+internal class CurveIntersector {
     private readonly ICollection<RevitElement> _sourceModels;
 
-    public Intersector(ICollection<RevitElement> sourceModels) {
+    public CurveIntersector(ICollection<RevitElement> sourceModels) {
         _sourceModels = sourceModels;
     }
     /// <summary>
@@ -27,7 +26,13 @@ internal class Intersector {
         }
         return null;
     }
-
+    /// <summary>
+    /// Основной метод пересечения поисковой сферы
+    /// </summary>    
+    /// <remarks>
+    /// В данном методе происходит пересечение объемных моделей и поисковой сферы
+    /// </remarks>
+    /// <returns>Возвращает RevitElement, который пересекся с поисковой сферой</returns> 
     public RevitElement IntersectWithCurve(Curve curve) {
         var options = new SolidCurveIntersectionOptions();
         foreach(var sourceModel in _sourceModels) {
