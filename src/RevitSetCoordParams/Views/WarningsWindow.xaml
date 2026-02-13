@@ -83,7 +83,6 @@
                                 <ui:Button
                                     Margin="20,0,0,0"
                                     HorizontalAlignment="Left"
-                                    Background="LightGray"
                                     Width="Auto"
                                     Content="{DynamicResource WarningGroupViewModel.SelectAll}"
                                     Command="{Binding SelectAllCommand}" />
@@ -104,7 +103,6 @@
                                                 <DataTemplate>
                                                     <Button
                                                         Width="100"
-                                                        Background="LightGray"
                                                         Content="{Binding ID}"
                                                         Command="{Binding DataContext.ShowElementCommand, 
                                                             RelativeSource={RelativeSource AncestorType=Window}}"
