@@ -35,7 +35,29 @@
                 TextWrapping="Wrap"
                 MaxWidth="{Binding ActualWidth, ElementName=_paramsSetControl}"
                 FontSize="{DynamicResource ControlContentThemeFontSize}"
-                Text="{Binding Description}" />
+                Text="{Binding Description}">
+                <ui:TextBlock.Style>
+                    <Style TargetType="ui:TextBlock">
+
+                        <Style.Triggers>
+                            <Trigger
+                                Property="Text"
+                                Value="">
+                                <Setter
+                                    Property="Visibility"
+                                    Value="Collapsed" />
+                            </Trigger>
+                            <Trigger
+                                Property="Text"
+                                Value="{x:Null}">
+                                <Setter
+                                    Property="Visibility"
+                                    Value="Collapsed" />
+                            </Trigger>
+                        </Style.Triggers>
+                    </Style>
+                </ui:TextBlock.Style>
+            </ui:TextBlock>
             <rules:ParamsSetUserControl
                 IsEnabled="False"
                 x:Name="_paramsSetControl"
