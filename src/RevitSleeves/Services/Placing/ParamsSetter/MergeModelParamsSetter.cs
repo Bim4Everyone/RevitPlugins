@@ -39,10 +39,10 @@ internal class MergeModelParamsSetter : ParamsSetter, IParamsSetter<SleeveMergeM
         (var start, var end) = _sleeveModel.GetEndPoints();
         double length = (end - start).GetLength();
         SetLength(sleeve, length);
-        SetStringParameters(sleeve, _sleeveModel);
+        SetParameters(sleeve, _sleeveModel);
     }
 
-    protected void SetStringParameters(FamilyInstance sleeve, SleeveMergeModel mergeModel) {
+    private void SetParameters(FamilyInstance sleeve, SleeveMergeModel mergeModel) {
         var firstMergeSleeve = mergeModel.GetSleeves().First().GetFamilyInstance();
         sleeve.SetParamValue(NamesProvider.ParameterSleeveSystem,
             firstMergeSleeve.GetParamValue<string>(NamesProvider.ParameterSleeveSystem));
@@ -50,5 +50,6 @@ internal class MergeModelParamsSetter : ParamsSetter, IParamsSetter<SleeveMergeM
             firstMergeSleeve.GetParamValue<string>(NamesProvider.ParameterSleeveEconomic));
         sleeve.SetParamValue(NamesProvider.ParameterSleeveDescription,
             firstMergeSleeve.GetParamValue<string>(NamesProvider.ParameterSleeveDescription));
+        SetThickness(sleeve, firstMergeSleeve.GetParamValue<double>(NamesProvider.ParameterSleeveThickness));
     }
 }
