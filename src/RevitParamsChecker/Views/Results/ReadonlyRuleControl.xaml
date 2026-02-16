@@ -38,7 +38,6 @@
                 Text="{Binding Description}">
                 <ui:TextBlock.Style>
                     <Style TargetType="ui:TextBlock">
-
                         <Style.Triggers>
                             <Trigger
                                 Property="Text"
