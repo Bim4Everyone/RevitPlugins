@@ -25,13 +25,14 @@
     </core:WpfUIPlatformUserControl.Resources>
     <!-- Редактор группировки (для DataGrid) -->
     <Border
+        Padding="8 0"
         Style="{StaticResource CustomBorder}">
         <DockPanel>
             <ui:ToggleSwitch
-                DockPanel.Dock="Top"
-                Margin="0 0 0 8"
+                Margin="0 0 8 0"
                 IsChecked="{Binding IsGroupingEnabled}"
-                Content="{me:LocalizationSource GroupsEditor.Label}"
+                Content="{ui:SymbolIcon GroupList20}"
+                ToolTip="{me:LocalizationSource GroupsEditor.Label}"
                 FontSize="{DynamicResource ControlContentThemeFontSize}" />
             <ui:Button
                 ToolTip="{me:LocalizationSource GroupsEditor.UpdateButtonTooltip}"
@@ -51,6 +52,7 @@
                 Command="{Binding RemoveGroupCommand}"
                 CommandParameter="{Binding SelectedGroupDescription}" />
             <ui:ListView
+                Margin="8 0 0 0"
                 x:Name="_groups"
                 SelectionMode="Single"
                 IsEnabled="{Binding IsGroupingEnabled}"
@@ -70,7 +72,6 @@
                             Style="{StaticResource CustomBorder}"
                             Padding="4">
                             <ComboBox
-                                MinWidth="120"
                                 MaxWidth="120"
                                 IsEditable="False"
                                 DisplayMemberPath="DisplayName"

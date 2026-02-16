@@ -47,13 +47,7 @@ internal class GroupDescriptionsViewModel : BaseViewModel {
 
     public bool IsGroupingEnabled {
         get => _isGroupingEnabled;
-        set {
-            RaiseAndSetIfChanged(ref _isGroupingEnabled, value);
-            if(!value) {
-                SelectedGroupDescription = null;
-                GroupDescriptions.Clear();
-            }
-        }
+        set => RaiseAndSetIfChanged(ref _isGroupingEnabled, value);
     }
 
     public GroupDescriptionViewModel SelectedGroupDescription {
