@@ -15,7 +15,7 @@
             <Private>False</Private>
         </Reference>
 
-        <Reference Include="Bim4Everyone.RevitFiltration">
+        <Reference Include="Bim4Everyone.RevitFiltration.Ninject">
             <HintPath>$(AppData)\pyRevit\Extensions\BIM4Everyone.lib\dosymep_libs\libs\$(RevitVersion)\Bim4Everyone.RevitFiltration.Ninject.dll</HintPath>
             <Private>False</Private>
         </Reference>
