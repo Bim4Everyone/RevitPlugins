@@ -98,6 +98,8 @@
     <system:String x:Key="WarningsViewModel.NotFoundParam">Элементы с незаполненными параметрами</system:String>
     <system:String x:Key="WarningsViewModel.NotFoundParamDescription">Данные параметры не добавлены в категории этих элементов и не были заполнены</system:String>
 
+    <system:String x:Key="WarningGroupViewModel.SelectAll">Выделить все элементы</system:String>
+
     <system:String x:Key="RevitRepository.DefaultFamilyName">Нет имени семейства</system:String>
     <system:String x:Key="RevitRepository.DefaultTypeName">Нет имени типа</system:String>
     <system:String x:Key="RevitRepository.DefaultLevelName">Нет уровня</system:String>
