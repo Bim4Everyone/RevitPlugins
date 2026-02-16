@@ -30,7 +30,6 @@ using RevitParamsChecker.ViewModels.Rules;
 using RevitParamsChecker.ViewModels.Utils;
 using RevitParamsChecker.Views;
 using RevitParamsChecker.Views.Checks;
-using RevitParamsChecker.Views.Dashboard;
 using RevitParamsChecker.Views.Filtration;
 using RevitParamsChecker.Views.Results;
 using RevitParamsChecker.Views.Rules;
@@ -91,9 +90,6 @@ public class RevitParamsCheckerCommand : BasePluginCommand {
     }
 
     private void BindPages(IKernel kernel) {
-        kernel.Bind<DashboardPage>()
-            .ToSelf()
-            .InSingletonScope();
         kernel.Bind<ChecksPage>()
             .ToSelf()
             .InSingletonScope()

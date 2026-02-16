@@ -23,17 +23,6 @@
         x:Key="NamesSelectionDialog.NamesHeader">Name</system:String>
 
     <system:String
-        x:Key="DashboardPage.Instruction.Title">Quick Guide</system:String>
-    <system:String
-        x:Key="DashboardPage.Instruction.Body"
-        xml:space="preserve">
-1. Create search sets to get the elements to be processed.
-2. Create rules for parameter checks.
-3. Set up checks using Revit documents, created search sets, and rules.
-4. Run the checks. To view the results, go to Analysis.
-</system:String>
-
-    <system:String
         x:Key="RulesPage.NewRulePrompt">New Rule</system:String>
     <system:String
         x:Key="RulesPage.RenameRulePrompt">Rename Rule</system:String>

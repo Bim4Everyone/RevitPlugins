@@ -6,7 +6,7 @@ using dosymep.SimpleServices;
 
 using Ninject;
 
-using RevitParamsChecker.Views.Dashboard;
+using RevitParamsChecker.Views.Checks;
 
 using Wpf.Ui;
 using Wpf.Ui.Abstractions;
@@ -39,7 +39,7 @@ internal partial class MainWindow : IDisposable {
         _rootNavigationView.SetPageProviderService(navigationViewPageProvider);
         Dispatcher.BeginInvoke(
             DispatcherPriority.Loaded,
-            () => _rootNavigationView.Navigate(typeof(DashboardPage)));
+            () => _rootNavigationView.Navigate(typeof(ChecksPage)));
     }
 
     public void Dispose() {

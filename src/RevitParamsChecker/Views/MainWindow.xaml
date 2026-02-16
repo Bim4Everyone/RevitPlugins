@@ -13,7 +13,6 @@
     xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
     xmlns:me="clr-namespace:dosymep.WpfCore.MarkupExtensions;assembly=dosymep.WpfCore"
     xmlns:checksViews="clr-namespace:RevitParamsChecker.Views.Checks"
-    xmlns:dashboardViews="clr-namespace:RevitParamsChecker.Views.Dashboard"
     xmlns:filtrationViews="clr-namespace:RevitParamsChecker.Views.Filtration"
     xmlns:resultsViews="clr-namespace:RevitParamsChecker.Views.Results"
     xmlns:rulesViews="clr-namespace:RevitParamsChecker.Views.Rules"
@@ -47,8 +46,6 @@
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition
-                Height="Auto" />
-            <RowDefinition
                 Height="*" />
             <RowDefinition
                 Height="Auto" />
@@ -60,7 +57,7 @@
             Title="{me:LocalizationSource MainWindow.Title}" />
 
         <ui:NavigationView
-            Grid.Row="1"
+            Grid.Row="0"
             x:Name="_rootNavigationView"
             FrameMargin="0"
             OpenPaneLength="200"
@@ -81,11 +78,6 @@
             </ui:NavigationView.Header>
 
             <ui:NavigationView.MenuItems>
-                <ui:NavigationViewItem
-                    Icon="{ui:SymbolIcon Symbol=Home24}"
-                    Content="{me:LocalizationSource DashboardPage.Title}"
-                    TargetPageType="{x:Type dashboardViews:DashboardPage}" />
-
                 <ui:NavigationViewItem
                     Icon="{ui:SymbolIcon Symbol=Filter24}"
                     Content="{me:LocalizationSource FiltrationPage.Title}"
@@ -114,7 +106,7 @@
             x:Name="_rootContentDialog" />
 
         <StackPanel
-            Grid.Row="2"
+            Grid.Row="1"
             Orientation="Horizontal"
             HorizontalAlignment="Right">
 

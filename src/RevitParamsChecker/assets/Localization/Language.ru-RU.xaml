@@ -23,17 +23,6 @@
         x:Key="NamesSelectionDialog.NamesHeader">Название</system:String>
 
     <system:String
-        x:Key="DashboardPage.Instruction.Title">Краткая инструкция</system:String>
-    <system:String
-        x:Key="DashboardPage.Instruction.Body"
-        xml:space="preserve">
-1. Создайте поисковые наборы для получения обрабатываемых элементов.
-2. Создайте правила проверки параметров.
-3. Настройте проверки, используя документы Revit, созданные поисковые наборы и проверки.
-4. Запустите проверки. Для просмотра результатов перейдите в Анализ.
-</system:String>
-
-    <system:String
         x:Key="RulesPage.NewRulePrompt">Новое правило</system:String>
     <system:String
         x:Key="RulesPage.RenameRulePrompt">Переименование правила</system:String>
