@@ -72,7 +72,8 @@ internal class RevitRepository {
         ActiveUIDocument.Selection.SetReferences(elements.Select(e => e.Reference).ToArray());
 #else
         ActiveUIDocument.Selection.SetElementIds(
-            elements.Where(e => e.Element.Document.Equals(Document))
+            elements.Where(e =>
+                    e.Element.Document.Title.Equals(Document.Title, StringComparison.CurrentCultureIgnoreCase))
                 .Select(e => e.Element.Id)
                 .ToArray());
 #endif

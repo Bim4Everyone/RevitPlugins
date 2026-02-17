@@ -46,15 +46,14 @@ internal class FilterDataProvider : IDataProvider {
     private RevitParam GetFilterableParam(ElementId paramId) {
         try {
             if(paramId.IsSystemId()) {
-                return
-                    SystemParamsConfig.Instance.CreateRevitParam(
+                return SystemParamsConfig.Instance.CreateRevitParam(
                         _revitRepository.Document,
                         (BuiltInParameter) paramId.GetIdValue());
             }
 
             var element = _revitRepository.Document.GetElement(paramId);
             if(element is SharedParameterElement sharedParameterElement) {
-                    SharedParamsConfig.Instance.CreateRevitParam(
+                return SharedParamsConfig.Instance.CreateRevitParam(
                         _revitRepository.Document,
                         sharedParameterElement.Name);
             }
