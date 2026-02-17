@@ -6,8 +6,8 @@ using RevitDeclarations.ViewModels;
 
 
 namespace RevitDeclarations.Views;
-internal partial class PrioritiesTabItem {
-    public PrioritiesTabItem(ApartmentsMainVM viewModel, ILoggerService loggerService,
+internal partial class PrioritiesPage {
+    public PrioritiesPage(ApartmentsMainVM viewModel, ILoggerService loggerService,
                             ILanguageService languageService, ILocalizationService localizationService,
                             IUIThemeService uiThemeService, IUIThemeUpdaterService themeUpdaterService) : base(loggerService,
             languageService, localizationService,

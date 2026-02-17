@@ -7,8 +7,8 @@ using RevitDeclarations.ViewModels;
 using RevitDeclarations.ViewModels.DeclarationPageViewModels;
 
 namespace RevitDeclarations.Views;
-internal partial class DeclarationApartTabItem {
-    public DeclarationApartTabItem(ApartmentsMainVM viewModel, ILoggerService loggerService,
+internal partial class DeclarationApartPage {
+    public DeclarationApartPage(ApartmentsMainVM viewModel, ILoggerService loggerService,
         ILanguageService languageService, ILocalizationService localizationService,
         IUIThemeService uiThemeService, IUIThemeUpdaterService themeUpdaterService) 
         : base(loggerService,

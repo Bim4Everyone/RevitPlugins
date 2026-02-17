@@ -1,8 +1,8 @@
 using System.Windows.Controls;
 
 namespace RevitDeclarations.Views;
-public partial class ParamsPublicAreasTabItem : UserControl {
-    public ParamsPublicAreasTabItem() {
+public partial class ParamsPublicAreasPage : UserControl {
+    public ParamsPublicAreasPage() {
         InitializeComponent();
     }
 }

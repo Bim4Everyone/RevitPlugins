@@ -38,13 +38,13 @@
         <TabControl>
             <TabItem 
                 Header="Декларация">
-                <tabData:DeclarationApartTabItem/>
+                <tabData:DeclarationApartPage/>
             </TabItem>
 
             <TabItem
                 Header="Параметры"
                 DataContext="{Binding ParametersViewModel}">
-                <tabData:ParamsPublicAreasTabItem/>
+                <tabData:ParamsPublicAreasPage/>
             </TabItem>
         </TabControl>
 

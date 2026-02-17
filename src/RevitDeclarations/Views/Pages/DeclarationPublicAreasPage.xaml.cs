@@ -7,8 +7,8 @@ using RevitDeclarations.ViewModels;
 using RevitDeclarations.ViewModels.DeclarationPageViewModels;
 
 namespace RevitDeclarations.Views;
-internal partial class DeclarationCommercialTabItem {
-    public DeclarationCommercialTabItem(PublicAreasMainVM viewModel, ILoggerService loggerService,
+internal partial class DeclarationPublicAreasPage {
+    public DeclarationPublicAreasPage(PublicAreasMainVM viewModel, ILoggerService loggerService,
         ILanguageService languageService, ILocalizationService localizationService,
         IUIThemeService uiThemeService, IUIThemeUpdaterService themeUpdaterService) 
         : base(loggerService,

@@ -28,13 +28,13 @@ public class ApartmentsDeclarationCommand : BasePluginCommand {
     protected override void Execute(UIApplication uiApplication) {
         using var kernel = uiApplication.CreatePlatformServices();
 
-        kernel.Bind<DeclarationApartTabItem>()
+        kernel.Bind<DeclarationApartPage>()
             .ToSelf()
             .InSingletonScope();
-        kernel.Bind<PrioritiesTabItem>()
+        kernel.Bind<PrioritiesPage>()
             .ToSelf()
             .InSingletonScope();
-        kernel.Bind<ParamsApartmentsTabItem>()
+        kernel.Bind<ParamsApartmentsPage>()
             .ToSelf()
             .InSingletonScope();
 
@@ -55,7 +55,6 @@ public class ApartmentsDeclarationCommand : BasePluginCommand {
         // Используем сервис обновления тем для WinUI
         kernel.UseWpfUIThemeUpdater();
 
-        //kernel.Bind<MainViewModel>().To<ApartmentsMainVM>().InSingletonScope();
         kernel.BindMainWindow<ApartmentsMainVM, ApartmentsMainWindow>();
         
         Notification(kernel.Get<ApartmentsMainWindow>());

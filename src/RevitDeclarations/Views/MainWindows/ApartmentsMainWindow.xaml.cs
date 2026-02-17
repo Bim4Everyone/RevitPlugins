@@ -26,7 +26,7 @@ public partial class ApartmentsMainWindow {
         _rootNavigationView.SetPageProviderService(navigationViewPageProvider);
 
         Dispatcher.BeginInvoke(DispatcherPriority.Loaded, () => {
-            _rootNavigationView.Navigate(typeof(DeclarationApartTabItem));
+            _rootNavigationView.Navigate(typeof(DeclarationApartPage));
         });
     }
 
