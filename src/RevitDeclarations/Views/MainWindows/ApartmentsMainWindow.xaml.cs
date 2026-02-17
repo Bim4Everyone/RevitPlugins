@@ -22,7 +22,9 @@ public partial class ApartmentsMainWindow {
                uiThemeService,
                themeUpdaterService) {
         InitializeComponent();
+
         _rootNavigationView.SetPageProviderService(navigationViewPageProvider);
+
         Dispatcher.BeginInvoke(DispatcherPriority.Loaded, () => {
             _rootNavigationView.Navigate(typeof(DeclarationTabItem));
         });

@@ -9,6 +9,7 @@ using dosymep.WpfCore.Ninject;
 using dosymep.WpfUI.Core.Ninject;
 
 using Ninject;
+using Ninject.Activation;
 
 using RevitDeclarations.Models;
 using RevitDeclarations.ViewModels;
@@ -25,6 +26,18 @@ public class ApartmentsDeclarationCommand : BasePluginCommand {
 
     protected override void Execute(UIApplication uiApplication) {
         using var kernel = uiApplication.CreatePlatformServices();
+
+        kernel.Bind<DeclarationTabItem>()
+            .ToSelf()
+            .InSingletonScope();
+        kernel.Bind<PrioritiesTabItem>()
+            .ToSelf()
+            .InSingletonScope();
+        kernel.Bind<ParamsApartmentsTabItem>()
+            .ToSelf()
+            .InSingletonScope();
+
+
         kernel.Bind<RevitRepository>()
             .ToSelf()
             .InSingletonScope();
