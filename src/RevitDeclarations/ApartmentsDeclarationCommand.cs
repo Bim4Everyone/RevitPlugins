@@ -13,6 +13,7 @@ using Ninject.Activation;
 
 using RevitDeclarations.Models;
 using RevitDeclarations.ViewModels;
+using RevitDeclarations.ViewModels.DeclarationPageViewModels;
 using RevitDeclarations.Views;
 
 using Wpf.Ui.Abstractions;
@@ -27,7 +28,7 @@ public class ApartmentsDeclarationCommand : BasePluginCommand {
     protected override void Execute(UIApplication uiApplication) {
         using var kernel = uiApplication.CreatePlatformServices();
 
-        kernel.Bind<DeclarationTabItem>()
+        kernel.Bind<DeclarationApartTabItem>()
             .ToSelf()
             .InSingletonScope();
         kernel.Bind<PrioritiesTabItem>()
@@ -36,7 +37,6 @@ public class ApartmentsDeclarationCommand : BasePluginCommand {
         kernel.Bind<ParamsApartmentsTabItem>()
             .ToSelf()
             .InSingletonScope();
-
 
         kernel.Bind<RevitRepository>()
             .ToSelf()
@@ -55,7 +55,7 @@ public class ApartmentsDeclarationCommand : BasePluginCommand {
         // Используем сервис обновления тем для WinUI
         kernel.UseWpfUIThemeUpdater();
 
-        kernel.Bind<MainViewModel>().To<ApartmentsMainVM>();
+        //kernel.Bind<MainViewModel>().To<ApartmentsMainVM>().InSingletonScope();
         kernel.BindMainWindow<ApartmentsMainVM, ApartmentsMainWindow>();
         
         Notification(kernel.Get<ApartmentsMainWindow>());

@@ -4,6 +4,7 @@ using System.Linq;
 using Autodesk.Revit.UI;
 
 using RevitDeclarations.Models;
+using RevitDeclarations.ViewModels.DeclarationPageViewModels;
 using RevitDeclarations.Views;
 
 using TaskDialog = Autodesk.Revit.UI.TaskDialog;
@@ -11,35 +12,15 @@ using TaskDialogResult = Autodesk.Revit.UI.TaskDialogResult;
 
 namespace RevitDeclarations.ViewModels;
 internal class ApartmentsMainVM : MainViewModel {
-    private readonly ApartmentsExcelExportVM _excelExportViewModel;
-    private readonly ApartmentsCsvExportVM _csvExportViewModel;
-    private readonly ApartmentsJsonExportVM _jsonExportViewModel;
-
     private new readonly ApartmentsSettings _settings;
 
     public ApartmentsMainVM(RevitRepository revitRepository, ApartmentsSettings settings)
         : base(revitRepository, settings) {
         _settings = settings;
 
-        _excelExportViewModel =
-            new ApartmentsExcelExportVM("Excel", new Guid("01EE33B6-69E1-4364-92FD-A2F94F115A9E"), _settings);
-        _csvExportViewModel =
-            new ApartmentsCsvExportVM("csv", new Guid("BF1869ED-C5C4-4FCE-9DA9-F8F75A6B190D"), _settings);
-        _jsonExportViewModel =
-            new ApartmentsJsonExportVM("json", new Guid("159FA27A-06E7-4515-9221-0BAFC0008F21"), _settings);
-
-        _exportFormats = [
-            _excelExportViewModel,
-            _csvExportViewModel,
-            _jsonExportViewModel,
-        ];
-        _selectedFormat = _exportFormats[0];
-
+        _declarationViewModel = new DeclarationApartVM(_revitRepository, settings);
         _parametersViewModel = new ApartmentsParamsVM(_revitRepository, this);
         _prioritiesViewModel = new PrioritiesViewModel(this);
-
-        _loadUtp = true;
-        _canLoadUtp = true;
 
         LoadConfig();
     }
@@ -48,7 +29,7 @@ internal class ApartmentsMainVM : MainViewModel {
         SetSelectedSettings();
         SetApartSettings();
 
-        var checkedDocuments = _revitDocuments
+        var checkedDocuments = _declarationViewModel.RevitDocuments
             .Where(x => x.IsChecked)
             .ToList();
 
@@ -118,7 +99,7 @@ internal class ApartmentsMainVM : MainViewModel {
             }
         }
 
-        if(_loadUtp) {
+        if(_declarationViewModel.LoadUtp) {
             // Проверка 6. Проверка проекта для корректной выгрузки УТП.
             var utpErrors = projects
                 .Select(x => x.CheckUtpWarnings())
@@ -148,7 +129,7 @@ internal class ApartmentsMainVM : MainViewModel {
             .ToList();
 
         try {
-            _selectedFormat.Export(FullPath, apartments);
+            _declarationViewModel.SelectedFormat.Export(_declarationViewModel.FullPath, apartments);
         } catch(Exception e) {
             var taskDialog = new TaskDialog("Ошибка выгрузки") {
                 CommonButtons = TaskDialogCommonButtons.No | TaskDialogCommonButtons.Yes,
@@ -159,7 +140,8 @@ internal class ApartmentsMainVM : MainViewModel {
             var dialogResult = taskDialog.Show();
 
             if(dialogResult == TaskDialogResult.Yes) {
-                _csvExportViewModel.Export(FullPath, apartments);
+                (_declarationViewModel as DeclarationApartVM)
+                    .CsvExportViewModel.Export(_declarationViewModel.FullPath, apartments);
             }
         }
     }

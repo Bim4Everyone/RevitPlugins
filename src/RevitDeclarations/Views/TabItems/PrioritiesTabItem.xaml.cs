@@ -7,7 +7,7 @@ using RevitDeclarations.ViewModels;
 
 namespace RevitDeclarations.Views;
 internal partial class PrioritiesTabItem {
-    public PrioritiesTabItem(MainViewModel viewModel, ILoggerService loggerService,
+    public PrioritiesTabItem(ApartmentsMainVM viewModel, ILoggerService loggerService,
                             ILanguageService languageService, ILocalizationService localizationService,
                             IUIThemeService uiThemeService, IUIThemeUpdaterService themeUpdaterService) : base(loggerService,
             languageService, localizationService,

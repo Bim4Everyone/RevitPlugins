@@ -52,7 +52,7 @@
                 <ui:NavigationViewItem
                     Content="Декларация"
                     Icon="{ui:SymbolIcon WindowBulletList20}"
-                    TargetPageType="{x:Type pages:DeclarationTabItem}" />
+                    TargetPageType="{x:Type pages:DeclarationApartTabItem}" />
                 <ui:NavigationViewItem
                     Content="Параметры"
                     Icon="{ui:SymbolIcon TextBulletListSquare20}"

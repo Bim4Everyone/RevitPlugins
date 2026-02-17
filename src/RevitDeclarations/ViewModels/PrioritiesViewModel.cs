@@ -46,8 +46,8 @@ internal class PrioritiesViewModel : BaseViewModel {
     public void SetDefaultConfig(object obj) {
         PrioritiesConfig = PrioritiesConfig.GetDefaultConfig();
 
-        _mainViewModel.CanLoadUtp = true;
-        _mainViewModel.CanLoadUtpText = "";
+        _mainViewModel.DeclarationViewModel.CanLoadUtp = true;
+        _mainViewModel.DeclarationViewModel.CanLoadUtpText = "";
         FilePath = "";
 
         PrioritiesVM = PrioritiesConfig
@@ -93,9 +93,9 @@ internal class PrioritiesViewModel : BaseViewModel {
                 .Select(x => new PriorityViewModel(x))
                 .ToList();
 
-            _mainViewModel.LoadUtp = false;
-            _mainViewModel.CanLoadUtp = false;
-            _mainViewModel.CanLoadUtpText = "Выгрузка доступна только с приоритетами A101";
+            _mainViewModel.DeclarationViewModel.LoadUtp = false;
+            _mainViewModel.DeclarationViewModel.CanLoadUtp = false;
+            _mainViewModel.DeclarationViewModel.CanLoadUtpText = "Выгрузка доступна только с приоритетами A101";
 
             PrioritiesConfig = new PrioritiesConfig(PrioritiesVM
                                         .Select(x => x.Priority)

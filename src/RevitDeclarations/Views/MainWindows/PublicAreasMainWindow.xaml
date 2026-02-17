@@ -38,7 +38,7 @@
         <TabControl>
             <TabItem 
                 Header="Декларация">
-                <tabData:DeclarationTabItem/>
+                <tabData:DeclarationApartTabItem/>
             </TabItem>
 
             <TabItem

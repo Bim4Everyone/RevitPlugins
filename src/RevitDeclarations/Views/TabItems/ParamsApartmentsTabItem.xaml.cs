@@ -6,7 +6,7 @@ using RevitDeclarations.ViewModels;
 
 namespace RevitDeclarations.Views;
 internal partial class ParamsApartmentsTabItem {
-    public ParamsApartmentsTabItem(MainViewModel viewModel, ILoggerService loggerService,
+    public ParamsApartmentsTabItem(ApartmentsMainVM viewModel, ILoggerService loggerService,
                                    ILanguageService languageService, ILocalizationService localizationService,
                                    IUIThemeService uiThemeService, IUIThemeUpdaterService themeUpdaterService) 
             : base(loggerService,

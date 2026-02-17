@@ -4,17 +4,18 @@ using System.Windows.Input;
 using dosymep.SimpleServices;
 
 using RevitDeclarations.ViewModels;
+using RevitDeclarations.ViewModels.DeclarationPageViewModels;
 
 namespace RevitDeclarations.Views;
-internal partial class DeclarationTabItem {
-    public DeclarationTabItem(MainViewModel viewModel, ILoggerService loggerService,
+internal partial class DeclarationPublicAreasTabItem {
+    public DeclarationPublicAreasTabItem(PublicAreasMainVM viewModel, ILoggerService loggerService,
         ILanguageService languageService, ILocalizationService localizationService,
         IUIThemeService uiThemeService, IUIThemeUpdaterService themeUpdaterService) 
         : base(loggerService,
                languageService, localizationService,
                uiThemeService, themeUpdaterService) {
         InitializeComponent();
-        DataContext = viewModel;
+        DataContext = viewModel.DeclarationViewModel;
     }
 
     private void IndentValidation(object sender, TextCompositionEventArgs e) {

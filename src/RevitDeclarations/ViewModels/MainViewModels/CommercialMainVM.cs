@@ -11,8 +11,7 @@ using TaskDialogResult = Autodesk.Revit.UI.TaskDialogResult;
 
 namespace RevitDeclarations.ViewModels;
 internal class CommercialMainVM : MainViewModel {
-    private readonly CommercialExcelExportVM _excelExportViewModel;
-    private readonly CommercialCsvExportVM _csvExportViewModel;
+
 
     private new readonly CommercialSettings _settings;
 
@@ -20,22 +19,9 @@ internal class CommercialMainVM : MainViewModel {
         : base(revitRepository, settings) {
         _settings = settings;
 
-        _excelExportViewModel =
-            new CommercialExcelExportVM("Excel", new Guid("8D69848F-159D-4B26-B4C0-17E3B3A132CC"), _settings);
-        _csvExportViewModel =
-            new CommercialCsvExportVM("csv", new Guid("EC72C14A-9D4A-4D8B-BD35-50801CE68C24"), _settings);
-
-        _exportFormats = [
-            _excelExportViewModel,
-            _csvExportViewModel
-        ];
-        _selectedFormat = _exportFormats[0];
-
         _parametersViewModel = new CommercialParamsVM(_revitRepository, this);
+        _declarationViewModel = new DeclarationCommercialVM(_revitRepository, settings);
         _prioritiesViewModel = new PrioritiesViewModel(this);
-
-        _loadUtp = false;
-        _canLoadUtp = false;
 
         LoadConfig();
     }
@@ -44,7 +30,7 @@ internal class CommercialMainVM : MainViewModel {
         SetSelectedSettings();
         SetCommSettings();
 
-        var checkedDocuments = _revitDocuments
+        var checkedDocuments = _declarationViewModel.RevitDocuments
             .Where(x => x.IsChecked)
             .ToList();
 
@@ -96,7 +82,7 @@ internal class CommercialMainVM : MainViewModel {
             .ThenBy(x => x.Rooms.First().Number ?? "", _stringComparer)
             .ToList();
 
-        _selectedFormat.Export(FullPath, commercialRooms);
+        _declarationViewModel.SelectedFormat.Export(_declarationViewModel.FullPath, commercialRooms);
         try {
         } catch(Exception e) {
             var taskDialog = new TaskDialog("Ошибка выгрузки") {
@@ -108,7 +94,7 @@ internal class CommercialMainVM : MainViewModel {
             var dialogResult = taskDialog.Show();
 
             if(dialogResult == TaskDialogResult.Yes) {
-                _csvExportViewModel.Export(FullPath, commercialRooms);
+                _declarationViewModel.SelectedFormat.Export(_declarationViewModel.FullPath, commercialRooms);
             }
         }
     }
