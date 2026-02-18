@@ -55,15 +55,15 @@ namespace RevitMechanicalSpecification.Service {
         /// <param name="paraName"></param>
         /// <returns></returns>
         public static Parameter GetTypeOrInstanceParam(this Element element, Element elementType, string paramName) {
-            if(!(element.IsExistsParam(paramName)
-                || elementType.IsExistsParam(paramName))) {
-                return null;
+            if(element.IsExistsParam(paramName)) {
+                return element.GetParam(paramName);
             }
 
-            Parameter parameter = element.GetParam(paramName) ??
-                elementType.GetParam(paramName);
+            if(elementType.IsExistsParam(paramName)) {
+                return elementType.GetParam(paramName);
+            }
 
-            return parameter;
+            return null;
         }
 
         public static bool IsTypeOrInstanceParamExist(this SpecificationElement specificationElement, string paramName) {

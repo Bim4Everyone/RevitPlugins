@@ -53,8 +53,7 @@ namespace RevitMechanicalSpecification.Service {
             }
 
             if(parameter.StorageType == StorageType.Double) {
-                double value = element.GetTypeOrInstanceParamDoubleValue(elemType, paramName);
-                value = UnitConverter.DoubleToMilimeters(value);
+                double value = UnitConverter.DoubleToProjectUnits(parameter.AsDouble(), parameter);
                 return UnitConverter.DoubleToString(value);
             }
 
