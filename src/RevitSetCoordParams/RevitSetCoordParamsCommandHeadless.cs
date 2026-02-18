@@ -58,7 +58,7 @@ public class RevitSetCoordParamsCommandHeadless : BasePluginCommand {
             ConfigSettings configSettings;
             if(projectConfig == null) {
                 configSettings = new ConfigSettings();
-                configSettings.ApplyDefaultValues();
+                configSettings.ApplyDefaultValues(revitRepository);
             } else {
                 configSettings = projectConfig.ConfigSettings;
             }

@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Linq;
 
 using Autodesk.Revit.DB;
 
@@ -10,30 +11,23 @@ internal class ConfigSettings {
     public ElementsProviderType ElementsProvider { get; set; }
     public PositionProviderType PositionProvider { get; set; }
     public string SourceFile { get; set; }
-    public string TypeModel { get; set; }
+    public List<string> TypeModels { get; set; }
     public List<ParamMap> ParamMaps { get; set; }
     public List<BuiltInCategory> Categories { get; set; }
     public double MaxDiameterSearchSphereMm { get; set; }
     public double StepDiameterSearchSphereMm { get; set; }
     public bool Search { get; set; }
 
-    public void ApplyDefaultValues() {
+    public void ApplyDefaultValues(RevitRepository revitRepository) {
         ElementsProvider = ElementsProviderType.AllElementsProvider;
         PositionProvider = PositionProviderType.CenterPositionProvider;
         SourceFile = RevitConstants.CoordFilePartName;
-        TypeModel = RevitConstants.TypeModel;
-        ParamMaps = GetDefaultParamMaps();
-        Categories = GetDefaultCategories();
+        var doc = revitRepository.FindDocumentsByName(SourceFile);
+        TypeModels = revitRepository.GetSourceElementsValues(doc).ToList();
+        ParamMaps = RevitConstants.GetDefaultParamMaps();
+        Categories = RevitConstants.GetDefaultBuiltInCategories();
         MaxDiameterSearchSphereMm = RevitConstants.MaxDiameterSearchSphereMm;
         StepDiameterSearchSphereMm = RevitConstants.StepDiameterSearchSphereMm;
         Search = RevitConstants.Search;
-    }
-
-    private List<ParamMap> GetDefaultParamMaps() {
-        return RevitConstants.GetDefaultParamMaps();
-    }
-
-    private List<BuiltInCategory> GetDefaultCategories() {
-        return RevitConstants.GetDefaultBuiltInCategories();
     }
 }

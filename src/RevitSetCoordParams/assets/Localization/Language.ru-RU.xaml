@@ -9,7 +9,10 @@
     <system:String x:Key="MainWindow.SourceFilesDescription">Файл, с которого будут считываться данные</system:String>
     
     <system:String x:Key="MainWindow.TypeModels">Тип объемных элементов СМР</system:String>
-    <system:String x:Key="MainWindow.TypeModelsDescription">Будут обработаны объемные модели только этого типа</system:String>
+    <system:String x:Key="MainWindow.TypeModelsDescription">Будут обработаны объемные модели этих типов</system:String>
+    <system:String x:Key="MainWindow.SearchTextTypeModels">Поиск по имени объемных элементов СМР</system:String>
+    <system:String x:Key="MainWindow.CheckedAllTypeModels">Выбрать все типы</system:String>
+    <system:String x:Key="MainWindow.NotCheckedAllTypeModels">Сбросить выбор типов</system:String>
     <system:String x:Key="MainWindow.Positions">Позиция элемента</system:String>
     <system:String x:Key="MainWindow.PositionsDescription">Определяет, относительно какой точки искать элемент</system:String>
     <system:String x:Key="MainWindow.Params">Параметры СМР</system:String>

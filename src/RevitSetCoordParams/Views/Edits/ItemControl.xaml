@@ -1,15 +1,17 @@
-﻿<UserControl x:Class="RevitSetCoordParams.Views.Edits.CategoryControl"             
+﻿<UserControl
+    x:Class="RevitSetCoordParams.Views.Edits.ItemControl"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
-    xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:local="clr-namespace:RevitSetCoordParams.Views.Edits"
     xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
     xmlns:converters="clr-namespace:dosymep.WpfCore.Converters;assembly=dosymep.WpfCore"
     x:Name="_this"
     Margin="5"
-    mc:Ignorable="d" 
-    d:DesignHeight="30" d:DesignWidth="300">
+    mc:Ignorable="d"
+    d:DesignHeight="30"
+    d:DesignWidth="300">
 
     <UserControl.Resources>
         <converters:BoolToVisibilityConverter
@@ -20,7 +22,7 @@
 
     <Border
         VerticalAlignment="Center"
-        HorizontalAlignment="Stretch"        
+        HorizontalAlignment="Stretch"
         Background="{DynamicResource CardBackground}"
         BorderBrush="{DynamicResource CardBorderBrush}"
         CornerRadius="{DynamicResource ControlCornerRadius}"
@@ -46,7 +48,7 @@
                 VerticalAlignment="Center"
                 FontTypography="BodyStrong"
                 Foreground="{DynamicResource TextFillColorPrimaryBrush}"
-                Text="{Binding CategoryName, ElementName=_this}"
+                Text="{Binding ItemName, ElementName=_this}"
                 TextWrapping="WrapWithOverflow" />
 
             <ui:SymbolIcon
