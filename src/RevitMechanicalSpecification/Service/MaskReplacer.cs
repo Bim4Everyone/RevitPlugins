@@ -93,13 +93,15 @@ namespace RevitMechanicalSpecification.Service {
                 return string.Empty;
             }
 
-            string mask = element.GetSharedParamValueOrDefault<string>(maskName) ?? elemType.GetSharedParamValueOrDefault<string>(maskName, "ЗАПОЛНИТЕ МАСКУ");
+            string mask = element.GetSharedParamValueOrDefault<string>(maskName) 
+                ?? elemType.GetSharedParamValueOrDefault<string>(maskName, "ЗАПОЛНИТЕ МАСКУ");
 
-            string width = GetStringValue(element, elemType, _adskWidth);
-            string height = GetStringValue(element, elemType, _adskHeight);
-            string lenght = GetStringValue(element, elemType, _adskLength);
+            string defaultSizeValue = UnitConverter.DoubleToString(0);
+            string width = GetStringValue(element, elemType, _adskWidth) ?? defaultSizeValue;
+            string height = GetStringValue(element, elemType, _adskHeight) ?? defaultSizeValue;
+            string lenght = GetStringValue(element, elemType, _adskLength) ?? defaultSizeValue;
 
-            string diameter = GetStringValue(element, elemType, _adskDiameter);
+            string diameter = GetStringValue(element, elemType, _adskDiameter) ?? defaultSizeValue;
 
             if(mask.Contains(_height)) {
                 mask = mask.Replace(_height, height);
