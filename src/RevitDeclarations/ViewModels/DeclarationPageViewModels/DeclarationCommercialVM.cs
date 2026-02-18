@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 
 using RevitDeclarations.Models;
-using RevitDeclarations.ViewModels.DeclarationPageViewModels;
+using RevitDeclarations.ViewModels;
 
 namespace RevitDeclarations.ViewModels;
 

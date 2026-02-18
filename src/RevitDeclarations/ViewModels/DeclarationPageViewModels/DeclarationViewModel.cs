@@ -15,7 +15,7 @@ using dosymep.WPF.Commands;
 using dosymep.WPF.ViewModels;
 using Microsoft.WindowsAPICodePack.Dialogs;
 
-namespace RevitDeclarations.ViewModels.DeclarationPageViewModels;
+namespace RevitDeclarations.ViewModels;
 
 internal class DeclarationViewModel : BaseViewModel {
     protected readonly RevitRepository _revitRepository;
@@ -35,9 +35,7 @@ internal class DeclarationViewModel : BaseViewModel {
 
     protected bool _loadUtp;
     protected bool _canLoadUtp;
-    protected string _canLoadUtpText;
-
-    
+    protected string _canLoadUtpText;    
 
     public DeclarationViewModel(RevitRepository revitRepository, DeclarationSettings settings) {
         _revitRepository = revitRepository;

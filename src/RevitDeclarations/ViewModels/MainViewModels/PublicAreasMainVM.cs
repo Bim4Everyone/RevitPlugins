@@ -4,7 +4,7 @@ using System.Linq;
 using Autodesk.Revit.UI;
 
 using RevitDeclarations.Models;
-using RevitDeclarations.ViewModels.DeclarationPageViewModels;
+using RevitDeclarations.ViewModels;
 using RevitDeclarations.Views;
 
 using TaskDialog = Autodesk.Revit.UI.TaskDialog;

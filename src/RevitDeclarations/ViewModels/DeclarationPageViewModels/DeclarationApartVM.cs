@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 using RevitDeclarations.Models;
 
-namespace RevitDeclarations.ViewModels.DeclarationPageViewModels;
+namespace RevitDeclarations.ViewModels;
 
 internal class DeclarationApartVM : DeclarationViewModel {
     private readonly ApartmentsExcelExportVM _excelExportViewModel;

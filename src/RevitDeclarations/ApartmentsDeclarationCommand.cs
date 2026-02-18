@@ -13,7 +13,6 @@ using Ninject.Activation;
 
 using RevitDeclarations.Models;
 using RevitDeclarations.ViewModels;
-using RevitDeclarations.ViewModels.DeclarationPageViewModels;
 using RevitDeclarations.Views;
 
 using Wpf.Ui.Abstractions;

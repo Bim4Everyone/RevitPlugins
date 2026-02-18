@@ -4,7 +4,6 @@ using System.Windows.Input;
 using dosymep.SimpleServices;
 
 using RevitDeclarations.ViewModels;
-using RevitDeclarations.ViewModels.DeclarationPageViewModels;
 
 namespace RevitDeclarations.Views;
 internal partial class DeclarationApartPage {

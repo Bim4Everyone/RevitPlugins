@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 using RevitDeclarations.Models;
 
-namespace RevitDeclarations.ViewModels.DeclarationPageViewModels;
+namespace RevitDeclarations.ViewModels;
 
 internal class DeclarationPublicAreasVM : DeclarationViewModel {
     private readonly PublicAreasExcelExportVM _excelExportViewModel;
