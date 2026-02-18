@@ -19,6 +19,7 @@ internal class CommercialMainVM : MainViewModel {
 
         _declarationViewModel = new DeclarationCommercialVM(_revitRepository, settings);
         _parametersViewModel = new CommercialParamsVM(_revitRepository, this);
+        _prioritiesViewModel = new PrioritiesViewModel(this);
 
         LoadConfig();
     }
