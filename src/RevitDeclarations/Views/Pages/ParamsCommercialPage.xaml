@@ -19,9 +19,8 @@
     <core:WpfUIPlatformPage.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
-                <ResourceDictionary  Source="../Styles.xaml"/>
-                <ResourceDictionary  Source="../Styles/StyleResources.xaml"/>
-                <ResourceDictionary  Source="../ToolTips/ParameterToolTips.xaml"/>
+                <ResourceDictionary Source="../Styles/Styles.xaml" />
+                <ResourceDictionary Source="../ToolTips/ParameterToolTips.xaml"/>
             </ResourceDictionary.MergedDictionaries>
             <BooleanToVisibilityConverter x:Key="BoolToVis"/>
         </ResourceDictionary>
