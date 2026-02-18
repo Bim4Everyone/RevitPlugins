@@ -4,18 +4,11 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-    
-    xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
-    
+    xmlns:vms="clr-namespace:RevitDeclarations.ViewModels"
+    xmlns:pages="clr-namespace:RevitDeclarations.Views"
     xmlns:core="clr-namespace:dosymep.WpfUI.Core"
     xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
     xmlns:me="clr-namespace:dosymep.WpfCore.MarkupExtensions;assembly=dosymep.WpfCore"
-    xmlns:pages="clr-namespace:RevitDeclarations.Views"
-    
-    xmlns:base="clr-namespace:dosymep.WPF.Views"
-    xmlns:local="clr-namespace:RevitDeclarations.Views"
-    xmlns:vms="clr-namespace:RevitDeclarations.ViewModels"
-    xmlns:tabData="clr-namespace:RevitDeclarations.Views"
     
     mc:Ignorable="d"
     WindowStartupLocation="CenterOwner"

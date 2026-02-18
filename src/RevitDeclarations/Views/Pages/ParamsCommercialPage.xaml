@@ -4,17 +4,16 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
-    xmlns:local="clr-namespace:RevitDeclarations.Views"
     xmlns:me="clr-namespace:dosymep.WpfCore.MarkupExtensions;assembly=dosymep.WpfCore"
     xmlns:core="clr-namespace:dosymep.WpfUI.Core"
     xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
+    
     xmlns:vms="clr-namespace:RevitDeclarations.ViewModels"    
     d:DataContext="{d:DesignInstance vms:CommercialParamsVM, IsDesignTimeCreatable=False}"
-    x:ClassModifier="internal"
+    
     mc:Ignorable="d" 
-    Background="White"
-    MinHeight="770" MinWidth="630"
-    Height="Auto" Width="Auto">
+    x:ClassModifier="internal"
+    Background="White">
 
     <core:WpfUIPlatformPage.Resources>
         <ResourceDictionary>
@@ -22,7 +21,6 @@
                 <ResourceDictionary Source="../Styles/Styles.xaml" />
                 <ResourceDictionary Source="../ToolTips/ParameterToolTips.xaml"/>
             </ResourceDictionary.MergedDictionaries>
-            <BooleanToVisibilityConverter x:Key="BoolToVis"/>
         </ResourceDictionary>
     </core:WpfUIPlatformPage.Resources>
 

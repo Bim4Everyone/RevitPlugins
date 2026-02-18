@@ -10,16 +10,13 @@
     xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
     
     Background="White"
-    x:ClassModifier="internal"
-    >
+    x:ClassModifier="internal">
 
     <core:WpfUIPlatformPage.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
                 <ResourceDictionary Source="../Styles/Styles.xaml" />
-                <ResourceDictionary Source="../ToolTips/ParameterToolTips.xaml"/>
             </ResourceDictionary.MergedDictionaries>
-            <BooleanToVisibilityConverter x:Key="BoolToVis"/>
         </ResourceDictionary>
     </core:WpfUIPlatformPage.Resources>
     

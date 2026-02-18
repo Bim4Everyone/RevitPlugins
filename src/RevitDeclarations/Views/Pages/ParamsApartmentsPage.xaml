@@ -21,7 +21,6 @@
                 <ResourceDictionary Source="../Styles/Styles.xaml" />
                 <ResourceDictionary Source="../ToolTips/ParameterToolTips.xaml"/>
             </ResourceDictionary.MergedDictionaries>
-            <BooleanToVisibilityConverter x:Key="BoolToVis"/>
         </ResourceDictionary>
     </core:WpfUIPlatformPage.Resources>
     
@@ -127,12 +126,12 @@
                     <RowDefinition Height="42"/>
                     <RowDefinition Height="42"/>
                 </Grid.RowDefinitions>
-
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="30"/>
                     <ColumnDefinition Width="340"/>
                     <ColumnDefinition/>
                 </Grid.ColumnDefinitions>
+                
                 <TextBlock
                     Grid.Row="0"
                     Grid.ColumnSpan="3"
@@ -300,7 +299,6 @@
                     <RowDefinition Height="43"/>
                     <RowDefinition Height="43"/>
                 </Grid.RowDefinitions>
-
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="30"/>
                     <ColumnDefinition Width="340"/>
