@@ -47,7 +47,7 @@ internal class WarningsViewModel : BaseViewModel {
 
     // Метод выделения элемента
     private void ShowElement(ElementId elementId) {
-        _revitRepository.SetSelected(elementId);
+        _revitRepository.SetSelected([elementId]);
     }
 
     // Метод формирования списка WarningGroupViewModel
@@ -56,7 +56,7 @@ internal class WarningsViewModel : BaseViewModel {
             .Where(w => w is not WarningNotFoundParamElement)
             .GroupBy(w => w.WarningType)
             .Select(group => {
-                var vm = new WarningGroupViewModel {
+                var vm = new WarningGroupViewModel(_revitRepository) {
                     Caption = _localizationService.GetLocalizedString($"WarningsViewModel.{group.Key}"),
                     Description = _localizationService.GetLocalizedString($"WarningsViewModel.{group.Key}Description"),
                     WarningElements = group.ToList(),
@@ -76,7 +76,7 @@ internal class WarningsViewModel : BaseViewModel {
             })
             .GroupBy(g => g.ParamNames)
             .Select(g => {
-                var vm = new WarningGroupViewModel {
+                var vm = new WarningGroupViewModel(_revitRepository) {
                     Caption = $"{_localizationService.GetLocalizedString("WarningsViewModel.NotFoundParam")}: {g.Key}",
                     Description = _localizationService.GetLocalizedString("WarningsViewModel.NotFoundParamDescription"),
                     WarningElements = g.SelectMany(x => x.WarningElements).ToList(),

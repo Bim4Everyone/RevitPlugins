@@ -82,11 +82,8 @@ internal class RevitRepository {
         }
 
         var categorySet = new HashSet<BuiltInCategory>(categories);
-
         var nested = GetAllNestedFamilyInstances(selectedElements);
-
         var dependent = GetAllDependentElements(selectedElements);
-
         var allElements = selectedElements
             .Concat(nested)
             .Concat(dependent)
@@ -134,7 +131,7 @@ internal class RevitRepository {
     }
 
     /// <summary>
-    /// Метод получения все вариантов значений объемных элементов по заданному параметру
+    /// Метод получения всех вариантов значений объемных элементов по заданному параметру
     /// </summary>
     public IEnumerable<string> GetSourceElementsValues(Document document) {
         var collector = new FilteredElementCollector(document)
@@ -217,9 +214,8 @@ internal class RevitRepository {
     /// <summary>
     /// Метод выделения элементов в документе
     /// </summary>
-    public void SetSelected(ElementId elementId) {
-        List<ElementId> listElements = [elementId];
-        ActiveUIDocument.SetSelectedElements(listElements);
+    public void SetSelected(List<ElementId> elementIds) {
+        ActiveUIDocument.SetSelectedElements(elementIds);
     }
 
     // Метод получения объединенного солида
