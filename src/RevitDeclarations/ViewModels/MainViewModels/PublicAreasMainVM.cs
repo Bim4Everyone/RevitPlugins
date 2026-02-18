@@ -12,8 +12,6 @@ using TaskDialogResult = Autodesk.Revit.UI.TaskDialogResult;
 
 namespace RevitDeclarations.ViewModels;
 internal class PublicAreasMainVM : MainViewModel {
-
-
     private new readonly PublicAreasSettings _settings;
 
     public PublicAreasMainVM(RevitRepository revitRepository, PublicAreasSettings settings)

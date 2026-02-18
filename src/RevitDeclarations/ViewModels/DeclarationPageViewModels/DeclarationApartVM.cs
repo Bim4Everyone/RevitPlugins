@@ -29,7 +29,6 @@ internal class DeclarationApartVM : DeclarationViewModel {
         ];
         _selectedFormat = _exportFormats[0];
 
-
         _loadUtp = true;
         _canLoadUtp = true;
     }

@@ -16,7 +16,6 @@ internal class PrioritiesViewModel : BaseViewModel {
     private string _filePath;
     private List<PriorityViewModel> _prioritiesVM;
 
-
     public PrioritiesViewModel(MainViewModel mainViewModel) {
         _mainViewModel = mainViewModel;
 

@@ -54,8 +54,6 @@ internal abstract class ParametersViewModel : BaseViewModel {
     public ICommand SetLastConfigCommand { get; }
     public ICommand SetCompanyConfigCommand { get; }
 
-    //public IList<RevitDocumentViewModel> RevitDocuments => _mainViewModel.DeclarationViewModel.RevitDocuments;
-
     public RevitDocumentViewModel SelectedDocument {
         get => _selectedDocument;
         set {
@@ -152,7 +150,6 @@ internal abstract class ParametersViewModel : BaseViewModel {
     /// Список параметров для проверки их заполненности в View
     /// </summary>
     public abstract List<Parameter> AllSelectedParameters { get; }
-
 
     public void AddFilter(object obj) {
         if(!string.IsNullOrEmpty(_filterRoomsValue)) {
