@@ -1,4 +1,4 @@
-﻿<base:PlatformWindow
+﻿<core:WpfUIPlatformWindow
     x:Class="RevitDeclarations.Views.PublicAreasMainWindow"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
@@ -6,7 +6,12 @@
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     
     xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
-
+    
+    xmlns:core="clr-namespace:dosymep.WpfUI.Core"
+    xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
+    xmlns:me="clr-namespace:dosymep.WpfCore.MarkupExtensions;assembly=dosymep.WpfCore"
+    xmlns:pages="clr-namespace:RevitDeclarations.Views"
+    
     xmlns:base="clr-namespace:dosymep.WPF.Views"
     xmlns:local="clr-namespace:RevitDeclarations.Views"
     xmlns:vms="clr-namespace:RevitDeclarations.ViewModels"
@@ -15,59 +20,69 @@
     mc:Ignorable="d"
     WindowStartupLocation="CenterOwner"
 
-    MinHeight="880" MinWidth="650"
-    Height="880" Width="650"
+    MinHeight="700" MinWidth="1000"
+    Height="700" Width="1000"
 
     d:DataContext="{d:DesignInstance vms:PublicAreasMainVM, IsDesignTimeCreatable=False}">
 
-    <Window.Resources>
-        <ResourceDictionary>
-            <ResourceDictionary.MergedDictionaries>
-                <ResourceDictionary  Source="../Styles/StyleResources.xaml"/>
-            </ResourceDictionary.MergedDictionaries>
-            <BooleanToVisibilityConverter x:Key="BoolToVis"/>
-        </ResourceDictionary>
-    </Window.Resources>
-
     <Grid>
         <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
             <RowDefinition Height="*" />
             <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
 
-        <TabControl>
-            <TabItem 
-                Header="Декларация">
-                <tabData:DeclarationApartPage/>
-            </TabItem>
+        <ui:TitleBar
+            VerticalAlignment="Center"
+            Grid.Row="0"
+            Title="{me:LocalizationSource MainWindow.Title}" />
+        
+        <ui:NavigationView
+            Grid.Row="1"
+            x:Name="_rootNavigationView"
+            FrameMargin="0"
+            OpenPaneLength="200"
+            IsPaneOpen="True"
+            PaneDisplayMode="Left"
+            IsBackButtonVisible="Collapsed"
+            IsPaneVisible="True"
+            IsPaneToggleVisible="True"
+            PaneTitle="Декларации"
+            BreadcrumbBar="{Binding ElementName=_breadcrumbBar}">
 
-            <TabItem
-                Header="Параметры"
-                DataContext="{Binding ParametersViewModel}">
-                <tabData:ParamsPublicAreasPage/>
-            </TabItem>
-        </TabControl>
+            <ui:NavigationView.MenuItems>
+                <ui:NavigationViewItem
+                    Content="Декларация"
+                    Icon="{ui:SymbolIcon WindowBulletList20}"
+                    TargetPageType="{x:Type pages:DeclarationPublicAreasPage}" />
+                <ui:NavigationViewItem
+                    Content="Параметры"
+                    Icon="{ui:SymbolIcon TextBulletListSquare20}"
+                    TargetPageType="{x:Type pages:ParamsPublicAreasPage}" />
+            </ui:NavigationView.MenuItems>
+        </ui:NavigationView>
 
         <StackPanel
-            Grid.Row="1"
-            Height="45"
+            Grid.Row="2"
             Orientation="Horizontal"
             HorizontalAlignment="Right">
             <TextBlock
                 Margin="10"
+                
                 Foreground="Orange"
                 VerticalAlignment="Center"
                 Text="{Binding ErrorText}"/>
 
-            <Button
+            <ui:Button
                 Margin="10"
                 Width="80"
                 Content="ОК"
                 IsDefault="True"
+                Appearance="Info"
                 Click="ButtonOk_Click"
                 Command="{Binding ExportDeclarationCommand}"/>
 
-            <Button
+            <ui:Button
                 Margin="10"
                 Width="80"
                 Content="Отмена"
@@ -75,5 +90,5 @@
                 Click="ButtonCancel_Click"/>
         </StackPanel>
     </Grid>
-</base:PlatformWindow>
+</core:WpfUIPlatformWindow>
 

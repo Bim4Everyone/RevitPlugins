@@ -113,7 +113,6 @@
                         <RowDefinition Height="43"/>
                         <RowDefinition Height="43"/>
                         <RowDefinition Height="43"/>
-                        <RowDefinition Height="43"/>
                     </Grid.RowDefinitions>
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="230" />
@@ -152,29 +151,7 @@
                         Height="35"
                         PreviewTextInput="IndentValidation"
                         PreviewKeyDown="TextBox_PreviewKeyDown"
-                        Text="{Binding Accuracy}"/>
-
-                    <TextBlock
-                        Grid.Row="3"
-                        Grid.Column="0"
-                        Style="{StaticResource PropertyName}"
-                        Text="Рассчитывать УТП:"/>
-                    <StackPanel
-                        Grid.Row="3"
-                        Grid.Column="1"
-                        Orientation="Horizontal">
-                        <CheckBox
-                            VerticalAlignment="Center"
-                            HorizontalAlignment="Left"
-                            IsEnabled="{Binding CanLoadUtp}"
-                            IsChecked="{Binding LoadUtp}"/>
-                        <TextBlock
-                            Margin="5,0,0,0"
-                            Foreground="Orange"
-                            Padding="0,2"
-                            VerticalAlignment="Center"
-                            Text="{Binding CanLoadUtpText}"/>
-                    </StackPanel>
+                        Text="{Binding Accuracy}" />
                 </Grid>
             </Border>
                     

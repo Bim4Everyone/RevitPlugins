@@ -20,10 +20,8 @@ internal class PublicAreasMainVM : MainViewModel {
         : base(revitRepository, settings) {
         _settings = settings;
 
-        _parametersViewModel = new PublicAreasParamsVM(_revitRepository, this);
         _declarationViewModel = new DeclarationPublicAreasVM(_revitRepository, settings);
-        _prioritiesViewModel = new PrioritiesViewModel(this);
-
+        _parametersViewModel = new PublicAreasParamsVM(_revitRepository, this);
 
         LoadConfig();
     }
