@@ -1,20 +1,22 @@
-﻿<UserControl 
+﻿<core:WpfUIPlatformPage 
     x:Class="RevitDeclarations.Views.ParamsCommercialPage"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
-    xmlns:local="clr-namespace:RevitDeclarations.Views"    
-        
+    xmlns:local="clr-namespace:RevitDeclarations.Views"
+    xmlns:me="clr-namespace:dosymep.WpfCore.MarkupExtensions;assembly=dosymep.WpfCore"
+    xmlns:core="clr-namespace:dosymep.WpfUI.Core"
+    xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
     xmlns:vms="clr-namespace:RevitDeclarations.ViewModels"    
     d:DataContext="{d:DesignInstance vms:CommercialParamsVM, IsDesignTimeCreatable=False}"
-    
+    x:ClassModifier="internal"
     mc:Ignorable="d" 
     Background="White"
     MinHeight="770" MinWidth="630"
     Height="Auto" Width="Auto">
 
-    <UserControl.Resources>
+    <core:WpfUIPlatformPage.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
                 <ResourceDictionary  Source="../Styles/StyleResources.xaml"/>
@@ -22,7 +24,7 @@
             </ResourceDictionary.MergedDictionaries>
             <BooleanToVisibilityConverter x:Key="BoolToVis"/>
         </ResourceDictionary>
-    </UserControl.Resources>
+    </core:WpfUIPlatformPage.Resources>
 
     <Grid>
         <Grid.RowDefinitions>
@@ -704,4 +706,4 @@
                 Text="{Binding ProjectName, UpdateSourceTrigger=PropertyChanged}"/>
         </Grid>
     </Grid>
-</UserControl>
+</core:WpfUIPlatformPage>

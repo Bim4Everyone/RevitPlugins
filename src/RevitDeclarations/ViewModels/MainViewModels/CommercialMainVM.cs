@@ -11,17 +11,14 @@ using TaskDialogResult = Autodesk.Revit.UI.TaskDialogResult;
 
 namespace RevitDeclarations.ViewModels;
 internal class CommercialMainVM : MainViewModel {
-
-
     private new readonly CommercialSettings _settings;
 
     public CommercialMainVM(RevitRepository revitRepository, CommercialSettings settings)
         : base(revitRepository, settings) {
         _settings = settings;
 
-        _parametersViewModel = new CommercialParamsVM(_revitRepository, this);
         _declarationViewModel = new DeclarationCommercialVM(_revitRepository, settings);
-        _prioritiesViewModel = new PrioritiesViewModel(this);
+        _parametersViewModel = new CommercialParamsVM(_revitRepository, this);
 
         LoadConfig();
     }
@@ -137,7 +134,6 @@ internal class CommercialMainVM : MainViewModel {
 
         config.SaveProjectConfig();
     }
-
 
     private void SetCommSettings() {
         var commercialParamsVM = (CommercialParamsVM) _parametersViewModel;

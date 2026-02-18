@@ -8,7 +8,7 @@ using RevitDeclarations.ViewModels.DeclarationPageViewModels;
 
 namespace RevitDeclarations.Views;
 internal partial class DeclarationCommercialPage {
-    public DeclarationCommercialPage(PublicAreasMainVM viewModel, ILoggerService loggerService,
+    public DeclarationCommercialPage(CommercialMainVM viewModel, ILoggerService loggerService,
         ILanguageService languageService, ILocalizationService localizationService,
         IUIThemeService uiThemeService, IUIThemeUpdaterService themeUpdaterService) 
         : base(loggerService,

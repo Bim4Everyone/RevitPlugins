@@ -39,7 +39,7 @@ internal abstract class ParametersViewModel : BaseViewModel {
         _mainViewModel = mainViewModel;
         _revitRepository = revitRepository;
 
-        SelectedDocument = RevitDocuments.FirstOrDefault();
+        SelectedDocument = _mainViewModel.DeclarationViewModel.RevitDocuments.FirstOrDefault();
 
         UpdateParameters();
 
@@ -54,7 +54,7 @@ internal abstract class ParametersViewModel : BaseViewModel {
     public ICommand SetLastConfigCommand { get; }
     public ICommand SetCompanyConfigCommand { get; }
 
-    public IList<RevitDocumentViewModel> RevitDocuments => _mainViewModel.DeclarationViewModel.RevitDocuments;
+    //public IList<RevitDocumentViewModel> RevitDocuments => _mainViewModel.DeclarationViewModel.RevitDocuments;
 
     public RevitDocumentViewModel SelectedDocument {
         get => _selectedDocument;

@@ -1,8 +1,17 @@
 using System.Windows.Controls;
 
+using dosymep.SimpleServices;
+using RevitDeclarations.ViewModels;
+
 namespace RevitDeclarations.Views;
-public partial class ParamsCommercialPage : UserControl {
-    public ParamsCommercialPage() {
+internal partial class ParamsCommercialPage {
+    public ParamsCommercialPage(CommercialMainVM viewModel, ILoggerService loggerService,
+                                   ILanguageService languageService, ILocalizationService localizationService,
+                                   IUIThemeService uiThemeService, IUIThemeUpdaterService themeUpdaterService)
+            : base(loggerService,
+            languageService, localizationService,
+            uiThemeService, themeUpdaterService) {
         InitializeComponent();
+        DataContext = viewModel.ParametersViewModel;
     }
 }

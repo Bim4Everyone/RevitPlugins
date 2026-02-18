@@ -4,7 +4,6 @@ using System.Windows.Input;
 using dosymep.SimpleServices;
 using RevitDeclarations.ViewModels;
 
-
 namespace RevitDeclarations.Views;
 internal partial class PrioritiesPage {
     public PrioritiesPage(ApartmentsMainVM viewModel, ILoggerService loggerService,
