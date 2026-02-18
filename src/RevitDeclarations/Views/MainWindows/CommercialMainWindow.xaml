@@ -71,7 +71,6 @@
 
         <StackPanel
             Grid.Row="2"
-            Height="45"
             Orientation="Horizontal"
             HorizontalAlignment="Right">
             <TextBlock
@@ -80,15 +79,16 @@
                 VerticalAlignment="Center"
                 Text="{Binding ErrorText}"/>
 
-            <Button
+            <ui:Button
                 Margin="10"
                 Width="80"
                 Content="ОК"
                 IsDefault="True"
+                Appearance="Info"
                 Click="ButtonOk_Click"
                 Command="{Binding ExportDeclarationCommand}"/>
 
-            <Button
+            <ui:Button
                 Margin="10"
                 Width="80"
                 Content="Отмена"
