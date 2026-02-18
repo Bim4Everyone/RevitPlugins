@@ -73,71 +73,65 @@
                         Description="{Binding Description}"
                         ExtraTextVisible="True"
                         ExtraText="{Binding WarningQuantity}"
+                        ButtonVisible="True"
+                        ButtonCommand="{Binding SelectAllCommand}"
                         IsChecked="True">
                         <edits:CustomGroupEditControl.EditControl>
-                            <StackPanel>
-                                <ui:Button
-                                    Margin="20,0,0,0"
-                                    HorizontalAlignment="Left"
-                                    Width="Auto"
-                                    Content="{DynamicResource WarningGroupViewModel.SelectAll}"
-                                    Command="{Binding SelectAllCommand}" />
-                                <ui:DataGrid
-                                    MaxHeight="500"
-                                    AutoGenerateColumns="False"
-                                    IsReadOnly="True"
-                                    Style="{StaticResource CustomResizableDataGridStyle}"
-                                    ItemsSource="{Binding Warnings}">
-                                    <ui:DataGrid.Columns>
-                                        <DataGridTemplateColumn>
-                                            <DataGridTemplateColumn.Header>
-                                                <!--В динамически-создаваемом UserControl работает только DynamicResource-->
-                                                <ui:TextBlock
-                                                    Text="{DynamicResource WarningWindow.IdHeader}" />
-                                            </DataGridTemplateColumn.Header>
-                                            <DataGridTemplateColumn.CellTemplate>
-                                                <DataTemplate>
-                                                    <Button
-                                                        Width="100"
-                                                        Content="{Binding ID}"
-                                                        Command="{Binding DataContext.ShowElementCommand, 
-                                                            RelativeSource={RelativeSource AncestorType=Window}}"
-                                                        CommandParameter="{Binding ID}" />
-                                                </DataTemplate>
-                                            </DataGridTemplateColumn.CellTemplate>
-                                        </DataGridTemplateColumn>
-                                        <DataGridTextColumn
-                                            Width="200"
-                                            Binding="{Binding Family}">
-                                            <DataGridTextColumn.Header>
-                                                <!--В динамически-создаваемом UserControl работает только DynamicResource-->
-                                                <ui:TextBlock
-                                                    Text="{DynamicResource WarningWindow.FamilyHeader}" />
-                                            </DataGridTextColumn.Header>
-                                        </DataGridTextColumn>
+                            <ui:DataGrid
+                                MaxHeight="500"
+                                AutoGenerateColumns="False"
+                                IsReadOnly="True"
+                                Style="{StaticResource CustomResizableDataGridStyle}"
+                                ItemsSource="{Binding Warnings}">
+                                <ui:DataGrid.Columns>
+                                    <DataGridTemplateColumn>
+                                        <DataGridTemplateColumn.Header>
+                                            <!--В динамически-создаваемом UserControl работает только DynamicResource-->
+                                            <ui:TextBlock
+                                                Text="{DynamicResource WarningWindow.IdHeader}" />
+                                        </DataGridTemplateColumn.Header>
+                                        <DataGridTemplateColumn.CellTemplate>
+                                            <DataTemplate>
+                                                <Button
+                                                    Width="100"
+                                                    Content="{Binding ID}"
+                                                    Command="{Binding DataContext.ShowElementCommand, 
+                                                        RelativeSource={RelativeSource AncestorType=Window}}"
+                                                    CommandParameter="{Binding ID}" />
+                                            </DataTemplate>
+                                        </DataGridTemplateColumn.CellTemplate>
+                                    </DataGridTemplateColumn>
+                                    <DataGridTextColumn
+                                        Width="200"
+                                        Binding="{Binding Family}">
+                                        <DataGridTextColumn.Header>
+                                            <!--В динамически-создаваемом UserControl работает только DynamicResource-->
+                                            <ui:TextBlock
+                                                Text="{DynamicResource WarningWindow.FamilyHeader}" />
+                                        </DataGridTextColumn.Header>
+                                    </DataGridTextColumn>
 
-                                        <DataGridTextColumn
-                                            Width="400"
-                                            Binding="{Binding Type}">
-                                            <DataGridTextColumn.Header>
-                                                <!--В динамически-создаваемом UserControl работает только DynamicResource-->
-                                                <ui:TextBlock
-                                                    Text="{DynamicResource WarningWindow.TypeHeader}" />
-                                            </DataGridTextColumn.Header>
-                                        </DataGridTextColumn>
+                                    <DataGridTextColumn
+                                        Width="400"
+                                        Binding="{Binding Type}">
+                                        <DataGridTextColumn.Header>
+                                            <!--В динамически-создаваемом UserControl работает только DynamicResource-->
+                                            <ui:TextBlock
+                                                Text="{DynamicResource WarningWindow.TypeHeader}" />
+                                        </DataGridTextColumn.Header>
+                                    </DataGridTextColumn>
 
-                                        <DataGridTextColumn
-                                            Width="200"
-                                            Binding="{Binding Level}">
-                                            <DataGridTextColumn.Header>
-                                                <!--В динамически-создаваемом UserControl работает только DynamicResource-->
-                                                <ui:TextBlock
-                                                    Text="{DynamicResource WarningWindow.LevelHeader}" />
-                                            </DataGridTextColumn.Header>
-                                        </DataGridTextColumn>
-                                    </ui:DataGrid.Columns>
-                                </ui:DataGrid>
-                            </StackPanel>
+                                    <DataGridTextColumn
+                                        Width="200"
+                                        Binding="{Binding Level}">
+                                        <DataGridTextColumn.Header>
+                                            <!--В динамически-создаваемом UserControl работает только DynamicResource-->
+                                            <ui:TextBlock
+                                                Text="{DynamicResource WarningWindow.LevelHeader}" />
+                                        </DataGridTextColumn.Header>
+                                    </DataGridTextColumn>
+                                </ui:DataGrid.Columns>
+                            </ui:DataGrid>
                         </edits:CustomGroupEditControl.EditControl>
                     </edits:CustomGroupEditControl>
                 </DataTemplate>

@@ -25,6 +25,10 @@
             x:Key="ExtraTextVisible"
             TrueValue="Visible"
             FalseValue="Collapsed" />
+        <converters:BoolToVisibilityConverter
+            x:Key="ButtonVisible"
+            TrueValue="Visible"
+            FalseValue="Collapsed" />
     </UserControl.Resources>
 
     <ui:CardExpander
@@ -65,18 +69,29 @@
                     VerticalAlignment="Center"
                     Grid.RowSpan="2"
                     Grid.Column="1">
-                    
-                    <ui:ToggleSwitch 
+
+                    <ui:ToggleSwitch
                         Margin="10,0,10,0"
                         OnContent="{Binding SwitchOnContent, ElementName=_this}"
                         OffContent="{Binding SwitchOffContent, ElementName=_this}"
                         IsChecked="{Binding IsChecked, ElementName=_this, Mode=TwoWay}"
                         Visibility="{Binding ToggleSwitchVisible, 
                             ElementName=_this, Converter={StaticResource ExtraContentVisible}}" />
+
+                    <ui:Button
+                        Margin="0,0,20,0"
+                        HorizontalAlignment="Right"
+                        Width="Auto"
+                        VerticalAlignment="Center"
+                        Content="{me:LocalizationSource WarningGroupViewModel.SelectAll}"
+                        Visibility="{Binding ButtonVisible, ElementName=_this,
+                            Converter={StaticResource ButtonVisible}}"
+                        Command="{Binding ButtonCommand, ElementName=_this}" />
                     
                     <ui:TextBlock
                         Margin="10,0,10,0"
                         FontTypography="BodyStrong"
+                        VerticalAlignment="Center"
                         Text="{Binding ExtraText, ElementName=_this}"                        
                         Visibility="{Binding ExtraTextVisible, ElementName=_this,
                             Converter={StaticResource ExtraTextVisible}}" />
