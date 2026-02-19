@@ -1,0 +1,194 @@
+<core:WpfUIPlatformUserControl
+    x:Class="RevitParamsChecker.Views.Checks.ChecksControl"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:local="clr-namespace:RevitParamsChecker.Views.Checks"
+    xmlns:core="clr-namespace:dosymep.WpfUI.Core"
+    xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
+    xmlns:me="clr-namespace:dosymep.WpfCore.MarkupExtensions;assembly=dosymep.WpfCore"
+    xmlns:vms="clr-namespace:RevitParamsChecker.ViewModels.Checks"
+    xmlns:custom="clr-namespace:RevitParamsChecker.Views.Controls"
+    mc:Ignorable="d"
+    d:DesignHeight="300"
+    d:DesignWidth="300"
+    x:ClassModifier="internal"
+    d:DataContext="{d:DesignInstance vms:ChecksPageViewModel, IsDesignTimeCreatable=False}">
+    <!-- Список проверок с кнопками для CRUD операций -->
+    <core:WpfUIPlatformUserControl.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary
+                    Source="../../Resources/CustomStyles.xaml" />
+                <ResourceDictionary
+                    Source="../../Resources/CustomDataGrid.xaml" />
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
+    </core:WpfUIPlatformUserControl.Resources>
+    <Border
+        Style="{StaticResource CustomBorder}">
+        <DockPanel
+            LastChildFill="True">
+            <DockPanel
+                Margin="0 0 0 8"
+                DockPanel.Dock="Top">
+                <custom:CrudButtonsControl
+                    AddCommand="{Binding AddCheckCommand}"
+                    RenameCommand="{Binding RenameCheckCommand}"
+                    RenameCommandParameter="{Binding SelectedItem, ElementName=_checksGrid}"
+                    CopyCommand="{Binding CopyCheckCommand}"
+                    CopyCommandParameter="{Binding SelectedItem, ElementName=_checksGrid}"
+                    RemoveCommand="{Binding RemoveChecksCommand}"
+                    RemoveCommandParameter="{Binding SelectedItems, ElementName=_checksGrid}" />
+                <ui:Button
+                    Margin="8 0 0 0"
+                    Content="{me:LocalizationSource ChecksPage.ExecuteChecksButton}"
+                    Command="{Binding ExecuteChecksCommand}" />
+                <ui:TextBlock
+                    Margin="8 0 0 0"
+                    HorizontalAlignment="Left"
+                    Style="{StaticResource CustomErrorText}"
+                    Text="{Binding ErrorText}" />
+            </DockPanel>
+            <ui:DataGrid
+                x:Name="_checksGrid"
+                SelectionMode="Extended"
+                AutoGenerateColumns="False"
+                CanUserAddRows="False"
+                CanUserDeleteRows="False"
+                CanUserReorderColumns="False"
+                GridLinesVisibility="Horizontal"
+                Style="{StaticResource CustomResizableDataGridStyle}"
+                SelectedItem="{Binding SelectedCheck}"
+                ItemsSource="{Binding Checks}">
+                <ui:DataGrid.Resources>
+                    <Style
+                        TargetType="CheckBox"
+                        BasedOn="{StaticResource CustomColumnCheckBoxStyle}" />
+                </ui:DataGrid.Resources>
+                <ui:DataGrid.CellStyle>
+                    <Style
+                        TargetType="DataGridCell"
+                        BasedOn="{StaticResource CustomTooltipDataGridCell}">
+                        <Setter
+                            Property="VerticalAlignment"
+                            Value="Stretch" />
+                        <Setter
+                            Property="VerticalContentAlignment"
+                            Value="Stretch" />
+                        <Setter
+                            Property="HorizontalAlignment"
+                            Value="Stretch" />
+                        <Setter
+                            Property="HorizontalContentAlignment"
+                            Value="Stretch" />
+                        <Setter
+                            Property="Padding"
+                            Value="2 0" />
+                    </Style>
+                </ui:DataGrid.CellStyle>
+
+                <ui:DataGrid.Columns>
+                    <DataGridCheckBoxColumn
+                        CanUserResize="False"
+                        Width="50"
+                        CanUserSort="False"
+                        Binding="{Binding IsSelected, UpdateSourceTrigger=PropertyChanged}">
+                        <DataGridCheckBoxColumn.Header>
+                            <CheckBox
+                                IsChecked="{Binding DataContext.AllSelected, RelativeSource={RelativeSource AncestorType=ui:DataGrid}, UpdateSourceTrigger=PropertyChanged}" />
+                        </DataGridCheckBoxColumn.Header>
+                    </DataGridCheckBoxColumn>
+
+                    <DataGridTextColumn
+                        IsReadOnly="True"
+                        MinWidth="100"
+                        SortMemberPath="Name">
+                        <DataGridTextColumn.Header>
+                            <ui:TextBlock
+                                Text="{DynamicResource ChecksPage.NameHeader}" />
+                        </DataGridTextColumn.Header>
+                        <DataGridTextColumn.ElementStyle>
+                            <Style
+                                TargetType="TextBlock">
+                                <Setter
+                                    Property="Text"
+                                    Value="{Binding Name}" />
+                                <Setter
+                                    Property="FontWeight"
+                                    Value="Normal" />
+                                <Style.Triggers>
+                                    <DataTrigger
+                                        Binding="{Binding Modified}"
+                                        Value="True">
+                                        <Setter
+                                            Property="Text"
+                                            Value="{Binding Name, StringFormat='{}{0} *'}" />
+                                        <Setter
+                                            Property="FontWeight"
+                                            Value="Bold" />
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </DataGridTextColumn.ElementStyle>
+                    </DataGridTextColumn>
+
+                    <DataGridTemplateColumn
+                        MinWidth="100"
+                        Width="*">
+                        <DataGridTemplateColumn.CellTemplate>
+                            <DataTemplate>
+                                <local:SelectedNamesControl
+                                    WarningMessage="{Binding WarningFiles}"
+                                    SelectedNames="{Binding SelectedFiles}"
+                                    SelectNamesCommandParameter="{Binding}"
+                                    SelectNamesCommand="{Binding DataContext.SetCheckSelectedFilesCommand, RelativeSource={RelativeSource AncestorType=UserControl, Mode=FindAncestor}}" />
+                            </DataTemplate>
+                        </DataGridTemplateColumn.CellTemplate>
+                        <DataGridTemplateColumn.Header>
+                            <ui:TextBlock
+                                Text="{DynamicResource ChecksPage.FilesHeader}" />
+                        </DataGridTemplateColumn.Header>
+                    </DataGridTemplateColumn>
+
+                    <DataGridTemplateColumn
+                        MinWidth="100"
+                        Width="*">
+                        <DataGridTemplateColumn.CellTemplate>
+                            <DataTemplate>
+                                <local:SelectedNamesControl
+                                    WarningMessage="{Binding WarningFilters}"
+                                    SelectedNames="{Binding SelectedFilters}"
+                                    SelectNamesCommandParameter="{Binding}"
+                                    SelectNamesCommand="{Binding DataContext.SetCheckSelectedFiltersCommand, RelativeSource={RelativeSource AncestorType=UserControl, Mode=FindAncestor}}" />
+                            </DataTemplate>
+                        </DataGridTemplateColumn.CellTemplate>
+                        <DataGridTemplateColumn.Header>
+                            <ui:TextBlock
+                                Text="{DynamicResource ChecksPage.FiltersHeader}" />
+                        </DataGridTemplateColumn.Header>
+                    </DataGridTemplateColumn>
+
+                    <DataGridTemplateColumn
+                        MinWidth="100"
+                        Width="*">
+                        <DataGridTemplateColumn.CellTemplate>
+                            <DataTemplate>
+                                <local:SelectedNamesControl
+                                    WarningMessage="{Binding WarningRules}"
+                                    SelectedNames="{Binding SelectedRules}"
+                                    SelectNamesCommandParameter="{Binding}"
+                                    SelectNamesCommand="{Binding DataContext.SetCheckSelectedRulesCommand, RelativeSource={RelativeSource AncestorType=UserControl, Mode=FindAncestor}}" />
+                            </DataTemplate>
+                        </DataGridTemplateColumn.CellTemplate>
+                        <DataGridTemplateColumn.Header>
+                            <ui:TextBlock
+                                Text="{DynamicResource ChecksPage.RulesHeader}" />
+                        </DataGridTemplateColumn.Header>
+                    </DataGridTemplateColumn>
+                </ui:DataGrid.Columns>
+            </ui:DataGrid>
+        </DockPanel>
+    </Border>
+</core:WpfUIPlatformUserControl>

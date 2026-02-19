@@ -1,0 +1,221 @@
+<ResourceDictionary
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:system="clr-namespace:System;assembly=mscorlib">
+
+    <system:String
+        x:Key="MainWindow.Title">Проверка параметров</system:String>
+
+    <system:String
+        x:Key="DashboardPage.Title">Главная</system:String>
+    <system:String
+        x:Key="FiltrationPage.Title">Поисковые наборы</system:String>
+    <system:String
+        x:Key="RulesPage.Title">Правила</system:String>
+    <system:String
+        x:Key="ChecksPage.Title">Проверки</system:String>
+    <system:String
+        x:Key="ResultsPage.Title">Анализ</system:String>
+    <system:String
+        x:Key="Exceptions.ParamNotFound">Параметр отсутствует: {0}</system:String>
+
+    <system:String
+        x:Key="NamesSelectionDialog.NamesHeader">Название</system:String>
+
+    <system:String
+        x:Key="RulesPage.NewRulePrompt">Новое правило</system:String>
+    <system:String
+        x:Key="RulesPage.RenameRulePrompt">Переименование правила</system:String>
+    <system:String
+        x:Key="RulesPage.DescriptionLabel">Описание:</system:String>
+    <system:String
+        x:Key="RulesPage.RuleLabel">Формула правила:</system:String>
+    <system:String
+        x:Key="RulesPage.AddParamRuleButton">Добавить правило</system:String>
+    <system:String
+        x:Key="RulesPage.AddParamsSetButton">Добавить набор</system:String>
+    <system:String
+        x:Key="RulesPage.ParamNamePlaceholder">Название параметра</system:String>
+    <system:String
+        x:Key="RulesPage.ValuePlaceholder">Значение</system:String>
+    <system:String
+        x:Key="RulesPage.SaveFileDefaultName">Настройка правил проверки параметров</system:String>
+    <system:String
+        x:Key="RulesPage.Error.CannotLoadRules">Не удалось загрузить правила</system:String>
+    <system:String
+        x:Key="RulesPage.Validation.InvalidRule">Заполните все поля в формуле правила '{0}'</system:String>
+
+    <system:String
+        x:Key="ChecksPage.ExecuteChecksButton">Запустить выбранные</system:String>
+    <system:String
+        x:Key="ChecksPage.NameHeader">Название</system:String>
+    <system:String
+        x:Key="ChecksPage.NothingSelectPrompt">Ничего не выбрано</system:String>
+    <system:String
+        x:Key="ChecksPage.FilesHeader">Файлы</system:String>
+    <system:String
+        x:Key="ChecksPage.FiltersHeader">Поисковые наборы</system:String>
+    <system:String
+        x:Key="ChecksPage.RulesHeader">Правила</system:String>
+    <system:String
+        x:Key="ChecksPage.SetSelectedFilesPrompt">Выберите файлы</system:String>
+    <system:String
+        x:Key="ChecksPage.SetSelectedFiltersPrompt">Выберите поисковые наборы</system:String>
+    <system:String
+        x:Key="ChecksPage.SetSelectedRulesPrompt">Выберите правила</system:String>
+    <system:String
+        x:Key="ChecksPage.SaveFileDefaultName">Настройки проверок параметров</system:String>
+    <system:String
+        x:Key="ChecksPage.Error.CannotLoadChecks">Не удалось загрузить проверки</system:String>
+    <system:String
+        xml:space="preserve"
+        x:Key="ChecksPage.Warning.MissingFiles">
+Выбранные ранее файлы отсутствуют:
+{0}
+    </system:String>
+    <system:String
+        xml:space="preserve"
+        x:Key="ChecksPage.Warning.MissingFilters">
+Выбранные ранее фильтры отсутствуют:
+{0}
+    </system:String>
+    <system:String
+        xml:space="preserve"
+        x:Key="ChecksPage.Warning.MissingRules">
+Выбранные ранее проверки отсутствуют:
+{0}
+    </system:String>
+    <system:String
+        x:Key="ChecksPage.Validation.SelectAnyCheck">Выберите хотя бы 1 проверку</system:String>
+    <system:String
+        x:Key="ChecksPage.Validation.SelectedChecksHaveEmptyFiles">Укажите файлы для всех выбранных проверок</system:String>
+    <system:String
+        x:Key="ChecksPage.Validation.SelectedChecksHaveEmptyFilters">Укажите фильтры для всех выбранных проверок</system:String>
+    <system:String
+        x:Key="ChecksPage.Validation.SelectedChecksHaveEmptyRules">Укажите правила для всех выбранных проверок</system:String>
+
+    <system:String
+        x:Key="NamesResolver.Header">Загрузка настроек</system:String>
+    <system:String
+        x:Key="NamesResolver.Body">В загружаемом файле содержатся существующие имена: {0}.</system:String>
+    <system:String
+        x:Key="NamesResolver.Replace">Заменить</system:String>
+    <system:String
+        x:Key="NamesResolver.KeepOnlyOld">Не заменять</system:String>
+    <system:String
+        x:Key="NamesResolver.CopyAndRename">Загрузить с переименованием</system:String>
+
+    <system:String
+        x:Key="ResultsPage.RulesHeader">Правила</system:String>
+    <system:String
+        x:Key="ResultsPage.ElementsHeader">Элементы</system:String>
+    <system:String
+        x:Key="ResultsPage.FileNameHeader">Файл</system:String>
+    <system:String
+        x:Key="ResultsPage.RuleNameHeader">Правило</system:String>
+    <system:String
+        x:Key="ResultsPage.StatusHeader">Статус</system:String>
+    <system:String
+        x:Key="ResultsPage.FamilyTypeNameHeader">Тип</system:String>
+    <system:String
+        x:Key="ResultsPage.CategoryNameHeader">Категория</system:String>
+    <system:String
+        x:Key="ResultsPage.UserMarkHeader">Пометки</system:String>
+    <system:String
+        x:Key="ResultsPage.ElementsSearchPlaceholder">Поиск</system:String>
+
+    <system:String
+        x:Key="GroupsEditor.Label">Группировка</system:String>
+    <system:String
+        x:Key="GroupsEditor.UpdateButtonTooltip">Применить изменения</system:String>
+    <system:String
+        x:Key="GroupsEditor.AddButtonTooltip">Добавить столбец для группировки</system:String>
+    <system:String
+        x:Key="GroupsEditor.RemoveButtonTooltip">Удалить столбец для группировки</system:String>
+
+    <system:String
+        x:Key="FiltersPage.NewFilterPrompt">Новый поисковый набор</system:String>
+    <system:String
+        x:Key="FiltersPage.RenameFilterPrompt">Переименование поискового набора</system:String>
+    <system:String
+        x:Key="FiltersPage.ShowFilterElements">Показать элементы</system:String>
+    <system:String
+        x:Key="FiltrationPage.SaveFileDefaultName">Настройка поисковых наборов</system:String>
+    <system:String
+        x:Key="FiltrationPage.Error.CannotLoadFilters">Не удалось загрузить поисковые наборы</system:String>
+
+    <system:String
+        x:Key="PageMenu.Tooltip.Load">Загрузить</system:String>
+    <system:String
+        x:Key="PageMenu.Tooltip.Save">Сохранить</system:String>
+    <system:String
+        x:Key="PageMenu.Tooltip.Export">Экспорт</system:String>
+    <system:String
+        x:Key="PageMenu.SaveChangesPrompt">Сохраните изменения</system:String>
+
+    <system:String
+        x:Key="CrudButtons.Tooltip.Add">Добавить</system:String>
+    <system:String
+        x:Key="CrudButtons.Tooltip.Rename">Переименовать</system:String>
+    <system:String
+        x:Key="CrudButtons.Tooltip.Copy">Копировать</system:String>
+    <system:String
+        x:Key="CrudButtons.Tooltip.Remove">Удалить</system:String>
+
+    <system:String
+        x:Key="NameEditor.Label">Имя:</system:String>
+    <system:String
+        x:Key="NameEditor.Validation.EmptyName">Введите новое название</system:String>
+    <system:String
+        x:Key="NameEditor.Validation.DuplicatedName">Такое название уже существует</system:String>
+
+    <system:String
+        x:Key="BeginsWithOperator">Начинается с</system:String>
+    <system:String
+        x:Key="ContainsOperator">Содержит</system:String>
+    <system:String
+        x:Key="EndsWithOperator">Заканчивается на</system:String>
+    <system:String
+        x:Key="EqualsOperator">Равно</system:String>
+    <system:String
+        x:Key="GreaterOperator">Больше</system:String>
+    <system:String
+        x:Key="GreaterOrEqualOperator">Больше или равно</system:String>
+    <system:String
+        x:Key="HasNoValueOperator">Нет значения</system:String>
+    <system:String
+        x:Key="HasValueOperator">Имеет значение</system:String>
+    <system:String
+        x:Key="LessOperator">Меньше</system:String>
+    <system:String
+        x:Key="LessOrEqualOperator">Меньше или равно</system:String>
+    <system:String
+        x:Key="NotBeginsWithOperator">Не начинается с</system:String>
+    <system:String
+        x:Key="NotContainsOperator">Не содержит</system:String>
+    <system:String
+        x:Key="NotEndsWithOperator">Не заканчивается на</system:String>
+    <system:String
+        x:Key="NotEqualsOperator">Не равно</system:String>
+
+    <system:String
+        x:Key="AndOperator">И</system:String>
+    <system:String
+        x:Key="OrOperator">Или</system:String>
+
+    <system:String
+        x:Key="StatusCode.Valid">Соответствует</system:String>
+    <system:String
+        x:Key="StatusCode.Invalid">Не соответствует</system:String>
+    <system:String
+        x:Key="StatusCode.ParamNotFound">Параметр отсутствует</system:String>
+    <system:String
+        x:Key="StatusCode.Error">Ошибка</system:String>
+
+    <system:String
+        x:Key="Ok">ОК</system:String>
+    <system:String
+        x:Key="Cancel">Отмена</system:String>
+    <system:String
+        x:Key="Close">Закрыть</system:String>
+</ResourceDictionary>

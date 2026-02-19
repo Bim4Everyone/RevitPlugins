@@ -1,0 +1,170 @@
+<ResourceDictionary
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
+    xmlns:system="clr-namespace:System;assembly=mscorlib">
+    <ResourceDictionary.MergedDictionaries>
+        <ResourceDictionary
+            Source="pack://application:,,,/Wpf.Ui;component/Controls/CardExpander/CardExpander.xaml"></ResourceDictionary>
+    </ResourceDictionary.MergedDictionaries>
+    <!-- Стиль для экспандера без анимации -->
+
+    <Style
+        x:Key="CustomCardExpanderNoAnimationStyle"
+        BasedOn="{StaticResource DefaultUiCardExpanderStyle}"
+        TargetType="{x:Type ui:CardExpander}">
+        <Setter
+            Property="Template">
+            <Setter.Value>
+                <ControlTemplate
+                    TargetType="{x:Type ui:CardExpander}">
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition
+                                Height="Auto" />
+                            <RowDefinition
+                                Height="Auto" />
+                        </Grid.RowDefinitions>
+
+                        <Border
+                            x:Name="ToggleButtonBorder"
+                            Grid.Row="0"
+                            Background="{TemplateBinding Background}"
+                            BorderBrush="{TemplateBinding BorderBrush}"
+                            BorderThickness="1"
+                            CornerRadius="{TemplateBinding CornerRadius}">
+                            <ToggleButton
+                                x:Name="ExpanderToggleButton"
+                                Margin="0"
+                                Padding="{TemplateBinding Padding}"
+                                HorizontalAlignment="Stretch"
+                                VerticalAlignment="{TemplateBinding VerticalContentAlignment}"
+                                HorizontalContentAlignment="Stretch"
+                                VerticalContentAlignment="Center"
+                                FontSize="{TemplateBinding FontSize}"
+                                Foreground="{TemplateBinding Foreground}"
+                                IsChecked="{Binding IsExpanded, Mode=TwoWay, RelativeSource={RelativeSource TemplatedParent}}"
+                                IsEnabled="{TemplateBinding IsEnabled}"
+                                OverridesDefaultStyle="True">
+                                <ToggleButton.Template>
+                                    <ControlTemplate
+                                        TargetType="{x:Type ToggleButton}">
+                                        <Border
+                                            Padding="{TemplateBinding Padding}"
+                                            Background="Transparent">
+                                            <Grid>
+                                                <Grid.ColumnDefinitions>
+                                                    <ColumnDefinition
+                                                        Width="*" />
+                                                    <ColumnDefinition
+                                                        Width="Auto" />
+                                                </Grid.ColumnDefinitions>
+                                                <ContentPresenter
+                                                    x:Name="ContentPresenter"
+                                                    Grid.Column="0"
+                                                    HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
+                                                    VerticalAlignment="{TemplateBinding VerticalContentAlignment}"
+                                                    Content="{TemplateBinding Content}" />
+                                                <ui:SymbolIcon
+                                                    x:Name="ControlChevronIcon"
+                                                    Grid.Column="1"
+                                                    Margin="0"
+                                                    VerticalAlignment="Center"
+                                                    FontSize="16"
+                                                    Foreground="{TemplateBinding Foreground}"
+                                                    Symbol="ChevronDown24" />
+                                            </Grid>
+                                        </Border>
+                                    </ControlTemplate>
+                                </ToggleButton.Template>
+                                <ToggleButton.Content>
+                                    <Grid>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition
+                                                Width="Auto" />
+                                            <ColumnDefinition
+                                                Width="*" />
+                                        </Grid.ColumnDefinitions>
+
+                                        <ContentControl
+                                            x:Name="ControlIcon"
+                                            Grid.Column="0"
+                                            Margin="0,0,14,0"
+                                            VerticalAlignment="Center"
+                                            Content="{TemplateBinding Icon}"
+                                            Focusable="False"
+                                            FontSize="24"
+                                            Foreground="{TemplateBinding Foreground}"
+                                            KeyboardNavigation.IsTabStop="False" />
+
+                                        <ContentPresenter
+                                            x:Name="HeaderContentPresenter"
+                                            Grid.Column="1"
+                                            Content="{TemplateBinding Header}"
+                                            TextElement.Foreground="{TemplateBinding Foreground}" />
+                                    </Grid>
+                                </ToggleButton.Content>
+                            </ToggleButton>
+                        </Border>
+
+                        <Border
+                            x:Name="ContentPresenterBorder"
+                            Grid.Row="1"
+                            Background="{DynamicResource CardBackground}"
+                            BorderBrush="{TemplateBinding BorderBrush}"
+                            BorderThickness="1,0,1,1"
+                            CornerRadius="{TemplateBinding CornerRadius}"
+                            Visibility="Collapsed">
+                            <ContentPresenter
+                                x:Name="ContentPresenter"
+                                Margin="{TemplateBinding ContentPadding}"
+                                HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
+                                VerticalAlignment="{TemplateBinding VerticalContentAlignment}"
+                                Content="{TemplateBinding Content}" />
+                        </Border>
+                    </Grid>
+                    <ControlTemplate.Triggers>
+                        <Trigger
+                            Property="IsExpanded"
+                            Value="True">
+                            <Setter
+                                TargetName="ContentPresenterBorder"
+                                Property="Visibility"
+                                Value="Visible" />
+                        </Trigger>
+                        <Trigger
+                            Property="IsEnabled"
+                            Value="False">
+                            <Setter
+                                Property="Background"
+                                Value="{DynamicResource CardBackgroundDisabled}" />
+                            <Setter
+                                Property="BorderBrush"
+                                Value="{DynamicResource CardBorderBrushDisabled}" />
+                            <Setter
+                                TargetName="ContentPresenter"
+                                Property="TextElement.Foreground"
+                                Value="{DynamicResource CardForegroundDisabled}" />
+                            <Setter
+                                TargetName="ExpanderToggleButton"
+                                Property="Foreground"
+                                Value="{DynamicResource CardForegroundDisabled}" />
+                        </Trigger>
+                        <Trigger
+                            Property="Icon"
+                            Value="{x:Null}">
+                            <Setter
+                                TargetName="ControlIcon"
+                                Property="Margin"
+                                Value="0" />
+                            <Setter
+                                TargetName="ControlIcon"
+                                Property="Visibility"
+                                Value="Collapsed" />
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+</ResourceDictionary>

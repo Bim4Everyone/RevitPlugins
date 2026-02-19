@@ -1,0 +1,62 @@
+<core:WpfUIPlatformUserControl
+    x:Class="RevitParamsChecker.Views.Controls.PageMenuControl"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:local="clr-namespace:RevitParamsChecker.Views.Controls"
+    xmlns:core="clr-namespace:dosymep.WpfUI.Core"
+    xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
+    xmlns:me="clr-namespace:dosymep.WpfCore.MarkupExtensions;assembly=dosymep.WpfCore"
+    xmlns:converters="clr-namespace:dosymep.WpfCore.Converters;assembly=dosymep.WpfCore"
+    mc:Ignorable="d"
+    x:Name="_this"
+    d:DesignHeight="300"
+    d:DesignWidth="300"
+    x:ClassModifier="internal">
+    <!-- Ряд кнопок для сохранения, загрузки и экспорта данных с текстом подсказки и текстом предупреждения. 
+    Используется как header для страниц. -->
+    <core:WpfUIPlatformUserControl.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary
+                    Source="../../Resources/CustomStyles.xaml" />
+            </ResourceDictionary.MergedDictionaries>
+            <converters:BoolToVisibilityConverter
+                x:Key="BoolToVisibilityConverter"
+                TrueValue="Visible"
+                FalseValue="Collapsed" />
+        </ResourceDictionary>
+    </core:WpfUIPlatformUserControl.Resources>
+    <Border
+        Style="{StaticResource CustomBorder}">
+        <DockPanel>
+            <ui:Button
+                ToolTip="{me:LocalizationSource PageMenu.Tooltip.Load}"
+                Command="{Binding LoadButtonCommand, ElementName=_this}"
+                Content="{ui:SymbolIcon Symbol=ArrowDownload20}" />
+            <ui:Button
+                Margin="8 0"
+                ToolTip="{me:LocalizationSource PageMenu.Tooltip.Save}"
+                Command="{Binding SaveButtonCommand, ElementName=_this}"
+                Content="{ui:SymbolIcon Symbol=Save20}" />
+            <ui:Button
+                ToolTip="{me:LocalizationSource PageMenu.Tooltip.Export}"
+                Command="{Binding ExportButtonCommand, ElementName=_this}"
+                Content="{ui:SymbolIcon Symbol=ArrowExportUp20}" />
+            <Label
+                Margin="8 0 0 0"
+                VerticalAlignment="Center"
+                Padding="0"
+                FontSize="{DynamicResource ControlContentThemeFontSize}"
+                Visibility="{Binding ShowSaveChangesPrompt, ElementName=_this, Converter={StaticResource BoolToVisibilityConverter}}"
+                Content="{me:LocalizationSource PageMenu.SaveChangesPrompt}" />
+            <ui:TextBlock
+                Margin="8 0 0 0"
+                HorizontalAlignment="Left"
+                Style="{StaticResource CustomErrorText}"
+                ToolTip="{Binding PageWarningMessage, ElementName=_this}"
+                Text="{Binding PageWarningMessage, ElementName=_this}" />
+        </DockPanel>
+    </Border>
+</core:WpfUIPlatformUserControl>

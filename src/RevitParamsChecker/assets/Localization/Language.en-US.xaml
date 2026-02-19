@@ -1,0 +1,221 @@
+<ResourceDictionary
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:system="clr-namespace:System;assembly=mscorlib">
+
+    <system:String
+        x:Key="MainWindow.Title">Parameter Check</system:String>
+
+    <system:String
+        x:Key="DashboardPage.Title">Main</system:String>
+    <system:String
+        x:Key="FiltrationPage.Title">Search Sets</system:String>
+    <system:String
+        x:Key="RulesPage.Title">Rules</system:String>
+    <system:String
+        x:Key="ChecksPage.Title">Checks</system:String>
+    <system:String
+        x:Key="ResultsPage.Title">Analysis</system:String>
+    <system:String
+        x:Key="Exceptions.ParamNotFound">Parameter missing: {0}</system:String>
+
+    <system:String
+        x:Key="NamesSelectionDialog.NamesHeader">Name</system:String>
+
+    <system:String
+        x:Key="RulesPage.NewRulePrompt">New Rule</system:String>
+    <system:String
+        x:Key="RulesPage.RenameRulePrompt">Rename Rule</system:String>
+    <system:String
+        x:Key="RulesPage.DescriptionLabel">Description:</system:String>
+    <system:String
+        x:Key="RulesPage.RuleLabel">Rule Formula:</system:String>
+    <system:String
+        x:Key="RulesPage.AddParamRuleButton">Add Rule</system:String>
+    <system:String
+        x:Key="RulesPage.AddParamsSetButton">Add Set</system:String>
+    <system:String
+        x:Key="RulesPage.ParamNamePlaceholder">Parameter Name</system:String>
+    <system:String
+        x:Key="RulesPage.ValuePlaceholder">Value</system:String>
+    <system:String
+        x:Key="RulesPage.SaveFileDefaultName">Parameter Check Rules Configuration</system:String>
+    <system:String
+        x:Key="RulesPage.Error.CannotLoadRules">Failed to load rules</system:String>
+    <system:String
+        x:Key="RulesPage.Validation.InvalidRule">Fill in all fields in rule formula '{0}'</system:String>
+
+    <system:String
+        x:Key="ChecksPage.ExecuteChecksButton">Run Selected</system:String>
+    <system:String
+        x:Key="ChecksPage.NameHeader">Name</system:String>
+    <system:String
+        x:Key="ChecksPage.NothingSelectPrompt">Nothing Selected</system:String>
+    <system:String
+        x:Key="ChecksPage.FilesHeader">Files</system:String>
+    <system:String
+        x:Key="ChecksPage.FiltersHeader">Search Sets</system:String>
+    <system:String
+        x:Key="ChecksPage.RulesHeader">Rules</system:String>
+    <system:String
+        x:Key="ChecksPage.SetSelectedFilesPrompt">Select Files</system:String>
+    <system:String
+        x:Key="ChecksPage.SetSelectedFiltersPrompt">Select Search Sets</system:String>
+    <system:String
+        x:Key="ChecksPage.SetSelectedRulesPrompt">Select Rules</system:String>
+    <system:String
+        x:Key="ChecksPage.SaveFileDefaultName">Parameter Check Settings</system:String>
+    <system:String
+        x:Key="ChecksPage.Error.CannotLoadChecks">Failed to load checks</system:String>
+    <system:String
+        xml:space="preserve"
+        x:Key="ChecksPage.Warning.MissingFiles">
+Previously selected files are missing:
+{0}
+    </system:String>
+    <system:String
+        xml:space="preserve"
+        x:Key="ChecksPage.Warning.MissingFilters">
+Previously selected filters are missing:
+{0}
+    </system:String>
+    <system:String
+        xml:space="preserve"
+        x:Key="ChecksPage.Warning.MissingRules">
+Previously selected checks are missing:
+{0}
+    </system:String>
+    <system:String
+        x:Key="ChecksPage.Validation.SelectAnyCheck">Select at least 1 check</system:String>
+    <system:String
+        x:Key="ChecksPage.Validation.SelectedChecksHaveEmptyFiles">Specify files for all selected checks</system:String>
+    <system:String
+        x:Key="ChecksPage.Validation.SelectedChecksHaveEmptyFilters">Specify filters for all selected checks</system:String>
+    <system:String
+        x:Key="ChecksPage.Validation.SelectedChecksHaveEmptyRules">Specify rules for all selected checks</system:String>
+
+    <system:String
+        x:Key="NamesResolver.Header">Loading Settings</system:String>
+    <system:String
+        x:Key="NamesResolver.Body">The file being loaded contains existing names: {0}.</system:String>
+    <system:String
+        x:Key="NamesResolver.Replace">Replace</system:String>
+    <system:String
+        x:Key="NamesResolver.KeepOnlyOld">Do Not Replace</system:String>
+    <system:String
+        x:Key="NamesResolver.CopyAndRename">Load with Renaming</system:String>
+
+    <system:String
+        x:Key="ResultsPage.RulesHeader">Rules</system:String>
+    <system:String
+        x:Key="ResultsPage.ElementsHeader">Elements</system:String>
+    <system:String
+        x:Key="ResultsPage.FileNameHeader">File</system:String>
+    <system:String
+        x:Key="ResultsPage.RuleNameHeader">Rule</system:String>
+    <system:String
+        x:Key="ResultsPage.StatusHeader">Status</system:String>
+    <system:String
+        x:Key="ResultsPage.FamilyTypeNameHeader">Type</system:String>
+    <system:String
+        x:Key="ResultsPage.CategoryNameHeader">Category</system:String>
+    <system:String
+        x:Key="ResultsPage.UserMarkHeader">Marks</system:String>
+    <system:String
+        x:Key="ResultsPage.ElementsSearchPlaceholder">Search</system:String>
+
+    <system:String
+        x:Key="GroupsEditor.Label">Grouping</system:String>
+    <system:String
+        x:Key="GroupsEditor.UpdateButtonTooltip">Apply Changes</system:String>
+    <system:String
+        x:Key="GroupsEditor.AddButtonTooltip">Add Column for Grouping</system:String>
+    <system:String
+        x:Key="GroupsEditor.RemoveButtonTooltip">Remove Column for Grouping</system:String>
+
+    <system:String
+        x:Key="FiltersPage.NewFilterPrompt">New Search Set</system:String>
+    <system:String
+        x:Key="FiltersPage.RenameFilterPrompt">Rename Search Set</system:String>
+    <system:String
+        x:Key="FiltersPage.ShowFilterElements">Show Elements</system:String>
+    <system:String
+        x:Key="FiltrationPage.SaveFileDefaultName">Search Sets Configuration</system:String>
+    <system:String
+        x:Key="FiltrationPage.Error.CannotLoadFilters">Failed to load search sets</system:String>
+
+    <system:String
+        x:Key="PageMenu.Tooltip.Load">Load</system:String>
+    <system:String
+        x:Key="PageMenu.Tooltip.Save">Save</system:String>
+    <system:String
+        x:Key="PageMenu.Tooltip.Export">Export</system:String>
+    <system:String
+        x:Key="PageMenu.SaveChangesPrompt">Save Changes</system:String>
+
+    <system:String
+        x:Key="CrudButtons.Tooltip.Add">Add</system:String>
+    <system:String
+        x:Key="CrudButtons.Tooltip.Rename">Rename</system:String>
+    <system:String
+        x:Key="CrudButtons.Tooltip.Copy">Copy</system:String>
+    <system:String
+        x:Key="CrudButtons.Tooltip.Remove">Remove</system:String>
+
+    <system:String
+        x:Key="NameEditor.Label">Name:</system:String>
+    <system:String
+        x:Key="NameEditor.Validation.EmptyName">Enter a new name</system:String>
+    <system:String
+        x:Key="NameEditor.Validation.DuplicatedName">This name already exists</system:String>
+
+    <system:String
+        x:Key="BeginsWithOperator">Starts With</system:String>
+    <system:String
+        x:Key="ContainsOperator">Contains</system:String>
+    <system:String
+        x:Key="EndsWithOperator">Ends With</system:String>
+    <system:String
+        x:Key="EqualsOperator">Equals</system:String>
+    <system:String
+        x:Key="GreaterOperator">Greater Than</system:String>
+    <system:String
+        x:Key="GreaterOrEqualOperator">Greater Than or Equal To</system:String>
+    <system:String
+        x:Key="HasNoValueOperator">Has No Value</system:String>
+    <system:String
+        x:Key="HasValueOperator">Has Value</system:String>
+    <system:String
+        x:Key="LessOperator">Less Than</system:String>
+    <system:String
+        x:Key="LessOrEqualOperator">Less Than or Equal To</system:String>
+    <system:String
+        x:Key="NotBeginsWithOperator">Does Not Start With</system:String>
+    <system:String
+        x:Key="NotContainsOperator">Does Not Contain</system:String>
+    <system:String
+        x:Key="NotEndsWithOperator">Does Not End With</system:String>
+    <system:String
+        x:Key="NotEqualsOperator">Not Equal</system:String>
+
+    <system:String
+        x:Key="AndOperator">And</system:String>
+    <system:String
+        x:Key="OrOperator">Or</system:String>
+
+    <system:String
+        x:Key="StatusCode.Valid">Valid</system:String>
+    <system:String
+        x:Key="StatusCode.Invalid">Invalid</system:String>
+    <system:String
+        x:Key="StatusCode.ParamNotFound">Parameter Missing</system:String>
+    <system:String
+        x:Key="StatusCode.Error">Error</system:String>
+
+    <system:String
+        x:Key="Ok">OK</system:String>
+    <system:String
+        x:Key="Cancel">Cancel</system:String>
+    <system:String
+        x:Key="Close">Close</system:String>
+</ResourceDictionary>

@@ -1,0 +1,61 @@
+<core:WpfUIPlatformUserControl
+    x:Class="RevitParamsChecker.Views.Rules.RuleUserControl"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:core="clr-namespace:dosymep.WpfUI.Core"
+    xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
+    xmlns:me="clr-namespace:dosymep.WpfCore.MarkupExtensions;assembly=dosymep.WpfCore"
+    xmlns:local="clr-namespace:RevitParamsChecker.Views.Rules"
+    xmlns:vms="clr-namespace:RevitParamsChecker.ViewModels.Rules"
+    mc:Ignorable="d"
+    d:DesignHeight="300"
+    d:DesignWidth="300"
+    x:ClassModifier="internal"
+    d:DataContext="{d:DesignInstance vms:RuleViewModel, IsDesignTimeCreatable=False}">
+    <!-- Отображение 1 правила проверки -->
+    <core:WpfUIPlatformUserControl.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary
+                    Source="../../Resources/CustomStyles.xaml" />
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
+    </core:WpfUIPlatformUserControl.Resources>
+    <Border
+        Style="{StaticResource CustomBorder}">
+        <DockPanel
+            LastChildFill="True">
+            <StackPanel
+                DockPanel.Dock="Top">
+                <Label
+                    Margin="0 0 0 8"
+                    FontSize="{StaticResource HeaderLabelFontSize}"
+                    FontWeight="SemiBold"
+                    Content="{Binding Name}" />
+                <Label
+                    Margin="0 0 0 4"
+                    FontSize="{DynamicResource ControlContentThemeFontSize}"
+                    Content="{me:LocalizationSource RulesPage.DescriptionLabel}"></Label>
+                <ui:TextBox
+                    Height="100"
+                    TextWrapping="Wrap"
+                    AcceptsReturn="True"
+                    ClearButtonEnabled="False"
+                    Text="{Binding Description, UpdateSourceTrigger=PropertyChanged}" />
+                <Label
+                    Margin="0 8 0 4"
+                    FontSize="{DynamicResource ControlContentThemeFontSize}"
+                    Content="{me:LocalizationSource RulesPage.RuleLabel}" />
+            </StackPanel>
+
+            <ScrollViewer
+                HorizontalScrollBarVisibility="Disabled"
+                VerticalScrollBarVisibility="Auto">
+                <local:ParamsSetUserControl
+                    DataContext="{Binding RootSet}" />
+            </ScrollViewer>
+        </DockPanel>
+    </Border>
+</core:WpfUIPlatformUserControl>
