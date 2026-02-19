@@ -24,27 +24,6 @@
         x:Key="Copy">копия</system:String>
 
     <system:String
-        x:Key="Excel.Ducts">Воздуховоды</system:String>
-    <system:String
-        x:Key="Excel.Pipes">Трубы</system:String>
-    <system:String
-        x:Key="Excel.PipeInsulation">Изоляция трубопроводов</system:String>
-    <system:String
-        x:Key="Excel.SystemName">Имя системы</system:String>
-    <system:String
-        x:Key="Excel.TypeName">Тип</system:String>
-    <system:String
-        x:Key="Excel.Size">Размер</system:String>
-    <system:String
-        x:Key="Excel.PipeSize">Размер трубы</system:String>
-    <system:String
-        x:Key="Excel.Length">Длина, м</system:String>
-    <system:String
-        x:Key="Excel.Area">Площадь, м2</system:String>
-    <system:String
-        x:Key="Excel.Thickness">Толщина, мм</system:String>
-
-    <system:String
         xml:space="preserve"
         x:Key="Errors.FileNamesConflict">
 Эти документы нельзя выгрузить за один раз,

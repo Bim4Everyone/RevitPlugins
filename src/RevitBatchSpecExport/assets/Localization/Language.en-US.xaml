@@ -24,30 +24,6 @@
         x:Key="Copy">copy</system:String>
 
     <system:String
-        x:Key="Excel.Ducts">Ducts</system:String>
-    <system:String
-        x:Key="Excel.Pipes">Pipes</system:String>
-    <system:String
-        x:Key="Excel.PipeInsulation">Pipe insulation</system:String>
-    <system:String
-        x:Key="Excel.SystemName">System name</system:String>
-    <system:String
-        x:Key="Excel.TypeName">Type</system:String>
-    <system:String
-        x:Key="Excel.Size">Size</system:String>
-    <system:String
-        x:Key="Excel.PipeSize">Pipe size</system:String>
-    <system:String
-        x:Key="Excel.Length">Length, m</system:String>
-    <system:String
-        x:Key="Excel.Area">Area, m2</system:String>
-    <system:String
-        x:Key="Excel.Thickness">Thickness, mm</system:String>
-
-    <system:String
-        x:Key="Excel.FileNameMask">Export volumes MEP-{0}</system:String>
-
-    <system:String
         xml:space="preserve"
         x:Key="Errors.FileNamesConflict">
 These documents cannot be exported at the same time,
