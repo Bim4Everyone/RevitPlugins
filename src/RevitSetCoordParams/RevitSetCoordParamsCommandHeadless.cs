@@ -13,6 +13,7 @@ using dosymep.WpfCore.Ninject;
 using Ninject;
 
 using RevitSetCoordParams.Models;
+using RevitSetCoordParams.Models.Interfaces;
 using RevitSetCoordParams.Models.Settings;
 
 namespace RevitSetCoordParams;
@@ -68,7 +69,7 @@ public class RevitSetCoordParamsCommandHeadless : BasePluginCommand {
             setCoordParamsSettings.LoadConfigSettings();
 
             // Создание основного класса процессора
-            var processor = new SetCoordParamsProcessor(localizationService, revitRepository, setCoordParamsSettings);
+            IIntersectProcessor processor = new IntersectCurveProcessor(localizationService, revitRepository, setCoordParamsSettings);
 
             // Основной метод
             processor.Run();

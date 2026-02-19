@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -188,27 +187,6 @@ internal class RevitRepository {
     /// </summary>
     public View GetCurrentView() {
         return ActiveUIDocument.ActiveGraphicalView;
-    }
-
-    /// <summary>
-    /// Метод получения сферы-солида
-    /// </summary>
-    public Solid GetSphereSolid(XYZ location, double diameter) {
-        var startPoint = new XYZ(location.X, location.Y, location.Z - diameter / 2);
-        var midPoint = new XYZ(location.X + diameter / 2, location.Y, location.Z);
-        var endPoint = new XYZ(location.X, location.Y, location.Z + diameter / 2);
-
-        var arc = Arc.Create(startPoint, endPoint, midPoint);
-        var line = Line.CreateBound(endPoint, startPoint);
-
-        var curve_loop = CurveLoop.Create([arc, line]);
-
-        int startAngle = 0;
-        double endAngle = 2 * Math.PI;
-
-        var frame = new Frame { Origin = location };
-
-        return GeometryCreationUtilities.CreateRevolvedGeometry(frame, [curve_loop], startAngle, endAngle);
     }
 
     /// <summary>
