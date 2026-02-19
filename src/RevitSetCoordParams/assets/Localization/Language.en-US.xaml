@@ -5,11 +5,14 @@
     <system:String x:Key="MainWindow.Title">Set parameters SMR</system:String>
     <system:String x:Key="MainWindow.RangeElements">Model element processing range</system:String>
     <system:String x:Key="MainWindow.RangeElementsDescription">Select how model elements will be processed</system:String>
-    <system:String x:Key="MainWindow.SourceFiles">File with common models</system:String>
+    <system:String x:Key="MainWindow.SourceFiles">File with common elements</system:String>
     <system:String x:Key="MainWindow.SourceFilesDescription">The file from which the data will be read</system:String>
     
-    <system:String x:Key="MainWindow.TypeModels">Type of common models SMR</system:String>
-    <system:String x:Key="MainWindow.TypeModelsDescription">Only common models of this type will be processed</system:String>
+    <system:String x:Key="MainWindow.TypeModels">Type of common elements SMR</system:String>
+    <system:String x:Key="MainWindow.TypeModelsDescription">Common elements of this types will be processed</system:String>
+    <system:String x:Key="MainWindow.SearchTextTypeModels">Search by name of common elements</system:String>
+    <system:String x:Key="MainWindow.CheckedAllTypeModels">Select all types</system:String>
+    <system:String x:Key="MainWindow.NotCheckedAllTypeModels">Clear type selection</system:String>
     <system:String x:Key="MainWindow.Positions">Element position</system:String>
     <system:String x:Key="MainWindow.PositionsDescription">Specifies relative position for element search</system:String>
     <system:String x:Key="MainWindow.Params">Parameters SMR</system:String>
@@ -79,9 +82,8 @@
     <system:String x:Key="MainViewModel.BottomPositionProvider">At the bottom of the element</system:String>
     
     <system:String x:Key="MainViewModel.UpPositionProvider">At the up of the element</system:String>
-    <system:String x:Key="MainViewModel.NoTypeModel">The required 3D models are missing in the file</system:String>
-    <system:String x:Key="MainViewModel.NoSelection">Elements is not selected</system:String>
-    <system:String x:Key="MainViewModel.WrongView">Please, open 3D-view, floor plan or schedule</system:String>
+    <system:String x:Key="MainViewModel.NoTypeModel">The required common elements are missing in the file</system:String>
+    <system:String x:Key="MainViewModel.NoSelection">Common elements is not selected</system:String>
     <system:String x:Key="MainViewModel.ProgressTitle">Processing... [{0}]\[{1}]</system:String>
 
     <system:String x:Key="SourceFileViewModel.CurrentFile">Current file (opened)</system:String>

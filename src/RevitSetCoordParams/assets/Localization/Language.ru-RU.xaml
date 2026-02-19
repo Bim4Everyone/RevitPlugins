@@ -9,7 +9,10 @@
     <system:String x:Key="MainWindow.SourceFilesDescription">Файл, с которого будут считываться данные</system:String>
     
     <system:String x:Key="MainWindow.TypeModels">Тип объемных элементов СМР</system:String>
-    <system:String x:Key="MainWindow.TypeModelsDescription">Будут обработаны объемные модели только этого типа</system:String>
+    <system:String x:Key="MainWindow.TypeModelsDescription">Будут обработаны объемные элементы этих типов</system:String>
+    <system:String x:Key="MainWindow.SearchTextTypeModels">Поиск по имени объемных элементов СМР</system:String>
+    <system:String x:Key="MainWindow.CheckedAllTypeModels">Выбрать все типы</system:String>
+    <system:String x:Key="MainWindow.NotCheckedAllTypeModels">Сбросить выбор типов</system:String>
     <system:String x:Key="MainWindow.Positions">Позиция элемента</system:String>
     <system:String x:Key="MainWindow.PositionsDescription">Определяет, относительно какой точки искать элемент</system:String>
     <system:String x:Key="MainWindow.Params">Параметры СМР</system:String>
@@ -79,9 +82,8 @@
     <system:String x:Key="MainViewModel.BottomPositionProvider">По низу элемента</system:String>
     
     <system:String x:Key="MainViewModel.UpPositionProvider">По верху элемента</system:String>
-    <system:String x:Key="MainViewModel.NoTypeModel">В файле отсутствуют необходимые объемные модели</system:String>    
-    <system:String x:Key="MainViewModel.NoSelection">Элементы не выбраны</system:String>
-    <system:String x:Key="MainViewModel.WrongView">Пожалуйста, откройте 3Д вид, план этажа или спецификацию</system:String>
+    <system:String x:Key="MainViewModel.NoTypeModel">В файле отсутствуют необходимые объемные элементы</system:String>    
+    <system:String x:Key="MainViewModel.NoSelection">Объемные элементы не выбраны</system:String>
     <system:String x:Key="MainViewModel.ProgressTitle">Обработка... [{0}]\[{1}]  </system:String>
 
     <system:String x:Key="SourceFileViewModel.CurrentFile">Текущий файл (открытый)</system:String>

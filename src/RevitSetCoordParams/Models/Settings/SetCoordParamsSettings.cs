@@ -23,7 +23,7 @@ internal class SetCoordParamsSettings {
     public IPositionProvider PositionProvider { get; set; }
     public IFileProvider FileProvider { get; set; }
     public ISphereProvider SphereProvider { get; set; }
-    public string TypeModel { get; set; }
+    public List<string> TypeModels { get; set; }
     public List<ParamMap> ParamMaps { get; set; }
     public List<BuiltInCategory> Categories { get; set; }
     public double MaxDiameterSearchSphereMm { get; set; }
@@ -36,7 +36,7 @@ internal class SetCoordParamsSettings {
         ElementsProvider = _providersFactory.GetElementsProvider(_revitRepository, ConfigSettings.ElementsProvider);
         PositionProvider = _providersFactory.GetPositionProvider(_revitRepository, ConfigSettings.PositionProvider);
         FileProvider = GetFileProvider(ConfigSettings.SourceFile);
-        TypeModel = ConfigSettings.TypeModel;
+        TypeModels = ConfigSettings.TypeModels;
         MaxDiameterSearchSphereMm = ConfigSettings.MaxDiameterSearchSphereMm;
         StepDiameterSearchSphereMm = ConfigSettings.StepDiameterSearchSphereMm;
         Search = ConfigSettings.Search;
@@ -49,7 +49,7 @@ internal class SetCoordParamsSettings {
         ConfigSettings.ElementsProvider = ElementsProvider.Type;
         ConfigSettings.PositionProvider = PositionProvider.Type;
         ConfigSettings.SourceFile = FileProvider.Document.GetUniqId();
-        ConfigSettings.TypeModel = TypeModel;
+        ConfigSettings.TypeModels = TypeModels;
         ConfigSettings.MaxDiameterSearchSphereMm = MaxDiameterSearchSphereMm;
         ConfigSettings.StepDiameterSearchSphereMm = StepDiameterSearchSphereMm;
         ConfigSettings.Search = Search;
