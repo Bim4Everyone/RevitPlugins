@@ -8,8 +8,8 @@
     "Rv2023",
     "Rv2024"
   ],
-  "IconUrl": "https://icons8.com/icon/22177/add-tag",
-  "BundleName": "Пакетный экспорт спек в XLSX",
+  "IconUrl": "https://icons8.com/icon/24032/microsoft-excel",
+  "BundleName": "Спеки по листам в XLSX",
   "BundleType": "InvokeButton",
   "BundleOutput": "01.BIM.extension\\BIM.tab\\Экспорт.panel\\экспорт 1.stack\\Спеки в XLSX.pulldown"
 }

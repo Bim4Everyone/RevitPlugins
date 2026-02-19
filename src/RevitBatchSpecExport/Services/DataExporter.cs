@@ -55,11 +55,18 @@ internal class DataExporter : IDataExporter {
         }
 
         foreach(var revitSheet in revitSheets) {
-            string path = CreateExcelFileName(docExportDirectory, revitSheet, config);
+            if(revitSheet.Schedules.Count == 0) {
+                continue;
+            }
+
+            string sheetUserParam = GetSheetUserParamValue(revitSheet, config);
+            string excelPath = string.IsNullOrWhiteSpace(sheetUserParam)
+                ? CreateExcelFileName(docExportDirectory, revitSheet, config)
+                : CreateExcelFileName(docExportDirectory.CreateSubdirectory(sheetUserParam), revitSheet, config);
             using var workbook = new XLWorkbook();
             for(int sheetIndex = 0; sheetIndex < revitSheet.Schedules.Count; sheetIndex++) {
                 var schedule = revitSheet.Schedules[sheetIndex].Schedule;
-                string name = CleanSheetName(schedule.Title);
+                string name = CleanSheetName(schedule.Name);
                 var worksheet = workbook.Worksheets.Add(name);
 
                 Write(worksheet, schedule);
@@ -67,7 +74,7 @@ internal class DataExporter : IDataExporter {
                 worksheet.Columns().AdjustToContents();
             }
 
-            workbook.SaveAs(path);
+            workbook.SaveAs(excelPath);
         }
     }
 
@@ -84,10 +91,7 @@ internal class DataExporter : IDataExporter {
         }
 
         const string fileExtension = ".xlsx";
-        string paramValue =
-            sheet.Sheet.IsExistsParam(config.SheetParamName) && sheet.Sheet.IsExistsParamValue(config.SheetParamName)
-                ? sheet.Sheet.GetParamValueOrDefault<string>(config.SheetParamName)
-                : string.Empty;
+        string paramValue = GetSheetUserParamValue(sheet, config);
         string sheetNumber = sheet.Sheet.SheetNumber;
         string sheetName = sheet.Sheet.Name;
         string docShortName = $"{paramValue}_{sheetNumber}_{sheetName}";
@@ -103,6 +107,12 @@ internal class DataExporter : IDataExporter {
         }
 
         return $"{exportDirectory.FullName}\\{docShortName}{fileExtension}";
+    }
+
+    private string GetSheetUserParamValue(SheetModel sheet, PluginConfig config) {
+        return sheet.Sheet.IsExistsParam(config.SheetParamName) && sheet.Sheet.IsExistsParamValue(config.SheetParamName)
+            ? sheet.Sheet.GetParamValueOrDefault<string>(config.SheetParamName)
+            : string.Empty;
     }
 
     /// <summary>

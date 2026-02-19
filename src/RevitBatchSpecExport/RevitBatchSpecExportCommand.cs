@@ -24,7 +24,7 @@ namespace RevitBatchSpecExport;
 [Transaction(TransactionMode.Manual)]
 public class RevitBatchSpecExportCommand : BasePluginCommand {
     public RevitBatchSpecExportCommand() {
-        PluginName = "Пакетный экспорт спек в XLSX";
+        PluginName = "Спеки по листам в XLSX";
     }
 
     protected override void Execute(UIApplication uiApplication) {
