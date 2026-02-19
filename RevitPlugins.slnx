@@ -49,6 +49,9 @@
   <Project Path="src/RevitBatchPrint/RevitBatchPrint.csproj">
     <Platform Project="x64" />
   </Project>
+  <Project Path="src/RevitBatchSpecExport/RevitBatchSpecExport.csproj">
+    <Platform Project="x64" />
+  </Project>
   <Project Path="src/RevitBuildCoordVolumes/RevitBuildCoordVolumes.csproj">
     <Platform Project="x64" />
   </Project>
