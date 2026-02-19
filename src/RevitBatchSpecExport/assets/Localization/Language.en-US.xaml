@@ -12,6 +12,8 @@
         x:Key="MainWindow.Title">Export totals</system:String>
     <system:String
         x:Key="MainWindow.SelectedProjects">Selected projects</system:String>
+    <system:String
+        x:Key="MainWindow.SelectedParameter">Sheet parameter</system:String>
 
     <system:String
         x:Key="ProgressTitle">Processing documents... [{0}]\[{1}]</system:String>

@@ -1,6 +1,6 @@
 using System.Collections.Generic;
 
-using RevitBatchSpecExport.Models.Interfaces;
+using RevitBatchSpecExport.Models;
 
 namespace RevitBatchSpecExport.Services;
 /// <summary>

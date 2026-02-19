@@ -1,4 +1,4 @@
-namespace RevitBatchSpecExport.Models.Interfaces;
+namespace RevitBatchSpecExport.Models;
 /// <summary>
 /// Документ Revit для обработки
 /// </summary>

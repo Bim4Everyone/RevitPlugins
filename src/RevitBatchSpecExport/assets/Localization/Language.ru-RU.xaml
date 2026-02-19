@@ -12,7 +12,9 @@
         x:Key="MainWindow.Title">Выгрузить объемы</system:String>
     <system:String
         x:Key="MainWindow.SelectedProjects">Выбранные проекты</system:String>
-    
+    <system:String
+        x:Key="MainWindow.SelectedParameter">Параметр листа</system:String>
+
     <system:String
         x:Key="ProgressTitle">Обработка документов... [{0}]\[{1}]</system:String>
 
@@ -41,9 +43,6 @@
         x:Key="Excel.Area">Площадь, м2</system:String>
     <system:String
         x:Key="Excel.Thickness">Толщина, мм</system:String>
-
-    <system:String
-        x:Key="Excel.FileNameMask">Выгрузка объемов ВИС-{0}</system:String>
 
     <system:String
         xml:space="preserve"

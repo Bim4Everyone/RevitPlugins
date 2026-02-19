@@ -1,18 +1,20 @@
-using System.Collections.Generic;
 using System.IO;
 
-using RevitBatchSpecExport.Models.Interfaces;
+using Autodesk.Revit.DB;
+
+using RevitBatchSpecExport.Models;
 
 namespace RevitBatchSpecExport.Services;
+
 /// <summary>
 /// Сервис, экспортирующий данные
 /// </summary>
 internal interface IDataExporter {
     /// <summary>
-    /// Экспортирует заданные данные в заданную директорию
+    /// Экспортирует данные документа в заданную директорию
     /// </summary>
-    /// <param name="directory">Директория для сохранения данных</param>
-    /// <param name="documentData">Данные для экспорта</param>
-    /// <param name="error">Сообщение об ошибках, возникших при экспорте</param>
-    void ExportData(DirectoryInfo directory, IList<IDocumentData> documentData, out string error);
+    /// <param name="docExportDirectory">Директория для сохранения данных документа</param>
+    /// <param name="document">Документ для экспорта</param>
+    /// <param name="config">Настройки экспорта</param>
+    void ExportData(DirectoryInfo docExportDirectory, Document document, PluginConfig config);
 }

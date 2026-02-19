@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 
-namespace RevitBatchSpecExport.Services.Implements;
+namespace RevitBatchSpecExport.Services;
 internal class ConstantsProvider : IConstantsProvider {
 
 

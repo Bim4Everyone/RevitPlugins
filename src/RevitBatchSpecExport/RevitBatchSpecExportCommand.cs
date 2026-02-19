@@ -6,6 +6,7 @@ using Autodesk.Revit.Attributes;
 using Autodesk.Revit.UI;
 
 using dosymep.Bim4Everyone;
+using dosymep.Bim4Everyone.ProjectConfigs;
 using dosymep.Bim4Everyone.SimpleServices;
 using dosymep.WpfCore.Ninject;
 using dosymep.WpfUI.Core.Ninject;
@@ -47,6 +48,9 @@ public class RevitBatchSpecExportCommand : BasePluginCommand {
         kernel.Bind<IErrorMessagesProvider>()
             .To<ErrorMessagesProvider>()
             .InSingletonScope();
+
+        kernel.Bind<PluginConfig>()
+            .ToMethod(c => PluginConfig.GetPluginConfig(c.Kernel.Get<IConfigSerializer>()));
 
         kernel.UseWpfUIThemeUpdater();
 

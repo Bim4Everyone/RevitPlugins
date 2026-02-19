@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 using dosymep.WPF.ViewModels;
 
-using RevitBatchSpecExport.Models.Interfaces;
+using RevitBatchSpecExport.Models;
 
 namespace RevitBatchSpecExport.ViewModels;
 /// <summary>

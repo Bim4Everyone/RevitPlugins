@@ -3,7 +3,7 @@ using System.Text.RegularExpressions;
 
 using dosymep.SimpleServices;
 
-namespace RevitBatchSpecExport.Services.Implements;
+namespace RevitBatchSpecExport.Services;
 internal class CopyNameProvider : ICopyNameProvider {
     private readonly ILocalizationService _localizationService;
 

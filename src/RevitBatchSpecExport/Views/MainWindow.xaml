@@ -8,6 +8,7 @@
     xmlns:vms="clr-namespace:RevitBatchSpecExport.ViewModels"
     xmlns:core="clr-namespace:dosymep.WpfUI.Core"
     xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
+    xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
     xmlns:me="clr-namespace:dosymep.WpfCore.MarkupExtensions;assembly=dosymep.WpfCore"
     xmlns:wpfbehaviors="clr-namespace:dosymep.WpfCore.Behaviors;assembly=dosymep.WpfCore"
     mc:Ignorable="d"
@@ -19,6 +20,13 @@
     MinHeight="400"
     MinWidth="400"
     d:DataContext="{d:DesignInstance vms:MainViewModel, IsDesignTimeCreatable=False}">
+    <i:Interaction.Triggers>
+        <i:EventTrigger
+            EventName="Loaded">
+            <i:InvokeCommandAction
+                Command="{Binding LoadViewCommand}" />
+        </i:EventTrigger>
+    </i:Interaction.Triggers>
     <core:WpfUIPlatformWindow.Resources>
         <Style
             TargetType="Border"
@@ -63,20 +71,18 @@
     </core:WpfUIPlatformWindow.Resources>
     <b:Interaction.Behaviors>
         <wpfbehaviors:WpfAttachServiceBehavior
-            AttachableService="{Binding ProgressDialogFactory}">
-        </wpfbehaviors:WpfAttachServiceBehavior>
+            AttachableService="{Binding ProgressDialogFactory}" />
         <wpfbehaviors:WpfAttachServiceBehavior
-            AttachableService="{Binding OpenFileDialogService}">
-        </wpfbehaviors:WpfAttachServiceBehavior>
+            AttachableService="{Binding OpenFileDialogService}" />
         <wpfbehaviors:WpfAttachServiceBehavior
-            AttachableService="{Binding OpenFolderDialogService}">
-        </wpfbehaviors:WpfAttachServiceBehavior>
+            AttachableService="{Binding OpenFolderDialogService}" />
         <wpfbehaviors:WpfAttachServiceBehavior
-            AttachableService="{Binding MessageBoxService}">
-        </wpfbehaviors:WpfAttachServiceBehavior>
+            AttachableService="{Binding MessageBoxService}" />
     </b:Interaction.Behaviors>
     <Grid>
         <Grid.RowDefinitions>
+            <RowDefinition
+                Height="Auto" />
             <RowDefinition
                 Height="Auto" />
             <RowDefinition
@@ -90,8 +96,23 @@
             Title="{me:LocalizationSource MainWindow.Title}" />
 
         <Border
-            Grid.Row="1"
+            Grid.Row="2"
             Margin="10"
+            Style="{StaticResource CustomBorder}">
+            <DockPanel
+                LastChildFill="True">
+                <Label
+                    Margin="0 0 10 0"
+                    Content="{me:LocalizationSource MainWindow.SelectedParameter}" />
+                <ui:TextBox
+                    ToolTip="{Binding ParamName}"
+                    Text="{Binding ParamName, UpdateSourceTrigger=PropertyChanged}" />
+            </DockPanel>
+        </Border>
+
+        <Border
+            Grid.Row="2"
+            Margin="10 0"
             Style="{StaticResource CustomBorder}">
             <DockPanel
                 LastChildFill="True">
@@ -101,13 +122,12 @@
                     Content="{me:LocalizationSource MainWindow.SelectedProjects}" />
                 <ui:ListView
                     ItemsSource="{Binding Documents}"
-                    SelectedItem="{Binding SelectedDocument}">
-                </ui:ListView>
+                    SelectedItem="{Binding SelectedDocument}" />
             </DockPanel>
         </Border>
 
         <StackPanel
-            Grid.Row="2"
+            Grid.Row="3"
             Orientation="Horizontal"
             HorizontalAlignment="Right">
             <TextBlock

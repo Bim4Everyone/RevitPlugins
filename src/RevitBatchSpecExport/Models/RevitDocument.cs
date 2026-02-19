@@ -2,8 +2,6 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 
-using RevitBatchSpecExport.Models.Interfaces;
-
 namespace RevitBatchSpecExport.Models;
 internal class RevitDocument : IDocument, IEquatable<RevitDocument> {
     private readonly FileInfo _file;
