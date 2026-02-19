@@ -19,7 +19,7 @@
         x:Key="ProgressTitle">Обработка документов... [{0}]\[{1}]</system:String>
 
     <system:String
-        x:Key="Copy">копия</system:String>
+        x:Key="FileSuffix.Copy">копия</system:String>
 
     <system:String
         xml:space="preserve"

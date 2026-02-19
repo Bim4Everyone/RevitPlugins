@@ -13,7 +13,7 @@ internal class CopyNameProvider : ICopyNameProvider {
     }
 
     public string CreateCopyName(string name, string[] existingNames) {
-        string suffixStart = $" - {_localizationService.GetLocalizedString("Copy")} (";
+        string suffixStart = $" - {_localizationService.GetLocalizedString("FileSuffix.Copy")} (";
         const string suffixEnd = ")";
 
         string newNameStart = name + suffixStart;
