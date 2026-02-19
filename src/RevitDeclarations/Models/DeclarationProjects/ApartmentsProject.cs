@@ -26,9 +26,9 @@ internal class ApartmentsProject : DeclarationProject {
     /// Проверяется общая площадь, жилая, без летних помещений и площадь с коэффициентом.
     /// </summary>
     /// <returns></returns>
-    public ErrorsListViewModel CheckRoomAreasEquality() {
-        var errorListVM = new ErrorsListViewModel() {
-            ErrorType = "Ошибка",
+    public WarningViewModel CheckRoomAreasEquality() {
+        var errorListVM = new WarningViewModel() {
+            WarningType = "Ошибка",
             Description = "Площади, рассчитанные квартирографией отличаются в пределах квартиры",
             DocumentName = _document.Name
         };
@@ -38,16 +38,16 @@ internal class ApartmentsProject : DeclarationProject {
                 string apartInfo = $"Группа помещений № {apartment.Number} на этаже {apartment.Level}";
                 string apartAreas = "Площади квартиры (без коэффициента/с коэффициентом/жилая/без ЛП) " +
                     "должны быть одинаковыми для каждого помещения квартиры";
-                errorListVM.Errors.Add(new ErrorElement(apartInfo, apartAreas));
+                errorListVM.Elements.Add(new WarningElementViewModel(apartInfo, apartAreas));
             }
         }
 
         return errorListVM;
     }
 
-    public ErrorsListViewModel CheckActualApartmentAreas() {
-        var errorListVM = new ErrorsListViewModel() {
-            ErrorType = "Предупреждение",
+    public WarningViewModel CheckActualApartmentAreas() {
+        var errorListVM = new WarningViewModel() {
+            WarningType = "Предупреждение",
             Description = "Не актуальные площади квартир, рассчитанные квартирографией",
             DocumentName = _document.Name
         };
@@ -59,14 +59,14 @@ internal class ApartmentsProject : DeclarationProject {
                     "отличаются от суммы актуальных системных площадей этой квартиры. " +
                     "Проверьте общую площадь квартиры, площадь с коэффициентом, " +
                     "площадь жилых помещений и площадь без летних помещений";
-                errorListVM.Errors.Add(new ErrorElement(apartInfo, apartAreas));
+                errorListVM.Elements.Add(new WarningElementViewModel(apartInfo, apartAreas));
             }
         }
 
         return errorListVM;
     }
 
-    public IReadOnlyCollection<ErrorsListViewModel> CheckUtpWarnings() {
+    public IReadOnlyCollection<WarningViewModel> CheckUtpWarnings() {
         _utpCalculator = new UtpCalculator(this, _settings);
         return _utpCalculator.CheckProjectForUtp();
     }

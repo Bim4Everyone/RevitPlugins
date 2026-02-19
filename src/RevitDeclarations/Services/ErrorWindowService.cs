@@ -23,11 +23,11 @@ internal class ErrorWindowService {
         _localizationService = localizationService;
     }
 
-    public bool ShowNoticeWindow(IList<ErrorsListViewModel> allWarnings, bool isWarning = false) {
+    public bool ShowNoticeWindow(IList<WarningViewModel> allWarnings, bool isWarning = false) {
         if(allWarnings.Any()) {
             var window = _resolutionRoot.Get<WarningsWindow>();
-            window.DataContext = new ErrorsViewModel() {
-                ErrorLists = [.. allWarnings],
+            window.DataContext = new WarningsViewModel() {
+                Warnings = [.. allWarnings],
                 IsWarning = isWarning
             };
 

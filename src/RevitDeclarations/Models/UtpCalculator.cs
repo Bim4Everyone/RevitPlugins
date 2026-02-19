@@ -42,21 +42,21 @@ internal class UtpCalculator {
         _roomConnectionAnalyzer.FindConnections();
     }
 
-    public IReadOnlyCollection<ErrorsListViewModel> CheckProjectForUtp() {
-        var areaErrorListVM = new ErrorsListViewModel() {
-            ErrorType = "Предупреждение",
+    public IReadOnlyCollection<WarningViewModel> CheckProjectForUtp() {
+        var areaErrorListVM = new WarningViewModel() {
+            WarningType = "Предупреждение",
             Description = "В проекте присутствуют помещения квартир с нулевыми системными площадями",
             DocumentName = _project.Document.Name
         };
 
         if(_hasNullAreas) {
-            areaErrorListVM.Errors.Add(new ErrorElement(_project.Document.Name,
+            areaErrorListVM.Elements.Add(new WarningElementViewModel(_project.Document.Name,
                 "В проекте присутствуют помещения квартир с нулевыми системными площадями. " +
                 "УТП \"Гардеробная\" и \"Увеличенная площадь балкона/лоджии\" не могут быть корректно рассчитаны."));
         }
 
-        var namesErrorListVM = new ErrorsListViewModel() {
-            ErrorType = "Предупреждение",
+        var namesErrorListVM = new WarningViewModel() {
+            WarningType = "Предупреждение",
             Description = "В проекте присутствуют помещения c некорректными именами.",
             DocumentName = _project.Document.Name
         };
@@ -64,19 +64,19 @@ internal class UtpCalculator {
         if(_hasBannedNames) {
             string names = string.Join(",", GetBannedUtpRoomNames());
 
-            namesErrorListVM.Errors.Add(new ErrorElement(_project.Document.Name,
+            namesErrorListVM.Elements.Add(new WarningElementViewModel(_project.Document.Name,
                 $"В проекте присутствуют помещения квартир c некорректными именами: \"{names}\". " +
                 "УТП \"Мастер-спальня\" и \"Две ванные\" не могут быть корректно рассчитаны."));
         }
 
-        var bathesErrorListVM = new ErrorsListViewModel() {
-            ErrorType = "Предупреждение",
+        var bathesErrorListVM = new WarningViewModel() {
+            WarningType = "Предупреждение",
             Description = "В проекте отсутсвуют семейства ванн и душевых.",
             DocumentName = _project.Document.Name
         };
 
         if(_project.GetBathInstances().Count == 0) {
-            bathesErrorListVM.Errors.Add(new ErrorElement(_project.Document.Name,
+            bathesErrorListVM.Elements.Add(new WarningElementViewModel(_project.Document.Name,
                 "В проекте отсутствуют экземпляры семейств с именами, включающими \"ванн\" или \"душев\". " +
                 "УТП \"Две ванные\" не может быть корректно рассчитано."));
         }

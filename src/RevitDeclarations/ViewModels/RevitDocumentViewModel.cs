@@ -60,16 +60,16 @@ internal class RevitDocumentViewModel : BaseViewModel {
         return Room != null;
     }
 
-    public ErrorsListViewModel CheckParameters() {
-        var errorListVM = new ErrorsListViewModel {
-            ErrorType = "Ошибка",
+    public WarningViewModel CheckParameters() {
+        var errorListVM = new WarningViewModel {
+            WarningType = "Ошибка",
             Description = "В проекте отсутствует параметр, выбранный в исходных данных",
             DocumentName = Name,
-            Errors = _settings
+            Elements = _settings
                 .AllParameters
                 .Select(x => x.Definition.Name)
                 .Where(x => !Room.IsExistsParam(x))
-                .Select(x => new ErrorElement(x, "Отсутствует параметр в проекте"))
+                .Select(x => new WarningElementViewModel(x, "Отсутствует параметр в проекте"))
                 .ToList()
         };
 

@@ -41,7 +41,7 @@ internal class ApartmentsMainVM : MainViewModel {
         // Проверка 1. Наличие параметров во всех выбранных проектах.
         var parameterErrors = checkedDocuments
             .Select(x => x.CheckParameters())
-            .Where(x => x.Errors.Any());
+            .Where(x => x.Elements.Any());
         if(parameterErrors.Any()) {
             _errorWindowService.ShowNoticeWindow(parameterErrors.ToList());
             return;
@@ -54,7 +54,7 @@ internal class ApartmentsMainVM : MainViewModel {
         // Проверка 2. Наличие квартир на выбранной стадии во всех выбранных проектах.
         var noApartsErrors = projects
             .Select(x => x.CheckRoomGroupsInProject())
-            .Where(x => x.Errors.Any());
+            .Where(x => x.Elements.Any());
         if(noApartsErrors.Any()) {
             _errorWindowService.ShowNoticeWindow(noApartsErrors.ToList());
             return;
@@ -63,7 +63,7 @@ internal class ApartmentsMainVM : MainViewModel {
         // Проверка 3. У всех помещений каждой квартиры должны совпадать общие площади квартиры.
         var areasErrors = projects
             .Select(x => x.CheckRoomAreasEquality())
-            .Where(x => x.Errors.Any());
+            .Where(x => x.Elements.Any());
         if(areasErrors.Any()) {
             _errorWindowService.ShowNoticeWindow(areasErrors.ToList());
             return;
@@ -72,7 +72,7 @@ internal class ApartmentsMainVM : MainViewModel {
         // Проверка 4. У каждого помещения должны быть актуальные площади помещения из кватирографии.
         var actualRoomAreasErrors = projects
             .Select(x => x.CheckActualRoomAreas())
-            .Where(x => x.Errors.Any());
+            .Where(x => x.Elements.Any());
         if(actualRoomAreasErrors.Any()) {
             bool windowResult = _errorWindowService.ShowNoticeWindow(actualRoomAreasErrors.ToList(), true);
 
@@ -84,7 +84,7 @@ internal class ApartmentsMainVM : MainViewModel {
         // Проверка 5. У каждого помещения должны быть актуальные площади квартиры из кватирографии.
         var actualApartmentAreasErrors = projects
             .Select(x => x.CheckActualApartmentAreas())
-            .Where(x => x.Errors.Any());
+            .Where(x => x.Elements.Any());
         if(actualApartmentAreasErrors.Any()) {
             bool windowResult = _errorWindowService.ShowNoticeWindow(actualApartmentAreasErrors.ToList(), true);
 
@@ -98,7 +98,7 @@ internal class ApartmentsMainVM : MainViewModel {
             var utpErrors = projects
                 .Select(x => x.CheckUtpWarnings())
                 .SelectMany(x => x)
-                .Where(x => x.Errors.Any());
+                .Where(x => x.Elements.Any());
             if(utpErrors.Any()) {
                 bool windowResult = _errorWindowService.ShowNoticeWindow(utpErrors.ToList(), true);
 

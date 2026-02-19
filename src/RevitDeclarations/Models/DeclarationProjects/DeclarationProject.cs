@@ -47,25 +47,25 @@ internal abstract class DeclarationProject {
             .ToList();
     }
 
-    public ErrorsListViewModel CheckRoomGroupsInProject() {
-        var errorListVM = new ErrorsListViewModel() {
-            ErrorType = "Ошибка",
+    public WarningViewModel CheckRoomGroupsInProject() {
+        var errorListVM = new WarningViewModel() {
+            WarningType = "Ошибка",
             Description = "В проекте отсутствуют необходимые группы помещений на выбранной стадии",
             DocumentName = _document.Name
         };
 
         if(_roomGroups.Count == 0) {
-            errorListVM.Errors = [
-                new ErrorElement(_settings.SelectedPhase.Name, "Отсутствуют группы помещений")
+            errorListVM.Elements = [
+                new WarningElementViewModel(_settings.SelectedPhase.Name, "Отсутствуют группы помещений")
             ];
         }
 
         return errorListVM;
     }
 
-    public ErrorsListViewModel CheckActualRoomAreas() {
-        var errorListVM = new ErrorsListViewModel() {
-            ErrorType = "Предупреждение",
+    public WarningViewModel CheckActualRoomAreas() {
+        var errorListVM = new WarningViewModel() {
+            WarningType = "Предупреждение",
             Description = "Не актуальные площади помещений, рассчитанные квартирографией",
             DocumentName = _document.Name
         };
@@ -75,7 +75,7 @@ internal abstract class DeclarationProject {
                 string groupInfo = $"Группа помещений № {roomGroup.Number} на этаже {roomGroup.Level}";
                 string groupAreas = "Площади помещений, рассчитанные квартирографией " +
                     "отличаются от актуальной системной площадей помещения.";
-                errorListVM.Errors.Add(new ErrorElement(groupInfo, groupAreas));
+                errorListVM.Elements.Add(new WarningElementViewModel(groupInfo, groupAreas));
             }
         }
 

@@ -40,7 +40,7 @@ internal class CommercialMainVM : MainViewModel {
         // Проверка 1. Наличие параметров во всех выбранных проектах.
         var parameterErrors = checkedDocuments
             .Select(x => x.CheckParameters())
-            .Where(x => x.Errors.Any());
+            .Where(x => x.Elements.Any());
         if(parameterErrors.Any()) {
             _errorWindowService.ShowNoticeWindow(parameterErrors.ToList());
             return;
@@ -53,7 +53,7 @@ internal class CommercialMainVM : MainViewModel {
         // Проверка 2. Наличие групп помещений на выбранной стадии во всех выбранных проектах.
         var noGroupsErrors = projects
             .Select(x => x.CheckRoomGroupsInProject())
-            .Where(x => x.Errors.Any());
+            .Where(x => x.Elements.Any());
         if(noGroupsErrors.Any()) {
             _errorWindowService.ShowNoticeWindow(noGroupsErrors.ToList());
             return;
@@ -62,7 +62,7 @@ internal class CommercialMainVM : MainViewModel {
         // Проверка 3. У каждого помещения должны быть актуальные площади помещения из кватирографии.
         var actualRoomAreasErrors = projects
             .Select(x => x.CheckActualRoomAreas())
-            .Where(x => x.Errors.Any());
+            .Where(x => x.Elements.Any());
         if(actualRoomAreasErrors.Any()) {
             bool windowResult = _errorWindowService.ShowNoticeWindow(actualRoomAreasErrors.ToList(), true);
 

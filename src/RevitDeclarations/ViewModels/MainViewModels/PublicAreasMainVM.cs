@@ -41,7 +41,7 @@ internal class PublicAreasMainVM : MainViewModel {
         // Проверка 1. Наличие параметров во всех выбранных проектах.
         var parameterErrors = checkedDocuments
             .Select(x => x.CheckParameters())
-            .Where(x => x.Errors.Any());
+            .Where(x => x.Elements.Any());
         if(parameterErrors.Any()) {
             _errorWindowService.ShowNoticeWindow(parameterErrors.ToList());
             return;
@@ -54,7 +54,7 @@ internal class PublicAreasMainVM : MainViewModel {
         // Проверка 2. Наличие групп помещений на выбранной стадии во всех выбранных проектах.
         var noApartsErrors = projects
             .Select(x => x.CheckRoomGroupsInProject())
-            .Where(x => x.Errors.Any());
+            .Where(x => x.Elements.Any());
         if(noApartsErrors.Any()) {
             _errorWindowService.ShowNoticeWindow(noApartsErrors.ToList());
             return;
@@ -63,7 +63,7 @@ internal class PublicAreasMainVM : MainViewModel {
         // Проверка 3. У каждого помещения должны быть актуальные площади помещения из кватирографии.
         var actualRoomAreasErrors = projects
             .Select(x => x.CheckActualRoomAreas())
-            .Where(x => x.Errors.Any());
+            .Where(x => x.Elements.Any());
         if(actualRoomAreasErrors.Any()) {
             bool windowResult = _errorWindowService.ShowNoticeWindow(actualRoomAreasErrors.ToList(), true);
 
