@@ -96,7 +96,9 @@ internal sealed class AlbumViewModel : BaseViewModel {
             FilteredSheets = new ObservableCollection<SheetViewModel>(MainSheets);
         } else {
             FilteredSheets = new ObservableCollection<SheetViewModel>(
-                MainSheets.Where(item => item.Name.IndexOf(searchText, StringComparison.OrdinalIgnoreCase) >= 0));
+                MainSheets.Where(item =>
+                    item.Name.IndexOf(searchText, StringComparison.OrdinalIgnoreCase) >= 0
+                    || item.SheetNumber.IndexOf(searchText, StringComparison.OrdinalIgnoreCase) >= 0));
         }
 
         // Обновляем выделение после фильтрации,
@@ -113,7 +115,11 @@ internal sealed class AlbumViewModel : BaseViewModel {
             return;
         }
 
-        foreach(SheetViewModel sheetViewModel in FilteredSheets) {
+        var sheets = FilteredSheets.Count == 0
+            ? MainSheets
+            : FilteredSheets;
+
+        foreach(SheetViewModel sheetViewModel in sheets) {
             sheetViewModel.IsSelected = IsSelected.Value;
         }
     }

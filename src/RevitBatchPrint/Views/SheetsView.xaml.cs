@@ -1,5 +1,6 @@
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Input;
 
 using Wpf.Ui.Controls;
 
@@ -14,13 +15,10 @@ public partial class SheetsView {
         _albumParamName.SetCurrentValue(ItemsControl.ItemsSourceProperty, _albumParamName.OriginalItemsSource);
     }
 
-    private void _albumParamName_OnTextChanged(AutoSuggestBox sender, AutoSuggestBoxTextChangedEventArgs args) {
-        if(!string.IsNullOrEmpty(_albumParamName.Text)) {
-            return;
+    private void _albumParamName_OnGotFocus(object sender, RoutedEventArgs e) {
+        if(!_albumParamName.IsSuggestionListOpen) {
+            _albumParamName.IsSuggestionListOpen = true;
         }
-
-        _albumParamName.IsSuggestionListOpen = true;
-        _albumParamName.SetCurrentValue(ItemsControl.ItemsSourceProperty, _albumParamName.OriginalItemsSource);
     }
 }
 
