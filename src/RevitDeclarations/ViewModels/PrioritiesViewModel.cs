@@ -3,6 +3,7 @@ using System.Linq;
 using System.Windows.Forms;
 using System.Windows.Input;
 
+using dosymep.SimpleServices;
 using dosymep.WPF.Commands;
 using dosymep.WPF.ViewModels;
 
@@ -13,11 +14,13 @@ using RevitDeclarations.Models;
 namespace RevitDeclarations.ViewModels;
 internal class PrioritiesViewModel : BaseViewModel {
     private readonly MainViewModel _mainViewModel;
+    private readonly IMessageBoxService _messageBoxService;
     private string _filePath;
     private List<PriorityViewModel> _prioritiesVM;
 
-    public PrioritiesViewModel(MainViewModel mainViewModel) {
+    public PrioritiesViewModel(MainViewModel mainViewModel, IMessageBoxService messageBoxService) {
         _mainViewModel = mainViewModel;
+        _messageBoxService = messageBoxService;
 
         SetDefaultConfig(new object());
 
@@ -75,9 +78,8 @@ internal class PrioritiesViewModel : BaseViewModel {
         if(dialog.ShowDialog() == CommonFileDialogResult.Ok) {
             var exporter = new JsonExporter<RoomPriority>();
             exporter.Export(dialog.FileName, PrioritiesConfig.Priorities);
-            Autodesk.Revit.UI.TaskDialog.Show(
-                "Декларации",
-                "Файл конфигурации приоритетов создан");
+
+            _messageBoxService.Show("Файл конфигурации приоритетов создан", "Декларации");
         }
     }
 
@@ -100,7 +102,7 @@ internal class PrioritiesViewModel : BaseViewModel {
                                         .Select(x => x.Priority)
                                         .ToList());
         } else {
-            Autodesk.Revit.UI.TaskDialog.Show("Импорт приоритетов", importer.ErrorInfo);
+            _messageBoxService.Show(importer.ErrorInfo, "Импорт приоритетов");
         }
     }
 }

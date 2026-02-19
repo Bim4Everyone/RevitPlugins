@@ -1,4 +1,6 @@
+using dosymep.SimpleServices;
+
 namespace RevitDeclarations.Models;
 internal interface ITableExporter {
-    void Export(string path, IDeclarationDataTable declarationTable);
+    void Export(string path, IDeclarationDataTable declarationTable, IMessageBoxService messageBoxService);
 }

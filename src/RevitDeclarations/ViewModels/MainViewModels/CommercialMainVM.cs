@@ -1,28 +1,29 @@
 using System;
 using System.Linq;
+using System.Windows;
 
 using Autodesk.Revit.UI;
+
+using dosymep.SimpleServices;
 
 using RevitDeclarations.Models;
 using RevitDeclarations.Services;
 using RevitDeclarations.Views;
-
-using TaskDialog = Autodesk.Revit.UI.TaskDialog;
-using TaskDialogResult = Autodesk.Revit.UI.TaskDialogResult;
 
 namespace RevitDeclarations.ViewModels;
 internal class CommercialMainVM : MainViewModel {
     private new readonly CommercialSettings _settings;
 
     public CommercialMainVM(RevitRepository revitRepository, 
-                            CommercialSettings settings, 
+                            CommercialSettings settings,
+                            IMessageBoxService messageBoxService,
                             ErrorWindowService errorWindowService)
-        : base(revitRepository, settings, errorWindowService) {
+        : base(revitRepository, settings, messageBoxService, errorWindowService) {
         _settings = settings;
 
-        _declarationViewModel = new DeclarationCommercialVM(_revitRepository, settings);
+        _declarationViewModel = new DeclarationCommercialVM(_revitRepository, settings, messageBoxService);
         _parametersViewModel = new CommercialParamsVM(_revitRepository, this);
-        _prioritiesViewModel = new PrioritiesViewModel(this);
+        _prioritiesViewModel = new PrioritiesViewModel(this, messageBoxService);
 
         LoadConfig();
     }
@@ -78,19 +79,18 @@ internal class CommercialMainVM : MainViewModel {
             .ThenBy(x => x.Rooms.First().Number ?? "", _stringComparer)
             .ToList();
 
-        _declarationViewModel.SelectedFormat.Export(_declarationViewModel.FullPath, commercialRooms);
         try {
+            _declarationViewModel.SelectedFormat.Export(_declarationViewModel.FullPath, commercialRooms);
         } catch(Exception e) {
-            var taskDialog = new TaskDialog("Ошибка выгрузки") {
-                CommonButtons = TaskDialogCommonButtons.No | TaskDialogCommonButtons.Yes,
-                MainContent = "Произошла ошибка выгрузки.\nПопробовать выгрузить декларацию в формате csv?",
-                ExpandedContent = $"Описание ошибки: {e.Message}"
-            };
+            var messageBoxResult = _messageBoxService.Show(
+                $"Произошла ошибка выгрузки: {e.Message}.\n\nПопробовать выгрузить декларацию в формате csv?",
+                "Ошибка выгрузки",
+                MessageBoxButton.YesNo,
+                MessageBoxImage.Warning);
 
-            var dialogResult = taskDialog.Show();
-
-            if(dialogResult == TaskDialogResult.Yes) {
-                _declarationViewModel.SelectedFormat.Export(_declarationViewModel.FullPath, commercialRooms);
+            if(messageBoxResult == MessageBoxResult.Yes) {
+                (_declarationViewModel as DeclarationCommercialVM)
+                    .CsvExportViewModel.Export(_declarationViewModel.FullPath, commercialRooms);
             }
         }
     }

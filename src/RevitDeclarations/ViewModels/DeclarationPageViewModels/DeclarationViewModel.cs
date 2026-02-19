@@ -14,12 +14,14 @@ using RevitDeclarations.Models;
 using dosymep.WPF.Commands;
 using dosymep.WPF.ViewModels;
 using Microsoft.WindowsAPICodePack.Dialogs;
+using dosymep.SimpleServices;
 
 namespace RevitDeclarations.ViewModels;
 
 internal class DeclarationViewModel : BaseViewModel {
     protected readonly RevitRepository _revitRepository;
     protected readonly DeclarationSettings _settings;
+    protected readonly IMessageBoxService _messageBoxService;
 
     protected readonly IList<RevitDocumentViewModel> _revitDocuments;
     protected readonly IReadOnlyList<Phase> _phases;
@@ -37,9 +39,10 @@ internal class DeclarationViewModel : BaseViewModel {
     protected bool _canLoadUtp;
     protected string _canLoadUtpText;    
 
-    public DeclarationViewModel(RevitRepository revitRepository, DeclarationSettings settings) {
+    public DeclarationViewModel(RevitRepository revitRepository, DeclarationSettings settings, IMessageBoxService messageBoxService) {
         _revitRepository = revitRepository;
         _settings = settings;
+        _messageBoxService = messageBoxService;
 
         _phases = _revitRepository.GetPhases();
         _selectedPhase = _phases[_phases.Count() - 1];

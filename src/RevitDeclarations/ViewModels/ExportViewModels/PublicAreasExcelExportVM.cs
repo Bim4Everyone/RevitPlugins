@@ -2,12 +2,14 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 
+using dosymep.SimpleServices;
+
 using RevitDeclarations.Models;
 
 namespace RevitDeclarations.ViewModels;
 internal class PublicAreasExcelExportVM : ExportViewModel {
-    public PublicAreasExcelExportVM(string name, Guid id, DeclarationSettings settings)
-        : base(name, id, settings) {
+    public PublicAreasExcelExportVM(string name, Guid id, DeclarationSettings settings, IMessageBoxService messageBoxService)
+        : base(name, id, settings, messageBoxService) {
     }
 
     public override void Export(string path, IEnumerable<RoomGroup> roomGroups) {

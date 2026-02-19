@@ -1,10 +1,13 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Windows;
 using System.Windows.Input;
 
 using Autodesk.Revit.DB;
 
 using dosymep.Revit.Comparators;
+using dosymep.SimpleServices;
 using dosymep.WPF.Commands;
 using dosymep.WPF.ViewModels;
 
@@ -18,7 +21,7 @@ namespace RevitDeclarations.ViewModels;
 internal abstract class MainViewModel : BaseViewModel {
     protected readonly RevitRepository _revitRepository;
     protected readonly DeclarationSettings _settings;
-
+    protected readonly IMessageBoxService _messageBoxService;
     protected readonly ErrorWindowService _errorWindowService;
 
     protected ParametersViewModel _parametersViewModel;
@@ -30,10 +33,12 @@ internal abstract class MainViewModel : BaseViewModel {
     private string _errorText;
 
     public MainViewModel(RevitRepository revitRepository, 
-                         DeclarationSettings settings, 
+                         DeclarationSettings settings,
+                         IMessageBoxService messageBoxService,
                          ErrorWindowService errorWindowService) {
         _revitRepository = revitRepository;
         _settings = settings;
+        _messageBoxService = messageBoxService;
         _errorWindowService = errorWindowService;
 
         _stringComparer = new LogicalStringComparer();

@@ -1,29 +1,30 @@
 using System;
 using System.Linq;
+using System.Windows;
 
 using Autodesk.Revit.UI;
+
+using dosymep.SimpleServices;
 
 using RevitDeclarations.Models;
 using RevitDeclarations.Services;
 using RevitDeclarations.ViewModels;
 using RevitDeclarations.Views;
 
-using TaskDialog = Autodesk.Revit.UI.TaskDialog;
-using TaskDialogResult = Autodesk.Revit.UI.TaskDialogResult;
-
 namespace RevitDeclarations.ViewModels;
 internal class ApartmentsMainVM : MainViewModel {
     private new readonly ApartmentsSettings _settings;
     
     public ApartmentsMainVM(RevitRepository revitRepository, 
-                            ApartmentsSettings settings, 
+                            ApartmentsSettings settings,
+                            IMessageBoxService messageBoxService,
                             ErrorWindowService errorWindowService)
-        : base(revitRepository, settings, errorWindowService) {
+        : base(revitRepository, settings, messageBoxService, errorWindowService) {
         _settings = settings;
 
-        _declarationViewModel = new DeclarationApartVM(_revitRepository, settings);
+        _declarationViewModel = new DeclarationApartVM(_revitRepository, settings, messageBoxService);
         _parametersViewModel = new ApartmentsParamsVM(_revitRepository, this);
-        _prioritiesViewModel = new PrioritiesViewModel(this);
+        _prioritiesViewModel = new PrioritiesViewModel(this, messageBoxService);
 
         LoadConfig();
     }
@@ -122,15 +123,13 @@ internal class ApartmentsMainVM : MainViewModel {
         try {
             _declarationViewModel.SelectedFormat.Export(_declarationViewModel.FullPath, apartments);
         } catch(Exception e) {
-            var taskDialog = new TaskDialog("Ошибка выгрузки") {
-                CommonButtons = TaskDialogCommonButtons.No | TaskDialogCommonButtons.Yes,
-                MainContent = "Произошла ошибка выгрузки.\nПопробовать выгрузить декларацию в формате csv?",
-                ExpandedContent = $"Описание ошибки: {e.Message}"
-            };
+            var messageBoxResult = _messageBoxService.Show(
+                $"Произошла ошибка выгрузки: {e.Message}.\n\nПопробовать выгрузить декларацию в формате csv?",
+                "Ошибка выгрузки",
+                MessageBoxButton.YesNo,
+                MessageBoxImage.Warning);
 
-            var dialogResult = taskDialog.Show();
-
-            if(dialogResult == TaskDialogResult.Yes) {
+            if(messageBoxResult == MessageBoxResult.Yes) {
                 (_declarationViewModel as DeclarationApartVM)
                     .CsvExportViewModel.Export(_declarationViewModel.FullPath, apartments);
             }

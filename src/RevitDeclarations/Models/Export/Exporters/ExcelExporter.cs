@@ -5,6 +5,8 @@ using System.Runtime.InteropServices;
 
 using Autodesk.Revit.UI;
 
+using dosymep.SimpleServices;
+
 using Microsoft.Office.Interop.Excel;
 
 namespace RevitDeclarations.Models;
@@ -15,7 +17,7 @@ internal class ExcelExporter : ITableExporter {
     private readonly Color _nonConfigRoomsColor = Color.FromArgb(237, 237, 237);
     private readonly Color _utpColor = Color.FromArgb(226, 207, 245);
 
-    public void Export(string path, IDeclarationDataTable declarationDataTable) {
+    public void Export(string path, IDeclarationDataTable declarationDataTable, IMessageBoxService messageBoxService) {
         string fullPath = $"{path}.xlsx";
         /* Releasing all COM objects was made on the basis of the article:
          * https://www.add-in-express.com/creating-addins-blog/release-excel-com-objects/
@@ -23,7 +25,7 @@ internal class ExcelExporter : ITableExporter {
         var officeType = Type.GetTypeFromProgID("Excel.Application.16");
 
         if(officeType == null) {
-            TaskDialog.Show("Ошибка", "Excel 2016 не найден на компьютере");
+            messageBoxService.Show($"Excel 2016 не найден на компьютере", "Ошибка");
             return;
         }
 
