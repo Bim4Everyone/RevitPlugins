@@ -4,6 +4,7 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:vms="clr-namespace:RevitDeclarations.ViewModels"
     xmlns:local="clr-namespace:RevitDeclarations.Views"
     xmlns:edits="clr-namespace:RevitDeclarations.Views.Controls"
     xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
@@ -16,7 +17,8 @@
     Title="Ошибки выгрузки декларации"
     
     Height="600" Width="1000"
-    MinHeight="600" MinWidth="1000">
+    MinHeight="600" MinWidth="1000"
+    d:DataContext="{d:DesignInstance vms:WarningsViewModel, IsDesignTimeCreatable=False}">
 
     <core:WpfUIPlatformWindow.Resources>
         <ResourceDictionary>
@@ -46,11 +48,11 @@
                 VirtualizingPanel.IsVirtualizing="True"
                 VirtualizingPanel.VirtualizationMode="Recycling"
                 ScrollViewer.CanContentScroll="True"
-                ItemsSource="{Binding ErrorLists}">
+                ItemsSource="{Binding Warnings}">
                 <ItemsControl.ItemTemplate>
                     <DataTemplate>
                         <edits:CustomGroupEditControl
-                            Header="{Binding FullErrorName}"
+                            Header="{Binding FullName}"
                             Description="{Binding Description}"
                             ExtraTextVisible="True"
                             IsChecked="True"
@@ -58,7 +60,7 @@
                             <edits:CustomGroupEditControl.EditControl>
                                 <ui:DataGrid
                                     Style="{StaticResource CustomResizableDataGridStyle}"
-                                    ItemsSource="{Binding Errors}">
+                                    ItemsSource="{Binding Elements}">
                                     <ui:DataGrid.Columns>
                                         <DataGridTextColumn
                                             Width="400"
@@ -71,7 +73,7 @@
 
                                         <DataGridTextColumn
                                             Width="500"
-                                            Binding="{Binding ErrorInfo}">
+                                            Binding="{Binding WarningInfo}">
                                             <DataGridTextColumn.Header>
                                                 <TextBlock
                                                     Text="{DynamicResource WarningsWindow.HeaderDescription}" />
