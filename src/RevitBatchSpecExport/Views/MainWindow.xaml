@@ -33,7 +33,7 @@
             x:Key="CustomBorder">
             <Setter
                 Property="Padding"
-                Value="20" />
+                Value="14 8" />
             <Setter
                 Property="VerticalAlignment"
                 Value="Stretch" />
@@ -97,12 +97,12 @@
 
         <Border
             Grid.Row="1"
-            Margin="10"
+            Margin="8"
             Style="{StaticResource CustomBorder}">
             <DockPanel
                 LastChildFill="True">
                 <Label
-                    Margin="0 0 10 0"
+                    Margin="0 0 8 0"
                     VerticalContentAlignment="Center"
                     Content="{me:LocalizationSource MainWindow.SelectedParameter}" />
                 <ui:TextBox
@@ -113,12 +113,12 @@
 
         <Border
             Grid.Row="2"
-            Margin="10 0"
+            Margin="8 0"
             Style="{StaticResource CustomBorder}">
             <DockPanel
                 LastChildFill="True">
                 <Label
-                    Margin="0 0 0 10"
+                    Margin="0 0 0 8"
                     DockPanel.Dock="Top"
                     Content="{me:LocalizationSource MainWindow.SelectedProjects}" />
                 <ui:ListView
@@ -132,25 +132,25 @@
             Orientation="Horizontal"
             HorizontalAlignment="Right">
             <TextBlock
-                Margin="10"
+                Margin="8"
                 Foreground="Orange"
                 VerticalAlignment="Center"
                 Text="{Binding ErrorText}" />
 
             <ui:Button
-                Margin="10"
+                Margin="0 8"
                 Appearance="Danger"
                 Content="{ui:SymbolIcon Symbol=Delete24}"
                 CommandParameter="{Binding SelectedDocument}"
                 Command="{Binding RemoveDocumentCommand}" />
 
             <ui:Button
-                Margin="10"
+                Margin="8"
                 Content="{ui:SymbolIcon Symbol=Add24}"
                 Command="{Binding AddDocumentCommand}" />
 
             <ui:Button
-                Margin="10"
+                Margin="0 8"
                 Width="80"
                 Appearance="Info"
                 IsDefault="True"
@@ -159,7 +159,7 @@
                 Command="{Binding ProcessDocumentsCommand}" />
 
             <ui:Button
-                Margin="10"
+                Margin="8"
                 Width="80"
                 IsCancel="True"
                 Click="ButtonCancel_Click"
