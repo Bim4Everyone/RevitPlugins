@@ -44,14 +44,15 @@
             <ui:AutoSuggestBox
                 x:Name="_albumParamName"
                 Margin="14,8,14,8"
+                DisplayMemberPath="Name"
                 Icon="{ui:SymbolIcon TextAlignJustify24}"
                 Text="{Binding AlbumParamName, Mode=TwoWay}"
                 ToolTip="{me:LocalizationSource MainWindow.AlbumHintText}"
                 PlaceholderText="{me:LocalizationSource MainWindow.AlbumHintText}"
                 OriginalItemsSource="{Binding AlbumParamNames}"
                 UpdateTextOnSelect="True"
-                Loaded="_albumParamName_OnLoaded"
-                TextChanged="_albumParamName_OnTextChanged">
+                GotFocus="_albumParamName_OnGotFocus"
+                Loaded="_albumParamName_OnLoaded">
 
                 <b:Interaction.Triggers>
                     <b:EventTrigger EventName="TextChanged">

@@ -7,23 +7,27 @@ using Autodesk.Revit.ApplicationServices;
 using Autodesk.Revit.DB;
 using Autodesk.Revit.UI;
 
+using dosymep.Bim4Everyone;
+using dosymep.Bim4Everyone.SimpleServices;
 using dosymep.Revit;
 using dosymep.SimpleServices;
 
 namespace RevitBatchPrint.Models {
     internal class RevitRepository {
         private readonly UIApplication _uiApplication;
+        private readonly IRevitParamFactory _revitParamFactory;
         private readonly ILocalizationService _localizationService;
 
         public RevitRepository(
             UIApplication uiApplication,
+            IRevitParamFactory revitParamFactory,
             ILocalizationService localizationService) {
             _uiApplication = uiApplication;
+            _revitParamFactory = revitParamFactory;
             _localizationService = localizationService;
         }
 
         public Document Document => _uiApplication.ActiveUIDocument.Document;
-       
 
         public string GetFileName(ViewSheet viewSheet) {
             string documentFileName = string.IsNullOrEmpty(Document.Title)
@@ -41,23 +45,30 @@ namespace RevitBatchPrint.Models {
             return filePath;
         }
 
-        public List<string> GetAlbumParamNames() {
-            var categoryId = new ElementId(BuiltInCategory.OST_Sheets);
-            return Document.GetParameterBindings()
-                .Where(item => item.Binding is InstanceBinding)
-                .Where(item =>
-                    ((InstanceBinding) item.Binding).Categories
-                    .OfType<Category>()
-                    .Any(category => category.Id == categoryId))
-#if REVIT_2021_OR_LESS
-                .Where(item => item.Definition.ParameterType == ParameterType.Text)
-#else
-                .Where(item => item.Definition.GetDataType() == SpecTypeId.String.Text)
-#endif
-                .Select(item => item.Definition.Name)
-                .OrderBy(item => item)
-                .Distinct()
+        public List<RevitParam> GetAlbumParamNames() {
+            return GetSheetParams()
+                .OrderBy(item => item.Name)
                 .ToList();
+        }
+
+        private IEnumerable<RevitParam> GetSheetParams() {
+            var catParams = ParameterFilterUtilities
+                .GetFilterableParametersInCommon(Document, new List<ElementId> { new(BuiltInCategory.OST_Sheets) });
+
+            foreach(var elementId in catParams) {
+                if(elementId.IsNotSystemId() && _revitParamFactory.CanCreate(Document, elementId)) {
+                    yield return _revitParamFactory.Create(Document, elementId);
+                }
+            }
+            
+            yield return _revitParamFactory.Create(Document, new ElementId(BuiltInParameter.SHEET_APPROVED_BY));
+            yield return _revitParamFactory.Create(Document, new ElementId(BuiltInParameter.SHEET_CHECKED_BY));
+            yield return _revitParamFactory.Create(Document, new ElementId(BuiltInParameter.SHEET_CURRENT_REVISION));
+            yield return _revitParamFactory.Create(Document, new ElementId(BuiltInParameter.SHEET_DESIGNED_BY));
+            yield return _revitParamFactory.Create(Document, new ElementId(BuiltInParameter.SHEET_DRAWN_BY));
+            yield return _revitParamFactory.Create(Document, new ElementId(BuiltInParameter.SHEET_NUMBER));
+            yield return _revitParamFactory.Create(Document, new ElementId(BuiltInParameter.SHEET_ISSUE_DATE));
+            yield return _revitParamFactory.Create(Document, new ElementId(BuiltInParameter.SHEET_NAME));
         }
 
         public List<(ViewSheet ViewSheet, FamilyInstance TitleBlock, Viewport[] Viewports)> GetSheetsInfo() {
