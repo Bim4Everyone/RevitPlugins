@@ -3,4 +3,6 @@
                     xmlns:system="clr-namespace:System;assembly=mscorlib">
 
     <system:String x:Key="MainWindow.Title">Декларации</system:String>
+    <system:String x:Key="WarningsWindow.HeaderName">Название</system:String>
+    <system:String x:Key="WarningsWindow.HeaderDescription">Описание</system:String>
 </ResourceDictionary>

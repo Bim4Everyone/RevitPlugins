@@ -4,9 +4,10 @@ using dosymep.WPF.ViewModels;
 
 namespace RevitDeclarations.ViewModels;
 internal class ErrorsListViewModel : BaseViewModel {
-    public string Message { get; set; }
+    public string ErrorType { get; set; }
     public string Description { get; set; }
     public string DocumentName { get; set; }
+    public string FullErrorName => $"{ErrorType} в проекте \"{DocumentName}\"";
 
     public IList<ErrorElement> Errors { get; set; } = [];
 }

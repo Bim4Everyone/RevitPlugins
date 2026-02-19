@@ -1,3 +1,5 @@
+using System.Globalization;
+using System.Reflection;
 using System.Windows;
 
 using Autodesk.Revit.Attributes;
@@ -12,6 +14,7 @@ using Ninject;
 using Ninject.Activation;
 
 using RevitDeclarations.Models;
+using RevitDeclarations.Services;
 using RevitDeclarations.ViewModels;
 using RevitDeclarations.Views;
 
@@ -37,6 +40,10 @@ public class ApartmentsDeclarationCommand : BasePluginCommand {
             .ToSelf()
             .InSingletonScope();
 
+        kernel.Bind<ErrorWindowService>()
+            .ToSelf()
+            .InSingletonScope();
+
         kernel.Bind<RevitRepository>()
             .ToSelf()
             .InSingletonScope();
@@ -54,8 +61,18 @@ public class ApartmentsDeclarationCommand : BasePluginCommand {
         // Используем сервис обновления тем для WinUI
         kernel.UseWpfUIThemeUpdater();
 
+        // Настройка локализации,
+        // получение имени сборки откуда брать текст
+        string assemblyName = Assembly.GetExecutingAssembly().GetName().Name;
+
+        // Настройка локализации,
+        // установка дефолтной локализации "ru-RU"
+        kernel.UseWpfLocalization(
+            $"/{assemblyName};component/assets/localization/language.xaml",
+            CultureInfo.GetCultureInfo("ru-RU"));
+
         kernel.BindMainWindow<ApartmentsMainVM, ApartmentsMainWindow>();
-        
+
         Notification(kernel.Get<ApartmentsMainWindow>());
     }
 }

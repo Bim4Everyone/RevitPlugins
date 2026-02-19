@@ -11,12 +11,15 @@ using dosymep.WPF.ViewModels;
 using Microsoft.WindowsAPICodePack.Dialogs;
 
 using RevitDeclarations.Models;
+using RevitDeclarations.Services;
 using RevitDeclarations.ViewModels;
 
 namespace RevitDeclarations.ViewModels;
 internal abstract class MainViewModel : BaseViewModel {
     protected readonly RevitRepository _revitRepository;
     protected readonly DeclarationSettings _settings;
+
+    protected readonly ErrorWindowService _errorWindowService;
 
     protected ParametersViewModel _parametersViewModel;
     protected PrioritiesViewModel _prioritiesViewModel;
@@ -26,9 +29,12 @@ internal abstract class MainViewModel : BaseViewModel {
 
     private string _errorText;
 
-    public MainViewModel(RevitRepository revitRepository, DeclarationSettings settings) {
+    public MainViewModel(RevitRepository revitRepository, 
+                         DeclarationSettings settings, 
+                         ErrorWindowService errorWindowService) {
         _revitRepository = revitRepository;
         _settings = settings;
+        _errorWindowService = errorWindowService;
 
         _stringComparer = new LogicalStringComparer();
 

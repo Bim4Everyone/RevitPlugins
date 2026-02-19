@@ -6,4 +6,9 @@
     <ItemGroup>
 		<PackageReference Include="Microsoft.Office.Interop.Excel" Version="15.0.4795.1001" />
     </ItemGroup>
+    <ItemGroup>
+      <Compile Update="Views\Controls\CustomGroupEditControl.xaml.cs">
+        <SubType>Code</SubType>
+      </Compile>
+    </ItemGroup>
 </Project>

@@ -4,6 +4,7 @@ using System.Linq;
 using Autodesk.Revit.UI;
 
 using RevitDeclarations.Models;
+using RevitDeclarations.Services;
 using RevitDeclarations.ViewModels;
 using RevitDeclarations.Views;
 
@@ -14,8 +15,10 @@ namespace RevitDeclarations.ViewModels;
 internal class PublicAreasMainVM : MainViewModel {
     private new readonly PublicAreasSettings _settings;
 
-    public PublicAreasMainVM(RevitRepository revitRepository, PublicAreasSettings settings)
-        : base(revitRepository, settings) {
+    public PublicAreasMainVM(RevitRepository revitRepository, 
+                             PublicAreasSettings settings, 
+                             ErrorWindowService errorWindowService)
+        : base(revitRepository, settings, errorWindowService) {
         _settings = settings;
 
         _declarationViewModel = new DeclarationPublicAreasVM(_revitRepository, settings);
@@ -40,8 +43,7 @@ internal class PublicAreasMainVM : MainViewModel {
             .Select(x => x.CheckParameters())
             .Where(x => x.Errors.Any());
         if(parameterErrors.Any()) {
-            var window = new ErrorWindow() { DataContext = new ErrorsViewModel(parameterErrors, false) };
-            window.ShowDialog();
+            _errorWindowService.ShowNoticeWindow(parameterErrors.ToList());
             return;
         }
 
@@ -54,8 +56,7 @@ internal class PublicAreasMainVM : MainViewModel {
             .Select(x => x.CheckRoomGroupsInProject())
             .Where(x => x.Errors.Any());
         if(noApartsErrors.Any()) {
-            var window = new ErrorWindow() { DataContext = new ErrorsViewModel(noApartsErrors, false) };
-            window.ShowDialog();
+            _errorWindowService.ShowNoticeWindow(noApartsErrors.ToList());
             return;
         }
 
@@ -64,12 +65,9 @@ internal class PublicAreasMainVM : MainViewModel {
             .Select(x => x.CheckActualRoomAreas())
             .Where(x => x.Errors.Any());
         if(actualRoomAreasErrors.Any()) {
-            var window = new ErrorWindow() {
-                DataContext = new ErrorsViewModel(actualRoomAreasErrors, true)
-            };
-            window.ShowDialog();
+            bool windowResult = _errorWindowService.ShowNoticeWindow(actualRoomAreasErrors.ToList(), true);
 
-            if(!(bool) window.DialogResult) {
+            if(!windowResult) {
                 return;
             }
         }

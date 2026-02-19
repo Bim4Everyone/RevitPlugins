@@ -1,3 +1,5 @@
+using System.Globalization;
+using System.Reflection;
 using System.Windows;
 
 using Autodesk.Revit.Attributes;
@@ -11,6 +13,7 @@ using dosymep.WpfUI.Core.Ninject;
 using Ninject;
 
 using RevitDeclarations.Models;
+using RevitDeclarations.Services;
 using RevitDeclarations.ViewModels;
 using RevitDeclarations.Views;
 
@@ -33,6 +36,10 @@ public class CommercialDeclarationCommand : BasePluginCommand {
             .ToSelf()
             .InSingletonScope();
 
+        kernel.Bind<ErrorWindowService>()
+            .ToSelf()
+            .InSingletonScope();
+
         kernel.Bind<RevitRepository>()
             .ToSelf()
             .InSingletonScope();
@@ -43,17 +50,22 @@ public class CommercialDeclarationCommand : BasePluginCommand {
         kernel.Bind<CommercialConfig>()
             .ToMethod(c => CommercialConfig.GetPluginConfig());
 
-        //kernel.Bind<CommercialMainVM>().ToSelf();
-        //kernel.Bind<CommercialMainWindow>().ToSelf()
-        //    .WithPropertyValue(nameof(Window.Title), PluginName)
-        //    .WithPropertyValue(nameof(Window.DataContext), c => c.Kernel.Get<CommercialMainVM>());
-
         kernel.Bind<INavigationViewPageProvider>()
             .To<NavigationViewPageProvider>()
             .InSingletonScope();
 
         // Используем сервис обновления тем для WinUI
         kernel.UseWpfUIThemeUpdater();
+
+        // Настройка локализации,
+        // получение имени сборки откуда брать текст
+        string assemblyName = Assembly.GetExecutingAssembly().GetName().Name;
+
+        // Настройка локализации,
+        // установка дефолтной локализации "ru-RU"
+        kernel.UseWpfLocalization(
+            $"/{assemblyName};component/assets/localization/language.xaml",
+            CultureInfo.GetCultureInfo("ru-RU"));
 
         kernel.BindMainWindow<CommercialMainVM, CommercialMainWindow>();
 

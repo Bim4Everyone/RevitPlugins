@@ -4,6 +4,7 @@ using System.Linq;
 using Autodesk.Revit.UI;
 
 using RevitDeclarations.Models;
+using RevitDeclarations.Services;
 using RevitDeclarations.Views;
 
 using TaskDialog = Autodesk.Revit.UI.TaskDialog;
@@ -13,8 +14,10 @@ namespace RevitDeclarations.ViewModels;
 internal class CommercialMainVM : MainViewModel {
     private new readonly CommercialSettings _settings;
 
-    public CommercialMainVM(RevitRepository revitRepository, CommercialSettings settings)
-        : base(revitRepository, settings) {
+    public CommercialMainVM(RevitRepository revitRepository, 
+                            CommercialSettings settings, 
+                            ErrorWindowService errorWindowService)
+        : base(revitRepository, settings, errorWindowService) {
         _settings = settings;
 
         _declarationViewModel = new DeclarationCommercialVM(_revitRepository, settings);
@@ -39,8 +42,7 @@ internal class CommercialMainVM : MainViewModel {
             .Select(x => x.CheckParameters())
             .Where(x => x.Errors.Any());
         if(parameterErrors.Any()) {
-            var window = new ErrorWindow() { DataContext = new ErrorsViewModel(parameterErrors, false) };
-            window.ShowDialog();
+            _errorWindowService.ShowNoticeWindow(parameterErrors.ToList());
             return;
         }
 
@@ -49,12 +51,11 @@ internal class CommercialMainVM : MainViewModel {
             .ToList();
 
         // Проверка 2. Наличие групп помещений на выбранной стадии во всех выбранных проектах.
-        var noApartsErrors = projects
+        var noGroupsErrors = projects
             .Select(x => x.CheckRoomGroupsInProject())
             .Where(x => x.Errors.Any());
-        if(noApartsErrors.Any()) {
-            var window = new ErrorWindow() { DataContext = new ErrorsViewModel(noApartsErrors, false) };
-            window.ShowDialog();
+        if(noGroupsErrors.Any()) {
+            _errorWindowService.ShowNoticeWindow(noGroupsErrors.ToList());
             return;
         }
 
@@ -63,12 +64,9 @@ internal class CommercialMainVM : MainViewModel {
             .Select(x => x.CheckActualRoomAreas())
             .Where(x => x.Errors.Any());
         if(actualRoomAreasErrors.Any()) {
-            var window = new ErrorWindow() {
-                DataContext = new ErrorsViewModel(actualRoomAreasErrors, true)
-            };
-            window.ShowDialog();
+            bool windowResult = _errorWindowService.ShowNoticeWindow(actualRoomAreasErrors.ToList(), true);
 
-            if(!(bool) window.DialogResult) {
+            if(!windowResult) {
                 return;
             }
         }

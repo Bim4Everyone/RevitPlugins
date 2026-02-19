@@ -49,7 +49,7 @@ internal abstract class DeclarationProject {
 
     public ErrorsListViewModel CheckRoomGroupsInProject() {
         var errorListVM = new ErrorsListViewModel() {
-            Message = "Ошибка",
+            ErrorType = "Ошибка",
             Description = "В проекте отсутствуют необходимые группы помещений на выбранной стадии",
             DocumentName = _document.Name
         };
@@ -65,7 +65,7 @@ internal abstract class DeclarationProject {
 
     public ErrorsListViewModel CheckActualRoomAreas() {
         var errorListVM = new ErrorsListViewModel() {
-            Message = "Предупреждение",
+            ErrorType = "Предупреждение",
             Description = "Не актуальные площади помещений, рассчитанные квартирографией",
             DocumentName = _document.Name
         };

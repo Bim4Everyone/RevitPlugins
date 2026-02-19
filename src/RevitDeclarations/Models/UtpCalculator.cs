@@ -44,7 +44,7 @@ internal class UtpCalculator {
 
     public IReadOnlyCollection<ErrorsListViewModel> CheckProjectForUtp() {
         var areaErrorListVM = new ErrorsListViewModel() {
-            Message = "Предупреждение",
+            ErrorType = "Предупреждение",
             Description = "В проекте присутствуют помещения квартир с нулевыми системными площадями",
             DocumentName = _project.Document.Name
         };
@@ -56,7 +56,7 @@ internal class UtpCalculator {
         }
 
         var namesErrorListVM = new ErrorsListViewModel() {
-            Message = "Предупреждение",
+            ErrorType = "Предупреждение",
             Description = "В проекте присутствуют помещения c некорректными именами.",
             DocumentName = _project.Document.Name
         };
@@ -70,7 +70,7 @@ internal class UtpCalculator {
         }
 
         var bathesErrorListVM = new ErrorsListViewModel() {
-            Message = "Предупреждение",
+            ErrorType = "Предупреждение",
             Description = "В проекте отсутсвуют семейства ванн и душевых.",
             DocumentName = _project.Document.Name
         };

@@ -28,7 +28,7 @@ internal class ApartmentsProject : DeclarationProject {
     /// <returns></returns>
     public ErrorsListViewModel CheckRoomAreasEquality() {
         var errorListVM = new ErrorsListViewModel() {
-            Message = "Ошибка",
+            ErrorType = "Ошибка",
             Description = "Площади, рассчитанные квартирографией отличаются в пределах квартиры",
             DocumentName = _document.Name
         };
@@ -47,7 +47,7 @@ internal class ApartmentsProject : DeclarationProject {
 
     public ErrorsListViewModel CheckActualApartmentAreas() {
         var errorListVM = new ErrorsListViewModel() {
-            Message = "Предупреждение",
+            ErrorType = "Предупреждение",
             Description = "Не актуальные площади квартир, рассчитанные квартирографией",
             DocumentName = _document.Name
         };

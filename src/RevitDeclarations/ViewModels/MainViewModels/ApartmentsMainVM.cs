@@ -4,6 +4,7 @@ using System.Linq;
 using Autodesk.Revit.UI;
 
 using RevitDeclarations.Models;
+using RevitDeclarations.Services;
 using RevitDeclarations.ViewModels;
 using RevitDeclarations.Views;
 
@@ -13,9 +14,11 @@ using TaskDialogResult = Autodesk.Revit.UI.TaskDialogResult;
 namespace RevitDeclarations.ViewModels;
 internal class ApartmentsMainVM : MainViewModel {
     private new readonly ApartmentsSettings _settings;
-
-    public ApartmentsMainVM(RevitRepository revitRepository, ApartmentsSettings settings)
-        : base(revitRepository, settings) {
+    
+    public ApartmentsMainVM(RevitRepository revitRepository, 
+                            ApartmentsSettings settings, 
+                            ErrorWindowService errorWindowService)
+        : base(revitRepository, settings, errorWindowService) {
         _settings = settings;
 
         _declarationViewModel = new DeclarationApartVM(_revitRepository, settings);
@@ -40,8 +43,7 @@ internal class ApartmentsMainVM : MainViewModel {
             .Select(x => x.CheckParameters())
             .Where(x => x.Errors.Any());
         if(parameterErrors.Any()) {
-            var window = new ErrorWindow() { DataContext = new ErrorsViewModel(parameterErrors, false) };
-            window.ShowDialog();
+            _errorWindowService.ShowNoticeWindow(parameterErrors.ToList());
             return;
         }
 
@@ -54,8 +56,7 @@ internal class ApartmentsMainVM : MainViewModel {
             .Select(x => x.CheckRoomGroupsInProject())
             .Where(x => x.Errors.Any());
         if(noApartsErrors.Any()) {
-            var window = new ErrorWindow() { DataContext = new ErrorsViewModel(noApartsErrors, false) };
-            window.ShowDialog();
+            _errorWindowService.ShowNoticeWindow(noApartsErrors.ToList());
             return;
         }
 
@@ -64,8 +65,7 @@ internal class ApartmentsMainVM : MainViewModel {
             .Select(x => x.CheckRoomAreasEquality())
             .Where(x => x.Errors.Any());
         if(areasErrors.Any()) {
-            var window = new ErrorWindow() { DataContext = new ErrorsViewModel(areasErrors, false) };
-            window.ShowDialog();
+            _errorWindowService.ShowNoticeWindow(areasErrors.ToList());
             return;
         }
 
@@ -74,12 +74,9 @@ internal class ApartmentsMainVM : MainViewModel {
             .Select(x => x.CheckActualRoomAreas())
             .Where(x => x.Errors.Any());
         if(actualRoomAreasErrors.Any()) {
-            var window = new ErrorWindow() {
-                DataContext = new ErrorsViewModel(actualRoomAreasErrors, true)
-            };
-            window.ShowDialog();
+            bool windowResult = _errorWindowService.ShowNoticeWindow(actualRoomAreasErrors.ToList(), true);
 
-            if(!(bool) window.DialogResult) {
+            if(!windowResult) {
                 return;
             }
         }
@@ -89,12 +86,9 @@ internal class ApartmentsMainVM : MainViewModel {
             .Select(x => x.CheckActualApartmentAreas())
             .Where(x => x.Errors.Any());
         if(actualApartmentAreasErrors.Any()) {
-            var window = new ErrorWindow() {
-                DataContext = new ErrorsViewModel(actualApartmentAreasErrors, true)
-            };
-            window.ShowDialog();
+            bool windowResult = _errorWindowService.ShowNoticeWindow(actualApartmentAreasErrors.ToList(), true);
 
-            if(!(bool) window.DialogResult) {
+            if(!windowResult) {
                 return;
             }
         }
@@ -106,12 +100,9 @@ internal class ApartmentsMainVM : MainViewModel {
                 .SelectMany(x => x)
                 .Where(x => x.Errors.Any());
             if(utpErrors.Any()) {
-                var window = new ErrorWindow() {
-                    DataContext = new ErrorsViewModel(utpErrors, true)
-                };
-                window.ShowDialog();
+                bool windowResult = _errorWindowService.ShowNoticeWindow(utpErrors.ToList(), true);
 
-                if(!(bool) window.DialogResult) {
+                if(!windowResult) {
                     return;
                 }
             }

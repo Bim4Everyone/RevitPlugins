@@ -7,12 +7,7 @@ namespace RevitDeclarations.ViewModels;
 internal class ErrorsViewModel : BaseViewModel {
     private ErrorsListViewModel _selectedList;
 
-    public ErrorsViewModel(IEnumerable<ErrorsListViewModel> errors, bool isWarning) {
-        ErrorLists = [.. errors];
-        IsWarning = isWarning;
-    }
-
-    public ObservableCollection<ErrorsListViewModel> ErrorLists { get; }
+    public ObservableCollection<ErrorsListViewModel> ErrorLists { set;  get; }
 
     public ErrorsListViewModel SelectedList {
         get => _selectedList;

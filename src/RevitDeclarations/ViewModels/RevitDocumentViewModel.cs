@@ -62,7 +62,7 @@ internal class RevitDocumentViewModel : BaseViewModel {
 
     public ErrorsListViewModel CheckParameters() {
         var errorListVM = new ErrorsListViewModel {
-            Message = "Ошибка",
+            ErrorType = "Ошибка",
             Description = "В проекте отсутствует параметр, выбранный в исходных данных",
             DocumentName = Name,
             Errors = _settings
