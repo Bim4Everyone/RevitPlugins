@@ -117,11 +117,12 @@
             CornerRadius="{DynamicResource ControlCornerRadius}">
 
             <DockPanel>
-                <ui:AutoSuggestBox
+                <ui:TextBox
                     DockPanel.Dock="Top"
                     Margin="14,8,14,8"
+                    IconPlacement="Right"
                     Icon="{ui:SymbolIcon Search24}"
-                    Text="{Binding SearchText, Mode=TwoWay}"
+                    Text="{Binding SearchText, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                     PlaceholderText="{me:LocalizationSource MainWindow.SearchHintText}">
                     <b:Interaction.Triggers>
                         <b:EventTrigger EventName="TextChanged">
@@ -129,7 +130,7 @@
                                 Command="{Binding SearchCommand}" />
                         </b:EventTrigger>
                     </b:Interaction.Triggers>
-                </ui:AutoSuggestBox>
+                </ui:TextBox>
 
                 <TreeView
                     DockPanel.Dock="Bottom"
