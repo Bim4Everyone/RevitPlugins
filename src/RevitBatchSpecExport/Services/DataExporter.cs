@@ -16,24 +16,14 @@ using SaveOptions = ClosedXML.Excel.SaveOptions;
 namespace RevitBatchSpecExport.Services;
 
 internal class DataExporter : IDataExporter {
-    private readonly IConstantsProvider _constantsProvider;
     private readonly ICopyNameProvider _copyNameProvider;
-    private readonly IErrorMessagesProvider _errorMessagesProvider;
-    private readonly ILocalizationService _localizationService;
     private readonly RevitRepository _repository;
 
     public DataExporter(
         RevitRepository repository,
-        ICopyNameProvider copyNameProvider,
-        IConstantsProvider constantsProvider,
-        IErrorMessagesProvider errorMessagesProvider,
-        ILocalizationService localizationService) {
+        ICopyNameProvider copyNameProvider) {
         _repository = repository ?? throw new ArgumentNullException(nameof(repository));
         _copyNameProvider = copyNameProvider ?? throw new ArgumentNullException(nameof(copyNameProvider));
-        _constantsProvider = constantsProvider ?? throw new ArgumentNullException(nameof(constantsProvider));
-        _errorMessagesProvider = errorMessagesProvider
-                                 ?? throw new ArgumentNullException(nameof(errorMessagesProvider));
-        _localizationService = localizationService ?? throw new ArgumentNullException(nameof(localizationService));
     }
 
     public void ExportData(
@@ -66,8 +56,7 @@ internal class DataExporter : IDataExporter {
             using var workbook = new XLWorkbook();
             for(int sheetIndex = 0; sheetIndex < revitSheet.Schedules.Count; sheetIndex++) {
                 var schedule = revitSheet.Schedules[sheetIndex].Schedule;
-                string name = CleanSheetName(schedule.Name);
-                var worksheet = workbook.Worksheets.Add(name);
+                var worksheet = workbook.Worksheets.Add();
 
                 Write(worksheet, schedule);
 
@@ -116,22 +105,6 @@ internal class DataExporter : IDataExporter {
     }
 
     /// <summary>
-    /// Корректирует название листа Excel в соответствии с правилами
-    /// https://support.microsoft.com/en-us/office/rename-a-worksheet-3f1f7148-ee83-404d-8ef0-9ff99fbad1f9
-    /// </summary>
-    /// <param name="name"></param>
-    /// <returns></returns>
-    private string CleanSheetName(string name) {
-        var charsToRemove = _constantsProvider.ProhibitedExcelChars;
-        string trimName = new string(name.Trim().Take(_constantsProvider.DocNameMaxLength).ToArray()).Trim();
-        foreach(char charToRemove in charsToRemove) {
-            trimName = trimName.Replace(charToRemove, '_');
-        }
-
-        return trimName;
-    }
-
-    /// <summary>
     /// Записывает данные из спецификации на лист
     /// </summary>
     /// <param name="worksheet">Лист Excel</param>
@@ -142,7 +115,8 @@ internal class DataExporter : IDataExporter {
 
         AlignCells(worksheet, tableData);
 
-        int currentRow = 1;
+        worksheet.Cell(1, 1).Value = schedule.Name;
+        int currentRow = 2;
         currentRow = ExportSection(worksheet, schedule, document, tableData, SectionType.Header, currentRow);
         ExportSection(worksheet, schedule, document, tableData, SectionType.Body, currentRow);
     }
