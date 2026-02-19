@@ -9,7 +9,7 @@
         x:Key="Cancel">Cancel</system:String>
 
     <system:String
-        x:Key="MainWindow.Title">Export totals</system:String>
+        x:Key="MainWindow.Title">Batch export of specs to XLSX</system:String>
     <system:String
         x:Key="MainWindow.SelectedProjects">Selected projects</system:String>
     <system:String
@@ -18,8 +18,6 @@
     <system:String
         x:Key="ProgressTitle">Processing documents... [{0}]\[{1}]</system:String>
 
-    <system:String
-        x:Key="DefaultStringParamValue">not available</system:String>
     <system:String
         x:Key="Copy">copy</system:String>
 

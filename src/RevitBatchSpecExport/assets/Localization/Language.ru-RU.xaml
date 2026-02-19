@@ -9,7 +9,7 @@
         x:Key="Cancel">Отмена</system:String>
 
     <system:String
-        x:Key="MainWindow.Title">Выгрузить объемы</system:String>
+        x:Key="MainWindow.Title">Пакетный экспорт спек в XLSX</system:String>
     <system:String
         x:Key="MainWindow.SelectedProjects">Выбранные проекты</system:String>
     <system:String
@@ -18,8 +18,6 @@
     <system:String
         x:Key="ProgressTitle">Обработка документов... [{0}]\[{1}]</system:String>
 
-    <system:String
-        x:Key="DefaultStringParamValue">отсутствует</system:String>
     <system:String
         x:Key="Copy">копия</system:String>
 
