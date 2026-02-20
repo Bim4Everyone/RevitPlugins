@@ -24,9 +24,10 @@ internal class PublicAreasMainVM : MainViewModel {
         : base(revitRepository, settings, localizationService, messageBoxService, errorWindowService) {
         _settings = settings;
 
-        _declarationViewModel = new DeclarationPublicAreasVM(_revitRepository, settings, messageBoxService);
+        _declarationViewModel = 
+            new DeclarationPublicAreasVM(_revitRepository, settings, localizationService, messageBoxService);
         _parametersViewModel = new PublicAreasParamsVM(_revitRepository, this);
-        _prioritiesViewModel = new PrioritiesViewModel(this, messageBoxService);
+        _prioritiesViewModel = new PrioritiesViewModel(this, localizationService, messageBoxService);
 
         LoadConfig();
     }
@@ -51,7 +52,7 @@ internal class PublicAreasMainVM : MainViewModel {
         }
 
         var projects = checkedDocuments
-            .Select(x => new PublicAreasProject(x, _revitRepository, _settings))
+            .Select(x => new PublicAreasProject(x, _revitRepository, _settings, _localizationService))
             .ToList();
 
         // Проверка 2. Наличие групп помещений на выбранной стадии во всех выбранных проектах.

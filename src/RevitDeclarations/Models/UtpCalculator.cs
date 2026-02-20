@@ -4,6 +4,7 @@ using System.Linq;
 
 using Autodesk.Revit.DB;
 
+using dosymep.SimpleServices;
 using dosymep.WPF.Extensions;
 
 using RevitDeclarations.ViewModels;
@@ -17,6 +18,7 @@ internal class UtpCalculator {
 
     private readonly ApartmentsProject _project;
     private readonly ApartmentsSettings _settings;
+    private readonly ILocalizationService _localizationService;
     private readonly PrioritiesConfig _priorities;
     private readonly RoomConnectionAnalyzer _roomConnectionAnalyzer;
 
@@ -25,9 +27,10 @@ internal class UtpCalculator {
     private readonly IEnumerable<ElementId> _roomsWithBathFamily;
 
 
-    public UtpCalculator(ApartmentsProject project, DeclarationSettings settings) {
+    public UtpCalculator(ApartmentsProject project, DeclarationSettings settings, ILocalizationService localizationService) {
         _project = project;
         _settings = (ApartmentsSettings) settings;
+        _localizationService = localizationService;
 
         _hasNullAreas = CheckUtpNullAreas();
         _hasBannedNames = GetBannedUtpRoomNames().Any();
@@ -43,7 +46,7 @@ internal class UtpCalculator {
     }
 
     public IReadOnlyCollection<WarningViewModel> CheckProjectForUtp() {
-        var areaErrorListVM = new WarningViewModel() {
+        var areaErrorListVM = new WarningViewModel(_localizationService) {
             WarningType = "Предупреждение",
             Description = "В проекте присутствуют помещения квартир с нулевыми системными площадями",
             DocumentName = _project.Document.Name
@@ -55,7 +58,7 @@ internal class UtpCalculator {
                 "УТП \"Гардеробная\" и \"Увеличенная площадь балкона/лоджии\" не могут быть корректно рассчитаны."));
         }
 
-        var namesErrorListVM = new WarningViewModel() {
+        var namesErrorListVM = new WarningViewModel(_localizationService) {
             WarningType = "Предупреждение",
             Description = "В проекте присутствуют помещения c некорректными именами.",
             DocumentName = _project.Document.Name
@@ -69,7 +72,7 @@ internal class UtpCalculator {
                 "УТП \"Мастер-спальня\" и \"Две ванные\" не могут быть корректно рассчитаны."));
         }
 
-        var bathesErrorListVM = new WarningViewModel() {
+        var bathesErrorListVM = new WarningViewModel(_localizationService) {
             WarningType = "Предупреждение",
             Description = "В проекте отсутсвуют семейства ванн и душевых.",
             DocumentName = _project.Document.Name

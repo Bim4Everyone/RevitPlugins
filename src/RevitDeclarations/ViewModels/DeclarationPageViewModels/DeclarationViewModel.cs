@@ -39,7 +39,10 @@ internal class DeclarationViewModel : BaseViewModel {
     protected bool _canLoadUtp;
     protected string _canLoadUtpText;    
 
-    public DeclarationViewModel(RevitRepository revitRepository, DeclarationSettings settings, IMessageBoxService messageBoxService) {
+    public DeclarationViewModel(RevitRepository revitRepository, 
+                                DeclarationSettings settings,
+                                ILocalizationService localizationService,
+                                IMessageBoxService messageBoxService) {
         _revitRepository = revitRepository;
         _settings = settings;
         _messageBoxService = messageBoxService;
@@ -55,7 +58,7 @@ internal class DeclarationViewModel : BaseViewModel {
             .ToList();
 
         var currentDocumentVM =
-            new RevitDocumentViewModel(_revitRepository.Document, _settings);
+            new RevitDocumentViewModel(_revitRepository.Document, _settings, localizationService);
 
         if(currentDocumentVM.HasRooms()) {
             _revitDocuments.Insert(0, currentDocumentVM);

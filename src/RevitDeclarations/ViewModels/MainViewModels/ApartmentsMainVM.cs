@@ -23,7 +23,7 @@ internal class ApartmentsMainVM : MainViewModel {
         : base(revitRepository, settings, localizationService, messageBoxService, errorWindowService) {
         _settings = settings;
 
-        _declarationViewModel = new DeclarationApartVM(_revitRepository, settings, messageBoxService);
+        _declarationViewModel = new DeclarationApartVM(_revitRepository, settings, localizationService, messageBoxService);
         _parametersViewModel = new ApartmentsParamsVM(_revitRepository, this);
         _prioritiesViewModel = new PrioritiesViewModel(this, localizationService, messageBoxService);
 
@@ -50,7 +50,7 @@ internal class ApartmentsMainVM : MainViewModel {
         }
 
         var projects = checkedDocuments
-            .Select(x => new ApartmentsProject(x, _revitRepository, _settings))
+            .Select(x => new ApartmentsProject(x, _revitRepository, _settings, _localizationService))
             .ToList();
 
         // Проверка 2. Наличие квартир на выбранной стадии во всех выбранных проектах.

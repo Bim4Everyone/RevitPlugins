@@ -4,13 +4,16 @@ using System.Linq;
 
 using Autodesk.Revit.DB;
 
+using dosymep.SimpleServices;
+
 using RevitDeclarations.ViewModels;
 
 namespace RevitDeclarations.Models;
 internal abstract class DeclarationProject {
     protected readonly RevitDocumentViewModel _document;
-    protected readonly DeclarationSettings _settings;
     protected readonly RevitRepository _revitRepository;
+    protected readonly DeclarationSettings _settings;
+    protected readonly ILocalizationService _localizationService;
 
     protected readonly Phase _phase;
 
@@ -19,10 +22,12 @@ internal abstract class DeclarationProject {
 
     public DeclarationProject(RevitDocumentViewModel document,
                               RevitRepository revitRepository,
-                              DeclarationSettings settings) {
+                              DeclarationSettings settings,
+                              ILocalizationService localizationService) {
         _document = document;
-        _settings = settings;
         _revitRepository = revitRepository;
+        _settings = settings;
+        _localizationService = localizationService;
 
         _phase = revitRepository.GetPhaseByName(document.Document, _settings.SelectedPhase.Name);
 
@@ -48,7 +53,7 @@ internal abstract class DeclarationProject {
     }
 
     public WarningViewModel CheckRoomGroupsInProject() {
-        var errorListVM = new WarningViewModel() {
+        var errorListVM = new WarningViewModel(_localizationService) {
             WarningType = "Ошибка",
             Description = "В проекте отсутствуют необходимые группы помещений на выбранной стадии",
             DocumentName = _document.Name
@@ -64,7 +69,7 @@ internal abstract class DeclarationProject {
     }
 
     public WarningViewModel CheckActualRoomAreas() {
-        var errorListVM = new WarningViewModel() {
+        var errorListVM = new WarningViewModel(_localizationService) {
             WarningType = "Предупреждение",
             Description = "Не актуальные площади помещений, рассчитанные квартирографией",
             DocumentName = _document.Name

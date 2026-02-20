@@ -8,8 +8,12 @@ using RevitDeclarations.Models;
 
 namespace RevitDeclarations.ViewModels;
 internal class PublicAreasExcelExportVM : ExportViewModel {
-    public PublicAreasExcelExportVM(string name, Guid id, DeclarationSettings settings, IMessageBoxService messageBoxService)
-        : base(name, id, settings, messageBoxService) {
+    public PublicAreasExcelExportVM(string name, 
+                                    Guid id, 
+                                    DeclarationSettings settings,
+                                    ILocalizationService localizationService,
+                                    IMessageBoxService messageBoxService)
+        : base(name, id, settings, localizationService, messageBoxService) {
     }
 
     public override void Export(string path, IEnumerable<RoomGroup> roomGroups) {

@@ -22,9 +22,9 @@ internal class CommercialMainVM : MainViewModel {
         : base(revitRepository, settings, localizationService, messageBoxService, errorWindowService) {
         _settings = settings;
 
-        _declarationViewModel = new DeclarationCommercialVM(_revitRepository, settings, messageBoxService);
+        _declarationViewModel = new DeclarationCommercialVM(_revitRepository, settings, localizationService, messageBoxService);
         _parametersViewModel = new CommercialParamsVM(_revitRepository, this);
-        _prioritiesViewModel = new PrioritiesViewModel(this, messageBoxService);
+        _prioritiesViewModel = new PrioritiesViewModel(this, localizationService, messageBoxService);
 
         LoadConfig();
     }
@@ -49,7 +49,7 @@ internal class CommercialMainVM : MainViewModel {
         }
 
         var projects = checkedDocuments
-            .Select(x => new CommercialProject(x, _revitRepository, _settings))
+            .Select(x => new CommercialProject(x, _revitRepository, _settings, _localizationService))
             .ToList();
 
         // Проверка 2. Наличие групп помещений на выбранной стадии во всех выбранных проектах.

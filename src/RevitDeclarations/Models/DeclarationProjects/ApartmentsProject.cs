@@ -3,6 +3,8 @@ using System.Linq;
 
 using Autodesk.Revit.DB;
 
+using dosymep.SimpleServices;
+
 using RevitDeclarations.ViewModels;
 
 namespace RevitDeclarations.Models;
@@ -11,7 +13,9 @@ internal class ApartmentsProject : DeclarationProject {
 
     public ApartmentsProject(RevitDocumentViewModel document,
                             RevitRepository revitRepository,
-                            DeclarationSettings settings) : base(document, revitRepository, settings) {
+                            DeclarationSettings settings,
+                            ILocalizationService localizationService) 
+        : base(document, revitRepository, settings, localizationService) {
 
         var paramProvider = new RoomParamProvider(settings);
         _roomGroups = revitRepository
@@ -27,7 +31,7 @@ internal class ApartmentsProject : DeclarationProject {
     /// </summary>
     /// <returns></returns>
     public WarningViewModel CheckRoomAreasEquality() {
-        var errorListVM = new WarningViewModel() {
+        var errorListVM = new WarningViewModel(_localizationService) {
             WarningType = "Ошибка",
             Description = "Площади, рассчитанные квартирографией отличаются в пределах квартиры",
             DocumentName = _document.Name
@@ -46,7 +50,7 @@ internal class ApartmentsProject : DeclarationProject {
     }
 
     public WarningViewModel CheckActualApartmentAreas() {
-        var errorListVM = new WarningViewModel() {
+        var errorListVM = new WarningViewModel(_localizationService) {
             WarningType = "Предупреждение",
             Description = "Не актуальные площади квартир, рассчитанные квартирографией",
             DocumentName = _document.Name
@@ -67,7 +71,7 @@ internal class ApartmentsProject : DeclarationProject {
     }
 
     public IReadOnlyCollection<WarningViewModel> CheckUtpWarnings() {
-        _utpCalculator = new UtpCalculator(this, _settings);
+        _utpCalculator = new UtpCalculator(this, _settings, _localizationService);
         return _utpCalculator.CheckProjectForUtp();
     }
 
