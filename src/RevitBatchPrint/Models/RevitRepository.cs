@@ -56,19 +56,14 @@ namespace RevitBatchPrint.Models {
                 .GetFilterableParametersInCommon(Document, new List<ElementId> { new(BuiltInCategory.OST_Sheets) });
 
             foreach(var elementId in catParams) {
-                if(elementId.IsNotSystemId() && _revitParamFactory.CanCreate(Document, elementId)) {
-                    yield return _revitParamFactory.Create(Document, elementId);
+                if(elementId.IsNotSystemId()
+                   && _revitParamFactory.CanCreate(Document, elementId)) {
+                    var revitParam = _revitParamFactory.Create(Document, elementId);
+                    if(revitParam.StorageType == StorageType.String) {
+                        yield return revitParam;
+                    }
                 }
             }
-            
-            yield return _revitParamFactory.Create(Document, new ElementId(BuiltInParameter.SHEET_APPROVED_BY));
-            yield return _revitParamFactory.Create(Document, new ElementId(BuiltInParameter.SHEET_CHECKED_BY));
-            yield return _revitParamFactory.Create(Document, new ElementId(BuiltInParameter.SHEET_CURRENT_REVISION));
-            yield return _revitParamFactory.Create(Document, new ElementId(BuiltInParameter.SHEET_DESIGNED_BY));
-            yield return _revitParamFactory.Create(Document, new ElementId(BuiltInParameter.SHEET_DRAWN_BY));
-            yield return _revitParamFactory.Create(Document, new ElementId(BuiltInParameter.SHEET_NUMBER));
-            yield return _revitParamFactory.Create(Document, new ElementId(BuiltInParameter.SHEET_ISSUE_DATE));
-            yield return _revitParamFactory.Create(Document, new ElementId(BuiltInParameter.SHEET_NAME));
         }
 
         public List<(ViewSheet ViewSheet, FamilyInstance TitleBlock, Viewport[] Viewports)> GetSheetsInfo() {
