@@ -5,6 +5,7 @@ using Autodesk.Revit.DB.Architecture;
 
 using dosymep.Bim4Everyone;
 using dosymep.Revit;
+using dosymep.SimpleServices;
 using dosymep.WPF.ViewModels;
 
 using RevitDeclarations.Models;
@@ -12,12 +13,16 @@ using RevitDeclarations.Models;
 namespace RevitDeclarations.ViewModels;
 internal class RevitDocumentViewModel : BaseViewModel {
     private readonly DeclarationSettings _settings;
+    private readonly ILocalizationService _localizationService;
     private bool _isChecked;
 
-    public RevitDocumentViewModel(Document document, DeclarationSettings settings) {
+    public RevitDocumentViewModel(Document document, 
+                                  DeclarationSettings settings, 
+                                  ILocalizationService localizationService) {
         Document = document;
         _settings = settings;
-        Name = $"{Document.Title} [текущий проект]";
+        _localizationService = localizationService;
+        Name = _localizationService.GetLocalizedString("MainWindow.FileName", Document.Title);
 
         Room = new FilteredElementCollector(Document)
             .OfCategory(BuiltInCategory.OST_Rooms)
@@ -29,7 +34,7 @@ internal class RevitDocumentViewModel : BaseViewModel {
     public RevitDocumentViewModel(RevitLinkInstance revitLinkInstance, DeclarationSettings settings) {
         Document = revitLinkInstance.GetLinkDocument();
         _settings = settings;
-        Name = $"{revitLinkInstance.Name} [связь]";
+        Name = _localizationService.GetLocalizedString("MainWindow.FileNameLink", revitLinkInstance.Name);
 
         Room = new FilteredElementCollector(Document)
             .OfCategory(BuiltInCategory.OST_Rooms)
@@ -61,15 +66,16 @@ internal class RevitDocumentViewModel : BaseViewModel {
     }
 
     public WarningViewModel CheckParameters() {
-        var errorListVM = new WarningViewModel {
-            WarningType = "Ошибка",
-            Description = "В проекте отсутствует параметр, выбранный в исходных данных",
+        var errorListVM = new WarningViewModel(_localizationService) {
+            WarningType = _localizationService.GetLocalizedString("WarningWindow.Error"),
+            Description = _localizationService.GetLocalizedString("WarningsWindow.NoParamsInProjects"),
             DocumentName = Name,
             Elements = _settings
                 .AllParameters
                 .Select(x => x.Definition.Name)
                 .Where(x => !Room.IsExistsParam(x))
-                .Select(x => new WarningElementViewModel(x, "Отсутствует параметр в проекте"))
+                .Select(x => new WarningElementViewModel(x,
+                    _localizationService.GetLocalizedString("WarningsWindow.NoParamInProject")))
                 .ToList()
         };
 

@@ -8,7 +8,10 @@ using RevitDeclarations.Models;
 
 namespace RevitDeclarations.ViewModels;
 internal class ApartmentsCsvExportVM : ExportViewModel {
-    public ApartmentsCsvExportVM(string name, Guid id, DeclarationSettings settings, IMessageBoxService messageBoxService)
+    public ApartmentsCsvExportVM(string name, 
+                                 Guid id, 
+                                 DeclarationSettings settings, 
+                                 IMessageBoxService messageBoxService)
         : base(name, id, settings, messageBoxService) {
     }
 

@@ -17,14 +17,15 @@ internal class ApartmentsMainVM : MainViewModel {
     
     public ApartmentsMainVM(RevitRepository revitRepository, 
                             ApartmentsSettings settings,
+                            ILocalizationService localizationService,
                             IMessageBoxService messageBoxService,
                             ErrorWindowService errorWindowService)
-        : base(revitRepository, settings, messageBoxService, errorWindowService) {
+        : base(revitRepository, settings, localizationService, messageBoxService, errorWindowService) {
         _settings = settings;
 
         _declarationViewModel = new DeclarationApartVM(_revitRepository, settings, messageBoxService);
         _parametersViewModel = new ApartmentsParamsVM(_revitRepository, this);
-        _prioritiesViewModel = new PrioritiesViewModel(this, messageBoxService);
+        _prioritiesViewModel = new PrioritiesViewModel(this, localizationService, messageBoxService);
 
         LoadConfig();
     }
@@ -124,8 +125,8 @@ internal class ApartmentsMainVM : MainViewModel {
             _declarationViewModel.SelectedFormat.Export(_declarationViewModel.FullPath, apartments);
         } catch(Exception e) {
             var messageBoxResult = _messageBoxService.Show(
-                $"Произошла ошибка выгрузки: {e.Message}.\n\nПопробовать выгрузить декларацию в формате csv?",
-                "Ошибка выгрузки",
+                _localizationService.GetLocalizedString("MessageBox.ExcelErrorLoadCsv", e.Message),
+                _localizationService.GetLocalizedString("MessageBox.ExportErrorTitle"),
                 MessageBoxButton.YesNo,
                 MessageBoxImage.Warning);
 

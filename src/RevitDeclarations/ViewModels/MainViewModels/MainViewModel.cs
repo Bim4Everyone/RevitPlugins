@@ -21,6 +21,7 @@ namespace RevitDeclarations.ViewModels;
 internal abstract class MainViewModel : BaseViewModel {
     protected readonly RevitRepository _revitRepository;
     protected readonly DeclarationSettings _settings;
+    protected readonly ILocalizationService _localizationService;
     protected readonly IMessageBoxService _messageBoxService;
     protected readonly ErrorWindowService _errorWindowService;
 
@@ -34,10 +35,12 @@ internal abstract class MainViewModel : BaseViewModel {
 
     public MainViewModel(RevitRepository revitRepository, 
                          DeclarationSettings settings,
+                         ILocalizationService localizationService,
                          IMessageBoxService messageBoxService,
                          ErrorWindowService errorWindowService) {
         _revitRepository = revitRepository;
         _settings = settings;
+        _localizationService = localizationService;
         _messageBoxService = messageBoxService;
         _errorWindowService = errorWindowService;
 
@@ -76,31 +79,31 @@ internal abstract class MainViewModel : BaseViewModel {
             .Any();
 
         if(string.IsNullOrEmpty(_declarationViewModel.FilePath)) {
-            ErrorText = "Не выбрана папка";
+            _localizationService.GetLocalizedString("MainWindow.ErrorNoFolder");
             return false;
         }
         if(string.IsNullOrEmpty(_declarationViewModel.FileName)) {
-            ErrorText = "Не заполнено имя файла";
+            _localizationService.GetLocalizedString("MainWindow.ErrorNoName");
             return false;
         }
         if(!hasCheckedDocuments) {
-            ErrorText = "Не выбраны проекты для выгрузки";
+            _localizationService.GetLocalizedString("MainWindow.ErrorNoProjects");
             return false;
         }
         if(!hasPhases) {
-            ErrorText = "В выбранных проектах отсутствует выбранная стадия";
+            _localizationService.GetLocalizedString("MainWindow.ErrorNoPhaseInDocs");
             return false;
         }
         if(hasEmptyParameters) {
-            ErrorText = "Не выбран параметр на вкладке \"Параметры\"";
+            _localizationService.GetLocalizedString("MainWindow.ErrorNoParams");
             return false;
         }
         if(!_parametersViewModel.FilterRoomsValues.Any()) {
-            ErrorText = "Не заполнены значения для фильтрации на вкладке \"Параметры\"";
+            _localizationService.GetLocalizedString("MainWindow.ErrorNoParamFilters");
             return false;
         }
         if(string.IsNullOrEmpty(_parametersViewModel.ProjectName)) {
-            ErrorText = "Не заполнено ИД объекта на вкладке \"Параметры\"";
+            _localizationService.GetLocalizedString("MainWindow.ErrorNoProjectId");
             return false;
         }
 

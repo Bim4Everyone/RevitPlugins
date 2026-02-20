@@ -16,9 +16,10 @@ internal class CommercialMainVM : MainViewModel {
 
     public CommercialMainVM(RevitRepository revitRepository, 
                             CommercialSettings settings,
+                            ILocalizationService localizationService,
                             IMessageBoxService messageBoxService,
                             ErrorWindowService errorWindowService)
-        : base(revitRepository, settings, messageBoxService, errorWindowService) {
+        : base(revitRepository, settings, localizationService, messageBoxService, errorWindowService) {
         _settings = settings;
 
         _declarationViewModel = new DeclarationCommercialVM(_revitRepository, settings, messageBoxService);
@@ -83,8 +84,8 @@ internal class CommercialMainVM : MainViewModel {
             _declarationViewModel.SelectedFormat.Export(_declarationViewModel.FullPath, commercialRooms);
         } catch(Exception e) {
             var messageBoxResult = _messageBoxService.Show(
-                $"Произошла ошибка выгрузки: {e.Message}.\n\nПопробовать выгрузить декларацию в формате csv?",
-                "Ошибка выгрузки",
+                _localizationService.GetLocalizedString("MessageBox.ExcelErrorLoadCsv", e.Message),
+                _localizationService.GetLocalizedString("MessageBox.ExportErrorTitle"),
                 MessageBoxButton.YesNo,
                 MessageBoxImage.Warning);
 

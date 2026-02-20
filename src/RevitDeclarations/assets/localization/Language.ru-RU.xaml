@@ -2,7 +2,41 @@
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
                     xmlns:system="clr-namespace:System;assembly=mscorlib">
 
-    <system:String x:Key="MainWindow.Title">Декларации</system:String>
+    <system:String x:Key="Window.Yes">Да</system:String>
+    <system:String x:Key="Window.No">Нет</system:String>
+    
+    <system:String x:Key="MainWindow.Title">Декларации</system:String>    
+    
+    <system:String x:Key="MainWindow.ErrorNoFolder">Не выбрана папка</system:String>    
+    <system:String x:Key="MainWindow.ErrorNoName">Не заполнено имя файла</system:String>    
+    <system:String x:Key="MainWindow.ErrorNoProjects">Не выбраны проекты для выгрузки</system:String>    
+    <system:String x:Key="MainWindow.ErrorNoPhaseInDocs">В выбранных проектах отсутствует выбранная стадия</system:String>    
+    <system:String x:Key="MainWindow.ErrorNoParams">Не выбран параметр на вкладке "Параметры"</system:String>    
+    <system:String x:Key="MainWindow.ErrorNoParamFilters">Не заполнены значения для фильтрации на вкладке "Параметры"</system:String>    
+    <system:String x:Key="MainWindow.ErrorNoProjectId">Не заполнено ИД объекта на вкладке "Параметры"</system:String>
+    <system:String x:Key="MainWindow.ErrorNoCorpPriorities">Выгрузка доступна только с корпоративными приоритетами</system:String>
+    <system:String x:Key="MainWindow.FileName">{0} [текущий проект]</system:String>
+    <system:String x:Key="MainWindow.FileNameLink">{0} [связь]</system:String>
+    
+    <system:String x:Key="MessageBox.ExportErrorTitle">Ошибка выгрузки</system:String>    
+    <system:String x:Key="MessageBox.ExcelErrorLoadCsv">
+        Произошла ошибка выгрузки: {0}.
+        
+        Попробовать выгрузить декларацию в формате csv?
+    </system:String>
+    <system:String x:Key="MessageBox.PrioritiesConfigCreated">Файл конфигурации приоритетов создан</system:String>    
+    <system:String x:Key="MessageBox.DeclFileCreated">Файл {0} создан</system:String>    
+    
+    <system:String x:Key="OpenFileDialog.SelectJson">Выберите Json файл"</system:String>    
+    
+    
+    <system:String x:Key="WarningWindow.Error">Ошибка</system:String>
+    <system:String x:Key="WarningWindow.Warning">Предупреждение</system:String>
     <system:String x:Key="WarningsWindow.HeaderName">Название</system:String>
     <system:String x:Key="WarningsWindow.HeaderDescription">Описание</system:String>
+    <system:String x:Key="WarningsWindow.WarningFullName">{0} в проекте "{1}"</system:String>
+    <system:String x:Key="WarningsWindow.NoParamsInProjects">В проекте отсутствует параметр, выбранный в исходных данных</system:String>
+    <system:String x:Key="WarningsWindow.NoParamInProject">Отсутствует параметр в проекте</system:String>
+    
+    
 </ResourceDictionary>

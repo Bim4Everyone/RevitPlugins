@@ -1,14 +1,22 @@
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 
+using dosymep.SimpleServices;
 using dosymep.WPF.ViewModels;
 
 namespace RevitDeclarations.ViewModels;
 internal class WarningViewModel : BaseViewModel {
+    private readonly ILocalizationService _localizationService;
+
+    public WarningViewModel(ILocalizationService localizationService) {
+        _localizationService = localizationService;
+    }
+
     public string WarningType { get; set; }
     public string Description { get; set; }
     public string DocumentName { get; set; }
-    public string FullName => $"{WarningType} в проекте \"{DocumentName}\"";
+    public string FullName => 
+        _localizationService.GetLocalizedString("WarningsWindow.WarningFullName", WarningType, DocumentName);
 
     public IList<WarningElementViewModel> Elements { get; set; } = [];
 }

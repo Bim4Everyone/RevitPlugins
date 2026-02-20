@@ -10,14 +10,20 @@ using RevitDeclarations.Models;
 
 namespace RevitDeclarations.ViewModels;
 internal class ApartmentsJsonExportVM : ExportViewModel {
-    public ApartmentsJsonExportVM(string name, Guid id, DeclarationSettings settings, IMessageBoxService messageBoxService)
-        : base(name, id, settings, messageBoxService) {
+    public ApartmentsJsonExportVM(string name, 
+                                  Guid id, 
+                                  DeclarationSettings settings,
+                                  ILocalizationService localizationService,
+                                  IMessageBoxService messageBoxService)
+        : base(name, id, settings, localizationService, messageBoxService) {
     }
 
     public override void Export(string path, IEnumerable<RoomGroup> roomGroups) {
         var apartments = roomGroups.Cast<Apartment>();
         var exporter = new JsonExporter<Apartment>();
         exporter.Export(path, apartments);
-        _messageBoxService.Show($"Файл {Name} создан", "Декларации");
+        _messageBoxService.Show(
+            _localizationService.GetLocalizedString("MessageBox.DeclFileCreated", Name),
+            _localizationService.GetLocalizedString("MainWindow.Title"));
     }
 }
