@@ -54,14 +54,15 @@ internal abstract class DeclarationProject {
 
     public WarningViewModel CheckRoomGroupsInProject() {
         var errorListVM = new WarningViewModel(_localizationService) {
-            WarningType = "Ошибка",
-            Description = "В проекте отсутствуют необходимые группы помещений на выбранной стадии",
+            WarningType = _localizationService.GetLocalizedString("WarningWindow.Error"),
+            Description = _localizationService.GetLocalizedString("WarningsWindow.NoGroupsAtPhase"),
             DocumentName = _document.Name
         };
 
         if(_roomGroups.Count == 0) {
             errorListVM.Elements = [
-                new WarningElementViewModel(_settings.SelectedPhase.Name, "Отсутствуют группы помещений")
+                new WarningElementViewModel(_settings.SelectedPhase.Name, 
+                _localizationService.GetLocalizedString("WarningsWindow.NoGroups"))
             ];
         }
 
@@ -70,16 +71,16 @@ internal abstract class DeclarationProject {
 
     public WarningViewModel CheckActualRoomAreas() {
         var errorListVM = new WarningViewModel(_localizationService) {
-            WarningType = "Предупреждение",
-            Description = "Не актуальные площади помещений, рассчитанные квартирографией",
+            WarningType = _localizationService.GetLocalizedString("WarningWindow.Warning"),
+            Description = _localizationService.GetLocalizedString("WarningWindow.NotActualAreas"),
             DocumentName = _document.Name
         };
 
         foreach(var roomGroup in _roomGroups) {
             if(!roomGroup.CheckActualRoomAreas()) {
-                string groupInfo = $"Группа помещений № {roomGroup.Number} на этаже {roomGroup.Level}";
-                string groupAreas = "Площади помещений, рассчитанные квартирографией " +
-                    "отличаются от актуальной системной площадей помещения.";
+                string groupInfo = _localizationService
+                    .GetLocalizedString("WarningsWindow.ErrorRoomGroup", roomGroup.Number, roomGroup.Level);
+                string groupAreas = _localizationService.GetLocalizedString("WarningsWindow.NotActualAreasInfo");
                 errorListVM.Elements.Add(new WarningElementViewModel(groupInfo, groupAreas));
             }
         }

@@ -20,7 +20,7 @@ internal class PublicAreasCsvExportVM : ExportViewModel {
     public override void Export(string path, IEnumerable<RoomGroup> roomGroups) {
         var publicAreas = roomGroups.Cast<PublicArea>().ToList();
         var tableData = new PublicAreasTableInfo(publicAreas, _settings);
-        var table = new PublicAreasDataTable("16.1 МОП", tableData);
+        var table = new PublicAreasDataTable(_declarationPublicAreasName, tableData);
         table.GenerateTable();
 
         ExportTable<ExcelExporter>(path, table);

@@ -13,6 +13,10 @@ internal abstract class ExportViewModel {
     protected readonly ILocalizationService _localizationService;
     protected readonly IMessageBoxService _messageBoxService;
 
+    protected const string _declarationApartsName = "15.2 Жилые помещения";
+    protected const string _declarationCommercialName = "15.3 Нежилые помещения";
+    protected const string _declarationPublicAreasName = "16.1 МОП";
+
     protected ExportViewModel(string name, 
                               Guid id, 
                               DeclarationSettings settings,
@@ -30,7 +34,7 @@ internal abstract class ExportViewModel {
 
     public void ExportTable<T>(string path, IDeclarationDataTable table) where T : ITableExporter, new() {
         var exporter = new T();
-        exporter.Export(path, table, _messageBoxService);
+        exporter.Export(path, table, _localizationService, _messageBoxService);
         _messageBoxService.Show(
             _localizationService.GetLocalizedString("MessageBox.DeclFileCreated", Name),
             _localizationService.GetLocalizedString("MainWindow.Title"));

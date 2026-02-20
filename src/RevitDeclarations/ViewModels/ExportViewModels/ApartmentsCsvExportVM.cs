@@ -19,7 +19,7 @@ internal class ApartmentsCsvExportVM : ExportViewModel {
     public override void Export(string path, IEnumerable<RoomGroup> roomGroups) {
         var apartments = roomGroups.Cast<Apartment>().ToList();
         var tableInfo = new ApartmentsTableInfo(apartments, _settings);
-        var table = new ApartmentsDataTable("15.2 Жилые помещения", tableInfo);
+        var table = new ApartmentsDataTable(_declarationApartsName, tableInfo);
         table.GenerateTable();
 
         ExportTable<CsvExporter>(path, table);

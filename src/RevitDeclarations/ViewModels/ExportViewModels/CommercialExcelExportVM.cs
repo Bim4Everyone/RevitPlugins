@@ -19,7 +19,7 @@ internal class CommercialExcelExportVM : ExportViewModel {
     public override void Export(string path, IEnumerable<RoomGroup> roomGroups) {
         var commercialRooms = roomGroups.Cast<CommercialRooms>().ToList();
         var tableInfo = new CommercialTableInfo(commercialRooms, _settings);
-        var table = new CommercialDataTable("15.3 Нежилые помещения", tableInfo);
+        var table = new CommercialDataTable(_declarationCommercialName, tableInfo);
         table.GenerateTable();
 
         ExportTable<ExcelExporter>(path, table);

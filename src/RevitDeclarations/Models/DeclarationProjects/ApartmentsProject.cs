@@ -32,16 +32,16 @@ internal class ApartmentsProject : DeclarationProject {
     /// <returns></returns>
     public WarningViewModel CheckRoomAreasEquality() {
         var errorListVM = new WarningViewModel(_localizationService) {
-            WarningType = "Ошибка",
-            Description = "Площади, рассчитанные квартирографией отличаются в пределах квартиры",
+            WarningType = _localizationService.GetLocalizedString("WarningWindow.Error"),
+            Description = _localizationService.GetLocalizedString("WarningsWindow.DiffInAreas"),
             DocumentName = _document.Name
         };
 
         foreach(Apartment apartment in _roomGroups) {
             if(!apartment.CheckEqualityOfRoomAreas()) {
-                string apartInfo = $"Группа помещений № {apartment.Number} на этаже {apartment.Level}";
-                string apartAreas = "Площади квартиры (без коэффициента/с коэффициентом/жилая/без ЛП) " +
-                    "должны быть одинаковыми для каждого помещения квартиры";
+                string apartInfo = _localizationService
+                    .GetLocalizedString("WarningsWindow.ErrorRoomGroup", apartment.Number, apartment.Level);                
+                string apartAreas = _localizationService.GetLocalizedString("WarningsWindow.ErrorRoomAreasInfo");
                 errorListVM.Elements.Add(new WarningElementViewModel(apartInfo, apartAreas));
             }
         }
@@ -51,18 +51,16 @@ internal class ApartmentsProject : DeclarationProject {
 
     public WarningViewModel CheckActualApartmentAreas() {
         var errorListVM = new WarningViewModel(_localizationService) {
-            WarningType = "Предупреждение",
-            Description = "Не актуальные площади квартир, рассчитанные квартирографией",
+            WarningType = _localizationService.GetLocalizedString("WarningWindow.Warning"),
+            Description = _localizationService.GetLocalizedString("WarningsWindow.ErrorRoomNotActualAreasInfo"),
             DocumentName = _document.Name
         };
 
         foreach(Apartment apartment in _roomGroups) {
             if(!apartment.CheckActualApartmentAreas()) {
-                string apartInfo = $"Группа помещений № {apartment.Number} на этаже {apartment.Level}";
-                string apartAreas = "Площади квартиры, рассчитанные квартирографией " +
-                    "отличаются от суммы актуальных системных площадей этой квартиры. " +
-                    "Проверьте общую площадь квартиры, площадь с коэффициентом, " +
-                    "площадь жилых помещений и площадь без летних помещений";
+                string apartInfo = _localizationService
+                    .GetLocalizedString("WarningsWindow.ErrorRoomGroup", apartment.Number, apartment.Level);
+                string apartAreas = _localizationService.GetLocalizedString("WarningsWindow.ErrorApartsNotActualAreasInfo");
                 errorListVM.Elements.Add(new WarningElementViewModel(apartInfo, apartAreas));
             }
         }
