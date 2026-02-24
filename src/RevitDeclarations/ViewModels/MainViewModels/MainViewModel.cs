@@ -79,31 +79,31 @@ internal abstract class MainViewModel : BaseViewModel {
             .Any();
 
         if(string.IsNullOrEmpty(_declarationViewModel.FilePath)) {
-            _localizationService.GetLocalizedString("MainWindow.ErrorNoFolder");
+            ErrorText = _localizationService.GetLocalizedString("MainWindow.ErrorNoFolder");
             return false;
         }
         if(string.IsNullOrEmpty(_declarationViewModel.FileName)) {
-            _localizationService.GetLocalizedString("MainWindow.ErrorNoName");
+            ErrorText = _localizationService.GetLocalizedString("MainWindow.ErrorNoName");
             return false;
         }
         if(!hasCheckedDocuments) {
-            _localizationService.GetLocalizedString("MainWindow.ErrorNoProjects");
+            ErrorText = _localizationService.GetLocalizedString("MainWindow.ErrorNoProjects");
             return false;
         }
         if(!hasPhases) {
-            _localizationService.GetLocalizedString("MainWindow.ErrorNoPhaseInDocs");
+            ErrorText = _localizationService.GetLocalizedString("MainWindow.ErrorNoPhaseInDocs");
             return false;
         }
         if(hasEmptyParameters) {
-            _localizationService.GetLocalizedString("MainWindow.ErrorNoParams");
+            ErrorText = _localizationService.GetLocalizedString("MainWindow.ErrorNoParams");
             return false;
         }
         if(!_parametersViewModel.FilterRoomsValues.Any()) {
-            _localizationService.GetLocalizedString("MainWindow.ErrorNoParamFilters");
+            ErrorText = _localizationService.GetLocalizedString("MainWindow.ErrorNoParamFilters");
             return false;
         }
         if(string.IsNullOrEmpty(_parametersViewModel.ProjectName)) {
-            _localizationService.GetLocalizedString("MainWindow.ErrorNoProjectId");
+            ErrorText = _localizationService.GetLocalizedString("MainWindow.ErrorNoProjectId");
             return false;
         }
 
