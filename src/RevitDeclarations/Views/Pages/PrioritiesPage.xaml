@@ -47,15 +47,9 @@
                     Grid.Row="0"
                     Grid.Column="0"
                     Grid.ColumnSpan="3"
-                    Margin="0,0,0,4">
-                    <Run Text="Имена помещений квартир в проекте должны соответствовать следующему списку приоритетов." />
-                    <LineBreak />
-                    <Run Text="Столбцы в декларации будут созданы в соответствии с порядковым номером приоритета." />
-                    <LineBreak />
-                    <Run Text="Помещения, для которых не найден приоритет, будут добавлены в конце таблицы." />
-                    <LineBreak />
-                    <Run Text="Приоритеты настраиваются в файле JSON. Вы можете использовать ваш собственный файл приоритетов." />
-                </TextBlock>
+                    Margin="0,0,0,4"
+                    TextWrapping="Wrap"
+                    Text="{me:LocalizationSource PrioritiesPage.Description}" />
 
                 <ui:Button
                     Grid.Row="1"
@@ -63,7 +57,7 @@
                     Margin="0,4,4,4"
                     HorizontalAlignment="Stretch"
                     Appearance="Info"
-                    Content="Корпоративные приоритеты"
+                    Content="{me:LocalizationSource PrioritiesPage.CorpPriorities}"
                     Command="{Binding SetDefaultConfigCommand}" />
                 <ui:Button
                     Grid.Row="1"
@@ -71,13 +65,13 @@
                     Margin="4"
                     HorizontalAlignment="Stretch"
                     Appearance="Info"
-                    Content="Экспорт приоритетов"
+                    Content="{me:LocalizationSource PrioritiesPage.ExportPriorities}"
                     Command="{Binding ExportConfigCommand}" />
                 <ui:Button
                     Grid.Row="1"
                     Grid.Column="2"
                     Margin="4,4,0,4"
-                    Content="Импорт приоритетов"
+                    Content="{me:LocalizationSource PrioritiesPage.ImportPriorities}"
                     Appearance="Info"
                     HorizontalAlignment="Stretch"
                     Command="{Binding ImportConfigCommand}" />
@@ -87,7 +81,7 @@
                     Grid.Column="0"
                     Margin="4,8"
                     VerticalAlignment="Center"
-                    Text="Путь к файлу приоритетов:" />
+                    Text="{me:LocalizationSource PrioritiesPage.FileLocation}" />
                 <TextBlock
                     Grid.Row="2"
                     Grid.Column="1"
@@ -115,27 +109,27 @@
                 ItemsSource="{Binding PrioritiesVM}">
                 <DataGrid.Columns>
                     <DataGridTextColumn
-                        Header="Номер"
+                        Header="{me:LocalizationSource PrioritiesPage.Number}"
                         Width="80"
                         IsReadOnly="True"
                         Binding="{Binding OrdinalNumber}" />
                     <DataGridTextColumn
-                        Header="Имя"
+                        Header="{me:LocalizationSource PrioritiesPage.Name}"
                         Width="*"
                         IsReadOnly="True"
                         Binding="{Binding Name}" />
                     <DataGridTextColumn
-                        Header="Коэффициент"
+                        Header="{me:LocalizationSource PrioritiesPage.Coef}"
                         Width="90"
                         IsReadOnly="True"
                         Binding="{Binding AreaCoefficient}" />
                     <DataGridTextColumn
-                        Header="Летнее"
+                        Header="{me:LocalizationSource PrioritiesPage.IsSummer}"
                         Width="90"
                         IsReadOnly="True"
                         Binding="{Binding IsSummer}" />
                     <DataGridTextColumn
-                        Header="Жилое"
+                        Header="{me:LocalizationSource PrioritiesPage.IsLiving}"
                         Width="90"
                         IsReadOnly="True"
                         Binding="{Binding IsLiving}" />

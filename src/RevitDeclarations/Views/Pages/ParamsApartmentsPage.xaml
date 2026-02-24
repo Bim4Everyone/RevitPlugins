@@ -19,7 +19,6 @@
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
                 <ResourceDictionary Source="../Styles/Styles.xaml" />
-                <ResourceDictionary Source="../ToolTips/ParameterToolTips.xaml"/>
             </ResourceDictionary.MergedDictionaries>
         </ResourceDictionary>
     </core:WpfUIPlatformPage.Resources>
@@ -53,18 +52,18 @@
                     Grid.Row="0"
                     Grid.ColumnSpan="3"
                     Style="{StaticResource HeaderName}"
-                    Text="Конфигурации" />
+                    Text="{me:LocalizationSource ParametersPage.Configs}" />
                 
                 <ui:Button
                     Grid.Row="1"
                     Grid.Column="0"
                     Style="{StaticResource ToolTipButton}"
-                    ToolTip="{StaticResource ParamDocumentToolTip}"/>
+                    ToolTip="{me:LocalizationSource ToolTip.ParamDocumentToolTip}"/>
                 <TextBlock
                     Grid.Row="1"
                     Grid.Column="1"
                     Style="{StaticResource PropertyName}"
-                    Text="Файл-основа для поиска параметров:"/>
+                    Text="{me:LocalizationSource ParametersPage.BaseFile}"/>
                 <ComboBox
                     Grid.Row="1"
                     Grid.Column="2"
@@ -76,38 +75,38 @@
                     Grid.Row="2"
                     Grid.Column="0"
                     Style="{StaticResource ToolTipButton}"
-                    ToolTip="{StaticResource LastConfigToolTip}" />
+                    ToolTip="{me:LocalizationSource ToolTip.LastConfigToolTip}" />
                 <TextBlock
                     Grid.Row="2"
                     Grid.Column="1"
                     Style="{StaticResource PropertyName}"
-                    Text="Конфигурация последнего запуска:"/>
+                    Text="{me:LocalizationSource ParametersPage.LastConfig}"/>
                 <ui:Button
                     Grid.Row="2"
                     Grid.Column="2"
                     Height="35"
                     HorizontalAlignment="Stretch"
                     Appearance="Info"
-                    Content="Загрузить"
+                    Content="{me:LocalizationSource ParametersPage.LoadConfig}"
                     Command="{Binding SetLastConfigCommand}"/>
 
                 <ui:Button
                     Grid.Row="3"
                     Grid.Column="0"
                     Style="{StaticResource ToolTipButton}"
-                    ToolTip="{StaticResource CompanyConfigToolTip}" />
+                    ToolTip="{me:LocalizationSource ToolTip.CompanyConfigToolTip}" />
                 <TextBlock
                     Grid.Row="3"
                     Grid.Column="1"
                     Style="{StaticResource PropertyName}"
-                    Text="Корпоративная конфигурация:"/>
+                    Text="{me:LocalizationSource ParametersPage.CorpConfig}"/>
                 <ui:Button
                     Grid.Row="3"
                     Grid.Column="2"
                     Height="35"
                     HorizontalAlignment="Stretch"
                     Appearance="Info"
-                    Content="Загрузить"
+                    Content="{me:LocalizationSource ParametersPage.LoadConfig}"
                     Command="{Binding SetCompanyConfigCommand}"/>
             </Grid>
         </Border>
@@ -136,18 +135,18 @@
                     Grid.Row="0"
                     Grid.ColumnSpan="3"
                     Style="{StaticResource HeaderName}"
-                    Text="Параметры для фильтрации и группировки помещений" />
+                    Text="{me:LocalizationSource ParametersPage.FilterParams}" />
 
                 <ui:Button
                     Grid.Row="1"
                     Grid.Column="0"
                     Style="{StaticResource ToolTipButton}"
-                    ToolTip="{StaticResource FilterRoomsParamToolTip}" />
+                    ToolTip="{me:LocalizationSource ToolTip.FilterRoomsParamToolTip}" />
                 <TextBlock
                     Grid.Column="1"
                     Grid.Row="1"
                     Style="{StaticResource PropertyName}"
-                    Text="Параметр для фильтрации помещений квартир:"/>
+                    Text="{me:LocalizationSource ParametersPage.FilterApartsParams}"/>
                 <ComboBox
                     Grid.Column="2"
                     Grid.Row="1"
@@ -159,12 +158,12 @@
                     Grid.Row="2"
                     Grid.Column="0"
                     Style="{StaticResource ToolTipButton}"
-                    ToolTip="{StaticResource FilterRoomsValuesToolTip}" />
+                    ToolTip="{me:LocalizationSource ToolTip.FilterRoomsValuesToolTip}" />
                 <TextBlock
                     Grid.Column="1"
                     Grid.Row="2"
                     Style="{StaticResource PropertyName}"
-                    Text="Значения параметра фильтрации:"/>
+                    Text="{me:LocalizationSource ParametersPage.FilterValue}"/>
                 <Grid
                     Grid.Column="2"
                     Grid.Row="2">
@@ -177,8 +176,8 @@
                         Height="35"
                         Text="{Binding FilterRoomsValue}"/>
                     <ui:Button
-                        Grid.Column="1"                    
-                        Content="Добавить"
+                        Grid.Column="1"
+                        Content="{me:LocalizationSource ParametersPage.AddButton}"
                         HorizontalAlignment="Stretch"
                         Height="35"
                         Appearance="Info"
@@ -227,12 +226,12 @@
                     Grid.Row="4"
                     Grid.Column="0"
                     Style="{StaticResource ToolTipButton}"
-                    ToolTip="{StaticResource GroupBySectionParamApartToolTip}" />
+                    ToolTip="{me:LocalizationSource ToolTip.GroupBySectionParamApartToolTip}" />
                 <TextBlock
                     Grid.Column="1"
                     Grid.Row="4"
                     Style="{StaticResource PropertyName}"
-                    Text="Параметр принадлежности к секции:"/>
+                    Text="{me:LocalizationSource ParametersPage.SectionParam}"/>
                 <ComboBox
                     Grid.Column="2"
                     Grid.Row="4"
@@ -244,12 +243,12 @@
                     Grid.Row="5"
                     Grid.Column="0"
                     Style="{StaticResource ToolTipButton}"
-                    ToolTip="{StaticResource GroupByGroupApartParamToolTip}" />
+                    ToolTip="{me:LocalizationSource ToolTip.GroupByGroupApartParamToolTip}" />
                 <TextBlock
                     Grid.Column="1"
                     Grid.Row="5"
                     Style="{StaticResource PropertyName}"
-                    Text="Параметр принадлежности к квартире:"/>
+                    Text="{me:LocalizationSource ParametersPage.ApartParam}"/>
                 <ComboBox
                     Grid.Column="2"
                     Grid.Row="5"
@@ -261,12 +260,12 @@
                     Grid.Row="6"
                     Grid.Column="0"
                     Style="{StaticResource ToolTipButton}"
-                    ToolTip="{StaticResource MultiStoreyApartParamToolTip}" />
+                    ToolTip="{me:LocalizationSource ToolTip.MultiStoreyApartParamToolTip}" />
                 <TextBlock
                     Grid.Column="1"
                     Grid.Row="6"
                     Style="{StaticResource PropertyName}"
-                    Text="Параметр группировки многоуровневых квартир:"/>
+                    Text="{me:LocalizationSource ParametersPage.MultiLevelParam}"/>
                 <ComboBox
                     Grid.Column="2"
                     Grid.Row="6"
@@ -309,18 +308,18 @@
                     Grid.Row="0"
                     Grid.ColumnSpan="3"
                     Style="{StaticResource HeaderName}"
-                    Text="Параметры для заполнения декларации. Информация о квартирах." />
+                    Text="{me:LocalizationSource ParametersPage.ApartParamsHeader}" />
 
                 <ui:Button
                     Grid.Row="1"
                     Grid.Column="0"
                     Style="{StaticResource ToolTipButton}"
-                    ToolTip="{StaticResource ApartFullNumParamToolTip}" />
+                    ToolTip="{me:LocalizationSource ToolTip.ApartFullNumParamToolTip}" />
                 <TextBlock
                     Grid.Column="1"
                     Grid.Row="1"
                     Style="{StaticResource PropertyName}"
-                    Text="1. Сквозной номер:"/>
+                    Text="{me:LocalizationSource ParametersPage.FullNumber}"/>
                 <ComboBox
                     Grid.Column="2"
                     Grid.Row="1"
@@ -332,12 +331,12 @@
                     Grid.Row="2"
                     Grid.Column="0"
                     Style="{StaticResource ToolTipButton}"
-                    ToolTip="{StaticResource DepartmentParamToolTip}" />
+                    ToolTip="{me:LocalizationSource ToolTip.DepartmentParamToolTip}" />
                 <TextBlock
                     Grid.Column="1"
                     Grid.Row="2"
                     Style="{StaticResource PropertyName}"
-                    Text="2. Назначение:"/>
+                    Text="{me:LocalizationSource ParametersPage.Definition}"/>
                 <ComboBox
                     Grid.Column="2"
                     Grid.Row="2"
@@ -349,12 +348,12 @@
                     Grid.Row="3"
                     Grid.Column="0"
                     Style="{StaticResource ToolTipButton}"
-                    ToolTip="{StaticResource LevelParamToolTip}" />
+                    ToolTip="{me:LocalizationSource ToolTip.LevelParamToolTip}" />
                 <TextBlock
                     Grid.Column="1"
                     Grid.Row="3"
                     Style="{StaticResource PropertyName}"
-                    Text="3. Этаж расположения:"/>
+                    Text="{me:LocalizationSource ParametersPage.Level}"/>
                 <ComboBox
                     Grid.Column="2"
                     Grid.Row="3"
@@ -366,12 +365,12 @@
                     Grid.Row="4"
                     Grid.Column="0"
                     Style="{StaticResource ToolTipButton}"
-                    ToolTip="{StaticResource SectionParamToolTip}" />
+                    ToolTip="{me:LocalizationSource ToolTip.SectionParamToolTip}" />
                 <TextBlock
                     Grid.Column="1"
                     Grid.Row="4"
                     Style="{StaticResource PropertyName}"
-                    Text="4. Номер подъезда:"/>
+                    Text="{me:LocalizationSource ParametersPage.Section}"/>
                 <ComboBox
                     Grid.Column="2"
                     Grid.Row="4"
@@ -383,12 +382,12 @@
                     Grid.Row="5"
                     Grid.Column="0"
                     Style="{StaticResource ToolTipButton}"
-                    ToolTip="{StaticResource BuildingParamToolTip}" />
+                    ToolTip="{me:LocalizationSource ToolTip.BuildingParamToolTip}" />
                 <TextBlock
                     Grid.Column="1"
                     Grid.Row="5"
                     Style="{StaticResource PropertyName}"
-                    Text="5. Номер корпуса:"/>
+                    Text="{me:LocalizationSource ParametersPage.Building}"/>
                 <ComboBox
                     Grid.Column="2"
                     Grid.Row="5"
@@ -400,12 +399,12 @@
                     Grid.Row="6"
                     Grid.Column="0"
                     Style="{StaticResource ToolTipButton}"
-                    ToolTip="{StaticResource BuildingNumberParamToolTip}" />
+                    ToolTip="{me:LocalizationSource ToolTip.BuildingNumberParamToolTip}" />
                 <TextBlock
                     Grid.Column="1"
                     Grid.Row="6"
                     Style="{StaticResource PropertyName}"
-                    Text="6. Номер здания:"/>
+                    Text="{me:LocalizationSource ParametersPage.BuildingNumber}"/>
                 <ComboBox
                     Grid.Column="2"
                     Grid.Row="6"
@@ -417,12 +416,12 @@
                     Grid.Row="7"
                     Grid.Column="0"
                     Style="{StaticResource ToolTipButton}"
-                    ToolTip="{StaticResource ConstrWorkNumberParamToolTip}" />
+                    ToolTip="{me:LocalizationSource ToolTip.ConstrWorkNumberParamToolTip}" />
                 <TextBlock
                     Grid.Column="1"
                     Grid.Row="7"
                     Style="{StaticResource PropertyName}"
-                    Text="7. Номер ОКС:"/>
+                    Text="{me:LocalizationSource ParametersPage.ConstrWorkNumber}"/>
                 <ComboBox
                     Grid.Column="2"
                     Grid.Row="7"
@@ -434,12 +433,12 @@
                     Grid.Row="8"
                     Grid.Column="0"
                     Style="{StaticResource ToolTipButton}"
-                    ToolTip="{StaticResource ApartAreaCoefParamToolTip}" />
+                    ToolTip="{me:LocalizationSource ToolTip.ApartAreaCoefParamToolTip}" />
                 <TextBlock
                     Grid.Column="1"
                     Grid.Row="8"
                     Style="{StaticResource PropertyName}"
-                    Text="8. Общая площадь с пониж. коэффициентом, м2:"/>
+                    Text="{me:LocalizationSource ParametersPage.ApartAreaCoef}"/>
                 <ComboBox
                     Grid.Column="2"
                     Grid.Row="8"
@@ -451,12 +450,12 @@
                     Grid.Row="9"
                     Grid.Column="0"
                     Style="{StaticResource ToolTipButton}"
-                    ToolTip="{StaticResource RoomsAmountParamToolTip}" />
+                    ToolTip="{me:LocalizationSource ToolTip.RoomsAmountParamToolTip}" />
                 <TextBlock
                     Grid.Column="1"
                     Grid.Row="9"
                     Style="{StaticResource PropertyName}"
-                    Text="9. Количество комнат:"/>
+                    Text="{me:LocalizationSource ParametersPage.RoomsAmount}"/>
                 <ComboBox
                     Grid.Column="2"
                     Grid.Row="9"
@@ -468,12 +467,12 @@
                     Grid.Row="10"
                     Grid.Column="0"
                     Style="{StaticResource ToolTipButton}"
-                    ToolTip="{StaticResource ApartAreaLivingParamToolTip}" />
+                    ToolTip="{me:LocalizationSource ToolTip.ApartAreaLivingParamToolTip}" />
                 <TextBlock
                     Grid.Column="1"
                     Grid.Row="10"
                     Style="{StaticResource PropertyName}"
-                    Text="10. Жилая площадь, м2:"/>
+                    Text="{me:LocalizationSource ParametersPage.ApartAreaLiving}"/>
                 <ComboBox
                     Grid.Column="2"
                     Grid.Row="10"
@@ -485,12 +484,12 @@
                     Grid.Row="11"
                     Grid.Column="0"
                     Style="{StaticResource ToolTipButton}"
-                    ToolTip="{StaticResource RoomsHeightParamToolTip}" />
+                    ToolTip="{me:LocalizationSource ToolTip.RoomsHeightParamToolTip}" />
                 <TextBlock
                     Grid.Row="11"
                     Grid.Column="1"
                     Style="{StaticResource PropertyName}"
-                    Text="11. Высота потолков, м:"/>
+                    Text="{me:LocalizationSource ParametersPage.RoomsHeight}"/>
                 <ComboBox
                     Grid.Row="11"
                     Grid.Column="2"
@@ -502,12 +501,12 @@
                     Grid.Row="12"
                     Grid.Column="0"
                     Style="{StaticResource ToolTipButton}"
-                    ToolTip="{StaticResource ProjectNameToolTip}" />
+                    ToolTip="{me:LocalizationSource ToolTip.ProjectNameToolTip}" />
                 <TextBlock
                     Grid.Column="1"
                     Grid.Row="12"
                     Style="{StaticResource PropertyName}"
-                    Text="12. ИД Объекта:"/>
+                    Text="{me:LocalizationSource ParametersPage.ProjectName}"/>
                 <TextBox
                     Grid.Column="2"
                     Grid.Row="12"
@@ -517,12 +516,12 @@
                     Grid.Row="13"
                     Grid.Column="0"
                     Style="{StaticResource ToolTipButton}"
-                    ToolTip="{StaticResource ApartNumParamToolTip}" />
+                    ToolTip="{me:LocalizationSource ToolTip.ApartNumParamToolTip}" />
                 <TextBlock
                     Grid.Column="1"
                     Grid.Row="13"
                     Style="{StaticResource PropertyName}"
-                    Text="13. Номер на площадке:"/>
+                    Text="{me:LocalizationSource ParametersPage.ApartNum}"/>
                 <ComboBox
                     Grid.Column="2"
                     Grid.Row="13"
@@ -534,12 +533,12 @@
                     Grid.Row="14"
                     Grid.Column="0"
                     Style="{StaticResource ToolTipButton}"
-                    ToolTip="{StaticResource ApartAreaParamToolTip}" />
+                    ToolTip="{me:LocalizationSource ToolTip.ApartAreaParamToolTip}" />
                 <TextBlock
                     Grid.Column="1"
                     Grid.Row="14"
                     Style="{StaticResource PropertyName}"
-                    Text="14. Общая площадь без пониж. коэффициента, м2:"/>
+                    Text="{me:LocalizationSource ParametersPage.ApartArea}"/>
                 <ComboBox
                     Grid.Column="2"
                     Grid.Row="14"
@@ -551,12 +550,12 @@
                     Grid.Row="15"
                     Grid.Column="0"
                     Style="{StaticResource ToolTipButton}"
-                    ToolTip="{StaticResource ApartAreaNonSumParamToolTip}" />
+                    ToolTip="{me:LocalizationSource ToolTip.ApartAreaNonSumParamToolTip}" />
                 <TextBlock
                     Grid.Column="1"
                     Grid.Row="15"
                     Style="{StaticResource PropertyName}"
-                    Text="15. Площадь без летних помещений, м2:"/>
+                    Text="{me:LocalizationSource ParametersPage.ApartAreaNonSum}"/>
                 <ComboBox
                     Grid.Column="2"
                     Grid.Row="15"
@@ -589,18 +588,18 @@
                     Grid.Row="0"
                     Grid.ColumnSpan="3"
                     Style="{StaticResource HeaderName}"
-                    Text="Параметры для заполнения декларации. Информация о помещениях." />
+                    Text="{me:LocalizationSource ParametersPage.RoomsParamsHeader}" />
 
                 <ui:Button
                     Grid.Row="1"
                     Grid.Column="0"
                     Style="{StaticResource ToolTipButton}"
-                    ToolTip="{StaticResource RoomNumberParamToolTip}" />
+                    ToolTip="{me:LocalizationSource ToolTip.RoomNumberParamToolTip}" />
                 <TextBlock
                     Grid.Column="1"
                     Grid.Row="1"
                     Style="{StaticResource PropertyName}"
-                    Text="Номер помещения:"/>
+                    Text="{me:LocalizationSource ParametersPage.RoomNumber}"/>
                 <ComboBox
                     Grid.Column="2"
                     Grid.Row="1"
@@ -612,12 +611,12 @@
                     Grid.Row="2"
                     Grid.Column="0"
                     Style="{StaticResource ToolTipButton}"
-                    ToolTip="{StaticResource RoomNameParamToolTip}" />
+                    ToolTip="{me:LocalizationSource ToolTip.RoomNameParamToolTip}" />
                 <TextBlock
                     Grid.Column="1"
                     Grid.Row="2"
                     Style="{StaticResource PropertyName}"
-                    Text="Имя помещения:"/>
+                    Text="{me:LocalizationSource ParametersPage.RoomName}"/>
                 <ComboBox
                     Grid.Column="2"
                     Grid.Row="2"
@@ -629,12 +628,12 @@
                     Grid.Row="3"
                     Grid.Column="0"
                     Style="{StaticResource ToolTipButton}"
-                    ToolTip="{StaticResource RoomAreaParamToolTip}" />
+                    ToolTip="{me:LocalizationSource ToolTip.RoomAreaParamToolTip}" />
                 <TextBlock
                     Grid.Column="1"
                     Grid.Row="3"
                     Style="{StaticResource PropertyName}"
-                    Text="Площадь помещения:"/>
+                    Text="{me:LocalizationSource ParametersPage.RoomArea}"/>
                 <ComboBox
                     Grid.Column="2"
                     Grid.Row="3"
@@ -646,12 +645,12 @@
                     Grid.Row="4"
                     Grid.Column="0"
                     Style="{StaticResource ToolTipButton}"
-                    ToolTip="{StaticResource RoomAreaCoefParamToolTip}" />
+                    ToolTip="{me:LocalizationSource ToolTip.RoomAreaCoefParamToolTip}" />
                 <TextBlock
                     Grid.Column="1"
                     Grid.Row="4"
                     Style="{StaticResource PropertyName}"
-                    Text="Площадь помещения с коэффициентом:"/>
+                    Text="{me:LocalizationSource ParametersPage.RoomAreaCoef}"/>
                 <ComboBox
                     Grid.Column="2"
                     Grid.Row="4"

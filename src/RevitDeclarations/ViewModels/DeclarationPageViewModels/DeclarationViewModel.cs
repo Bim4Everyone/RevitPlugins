@@ -52,7 +52,7 @@ internal class DeclarationViewModel : BaseViewModel {
 
         _revitDocuments = _revitRepository
             .GetLinks()
-            .Select(x => new RevitDocumentViewModel(x, _settings))
+            .Select(x => new RevitDocumentViewModel(x, _settings, localizationService))
             .Where(x => x.HasRooms())
             .OrderBy(x => x.Name)
             .ToList();

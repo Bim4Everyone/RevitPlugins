@@ -50,13 +50,13 @@
                         Grid.Column="0"
                         Grid.ColumnSpan="3"
                         Style="{StaticResource HeaderName}"
-                        Text="Формат выгрузки"/>
+                        Text="{me:LocalizationSource DeclarationPage.ExportFormat}"/>
 
                     <TextBlock
                         Grid.Row="1"
                         Grid.Column="0"
                         Style="{StaticResource PropertyName}"
-                        Text="Название файла:"/>
+                        Text="{me:LocalizationSource DeclarationPage.FileName}"/>
                     <ui:TextBox
                         Grid.Row="1"
                         Grid.Column="1"
@@ -68,14 +68,14 @@
                         Margin="4,0,0,0"
                         Appearance="Info"
                         Height="35"
-                        Content = "Выбрать папку"
+                        Content="{me:LocalizationSource DeclarationPage.SelectFolder}"
                         Command="{Binding SelectFolderCommand}"/>
 
                     <TextBlock
                         Grid.Row="2"  
                         Grid.Column="0"
                         Style="{StaticResource PropertyName}"
-                        Text="Папка выгрузки:"/>
+                        Text="{me:LocalizationSource DeclarationPage.ExportFolder}"/>
                     <TextBlock
                         Grid.Row="2"
                         Grid.Column="1"
@@ -89,7 +89,7 @@
                         Grid.Row="3"
                         Grid.Column="0"
                         Style="{StaticResource PropertyName}"
-                        Text="Формат файла:"/>
+                        Text="{me:LocalizationSource DeclarationPage.FileFormat}"/>
                     <ComboBox
                         Grid.Row="3"
                         Grid.Column="1"
@@ -121,13 +121,13 @@
                         Grid.Row="0"
                         Grid.ColumnSpan="2"
                         Style="{StaticResource HeaderName}"
-                        Text="Настройки выгрузки декларации"/>
+                        Text="{me:LocalizationSource DeclarationPage.ExportSettings}"/>
 
                     <TextBlock 
                         Grid.Row="1"
                         Grid.Column="0"
                         Style="{StaticResource PropertyName}"
-                        Text="Стадия:"/>
+                        Text="{me:LocalizationSource DeclarationPage.Phase}"/>
                     <ComboBox
                         Grid.Row="1"
                         Grid.Column="1"
@@ -140,7 +140,7 @@
                         Grid.Row="2"
                         Grid.Column="0"
                         Style="{StaticResource PropertyName}"
-                        Text="Количество знаков после запятой:"/>
+                        Text="{me:LocalizationSource DeclarationPage.Accuracy}"/>
                     <TextBox
                         Grid.Row="2"
                         Grid.Column="1"
@@ -154,7 +154,7 @@
                         Grid.Row="3"
                         Grid.Column="0"
                         Style="{StaticResource PropertyName}"
-                        Text="Рассчитывать УТП:"/>
+                        Text="{me:LocalizationSource DeclarationPage.CalculateUtp}"/>
                     <StackPanel
                         Grid.Row="3"
                         Grid.Column="1"
@@ -186,7 +186,7 @@
                     <TextBlock 
                         Grid.Row="0"
                         Style="{StaticResource HeaderName}"
-                        Text="Проекты с помещениями, доступные для выгрузки:"/>
+                        Text="{me:LocalizationSource DeclarationPage.Projects}"/>
                     <Border
                         Grid.Row="1"
                         Style="{StaticResource CustomBorder}">

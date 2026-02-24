@@ -40,20 +40,20 @@
             IsBackButtonVisible="Collapsed"
             IsPaneVisible="True"
             IsPaneToggleVisible="True"
-            PaneTitle="Декларации"
+            PaneTitle="{me:LocalizationSource MainWindow.Settings}"
             BreadcrumbBar="{Binding ElementName=_breadcrumbBar}">
             
             <ui:NavigationView.MenuItems>
                 <ui:NavigationViewItem
-                    Content="Декларация"
+                    Content="{me:LocalizationSource MainWindow.SettingsGeneral}"
                     Icon="{ui:SymbolIcon WindowBulletList20}"
                     TargetPageType="{x:Type pages:DeclarationApartPage}" />
                 <ui:NavigationViewItem
-                    Content="Параметры"
+                    Content="{me:LocalizationSource MainWindow.SettingsParams}"
                     Icon="{ui:SymbolIcon TextBulletListSquare20}"
                     TargetPageType="{x:Type pages:ParamsApartmentsPage}" />
                 <ui:NavigationViewItem
-                    Content="Приоритеты"
+                    Content="{me:LocalizationSource MainWindow.SettingsPriorities}"
                     Icon="{ui:SymbolIcon NumberSymbolSquare20}"
                     TargetPageType="{x:Type pages:PrioritiesPage}" />
             </ui:NavigationView.MenuItems>            
@@ -72,7 +72,7 @@
             <ui:Button
                 Margin="10"
                 Width="80"
-                Content="ОК"
+                Content="{me:LocalizationSource MainWindow.OkButton}"
                 IsDefault="True"
                 Appearance="Info"
                 Click="ButtonOk_Click"
@@ -81,7 +81,7 @@
             <ui:Button
                 Margin="10"
                 Width="80"
-                Content="Отмена"
+                Content="{me:LocalizationSource MainWindow.CancelButton}"
                 IsCancel="True"
                 Click="ButtonCancel_Click"/>
         </StackPanel>

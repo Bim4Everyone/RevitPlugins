@@ -31,9 +31,12 @@ internal class RevitDocumentViewModel : BaseViewModel {
             .FirstOrDefault();
     }
 
-    public RevitDocumentViewModel(RevitLinkInstance revitLinkInstance, DeclarationSettings settings) {
+    public RevitDocumentViewModel(RevitLinkInstance revitLinkInstance, 
+                                  DeclarationSettings settings,
+                                  ILocalizationService localizationService) {
         Document = revitLinkInstance.GetLinkDocument();
         _settings = settings;
+        _localizationService = localizationService;
         Name = _localizationService.GetLocalizedString("MainWindow.FileNameLink", revitLinkInstance.Name);
 
         Room = new FilteredElementCollector(Document)

@@ -5,8 +5,14 @@
     <system:String x:Key="Window.Yes">Да</system:String>
     <system:String x:Key="Window.No">Нет</system:String>
     
-    <system:String x:Key="MainWindow.Title">Декларации</system:String>    
     
+    <system:String x:Key="MainWindow.Title">Декларации</system:String>    
+    <system:String x:Key="MainWindow.Settings">Настройки</system:String>
+    <system:String x:Key="MainWindow.SettingsGeneral">Общие</system:String>
+    <system:String x:Key="MainWindow.SettingsParams">Параметры</system:String>
+    <system:String x:Key="MainWindow.SettingsPriorities">Приоритеты</system:String>
+    <system:String x:Key="MainWindow.OkButton">ОК</system:String>
+    <system:String x:Key="MainWindow.CancelButton">Отмена</system:String>    
     <system:String x:Key="MainWindow.ErrorNoFolder">Не выбрана папка</system:String>    
     <system:String x:Key="MainWindow.ErrorNoName">Не заполнено имя файла</system:String>    
     <system:String x:Key="MainWindow.ErrorNoProjects">Не выбраны проекты для выгрузки</system:String>    
@@ -17,6 +23,104 @@
     <system:String x:Key="MainWindow.ErrorNoCorpPriorities">Выгрузка доступна только с корпоративными приоритетами</system:String>
     <system:String x:Key="MainWindow.FileName">{0} [текущий проект]</system:String>
     <system:String x:Key="MainWindow.FileNameLink">{0} [связь]</system:String>
+    
+    
+    <system:String x:Key="DeclarationPage.ExportFormat">Формат выгрузки</system:String>
+    <system:String x:Key="DeclarationPage.FileName">Название файла:</system:String>
+    <system:String x:Key="DeclarationPage.SelectFolder">Выбрать папку</system:String>
+    <system:String x:Key="DeclarationPage.ExportFolder">Папка выгрузки:</system:String>
+    <system:String x:Key="DeclarationPage.FileFormat">Формат файла:</system:String>
+    <system:String x:Key="DeclarationPage.ExportSettings">Настройки выгрузки декларации</system:String>
+    <system:String x:Key="DeclarationPage.Phase">Стадия:</system:String>
+    <system:String x:Key="DeclarationPage.Accuracy">Количество знаков после запятой:</system:String>
+    <system:String x:Key="DeclarationPage.CalculateUtp">Рассчитывать УТП:</system:String>
+    <system:String x:Key="DeclarationPage.Projects">Проекты с помещениями, доступные для выгрузки:</system:String>
+
+    
+    <system:String x:Key="ParametersPage.Configs">Конфигурации</system:String>
+    <system:String x:Key="ParametersPage.BaseFile">Файл-основа для поиска параметров:</system:String>
+    <system:String x:Key="ParametersPage.LastConfig">Конфигурация последнего запуска:</system:String>
+    <system:String x:Key="ParametersPage.CorpConfig">Корпоративная конфигурация:</system:String>
+    <system:String x:Key="ParametersPage.LoadConfig">Загрузить</system:String>
+    <system:String x:Key="ParametersPage.FilterParams">Параметры для фильтрации и группировки помещений</system:String>
+    <system:String x:Key="ParametersPage.FilterApartsParams">Параметр для фильтрации помещений квартир:</system:String>
+    <system:String x:Key="ParametersPage.FilterValue">Значения параметра фильтрации:</system:String>
+    <system:String x:Key="ParametersPage.SectionParam">Параметр принадлежности к секции:</system:String>
+    <system:String x:Key="ParametersPage.ApartParam">Параметр принадлежности к квартире:</system:String>
+    <system:String x:Key="ParametersPage.MultiLevelParam">Параметр группировки многоуровневых квартир:</system:String>
+    <system:String x:Key="ParametersPage.AddButton">Добавить</system:String>
+    <system:String x:Key="ParametersPage.ApartParamsHeader">Параметры для заполнения декларации. Информация о квартирах.</system:String>
+    <system:String x:Key="ParametersPage.FullNumber">1. Сквозной номер:</system:String>
+    <system:String x:Key="ParametersPage.Definition">2. Назначение:</system:String>
+    <system:String x:Key="ParametersPage.Level">3. Этаж расположения:</system:String>
+    <system:String x:Key="ParametersPage.Section">4. Номер подъезда:</system:String>
+    <system:String x:Key="ParametersPage.Building">5. Номер корпуса:</system:String>
+    <system:String x:Key="ParametersPage.BuildingNumber">6. Номер здания:</system:String>
+    <system:String x:Key="ParametersPage.ConstrWorkNumber">7. Номер ОКС:</system:String>
+    <system:String x:Key="ParametersPage.ApartAreaCoef">8. Общая площадь с пониж. коэффициентом, м2:</system:String>
+    <system:String x:Key="ParametersPage.RoomsAmount">9. Количество комнат:</system:String>
+    <system:String x:Key="ParametersPage.ApartAreaLiving">10. Жилая площадь, м2:</system:String>
+    <system:String x:Key="ParametersPage.RoomsHeight">11. Высота потолков, м:</system:String>
+    <system:String x:Key="ParametersPage.ProjectName">12. ИД Объекта:</system:String>
+    <system:String x:Key="ParametersPage.ApartNum">13. Номер на площадке:</system:String>
+    <system:String x:Key="ParametersPage.ApartArea">14. Общая площадь без пониж. коэффициента, м2:</system:String>
+    <system:String x:Key="ParametersPage.ApartAreaNonSum">15. Площадь без летних помещений, м2:</system:String>
+    <system:String x:Key="ParametersPage.RoomsParamsHeader">Параметры для заполнения декларации. Информация о помещениях.</system:String>
+    <system:String x:Key="ParametersPage.RoomNumber">Номер помещения:</system:String>
+    <system:String x:Key="ParametersPage.RoomName">Имя помещения:</system:String>
+    <system:String x:Key="ParametersPage.RoomArea">Площадь помещения:</system:String>
+    <system:String x:Key="ParametersPage.RoomAreaCoef">Площадь помещения с коэффициентом:</system:String>
+    <system:String x:Key="ParametersPage.FilterCommercParams">Параметр для фильтрации нежилых помещений:</system:String>
+    <system:String x:Key="ParametersPage.CommercParam">Параметр группировки нежилых групп:</system:String>
+    <system:String x:Key="ParametersPage.CommercGroupParam">Параметр группировки внутри нежилых групп:</system:String>
+    <system:String x:Key="ParametersPage.MultiLeveGrouplParam">Параметр группировки многоуровневых групп:</system:String>
+    <system:String x:Key="ParametersPage.DeclParamsHeader">Параметры для заполнения декларации</system:String>
+    <system:String x:Key="ParametersPage.ComRoomNumber">1.1 Номер помещения:</system:String>
+    <system:String x:Key="ParametersPage.ComRoomAddPrefix">1.2 Добавить префикс в номер:</system:String>
+    <system:String x:Key="ParametersPage.ComRoomPrefixParam">1.3 Параметр для префикса:</system:String>
+    <system:String x:Key="ParametersPage.ComRoomArea">8. Общая площадь</system:String>
+    <system:String x:Key="ParametersPage.ComRoomAreaGroupParam">8.1 Для группы из нескольких помещений:</system:String>
+    <system:String x:Key="ParametersPage.ComRoomAreaParam">8.2 Для одного помещения:</system:String>
+    <system:String x:Key="ParametersPage.ComRoomHeight">9. Высота потолков:</system:String>
+    <system:String x:Key="ParametersPage.ComRoomCar">10. Класс машино-места:</system:String>
+    <system:String x:Key="ParametersPage.ComRoomUse">11. Применимость:</system:String>
+    <system:String x:Key="ParametersPage.ComRoomName">12. Наименование помещения</system:String>
+    <system:String x:Key="ParametersPage.ComRoomGroupNameParam">12.1 Для группы из нескольких помещений:</system:String>
+    <system:String x:Key="ParametersPage.ComRoomNameParam">12.2 Для одного помещения:</system:String>
+    <system:String x:Key="ParametersPage.ComRoomProjectName">13. ИД Объекта:</system:String>
+    <system:String x:Key="ParametersPage.PublicAreaFilterParam">Параметр для фильтрации помещений МОП:</system:String>
+    <system:String x:Key="ParametersPage.PublicAreaParam">Параметр группировки МОП:</system:String>
+    <system:String x:Key="ParametersPage.PublicAreaGroupParams">Параметр группировки внутри групп МОП:</system:String>
+    <system:String x:Key="ParametersPage.PublicAreaRoomNumber">1.1 Номер помещения:</system:String>
+    <system:String x:Key="ParametersPage.PublicAreaAddPrefix">1.2 Добавить префикс:</system:String>
+    <system:String x:Key="ParametersPage.PublicAreaPrefixParam">1.3 Параметр для префикса:</system:String>
+    <system:String x:Key="ParametersPage.PublicAreaRoomType">2. Вид помещения:</system:String>
+    <system:String x:Key="ParametersPage.PublicAreaPositionBuilding">3.1 Местоположение - корпус:</system:String>
+    <system:String x:Key="ParametersPage.PublicAreaPositionSection">3.2 Местоположение - секция:</system:String>
+    <system:String x:Key="ParametersPage.PublicAreaPositionLevel">3.3 Местоположение - этаж:</system:String>
+    <system:String x:Key="ParametersPage.PublicAreaDefinition">4. Назначение:</system:String>
+    <system:String x:Key="ParametersPage.PublicAreaArea">5. Площадь, м2</system:String>
+    <system:String x:Key="ParametersPage.PublicAreaAreaForSeveralRooms">5.1 Для группы из нескольких помещений:</system:String>
+    <system:String x:Key="ParametersPage.PublicAreaAreaForOneRoom">5.2 Для одного помещения:</system:String>
+    <system:String x:Key="ParametersPage.PublicAreaProjectName">6. ИД Объекта:</system:String>
+    
+    
+    <system:String x:Key="PrioritiesPage.Description">
+        Имена помещений квартир в проекте должны соответствовать следующему списку приоритетов.
+        Столбцы в декларации будут созданы в соответствии с порядковым номером приоритета.        
+        Помещения, для которых не найден приоритет, будут добавлены в конце таблицы.
+        Приоритеты настраиваются в файле JSON. Вы можете использовать ваш собственный файл приоритетов.
+    </system:String>
+    <system:String x:Key="PrioritiesPage.CorpPriorities">Корпоративные приоритеты</system:String>
+    <system:String x:Key="PrioritiesPage.ExportPriorities">Экспорт приоритетов</system:String>
+    <system:String x:Key="PrioritiesPage.ImportPriorities">Импорт приоритетов</system:String>
+    <system:String x:Key="PrioritiesPage.FileLocation">Путь к файлу приоритетов:</system:String>
+    <system:String x:Key="PrioritiesPage.Number">Номер</system:String>
+    <system:String x:Key="PrioritiesPage.Name">Имя</system:String>
+    <system:String x:Key="PrioritiesPage.Coef">Коэффициент</system:String>
+    <system:String x:Key="PrioritiesPage.IsSummer">Летнее</system:String>
+    <system:String x:Key="PrioritiesPage.IsLiving">Жилое</system:String>
+        
     
     <system:String x:Key="MessageBox.ExportErrorTitle">Ошибка выгрузки</system:String>    
     <system:String x:Key="MessageBox.ExcelErrorLoadCsv">
@@ -65,6 +169,106 @@
         "В проекте отсутствуют экземпляры семейств с именами, включающими "ванн" или "душев". 
         УТП "Две ванные" не может быть корректно рассчитано.
     </system:String>
+    <system:String x:Key="WarningsWindow.Continue">Выгрузить декларацию</system:String>
+    <system:String x:Key="WarningsWindow.Stop">Отменить выгрузку</system:String>
+
     
-    
+    <system:String x:Key="ToolTip.ParamDocumentToolTip">Проект на основе которого выводится список параметров для выбора.</system:String>
+    <system:String x:Key="ToolTip.LastConfigToolTip">Подгрузка параметров, которые использовались при последнем запуске скрипта в этом проекте.</system:String>
+    <system:String x:Key="ToolTip.CompanyConfigToolTip">Подгрузка параметров компании.</system:String>
+    <system:String x:Key="ToolTip.FilterRoomsParamToolTip">Параметр для фильтрации помещений для выгрузки.</system:String>
+    <system:String x:Key="ToolTip.FilterRoomsValuesToolTip">
+        Значения для фильтрации групп помещений по параметру выше.
+        Скрипт обрабатывает только те помещения, которые СОДЕРЖАТ одно из введенных значений.
+        Регистр не учитывается.
+        Для создания нового значения фильтрации введите текст и нажмите "Добавить".
+        Для удаления значения нажмите на него.
+    </system:String>
+    <system:String x:Key="ToolTip.GroupBySectionParamApartToolTip">
+        Параметр, по которому помещения группируются по секциям. Если помещения имеют одинаковое 
+        значение этого параметра, то считается, что они относятся к одной секции.
+    </system:String>
+    <system:String x:Key="ToolTip.GroupBySectionParamCommerToolTip">
+        Параметр, по которому группируются нежилые помещения в основные группы.
+        Внутри этих групп происходит дополнительная группировка по следующему параметру.
+    </system:String>
+    <system:String x:Key="ToolTip.GroupBySectionParamPublicToolTip">
+        Параметр, по которому помещения группируются по секциям.
+        Если помещения имеют одинаковое значение этого параметра, то считается, что они относятся к одной секции.
+    </system:String>
+    <system:String x:Key="ToolTip.GroupByGroupApartParamToolTip">
+        Параметр, по которому помещения группируются по квартирам.
+        Если помещения на одном этаже имеют одинаковое значение этого параметра
+        и находятся в одной секции, то считается, что они относятся к одной квартире.
+    </system:String>
+    <system:String x:Key="ToolTip.GroupByGroupCommerParamToolTip">
+        Параметр, по которому помещения группируются внутри основных групп.
+        Помещения, сгруппированные по этому параметру объединяются в одну строку в декларации.
+    </system:String>
+    <system:String x:Key="ToolTip.MultiStoreyApartParamToolTip">
+        Параметр, по которому определяются двухуровневые квартиры. Все помещения, 
+        имеющие одинаковое значения этого параметра, будут считаться одной квартирой, 
+        даже если они находятся на разных уровнях. Для одноуровневых квартир параметр можно не заполнять.";
+    </system:String>
+    <system:String x:Key="ToolTip.MultiStoreyCommerParamToolTip">
+        Параметр, по которому определяются двухуровневые группы. Все помещения, 
+        имеющие одинаковое значения этого параметра, будут считаться одной группой, даже если они 
+        находятся на разных уровнях. Для одноуровневых групп параметр можно не заполнять.
+    </system:String>
+    <system:String x:Key="ToolTip.DepartmentParamToolTip">Текстовый параметр, значение которого выводится в столбец декларации "Назначение"</system:String>
+    <system:String x:Key="ToolTip.LevelParamToolTip">Текстовый параметр, значение которого выводится в столбец декларации "Этаж расположения"</system:String>
+    <system:String x:Key="ToolTip.SectionParamToolTip">Текстовый параметр, значение которого выводится в столбец декларации "Номер подъезда"</system:String>
+    <system:String x:Key="ToolTip.BuildingParamToolTip">Текстовый параметр, значение которого выводится в столбец декларации "Номер корпуса"</system:String>
+    <system:String x:Key="ToolTip.BuildingNumberParamToolTip">Текстовый параметр, значение которого выводится в столбец декларации "Номер здания"</system:String>
+    <system:String x:Key="ToolTip.ConstrWorkNumberParamToolTip">Текстовый параметр, значение которого выводится в столбец декларации "Номер ОКС"</system:String>
+    <system:String x:Key="ToolTip.ApartNumParamToolTip">Текстовый параметр, значение которого выводится в столбец декларации "Номер на площадке"</system:String>
+    <system:String x:Key="ToolTip.RoomsHeightParamToolTip">Числовой параметр, значение которого выводится в столбец декларации "Высота потолков"</system:String>
+    <system:String x:Key="ToolTip.ProjectNameToolTip">Значение, которое выводится в столбец декларации "ИД Объекта"</system:String>
+    <system:String x:Key="ToolTip.ApartAreaParamToolTip">Числовой параметр, значение которого выводится в столбец декларации "Общая площадь без пониж. коэффициента"</system:String>
+    <system:String x:Key="ToolTip.ApartAreaCoefParamToolTip">Числовой параметр, значение которого выводится в столбец декларации "Общая площадь с пониж. коэффициентом"</system:String>
+    <system:String x:Key="ToolTip.ApartAreaLivingParamToolTip">Числовой параметр, значение которого выводится в столбец декларации "Жилая площадь"</system:String>
+    <system:String x:Key="ToolTip.ApartAreaNonSumParamToolTip">Числовой параметр, значение которого выводится в столбец декларации "Площадь квартиры без летних помещений"</system:String>
+    <system:String x:Key="ToolTip.RoomsAmountParamToolTip">Целочисленный параметр, значение которого выводится в столбец декларации "Количество комнат"</system:String>
+    <system:String x:Key="ToolTip.ApartFullNumParamToolTip">Текстовый параметр, значение которого выводится в столбец декларации "Сквозной номер квартиры"</system:String>
+    <system:String x:Key="ToolTip.ConditionalNumberParamToolTip">
+        Текстовый параметр, значение которого выводится в столбец декларации "Условный номер".
+        В значение можно добавить префикс, для этого надо поставить галочку и выбрать параметр для префикса.
+    </system:String>
+    <system:String x:Key="ToolTip.ParkingSpaceClassParamToolTip">Текстовый параметр, значение которого выводится в столбец декларации "Класс машино-места"</system:String>
+    <system:String x:Key="ToolTip.ParkingInfoParamToolTip">Текстовый параметр, значение которого выводится в столбец декларации "Применимость"</system:String>
+    <system:String x:Key="ToolTip.CommercialAreaParamToolTip">
+        Числовой параметр, значение которого выводится в столбец декларации "Общая площадь".
+        Необходимо выбрать два параметра. Один для случая, когда группа состоит из нескольких помещений,
+        другой для случая, когда группа состоит из одного помещения.
+    </system:String>
+    <system:String x:Key="ToolTip.CommercialNameClassParamToolTip">
+        Текстовый параметр, значение которого выводится в столбец декларации "Наименование помещения".
+        Необходимо выбрать два параметра. Один для случая, когда группа состоит из нескольких помещений,
+        другой для случая, когда группа состоит из одного помещения.
+    </system:String>
+    <system:String x:Key="ToolTip.PublicAreaNumberParamToolTip">
+        Текстовый параметр, значение которого выводится в столбец декларации "№ п/п".
+        В значение можно добавить префикс, для этого надо поставить галочку и выбрать параметр для префикса.
+    </system:String>
+    <system:String x:Key="ToolTip.PublicAreaNameParamToolTip"> Текстовый параметр, значение которого выводится в столбец декларации "Вид помещения"</system:String>
+    <system:String x:Key="ToolTip.PublicAreaPositionParamToolTip">
+        Текстовые параметры, значения которых выводится в столбец декларации "Описание места расположения помещения".
+        Значение выводится в формате "Корпус 'Корпус', Секция 'Секция', 'Этаж' этаж".
+    </system:String>
+    <system:String x:Key="ToolTip.PublicAreaDepartmentParamToolTip">Текстовый параметр, значение которого выводится в столбец декларации "Назначение помещения"</system:String>
+    <system:String x:Key="ToolTip.PublicAreaAreaParamToolTip">
+        Числовой параметр, значение которого выводится в столбец декларации "Площадь".
+        Необходимо выбрать два параметра. Один для случая, когда группа состоит из нескольких помещений,
+        другой для случая, когда группа состоит из одного помещения.
+    </system:String>
+    <system:String x:Key="ToolTip.RoomNameParamToolTip">
+        Текстовый параметр, значение которого выводится в столбец с наименованием помещения.
+        Значение заполняется в формате "Имя_Номер".
+    </system:String>
+    <system:String x:Key="ToolTip.RoomNumberParamToolTip">
+        Текстовый параметр, значение которого выводится в столбец с номером помещения.
+        Значение заполняется в формате "Номер".
+    </system:String>
+    <system:String x:Key="ToolTip.RoomAreaParamToolTip">Числовой параметр, значение которого выводится в столбец с площадью помещения без коэффициента.</system:String>
+    <system:String x:Key="ToolTip.RoomAreaCoefParamToolTip">Числовой параметр, значение которого выводится в столбец с площадью помещения с коэффициентом.</system:String>
 </ResourceDictionary>
