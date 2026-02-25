@@ -33,8 +33,6 @@ internal class RevitRepository {
             .Where(x => !x.IsNestedLink)
             .Where(x => x.GetLinkedFileStatus() == LinkedFileStatus.Loaded);
 
-        var temp = loadedLinkTypes.ToList();
-
         var filter = new ElementClassFilter(typeof(RevitLinkInstance));
 
         return loadedLinkTypes
@@ -99,8 +97,8 @@ internal class RevitRepository {
         var notWindowsFilter = new ElementCategoryFilter(BuiltInCategory.OST_Windows, true);
         var phaseFilter = new ElementPhaseStatusFilter(phase.Id, _statuses);
 
-        /// Поиск семейств ванн и душевых кабин по наличию "ванна" или "душев" в имени семейства.
-        /// Также исключается семейства с суффиксом "ова", например, заканчиваюищеся на "ованная"
+        // Поиск семейств ванн и душевых кабин по наличию "ванна" или "душев" в имени семейства.
+        // Также исключается семейства с суффиксом "ова", например, заканчиваюищеся на "ованная"
         return new FilteredElementCollector(document)
             .OfClass(typeof(FamilyInstance))
             .WhereElementIsNotElementType()
