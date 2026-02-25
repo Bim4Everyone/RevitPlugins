@@ -1,7 +1,6 @@
 <ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
                     xmlns:system="clr-namespace:System;assembly=mscorlib">
-
     <system:String x:Key="Window.Yes">Да</system:String>
     <system:String x:Key="Window.No">Нет</system:String>
     
@@ -130,8 +129,7 @@
     </system:String>
     <system:String x:Key="MessageBox.PrioritiesConfigCreated">Файл конфигурации приоритетов создан</system:String>    
     <system:String x:Key="MessageBox.DeclFileCreated">Файл {0} создан</system:String>    
-    <system:String x:Key="MessageBox.NoExcel">Excel 2016 не найден на компьютере</system:String>    
-    
+    <system:String x:Key="MessageBox.NoExcel">Excel 2016 не найден на компьютере</system:String>
     <system:String x:Key="OpenFileDialog.SelectJson">Выберите Json файл"</system:String>    
     
     
@@ -143,7 +141,7 @@
     <system:String x:Key="WarningsWindow.NoParamsInProjects">В проекте отсутствует параметр, выбранный в исходных данных</system:String>
     <system:String x:Key="WarningsWindow.NoParamInProject">Отсутствует параметр в проекте</system:String>
     <system:String x:Key="WarningsWindow.DiffInAreas">Площади, рассчитанные квартирографией отличаются в пределах квартиры</system:String>
-    <system:String x:Key="WarningsWindow.ErrorRoomGroup">Группа помещений № {0} на этаже {0}</system:String>
+    <system:String x:Key="WarningsWindow.ErrorRoomGroup">Группа помещений № {0} на этаже {1}</system:String>
     <system:String x:Key="WarningsWindow.ErrorRoomAreasInfo">Площади квартиры (без коэффициента/с коэффициентом/жилая/без ЛП) должны быть одинаковыми для каждого помещения квартиры</system:String>
     <system:String x:Key="WarningsWindow.ErrorRoomNotActualAreasInfo">Не актуальные площади квартир, рассчитанные квартирографией</system:String>
     <system:String x:Key="WarningsWindow.ErrorApartsNotActualAreasInfo">
@@ -157,7 +155,7 @@
     <system:String x:Key="WarningsWindow.NullAreas">В проекте присутствуют помещения квартир с нулевыми системными площадями</system:String>
     <system:String x:Key="WarningsWindow.NullAreasInfo">
         В проекте присутствуют помещения квартир с нулевыми системными площадями. 
-        УТП \"Гардеробная\" и \"Увеличенная площадь балкона/лоджии\" не могут быть корректно рассчитаны.
+        УТП "Гардеробная" и "Увеличенная площадь балкона/лоджии" не могут быть корректно рассчитаны.
     </system:String>
     <system:String x:Key="WarningsWindow.RoomNameErrors">В проекте присутствуют помещения c некорректными именами</system:String>
     <system:String x:Key="WarningsWindow.RoomNameErrorsInfo">
