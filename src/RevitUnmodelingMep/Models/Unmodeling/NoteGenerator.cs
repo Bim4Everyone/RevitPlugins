@@ -12,7 +12,7 @@ internal sealed class NoteGenerator {
     public string Create(
         string noteTemplate,
         IReadOnlyCollection<CalculationElementBase> calculationElements,
-        double noteValue = 0) {
+        double noteValue) {
 
         string template = noteTemplate ?? string.Empty;
         if(string.IsNullOrEmpty(template)) {
