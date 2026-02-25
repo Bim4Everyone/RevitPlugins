@@ -1,10 +1,5 @@
-using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-using dosymep.SimpleServices;
 
 using Ninject;
 using Ninject.Syntax;
@@ -16,11 +11,9 @@ namespace RevitDeclarations.Services;
 
 internal class ErrorWindowService {
     private readonly IResolutionRoot _resolutionRoot;
-    private readonly ILocalizationService _localizationService;
 
-    public ErrorWindowService(IResolutionRoot resolutionRoot, ILocalizationService localizationService) {
+    public ErrorWindowService(IResolutionRoot resolutionRoot) {
         _resolutionRoot = resolutionRoot;
-        _localizationService = localizationService;
     }
 
     public bool ShowNoticeWindow(IList<WarningViewModel> allWarnings, bool isWarning = false) {
