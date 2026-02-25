@@ -108,13 +108,10 @@ internal class UtpCalculator {
             return _utpNamesError;
         }
 
-        int bathAmount = 0;
-
-        bathAmount = apartment.Rooms
+        int bathAmount = apartment.Rooms
             .Select(x => x.RevitRoom.Id)
             .Where(x => !_roomConnectionAnalyzer.CheckIsMasterBathroom(x))
-            .Where(x => _roomsWithBathFamily.Contains(x))
-            .Count();
+            .Count(x => _roomsWithBathFamily.Contains(x));
 
         return bathAmount > 1 ? _utpYes : _utpNo;
     }
