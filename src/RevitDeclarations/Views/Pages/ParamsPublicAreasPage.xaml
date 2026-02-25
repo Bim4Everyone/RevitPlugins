@@ -248,7 +248,7 @@
                         Grid.Row="5"
                         Grid.Column="0"
                         Style="{StaticResource ToolTipButton}"
-                        ToolTip="{me:LocalizationSource ToolTip.GroupByGroupCommerParamToolTip}" />
+                        ToolTip="{me:LocalizationSource ToolTip.GroupByGroupComParamToolTip}" />
                     <TextBlock
                         Grid.Column="1"
                         Grid.Row="5"
@@ -265,12 +265,12 @@
                         Grid.Row="6"
                         Grid.Column="0"
                         Style="{StaticResource ToolTipButton}"
-                        ToolTip="{me:LocalizationSource ToolTip.MultiStoreyCommerParamToolTip}" />
+                        ToolTip="{me:LocalizationSource ToolTip.MultiStoreyComParamToolTip}" />
                     <TextBlock
                         Grid.Column="1"
                         Grid.Row="6"
                         Style="{StaticResource PropertyName}"
-                        Text="{me:LocalizationSource ParametersPage.MultiLeveGrouplParam}" />
+                        Text="{me:LocalizationSource ParametersPage.MultiLeveGroupParam}" />
                     <ComboBox
                         Grid.Column="2"
                         Grid.Row="6"

@@ -69,10 +69,10 @@
     <system:String x:Key="ParametersPage.RoomName">Имя помещения:</system:String>
     <system:String x:Key="ParametersPage.RoomArea">Площадь помещения:</system:String>
     <system:String x:Key="ParametersPage.RoomAreaCoef">Площадь помещения с коэффициентом:</system:String>
-    <system:String x:Key="ParametersPage.FilterCommercParams">Параметр для фильтрации нежилых помещений:</system:String>
-    <system:String x:Key="ParametersPage.CommercParam">Параметр группировки нежилых групп:</system:String>
-    <system:String x:Key="ParametersPage.CommercGroupParam">Параметр группировки внутри нежилых групп:</system:String>
-    <system:String x:Key="ParametersPage.MultiLeveGrouplParam">Параметр группировки многоуровневых групп:</system:String>
+    <system:String x:Key="ParametersPage.FilterComParams">Параметр для фильтрации нежилых помещений:</system:String>
+    <system:String x:Key="ParametersPage.ComParam">Параметр группировки нежилых групп:</system:String>
+    <system:String x:Key="ParametersPage.ComGroupParam">Параметр группировки внутри нежилых групп:</system:String>
+    <system:String x:Key="ParametersPage.MultiLeveGroupParam">Параметр группировки многоуровневых групп:</system:String>
     <system:String x:Key="ParametersPage.DeclParamsHeader">Параметры для заполнения декларации</system:String>
     <system:String x:Key="ParametersPage.ComRoomNumber">1.1 Номер помещения:</system:String>
     <system:String x:Key="ParametersPage.ComRoomAddPrefix">1.2 Добавить префикс в номер:</system:String>
@@ -186,7 +186,7 @@
         Параметр, по которому помещения группируются по секциям. Если помещения имеют одинаковое 
         значение этого параметра, то считается, что они относятся к одной секции.
     </system:String>
-    <system:String x:Key="ToolTip.GroupBySectionParamCommerToolTip">
+    <system:String x:Key="ToolTip.GroupBySectionParamComToolTip">
         Параметр, по которому группируются нежилые помещения в основные группы.
         Внутри этих групп происходит дополнительная группировка по следующему параметру.
     </system:String>
@@ -199,7 +199,7 @@
         Если помещения на одном этаже имеют одинаковое значение этого параметра
         и находятся в одной секции, то считается, что они относятся к одной квартире.
     </system:String>
-    <system:String x:Key="ToolTip.GroupByGroupCommerParamToolTip">
+    <system:String x:Key="ToolTip.GroupByGroupComParamToolTip">
         Параметр, по которому помещения группируются внутри основных групп.
         Помещения, сгруппированные по этому параметру объединяются в одну строку в декларации.
     </system:String>
@@ -208,7 +208,7 @@
         имеющие одинаковое значения этого параметра, будут считаться одной квартирой, 
         даже если они находятся на разных уровнях. Для одноуровневых квартир параметр можно не заполнять.";
     </system:String>
-    <system:String x:Key="ToolTip.MultiStoreyCommerParamToolTip">
+    <system:String x:Key="ToolTip.MultiStoreyComParamToolTip">
         Параметр, по которому определяются двухуровневые группы. Все помещения, 
         имеющие одинаковое значения этого параметра, будут считаться одной группой, даже если они 
         находятся на разных уровнях. Для одноуровневых групп параметр можно не заполнять.
@@ -251,7 +251,7 @@
     <system:String x:Key="ToolTip.PublicAreaNameParamToolTip"> Текстовый параметр, значение которого выводится в столбец декларации "Вид помещения"</system:String>
     <system:String x:Key="ToolTip.PublicAreaPositionParamToolTip">
         Текстовые параметры, значения которых выводится в столбец декларации "Описание места расположения помещения".
-        Значение выводится в формате "Корпус 'Корпус', Секция 'Секция', 'Этаж' этаж".
+        Значение выводится в формате "Корпус 'Корпус', Секция 'Секция', 'Этаж' этаж".
     </system:String>
     <system:String x:Key="ToolTip.PublicAreaDepartmentParamToolTip">Текстовый параметр, значение которого выводится в столбец декларации "Назначение помещения"</system:String>
     <system:String x:Key="ToolTip.PublicAreaAreaParamToolTip">

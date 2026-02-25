@@ -12,7 +12,7 @@
     <system:String x:Key="MainWindow.SettingsPriorities">Priorities</system:String>
     <system:String x:Key="MainWindow.OkButton">OK</system:String>
     <system:String x:Key="MainWindow.CancelButton">Cancel</system:String>    
-    <system:String x:Key="MainWindow.ErrorNoFolder">Foler is not selected</system:String>    
+    <system:String x:Key="MainWindow.ErrorNoFolder">Folder is not selected</system:String>    
     <system:String x:Key="MainWindow.ErrorNoName">File's name is empty</system:String>    
     <system:String x:Key="MainWindow.ErrorNoProjects">Projects are not selected</system:String>    
     <system:String x:Key="MainWindow.ErrorNoPhaseInDocs">No selected phase in selected projects</system:String>    
@@ -69,10 +69,10 @@
     <system:String x:Key="ParametersPage.RoomName">Room name:</system:String>
     <system:String x:Key="ParametersPage.RoomArea">Room area:</system:String>
     <system:String x:Key="ParametersPage.RoomAreaCoef">Room area with coefficient:</system:String>
-    <system:String x:Key="ParametersPage.FilterCommercParams">Parameter for filtering non-residential groups:</system:String>
-    <system:String x:Key="ParametersPage.CommercParam">Parameter for grouping non-residential units:</system:String>
-    <system:String x:Key="ParametersPage.CommercGroupParam">Parameter for grouping within non-residential units:</system:String>
-    <system:String x:Key="ParametersPage.MultiLeveGrouplParam">Parameter for grouping multi-level units:</system:String>
+    <system:String x:Key="ParametersPage.FilterComParams">Parameter for filtering non-residential groups:</system:String>
+    <system:String x:Key="ParametersPage.ComParam">Parameter for grouping non-residential units:</system:String>
+    <system:String x:Key="ParametersPage.ComGroupParam">Parameter for grouping within non-residential units:</system:String>
+    <system:String x:Key="ParametersPage.MultiLeveGroupParam">Parameter for grouping multi-level units:</system:String>
     <system:String x:Key="ParametersPage.DeclParamsHeader">Parameters for filling out the declaration</system:String>
     <system:String x:Key="ParametersPage.ComRoomNumber">1.1 Room number:</system:String>
     <system:String x:Key="ParametersPage.ComRoomAddPrefix">1.2 Add prefix to the number:</system:String>
@@ -186,7 +186,7 @@
         Parameter used to group rooms by sections. If rooms have the same 
         value of this parameter, they are considered to belong to the same section.
     </system:String>
-    <system:String x:Key="ToolTip.GroupBySectionParamCommerToolTip">
+    <system:String x:Key="ToolTip.GroupBySectionParamComToolTip">
         Parameter used to group non-residential rooms into main groups.
         Within these groups, additional grouping is performed by the next parameter.
     </system:String>
@@ -199,7 +199,7 @@
         If rooms on the same level have the same value of this parameter
         and belong to the same section, they are considered to belong to the same apartment.
     </system:String>
-    <system:String x:Key="ToolTip.GroupByGroupCommerParamToolTip">
+    <system:String x:Key="ToolTip.GroupByGroupComParamToolTip">
         Parameter used to group rooms within main groups.
         Rooms grouped by this parameter are merged into a single row in the declaration.
     </system:String>
@@ -208,7 +208,7 @@
         with the same value of this parameter are considered one apartment, 
         even if they are located on different levels. For single-level apartments, the parameter may be left empty.
     </system:String>
-    <system:String x:Key="ToolTip.MultiStoreyCommerParamToolTip">
+    <system:String x:Key="ToolTip.MultiStoreyComParamToolTip">
         Parameter used to identify multi-level groups. All rooms 
         with the same value of this parameter are considered one group, even if they 
         are located on different levels. For single-level groups, the parameter may be left empty.
