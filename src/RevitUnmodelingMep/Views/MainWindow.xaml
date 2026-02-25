@@ -387,6 +387,30 @@
 
                                                             <TextBlock
                                                                 Style="{StaticResource FieldLabel}"
+                                                                Text="{DynamicResource MainWindow.NoteValueFormula}" />
+                                                            <ui:TextBox
+                                                                AcceptsReturn="True"
+                                                                Height="90"
+                                                                TextWrapping="Wrap"
+                                                                beh:HintInsert.TrackActive="True"
+                                                                beh:HintInsert.Target="Formula"
+                                                                Text="{Binding NoteValue, UpdateSourceTrigger=PropertyChanged}">
+                                                                <i:Interaction.Triggers>
+                                                                    <i:EventTrigger EventName="GotKeyboardFocus">
+                                                                        <i:InvokeCommandAction Command="{Binding DataContext.Hint.BeginFormulaEditCommand, RelativeSource={RelativeSource AncestorType=Window}}" CommandParameter="{Binding}" />
+                                                                    </i:EventTrigger>
+                                                                    <i:EventTrigger EventName="LostKeyboardFocus">
+                                                                        <i:InvokeCommandAction Command="{Binding DataContext.Hint.EndFormulaEditCommand, RelativeSource={RelativeSource AncestorType=Window}}" CommandParameter="{Binding}" />
+                                                                    </i:EventTrigger>
+                                                                </i:Interaction.Triggers>
+                                                            </ui:TextBox>
+                                                            <CheckBox
+                                                                Margin="0 6 0 0"
+                                                                Content="{DynamicResource MainWindow.RoundUpNoteTotal}"
+                                                                IsChecked="{Binding RoundUpNoteTotal, Mode=TwoWay}" />
+
+                                                            <TextBlock
+                                                                Style="{StaticResource FieldLabel}"
                                                                 Text="{DynamicResource MainWindow.Note}" />
                                                             <ui:TextBox
                                                                 AcceptsReturn="True"

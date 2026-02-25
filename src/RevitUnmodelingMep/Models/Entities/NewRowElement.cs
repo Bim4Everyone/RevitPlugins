@@ -21,6 +21,7 @@ internal class NewRowElement {
     private string _unit;
     private string _description;
     private double _number;
+    private double _noteValue;
     private string _note;
     private string _mass;
     private string _smrBlock;
@@ -76,6 +77,11 @@ internal class NewRowElement {
     public double Number {
         get => _number;
         set => _number = value;
+    }
+
+    public double NoteValue {
+        get => _noteValue;
+        set => _noteValue = value;
     }
 
     public string Note {

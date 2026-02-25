@@ -18,8 +18,10 @@ internal class ConsumableTypeItem : BaseViewModel {
     private string _unit;
     private string _maker;
     private string _formula;
+    private string _noteValue;
     private string _note;
     private bool _roundUpTotal;
+    private bool _roundUpNoteTotal;
     private CategoryOption _selectedCategory;
 
     public string Title {
@@ -76,6 +78,11 @@ internal class ConsumableTypeItem : BaseViewModel {
         set => RaiseAndSetIfChanged(ref _formula, value);
     }
 
+    public string NoteValue {
+        get => _noteValue;
+        set => RaiseAndSetIfChanged(ref _noteValue, value);
+    }
+
     public string Note {
         get => _note;
         set => RaiseAndSetIfChanged(ref _note, value);
@@ -84,6 +91,11 @@ internal class ConsumableTypeItem : BaseViewModel {
     public bool RoundUpTotal {
         get => _roundUpTotal;
         set => RaiseAndSetIfChanged(ref _roundUpTotal, value);
+    }
+
+    public bool RoundUpNoteTotal {
+        get => _roundUpNoteTotal;
+        set => RaiseAndSetIfChanged(ref _roundUpNoteTotal, value);
     }
 
     public CategoryOption SelectedCategory {
@@ -112,8 +124,10 @@ internal class ConsumableTypeItem : BaseViewModel {
             Unit = config.Unit,
             Maker = config.Creator,
             Formula = config.ValueFormula,
+            NoteValue = config.NoteValue,
             Note = config.NoteFormat,
             RoundUpTotal = config.RoundUpTotal,
+            RoundUpNoteTotal = config.RoundUpNoteTotal,
             AssignedElementIds = config.AssignedElementIds != null
                 ? new List<int>(config.AssignedElementIds)
                 : new List<int>(),
@@ -136,8 +150,10 @@ internal class ConsumableTypeItem : BaseViewModel {
             Unit = Unit ?? string.Empty,
             Creator = Maker ?? string.Empty,
             ValueFormula = Formula ?? string.Empty,
+            NoteValue = NoteValue ?? string.Empty,
             NoteFormat = Note ?? string.Empty,
             RoundUpTotal = RoundUpTotal,
+            RoundUpNoteTotal = RoundUpNoteTotal,
             AssignedElementIds = AssignedElementIds != null
                 ? new List<int>(AssignedElementIds)
                 : new List<int>(),

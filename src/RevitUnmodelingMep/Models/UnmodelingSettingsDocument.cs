@@ -41,11 +41,15 @@ internal class UnmodelingConfigItem {
 
     public string ValueFormula { get; set; }
 
+    public string NoteValue { get; set; }
+
     public string NoteFormat { get; set; }
 
     public List<int> AssignedElementIds { get; set; } = new();
 
     public bool RoundUpTotal { get; set; }
+
+    public bool RoundUpNoteTotal { get; set; }
 
     [JsonExtensionData]
     public IDictionary<string, object> ExtensionData { get; set; }

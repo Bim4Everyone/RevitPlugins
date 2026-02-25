@@ -9,7 +9,11 @@ using RevitUnmodelingMep.Models.Entities;
 namespace RevitUnmodelingMep.Models.Unmodeling;
 
 internal sealed class NoteGenerator {
-    public string Create(string noteTemplate, IReadOnlyCollection<CalculationElementBase> calculationElements) {
+    public string Create(
+        string noteTemplate,
+        IReadOnlyCollection<CalculationElementBase> calculationElements,
+        double noteValue) {
+
         string template = noteTemplate ?? string.Empty;
         if(string.IsNullOrEmpty(template)) {
             return string.Empty;
@@ -20,7 +24,7 @@ internal sealed class NoteGenerator {
             return rounded.ToString("0.##", CultureInfo.InvariantCulture);
         }
 
-        NoteElement noteElement = BuildNoteElement(calculationElements);
+        NoteElement noteElement = BuildNoteElement(calculationElements, noteValue);
         IReadOnlyList<string> tokenNames = NoteElement.GetTokenNames();
         Dictionary<string, string> tokens = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
         foreach(string tokenName in tokenNames) {
@@ -31,7 +35,6 @@ internal sealed class NoteGenerator {
             double? value = GetDoublePropertyValue(noteElement, tokenName);
             tokens[tokenName] = FormatValue(value ?? 0);
         }
-
         string result = template;
         foreach(var token in tokens) {
             string placeholder = "{" + token.Key + "}";
@@ -43,7 +46,10 @@ internal sealed class NoteGenerator {
         return result;
     }
 
-    private static NoteElement BuildNoteElement(IReadOnlyCollection<CalculationElementBase> calculationElements) {
+    private static NoteElement BuildNoteElement(
+        IReadOnlyCollection<CalculationElementBase> calculationElements,
+        double noteValue) {
+
         double sumArea = calculationElements.Any()
             ? calculationElements.Sum(r => GetDoublePropertyValue(r, "Area_m2") ?? 0)
             : 0;
@@ -64,7 +70,8 @@ internal sealed class NoteGenerator {
             Count = count,
             SumAreaWithStock_m2 = sumArea * stock,
             SumLengthWithStock_mm = sumLengthMm * stock,
-            SumLengthWithStock_m = sumLengthM * stock
+            SumLengthWithStock_m = sumLengthM * stock,
+            NoteValue = noteValue
         };
     }
 
