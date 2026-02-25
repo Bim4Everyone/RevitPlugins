@@ -12,8 +12,7 @@
     d:DataContext="{d:DesignInstance vms:CommercialParamsVM, IsDesignTimeCreatable=False}"
     
     mc:Ignorable="d" 
-    x:ClassModifier="internal"
-    Background="White">
+    x:ClassModifier="internal">
 
     <core:WpfUIPlatformPage.Resources>
         <ResourceDictionary>

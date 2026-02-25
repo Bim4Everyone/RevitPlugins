@@ -9,8 +9,7 @@
     xmlns:core="clr-namespace:dosymep.WpfUI.Core"
     xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
     
-    x:ClassModifier="internal"
-    Background="White">
+    x:ClassModifier="internal">
 
     <core:WpfUIPlatformPage.Resources>
         <ResourceDictionary>
