@@ -18,6 +18,15 @@
 
     d:DataContext="{d:DesignInstance vms:MainViewModel, IsDesignTimeCreatable=False}">
 
+    <Window.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary
+                    Source="../Styles/Styles.xaml" />
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
+    </Window.Resources>
+
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
@@ -47,11 +56,25 @@
                 <ui:NavigationViewItem
                     Content="{me:LocalizationSource MainWindow.SettingsGeneral}"
                     Icon="{ui:SymbolIcon WindowBulletList20}"
-                    TargetPageType="{x:Type pages:DeclarationCommercialPage}" />
+                    TargetPageType="{x:Type pages:DeclarationCommercialPage}">
+                    <ui:NavigationViewItem.InfoBadge>
+                        <ui:InfoBadge
+                            Style="{StaticResource RoundInfoBadgeStyle}"
+                            Visibility="{Binding Path=HasDeclarationPageErrors, Converter={StaticResource BooleanToVisibilityConverter}}">
+                        </ui:InfoBadge>
+                    </ui:NavigationViewItem.InfoBadge>
+                </ui:NavigationViewItem>
                 <ui:NavigationViewItem
                     Content="{me:LocalizationSource MainWindow.SettingsParams}"
                     Icon="{ui:SymbolIcon TextBulletListSquare20}"
-                    TargetPageType="{x:Type pages:ParamsCommercialPage}" />
+                    TargetPageType="{x:Type pages:ParamsCommercialPage}">
+                    <ui:NavigationViewItem.InfoBadge>
+                        <ui:InfoBadge
+                            Style="{StaticResource RoundInfoBadgeStyle}"
+                            Visibility="{Binding Path=HasParametersPageErrors, Converter={StaticResource BooleanToVisibilityConverter}}">
+                        </ui:InfoBadge>
+                    </ui:NavigationViewItem.InfoBadge>
+                </ui:NavigationViewItem>
             </ui:NavigationView.MenuItems>
         </ui:NavigationView>
 

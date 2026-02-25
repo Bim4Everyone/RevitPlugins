@@ -52,7 +52,27 @@
             Property="FontSize"
             Value="14" />
     </Style>
-    
+
+    <Style
+        x:Key="RoundInfoBadgeStyle"
+        TargetType="ui:InfoBadge">
+        <Setter
+            Property="Template">
+            <Setter.Value>
+                <ControlTemplate
+                    TargetType="ui:InfoBadge">
+                    <Grid>
+                        <Ellipse
+                            Fill="Orange"
+                            Margin="10"
+                            Width="15"
+                            Height="15" />
+                    </Grid>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
     <Style
         TargetType="Border"
         x:Key="CustomBorder">

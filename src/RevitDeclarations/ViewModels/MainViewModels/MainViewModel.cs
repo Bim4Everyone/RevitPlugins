@@ -31,6 +31,8 @@ internal abstract class MainViewModel : BaseViewModel {
 
     protected LogicalStringComparer _stringComparer;
 
+    private bool _hasDeclarationPageErrors;
+    private bool _hasParametersPageErrors;
     private string _errorText;
 
     public MainViewModel(RevitRepository revitRepository, 
@@ -60,49 +62,72 @@ internal abstract class MainViewModel : BaseViewModel {
         set => RaiseAndSetIfChanged(ref _errorText, value);
     }
 
+    public bool HasDeclarationPageErrors {
+        get => _hasDeclarationPageErrors;
+        set {
+            if(ValidateFilePath()) {
+                value = true;
+            }
+            if(ValidateFileName()) {
+                value = true;
+            }
+            if(ValidateCheckedDocuments()) {
+                value = true;
+            }
+            if(ValidatePhases()) {
+                value = true;
+            }
+            RaiseAndSetIfChanged(ref _hasDeclarationPageErrors, value);
+        }
+    }
+
+    public bool HasParametersPageErrors {
+        get => _hasParametersPageErrors;
+        set {
+            if(ValidateEmptyParameters()) {
+                value = true;
+            }
+            if(ValidateFilterValues()) {
+                value = true;
+            }
+            if(ValidateProjectName()) {
+                value = true;
+            }
+            RaiseAndSetIfChanged(ref _hasParametersPageErrors, value);
+        }
+    }
+
     public abstract void ExportDeclaration(object obj);
 
     public bool CanExport(object obj) {
-        var checkedDocuments = _declarationViewModel.RevitDocuments
-            .Where(x => x.IsChecked);
+        HasDeclarationPageErrors = false;
+        HasParametersPageErrors = false;
 
-        bool hasCheckedDocuments = _declarationViewModel.RevitDocuments
-            .Where(x => x.IsChecked)
-            .Any();
-
-        bool hasPhases = checkedDocuments
-            .All(x => x.HasPhase(_declarationViewModel.SelectedPhase));
-
-        bool hasEmptyParameters = _parametersViewModel
-            .AllSelectedParameters
-            .Where(x => x == null)
-            .Any();
-
-        if(string.IsNullOrEmpty(_declarationViewModel.FilePath)) {
+        if(ValidateFilePath()) {
             ErrorText = _localizationService.GetLocalizedString("MainWindow.ErrorNoFolder");
             return false;
         }
-        if(string.IsNullOrEmpty(_declarationViewModel.FileName)) {
+        if(ValidateFileName()) {
             ErrorText = _localizationService.GetLocalizedString("MainWindow.ErrorNoName");
             return false;
         }
-        if(!hasCheckedDocuments) {
+        if(ValidateCheckedDocuments()) {
             ErrorText = _localizationService.GetLocalizedString("MainWindow.ErrorNoProjects");
             return false;
         }
-        if(!hasPhases) {
+        if(ValidatePhases()) {
             ErrorText = _localizationService.GetLocalizedString("MainWindow.ErrorNoPhaseInDocs");
             return false;
         }
-        if(hasEmptyParameters) {
+        if(ValidateEmptyParameters()) {
             ErrorText = _localizationService.GetLocalizedString("MainWindow.ErrorNoParams");
             return false;
         }
-        if(!_parametersViewModel.FilterRoomsValues.Any()) {
+        if(ValidateFilterValues()) {
             ErrorText = _localizationService.GetLocalizedString("MainWindow.ErrorNoParamFilters");
             return false;
         }
-        if(string.IsNullOrEmpty(_parametersViewModel.ProjectName)) {
+        if(ValidateProjectName()) {
             ErrorText = _localizationService.GetLocalizedString("MainWindow.ErrorNoProjectId");
             return false;
         }
@@ -197,5 +222,40 @@ internal abstract class MainViewModel : BaseViewModel {
         foreach(var document in documents) {
             document.IsChecked = true;
         }
+    }
+
+    private bool ValidateFilePath() {
+        return string.IsNullOrEmpty(_declarationViewModel.FilePath);
+    }
+
+    private bool ValidateFileName() {
+        return string.IsNullOrEmpty(_declarationViewModel.FileName);
+    }
+
+    private bool ValidatePhases() {
+        return !_declarationViewModel.RevitDocuments
+            .Where(x => x.IsChecked)
+            .All(x => x.HasPhase(_declarationViewModel.SelectedPhase));
+    }
+
+    private bool ValidateCheckedDocuments() {
+        return !_declarationViewModel.RevitDocuments
+            .Where(x => x.IsChecked)
+            .Any();
+    }
+
+    private bool ValidateEmptyParameters() {
+        return _parametersViewModel
+            .AllSelectedParameters
+            .Where(x => x == null)
+            .Any();
+    }
+
+    private bool ValidateFilterValues() {
+        return !_parametersViewModel.FilterRoomsValues.Any();
+    }
+
+    private bool ValidateProjectName() {
+        return string.IsNullOrEmpty(_parametersViewModel.ProjectName);
     }
 }

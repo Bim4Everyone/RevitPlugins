@@ -4,6 +4,7 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
     xmlns:vms="clr-namespace:RevitDeclarations.ViewModels"
     xmlns:pages="clr-namespace:RevitDeclarations.Views"
     xmlns:core="clr-namespace:dosymep.WpfUI.Core"
@@ -17,7 +18,16 @@
     Height="700" Width="1000"
     
     d:DataContext="{d:DesignInstance vms:ApartmentsMainVM, IsDesignTimeCreatable=False}">
-
+    
+    <Window.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary
+                    Source="../Styles/Styles.xaml" />
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
+    </Window.Resources>
+    
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />
@@ -42,21 +52,35 @@
             IsPaneToggleVisible="True"
             PaneTitle="{me:LocalizationSource MainWindow.Settings}"
             BreadcrumbBar="{Binding ElementName=_breadcrumbBar}">
-            
+
             <ui:NavigationView.MenuItems>
                 <ui:NavigationViewItem
                     Content="{me:LocalizationSource MainWindow.SettingsGeneral}"
                     Icon="{ui:SymbolIcon WindowBulletList20}"
-                    TargetPageType="{x:Type pages:DeclarationApartPage}" />
+                    TargetPageType="{x:Type pages:DeclarationApartPage}">
+                    <ui:NavigationViewItem.InfoBadge>
+                        <ui:InfoBadge
+                            Style="{StaticResource RoundInfoBadgeStyle}"
+                            Visibility="{Binding Path=HasDeclarationPageErrors, Converter={StaticResource BooleanToVisibilityConverter}}">
+                        </ui:InfoBadge>
+                    </ui:NavigationViewItem.InfoBadge>
+                </ui:NavigationViewItem>
                 <ui:NavigationViewItem
                     Content="{me:LocalizationSource MainWindow.SettingsParams}"
                     Icon="{ui:SymbolIcon TextBulletListSquare20}"
-                    TargetPageType="{x:Type pages:ParamsApartmentsPage}" />
+                    TargetPageType="{x:Type pages:ParamsApartmentsPage}">
+                    <ui:NavigationViewItem.InfoBadge>
+                        <ui:InfoBadge
+                            Style="{StaticResource RoundInfoBadgeStyle}"
+                            Visibility="{Binding Path=HasParametersPageErrors, Converter={StaticResource BooleanToVisibilityConverter}}">
+                        </ui:InfoBadge>
+                    </ui:NavigationViewItem.InfoBadge>
+                </ui:NavigationViewItem>
                 <ui:NavigationViewItem
                     Content="{me:LocalizationSource MainWindow.SettingsPriorities}"
                     Icon="{ui:SymbolIcon NumberSymbolSquare20}"
                     TargetPageType="{x:Type pages:PrioritiesPage}" />
-            </ui:NavigationView.MenuItems>            
+            </ui:NavigationView.MenuItems>
         </ui:NavigationView>
 
         <StackPanel
