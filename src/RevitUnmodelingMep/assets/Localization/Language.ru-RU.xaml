@@ -29,9 +29,11 @@
     <system:String x:Key="MainWindow.Code">Код изделия</system:String>
     <system:String x:Key="MainWindow.Unit">Ед. изм.</system:String>
     <system:String x:Key="MainWindow.Creator">Производитель</system:String>
-    <system:String x:Key="MainWindow.Formula">Формула</system:String>
+    <system:String x:Key="MainWindow.Formula">Формула числа</system:String>
     <system:String x:Key="MainWindow.RoundUpTotal">Округлять итог вверх до ближайшего целого</system:String>
-    <system:String x:Key="MainWindow.Note">Формула примечания</system:String>
+    <system:String x:Key="MainWindow.NoteValueFormula">Формула для примечаний(NoteValue)</system:String>
+    <system:String x:Key="MainWindow.RoundUpNoteTotal">Округлять итог для примечаний вверх до ближайшего целого</system:String>
+    <system:String x:Key="MainWindow.Note">Формат примечания</system:String>
 
     <system:String x:Key="MainViewModel.SavePropertyDefault">по умолчанию</system:String>
     <system:String x:Key="MainViewModel.SavePropertyEmpty">Ошибка конфигурации: не задано обязательное значение.</system:String>

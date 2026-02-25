@@ -29,9 +29,11 @@
     <system:String x:Key="MainWindow.Code">Product code</system:String>
     <system:String x:Key="MainWindow.Unit">Unit</system:String>
     <system:String x:Key="MainWindow.Creator">Manufacturer</system:String>
-    <system:String x:Key="MainWindow.Formula">Formula</system:String>
+    <system:String x:Key="MainWindow.Formula">Number formula</system:String>
     <system:String x:Key="MainWindow.RoundUpTotal">Round total up to the nearest integer</system:String>
-    <system:String x:Key="MainWindow.Note">Note formula</system:String>
+    <system:String x:Key="MainWindow.NoteValueFormula">Formula for notes (NoteValue)</system:String>
+    <system:String x:Key="MainWindow.RoundUpNoteTotal">Round note total up to the nearest integer</system:String>
+    <system:String x:Key="MainWindow.Note">Note format</system:String>
 
     <system:String x:Key="MainViewModel.SavePropertyDefault">default</system:String>
     <system:String x:Key="MainViewModel.SavePropertyEmpty">Configuration error: required setting is empty.</system:String>
@@ -71,3 +73,4 @@
     <system:String x:Key="EditorChecker.SettigsIsBusy">Project information is editing by user: </system:String>
     <system:String x:Key="EditorChecker.SettigsIsOutDated">You own the items, but your file is out of date. Please sync.</system:String>
 </ResourceDictionary>
+

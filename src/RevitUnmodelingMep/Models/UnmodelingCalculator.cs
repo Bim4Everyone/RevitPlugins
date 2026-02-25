@@ -55,15 +55,23 @@ internal class UnmodelingCalculator {
 
             draftRow.CalculationElement = calcElement;
             draftRow.Number = _formulaEvaluator.Evaluate(config.Formula, calcElement);
+            draftRow.NoteValue = string.IsNullOrWhiteSpace(config.NoteValue)
+                ? 0
+                : _formulaEvaluator.Evaluate(config.NoteValue, calcElement);
             calculationElements.Add(calcElement);
         }
 
         NewRowElement baseRow = draftRows[0];
         double totalNumber = draftRows.Sum(r => r.Number);
+        double totalNoteValue = draftRows.Sum(r => r.NoteValue);
+        totalNoteValue = Math.Round(totalNoteValue, 2, MidpointRounding.AwayFromZero);
 
         totalNumber = Math.Round(totalNumber, 2, MidpointRounding.AwayFromZero);
         if(config.RoundUpTotal) {
             totalNumber = System.Math.Ceiling(totalNumber);
+        }
+        if(config.RoundUpNoteTotal) {
+            totalNoteValue = System.Math.Ceiling(totalNoteValue);
         }
 
         string finalDescription = $"{baseRow.Description}_{baseRow.Element.Id.ToString()}";
@@ -81,11 +89,12 @@ internal class UnmodelingCalculator {
             Maker = baseRow.Maker,
             Unit = baseRow.Unit,
             Number = totalNumber,
+            NoteValue = totalNoteValue,
             System = baseRow.System,
             Function = baseRow.Function,
             Description = baseRow.Description,
             Mass = baseRow.Mass,
-            Note = _noteGenerator.Create(config.Note, calculationElements)
+            Note = _noteGenerator.Create(config.Note, calculationElements, totalNoteValue)
         };
     }
 }
