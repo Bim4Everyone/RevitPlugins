@@ -1,20 +1,17 @@
-using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 using Autodesk.Revit.DB;
 
-using dosymep.Revit.Comparators;
-
 using System.Windows.Input;
 
-using RevitDeclarations.Models;
 using dosymep.WPF.Commands;
 using dosymep.WPF.ViewModels;
-using Microsoft.WindowsAPICodePack.Dialogs;
 using dosymep.SimpleServices;
+
+using Microsoft.WindowsAPICodePack.Dialogs;
+
+using RevitDeclarations.Models;
 
 namespace RevitDeclarations.ViewModels;
 

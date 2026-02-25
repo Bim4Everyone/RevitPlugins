@@ -1,21 +1,13 @@
-using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Windows;
 using System.Windows.Input;
-
-using Autodesk.Revit.DB;
 
 using dosymep.Revit.Comparators;
 using dosymep.SimpleServices;
 using dosymep.WPF.Commands;
 using dosymep.WPF.ViewModels;
 
-using Microsoft.WindowsAPICodePack.Dialogs;
-
 using RevitDeclarations.Models;
 using RevitDeclarations.Services;
-using RevitDeclarations.ViewModels;
 
 namespace RevitDeclarations.ViewModels;
 internal abstract class MainViewModel : BaseViewModel {

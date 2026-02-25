@@ -2,13 +2,10 @@ using System;
 using System.Linq;
 using System.Windows;
 
-using Autodesk.Revit.UI;
-
 using dosymep.SimpleServices;
 
 using RevitDeclarations.Models;
 using RevitDeclarations.Services;
-using RevitDeclarations.Views;
 
 namespace RevitDeclarations.ViewModels;
 internal class CommercialMainVM : MainViewModel {
