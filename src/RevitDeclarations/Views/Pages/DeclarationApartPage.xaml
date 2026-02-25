@@ -8,7 +8,9 @@
     xmlns:me="clr-namespace:dosymep.WpfCore.MarkupExtensions;assembly=dosymep.WpfCore"
     xmlns:core="clr-namespace:dosymep.WpfUI.Core"
     xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
-
+    
+    ScrollViewer.CanContentScroll="False"
+    
     x:ClassModifier="internal">
 
     <core:WpfUIPlatformPage.Resources>
@@ -19,7 +21,7 @@
         </ResourceDictionary>
     </core:WpfUIPlatformPage.Resources>
     
-    <Grid>
+    <ScrollViewer>
         <Grid>
             <Grid.RowDefinitions>
                 <RowDefinition Height="Auto"/>
@@ -203,5 +205,5 @@
                 </Grid>
             </Border>
         </Grid>
-    </Grid>
+    </ScrollViewer>
 </core:WpfUIPlatformPage>

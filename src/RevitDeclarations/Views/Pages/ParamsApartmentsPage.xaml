@@ -11,6 +11,8 @@
     xmlns:vms="clr-namespace:RevitDeclarations.ViewModels"    
     d:DataContext="{d:DesignInstance vms:ApartmentsParamsVM, IsDesignTimeCreatable=False}"
     
+    ScrollViewer.CanContentScroll="False"
+    
     mc:Ignorable="d" 
     x:ClassModifier="internal">
     
@@ -21,642 +23,644 @@
             </ResourceDictionary.MergedDictionaries>
         </ResourceDictionary>
     </core:WpfUIPlatformPage.Resources>
-    
-    <Grid>
-        <Grid.RowDefinitions>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="Auto"/>
-        </Grid.RowDefinitions>
 
-        <Border
-            Grid.Row="0"
-            Margin="14,4"
-            Style="{StaticResource CustomBorder}">
-            <Grid>
-                <Grid.RowDefinitions>
-                    <RowDefinition Height="42"/>
-                    <RowDefinition Height="42"/>
-                    <RowDefinition Height="42"/>
-                    <RowDefinition Height="42"/>
-                </Grid.RowDefinitions>
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="30"/>
-                    <ColumnDefinition Width="340"/>
-                    <ColumnDefinition/>
-                </Grid.ColumnDefinitions>
-                
-                <TextBlock
-                    Grid.Row="0"
-                    Grid.ColumnSpan="3"
-                    Style="{StaticResource HeaderName}"
-                    Text="{me:LocalizationSource ParametersPage.Configs}" />
-                
-                <ui:Button
-                    Grid.Row="1"
-                    Grid.Column="0"
-                    Style="{StaticResource ToolTipButton}"
-                    ToolTip="{me:LocalizationSource ToolTip.ParamDocumentToolTip}"/>
-                <TextBlock
-                    Grid.Row="1"
-                    Grid.Column="1"
-                    Style="{StaticResource PropertyName}"
-                    Text="{me:LocalizationSource ParametersPage.BaseFile}"/>
-                <ComboBox
-                    Grid.Row="1"
-                    Grid.Column="2"
-                    ItemsSource="{Binding RevitDocuments}"
-                    DisplayMemberPath="Name"
-                    SelectedItem="{Binding SelectedDocument}"/>
+    <ScrollViewer> 
+        <Grid>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+            </Grid.RowDefinitions>
 
-                <ui:Button
-                    Grid.Row="2"
-                    Grid.Column="0"
-                    Style="{StaticResource ToolTipButton}"
-                    ToolTip="{me:LocalizationSource ToolTip.LastConfigToolTip}" />
-                <TextBlock
-                    Grid.Row="2"
-                    Grid.Column="1"
-                    Style="{StaticResource PropertyName}"
-                    Text="{me:LocalizationSource ParametersPage.LastConfig}"/>
-                <ui:Button
-                    Grid.Row="2"
-                    Grid.Column="2"
-                    Height="35"
-                    HorizontalAlignment="Stretch"
-                    Appearance="Info"
-                    Content="{me:LocalizationSource ParametersPage.LoadConfig}"
-                    Command="{Binding SetLastConfigCommand}"/>
-
-                <ui:Button
-                    Grid.Row="3"
-                    Grid.Column="0"
-                    Style="{StaticResource ToolTipButton}"
-                    ToolTip="{me:LocalizationSource ToolTip.CompanyConfigToolTip}" />
-                <TextBlock
-                    Grid.Row="3"
-                    Grid.Column="1"
-                    Style="{StaticResource PropertyName}"
-                    Text="{me:LocalizationSource ParametersPage.CorpConfig}"/>
-                <ui:Button
-                    Grid.Row="3"
-                    Grid.Column="2"
-                    Height="35"
-                    HorizontalAlignment="Stretch"
-                    Appearance="Info"
-                    Content="{me:LocalizationSource ParametersPage.LoadConfig}"
-                    Command="{Binding SetCompanyConfigCommand}"/>
-            </Grid>
-        </Border>
-
-        <Border
-            Grid.Row="1"
-            Margin="14,0,14,4"
-            Style="{StaticResource CustomBorder}">
-            <Grid>
-                <Grid.RowDefinitions>
-                    <RowDefinition Height="42"/>
-                    <RowDefinition Height="42"/>
-                    <RowDefinition Height="42"/>
-                    <RowDefinition MinHeight="42"/>
-                    <RowDefinition Height="42"/>
-                    <RowDefinition Height="42"/>
-                    <RowDefinition Height="42"/>
-                </Grid.RowDefinitions>
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="30"/>
-                    <ColumnDefinition Width="340"/>
-                    <ColumnDefinition/>
-                </Grid.ColumnDefinitions>
-                
-                <TextBlock
-                    Grid.Row="0"
-                    Grid.ColumnSpan="3"
-                    Style="{StaticResource HeaderName}"
-                    Text="{me:LocalizationSource ParametersPage.FilterParams}" />
-
-                <ui:Button
-                    Grid.Row="1"
-                    Grid.Column="0"
-                    Style="{StaticResource ToolTipButton}"
-                    ToolTip="{me:LocalizationSource ToolTip.FilterRoomsParamToolTip}" />
-                <TextBlock
-                    Grid.Column="1"
-                    Grid.Row="1"
-                    Style="{StaticResource PropertyName}"
-                    Text="{me:LocalizationSource ParametersPage.FilterApartsParams}"/>
-                <ComboBox
-                    Grid.Column="2"
-                    Grid.Row="1"
-                    ItemsSource="{Binding TextParameters}"
-                    DisplayMemberPath="Definition.Name"
-                    SelectedItem="{Binding SelectedFilterRoomsParam}"/>
-
-                <ui:Button
-                    Grid.Row="2"
-                    Grid.Column="0"
-                    Style="{StaticResource ToolTipButton}"
-                    ToolTip="{me:LocalizationSource ToolTip.FilterRoomsValuesToolTip}" />
-                <TextBlock
-                    Grid.Column="1"
-                    Grid.Row="2"
-                    Style="{StaticResource PropertyName}"
-                    Text="{me:LocalizationSource ParametersPage.FilterValue}"/>
-                <Grid
-                    Grid.Column="2"
-                    Grid.Row="2">
+            <Border
+                Grid.Row="0"
+                Margin="14,4"
+                Style="{StaticResource CustomBorder}">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="42"/>
+                        <RowDefinition Height="42"/>
+                        <RowDefinition Height="42"/>
+                        <RowDefinition Height="42"/>
+                    </Grid.RowDefinitions>
                     <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="30"/>
+                        <ColumnDefinition Width="340"/>
                         <ColumnDefinition/>
-                        <ColumnDefinition Width="120"/>
                     </Grid.ColumnDefinitions>
-                    <TextBox
-                        Grid.Column="0"
-                        Height="35"
-                        Text="{Binding FilterRoomsValue}"/>
+                
+                    <TextBlock
+                        Grid.Row="0"
+                        Grid.ColumnSpan="3"
+                        Style="{StaticResource HeaderName}"
+                        Text="{me:LocalizationSource ParametersPage.Configs}" />
+                
                     <ui:Button
+                        Grid.Row="1"
+                        Grid.Column="0"
+                        Style="{StaticResource ToolTipButton}"
+                        ToolTip="{me:LocalizationSource ToolTip.ParamDocumentToolTip}"/>
+                    <TextBlock
+                        Grid.Row="1"
                         Grid.Column="1"
-                        Content="{me:LocalizationSource ParametersPage.AddButton}"
-                        HorizontalAlignment="Stretch"
+                        Style="{StaticResource PropertyName}"
+                        Text="{me:LocalizationSource ParametersPage.BaseFile}"/>
+                    <ComboBox
+                        Grid.Row="1"
+                        Grid.Column="2"
+                        ItemsSource="{Binding RevitDocuments}"
+                        DisplayMemberPath="Name"
+                        SelectedItem="{Binding SelectedDocument}"/>
+
+                    <ui:Button
+                        Grid.Row="2"
+                        Grid.Column="0"
+                        Style="{StaticResource ToolTipButton}"
+                        ToolTip="{me:LocalizationSource ToolTip.LastConfigToolTip}" />
+                    <TextBlock
+                        Grid.Row="2"
+                        Grid.Column="1"
+                        Style="{StaticResource PropertyName}"
+                        Text="{me:LocalizationSource ParametersPage.LastConfig}"/>
+                    <ui:Button
+                        Grid.Row="2"
+                        Grid.Column="2"
                         Height="35"
+                        HorizontalAlignment="Stretch"
                         Appearance="Info"
-                        Command="{Binding AddFilterCommand}"/>
-                </Grid> 
+                        Content="{me:LocalizationSource ParametersPage.LoadConfig}"
+                        Command="{Binding SetLastConfigCommand}"/>
 
-                <ItemsControl
-                    Grid.Column="1"
-                    Grid.ColumnSpan="2"
-                    Grid.Row="3"
-                    MinHeight="35"
-                    Height="Auto"                  
-                    ItemsSource="{Binding FilterRoomsValues}">
-                    <ItemsControl.ItemsPanel>
-                        <ItemsPanelTemplate>
-                            <WrapPanel                            
-                                Orientation="Horizontal"
-                                HorizontalAlignment="Right"/>
-                        </ItemsPanelTemplate>
-                    </ItemsControl.ItemsPanel>
-                    <ItemsControl.ItemTemplate>
-                        <DataTemplate>
-                            <Button 
-                                Width="Auto"
-                                Margin="4"
-                                Padding="3"
-                                Background="#e9f0f0"
-                                BorderThickness="0"
-                                Command="{Binding RemoveFilterCommand}">
-                                <DockPanel>
-                                    <TextBlock
-                                        DockPanel.Dock="Left"
-                                        Text="{Binding Value}"/>
-                                    <TextBlock
-                                        DockPanel.Dock="Right"
-                                        FontWeight="Bold"
-                                        FontSize="14"                                
-                                        Text="  x"/>
-                                </DockPanel>
-                            </Button>
-                        </DataTemplate>
-                    </ItemsControl.ItemTemplate>
-                </ItemsControl>
+                    <ui:Button
+                        Grid.Row="3"
+                        Grid.Column="0"
+                        Style="{StaticResource ToolTipButton}"
+                        ToolTip="{me:LocalizationSource ToolTip.CompanyConfigToolTip}" />
+                    <TextBlock
+                        Grid.Row="3"
+                        Grid.Column="1"
+                        Style="{StaticResource PropertyName}"
+                        Text="{me:LocalizationSource ParametersPage.CorpConfig}"/>
+                    <ui:Button
+                        Grid.Row="3"
+                        Grid.Column="2"
+                        Height="35"
+                        HorizontalAlignment="Stretch"
+                        Appearance="Info"
+                        Content="{me:LocalizationSource ParametersPage.LoadConfig}"
+                        Command="{Binding SetCompanyConfigCommand}"/>
+                </Grid>
+            </Border>
 
-                <ui:Button
-                    Grid.Row="4"
-                    Grid.Column="0"
-                    Style="{StaticResource ToolTipButton}"
-                    ToolTip="{me:LocalizationSource ToolTip.GroupBySectionParamApartToolTip}" />
-                <TextBlock
-                    Grid.Column="1"
-                    Grid.Row="4"
-                    Style="{StaticResource PropertyName}"
-                    Text="{me:LocalizationSource ParametersPage.SectionParam}"/>
-                <ComboBox
-                    Grid.Column="2"
-                    Grid.Row="4"
-                    ItemsSource="{Binding TextParameters}"
-                    DisplayMemberPath="Definition.Name"
-                    SelectedItem="{Binding SelectedGroupingBySectionParam}"/>
+            <Border
+                Grid.Row="1"
+                Margin="14,0,14,4"
+                Style="{StaticResource CustomBorder}">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="42"/>
+                        <RowDefinition Height="42"/>
+                        <RowDefinition Height="42"/>
+                        <RowDefinition MinHeight="42"/>
+                        <RowDefinition Height="42"/>
+                        <RowDefinition Height="42"/>
+                        <RowDefinition Height="42"/>
+                    </Grid.RowDefinitions>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="30"/>
+                        <ColumnDefinition Width="340"/>
+                        <ColumnDefinition/>
+                    </Grid.ColumnDefinitions>
+                
+                    <TextBlock
+                        Grid.Row="0"
+                        Grid.ColumnSpan="3"
+                        Style="{StaticResource HeaderName}"
+                        Text="{me:LocalizationSource ParametersPage.FilterParams}" />
 
-                <ui:Button
-                    Grid.Row="5"
-                    Grid.Column="0"
-                    Style="{StaticResource ToolTipButton}"
-                    ToolTip="{me:LocalizationSource ToolTip.GroupByGroupApartParamToolTip}" />
-                <TextBlock
-                    Grid.Column="1"
-                    Grid.Row="5"
-                    Style="{StaticResource PropertyName}"
-                    Text="{me:LocalizationSource ParametersPage.ApartParam}"/>
-                <ComboBox
-                    Grid.Column="2"
-                    Grid.Row="5"
-                    ItemsSource="{Binding TextParameters}"
-                    DisplayMemberPath="Definition.Name"
-                    SelectedItem="{Binding SelectedGroupingByGroupParam}"/>
+                    <ui:Button
+                        Grid.Row="1"
+                        Grid.Column="0"
+                        Style="{StaticResource ToolTipButton}"
+                        ToolTip="{me:LocalizationSource ToolTip.FilterRoomsParamToolTip}" />
+                    <TextBlock
+                        Grid.Column="1"
+                        Grid.Row="1"
+                        Style="{StaticResource PropertyName}"
+                        Text="{me:LocalizationSource ParametersPage.FilterApartsParams}"/>
+                    <ComboBox
+                        Grid.Column="2"
+                        Grid.Row="1"
+                        ItemsSource="{Binding TextParameters}"
+                        DisplayMemberPath="Definition.Name"
+                        SelectedItem="{Binding SelectedFilterRoomsParam}"/>
 
-                <ui:Button
-                    Grid.Row="6"
-                    Grid.Column="0"
-                    Style="{StaticResource ToolTipButton}"
-                    ToolTip="{me:LocalizationSource ToolTip.MultiStoreyApartParamToolTip}" />
-                <TextBlock
-                    Grid.Column="1"
-                    Grid.Row="6"
-                    Style="{StaticResource PropertyName}"
-                    Text="{me:LocalizationSource ParametersPage.MultiLevelParam}"/>
-                <ComboBox
-                    Grid.Column="2"
-                    Grid.Row="6"
-                    ItemsSource="{Binding TextParameters}"
-                    DisplayMemberPath="Definition.Name"
-                    SelectedItem="{Binding SelectedMultiStoreyParam}"/>
-            </Grid>
-        </Border>
+                    <ui:Button
+                        Grid.Row="2"
+                        Grid.Column="0"
+                        Style="{StaticResource ToolTipButton}"
+                        ToolTip="{me:LocalizationSource ToolTip.FilterRoomsValuesToolTip}" />
+                    <TextBlock
+                        Grid.Column="1"
+                        Grid.Row="2"
+                        Style="{StaticResource PropertyName}"
+                        Text="{me:LocalizationSource ParametersPage.FilterValue}"/>
+                    <Grid
+                        Grid.Column="2"
+                        Grid.Row="2">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition/>
+                            <ColumnDefinition Width="120"/>
+                        </Grid.ColumnDefinitions>
+                        <TextBox
+                            Grid.Column="0"
+                            Height="35"
+                            Text="{Binding FilterRoomsValue}"/>
+                        <ui:Button
+                            Grid.Column="1"
+                            Content="{me:LocalizationSource ParametersPage.AddButton}"
+                            HorizontalAlignment="Stretch"
+                            Height="35"
+                            Appearance="Info"
+                            Command="{Binding AddFilterCommand}"/>
+                    </Grid> 
+
+                    <ItemsControl
+                        Grid.Column="1"
+                        Grid.ColumnSpan="2"
+                        Grid.Row="3"
+                        MinHeight="35"
+                        Height="Auto"                  
+                        ItemsSource="{Binding FilterRoomsValues}">
+                        <ItemsControl.ItemsPanel>
+                            <ItemsPanelTemplate>
+                                <WrapPanel                            
+                                    Orientation="Horizontal"
+                                    HorizontalAlignment="Right"/>
+                            </ItemsPanelTemplate>
+                        </ItemsControl.ItemsPanel>
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate>
+                                <Button 
+                                    Width="Auto"
+                                    Margin="4"
+                                    Padding="3"
+                                    Background="#e9f0f0"
+                                    BorderThickness="0"
+                                    Command="{Binding RemoveFilterCommand}">
+                                    <DockPanel>
+                                        <TextBlock
+                                            DockPanel.Dock="Left"
+                                            Text="{Binding Value}"/>
+                                        <TextBlock
+                                            DockPanel.Dock="Right"
+                                            FontWeight="Bold"
+                                            FontSize="14"                                
+                                            Text="  x"/>
+                                    </DockPanel>
+                                </Button>
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+
+                    <ui:Button
+                        Grid.Row="4"
+                        Grid.Column="0"
+                        Style="{StaticResource ToolTipButton}"
+                        ToolTip="{me:LocalizationSource ToolTip.GroupBySectionParamApartToolTip}" />
+                    <TextBlock
+                        Grid.Column="1"
+                        Grid.Row="4"
+                        Style="{StaticResource PropertyName}"
+                        Text="{me:LocalizationSource ParametersPage.SectionParam}"/>
+                    <ComboBox
+                        Grid.Column="2"
+                        Grid.Row="4"
+                        ItemsSource="{Binding TextParameters}"
+                        DisplayMemberPath="Definition.Name"
+                        SelectedItem="{Binding SelectedGroupingBySectionParam}"/>
+
+                    <ui:Button
+                        Grid.Row="5"
+                        Grid.Column="0"
+                        Style="{StaticResource ToolTipButton}"
+                        ToolTip="{me:LocalizationSource ToolTip.GroupByGroupApartParamToolTip}" />
+                    <TextBlock
+                        Grid.Column="1"
+                        Grid.Row="5"
+                        Style="{StaticResource PropertyName}"
+                        Text="{me:LocalizationSource ParametersPage.ApartParam}"/>
+                    <ComboBox
+                        Grid.Column="2"
+                        Grid.Row="5"
+                        ItemsSource="{Binding TextParameters}"
+                        DisplayMemberPath="Definition.Name"
+                        SelectedItem="{Binding SelectedGroupingByGroupParam}"/>
+
+                    <ui:Button
+                        Grid.Row="6"
+                        Grid.Column="0"
+                        Style="{StaticResource ToolTipButton}"
+                        ToolTip="{me:LocalizationSource ToolTip.MultiStoreyApartParamToolTip}" />
+                    <TextBlock
+                        Grid.Column="1"
+                        Grid.Row="6"
+                        Style="{StaticResource PropertyName}"
+                        Text="{me:LocalizationSource ParametersPage.MultiLevelParam}"/>
+                    <ComboBox
+                        Grid.Column="2"
+                        Grid.Row="6"
+                        ItemsSource="{Binding TextParameters}"
+                        DisplayMemberPath="Definition.Name"
+                        SelectedItem="{Binding SelectedMultiStoreyParam}"/>
+                </Grid>
+            </Border>
         
-        <Border
-            Grid.Row="2"
-            Margin="14,0,14,4"
-            Style="{StaticResource CustomBorder}">
-            <Grid>
-                <Grid.RowDefinitions>
-                    <RowDefinition Height="43"/>
-                    <RowDefinition Height="43"/>
-                    <RowDefinition Height="43"/>
-                    <RowDefinition Height="43"/>
-                    <RowDefinition Height="43"/>
-                    <RowDefinition Height="43"/>
-                    <RowDefinition Height="43"/>
-                    <RowDefinition Height="43"/>
-                    <RowDefinition Height="43"/>
-                    <RowDefinition Height="43"/>
-                    <RowDefinition Height="43"/>
-                    <RowDefinition Height="43"/>
-                    <RowDefinition Height="43"/>
-                    <RowDefinition Height="43"/>
-                    <RowDefinition Height="43"/>
-                    <RowDefinition Height="43"/>
-                </Grid.RowDefinitions>
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="30"/>
-                    <ColumnDefinition Width="340"/>
-                    <ColumnDefinition/>
-                </Grid.ColumnDefinitions>
+            <Border
+                Grid.Row="2"
+                Margin="14,0,14,4"
+                Style="{StaticResource CustomBorder}">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="43"/>
+                        <RowDefinition Height="43"/>
+                        <RowDefinition Height="43"/>
+                        <RowDefinition Height="43"/>
+                        <RowDefinition Height="43"/>
+                        <RowDefinition Height="43"/>
+                        <RowDefinition Height="43"/>
+                        <RowDefinition Height="43"/>
+                        <RowDefinition Height="43"/>
+                        <RowDefinition Height="43"/>
+                        <RowDefinition Height="43"/>
+                        <RowDefinition Height="43"/>
+                        <RowDefinition Height="43"/>
+                        <RowDefinition Height="43"/>
+                        <RowDefinition Height="43"/>
+                        <RowDefinition Height="43"/>
+                    </Grid.RowDefinitions>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="30"/>
+                        <ColumnDefinition Width="340"/>
+                        <ColumnDefinition/>
+                    </Grid.ColumnDefinitions>
 
-                <TextBlock
-                    Grid.Row="0"
-                    Grid.ColumnSpan="3"
-                    Style="{StaticResource HeaderName}"
-                    Text="{me:LocalizationSource ParametersPage.ApartParamsHeader}" />
+                    <TextBlock
+                        Grid.Row="0"
+                        Grid.ColumnSpan="3"
+                        Style="{StaticResource HeaderName}"
+                        Text="{me:LocalizationSource ParametersPage.ApartParamsHeader}" />
 
-                <ui:Button
-                    Grid.Row="1"
-                    Grid.Column="0"
-                    Style="{StaticResource ToolTipButton}"
-                    ToolTip="{me:LocalizationSource ToolTip.ApartFullNumParamToolTip}" />
-                <TextBlock
-                    Grid.Column="1"
-                    Grid.Row="1"
-                    Style="{StaticResource PropertyName}"
-                    Text="{me:LocalizationSource ParametersPage.FullNumber}"/>
-                <ComboBox
-                    Grid.Column="2"
-                    Grid.Row="1"
-                    ItemsSource="{Binding TextParameters}"
-                    DisplayMemberPath="Definition.Name"
-                    SelectedItem="{Binding SelectedApartFullNumParam}"/>
+                    <ui:Button
+                        Grid.Row="1"
+                        Grid.Column="0"
+                        Style="{StaticResource ToolTipButton}"
+                        ToolTip="{me:LocalizationSource ToolTip.ApartFullNumParamToolTip}" />
+                    <TextBlock
+                        Grid.Column="1"
+                        Grid.Row="1"
+                        Style="{StaticResource PropertyName}"
+                        Text="{me:LocalizationSource ParametersPage.FullNumber}"/>
+                    <ComboBox
+                        Grid.Column="2"
+                        Grid.Row="1"
+                        ItemsSource="{Binding TextParameters}"
+                        DisplayMemberPath="Definition.Name"
+                        SelectedItem="{Binding SelectedApartFullNumParam}"/>
 
-                <ui:Button
-                    Grid.Row="2"
-                    Grid.Column="0"
-                    Style="{StaticResource ToolTipButton}"
-                    ToolTip="{me:LocalizationSource ToolTip.DepartmentParamToolTip}" />
-                <TextBlock
-                    Grid.Column="1"
-                    Grid.Row="2"
-                    Style="{StaticResource PropertyName}"
-                    Text="{me:LocalizationSource ParametersPage.Definition}"/>
-                <ComboBox
-                    Grid.Column="2"
-                    Grid.Row="2"
-                    ItemsSource="{Binding TextParameters}"
-                    DisplayMemberPath="Definition.Name"
-                    SelectedItem="{Binding SelectedDepartmentParam}"/>
+                    <ui:Button
+                        Grid.Row="2"
+                        Grid.Column="0"
+                        Style="{StaticResource ToolTipButton}"
+                        ToolTip="{me:LocalizationSource ToolTip.DepartmentParamToolTip}" />
+                    <TextBlock
+                        Grid.Column="1"
+                        Grid.Row="2"
+                        Style="{StaticResource PropertyName}"
+                        Text="{me:LocalizationSource ParametersPage.Definition}"/>
+                    <ComboBox
+                        Grid.Column="2"
+                        Grid.Row="2"
+                        ItemsSource="{Binding TextParameters}"
+                        DisplayMemberPath="Definition.Name"
+                        SelectedItem="{Binding SelectedDepartmentParam}"/>
 
-                <ui:Button
-                    Grid.Row="3"
-                    Grid.Column="0"
-                    Style="{StaticResource ToolTipButton}"
-                    ToolTip="{me:LocalizationSource ToolTip.LevelParamToolTip}" />
-                <TextBlock
-                    Grid.Column="1"
-                    Grid.Row="3"
-                    Style="{StaticResource PropertyName}"
-                    Text="{me:LocalizationSource ParametersPage.Level}"/>
-                <ComboBox
-                    Grid.Column="2"
-                    Grid.Row="3"
-                    ItemsSource="{Binding TextParameters}"
-                    DisplayMemberPath="Definition.Name"
-                    SelectedItem="{Binding SelectedLevelParam}"/>
+                    <ui:Button
+                        Grid.Row="3"
+                        Grid.Column="0"
+                        Style="{StaticResource ToolTipButton}"
+                        ToolTip="{me:LocalizationSource ToolTip.LevelParamToolTip}" />
+                    <TextBlock
+                        Grid.Column="1"
+                        Grid.Row="3"
+                        Style="{StaticResource PropertyName}"
+                        Text="{me:LocalizationSource ParametersPage.Level}"/>
+                    <ComboBox
+                        Grid.Column="2"
+                        Grid.Row="3"
+                        ItemsSource="{Binding TextParameters}"
+                        DisplayMemberPath="Definition.Name"
+                        SelectedItem="{Binding SelectedLevelParam}"/>
 
-                <ui:Button
-                    Grid.Row="4"
-                    Grid.Column="0"
-                    Style="{StaticResource ToolTipButton}"
-                    ToolTip="{me:LocalizationSource ToolTip.SectionParamToolTip}" />
-                <TextBlock
-                    Grid.Column="1"
-                    Grid.Row="4"
-                    Style="{StaticResource PropertyName}"
-                    Text="{me:LocalizationSource ParametersPage.Section}"/>
-                <ComboBox
-                    Grid.Column="2"
-                    Grid.Row="4"
-                    ItemsSource="{Binding TextParameters}"
-                    DisplayMemberPath="Definition.Name"
-                    SelectedItem="{Binding SelectedSectionParam}"/>
+                    <ui:Button
+                        Grid.Row="4"
+                        Grid.Column="0"
+                        Style="{StaticResource ToolTipButton}"
+                        ToolTip="{me:LocalizationSource ToolTip.SectionParamToolTip}" />
+                    <TextBlock
+                        Grid.Column="1"
+                        Grid.Row="4"
+                        Style="{StaticResource PropertyName}"
+                        Text="{me:LocalizationSource ParametersPage.Section}"/>
+                    <ComboBox
+                        Grid.Column="2"
+                        Grid.Row="4"
+                        ItemsSource="{Binding TextParameters}"
+                        DisplayMemberPath="Definition.Name"
+                        SelectedItem="{Binding SelectedSectionParam}"/>
 
-                <ui:Button
-                    Grid.Row="5"
-                    Grid.Column="0"
-                    Style="{StaticResource ToolTipButton}"
-                    ToolTip="{me:LocalizationSource ToolTip.BuildingParamToolTip}" />
-                <TextBlock
-                    Grid.Column="1"
-                    Grid.Row="5"
-                    Style="{StaticResource PropertyName}"
-                    Text="{me:LocalizationSource ParametersPage.Building}"/>
-                <ComboBox
-                    Grid.Column="2"
-                    Grid.Row="5"
-                    ItemsSource="{Binding TextParameters}"
-                    DisplayMemberPath="Definition.Name"
-                    SelectedItem="{Binding SelectedBuildingParam}"/>
+                    <ui:Button
+                        Grid.Row="5"
+                        Grid.Column="0"
+                        Style="{StaticResource ToolTipButton}"
+                        ToolTip="{me:LocalizationSource ToolTip.BuildingParamToolTip}" />
+                    <TextBlock
+                        Grid.Column="1"
+                        Grid.Row="5"
+                        Style="{StaticResource PropertyName}"
+                        Text="{me:LocalizationSource ParametersPage.Building}"/>
+                    <ComboBox
+                        Grid.Column="2"
+                        Grid.Row="5"
+                        ItemsSource="{Binding TextParameters}"
+                        DisplayMemberPath="Definition.Name"
+                        SelectedItem="{Binding SelectedBuildingParam}"/>
 
-                <ui:Button
-                    Grid.Row="6"
-                    Grid.Column="0"
-                    Style="{StaticResource ToolTipButton}"
-                    ToolTip="{me:LocalizationSource ToolTip.BuildingNumberParamToolTip}" />
-                <TextBlock
-                    Grid.Column="1"
-                    Grid.Row="6"
-                    Style="{StaticResource PropertyName}"
-                    Text="{me:LocalizationSource ParametersPage.BuildingNumber}"/>
-                <ComboBox
-                    Grid.Column="2"
-                    Grid.Row="6"
-                    ItemsSource="{Binding TextParameters}"
-                    DisplayMemberPath="Definition.Name"
-                    SelectedItem="{Binding SelectedBuildingNumberParam}"/>
+                    <ui:Button
+                        Grid.Row="6"
+                        Grid.Column="0"
+                        Style="{StaticResource ToolTipButton}"
+                        ToolTip="{me:LocalizationSource ToolTip.BuildingNumberParamToolTip}" />
+                    <TextBlock
+                        Grid.Column="1"
+                        Grid.Row="6"
+                        Style="{StaticResource PropertyName}"
+                        Text="{me:LocalizationSource ParametersPage.BuildingNumber}"/>
+                    <ComboBox
+                        Grid.Column="2"
+                        Grid.Row="6"
+                        ItemsSource="{Binding TextParameters}"
+                        DisplayMemberPath="Definition.Name"
+                        SelectedItem="{Binding SelectedBuildingNumberParam}"/>
 
-                <ui:Button
-                    Grid.Row="7"
-                    Grid.Column="0"
-                    Style="{StaticResource ToolTipButton}"
-                    ToolTip="{me:LocalizationSource ToolTip.ConstrWorkNumberParamToolTip}" />
-                <TextBlock
-                    Grid.Column="1"
-                    Grid.Row="7"
-                    Style="{StaticResource PropertyName}"
-                    Text="{me:LocalizationSource ParametersPage.ConstrWorkNumber}"/>
-                <ComboBox
-                    Grid.Column="2"
-                    Grid.Row="7"
-                    ItemsSource="{Binding TextParameters}"
-                    DisplayMemberPath="Definition.Name"
-                    SelectedItem="{Binding SelectedConstrWorksNumberParam}"/>
+                    <ui:Button
+                        Grid.Row="7"
+                        Grid.Column="0"
+                        Style="{StaticResource ToolTipButton}"
+                        ToolTip="{me:LocalizationSource ToolTip.ConstrWorkNumberParamToolTip}" />
+                    <TextBlock
+                        Grid.Column="1"
+                        Grid.Row="7"
+                        Style="{StaticResource PropertyName}"
+                        Text="{me:LocalizationSource ParametersPage.ConstrWorkNumber}"/>
+                    <ComboBox
+                        Grid.Column="2"
+                        Grid.Row="7"
+                        ItemsSource="{Binding TextParameters}"
+                        DisplayMemberPath="Definition.Name"
+                        SelectedItem="{Binding SelectedConstrWorksNumberParam}"/>
 
-                <ui:Button
-                    Grid.Row="8"
-                    Grid.Column="0"
-                    Style="{StaticResource ToolTipButton}"
-                    ToolTip="{me:LocalizationSource ToolTip.ApartAreaCoefParamToolTip}" />
-                <TextBlock
-                    Grid.Column="1"
-                    Grid.Row="8"
-                    Style="{StaticResource PropertyName}"
-                    Text="{me:LocalizationSource ParametersPage.ApartAreaCoef}"/>
-                <ComboBox
-                    Grid.Column="2"
-                    Grid.Row="8"
-                    ItemsSource="{Binding DoubleParameters}"
-                    DisplayMemberPath="Definition.Name"
-                    SelectedItem="{Binding SelectedApartAreaCoefParam}"/>
+                    <ui:Button
+                        Grid.Row="8"
+                        Grid.Column="0"
+                        Style="{StaticResource ToolTipButton}"
+                        ToolTip="{me:LocalizationSource ToolTip.ApartAreaCoefParamToolTip}" />
+                    <TextBlock
+                        Grid.Column="1"
+                        Grid.Row="8"
+                        Style="{StaticResource PropertyName}"
+                        Text="{me:LocalizationSource ParametersPage.ApartAreaCoef}"/>
+                    <ComboBox
+                        Grid.Column="2"
+                        Grid.Row="8"
+                        ItemsSource="{Binding DoubleParameters}"
+                        DisplayMemberPath="Definition.Name"
+                        SelectedItem="{Binding SelectedApartAreaCoefParam}"/>
 
-                <ui:Button
-                    Grid.Row="9"
-                    Grid.Column="0"
-                    Style="{StaticResource ToolTipButton}"
-                    ToolTip="{me:LocalizationSource ToolTip.RoomsAmountParamToolTip}" />
-                <TextBlock
-                    Grid.Column="1"
-                    Grid.Row="9"
-                    Style="{StaticResource PropertyName}"
-                    Text="{me:LocalizationSource ParametersPage.RoomsAmount}"/>
-                <ComboBox
-                    Grid.Column="2"
-                    Grid.Row="9"
-                    ItemsSource="{Binding IntAndCurrencyParameters}"
-                    DisplayMemberPath="Definition.Name"
-                    SelectedItem="{Binding SelectedRoomsAmountParam}"/>
+                    <ui:Button
+                        Grid.Row="9"
+                        Grid.Column="0"
+                        Style="{StaticResource ToolTipButton}"
+                        ToolTip="{me:LocalizationSource ToolTip.RoomsAmountParamToolTip}" />
+                    <TextBlock
+                        Grid.Column="1"
+                        Grid.Row="9"
+                        Style="{StaticResource PropertyName}"
+                        Text="{me:LocalizationSource ParametersPage.RoomsAmount}"/>
+                    <ComboBox
+                        Grid.Column="2"
+                        Grid.Row="9"
+                        ItemsSource="{Binding IntAndCurrencyParameters}"
+                        DisplayMemberPath="Definition.Name"
+                        SelectedItem="{Binding SelectedRoomsAmountParam}"/>
 
-                <ui:Button
-                    Grid.Row="10"
-                    Grid.Column="0"
-                    Style="{StaticResource ToolTipButton}"
-                    ToolTip="{me:LocalizationSource ToolTip.ApartAreaLivingParamToolTip}" />
-                <TextBlock
-                    Grid.Column="1"
-                    Grid.Row="10"
-                    Style="{StaticResource PropertyName}"
-                    Text="{me:LocalizationSource ParametersPage.ApartAreaLiving}"/>
-                <ComboBox
-                    Grid.Column="2"
-                    Grid.Row="10"
-                    ItemsSource="{Binding DoubleParameters}"
-                    DisplayMemberPath="Definition.Name"
-                    SelectedItem="{Binding SelectedApartAreaLivingParam}"/>
+                    <ui:Button
+                        Grid.Row="10"
+                        Grid.Column="0"
+                        Style="{StaticResource ToolTipButton}"
+                        ToolTip="{me:LocalizationSource ToolTip.ApartAreaLivingParamToolTip}" />
+                    <TextBlock
+                        Grid.Column="1"
+                        Grid.Row="10"
+                        Style="{StaticResource PropertyName}"
+                        Text="{me:LocalizationSource ParametersPage.ApartAreaLiving}"/>
+                    <ComboBox
+                        Grid.Column="2"
+                        Grid.Row="10"
+                        ItemsSource="{Binding DoubleParameters}"
+                        DisplayMemberPath="Definition.Name"
+                        SelectedItem="{Binding SelectedApartAreaLivingParam}"/>
 
-                <ui:Button
-                    Grid.Row="11"
-                    Grid.Column="0"
-                    Style="{StaticResource ToolTipButton}"
-                    ToolTip="{me:LocalizationSource ToolTip.RoomsHeightParamToolTip}" />
-                <TextBlock
-                    Grid.Row="11"
-                    Grid.Column="1"
-                    Style="{StaticResource PropertyName}"
-                    Text="{me:LocalizationSource ParametersPage.RoomsHeight}"/>
-                <ComboBox
-                    Grid.Row="11"
-                    Grid.Column="2"
-                    ItemsSource="{Binding DoubleParameters}"
-                    DisplayMemberPath="Definition.Name"
-                    SelectedItem="{Binding SelectedRoomsHeightParam}"/>
+                    <ui:Button
+                        Grid.Row="11"
+                        Grid.Column="0"
+                        Style="{StaticResource ToolTipButton}"
+                        ToolTip="{me:LocalizationSource ToolTip.RoomsHeightParamToolTip}" />
+                    <TextBlock
+                        Grid.Row="11"
+                        Grid.Column="1"
+                        Style="{StaticResource PropertyName}"
+                        Text="{me:LocalizationSource ParametersPage.RoomsHeight}"/>
+                    <ComboBox
+                        Grid.Row="11"
+                        Grid.Column="2"
+                        ItemsSource="{Binding DoubleParameters}"
+                        DisplayMemberPath="Definition.Name"
+                        SelectedItem="{Binding SelectedRoomsHeightParam}"/>
 
-                <ui:Button
-                    Grid.Row="12"
-                    Grid.Column="0"
-                    Style="{StaticResource ToolTipButton}"
-                    ToolTip="{me:LocalizationSource ToolTip.ProjectNameToolTip}" />
-                <TextBlock
-                    Grid.Column="1"
-                    Grid.Row="12"
-                    Style="{StaticResource PropertyName}"
-                    Text="{me:LocalizationSource ParametersPage.ProjectName}"/>
-                <TextBox
-                    Grid.Column="2"
-                    Grid.Row="12"
-                    Text="{Binding ProjectName, UpdateSourceTrigger=PropertyChanged}"/>
+                    <ui:Button
+                        Grid.Row="12"
+                        Grid.Column="0"
+                        Style="{StaticResource ToolTipButton}"
+                        ToolTip="{me:LocalizationSource ToolTip.ProjectNameToolTip}" />
+                    <TextBlock
+                        Grid.Column="1"
+                        Grid.Row="12"
+                        Style="{StaticResource PropertyName}"
+                        Text="{me:LocalizationSource ParametersPage.ProjectName}"/>
+                    <TextBox
+                        Grid.Column="2"
+                        Grid.Row="12"
+                        Text="{Binding ProjectName, UpdateSourceTrigger=PropertyChanged}"/>
 
-                <ui:Button
-                    Grid.Row="13"
-                    Grid.Column="0"
-                    Style="{StaticResource ToolTipButton}"
-                    ToolTip="{me:LocalizationSource ToolTip.ApartNumParamToolTip}" />
-                <TextBlock
-                    Grid.Column="1"
-                    Grid.Row="13"
-                    Style="{StaticResource PropertyName}"
-                    Text="{me:LocalizationSource ParametersPage.ApartNum}"/>
-                <ComboBox
-                    Grid.Column="2"
-                    Grid.Row="13"
-                    ItemsSource="{Binding TextParameters}"
-                    DisplayMemberPath="Definition.Name"
-                    SelectedItem="{Binding SelectedApartNumParam}"/>
+                    <ui:Button
+                        Grid.Row="13"
+                        Grid.Column="0"
+                        Style="{StaticResource ToolTipButton}"
+                        ToolTip="{me:LocalizationSource ToolTip.ApartNumParamToolTip}" />
+                    <TextBlock
+                        Grid.Column="1"
+                        Grid.Row="13"
+                        Style="{StaticResource PropertyName}"
+                        Text="{me:LocalizationSource ParametersPage.ApartNum}"/>
+                    <ComboBox
+                        Grid.Column="2"
+                        Grid.Row="13"
+                        ItemsSource="{Binding TextParameters}"
+                        DisplayMemberPath="Definition.Name"
+                        SelectedItem="{Binding SelectedApartNumParam}"/>
 
-                <ui:Button
-                    Grid.Row="14"
-                    Grid.Column="0"
-                    Style="{StaticResource ToolTipButton}"
-                    ToolTip="{me:LocalizationSource ToolTip.ApartAreaParamToolTip}" />
-                <TextBlock
-                    Grid.Column="1"
-                    Grid.Row="14"
-                    Style="{StaticResource PropertyName}"
-                    Text="{me:LocalizationSource ParametersPage.ApartArea}"/>
-                <ComboBox
-                    Grid.Column="2"
-                    Grid.Row="14"
-                    ItemsSource="{Binding DoubleParameters}"
-                    DisplayMemberPath="Definition.Name"
-                    SelectedItem="{Binding SelectedApartAreaParam}"/>
+                    <ui:Button
+                        Grid.Row="14"
+                        Grid.Column="0"
+                        Style="{StaticResource ToolTipButton}"
+                        ToolTip="{me:LocalizationSource ToolTip.ApartAreaParamToolTip}" />
+                    <TextBlock
+                        Grid.Column="1"
+                        Grid.Row="14"
+                        Style="{StaticResource PropertyName}"
+                        Text="{me:LocalizationSource ParametersPage.ApartArea}"/>
+                    <ComboBox
+                        Grid.Column="2"
+                        Grid.Row="14"
+                        ItemsSource="{Binding DoubleParameters}"
+                        DisplayMemberPath="Definition.Name"
+                        SelectedItem="{Binding SelectedApartAreaParam}"/>
 
-                <ui:Button
-                    Grid.Row="15"
-                    Grid.Column="0"
-                    Style="{StaticResource ToolTipButton}"
-                    ToolTip="{me:LocalizationSource ToolTip.ApartAreaNonSumParamToolTip}" />
-                <TextBlock
-                    Grid.Column="1"
-                    Grid.Row="15"
-                    Style="{StaticResource PropertyName}"
-                    Text="{me:LocalizationSource ParametersPage.ApartAreaNonSum}"/>
-                <ComboBox
-                    Grid.Column="2"
-                    Grid.Row="15"
-                    ItemsSource="{Binding DoubleParameters}"
-                    DisplayMemberPath="Definition.Name"
-                    SelectedItem="{Binding SelectedApartAreaNonSumParam}"/>
-            </Grid>
-        </Border>
+                    <ui:Button
+                        Grid.Row="15"
+                        Grid.Column="0"
+                        Style="{StaticResource ToolTipButton}"
+                        ToolTip="{me:LocalizationSource ToolTip.ApartAreaNonSumParamToolTip}" />
+                    <TextBlock
+                        Grid.Column="1"
+                        Grid.Row="15"
+                        Style="{StaticResource PropertyName}"
+                        Text="{me:LocalizationSource ParametersPage.ApartAreaNonSum}"/>
+                    <ComboBox
+                        Grid.Column="2"
+                        Grid.Row="15"
+                        ItemsSource="{Binding DoubleParameters}"
+                        DisplayMemberPath="Definition.Name"
+                        SelectedItem="{Binding SelectedApartAreaNonSumParam}"/>
+                </Grid>
+            </Border>
 
-        <Border
-            Grid.Row="3"
-            Margin="14,0,14,4"
-            Style="{StaticResource CustomBorder}">
-            <Grid>
-                <Grid.RowDefinitions>
-                    <RowDefinition Height="43"/>
-                    <RowDefinition Height="43"/>
-                    <RowDefinition Height="43"/>
-                    <RowDefinition Height="43"/>
-                    <RowDefinition Height="43"/>
-                </Grid.RowDefinitions>
+            <Border
+                Grid.Row="3"
+                Margin="14,0,14,4"
+                Style="{StaticResource CustomBorder}">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="43"/>
+                        <RowDefinition Height="43"/>
+                        <RowDefinition Height="43"/>
+                        <RowDefinition Height="43"/>
+                        <RowDefinition Height="43"/>
+                    </Grid.RowDefinitions>
 
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="30"/>
-                    <ColumnDefinition Width="340"/>
-                    <ColumnDefinition/>
-                </Grid.ColumnDefinitions>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="30"/>
+                        <ColumnDefinition Width="340"/>
+                        <ColumnDefinition/>
+                    </Grid.ColumnDefinitions>
 
-                <TextBlock
-                    Grid.Row="0"
-                    Grid.ColumnSpan="3"
-                    Style="{StaticResource HeaderName}"
-                    Text="{me:LocalizationSource ParametersPage.RoomsParamsHeader}" />
+                    <TextBlock
+                        Grid.Row="0"
+                        Grid.ColumnSpan="3"
+                        Style="{StaticResource HeaderName}"
+                        Text="{me:LocalizationSource ParametersPage.RoomsParamsHeader}" />
 
-                <ui:Button
-                    Grid.Row="1"
-                    Grid.Column="0"
-                    Style="{StaticResource ToolTipButton}"
-                    ToolTip="{me:LocalizationSource ToolTip.RoomNumberParamToolTip}" />
-                <TextBlock
-                    Grid.Column="1"
-                    Grid.Row="1"
-                    Style="{StaticResource PropertyName}"
-                    Text="{me:LocalizationSource ParametersPage.RoomNumber}"/>
-                <ComboBox
-                    Grid.Column="2"
-                    Grid.Row="1"
-                    ItemsSource="{Binding TextParameters}"
-                    DisplayMemberPath="Definition.Name"
-                    SelectedItem="{Binding SelectedRoomNumberParam}"/>
+                    <ui:Button
+                        Grid.Row="1"
+                        Grid.Column="0"
+                        Style="{StaticResource ToolTipButton}"
+                        ToolTip="{me:LocalizationSource ToolTip.RoomNumberParamToolTip}" />
+                    <TextBlock
+                        Grid.Column="1"
+                        Grid.Row="1"
+                        Style="{StaticResource PropertyName}"
+                        Text="{me:LocalizationSource ParametersPage.RoomNumber}"/>
+                    <ComboBox
+                        Grid.Column="2"
+                        Grid.Row="1"
+                        ItemsSource="{Binding TextParameters}"
+                        DisplayMemberPath="Definition.Name"
+                        SelectedItem="{Binding SelectedRoomNumberParam}"/>
 
-                <ui:Button
-                    Grid.Row="2"
-                    Grid.Column="0"
-                    Style="{StaticResource ToolTipButton}"
-                    ToolTip="{me:LocalizationSource ToolTip.RoomNameParamToolTip}" />
-                <TextBlock
-                    Grid.Column="1"
-                    Grid.Row="2"
-                    Style="{StaticResource PropertyName}"
-                    Text="{me:LocalizationSource ParametersPage.RoomName}"/>
-                <ComboBox
-                    Grid.Column="2"
-                    Grid.Row="2"
-                    ItemsSource="{Binding TextParameters}"
-                    DisplayMemberPath="Definition.Name"
-                    SelectedItem="{Binding SelectedRoomNameParam}"/>
+                    <ui:Button
+                        Grid.Row="2"
+                        Grid.Column="0"
+                        Style="{StaticResource ToolTipButton}"
+                        ToolTip="{me:LocalizationSource ToolTip.RoomNameParamToolTip}" />
+                    <TextBlock
+                        Grid.Column="1"
+                        Grid.Row="2"
+                        Style="{StaticResource PropertyName}"
+                        Text="{me:LocalizationSource ParametersPage.RoomName}"/>
+                    <ComboBox
+                        Grid.Column="2"
+                        Grid.Row="2"
+                        ItemsSource="{Binding TextParameters}"
+                        DisplayMemberPath="Definition.Name"
+                        SelectedItem="{Binding SelectedRoomNameParam}"/>
 
-                <ui:Button
-                    Grid.Row="3"
-                    Grid.Column="0"
-                    Style="{StaticResource ToolTipButton}"
-                    ToolTip="{me:LocalizationSource ToolTip.RoomAreaParamToolTip}" />
-                <TextBlock
-                    Grid.Column="1"
-                    Grid.Row="3"
-                    Style="{StaticResource PropertyName}"
-                    Text="{me:LocalizationSource ParametersPage.RoomArea}"/>
-                <ComboBox
-                    Grid.Column="2"
-                    Grid.Row="3"
-                    ItemsSource="{Binding DoubleParameters}"
-                    DisplayMemberPath="Definition.Name"
-                    SelectedItem="{Binding SelectedRoomAreaParam}"/>
+                    <ui:Button
+                        Grid.Row="3"
+                        Grid.Column="0"
+                        Style="{StaticResource ToolTipButton}"
+                        ToolTip="{me:LocalizationSource ToolTip.RoomAreaParamToolTip}" />
+                    <TextBlock
+                        Grid.Column="1"
+                        Grid.Row="3"
+                        Style="{StaticResource PropertyName}"
+                        Text="{me:LocalizationSource ParametersPage.RoomArea}"/>
+                    <ComboBox
+                        Grid.Column="2"
+                        Grid.Row="3"
+                        ItemsSource="{Binding DoubleParameters}"
+                        DisplayMemberPath="Definition.Name"
+                        SelectedItem="{Binding SelectedRoomAreaParam}"/>
 
-                <ui:Button
-                    Grid.Row="4"
-                    Grid.Column="0"
-                    Style="{StaticResource ToolTipButton}"
-                    ToolTip="{me:LocalizationSource ToolTip.RoomAreaCoefParamToolTip}" />
-                <TextBlock
-                    Grid.Column="1"
-                    Grid.Row="4"
-                    Style="{StaticResource PropertyName}"
-                    Text="{me:LocalizationSource ParametersPage.RoomAreaCoef}"/>
-                <ComboBox
-                    Grid.Column="2"
-                    Grid.Row="4"
-                    ItemsSource="{Binding DoubleParameters}"
-                    DisplayMemberPath="Definition.Name"
-                    SelectedItem="{Binding SelectedRoomAreaCoefParam}"/>
-            </Grid>
-        </Border>
-    </Grid>
+                    <ui:Button
+                        Grid.Row="4"
+                        Grid.Column="0"
+                        Style="{StaticResource ToolTipButton}"
+                        ToolTip="{me:LocalizationSource ToolTip.RoomAreaCoefParamToolTip}" />
+                    <TextBlock
+                        Grid.Column="1"
+                        Grid.Row="4"
+                        Style="{StaticResource PropertyName}"
+                        Text="{me:LocalizationSource ParametersPage.RoomAreaCoef}"/>
+                    <ComboBox
+                        Grid.Column="2"
+                        Grid.Row="4"
+                        ItemsSource="{Binding DoubleParameters}"
+                        DisplayMemberPath="Definition.Name"
+                        SelectedItem="{Binding SelectedRoomAreaCoefParam}"/>
+                </Grid>
+            </Border>
+        </Grid>
+    </ScrollViewer>
 </core:WpfUIPlatformPage>
