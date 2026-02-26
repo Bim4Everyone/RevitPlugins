@@ -34,6 +34,13 @@ internal class Apartment : RoomGroup {
             }
         }
 
+        foreach(var pair in _mainRooms) {
+            pair.Value.Sort((x, y) => string.Compare(x.Number, y.Number));
+        }
+        foreach(var pair in _nonConfigRooms) {
+            pair.Value.Sort((x, y) => string.Compare(x.Number, y.Number));
+        }
+
         CalculateRevitAreas();
     }
 
