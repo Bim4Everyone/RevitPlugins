@@ -206,7 +206,7 @@
                                     Width="Auto"
                                     Margin="4"
                                     Padding="3"
-                                    Background="#e9f0f0"
+                                    Background="CadetBlue"
                                     BorderThickness="0"
                                     Command="{Binding RemoveFilterCommand}">
                                     <DockPanel>
