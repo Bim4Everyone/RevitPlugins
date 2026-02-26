@@ -1,0 +1,15 @@
+{
+  "$schema": "./build.schema.json",
+  "Solution": "RevitPlugins.slnx",
+  "PluginName": "RevitDocumenter",
+  "PublishDirectory": "03.KR.extension\\КР.tab\\bin",
+  "RevitVersions": [
+    "Rv2022",
+    "Rv2023",
+    "Rv2024"
+  ],
+  "IconUrl": "https://icons8.com/icon/18781/surface",
+  "BundleName": "Доп.Арм. Размеры",
+  "BundleType": "InvokeButton",
+  "BundleOutput": "03.KR.extension\\КР.tab\\Документация.panel\\Плиты.pulldown"
+}
