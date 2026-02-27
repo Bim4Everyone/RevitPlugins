@@ -1,6 +1,9 @@
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
+
+using dosymep.Revit.Comparators;
 
 using pyRevitLabs.Json;
 
@@ -34,11 +37,12 @@ internal class Apartment : RoomGroup {
             }
         }
 
+        var logicalStrComparer = new LogicalStringComparer();
         foreach(var pair in _mainRooms) {
-            pair.Value.Sort((x, y) => string.Compare(x.Number, y.Number));
+            pair.Value.Sort((x, y) => logicalStrComparer.Compare(x.Number, y.Number));
         }
         foreach(var pair in _nonConfigRooms) {
-            pair.Value.Sort((x, y) => string.Compare(x.Number, y.Number));
+            pair.Value.Sort((x, y) => logicalStrComparer.Compare(x.Number, y.Number));
         }
 
         CalculateRevitAreas();
