@@ -29,6 +29,7 @@ internal class MainViewModel : BaseViewModel {
     private ICollection<ElementId> _elementIds;
     private ObservableCollection<ParamViewModel> _paramViewModels;
     private bool _hasParamWarning;
+    private bool _isSaveCutVolume;
 
     private string _errorText;
 
@@ -77,6 +78,10 @@ internal class MainViewModel : BaseViewModel {
     public bool HasParamWarning {
         get => _hasParamWarning;
         set => RaiseAndSetIfChanged(ref _hasParamWarning, value);
+    }
+    public bool IsSaveCutVolume {
+        get => _isSaveCutVolume;
+        set => RaiseAndSetIfChanged(ref _isSaveCutVolume, value);
     }
     public string ErrorText {
         get => _errorText;

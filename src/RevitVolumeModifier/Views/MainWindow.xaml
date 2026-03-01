@@ -6,21 +6,19 @@
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:base="clr-namespace:dosymep.WPF.Views"
     xmlns:local="clr-namespace:RevitVolumeModifier.Views"
+    xmlns:edits="clr-namespace:RevitVolumeModifier.Views.Edits"
     xmlns:vms="clr-namespace:RevitVolumeModifier.ViewModels"
     xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
     xmlns:core="clr-namespace:dosymep.WpfUI.Core"
     xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
     xmlns:me="clr-namespace:dosymep.WpfCore.MarkupExtensions;assembly=dosymep.WpfCore"
-   
+    xmlns:converters="clr-namespace:dosymep.WpfCore.Converters;assembly=dosymep.WpfCore"
+    xmlns:wpfbehaviors="clr-namespace:dosymep.WpfCore.Behaviors;assembly=dosymep.WpfCore"
     mc:Ignorable="d"
     Title="{me:LocalizationSource MainWindow.Title}"
-    
-    Height="500"
-    Width="500"
-    
-    MinHeight="500"
+    SizeToContent="Height"
+    MinHeight="450"
     MinWidth="500"
-   
     d:DataContext="{d:DesignInstance vms:MainViewModel, IsDesignTimeCreatable=False}">
 
     <i:Interaction.Triggers>
@@ -29,28 +27,177 @@
         </i:EventTrigger>
     </i:Interaction.Triggers>
 
+    <Window.Resources>
+        <converters:BoolToVisibilityConverter
+            x:Key="ParamWarningIconVisible"
+            TrueValue="Visible"
+            FalseValue="Collapsed" />
+        <Style
+            TargetType="ToolTip">
+            <Setter
+                Property="MaxWidth"
+                Value="500" />
+        </Style>
+    </Window.Resources>   
+
+
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />
             <RowDefinition Height="*" />
             <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
-        
-        <ui:TitleBar
+
+        <ui:TitleBar            
             Grid.Row="0"
-            Title="{me:LocalizationSource MainWindow.Title}" />        
+            Icon="{ui:SymbolIcon botSparkle24, FontSize=20}"
+            Title="{me:LocalizationSource MainWindow.Title}"
+            FontSize="14"
+            FontWeight="DemiBold" />
 
-        <StackPanel
-            Grid.Row="2"
-            Orientation="Horizontal"
-            HorizontalAlignment="Right">
+        <ScrollViewer
+            Grid.Row="1"
+            VerticalScrollBarVisibility="Auto"
+            HorizontalScrollBarVisibility="Disabled">
+            <StackPanel
+                Margin="5">
+                <edits:CustomGroupEditControl
+                    Icon="{ui:SymbolIcon settingsChat24}"
+                    Header="{me:LocalizationSource MainWindow.Params}"
+                    Description="{me:LocalizationSource MainWindow.ParamsDescription}"
+                    ExtraIconVisible="True">
+                    <edits:CustomGroupEditControl.ExtraIcon>
+                        <ui:SymbolIcon
+                            Symbol="Warning24"
+                            Foreground="OrangeRed"
+                            FontSize="24"
+                            ToolTip="{me:LocalizationSource MainWindow.ParamWarningTooltip}"
+                            Visibility="{Binding HasParamWarning, Converter={StaticResource ParamWarningIconVisible}}" />
+                    </edits:CustomGroupEditControl.ExtraIcon>
+                    <edits:CustomGroupEditControl.EditControl>
+                        <ItemsControl
+                            ItemsSource="{Binding ParamViewModels}">
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate
+                                    DataType="{x:Type vms:ParamViewModel}">
+                                    <edits:ParamEditControl
+                                        Description="{Binding Description}"
+                                        DetailDescription="{Binding DetailDescription}"
+                                        RevitParamName="{Binding RevitParamName, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"                                        
+                                        HasWarning="{Binding HasWarning, Mode=TwoWay}"
+                                        Warning="{Binding Warning}" />
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                            <ItemsControl.ItemsPanel>
+                                <ItemsPanelTemplate>
+                                    <StackPanel />
+                                </ItemsPanelTemplate>
+                            </ItemsControl.ItemsPanel>
+                        </ItemsControl>
+                    </edits:CustomGroupEditControl.EditControl>
+                </edits:CustomGroupEditControl>
 
-            <ui:TextBlock
-                Margin="10"
-                Foreground="Orange"
-                VerticalAlignment="Center"
-                Text="{Binding ErrorText}" />            
-                
-        </StackPanel>
+                <edits:CustomGroupEditControl
+                    Icon="{ui:SymbolIcon shapeUnion24}"
+                    Header="{me:LocalizationSource MainWindow.JoinPanel}"
+                    Description="{me:LocalizationSource MainWindow.JoinPanelDescription}">
+
+                    <ui:Button
+                        Height="50"
+                        BorderThickness="2"
+                        BorderBrush="DimGray"
+                        CornerRadius="10"
+                        HorizontalAlignment="Stretch"
+                        VerticalAlignment="Center"
+                        Content="{me:LocalizationSource MainWindow.JoinCommand}"
+                        Command="{Binding JoinCommand}" />
+
+                </edits:CustomGroupEditControl>
+
+                <edits:CustomGroupEditControl
+                    Icon="{ui:SymbolIcon splitHorizontal24}"
+                    Header="{me:LocalizationSource MainWindow.DividePanel}"
+                    Description="{me:LocalizationSource MainWindow.DividePanelDescription}">
+
+                    <StackPanel>
+                        <ui:Button
+                            Height="50"
+                            BorderThickness="2"
+                            BorderBrush="DimGray"
+                            CornerRadius="10"
+                            HorizontalAlignment="Stretch"
+                            VerticalAlignment="Center"
+                            Content="{me:LocalizationSource MainWindow.DivideBySelectHorizontalPointCommand}"
+                            Command="{Binding DivideBySelectHorizontalPointCommand}" />
+                        <ui:Button
+                            Margin="0,5,0,0"
+                            Height="50"
+                            BorderThickness="2"
+                            BorderBrush="DimGray"
+                            CornerRadius="10"
+                            HorizontalAlignment="Stretch"
+                            VerticalAlignment="Center"
+                            Content="{me:LocalizationSource MainWindow.DivideBySelectVerticalPointCommand}"
+                            Command="{Binding DivideBySelectVerticalPointCommand}" />
+                        <ui:Button
+                            Margin="0,5,0,0"
+                            Height="50"
+                            BorderThickness="2"
+                            BorderBrush="DimGray"
+                            CornerRadius="10"
+                            HorizontalAlignment="Stretch"
+                            VerticalAlignment="Center"
+                            Content="{me:LocalizationSource MainWindow.DivideBySelectThreePointCommand}"
+                            Command="{Binding DivideBySelectThreePointCommand}" />
+                        <ui:Button
+                            Margin="0,5,0,0"
+                            Height="50"
+                            BorderThickness="2"
+                            BorderBrush="DimGray"
+                            CornerRadius="10"
+                            HorizontalAlignment="Stretch"
+                            VerticalAlignment="Center"
+                            Content="{me:LocalizationSource MainWindow.DivideBySelectFacesCommand}"
+                            Command="{Binding DivideBySelectFacesCommand}" />
+                    </StackPanel>
+
+                </edits:CustomGroupEditControl>
+
+                <edits:CustomGroupEditControl
+                    Icon="{ui:SymbolIcon shapeSubtract24}"
+                    Header="{me:LocalizationSource MainWindow.CutPanel}"
+                    Description="{me:LocalizationSource MainWindow.CutPanelDescription}">
+
+                    <StackPanel>
+                        <ui:Button
+                            Height="50"
+                            BorderThickness="2"
+                            BorderBrush="DimGray"
+                            CornerRadius="10"
+                            HorizontalAlignment="Stretch"
+                            VerticalAlignment="Center"
+                            Content="{me:LocalizationSource MainWindow.CutCommand}"
+                            Command="{Binding CutCommand}" />
+
+                        <ui:ToggleSwitch
+                            Margin="0,10,0,0"
+                            OnContent="{me:LocalizationSource MainWindow.OnContent}"
+                            OffContent="{me:LocalizationSource MainWindow.OffContent}"
+                            IsChecked="{Binding IsSaveCutVolume, Mode=TwoWay}" />
+
+                    </StackPanel>
+
+                </edits:CustomGroupEditControl>
+
+            </StackPanel>
+        </ScrollViewer>
+
+        <ui:TextBlock
+            Margin="10"
+            Foreground="Orange"
+            VerticalAlignment="Center"
+            HorizontalAlignment="Right"
+            Text="{Binding ErrorText}" />
     </Grid>
+    
 </core:WpfUIPlatformWindow>

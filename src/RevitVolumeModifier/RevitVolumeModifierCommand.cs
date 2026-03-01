@@ -12,7 +12,9 @@ using dosymep.WpfUI.Core.Ninject;
 
 using Ninject;
 
+using RevitVolumeModifier.Interfaces;
 using RevitVolumeModifier.Models;
+using RevitVolumeModifier.Services;
 using RevitVolumeModifier.ViewModels;
 using RevitVolumeModifier.Views;
 
@@ -32,6 +34,11 @@ public class RevitVolumeModifierCommand : BasePluginCommand {
         // Настройка доступа к Revit
         kernel.Bind<RevitRepository>()
             .ToSelf()
+            .InSingletonScope();
+
+        // Настройка доступа к сервису проверки параметров
+        kernel.Bind<IParamAvailabilityService>()
+            .To<ParamAvailabilityService>()
             .InSingletonScope();
 
         // Настройка конфигурации плагина

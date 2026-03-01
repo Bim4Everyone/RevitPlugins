@@ -43,9 +43,10 @@ internal class ParamViewModel : BaseViewModel {
     /// Метод, который обновляет предупреждения в параметре
     /// </summary>
     public void UpdateWarning(Document document, ILocalizationService localizationService, IParamAvailabilityService paramAvailabilityService) {
-        if(!paramAvailabilityService.IsParamExist(document, ParamModel.RevitParam.Name)) {
+        if(!paramAvailabilityService.IsParamExist(document, RevitParamName)) {
             HasWarning = true;
             Warning = localizationService.GetLocalizedString("ParamViewModel.NoParam");
+            return;
         }
         HasWarning = false;
         Warning = string.Empty;
