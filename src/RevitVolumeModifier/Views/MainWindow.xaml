@@ -16,10 +16,10 @@
     Title="{me:LocalizationSource MainWindow.Title}"
     
     Height="500"
-    Width="700"
+    Width="500"
     
     MinHeight="500"
-    MinWidth="700"
+    MinWidth="500"
    
     d:DataContext="{d:DesignInstance vms:MainViewModel, IsDesignTimeCreatable=False}">
 
@@ -38,14 +38,7 @@
         
         <ui:TitleBar
             Grid.Row="0"
-            Title="{me:LocalizationSource MainWindow.Title}" />
-
-        <ui:TextBox
-            Grid.Row="1"
-            Width="200"
-            VerticalAlignment="Center"
-            HorizontalAlignment="Center"
-            Text="{Binding SaveProperty, UpdateSourceTrigger=PropertyChanged}" />
+            Title="{me:LocalizationSource MainWindow.Title}" />        
 
         <StackPanel
             Grid.Row="2"
@@ -56,22 +49,8 @@
                 Margin="10"
                 Foreground="Orange"
                 VerticalAlignment="Center"
-                Text="{Binding ErrorText}" />
-
-            <ui:Button
-                Margin="10"
-                Width="80"
-                Appearance="Info"
-                Content="{me:LocalizationSource MainWindow.ButtonOk}"
-                Click="ButtonOk_Click"
-                Command="{Binding AcceptViewCommand}" />
-
-            <ui:Button
-                Margin="10"
-                Width="80"
-                Content="{me:LocalizationSource MainWindow.ButtonCancel}"
-                IsCancel="True"
-                Click="ButtonCancel_Click" />
+                Text="{Binding ErrorText}" />            
+                
         </StackPanel>
     </Grid>
 </core:WpfUIPlatformWindow>

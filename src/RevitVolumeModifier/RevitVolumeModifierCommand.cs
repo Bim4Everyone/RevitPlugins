@@ -18,29 +18,13 @@ using RevitVolumeModifier.Views;
 
 namespace RevitVolumeModifier;
 
-/// <summary>
-/// Класс команды Revit плагина.
-/// </summary>
-/// <remarks>
-/// В данном классе должна быть инициализация контейнера плагина и указание названия команды.
-/// </remarks>
 [Transaction(TransactionMode.Manual)]
 public class RevitVolumeModifierCommand : BasePluginCommand {
-    /// <summary>
-    /// Инициализирует команду плагина.
-    /// </summary>
+
     public RevitVolumeModifierCommand() {
-        PluginName = "Модифицировать объемный элемент";
+        PluginName = "Объединить объемные элементы";
     }
 
-    /// <summary>
-    /// Метод выполнения основного кода плагина.
-    /// </summary>
-    /// <param name="uiApplication">Интерфейс взаимодействия с Revit.</param>
-    /// <remarks>
-    /// В случаях, когда не используется конфигурация
-    /// или локализация требуется удалять их использование полностью во всем проекте.
-    /// </remarks>
     protected override void Execute(UIApplication uiApplication) {
         // Создание контейнера зависимостей плагина с сервисами из платформы
         using var kernel = uiApplication.CreatePlatformServices();
@@ -57,8 +41,9 @@ public class RevitVolumeModifierCommand : BasePluginCommand {
         // Используем сервис обновления тем для WinUI
         kernel.UseWpfUIThemeUpdater();
 
-        // Настройка запуска окна
+        // Настройка запуска основного окна
         kernel.BindMainWindow<MainViewModel, MainWindow>();
+
 
         // Настройка локализации,
         // получение имени сборки откуда брать текст
@@ -70,7 +55,7 @@ public class RevitVolumeModifierCommand : BasePluginCommand {
             $"/{assemblyName};component/assets/localization/language.xaml",
             CultureInfo.GetCultureInfo("ru-RU"));
 
-        // Вызывает стандартное уведомление
-        Notification(kernel.Get<MainWindow>());
+        var window = kernel.Get<MainWindow>();
+        window.Show();
     }
 }

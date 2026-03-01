@@ -1,123 +1,158 @@
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.ComponentModel;
+using System.Linq;
 using System.Windows.Input;
 
+using Autodesk.Revit.DB;
+
+using dosymep.Bim4Everyone.SimpleServices;
+using dosymep.Revit;
 using dosymep.SimpleServices;
 using dosymep.WPF.Commands;
 using dosymep.WPF.ViewModels;
 
+using RevitVolumeModifier.Interfaces;
 using RevitVolumeModifier.Models;
 
 namespace RevitVolumeModifier.ViewModels;
 
-/// <summary>
-/// Основная ViewModel главного окна плагина.
-/// </summary>
 internal class MainViewModel : BaseViewModel {
-    private readonly PluginConfig _pluginConfig;
-    private readonly RevitRepository _revitRepository;
     private readonly ILocalizationService _localizationService;
+    private readonly IParamAvailabilityService _paramAvailabilityService;
+    private readonly IRevitParamFactory _revitParamFactory;
+    private readonly RevitRepository _revitRepository;
+    private readonly SystemPluginConfig _systemPluginConfig;
+    private readonly PluginConfig _pluginConfig;
+
+    private List<ParamModel> _paramModels;
+    private ICollection<ElementId> _elementIds;
+    private ObservableCollection<ParamViewModel> _paramViewModels;
+    private bool _hasParamWarning;
 
     private string _errorText;
-    private string _saveProperty;
-    
-    /// <summary>
-    /// Создает экземпляр основной ViewModel главного окна.
-    /// </summary>
-    /// <param name="pluginConfig">Настройки плагина.</param>
-    /// <param name="revitRepository">Класс доступа к интерфейсу Revit.</param>
-    /// <param name="localizationService">Интерфейс доступа к сервису локализации.</param>
+
     public MainViewModel(
-        PluginConfig pluginConfig,
+        ILocalizationService localizationService,
+        IParamAvailabilityService paramAvailabilityService,
+        IRevitParamFactory revitParamFactory,
         RevitRepository revitRepository,
-        ILocalizationService localizationService) {
-        
-        _pluginConfig = pluginConfig;
-        _revitRepository = revitRepository;
+        SystemPluginConfig systemPluginConfig,
+        PluginConfig pluginConfig) {
+
         _localizationService = localizationService;
+        _paramAvailabilityService = paramAvailabilityService;
+        _revitParamFactory = revitParamFactory;
+        _revitRepository = revitRepository;
+        _systemPluginConfig = systemPluginConfig;
+        _pluginConfig = pluginConfig;
 
         LoadViewCommand = RelayCommand.Create(LoadView);
-        AcceptViewCommand = RelayCommand.Create(AcceptView, CanAcceptView);
+        SaveConfigCommand = RelayCommand.Create(SaveConfig);
+        JoinCommand = RelayCommand.Create(Join);
+        DivideBySelectHorizontalPointCommand = RelayCommand.Create(DivideBySelectHorizontalPoint);
+        DivideBySelectVerticalPointCommand = RelayCommand.Create(DivideBySelectVerticalPoint);
+        DivideBySelectThreePointCommand = RelayCommand.Create(DivideBySelectThreePointPoint);
+        DivideBySelectFacesCommand = RelayCommand.Create(DivideBySelectFacesPoint);
+        CutCommand = RelayCommand.Create(Cut);
     }
 
-    /// <summary>
-    /// Команда загрузки главного окна.
-    /// </summary>
     public ICommand LoadViewCommand { get; }
-    
-    /// <summary>
-    /// Команда применения настроек главного окна. (запуск плагина)
-    /// </summary>
-    /// <remarks>В случаях, когда используется немодальное окно, требуется данную команду удалять.</remarks>
-    public ICommand AcceptViewCommand { get; }
+    public ICommand SaveConfigCommand { get; }
+    public ICommand JoinCommand { get; }
+    public ICommand DivideBySelectHorizontalPointCommand { get; }
+    public ICommand DivideBySelectVerticalPointCommand { get; }
+    public ICommand DivideBySelectThreePointCommand { get; }
+    public ICommand DivideBySelectFacesCommand { get; }
+    public ICommand CutCommand { get; }
 
-    /// <summary>
-    /// Текст ошибки, который отображается при неверном вводе пользователя.
-    /// </summary>
+    public ICollection<ElementId> ElementIds {
+        get => _elementIds;
+        set => RaiseAndSetIfChanged(ref _elementIds, value);
+    }
+    public ObservableCollection<ParamViewModel> ParamViewModels {
+        get => _paramViewModels;
+        set => RaiseAndSetIfChanged(ref _paramViewModels, value);
+    }
+    public bool HasParamWarning {
+        get => _hasParamWarning;
+        set => RaiseAndSetIfChanged(ref _hasParamWarning, value);
+    }
     public string ErrorText {
         get => _errorText;
         set => RaiseAndSetIfChanged(ref _errorText, value);
     }
 
-    /// <summary>
-    /// Свойство для примера. (требуется удалить)
-    /// </summary>
-    public string SaveProperty {
-        get => _saveProperty;
-        set => RaiseAndSetIfChanged(ref _saveProperty, value);
+    // Метод обновления предупреждений в параметрах
+    private void UpdateParamWarnings() {
+        foreach(var paramViewModel in ParamViewModels) {
+            paramViewModel.UpdateWarning(_revitRepository.Document, _localizationService, _paramAvailabilityService);
+        }
+        HasParamWarning = ParamViewModels.Any(param => param.HasWarning);
     }
 
-    /// <summary>
-    /// Метод загрузки главного окна.
-    /// </summary>
-    /// <remarks>В данном методе должна происходить загрузка настроек окна, а так же инициализация полей окна.</remarks>
+    // Метод подписанный на событие изменения ParamViewModel
+    private void OnParamChanged(object sender, PropertyChangedEventArgs e) {
+        if(sender is not ParamViewModel vm) {
+            return;
+        }
+        switch(e.PropertyName) {
+            case nameof(ParamViewModel.RevitParamName):
+                UpdateParamWarnings();
+                if(!vm.HasWarning) {
+                    var def = _paramAvailabilityService.GetDefinitionByName(_revitRepository.Document, vm.RevitParamName);
+                    var newParam = _revitParamFactory.Create(_revitRepository.Document, def.GetElementId());
+                    vm.ParamModel.RevitParam = newParam;
+                }
+                break;
+        }
+    }
+
+    // Метод получения коллекции ParamViewModel для Params
+    private IEnumerable<ParamViewModel> GetParamViewModels() {
+        return _paramModels
+            .Select(param => new ParamViewModel {
+                ParamModel = param,
+                RevitParamName = param.RevitParam.Name,
+                Description = _localizationService.GetLocalizedString($"MainViewModel.{param.ParamType}Description"),
+                DetailDescription = _localizationService.GetLocalizedString($"MainViewModel.{param.ParamType}DetailDescription")
+            });
+    }
+
+    private void Join() { }
+
+    private void DivideBySelectHorizontalPoint() { }
+
+    private void DivideBySelectVerticalPoint() { }
+
+    private void DivideBySelectThreePointPoint() { }
+
+    private void DivideBySelectFacesPoint() { }
+
+    private void Cut() { }
+
+    // Метод загрузки вида
     private void LoadView() {
         LoadConfig();
-    }
-
-    /// <summary>
-    /// Метод применения настроек главного окна. (выполнение плагина)
-    /// </summary>
-    /// <remarks>
-    /// В данном методе должны браться настройки пользователя и сохраняться в конфиг, а так же быть основной код плагина.
-    /// </remarks>
-    private void AcceptView() {
-        SaveConfig();
-    }
-
-    /// <summary>
-    /// Метод проверки возможности выполнения команды применения настроек.
-    /// </summary>
-    /// <returns>В случае когда true - команда может выполниться, в случае false - нет.</returns>
-    /// <remarks>
-    /// В данном методе происходит валидация ввода пользователя и уведомление его о неверных значениях.
-    /// В методе проверяемые свойства окна должны быть отсортированы в таком же порядке как в окне (сверху-вниз)
-    /// </remarks>
-    private bool CanAcceptView() {
-        if(string.IsNullOrEmpty(SaveProperty)) {
-            ErrorText = _localizationService.GetLocalizedString("MainWindow.HelloCheck");
-            return false;
+        ParamViewModels = new ObservableCollection<ParamViewModel>(GetParamViewModels());
+        // Подписка на события в ParamViewModel
+        foreach(var param in ParamViewModels) {
+            param.PropertyChanged += OnParamChanged;
         }
-
-        ErrorText = null;
-        return true;
+        UpdateParamWarnings();
     }
 
-    /// <summary>
-    /// Загрузка настроек плагина.
-    /// </summary>
+    // Метод загрузки конфигурации
     private void LoadConfig() {
-        RevitSettings setting = _pluginConfig.GetSettings(_revitRepository.Document);
-
-        SaveProperty = setting?.SaveProperty ?? _localizationService.GetLocalizedString("MainWindow.Hello");
+        var setting = _pluginConfig.GetSettings(_revitRepository.Document);
+        _paramModels = setting?.ParamModels ?? _systemPluginConfig.GetDefaultParams();
     }
 
-    /// <summary>
-    /// Сохранение настроек плагина.
-    /// </summary>
-    private void SaveConfig() {
-        RevitSettings setting = _pluginConfig.GetSettings(_revitRepository.Document)
+    // Метод сохранения конфигурации
+    public void SaveConfig() {
+        var setting = _pluginConfig.GetSettings(_revitRepository.Document)
                                 ?? _pluginConfig.AddSettings(_revitRepository.Document);
-
-        setting.SaveProperty = SaveProperty;
+        setting.ParamModels = ParamViewModels.Select(vm => vm.ParamModel).ToList();
         _pluginConfig.SaveProjectConfig();
     }
 }

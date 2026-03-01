@@ -1,35 +1,25 @@
+using System.Collections.Generic;
+
 using dosymep.Bim4Everyone;
 using dosymep.Bim4Everyone.ProjectConfigs;
-using dosymep.Serializers;
+using dosymep.Bim4Everyone.SharedParams;
+using dosymep.SimpleServices;
 
 using pyRevitLabs.Json;
 
+using RevitVolumeModifier.Enums;
+using RevitVolumeModifier.Interfaces;
+
 namespace RevitVolumeModifier.Models;
 
-/// <summary>
-/// Класс конфигурации плагина.
-/// (Если не используется удалить)
-/// </summary>
 internal class PluginConfig : ProjectConfig<RevitSettings> {
-    /// <summary>
-    /// Системное свойство конфигурации. (Не трогать)
-    /// </summary>
+
     [JsonIgnore]
     public override string ProjectConfigPath { get; set; }
 
-    /// <summary>
-    /// Системное свойство конфигурации. (Не трогать)
-    /// </summary>
     [JsonIgnore]
     public override IConfigSerializer Serializer { get; set; }
 
-    /// <summary>
-    /// Метод создания конфигурации плагина.
-    /// </summary>
-    /// <returns>
-	/// <param name="configSerializer">Сериализатор конфигурации.</param>
-    /// Возвращает прочитанную конфигурацию плагина, либо созданный конфиг по умолчанию.
-    /// </returns>
     public static PluginConfig GetPluginConfig(IConfigSerializer configSerializer) {
         return new ProjectConfigBuilder()
             .SetSerializer(configSerializer)
@@ -40,27 +30,89 @@ internal class PluginConfig : ProjectConfig<RevitSettings> {
     }
 }
 
-/// <summary>
-/// Настройки проекта.
-/// В настройках проекта обычно хранится выбор пользователя в основном окне плагина.
-/// </summary>
-/// <remarks>
-/// Проектом по умолчанию является текст до первого нижнего подчеркивания.
-/// <see cref="ProjectConfig" />
-/// https://github.com/dosymep/dosymep.Revit/blob/master/src/dosymep.Bim4Everyone/ProjectConfigs/ProjectConfig.cs#L102
-/// Если плагин работает без открытых проектов,
-/// то требуется данный класс удалять из проекта,
-/// как сделано в плагине RevitServerFolders
-/// https://github.com/Bim4Everyone/RevitPlugins/blob/master/src/RevitServerFolders/Models/PluginConfig.cs#L8
-/// </remarks>
 internal class RevitSettings : ProjectSettings {
-    /// <summary>
-    /// Наименование проекта. Системное свойство. (Не трогать)
-    /// </summary>
     public override string ProjectName { get; set; }
-    
+    public List<ParamModel> ParamModels { get; set; }
+}
+
+internal class SystemPluginConfig {
+    private readonly ILocalizationService _localizationService;
+    private readonly IParamAvailabilityService _paramAvailabilityService;
+
+    public SystemPluginConfig(ILocalizationService localizationService, IParamAvailabilityService paramAvailabilityService) {
+        _localizationService = localizationService;
+        _paramAvailabilityService = paramAvailabilityService;
+    }
+
     /// <summary>
-    /// Сохраняемое свойство для примера, нужно его заменить своими настройками.
+    /// Метод получения списка всех параметров
     /// </summary>
-    public string SaveProperty { get; set; }
+    public List<ParamModel> GetDefaultParams() {
+        return [
+            GetDescriptionParam(),
+            GetBlockParam(),
+            GetSectionParam(),
+            GetFloorParam(),
+            GetFloorDEParam(),
+            GetZoneParam(),
+            GetVolumeParam()
+        ];
+    }
+
+    // Метод получения параметра ФОП_Описание СМР     
+    private ParamModel GetDescriptionParam() {
+        var instance = SharedParamsConfig.Instance;
+        var param = instance?.BuildingWorksDescription;
+        return GetParam(param, ParamType.DescriptionParam);
+    }
+
+    // Метод получения параметра ФОП_Блок СМР     
+    private ParamModel GetBlockParam() {
+        var instance = SharedParamsConfig.Instance;
+        var param = instance?.BuildingWorksBlock;
+        return GetParam(param, ParamType.BlockParam);
+    }
+
+    // Метод получения параметра ФОП_Секция СМР    
+    private ParamModel GetSectionParam() {
+        var instance = SharedParamsConfig.Instance;
+        var param = instance?.BuildingWorksSection;
+        return GetParam(param, ParamType.SectionParam);
+    }
+
+    // Метод получения параметра ФОП_Этаж СМР    
+    private ParamModel GetFloorParam() {
+        var instance = SharedParamsConfig.Instance;
+        var param = instance?.BuildingWorksLevel;
+        return GetParam(param, ParamType.FloorParam);
+    }
+
+    // Метод получения параметра ФОП_Этаж СМР_ДЕ
+    private ParamModel GetFloorDEParam() {
+        var instance = SharedParamsConfig.Instance;
+        var param = instance?.BuildingWorksLevelCurrency;
+        return GetParam(param, ParamType.FloorDEParam);
+    }
+
+    // Метод получения параметра ФОП_Зона СМР    
+    private ParamModel GetZoneParam() {
+        var instance = SharedParamsConfig.Instance;
+        var param = instance?.BuildingWorksZone;
+        return GetParam(param, ParamType.ZoneParam);
+    }
+
+    // Метод получения параметра ФОП_РАЗМ_Объем СМР    
+    private ParamModel GetVolumeParam() {
+        var instance = SharedParamsConfig.Instance;
+        var param = instance?.SizeVolumeBuildingWorks;
+        return GetParam(param, ParamType.VolumeParam);
+    }
+
+    // Метод получения параметра
+    private ParamModel GetParam(RevitParam revitParam, ParamType paramType) {
+        return new ParamModel {
+            RevitParam = revitParam,
+            ParamType = paramType
+        };
+    }
 }
