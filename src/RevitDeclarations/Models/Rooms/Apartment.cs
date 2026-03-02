@@ -23,8 +23,9 @@ internal class Apartment : RoomGroup {
 
     public Apartment(IEnumerable<RoomElement> rooms,
                      DeclarationSettings settings,
-                     RoomParamProvider paramProvider)
-        : base(rooms, settings, paramProvider) {
+                     RoomParamProvider paramProvider, 
+                     LogicalStringComparer logicalStrComparer)
+        : base(rooms, settings, paramProvider, logicalStrComparer) {
         _settings = (ApartmentsSettings) settings;
         _mainRooms = new Dictionary<string, List<RoomElement>>(_strComparer);
         _nonConfigRooms = new Dictionary<string, List<RoomElement>>(_strComparer);
@@ -35,14 +36,6 @@ internal class Apartment : RoomGroup {
             } else {
                 AddToDictionary(_nonConfigRooms, room);
             }
-        }
-
-        var logicalStrComparer = new LogicalStringComparer();
-        foreach(var pair in _mainRooms) {
-            pair.Value.Sort((x, y) => logicalStrComparer.Compare(x.Number, y.Number));
-        }
-        foreach(var pair in _nonConfigRooms) {
-            pair.Value.Sort((x, y) => logicalStrComparer.Compare(x.Number, y.Number));
         }
 
         CalculateRevitAreas();
