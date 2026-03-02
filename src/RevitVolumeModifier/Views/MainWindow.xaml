@@ -8,14 +8,14 @@
     xmlns:local="clr-namespace:RevitVolumeModifier.Views"
     xmlns:edits="clr-namespace:RevitVolumeModifier.Views.Edits"
     xmlns:vms="clr-namespace:RevitVolumeModifier.ViewModels"
+    xmlns:enums="clr-namespace:RevitVolumeModifier.Enums"
     xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
     xmlns:core="clr-namespace:dosymep.WpfUI.Core"
     xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
     xmlns:me="clr-namespace:dosymep.WpfCore.MarkupExtensions;assembly=dosymep.WpfCore"
     xmlns:converters="clr-namespace:dosymep.WpfCore.Converters;assembly=dosymep.WpfCore"
     xmlns:wpfbehaviors="clr-namespace:dosymep.WpfCore.Behaviors;assembly=dosymep.WpfCore"
-    mc:Ignorable="d"
-    Title="{me:LocalizationSource MainWindow.Title}"
+    mc:Ignorable="d"    
     SizeToContent="Height"
     MinHeight="450"
     MinWidth="500"
@@ -38,6 +38,25 @@
                 Property="MaxWidth"
                 Value="500" />
         </Style>
+
+        <SolidColorBrush
+            x:Key="Join"
+            Color="DimGray" />
+        <SolidColorBrush
+            x:Key="DivideByHorPoint"
+            Color="DimGray" />
+        <SolidColorBrush
+            x:Key="DivideByVertPoint"
+            Color="DimGray" />
+        <SolidColorBrush
+            x:Key="DivideByThreePoint"
+            Color="DimGray" />
+        <SolidColorBrush
+            x:Key="DivideByFaces"
+            Color="DimGray" />
+        <SolidColorBrush
+            x:Key="Cut"
+            Color="DimGray" />
     </Window.Resources>   
 
 
@@ -105,10 +124,11 @@
                     <ui:Button
                         Height="50"
                         BorderThickness="2"
-                        BorderBrush="DimGray"
                         CornerRadius="10"
                         HorizontalAlignment="Stretch"
                         VerticalAlignment="Center"
+                        ToolTip="{Binding CommandState.CommandText}"
+                        BorderBrush="{StaticResource Join}"
                         Content="{me:LocalizationSource MainWindow.JoinCommand}"
                         Command="{Binding JoinCommand}" />
 
@@ -122,41 +142,45 @@
                     <StackPanel>
                         <ui:Button
                             Height="50"
-                            BorderThickness="2"
-                            BorderBrush="DimGray"
+                            BorderThickness="2"                            
                             CornerRadius="10"
                             HorizontalAlignment="Stretch"
                             VerticalAlignment="Center"
+                            ToolTip="{Binding CommandState.CommandText}"
+                            BorderBrush="{StaticResource DivideByHorPoint}"
                             Content="{me:LocalizationSource MainWindow.DivideBySelectHorizontalPointCommand}"
                             Command="{Binding DivideBySelectHorizontalPointCommand}" />
                         <ui:Button
                             Margin="0,5,0,0"
                             Height="50"
-                            BorderThickness="2"
-                            BorderBrush="DimGray"
+                            BorderThickness="2"                            
                             CornerRadius="10"
                             HorizontalAlignment="Stretch"
                             VerticalAlignment="Center"
+                            ToolTip="{Binding CommandState.CommandText}"
+                            BorderBrush="{StaticResource DivideByVertPoint}"
                             Content="{me:LocalizationSource MainWindow.DivideBySelectVerticalPointCommand}"
                             Command="{Binding DivideBySelectVerticalPointCommand}" />
                         <ui:Button
                             Margin="0,5,0,0"
                             Height="50"
-                            BorderThickness="2"
-                            BorderBrush="DimGray"
+                            BorderThickness="2"                            
                             CornerRadius="10"
                             HorizontalAlignment="Stretch"
                             VerticalAlignment="Center"
+                            ToolTip="{Binding CommandState.CommandText}"
+                            BorderBrush="{StaticResource DivideByThreePoint}"
                             Content="{me:LocalizationSource MainWindow.DivideBySelectThreePointCommand}"
                             Command="{Binding DivideBySelectThreePointCommand}" />
                         <ui:Button
                             Margin="0,5,0,0"
                             Height="50"
-                            BorderThickness="2"
-                            BorderBrush="DimGray"
+                            BorderThickness="2"                            
                             CornerRadius="10"
                             HorizontalAlignment="Stretch"
                             VerticalAlignment="Center"
+                            ToolTip="{Binding CommandState.CommandText}"
+                            BorderBrush="{StaticResource DivideByFaces}"
                             Content="{me:LocalizationSource MainWindow.DivideBySelectFacesCommand}"
                             Command="{Binding DivideBySelectFacesCommand}" />
                     </StackPanel>
@@ -172,15 +196,16 @@
                         <ui:Button
                             Height="50"
                             BorderThickness="2"
-                            BorderBrush="DimGray"
                             CornerRadius="10"
                             HorizontalAlignment="Stretch"
                             VerticalAlignment="Center"
+                            ToolTip="{Binding CommandState.CommandText}"
+                            BorderBrush="{StaticResource Cut}"
                             Content="{me:LocalizationSource MainWindow.CutCommand}"
                             Command="{Binding CutCommand}" />
 
                         <ui:ToggleSwitch
-                            Margin="0,10,0,0"
+                            Margin="0,20,0,0"
                             OnContent="{me:LocalizationSource MainWindow.OnContent}"
                             OffContent="{me:LocalizationSource MainWindow.OffContent}"
                             IsChecked="{Binding IsSaveCutVolume, Mode=TwoWay}" />

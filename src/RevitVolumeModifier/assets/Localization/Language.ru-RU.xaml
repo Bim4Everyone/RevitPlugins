@@ -42,6 +42,9 @@
     <system:String x:Key="MainViewModel.VolumeParamDescription">Параметр объёма СМР</system:String>
     <system:String x:Key="MainViewModel.VolumeParamDetailDescription">Тип - Объем</system:String>
 
+    <system:String x:Key="MainViewModel.FailedCommand">Операция выполнена с ошибками</system:String>
+    <system:String x:Key="MainViewModel.SuccessCommand">Операция выполнена успешно</system:String>
+
     <system:String x:Key="RevitRepository.NoParamValue">Нет значения</system:String>
     
     

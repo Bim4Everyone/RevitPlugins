@@ -12,6 +12,7 @@ using dosymep.SimpleServices;
 using dosymep.WPF.Commands;
 using dosymep.WPF.ViewModels;
 
+using RevitVolumeModifier.Enums;
 using RevitVolumeModifier.Interfaces;
 using RevitVolumeModifier.Models;
 
@@ -30,8 +31,9 @@ internal class MainViewModel : BaseViewModel {
     private ObservableCollection<ParamViewModel> _paramViewModels;
     private bool _hasParamWarning;
     private bool _isSaveCutVolume;
-
     private string _errorText;
+
+    private CommandStateViewModel _commandState;
 
     public MainViewModel(
         ILocalizationService localizationService,
@@ -56,6 +58,7 @@ internal class MainViewModel : BaseViewModel {
         DivideBySelectThreePointCommand = RelayCommand.Create(DivideBySelectThreePointPoint);
         DivideBySelectFacesCommand = RelayCommand.Create(DivideBySelectFacesPoint);
         CutCommand = RelayCommand.Create(Cut);
+
     }
 
     public ICommand LoadViewCommand { get; }
@@ -86,6 +89,11 @@ internal class MainViewModel : BaseViewModel {
     public string ErrorText {
         get => _errorText;
         set => RaiseAndSetIfChanged(ref _errorText, value);
+    }
+
+    public CommandStateViewModel CommandState {
+        get => _commandState;
+        set => RaiseAndSetIfChanged(ref _commandState, value);
     }
 
     // Метод обновления предупреждений в параметрах
@@ -124,17 +132,55 @@ internal class MainViewModel : BaseViewModel {
             });
     }
 
-    private void Join() { }
+    private void Join() {
+        ResetCommandState();
+        UpdateCommandState(
+            CommandStatus.Success,
+            CommandType.Join,
+            _localizationService.GetLocalizedString("MainViewModel.SuccessCommand"));
 
-    private void DivideBySelectHorizontalPoint() { }
+    }
 
-    private void DivideBySelectVerticalPoint() { }
 
-    private void DivideBySelectThreePointPoint() { }
+    private void DivideBySelectHorizontalPoint() {
+        ResetCommandState();
+        UpdateCommandState(
+            CommandStatus.Failed,
+            CommandType.DivideByHorPoint,
+            _localizationService.GetLocalizedString("MainViewModel.FailedCommand"));
+    }
 
-    private void DivideBySelectFacesPoint() { }
+    private void DivideBySelectVerticalPoint() {
+        ResetCommandState();
+        UpdateCommandState(
+            CommandStatus.Failed,
+            CommandType.DivideByVertPoint,
+            _localizationService.GetLocalizedString("MainViewModel.FailedCommand"));
+    }
 
-    private void Cut() { }
+    private void DivideBySelectThreePointPoint() {
+        ResetCommandState();
+        UpdateCommandState(
+            CommandStatus.Success,
+            CommandType.DivideByThreePoint,
+            _localizationService.GetLocalizedString("MainViewModel.SuccessCommand"));
+    }
+
+    private void DivideBySelectFacesPoint() {
+        ResetCommandState();
+        UpdateCommandState(
+            CommandStatus.Success,
+            CommandType.DivideByFaces,
+            _localizationService.GetLocalizedString("MainViewModel.SuccessCommand"));
+    }
+
+    private void Cut() {
+        ResetCommandState();
+        UpdateCommandState(
+            CommandStatus.Failed,
+            CommandType.Cut,
+            _localizationService.GetLocalizedString("MainViewModel.FailedCommand"));
+    }
 
     // Метод загрузки вида
     private void LoadView() {
@@ -145,6 +191,24 @@ internal class MainViewModel : BaseViewModel {
             param.PropertyChanged += OnParamChanged;
         }
         UpdateParamWarnings();
+
+        CommandState = new CommandStateViewModel() {
+            CommandStatus = CommandStatus.None,
+            CommandType = CommandType.None,
+            CommandText = string.Empty
+        };
+    }
+
+    private void ResetCommandState() {
+        CommandState.CommandStatus = CommandStatus.None;
+        CommandState.CommandType = CommandType.None;
+        CommandState.CommandText = string.Empty;
+    }
+
+    private void UpdateCommandState(CommandStatus commandStatus, CommandType commandType, string commandText) {
+        CommandState.CommandStatus = commandStatus;
+        CommandState.CommandType = commandType;
+        CommandState.CommandText = commandText;
     }
 
     // Метод загрузки конфигурации

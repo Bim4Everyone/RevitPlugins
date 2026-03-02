@@ -3,4 +3,7 @@
         <UseWpfUI>true</UseWpfUI>
         <LangVersion>12</LangVersion>
     </PropertyGroup>
+    <ItemGroup>
+      <Folder Include="NewFolder\" />
+    </ItemGroup>
 </Project>
