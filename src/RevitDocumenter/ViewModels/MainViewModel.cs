@@ -1,4 +1,7 @@
+using System.Collections.Generic;
 using System.Windows.Input;
+
+using Autodesk.Revit.DB;
 
 using dosymep.SimpleServices;
 using dosymep.WPF.Commands;
@@ -17,8 +20,10 @@ internal class MainViewModel : BaseViewModel {
     private readonly ILocalizationService _localizationService;
 
     private string _errorText;
-    private string _saveProperty;
-    
+    private string _familyNamePart;
+    private DimensionType _selectedDimensionType;
+    private List<DimensionType> _dimensionTypes;
+
     /// <summary>
     /// Создает экземпляр основной ViewModel главного окна.
     /// </summary>
@@ -29,25 +34,22 @@ internal class MainViewModel : BaseViewModel {
         PluginConfig pluginConfig,
         RevitRepository revitRepository,
         ILocalizationService localizationService) {
-        
+
         _pluginConfig = pluginConfig;
         _revitRepository = revitRepository;
         _localizationService = localizationService;
+
+        ReferenceNamesVM = new ReferenceNamesViewModel();
 
         LoadViewCommand = RelayCommand.Create(LoadView);
         AcceptViewCommand = RelayCommand.Create(AcceptView, CanAcceptView);
     }
 
-    /// <summary>
-    /// Команда загрузки главного окна.
-    /// </summary>
     public ICommand LoadViewCommand { get; }
-    
-    /// <summary>
-    /// Команда применения настроек главного окна. (запуск плагина)
-    /// </summary>
-    /// <remarks>В случаях, когда используется немодальное окно, требуется данную команду удалять.</remarks>
     public ICommand AcceptViewCommand { get; }
+
+    public ReferenceNamesViewModel ReferenceNamesVM { get; }
+
 
     /// <summary>
     /// Текст ошибки, который отображается при неверном вводе пользователя.
@@ -57,13 +59,21 @@ internal class MainViewModel : BaseViewModel {
         set => RaiseAndSetIfChanged(ref _errorText, value);
     }
 
-    /// <summary>
-    /// Свойство для примера. (требуется удалить)
-    /// </summary>
-    public string SaveProperty {
-        get => _saveProperty;
-        set => RaiseAndSetIfChanged(ref _saveProperty, value);
+    public string FamilyNamePart {
+        get => _familyNamePart;
+        set => RaiseAndSetIfChanged(ref _familyNamePart, value);
     }
+
+    public DimensionType SelectedDimensionType {
+        get => _selectedDimensionType;
+        set => RaiseAndSetIfChanged(ref _selectedDimensionType, value);
+    }
+
+    public List<DimensionType> DimensionTypes {
+        get => _dimensionTypes;
+        set => RaiseAndSetIfChanged(ref _dimensionTypes, value);
+    }
+
 
     /// <summary>
     /// Метод загрузки главного окна.
@@ -71,6 +81,8 @@ internal class MainViewModel : BaseViewModel {
     /// <remarks>В данном методе должна происходить загрузка настроек окна, а так же инициализация полей окна.</remarks>
     private void LoadView() {
         LoadConfig();
+
+        DimensionTypes = _revitRepository.DimensionTypes;
     }
 
     /// <summary>
@@ -92,12 +104,6 @@ internal class MainViewModel : BaseViewModel {
     /// В методе проверяемые свойства окна должны быть отсортированы в таком же порядке как в окне (сверху-вниз)
     /// </remarks>
     private bool CanAcceptView() {
-        if(string.IsNullOrEmpty(SaveProperty)) {
-            ErrorText = _localizationService.GetLocalizedString("MainWindow.HelloCheck");
-            return false;
-        }
-
-        ErrorText = null;
         return true;
     }
 
@@ -107,7 +113,7 @@ internal class MainViewModel : BaseViewModel {
     private void LoadConfig() {
         RevitSettings setting = _pluginConfig.GetSettings(_revitRepository.Document);
 
-        SaveProperty = setting?.SaveProperty ?? _localizationService.GetLocalizedString("MainWindow.Hello");
+        FamilyNamePart = setting?.FamilyNamePart ?? _localizationService.GetLocalizedString("MainWindow.Hello");
     }
 
     /// <summary>
@@ -117,7 +123,7 @@ internal class MainViewModel : BaseViewModel {
         RevitSettings setting = _pluginConfig.GetSettings(_revitRepository.Document)
                                 ?? _pluginConfig.AddSettings(_revitRepository.Document);
 
-        setting.SaveProperty = SaveProperty;
+        setting.FamilyNamePart = FamilyNamePart;
         _pluginConfig.SaveProjectConfig();
     }
 }

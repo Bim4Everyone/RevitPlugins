@@ -8,6 +8,8 @@
     xmlns:local="clr-namespace:RevitDocumenter.Views"
     xmlns:vms="clr-namespace:RevitDocumenter.ViewModels"
     xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
+    
+    xmlns:converters="clr-namespace:dosymep.WPF.Converters"
     xmlns:core="clr-namespace:dosymep.WpfUI.Core"
     xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
     xmlns:me="clr-namespace:dosymep.WpfCore.MarkupExtensions;assembly=dosymep.WpfCore"
@@ -16,12 +18,20 @@
     Title="{me:LocalizationSource MainWindow.Title}"
     
     Height="500"
-    Width="700"
+    Width="600"
     
     MinHeight="500"
-    MinWidth="700"
+    MinWidth="600"
    
     d:DataContext="{d:DesignInstance vms:MainViewModel, IsDesignTimeCreatable=False}">
+    <core:WpfUIPlatformWindow.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary
+                    Source="CustomStyles.xaml" />
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
+    </core:WpfUIPlatformWindow.Resources>
 
     <i:Interaction.Triggers>
         <i:EventTrigger EventName="Loaded">
@@ -32,7 +42,9 @@
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
             <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" />
             <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
         
@@ -40,26 +52,206 @@
             Grid.Row="0"
             Title="{me:LocalizationSource MainWindow.Title}" />
 
-        <ui:TextBox
+        <Border
             Grid.Row="1"
-            Width="200"
-            VerticalAlignment="Center"
-            HorizontalAlignment="Center"
-            Text="{Binding SaveProperty, UpdateSourceTrigger=PropertyChanged}" />
+            Margin="15 0 15 5"
+            Style="{StaticResource CustomBorder}">
+            <StackPanel>
+                <ui:TextBlock
+                    Margin="5"
+                    HorizontalAlignment="Stretch"
+                    Text="Family name part:"
+                    Style="{StaticResource CustomTextBlock}" />
 
-        <StackPanel
+                <ui:TextBox
+                    Margin="5"
+                    VerticalAlignment="Center"
+                    HorizontalAlignment="Stretch"
+                    Text="{Binding Path=FamilyNamePart}" />
+            </StackPanel>
+        </Border>
+
+
+        <Border
             Grid.Row="2"
+            Margin="15 5 15 5"
+            Style="{StaticResource CustomBorder}">
+
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="*" />
+                </Grid.RowDefinitions>
+
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="*" />
+                </Grid.ColumnDefinitions>
+
+                <ui:TextBlock
+                    Grid.ColumnSpan="2"
+                    Margin="5"
+                    HorizontalAlignment="Stretch"
+                    Text="Reference names:"
+                    Style="{StaticResource CustomTextBlock}" />
+
+                <Border
+                    Grid.Row="1"
+                    Grid.Column="0"
+                    Margin="5"
+                    Style="{StaticResource CustomBorder}">
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="*" />
+                            <RowDefinition Height="Auto" />
+                        </Grid.RowDefinitions>
+
+                        <ui:TextBlock
+                            Grid.Row="0"
+                            Margin="5"
+                            HorizontalAlignment="Stretch"
+                            Text="Vertical:"
+                            Style="{StaticResource CustomTextBlock}" />
+
+                        <ui:DataGrid
+                            Grid.Row="1"
+                            Style="{StaticResource CustomResizableDataGridStyle}"
+                            ItemsSource="{Binding 
+                                Path=ReferenceNamesVM.VerticalRefNames, 
+                                UpdateSourceTrigger=PropertyChanged, 
+                                Mode=TwoWay}">
+
+                            <DataGrid.Columns>
+                                <DataGridCheckBoxColumn
+                                    Binding="{Binding Path=IsCheck, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                    Header="IsCheck" />
+
+                                <DataGridTextColumn
+                                    Binding="{Binding Path=ReferenceName}"
+                                    Header="ReferenceName"
+                                    IsReadOnly="False" />
+                            </DataGrid.Columns>
+                        </ui:DataGrid>
+
+                        <StackPanel
+                            Grid.Row="2"
+                            Orientation="Horizontal"
+                            HorizontalAlignment="Right">
+
+                            <ui:Button
+                                Margin="5"
+                                Width="80"
+                                Content="Add"
+                                Command="{Binding Path=ReferenceNamesVM.AddVerticalNameRefCommand}" />
+
+                            <ui:Button
+                                Margin="5"
+                                Width="80"
+                                Content="Remove"
+                                Command="{Binding Path=ReferenceNamesVM.RemoveVerticalNameRefCommand}" />
+                        </StackPanel>
+                    </Grid>
+                </Border>
+
+                <Border
+                    Grid.Row="1"
+                    Grid.Column="1"
+                    Margin="5"
+                    Style="{StaticResource CustomBorder}">
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="*" />
+                            <RowDefinition Height="Auto" />
+                        </Grid.RowDefinitions>
+
+                        <ui:TextBlock
+                            Grid.Row="0"
+                            Margin="5"
+                            HorizontalAlignment="Stretch"
+                            Text="Horizontal:"
+                            Style="{StaticResource CustomTextBlock}" />
+
+                        <ui:DataGrid
+                            Grid.Row="1"
+                            Style="{StaticResource CustomResizableDataGridStyle}"
+                            ItemsSource="{Binding 
+                                Path=ReferenceNamesVM.HorizontalRefNames, 
+                                UpdateSourceTrigger=PropertyChanged, 
+                                Mode=TwoWay}">
+
+                            <DataGrid.Columns>
+                                <DataGridCheckBoxColumn
+                                    Binding="{Binding Path=IsCheck, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                    Header="IsCheck" />
+
+                                <DataGridTextColumn
+                                    Binding="{Binding Path=ReferenceName}"
+                                    Header="ReferenceName"
+                                    IsReadOnly="True" />
+                            </DataGrid.Columns>
+                        </ui:DataGrid>
+
+                        <StackPanel
+                            Grid.Row="2"
+                            Orientation="Horizontal"
+                            HorizontalAlignment="Right">
+
+                            <ui:Button
+                                Margin="5"
+                                Width="80"
+                                Content="Add"
+                                Command="{Binding Path=ReferenceNamesVM.AddHorizontalNameRefCommand}" />
+
+                            <ui:Button
+                                Margin="5"
+                                Width="80"
+                                Content="Remove"
+                                Command="{Binding Path=ReferenceNamesVM.RemoveHorizontalNameRefCommand}" />
+                        </StackPanel>
+                    </Grid>
+                </Border>
+            </Grid>
+        </Border>
+
+
+        <Border
+            Grid.Row="3"
+            Margin="15 5 15 5"
+            Style="{StaticResource CustomBorder}">
+            <StackPanel>
+                <ui:TextBlock
+                    Margin="5"
+                    HorizontalAlignment="Stretch"
+                    Text="Dimension type:"
+                    Style="{StaticResource CustomTextBlock}" />
+
+                <ComboBox
+                    Margin="5"
+                    VerticalAlignment="Center"
+                    HorizontalAlignment="Stretch"
+                    ItemsSource="{Binding Path=DimensionTypes}"
+                    SelectedItem="{Binding Path=SelectedDimensionType}"
+                    DisplayMemberPath="Name"/>
+            </StackPanel>
+        </Border>
+
+        
+        <StackPanel
+            Grid.Row="4"
+            Margin="0 0 10 10"
             Orientation="Horizontal"
             HorizontalAlignment="Right">
 
             <ui:TextBlock
-                Margin="10"
+                Margin="5"
                 Foreground="Orange"
                 VerticalAlignment="Center"
                 Text="{Binding ErrorText}" />
 
             <ui:Button
-                Margin="10"
+                Margin="5"
                 Width="80"
                 Appearance="Info"
                 Content="{me:LocalizationSource MainWindow.ButtonOk}"
@@ -67,7 +259,7 @@
                 Command="{Binding AcceptViewCommand}" />
 
             <ui:Button
-                Margin="10"
+                Margin="5"
                 Width="80"
                 Content="{me:LocalizationSource MainWindow.ButtonCancel}"
                 IsCancel="True"
