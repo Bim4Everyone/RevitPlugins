@@ -58,11 +58,20 @@
                             <edits:CustomGroupEditControl.EditControl>
                                 <ui:DataGrid
                                     Style="{StaticResource CustomResizableDataGridStyle}"
+                                    CanUserResizeColumns="True"
                                     ItemsSource="{Binding Elements}">
                                     <ui:DataGrid.Columns>
                                         <DataGridTextColumn
                                             Width="400"
                                             Binding="{Binding ElementInfo}">
+                                            <DataGridTextColumn.ElementStyle>
+                                                <Style
+                                                    TargetType="TextBlock">
+                                                    <Setter
+                                                        Property="TextWrapping"
+                                                        Value="Wrap" />
+                                                </Style>
+                                            </DataGridTextColumn.ElementStyle>
                                             <DataGridTextColumn.Header>
                                                 <TextBlock
                                                     Text="{DynamicResource WarningsWindow.HeaderName}" />
@@ -72,6 +81,14 @@
                                         <DataGridTextColumn
                                             Width="500"
                                             Binding="{Binding WarningInfo}">
+                                            <DataGridTextColumn.ElementStyle>
+                                                <Style
+                                                    TargetType="TextBlock">
+                                                    <Setter
+                                                        Property="TextWrapping"
+                                                        Value="Wrap" />
+                                                </Style>
+                                            </DataGridTextColumn.ElementStyle>
                                             <DataGridTextColumn.Header>
                                                 <TextBlock
                                                     Text="{DynamicResource WarningsWindow.HeaderDescription}" />
