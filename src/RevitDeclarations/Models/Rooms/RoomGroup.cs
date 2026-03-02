@@ -2,6 +2,8 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 
+using dosymep.Revit.Comparators;
+
 using pyRevitLabs.Json;
 
 namespace RevitDeclarations.Models;
@@ -20,13 +22,18 @@ internal abstract class RoomGroup {
     protected readonly bool _isOneRoomGroup = false;
     private readonly DeclarationSettings _settings;
 
-    public RoomGroup(IEnumerable<RoomElement> rooms, DeclarationSettings settings, RoomParamProvider paramProvider) {
+    public RoomGroup(IEnumerable<RoomElement> rooms, 
+                     DeclarationSettings settings, 
+                     RoomParamProvider paramProvider,
+                     LogicalStringComparer logicalStrComparer) {
         _settings = settings;
         _paramProvider = paramProvider;
         _accuracyForArea = settings.AccuracyForArea;
         _accuracyForLength = settings.AccuracyForLength;
 
-        _rooms = rooms.ToList();
+        _rooms = rooms
+            .OrderBy(x => x.Number, logicalStrComparer)
+            .ToList();
         _firstRoom = rooms.FirstOrDefault();
         if(rooms.Count() == 1) {
             _isOneRoomGroup = true;

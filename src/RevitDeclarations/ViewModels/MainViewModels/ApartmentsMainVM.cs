@@ -65,7 +65,7 @@ internal class ApartmentsMainVM : MainViewModel {
         }
 
         var projects = checkedDocuments
-            .Select(x => new ApartmentsProject(x, _revitRepository, _settings))
+            .Select(x => new ApartmentsProject(x, _revitRepository, _settings, _stringComparer))
             .ToList();
 
         // Проверка 2. Наличие квартир на выбранной стадии во всех выбранных проектах.

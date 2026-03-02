@@ -4,6 +4,8 @@ using System.Linq;
 
 using Autodesk.Revit.DB;
 
+using dosymep.Revit.Comparators;
+
 using RevitDeclarations.ViewModels;
 
 namespace RevitDeclarations.Models;
@@ -11,6 +13,7 @@ internal abstract class DeclarationProject {
     protected readonly RevitDocumentViewModel _document;
     protected readonly DeclarationSettings _settings;
     protected readonly RevitRepository _revitRepository;
+    protected readonly LogicalStringComparer _logicalStrComparer;
 
     protected readonly Phase _phase;
 
@@ -19,10 +22,12 @@ internal abstract class DeclarationProject {
 
     public DeclarationProject(RevitDocumentViewModel document,
                               RevitRepository revitRepository,
-                              DeclarationSettings settings) {
+                              DeclarationSettings settings, 
+                              LogicalStringComparer logicalStrComparer) {
         _document = document;
         _settings = settings;
         _revitRepository = revitRepository;
+        _logicalStrComparer = logicalStrComparer;
 
         _phase = revitRepository.GetPhaseByName(document.Document, _settings.SelectedPhase.Name);
 

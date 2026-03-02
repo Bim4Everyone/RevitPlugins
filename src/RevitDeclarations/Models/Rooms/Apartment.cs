@@ -1,6 +1,9 @@
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
+
+using dosymep.Revit.Comparators;
 
 using pyRevitLabs.Json;
 
@@ -20,8 +23,9 @@ internal class Apartment : RoomGroup {
 
     public Apartment(IEnumerable<RoomElement> rooms,
                      DeclarationSettings settings,
-                     RoomParamProvider paramProvider)
-        : base(rooms, settings, paramProvider) {
+                     RoomParamProvider paramProvider, 
+                     LogicalStringComparer logicalStrComparer)
+        : base(rooms, settings, paramProvider, logicalStrComparer) {
         _settings = (ApartmentsSettings) settings;
         _mainRooms = new Dictionary<string, List<RoomElement>>(_strComparer);
         _nonConfigRooms = new Dictionary<string, List<RoomElement>>(_strComparer);
@@ -32,13 +36,6 @@ internal class Apartment : RoomGroup {
             } else {
                 AddToDictionary(_nonConfigRooms, room);
             }
-        }
-
-        foreach(var pair in _mainRooms) {
-            pair.Value.Sort((x, y) => string.Compare(x.Number, y.Number));
-        }
-        foreach(var pair in _nonConfigRooms) {
-            pair.Value.Sort((x, y) => string.Compare(x.Number, y.Number));
         }
 
         CalculateRevitAreas();

@@ -61,7 +61,7 @@ internal class CommercialMainVM : MainViewModel {
         }
 
         var projects = checkedDocuments
-            .Select(x => new CommercialProject(x, _revitRepository, _settings))
+            .Select(x => new CommercialProject(x, _revitRepository, _settings, _stringComparer))
             .ToList();
 
         // Проверка 2. Наличие групп помещений на выбранной стадии во всех выбранных проектах.
