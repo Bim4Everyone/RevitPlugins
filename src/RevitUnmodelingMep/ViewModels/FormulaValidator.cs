@@ -19,13 +19,6 @@ internal static class FormulaValidator {
         return NoteElement.GetTokenNames();
     }
 
-    public static string NormalizeFormula(string formula) {
-        if(string.IsNullOrEmpty(formula))
-            return formula;
-
-        return formula;
-    }
-
     public static bool ValidateFormulas(
         IEnumerable<ConsumableTypeItem> consumableTypes,
         string saveProperty,
@@ -55,8 +48,10 @@ internal static class FormulaValidator {
 
         ConsumableTypeItem formulaWithComma = consumableTypes?
             .FirstOrDefault(item =>
-                !string.IsNullOrWhiteSpace(item?.Formula) &&
-                item.Formula.Contains(","));
+                (!string.IsNullOrWhiteSpace(item?.Formula)
+                 && item.Formula.Contains(","))
+                || (!string.IsNullOrWhiteSpace(item?.NoteValue)
+                    && item.NoteValue.Contains(",")));
 
         if(formulaWithComma != null) {
             string name = GetName(formulaWithComma);
@@ -66,7 +61,15 @@ internal static class FormulaValidator {
         }
 
         foreach(ConsumableTypeItem item in consumableTypes ?? Enumerable.Empty<ConsumableTypeItem>()) {
-            if(!IsFormulaAllowed(item, resolveCategoryId, out string invalidToken)) {
+            if(!IsFormulaAllowed(item, item.Formula, resolveCategoryId, out string invalidToken)) {
+                string name = GetName(item);
+                string message = localizationService?.GetLocalizedString("FormulaValidator.VariableError");
+                errorText = AppendDetail(AppendDetail(message, name), invalidToken);
+                return false;
+            }
+
+            if(!string.IsNullOrWhiteSpace(item.NoteValue)
+                && !IsFormulaAllowed(item, item.NoteValue, resolveCategoryId, out invalidToken)) {
                 string name = GetName(item);
                 string message = localizationService?.GetLocalizedString("FormulaValidator.VariableError");
                 errorText = AppendDetail(AppendDetail(message, name), invalidToken);
@@ -79,11 +82,12 @@ internal static class FormulaValidator {
 
     private static bool IsFormulaAllowed(
         ConsumableTypeItem item,
+        string formula,
         Func<ConsumableTypeItem, int?> resolveCategoryId,
         out string invalidToken) {
 
         invalidToken = null;
-        if(item == null || string.IsNullOrWhiteSpace(item.Formula)) {
+        if(item == null || string.IsNullOrWhiteSpace(formula)) {
             return false;
         }
 
@@ -102,8 +106,7 @@ internal static class FormulaValidator {
         };
 
 
-        string normalizedFormula = NormalizeFormula(item.Formula);
-        string formulaNoStrings = Regex.Replace(normalizedFormula, "\"[^\"]*\"", " ");
+        string formulaNoStrings = Regex.Replace(formula, "\"[^\"]*\"", " ");
 
         foreach(Match match in Regex.Matches(formulaNoStrings, @"[\p{L}_][\p{L}\p{Nd}_]*")) {
             string token = match.Value;

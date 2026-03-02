@@ -1,5 +1,6 @@
 using System.ComponentModel;
 using System.Windows;
+using System.Windows.Input;
 using System.Windows.Markup;
 
 using Wpf.Ui.Controls;
@@ -33,6 +34,9 @@ public partial class CustomGroupEditControl {
     public static readonly DependencyProperty ToggleSwitchVisibleProperty = DependencyProperty.Register(
         nameof(ToggleSwitchVisible), typeof(bool), typeof(CustomGroupEditControl), new PropertyMetadata(false));
 
+    public static readonly DependencyProperty ButtonVisibleProperty = DependencyProperty.Register(
+        nameof(ButtonVisible), typeof(bool), typeof(CustomGroupEditControl), new PropertyMetadata(false));
+
     public static readonly DependencyProperty ExtraIconVisibleProperty = DependencyProperty.Register(
         nameof(ExtraIconVisible), typeof(bool), typeof(CustomGroupEditControl), new PropertyMetadata(false));
 
@@ -44,6 +48,9 @@ public partial class CustomGroupEditControl {
 
     public static readonly DependencyProperty SwitchOffContentProperty = DependencyProperty.Register(
         nameof(SwitchOffContent), typeof(string), typeof(CustomGroupEditControl), new PropertyMetadata(default(string)));
+
+    public static readonly DependencyProperty ButtonCommandProperty = DependencyProperty.Register(
+        nameof(ButtonCommand), typeof(ICommand), typeof(CustomGroupEditControl), new PropertyMetadata(default(ICommand)));
 
 
     public CustomGroupEditControl() {
@@ -90,6 +97,11 @@ public partial class CustomGroupEditControl {
         set => SetValue(ToggleSwitchVisibleProperty, value);
     }
 
+    public bool ButtonVisible {
+        get => (bool) GetValue(ButtonVisibleProperty);
+        set => SetValue(ButtonVisibleProperty, value);
+    }
+
     public string SwitchOnContent {
         get => (string) GetValue(SwitchOnContentProperty);
         set => SetValue(SwitchOnContentProperty, value);
@@ -108,5 +120,10 @@ public partial class CustomGroupEditControl {
     public bool ExtraTextVisible {
         get => (bool) GetValue(ExtraTextVisibleProperty);
         set => SetValue(ExtraTextVisibleProperty, value);
+    }
+
+    public ICommand ButtonCommand {
+        get => (ICommand) GetValue(ButtonCommandProperty);
+        set => SetValue(ButtonCommandProperty, value);
     }
 }

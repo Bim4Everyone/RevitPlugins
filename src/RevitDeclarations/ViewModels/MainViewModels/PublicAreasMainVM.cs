@@ -47,7 +47,7 @@ internal class PublicAreasMainVM : MainViewModel {
         }
 
         var projects = checkedDocuments
-            .Select(x => new PublicAreasProject(x, _revitRepository, _settings, _localizationService))
+            .Select(x => new PublicAreasProject(x, _revitRepository, _settings, _stringComparer, _localizationService))
             .ToList();
 
         // Проверка 2. Наличие групп помещений на выбранной стадии во всех выбранных проектах.

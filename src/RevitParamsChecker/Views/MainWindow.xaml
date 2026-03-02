@@ -1,0 +1,127 @@
+<core:WpfUIPlatformWindow
+    x:Class="RevitParamsChecker.Views.MainWindow"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:base="clr-namespace:dosymep.WPF.Views"
+    xmlns:local="clr-namespace:RevitParamsChecker.Views"
+    xmlns:vms="clr-namespace:RevitParamsChecker.ViewModels"
+    xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
+    xmlns:wpfbehaviors="clr-namespace:dosymep.WpfCore.Behaviors;assembly=dosymep.WpfCore"
+    xmlns:core="clr-namespace:dosymep.WpfUI.Core"
+    xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
+    xmlns:me="clr-namespace:dosymep.WpfCore.MarkupExtensions;assembly=dosymep.WpfCore"
+    xmlns:checksViews="clr-namespace:RevitParamsChecker.Views.Checks"
+    xmlns:filtrationViews="clr-namespace:RevitParamsChecker.Views.Filtration"
+    xmlns:resultsViews="clr-namespace:RevitParamsChecker.Views.Results"
+    xmlns:rulesViews="clr-namespace:RevitParamsChecker.Views.Rules"
+    mc:Ignorable="d"
+    Title="{me:LocalizationSource MainWindow.Title}"
+    Height="700"
+    Width="1100"
+    MinHeight="500"
+    MinWidth="700"
+    Closed="MainWindow_OnClosed"
+    d:DataContext="{d:DesignInstance vms:MainViewModel, IsDesignTimeCreatable=False}"
+    x:ClassModifier="internal">
+    <Window.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ui:ThemesDictionary />
+                <ui:ControlsDictionary />
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
+    </Window.Resources>
+    <i:Interaction.Behaviors>
+        <wpfbehaviors:WpfAttachServiceBehavior
+            AttachableService="{Binding OpenFileDialogService}" />
+        <wpfbehaviors:WpfAttachServiceBehavior
+            AttachableService="{Binding SaveFileDialogService}" />
+        <wpfbehaviors:WpfAttachServiceBehavior
+            AttachableService="{Binding MessageBoxService}" />
+        <wpfbehaviors:WpfAttachServiceBehavior
+            AttachableService="{Binding ProgressDialogFactory}" />
+    </i:Interaction.Behaviors>
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition
+                Height="*" />
+            <RowDefinition
+                Height="Auto" />
+        </Grid.RowDefinitions>
+
+        <ui:TitleBar
+            Grid.Row="0"
+            x:Name="_titleBar"
+            Title="{me:LocalizationSource MainWindow.Title}" />
+
+        <ui:NavigationView
+            Grid.Row="0"
+            x:Name="_rootNavigationView"
+            FrameMargin="0"
+            OpenPaneLength="200"
+            IsPaneOpen="True"
+            PaneDisplayMode="Left"
+            IsBackButtonVisible="Visible"
+            IsPaneVisible="True"
+            IsPaneToggleVisible="True"
+            TitleBar="{Binding ElementName=_titleBar}"
+            BreadcrumbBar="{Binding ElementName=_breadcrumbBar}">
+
+            <ui:NavigationView.Header>
+                <StackPanel
+                    Margin="42 20 42 20">
+                    <ui:BreadcrumbBar
+                        x:Name="_breadcrumbBar" />
+                </StackPanel>
+            </ui:NavigationView.Header>
+
+            <ui:NavigationView.MenuItems>
+                <ui:NavigationViewItem
+                    Icon="{ui:SymbolIcon Symbol=Filter24}"
+                    Content="{me:LocalizationSource FiltrationPage.Title}"
+                    TargetPageType="{x:Type filtrationViews:FiltrationPage}" />
+
+                <ui:NavigationViewItem
+                    Icon="{ui:SymbolIcon Symbol=MathFormula24}"
+                    Content="{me:LocalizationSource RulesPage.Title}"
+                    TargetPageType="{x:Type rulesViews:RulesPage}" />
+
+                <ui:NavigationViewItem
+                    Icon="{ui:SymbolIcon Symbol=TableSettings24}"
+                    Content="{me:LocalizationSource ChecksPage.Title}"
+                    TargetPageType="{x:Type checksViews:ChecksPage}" />
+
+                <ui:NavigationViewItem
+                    Icon="{ui:SymbolIcon Symbol=DocumentTableCheckmark24}"
+                    Content="{me:LocalizationSource ResultsPage.Title}"
+                    TargetPageType="{x:Type resultsViews:ResultsPage}" />
+            </ui:NavigationView.MenuItems>
+        </ui:NavigationView>
+
+        <ContentPresenter
+            Grid.Row="0"
+            Grid.RowSpan="2"
+            x:Name="_rootContentDialog" />
+
+        <StackPanel
+            Grid.Row="1"
+            Orientation="Horizontal"
+            HorizontalAlignment="Right">
+
+            <ui:TextBlock
+                Margin="10"
+                Foreground="Orange"
+                VerticalAlignment="Center"
+                Text="{Binding ErrorText}" />
+
+            <ui:Button
+                Margin="10"
+                Width="80"
+                Content="{me:LocalizationSource Close}"
+                IsCancel="True"
+                Click="ButtonCancel_Click" />
+        </StackPanel>
+    </Grid>
+</core:WpfUIPlatformWindow>

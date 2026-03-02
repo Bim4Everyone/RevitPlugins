@@ -288,7 +288,7 @@ internal class MainViewModel : BaseViewModel {
                 ResolveCategoryOption,
                 out _lastConfigIndex);
 
-        ConsumableTypes = new ObservableCollection<ConsumableTypeItem>(consumableTypes);
+        ConsumableTypes = CreateSortedConsumableTypes(consumableTypes);
         UpdateTypesLists();
     }
 
@@ -302,7 +302,7 @@ internal class MainViewModel : BaseViewModel {
                 ResolveCategoryOption,
                 out _lastConfigIndex);
 
-        ConsumableTypes = new ObservableCollection<ConsumableTypeItem>(consumableTypes);
+        ConsumableTypes = CreateSortedConsumableTypes(consumableTypes);
     }
 
     private void SaveUnmodelingConfigs() {
@@ -328,6 +328,13 @@ internal class MainViewModel : BaseViewModel {
         }
 
         return configs;
+    }
+
+    private static ObservableCollection<ConsumableTypeItem> CreateSortedConsumableTypes(
+        IEnumerable<ConsumableTypeItem> consumableTypes) {
+        return new ObservableCollection<ConsumableTypeItem>(
+            (consumableTypes ?? Enumerable.Empty<ConsumableTypeItem>())
+                .OrderBy(item => item?.ConfigKey ?? string.Empty, StringComparer.CurrentCultureIgnoreCase));
     }
 
     private UnmodelingSettingsOptions BuildUnmodelingSettings() {

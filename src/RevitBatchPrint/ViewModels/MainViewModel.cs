@@ -8,12 +8,14 @@ using System.Windows.Input;
 
 using Autodesk.Revit.DB;
 
+using dosymep.Bim4Everyone;
 using dosymep.Revit;
 using dosymep.Revit.Comparators;
 using dosymep.SimpleServices;
 using dosymep.WPF.Commands;
 using dosymep.WPF.ViewModels;
 
+using RevitBatchPrint.Extensions;
 using RevitBatchPrint.Models;
 using RevitBatchPrint.Services;
 
@@ -44,7 +46,7 @@ internal class MainViewModel : BaseViewModel, IPrintContext, IExportContext {
     private string _albumParamName;
     private PrintOptionsViewModel _printOptions;
 
-    private ObservableCollection<string> _albumParamNames;
+    private ObservableCollection<RevitParam> _albumParamNames;
     private ObservableCollection<AlbumViewModel> _mainAlbums;
     private ObservableCollection<AlbumViewModel> _filteredAlbums;
 
@@ -140,13 +142,13 @@ internal class MainViewModel : BaseViewModel, IPrintContext, IExportContext {
         set => this.RaiseAndSetIfChanged(ref _filteredAlbums, value);
     }
 
-    public ObservableCollection<string> AlbumParamNames {
+    public ObservableCollection<RevitParam> AlbumParamNames {
         get => _albumParamNames;
         set => this.RaiseAndSetIfChanged(ref _albumParamNames, value);
     }
 
     private void LoadView() {
-        AlbumParamNames = new ObservableCollection<string>(_revitRepository.GetAlbumParamNames());
+        AlbumParamNames = new ObservableCollection<RevitParam>(_revitRepository.GetAlbumParamNames());
 
         LoadConfig();
         CreateAlbumCollection();
@@ -234,22 +236,30 @@ internal class MainViewModel : BaseViewModel, IPrintContext, IExportContext {
     }
 
     private bool CanAcceptView(bool checkSelected, bool checkPrint, bool checkExport) {
-        if(checkPrint && ShowPrint && string.IsNullOrEmpty(PrintOptions?.PrinterName)) {
+        if(checkPrint
+           && ShowPrint
+           && string.IsNullOrEmpty(PrintOptions?.PrinterName)) {
             ErrorText = _localizationService.GetLocalizedString("MainWindow.NotSelectedPrinter");
             return false;
         }
 
-        if(checkExport && ShowExport && string.IsNullOrEmpty(PrintOptions?.FilePath)) {
+        if(checkExport
+           && ShowExport
+           && string.IsNullOrEmpty(PrintOptions?.FilePath)) {
             ErrorText = _localizationService.GetLocalizedString("MainWindow.NotSelectedFilePath");
             return false;
         }
-        
-        if(checkExport && ShowExport && !PrintOptions.FilePath.EndsWith(".pdf", StringComparison.OrdinalIgnoreCase)) {
+
+        if(checkExport
+           && ShowExport
+           && !PrintOptions.FilePath.EndsWith(".pdf", StringComparison.OrdinalIgnoreCase)) {
             ErrorText = _localizationService.GetLocalizedString("MainWindow.FilePathNotPdf");
             return false;
         }
-        
-        if(checkExport && ShowExport && !Path.IsPathRooted(PrintOptions.FilePath)) {
+
+        if(checkExport
+           && ShowExport
+           && !Path.IsPathRooted(PrintOptions.FilePath)) {
             ErrorText = _localizationService.GetLocalizedString("MainWindow.FilePathNotRooted");
             return false;
         }
@@ -283,11 +293,15 @@ internal class MainViewModel : BaseViewModel, IPrintContext, IExportContext {
         CreateAlbumCollection();
     }
 
+    private RevitParam GetSelectedRevitParam() {
+        return AlbumParamNames.FirstOrDefault(item => item.Name == AlbumParamName);
+    }
+
     private void CreateAlbumCollection() {
         AlbumViewModel[] albums = _revitRepository.GetSheetsInfo()
-            .GroupBy(item => string.IsNullOrEmpty(AlbumParamName)
+            .GroupBy(item => AlbumParamName == null
                 ? null
-                : item.ViewSheet.GetParamValueOrDefault<string>(AlbumParamName))
+                : item.ViewSheet.GetParamDisplayValue(GetSelectedRevitParam()))
             .Select(item => CreateAlbum(item.Key, item))
             .OrderBy(item => item.Name)
             .ToArray();
@@ -352,12 +366,16 @@ internal class MainViewModel : BaseViewModel, IPrintContext, IExportContext {
         RevitSettings setting = _pluginConfig.GetSettings(_revitRepository.Document);
 
         AlbumParamName = AlbumParamNames
+                             .Select(item => item.Name)
                              .FirstOrDefault(item =>
                                  item.Equals(setting?.AlbumParamName))
                          ?? AlbumParamNames
+                             .Select(item => item.Name)
                              .FirstOrDefault(item =>
                                  PluginSystemConfig.PrintParamNames.Contains(item))
-                         ?? AlbumParamNames.FirstOrDefault();
+                         ?? AlbumParamNames
+                             .Select(item => item.Name)
+                             .FirstOrDefault();
 
         PrintOptions = new PrintOptionsViewModel(
             _printerService.EnumPrinterNames(),

@@ -11,9 +11,9 @@ using RevitDeclarations.ViewModels;
 
 namespace RevitDeclarations.Models;
 internal class UtpCalculator {
-    private const int _minHighFlatHeight = 3400;
     private const int _minBalconyDepth = 1200;
     private const int _minPantryDepth = 1000;
+    private const double _minHighFlatHeight = 3.4;
     private const double _minPantryArea = 1.8;
 
     private readonly ApartmentsProject _project;

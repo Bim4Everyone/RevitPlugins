@@ -10,7 +10,7 @@
     <system:String x:Key="MainWindow.TabTypesName">Типы расходников</system:String>
     <system:String x:Key="MainWindow.TabDestinationName">Назначение расходников</system:String>
     <system:String x:Key="MainWindow.FormulaVariables">Доступные переменные</system:String>
-    <system:String x:Key="MainWindow.PlaceholderBracesHint">Переменные нужно писать внутри фигурных скобок: {Переменная}</system:String>
+    <system:String x:Key="MainWindow.PlaceholderBracesHint">В данной ячейке формулы недоступны. Можно указывать только переменные, которые будут подставлены в итоговую строку. Переменные необходимо записывать в фигурных скобках: {Переменная}</system:String>
     
     <system:String x:Key="MainWindow.ButtonOk">ОК</system:String>
     <system:String x:Key="MainWindow.ButtonCancel">Отмена</system:String>
@@ -29,9 +29,11 @@
     <system:String x:Key="MainWindow.Code">Код изделия</system:String>
     <system:String x:Key="MainWindow.Unit">Ед. изм.</system:String>
     <system:String x:Key="MainWindow.Creator">Производитель</system:String>
-    <system:String x:Key="MainWindow.Formula">Формула</system:String>
+    <system:String x:Key="MainWindow.Formula">Формула числа</system:String>
     <system:String x:Key="MainWindow.RoundUpTotal">Округлять итог вверх до ближайшего целого</system:String>
-    <system:String x:Key="MainWindow.Note">Формула примечания</system:String>
+    <system:String x:Key="MainWindow.NoteValueFormula">Формула для примечаний(NoteValue)</system:String>
+    <system:String x:Key="MainWindow.RoundUpNoteTotal">Округлять итог для примечаний вверх до ближайшего целого</system:String>
+    <system:String x:Key="MainWindow.Note">Формат примечания</system:String>
 
     <system:String x:Key="MainViewModel.SavePropertyDefault">по умолчанию</system:String>
     <system:String x:Key="MainViewModel.SavePropertyEmpty">Ошибка конфигурации: не задано обязательное значение.</system:String>

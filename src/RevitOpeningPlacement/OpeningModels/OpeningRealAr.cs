@@ -27,11 +27,7 @@ internal class OpeningRealAr : OpeningRealByMep, IEquatable<OpeningRealAr> {
         Width = GetFamilyInstanceStringParamValueOrEmpty(RealOpeningArPlacer.RealOpeningArWidth);
         Height = GetFamilyInstanceStringParamValueOrEmpty(RealOpeningArPlacer.RealOpeningArHeight);
         Name = _familyInstance.Name;
-        Comment = _familyInstance.GetParamValueStringOrDefault(
-            SystemParamsConfig.Instance.CreateRevitParam(
-                _familyInstance.Document,
-                BuiltInParameter.ALL_MODEL_INSTANCE_COMMENTS),
-            string.Empty);
+        Comment = _familyInstance.GetParamValueOrDefault(BuiltInParameter.ALL_MODEL_INSTANCE_COMMENTS, string.Empty);
     }
 
 

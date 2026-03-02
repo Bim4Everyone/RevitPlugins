@@ -4,6 +4,7 @@ using System.Linq;
 using Autodesk.Revit.DB;
 
 using dosymep.SimpleServices;
+using dosymep.Revit.Comparators;
 
 using RevitDeclarations.ViewModels;
 
@@ -12,15 +13,16 @@ internal class ApartmentsProject : DeclarationProject {
     private UtpCalculator _utpCalculator;
 
     public ApartmentsProject(RevitDocumentViewModel document,
-                            RevitRepository revitRepository,
-                            DeclarationSettings settings,
-                            ILocalizationService localizationService) 
-        : base(document, revitRepository, settings, localizationService) {
+                             RevitRepository revitRepository,
+                             DeclarationSettings settings,
+                             LogicalStringComparer logicalStrComparer,
+                             ILocalizationService localizationService) 
+        : base(document, revitRepository, settings, logicalStrComparer, localizationService) {
 
         var paramProvider = new RoomParamProvider(settings);
         _roomGroups = revitRepository
             .GroupRooms(_rooms, settings)
-            .Select(x => new Apartment(x, settings, paramProvider))
+            .Select(x => new Apartment(x, settings, paramProvider, logicalStrComparer))
             .ToList();
     }
 

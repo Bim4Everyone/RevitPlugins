@@ -3,20 +3,28 @@ using System.Collections.ObjectModel;
 using System.Linq;
 using System.Windows.Input;
 
+using dosymep.WPF.Commands;
 using dosymep.WPF.ViewModels;
 
 using RevitSetCoordParams.Models;
 
 namespace RevitSetCoordParams.ViewModels;
 internal class WarningGroupViewModel : BaseViewModel {
+    private readonly RevitRepository _revitRepository;
 
     private ObservableCollection<WarningElementViewModel> _warnings;
     private string _caption;
     private string _description;
     private string _warningQuantity;
 
+    public WarningGroupViewModel(RevitRepository revitRepository) {
+        _revitRepository = revitRepository;
+        SelectAllCommand = RelayCommand.Create(SelectAll);
+    }
+
     public IReadOnlyCollection<WarningElement> WarningElements { get; set; } = [];
     public ICommand ShowElementCommand { get; set; }
+    public ICommand SelectAllCommand { get; }
 
     public ObservableCollection<WarningElementViewModel> Warnings {
         get => _warnings;
@@ -40,6 +48,14 @@ internal class WarningGroupViewModel : BaseViewModel {
     /// </summary>    
     public void LoadView() {
         Warnings = new(GetWarningElementViewModel());
+    }
+
+    // Метод команды на выделение всех элементов
+    private void SelectAll() {
+        var ids = Warnings
+            .Select(warning => warning.ID)
+            .ToList();
+        _revitRepository.SetSelected(ids);
     }
 
     // Метод получения списка WarningElementViewModel

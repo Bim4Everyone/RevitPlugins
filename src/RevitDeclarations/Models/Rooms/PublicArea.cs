@@ -1,14 +1,17 @@
 using System;
 using System.Collections.Generic;
 
+using dosymep.Revit.Comparators;
+
 namespace RevitDeclarations.Models;
 internal class PublicArea : RoomGroup {
     private readonly PublicAreasSettings _settings;
 
     public PublicArea(IEnumerable<RoomElement> rooms,
                       DeclarationSettings settings,
-                      RoomParamProvider paramProvider)
-        : base(rooms, settings, paramProvider) {
+                      RoomParamProvider paramProvider, 
+                      LogicalStringComparer logicalStrComparer)
+        : base(rooms, settings, paramProvider, logicalStrComparer) {
         _settings = (PublicAreasSettings) settings;
 
         RoomPosition = _paramProvider.GetRoomsPosition(this);

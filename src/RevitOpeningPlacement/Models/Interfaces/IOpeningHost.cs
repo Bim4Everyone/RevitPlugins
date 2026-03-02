@@ -4,7 +4,7 @@ namespace RevitOpeningPlacement.Models.Interfaces;
 /// <summary>
 /// Хост задания на отверстие или хост чистового отверстия
 /// </summary>
-internal interface IOpeningHost {
+internal interface IOpeningHost : ISelectorAndHighlighter {
     /// <summary>
     /// Название хоста
     /// </summary>

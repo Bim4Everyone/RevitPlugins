@@ -10,6 +10,7 @@ internal sealed class NoteElement {
     public double SumAreaWithStock_m2 { get; set; }
     public double SumLengthWithStock_mm { get; set; }
     public double SumLengthWithStock_m { get; set; }
+    public double NoteValue { get; set; }
 
     public static IReadOnlyList<string> GetTokenNames() {
         return new[] {
@@ -19,7 +20,8 @@ internal sealed class NoteElement {
             nameof(SumLengthWithStock_mm),
             nameof(SumLength_m),
             nameof(SumLengthWithStock_m),
-            nameof(Count)
+            nameof(Count),
+            nameof(NoteValue)
         };
     }
 }

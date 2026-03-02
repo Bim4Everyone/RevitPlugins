@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -82,11 +81,8 @@ internal class RevitRepository {
         }
 
         var categorySet = new HashSet<BuiltInCategory>(categories);
-
         var nested = GetAllNestedFamilyInstances(selectedElements);
-
         var dependent = GetAllDependentElements(selectedElements);
-
         var allElements = selectedElements
             .Concat(nested)
             .Concat(dependent)
@@ -134,7 +130,7 @@ internal class RevitRepository {
     }
 
     /// <summary>
-    /// Метод получения все вариантов значений объемных элементов по заданному параметру
+    /// Метод получения всех вариантов значений объемных элементов по заданному параметру
     /// </summary>
     public IEnumerable<string> GetSourceElementsValues(Document document) {
         var collector = new FilteredElementCollector(document)
@@ -194,32 +190,10 @@ internal class RevitRepository {
     }
 
     /// <summary>
-    /// Метод получения сферы-солида
-    /// </summary>
-    public Solid GetSphereSolid(XYZ location, double diameter) {
-        var startPoint = new XYZ(location.X, location.Y, location.Z - diameter / 2);
-        var midPoint = new XYZ(location.X + diameter / 2, location.Y, location.Z);
-        var endPoint = new XYZ(location.X, location.Y, location.Z + diameter / 2);
-
-        var arc = Arc.Create(startPoint, endPoint, midPoint);
-        var line = Line.CreateBound(endPoint, startPoint);
-
-        var curve_loop = CurveLoop.Create([arc, line]);
-
-        int startAngle = 0;
-        double endAngle = 2 * Math.PI;
-
-        var frame = new Frame { Origin = location };
-
-        return GeometryCreationUtilities.CreateRevolvedGeometry(frame, [curve_loop], startAngle, endAngle);
-    }
-
-    /// <summary>
     /// Метод выделения элементов в документе
     /// </summary>
-    public void SetSelected(ElementId elementId) {
-        List<ElementId> listElements = [elementId];
-        ActiveUIDocument.SetSelectedElements(listElements);
+    public void SetSelected(List<ElementId> elementIds) {
+        ActiveUIDocument.SetSelectedElements(elementIds);
     }
 
     // Метод получения объединенного солида

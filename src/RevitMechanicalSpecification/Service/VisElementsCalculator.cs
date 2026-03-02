@@ -47,7 +47,7 @@ namespace RevitMechanicalSpecification.Service {
         /// <returns></returns>
         public string GetDuctFittingMark(Element element) {
             List<Connector> connectors = GetConnectors(element);
-            Element duct = GetDuctFromFitting(connectors);
+            Element duct = GetDuctFromConnectorList(connectors);
             if(duct is null) {
                 return "!Не учитывать";
             }
@@ -323,44 +323,71 @@ namespace RevitMechanicalSpecification.Service {
         /// </summary>
         /// <param name="connectors"></param>
         /// <returns></returns>
-        private Element GetDuctFromFitting(List<Connector> connectors) {
-            var subConnectors = new List<Connector>();
+        private Element GetDuctFromConnectorList(List<Connector> connectors) {
             foreach(Connector connector in connectors) {
-                foreach(Connector reference in connector.AllRefs) {
+                Element duct = GetDuctFromConnector(connector);
+                if(duct != null) {
+                    return duct;
+                }
+            }
+
+            return null;
+        }
+
+        private Element GetDuctFromConnector(Connector connector) {
+            var subConnectors = new List<Connector>();
+
+            foreach(Connector reference in connector.AllRefs) {
+                if(reference.Owner.Category.IsId(BuiltInCategory.OST_DuctCurves)) {
+                    return reference.Owner;
+                }
+                if(reference.Owner.Category.IsId(BuiltInCategory.OST_DuctFitting)) {
+                    subConnectors.AddRange(GetConnectors(reference.Owner));
+                }
+            }
+
+            //Мы ищем воздуховод сначала среди коннекторов фитинга, а потом, если не находим, среди коннекторов возможных фитингов вокруг
+            //если там какая-то дикая конструкция из 4 соединенных фитингов - лучше вернуть нулл, а не искать дальше, таких мест вряд ли будет много
+            foreach(Connector subConnector in subConnectors) {
+                foreach(Connector reference in subConnector.AllRefs) {
                     if(reference.Owner.Category.IsId(BuiltInCategory.OST_DuctCurves)) {
                         return reference.Owner;
                     }
-                    if(reference.Owner.Category.IsId(BuiltInCategory.OST_DuctFitting)) {
-                        subConnectors.AddRange(GetConnectors(reference.Owner));
-                    }
-                }
-
-                //Мы ищем воздуховод сначала среди коннекторов фитинга, а потом, если не находим, среди коннекторов возможных фитингов вокруг
-                //если там какая-то дикая конструкция из 4 соединенных фитингов - лучше вернуть нулл, а не искать дальше, таких мест вряд ли будет много
-                foreach(Connector subConnector in subConnectors) {
-                    foreach(Connector reference in subConnector.AllRefs) {
-                        if(reference.Owner.Category.IsId(BuiltInCategory.OST_DuctCurves)) {
-                            return reference.Owner;
-                        }
-                    }
                 }
             }
+
             return null;
         }
 
         /// <summary>
-        /// получение толщины фитинга воздуховода
+        /// получение толщины фитинга воздуховода. Возвращает максимальное значение из подключенных воздуховодов
         /// </summary>
         /// <param name="element"></param>
         /// <returns></returns>
         private string GetDuctFittingThikness(Element element) {
             List<Connector> connectors = GetConnectors(element);
-            Element duct = GetDuctFromFitting(connectors);
-            if(duct is null) {
-                return null;
+            double maxValue = 0;
+            bool hasValue = false;
+
+            foreach(Connector connector in connectors) {
+                Element duct = GetDuctFromConnector(connector);
+                if(duct == null)
+                    continue;
+
+                string valueStr = GetDuctThikness(duct, duct.GetElementType());
+
+                if(double.TryParse(valueStr, out double value)) {
+                    if(value > maxValue) {
+                        maxValue = value;
+                        hasValue = true;
+                    }
+                }
             }
 
-            return GetDuctThikness(duct, duct.GetElementType());
+            if(!hasValue)
+                return null;
+
+            return maxValue.ToString();
         }
 
         /// <summary>

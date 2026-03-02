@@ -46,11 +46,7 @@ internal class OpeningArTaskIncoming : OpeningRealBase, IEquatable<OpeningArTask
         DisplayDiameter = GetFamilyInstanceStringParamValueOrEmpty(RealOpeningArPlacer.RealOpeningArDiameter);
         DisplayWidth = GetFamilyInstanceStringParamValueOrEmpty(RealOpeningArPlacer.RealOpeningArWidth);
         DisplayHeight = GetFamilyInstanceStringParamValueOrEmpty(RealOpeningArPlacer.RealOpeningArHeight);
-        Comment = _familyInstance.GetParamValueStringOrDefault(
-            SystemParamsConfig.Instance.CreateRevitParam(
-                _familyInstance.Document,
-                BuiltInParameter.ALL_MODEL_INSTANCE_COMMENTS),
-            string.Empty);
+        Comment = _familyInstance.GetParamValueOrDefault(BuiltInParameter.ALL_MODEL_INSTANCE_COMMENTS, string.Empty);
 
         Diameter = GetFamilyInstanceDoubleParamValueOrZero(RealOpeningArPlacer.RealOpeningArDiameter);
         Height = GetFamilyInstanceDoubleParamValueOrZero(RealOpeningArPlacer.RealOpeningArHeight);

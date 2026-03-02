@@ -100,16 +100,73 @@
                         DisplayMemberPath="FileName"/>
                 </edits:CustomEditControl>
 
-                <edits:CustomEditControl
+                <edits:CustomGroupEditControl
                     Icon="{ui:SymbolIcon grid24}"
                     Header="{me:LocalizationSource MainWindow.TypeModels}"
-                    Description="{me:LocalizationSource MainWindow.TypeModelsDescription}">
+                    Description="{me:LocalizationSource MainWindow.TypeModelsDescription}"
+                    ExtraIconVisible="False">
+                    <edits:CustomGroupEditControl.EditControl>
+                        <StackPanel>
+                            <Border
+                                Margin="5"
+                                VerticalAlignment="Center"
+                                HorizontalAlignment="Stretch"
+                                Background="{DynamicResource CardBackground}"
+                                BorderBrush="{DynamicResource CardBorderBrush}"
+                                CornerRadius="{DynamicResource ControlCornerRadius}"
+                                BorderThickness="{DynamicResource CardControlBorderThemeThickness}">
+                                <StackPanel
+                                    Orientation="Horizontal"
+                                    VerticalAlignment="Center"
+                                    HorizontalAlignment="Center">
+                                    <RadioButton
+                                        Margin="20,0,0,0"
+                                        GroupName="Choise"
+                                        Content="{me:LocalizationSource MainWindow.CheckedAllTypeModels}"
+                                        IsChecked="{Binding IsCheckedAllTypeModels, Mode=TwoWay}"
+                                        Command="{Binding CheckAllTypeModelsCommand}" />
+                                    <RadioButton
+                                        Margin="20,0,0,0"
+                                        GroupName="Choise"
+                                        Content="{me:LocalizationSource MainWindow.NotCheckedAllTypeModels}"
+                                        Command="{Binding UncheckAllTypeModelsCommand}" />
+                                </StackPanel>
+                            </Border>
+                            <ui:AutoSuggestBox
+                                Margin="5,0,5,20"
+                                Icon="{ui:SymbolIcon Search24}"
+                                Text="{Binding SearchTextTypeModels, Mode=TwoWay}"
+                                PlaceholderText="{me:LocalizationSource MainWindow.SearchTextTypeModels}">
+                                <i:Interaction.Triggers>
+                                    <i:EventTrigger
+                                        EventName="TextChanged">
+                                        <i:InvokeCommandAction
+                                            Command="{Binding SearchTypeModelsCommand}" />
+                                    </i:EventTrigger>
+                                </i:Interaction.Triggers>
+                            </ui:AutoSuggestBox>
+                            <ItemsControl
+                                ItemsSource="{Binding FilteredTypeModels}">
+                                <ItemsControl.ItemTemplate>
+                                    <DataTemplate
+                                        DataType="{x:Type vms:TypeModelViewModel}">
+                                        <edits:ItemControl
+                                            ItemName="{Binding Name}"
+                                            IsChecked="{Binding IsChecked, Mode=TwoWay}"
+                                            HasWarning="False" />
+                                    </DataTemplate>
+                                </ItemsControl.ItemTemplate>
 
-                    <ComboBox
-                        ItemsSource="{Binding TypeModels}"
-                        SelectedValue="{Binding SelectedTypeModel}"
-                        DisplayMemberPath="Name" />
-                </edits:CustomEditControl>
+                                <ItemsControl.ItemsPanel>
+                                    <ItemsPanelTemplate>
+                                        <UniformGrid
+                                            Columns="3" />
+                                    </ItemsPanelTemplate>
+                                </ItemsControl.ItemsPanel>
+                            </ItemsControl>
+                        </StackPanel>
+                    </edits:CustomGroupEditControl.EditControl>
+                </edits:CustomGroupEditControl>
 
                 <edits:CustomEditControl
                     Icon="{ui:SymbolIcon fullScreenMinimize24}"
@@ -161,7 +218,6 @@
                             </ItemsControl.ItemsPanel>
                         </ItemsControl>
                     </edits:CustomGroupEditControl.EditControl>
-
                 </edits:CustomGroupEditControl>
 
                 <edits:CustomGroupEditControl
@@ -211,8 +267,8 @@
                                 <ItemsControl.ItemTemplate>
                                     <DataTemplate
                                         DataType="{x:Type vms:CategoryViewModel}">
-                                        <edits:CategoryControl
-                                            CategoryName="{Binding CategoryName}"
+                                        <edits:ItemControl
+                                            ItemName="{Binding CategoryName}"
                                             IsChecked="{Binding IsChecked, Mode=TwoWay}"
                                             HasWarning="{Binding HasWarning, Mode=TwoWay}"
                                             WarningDescription="{Binding Warnings}" />

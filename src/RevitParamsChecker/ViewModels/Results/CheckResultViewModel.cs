@@ -1,0 +1,202 @@
+using System;
+using System.Collections;
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.ComponentModel;
+using System.Linq;
+using System.Windows.Data;
+using System.Windows.Input;
+
+using dosymep.SimpleServices;
+using dosymep.WPF.Commands;
+using dosymep.WPF.ViewModels;
+
+using RevitParamsChecker.Models.Results;
+using RevitParamsChecker.Models.Revit;
+using RevitParamsChecker.Services;
+using RevitParamsChecker.ViewModels.Rules;
+
+namespace RevitParamsChecker.ViewModels.Results;
+
+internal class CheckResultViewModel : BaseViewModel {
+    /// <summary>
+    /// Максимальный размер одной группы элементов
+    /// </summary>
+    private const int _chunkSize = 1000;
+
+    private readonly ILocalizationService _localization;
+    private readonly DelayAction _refreshViewDelay;
+    private readonly RevitRepository _revitRepo;
+    private readonly ObservableCollection<ElementResultViewModel> _allElementResults;
+    private readonly PropertyGroupDescription _defaultGroupDescription;
+    private string _elementsFilter;
+    private ElementResultViewModel _selectedElementResult;
+    private RuleViewModel _selectedRuleStamp;
+
+    public CheckResultViewModel(ILocalizationService localization, CheckResult checkResult, RevitRepository revitRepo) {
+        _localization = localization ?? throw new ArgumentNullException(nameof(localization));
+        _revitRepo = revitRepo ?? throw new ArgumentNullException(nameof(revitRepo));
+        CheckResult = checkResult ?? throw new ArgumentNullException(nameof(checkResult));
+        Name = CheckResult.CheckCopy.Name;
+        RulesStamp = GetRulesStamp(CheckResult, _localization);
+        _allElementResults = GetElementResults(CheckResult, _localization);
+        ElementResults = new CollectionViewSource() { Source = _allElementResults };
+        ElementResults.Filter += ElementResultsFilterHandler;
+        SelectElementsCommand = RelayCommand.Create<IList>(SelectElements, CanSelectElements);
+        RegroupElementsCommand = RelayCommand.Create(RegroupElements);
+        _refreshViewDelay = new DelayAction(300, () => ElementResults.View.Refresh());
+        var availableProperties = GetEditableGroupProperties(_localization);
+        GroupingProperties = new GroupDescriptionsViewModel(availableProperties, [availableProperties.First()]);
+        _defaultGroupDescription = new PropertyGroupDescription(nameof(ElementResultViewModel.ChunkName));
+        if(_allElementResults.Count <= _chunkSize) {
+            ResetGrouping(ElementResults, [availableProperties.First().PropertyGroupDescription]);
+        } else {
+            ResetGrouping(
+                ElementResults,
+                [_defaultGroupDescription, availableProperties.First().PropertyGroupDescription]);
+        }
+
+        PropertyChanged += ElementsFilterPropertyChanged;
+    }
+
+    public ICommand SelectElementsCommand { get; }
+    public ICommand RegroupElementsCommand { get; }
+    public string Name { get; }
+    public CheckResult CheckResult { get; }
+    public IReadOnlyCollection<RuleViewModel> RulesStamp { get; }
+    public CollectionViewSource ElementResults { get; }
+    public GroupDescriptionsViewModel GroupingProperties { get; }
+
+    public ElementResultViewModel SelectedElementResult {
+        get => _selectedElementResult;
+        set {
+            RaiseAndSetIfChanged(ref _selectedElementResult, value);
+            var ruleName = value?.RuleName;
+            if(!string.IsNullOrWhiteSpace(ruleName)) {
+                SelectedRuleStamp = RulesStamp.FirstOrDefault(r => r.Name == ruleName);
+            }
+        }
+    }
+
+    public RuleViewModel SelectedRuleStamp {
+        get => _selectedRuleStamp;
+        set => RaiseAndSetIfChanged(ref _selectedRuleStamp, value);
+    }
+
+    /// <summary>
+    /// Фильтр для таблицы с элементами в ui
+    /// </summary>
+    public string ElementsFilter {
+        get => _elementsFilter;
+        set => RaiseAndSetIfChanged(ref _elementsFilter, value);
+    }
+
+    private void SelectElements(IList items) {
+        var elements = items.OfType<ElementResultViewModel>()
+            .Select(vm => vm.ElementResult.ElementModel)
+            .ToArray();
+        _revitRepo.SelectElements(elements);
+    }
+
+    private bool CanSelectElements(IList items) {
+        return items != null && items.OfType<ElementResultViewModel>().Count() != 0;
+    }
+
+    private void ElementsFilterPropertyChanged(object sender, PropertyChangedEventArgs e) {
+        if(e.PropertyName == nameof(ElementsFilter)) {
+            _refreshViewDelay.Action();
+        }
+    }
+
+    private void ElementResultsFilterHandler(object sender, FilterEventArgs e) {
+        string filter = ElementsFilter?.Trim() ?? string.Empty;
+        if(string.IsNullOrWhiteSpace(filter)) {
+            e.Accepted = true;
+            return;
+        }
+
+        if(e.Item is ElementResultViewModel result) {
+            e.Accepted = result.FileName?.IndexOf(filter, StringComparison.CurrentCultureIgnoreCase) >= 0
+                         || result.FamilyTypeName?.IndexOf(filter, StringComparison.CurrentCultureIgnoreCase) >= 0
+                         || result.RuleName?.IndexOf(filter, StringComparison.CurrentCultureIgnoreCase) >= 0
+                         || result.Status?.IndexOf(filter, StringComparison.CurrentCultureIgnoreCase) >= 0
+                         || result.Error?.IndexOf(filter, StringComparison.CurrentCultureIgnoreCase) >= 0
+                         || result.UserMark?.IndexOf(filter, StringComparison.CurrentCultureIgnoreCase) >= 0
+                         || result.CategoryName?.IndexOf(filter, StringComparison.CurrentCultureIgnoreCase) >= 0;
+        }
+    }
+
+    private IList<PropertyViewModel> GetEditableGroupProperties(ILocalizationService localization) {
+        return [
+            new PropertyViewModel(
+                localization.GetLocalizedString("ResultsPage.StatusHeader"),
+                nameof(ElementResultViewModel.Status)),
+            new PropertyViewModel(
+                localization.GetLocalizedString("ResultsPage.FileNameHeader"),
+                nameof(ElementResultViewModel.FileName)),
+            new PropertyViewModel(
+                localization.GetLocalizedString("ResultsPage.RuleNameHeader"),
+                nameof(ElementResultViewModel.RuleName)),
+            new PropertyViewModel(
+                localization.GetLocalizedString("ResultsPage.FamilyTypeNameHeader"),
+                nameof(ElementResultViewModel.FamilyTypeName)),
+            new PropertyViewModel(
+                localization.GetLocalizedString("ResultsPage.CategoryNameHeader"),
+                nameof(ElementResultViewModel.CategoryName))
+        ];
+    }
+
+    private void ResetGrouping(CollectionViewSource collection, IList<PropertyGroupDescription> properties) {
+        collection.GroupDescriptions.Clear();
+        foreach(var p in properties) {
+            collection.GroupDescriptions.Add(p);
+        }
+    }
+
+    private ObservableCollection<ElementResultViewModel> GetElementResults(
+        CheckResult checkResult,
+        ILocalizationService localization) {
+        ElementResultViewModel[] elements = checkResult.RuleResults
+            .SelectMany(res => res.ElementResults)
+            .Select(e => new ElementResultViewModel(localization, e))
+            .OrderBy(e => e.ElementResult.Status)
+            .ThenBy(e => e.FileName)
+            .ThenBy(e => e.RuleName)
+            .ThenBy(e => e.FamilyTypeName)
+            .ToArray();
+        for(int i = 0; i < elements.Length; i++) {
+            int groupStart = (i / _chunkSize) * _chunkSize + 1;
+            int groupEnd = Math.Min(groupStart + _chunkSize - 1, elements.Length);
+            elements[i].ItemNumber = i + 1;
+            elements[i].ChunkName = $"[{groupStart}...{groupEnd}]";
+        }
+
+        return new ObservableCollection<ElementResultViewModel>(elements);
+    }
+
+    private ReadOnlyCollection<RuleViewModel> GetRulesStamp(
+        CheckResult checkResult,
+        ILocalizationService localization) {
+        return new ReadOnlyCollection<RuleViewModel>(
+            checkResult.RuleResults
+                .Select(r => new RuleViewModel(r.RuleCopy, localization))
+                .ToArray()
+        );
+    }
+
+    private void RegroupElements() {
+        if(!GroupingProperties.IsGroupingEnabled) {
+            ResetGrouping(ElementResults, []);
+            return;
+        }
+
+        var groups = GroupingProperties.GroupDescriptions
+            .Select(g => g.SelectedProperty.PropertyGroupDescription)
+            .ToArray();
+        if(_allElementResults.Count <= _chunkSize) {
+            ResetGrouping(ElementResults, groups);
+        } else {
+            ResetGrouping(ElementResults, [_defaultGroupDescription, .. groups]);
+        }
+    }
+}

@@ -1,0 +1,84 @@
+using System.Collections.Generic;
+using System.Windows;
+using System.Windows.Input;
+
+using dosymep.SimpleServices;
+
+namespace RevitParamsChecker.Views.Checks;
+
+internal partial class SelectedNamesControl {
+    public SelectedNamesControl()
+        : base() {
+        InitializeComponent();
+    }
+
+    public SelectedNamesControl(
+        ILoggerService loggerService,
+        ILanguageService languageService,
+        ILocalizationService localizationService,
+        IUIThemeService uiThemeService,
+        IUIThemeUpdaterService themeUpdaterService)
+        : base(
+            loggerService,
+            languageService,
+            localizationService,
+            uiThemeService,
+            themeUpdaterService) {
+        InitializeComponent();
+    }
+
+    public static readonly DependencyProperty SelectedNamesProperty = DependencyProperty.Register(
+        nameof(SelectedNames),
+        typeof(ICollection<string>),
+        typeof(SelectedNamesControl),
+        new FrameworkPropertyMetadata(null, FrameworkPropertyMetadataOptions.BindsTwoWayByDefault));
+
+    public static readonly DependencyProperty SelectNamesCommandProperty = DependencyProperty.Register(
+        nameof(SelectNamesCommand),
+        typeof(ICommand),
+        typeof(SelectedNamesControl),
+        new PropertyMetadata(null));
+
+    public static readonly DependencyProperty SelectNamesCommandParameterProperty = DependencyProperty.Register(
+        nameof(SelectNamesCommandParameter),
+        typeof(object),
+        typeof(SelectedNamesControl),
+        new PropertyMetadata(null));
+
+    public static readonly DependencyProperty SelectNamesPromptProperty = DependencyProperty.Register(
+        nameof(SelectNamesPrompt),
+        typeof(string),
+        typeof(SelectedNamesControl),
+        new PropertyMetadata(default(string)));
+
+    public static readonly DependencyProperty WarningMessageProperty = DependencyProperty.Register(
+        nameof(WarningMessage),
+        typeof(string),
+        typeof(SelectedNamesControl),
+        new FrameworkPropertyMetadata(null, FrameworkPropertyMetadataOptions.BindsTwoWayByDefault));
+
+    public ICollection<string> SelectedNames {
+        get => (ICollection<string>) GetValue(SelectedNamesProperty);
+        set => SetValue(SelectedNamesProperty, value);
+    }
+
+    public ICommand SelectNamesCommand {
+        get => (ICommand) GetValue(SelectNamesCommandProperty);
+        set => SetValue(SelectNamesCommandProperty, value);
+    }
+
+    public object SelectNamesCommandParameter {
+        get => (object) GetValue(SelectNamesCommandParameterProperty);
+        set => SetValue(SelectNamesCommandParameterProperty, value);
+    }
+
+    public string SelectNamesPrompt {
+        get => (string) GetValue(SelectNamesPromptProperty);
+        set => SetValue(SelectNamesPromptProperty, value);
+    }
+
+    public string WarningMessage {
+        get => (string) GetValue(WarningMessageProperty);
+        set => SetValue(WarningMessageProperty, value);
+    }
+}

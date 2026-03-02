@@ -1,0 +1,76 @@
+﻿<ResourceDictionary
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:system="clr-namespace:System;assembly=mscorlib">
+
+    <system:String
+        x:Key="Ok">ОК</system:String>
+    <system:String
+        x:Key="Cancel">Отмена</system:String>
+
+    <system:String
+        x:Key="MainWindow.Title">Пакетный экспорт спек в XLSX</system:String>
+    <system:String
+        x:Key="MainWindow.SelectedProjects">Выбранные проекты</system:String>
+    <system:String
+        x:Key="MainWindow.SelectedParameter">Параметр листа</system:String>
+
+    <system:String
+        x:Key="ProgressTitle">Обработка документов... [{0}]\[{1}]</system:String>
+
+    <system:String
+        x:Key="FileSuffix.Copy">копия</system:String>
+
+    <system:String
+        xml:space="preserve"
+        x:Key="Errors.FileNamesConflict">
+Эти документы нельзя выгрузить за один раз,
+т.к. они образуют конфликт имен в листах Excel:
+{0}
+Имя листа Excel должно быть не более {1} символов
+и не должно содержать {2}
+</system:String>
+    <system:String
+        xml:space="preserve"
+        x:Key="Errors.CannotProcessOpenedDocument">
+Нельзя обработать открытый документ:
+'{0}'</system:String>
+    <system:String
+        xml:space="preserve"
+        x:Key="Errors.NotSupportedDocumentVersion">
+Документ создан в более поздней версии:
+'{0}'</system:String>
+    <system:String
+        xml:space="preserve"
+        x:Key="Errors.DocumentHasTooManyErrors">
+В документе слишком много ошибок:
+'{0}'</system:String>
+    <system:String
+        xml:space="preserve"
+        x:Key="Errors.CannotProcessDocument">
+Документ нельзя обработать:
+'{0}'</system:String>
+    <system:String
+        xml:space="preserve"
+        x:Key="Errors.DocumentIsRemoved">
+Документ удален:
+'{0}'</system:String>
+    <system:String
+        xml:space="preserve"
+        x:Key="Errors.InsufficientResources">
+У компьютера недостаточно ресурсов,
+чтобы открыть модель.</system:String>
+    <system:String
+        xml:space="preserve"
+        x:Key="Errors.DocumentAlreadyAdded">
+Документ уже добавлен в список:
+'{0}'</system:String>
+
+    <system:String
+        xml:space="preserve"
+        x:Key="Warnings.DocumentWillBeRemoved">
+Из списка будет удален документ:
+{0}
+Продолжить?</system:String>
+
+</ResourceDictionary>
