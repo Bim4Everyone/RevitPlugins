@@ -24,8 +24,8 @@ internal class ViewHelper {
     /// </summary>
     public ViewHelper(ViewPlan viewPlan, ILocalizationService localizationService) {
         View = viewPlan;
-        NameHelper = new ViewNameHelper(viewPlan, _localizationService);
         _localizationService = localizationService;
+        NameHelper = new ViewNameHelper(viewPlan, _localizationService);
     }
 
     public RevitRepository Repository { get; set; }
