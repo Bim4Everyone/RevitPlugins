@@ -54,6 +54,8 @@ internal abstract class ParametersViewModel : BaseViewModel {
     public ICommand SetLastConfigCommand { get; }
     public ICommand SetCompanyConfigCommand { get; }
 
+    public IList<RevitDocumentViewModel> RevitDocuments => _mainViewModel.DeclarationViewModel.RevitDocuments;
+
     public RevitDocumentViewModel SelectedDocument {
         get => _selectedDocument;
         set {
