@@ -12,9 +12,9 @@ internal class ApartmentsProject : DeclarationProject {
     private UtpCalculator _utpCalculator;
 
     public ApartmentsProject(RevitDocumentViewModel document,
-                            RevitRepository revitRepository,
-                            DeclarationSettings settings,
-                            LogicalStringComparer logicalStrComparer) 
+                             RevitRepository revitRepository,
+                             DeclarationSettings settings,
+                             LogicalStringComparer logicalStrComparer) 
         : base(document, revitRepository, settings, logicalStrComparer) {
 
         var paramProvider = new RoomParamProvider(settings);
