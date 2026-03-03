@@ -1,3 +1,5 @@
+using System.Collections.Generic;
+
 using dosymep.Bim4Everyone;
 using dosymep.Bim4Everyone.ProjectConfigs;
 
@@ -58,8 +60,9 @@ internal class RevitSettings : ProjectSettings {
     /// </summary>
     public override string ProjectName { get; set; }
 
-    /// <summary>
-    /// Сохраняемое свойство для примера, нужно его заменить своими настройками.
-    /// </summary>
     public string FamilyNamePart { get; set; }
+    public string SelectedDimensionTypeName { get; set; }
+
+    public List<string> VerticalRefNames { get; set; }
+    public List<string> HorizontalRefNames { get; set; }
 }

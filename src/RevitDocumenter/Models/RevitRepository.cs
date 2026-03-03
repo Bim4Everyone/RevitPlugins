@@ -48,6 +48,7 @@ internal class RevitRepository {
     public List<DimensionType> DimensionTypes => new FilteredElementCollector(Document)
         .OfClass(typeof(DimensionType))
         .OfType<DimensionType>()
+        .Where(d => d.StyleType == DimensionStyleType.Linear)
         .OrderBy(a => a.FamilyName)
         .ThenBy(a => a.Name)
         .ToList();

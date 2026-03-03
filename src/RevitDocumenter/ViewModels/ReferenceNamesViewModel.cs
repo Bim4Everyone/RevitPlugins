@@ -10,8 +10,8 @@ using RevitDocumenter.Models;
 namespace RevitDocumenter.ViewModels;
 internal class ReferenceNamesViewModel : BaseViewModel {
     public ReferenceNamesViewModel() {
-        VerticalRefNames = [new("Габарит_Ширина_1"), new("Габарит_Ширина_2")];
-        HorizontalRefNames = [new("Габарит_Длина_1"), new("Габарит_Длина_2")];
+        VerticalRefNames = [];
+        HorizontalRefNames = [];
 
         AddVerticalNameRefCommand = RelayCommand.Create(AddVerticalNameRef);
         RemoveVerticalNameRefCommand = RelayCommand.Create(RemoveVerticalNameRef, CanRemoveVerticalNameRef);

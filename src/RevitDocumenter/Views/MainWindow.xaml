@@ -17,10 +17,10 @@
     mc:Ignorable="d"
     Title="{me:LocalizationSource MainWindow.Title}"
     
-    Height="500"
+    Height="650"
     Width="600"
     
-    MinHeight="500"
+    MinHeight="650"
     MinWidth="600"
    
     d:DataContext="{d:DesignInstance vms:MainViewModel, IsDesignTimeCreatable=False}">
@@ -189,7 +189,7 @@
                                 <DataGridTextColumn
                                     Binding="{Binding Path=ReferenceName}"
                                     Header="ReferenceName"
-                                    IsReadOnly="True" />
+                                    IsReadOnly="False" />
                             </DataGrid.Columns>
                         </ui:DataGrid>
 

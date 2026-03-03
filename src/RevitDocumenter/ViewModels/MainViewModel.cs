@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Linq;
 using System.Windows.Input;
 
 using Autodesk.Revit.DB;
@@ -23,6 +24,12 @@ internal class MainViewModel : BaseViewModel {
     private string _familyNamePart;
     private DimensionType _selectedDimensionType;
     private List<DimensionType> _dimensionTypes;
+
+    private readonly string _defFamilyNamePart = "IFC_Зона_Доп.Арм";
+    private readonly string _defSelectedDimensionTypeName = "я_Основной_Плагин_2.5 мм";
+    private readonly List<string> _defVerticalRefNames = ["Габарит_Ширина_1", "Габарит_Ширина_2"];
+    private readonly List<string> _defHorizontalRefNames = ["Габарит_Длина_1", "Габарит_Длина_2"];
+
 
     /// <summary>
     /// Создает экземпляр основной ViewModel главного окна.
@@ -80,9 +87,9 @@ internal class MainViewModel : BaseViewModel {
     /// </summary>
     /// <remarks>В данном методе должна происходить загрузка настроек окна, а так же инициализация полей окна.</remarks>
     private void LoadView() {
-        LoadConfig();
-
         DimensionTypes = _revitRepository.DimensionTypes;
+
+        LoadConfig();
     }
 
     /// <summary>
@@ -111,9 +118,17 @@ internal class MainViewModel : BaseViewModel {
     /// Загрузка настроек плагина.
     /// </summary>
     private void LoadConfig() {
-        RevitSettings setting = _pluginConfig.GetSettings(_revitRepository.Document);
+        var setting = _pluginConfig.GetSettings(_revitRepository.Document);
 
-        FamilyNamePart = setting?.FamilyNamePart ?? _localizationService.GetLocalizedString("MainWindow.Hello");
+        FamilyNamePart = setting?.FamilyNamePart ?? _defFamilyNamePart;
+        SelectedDimensionType = DimensionTypes.FirstOrDefault(d =>
+            d.Name.Equals(setting?.SelectedDimensionTypeName ?? _defSelectedDimensionTypeName));
+
+        var verticalRefNames = setting?.VerticalRefNames ?? _defVerticalRefNames;
+        verticalRefNames.ForEach(item => ReferenceNamesVM.VerticalRefNames.Add(new ReferenceNameViewModel(item)));
+
+        var horizontalRefNames = setting?.HorizontalRefNames ?? _defHorizontalRefNames;
+        horizontalRefNames.ForEach(item => ReferenceNamesVM.HorizontalRefNames.Add(new ReferenceNameViewModel(item)));
     }
 
     /// <summary>
@@ -124,6 +139,11 @@ internal class MainViewModel : BaseViewModel {
                                 ?? _pluginConfig.AddSettings(_revitRepository.Document);
 
         setting.FamilyNamePart = FamilyNamePart;
+        setting.SelectedDimensionTypeName = SelectedDimensionType.Name;
+
+        setting.VerticalRefNames = [.. ReferenceNamesVM.VerticalRefNames.Select(r => r.ReferenceName)];
+        setting.HorizontalRefNames = [.. ReferenceNamesVM.HorizontalRefNames.Select(r => r.ReferenceName)];
+
         _pluginConfig.SaveProjectConfig();
     }
 }
