@@ -30,16 +30,11 @@
                 <RowDefinition Height="Auto"/>
                 <RowDefinition Height="Auto"/>
                 <RowDefinition Height="Auto"/>
-                <RowDefinition Height="Auto"/>
-                <RowDefinition Height="Auto"/>
-                <RowDefinition Height="Auto"/>
-                <RowDefinition Height="Auto"/>
-                <RowDefinition Height="Auto"/>
             </Grid.RowDefinitions>
         
             <Border
                 Grid.Row="0"
-                Margin="14,4"
+                Margin="14,14,14,4"
                 Style="{StaticResource CustomBorder}">
                 <Grid>
                     <Grid.RowDefinitions>
@@ -283,7 +278,7 @@
 
             <Border
                 Grid.Row="2"
-                Margin="14,0,14,4"
+                Margin="14,0,14,14"
                 Style="{StaticResource CustomBorder}">
                 <Grid>
                     <Grid.RowDefinitions>
