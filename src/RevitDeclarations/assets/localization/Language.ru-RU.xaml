@@ -164,7 +164,7 @@
     </system:String>
     <system:String x:Key="WarningsWindow.BathErrors">В проекте отсутсвуют семейства ванн и душевых</system:String>
     <system:String x:Key="WarningsWindow.BathErrorsInfo">
-        "В проекте отсутствуют экземпляры семейств с именами, включающими "ванн" или "душев". 
+        В проекте отсутствуют экземпляры семейств с именами, включающими "ванн" или "душев". 
         УТП "Две ванные" не может быть корректно рассчитано.
     </system:String>
     <system:String x:Key="WarningsWindow.Continue">Выгрузить декларацию</system:String>
