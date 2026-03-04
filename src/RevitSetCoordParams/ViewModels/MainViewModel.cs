@@ -395,11 +395,11 @@ internal class MainViewModel : BaseViewModel {
     // Основной метод
     private void AcceptView() {
         SaveConfig();
-
         IIntersectProcessor processor = new IntersectCurveProcessor(_localizationService, _revitRepository, _setCoordParamsSettings);
+        var elements = processor.RevitElements;
 
         using var progressDialogService = ProgressDialogFactory.CreateDialog();
-        progressDialogService.MaxValue = processor.RevitElements.Count();
+        progressDialogService.MaxValue = elements.Count();
         progressDialogService.StepValue = 20;
         progressDialogService.DisplayTitleFormat = _localizationService.GetLocalizedString("MainViewModel.ProgressTitle");
         var progress = progressDialogService.CreateProgress();
