@@ -3,6 +3,7 @@ using System.Linq;
 
 using Autodesk.Revit.DB;
 
+using dosymep.SimpleServices;
 using dosymep.Revit.Comparators;
 
 using RevitDeclarations.ViewModels;
@@ -14,8 +15,9 @@ internal class ApartmentsProject : DeclarationProject {
     public ApartmentsProject(RevitDocumentViewModel document,
                              RevitRepository revitRepository,
                              DeclarationSettings settings,
-                             LogicalStringComparer logicalStrComparer) 
-        : base(document, revitRepository, settings, logicalStrComparer) {
+                             LogicalStringComparer logicalStrComparer,
+                             ILocalizationService localizationService) 
+        : base(document, revitRepository, settings, logicalStrComparer, localizationService) {
 
         var paramProvider = new RoomParamProvider(settings);
         _roomGroups = revitRepository
@@ -30,48 +32,46 @@ internal class ApartmentsProject : DeclarationProject {
     /// Проверяется общая площадь, жилая, без летних помещений и площадь с коэффициентом.
     /// </summary>
     /// <returns></returns>
-    public ErrorsListViewModel CheckRoomAreasEquality() {
-        var errorListVM = new ErrorsListViewModel() {
-            Message = "Ошибка",
-            Description = "Площади, рассчитанные квартирографией отличаются в пределах квартиры",
+    public WarningViewModel CheckRoomAreasEquality() {
+        var errorListVM = new WarningViewModel(_localizationService) {
+            WarningType = _localizationService.GetLocalizedString("WarningWindow.Error"),
+            Description = _localizationService.GetLocalizedString("WarningsWindow.DiffInAreas"),
             DocumentName = _document.Name
         };
 
         foreach(Apartment apartment in _roomGroups) {
             if(!apartment.CheckEqualityOfRoomAreas()) {
-                string apartInfo = $"Группа помещений № {apartment.Number} на этаже {apartment.Level}";
-                string apartAreas = "Площади квартиры (без коэффициента/с коэффициентом/жилая/без ЛП) " +
-                    "должны быть одинаковыми для каждого помещения квартиры";
-                errorListVM.Errors.Add(new ErrorElement(apartInfo, apartAreas));
+                string apartInfo = _localizationService
+                    .GetLocalizedString("WarningsWindow.ErrorRoomGroup", apartment.Number, apartment.Level);                
+                string apartAreas = _localizationService.GetLocalizedString("WarningsWindow.ErrorRoomAreasInfo");
+                errorListVM.Elements.Add(new WarningElementViewModel(apartInfo, apartAreas));
             }
         }
 
         return errorListVM;
     }
 
-    public ErrorsListViewModel CheckActualApartmentAreas() {
-        var errorListVM = new ErrorsListViewModel() {
-            Message = "Предупреждение",
-            Description = "Не актуальные площади квартир, рассчитанные квартирографией",
+    public WarningViewModel CheckActualApartmentAreas() {
+        var errorListVM = new WarningViewModel(_localizationService) {
+            WarningType = _localizationService.GetLocalizedString("WarningWindow.Warning"),
+            Description = _localizationService.GetLocalizedString("WarningsWindow.ErrorRoomNotActualAreasInfo"),
             DocumentName = _document.Name
         };
 
         foreach(Apartment apartment in _roomGroups) {
             if(!apartment.CheckActualApartmentAreas()) {
-                string apartInfo = $"Группа помещений № {apartment.Number} на этаже {apartment.Level}";
-                string apartAreas = "Площади квартиры, рассчитанные квартирографией " +
-                    "отличаются от суммы актуальных системных площадей этой квартиры. " +
-                    "Проверьте общую площадь квартиры, площадь с коэффициентом, " +
-                    "площадь жилых помещений и площадь без летних помещений";
-                errorListVM.Errors.Add(new ErrorElement(apartInfo, apartAreas));
+                string apartInfo = _localizationService
+                    .GetLocalizedString("WarningsWindow.ErrorRoomGroup", apartment.Number, apartment.Level);
+                string apartAreas = _localizationService.GetLocalizedString("WarningsWindow.ErrorApartsNotActualAreasInfo");
+                errorListVM.Elements.Add(new WarningElementViewModel(apartInfo, apartAreas));
             }
         }
 
         return errorListVM;
     }
 
-    public IReadOnlyCollection<ErrorsListViewModel> CheckUtpWarnings() {
-        _utpCalculator = new UtpCalculator(this, _settings);
+    public IReadOnlyCollection<WarningViewModel> CheckUtpWarnings() {
+        _utpCalculator = new UtpCalculator(this, _settings, _localizationService);
         return _utpCalculator.CheckProjectForUtp();
     }
 

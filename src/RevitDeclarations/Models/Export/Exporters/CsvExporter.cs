@@ -3,9 +3,14 @@ using System.IO;
 using System.Linq;
 using System.Text;
 
+using dosymep.SimpleServices;
+
 namespace RevitDeclarations.Models;
 internal class CsvExporter : ITableExporter {
-    public void Export(string path, IDeclarationDataTable table) {
+    public void Export(string path, 
+                       IDeclarationDataTable table,
+                       ILocalizationService localizationService,
+                       IMessageBoxService messageBoxService) {
         string fullPath = $"{path}.csv";
 
         string strData = ConvertDataTableToString(table);
@@ -18,7 +23,7 @@ internal class CsvExporter : ITableExporter {
             int tableNumber = 1;
             foreach(var subTable in table.SubTables) {
                 path = $"{path}-{tableNumber}";
-                Export(path, subTable);
+                Export(path, subTable, localizationService, messageBoxService);
                 tableNumber++;
             }
         }

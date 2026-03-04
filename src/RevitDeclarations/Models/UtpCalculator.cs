@@ -4,6 +4,7 @@ using System.Linq;
 
 using Autodesk.Revit.DB;
 
+using dosymep.SimpleServices;
 using dosymep.WPF.Extensions;
 
 using RevitDeclarations.ViewModels;
@@ -17,6 +18,7 @@ internal class UtpCalculator {
 
     private readonly ApartmentsProject _project;
     private readonly ApartmentsSettings _settings;
+    private readonly ILocalizationService _localizationService;
     private readonly PrioritiesConfig _priorities;
     private readonly RoomConnectionAnalyzer _roomConnectionAnalyzer;
 
@@ -24,10 +26,15 @@ internal class UtpCalculator {
     private readonly bool _hasBannedNames;
     private readonly IEnumerable<ElementId> _roomsWithBathFamily;
 
+    private const string _utpYes = "Да";
+    private const string _utpNo = "Нет";
+    private const string _utpNamesError = "Ошибка имен помещений";
+    private const string _utpNullAreasError = "Ошибка нулевых площадей";
 
-    public UtpCalculator(ApartmentsProject project, DeclarationSettings settings) {
+    public UtpCalculator(ApartmentsProject project, DeclarationSettings settings, ILocalizationService localizationService) {
         _project = project;
         _settings = (ApartmentsSettings) settings;
+        _localizationService = localizationService;
 
         _hasNullAreas = CheckUtpNullAreas();
         _hasBannedNames = GetBannedUtpRoomNames().Any();
@@ -42,43 +49,40 @@ internal class UtpCalculator {
         _roomConnectionAnalyzer.FindConnections();
     }
 
-    public IReadOnlyCollection<ErrorsListViewModel> CheckProjectForUtp() {
-        var areaErrorListVM = new ErrorsListViewModel() {
-            Message = "Предупреждение",
-            Description = "В проекте присутствуют помещения квартир с нулевыми системными площадями",
+    public IReadOnlyCollection<WarningViewModel> CheckProjectForUtp() {
+        var areaErrorListVM = new WarningViewModel(_localizationService) {
+            WarningType = _localizationService.GetLocalizedString("WarningWindow.Warning"),
+            Description = _localizationService.GetLocalizedString("WarningWindow.NullAreas"),
             DocumentName = _project.Document.Name
         };
 
         if(_hasNullAreas) {
-            areaErrorListVM.Errors.Add(new ErrorElement(_project.Document.Name,
-                "В проекте присутствуют помещения квартир с нулевыми системными площадями. " +
-                "УТП \"Гардеробная\" и \"Увеличенная площадь балкона/лоджии\" не могут быть корректно рассчитаны."));
+            areaErrorListVM.Elements.Add(new WarningElementViewModel(_project.Document.Name,
+                _localizationService.GetLocalizedString("WarningWindow.NullAreasInfo")));
         }
 
-        var namesErrorListVM = new ErrorsListViewModel() {
-            Message = "Предупреждение",
-            Description = "В проекте присутствуют помещения c некорректными именами.",
+        var namesErrorListVM = new WarningViewModel(_localizationService) {
+            WarningType = _localizationService.GetLocalizedString("WarningWindow.Warning"),
+            Description = _localizationService.GetLocalizedString("WarningsWindow.RoomNameErrors"),
             DocumentName = _project.Document.Name
         };
 
         if(_hasBannedNames) {
             string names = string.Join(",", GetBannedUtpRoomNames());
 
-            namesErrorListVM.Errors.Add(new ErrorElement(_project.Document.Name,
-                $"В проекте присутствуют помещения квартир c некорректными именами: \"{names}\". " +
-                "УТП \"Мастер-спальня\" и \"Две ванные\" не могут быть корректно рассчитаны."));
+            namesErrorListVM.Elements.Add(new WarningElementViewModel(_project.Document.Name,
+                _localizationService.GetLocalizedString("WarningsWindow.RoomNameErrorsInfo", names)));
         }
 
-        var bathesErrorListVM = new ErrorsListViewModel() {
-            Message = "Предупреждение",
-            Description = "В проекте отсутсвуют семейства ванн и душевых.",
+        var bathesErrorListVM = new WarningViewModel(_localizationService) {
+            WarningType = _localizationService.GetLocalizedString("WarningWindow.Warning"),
+            Description = _localizationService.GetLocalizedString("WarningsWindow.BathErrors"),
             DocumentName = _project.Document.Name
         };
 
         if(_project.GetBathInstances().Count == 0) {
-            bathesErrorListVM.Errors.Add(new ErrorElement(_project.Document.Name,
-                "В проекте отсутствуют экземпляры семейств с именами, включающими \"ванн\" или \"душев\". " +
-                "УТП \"Две ванные\" не может быть корректно рассчитано."));
+            bathesErrorListVM.Elements.Add(new WarningElementViewModel(_project.Document.Name,
+                _localizationService.GetLocalizedString("WarningsWindow.BathErrorsInfo")));
         }
 
         return [areaErrorListVM, namesErrorListVM, bathesErrorListVM];
@@ -90,10 +94,10 @@ internal class UtpCalculator {
         foreach(var room in apartment.Rooms) {
             double height = room.GetLengthParamValue(_settings.RoomsHeightParam, _settings.AccuracyForArea);
             if(height < _minHighFlatHeight) {
-                return "Нет";
+                return _utpNo;
             }
         }
-        return "Да";
+        return _utpYes;
     }
 
     // УТП Две ванны.
@@ -101,18 +105,15 @@ internal class UtpCalculator {
     // Помещения санузлов, которые относятся к мастер-спальням не учитываются.
     public string CalculateTwoBathes(Apartment apartment) {
         if(_hasBannedNames) {
-            return "Ошибка имен помещений";
+            return _utpNamesError;
         }
 
-        int bathAmount = 0;
-
-        bathAmount = apartment.Rooms
+        int bathAmount = apartment.Rooms
             .Select(x => x.RevitRoom.Id)
             .Where(x => !_roomConnectionAnalyzer.CheckIsMasterBathroom(x))
-            .Where(x => _roomsWithBathFamily.Contains(x))
-            .Count();
+            .Count(x => _roomsWithBathFamily.Contains(x));
 
-        return bathAmount > 1 ? "Да" : "Нет";
+        return bathAmount > 1 ? _utpYes : _utpNo;
     }
 
     // УТП Лоджия/балкон.
@@ -122,7 +123,7 @@ internal class UtpCalculator {
         int balconies = apartment.GetRoomsByPrior(_priorities.Balcony).Count;
         int loggies = apartment.GetRoomsByPrior(_priorities.Loggia).Count;
 
-        return balconies + loggies > 0 ? "Да" : "Нет";
+        return balconies + loggies > 0 ? _utpYes : _utpNo;
     }
 
     // УТП Доп. летние помещения.
@@ -131,7 +132,7 @@ internal class UtpCalculator {
         int balconies = apartment.GetRoomsByPrior(_priorities.Balcony).Count;
         int loggies = apartment.GetRoomsByPrior(_priorities.Loggia).Count;
 
-        return balconies + loggies > 1 ? "Да" : "Нет";
+        return balconies + loggies > 1 ? _utpYes : _utpNo;
     }
 
     // УТП Мастер-спальня.
@@ -140,15 +141,15 @@ internal class UtpCalculator {
     // или сначала в гардеробную, а гардеробная уже в санузел.
     public string CalculateMasterBedroom(Apartment apartment) {
         if(_hasBannedNames) {
-            return "Ошибка имен помещений";
+            return _utpNamesError;
         }
 
         foreach(var room in apartment.Rooms) {
             if(_roomConnectionAnalyzer.CheckIsMasterBedroom(room.RevitRoom.Id)) {
-                return "Да";
+                return _utpYes;
             }
         }
-        return "Нет";
+        return _utpNo;
     }
 
     // УТП Терраса.
@@ -156,7 +157,7 @@ internal class UtpCalculator {
     public string CalculateTerrace(Apartment apartment) {
         int amount = apartment.GetRoomsByPrior(_priorities.Terrace).Count;
 
-        return amount > 0 ? "Да" : "Нет";
+        return amount > 0 ? _utpYes : _utpNo;
     }
 
     // УТП Увеличенная площадь балкона/лоджии.
@@ -164,7 +165,7 @@ internal class UtpCalculator {
     // с глубиной не менее 1200 мм.
     public string CalculateExtraBalconyArea(Apartment apartment) {
         if(_hasNullAreas) {
-            return "Ошибка нулевых площадей";
+            return _utpNullAreasError;
         }
 
         List<RoomElement> summerRooms =
@@ -178,7 +179,7 @@ internal class UtpCalculator {
             ? ContourChecker
                 .CheckAnyRoomSizes(summerRevitRooms, _settings.AccuracyForArea, 0, _minBalconyDepth)
                 .GetDescription()
-            : "Нет";
+            : _utpNo;
     }
 
     // УТП Гардеробная.
@@ -187,10 +188,10 @@ internal class UtpCalculator {
     // Помещения, которые связаны дверью с жилой комнатой не учитываются.
     public string CalculatePantry(Apartment apartment) {
         if(_hasNullAreas) {
-            return "Ошибка нулевых площадей";
+            return _utpNullAreasError;
         }
         if(_hasBannedNames) {
-            return "Ошибка имен помещений";
+            return _utpNamesError;
         }
 
         var pantriesWithoutBedrooms = apartment
@@ -204,7 +205,7 @@ internal class UtpCalculator {
             ? ContourChecker
                 .CheckAnyRoomSizes(pantriesWithoutBedrooms, _settings.AccuracyForArea, _minPantryDepth)
                 .GetDescription()
-            : "Нет";
+            : _utpNo;
     }
 
     // УТП Постирочная.
@@ -214,7 +215,7 @@ internal class UtpCalculator {
             .GetRoomsByPrior(_priorities.Laundry)
             .Any();
 
-        return hasLaundries ? "Да" : "Нет";
+        return hasLaundries ? _utpYes : _utpNo;
     }
 
     private bool CheckUtpNullAreas() {

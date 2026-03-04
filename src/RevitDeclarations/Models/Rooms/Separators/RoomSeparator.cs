@@ -4,7 +4,6 @@ using System.Linq;
 using Autodesk.Revit.DB;
 using Autodesk.Revit.DB.Architecture;
 
-using dosymep.Bim4Everyone;
 using dosymep.Revit;
 
 namespace RevitDeclarations.Models;

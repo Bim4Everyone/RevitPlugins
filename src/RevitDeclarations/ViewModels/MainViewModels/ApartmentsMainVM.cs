@@ -1,45 +1,27 @@
 using System;
 using System.Linq;
+using System.Windows;
 
-using Autodesk.Revit.UI;
+using dosymep.SimpleServices;
 
 using RevitDeclarations.Models;
-using RevitDeclarations.Views;
-
-using TaskDialog = Autodesk.Revit.UI.TaskDialog;
-using TaskDialogResult = Autodesk.Revit.UI.TaskDialogResult;
+using RevitDeclarations.Services;
 
 namespace RevitDeclarations.ViewModels;
 internal class ApartmentsMainVM : MainViewModel {
-    private readonly ApartmentsExcelExportVM _excelExportViewModel;
-    private readonly ApartmentsCsvExportVM _csvExportViewModel;
-    private readonly ApartmentsJsonExportVM _jsonExportViewModel;
-
     private new readonly ApartmentsSettings _settings;
-
-    public ApartmentsMainVM(RevitRepository revitRepository, ApartmentsSettings settings)
-        : base(revitRepository, settings) {
+    
+    public ApartmentsMainVM(RevitRepository revitRepository, 
+                            ApartmentsSettings settings,
+                            ILocalizationService localizationService,
+                            IMessageBoxService messageBoxService,
+                            ErrorWindowService errorWindowService)
+        : base(revitRepository, settings, localizationService, messageBoxService, errorWindowService) {
         _settings = settings;
 
-        _excelExportViewModel =
-            new ApartmentsExcelExportVM("Excel", new Guid("01EE33B6-69E1-4364-92FD-A2F94F115A9E"), _settings);
-        _csvExportViewModel =
-            new ApartmentsCsvExportVM("csv", new Guid("BF1869ED-C5C4-4FCE-9DA9-F8F75A6B190D"), _settings);
-        _jsonExportViewModel =
-            new ApartmentsJsonExportVM("json", new Guid("159FA27A-06E7-4515-9221-0BAFC0008F21"), _settings);
-
-        _exportFormats = [
-            _excelExportViewModel,
-            _csvExportViewModel,
-            _jsonExportViewModel,
-        ];
-        _selectedFormat = _exportFormats[0];
-
+        _declarationViewModel = new DeclarationApartVM(_revitRepository, settings, localizationService, messageBoxService);
         _parametersViewModel = new ApartmentsParamsVM(_revitRepository, this);
-        _prioritiesViewModel = new PrioritiesViewModel(this);
-
-        _loadUtp = true;
-        _canLoadUtp = true;
+        _prioritiesViewModel = new PrioritiesViewModel(this, localizationService, messageBoxService);
 
         LoadConfig();
     }
@@ -48,7 +30,7 @@ internal class ApartmentsMainVM : MainViewModel {
         SetSelectedSettings();
         SetApartSettings();
 
-        var checkedDocuments = _revitDocuments
+        var checkedDocuments = _declarationViewModel.RevitDocuments
             .Where(x => x.IsChecked)
             .ToList();
 
@@ -57,48 +39,42 @@ internal class ApartmentsMainVM : MainViewModel {
         // Проверка 1. Наличие параметров во всех выбранных проектах.
         var parameterErrors = checkedDocuments
             .Select(x => x.CheckParameters())
-            .Where(x => x.Errors.Any());
+            .Where(x => x.Elements.Any());
         if(parameterErrors.Any()) {
-            var window = new ErrorWindow() { DataContext = new ErrorsViewModel(parameterErrors, false) };
-            window.ShowDialog();
+            _errorWindowService.ShowNoticeWindow(parameterErrors.ToList());
             return;
         }
 
         var projects = checkedDocuments
-            .Select(x => new ApartmentsProject(x, _revitRepository, _settings, _stringComparer))
+            .Select(x => new ApartmentsProject(x, _revitRepository, _settings, _stringComparer, _localizationService))
             .ToList();
 
         // Проверка 2. Наличие квартир на выбранной стадии во всех выбранных проектах.
         var noApartsErrors = projects
             .Select(x => x.CheckRoomGroupsInProject())
-            .Where(x => x.Errors.Any());
+            .Where(x => x.Elements.Any());
         if(noApartsErrors.Any()) {
-            var window = new ErrorWindow() { DataContext = new ErrorsViewModel(noApartsErrors, false) };
-            window.ShowDialog();
+            _errorWindowService.ShowNoticeWindow(noApartsErrors.ToList());
             return;
         }
 
         // Проверка 3. У всех помещений каждой квартиры должны совпадать общие площади квартиры.
         var areasErrors = projects
             .Select(x => x.CheckRoomAreasEquality())
-            .Where(x => x.Errors.Any());
+            .Where(x => x.Elements.Any());
         if(areasErrors.Any()) {
-            var window = new ErrorWindow() { DataContext = new ErrorsViewModel(areasErrors, false) };
-            window.ShowDialog();
+            _errorWindowService.ShowNoticeWindow(areasErrors.ToList());
             return;
         }
 
         // Проверка 4. У каждого помещения должны быть актуальные площади помещения из кватирографии.
         var actualRoomAreasErrors = projects
             .Select(x => x.CheckActualRoomAreas())
-            .Where(x => x.Errors.Any());
+            .Where(x => x.Elements.Any());
         if(actualRoomAreasErrors.Any()) {
-            var window = new ErrorWindow() {
-                DataContext = new ErrorsViewModel(actualRoomAreasErrors, true)
-            };
-            window.ShowDialog();
+            bool windowResult = _errorWindowService.ShowNoticeWindow(actualRoomAreasErrors.ToList(), true);
 
-            if(!(bool) window.DialogResult) {
+            if(!windowResult) {
                 return;
             }
         }
@@ -106,31 +82,25 @@ internal class ApartmentsMainVM : MainViewModel {
         // Проверка 5. У каждого помещения должны быть актуальные площади квартиры из кватирографии.
         var actualApartmentAreasErrors = projects
             .Select(x => x.CheckActualApartmentAreas())
-            .Where(x => x.Errors.Any());
+            .Where(x => x.Elements.Any());
         if(actualApartmentAreasErrors.Any()) {
-            var window = new ErrorWindow() {
-                DataContext = new ErrorsViewModel(actualApartmentAreasErrors, true)
-            };
-            window.ShowDialog();
+            bool windowResult = _errorWindowService.ShowNoticeWindow(actualApartmentAreasErrors.ToList(), true);
 
-            if(!(bool) window.DialogResult) {
+            if(!windowResult) {
                 return;
             }
         }
 
-        if(_loadUtp) {
+        if(_declarationViewModel.LoadUtp) {
             // Проверка 6. Проверка проекта для корректной выгрузки УТП.
             var utpErrors = projects
                 .Select(x => x.CheckUtpWarnings())
                 .SelectMany(x => x)
-                .Where(x => x.Errors.Any());
+                .Where(x => x.Elements.Any());
             if(utpErrors.Any()) {
-                var window = new ErrorWindow() {
-                    DataContext = new ErrorsViewModel(utpErrors, true)
-                };
-                window.ShowDialog();
+                bool windowResult = _errorWindowService.ShowNoticeWindow(utpErrors.ToList(), true);
 
-                if(!(bool) window.DialogResult) {
+                if(!windowResult) {
                     return;
                 }
             }
@@ -148,18 +118,17 @@ internal class ApartmentsMainVM : MainViewModel {
             .ToList();
 
         try {
-            _selectedFormat.Export(FullPath, apartments);
+            _declarationViewModel.SelectedFormat.Export(_declarationViewModel.FullPath, apartments);
         } catch(Exception e) {
-            var taskDialog = new TaskDialog("Ошибка выгрузки") {
-                CommonButtons = TaskDialogCommonButtons.No | TaskDialogCommonButtons.Yes,
-                MainContent = "Произошла ошибка выгрузки.\nПопробовать выгрузить декларацию в формате csv?",
-                ExpandedContent = $"Описание ошибки: {e.Message}"
-            };
+            var messageBoxResult = _messageBoxService.Show(
+                _localizationService.GetLocalizedString("MessageBox.ExcelErrorLoadCsv", e.Message),
+                _localizationService.GetLocalizedString("MessageBox.ExportErrorTitle"),
+                MessageBoxButton.YesNo,
+                MessageBoxImage.Warning);
 
-            var dialogResult = taskDialog.Show();
-
-            if(dialogResult == TaskDialogResult.Yes) {
-                _csvExportViewModel.Export(FullPath, apartments);
+            if(messageBoxResult == MessageBoxResult.Yes) {
+                (_declarationViewModel as DeclarationApartVM)
+                    .CsvExportViewModel.Export(_declarationViewModel.FullPath, apartments);
             }
         }
     }

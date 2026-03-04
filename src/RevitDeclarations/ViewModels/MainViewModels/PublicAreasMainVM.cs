@@ -1,41 +1,28 @@
 using System;
 using System.Linq;
+using System.Windows;
 
-using Autodesk.Revit.UI;
+using dosymep.SimpleServices;
 
 using RevitDeclarations.Models;
-using RevitDeclarations.Views;
-
-using TaskDialog = Autodesk.Revit.UI.TaskDialog;
-using TaskDialogResult = Autodesk.Revit.UI.TaskDialogResult;
+using RevitDeclarations.Services;
 
 namespace RevitDeclarations.ViewModels;
 internal class PublicAreasMainVM : MainViewModel {
-    private readonly PublicAreasExcelExportVM _excelExportViewModel;
-    private readonly PublicAreasCsvExportVM _csvExportViewModel;
-
     private new readonly PublicAreasSettings _settings;
 
-    public PublicAreasMainVM(RevitRepository revitRepository, PublicAreasSettings settings)
-        : base(revitRepository, settings) {
+    public PublicAreasMainVM(RevitRepository revitRepository, 
+                             PublicAreasSettings settings,
+                             ILocalizationService localizationService,
+                             IMessageBoxService messageBoxService,
+                             ErrorWindowService errorWindowService)
+        : base(revitRepository, settings, localizationService, messageBoxService, errorWindowService) {
         _settings = settings;
 
-        _excelExportViewModel =
-            new PublicAreasExcelExportVM("Excel", new Guid("186F3EEE-303A-42DF-910E-475AD2525ABD"), _settings);
-        _csvExportViewModel =
-            new PublicAreasCsvExportVM("csv", new Guid("A674AB16-642A-4642-BE51-51B812378734"), _settings);
-
-        _exportFormats = [
-            _excelExportViewModel,
-            _csvExportViewModel
-        ];
-        _selectedFormat = _exportFormats[0];
-
+        _declarationViewModel = 
+            new DeclarationPublicAreasVM(_revitRepository, settings, localizationService, messageBoxService);
         _parametersViewModel = new PublicAreasParamsVM(_revitRepository, this);
-        _prioritiesViewModel = new PrioritiesViewModel(this);
-
-        _loadUtp = false;
-        _canLoadUtp = false;
+        _prioritiesViewModel = new PrioritiesViewModel(this, localizationService, messageBoxService);
 
         LoadConfig();
     }
@@ -44,7 +31,7 @@ internal class PublicAreasMainVM : MainViewModel {
         SetSelectedSettings();
         SetPublicAreasSettings();
 
-        var checkedDocuments = _revitDocuments
+        var checkedDocuments = _declarationViewModel.RevitDocuments
             .Where(x => x.IsChecked)
             .ToList();
 
@@ -53,38 +40,33 @@ internal class PublicAreasMainVM : MainViewModel {
         // Проверка 1. Наличие параметров во всех выбранных проектах.
         var parameterErrors = checkedDocuments
             .Select(x => x.CheckParameters())
-            .Where(x => x.Errors.Any());
+            .Where(x => x.Elements.Any());
         if(parameterErrors.Any()) {
-            var window = new ErrorWindow() { DataContext = new ErrorsViewModel(parameterErrors, false) };
-            window.ShowDialog();
+            _errorWindowService.ShowNoticeWindow(parameterErrors.ToList());
             return;
         }
 
         var projects = checkedDocuments
-            .Select(x => new PublicAreasProject(x, _revitRepository, _settings, _stringComparer))
+            .Select(x => new PublicAreasProject(x, _revitRepository, _settings, _stringComparer, _localizationService))
             .ToList();
 
         // Проверка 2. Наличие групп помещений на выбранной стадии во всех выбранных проектах.
         var noApartsErrors = projects
             .Select(x => x.CheckRoomGroupsInProject())
-            .Where(x => x.Errors.Any());
+            .Where(x => x.Elements.Any());
         if(noApartsErrors.Any()) {
-            var window = new ErrorWindow() { DataContext = new ErrorsViewModel(noApartsErrors, false) };
-            window.ShowDialog();
+            _errorWindowService.ShowNoticeWindow(noApartsErrors.ToList());
             return;
         }
 
         // Проверка 3. У каждого помещения должны быть актуальные площади помещения из кватирографии.
         var actualRoomAreasErrors = projects
             .Select(x => x.CheckActualRoomAreas())
-            .Where(x => x.Errors.Any());
+            .Where(x => x.Elements.Any());
         if(actualRoomAreasErrors.Any()) {
-            var window = new ErrorWindow() {
-                DataContext = new ErrorsViewModel(actualRoomAreasErrors, true)
-            };
-            window.ShowDialog();
+            bool windowResult = _errorWindowService.ShowNoticeWindow(actualRoomAreasErrors.ToList(), true);
 
-            if(!(bool) window.DialogResult) {
+            if(!windowResult) {
                 return;
             }
         }
@@ -98,18 +80,17 @@ internal class PublicAreasMainVM : MainViewModel {
             .ToList();
 
         try {
-            _selectedFormat.Export(FullPath, commercialRooms);
+            _declarationViewModel.SelectedFormat.Export(_declarationViewModel.FullPath, commercialRooms);
         } catch(Exception e) {
-            var taskDialog = new TaskDialog("Ошибка выгрузки") {
-                CommonButtons = TaskDialogCommonButtons.No | TaskDialogCommonButtons.Yes,
-                MainContent = "Произошла ошибка выгрузки.\nПопробовать выгрузить декларацию в формате csv?",
-                ExpandedContent = $"Описание ошибки: {e.Message}"
-            };
+            var messageBoxResult = _messageBoxService.Show(
+                _localizationService.GetLocalizedString("MessageBox.ExcelErrorLoadCsv", e.Message),
+                _localizationService.GetLocalizedString("MessageBox.ExportErrorTitle"),
+                MessageBoxButton.YesNo,
+                MessageBoxImage.Warning);
 
-            var dialogResult = taskDialog.Show();
-
-            if(dialogResult == TaskDialogResult.Yes) {
-                _csvExportViewModel.Export(FullPath, commercialRooms);
+            if(messageBoxResult == MessageBoxResult.Yes) {
+                (_declarationViewModel as DeclarationPublicAreasVM)
+                    .CsvExportViewModel.Export(_declarationViewModel.FullPath, commercialRooms);
             }
         }
     }

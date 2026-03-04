@@ -39,7 +39,7 @@ internal abstract class ParametersViewModel : BaseViewModel {
         _mainViewModel = mainViewModel;
         _revitRepository = revitRepository;
 
-        SelectedDocument = RevitDocuments.FirstOrDefault();
+        SelectedDocument = _mainViewModel.DeclarationViewModel.RevitDocuments.FirstOrDefault();
 
         UpdateParameters();
 
@@ -54,7 +54,7 @@ internal abstract class ParametersViewModel : BaseViewModel {
     public ICommand SetLastConfigCommand { get; }
     public ICommand SetCompanyConfigCommand { get; }
 
-    public IList<RevitDocumentViewModel> RevitDocuments => _mainViewModel.RevitDocuments;
+    public IList<RevitDocumentViewModel> RevitDocuments => _mainViewModel.DeclarationViewModel.RevitDocuments;
 
     public RevitDocumentViewModel SelectedDocument {
         get => _selectedDocument;
@@ -152,7 +152,6 @@ internal abstract class ParametersViewModel : BaseViewModel {
     /// Список параметров для проверки их заполненности в View
     /// </summary>
     public abstract List<Parameter> AllSelectedParameters { get; }
-
 
     public void AddFilter(object obj) {
         if(!string.IsNullOrEmpty(_filterRoomsValue)) {

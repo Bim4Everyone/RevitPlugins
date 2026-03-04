@@ -1,0 +1,272 @@
+<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:system="clr-namespace:System;assembly=mscorlib">
+    <system:String x:Key="Window.Yes">Yes</system:String>
+    <system:String x:Key="Window.No">No</system:String>
+
+
+    <system:String x:Key="MainWindow.Title">Declarations</system:String>    
+    <system:String x:Key="MainWindow.Settings">Settings</system:String>
+    <system:String x:Key="MainWindow.SettingsGeneral">General</system:String>
+    <system:String x:Key="MainWindow.SettingsParams">Parameters</system:String>
+    <system:String x:Key="MainWindow.SettingsPriorities">Priorities</system:String>
+    <system:String x:Key="MainWindow.OkButton">OK</system:String>
+    <system:String x:Key="MainWindow.CancelButton">Cancel</system:String>    
+    <system:String x:Key="MainWindow.ErrorNoFolder">Folder is not selected</system:String>    
+    <system:String x:Key="MainWindow.ErrorNoName">File's name is empty</system:String>    
+    <system:String x:Key="MainWindow.ErrorNoProjects">Projects are not selected</system:String>    
+    <system:String x:Key="MainWindow.ErrorNoPhaseInDocs">No selected phase in selected projects</system:String>    
+    <system:String x:Key="MainWindow.ErrorNoParams">Parameter is not selected</system:String>    
+    <system:String x:Key="MainWindow.ErrorNoParamFilters">Filter value is empty</system:String>    
+    <system:String x:Key="MainWindow.ErrorNoProjectId">Project name is empty</system:String>
+    <system:String x:Key="MainWindow.ErrorNoCorpPriorities">You can upload declaration only with corporate priorities</system:String>
+    <system:String x:Key="MainWindow.FileName">{0} [current project]</system:String>
+    <system:String x:Key="MainWindow.FileNameLink">{0} [link]</system:String>
+
+
+    <system:String x:Key="DeclarationPage.ExportFormat">Format</system:String>
+    <system:String x:Key="DeclarationPage.FileName">File name:</system:String>
+    <system:String x:Key="DeclarationPage.SelectFolder">Select folder</system:String>
+    <system:String x:Key="DeclarationPage.ExportFolder">Folder:</system:String>
+    <system:String x:Key="DeclarationPage.FileFormat">File format:</system:String>
+    <system:String x:Key="DeclarationPage.ExportSettings">Export settings</system:String>
+    <system:String x:Key="DeclarationPage.Phase">Phase:</system:String>
+    <system:String x:Key="DeclarationPage.Accuracy">Accuracy:</system:String>
+    <system:String x:Key="DeclarationPage.CalculateUtp">Calculate UTP:</system:String>
+    <system:String x:Key="DeclarationPage.Projects">Projects with rooms for uploading:</system:String>
+
+
+    <system:String x:Key="ParametersPage.Configs">Configurations</system:String>
+    <system:String x:Key="ParametersPage.BaseFile">Base-file for parameters:</system:String>
+    <system:String x:Key="ParametersPage.LastConfig">Last run configuration:</system:String>
+    <system:String x:Key="ParametersPage.CorpConfig">Corporate configuration:</system:String>
+    <system:String x:Key="ParametersPage.LoadConfig">Load</system:String>
+    <system:String x:Key="ParametersPage.FilterParams">Parameters for rooms filtration and grouping</system:String>
+    <system:String x:Key="ParametersPage.FilterApartsParams">Parameter for filtering apartment rooms:</system:String>
+    <system:String x:Key="ParametersPage.FilterValue">Filter parameter values:</system:String>
+    <system:String x:Key="ParametersPage.SectionParam">Section assignment parameter:</system:String>
+    <system:String x:Key="ParametersPage.ApartParam">Apartment assignment parameter:</system:String>
+    <system:String x:Key="ParametersPage.MultiLevelParam">Multi-level apartment grouping parameter:</system:String>
+    <system:String x:Key="ParametersPage.AddButton">Add</system:String>
+    <system:String x:Key="ParametersPage.ApartParamsHeader">Parameters for filling out the declaration. Apartment information.</system:String>
+    <system:String x:Key="ParametersPage.FullNumber">1. Full number:</system:String>
+    <system:String x:Key="ParametersPage.Definition">2. Definition:</system:String>
+    <system:String x:Key="ParametersPage.Level">3. Level:</system:String>
+    <system:String x:Key="ParametersPage.Section">4. Entrance number:</system:String>
+    <system:String x:Key="ParametersPage.Building">5. Building:</system:String>
+    <system:String x:Key="ParametersPage.BuildingNumber">6. Building number:</system:String>
+    <system:String x:Key="ParametersPage.ConstrWorkNumber">7. Construction work number:</system:String>
+    <system:String x:Key="ParametersPage.ApartAreaCoef">8. Total area with reduction coefficient, m2:</system:String>
+    <system:String x:Key="ParametersPage.RoomsAmount">9. Number of rooms:</system:String>
+    <system:String x:Key="ParametersPage.ApartAreaLiving">10. Living area, m2:</system:String>
+    <system:String x:Key="ParametersPage.RoomsHeight">11. Ceiling height, m:</system:String>
+    <system:String x:Key="ParametersPage.ProjectName">12. Project ID:</system:String>
+    <system:String x:Key="ParametersPage.ApartNum">13. Unit number on the floor:</system:String>
+    <system:String x:Key="ParametersPage.ApartArea">14. Total area without reduction coefficient, m2:</system:String>
+    <system:String x:Key="ParametersPage.ApartAreaNonSum">15. Area excluding summer rooms, m2:</system:String>
+    <system:String x:Key="ParametersPage.RoomsParamsHeader">Parameters for filling out the declaration. Room information.</system:String>
+    <system:String x:Key="ParametersPage.RoomNumber">Room number:</system:String>
+    <system:String x:Key="ParametersPage.RoomName">Room name:</system:String>
+    <system:String x:Key="ParametersPage.RoomArea">Room area:</system:String>
+    <system:String x:Key="ParametersPage.RoomAreaCoef">Room area with coefficient:</system:String>
+    <system:String x:Key="ParametersPage.FilterComParams">Parameter for filtering non-residential groups:</system:String>
+    <system:String x:Key="ParametersPage.ComParam">Parameter for grouping non-residential units:</system:String>
+    <system:String x:Key="ParametersPage.ComGroupParam">Parameter for grouping within non-residential units:</system:String>
+    <system:String x:Key="ParametersPage.MultiLeveGroupParam">Parameter for grouping multi-level units:</system:String>
+    <system:String x:Key="ParametersPage.DeclParamsHeader">Parameters for filling out the declaration</system:String>
+    <system:String x:Key="ParametersPage.ComRoomNumber">1.1 Room number:</system:String>
+    <system:String x:Key="ParametersPage.ComRoomAddPrefix">1.2 Add prefix to the number:</system:String>
+    <system:String x:Key="ParametersPage.ComRoomPrefixParam">1.3 Parameter for prefix:</system:String>
+    <system:String x:Key="ParametersPage.ComRoomArea">8. Total area</system:String>
+    <system:String x:Key="ParametersPage.ComRoomAreaGroupParam">8.1 For a group of multiple rooms:</system:String>
+    <system:String x:Key="ParametersPage.ComRoomAreaParam">8.2 For a single room:</system:String>
+    <system:String x:Key="ParametersPage.ComRoomHeight">9. Ceiling height:</system:String>
+    <system:String x:Key="ParametersPage.ComRoomCar">10. Parking space class:</system:String>
+    <system:String x:Key="ParametersPage.ComRoomUse">11. Applicability:</system:String>
+    <system:String x:Key="ParametersPage.ComRoomName">12. Room name</system:String>
+    <system:String x:Key="ParametersPage.ComRoomGroupNameParam">12.1 For a group of multiple rooms:</system:String>
+    <system:String x:Key="ParametersPage.ComRoomNameParam">12.2 For a single room:</system:String>
+    <system:String x:Key="ParametersPage.ComRoomProjectName">13. Project ID:</system:String>
+    <system:String x:Key="ParametersPage.PublicAreaFilterParam">Parameter for filtering public areas:</system:String>
+    <system:String x:Key="ParametersPage.PublicAreaParam">Parameter for grouping public areas:</system:String>
+    <system:String x:Key="ParametersPage.PublicAreaGroupParams">Parameter for grouping within public area groups:</system:String>
+    <system:String x:Key="ParametersPage.PublicAreaRoomNumber">1.1 Room number:</system:String>
+    <system:String x:Key="ParametersPage.PublicAreaAddPrefix">1.2 Add prefix:</system:String>
+    <system:String x:Key="ParametersPage.PublicAreaPrefixParam">1.3 Parameter for prefix:</system:String>
+    <system:String x:Key="ParametersPage.PublicAreaRoomType">2. Room type:</system:String>
+    <system:String x:Key="ParametersPage.PublicAreaPositionBuilding">3.1 Location - building block:</system:String>
+    <system:String x:Key="ParametersPage.PublicAreaPositionSection">3.2 Location - section:</system:String>
+    <system:String x:Key="ParametersPage.PublicAreaPositionLevel">3.3 Location - floor:</system:String>
+    <system:String x:Key="ParametersPage.PublicAreaDefinition">4. Purpose:</system:String>
+    <system:String x:Key="ParametersPage.PublicAreaArea">5. Area, m2</system:String>
+    <system:String x:Key="ParametersPage.PublicAreaAreaForSeveralRooms">5.1 For a group of multiple rooms:</system:String>
+    <system:String x:Key="ParametersPage.PublicAreaAreaForOneRoom">5.2 For a single room:</system:String>
+    <system:String x:Key="ParametersPage.PublicAreaProjectName">6. Project ID:</system:String>
+    
+    
+    <system:String x:Key="PrioritiesPage.Description">
+        Apartment room names in the project must comply with the following list of priorities.
+        Columns in the declaration will be created according to the priority order number.        
+        Rooms for which no priority is found will be added at the end of the table.
+        Priorities are configured in a JSON file. You may use your own priorities file.
+    </system:String>
+    <system:String x:Key="PrioritiesPage.CorpPriorities">Corporate priorities</system:String>
+    <system:String x:Key="PrioritiesPage.ExportPriorities">Export priorities</system:String>
+    <system:String x:Key="PrioritiesPage.ImportPriorities">Import priorities</system:String>
+    <system:String x:Key="PrioritiesPage.FileLocation">Path to the priorities file:</system:String>
+    <system:String x:Key="PrioritiesPage.Number">Number</system:String>
+    <system:String x:Key="PrioritiesPage.Name">Name</system:String>
+    <system:String x:Key="PrioritiesPage.Coef">Coefficient</system:String>
+    <system:String x:Key="PrioritiesPage.IsSummer">Summer</system:String>
+    <system:String x:Key="PrioritiesPage.IsLiving">Residential</system:String>
+
+    
+    <system:String x:Key="MessageBox.ExportErrorTitle">Export error</system:String>    
+    <system:String x:Key="MessageBox.ExcelErrorLoadCsv">
+        An export error has occurred: {0}.
+    
+        Would you like to export the declaration in CSV format?
+    </system:String>
+    <system:String x:Key="MessageBox.PrioritiesConfigCreated">Priorities configuration file has been created</system:String>    
+    <system:String x:Key="MessageBox.DeclFileCreated">File {0} has been created</system:String>    
+    <system:String x:Key="MessageBox.NoExcel">Excel 2016 was not found on this computer</system:String>
+    <system:String x:Key="OpenFileDialog.SelectJson">Select JSON file</system:String>    
+
+    
+    <system:String x:Key="WarningWindow.Error">Error</system:String>
+    <system:String x:Key="WarningWindow.Warning">Warning</system:String>
+    <system:String x:Key="WarningsWindow.HeaderName">Name</system:String>
+    <system:String x:Key="WarningsWindow.HeaderDescription">Description</system:String>
+    <system:String x:Key="WarningsWindow.WarningFullName">{0} in project "{1}"</system:String>
+    <system:String x:Key="WarningsWindow.NoParamsInProjects">The parameter selected in the source data is missing in the project</system:String>
+    <system:String x:Key="WarningsWindow.NoParamInProject">Parameter is missing in the project</system:String>
+    <system:String x:Key="WarningsWindow.DiffInAreas">Apartment calculated areas differ within the apartment</system:String>
+    <system:String x:Key="WarningsWindow.ErrorRoomGroup">Room group No. {0} on level {1}</system:String>
+    <system:String x:Key="WarningsWindow.ErrorRoomAreasInfo">Apartment areas (without coefficient / with coefficient / living / excluding summer rooms) must be identical for each room in the apartment</system:String>
+    <system:String x:Key="WarningsWindow.ErrorRoomNotActualAreasInfo">Outdated apartment calculated areas</system:String>
+    <system:String x:Key="WarningsWindow.ErrorApartsNotActualAreasInfo">
+        Apartment calculated areas differ from the sum of the current system areas of this apartment. 
+        Check the total apartment area, area with coefficient, living area, and area excluding summer rooms
+    </system:String>
+    <system:String x:Key="WarningsWindow.NoGroupsAtPhase">Required room groups are missing in the project at the selected phase</system:String>
+    <system:String x:Key="WarningsWindow.NoGroups">Room groups are missing</system:String>
+    <system:String x:Key="WarningsWindow.NotActualAreas">Outdated room calculated areas</system:String>
+    <system:String x:Key="WarningsWindow.NotActualAreasInfo">Room calculated areas differ from the current system room area</system:String>
+    <system:String x:Key="WarningsWindow.NullAreas">The project contains apartment rooms with zero system areas</system:String>
+    <system:String x:Key="WarningsWindow.NullAreasInfo">
+        The project contains apartment rooms with zero system areas. 
+        UTP "Walk-in Closet" and "Increased Balcony/Loggia Area" cannot be calculated correctly.
+    </system:String>
+    <system:String x:Key="WarningsWindow.RoomNameErrors">The project contains rooms with incorrect names</system:String>
+    <system:String x:Key="WarningsWindow.RoomNameErrorsInfo">
+        The project contains apartment rooms with incorrect names: "{0}". 
+        UTP "Master Bedroom" and "Two Bathrooms" cannot be calculated correctly.
+    </system:String>
+    <system:String x:Key="WarningsWindow.BathErrors">No bathtub or shower families found in the project</system:String>
+    <system:String x:Key="WarningsWindow.BathErrorsInfo">
+        There are no family instances in the project with names containing "bath" or "shower". 
+        UTP "Two Bathrooms" cannot be calculated correctly.
+    </system:String>
+    <system:String x:Key="WarningsWindow.Continue">Export declaration</system:String>
+    <system:String x:Key="WarningsWindow.Stop">Cancel export</system:String>
+    
+
+    <system:String x:Key="ToolTip.ParamDocumentToolTip">Project based on which the list of parameters for selection is generated.</system:String>
+    <system:String x:Key="ToolTip.LastConfigToolTip">Load parameters used during the last script run in this project.</system:String>
+    <system:String x:Key="ToolTip.CompanyConfigToolTip">Load company parameters.</system:String>
+    <system:String x:Key="ToolTip.FilterRoomsParamToolTip">Parameter used to filter rooms for export.</system:String>
+    <system:String x:Key="ToolTip.FilterRoomsValuesToolTip">
+        Values for filtering room groups by the parameter above.
+        The script processes only rooms that CONTAIN one of the entered values.
+        Case insensitive.
+        To create a new filter value, enter text and click "Add".
+        To delete a value, click on it.
+    </system:String>
+    <system:String x:Key="ToolTip.GroupBySectionParamApartToolTip">
+        Parameter used to group rooms by sections. If rooms have the same 
+        value of this parameter, they are considered to belong to the same section.
+    </system:String>
+    <system:String x:Key="ToolTip.GroupBySectionParamComToolTip">
+        Parameter used to group non-residential rooms into main groups.
+        Within these groups, additional grouping is performed by the next parameter.
+    </system:String>
+    <system:String x:Key="ToolTip.GroupBySectionParamPublicToolTip">
+        Parameter used to group rooms by sections.
+        If rooms have the same value of this parameter, they are considered to belong to the same section.
+    </system:String>
+    <system:String x:Key="ToolTip.GroupByGroupApartParamToolTip">
+        Parameter used to group rooms by apartments.
+        If rooms on the same level have the same value of this parameter
+        and belong to the same section, they are considered to belong to the same apartment.
+    </system:String>
+    <system:String x:Key="ToolTip.GroupByGroupComParamToolTip">
+        Parameter used to group rooms within main groups.
+        Rooms grouped by this parameter are merged into a single row in the declaration.
+    </system:String>
+    <system:String x:Key="ToolTip.MultiStoreyApartParamToolTip">
+        Parameter used to identify duplex apartments. All rooms 
+        with the same value of this parameter are considered one apartment, 
+        even if they are located on different levels. For single-level apartments, the parameter may be left empty.
+    </system:String>
+    <system:String x:Key="ToolTip.MultiStoreyComParamToolTip">
+        Parameter used to identify multi-level groups. All rooms 
+        with the same value of this parameter are considered one group, even if they 
+        are located on different levels. For single-level groups, the parameter may be left empty.
+    </system:String>
+    <system:String x:Key="ToolTip.DepartmentParamToolTip">Text parameter whose value is output to the declaration column "Definition"</system:String>
+    <system:String x:Key="ToolTip.LevelParamToolTip">Text parameter whose value is output to the declaration column "Floor level"</system:String>
+    <system:String x:Key="ToolTip.SectionParamToolTip">Text parameter whose value is output to the declaration column "Entrance number"</system:String>
+    <system:String x:Key="ToolTip.BuildingParamToolTip">Text parameter whose value is output to the declaration column "Building"</system:String>
+    <system:String x:Key="ToolTip.BuildingNumberParamToolTip">Text parameter whose value is output to the declaration column "Building number"</system:String>
+    <system:String x:Key="ToolTip.ConstrWorkNumberParamToolTip">Text parameter whose value is output to the declaration column "Construction work number"</system:String>
+    <system:String x:Key="ToolTip.ApartNumParamToolTip">Text parameter whose value is output to the declaration column "Unit number on the floor"</system:String>
+    <system:String x:Key="ToolTip.RoomsHeightParamToolTip">Numeric parameter whose value is output to the declaration column "Ceiling height"</system:String>
+    <system:String x:Key="ToolTip.ProjectNameToolTip">Value that is output to the declaration column "Project ID"</system:String>
+    <system:String x:Key="ToolTip.ApartAreaParamToolTip">Numeric parameter whose value is output to the declaration column "Total area without reduction coefficient"</system:String>
+    <system:String x:Key="ToolTip.ApartAreaCoefParamToolTip">Numeric parameter whose value is output to the declaration column "Total area with reduction coefficient"</system:String>
+    <system:String x:Key="ToolTip.ApartAreaLivingParamToolTip">Numeric parameter whose value is output to the declaration column "Living area"</system:String>
+    <system:String x:Key="ToolTip.ApartAreaNonSumParamToolTip">Numeric parameter whose value is output to the declaration column "Apartment area excluding summer rooms"</system:String>
+    <system:String x:Key="ToolTip.RoomsAmountParamToolTip">Integer parameter whose value is output to the declaration column "Number of rooms"</system:String>
+    <system:String x:Key="ToolTip.ApartFullNumParamToolTip">Text parameter whose value is output to the declaration column "Full number"</system:String>
+    <system:String x:Key="ToolTip.ConditionalNumberParamToolTip">
+        Text parameter whose value is output to the declaration column "Full number".
+        A prefix can be added to the value by checking the box and selecting the prefix parameter.
+    </system:String>
+    <system:String x:Key="ToolTip.ParkingSpaceClassParamToolTip">Text parameter whose value is output to the declaration column "Parking space class"</system:String>
+    <system:String x:Key="ToolTip.ParkingInfoParamToolTip">Text parameter whose value is output to the declaration column "Applicability"</system:String>
+    <system:String x:Key="ToolTip.CommercialAreaParamToolTip">
+        Numeric parameter whose value is output to the declaration column "Total area".
+        Two parameters must be selected: one for when the group consists of multiple rooms,
+        and another for when the group consists of a single room.
+    </system:String>
+    <system:String x:Key="ToolTip.CommercialNameClassParamToolTip">
+        Text parameter whose value is output to the declaration column "Room name".
+        Two parameters must be selected: one for when the group consists of multiple rooms,
+        and another for when the group consists of a single room.
+    </system:String>
+    <system:String x:Key="ToolTip.PublicAreaNumberParamToolTip">
+        Text parameter whose value is output to the declaration column "No.".
+        A prefix can be added to the value by checking the box and selecting the prefix parameter.
+    </system:String>
+    <system:String x:Key="ToolTip.PublicAreaNameParamToolTip">Text parameter whose value is output to the declaration column "Room type"</system:String>
+    <system:String x:Key="ToolTip.PublicAreaPositionParamToolTip">
+        Text parameters whose values are output to the declaration column "Room location description".
+        The value is formatted as: "Building 'Building', Section 'Section', 'Floor' floor".
+    </system:String>
+    <system:String x:Key="ToolTip.PublicAreaDepartmentParamToolTip">Text parameter whose value is output to the declaration column "Room purpose"</system:String>
+    <system:String x:Key="ToolTip.PublicAreaAreaParamToolTip">
+        Numeric parameter whose value is output to the declaration column "Area".
+        Two parameters must be selected: one for when the group consists of multiple rooms,
+        and another for when the group consists of a single room.
+    </system:String>
+    <system:String x:Key="ToolTip.RoomNameParamToolTip">
+        Text parameter whose value is output to the column with the room name.
+        The value is formatted as "Name_Number".
+    </system:String>
+    <system:String x:Key="ToolTip.RoomNumberParamToolTip">
+        Text parameter whose value is output to the column with the room number.
+        The value is formatted as "Number".
+    </system:String>
+    <system:String x:Key="ToolTip.RoomAreaParamToolTip"> Numeric parameter whose value is output to the column with the room area without coefficient.</system:String>
+    <system:String x:Key="ToolTip.RoomAreaCoefParamToolTip">Numeric parameter whose value is output to the column with the room area with coefficient.</system:String>
+</ResourceDictionary>

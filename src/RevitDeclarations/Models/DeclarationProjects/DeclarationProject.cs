@@ -5,15 +5,17 @@ using System.Linq;
 using Autodesk.Revit.DB;
 
 using dosymep.Revit.Comparators;
+using dosymep.SimpleServices;
 
 using RevitDeclarations.ViewModels;
 
 namespace RevitDeclarations.Models;
 internal abstract class DeclarationProject {
     protected readonly RevitDocumentViewModel _document;
-    protected readonly DeclarationSettings _settings;
     protected readonly RevitRepository _revitRepository;
     protected readonly LogicalStringComparer _logicalStrComparer;
+    protected readonly DeclarationSettings _settings;
+    protected readonly ILocalizationService _localizationService;
 
     protected readonly Phase _phase;
 
@@ -22,12 +24,14 @@ internal abstract class DeclarationProject {
 
     public DeclarationProject(RevitDocumentViewModel document,
                               RevitRepository revitRepository,
-                              DeclarationSettings settings, 
-                              LogicalStringComparer logicalStrComparer) {
+                              DeclarationSettings settings,
+                              LogicalStringComparer logicalStrComparer,
+                              ILocalizationService localizationService) {
         _document = document;
-        _settings = settings;
         _revitRepository = revitRepository;
         _logicalStrComparer = logicalStrComparer;
+        _settings = settings;
+        _localizationService = localizationService;
 
         _phase = revitRepository.GetPhaseByName(document.Document, _settings.SelectedPhase.Name);
 
@@ -52,35 +56,36 @@ internal abstract class DeclarationProject {
             .ToList();
     }
 
-    public ErrorsListViewModel CheckRoomGroupsInProject() {
-        var errorListVM = new ErrorsListViewModel() {
-            Message = "Ошибка",
-            Description = "В проекте отсутствуют необходимые группы помещений на выбранной стадии",
+    public WarningViewModel CheckRoomGroupsInProject() {
+        var errorListVM = new WarningViewModel(_localizationService) {
+            WarningType = _localizationService.GetLocalizedString("WarningWindow.Error"),
+            Description = _localizationService.GetLocalizedString("WarningsWindow.NoGroupsAtPhase"),
             DocumentName = _document.Name
         };
 
         if(_roomGroups.Count == 0) {
-            errorListVM.Errors = [
-                new ErrorElement(_settings.SelectedPhase.Name, "Отсутствуют группы помещений")
+            errorListVM.Elements = [
+                new WarningElementViewModel(_settings.SelectedPhase.Name, 
+                _localizationService.GetLocalizedString("WarningsWindow.NoGroups"))
             ];
         }
 
         return errorListVM;
     }
 
-    public ErrorsListViewModel CheckActualRoomAreas() {
-        var errorListVM = new ErrorsListViewModel() {
-            Message = "Предупреждение",
-            Description = "Не актуальные площади помещений, рассчитанные квартирографией",
+    public WarningViewModel CheckActualRoomAreas() {
+        var errorListVM = new WarningViewModel(_localizationService) {
+            WarningType = _localizationService.GetLocalizedString("WarningWindow.Warning"),
+            Description = _localizationService.GetLocalizedString("WarningWindow.NotActualAreas"),
             DocumentName = _document.Name
         };
 
         foreach(var roomGroup in _roomGroups) {
             if(!roomGroup.CheckActualRoomAreas()) {
-                string groupInfo = $"Группа помещений № {roomGroup.Number} на этаже {roomGroup.Level}";
-                string groupAreas = "Площади помещений, рассчитанные квартирографией " +
-                    "отличаются от актуальной системной площадей помещения.";
-                errorListVM.Errors.Add(new ErrorElement(groupInfo, groupAreas));
+                string groupInfo = _localizationService
+                    .GetLocalizedString("WarningsWindow.ErrorRoomGroup", roomGroup.Number, roomGroup.Level);
+                string groupAreas = _localizationService.GetLocalizedString("WarningsWindow.NotActualAreasInfo");
+                errorListVM.Elements.Add(new WarningElementViewModel(groupInfo, groupAreas));
             }
         }
 

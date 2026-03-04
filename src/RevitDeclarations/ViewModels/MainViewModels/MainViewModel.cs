@@ -1,182 +1,126 @@
-using System.Collections.Generic;
 using System.Linq;
 using System.Windows.Input;
 
-using Autodesk.Revit.DB;
-
 using dosymep.Revit.Comparators;
+using dosymep.SimpleServices;
 using dosymep.WPF.Commands;
 using dosymep.WPF.ViewModels;
 
-using Microsoft.WindowsAPICodePack.Dialogs;
-
 using RevitDeclarations.Models;
+using RevitDeclarations.Services;
 
 namespace RevitDeclarations.ViewModels;
 internal abstract class MainViewModel : BaseViewModel {
     protected readonly RevitRepository _revitRepository;
     protected readonly DeclarationSettings _settings;
-
-    protected readonly IList<RevitDocumentViewModel> _revitDocuments;
-    protected readonly IReadOnlyList<Phase> _phases;
-    protected Phase _selectedPhase;
-
-    protected string _filePath;
-    protected string _fileName;
+    protected readonly ILocalizationService _localizationService;
+    protected readonly IMessageBoxService _messageBoxService;
+    protected readonly ErrorWindowService _errorWindowService;
 
     protected ParametersViewModel _parametersViewModel;
     protected PrioritiesViewModel _prioritiesViewModel;
-
-    protected List<ExportViewModel> _exportFormats;
-    protected ExportViewModel _selectedFormat;
-
-    protected string _accuracy;
-
-    protected bool _loadUtp;
-    protected bool _canLoadUtp;
-    protected string _canLoadUtpText;
+    protected DeclarationViewModel _declarationViewModel;
 
     protected LogicalStringComparer _stringComparer;
 
+    private bool _hasDeclarationPageErrors;
+    private bool _hasParametersPageErrors;
     private string _errorText;
 
-    public MainViewModel(RevitRepository revitRepository, DeclarationSettings settings) {
+    public MainViewModel(RevitRepository revitRepository, 
+                         DeclarationSettings settings,
+                         ILocalizationService localizationService,
+                         IMessageBoxService messageBoxService,
+                         ErrorWindowService errorWindowService) {
         _revitRepository = revitRepository;
         _settings = settings;
-
-        _phases = _revitRepository.GetPhases();
-        _selectedPhase = _phases[_phases.Count() - 1];
-
-        _revitDocuments = _revitRepository
-            .GetLinks()
-            .Select(x => new RevitDocumentViewModel(x, _settings))
-            .Where(x => x.HasRooms())
-            .OrderBy(x => x.Name)
-            .ToList();
-
-        var currentDocumentVM =
-            new RevitDocumentViewModel(_revitRepository.Document, _settings);
-
-        if(currentDocumentVM.HasRooms()) {
-            _revitDocuments.Insert(0, currentDocumentVM);
-        }
-
-        _accuracy = "1";
+        _localizationService = localizationService;
+        _messageBoxService = messageBoxService;
+        _errorWindowService = errorWindowService;
 
         _stringComparer = new LogicalStringComparer();
 
-        SelectFolderCommand = new RelayCommand(SelectFolder);
         ExportDeclarationCommand = new RelayCommand(ExportDeclaration, CanExport);
     }
 
-    public ICommand SelectFolderCommand { get; }
     public ICommand ExportDeclarationCommand { get; }
 
+    public DeclarationViewModel DeclarationViewModel => _declarationViewModel;
     public ParametersViewModel ParametersViewModel => _parametersViewModel;
     public PrioritiesViewModel PrioritiesViewModel => _prioritiesViewModel;
-
-    public IList<RevitDocumentViewModel> RevitDocuments => _revitDocuments;
-    public IReadOnlyList<Phase> Phases => _phases;
-
-    public Phase SelectedPhase {
-        get => _selectedPhase;
-        set => RaiseAndSetIfChanged(ref _selectedPhase, value);
-    }
-
-    public string FilePath {
-        get => _filePath;
-        set => RaiseAndSetIfChanged(ref _filePath, value);
-    }
-    public string FileName {
-        get => _fileName;
-        set => RaiseAndSetIfChanged(ref _fileName, value);
-    }
-    public string FullPath => FilePath + "\\" + FileName;
-
-    public IReadOnlyList<ExportViewModel> ExportFormats => _exportFormats;
-    public ExportViewModel SelectedFormat {
-        get => _selectedFormat;
-        set => RaiseAndSetIfChanged(ref _selectedFormat, value);
-    }
-
-    public string Accuracy {
-        get => _accuracy;
-        set => RaiseAndSetIfChanged(ref _accuracy, value);
-    }
-
-    public bool LoadUtp {
-        get => _loadUtp;
-        set => RaiseAndSetIfChanged(ref _loadUtp, value);
-    }
-
-    public bool CanLoadUtp {
-        get => _canLoadUtp;
-        set => RaiseAndSetIfChanged(ref _canLoadUtp, value);
-    }
-    public string CanLoadUtpText {
-        get => _canLoadUtpText;
-        set => RaiseAndSetIfChanged(ref _canLoadUtpText, value);
-    }
 
     public string ErrorText {
         get => _errorText;
         set => RaiseAndSetIfChanged(ref _errorText, value);
     }
 
-    public void SelectFolder(object obj) {
-        var dialog = new CommonOpenFileDialog() {
-            IsFolderPicker = true
-        };
+    public bool HasDeclarationPageErrors {
+        get => _hasDeclarationPageErrors;
+        set {
+            if(ValidateFilePath()) {
+                value = true;
+            }
+            if(ValidateFileName()) {
+                value = true;
+            }
+            if(ValidateCheckedDocuments()) {
+                value = true;
+            }
+            if(ValidatePhases()) {
+                value = true;
+            }
+            RaiseAndSetIfChanged(ref _hasDeclarationPageErrors, value);
+        }
+    }
 
-        if(dialog.ShowDialog() == CommonFileDialogResult.Ok) {
-            FilePath = dialog.FileName;
+    public bool HasParametersPageErrors {
+        get => _hasParametersPageErrors;
+        set {
+            if(ValidateEmptyParameters()) {
+                value = true;
+            }
+            if(ValidateFilterValues()) {
+                value = true;
+            }
+            if(ValidateProjectName()) {
+                value = true;
+            }
+            RaiseAndSetIfChanged(ref _hasParametersPageErrors, value);
         }
     }
 
     public abstract void ExportDeclaration(object obj);
 
     public bool CanExport(object obj) {
-        var checkedDocuments = _revitDocuments
-            .Where(x => x.IsChecked);
+        HasDeclarationPageErrors = false;
+        HasParametersPageErrors = false;
 
-        bool hasCheckedDocuments = _revitDocuments
-            .Where(x => x.IsChecked)
-            .Any();
-
-        bool hasPhases = checkedDocuments
-            .All(x => x.HasPhase(_selectedPhase));
-
-        bool hasEmptyParameters = _parametersViewModel
-            .AllSelectedParameters
-            .Where(x => x == null)
-            .Any();
-
-        if(string.IsNullOrEmpty(_filePath)) {
-            ErrorText = "Не выбрана папка";
+        if(ValidateFilePath()) {
+            ErrorText = _localizationService.GetLocalizedString("MainWindow.ErrorNoFolder");
             return false;
         }
-        if(string.IsNullOrEmpty(_fileName)) {
-            ErrorText = "Не заполнено имя файла";
+        if(ValidateFileName()) {
+            ErrorText = _localizationService.GetLocalizedString("MainWindow.ErrorNoName");
             return false;
         }
-        if(!hasCheckedDocuments) {
-            ErrorText = "Не выбраны проекты для выгрузки";
+        if(ValidateCheckedDocuments()) {
+            ErrorText = _localizationService.GetLocalizedString("MainWindow.ErrorNoProjects");
             return false;
         }
-        if(!hasPhases) {
-            ErrorText = "В выбранных проектах отсутствует выбранная стадия";
+        if(ValidatePhases()) {
+            ErrorText = _localizationService.GetLocalizedString("MainWindow.ErrorNoPhaseInDocs");
             return false;
         }
-        if(hasEmptyParameters) {
-            ErrorText = "Не выбран параметр на вкладке \"Параметры\"";
+        if(ValidateEmptyParameters()) {
+            ErrorText = _localizationService.GetLocalizedString("MainWindow.ErrorNoParams");
             return false;
         }
-        if(!_parametersViewModel.FilterRoomsValues.Any()) {
-            ErrorText = "Не заполнены значения для фильтрации на вкладке \"Параметры\"";
+        if(ValidateFilterValues()) {
+            ErrorText = _localizationService.GetLocalizedString("MainWindow.ErrorNoParamFilters");
             return false;
         }
-        if(string.IsNullOrEmpty(_parametersViewModel.ProjectName)) {
-            ErrorText = "Не заполнено ИД объекта на вкладке \"Параметры\"";
+        if(ValidateProjectName()) {
+            ErrorText = _localizationService.GetLocalizedString("MainWindow.ErrorNoProjectId");
             return false;
         }
 
@@ -185,14 +129,14 @@ internal abstract class MainViewModel : BaseViewModel {
     }
 
     public void SetSelectedSettings() {
-        int.TryParse(_accuracy, out int accuracy);
+        int.TryParse(_declarationViewModel.Accuracy, out int accuracy);
         _settings.AccuracyForArea = accuracy;
         _settings.AccuracyForLength = 2;
-        _settings.SelectedPhase = _selectedPhase;
+        _settings.SelectedPhase = _declarationViewModel.SelectedPhase;
 
         _settings.PrioritiesConfig = _prioritiesViewModel.PrioritiesConfig;
 
-        _settings.LoadUtp = _loadUtp;
+        _settings.LoadUtp = _declarationViewModel.LoadUtp;
 
         _settings.FilterRoomsParam = _parametersViewModel.SelectedFilterRoomsParam;
         _settings.FilterRoomsValues = _parametersViewModel.FilterRoomsValues.Select(x => x.Value).ToArray();
@@ -219,12 +163,12 @@ internal abstract class MainViewModel : BaseViewModel {
     /// Эти настройки одинаковы для всех деклараций.
     /// </summary>
     public void SaveMainWindowConfig(DeclarationConfigSettings configSettings) {
-        configSettings.DeclarationName = FileName;
-        configSettings.DeclarationPath = FilePath;
-        configSettings.ExportFormat = SelectedFormat.Id;
-        configSettings.Phase = SelectedPhase.Name;
+        configSettings.DeclarationName = _declarationViewModel.FileName;
+        configSettings.DeclarationPath = _declarationViewModel.FilePath;
+        configSettings.ExportFormat = _declarationViewModel.SelectedFormat.Id;
+        configSettings.Phase = _declarationViewModel.SelectedPhase.Name;
 
-        configSettings.RevitDocuments = RevitDocuments
+        configSettings.RevitDocuments = _declarationViewModel.RevitDocuments
             .Where(x => x.IsChecked)
             .Select(x => x.Name)
             .ToList();
@@ -256,18 +200,54 @@ internal abstract class MainViewModel : BaseViewModel {
     }
 
     public void LoadMainWindowConfig(DeclarationConfigSettings configSettings) {
-        FileName = configSettings.DeclarationName;
-        FilePath = configSettings.DeclarationPath;
-        SelectedFormat = ExportFormats
-            .FirstOrDefault(x => x.Id == configSettings.ExportFormat) ?? _exportFormats.FirstOrDefault();
-        SelectedPhase = Phases
-            .FirstOrDefault(x => x.Name == configSettings.Phase) ?? _phases[_phases.Count - 1];
+        _declarationViewModel.FileName = configSettings.DeclarationName;
+        _declarationViewModel.FilePath = configSettings.DeclarationPath;
+        _declarationViewModel.SelectedFormat = _declarationViewModel.ExportFormats
+            .FirstOrDefault(x => x.Id == configSettings.ExportFormat) ?? _declarationViewModel.ExportFormats.FirstOrDefault();
+        _declarationViewModel.SelectedPhase = _declarationViewModel.Phases
+            .FirstOrDefault(x => x.Name == configSettings.Phase) ?? _declarationViewModel
+            .Phases[_declarationViewModel.Phases.Count - 1];
 
-        var documents = RevitDocuments
+        var documents = _declarationViewModel.RevitDocuments
             .Where(x => configSettings.RevitDocuments.Contains(x.Name));
 
         foreach(var document in documents) {
             document.IsChecked = true;
         }
+    }
+
+    private bool ValidateFilePath() {
+        return string.IsNullOrEmpty(_declarationViewModel.FilePath);
+    }
+
+    private bool ValidateFileName() {
+        return string.IsNullOrEmpty(_declarationViewModel.FileName);
+    }
+
+    private bool ValidatePhases() {
+        return !_declarationViewModel.RevitDocuments
+            .Where(x => x.IsChecked)
+            .All(x => x.HasPhase(_declarationViewModel.SelectedPhase));
+    }
+
+    private bool ValidateCheckedDocuments() {
+        return !_declarationViewModel.RevitDocuments
+            .Where(x => x.IsChecked)
+            .Any();
+    }
+
+    private bool ValidateEmptyParameters() {
+        return _parametersViewModel
+            .AllSelectedParameters
+            .Where(x => x == null)
+            .Any();
+    }
+
+    private bool ValidateFilterValues() {
+        return !_parametersViewModel.FilterRoomsValues.Any();
+    }
+
+    private bool ValidateProjectName() {
+        return string.IsNullOrEmpty(_parametersViewModel.ProjectName);
     }
 }
