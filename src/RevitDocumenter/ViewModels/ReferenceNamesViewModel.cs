@@ -1,11 +1,10 @@
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Windows.Input;
 
 using dosymep.WPF.Commands;
 using dosymep.WPF.ViewModels;
-
-using RevitDocumenter.Models;
 
 namespace RevitDocumenter.ViewModels;
 internal class ReferenceNamesViewModel : BaseViewModel {
@@ -51,7 +50,6 @@ internal class ReferenceNamesViewModel : BaseViewModel {
         return HorizontalRefNames.Any(x => x.IsCheck);
     }
 
-    public ReferenceNames GetReferenceNames() => new(
-        [.. VerticalRefNames.Select(r => r.ReferenceName)],
-        [.. HorizontalRefNames.Select(r => r.ReferenceName)]);
+    public List<string> GetVertReferenceNames() => [.. VerticalRefNames.Select(r => r.ReferenceName)];
+    public List<string> GetHorizReferenceNames() => [.. HorizontalRefNames.Select(r => r.ReferenceName)];
 }

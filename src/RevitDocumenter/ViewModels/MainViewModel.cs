@@ -100,6 +100,27 @@ internal class MainViewModel : BaseViewModel {
     /// </remarks>
     private void AcceptView() {
         SaveConfig();
+
+        //var doc = _revitRepository.Document;
+        //var grids = _revitRepository.GetGrids();
+        //foreach(var rebar in _revitRepository.GetRebarElements(FamilyNamePart,
+        //                                                       ReferenceNamesVM.GetVertReferenceNames(),
+        //                                                       ReferenceNamesVM.GetHorizReferenceNames())) {
+        //    if(rebar.VerticalRefs is { Count: > 0 } rebarVerticalRefs) {
+        //        // Получаем опорные плоскости для размера
+        //        var dimRefsY = _сomparisonService.Compare(rebarVerticalRefs, grids, rebar.Rebar.FacingOrientation);
+        //        // Получаем линию размещения размера
+        //        var dimensionLineY = _dimLineSearchService.GetLine(rebar);
+        //        // Строим горизонтальный размер между вертикальными осями (относ. локальной системы координат зоны)
+        //        doc.Create.NewDimension(doc.ActiveView, dimensionLineY, dimRefsY, _selectedDimensionType);
+        //    }
+
+        //    if(rebar.HorizontalRefs is { Count: > 0 } rebarHorizontalRefs) {
+        //        var dimRefsX = _сomparisonService.Compare(rebarHorizontalRefs, grids, rebar.Rebar.HandOrientation);
+        //        var dimensionLineX = _dimLineSearchService.GetLine(rebar);
+        //        doc.Create.NewDimension(doc.ActiveView, dimensionLineX, dimRefsX, _selectedDimensionType);
+        //    }
+        //}
     }
 
     /// <summary>
