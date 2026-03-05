@@ -10,6 +10,7 @@ using dosymep.WPF.ViewModels;
 
 using RevitDocumenter.Models;
 using RevitDocumenter.Models.Comparision;
+using RevitDocumenter.Models.DimensionLine;
 
 namespace RevitDocumenter.ViewModels;
 
@@ -21,6 +22,7 @@ internal class MainViewModel : BaseViewModel {
     private readonly RevitRepository _revitRepository;
     private readonly ILocalizationService _localizationService;
     private readonly IComparisonService _comparisonService;
+    private readonly IDimensionLineService _dimensionLineService;
     private readonly DimensionCreator _dimensionCreator;
     private string _errorText;
     private string _familyNamePart;
@@ -44,12 +46,14 @@ internal class MainViewModel : BaseViewModel {
         RevitRepository revitRepository,
         ILocalizationService localizationService,
         IComparisonService comparisonService,
+        IDimensionLineService dimensionLineService,
         DimensionCreator dimensionCreator) {
 
         _pluginConfig = pluginConfig;
         _revitRepository = revitRepository;
         _localizationService = localizationService;
         _comparisonService = comparisonService;
+        _dimensionLineService = dimensionLineService;
         _dimensionCreator = dimensionCreator;
 
         ReferenceNamesVM = new ReferenceNamesViewModel();
@@ -124,7 +128,10 @@ internal class MainViewModel : BaseViewModel {
                 var dimRefsY = _comparisonService.Compare(comparisonContext);
                 //// Получаем линию размещения размера
                 //var dimensionLineY = _dimLineSearchService.GetLine(rebar);
-                var dimensionLineY = Line.CreateBound(XYZ.Zero, XYZ.Zero + rebar.Rebar.FacingOrientation.CrossProduct(XYZ.BasisZ));
+
+                var dimensionLineY = _dimensionLineService.GetLine(rebar, rebar.Rebar.FacingOrientation.CrossProduct(XYZ.BasisZ));
+
+                //var dimensionLineY = Line.CreateBound(XYZ.Zero, XYZ.Zero + rebar.Rebar.FacingOrientation.CrossProduct(XYZ.BasisZ));
 
                 //// Строим горизонтальный размер между вертикальными осями (относ. локальной системы координат зоны)
                 _dimensionCreator.Create(dimensionLineY, dimRefsY, _selectedDimensionType);

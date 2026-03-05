@@ -14,6 +14,7 @@ using Ninject;
 
 using RevitDocumenter.Models;
 using RevitDocumenter.Models.Comparision;
+using RevitDocumenter.Models.DimensionLine;
 using RevitDocumenter.ViewModels;
 using RevitDocumenter.Views;
 
@@ -57,6 +58,10 @@ public class RevitDocumenterCommand : BasePluginCommand {
 
         kernel.Bind<IComparisonService>()
             .To<GridComparisonService>()
+            .InSingletonScope();
+
+        kernel.Bind<IDimensionLineService>()
+            .To<SimpleDimensionLineService>()
             .InSingletonScope();
 
         kernel.Bind<DimensionCreator>()
