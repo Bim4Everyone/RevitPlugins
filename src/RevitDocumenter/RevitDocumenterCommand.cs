@@ -63,6 +63,10 @@ public class RevitDocumenterCommand : BasePluginCommand {
             .ToSelf()
             .InSingletonScope();
 
+        kernel.Bind<ArgumentValidator>()
+            .ToSelf()
+            .InSingletonScope();
+
         // Используем сервис обновления тем для WinUI
         kernel.UseWpfUIThemeUpdater();
 
