@@ -13,6 +13,7 @@ using dosymep.WpfUI.Core.Ninject;
 using Ninject;
 
 using RevitDocumenter.Models;
+using RevitDocumenter.Models.Comparision;
 using RevitDocumenter.ViewModels;
 using RevitDocumenter.Views;
 
@@ -53,6 +54,14 @@ public class RevitDocumenterCommand : BasePluginCommand {
         // Настройка конфигурации плагина
         kernel.Bind<PluginConfig>()
             .ToMethod(c => PluginConfig.GetPluginConfig(c.Kernel.Get<IConfigSerializer>()));
+
+        kernel.Bind<IComparisonService>()
+            .To<GridComparisonService>()
+            .InSingletonScope();
+
+        kernel.Bind<DimensionCreator>()
+            .ToSelf()
+            .InSingletonScope();
 
         // Используем сервис обновления тем для WinUI
         kernel.UseWpfUIThemeUpdater();

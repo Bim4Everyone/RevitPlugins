@@ -4,11 +4,13 @@ using System.Windows.Input;
 
 using Autodesk.Revit.DB;
 
+using dosymep.Revit;
 using dosymep.SimpleServices;
 using dosymep.WPF.Commands;
 using dosymep.WPF.ViewModels;
 
 using RevitDocumenter.Models;
+using RevitDocumenter.Models.Comparision;
 
 namespace RevitDocumenter.ViewModels;
 
@@ -19,7 +21,8 @@ internal class MainViewModel : BaseViewModel {
     private readonly PluginConfig _pluginConfig;
     private readonly RevitRepository _revitRepository;
     private readonly ILocalizationService _localizationService;
-
+    private readonly IComparisonService _comparisonService;
+    private readonly DimensionCreator _dimensionCreator;
     private string _errorText;
     private string _familyNamePart;
     private DimensionType _selectedDimensionType;
@@ -40,11 +43,15 @@ internal class MainViewModel : BaseViewModel {
     public MainViewModel(
         PluginConfig pluginConfig,
         RevitRepository revitRepository,
-        ILocalizationService localizationService) {
+        ILocalizationService localizationService,
+        IComparisonService comparisonService,
+        DimensionCreator dimensionCreator) {
 
         _pluginConfig = pluginConfig;
         _revitRepository = revitRepository;
         _localizationService = localizationService;
+        _comparisonService = comparisonService;
+        _dimensionCreator = dimensionCreator;
 
         ReferenceNamesVM = new ReferenceNamesViewModel();
 
@@ -101,26 +108,38 @@ internal class MainViewModel : BaseViewModel {
     private void AcceptView() {
         SaveConfig();
 
-        //var doc = _revitRepository.Document;
-        //var grids = _revitRepository.GetGrids();
-        //foreach(var rebar in _revitRepository.GetRebarElements(FamilyNamePart,
-        //                                                       ReferenceNamesVM.GetVertReferenceNames(),
-        //                                                       ReferenceNamesVM.GetHorizReferenceNames())) {
-        //    if(rebar.VerticalRefs is { Count: > 0 } rebarVerticalRefs) {
-        //        // Получаем опорные плоскости для размера
-        //        var dimRefsY = _сomparisonService.Compare(rebarVerticalRefs, grids, rebar.Rebar.FacingOrientation);
-        //        // Получаем линию размещения размера
-        //        var dimensionLineY = _dimLineSearchService.GetLine(rebar);
-        //        // Строим горизонтальный размер между вертикальными осями (относ. локальной системы координат зоны)
-        //        doc.Create.NewDimension(doc.ActiveView, dimensionLineY, dimRefsY, _selectedDimensionType);
-        //    }
+        var doc = _revitRepository.Document;
+        var grids = _revitRepository.GetGrids();
 
-        //    if(rebar.HorizontalRefs is { Count: > 0 } rebarHorizontalRefs) {
-        //        var dimRefsX = _сomparisonService.Compare(rebarHorizontalRefs, grids, rebar.Rebar.HandOrientation);
-        //        var dimensionLineX = _dimLineSearchService.GetLine(rebar);
-        //        doc.Create.NewDimension(doc.ActiveView, dimensionLineX, dimRefsX, _selectedDimensionType);
-        //    }
-        //}
+
+        using var transactionGroup = _revitRepository.Document.StartTransactionGroup("Create Dimensions");
+
+        foreach(var rebar in _revitRepository.GetRebarElements(FamilyNamePart,
+                                                               ReferenceNamesVM.GetVertReferenceNames(),
+                                                               ReferenceNamesVM.GetHorizReferenceNames())) {
+            if(rebar.VerticalRefs is { Count: > 0 } rebarVerticalRefs) {
+                // Получаем опорные плоскости для размера
+                IComparisonContext comparisonContext =
+                    new GridComparisonContext(rebarVerticalRefs, grids, rebar.Rebar.FacingOrientation);
+
+                var dimRefsY = _comparisonService.Compare(comparisonContext);
+                //// Получаем линию размещения размера
+                //var dimensionLineY = _dimLineSearchService.GetLine(rebar);
+                var dimensionLineY = Line.CreateBound(XYZ.Zero, XYZ.Zero + rebar.Rebar.FacingOrientation.CrossProduct(XYZ.BasisZ));
+
+                //// Строим горизонтальный размер между вертикальными осями (относ. локальной системы координат зоны)
+                using var transaction = _revitRepository.Document.StartTransaction("Creation Dimensions");
+                _dimensionCreator.Create(dimensionLineY, dimRefsY, _selectedDimensionType);
+                transaction.Commit();
+            }
+
+            //if(rebar.HorizontalRefs is { Count: > 0 } rebarHorizontalRefs) {
+            //    var dimRefsX = _сomparisonService.Compare(rebarHorizontalRefs, grids, rebar.Rebar.HandOrientation);
+            //    var dimensionLineX = _dimLineSearchService.GetLine(rebar);
+            //    doc.Create.NewDimension(doc.ActiveView, dimensionLineX, dimRefsX, _selectedDimensionType);
+            //}
+        }
+        transactionGroup.Commit();
     }
 
     /// <summary>

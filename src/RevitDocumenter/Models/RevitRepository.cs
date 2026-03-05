@@ -55,7 +55,7 @@ internal class RevitRepository {
         .ToList();
 
     public List<Grid> GetGrids() {
-        return new FilteredElementCollector(Document)
+        return new FilteredElementCollector(Document, Document.ActiveView.Id)
           .OfClass(typeof(Grid))
           .WhereElementIsNotElementType()
           .OfType<Grid>()
@@ -65,7 +65,7 @@ internal class RevitRepository {
     public List<RebarElement> GetRebarElements(
         string familyNamePart,
         List<string> verticalRefNames,
-        List<string> horizontalRefNames) => new FilteredElementCollector(Document)
+        List<string> horizontalRefNames) => new FilteredElementCollector(Document, Document.ActiveView.Id)
           .OfCategory(BuiltInCategory.OST_Rebar)
           .WhereElementIsNotElementType()
           .OfType<FamilyInstance>()
