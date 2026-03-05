@@ -4,8 +4,6 @@ using System.Linq;
 
 using Autodesk.Revit.DB;
 
-using dosymep.Revit;
-
 namespace RevitDocumenter.Models.Comparision;
 internal class GridComparisonService : IComparisonService {
     private readonly RevitRepository _revitRepository;
@@ -60,27 +58,30 @@ internal class GridComparisonService : IComparisonService {
         double minDistance = double.MaxValue;
 
         // Создаем временную транзакцию для создания размеров
-        using var transaction = _revitRepository.Document.StartTransaction("Temporary Dimensions");
-        try {
-            // Создаем размер между каждой парой
-            foreach(var refA in referencesA) {
-                foreach(var refB in referencesB) {
-                    Dimension dimension = _dimensionCreator.Create(dimensionLine, refA, refB);
+        using(SubTransaction subTransaction = new SubTransaction(_revitRepository.Document)) {
+            subTransaction.Start();
 
-                    if(dimension != null && dimension.Value.HasValue) {
-                        double distance = dimension.Value.Value;
+            try {
+                // Создаем размер между каждой парой
+                foreach(var refA in referencesA) {
+                    foreach(var refB in referencesB) {
+                        Dimension dimension = _dimensionCreator.Create(dimensionLine, refA, refB);
 
-                        if(distance < minDistance) {
-                            minDistance = distance;
-                            resultRef1 = refA;
-                            resultRef2 = refB;
+                        if(dimension != null && dimension.Value.HasValue) {
+                            double distance = dimension.Value.Value;
+
+                            if(distance < minDistance) {
+                                minDistance = distance;
+                                resultRef1 = refA;
+                                resultRef2 = refB;
+                            }
                         }
                     }
                 }
+                subTransaction.RollBack();
+            } catch(Exception) {
+                subTransaction.RollBack();
             }
-            transaction.RollBack();
-        } catch(Exception) {
-            transaction.RollBack();
         }
 
         if(resultRef1 != null && resultRef2 != null) {

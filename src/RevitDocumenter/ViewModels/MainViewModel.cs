@@ -4,7 +4,6 @@ using System.Windows.Input;
 
 using Autodesk.Revit.DB;
 
-using dosymep.Revit;
 using dosymep.SimpleServices;
 using dosymep.WPF.Commands;
 using dosymep.WPF.ViewModels;
@@ -111,12 +110,12 @@ internal class MainViewModel : BaseViewModel {
         var doc = _revitRepository.Document;
         var grids = _revitRepository.GetGrids();
 
-
-        using var transactionGroup = _revitRepository.Document.StartTransactionGroup("Create Dimensions");
+        using Transaction mainTransaction = new Transaction(doc, "Основная операция");
+        mainTransaction.Start();
 
         foreach(var rebar in _revitRepository.GetRebarElements(FamilyNamePart,
-                                                               ReferenceNamesVM.GetVertReferenceNames(),
-                                                               ReferenceNamesVM.GetHorizReferenceNames())) {
+                                                       ReferenceNamesVM.GetVertReferenceNames(),
+                                                       ReferenceNamesVM.GetHorizReferenceNames())) {
             if(rebar.VerticalRefs is { Count: > 0 } rebarVerticalRefs) {
                 // Получаем опорные плоскости для размера
                 IComparisonContext comparisonContext =
@@ -128,9 +127,7 @@ internal class MainViewModel : BaseViewModel {
                 var dimensionLineY = Line.CreateBound(XYZ.Zero, XYZ.Zero + rebar.Rebar.FacingOrientation.CrossProduct(XYZ.BasisZ));
 
                 //// Строим горизонтальный размер между вертикальными осями (относ. локальной системы координат зоны)
-                using var transaction = _revitRepository.Document.StartTransaction("Creation Dimensions");
                 _dimensionCreator.Create(dimensionLineY, dimRefsY, _selectedDimensionType);
-                transaction.Commit();
             }
 
             //if(rebar.HorizontalRefs is { Count: > 0 } rebarHorizontalRefs) {
@@ -139,7 +136,7 @@ internal class MainViewModel : BaseViewModel {
             //    doc.Create.NewDimension(doc.ActiveView, dimensionLineX, dimRefsX, _selectedDimensionType);
             //}
         }
-        transactionGroup.Commit();
+        mainTransaction.Commit();
     }
 
     /// <summary>

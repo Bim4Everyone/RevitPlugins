@@ -48,7 +48,10 @@ internal class DimensionCreator {
         if(referenceArray == null)
             throw new ArgumentNullException(nameof(referenceArray));
 
-        return selectedDimensionType is null
+        using var subTransaction = new SubTransaction(_revitRepository.Document);
+        subTransaction.Start();
+
+        var dimension = selectedDimensionType is null
             ? _revitRepository.Document.Create.NewDimension(
                 _revitRepository.Document.ActiveView,
                 dimensionLine,
@@ -58,5 +61,7 @@ internal class DimensionCreator {
                 dimensionLine,
                 referenceArray,
                 selectedDimensionType);
+        subTransaction.Commit();
+        return dimension;
     }
 }
