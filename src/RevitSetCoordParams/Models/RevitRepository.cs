@@ -124,7 +124,7 @@ internal class RevitRepository {
                 var transSolid = transform != null
                     ? SolidUtils.CreateTransformed(unitedSolid, transform)
                     : unitedSolid;
-                return new RevitElement { Element = instance, Solid = transSolid };
+                return new RevitElement { Element = instance, Solid = transSolid, BoundingBoxXYZ = transSolid.GetBoundingBox() };
             })
             .ToList();
     }
