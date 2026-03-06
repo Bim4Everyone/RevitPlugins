@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -11,21 +12,24 @@ namespace RevitSetCoordParams.Models;
 internal class ParamManager {
     private readonly SetCoordParamsSettings _settings;
     private readonly List<ParamMap> _paramMaps;
+    private readonly ParamMap _blockingParamMap;
+    private readonly List<ParamMap> _pairParamMaps;
 
     public ParamManager(SetCoordParamsSettings settings) {
         _settings = settings;
         _paramMaps = _settings.ParamMaps;
+        _blockingParamMap = _paramMaps
+            .FirstOrDefault(paramMap => paramMap.Type == ParamType.BlockingParam);
+        _pairParamMaps = _paramMaps
+            .Where(x => x.Type != ParamType.BlockingParam).ToList();
     }
 
     public bool BlockingCheck(RevitElement targetElement) {
-        var blockingParamMap = _paramMaps
-            .FirstOrDefault(paramMap => paramMap.Type == ParamType.BlockingParam);
-
-        if(blockingParamMap is null) {
+        if(_blockingParamMap is null) {
             return false;
         }
 
-        string targetParamNane = blockingParamMap.TargetParam.Name;
+        string targetParamNane = _blockingParamMap.TargetParam.Name;
         if(targetElement.Element.IsExistsParam(targetParamNane)) {
             int blockValue = targetElement.Element.GetParamValueOrDefault<int>(targetParamNane);
             if(blockValue is not default(int) and 1) {
@@ -35,18 +39,13 @@ internal class ParamManager {
         return false;
     }
 
-    public List<RevitParam> SetParams(RevitElement sourceElement, RevitElement targetElement) {
-        var pairParamMaps = _paramMaps
-            .Where(x => x.Type != ParamType.BlockingParam);
-
-        var missedParams = new List<RevitParam>();
-
-        foreach(var paramMap in pairParamMaps) {
+    public void SetParams(RevitElement sourceElement, RevitElement targetElement, Action<RevitParam> onMissedParam) {
+        foreach(var paramMap in _pairParamMaps) {
             string sourceParamName = paramMap.SourceParam.Name;
             string targetParamName = paramMap.TargetParam.Name;
 
             if(!targetElement.Element.IsExistsParam(targetParamName) || !sourceElement.Element.IsExistsParam(sourceParamName)) {
-                missedParams.Add(paramMap.TargetParam);
+                onMissedParam(paramMap.TargetParam);
                 continue;
             }
 
@@ -60,7 +59,6 @@ internal class ParamManager {
                     break;
             }
         }
-        return missedParams;
     }
 
     private void SetDoubleParam(RevitElement sourceElement, RevitElement targetElement, string sourceParamName, string targetParamName) {
@@ -73,7 +71,6 @@ internal class ParamManager {
 
     private void SetStringParam(RevitElement sourceElement, RevitElement targetElement, string sourceParamName, string targetParamName) {
         string value = sourceElement.Element.GetParamValueOrDefault<string>(sourceParamName);
-
         if(string.IsNullOrEmpty(value)) {
             return;
         }

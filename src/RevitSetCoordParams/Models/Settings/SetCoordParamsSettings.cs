@@ -4,6 +4,7 @@ using Autodesk.Revit.DB;
 
 using dosymep.Revit;
 
+using RevitSetCoordParams.Models.Enums;
 using RevitSetCoordParams.Models.Interfaces;
 
 namespace RevitSetCoordParams.Models.Settings;
@@ -28,6 +29,7 @@ internal class SetCoordParamsSettings {
     public double MaxDiameterSearchSphereMm { get; set; }
     public double StepDiameterSearchSphereMm { get; set; }
     public bool Search { get; set; }
+    public DepElementsProcessType DepElementsProcessType { get; set; }
 
     public void LoadConfigSettings() {
         ParamMaps = ConfigSettings.ParamMaps;
@@ -39,6 +41,7 @@ internal class SetCoordParamsSettings {
         MaxDiameterSearchSphereMm = ConfigSettings.MaxDiameterSearchSphereMm;
         StepDiameterSearchSphereMm = ConfigSettings.StepDiameterSearchSphereMm;
         Search = ConfigSettings.Search;
+        DepElementsProcessType = ConfigSettings.DepElementsProcessType;
     }
 
     public void UpdateConfigSettings() {
@@ -51,6 +54,7 @@ internal class SetCoordParamsSettings {
         ConfigSettings.MaxDiameterSearchSphereMm = MaxDiameterSearchSphereMm;
         ConfigSettings.StepDiameterSearchSphereMm = StepDiameterSearchSphereMm;
         ConfigSettings.Search = Search;
+        ConfigSettings.DepElementsProcessType = DepElementsProcessType;
     }
 
     private IFileProvider GetFileProvider(string fileName) {
