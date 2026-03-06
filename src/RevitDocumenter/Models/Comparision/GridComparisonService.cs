@@ -4,37 +4,43 @@ using System.Linq;
 
 using Autodesk.Revit.DB;
 
+using RevitDocumenter.Models.DimensionLine;
+
 using Grid = Autodesk.Revit.DB.Grid;
 
 namespace RevitDocumenter.Models.Comparision;
 internal class GridComparisonService : IComparisonService {
     private readonly RevitRepository _revitRepository;
     private readonly DimensionCreator _dimensionCreator;
-    private readonly ArgumentValidator _argumentValidator;
+    private readonly IDimensionLineService _dimensionLineService;
+    private readonly Guard _guard;
 
     public GridComparisonService(
         RevitRepository revitRepository,
         DimensionCreator dimensionCreator,
-        ArgumentValidator argumentValidator) {
+        IDimensionLineService dimensionLineService,
+        Guard guard) {
 
         _revitRepository = revitRepository;
         _dimensionCreator = dimensionCreator;
-        _argumentValidator = argumentValidator;
+        _dimensionLineService = dimensionLineService;
+        _guard = guard;
     }
 
 
     public ReferenceArray Compare(IComparisonContext context) {
         var gridComparisonContext = context as GridComparisonContext ?? throw new ArgumentException("Invalid context type");
 
-        var gridRefsByDirection = GetGridReferencesByDirection(gridComparisonContext.Grids, gridComparisonContext.Direction);
+        var gridRefsByDirection = GetGridReferencesByDirection(
+            gridComparisonContext.Grids,
+            gridComparisonContext.Direction);
 
-        if(gridRefsByDirection.Count == 0) {
-            return null;
-        }
-
-        var line = Line.CreateBound(XYZ.Zero, XYZ.Zero + gridComparisonContext.Direction.CrossProduct(XYZ.BasisZ));
-
-        return FindClosestReferences(gridComparisonContext.RebarReferences, gridRefsByDirection, line);
+        return gridRefsByDirection.Count == 0
+            ? null
+            : FindClosestReferences(
+                gridComparisonContext.RebarReferences,
+                gridRefsByDirection,
+                _dimensionLineService.GetPerpendicularLine(XYZ.Zero, gridComparisonContext.Direction));
     }
 
     private List<Reference> GetGridReferencesByDirection(List<Grid> grids, XYZ direction) {
@@ -52,6 +58,7 @@ internal class GridComparisonService : IComparisonService {
         return false;
     }
 
+
     /// <summary>
     /// Метод по поиску ближайших опорных плоскостей из двух списков
     /// </summary>
@@ -64,7 +71,7 @@ internal class GridComparisonService : IComparisonService {
         List<Reference> referencesB,
         Line dimensionLine) {
 
-        _argumentValidator.Validate(referencesA, referencesB, dimensionLine);
+        _guard.ThrowIfNullOrEmpty(referencesA, referencesB, dimensionLine);
 
         Reference resultRef1 = null;
         Reference resultRef2 = null;

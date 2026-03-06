@@ -25,7 +25,7 @@ internal class MainViewModel : BaseViewModel {
     private readonly IComparisonService _comparisonService;
     private readonly IDimensionLineService _dimensionLineService;
     private readonly DimensionCreator _dimensionCreator;
-    private readonly ArgumentValidator _argumentValidator;
+    private readonly Guard _guard;
 
     private string _errorText;
     private string _familyNamePart;
@@ -51,7 +51,7 @@ internal class MainViewModel : BaseViewModel {
         IComparisonService comparisonService,
         IDimensionLineService dimensionLineService,
         DimensionCreator dimensionCreator,
-        ArgumentValidator argumentValidator) {
+        Guard guard) {
 
         _pluginConfig = pluginConfig;
         _revitRepository = revitRepository;
@@ -59,7 +59,7 @@ internal class MainViewModel : BaseViewModel {
         _comparisonService = comparisonService;
         _dimensionLineService = dimensionLineService;
         _dimensionCreator = dimensionCreator;
-        _argumentValidator = argumentValidator;
+        _guard = guard;
 
         ReferenceNamesVM = new ReferenceNamesViewModel();
 
@@ -115,18 +115,20 @@ internal class MainViewModel : BaseViewModel {
     /// </remarks>
     private void AcceptView() {
         SaveConfig();
-
         var doc = _revitRepository.Document;
         var grids = _revitRepository.GetGrids();
 
-        using var mainTransaction = new Transaction(doc, "Основная операция");
+        using var mainTransaction = new Transaction(doc, "Creating");
         mainTransaction.Start();
 
-        foreach(var rebar in _revitRepository.GetRebarElements(FamilyNamePart,
-                                                       ReferenceNamesVM.GetVertReferenceNames(),
-                                                       ReferenceNamesVM.GetHorizReferenceNames())) {
-            CreateDimension(grids, rebar);
+        foreach(var rebar in _revitRepository.GetRebarElements(
+            FamilyNamePart,
+            ReferenceNamesVM.GetVertReferenceNames(),
+            ReferenceNamesVM.GetHorizReferenceNames())) {
 
+            // Создание вертикального размера (относительно локальных осей зоны армирования)
+            CreateDimension(grids, rebar);
+            // Создание горизонтального размера (относительно локальных осей зоны армирования)
             CreateDimension(grids, rebar, false);
         }
         mainTransaction.Commit();
@@ -134,12 +136,13 @@ internal class MainViewModel : BaseViewModel {
 
     private Dimension CreateDimension(List<Grid> grids, RebarElement rebar, bool isForVertical = true) {
         try {
-            _argumentValidator.Validate(grids, rebar);
+            _guard.ThrowIfNull(grids, rebar);
         } catch(Exception) {
             return null;
         }
 
         var rebarReferences = isForVertical ? rebar.VerticalRefs : rebar.HorizontalRefs;
+        // Нормальная ситуация, когда подходящие оси не были найдены
         if(rebarReferences.Count == 0)
             return null;
 
@@ -149,16 +152,16 @@ internal class MainViewModel : BaseViewModel {
             new GridComparisonContext(rebarReferences, grids, direction);
 
         // Получаем опорные плоскости для размера
-        var dimRefsY = _comparisonService.Compare(comparisonContext);
-        if(dimRefsY is null) {
+        var dimensionRefs = _comparisonService.Compare(comparisonContext);
+        if(dimensionRefs is null) {
             return null;
         }
 
         // Получаем линию размещения размера
-        var dimensionLineY = _dimensionLineService.GetLine(rebar, direction.CrossProduct(XYZ.BasisZ));
+        var dimensionLineY = _dimensionLineService.GetDimensionLine(rebar, direction);
 
         // Строим размер
-        var dimension = _dimensionCreator.Create(dimensionLineY, dimRefsY, _selectedDimensionType);
+        var dimension = _dimensionCreator.Create(dimensionLineY, dimensionRefs, _selectedDimensionType);
         return dimension;
     }
 

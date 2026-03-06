@@ -3,15 +3,15 @@ using Autodesk.Revit.DB;
 namespace RevitDocumenter.Models;
 internal class DimensionCreator {
     private readonly RevitRepository _revitRepository;
-    private readonly ArgumentValidator _argumentValidator;
+    private readonly Guard _guard;
 
-    public DimensionCreator(RevitRepository revitRepository, ArgumentValidator argumentValidator) {
+    public DimensionCreator(RevitRepository revitRepository, Guard guard) {
         _revitRepository = revitRepository;
-        _argumentValidator = argumentValidator;
+        _guard = guard;
     }
 
     public Dimension Create(Line dimensionLine, params Reference[] references) {
-        _argumentValidator.Validate(dimensionLine, references);
+        _guard.ThrowIfNull(dimensionLine, references);
 
         var refArray = new ReferenceArray();
         foreach(var reference in references) {
@@ -21,7 +21,7 @@ internal class DimensionCreator {
     }
 
     public Dimension Create(Line dimensionLine, DimensionType selectedDimensionType, params Reference[] references) {
-        _argumentValidator.Validate(dimensionLine, selectedDimensionType, references);
+        _guard.ThrowIfNull(dimensionLine, selectedDimensionType, references);
 
         var refArray = new ReferenceArray();
         foreach(var reference in references) {
@@ -31,7 +31,7 @@ internal class DimensionCreator {
     }
 
     public Dimension Create(Line dimensionLine, ReferenceArray referenceArray, DimensionType selectedDimensionType = null) {
-        _argumentValidator.Validate(dimensionLine, referenceArray);
+        _guard.ThrowIfNull(dimensionLine, referenceArray);
 
         using var subTransaction = new SubTransaction(_revitRepository.Document);
         subTransaction.Start();

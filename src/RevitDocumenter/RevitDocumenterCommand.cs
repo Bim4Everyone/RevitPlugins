@@ -68,7 +68,7 @@ public class RevitDocumenterCommand : BasePluginCommand {
             .ToSelf()
             .InSingletonScope();
 
-        kernel.Bind<ArgumentValidator>()
+        kernel.Bind<Guard>()
             .ToSelf()
             .InSingletonScope();
 
