@@ -68,7 +68,7 @@ public class RevitDocumenterCommand : BasePluginCommand {
             .ToSelf()
             .InSingletonScope();
 
-        kernel.Bind<Guard>()
+        kernel.Bind<ValueGuard>()
             .ToSelf()
             .InSingletonScope();
 

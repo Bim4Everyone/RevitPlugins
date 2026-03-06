@@ -13,6 +13,8 @@ using RevitDocumenter.Models;
 using RevitDocumenter.Models.Comparision;
 using RevitDocumenter.Models.DimensionLine;
 
+using Grid = Autodesk.Revit.DB.Grid;
+
 namespace RevitDocumenter.ViewModels;
 
 /// <summary>
@@ -25,12 +27,13 @@ internal class MainViewModel : BaseViewModel {
     private readonly IComparisonService _comparisonService;
     private readonly IDimensionLineService _dimensionLineService;
     private readonly DimensionCreator _dimensionCreator;
-    private readonly Guard _guard;
+    private readonly ValueGuard _guard;
 
     private string _errorText;
     private string _familyNamePart;
     private DimensionType _selectedDimensionType;
     private List<DimensionType> _dimensionTypes;
+    private List<Grid> _grids = [];
 
     private readonly string _defFamilyNamePart = "IFC_Зона_Доп.Арм";
     private readonly string _defSelectedDimensionTypeName = "я_Основной_Плагин_2.5 мм";
@@ -51,7 +54,7 @@ internal class MainViewModel : BaseViewModel {
         IComparisonService comparisonService,
         IDimensionLineService dimensionLineService,
         DimensionCreator dimensionCreator,
-        Guard guard) {
+        ValueGuard guard) {
 
         _pluginConfig = pluginConfig;
         _revitRepository = revitRepository;
@@ -95,6 +98,10 @@ internal class MainViewModel : BaseViewModel {
         get => _dimensionTypes;
         set => RaiseAndSetIfChanged(ref _dimensionTypes, value);
     }
+    public List<Grid> Grids {
+        get => _grids;
+        set => RaiseAndSetIfChanged(ref _grids, value);
+    }
 
 
     /// <summary>
@@ -103,6 +110,7 @@ internal class MainViewModel : BaseViewModel {
     /// <remarks>В данном методе должна происходить загрузка настроек окна, а так же инициализация полей окна.</remarks>
     private void LoadView() {
         DimensionTypes = _revitRepository.DimensionTypes;
+        Grids = _revitRepository.GetGrids();
 
         LoadConfig();
     }
@@ -115,10 +123,7 @@ internal class MainViewModel : BaseViewModel {
     /// </remarks>
     private void AcceptView() {
         SaveConfig();
-        var doc = _revitRepository.Document;
-        var grids = _revitRepository.GetGrids();
-
-        using var mainTransaction = new Transaction(doc, "Creating");
+        using var mainTransaction = new Transaction(_revitRepository.Document, "Creating");
         mainTransaction.Start();
 
         foreach(var rebar in _revitRepository.GetRebarElements(
@@ -127,9 +132,9 @@ internal class MainViewModel : BaseViewModel {
             ReferenceNamesVM.GetHorizReferenceNames())) {
 
             // Создание вертикального размера (относительно локальных осей зоны армирования)
-            CreateDimension(grids, rebar);
+            CreateDimension(Grids, rebar);
             // Создание горизонтального размера (относительно локальных осей зоны армирования)
-            CreateDimension(grids, rebar, false);
+            CreateDimension(Grids, rebar, false);
         }
         mainTransaction.Commit();
     }
@@ -175,6 +180,11 @@ internal class MainViewModel : BaseViewModel {
     /// В методе проверяемые свойства окна должны быть отсортированы в таком же порядке как в окне (сверху-вниз)
     /// </remarks>
     private bool CanAcceptView() {
+        if(Grids.Count == 0) {
+            ErrorText = "View has not grids";
+            return false;
+        }
+        ErrorText = string.Empty;
         return true;
     }
 

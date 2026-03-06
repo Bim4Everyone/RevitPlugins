@@ -13,13 +13,13 @@ internal class GridComparisonService : IComparisonService {
     private readonly RevitRepository _revitRepository;
     private readonly DimensionCreator _dimensionCreator;
     private readonly IDimensionLineService _dimensionLineService;
-    private readonly Guard _guard;
+    private readonly ValueGuard _guard;
 
     public GridComparisonService(
         RevitRepository revitRepository,
         DimensionCreator dimensionCreator,
         IDimensionLineService dimensionLineService,
-        Guard guard) {
+        ValueGuard guard) {
 
         _revitRepository = revitRepository;
         _dimensionCreator = dimensionCreator;

@@ -3,9 +3,9 @@ using Autodesk.Revit.DB;
 namespace RevitDocumenter.Models;
 internal class DimensionCreator {
     private readonly RevitRepository _revitRepository;
-    private readonly Guard _guard;
+    private readonly ValueGuard _guard;
 
-    public DimensionCreator(RevitRepository revitRepository, Guard guard) {
+    public DimensionCreator(RevitRepository revitRepository, ValueGuard guard) {
         _revitRepository = revitRepository;
         _guard = guard;
     }

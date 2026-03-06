@@ -2,7 +2,7 @@ using System;
 using System.Collections;
 
 namespace RevitDocumenter.Models;
-internal class Guard {
+internal class ValueGuard {
     internal void ThrowIfNull(params object[] objects) {
         if(objects == null) {
             throw new ArgumentNullException(nameof(objects));
