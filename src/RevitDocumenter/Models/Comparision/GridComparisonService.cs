@@ -28,6 +28,10 @@ internal class GridComparisonService : IComparisonService {
 
         var gridRefsByDirection = GetGridReferencesByDirection(gridComparisonContext.Grids, gridComparisonContext.Direction);
 
+        if(gridRefsByDirection.Count == 0) {
+            return null;
+        }
+
         var line = Line.CreateBound(XYZ.Zero, XYZ.Zero + gridComparisonContext.Direction.CrossProduct(XYZ.BasisZ));
 
         return FindClosestReferences(gridComparisonContext.RebarReferences, gridRefsByDirection, line);

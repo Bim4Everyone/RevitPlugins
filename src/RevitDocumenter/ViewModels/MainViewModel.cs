@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Windows.Input;
@@ -24,6 +25,8 @@ internal class MainViewModel : BaseViewModel {
     private readonly IComparisonService _comparisonService;
     private readonly IDimensionLineService _dimensionLineService;
     private readonly DimensionCreator _dimensionCreator;
+    private readonly ArgumentValidator _argumentValidator;
+
     private string _errorText;
     private string _familyNamePart;
     private DimensionType _selectedDimensionType;
@@ -47,7 +50,8 @@ internal class MainViewModel : BaseViewModel {
         ILocalizationService localizationService,
         IComparisonService comparisonService,
         IDimensionLineService dimensionLineService,
-        DimensionCreator dimensionCreator) {
+        DimensionCreator dimensionCreator,
+        ArgumentValidator argumentValidator) {
 
         _pluginConfig = pluginConfig;
         _revitRepository = revitRepository;
@@ -55,6 +59,7 @@ internal class MainViewModel : BaseViewModel {
         _comparisonService = comparisonService;
         _dimensionLineService = dimensionLineService;
         _dimensionCreator = dimensionCreator;
+        _argumentValidator = argumentValidator;
 
         ReferenceNamesVM = new ReferenceNamesViewModel();
 
@@ -114,37 +119,49 @@ internal class MainViewModel : BaseViewModel {
         var doc = _revitRepository.Document;
         var grids = _revitRepository.GetGrids();
 
-        using Transaction mainTransaction = new Transaction(doc, "Основная операция");
+        using var mainTransaction = new Transaction(doc, "Основная операция");
         mainTransaction.Start();
 
         foreach(var rebar in _revitRepository.GetRebarElements(FamilyNamePart,
                                                        ReferenceNamesVM.GetVertReferenceNames(),
                                                        ReferenceNamesVM.GetHorizReferenceNames())) {
-            if(rebar.VerticalRefs is { Count: > 0 } rebarVerticalRefs) {
-                // Получаем опорные плоскости для размера
-                IComparisonContext comparisonContext =
-                    new GridComparisonContext(rebarVerticalRefs, grids, rebar.Rebar.FacingOrientation);
+            CreateDimension(grids, rebar);
 
-                var dimRefsY = _comparisonService.Compare(comparisonContext);
-                //// Получаем линию размещения размера
-                //var dimensionLineY = _dimLineSearchService.GetLine(rebar);
-
-                var dimensionLineY = _dimensionLineService.GetLine(rebar, rebar.Rebar.FacingOrientation.CrossProduct(XYZ.BasisZ));
-
-                //var dimensionLineY = Line.CreateBound(XYZ.Zero, XYZ.Zero + rebar.Rebar.FacingOrientation.CrossProduct(XYZ.BasisZ));
-
-                //// Строим горизонтальный размер между вертикальными осями (относ. локальной системы координат зоны)
-                _dimensionCreator.Create(dimensionLineY, dimRefsY, _selectedDimensionType);
-            }
-
-            //if(rebar.HorizontalRefs is { Count: > 0 } rebarHorizontalRefs) {
-            //    var dimRefsX = _сomparisonService.Compare(rebarHorizontalRefs, grids, rebar.Rebar.HandOrientation);
-            //    var dimensionLineX = _dimLineSearchService.GetLine(rebar);
-            //    doc.Create.NewDimension(doc.ActiveView, dimensionLineX, dimRefsX, _selectedDimensionType);
-            //}
+            CreateDimension(grids, rebar, false);
         }
         mainTransaction.Commit();
     }
+
+    private Dimension CreateDimension(List<Grid> grids, RebarElement rebar, bool isForVertical = true) {
+        try {
+            _argumentValidator.Validate(grids, rebar);
+        } catch(Exception) {
+            return null;
+        }
+
+        var rebarReferences = isForVertical ? rebar.VerticalRefs : rebar.HorizontalRefs;
+        if(rebarReferences.Count == 0)
+            return null;
+
+        var direction = isForVertical ? rebar.Rebar.FacingOrientation : rebar.Rebar.HandOrientation;
+
+        IComparisonContext comparisonContext =
+            new GridComparisonContext(rebarReferences, grids, direction);
+
+        // Получаем опорные плоскости для размера
+        var dimRefsY = _comparisonService.Compare(comparisonContext);
+        if(dimRefsY is null) {
+            return null;
+        }
+
+        // Получаем линию размещения размера
+        var dimensionLineY = _dimensionLineService.GetLine(rebar, direction.CrossProduct(XYZ.BasisZ));
+
+        // Строим размер
+        var dimension = _dimensionCreator.Create(dimensionLineY, dimRefsY, _selectedDimensionType);
+        return dimension;
+    }
+
 
     /// <summary>
     /// Метод проверки возможности выполнения команды применения настроек.
