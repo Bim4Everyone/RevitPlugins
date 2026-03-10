@@ -26,7 +26,7 @@ internal class ConfigSettings {
         var doc = revitRepository.FindDocumentsByName(SourceFile);
         TypeModels = revitRepository.GetSourceElementsValues(doc).ToList();
         ParamMaps = RevitConstants.GetDefaultParamMaps();
-        Categories = RevitConstants.GetDefaultBuiltInCategories();
+        Categories = RevitConstants.GetDefaultBuiltInCategories().ToList();
         MaxDiameterSearchSphereMm = RevitConstants.MaxDiameterSearchSphereMm;
         StepDiameterSearchSphereMm = RevitConstants.StepDiameterSearchSphereMm;
         Search = RevitConstants.Search;

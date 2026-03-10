@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Linq;
 
 using Autodesk.Revit.DB;
 
@@ -26,24 +27,14 @@ internal static class RevitConstants {
     // Ключевая строка, по которому ищется координационный файл
     public const string CoordFilePartName = "KOORD";
 
-    // Утвержденные категории, которые используются в проектах разных дисциплин
-    private static readonly List<BuiltInCategory> _allCategories = [
+    // Утвержденные категории верхнего уровня
+    private static readonly ICollection<BuiltInCategory> _parentCategories = [
         BuiltInCategory.OST_CableTray,
         BuiltInCategory.OST_Casework,
         BuiltInCategory.OST_Ceilings,
         BuiltInCategory.OST_Curtain_Systems,
-        BuiltInCategory.OST_CurtainWallMullions,
-        BuiltInCategory.OST_CurtainWallPanels,
-        BuiltInCategory.OST_CommunicationDevices,
-        BuiltInCategory.OST_Conduit,
         BuiltInCategory.OST_Doors,
         BuiltInCategory.OST_DuctCurves,
-        BuiltInCategory.OST_DuctFitting,
-        BuiltInCategory.OST_DuctAccessory,
-        BuiltInCategory.OST_DuctInsulations,
-        BuiltInCategory.OST_DuctFittingInsulation,
-        BuiltInCategory.OST_DuctCurvesInsulation,
-        BuiltInCategory.OST_FlexDuctCurvesInsulation,
         BuiltInCategory.OST_DuctTerminal,
         BuiltInCategory.OST_ElectricalEquipment,
         BuiltInCategory.OST_ElectricalFixtures,
@@ -51,36 +42,49 @@ internal static class RevitConstants {
         BuiltInCategory.OST_Furniture,
         BuiltInCategory.OST_FurnitureSystems,
         BuiltInCategory.OST_GenericModel,
-        BuiltInCategory.OST_LightingDevices,
         BuiltInCategory.OST_LightingFixtures,
         BuiltInCategory.OST_Mass,
         BuiltInCategory.OST_MechanicalEquipment,
-        BuiltInCategory.OST_PlaceHolderPipes,
         BuiltInCategory.OST_PipeCurves,
+        BuiltInCategory.OST_PlumbingFixtures,
+        BuiltInCategory.OST_Parking,
+        BuiltInCategory.OST_Planting,
+        BuiltInCategory.OST_Ramps,
+        BuiltInCategory.OST_Roofs,
+        BuiltInCategory.OST_Stairs,
+        BuiltInCategory.OST_Railings,
+        BuiltInCategory.OST_StructuralColumns,
+        BuiltInCategory.OST_StructuralFoundation,
+        BuiltInCategory.OST_StructuralFraming,
+        BuiltInCategory.OST_Topography,
+        BuiltInCategory.OST_Walls,
+        BuiltInCategory.OST_Windows,
+        BuiltInCategory.OST_Roads];
+
+    // Вложенные / зависимые категории
+    private static readonly ICollection<BuiltInCategory> _dependentCategories = [
+        BuiltInCategory.OST_CurtainWallMullions,
+        BuiltInCategory.OST_CurtainWallPanels,
+        BuiltInCategory.OST_CommunicationDevices,
+        BuiltInCategory.OST_Conduit,
+        BuiltInCategory.OST_DuctFitting,
+        BuiltInCategory.OST_DuctAccessory,
+        BuiltInCategory.OST_DuctInsulations,
+        BuiltInCategory.OST_DuctFittingInsulation,
+        BuiltInCategory.OST_DuctCurvesInsulation,
+        BuiltInCategory.OST_FlexDuctCurvesInsulation,
+        BuiltInCategory.OST_LightingDevices,
+        BuiltInCategory.OST_PlaceHolderPipes,
         BuiltInCategory.OST_PipeFitting,
         BuiltInCategory.OST_PipeAccessory,
         BuiltInCategory.OST_PipeInsulations,
         BuiltInCategory.OST_PipeFittingInsulation,
         BuiltInCategory.OST_PipeCurvesInsulation,
         BuiltInCategory.OST_FlexPipeCurvesInsulation,
-        BuiltInCategory.OST_Parking,
-        BuiltInCategory.OST_Planting,
-        BuiltInCategory.OST_PlumbingFixtures,
         BuiltInCategory.OST_RailingSystemRail,
-        BuiltInCategory.OST_Railings,
-        BuiltInCategory.OST_Ramps,
-        BuiltInCategory.OST_Roads,
-        BuiltInCategory.OST_Roofs,
         BuiltInCategory.OST_SecurityDevices,
         BuiltInCategory.OST_Sprinklers,
-        BuiltInCategory.OST_Stairs,
-        BuiltInCategory.OST_StairsRailing,
-        BuiltInCategory.OST_StructuralColumns,
-        BuiltInCategory.OST_StructuralFoundation,
-        BuiltInCategory.OST_StructuralFraming,
-        BuiltInCategory.OST_Topography,
-        BuiltInCategory.OST_Walls,
-        BuiltInCategory.OST_Windows];
+        BuiltInCategory.OST_StairsRailing];
 
     // Параметр, значения которого используется дли идентификации объемных элементов
     public static RevitParam SourceVolumeParam => SharedParamsConfig.Instance?.BuildingWorksDescription;
@@ -162,9 +166,25 @@ internal static class RevitConstants {
     }
 
     /// <summary>
+    /// Метод получения родительских категорий
+    /// </summary>
+    public static ICollection<BuiltInCategory> GetParentBuiltInCategories() {
+        return _parentCategories;
+    }
+
+    /// <summary>
+    /// Метод получения вложенных/зависимых категорий
+    /// </summary>
+    public static ICollection<BuiltInCategory> GetDependentBuiltInCategories() {
+        return _dependentCategories;
+    }
+
+    /// <summary>
     /// Метод получения всех категорий
     /// </summary>
-    public static List<BuiltInCategory> GetDefaultBuiltInCategories() {
-        return _allCategories;
+    public static ICollection<BuiltInCategory> GetDefaultBuiltInCategories() {
+        return _parentCategories
+            .Concat(_dependentCategories)
+            .ToArray();
     }
 }

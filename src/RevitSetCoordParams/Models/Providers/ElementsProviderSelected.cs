@@ -16,7 +16,7 @@ internal class ElementsProviderSelected : IElementsProvider {
 
     public ElementsProviderType Type => ElementsProviderType.SelectedElementsProvider;
 
-    public IEnumerable<RevitElement> GetRevitElements(IEnumerable<BuiltInCategory> categories) {
+    public IEnumerable<RevitElement> GetRevitElements(ICollection<BuiltInCategory> categories) {
         return _revitRepository.GetSelectedRevitElements(categories);
     }
 }
