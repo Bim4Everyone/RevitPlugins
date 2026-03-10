@@ -242,7 +242,7 @@ internal class MainViewModel : BaseViewModel {
 
     // Метод получения коллекции NestedElementsProcessTypeViewModel для NestedElementsProcessTypeViewModels
     private IEnumerable<DependentProcessViewModel> GetDependentProcessViewModels() {
-        var currentProcess = _setCoordParamsSettings.DepElementsProcessType;
+        var currentProcess = _setCoordParamsSettings.DependentProcess;
         var processes = Enum.GetValues(typeof(DependentProcess)).Cast<DependentProcess>();
         return processes
             .Select(processType => new DependentProcessViewModel {
@@ -535,7 +535,7 @@ internal class MainViewModel : BaseViewModel {
         _setCoordParamsSettings.Categories = Categories.Where(c => c.IsChecked).Select(catVM => catVM.Category.GetBuiltInCategory()).ToList();
         _setCoordParamsSettings.ElementsProvider = SelectedRangeElements.ElementsProvider;
         _setCoordParamsSettings.PositionProvider = SelectedPosition.PositionProvider;
-        _setCoordParamsSettings.DepElementsProcessType = SelectedDependentProcessViewModel.DependentProcess;
+        _setCoordParamsSettings.DependentProcess = SelectedDependentProcessViewModel.DependentProcess;
         _setCoordParamsSettings.FileProvider = SelectedSourceFile.FileProvider;
         _setCoordParamsSettings.TypeModels = FilteredTypeModels.Where(vm => vm.IsChecked).Select(vm => vm.Name).ToList();
         _setCoordParamsSettings.Search = Search;

@@ -29,7 +29,7 @@ internal class SetCoordParamsSettings {
     public double MaxDiameterSearchSphereMm { get; set; }
     public double StepDiameterSearchSphereMm { get; set; }
     public bool Search { get; set; }
-    public DependentProcess DepElementsProcessType { get; set; }
+    public DependentProcess DependentProcess { get; set; }
 
     public void LoadConfigSettings() {
         ParamMaps = ConfigSettings.ParamMaps;
@@ -41,7 +41,7 @@ internal class SetCoordParamsSettings {
         MaxDiameterSearchSphereMm = ConfigSettings.MaxDiameterSearchSphereMm;
         StepDiameterSearchSphereMm = ConfigSettings.StepDiameterSearchSphereMm;
         Search = ConfigSettings.Search;
-        DepElementsProcessType = ConfigSettings.DepElementsProcessType;
+        DependentProcess = ConfigSettings.DependentProcess;
     }
 
     public void UpdateConfigSettings() {
@@ -54,7 +54,7 @@ internal class SetCoordParamsSettings {
         ConfigSettings.MaxDiameterSearchSphereMm = MaxDiameterSearchSphereMm;
         ConfigSettings.StepDiameterSearchSphereMm = StepDiameterSearchSphereMm;
         ConfigSettings.Search = Search;
-        ConfigSettings.DepElementsProcessType = DepElementsProcessType;
+        ConfigSettings.DependentProcess = DependentProcess;
     }
 
     private IFileProvider GetFileProvider(string fileName) {

@@ -17,7 +17,7 @@ internal class ConfigSettings {
     public double MaxDiameterSearchSphereMm { get; set; }
     public double StepDiameterSearchSphereMm { get; set; }
     public bool Search { get; set; }
-    public DependentProcess DepElementsProcessType { get; set; }
+    public DependentProcess DependentProcess { get; set; }
 
     public void ApplyDefaultValues(RevitRepository revitRepository) {
         ElementsProvider = ElementsProviderType.AllElementsProvider;
@@ -30,6 +30,6 @@ internal class ConfigSettings {
         MaxDiameterSearchSphereMm = RevitConstants.MaxDiameterSearchSphereMm;
         StepDiameterSearchSphereMm = RevitConstants.StepDiameterSearchSphereMm;
         Search = RevitConstants.Search;
-        DepElementsProcessType = DependentProcess.InheritanceParent;
+        DependentProcess = DependentProcess.InheritanceParent;
     }
 }

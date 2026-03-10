@@ -16,7 +16,7 @@ internal class JournalDataReader {
     private const string _maxDiameterSearchSphereMmKey = "MaxDiameterSearchSphereMm";
     private const string _stepDiameterSearchSphereMmKey = "StepDiameterSearchSphereMm";
     private const string _searchKey = "Search";
-    private const string _saveConfigSettingsKey = "saveConfigSettings";
+    private const string _dependentProcess = "DependentProcess";
 
     private readonly IDictionary<string, string> _journalData;
 
@@ -33,6 +33,7 @@ internal class JournalDataReader {
     public JournalContainer MaxDiameterSearchSphereMm => GetValue(_maxDiameterSearchSphereMmKey);
     public JournalContainer StepDiameterSearchSphereMm => GetValue(_stepDiameterSearchSphereMmKey);
     public JournalContainer Search => GetValue(_searchKey);
+    public JournalContainer DependentProcess => GetValue(_dependentProcess);
 
     // Метод получения JournalContainer и распределения по типам настроек
     private JournalContainer GetValue(string key) {
