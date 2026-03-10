@@ -14,6 +14,8 @@
     <system:String x:Key="MainWindow.CheckedAllTypeModels">Select all types</system:String>
     <system:String x:Key="MainWindow.NotCheckedAllTypeModels">Clear type selection</system:String>
     <system:String x:Key="MainWindow.Positions">Element position</system:String>
+    <system:String x:Key="MainWindow.DependentProcessViewModels">Dependent Element Processing Mode</system:String>
+    <system:String x:Key="MainWindow.DependentProcessViewModelsDescription">Determines how to process nested/dependent families</system:String>
     <system:String x:Key="MainWindow.PositionsDescription">Specifies relative position for element search</system:String>
     <system:String x:Key="MainWindow.Params">Parameters SMR</system:String>
     
@@ -80,7 +82,10 @@
     <system:String x:Key="MainViewModel.CurrentViewProvider">Visible elements in the view</system:String>
     <system:String x:Key="MainViewModel.CenterPositionProvider">At the center of the element</system:String>
     <system:String x:Key="MainViewModel.BottomPositionProvider">At the bottom of the element</system:String>
-    
+
+    <system:String x:Key="MainViewModel.GeometricPosition">By geometric position of the element</system:String>
+    <system:String x:Key="MainViewModel.InheritanceParent">Inheritance from the parent family</system:String>
+
     <system:String x:Key="MainViewModel.UpPositionProvider">At the up of the element</system:String>
     <system:String x:Key="MainViewModel.NoTypeModel">The required common elements are missing in the file</system:String>
     <system:String x:Key="MainViewModel.NoSelection">Common elements is not selected</system:String>
