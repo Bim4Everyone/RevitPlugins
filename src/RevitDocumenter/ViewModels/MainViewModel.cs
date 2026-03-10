@@ -123,7 +123,9 @@ internal class MainViewModel : BaseViewModel {
     /// </remarks>
     private void AcceptView() {
         SaveConfig();
-        using var mainTransaction = new Transaction(_revitRepository.Document, "Creating");
+        using var mainTransaction = new Transaction(
+            _revitRepository.Document,
+            _localizationService.GetLocalizedString("MainWindow.Title"));
         mainTransaction.Start();
 
         foreach(var rebar in _revitRepository.GetRebarElements(
@@ -181,7 +183,19 @@ internal class MainViewModel : BaseViewModel {
     /// </remarks>
     private bool CanAcceptView() {
         if(Grids.Count == 0) {
-            ErrorText = "View has not grids";
+            ErrorText = _localizationService.GetLocalizedString("MainWindow.ViewHasNotGrids");
+            return false;
+        }
+        if(string.IsNullOrEmpty(FamilyNamePart)) {
+            ErrorText = _localizationService.GetLocalizedString("MainWindow.WriteFamilyNamePart");
+            return false;
+        }
+        if(SelectedDimensionType is null) {
+            ErrorText = _localizationService.GetLocalizedString("MainWindow.DimensionTypeIsNotSelected");
+            return false;
+        }
+        if(ReferenceNamesVM.VerticalRefNames.Count == 0 && ReferenceNamesVM.HorizontalRefNames.Count == 0) {
+            ErrorText = _localizationService.GetLocalizedString("MainWindow.WriteReferenceNames");
             return false;
         }
         ErrorText = string.Empty;

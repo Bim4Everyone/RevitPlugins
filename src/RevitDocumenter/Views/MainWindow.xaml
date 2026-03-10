@@ -18,10 +18,10 @@
     Title="{me:LocalizationSource MainWindow.Title}"
     
     Height="650"
-    Width="600"
+    Width="630"
     
     MinHeight="650"
-    MinWidth="600"
+    MinWidth="630"
    
     d:DataContext="{d:DesignInstance vms:MainViewModel, IsDesignTimeCreatable=False}">
     <core:WpfUIPlatformWindow.Resources>
@@ -30,6 +30,15 @@
                 <ResourceDictionary
                     Source="CustomStyles.xaml" />
             </ResourceDictionary.MergedDictionaries>
+            <ui:TextBlock
+                x:Key="DataColumnIsCheck"
+                Text="" />
+            <ui:TextBlock
+                x:Key="DataColumnReferenceName1"
+                Text="{me:LocalizationSource MainWindow.Name}"/>
+            <ui:TextBlock
+                x:Key="DataColumnReferenceName2"
+                Text="{me:LocalizationSource MainWindow.Name}" />
         </ResourceDictionary>
     </core:WpfUIPlatformWindow.Resources>
 
@@ -60,14 +69,14 @@
                 <ui:TextBlock
                     Margin="5"
                     HorizontalAlignment="Stretch"
-                    Text="Family name part:"
+                    Text="{me:LocalizationSource MainWindow.FamilyNamePart}"
                     Style="{StaticResource CustomTextBlock}" />
 
                 <ui:TextBox
                     Margin="5"
                     VerticalAlignment="Center"
                     HorizontalAlignment="Stretch"
-                    Text="{Binding Path=FamilyNamePart}" />
+                    Text="{Binding Path=FamilyNamePart, UpdateSourceTrigger=PropertyChanged}" />
             </StackPanel>
         </Border>
 
@@ -92,7 +101,7 @@
                     Grid.ColumnSpan="2"
                     Margin="5"
                     HorizontalAlignment="Stretch"
-                    Text="Reference names:"
+                    Text="{me:LocalizationSource MainWindow.ReferenceNames}"
                     Style="{StaticResource CustomTextBlock}" />
 
                 <Border
@@ -111,7 +120,7 @@
                             Grid.Row="0"
                             Margin="5"
                             HorizontalAlignment="Stretch"
-                            Text="Vertical:"
+                            Text="{me:LocalizationSource MainWindow.VerticalReferences}"
                             Style="{StaticResource CustomTextBlock}" />
 
                         <ui:DataGrid
@@ -125,11 +134,11 @@
                             <DataGrid.Columns>
                                 <DataGridCheckBoxColumn
                                     Binding="{Binding Path=IsCheck, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-                                    Header="IsCheck" />
+                                    Header="{StaticResource DataColumnIsCheck}" />
 
                                 <DataGridTextColumn
                                     Binding="{Binding Path=ReferenceName}"
-                                    Header="ReferenceName"
+                                    Header="{StaticResource DataColumnReferenceName1}"
                                     IsReadOnly="False" />
                             </DataGrid.Columns>
                         </ui:DataGrid>
@@ -141,14 +150,14 @@
 
                             <ui:Button
                                 Margin="5"
-                                Width="80"
-                                Content="Add"
+                                Width="100"
+                                Content="{me:LocalizationSource MainWindow.Add}"
                                 Command="{Binding Path=ReferenceNamesVM.AddVerticalNameRefCommand}" />
 
                             <ui:Button
                                 Margin="5"
                                 Width="80"
-                                Content="Remove"
+                                Content="{me:LocalizationSource MainWindow.Remove}"
                                 Command="{Binding Path=ReferenceNamesVM.RemoveVerticalNameRefCommand}" />
                         </StackPanel>
                     </Grid>
@@ -170,7 +179,7 @@
                             Grid.Row="0"
                             Margin="5"
                             HorizontalAlignment="Stretch"
-                            Text="Horizontal:"
+                            Text="{me:LocalizationSource MainWindow.HorizontalReferences}"
                             Style="{StaticResource CustomTextBlock}" />
 
                         <ui:DataGrid
@@ -184,11 +193,11 @@
                             <DataGrid.Columns>
                                 <DataGridCheckBoxColumn
                                     Binding="{Binding Path=IsCheck, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-                                    Header="IsCheck" />
+                                    Header="{StaticResource DataColumnIsCheck}" />
 
                                 <DataGridTextColumn
                                     Binding="{Binding Path=ReferenceName}"
-                                    Header="ReferenceName"
+                                    Header="{StaticResource DataColumnReferenceName2}"
                                     IsReadOnly="False" />
                             </DataGrid.Columns>
                         </ui:DataGrid>
@@ -200,14 +209,14 @@
 
                             <ui:Button
                                 Margin="5"
-                                Width="80"
-                                Content="Add"
+                                Width="100"
+                                Content="{me:LocalizationSource MainWindow.Add}"
                                 Command="{Binding Path=ReferenceNamesVM.AddHorizontalNameRefCommand}" />
 
                             <ui:Button
                                 Margin="5"
                                 Width="80"
-                                Content="Remove"
+                                Content="{me:LocalizationSource MainWindow.Remove}"
                                 Command="{Binding Path=ReferenceNamesVM.RemoveHorizontalNameRefCommand}" />
                         </StackPanel>
                     </Grid>
@@ -224,7 +233,7 @@
                 <ui:TextBlock
                     Margin="5"
                     HorizontalAlignment="Stretch"
-                    Text="Dimension type:"
+                    Text="{me:LocalizationSource MainWindow.DimensionType}"
                     Style="{StaticResource CustomTextBlock}" />
 
                 <ComboBox
