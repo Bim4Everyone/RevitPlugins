@@ -29,7 +29,7 @@ internal class SetCoordParamsSettings {
     public double MaxDiameterSearchSphereMm { get; set; }
     public double StepDiameterSearchSphereMm { get; set; }
     public bool Search { get; set; }
-    public DepElementsProcessType DepElementsProcessType { get; set; }
+    public DependentProcess DepElementsProcessType { get; set; }
 
     public void LoadConfigSettings() {
         ParamMaps = ConfigSettings.ParamMaps;

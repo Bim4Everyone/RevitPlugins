@@ -48,7 +48,7 @@ internal class IntersectCurveProcessor : IIntersectProcessor {
                 continue;
             }
 
-            if(_settings.DepElementsProcessType == DepElementsProcessType.InheritanceParent) {
+            if(_settings.DepElementsProcessType == DependentProcess.InheritanceParent) {
                 ProcessWithInheritance(targetElement, warnings);
             } else {
                 ProcessSingleElement(targetElement, warnings);

@@ -1,5 +1,5 @@
 namespace RevitSetCoordParams.Models.Enums;
-internal enum DepElementsProcessType {
+internal enum DependentProcess {
     GeometricPosition,
     InheritanceParent
 }
