@@ -39,50 +39,194 @@ internal class MapService {
 
         string imagePath = PrintViewByPixelSize(view, 4096);
 
+        string croppedImagePath = CropImageByMagentaPixels(imagePath);
+
+
         GetImageDimensions(imagePath);
+
+
+
+
+        //GetMapFromPNG(imagePath, stepCountX, stepCountY);
+
+
+
 
 
 
         using var subTransaction = new SubTransaction(doc);
         subTransaction.Start();
 
-
-
-
-
-
         subTransaction.Commit();
-
-
-
-
-
 
         //CreateSphere(viewMax);
         //CreateTestSpheres(viewMinFixed, viewMaxFixed);
-        //GetMapFromPNG(imagePath);
     }
 
-    private void GetMapFromPNG(string imagePath) {
+
+
+
+
+    //public Bitmap[,] SplitImageIntoSquaresArrayFromBottomLeft(string imagePath, double step) {
+    //    using(var image = new Bitmap(imagePath)) {
+
+    //        double pixelsInStepX = image.Width / step;
+    //        double pixelsInStepY = image.Height / step;
+
+    //        int pixelsInStepXRounded = (int) Math.Floor(pixelsInStepX);
+    //        int pixelsInStepYRounded = (int) Math.Floor(pixelsInStepY);
+
+    //        double realStepX = step * pixelsInStepXRounded
+
+
+
+    //        int cols = (int) Math.Floor(image.Width / step);
+    //        int rows = (int) Math.Floor(image.Height / step);
+
+    //        var grid = new Bitmap[rows, cols];
+
+    //        for(int row = 0; row < rows; row++) // row = 0 - нижний ряд
+    //        {
+    //            for(int col = 0; col < cols; col++) {
+    //                Bitmap square = new Bitmap(step, step);
+
+    //                using(Graphics graphics = Graphics.FromImage(square)) {
+    //                    int sourceY = image.Height - (row + 1) * step;
+
+    //                    Rectangle sourceRect = new Rectangle(
+    //                        col * step,
+    //                        sourceY,
+    //                        step,
+    //                        step
+    //                    );
+
+    //                    graphics.DrawImage(
+    //                        image,
+    //                        0, 0,
+    //                        sourceRect,
+    //                        GraphicsUnit.Pixel
+    //                    );
+    //                }
+
+    //                grid[row, col] = square;
+    //            }
+    //        }
+
+    //        return grid;
+    //    }
+    //}
+
+
+    private void GetMapFromPNG(string imagePath, double stepCountX, double stepCountY) {
         // Проверяем существование файла
         if(!File.Exists(imagePath)) {
             throw new FileNotFoundException(imagePath);
         }
 
-        int exportDpi = 600;
-
         using var bitmap = new Bitmap(imagePath);
 
-        int actualWidth = bitmap.Width;
-        int actualHeight = bitmap.Height;
+        double pixelsInStepX = Math.Floor(bitmap.Width / stepCountX);
+        double pixelsInStepY = Math.Floor(bitmap.Height / stepCountY);
 
-        // Рассчитываем соотношение сторон
-        double aspectRatio = (double) actualWidth / actualHeight;
+        TaskDialog.Show("fd", $"{pixelsInStepX} {pixelsInStepY}");
 
-        // Физические размеры в дюймах (используем DPI из экспорта)
-        double widthInches = (double) actualWidth / exportDpi;
-        double heightInches = (double) actualHeight / exportDpi;
 
+
+
+
+
+
+        //for(int row = 0; row < pixelsInStepY; row++) {
+        //    for(int col = 0; col < pixelsInStepX; col++) {
+        //        // Создаем новый квадрат
+        //        Bitmap square = new Bitmap(squareSize, squareSize);
+
+        //        using(Graphics graphics = Graphics.FromImage(square)) {
+        //            // Вырезаем соответствующую область из оригинального изображения
+        //            Rectangle sourceRect = new Rectangle(
+        //                col * squareSize,
+        //                row * squareSize,
+        //                squareSize,
+        //                squareSize
+        //            );
+
+        //            graphics.DrawImage(
+        //                originalImage,
+        //                0, 0, sourceRect, GraphicsUnit.Pixel
+        //            );
+        //        }
+
+        //        squares.Add(square);
+        //    }
+        //}
+
+
+
+
+
+
+
+
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+
+    public string CropImageByMagentaPixels(string imagePath) {
+        // Загружаем изображение
+        using var image = new Bitmap(imagePath);
+        // Находим координаты розовых пикселей
+        (int startX, int startY) = FindBottomLeftMagentaPixel(image);
+        (int endX, int endY) = FindTopRightMagentaPixel(image);
+
+        // Вычисляем размеры новой области
+        int newWidth = endX - startX + 1;
+        int newHeight = startY - endY + 1;
+
+        var cropRect = new System.Drawing.Rectangle(startX, endY, newWidth, newHeight);
+        Bitmap croppedImage = image.Clone(cropRect, image.PixelFormat);
+
+        croppedImage.Save(imagePath.Replace(".png", "1.png"), System.Drawing.Imaging.ImageFormat.Png);
+        return imagePath.Replace(".png", "1.png");
+    }
+
+    private (int, int) FindBottomLeftMagentaPixel(Bitmap image) {
+        // Ищем снизу вверх, слева направо
+        for(int y = image.Height - 1; y >= 0; y--) {
+            for(int x = 0; x < image.Width; x++) {
+                var color = image.GetPixel(x, y);
+                if(IsPink(color)) {
+                    return (x, y);
+                }
+            }
+        }
+        throw new InvalidOperationException("Pink pixel not found!");
+    }
+
+    private (int, int) FindTopRightMagentaPixel(Bitmap image) {
+        // Ищем сверху вниз, справа налево
+        for(int y = 0; y < image.Height; y++) {
+            for(int x = image.Width - 1; x >= 0; x--) {
+                var pixel = image.GetPixel(x, y);
+                if(IsPink(pixel)) {
+                    return (x, y);
+                }
+            }
+        }
+        throw new InvalidOperationException("Pink pixel not found!");
+    }
+
+    private bool IsPink(System.Drawing.Color color) {
+        return color.R == 255 && color.G == 0 && color.B == 255;
     }
 
 
