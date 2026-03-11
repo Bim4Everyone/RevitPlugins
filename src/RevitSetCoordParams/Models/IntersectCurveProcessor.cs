@@ -9,6 +9,7 @@ using dosymep.SimpleServices;
 
 using RevitSetCoordParams.Models.Enums;
 using RevitSetCoordParams.Models.Interfaces;
+using RevitSetCoordParams.Models.Services;
 using RevitSetCoordParams.Models.Settings;
 
 
@@ -19,6 +20,7 @@ internal class IntersectCurveProcessor : IIntersectProcessor {
     private readonly SetCoordParamsSettings _settings;
     private readonly CurveIntersector _intersector;
     private readonly ParamManager _paramManager;
+    private readonly ElementStatusService _elementStatusService;
 
     public IntersectCurveProcessor(
         ILocalizationService localizationService,
@@ -29,6 +31,7 @@ internal class IntersectCurveProcessor : IIntersectProcessor {
         _settings = settings;
         _intersector = new CurveIntersector(_settings);
         _paramManager = new ParamManager(_settings);
+        _elementStatusService = new ElementStatusService(_revitRepository.Document);
     }
 
     public IEnumerable<RevitElement> RevitElements => GetRevitElements();
@@ -44,6 +47,19 @@ internal class IntersectCurveProcessor : IIntersectProcessor {
 
             if(_paramManager.BlockingCheck(targetElement)) {
                 CollectBlockingElementWarnings(targetElement, warnings);
+                progress?.Report(++counter);
+                continue;
+            }
+
+            if(_elementStatusService.IsDeletedOrUpdatedInCentral(targetElement)) {
+                CollectDeletedOrUpdatedWarnings(targetElement, warnings);
+                progress?.Report(++counter);
+                continue;
+            }
+
+            if(_elementStatusService.IsElementOccupied(targetElement, user => {
+                CollectOccupiedWarnings(targetElement, user, warnings);
+            })) {
                 progress?.Report(++counter);
                 continue;
             }
@@ -129,6 +145,37 @@ internal class IntersectCurveProcessor : IIntersectProcessor {
             warnings.Add(new WarningSkipElement {
                 WarningType = WarningType.SkipElement,
                 RevitElement = dependentElement
+            });
+        }
+    }
+
+    // Метод сбора предупреждений об удаленном или обновленном элементе в центральной модели хранилища
+    private void CollectDeletedOrUpdatedWarnings(RevitElement target, List<WarningElement> warnings) {
+        warnings.Add(new WarningDeletedInCentralElement {
+            WarningType = WarningType.DeletedInCentral,
+            RevitElement = target
+        });
+
+        foreach(var dependentElement in target.DependentElements ?? Enumerable.Empty<RevitElement>()) {
+            warnings.Add(new WarningDeletedInCentralElement {
+                WarningType = WarningType.DeletedInCentral,
+                RevitElement = dependentElement
+            });
+        }
+    }
+
+    // Метод сбора предупреждений о занятом элементе пользователем
+    private void CollectOccupiedWarnings(RevitElement element, string user, List<WarningElement> warnings) {
+        warnings.Add(new WarningOccupiedElement {
+            WarningType = WarningType.OccupiedElement,
+            RevitElement = element,
+            User = user
+        });
+        foreach(var dependentElement in element.DependentElements ?? Enumerable.Empty<RevitElement>()) {
+            warnings.Add(new WarningOccupiedElement {
+                WarningType = WarningType.OccupiedElement,
+                RevitElement = dependentElement,
+                User = user
             });
         }
     }

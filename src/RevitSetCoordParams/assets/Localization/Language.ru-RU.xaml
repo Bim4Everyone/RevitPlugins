@@ -104,6 +104,10 @@
     <system:String x:Key="WarningsViewModel.NotFoundElementDescription">Элементы находятся слишком далеко или не могут быть обработаны</system:String>
     <system:String x:Key="WarningsViewModel.NotFoundParam">Элементы с незаполненными параметрами</system:String>
     <system:String x:Key="WarningsViewModel.NotFoundParamDescription">Данные параметры не добавлены в категории этих элементов и не были заполнены</system:String>
+    <system:String x:Key="WarningsViewModel.OccupiedElement">Элементы, занятые пользователем</system:String>
+    <system:String x:Key="WarningsViewModel.OccupiedElementDescription">Требуется синхронизация пользователя для обработки этих элементов</system:String>
+    <system:String x:Key="WarningsViewModel.DeletedInCentral">Элементы удалены из центральной модели хранилища</system:String>
+    <system:String x:Key="WarningsViewModel.DeletedInCentralDescription">Требуется синхронизация в текущем документе</system:String>
 
     <system:String x:Key="WarningGroupViewModel.SelectAll">Выделить все элементы</system:String>
 

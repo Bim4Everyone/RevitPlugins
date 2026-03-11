@@ -53,7 +53,7 @@ internal class WarningsViewModel : BaseViewModel {
     // Метод формирования списка WarningGroupViewModel
     private IEnumerable<WarningGroupViewModel> GetWarningGroupViewModels() {
         var regularGroups = WarningElementsCollection
-            .Where(w => w is not WarningNotFoundParamElement)
+            .Where(w => w is not WarningNotFoundParamElement and not WarningOccupiedElement)
             .GroupBy(w => w.WarningType)
             .Select(group => {
                 var vm = new WarningGroupViewModel(_revitRepository) {
@@ -86,6 +86,22 @@ internal class WarningsViewModel : BaseViewModel {
                 vm.LoadView();
                 return vm;
             });
-        return regularGroups.Concat(notFoundGroups);
+
+        var occupiedGroups = WarningElementsCollection
+            .OfType<WarningOccupiedElement>()
+            .GroupBy(w => w.WarningType)
+            .Select(group => {
+                var vm = new WarningGroupViewModel(_revitRepository) {
+                    Caption = $"{_localizationService.GetLocalizedString("WarningsViewModel.OccupiedElement")}: {group.First().User}",
+                    Description = _localizationService.GetLocalizedString("WarningsViewModel.OccupiedElementDescription"),
+                    WarningElements = group.ToList(),
+                    WarningQuantity = $"({group.Count()})",
+                    ShowElementCommand = ShowElementCommand
+                };
+                vm.LoadView();
+                return vm;
+            });
+
+        return regularGroups.Concat(notFoundGroups).Concat(occupiedGroups);
     }
 }
