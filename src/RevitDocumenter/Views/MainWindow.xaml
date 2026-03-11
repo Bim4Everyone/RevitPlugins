@@ -16,6 +16,7 @@
    
     mc:Ignorable="d"
     Title="{me:LocalizationSource MainWindow.Title}"
+    KeyDown="Window_KeyDown"
     
     Height="650"
     Width="630"
@@ -260,6 +261,7 @@
                 Text="{Binding ErrorText}" />
 
             <ui:Button
+                x:Name="OkButton"
                 Margin="5"
                 Width="80"
                 Appearance="Info"

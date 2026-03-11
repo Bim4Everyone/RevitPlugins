@@ -61,7 +61,7 @@ public class RevitDocumenterCommand : BasePluginCommand {
             .InSingletonScope();
 
         kernel.Bind<IDimensionLineService>()
-            .To<SimpleDimensionLineService>()
+            .To<DimensionLineByMapService>()
             .InSingletonScope();
 
         kernel.Bind<DimensionCreator>()

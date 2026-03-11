@@ -128,16 +128,25 @@ internal class MainViewModel : BaseViewModel {
             _localizationService.GetLocalizedString("MainWindow.Title"));
         mainTransaction.Start();
 
-        foreach(var rebar in _revitRepository.GetRebarElements(
-            FamilyNamePart,
-            ReferenceNamesVM.GetVertReferenceNames(),
-            ReferenceNamesVM.GetHorizReferenceNames())) {
 
-            // Создание вертикального размера (относительно локальных осей зоны армирования)
-            CreateDimension(Grids, rebar);
-            // Создание горизонтального размера (относительно локальных осей зоны армирования)
-            CreateDimension(Grids, rebar, false);
-        }
+        var mapService = new MapService(_revitRepository);
+        mapService.GetMap();
+
+
+
+
+
+
+        //foreach(var rebar in _revitRepository.GetRebarElements(
+        //    FamilyNamePart,
+        //    ReferenceNamesVM.GetVertReferenceNames(),
+        //    ReferenceNamesVM.GetHorizReferenceNames())) {
+
+        //    // Создание вертикального размера (относительно локальных осей зоны армирования)
+        //    CreateDimension(Grids, rebar);
+        //    // Создание горизонтального размера (относительно локальных осей зоны армирования)
+        //    //CreateDimension(Grids, rebar, false);
+        //}
         mainTransaction.Commit();
     }
 

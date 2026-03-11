@@ -1,4 +1,5 @@
 using System.Windows;
+using System.Windows.Input;
 
 using dosymep.SimpleServices;
 
@@ -45,5 +46,15 @@ public partial class MainWindow {
 
     private void ButtonCancel_Click(object sender, RoutedEventArgs e) {
         DialogResult = false;
+    }
+
+    private void Window_KeyDown(object sender, KeyEventArgs e) {
+        if(e.Key == Key.Escape) {
+            Close();
+        }
+        if(e.Key == Key.Enter) {
+            ButtonOk_Click(sender, e);
+            OkButton.Command.Execute(null);
+        }
     }
 }
