@@ -13,7 +13,7 @@ namespace RevitDocumenter.Models;
 internal class MapService {
     private readonly RevitRepository _revitRepository;
 
-    private readonly double _mappingStep = 5000.0;
+    private readonly double _mappingStep = 15000.0;
 
     // Будет делаться тонкая розовая линия
     private readonly Color _colorForTestLines = new(255, 0, 255);
@@ -28,12 +28,18 @@ internal class MapService {
         var doc = _revitRepository.Document;
         var view = doc.ActiveView;
 
-        double step = UnitUtilsHelper.ConvertToInternalValue(_mappingStep);
+        double revitStep = UnitUtilsHelper.ConvertToInternalValue(_mappingStep);
 
         (XYZ viewMinFixed, XYZ viewMaxFixed) = GetFixedCropBoxPoints(view);
 
-        double stepCountX = (viewMaxFixed.X - viewMinFixed.X) / step;
-        double stepCountY = (viewMaxFixed.Y - viewMinFixed.Y) / step;
+        // Количество квадратов по Revit
+        int stepCountX = (int) Math.Round((viewMaxFixed.X - viewMinFixed.X) / revitStep);
+        int stepCountY = (int) Math.Round((viewMaxFixed.Y - viewMinFixed.Y) / revitStep);
+
+
+
+
+
 
         CreateAnchorLines(view, viewMinFixed, viewMaxFixed);
 
@@ -41,15 +47,15 @@ internal class MapService {
 
         string croppedImagePath = CropImageByMagentaPixels(imagePath);
 
+        //var map = SplitImageIntoSquaresArrayFromBottomLeft(croppedImagePath, stepCountX, stepCountY);
+
+
+
 
         GetImageDimensions(imagePath);
 
 
-
-
         //GetMapFromPNG(imagePath, stepCountX, stepCountY);
-
-
 
 
 
@@ -60,61 +66,54 @@ internal class MapService {
         subTransaction.Commit();
 
         //CreateSphere(viewMax);
-        //CreateTestSpheres(viewMinFixed, viewMaxFixed);
+        CreateTestSpheres(viewMinFixed, viewMaxFixed);
     }
 
 
 
 
+    public Bitmap[,] SplitImageIntoSquaresArrayFromBottomLeft(string imagePath, int stepCountX, int stepCountY) {
+        using(var image = new Bitmap(imagePath)) {
 
-    //public Bitmap[,] SplitImageIntoSquaresArrayFromBottomLeft(string imagePath, double step) {
-    //    using(var image = new Bitmap(imagePath)) {
+            double pixelsInStepX = (double) image.Width / stepCountX;
+            double pixelsInStepY = (double) image.Height / stepCountY;
 
-    //        double pixelsInStepX = image.Width / step;
-    //        double pixelsInStepY = image.Height / step;
+            int pixelsInStepXRounded = (int) Math.Round(pixelsInStepX);
+            int pixelsInStepYRounded = (int) Math.Round(pixelsInStepY);
 
-    //        int pixelsInStepXRounded = (int) Math.Floor(pixelsInStepX);
-    //        int pixelsInStepYRounded = (int) Math.Floor(pixelsInStepY);
+            // Сколько пикселей на самом деле находится в шаге (стороне квадрата)
+            int pixelsInStepRounded = pixelsInStepXRounded < pixelsInStepYRounded
+                ? pixelsInStepXRounded
+                : pixelsInStepYRounded;
 
-    //        double realStepX = step * pixelsInStepXRounded
+            var grid = new Bitmap[stepCountX, stepCountY];
 
+            for(int row = 0; row < stepCountY; row++) // row = 0 - нижний ряд
+            {
+                for(int col = 0; col < stepCountX; col++) {
+                    var square = new Bitmap(pixelsInStepRounded, pixelsInStepRounded);
 
+                    using(var graphics = Graphics.FromImage(square)) {
+                        var sourceRect = new System.Drawing.Rectangle(
+                            col * pixelsInStepRounded,
+                            image.Height - (row + 1) * pixelsInStepRounded,
+                            pixelsInStepRounded,
+                            pixelsInStepRounded
+                        );
 
-    //        int cols = (int) Math.Floor(image.Width / step);
-    //        int rows = (int) Math.Floor(image.Height / step);
-
-    //        var grid = new Bitmap[rows, cols];
-
-    //        for(int row = 0; row < rows; row++) // row = 0 - нижний ряд
-    //        {
-    //            for(int col = 0; col < cols; col++) {
-    //                Bitmap square = new Bitmap(step, step);
-
-    //                using(Graphics graphics = Graphics.FromImage(square)) {
-    //                    int sourceY = image.Height - (row + 1) * step;
-
-    //                    Rectangle sourceRect = new Rectangle(
-    //                        col * step,
-    //                        sourceY,
-    //                        step,
-    //                        step
-    //                    );
-
-    //                    graphics.DrawImage(
-    //                        image,
-    //                        0, 0,
-    //                        sourceRect,
-    //                        GraphicsUnit.Pixel
-    //                    );
-    //                }
-
-    //                grid[row, col] = square;
-    //            }
-    //        }
-
-    //        return grid;
-    //    }
-    //}
+                        graphics.DrawImage(
+                            image,
+                            0, 0,
+                            sourceRect,
+                            GraphicsUnit.Pixel
+                        );
+                    }
+                    grid[row, col] = square;
+                }
+            }
+            return grid;
+        }
+    }
 
 
     private void GetMapFromPNG(string imagePath, double stepCountX, double stepCountY) {
@@ -159,23 +158,7 @@ internal class MapService {
         //        squares.Add(square);
         //    }
         //}
-
-
-
-
-
-
-
-
     }
-
-
-
-
-
-
-
-
 
 
 
@@ -356,8 +339,8 @@ internal class MapService {
         double countX = tX / step;
         double countY = tY / step;
 
-        for(int i = 1; i < countX; i++) {
-            for(int j = 1; j < countY; j++) {
+        for(int i = 0; i <= countX; i++) {
+            for(int j = 0; j <= countY; j++) {
                 var ptForTest = viewMinFixed + new XYZ(step * i, step * j, 0);
                 CreateSphere(ptForTest);
             }
