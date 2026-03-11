@@ -15,6 +15,8 @@
     <system:String x:Key="MainWindow.NotCheckedAllTypeModels">Сбросить выбор типов</system:String>
     <system:String x:Key="MainWindow.Positions">Позиция элемента</system:String>
     <system:String x:Key="MainWindow.PositionsDescription">Определяет, относительно какой точки искать элемент</system:String>
+    <system:String x:Key="MainWindow.DependentProcessViewModels">Режим обработки вложенных элементов</system:String>
+    <system:String x:Key="MainWindow.DependentProcessViewModelsDescription">Определяет, как обрабатывать вложенные/зависимые семейства</system:String>
     <system:String x:Key="MainWindow.Params">Параметры СМР</system:String>
     
     <system:String x:Key="MainWindow.ParamsDescription">Выбор параметров СМР для чтения и записи</system:String>
@@ -80,7 +82,10 @@
     <system:String x:Key="MainViewModel.CurrentViewProvider">Видимые элементы на виде</system:String>
     <system:String x:Key="MainViewModel.CenterPositionProvider">По центру элемента</system:String>
     <system:String x:Key="MainViewModel.BottomPositionProvider">По низу элемента</system:String>
-    
+
+    <system:String x:Key="MainViewModel.GeometricPosition">По геометрическому положению элемента</system:String>
+    <system:String x:Key="MainViewModel.InheritanceParent">Наследование от родительского семейства</system:String>
+
     <system:String x:Key="MainViewModel.UpPositionProvider">По верху элемента</system:String>
     <system:String x:Key="MainViewModel.NoTypeModel">В файле отсутствуют необходимые объемные элементы</system:String>    
     <system:String x:Key="MainViewModel.NoSelection">Объемные элементы не выбраны</system:String>

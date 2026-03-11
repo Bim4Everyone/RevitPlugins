@@ -44,6 +44,8 @@ internal class MainViewModel : BaseViewModel {
     private string _searchTextTypeModels;
     private ObservableCollection<PositionViewModel> _positions;
     private PositionViewModel _selectedPosition;
+    private ObservableCollection<DependentProcessViewModel> _dependentProcessViewModels;
+    private DependentProcessViewModel _selectedDependentProcessViewModel;
     private ObservableCollection<ParamViewModel> _params;
     private ObservableCollection<CategoryViewModel> _categories;
     private bool _search;
@@ -127,6 +129,14 @@ internal class MainViewModel : BaseViewModel {
     public PositionViewModel SelectedPosition {
         get => _selectedPosition;
         set => RaiseAndSetIfChanged(ref _selectedPosition, value);
+    }
+    public ObservableCollection<DependentProcessViewModel> DependentProcessViewModels {
+        get => _dependentProcessViewModels;
+        set => RaiseAndSetIfChanged(ref _dependentProcessViewModels, value);
+    }
+    public DependentProcessViewModel SelectedDependentProcessViewModel {
+        get => _selectedDependentProcessViewModel;
+        set => RaiseAndSetIfChanged(ref _selectedDependentProcessViewModel, value);
     }
     public ObservableCollection<ParamViewModel> Params {
         get => _params;
@@ -227,6 +237,19 @@ internal class MainViewModel : BaseViewModel {
                     : _providersFactory.GetPositionProvider(_revitRepository, provider)
             })
             .OrderByDescending(vm => vm.PositionProvider.Type == currentProvider.Type)
+            .ThenBy(vm => vm.Name);
+    }
+
+    // Метод получения коллекции NestedElementsProcessTypeViewModel для NestedElementsProcessTypeViewModels
+    private IEnumerable<DependentProcessViewModel> GetDependentProcessViewModels() {
+        var currentProcess = _setCoordParamsSettings.DependentProcess;
+        var processes = Enum.GetValues(typeof(DependentProcess)).Cast<DependentProcess>();
+        return processes
+            .Select(processType => new DependentProcessViewModel {
+                Name = _localizationService.GetLocalizedString($"MainViewModel.{processType}"),
+                DependentProcess = processType
+            })
+            .OrderByDescending(vm => vm.DependentProcess == currentProcess)
             .ThenBy(vm => vm.Name);
     }
 
@@ -376,6 +399,8 @@ internal class MainViewModel : BaseViewModel {
         FilteredTypeModels = new ObservableCollection<TypeModelViewModel>(TypeModels);
         Positions = new ObservableCollection<PositionViewModel>(GetPositionViewModels());
         SelectedPosition = Positions.FirstOrDefault();
+        DependentProcessViewModels = new ObservableCollection<DependentProcessViewModel>(GetDependentProcessViewModels());
+        SelectedDependentProcessViewModel = DependentProcessViewModels.FirstOrDefault();
         Params = new ObservableCollection<ParamViewModel>(GetParamViewModels());
         // Подписка на события в ParamViewModel
         foreach(var param in Params) {
@@ -395,11 +420,11 @@ internal class MainViewModel : BaseViewModel {
     // Основной метод
     private void AcceptView() {
         SaveConfig();
+
         IIntersectProcessor processor = new IntersectCurveProcessor(_localizationService, _revitRepository, _setCoordParamsSettings);
-        var elements = processor.RevitElements;
 
         using var progressDialogService = ProgressDialogFactory.CreateDialog();
-        progressDialogService.MaxValue = elements.Count();
+        progressDialogService.MaxValue = processor.RevitElements.Count();
         progressDialogService.StepValue = 20;
         progressDialogService.DisplayTitleFormat = _localizationService.GetLocalizedString("MainViewModel.ProgressTitle");
         var progress = progressDialogService.CreateProgress();
@@ -510,6 +535,7 @@ internal class MainViewModel : BaseViewModel {
         _setCoordParamsSettings.Categories = Categories.Where(c => c.IsChecked).Select(catVM => catVM.Category.GetBuiltInCategory()).ToList();
         _setCoordParamsSettings.ElementsProvider = SelectedRangeElements.ElementsProvider;
         _setCoordParamsSettings.PositionProvider = SelectedPosition.PositionProvider;
+        _setCoordParamsSettings.DependentProcess = SelectedDependentProcessViewModel.DependentProcess;
         _setCoordParamsSettings.FileProvider = SelectedSourceFile.FileProvider;
         _setCoordParamsSettings.TypeModels = FilteredTypeModels.Where(vm => vm.IsChecked).Select(vm => vm.Name).ToList();
         _setCoordParamsSettings.Search = Search;

@@ -14,5 +14,5 @@ internal interface IElementsProvider {
     /// <summary>
     /// Метод получения элементов модели по категориям
     /// </summary>
-    IEnumerable<RevitElement> GetRevitElements(IEnumerable<BuiltInCategory> categories);
+    IEnumerable<RevitElement> GetRevitElements(ICollection<BuiltInCategory> categories);
 }

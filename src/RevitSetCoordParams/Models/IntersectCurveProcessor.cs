@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 
+using dosymep.Bim4Everyone;
 using dosymep.Revit;
 using dosymep.SimpleServices;
 
@@ -16,6 +17,8 @@ internal class IntersectCurveProcessor : IIntersectProcessor {
     private readonly ILocalizationService _localizationService;
     private readonly RevitRepository _revitRepository;
     private readonly SetCoordParamsSettings _settings;
+    private readonly CurveIntersector _intersector;
+    private readonly ParamManager _paramManager;
 
     public IntersectCurveProcessor(
         ILocalizationService localizationService,
@@ -24,63 +27,110 @@ internal class IntersectCurveProcessor : IIntersectProcessor {
         _localizationService = localizationService;
         _revitRepository = revitRepository;
         _settings = settings;
+        _intersector = new CurveIntersector(_settings);
+        _paramManager = new ParamManager(_settings);
     }
 
     public IEnumerable<RevitElement> RevitElements => GetRevitElements();
 
     public IReadOnlyCollection<WarningElement> Run(IProgress<int> progress = null, CancellationToken ct = default) {
-        var targetElements = RevitElements;
-
-        var intersector = new CurveIntersector(_settings);
-        var paramManager = new ParamManager(_settings);
-
         string transactionName = _localizationService.GetLocalizedString("SetCoordParamsProcessor.TransactionName");
         using var t = _revitRepository.Document.StartTransaction(transactionName);
 
-        int i = 0;
+        int counter = 0;
         List<WarningElement> warnings = [];
-        foreach(var targetElement in targetElements) {
+        foreach(var targetElement in RevitElements) {
             ct.ThrowIfCancellationRequested();
 
-            if(paramManager.BlockingCheck(targetElement)) {
-                warnings.Add(new WarningSkipElement {
-                    WarningType = WarningType.SkipElement,
-                    RevitElement = targetElement
-                });
-                progress?.Report(++i);
+            if(_paramManager.BlockingCheck(targetElement)) {
+                CollectBlockingElementWarnings(targetElement, warnings);
+                progress?.Report(++counter);
                 continue;
             }
 
-            var foundModel = intersector.Intersect(targetElement);
-
-            if(foundModel is null) {
-                warnings.Add(new WarningNotFoundElement {
-                    WarningType = WarningType.NotFoundElement,
-                    RevitElement = targetElement
-                });
-                progress?.Report(++i);
-                continue;
+            if(_settings.DependentProcess == DependentProcess.InheritanceParent) {
+                ProcessWithInheritance(targetElement, warnings);
+            } else {
+                ProcessSingleElement(targetElement, warnings);
             }
-
-            var missedParams = paramManager.SetParams(foundModel, targetElement);
-
-            if(!missedParams.Any()) {
-                progress?.Report(++i);
-                continue;
-            }
-
-            foreach(var param in missedParams) {
-                warnings.Add(new WarningNotFoundParamElement {
-                    WarningType = WarningType.NotFoundParameter,
-                    RevitElement = targetElement,
-                    RevitParam = param
-                });
-            }
-
-            progress?.Report(++i);
+            progress?.Report(++counter);
         }
         t.Commit();
         return warnings;
+    }
+
+    // Метод назначения параметров в режиме "наследования"
+    private void ProcessWithInheritance(RevitElement parent, List<WarningElement> warnings) {
+        var foundModel = _intersector.Intersect(parent);
+        if(foundModel is null) {
+            CollectIntersectWarnings(parent, warnings);
+            foreach(var depElement in parent.DependentElements ?? Enumerable.Empty<RevitElement>()) {
+                CollectIntersectWarnings(depElement, warnings);
+            }
+            return;
+        }
+        ProcessParams(foundModel, parent, warnings);
+        foreach(var depElement in parent.DependentElements ?? Enumerable.Empty<RevitElement>()) {
+            ProcessParams(foundModel, depElement, warnings);
+        }
+    }
+
+    // Метод назначения параметров в режиме "по геометрическому положению"
+    private void ProcessSingleElement(RevitElement element, List<WarningElement> warnings) {
+        ProcessIntersect(element, warnings);
+
+        foreach(var dependentElement in element.DependentElements ?? Enumerable.Empty<RevitElement>()) {
+            ProcessIntersect(dependentElement, warnings);
+        }
+    }
+
+    // Метод назначения параметров и сбора предупреждений
+    private void ProcessParams(RevitElement source, RevitElement target, List<WarningElement> warnings) {
+        _paramManager.SetParams(source, target, param => {
+            CollectParamWarnings(target, param, warnings);
+        });
+    }
+
+    // Метод пересечений и сбора предупреждений
+    private void ProcessIntersect(RevitElement element, List<WarningElement> warnings) {
+        var foundModel = _intersector.Intersect(element);
+        if(foundModel is null) {
+            CollectIntersectWarnings(element, warnings);
+        } else {
+            ProcessParams(foundModel, element, warnings);
+        }
+    }
+
+    // Метод сбора предупреждений о неудачных пересечениях
+    private void CollectIntersectWarnings(RevitElement element, List<WarningElement> warnings) {
+        warnings.Add(new WarningNotFoundElement {
+            WarningType = WarningType.NotFoundElement,
+            RevitElement = element
+        });
+    }
+
+    // Метод сбора предупреждений о неудачных присвоениях параметров
+    private void CollectParamWarnings(RevitElement element, RevitParam param, List<WarningElement> warnings) {
+        warnings.Add(new WarningNotFoundParamElement {
+            WarningType = WarningType.NotFoundParameter,
+            RevitElement = element,
+            RevitParam = param
+        });
+    }
+
+    // Метод сбора предупреждений о заблокированных элементах
+    private void CollectBlockingElementWarnings(RevitElement target, List<WarningElement> warnings) {
+        warnings.Add(new WarningSkipElement {
+            WarningType = WarningType.SkipElement,
+            RevitElement = target
+        });
+
+        foreach(var dependentElement in target.DependentElements ?? Enumerable.Empty<RevitElement>()) {
+            warnings.Add(new WarningSkipElement {
+                WarningType = WarningType.SkipElement,
+                RevitElement = dependentElement
+            });
+        }
     }
 
     // Метод получения элементов модели для основного метода и прогресс-бара  

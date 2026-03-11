@@ -108,7 +108,8 @@ public class RevitSetCoordParamsCommandHeadless : BasePluginCommand {
                 Categories = resolver.ResolveListEnum(reader.Categories, x => x.Categories),
                 MaxDiameterSearchSphereMm = resolver.ResolveDouble(reader.MaxDiameterSearchSphereMm, x => x.MaxDiameterSearchSphereMm),
                 StepDiameterSearchSphereMm = resolver.ResolveDouble(reader.StepDiameterSearchSphereMm, x => x.StepDiameterSearchSphereMm),
-                Search = resolver.ResolveBool(reader.Search, x => x.Search)
+                Search = resolver.ResolveBool(reader.Search, x => x.Search),
+                DependentProcess = resolver.ResolveEnum(reader.DependentProcess, x => x.DependentProcess)
             };
 
             var setCoordParamsSettings = new SetCoordParamsSettings(revitRepository, finalSettings);
