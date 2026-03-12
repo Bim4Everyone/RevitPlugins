@@ -4,7 +4,6 @@ using System.Linq;
 using Autodesk.Revit.DB;
 using Autodesk.Revit.DB.Architecture;
 
-using dosymep.Bim4Everyone;
 using dosymep.Revit;
 
 using pyRevitLabs.Json;
@@ -56,11 +55,17 @@ internal class RoomElement {
         return RevitRoom.GetParamValueOrDefault<string>(parameter.Definition.Name);
     }
 
+    /// <summary>
+    /// Возвращает значение параметра длины в квадратных метрах.
+    /// </summary>
     public double GetAreaParamValue(Parameter parameter, int accuracy) {
         double value = RevitRoom.GetParamValueOrDefault<double>(parameter.Definition.Name);
         return ParamConverter.ConvertArea(value, accuracy);
     }
 
+    /// <summary>
+    /// Возвращает значение параметра длины в метрах.
+    /// </summary>
     public double GetLengthParamValue(Parameter parameter, int accuracy) {
         double value = RevitRoom.GetParamValueOrDefault<double>(parameter.Definition.Name);
         return ParamConverter.ConvertLength(value, accuracy);

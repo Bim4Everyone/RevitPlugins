@@ -49,8 +49,8 @@ internal class RevitRepository {
     /// <summary>
     /// Получает все фильтры, имеющиеся на виде
     /// </summary>
-    public List<ParameterFilterElement> AllFilterElementsInView => Document.ActiveView.GetFilters()
-        .Select(id => Document.GetElement(id) as ParameterFilterElement)
+    public List<FilterElement> AllFilterElementsInView => Document.ActiveView.GetFilters()
+        .Select(id => Document.GetElement(id) as FilterElement)
         .ToList();
 
     public List<string> AllFilterElementNames => new FilteredElementCollector(Document)
@@ -109,10 +109,10 @@ internal class RevitRepository {
     /// Удаляет все пользовательские временные виды (напр., "$divin_n_...")
     /// </summary>
     public void DeleteTempFiltersInView() {
-        List<ParameterFilterElement> filters = AllFilterElementsInView;
+        List<FilterElement> filters = AllFilterElementsInView;
         string checkString = string.Format("${0}/", UserName);
 
-        foreach(ParameterFilterElement filter in filters) {
+        foreach(FilterElement filter in filters) {
             if(filter.Name.Contains(checkString)) {
                 try {
                     Document.ActiveView.RemoveFilter(filter.Id);

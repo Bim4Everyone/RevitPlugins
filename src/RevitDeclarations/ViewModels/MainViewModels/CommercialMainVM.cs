@@ -1,41 +1,27 @@
 using System;
 using System.Linq;
+using System.Windows;
 
-using Autodesk.Revit.UI;
+using dosymep.SimpleServices;
 
 using RevitDeclarations.Models;
-using RevitDeclarations.Views;
-
-using TaskDialog = Autodesk.Revit.UI.TaskDialog;
-using TaskDialogResult = Autodesk.Revit.UI.TaskDialogResult;
+using RevitDeclarations.Services;
 
 namespace RevitDeclarations.ViewModels;
 internal class CommercialMainVM : MainViewModel {
-    private readonly CommercialExcelExportVM _excelExportViewModel;
-    private readonly CommercialCsvExportVM _csvExportViewModel;
-
     private new readonly CommercialSettings _settings;
 
-    public CommercialMainVM(RevitRepository revitRepository, CommercialSettings settings)
-        : base(revitRepository, settings) {
+    public CommercialMainVM(RevitRepository revitRepository, 
+                            CommercialSettings settings,
+                            ILocalizationService localizationService,
+                            IMessageBoxService messageBoxService,
+                            ErrorWindowService errorWindowService)
+        : base(revitRepository, settings, localizationService, messageBoxService, errorWindowService) {
         _settings = settings;
 
-        _excelExportViewModel =
-            new CommercialExcelExportVM("Excel", new Guid("8D69848F-159D-4B26-B4C0-17E3B3A132CC"), _settings);
-        _csvExportViewModel =
-            new CommercialCsvExportVM("csv", new Guid("EC72C14A-9D4A-4D8B-BD35-50801CE68C24"), _settings);
-
-        _exportFormats = [
-            _excelExportViewModel,
-            _csvExportViewModel
-        ];
-        _selectedFormat = _exportFormats[0];
-
+        _declarationViewModel = new DeclarationCommercialVM(_revitRepository, settings, localizationService, messageBoxService);
         _parametersViewModel = new CommercialParamsVM(_revitRepository, this);
-        _prioritiesViewModel = new PrioritiesViewModel(this);
-
-        _loadUtp = false;
-        _canLoadUtp = false;
+        _prioritiesViewModel = new PrioritiesViewModel(this, localizationService, messageBoxService);
 
         LoadConfig();
     }
@@ -44,7 +30,7 @@ internal class CommercialMainVM : MainViewModel {
         SetSelectedSettings();
         SetCommSettings();
 
-        var checkedDocuments = _revitDocuments
+        var checkedDocuments = _declarationViewModel.RevitDocuments
             .Where(x => x.IsChecked)
             .ToList();
 
@@ -53,38 +39,33 @@ internal class CommercialMainVM : MainViewModel {
         // Проверка 1. Наличие параметров во всех выбранных проектах.
         var parameterErrors = checkedDocuments
             .Select(x => x.CheckParameters())
-            .Where(x => x.Errors.Any());
+            .Where(x => x.Elements.Any());
         if(parameterErrors.Any()) {
-            var window = new ErrorWindow() { DataContext = new ErrorsViewModel(parameterErrors, false) };
-            window.ShowDialog();
+            _errorWindowService.ShowNoticeWindow(parameterErrors.ToList());
             return;
         }
 
         var projects = checkedDocuments
-            .Select(x => new CommercialProject(x, _revitRepository, _settings))
+            .Select(x => new CommercialProject(x, _revitRepository, _settings, _stringComparer, _localizationService))
             .ToList();
 
         // Проверка 2. Наличие групп помещений на выбранной стадии во всех выбранных проектах.
-        var noApartsErrors = projects
+        var noGroupsErrors = projects
             .Select(x => x.CheckRoomGroupsInProject())
-            .Where(x => x.Errors.Any());
-        if(noApartsErrors.Any()) {
-            var window = new ErrorWindow() { DataContext = new ErrorsViewModel(noApartsErrors, false) };
-            window.ShowDialog();
+            .Where(x => x.Elements.Any());
+        if(noGroupsErrors.Any()) {
+            _errorWindowService.ShowNoticeWindow(noGroupsErrors.ToList());
             return;
         }
 
         // Проверка 3. У каждого помещения должны быть актуальные площади помещения из кватирографии.
         var actualRoomAreasErrors = projects
             .Select(x => x.CheckActualRoomAreas())
-            .Where(x => x.Errors.Any());
+            .Where(x => x.Elements.Any());
         if(actualRoomAreasErrors.Any()) {
-            var window = new ErrorWindow() {
-                DataContext = new ErrorsViewModel(actualRoomAreasErrors, true)
-            };
-            window.ShowDialog();
+            bool windowResult = _errorWindowService.ShowNoticeWindow(actualRoomAreasErrors.ToList(), true);
 
-            if(!(bool) window.DialogResult) {
+            if(!windowResult) {
                 return;
             }
         }
@@ -96,19 +77,18 @@ internal class CommercialMainVM : MainViewModel {
             .ThenBy(x => x.Rooms.First().Number ?? "", _stringComparer)
             .ToList();
 
-        _selectedFormat.Export(FullPath, commercialRooms);
         try {
+            _declarationViewModel.SelectedFormat.Export(_declarationViewModel.FullPath, commercialRooms);
         } catch(Exception e) {
-            var taskDialog = new TaskDialog("Ошибка выгрузки") {
-                CommonButtons = TaskDialogCommonButtons.No | TaskDialogCommonButtons.Yes,
-                MainContent = "Произошла ошибка выгрузки.\nПопробовать выгрузить декларацию в формате csv?",
-                ExpandedContent = $"Описание ошибки: {e.Message}"
-            };
+            var messageBoxResult = _messageBoxService.Show(
+                _localizationService.GetLocalizedString("MessageBox.ExcelErrorLoadCsv", e.Message),
+                _localizationService.GetLocalizedString("MessageBox.ExportErrorTitle"),
+                MessageBoxButton.YesNo,
+                MessageBoxImage.Warning);
 
-            var dialogResult = taskDialog.Show();
-
-            if(dialogResult == TaskDialogResult.Yes) {
-                _csvExportViewModel.Export(FullPath, commercialRooms);
+            if(messageBoxResult == MessageBoxResult.Yes) {
+                (_declarationViewModel as DeclarationCommercialVM)
+                    .CsvExportViewModel.Export(_declarationViewModel.FullPath, commercialRooms);
             }
         }
     }
@@ -151,7 +131,6 @@ internal class CommercialMainVM : MainViewModel {
 
         config.SaveProjectConfig();
     }
-
 
     private void SetCommSettings() {
         var commercialParamsVM = (CommercialParamsVM) _parametersViewModel;

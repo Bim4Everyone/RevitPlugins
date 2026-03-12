@@ -1,0 +1,84 @@
+<core:WpfUIPlatformPage
+    x:Class="RevitParamsChecker.Views.Filtration.FiltrationPage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:local="clr-namespace:RevitParamsChecker.Views.Filtration"
+    xmlns:core="clr-namespace:dosymep.WpfUI.Core"
+    xmlns:me="clr-namespace:dosymep.WpfCore.MarkupExtensions;assembly=dosymep.WpfCore"
+    xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
+    xmlns:vms="clr-namespace:RevitParamsChecker.ViewModels.Filtration"
+    xmlns:custom="clr-namespace:RevitParamsChecker.Views.Controls"
+    xmlns:filtration="clr-namespace:Bim4Everyone.RevitFiltration.Controls.Views;assembly=Bim4Everyone.RevitFiltration.Controls"
+    ScrollViewer.CanContentScroll="False"
+    mc:Ignorable="d"
+    d:DesignHeight="450"
+    d:DesignWidth="800"
+    d:DataContext="{d:DesignInstance vms:FiltrationPageViewModel, IsDesignTimeCreatable=False}">
+    <!-- Страница редактора фильтров элементов для проверки -->
+    <core:WpfUIPlatformPage.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary
+                    Source="../../Resources/CustomStyles.xaml" />
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
+    </core:WpfUIPlatformPage.Resources>
+    <core:WpfUIPlatformPage.InputBindings>
+        <KeyBinding
+            Key="S"
+            Modifiers="Control"
+            Command="{Binding SaveCommand}" />
+    </core:WpfUIPlatformPage.InputBindings>
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition
+                Height="Auto" />
+            <RowDefinition
+                Height="*" />
+        </Grid.RowDefinitions>
+
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition
+                Width="1.5*"
+                MinWidth="200" />
+            <ColumnDefinition
+                Width="Auto" />
+            <ColumnDefinition
+                Width="6*"
+                MinWidth="200" />
+        </Grid.ColumnDefinitions>
+
+        <custom:PageMenuControl
+            Grid.Row="0"
+            Grid.ColumnSpan="3"
+            Margin="0 0 0 8"
+            PageWarningMessage="{Binding ErrorText}"
+            LoadButtonCommand="{Binding LoadCommand}"
+            SaveButtonCommand="{Binding SaveCommand}"
+            ExportButtonCommand="{Binding ExportCommand}"
+            ShowSaveChangesPrompt="{Binding FiltersModified}" />
+
+        <custom:EditableListControl
+            Grid.Row="1"
+            Grid.Column="0"
+            ListItemsSource="{Binding Filters}"
+            ListSelectedItem="{Binding SelectedFilter}"
+            AddItemCommand="{Binding AddFilterCommand}"
+            RenameItemCommand="{Binding RenameFilterCommand}"
+            CopyItemCommand="{Binding CopyFilterCommand}"
+            RemoveItemsCommand="{Binding RemoveFiltersCommand}" />
+
+        <GridSplitter
+            Grid.Row="1"
+            Grid.Column="1"
+            Style="{StaticResource CustomGridSplitter}" />
+
+        <filtration:DynamicCategoriesFilterControl
+            Grid.Row="1"
+            Grid.Column="2"
+            LanguageService="{Binding LanguageService}"
+            LogicalFilterProvider="{Binding SelectedFilter.FilterProvider}" />
+    </Grid>
+</core:WpfUIPlatformPage>

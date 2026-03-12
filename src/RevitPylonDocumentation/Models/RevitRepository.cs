@@ -6,6 +6,7 @@ using Autodesk.Revit.DB;
 using Autodesk.Revit.UI;
 
 using dosymep.Revit;
+using dosymep.SimpleServices;
 
 using RevitPylonDocumentation.Models.PylonSheetNView;
 using RevitPylonDocumentation.ViewModels;
@@ -15,13 +16,17 @@ using View = Autodesk.Revit.DB.View;
 
 namespace RevitPylonDocumentation.Models;
 internal class RevitRepository {
+    private readonly ILocalizationService _localizationService;
     private readonly double _maxDistanceBetweenPylon = 10;
 
-    public RevitRepository(UIApplication uiApplication) {
+    public RevitRepository(UIApplication uiApplication,
+                           ILocalizationService localizationService) {
         UIApplication = uiApplication;
+        _localizationService = localizationService;
     }
 
     public UIApplication UIApplication { get; }
+
     public UIDocument ActiveUIDocument => UIApplication.ActiveUIDocument;
 
     public Application Application => UIApplication.Application;
@@ -52,6 +57,7 @@ internal class RevitRepository {
         .WhereElementIsNotElementType()
         .OfType<ViewSchedule>()
         .Where(view => !view.IsTemplate)
+        .OrderBy(a => a.Name)
         .ToList();
 
     /// <summary>
@@ -71,7 +77,7 @@ internal class RevitRepository {
         .OfType<ViewFamilyType>()
         .Where(a => ViewFamily.Section == a.ViewFamily)
         .ToList();
-    
+
     /// <summary>
     /// Возвращает список всех легенд, присутствующих в проекте
     /// </summary>
@@ -80,7 +86,7 @@ internal class RevitRepository {
         .OfType<View>()
         .Where(view => view.ViewType == ViewType.Legend)
         .ToList();
-    
+
     /// <summary>
     /// Возвращает список всех шаблонов сечений в проекте
     /// </summary>
@@ -98,7 +104,8 @@ internal class RevitRepository {
     public List<DimensionType> DimensionTypes => new FilteredElementCollector(Document)
         .OfClass(typeof(DimensionType))
         .OfType<DimensionType>()
-        .OrderBy(a => a.Name)
+        .OrderBy(a => a.FamilyName)
+        .ThenBy(a => a.Name)
         .ToList();
 
     /// <summary>
@@ -107,7 +114,8 @@ internal class RevitRepository {
     public List<SpotDimensionType> SpotDimensionTypes => new FilteredElementCollector(Document)
         .OfClass(typeof(SpotDimensionType))
         .OfType<SpotDimensionType>()
-        .OrderBy(a => a.Name)
+        .OrderBy(a => a.FamilyName)
+        .ThenBy(a => a.Name)
         .ToList();
 
     /// <summary>
@@ -117,7 +125,8 @@ internal class RevitRepository {
         .OfCategory(BuiltInCategory.OST_RebarTags)
         .WhereElementIsElementType()
         .OfType<FamilySymbol>()
-        .OrderBy(a => a.Name)
+        .OrderBy(a => a.FamilyName)
+        .ThenBy(a => a.Name)
         .ToList();
 
     /// <summary>
@@ -127,7 +136,8 @@ internal class RevitRepository {
         .OfCategory(BuiltInCategory.OST_DetailComponents)
         .WhereElementIsElementType()
         .OfType<FamilySymbol>()
-        .OrderBy(a => a.Name)
+        .OrderBy(a => a.FamilyName)
+        .ThenBy(a => a.Name)
         .ToList();
 
     /// <summary>
@@ -137,7 +147,8 @@ internal class RevitRepository {
         .OfCategory(BuiltInCategory.OST_GenericAnnotation)
         .WhereElementIsElementType()
         .OfType<FamilySymbol>()
-        .OrderBy(a => a.Name)
+        .OrderBy(a => a.FamilyName)
+        .ThenBy(a => a.Name)
         .ToList();
 
     /// <summary>
@@ -204,34 +215,28 @@ internal class RevitRepository {
         foreach(var elem in elems) {
             if(!elem.Name.Contains("Пилон") && !elem.Name.Contains("Колонна")) { continue; }
 
-            // Запрашиваем параметр фильтрации типовых пилонов. Если он не равен заданному, то отсеиваем этот пилон
-            var typicalPylonParameter = elem.LookupParameter(mainViewModel.ProjectSettings.TypicalPylonFilterParameter);
-            if(typicalPylonParameter == null) {
-                mainViewModel.ErrorText = "Параметр фильтрации типовых пилонов не найден";
-                return;
-            }
+            // Могут быть следующие состояния:
+            // - параметр не найден - LookupParameter вернет null
+            // - значение параметра ни разу не задавалось - AsString() вернет null
+            // - значение найдено - AsString() вернет значение
 
-            if(typicalPylonParameter.AsString() is null
-                || typicalPylonParameter.AsString() != mainViewModel.ProjectSettings.TypicalPylonFilterValue) { continue; }
+            // Запрашиваем параметр фильтрации типовых пилонов. Если он не равен заданному, то отсеиваем этот пилон
+            // def "обр_ФОП_Фильтрация 1"
+            var typicalPylonParameter = elem.LookupParameter(mainViewModel.PylonSettings.TypicalPylonFilterParameter);
+            if(typicalPylonParameter?.AsString() is null
+                || typicalPylonParameter?.AsString() != mainViewModel.PylonSettings.TypicalPylonFilterValue) { continue; }
 
             // Запрашиваем Раздел проекта
-            var projectSectionParameter = elem.LookupParameter(mainViewModel.ProjectSettings.ProjectSection);
-            if(projectSectionParameter == null) {
-                mainViewModel.ErrorText = "Параметр раздела не найден у элементов Стен или Несущих колонн";
-                return;
+            // def "обр_ФОП_Раздел проекта"
+            if(elem.LookupParameter(mainViewModel.PylonSettings.ProjectSection)?.AsString() is not string projectSection) {
+                continue;
             }
-            string projectSection = projectSectionParameter.AsString();
-            if(projectSection is null) { continue; }
-
 
             // Запрашиваем Марку пилона
-            var hostMarkParameter = elem.LookupParameter(mainViewModel.ProjectSettings.Mark);
-            if(hostMarkParameter == null) {
-                mainViewModel.ErrorText = "Параметр марки не найден у элементов Стен или Несущих колонн";
-                return;
+            // def "Марка"
+            if(elem.LookupParameter(mainViewModel.PylonSettings.Mark)?.AsString() is not string hostMark) {
+                continue;
             }
-            string hostMark = hostMarkParameter.AsString();
-            if(hostMark is null) { continue; }
 
             var testPylonSheetInfo = HostsInfo
                 .Where(item => item.PylonKeyName.Equals(hostMark) && item.ProjectSection.Equals(projectSection))
@@ -266,7 +271,8 @@ internal class RevitRepository {
                     : (elemForCompareByDistance.Location as LocationPoint).Point;
 
                 if(pt1.DistanceTo(pt2) > _maxDistanceBetweenPylon) {
-                    mainViewModel.ErrorText = "Найдены пилоны с одинаковой маркой";
+                    mainViewModel.ErrorText = _localizationService.GetLocalizedString("VM.DuplicatePylonMarksFound");
+                    mainViewModel.ErrorElements = [elem.Id, elemForCompareByDistance.Id];
                 }
             }
         }
@@ -278,10 +284,9 @@ internal class RevitRepository {
     /// </summary>
     public void FindSheetInPj(MainViewModel mainViewModel, PylonSheetInfoVM pylonSheetInfoVM) {
         var sheet = AllSheets
-            .Where(item => item.Name.Equals(mainViewModel.ProjectSettings.SheetPrefix 
-                                            + pylonSheetInfoVM.PylonKeyName 
-                                            + mainViewModel.ProjectSettings.SheetSuffix))
-            .FirstOrDefault();
+            .FirstOrDefault(item => item.Name.Equals(mainViewModel.SheetSettings.SheetPrefix
+                                                    + pylonSheetInfoVM.PylonKeyName
+                                                    + mainViewModel.SheetSettings.SheetSuffix));
 
         if(sheet != null) {
             pylonSheetInfoVM.SheetInProject = true;

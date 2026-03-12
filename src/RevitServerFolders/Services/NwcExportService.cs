@@ -287,6 +287,7 @@ internal class NwcExportService : IModelsExportService<FileModelObjectExportSett
             viewTemplate.SetWorksetVisibility(workset.Id, visibility);
         }
 
+        destinationDocument.Regenerate();
         t.Commit();
         return view;
     }

@@ -18,7 +18,7 @@ internal class TransViewMarkService {
 
     private readonly FamilySymbol _tagSkeletonSymbol;
 
-    internal TransViewMarkService(CreationSettings settings, Document document, PylonSheetInfo pylonSheetInfo, 
+    internal TransViewMarkService(CreationSettings settings, Document document, PylonSheetInfo pylonSheetInfo,
                                   PylonView pylonView) {
         _settings = settings;
         _doc = document;
@@ -29,7 +29,7 @@ internal class TransViewMarkService {
         _annotationService = new TagCreationService(pylonView);
 
         // Находим типоразмер марки несущей арматуры для обозначения марки изделия
-        _tagSkeletonSymbol = _settings.TypesSettings.SelectedSkeletonTagType;
+        _tagSkeletonSymbol = _settings.AnnotationSettings.SelectedSkeletonTagType;
     }
 
 
@@ -45,7 +45,7 @@ internal class TransViewMarkService {
 
     private void CreateLeftBottomMark(List<Element> simpleRebars) {
         // Получаем референс-элемент
-        var leftBottomVerticalBar = _viewPointsAnalyzer.GetElementByDirection(simpleRebars, DirectionType.LeftBottom, 
+        var leftBottomVerticalBar = _viewPointsAnalyzer.GetElementByDirection(simpleRebars, DirectionType.LeftBottom,
                                                                                   false);
         // Получаем точку в которую нужно поставить аннотацию
         var pylonPoint = _viewPointsAnalyzer.GetPylonPointByDirection(_sheetInfo, DirectionType.LeftBottom);

@@ -1,0 +1,200 @@
+﻿<core:WpfUIPlatformPage
+    x:Class="RevitPylonDocumentation.Views.Pages.AnnotationParamsPage"
+    x:ClassModifier="internal"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
+    
+    xmlns:core="clr-namespace:dosymep.WpfUI.Core"
+    xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
+    xmlns:me="clr-namespace:dosymep.WpfCore.MarkupExtensions;assembly=dosymep.WpfCore"
+    xmlns:vms="clr-namespace:RevitPylonDocumentation.ViewModels"
+    
+    xmlns:local="clr-namespace:RevitPylonDocumentation.Views.Pages"
+    xmlns:views="clr-namespace:RevitPylonDocumentation.Views"
+    xmlns:controls="clr-namespace:RevitPylonDocumentation.Views.Controls"
+    xmlns:converters="clr-namespace:RevitPylonDocumentation.Views.Converters"
+    xmlns:extensions="clr-namespace:RevitPylonDocumentation.Views.Extensions"
+    
+    mc:Ignorable="d"
+    ScrollViewer.CanContentScroll="False"
+    Title="AnnotationParamsPage"
+    d:DesignHeight="700"
+    d:DesignWidth="600"
+    d:DataContext="{d:DesignInstance vms:MainViewModel, IsDesignTimeCreatable=False}">
+    <core:WpfUIPlatformPage.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary
+                    Source="../CustomStyles.xaml" />
+            </ResourceDictionary.MergedDictionaries>
+            <converters:CollectionNotEmptyToBoolConverter
+                x:Key="CollectionNotEmptyToBoolConverter" />
+        </ResourceDictionary>
+    </core:WpfUIPlatformPage.Resources>
+    
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+
+        <ScrollViewer>
+            <Border Name="ProjectProps"
+                Margin="15"
+                Style="{StaticResource CustomBorder}">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
+                    </Grid.RowDefinitions>
+
+                    <controls:SettingsTitleControl
+                        LabelText="{me:LocalizationSource AnnotationParams.AnnotationRelatedParameters}"
+                        ToolTipText="{me:LocalizationSource AnnotationParams.AnnotationRelatedParametersToolTip}"
+                        ButtonCommand="{Binding SaveSettingsCommand}" />
+
+                    <UniformGrid
+                        Grid.Row="1"
+                        extensions:UniformGridExtensions.AutoColumns="True">
+
+                        <controls:ComboBoxSettingControl
+                            LabelText="{me:LocalizationSource AnnotationParams.SelectDimensionTypeSize}"
+                            ItemsSource="{Binding DimensionTypes}"
+                            SelectedItem="{Binding 
+                                Path=AnnotationSettings.SelectedDimensionType, 
+                                UpdateSourceTrigger=PropertyChanged, Mode=TwoWay,
+                                ValidatesOnDataErrors=True, NotifyOnValidationError=True}"
+                            ToolTipText="{me:LocalizationSource AnnotationParams.SelectDimensionTypeSizeToolTip}"
+                            SelectionChangedCommand="{Binding SettingsChangedCommand}"
+                            ItemTemplate="{StaticResource WithFamilyNameItemTemplate}" />
+
+                        <controls:ComboBoxSettingControl
+                            LabelText="{me:LocalizationSource AnnotationParams.SelectSpotDimensionTypeSize}"
+                            ItemsSource="{Binding SpotDimensionTypes}"
+                            SelectedItem="{Binding 
+                                Path=AnnotationSettings.SelectedSpotDimensionType, 
+                                UpdateSourceTrigger=PropertyChanged, Mode=TwoWay,
+                                ValidatesOnDataErrors=True, NotifyOnValidationError=True}"
+                            ToolTipText="{me:LocalizationSource AnnotationParams.SelectSpotDimensionTypeSizeToolTip}"
+                            SelectionChangedCommand="{Binding SettingsChangedCommand}"
+                            ItemTemplate="{StaticResource WithFamilyNameItemTemplate}" />
+
+                        <controls:ComboBoxSettingControl
+                            Grid.Column="0"
+                            LabelText="{me:LocalizationSource AnnotationParams.SelectRebarProductMarkTypeSize}"
+                            ItemsSource="{Binding RebarTagTypes}"
+                            SelectedItem="{Binding 
+                                Path=AnnotationSettings.SelectedSkeletonTagType, 
+                                UpdateSourceTrigger=PropertyChanged, Mode=TwoWay,
+                                ValidatesOnDataErrors=True, NotifyOnValidationError=True}"
+                            ToolTipText="{me:LocalizationSource AnnotationParams.SelectRebarProductMarkTypeSizeToolTip}"
+                            SelectionChangedCommand="{Binding SettingsChangedCommand}"
+                            ItemTemplate="{StaticResource WithFamilyNameItemTemplate}" />
+
+                        <controls:ComboBoxSettingControl
+                            LabelText="{me:LocalizationSource AnnotationParams.SelectRebarMarkWithSerifTypeSize}"
+                            ItemsSource="{Binding RebarTagTypes}"
+                            SelectedItem="{Binding 
+                                Path=AnnotationSettings.SelectedRebarTagTypeWithSerif, 
+                                UpdateSourceTrigger=PropertyChanged, Mode=TwoWay,
+                                ValidatesOnDataErrors=True, NotifyOnValidationError=True}"
+                            ToolTipText="{me:LocalizationSource AnnotationParams.SelectRebarMarkWithSerifTypeSizeToolTip}"
+                            SelectionChangedCommand="{Binding SettingsChangedCommand}"
+                            ItemTemplate="{StaticResource WithFamilyNameItemTemplate}" />
+
+                        <controls:ComboBoxSettingControl
+                            LabelText="{me:LocalizationSource AnnotationParams.SelectRebarMarkWithStepTypeSize}"
+                            ItemsSource="{Binding RebarTagTypes}"
+                            SelectedItem="{Binding 
+                                Path=AnnotationSettings.SelectedRebarTagTypeWithStep, 
+                                UpdateSourceTrigger=PropertyChanged, Mode=TwoWay,
+                                ValidatesOnDataErrors=True, NotifyOnValidationError=True}"
+                            ToolTipText="{me:LocalizationSource AnnotationParams.SelectRebarMarkWithStepTypeSizeToolTip}"
+                            SelectionChangedCommand="{Binding SettingsChangedCommand}"
+                            ItemTemplate="{StaticResource WithFamilyNameItemTemplate}" />
+
+                        <controls:ComboBoxSettingControl
+                            LabelText="{me:LocalizationSource AnnotationParams.SelectRebarMarkWithCommentTypeSize}"
+                            ItemsSource="{Binding RebarTagTypes}"
+                            SelectedItem="{Binding 
+                                Path=AnnotationSettings.SelectedRebarTagTypeWithComment, 
+                                UpdateSourceTrigger=PropertyChanged, Mode=TwoWay,
+                                ValidatesOnDataErrors=True, NotifyOnValidationError=True}"
+                            ToolTipText="{me:LocalizationSource AnnotationParams.SelectRebarMarkWithCommentTypeSizeToolTip}"
+                            SelectionChangedCommand="{Binding SettingsChangedCommand}"
+                            ItemTemplate="{StaticResource WithFamilyNameItemTemplate}" />
+
+                        <controls:ComboBoxSettingControl
+                            LabelText="{me:LocalizationSource AnnotationParams.SelectUniversalMarkWithTextTypeSize}"
+                            ItemsSource="{Binding TypicalAnnotationsTypes}"
+                            SelectedItem="{Binding 
+                                Path=AnnotationSettings.SelectedUniversalTagType, 
+                                UpdateSourceTrigger=PropertyChanged, Mode=TwoWay,
+                                ValidatesOnDataErrors=True, NotifyOnValidationError=True}"
+                            ToolTipText="{me:LocalizationSource AnnotationParams.SelectUniversalMarkWithTextTypeSizeToolTip}"
+                            SelectionChangedCommand="{Binding SettingsChangedCommand}"
+                            ItemTemplate="{StaticResource WithFamilyNameItemTemplate}" />
+
+                        <controls:ComboBoxSettingControl
+                            LabelText="{me:LocalizationSource AnnotationParams.SelectBreakLineTypeSize}"
+                            ItemsSource="{Binding DetailComponentsTypes}"
+                            SelectedItem="{Binding 
+                                Path=AnnotationSettings.SelectedBreakLineType, 
+                                UpdateSourceTrigger=PropertyChanged, Mode=TwoWay,
+                                ValidatesOnDataErrors=True, NotifyOnValidationError=True}"
+                            ToolTipText="{me:LocalizationSource AnnotationParams.SelectBreakLineTypeSizeToolTip}"
+                            SelectionChangedCommand="{Binding SettingsChangedCommand}"
+                            ItemTemplate="{StaticResource WithFamilyNameItemTemplate}" />
+
+                        <controls:ComboBoxSettingControl
+                            LabelText="{me:LocalizationSource AnnotationParams.SelectConcretingJointTypeSize}"
+                            ItemsSource="{Binding DetailComponentsTypes}"
+                            SelectedItem="{Binding 
+                                Path=AnnotationSettings.SelectedConcretingJointType, 
+                                UpdateSourceTrigger=PropertyChanged, Mode=TwoWay,
+                                ValidatesOnDataErrors=True, NotifyOnValidationError=True}"
+                            ToolTipText="{me:LocalizationSource AnnotationParams.SelectConcretingJointTypeSizeToolTip}"
+                            SelectionChangedCommand="{Binding SettingsChangedCommand}"
+                            ItemTemplate="{StaticResource WithFamilyNameItemTemplate}" />
+                    </UniformGrid>
+
+
+                    <CheckBox
+                        Grid.Row="2"
+                        Margin="-5 10 0 5"
+                        Content="{me:LocalizationSource AnnotationParams.DimensionGrouping}"
+                        IsChecked="{Binding Path=AnnotationSettings.DimensionGrouping, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
+                        ToolTip="{me:LocalizationSource AnnotationParams.DimensionGroupingTooltip}">
+                        <i:Interaction.Triggers>
+                            <i:EventTrigger
+                                EventName="Checked">
+                                <i:InvokeCommandAction
+                                    Command="{Binding SettingsChangedCommand}" />
+                            </i:EventTrigger>
+
+                            <i:EventTrigger
+                                EventName="Unchecked">
+                                <i:InvokeCommandAction
+                                    Command="{Binding SettingsChangedCommand}" />
+                            </i:EventTrigger>
+                        </i:Interaction.Triggers>
+                    </CheckBox>
+                </Grid>
+            </Border>
+        </ScrollViewer>
+
+        <controls:AppFooterControl
+            Grid.Row="1"
+            HorizontalAlignment="Right"
+            ErrorText="{Binding ErrorText}"
+            ShowErrorElemsButtonText="{me:LocalizationSource GeneralPage.Show}"
+            ShowErrorElemsButton="{Binding Path=ErrorElements, Converter={StaticResource CollectionNotEmptyToBoolConverter}}"
+            ShowErrorElemsCommand="{Binding ShowErrorElementsCommand}"
+            ShowOkButton="False"
+            CancelButtonText="{me:LocalizationSource GeneralPage.Cancel}" />
+    </Grid>
+</core:WpfUIPlatformPage>

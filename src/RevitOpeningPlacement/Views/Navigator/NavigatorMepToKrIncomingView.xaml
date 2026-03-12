@@ -22,7 +22,7 @@
     Width="1000"
     MinHeight="150"
     MinWidth="150"
-    d:DataContext="{d:DesignInstance {x:Type vm:ConstructureNavigatorForIncomingTasksViewModel}, IsDesignTimeCreatable=False}"
+    d:DataContext="{d:DesignInstance {x:Type vm:NavigatorKrViewModel}, IsDesignTimeCreatable=False}"
     WindowStartupLocation="Manual"
     Left="50"
     Top="50">
@@ -165,11 +165,9 @@
                     <dxg:GridControl
                         x:Name="_dgIncomingTasks"
                         Grid.Row="0"
-                        ItemsSource="{Binding OpeningsTasksIncomingViewSource.View}"
+                        ItemsSource="{Binding OpeningsTasksIncoming}"
                         BorderThickness="0"
                         SelectionMode="Row"
-                        CurrentItem="RevitOpeningPlacement.Models.Interfaces.IOpeningTaskIncomingForKrViewModel"
-                        SelectedItem="{Binding SelectedOpeningTaskIncoming}"
                         MaxHeight="2000">
                         <dxg:GridControl.GroupSummary>
                             <dxg:GridSummaryItem
@@ -182,7 +180,6 @@
                                 ShowDataNavigator="True"
                                 ShowSearchPanelMode="Always"
                                 IndicatorWidth="0"
-                                FocusedRowHandleChanged="viewTasks_FocusedRowHandleChanged"
                                 NavigationStyle="Cell"
                                 VirtualizingPanel.IsVirtualizingWhenGrouping="True"
                                 VirtualizingPanel.VirtualizationMode="Recycling"
@@ -321,12 +318,10 @@
                     ShowCloseButton="False">
                     <dxg:GridControl
                         x:Name="_dgOpeningsReal"
-                        ItemsSource="{Binding OpeningsRealViewSource.View}"
+                        ItemsSource="{Binding OpeningsReal}"
                         DefaultSorting="Diameter"
                         BorderThickness="0"
                         SelectionMode="Row"
-                        CurrentItem="RevitOpeningPlacement.ViewModels.Navigator.OpeningRealKrViewModel"
-                        SelectedItem="{Binding SelectedOpeningReal}"
                         MaxHeight="2000">
                         <dxg:GridControl.GroupSummary>
                             <dxg:GridSummaryItem
@@ -339,7 +334,6 @@
                                 ShowDataNavigator="True"
                                 ShowSearchPanelMode="Always"
                                 IndicatorWidth="0"
-                                FocusedRowHandleChanged="viewOpenings_FocusedRowHandleChanged"
                                 NavigationStyle="Cell"
                                 VirtualizingPanel.IsVirtualizingWhenGrouping="True"
                                 VirtualizingPanel.VirtualizationMode="Recycling"

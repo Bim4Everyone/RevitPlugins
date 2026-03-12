@@ -11,15 +11,11 @@
     xmlns:vms="clr-namespace:RevitSetCoordParams.ViewModels"
     xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
     xmlns:me="clr-namespace:dosymep.WpfCore.MarkupExtensions;assembly=dosymep.WpfCore"
-    
     mc:Ignorable="d"
-    
     Height="500"
     Width="1000"
-    
     MinHeight="500"
     MinWidth="1000"
-    
     d:DataContext="{d:DesignInstance vms:WarningsViewModel, IsDesignTimeCreatable=False}">
 
     <Window.Resources>
@@ -27,7 +23,7 @@
             <ResourceDictionary.MergedDictionaries>
                 <ResourceDictionary
                     Source="CustomStyles.xaml" />
-            </ResourceDictionary.MergedDictionaries>            
+            </ResourceDictionary.MergedDictionaries>
         </ResourceDictionary>
     </Window.Resources>
 
@@ -49,12 +45,12 @@
                     Orientation="Horizontal"
                     HorizontalAlignment="Left"
                     VerticalAlignment="Center">
-                    <ui:TextBlock                        
+                    <ui:TextBlock
                         FontSize="14"
                         FontWeight="DemiBold"
                         Text="{me:LocalizationSource WarningWindow.Title}"/>
                     <ui:TextBlock
-                        Margin="7,0,0,0"                        
+                        Margin="7,0,0,0"
                         FontSize="14"
                         FontWeight="DemiBold"
                         Text="{Binding WarningQuantity}" />
@@ -64,7 +60,7 @@
 
         <ItemsControl
             Grid.Row="1"
-            Padding="10"            
+            Padding="10"
             VirtualizingPanel.IsVirtualizing="True"
             VirtualizingPanel.VirtualizationMode="Recycling"
             ScrollViewer.CanContentScroll="True"
@@ -77,6 +73,8 @@
                         Description="{Binding Description}"
                         ExtraTextVisible="True"
                         ExtraText="{Binding WarningQuantity}"
+                        ButtonVisible="True"
+                        ButtonCommand="{Binding SelectAllCommand}"
                         IsChecked="True">
                         <edits:CustomGroupEditControl.EditControl>
                             <ui:DataGrid
@@ -98,7 +96,7 @@
                                                     Width="100"
                                                     Content="{Binding ID}"
                                                     Command="{Binding DataContext.ShowElementCommand, 
-                                                RelativeSource={RelativeSource AncestorType=Window}}"
+                                                        RelativeSource={RelativeSource AncestorType=Window}}"
                                                     CommandParameter="{Binding ID}" />
                                             </DataTemplate>
                                         </DataGridTemplateColumn.CellTemplate>
@@ -148,5 +146,5 @@
             </ItemsControl.ItemsPanel>
 
         </ItemsControl>
-    </Grid>    
+    </Grid>
 </core:WpfUIPlatformWindow>

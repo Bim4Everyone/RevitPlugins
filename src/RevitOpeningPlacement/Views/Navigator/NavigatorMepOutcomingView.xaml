@@ -19,7 +19,7 @@
     Width="800"
     MinHeight="150"
     MinWidth="150"
-    d:DataContext="{d:DesignInstance {x:Type vm:MepNavigatorForOutcomingTasksViewModel}, IsDesignTimeCreatable=False}">
+    d:DataContext="{d:DesignInstance {x:Type vm:NavigatorMepViewModel}, IsDesignTimeCreatable=False}">
     <dxmvvm:Interaction.Behaviors>
         <dxmvvm:EventToCommand
             EventName="Loaded"
@@ -27,45 +27,6 @@
     </dxmvvm:Interaction.Behaviors>
 
     <base:ThemedPlatformWindow.Resources>
-        <DataTemplate
-            x:Key="OneParentIdTemplate"
-            DataType="{x:Type dxg:GroupRowData}">
-            <Grid
-                x:Name="_grid">
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition
-                        Width="Auto" />
-                    <ColumnDefinition />
-                </Grid.ColumnDefinitions>
-                <StackPanel
-                    Orientation="Horizontal">
-                    <dxg:GridGroupExpandButton
-                        x:Name="Toggle"
-                        VerticalAlignment="Center"
-                        HorizontalAlignment="Left"
-                        Command="{Binding View.Commands.ChangeGroupExpanded}"
-                        CommandParameter="{Binding RowHandle.Value}"
-                        IsChecked="{Binding Path=IsRowExpanded}" />
-                    <TextBlock
-                        Margin="2,0"
-                        Text="Входящие задания на отверстия"
-                        VerticalAlignment="Center"
-                        HorizontalAlignment="Left" />
-                </StackPanel>
-                <StackPanel
-                    Grid.Column="2"
-                    Orientation="Horizontal"
-                    VerticalAlignment="Center"
-                    HorizontalAlignment="Right">
-                    <TextBlock
-                        Margin="5,0"
-                        Text="{Binding GroupSummaryData[0].Text}"
-                        VerticalAlignment="Center"
-                        HorizontalAlignment="Right" />
-                </StackPanel>
-            </Grid>
-        </DataTemplate>
-
         <ControlTemplate
             x:Key="{dxgt:TableViewThemeKey ResourceKey=GroupPanelContentTemplate, IsThemeIndependent = true}"
             TargetType="{x:Type dxg:GroupPanelControl}">
@@ -139,15 +100,14 @@
 
         <dxg:GridControl
             x:Name="_dg"
-            ItemsSource="{Binding OpeningsMepTasksOutcomingViewSource.View}"
+            ItemsSource="{Binding OpeningsMepTaskOutcoming}"
             DefaultSorting="MepSystem"
             BorderThickness="0"
             SelectionMode="Row"
-            Grid.Row="1"
-            CurrentItem="RevitOpeningPlacement.ViewModels.Navigator.OpeningMepTaskOutcomingViewModel"
-            SelectedItem="{Binding SelectedOpeningMepTaskOutcoming}">
+            Grid.Row="1">
             <dxg:GridControl.GroupSummary>
                 <dxg:GridSummaryItem
+                    FieldName="OpeningId"
                     SummaryType="Count" />
             </dxg:GridControl.GroupSummary>
             <dxg:GridControl.View>
@@ -157,7 +117,6 @@
                     ShowDataNavigator="True"
                     ShowSearchPanelMode="Always"
                     IndicatorWidth="0"
-                    FocusedRowHandleChanged="view_FocusedRowHandleChanged"
                     NavigationStyle="Cell"
                     VirtualizingPanel.IsVirtualizingWhenGrouping="True"
                     VirtualizingPanel.VirtualizationMode="Recycling"
@@ -167,7 +126,6 @@
             <dxg:GridControl.Columns>
                 <dxg:GridColumn
                     Width="70"
-                    GroupIndex="0"
                     SortMode="Custom"
                     AllowResizing="False">
                     <dxg:GridColumn.CellTemplate>
@@ -184,12 +142,14 @@
                     Width="60"
                     Header="Статус"
                     IsSmart="True"
+                    GroupIndex="0"
                     FieldName="Status" />
                 <dxg:GridColumn
                     ReadOnly="True"
                     Width="60"
                     Header="Дата"
                     IsSmart="True"
+                    GroupIndex="1"
                     FieldName="Date" />
                 <dxg:GridColumn
                     ReadOnly="True"

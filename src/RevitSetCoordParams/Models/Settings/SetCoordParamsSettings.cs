@@ -4,6 +4,7 @@ using Autodesk.Revit.DB;
 
 using dosymep.Revit;
 
+using RevitSetCoordParams.Models.Enums;
 using RevitSetCoordParams.Models.Interfaces;
 
 namespace RevitSetCoordParams.Models.Settings;
@@ -22,13 +23,13 @@ internal class SetCoordParamsSettings {
     public IElementsProvider ElementsProvider { get; set; }
     public IPositionProvider PositionProvider { get; set; }
     public IFileProvider FileProvider { get; set; }
-    public ISphereProvider SphereProvider { get; set; }
-    public string TypeModel { get; set; }
+    public List<string> TypeModels { get; set; }
     public List<ParamMap> ParamMaps { get; set; }
     public List<BuiltInCategory> Categories { get; set; }
     public double MaxDiameterSearchSphereMm { get; set; }
     public double StepDiameterSearchSphereMm { get; set; }
     public bool Search { get; set; }
+    public DependentProcess DependentProcess { get; set; }
 
     public void LoadConfigSettings() {
         ParamMaps = ConfigSettings.ParamMaps;
@@ -36,11 +37,11 @@ internal class SetCoordParamsSettings {
         ElementsProvider = _providersFactory.GetElementsProvider(_revitRepository, ConfigSettings.ElementsProvider);
         PositionProvider = _providersFactory.GetPositionProvider(_revitRepository, ConfigSettings.PositionProvider);
         FileProvider = GetFileProvider(ConfigSettings.SourceFile);
-        TypeModel = ConfigSettings.TypeModel;
+        TypeModels = ConfigSettings.TypeModels;
         MaxDiameterSearchSphereMm = ConfigSettings.MaxDiameterSearchSphereMm;
         StepDiameterSearchSphereMm = ConfigSettings.StepDiameterSearchSphereMm;
         Search = ConfigSettings.Search;
-        SphereProvider = _providersFactory.GetSphereProvider(_revitRepository);
+        DependentProcess = ConfigSettings.DependentProcess;
     }
 
     public void UpdateConfigSettings() {
@@ -49,10 +50,11 @@ internal class SetCoordParamsSettings {
         ConfigSettings.ElementsProvider = ElementsProvider.Type;
         ConfigSettings.PositionProvider = PositionProvider.Type;
         ConfigSettings.SourceFile = FileProvider.Document.GetUniqId();
-        ConfigSettings.TypeModel = TypeModel;
+        ConfigSettings.TypeModels = TypeModels;
         ConfigSettings.MaxDiameterSearchSphereMm = MaxDiameterSearchSphereMm;
         ConfigSettings.StepDiameterSearchSphereMm = StepDiameterSearchSphereMm;
         ConfigSettings.Search = Search;
+        ConfigSettings.DependentProcess = DependentProcess;
     }
 
     private IFileProvider GetFileProvider(string fileName) {

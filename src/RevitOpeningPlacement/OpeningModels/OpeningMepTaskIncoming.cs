@@ -65,11 +65,7 @@ internal class OpeningMepTaskIncoming : IOpeningTaskIncoming, IEquatable<Opening
         DisplayHeight = GetFamilyInstanceStringParamValueOrEmpty(RevitRepository.OpeningHeight);
         DisplayWidth = GetFamilyInstanceStringParamValueOrEmpty(RevitRepository.OpeningWidth);
         DisplayThickness = GetFamilyInstanceStringParamValueOrEmpty(RevitRepository.OpeningThickness);
-        Comment = _familyInstance.GetParamValueStringOrDefault(
-            SystemParamsConfig.Instance.CreateRevitParam(
-                _familyInstance.Document,
-                BuiltInParameter.ALL_MODEL_INSTANCE_COMMENTS),
-            string.Empty);
+        Comment = _familyInstance.GetParamValueOrDefault(BuiltInParameter.ALL_MODEL_INSTANCE_COMMENTS, string.Empty);
         Username = GetFamilyInstanceStringParamValueOrEmpty(RevitRepository.OpeningAuthor);
 
         Diameter = GetFamilyInstanceDoubleParamValueOrZero(RevitRepository.OpeningDiameter);

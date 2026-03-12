@@ -47,6 +47,12 @@
   <Project Path="src/RevitBatchPrint/RevitBatchPrint.csproj">
     <Platform Project="x64" />
   </Project>
+  <Project Path="src/RevitBatchSpecExport/RevitBatchSpecExport.csproj">
+    <Platform Project="x64" />
+  </Project>
+  <Project Path="src/RevitBuildCoordVolumes/RevitBuildCoordVolumes.csproj">
+    <Platform Project="x64" />
+  </Project>
   <Project Path="src/RevitCheckingLevels/RevitCheckingLevels.csproj">
     <Platform Project="x64" />
   </Project>
@@ -143,6 +149,9 @@
   <Project Path="src/RevitOverridingGraphicsInViews/RevitOverridingGraphicsInViews.csproj">
     <Platform Project="x64" />
   </Project>
+  <Project Path="src/RevitParamsChecker/RevitParamsChecker.csproj">
+    <Platform Project="x64" />
+  </Project>
   <Project Path="src/RevitPlatformSettings/RevitPlatformSettings.csproj">
     <Platform Project="x64" />
   </Project>
@@ -198,6 +207,9 @@
     <Platform Project="x64" />
   </Project>
   <Project Path="src/RevitSuperfilter/RevitSuperfilter.csproj">
+    <Platform Project="x64" />
+  </Project>
+  <Project Path="src/RevitUnmodelingMep/RevitUnmodelingMep.csproj">
     <Platform Project="x64" />
   </Project>
   <Project Path="src/RevitTagAllCategories/RevitTagAllCategories.csproj">

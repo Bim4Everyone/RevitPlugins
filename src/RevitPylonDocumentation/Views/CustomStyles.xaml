@@ -1,0 +1,191 @@
+﻿<ResourceDictionary
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
+    xmlns:controls="clr-namespace:Wpf.Ui.Controls;assembly=Wpf.Ui"
+    xmlns:myControls="clr-namespace:RevitPylonDocumentation.Views.Controls">
+    <ResourceDictionary.MergedDictionaries>
+        <ResourceDictionary
+            Source="pack://application:,,,/Wpf.Ui;component/Controls/CheckBox/CheckBox.xaml" />
+        <ResourceDictionary
+            Source="pack://application:,,,/Wpf.Ui;component/Controls/ToggleSwitch/ToggleSwitch.xaml" />
+        <ResourceDictionary
+            Source="pack://application:,,,/Wpf.Ui;component/Controls/DataGrid/DataGrid.xaml" />
+        <ResourceDictionary
+            Source="pack://application:,,,/Wpf.Ui;component/Controls/ComboBox/ComboBox.xaml" />
+        <ResourceDictionary
+            Source="pack://application:,,,/Wpf.Ui;component/Controls/GridView/GridViewHeaderRowIndicator.xaml" />
+        <ResourceDictionary
+            Source="pack://application:,,,/Wpf.Ui;component/Controls/Button/Button.xaml" />
+        <ResourceDictionary
+            Source="pack://application:,,,/Wpf.Ui;component/Controls/ListView/ListViewItem.xaml" />
+        <ResourceDictionary
+            Source="pack://application:,,,/Wpf.Ui;component/Controls/ListView/ListView.xaml" />
+        <ResourceDictionary
+            Source="pack://application:,,,/Wpf.Ui;component/Controls/Expander/Expander.xaml" />
+        <ResourceDictionary
+            Source="pack://application:,,,/Wpf.Ui;component/Controls/TextBlock/TextBlock.xaml" />
+        <ResourceDictionary
+            Source="pack://application:,,,/Wpf.Ui;component/Controls/ScrollViewer/ScrollViewer.xaml" />
+        <ResourceDictionary
+            Source="pack://application:,,,/Wpf.Ui;component/Controls/InfoBadge/InfoBadge.xaml" />
+    </ResourceDictionary.MergedDictionaries>
+
+    <Style x:Key="RoundInfoBadgeStyle"
+        TargetType="ui:InfoBadge">
+        <Setter
+            Property="Template">
+            <Setter.Value>
+                <ControlTemplate
+                    TargetType="ui:InfoBadge">
+                    <Grid>
+                        <Ellipse
+                            Fill="Orange"
+                            Margin="10"
+                            Width="15"
+                            Height="15"/>
+                    </Grid>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <Style x:Key="ComboBoxWithTooltipStyle"
+        TargetType="{x:Type ComboBox}"
+        BasedOn="{StaticResource DefaultComboBoxStyle}">
+        <Setter
+            Property="ToolTipService.InitialShowDelay"
+            Value="1000" />
+        <Setter
+            Property="ToolTipService.ShowDuration"
+            Value="20000" />
+        <Setter
+            Property="ToolTipService.BetweenShowDelay"
+            Value="1" />
+    </Style>
+
+    <Style x:Key="ErrorComboBoxStyle"
+        TargetType="{x:Type ComboBox}"
+        BasedOn="{StaticResource ComboBoxWithTooltipStyle}">
+        <Setter
+            Property="BorderBrush"
+            Value="Orange" />
+        <Setter
+            Property="BorderThickness"
+            Value="1" />
+        <Setter
+            Property="Background">
+            <Setter.Value>
+                <SolidColorBrush
+                    Color="Orange"
+                    Opacity="0.1" />
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <Style x:Key="TextBoxWithTooltipStyle"
+        TargetType="{x:Type ui:TextBox}"
+        BasedOn="{StaticResource DefaultUiTextBoxStyle}">
+        <Setter
+            Property="ToolTipService.InitialShowDelay"
+            Value="1000" />
+        <Setter
+            Property="ToolTipService.ShowDuration"
+            Value="20000" />
+        <Setter
+            Property="ToolTipService.BetweenShowDelay"
+            Value="1" />
+    </Style>
+
+    <Style x:Key="ErrorTextBoxStyle"
+        TargetType="{x:Type ui:TextBox}"
+        BasedOn="{StaticResource TextBoxWithTooltipStyle}">
+        <Setter
+            Property="BorderBrush"
+            Value="Orange" />
+        <Setter
+            Property="BorderThickness"
+            Value="1" />
+        <Setter
+            Property="Background">
+            <Setter.Value>
+                <SolidColorBrush
+                    Color="Orange"
+                    Opacity="0.1" />
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <Style x:Key="CustomTextBlock"
+        TargetType="ui:TextBlock" >
+        <Setter
+            Property="Foreground"
+            Value="{DynamicResource TextFillColorPrimaryBrush}" />
+        <Setter
+            Property="FontSize"
+            Value="14" />
+    </Style>
+
+    <Style x:Key="TextBlockWithTooltipStyle"
+        TargetType="ui:TextBlock"
+        BasedOn="{StaticResource CustomTextBlock}">
+
+        <Setter
+            Property="ToolTipService.InitialShowDelay"
+            Value="1000" />
+        <Setter
+            Property="ToolTipService.ShowDuration"
+            Value="20000" />
+        <Setter
+            Property="ToolTipService.BetweenShowDelay"
+            Value="1" />
+    </Style>
+
+    <Style x:Key="CustomListViewItem"
+        TargetType="ui:ListViewItem"
+        BasedOn="{StaticResource ListViewItemStyle}">
+        <Setter
+            Property="IsSelected"
+            Value="{Binding IsCheck, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" />
+    </Style>
+
+    <Style x:Key="CustomBorder"
+        TargetType="Border" >
+        <Setter
+            Property="Padding"
+            Value="10" />
+        <Setter
+            Property="CornerRadius"
+            Value="10" />
+        <Setter
+            Property="VerticalAlignment"
+            Value="Stretch" />
+        <Setter
+            Property="HorizontalAlignment"
+            Value="Stretch" />
+        <Setter
+            Property="SnapsToDevicePixels"
+            Value="True" />
+        <Setter
+            Property="OverridesDefaultStyle"
+            Value="True" />
+        <Setter
+            Property="ScrollViewer.HorizontalScrollBarVisibility"
+            Value="Auto" />
+        <Setter
+            Property="ScrollViewer.VerticalScrollBarVisibility"
+            Value="Disabled" />
+        <Setter
+            Property="Background"
+            Value="{DynamicResource CardBackground}" />
+        <Setter
+            Property="BorderBrush"
+            Value="{DynamicResource CardBorderBrush}" />
+        <Setter
+            Property="BorderThickness"
+            Value="{DynamicResource CardControlBorderThemeThickness}" />
+        <Setter
+            Property="FocusVisualStyle"
+            Value="{DynamicResource DefaultControlFocusVisualStyle}" />
+    </Style>
+</ResourceDictionary>

@@ -1,0 +1,120 @@
+<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:system="clr-namespace:System;assembly=mscorlib">    
+
+    <system:String x:Key="MainWindow.Title">Построить объемы СМР</system:String>
+    <system:String x:Key="MainWindow.CommonSettings">Общие настройки</system:String>
+    <system:String x:Key="MainWindow.SlabBasedAlgorythmSettings">Настройки алгоритма на основе перекрытий</system:String>
+    <system:String x:Key="MainWindow.ButtonCheckArea">Проверить зоны</system:String>
+    <system:String x:Key="MainWindow.ButtonOk">Построить</system:String>
+    <system:String x:Key="MainWindow.ButtonCancel">Отменить</system:String>
+
+    <system:String x:Key="CommonSettingsEditControl.TypeAlgorithm">Тип алгоритма</system:String>
+    <system:String x:Key="CommonSettingsEditControl.TypeAlgorithmDescription">Выбор типа алгоритма для построения объемных элементов</system:String> 
+    <system:String x:Key="CommonSettingsEditControl.TypeZones">Тип зоны</system:String>
+    <system:String x:Key="CommonSettingsEditControl.TypeZonesDescription">Выбор типа зоны для построения объемных элементов</system:String>
+    <system:String x:Key="CommonSettingsEditControl.Params">Параметры СМР</system:String>
+    <system:String x:Key="CommonSettingsEditControl.ParamsDescription">Выбор параметров СМР для чтения и записи</system:String>
+    <system:String x:Key="CommonSettingsEditControl.ParamWarningTooltip">В некоторых параметрах есть ошибки</system:String>
+    
+    <system:String x:Key="ParamControl.ParamsToggleSwitchOn">Использовать параметр</system:String>
+    <system:String x:Key="ParamControl.ParamsToggleSwitchOff">Не использовать параметр</system:String>
+    <system:String x:Key="ParamControl.SourceParamHeader">Параметр зон</system:String>
+    <system:String x:Key="ParamControl.TargetParamHeader">Параметр объемных элементов</system:String>
+
+    <system:String x:Key="SlabBasedSettingEditControl.BuilderMode">Режим работы алгоритма</system:String>
+    <system:String x:Key="SlabBasedSettingEditControl.BuilderModeDescription">Выбор режима работы алгоритма на основе перекрытий</system:String>
+    
+    <system:String x:Key="SlabBasedSettingEditControl.SourceFiles">Файлы с плитами перекрытий</system:String>
+    <system:String x:Key="SlabBasedSettingEditControl.SourceFilesDescription">Файлы, где расположены плиты перекрытий</system:String>
+    <system:String x:Key="SlabBasedSettingEditControl.SearchTextDocs">Поиск по имени файла</system:String>    
+
+    <system:String x:Key="SlabBasedSettingEditControl.TypeSlabs">Типоразмеры плит перекрытий</system:String>
+    <system:String x:Key="SlabBasedSettingEditControl.TypeSlabsDescription">Типоразмеры плит использующихся для определения основы</system:String>
+    <system:String x:Key="SlabBasedSettingEditControl.SearchTextSlabs">Поиск по имени типоразмера</system:String>
+    
+    <system:String x:Key="SlabBasedSettingEditControl.Levels">Уровни плит перекрытий</system:String>
+    <system:String x:Key="SlabBasedSettingEditControl.LevelsDescription">Уровни плит использующихся для определения основы</system:String>
+    <system:String x:Key="SlabBasedSettingEditControl.CheckedAllLevels">Выбрать все уровни</system:String>
+    <system:String x:Key="SlabBasedSettingEditControl.SearchTextLevels">Поиск по имени уровня</system:String>
+    <system:String x:Key="SlabBasedSettingEditControl.NotCheckedAllLevels">Сбросить выбор уровней</system:String>
+
+    <system:String x:Key="SlabBasedSettingEditControl.SquareSide">Длина стороны квадрата в мм</system:String>
+    <system:String x:Key="SlabBasedSettingEditControl.SquareSideDescription">Зона разбивается на сетку квадратов с заданной стороной</system:String>
+    <system:String x:Key="SlabBasedSettingEditControl.SquareSideTooltip">Влияет на производительность и точность. Меньше значение - меньше производительность, но больше точность</system:String>
+
+    <system:String x:Key="SlabBasedSettingEditControl.SquareAngle">Угол поворота квадрата в градусах</system:String>
+    <system:String x:Key="SlabBasedSettingEditControl.SquareAngleDescription">Сетка квадратов поворачивается на заданный угол</system:String>
+    <system:String x:Key="SlabBasedSettingEditControl.SquareAngleTooltip">Поворот налево - положительное значение, направо - отрицательное</system:String>    
+
+    <system:String x:Key="CommonSettingViewModel.SlabBasedAlgorithm">На основе перекрытий (автоматический)</system:String>
+    <system:String x:Key="CommonSettingViewModel.ParamBasedAlgorithm">На основе параметров (низа и верха)</system:String>
+    <system:String x:Key="CommonSettingViewModel.DescriptionParamDescription">Параметр типа зон</system:String>
+    <system:String x:Key="CommonSettingViewModel.DescriptionParamDetailDescription">Используется для определения типа зон</system:String>
+    <system:String x:Key="CommonSettingViewModel.BlockParamDescription">Параметр блока СМР</system:String>
+    <system:String x:Key="CommonSettingViewModel.BlockParamDetailDescription">Используется для определения корпуса здания</system:String>
+    <system:String x:Key="CommonSettingViewModel.SectionParamDescription">Параметр секции СМР</system:String>
+    <system:String x:Key="CommonSettingViewModel.SectionParamDetailDescription">Используется для определения секции здания</system:String>
+    <system:String x:Key="CommonSettingViewModel.FloorParamDescription">Параметр этажа СМР</system:String>
+    <system:String x:Key="CommonSettingViewModel.FloorParamDetailDescription">Используется для определения этажа здания</system:String>
+    <system:String x:Key="CommonSettingViewModel.FloorDEParamDescription">Дополнительный параметр этажа СМР</system:String>
+    <system:String x:Key="CommonSettingViewModel.FloorDEParamDetailDescription">Используется для определения этажа здания</system:String>
+    <system:String x:Key="CommonSettingViewModel.ZoneParamDescription">Параметр зоны СМР</system:String>
+    <system:String x:Key="CommonSettingViewModel.ZoneParamDetailDescription">Используется для определения зоны СМР</system:String>
+    <system:String x:Key="CommonSettingViewModel.BottomZoneParamDescription">Параметр низа СМР</system:String>
+    <system:String x:Key="CommonSettingViewModel.BottomZoneParamDetailDescription">Используется для построения простого объема</system:String>
+    <system:String x:Key="CommonSettingViewModel.TopZoneParamDescription">Параметр верха СМР</system:String>
+    <system:String x:Key="CommonSettingViewModel.TopZoneParamDetailDescription">Используется для построения простого объема</system:String>
+    <system:String x:Key="CommonSettingViewModel.VolumeParamDescription">Параметр объёма СМР</system:String>
+    <system:String x:Key="CommonSettingViewModel.VolumeParamDetailDescription">Используется для вычисления объёма</system:String>
+
+    <system:String x:Key="SlabBasedSettingViewModel.AutomaticBuilder">Автоматический выбор по перекрытию</system:String>
+    <system:String x:Key="SlabBasedSettingViewModel.ContourBuilder">Экструзия квадратов с объединением</system:String>
+    <system:String x:Key="SlabBasedSettingViewModel.ColumnBuilder">Экструзия квадратов без объединения</system:String>
+
+    <system:String x:Key="MainViewModel.RequiredCheckArea">Требуется проверить зоны</system:String>
+    <system:String x:Key="MainViewModel.NoMainParam">Параметр типа зон обязателен к использованию</system:String>
+    <system:String x:Key="MainViewModel.NoBottomZoneParam">Параметр низа СМР обязателен к использованию в данном алгоритме</system:String>
+    <system:String x:Key="MainViewModel.NoTopZoneParam">Параметр верха СМР обязателен к использованию в данном алгоритме</system:String>
+    <system:String x:Key="MainViewModel.NoVolumeParam">Параметр объёма СМР обязателен к использованию</system:String>
+    <system:String x:Key="MainViewModel.NoDocuments">Не выбраны файлы с перекрытиями</system:String>
+    <system:String x:Key="MainViewModel.NoParams">Не выбраны параметры</system:String>
+    <system:String x:Key="MainViewModel.NoSlabs">Не выбраны плиты перекрытий</system:String>
+    <system:String x:Key="MainViewModel.NoLevels">Не выбраны уровни перекрытий</system:String>
+    <system:String x:Key="MainViewModel.NoTypeZone">Не выбран тип зон</system:String>
+    <system:String x:Key="MainViewModel.ErrorParams">Отсутствуют некоторые параметры</system:String>
+    <system:String x:Key="MainViewModel.SquareValueNoDouble">Вводимые данные должны быть числом</system:String>
+    <system:String x:Key="MainViewModel.SquareSideNoNegate">Вводимые данные должны быть положительными</system:String>
+    <system:String x:Key="MainViewModel.SquareSideBig">Вводимые данные не должны превышать 1000 мм</system:String>
+    <system:String x:Key="MainViewModel.SquareSideSmall">Вводимые данные не должны быть меньше 10 мм</system:String>    
+    <system:String x:Key="MainViewModel.ProgressTitle">Построение объёмов... [{0}]\[{1}]</system:String>
+    <system:String x:Key="MainViewModel.MessageBoxTitle">Проверка зон</system:String>
+    <system:String x:Key="MainViewModel.MessageBoxText">Зоны проверены. Проблем не обнаружено</system:String>
+
+    <system:String x:Key="ParamViewModel.WarningStartString">Отсутствуют параметры:</system:String>
+    <system:String x:Key="DocumentViewModel.CurrentFile">Текущий файл (открытый)</system:String>
+
+    <system:String x:Key="BuildCoordVolumesProcessor.TransactionName">Построение объемов СМР</system:String>
+
+    <system:String x:Key="Common.ParamErrorMessageBody">Ошибка загрузки параметров</system:String>
+    <system:String x:Key="Common.ConfigErrorMessageTitle">Ошибка настройки плагина</system:String>
+
+    <system:String x:Key="SystemPluginConfig.SlopeLineName">Направление уклона</system:String>
+
+    <system:String x:Key="WarningWindow.Title">Предупреждения</system:String>
+    <system:String x:Key="WarningWindow.ElementIdHeader">ID зоны</system:String>
+    <system:String x:Key="WarningWindow.NameHeader">Имя зоны</system:String>
+    <system:String x:Key="WarningWindow.LevelNameHeader">Уровень зоны</system:String>
+    <system:String x:Key="WarningWindow.DescriptionHeader">Описание зоны</system:String>
+
+    <system:String x:Key="WarningsViewModel.Redundant">Избыточные зоны</system:String>
+    <system:String x:Key="WarningsViewModel.RedundantDescription">Зоны, находящиеся в одной окруженной области</system:String>
+    <system:String x:Key="WarningsViewModel.NotEnclosed">Не окруженные зоны / Не размещенные зоны</system:String>
+    <system:String x:Key="WarningsViewModel.NotEnclosedDescription">Зоны, не имеющие границ или не размещенные на плане</system:String>
+    <system:String x:Key="WarningsViewModel.BrokenContour">Зоны с поврежденным контуром</system:String>
+    <system:String x:Key="WarningsViewModel.BrokenContourDescription">Зоны, имеющие поврежденный контур (ограничить разделителями)</system:String>
+    <system:String x:Key="WarningsViewModel.NotFilledParam">Зоны с не заполненными параметрами</system:String>
+    <system:String x:Key="WarningsViewModel.NotFilledParamDescription">Зоны с не заполненными параметрами, необходимыми для построения</system:String>
+    <system:String x:Key="WarningsViewModel.WrongFilledParam">Зоны с неверно заполненными параметрами</system:String>
+    <system:String x:Key="WarningsViewModel.WrongFilledParamDescription">Отметка низа находится выше или равна отметке верха</system:String>
+</ResourceDictionary>

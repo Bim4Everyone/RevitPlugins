@@ -11,6 +11,7 @@ using RevitPylonDocumentation.Models.Services;
 
 namespace RevitPylonDocumentation.Models.PylonSheetNView.ViewDimensionServices.ViewRebarDimensionServices;
 internal class GeneralViewRebarDimensionService {
+    private readonly CreationSettings _settings;
     private readonly DimensionType _selectedDimensionType;
     private readonly Document _doc;
     private readonly PylonSheetInfo _sheetInfo;
@@ -18,11 +19,12 @@ internal class GeneralViewRebarDimensionService {
 
     private readonly DimensionBaseService _dimensionBaseService;
     private readonly DimensionSegmentsService _dimSegmentsService;
-    
-    internal GeneralViewRebarDimensionService(CreationSettings settings, Document document, 
-                                              PylonSheetInfo pylonSheetInfo, PylonView pylonView, 
+
+    internal GeneralViewRebarDimensionService(CreationSettings settings, Document document,
+                                              PylonSheetInfo pylonSheetInfo, PylonView pylonView,
                                               DimensionBaseService dimensionBaseService) {
-        _selectedDimensionType = settings.TypesSettings.SelectedDimensionType;
+        _settings = settings;
+        _selectedDimensionType = settings.AnnotationSettings.SelectedDimensionType;
         _doc = document;
         _sheetInfo = pylonSheetInfo;
         _viewOfPylon = pylonView;
@@ -37,12 +39,14 @@ internal class GeneralViewRebarDimensionService {
     internal void TryCreateAllTopRebarDimensions(FamilyInstance skeletonParentRebar) {
         try {
             // Если все стержни Г-образные,тогда нет смысла ставить этот размер
-            if(_sheetInfo.RebarInfo.AllRebarAreL) { return; }
+            if(_sheetInfo.RebarInfo.AllRebarAreL && !_sheetInfo.RebarInfo.SkeletonParentRebarForParking) { return; }
             var dimensionLineTop = _dimensionBaseService.GetDimensionLine(skeletonParentRebar, DirectionType.Top, 0.5);
-            var refArrayTop = _dimensionBaseService.GetDimensionRefs(skeletonParentRebar,  ["верх", "фронт"]);
-            var dimension = _doc.Create.NewDimension(_viewOfPylon.ViewElement, dimensionLineTop, 
+            var refArrayTop = _dimensionBaseService.GetDimensionRefs(skeletonParentRebar, ["верх", "фронт"]);
+            var dimension = _doc.Create.NewDimension(_viewOfPylon.ViewElement, dimensionLineTop,
                                                                      refArrayTop, _selectedDimensionType);
-            dimension.SetParamValue(BuiltInParameter.DIM_DISPLAY_EQ, 2);
+            if(_settings.AnnotationSettings.DimensionGrouping) {
+                dimension.SetParamValue(BuiltInParameter.DIM_DISPLAY_EQ, 2);
+            }
         } catch(Exception) { }
     }
 
@@ -51,12 +55,14 @@ internal class GeneralViewRebarDimensionService {
     /// </summary>
     internal void TryCreateAllBottomRebarDimensions(FamilyInstance skeletonParentRebar) {
         try {
-            var dimensionLineBottom = _dimensionBaseService.GetDimensionLine(skeletonParentRebar, 
+            var dimensionLineBottom = _dimensionBaseService.GetDimensionLine(skeletonParentRebar,
                                                                              DirectionType.Bottom, 0.6);
-            var refArrayBottom = _dimensionBaseService.GetDimensionRefs(skeletonParentRebar,  ["низ", "фронт"]);
-            var dimension = _doc.Create.NewDimension(_viewOfPylon.ViewElement, dimensionLineBottom, 
+            var refArrayBottom = _dimensionBaseService.GetDimensionRefs(skeletonParentRebar, ["низ", "фронт"]);
+            var dimension = _doc.Create.NewDimension(_viewOfPylon.ViewElement, dimensionLineBottom,
                                                                      refArrayBottom, _selectedDimensionType);
-            dimension.SetParamValue(BuiltInParameter.DIM_DISPLAY_EQ, 2);
+            if(_settings.AnnotationSettings.DimensionGrouping) {
+                dimension.SetParamValue(BuiltInParameter.DIM_DISPLAY_EQ, 2);
+            }
         } catch(Exception) { }
     }
 
@@ -67,7 +73,7 @@ internal class GeneralViewRebarDimensionService {
         try {
             var dimensionLineBottomEdges = _dimensionBaseService.GetDimensionLine(skeletonParentRebar,
                                                                                   DirectionType.Bottom, 1.1);
-            var refArrayBottomEdges = _dimensionBaseService.GetDimensionRefs(skeletonParentRebar, 
+            var refArrayBottomEdges = _dimensionBaseService.GetDimensionRefs(skeletonParentRebar,
                                                                              ["низ", "фронт", "край"]);
             _doc.Create.NewDimension(_viewOfPylon.ViewElement, dimensionLineBottomEdges,
                                                      refArrayBottomEdges, _selectedDimensionType);
@@ -84,14 +90,14 @@ internal class GeneralViewRebarDimensionService {
         try {
             // Собираем опорные плоскости по арматуре и заполняем список опций изменений сегментов размера
             // Добавляем нижнюю горизонтальную опорную плоскость от верт стержней "#_1_горизонт_край_низ"
-            var refArraySide = 
+            var refArraySide =
                 _dimensionBaseService.GetDimensionRefs(skeletonParentRebar, ["горизонт", "край", "низ"]);
             // Создаем коллекцию опций изменений будущего размера и добавляем запись про "#_1_горизонт_край_низ"
             var dimSegmentOpts = new List<DimensionSegmentOption> {
                 new(true, "", _dimSegmentsService.HorizSmallUpDirectDimTextOffset)
             };
             foreach(var clampsParentRebar in clampsParentRebars) {
-                refArraySide = _dimensionBaseService.GetDimensionRefs(clampsParentRebar,  
+                refArraySide = _dimensionBaseService.GetDimensionRefs(clampsParentRebar,
                                                                       ["горизонт"],
                                                                       oldRefArray: refArraySide);
                 // Получаем настройки для изменения сегментов размеров
@@ -101,14 +107,14 @@ internal class GeneralViewRebarDimensionService {
                 dimSegmentOpts.Add(new DimensionSegmentOption(false));
             }
 
-            if(_sheetInfo.RebarInfo.AllRebarAreL) {
+            if(_sheetInfo.RebarInfo.AllRebarAreL || _sheetInfo.RebarInfo.SkeletonParentRebarForParking) {
                 // Дополняем плоскостью на Гэшках вертикальных стержней "#1_горизонт_Г-стержень"
-                refArraySide = _dimensionBaseService.GetDimensionRefs(skeletonParentRebar,  
+                refArraySide = _dimensionBaseService.GetDimensionRefs(skeletonParentRebar,
                                                                       ["горизонт", "Г-стержень"],
                                                                       oldRefArray: refArraySide);
             } else {
                 // Дополняем плоскостью на выпусках от вертикальных стержней "#1_горизонт_выпуск"
-                refArraySide = _dimensionBaseService.GetDimensionRefs(skeletonParentRebar,  
+                refArraySide = _dimensionBaseService.GetDimensionRefs(skeletonParentRebar,
                                                                       ["горизонт", "выпуск"],
                                                                       oldRefArray: refArraySide);
             }

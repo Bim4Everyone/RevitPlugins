@@ -93,7 +93,9 @@ internal class ApartmentsParamsVM : ParametersViewModel {
     public override void SetLastParamConfig(object obj) {
         var config = ApartmentsConfig.GetPluginConfig();
         var configSettings = config.GetSettings(_revitRepository.Document);
-        SetParametersFromConfig(configSettings);
+        if(configSettings != null) {
+            SetParametersFromConfig(configSettings);
+        }
     }
 
     public override void SetCompanyParamConfig(object obj) {
