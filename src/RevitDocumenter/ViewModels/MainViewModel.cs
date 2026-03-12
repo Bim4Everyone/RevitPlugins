@@ -5,6 +5,8 @@ using System.Windows.Input;
 
 using Autodesk.Revit.DB;
 
+using dosymep.Bim4Everyone;
+using dosymep.Revit;
 using dosymep.SimpleServices;
 using dosymep.WPF.Commands;
 using dosymep.WPF.ViewModels;
@@ -128,25 +130,31 @@ internal class MainViewModel : BaseViewModel {
             _localizationService.GetLocalizedString("MainWindow.Title"));
         mainTransaction.Start();
 
-
-        var mapService = new MapService(_revitRepository);
-        mapService.GetMap();
-
-
-
-
-
-
-        //foreach(var rebar in _revitRepository.GetRebarElements(
+        //var rebar = _revitRepository.GetRebarElements(
         //    FamilyNamePart,
         //    ReferenceNamesVM.GetVertReferenceNames(),
-        //    ReferenceNamesVM.GetHorizReferenceNames())) {
+        //    ReferenceNamesVM.GetHorizReferenceNames()
+        //    ).First();
+        //var dimensionLineY = _dimensionLineService.GetDimensionLine(rebar, XYZ.BasisY);
 
-        //    // Создание вертикального размера (относительно локальных осей зоны армирования)
-        //    CreateDimension(Grids, rebar);
-        //    // Создание горизонтального размера (относительно локальных осей зоны армирования)
-        //    //CreateDimension(Grids, rebar, false);
-        //}
+
+        var mapService = new MapService(_revitRepository);
+        SquareInfo[,] map = mapService.GetMap();
+
+
+
+
+
+        foreach(var rebar in _revitRepository.GetRebarElements(
+            FamilyNamePart,
+            ReferenceNamesVM.GetVertReferenceNames(),
+            ReferenceNamesVM.GetHorizReferenceNames())) {
+
+            // Создание вертикального размера (относительно локальных осей зоны армирования)
+            CreateDimension(Grids, rebar);
+            // Создание горизонтального размера (относительно локальных осей зоны армирования)
+            CreateDimension(Grids, rebar, false);
+        }
         mainTransaction.Commit();
     }
 
@@ -178,8 +186,73 @@ internal class MainViewModel : BaseViewModel {
 
         // Строим размер
         var dimension = _dimensionCreator.Create(dimensionLineY, dimensionRefs, _selectedDimensionType);
+
+
+        try {
+            var p1 = (dimension.Curve as Line).Origin;
+            var leaderEndPosition = dimension.LeaderEndPosition;
+            var textPosition = dimension.TextPosition;
+            var center = GetDimensionCenterPoint(dimension);
+            (var leftStroke, var rightStroke) = GetDimensionEdgePoints(dimension);
+
+            // Горизонтально размеру нужно сделать небольшой отступ от текста
+            double coefForHorizOffset = 0.1;
+            var textEdgeLeftBottom = leaderEndPosition + (leaderEndPosition - center).Normalize() * coefForHorizOffset;
+            var textEdgeRightBottom = textEdgeLeftBottom + (center - textEdgeLeftBottom) * 2;
+
+
+            int viewScale = _revitRepository.Document.ActiveView.Scale;
+            // Текст на самом деле немного отстоит от размерной линии, чтобы это скомпенсировать берем коэффициент
+            double someCoefficient = 2;
+            double dimTextHeight =
+                _selectedDimensionType.GetParamValue<double>(BuiltInParameter.TEXT_SIZE) * viewScale * someCoefficient;
+
+            var textEdgeLeftTop = textEdgeLeftBottom + (textPosition - center).Normalize() * dimTextHeight;
+            var textEdgeRightTop = textEdgeRightBottom + (textPosition - center).Normalize() * dimTextHeight;
+
+
+
+            var imagePreparer = new ImagePreparer(_revitRepository);
+            imagePreparer.CreateSphere(textEdgeLeftBottom);
+            imagePreparer.CreateSphere(textEdgeRightBottom);
+            imagePreparer.CreateSphere(textEdgeLeftTop);
+            imagePreparer.CreateSphere(textEdgeRightTop);
+
+            imagePreparer.CreateSphere(center);
+            imagePreparer.CreateSphere(leftStroke);
+            imagePreparer.CreateSphere(rightStroke);
+
+
+        } catch(Exception) {
+        }
+
+
+
         return dimension;
     }
+
+
+
+    public XYZ GetDimensionCenterPoint(Dimension dimension) {
+        // Получаем бесконечную линию вдоль которой строится размер
+        var unboundLine = dimension.Curve as Line;
+        // Получаем точку позиции текста - она при первоначальном размещении посередине текста, но чуть выше линии
+        var ptForProject = dimension.TextPosition;
+        return unboundLine.Project(ptForProject).XYZPoint;
+    }
+
+    public (XYZ, XYZ) GetDimensionEdgePoints(Dimension dimension) {
+        var center = GetDimensionCenterPoint(dimension);
+        var unboundLineVector = (dimension.Curve as Line).Direction;
+        double? halfDistance = dimension.Value / 2;
+
+        var leftEdgePoint = center + halfDistance.Value * unboundLineVector.Normalize().Negate();
+        var rightEdgePoint = center + halfDistance.Value * unboundLineVector.Normalize();
+        return (leftEdgePoint, rightEdgePoint);
+    }
+
+
+
 
 
     /// <summary>

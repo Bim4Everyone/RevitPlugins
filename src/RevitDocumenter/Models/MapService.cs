@@ -1,11 +1,9 @@
 using System;
 using System.Drawing;
 using System.Drawing.Imaging;
-using System.IO;
 using System.Runtime.InteropServices;
 
 using Autodesk.Revit.DB;
-using Autodesk.Revit.UI;
 
 using Color = Autodesk.Revit.DB.Color;
 using Point = System.Drawing.Point;
@@ -15,7 +13,7 @@ namespace RevitDocumenter.Models;
 internal class MapService {
     private readonly RevitRepository _revitRepository;
 
-    private readonly double _mappingStepInMm = 500.0;
+    private readonly double _mappingStepInMm = 200.0;
 
     // Будет делаться тонкая розовая линия
     private readonly Color _colorForTestLines = new(255, 0, 255);
@@ -26,7 +24,7 @@ internal class MapService {
     }
 
 
-    public void GetMap() {
+    public SquareInfo[,] GetMap() {
         var doc = _revitRepository.Document;
         var view = doc.ActiveView;
 
@@ -68,16 +66,9 @@ internal class MapService {
 
 
 
-
-
         var map = AnalyzeImageSquares(croppedScaledImagePath, stepCountX, stepCountY);
 
         MarkWhiteSquaresOnImage(croppedScaledImagePath, map, stepCountX, stepCountY);
-
-
-
-
-
 
 
         using var subTransaction = new SubTransaction(doc);
@@ -87,187 +78,9 @@ internal class MapService {
 
         //CreateSphere(viewMax);
         //CreateTestSpheres(viewMinFixed, viewMaxFixed);
+
+        return map;
     }
-
-
-
-    public SquareInfo[,] GetImageMap(int stepCountX, int stepCountY, int pixelPerSquare) {
-
-        var imagePath = "C:\\Users\\nikita\\Desktop\\check.png";
-
-
-        using(var image = new Bitmap(imagePath)) {
-            // Блокируем биты исходного изображения для быстрого доступа
-            BitmapData imageData = image.LockBits(
-                new Rectangle(0, 0, image.Width, image.Height),
-                ImageLockMode.ReadOnly,
-                PixelFormat.Format32bppArgb);
-
-            int stride = imageData.Stride;
-            byte[] imagePixels = new byte[stride * image.Height];
-            Marshal.Copy(imageData.Scan0, imagePixels, 0, imagePixels.Length);
-            image.UnlockBits(imageData);
-
-            // Результирующий массив с информацией о квадратах
-            var results = new SquareInfo[stepCountY, stepCountX];
-
-
-
-            for(int row = 0; row < stepCountY; row++) {
-                for(int col = 0; col < stepCountX; col++) {
-                    int startX = col * pixelPerSquare;
-                    int startY = image.Height - (row + 1) * pixelPerSquare;
-
-                    var info = AnalyzeSquare(
-                        imagePixels,
-                        stride,
-                        startX,
-                        startY,
-                        pixelPerSquare,
-                        image.Width,
-                        image.Height);
-
-                    results[row, col] = info;
-                }
-            }
-
-            return results;
-        }
-    }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-    public Bitmap[,] SplitImageIntoSquaresArrayFromBottomLeft(string imagePath, int stepCountX, int stepCountY) {
-        using(var image = new Bitmap(imagePath)) {
-
-            double pixelsInStepX = (double) image.Width / stepCountX;
-            double pixelsInStepY = (double) image.Height / stepCountY;
-
-            int pixelsInStepXRounded = (int) Math.Floor(pixelsInStepX);
-            int pixelsInStepYRounded = (int) Math.Floor(pixelsInStepY);
-
-            // Сколько пикселей на самом деле находится в шаге (стороне квадрата)
-            int pixelsInStepRounded = pixelsInStepXRounded < pixelsInStepYRounded
-                ? pixelsInStepXRounded
-                : pixelsInStepYRounded;
-
-            var grid = new Bitmap[stepCountY, stepCountX];
-
-            for(int row = 0; row < stepCountY; row++) // row = 0 - нижний ряд
-            {
-                for(int col = 0; col < stepCountX; col++) {
-                    var square = new Bitmap(pixelsInStepRounded, pixelsInStepRounded);
-
-                    using(var graphics = Graphics.FromImage(square)) {
-                        // Устанавливаем высокое качество
-                        graphics.CompositingQuality = System.Drawing.Drawing2D.CompositingQuality.HighQuality;
-                        graphics.InterpolationMode = System.Drawing.Drawing2D.InterpolationMode.HighQualityBicubic;
-                        graphics.PixelOffsetMode = System.Drawing.Drawing2D.PixelOffsetMode.HighQuality;
-                        graphics.SmoothingMode = System.Drawing.Drawing2D.SmoothingMode.HighQuality;
-
-                        var sourceRect = new System.Drawing.Rectangle(
-                            col * pixelsInStepRounded,
-                            image.Height - (row + 1) * pixelsInStepRounded,
-                            pixelsInStepRounded,
-                            pixelsInStepRounded
-                        );
-
-                        graphics.DrawImage(
-                            image,
-                            0, 0,
-                            sourceRect,
-                            GraphicsUnit.Pixel
-                        );
-                    }
-                    grid[row, col] = square;
-                    //square.Save(imagePath.Replace(".png", $"2-{row}-{col}.png"), System.Drawing.Imaging.ImageFormat.Png);
-                }
-            }
-            return grid;
-        }
-    }
-
-
-    private void GetMapFromPNG(string imagePath, double stepCountX, double stepCountY) {
-        // Проверяем существование файла
-        if(!File.Exists(imagePath)) {
-            throw new FileNotFoundException(imagePath);
-        }
-
-        using var bitmap = new Bitmap(imagePath);
-
-        double pixelsInStepX = Math.Floor(bitmap.Width / stepCountX);
-        double pixelsInStepY = Math.Floor(bitmap.Height / stepCountY);
-
-        TaskDialog.Show("fd", $"{pixelsInStepX} {pixelsInStepY}");
-
-
-
-
-
-
-
-        //for(int row = 0; row < pixelsInStepY; row++) {
-        //    for(int col = 0; col < pixelsInStepX; col++) {
-        //        // Создаем новый квадрат
-        //        Bitmap square = new Bitmap(squareSize, squareSize);
-
-        //        using(Graphics graphics = Graphics.FromImage(square)) {
-        //            // Вырезаем соответствующую область из оригинального изображения
-        //            Rectangle sourceRect = new Rectangle(
-        //                col * squareSize,
-        //                row * squareSize,
-        //                squareSize,
-        //                squareSize
-        //            );
-
-        //            graphics.DrawImage(
-        //                originalImage,
-        //                0, 0, sourceRect, GraphicsUnit.Pixel
-        //            );
-        //        }
-
-        //        squares.Add(square);
-        //    }
-        //}
-    }
-
-
-
-
-
-
-
-
-
-
 
 
 
