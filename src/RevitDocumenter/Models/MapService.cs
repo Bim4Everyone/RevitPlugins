@@ -1,5 +1,4 @@
 using System;
-using System.Collections.Generic;
 using System.Drawing;
 using System.Drawing.Imaging;
 using System.IO;
@@ -9,7 +8,6 @@ using Autodesk.Revit.DB;
 using Autodesk.Revit.UI;
 
 using Color = Autodesk.Revit.DB.Color;
-using Frame = Autodesk.Revit.DB.Frame;
 using Point = System.Drawing.Point;
 using Rectangle = System.Drawing.Rectangle;
 
@@ -17,7 +15,7 @@ namespace RevitDocumenter.Models;
 internal class MapService {
     private readonly RevitRepository _revitRepository;
 
-    private readonly double _mappingStep = 500.0;
+    private readonly double _mappingStepInMm = 500.0;
 
     // Будет делаться тонкая розовая линия
     private readonly Color _colorForTestLines = new(255, 0, 255);
@@ -32,42 +30,49 @@ internal class MapService {
         var doc = _revitRepository.Document;
         var view = doc.ActiveView;
 
-        double revitStep = UnitUtilsHelper.ConvertToInternalValue(_mappingStep);
+        double revitStep = UnitUtilsHelper.ConvertToInternalValue(_mappingStepInMm);
 
-        (XYZ viewMinFixed, XYZ viewMaxFixed) = GetFixedCropBoxPoints(view);
+        var imagePreparer = new ImagePreparer(_revitRepository);
 
-        // Количество квадратов по Revit
-        int stepCountX = (int) Math.Round((viewMaxFixed.X - viewMinFixed.X) / revitStep);  // 93
-        int stepCountY = (int) Math.Round((viewMaxFixed.Y - viewMinFixed.Y) / revitStep);  // 65
+        // Получаем точки рамки подрезки вида,смещенные немного внутрь,чтобы расстояние 
+        // между ними было кратно указанному шагу
+        (XYZ viewMinFixed, XYZ viewMaxFixed) = imagePreparer.GetFixedCropBoxPoints(view, _mappingStepInMm);
 
+        // Количество квадратов в среде Revit
+        int stepCountX = (int) Math.Round((viewMaxFixed.X - viewMinFixed.X) / revitStep);  // 93 (при 500.0)
+        int stepCountY = (int) Math.Round((viewMaxFixed.Y - viewMinFixed.Y) / revitStep);  // 65 (при 500.0)
+
+        // Стандартное значение ширины изображения в пикселях, подходящее для обработки
         int standartX = 4096;
-        int coefficient = standartX / stepCountX;
+        int pixelPerSquare = standartX / stepCountX;
 
-        int pixelsX = coefficient * stepCountX;
-        int pixelsY = coefficient * stepCountY;
-
-
-
-        CreateAnchorLines(view, viewMinFixed, viewMaxFixed);
-
-        string imagePath = PrintViewByPixelSize(view, pixelsX);
-
-        string croppedImagePath = CropImageByPinkPixels(imagePath);
-
-        // допустим шаг revitStep = 400
-        //(var x, var y) = GetImageDimensions(imagePath);
-
-        // Теперь здесь подготовленное изображение, размеры которого точно кратны шагам в Revit
-        string croppedScaledImagePath = ScaledImageByPixels(croppedImagePath, pixelsX, pixelsY);
+        // Получаем точные значения изображения для анализа в пикселях в соответствии с Revit
+        int pixelsX = pixelPerSquare * stepCountX;
+        int pixelsY = pixelPerSquare * stepCountY;
 
 
+        // Создаем якорные линии в пространстве Revit, которые будут использованы для сопоставления 
+        // пространства Revit и изображения
+        imagePreparer.CreateAnchorLines(view, viewMinFixed, viewMaxFixed, _weightForTestLines, _colorForTestLines);
+
+        // Экспортируем вид в изображение, задавая желаемую ширину в пикселях
+        string imagePath = imagePreparer.PrintViewByPixelSize(view, pixelsX);
+
+        // Подрезаем изображение по якорям и сохраняем
+        string croppedImagePath = imagePreparer.CropImageByPinkPixels(imagePath);
+
+        // Масштабируем изображение под нужный размер в пикселях, чтобы шаги соответствовали Revit
+        string croppedScaledImagePath = imagePreparer.ScaledImageByPixels(croppedImagePath, pixelsX, pixelsY);
+
+        // По идее могли бы просто получить BB по всем объектам на виде и построить точки
 
 
 
 
-        var map = AnalyzeImageSquares(croppedImagePath, stepCountX, stepCountY);
 
-        MarkWhiteSquaresOnImage(croppedImagePath, map, stepCountX, stepCountY);
+        var map = AnalyzeImageSquares(croppedScaledImagePath, stepCountX, stepCountY);
+
+        MarkWhiteSquaresOnImage(croppedScaledImagePath, map, stepCountX, stepCountY);
 
 
 
@@ -85,20 +90,75 @@ internal class MapService {
     }
 
 
-    private string ScaledImageByPixels(string imagePath, int targetWidth, int targetHeight) {
-        using(var image = new Bitmap(imagePath)) {
-            using(Bitmap resizedImage = new Bitmap(targetWidth, targetHeight)) {
-                using(Graphics graphics = Graphics.FromImage(resizedImage)) {
-                    graphics.InterpolationMode = System.Drawing.Drawing2D.InterpolationMode.HighQualityBicubic;
-                    graphics.DrawImage(image, 0, 0, targetWidth, targetHeight);
-                }
 
-                // Сохранение результата
-                resizedImage.Save(imagePath.Replace(".png", $"2.png"), System.Drawing.Imaging.ImageFormat.Png);
+    public SquareInfo[,] GetImageMap(int stepCountX, int stepCountY, int pixelPerSquare) {
+
+        var imagePath = "C:\\Users\\nikita\\Desktop\\check.png";
+
+
+        using(var image = new Bitmap(imagePath)) {
+            // Блокируем биты исходного изображения для быстрого доступа
+            BitmapData imageData = image.LockBits(
+                new Rectangle(0, 0, image.Width, image.Height),
+                ImageLockMode.ReadOnly,
+                PixelFormat.Format32bppArgb);
+
+            int stride = imageData.Stride;
+            byte[] imagePixels = new byte[stride * image.Height];
+            Marshal.Copy(imageData.Scan0, imagePixels, 0, imagePixels.Length);
+            image.UnlockBits(imageData);
+
+            // Результирующий массив с информацией о квадратах
+            var results = new SquareInfo[stepCountY, stepCountX];
+
+
+
+            for(int row = 0; row < stepCountY; row++) {
+                for(int col = 0; col < stepCountX; col++) {
+                    int startX = col * pixelPerSquare;
+                    int startY = image.Height - (row + 1) * pixelPerSquare;
+
+                    var info = AnalyzeSquare(
+                        imagePixels,
+                        stride,
+                        startX,
+                        startY,
+                        pixelPerSquare,
+                        image.Width,
+                        image.Height);
+
+                    results[row, col] = info;
+                }
             }
+
+            return results;
         }
-        return imagePath.Replace(".png", $"2.png");
     }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -199,219 +259,6 @@ internal class MapService {
         //}
     }
 
-
-
-
-
-    public string CropImageByPinkPixels(string imagePath) {
-        // Загружаем изображение
-        using var image = new Bitmap(imagePath);
-        // Находим координаты розовых пикселей
-        (int startX, int startY) = FindBottomLeftPinkPixel(image);
-        (int endX, int endY) = FindTopRightPinkPixel(image);
-
-        // Вычисляем размеры новой области
-        int newWidth = endX - startX + 1;
-        int newHeight = startY - endY + 1;
-
-        var cropRect = new System.Drawing.Rectangle(startX, endY, newWidth, newHeight);
-        Bitmap croppedImage = image.Clone(cropRect, image.PixelFormat);
-
-        croppedImage.Save(imagePath.Replace(".png", "1.png"), System.Drawing.Imaging.ImageFormat.Png);
-        return imagePath.Replace(".png", "1.png");
-    }
-
-    private (int, int) FindBottomLeftPinkPixel(Bitmap image) {
-        // Ищем снизу вверх, слева направо
-        for(int y = image.Height - 1; y >= 0; y--) {
-            for(int x = 0; x < image.Width; x++) {
-                var color = image.GetPixel(x, y);
-                if(IsPink(color)) {
-                    return (x, y);
-                }
-            }
-        }
-        throw new InvalidOperationException("Pink pixel not found!");
-    }
-
-    private (int, int) FindTopRightPinkPixel(Bitmap image) {
-        // Ищем сверху вниз, справа налево
-        for(int y = 0; y < image.Height; y++) {
-            for(int x = image.Width - 1; x >= 0; x--) {
-                var pixel = image.GetPixel(x, y);
-                if(IsPink(pixel)) {
-                    return (x, y);
-                }
-            }
-        }
-        throw new InvalidOperationException("Pink pixel not found!");
-    }
-
-    private bool IsPink(System.Drawing.Color color) {
-        return color.R == 255 && color.G == 0 && color.B == 255;
-    }
-
-
-
-
-
-    private (XYZ, XYZ) GetFixedCropBoxPoints(View view) {
-        var viewMax = ProjectPointToViewPlan(view, view.CropBox.Max);
-        var viewMin = ProjectPointToViewPlan(view, view.CropBox.Min);
-
-        double step = UnitUtilsHelper.ConvertToInternalValue(_mappingStep);
-
-        double deltaX = viewMax.X - viewMin.X;
-        double deltaY = viewMax.Y - viewMin.Y;
-
-        double halfRemainderX = (deltaX % step) / 2;
-        double halfRemainderY = (deltaY % step) / 2;
-
-        var viewMaxFixed = new XYZ(viewMax.X - halfRemainderX, viewMax.Y - halfRemainderY, viewMax.Z);
-        var viewMinFixed = new XYZ(viewMin.X + halfRemainderX, viewMin.Y + halfRemainderY, viewMin.Z);
-
-        return (viewMinFixed, viewMaxFixed);
-    }
-
-
-    private void CreateAnchorLines(View view, XYZ viewMinFixed, XYZ viewMaxFixed) {
-        var lineGeom1 = Line.CreateBound(viewMinFixed, viewMinFixed + XYZ.BasisX);
-        var lineGeom2 = Line.CreateBound(viewMaxFixed, viewMaxFixed - XYZ.BasisX);
-
-        var overrideSettings = new OverrideGraphicSettings();
-        overrideSettings.SetProjectionLineWeight(_weightForTestLines);
-        overrideSettings.SetProjectionLineColor(_colorForTestLines);
-
-        var doc = _revitRepository.Document;
-        using var subTransaction = new SubTransaction(doc);
-        subTransaction.Start();
-
-        var detailLine1 = doc.Create.NewDetailCurve(view, lineGeom1);
-        var detailLine2 = doc.Create.NewDetailCurve(view, lineGeom2);
-
-        view.SetElementOverrides(detailLine1.Id, overrideSettings);
-        view.SetElementOverrides(detailLine2.Id, overrideSettings);
-        subTransaction.Commit();
-    }
-
-
-
-    private (int width, int height) GetImageDimensions(string imagePath) {
-        // Проверяем существование файла
-        if(!File.Exists(imagePath)) {
-            throw new FileNotFoundException(imagePath);
-        }
-
-        using var bitmap = new Bitmap(imagePath);
-
-        int width = bitmap.Width;
-        int height = bitmap.Height;
-
-        //TaskDialog.Show("GetImageDimensions", $"{width}x{height}");
-
-        return (width, height);
-    }
-
-
-    private string PrintViewByPixelSize(View view, int pixelSize) {
-        try {
-            string desktopPath = Environment.GetFolderPath(Environment.SpecialFolder.Desktop) + "\\";
-            var options = new ImageExportOptions {
-                FilePath = desktopPath,
-                PixelSize = pixelSize,
-                FitDirection = FitDirectionType.Horizontal,
-                ImageResolution = ImageResolution.DPI_600,
-                HLRandWFViewsFileType = ImageFileType.PNG,
-                ShadowViewsFileType = ImageFileType.PNG,
-                ExportRange = ExportRange.SetOfViews,
-            };
-            options.SetViewsAndSheets([view.Id]);
-            _revitRepository.Document.ExportImage(options);
-
-            return desktopPath + ImageExportOptions.GetFileName(_revitRepository.Document, view.Id) + ".png";
-        } catch(Exception) {
-            return string.Empty;
-        }
-    }
-
-    private string PrintViewByZoom(View view) {
-        try {
-            string desktopPath = Environment.GetFolderPath(Environment.SpecialFolder.Desktop) + "\\";
-            var options = new ImageExportOptions {
-                FilePath = desktopPath,
-                ZoomType = ZoomFitType.Zoom,
-                Zoom = 50,
-                ImageResolution = ImageResolution.DPI_600,
-                HLRandWFViewsFileType = ImageFileType.PNG,
-                ShadowViewsFileType = ImageFileType.PNG,
-                ExportRange = ExportRange.SetOfViews,
-            };
-            options.SetViewsAndSheets([view.Id]);
-            _revitRepository.Document.ExportImage(options);
-
-            return desktopPath + ImageExportOptions.GetFileName(_revitRepository.Document, view.Id) + ".png";
-        } catch(Exception) {
-            return string.Empty;
-        }
-    }
-
-    public XYZ ProjectPointToViewPlan(View view, XYZ point) {
-        var pointOnViewPlan = new XYZ(0, 0, view.GenLevel.Elevation);
-        var normal = view.ViewDirection.Normalize();
-
-        // Вычисляем вектор от точки на плоскости к целевой точке
-        var vector = point - pointOnViewPlan;
-
-        // Находим расстояние вдоль нормали (скалярное произведение)
-        double distance = normal.DotProduct(vector);
-
-        // Проецируем точку на плоскость
-        return point - distance * normal;
-    }
-
-    private void CreateTestSpheres(XYZ viewMinFixed, XYZ viewMaxFixed) {
-        double tX = viewMaxFixed.X - viewMinFixed.X;
-        double tY = viewMaxFixed.Y - viewMinFixed.Y;
-
-        double step = UnitUtilsHelper.ConvertToInternalValue(_mappingStep);
-
-        double countX = tX / step;
-        double countY = tY / step;
-
-        for(int i = 0; i <= countX; i++) {
-            for(int j = 0; j <= countY; j++) {
-                var ptForTest = viewMinFixed + new XYZ(step * i, step * j, 0);
-                CreateSphere(ptForTest);
-            }
-        }
-    }
-
-    private void CreateSphere(XYZ center) {
-        List<Curve> profile = new List<Curve>();
-
-        // first create sphere with 0.5' radius
-        double radius = 0.5;
-        XYZ profile00 = center;
-        XYZ profilePlus = center + new XYZ(0, radius, 0);
-        XYZ profileMinus = center - new XYZ(0, radius, 0);
-
-        profile.Add(Line.CreateBound(profilePlus, profileMinus));
-        profile.Add(Arc.Create(profileMinus, profilePlus, center + new XYZ(radius, 0, 0)));
-
-        CurveLoop curveLoop = CurveLoop.Create(profile);
-        SolidOptions options = new SolidOptions(ElementId.InvalidElementId, ElementId.InvalidElementId);
-
-        var doc = _revitRepository.Document;
-
-        Frame frame = new Frame(center, XYZ.BasisX, -XYZ.BasisZ, XYZ.BasisY);
-        if(Frame.CanDefineRevitGeometry(frame) == true) {
-            Solid sphere = GeometryCreationUtilities.CreateRevolvedGeometry(frame, new CurveLoop[] { curveLoop }, 0, 2 * Math.PI, options);
-
-            DirectShape ds = DirectShape.CreateElement(doc, new ElementId(BuiltInCategory.OST_GenericModel));
-
-            ds.SetShape(new GeometryObject[] { sphere });
-        }
-    }
 
 
 
