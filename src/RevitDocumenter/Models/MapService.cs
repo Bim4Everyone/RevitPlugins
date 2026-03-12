@@ -17,7 +17,7 @@ namespace RevitDocumenter.Models;
 internal class MapService {
     private readonly RevitRepository _revitRepository;
 
-    private readonly double _mappingStep = 400.0;
+    private readonly double _mappingStep = 500.0;
 
     // Будет делаться тонкая розовая линия
     private readonly Color _colorForTestLines = new(255, 0, 255);
@@ -37,21 +37,33 @@ internal class MapService {
         (XYZ viewMinFixed, XYZ viewMaxFixed) = GetFixedCropBoxPoints(view);
 
         // Количество квадратов по Revit
-        int stepCountX = (int) Math.Round((viewMaxFixed.X - viewMinFixed.X) / revitStep);
-        int stepCountY = (int) Math.Round((viewMaxFixed.Y - viewMinFixed.Y) / revitStep);
+        int stepCountX = (int) Math.Round((viewMaxFixed.X - viewMinFixed.X) / revitStep);  // 93
+        int stepCountY = (int) Math.Round((viewMaxFixed.Y - viewMinFixed.Y) / revitStep);  // 65
 
+        int standartX = 4096;
+        int coefficient = standartX / stepCountX;
 
-
+        int pixelsX = coefficient * stepCountX;
+        int pixelsY = coefficient * stepCountY;
 
 
 
         CreateAnchorLines(view, viewMinFixed, viewMaxFixed);
 
-        string imagePath = PrintViewByPixelSize(view, 4096);
+        string imagePath = PrintViewByPixelSize(view, pixelsX);
 
         string croppedImagePath = CropImageByPinkPixels(imagePath);
 
-        //var map = SplitImageIntoSquaresArrayFromBottomLeft(croppedImagePath, stepCountX, stepCountY);
+        // допустим шаг revitStep = 400
+        //(var x, var y) = GetImageDimensions(imagePath);
+
+        // Теперь здесь подготовленное изображение, размеры которого точно кратны шагам в Revit
+        string croppedScaledImagePath = ScaledImageByPixels(croppedImagePath, pixelsX, pixelsY);
+
+
+
+
+
 
         var map = AnalyzeImageSquares(croppedImagePath, stepCountX, stepCountY);
 
@@ -59,7 +71,6 @@ internal class MapService {
 
 
 
-        //GetMapFromPNG(imagePath, stepCountX, stepCountY);
 
 
 
@@ -69,10 +80,26 @@ internal class MapService {
 
         subTransaction.Commit();
 
-        //GetImageDimensions(imagePath);
         //CreateSphere(viewMax);
         //CreateTestSpheres(viewMinFixed, viewMaxFixed);
     }
+
+
+    private string ScaledImageByPixels(string imagePath, int targetWidth, int targetHeight) {
+        using(var image = new Bitmap(imagePath)) {
+            using(Bitmap resizedImage = new Bitmap(targetWidth, targetHeight)) {
+                using(Graphics graphics = Graphics.FromImage(resizedImage)) {
+                    graphics.InterpolationMode = System.Drawing.Drawing2D.InterpolationMode.HighQualityBicubic;
+                    graphics.DrawImage(image, 0, 0, targetWidth, targetHeight);
+                }
+
+                // Сохранение результата
+                resizedImage.Save(imagePath.Replace(".png", $"2.png"), System.Drawing.Imaging.ImageFormat.Png);
+            }
+        }
+        return imagePath.Replace(".png", $"2.png");
+    }
+
 
 
 
@@ -180,8 +207,8 @@ internal class MapService {
         // Загружаем изображение
         using var image = new Bitmap(imagePath);
         // Находим координаты розовых пикселей
-        (int startX, int startY) = FindBottomLeftMagentaPixel(image);
-        (int endX, int endY) = FindTopRightMagentaPixel(image);
+        (int startX, int startY) = FindBottomLeftPinkPixel(image);
+        (int endX, int endY) = FindTopRightPinkPixel(image);
 
         // Вычисляем размеры новой области
         int newWidth = endX - startX + 1;
@@ -194,7 +221,7 @@ internal class MapService {
         return imagePath.Replace(".png", "1.png");
     }
 
-    private (int, int) FindBottomLeftMagentaPixel(Bitmap image) {
+    private (int, int) FindBottomLeftPinkPixel(Bitmap image) {
         // Ищем снизу вверх, слева направо
         for(int y = image.Height - 1; y >= 0; y--) {
             for(int x = 0; x < image.Width; x++) {
@@ -207,7 +234,7 @@ internal class MapService {
         throw new InvalidOperationException("Pink pixel not found!");
     }
 
-    private (int, int) FindTopRightMagentaPixel(Bitmap image) {
+    private (int, int) FindTopRightPinkPixel(Bitmap image) {
         // Ищем сверху вниз, справа налево
         for(int y = 0; y < image.Height; y++) {
             for(int x = image.Width - 1; x >= 0; x--) {
@@ -280,7 +307,7 @@ internal class MapService {
         int width = bitmap.Width;
         int height = bitmap.Height;
 
-        TaskDialog.Show("GetImageDimensions", $"{width}x{height}");
+        //TaskDialog.Show("GetImageDimensions", $"{width}x{height}");
 
         return (width, height);
     }
