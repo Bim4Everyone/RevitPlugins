@@ -2,7 +2,7 @@ using System.Windows;
 
 using dosymep.SimpleServices;
 
-namespace RevitTagAllCategories.Views;
+namespace RevitMarkAllDocuments.Views;
 
 /// <summary>
 /// Класс главного окна плагина.
@@ -29,7 +29,7 @@ public partial class MainWindow {
     /// <remarks>
     /// Используется для сохранения положения окна.
     /// </remarks>
-    public override string PluginName => nameof(RevitTagAllCategories);
+    public override string PluginName => nameof(RevitMarkAllDocuments);
     
     /// <summary>
     /// Наименование файла конфигурации.

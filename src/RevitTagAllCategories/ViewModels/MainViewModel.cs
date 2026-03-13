@@ -8,10 +8,10 @@ using dosymep.SimpleServices;
 using dosymep.WPF.Commands;
 using dosymep.WPF.ViewModels;
 
-using RevitTagAllCategories.Models;
-using RevitTagAllCategories.Models.Filtration;
+using RevitMarkAllDocuments.Models;
+using RevitMarkAllDocuments.Models.Filtration;
 
-namespace RevitTagAllCategories.ViewModels;
+namespace RevitMarkAllDocuments.ViewModels;
 
 /// <summary>
 /// Основная ViewModel главного окна плагина.

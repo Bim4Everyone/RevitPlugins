@@ -14,7 +14,7 @@ using dosymep.Bim4Everyone.SharedParams;
 using dosymep.Bim4Everyone.SystemParams;
 using dosymep.Revit;
 
-namespace RevitTagAllCategories.Models.Filtration
+namespace RevitMarkAllDocuments.Models.Filtration
 {
     internal class DataProvider : IDataProvider {
         private readonly RevitRepository _revitRepository;

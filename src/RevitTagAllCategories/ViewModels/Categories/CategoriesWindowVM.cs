@@ -11,9 +11,9 @@ using Autodesk.Revit.DB;
 using dosymep.WPF.Commands;
 using dosymep.WPF.ViewModels;
 
-using RevitTagAllCategories.Models;
+using RevitMarkAllDocuments.Models;
 
-namespace RevitTagAllCategories.ViewModels {
+namespace RevitMarkAllDocuments.ViewModels {
     internal class CategoriesWindowVM : BaseViewModel {
         private readonly IList<CategoryViewModel> _allCategories;
         private readonly RevitRepository _revitRepository;

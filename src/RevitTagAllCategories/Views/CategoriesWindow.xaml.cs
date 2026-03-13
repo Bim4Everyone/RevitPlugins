@@ -14,7 +14,7 @@ using System.Windows.Shapes;
 
 using dosymep.SimpleServices;
 
-namespace RevitTagAllCategories.Views;
+namespace RevitMarkAllDocuments.Views;
 
 public partial class CategoriesWindow {
     public CategoriesWindow(ILoggerService loggerService,

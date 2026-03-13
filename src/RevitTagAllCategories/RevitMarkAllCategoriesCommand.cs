@@ -21,12 +21,12 @@ using dosymep.Xpf.Core.Ninject;
 
 using Ninject;
 
-using RevitTagAllCategories.Models;
-using RevitTagAllCategories.Models.Filtration;
-using RevitTagAllCategories.ViewModels;
-using RevitTagAllCategories.Views;
+using RevitMarkAllDocuments.Models;
+using RevitMarkAllDocuments.Models.Filtration;
+using RevitMarkAllDocuments.ViewModels;
+using RevitMarkAllDocuments.Views;
 
-namespace RevitTagAllCategories;
+namespace RevitMarkAllDocuments;
 
 /// <summary>
 /// Класс команды Revit плагина.
@@ -35,12 +35,12 @@ namespace RevitTagAllCategories;
 /// В данном классе должна быть инициализация контейнера плагина и указание названия команды.
 /// </remarks>
 [Transaction(TransactionMode.Manual)]
-public class RevitTagAllCategoriesCommand : BasePluginCommand {
+public class RevitMarkAllCategoriesCommand : BasePluginCommand {
     /// <summary>
     /// Инициализирует команду плагина.
     /// </summary>
-    public RevitTagAllCategoriesCommand() {
-        PluginName = "RevitTagAllCategories";
+    public RevitMarkAllCategoriesCommand() {
+        PluginName = "RevitMarkAllDocuments";
     }
 
     /// <summary>

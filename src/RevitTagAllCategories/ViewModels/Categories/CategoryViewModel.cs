@@ -8,7 +8,7 @@ using Autodesk.Revit.DB;
 
 using dosymep.WPF.ViewModels;
 
-namespace RevitTagAllCategories.ViewModels {
+namespace RevitMarkAllDocuments.ViewModels {
     internal class CategoryViewModel : BaseViewModel {
         private readonly Category _category;
         private readonly string _name;

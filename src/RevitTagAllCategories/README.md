@@ -1,12 +1,12 @@
-# RevitTagAllCategories (Маркировать всё)
+# RevitMarkAllDocuments (Маркировать всё)
 Описание проекта 
 
 # Сборка проекта
 ```
-nuke compile --profile RevitTagAllCategories
+nuke compile --profile RevitMarkAllDocuments
 ```
 
 # Публикация проекта
 ```
-nuke publish --profile RevitTagAllCategories
+nuke publish --profile RevitMarkAllDocuments
 ```
