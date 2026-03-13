@@ -43,6 +43,7 @@ internal class PipeWallParamsSetter : PipeParamsSetter, IParamsSetter<ClashModel
         double length = GetLength(diameter);
         SetLength(sleeve, length);
         SetStringParameters(sleeve, _clash.MepElement);
+        SetWorkset(sleeve, _clash.MepElement.WorksetId);
     }
 
     /// <summary>

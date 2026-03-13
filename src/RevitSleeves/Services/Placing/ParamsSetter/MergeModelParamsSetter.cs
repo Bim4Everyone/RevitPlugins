@@ -51,5 +51,6 @@ internal class MergeModelParamsSetter : ParamsSetter, IParamsSetter<SleeveMergeM
         sleeve.SetParamValue(NamesProvider.ParameterSleeveDescription,
             firstMergeSleeve.GetParamValue<string>(NamesProvider.ParameterSleeveDescription));
         SetThickness(sleeve, firstMergeSleeve.GetParamValue<double>(NamesProvider.ParameterSleeveThickness));
+        SetWorkset(sleeve, firstMergeSleeve.WorksetId);
     }
 }
