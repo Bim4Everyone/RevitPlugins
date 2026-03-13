@@ -6,8 +6,7 @@ using Autodesk.Revit.Attributes;
 using Autodesk.Revit.UI;
 
 using Bim4Everyone.RevitFiltration.Controls;
-using Bim4Everyone.RevitFiltration.Controls.Extensions;
-using Bim4Everyone.RevitFiltration.Extensions;
+using Bim4Everyone.RevitFiltration.Ninject;
 
 //using Bim4Everyone.RevitFiltration.Extensions;
 
