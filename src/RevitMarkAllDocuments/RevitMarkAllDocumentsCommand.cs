@@ -5,6 +5,8 @@ using System.Windows;
 using Autodesk.Revit.Attributes;
 using Autodesk.Revit.UI;
 
+using Bim4Everyone.RevitFiltration.Ninject;
+
 using dosymep.Bim4Everyone;
 using dosymep.Bim4Everyone.ProjectConfigs;
 using dosymep.Bim4Everyone.SimpleServices;
@@ -19,6 +21,8 @@ using Ninject;
 using RevitMarkAllDocuments.Models;
 using RevitMarkAllDocuments.ViewModels;
 using RevitMarkAllDocuments.Views;
+
+using Wpf.Ui.Abstractions;
 
 namespace RevitMarkAllDocuments;
 
@@ -49,6 +53,10 @@ public class RevitMarkAllDocumentsCommand : BasePluginCommand {
         // Создание контейнера зависимостей плагина с сервисами из платформы
         using IKernel kernel = uiApplication.CreatePlatformServices();
 
+        kernel.UseLogicalFilterFactory(); // сервис для создания фильтра (обязательно)
+        kernel.UseLogicalFilterProviderFactory(); // сервис для привязки фильтра из UI к ViewModel (обязательно)
+        kernel.UseFilterContextParser(); // сервис для сохранения и загрузки фильтра UI (опционально)
+
         // Настройка доступа к Revit
         kernel.Bind<RevitRepository>()
             .ToSelf()
@@ -57,6 +65,10 @@ public class RevitMarkAllDocumentsCommand : BasePluginCommand {
         // Настройка конфигурации плагина
         kernel.Bind<PluginConfig>()
             .ToMethod(c => PluginConfig.GetPluginConfig(c.Kernel.Get<IConfigSerializer>()));
+
+        kernel.Bind<INavigationViewPageProvider>()
+            .To<NavigationViewPageProvider>()
+            .InSingletonScope();
 
         // Используем сервис обновления тем для WinUI
         kernel.UseWpfUIThemeUpdater();

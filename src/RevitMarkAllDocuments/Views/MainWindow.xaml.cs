@@ -1,6 +1,11 @@
 using System.Windows;
+using System.Windows.Threading;
 
 using dosymep.SimpleServices;
+
+using RevitMarkAllDocuments.Views;
+
+using Wpf.Ui.Abstractions;
 
 namespace RevitMarkAllDocuments.Views;
 
@@ -11,16 +16,24 @@ public partial class MainWindow {
     /// <summary>
     /// Иницализирует главное окно плагина.
     /// </summary>
-    public MainWindow(
-        ILoggerService loggerService,
-        ISerializationService serializationService,
-        ILanguageService languageService, ILocalizationService localizationService,
-        IUIThemeService uiThemeService, IUIThemeUpdaterService themeUpdaterService)
+    public MainWindow(INavigationViewPageProvider navigationViewPageProvider,
+                      ILoggerService loggerService,
+                      ISerializationService serializationService,
+                      ILanguageService languageService, 
+                      ILocalizationService localizationService,
+                      IUIThemeService uiThemeService, 
+                      IUIThemeUpdaterService themeUpdaterService)
         : base(loggerService,
             serializationService,
             languageService, localizationService,
             uiThemeService, themeUpdaterService) {
         InitializeComponent();
+
+        _rootNavigationView.SetPageProviderService(navigationViewPageProvider);
+
+        Dispatcher.BeginInvoke(DispatcherPriority.Loaded, () => {
+            _rootNavigationView.Navigate(typeof(DocumentsPage));
+        });
     }
 
     /// <summary>

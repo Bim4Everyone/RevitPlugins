@@ -7,6 +7,7 @@
     xmlns:base="clr-namespace:dosymep.WPF.Views"
     xmlns:local="clr-namespace:RevitMarkAllDocuments.Views"
     xmlns:vms="clr-namespace:RevitMarkAllDocuments.ViewModels"
+    xmlns:pages="clr-namespace:RevitMarkAllDocuments.Views"
     xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
     xmlns:core="clr-namespace:dosymep.WpfUI.Core"
     xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
@@ -40,12 +41,40 @@
             Grid.Row="0"
             Title="{me:LocalizationSource MainWindow.Title}" />
 
-        <ui:TextBox
+        <ui:NavigationView
             Grid.Row="1"
-            Width="200"
-            VerticalAlignment="Center"
-            HorizontalAlignment="Center"
-            Text="{Binding SaveProperty, UpdateSourceTrigger=PropertyChanged}" />
+            x:Name="_rootNavigationView"
+            FrameMargin="0"
+            OpenPaneLength="200"
+            IsPaneOpen="True"
+            PaneDisplayMode="Left"
+            IsBackButtonVisible="Collapsed"
+            IsPaneVisible="True"
+            IsPaneToggleVisible="True"
+            PaneTitle="{me:LocalizationSource MainWindow.Settings}"
+            BreadcrumbBar="{Binding ElementName=_breadcrumbBar}">
+
+            <ui:NavigationView.MenuItems>
+                <ui:NavigationViewItem
+                    Content="{me:LocalizationSource MainWindow.DocumentsPage}"
+                    Icon="{ui:SymbolIcon WindowBulletList20}"
+                    TargetPageType="{x:Type pages:DocumentsPage}">
+                </ui:NavigationViewItem>
+                <ui:NavigationViewItem
+                    Content="{me:LocalizationSource MainWindow.FilterPage}"
+                    Icon="{ui:SymbolIcon TextBulletListSquare20}"
+                    TargetPageType="{x:Type pages:FilterPage}">
+                </ui:NavigationViewItem>
+                <ui:NavigationViewItem
+                    Content="{me:LocalizationSource MainWindow.SortPage}"
+                    Icon="{ui:SymbolIcon NumberSymbolSquare20}"
+                    TargetPageType="{x:Type pages:SortPage}" />
+                <ui:NavigationViewItem
+                    Content="{me:LocalizationSource MainWindow.MarkPage}"
+                    Icon="{ui:SymbolIcon NumberSymbolSquare20}"
+                    TargetPageType="{x:Type pages:MarkSettingsPage}" />
+            </ui:NavigationView.MenuItems>
+        </ui:NavigationView>
 
         <StackPanel
             Grid.Row="2"

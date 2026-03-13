@@ -3,4 +3,37 @@
         <UseWpfUI>true</UseWpfUI>
         <LangVersion>12</LangVersion>
     </PropertyGroup>
+
+	<ItemGroup Condition="$(RevitVersion) != ''">
+		<Reference Include="Bim4Everyone.RevitFiltration.Controls">
+			<HintPath>$(AppData)\pyRevit\Extensions\BIM4Everyone.lib\dosymep_libs\libs\$(RevitVersion)\Bim4Everyone.RevitFiltration.Controls.dll</HintPath>
+			<Private>False</Private>
+		</Reference>
+
+		<Reference Include="Bim4Everyone.RevitFiltration">
+			<HintPath>$(AppData)\pyRevit\Extensions\BIM4Everyone.lib\dosymep_libs\libs\$(RevitVersion)\Bim4Everyone.RevitFiltration.dll</HintPath>
+			<Private>False</Private>
+		</Reference>
+
+		<Reference Include="Bim4Everyone.RevitFiltration.Ninject">
+			<HintPath>$(AppData)\pyRevit\Extensions\BIM4Everyone.lib\dosymep_libs\libs\$(RevitVersion)\Bim4Everyone.RevitFiltration.Ninject.dll</HintPath>
+			<Private>False</Private>
+		</Reference>
+	</ItemGroup>
+
+	<ItemGroup>
+	  <Folder Include="Views\Styles\" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <Compile Update="Views\Pages\SortPage.xaml.cs">
+	    <SubType>Code</SubType>
+	  </Compile>
+	  <Compile Update="Views\Pages\MarkSettingsPage.xaml.cs">
+	    <SubType>Code</SubType>
+	  </Compile>
+	  <Compile Update="Views\Pages\FilterPage.xaml.cs">
+	    <SubType>Code</SubType>
+	  </Compile>
+	</ItemGroup>
 </Project>
