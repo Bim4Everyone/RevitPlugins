@@ -104,6 +104,10 @@
     <system:String x:Key="WarningsViewModel.NotFoundElementDescription">Elements are too far away or cannot be processed</system:String>
     <system:String x:Key="WarningsViewModel.NotFoundParam">Elements with unfilled parameters</system:String>
     <system:String x:Key="WarningsViewModel.NotFoundParamDescription">These parameters are not added to the categories of these elements and were not filled in</system:String>
+    <system:String x:Key="WarningsViewModel.OccupiedElement">Elements occupied by another user</system:String>
+    <system:String x:Key="WarningsViewModel.OccupiedElementDescription">Synchronization with the central model is required to process these elements</system:String>
+    <system:String x:Key="WarningsViewModel.DeletedInCentral">Elements deleted or updated from the central model</system:String>
+    <system:String x:Key="WarningsViewModel.DeletedInCentralDescription">Synchronization with the central model is required in the current document</system:String>
 
     <system:String x:Key="WarningGroupViewModel.SelectAll">Select all elements</system:String>
 
