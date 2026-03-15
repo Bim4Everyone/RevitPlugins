@@ -10,7 +10,7 @@ internal interface IIntersectProcessor {
     /// <returns>
     /// Коллекция RevitElement - обрабатываемых элементов модели.
     /// </returns>
-    IEnumerable<RevitElement> RevitElements { get; }
+    List<RevitElement> RevitElements { get; }
     /// <summary>
     /// Основной метод обработки элементов.
     /// </summary>

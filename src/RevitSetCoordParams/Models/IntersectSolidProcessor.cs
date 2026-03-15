@@ -19,6 +19,7 @@ internal class IntersectSolidProcessor : IIntersectProcessor {
     private readonly ILocalizationService _localizationService;
     private readonly RevitRepository _revitRepository;
     private readonly SetCoordParamsSettings _settings;
+    private List<RevitElement> _revitElements;
 
     public IntersectSolidProcessor(
         ILocalizationService localizationService,
@@ -29,7 +30,7 @@ internal class IntersectSolidProcessor : IIntersectProcessor {
         _settings = settings;
     }
 
-    public IEnumerable<RevitElement> RevitElements => GetRevitElements();
+    public List<RevitElement> RevitElements => _revitElements ??= GetRevitElements();
 
     public IReadOnlyCollection<WarningElement> Run(IProgress<int> progress = null, CancellationToken ct = default) {
         var sourceModels = _settings.TypeModels
@@ -114,7 +115,7 @@ internal class IntersectSolidProcessor : IIntersectProcessor {
     }
 
     // Метод получения элементов модели для основного метода и прогресс-бара  
-    private IEnumerable<RevitElement> GetRevitElements() {
+    private List<RevitElement> GetRevitElements() {
         return _settings.ElementsProvider.GetRevitElements(_settings.Categories);
     }
 
