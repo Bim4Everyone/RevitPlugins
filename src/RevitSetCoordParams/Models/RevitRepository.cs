@@ -18,20 +18,29 @@ namespace RevitSetCoordParams.Models;
 internal class RevitRepository {
     private readonly ILocalizationService _localizationService;
     private readonly IDocumentsService _documentsService;
+    private readonly IDependentElementService _dependentService;
     private readonly WorksetTable _worksetTable;
     private readonly string _defaultFamilyName;
     private readonly string _defaultTypeName;
     private readonly string _defaultLevelName;
+    private readonly Options _geomOptions;
 
     public RevitRepository(UIApplication uiApplication, ILocalizationService localizationService) {
         UIApplication = uiApplication;
         _localizationService = localizationService;
         _documentsService = new DocumentsService(Document);
+        _dependentService = new DependentElementService(Document);
         _worksetTable = Document.GetWorksetTable();
 
         _defaultFamilyName = _localizationService.GetLocalizedString("RevitRepository.DefaultFamilyName");
         _defaultTypeName = _localizationService.GetLocalizedString("RevitRepository.DefaultTypeName");
         _defaultLevelName = _localizationService.GetLocalizedString("RevitRepository.DefaultLevelName");
+
+        _geomOptions = new Options {
+            ComputeReferences = true,
+            IncludeNonVisibleObjects = false,
+            DetailLevel = ViewDetailLevel.Fine
+        };
     }
 
     public UIApplication UIApplication { get; }
@@ -41,71 +50,83 @@ internal class RevitRepository {
 
     /// <summary>
     /// Метод получения всех элементов модели по заданным категориям и рабочим наборам
-    /// </summary>
-    public IEnumerable<RevitElement> GetAllRevitElements(ICollection<BuiltInCategory> categories) {
-        return categories == null || !categories.Any()
-            ? []
-            : RevitConstants.GetParentBuiltInCategories()
-                .Where(categories.Contains)
-                .SelectMany(category => new FilteredElementCollector(Document)
-                    .OfCategory(category)
-                    .WhereElementIsNotElementType()
-                    .Where(ElementOutWorkset)
-                    .Where(element => {
-                        return element is not FamilyInstance fi || fi.SuperComponent == null;
-                    })
-                    .Select(element => {
-                        var revitElement = CreateRevitElement(element);
-                        revitElement.DependentElements = GetDependentElements(element, categories);
-                        return revitElement;
-                    })
-                    .Where(element => element.BoundingBoxXYZ != null)
-                );
+    /// </summary> 
+    public List<RevitElement> GetAllRevitElements(ICollection<BuiltInCategory> categories) {
+        if(categories == null || categories.Count == 0) {
+            return [];
+        }
+        var categorySet = new HashSet<BuiltInCategory>(categories);
+
+        var allElements = new FilteredElementCollector(Document)
+            .WhereElementIsNotElementType()
+            .Where(element => ElementMatchesCategoryAndWorkSet(element, categorySet));
+
+        var result = allElements
+            .Where(_dependentService.IsRootElement)
+            .Select(e => {
+                var revitElement = CreateRevitElement(e);
+                revitElement.DependentElements = GetDependentElements(e, categorySet);
+                return revitElement;
+            })
+            .Where(e => e.BoundingBoxXYZ != null)
+            .ToList();
+
+        return result;
     }
 
     /// <summary>
     /// Метод получения всех элементов модели на текущем виде по заданным категориям и рабочим наборам
     /// </summary>
-    public IEnumerable<RevitElement> GetCurrentViewRevitElements(ICollection<BuiltInCategory> categories) {
-        return categories == null || !categories.Any()
-            ? []
-            : RevitConstants.GetParentBuiltInCategories()
-                .Where(categories.Contains)
-                .SelectMany(category => new FilteredElementCollector(Document, GetCurrentView().Id)
-                    .OfCategory(category)
-                    .WhereElementIsNotElementType()
-                    .Where(ElementOutWorkset)
-                    .Where(element => {
-                        return element is not FamilyInstance fi || fi.SuperComponent == null;
-                    })
-                    .Select(element => {
-                        var revitElement = CreateRevitElement(element);
-                        revitElement.DependentElements = GetDependentElements(element, categories);
-                        return revitElement;
-                    })
-                    .Where(element => element.BoundingBoxXYZ != null)
-                );
+    public List<RevitElement> GetCurrentViewRevitElements(ICollection<BuiltInCategory> categories) {
+        if(categories == null || categories.Count == 0) {
+            return [];
+        }
+
+        var categorySet = new HashSet<BuiltInCategory>(categories);
+
+        var allElements = new FilteredElementCollector(Document, GetCurrentView().Id)
+           .WhereElementIsNotElementType()
+           .Where(element => ElementMatchesCategoryAndWorkSet(element, categorySet));
+
+        var result = allElements
+            .Where(_dependentService.IsRootElement)
+            .Select(e => {
+                var revitElement = CreateRevitElement(e);
+                revitElement.DependentElements = GetDependentElements(e, categorySet);
+                return revitElement;
+            })
+            .Where(e => e.BoundingBoxXYZ != null)
+            .ToList();
+
+        return result;
     }
 
     /// <summary>
-    /// Метод получения всех выделенных элементов модели по заданным категориям и рабочим наборам
+    /// Метод получения всех выделенных элементов модели по заданным категориям и рабочим наборам, включая только родительские семейства
     /// </summary>
-    public IEnumerable<RevitElement> GetSelectedRevitElements(ICollection<BuiltInCategory> categories) {
+    public List<RevitElement> GetSelectedRevitElements(ICollection<BuiltInCategory> categories) {
         var selectedElements = GetSelectedElements();
+        if(selectedElements == null || selectedElements.Count() == 0) {
+            return [];
+        }
+
         var categorySet = new HashSet<BuiltInCategory>(categories);
-        return !selectedElements.Any()
-            ? []
-            : selectedElements
-                .Where(element => element != null)
-                .GroupBy(element => element.Id)
-                .Select(group => group.First())
-                .Where(element => ElementMatchesCategoryAndWorkSet(element, categorySet))
-                .Select(element => {
-                    var revitElement = CreateRevitElement(element);
-                    revitElement.DependentElements = GetDependentElements(element, categorySet);
-                    return revitElement;
-                })
-                .Where(revitElement => revitElement.BoundingBoxXYZ != null);
+
+        var result = selectedElements
+            .Where(element => element != null)
+            .Where(element => ElementMatchesCategoryAndWorkSet(element, categorySet))
+            .GroupBy(element => element.Id)
+            .Select(group => group.First())
+            .Select(element => {
+                var revitElement = CreateRevitElement(element);
+                revitElement.DependentElements = GetDependentElements(element, categorySet);
+                return revitElement;
+            })
+            .Where(revitElement => revitElement.BoundingBoxXYZ != null)
+            .ToList();
+        ;
+
+        return result;
     }
 
     /// <summary>
@@ -135,7 +156,14 @@ internal class RevitRepository {
                 var transSolid = transform != null
                     ? SolidUtils.CreateTransformed(unitedSolid, transform)
                     : unitedSolid;
-                return new RevitElement { Element = instance, Solid = transSolid, BoundingBoxXYZ = transSolid.GetBoundingBox() };
+                var boundingBox = transSolid.GetBoundingBox();
+                var outline = new Outline(boundingBox.Transform.OfPoint(boundingBox.Min), boundingBox.Transform.OfPoint(boundingBox.Max));
+                return new RevitElement {
+                    Element = instance,
+                    Solid = transSolid,
+                    BoundingBoxXYZ = boundingBox,
+                    Outline = outline
+                };
             })
             .ToList();
     }
@@ -211,23 +239,44 @@ internal class RevitRepository {
     private RevitElement CreateRevitElement(Element element) {
         return new RevitElement {
             Element = element,
-            BoundingBoxXYZ = element.GetBoundingBox(),
+            BoundingBoxXYZ = GetBoundingBoxXYZ(element),
             FamilyName = GetFamilyName(element),
             TypeName = element.Name ?? _defaultTypeName,
             LevelName = GetLevelName(element)
         };
     }
 
-    // Метод получения вложенных/зависимых элементов
-    private List<RevitElement> GetDependentElements(Element element, ICollection<BuiltInCategory> categories) {
-        var filter = new ElementMulticategoryFilter(categories);
-        return element.GetDependentElements(filter)
-            .Where(id => id != element.Id)
-            .Select(Document.GetElement)
-            .Where(element => element != null)
-            .Select(CreateRevitElement)
-            .Where(revitElement => revitElement.BoundingBoxXYZ != null)
-            .ToList();
+    // Метод получения GetBoundingBoxXYZ
+    private BoundingBoxXYZ GetBoundingBoxXYZ(Element element) {
+        var bbox = element.GetBoundingBox();
+        if(bbox == null) {
+            var geom = element.get_Geometry(_geomOptions);
+            bbox = geom.GetBoundingBox();
+        }
+        return bbox;
+    }
+
+    // Метод получения вложенных/зависимых RevitElement
+    private List<RevitElement> GetDependentElements(Element element, HashSet<BuiltInCategory> categorySet) {
+        var result = new List<RevitElement>();
+        if(!_dependentService.DependentMap.TryGetValue(element.Id, out var dependentIds)) {
+            return result;
+        }
+        foreach(var id in dependentIds) {
+            var depElement = Document.GetElement(id);
+            if(depElement == null) {
+                continue;
+            }
+            if(!ElementMatchesCategoryAndWorkSet(depElement, categorySet)) {
+                continue;
+            }
+            var revitElement = CreateRevitElement(depElement);
+            if(revitElement?.BoundingBoxXYZ == null) {
+                continue;
+            }
+            result.Add(revitElement);
+        }
+        return result;
     }
 
     // Метод фильтрации элементов по рабочему набору и категориям

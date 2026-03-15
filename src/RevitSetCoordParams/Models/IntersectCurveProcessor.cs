@@ -21,6 +21,7 @@ internal class IntersectCurveProcessor : IIntersectProcessor {
     private readonly CurveIntersector _intersector;
     private readonly ParamManager _paramManager;
     private readonly ElementStatusService _elementStatusService;
+    private List<RevitElement> _revitElements;
 
     public IntersectCurveProcessor(
         ILocalizationService localizationService,
@@ -34,7 +35,7 @@ internal class IntersectCurveProcessor : IIntersectProcessor {
         _elementStatusService = new ElementStatusService(_revitRepository.Document);
     }
 
-    public IEnumerable<RevitElement> RevitElements => GetRevitElements();
+    public List<RevitElement> RevitElements => _revitElements ??= GetRevitElements();
 
     public IReadOnlyCollection<WarningElement> Run(IProgress<int> progress = null, CancellationToken ct = default) {
         string transactionName = _localizationService.GetLocalizedString("SetCoordParamsProcessor.TransactionName");
@@ -181,7 +182,7 @@ internal class IntersectCurveProcessor : IIntersectProcessor {
     }
 
     // Метод получения элементов модели для основного метода и прогресс-бара  
-    private IEnumerable<RevitElement> GetRevitElements() {
+    private List<RevitElement> GetRevitElements() {
         return _settings.ElementsProvider.GetRevitElements(_settings.Categories);
     }
 }

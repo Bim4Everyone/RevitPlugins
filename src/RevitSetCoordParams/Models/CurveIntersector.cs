@@ -17,7 +17,10 @@ internal class CurveIntersector {
 
     public CurveIntersector(SetCoordParamsSettings settings) {
         _settings = settings;
-        _sourceModels = _settings.TypeModels.SelectMany(_settings.FileProvider.GetRevitElements).ToArray();
+        _sourceModels = _settings.TypeModels
+            .SelectMany(_settings.FileProvider.GetRevitElements)
+            .Where(x => x.BoundingBoxXYZ != null)
+            .ToArray();
         _intersectCurveLength = UnitUtils.ConvertToInternalUnits(RevitConstants.IntersectCurveLengthMm, UnitTypeId.Millimeters);
         _startDiamSphere = UnitUtils.ConvertToInternalUnits(RevitConstants.StartDiameterSearchSphereMm, UnitTypeId.Millimeters);
         _maxDiamSphere = UnitUtils.ConvertToInternalUnits(_settings.MaxDiameterSearchSphereMm, UnitTypeId.Millimeters);
@@ -39,12 +42,12 @@ internal class CurveIntersector {
 
         var position = _settings.PositionProvider.GetPositionElement(targetElement);
 
-        var bboxCandidates = GetContainCandidates(position);
+        var containCandidates = GetContainCandidates(position).ToList();
 
-        if(bboxCandidates.Any()) {
+        if(containCandidates.Count > 0) {
             var offset = new XYZ(0, 0, _intersectCurveLength);
             var curve = GetIntersectCurve(position, offset);
-            var foundModel = IntersectWithCurve(curve, bboxCandidates);
+            var foundModel = IntersectWithCurve(curve, containCandidates);
 
             if(foundModel is not null) {
                 return foundModel;
@@ -56,11 +59,13 @@ internal class CurveIntersector {
         }
 
         double currentDiamSphere = _startDiamSphere;
+        List<RevitElement> candidates = null;
+
         while(currentDiamSphere < _maxDiamSphere) {
             var sphereOutline = GetSphereOutline(position, currentDiamSphere);
-            var candidates = GetIntersectCandidates(sphereOutline);
+            candidates = GetIntersectCandidates(sphereOutline).ToList();
 
-            if(!candidates.Any()) {
+            if(candidates.Count == 0) {
                 currentDiamSphere += _stepDiamSphere;
                 continue;
             }
@@ -71,6 +76,7 @@ internal class CurveIntersector {
             if(foundModel is not null) {
                 return foundModel;
             }
+
             currentDiamSphere += _stepDiamSphere;
         }
         return null;
@@ -78,24 +84,20 @@ internal class CurveIntersector {
 
     // Метод отсеивания кандидатов-объёмных моделей путем нахождения XYZ в Outline
     private IEnumerable<RevitElement> GetContainCandidates(XYZ position) {
-        return _sourceModels
-            .Where(x => x.BoundingBoxXYZ != null)
-            .Where(x => {
-                var bb = x.BoundingBoxXYZ;
-                var outline = new Outline(bb.Transform.OfPoint(bb.Min), bb.Transform.OfPoint(bb.Max));
-                return outline.Contains(position, 0);
-            });
+        foreach(var sourceModel in _sourceModels) {
+            if(sourceModel.Outline.Contains(position, 0)) {
+                yield return sourceModel;
+            }
+        }
     }
 
-    // Метод отсеивания кандидатов-объёмных моделей путем пересечения BoundingBox и Outline
+    // Метод отсеивания кандидатов-объёмных моделей путем пересечения BoundingBox и Outline    
     private IEnumerable<RevitElement> GetIntersectCandidates(Outline sphereOutline) {
-        return _sourceModels
-            .Where(x => x.BoundingBoxXYZ != null)
-            .Where(x => {
-                var bb = x.BoundingBoxXYZ;
-                var outline = new Outline(bb.Transform.OfPoint(bb.Min), bb.Transform.OfPoint(bb.Max));
-                return outline.Intersects(sphereOutline, 0);
-            });
+        foreach(var sourceModel in _sourceModels) {
+            if(sourceModel.Outline.Intersects(sphereOutline, 0)) {
+                yield return sourceModel;
+            }
+        }
     }
 
     // Метод расширения сферы-Outline 
@@ -109,11 +111,21 @@ internal class CurveIntersector {
     // Метод пересечения линии с объемными элементами
     private RevitElement IntersectWithCurve(Curve curve, IEnumerable<RevitElement> candidates) {
         foreach(var sourceModel in candidates) {
-            var result = sourceModel.Solid.IntersectWithCurve(curve, _intersectOptions);
+            var solid = sourceModel.Solid;
+            if(solid is null) {
+                continue;
+            }
+            var result = solid.IntersectWithCurve(curve, _intersectOptions);
 
-            if(result.ResultType == SolidCurveIntersectionMode.CurveSegmentsInside &&
-               result.Any(item => item.Length > 0)) {
-                return sourceModel;
+            if(result.ResultType is not SolidCurveIntersectionMode.CurveSegmentsInside) {
+                continue;
+            }
+            int segmentsCount = result.SegmentCount;
+            for(int i = 0; i < segmentsCount; i++) {
+                var segment = result.GetCurveSegment(i);
+                if(segment is not null && segment.Length > 0) {
+                    return sourceModel;
+                }
             }
         }
         return null;
@@ -121,15 +133,10 @@ internal class CurveIntersector {
 
     // Метод пересечения сферы из линий с объемными элементами
     private RevitElement IntersectWithCurves(List<Curve> curves, IEnumerable<RevitElement> candidates) {
-        foreach(var sourceModel in candidates) {
-            foreach(var curve in curves) {
-
-                var result = sourceModel.Solid.IntersectWithCurve(curve, _intersectOptions);
-
-                if(result.ResultType == SolidCurveIntersectionMode.CurveSegmentsInside &&
-                   result.Any(item => item.Length > 0)) {
-                    return sourceModel;
-                }
+        foreach(var curve in curves) {
+            var result = IntersectWithCurve(curve, candidates);
+            if(result is not null) {
+                return result;
             }
         }
         return null;

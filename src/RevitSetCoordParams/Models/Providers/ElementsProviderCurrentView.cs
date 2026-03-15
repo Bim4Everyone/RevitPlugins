@@ -16,7 +16,7 @@ internal class ElementsProviderCurrentView : IElementsProvider {
 
     public ElementsProviderType Type => ElementsProviderType.CurrentViewProvider;
 
-    public IEnumerable<RevitElement> GetRevitElements(ICollection<BuiltInCategory> categories) {
+    public List<RevitElement> GetRevitElements(ICollection<BuiltInCategory> categories) {
         return _revitRepository.GetCurrentViewRevitElements(categories);
     }
 }

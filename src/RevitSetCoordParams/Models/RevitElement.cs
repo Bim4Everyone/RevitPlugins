@@ -8,6 +8,7 @@ internal class RevitElement {
     public Element Element { get; set; }
     public Solid Solid { get; set; }
     public BoundingBoxXYZ BoundingBoxXYZ { get; set; }
+    public Outline Outline { get; set; }
     public List<RevitElement> DependentElements { get; set; }
     public string FamilyName { get; set; }
     public string TypeName { get; set; }
