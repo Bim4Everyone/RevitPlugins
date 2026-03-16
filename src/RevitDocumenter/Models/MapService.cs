@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Drawing;
 using System.Drawing.Imaging;
 using System.Runtime.InteropServices;
@@ -12,8 +13,14 @@ using Rectangle = System.Drawing.Rectangle;
 namespace RevitDocumenter.Models;
 internal class MapService {
     private readonly RevitRepository _revitRepository;
-
     private readonly double _mappingStepInMm = 200.0;
+
+    private string _croppedScaledImagePath;
+    private SquareInfo[,] _map;
+    private int _stepCountX;
+    private int _stepCountY;
+    private XYZ _startPoint;
+    private double _revitStep;
 
     // Будет делаться тонкая розовая линия
     private readonly Color _colorForTestLines = new(255, 0, 255);
@@ -23,12 +30,15 @@ internal class MapService {
         _revitRepository = revitRepository;
     }
 
+    public double RevitStep {
+        get => _revitStep;
+    }
 
-    public SquareInfo[,] GetMap() {
+    public (SquareInfo[,], XYZ, double) GetMap() {
         var doc = _revitRepository.Document;
         var view = doc.ActiveView;
 
-        double revitStep = UnitUtilsHelper.ConvertToInternalValue(_mappingStepInMm);
+        _revitStep = UnitUtilsHelper.ConvertToInternalValue(_mappingStepInMm);
 
         var imagePreparer = new ImagePreparer(_revitRepository);
 
@@ -37,8 +47,8 @@ internal class MapService {
         (XYZ viewMinFixed, XYZ viewMaxFixed) = imagePreparer.GetFixedCropBoxPoints(view, _mappingStepInMm);
 
         // Количество квадратов в среде Revit
-        int stepCountX = (int) Math.Round((viewMaxFixed.X - viewMinFixed.X) / revitStep);  // 93 (при 500.0)
-        int stepCountY = (int) Math.Round((viewMaxFixed.Y - viewMinFixed.Y) / revitStep);  // 65 (при 500.0)
+        int stepCountX = (int) Math.Round((viewMaxFixed.X - viewMinFixed.X) / _revitStep);  // 93 (при 500.0)
+        int stepCountY = (int) Math.Round((viewMaxFixed.Y - viewMinFixed.Y) / _revitStep);  // 65 (при 500.0)
 
         // Стандартное значение ширины изображения в пикселях, подходящее для обработки
         int standartX = 4096;
@@ -68,6 +78,13 @@ internal class MapService {
 
         var map = AnalyzeImageSquares(croppedScaledImagePath, stepCountX, stepCountY);
 
+
+        _croppedScaledImagePath = croppedScaledImagePath;
+        _map = map;
+        _stepCountX = stepCountX;
+        _stepCountY = stepCountY;
+        _startPoint = viewMinFixed;
+
         MarkWhiteSquaresOnImage(croppedScaledImagePath, map, stepCountX, stepCountY);
 
 
@@ -79,7 +96,20 @@ internal class MapService {
         //CreateSphere(viewMax);
         //CreateTestSpheres(viewMinFixed, viewMaxFixed);
 
-        return map;
+        return (map, viewMinFixed, _mappingStepInMm);
+    }
+
+
+    public bool IsWhiteSquare(XYZ point) {
+
+        XYZ difVector = point - _startPoint;
+        double x = difVector.X;
+        double y = difVector.Y;
+
+        int stepsForX = (int) Math.Floor(x / _revitStep);
+        int stepsForY = (int) Math.Floor(y / _revitStep);
+
+        return _map[stepsForY, stepsForX].AllPixelsWhite;
     }
 
 
@@ -202,6 +232,74 @@ internal class MapService {
                 }
             }
             image.Save(imagePath.Replace(".png", $"_marked.png"), System.Drawing.Imaging.ImageFormat.Png);
+        }
+    }
+
+
+
+    // Покраска нескольких квадратов по их координатам
+    public void MarkWhiteSquaresOnImage(List<List<int>> list) {
+        string imagePath = _croppedScaledImagePath;
+        SquareInfo[,] analysisResults = _map;
+        int stepCountX = _stepCountX;
+        int stepCountY = _stepCountY;
+
+
+        using(var image = new Bitmap(imagePath)) {
+
+            using(var graphics = Graphics.FromImage(image)) {
+                // Настраиваем качество отрисовки
+                graphics.CompositingQuality = System.Drawing.Drawing2D.CompositingQuality.HighQuality;
+                graphics.InterpolationMode = System.Drawing.Drawing2D.InterpolationMode.HighQualityBicubic;
+                graphics.PixelOffsetMode = System.Drawing.Drawing2D.PixelOffsetMode.HighQuality;
+                graphics.SmoothingMode = System.Drawing.Drawing2D.SmoothingMode.HighQuality;
+
+                // Создаем розовую полупрозрачную кисть
+                // Color.FromArgb(alpha, red, green, blue) - alpha 128 делает полупрозрачной
+                using(var brush = new SolidBrush(System.Drawing.Color.FromArgb(128, 255, 192, 203))) // Полупрозрачный розовый
+                {
+                    // Проходим по всем квадратам
+                    for(int row = 0; row < stepCountY; row++) {
+                        for(int col = 0; col < stepCountX; col++) {
+                            var square = analysisResults[row, col];
+
+                            // Если все пиксели квадрата белые - закрашиваем его
+                            if(square.AllPixelsWhite) {
+                                // Создаем прямоугольник для заливки
+                                var rect = new Rectangle(
+                                    square.StartPoint.X,                    // X левого верхнего угла
+                                    square.StartPoint.Y,                    // Y левого верхнего угла
+                                    square.EndPoint.X - square.StartPoint.X + 1,  // Ширина
+                                    square.EndPoint.Y - square.StartPoint.Y + 1   // Высота
+                                );
+
+                                // Закрашиваем прямоугольник розовым
+                                graphics.FillRectangle(brush, rect);
+                            }
+                        }
+                    }
+                }
+
+                foreach(List<int> item in list) {
+                    var stepsForY = item[0];
+                    var stepsForX = item[1];
+
+                    using(var brush = new SolidBrush(System.Drawing.Color.FromArgb(255, 255, 255, 255))) {
+                        var square = analysisResults[stepsForY, stepsForX];
+
+                        // Создаем прямоугольник для заливки
+                        var rect = new Rectangle(
+                            square.StartPoint.X,                    // X левого верхнего угла
+                            square.StartPoint.Y,                    // Y левого верхнего угла
+                            square.EndPoint.X - square.StartPoint.X + 1,  // Ширина
+                            square.EndPoint.Y - square.StartPoint.Y + 1   // Высота
+                        );
+
+                        graphics.FillRectangle(brush, rect);
+                    }
+                }
+            }
+            image.Save(imagePath.Replace(".png", $"_marked1.png"), System.Drawing.Imaging.ImageFormat.Png);
         }
     }
 }

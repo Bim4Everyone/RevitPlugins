@@ -139,7 +139,7 @@ internal class MainViewModel : BaseViewModel {
 
 
         var mapService = new MapService(_revitRepository);
-        SquareInfo[,] map = mapService.GetMap();
+        (SquareInfo[,] map, XYZ viewMinFixed, double mappingStepInMm) = mapService.GetMap();
 
 
 
@@ -151,14 +151,16 @@ internal class MainViewModel : BaseViewModel {
             ReferenceNamesVM.GetHorizReferenceNames())) {
 
             // Создание вертикального размера (относительно локальных осей зоны армирования)
-            CreateDimension(Grids, rebar);
+            CreateDimension(Grids, rebar, map, viewMinFixed, mappingStepInMm, mapService);
             // Создание горизонтального размера (относительно локальных осей зоны армирования)
-            CreateDimension(Grids, rebar, false);
+            //CreateDimension(Grids, rebar, map, viewMinFixed, mappingStepInMm, mapService, false);
         }
         mainTransaction.Commit();
     }
 
-    private Dimension CreateDimension(List<Grid> grids, RebarElement rebar, bool isForVertical = true) {
+    private Dimension CreateDimension(
+        List<Grid> grids, RebarElement rebar, SquareInfo[,] map,
+        XYZ startPoint, double mmInSquare, MapService mapService, bool isForVertical = true) {
         try {
             _guard.ThrowIfNull(grids, rebar);
         } catch(Exception) {
@@ -211,6 +213,41 @@ internal class MainViewModel : BaseViewModel {
             var textEdgeRightTop = textEdgeRightBottom + (textPosition - center).Normalize() * dimTextHeight;
 
 
+            //(int stepsForY1, int stepsForX1) = GetSquareInfo(map, textEdgeLeftBottom, startPoint, (int) mmInSquare);
+            //(int stepsForY2, int stepsForX2) = GetSquareInfo(map, textEdgeRightBottom, startPoint, (int) mmInSquare);
+            //(int stepsForY3, int stepsForX3) = GetSquareInfo(map, textEdgeLeftTop, startPoint, (int) mmInSquare);
+            //(int stepsForY4, int stepsForX4) = GetSquareInfo(map, textEdgeRightTop, startPoint, (int) mmInSquare);
+
+
+            //List<List<int>> list = [
+            //    [stepsForY1, stepsForX1],
+            //    [stepsForY2, stepsForX2],
+            //    [stepsForY3, stepsForX3],
+            //    [stepsForY4, stepsForX4],
+            //];
+
+            //mapService.MarkWhiteSquaresOnImage(list);
+
+            int c = 0;
+
+            while(
+                !mapService.IsWhiteSquare(textEdgeLeftBottom)
+                || !mapService.IsWhiteSquare(textEdgeRightBottom)
+                || !mapService.IsWhiteSquare(textEdgeLeftTop)
+                || !mapService.IsWhiteSquare(textEdgeRightTop)) {
+
+                textEdgeLeftBottom += (textPosition - center).Normalize() * mapService.RevitStep;
+                textEdgeRightBottom += (textPosition - center).Normalize() * mapService.RevitStep;
+                textEdgeLeftTop += (textPosition - center).Normalize() * mapService.RevitStep;
+                textEdgeRightTop += (textPosition - center).Normalize() * mapService.RevitStep;
+
+                c++;
+                if(c > 5) {
+                    break;
+                }
+            }
+
+
 
             var imagePreparer = new ImagePreparer(_revitRepository);
             imagePreparer.CreateSphere(textEdgeLeftBottom);
@@ -229,6 +266,29 @@ internal class MainViewModel : BaseViewModel {
 
 
         return dimension;
+    }
+
+
+
+
+
+
+
+
+
+    private (int, int) GetSquareInfo(SquareInfo[,] map, XYZ point, XYZ startPoint, int mmInSquare) {
+
+        XYZ difVector = point - startPoint;
+        double x = difVector.X;
+        double y = difVector.Y;
+
+        double revitStep = UnitUtilsHelper.ConvertToInternalValue(mmInSquare);
+
+        int stepsForX = (int) Math.Floor(x / revitStep);
+        int stepsForY = (int) Math.Floor(y / revitStep);
+
+        //return map[stepsForY, stepsForX];
+        return (stepsForY, stepsForX);
     }
 
 
