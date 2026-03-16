@@ -31,6 +31,10 @@ internal static class CollectionGenerator {
             .Where(e => e.GetTypeId() == typeId)
             .ToList();
 
+        elements = elements
+            .Where(e => !IsPlaceholderElement(e))
+            .ToList();
+
         if(type.InAnyCategory([BuiltInCategory.OST_PipingSystem, BuiltInCategory.OST_DuctSystem])) {
             var unique = new Dictionary<string, Element>();
 
@@ -124,6 +128,14 @@ internal static class CollectionGenerator {
         }
 
         return elements;
+    }
+
+    private static bool IsPlaceholderElement(Element element) {
+        return element switch {
+            Duct duct => duct.IsPlaceholder,
+            Pipe pipe => pipe.IsPlaceholder,
+            _ => false
+        };
     }
 
 }
