@@ -191,7 +191,6 @@ internal class MainViewModel : BaseViewModel {
 
 
         try {
-            var p1 = (dimension.Curve as Line).Origin;
             var leaderEndPosition = dimension.LeaderEndPosition;
             var textPosition = dimension.TextPosition;
             var center = GetDimensionCenterPoint(dimension);
@@ -214,34 +213,108 @@ internal class MainViewModel : BaseViewModel {
 
 
             XYZ vectorUp = (textPosition - center).Normalize();
-            double step = mapService.RevitStep;
+            XYZ vectorRight = (textEdgeRightBottom - textEdgeLeftBottom).Normalize();
+            double upStep = mapService.RevitStep;
+            double rightStep = textEdgeRightBottom.DistanceTo(textEdgeLeftBottom) * 1.5;
 
-            int coef = 0;
-            int maxStepsForSearch = 10;
-            bool needRecreateDimension = false;
-            for(int i = 1; i <= maxStepsForSearch; i++) {
-                if(Check(mapService, textEdgeLeftBottom, textEdgeRightBottom, textEdgeLeftTop, textEdgeRightTop)) {
-                    if(needRecreateDimension) {
-                        _revitRepository.Document.Delete(dimension.Id);
 
-                        dimension = _dimensionCreator.Create(
-                            Line.CreateBound(textEdgeLeftBottom, textEdgeRightBottom),
-                            dimensionRefs,
-                            _selectedDimensionType);
-                        Paint(mapService, textEdgeLeftBottom, textEdgeRightBottom, textEdgeLeftTop, textEdgeRightTop);
+            int minDimensionInView = GetMinDimensionInView();
+            if(dimension.Value >= minDimensionInView) {
+                // Просто переносим выше или ниже
+                int coef = 0;
+                int maxStepsForSearch = 10;
+                bool needRecreateDimension = false;
+                for(int i = 1; i <= maxStepsForSearch; i++) {
+                    if(Check(mapService, textEdgeLeftBottom, textEdgeRightBottom, textEdgeLeftTop, textEdgeRightTop)) {
+                        if(needRecreateDimension) {
+                            _revitRepository.Document.Delete(dimension.Id);
+
+                            dimension = _dimensionCreator.Create(
+                                Line.CreateBound(textEdgeLeftBottom, textEdgeRightBottom),
+                                dimensionRefs,
+                                _selectedDimensionType);
+                            Paint(mapService, textEdgeLeftBottom, textEdgeRightBottom, textEdgeLeftTop, textEdgeRightTop);
+                        }
+                        break;
                     }
-                    break;
+
+                    coef = i % 2 == 1 ? i : -i;
+
+                    textEdgeLeftBottom += vectorUp * upStep * coef;
+                    textEdgeRightBottom += vectorUp * upStep * coef;
+                    textEdgeLeftTop += vectorUp * upStep * coef;
+                    textEdgeRightTop += vectorUp * upStep * coef;
+
+                    needRecreateDimension = true;
                 }
+            } else {
+                // Переносим выше или ниже при этом смещая в сторону, чтобы размер отобразился корректно
+                int upCoef = 0;
+                int maxStepsForSearch = 10;
+                bool needRecreateDimension = false;
 
-                coef = i % 2 == 1 ? i : -i;
+                int rightCoef = 1;
 
-                textEdgeLeftBottom += vectorUp * step * coef;
-                textEdgeRightBottom += vectorUp * step * coef;
-                textEdgeLeftTop += vectorUp * step * coef;
-                textEdgeRightTop += vectorUp * step * coef;
+                for(int i = 1; i <= maxStepsForSearch; i++) {
+                    // Вправо
+                    textEdgeLeftBottom += vectorRight * rightStep * rightCoef;
+                    textEdgeRightBottom += vectorRight * rightStep * rightCoef;
+                    textEdgeLeftTop += vectorRight * rightStep * rightCoef;
+                    textEdgeRightTop += vectorRight * rightStep * rightCoef;
 
-                needRecreateDimension = true;
+                    if(Check(mapService, textEdgeLeftBottom, textEdgeRightBottom, textEdgeLeftTop, textEdgeRightTop)) {
+                        if(needRecreateDimension) {
+                            _revitRepository.Document.Delete(dimension.Id);
+
+                            dimension = _dimensionCreator.Create(
+                                Line.CreateBound(textEdgeLeftBottom, textEdgeRightBottom),
+                                dimensionRefs,
+                                _selectedDimensionType);
+                            dimension.TextPosition = (textEdgeLeftBottom + textEdgeRightBottom) / 2 + (textPosition - center);
+                            Paint(mapService, textEdgeLeftBottom, textEdgeRightBottom, textEdgeLeftTop, textEdgeRightTop);
+                        }
+                        break;
+                    }
+                    needRecreateDimension = true;
+
+                    rightCoef = -2;
+                    // Влево
+                    textEdgeLeftBottom += vectorRight * rightStep * rightCoef;
+                    textEdgeRightBottom += vectorRight * rightStep * rightCoef;
+                    textEdgeLeftTop += vectorRight * rightStep * rightCoef;
+                    textEdgeRightTop += vectorRight * rightStep * rightCoef;
+
+
+                    if(Check(mapService, textEdgeLeftBottom, textEdgeRightBottom, textEdgeLeftTop, textEdgeRightTop)) {
+                        if(needRecreateDimension) {
+                            _revitRepository.Document.Delete(dimension.Id);
+
+                            dimension = _dimensionCreator.Create(
+                                Line.CreateBound(textEdgeLeftBottom, textEdgeRightBottom),
+                                dimensionRefs,
+                                _selectedDimensionType);
+                            dimension.TextPosition = (textEdgeLeftBottom + textEdgeRightBottom) / 2 + (textPosition - center);
+                            Paint(mapService, textEdgeLeftBottom, textEdgeRightBottom, textEdgeLeftTop, textEdgeRightTop);
+                        }
+                        break;
+                    }
+
+
+                    upCoef = i % 2 == 1 ? i : -i;
+
+                    textEdgeLeftBottom += vectorUp * upStep * upCoef;
+                    textEdgeRightBottom += vectorUp * upStep * upCoef;
+                    textEdgeLeftTop += vectorUp * upStep * upCoef;
+                    textEdgeRightTop += vectorUp * upStep * upCoef;
+
+                    rightCoef = 2;
+                }
             }
+
+
+
+
+
 
 
             var imagePreparer = new ImagePreparer(_revitRepository);
@@ -262,6 +335,16 @@ internal class MainViewModel : BaseViewModel {
         return dimension;
     }
 
+    private int GetMinDimensionInView() {
+        int scale = _revitRepository.Document.ActiveView.Scale;
+        // При масштабе 1:100 корректно смотрится на виде размер до 2 футов
+        int minDimension = 2;
+        // Ищем минимальное значение размера, которое будет корректно видимо на виде с учетом масштаба
+        //      100       scale         minDimension * scale
+        // ------------ = -----  => x = --------------------
+        // minDimension     x                   100
+        return minDimension * scale / 100;
+    }
 
     private bool Check(
         MapService mapService, XYZ textEdgeLeftBottomTemp, XYZ textEdgeRightBottomTemp,
