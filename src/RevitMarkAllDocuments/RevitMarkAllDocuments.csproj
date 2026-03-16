@@ -22,10 +22,6 @@
 	</ItemGroup>
 
 	<ItemGroup>
-	  <Folder Include="Views\Styles\" />
-	</ItemGroup>
-
-	<ItemGroup>
 	  <Compile Update="Views\Pages\SortPage.xaml.cs">
 	    <SubType>Code</SubType>
 	  </Compile>
