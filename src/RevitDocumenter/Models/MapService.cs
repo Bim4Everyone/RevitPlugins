@@ -112,6 +112,18 @@ internal class MapService {
         return _map[stepsForY, stepsForX].AllPixelsWhite;
     }
 
+    public void PaintSquare(XYZ point) {
+
+        XYZ difVector = point - _startPoint;
+        double x = difVector.X;
+        double y = difVector.Y;
+
+        int stepsForX = (int) Math.Floor(x / _revitStep);
+        int stepsForY = (int) Math.Floor(y / _revitStep);
+
+        _map[stepsForY, stepsForX].AllPixelsWhite = false;
+    }
+
 
 
 

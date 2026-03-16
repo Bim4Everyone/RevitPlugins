@@ -16,6 +16,7 @@ using RevitDocumenter.Models.Comparision;
 using RevitDocumenter.Models.DimensionLine;
 
 using Grid = Autodesk.Revit.DB.Grid;
+using Line = Autodesk.Revit.DB.Line;
 
 namespace RevitDocumenter.ViewModels;
 
@@ -151,16 +152,15 @@ internal class MainViewModel : BaseViewModel {
             ReferenceNamesVM.GetHorizReferenceNames())) {
 
             // Создание вертикального размера (относительно локальных осей зоны армирования)
-            CreateDimension(Grids, rebar, map, viewMinFixed, mappingStepInMm, mapService);
+            CreateDimension(Grids, rebar, mapService);
             // Создание горизонтального размера (относительно локальных осей зоны армирования)
-            //CreateDimension(Grids, rebar, map, viewMinFixed, mappingStepInMm, mapService, false);
+            CreateDimension(Grids, rebar, mapService, false);
         }
         mainTransaction.Commit();
     }
 
     private Dimension CreateDimension(
-        List<Grid> grids, RebarElement rebar, SquareInfo[,] map,
-        XYZ startPoint, double mmInSquare, MapService mapService, bool isForVertical = true) {
+        List<Grid> grids, RebarElement rebar, MapService mapService, bool isForVertical = true) {
         try {
             _guard.ThrowIfNull(grids, rebar);
         } catch(Exception) {
@@ -213,40 +213,35 @@ internal class MainViewModel : BaseViewModel {
             var textEdgeRightTop = textEdgeRightBottom + (textPosition - center).Normalize() * dimTextHeight;
 
 
-            //(int stepsForY1, int stepsForX1) = GetSquareInfo(map, textEdgeLeftBottom, startPoint, (int) mmInSquare);
-            //(int stepsForY2, int stepsForX2) = GetSquareInfo(map, textEdgeRightBottom, startPoint, (int) mmInSquare);
-            //(int stepsForY3, int stepsForX3) = GetSquareInfo(map, textEdgeLeftTop, startPoint, (int) mmInSquare);
-            //(int stepsForY4, int stepsForX4) = GetSquareInfo(map, textEdgeRightTop, startPoint, (int) mmInSquare);
+            XYZ vectorUp = (textPosition - center).Normalize();
+            double step = mapService.RevitStep;
 
+            int coef = 0;
+            int maxStepsForSearch = 10;
+            bool needRecreateDimension = false;
+            for(int i = 1; i <= maxStepsForSearch; i++) {
+                if(Check(mapService, textEdgeLeftBottom, textEdgeRightBottom, textEdgeLeftTop, textEdgeRightTop)) {
+                    if(needRecreateDimension) {
+                        _revitRepository.Document.Delete(dimension.Id);
 
-            //List<List<int>> list = [
-            //    [stepsForY1, stepsForX1],
-            //    [stepsForY2, stepsForX2],
-            //    [stepsForY3, stepsForX3],
-            //    [stepsForY4, stepsForX4],
-            //];
-
-            //mapService.MarkWhiteSquaresOnImage(list);
-
-            int c = 0;
-
-            while(
-                !mapService.IsWhiteSquare(textEdgeLeftBottom)
-                || !mapService.IsWhiteSquare(textEdgeRightBottom)
-                || !mapService.IsWhiteSquare(textEdgeLeftTop)
-                || !mapService.IsWhiteSquare(textEdgeRightTop)) {
-
-                textEdgeLeftBottom += (textPosition - center).Normalize() * mapService.RevitStep;
-                textEdgeRightBottom += (textPosition - center).Normalize() * mapService.RevitStep;
-                textEdgeLeftTop += (textPosition - center).Normalize() * mapService.RevitStep;
-                textEdgeRightTop += (textPosition - center).Normalize() * mapService.RevitStep;
-
-                c++;
-                if(c > 5) {
+                        dimension = _dimensionCreator.Create(
+                            Line.CreateBound(textEdgeLeftBottom, textEdgeRightBottom),
+                            dimensionRefs,
+                            _selectedDimensionType);
+                        Paint(mapService, textEdgeLeftBottom, textEdgeRightBottom, textEdgeLeftTop, textEdgeRightTop);
+                    }
                     break;
                 }
-            }
 
+                coef = i % 2 == 1 ? i : -i;
+
+                textEdgeLeftBottom += vectorUp * step * coef;
+                textEdgeRightBottom += vectorUp * step * coef;
+                textEdgeLeftTop += vectorUp * step * coef;
+                textEdgeRightTop += vectorUp * step * coef;
+
+                needRecreateDimension = true;
+            }
 
 
             var imagePreparer = new ImagePreparer(_revitRepository);
@@ -264,14 +259,28 @@ internal class MainViewModel : BaseViewModel {
         }
 
 
-
         return dimension;
     }
 
 
+    private bool Check(
+        MapService mapService, XYZ textEdgeLeftBottomTemp, XYZ textEdgeRightBottomTemp,
+        XYZ textEdgeLeftTopTemp, XYZ textEdgeRightTopTemp) {
+        return
+            mapService.IsWhiteSquare(textEdgeLeftBottomTemp)
+            && mapService.IsWhiteSquare(textEdgeRightBottomTemp)
+            && mapService.IsWhiteSquare(textEdgeLeftTopTemp)
+            && mapService.IsWhiteSquare(textEdgeRightTopTemp);
+    }
 
-
-
+    private void Paint(
+        MapService mapService, XYZ textEdgeLeftBottomTemp, XYZ textEdgeRightBottomTemp,
+        XYZ textEdgeLeftTopTemp, XYZ textEdgeRightTopTemp) {
+        mapService.PaintSquare(textEdgeLeftBottomTemp);
+        mapService.PaintSquare(textEdgeRightBottomTemp);
+        mapService.PaintSquare(textEdgeLeftTopTemp);
+        mapService.PaintSquare(textEdgeRightTopTemp);
+    }
 
 
 
