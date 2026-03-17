@@ -11,26 +11,33 @@ internal class ViewPreparer {
         _revitRepository = revitRepository;
     }
 
-    public void Prepare(ExportOption exportOption) {
+    public ExportOption Prepare(ViewPreparerOption viewPreparerOption) {
         var view = _revitRepository.Document.ActiveView;
         // Получаем точки рамки подрезки вида, смещенные немного внутрь, чтобы расстояние 
         // между ними было кратно указанному шагу
-        (var viewMinFixed, var viewMaxFixed) = GetFixedCropBoxPoints(view, exportOption.MappingStepInMm);
-
-        exportOption.StartPointInRevit = viewMinFixed;
-        exportOption.EndPointInRevit = viewMaxFixed;
+        (var viewMinFixed, var viewMaxFixed) = GetFixedCropBoxPoints(view, viewPreparerOption.MappingStepInMm);
 
         // Количество квадратов в среде Revit
-        int stepCountX = (int) Math.Round((viewMaxFixed.X - viewMinFixed.X) / exportOption.MappingStepInFeet);
-        int stepCountY = (int) Math.Round((viewMaxFixed.Y - viewMinFixed.Y) / exportOption.MappingStepInFeet);
-
-        exportOption.StepCountX = stepCountX;
-        exportOption.StepCountY = stepCountY;
+        int stepCountX = (int) Math.Round((viewMaxFixed.X - viewMinFixed.X) / viewPreparerOption.MappingStepInFeet);
+        int stepCountY = (int) Math.Round((viewMaxFixed.Y - viewMinFixed.Y) / viewPreparerOption.MappingStepInFeet);
 
         // Создаем якорные линии в пространстве Revit, которые будут использованы для сопоставления 
         // пространства Revit и изображения
-        exportOption.AnchorLineIds =
-            CreateAnchorLines(viewMinFixed, viewMaxFixed, exportOption.WeightForAnchorLines, exportOption.ColorForAnchorLines);
+        var anchorLineIds = CreateAnchorLines(
+            viewMinFixed,
+            viewMaxFixed,
+            viewPreparerOption.WeightForAnchorLines,
+            viewPreparerOption.ColorForAnchorLines);
+
+        return new ExportOption {
+            MappingStepInFeet = viewPreparerOption.MappingStepInFeet,
+            ColorForAnchorLines = viewPreparerOption.ColorForAnchorLines,
+            StartPointInRevit = viewMinFixed,
+            EndPointInRevit = viewMaxFixed,
+            StepCountX = stepCountX,
+            StepCountY = stepCountY,
+            AnchorLineIds = anchorLineIds
+        };
     }
 
     private (XYZ, XYZ) GetFixedCropBoxPoints(View view, double mappingStepInMm) {

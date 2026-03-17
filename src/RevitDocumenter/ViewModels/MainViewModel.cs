@@ -137,7 +137,7 @@ internal class MainViewModel : BaseViewModel {
             _localizationService.GetLocalizedString("MainWindow.Title"));
         mainTransaction.Start();
 
-        var exportOption = new ExportOption() {
+        var viewPreparerOption = new ViewPreparerOption() {
             MappingStepInMm = _mappingStepInMm,
             MappingStepInFeet = UnitUtilsHelper.ConvertToInternalValue(_mappingStepInMm),
             ColorForAnchorLines = new(255, 0, 255),
@@ -145,12 +145,12 @@ internal class MainViewModel : BaseViewModel {
         };
 
         var viewPreparer = new ViewPreparer(_revitRepository);
-        viewPreparer.Prepare(exportOption);
+        var exportOption = viewPreparer.Prepare(viewPreparerOption);
 
         var imageExporter = new ImageExporter(_revitRepository.Document);
-        string path = imageExporter.Export(exportOption);
+        string imagePath = imageExporter.Export(exportOption);
 
-        _mapService.CreateMap(path, exportOption);
+        _mapService.CreateMap(imagePath, exportOption);
 
 
         foreach(var rebar in _revitRepository.GetRebarElements(

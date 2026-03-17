@@ -1,7 +1,10 @@
 using System;
 using System.Drawing;
+using System.IO;
 
 using Autodesk.Revit.DB;
+
+using Color = Autodesk.Revit.DB.Color;
 
 namespace RevitDocumenter.Models;
 internal class ImageExporter {
@@ -24,7 +27,7 @@ internal class ImageExporter {
         string imagePath = PrintViewByPixelSize(_doc.ActiveView, pixelsX);
 
         // Подрезаем изображение по якорям и сохраняем
-        string croppedImagePath = CropImageByPinkPixels(imagePath);
+        string croppedImagePath = CropImageByColorPixels(imagePath, exportOption.ColorForAnchorLines);
 
         // Масштабируем изображение под нужный размер в пикселях, чтобы шаги соответствовали Revit
         return ScaledImageByPixels(croppedImagePath, pixelsX, pixelsY);
@@ -52,31 +55,46 @@ internal class ImageExporter {
         }
     }
 
-
-    public string CropImageByPinkPixels(string imagePath) {
+    public string CropImageByColorPixels(string imagePath, Color colorForFind) {
         // Загружаем изображение
         using var image = new Bitmap(imagePath);
-        // Находим координаты розовых пикселей
-        (int startX, int startY) = FindBottomLeftPinkPixel(image);
-        (int endX, int endY) = FindTopRightPinkPixel(image);
+
+        // Находим координаты пикселей
+        (int startX, int startY) = FindBottomLeftColorPixel(image, colorForFind);
+        (int endX, int endY) = FindTopRightColorPixel(image, colorForFind);
 
         // Вычисляем размеры новой области
         int newWidth = endX - startX + 1;
         int newHeight = startY - endY + 1;
 
         var cropRect = new System.Drawing.Rectangle(startX, endY, newWidth, newHeight);
-        Bitmap croppedImage = image.Clone(cropRect, image.PixelFormat);
 
-        croppedImage.Save(imagePath.Replace(".png", "1.png"), System.Drawing.Imaging.ImageFormat.Png);
-        return imagePath.Replace(".png", "1.png");
+        // Создаем обрезанное изображение
+        using Bitmap croppedImage = image.Clone(cropRect, image.PixelFormat);
+
+        // Сохраняем в MemoryStream
+        byte[] imageBytes;
+        using(var ms = new MemoryStream()) {
+            croppedImage.Save(ms, System.Drawing.Imaging.ImageFormat.Png);
+            imageBytes = ms.ToArray();
+        }
+
+        // Освобождаем ресурсы перед перезаписью
+        image.Dispose();
+        croppedImage.Dispose();
+
+        // Перезаписываем оригинальный файл
+        File.WriteAllBytes(imagePath, imageBytes);
+
+        return imagePath;
     }
 
-    private (int, int) FindBottomLeftPinkPixel(Bitmap image) {
+    private (int, int) FindBottomLeftColorPixel(Bitmap image, Color colorForFind) {
         // Ищем снизу вверх, слева направо
         for(int y = image.Height - 1; y >= 0; y--) {
             for(int x = 0; x < image.Width; x++) {
                 var color = image.GetPixel(x, y);
-                if(IsPink(color)) {
+                if(IsColor(color, colorForFind)) {
                     return (x, y);
                 }
             }
@@ -84,12 +102,12 @@ internal class ImageExporter {
         throw new InvalidOperationException("Pink pixel not found!");
     }
 
-    private (int, int) FindTopRightPinkPixel(Bitmap image) {
+    private (int, int) FindTopRightColorPixel(Bitmap image, Color colorForFind) {
         // Ищем сверху вниз, справа налево
         for(int y = 0; y < image.Height; y++) {
             for(int x = image.Width - 1; x >= 0; x--) {
                 var pixel = image.GetPixel(x, y);
-                if(IsPink(pixel)) {
+                if(IsColor(pixel, colorForFind)) {
                     return (x, y);
                 }
             }
@@ -97,23 +115,35 @@ internal class ImageExporter {
         throw new InvalidOperationException("Pink pixel not found!");
     }
 
-    private bool IsPink(System.Drawing.Color color) {
-        return color.R == 255 && color.G == 0 && color.B == 255;
+    private bool IsColor(System.Drawing.Color color, Color colorForComparison) {
+        return
+            color.R == colorForComparison.Red
+            && color.G == colorForComparison.Green
+            && color.B == colorForComparison.Blue;
     }
 
 
     public string ScaledImageByPixels(string imagePath, int targetWidth, int targetHeight) {
         using(var image = new Bitmap(imagePath)) {
-            using(Bitmap resizedImage = new Bitmap(targetWidth, targetHeight)) {
-                using(Graphics graphics = Graphics.FromImage(resizedImage)) {
+            using(var resizedImage = new Bitmap(targetWidth, targetHeight)) {
+                using(var graphics = Graphics.FromImage(resizedImage)) {
                     graphics.InterpolationMode = System.Drawing.Drawing2D.InterpolationMode.HighQualityBicubic;
                     graphics.DrawImage(image, 0, 0, targetWidth, targetHeight);
                 }
 
-                // Сохранение результата
-                resizedImage.Save(imagePath.Replace(".png", $"2.png"), System.Drawing.Imaging.ImageFormat.Png);
+                // Сохраняем в MemoryStream
+                using(var ms = new MemoryStream()) {
+                    resizedImage.Save(ms, System.Drawing.Imaging.ImageFormat.Png);
+
+                    // Освобождаем ресурсы перед перезаписью
+                    resizedImage.Dispose();
+                    image.Dispose();
+
+                    // Перезаписываем файл
+                    File.WriteAllBytes(imagePath, ms.ToArray());
+                }
             }
         }
-        return imagePath.Replace(".png", $"2.png");
+        return imagePath;
     }
 }
