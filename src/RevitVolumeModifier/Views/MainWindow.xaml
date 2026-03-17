@@ -118,7 +118,7 @@
 
                 <edits:CustomGroupEditControl
                     Icon="{ui:SymbolIcon shapeUnion24}"
-                    Header="{me:LocalizationSource MainWindow.JoinPanel}"
+                    Header="{me:LocalizationSource MainWindow.JoinPanel}"                    
                     Description="{me:LocalizationSource MainWindow.JoinPanelDescription}">
 
                     <ui:Button
@@ -218,6 +218,7 @@
         </ScrollViewer>
 
         <ui:TextBlock
+            Grid.Row="2"
             Margin="10"
             Foreground="Orange"
             VerticalAlignment="Center"

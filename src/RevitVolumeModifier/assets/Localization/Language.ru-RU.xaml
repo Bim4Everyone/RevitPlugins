@@ -45,6 +45,14 @@
     <system:String x:Key="MainViewModel.FailedCommand">Операция выполнена с ошибками</system:String>
     <system:String x:Key="MainViewModel.SuccessCommand">Операция выполнена успешно</system:String>
 
+    <system:String x:Key="MainViewModel.NoSelection">Не выделены элементы</system:String>
+    <system:String x:Key="MainViewModel.PickPointOnElementPromt">Выберите точку на объемном элементе</system:String>
+    <system:String x:Key="MainViewModel.PickPointFirst">Выберите первую точку на объемном элементе</system:String>
+    <system:String x:Key="MainViewModel.PickPointSecond">Выберите вторую точку на объемном элементе</system:String>
+    <system:String x:Key="MainViewModel.PickPointThird">Выберите третью точку на объемном элементе</system:String>
+    <system:String x:Key="MainViewModel.PickFacesPromt">Выберите плоскости (грани) и нажмите "Готово"</system:String>
+    <system:String x:Key="MainViewModel.CutPromt">Выберите элементы, которые нужно вырезать и нажмите "Готово"</system:String>
+
     <system:String x:Key="RevitRepository.NoParamValue">Нет значения</system:String>
     
     

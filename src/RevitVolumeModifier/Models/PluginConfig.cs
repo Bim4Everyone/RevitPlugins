@@ -1,5 +1,7 @@
 using System.Collections.Generic;
 
+using Autodesk.Revit.DB;
+
 using dosymep.Bim4Everyone;
 using dosymep.Bim4Everyone.ProjectConfigs;
 using dosymep.Bim4Everyone.SharedParams;
@@ -43,6 +45,9 @@ internal class SystemPluginConfig {
         _localizationService = localizationService;
         _paramAvailabilityService = paramAvailabilityService;
     }
+
+    // Категория моделей, с которыми работает плагин
+    public BuiltInCategory ModelCategory => BuiltInCategory.OST_GenericModel;
 
     /// <summary>
     /// Метод получения списка всех параметров

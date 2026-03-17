@@ -15,6 +15,7 @@ using dosymep.WPF.ViewModels;
 using RevitVolumeModifier.Enums;
 using RevitVolumeModifier.Interfaces;
 using RevitVolumeModifier.Models;
+using RevitVolumeModifier.Services;
 
 namespace RevitVolumeModifier.ViewModels;
 
@@ -23,6 +24,7 @@ internal class MainViewModel : BaseViewModel {
     private readonly IParamAvailabilityService _paramAvailabilityService;
     private readonly IRevitParamFactory _revitParamFactory;
     private readonly RevitRepository _revitRepository;
+    private readonly RevitPickService _revitPickService;
     private readonly SystemPluginConfig _systemPluginConfig;
     private readonly PluginConfig _pluginConfig;
 
@@ -40,6 +42,7 @@ internal class MainViewModel : BaseViewModel {
         IParamAvailabilityService paramAvailabilityService,
         IRevitParamFactory revitParamFactory,
         RevitRepository revitRepository,
+        RevitPickService revitPickService,
         SystemPluginConfig systemPluginConfig,
         PluginConfig pluginConfig) {
 
@@ -47,18 +50,18 @@ internal class MainViewModel : BaseViewModel {
         _paramAvailabilityService = paramAvailabilityService;
         _revitParamFactory = revitParamFactory;
         _revitRepository = revitRepository;
+        _revitPickService = revitPickService;
         _systemPluginConfig = systemPluginConfig;
         _pluginConfig = pluginConfig;
 
         LoadViewCommand = RelayCommand.Create(LoadView);
         SaveConfigCommand = RelayCommand.Create(SaveConfig);
-        JoinCommand = RelayCommand.Create(Join);
-        DivideBySelectHorizontalPointCommand = RelayCommand.Create(DivideBySelectHorizontalPoint);
-        DivideBySelectVerticalPointCommand = RelayCommand.Create(DivideBySelectVerticalPoint);
-        DivideBySelectThreePointCommand = RelayCommand.Create(DivideBySelectThreePointPoint);
-        DivideBySelectFacesCommand = RelayCommand.Create(DivideBySelectFacesPoint);
-        CutCommand = RelayCommand.Create(Cut);
-
+        JoinCommand = RelayCommand.Create(Join, CanExecute);
+        DivideBySelectHorizontalPointCommand = RelayCommand.Create(DivideBySelectHorizontalPoint, CanExecute);
+        DivideBySelectVerticalPointCommand = RelayCommand.Create(DivideBySelectVerticalPoint, CanExecute);
+        DivideBySelectThreePointCommand = RelayCommand.Create(DivideBySelectThreePoint, CanExecute);
+        DivideBySelectFacesCommand = RelayCommand.Create(DivideBySelectFacesPoint, CanExecute);
+        CutCommand = RelayCommand.Create(Cut, CanExecute);
     }
 
     public ICommand LoadViewCommand { get; }
@@ -132,55 +135,104 @@ internal class MainViewModel : BaseViewModel {
             });
     }
 
-    private void Join() {
+    // Метод объединения объемов
+    private async void Join() {
         ResetCommandState();
-        UpdateCommandState(
-            CommandStatus.Success,
-            CommandType.Join,
-            _localizationService.GetLocalizedString("MainViewModel.SuccessCommand"));
-
+        var commandType = CommandType.Join;
+        bool result = await _revitRepository.Join(ElementIds);
+        UpdateCommandState(result, commandType);
     }
 
-
-    private void DivideBySelectHorizontalPoint() {
+    // Метод разделения объемов по горизонтальной точке
+    private async void DivideBySelectHorizontalPoint() {
         ResetCommandState();
-        UpdateCommandState(
-            CommandStatus.Failed,
-            CommandType.DivideByHorPoint,
-            _localizationService.GetLocalizedString("MainViewModel.FailedCommand"));
+        var commandType = CommandType.DivideByHorPoint;
+        string promt = _localizationService.GetLocalizedString("MainViewModel.PickPointOnElementPromt");
+        var point = await _revitPickService.PickPointOnElementAsync(promt);
+        if(point == null) {
+            UpdateCommandStateFailed(commandType);
+            return;
+        }
+        bool result = await _revitRepository.DivideByHorizontalPointAsync(ElementIds, point);
+        UpdateCommandState(result, commandType);
     }
 
-    private void DivideBySelectVerticalPoint() {
+    // Метод разделения объемов по вертикальной точке
+    private async void DivideBySelectVerticalPoint() {
         ResetCommandState();
-        UpdateCommandState(
-            CommandStatus.Failed,
-            CommandType.DivideByVertPoint,
-            _localizationService.GetLocalizedString("MainViewModel.FailedCommand"));
+        var commandType = CommandType.DivideByVertPoint;
+        string promt = _localizationService.GetLocalizedString("MainViewModel.PickPointOnElementPromt");
+        var point = await _revitPickService.PickPointOnElementAsync(promt);
+        if(point == null) {
+            UpdateCommandStateFailed(commandType);
+            return;
+        }
+        bool result = await _revitRepository.DivideByVerticalPointAsync(ElementIds, point);
+        UpdateCommandState(result, commandType);
     }
 
-    private void DivideBySelectThreePointPoint() {
+    // Метод разделения объемов по трем точкам
+    private async void DivideBySelectThreePoint() {
         ResetCommandState();
-        UpdateCommandState(
-            CommandStatus.Success,
-            CommandType.DivideByThreePoint,
-            _localizationService.GetLocalizedString("MainViewModel.SuccessCommand"));
+        var commandType = CommandType.DivideByThreePoint;
+        string[] promts = [
+            _localizationService.GetLocalizedString("MainViewModel.PickPointFirst"),
+            _localizationService.GetLocalizedString("MainViewModel.PickPointSecond"),
+            _localizationService.GetLocalizedString("MainViewModel.PickPointThird")];
+        var points = await _revitPickService.PickThreePointsOnElementAsync(promts);
+        if(points == null || points.Count < 3) {
+            UpdateCommandStateFailed(commandType);
+            return;
+        }
+        bool result = await _revitRepository.DivideByThreePointsAsync(ElementIds, points[0], points[1], points[2]);
+        UpdateCommandState(result, commandType);
     }
 
-    private void DivideBySelectFacesPoint() {
+    // Метод разделения объемов по граням
+    private async void DivideBySelectFacesPoint() {
         ResetCommandState();
-        UpdateCommandState(
-            CommandStatus.Success,
-            CommandType.DivideByFaces,
-            _localizationService.GetLocalizedString("MainViewModel.SuccessCommand"));
+        var commandType = CommandType.DivideByFaces;
+        string promt = _localizationService.GetLocalizedString("MainViewModel.PickFacesPromt");
+        var fases = await _revitPickService.PickFacesMultipleOnElementAsync(promt);
+        if(fases == null) {
+            UpdateCommandStateFailed(commandType);
+            return;
+        }
+        bool result = await _revitRepository.DivideByFacesAsync(ElementIds, fases);
+        UpdateCommandState(result, commandType);
     }
 
-    private void Cut() {
+    // Метод вырезания объемов
+    private async void Cut() {
         ResetCommandState();
-        UpdateCommandState(
-            CommandStatus.Failed,
-            CommandType.Cut,
-            _localizationService.GetLocalizedString("MainViewModel.FailedCommand"));
+        var commandType = CommandType.Cut;
+        string promt = _localizationService.GetLocalizedString("MainViewModel.CutPromt");
+        var elements = await _revitPickService.PickGenericModelsAsync(promt);
+        if(elements == null) {
+            UpdateCommandStateFailed(commandType);
+            return;
+        }
+        bool result = await _revitRepository.CutAsync(ElementIds, elements, IsSaveCutVolume);
+        UpdateCommandState(result, commandType);
     }
+
+    // Метод проверки выполнения всех методов
+    private bool CanExecute() {
+        if(ElementIds == null || ElementIds.Count == 0) {
+            ErrorText = _localizationService.GetLocalizedString("MainViewModel.NoSelection");
+            return false;
+        }
+        ErrorText = null;
+        return true;
+    }
+
+    // Метод подписанный на события изменения выделения
+    public void OnSelectionChanged(ICollection<ElementId> selection) {
+        ElementIds = selection;
+        ResetCommandState();
+        CommandManager.InvalidateRequerySuggested();
+    }
+
 
     // Метод загрузки вида
     private void LoadView() {
@@ -192,23 +244,38 @@ internal class MainViewModel : BaseViewModel {
         }
         UpdateParamWarnings();
 
-        CommandState = new CommandStateViewModel() {
-            CommandStatus = CommandStatus.None,
-            CommandType = CommandType.None,
-            CommandText = string.Empty
-        };
+        CommandState = new CommandStateViewModel();
+        ResetCommandState();
     }
 
+    // Метод обновления CommandState в зависимости от результата
+    private void UpdateCommandState(bool result, CommandType commandType) {
+        if(result) {
+            UpdateCommandStateSuccess(commandType);
+        } else {
+            UpdateCommandStateFailed(commandType);
+        }
+    }
+
+    // Метод сброса CommandState
     private void ResetCommandState() {
         CommandState.CommandStatus = CommandStatus.None;
         CommandState.CommandType = CommandType.None;
         CommandState.CommandText = string.Empty;
     }
 
-    private void UpdateCommandState(CommandStatus commandStatus, CommandType commandType, string commandText) {
-        CommandState.CommandStatus = commandStatus;
+    // Метод обновления CommandState при положительном результате
+    private void UpdateCommandStateSuccess(CommandType commandType) {
+        CommandState.CommandStatus = CommandStatus.Success;
         CommandState.CommandType = commandType;
-        CommandState.CommandText = commandText;
+        CommandState.CommandText = _localizationService.GetLocalizedString("MainViewModel.SuccessCommand");
+    }
+
+    // Метод обновления CommandState при отрицательном результате
+    private void UpdateCommandStateFailed(CommandType commandType) {
+        CommandState.CommandStatus = CommandStatus.Failed;
+        CommandState.CommandType = commandType;
+        CommandState.CommandText = _localizationService.GetLocalizedString("MainViewModel.FailedCommand");
     }
 
     // Метод загрузки конфигурации

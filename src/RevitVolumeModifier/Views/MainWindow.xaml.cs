@@ -6,13 +6,21 @@ using System.Windows.Media.Animation;
 
 using dosymep.SimpleServices;
 
+using Ninject;
+
 using RevitVolumeModifier.Enums;
+using RevitVolumeModifier.Models;
 using RevitVolumeModifier.ViewModels;
 
 namespace RevitVolumeModifier.Views;
 
-public partial class MainWindow {
+public partial class MainWindow : IDisposable {
+    private readonly IKernel _kernel;
+    private readonly SelectionMonitor _selectionMonitor;
+    private CommandStateViewModel _currentCommandState;
     public MainWindow(
+        IKernel kernel,
+        SelectionMonitor selectionMonitor,
         ILoggerService loggerService,
         ISerializationService serializationService,
         ILanguageService languageService, ILocalizationService localizationService,
@@ -22,11 +30,17 @@ public partial class MainWindow {
             languageService, localizationService,
             uiThemeService, themeUpdaterService) {
         InitializeComponent();
+        _kernel = kernel ?? throw new ArgumentNullException(nameof(kernel));
+        _selectionMonitor = selectionMonitor ?? throw new ArgumentNullException(nameof(selectionMonitor));
     }
 
     public override string PluginName => nameof(RevitVolumeModifier);
 
     public override string ProjectConfigName => nameof(MainWindow);
+
+    public void Dispose() {
+        _kernel?.Dispose();
+    }
 
     protected override void OnContentRendered(EventArgs e) {
         base.OnContentRendered(e);
@@ -46,11 +60,17 @@ public partial class MainWindow {
             return;
         }
 
-        // Если CommandState сменился полностью, подписываемся на новый объект
         if(e.PropertyName == nameof(MainViewModel.CommandState)) {
-            if(vm.CommandState != null) {
-                vm.CommandState.PropertyChanged += OnCommandStatePropertyChanged;
-                AnimateBorder(vm.CommandState.CommandType, vm.CommandState.CommandStatus);
+
+            if(_currentCommandState != null) {
+                _currentCommandState.PropertyChanged -= OnCommandStatePropertyChanged;
+            }
+
+            _currentCommandState = vm.CommandState;
+
+            if(_currentCommandState != null) {
+                _currentCommandState.PropertyChanged += OnCommandStatePropertyChanged;
+                AnimateBorder(_currentCommandState.CommandType, _currentCommandState.CommandStatus);
             }
         }
     }
@@ -106,8 +126,13 @@ public partial class MainWindow {
             Duration = TimeSpan.FromMilliseconds(time),
             AutoReverse = true,
             RepeatBehavior = new RepeatBehavior(repeat),
-            EasingFunction = new CubicEase { EasingMode = EasingMode.EaseOut }
+            EasingFunction = new CubicEase { EasingMode = EasingMode.EaseIn }
         };
         brush.BeginAnimation(SolidColorBrush.ColorProperty, blinkAnimation);
+    }
+
+    private void MainWindow_OnClosed(object sender, EventArgs e) {
+        _selectionMonitor.Dispose();
+        Dispose();
     }
 }

@@ -12,6 +12,7 @@ using dosymep.WpfUI.Core.Ninject;
 
 using Ninject;
 
+using RevitVolumeModifier.Handler;
 using RevitVolumeModifier.Interfaces;
 using RevitVolumeModifier.Models;
 using RevitVolumeModifier.Services;
@@ -24,16 +25,28 @@ namespace RevitVolumeModifier;
 public class RevitVolumeModifierCommand : BasePluginCommand {
 
     public RevitVolumeModifierCommand() {
-        PluginName = "Объединить объемные элементы";
+        PluginName = "Модифицировать объемные элементы";
     }
 
     protected override void Execute(UIApplication uiApplication) {
         // Создание контейнера зависимостей плагина с сервисами из платформы
         using var kernel = uiApplication.CreatePlatformServices();
 
+        kernel.Bind<ExternalRevitHandler>()
+            .ToSelf()
+            .InSingletonScope();
+
+        kernel.Bind<SelectionMonitor>()
+            .ToMethod(c => new SelectionMonitor(uiApplication))
+            .InSingletonScope();
+
         // Настройка доступа к Revit
         kernel.Bind<RevitRepository>()
             .ToSelf()
+            .InSingletonScope();
+
+        kernel.Bind<RevitPickService>()
+            .ToMethod(c => new RevitPickService(c.Kernel.Get<ExternalRevitHandler>(), c.Kernel.Get<MainWindow>()))
             .InSingletonScope();
 
         // Настройка доступа к сервису проверки параметров
@@ -51,7 +64,6 @@ public class RevitVolumeModifierCommand : BasePluginCommand {
         // Настройка запуска основного окна
         kernel.BindMainWindow<MainViewModel, MainWindow>();
 
-
         // Настройка локализации,
         // получение имени сборки откуда брать текст
         string assemblyName = Assembly.GetExecutingAssembly().GetName().Name;
@@ -63,6 +75,12 @@ public class RevitVolumeModifierCommand : BasePluginCommand {
             CultureInfo.GetCultureInfo("ru-RU"));
 
         var window = kernel.Get<MainWindow>();
+
+        var vm = kernel.Get<MainViewModel>();
+        var monitor = kernel.Get<SelectionMonitor>();
+
+        monitor.SelectionChanged += vm.OnSelectionChanged;
+
         window.Show();
     }
 }
