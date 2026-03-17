@@ -423,9 +423,11 @@ internal class MainViewModel : BaseViewModel {
 
         IIntersectProcessor processor = new IntersectCurveProcessor(_localizationService, _revitRepository, _setCoordParamsSettings);
 
+        int elementsCount = processor.RevitElements.Count;
+
         using var progressDialogService = ProgressDialogFactory.CreateDialog();
-        progressDialogService.MaxValue = processor.RevitElements.Count();
-        progressDialogService.StepValue = 20;
+        progressDialogService.MaxValue = elementsCount;
+        progressDialogService.StepValue = elementsCount < 400 ? 20 : elementsCount < 1000 ? 100 : 200;
         progressDialogService.DisplayTitleFormat = _localizationService.GetLocalizedString("MainViewModel.ProgressTitle");
         var progress = progressDialogService.CreateProgress();
 
