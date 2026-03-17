@@ -166,8 +166,7 @@ internal class MainViewModel : BaseViewModel {
         mainTransaction.Commit();
     }
 
-    private Dimension CreateDimension(
-        List<Grid> grids, RebarElement rebar, bool isForVertical = true) {
+    private Dimension CreateDimension(List<Grid> grids, RebarElement rebar, bool isForVertical = true) {
         try {
             _guard.ThrowIfNull(grids, rebar);
         } catch(Exception) {
@@ -317,19 +316,8 @@ internal class MainViewModel : BaseViewModel {
                     rightCoef = 2;
                 }
             }
-
-
-
-
-            CreateSphere(textEdgeLeftBottom);
-            CreateSphere(textEdgeRightBottom);
-            CreateSphere(textEdgeLeftTop);
-            CreateSphere(textEdgeRightTop);
-
-            CreateSphere(center);
-            CreateSphere(leftStroke);
-            CreateSphere(rightStroke);
-        } catch(Exception) {
+        } catch {
+            // ignored
         }
 
         return dimension;
