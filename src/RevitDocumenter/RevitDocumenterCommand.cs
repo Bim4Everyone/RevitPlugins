@@ -15,6 +15,7 @@ using Ninject;
 using RevitDocumenter.Models;
 using RevitDocumenter.Models.Comparision;
 using RevitDocumenter.Models.DimensionLine;
+using RevitDocumenter.Models.MapServices;
 using RevitDocumenter.ViewModels;
 using RevitDocumenter.Views;
 
@@ -62,6 +63,10 @@ public class RevitDocumenterCommand : BasePluginCommand {
 
         kernel.Bind<IDimensionLineService>()
             .To<DimensionLineByMapService>()
+            .InSingletonScope();
+
+        kernel.Bind<ViewMapService>()
+            .ToSelf()
             .InSingletonScope();
 
         kernel.Bind<DimensionCreator>()
