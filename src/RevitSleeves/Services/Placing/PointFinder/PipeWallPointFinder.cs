@@ -53,6 +53,11 @@ internal class PipeWallPointFinder : IPointFinder<ClashModel<Pipe, Wall>> {
             _errorsService.AddError([param.MepElement, param.StructureElement], "Exceptions.WallLocationIsNotLine");
             throw new CannotCreateSleeveException();
         }
+
+        if(param.StructureElement.WallType.Kind == WallKind.Curtain) {
+            _errorsService.AddError([param.MepElement, param.StructureElement], "Exceptions.WallIsCurtain");
+            throw new CannotCreateSleeveException();
+        }
         if(((Line) ((LocationCurve) param.MepElement.Location).Curve).Direction.IsAlmostEqualTo(wallLine.Direction)) {
             _errorsService.AddError([param.MepElement, param.StructureElement], "Exceptions.MepCurveIsParallelToWall");
             throw new CannotCreateSleeveException();

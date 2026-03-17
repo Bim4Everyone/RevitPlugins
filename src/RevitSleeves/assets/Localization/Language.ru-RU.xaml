@@ -248,6 +248,8 @@
     <system:String
         x:Key="Exceptions.WallLocationIsNotLine">Ось стены не является прямой</system:String>
     <system:String
+        x:Key="Exceptions.WallIsCurtain">Витражные стены не обрабатываются</system:String>
+    <system:String
         x:Key="Exceptions.MepCurveIsParallelToWall">Ось инженерного элемента параллельна стене</system:String>
     <system:String
         x:Key="Exceptions.CannotFindDiameterRange">Не удалось найти диаметр гильзы для трубы</system:String>
