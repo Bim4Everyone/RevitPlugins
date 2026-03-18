@@ -8,10 +8,12 @@ using Color = Autodesk.Revit.DB.Color;
 
 namespace RevitDocumenter.Models;
 internal class ImageService {
+    private readonly RevitRepository _revitRepository;
     private readonly Document _doc;
 
-    public ImageService(Document doc) {
-        _doc = doc;
+    public ImageService(RevitRepository revitRepository) {
+        _revitRepository = revitRepository;
+        _doc = revitRepository.Document;
     }
 
     public void Delete(string path) {

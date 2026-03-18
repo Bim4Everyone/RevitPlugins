@@ -5,12 +5,14 @@ using Autodesk.Revit.DB;
 namespace RevitDocumenter.Models;
 internal class ViewPreparer {
     private readonly RevitRepository _revitRepository;
+    private readonly AnchorLineService _anchorLineService;
 
-    public ViewPreparer(RevitRepository revitRepository) {
+    public ViewPreparer(RevitRepository revitRepository, AnchorLineService anchorLineService) {
         _revitRepository = revitRepository;
+        _anchorLineService = anchorLineService;
     }
 
-    public ExportOption Prepare(ViewPreparerOption viewPreparerOption, AnchorLineService anchorLinesManager) {
+    public ExportOption Prepare(ViewPreparerOption viewPreparerOption) {
         var view = _revitRepository.Document.ActiveView;
         // Получаем точки рамки подрезки вида, смещенные немного внутрь, чтобы расстояние 
         // между ними было кратно указанному шагу
@@ -22,7 +24,7 @@ internal class ViewPreparer {
 
         // Создаем якорные линии в пространстве Revit, которые будут использованы для сопоставления 
         // пространства Revit и изображения
-        var anchorLineIds = anchorLinesManager.CreateAnchorLines(
+        var anchorLineIds = _anchorLineService.CreateAnchorLines(
             viewMinFixed,
             viewMaxFixed,
             viewPreparerOption.WeightForAnchorLines,

@@ -22,8 +22,11 @@ internal class MainViewModel : BaseViewModel {
     private readonly PluginConfig _pluginConfig;
     private readonly RevitRepository _revitRepository;
     private readonly ILocalizationService _localizationService;
-    private readonly DimensionService _dimensionService;
     private readonly ViewMapService _mapService;
+    private readonly DimensionService _dimensionService;
+    private readonly ViewPreparer _viewPreparer;
+    private readonly ImageService _imageService;
+    private readonly PaintSquaresByMapService _paintSquaresByMapService;
 
     private string _errorText;
     private string _familyNamePart;
@@ -51,14 +54,19 @@ internal class MainViewModel : BaseViewModel {
         RevitRepository revitRepository,
         ILocalizationService localizationService,
         ViewMapService mapService,
-        DimensionService dimensionService) {
+        DimensionService dimensionService,
+        ViewPreparer viewPreparer,
+        ImageService imageService,
+        PaintSquaresByMapService paintSquaresByMapService) {
 
         _pluginConfig = pluginConfig;
         _revitRepository = revitRepository;
         _localizationService = localizationService;
-        _dimensionService = dimensionService;
         _mapService = mapService;
-
+        _dimensionService = dimensionService;
+        _viewPreparer = viewPreparer;
+        _imageService = imageService;
+        _paintSquaresByMapService = paintSquaresByMapService;
         ReferenceNamesVM = new ReferenceNamesViewModel();
 
         LoadViewCommand = RelayCommand.Create(LoadView);
@@ -137,19 +145,15 @@ internal class MainViewModel : BaseViewModel {
                 WeightForAnchorLines = 1,
             };
 
-            var viewPreparer = new ViewPreparer(_revitRepository);
-            var anchorLineService = new AnchorLineService(_revitRepository);
-            var exportOption = viewPreparer.Prepare(viewPreparerOption, anchorLineService);
-
-            var imageService = new ImageService(_revitRepository.Document);
-            string imagePath = imageService.Export(exportOption);
+            var exportOption = _viewPreparer.Prepare(viewPreparerOption);
+            string imagePath = _imageService.Export(exportOption);
 
             _mapService.CreateMap(imagePath, exportOption);
             if(_createMarkedImage) {
-                var painter = new PaintSquaresByMapService();
-                painter.MarkWhiteSquaresOnImage(imagePath, _mapService.Map, exportOption.StepCountX, exportOption.StepCountY);
+                _paintSquaresByMapService.MarkWhiteSquaresOnImage(
+                    imagePath, _mapService.Map, exportOption.StepCountX, exportOption.StepCountY);
             }
-            imageService.Delete(imagePath);
+            _imageService.Delete(imagePath);
         }
 
         var rebars = _revitRepository.GetRebarElements(
