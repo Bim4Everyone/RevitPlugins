@@ -44,6 +44,9 @@ namespace RevitMechanicalSpecification.Models.Fillers {
 
         protected Document Document => _document;
 
+        protected virtual void PrepareValue(SpecificationElement specificationElement) {
+        }
+
         public abstract void SetParamValue(SpecificationElement specificationElement);
 
         public void Fill(SpecificationElement specificationElement) {
@@ -64,6 +67,8 @@ namespace RevitMechanicalSpecification.Models.Fillers {
             }
 
             // Если целевой параметр ридонли - можно сразу идти дальше
+            PrepareValue(specificationElement);
+
             if(TargetParam.IsReadOnly) {
                 return;
             }
