@@ -15,6 +15,9 @@ internal class ViewMapService {
 
     public ViewMapService() { }
 
+    public SquareInfo[,] Map {
+        get => _map;
+    }
     public void CreateMap(string path, ExportOption exportOption) {
         _exportOption = exportOption;
         _map = AnalyzeImageSquares(path, exportOption.StepCountX, exportOption.StepCountY);

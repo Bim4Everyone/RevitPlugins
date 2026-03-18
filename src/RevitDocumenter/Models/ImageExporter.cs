@@ -16,8 +16,8 @@ internal class ImageExporter {
 
     public string Export(ExportOption exportOption) {
         // Стандартное значение ширины изображения в пикселях, подходящее для обработки
-        int standartX = 4096;
-        int pixelPerSquare = standartX / exportOption.StepCountX;
+        int standardX = 4096;
+        int pixelPerSquare = standardX / exportOption.StepCountX;
 
         // Получаем точные значения изображения для анализа в пикселях в соответствии с Revit
         int pixelsX = pixelPerSquare * exportOption.StepCountX;
@@ -33,8 +33,7 @@ internal class ImageExporter {
         return ScaledImageByPixels(croppedImagePath, pixelsX, pixelsY);
     }
 
-
-    public string PrintViewByPixelSize(View view, int pixelSize) {
+    private string PrintViewByPixelSize(View view, int pixelSize) {
         try {
             string desktopPath = Environment.GetFolderPath(Environment.SpecialFolder.Desktop) + "\\";
             var options = new ImageExportOptions {
@@ -55,7 +54,7 @@ internal class ImageExporter {
         }
     }
 
-    public string CropImageByColorPixels(string imagePath, Color colorForFind) {
+    private string CropImageByColorPixels(string imagePath, Color colorForFind) {
         // Загружаем изображение
         using var image = new Bitmap(imagePath);
 
@@ -122,8 +121,7 @@ internal class ImageExporter {
             && color.B == colorForComparison.Blue;
     }
 
-
-    public string ScaledImageByPixels(string imagePath, int targetWidth, int targetHeight) {
+    private string ScaledImageByPixels(string imagePath, int targetWidth, int targetHeight) {
         using(var image = new Bitmap(imagePath)) {
             using(var resizedImage = new Bitmap(targetWidth, targetHeight)) {
                 using(var graphics = Graphics.FromImage(resizedImage)) {

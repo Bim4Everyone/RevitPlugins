@@ -5,8 +5,6 @@ using System.Windows.Input;
 
 using Autodesk.Revit.DB;
 
-using dosymep.Bim4Everyone;
-using dosymep.Revit;
 using dosymep.SimpleServices;
 using dosymep.WPF.Commands;
 using dosymep.WPF.ViewModels;
@@ -16,9 +14,7 @@ using RevitDocumenter.Models.Comparision;
 using RevitDocumenter.Models.DimensionLine;
 using RevitDocumenter.Models.MapServices;
 
-using Frame = Autodesk.Revit.DB.Frame;
 using Grid = Autodesk.Revit.DB.Grid;
-using Line = Autodesk.Revit.DB.Line;
 
 namespace RevitDocumenter.ViewModels;
 
@@ -45,6 +41,8 @@ internal class MainViewModel : BaseViewModel {
     private readonly string _defSelectedDimensionTypeName = "я_Основной_Плагин_2.5 мм";
     private readonly List<string> _defVerticalRefNames = ["Габарит_Ширина_1", "Габарит_Ширина_2"];
     private readonly List<string> _defHorizontalRefNames = ["Габарит_Длина_1", "Габарит_Длина_2"];
+
+    private readonly bool _createMarkedImage = true;
 
     private readonly double _mappingStepInMm = 200.0;
 
@@ -151,7 +149,10 @@ internal class MainViewModel : BaseViewModel {
         string imagePath = imageExporter.Export(exportOption);
 
         _mapService.CreateMap(imagePath, exportOption);
-
+        if(_createMarkedImage) {
+            var painter = new PaintSquaresByMapService();
+            painter.MarkWhiteSquaresOnImage(imagePath, _mapService.Map, exportOption.StepCountX, exportOption.StepCountY);
+        }
 
         foreach(var rebar in _revitRepository.GetRebarElements(
             FamilyNamePart,
@@ -195,189 +196,11 @@ internal class MainViewModel : BaseViewModel {
         // Строим размер
         var dimension = _dimensionCreator.Create(dimensionLineY, dimensionRefs, _selectedDimensionType);
 
-
-        try {
-            var leaderEndPosition = dimension.LeaderEndPosition;
-            var textPosition = dimension.TextPosition;
-            var center = GetDimensionCenterPoint(dimension);
-            (var leftStroke, var rightStroke) = GetDimensionEdgePoints(dimension);
-
-            // Горизонтально размеру нужно сделать небольшой отступ от текста
-            double coefForHorizOffset = 0.1;
-            var textEdgeLeftBottom = leaderEndPosition + (leaderEndPosition - center).Normalize() * coefForHorizOffset;
-            var textEdgeRightBottom = textEdgeLeftBottom + (center - textEdgeLeftBottom) * 2;
-
-
-            int viewScale = _revitRepository.Document.ActiveView.Scale;
-            // Текст на самом деле немного отстоит от размерной линии, чтобы это скомпенсировать берем коэффициент
-            double someCoefficient = 2;
-            double dimTextHeight =
-                _selectedDimensionType.GetParamValue<double>(BuiltInParameter.TEXT_SIZE) * viewScale * someCoefficient;
-
-            var textEdgeLeftTop = textEdgeLeftBottom + (textPosition - center).Normalize() * dimTextHeight;
-            var textEdgeRightTop = textEdgeRightBottom + (textPosition - center).Normalize() * dimTextHeight;
-
-
-            XYZ vectorUp = (textPosition - center).Normalize();
-            XYZ vectorRight = (textEdgeRightBottom - textEdgeLeftBottom).Normalize();
-            double upStep = UnitUtilsHelper.ConvertToInternalValue(_mappingStepInMm);
-            double rightStep = textEdgeRightBottom.DistanceTo(textEdgeLeftBottom) * 1.5;
-
-
-            int minDimensionInView = _revitRepository.GetMinDimensionInView();
-            if(dimension.Value >= minDimensionInView) {
-                // Просто переносим выше или ниже
-                int coef = 0;
-                int maxStepsForSearch = 10;
-                bool needRecreateDimension = false;
-                for(int i = 1; i <= maxStepsForSearch; i++) {
-                    if(_mapService.Check(textEdgeLeftBottom, textEdgeRightBottom, textEdgeLeftTop, textEdgeRightTop)) {
-                        if(needRecreateDimension) {
-                            _revitRepository.Document.Delete(dimension.Id);
-
-                            dimension = _dimensionCreator.Create(
-                                Line.CreateBound(textEdgeLeftBottom, textEdgeRightBottom),
-                                dimensionRefs,
-                                _selectedDimensionType);
-                            _mapService.Paint(textEdgeLeftBottom, textEdgeRightBottom, textEdgeLeftTop, textEdgeRightTop);
-                        }
-                        break;
-                    }
-
-                    coef = i % 2 == 1 ? i : -i;
-
-                    textEdgeLeftBottom += vectorUp * upStep * coef;
-                    textEdgeRightBottom += vectorUp * upStep * coef;
-                    textEdgeLeftTop += vectorUp * upStep * coef;
-                    textEdgeRightTop += vectorUp * upStep * coef;
-
-                    needRecreateDimension = true;
-                }
-            } else {
-                // Переносим выше или ниже при этом смещая в сторону, чтобы размер отобразился корректно
-                int upCoef = 0;
-                int maxStepsForSearch = 10;
-                bool needRecreateDimension = false;
-
-                int rightCoef = 1;
-
-                for(int i = 1; i <= maxStepsForSearch; i++) {
-                    // Вправо
-                    textEdgeLeftBottom += vectorRight * rightStep * rightCoef;
-                    textEdgeRightBottom += vectorRight * rightStep * rightCoef;
-                    textEdgeLeftTop += vectorRight * rightStep * rightCoef;
-                    textEdgeRightTop += vectorRight * rightStep * rightCoef;
-
-                    if(_mapService.Check(textEdgeLeftBottom, textEdgeRightBottom, textEdgeLeftTop, textEdgeRightTop)) {
-                        if(needRecreateDimension) {
-                            _revitRepository.Document.Delete(dimension.Id);
-
-                            dimension = _dimensionCreator.Create(
-                                Line.CreateBound(textEdgeLeftBottom, textEdgeRightBottom),
-                                dimensionRefs,
-                                _selectedDimensionType);
-                            dimension.TextPosition = (textEdgeLeftBottom + textEdgeRightBottom) / 2 + (textPosition - center);
-                            _mapService.Paint(textEdgeLeftBottom, textEdgeRightBottom, textEdgeLeftTop, textEdgeRightTop);
-                        }
-                        break;
-                    }
-                    needRecreateDimension = true;
-
-                    rightCoef = -2;
-                    // Влево
-                    textEdgeLeftBottom += vectorRight * rightStep * rightCoef;
-                    textEdgeRightBottom += vectorRight * rightStep * rightCoef;
-                    textEdgeLeftTop += vectorRight * rightStep * rightCoef;
-                    textEdgeRightTop += vectorRight * rightStep * rightCoef;
-
-
-                    if(_mapService.Check(textEdgeLeftBottom, textEdgeRightBottom, textEdgeLeftTop, textEdgeRightTop)) {
-                        if(needRecreateDimension) {
-                            _revitRepository.Document.Delete(dimension.Id);
-
-                            dimension = _dimensionCreator.Create(
-                                Line.CreateBound(textEdgeLeftBottom, textEdgeRightBottom),
-                                dimensionRefs,
-                                _selectedDimensionType);
-                            dimension.TextPosition = (textEdgeLeftBottom + textEdgeRightBottom) / 2 + (textPosition - center);
-                            _mapService.Paint(textEdgeLeftBottom, textEdgeRightBottom, textEdgeLeftTop, textEdgeRightTop);
-                        }
-                        break;
-                    }
-
-
-                    upCoef = i % 2 == 1 ? i : -i;
-
-                    textEdgeLeftBottom += vectorUp * upStep * upCoef;
-                    textEdgeRightBottom += vectorUp * upStep * upCoef;
-                    textEdgeLeftTop += vectorUp * upStep * upCoef;
-                    textEdgeRightTop += vectorUp * upStep * upCoef;
-
-                    rightCoef = 2;
-                }
-            }
-        } catch {
-            // ignored
-        }
+        var dimensionChanger = new DimensionChanger(_revitRepository, _dimensionCreator);
+        dimensionChanger.Change(dimension, _mapService, _mappingStepInMm, dimensionRefs);
 
         return dimension;
     }
-
-
-
-
-    public XYZ GetDimensionCenterPoint(Dimension dimension) {
-        // Получаем бесконечную линию вдоль которой строится размер
-        var unboundLine = dimension.Curve as Line;
-        // Получаем точку позиции текста - она при первоначальном размещении посередине текста, но чуть выше линии
-        var ptForProject = dimension.TextPosition;
-        return unboundLine.Project(ptForProject).XYZPoint;
-    }
-
-    public (XYZ, XYZ) GetDimensionEdgePoints(Dimension dimension) {
-        var center = GetDimensionCenterPoint(dimension);
-        var unboundLineVector = (dimension.Curve as Line).Direction;
-        double? halfDistance = dimension.Value / 2;
-
-        var leftEdgePoint = center + halfDistance.Value * unboundLineVector.Normalize().Negate();
-        var rightEdgePoint = center + halfDistance.Value * unboundLineVector.Normalize();
-        return (leftEdgePoint, rightEdgePoint);
-    }
-
-
-
-
-
-    public void CreateSphere(XYZ center) {
-        List<Curve> profile = new List<Curve>();
-
-        // first create sphere with 0.5' radius
-        double radius = 0.5;
-        XYZ profile00 = center;
-        XYZ profilePlus = center + new XYZ(0, radius, 0);
-        XYZ profileMinus = center - new XYZ(0, radius, 0);
-
-        profile.Add(Line.CreateBound(profilePlus, profileMinus));
-        profile.Add(Arc.Create(profileMinus, profilePlus, center + new XYZ(radius, 0, 0)));
-
-        CurveLoop curveLoop = CurveLoop.Create(profile);
-        SolidOptions options = new SolidOptions(ElementId.InvalidElementId, ElementId.InvalidElementId);
-
-        Frame frame = new Frame(center, XYZ.BasisX, -XYZ.BasisZ, XYZ.BasisY);
-        if(Frame.CanDefineRevitGeometry(frame) == true) {
-            Solid sphere = GeometryCreationUtilities.CreateRevolvedGeometry(frame, new CurveLoop[] { curveLoop }, 0, 2 * Math.PI, options);
-
-            DirectShape ds = DirectShape.CreateElement(_revitRepository.Document, new ElementId(BuiltInCategory.OST_GenericModel));
-
-            ds.SetShape(new GeometryObject[] { sphere });
-        }
-    }
-
-
-
-
-
-
 
 
     /// <summary>

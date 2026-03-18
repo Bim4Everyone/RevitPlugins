@@ -75,6 +75,10 @@ public class RevitDocumenterCommand : BasePluginCommand {
 
         kernel.Bind<ValueGuard>()
             .ToSelf()
+            .InSingletonScope();        
+        
+        kernel.Bind<BallCreator>()
+            .ToSelf()
             .InSingletonScope();
 
         // Используем сервис обновления тем для WinUI
