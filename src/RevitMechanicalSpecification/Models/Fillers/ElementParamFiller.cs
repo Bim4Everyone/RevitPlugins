@@ -65,8 +65,7 @@ namespace RevitMechanicalSpecification.Models.Fillers {
                 // Получаем значение оригинального параметра
                 OriginalParamValue = specificationElement.GetTypeOrInstanceParamStringValue(OriginalParamName);
             }
-
-            // Если целевой параметр ридонли - можно сразу идти дальше
+            
             PrepareValue(specificationElement);
 
             if(TargetParam.IsReadOnly) {
