@@ -2,7 +2,7 @@ using System;
 
 using Autodesk.Revit.DB;
 
-namespace RevitDocumenter.Models.DimensionLine;
+namespace RevitDocumenter.Models.DimensionServices;
 internal class DimensionLineService {
     /// <summary>
     /// Создает линию единичной длины перпендикулярно передаваемому направлению

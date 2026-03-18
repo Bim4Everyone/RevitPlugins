@@ -1,6 +1,6 @@
 using Autodesk.Revit.DB;
 
-namespace RevitDocumenter.Models;
+namespace RevitDocumenter.Models.DimensionServices;
 /// <summary>
 /// Описывает прямоугольную область и контрольные точки текста размера
 /// </summary>

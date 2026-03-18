@@ -2,7 +2,7 @@ using System.Collections.Generic;
 
 using Autodesk.Revit.DB;
 
-namespace RevitDocumenter.Models;
+namespace RevitDocumenter.Models.ViewServices;
 internal class AnchorLineService {
     private readonly RevitRepository _revitRepository;
 
@@ -19,12 +19,6 @@ internal class AnchorLineService {
             CreateLineWithOverrides(viewMinFixed, viewMinFixed + XYZ.BasisX, overrideSettings).Id,
             CreateLineWithOverrides(viewMaxFixed, viewMaxFixed - XYZ.BasisX, overrideSettings).Id
         ];
-    }
-
-    public void DeleteAnchorLines(List<ElementId> linesIds) {
-        foreach(var linesId in linesIds) {
-            _revitRepository.Document.Delete(linesId);
-        }
     }
 
     public DetailCurve CreateLineWithOverrides(XYZ pt1, XYZ pt2, OverrideGraphicSettings overrideSettings) {

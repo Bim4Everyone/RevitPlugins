@@ -4,7 +4,7 @@ using System.Linq;
 
 using Autodesk.Revit.DB;
 
-using RevitDocumenter.Models.DimensionLine;
+using RevitDocumenter.Models.DimensionServices;
 
 using Grid = Autodesk.Revit.DB.Grid;
 

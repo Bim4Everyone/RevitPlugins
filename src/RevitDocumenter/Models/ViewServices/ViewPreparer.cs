@@ -2,7 +2,7 @@ using System;
 
 using Autodesk.Revit.DB;
 
-namespace RevitDocumenter.Models;
+namespace RevitDocumenter.Models.ViewServices;
 internal class ViewPreparer {
     private readonly RevitRepository _revitRepository;
     private readonly AnchorLineService _anchorLineService;
@@ -50,8 +50,8 @@ internal class ViewPreparer {
         double deltaX = viewMax.X - viewMin.X;
         double deltaY = viewMax.Y - viewMin.Y;
 
-        double halfRemainderX = (deltaX % step) / 2;
-        double halfRemainderY = (deltaY % step) / 2;
+        double halfRemainderX = deltaX % step / 2;
+        double halfRemainderY = deltaY % step / 2;
 
         var viewMaxFixed = new XYZ(viewMax.X - halfRemainderX, viewMax.Y - halfRemainderY, viewMax.Z);
         var viewMinFixed = new XYZ(viewMin.X + halfRemainderX, viewMin.Y + halfRemainderY, viewMin.Z);

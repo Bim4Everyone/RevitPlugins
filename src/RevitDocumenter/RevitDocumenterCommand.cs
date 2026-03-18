@@ -14,8 +14,9 @@ using Ninject;
 
 using RevitDocumenter.Models;
 using RevitDocumenter.Models.Comparision;
-using RevitDocumenter.Models.DimensionLine;
+using RevitDocumenter.Models.DimensionServices;
 using RevitDocumenter.Models.MapServices;
+using RevitDocumenter.Models.ViewServices;
 using RevitDocumenter.ViewModels;
 using RevitDocumenter.Views;
 

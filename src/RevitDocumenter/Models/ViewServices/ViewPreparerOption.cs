@@ -1,6 +1,6 @@
 using Autodesk.Revit.DB;
 
-namespace RevitDocumenter.Models;
+namespace RevitDocumenter.Models.ViewServices;
 internal class ViewPreparerOption {
     public double MappingStepInMm { get; set; }
     public double MappingStepInFeet { get; set; }

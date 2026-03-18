@@ -9,7 +9,9 @@ using dosymep.WPF.Commands;
 using dosymep.WPF.ViewModels;
 
 using RevitDocumenter.Models;
+using RevitDocumenter.Models.DimensionServices;
 using RevitDocumenter.Models.MapServices;
+using RevitDocumenter.Models.ViewServices;
 
 using Grid = Autodesk.Revit.DB.Grid;
 
@@ -153,6 +155,7 @@ internal class MainViewModel : BaseViewModel {
                 _paintSquaresByMapService.MarkWhiteSquaresOnImage(
                     imagePath, _mapService.Map, exportOption.StepCountX, exportOption.StepCountY);
             }
+            _revitRepository.DeleteElementsById(exportOption.AnchorLineIds);
             _imageService.Delete(imagePath);
         }
 

@@ -4,10 +4,9 @@ using System.Collections.Generic;
 using Autodesk.Revit.DB;
 
 using RevitDocumenter.Models.Comparision;
-using RevitDocumenter.Models.DimensionLine;
 using RevitDocumenter.Models.MapServices;
 
-namespace RevitDocumenter.Models;
+namespace RevitDocumenter.Models.DimensionServices;
 internal class DimensionService {
     private readonly DimensionCreator _dimensionCreator;
     private readonly DimensionChanger _dimensionChanger;

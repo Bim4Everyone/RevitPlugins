@@ -6,7 +6,7 @@ using Autodesk.Revit.DB;
 
 using Color = Autodesk.Revit.DB.Color;
 
-namespace RevitDocumenter.Models;
+namespace RevitDocumenter.Models.ViewServices;
 internal class ImageService {
     private readonly RevitRepository _revitRepository;
     private readonly Document _doc;
@@ -77,7 +77,7 @@ internal class ImageService {
         var cropRect = new System.Drawing.Rectangle(startX, endY, newWidth, newHeight);
 
         // Создаем обрезанное изображение
-        using Bitmap croppedImage = image.Clone(cropRect, image.PixelFormat);
+        using var croppedImage = image.Clone(cropRect, image.PixelFormat);
 
         // Сохраняем в MemoryStream
         byte[] imageBytes;

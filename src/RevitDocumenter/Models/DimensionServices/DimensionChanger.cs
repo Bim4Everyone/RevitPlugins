@@ -6,7 +6,7 @@ using dosymep.Revit;
 
 using RevitDocumenter.Models.MapServices;
 
-namespace RevitDocumenter.Models;
+namespace RevitDocumenter.Models.DimensionServices;
 
 internal class DimensionChanger {
     private const double _horizontalOffsetFactor = 0.1;
@@ -114,7 +114,7 @@ internal class DimensionChanger {
         for(int stepIndex = 0; stepIndex <= _maxSearchSteps; stepIndex++) {
             // При первом заходе в цикл не ищем для размера новое, а проверяем его стандартное положение
             if(stepIndex > 0) {
-                int directionFactor = (stepIndex % 2 == 1) ? stepIndex : -stepIndex;
+                int directionFactor = stepIndex % 2 == 1 ? stepIndex : -stepIndex;
                 textPoints.Translate(verticalStep * directionFactor);
             }
             if(!mapService.Check(
@@ -171,7 +171,7 @@ internal class DimensionChanger {
             }
 
             // Если по бокам места нет, делаем шаг по вертикали и сбрасываем боковой сдвиг
-            int verticalDirectionFactor = (stepIndex % 2 == 1) ? stepIndex : -stepIndex;
+            int verticalDirectionFactor = stepIndex % 2 == 1 ? stepIndex : -stepIndex;
             textPoints.Translate(verticalStep * verticalDirectionFactor);
             // Возвращаем текст к центру
             textPoints.Translate(horizontalStep);

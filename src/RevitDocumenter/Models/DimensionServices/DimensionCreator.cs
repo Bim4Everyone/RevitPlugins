@@ -1,6 +1,6 @@
 using Autodesk.Revit.DB;
 
-namespace RevitDocumenter.Models;
+namespace RevitDocumenter.Models.DimensionServices;
 internal class DimensionCreator {
     private readonly RevitRepository _revitRepository;
     private readonly ValueGuard _guard;

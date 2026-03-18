@@ -2,7 +2,7 @@ using System.Collections.Generic;
 
 using Autodesk.Revit.DB;
 
-namespace RevitDocumenter.Models;
+namespace RevitDocumenter.Models.ViewServices;
 
 internal class ExportOption {
     public double MappingStepInFeet { get; set; }
