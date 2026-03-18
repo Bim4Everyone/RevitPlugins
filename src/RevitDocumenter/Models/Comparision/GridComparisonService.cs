@@ -12,13 +12,13 @@ namespace RevitDocumenter.Models.Comparision;
 internal class GridComparisonService : IComparisonService {
     private readonly RevitRepository _revitRepository;
     private readonly DimensionCreator _dimensionCreator;
-    private readonly IDimensionLineService _dimensionLineService;
+    private readonly DimensionLineService _dimensionLineService;
     private readonly ValueGuard _guard;
 
     public GridComparisonService(
         RevitRepository revitRepository,
         DimensionCreator dimensionCreator,
-        IDimensionLineService dimensionLineService,
+        DimensionLineService dimensionLineService,
         ValueGuard guard) {
 
         _revitRepository = revitRepository;

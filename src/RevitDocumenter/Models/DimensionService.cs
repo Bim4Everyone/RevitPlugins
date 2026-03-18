@@ -13,7 +13,7 @@ internal class DimensionService {
     private readonly DimensionChanger _dimensionChanger;
     private readonly ValueGuard _guard;
     private readonly IComparisonService _comparisonService;
-    private readonly IDimensionLineService _dimensionLineService;
+    private readonly DimensionLineService _dimensionLineService;
     private readonly ViewMapService _mapService;
 
     public DimensionService(
@@ -21,7 +21,7 @@ internal class DimensionService {
         DimensionChanger dimensionChanger,
         ValueGuard guard,
         IComparisonService comparisonService,
-        IDimensionLineService dimensionLineService,
+        DimensionLineService dimensionLineService,
         ViewMapService mapService) {
         _dimensionCreator = dimensionCreator;
         _dimensionChanger = dimensionChanger;

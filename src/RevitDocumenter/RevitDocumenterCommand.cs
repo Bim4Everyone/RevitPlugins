@@ -61,8 +61,8 @@ public class RevitDocumenterCommand : BasePluginCommand {
             .To<GridComparisonService>()
             .InSingletonScope();
 
-        kernel.Bind<IDimensionLineService>()
-            .To<DimensionLineByMapService>()
+        kernel.Bind<DimensionLineService>()
+            .ToSelf()
             .InSingletonScope();
 
         kernel.Bind<ViewMapService>()
