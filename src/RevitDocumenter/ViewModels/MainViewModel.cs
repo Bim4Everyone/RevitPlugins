@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Windows.Input;
@@ -10,8 +9,6 @@ using dosymep.WPF.Commands;
 using dosymep.WPF.ViewModels;
 
 using RevitDocumenter.Models;
-using RevitDocumenter.Models.Comparision;
-using RevitDocumenter.Models.DimensionLine;
 using RevitDocumenter.Models.MapServices;
 
 using Grid = Autodesk.Revit.DB.Grid;
@@ -25,26 +22,23 @@ internal class MainViewModel : BaseViewModel {
     private readonly PluginConfig _pluginConfig;
     private readonly RevitRepository _revitRepository;
     private readonly ILocalizationService _localizationService;
-    private readonly IComparisonService _comparisonService;
-    private readonly IDimensionLineService _dimensionLineService;
+    private readonly DimensionService _dimensionService;
     private readonly ViewMapService _mapService;
-    private readonly DimensionCreator _dimensionCreator;
-    private readonly ValueGuard _guard;
 
     private string _errorText;
     private string _familyNamePart;
     private DimensionType _selectedDimensionType;
     private List<DimensionType> _dimensionTypes;
     private List<Grid> _grids = [];
+    private bool _placeDimensionsAccurately;
 
     private readonly string _defFamilyNamePart = "IFC_Зона_Доп.Арм";
     private readonly string _defSelectedDimensionTypeName = "я_Основной_Плагин_2.5 мм";
     private readonly List<string> _defVerticalRefNames = ["Габарит_Ширина_1", "Габарит_Ширина_2"];
     private readonly List<string> _defHorizontalRefNames = ["Габарит_Длина_1", "Габарит_Длина_2"];
 
-    private readonly bool _createMarkedImage = true;
-
     private readonly double _mappingStepInMm = 200.0;
+    private readonly bool _createMarkedImage = true;
 
     /// <summary>
     /// Создает экземпляр основной ViewModel главного окна.
@@ -56,20 +50,14 @@ internal class MainViewModel : BaseViewModel {
         PluginConfig pluginConfig,
         RevitRepository revitRepository,
         ILocalizationService localizationService,
-        IComparisonService comparisonService,
-        IDimensionLineService dimensionLineService,
         ViewMapService mapService,
-        DimensionCreator dimensionCreator,
-        ValueGuard guard) {
+        DimensionService dimensionService) {
 
         _pluginConfig = pluginConfig;
         _revitRepository = revitRepository;
         _localizationService = localizationService;
-        _comparisonService = comparisonService;
-        _dimensionLineService = dimensionLineService;
+        _dimensionService = dimensionService;
         _mapService = mapService;
-        _dimensionCreator = dimensionCreator;
-        _guard = guard;
 
         ReferenceNamesVM = new ReferenceNamesViewModel();
 
@@ -105,6 +93,12 @@ internal class MainViewModel : BaseViewModel {
         get => _dimensionTypes;
         set => RaiseAndSetIfChanged(ref _dimensionTypes, value);
     }
+
+    public bool PlaceDimensionsAccurately {
+        get => _placeDimensionsAccurately;
+        set => RaiseAndSetIfChanged(ref _placeDimensionsAccurately, value);
+    }
+
     public List<Grid> Grids {
         get => _grids;
         set => RaiseAndSetIfChanged(ref _grids, value);
@@ -135,71 +129,36 @@ internal class MainViewModel : BaseViewModel {
             _localizationService.GetLocalizedString("MainWindow.Title"));
         mainTransaction.Start();
 
-        var viewPreparerOption = new ViewPreparerOption() {
-            MappingStepInMm = _mappingStepInMm,
-            MappingStepInFeet = UnitUtilsHelper.ConvertToInternalValue(_mappingStepInMm),
-            ColorForAnchorLines = new(255, 0, 255),
-            WeightForAnchorLines = 1,
-        };
+        if(_placeDimensionsAccurately) {
+            var viewPreparerOption = new ViewPreparerOption() {
+                MappingStepInMm = _mappingStepInMm,
+                MappingStepInFeet = UnitUtilsHelper.ConvertToInternalValue(_mappingStepInMm),
+                ColorForAnchorLines = new(255, 0, 255),
+                WeightForAnchorLines = 1,
+            };
 
-        var viewPreparer = new ViewPreparer(_revitRepository);
-        var exportOption = viewPreparer.Prepare(viewPreparerOption);
+            var viewPreparer = new ViewPreparer(_revitRepository);
+            var anchorLineService = new AnchorLineService(_revitRepository);
+            var exportOption = viewPreparer.Prepare(viewPreparerOption, anchorLineService);
 
-        var imageExporter = new ImageExporter(_revitRepository.Document);
-        string imagePath = imageExporter.Export(exportOption);
+            var imageService = new ImageService(_revitRepository.Document);
+            string imagePath = imageService.Export(exportOption);
 
-        _mapService.CreateMap(imagePath, exportOption);
-        if(_createMarkedImage) {
-            var painter = new PaintSquaresByMapService();
-            painter.MarkWhiteSquaresOnImage(imagePath, _mapService.Map, exportOption.StepCountX, exportOption.StepCountY);
+            _mapService.CreateMap(imagePath, exportOption);
+            if(_createMarkedImage) {
+                var painter = new PaintSquaresByMapService();
+                painter.MarkWhiteSquaresOnImage(imagePath, _mapService.Map, exportOption.StepCountX, exportOption.StepCountY);
+            }
+            imageService.Delete(imagePath);
         }
 
-        foreach(var rebar in _revitRepository.GetRebarElements(
+        var rebars = _revitRepository.GetRebarElements(
             FamilyNamePart,
             ReferenceNamesVM.GetVertReferenceNames(),
-            ReferenceNamesVM.GetHorizReferenceNames())) {
+            ReferenceNamesVM.GetHorizReferenceNames());
 
-            // Создание вертикального размера (относительно локальных осей зоны армирования)
-            CreateDimension(Grids, rebar);
-            // Создание горизонтального размера (относительно локальных осей зоны армирования)
-            CreateDimension(Grids, rebar, false);
-        }
+        _dimensionService.Create(rebars, _grids, _selectedDimensionType, _placeDimensionsAccurately);
         mainTransaction.Commit();
-    }
-
-    private Dimension CreateDimension(List<Grid> grids, RebarElement rebar, bool isForVertical = true) {
-        try {
-            _guard.ThrowIfNull(grids, rebar);
-        } catch(Exception) {
-            return null;
-        }
-
-        var rebarReferences = isForVertical ? rebar.VerticalRefs : rebar.HorizontalRefs;
-        // Нормальная ситуация, когда подходящие оси не были найдены
-        if(rebarReferences.Count == 0)
-            return null;
-
-        var direction = isForVertical ? rebar.Rebar.FacingOrientation : rebar.Rebar.HandOrientation;
-
-        IComparisonContext comparisonContext =
-            new GridComparisonContext(rebarReferences, grids, direction);
-
-        // Получаем опорные плоскости для размера
-        var dimensionRefs = _comparisonService.Compare(comparisonContext);
-        if(dimensionRefs is null) {
-            return null;
-        }
-
-        // Получаем линию размещения размера
-        var dimensionLineY = _dimensionLineService.GetDimensionLine(rebar, direction);
-
-        // Строим размер
-        var dimension = _dimensionCreator.Create(dimensionLineY, dimensionRefs, _selectedDimensionType);
-
-        var dimensionChanger = new DimensionChanger(_revitRepository, _dimensionCreator);
-        dimensionChanger.Change(dimension, _mapService, _mappingStepInMm, dimensionRefs);
-
-        return dimension;
     }
 
 
@@ -247,6 +206,8 @@ internal class MainViewModel : BaseViewModel {
 
         var horizontalRefNames = setting?.HorizontalRefNames ?? _defHorizontalRefNames;
         horizontalRefNames.ForEach(item => ReferenceNamesVM.HorizontalRefNames.Add(new ReferenceNameViewModel(item)));
+
+        PlaceDimensionsAccurately = setting?.PlaceDimensionsAccurately ?? true;
     }
 
     /// <summary>
@@ -261,6 +222,8 @@ internal class MainViewModel : BaseViewModel {
 
         setting.VerticalRefNames = [.. ReferenceNamesVM.VerticalRefNames.Select(r => r.ReferenceName)];
         setting.HorizontalRefNames = [.. ReferenceNamesVM.HorizontalRefNames.Select(r => r.ReferenceName)];
+
+        setting.PlaceDimensionsAccurately = PlaceDimensionsAccurately;
 
         _pluginConfig.SaveProjectConfig();
     }

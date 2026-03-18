@@ -19,6 +19,9 @@
     <system:String x:Key="MainWindow.WriteFamilyNamePart">Не указана часть имени семейства</system:String>
     <system:String x:Key="MainWindow.DimensionTypeIsNotSelected">Не выбран типоразмер размера</system:String>
     <system:String x:Key="MainWindow.WriteReferenceNames">Не указаны имена опорных плоскостей</system:String>
+    
+    <system:String x:Key="MainWindow.PlaceDimensions">Методика позиционирования размеров:</system:String>
+    <system:String x:Key="MainWindow.PlaceDimensionsAccurately">Позиционировать размеры точно</system:String>
 
     <system:String x:Key="MainWindow.ButtonOk">ОК</system:String>
     <system:String x:Key="MainWindow.ButtonCancel">Отмена</system:String>

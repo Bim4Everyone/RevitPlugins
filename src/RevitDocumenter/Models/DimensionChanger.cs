@@ -26,12 +26,11 @@ internal class DimensionChanger {
     public Dimension Change(
         Dimension dimension,
         ViewMapService mapService,
-        double mappingStepInMm,
+        double verticalStepValue,
         ReferenceArray dimensionReferences) {
         try {
             var textPoints = GetDimensionTextPoints(dimension);
             (var upDimensionVector, var rightDimensionVector) = GetDimensionVectors(dimension, textPoints);
-            double verticalStepValue = UnitUtilsHelper.ConvertToInternalValue(mappingStepInMm);
 
             if(dimension.Value < _revitRepository.GetMinDimensionInView()) {
                 var horizontalStep =
@@ -196,42 +195,5 @@ internal class DimensionChanger {
             points.TopLeftCorner,
             points.TopRightCorner);
         return newDimension;
-    }
-}
-
-/// <summary>
-/// Описывает прямоугольную область (габариты) текста размера в 3D пространстве вида.
-/// </summary>
-internal class DimensionTextPoints {
-    public XYZ BottomLeftCorner { get; private set; }
-    public XYZ BottomRightCorner { get; private set; }
-    public XYZ TopLeftCorner { get; private set; }
-    public XYZ TopRightCorner { get; private set; }
-    public XYZ DimensionCenterPoint { get; private set; }
-    public XYZ TextPositionPoint { get; private set; }
-    public double Height { get; }
-
-    public DimensionTextPoints(
-        XYZ bottomLeft,
-        XYZ bottomRight,
-        XYZ upVector,
-        double height,
-        XYZ centerPoint,
-        XYZ textPosition) {
-        BottomLeftCorner = bottomLeft;
-        BottomRightCorner = bottomRight;
-        DimensionCenterPoint = centerPoint;
-        TextPositionPoint = textPosition;
-        Height = height;
-
-        TopLeftCorner = bottomLeft + upVector * height;
-        TopRightCorner = bottomRight + upVector * height;
-    }
-
-    public void Translate(XYZ translationVector) {
-        BottomLeftCorner += translationVector;
-        BottomRightCorner += translationVector;
-        TopLeftCorner += translationVector;
-        TopRightCorner += translationVector;
     }
 }

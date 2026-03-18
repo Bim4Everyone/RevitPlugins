@@ -20,6 +20,9 @@
     <system:String x:Key="MainWindow.DimensionTypeIsNotSelected">Dimension type not selected</system:String>
     <system:String x:Key="MainWindow.WriteReferenceNames">Missing reference plane names</system:String>
     
+    <system:String x:Key="MainWindow.PlaceDimensions">Methodology of positioning dimensions:</system:String>
+    <system:String x:Key="MainWindow.PlaceDimensionsAccurately">Position dimensions accurately</system:String>
+    
     <system:String x:Key="MainWindow.ButtonOk">OK</system:String>
     <system:String x:Key="MainWindow.ButtonCancel">Cancel</system:String>
 </ResourceDictionary>

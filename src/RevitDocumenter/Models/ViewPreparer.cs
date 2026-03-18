@@ -1,5 +1,4 @@
 using System;
-using System.Collections.Generic;
 
 using Autodesk.Revit.DB;
 
@@ -11,7 +10,7 @@ internal class ViewPreparer {
         _revitRepository = revitRepository;
     }
 
-    public ExportOption Prepare(ViewPreparerOption viewPreparerOption) {
+    public ExportOption Prepare(ViewPreparerOption viewPreparerOption, AnchorLineService anchorLinesManager) {
         var view = _revitRepository.Document.ActiveView;
         // Получаем точки рамки подрезки вида, смещенные немного внутрь, чтобы расстояние 
         // между ними было кратно указанному шагу
@@ -23,7 +22,7 @@ internal class ViewPreparer {
 
         // Создаем якорные линии в пространстве Revit, которые будут использованы для сопоставления 
         // пространства Revit и изображения
-        var anchorLineIds = CreateAnchorLines(
+        var anchorLineIds = anchorLinesManager.CreateAnchorLines(
             viewMinFixed,
             viewMaxFixed,
             viewPreparerOption.WeightForAnchorLines,
@@ -70,30 +69,5 @@ internal class ViewPreparer {
 
         // Проецируем точку на плоскость
         return point - distance * normal;
-    }
-
-    private List<ElementId> CreateAnchorLines(XYZ viewMinFixed, XYZ viewMaxFixed, int lineWeight, Color lineColor) {
-        var overrideSettings = new OverrideGraphicSettings();
-        overrideSettings.SetProjectionLineWeight(lineWeight);
-        overrideSettings.SetProjectionLineColor(lineColor);
-
-        return [
-            CreateLineWithOverrides(viewMinFixed, viewMinFixed + XYZ.BasisX, overrideSettings).Id,
-            CreateLineWithOverrides(viewMaxFixed, viewMaxFixed - XYZ.BasisX, overrideSettings).Id
-        ];
-    }
-
-    public DetailCurve CreateLineWithOverrides(XYZ pt1, XYZ pt2, OverrideGraphicSettings overrideSettings) {
-        var doc = _revitRepository.Document;
-
-        var lineGeom = Line.CreateBound(pt1, pt2);
-        using var subTransaction = new SubTransaction(doc);
-        subTransaction.Start();
-
-        var detailLine = doc.Create.NewDetailCurve(doc.ActiveView, lineGeom);
-        _revitRepository.Document.ActiveView.SetElementOverrides(detailLine.Id, overrideSettings);
-
-        subTransaction.Commit();
-        return detailLine;
     }
 }

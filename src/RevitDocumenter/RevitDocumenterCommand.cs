@@ -73,10 +73,14 @@ public class RevitDocumenterCommand : BasePluginCommand {
             .ToSelf()
             .InSingletonScope();
 
+        kernel.Bind<DimensionChanger>()
+            .ToSelf()
+            .InSingletonScope();
+
         kernel.Bind<ValueGuard>()
             .ToSelf()
-            .InSingletonScope();        
-        
+            .InSingletonScope();
+
         kernel.Bind<BallCreator>()
             .ToSelf()
             .InSingletonScope();

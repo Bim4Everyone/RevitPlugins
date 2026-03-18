@@ -7,11 +7,17 @@ using Autodesk.Revit.DB;
 using Color = Autodesk.Revit.DB.Color;
 
 namespace RevitDocumenter.Models;
-internal class ImageExporter {
+internal class ImageService {
     private readonly Document _doc;
 
-    public ImageExporter(Document doc) {
+    public ImageService(Document doc) {
         _doc = doc;
+    }
+
+    public void Delete(string path) {
+        if(File.Exists(path)) {
+            File.Delete(path);
+        }
     }
 
     public string Export(ExportOption exportOption) {
