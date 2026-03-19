@@ -103,43 +103,6 @@ internal class DimensionChanger {
     /// Метод анализирует положение текста размера с учетом бинарной карты, определяет нужно ли выполнять смещение
     /// и при необходимости пытается подобрать положение, чтобы текст ничего не пересекал на чертеже, а затем
     /// пересоздает размер.
-    /// Если текст размера с учетом масштаба укладывается между засечками размера, то размер считается нормальным и
-    /// для него ищется смещение только по вертикали 
-    /// </summary>
-    private Dimension DefinePositionForNormalDimension(
-        Dimension dimension,
-        ReferenceArray references,
-        DimensionTextPoints textPoints,
-        ViewMapService mapService,
-        XYZ verticalStep) {
-
-        for(int stepIndex = 0; stepIndex <= _maxSearchSteps; stepIndex++) {
-            // При первом заходе в цикл не ищем для размера новое, а проверяем его стандартное положение
-            if(stepIndex > 0) {
-                int directionFactor = stepIndex % 2 == 1 ? stepIndex : -stepIndex;
-                textPoints.Translate(verticalStep * directionFactor);
-            }
-            if(!mapService.Check(
-                   textPoints.BottomLeftCorner,
-                   textPoints.BottomRightCorner,
-                   textPoints.TopLeftCorner,
-                   textPoints.TopRightCorner)) {
-                continue;
-            }
-
-            // Если текст размера ничего не пересекает и сдвиг был, пересоздаем размер на новом месте
-            if(stepIndex > 0) {
-                dimension = RecreateDimension(dimension, textPoints, references, mapService);
-            }
-            break;
-        }
-        return dimension;
-    }
-
-    /// <summary>
-    /// Метод анализирует положение текста размера с учетом бинарной карты, определяет нужно ли выполнять смещение
-    /// и при необходимости пытается подобрать положение, чтобы текст ничего не пересекал на чертеже, а затем
-    /// пересоздает размер.
     /// Если текст размера с учетом масштаба не укладывается между засечками размера, то размер считается маленьким и
     /// для него ищется смещение по вертикали и в бок (влево и вправо) 
     /// </summary>
@@ -163,29 +126,15 @@ internal class DimensionChanger {
             foreach(int horizontalDirectionFactor in new[] { 1, -2 }) {
                 textPoints.Translate(horizontalStep * horizontalDirectionFactor);
 
-                if(!mapService.Check(
-                       textPoints.BottomLeftCorner,
-                       textPoints.BottomRightCorner,
-                       textPoints.TopLeftCorner,
-                       textPoints.TopRightCorner,
-                       textPoints.TextMiddlePoint)) {
+                if(!mapService.CheckInRectangle(textPoints.BottomLeftCorner, textPoints.TopRightCorner)) {
                     continue;
                 }
 
                 // Центрируем текст для маленьких размеров, чтобы он смотрелся корректно
                 dimension = RecreateDimension(dimension, textPoints, references, mapService);
                 dimension.TextPosition = textPoints.TextPositionPoint;
-                //dimension.TextPosition =
-                //    (textPoints.BottomLeftCorner + textPoints.BottomRightCorner) / 2
-                //    + (textPoints.TextPositionPoint - textPoints.TextLineCenterPoint);
-
-                _ballCreator.CreateSphere(textPoints.TopLeftCorner, 100);
-                _ballCreator.CreateSphere(textPoints.TopRightCorner, 100);
-                _ballCreator.CreateSphere(textPoints.BottomLeftCorner, 100);
-                _ballCreator.CreateSphere(textPoints.BottomRightCorner, 100);
-                _ballCreator.CreateSphere(textPoints.TextMiddlePoint, 100);
-
                 success = true;
+                break;
             }
             // Если нашли нужно положение, то больше не ищем
             if(success)
@@ -193,6 +142,39 @@ internal class DimensionChanger {
 
             // Возвращаем текст к центру
             textPoints.Translate(horizontalStep);
+        }
+        return dimension;
+    }
+
+    /// <summary>
+    /// Метод анализирует положение текста размера с учетом бинарной карты, определяет нужно ли выполнять смещение
+    /// и при необходимости пытается подобрать положение, чтобы текст ничего не пересекал на чертеже, а затем
+    /// пересоздает размер.
+    /// Если текст размера с учетом масштаба укладывается между засечками размера, то размер считается нормальным и
+    /// для него ищется смещение только по вертикали 
+    /// </summary>
+    private Dimension DefinePositionForNormalDimension(
+        Dimension dimension,
+        ReferenceArray references,
+        DimensionTextPoints textPoints,
+        ViewMapService mapService,
+        XYZ verticalStep) {
+
+        for(int stepIndex = 0; stepIndex <= _maxSearchSteps; stepIndex++) {
+            // При первом заходе в цикл не ищем для размера новое, а проверяем его стандартное положение
+            if(stepIndex > 0) {
+                int directionFactor = stepIndex % 2 == 1 ? stepIndex : -stepIndex;
+                textPoints.Translate(verticalStep * directionFactor);
+            }
+            if(!mapService.CheckInRectangle(textPoints.BottomLeftCorner, textPoints.TopRightCorner)) {
+                continue;
+            }
+
+            // Если текст размера ничего не пересекает и сдвиг был, пересоздаем размер на новом месте
+            if(stepIndex > 0) {
+                dimension = RecreateDimension(dimension, textPoints, references, mapService);
+            }
+            break;
         }
         return dimension;
     }
@@ -207,11 +189,7 @@ internal class DimensionChanger {
         var newDimension = _dimensionCreator.Create(dimensionLine, references, oldDimension.DimensionType);
         _revitRepository.Document.Delete(oldDimension.Id);
 
-        mapService.Paint(
-            points.BottomLeftCorner,
-            points.BottomRightCorner,
-            points.TopLeftCorner,
-            points.TopRightCorner);
+        mapService.PaintInRectangle(points.BottomLeftCorner, points.TopRightCorner);
         return newDimension;
     }
 }
