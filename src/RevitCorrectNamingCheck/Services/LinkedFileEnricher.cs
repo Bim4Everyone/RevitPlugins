@@ -5,12 +5,13 @@ using dosymep.Bim4Everyone;
 using dosymep.Bim4Everyone.SimpleServices;
 
 using RevitCorrectNamingCheck.Helpers;
+using RevitCorrectNamingCheck.Models;
+using RevitCorrectNamingCheck.ViewModels;
 
-namespace RevitCorrectNamingCheck.Models;
+namespace RevitCorrectNamingCheck.Services;
 
 internal class LinkedFileEnricher {
-
-    private static readonly Dictionary<string, string> _partFileToRnMap = new() {
+    private readonly Dictionary<string, string> _partFileToRnMap = new() {
     { "AR", "AR" },
     { "KR", "KR" },
     { "OV", "OV" },
@@ -28,7 +29,10 @@ internal class LinkedFileEnricher {
         _bimModelPartsService = bimModelPartsService;
     }
 
-    private void SetWorksetInfo(WorksetInfo workset, BimModelPart currentPart, List<string> bimIdentifiers) {
+    private void SetWorksetNameStatus(
+        WorksetInfoViewModel workset,
+        BimModelPart currentPart,
+        List<string> bimIdentifiers) {
         workset.WorksetNameStatus = GetWorksetNameStatus(workset.Name, currentPart, bimIdentifiers);
     }
 
@@ -67,8 +71,7 @@ internal class LinkedFileEnricher {
         return NameStatus.None;
     }
 
-
-    public LinkedFile Enrich(LinkedFile linkedFile) {
+    public void Enrich(LinkedFileViewModel linkedFile) {
 
         var requiredParts = new[] { "AR", "KR", "OV", "ITP", "VK", "EOM", "EG", "SS" };
 
@@ -86,9 +89,14 @@ internal class LinkedFileEnricher {
 
         var currentPart = _bimModelPartsService.GetBimModelPart(linkedFile.Name);
 
-        SetWorksetInfo(linkedFile.TypeWorkset, currentPart, bimIdentifiers);
-        SetWorksetInfo(linkedFile.InstanceWorkset, currentPart, bimIdentifiers);
+        SetWorksetNameStatus(linkedFile.TypeWorkset, currentPart, bimIdentifiers);
+        SetWorksetNameStatus(linkedFile.InstanceWorkset, currentPart, bimIdentifiers);
+        foreach(var workset in linkedFile.TypeWorksets) {
+            SetWorksetNameStatus(workset, currentPart, bimIdentifiers);
+        }
 
-        return linkedFile;
+        foreach(var workset in linkedFile.InstanceWorksets) {
+            SetWorksetNameStatus(workset, currentPart, bimIdentifiers);
+        }
     }
 }

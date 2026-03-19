@@ -22,6 +22,10 @@
 
     <system:String x:Key="MainWindow.Undefined">Не определено</system:String>
     <system:String x:Key="MainWindow.Pinned">Закреплена</system:String>
-    <system:String x:Key="MainWindow.ButtonRefresh">Обновить</system:String>
     <system:String x:Key="MainWindow.ButtonCancel">Отмена</system:String>
+    <system:String
+        x:Key="MainWindow.ButtonOk">ОК</system:String>
+
+    <system:String
+        x:Key="Transaction.UpdateLinks">Корректировка РН связей</system:String>
 </ResourceDictionary>

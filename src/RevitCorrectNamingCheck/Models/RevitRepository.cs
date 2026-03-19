@@ -10,6 +10,8 @@ using dosymep.Bim4Everyone.SimpleServices;
 using dosymep.Revit;
 using dosymep.SimpleServices;
 
+using RevitCorrectNamingCheck.Services;
+
 namespace RevitCorrectNamingCheck.Models;
 
 /// <summary>
@@ -20,7 +22,6 @@ namespace RevitCorrectNamingCheck.Models;
 /// </remarks>
 //bimModelPartsService
 internal class RevitRepository {
-    private readonly IBimModelPartsService _bimModelPartsService;
     private readonly ILocalizationService _localizationService;
     /// <summary>
     /// Создает экземпляр репозитория.
@@ -28,10 +29,8 @@ internal class RevitRepository {
     /// <param name="uiApplication">Класс доступа к интерфейсу Revit.</param>
 
     public RevitRepository(UIApplication uiApplication,
-        IBimModelPartsService bimModelPartsService,
         ILocalizationService localizationService) {
         UIApplication = uiApplication;
-        _bimModelPartsService = bimModelPartsService;
         _localizationService = localizationService;
     }
 
@@ -70,37 +69,57 @@ internal class RevitRepository {
             .ToList();
     }
 
-    private string GetWorksetName(Element element) {
-        string undefinedText = _localizationService.GetLocalizedString("MainWindow.Undefined");
+    private WorksetInfo GetWorksetInfo(Element element, Dictionary<WorksetId, string> worksets) {
+        string undefinedName = _localizationService.GetLocalizedString("MainWindow.Undefined");
 
         int? worksetId = element.GetParamValueOrDefault<int?>(BuiltInParameter.ELEM_PARTITION_PARAM);
         if(worksetId is null) {
-            return undefinedText;
+            return new WorksetInfo(element.WorksetId, undefinedName);
         }
 
-        var workset = Document.GetWorksetTable().GetWorkset(new WorksetId(worksetId.Value));
-        return workset?.Name ?? undefinedText;
+        bool success = worksets.TryGetValue(new WorksetId(worksetId.Value), out string name);
+        return new WorksetInfo(element.WorksetId, success ? name : undefinedName);
+    }
+
+    public Dictionary<WorksetId, string> GetUserWorksets() {
+        return WorksharingUtils.GetUserWorksetInfo(
+                Document.GetWorksharingCentralModelPath()
+                ?? ModelPathUtils.ConvertUserVisiblePathToModelPath(Document.PathName))
+            .ToDictionary(p => p.Id, p => p.Name);
     }
 
     public List<LinkedFile> GetLinkedFiles() {
         var result = new List<LinkedFile>();
-        var linkedFileEnricher = new LinkedFileEnricher(_bimModelPartsService);
 
         var linkTypes = GetRevitLinkTypes();
         var linkInstances = GetRevitLinkInstances();
-
+        var worksets = GetUserWorksets();
         foreach(var linkType in linkTypes) {
             var instances = linkInstances.Where(x => x.GetTypeId() == linkType.Id);
 
             foreach(var instance in instances) {
-                var typeWorkset = new WorksetInfo(linkType.WorksetId, GetWorksetName(linkType));
-                var instanceWorkset = new WorksetInfo(instance.WorksetId, GetWorksetName(instance));
-                var linkedFile = new LinkedFile(linkType.Id, linkType.Name, instance.Pinned, typeWorkset, instanceWorkset);
+                var typeWorkset = GetWorksetInfo(linkType, worksets);
+                var instanceWorkset = GetWorksetInfo(instance, worksets);
+                var linkedFile = new LinkedFile(instance, typeWorkset, instanceWorkset);
 
-                linkedFileEnricher.Enrich(linkedFile);
                 result.Add(linkedFile);
             }
         }
         return result;
+    }
+
+    public void UpdateLinkedFile(LinkedFile link, WorksetId typeWorkset, WorksetId instanceWorkset, bool isPinned) {
+        if(link.TypeWorkset.Id != typeWorkset) {
+            link.Instance.GetElementType()
+                .SetParamValue(BuiltInParameter.ELEM_PARTITION_PARAM, typeWorkset.IntegerValue);
+        }
+
+        if(link.InstanceWorkset.Id != instanceWorkset) {
+            link.Instance.SetParamValue(BuiltInParameter.ELEM_PARTITION_PARAM, instanceWorkset.IntegerValue);
+        }
+
+        if(link.IsPinned != isPinned) {
+            link.Instance.Pinned = isPinned;
+        }
     }
 }
