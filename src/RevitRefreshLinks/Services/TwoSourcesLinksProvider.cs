@@ -9,10 +9,10 @@ using dosymep.SimpleServices;
 using RevitRefreshLinks.Models;
 
 namespace RevitRefreshLinks.Services;
+
 internal class TwoSourcesLinksProvider : ITwoSourceLinksProvider {
     private readonly RevitRepository _revitRepository;
     private readonly IConfigProvider _configProvider;
-    private readonly IOpenFolderDialogService _openFolderDialog;
     private readonly IOpenFolderDialog _rsOpenFolderDialog;
 
     public TwoSourcesLinksProvider(
@@ -23,23 +23,26 @@ internal class TwoSourcesLinksProvider : ITwoSourceLinksProvider {
 
         _revitRepository = revitRepository ?? throw new ArgumentNullException(nameof(revitRepository));
         _configProvider = configProvider ?? throw new ArgumentNullException(nameof(configProvider));
-        _openFolderDialog = openFolderDialog ?? throw new ArgumentNullException(nameof(openFolderDialog));
+        OpenFolderDialogService = openFolderDialog ?? throw new ArgumentNullException(nameof(openFolderDialog));
         _rsOpenFolderDialog = rsOpenFolderDialog ?? throw new ArgumentNullException(nameof(rsOpenFolderDialog));
     }
 
+    public IOpenFolderDialogService OpenFolderDialogService { get; }
+
 
     public ILinksFromSource GetLocalLinks() {
-        if(_openFolderDialog.ShowDialog()) {
+        if(OpenFolderDialogService.ShowDialog()) {
             var config = _configProvider.GetUpdateLinksConfig();
             var settings = config.GetSettings(_revitRepository.Document)
                 ?? config.AddSettings(_revitRepository.Document);
-            settings.InitialFolderPath = _openFolderDialog.Folder.FullName;
+            settings.InitialFolderPath = OpenFolderDialogService.Folder.FullName;
             config.SaveProjectConfig();
 
             const string searchPattern = "*.rvt";
 
-            return new LinksFromSource(_openFolderDialog.Folder.FullName,
-                _openFolderDialog.Folders
+            return new LinksFromSource(
+                OpenFolderDialogService.Folder.FullName,
+                OpenFolderDialogService.Folders
                 .SelectMany(dir => Directory.EnumerateFiles(
                     dir.FullName,
                     searchPattern,
