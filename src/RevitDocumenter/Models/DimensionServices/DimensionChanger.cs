@@ -10,7 +10,7 @@ namespace RevitDocumenter.Models.DimensionServices;
 
 internal class DimensionChanger {
     private const double _horizontalOffsetFactor = 0.1;
-    private const double _textHeightAdjustmentFactor = 2.0;
+    private const double _textHeightFactor = 2.0;
     private const double _verticalStepFactor = 1;
     private const double _horizontalStepFactor = 1.2;
     private const int _maxSearchSteps = 10;
@@ -64,29 +64,29 @@ internal class DimensionChanger {
     /// Определяет контрольные точки текстового поля размера
     /// </summary>
     private DimensionTextPoints GetDimensionTextPoints(Dimension dimension) {
-        var centerPoint = GetDimensionCenterPoint(dimension);
+        var textLineCenterPoint = GetDimensionCenterPoint(dimension);
         var leaderEndPosition = dimension.LeaderEndPosition;
         var textPosition = dimension.TextPosition;
 
-        var directionToLeader = (leaderEndPosition - centerPoint).Normalize();
+        var directionToLeader = (leaderEndPosition - textLineCenterPoint).Normalize();
         var bottomLeft = leaderEndPosition + directionToLeader * _horizontalOffsetFactor;
-        var bottomRight = bottomLeft + (centerPoint - bottomLeft) * 2;
+        var bottomRight = bottomLeft + (textLineCenterPoint - bottomLeft) * 2;
 
         int viewScale = _revitRepository.Document.ActiveView.Scale;
         double textHeight = dimension.DimensionType.GetParamValue<double>(BuiltInParameter.TEXT_SIZE)
                             * viewScale
-                            * _textHeightAdjustmentFactor;
+                            * _textHeightFactor;
 
-        var upDirection = (dimension.TextPosition - centerPoint).Normalize();
+        var upDirection = (dimension.TextPosition - textLineCenterPoint).Normalize();
         return
-            new DimensionTextPoints(bottomLeft, bottomRight, upDirection, textHeight, centerPoint, textPosition);
+            new DimensionTextPoints(bottomLeft, bottomRight, upDirection * textHeight, textLineCenterPoint, textPosition);
     }
 
     private (XYZ DimensionUpVector, XYZ DimensionRightVector) GetDimensionVectors(
         Dimension dimension,
         DimensionTextPoints points) {
         return (
-            (dimension.TextPosition - points.DimensionCenterPoint).Normalize(),
+            (dimension.TextPosition - points.TextLineCenterPoint).Normalize(),
             (points.BottomRightCorner - points.BottomLeftCorner).Normalize());
     }
 
@@ -167,15 +167,24 @@ internal class DimensionChanger {
                        textPoints.BottomLeftCorner,
                        textPoints.BottomRightCorner,
                        textPoints.TopLeftCorner,
-                       textPoints.TopRightCorner)) {
+                       textPoints.TopRightCorner,
+                       textPoints.TextMiddlePoint)) {
                     continue;
                 }
 
                 // Центрируем текст для маленьких размеров, чтобы он смотрелся корректно
                 dimension = RecreateDimension(dimension, textPoints, references, mapService);
-                dimension.TextPosition =
-                    (textPoints.BottomLeftCorner + textPoints.BottomRightCorner) / 2
-                    + (textPoints.TextPositionPoint - textPoints.DimensionCenterPoint);
+                dimension.TextPosition = textPoints.TextPositionPoint;
+                //dimension.TextPosition =
+                //    (textPoints.BottomLeftCorner + textPoints.BottomRightCorner) / 2
+                //    + (textPoints.TextPositionPoint - textPoints.TextLineCenterPoint);
+
+                _ballCreator.CreateSphere(textPoints.TopLeftCorner, 100);
+                _ballCreator.CreateSphere(textPoints.TopRightCorner, 100);
+                _ballCreator.CreateSphere(textPoints.BottomLeftCorner, 100);
+                _ballCreator.CreateSphere(textPoints.BottomRightCorner, 100);
+                _ballCreator.CreateSphere(textPoints.TextMiddlePoint, 100);
+
                 success = true;
             }
             // Если нашли нужно положение, то больше не ищем

@@ -5,35 +5,54 @@ namespace RevitDocumenter.Models.DimensionServices;
 /// Описывает прямоугольную область и контрольные точки текста размера
 /// </summary>
 internal class DimensionTextPoints {
-    public XYZ BottomLeftCorner { get; private set; }
-    public XYZ BottomRightCorner { get; private set; }
-    public XYZ TopLeftCorner { get; private set; }
+    public XYZ TopPoint { get; private set; }
+    public XYZ RightPoint { get; private set; }
+    public XYZ BottomPoint { get; private set; }
+    public XYZ LeftPoint { get; private set; }
+
     public XYZ TopRightCorner { get; private set; }
-    public XYZ DimensionCenterPoint { get; private set; }
+    public XYZ BottomRightCorner { get; private set; }
+    public XYZ BottomLeftCorner { get; private set; }
+    public XYZ TopLeftCorner { get; private set; }
+
+    public XYZ TextMiddlePoint { get; private set; }
     public XYZ TextPositionPoint { get; private set; }
-    public double Height { get; }
+    public XYZ TextLineCenterPoint { get; private set; }
 
     public DimensionTextPoints(
         XYZ bottomLeft,
         XYZ bottomRight,
-        XYZ upVector,
-        double height,
-        XYZ centerPoint,
+        XYZ textBoxHeightVector,
+        XYZ textLineCenterPoint,
         XYZ textPosition) {
         BottomLeftCorner = bottomLeft;
         BottomRightCorner = bottomRight;
-        DimensionCenterPoint = centerPoint;
+        TextLineCenterPoint = textLineCenterPoint;
         TextPositionPoint = textPosition;
-        Height = height;
 
-        TopLeftCorner = bottomLeft + upVector * height;
-        TopRightCorner = bottomRight + upVector * height;
+        TopLeftCorner = bottomLeft + textBoxHeightVector;
+        TopRightCorner = bottomRight + textBoxHeightVector;
+        TextMiddlePoint = (TopRightCorner + BottomLeftCorner) / 2;
+
+        TopPoint = (TopLeftCorner + TopRightCorner) / 2;
+        RightPoint = (TopRightCorner + BottomRightCorner) / 2;
+        BottomPoint = (BottomLeftCorner + BottomRightCorner) / 2;
+        LeftPoint = (TopLeftCorner + BottomLeftCorner) / 2;
     }
 
     public void Translate(XYZ translationVector) {
-        BottomLeftCorner += translationVector;
-        BottomRightCorner += translationVector;
-        TopLeftCorner += translationVector;
         TopRightCorner += translationVector;
+        BottomRightCorner += translationVector;
+        BottomLeftCorner += translationVector;
+        TopLeftCorner += translationVector;
+
+        TextMiddlePoint += translationVector;
+        TextPositionPoint += translationVector;
+        TextLineCenterPoint += translationVector;
+
+        TopPoint += translationVector;
+        RightPoint += translationVector;
+        BottomPoint += translationVector;
+        LeftPoint += translationVector;
     }
 }

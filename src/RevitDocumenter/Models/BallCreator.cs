@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 
 using Autodesk.Revit.DB;
@@ -11,12 +11,11 @@ internal class BallCreator {
     public BallCreator(RevitRepository revitRepository) {
         _revitRepository = revitRepository;
     }
-    
-    public void CreateSphere(XYZ center) {
+
+    public void CreateSphere(XYZ center, double radius) {
         var profile = new List<Curve>();
 
-        // create sphere with 0.5' radius
-        const double radius = 0.5;
+        radius = UnitUtilsHelper.ConvertToInternalValue(radius);
         XYZ profile00 = center;
         XYZ profilePlus = center + new XYZ(0, radius, 0);
         XYZ profileMinus = center - new XYZ(0, radius, 0);
@@ -32,13 +31,13 @@ internal class BallCreator {
             return;
         }
         Solid sphere = GeometryCreationUtilities.CreateRevolvedGeometry(
-            frame, 
-            [curveLoop], 
-            0, 
-            2 * Math.PI, 
+            frame,
+            [curveLoop],
+            0,
+            2 * Math.PI,
             options);
         DirectShape ds = DirectShape.CreateElement(
-            _revitRepository.Document, 
+            _revitRepository.Document,
             new ElementId(BuiltInCategory.OST_GenericModel));
         ds.SetShape([sphere]);
     }

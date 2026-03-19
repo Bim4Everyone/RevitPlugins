@@ -1,6 +1,7 @@
 using System;
 using System.Drawing;
 using System.Drawing.Imaging;
+using System.Linq;
 using System.Runtime.InteropServices;
 
 using Autodesk.Revit.DB;
@@ -106,16 +107,8 @@ internal class ViewMapService {
     }
 
 
-    public bool Check(
-        XYZ textEdgeLeftBottomTemp,
-        XYZ textEdgeRightBottomTemp,
-        XYZ textEdgeLeftTopTemp,
-        XYZ textEdgeRightTopTemp) {
-        return
-            IsWhiteSquare(textEdgeLeftBottomTemp)
-            && IsWhiteSquare(textEdgeRightBottomTemp)
-            && IsWhiteSquare(textEdgeLeftTopTemp)
-            && IsWhiteSquare(textEdgeRightTopTemp);
+    public bool Check(params XYZ[] points) {
+        return points != null && points.All(IsWhiteSquare);
     }
 
     public bool IsWhiteSquare(XYZ point) {
@@ -129,15 +122,8 @@ internal class ViewMapService {
         return _map[stepsForY, stepsForX].AllPixelsWhite;
     }
 
-    public void Paint(
-        XYZ textEdgeLeftBottomTemp,
-        XYZ textEdgeRightBottomTemp,
-        XYZ textEdgeLeftTopTemp,
-        XYZ textEdgeRightTopTemp) {
-        PaintSquare(textEdgeLeftBottomTemp);
-        PaintSquare(textEdgeRightBottomTemp);
-        PaintSquare(textEdgeLeftTopTemp);
-        PaintSquare(textEdgeRightTopTemp);
+    public void Paint(params XYZ[] points) {
+        points?.ToList().ForEach(PaintSquare);
     }
 
     public void PaintSquare(XYZ point) {
