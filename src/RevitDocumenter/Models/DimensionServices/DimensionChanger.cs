@@ -12,15 +12,17 @@ internal class DimensionChanger {
     private const double _horizontalOffsetFactor = 0.1;
     private const double _textHeightAdjustmentFactor = 2.0;
     private const double _verticalStepFactor = 1;
-    private const double _horizontalStepFactor = 1.5;
+    private const double _horizontalStepFactor = 1.2;
     private const int _maxSearchSteps = 10;
 
     private readonly RevitRepository _revitRepository;
     private readonly DimensionCreator _dimensionCreator;
+    private readonly BallCreator _ballCreator;
 
-    public DimensionChanger(RevitRepository revitRepository, DimensionCreator dimensionCreator) {
+    public DimensionChanger(RevitRepository revitRepository, DimensionCreator dimensionCreator, BallCreator ballCreator) {
         _revitRepository = revitRepository;
         _dimensionCreator = dimensionCreator;
+        _ballCreator = ballCreator;
     }
 
     public Dimension Change(
@@ -151,6 +153,12 @@ internal class DimensionChanger {
 
         // Маленький размер всегда устанавливается с текстом по середине, поэтому перемещать его нужно сразу
         for(int stepIndex = 1; stepIndex <= _maxSearchSteps; stepIndex++) {
+            bool success = false;
+
+            // Если по бокам места нет, делаем шаг по вертикали и сбрасываем боковой сдвиг
+            int verticalDirectionFactor = stepIndex % 2 == 1 ? -stepIndex : stepIndex;
+            textPoints.Translate(verticalStep * verticalDirectionFactor);
+
             // Пробуем смещение вправо (1), затем влево (-2 от текущей позиции)
             foreach(int horizontalDirectionFactor in new[] { 1, -2 }) {
                 textPoints.Translate(horizontalStep * horizontalDirectionFactor);
@@ -168,11 +176,12 @@ internal class DimensionChanger {
                 dimension.TextPosition =
                     (textPoints.BottomLeftCorner + textPoints.BottomRightCorner) / 2
                     + (textPoints.TextPositionPoint - textPoints.DimensionCenterPoint);
+                success = true;
             }
+            // Если нашли нужно положение, то больше не ищем
+            if(success)
+                break;
 
-            // Если по бокам места нет, делаем шаг по вертикали и сбрасываем боковой сдвиг
-            int verticalDirectionFactor = stepIndex % 2 == 1 ? stepIndex : -stepIndex;
-            textPoints.Translate(verticalStep * verticalDirectionFactor);
             // Возвращаем текст к центру
             textPoints.Translate(horizontalStep);
         }

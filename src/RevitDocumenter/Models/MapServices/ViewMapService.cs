@@ -119,7 +119,6 @@ internal class ViewMapService {
     }
 
     public bool IsWhiteSquare(XYZ point) {
-
         var difVector = point - _exportOption.StartPointInRevit;
         double x = difVector.X;
         double y = difVector.Y;
@@ -142,7 +141,6 @@ internal class ViewMapService {
     }
 
     public void PaintSquare(XYZ point) {
-
         var difVector = point - _exportOption.StartPointInRevit;
         double x = difVector.X;
         double y = difVector.Y;

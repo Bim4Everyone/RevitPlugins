@@ -69,10 +69,10 @@ internal class DimensionService {
             return;
         }
         // Получаем линию размещения размера
-        var dimensionLineY = _dimensionLineService.GetDimensionLine(rebar, direction);
+        var dimensionLine = _dimensionLineService.GetDimensionLine(rebar, direction);
 
         // Строим размер
-        var dimension = _dimensionCreator.Create(dimensionLineY, dimensionRefs, selectedDimensionType);
+        var dimension = _dimensionCreator.Create(dimensionLine, dimensionRefs, selectedDimensionType);
 
         // Если запросили точное расположение размеров
         if(placeDimensionsAccurately) {
