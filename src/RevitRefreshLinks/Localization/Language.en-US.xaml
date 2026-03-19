@@ -63,6 +63,8 @@
     <system:String
         x:Key="LinkLoader.Transaction.AddLinks">Add links</system:String>
     <system:String
+        x:Key="LinkLoader.Transaction.PinLinks">Pin links</system:String>
+    <system:String
         x:Key="LinkLoader.Error.Coordinates">File with different shared coordinates</system:String>
     <system:String
         x:Key="LinkLoader.Error.Version">File was created in a different Revit version</system:String>
