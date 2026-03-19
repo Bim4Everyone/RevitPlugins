@@ -30,11 +30,7 @@ internal class FilterDataProvider : IDataProvider {
     }
 
     public ICollection<Category> GetCategories() {
-        return ParameterFilterUtilities.GetAllFilterableCategories()
-            .Select(c => Category.GetCategory(_doc, c))
-            .Where(category => category != null)
-            .Where(c => c.CategoryType == CategoryType.Model && c.IsVisibleInUI)
-            .ToArray();
+        return [Category.GetCategory(_doc, BuiltInCategory.OST_Walls)];
     }
 
     public ICollection<Document> GetDocuments() {

@@ -10,6 +10,7 @@ internal class FilterPageViewModel : BaseViewModel {
                                ILocalizationService languageService,
                                IDataProvider dataProvider) {
         FilterProvider = filterProviderFactory.Create(dataProvider);
+        LanguageService = languageService;
     }
 
     public ILogicalFilterProvider FilterProvider { get; }

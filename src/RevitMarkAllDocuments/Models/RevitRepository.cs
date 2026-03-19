@@ -1,3 +1,6 @@
+using System.Collections.Generic;
+using System.Linq;
+
 using Autodesk.Revit.ApplicationServices;
 using Autodesk.Revit.DB;
 using Autodesk.Revit.UI;
@@ -38,4 +41,22 @@ internal class RevitRepository {
     /// Класс доступа к документу Revit.
     /// </summary>
     public Document Document => ActiveUIDocument.Document;
+
+    public IEnumerable<Document> GetAllDocuments() {
+        var docs = new List<Document> { Document };
+
+        // Получаем все связи (RevitLinkInstance)
+        var linkInstances = new FilteredElementCollector(Document)
+            .OfClass(typeof(RevitLinkInstance))
+            .Cast<RevitLinkInstance>();
+
+        foreach(var linkInstance in linkInstances) {
+            var linkDoc = linkInstance.GetLinkDocument();
+            if(linkDoc != null && !docs.Contains(linkDoc)) {
+                docs.Add(linkDoc);
+            }
+        }
+
+        return docs;
+    }
 }

@@ -1,9 +1,12 @@
+using Autodesk.Revit.DB;
+
 using dosymep.WPF.ViewModels;
 
 namespace RevitMarkAllDocuments.ViewModels;
 
 internal class DocumentViewModel : BaseViewModel {
     private string _name;
+    private Document _document;
     private string _documentType;
     private bool _isChecked;
 
@@ -16,6 +19,11 @@ internal class DocumentViewModel : BaseViewModel {
     public string Name {
         get => _name;
         set => RaiseAndSetIfChanged(ref _name, value);
+    }
+
+    public Document Document {
+        get => _document;
+        set => RaiseAndSetIfChanged(ref _document, value);
     }
 
     public string DocumentType {
