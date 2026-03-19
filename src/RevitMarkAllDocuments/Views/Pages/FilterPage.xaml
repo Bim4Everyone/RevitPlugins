@@ -8,12 +8,15 @@
     xmlns:me="clr-namespace:dosymep.WpfCore.MarkupExtensions;assembly=dosymep.WpfCore"
     xmlns:core="clr-namespace:dosymep.WpfUI.Core"
     xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
+    xmlns:filtration="clr-namespace:Bim4Everyone.RevitFiltration.Controls.Views;assembly=Bim4Everyone.RevitFiltration.Controls"
     
     ScrollViewer.CanContentScroll="False"
     
     x:ClassModifier="internal">
 
     <Grid>
-        
+        <filtration:PresetCategoriesFilterControl
+            LanguageService="{Binding LanguageService}"
+            LogicalFilterProvider="{Binding FilterProvider}" />
     </Grid>
 </core:WpfUIPlatformPage>

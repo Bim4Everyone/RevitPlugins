@@ -20,7 +20,7 @@ using RevitMarkAllDocuments.ViewModels;
 namespace RevitMarkAllDocuments.Views;
 
 internal partial class FilterPage {
-    public FilterPage(DocumentsPageViewModel viewModel, 
+    public FilterPage(MainViewModel viewModel, 
                       ILoggerService loggerService,
                       ILanguageService languageService, 
                       ILocalizationService localizationService,
@@ -30,6 +30,6 @@ internal partial class FilterPage {
                languageService, localizationService,
                uiThemeService, themeUpdaterService) {
         InitializeComponent();
-        DataContext = viewModel;
+        DataContext = viewModel.FilterPageViewModel;
     }
 }

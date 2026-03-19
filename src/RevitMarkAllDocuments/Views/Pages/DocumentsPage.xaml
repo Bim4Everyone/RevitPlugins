@@ -13,7 +13,38 @@
     
     x:ClassModifier="internal">
 
-    <Grid>
-        
+    <core:WpfUIPlatformPage.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary
+                    Source="../Styles/Styles.xaml" />
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
+    </core:WpfUIPlatformPage.Resources>
+
+
+    <Grid Margin="14">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="43" />
+            <RowDefinition />
+        </Grid.RowDefinitions>
+        <TextBlock
+            Grid.Row="0"
+            Style="{StaticResource HeaderName}"
+            Text="{me:LocalizationSource DocumentsPage.SelectDocs}" />
+        <Border
+            Grid.Row="1"
+            Style="{StaticResource CustomBorder}">
+            <ListBox
+                ItemsSource="{Binding Documents}">
+                <ListBox.ItemTemplate>
+                    <DataTemplate>
+                        <CheckBox
+                            Content="{Binding Name}"
+                            IsChecked="{Binding IsChecked}" />
+                    </DataTemplate>
+                </ListBox.ItemTemplate>
+            </ListBox>
+        </Border>
     </Grid>
 </core:WpfUIPlatformPage>

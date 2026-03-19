@@ -7,6 +7,8 @@
     <system:String x:Key="MainWindow.FilterPage">Фильтр</system:String>
     <system:String x:Key="MainWindow.SortPage">Сортировка</system:String>
     <system:String x:Key="MainWindow.MarkPage">Марка</system:String>
+    
+    <system:String x:Key="DocumentsPage.SelectDocs">Выберите проекты для маркировки</system:String>
 
     <system:String x:Key="MainWindow.ButtonOk">ОК</system:String>
     <system:String x:Key="MainWindow.ButtonCancel">Отмена</system:String>

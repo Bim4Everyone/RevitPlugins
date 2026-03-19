@@ -38,7 +38,7 @@ public class RevitMarkAllDocumentsCommand : BasePluginCommand {
     /// Инициализирует команду плагина.
     /// </summary>
     public RevitMarkAllDocumentsCommand() {
-        PluginName = "RevitMarkAllDocuments";
+        PluginName = "Маркировать всё";
     }
 
     /// <summary>
@@ -53,9 +53,9 @@ public class RevitMarkAllDocumentsCommand : BasePluginCommand {
         // Создание контейнера зависимостей плагина с сервисами из платформы
         using IKernel kernel = uiApplication.CreatePlatformServices();
 
-        kernel.UseLogicalFilterFactory(); // сервис для создания фильтра (обязательно)
-        kernel.UseLogicalFilterProviderFactory(); // сервис для привязки фильтра из UI к ViewModel (обязательно)
-        kernel.UseFilterContextParser(); // сервис для сохранения и загрузки фильтра UI (опционально)
+        kernel.UseLogicalFilterFactory();
+        kernel.UseLogicalFilterProviderFactory(); 
+        kernel.UseFilterContextParser();
 
         // Настройка доступа к Revit
         kernel.Bind<RevitRepository>()
