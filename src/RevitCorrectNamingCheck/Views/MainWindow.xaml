@@ -60,7 +60,6 @@
                 CanUserDeleteRows="False"
                 AutoGenerateColumns="False"
                 CanUserAddRows="False"
-                IsReadOnly="True"
                 Grid.Row="1"
                 Margin="10,0,10,0"
                 HeadersVisibility="Column"
@@ -68,7 +67,8 @@
                 ItemsSource="{Binding LinkedFiles}">
 
                 <DataGrid.Columns>
-                    <DataGridTemplateColumn>
+                    <DataGridTemplateColumn
+                        IsReadOnly="True">
                         <DataGridTemplateColumn.Header>
                             <TextBlock
                                 Text="{DynamicResource MainWindow.LinkedFile}" />
@@ -88,10 +88,14 @@
                         </DataGridTemplateColumn.Header>
                         <DataGridTemplateColumn.CellTemplate>
                             <DataTemplate>
-                                <ContentControl
-                                    Content="{Binding TypeWorkset}"
-                                    ContentTemplateSelector="{StaticResource WorksetSelector}" />
-
+                                <ComboBox
+                                    Padding="0"
+                                    MinWidth="150"
+                                    IsSynchronizedWithCurrentItem="True"
+                                    ScrollViewer.VerticalScrollBarVisibility="Visible"
+                                    ItemsSource="{Binding TypeWorksets}"
+                                    SelectedItem="{Binding TypeWorkset, UpdateSourceTrigger=PropertyChanged}"
+                                    ItemTemplateSelector="{StaticResource WorksetSelector}" />
                             </DataTemplate>
                         </DataGridTemplateColumn.CellTemplate>
                     </DataGridTemplateColumn>
@@ -102,12 +106,17 @@
                                 Text="{DynamicResource MainWindow.Instance}" />
 
                         </DataGridTemplateColumn.Header>
+
                         <DataGridTemplateColumn.CellTemplate>
                             <DataTemplate>
-                                <ContentControl
-                                    Content="{Binding InstanceWorkset}"
-                                    ContentTemplateSelector="{StaticResource WorksetSelector}" />
-
+                                <ComboBox
+                                    Padding="0"
+                                    MinWidth="150"
+                                    IsSynchronizedWithCurrentItem="True"
+                                    ScrollViewer.VerticalScrollBarVisibility="Visible"
+                                    ItemsSource="{Binding InstanceWorksets}"
+                                    SelectedItem="{Binding InstanceWorkset, UpdateSourceTrigger=PropertyChanged}"
+                                    ItemTemplateSelector="{StaticResource WorksetSelector}" />
                             </DataTemplate>
                         </DataGridTemplateColumn.CellTemplate>
                     </DataGridTemplateColumn>
@@ -122,11 +131,9 @@
                         <DataGridTemplateColumn.CellTemplate>
                             <DataTemplate>
                                 <CheckBox
-                                    IsHitTestVisible="False"
-                                    Focusable="False"
                                     HorizontalAlignment="Center"
                                     VerticalAlignment="Center"
-                                    IsChecked="{Binding IsPinned}" />
+                                    IsChecked="{Binding IsPinned, UpdateSourceTrigger=PropertyChanged}" />
                             </DataTemplate>
                         </DataGridTemplateColumn.CellTemplate>
                     </DataGridTemplateColumn>
@@ -143,8 +150,9 @@
                 Width="100"
                 Margin="10"
                 Appearance="Info"
-                Content="{me:LocalizationSource MainWindow.ButtonRefresh}"
-                Command="{Binding LoadViewCommand}" />
+                Click="ButtonOk_Click"
+                Content="{me:LocalizationSource MainWindow.ButtonOk}"
+                Command="{Binding AcceptViewCommand}" />
             
             <ui:Button
                 IsCancel="True"
