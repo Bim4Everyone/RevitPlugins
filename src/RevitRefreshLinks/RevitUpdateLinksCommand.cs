@@ -1,5 +1,6 @@
 using System.Globalization;
 using System.Reflection;
+using System.Windows;
 
 using Autodesk.Revit.Attributes;
 using Autodesk.Revit.DB;
@@ -33,7 +34,7 @@ public class RevitUpdateLinksCommand : BasePluginCommand {
         kernel.Bind<RevitRepository>()
             .ToSelf()
             .InSingletonScope();
-        kernel.Bind<ITwoSourceLinksProvider>()
+        kernel.Bind<ITwoSourceLinksProvider, TwoSourcesLinksProvider>()
             .To<TwoSourcesLinksProvider>()
             .InSingletonScope();
         kernel.Bind<ILinksLoader>()
@@ -46,7 +47,17 @@ public class RevitUpdateLinksCommand : BasePluginCommand {
         kernel.Bind<UpdateLinksConfig>()
             .ToMethod(c => UpdateLinksConfig.GetPluginConfig(c.Kernel.Get<IConfigSerializer>()));
 
-        kernel.BindMainWindow<UpdateLinksViewModel, UpdateLinksWindow>();
+        kernel.Bind<UpdateLinksViewModel>()
+            .ToSelf()
+            .InSingletonScope()
+            .WithConstructorArgument(
+                "openFolderDialog",
+                c => c.Kernel.Get<TwoSourcesLinksProvider>().OpenFolderDialogService);
+        kernel.Bind<IHasTheme, IHasLocalization, UpdateLinksWindow>()
+            .To<UpdateLinksWindow>()
+            .InSingletonScope()
+            .WithPropertyValue(nameof(Window.DataContext), c => c.Kernel.Get<UpdateLinksViewModel>());
+        kernel.UseWpfUIMessageBox<UpdateLinksViewModel>();
 
         kernel.UseWpfUIThemeUpdater();
 
@@ -54,7 +65,7 @@ public class RevitUpdateLinksCommand : BasePluginCommand {
         kernel.UseWpfLocalization($"/{assemblyName};component/Localization/Language.xaml",
             CultureInfo.GetCultureInfo("ru-RU"));
         var localizationService = kernel.Get<ILocalizationService>();
-        kernel.UseXtraOpenFolderDialog<TwoSourcesLinksProvider>(
+        kernel.UseWpfOpenFolderDialog<TwoSourcesLinksProvider>(
             title: localizationService.GetLocalizedString("SelectLocalFoldersDialog.Title"),
             initialDirectory: GetInitialLocalFolder(kernel),
             multiSelect: false);
