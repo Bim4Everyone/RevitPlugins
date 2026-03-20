@@ -127,6 +127,31 @@ internal class ViewMapService {
         return true;
     }
 
+    /// <summary>
+    /// Анализирует квадраты по центральной точке квадрата и отступам на наличие белых групп пикселей
+    /// </summary>
+    public bool CheckInRectangle(MapInfo mapInfo, XYZ point, int offset) {
+        // Переводим координаты точек в Revit в индексы квадратов на карте
+        (int indexX, int indexY) = GetMapIndexes(mapInfo, point);
+
+        // Определяем границы прямоугольника
+        int minX = indexX - offset;
+        int maxX = indexX + offset;
+        int minY = indexY - offset;
+        int maxY = indexY + offset;
+
+        // Проходим по всем SquareInfo в прямоугольнике
+        for(int x = minX; x <= maxX; x++) {
+            for(int y = minY; y <= maxY; y++) {
+                if(!mapInfo.Map[y, x].AllPixelsWhite) {
+                    // Нашли не белый квадрат
+                    return false;
+                }
+            }
+        }
+        return true;
+    }
+
     public (int indexX, int indexY) GetMapIndexes(MapInfo mapInfo, XYZ point) {
         var difVector = point - mapInfo.StartPointInRevit;
         double x = difVector.X;
@@ -164,6 +189,24 @@ internal class ViewMapService {
         int maxX = Math.Max(indexX1, indexX2);
         int minY = Math.Min(indexY1, indexY2);
         int maxY = Math.Max(indexY1, indexY2);
+
+        // Проходим по всем SquareInfo в прямоугольнике
+        for(int x = minX; x <= maxX; x++) {
+            for(int y = minY; y <= maxY; y++) {
+                mapInfo.Map[y, x].AllPixelsWhite = false;
+            }
+        }
+    }
+
+    public void PaintInRectangle(MapInfo mapInfo, XYZ point, int offset) {
+        // Переводим координаты точек в Revit в индексы квадратов на карте
+        (int indexX, int indexY) = GetMapIndexes(mapInfo, point);
+
+        // Определяем границы прямоугольника
+        int minX = indexX - offset;
+        int maxX = indexX + offset;
+        int minY = indexY - offset;
+        int maxY = indexY + offset;
 
         // Проходим по всем SquareInfo в прямоугольнике
         for(int x = minX; x <= maxX; x++) {

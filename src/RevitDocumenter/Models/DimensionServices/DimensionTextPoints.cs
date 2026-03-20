@@ -12,6 +12,7 @@ internal class DimensionTextPoints {
 
     public XYZ TextPositionPoint { get; private set; }
     public XYZ TextLineCenterPoint { get; private set; }
+    public XYZ TextMiddlePoint { get; private set; }
 
     public DimensionTextPoints(
         XYZ bottomLeft,
@@ -26,6 +27,7 @@ internal class DimensionTextPoints {
 
         TopLeftCorner = bottomLeft + textBoxHeightVector;
         TopRightCorner = bottomRight + textBoxHeightVector;
+        TextMiddlePoint = (BottomLeftCorner + TopRightCorner) / 2;
     }
 
     public void Translate(XYZ translationVector) {
@@ -36,5 +38,6 @@ internal class DimensionTextPoints {
 
         TextPositionPoint += translationVector;
         TextLineCenterPoint += translationVector;
+        TextMiddlePoint += translationVector;
     }
 }

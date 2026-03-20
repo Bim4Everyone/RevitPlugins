@@ -115,21 +115,48 @@ internal class DimensionChanger {
         DimensionTextPoints textPoints,
         XYZ verticalStep) {
 
+        var dimensionLine = dimension.Curve as Line;
+        if(dimensionLine == null)
+            return dimension;
+
+        double dimensionLineDirX = dimensionLine.Direction.X;
+        double tolerance = 1e-10;
+        bool isOrthogonalDimension =
+            Math.Abs(dimensionLineDirX - 0) < tolerance
+            || Math.Abs(dimensionLineDirX - 1) < tolerance
+            || Math.Abs(dimensionLineDirX + 1) < tolerance;
+
         for(int stepIndex = 0; stepIndex <= _maxSearchSteps; stepIndex++) {
             // При первом заходе в цикл не ищем для размера новое, а проверяем его стандартное положение
             if(stepIndex > 0) {
                 int directionFactor = stepIndex % 2 == 1 ? stepIndex : -stepIndex;
                 textPoints.Translate(verticalStep * directionFactor);
             }
-            if(!_mapService.CheckInRectangle(mapInfo, textPoints.BottomLeftCorner, textPoints.TopRightCorner)) {
-                continue;
+
+            if(isOrthogonalDimension) {
+                if(!_mapService.CheckInRectangle(mapInfo, textPoints.BottomLeftCorner, textPoints.TopRightCorner)) {
+                    continue;
+                }
+            } else {
+                if(!_mapService.CheckInRectangle(
+                    mapInfo,
+                    textPoints.TextMiddlePoint,
+                    1)) {
+                    continue;
+                }
             }
 
             // Если текст размера ничего не пересекает и сдвиг был, пересоздаем размер на новом месте
             if(stepIndex > 0) {
                 dimension = RecreateDimension(dimension, textPoints, references);
             }
-            _mapService.PaintInRectangle(mapInfo, textPoints.BottomLeftCorner, textPoints.TopRightCorner);
+
+            // Фиксируем в карте, что теперь эти квадраты заняты
+            if(isOrthogonalDimension) {
+                _mapService.PaintInRectangle(mapInfo, textPoints.BottomLeftCorner, textPoints.TopRightCorner);
+            } else {
+                _mapService.PaintInRectangle(mapInfo, textPoints.TextMiddlePoint, 1);
+            }
             break;
         }
         return dimension;
@@ -150,6 +177,17 @@ internal class DimensionChanger {
         XYZ verticalStep,
         XYZ horizontalStep) {
 
+        var dimensionLine = dimension.Curve as Line;
+        if(dimensionLine == null)
+            return dimension;
+
+        double dimensionLineDirX = dimensionLine.Direction.X;
+        double tolerance = 1e-10;
+        bool isOrthogonalDimension =
+            Math.Abs(dimensionLineDirX - 0) < tolerance
+            || Math.Abs(dimensionLineDirX - 1) < tolerance
+            || Math.Abs(dimensionLineDirX + 1) < tolerance;
+
         // Маленький размер всегда устанавливается с текстом по середине, поэтому перемещать его нужно сразу
         for(int stepIndex = 1; stepIndex <= _maxSearchSteps; stepIndex++) {
             bool success = false;
@@ -162,13 +200,28 @@ internal class DimensionChanger {
             foreach(int horizontalDirectionFactor in new[] { 1, -2 }) {
                 textPoints.Translate(horizontalStep * horizontalDirectionFactor);
 
-                if(!_mapService.CheckInRectangle(mapInfo, textPoints.BottomLeftCorner, textPoints.TopRightCorner)) {
-                    continue;
+                if(isOrthogonalDimension) {
+                    if(!_mapService.CheckInRectangle(mapInfo, textPoints.BottomLeftCorner, textPoints.TopRightCorner)) {
+                        continue;
+                    }
+                } else {
+                    if(!_mapService.CheckInRectangle(
+                        mapInfo,
+                        textPoints.TextMiddlePoint,
+                        1)) {
+                        continue;
+                    }
                 }
 
                 // Центрируем текст для маленьких размеров, чтобы он смотрелся корректно
                 dimension = RecreateDimension(dimension, textPoints, references);
-                _mapService.PaintInRectangle(mapInfo, textPoints.BottomLeftCorner, textPoints.TopRightCorner);
+
+                // Фиксируем в карте, что теперь эти квадраты заняты
+                if(isOrthogonalDimension) {
+                    _mapService.PaintInRectangle(mapInfo, textPoints.BottomLeftCorner, textPoints.TopRightCorner);
+                } else {
+                    _mapService.PaintInRectangle(mapInfo, textPoints.TextMiddlePoint, 1);
+                }
                 success = true;
                 break;
             }
