@@ -93,10 +93,10 @@ internal class RevitRepository {
         return refs;
     }
 
-    public int GetMinDimensionInView() {
+    public double GetMinDimensionInView() {
         int scale = Document.ActiveView.Scale;
         // При масштабе 1:100 корректно смотрится на виде размер до 2 футов
-        const int minDimension = 2;
+        const double minDimension = 1.6;
         const int standardScale = 100;
         // Ищем минимальное значение размера, которое будет корректно видимо на виде с учетом масштаба
         //      100       scale         minDimension * scale

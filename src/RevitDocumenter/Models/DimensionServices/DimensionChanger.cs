@@ -12,7 +12,7 @@ internal class DimensionChanger {
     private const double _horizontalOffsetFactor = 0.1;
     private const double _textHeightFactor = 2.0;
     private const double _verticalStepFactor = 1;
-    private const double _horizontalStepFactor = 1.2;
+    private const double _horizontalStepFactor = 1.5;
     private const int _maxSearchSteps = 10;
 
     private readonly RevitRepository _revitRepository;
@@ -34,7 +34,18 @@ internal class DimensionChanger {
             var textPoints = GetDimensionTextPoints(dimension);
             (var upDimensionVector, var rightDimensionVector) = GetDimensionVectors(dimension, textPoints);
 
-            if(dimension.Value < _revitRepository.GetMinDimensionInView()) {
+            var q = dimension.Value;
+            var t = _revitRepository.GetMinDimensionInView();
+
+
+            if(dimension.Value > _revitRepository.GetMinDimensionInView()) {
+                dimension = DefinePositionForNormalDimension(
+                    dimension,
+                    dimensionReferences,
+                    textPoints,
+                    mapService,
+                    upDimensionVector * verticalStepValue * _verticalStepFactor);
+            } else {
                 var horizontalStep =
                     rightDimensionVector
                     * textPoints.BottomLeftCorner.DistanceTo(textPoints.BottomRightCorner)
@@ -46,13 +57,6 @@ internal class DimensionChanger {
                     mapService,
                     upDimensionVector * verticalStepValue * _verticalStepFactor,
                     horizontalStep);
-            } else {
-                dimension = DefinePositionForNormalDimension(
-                    dimension,
-                    dimensionReferences,
-                    textPoints,
-                    mapService,
-                    upDimensionVector * verticalStepValue * _verticalStepFactor);
             }
         } catch {
             // ignored
@@ -103,53 +107,6 @@ internal class DimensionChanger {
     /// Метод анализирует положение текста размера с учетом бинарной карты, определяет нужно ли выполнять смещение
     /// и при необходимости пытается подобрать положение, чтобы текст ничего не пересекал на чертеже, а затем
     /// пересоздает размер.
-    /// Если текст размера с учетом масштаба не укладывается между засечками размера, то размер считается маленьким и
-    /// для него ищется смещение по вертикали и в бок (влево и вправо) 
-    /// </summary>
-    private Dimension DefinePositionForSmallDimension(
-        Dimension dimension,
-        ReferenceArray references,
-        DimensionTextPoints textPoints,
-        ViewMapService mapService,
-        XYZ verticalStep,
-        XYZ horizontalStep) {
-
-        // Маленький размер всегда устанавливается с текстом по середине, поэтому перемещать его нужно сразу
-        for(int stepIndex = 1; stepIndex <= _maxSearchSteps; stepIndex++) {
-            bool success = false;
-
-            // Если по бокам места нет, делаем шаг по вертикали и сбрасываем боковой сдвиг
-            int verticalDirectionFactor = stepIndex % 2 == 1 ? -stepIndex : stepIndex;
-            textPoints.Translate(verticalStep * verticalDirectionFactor);
-
-            // Пробуем смещение вправо (1), затем влево (-2 от текущей позиции)
-            foreach(int horizontalDirectionFactor in new[] { 1, -2 }) {
-                textPoints.Translate(horizontalStep * horizontalDirectionFactor);
-
-                if(!mapService.CheckInRectangle(textPoints.BottomLeftCorner, textPoints.TopRightCorner)) {
-                    continue;
-                }
-
-                // Центрируем текст для маленьких размеров, чтобы он смотрелся корректно
-                dimension = RecreateDimension(dimension, textPoints, references, mapService);
-                dimension.TextPosition = textPoints.TextPositionPoint;
-                success = true;
-                break;
-            }
-            // Если нашли нужно положение, то больше не ищем
-            if(success)
-                break;
-
-            // Возвращаем текст к центру
-            textPoints.Translate(horizontalStep);
-        }
-        return dimension;
-    }
-
-    /// <summary>
-    /// Метод анализирует положение текста размера с учетом бинарной карты, определяет нужно ли выполнять смещение
-    /// и при необходимости пытается подобрать положение, чтобы текст ничего не пересекал на чертеже, а затем
-    /// пересоздает размер.
     /// Если текст размера с учетом масштаба укладывается между засечками размера, то размер считается нормальным и
     /// для него ищется смещение только по вертикали 
     /// </summary>
@@ -175,6 +132,59 @@ internal class DimensionChanger {
                 dimension = RecreateDimension(dimension, textPoints, references, mapService);
             }
             break;
+        }
+        return dimension;
+    }
+
+    /// <summary>
+    /// Метод анализирует положение текста размера с учетом бинарной карты, определяет нужно ли выполнять смещение
+    /// и при необходимости пытается подобрать положение, чтобы текст ничего не пересекал на чертеже, а затем
+    /// пересоздает размер.
+    /// Если текст размера с учетом масштаба не укладывается между засечками размера, то размер считается маленьким и
+    /// для него ищется смещение по вертикали и в бок (влево и вправо) 
+    /// </summary>
+    private Dimension DefinePositionForSmallDimension(
+        Dimension dimension,
+        ReferenceArray references,
+        DimensionTextPoints textPoints,
+        ViewMapService mapService,
+        XYZ verticalStep,
+        XYZ horizontalStep) {
+
+        // Маленький размер всегда устанавливается с текстом по середине, поэтому перемещать его нужно сразу
+        for(int stepIndex = 1; stepIndex <= _maxSearchSteps; stepIndex++) {
+            bool success = false;
+
+            // Если по бокам места нет, делаем шаг по вертикали и сбрасываем боковой сдвиг
+            int verticalDirectionFactor = stepIndex % 2 == 1 ? -stepIndex : stepIndex;
+            textPoints.Translate(verticalStep * verticalDirectionFactor);
+
+            // Пробуем смещение вправо (1), затем влево (-2 от текущей позиции)
+            foreach(int horizontalDirectionFactor in new[] { 1, -2 }) {
+                textPoints.Translate(horizontalStep * horizontalDirectionFactor);
+
+                _ballCreator.CreateSphere(textPoints.TopRightCorner, 50);
+                _ballCreator.CreateSphere(textPoints.TopLeftCorner, 50);
+                _ballCreator.CreateSphere(textPoints.BottomRightCorner, 50);
+                _ballCreator.CreateSphere(textPoints.BottomLeftCorner, 50);
+
+
+                if(!mapService.CheckInRectangle(textPoints.BottomLeftCorner, textPoints.TopRightCorner)) {
+                    continue;
+                }
+
+                // Центрируем текст для маленьких размеров, чтобы он смотрелся корректно
+                dimension = RecreateDimension(dimension, textPoints, references, mapService);
+                dimension.TextPosition = textPoints.TextPositionPoint;
+                success = true;
+                break;
+            }
+            // Если нашли нужно положение, то больше не ищем
+            if(success)
+                break;
+
+            // Возвращаем текст к центру
+            textPoints.Translate(horizontalStep);
         }
         return dimension;
     }
