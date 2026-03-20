@@ -1,6 +1,7 @@
 using System;
 using System.Drawing;
 using System.Drawing.Imaging;
+using System.Linq;
 using System.Runtime.InteropServices;
 
 using Autodesk.Revit.DB;
@@ -12,22 +13,17 @@ using Rectangle = System.Drawing.Rectangle;
 
 namespace RevitDocumenter.Models.MapServices;
 internal class ViewMapService {
-    private SquareInfo[,] _map;
-    private ExportOption _exportOption;
-
     public ViewMapService() { }
 
-    public ExportOption ExportOption {
-        get => _exportOption;
-    }
-
-    public SquareInfo[,] Map {
-        get => _map;
-    }
-
-    public void CreateMap(string path, ExportOption exportOption) {
-        _exportOption = exportOption;
-        _map = AnalyzeImageSquares(path, exportOption.StepCountX, exportOption.StepCountY);
+    public MapInfo CreateMap(string path, ExportOption exportOption) {
+        var map = AnalyzeImageSquares(path, exportOption.StepCountX, exportOption.StepCountY);
+        return new MapInfo(
+            map,
+            path,
+            exportOption.MappingStepInFeet,
+            exportOption.StepCountX,
+            exportOption.StepCountY,
+            exportOption.StartPointInRevit);
     }
 
     public SquareInfo[,] AnalyzeImageSquares(string imagePath, int stepCountX, int stepCountY) {
@@ -108,10 +104,10 @@ internal class ViewMapService {
     /// <summary>
     /// Анализирует квадраты между точками на наличие белых групп пикселей
     /// </summary>
-    public bool CheckInRectangle(XYZ point1, XYZ point2) {
+    public bool CheckInRectangle(MapInfo mapInfo, XYZ point1, XYZ point2) {
         // Переводим координаты точек в Revit в индексы квадратов на карте
-        (int indexX1, int indexY1) = GetMapIndexes(point1);
-        (int indexX2, int indexY2) = GetMapIndexes(point2);
+        (int indexX1, int indexY1) = GetMapIndexes(mapInfo, point1);
+        (int indexX2, int indexY2) = GetMapIndexes(mapInfo, point2);
 
         // Определяем границы прямоугольника
         int minX = Math.Min(indexX1, indexX2);
@@ -122,7 +118,7 @@ internal class ViewMapService {
         // Проходим по всем SquareInfo в прямоугольнике
         for(int x = minX; x <= maxX; x++) {
             for(int y = minY; y <= maxY; y++) {
-                if(!_map[y, x].AllPixelsWhite) {
+                if(!mapInfo.Map[y, x].AllPixelsWhite) {
                     // Нашли не белый квадрат
                     return false;
                 }
@@ -131,37 +127,37 @@ internal class ViewMapService {
         return true;
     }
 
-    public (int indexX, int indexY) GetMapIndexes(XYZ point) {
-        var difVector = point - _exportOption.StartPointInRevit;
+    public (int indexX, int indexY) GetMapIndexes(MapInfo mapInfo, XYZ point) {
+        var difVector = point - mapInfo.StartPointInRevit;
         double x = difVector.X;
         double y = difVector.Y;
 
-        int indexX = (int) Math.Floor(x / _exportOption.MappingStepInFeet);
-        int indexY = (int) Math.Floor(y / _exportOption.MappingStepInFeet);
+        int indexX = (int) Math.Floor(x / mapInfo.MappingStepInFeet);
+        int indexY = (int) Math.Floor(y / mapInfo.MappingStepInFeet);
 
         return (indexX, indexY);
     }
 
-    //public bool Check(params XYZ[] points) {
-    //    return points != null && points.All(IsWhiteSquare);
-    //}
+    public bool Check(MapInfo mapInfo, params XYZ[] points) {
+        return points != null && points.All(point => IsWhiteSquare(mapInfo, point));
+    }
 
-    //public bool IsWhiteSquare(XYZ point) {
-    //    var difVector = point - _exportOption.StartPointInRevit;
-    //    double x = difVector.X;
-    //    double y = difVector.Y;
+    public bool IsWhiteSquare(MapInfo mapInfo, XYZ point) {
+        var difVector = point - mapInfo.StartPointInRevit;
+        double x = difVector.X;
+        double y = difVector.Y;
 
-    //    int stepsForX = (int) Math.Floor(x / _exportOption.MappingStepInFeet);
-    //    int stepsForY = (int) Math.Floor(y / _exportOption.MappingStepInFeet);
+        int stepsForX = (int) Math.Floor(x / mapInfo.MappingStepInFeet);
+        int stepsForY = (int) Math.Floor(y / mapInfo.MappingStepInFeet);
 
-    //    return _map[stepsForY, stepsForX].AllPixelsWhite;
-    //}
+        return mapInfo.Map[stepsForY, stepsForX].AllPixelsWhite;
+    }
 
 
-    public void PaintInRectangle(XYZ point1, XYZ point2) {
+    public void PaintInRectangle(MapInfo mapInfo, XYZ point1, XYZ point2) {
         // Переводим координаты точек в Revit в индексы квадратов на карте
-        (int indexX1, int indexY1) = GetMapIndexes(point1);
-        (int indexX2, int indexY2) = GetMapIndexes(point2);
+        (int indexX1, int indexY1) = GetMapIndexes(mapInfo, point1);
+        (int indexX2, int indexY2) = GetMapIndexes(mapInfo, point2);
 
         // Определяем границы прямоугольника
         int minX = Math.Min(indexX1, indexX2);
@@ -172,24 +168,24 @@ internal class ViewMapService {
         // Проходим по всем SquareInfo в прямоугольнике
         for(int x = minX; x <= maxX; x++) {
             for(int y = minY; y <= maxY; y++) {
-                _map[y, x].AllPixelsWhite = false;
+                mapInfo.Map[y, x].AllPixelsWhite = false;
             }
         }
     }
 
 
-    //public void Paint(params XYZ[] points) {
-    //    points?.ToList().ForEach(PaintSquare);
-    //}
+    public void Paint(MapInfo mapInfo, params XYZ[] points) {
+        points?.ToList().ForEach(point => PaintSquare(mapInfo, point));
+    }
 
-    //public void PaintSquare(XYZ point) {
-    //    var difVector = point - _exportOption.StartPointInRevit;
-    //    double x = difVector.X;
-    //    double y = difVector.Y;
+    public void PaintSquare(MapInfo mapInfo, XYZ point) {
+        var difVector = point - mapInfo.StartPointInRevit;
+        double x = difVector.X;
+        double y = difVector.Y;
 
-    //    int stepsForX = (int) Math.Floor(x / _exportOption.MappingStepInFeet);
-    //    int stepsForY = (int) Math.Floor(y / _exportOption.MappingStepInFeet);
+        int stepsForX = (int) Math.Floor(x / mapInfo.MappingStepInFeet);
+        int stepsForY = (int) Math.Floor(y / mapInfo.MappingStepInFeet);
 
-    //    _map[stepsForY, stepsForX].AllPixelsWhite = false;
-    //}
+        mapInfo.Map[stepsForY, stepsForX].AllPixelsWhite = false;
+    }
 }

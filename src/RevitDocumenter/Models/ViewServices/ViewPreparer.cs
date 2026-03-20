@@ -12,11 +12,15 @@ internal class ViewPreparer {
         _anchorLineService = anchorLineService;
     }
 
+    /// <summary>
+    /// В методе подготавливается вид, определяются краевые точки, по ним строятся якорные линии, 
+    /// вычисляется количество квадратов
+    /// </summary>
     public ExportOption Prepare(ViewPreparerOption viewPreparerOption) {
         var view = _revitRepository.Document.ActiveView;
         // Получаем точки рамки подрезки вида, смещенные немного внутрь, чтобы расстояние 
         // между ними было кратно указанному шагу
-        (var viewMinFixed, var viewMaxFixed) = GetFixedCropBoxPoints(view, viewPreparerOption.MappingStepInMm);
+        (var viewMinFixed, var viewMaxFixed) = GetFixedCropBoxPoints(view, viewPreparerOption.MappingStepInFeet);
 
         // Количество квадратов в среде Revit
         int stepCountX = (int) Math.Round((viewMaxFixed.X - viewMinFixed.X) / viewPreparerOption.MappingStepInFeet);
@@ -41,17 +45,15 @@ internal class ViewPreparer {
         };
     }
 
-    private (XYZ, XYZ) GetFixedCropBoxPoints(View view, double mappingStepInMm) {
+    private (XYZ, XYZ) GetFixedCropBoxPoints(View view, double mappingStepInFeet) {
         var viewMax = ProjectPointToViewPlan(view, view.CropBox.Max);
         var viewMin = ProjectPointToViewPlan(view, view.CropBox.Min);
-
-        double step = UnitUtilsHelper.ConvertToInternalValue(mappingStepInMm);
 
         double deltaX = viewMax.X - viewMin.X;
         double deltaY = viewMax.Y - viewMin.Y;
 
-        double halfRemainderX = deltaX % step / 2;
-        double halfRemainderY = deltaY % step / 2;
+        double halfRemainderX = deltaX % mappingStepInFeet / 2;
+        double halfRemainderY = deltaY % mappingStepInFeet / 2;
 
         var viewMaxFixed = new XYZ(viewMax.X - halfRemainderX, viewMax.Y - halfRemainderY, viewMax.Z);
         var viewMinFixed = new XYZ(viewMin.X + halfRemainderX, viewMin.Y + halfRemainderY, viewMin.Z);

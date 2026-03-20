@@ -18,40 +18,42 @@ internal class DimensionChanger {
     private readonly RevitRepository _revitRepository;
     private readonly DimensionCreator _dimensionCreator;
     private readonly BallCreator _ballCreator;
+    private readonly ViewMapService _mapService;
 
-    public DimensionChanger(RevitRepository revitRepository, DimensionCreator dimensionCreator, BallCreator ballCreator) {
+    public DimensionChanger(
+        RevitRepository revitRepository,
+        DimensionCreator dimensionCreator,
+        BallCreator ballCreator,
+        ViewMapService mapService) {
         _revitRepository = revitRepository;
         _dimensionCreator = dimensionCreator;
         _ballCreator = ballCreator;
+        _mapService = mapService;
     }
 
-    public Dimension Change(
-        Dimension dimension,
-        ViewMapService mapService,
-        double verticalStepValue,
-        ReferenceArray dimensionReferences) {
+    public Dimension Change(Dimension dimension, MapInfo mapInfo, ReferenceArray dimensionReferences) {
         try {
             var textPoints = GetDimensionTextPoints(dimension);
             (var upDimensionVector, var rightDimensionVector) = GetDimensionVectors(dimension, textPoints);
+            var verticalStep = upDimensionVector * mapInfo.MappingStepInFeet * _verticalStepFactor;
+            var horizontalStep = rightDimensionVector
+                * textPoints.BottomLeftCorner.DistanceTo(textPoints.BottomRightCorner)
+                * _horizontalStepFactor;
 
             if(dimension.Value > _revitRepository.GetMinDimensionInView()) {
                 dimension = DefinePositionForNormalDimension(
                     dimension,
                     dimensionReferences,
+                    mapInfo,
                     textPoints,
-                    mapService,
-                    upDimensionVector * verticalStepValue * _verticalStepFactor);
+                    verticalStep);
             } else {
-                var horizontalStep =
-                    rightDimensionVector
-                    * textPoints.BottomLeftCorner.DistanceTo(textPoints.BottomRightCorner)
-                    * _horizontalStepFactor;
                 dimension = DefinePositionForSmallDimension(
                     dimension,
                     dimensionReferences,
                     textPoints,
-                    mapService,
-                    upDimensionVector * verticalStepValue * _verticalStepFactor,
+                    mapInfo,
+                    verticalStep,
                     horizontalStep);
             }
         } catch {
@@ -109,8 +111,8 @@ internal class DimensionChanger {
     private Dimension DefinePositionForNormalDimension(
         Dimension dimension,
         ReferenceArray references,
+        MapInfo mapInfo,
         DimensionTextPoints textPoints,
-        ViewMapService mapService,
         XYZ verticalStep) {
 
         for(int stepIndex = 0; stepIndex <= _maxSearchSteps; stepIndex++) {
@@ -119,14 +121,15 @@ internal class DimensionChanger {
                 int directionFactor = stepIndex % 2 == 1 ? stepIndex : -stepIndex;
                 textPoints.Translate(verticalStep * directionFactor);
             }
-            if(!mapService.CheckInRectangle(textPoints.BottomLeftCorner, textPoints.TopRightCorner)) {
+            if(!_mapService.CheckInRectangle(mapInfo, textPoints.BottomLeftCorner, textPoints.TopRightCorner)) {
                 continue;
             }
 
             // Если текст размера ничего не пересекает и сдвиг был, пересоздаем размер на новом месте
             if(stepIndex > 0) {
-                dimension = RecreateDimension(dimension, textPoints, references, mapService);
+                dimension = RecreateDimension(dimension, textPoints, references);
             }
+            _mapService.PaintInRectangle(mapInfo, textPoints.BottomLeftCorner, textPoints.TopRightCorner);
             break;
         }
         return dimension;
@@ -143,7 +146,7 @@ internal class DimensionChanger {
         Dimension dimension,
         ReferenceArray references,
         DimensionTextPoints textPoints,
-        ViewMapService mapService,
+        MapInfo mapInfo,
         XYZ verticalStep,
         XYZ horizontalStep) {
 
@@ -159,13 +162,13 @@ internal class DimensionChanger {
             foreach(int horizontalDirectionFactor in new[] { 1, -2 }) {
                 textPoints.Translate(horizontalStep * horizontalDirectionFactor);
 
-                if(!mapService.CheckInRectangle(textPoints.BottomLeftCorner, textPoints.TopRightCorner)) {
+                if(!_mapService.CheckInRectangle(mapInfo, textPoints.BottomLeftCorner, textPoints.TopRightCorner)) {
                     continue;
                 }
 
                 // Центрируем текст для маленьких размеров, чтобы он смотрелся корректно
-                dimension = RecreateDimension(dimension, textPoints, references, mapService);
-                dimension.TextPosition = textPoints.TextPositionPoint;
+                dimension = RecreateDimension(dimension, textPoints, references);
+                _mapService.PaintInRectangle(mapInfo, textPoints.BottomLeftCorner, textPoints.TopRightCorner);
                 success = true;
                 break;
             }
@@ -182,14 +185,12 @@ internal class DimensionChanger {
     private Dimension RecreateDimension(
         Dimension oldDimension,
         DimensionTextPoints points,
-        ReferenceArray references,
-        ViewMapService mapService) {
+        ReferenceArray references) {
 
         var dimensionLine = Line.CreateBound(points.BottomLeftCorner, points.BottomRightCorner);
         var newDimension = _dimensionCreator.Create(dimensionLine, references, oldDimension.DimensionType);
+        newDimension.TextPosition = points.TextPositionPoint;
         _revitRepository.Document.Delete(oldDimension.Id);
-
-        mapService.PaintInRectangle(points.BottomLeftCorner, points.TopRightCorner);
         return newDimension;
     }
 }

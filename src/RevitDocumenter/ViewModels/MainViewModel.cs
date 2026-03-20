@@ -138,10 +138,10 @@ internal class MainViewModel : BaseViewModel {
             _revitRepository.Document,
             _localizationService.GetLocalizedString("MainWindow.Title"));
         mainTransaction.Start();
+        MapInfo mapInfo = null;
 
         if(_placeDimensionsAccurately) {
             var viewPreparerOption = new ViewPreparerOption() {
-                MappingStepInMm = _mappingStepInMm,
                 MappingStepInFeet = UnitUtilsHelper.ConvertToInternalValue(_mappingStepInMm),
                 ColorForAnchorLines = new(255, 0, 255),
                 WeightForAnchorLines = 1,
@@ -149,22 +149,26 @@ internal class MainViewModel : BaseViewModel {
 
             var exportOption = _viewPreparer.Prepare(viewPreparerOption);
             string imagePath = _imageService.Export(exportOption);
-
-            _mapService.CreateMap(imagePath, exportOption);
-            if(_createMarkedImage) {
-                _paintSquaresByMapService.MarkWhiteSquaresOnImage(
-                    imagePath, _mapService.Map, exportOption.StepCountX, exportOption.StepCountY);
-            }
             _revitRepository.DeleteElementsById(exportOption.AnchorLineIds);
-            _imageService.Delete(imagePath);
+
+            mapInfo = _mapService.CreateMap(imagePath, exportOption);
+            // Если пользователь запросил изображения для проверки
+            if(_createMarkedImage && mapInfo != null) {
+                _paintSquaresByMapService.MarkWhiteSquaresOnImage(mapInfo, "_marked");
+            } else {
+                _imageService.Delete(imagePath);
+            }
         }
 
         var rebars = _revitRepository.GetRebarElements(
             FamilyNamePart,
             ReferenceNamesVM.GetVertReferenceNames(),
             ReferenceNamesVM.GetHorizReferenceNames());
+        _dimensionService.Create(rebars, _grids, _selectedDimensionType, mapInfo);
 
-        _dimensionService.Create(rebars, _grids, _selectedDimensionType, _placeDimensionsAccurately);
+        if(_placeDimensionsAccurately && _createMarkedImage && mapInfo != null) {
+            _paintSquaresByMapService.MarkWhiteSquaresOnImage(mapInfo, "_marked_after_dims");
+        }
         mainTransaction.Commit();
     }
 

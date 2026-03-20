@@ -13,33 +13,30 @@ internal class DimensionService {
     private readonly ValueGuard _guard;
     private readonly IComparisonService _comparisonService;
     private readonly DimensionLineService _dimensionLineService;
-    private readonly ViewMapService _mapService;
 
     public DimensionService(
         DimensionCreator dimensionCreator,
         DimensionChanger dimensionChanger,
         ValueGuard guard,
         IComparisonService comparisonService,
-        DimensionLineService dimensionLineService,
-        ViewMapService mapService) {
+        DimensionLineService dimensionLineService) {
         _dimensionCreator = dimensionCreator;
         _dimensionChanger = dimensionChanger;
         _guard = guard;
         _comparisonService = comparisonService;
         _dimensionLineService = dimensionLineService;
-        _mapService = mapService;
     }
 
     internal void Create(
         List<RebarElement> rebars,
         List<Grid> grids,
         DimensionType selectedDimensionType,
-        bool placeDimensionsAccurately) {
+        MapInfo mapInfo) {
         foreach(var rebar in rebars) {
             // Создание вертикального размера (относительно локальных осей зоны армирования)
-            CreateDimension(grids, rebar, selectedDimensionType, placeDimensionsAccurately);
+            CreateDimension(grids, rebar, selectedDimensionType, true, mapInfo);
             // Создание горизонтального размера (относительно локальных осей зоны армирования)
-            CreateDimension(grids, rebar, selectedDimensionType, placeDimensionsAccurately, false);
+            CreateDimension(grids, rebar, selectedDimensionType, false, mapInfo);
         }
     }
 
@@ -47,8 +44,8 @@ internal class DimensionService {
         List<Grid> grids,
         RebarElement rebar,
         DimensionType selectedDimensionType,
-        bool placeDimensionsAccurately,
-        bool isForVertical = true) {
+        bool isForVertical,
+        MapInfo mapInfo) {
 
         try {
             _guard.ThrowIfNull(grids, rebar);
@@ -75,9 +72,9 @@ internal class DimensionService {
         var dimension = _dimensionCreator.Create(dimensionLine, dimensionRefs, selectedDimensionType);
 
         // Если запросили точное расположение размеров
-        if(placeDimensionsAccurately) {
+        if(mapInfo != null) {
             // Меняем положение размера в соответствии с картой
-            _dimensionChanger.Change(dimension, _mapService, _mapService.ExportOption.MappingStepInFeet, dimensionRefs);
+            _dimensionChanger.Change(dimension, mapInfo, dimensionRefs);
         }
     }
 }

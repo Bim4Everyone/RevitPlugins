@@ -2,8 +2,8 @@ using System.Drawing;
 
 namespace RevitDocumenter.Models.MapServices;
 internal class PaintSquaresByMapService {
-    public void MarkWhiteSquaresOnImage(string imagePath, SquareInfo[,] analysisResults, int stepCountX, int stepCountY) {
-        using(var image = new Bitmap(imagePath)) {
+    public string MarkWhiteSquaresOnImage(MapInfo mapInfo, string imageFileSuffix) {
+        using(var image = new Bitmap(mapInfo.ImagePath)) {
 
             using(var graphics = Graphics.FromImage(image)) {
                 // Настраиваем качество отрисовки
@@ -13,11 +13,11 @@ internal class PaintSquaresByMapService {
                 graphics.SmoothingMode = System.Drawing.Drawing2D.SmoothingMode.HighQuality;
 
                 // Создаем розовую полупрозрачную кисть
-                using(var brush = new SolidBrush(System.Drawing.Color.FromArgb(128, 255, 192, 203))) {
+                using(var brush = new SolidBrush(Color.FromArgb(128, 255, 192, 203))) {
                     // Проходим по всем квадратам
-                    for(int row = 0; row < stepCountY; row++) {
-                        for(int col = 0; col < stepCountX; col++) {
-                            var square = analysisResults[row, col];
+                    for(int row = 0; row < mapInfo.StepCountY; row++) {
+                        for(int col = 0; col < mapInfo.StepCountX; col++) {
+                            var square = mapInfo.Map[row, col];
 
                             // Если все пиксели квадрата белые - закрашиваем его
                             if(square.AllPixelsWhite) {
@@ -36,7 +36,9 @@ internal class PaintSquaresByMapService {
                     }
                 }
             }
-            image.Save(imagePath.Replace(".png", $"_marked.png"), System.Drawing.Imaging.ImageFormat.Png);
+            string newImagePath = mapInfo.ImagePath.Replace(".png", $"{imageFileSuffix}.png");
+            image.Save(newImagePath, System.Drawing.Imaging.ImageFormat.Png);
+            return newImagePath;
         }
     }
 }
