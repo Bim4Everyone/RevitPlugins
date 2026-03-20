@@ -61,19 +61,25 @@ namespace RevitMechanicalSpecification.Service {
         /// <returns></returns>
         public string GetDuctFittingName(Element element) {
             string thikness = GetDuctFittingThikness(element);
-            if(thikness is null) {
+            string startName = "Не удалось определить тип фитинга";
+            FamilyInstance instanse = element as FamilyInstance;
+            MechanicalFitting fitting = instanse.MEPModel as MechanicalFitting;
+            
+            if(thikness is null && fitting.PartType != PartType.MultiPort) {
                 return "!Не учитывать";
             }
 
             if(!_specConfiguration.IsSpecifyDuctFittings) {
                 return "Металл для фасонных деталей воздуховодов с толщиной стенки " + thikness + " мм";
             }
-
-            string startName = "Не удалось определить тип фитинга";
-            FamilyInstance instanse = element as FamilyInstance;
-            MechanicalFitting fitting = instanse.MEPModel as MechanicalFitting;
-
+            
             switch(fitting.PartType) {
+                case PartType.MultiPort:
+                    Element elementType = element.GetElementType();
+                    startName = element.GetTypeOrInstanceParamStringValue(
+                        elementType, 
+                        _specConfiguration.OriginalParamNameName);
+                    return startName;
                 case PartType.Transition:
                     startName = "Переход между сечениями воздуховода";
                     break;

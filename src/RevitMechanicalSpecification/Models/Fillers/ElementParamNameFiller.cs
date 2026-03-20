@@ -17,6 +17,14 @@ using RevitMechanicalSpecification.Service;
 namespace RevitMechanicalSpecification.Models.Fillers {
     internal class ElementParamNameFiller : ElementParamFiller {
         private readonly VisElementsCalculator _calculator;
+        private const string ManifoldAddon = ", в составе:";
+        private static readonly IReadOnlyList<string> _manifoldNameEndings = new List<string> {
+            "В составе:",
+            "в составе:",
+            "В составе",
+            "в составе",
+            ":"
+        };
         private string _name;
         private string _nameAddon;
 
@@ -30,8 +38,12 @@ namespace RevitMechanicalSpecification.Models.Fillers {
             _calculator = visElementsCalculator;
         }
 
+        protected override void PrepareValue(SpecificationElement specificationElement) {
+            specificationElement.ElementName = GetName(specificationElement);
+        }
+
         public override void SetParamValue(SpecificationElement specificationElement) {
-            string name = GetName(specificationElement);
+            string name = specificationElement.ElementName ?? GetName(specificationElement);
 
             TargetParam.Set(specificationElement.ManifoldInstance != null
                 ? $"‎    •  {name}"
@@ -49,6 +61,7 @@ namespace RevitMechanicalSpecification.Models.Fillers {
         private string GetName(SpecificationElement specificationElement) {
             _name = specificationElement.GetTypeOrInstanceParamStringValue(Config.OriginalParamNameName);
             _nameAddon = specificationElement.GetTypeOrInstanceParamStringValue(Config.NameAddition);
+
 
             if(string.IsNullOrEmpty(_name)) {
                 _name = "ЗАПОЛНИТЕ НАИМЕНОВАНИЕ";
@@ -72,7 +85,35 @@ namespace RevitMechanicalSpecification.Models.Fillers {
                     return GetFlexElementName(specificationElement);
             }
 
+            string baseName = GetBaseName();
+            if(specificationElement.ElementType.GetSharedParamValueOrDefault<int>(Config.IsManiFoldParamName) == 1) {
+                // Данный пункт необходим для обработки нейросетевым помощником сметчиков, 
+                // необходима подстрока однозначно диктующая что это материнский элемент узла, т.к. его стоимость зануляется
+                return ReplaceOrAppendManifoldAddon(baseName);
+            }
+
+            return baseName;
+        }
+
+        private string GetBaseName() {
             return string.IsNullOrEmpty(_nameAddon) ? _name : $"{_name} {_nameAddon}";
+        }
+
+        private string ReplaceOrAppendManifoldAddon(string name) {
+            string normalizedName = name.TrimEnd();
+
+            foreach(string ending in _manifoldNameEndings.OrderByDescending(item => item.Length)) {
+                if(normalizedName.EndsWith(ending, StringComparison.OrdinalIgnoreCase)) {
+                    string trimmedName = normalizedName
+                        .Substring(0, normalizedName.Length - ending.Length)
+                        .TrimEnd(' ', ',', '.', ':');
+                    return string.IsNullOrEmpty(trimmedName)
+                        ? ManifoldAddon.TrimStart(',', ' ')
+                        : $"{trimmedName}{ManifoldAddon}";
+                }
+            }
+
+            return $"{normalizedName}{ManifoldAddon}";
         }
 
         /// <summary>
