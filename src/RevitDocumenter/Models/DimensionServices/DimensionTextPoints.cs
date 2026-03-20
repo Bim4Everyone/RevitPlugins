@@ -30,6 +30,23 @@ internal class DimensionTextPoints {
         TextMiddlePoint = (BottomLeftCorner + TopRightCorner) / 2;
     }
 
+    public DimensionTextPoints(
+        XYZ topRightCorner,
+        XYZ bottomRightCorner,
+        XYZ bottomLeftCorner,
+        XYZ topLeftCorner,
+        XYZ textPositionPoint,
+        XYZ textLineCenterPoint,
+        XYZ textMiddlePoint) {
+        TopRightCorner = topRightCorner;
+        BottomRightCorner = bottomRightCorner;
+        BottomLeftCorner = bottomLeftCorner;
+        TopLeftCorner = topLeftCorner;
+        TextPositionPoint = textPositionPoint;
+        TextLineCenterPoint = textLineCenterPoint;
+        TextMiddlePoint = textMiddlePoint;
+    }
+
     public void Translate(XYZ translationVector) {
         TopRightCorner += translationVector;
         BottomRightCorner += translationVector;
@@ -39,5 +56,17 @@ internal class DimensionTextPoints {
         TextPositionPoint += translationVector;
         TextLineCenterPoint += translationVector;
         TextMiddlePoint += translationVector;
+    }
+
+    public DimensionTextPoints Clone() {
+        return new DimensionTextPoints(
+            new XYZ(TopRightCorner.X, TopRightCorner.Y, TopRightCorner.Z),
+            new XYZ(BottomRightCorner.X, BottomRightCorner.Y, BottomRightCorner.Z),
+            new XYZ(BottomLeftCorner.X, BottomLeftCorner.Y, BottomLeftCorner.Z),
+            new XYZ(TopLeftCorner.X, TopLeftCorner.Y, TopLeftCorner.Z),
+            new XYZ(TextPositionPoint.X, TextPositionPoint.Y, TextPositionPoint.Z),
+            new XYZ(TextLineCenterPoint.X, TextLineCenterPoint.Y, TextLineCenterPoint.Z),
+            new XYZ(TextMiddlePoint.X, TextMiddlePoint.Y, TextMiddlePoint.Z)
+        );
     }
 }

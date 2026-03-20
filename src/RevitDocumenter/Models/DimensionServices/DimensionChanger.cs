@@ -31,27 +31,35 @@ internal class DimensionChanger {
         _mapService = mapService;
     }
 
-    public Dimension Change(Dimension dimension, MapInfo mapInfo, ReferenceArray dimensionReferences) {
+    public void Change(Dimension dimension, MapInfo mapInfo, ReferenceArray dimensionReferences) {
         try {
             var textPoints = GetDimensionTextPoints(dimension);
             (var upDimensionVector, var rightDimensionVector) = GetDimensionVectors(dimension, textPoints);
-            var verticalStep = upDimensionVector * mapInfo.MappingStepInFeet * _verticalStepFactor;
-            var horizontalStep = rightDimensionVector
+
+            var verticalStep =
+                upDimensionVector
+                * mapInfo.MappingStepInFeet
+                * _verticalStepFactor;
+            var horizontalStep =
+                rightDimensionVector
                 * textPoints.BottomLeftCorner.DistanceTo(textPoints.BottomRightCorner)
                 * _horizontalStepFactor;
 
+            bool success = false;
             if(dimension.Value > _revitRepository.GetMinDimensionInView()) {
-                dimension = DefinePositionForNormalDimension(
+                success = DefinePositionForNormalDimension(
                     dimension,
                     dimensionReferences,
                     mapInfo,
-                    textPoints,
+                    textPoints.Clone(),
                     verticalStep);
-            } else {
-                dimension = DefinePositionForSmallDimension(
+            }
+
+            if(!success) {
+                DefinePositionForSmallDimension(
                     dimension,
                     dimensionReferences,
-                    textPoints,
+                    textPoints.Clone(),
                     mapInfo,
                     verticalStep,
                     horizontalStep);
@@ -59,7 +67,6 @@ internal class DimensionChanger {
         } catch {
             // ignored
         }
-        return dimension;
     }
 
     /// <summary>
@@ -101,6 +108,17 @@ internal class DimensionChanger {
             : dimensionLine.Project(dimension.TextPosition).XYZPoint;
     }
 
+    private bool DimensionIsOrthogonal(Dimension dimension) {
+        var dimensionLine = dimension.Curve as Line;
+        double dimensionLineDirX = dimensionLine.Direction.X;
+        double tolerance = 1e-10;
+
+        return Math.Abs(dimensionLineDirX - 0) < tolerance
+            || Math.Abs(dimensionLineDirX - 1) < tolerance
+            || Math.Abs(dimensionLineDirX + 1) < tolerance;
+    }
+
+
     /// <summary>
     /// Метод анализирует положение текста размера с учетом бинарной карты, определяет нужно ли выполнять смещение
     /// и при необходимости пытается подобрать положение, чтобы текст ничего не пересекал на чертеже, а затем
@@ -108,23 +126,13 @@ internal class DimensionChanger {
     /// Если текст размера с учетом масштаба укладывается между засечками размера, то размер считается нормальным и
     /// для него ищется смещение только по вертикали 
     /// </summary>
-    private Dimension DefinePositionForNormalDimension(
+    private bool DefinePositionForNormalDimension(
         Dimension dimension,
         ReferenceArray references,
         MapInfo mapInfo,
         DimensionTextPoints textPoints,
         XYZ verticalStep) {
-
-        var dimensionLine = dimension.Curve as Line;
-        if(dimensionLine == null)
-            return dimension;
-
-        double dimensionLineDirX = dimensionLine.Direction.X;
-        double tolerance = 1e-10;
-        bool isOrthogonalDimension =
-            Math.Abs(dimensionLineDirX - 0) < tolerance
-            || Math.Abs(dimensionLineDirX - 1) < tolerance
-            || Math.Abs(dimensionLineDirX + 1) < tolerance;
+        bool isOrthogonalDimension = DimensionIsOrthogonal(dimension);
 
         for(int stepIndex = 0; stepIndex <= _maxSearchSteps; stepIndex++) {
             // При первом заходе в цикл не ищем для размера новое, а проверяем его стандартное положение
@@ -133,6 +141,7 @@ internal class DimensionChanger {
                 textPoints.Translate(verticalStep * directionFactor);
             }
 
+            // Если размер стоит ортогонально, то применяем более точный метод анализа
             if(isOrthogonalDimension) {
                 if(!_mapService.CheckInRectangle(mapInfo, textPoints.BottomLeftCorner, textPoints.TopRightCorner)) {
                     continue;
@@ -157,9 +166,9 @@ internal class DimensionChanger {
             } else {
                 _mapService.PaintInRectangle(mapInfo, textPoints.TextMiddlePoint, 1);
             }
-            break;
+            return true;
         }
-        return dimension;
+        return false;
     }
 
     /// <summary>
@@ -169,29 +178,17 @@ internal class DimensionChanger {
     /// Если текст размера с учетом масштаба не укладывается между засечками размера, то размер считается маленьким и
     /// для него ищется смещение по вертикали и в бок (влево и вправо) 
     /// </summary>
-    private Dimension DefinePositionForSmallDimension(
+    private bool DefinePositionForSmallDimension(
         Dimension dimension,
         ReferenceArray references,
         DimensionTextPoints textPoints,
         MapInfo mapInfo,
         XYZ verticalStep,
         XYZ horizontalStep) {
-
-        var dimensionLine = dimension.Curve as Line;
-        if(dimensionLine == null)
-            return dimension;
-
-        double dimensionLineDirX = dimensionLine.Direction.X;
-        double tolerance = 1e-10;
-        bool isOrthogonalDimension =
-            Math.Abs(dimensionLineDirX - 0) < tolerance
-            || Math.Abs(dimensionLineDirX - 1) < tolerance
-            || Math.Abs(dimensionLineDirX + 1) < tolerance;
+        bool isOrthogonalDimension = DimensionIsOrthogonal(dimension);
 
         // Маленький размер всегда устанавливается с текстом по середине, поэтому перемещать его нужно сразу
         for(int stepIndex = 1; stepIndex <= _maxSearchSteps; stepIndex++) {
-            bool success = false;
-
             // Если по бокам места нет, делаем шаг по вертикали и сбрасываем боковой сдвиг
             int verticalDirectionFactor = stepIndex % 2 == 1 ? -stepIndex : stepIndex;
             textPoints.Translate(verticalStep * verticalDirectionFactor);
@@ -200,6 +197,7 @@ internal class DimensionChanger {
             foreach(int horizontalDirectionFactor in new[] { 1, -2 }) {
                 textPoints.Translate(horizontalStep * horizontalDirectionFactor);
 
+                // Если размер стоит ортогонально, то применяем более точный метод анализа
                 if(isOrthogonalDimension) {
                     if(!_mapService.CheckInRectangle(mapInfo, textPoints.BottomLeftCorner, textPoints.TopRightCorner)) {
                         continue;
@@ -222,17 +220,14 @@ internal class DimensionChanger {
                 } else {
                     _mapService.PaintInRectangle(mapInfo, textPoints.TextMiddlePoint, 1);
                 }
-                success = true;
-                break;
+                // Если нашли нужно положение, то больше не ищем
+                return true;
             }
-            // Если нашли нужно положение, то больше не ищем
-            if(success)
-                break;
 
             // Возвращаем текст к центру
             textPoints.Translate(horizontalStep);
         }
-        return dimension;
+        return false;
     }
 
     private Dimension RecreateDimension(
