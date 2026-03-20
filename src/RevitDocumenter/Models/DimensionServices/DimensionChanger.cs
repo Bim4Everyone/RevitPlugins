@@ -34,10 +34,6 @@ internal class DimensionChanger {
             var textPoints = GetDimensionTextPoints(dimension);
             (var upDimensionVector, var rightDimensionVector) = GetDimensionVectors(dimension, textPoints);
 
-            var q = dimension.Value;
-            var t = _revitRepository.GetMinDimensionInView();
-
-
             if(dimension.Value > _revitRepository.GetMinDimensionInView()) {
                 dimension = DefinePositionForNormalDimension(
                     dimension,
@@ -162,12 +158,6 @@ internal class DimensionChanger {
             // Пробуем смещение вправо (1), затем влево (-2 от текущей позиции)
             foreach(int horizontalDirectionFactor in new[] { 1, -2 }) {
                 textPoints.Translate(horizontalStep * horizontalDirectionFactor);
-
-                _ballCreator.CreateSphere(textPoints.TopRightCorner, 50);
-                _ballCreator.CreateSphere(textPoints.TopLeftCorner, 50);
-                _ballCreator.CreateSphere(textPoints.BottomRightCorner, 50);
-                _ballCreator.CreateSphere(textPoints.BottomLeftCorner, 50);
-
 
                 if(!mapService.CheckInRectangle(textPoints.BottomLeftCorner, textPoints.TopRightCorner)) {
                     continue;
