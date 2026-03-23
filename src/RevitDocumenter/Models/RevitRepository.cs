@@ -16,8 +16,6 @@ namespace RevitDocumenter.Models;
 /// В случае если данный класс разрастается, рекомендуется его разделить на несколько.
 /// </remarks>
 internal class RevitRepository {
-    private List<ReferenceArray> _dimensionReferences;
-
     /// <summary>
     /// Создает экземпляр репозитория.
     /// </summary>
@@ -63,17 +61,6 @@ internal class RevitRepository {
           .WhereElementIsNotElementType()
           .OfType<Grid>()
           .ToList();
-    }
-
-    public List<ReferenceArray> DimensionReferences() {
-        _dimensionReferences ??= GetDimensionReferences();
-        return _dimensionReferences;
-    }
-
-    public List<ReferenceArray> GetDimensionReferences() {
-        return GetDimensions()
-            .Select(d => d.References)
-            .ToList();
     }
 
     public List<Dimension> GetDimensions() {

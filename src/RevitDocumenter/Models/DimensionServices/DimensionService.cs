@@ -8,7 +8,6 @@ using RevitDocumenter.Models.MapServices;
 
 namespace RevitDocumenter.Models.DimensionServices;
 internal class DimensionService {
-    private readonly RevitRepository _revitRepository;
     private readonly DimensionCreator _dimensionCreator;
     private readonly DimensionChanger _dimensionChanger;
     private readonly ValueGuard _guard;
@@ -17,14 +16,12 @@ internal class DimensionService {
     private readonly ReferenceAnalizeService _referenceAnalizeService;
 
     public DimensionService(
-        RevitRepository revitRepository,
         DimensionCreator dimensionCreator,
         DimensionChanger dimensionChanger,
         ValueGuard guard,
         IComparisonService comparisonService,
         DimensionLineService dimensionLineService,
         ReferenceAnalizeService referenceAnalizeService) {
-        _revitRepository = revitRepository;
         _dimensionCreator = dimensionCreator;
         _dimensionChanger = dimensionChanger;
         _guard = guard;
@@ -65,7 +62,6 @@ internal class DimensionService {
             return;
         var direction = isForVertical ? rebar.Rebar.FacingOrientation : rebar.Rebar.HandOrientation;
 
-
         // Получаем опорные плоскости для размера
         // Нормальная ситуация, когда подходящие оси не были найдены
         var dimensionRefs = _comparisonService.Compare(new GridComparisonContext(rebarReferences, grids, direction));
@@ -76,7 +72,7 @@ internal class DimensionService {
         // Если размер между объектами уже существует, то не ставим - это нормально
         if(_referenceAnalizeService.IsReferenceArrayInList(
             dimensionRefs,
-            _revitRepository.DimensionReferences())) {
+            _referenceAnalizeService.DimensionReferences())) {
             return;
         }
 

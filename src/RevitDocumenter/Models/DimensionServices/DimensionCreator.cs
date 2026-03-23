@@ -49,4 +49,12 @@ internal class DimensionCreator {
         subTransaction.Commit();
         return dimension;
     }
+
+    public Dimension RecreateDimension(Dimension oldDimension, DimensionTextPoints points, ReferenceArray references) {
+        var dimensionLine = Line.CreateBound(points.BottomLeftCorner, points.BottomRightCorner);
+        var newDimension = Create(dimensionLine, references, oldDimension.DimensionType);
+        newDimension.TextPosition = points.TextPositionPoint;
+        _revitRepository.Document.Delete(oldDimension.Id);
+        return newDimension;
+    }
 }

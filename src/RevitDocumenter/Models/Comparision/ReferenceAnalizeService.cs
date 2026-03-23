@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 using Autodesk.Revit.DB;
 
@@ -10,6 +11,8 @@ internal class ReferenceAnalizeService {
     private readonly RevitRepository _revitRepository;
     private readonly DimensionCreator _dimensionCreator;
     private readonly ValueGuard _guard;
+
+    private List<ReferenceArray> _dimensionReferences;
 
     public ReferenceAnalizeService(
         RevitRepository revitRepository,
@@ -111,5 +114,17 @@ internal class ReferenceAnalizeService {
             }
         }
         return false;
+    }
+
+
+    public List<ReferenceArray> DimensionReferences() {
+        _dimensionReferences ??= GetDimensionReferences();
+        return _dimensionReferences;
+    }
+
+    public List<ReferenceArray> GetDimensionReferences() {
+        return _revitRepository.GetDimensions()
+            .Select(d => d.References)
+            .ToList();
     }
 }

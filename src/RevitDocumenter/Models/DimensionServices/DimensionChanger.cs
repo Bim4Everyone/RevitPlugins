@@ -157,7 +157,7 @@ internal class DimensionChanger {
 
             // Если текст размера ничего не пересекает и сдвиг был, пересоздаем размер на новом месте
             if(stepIndex > 0) {
-                dimension = RecreateDimension(dimension, textPoints, references);
+                dimension = _dimensionCreator.RecreateDimension(dimension, textPoints, references);
             }
 
             // Фиксируем в карте, что теперь эти квадраты заняты
@@ -212,7 +212,7 @@ internal class DimensionChanger {
                 }
 
                 // Центрируем текст для маленьких размеров, чтобы он смотрелся корректно
-                dimension = RecreateDimension(dimension, textPoints, references);
+                dimension = _dimensionCreator.RecreateDimension(dimension, textPoints, references);
 
                 // Фиксируем в карте, что теперь эти квадраты заняты
                 if(isOrthogonalDimension) {
@@ -228,17 +228,5 @@ internal class DimensionChanger {
             textPoints.Translate(horizontalStep);
         }
         return false;
-    }
-
-    private Dimension RecreateDimension(
-        Dimension oldDimension,
-        DimensionTextPoints points,
-        ReferenceArray references) {
-
-        var dimensionLine = Line.CreateBound(points.BottomLeftCorner, points.BottomRightCorner);
-        var newDimension = _dimensionCreator.Create(dimensionLine, references, oldDimension.DimensionType);
-        newDimension.TextPosition = points.TextPositionPoint;
-        _revitRepository.Document.Delete(oldDimension.Id);
-        return newDimension;
     }
 }
