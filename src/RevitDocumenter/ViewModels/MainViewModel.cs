@@ -9,6 +9,7 @@ using dosymep.WPF.Commands;
 using dosymep.WPF.ViewModels;
 
 using RevitDocumenter.Models;
+using RevitDocumenter.Models.Comparision;
 using RevitDocumenter.Models.DimensionServices;
 using RevitDocumenter.Models.MapServices;
 using RevitDocumenter.Models.ViewServices;
@@ -29,7 +30,7 @@ internal class MainViewModel : BaseViewModel {
     private readonly ViewPreparer _viewPreparer;
     private readonly ImageService _imageService;
     private readonly PaintSquaresByMapService _paintSquaresByMapService;
-
+    private readonly ReferenceAnalizeService _referenceAnalizeService;
     private string _errorText;
     private string _familyNamePart;
     private DimensionType _selectedDimensionType;
@@ -59,7 +60,8 @@ internal class MainViewModel : BaseViewModel {
         DimensionService dimensionService,
         ViewPreparer viewPreparer,
         ImageService imageService,
-        PaintSquaresByMapService paintSquaresByMapService) {
+        PaintSquaresByMapService paintSquaresByMapService,
+        ReferenceAnalizeService referenceAnalizeService) {
 
         _pluginConfig = pluginConfig;
         _revitRepository = revitRepository;
@@ -69,6 +71,8 @@ internal class MainViewModel : BaseViewModel {
         _viewPreparer = viewPreparer;
         _imageService = imageService;
         _paintSquaresByMapService = paintSquaresByMapService;
+        _referenceAnalizeService = referenceAnalizeService;
+
         ReferenceNamesVM = new ReferenceNamesViewModel();
 
         LoadViewCommand = RelayCommand.Create(LoadView);
@@ -163,7 +167,8 @@ internal class MainViewModel : BaseViewModel {
         var rebars = _revitRepository.GetRebarElements(
             FamilyNamePart,
             ReferenceNamesVM.GetVertReferenceNames(),
-            ReferenceNamesVM.GetHorizReferenceNames());
+            ReferenceNamesVM.GetHorizReferenceNames(),
+            _referenceAnalizeService);
         _dimensionService.Create(rebars, _grids, _selectedDimensionType, mapInfo);
 
         if(_placeDimensionsAccurately && _createMarkedImage && mapInfo != null) {

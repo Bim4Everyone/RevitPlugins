@@ -1,10 +1,11 @@
-using System;
 using System.Collections.Generic;
 using System.Linq;
 
 using Autodesk.Revit.ApplicationServices;
 using Autodesk.Revit.DB;
 using Autodesk.Revit.UI;
+
+using RevitDocumenter.Models.Comparision;
 
 namespace RevitDocumenter.Models;
 
@@ -15,6 +16,8 @@ namespace RevitDocumenter.Models;
 /// В случае если данный класс разрастается, рекомендуется его разделить на несколько.
 /// </remarks>
 internal class RevitRepository {
+    private List<ReferenceArray> _dimensionReferences;
+
     /// <summary>
     /// Создает экземпляр репозитория.
     /// </summary>
@@ -62,10 +65,30 @@ internal class RevitRepository {
           .ToList();
     }
 
+    public List<ReferenceArray> DimensionReferences() {
+        _dimensionReferences ??= GetDimensionReferences();
+        return _dimensionReferences;
+    }
+
+    public List<ReferenceArray> GetDimensionReferences() {
+        return GetDimensions()
+            .Select(d => d.References)
+            .ToList();
+    }
+
+    public List<Dimension> GetDimensions() {
+        return new FilteredElementCollector(Document, Document.ActiveView.Id)
+                  .OfClass(typeof(Dimension))
+                  .WhereElementIsNotElementType()
+                  .OfType<Dimension>()
+                  .ToList();
+    }
+
     public List<RebarElement> GetRebarElements(
         string familyNamePart,
         List<string> verticalRefNames,
-        List<string> horizontalRefNames) => new FilteredElementCollector(Document, Document.ActiveView.Id)
+        List<string> horizontalRefNames,
+        ReferenceAnalizeService referenceAnalizeService) => new FilteredElementCollector(Document, Document.ActiveView.Id)
           .OfCategory(BuiltInCategory.OST_Rebar)
           .WhereElementIsNotElementType()
           .OfType<FamilyInstance>()
@@ -75,23 +98,11 @@ internal class RevitRepository {
                      type.FamilyName != null &&
                      type.FamilyName.Contains(familyNamePart);
           })
-          .Select(e => new RebarElement(e, GetDimensionRefList(e, verticalRefNames), GetDimensionRefList(e, horizontalRefNames)))
+          .Select(e => new RebarElement(
+              e,
+              referenceAnalizeService.GetDimensionRefList(e, verticalRefNames),
+              referenceAnalizeService.GetDimensionRefList(e, horizontalRefNames)))
           .ToList();
-
-
-    public List<Reference> GetDimensionRefList(FamilyInstance elem, List<string> importantRefNameParts) {
-        var allRefs = new List<Reference>();
-        foreach(FamilyInstanceReferenceType referenceType in Enum.GetValues(typeof(FamilyInstanceReferenceType))) {
-            allRefs.AddRange(elem.GetReferences(referenceType));
-        }
-        var refs = new List<Reference>();
-        foreach(var reference in allRefs) {
-            if(importantRefNameParts.Contains(elem.GetReferenceName(reference))) {
-                refs.Add(reference);
-            }
-        }
-        return refs;
-    }
 
     public double GetMinDimensionInView() {
         int scale = Document.ActiveView.Scale;

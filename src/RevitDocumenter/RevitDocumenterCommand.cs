@@ -102,6 +102,14 @@ public class RevitDocumenterCommand : BasePluginCommand {
             .ToSelf()
             .InSingletonScope();
 
+        kernel.Bind<LineBasedElementFilterService>()
+            .ToSelf()
+            .InSingletonScope();
+
+        kernel.Bind<ReferenceAnalizeService>()
+            .ToSelf()
+            .InSingletonScope();
+
         // Используем сервис обновления тем для WinUI
         kernel.UseWpfUIThemeUpdater();
 

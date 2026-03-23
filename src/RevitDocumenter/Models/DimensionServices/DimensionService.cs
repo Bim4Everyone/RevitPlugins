@@ -8,23 +8,29 @@ using RevitDocumenter.Models.MapServices;
 
 namespace RevitDocumenter.Models.DimensionServices;
 internal class DimensionService {
+    private readonly RevitRepository _revitRepository;
     private readonly DimensionCreator _dimensionCreator;
     private readonly DimensionChanger _dimensionChanger;
     private readonly ValueGuard _guard;
     private readonly IComparisonService _comparisonService;
     private readonly DimensionLineService _dimensionLineService;
+    private readonly ReferenceAnalizeService _referenceAnalizeService;
 
     public DimensionService(
+        RevitRepository revitRepository,
         DimensionCreator dimensionCreator,
         DimensionChanger dimensionChanger,
         ValueGuard guard,
         IComparisonService comparisonService,
-        DimensionLineService dimensionLineService) {
+        DimensionLineService dimensionLineService,
+        ReferenceAnalizeService referenceAnalizeService) {
+        _revitRepository = revitRepository;
         _dimensionCreator = dimensionCreator;
         _dimensionChanger = dimensionChanger;
         _guard = guard;
         _comparisonService = comparisonService;
         _dimensionLineService = dimensionLineService;
+        _referenceAnalizeService = referenceAnalizeService;
     }
 
     internal void Create(
@@ -59,12 +65,21 @@ internal class DimensionService {
             return;
         var direction = isForVertical ? rebar.Rebar.FacingOrientation : rebar.Rebar.HandOrientation;
 
+
         // Получаем опорные плоскости для размера
         // Нормальная ситуация, когда подходящие оси не были найдены
         var dimensionRefs = _comparisonService.Compare(new GridComparisonContext(rebarReferences, grids, direction));
         if(dimensionRefs is null) {
             return;
         }
+
+        // Если размер между объектами уже существует, то не ставим - это нормально
+        if(_referenceAnalizeService.IsReferenceArrayInList(
+            dimensionRefs,
+            _revitRepository.DimensionReferences())) {
+            return;
+        }
+
         // Получаем линию размещения размера
         var dimensionLine = _dimensionLineService.GetDimensionLine(rebar, direction);
 
