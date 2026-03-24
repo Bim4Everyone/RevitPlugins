@@ -21,7 +21,7 @@ namespace RevitDocumenter.ViewModels;
 /// <summary>
 /// Основная ViewModel главного окна плагина.
 /// </summary>
-internal class MainViewModel : BaseViewModel {
+internal class ReinforcementDimensioningViewModel : BaseViewModel {
     private readonly PluginConfig _pluginConfig;
     private readonly RevitRepository _revitRepository;
     private readonly ILocalizationService _localizationService;
@@ -52,7 +52,7 @@ internal class MainViewModel : BaseViewModel {
     /// <param name="pluginConfig">Настройки плагина.</param>
     /// <param name="revitRepository">Класс доступа к интерфейсу Revit.</param>
     /// <param name="localizationService">Интерфейс доступа к сервису локализации.</param>
-    public MainViewModel(
+    public ReinforcementDimensioningViewModel(
         PluginConfig pluginConfig,
         RevitRepository revitRepository,
         ILocalizationService localizationService,
@@ -140,7 +140,7 @@ internal class MainViewModel : BaseViewModel {
         SaveConfig();
         using var mainTransaction = new Transaction(
             _revitRepository.Document,
-            _localizationService.GetLocalizedString("MainWindow.Title"));
+            _localizationService.GetLocalizedString("ReinforcementDimensioningWindow.Title"));
         mainTransaction.Start();
         MapInfo mapInfo = null;
 
@@ -188,19 +188,19 @@ internal class MainViewModel : BaseViewModel {
     /// </remarks>
     private bool CanAcceptView() {
         if(Grids.Count == 0) {
-            ErrorText = _localizationService.GetLocalizedString("MainWindow.ViewHasNotGrids");
+            ErrorText = _localizationService.GetLocalizedString("ReinforcementDimensioningWindow.ViewHasNotGrids");
             return false;
         }
         if(string.IsNullOrEmpty(FamilyNamePart)) {
-            ErrorText = _localizationService.GetLocalizedString("MainWindow.WriteFamilyNamePart");
+            ErrorText = _localizationService.GetLocalizedString("ReinforcementDimensioningWindow.WriteFamilyNamePart");
             return false;
         }
         if(SelectedDimensionType is null) {
-            ErrorText = _localizationService.GetLocalizedString("MainWindow.DimensionTypeIsNotSelected");
+            ErrorText = _localizationService.GetLocalizedString("ReinforcementDimensioningWindow.DimensionTypeIsNotSelected");
             return false;
         }
         if(ReferenceNamesVM.VerticalRefNames.Count == 0 && ReferenceNamesVM.HorizontalRefNames.Count == 0) {
-            ErrorText = _localizationService.GetLocalizedString("MainWindow.WriteReferenceNames");
+            ErrorText = _localizationService.GetLocalizedString("ReinforcementDimensioningWindow.WriteReferenceNames");
             return false;
         }
         ErrorText = string.Empty;

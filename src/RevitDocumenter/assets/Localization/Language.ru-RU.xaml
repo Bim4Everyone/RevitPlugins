@@ -2,27 +2,27 @@
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
                     xmlns:system="clr-namespace:System;assembly=mscorlib">
 
-    <system:String x:Key="MainWindow.Title">Размеры зон дополнительного армирования</system:String>
+    <system:String x:Key="ReinforcementDimensioningWindow.Title">Размеры зон дополнительного армирования</system:String>
     
-    <system:String x:Key="MainWindow.FamilyNamePart">Часть имени семейства зоны армирования:</system:String>
-    <system:String x:Key="MainWindow.ReferenceNames">Имена опорных плоскостей:</system:String>
-    <system:String x:Key="MainWindow.VerticalReferences">Вертикальные опорные плоскости:</system:String>
-    <system:String x:Key="MainWindow.HorizontalReferences">Горизонтальные опорные плоскости:</system:String>
+    <system:String x:Key="ReinforcementDimensioningWindow.FamilyNamePart">Часть имени семейства зоны армирования:</system:String>
+    <system:String x:Key="ReinforcementDimensioningWindow.ReferenceNames">Имена опорных плоскостей:</system:String>
+    <system:String x:Key="ReinforcementDimensioningWindow.VerticalReferences">Вертикальные опорные плоскости:</system:String>
+    <system:String x:Key="ReinforcementDimensioningWindow.HorizontalReferences">Горизонтальные опорные плоскости:</system:String>
     
-    <system:String x:Key="MainWindow.Name">Имя</system:String>
-    <system:String x:Key="MainWindow.Add">Добавить</system:String>
-    <system:String x:Key="MainWindow.Remove">Удалить</system:String>
+    <system:String x:Key="ReinforcementDimensioningWindow.Name">Имя</system:String>
+    <system:String x:Key="ReinforcementDimensioningWindow.Add">Добавить</system:String>
+    <system:String x:Key="ReinforcementDimensioningWindow.Remove">Удалить</system:String>
     
-    <system:String x:Key="MainWindow.DimensionType">Типоразмер размера:</system:String>
+    <system:String x:Key="ReinforcementDimensioningWindow.DimensionType">Типоразмер размера:</system:String>
 
-    <system:String x:Key="MainWindow.ViewHasNotGrids">На виде нет осей</system:String>
-    <system:String x:Key="MainWindow.WriteFamilyNamePart">Не указана часть имени семейства</system:String>
-    <system:String x:Key="MainWindow.DimensionTypeIsNotSelected">Не выбран типоразмер размера</system:String>
-    <system:String x:Key="MainWindow.WriteReferenceNames">Не указаны имена опорных плоскостей</system:String>
+    <system:String x:Key="ReinforcementDimensioningWindow.ViewHasNotGrids">На виде нет осей</system:String>
+    <system:String x:Key="ReinforcementDimensioningWindow.WriteFamilyNamePart">Не указана часть имени семейства</system:String>
+    <system:String x:Key="ReinforcementDimensioningWindow.DimensionTypeIsNotSelected">Не выбран типоразмер размера</system:String>
+    <system:String x:Key="ReinforcementDimensioningWindow.WriteReferenceNames">Не указаны имена опорных плоскостей</system:String>
     
-    <system:String x:Key="MainWindow.PlaceDimensions">Методика позиционирования размеров:</system:String>
-    <system:String x:Key="MainWindow.PlaceDimensionsAccurately">Позиционировать размеры точно</system:String>
+    <system:String x:Key="ReinforcementDimensioningWindow.PlaceDimensions">Методика позиционирования размеров:</system:String>
+    <system:String x:Key="ReinforcementDimensioningWindow.PlaceDimensionsAccurately">Позиционировать размеры точно</system:String>
 
-    <system:String x:Key="MainWindow.ButtonOk">ОК</system:String>
-    <system:String x:Key="MainWindow.ButtonCancel">Отмена</system:String>
+    <system:String x:Key="ReinforcementDimensioningWindow.ButtonOk">ОК</system:String>
+    <system:String x:Key="ReinforcementDimensioningWindow.ButtonCancel">Отмена</system:String>
 </ResourceDictionary>

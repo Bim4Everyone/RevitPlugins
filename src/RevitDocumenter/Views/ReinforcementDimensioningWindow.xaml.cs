@@ -8,11 +8,11 @@ namespace RevitDocumenter.Views;
 /// <summary>
 /// Класс главного окна плагина.
 /// </summary>
-public partial class MainWindow {
+public partial class ReinforcementDimensioningWindow {
     /// <summary>
     /// Инициализирует главное окно плагина.
     /// </summary>
-    public MainWindow(
+    public ReinforcementDimensioningWindow(
         ILoggerService loggerService,
         ISerializationService serializationService,
         ILanguageService languageService, ILocalizationService localizationService,
@@ -38,7 +38,7 @@ public partial class MainWindow {
     /// <remarks>
     /// Используется для сохранения положения окна.
     /// </remarks>
-    public override string ProjectConfigName => nameof(MainWindow);
+    public override string ProjectConfigName => nameof(ReinforcementDimensioningWindow);
 
     private void ButtonOk_Click(object sender, RoutedEventArgs e) {
         DialogResult = true;
