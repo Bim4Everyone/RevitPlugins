@@ -48,7 +48,8 @@ public partial class MainWindow : IDisposable {
         if(DataContext is MainViewModel vm) {
             vm.PropertyChanged += OnViewModelPropertyChanged;
 
-            // Подписка на внутренние свойства CommandState
+            vm.LoadView();
+
             if(vm.CommandState != null) {
                 vm.CommandState.PropertyChanged += OnCommandStatePropertyChanged;
             }

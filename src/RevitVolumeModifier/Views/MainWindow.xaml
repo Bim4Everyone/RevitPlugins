@@ -21,12 +21,6 @@
     MinWidth="500"
     d:DataContext="{d:DesignInstance vms:MainViewModel, IsDesignTimeCreatable=False}">
 
-    <i:Interaction.Triggers>
-        <i:EventTrigger EventName="Loaded">
-            <i:InvokeCommandAction Command="{Binding LoadViewCommand}" />
-        </i:EventTrigger>
-    </i:Interaction.Triggers>
-
     <Window.Resources>
         <converters:BoolToVisibilityConverter
             x:Key="ParamWarningIconVisible"
@@ -160,18 +154,7 @@
                             ToolTip="{Binding CommandState.CommandText}"
                             BorderBrush="{StaticResource DivideByVertPoint}"
                             Content="{me:LocalizationSource MainWindow.DivideBySelectVerticalPointCommand}"
-                            Command="{Binding DivideBySelectVerticalPointCommand}" />
-                        <ui:Button
-                            Margin="0,5,0,0"
-                            Height="50"
-                            BorderThickness="2"                            
-                            CornerRadius="10"
-                            HorizontalAlignment="Stretch"
-                            VerticalAlignment="Center"
-                            ToolTip="{Binding CommandState.CommandText}"
-                            BorderBrush="{StaticResource DivideByThreePoint}"
-                            Content="{me:LocalizationSource MainWindow.DivideBySelectThreePointCommand}"
-                            Command="{Binding DivideBySelectThreePointCommand}" />
+                            Command="{Binding DivideBySelectVerticalPointCommand}" />                        
                         <ui:Button
                             Margin="0,5,0,0"
                             Height="50"
@@ -191,27 +174,16 @@
                     Icon="{ui:SymbolIcon shapeSubtract24}"
                     Header="{me:LocalizationSource MainWindow.CutPanel}"
                     Description="{me:LocalizationSource MainWindow.CutPanelDescription}">
-
-                    <StackPanel>
-                        <ui:Button
-                            Height="50"
-                            BorderThickness="2"
-                            CornerRadius="10"
-                            HorizontalAlignment="Stretch"
-                            VerticalAlignment="Center"
-                            ToolTip="{Binding CommandState.CommandText}"
-                            BorderBrush="{StaticResource Cut}"
-                            Content="{me:LocalizationSource MainWindow.CutCommand}"
-                            Command="{Binding CutCommand}" />
-
-                        <ui:ToggleSwitch
-                            Margin="0,20,0,0"
-                            OnContent="{me:LocalizationSource MainWindow.OnContent}"
-                            OffContent="{me:LocalizationSource MainWindow.OffContent}"
-                            IsChecked="{Binding IsSaveCutVolume, Mode=TwoWay}" />
-
-                    </StackPanel>
-
+                    <ui:Button
+                        Height="50"
+                        BorderThickness="2"
+                        CornerRadius="10"
+                        HorizontalAlignment="Stretch"
+                        VerticalAlignment="Center"
+                        ToolTip="{Binding CommandState.CommandText}"
+                        BorderBrush="{StaticResource Cut}"
+                        Content="{me:LocalizationSource MainWindow.CutCommand}"
+                        Command="{Binding CutCommand}" />
                 </edits:CustomGroupEditControl>
 
             </StackPanel>

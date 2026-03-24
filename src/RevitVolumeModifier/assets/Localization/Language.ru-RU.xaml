@@ -18,14 +18,11 @@
     <system:String x:Key="MainWindow.DividePanelDescription">Выделенные элементы будут разделены</system:String>
     <system:String x:Key="MainWindow.DivideBySelectHorizontalPointCommand">Разделить по горизонтальной точке</system:String>
     <system:String x:Key="MainWindow.DivideBySelectVerticalPointCommand">Разделить по вертикальной точке</system:String>
-    <system:String x:Key="MainWindow.DivideBySelectThreePointCommand">Разделить по 3-м точкам</system:String>
     <system:String x:Key="MainWindow.DivideBySelectFacesCommand">Разделить по граням</system:String>
 
     <system:String x:Key="MainWindow.CutPanel">Вырезание элементов</system:String>
-    <system:String x:Key="MainWindow.CutPanelDescription">Выделенные элементы будут Вырезаны</system:String>
+    <system:String x:Key="MainWindow.CutPanelDescription">Выделенные элементы будут вырезаны</system:String>
     <system:String x:Key="MainWindow.CutCommand">Выбрать вырезаемые элементы</system:String>
-    <system:String x:Key="MainWindow.OnContent">Сохранять вырезаемую часть</system:String>
-    <system:String x:Key="MainWindow.OffContent">Не сохранять вырезаемую часть</system:String>
 
     <system:String x:Key="MainViewModel.DescriptionParamDescription">Параметр описания СМР</system:String>
     <system:String x:Key="MainViewModel.DescriptionParamDetailDescription">Тип - Текст</system:String>
@@ -46,14 +43,17 @@
     <system:String x:Key="MainViewModel.SuccessCommand">Операция выполнена успешно</system:String>
 
     <system:String x:Key="MainViewModel.NoSelection">Не выделены элементы</system:String>
-    <system:String x:Key="MainViewModel.PickPointOnElementPromt">Выберите точку на объемном элементе</system:String>
-    <system:String x:Key="MainViewModel.PickPointFirst">Выберите первую точку на объемном элементе</system:String>
-    <system:String x:Key="MainViewModel.PickPointSecond">Выберите вторую точку на объемном элементе</system:String>
-    <system:String x:Key="MainViewModel.PickPointThird">Выберите третью точку на объемном элементе</system:String>
+    <system:String x:Key="MainViewModel.DocumentChangedWarning">Откройте исходный документ</system:String>
+    <system:String x:Key="MainViewModel.HasParamWarning">В файле отсутствуют необходимые параметры</system:String>
+    <system:String x:Key="MainViewModel.PickPointOnElementPromt">Выберите точку на объемном элементе</system:String>    
     <system:String x:Key="MainViewModel.PickFacesPromt">Выберите плоскости (грани) и нажмите "Готово"</system:String>
     <system:String x:Key="MainViewModel.CutPromt">Выберите элементы, которые нужно вырезать и нажмите "Готово"</system:String>
 
     <system:String x:Key="RevitRepository.NoParamValue">Нет значения</system:String>
+
+    <system:String x:Key="RevitRepository.TransactionNameJoin">Объединение объемов СМР</system:String>
+    <system:String x:Key="RevitRepository.TransactionNameDivide">Разделение объемов СМР</system:String>
+    <system:String x:Key="RevitRepository.TransactionNameCut">Вырезание объемов СМР</system:String>
     
     
 </ResourceDictionary>

@@ -3,236 +3,302 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-using Autodesk.Revit.ApplicationServices;
 using Autodesk.Revit.DB;
 using Autodesk.Revit.UI;
 
-using dosymep.Bim4Everyone;
 using dosymep.Revit;
 using dosymep.SimpleServices;
 
-using RevitVolumeModifier.Enums;
 using RevitVolumeModifier.Handler;
-
-namespace RevitVolumeModifier.Models;
+using RevitVolumeModifier.Models;
+using RevitVolumeModifier.Services;
 
 internal class RevitRepository {
     private readonly ILocalizationService _localizationService;
-    private readonly SystemPluginConfig _systemPluginConfig;
     private readonly ExternalRevitHandler _handler;
+    private readonly GeomObjectFactory _geomObjectFactory;
+    private readonly DirectShapeObjectFactory _directShapeObjectFactory;
+    private readonly ParamSetter _paramSetter;
+    private readonly SolidService _solidService;
 
     public RevitRepository(
         UIApplication uiApplication,
         ILocalizationService localizationService,
-        SystemPluginConfig systemPluginConfig,
-        ExternalRevitHandler externalRevitHandler) {
+        ExternalRevitHandler externalRevitHandler,
+        GeomObjectFactory geomObjectFactory,
+        DirectShapeObjectFactory directShapeObjectFactory,
+        ParamSetter paramSetter,
+        SolidService solidService) {
 
         UIApplication = uiApplication;
         _localizationService = localizationService;
-        _systemPluginConfig = systemPluginConfig;
         _handler = externalRevitHandler;
+        _geomObjectFactory = geomObjectFactory;
+        _directShapeObjectFactory = directShapeObjectFactory;
+        _paramSetter = paramSetter;
+        _solidService = solidService;
     }
 
     public UIApplication UIApplication { get; }
     public UIDocument ActiveUIDocument => UIApplication.ActiveUIDocument;
-    public Application Application => UIApplication.Application;
     public Document Document => ActiveUIDocument.Document;
 
-    public Task<bool> Join(ICollection<ElementId> elements) {
+    public Task<bool> Join(ICollection<ElementId> elementIds, IEnumerable<ParamModel> paramModels) {
+        return ExecuteOperationAsync(elementIds, paramModels, "RevitRepository.TransactionNameJoin", ProcessJoin);
+    }
+
+    public Task<bool> CutAsync(
+        ICollection<ElementId> elementIds,
+        ICollection<ElementId> elementIdsToCut,
+        IEnumerable<ParamModel> paramModels) {
+
+        return ExecuteOperationAsync(elementIds, paramModels, "RevitRepository.TransactionNameCut", elements =>
+            ProcessCut(elements, elementIdsToCut));
+    }
+
+    public Task<bool> DivideByHorizontalPointAsync(
+        ICollection<ElementId> elementIds,
+        Reference reference,
+        IEnumerable<ParamModel> paramModels) {
+
+        var plane = _solidService.GetHorizontalPlane(reference);
+        return DivideElementsAsync(elementIds, [plane], paramModels);
+    }
+
+    public Task<bool> DivideByVerticalPointAsync(
+        ICollection<ElementId> elementIds,
+        Reference reference,
+        IEnumerable<ParamModel> paramModels) {
+
+        var plane = _solidService.GetVerticalPlane(Document, reference);
+        return DivideElementsAsync(elementIds, [plane], paramModels);
+    }
+
+    public Task<bool> DivideByFacesAsync(
+        ICollection<ElementId> elementIds,
+        IList<Reference> faces,
+        IEnumerable<ParamModel> paramModels) {
+
+        var planes = faces
+            .Select(f => _solidService.GetPlaneFromFace(Document, f))
+            .Where(p => p != null);
+
+        return DivideElementsAsync(elementIds, planes, paramModels);
+    }
+
+    private Task<bool> ExecuteOperationAsync(
+        ICollection<ElementId> elementIds,
+        IEnumerable<ParamModel> paramModels,
+        string transactionNameKey,
+        Func<List<Element>, OperationResult> operation) {
+
         var tcs = new TaskCompletionSource<bool>();
 
         _handler.Raise(app => {
             var doc = app.ActiveUIDocument.Document;
-            try {
-                string transactionName = _localizationService.GetLocalizedString("SetCoordParamsProcessor.TransactionName");
-                using var t = doc.StartTransaction(transactionName);
 
-                // TODO: логика разделения
+            using var t = doc.StartTransaction(
+                _localizationService.GetLocalizedString(transactionNameKey));
+
+            try {
+                var elements = GetElements(doc, elementIds);
+                if(!elements.Any()) {
+                    tcs.SetResult(false);
+                    return;
+                }
+
+                var result = operation(elements);
+
+                if(result == null || !result.Items.Any()) {
+                    t.RollBack();
+                    UIApplication.ActiveUIDocument.Selection
+                        .SetElementIds([.. elements.Select(e => e.Id)]);
+                    tcs.SetResult(false);
+                    return;
+                }
+
+                foreach(var item in result.Items) {
+                    var source = doc.GetElement(item.SourceId);
+                    if(source == null) {
+                        continue;
+                    }
+
+                    _paramSetter.SetParams(source, [item.Shape], paramModels);
+                }
+
+                List<ElementId> elementsToSelect;
+
+                if(result.ElementsToDelete.Any()) {
+                    doc.Delete(result.ElementsToDelete);
+
+                    elementsToSelect = result.Items
+                        .Select(i => i.Shape.DirectShape.Id)
+                        .ToList();
+                } else {
+                    elementsToSelect = elements.Select(e => e.Id).ToList();
+                }
+
+                UIApplication.ActiveUIDocument.Selection.SetElementIds(elementsToSelect);
 
                 t.Commit();
-
-                tcs.SetResult(true);
-            } catch(Exception) {
+                tcs.SetResult(result.Success);
+            } catch {
+                t.RollBack();
                 tcs.SetResult(false);
+                throw;
             }
         });
 
         return tcs.Task;
     }
 
-    public Task<bool> DivideByHorizontalPointAsync(ICollection<ElementId> elements, XYZ point) {
-        var tcs = new TaskCompletionSource<bool>();
-
-        _handler.Raise(app => {
-            var doc = app.ActiveUIDocument.Document;
-
-            try {
-                using var tx = new Transaction(doc, "DivideHorizontal");
-                tx.Start();
-
-                // TODO: логика разделения
-
-                tx.Commit();
-
-                tcs.SetResult(true);
-            } catch(Exception) {
-                tcs.SetResult(false);
-            }
-        });
-
-        return tcs.Task;
-    }
-
-    public Task<bool> DivideByVerticalPointAsync(ICollection<ElementId> elements, XYZ point) {
-        var tcs = new TaskCompletionSource<bool>();
-
-        _handler.Raise(app => {
-            var doc = app.ActiveUIDocument.Document;
-
-            try {
-                using var tx = new Transaction(doc, "DivideVirtical");
-                tx.Start();
-
-                // TODO: логика разделения
-
-                tx.Commit();
-
-                tcs.SetResult(true);
-            } catch(Exception) {
-                tcs.SetResult(false);
-            }
-        });
-
-        return tcs.Task;
-    }
-
-    public Task<bool> DivideByThreePointsAsync(ICollection<ElementId> elements, XYZ point1, XYZ point2, XYZ point3) {
-        var tcs = new TaskCompletionSource<bool>();
-
-        _handler.Raise(app => {
-            var doc = app.ActiveUIDocument.Document;
-
-            try {
-                using var tx = new Transaction(doc, "DivideThreePoints");
-                tx.Start();
-
-                // TODO: логика разделения
-
-                tx.Commit();
-
-                tcs.SetResult(true);
-            } catch(Exception) {
-                tcs.SetResult(false);
-            }
-        });
-
-        return tcs.Task;
-    }
-
-    public Task<bool> DivideByFacesAsync(ICollection<ElementId> elements, IList<Reference> faces) {
-        var tcs = new TaskCompletionSource<bool>();
-
-        _handler.Raise(app => {
-            var doc = app.ActiveUIDocument.Document;
-
-            try {
-                using var tx = new Transaction(doc, "DivideByFaces");
-                tx.Start();
-
-                // TODO: логика разделения
-
-                tx.Commit();
-
-                tcs.SetResult(true);
-            } catch(Exception) {
-                tcs.SetResult(false);
-            }
-        });
-
-        return tcs.Task;
-    }
-
-    public Task<bool> CutAsync(ICollection<ElementId> elements, ICollection<ElementId> elementsToCut, bool saveVolume) {
-        var tcs = new TaskCompletionSource<bool>();
-
-        _handler.Raise(app => {
-            var doc = app.ActiveUIDocument.Document;
-
-            try {
-                using var tx = new Transaction(doc, "Cut");
-                tx.Start();
-
-                // TODO: логика разделения
-
-                tx.Commit();
-
-                tcs.SetResult(true);
-            } catch(Exception) {
-                tcs.SetResult(false);
-            }
-        });
-
-        return tcs.Task;
-    }
-
-
-    public IEnumerable<Element> GetSelectionElements() {
-        var selectionIds = ActiveUIDocument.GetSelectedElements();
-        return selectionIds
-            .Where(ElementMatchesCategory);
-    }
-
-    // Метод фильтрации элементов по категории
-    private bool ElementMatchesCategory(Element element) {
-        var category = element.Category?.GetBuiltInCategory();
-        return category is not null && category.Value == _systemPluginConfig.ModelCategory;
-    }
-
-    public IEnumerable<string> GetElementsValues(ICollection<ElementId> selection, ParamModel param) {
-        if(selection == null || !selection.Any() || param?.RevitParam == null) {
-            return [_localizationService.GetLocalizedString("RevitRepository.NoParamValue")];
+    private OperationResult ProcessJoin(List<Element> elements) {
+        var solids = _solidService.JoinElementSolids(elements, out bool success);
+        if(!solids.Any()) {
+            return new OperationResult { Success = false };
         }
 
-        string paramName = param.RevitParam.Name;
-
-        return selection
-            .Select(elementId => {
-                var element = Document.GetElement(elementId);
-                return element == null || !element.IsExistsParam(paramName)
-                    ? null
-                    : param.ParamType switch {
-                        ParamType.VolumeParam =>
-                            element.GetParamValueOrDefault<double>(paramName).ToString(),
-
-                        ParamType.FloorDEParam =>
-                            element.GetParamValueOrDefault<double>(paramName).ToString(),
-
-                        _ =>
-                            element.GetParamValueOrDefault<string>(paramName)
-                    };
-            })
-            .Where(str => !string.IsNullOrWhiteSpace(str))
-            .Distinct();
-    }
-
-    public string GetVolume(ICollection<ElementId> selection, ParamModel param) {
-        if(selection == null || !selection.Any() || param?.RevitParam == null) {
-            return _localizationService.GetLocalizedString("RevitRepository.NoParamValue");
+        var geom = _geomObjectFactory.GetGeomObject([.. solids]);
+        if(geom == null) {
+            return new OperationResult { Success = false };
         }
 
-        string paramName = param.RevitParam.Name;
+        var ds = _directShapeObjectFactory.GetDirectShapeObject(geom, Document);
+        return ds == null
+            ? new OperationResult { Success = false }
+            : new OperationResult {
+                Success = success,
+                Items = [
+                new() {
+                    SourceId = elements.First().Id,
+                    Shape = ds
+                }
+            ],
+                ElementsToDelete = elements.Select(e => e.Id).ToList()
+            };
+    }
 
-        var volumes = selection
-            .Select(elementId => {
-                var element = Document.GetElement(elementId);
-                return element == null || !element.IsExistsParam(paramName)
-                    ? 0
-                    : element.GetParamValueOrDefault<double>(paramName);
+    private OperationResult ProcessCut(List<Element> elements, ICollection<ElementId> elementIdsToCut) {
+
+        var elementsToCut = GetElements(Document, elementIdsToCut);
+        if(!elementsToCut.Any()) {
+            return new OperationResult { Success = false };
+        }
+
+        var resultDict = _solidService.CutElementSolids(
+            elements, elementsToCut,
+            out bool success,
+            out var elementsToDelete);
+
+        if(!resultDict.Any()) {
+            return new OperationResult { Success = false };
+        }
+
+        var items = new List<OperationResultItem>();
+
+        foreach(var kvp in resultDict) {
+            var sourceId = kvp.Key;
+
+            var geom = _geomObjectFactory.GetGeomObject([.. kvp.Value]);
+            if(geom == null) {
+                continue;
+            }
+
+            var ds = _directShapeObjectFactory.GetDirectShapeObject(geom, Document);
+            if(ds == null) {
+                continue;
+            }
+
+            items.Add(new OperationResultItem {
+                SourceId = sourceId,
+                Shape = ds
             });
+        }
 
-        double sumVolumes = volumes.Sum();
-        return sumVolumes > 0
-            ? sumVolumes.ToString()
-            : _localizationService.GetLocalizedString("RevitRepository.NoParamValue");
+        return new OperationResult {
+            Success = success,
+            Items = items,
+            ElementsToDelete = elementsToDelete
+        };
+    }
+
+    private Task<bool> DivideElementsAsync(
+        ICollection<ElementId> elementIds,
+        IEnumerable<DividePlane> planes,
+        IEnumerable<ParamModel> paramModels) {
+
+        return ExecuteOperationAsync(
+            elementIds,
+            paramModels,
+            "RevitRepository.TransactionNameDivide",
+            elements => ProcessDivide(elements, planes));
+    }
+
+    private OperationResult ProcessDivide(
+        List<Element> elements,
+        IEnumerable<DividePlane> planes) {
+
+        var items = new List<OperationResultItem>();
+        var toDelete = new List<ElementId>();
+
+        foreach(var plane in planes) {
+            foreach(var element in elements) {
+
+                var positive = _solidService
+                    .DivideElementSolids(element, plane.PositivePlane);
+
+                var negative = _solidService
+                    .DivideElementSolids(element, plane.NegativePlane);
+
+                double volPos = positive.Sum(s => s?.Volume ?? 0);
+                double volNeg = negative.Sum(s => s?.Volume ?? 0);
+
+                if(volPos > SolidService.VolumeEpsilon &&
+                   volNeg > SolidService.VolumeEpsilon) {
+
+                    var gPos = _geomObjectFactory.GetGeomObject([.. positive]);
+                    var gNeg = _geomObjectFactory.GetGeomObject([.. negative]);
+
+                    if(gPos == null || gNeg == null) {
+                        continue;
+                    }
+
+                    var dsPos = _directShapeObjectFactory.GetDirectShapeObject(gPos, Document);
+                    var dsNeg = _directShapeObjectFactory.GetDirectShapeObject(gNeg, Document);
+
+                    if(dsPos == null || dsNeg == null) {
+                        continue;
+                    }
+
+                    items.Add(new OperationResultItem {
+                        SourceId = element.Id,
+                        Shape = dsPos
+                    });
+
+                    items.Add(new OperationResultItem {
+                        SourceId = element.Id,
+                        Shape = dsNeg
+                    });
+
+                    toDelete.Add(element.Id);
+                }
+            }
+        }
+        return new OperationResult {
+            Success = items.Any(),
+            Items = items,
+            ElementsToDelete = toDelete.Distinct().ToList()
+        };
+    }
+
+    private List<Element> GetElements(Document document,
+        ICollection<ElementId> elementIds) {
+
+        var filter = new DirectShapeOrInPlaceFilter(document);
+
+        return elementIds
+            .Select(document.GetElement)
+            .Where(el => el != null && filter.AllowElement(el))
+            .ToList();
     }
 }

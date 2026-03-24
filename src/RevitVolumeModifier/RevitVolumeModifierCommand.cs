@@ -40,6 +40,30 @@ public class RevitVolumeModifierCommand : BasePluginCommand {
             .ToMethod(c => new SelectionMonitor(uiApplication))
             .InSingletonScope();
 
+        kernel.Bind<DocumentMonitor>()
+            .ToMethod(c => new DocumentMonitor(uiApplication))
+            .InSingletonScope();
+
+        // Настройка доступа к GeomObjectFactory
+        kernel.Bind<GeomObjectFactory>()
+            .ToSelf()
+            .InSingletonScope();
+
+        // Настройка доступа к DirectShapeObjectFactory
+        kernel.Bind<DirectShapeObjectFactory>()
+            .ToSelf()
+            .InSingletonScope();
+
+        // Настройка доступа к ParamSetter
+        kernel.Bind<ParamSetter>()
+            .ToSelf()
+            .InSingletonScope();
+
+        // Настройка доступа к SolidService
+        kernel.Bind<SolidService>()
+            .ToSelf()
+            .InSingletonScope();
+
         // Настройка доступа к Revit
         kernel.Bind<RevitRepository>()
             .ToSelf()
@@ -74,12 +98,17 @@ public class RevitVolumeModifierCommand : BasePluginCommand {
             $"/{assemblyName};component/assets/localization/language.xaml",
             CultureInfo.GetCultureInfo("ru-RU"));
 
+        // Получаем экземпляры
         var window = kernel.Get<MainWindow>();
-
         var vm = kernel.Get<MainViewModel>();
-        var monitor = kernel.Get<SelectionMonitor>();
+        var selectionMonitor = kernel.Get<SelectionMonitor>();
+        var documentMonitor = kernel.Get<DocumentMonitor>();
 
-        monitor.SelectionChanged += vm.OnSelectionChanged;
+        // Подписываем VM на события выделения
+        selectionMonitor.SelectionChanged += vm.OnSelectionChanged;
+
+        // Подписываем VM на смену документа
+        documentMonitor.ActiveDocumentChanged += vm.OnDocumentChanged;
 
         window.Show();
     }

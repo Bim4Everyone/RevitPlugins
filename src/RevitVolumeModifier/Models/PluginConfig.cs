@@ -49,6 +49,9 @@ internal class SystemPluginConfig {
     // Категория моделей, с которыми работает плагин
     public BuiltInCategory ModelCategory => BuiltInCategory.OST_GenericModel;
 
+    // ID категории для построения DirectShape
+    public ElementId ElementIdDirectShape => new(BuiltInCategory.OST_GenericModel);
+
     /// <summary>
     /// Метод получения списка всех параметров
     /// </summary>

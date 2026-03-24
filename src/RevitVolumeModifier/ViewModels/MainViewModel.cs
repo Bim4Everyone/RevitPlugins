@@ -28,13 +28,13 @@ internal class MainViewModel : BaseViewModel {
     private readonly SystemPluginConfig _systemPluginConfig;
     private readonly PluginConfig _pluginConfig;
 
+    private Document _initialDocument;
+    private bool _initialDocumentChanged;
     private List<ParamModel> _paramModels;
     private ICollection<ElementId> _elementIds;
     private ObservableCollection<ParamViewModel> _paramViewModels;
     private bool _hasParamWarning;
-    private bool _isSaveCutVolume;
     private string _errorText;
-
     private CommandStateViewModel _commandState;
 
     public MainViewModel(
@@ -59,7 +59,6 @@ internal class MainViewModel : BaseViewModel {
         JoinCommand = RelayCommand.Create(Join, CanExecute);
         DivideBySelectHorizontalPointCommand = RelayCommand.Create(DivideBySelectHorizontalPoint, CanExecute);
         DivideBySelectVerticalPointCommand = RelayCommand.Create(DivideBySelectVerticalPoint, CanExecute);
-        DivideBySelectThreePointCommand = RelayCommand.Create(DivideBySelectThreePoint, CanExecute);
         DivideBySelectFacesCommand = RelayCommand.Create(DivideBySelectFacesPoint, CanExecute);
         CutCommand = RelayCommand.Create(Cut, CanExecute);
     }
@@ -69,10 +68,13 @@ internal class MainViewModel : BaseViewModel {
     public ICommand JoinCommand { get; }
     public ICommand DivideBySelectHorizontalPointCommand { get; }
     public ICommand DivideBySelectVerticalPointCommand { get; }
-    public ICommand DivideBySelectThreePointCommand { get; }
     public ICommand DivideBySelectFacesCommand { get; }
     public ICommand CutCommand { get; }
 
+    public bool InitialDocumentChanged {
+        get => _initialDocumentChanged;
+        set => RaiseAndSetIfChanged(ref _initialDocumentChanged, value);
+    }
     public ICollection<ElementId> ElementIds {
         get => _elementIds;
         set => RaiseAndSetIfChanged(ref _elementIds, value);
@@ -85,15 +87,10 @@ internal class MainViewModel : BaseViewModel {
         get => _hasParamWarning;
         set => RaiseAndSetIfChanged(ref _hasParamWarning, value);
     }
-    public bool IsSaveCutVolume {
-        get => _isSaveCutVolume;
-        set => RaiseAndSetIfChanged(ref _isSaveCutVolume, value);
-    }
     public string ErrorText {
         get => _errorText;
         set => RaiseAndSetIfChanged(ref _errorText, value);
     }
-
     public CommandStateViewModel CommandState {
         get => _commandState;
         set => RaiseAndSetIfChanged(ref _commandState, value);
@@ -139,7 +136,8 @@ internal class MainViewModel : BaseViewModel {
     private async void Join() {
         ResetCommandState();
         var commandType = CommandType.Join;
-        bool result = await _revitRepository.Join(ElementIds);
+        var parameters = ParamViewModels.Select(p => p.ParamModel);
+        bool result = await _revitRepository.Join(ElementIds, parameters);
         UpdateCommandState(result, commandType);
     }
 
@@ -147,13 +145,14 @@ internal class MainViewModel : BaseViewModel {
     private async void DivideBySelectHorizontalPoint() {
         ResetCommandState();
         var commandType = CommandType.DivideByHorPoint;
+        var parameters = ParamViewModels.Select(p => p.ParamModel);
         string promt = _localizationService.GetLocalizedString("MainViewModel.PickPointOnElementPromt");
-        var point = await _revitPickService.PickPointOnElementAsync(promt);
-        if(point == null) {
+        var reference = await _revitPickService.PickPointOnElementAsync(promt);
+        if(reference == null) {
             UpdateCommandStateFailed(commandType);
             return;
         }
-        bool result = await _revitRepository.DivideByHorizontalPointAsync(ElementIds, point);
+        bool result = await _revitRepository.DivideByHorizontalPointAsync(ElementIds, reference, parameters);
         UpdateCommandState(result, commandType);
     }
 
@@ -161,30 +160,14 @@ internal class MainViewModel : BaseViewModel {
     private async void DivideBySelectVerticalPoint() {
         ResetCommandState();
         var commandType = CommandType.DivideByVertPoint;
+        var parameters = ParamViewModels.Select(p => p.ParamModel);
         string promt = _localizationService.GetLocalizedString("MainViewModel.PickPointOnElementPromt");
-        var point = await _revitPickService.PickPointOnElementAsync(promt);
-        if(point == null) {
+        var reference = await _revitPickService.PickPointOnElementAsync(promt);
+        if(reference == null) {
             UpdateCommandStateFailed(commandType);
             return;
         }
-        bool result = await _revitRepository.DivideByVerticalPointAsync(ElementIds, point);
-        UpdateCommandState(result, commandType);
-    }
-
-    // Метод разделения объемов по трем точкам
-    private async void DivideBySelectThreePoint() {
-        ResetCommandState();
-        var commandType = CommandType.DivideByThreePoint;
-        string[] promts = [
-            _localizationService.GetLocalizedString("MainViewModel.PickPointFirst"),
-            _localizationService.GetLocalizedString("MainViewModel.PickPointSecond"),
-            _localizationService.GetLocalizedString("MainViewModel.PickPointThird")];
-        var points = await _revitPickService.PickThreePointsOnElementAsync(promts);
-        if(points == null || points.Count < 3) {
-            UpdateCommandStateFailed(commandType);
-            return;
-        }
-        bool result = await _revitRepository.DivideByThreePointsAsync(ElementIds, points[0], points[1], points[2]);
+        bool result = await _revitRepository.DivideByVerticalPointAsync(ElementIds, reference, parameters);
         UpdateCommandState(result, commandType);
     }
 
@@ -192,13 +175,14 @@ internal class MainViewModel : BaseViewModel {
     private async void DivideBySelectFacesPoint() {
         ResetCommandState();
         var commandType = CommandType.DivideByFaces;
+        var parameters = ParamViewModels.Select(p => p.ParamModel);
         string promt = _localizationService.GetLocalizedString("MainViewModel.PickFacesPromt");
         var fases = await _revitPickService.PickFacesMultipleOnElementAsync(promt);
         if(fases == null) {
             UpdateCommandStateFailed(commandType);
             return;
         }
-        bool result = await _revitRepository.DivideByFacesAsync(ElementIds, fases);
+        bool result = await _revitRepository.DivideByFacesAsync(ElementIds, fases, parameters);
         UpdateCommandState(result, commandType);
     }
 
@@ -206,18 +190,27 @@ internal class MainViewModel : BaseViewModel {
     private async void Cut() {
         ResetCommandState();
         var commandType = CommandType.Cut;
+        var parameters = ParamViewModels.Select(p => p.ParamModel);
         string promt = _localizationService.GetLocalizedString("MainViewModel.CutPromt");
         var elements = await _revitPickService.PickGenericModelsAsync(promt);
         if(elements == null) {
             UpdateCommandStateFailed(commandType);
             return;
         }
-        bool result = await _revitRepository.CutAsync(ElementIds, elements, IsSaveCutVolume);
+        bool result = await _revitRepository.CutAsync(ElementIds, elements, parameters);
         UpdateCommandState(result, commandType);
     }
 
     // Метод проверки выполнения всех методов
     private bool CanExecute() {
+        if(InitialDocumentChanged) {
+            ErrorText = _localizationService.GetLocalizedString("MainViewModel.DocumentChangedWarning");
+            return false;
+        }
+        if(HasParamWarning) {
+            ErrorText = _localizationService.GetLocalizedString("MainViewModel.HasParamWarning");
+            return false;
+        }
         if(ElementIds == null || ElementIds.Count == 0) {
             ErrorText = _localizationService.GetLocalizedString("MainViewModel.NoSelection");
             return false;
@@ -229,16 +222,21 @@ internal class MainViewModel : BaseViewModel {
     // Метод подписанный на события изменения выделения
     public void OnSelectionChanged(ICollection<ElementId> selection) {
         ElementIds = selection;
-        ResetCommandState();
         CommandManager.InvalidateRequerySuggested();
     }
 
+    // Метод подписанный на события смены документа
+    public void OnDocumentChanged(Document doc) {
+        InitialDocumentChanged = doc.GetUniqId() != _initialDocument.GetUniqId();
+        UpdateParamWarnings();
+        ElementIds = null;
+        CommandManager.InvalidateRequerySuggested();
+    }
 
     // Метод загрузки вида
-    private void LoadView() {
+    public void LoadView() {
         LoadConfig();
         ParamViewModels = new ObservableCollection<ParamViewModel>(GetParamViewModels());
-        // Подписка на события в ParamViewModel
         foreach(var param in ParamViewModels) {
             param.PropertyChanged += OnParamChanged;
         }
@@ -246,6 +244,8 @@ internal class MainViewModel : BaseViewModel {
 
         CommandState = new CommandStateViewModel();
         ResetCommandState();
+        _initialDocument = _revitRepository.Document;
+        InitialDocumentChanged = false;
     }
 
     // Метод обновления CommandState в зависимости от результата
@@ -282,6 +282,7 @@ internal class MainViewModel : BaseViewModel {
     private void LoadConfig() {
         var setting = _pluginConfig.GetSettings(_revitRepository.Document);
         _paramModels = setting?.ParamModels ?? _systemPluginConfig.GetDefaultParams();
+        System.Windows.MessageBox.Show(_paramModels.Count.ToString());
     }
 
     // Метод сохранения конфигурации

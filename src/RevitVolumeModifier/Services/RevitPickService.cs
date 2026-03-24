@@ -26,8 +26,8 @@ internal class RevitPickService {
     /// <summary>
     /// Выбор точки, привязанной к элементу
     /// </summary>
-    public Task<XYZ> PickPointOnElementAsync(string prompt) {
-        var tcs = new TaskCompletionSource<XYZ>();
+    public Task<Reference> PickPointOnElementAsync(string prompt) {
+        var tcs = new TaskCompletionSource<Reference>();
 
         _handler.Raise(uiApp => {
             var uidoc = uiApp.ActiveUIDocument;
@@ -37,10 +37,7 @@ internal class RevitPickService {
                 var reference = uidoc.Selection.PickObject(ObjectType.PointOnElement, prompt);
 
                 if(reference != null) {
-                    var element = uidoc.Document.GetElement(reference.ElementId);
-                    var point = reference.GlobalPoint;
-
-                    tcs.SetResult(point);
+                    tcs.SetResult(reference);
                 } else {
                     tcs.SetResult(null);
                 }
@@ -52,25 +49,6 @@ internal class RevitPickService {
         });
 
         return tcs.Task;
-    }
-
-    /// <summary>
-    /// Выбор трёх точек
-    /// </summary>
-    public async Task<IList<XYZ>> PickThreePointsOnElementAsync(string[] prompts) {
-        var points = new List<XYZ>();
-
-        for(int i = 0; i < 3; i++) {
-            var point = await PickPointOnElementAsync(prompts[i]);
-
-            if(point == null) {
-                return null;
-            }
-
-            points.Add(point);
-        }
-
-        return points;
     }
 
     /// <summary>
@@ -103,26 +81,18 @@ internal class RevitPickService {
     /// </summary>
     public Task<IList<ElementId>> PickGenericModelsAsync(string prompt) {
         var tcs = new TaskCompletionSource<IList<ElementId>>();
-
         _handler.Raise(uiApp => {
             var uidoc = uiApp.ActiveUIDocument;
-
             try {
                 _mainWindow.Dispatcher.Invoke(() => _mainWindow.Hide());
-
-                var refs = uidoc.Selection.PickObjects(ObjectType.Element, new GenericModelSelectionFilter(), prompt);
-
-                var ids = refs.Select(x => x.ElementId).ToList();
-
-                tcs.SetResult(ids);
-
+                var refs = uidoc.Selection.PickObjects(ObjectType.Element, new DirectShapeOrInPlaceFilter(uidoc.Document), prompt);
+                tcs.SetResult(refs.Select(x => x.ElementId).ToList());
             } catch(Autodesk.Revit.Exceptions.OperationCanceledException) {
                 tcs.SetResult(null);
             } finally {
                 _mainWindow.Dispatcher.Invoke(() => _mainWindow.Show());
             }
         });
-
         return tcs.Task;
     }
 }
