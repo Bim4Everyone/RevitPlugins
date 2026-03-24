@@ -34,6 +34,7 @@ internal class MainViewModel : BaseViewModel {
     private ICollection<ElementId> _elementIds;
     private ObservableCollection<ParamViewModel> _paramViewModels;
     private bool _hasParamWarning;
+    private bool _saveConfigNecessary;
     private string _errorText;
     private CommandStateViewModel _commandState;
 
@@ -55,7 +56,7 @@ internal class MainViewModel : BaseViewModel {
         _pluginConfig = pluginConfig;
 
         LoadViewCommand = RelayCommand.Create(LoadView);
-        SaveConfigCommand = RelayCommand.Create(SaveConfig);
+        SaveConfigCommand = RelayCommand.Create(SaveConfig, CanSaveConfig);
         JoinCommand = RelayCommand.Create(Join, CanExecute);
         DivideBySelectHorizontalPointCommand = RelayCommand.Create(DivideBySelectHorizontalPoint, CanExecute);
         DivideBySelectVerticalPointCommand = RelayCommand.Create(DivideBySelectVerticalPoint, CanExecute);
@@ -87,6 +88,10 @@ internal class MainViewModel : BaseViewModel {
         get => _hasParamWarning;
         set => RaiseAndSetIfChanged(ref _hasParamWarning, value);
     }
+    public bool SaveConfigNecessary {
+        get => _saveConfigNecessary;
+        set => RaiseAndSetIfChanged(ref _saveConfigNecessary, value);
+    }
     public string ErrorText {
         get => _errorText;
         set => RaiseAndSetIfChanged(ref _errorText, value);
@@ -102,6 +107,11 @@ internal class MainViewModel : BaseViewModel {
             paramViewModel.UpdateWarning(_revitRepository.Document, _localizationService, _paramAvailabilityService);
         }
         HasParamWarning = ParamViewModels.Any(param => param.HasWarning);
+        if(HasParamWarning) {
+            SaveConfigNecessary = true;
+            return;
+        }
+        SaveConfigNecessary = false;
     }
 
     // Метод подписанный на событие изменения ParamViewModel
@@ -211,8 +221,22 @@ internal class MainViewModel : BaseViewModel {
             ErrorText = _localizationService.GetLocalizedString("MainViewModel.HasParamWarning");
             return false;
         }
+        if(SaveConfigNecessary) {
+            ErrorText = _localizationService.GetLocalizedString("MainViewModel.SaveConfigNecessary");
+            return false;
+        }
         if(ElementIds == null || ElementIds.Count == 0) {
             ErrorText = _localizationService.GetLocalizedString("MainViewModel.NoSelection");
+            return false;
+        }
+        ErrorText = null;
+        return true;
+    }
+
+    // Метод проверки выполнения всех методов
+    private bool CanSaveConfig() {
+        if(HasParamWarning) {
+            ErrorText = _localizationService.GetLocalizedString("MainViewModel.HasParamWarning");
             return false;
         }
         ErrorText = null;
@@ -246,6 +270,7 @@ internal class MainViewModel : BaseViewModel {
         ResetCommandState();
         _initialDocument = _revitRepository.Document;
         InitialDocumentChanged = false;
+        SaveConfigNecessary = false;
     }
 
     // Метод обновления CommandState в зависимости от результата
@@ -282,7 +307,6 @@ internal class MainViewModel : BaseViewModel {
     private void LoadConfig() {
         var setting = _pluginConfig.GetSettings(_revitRepository.Document);
         _paramModels = setting?.ParamModels ?? _systemPluginConfig.GetDefaultParams();
-        System.Windows.MessageBox.Show(_paramModels.Count.ToString());
     }
 
     // Метод сохранения конфигурации
@@ -291,5 +315,6 @@ internal class MainViewModel : BaseViewModel {
                                 ?? _pluginConfig.AddSettings(_revitRepository.Document);
         setting.ParamModels = ParamViewModels.Select(vm => vm.ParamModel).ToList();
         _pluginConfig.SaveProjectConfig();
+        SaveConfigNecessary = false;
     }
 }

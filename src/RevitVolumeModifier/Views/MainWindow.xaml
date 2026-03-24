@@ -88,25 +88,37 @@
                             Visibility="{Binding HasParamWarning, Converter={StaticResource ParamWarningIconVisible}}" />
                     </edits:CustomGroupEditControl.ExtraIcon>
                     <edits:CustomGroupEditControl.EditControl>
-                        <ItemsControl
-                            ItemsSource="{Binding ParamViewModels}">
-                            <ItemsControl.ItemTemplate>
-                                <DataTemplate
-                                    DataType="{x:Type vms:ParamViewModel}">
-                                    <edits:ParamEditControl
-                                        Description="{Binding Description}"
-                                        DetailDescription="{Binding DetailDescription}"
-                                        RevitParamName="{Binding RevitParamName, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"                                        
-                                        HasWarning="{Binding HasWarning, Mode=TwoWay}"
-                                        Warning="{Binding Warning}" />
-                                </DataTemplate>
-                            </ItemsControl.ItemTemplate>
-                            <ItemsControl.ItemsPanel>
-                                <ItemsPanelTemplate>
-                                    <StackPanel />
-                                </ItemsPanelTemplate>
-                            </ItemsControl.ItemsPanel>
-                        </ItemsControl>
+                        <StackPanel>
+                            <ItemsControl
+                                ItemsSource="{Binding ParamViewModels}">
+                                <ItemsControl.ItemTemplate>
+                                    <DataTemplate
+                                        DataType="{x:Type vms:ParamViewModel}">
+                                        <edits:ParamEditControl
+                                            Description="{Binding Description}"
+                                            DetailDescription="{Binding DetailDescription}"
+                                            RevitParamName="{Binding RevitParamName, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
+                                            HasWarning="{Binding HasWarning, Mode=TwoWay}"
+                                            Warning="{Binding Warning}" />
+                                    </DataTemplate>
+                                </ItemsControl.ItemTemplate>
+                                <ItemsControl.ItemsPanel>
+                                    <ItemsPanelTemplate>
+                                        <StackPanel />
+                                    </ItemsPanelTemplate>
+                                </ItemsControl.ItemsPanel>
+                            </ItemsControl>
+                            <ui:Button
+                                Margin="5"
+                                Height="40"
+                                BorderThickness="2"
+                                CornerRadius="10"
+                                HorizontalAlignment="Stretch"
+                                VerticalAlignment="Center"
+                                Content="{me:LocalizationSource MainWindow.SaveConfig}"
+                                Command="{Binding SaveConfigCommand}" />
+                        </StackPanel>
+                        
                     </edits:CustomGroupEditControl.EditControl>
                 </edits:CustomGroupEditControl>
 

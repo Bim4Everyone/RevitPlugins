@@ -62,7 +62,7 @@ internal class RevitPickService {
             try {
                 _mainWindow.Dispatcher.Invoke(() => _mainWindow.Hide());
 
-                var faces = uidoc.Selection.PickObjects(ObjectType.Face, new FaceSelectionFilter(), prompt);
+                var faces = uidoc.Selection.PickObjects(ObjectType.PointOnElement, new FaceSelectionFilter(), prompt);
 
                 tcs.SetResult(faces);
 

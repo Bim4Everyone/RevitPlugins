@@ -9,6 +9,7 @@
     <system:String x:Key="MainWindow.Params">Настройка параметров</system:String>
     <system:String x:Key="MainWindow.ParamsDescription">Параметры СМР, используемые плагином</system:String>
     <system:String x:Key="MainWindow.ParamWarningTooltip">В некоторых параметрах есть ошибки</system:String>
+    <system:String x:Key="MainWindow.SaveConfig">Сохранить настройки параметров</system:String>
 
     <system:String x:Key="MainWindow.JoinPanel">Объединение элементов</system:String>
     <system:String x:Key="MainWindow.JoinPanelDescription">Выделенные элементы будут объединены</system:String>
@@ -45,6 +46,7 @@
     <system:String x:Key="MainViewModel.NoSelection">Не выделены элементы</system:String>
     <system:String x:Key="MainViewModel.DocumentChangedWarning">Откройте исходный документ</system:String>
     <system:String x:Key="MainViewModel.HasParamWarning">В файле отсутствуют необходимые параметры</system:String>
+    <system:String x:Key="MainViewModel.SaveConfigNecessary">Необходимо сохранить конфигурацию параметров</system:String>
     <system:String x:Key="MainViewModel.PickPointOnElementPromt">Выберите точку на объемном элементе</system:String>    
     <system:String x:Key="MainViewModel.PickFacesPromt">Выберите плоскости (грани) и нажмите "Готово"</system:String>
     <system:String x:Key="MainViewModel.CutPromt">Выберите элементы, которые нужно вырезать и нажмите "Готово"</system:String>

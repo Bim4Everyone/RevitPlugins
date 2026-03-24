@@ -7,6 +7,7 @@ using Autodesk.Revit.DB;
 using Autodesk.Revit.UI;
 
 using dosymep.Revit;
+using dosymep.Revit.Geometry;
 using dosymep.SimpleServices;
 
 using RevitVolumeModifier.Handler;
@@ -96,9 +97,7 @@ internal class RevitRepository {
 
         _handler.Raise(app => {
             var doc = app.ActiveUIDocument.Document;
-
-            using var t = doc.StartTransaction(
-                _localizationService.GetLocalizedString(transactionNameKey));
+            using var t = doc.StartTransaction(_localizationService.GetLocalizedString(transactionNameKey));
 
             try {
                 var elements = GetElements(doc, elementIds);
@@ -234,56 +233,74 @@ internal class RevitRepository {
             elements => ProcessDivide(elements, planes));
     }
 
-    private OperationResult ProcessDivide(
-        List<Element> elements,
-        IEnumerable<DividePlane> planes) {
+    private OperationResult ProcessDivide(List<Element> elements, IEnumerable<DividePlane> planes) {
+        var planeList = planes?.ToList() ?? [];
+        if(planeList.Count == 0) {
+            return new OperationResult { Success = false };
+        }
 
         var items = new List<OperationResultItem>();
         var toDelete = new List<ElementId>();
 
-        foreach(var plane in planes) {
-            foreach(var element in elements) {
+        foreach(var element in elements) {
+            var parts = element.GetSolids()
+                .Where(s => s != null && s.Volume > SolidService.VolumeEpsilon)
+                .ToList();
 
-                var positive = _solidService
-                    .DivideElementSolids(element, plane.PositivePlane);
+            if(parts.Count == 0) {
+                continue;
+            }
 
-                var negative = _solidService
-                    .DivideElementSolids(element, plane.NegativePlane);
+            bool elementWasDivided = false;
 
-                double volPos = positive.Sum(s => s?.Volume ?? 0);
-                double volNeg = negative.Sum(s => s?.Volume ?? 0);
+            foreach(var plane in planeList) {
+                var newParts = new List<Solid>();
 
-                if(volPos > SolidService.VolumeEpsilon &&
-                   volNeg > SolidService.VolumeEpsilon) {
+                foreach(var part in parts) {
+                    var pos = _solidService.DivideSolidSafe(part, plane.PositivePlane);
+                    var neg = _solidService.DivideSolidSafe(part, plane.NegativePlane);
 
-                    var gPos = _geomObjectFactory.GetGeomObject([.. positive]);
-                    var gNeg = _geomObjectFactory.GetGeomObject([.. negative]);
+                    double vPos = pos?.Volume ?? 0;
+                    double vNeg = neg?.Volume ?? 0;
 
-                    if(gPos == null || gNeg == null) {
-                        continue;
+                    if(vPos > SolidService.VolumeEpsilon && vNeg > SolidService.VolumeEpsilon) {
+                        newParts.Add(pos);
+                        newParts.Add(neg);
+                        elementWasDivided = true;
+                    } else {
+                        newParts.Add(part);
                     }
-
-                    var dsPos = _directShapeObjectFactory.GetDirectShapeObject(gPos, Document);
-                    var dsNeg = _directShapeObjectFactory.GetDirectShapeObject(gNeg, Document);
-
-                    if(dsPos == null || dsNeg == null) {
-                        continue;
-                    }
-
-                    items.Add(new OperationResultItem {
-                        SourceId = element.Id,
-                        Shape = dsPos
-                    });
-
-                    items.Add(new OperationResultItem {
-                        SourceId = element.Id,
-                        Shape = dsNeg
-                    });
-
-                    toDelete.Add(element.Id);
                 }
+
+                parts = newParts;
+            }
+
+            if(!elementWasDivided) {
+                continue;
+            }
+
+            foreach(var solid in parts.Where(s => s != null && s.Volume > SolidService.VolumeEpsilon)) {
+                var geom = _geomObjectFactory.GetGeomObject([solid]);
+                if(geom == null) {
+                    continue;
+                }
+
+                var ds = _directShapeObjectFactory.GetDirectShapeObject(geom, Document);
+                if(ds == null) {
+                    continue;
+                }
+
+                items.Add(new OperationResultItem {
+                    SourceId = element.Id,
+                    Shape = ds
+                });
+            }
+
+            if(items.Any(i => i.SourceId == element.Id)) {
+                toDelete.Add(element.Id);
             }
         }
+
         return new OperationResult {
             Success = items.Any(),
             Items = items,
