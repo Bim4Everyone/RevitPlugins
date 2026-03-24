@@ -2,7 +2,7 @@ using System;
 
 using Autodesk.Revit.DB;
 
-namespace RevitDocumenter.Models.DimensionServices;
+namespace RevitDocumenter.Models.Dimensions.DimensionLines;
 internal class RebarElementDimensionLineProvider : IDimensionLineProvider<RebarElementDimensionLineProviderContext> {
     /// <summary>
     /// Создает линию единичной длины перпендикулярно передаваемому направлению

@@ -5,7 +5,8 @@ using Autodesk.Revit.ApplicationServices;
 using Autodesk.Revit.DB;
 using Autodesk.Revit.UI;
 
-using RevitDocumenter.Models.ReferenceCollectors;
+using RevitDocumenter.Models.Dimensions;
+using RevitDocumenter.Models.Dimensions.DimensionReferences;
 
 namespace RevitDocumenter.Models;
 

@@ -2,7 +2,7 @@ using System;
 
 using Autodesk.Revit.DB;
 
-namespace RevitDocumenter.Models.ViewServices;
+namespace RevitDocumenter.Models.Mapping.ViewServices;
 internal class ViewPreparer {
     private readonly RevitRepository _revitRepository;
     private readonly AnchorLineService _anchorLineService;

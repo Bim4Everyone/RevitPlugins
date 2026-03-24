@@ -1,18 +1,18 @@
 using Autodesk.Revit.DB;
 
-using RevitDocumenter.Models.DimensionServices;
+using RevitDocumenter.Models.Dimensions.DimensionLines;
 
-namespace RevitDocumenter.Models.ReferenceCollectors;
+namespace RevitDocumenter.Models.Dimensions.DimensionReferences.ReferenceCollector;
 /// <summary>
 /// Класс, который собирает референсы от объекта до осей
 /// </summary>
 internal class ReferenceToGridsCollector : IReferenceCollector<ReferenceToGridsCollectorContext> {
-    private readonly LineBasedElementFilterService _lineBasedElementFilterService;
+    private readonly GridDirectionFilter _lineBasedElementFilterService;
     private readonly ReferenceAnalizeService _referenceAnalizeService;
     private readonly RebarElementDimensionLineProvider _dimensionLineService;
 
     public ReferenceToGridsCollector(
-        LineBasedElementFilterService lineBasedElementFilterService,
+        GridDirectionFilter lineBasedElementFilterService,
         ReferenceAnalizeService referenceAnalizeService,
         RebarElementDimensionLineProvider dimensionLineService) {
 

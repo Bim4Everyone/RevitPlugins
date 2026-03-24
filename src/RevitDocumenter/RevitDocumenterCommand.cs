@@ -14,8 +14,10 @@ using Ninject;
 
 using RevitDocumenter.Extensions;
 using RevitDocumenter.Models;
-using RevitDocumenter.Models.DimensionServices;
-using RevitDocumenter.Models.ReferenceCollectors;
+using RevitDocumenter.Models.Dimensions.DimensionLines;
+using RevitDocumenter.Models.Dimensions.DimensionReferences;
+using RevitDocumenter.Models.Dimensions.DimensionReferences.ReferenceCollector;
+using RevitDocumenter.Models.Dimensions.DimensionServices;
 using RevitDocumenter.ViewModels;
 using RevitDocumenter.Views;
 
@@ -66,7 +68,7 @@ public class RevitDocumenterCommand : BasePluginCommand {
             .ToSelf()
             .InSingletonScope();
 
-        kernel.Bind<LineBasedElementFilterService>()
+        kernel.Bind<GridDirectionFilter>()
             .ToSelf()
             .InSingletonScope();
 

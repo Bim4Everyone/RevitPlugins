@@ -2,7 +2,7 @@ using System.Collections.Generic;
 
 using Autodesk.Revit.DB;
 
-namespace RevitDocumenter.Models;
+namespace RevitDocumenter.Models.Dimensions;
 internal class RebarElement {
     public RebarElement(FamilyInstance rebar, List<Reference> verticalRefs, List<Reference> horizontalRefs) {
         Rebar = rebar;

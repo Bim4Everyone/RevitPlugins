@@ -1,8 +1,7 @@
 using Ninject;
 
-using RevitDocumenter.Models;
+using RevitDocumenter.Models.Mapping.ViewServices;
 using RevitDocumenter.Models.MapServices;
-using RevitDocumenter.Models.ViewServices;
 
 namespace RevitDocumenter.Extensions;
 

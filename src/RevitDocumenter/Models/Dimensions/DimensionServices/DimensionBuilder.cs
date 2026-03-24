@@ -3,11 +3,13 @@ using System.Collections.Generic;
 
 using Autodesk.Revit.DB;
 
+using RevitDocumenter.Models.Dimensions.DimensionLines;
+using RevitDocumenter.Models.Dimensions.DimensionReferences;
+using RevitDocumenter.Models.Dimensions.DimensionReferences.ReferenceCollector;
 using RevitDocumenter.Models.MapServices;
-using RevitDocumenter.Models.ReferenceCollectors;
 
-namespace RevitDocumenter.Models.DimensionServices;
-internal class DimensionService {
+namespace RevitDocumenter.Models.Dimensions.DimensionServices;
+internal class DimensionBuilder {
     private readonly DimensionCreator _dimensionCreator;
     private readonly DimensionChanger _dimensionChanger;
     private readonly ValueGuard _guard;
@@ -15,7 +17,7 @@ internal class DimensionService {
     private readonly IDimensionLineProvider<RebarElementDimensionLineProviderContext> _dimensionLineProvider;
     private readonly ReferenceAnalizeService _referenceAnalizeService;
 
-    public DimensionService(
+    public DimensionBuilder(
         DimensionCreator dimensionCreator,
         DimensionChanger dimensionChanger,
         ValueGuard guard,

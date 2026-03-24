@@ -1,6 +1,6 @@
 using Autodesk.Revit.DB;
 
-namespace RevitDocumenter.Models.ViewServices;
+namespace RevitDocumenter.Models.Mapping.ViewServices;
 internal class ViewPreparerOption {
     public double MappingStepInFeet { get; set; }
     public Color ColorForAnchorLines { get; set; }

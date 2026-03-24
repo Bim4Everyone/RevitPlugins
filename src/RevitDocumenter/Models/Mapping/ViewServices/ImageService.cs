@@ -6,7 +6,7 @@ using Autodesk.Revit.DB;
 
 using Color = Autodesk.Revit.DB.Color;
 
-namespace RevitDocumenter.Models.ViewServices;
+namespace RevitDocumenter.Models.Mapping.ViewServices;
 internal class ImageService {
     private readonly RevitRepository _revitRepository;
     private readonly Document _doc;

@@ -6,7 +6,7 @@ using System.Runtime.InteropServices;
 
 using Autodesk.Revit.DB;
 
-using RevitDocumenter.Models.ViewServices;
+using RevitDocumenter.Models.Mapping.ViewServices;
 
 using Point = System.Drawing.Point;
 using Rectangle = System.Drawing.Rectangle;

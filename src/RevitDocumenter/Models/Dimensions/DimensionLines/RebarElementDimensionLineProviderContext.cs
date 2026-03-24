@@ -1,6 +1,6 @@
 using Autodesk.Revit.DB;
 
-namespace RevitDocumenter.Models.DimensionServices;
+namespace RevitDocumenter.Models.Dimensions.DimensionLines;
 internal class RebarElementDimensionLineProviderContext : IDimensionLineProviderContext {
     public RebarElementDimensionLineProviderContext(RebarElement rebar, XYZ direction) {
         Rebar = rebar;

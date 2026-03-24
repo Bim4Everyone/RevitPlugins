@@ -3,8 +3,8 @@ using System.Linq;
 
 using Autodesk.Revit.DB;
 
-namespace RevitDocumenter.Models.ReferenceCollectors;
-internal class LineBasedElementFilterService {
+namespace RevitDocumenter.Models;
+internal class GridDirectionFilter {
     public List<Reference> GetGridReferencesByDirection(List<Grid> grids, XYZ direction) {
         return GetGridsByDirection(grids, direction)
             .Select(g => new Reference(g))

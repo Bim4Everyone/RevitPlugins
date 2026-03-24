@@ -9,10 +9,10 @@ using dosymep.WPF.Commands;
 using dosymep.WPF.ViewModels;
 
 using RevitDocumenter.Models;
-using RevitDocumenter.Models.DimensionServices;
+using RevitDocumenter.Models.Dimensions.DimensionReferences;
+using RevitDocumenter.Models.Dimensions.DimensionServices;
+using RevitDocumenter.Models.Mapping.ViewServices;
 using RevitDocumenter.Models.MapServices;
-using RevitDocumenter.Models.ReferenceCollectors;
-using RevitDocumenter.Models.ViewServices;
 
 using Grid = Autodesk.Revit.DB.Grid;
 
@@ -26,7 +26,7 @@ internal class MainViewModel : BaseViewModel {
     private readonly RevitRepository _revitRepository;
     private readonly ILocalizationService _localizationService;
     private readonly ViewMapService _mapService;
-    private readonly DimensionService _dimensionService;
+    private readonly DimensionBuilder _dimensionService;
     private readonly ViewPreparer _viewPreparer;
     private readonly ImageService _imageService;
     private readonly PaintSquaresByMapService _paintSquaresByMapService;
@@ -57,7 +57,7 @@ internal class MainViewModel : BaseViewModel {
         RevitRepository revitRepository,
         ILocalizationService localizationService,
         ViewMapService mapService,
-        DimensionService dimensionService,
+        DimensionBuilder dimensionService,
         ViewPreparer viewPreparer,
         ImageService imageService,
         PaintSquaresByMapService paintSquaresByMapService,

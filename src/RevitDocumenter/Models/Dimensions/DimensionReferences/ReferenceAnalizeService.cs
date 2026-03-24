@@ -4,9 +4,9 @@ using System.Linq;
 
 using Autodesk.Revit.DB;
 
-using RevitDocumenter.Models.DimensionServices;
+using RevitDocumenter.Models.Dimensions.DimensionServices;
 
-namespace RevitDocumenter.Models.ReferenceCollectors;
+namespace RevitDocumenter.Models.Dimensions.DimensionReferences;
 internal class ReferenceAnalizeService {
     private readonly RevitRepository _revitRepository;
     private readonly DimensionCreator _dimensionCreator;

@@ -4,9 +4,10 @@ using Autodesk.Revit.DB;
 
 using dosymep.Revit;
 
+using RevitDocumenter.Models.Mapping.ViewServices;
 using RevitDocumenter.Models.MapServices;
 
-namespace RevitDocumenter.Models.DimensionServices;
+namespace RevitDocumenter.Models.Dimensions.DimensionServices;
 
 internal class DimensionChanger {
     private const double _horizontalOffsetFactor = 0.1;
