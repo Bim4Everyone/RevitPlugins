@@ -11,8 +11,8 @@ using dosymep.WPF.ViewModels;
 using RevitDocumenter.Models;
 using RevitDocumenter.Models.Dimensions.DimensionReferences;
 using RevitDocumenter.Models.Dimensions.DimensionServices;
+using RevitDocumenter.Models.Mapping.MapServices;
 using RevitDocumenter.Models.Mapping.ViewServices;
-using RevitDocumenter.Models.MapServices;
 
 using Grid = Autodesk.Revit.DB.Grid;
 
@@ -21,7 +21,7 @@ namespace RevitDocumenter.ViewModels;
 /// <summary>
 /// Основная ViewModel главного окна плагина.
 /// </summary>
-internal class ReinforcementDimensioningViewModel : BaseViewModel {
+internal class RebarDimensioningViewModel : BaseViewModel {
     private readonly PluginConfig _pluginConfig;
     private readonly RevitRepository _revitRepository;
     private readonly ILocalizationService _localizationService;
@@ -31,20 +31,28 @@ internal class ReinforcementDimensioningViewModel : BaseViewModel {
     private readonly ImageService _imageService;
     private readonly PaintSquaresByMapService _paintSquaresByMapService;
     private readonly ReferenceAnalizeService _referenceAnalizeService;
-    private string _errorText;
-    private string _familyNamePart;
-    private DimensionType _selectedDimensionType;
-    private List<DimensionType> _dimensionTypes;
-    private List<Grid> _grids = [];
-    private bool _placeDimensionsAccurately;
 
     private readonly string _defFamilyNamePart = "IFC_Зона_Доп.Арм";
     private readonly string _defSelectedDimensionTypeName = "я_Основной_Плагин_2.5 мм";
     private readonly List<string> _defVerticalRefNames = ["Габарит_Ширина_1", "Габарит_Ширина_2"];
     private readonly List<string> _defHorizontalRefNames = ["Габарит_Длина_1", "Габарит_Длина_2"];
 
+    private string _errorText;
+    private string _familyNamePart;
+    private DimensionType _selectedDimensionType;
+    private List<DimensionType> _dimensionTypes;
+    private bool _placeDimensionsAccurately;
+    private bool _createMarkedImage;
+
+    private List<Grid> _grids = [];
+
+    // Шаг создания сетки при генерации карты, если пользователь запросил точное размещение размеров
     private readonly double _mappingStepInMm = 200.0;
-    private readonly bool _createMarkedImage = true;
+    // Цвет якорных линий, которые помогают применяются при создании карты и точном размещении размеров
+    private readonly Color _colorForAnchorLines = new(255, 0, 255);
+    // Вес якорных линий, которые помогают применяются при создании карты и точном размещении размеров
+    private readonly int _weightForAnchorLines = 1;
+
 
     /// <summary>
     /// Создает экземпляр основной ViewModel главного окна.
@@ -52,7 +60,7 @@ internal class ReinforcementDimensioningViewModel : BaseViewModel {
     /// <param name="pluginConfig">Настройки плагина.</param>
     /// <param name="revitRepository">Класс доступа к интерфейсу Revit.</param>
     /// <param name="localizationService">Интерфейс доступа к сервису локализации.</param>
-    public ReinforcementDimensioningViewModel(
+    public RebarDimensioningViewModel(
         PluginConfig pluginConfig,
         RevitRepository revitRepository,
         ILocalizationService localizationService,
@@ -113,6 +121,11 @@ internal class ReinforcementDimensioningViewModel : BaseViewModel {
         set => RaiseAndSetIfChanged(ref _placeDimensionsAccurately, value);
     }
 
+    public bool CreateMarkedImage {
+        get => _createMarkedImage;
+        set => RaiseAndSetIfChanged(ref _createMarkedImage, value);
+    }
+
     public List<Grid> Grids {
         get => _grids;
         set => RaiseAndSetIfChanged(ref _grids, value);
@@ -140,15 +153,15 @@ internal class ReinforcementDimensioningViewModel : BaseViewModel {
         SaveConfig();
         using var mainTransaction = new Transaction(
             _revitRepository.Document,
-            _localizationService.GetLocalizedString("ReinforcementDimensioningWindow.Title"));
+            _localizationService.GetLocalizedString("RebarDimensioningWindow.Title"));
         mainTransaction.Start();
         MapInfo mapInfo = null;
 
         if(_placeDimensionsAccurately) {
             var viewPreparerOption = new ViewPreparerOption() {
                 MappingStepInFeet = UnitUtilsHelper.ConvertToInternalValue(_mappingStepInMm),
-                ColorForAnchorLines = new(255, 0, 255),
-                WeightForAnchorLines = 1,
+                ColorForAnchorLines = _colorForAnchorLines,
+                WeightForAnchorLines = _weightForAnchorLines,
             };
 
             var exportOption = _viewPreparer.Prepare(viewPreparerOption);
@@ -188,19 +201,19 @@ internal class ReinforcementDimensioningViewModel : BaseViewModel {
     /// </remarks>
     private bool CanAcceptView() {
         if(Grids.Count == 0) {
-            ErrorText = _localizationService.GetLocalizedString("ReinforcementDimensioningWindow.ViewHasNotGrids");
+            ErrorText = _localizationService.GetLocalizedString("RebarDimensioningWindow.ViewHasNotGrids");
             return false;
         }
         if(string.IsNullOrEmpty(FamilyNamePart)) {
-            ErrorText = _localizationService.GetLocalizedString("ReinforcementDimensioningWindow.WriteFamilyNamePart");
+            ErrorText = _localizationService.GetLocalizedString("RebarDimensioningWindow.WriteFamilyNamePart");
             return false;
         }
         if(SelectedDimensionType is null) {
-            ErrorText = _localizationService.GetLocalizedString("ReinforcementDimensioningWindow.DimensionTypeIsNotSelected");
+            ErrorText = _localizationService.GetLocalizedString("RebarDimensioningWindow.DimensionTypeIsNotSelected");
             return false;
         }
         if(ReferenceNamesVM.VerticalRefNames.Count == 0 && ReferenceNamesVM.HorizontalRefNames.Count == 0) {
-            ErrorText = _localizationService.GetLocalizedString("ReinforcementDimensioningWindow.WriteReferenceNames");
+            ErrorText = _localizationService.GetLocalizedString("RebarDimensioningWindow.WriteReferenceNames");
             return false;
         }
         ErrorText = string.Empty;
@@ -224,6 +237,7 @@ internal class ReinforcementDimensioningViewModel : BaseViewModel {
         horizontalRefNames.ForEach(item => ReferenceNamesVM.HorizontalRefNames.Add(new ReferenceNameViewModel(item)));
 
         PlaceDimensionsAccurately = setting?.PlaceDimensionsAccurately ?? true;
+        CreateMarkedImage = setting?.CreateMarkedImage ?? false;
     }
 
     /// <summary>
@@ -240,6 +254,7 @@ internal class ReinforcementDimensioningViewModel : BaseViewModel {
         setting.HorizontalRefNames = [.. ReferenceNamesVM.HorizontalRefNames.Select(r => r.ReferenceName)];
 
         setting.PlaceDimensionsAccurately = PlaceDimensionsAccurately;
+        setting.CreateMarkedImage = CreateMarkedImage;
 
         _pluginConfig.SaveProjectConfig();
     }

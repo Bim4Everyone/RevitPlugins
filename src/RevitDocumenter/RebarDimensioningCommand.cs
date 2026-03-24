@@ -30,11 +30,11 @@ namespace RevitDocumenter;
 /// В данном классе должна быть инициализация контейнера плагина и указание названия команды.
 /// </remarks>
 [Transaction(TransactionMode.Manual)]
-public class ReinforcementDimensioningCommand : BasePluginCommand {
+public class RebarDimensioningCommand : BasePluginCommand {
     /// <summary>
     /// Инициализирует команду плагина.
     /// </summary>
-    public ReinforcementDimensioningCommand() {
+    public RebarDimensioningCommand() {
         PluginName = "Доп.Арм. Размеры";
     }
 
@@ -92,7 +92,7 @@ public class ReinforcementDimensioningCommand : BasePluginCommand {
         kernel.UseWpfUIThemeUpdater();
 
         // Настройка запуска окна
-        kernel.BindMainWindow<ReinforcementDimensioningViewModel, ReinforcementDimensioningWindow>();
+        kernel.BindMainWindow<RebarDimensioningViewModel, RebarDimensioningWindow>();
 
         // Настройка локализации,
         // получение имени сборки откуда брать текст
@@ -105,6 +105,6 @@ public class ReinforcementDimensioningCommand : BasePluginCommand {
             CultureInfo.GetCultureInfo("ru-RU"));
 
         // Вызывает стандартное уведомление
-        Notification(kernel.Get<ReinforcementDimensioningWindow>());
+        Notification(kernel.Get<RebarDimensioningWindow>());
     }
 }

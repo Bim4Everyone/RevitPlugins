@@ -66,4 +66,5 @@ internal class RevitSettings : ProjectSettings {
     public List<string> VerticalRefNames { get; set; }
     public List<string> HorizontalRefNames { get; set; }
     public bool PlaceDimensionsAccurately { get; set; }
+    public bool CreateMarkedImage { get; set; }
 }

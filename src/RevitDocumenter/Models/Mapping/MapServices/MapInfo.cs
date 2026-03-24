@@ -1,6 +1,6 @@
 using Autodesk.Revit.DB;
 
-namespace RevitDocumenter.Models.MapServices;
+namespace RevitDocumenter.Models.Mapping.MapServices;
 internal class MapInfo {
     public MapInfo(SquareInfo[,] map, string path, double mappingStepInFeet, int stepCountX, int stepCountY,
         XYZ startPointInRevit) {

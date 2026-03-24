@@ -1,6 +1,6 @@
 using System.Drawing;
 
-namespace RevitDocumenter.Models.MapServices;
+namespace RevitDocumenter.Models.Mapping.MapServices;
 internal class SquareInfo {
     // true, если ВСЕ пиксели в квадрате белые
     public bool AllPixelsWhite { get; set; }

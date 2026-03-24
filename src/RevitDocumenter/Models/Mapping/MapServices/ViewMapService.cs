@@ -11,7 +11,7 @@ using RevitDocumenter.Models.Mapping.ViewServices;
 using Point = System.Drawing.Point;
 using Rectangle = System.Drawing.Rectangle;
 
-namespace RevitDocumenter.Models.MapServices;
+namespace RevitDocumenter.Models.Mapping.MapServices;
 internal class ViewMapService {
     public ViewMapService() { }
 

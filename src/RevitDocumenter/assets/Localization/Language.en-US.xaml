@@ -2,27 +2,28 @@
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
                     xmlns:system="clr-namespace:System;assembly=mscorlib">
 
-    <system:String x:Key="ReinforcementDimensioningWindow.Title">Dimensions of additional reinforcement zones</system:String>
+    <system:String x:Key="RebarDimensioningWindow.Title">Dimensions of additional reinforcement zones</system:String>
     
-    <system:String x:Key="ReinforcementDimensioningWindow.FamilyNamePart">Part of the family name of the reinforcement zone:</system:String>
-    <system:String x:Key="ReinforcementDimensioningWindow.ReferenceNames">Reference names:</system:String>
-    <system:String x:Key="ReinforcementDimensioningWindow.VerticalReferences">Vertical reference names:</system:String>
-    <system:String x:Key="ReinforcementDimensioningWindow.HorizontalReferences">Horizontal reference names:</system:String>
+    <system:String x:Key="RebarDimensioningWindow.FamilyNamePart">Part of the family name of the reinforcement zone:</system:String>
+    <system:String x:Key="RebarDimensioningWindow.ReferenceNames">Reference names:</system:String>
+    <system:String x:Key="RebarDimensioningWindow.VerticalReferences">Vertical reference names:</system:String>
+    <system:String x:Key="RebarDimensioningWindow.HorizontalReferences">Horizontal reference names:</system:String>
 
-    <system:String x:Key="ReinforcementDimensioningWindow.ReferenceName">Reference name</system:String>
-    <system:String x:Key="ReinforcementDimensioningWindow.Add">Add</system:String>
-    <system:String x:Key="ReinforcementDimensioningWindow.Remove">Remove</system:String>
+    <system:String x:Key="RebarDimensioningWindow.ReferenceName">Reference name</system:String>
+    <system:String x:Key="RebarDimensioningWindow.Add">Add</system:String>
+    <system:String x:Key="RebarDimensioningWindow.Remove">Remove</system:String>
     
-    <system:String x:Key="ReinforcementDimensioningWindow.DimensionType">Dimension type:</system:String>
+    <system:String x:Key="RebarDimensioningWindow.DimensionType">Dimension type:</system:String>
     
-    <system:String x:Key="ReinforcementDimensioningWindow.ViewHasNotGrids">View does not contain grids</system:String>
-    <system:String x:Key="ReinforcementDimensioningWindow.WriteFamilyNamePart">Part of the family name is missing</system:String>
-    <system:String x:Key="ReinforcementDimensioningWindow.DimensionTypeIsNotSelected">Dimension type not selected</system:String>
-    <system:String x:Key="ReinforcementDimensioningWindow.WriteReferenceNames">Missing reference plane names</system:String>
+    <system:String x:Key="RebarDimensioningWindow.ViewHasNotGrids">View does not contain grids</system:String>
+    <system:String x:Key="RebarDimensioningWindow.WriteFamilyNamePart">Part of the family name is missing</system:String>
+    <system:String x:Key="RebarDimensioningWindow.DimensionTypeIsNotSelected">Dimension type not selected</system:String>
+    <system:String x:Key="RebarDimensioningWindow.WriteReferenceNames">Missing reference plane names</system:String>
     
-    <system:String x:Key="ReinforcementDimensioningWindow.PlaceDimensions">Methodology of positioning dimensions:</system:String>
-    <system:String x:Key="ReinforcementDimensioningWindow.PlaceDimensionsAccurately">Position dimensions accurately</system:String>
-    
-    <system:String x:Key="ReinforcementDimensioningWindow.ButtonOk">OK</system:String>
-    <system:String x:Key="ReinforcementDimensioningWindow.ButtonCancel">Cancel</system:String>
+    <system:String x:Key="RebarDimensioningWindow.PlaceDimensions">Methodology of positioning dimensions:</system:String>
+    <system:String x:Key="RebarDimensioningWindow.PlaceDimensionsAccurately">Position dimensions accurately</system:String>
+    <system:String x:Key="RebarDimensioningWindow.CreateMarkedImage">Create an image of the free zone map</system:String>
+
+    <system:String x:Key="RebarDimensioningWindow.ButtonOk">OK</system:String>
+    <system:String x:Key="RebarDimensioningWindow.ButtonCancel">Cancel</system:String>
 </ResourceDictionary>

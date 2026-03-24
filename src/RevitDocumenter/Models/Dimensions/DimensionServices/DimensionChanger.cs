@@ -4,16 +4,21 @@ using Autodesk.Revit.DB;
 
 using dosymep.Revit;
 
+using RevitDocumenter.Models.Mapping.MapServices;
 using RevitDocumenter.Models.Mapping.ViewServices;
-using RevitDocumenter.Models.MapServices;
 
 namespace RevitDocumenter.Models.Dimensions.DimensionServices;
 
 internal class DimensionChanger {
+    // Коэффициент регулирующий смещение области, занимаемой текстом по горизонтали для более далекого поиска пересечек
     private const double _horizontalOffsetFactor = 0.1;
+    // Коэффициент регулирующий смещение области, занимаемой текстом по вертикали для более далекого поиска пересечек
     private const double _textHeightFactor = 2.0;
+    // Коэффициент регулирующий отношение вертикального шага при смещении текста размера от величины квадрата анализа
     private const double _verticalStepFactor = 1;
+    // Коэффициент регулирующий отношение горизонтального шага при смещении текста размера от его ширины
     private const double _horizontalStepFactor = 1.5;
+    // Максимальное количество шагов для поиска подходящего положения текста размера
     private const int _maxSearchSteps = 10;
 
     private readonly RevitRepository _revitRepository;

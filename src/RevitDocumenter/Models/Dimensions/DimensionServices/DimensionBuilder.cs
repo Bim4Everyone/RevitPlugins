@@ -6,7 +6,7 @@ using Autodesk.Revit.DB;
 using RevitDocumenter.Models.Dimensions.DimensionLines;
 using RevitDocumenter.Models.Dimensions.DimensionReferences;
 using RevitDocumenter.Models.Dimensions.DimensionReferences.ReferenceCollector;
-using RevitDocumenter.Models.MapServices;
+using RevitDocumenter.Models.Mapping.MapServices;
 
 namespace RevitDocumenter.Models.Dimensions.DimensionServices;
 internal class DimensionBuilder {
