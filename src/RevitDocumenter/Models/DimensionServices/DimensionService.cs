@@ -3,30 +3,30 @@ using System.Collections.Generic;
 
 using Autodesk.Revit.DB;
 
-using RevitDocumenter.Models.Comparision;
 using RevitDocumenter.Models.MapServices;
+using RevitDocumenter.Models.ReferenceCollectors;
 
 namespace RevitDocumenter.Models.DimensionServices;
 internal class DimensionService {
     private readonly DimensionCreator _dimensionCreator;
     private readonly DimensionChanger _dimensionChanger;
     private readonly ValueGuard _guard;
-    private readonly IComparisonService _comparisonService;
-    private readonly DimensionLineService _dimensionLineService;
+    private readonly IReferenceCollector<ReferenceToGridsCollectorContext> _comparisonService;
+    private readonly IDimensionLineProvider<RebarElementDimensionLineProviderContext> _dimensionLineProvider;
     private readonly ReferenceAnalizeService _referenceAnalizeService;
 
     public DimensionService(
         DimensionCreator dimensionCreator,
         DimensionChanger dimensionChanger,
         ValueGuard guard,
-        IComparisonService comparisonService,
-        DimensionLineService dimensionLineService,
+        IReferenceCollector<ReferenceToGridsCollectorContext> comparisonService,
+        IDimensionLineProvider<RebarElementDimensionLineProviderContext> dimensionLineProvider,
         ReferenceAnalizeService referenceAnalizeService) {
         _dimensionCreator = dimensionCreator;
         _dimensionChanger = dimensionChanger;
         _guard = guard;
         _comparisonService = comparisonService;
-        _dimensionLineService = dimensionLineService;
+        _dimensionLineProvider = dimensionLineProvider;
         _referenceAnalizeService = referenceAnalizeService;
     }
 
@@ -64,7 +64,8 @@ internal class DimensionService {
 
         // Получаем опорные плоскости для размера
         // Нормальная ситуация, когда подходящие оси не были найдены
-        var dimensionRefs = _comparisonService.Compare(new GridComparisonContext(rebarReferences, grids, direction));
+        var dimensionRefs = _comparisonService.CollectReferences(
+            new ReferenceToGridsCollectorContext(rebarReferences, grids, direction));
         if(dimensionRefs is null) {
             return;
         }
@@ -77,7 +78,8 @@ internal class DimensionService {
         }
 
         // Получаем линию размещения размера
-        var dimensionLine = _dimensionLineService.GetDimensionLine(rebar, direction);
+        var dimensionLine = _dimensionLineProvider.GetDimensionLine(
+            new RebarElementDimensionLineProviderContext(rebar, direction));
 
         // Строим размер
         var dimension = _dimensionCreator.Create(dimensionLine, dimensionRefs, selectedDimensionType);

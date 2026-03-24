@@ -9,9 +9,9 @@ using dosymep.WPF.Commands;
 using dosymep.WPF.ViewModels;
 
 using RevitDocumenter.Models;
-using RevitDocumenter.Models.Comparision;
 using RevitDocumenter.Models.DimensionServices;
 using RevitDocumenter.Models.MapServices;
+using RevitDocumenter.Models.ReferenceCollectors;
 using RevitDocumenter.Models.ViewServices;
 
 using Grid = Autodesk.Revit.DB.Grid;

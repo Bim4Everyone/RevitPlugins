@@ -12,11 +12,10 @@ using dosymep.WpfUI.Core.Ninject;
 
 using Ninject;
 
+using RevitDocumenter.Extensions;
 using RevitDocumenter.Models;
-using RevitDocumenter.Models.Comparision;
 using RevitDocumenter.Models.DimensionServices;
-using RevitDocumenter.Models.MapServices;
-using RevitDocumenter.Models.ViewServices;
+using RevitDocumenter.Models.ReferenceCollectors;
 using RevitDocumenter.ViewModels;
 using RevitDocumenter.Views;
 
@@ -48,6 +47,7 @@ public class RevitDocumenterCommand : BasePluginCommand {
     protected override void Execute(UIApplication uiApplication) {
         // Создание контейнера зависимостей плагина с сервисами из платформы
         using IKernel kernel = uiApplication.CreatePlatformServices();
+        kernel.BindMapping();
 
         // Настройка доступа к Revit
         kernel.Bind<RevitRepository>()
@@ -58,32 +58,20 @@ public class RevitDocumenterCommand : BasePluginCommand {
         kernel.Bind<PluginConfig>()
             .ToMethod(c => PluginConfig.GetPluginConfig(c.Kernel.Get<IConfigSerializer>()));
 
-        kernel.Bind<IComparisonService>()
-            .To<GridComparisonService>()
+        kernel.Bind<IReferenceCollector<ReferenceToGridsCollectorContext>>()
+            .To<ReferenceToGridsCollector>()
             .InSingletonScope();
 
-        kernel.Bind<ViewPreparer>()
+        kernel.Bind<ReferenceAnalizeService>()
             .ToSelf()
             .InSingletonScope();
 
-        kernel.Bind<AnchorLineService>()
+        kernel.Bind<LineBasedElementFilterService>()
             .ToSelf()
             .InSingletonScope();
 
-        kernel.Bind<ImageService>()
-            .ToSelf()
-            .InSingletonScope();
-
-        kernel.Bind<PaintSquaresByMapService>()
-            .ToSelf()
-            .InSingletonScope();
-
-        kernel.Bind<DimensionLineService>()
-            .ToSelf()
-            .InSingletonScope();
-
-        kernel.Bind<ViewMapService>()
-            .ToSelf()
+        kernel.Bind<IDimensionLineProvider<RebarElementDimensionLineProviderContext>>()
+            .To<RebarElementDimensionLineProvider>()
             .InSingletonScope();
 
         kernel.Bind<DimensionCreator>()
@@ -95,18 +83,6 @@ public class RevitDocumenterCommand : BasePluginCommand {
             .InSingletonScope();
 
         kernel.Bind<ValueGuard>()
-            .ToSelf()
-            .InSingletonScope();
-
-        kernel.Bind<BallCreator>()
-            .ToSelf()
-            .InSingletonScope();
-
-        kernel.Bind<LineBasedElementFilterService>()
-            .ToSelf()
-            .InSingletonScope();
-
-        kernel.Bind<ReferenceAnalizeService>()
             .ToSelf()
             .InSingletonScope();
 

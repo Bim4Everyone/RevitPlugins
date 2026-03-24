@@ -3,7 +3,7 @@ using System.Linq;
 
 using Autodesk.Revit.DB;
 
-namespace RevitDocumenter.Models.Comparision;
+namespace RevitDocumenter.Models.ReferenceCollectors;
 internal class LineBasedElementFilterService {
     public List<Reference> GetGridReferencesByDirection(List<Grid> grids, XYZ direction) {
         return GetGridsByDirection(grids, direction)

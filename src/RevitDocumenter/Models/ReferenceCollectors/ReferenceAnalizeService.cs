@@ -6,7 +6,7 @@ using Autodesk.Revit.DB;
 
 using RevitDocumenter.Models.DimensionServices;
 
-namespace RevitDocumenter.Models.Comparision;
+namespace RevitDocumenter.Models.ReferenceCollectors;
 internal class ReferenceAnalizeService {
     private readonly RevitRepository _revitRepository;
     private readonly DimensionCreator _dimensionCreator;

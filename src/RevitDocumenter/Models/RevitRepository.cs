@@ -5,7 +5,7 @@ using Autodesk.Revit.ApplicationServices;
 using Autodesk.Revit.DB;
 using Autodesk.Revit.UI;
 
-using RevitDocumenter.Models.Comparision;
+using RevitDocumenter.Models.ReferenceCollectors;
 
 namespace RevitDocumenter.Models;
 
