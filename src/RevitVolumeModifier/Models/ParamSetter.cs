@@ -8,6 +8,7 @@ using dosymep.Revit;
 using RevitVolumeModifier.Enums;
 
 namespace RevitVolumeModifier.Models;
+
 internal class ParamSetter {
     public void SetParams(Element element, List<DirectShapeObject> directShapeObjects, IEnumerable<ParamModel> paramModels) {
         foreach(var directShapeObject in directShapeObjects) {

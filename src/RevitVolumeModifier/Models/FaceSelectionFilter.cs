@@ -1,6 +1,8 @@
 using Autodesk.Revit.DB;
 using Autodesk.Revit.UI.Selection;
 
+namespace RevitVolumeModifier.Models;
+
 internal class FaceSelectionFilter : ISelectionFilter {
     public bool AllowElement(Element elem) {
         return true;

@@ -4,6 +4,7 @@ using System.Linq;
 using Autodesk.Revit.DB;
 
 namespace RevitVolumeModifier.Models;
+
 internal class GeomObjectFactory {
     public GeomObject GetGeomObject(List<Solid> solids) {
         var geomObjects = new List<GeometryObject>();

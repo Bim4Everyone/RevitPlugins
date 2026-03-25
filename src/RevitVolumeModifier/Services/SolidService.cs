@@ -13,6 +13,9 @@ namespace RevitVolumeModifier.Services;
 internal class SolidService {
     public const double VolumeEpsilon = 1e-6;
 
+    /// <summary>
+    /// Метод объединения солидов
+    /// </summary>
     public IList<Solid> JoinElementSolids(IList<Element> elements, out bool success) {
         success = true;
         var allSolids = new List<Solid>();
@@ -38,6 +41,9 @@ internal class SolidService {
         return resultSolids;
     }
 
+    /// <summary>
+    /// Метод вырезания солидов
+    /// </summary>
     public Dictionary<ElementId, List<Solid>> CutElementSolids(
         IList<Element> elements,
         IList<Element> elementsToCut,
@@ -86,10 +92,16 @@ internal class SolidService {
         return result;
     }
 
+    /// <summary>
+    /// Метод построения горизонтальной секущей плоскости
+    /// </summary>
     public DividePlane GetHorizontalPlane(Reference reference) {
         return CreateDividePlane(new XYZ(0, 0, 1), reference.GlobalPoint);
     }
 
+    /// <summary>
+    /// Метод построения вертикальной секущей плоскости
+    /// </summary>
     public DividePlane GetVerticalPlane(Document doc, Reference reference) {
         if(!TryGetFaceData(doc, reference, out var face, out var transform)) {
             return null;
@@ -121,6 +133,9 @@ internal class SolidService {
         return CreateDividePlane(perpendicular, origin);
     }
 
+    /// <summary>
+    /// Метод построения секущей плоскости из Face
+    /// </summary>
     public DividePlane GetPlaneFromFace(Document doc, Reference reference) {
         if(!TryGetFaceData(doc, reference, out var face, out var transform)) {
             return null;
@@ -150,7 +165,7 @@ internal class SolidService {
         return CreateDividePlane(normalHost, originHost);
     }
 
-
+    // Метод получения Face из Reference
     private bool TryGetFaceData(Document hostDoc, Reference reference, out Face face, out Transform transform) {
         face = null;
         transform = Transform.Identity;
@@ -227,12 +242,14 @@ internal class SolidService {
         return true;
     }
 
+    // Метод построения разрезающих плоскостей
     private DividePlane CreateDividePlane(XYZ normal, XYZ origin) {
         var positivePlane = Plane.CreateByNormalAndOrigin(normal, origin);
         var negativePlane = Plane.CreateByNormalAndOrigin(normal.Negate(), origin);
         return new DividePlane { PositivePlane = positivePlane, NegativePlane = negativePlane };
     }
 
+    // Метод объединения солидов с выводом флага результата
     private IList<Solid> CreateUnitedSolids(IList<Solid> solids, out bool success) {
         success = true;
         if(!solids.Any()) {
@@ -256,6 +273,7 @@ internal class SolidService {
         return list;
     }
 
+    // Метод разрезания солида
     public Solid DivideSolidSafe(Solid solid, Plane plane) {
         try {
             return BooleanOperationsUtils.CutWithHalfSpace(solid, plane);
@@ -264,6 +282,7 @@ internal class SolidService {
         }
     }
 
+    // Метод получения разрезанного солида
     private Solid CreateCutSolid(Solid solid, IList<Solid> solidsToCut) {
         if(!IsValidSolid(solid)) {
             return solid;
@@ -285,6 +304,7 @@ internal class SolidService {
         return solid;
     }
 
+    // Метод проверки валидности солида
     private bool IsValidSolid(Solid solid) {
         return solid != null && solid.Volume > 0;
     }

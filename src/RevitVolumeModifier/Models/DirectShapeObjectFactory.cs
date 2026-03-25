@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using Autodesk.Revit.DB;
 
 namespace RevitVolumeModifier.Models;
+
 internal class DirectShapeObjectFactory {
     private readonly SystemPluginConfig _systemPluginConfig;
 
@@ -20,7 +21,6 @@ internal class DirectShapeObjectFactory {
         }
         return directShapeElements;
     }
-
 
     public DirectShapeObject GetDirectShapeObject(GeomObject geomObject, Document document) {
         var geometryObjects = geomObject.GeometryObjects;

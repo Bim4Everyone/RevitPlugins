@@ -6,10 +6,10 @@
 
     <system:String x:Key="ParamViewModel.NoParam">Параметра не существует в проекте</system:String>
 
-    <system:String x:Key="MainWindow.Params">Настройка параметров</system:String>
+    <system:String x:Key="MainWindow.Params">Конфигурация параметров</system:String>
     <system:String x:Key="MainWindow.ParamsDescription">Параметры СМР, используемые плагином</system:String>
     <system:String x:Key="MainWindow.ParamWarningTooltip">В некоторых параметрах есть ошибки</system:String>
-    <system:String x:Key="MainWindow.SaveConfig">Сохранить настройки параметров</system:String>
+    <system:String x:Key="MainWindow.SaveConfig">Сохранить конфигурацию параметров</system:String>
 
     <system:String x:Key="MainWindow.JoinPanel">Объединение элементов</system:String>
     <system:String x:Key="MainWindow.JoinPanelDescription">Выделенные элементы будут объединены</system:String>
@@ -40,7 +40,7 @@
     <system:String x:Key="MainViewModel.VolumeParamDescription">Параметр объёма СМР</system:String>
     <system:String x:Key="MainViewModel.VolumeParamDetailDescription">Тип - Объем</system:String>
 
-    <system:String x:Key="MainViewModel.FailedCommand">Операция выполнена с ошибками</system:String>
+    <system:String x:Key="MainViewModel.FailedCommand">Операция выполнена с предупреждениями</system:String>
     <system:String x:Key="MainViewModel.SuccessCommand">Операция выполнена успешно</system:String>
 
     <system:String x:Key="MainViewModel.NoSelection">Не выделены элементы</system:String>
@@ -55,7 +55,5 @@
 
     <system:String x:Key="RevitRepository.TransactionNameJoin">Объединение объемов СМР</system:String>
     <system:String x:Key="RevitRepository.TransactionNameDivide">Разделение объемов СМР</system:String>
-    <system:String x:Key="RevitRepository.TransactionNameCut">Вырезание объемов СМР</system:String>
-    
-    
+    <system:String x:Key="RevitRepository.TransactionNameCut">Вырезание объемов СМР</system:String>      
 </ResourceDictionary>

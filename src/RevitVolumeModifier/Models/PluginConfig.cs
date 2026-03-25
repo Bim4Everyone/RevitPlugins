@@ -5,12 +5,10 @@ using Autodesk.Revit.DB;
 using dosymep.Bim4Everyone;
 using dosymep.Bim4Everyone.ProjectConfigs;
 using dosymep.Bim4Everyone.SharedParams;
-using dosymep.SimpleServices;
 
 using pyRevitLabs.Json;
 
 using RevitVolumeModifier.Enums;
-using RevitVolumeModifier.Interfaces;
 
 namespace RevitVolumeModifier.Models;
 
@@ -38,17 +36,6 @@ internal class RevitSettings : ProjectSettings {
 }
 
 internal class SystemPluginConfig {
-    private readonly ILocalizationService _localizationService;
-    private readonly IParamAvailabilityService _paramAvailabilityService;
-
-    public SystemPluginConfig(ILocalizationService localizationService, IParamAvailabilityService paramAvailabilityService) {
-        _localizationService = localizationService;
-        _paramAvailabilityService = paramAvailabilityService;
-    }
-
-    // Категория моделей, с которыми работает плагин
-    public BuiltInCategory ModelCategory => BuiltInCategory.OST_GenericModel;
-
     // ID категории для построения DirectShape
     public ElementId ElementIdDirectShape => new(BuiltInCategory.OST_GenericModel);
 

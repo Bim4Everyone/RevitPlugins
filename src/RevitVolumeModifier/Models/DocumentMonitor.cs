@@ -4,12 +4,13 @@ using Autodesk.Revit.DB;
 using Autodesk.Revit.UI;
 using Autodesk.Revit.UI.Events;
 
+namespace RevitVolumeModifier.Models;
+
 internal class DocumentMonitor {
     private readonly UIApplication _uiApplication;
+    private Document _lastDocument;
 
     public event Action<Document> ActiveDocumentChanged;
-
-    private Document _lastDocument;
 
     public DocumentMonitor(UIApplication uiApplication) {
         _uiApplication = uiApplication;

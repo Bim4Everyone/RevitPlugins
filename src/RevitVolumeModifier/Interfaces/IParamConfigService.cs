@@ -4,6 +4,7 @@ using System.ComponentModel;
 using RevitVolumeModifier.Models;
 
 namespace RevitVolumeModifier.Interfaces;
+
 internal interface IParamConfigService {
     event PropertyChangedEventHandler PropertyChanged;
     ObservableCollection<ParamModel> ParamModels { get; }

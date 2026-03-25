@@ -77,7 +77,7 @@ internal class RevitPickService {
     }
 
     /// <summary>
-    /// Выбор элемента
+    /// Выбор элемента с фильтром DirectShape и "Модели в контексте"
     /// </summary>
     public Task<IList<ElementId>> PickGenericModelsAsync(string prompt) {
         var tcs = new TaskCompletionSource<IList<ElementId>>();

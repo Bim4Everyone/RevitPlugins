@@ -7,6 +7,7 @@ using Autodesk.Revit.UI;
 using Autodesk.Revit.UI.Events;
 
 namespace RevitVolumeModifier.Models;
+
 public class SelectionMonitor {
     private readonly UIApplication _uiApp;
     private ICollection<ElementId> _lastSelection = [];

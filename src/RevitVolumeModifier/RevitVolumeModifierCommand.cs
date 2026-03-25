@@ -32,14 +32,17 @@ public class RevitVolumeModifierCommand : BasePluginCommand {
         // Создание контейнера зависимостей плагина с сервисами из платформы
         using var kernel = uiApplication.CreatePlatformServices();
 
+        // Настройка доступа к ExternalRevitHandler
         kernel.Bind<ExternalRevitHandler>()
             .ToSelf()
             .InSingletonScope();
 
+        // Настройка доступа к SelectionMonitor
         kernel.Bind<SelectionMonitor>()
             .ToMethod(c => new SelectionMonitor(uiApplication))
             .InSingletonScope();
 
+        // Настройка доступа к DocumentMonitor
         kernel.Bind<DocumentMonitor>()
             .ToMethod(c => new DocumentMonitor(uiApplication))
             .InSingletonScope();
@@ -69,6 +72,7 @@ public class RevitVolumeModifierCommand : BasePluginCommand {
             .ToSelf()
             .InSingletonScope();
 
+        // Настройка доступа к RevitPickService
         kernel.Bind<RevitPickService>()
             .ToMethod(c => new RevitPickService(c.Kernel.Get<ExternalRevitHandler>(), c.Kernel.Get<MainWindow>()))
             .InSingletonScope();
@@ -110,6 +114,7 @@ public class RevitVolumeModifierCommand : BasePluginCommand {
         // Подписываем VM на смену документа
         documentMonitor.ActiveDocumentChanged += vm.OnDocumentChanged;
 
+        // Окно в не модальном режиме
         window.Show();
     }
 }

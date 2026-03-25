@@ -7,6 +7,7 @@ using dosymep.Revit;
 using RevitVolumeModifier.Interfaces;
 
 namespace RevitVolumeModifier.Services;
+
 internal class ParamAvailabilityService : IParamAvailabilityService {
     private readonly Dictionary<string, ParamAvailabilityCache> _cacheByDocId = [];
     /// <summary>

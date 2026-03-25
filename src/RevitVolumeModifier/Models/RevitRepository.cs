@@ -11,8 +11,9 @@ using dosymep.Revit.Geometry;
 using dosymep.SimpleServices;
 
 using RevitVolumeModifier.Handler;
-using RevitVolumeModifier.Models;
 using RevitVolumeModifier.Services;
+
+namespace RevitVolumeModifier.Models;
 
 internal class RevitRepository {
     private readonly ILocalizationService _localizationService;
@@ -30,7 +31,6 @@ internal class RevitRepository {
         DirectShapeObjectFactory directShapeObjectFactory,
         ParamSetter paramSetter,
         SolidService solidService) {
-
         UIApplication = uiApplication;
         _localizationService = localizationService;
         _handler = externalRevitHandler;
@@ -44,19 +44,16 @@ internal class RevitRepository {
     public UIDocument ActiveUIDocument => UIApplication.ActiveUIDocument;
     public Document Document => ActiveUIDocument.Document;
 
+    /// <summary>
+    /// Метод объединения элементов
+    /// </summary>
     public Task<bool> Join(ICollection<ElementId> elementIds, IEnumerable<ParamModel> paramModels) {
         return ExecuteOperationAsync(elementIds, paramModels, "RevitRepository.TransactionNameJoin", ProcessJoin);
     }
 
-    public Task<bool> CutAsync(
-        ICollection<ElementId> elementIds,
-        ICollection<ElementId> elementIdsToCut,
-        IEnumerable<ParamModel> paramModels) {
-
-        return ExecuteOperationAsync(elementIds, paramModels, "RevitRepository.TransactionNameCut", elements =>
-            ProcessCut(elements, elementIdsToCut));
-    }
-
+    /// <summary>
+    /// Метод разрезания элементов по горизонтальной точке
+    /// </summary>
     public Task<bool> DivideByHorizontalPointAsync(
         ICollection<ElementId> elementIds,
         Reference reference,
@@ -66,6 +63,9 @@ internal class RevitRepository {
         return DivideElementsAsync(elementIds, [plane], paramModels);
     }
 
+    /// <summary>
+    /// Метод разрезания элементов по вертикальной точке
+    /// </summary>
     public Task<bool> DivideByVerticalPointAsync(
         ICollection<ElementId> elementIds,
         Reference reference,
@@ -75,6 +75,9 @@ internal class RevitRepository {
         return DivideElementsAsync(elementIds, [plane], paramModels);
     }
 
+    /// <summary>
+    /// Метод разрезания элементов по граням
+    /// </summary>
     public Task<bool> DivideByFacesAsync(
         ICollection<ElementId> elementIds,
         IList<Reference> faces,
@@ -87,6 +90,19 @@ internal class RevitRepository {
         return DivideElementsAsync(elementIds, planes, paramModels);
     }
 
+    /// <summary>
+    /// Метод вырезания элементов
+    /// </summary>
+    public Task<bool> CutAsync(
+        ICollection<ElementId> elementIds,
+        ICollection<ElementId> elementIdsToCut,
+        IEnumerable<ParamModel> paramModels) {
+
+        return ExecuteOperationAsync(elementIds, paramModels, "RevitRepository.TransactionNameCut", elements =>
+            ProcessCut(elements, elementIdsToCut));
+    }
+
+    // Основной метод обработки
     private Task<bool> ExecuteOperationAsync(
         ICollection<ElementId> elementIds,
         IEnumerable<ParamModel> paramModels,
@@ -151,6 +167,7 @@ internal class RevitRepository {
         return tcs.Task;
     }
 
+    // Метод объединения элементов
     private OperationResult ProcessJoin(List<Element> elements) {
         var solids = _solidService.JoinElementSolids(elements, out bool success);
         if(!solids.Any()) {
@@ -177,8 +194,8 @@ internal class RevitRepository {
             };
     }
 
+    // Метод вырезания элементов
     private OperationResult ProcessCut(List<Element> elements, ICollection<ElementId> elementIdsToCut) {
-
         var elementsToCut = GetElements(Document, elementIdsToCut);
         if(!elementsToCut.Any()) {
             return new OperationResult { Success = false };
@@ -221,6 +238,7 @@ internal class RevitRepository {
         };
     }
 
+    // Метод деления элементов
     private Task<bool> DivideElementsAsync(
         ICollection<ElementId> elementIds,
         IEnumerable<DividePlane> planes,
@@ -233,6 +251,7 @@ internal class RevitRepository {
             elements => ProcessDivide(elements, planes));
     }
 
+    // Метод деления элементов
     private OperationResult ProcessDivide(List<Element> elements, IEnumerable<DividePlane> planes) {
         var planeList = planes?.ToList() ?? [];
         if(planeList.Count == 0) {
@@ -308,6 +327,7 @@ internal class RevitRepository {
         };
     }
 
+    // Метод получения элементов
     private List<Element> GetElements(Document document,
         ICollection<ElementId> elementIds) {
 

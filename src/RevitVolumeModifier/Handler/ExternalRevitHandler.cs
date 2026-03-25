@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using Autodesk.Revit.UI;
 
 namespace RevitVolumeModifier.Handler;
+
 internal class ExternalRevitHandler : IExternalEventHandler {
     private readonly Queue<Action<UIApplication>> _actions = new();
     private readonly ExternalEvent _externalEvent;
