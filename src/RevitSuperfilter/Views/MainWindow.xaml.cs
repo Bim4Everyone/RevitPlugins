@@ -1,19 +1,45 @@
-﻿using System.Windows;
+using System.Windows;
+
+using dosymep.SimpleServices;
 
 namespace RevitSuperfilter.Views;
 
 /// <summary>
-///     Interaction logic for MainWindow.xaml
+/// Класс главного окна плагина.
 /// </summary>
 public partial class MainWindow {
-    public MainWindow() {
+    /// <summary>
+    /// Инициализирует главное окно плагина.
+    /// </summary>
+    public MainWindow(
+        ILoggerService loggerService,
+        ISerializationService serializationService,
+        ILanguageService languageService, ILocalizationService localizationService,
+        IUIThemeService uiThemeService, IUIThemeUpdaterService themeUpdaterService)
+        : base(loggerService,
+            serializationService,
+            languageService, localizationService,
+            uiThemeService, themeUpdaterService) {
         InitializeComponent();
     }
 
+    /// <summary>
+    /// Наименование плагина.
+    /// </summary>
+    /// <remarks>
+    /// Используется для сохранения положения окна.
+    /// </remarks>
     public override string PluginName => nameof(RevitSuperfilter);
+    
+    /// <summary>
+    /// Наименование файла конфигурации.
+    /// </summary>
+    /// <remarks>
+    /// Используется для сохранения положения окна.
+    /// </remarks>
     public override string ProjectConfigName => nameof(MainWindow);
-
-    private void ButtonOK_Click(object sender, RoutedEventArgs e) {
+    
+    private void ButtonOk_Click(object sender, RoutedEventArgs e) {
         DialogResult = true;
     }
 

@@ -1,39 +1,76 @@
-﻿using System.Linq;
+using System.Globalization;
+using System.Reflection;
 
 using Autodesk.Revit.Attributes;
 using Autodesk.Revit.UI;
 
 using dosymep.Bim4Everyone;
-using dosymep.Revit;
-using dosymep.SimpleServices;
+using dosymep.Bim4Everyone.ProjectConfigs;
+using dosymep.Bim4Everyone.SimpleServices;
+using dosymep.WpfCore.Ninject;
+using dosymep.WpfUI.Core.Ninject;
 
+using Ninject;
+
+using RevitSuperfilter.Models;
 using RevitSuperfilter.ViewModels;
 using RevitSuperfilter.Views;
 
 namespace RevitSuperfilter;
 
+/// <summary>
+/// Класс команды Revit плагина.
+/// </summary>
+/// <remarks>
+/// В данном классе должна быть инициализация контейнера плагина и указание названия команды.
+/// </remarks>
 [Transaction(TransactionMode.Manual)]
 public class SuperfilterCommand : BasePluginCommand {
+    /// <summary>
+    /// Инициализирует команду плагина.
+    /// </summary>
     public SuperfilterCommand() {
-        PluginName = "Суперфильтр";
+        PluginName = "Пример команды";
     }
 
+    /// <summary>
+    /// Метод выполнения основного кода плагина.
+    /// </summary>
+    /// <param name="uiApplication">Интерфейс взаимодействия с Revit.</param>
+    /// <remarks>
+    /// В случаях, когда не используется конфигурация
+    /// или локализация требуется удалять их использование полностью во всем проекте.
+    /// </remarks>
     protected override void Execute(UIApplication uiApplication) {
-        bool hasSelectedElements = uiApplication.ActiveUIDocument.GetSelectedElements().Any();
-        var viewModel = new SuperfilterViewModel(
-            uiApplication.Application,
-            uiApplication.ActiveUIDocument.Document,
-            hasSelectedElements);
+        // Создание контейнера зависимостей плагина с сервисами из платформы
+        using IKernel kernel = uiApplication.CreatePlatformServices();
 
-        var window = new MainWindow { DataContext = viewModel };
-        if(window.ShowDialog() == true) {
-            GetPlatformService<INotificationService>()
-                .CreateNotification(PluginName, "Выполнение скрипта завершено успешно.", "C#")
-                .ShowAsync();
-        } else {
-            GetPlatformService<INotificationService>()
-                .CreateWarningNotification(PluginName, "Выполнение скрипта отменено.")
-                .ShowAsync();
-        }
+        // Настройка доступа к Revit
+        kernel.Bind<RevitRepository>()
+            .ToSelf()
+            .InSingletonScope();
+
+        // Настройка конфигурации плагина
+        kernel.Bind<PluginConfig>()
+            .ToMethod(c => PluginConfig.GetPluginConfig(c.Kernel.Get<IConfigSerializer>()));
+
+        // Используем сервис обновления тем для WinUI
+        kernel.UseWpfUIThemeUpdater();
+
+        // Настройка запуска окна
+        kernel.BindMainWindow<MainViewModel, MainWindow>();
+
+        // Настройка локализации,
+        // получение имени сборки откуда брать текст
+        string assemblyName = Assembly.GetExecutingAssembly().GetName().Name;
+
+        // Настройка локализации,
+        // установка дефолтной локализации "ru-RU"
+        kernel.UseWpfLocalization(
+            $"/{assemblyName};component/assets/localization/Language.xaml",
+            CultureInfo.GetCultureInfo("ru-RU"));
+
+        // Вызывает стандартное уведомление
+        Notification(kernel.Get<MainWindow>());
     }
 }
