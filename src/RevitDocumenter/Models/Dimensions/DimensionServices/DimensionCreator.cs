@@ -3,15 +3,14 @@ using Autodesk.Revit.DB;
 namespace RevitDocumenter.Models.Dimensions.DimensionServices;
 internal class DimensionCreator {
     private readonly RevitRepository _revitRepository;
-    private readonly ValueGuard _guard;
 
-    public DimensionCreator(RevitRepository revitRepository, ValueGuard guard) {
+    public DimensionCreator(RevitRepository revitRepository) {
         _revitRepository = revitRepository;
-        _guard = guard;
     }
 
     public Dimension Create(Line dimensionLine, params Reference[] references) {
-        _guard.ThrowIfNull(dimensionLine, references);
+        dimensionLine.ThrowIfNull();
+        references.ThrowIfNullOrEmpty();
 
         var refArray = new ReferenceArray();
         foreach(var reference in references) {
@@ -21,7 +20,9 @@ internal class DimensionCreator {
     }
 
     public Dimension Create(Line dimensionLine, DimensionType selectedDimensionType, params Reference[] references) {
-        _guard.ThrowIfNull(dimensionLine, selectedDimensionType, references);
+        dimensionLine.ThrowIfNull();
+        selectedDimensionType.ThrowIfNull();
+        references.ThrowIfNullOrEmpty();
 
         var refArray = new ReferenceArray();
         foreach(var reference in references) {
@@ -31,7 +32,8 @@ internal class DimensionCreator {
     }
 
     public Dimension Create(Line dimensionLine, ReferenceArray referenceArray, DimensionType selectedDimensionType = null) {
-        _guard.ThrowIfNull(dimensionLine, referenceArray);
+        dimensionLine.ThrowIfNull();
+        referenceArray.ThrowIfNull();
 
         using var subTransaction = new SubTransaction(_revitRepository.Document);
         subTransaction.Start();
@@ -51,6 +53,10 @@ internal class DimensionCreator {
     }
 
     public Dimension RecreateDimension(Dimension oldDimension, DimensionTextPoints points, ReferenceArray references) {
+        oldDimension.ThrowIfNull();
+        points.ThrowIfNull();
+        references.ThrowIfNull();
+
         var dimensionLine = Line.CreateBound(points.BottomLeftCorner, points.BottomRightCorner);
         var newDimension = Create(dimensionLine, references, oldDimension.DimensionType);
         newDimension.TextPosition = points.TextPositionPoint;

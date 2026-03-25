@@ -4,7 +4,7 @@ namespace RevitDocumenter.Models.Mapping.MapServices;
 internal class MapInfo {
     public MapInfo(SquareInfo[,] map, string path, double mappingStepInFeet, int stepCountX, int stepCountY,
         XYZ startPointInRevit) {
-        Map = map;
+        Map = map.ThrowIfNull();
         ImagePath = path;
         MappingStepInFeet = mappingStepInFeet;
         StepCountX = stepCountX;

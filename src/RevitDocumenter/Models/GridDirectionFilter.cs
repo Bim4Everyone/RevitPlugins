@@ -6,12 +6,18 @@ using Autodesk.Revit.DB;
 namespace RevitDocumenter.Models;
 internal class GridDirectionFilter {
     public List<Reference> GetGridReferencesByDirection(List<Grid> grids, XYZ direction) {
+        grids.ThrowIfNullOrEmpty();
+        direction.ThrowIfNull();
+
         return GetGridsByDirection(grids, direction)
             .Select(g => new Reference(g))
             .ToList();
     }
 
     public List<Grid> GetGridsByDirection(List<Grid> grids, XYZ direction) {
+        grids.ThrowIfNullOrEmpty();
+        direction.ThrowIfNull();
+
         return grids
             .Where(g => !g.IsCurved)
             .Where(g => IsGridLineParallelToDirection((Line) g.Curve, direction))
@@ -19,6 +25,9 @@ internal class GridDirectionFilter {
     }
 
     private bool IsGridLineParallelToDirection(Line line, XYZ direction) {
+        line.ThrowIfNull();
+        direction.ThrowIfNull();
+
         return line.Direction.IsAlmostEqualTo(direction) || line.Direction.IsAlmostEqualTo(direction.Negate());
     }
 }

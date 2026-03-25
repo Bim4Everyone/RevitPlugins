@@ -76,7 +76,8 @@ internal class RevitRepository {
         string familyNamePart,
         List<string> verticalRefNames,
         List<string> horizontalRefNames,
-        ReferenceAnalizeService referenceAnalizeService) => new FilteredElementCollector(Document, Document.ActiveView.Id)
+        ReferenceAnalizeService referenceAnalizeService) {
+        return new FilteredElementCollector(Document, Document.ActiveView.Id)
           .OfCategory(BuiltInCategory.OST_Rebar)
           .WhereElementIsNotElementType()
           .OfType<FamilyInstance>()
@@ -91,6 +92,7 @@ internal class RevitRepository {
               referenceAnalizeService.GetDimensionRefList(e, verticalRefNames),
               referenceAnalizeService.GetDimensionRefList(e, horizontalRefNames)))
           .ToList();
+    }
 
     public double GetMinDimensionInView() {
         int scale = Document.ActiveView.Scale;
@@ -105,6 +107,8 @@ internal class RevitRepository {
     }
 
     public void DeleteElementsById(List<ElementId> list) {
+        list.ThrowIfNullOrEmpty();
+
         using var subTransaction = new SubTransaction(Document);
         subTransaction.Start();
 

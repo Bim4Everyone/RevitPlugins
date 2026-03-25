@@ -7,10 +7,14 @@ internal class AnchorLineService {
     private readonly RevitRepository _revitRepository;
 
     public AnchorLineService(RevitRepository revitRepository) {
-        _revitRepository = revitRepository;
+        _revitRepository = revitRepository.ThrowIfNull();
     }
 
     public List<ElementId> CreateAnchorLines(XYZ viewMinFixed, XYZ viewMaxFixed, int lineWeight, Color lineColor) {
+        viewMinFixed.ThrowIfNull();
+        viewMaxFixed.ThrowIfNull();
+        lineColor.ThrowIfNull();
+
         var overrideSettings = new OverrideGraphicSettings();
         overrideSettings.SetProjectionLineWeight(lineWeight);
         overrideSettings.SetProjectionLineColor(lineColor);
@@ -22,6 +26,10 @@ internal class AnchorLineService {
     }
 
     public DetailCurve CreateLineWithOverrides(XYZ pt1, XYZ pt2, OverrideGraphicSettings overrideSettings) {
+        pt1.ThrowIfNull();
+        pt2.ThrowIfNull();
+        overrideSettings.ThrowIfNull();
+
         var doc = _revitRepository.Document;
 
         var lineGeom = Line.CreateBound(pt1, pt2);

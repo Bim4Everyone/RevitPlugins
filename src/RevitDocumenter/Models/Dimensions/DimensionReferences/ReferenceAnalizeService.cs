@@ -10,24 +10,24 @@ namespace RevitDocumenter.Models.Dimensions.DimensionReferences;
 internal class ReferenceAnalizeService {
     private readonly RevitRepository _revitRepository;
     private readonly DimensionCreator _dimensionCreator;
-    private readonly ValueGuard _guard;
 
     private List<ReferenceArray> _dimensionReferences;
 
     public ReferenceAnalizeService(
         RevitRepository revitRepository,
-        DimensionCreator dimensionCreator,
-        ValueGuard guard) {
+        DimensionCreator dimensionCreator) {
 
         _revitRepository = revitRepository;
         _dimensionCreator = dimensionCreator;
-        _guard = guard;
     }
 
     /// <summary>
     /// Получает список опорных плоскостей размера по ключевым словам в их именах
     /// </summary>
     public List<Reference> GetDimensionRefList(FamilyInstance elem, List<string> importantRefNameParts) {
+        elem.ThrowIfNull();
+        importantRefNameParts.ThrowIfNullOrEmpty();
+
         var allRefs = new List<Reference>();
         foreach(FamilyInstanceReferenceType referenceType in Enum.GetValues(typeof(FamilyInstanceReferenceType))) {
             allRefs.AddRange(elem.GetReferences(referenceType));
@@ -49,7 +49,9 @@ internal class ReferenceAnalizeService {
     /// <param name="dimensionLine">Линия, вдоль которой нужно строить временные размеры</param>
     /// <returns>Массив из пары опорных плоскостей, которые стоят наиболее близко</returns>
     public ReferenceArray FindClosestReferencesByDimension(List<Reference> refsA, List<Reference> refsB, Line dimensionLine) {
-        _guard.ThrowIfNullOrEmpty(refsA, refsB, dimensionLine);
+        refsA.ThrowIfNullOrEmpty();
+        refsB.ThrowIfNullOrEmpty();
+        dimensionLine.ThrowIfNull();
 
         Reference resultRef1 = null;
         Reference resultRef2 = null;
@@ -82,8 +84,8 @@ internal class ReferenceAnalizeService {
     }
 
     private ReferenceArray CreateReferenceArray(Reference ref1, Reference ref2) {
-        if(ref1 == null || ref2 == null)
-            return null;
+        ref1.ThrowIfNull();
+        ref2.ThrowIfNull();
 
         var refArray = new ReferenceArray();
         refArray.Append(ref1);
@@ -93,6 +95,9 @@ internal class ReferenceAnalizeService {
 
 
     public bool IsReferenceArrayInList(ReferenceArray refArray, List<ReferenceArray> listRefArrayForCheck) {
+        refArray.ThrowIfNull();
+        listRefArrayForCheck.ThrowIfNullOrEmpty();
+
         if(refArray.Size != 2) {
             return false;
         }

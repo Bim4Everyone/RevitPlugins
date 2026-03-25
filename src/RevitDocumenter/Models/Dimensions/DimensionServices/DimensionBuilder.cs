@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 
 using Autodesk.Revit.DB;
@@ -12,7 +11,6 @@ namespace RevitDocumenter.Models.Dimensions.DimensionServices;
 internal class DimensionBuilder {
     private readonly DimensionCreator _dimensionCreator;
     private readonly DimensionChanger _dimensionChanger;
-    private readonly ValueGuard _guard;
     private readonly IReferenceCollector<ReferenceToGridsCollectorContext> _comparisonService;
     private readonly IDimensionLineProvider<RebarElementDimensionLineProviderContext> _dimensionLineProvider;
     private readonly ReferenceAnalizeService _referenceAnalizeService;
@@ -20,23 +18,25 @@ internal class DimensionBuilder {
     public DimensionBuilder(
         DimensionCreator dimensionCreator,
         DimensionChanger dimensionChanger,
-        ValueGuard guard,
         IReferenceCollector<ReferenceToGridsCollectorContext> comparisonService,
         IDimensionLineProvider<RebarElementDimensionLineProviderContext> dimensionLineProvider,
         ReferenceAnalizeService referenceAnalizeService) {
-        _dimensionCreator = dimensionCreator;
-        _dimensionChanger = dimensionChanger;
-        _guard = guard;
-        _comparisonService = comparisonService;
-        _dimensionLineProvider = dimensionLineProvider;
-        _referenceAnalizeService = referenceAnalizeService;
+        _dimensionCreator = dimensionCreator.ThrowIfNull();
+        _dimensionChanger = dimensionChanger.ThrowIfNull();
+        _comparisonService = comparisonService.ThrowIfNull();
+        _dimensionLineProvider = dimensionLineProvider.ThrowIfNull();
+        _referenceAnalizeService = referenceAnalizeService.ThrowIfNull();
     }
 
     internal void Create(
         List<RebarElement> rebars,
         List<Grid> grids,
         DimensionType selectedDimensionType,
-        MapInfo mapInfo) {
+        MapInfo mapInfo = null) {
+        rebars.ThrowIfNullOrEmpty();
+        grids.ThrowIfNullOrEmpty();
+        selectedDimensionType.ThrowIfNull();
+
         foreach(var rebar in rebars) {
             // Создание вертикального размера (относительно локальных осей зоны армирования)
             CreateDimension(grids, rebar, selectedDimensionType, true, mapInfo);
@@ -45,18 +45,15 @@ internal class DimensionBuilder {
         }
     }
 
-    private void CreateDimension(
+    internal void CreateDimension(
         List<Grid> grids,
         RebarElement rebar,
         DimensionType selectedDimensionType,
         bool isForVertical,
-        MapInfo mapInfo) {
-
-        try {
-            _guard.ThrowIfNull(grids, rebar);
-        } catch(Exception) {
-            return;
-        }
+        MapInfo mapInfo = null) {
+        grids.ThrowIfNullOrEmpty();
+        rebar.ThrowIfNull();
+        selectedDimensionType.ThrowIfNull();
 
         var rebarReferences = isForVertical ? rebar.VerticalRefs : rebar.HorizontalRefs;
         // Нормальная ситуация, когда в зоне армирования какие-то опорные плоскости не были найдены
@@ -73,7 +70,8 @@ internal class DimensionBuilder {
         }
 
         // Если размер между объектами уже существует, то не ставим - это нормально
-        if(_referenceAnalizeService.IsReferenceArrayInList(
+        var existingDims = _referenceAnalizeService.DimensionReferences();
+        if(existingDims.Count != 0 && _referenceAnalizeService.IsReferenceArrayInList(
             dimensionRefs,
             _referenceAnalizeService.DimensionReferences())) {
             return;

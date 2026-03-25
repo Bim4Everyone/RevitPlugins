@@ -12,7 +12,7 @@ internal class ImageService {
     private readonly Document _doc;
 
     public ImageService(RevitRepository revitRepository) {
-        _revitRepository = revitRepository;
+        _revitRepository = revitRepository.ThrowIfNull();
         _doc = revitRepository.Document;
     }
 
@@ -23,6 +23,8 @@ internal class ImageService {
     }
 
     public string Export(ExportOption exportOption) {
+        exportOption.ThrowIfNull();
+
         // Стандартное значение ширины изображения в пикселях, подходящее для обработки
         int standardX = 4096;
         int pixelPerSquare = standardX / exportOption.StepCountX;
@@ -42,6 +44,8 @@ internal class ImageService {
     }
 
     private string PrintViewByPixelSize(View view, int pixelSize) {
+        view.ThrowIfNull();
+
         try {
             string desktopPath = Environment.GetFolderPath(Environment.SpecialFolder.Desktop) + "\\";
             var options = new ImageExportOptions {
@@ -63,6 +67,8 @@ internal class ImageService {
     }
 
     private string CropImageByColorPixels(string imagePath, Color colorForFind) {
+        colorForFind.ThrowIfNull();
+
         // Загружаем изображение
         using var image = new Bitmap(imagePath);
 
@@ -97,6 +103,9 @@ internal class ImageService {
     }
 
     private (int, int) FindBottomLeftColorPixel(Bitmap image, Color colorForFind) {
+        image.ThrowIfNull();
+        colorForFind.ThrowIfNull();
+
         // Ищем снизу вверх, слева направо
         for(int y = image.Height - 1; y >= 0; y--) {
             for(int x = 0; x < image.Width; x++) {
@@ -110,6 +119,9 @@ internal class ImageService {
     }
 
     private (int, int) FindTopRightColorPixel(Bitmap image, Color colorForFind) {
+        image.ThrowIfNull();
+        colorForFind.ThrowIfNull();
+
         // Ищем сверху вниз, справа налево
         for(int y = 0; y < image.Height; y++) {
             for(int x = image.Width - 1; x >= 0; x--) {
@@ -123,6 +135,9 @@ internal class ImageService {
     }
 
     private bool IsColor(System.Drawing.Color color, Color colorForComparison) {
+        color.ThrowIfNull();
+        colorForComparison.ThrowIfNull();
+
         return
             color.R == colorForComparison.Red
             && color.G == colorForComparison.Green

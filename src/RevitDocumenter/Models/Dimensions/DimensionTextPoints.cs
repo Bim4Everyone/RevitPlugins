@@ -20,10 +20,10 @@ internal class DimensionTextPoints {
         XYZ textBoxHeightVector,
         XYZ textLineCenterPoint,
         XYZ textPosition) {
-        BottomLeftCorner = bottomLeft;
-        BottomRightCorner = bottomRight;
-        TextLineCenterPoint = textLineCenterPoint;
-        TextPositionPoint = textPosition;
+        BottomLeftCorner = bottomLeft.ThrowIfNull();
+        BottomRightCorner = bottomRight.ThrowIfNull();
+        TextLineCenterPoint = textLineCenterPoint.ThrowIfNull();
+        TextPositionPoint = textPosition.ThrowIfNull();
 
         TopLeftCorner = bottomLeft + textBoxHeightVector;
         TopRightCorner = bottomRight + textBoxHeightVector;
@@ -38,17 +38,17 @@ internal class DimensionTextPoints {
         XYZ textPositionPoint,
         XYZ textLineCenterPoint,
         XYZ textMiddlePoint) {
-        TopRightCorner = topRightCorner;
-        BottomRightCorner = bottomRightCorner;
-        BottomLeftCorner = bottomLeftCorner;
-        TopLeftCorner = topLeftCorner;
-        TextPositionPoint = textPositionPoint;
-        TextLineCenterPoint = textLineCenterPoint;
-        TextMiddlePoint = textMiddlePoint;
+        TopRightCorner = topRightCorner.ThrowIfNull();
+        BottomRightCorner = bottomRightCorner.ThrowIfNull();
+        BottomLeftCorner = bottomLeftCorner.ThrowIfNull();
+        TopLeftCorner = topLeftCorner.ThrowIfNull();
+        TextPositionPoint = textPositionPoint.ThrowIfNull();
+        TextLineCenterPoint = textLineCenterPoint.ThrowIfNull();
+        TextMiddlePoint = textMiddlePoint.ThrowIfNull();
     }
 
     public void Translate(XYZ translationVector) {
-        TopRightCorner += translationVector;
+        TopRightCorner += translationVector.ThrowIfNull();
         BottomRightCorner += translationVector;
         BottomLeftCorner += translationVector;
         TopLeftCorner += translationVector;

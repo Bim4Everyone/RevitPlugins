@@ -16,6 +16,9 @@ internal class ViewMapService {
     public ViewMapService() { }
 
     public MapInfo CreateMap(string path, ExportOption exportOption) {
+        path.ThrowIfNull();
+        exportOption.ThrowIfNull();
+
         var map = AnalyzeImageSquares(path, exportOption.StepCountX, exportOption.StepCountY);
         return new MapInfo(
             map,
@@ -105,6 +108,8 @@ internal class ViewMapService {
     /// Анализирует квадраты между точками на наличие белых групп пикселей
     /// </summary>
     public bool CheckInRectangle(MapInfo mapInfo, XYZ point1, XYZ point2) {
+        mapInfo.ThrowIfNull();
+
         // Переводим координаты точек в Revit в индексы квадратов на карте
         (int indexX1, int indexY1) = GetMapIndexes(mapInfo, point1);
         (int indexX2, int indexY2) = GetMapIndexes(mapInfo, point2);
@@ -131,6 +136,9 @@ internal class ViewMapService {
     /// Анализирует квадраты по центральной точке квадрата и отступам на наличие белых групп пикселей
     /// </summary>
     public bool CheckInRectangle(MapInfo mapInfo, XYZ point, int offset) {
+        mapInfo.ThrowIfNull();
+        point.ThrowIfNull();
+
         // Переводим координаты точек в Revit в индексы квадратов на карте
         (int indexX, int indexY) = GetMapIndexes(mapInfo, point);
 
@@ -153,6 +161,9 @@ internal class ViewMapService {
     }
 
     public (int indexX, int indexY) GetMapIndexes(MapInfo mapInfo, XYZ point) {
+        mapInfo.ThrowIfNull();
+        point.ThrowIfNull();
+
         var difVector = point - mapInfo.StartPointInRevit;
         double x = difVector.X;
         double y = difVector.Y;
@@ -168,6 +179,9 @@ internal class ViewMapService {
     }
 
     public bool IsWhiteSquare(MapInfo mapInfo, XYZ point) {
+        mapInfo.ThrowIfNull();
+        point.ThrowIfNull();
+
         var difVector = point - mapInfo.StartPointInRevit;
         double x = difVector.X;
         double y = difVector.Y;
@@ -180,6 +194,10 @@ internal class ViewMapService {
 
 
     public void PaintInRectangle(MapInfo mapInfo, XYZ point1, XYZ point2) {
+        mapInfo.ThrowIfNull();
+        point1.ThrowIfNull();
+        point2.ThrowIfNull();
+
         // Переводим координаты точек в Revit в индексы квадратов на карте
         (int indexX1, int indexY1) = GetMapIndexes(mapInfo, point1);
         (int indexX2, int indexY2) = GetMapIndexes(mapInfo, point2);
@@ -199,6 +217,9 @@ internal class ViewMapService {
     }
 
     public void PaintInRectangle(MapInfo mapInfo, XYZ point, int offset) {
+        mapInfo.ThrowIfNull();
+        point.ThrowIfNull();
+
         // Переводим координаты точек в Revit в индексы квадратов на карте
         (int indexX, int indexY) = GetMapIndexes(mapInfo, point);
 
@@ -218,10 +239,14 @@ internal class ViewMapService {
 
 
     public void Paint(MapInfo mapInfo, params XYZ[] points) {
-        points?.ToList().ForEach(point => PaintSquare(mapInfo, point));
+        mapInfo.ThrowIfNull();
+        points.ThrowIfNullOrEmpty().ToList().ForEach(point => PaintSquare(mapInfo, point));
     }
 
     public void PaintSquare(MapInfo mapInfo, XYZ point) {
+        mapInfo.ThrowIfNull();
+        point.ThrowIfNull();
+
         var difVector = point - mapInfo.StartPointInRevit;
         double x = difVector.X;
         double y = difVector.Y;

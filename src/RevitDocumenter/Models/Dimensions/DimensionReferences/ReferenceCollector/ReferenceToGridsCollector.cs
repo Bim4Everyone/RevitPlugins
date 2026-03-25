@@ -16,9 +16,9 @@ internal class ReferenceToGridsCollector : IReferenceCollector<ReferenceToGridsC
         ReferenceAnalizeService referenceAnalizeService,
         RebarElementDimensionLineProvider dimensionLineService) {
 
-        _lineBasedElementFilterService = lineBasedElementFilterService;
-        _referenceAnalizeService = referenceAnalizeService;
-        _dimensionLineService = dimensionLineService;
+        _lineBasedElementFilterService = lineBasedElementFilterService.ThrowIfNull();
+        _referenceAnalizeService = referenceAnalizeService.ThrowIfNull();
+        _dimensionLineService = dimensionLineService.ThrowIfNull();
     }
 
     /// <summary>
@@ -28,6 +28,11 @@ internal class ReferenceToGridsCollector : IReferenceCollector<ReferenceToGridsC
     /// и референсах элементов, от которых нужно отталкиваться</param>
     /// <returns>Массив референсов самых ближайших между референсами на плоскости в элементе и осями</returns>
     public ReferenceArray CollectReferences(ReferenceToGridsCollectorContext context) {
+        context.ThrowIfNull();
+        context.Grids.ThrowIfNull();
+        context.Direction.ThrowIfNull();
+        context.ElementReferences.ThrowIfNullOrEmpty();
+
         var gridRefs = _lineBasedElementFilterService.GetGridReferencesByDirection(
             context.Grids,
             context.Direction);

@@ -31,13 +31,17 @@ internal class DimensionChanger {
         DimensionCreator dimensionCreator,
         BallCreator ballCreator,
         ViewMapService mapService) {
-        _revitRepository = revitRepository;
-        _dimensionCreator = dimensionCreator;
-        _ballCreator = ballCreator;
-        _mapService = mapService;
+        _revitRepository = revitRepository.ThrowIfNull();
+        _dimensionCreator = dimensionCreator.ThrowIfNull();
+        _ballCreator = ballCreator.ThrowIfNull();
+        _mapService = mapService.ThrowIfNull();
     }
 
     public void Change(Dimension dimension, MapInfo mapInfo, ReferenceArray dimensionReferences) {
+        dimension.ThrowIfNull();
+        mapInfo.ThrowIfNull();
+        dimensionReferences.ThrowIfNull();
+
         try {
             var textPoints = GetDimensionTextPoints(dimension);
             (var upDimensionVector, var rightDimensionVector) = GetDimensionVectors(dimension, textPoints);
@@ -79,6 +83,8 @@ internal class DimensionChanger {
     /// Определяет контрольные точки текстового поля размера
     /// </summary>
     private DimensionTextPoints GetDimensionTextPoints(Dimension dimension) {
+        dimension.ThrowIfNull();
+
         var textLineCenterPoint = GetDimensionCenterPoint(dimension);
         var leaderEndPosition = dimension.LeaderEndPosition;
         var textPosition = dimension.TextPosition;
@@ -100,6 +106,8 @@ internal class DimensionChanger {
     private (XYZ DimensionUpVector, XYZ DimensionRightVector) GetDimensionVectors(
         Dimension dimension,
         DimensionTextPoints points) {
+        dimension.ThrowIfNull();
+        points.ThrowIfNull();
         return (
             (dimension.TextPosition - points.TextLineCenterPoint).Normalize(),
             (points.BottomRightCorner - points.BottomLeftCorner).Normalize());
@@ -109,12 +117,14 @@ internal class DimensionChanger {
     /// Получает точку посередине размера под текстом значения размера
     /// </summary>
     private XYZ GetDimensionCenterPoint(Dimension dimension) {
+        dimension.ThrowIfNull();
         return dimension.Curve is not Line dimensionLine
             ? throw new InvalidOperationException("The dimension line must be straight.")
             : dimensionLine.Project(dimension.TextPosition).XYZPoint;
     }
 
     private bool DimensionIsOrthogonal(Dimension dimension) {
+        dimension.ThrowIfNull();
         var dimensionLine = dimension.Curve as Line;
         double dimensionLineDirX = dimensionLine.Direction.X;
         double tolerance = 1e-10;
@@ -138,6 +148,13 @@ internal class DimensionChanger {
         MapInfo mapInfo,
         DimensionTextPoints textPoints,
         XYZ verticalStep) {
+
+        dimension.ThrowIfNull();
+        references.ThrowIfNull();
+        mapInfo.ThrowIfNull();
+        textPoints.ThrowIfNull();
+        verticalStep.ThrowIfNull();
+
         bool isOrthogonalDimension = DimensionIsOrthogonal(dimension);
 
         for(int stepIndex = 0; stepIndex <= _maxSearchSteps; stepIndex++) {
@@ -191,6 +208,14 @@ internal class DimensionChanger {
         MapInfo mapInfo,
         XYZ verticalStep,
         XYZ horizontalStep) {
+
+        dimension.ThrowIfNull();
+        references.ThrowIfNull();
+        mapInfo.ThrowIfNull();
+        textPoints.ThrowIfNull();
+        verticalStep.ThrowIfNull();
+        horizontalStep.ThrowIfNull();
+
         bool isOrthogonalDimension = DimensionIsOrthogonal(dimension);
 
         // Маленький размер всегда устанавливается с текстом по середине, поэтому перемещать его нужно сразу

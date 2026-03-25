@@ -9,10 +9,12 @@ internal class BallCreator {
     private readonly RevitRepository _revitRepository;
 
     public BallCreator(RevitRepository revitRepository) {
-        _revitRepository = revitRepository;
+        _revitRepository = revitRepository.ThrowIfNull();
     }
 
     public void CreateSphere(XYZ center, double radius) {
+        center.ThrowIfNull();
+
         var profile = new List<Curve>();
 
         radius = UnitUtilsHelper.ConvertToInternalValue(radius);

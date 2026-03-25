@@ -84,10 +84,6 @@ public class RebarDimensioningCommand : BasePluginCommand {
             .ToSelf()
             .InSingletonScope();
 
-        kernel.Bind<ValueGuard>()
-            .ToSelf()
-            .InSingletonScope();
-
         // Используем сервис обновления тем для WinUI
         kernel.UseWpfUIThemeUpdater();
 

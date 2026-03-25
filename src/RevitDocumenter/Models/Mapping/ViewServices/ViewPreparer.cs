@@ -8,8 +8,8 @@ internal class ViewPreparer {
     private readonly AnchorLineService _anchorLineService;
 
     public ViewPreparer(RevitRepository revitRepository, AnchorLineService anchorLineService) {
-        _revitRepository = revitRepository;
-        _anchorLineService = anchorLineService;
+        _revitRepository = revitRepository.ThrowIfNull();
+        _anchorLineService = anchorLineService.ThrowIfNull();
     }
 
     /// <summary>
@@ -17,6 +17,8 @@ internal class ViewPreparer {
     /// вычисляется количество квадратов
     /// </summary>
     public ExportOption Prepare(ViewPreparerOption viewPreparerOption) {
+        viewPreparerOption.ThrowIfNull();
+
         var view = _revitRepository.Document.ActiveView;
         // Получаем точки рамки подрезки вида, смещенные немного внутрь, чтобы расстояние 
         // между ними было кратно указанному шагу
@@ -46,6 +48,8 @@ internal class ViewPreparer {
     }
 
     private (XYZ, XYZ) GetFixedCropBoxPoints(View view, double mappingStepInFeet) {
+        view.ThrowIfNull();
+
         var viewMax = ProjectPointToViewPlan(view, view.CropBox.Max);
         var viewMin = ProjectPointToViewPlan(view, view.CropBox.Min);
 
@@ -62,6 +66,9 @@ internal class ViewPreparer {
     }
 
     private XYZ ProjectPointToViewPlan(View view, XYZ point) {
+        view.ThrowIfNull();
+        point.ThrowIfNull();
+
         var pointOnViewPlan = new XYZ(0, 0, view.GenLevel.Elevation);
         var normal = view.ViewDirection.Normalize();
 
