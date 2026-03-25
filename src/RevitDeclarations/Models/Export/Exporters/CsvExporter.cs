@@ -15,8 +15,8 @@ internal class CsvExporter : ITableExporter {
 
         string strData = ConvertDataTableToString(table);
 
-        using(var file = File.CreateText(fullPath)) {
-            file.Write(strData);
+        using(var writer = new StreamWriter(fullPath, false, Encoding.UTF8)) {
+            writer.Write(strData);
         }
 
         if(table.SubTables.Any()) {
