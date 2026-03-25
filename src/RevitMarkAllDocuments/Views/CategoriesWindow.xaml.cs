@@ -34,5 +34,29 @@ namespace RevitMarkAllDocuments.Views
             uiThemeService, themeUpdaterService) {
             InitializeComponent();
         }
+
+        /// <summary>
+        /// Наименование плагина.
+        /// </summary>
+        /// <remarks>
+        /// Используется для сохранения положения окна.
+        /// </remarks>
+        public override string PluginName => nameof(RevitMarkAllDocuments);
+
+        /// <summary>
+        /// Наименование файла конфигурации.
+        /// </summary>
+        /// <remarks>
+        /// Используется для сохранения положения окна.
+        /// </remarks>
+        public override string ProjectConfigName => nameof(MainWindow);
+
+        private void ButtonOk_Click(object sender, RoutedEventArgs e) {
+            DialogResult = true;
+        }
+
+        private void ButtonCancel_Click(object sender, RoutedEventArgs e) {
+            DialogResult = false;
+        }
     }
 }
