@@ -20,6 +20,7 @@ internal class MainViewModel : BaseViewModel {
     private readonly RevitRepository _revitRepository;
     private readonly ILogicalFilterProviderFactory _filterFactory;
     private readonly ILocalizationService _localizationService;
+    private readonly string _selectedCategoryName;
 
     private DocumentsPageViewModel _documentsPageViewModel;
     private FilterPageViewModel _filterPageViewModel;
@@ -28,12 +29,15 @@ internal class MainViewModel : BaseViewModel {
 
     public MainViewModel(PluginConfig pluginConfig,
                          RevitRepository revitRepository,
+                         CategoryContext categoryContext,
                          ILogicalFilterProviderFactory filterFactory,
                          ILocalizationService localizationService) {        
         _pluginConfig = pluginConfig;
         _revitRepository = revitRepository;
         _filterFactory = filterFactory;
         _localizationService = localizationService;
+
+        _selectedCategoryName = categoryContext.SelectedCategory.Name;
 
         LoadViewCommand = RelayCommand.Create(LoadView);
         AcceptViewCommand = RelayCommand.Create(AcceptView, CanAcceptView);
@@ -49,6 +53,8 @@ internal class MainViewModel : BaseViewModel {
 
     public DocumentsPageViewModel DocumentsPageViewModel => _documentsPageViewModel;
     public FilterPageViewModel FilterPageViewModel => _filterPageViewModel;
+
+    public string SelectedCategoryName => _selectedCategoryName;
 
     public string ErrorText {
         get => _errorText;

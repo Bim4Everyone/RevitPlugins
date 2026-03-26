@@ -14,7 +14,8 @@
     
     x:ClassModifier="internal">
 
-    <Grid>
+    <Grid
+        Margin="4">
         <filtration:PresetCategoriesFilterControl
             LanguageService="{Binding LanguageService}"
             LogicalFilterProvider="{Binding FilterProvider}" />

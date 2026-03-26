@@ -17,10 +17,10 @@
     Title="{me:LocalizationSource MainWindow.Title}"
     
     Height="500"
-    Width="700"
+    Width="1000"
     
     MinHeight="500"
-    MinWidth="700"
+    MinWidth="1000"
    
     d:DataContext="{d:DesignInstance vms:MainViewModel, IsDesignTimeCreatable=False}">
 
@@ -74,6 +74,20 @@
                     Icon="{ui:SymbolIcon NumberSymbolSquare20}"
                     TargetPageType="{x:Type pages:MarkSettingsPage}" />
             </ui:NavigationView.MenuItems>
+
+            <ui:NavigationView.PaneFooter>
+                <StackPanel>                    
+                    <TextBlock
+                        Margin="24,4"
+                        TextWrapping="Wrap"
+                        FontWeight="DemiBold"
+                        Text="{me:LocalizationSource MainWindow.SelectedCategory}" />                
+                    <TextBlock
+                        Margin="24,0"
+                        TextWrapping="Wrap"
+                        Text="{Binding SelectedCategoryName}" />
+                </StackPanel>
+            </ui:NavigationView.PaneFooter>
         </ui:NavigationView>
 
         <StackPanel

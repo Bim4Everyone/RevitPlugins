@@ -9,10 +9,12 @@
     <system:String x:Key="CategoriesWindow.NoSelection">Не выбрана категория</system:String>
     
     <system:String x:Key="MainWindow.Title">Маркировка</system:String>
+    <system:String x:Key="MainWindow.Settings">Настройки</system:String>
     <system:String x:Key="MainWindow.DocumentsPage">Документы</system:String>
     <system:String x:Key="MainWindow.FilterPage">Фильтр</system:String>
     <system:String x:Key="MainWindow.SortPage">Сортировка</system:String>
     <system:String x:Key="MainWindow.MarkPage">Марка</system:String>
+    <system:String x:Key="MainWindow.SelectedCategory">Категория:</system:String>
     
     <system:String x:Key="DocumentsPage.SelectDocs">Выберите проекты для маркировки</system:String>
 
