@@ -2,7 +2,13 @@
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
                     xmlns:system="clr-namespace:System;assembly=mscorlib">
 
-    <system:String x:Key="MainWindow.Title">Пример команды</system:String>
+    <system:String x:Key="CategoriesWindow.Title">Выбор категории</system:String>
+    <system:String x:Key="CategoriesWindow.SearchText">Поиск по имени категории</system:String>
+    <system:String x:Key="CategoriesWindow.SelectCategory">Выберите категорию для маркировки:</system:String>
+    <system:String x:Key="CategoriesWindow.MarkTypes">Маркировать типоразмеры</system:String>
+    <system:String x:Key="CategoriesWindow.NoSelection">Не выбрана категория</system:String>
+    
+    <system:String x:Key="MainWindow.Title">Маркировка</system:String>
     <system:String x:Key="MainWindow.DocumentsPage">Документы</system:String>
     <system:String x:Key="MainWindow.FilterPage">Фильтр</system:String>
     <system:String x:Key="MainWindow.SortPage">Сортировка</system:String>

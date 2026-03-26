@@ -70,11 +70,15 @@ public class RevitMarkAllDocumentsCommand : BasePluginCommand {
             .To<NavigationViewPageProvider>()
             .InSingletonScope();
 
+        kernel.Bind<CategoryContext>()
+            .ToSelf()
+            .InSingletonScope();
+
         // Используем сервис обновления тем для WinUI
         kernel.UseWpfUIThemeUpdater();
 
-        // Настройка запуска окна
         kernel.BindMainWindow<MainViewModel, MainWindow>();
+        kernel.BindOtherWindow<CategoriesWindowVM, CategoriesWindow>();
 
         // Настройка локализации,
         // получение имени сборки откуда брать текст
@@ -86,7 +90,10 @@ public class RevitMarkAllDocumentsCommand : BasePluginCommand {
             $"/{assemblyName};component/assets/localization/language.xaml",
             CultureInfo.GetCultureInfo("ru-RU"));
 
-        // Вызывает стандартное уведомление
-        Notification(kernel.Get<MainWindow>());
+
+        var categoriesWindow = kernel.Get<CategoriesWindow>();
+        if(categoriesWindow.ShowDialog() == true) {
+            Notification(kernel.Get<MainWindow>());
+        }
     }
 }

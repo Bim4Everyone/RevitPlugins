@@ -42,6 +42,19 @@ internal class RevitRepository {
     /// </summary>
     public Document Document => ActiveUIDocument.Document;
 
+    public IEnumerable<Category> GetCategories() {
+        var allCategories = Document.Settings.Categories
+            .Cast<Category>()
+            .Select(x => x.Id)
+            .ToList();
+
+        var filterableCategories = ParameterFilterUtilities
+            .RemoveUnfilterableCategories(allCategories);
+
+        return filterableCategories
+            .Select(x => Category.GetCategory(Document, x));
+    }
+
     public IEnumerable<Document> GetAllDocuments() {
         var docs = new List<Document> { Document };
 

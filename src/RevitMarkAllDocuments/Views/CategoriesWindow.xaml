@@ -4,6 +4,8 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:b="http://schemas.microsoft.com/xaml/behaviors"
+    
     xmlns:base="clr-namespace:dosymep.WPF.Views"
     xmlns:local="clr-namespace:RevitMarkAllDocuments.Views"
     xmlns:vms="clr-namespace:RevitMarkAllDocuments.ViewModels"
@@ -32,48 +34,79 @@
         </ResourceDictionary>
     </core:WpfUIPlatformWindow.Resources>
 
+    <b:Interaction.Triggers>
+        <b:EventTrigger
+            EventName="Loaded">
+            <b:InvokeCommandAction
+                Command="{Binding LoadViewCommand}" />
+        </b:EventTrigger>
+    </b:Interaction.Triggers>
+
     <Grid>
         <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
             <RowDefinition Height="Auto"/>
             <RowDefinition />
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
-        
-        <Border
+
+        <ui:TitleBar
             Grid.Row="0"
+            Title="{me:LocalizationSource CategoriesWindow.Title}" />
+
+        <Border
+            Grid.Row="1"
+            Margin="14,4"
             Style="{StaticResource CustomBorder}">
             <StackPanel>
-                <TextBlock 
-                    Text="Select category"/>
-                <ComboBox />
+                <TextBlock
+                    Text="{me:LocalizationSource CategoriesWindow.SelectCategory}"
+                    Margin="4,8" />
+                <ui:AutoSuggestBox
+                    Margin="0,0,0,8"
+                    DockPanel.Dock="Top"
+                    Icon="{ui:SymbolIcon Search24}"
+                    Text="{Binding SearchText, Mode=TwoWay}"
+                    PlaceholderText="{me:LocalizationSource CategoriesWindow.SearchText}">
+                    <i:Interaction.Triggers>
+                        <i:EventTrigger
+                            EventName="TextChanged">
+                            <i:InvokeCommandAction
+                                Command="{Binding SearchCommand}" />
+                        </i:EventTrigger>
+                    </i:Interaction.Triggers>
+                </ui:AutoSuggestBox>
             </StackPanel>
         </Border>
         
         <Border
-            Grid.Row="1"
+            Grid.Row="2"
+            Margin="14,4"
             Style="{StaticResource CustomBorder}">
             <ListBox
-                ItemsSource="{Binding Categories}">
+                ItemsSource="{Binding FilteredCategories}"
+                SelectedItem="{Binding SelectedCategory}">
                 <ListBox.ItemTemplate>
                     <DataTemplate>
-                        <CheckBox
-                            Content="{Binding Name}"
-                            IsChecked="{Binding IsChecked}" />
+                        <TextBlock
+                            Text="{Binding Name}"/>
                     </DataTemplate>
                 </ListBox.ItemTemplate>
             </ListBox>
         </Border>
 
         <Border
-            Grid.Row="2"
+            Grid.Row="3"
+            Margin="14,4"
             Style="{StaticResource CustomBorder}">
-            <CheckBox 
-                Content="Mark types"/>
+            <CheckBox
+                Content="{me:LocalizationSource CategoriesWindow.MarkTypes}"
+                IsChecked="{Binding IsMarkForTypes}"/>
         </Border>
 
         <StackPanel
-            Grid.Row="3"
+            Grid.Row="4"
             Orientation="Horizontal"
             HorizontalAlignment="Right">
             <ui:TextBlock
