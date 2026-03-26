@@ -13,7 +13,65 @@
     
     x:ClassModifier="internal">
 
-    <Grid>
+    <core:WpfUIPlatformPage.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary
+                    Source="../Styles/Styles.xaml" />
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
+    </core:WpfUIPlatformPage.Resources>
+
+    <Grid Margin="14">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition />
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition />
+            <ColumnDefinition Width="50"/>
+            <ColumnDefinition />
+        </Grid.ColumnDefinitions>
         
+        <TextBlock
+            Grid.Row="0"
+            Grid.Column="0"
+            Grid.ColumnSpan="3"
+            Margin="4,0,0,8"
+            Style="{StaticResource HeaderName}"
+            Text="{me:LocalizationSource SortPage.SelectParams}" />
+        
+        <Border
+            Grid.Row="1"
+            Grid.Column="0"
+            Style="{StaticResource CustomBorder}">
+            <ListBox
+                ItemsSource="{Binding SelectableParams}"
+                SelectedItem="{Binding SelectedParamFromSelectable}">
+                <ListBox.ItemTemplate>
+                    <DataTemplate>
+                        <TextBlock
+                            Text="{Binding Name}" />
+                    </DataTemplate>
+                </ListBox.ItemTemplate>
+            </ListBox>
+        </Border>
+
+        <Border
+            Grid.Row="1"
+            Grid.Column="2"
+            Style="{StaticResource CustomBorder}">
+            <ListBox
+                ItemsSource="{Binding SelectedParams}"
+                SelectedItem="{Binding SelectedParamFromSelected}">
+                <ListBox.ItemTemplate>
+                    <DataTemplate>
+                        <TextBlock
+                            Text="{Binding Name}" />
+                    </DataTemplate>
+                </ListBox.ItemTemplate>
+            </ListBox>
+        </Border>
     </Grid>
 </core:WpfUIPlatformPage>

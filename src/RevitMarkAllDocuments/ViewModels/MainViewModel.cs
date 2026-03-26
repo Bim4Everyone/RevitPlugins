@@ -20,10 +20,12 @@ internal class MainViewModel : BaseViewModel {
     private readonly RevitRepository _revitRepository;
     private readonly ILogicalFilterProviderFactory _filterFactory;
     private readonly ILocalizationService _localizationService;
+    private readonly Category _selectedCategory;
     private readonly string _selectedCategoryName;
 
     private DocumentsPageViewModel _documentsPageViewModel;
     private FilterPageViewModel _filterPageViewModel;
+    private SortPageViewModel _sortPageViewModel;
 
     private string _errorText;
 
@@ -37,6 +39,7 @@ internal class MainViewModel : BaseViewModel {
         _filterFactory = filterFactory;
         _localizationService = localizationService;
 
+        _selectedCategory = categoryContext.SelectedCategory;
         _selectedCategoryName = categoryContext.SelectedCategory.Name;
 
         LoadViewCommand = RelayCommand.Create(LoadView);
@@ -53,6 +56,7 @@ internal class MainViewModel : BaseViewModel {
 
     public DocumentsPageViewModel DocumentsPageViewModel => _documentsPageViewModel;
     public FilterPageViewModel FilterPageViewModel => _filterPageViewModel;
+    public SortPageViewModel SortPageViewModel => _sortPageViewModel;
 
     public string SelectedCategoryName => _selectedCategoryName;
 
@@ -63,8 +67,9 @@ internal class MainViewModel : BaseViewModel {
 
     private void LoadView() {
         _documentsPageViewModel = new DocumentsPageViewModel(_revitRepository);
-        _filterPageViewModel = 
-            new FilterPageViewModel(_filterFactory, _localizationService, new FilterDataProvider(_revitRepository.Document));
+        _filterPageViewModel = new FilterPageViewModel(_filterFactory, _localizationService, 
+                new FilterDataProvider(_revitRepository, _selectedCategory));
+        _sortPageViewModel = new SortPageViewModel(_revitRepository, _selectedCategory);
 
         LoadConfig();
     }

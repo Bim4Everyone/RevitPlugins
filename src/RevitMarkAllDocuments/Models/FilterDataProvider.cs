@@ -15,49 +15,23 @@ using dosymep.Revit;
 namespace RevitMarkAllDocuments.Models;
 
 internal class FilterDataProvider : IDataProvider {
-    private readonly Document _doc;
+    private readonly RevitRepository _revitRepository;
+    private readonly Category _category;
 
-    public FilterDataProvider(Document doc) {
-        _doc = doc;
+    public FilterDataProvider(RevitRepository revitRepository, Category category) {
+        _revitRepository = revitRepository;
+        _category = category;
     }
 
     public ICollection<RevitParam> GetParams(ICollection<Category> categories) {
-        return ParameterFilterUtilities
-            .GetFilterableParametersInCommon(_doc, [.. categories.Select(c => c.Id)])
-            .Select(GetFilterableParam)
-            .Where(p => p != null)
-            .ToArray();
+        return _revitRepository.GetSortableParams(_category);
     }
 
     public ICollection<Category> GetCategories() {
-        return [Category.GetCategory(_doc, BuiltInCategory.OST_Walls)];
+        return [_category];
     }
 
     public ICollection<Document> GetDocuments() {
-        return [_doc];
-    }
-
-    private RevitParam GetFilterableParam(ElementId paramId) {
-        try {
-            if(paramId.IsSystemId()) {
-                return SystemParamsConfig.Instance.CreateRevitParam(
-                        _doc,
-                        (BuiltInParameter) paramId.GetIdValue());
-            }
-
-            var element = _doc.GetElement(paramId);
-            if(element is SharedParameterElement sharedParameterElement) {
-                return SharedParamsConfig.Instance.CreateRevitParam(
-                        _doc,
-                        sharedParameterElement.Name);
-            }
-
-            if(element is ParameterElement parameterElement) {
-                return ProjectParamsConfig.Instance.CreateRevitParam(_doc, parameterElement.Name);
-            }
-            return null;
-        } catch(Exception) {
-            return null;
-        }
+        return [_revitRepository.Document];
     }
 }

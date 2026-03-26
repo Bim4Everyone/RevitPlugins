@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -5,41 +6,22 @@ using Autodesk.Revit.ApplicationServices;
 using Autodesk.Revit.DB;
 using Autodesk.Revit.UI;
 
+using dosymep.Bim4Everyone;
+using dosymep.Bim4Everyone.ProjectParams;
+using dosymep.Bim4Everyone.SharedParams;
+using dosymep.Bim4Everyone.SystemParams;
+using dosymep.Revit;
+
 namespace RevitMarkAllDocuments.Models;
 
-/// <summary>
-/// Класс доступа к документу и приложению Revit.
-/// </summary>
-/// <remarks>
-/// В случае если данный класс разрастается, рекомендуется его разделить на несколько.
-/// </remarks>
 internal class RevitRepository {
-    /// <summary>
-    /// Создает экземпляр репозитория.
-    /// </summary>
-    /// <param name="uiApplication">Класс доступа к интерфейсу Revit.</param>
     public RevitRepository(UIApplication uiApplication) {
         UIApplication = uiApplication;
     }
 
-    /// <summary>
-    /// Класс доступа к интерфейсу Revit.
-    /// </summary>
     public UIApplication UIApplication { get; }
-    
-    /// <summary>
-    /// Класс доступа к интерфейсу документа Revit.
-    /// </summary>
-    public UIDocument ActiveUIDocument => UIApplication.ActiveUIDocument;
-    
-    /// <summary>
-    /// Класс доступа к приложению Revit.
-    /// </summary>
+    public UIDocument ActiveUIDocument => UIApplication.ActiveUIDocument;    
     public Application Application => UIApplication.Application;
-    
-    /// <summary>
-    /// Класс доступа к документу Revit.
-    /// </summary>
     public Document Document => ActiveUIDocument.Document;
 
     public IEnumerable<Category> GetCategories() {
@@ -71,5 +53,37 @@ internal class RevitRepository {
         }
 
         return docs;
+    }
+
+    public ICollection<RevitParam> GetSortableParams(Category category) {
+        return ParameterFilterUtilities
+            .GetFilterableParametersInCommon(Document, [category.Id])
+            .Select(GetFilterableParam)
+            .Where(p => p != null)
+            .ToArray();
+    }
+
+    private RevitParam GetFilterableParam(ElementId paramId) {
+        try {
+            if(paramId.IsSystemId()) {
+                return SystemParamsConfig.Instance.CreateRevitParam(
+                        Document,
+                        (BuiltInParameter) paramId.GetIdValue());
+            }
+
+            var element = Document.GetElement(paramId);
+            if(element is SharedParameterElement sharedParameterElement) {
+                return SharedParamsConfig.Instance.CreateRevitParam(
+                        Document,
+                        sharedParameterElement.Name);
+            }
+
+            if(element is ParameterElement parameterElement) {
+                return ProjectParamsConfig.Instance.CreateRevitParam(Document, parameterElement.Name);
+            }
+            return null;
+        } catch(Exception) {
+            return null;
+        }
     }
 }
