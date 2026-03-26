@@ -13,6 +13,7 @@ internal class AnchorLineService {
     public List<ElementId> CreateAnchorLines(XYZ viewMinFixed, XYZ viewMaxFixed, int lineWeight, Color lineColor) {
         viewMinFixed.ThrowIfNull();
         viewMaxFixed.ThrowIfNull();
+        lineWeight.ThrowIfLessOrEqualThan();
         lineColor.ThrowIfNull();
 
         var overrideSettings = new OverrideGraphicSettings();

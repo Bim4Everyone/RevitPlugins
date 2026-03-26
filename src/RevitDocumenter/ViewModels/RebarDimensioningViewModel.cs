@@ -164,26 +164,40 @@ internal class RebarDimensioningViewModel : BaseViewModel {
                 WeightForAnchorLines = _weightForAnchorLines,
             };
 
+            // Подготавливаем вид, определяя требуемые габариты изображения, размещая якорные линии
+            // Якорные линии - линии в модели определенного цвета на виде, по которым будет подрезаться и потом
+            // масштабироваться изображение для синхронизации с размерами в Revit. Подрезка и масштабирование требуется
+            // в связи с тем, что когда Revit экспортирует изображение, захватываются различные элементы на виде,
+            // которые расширяют первоначальную зону подрезки вида, и тогда нельзя связать точку на виде Revit и изображении
             var exportOption = _viewPreparer.Prepare(viewPreparerOption);
+            // Производим экспорт вида в качестве изображения, его подрезку и масштабирование
             string imagePath = _imageService.Export(exportOption);
+            // Удаляем созданные на виде якорные линии
             _revitRepository.DeleteElementsById(exportOption.AnchorLineIds);
 
+            // Создаем бинарную карту - двумерный массив сгруппированных пикселей с информацией есть ли в группе
+            // темные пиксели (т.е. квадрат занят элементами на виде) или они все белые (квадрат свободен и на нем
+            // можно размещать размер или другую аннотацию)
             mapInfo = _mapService.CreateMap(imagePath, exportOption);
-            // Если пользователь запросил изображения для проверки
+            // Если пользователь запросил изображения для проверки, то выгружаем его (до размещения размеров)
             if(_createMarkedImage && mapInfo != null) {
                 _paintSquaresByMapService.MarkWhiteSquaresOnImage(mapInfo, "_marked");
             } else {
+                // Если нет, то удаляем выгруженное проанализированное изображение
                 _imageService.Delete(imagePath);
             }
         }
 
+        // Получаем арматурные элементы на виде с учетом фильтрации по именам семейств, а также их опорные плоскости
         var rebars = _revitRepository.GetRebarElements(
             FamilyNamePart,
             ReferenceNamesVM.GetVertReferenceNames(),
             ReferenceNamesVM.GetHorizReferenceNames(),
             _referenceAnalizeService);
+        // Создаем размеры по найденным арматурным элементам (от их опорных плоскостей до осей)
         _dimensionService.Create(rebars, _grids, _selectedDimensionType, mapInfo);
 
+        // Если пользователь запросил изображения для проверки, то выгружаем его (после размещения размеров)
         if(_placeDimensionsAccurately && _createMarkedImage && mapInfo != null) {
             _paintSquaresByMapService.MarkWhiteSquaresOnImage(mapInfo, "_marked_after_dims");
         }

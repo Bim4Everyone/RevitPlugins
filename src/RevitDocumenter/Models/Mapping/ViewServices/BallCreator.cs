@@ -14,6 +14,7 @@ internal class BallCreator {
 
     public void CreateSphere(XYZ center, double radius) {
         center.ThrowIfNull();
+        radius.ThrowIfLessOrEqualThan();
 
         var profile = new List<Curve>();
 

@@ -20,6 +20,38 @@ internal static class ValueGuard {
     }
 
     /// <summary>
+    /// Проверяет число, что оно меньше заданного (по умолчанию 0)
+    /// </summary>
+    internal static T ThrowIfLessThan<T>(
+        this T value,
+        T minValue = default,
+        [CallerArgumentExpression(nameof(value))] string paramName = null)
+        where T : struct, IComparable<T> {
+        if(value.CompareTo(minValue) < 0) {
+            throw new ArgumentException(
+                $"{paramName} with value '{value}' cannot be less than '{minValue}'",
+                paramName);
+        }
+        return value;
+    }
+
+    /// <summary>
+    /// Проверяет число, что оно меньше или равно заданному (по умолчанию 0)
+    /// </summary>
+    internal static T ThrowIfLessOrEqualThan<T>(
+        this T value,
+        T minValue = default,
+        [CallerArgumentExpression(nameof(value))] string paramName = null)
+        where T : struct, IComparable<T> {
+        if(value.CompareTo(minValue) <= 0) {
+            throw new ArgumentException(
+                $"{paramName} with value '{value}' must be greater than '{minValue}'",
+                paramName);
+        }
+        return value;
+    }
+
+    /// <summary>
     /// Проверяет строку на null или пустоту
     /// </summary>
     internal static string ThrowIfNullOrEmpty(

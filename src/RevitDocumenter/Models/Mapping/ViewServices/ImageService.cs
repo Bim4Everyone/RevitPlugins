@@ -45,6 +45,7 @@ internal class ImageService {
 
     private string PrintViewByPixelSize(View view, int pixelSize) {
         view.ThrowIfNull();
+        pixelSize.ThrowIfLessOrEqualThan();
 
         try {
             string desktopPath = Environment.GetFolderPath(Environment.SpecialFolder.Desktop) + "\\";
@@ -145,6 +146,8 @@ internal class ImageService {
 
     private string ScaledImageByPixels(string imagePath, int targetWidth, int targetHeight) {
         imagePath.ThrowIfNullOrEmpty();
+        targetWidth.ThrowIfLessOrEqualThan();
+        targetHeight.ThrowIfLessOrEqualThan();
 
         using(var image = new Bitmap(imagePath)) {
             using(var resizedImage = new Bitmap(targetWidth, targetHeight)) {

@@ -49,6 +49,7 @@ internal class ViewPreparer {
 
     private (XYZ, XYZ) GetFixedCropBoxPoints(View view, double mappingStepInFeet) {
         view.ThrowIfNull();
+        mappingStepInFeet.ThrowIfLessOrEqualThan();
 
         var viewMax = ProjectPointToViewPlan(view, view.CropBox.Max);
         var viewMin = ProjectPointToViewPlan(view, view.CropBox.Min);

@@ -6,9 +6,9 @@ internal class MapInfo {
         XYZ startPointInRevit) {
         Map = map.ThrowIfNull();
         ImagePath = path.ThrowIfNullOrEmpty();
-        MappingStepInFeet = mappingStepInFeet;
-        StepCountX = stepCountX;
-        StepCountY = stepCountY;
+        MappingStepInFeet = mappingStepInFeet.ThrowIfLessThan();
+        StepCountX = stepCountX.ThrowIfLessThan();
+        StepCountY = stepCountY.ThrowIfLessThan();
         StartPointInRevit = startPointInRevit.ThrowIfNull();
     }
 
