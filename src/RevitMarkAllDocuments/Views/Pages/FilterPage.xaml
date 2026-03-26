@@ -14,9 +14,30 @@
     
     x:ClassModifier="internal">
 
+    <core:WpfUIPlatformPage.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary
+                    Source="../Styles/Styles.xaml" />
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
+    </core:WpfUIPlatformPage.Resources>
+
     <Grid
-        Margin="4">
+        Margin="14">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition />
+        </Grid.RowDefinitions>
+        
+        <TextBlock
+            Grid.Row="0"
+            Margin="4,0,0,8"
+            Style="{StaticResource HeaderName}"
+            Text="{me:LocalizationSource FilterPage.SetFilters}" />
+        
         <filtration:PresetCategoriesFilterControl
+            Grid.Row="1"
             LanguageService="{Binding LanguageService}"
             LogicalFilterProvider="{Binding FilterProvider}" />
     </Grid>

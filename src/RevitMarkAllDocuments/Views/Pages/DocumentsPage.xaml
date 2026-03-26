@@ -22,14 +22,14 @@
         </ResourceDictionary>
     </core:WpfUIPlatformPage.Resources>
 
-
     <Grid Margin="14">
         <Grid.RowDefinitions>
-            <RowDefinition Height="43" />
+            <RowDefinition Height="Auto" />
             <RowDefinition />
         </Grid.RowDefinitions>
         <TextBlock
             Grid.Row="0"
+            Margin="4,0,0,8"
             Style="{StaticResource HeaderName}"
             Text="{me:LocalizationSource DocumentsPage.SelectDocs}" />
         <Border
