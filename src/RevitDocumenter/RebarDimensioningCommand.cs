@@ -72,8 +72,8 @@ public class RebarDimensioningCommand : BasePluginCommand {
             .ToSelf()
             .InSingletonScope();
 
-        kernel.Bind<IDimensionLineProvider<RebarElementDimensionLineProviderContext>>()
-            .To<RebarElementDimensionLineProvider>()
+        kernel.Bind<IDimensionLineProvider<RebarZoneDimensionLineProviderContext>>()
+            .To<RebarZoneDimensionLineProvider>()
             .InSingletonScope();
 
         kernel.Bind<DimensionCreator>()

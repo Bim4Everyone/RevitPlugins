@@ -11,7 +11,8 @@ internal static class ValueGuard {
     /// </summary>
     internal static T ThrowIfNull<T>(
         this T obj,
-        [CallerArgumentExpression(nameof(obj))] string objName = null) {
+        [CallerArgumentExpression(nameof(obj))] string objName = null)
+        where T : class {
         if(obj is null) {
             throw new ArgumentException($"{objName} cannot be null", objName);
         }

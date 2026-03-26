@@ -77,6 +77,9 @@ internal class RevitRepository {
         List<string> verticalRefNames,
         List<string> horizontalRefNames,
         ReferenceAnalizeService referenceAnalizeService) {
+        familyNamePart.ThrowIfNull();
+        referenceAnalizeService.ThrowIfNull();
+
         return new FilteredElementCollector(Document, Document.ActiveView.Id)
           .OfCategory(BuiltInCategory.OST_Rebar)
           .WhereElementIsNotElementType()

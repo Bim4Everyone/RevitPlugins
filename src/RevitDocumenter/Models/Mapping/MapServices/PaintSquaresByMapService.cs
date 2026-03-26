@@ -4,6 +4,7 @@ namespace RevitDocumenter.Models.Mapping.MapServices;
 internal class PaintSquaresByMapService {
     public string MarkWhiteSquaresOnImage(MapInfo mapInfo, string imageFileSuffix) {
         mapInfo.ThrowIfNull();
+        imageFileSuffix.ThrowIfNullOrEmpty();
 
         using(var image = new Bitmap(mapInfo.ImagePath)) {
 

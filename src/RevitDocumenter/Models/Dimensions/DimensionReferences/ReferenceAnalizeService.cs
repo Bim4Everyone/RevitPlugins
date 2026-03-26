@@ -17,8 +17,8 @@ internal class ReferenceAnalizeService {
         RevitRepository revitRepository,
         DimensionCreator dimensionCreator) {
 
-        _revitRepository = revitRepository;
-        _dimensionCreator = dimensionCreator;
+        _revitRepository = revitRepository.ThrowIfNull();
+        _dimensionCreator = dimensionCreator.ThrowIfNull();
     }
 
     /// <summary>

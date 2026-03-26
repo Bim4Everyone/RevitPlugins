@@ -67,6 +67,7 @@ internal class ImageService {
     }
 
     private string CropImageByColorPixels(string imagePath, Color colorForFind) {
+        imagePath.ThrowIfNullOrEmpty();
         colorForFind.ThrowIfNull();
 
         // Загружаем изображение
@@ -135,9 +136,7 @@ internal class ImageService {
     }
 
     private bool IsColor(System.Drawing.Color color, Color colorForComparison) {
-        color.ThrowIfNull();
         colorForComparison.ThrowIfNull();
-
         return
             color.R == colorForComparison.Red
             && color.G == colorForComparison.Green
@@ -145,6 +144,8 @@ internal class ImageService {
     }
 
     private string ScaledImageByPixels(string imagePath, int targetWidth, int targetHeight) {
+        imagePath.ThrowIfNullOrEmpty();
+
         using(var image = new Bitmap(imagePath)) {
             using(var resizedImage = new Bitmap(targetWidth, targetHeight)) {
                 using(var graphics = Graphics.FromImage(resizedImage)) {

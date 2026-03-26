@@ -71,15 +71,15 @@ internal class RebarDimensioningViewModel : BaseViewModel {
         PaintSquaresByMapService paintSquaresByMapService,
         ReferenceAnalizeService referenceAnalizeService) {
 
-        _pluginConfig = pluginConfig;
-        _revitRepository = revitRepository;
-        _localizationService = localizationService;
-        _mapService = mapService;
-        _dimensionService = dimensionService;
-        _viewPreparer = viewPreparer;
-        _imageService = imageService;
-        _paintSquaresByMapService = paintSquaresByMapService;
-        _referenceAnalizeService = referenceAnalizeService;
+        _pluginConfig = pluginConfig.ThrowIfNull();
+        _revitRepository = revitRepository.ThrowIfNull();
+        _localizationService = localizationService.ThrowIfNull();
+        _mapService = mapService.ThrowIfNull();
+        _dimensionService = dimensionService.ThrowIfNull();
+        _viewPreparer = viewPreparer.ThrowIfNull();
+        _imageService = imageService.ThrowIfNull();
+        _paintSquaresByMapService = paintSquaresByMapService.ThrowIfNull();
+        _referenceAnalizeService = referenceAnalizeService.ThrowIfNull();
 
         ReferenceNamesVM = new ReferenceNamesViewModel();
 

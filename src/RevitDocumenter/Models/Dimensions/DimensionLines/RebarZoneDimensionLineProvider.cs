@@ -3,7 +3,7 @@ using System;
 using Autodesk.Revit.DB;
 
 namespace RevitDocumenter.Models.Dimensions.DimensionLines;
-internal class RebarElementDimensionLineProvider : IDimensionLineProvider<RebarElementDimensionLineProviderContext> {
+internal class RebarZoneDimensionLineProvider : IDimensionLineProvider<RebarZoneDimensionLineProviderContext> {
     /// <summary>
     /// Создает линию единичной длины перпендикулярно передаваемому направлению
     /// </summary>
@@ -13,12 +13,12 @@ internal class RebarElementDimensionLineProvider : IDimensionLineProvider<RebarE
         return Line.CreateBound(point, point + direction.CrossProduct(XYZ.BasisZ));
     }
 
-    public Line GetDimensionLine(RebarElementDimensionLineProviderContext context) {
+    public Line GetDimensionLine(RebarZoneDimensionLineProviderContext context) {
         context.ThrowIfNull();
-        context.Rebar.ThrowIfNull();
+        context.Element.ThrowIfNull();
         context.Direction.ThrowIfNull();
-        return context.Rebar.Rebar.Location is not LocationPoint pt
-            ? throw new ArgumentException(nameof(context.Rebar))
+        return context.Element.Location is not LocationPoint pt
+            ? throw new ArgumentException(nameof(context.Element))
             : GetPerpendicularLine(pt.Point, context.Direction);
     }
 }

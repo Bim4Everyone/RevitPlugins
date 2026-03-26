@@ -12,14 +12,14 @@ internal class DimensionBuilder {
     private readonly DimensionCreator _dimensionCreator;
     private readonly DimensionChanger _dimensionChanger;
     private readonly IReferenceCollector<ReferenceToGridsCollectorContext> _comparisonService;
-    private readonly IDimensionLineProvider<RebarElementDimensionLineProviderContext> _dimensionLineProvider;
+    private readonly IDimensionLineProvider<RebarZoneDimensionLineProviderContext> _dimensionLineProvider;
     private readonly ReferenceAnalizeService _referenceAnalizeService;
 
     public DimensionBuilder(
         DimensionCreator dimensionCreator,
         DimensionChanger dimensionChanger,
         IReferenceCollector<ReferenceToGridsCollectorContext> comparisonService,
-        IDimensionLineProvider<RebarElementDimensionLineProviderContext> dimensionLineProvider,
+        IDimensionLineProvider<RebarZoneDimensionLineProviderContext> dimensionLineProvider,
         ReferenceAnalizeService referenceAnalizeService) {
         _dimensionCreator = dimensionCreator.ThrowIfNull();
         _dimensionChanger = dimensionChanger.ThrowIfNull();
@@ -79,7 +79,7 @@ internal class DimensionBuilder {
 
         // Получаем линию размещения размера
         var dimensionLine = _dimensionLineProvider.GetDimensionLine(
-            new RebarElementDimensionLineProviderContext(rebar, direction));
+            new RebarZoneDimensionLineProviderContext(rebar.Rebar, direction));
 
         // Строим размер
         var dimension = _dimensionCreator.Create(dimensionLine, dimensionRefs, selectedDimensionType);

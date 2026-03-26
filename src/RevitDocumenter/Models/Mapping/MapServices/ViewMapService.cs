@@ -16,7 +16,7 @@ internal class ViewMapService {
     public ViewMapService() { }
 
     public MapInfo CreateMap(string path, ExportOption exportOption) {
-        path.ThrowIfNull();
+        path.ThrowIfNullOrEmpty();
         exportOption.ThrowIfNull();
 
         var map = AnalyzeImageSquares(path, exportOption.StepCountX, exportOption.StepCountY);
@@ -30,6 +30,8 @@ internal class ViewMapService {
     }
 
     public SquareInfo[,] AnalyzeImageSquares(string imagePath, int stepCountX, int stepCountY) {
+        imagePath.ThrowIfNullOrEmpty();
+
         using(var image = new Bitmap(imagePath)) {
             // Блокируем биты исходного изображения для быстрого доступа
             var imageData = image.LockBits(
@@ -70,6 +72,8 @@ internal class ViewMapService {
     }
 
     private SquareInfo AnalyzeSquare(byte[] pixels, int stride, int startX, int startY, int size, int imageWidth, int imageHeight) {
+        pixels.ThrowIfNullOrEmpty();
+
         // Корректируем границы, если квадрат выходит за пределы изображения
         int endX = Math.Min(startX + size, imageWidth);
         int endY = Math.Min(startY + size, imageHeight);
@@ -109,6 +113,8 @@ internal class ViewMapService {
     /// </summary>
     public bool CheckInRectangle(MapInfo mapInfo, XYZ point1, XYZ point2) {
         mapInfo.ThrowIfNull();
+        point1.ThrowIfNull();
+        point2.ThrowIfNull();
 
         // Переводим координаты точек в Revit в индексы квадратов на карте
         (int indexX1, int indexY1) = GetMapIndexes(mapInfo, point1);

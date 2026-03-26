@@ -9,12 +9,12 @@ namespace RevitDocumenter.Models.Dimensions.DimensionReferences.ReferenceCollect
 internal class ReferenceToGridsCollector : IReferenceCollector<ReferenceToGridsCollectorContext> {
     private readonly GridDirectionFilter _lineBasedElementFilterService;
     private readonly ReferenceAnalizeService _referenceAnalizeService;
-    private readonly RebarElementDimensionLineProvider _dimensionLineService;
+    private readonly RebarZoneDimensionLineProvider _dimensionLineService;
 
     public ReferenceToGridsCollector(
         GridDirectionFilter lineBasedElementFilterService,
         ReferenceAnalizeService referenceAnalizeService,
-        RebarElementDimensionLineProvider dimensionLineService) {
+        RebarZoneDimensionLineProvider dimensionLineService) {
 
         _lineBasedElementFilterService = lineBasedElementFilterService.ThrowIfNull();
         _referenceAnalizeService = referenceAnalizeService.ThrowIfNull();
