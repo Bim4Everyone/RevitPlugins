@@ -6,8 +6,8 @@ namespace RevitDocumenter.Models.Dimensions;
 internal class RebarElement {
     public RebarElement(FamilyInstance rebar, List<Reference> verticalRefs, List<Reference> horizontalRefs) {
         Rebar = rebar.ThrowIfNull();
-        VerticalRefs = [.. verticalRefs.ThrowIfNullOrEmpty()];
-        HorizontalRefs = [.. horizontalRefs.ThrowIfNullOrEmpty()];
+        VerticalRefs = [.. verticalRefs.ThrowIfNull()];
+        HorizontalRefs = [.. horizontalRefs.ThrowIfNull()];
     }
     public FamilyInstance Rebar { get; set; }
     public List<Reference> VerticalRefs { get; set; }
