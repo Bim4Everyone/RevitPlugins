@@ -12,6 +12,7 @@ using dosymep.WPF.Commands;
 using dosymep.WPF.ViewModels;
 
 using RevitMarkAllDocuments.Models;
+using RevitMarkAllDocuments.Services;
 
 namespace RevitMarkAllDocuments.ViewModels;
 
@@ -78,6 +79,10 @@ internal class MainViewModel : BaseViewModel {
     }
 
     private void AcceptView() {
+        var filtrationService = new FiltrationService();
+        var sortElementService = new SortElementService();
+        var markSetterService = new MarkSetterService();
+
         // get documents
         var documents = DocumentsPageViewModel.Documents
             .Where(d => d.IsChecked)
@@ -85,18 +90,8 @@ internal class MainViewModel : BaseViewModel {
             .ToArray();
 
         // filter elements
-        var allElements = new List<Element>();
-
-        foreach(var document in documents) {
-            var filter = FilterPageViewModel.FilterProvider.GetFilter();
-
-            var elements = new FilteredElementCollector(document)
-                .OfCategory(BuiltInCategory.OST_Walls)
-                .WherePasses(filter.GetFilter().Build(document, new FilterOptions() { Tolerance = 0 }))
-                .ToElements();
-
-            allElements.AddRange(elements);
-        }
+        var allElements = filtrationService
+            .FilterElements(documents, FilterPageViewModel.FilterProvider);
 
         // sort elements
 
