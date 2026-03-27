@@ -29,4 +29,20 @@ internal partial class DocumentsPage {
         InitializeComponent();
         DataContext = viewModel.DocumentsPageViewModel;
     }
+
+    private void CheckBox_Checked(object sender, RoutedEventArgs e) {
+        ChangeSelected(true);
+    }
+
+    private void CheckBox_Unchecked(object sender, RoutedEventArgs e) {
+        ChangeSelected(false);
+    }
+
+    private void ChangeSelected(bool state) {
+        var dataGrid = (DataGrid) FindName("Documents");
+        var docs = dataGrid.SelectedItems;
+        foreach(DocumentViewModel doc in docs) {
+            doc.IsChecked = state;
+        }
+    }
 }

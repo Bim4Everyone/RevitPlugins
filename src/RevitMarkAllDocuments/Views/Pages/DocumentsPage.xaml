@@ -35,16 +35,45 @@
         <Border
             Grid.Row="1"
             Style="{StaticResource CustomBorder}">
-            <ListBox
+            <ui:DataGrid
+                AutoGenerateColumns="False"
+                x:Name="Documents"
+                HeadersVisibility="None"
+                CanUserResizeColumns="True"
+                Style="{StaticResource CustomResizableDataGridStyle}"
                 ItemsSource="{Binding Documents}">
-                <ListBox.ItemTemplate>
-                    <DataTemplate>
-                        <CheckBox
-                            Content="{Binding Name}"
-                            IsChecked="{Binding IsChecked}" />
-                    </DataTemplate>
-                </ListBox.ItemTemplate>
-            </ListBox>
+                <DataGrid.Columns>
+                    <DataGridCheckBoxColumn
+                        Binding="{Binding Path=IsChecked, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}">
+                        <DataGridCheckBoxColumn.CellStyle>
+                            <Style
+                                TargetType="DataGridCell">
+                                <EventSetter
+                                    Event="CheckBox.Checked"
+                                    Handler="CheckBox_Checked" />
+                                <EventSetter
+                                    Event="CheckBox.Unchecked"
+                                    Handler="CheckBox_Unchecked" />
+                                <Setter
+                                    Property="Background"
+                                    Value="Transparent" />
+                                <Setter
+                                    Property="BorderThickness"
+                                    Value="0" />
+                            </Style>
+                        </DataGridCheckBoxColumn.CellStyle>
+                    </DataGridCheckBoxColumn>
+                    <DataGridTextColumn
+                        Binding="{Binding Path=Name}"
+                        Width="400"
+                        IsReadOnly="True" />
+                    <DataGridTextColumn
+                        Binding="{Binding Path=DocumentType}"
+                        Width="250"
+                        IsReadOnly="True" />
+                </DataGrid.Columns>
+
+            </ui:DataGrid>
         </Border>
     </Grid>
 </core:WpfUIPlatformPage>
