@@ -4,6 +4,9 @@ using System.Collections.ObjectModel;
 using dosymep.WPF.ViewModels;
 using RevitMarkAllDocuments.Models;
 using System.Linq;
+using System.Windows.Input;
+using dosymep.WPF.Commands;
+using dosymep.Bim4Everyone;
 
 namespace RevitMarkAllDocuments.ViewModels;
 
@@ -17,9 +20,16 @@ internal class SortPageViewModel : BaseViewModel {
     public SortPageViewModel(RevitRepository revitRepository, Category category) {
         SelectableParams = [..revitRepository
             .GetSortableParams(category)
-            .Select(x => new ParameterViewModel(x))];
+            .Select(x => new ParameterViewModel(x))
+            .OrderBy(x => x.Name)];
         SelectedParams = [];
+
+        AddParamCommand = RelayCommand.Create(AddParam, CanAddParam);
+        RemoveParamCommand = RelayCommand.Create(RemoveParam, CanRemoveParam);
     }
+
+    public ICommand AddParamCommand { get; }
+    public ICommand RemoveParamCommand { get; }
 
     public ObservableCollection<ParameterViewModel> SelectableParams {
         get => _selectableParams;
@@ -38,5 +48,35 @@ internal class SortPageViewModel : BaseViewModel {
     public ParameterViewModel SelectedParamFromSelected {
         get => _selectedParamFromSelected;
         set => RaiseAndSetIfChanged(ref _selectedParamFromSelected, value);
+    }
+
+    public void AddParam() {
+        MoveParams(SelectableParams, SelectedParams, SelectedParamFromSelectable);
+    }
+
+    public void RemoveParam() {
+        MoveParams(SelectedParams, SelectableParams, SelectedParamFromSelected);
+    }
+
+    private bool CanAddParam() {
+        return SelectedParamFromSelectable != null;
+    }
+
+    private bool CanRemoveParam() {
+        return SelectedParamFromSelected != null;
+    }
+
+    public void MoveParams(ObservableCollection<ParameterViewModel> fromParams,
+                           ObservableCollection<ParameterViewModel> toParams,
+                           ParameterViewModel param) {
+        fromParams.Remove(param);
+        toParams.Add(param);
+
+        toParams.Clear();
+        var sorted = toParams.OrderBy(x => x.Name).ToList();
+
+        foreach(var item in sorted) {
+            toParams.Add(item);
+        }
     }
 }

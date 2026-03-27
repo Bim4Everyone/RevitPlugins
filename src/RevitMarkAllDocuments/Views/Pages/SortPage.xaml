@@ -30,7 +30,7 @@
         </Grid.RowDefinitions>
         <Grid.ColumnDefinitions>
             <ColumnDefinition />
-            <ColumnDefinition Width="50"/>
+            <ColumnDefinition Width="Auto"/>
             <ColumnDefinition />
         </Grid.ColumnDefinitions>
         
@@ -73,5 +73,20 @@
                 </ListBox.ItemTemplate>
             </ListBox>
         </Border>
+
+        <StackPanel
+            Grid.Row="1"
+            Grid.Column="1"
+            Margin="4,0">
+            <ui:Button 
+                Height="50"
+                Margin="0,0,0,8"
+                Content=">>"
+                Command="{Binding AddParamCommand}"/>
+            <ui:Button 
+                Height="50"
+                Content="&lt;&lt;"
+                Command="{Binding RemoveParamCommand}"/>
+        </StackPanel>
     </Grid>
 </core:WpfUIPlatformPage>
