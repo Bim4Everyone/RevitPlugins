@@ -26,6 +26,7 @@ internal class MainViewModel : BaseViewModel {
     private DocumentsPageViewModel _documentsPageViewModel;
     private FilterPageViewModel _filterPageViewModel;
     private SortPageViewModel _sortPageViewModel;
+    private MarkSettingsPageViewModel _markSettingsPageViewModel;
 
     private string _errorText;
 
@@ -57,6 +58,7 @@ internal class MainViewModel : BaseViewModel {
     public DocumentsPageViewModel DocumentsPageViewModel => _documentsPageViewModel;
     public FilterPageViewModel FilterPageViewModel => _filterPageViewModel;
     public SortPageViewModel SortPageViewModel => _sortPageViewModel;
+    public MarkSettingsPageViewModel MarkSettingsPageViewModel => _markSettingsPageViewModel;
 
     public string SelectedCategoryName => _selectedCategoryName;
 
@@ -70,6 +72,7 @@ internal class MainViewModel : BaseViewModel {
         _filterPageViewModel = new FilterPageViewModel(_filterFactory, _localizationService, 
                 new FilterDataProvider(_revitRepository, _selectedCategory));
         _sortPageViewModel = new SortPageViewModel(_revitRepository, _selectedCategory);
+        _markSettingsPageViewModel = new MarkSettingsPageViewModel(_revitRepository, _selectedCategory);
 
         LoadConfig();
     }

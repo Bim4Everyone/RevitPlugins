@@ -13,7 +13,77 @@
     
     x:ClassModifier="internal">
 
-    <Grid>
-        
+    <core:WpfUIPlatformPage.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary
+                    Source="../Styles/Styles.xaml" />
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
+    </core:WpfUIPlatformPage.Resources>
+
+    <Grid
+        Margin="14">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition />
+        </Grid.RowDefinitions>
+
+        <TextBlock
+            Grid.Row="0"
+            Grid.Column="0"
+            Grid.ColumnSpan="3"
+            Margin="4,0,0,8"
+            Style="{StaticResource HeaderName}"
+            Text="{me:LocalizationSource MarkPage.Settings}" />
+
+        <Border
+            Grid.Row="1"
+            Style="{StaticResource CustomBorder}">
+            <UniformGrid
+                Rows="4"
+                VerticalAlignment="Top"
+                Height="200">
+                <DockPanel>
+                    <TextBlock
+                        Width="140"
+                        VerticalAlignment="Center"
+                        Text="{me:LocalizationSource MarkPage.Param}" />
+                    <ComboBox
+                        ItemsSource="{Binding ParamsForMark}"
+                        DisplayMemberPath="Name"
+                        SelectedItem="{Binding SelectedParam}" />
+                </DockPanel>
+                <DockPanel>
+                    <TextBlock
+                        Width="140"
+                        VerticalAlignment="Center"
+                        Text="{me:LocalizationSource MarkPage.StartNumber}" />
+                    <TextBox
+                        Margin="0,7"
+                        Text="{Binding StartNumber, UpdateSourceTrigger=PropertyChanged}" />
+                </DockPanel>
+                <DockPanel>
+                    <TextBlock
+                        Width="140"
+                        VerticalAlignment="Center"
+                        Text="{me:LocalizationSource MarkPage.Prefix}" />
+                    <TextBox
+                        Margin="0,7"
+                        IsEnabled="{Binding IsSuffixPrefixEnable}"
+                        Text="{Binding Prefix, UpdateSourceTrigger=PropertyChanged}" />
+                </DockPanel>
+                <DockPanel>
+                    <TextBlock
+                        Width="140"
+                        VerticalAlignment="Center"
+                        Text="{me:LocalizationSource MarkPage.Suffix}" />
+                    <TextBox
+                        Margin="0,7"
+                        IsEnabled="{Binding IsSuffixPrefixEnable}"
+                        Text="{Binding Suffix, UpdateSourceTrigger=PropertyChanged}" />
+                </DockPanel>
+            </UniformGrid>
+        </Border>
     </Grid>
 </core:WpfUIPlatformPage>
