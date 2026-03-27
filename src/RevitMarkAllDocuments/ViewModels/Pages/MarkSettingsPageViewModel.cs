@@ -19,7 +19,7 @@ internal class MarkSettingsPageViewModel : BaseViewModel {
     private bool _isSuffixEnable;
 
     public MarkSettingsPageViewModel(RevitRepository revitRepository, Category category) {
-        _paramsForMark = [.. revitRepository.GetSortableParams(category)
+        _paramsForMark = [.. revitRepository.GetFilterableParams(category)
             .Where(x => x.StorageType == StorageType.String 
                 || x.StorageType == StorageType.Integer 
                 || x.StorageType == StorageType.Double)

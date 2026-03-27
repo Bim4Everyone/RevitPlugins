@@ -19,7 +19,7 @@ internal class SortPageViewModel : BaseViewModel {
 
     public SortPageViewModel(RevitRepository revitRepository, Category category) {
         SelectableParams = [..revitRepository
-            .GetSortableParams(category)
+            .GetFilterableParams(category)
             .Select(x => new ParameterViewModel(x))
             .OrderBy(x => x.Name)];
         SelectedParams = [];

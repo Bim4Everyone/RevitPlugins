@@ -24,7 +24,7 @@ internal class FilterDataProvider : IDataProvider {
     }
 
     public ICollection<RevitParam> GetParams(ICollection<Category> categories) {
-        return _revitRepository.GetSortableParams(_category);
+        return _revitRepository.GetFilterableParams(_category);
     }
 
     public ICollection<Category> GetCategories() {

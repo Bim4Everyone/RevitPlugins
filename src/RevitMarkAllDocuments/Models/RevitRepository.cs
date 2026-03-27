@@ -55,7 +55,7 @@ internal class RevitRepository {
         return docs;
     }
 
-    public ICollection<RevitParam> GetSortableParams(Category category) {
+    public ICollection<RevitParam> GetFilterableParams(Category category) {
         return ParameterFilterUtilities
             .GetFilterableParametersInCommon(Document, [category.Id])
             .Select(GetFilterableParam)
