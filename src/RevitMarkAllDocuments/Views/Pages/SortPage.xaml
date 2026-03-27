@@ -81,12 +81,27 @@
             <ui:Button 
                 Height="50"
                 Margin="0,0,0,8"
-                Content=">>"
+                Content="⯈"
                 Command="{Binding AddParamCommand}"/>
             <ui:Button 
                 Height="50"
-                Content="&lt;&lt;"
+                Content="⯇"
                 Command="{Binding RemoveParamCommand}"/>
         </StackPanel>
+
+        <UniformGrid
+            Grid.Row="2"
+            Grid.Column="2">
+            <ui:Button
+                Margin="4"
+                HorizontalAlignment="Stretch"
+                Content="▲"
+                Command="{Binding MoveUpParamCommand}" />
+            <ui:Button
+                Margin="4"
+                HorizontalAlignment="Stretch"
+                Content="▼"
+                Command="{Binding MoveDownParamCommand}" />
+        </UniformGrid>
     </Grid>
 </core:WpfUIPlatformPage>
