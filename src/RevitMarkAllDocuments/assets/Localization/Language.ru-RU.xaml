@@ -19,6 +19,11 @@
     <system:String x:Key="DocumentsPage.SelectDocs">Выберите проекты для маркировки</system:String>
     <system:String x:Key="FilterPage.SetFilters">Настройте критерии фильтрации</system:String>
     <system:String x:Key="SortPage.SelectParams">Выберите параметры для сортировки элементов</system:String>
+    <system:String x:Key="MarkPage.Settings">Настройте параметры для значений марок</system:String>
+    <system:String x:Key="MarkPage.Param">Параметр:</system:String>
+    <system:String x:Key="MarkPage.StartNumber">Начальный номер:</system:String>
+    <system:String x:Key="MarkPage.Prefix">Суффикс:</system:String>
+    <system:String x:Key="MarkPage.Suffix">Префикс:</system:String>
 
     <system:String x:Key="MainWindow.ButtonOk">ОК</system:String>
     <system:String x:Key="MainWindow.ButtonCancel">Отмена</system:String>
