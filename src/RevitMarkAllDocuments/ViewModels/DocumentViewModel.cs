@@ -1,3 +1,5 @@
+using System.Windows.Controls;
+
 using Autodesk.Revit.DB;
 
 using dosymep.WPF.ViewModels;
@@ -5,31 +7,24 @@ using dosymep.WPF.ViewModels;
 namespace RevitMarkAllDocuments.ViewModels;
 
 internal class DocumentViewModel : BaseViewModel {
-    private string _name;
-    private Document _document;
-    private string _documentType;
+    private readonly string _name;
+    private readonly Document _document;
+    private readonly string _documentType;
+    private readonly bool _isLink;
+
     private bool _isChecked;
 
-    public DocumentViewModel(string name, string documentType, bool isChecked = false) {
+    public DocumentViewModel(string name, bool isLink, bool isChecked = false) {
         _name = name;
-        _documentType = documentType;
+        _isLink = isLink;
+        _documentType = isLink ? "Связь" : "Текущий",;
         _isChecked = isChecked;
     }
 
-    public string Name {
-        get => _name;
-        set => RaiseAndSetIfChanged(ref _name, value);
-    }
-
-    public Document Document {
-        get => _document;
-        set => RaiseAndSetIfChanged(ref _document, value);
-    }
-
-    public string DocumentType {
-        get => _documentType;
-        set => RaiseAndSetIfChanged(ref _documentType, value);
-    }
+    public string Name => _name;
+    public Document Document => _document;
+    public bool IsLink => _isLink;
+    public string DocumentType => _documentType;
 
     public bool IsChecked {
         get => _isChecked;

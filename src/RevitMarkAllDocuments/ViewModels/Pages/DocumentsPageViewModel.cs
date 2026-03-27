@@ -18,7 +18,7 @@ internal class DocumentsPageViewModel : BaseViewModel {
             repository.GetAllDocuments()
                 .Select(doc => new DocumentViewModel(
                     doc.Title,
-                    doc.IsLinked ? "Связь" : "Текущий",
+                    doc.IsLinked,
                     false
                 ))
         );
