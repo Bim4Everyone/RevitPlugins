@@ -1,8 +1,11 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 
 using Autodesk.Revit.ApplicationServices;
 using Autodesk.Revit.DB;
+using Autodesk.Revit.DB.Mechanical;
+using Autodesk.Revit.DB.Plumbing;
 using Autodesk.Revit.UI;
 
 using dosymep.Bim4Everyone;
@@ -239,7 +242,7 @@ internal class RevitRepository {
     private RevitElement CreateRevitElement(Element element) {
         return new RevitElement {
             Element = element,
-            BoundingBoxXYZ = GetBoundingBoxXYZ(element),
+            BoundingBoxXYZ = GetGeometricalBoundingBoxXYZ(element),
             FamilyName = GetFamilyName(element),
             TypeName = element.Name ?? _defaultTypeName,
             LevelName = GetLevelName(element)
@@ -247,13 +250,95 @@ internal class RevitRepository {
     }
 
     // Метод получения GetBoundingBoxXYZ
-    private BoundingBoxXYZ GetBoundingBoxXYZ(Element element) {
-        var bbox = element.GetBoundingBox();
-        if(bbox == null) {
-            var geom = element.get_Geometry(_geomOptions);
-            bbox = geom.GetBoundingBox();
+    private BoundingBoxXYZ GetGeometricalBoundingBoxXYZ(Element element) {
+        if(element is FlexPipe fp) {
+            return CreatePointsBBox([.. fp.Points]);
         }
-        return bbox;
+        if(element is FlexDuct fd) {
+            return CreatePointsBBox([.. fd.Points]);
+        }
+        if(element is FamilyInstance fi) {
+            var tr = fi.GetTransform();
+            return GetGeomBoundingBox(fi, tr);
+        }
+        var geom = element.get_Geometry(_geomOptions);
+        if(geom != null) {
+            return geom.GetBoundingBox();
+        }
+        var bbox = element.GetBoundingBox();
+        return bbox ?? null;
+    }
+
+    // Метод получения BoundingBoxXYZ геометрической части элемента
+    private BoundingBoxXYZ GetGeomBoundingBox(Element element, Transform transform) {
+        var geomElement = element.get_Geometry(_geomOptions);
+        if(geomElement == null) {
+            return null;
+        }
+        var minPoint = new XYZ(double.MaxValue, double.MaxValue, double.MaxValue);
+        var maxPoint = new XYZ(double.MinValue, double.MinValue, double.MinValue);
+
+        var minP = new XYZ(double.MaxValue, double.MaxValue, double.MaxValue);
+        var maxP = new XYZ(double.MinValue, double.MinValue, double.MinValue);
+
+        foreach(var geomObj in geomElement) {
+            if(geomObj is GeometryInstance instance) {
+                var instGeom = instance.GetInstanceGeometry();
+
+                foreach(var obj in instGeom) {
+                    if(obj is Solid solid && solid.Faces.Size > 0) {
+                        var bbox = solid.GetBoundingBox();
+
+                        var min = transform.OfPoint(bbox.Min);
+                        var max = transform.OfPoint(bbox.Max);
+
+                        minPoint = new XYZ(
+                            Math.Min(minPoint.X, min.X),
+                            Math.Min(minPoint.Y, min.Y),
+                            Math.Min(minPoint.Z, min.Z)
+                        );
+                        maxPoint = new XYZ(
+                            Math.Max(maxPoint.X, max.X),
+                            Math.Max(maxPoint.Y, max.Y),
+                            Math.Max(maxPoint.Z, max.Z)
+                        );
+                    }
+                }
+            }
+        }
+        return minPoint.X == double.MaxValue ? null : new BoundingBoxXYZ { Min = minPoint, Max = maxPoint };
+    }
+
+    // Метод получения BoundingBoxXYZ из списка точек
+    private BoundingBoxXYZ CreatePointsBBox(List<XYZ> points) {
+        var (minPoint, maxPoint) = GetMinMaxPoints(points);
+        return new BoundingBoxXYZ {
+            Min = minPoint,
+            Max = maxPoint
+        };
+    }
+
+    // Метод получения минимальной и максимальной точек из списка точек
+    private (XYZ minPoint, XYZ maxPoint) GetMinMaxPoints(List<XYZ> points) {
+        double minX = double.MaxValue;
+        double minY = double.MaxValue;
+        double minZ = double.MaxValue;
+        double maxX = double.MinValue;
+        double maxY = double.MinValue;
+        double maxZ = double.MinValue;
+
+        foreach(var point in points) {
+            minX = Math.Min(minX, point.X);
+            minY = Math.Min(minY, point.Y);
+            minZ = Math.Min(minZ, point.Z);
+
+            maxX = Math.Max(maxX, point.X);
+            maxY = Math.Max(maxY, point.Y);
+            maxZ = Math.Max(maxZ, point.Z);
+        }
+        var min = new XYZ(minX, minY, minZ);
+        var max = new XYZ(maxX, maxY, maxZ);
+        return (min, max);
     }
 
     // Метод получения вложенных/зависимых RevitElement
