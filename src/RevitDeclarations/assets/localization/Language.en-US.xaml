@@ -81,12 +81,13 @@
     <system:String x:Key="ParametersPage.ComRoomAreaGroupParam">8.1 For a group of multiple rooms:</system:String>
     <system:String x:Key="ParametersPage.ComRoomAreaParam">8.2 For a single room:</system:String>
     <system:String x:Key="ParametersPage.ComRoomHeight">9. Ceiling height:</system:String>
-    <system:String x:Key="ParametersPage.ComRoomCar">10. Parking space class:</system:String>
-    <system:String x:Key="ParametersPage.ComRoomUse">11. Applicability:</system:String>
-    <system:String x:Key="ParametersPage.ComRoomName">12. Room name</system:String>
-    <system:String x:Key="ParametersPage.ComRoomGroupNameParam">12.1 For a group of multiple rooms:</system:String>
-    <system:String x:Key="ParametersPage.ComRoomNameParam">12.2 For a single room:</system:String>
-    <system:String x:Key="ParametersPage.ComRoomProjectName">13. Project ID:</system:String>
+    <system:String x:Key="ParametersPage.ComPositionType">10. Position type:</system:String>
+    <system:String x:Key="ParametersPage.ComRoomCar">11. Parking space class:</system:String>
+    <system:String x:Key="ParametersPage.ComRoomUse">12. Applicability:</system:String>
+    <system:String x:Key="ParametersPage.ComRoomName">13. Room name</system:String>
+    <system:String x:Key="ParametersPage.ComRoomGroupNameParam">13.1 For a group of multiple rooms:</system:String>
+    <system:String x:Key="ParametersPage.ComRoomNameParam">13.2 For a single room:</system:String>
+    <system:String x:Key="ParametersPage.ComRoomProjectName">14. Project ID:</system:String>
     <system:String x:Key="ParametersPage.PublicAreaFilterParam">Parameter for filtering public areas:</system:String>
     <system:String x:Key="ParametersPage.PublicAreaParam">Parameter for grouping public areas:</system:String>
     <system:String x:Key="ParametersPage.PublicAreaGroupParams">Parameter for grouping within public area groups:</system:String>
@@ -222,6 +223,7 @@
     <system:String x:Key="ToolTip.ApartNumParamToolTip">Text parameter whose value is output to the declaration column "Unit number on the floor"</system:String>
     <system:String x:Key="ToolTip.RoomsHeightParamToolTip">Numeric parameter whose value is output to the declaration column "Ceiling height"</system:String>
     <system:String x:Key="ToolTip.ProjectNameToolTip">Value that is output to the declaration column "Project ID"</system:String>
+    <system:String x:Key="ToolTip.PositionTypeToolTip">Text parameter whose value is output to the declaration column "Position type"</system:String>
     <system:String x:Key="ToolTip.ApartAreaParamToolTip">Numeric parameter whose value is output to the declaration column "Total area without reduction coefficient"</system:String>
     <system:String x:Key="ToolTip.ApartAreaCoefParamToolTip">Numeric parameter whose value is output to the declaration column "Total area with reduction coefficient"</system:String>
     <system:String x:Key="ToolTip.ApartAreaLivingParamToolTip">Numeric parameter whose value is output to the declaration column "Living area"</system:String>

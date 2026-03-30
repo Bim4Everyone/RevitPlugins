@@ -36,7 +36,7 @@ internal class CommercialDataTable : DeclarationDataTable {
             _mainTable.Rows[rowNumber][6] = commercialRooms.ConstrWorksNumber ?? "";
             _mainTable.Rows[rowNumber][7] = commercialRooms.AreaMain;
             _mainTable.Rows[rowNumber][8] = commercialRooms.RoomsHeight;
-            _mainTable.Rows[rowNumber][9] = "";
+            _mainTable.Rows[rowNumber][9] = commercialRooms.PositionType;
             _mainTable.Rows[rowNumber][10] = commercialRooms.ParkingSpaceClass ?? "";
             _mainTable.Rows[rowNumber][11] = commercialRooms.ParkingInfo ?? "";
             _mainTable.Rows[rowNumber][12] = commercialRooms.GroupName ?? "";

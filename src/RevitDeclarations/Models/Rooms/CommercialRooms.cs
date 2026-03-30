@@ -26,6 +26,7 @@ internal class CommercialRooms : RoomGroup {
     [JsonProperty("type")]
     public string ParkingSpaceClass => _firstRoom.GetTextParamValue(_settings.ParkingSpaceClass);
     public string ParkingInfo => _firstRoom.GetTextParamValue(_settings.ParkingInfo);
+    public string PositionType => _firstRoom.GetTextParamValue(_settings.PositionType);
 
     public string DeclarationNumber =>
         _paramProvider.GetTwoParamsWithHyphen(_firstRoom, _settings.AddPrefixToNumber);
