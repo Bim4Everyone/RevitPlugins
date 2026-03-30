@@ -24,7 +24,7 @@ using RevitMarkAllDocuments.Views;
 
 using Wpf.Ui.Abstractions;
 
-namespace RevitMarkAllDocsByConfig;
+namespace RevitMarkAllDocuments;
 
 /// <summary>
 /// Класс команды Revit плагина.
@@ -39,16 +39,16 @@ public class RevitMarkAllDocsByConfigCommand : BasePluginCommand {
     }
 
     protected override void Execute(UIApplication uiApplication) {
-        //// Создание контейнера зависимостей плагина с сервисами из платформы
-        //using IKernel kernel = uiApplication.CreatePlatformServices();
+        // Создание контейнера зависимостей плагина с сервисами из платформы
+        using IKernel kernel = uiApplication.CreatePlatformServices();
 
-        //kernel.UseLogicalFilterFactory();
-        //kernel.UseLogicalFilterProviderFactory();
-        //kernel.UseFilterContextParser();
+        kernel.UseLogicalFilterFactory();
+        kernel.UseLogicalFilterProviderFactory();
+        kernel.UseFilterContextParser();
 
-        //// Настройка доступа к Revit
-        //kernel.Bind<RevitRepository>()
-        //    .ToSelf()
-        //    .InSingletonScope();
+        // Настройка доступа к Revit
+        kernel.Bind<RevitRepository>()
+            .ToSelf()
+            .InSingletonScope();
     }
 }
