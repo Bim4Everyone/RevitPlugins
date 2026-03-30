@@ -11,7 +11,7 @@ internal abstract class RoomGroup {
     protected const double _maxAreaDeviation = 0.2;
 
     protected readonly StringComparer _strComparer = StringComparer.OrdinalIgnoreCase;
-
+    protected readonly LogicalStringComparer _logicalStrComparer;
     protected readonly RoomParamProvider _paramProvider;
     protected readonly int _accuracyForArea;
     protected readonly int _accuracyForLength;
@@ -30,6 +30,7 @@ internal abstract class RoomGroup {
         _paramProvider = paramProvider;
         _accuracyForArea = settings.AccuracyForArea;
         _accuracyForLength = settings.AccuracyForLength;
+        _logicalStrComparer = logicalStrComparer;
 
         _rooms = rooms
             .OrderBy(x => x.Number, logicalStrComparer)
@@ -46,7 +47,7 @@ internal abstract class RoomGroup {
     public virtual string Department => _firstRoom.GetTextParamValue(_settings.DepartmentParam);
 
     [JsonProperty("floor_number")]
-    public string Level => _paramProvider.GetAllLevels(_rooms);
+    public string Level => _paramProvider.GetAllLevels(_rooms, _logicalStrComparer);
     [JsonProperty("number")]
     public virtual string Number => _firstRoom.GetTextParamValue(_settings.ApartmentNumberParam);
     [JsonProperty("section")]
