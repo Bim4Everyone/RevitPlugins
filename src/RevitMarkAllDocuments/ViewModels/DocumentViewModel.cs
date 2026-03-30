@@ -30,5 +30,4 @@ internal class DocumentViewModel : BaseViewModel {
         get => _isChecked;
         set => RaiseAndSetIfChanged(ref _isChecked, value);
     }
-
 }

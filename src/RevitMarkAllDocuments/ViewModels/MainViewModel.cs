@@ -94,21 +94,27 @@ internal class MainViewModel : BaseViewModel {
             .FilterElements(documents, FilterPageViewModel.FilterProvider);
 
         // sort elements
+        var sortedElements = sortElementService.SortElements();
 
-        // convert to json
+        bool linksSelected = DocumentsPageViewModel.Documents
+            .Where(d => d.IsChecked)
+            .Any(d => d.IsLink);
 
+        if(linksSelected) {
+            //export JSON
+        }
+
+        bool currentDocSelected = DocumentsPageViewModel.Documents
+            .Where(d => d.IsChecked)
+            .Any(d => !d.IsLink);
+
+        if(linksSelected) {
+            //show elements list
+        }
 
         SaveConfig();
     }
 
-    /// <summary>
-    /// Метод проверки возможности выполнения команды применения настроек.
-    /// </summary>
-    /// <returns>В случае когда true - команда может выполниться, в случае false - нет.</returns>
-    /// <remarks>
-    /// В данном методе происходит валидация ввода пользователя и уведомление его о неверных значениях.
-    /// В методе проверяемые свойства окна должны быть отсортированы в таком же порядке как в окне (сверху-вниз)
-    /// </remarks>
     private bool CanAcceptView() {
         ErrorText = null;
         return true;

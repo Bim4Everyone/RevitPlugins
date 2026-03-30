@@ -6,6 +6,8 @@ using System.Threading.Tasks;
 
 namespace RevitMarkAllDocuments.Services;
 
-internal class SortElementService
-{
+internal class SortElementService {
+    internal object SortElements() {
+        throw new NotImplementedException();
+    }
 }
