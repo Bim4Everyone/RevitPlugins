@@ -16,11 +16,7 @@ internal class DocumentsPageViewModel : BaseViewModel {
     public DocumentsPageViewModel(RevitRepository repository) {
         Documents = new ObservableCollection<DocumentViewModel>(
             repository.GetAllDocuments()
-                .Select(doc => new DocumentViewModel(
-                    doc.Title,
-                    doc.IsLinked,
-                    false
-                ))
+                .Select(doc => new DocumentViewModel(doc))
         );
 
     }

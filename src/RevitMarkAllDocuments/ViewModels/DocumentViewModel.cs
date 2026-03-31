@@ -14,11 +14,11 @@ internal class DocumentViewModel : BaseViewModel {
 
     private bool _isChecked;
 
-    public DocumentViewModel(string name, bool isLink, bool isChecked = false) {
-        _name = name;
-        _isLink = isLink;
-        _documentType = isLink ? "Связь" : "Текущий",;
-        _isChecked = isChecked;
+    public DocumentViewModel(Document document) {
+        _document = document;
+        _name = document.Title;
+        _isLink = document.IsLinked;
+        _documentType = _isLink ? "Связь" : "Текущий";
     }
 
     public string Name => _name;
