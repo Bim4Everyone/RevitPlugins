@@ -1,4 +1,5 @@
 using System;
+using System.Diagnostics;
 using System.Drawing;
 using System.IO;
 
@@ -16,12 +17,31 @@ internal class ImageService {
         _doc = revitRepository.Document;
     }
 
+    /// <summary>
+    /// Открывает изображение по пути при помощи стандартного приложения
+    /// </summary>
+    public void OpenImage(string imagePath) {
+        if(!File.Exists(imagePath)) {
+            return;
+        }
+        Process.Start(new ProcessStartInfo {
+            FileName = imagePath,
+            UseShellExecute = true
+        });
+    }
+
+    /// <summary>
+    /// Удаляет изображение по указанному пути
+    /// </summary>
     public void Delete(string path) {
         if(File.Exists(path)) {
             File.Delete(path);
         }
     }
 
+    /// <summary>
+    /// Экспортирует вид из Revit в формате png, обрезает и подгоняет под нужны масштаб
+    /// </summary>
     public string Export(ExportOption exportOption) {
         exportOption.ThrowIfNull();
 

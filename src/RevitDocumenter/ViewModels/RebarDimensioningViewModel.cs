@@ -179,13 +179,6 @@ internal class RebarDimensioningViewModel : BaseViewModel {
             // темные пиксели (т.е. квадрат занят элементами на виде) или они все белые (квадрат свободен и на нем
             // можно размещать размер или другую аннотацию)
             mapInfo = _mapService.CreateMap(imagePath, exportOption);
-            // Если пользователь запросил изображения для проверки, то выгружаем его (до размещения размеров)
-            if(_createMarkedImage && mapInfo != null) {
-                _paintSquaresByMapService.MarkWhiteSquaresOnImage(mapInfo, "_marked");
-            } else {
-                // Если нет, то удаляем выгруженное проанализированное изображение
-                _imageService.Delete(imagePath);
-            }
         }
 
         // Получаем арматурные элементы на виде с учетом фильтрации по именам семейств, а также их опорные плоскости
@@ -197,10 +190,17 @@ internal class RebarDimensioningViewModel : BaseViewModel {
         // Создаем размеры по найденным арматурным элементам (от их опорных плоскостей до осей)
         _dimensionService.Create(rebars, _grids, _selectedDimensionType, mapInfo);
 
-        // Если пользователь запросил изображения для проверки, то выгружаем его (после размещения размеров)
+        // Если пользователь запросил изображение для проверки, то создаем его на основе карты (после размещения размеров)
         if(_placeDimensionsAccurately && _createMarkedImage && mapInfo != null) {
-            _paintSquaresByMapService.MarkWhiteSquaresOnImage(mapInfo, "_marked_after_dims");
+            string markedImagePath = _paintSquaresByMapService.MarkWhiteSquaresOnImage(mapInfo, "_marked_after_dims");
+            _imageService.OpenImage(markedImagePath);
         }
+
+        // Удаляем первоначальное выгруженное проанализированное изображение (без окраса), если его создавали
+        if(_placeDimensionsAccurately && mapInfo != null) {
+            _imageService.Delete(mapInfo.ImagePath);
+        }
+
         mainTransaction.Commit();
     }
 

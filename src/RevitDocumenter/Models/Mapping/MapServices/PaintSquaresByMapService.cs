@@ -5,6 +5,7 @@ internal class PaintSquaresByMapService {
     public string MarkWhiteSquaresOnImage(MapInfo mapInfo, string imageFileSuffix) {
         mapInfo.ThrowIfNull();
         imageFileSuffix.ThrowIfNullOrEmpty();
+        mapInfo.ImagePath.ThrowIfFileNotExist();
 
         using(var image = new Bitmap(mapInfo.ImagePath)) {
 

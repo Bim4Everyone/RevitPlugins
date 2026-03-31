@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Runtime.CompilerServices;
 
@@ -14,7 +15,7 @@ internal static class ValueGuard {
         [CallerArgumentExpression(nameof(obj))] string objName = null)
         where T : class {
         if(obj is null) {
-            throw new ArgumentException($"{objName} cannot be null", objName);
+            throw new ArgumentException($"{objName} cannot be null");
         }
         return obj;
     }
@@ -29,8 +30,7 @@ internal static class ValueGuard {
         where T : struct, IComparable<T> {
         if(value.CompareTo(minValue) < 0) {
             throw new ArgumentException(
-                $"{paramName} with value '{value}' cannot be less than '{minValue}'",
-                paramName);
+                $"{paramName} with value '{value}' cannot be less than '{minValue}'");
         }
         return value;
     }
@@ -45,8 +45,7 @@ internal static class ValueGuard {
         where T : struct, IComparable<T> {
         if(value.CompareTo(minValue) <= 0) {
             throw new ArgumentException(
-                $"{paramName} with value '{value}' must be greater than '{minValue}'",
-                paramName);
+                $"{paramName} with value '{value}' must be greater than '{minValue}'");
         }
         return value;
     }
@@ -60,7 +59,7 @@ internal static class ValueGuard {
         str.ThrowIfNull(objName);
 
         if(str.Length == 0) {
-            throw new ArgumentException($"{objName} cannot be empty", objName);
+            throw new ArgumentException($"{objName} cannot be empty");
         }
         return str;
     }
@@ -74,7 +73,7 @@ internal static class ValueGuard {
         collection.ThrowIfNull(collectionName);
 
         if(!collection.Any()) {
-            throw new ArgumentException($"{collectionName} cannot be empty collection", collectionName);
+            throw new ArgumentException($"{collectionName} cannot be empty collection");
         }
         return collection;
     }
@@ -98,8 +97,18 @@ internal static class ValueGuard {
             obj.ThrowIfNull(objName);
 
             if(obj is IEnumerable enumerable && !enumerable.Cast<object>().Any()) {
-                throw new ArgumentException($"{objName} cannot be empty collection", objName);
+                throw new ArgumentException($"{objName} cannot be empty collection");
             }
         }
+    }
+
+    /// <summary>
+    /// Проверяет есть ли файл по указанному пути
+    /// </summary>
+    internal static string ThrowIfFileNotExist(this string path) {
+        if(!File.Exists(path)) {
+            throw new ArgumentException($"The file does not exist at the path:{path}");
+        }
+        return path;
     }
 }
