@@ -99,7 +99,7 @@ internal class MainViewModel : BaseViewModel {
             .FilterElements(documents, FilterPageViewModel.FilterProvider);
 
         // sort elements
-        var sortedElements = sortElementService.SortElements();
+        //var sortedElements = sortElementService.SortElements();
 
         // create mark values
 
@@ -125,6 +125,11 @@ internal class MainViewModel : BaseViewModel {
     }
 
     private bool CanAcceptView() {
+        if(!DocumentsPageViewModel.Documents.Any(d => d.IsChecked)) {
+            ErrorText = "Не выбраны документы";
+            return false;
+        }
+
         ErrorText = null;
         return true;
     }

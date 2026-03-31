@@ -5,7 +5,7 @@ using Ninject.Syntax;
 
 using Wpf.Ui.Abstractions;
 
-namespace RevitMarkAllDocuments.Models;
+namespace RevitMarkAllDocuments.Services;
 
 internal sealed class NavigationViewPageProvider : INavigationViewPageProvider {
     private readonly IResolutionRoot _resolutionRoot;
