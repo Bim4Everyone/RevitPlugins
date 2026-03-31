@@ -21,8 +21,84 @@
     
     MinHeight="500"
     MinWidth="1000">
-    
+
+    <core:WpfUIPlatformWindow.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary
+                    Source="Styles/Styles.xaml" />
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
+    </core:WpfUIPlatformWindow.Resources>
+
     <Grid>
-        
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+
+        <ui:TitleBar
+            Grid.Row="0"
+            Title="{me:LocalizationSource MainWindow.Title}" />
+
+        <Border
+            Grid.Row="1"
+            Margin="14,4"
+            Style="{StaticResource CustomBorder}">
+            <ui:DataGrid
+                ItemsSource="{Binding Path=MarkedElements}"
+                Style="{StaticResource  CustomResizableDataGridStyle}">
+                <DataGrid.Columns>
+                    <DataGridTextColumn
+                        Width="500"
+                        Binding="{Binding Path=Name}"
+                        IsReadOnly="True">
+                        <DataGridTextColumn.Header>
+                            <TextBlock
+                                TextAlignment="Center"
+                                Text="{me:LocalizationSource MainWindow.HeaderName}" />
+                        </DataGridTextColumn.Header>
+                    </DataGridTextColumn>
+                    <DataGridTextColumn
+                        Binding="{Binding Path=Status}"
+                        SortMemberPath="OpenStatus.Order"
+                        IsReadOnly="True">
+                        <DataGridTextColumn.Header>
+                            <TextBlock
+                                TextAlignment="Center"
+                                Text="{me:LocalizationSource MainWindow.HeaderStatus}" />
+                        </DataGridTextColumn.Header>
+                    </DataGridTextColumn>
+                </DataGrid.Columns>
+            </ui:DataGrid>
+        </Border>
+
+        <StackPanel
+            Grid.Row="2"
+            Orientation="Horizontal"
+            HorizontalAlignment="Right">
+
+            <ui:TextBlock
+                Margin="10"
+                Foreground="Orange"
+                VerticalAlignment="Center"
+                Text="{Binding ErrorText}" />
+
+            <ui:Button
+                Margin="10"
+                Width="80"
+                Appearance="Info"
+                Content="{me:LocalizationSource MainWindow.ButtonOk}"
+                Click="ButtonOk_Click"
+                Command="{Binding MarkElementsCommand}" />
+
+            <ui:Button
+                Margin="10"
+                Width="80"
+                Content="{me:LocalizationSource MainWindow.ButtonCancel}"
+                IsCancel="True"
+                Click="ButtonCancel_Click" />
+        </StackPanel>
     </Grid>
 </core:WpfUIPlatformWindow>

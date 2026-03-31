@@ -26,6 +26,7 @@ public partial class MainWindow {
         _rootNavigationView.SetPageProviderService(navigationViewPageProvider);
 
         Dispatcher.BeginInvoke(DispatcherPriority.Loaded, () => {
+            _rootNavigationView.Navigate(typeof(FilterPage));
             _rootNavigationView.Navigate(typeof(DocumentsPage));
         });
     }

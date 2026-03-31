@@ -19,6 +19,7 @@ using dosymep.Xpf.Core.Ninject;
 using Ninject;
 
 using RevitMarkAllDocuments.Models;
+using RevitMarkAllDocuments.Services;
 using RevitMarkAllDocuments.ViewModels;
 using RevitMarkAllDocuments.Views;
 
@@ -68,6 +69,10 @@ public class RevitMarkAllDocumentsCommand : BasePluginCommand {
 
         kernel.Bind<INavigationViewPageProvider>()
             .To<NavigationViewPageProvider>()
+            .InSingletonScope();
+
+        kernel.Bind<MarkListWindowService>()
+            .ToSelf()
             .InSingletonScope();
 
         kernel.Bind<CategoryContext>()

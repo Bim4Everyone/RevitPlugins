@@ -19,6 +19,7 @@ namespace RevitMarkAllDocuments.ViewModels;
 internal class MainViewModel : BaseViewModel {
     private readonly PluginConfig _pluginConfig;
     private readonly RevitRepository _revitRepository;
+    private readonly MarkListWindowService _markListWindowService;
     private readonly ILogicalFilterProviderFactory _filterFactory;
     private readonly ILocalizationService _localizationService;
     private readonly Category _selectedCategory;
@@ -34,10 +35,12 @@ internal class MainViewModel : BaseViewModel {
     public MainViewModel(PluginConfig pluginConfig,
                          RevitRepository revitRepository,
                          CategoryContext categoryContext,
+                         MarkListWindowService markListWindowService,
                          ILogicalFilterProviderFactory filterFactory,
                          ILocalizationService localizationService) {        
         _pluginConfig = pluginConfig;
         _revitRepository = revitRepository;
+        _markListWindowService = markListWindowService;
         _filterFactory = filterFactory;
         _localizationService = localizationService;
 
@@ -89,12 +92,14 @@ internal class MainViewModel : BaseViewModel {
             .Select(d => d.Document)
             .ToArray();
 
+        var filterProvider = FilterPageViewModel.FilterProvider;
+
         // filter elements
         var allElements = filtrationService
             .FilterElements(documents, FilterPageViewModel.FilterProvider);
 
         // sort elements
-        var sortedElements = sortElementService.SortElements();
+        // var sortedElements = sortElementService.SortElements();
 
         bool linksSelected = DocumentsPageViewModel.Documents
             .Where(d => d.IsChecked)
@@ -108,8 +113,13 @@ internal class MainViewModel : BaseViewModel {
             .Where(d => d.IsChecked)
             .Any(d => !d.IsLink);
 
-        if(linksSelected) {
+        if(currentDocSelected) {
             //show elements list
+            var markedElements = allElements
+                .Select(x => new MarkedElementViewModel(x.Name))
+                .ToList();
+
+            _markListWindowService.ShowWindow(markedElements);
         }
 
         SaveConfig();
