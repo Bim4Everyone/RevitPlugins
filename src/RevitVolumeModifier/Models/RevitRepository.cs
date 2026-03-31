@@ -104,32 +104,27 @@ internal class RevitRepository {
 
     // Основной метод обработки
     private Task<bool> ExecuteOperationAsync(
-        ICollection<ElementId> elementIds,
-        IEnumerable<ParamModel> paramModels,
-        string transactionNameKey,
-        Func<List<Element>, OperationResult> operation) {
+    ICollection<ElementId> elementIds,
+    IEnumerable<ParamModel> paramModels,
+    string transactionNameKey,
+    Func<List<Element>, OperationResult> operation) {
 
-        var tcs = new TaskCompletionSource<bool>();
-
-        _handler.Raise(app => {
+        return _handler.RaiseAsync(app => {
             var doc = app.ActiveUIDocument.Document;
-            using var t = doc.StartTransaction(_localizationService.GetLocalizedString(transactionNameKey));
 
+            using var t = doc.StartTransaction(_localizationService.GetLocalizedString(transactionNameKey));
             try {
                 var elements = GetElements(doc, elementIds);
                 if(!elements.Any()) {
-                    tcs.SetResult(false);
-                    return;
+                    t.RollBack();
+                    return false;
                 }
 
                 var result = operation(elements);
-
                 if(result == null || !result.Items.Any()) {
                     t.RollBack();
-                    UIApplication.ActiveUIDocument.Selection
-                        .SetElementIds([.. elements.Select(e => e.Id)]);
-                    tcs.SetResult(false);
-                    return;
+                    UIApplication.ActiveUIDocument.Selection.SetElementIds([.. elements.Select(e => e.Id)]);
+                    return false;
                 }
 
                 foreach(var item in result.Items) {
@@ -137,15 +132,12 @@ internal class RevitRepository {
                     if(source == null) {
                         continue;
                     }
-
                     _paramSetter.SetParams(source, [item.Shape], paramModels);
                 }
 
                 List<ElementId> elementsToSelect;
-
                 if(result.ElementsToDelete.Any()) {
                     doc.Delete(result.ElementsToDelete);
-
                     elementsToSelect = result.Items
                         .Select(i => i.Shape.DirectShape.Id)
                         .ToList();
@@ -156,15 +148,12 @@ internal class RevitRepository {
                 UIApplication.ActiveUIDocument.Selection.SetElementIds(elementsToSelect);
 
                 t.Commit();
-                tcs.SetResult(result.Success);
+                return result.Success;
             } catch {
                 t.RollBack();
-                tcs.SetResult(false);
                 throw;
             }
         });
-
-        return tcs.Task;
     }
 
     // Метод объединения элементов

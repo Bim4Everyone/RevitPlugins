@@ -59,11 +59,11 @@ internal class MainViewModel : BaseViewModel {
 
         LoadViewCommand = RelayCommand.Create(LoadView);
         SaveConfigCommand = RelayCommand.Create(SaveConfig, CanSaveConfig);
-        JoinCommand = RelayCommand.Create(Join, CanExecute);
-        DivideBySelectHorizontalPointCommand = RelayCommand.Create(DivideBySelectHorizontalPoint, CanExecute);
-        DivideBySelectVerticalPointCommand = RelayCommand.Create(DivideBySelectVerticalPoint, CanExecute);
-        DivideBySelectFacesCommand = RelayCommand.Create(DivideBySelectFacesPoint, CanExecute);
-        CutCommand = RelayCommand.Create(Cut, CanExecute);
+        JoinCommand = RelayCommand.CreateAsync(Join, CanExecute);
+        DivideBySelectHorizontalPointCommand = RelayCommand.CreateAsync(DivideBySelectHorizontalPoint, CanExecute);
+        DivideBySelectVerticalPointCommand = RelayCommand.CreateAsync(DivideBySelectVerticalPoint, CanExecute);
+        DivideBySelectFacesCommand = RelayCommand.CreateAsync(DivideBySelectFacesPoint, CanExecute);
+        CutCommand = RelayCommand.CreateAsync(Cut, CanExecute);
     }
 
     public ICommand LoadViewCommand { get; }
@@ -193,7 +193,7 @@ internal class MainViewModel : BaseViewModel {
     }
 
     // Метод объединения объемов
-    private async void Join() {
+    private async Task Join() {
         ResetCommandState();
         var commandType = CommandType.Join;
         var parameters = ParamViewModels.Select(p => p.ParamModel);
@@ -202,43 +202,43 @@ internal class MainViewModel : BaseViewModel {
     }
 
     // Метод разделения объемов по горизонтальной точке
-    private async void DivideBySelectHorizontalPoint() {
+    private async Task DivideBySelectHorizontalPoint() {
         await ExecuteCommandAsync(
         CommandType.DivideByHorPoint,
         "MainViewModel.PickPointOnElementPromt",
         _revitPickService.PickPointOnElementAsync,
         reference => _revitRepository.DivideByHorizontalPointAsync(ElementIds, reference, ParamViewModels.Select(p => p.ParamModel))
-    );
+        );
     }
 
     // Метод разделения объемов по вертикальной точке
-    private async void DivideBySelectVerticalPoint() {
+    private async Task DivideBySelectVerticalPoint() {
         await ExecuteCommandAsync(
         CommandType.DivideByVertPoint,
         "MainViewModel.PickPointOnElementPromt",
         _revitPickService.PickPointOnElementAsync,
         reference => _revitRepository.DivideByVerticalPointAsync(ElementIds, reference, ParamViewModels.Select(p => p.ParamModel))
-    );
+        );
     }
 
     // Метод разделения объемов по граням
-    private async void DivideBySelectFacesPoint() {
+    private async Task DivideBySelectFacesPoint() {
         await ExecuteCommandAsync(
         CommandType.DivideByFaces,
         "MainViewModel.PickFacesPromt",
         _revitPickService.PickFacesMultipleOnElementAsync,
         faces => _revitRepository.DivideByFacesAsync(ElementIds, faces, ParamViewModels.Select(p => p.ParamModel))
-    );
+        );
     }
 
     // Метод вырезания объемов
-    private async void Cut() {
+    private async Task Cut() {
         await ExecuteCommandAsync(
         CommandType.Cut,
         "MainViewModel.CutPromt",
         _revitPickService.PickGenericModelsAsync,
         elements => _revitRepository.CutAsync(ElementIds, elements, ParamViewModels.Select(p => p.ParamModel))
-    );
+        );
     }
 
     // Универсальный метод для разделения и вырезания

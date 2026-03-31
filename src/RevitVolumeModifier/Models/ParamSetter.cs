@@ -22,10 +22,8 @@ internal class ParamSetter {
         foreach(var paramModel in paramModels) {
             if(paramModel.ParamType == ParamType.VolumeParam) {
                 SetVolumeParam(directShapeObject, paramModel);
-            } else if(paramModel.ParamType == ParamType.FloorDEParam) {
-                SetDoubleParam(element, directShapeObject, paramModel);
             } else {
-                SetStringParam(element, directShapeObject, paramModel);
+                SetParam(element, directShapeObject, paramModel);
             }
         }
     }
@@ -37,14 +35,12 @@ internal class ParamSetter {
     }
 
     // Метод назначения числового параметра DirectShapeObject
-    private void SetDoubleParam(Element element, DirectShapeObject directShapeObject, ParamModel paramModel) {
-        double value = element.GetParamValueOrDefault<double>(paramModel.RevitParam);
-        directShapeObject.DirectShape.SetParamValue(paramModel.RevitParam, value);
-    }
-
-    // Метод назначения текстового параметра DirectShapeObject
-    private void SetStringParam(Element element, DirectShapeObject directShapeObject, ParamModel paramModel) {
-        string value = element.GetParamValueOrDefault<string>(paramModel.RevitParam);
-        directShapeObject.DirectShape.SetParamValue(paramModel.RevitParam, value);
+    private void SetParam(Element element, DirectShapeObject directShapeObject, ParamModel paramModel) {
+        var elementParam = element.GetParam(paramModel.RevitParam);
+        var directShapeParam = directShapeObject.DirectShape.GetParam(paramModel.RevitParam);
+        if(elementParam == null || directShapeParam == null || directShapeParam.IsReadOnly) {
+            return;
+        }
+        directShapeParam.Set(elementParam);
     }
 }
