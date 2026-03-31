@@ -1,0 +1,19 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+using dosymep.WPF.ViewModels;
+
+namespace RevitMarkAllDocuments.ViewModels;
+
+internal class MarkedElementViewModel : BaseViewModel{
+    private readonly string _name;
+
+    public MarkedElementViewModel(string name) {
+        _name = name;
+    }
+
+    public string Name => _name;
+}
