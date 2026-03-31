@@ -7,6 +7,8 @@ using System.Windows;
 using Autodesk.Revit.DB;
 using Autodesk.Revit.UI.Selection;
 
+using dosymep.SimpleServices;
+
 using RevitVolumeModifier.Handler;
 using RevitVolumeModifier.Models;
 
@@ -16,10 +18,12 @@ namespace RevitVolumeModifier.Services;
 /// Сервис безопасного выбора объектов/точек в Revit из немодального окна
 /// </summary>
 internal class RevitPickService {
+    private readonly ILocalizationService _localizationService;
     private readonly ExternalRevitHandler _handler;
     private readonly Window _mainWindow;
 
-    public RevitPickService(ExternalRevitHandler handler, Window mainWindow) {
+    public RevitPickService(ILocalizationService localizationService, ExternalRevitHandler handler, Window mainWindow) {
+        _localizationService = localizationService;
         _handler = handler ?? throw new ArgumentNullException(nameof(handler));
         _mainWindow = mainWindow ?? throw new ArgumentNullException(nameof(mainWindow));
     }
@@ -35,7 +39,8 @@ internal class RevitPickService {
                 try {
                     return uidoc.Selection.PickObject(ObjectType.PointOnElement, prompt);
                 } catch(Autodesk.Revit.Exceptions.OperationCanceledException) {
-                    return null;
+                    throw new OperationCanceledException(
+                        _localizationService.GetLocalizedString("RevitPickService.CancelledSelectionPoint"));
                 }
             });
         } finally {
@@ -59,7 +64,8 @@ internal class RevitPickService {
 
                     return faces;
                 } catch(Autodesk.Revit.Exceptions.OperationCanceledException) {
-                    return null;
+                    throw new OperationCanceledException(
+                        _localizationService.GetLocalizedString("RevitPickService.CancelledSelectionFaces"));
                 }
             });
         } finally {
@@ -83,7 +89,8 @@ internal class RevitPickService {
 
                     return refs.Select(x => x.ElementId).ToList();
                 } catch(Autodesk.Revit.Exceptions.OperationCanceledException) {
-                    return null;
+                    throw new OperationCanceledException(
+                        _localizationService.GetLocalizedString("RevitPickService.CancelledSelectionElements"));
                 }
             });
         } finally {

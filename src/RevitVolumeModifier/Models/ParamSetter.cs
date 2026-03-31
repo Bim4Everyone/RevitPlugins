@@ -36,11 +36,15 @@ internal class ParamSetter {
 
     // Метод назначения числового параметра DirectShapeObject
     private void SetParam(Element element, DirectShapeObject directShapeObject, ParamModel paramModel) {
-        var elementParam = element.GetParam(paramModel.RevitParam);
-        var directShapeParam = directShapeObject.DirectShape.GetParam(paramModel.RevitParam);
-        if(elementParam == null || directShapeParam == null || directShapeParam.IsReadOnly) {
+        try {
+            var elementParam = element.GetParam(paramModel.RevitParam);
+            var directShapeParam = directShapeObject.DirectShape.GetParam(paramModel.RevitParam);
+            if(elementParam == null || directShapeParam == null || directShapeParam.IsReadOnly) {
+                return;
+            }
+            directShapeParam.Set(elementParam);
+        } catch {
             return;
         }
-        directShapeParam.Set(elementParam);
     }
 }

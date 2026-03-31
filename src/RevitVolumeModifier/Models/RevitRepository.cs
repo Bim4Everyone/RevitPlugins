@@ -102,6 +102,13 @@ internal class RevitRepository {
             ProcessCut(elements, elementIdsToCut));
     }
 
+    /// <summary>
+    /// Метод выбора элементов 
+    /// </summary>
+    public void SetElement(ICollection<ElementId> elementIds) {
+        UIApplication.ActiveUIDocument.Selection.SetElementIds(elementIds);
+    }
+
     // Основной метод обработки
     private Task<bool> ExecuteOperationAsync(
     ICollection<ElementId> elementIds,
@@ -111,6 +118,7 @@ internal class RevitRepository {
 
         return _handler.RaiseAsync(app => {
             var doc = app.ActiveUIDocument.Document;
+            var uidoc = app.ActiveUIDocument;
 
             using var t = doc.StartTransaction(_localizationService.GetLocalizedString(transactionNameKey));
             try {
@@ -123,7 +131,7 @@ internal class RevitRepository {
                 var result = operation(elements);
                 if(result == null || !result.Items.Any()) {
                     t.RollBack();
-                    UIApplication.ActiveUIDocument.Selection.SetElementIds([.. elements.Select(e => e.Id)]);
+                    uidoc.Selection.SetElementIds([.. elements.Select(e => e.Id)]);
                     return false;
                 }
 
@@ -145,7 +153,7 @@ internal class RevitRepository {
                     elementsToSelect = elements.Select(e => e.Id).ToList();
                 }
 
-                UIApplication.ActiveUIDocument.Selection.SetElementIds(elementsToSelect);
+                uidoc.Selection.SetElementIds(elementsToSelect);
 
                 t.Commit();
                 return result.Success;

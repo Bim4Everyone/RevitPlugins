@@ -55,5 +55,8 @@
 
     <system:String x:Key="RevitRepository.TransactionNameJoin">Объединение объемов СМР</system:String>
     <system:String x:Key="RevitRepository.TransactionNameDivide">Разделение объемов СМР</system:String>
-    <system:String x:Key="RevitRepository.TransactionNameCut">Вырезание объемов СМР</system:String>      
+    <system:String x:Key="RevitRepository.TransactionNameCut">Вырезание объемов СМР</system:String>
+    <system:String x:Key="RevitPickService.CancelledSelectionPoint">Выбор точек отменен</system:String>      
+    <system:String x:Key="RevitPickService.CancelledSelectionFaces">Выбор граней отменен</system:String>      
+    <system:String x:Key="RevitPickService.CancelledSelectionElements">Выбор элементов вырезания отменен</system:String>      
 </ResourceDictionary>

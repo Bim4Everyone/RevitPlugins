@@ -7,6 +7,7 @@ using Autodesk.Revit.UI;
 using dosymep.Bim4Everyone;
 using dosymep.Bim4Everyone.ProjectConfigs;
 using dosymep.Bim4Everyone.SimpleServices;
+using dosymep.SimpleServices;
 using dosymep.WpfCore.Ninject;
 using dosymep.WpfUI.Core.Ninject;
 
@@ -74,7 +75,10 @@ public class RevitVolumeModifierCommand : BasePluginCommand {
 
         // Настройка доступа к RevitPickService
         kernel.Bind<RevitPickService>()
-            .ToMethod(c => new RevitPickService(c.Kernel.Get<ExternalRevitHandler>(), c.Kernel.Get<MainWindow>()))
+            .ToMethod(c => new RevitPickService(
+                c.Kernel.Get<ILocalizationService>(),
+                c.Kernel.Get<ExternalRevitHandler>(),
+                c.Kernel.Get<MainWindow>()))
             .InSingletonScope();
 
         // Настройка доступа к сервису проверки параметров

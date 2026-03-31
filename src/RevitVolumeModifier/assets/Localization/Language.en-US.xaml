@@ -56,4 +56,7 @@
     <system:String x:Key="RevitRepository.TransactionNameJoin">Join SMR volumes</system:String>
     <system:String x:Key="RevitRepository.TransactionNameDivide">Divide SMR volumes</system:String>
     <system:String x:Key="RevitRepository.TransactionNameCut">Cut SMR volumes</system:String>
+    <system:String x:Key="RevitPickService.CancelledSelectionPoint">Points selection cancelled</system:String>
+    <system:String x:Key="RevitPickService.CancelledSelectionFaces">Faces selection cancelled</system:String>
+    <system:String x:Key="RevitPickService.CancelledSelectionElements">Cutting elements selection cancelled</system:String>
 </ResourceDictionary>

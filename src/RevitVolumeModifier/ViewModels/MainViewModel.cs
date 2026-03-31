@@ -250,13 +250,15 @@ internal class MainViewModel : BaseViewModel {
         ResetCommandState();
         var parameters = ParamViewModels.Select(p => p.ParamModel);
         string prompt = _localizationService.GetLocalizedString(promptKey);
-        var pickResult = await pickFunc(prompt);
-        if(pickResult == null) {
-            UpdateCommandStateFailed(commandType);
+        try {
+            var pickResult = await pickFunc(prompt);
+            bool result = await executeFunc(pickResult);
+            UpdateCommandState(result, commandType);
+        } catch(OperationCanceledException ex) {
+            _revitRepository.SetElement(ElementIds);
+            UpdateCommandStateFailed(commandType, ex.Message);
             return;
         }
-        bool result = await executeFunc(pickResult);
-        UpdateCommandState(result, commandType);
     }
 
     // Метод проверки выполнения всех методов
@@ -294,9 +296,11 @@ internal class MainViewModel : BaseViewModel {
     // Метод обновления CommandState в зависимости от результата
     private void UpdateCommandState(bool result, CommandType commandType) {
         if(result) {
-            UpdateCommandStateSuccess(commandType);
+            string successText = _localizationService.GetLocalizedString("MainViewModel.SuccessCommand");
+            UpdateCommandStateSuccess(commandType, successText);
         } else {
-            UpdateCommandStateFailed(commandType);
+            string hasWarningText = _localizationService.GetLocalizedString("MainViewModel.FailedCommand");
+            UpdateCommandStateFailed(commandType, hasWarningText);
         }
     }
 
@@ -308,17 +312,17 @@ internal class MainViewModel : BaseViewModel {
     }
 
     // Метод обновления CommandState при положительном результате
-    private void UpdateCommandStateSuccess(CommandType commandType) {
+    private void UpdateCommandStateSuccess(CommandType commandType, string text) {
         CommandState.CommandStatus = CommandStatus.Success;
         CommandState.CommandType = commandType;
-        CommandState.CommandText = _localizationService.GetLocalizedString("MainViewModel.SuccessCommand");
+        CommandState.CommandText = text;
     }
 
     // Метод обновления CommandState при отрицательном результате
-    private void UpdateCommandStateFailed(CommandType commandType) {
+    private void UpdateCommandStateFailed(CommandType commandType, string text) {
         CommandState.CommandStatus = CommandStatus.Failed;
         CommandState.CommandType = commandType;
-        CommandState.CommandText = _localizationService.GetLocalizedString("MainViewModel.FailedCommand");
+        CommandState.CommandText = text;
     }
 
     // Метод загрузки конфигурации
