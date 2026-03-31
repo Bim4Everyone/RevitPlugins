@@ -68,9 +68,9 @@ internal class ImageService {
         pixelSize.ThrowIfLessOrEqualThan();
 
         try {
-            string desktopPath = Environment.GetFolderPath(Environment.SpecialFolder.Desktop) + "\\";
+            string tempPath = Path.GetTempPath() + "\\";
             var options = new ImageExportOptions {
-                FilePath = desktopPath,
+                FilePath = tempPath,
                 PixelSize = pixelSize,
                 FitDirection = FitDirectionType.Horizontal,
                 ImageResolution = ImageResolution.DPI_600,
@@ -81,7 +81,7 @@ internal class ImageService {
             options.SetViewsAndSheets([view.Id]);
             _doc.ExportImage(options);
 
-            return desktopPath + ImageExportOptions.GetFileName(_doc, view.Id) + ".png";
+            return tempPath + ImageExportOptions.GetFileName(_doc, view.Id) + ".png";
         } catch(Exception) {
             return string.Empty;
         }
@@ -89,6 +89,7 @@ internal class ImageService {
 
     private string CropImageByColorPixels(string imagePath, Color colorForFind) {
         imagePath.ThrowIfNullOrEmpty();
+        imagePath.ThrowIfFileNotExist();
         colorForFind.ThrowIfNull();
 
         // Загружаем изображение
@@ -166,6 +167,7 @@ internal class ImageService {
 
     private string ScaledImageByPixels(string imagePath, int targetWidth, int targetHeight) {
         imagePath.ThrowIfNullOrEmpty();
+        imagePath.ThrowIfFileNotExist();
         targetWidth.ThrowIfLessOrEqualThan();
         targetHeight.ThrowIfLessOrEqualThan();
 

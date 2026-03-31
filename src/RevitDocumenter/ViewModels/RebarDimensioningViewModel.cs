@@ -192,7 +192,9 @@ internal class RebarDimensioningViewModel : BaseViewModel {
 
         // Если пользователь запросил изображение для проверки, то создаем его на основе карты (после размещения размеров)
         if(_placeDimensionsAccurately && _createMarkedImage && mapInfo != null) {
-            string markedImagePath = _paintSquaresByMapService.MarkWhiteSquaresOnImage(mapInfo, "_marked_after_dims");
+            // Указываем имя, под которым будет сохранено изображение для демонстрации свободных зон на виде
+            string markedImageForDemoName = "Marked";
+            string markedImagePath = _paintSquaresByMapService.MarkWhiteSquaresOnImage(mapInfo, markedImageForDemoName);
             _imageService.OpenImage(markedImagePath);
         }
 

@@ -1,13 +1,15 @@
 using System.Drawing;
+using System.IO;
 
 namespace RevitDocumenter.Models.Mapping.MapServices;
 internal class PaintSquaresByMapService {
-    public string MarkWhiteSquaresOnImage(MapInfo mapInfo, string imageFileSuffix) {
+    public string MarkWhiteSquaresOnImage(MapInfo mapInfo, string newImageName) {
         mapInfo.ThrowIfNull();
-        imageFileSuffix.ThrowIfNullOrEmpty();
+        newImageName.ThrowIfNullOrEmpty();
         mapInfo.ImagePath.ThrowIfFileNotExist();
 
-        using(var image = new Bitmap(mapInfo.ImagePath)) {
+        string oldImagePath = mapInfo.ImagePath;
+        using(var image = new Bitmap(oldImagePath)) {
 
             using(var graphics = Graphics.FromImage(image)) {
                 // Настраиваем качество отрисовки
@@ -40,7 +42,12 @@ internal class PaintSquaresByMapService {
                     }
                 }
             }
-            string newImagePath = mapInfo.ImagePath.Replace(".png", $"{imageFileSuffix}.png");
+
+            // Формируем новый путь с новым именем, но старым расширением
+            string newImagePath = Path.Combine(
+                Path.GetDirectoryName(oldImagePath),
+                newImageName + Path.GetExtension(oldImagePath));
+
             image.Save(newImagePath, System.Drawing.Imaging.ImageFormat.Png);
             return newImagePath;
         }
