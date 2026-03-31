@@ -99,13 +99,9 @@ internal class MainViewModel : BaseViewModel {
             .FilterElements(documents, FilterPageViewModel.FilterProvider);
 
         // sort elements
-        // var sortedElements = sortElementService.SortElements();
+        var sortedElements = sortElementService.SortElements();
 
-
-        var markedElements = allElements
-            .Select(x => new MarkedElement(x))
-            .ToList();
-
+        // create mark values
 
         bool linksSelected = DocumentsPageViewModel.Documents
             .Where(d => d.IsChecked)
@@ -122,7 +118,7 @@ internal class MainViewModel : BaseViewModel {
         if(currentDocSelected) {
             //show elements list
 
-            _markListWindowService.ShowWindow(_revitRepository.Document, markedElements);
+            _markListWindowService.ShowWindow(_revitRepository.Document, allElements);
         }
 
         SaveConfig();
@@ -135,7 +131,6 @@ internal class MainViewModel : BaseViewModel {
 
     private void LoadConfig() {
         RevitSettings setting = _pluginConfig.GetSettings(_revitRepository.Document);
-
     }
 
     private void SaveConfig() {
