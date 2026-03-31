@@ -81,12 +81,13 @@
     <system:String x:Key="ParametersPage.ComRoomAreaGroupParam">8.1 Для группы из нескольких помещений:</system:String>
     <system:String x:Key="ParametersPage.ComRoomAreaParam">8.2 Для одного помещения:</system:String>
     <system:String x:Key="ParametersPage.ComRoomHeight">9. Высота потолков:</system:String>
-    <system:String x:Key="ParametersPage.ComRoomCar">10. Класс машино-места:</system:String>
-    <system:String x:Key="ParametersPage.ComRoomUse">11. Применимость:</system:String>
-    <system:String x:Key="ParametersPage.ComRoomName">12. Наименование помещения</system:String>
-    <system:String x:Key="ParametersPage.ComRoomGroupNameParam">12.1 Для группы из нескольких помещений:</system:String>
-    <system:String x:Key="ParametersPage.ComRoomNameParam">12.2 Для одного помещения:</system:String>
-    <system:String x:Key="ParametersPage.ComRoomProjectName">13. ИД Объекта:</system:String>
+    <system:String x:Key="ParametersPage.ComPositionType">10. Тип расположения:</system:String>
+    <system:String x:Key="ParametersPage.ComRoomCar">11. Класс машино-места:</system:String>
+    <system:String x:Key="ParametersPage.ComRoomUse">12. Применимость:</system:String>
+    <system:String x:Key="ParametersPage.ComRoomName">13. Наименование помещения</system:String>
+    <system:String x:Key="ParametersPage.ComRoomGroupNameParam">13.1 Для группы из нескольких помещений:</system:String>
+    <system:String x:Key="ParametersPage.ComRoomNameParam">13.2 Для одного помещения:</system:String>
+    <system:String x:Key="ParametersPage.ComRoomProjectName">14. ИД Объекта:</system:String>
     <system:String x:Key="ParametersPage.PublicAreaFilterParam">Параметр для фильтрации помещений МОП:</system:String>
     <system:String x:Key="ParametersPage.PublicAreaParam">Параметр группировки МОП:</system:String>
     <system:String x:Key="ParametersPage.PublicAreaGroupParams">Параметр группировки внутри групп МОП:</system:String>
@@ -221,6 +222,7 @@
     <system:String x:Key="ToolTip.ConstrWorkNumberParamToolTip">Текстовый параметр, значение которого выводится в столбец декларации "Номер ОКС"</system:String>
     <system:String x:Key="ToolTip.ApartNumParamToolTip">Текстовый параметр, значение которого выводится в столбец декларации "Номер на площадке"</system:String>
     <system:String x:Key="ToolTip.RoomsHeightParamToolTip">Числовой параметр, значение которого выводится в столбец декларации "Высота потолков"</system:String>
+    <system:String x:Key="ToolTip.PositionTypeToolTip">Текстовый параметр, значение которого выводится в столбец декларации "Тип расположения".</system:String>
     <system:String x:Key="ToolTip.ProjectNameToolTip">Значение, которое выводится в столбец декларации "ИД Объекта"</system:String>
     <system:String x:Key="ToolTip.ApartAreaParamToolTip">Числовой параметр, значение которого выводится в столбец декларации "Общая площадь без пониж. коэффициента"</system:String>
     <system:String x:Key="ToolTip.ApartAreaCoefParamToolTip">Числовой параметр, значение которого выводится в столбец декларации "Общая площадь с пониж. коэффициентом"</system:String>

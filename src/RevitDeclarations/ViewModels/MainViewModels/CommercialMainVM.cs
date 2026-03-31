@@ -110,6 +110,7 @@ internal class CommercialMainVM : MainViewModel {
         configSettings.GroupNameParam = settings.GroupNameParam?.Definition.Name;
         configSettings.ParkingSpaceClass = settings.ParkingSpaceClass?.Definition.Name;
         configSettings.ParkingInfo = settings.ParkingInfo?.Definition.Name;
+        configSettings.PositionType = settings.PositionType?.Definition.Name;
         configSettings.AddPrefixToNumber = settings.AddPrefixToNumber;
         if(settings.AddPrefixToNumber) {
             configSettings.RoomNumberParam = settings.RoomNumberParam?.Definition.Name;
@@ -139,6 +140,7 @@ internal class CommercialMainVM : MainViewModel {
         _settings.RoomsHeightParam = commercialParamsVM.SelectedRoomsHeightParam;
         _settings.ParkingSpaceClass = commercialParamsVM.SelectedParkingSpaceClass;
         _settings.ParkingInfo = commercialParamsVM.SelectedParkingInfo;
+        _settings.PositionType = commercialParamsVM.SelectedPositionType;
         _settings.GroupNameParam = commercialParamsVM.SelectedGroupNameParam;
         _settings.AddPrefixToNumber = commercialParamsVM.AddPrefixToNumber;
     }
