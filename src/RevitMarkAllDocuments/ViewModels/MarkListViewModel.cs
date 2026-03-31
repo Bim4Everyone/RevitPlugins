@@ -6,15 +6,23 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Input;
 
+using Autodesk.Revit.DB;
+
 using dosymep.WPF.Commands;
 using dosymep.WPF.ViewModels;
+
+using RevitMarkAllDocuments.Models;
 
 namespace RevitMarkAllDocuments.ViewModels;
 
 internal class MarkListViewModel : BaseViewModel {
     private ObservableCollection<MarkedElementViewModel> _markedElements;
 
-    public MarkListViewModel() {
+    public MarkListViewModel(Document document, IList<MarkedElement> elements) {
+        _markedElements = [..elements
+            .Select(x => new MarkedElementViewModel(x, document))
+            .ToList()];
+
         MarkElementsCommand = RelayCommand.Create(MarkElements);
     }
 

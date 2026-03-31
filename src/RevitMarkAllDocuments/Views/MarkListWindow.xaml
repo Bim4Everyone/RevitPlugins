@@ -51,8 +51,8 @@
                 Style="{StaticResource  CustomResizableDataGridStyle}">
                 <DataGrid.Columns>
                     <DataGridTextColumn
-                        Width="500"
-                        Binding="{Binding Path=Name}"
+                        Width="150"
+                        Binding="{Binding Path=Id}"
                         IsReadOnly="True">
                         <DataGridTextColumn.Header>
                             <TextBlock
@@ -61,8 +61,28 @@
                         </DataGridTextColumn.Header>
                     </DataGridTextColumn>
                     <DataGridTextColumn
+                        Width="250"
+                        Binding="{Binding Path=Name}"
+                        IsReadOnly="True">
+                        <DataGridTextColumn.Header>
+                            <TextBlock
+                                TextAlignment="Center"
+                                Text="{me:LocalizationSource MainWindow.HeaderStatus}" />
+                        </DataGridTextColumn.Header>
+                    </DataGridTextColumn>
+                    <DataGridTextColumn
+                        Width="150"
+                        Binding="{Binding Path=MarkValue}"
+                        IsReadOnly="True">
+                        <DataGridTextColumn.Header>
+                            <TextBlock
+                                TextAlignment="Center"
+                                Text="{me:LocalizationSource MainWindow.HeaderStatus}" />
+                        </DataGridTextColumn.Header>
+                    </DataGridTextColumn>
+                    <DataGridTextColumn
+                        Width="300"
                         Binding="{Binding Path=Status}"
-                        SortMemberPath="OpenStatus.Order"
                         IsReadOnly="True">
                         <DataGridTextColumn.Header>
                             <TextBlock

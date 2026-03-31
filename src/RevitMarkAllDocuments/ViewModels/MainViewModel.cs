@@ -101,6 +101,12 @@ internal class MainViewModel : BaseViewModel {
         // sort elements
         // var sortedElements = sortElementService.SortElements();
 
+
+        var markedElements = allElements
+            .Select(x => new MarkedElement(x))
+            .ToList();
+
+
         bool linksSelected = DocumentsPageViewModel.Documents
             .Where(d => d.IsChecked)
             .Any(d => d.IsLink);
@@ -115,11 +121,8 @@ internal class MainViewModel : BaseViewModel {
 
         if(currentDocSelected) {
             //show elements list
-            var markedElements = allElements
-                .Select(x => new MarkedElementViewModel(x.Name))
-                .ToList();
 
-            _markListWindowService.ShowWindow(markedElements);
+            _markListWindowService.ShowWindow(_revitRepository.Document, markedElements);
         }
 
         SaveConfig();
