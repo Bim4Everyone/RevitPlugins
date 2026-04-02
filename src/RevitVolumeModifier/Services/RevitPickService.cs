@@ -58,7 +58,7 @@ internal class RevitPickService {
                 var uidoc = uiApp.ActiveUIDocument;
                 try {
                     var faces = uidoc.Selection.PickObjects(
-                        ObjectType.Face,
+                        ObjectType.PointOnElement,
                         new FaceSelectionFilter(),
                         prompt);
 
