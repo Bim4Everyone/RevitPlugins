@@ -341,27 +341,41 @@ internal class MainViewModel : BaseViewModel {
         using var t = _revitRepository.Document.StartTransaction(transactionName);
 
         var tempDoc = new TempFamilyDocument(_localizationService, _revitRepository, _familyLoadOptions);
+        var instancesAssembly = new InstancesAssembly(_localizationService, _revitRepository);
+
         string familyTemplatePath = _familyPathFinder.GetFamilyTemplatePath();
+
         var albums = SelectedSheets.GroupBy(sheet => sheet.AlbumName);
         int counter = 0;
         foreach(var album in albums) {
             string albumName = PathCharValidator.LegalizeString(album.Key);
             var viewDrafting = _revitRepository.GetViewDrafting(albumName);
             var famSymbol = tempDoc.GetFamilySymbol(familyTemplatePath, albumName);
-            var instancesAssembly = new InstancesAssembly(_localizationService, _revitRepository, viewDrafting, famSymbol, albumName);
 
-            instancesAssembly.DeleteFamilyInstances();
+            instancesAssembly.DeleteFamilyInstances(viewDrafting);
 
             if(_isScheduleToSheetChecked) {
                 var firstSheet = album.First();
-                instancesAssembly.PlaceFamilyInstance(firstSheet.Number, GetRevisionNumber(firstSheet), ParamFactory.ScheduleName);
+                instancesAssembly.PlaceFamilyInstance(
+                    firstSheet.Number,
+                    GetRevisionNumber(firstSheet),
+                    ParamFactory.ScheduleName,
+                    famSymbol,
+                    viewDrafting,
+                    albumName);
             }
             foreach(var sheet in album) {
                 ct.ThrowIfCancellationRequested();
                 progress.Report(counter++);
                 var schedules = _revitRepository.GetScheduleInstances(GetDocument(sheet), sheet.ViewSheet);
                 if(schedules != null) {
-                    instancesAssembly.PlaceFamilyInstances(sheet.Number, GetRevisionNumber(sheet), schedules);
+                    instancesAssembly.PlaceFamilyInstances(
+                        sheet.Number,
+                        GetRevisionNumber(sheet),
+                        schedules,
+                        famSymbol,
+                        viewDrafting,
+                        albumName);
                 }
             }
             if(_isCreateScheduleChecked) {
