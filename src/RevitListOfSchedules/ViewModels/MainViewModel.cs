@@ -25,6 +25,7 @@ internal class MainViewModel : BaseViewModel {
     private readonly ILocalizationService _localizationService;
     private readonly FamilyLoadOptions _familyLoadOptions;
     private readonly ParamFactory _paramFactory;
+    private readonly FamilyPathFinder _familyPathFinder;
     private string _errorText;
     private string _errorLinkText;
     private ObservableCollection<LinkViewModel> _links;
@@ -43,6 +44,7 @@ internal class MainViewModel : BaseViewModel {
         ILocalizationService localizationService,
         FamilyLoadOptions familyLoadOptions,
         ParamFactory paramFactory,
+        FamilyPathFinder familyPathFinder,
         IMessageBoxService messageBoxService) {
 
         _pluginConfig = pluginConfig;
@@ -50,6 +52,7 @@ internal class MainViewModel : BaseViewModel {
         _localizationService = localizationService;
         _familyLoadOptions = familyLoadOptions;
         _paramFactory = paramFactory;
+        _familyPathFinder = familyPathFinder;
         MessageBoxService = messageBoxService;
 
         LoadViewCommand = RelayCommand.Create(LoadView);
@@ -337,13 +340,14 @@ internal class MainViewModel : BaseViewModel {
         string transactionName = _localizationService.GetLocalizedString("MainViewModel.TransactionName");
         using var t = _revitRepository.Document.StartTransaction(transactionName);
 
+        var tempDoc = new TempFamilyDocument(_localizationService, _revitRepository, _familyLoadOptions);
+        string familyTemplatePath = _familyPathFinder.GetFamilyTemplatePath();
         var albums = SelectedSheets.GroupBy(sheet => sheet.AlbumName);
         int counter = 0;
         foreach(var album in albums) {
             string albumName = PathCharValidator.LegalizeString(album.Key);
             var viewDrafting = _revitRepository.GetViewDrafting(albumName);
-            var tempDoc = new TempFamilyDocument(_localizationService, _revitRepository, _familyLoadOptions, albumName);
-            var famSymbol = tempDoc.GetFamilySymbol();
+            var famSymbol = tempDoc.GetFamilySymbol(familyTemplatePath, albumName);
             var instancesAssembly = new InstancesAssembly(_localizationService, _revitRepository, viewDrafting, famSymbol, albumName);
 
             instancesAssembly.DeleteFamilyInstances();
