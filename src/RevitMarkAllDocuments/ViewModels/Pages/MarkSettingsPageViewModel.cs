@@ -63,4 +63,12 @@ internal class MarkSettingsPageViewModel : BaseViewModel {
         get => _isSuffixEnable;
         set => RaiseAndSetIfChanged(ref _isSuffixEnable, value);
     }
+
+    public MarkStartValue GetStartValue() {
+        return new MarkStartValue() {
+            Prefix = Prefix,
+            StartValue = StartNumber,
+            Suffix = Suffix
+        };
+    }
 }
