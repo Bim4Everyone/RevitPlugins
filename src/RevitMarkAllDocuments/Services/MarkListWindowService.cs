@@ -19,9 +19,9 @@ internal class MarkListWindowService {
         _resolutionRoot = resolutionRoot;
     }
 
-    public bool ShowWindow(Document document, IList<MarkedElement> markedElements) {
+    public bool ShowWindow(Document document, MarkDataByDocument markDataByDocument) {
         var window = _resolutionRoot.Get<MarkListWindow>();
-        window.DataContext = new MarkListViewModel(document, markedElements);
+        window.DataContext = new MarkListViewModel(document, markDataByDocument);
 
         window.ShowDialog();
         if((bool) window.DialogResult) {

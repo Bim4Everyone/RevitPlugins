@@ -19,33 +19,29 @@ internal class FiltrationService {
         _filterOptions = new FilterOptions() { Tolerance = 0 };
     }
 
-    public IList<MarkedElement> FilterElements(Document[] documents, 
-                                         ILogicalFilterProvider filterProvider) {
-        var allElements = new List<MarkedElement>();
+    public MarkData FilterElements(Document[] documents, ILogicalFilterProvider filterProvider) {
+        var markData = new MarkData();
+
+        var docService = new DocumentService();
 
         foreach(var document in documents) {
+            var marksByDocument = new MarkDataByDocument() {
+                DocumentName = docService.GetDocumentFullName(document)
+            };
+
             var filter = filterProvider.GetFilter();
 
-            string documentName = GetCentralServerPath(document);
-
-            var elements = new FilteredElementCollector(document)
+            marksByDocument.Elements = new FilteredElementCollector(document)
                 .OfCategory(BuiltInCategory.OST_Walls)
+                .WhereElementIsNotElementType()
                 .WherePasses(filter.GetFilter().Build(document, _filterOptions))
                 .ToElements()
-                .Select(x => new MarkedElement(x, documentName));
+                .Select(x => new MarkedElement(x))
+                .ToList();
 
-            allElements.AddRange(elements);
+            markData.MarkDataByDocument.Add(marksByDocument);
         }
 
-        return allElements;
-    }
-
-    private string GetCentralServerPath(Document document) {
-        if(document.IsWorkshared) {
-            var modelPath = document.GetWorksharingCentralModelPath();
-            return ModelPathUtils.ConvertModelPathToUserVisiblePath(modelPath);
-        } else {
-            return document.Title;
-        }
+        return markData;
     }
 }
