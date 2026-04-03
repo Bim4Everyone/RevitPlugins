@@ -1,8 +1,5 @@
-using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 using dosymep.Bim4Everyone;
 
@@ -11,16 +8,8 @@ using RevitMarkAllDocuments.Services;
 namespace RevitMarkAllDocuments.Models;
 
 internal class MarkData {
-    public MarkData() {
-        MarkDataByDocument = new List<MarkDataByDocument>();
-    }
-
     public string ParamName { get; set; }
-    public List<MarkDataByDocument> MarkDataByDocument { get; set; }
-
-    public IList<MarkedElement> GetAllElements() {
-        return MarkDataByDocument.SelectMany(x => x.Elements).ToList();
-    }
+    public List<MarkDataByDocument> MarkDataByDocument { get; set; } = [];
 
     public MarkDataByDocument GetDataByDocument(string documentName) {
         return MarkDataByDocument.FirstOrDefault(x => x.DocumentName == documentName);
@@ -49,5 +38,9 @@ internal class MarkData {
             element.MarkValue = $"{startValue.Prefix}{startNumber}{startValue.Suffix}";
             startNumber++;
         }
+    }
+
+    private IList<MarkedElement> GetAllElements() {
+        return MarkDataByDocument.SelectMany(x => x.Elements).ToList();
     }
 }

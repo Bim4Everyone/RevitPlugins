@@ -1,8 +1,4 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using System.Security.Cryptography;
 
 using Autodesk.Revit.DB;
 
@@ -11,16 +7,25 @@ using pyRevitLabs.Json;
 namespace RevitMarkAllDocuments.Models;
 
 internal class MarkedElement {
-    private readonly Element _element;
-    private readonly ElementId _id;
+    public MarkedElement() {
+        
+    }
 
     public MarkedElement(Element element) {
-        _element = element;
-        _id = element.Id;
+        Element = element;
+#if REVIT_2023_OR_LESS
+        Id = element.Id.IntegerValue;
+#else
+        Id = element.Id.Value;
+#endif
     }
 
     [JsonIgnore]
-    public Element Element => _element;
-    public ElementId Id => _id;
+    public Element Element { get; set; }
+#if REVIT_2023_OR_LESS
+    public int Id { get; set; }
+#else
+    public long Id { get; set; }
+#endif
     public string MarkValue { get; set; }
 }

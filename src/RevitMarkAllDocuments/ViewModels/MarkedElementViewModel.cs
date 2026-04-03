@@ -21,13 +21,13 @@ internal class MarkedElementViewModel : BaseViewModel{
 
     public MarkedElementViewModel(MarkedElement element, Document document) {
 #if REVIT_2023_OR_LESS
-        _id = element.Id.IntegerValue.ToString();
+        _id = element.Id.ToString();
 #else
-        _id = element.Id.Value.ToString();
+        _id = element.Id.ToString();
 #endif
         _markValue = element.MarkValue;
 
-        var revitElement = document.GetElement(element.Id);
+        var revitElement = document.GetElement(new ElementId(element.Id));
         if(revitElement != null) {
             _name = revitElement.Name;
             _status = "";
