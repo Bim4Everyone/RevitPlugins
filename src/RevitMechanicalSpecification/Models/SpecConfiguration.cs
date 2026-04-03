@@ -14,6 +14,7 @@ using dosymep.Revit;
 namespace RevitMechanicalSpecification.Models {
     public class SpecConfiguration {
         public readonly string GlobalFunction;
+        public readonly string DoNotCountPlaceHolder;
         public readonly string OriginalParamNameName;
         public readonly string OriginalParamNameMark;
         public readonly string OriginalParamNameCode;
@@ -89,6 +90,7 @@ namespace RevitMechanicalSpecification.Models {
                 TargetNameNumber = SharedParamsConfig.Instance.VISSpecNumbersCurrency.Name; //"ФОП_ВИС_Число ДЕ";
             }
 
+            DoNotCountPlaceHolder = "!Не учитывать";
             GlobalSystem = info.GetParamValueOrDefault(_outSystemNameParam, "!Нет системы");
             OriginalParamNameName = info.GetParamValueOrDefault(_changedNameName, "ADSK_Наименование");
             OriginalParamNameMark = info.GetParamValueOrDefault(_changedNameMark, "ADSK_Марка");

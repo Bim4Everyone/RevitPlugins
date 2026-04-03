@@ -25,6 +25,12 @@ namespace RevitMechanicalSpecification.Models.Fillers {
             "в составе",
             ":"
         };
+
+        private readonly List<BuiltInCategory> _ductInsulationHostCategories = new List<BuiltInCategory>() {
+            BuiltInCategory.OST_DuctFitting,
+            BuiltInCategory.OST_DuctCurves
+        };
+        
         private string _name;
         private string _nameAddon;
 
@@ -61,8 +67,7 @@ namespace RevitMechanicalSpecification.Models.Fillers {
         private string GetName(SpecificationElement specificationElement) {
             _name = specificationElement.GetTypeOrInstanceParamStringValue(Config.OriginalParamNameName);
             _nameAddon = specificationElement.GetTypeOrInstanceParamStringValue(Config.NameAddition);
-
-
+            
             if(string.IsNullOrEmpty(_name)) {
                 _name = "ЗАПОЛНИТЕ НАИМЕНОВАНИЕ";
             }
@@ -83,6 +88,8 @@ namespace RevitMechanicalSpecification.Models.Fillers {
                     return GetFlexElementName(specificationElement);
                 case BuiltInCategory.OST_FlexPipeCurves:
                     return GetFlexElementName(specificationElement);
+                case BuiltInCategory.OST_DuctInsulations:
+                    return GetDuctInsulationName(specificationElement);
             }
 
             string baseName = GetBaseName();
@@ -236,15 +243,54 @@ namespace RevitMechanicalSpecification.Models.Fillers {
             InsulationLiningBase insulation = (InsulationLiningBase)specificationElement.Element;
 
             // Нужно проверить, что у изоляции реально есть хост. Изредка багует что его нет
+            Element hostElement = GetInsulationHost(
+                insulation,
+                host => host.Category.IsId(BuiltInCategory.OST_PipeCurves));
+
+            return hostElement != null ?
+                $"{_name} " +
+                $"(Для: {GetPipeName(hostElement, hostElement.GetElementType())}) {_nameAddon}"
+                : Config.DoNotCountPlaceHolder;
+        }
+        
+        private string GetDuctInsulationName(SpecificationElement specificationElement) {
+            InsulationLiningBase insulation = (InsulationLiningBase)specificationElement.Element;
+            
+            // Нужно проверить, что у изоляции реально есть хост. Изредка багует что его нет
+            Element hostElement = GetInsulationHost(insulation, IsValidDuctInsulationHost);
+            
+            return hostElement != null
+                ? $"{_name} {_nameAddon}"
+                : Config.DoNotCountPlaceHolder;
+        }
+
+        private Element GetInsulationHost(
+            InsulationLiningBase insulation,
+            Func<Element, bool> hostValidation) {
             if(insulation.HostElementId.IsNull()) {
-                return "!Не учиывать";
+                return null;
             }
 
-            Element pipe = Document.GetElement(insulation.HostElementId);
-            return (pipe != null & pipe.Category.IsId(BuiltInCategory.OST_PipeCurves)) ?
-                $"{_name} " +
-                $"(Для: {GetPipeName(pipe, pipe.GetElementType())}) {_nameAddon}"
-                : "!Не учитывать";
+            Element element = Document.GetElement(insulation.HostElementId);
+            if(element == null) {
+                return null;
+            }
+
+            return hostValidation(element) ? element : null;
+        }
+
+        private bool IsValidDuctInsulationHost(Element element) {
+            if(!element.InAnyCategory(_ductInsulationHostCategories)) {
+                return false;
+            }
+
+            if(element.Category.IsId(BuiltInCategory.OST_DuctFitting)) {
+                return element is FamilyInstance instance
+                    && instance.MEPModel is MechanicalFitting fitting
+                    && fitting.PartType != PartType.Union;
+            }
+
+            return true;
         }
     }
 }
