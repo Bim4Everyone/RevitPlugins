@@ -87,38 +87,32 @@ internal class MainViewModel : BaseViewModel {
         var markSetterService = new MarkSetterService();
 
         // get documents
-        var documents = DocumentsPageViewModel.Documents
+        var checkedDocuments = DocumentsPageViewModel.Documents
             .Where(d => d.IsChecked)
             .Select(d => d.Document)
             .ToArray();
 
-        var filterProvider = FilterPageViewModel.FilterProvider;
-
         // filter elements
-        var allElements = filtrationService
-            .FilterElements(documents, FilterPageViewModel.FilterProvider);
+        var markData = filtrationService.FilterElements(checkedDocuments, FilterPageViewModel.FilterProvider);
 
-        // sort elements
-        //var sortedElements = sortElementService.SortElements();
+        // sort and mark elements
+        markData.ParamName = MarkSettingsPageViewModel.SelectedParam.Name;
+        var sortParams = SortPageViewModel.SelectedParams
+            .Select(x => x.RevitParam)
+            .ToList();
+        int startValue = int.Parse(MarkSettingsPageViewModel.StartNumber);
+        var sortedElements = sortElementService.SortElements(markData, sortParams, startValue);
+     
+        var docService = new DocumentService();
+        string currentDocName = docService.GetDocumentFullName(_revitRepository.Document);
 
-        // create mark values
-
-        bool linksSelected = DocumentsPageViewModel.Documents
-            .Where(d => d.IsChecked)
-            .Any(d => d.IsLink);
-
-        if(linksSelected) {
+        if(markData.HasLinksForExport(currentDocName)) {
             //export JSON
         }
 
-        bool currentDocSelected = DocumentsPageViewModel.Documents
-            .Where(d => d.IsChecked)
-            .Any(d => !d.IsLink);
-
-        if(currentDocSelected) {
-            //show elements list
-
-            _markListWindowService.ShowWindow(_revitRepository.Document, allElements);
+        var markDataForCurrentDoc = markData.GetDataByDocument(currentDocName);        
+        if(markDataForCurrentDoc != null) {
+            _markListWindowService.ShowWindow(_revitRepository.Document, markDataForCurrentDoc);
         }
 
         SaveConfig();
@@ -127,6 +121,18 @@ internal class MainViewModel : BaseViewModel {
     private bool CanAcceptView() {
         if(!DocumentsPageViewModel.Documents.Any(d => d.IsChecked)) {
             ErrorText = "Не выбраны документы";
+            return false;
+        }
+        if(!SortPageViewModel.SelectedParams.Any()) {
+            ErrorText = "Не выбраны параметры для сортировки";
+            return false;
+        }
+        if(MarkSettingsPageViewModel.SelectedParam == null) {
+            ErrorText = "Не выбран параметр для заполнения марки";
+            return false;
+        }
+        if(string.IsNullOrEmpty(MarkSettingsPageViewModel.StartNumber)) {
+            ErrorText = "Не заполнен начальный номер";
             return false;
         }
 

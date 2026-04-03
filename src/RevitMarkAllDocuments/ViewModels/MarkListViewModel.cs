@@ -18,8 +18,9 @@ namespace RevitMarkAllDocuments.ViewModels;
 internal class MarkListViewModel : BaseViewModel {
     private ObservableCollection<MarkedElementViewModel> _markedElements;
 
-    public MarkListViewModel(Document document, IList<MarkedElement> elements) {
-        _markedElements = [..elements
+    public MarkListViewModel(Document document, MarkDataByDocument markDataByDocument) {
+        _markedElements = [..markDataByDocument
+            .Elements
             .Select(x => new MarkedElementViewModel(x, document))
             .ToList()];
 
