@@ -83,7 +83,6 @@ internal class MainViewModel : BaseViewModel {
 
     private void AcceptView() {
         var filtrationService = new FiltrationService();
-        var sortElementService = new SortElementService();
         var markSetterService = new MarkSetterService();
 
         // get documents
@@ -94,15 +93,15 @@ internal class MainViewModel : BaseViewModel {
 
         // filter elements
         var markData = filtrationService.FilterElements(checkedDocuments, FilterPageViewModel.FilterProvider);
+        markData.ParamName = MarkSettingsPageViewModel.SelectedParam.Name;
 
         // sort and mark elements
-        markData.ParamName = MarkSettingsPageViewModel.SelectedParam.Name;
         var sortParams = SortPageViewModel.SelectedParams
             .Select(x => x.RevitParam)
             .ToList();
-        int startValue = int.Parse(MarkSettingsPageViewModel.StartNumber);
-        var sortedElements = sortElementService.SortElements(markData, sortParams, startValue);
-     
+        var startValue = MarkSettingsPageViewModel.GetStartValue();
+        markData.SerMarkValues(sortParams, startValue);
+
         var docService = new DocumentService();
         string currentDocName = docService.GetDocumentFullName(_revitRepository.Document);
 

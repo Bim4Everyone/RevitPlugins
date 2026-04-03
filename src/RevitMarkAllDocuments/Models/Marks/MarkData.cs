@@ -4,6 +4,10 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
+using dosymep.Bim4Everyone;
+
+using RevitMarkAllDocuments.Services;
+
 namespace RevitMarkAllDocuments.Models;
 
 internal class MarkData {
@@ -34,5 +38,16 @@ internal class MarkData {
         }
 
         return false;
+    }
+
+    public void SerMarkValues(IList<RevitParam> sortParams, MarkStartValue startValue) {
+        var sortService = new SortElementService();
+        var sortedMarkedElements = sortService.SortElements(GetAllElements(), sortParams);
+        int startNumber = int.Parse(startValue.StartValue);
+
+        foreach(var element in sortedMarkedElements) {
+            element.MarkValue = $"{startValue.Prefix}{startNumber}{startValue.Suffix}";
+            startNumber++;
+        }
     }
 }
