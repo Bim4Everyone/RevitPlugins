@@ -9,15 +9,15 @@ using Autodesk.Revit.DB;
 namespace RevitMarkAllDocuments.Models;
 
 internal class MarkedElement {
+    private readonly Element _element;
     private readonly ElementId _id;
-    private readonly string _document;
 
-    public MarkedElement(Element element, string document) {
+    public MarkedElement(Element element) {
+        _element = element;
         _id = element.Id;
-        _document = document;
     }
 
+    public Element Element => _element;
     public ElementId Id => _id;
-    public string Document => _document;
     public string MarkValue { get; set; }
 }
