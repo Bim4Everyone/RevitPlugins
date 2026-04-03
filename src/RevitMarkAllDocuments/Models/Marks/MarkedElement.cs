@@ -6,6 +6,8 @@ using System.Threading.Tasks;
 
 using Autodesk.Revit.DB;
 
+using pyRevitLabs.Json;
+
 namespace RevitMarkAllDocuments.Models;
 
 internal class MarkedElement {
@@ -17,6 +19,7 @@ internal class MarkedElement {
         _id = element.Id;
     }
 
+    [JsonIgnore]
     public Element Element => _element;
     public ElementId Id => _id;
     public string MarkValue { get; set; }

@@ -11,7 +11,10 @@ using dosymep.SimpleServices;
 using dosymep.WPF.Commands;
 using dosymep.WPF.ViewModels;
 
+using Microsoft.WindowsAPICodePack.Dialogs;
+
 using RevitMarkAllDocuments.Models;
+using RevitMarkAllDocuments.Models.Export;
 using RevitMarkAllDocuments.Services;
 
 namespace RevitMarkAllDocuments.ViewModels;
@@ -81,6 +84,18 @@ internal class MainViewModel : BaseViewModel {
         LoadConfig();
     }
 
+    public string SelectFolder() {
+        var dialog = new CommonOpenFileDialog() {
+            IsFolderPicker = true
+        };
+
+        if(dialog.ShowDialog() == CommonFileDialogResult.Ok) {
+            return dialog.FileName;
+        }
+
+        return string.Empty;
+    }
+
     private void AcceptView() {
         var filtrationService = new FiltrationService();
         var markSetterService = new MarkSetterService();
@@ -106,7 +121,11 @@ internal class MainViewModel : BaseViewModel {
         string currentDocName = docService.GetDocumentFullName(_revitRepository.Document);
 
         if(markData.HasLinksForExport(currentDocName)) {
-            //export JSON
+            string path = SelectFolder();
+            string fullPath = path + "\\" + $"{currentDocName}.json";
+
+            var exporter = new JsonExporter();
+            exporter.Export(fullPath, markData);
         }
 
         var markDataForCurrentDoc = markData.GetDataByDocument(currentDocName);        
