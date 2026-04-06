@@ -136,7 +136,7 @@ namespace RevitMechanicalSpecification.Service {
         /// </summary>
         /// <param name="element"></param>
         /// <returns></returns>
-        public string ReplaceMarkMask(Element element) {
+        private string ReplaceMarkMask(Element element) {
             return ReplaceMask(element, _specConfiguration.MaskMarkName, "ADSK_Марка");
         }
 
@@ -145,12 +145,21 @@ namespace RevitMechanicalSpecification.Service {
         /// </summary>
         /// <param name="element"></param>
         /// <returns></returns>
-        public string ReplaceNameMask(Element element) {
+        private string ReplaceNameMask(Element element) {
             return ReplaceMask(element, _specConfiguration.MaskNameName, "ADSK_Наименование");
         }
 
         /// <summary>
-        /// Вызывает замену обоих целевых параметров масками. Возвращает бул, 
+        /// Вызов замены параметра ADSK_Наименование краткое
+        /// </summary>
+        /// <param name="element"></param>
+        /// <returns></returns>
+        private string ReplaceShortNameMask(Element element) {
+            return ReplaceMask(element, _specConfiguration.MaskShortNameName, "ADSK_Наименование краткое");
+        }
+
+        /// <summary>
+        /// Вызывает замену целевых параметров масками. Возвращает бул, 
         /// чтоб в общей обработке понять была ли замена
         /// </summary>
         /// <param name="element"></param>
@@ -158,8 +167,11 @@ namespace RevitMechanicalSpecification.Service {
         public bool ExecuteReplacment(Element element) {
             string markMask = ReplaceMarkMask(element);
             string nameMask = ReplaceNameMask(element);
+            string shortNameMask = ReplaceShortNameMask(element);
 
-            return !string.IsNullOrEmpty(markMask) & !string.IsNullOrEmpty(nameMask);
+            return !string.IsNullOrEmpty(markMask) 
+                   || !string.IsNullOrEmpty(nameMask) 
+                   || !string.IsNullOrEmpty(shortNameMask);
         }
     }
 }

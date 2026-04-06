@@ -79,9 +79,10 @@ namespace RevitMechanicalSpecification.Models {
         public readonly string DyWall = SharedParamsConfig.Instance.VISDiameterNominalXThikness.Name; //"ФОП_ВИС_Ду х Стенка";
         public readonly string DExternalWall = SharedParamsConfig.Instance.VISDiameterExternalXThikness.Name; //"ФОП_ВИС_Днар х Стенка";
 
-        public readonly string MaskMarkName = "ФОП_ВИС_Маска марки";
-        public readonly string MaskNameName = "ФОП_ВИС_Маска наименования";
-
+        public readonly string MaskMarkName = SharedParamsConfig.Instance.VISMaskMark.Name; //"ФОП_ВИС_Маска марки";
+        public readonly string MaskNameName = SharedParamsConfig.Instance.VISMaskName.Name; //"ФОП_ВИС_Маска наименования";
+        public readonly string MaskShortNameName = SharedParamsConfig.Instance.VISMaskShortName.Name; //ФОП_ВИС_Маска краткого наименования
+        
         public SpecConfiguration(Document document) {
             ProjectInfo info = document.ProjectInformation;
 
