@@ -34,6 +34,7 @@ internal class RebarDimensioningViewModel : BaseViewModel {
 
     private readonly string _defFamilyNamePart = "IFC_Зона_Доп.Арм";
     private readonly string _defSelectedDimensionTypeName = "я_Основной_Плагин_2.5 мм";
+    private readonly string _defMinValueDimension = "20";
     private readonly List<string> _defVerticalRefNames = ["Габарит_Ширина_1", "Габарит_Ширина_2"];
     private readonly List<string> _defHorizontalRefNames = ["Габарит_Длина_1", "Габарит_Длина_2"];
 
@@ -41,6 +42,7 @@ internal class RebarDimensioningViewModel : BaseViewModel {
     private string _familyNamePart;
     private DimensionType _selectedDimensionType;
     private List<DimensionType> _dimensionTypes;
+    private string _minValueDimension;
     private bool _placeDimensionsAccurately;
     private bool _createMarkedImage;
 
@@ -116,6 +118,11 @@ internal class RebarDimensioningViewModel : BaseViewModel {
         set => RaiseAndSetIfChanged(ref _dimensionTypes, value);
     }
 
+    public string MinValueDimension {
+        get => _minValueDimension;
+        set => RaiseAndSetIfChanged(ref _minValueDimension, value);
+    }
+
     public bool PlaceDimensionsAccurately {
         get => _placeDimensionsAccurately;
         set => RaiseAndSetIfChanged(ref _placeDimensionsAccurately, value);
@@ -188,7 +195,9 @@ internal class RebarDimensioningViewModel : BaseViewModel {
             ReferenceNamesVM.GetHorizReferenceNames(),
             _referenceAnalizeService);
         // Создаем размеры по найденным арматурным элементам (от их опорных плоскостей до осей)
-        _dimensionService.Create(rebars, _grids, _selectedDimensionType, mapInfo);
+        double.TryParse(MinValueDimension, out double minValueDimension);
+        minValueDimension = UnitUtilsHelper.ConvertToInternalValue(minValueDimension);
+        _dimensionService.Create(rebars, _grids, _selectedDimensionType, minValueDimension, mapInfo);
 
         // Если пользователь запросил изображение для проверки, то создаем его на основе карты (после размещения размеров)
         if(_placeDimensionsAccurately && _createMarkedImage && mapInfo != null) {
@@ -232,6 +241,10 @@ internal class RebarDimensioningViewModel : BaseViewModel {
             ErrorText = _localizationService.GetLocalizedString("RebarDimensioningWindow.WriteReferenceNames");
             return false;
         }
+        if(!double.TryParse(MinValueDimension, out double minValueDimensionAsDouble) || minValueDimensionAsDouble < 0) {
+            ErrorText = _localizationService.GetLocalizedString("RebarDimensioningWindow.MinValueDimensionIncorrect");
+            return false;
+        }
         ErrorText = string.Empty;
         return true;
     }
@@ -245,6 +258,7 @@ internal class RebarDimensioningViewModel : BaseViewModel {
         FamilyNamePart = setting?.FamilyNamePart ?? _defFamilyNamePart;
         SelectedDimensionType = DimensionTypes.FirstOrDefault(d =>
             d.Name.Equals(setting?.SelectedDimensionTypeName ?? _defSelectedDimensionTypeName));
+        MinValueDimension = setting?.MinValueDimension ?? _defMinValueDimension;
 
         var verticalRefNames = setting?.VerticalRefNames ?? _defVerticalRefNames;
         verticalRefNames.ForEach(item => ReferenceNamesVM.VerticalRefNames.Add(new ReferenceNameViewModel(item)));
@@ -265,6 +279,7 @@ internal class RebarDimensioningViewModel : BaseViewModel {
 
         setting.FamilyNamePart = FamilyNamePart;
         setting.SelectedDimensionTypeName = SelectedDimensionType.Name;
+        setting.MinValueDimension = MinValueDimension;
 
         setting.VerticalRefNames = [.. ReferenceNamesVM.VerticalRefNames.Select(r => r.ReferenceName)];
         setting.HorizontalRefNames = [.. ReferenceNamesVM.HorizontalRefNames.Select(r => r.ReferenceName)];

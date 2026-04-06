@@ -32,6 +32,7 @@ internal class DimensionBuilder {
         List<RebarElement> rebars,
         List<Grid> grids,
         DimensionType selectedDimensionType,
+        double minDimension,
         MapInfo mapInfo = null) {
         rebars.ThrowIfNullOrEmpty();
         grids.ThrowIfNullOrEmpty();
@@ -39,9 +40,9 @@ internal class DimensionBuilder {
 
         foreach(var rebar in rebars) {
             // Создание вертикального размера (относительно локальных осей зоны армирования)
-            CreateDimension(grids, rebar, selectedDimensionType, true, mapInfo);
+            CreateDimension(grids, rebar, selectedDimensionType, true, minDimension, mapInfo);
             // Создание горизонтального размера (относительно локальных осей зоны армирования)
-            CreateDimension(grids, rebar, selectedDimensionType, false, mapInfo);
+            CreateDimension(grids, rebar, selectedDimensionType, false, minDimension, mapInfo);
         }
     }
 
@@ -50,7 +51,9 @@ internal class DimensionBuilder {
         RebarElement rebar,
         DimensionType selectedDimensionType,
         bool isForVertical,
+        double minDimension,
         MapInfo mapInfo = null) {
+
         grids.ThrowIfNullOrEmpty();
         rebar.ThrowIfNull();
         selectedDimensionType.ThrowIfNull();
@@ -64,7 +67,7 @@ internal class DimensionBuilder {
         // Получаем опорные плоскости для размера
         // Нормальная ситуация, когда подходящие оси не были найдены
         var dimensionRefs = _comparisonService.CollectReferences(
-            new ReferenceToGridsCollectorContext(rebarReferences, grids, direction));
+            new ReferenceToGridsCollectorContext(rebarReferences, grids, direction, minDimension));
         if(dimensionRefs is null) {
             return;
         }

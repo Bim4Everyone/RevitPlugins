@@ -14,6 +14,8 @@
     <system:String x:Key="RebarDimensioningWindow.Remove">Удалить</system:String>
     
     <system:String x:Key="RebarDimensioningWindow.DimensionType">Типоразмер размера:</system:String>
+    <system:String x:Key="RebarDimensioningWindow.MinValueDimension">Минимальный размер для размещения:</system:String>
+    <system:String x:Key="RebarDimensioningWindow.MinValueDimensionIncorrect">Минимальный размер для размещения некорректен</system:String>
 
     <system:String x:Key="RebarDimensioningWindow.ViewHasNotGrids">На виде нет осей</system:String>
     <system:String x:Key="RebarDimensioningWindow.WriteFamilyNamePart">Не указана часть имени семейства</system:String>

@@ -14,7 +14,9 @@
     <system:String x:Key="RebarDimensioningWindow.Remove">Remove</system:String>
     
     <system:String x:Key="RebarDimensioningWindow.DimensionType">Dimension type:</system:String>
-    
+    <system:String x:Key="RebarDimensioningWindow.MinValueDimension">Minimum dimension for placement:</system:String>
+    <system:String x:Key="RebarDimensioningWindow.MinValueDimensionIncorrect">Minimum dimension for placement is incorrect</system:String>
+
     <system:String x:Key="RebarDimensioningWindow.ViewHasNotGrids">View does not contain grids</system:String>
     <system:String x:Key="RebarDimensioningWindow.WriteFamilyNamePart">Part of the family name is missing</system:String>
     <system:String x:Key="RebarDimensioningWindow.DimensionTypeIsNotSelected">Dimension type not selected</system:String>

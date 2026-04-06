@@ -45,6 +45,7 @@ internal class ReferenceToGridsCollector : IReferenceCollector<ReferenceToGridsC
         return _referenceAnalizeService.FindClosestReferencesByDimension(
             context.ElementReferences,
             gridRefs,
-            dimensionLine);
+            dimensionLine,
+            context.MinDimension);
     }
 }

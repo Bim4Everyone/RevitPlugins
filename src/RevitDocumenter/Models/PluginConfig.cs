@@ -62,6 +62,7 @@ internal class RevitSettings : ProjectSettings {
 
     public string FamilyNamePart { get; set; }
     public string SelectedDimensionTypeName { get; set; }
+    public string MinValueDimension { get; set; }
 
     public List<string> VerticalRefNames { get; set; }
     public List<string> HorizontalRefNames { get; set; }

@@ -48,7 +48,11 @@ internal class ReferenceAnalizeService {
     /// <param name="refsB">Второй список опорных плоскостей</param>
     /// <param name="dimensionLine">Линия, вдоль которой нужно строить временные размеры</param>
     /// <returns>Массив из пары опорных плоскостей, которые стоят наиболее близко</returns>
-    public ReferenceArray FindClosestReferencesByDimension(List<Reference> refsA, List<Reference> refsB, Line dimensionLine) {
+    public ReferenceArray FindClosestReferencesByDimension(
+        List<Reference> refsA,
+        List<Reference> refsB,
+        Line dimensionLine,
+        double minDimension) {
         refsA.ThrowIfNullOrEmpty();
         refsB.ThrowIfNullOrEmpty();
         dimensionLine.ThrowIfNull();
@@ -67,7 +71,7 @@ internal class ReferenceAnalizeService {
                         if(dimension?.Value.HasValue == true) {
                             double distance = dimension.Value.Value;
 
-                            if(distance < minDistance) {
+                            if(distance < minDistance && distance >= minDimension) {
                                 minDistance = distance;
                                 resultRef1 = refA;
                                 resultRef2 = refB;
@@ -80,7 +84,13 @@ internal class ReferenceAnalizeService {
                 subTransaction.RollBack();
             }
         }
-        return CreateReferenceArray(resultRef1, resultRef2);
+        // Нормальная ситуация, когда ни одна пара плоскостей (1 - от семейства, 2 - от оси) не подошла
+        // Это возможно в случае,если пользователь задал большое значение минимального размера
+        if(resultRef1 is null || resultRef2 is null) {
+            return null;
+        } else {
+            return CreateReferenceArray(resultRef1, resultRef2);
+        }
     }
 
     private ReferenceArray CreateReferenceArray(Reference ref1, Reference ref2) {
