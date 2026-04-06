@@ -3,6 +3,8 @@
                     xmlns:system="clr-namespace:System;assembly=mscorlib">
 
     <system:String x:Key="RebarDimensioningWindow.Title">Размеры зон дополнительного армирования</system:String>
+
+    <system:String x:Key="RebarDimensioningWindow.ViewNotViewPlan">Активный вид должен быть планом</system:String>
     
     <system:String x:Key="RebarDimensioningWindow.FamilyNamePart">Часть имени семейства зоны армирования:</system:String>
     <system:String x:Key="RebarDimensioningWindow.ReferenceNames">Имена опорных плоскостей:</system:String>

@@ -245,6 +245,10 @@ internal class RebarDimensioningViewModel : BaseViewModel {
             ErrorText = _localizationService.GetLocalizedString("RebarDimensioningWindow.MinValueDimensionIncorrect");
             return false;
         }
+        if(_revitRepository.Document.ActiveView is not ViewPlan) {
+            ErrorText = _localizationService.GetLocalizedString("RebarDimensioningWindow.ViewNotViewPlan");
+            return false;
+        }
         ErrorText = string.Empty;
         return true;
     }

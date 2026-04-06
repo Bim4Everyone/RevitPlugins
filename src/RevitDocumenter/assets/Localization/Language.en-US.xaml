@@ -4,6 +4,8 @@
 
     <system:String x:Key="RebarDimensioningWindow.Title">Dimensions of additional reinforcement zones</system:String>
     
+    <system:String x:Key="RebarDimensioningWindow.ViewNotViewPlan">The active view must be a plan</system:String>
+    
     <system:String x:Key="RebarDimensioningWindow.FamilyNamePart">Part of the family name of the reinforcement zone:</system:String>
     <system:String x:Key="RebarDimensioningWindow.ReferenceNames">Reference names:</system:String>
     <system:String x:Key="RebarDimensioningWindow.VerticalReferences">Vertical reference names:</system:String>
