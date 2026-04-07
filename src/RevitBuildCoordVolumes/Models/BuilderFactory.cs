@@ -30,21 +30,9 @@ internal sealed class BuilderFactory {
     /// </returns>
     public ICoordVolumeBuilder Create(AlgorithmType algorithmType) {
         return algorithmType == AlgorithmType.SlabBasedAlgorithm
-            ? new SlabBasedCoordVolumeBuilder(
-                _services.SpatialDivider,
-                _services.SlabNormalizer,
-                _services.ColumnFactory,
-                _services.GeomObjectFactory,
-                _revitRepository,
-                _settings)
+            ? new SlabBasedCoordVolumeBuilder(_revitRepository, _services, _settings)
             : algorithmType == AlgorithmType.ParamBasedAlgorithm
-            ? new ParamBasedCoordVolumeBuilder(
-                _services.GeomObjectFactory,
-                _revitRepository,
-                _settings)
-            : new ParamBasedCoordVolumeBuilder(
-                _services.GeomObjectFactory,
-                _revitRepository,
-                _settings);
+            ? new ParamBasedCoordVolumeBuilder(_revitRepository, _services, _settings)
+            : new ParamBasedCoordVolumeBuilder(_revitRepository, _services, _settings);
     }
 }

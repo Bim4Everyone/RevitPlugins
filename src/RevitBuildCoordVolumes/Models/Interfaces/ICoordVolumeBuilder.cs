@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 
 using RevitBuildCoordVolumes.Models.Geometry;
+using RevitBuildCoordVolumes.Models.Services;
 
 namespace RevitBuildCoordVolumes.Models.Interfaces;
 
@@ -15,5 +16,5 @@ internal interface ICoordVolumeBuilder {
     /// <returns>
     /// Список GeomObject дальнейшего присвоение параметров.
     /// </returns>
-    List<GeomObject> Build(SpatialObject spatialElement);
+    List<GeomObject> Build(SpatialObject spatialElement, ProgressService pro);
 }

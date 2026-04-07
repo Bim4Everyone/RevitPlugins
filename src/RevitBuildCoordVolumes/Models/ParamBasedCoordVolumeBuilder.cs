@@ -4,25 +4,26 @@ using System.Linq;
 using RevitBuildCoordVolumes.Models.Enums;
 using RevitBuildCoordVolumes.Models.Geometry;
 using RevitBuildCoordVolumes.Models.Interfaces;
+using RevitBuildCoordVolumes.Models.Services;
 using RevitBuildCoordVolumes.Models.Settings;
 
 namespace RevitBuildCoordVolumes.Models;
 
 internal class ParamBasedCoordVolumeBuilder : ICoordVolumeBuilder {
-    private readonly IGeomObjectFactory _geomElementFactory;
+    private readonly IGeomObjectFactory _geomObjectFactory;
     private readonly RevitRepository _revitRepository;
     private readonly BuildCoordVolumeSettings _settings;
 
     public ParamBasedCoordVolumeBuilder(
-        IGeomObjectFactory geomElementFactory,
         RevitRepository revitRepository,
+        BuildCoordVolumeServices services,
         BuildCoordVolumeSettings settings) {
-        _geomElementFactory = geomElementFactory;
         _revitRepository = revitRepository;
+        _geomObjectFactory = services.GeomObjectFactory;
         _settings = settings;
     }
 
-    public List<GeomObject> Build(SpatialObject spatialObject) {
+    public List<GeomObject> Build(SpatialObject spatialObject, ProgressService progressService) {
         var spatialElement = spatialObject.SpatialElement;
 
         var topZoneParam = _settings.ParamMaps
@@ -38,11 +39,12 @@ internal class ParamBasedCoordVolumeBuilder : ICoordVolumeBuilder {
 
         double basePointOffset = _revitRepository.GetBasePointOffset();
 
-        var listGeomObjects = _geomElementFactory.GetSimpleGeomObjects(
+        var listGeomObjects = _geomObjectFactory.GetSimpleGeomObjects(
             spatialElement,
             bottomPosition,
             topPosition,
-            basePointOffset);
+            basePointOffset,
+            progressService);
 
         return listGeomObjects.Count > 0
             ? listGeomObjects

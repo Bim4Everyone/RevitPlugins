@@ -3,8 +3,10 @@ using System.Linq;
 
 using Autodesk.Revit.DB;
 
+using RevitBuildCoordVolumes.Models.Enums;
 using RevitBuildCoordVolumes.Models.Geometry;
 using RevitBuildCoordVolumes.Models.Interfaces;
+using RevitBuildCoordVolumes.Models.Services;
 
 namespace RevitBuildCoordVolumes.Models;
 
@@ -12,8 +14,9 @@ internal class ColumnFactory : IColumnFactory {
     // Длина линии для пресечения, примерно 100 этажей
     private const double _rayHeight = 1000;
 
-    public IEnumerable<IGrouping<string, ColumnObject>> GenerateColumnGroups(List<PolygonObject> polygons, List<SlabElement> slabs) {
-        var columns = GetColumns(polygons, slabs);
+    public IEnumerable<IGrouping<string, ColumnObject>> GenerateColumnGroups(
+        List<PolygonObject> polygons, List<SlabElement> slabs, ProgressService progressService) {
+        var columns = GetColumns(polygons, slabs, progressService);
 
         // Группируем по GUID плит - низ + верх      
         return columns
@@ -21,16 +24,33 @@ internal class ColumnFactory : IColumnFactory {
     }
 
     // Метод генерации колонн
-    private List<ColumnObject> GetColumns(List<PolygonObject> polygons, List<SlabElement> slabs) {
+    private List<ColumnObject> GetColumns(
+        List<PolygonObject> polygons, List<SlabElement> slabs, ProgressService progressService) {
         if(polygons.Count == 0 || slabs.Count < 2) {
             return [];
         }
         var columns = new List<ColumnObject>();
 
+        progressService?.BeginStage(ProgressType.BuildVolumes);
+        int total = polygons.Count;
+        int processed = 0;
+        int reported = 0;
+
         foreach(var polygon in polygons) {
+            progressService?.CancellationToken.ThrowIfCancellationRequested();
             var center = polygon.Center;
             var points = new List<SlabObject>(slabs.Count);
             var line = Line.CreateBound(center + XYZ.BasisZ * _rayHeight, center - XYZ.BasisZ * _rayHeight);
+
+            processed++;
+            int current = processed * 100 / total;
+            if(current > 100) {
+                current = 100;
+            }
+            if(current > reported) {
+                reported = current;
+                progressService?.ProgressCount?.Report(reported);
+            }
 
             foreach(var slab in slabs) {
                 double z = double.NaN;
