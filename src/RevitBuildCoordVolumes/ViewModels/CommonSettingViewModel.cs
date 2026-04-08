@@ -3,10 +3,12 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Linq;
+using System.Windows.Input;
 
 using dosymep.Bim4Everyone.SimpleServices;
 using dosymep.Revit;
 using dosymep.SimpleServices;
+using dosymep.WPF.Commands;
 using dosymep.WPF.ViewModels;
 
 using RevitBuildCoordVolumes.Models;
@@ -27,7 +29,8 @@ internal class CommonSettingViewModel : BaseViewModel {
     private ObservableCollection<AlgorithmViewModel> _typeAlgorithms;
     private AlgorithmViewModel _selectedTypeAlgorithm;
     private ObservableCollection<TypeZoneViewModel> _typeZones;
-    private TypeZoneViewModel _selectedTypeZone;
+    private ObservableCollection<TypeZoneViewModel> _filteredTypeZones;
+    private string _searchTextTypeZones;
     private ObservableCollection<ParamViewModel> _params;
     private bool _hasParamWarning;
 
@@ -45,7 +48,15 @@ internal class CommonSettingViewModel : BaseViewModel {
         _revitParamFactory = _services.RevitParamFactory;
 
         LoadView();
+
+        SearchTypeZonesCommand = RelayCommand.Create(ApplySearchTypeZones);
+        CheckAllTypeModelsCommand = RelayCommand.Create(CheckAllTypeZones);
+        UncheckAllTypeModelsCommand = RelayCommand.Create(UncheckAllTypeZones);
     }
+
+    public ICommand SearchTypeZonesCommand { get; }
+    public ICommand CheckAllTypeModelsCommand { get; }
+    public ICommand UncheckAllTypeModelsCommand { get; }
 
     public ObservableCollection<AlgorithmViewModel> TypeAlgorithms {
         get => _typeAlgorithms;
@@ -59,9 +70,13 @@ internal class CommonSettingViewModel : BaseViewModel {
         get => _typeZones;
         set => RaiseAndSetIfChanged(ref _typeZones, value);
     }
-    public TypeZoneViewModel SelectedTypeZone {
-        get => _selectedTypeZone;
-        set => RaiseAndSetIfChanged(ref _selectedTypeZone, value);
+    public ObservableCollection<TypeZoneViewModel> FilteredTypeZones {
+        get => _filteredTypeZones;
+        set => RaiseAndSetIfChanged(ref _filteredTypeZones, value);
+    }
+    public string SearchTextTypeZones {
+        get => _searchTextTypeZones;
+        set => RaiseAndSetIfChanged(ref _searchTextTypeZones, value);
     }
     public ObservableCollection<ParamViewModel> Params {
         get => _params;
@@ -72,10 +87,33 @@ internal class CommonSettingViewModel : BaseViewModel {
         set => RaiseAndSetIfChanged(ref _hasParamWarning, value);
     }
 
+    // Метод для реализации поиска типов зон
+    private void ApplySearchTypeZones() {
+        FilteredTypeZones = string.IsNullOrEmpty(SearchTextTypeZones)
+            ? new ObservableCollection<TypeZoneViewModel>(TypeZones)
+            : new ObservableCollection<TypeZoneViewModel>(TypeZones
+                .Where(item => item.Name
+                .IndexOf(SearchTextTypeZones, StringComparison.OrdinalIgnoreCase) >= 0));
+    }
+
+    // Метод команды на выделение всех типов зон
+    private void CheckAllTypeZones() {
+        foreach(var catVM in FilteredTypeZones) {
+            catVM.IsChecked = true;
+        }
+    }
+
+    // Метод команды на снятие выделения всех типов зон
+    private void UncheckAllTypeZones() {
+        foreach(var catVM in FilteredTypeZones) {
+            catVM.IsChecked = false;
+        }
+    }
+
     // Метод обновления TypeZones
     private void UpdateTypeZones() {
         TypeZones = new ObservableCollection<TypeZoneViewModel>(GetTypeZoneViewModels());
-        SelectedTypeZone = TypeZones.FirstOrDefault();
+        FilteredTypeZones = new ObservableCollection<TypeZoneViewModel>(TypeZones);
     }
 
     // Метод получения коллекции TypeModelViewModel для TypeModels
@@ -204,6 +242,6 @@ internal class CommonSettingViewModel : BaseViewModel {
         UpdateParamWarnings();
 
         TypeZones = new ObservableCollection<TypeZoneViewModel>(GetTypeZoneViewModels());
-        SelectedTypeZone = TypeZones.FirstOrDefault();
+        FilteredTypeZones = new ObservableCollection<TypeZoneViewModel>(TypeZones);
     }
 }

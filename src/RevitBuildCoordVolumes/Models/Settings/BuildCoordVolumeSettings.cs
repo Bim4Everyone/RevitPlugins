@@ -10,7 +10,7 @@ namespace RevitBuildCoordVolumes.Models.Settings;
 internal class BuildCoordVolumeSettings {
     public AlgorithmType AlgorithmType { get; set; }
     public BuilderMode BuilderMode { get; set; }
-    public string TypeZone { get; set; }
+    public List<string> TypeZones { get; set; }
     public List<ParamMap> ParamMaps { get; set; }
     public List<Document> Documents { get; set; }
     public List<string> TypeSlabs { get; set; }
