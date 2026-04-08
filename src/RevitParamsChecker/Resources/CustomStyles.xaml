@@ -151,6 +151,22 @@
             Value="Stretch" />
     </Style>
     <Style
+        TargetType="GridSplitter"
+        x:Key="CustomHorizontalGridSplitter">
+        <Setter
+            Property="Height"
+            Value="4" />
+        <Setter
+            Property="Background"
+            Value="Transparent" />
+        <Setter
+            Property="HorizontalAlignment"
+            Value="Stretch" />
+        <Setter
+            Property="VerticalAlignment"
+            Value="Center" />
+    </Style>
+    <Style
         TargetType="ui:ToggleSwitch"
         x:Key="LabeledToggleSwitch"
         BasedOn="{StaticResource DefaultUiToggleSwitchStyle}">

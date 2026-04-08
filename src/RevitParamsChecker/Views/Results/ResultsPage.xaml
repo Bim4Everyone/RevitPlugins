@@ -32,30 +32,40 @@
             <ColumnDefinition
                 Width="Auto" />
             <ColumnDefinition
-                Width="5*"
-                MinWidth="200" />
-            <ColumnDefinition
-                Width="Auto" />
-            <ColumnDefinition
-                Width="3*"
-                MinWidth="200" />
+                Width="*" />
         </Grid.ColumnDefinitions>
+
+        <Grid.RowDefinitions>
+            <RowDefinition
+                Height="2*"
+                MinHeight="200" />
+            <RowDefinition
+                Height="Auto" />
+            <RowDefinition
+                Height="1*"
+                MinHeight="200" />
+        </Grid.RowDefinitions>
 
         <local:CheckResultsListControl
             Grid.Column="0"
+            Grid.RowSpan="3"
             DataContext="{Binding}" />
 
         <local:CheckResultControl
             Grid.Column="1"
+            Grid.Row="0"
             Margin="4 0 0 0"
             DataContext="{Binding SelectedCheckResult}" />
 
         <GridSplitter
-            Grid.Column="2"
-            Style="{StaticResource CustomGridSplitter}" />
+            Grid.Column="1"
+            Grid.Row="1"
+            Style="{StaticResource CustomHorizontalGridSplitter}" />
 
         <Border
-            Grid.Column="3"
+            Grid.Column="1"
+            Grid.Row="2"
+            Margin="4 0 0 0"
             Style="{StaticResource CustomBorder}">
             <DockPanel
                 LastChildFill="True">
