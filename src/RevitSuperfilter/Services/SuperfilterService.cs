@@ -1,0 +1,100 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
+
+using Autodesk.Revit.DB;
+using Autodesk.Revit.UI;
+
+using dosymep.WPF;
+
+using RevitSuperfilter.Models;
+using RevitSuperfilter.Models.Selections;
+
+namespace RevitSuperfilter.Services;
+
+internal sealed class SuperfilterService : ObservableObject, ISuperfilterService {
+    private readonly UIApplication _uiApplication;
+
+    private Document _document;
+    private ISelectionElements _selectionElements;
+
+    public SuperfilterService(UIApplication uiApplication) {
+        _uiApplication = uiApplication;
+    }
+
+    public Superfilter Superfilter { get; } = new();
+    public ElementsIndex ElementsIndex { get; } = new();
+
+    public void Build(ISelectionElements selectionElements) {
+        _selectionElements = selectionElements;
+        _selectionElements.OnSelectionChanged += SelectionElementsOnOnSelectionChanged;
+
+        BuildImpl(selectionElements);
+    }
+
+    private void BuildImpl(ISelectionElements selectionElements) {
+        Clear();
+        _document = GetActiveDocument();
+        
+        IReadOnlyCollection<Element> elements = selectionElements
+            .GetElements()
+            .ToArray();
+
+        Superfilter.Build(elements);
+        ElementsIndex.Build(elements);
+    }
+
+    public void Clear() {
+        Superfilter.Clear();
+        ElementsIndex.Clear();
+    }
+
+    public void Add(Element element) {
+        Superfilter.Add(element);
+        ElementsIndex.Add(element);
+    }
+
+    public void Remove(ElementId elementId) {
+        Superfilter.Remove(elementId);
+        ElementsIndex.Remove(elementId);
+    }
+
+    private Document GetActiveDocument() {
+        return _uiApplication.ActiveUIDocument.Document;
+    }
+
+    private void AddElements(SelectionChangeEventArgs e) {
+        var addedElements = e.AddedElementIds
+            .Select(item => _document.GetElement(item));
+
+        foreach(var addedElement in addedElements) {
+            Add(addedElement);
+        }
+    }
+
+    private void RemoveElements(SelectionChangeEventArgs e) {
+        foreach(var removedElement in e.RemovedElementIds) {
+            Remove(removedElement);
+        }
+    }
+
+    private void ReplaceElements(SelectionChangeEventArgs e) {
+        var modifiedElements = e.ModifiedElementIds
+            .Select(item => _document.GetElement(item));
+
+        foreach(var modifiedElement in modifiedElements) {
+            Add(modifiedElement);
+        }
+    }
+    
+    private void SelectionElementsOnOnSelectionChanged(object sender, SelectionChangeEventArgs e) {
+        if(e.IsEmpty) {
+            BuildImpl(_selectionElements);
+            return;
+        }
+        
+        AddElements(e);
+        RemoveElements(e);
+        ReplaceElements(e);
+    }
+}

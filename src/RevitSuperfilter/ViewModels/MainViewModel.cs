@@ -5,6 +5,7 @@ using dosymep.WPF.Commands;
 using dosymep.WPF.ViewModels;
 
 using RevitSuperfilter.Models;
+using RevitSuperfilter.Services;
 
 namespace RevitSuperfilter.ViewModels;
 
@@ -13,6 +14,7 @@ namespace RevitSuperfilter.ViewModels;
 /// </summary>
 internal class MainViewModel : BaseViewModel {
     private readonly RevitRepository _revitRepository;
+    private readonly ISuperfilterService _superfilterService;
     private readonly ILocalizationService _localizationService;
 
     private string _errorText;
@@ -20,14 +22,13 @@ internal class MainViewModel : BaseViewModel {
     /// <summary>
     /// Создает экземпляр основной ViewModel главного окна.
     /// </summary>
-    /// <param name="pluginConfig">Настройки плагина.</param>
-    /// <param name="revitRepository">Класс доступа к интерфейсу Revit.</param>
-    /// <param name="localizationService">Интерфейс доступа к сервису локализации.</param>
     public MainViewModel(
         PluginConfig pluginConfig,
         RevitRepository revitRepository,
+        ISuperfilterService superfilterService,
         ILocalizationService localizationService) {
         _revitRepository = revitRepository;
+        _superfilterService = superfilterService;
         _localizationService = localizationService;
 
         LoadViewCommand = RelayCommand.Create(LoadView);
