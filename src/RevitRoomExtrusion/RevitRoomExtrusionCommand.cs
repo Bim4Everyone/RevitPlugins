@@ -43,6 +43,9 @@ public class RevitRoomExtrusionCommand : BasePluginCommand {
         kernel.Bind<FamilyLoadOptions>()
             .ToSelf()
             .InSingletonScope();
+        kernel.Bind<FamilyPathFinder>()
+            .ToSelf()
+            .InSingletonScope();
 
         // Настройка конфигурации плагина
         kernel.Bind<PluginConfig>()
@@ -62,11 +65,21 @@ public class RevitRoomExtrusionCommand : BasePluginCommand {
             $"/{assemblyName};component/assets/localization/Language.xaml",
             CultureInfo.GetCultureInfo("ru-RU"));
 
-        var roomChecker = kernel.Get<RoomChecker>();
-
         var messageBoxService = kernel.Get<IMessageBoxService>();
         var localizationService = kernel.Get<ILocalizationService>();
 
+        // Проверка существования шаблона семейства
+        var pathFinder = kernel.Get<FamilyPathFinder>();
+        if(!pathFinder.CheckFamilyTemplatePath(out string path, out string fam)) {
+            messageBoxService.Show(
+                localizationService.GetLocalizedString("Common.ConfigErrorNoFamily", fam, path),
+                localizationService.GetLocalizedString("Common.ConfigErrorMessageTitle"),
+                MessageBoxButton.OK,
+                MessageBoxImage.Exclamation);
+            throw new OperationCanceledException();
+        }
+
+        var roomChecker = kernel.Get<RoomChecker>();
         if(roomChecker.CheckSelection()) {
             if(roomChecker.CheckRooms()) {
                 Notification(kernel.Get<MainWindow>());

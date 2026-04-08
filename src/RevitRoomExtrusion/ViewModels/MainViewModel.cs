@@ -22,6 +22,7 @@ internal class MainViewModel : BaseViewModel {
     private readonly RevitRepository _revitRepository;
     private readonly ILocalizationService _localizationService;
     private readonly FamilyLoadOptions _familyLoadOptions;
+    private readonly FamilyPathFinder _familyPathFinder;
 
     private string _errorText;
     private string _extrusionHeightMm;
@@ -32,12 +33,14 @@ internal class MainViewModel : BaseViewModel {
         PluginConfig pluginConfig,
         RevitRepository revitRepository,
         ILocalizationService localizationService,
-        FamilyLoadOptions familyLoadOptions) {
+        FamilyLoadOptions familyLoadOptions,
+        FamilyPathFinder familyPathFinder) {
 
         _pluginConfig = pluginConfig;
         _revitRepository = revitRepository;
         _localizationService = localizationService;
         _familyLoadOptions = familyLoadOptions;
+        _familyPathFinder = familyPathFinder;
 
         LoadViewCommand = RelayCommand.Create(LoadView);
         AcceptViewCommand = RelayCommand.Create(AcceptView, CanAcceptView);
@@ -74,8 +77,10 @@ internal class MainViewModel : BaseViewModel {
         SaveConfig();
         SelectedRooms = _revitRepository.GetSelectedRooms();
         double extrusionHeightDouble = Convert.ToDouble(_extrusionHeightMm);
+        string familyPath = _familyPathFinder.GetFamilyTemplatePath();
         var instanceManager = new InstanceManager(_localizationService, _revitRepository, _familyLoadOptions);
-        instanceManager.CreateInstances(SelectedRooms, _extrusionFamilyName, extrusionHeightDouble, _isJoinExtrusionChecked);
+        instanceManager.CreateInstances(
+            SelectedRooms, _extrusionFamilyName, extrusionHeightDouble, _isJoinExtrusionChecked, familyPath);
     }
 
     // Метод проверки возможности выполнения основного метода
