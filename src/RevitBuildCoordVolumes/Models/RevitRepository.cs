@@ -86,7 +86,7 @@ internal class RevitRepository {
     /// <summary>
     /// Метод получения зон RevitArea по заданному типу и параметру
     /// </summary>
-    public IEnumerable<SpatialObject> GetSpatialObjects(string areaType, RevitParam revitParam) {
+    public IEnumerable<SpatialObject> GetSpatialObjects(List<string> areaTypes, RevitParam revitParam) {
         return GetSpatialElements()
             .Select(spatialElement => {
                 string levelName = GetLevelName(spatialElement);
@@ -97,8 +97,10 @@ internal class RevitRepository {
                     Description = description
                 };
             })
-            .Where(spatialObject => areaType
-                .Equals(spatialObject.SpatialElement.GetParamValueOrDefault<string>(revitParam.Name)));
+            .Where(spatialObject => {
+                string value = spatialObject.SpatialElement.GetParamValueOrDefault<string>(revitParam.Name);
+                return value != null && areaTypes.Contains(value);
+            });
     }
 
     /// <summary>
