@@ -35,6 +35,8 @@ internal class NavigatorViewModel : BaseViewModel, ISupportServices {
     private bool _openFromClashDetector;
     private ReportViewModel _selectedFile;
     private ObservableCollection<ReportViewModel> _reports;
+    private ReportsMergeViewModel _reportsMergeViewModel;
+    private bool _showReportsMergeView = false;
 
     public NavigatorViewModel(
         RevitRepository revitRepository,
@@ -67,6 +69,10 @@ internal class NavigatorViewModel : BaseViewModel, ISupportServices {
         DeleteCommand = RelayCommand.Create(Delete, CanDelete);
         SelectClashCommand = RelayCommand.Create<IClashViewModel>(SelectClash, CanSelectClash);
         EditCommentsCommand = RelayCommand.Create<IClashViewModel>(EditComments, CanEditComments);
+        ShowCommentsCommand = RelayCommand.Create<IClashViewModel>(ShowComments, CanEditComments);
+        AcceptReportsMergeCommand =
+            RelayCommand.Create<ReportsMergeViewModel>(AcceptReportsMerge, CanAcceptReportsMerge);
+        CancelReportsMergeCommand = RelayCommand.Create(CancelReportsMerge);
         SaveAllReportsCommand = RelayCommand.Create(SaveAllReports, CanSaveAllReports);
         AskForSaveCommand = RelayCommand.Create(AskForSave);
     }
@@ -79,11 +85,23 @@ internal class NavigatorViewModel : BaseViewModel, ISupportServices {
     public ICommand SaveAllReportsCommand { get; }
     public ICommand AskForSaveCommand { get; }
     public ICommand EditCommentsCommand { get; }
+    public ICommand ShowCommentsCommand { get; }
+    public ICommand AcceptReportsMergeCommand { get; }
+    public ICommand CancelReportsMergeCommand { get; }
     public IOpenFileDialogService OpenFileDialogService { get; }
     public ISaveFileDialogService SaveFileDialogService { get; }
     public IMessageBoxService MessageBoxService { get; }
     public IServiceContainer ServiceContainer { get; }
 
+    public ReportsMergeViewModel ReportsMergeViewModel {
+        get => _reportsMergeViewModel;
+        set => RaiseAndSetIfChanged(ref _reportsMergeViewModel, value);
+    }
+
+    public bool ShowReportsMergeView {
+        get => _showReportsMergeView;
+        set => RaiseAndSetIfChanged(ref _showReportsMergeView, value);
+    }
 
     public ObservableCollection<ReportViewModel> Reports {
         get => _reports;
@@ -156,14 +174,16 @@ internal class NavigatorViewModel : BaseViewModel, ISupportServices {
     }
 
     private void Load() {
-        string path = _revitRepository.GetFileDialogPath();
-        if(!OpenFileDialogService.ShowDialog(path)) {
-            throw new OperationCanceledException();
-        }
-
-        InitializeClashes(OpenFileDialogService.File.FullName);
-        _revitRepository.CommonConfig.LastRunPath = OpenFileDialogService.File.DirectoryName;
-        _revitRepository.CommonConfig.SaveProjectConfig();
+        ShowReportsMergeView = !ShowReportsMergeView;
+        // TODO
+        // string path = _revitRepository.GetFileDialogPath();
+        // if(!OpenFileDialogService.ShowDialog(path)) {
+        //     throw new OperationCanceledException();
+        // }
+        // 
+        // InitializeClashes(OpenFileDialogService.File.FullName);
+        // _revitRepository.CommonConfig.LastRunPath = OpenFileDialogService.File.DirectoryName;
+        // _revitRepository.CommonConfig.SaveProjectConfig();
     }
 
     private void InitializeClashes(string path) {
@@ -245,5 +265,27 @@ internal class NavigatorViewModel : BaseViewModel, ISupportServices {
 
     private bool CanEditComments(IClashViewModel clash) {
         return clash is ClashViewModel;
+    }
+
+    private void ShowComments(IClashViewModel clashVm) {
+        var clash = (ClashViewModel) clashVm;
+        bool backup = clash.CanEditComments;
+        clash.CanEditComments = false;
+        EditComments(clash);
+        clash.CanEditComments = backup;
+    }
+
+    private void AcceptReportsMerge(ReportsMergeViewModel vm) {
+    }
+
+    private bool CanAcceptReportsMerge(ReportsMergeViewModel vm) {
+        if(vm is null) {
+            return false;
+        }
+
+        return true;
+    }
+
+    private void CancelReportsMerge() {
     }
 }

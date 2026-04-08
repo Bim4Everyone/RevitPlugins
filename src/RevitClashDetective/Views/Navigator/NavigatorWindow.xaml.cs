@@ -29,8 +29,8 @@ internal partial class NavigatorWindow {
                 VisibleIndex = startSecond,
                 FieldName = $"{nameof(IClashViewModel.SecondElementParams)}.{ClashViewModel.ElementParamFieldName}{i}"
             };
-            _dg.Columns.Add(firstElementColumn);
-            _dg.Columns.Add(secondElementColumn);
+            _selectedReportView._dg.Columns.Add(firstElementColumn);
+            _selectedReportView._dg.Columns.Add(secondElementColumn);
         }
     }
 

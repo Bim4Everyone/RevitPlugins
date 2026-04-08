@@ -27,6 +27,7 @@
         <StackPanel
             Grid.Row="0"
             Margin="0 0 0 8"
+            IsEnabled="{Binding CanEditComments}"
             Orientation="Horizontal">
             <dx:SimpleButton
                 Command="{Binding AddCommentCommand}"
@@ -42,6 +43,7 @@
             Grid.Row="1"
             x:Name="_commentsListView"
             SelectionMode="Single"
+            IsEnabled="{Binding CanEditComments}"
             ScrollViewer.HorizontalScrollBarVisibility="Disabled"
             ScrollViewer.VerticalScrollBarVisibility="Auto"
             ItemsSource="{Binding Comments}"

@@ -24,6 +24,7 @@ internal class ClashViewModel : BaseViewModel, IClashViewModel, IEquatable<Clash
     private readonly RevitRepository _revitRepository;
     private bool _clashDataIsValid;
     private ClashCommentViewModel _selectedComment;
+    private bool _canEditComments = true;
 
     public ClashViewModel(RevitRepository revitRepository, ClashModel clash) {
         _revitRepository = revitRepository;
@@ -84,6 +85,11 @@ internal class ClashViewModel : BaseViewModel, IClashViewModel, IEquatable<Clash
     public ClashCommentViewModel SelectedComment {
         get => _selectedComment;
         set => RaiseAndSetIfChanged(ref _selectedComment, value);
+    }
+
+    public bool CanEditComments {
+        get => _canEditComments;
+        set => RaiseAndSetIfChanged(ref _canEditComments, value);
     }
 
     public ObservableCollection<ClashCommentViewModel> Comments { get; }
