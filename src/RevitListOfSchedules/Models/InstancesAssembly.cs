@@ -13,31 +13,26 @@ internal class InstancesAssembly {
     private readonly ILocalizationService _localizationService;
     private readonly IList<string> _approvedLines;
     private readonly RevitRepository _revitRepository;
-    private readonly ViewDrafting _viewDrafting;
-    private readonly FamilySymbol _familySymbol;
-    private readonly string _albumName;
 
     public InstancesAssembly(
         ILocalizationService localizationService,
-        RevitRepository revitRepository,
-        ViewDrafting viewDrafting,
-        FamilySymbol familySymbol,
-        string albumName) {
+        RevitRepository revitRepository) {
         _localizationService = localizationService;
         _revitRepository = revitRepository;
-        _viewDrafting = viewDrafting;
-        _familySymbol = familySymbol;
-        _albumName = albumName;
-
         string localizedApprovedLines = _localizationService.GetLocalizedString("InstancesAssembly.ApprovedLines");
-
         _approvedLines = localizedApprovedLines
             .Split([','], StringSplitOptions.RemoveEmptyEntries)
             .Select(s => s.Trim())
             .ToList();
     }
 
-    public void PlaceFamilyInstances(string sheetNumber, string sheetRevNumber, IList<ViewSchedule> listOfSchedules) {
+    public void PlaceFamilyInstances(
+        string sheetNumber,
+        string sheetRevNumber,
+        IList<ViewSchedule> listOfSchedules,
+        FamilySymbol familySymbol,
+        ViewDrafting viewDrafting,
+        string albumName) {
         foreach(var schedule in listOfSchedules) {
             var tableData = schedule.GetTableData();
             var headData = tableData.GetSectionData(SectionType.Header);
@@ -56,28 +51,34 @@ internal class InstancesAssembly {
                     }
                 }
                 if(found) {
-                    PlaceFamilyInstance(sheetNumber, sheetRevNumber, resultScheduleName);
+                    PlaceFamilyInstance(sheetNumber, sheetRevNumber, resultScheduleName, familySymbol, viewDrafting, albumName);
                 } else if(!found
                     && headData.NumberOfRows == 1
                     && headData.NumberOfColumns == 1
                     && string.IsNullOrEmpty(headData.GetCellText(0, 0))) {
 
-                    PlaceFamilyInstance(sheetNumber, sheetRevNumber, schedule.Name);
+                    PlaceFamilyInstance(sheetNumber, sheetRevNumber, schedule.Name, familySymbol, viewDrafting, albumName);
                 }
             }
         }
     }
 
-    public void PlaceFamilyInstance(string sheetNumber, string sheetRevNumber, string scheduleName) {
-        var familyInstance = _revitRepository.Document.Create.NewFamilyInstance(XYZ.Zero, _familySymbol, _viewDrafting);
+    public void PlaceFamilyInstance(
+        string sheetNumber,
+        string sheetRevNumber,
+        string scheduleName,
+        FamilySymbol familySymbol,
+        ViewDrafting viewDrafting,
+        string albumName) {
+        var familyInstance = _revitRepository.Document.Create.NewFamilyInstance(XYZ.Zero, familySymbol, viewDrafting);
         familyInstance.SetParamValue(ParamFactory.ListOfSchedulesSheetName, sheetNumber);
         familyInstance.SetParamValue(ParamFactory.ListOfSchedulesRevNumber, sheetRevNumber);
         familyInstance.SetParamValue(ParamFactory.ListOfSchedulesListName, scheduleName);
-        familyInstance.SetParamValue(ParamFactory.ListOfSchedulesGroup, $"{ParamFactory.DefaultScheduleName}_{_albumName}");
+        familyInstance.SetParamValue(ParamFactory.ListOfSchedulesGroup, $"{ParamFactory.DefaultScheduleName}_{albumName}");
     }
 
-    public void DeleteFamilyInstances() {
-        var instances = new FilteredElementCollector(_revitRepository.Document, _viewDrafting.Id)
+    public void DeleteFamilyInstances(ViewDrafting viewDrafting) {
+        var instances = new FilteredElementCollector(_revitRepository.Document, viewDrafting.Id)
             .OfType<FamilyInstance>()
             .Select(instance => instance.Id)
             .ToList();

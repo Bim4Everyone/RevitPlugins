@@ -47,7 +47,7 @@
     <system:String
         x:Key="MainWindow.ButtonCancel">Отмена</system:String>
     <system:String
-        x:Key="TempFamilyDocument.TemplateFamilyName">{0}\Метрическая система, элементы узлов.rft</system:String>
+        x:Key="TempFamilyDocument.TemplateFamilyName">Метрическая система, элементы узлов.rft</system:String>
     <system:String
         x:Key="TempFamilyDocument.FamilyName">{0}Ведомость_Спецификаций_{1}{2}</system:String>
     <system:String
@@ -70,6 +70,8 @@
         x:Key="Common.ParamErrorMessageBody">Ошибка загрузки параметров</system:String>
     <system:String
         x:Key="Common.ConfigErrorMessageTitle">Ошибка настройки плагина</system:String>
+    <system:String
+        x:Key="Common.ConfigErrorNoFamily">Отсутствует шаблон семейства:  {0}  по пути:  {1}</system:String>
     <system:String
         x:Key="GroupParameter.NoParameter">Нет параметра группировки</system:String>
     <system:String

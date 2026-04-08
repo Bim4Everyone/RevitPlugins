@@ -14,36 +14,28 @@ internal class TempFamilyDocument {
     private readonly ILocalizationService _localizationService;
     private readonly RevitRepository _revitRepository;
     private readonly FamilyLoadOptions _familyLoadOptions;
-    private readonly string _familyTemplatePath;
-    private readonly string _familyPath;
     private readonly string _tempDirectory = Path.GetTempPath();
 
     public TempFamilyDocument(
         ILocalizationService localizationService,
         RevitRepository revitRepository,
-        FamilyLoadOptions familyLoadOptions,
-        string albumName) {
+        FamilyLoadOptions familyLoadOptions) {
         _localizationService = localizationService;
         _revitRepository = revitRepository;
         _familyLoadOptions = familyLoadOptions;
-
-        string familyTemplatePath = _revitRepository.Application.FamilyTemplatePath;
-
-        _familyTemplatePath = _localizationService.GetLocalizedString(
-            "TempFamilyDocument.TemplateFamilyName", familyTemplatePath);
-        _familyPath = _localizationService.GetLocalizedString(
-            "TempFamilyDocument.FamilyName", _tempDirectory, albumName, _extension);
     }
 
-    public FamilySymbol GetFamilySymbol() {
+    public FamilySymbol GetFamilySymbol(string familyTemplatePath, string albumName) {
+        string familyPath = _localizationService.GetLocalizedString(
+            "TempFamilyDocument.FamilyName", _tempDirectory, albumName, _extension);
         try {
-            CreateFile();
+            CreateFile(familyTemplatePath, familyPath);
             FamilySymbol familySymbol = null;
-            bool loadSuccess = _revitRepository.Document.LoadFamily(_familyPath, _familyLoadOptions, out var family);
+            bool loadSuccess = _revitRepository.Document.LoadFamily(familyPath, _familyLoadOptions, out var family);
             familySymbol = _revitRepository.GetFamilySymbol(family);
 
             if(!loadSuccess || family == null) {
-                DeleteFile();
+                DeleteFile(familyPath);
                 return null;
             }
             if(familySymbol != null) {
@@ -51,18 +43,18 @@ internal class TempFamilyDocument {
                     familySymbol.Activate();
                 }
             }
-            DeleteFile();
+            DeleteFile(familyPath);
             return familySymbol;
 
         } finally {
-            DeleteFile();
+            DeleteFile(familyPath);
         }
     }
 
-    private void CreateFile() {
+    private void CreateFile(string familyTemplatePath, string familyPath) {
         Document document = null;
         try {
-            document = _revitRepository.Application.NewFamilyDocument(_familyTemplatePath);
+            document = _revitRepository.Application.NewFamilyDocument(familyTemplatePath);
             string transactionName = _localizationService.GetLocalizedString("TempFamilyDocument.TransactionName");
             using(var t = document.StartTransaction(transactionName)) {
                 CreateCircle(document);
@@ -71,7 +63,7 @@ internal class TempFamilyDocument {
             var opt = new SaveAsOptions {
                 OverwriteExistingFile = true
             };
-            document.SaveAs(_familyPath, opt);
+            document.SaveAs(familyPath, opt);
 
         } finally {
             document?.Close(false);
@@ -90,10 +82,10 @@ internal class TempFamilyDocument {
         familyCreator.NewDetailCurve(viewPlan, circle);
     }
 
-    private void DeleteFile() {
+    private void DeleteFile(string familyPath) {
         try {
-            if(File.Exists(_familyPath)) {
-                File.Delete(_familyPath);
+            if(File.Exists(familyPath)) {
+                File.Delete(familyPath);
             }
         } catch(UnauthorizedAccessException) {
         }
