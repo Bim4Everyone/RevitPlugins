@@ -14,6 +14,7 @@ using RevitClashDetective.Models.FilterModel;
 using RevitClashDetective.Models.Interfaces;
 using RevitClashDetective.ViewModels.Navigator;
 using RevitClashDetective.Views;
+using RevitClashDetective.Views.Navigator;
 
 using Wpf.Ui;
 
@@ -187,8 +188,8 @@ internal class CheckViewModel : BaseViewModel, INamedEntity {
     }
 
     private void ShowClashes() {
-        var view = new NavigatorView(_settingsConfig) {
-            DataContext = new ReportsViewModel(
+        var view = new NavigatorWindow(_settingsConfig) {
+            DataContext = new NavigatorViewModel(
             _revitRepository,
             OpenFileDialogService,
             SaveFileDialogService,

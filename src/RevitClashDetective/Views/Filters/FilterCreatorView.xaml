@@ -1,5 +1,5 @@
 ﻿<core:WpfUIPlatformWindow
-    x:Class="RevitClashDetective.Views.FilterCreatorView"
+    x:Class="RevitClashDetective.Views.Filters.FilterCreatorView"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:local="clr-namespace:RevitClashDetective.Views"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
@@ -12,6 +12,7 @@
     xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
     xmlns:wpfbehaviors="clr-namespace:dosymep.WpfCore.Behaviors;assembly=dosymep.WpfCore"
     xmlns:res="clr-namespace:RevitClashDetective.Resources"
+    xmlns:filters="clr-namespace:RevitClashDetective.Views.Filters"
     mc:Ignorable="d"
     Height="600"
     Width="1000"
@@ -34,7 +35,7 @@
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
                 <ResourceDictionary
-                    Source="../Resources/CustomStyles.xaml" />
+                    Source="../../Resources/CustomStyles.xaml" />
                 <ResourceDictionary
                     Source="pack://application:,,,/Wpf.Ui;component/Controls/ListView/ListView.xaml" />
                 <ResourceDictionary
@@ -171,7 +172,7 @@
                 <Label
                     DockPanel.Dock="Top"
                     Content="{me:LocalizationSource FilterCreation.Categories}" />
-                <local:CategoryView
+                <filters:CategoryView
                     DataContext="{Binding SelectedFilter}" />
             </DockPanel>
         </Border>
@@ -192,7 +193,7 @@
                     DockPanel.Dock="Top"
                     Content="{me:LocalizationSource FilterCreation.Criteria}" />
                 <ScrollViewer>
-                    <local:CriterionView
+                    <filters:CriterionView
                         DataContext="{Binding SelectedFilter.Set}" />
                 </ScrollViewer>
             </DockPanel>

@@ -4,20 +4,24 @@ using dosymep.SimpleServices;
 
 using Wpf.Ui;
 
-namespace RevitClashDetective.Views;
+namespace RevitClashDetective.Views.Checks;
+
 public partial class MainWindow {
     public MainWindow(
-    ILoggerService loggerService,
-    ISerializationService serializationService,
-    ILanguageService languageService,
-    ILocalizationService localizationService,
-    IUIThemeService uiThemeService,
-    IUIThemeUpdaterService themeUpdaterService,
-    IContentDialogService contentDialogService)
-    : base(loggerService,
-        serializationService,
-        languageService, localizationService,
-        uiThemeService, themeUpdaterService) {
+        ILoggerService loggerService,
+        ISerializationService serializationService,
+        ILanguageService languageService,
+        ILocalizationService localizationService,
+        IUIThemeService uiThemeService,
+        IUIThemeUpdaterService themeUpdaterService,
+        IContentDialogService contentDialogService)
+        : base(
+            loggerService,
+            serializationService,
+            languageService,
+            localizationService,
+            uiThemeService,
+            themeUpdaterService) {
         InitializeComponent();
         contentDialogService.SetDialogHost(_rootContentDialog);
     }

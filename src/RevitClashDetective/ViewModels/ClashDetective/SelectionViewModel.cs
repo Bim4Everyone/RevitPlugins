@@ -14,6 +14,7 @@ using RevitClashDetective.Models;
 using RevitClashDetective.Models.FilterModel;
 using RevitClashDetective.Models.Interfaces;
 using RevitClashDetective.Views;
+using RevitClashDetective.Views.Checks;
 
 using Wpf.Ui;
 

@@ -1,4 +1,4 @@
-namespace RevitClashDetective.Views;
+namespace RevitClashDetective.Views.Navigator;
 
 public partial class CommentView {
     public CommentView() {

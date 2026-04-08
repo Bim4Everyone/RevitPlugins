@@ -18,6 +18,7 @@ using RevitClashDetective.Models.GraphicView;
 using RevitClashDetective.Models.Handlers;
 using RevitClashDetective.ViewModels.Navigator;
 using RevitClashDetective.Views;
+using RevitClashDetective.Views.Navigator;
 
 using Wpf.Ui;
 
@@ -39,7 +40,7 @@ public class GetClashesCommand : BasePluginCommand {
         kernel.Bind<ParameterFilterProvider>()
             .ToSelf()
             .InSingletonScope();
-        kernel.Bind<ReportsViewModel>()
+        kernel.Bind<NavigatorViewModel>()
             .ToSelf()
             .InSingletonScope()
             .WithConstructorArgument("selectedFile", (string) null);
@@ -48,20 +49,20 @@ public class GetClashesCommand : BasePluginCommand {
             .InSingletonScope();
         kernel.Bind<SettingsConfig>()
             .ToMethod(c => SettingsConfig.GetSettingsConfig(c.Kernel.Get<IConfigSerializer>()));
-        kernel.UseWpfOpenFileDialog<ReportsViewModel>(
+        kernel.UseWpfOpenFileDialog<NavigatorViewModel>(
             filter: "NavisClashReport (*.xml)|*.xml|PluginClashReport (*.json)|*.json");
-        kernel.UseWpfSaveFileDialog<ReportsViewModel>();
-        kernel.UseXtraMessageBox<ReportsViewModel>();
-        kernel.Bind<NavigatorView>()
+        kernel.UseWpfSaveFileDialog<NavigatorViewModel>();
+        kernel.UseXtraMessageBox<NavigatorViewModel>();
+        kernel.Bind<NavigatorWindow>()
             .ToSelf()
             .InSingletonScope()
-            .WithPropertyValue(nameof(Window.DataContext), c => c.Kernel.Get<ReportsViewModel>());
+            .WithPropertyValue(nameof(Window.DataContext), c => c.Kernel.Get<NavigatorViewModel>());
 
         string assemblyName = Assembly.GetExecutingAssembly().GetName().Name;
         kernel.UseWpfLocalization(
             $"/{assemblyName};component/assets/Localization/Language.xaml",
             CultureInfo.GetCultureInfo("ru-RU"));
 
-        kernel.Get<NavigatorView>().Show();
+        kernel.Get<NavigatorWindow>().Show();
     }
 }

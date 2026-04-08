@@ -6,9 +6,10 @@ using DevExpress.Xpf.Grid;
 using RevitClashDetective.Models;
 using RevitClashDetective.ViewModels.Navigator;
 
-namespace RevitClashDetective.Views;
-internal partial class NavigatorView {
-    public NavigatorView(SettingsConfig config) {
+namespace RevitClashDetective.Views.Navigator;
+
+internal partial class NavigatorWindow {
+    public NavigatorWindow(SettingsConfig config) {
         if(config is null) {
             throw new ArgumentNullException(nameof(config));
         }
@@ -34,7 +35,7 @@ internal partial class NavigatorView {
     }
 
     public override string PluginName => nameof(RevitClashDetective);
-    public override string ProjectConfigName => nameof(NavigatorView);
+    public override string ProjectConfigName => nameof(NavigatorWindow);
 
     private void ButtonCancel_Click(object sender, RoutedEventArgs e) {
         Close();

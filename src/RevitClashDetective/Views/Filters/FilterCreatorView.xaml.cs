@@ -2,19 +2,23 @@ using System.Windows;
 
 using dosymep.SimpleServices;
 
-namespace RevitClashDetective.Views;
+namespace RevitClashDetective.Views.Filters;
+
 public partial class FilterCreatorView {
     public FilterCreatorView(
-    ILoggerService loggerService,
-    ISerializationService serializationService,
-    ILanguageService languageService,
-    ILocalizationService localizationService,
-    IUIThemeService uiThemeService,
-    IUIThemeUpdaterService themeUpdaterService)
-    : base(loggerService,
-        serializationService,
-        languageService, localizationService,
-        uiThemeService, themeUpdaterService) {
+        ILoggerService loggerService,
+        ISerializationService serializationService,
+        ILanguageService languageService,
+        ILocalizationService localizationService,
+        IUIThemeService uiThemeService,
+        IUIThemeUpdaterService themeUpdaterService)
+        : base(
+            loggerService,
+            serializationService,
+            languageService,
+            localizationService,
+            uiThemeService,
+            themeUpdaterService) {
         InitializeComponent();
     }
 

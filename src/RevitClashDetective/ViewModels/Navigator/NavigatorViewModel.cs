@@ -16,6 +16,7 @@ using dosymep.WPF.ViewModels;
 using RevitClashDetective.Models;
 using RevitClashDetective.Models.Clashes;
 using RevitClashDetective.Models.RevitClashReport;
+using RevitClashDetective.Services.ReportsMerging;
 using RevitClashDetective.Services.RevitViewSettings;
 
 using Wpf.Ui;
@@ -26,7 +27,7 @@ using ISaveFileDialogService = dosymep.SimpleServices.ISaveFileDialogService;
 
 namespace RevitClashDetective.ViewModels.Navigator;
 
-internal class ReportsViewModel : BaseViewModel, ISupportServices {
+internal class NavigatorViewModel : BaseViewModel, ISupportServices {
     private readonly RevitRepository _revitRepository;
     private readonly ILocalizationService _localizationService;
     private readonly IContentDialogService _contentDialogService;
@@ -35,7 +36,8 @@ internal class ReportsViewModel : BaseViewModel, ISupportServices {
     private ReportViewModel _selectedFile;
     private ObservableCollection<ReportViewModel> _reports;
 
-    public ReportsViewModel(RevitRepository revitRepository,
+    public NavigatorViewModel(
+        RevitRepository revitRepository,
         IOpenFileDialogService openFileDialogService,
         ISaveFileDialogService saveFileDialogService,
         IMessageBoxService messageBoxService,

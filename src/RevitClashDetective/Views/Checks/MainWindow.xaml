@@ -1,5 +1,5 @@
 ﻿<core:WpfUIPlatformWindow
-    x:Class="RevitClashDetective.Views.MainWindow"
+    x:Class="RevitClashDetective.Views.Checks.MainWindow"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
@@ -13,6 +13,7 @@
     xmlns:clashDetective="clr-namespace:RevitClashDetective.ViewModels.ClashDetective"
     xmlns:cm="clr-namespace:System.ComponentModel;assembly=WindowsBase"
     xmlns:converters="clr-namespace:dosymep.WpfCore.Converters;assembly=dosymep.WpfCore"
+    xmlns:checks="clr-namespace:RevitClashDetective.Views.Checks"
     mc:Ignorable="d"
     Height="450"
     Width="800"
@@ -39,9 +40,9 @@
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
                 <ResourceDictionary
-                    Source="../Resources/CustomStyles.xaml" />
+                    Source="../../Resources/CustomStyles.xaml" />
                 <ResourceDictionary
-                    Source="../Resources/CustomDataGrid.xaml" />
+                    Source="../../Resources/CustomDataGrid.xaml" />
                 <ResourceDictionary
                     Source="pack://application:,,,/Wpf.Ui;component/Controls/DataGrid/DataGrid.xaml" />
             </ResourceDictionary.MergedDictionaries>
@@ -198,7 +199,7 @@
                             Header="{StaticResource FirstSelectionLabel}">
                             <DataGridTemplateColumn.CellTemplate>
                                 <DataTemplate>
-                                    <local:SelectionView
+                                    <checks:SelectionView
                                         DataContext="{Binding FirstSelection, UpdateSourceTrigger=PropertyChanged}" />
                                 </DataTemplate>
                             </DataGridTemplateColumn.CellTemplate>
@@ -210,7 +211,7 @@
                             Header="{StaticResource SecondSelectionLabel}">
                             <DataGridTemplateColumn.CellTemplate>
                                 <DataTemplate>
-                                    <local:SelectionView
+                                    <checks:SelectionView
                                         DataContext="{Binding SecondSelection, UpdateSourceTrigger=PropertyChanged}" />
                                 </DataTemplate>
                             </DataGridTemplateColumn.CellTemplate>

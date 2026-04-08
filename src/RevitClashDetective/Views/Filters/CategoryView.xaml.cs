@@ -1,8 +1,10 @@
 using dosymep.SimpleServices;
 
-namespace RevitClashDetective.Views;
+namespace RevitClashDetective.Views.Filters;
+
 public partial class CategoryView {
-    public CategoryView() : base() {
+    public CategoryView()
+        : base() {
         InitializeComponent();
     }
 
@@ -12,7 +14,8 @@ public partial class CategoryView {
         ILocalizationService localizationService,
         IUIThemeService uiThemeService,
         IUIThemeUpdaterService themeUpdaterService)
-        : base(loggerService,
+        : base(
+            loggerService,
             languageService,
             localizationService,
             uiThemeService,

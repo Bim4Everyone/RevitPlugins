@@ -24,6 +24,9 @@ using RevitClashDetective.ViewModels.SearchSet;
 using RevitClashDetective.ViewModels.Services;
 using RevitClashDetective.Views;
 
+using FilterNameView = RevitClashDetective.Views.Filters.FilterNameView;
+using SearchSetView = RevitClashDetective.Views.Filters.SearchSetView;
+
 namespace RevitClashDetective.ViewModels.FilterCreatorViewModels;
 
 internal class FiltersViewModel : BaseViewModel, IWindowClosingHandler {

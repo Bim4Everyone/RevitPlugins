@@ -1,19 +1,21 @@
 using dosymep.SimpleServices;
 
-namespace RevitClashDetective.Views;
-public partial class SelectionView {
+namespace RevitClashDetective.Views.Filters;
 
-    public SelectionView() : base() {
+public partial class CriterionView {
+    public CriterionView()
+        : base() {
         InitializeComponent();
     }
 
-    public SelectionView(
+    public CriterionView(
         ILoggerService loggerService,
         ILanguageService languageService,
         ILocalizationService localizationService,
         IUIThemeService uiThemeService,
         IUIThemeUpdaterService themeUpdaterService)
-        : base(loggerService,
+        : base(
+            loggerService,
             languageService,
             localizationService,
             uiThemeService,

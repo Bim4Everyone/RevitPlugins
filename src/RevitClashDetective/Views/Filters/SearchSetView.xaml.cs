@@ -1,4 +1,5 @@
-namespace RevitClashDetective.Views;
+namespace RevitClashDetective.Views.Filters;
+
 public partial class SearchSetView {
     public SearchSetView() {
         InitializeComponent();

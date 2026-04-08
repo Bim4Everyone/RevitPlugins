@@ -1,6 +1,8 @@
 using System.Collections.Generic;
 
-namespace RevitClashDetective.ViewModels.Navigator;
+using RevitClashDetective.ViewModels.Navigator;
+
+namespace RevitClashDetective.Services.ReportsMerging;
 internal class ReportsNamesIgnoreCaseComparer : IEqualityComparer<ReportViewModel> {
     public bool Equals(ReportViewModel x, ReportViewModel y) {
         if(x is null || y is null || string.IsNullOrWhiteSpace(x.Name) || string.IsNullOrWhiteSpace(y.Name)) {

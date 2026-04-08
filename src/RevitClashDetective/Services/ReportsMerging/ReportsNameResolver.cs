@@ -6,7 +6,9 @@ using Autodesk.Revit.UI;
 
 using dosymep.SimpleServices;
 
-namespace RevitClashDetective.ViewModels.Navigator;
+using RevitClashDetective.ViewModels.Navigator;
+
+namespace RevitClashDetective.Services.ReportsMerging;
 internal class ReportsNameResolver {
     private readonly IEqualityComparer<ReportViewModel> _reportsComparer;
     private readonly IEqualityComparer<IClashViewModel> _clashesComparer;

@@ -2,7 +2,8 @@ using RevitClashDetective.ViewModels.ClashDetective;
 
 using Wpf.Ui;
 
-namespace RevitClashDetective.Views;
+namespace RevitClashDetective.Views.Checks;
+
 internal partial class SelectableNamesDialog {
     public SelectableNamesDialog(SelectableNamesViewModel vm, IContentDialogService dialogService)
         : base(dialogService.GetDialogHost()) {
