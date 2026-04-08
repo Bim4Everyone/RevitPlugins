@@ -4,6 +4,7 @@ using System.Linq;
 
 using Autodesk.Revit.DB;
 
+using RevitBuildCoordVolumes.Models.Enums;
 using RevitBuildCoordVolumes.Models.Geometry;
 using RevitBuildCoordVolumes.Models.Interfaces;
 using RevitBuildCoordVolumes.Models.Utilites;
@@ -11,14 +12,15 @@ using RevitBuildCoordVolumes.Models.Utilites;
 namespace RevitBuildCoordVolumes.Models.Services;
 
 internal class ContourService : IContourService {
-    public List<CurveLoop> GetColumnsCurveLoops(List<ColumnObject> columns, double spatialElementPosition, double startExtrudePosition) {
+    public List<CurveLoop> GetColumnsCurveLoops(
+        List<ColumnObject> columns, double spatialElementPosition, double startExtrudePosition, ProgressService progressService) {
         // Получаем все линии полигонов
         var allLines = columns
             .SelectMany(column => column.PolygonObject.Sides)
             .ToList();
 
         // Удаляем дубликаты
-        var uniqueLines = GetUniqueLines(allLines)
+        var uniqueLines = GetUniqueLines(allLines, progressService)
             .Cast<Curve>()
             .ToList();
 
@@ -93,9 +95,8 @@ internal class ContourService : IContourService {
     }
 
     // Метод получения списка уникальных линий (удаление дубликатов квадратов)
-    private List<Line> GetUniqueLines(List<Line> lines) {
+    private List<Line> GetUniqueLines(List<Line> lines, ProgressService progressService) {
         var map = new Dictionary<string, Line>(lines.Count);
-
         static string GetKey(Line line) {
             // сортируем концы по координатам
             double x1 = line.GetEndPoint(0).X, y1 = line.GetEndPoint(0).Y;
@@ -114,17 +115,29 @@ internal class ContourService : IContourService {
 
             return $"{qx1}_{qy1}_{qx2}_{qy2}";
         }
-
+        progressService?.BeginStage(ProgressType.BuildContour);
+        int total = lines.Count;
+        int processed = 0;
+        int reported = 0;
         foreach(var line in lines) {
+            progressService?.CancellationToken.ThrowIfCancellationRequested();
             string key = GetKey(line);
 
             if(map.TryGetValue(key, out var existing)) {
                 if(line.Intersect(existing) == SetComparisonResult.Equal) {
-                    // удаляем обе линии
                     map.Remove(key);
                 }
             } else {
                 map.Add(key, line);
+            }
+            processed++;
+            int current = processed * 100 / total;
+            if(current > 100) {
+                current = 100;
+            }
+            if(current > reported) {
+                reported = current;
+                progressService?.ProgressCount?.Report(reported);
             }
         }
 

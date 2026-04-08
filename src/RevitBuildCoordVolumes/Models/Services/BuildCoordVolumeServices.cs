@@ -15,6 +15,7 @@ internal sealed class BuildCoordVolumeServices {
         IWindowService windowService) {
         LocalizationService = localizationService;
         RevitParamFactory = revitParamFactory;
+        ContourService = new ContourService();
         GeomObjectFactory = new GeomObjectFactory(ContourService);
         CategoryAvailabilityService = new CategoryAvailabilityService(revitRepository.Document);
         DirectShapeObjectFactory = new DirectShapeObjectFactory(systemPluginConfig);
@@ -23,12 +24,13 @@ internal sealed class BuildCoordVolumeServices {
         SpatialElementCheckService = new SpatialElementCheckService(ContourService);
         SpatialDivider = new SpatialElementDividerService(ContourService);
         SlabNormalizer = new SlabNormalizeService(systemPluginConfig);
+        ColumnFactory = new ColumnFactory();
     }
 
     public ISpatialElementDividerService SpatialDivider { get; }
     public ISlabNormalizeService SlabNormalizer { get; }
-    public IColumnFactory ColumnFactory { get; } = new ColumnFactory();
-    public IContourService ContourService { get; } = new ContourService();
+    public IColumnFactory ColumnFactory { get; }
+    public IContourService ContourService { get; }
     public IGeomObjectFactory GeomObjectFactory { get; }
     public IParamSetter ParamSetter { get; }
     public IDirectShapeObjectFactory DirectShapeObjectFactory { get; }

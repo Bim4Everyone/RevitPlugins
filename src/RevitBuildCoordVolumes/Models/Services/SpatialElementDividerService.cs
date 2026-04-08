@@ -4,6 +4,7 @@ using System.Linq;
 
 using Autodesk.Revit.DB;
 
+using RevitBuildCoordVolumes.Models.Enums;
 using RevitBuildCoordVolumes.Models.Geometry;
 using RevitBuildCoordVolumes.Models.Interfaces;
 using RevitBuildCoordVolumes.Models.Utilites;
@@ -17,9 +18,12 @@ internal class SpatialElementDividerService : ISpatialElementDividerService {
         _contourService = contourService;
     }
 
-    public List<PolygonObject> DivideSpatialElement(SpatialElement spatialElement, double side, double angleDeg) {
+    public List<PolygonObject> DivideSpatialElement(
+        SpatialElement spatialElement,
+        double side,
+        double angleDeg,
+        ProgressService progressService) {
         var contour = _contourService.GetOuterContour(spatialElement);
-
         if(contour.Count == 0) {
             return [];
         }
@@ -44,10 +48,14 @@ internal class SpatialElementDividerService : ISpatialElementDividerService {
         int nx = (int) (halfWidth / side) + 1;
         int ny = (int) (halfHeight / side) + 1;
 
+        progressService?.BeginStage(ProgressType.DivideSpatial);
+        int total = (2 * nx + 1) * (2 * ny + 1);
+        int processed = 0;
+        int reported = 0;
         var polygons = new List<PolygonObject>();
-
         for(int ix = -nx; ix <= nx; ix++) {
             for(int iy = -ny; iy <= ny; iy++) {
+                progressService?.CancellationToken.ThrowIfCancellationRequested();
 
                 var basePoint = origin + ux * (ix * side) + uy * (iy * side);
 
@@ -78,6 +86,15 @@ internal class SpatialElementDividerService : ISpatialElementDividerService {
                         Line.CreateBound(p4, p1)
                     ]
                 });
+                processed++;
+                int current = processed * 100 / total;
+                if(current > 100) {
+                    current = 100;
+                }
+                if(current > reported) {
+                    reported = current;
+                    progressService?.ProgressCount?.Report(reported);
+                }
             }
         }
         return polygons;

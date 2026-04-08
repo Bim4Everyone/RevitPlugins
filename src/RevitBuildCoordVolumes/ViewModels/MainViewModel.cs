@@ -178,19 +178,24 @@ internal class MainViewModel : BaseViewModel {
 
         var processor = new BuildCoordVolumesProcessor(_revitRepository, _settings, _services);
 
-        int count = _settings.SpatialObjects.Count;
         using var progressDialogService = ProgressDialogFactory.CreateDialog();
         var progress = progressDialogService.CreateProgress();
         var ct = progressDialogService.CreateCancellationToken();
 
-        progressDialogService.MaxValue = count;
-        progressDialogService.StepValue = count / 10;
-        progressDialogService.DisplayTitleFormat = _services.LocalizationService.GetLocalizedString("MainViewModel.ProgressTitle");
+        var progressService = new ProgressService(_services.LocalizationService) {
+            CancellationToken = ct,
+            ProgressCount = progress,
+            SetupStage = (text, max, step) => {
+                progressDialogService.DisplayTitleFormat = text;
+                progressDialogService.MaxValue = max;
+                progressDialogService.StepValue = step;
+            }
+        };
 
         progressDialogService.Show();
 
         // Основной метод построения объемов
-        processor.Run(progress, ct);
+        processor.Run(progressService);
     }
 
     // Метод проверки возможности выполнения основного метода

@@ -3,8 +3,10 @@ using System.Linq;
 
 using Autodesk.Revit.DB;
 
+using RevitBuildCoordVolumes.Models.Enums;
 using RevitBuildCoordVolumes.Models.Geometry;
 using RevitBuildCoordVolumes.Models.Interfaces;
+using RevitBuildCoordVolumes.Models.Services;
 using RevitBuildCoordVolumes.Models.Utilites;
 
 namespace RevitBuildCoordVolumes.Models;
@@ -20,10 +22,15 @@ internal class GeomObjectFactory : IGeomObjectFactory {
         SpatialElement spatialElement,
         double startExtrudePosition,
         double finishExtrudePosition,
-        double basePointOffset) {
+        double basePointOffset,
+        ProgressService progressService) {
+
+        progressService?.BeginStage(ProgressType.BuildVolumes);
 
         var listCurveLoops = _contourService.GetSimpleCurveLoops(spatialElement, startExtrudePosition, basePointOffset);
         var solid = SolidUtility.ExtrudeSolid(listCurveLoops, startExtrudePosition, finishExtrudePosition);
+
+        progressService?.ProgressCount?.Report(100);
 
         return solid == null
             ? []
@@ -31,14 +38,17 @@ internal class GeomObjectFactory : IGeomObjectFactory {
                 GeometryObjects = [solid],
                 Volume = solid.Volume
             }];
+
     }
 
-    public List<GeomObject> GetUnitedGeomObjects(List<ColumnObject> columns, double spatialElementPosition) {
+    public List<GeomObject> GetUnitedGeomObjects(
+        List<ColumnObject> columns, double spatialElementPosition, ProgressService progressService) {
         var firstElement = columns[0];
         double startExtrudePosition = firstElement.StartPosition;
         double finishExtrudePosition = firstElement.FinishPosition;
 
-        var listCurveLoops = _contourService.GetColumnsCurveLoops(columns, spatialElementPosition, startExtrudePosition);
+        var listCurveLoops = _contourService.GetColumnsCurveLoops(
+            columns, spatialElementPosition, startExtrudePosition, progressService);
         var solid = SolidUtility.ExtrudeSolid(listCurveLoops, startExtrudePosition, finishExtrudePosition);
 
         if(solid == null) {
@@ -55,11 +65,17 @@ internal class GeomObjectFactory : IGeomObjectFactory {
             })];
     }
 
-    public List<GeomObject> GetSeparatedGeomObjects(List<ColumnObject> columns, double spatialElementPosition) {
+    public List<GeomObject> GetSeparatedGeomObjects(
+        List<ColumnObject> columns, double spatialElementPosition, ProgressService progressService) {
         var solids = new List<GeometryObject>();
         var volumes = new List<double>();
         var firstElement = columns[0];
+        progressService?.BeginStage(ProgressType.BuildContour);
+        int total = columns.Count;
+        int processed = 0;
+        int reported = 0;
         foreach(var column in columns) {
+            progressService?.CancellationToken.ThrowIfCancellationRequested();
             double startExtrudePosition = column.StartPosition;
             double finishExtrudePosition = column.FinishPosition;
 
@@ -68,6 +84,15 @@ internal class GeomObjectFactory : IGeomObjectFactory {
             if(solid != null) {
                 solids.Add(solid);
                 volumes.Add(solid.Volume);
+            }
+            processed++;
+            int current = processed * 100 / total;
+            if(current > 100) {
+                current = 100;
+            }
+            if(current > reported) {
+                reported = current;
+                progressService?.ProgressCount?.Report(reported);
             }
         }
 

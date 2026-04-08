@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using System.Linq;
 
 using RevitBuildCoordVolumes.Models.Geometry;
+using RevitBuildCoordVolumes.Models.Services;
 
 namespace RevitBuildCoordVolumes.Models.Interfaces;
 
@@ -14,8 +15,9 @@ internal interface IColumnFactory {
     /// </remarks>
     /// <param name="polygons">Список полигонов, на которые была разбита зона.</param>    
     /// <param name="slabs">Список плит перекрытий, служащих для определения точек пересечения.</param>
+    /// <param name="progressService">ProgressService.</param>
     /// <returns>
     /// Коллекция групп ColumnObject, где ключ параметр группировки (GUID низа и верха плиты).
     /// </returns>
-    IEnumerable<IGrouping<string, ColumnObject>> GenerateColumnGroups(List<PolygonObject> polygons, List<SlabElement> slabs);
+    IEnumerable<IGrouping<string, ColumnObject>> GenerateColumnGroups(List<PolygonObject> polygons, List<SlabElement> slabs, ProgressService progressService);
 }

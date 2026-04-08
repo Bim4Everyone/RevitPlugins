@@ -42,7 +42,6 @@ internal class SpatialElementCheckService : ISpatialElementCheckService {
                     });
                 } else {
                     var contourCurves = _contourService.GetOuterContour(spatialElement);
-                    //var loop = _contourService.GetCurveLoop(contourCurves, null);
                     var l = _contourService.GetCurveLoopsContour(contourCurves, null);
                     var testSolid = SolidUtility.ExtrudeSolid(l);
                     if(testSolid == null) {

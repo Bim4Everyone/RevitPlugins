@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using Autodesk.Revit.DB;
 
 using RevitBuildCoordVolumes.Models.Geometry;
+using RevitBuildCoordVolumes.Models.Services;
 
 namespace RevitBuildCoordVolumes.Models.Interfaces;
 
@@ -16,10 +17,15 @@ internal interface IContourService {
     /// <param name="columns">Список колонн, которые были сформированы ColumnFactory.</param>    
     /// <param name="spatialElementPosition">Реальная позиция кривой исходной зоны.</param>
     /// <param name="startExtrudePosition">Позиция для старта экструзии.</param>
+    /// <param name="progressService">ProgressService.</param>
     /// <returns>
     /// Список CurveLoop для построения Solid.
     /// </returns>
-    List<CurveLoop> GetColumnsCurveLoops(List<ColumnObject> columns, double spatialElementPosition, double startExtrudePosition);
+    List<CurveLoop> GetColumnsCurveLoops(
+        List<ColumnObject> columns,
+        double spatialElementPosition,
+        double startExtrudePosition,
+        ProgressService progressService);
     /// <summary>
     /// Метод получения контура по ColumnObject.
     /// </summary>
@@ -28,7 +34,7 @@ internal interface IContourService {
     /// </remarks>
     /// <param name="column">Колонна, которые были сформирована ColumnFactory.</param>    
     /// <param name="spatialElementPosition">Реальная позиция кривой исходной зоны.</param>
-    /// <param name="startExtrudePosition">Позиция для старта экструзии.</param>
+    /// <param name="startExtrudePosition">Позиция для старта экструзии.</param>    
     /// <returns>
     /// Список CurveLoop для построения Solid.
     /// </returns>
