@@ -116,16 +116,19 @@ internal class CommonSettingViewModel : BaseViewModel {
         FilteredTypeZones = new ObservableCollection<TypeZoneViewModel>(TypeZones);
     }
 
-    // Метод получения коллекции TypeModelViewModel для TypeModels
+    // Метод получения коллекции TypeZoneViewModel для TypeModels
     private IEnumerable<TypeZoneViewModel> GetTypeZoneViewModels() {
         var param = Params.FirstOrDefault()?.ParamMap.SourceParam;
-        var typeZones = _revitRepository.GetTypeZones(param);
-        return !typeZones.Any()
+        var allTypeZones = _revitRepository.GetTypeZones(param);
+        var savedTypeModels = _settings.TypeZones ?? [];
+        return !allTypeZones.Any()
             ? []
-            : typeZones
-                .Select(value => new TypeZoneViewModel { Name = value })
-                .OrderByDescending(vm => vm.Name.Equals(_settings.TypeZone))
-                .ThenBy(vm => vm.Name);
+            : allTypeZones
+                .Select(value => new TypeZoneViewModel {
+                    Name = value,
+                    IsChecked = savedTypeModels.Contains(value)
+                })
+                .OrderBy(vm => vm.Name);
     }
 
     // Метод обновления Params
