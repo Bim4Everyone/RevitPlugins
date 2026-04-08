@@ -32,18 +32,75 @@
                 ItemsSource="{Binding TypeAlgorithms}"
                 SelectedValue="{Binding SelectedTypeAlgorithm}"
                 DisplayMemberPath="Name" />
-        </edits:CustomEditControl>
+        </edits:CustomEditControl>        
 
-        <edits:CustomEditControl
+        <edits:CustomGroupEditControl
             Icon="{ui:SymbolIcon grid24}"
-            Header="{me:LocalizationSource CommonSettingsEditControl.TypeZones}"
-            Description="{me:LocalizationSource CommonSettingsEditControl.TypeZonesDescription}">
+            Header="{me:LocalizationSource MainWindow.TypeZones}"
+            Description="{me:LocalizationSource MainWindow.TypeZonesDescription}"
+            ExtraIconVisible="False">
+            <edits:CustomGroupEditControl.EditControl>
+                <StackPanel>
+                    <Border
+                        Margin="5"
+                        VerticalAlignment="Center"
+                        HorizontalAlignment="Stretch"
+                        Background="{DynamicResource CardBackground}"
+                        BorderBrush="{DynamicResource CardBorderBrush}"
+                        CornerRadius="{DynamicResource ControlCornerRadius}"
+                        BorderThickness="{DynamicResource CardControlBorderThemeThickness}">
+                        <StackPanel
+                            Orientation="Horizontal"
+                            VerticalAlignment="Center"
+                            HorizontalAlignment="Center">
+                            <RadioButton
+                                Margin="20,0,0,0"
+                                GroupName="Choise"
+                                Content="{me:LocalizationSource MainWindow.CheckedAllTypeZones}"
+                                IsChecked="{Binding IsCheckedAllTypeZones, Mode=TwoWay}"
+                                Command="{Binding CheckAllTypeZonesCommand}" />
+                            <RadioButton
+                                Margin="20,0,0,0"
+                                GroupName="Choise"
+                                Content="{me:LocalizationSource MainWindow.NotCheckedAllTypeZones}"
+                                Command="{Binding UncheckAllTypeZonesCommand}" />
+                        </StackPanel>
+                    </Border>
+                    <ui:AutoSuggestBox
+                        Margin="5,0,5,20"
+                        Icon="{ui:SymbolIcon Search24}"
+                        Text="{Binding SearchTextTypeZones, Mode=TwoWay}"
+                        PlaceholderText="{me:LocalizationSource MainWindow.SearchTextTypeZones}">
+                        <i:Interaction.Triggers>
+                            <i:EventTrigger
+                                EventName="TextChanged">
+                                <i:InvokeCommandAction
+                                    Command="{Binding SearchTypeZonesCommand}" />
+                            </i:EventTrigger>
+                        </i:Interaction.Triggers>
+                    </ui:AutoSuggestBox>
+                    <ItemsControl
+                        ItemsSource="{Binding FilteredTypeZones}">
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate
+                                DataType="{x:Type vms:TypeZoneViewModel}">
+                                <edits:ItemControl
+                                    ItemName="{Binding Name}"
+                                    IsChecked="{Binding IsChecked, Mode=TwoWay}"
+                                    HasWarning="False" />
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
 
-            <ComboBox
-                ItemsSource="{Binding TypeZones}"
-                SelectedValue="{Binding SelectedTypeZone}"
-                DisplayMemberPath="Name" />
-        </edits:CustomEditControl>
+                        <ItemsControl.ItemsPanel>
+                            <ItemsPanelTemplate>
+                                <UniformGrid
+                                    Columns="3" />
+                            </ItemsPanelTemplate>
+                        </ItemsControl.ItemsPanel>
+                    </ItemsControl>
+                </StackPanel>
+            </edits:CustomGroupEditControl.EditControl>
+        </edits:CustomGroupEditControl>
 
         <edits:CustomGroupEditControl
             Icon="{ui:SymbolIcon clipboardTaskListLtr24}"
