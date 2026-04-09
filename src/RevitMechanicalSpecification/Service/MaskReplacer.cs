@@ -67,11 +67,16 @@ namespace RevitMechanicalSpecification.Service {
                 if(string.IsNullOrWhiteSpace(paramName)) {
                     return match.Value;
                 }
+                
+                Parameter parameter = element.GetTypeOrInstanceParam(elemType, paramName);
+                if(parameter == null) {
+                    return match.Value;
+                }
 
                 string value = GetStringValue(element, elemType, paramName);
 
                 if(value == null) {
-                    return match.Value;
+                    return string.Empty;
                 }
 
                 return value;
