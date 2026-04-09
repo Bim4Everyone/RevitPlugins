@@ -36,8 +36,8 @@
 
         <edits:CustomGroupEditControl
             Icon="{ui:SymbolIcon grid24}"
-            Header="{me:LocalizationSource MainWindow.TypeZones}"
-            Description="{me:LocalizationSource MainWindow.TypeZonesDescription}"
+            Header="{me:LocalizationSource CommonSettingsEditControl.TypeZones}"
+            Description="{me:LocalizationSource CommonSettingsEditControl.TypeZonesDescription}"
             ExtraIconVisible="False">
             <edits:CustomGroupEditControl.EditControl>
                 <StackPanel>
@@ -56,13 +56,12 @@
                             <RadioButton
                                 Margin="20,0,0,0"
                                 GroupName="Choise"
-                                Content="{me:LocalizationSource MainWindow.CheckedAllTypeZones}"
-                                IsChecked="{Binding IsCheckedAllTypeZones, Mode=TwoWay}"
+                                Content="{me:LocalizationSource CommonSettingsEditControl.CheckedAllTypeZones}"
                                 Command="{Binding CheckAllTypeZonesCommand}" />
                             <RadioButton
                                 Margin="20,0,0,0"
                                 GroupName="Choise"
-                                Content="{me:LocalizationSource MainWindow.NotCheckedAllTypeZones}"
+                                Content="{me:LocalizationSource CommonSettingsEditControl.NotCheckedAllTypeZones}"
                                 Command="{Binding UncheckAllTypeZonesCommand}" />
                         </StackPanel>
                     </Border>
@@ -70,7 +69,7 @@
                         Margin="5,0,5,20"
                         Icon="{ui:SymbolIcon Search24}"
                         Text="{Binding SearchTextTypeZones, Mode=TwoWay}"
-                        PlaceholderText="{me:LocalizationSource MainWindow.SearchTextTypeZones}">
+                        PlaceholderText="{me:LocalizationSource CommonSettingsEditControl.SearchTextTypeZones}">
                         <i:Interaction.Triggers>
                             <i:EventTrigger
                                 EventName="TextChanged">

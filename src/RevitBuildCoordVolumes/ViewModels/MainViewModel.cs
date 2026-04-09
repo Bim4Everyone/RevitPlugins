@@ -97,7 +97,7 @@ internal class MainViewModel : BaseViewModel {
             case nameof(CommonSettingViewModel.SelectedTypeAlgorithm):
                 UpdateVisibilitySettings();
                 break;
-            case nameof(CommonSettingViewModel.TypeZones):
+            case nameof(CommonSettingViewModel.SelectedTypeZones):
                 UpdateRequiredCheckArea();
                 CanAcceptView();
                 break;
@@ -165,7 +165,7 @@ internal class MainViewModel : BaseViewModel {
     // Метод проверки возможности выполнения метода проверки зон
     private bool CanCheckArea() {
         return CommonSettingViewModel != null
-            && CommonSettingViewModel.FilteredTypeZones.Count == 0
+            && CommonSettingViewModel.FilteredTypeZones.Count != 0
             && RequiredCheckArea;
     }
 
@@ -231,7 +231,7 @@ internal class MainViewModel : BaseViewModel {
                 ErrorText = _services.LocalizationService.GetLocalizedString("MainViewModel.ErrorParams");
                 return false;
             }
-            if(CommonSettingViewModel.FilteredTypeZones.Count == 0) {
+            if(CommonSettingViewModel.SelectedTypeZones.Count == 0) {
                 ErrorText = _services.LocalizationService.GetLocalizedString("MainViewModel.NoTypeZone");
                 return false;
             }

@@ -30,6 +30,7 @@ internal class CommonSettingViewModel : BaseViewModel {
     private AlgorithmViewModel _selectedTypeAlgorithm;
     private ObservableCollection<TypeZoneViewModel> _typeZones;
     private ObservableCollection<TypeZoneViewModel> _filteredTypeZones;
+    private ObservableCollection<TypeZoneViewModel> _selectedTypeZones;
     private string _searchTextTypeZones;
     private ObservableCollection<ParamViewModel> _params;
     private bool _hasParamWarning;
@@ -50,13 +51,13 @@ internal class CommonSettingViewModel : BaseViewModel {
         LoadView();
 
         SearchTypeZonesCommand = RelayCommand.Create(ApplySearchTypeZones);
-        CheckAllTypeModelsCommand = RelayCommand.Create(CheckAllTypeZones);
-        UncheckAllTypeModelsCommand = RelayCommand.Create(UncheckAllTypeZones);
+        CheckAllTypeZonesCommand = RelayCommand.Create(CheckAllTypeZones);
+        UncheckAllTypeZonesCommand = RelayCommand.Create(UncheckAllTypeZones);
     }
 
     public ICommand SearchTypeZonesCommand { get; }
-    public ICommand CheckAllTypeModelsCommand { get; }
-    public ICommand UncheckAllTypeModelsCommand { get; }
+    public ICommand CheckAllTypeZonesCommand { get; }
+    public ICommand UncheckAllTypeZonesCommand { get; }
 
     public ObservableCollection<AlgorithmViewModel> TypeAlgorithms {
         get => _typeAlgorithms;
@@ -73,6 +74,10 @@ internal class CommonSettingViewModel : BaseViewModel {
     public ObservableCollection<TypeZoneViewModel> FilteredTypeZones {
         get => _filteredTypeZones;
         set => RaiseAndSetIfChanged(ref _filteredTypeZones, value);
+    }
+    public ObservableCollection<TypeZoneViewModel> SelectedTypeZones {
+        get => _selectedTypeZones;
+        set => RaiseAndSetIfChanged(ref _selectedTypeZones, value);
     }
     public string SearchTextTypeZones {
         get => _searchTextTypeZones;
@@ -114,6 +119,15 @@ internal class CommonSettingViewModel : BaseViewModel {
     private void UpdateTypeZones() {
         TypeZones = new ObservableCollection<TypeZoneViewModel>(GetTypeZoneViewModels());
         FilteredTypeZones = new ObservableCollection<TypeZoneViewModel>(TypeZones);
+        SelectedTypeZones = new ObservableCollection<TypeZoneViewModel>(FilteredTypeZones.Where(zone => zone.IsChecked));
+    }
+
+    // Метод обновления предупреждений в параметрах
+    private void OnTypeZoneChanged(object sender, PropertyChangedEventArgs e) {
+        if(sender is not TypeZoneViewModel vm) {
+            return;
+        }
+        SelectedTypeZones = new ObservableCollection<TypeZoneViewModel>(FilteredTypeZones.Where(zone => zone.IsChecked));
     }
 
     // Метод получения коллекции TypeZoneViewModel для TypeModels
@@ -245,6 +259,11 @@ internal class CommonSettingViewModel : BaseViewModel {
         UpdateParamWarnings();
 
         TypeZones = new ObservableCollection<TypeZoneViewModel>(GetTypeZoneViewModels());
+        // Подписка на события в ParamViewModel
+        foreach(var typeZone in TypeZones) {
+            typeZone.PropertyChanged += OnTypeZoneChanged;
+        }
         FilteredTypeZones = new ObservableCollection<TypeZoneViewModel>(TypeZones);
+        SelectedTypeZones = new ObservableCollection<TypeZoneViewModel>(FilteredTypeZones.Where(zone => zone.IsChecked));
     }
 }
