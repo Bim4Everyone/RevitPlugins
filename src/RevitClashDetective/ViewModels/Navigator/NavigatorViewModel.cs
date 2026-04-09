@@ -1,9 +1,12 @@
 using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.IO;
 using System.Linq;
 using System.Windows;
 using System.Windows.Input;
+
+using Autodesk.Revit.UI;
 
 using DevExpress.Mvvm;
 using DevExpress.Mvvm.POCO;
@@ -173,21 +176,8 @@ internal class NavigatorViewModel : BaseViewModel, ISupportServices {
         }
     }
 
-    private void Load() {
-        ShowReportsMergeView = !ShowReportsMergeView;
-        // TODO
-        // string path = _revitRepository.GetFileDialogPath();
-        // if(!OpenFileDialogService.ShowDialog(path)) {
-        //     throw new OperationCanceledException();
-        // }
-        // 
-        // InitializeClashes(OpenFileDialogService.File.FullName);
-        // _revitRepository.CommonConfig.LastRunPath = OpenFileDialogService.File.DirectoryName;
-        // _revitRepository.CommonConfig.SaveProjectConfig();
-    }
-
-    private void InitializeClashes(string path) {
-        var reports = ReportLoader.GetReports(_revitRepository, path)
+    private IList<ReportViewModel> GetReports(string path) {
+        return ReportLoader.GetReports(_revitRepository, path)
             .Select(r => new ReportViewModel(
                 _revitRepository,
                 r.Name,
@@ -199,9 +189,49 @@ internal class NavigatorViewModel : BaseViewModel, ISupportServices {
                 _settingsConfig,
                 r.Clashes?.ToArray() ?? []))
             .ToArray();
+    }
 
-        Reports = new ObservableCollection<ReportViewModel>(new ReportsNameResolver(_localizationService)
-            .GetReports(Reports, reports));
+    private void Load() {
+        string path = _revitRepository.GetFileDialogPath();
+        if(!OpenFileDialogService.ShowDialog(path)) {
+            throw new OperationCanceledException();
+        }
+
+        var importingReports = GetReports(path);
+        string[] intersections = importingReports
+            .Intersect(Reports, new ReportsNamesIgnoreCaseComparer())
+            .Select(r => r.Name)
+            .ToArray();
+        var namesResolver = new ReportsNameResolver();
+        if(intersections.Length > 0) {
+            switch(GetResult(string.Join(", ", intersections))) {
+                case TaskDialogResult.CommandLink1: {
+                    SetReports(Merge(Reports, importingReports));
+                    break;
+                }
+                case TaskDialogResult.CommandLink2: {
+                    SetReports(namesResolver.Replace(Reports, importingReports));
+                    break;
+                }
+                case TaskDialogResult.CommandLink3: {
+                    SetReports(namesResolver.CopyAndRename(Reports, importingReports));
+                    break;
+                }
+                default: {
+                    // отмена
+                    return;
+                }
+            }
+        } else {
+            SetReports(Reports.Union(importingReports).ToArray());
+        }
+
+        _revitRepository.CommonConfig.LastRunPath = OpenFileDialogService.File.DirectoryName;
+        _revitRepository.CommonConfig.SaveProjectConfig();
+    }
+
+    private void SetReports(ICollection<ReportViewModel> reports) {
+        Reports = new ObservableCollection<ReportViewModel>(reports);
         SelectedReport = null;
         SelectedReport = Reports.FirstOrDefault();
     }
@@ -275,6 +305,29 @@ internal class NavigatorViewModel : BaseViewModel, ISupportServices {
         clash.CanEditComments = backup;
     }
 
+    private TaskDialogResult GetResult(string names) {
+        var dialog = new TaskDialog(_localizationService.GetLocalizedString("ReportsResolver.Header")) {
+            MainContent = _localizationService.GetLocalizedString("ReportsResolver.Body", names)
+        };
+        dialog.AddCommandLink(
+            TaskDialogCommandLinkId.CommandLink1,
+            _localizationService.GetLocalizedString("ReportsResolver.Merge"));
+        dialog.AddCommandLink(
+            TaskDialogCommandLinkId.CommandLink2,
+            _localizationService.GetLocalizedString("ReportsResolver.Replace"));
+        dialog.AddCommandLink(
+            TaskDialogCommandLinkId.CommandLink3,
+            _localizationService.GetLocalizedString("ReportsResolver.CopyAndRename"));
+        dialog.CommonButtons = TaskDialogCommonButtons.Cancel;
+        return dialog.Show();
+    }
+
+    private ICollection<ReportViewModel> Merge(
+        ICollection<ReportViewModel> existingReports,
+        ICollection<ReportViewModel> importingReports) {
+        throw new NotImplementedException();
+    }
+
     private void AcceptReportsMerge(ReportsMergeViewModel vm) {
     }
 
@@ -287,5 +340,7 @@ internal class NavigatorViewModel : BaseViewModel, ISupportServices {
     }
 
     private void CancelReportsMerge() {
+        ShowReportsMergeView = false;
+        ReportsMergeViewModel = null;
     }
 }

@@ -94,7 +94,10 @@
 
         <DockPanel
             Grid.Row="0"
-            LastChildFill="True">
+            LastChildFill="True"
+            Visibility="{Binding ElementName=_this,
+                Path=DataContext.ShowReportsMergeView, 
+                Converter={StaticResource ReportVisibilityConverter}}">
 
             <dx:SimpleButton
                 DockPanel.Dock="Left"
@@ -150,8 +153,8 @@
                 Converter={StaticResource ReportVisibilityConverter}}" />
 
         <navigator:ReportsMergeUserControl
-            Grid.Row="1"
-            Grid.RowSpan="2"
+            Grid.Row="0"
+            Grid.RowSpan="3"
             DataContext="{Binding ReportsMergeViewModel}"
             AcceptMergeCommand="{Binding ElementName=_this, Path=DataContext.AcceptReportsMergeCommand}"
             CancelMergeCommand="{Binding ElementName=_this, Path=DataContext.CancelReportsMergeCommand}"

@@ -136,8 +136,7 @@ internal class ReportViewModel : BaseViewModel, INamedEntity, IEquatable<ReportV
 
     public IMessageBoxService MessageBoxService { get; }
 
-
-    private ObservableCollection<ClashViewModel> Clashes {
+    public ObservableCollection<ClashViewModel> Clashes {
         get => _clashes;
         set => RaiseAndSetIfChanged(ref _clashes, value);
     }

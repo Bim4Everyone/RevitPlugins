@@ -11,63 +11,12 @@ using RevitClashDetective.ViewModels.Navigator;
 namespace RevitClashDetective.Services.ReportsMerging;
 internal class ReportsNameResolver {
     private readonly IEqualityComparer<ReportViewModel> _reportsComparer;
-    private readonly IEqualityComparer<IClashViewModel> _clashesComparer;
-    private readonly ILocalizationService _localization;
 
-    public ReportsNameResolver(ILocalizationService localization) {
-
-        _localization = localization ?? throw new ArgumentNullException(nameof(localization));
+    public ReportsNameResolver() {
         _reportsComparer = new ReportsNamesIgnoreCaseComparer();
-        _clashesComparer = new ClashViewModelComparer();
     }
 
-
-    public ICollection<ReportViewModel> GetReports(ICollection<ReportViewModel> oldReports,
-        ICollection<ReportViewModel> addedReports) {
-        string[] intersections = addedReports
-            .Intersect(oldReports, _reportsComparer)
-            .Select(r => r.Name)
-            .ToArray();
-        if(intersections.Length > 0) {
-            switch(GetResult(string.Join(", ", intersections))) {
-                case TaskDialogResult.CommandLink1: {
-                    return ReplaceAndKeepData(oldReports, addedReports);
-                }
-                case TaskDialogResult.CommandLink2: {
-                    return Replace(oldReports, addedReports);
-                }
-                case TaskDialogResult.CommandLink3: {
-                    return KeepOnlyOld(oldReports, addedReports);
-                }
-                case TaskDialogResult.CommandLink4: {
-                    return CopyAndRename(oldReports, addedReports);
-                }
-                default: {
-                    return oldReports;
-                }
-            }
-        } else {
-            return oldReports.Union(addedReports).ToArray();
-        }
-    }
-
-    private TaskDialogResult GetResult(string names) {
-        var dialog = new TaskDialog(_localization.GetLocalizedString("ReportsResolver.Header")) {
-            MainContent = _localization.GetLocalizedString("ReportsResolver.Body", names)
-        };
-        dialog.AddCommandLink(TaskDialogCommandLinkId.CommandLink1,
-            _localization.GetLocalizedString("ReportsResolver.ReplaceAndKeepStatuses"));
-        dialog.AddCommandLink(TaskDialogCommandLinkId.CommandLink2,
-            _localization.GetLocalizedString("ReportsResolver.Replace"));
-        dialog.AddCommandLink(TaskDialogCommandLinkId.CommandLink3,
-            _localization.GetLocalizedString("ReportsResolver.KeepOnlyOld"));
-        dialog.AddCommandLink(TaskDialogCommandLinkId.CommandLink4,
-            _localization.GetLocalizedString("ReportsResolver.CopyAndRename"));
-        dialog.CommonButtons = TaskDialogCommonButtons.Cancel;
-        return dialog.Show();
-    }
-
-    private ICollection<ReportViewModel> Replace(
+    public ICollection<ReportViewModel> Replace(
         ICollection<ReportViewModel> oldReports,
         ICollection<ReportViewModel> addedReports) {
         return oldReports
@@ -76,48 +25,7 @@ internal class ReportsNameResolver {
             .ToArray();
     }
 
-    private ICollection<ReportViewModel> ReplaceAndKeepData(
-        ICollection<ReportViewModel> oldReports,
-        ICollection<ReportViewModel> addedReports) {
-        var intersectionOld = oldReports
-            .Intersect(addedReports, _reportsComparer)
-            .ToArray();
-        var intersectionNew = addedReports
-            .Intersect(oldReports, _reportsComparer)
-            .ToArray();
-        foreach(var newReport in intersectionNew) {
-            var oldReport = intersectionOld.First(r => _reportsComparer.Equals(r, newReport));
-            var oldClashes = oldReport.GuiClashes;
-            foreach(var newClash in newReport.GuiClashes) {
-                var oldClash = oldClashes.FirstOrDefault(c => _clashesComparer.Equals(c, newClash));
-                if(oldClash != null) {
-                    newClash.ClashStatus = oldClash.ClashStatus;
-                    SetOldComments(newClash, oldClash);
-                }
-            }
-        }
-        return Replace(oldReports, addedReports);
-    }
-
-    private void SetOldComments(IClashViewModel newClash, IClashViewModel oldClash) {
-        if(newClash is ClashViewModel newRealClash
-           && oldClash is ClashViewModel oldRealClash) {
-            newRealClash.Comments.Clear();
-            foreach(var comment in oldRealClash.Comments) {
-                newRealClash.Comments.Add(comment);
-            }
-        }
-    }
-
-    private ICollection<ReportViewModel> KeepOnlyOld(
-        ICollection<ReportViewModel> oldReports,
-        ICollection<ReportViewModel> addedReports) {
-        return oldReports
-            .Union(addedReports.Except(oldReports, _reportsComparer))
-            .ToArray();
-    }
-
-    private ICollection<ReportViewModel> CopyAndRename(
+    public ICollection<ReportViewModel> CopyAndRename(
         ICollection<ReportViewModel> oldReports,
         ICollection<ReportViewModel> addedReports) {
         var intersection = addedReports

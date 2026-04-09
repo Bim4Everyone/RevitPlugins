@@ -91,6 +91,8 @@
     <system:String
         x:Key="ReportsResolver.Body">В загружаемом файле содержатся проверки с совпадающими именами: {0}.</system:String>
     <system:String
+        x:Key="ReportsResolver.Merge">Объединить</system:String>
+    <system:String
         x:Key="ReportsResolver.ReplaceAndKeepStatuses">Заменить с сохранением статусов</system:String>
     <system:String
         x:Key="ReportsResolver.Replace">Заменить с перезаписью статусов и комментариев</system:String>
