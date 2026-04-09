@@ -29,6 +29,7 @@ internal static class RevitConstants {
     // Утвержденные категории верхнего уровня
     private static readonly ICollection<BuiltInCategory> _allCategories = [
         BuiltInCategory.OST_CableTray,
+        BuiltInCategory.OST_CableTrayFitting,
         BuiltInCategory.OST_Casework,
         BuiltInCategory.OST_Ceilings,
         BuiltInCategory.OST_Curtain_Systems,
@@ -50,6 +51,7 @@ internal static class RevitConstants {
         BuiltInCategory.OST_DuctTerminal,
         BuiltInCategory.OST_ElectricalEquipment,
         BuiltInCategory.OST_ElectricalFixtures,
+        BuiltInCategory.OST_FireAlarmDevices,
         BuiltInCategory.OST_Floors,
         BuiltInCategory.OST_Furniture,
         BuiltInCategory.OST_FurnitureSystems,
