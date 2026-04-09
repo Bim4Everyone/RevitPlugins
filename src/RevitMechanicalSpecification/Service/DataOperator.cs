@@ -11,6 +11,12 @@ using RevitMechanicalSpecification.Entities;
 
 namespace RevitMechanicalSpecification.Service {
     public static class DataOperator {
+        private static readonly ElementFilter _insulationFilter = new ElementMulticategoryFilter(
+            new List<BuiltInCategory> {
+                BuiltInCategory.OST_PipeInsulations,
+                BuiltInCategory.OST_DuctInsulations
+            });
+
         /// <summary>
         /// возвращает значение параметра по типу или экземпляру, если существует, иначе null
         /// </summary>
@@ -140,6 +146,24 @@ namespace RevitMechanicalSpecification.Service {
                     subs.AddRange(GetSub(subInst, document));
                 }
             }
+            // Для категории арматуры изоляция не является субкомпонентом, требуется сбор через зависимые, иначе
+            // при работе полного обновления выбранного изоляция не обновится на части элементов
+            if(element.InAnyCategory(new List<BuiltInCategory> {
+                BuiltInCategory.OST_PipeAccessory,
+                BuiltInCategory.OST_DuctAccessory
+            })) {
+                foreach(ElementId dependentElementId in element.GetDependentElements(_insulationFilter)) {
+                    Element dependentElement = document.GetElement(dependentElementId);
+                    if(dependentElement == null) {
+                        continue;
+                    }
+
+                    if(subs.All(item => item.Id != dependentElement.Id)) {
+                        subs.Add(dependentElement);
+                    }
+                }
+            }
+
             return subs;
         }
     }
