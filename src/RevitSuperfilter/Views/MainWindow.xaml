@@ -13,6 +13,7 @@
     xmlns:vms="clr-namespace:RevitSuperfilter.ViewModels"
     xmlns:me="clr-namespace:dosymep.WpfCore.MarkupExtensions;assembly=dosymep.WpfCore"
     xmlns:views="clr-namespace:RevitSuperfilter.Views"
+    xmlns:converters="clr-namespace:RevitSuperfilter.Converters"
 
     mc:Ignorable="d"
     WindowStartupLocation="CenterOwner"
@@ -25,6 +26,7 @@
     MinWidth="400"
     MinHeight="450"
 
+    x:Name="_this"
     d:DataContext="{d:DesignInstance vms:MainViewModel, IsDesignTimeCreatable=False}">
 
     <b:Interaction.Triggers>
@@ -34,6 +36,14 @@
                 Command="{Binding LoadViewCommand}" />
         </b:EventTrigger>
     </b:Interaction.Triggers>
+
+    <Window.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="../ViewStyles/MainControlStyles.xaml" />
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
+    </Window.Resources>
 
     <Grid>
         <Grid.RowDefinitions>
@@ -50,7 +60,7 @@
             Grid.Row="1"
             ItemsSource="{Binding Modes}" />
 
-        <views:WideControl Grid.Row="2" />
-        <!-- <views:NarrowControl Grid.Row="2" /> -->
+        <views:WideControl Grid.Row="2" Style="{StaticResource WideOnly}" />
+        <views:NarrowControl Grid.Row="2" Style="{StaticResource NarrowOnly}" />
     </Grid>
 </core:WpfUIPlatformWindow>

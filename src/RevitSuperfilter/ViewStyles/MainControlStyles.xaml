@@ -1,0 +1,30 @@
+<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:converters="clr-namespace:RevitSuperfilter.Converters">
+    
+    <converters:LessThanConverter x:Key="LessThan" />
+
+    <Style x:Key="WideOnly" TargetType="FrameworkElement">
+        <Setter Property="Visibility" Value="Visible" />
+        <Style.Triggers>
+            <DataTrigger Value="True"
+                         Binding="{Binding ElementName=_this, Path=ActualWidth,
+                                               Converter={StaticResource LessThan},
+                                               ConverterParameter=700}">
+                <Setter Property="Visibility" Value="Collapsed" />
+            </DataTrigger>
+        </Style.Triggers>
+    </Style>
+
+    <Style x:Key="NarrowOnly" TargetType="FrameworkElement">
+        <Setter Property="Visibility" Value="Collapsed" />
+        <Style.Triggers>
+            <DataTrigger Value="True"
+                         Binding="{Binding ElementName=_this, Path=ActualWidth,
+                                               Converter={StaticResource LessThan},
+                                               ConverterParameter=700}">
+                <Setter Property="Visibility" Value="Visible" />
+            </DataTrigger>
+        </Style.Triggers>
+    </Style>
+</ResourceDictionary>
