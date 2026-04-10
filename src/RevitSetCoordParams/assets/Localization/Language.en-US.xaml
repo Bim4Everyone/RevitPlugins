@@ -62,6 +62,8 @@
     <system:String x:Key="MainViewModel.FloorParamDetailDescription">Used to determine the building floor</system:String>
     <system:String x:Key="MainViewModel.FloorDEParamDescription">Additional SMR Floor Parameter</system:String>
     <system:String x:Key="MainViewModel.FloorDEParamDetailDescription">Used to determine the building floor</system:String>
+    <system:String x:Key="MainViewModel.ZoneParamDescription">SMR Zone Parameter</system:String>
+    <system:String x:Key="MainViewModel.ZoneParamDetailDescription">Used to determine the building zone</system:String>
     <system:String x:Key="MainViewModel.BlockingParamDescription">Blocking Parameter</system:String>
     <system:String x:Key="MainViewModel.BlockingParamDetailDescription">Parameter type – Yes / No</system:String>
     

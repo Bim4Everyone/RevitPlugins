@@ -142,6 +142,18 @@ internal static class RevitConstants {
     }
 
     /// <summary>
+    /// Метод получения параметра ФОП_Зона СМР
+    /// </summary>  
+    public static ParamMap GetZoneParamMap() {
+        var instance = SharedParamsConfig.Instance;
+        return new ParamMap {
+            Type = ParamType.FloorDEParam,
+            SourceParam = instance?.BuildingWorksZone,
+            TargetParam = instance?.BuildingWorksZone
+        };
+    }
+
+    /// <summary>
     /// Метод получения параметра ФОП_Фиксация координаты СМР
     /// </summary>  
     public static ParamMap GetBlockingParamMap() {
@@ -162,6 +174,7 @@ internal static class RevitConstants {
             GetSectionParamMap(),
             GetFloorParamMap(),
             GetFloorDEParamMap(),
+            GetZoneParamMap(),
             GetBlockingParamMap()
         ];
     }

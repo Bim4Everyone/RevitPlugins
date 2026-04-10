@@ -62,6 +62,8 @@
     <system:String x:Key="MainViewModel.FloorParamDetailDescription">Используется для определения этажа здания</system:String>
     <system:String x:Key="MainViewModel.FloorDEParamDescription">Дополнительный параметр этажа СМР</system:String>
     <system:String x:Key="MainViewModel.FloorDEParamDetailDescription">Используется для определения этажа здания</system:String>
+    <system:String x:Key="MainViewModel.ZoneParamDescription">Параметр зоны СМР</system:String>
+    <system:String x:Key="MainViewModel.ZoneParamDetailDescription">Используется для определения зоны СМР</system:String>
     <system:String x:Key="MainViewModel.BlockingParamDescription">Параметр для блокировки</system:String>
     <system:String x:Key="MainViewModel.BlockingParamDetailDescription">Тип параметра - да / нет</system:String>
     
