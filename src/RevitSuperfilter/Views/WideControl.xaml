@@ -41,21 +41,28 @@
             Margin="8 4"
             CornerRadius="6"
             Background="{DynamicResource CardBackground}">
-            <ui:ListView
-                x:Name="_categories"
-                SelectedItem="{Binding Category}"
-                ItemsSource="{Binding SuperfilterService.Superfilter.Categories}"
-                ItemTemplate="{StaticResource TreeViewItem}">
+            <StackPanel>
+                <ui:AutoSuggestBox
+                    Margin="8 4"
+                    PlaceholderText="{me:LocalizationSource WideControl.SearchCategory}" />
+               
+                <ui:ListView
+                    x:Name="_categories"
+                    Margin="8 0"
+                    SelectedItem="{Binding Category}"
+                    ItemsSource="{Binding SuperfilterService.Superfilter.Categories}"
+                    ItemTemplate="{StaticResource TreeViewItem}">
 
-                <b:Interaction.Triggers>
-                    <b:EventTrigger EventName="SelectionChanged">
-                        <b:InvokeCommandAction
-                            Command="{Binding
+                    <b:Interaction.Triggers>
+                        <b:EventTrigger EventName="SelectionChanged">
+                            <b:InvokeCommandAction
+                                Command="{Binding
                             ElementName=_categories,
                             Path=SelectedItem.LoadParamsCommand}" />
-                    </b:EventTrigger>
-                </b:Interaction.Triggers>
-            </ui:ListView>
+                        </b:EventTrigger>
+                    </b:Interaction.Triggers>
+                </ui:ListView>
+            </StackPanel>
         </Border>
 
         <GridSplitter
@@ -73,7 +80,16 @@
             Margin="8 4"
             CornerRadius="6"
             Background="{DynamicResource CardBackground}">
-            <TreeView ItemsSource="{Binding Category.Params}"/>
+            <StackPanel>
+                <ui:AutoSuggestBox
+                    Margin="8 4"
+                    PlaceholderText="{me:LocalizationSource WideControl.SearchParams}" />
+
+                <TreeView
+                    Margin="8 0"
+                    ItemsSource="{Binding Category.Params}" />
+            </StackPanel>
+
         </Border>
 
         <DockPanel

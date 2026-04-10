@@ -64,6 +64,8 @@ internal sealed class Superfilter : ObservableObject, IElementIndex {
         if(!_categories.TryGetValue(element.Category?.Name ?? "", out var categoryViewModel)) {
             return;
         }
+        
+        categoryViewModel.Remove(elementId);
 
         Categories.Remove(categoryViewModel);
         _categories.Remove(element.Category?.Name ?? "");

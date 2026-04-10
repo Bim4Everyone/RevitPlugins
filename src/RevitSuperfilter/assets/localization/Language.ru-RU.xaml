@@ -13,4 +13,8 @@
     <system:String x:Key="Selection.DBSelection">Документ</system:String>
     <system:String x:Key="Selection.DBViewSelection">Вид</system:String>
     <system:String x:Key="Selection.SelectedOnViewSelection">Выделено</system:String>
+    
+    <system:String x:Key="WideControl.SearchCategory">Поиск категорий</system:String>
+    <system:String x:Key="WideControl.SearchParams">Поиск параметров</system:String>
+    <system:String x:Key="WideControl.SearchElements">Поиск элементов</system:String>
 </ResourceDictionary>

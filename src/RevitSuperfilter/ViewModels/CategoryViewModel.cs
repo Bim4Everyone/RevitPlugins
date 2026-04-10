@@ -53,6 +53,8 @@ internal sealed class CategoryViewModel : BaseViewModel, IElementIndex {
             var param = GetOrAdd(elementParam);
             param.Add(element, elementParam.GetValueOrDefault());
         }
+        
+        OnPropertyChanged(nameof(Count));
     }
 
     public void Remove(ElementId elementId) {
@@ -70,8 +72,11 @@ internal sealed class CategoryViewModel : BaseViewModel, IElementIndex {
             if(_params.TryGetValue(elementParam.Definition, out var paramViewModel)) {
                 Params.Remove(paramViewModel);
                 _params.Remove(elementParam.Definition);
+                paramViewModel.Remove(elementId, elementParam.GetValueOrDefault());
             }
         }
+        
+        OnPropertyChanged(nameof(Count));
     }
 
     #endregion IElementIndex
@@ -80,6 +85,8 @@ internal sealed class CategoryViewModel : BaseViewModel, IElementIndex {
         foreach(var element in elements) {
             _elementsById.Add(element.Id, element);
         }
+        
+        OnPropertyChanged(nameof(Count));
     }
     
     private ParamViewModel GetOrAdd(Parameter elementParam) {

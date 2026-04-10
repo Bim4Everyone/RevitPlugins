@@ -13,4 +13,8 @@
     <system:String x:Key="Selection.DBSelection">Document</system:String>
     <system:String x:Key="Selection.DBViewSelection">View</system:String>
     <system:String x:Key="Selection.SelectedOnViewSelection">Selected</system:String>
+    
+    <system:String x:Key="WideControl.SearchCategory">Search categories</system:String>
+    <system:String x:Key="WideControl.SearchParams">Search parameters</system:String>
+    <system:String x:Key="WideControl.SearchElements">Search elements</system:String>
 </ResourceDictionary>

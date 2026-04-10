@@ -31,6 +31,7 @@ internal sealed class ParamViewModel : BaseViewModel {
         _elementsById.Add(element.Id, element);
         var viewModel = GetOrAdd(element, paramValue);
         viewModel.Add(element);
+        OnPropertyChanged(nameof(Count));
     }
 
     public void Remove(ElementId elementId, string paramValue) {
@@ -42,6 +43,7 @@ internal sealed class ParamViewModel : BaseViewModel {
             _paramValues.Remove(paramValue);
             ParamValues.Remove(paramValueViewModel);
         }
+        OnPropertyChanged(nameof(Count));
     }
 
     private ParamValueViewModel GetOrAdd(Element element, string value) {

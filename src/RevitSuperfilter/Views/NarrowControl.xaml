@@ -13,7 +13,7 @@
     mc:Ignorable="d"
     d:DesignHeight="500" d:DesignWidth="400"
     d:DataContext="{d:DesignInstance vms:MainViewModel, IsDesignTimeCreatable=False}">
-    
+
     <UserControl.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
@@ -21,33 +21,40 @@
             </ResourceDictionary.MergedDictionaries>
         </ResourceDictionary>
     </UserControl.Resources>
-    
+
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="*" />
             <RowDefinition Height="Auto" />
             <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
-        
+
         <Border
             Grid.Row="0"
             Margin="8 4"
             CornerRadius="6"
             Background="{DynamicResource CardBackground}">
-            <TreeView
-                x:Name="_categories"
-                ItemsSource="{Binding SuperfilterService.Superfilter.Categories}">
-                
-                <b:Interaction.Triggers>
-                    <b:EventTrigger EventName="SelectedItemChanged">
-                        <b:InvokeCommandAction
-                            Command="{Binding
+            <StackPanel>
+                <ui:AutoSuggestBox
+                    Margin="8 4"
+                    PlaceholderText="{me:LocalizationSource WideControl.SearchElements}" />
+              
+                <TreeView
+                    x:Name="_categories"
+                    Margin="8 4"
+                    ItemsSource="{Binding SuperfilterService.Superfilter.Categories}">
+
+                    <b:Interaction.Triggers>
+                        <b:EventTrigger EventName="SelectedItemChanged">
+                            <b:InvokeCommandAction
+                                Command="{Binding
                             ElementName=_categories,
                             Path=SelectedItem.LoadParamsCommand}" />
-                    </b:EventTrigger>
-                </b:Interaction.Triggers>
-                
-            </TreeView>
+                        </b:EventTrigger>
+                    </b:Interaction.Triggers>
+
+                </TreeView>
+            </StackPanel>
         </Border>
 
         <DockPanel

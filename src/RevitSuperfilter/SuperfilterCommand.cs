@@ -97,7 +97,6 @@ public class SuperfilterCommand : BasePluginCommand {
                 .ToArray())
             .InSingletonScope();
 
-        // Вызывает стандартное уведомление
-        Notification(kernel.Get<MainWindow>());
+        kernel.Get<MainWindow>().Show();
     }
 }
