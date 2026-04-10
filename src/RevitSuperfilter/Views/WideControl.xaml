@@ -12,17 +12,45 @@
     mc:Ignorable="d"
     d:DesignHeight="400" d:DesignWidth="500"
     d:DataContext="{d:DesignInstance vms:MainViewModel, IsDesignTimeCreatable=False}">
-    
+
     <Grid>
         <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="*" />
-            <ColumnDefinition Width="*" />
+            <ColumnDefinition Width="*" MinWidth="200" />
+            <ColumnDefinition Width="Auto" />
+            <ColumnDefinition Width="*" MinWidth="200" />
         </Grid.ColumnDefinitions>
 
         <Grid.RowDefinitions>
             <RowDefinition Height="*" />
             <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
+
+        <Border
+            Grid.Row="0"
+            Grid.Column="0"
+            Margin="8 4"
+            CornerRadius="6"
+            Background="{DynamicResource CardBackground}">
+
+        </Border>
+
+        <GridSplitter
+            Grid.Row="0"
+            Grid.Column="1"
+            Width="3"
+            Margin="0 4"
+            ResizeDirection="Columns"
+            HorizontalAlignment="Center"
+            Background="{DynamicResource CardBackground}" />
+
+        <Border
+            Grid.Row="0"
+            Grid.Column="2"
+            Margin="8 4"
+            CornerRadius="6"
+            Background="{DynamicResource CardBackground}">
+
+        </Border>
 
         <DockPanel
             Grid.Row="1"
@@ -41,7 +69,7 @@
 
         <DockPanel
             Grid.Row="1"
-            Grid.Column="1"
+            Grid.Column="2"
             Margin="8 4"
             LastChildFill="True">
 

@@ -58,7 +58,7 @@
 
         <views:ModeSwitcherControl
             Grid.Row="1"
-            DisplayMemberPath="Selection"
+            DisplayMemberPath="DisplaySelection"
             SelectedItem="{Binding SuperfilterService}"
             ItemsSource="{Binding SuperfilterServices}" />
 

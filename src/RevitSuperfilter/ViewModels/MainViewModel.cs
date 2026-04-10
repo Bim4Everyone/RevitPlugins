@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Linq;
 using System.Windows.Input;
 
 using dosymep.SimpleServices;
@@ -70,6 +71,17 @@ internal class MainViewModel : BaseViewModel {
     /// </summary>
     /// <remarks>В данном методе должна происходить загрузка настроек окна, а так же инициализация полей окна.</remarks>
     private void LoadView() {
+        foreach(var superfilterService in SuperfilterServices) {
+            superfilterService.Build();
+        }
+
+        SuperfilterService =
+            SuperfilterServices.FirstOrDefault(item =>
+                item.Selection == Selection.SelectedOnViewSelection && item.Superfilter.Categories.Count > 0)
+            ?? SuperfilterServices.FirstOrDefault(item =>
+                item.Selection == Selection.DBViewSelection && item.Superfilter.Categories.Count > 0)
+            ?? SuperfilterServices.FirstOrDefault(item =>
+                item.Selection == Selection.DBSelection && item.Superfilter.Categories.Count > 0);
     }
 
     /// <summary>

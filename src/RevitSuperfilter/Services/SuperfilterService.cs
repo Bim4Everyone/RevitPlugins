@@ -26,13 +26,15 @@ internal sealed class SuperfilterService : ObservableObject, ISuperfilterService
         _localizationService = localizationService;
         _selectionElements.OnSelectionChanged += SelectionElementsOnOnSelectionChanged;
     }
-    
-    public string Selection => _localizationService.GetLocalizedString($"{_selectionElements.Selection.GetType().Name}.{_selectionElements.Selection}");
+   
+    public Selection Selection => _selectionElements.Selection;
+    public string DisplaySelection => _localizationService.GetLocalizedString($"{Selection.GetType().Name}.{_selectionElements.Selection}");
+
 
     public Superfilter Superfilter { get; } = new();
     public ElementsIndex ElementsIndex { get; } = new();
 
-    public void Build() {
+    public ISuperfilterService Build() {
         Clear();
         _document = GetActiveDocument();
 
@@ -41,7 +43,9 @@ internal sealed class SuperfilterService : ObservableObject, ISuperfilterService
             .ToArray();
 
         Superfilter.Build(elements);
-        ElementsIndex.Build(elements);
+        //ElementsIndex.Build(elements);
+        
+        return this;
     }
 
     public void Clear() {

@@ -13,7 +13,7 @@
         <Style x:Key="ModeSwitcherItemStyle" TargetType="{x:Type ListBoxItem}">
             <Setter Property="FocusVisualStyle" Value="{x:Null}" />
             <Setter Property="Cursor" Value="Hand" />
-            <Setter Property="Margin" Value="0" />
+            <Setter Property="Margin" Value="8 4" />
             <Setter Property="Padding" Value="12,6" />
             <Setter Property="VerticalContentAlignment" Value="Center" />
             <Setter Property="HorizontalContentAlignment" Value="Center" />
@@ -62,8 +62,9 @@
 
     <Border
         Padding="3"
-        CornerRadius="8"
-        Background="{DynamicResource ControlFillColorTertiaryBrush}">
+        Margin="8 0"
+        CornerRadius="6"
+        Background="{DynamicResource CardBackground}">
 
         <ListBox
             x:Name="_innerListBox"

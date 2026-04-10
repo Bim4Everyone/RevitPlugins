@@ -19,6 +19,14 @@
             <RowDefinition Height="Auto" />
             <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
+        
+        <Border
+            Grid.Row="0"
+            Margin="8 4"
+            CornerRadius="6"
+            Background="{DynamicResource CardBackground}">
+            
+        </Border>
 
         <DockPanel
             Grid.Row="1"
