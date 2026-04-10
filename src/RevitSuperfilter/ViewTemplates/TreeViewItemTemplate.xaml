@@ -23,19 +23,24 @@
 
             <ui:TextBlock
                 VerticalAlignment="Center"
-                Text="{Binding Name}" />
+                Text="{Binding DisplayValue}" />
         </DockPanel>
     </DataTemplate>
-
-    <HierarchicalDataTemplate
-        DataType="{x:Type vms:ParamViewModel}"
-        ItemsSource="{Binding ParamValues}">
-        <ContentPresenter ContentTemplate="{StaticResource TreeViewItem}" />
-    </HierarchicalDataTemplate>
 
     <HierarchicalDataTemplate
         DataType="{x:Type vms:CategoryViewModel}"
         ItemsSource="{Binding Params}">
         <ContentPresenter ContentTemplate="{StaticResource TreeViewItem}" />
     </HierarchicalDataTemplate>
+    
+    <HierarchicalDataTemplate
+        DataType="{x:Type vms:ParamViewModel}"
+        ItemsSource="{Binding ParamValues}">
+        <ContentPresenter ContentTemplate="{StaticResource TreeViewItem}" />
+    </HierarchicalDataTemplate>
+    
+    <DataTemplate DataType="{x:Type vms:ParamValueViewModel}">
+        <ContentPresenter ContentTemplate="{StaticResource TreeViewItem}"/>
+    </DataTemplate>
+    
 </ResourceDictionary>

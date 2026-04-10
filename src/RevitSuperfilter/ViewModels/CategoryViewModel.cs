@@ -30,7 +30,7 @@ internal sealed class CategoryViewModel : BaseViewModel, IElementIndex {
     public bool IsLoaded { get; private set; }
 
     public int Count => _elementsById.Count;
-    public string Name => _category?.Name;
+    public string DisplayValue => _category?.Name;
 
     public ObservableCollection<ParamViewModel> Params { get; } = [];
     

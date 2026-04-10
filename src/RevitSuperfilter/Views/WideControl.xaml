@@ -8,6 +8,8 @@
     xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
     xmlns:me="clr-namespace:dosymep.WpfCore.MarkupExtensions;assembly=dosymep.WpfCore"
     xmlns:vms="clr-namespace:RevitSuperfilter.ViewModels"
+    xmlns:b="http://schemas.microsoft.com/xaml/behaviors"
+    xmlns:sys="clr-namespace:System;assembly=mscorlib"
 
     mc:Ignorable="d"
     d:DesignHeight="400" d:DesignWidth="500"
@@ -40,9 +42,19 @@
             CornerRadius="6"
             Background="{DynamicResource CardBackground}">
             <ui:ListView
+                x:Name="_categories"
                 SelectedItem="{Binding Category}"
                 ItemsSource="{Binding SuperfilterService.Superfilter.Categories}"
                 ItemTemplate="{StaticResource TreeViewItem}">
+
+                <b:Interaction.Triggers>
+                    <b:EventTrigger EventName="SelectionChanged">
+                        <b:InvokeCommandAction
+                            Command="{Binding
+                            ElementName=_categories,
+                            Path=SelectedItem.LoadParamsCommand}" />
+                    </b:EventTrigger>
+                </b:Interaction.Triggers>
             </ui:ListView>
         </Border>
 
@@ -61,10 +73,7 @@
             Margin="8 4"
             CornerRadius="6"
             Background="{DynamicResource CardBackground}">
-            <TreeView
-                ItemsSource="{Binding Category}"
-                ItemTemplate="{StaticResource CategoryTemplate}">
-            </TreeView>
+            <TreeView ItemsSource="{Binding Category.Params}"/>
         </Border>
 
         <DockPanel

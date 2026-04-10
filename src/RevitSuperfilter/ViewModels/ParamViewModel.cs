@@ -19,7 +19,7 @@ internal sealed class ParamViewModel : BaseViewModel {
     }
 
     public int Count => _elementsById.Count;
-    public string Name => _definition.Name;
+    public string DisplayValue => _definition.Name;
     
     public ObservableCollection<ParamValueViewModel> ParamValues { get; } = [];
 
@@ -30,6 +30,7 @@ internal sealed class ParamViewModel : BaseViewModel {
 
         _elementsById.Add(element.Id, element);
         var viewModel = GetOrAdd(element, paramValue);
+        viewModel.Add(element);
     }
 
     public void Remove(ElementId elementId, string paramValue) {
@@ -44,11 +45,11 @@ internal sealed class ParamViewModel : BaseViewModel {
     }
 
     private ParamValueViewModel GetOrAdd(Element element, string value) {
-        if(!_paramValues.TryGetValue(value, out var paramValueViewModel)) {
+        if(!_paramValues.TryGetValue(value ?? "<null>", out var paramValueViewModel)) {
             paramValueViewModel = new ParamValueViewModel(value);
 
             ParamValues.Add(paramValueViewModel);
-            _paramValues.Add(value, paramValueViewModel);
+            _paramValues.Add(value ?? "<null>", paramValueViewModel);
         }
 
         return paramValueViewModel;
