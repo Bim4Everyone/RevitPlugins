@@ -65,6 +65,10 @@ namespace RevitMechanicalSpecification.Models.Fillers {
         /// <returns></returns>
         private string GetSystemName(SpecificationElement specificationElement) {
             string forcedSystem = _nameFactory.GetForcedParamValue(specificationElement, Config.ForcedSystemName);
+            if(_nameFactory.IsForcedSystemPattern(forcedSystem)) {
+                return _nameFactory.GetSystemNameValue(specificationElement);
+            }
+
             if(!string.IsNullOrEmpty(forcedSystem)) {
                 return forcedSystem;
             }
@@ -74,12 +78,13 @@ namespace RevitMechanicalSpecification.Models.Fillers {
             if(specificationElement.InsulationSpHost != null) {
                 string forcedHostSystem = _nameFactory.GetForcedParamValue(specificationElement.InsulationSpHost,
                     Config.ForcedSystemName);
-                if(!string.IsNullOrEmpty(forcedHostSystem)) {
+                if(!string.IsNullOrEmpty(forcedHostSystem)
+                    && !_nameFactory.IsForcedSystemPattern(forcedHostSystem)) {
                     return forcedHostSystem;
                 }
             }
 
-            return _nameFactory.GetSystemNameValue(specificationElement.Element);
+            return _nameFactory.GetSystemNameValue(specificationElement);
         }
     }
 }
