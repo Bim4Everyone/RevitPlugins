@@ -11,6 +11,7 @@ namespace RevitClashDetective.ViewModels.Navigator;
 
 internal class ReportMergePairViewModel : BaseViewModel {
     private readonly ILocalizationService _localization;
+    private readonly ReportsMergePair _reportsMergePair;
     private readonly ClashMergeCollection _mergeConflictClashes;
     private readonly ClashMergeCollection _autoMergedClashes;
     private readonly ClashViewModel[] _unchangedClashes;
@@ -21,9 +22,11 @@ internal class ReportMergePairViewModel : BaseViewModel {
         ILocalizationService localization,
         ReportsMergePair reportsMergePair) {
         _localization = localization ?? throw new ArgumentNullException(nameof(localization));
-        ExistingReport = existingReport ?? throw new ArgumentNullException(nameof(existingReport));
-        ImportingReport = importingReport ?? throw new ArgumentNullException(nameof(importingReport));
+        _reportsMergePair = reportsMergePair ?? throw new ArgumentNullException(nameof(reportsMergePair));
+        ExistingReport = _reportsMergePair.Left;
+        ImportingReport = _reportsMergePair.Right;
 
+        // TODO
         _mergeConflictClashes = new(
             _localization.GetLocalizedString("TODO"),
             FindMergeConflicts(ExistingReport.Clashes, ImportingReport.Clashes));

@@ -9,32 +9,38 @@ namespace RevitClashDetective.Services.ReportsMerging;
 internal class ReportsMergePair {
     private static readonly ReportsNamesIgnoreCaseComparer _reportsComparer = new();
     private static readonly ClashIdDocComparer _clashComparer = new();
-    private readonly ReportViewModel _left;
-    private readonly ReportViewModel _right;
+
 
     public ReportsMergePair(ReportViewModel left, ReportViewModel right) {
-        _left = left ?? throw new ArgumentNullException(nameof(left));
-        _right = right ?? throw new ArgumentNullException(nameof(right));
-        if(!_reportsComparer.Equals(_left, _right)) {
+        Left = left ?? throw new ArgumentNullException(nameof(left));
+        Right = right ?? throw new ArgumentNullException(nameof(right));
+        if(!_reportsComparer.Equals(Left, Right)) {
             throw new ArgumentException("Отчеты не соответствуют друг другу", nameof(right));
         }
 
-        LeftOuterClashes = left.Clashes.Except(right.Clashes, _clashComparer).ToArray();
-        RightOuterClashes = right.Clashes.Except(left.Clashes, _clashComparer).ToArray();
-        ManualMergeClashes = GetManualMergeClashes();
-        AutoMergeClashes = GetAutoMergeClashes();
+        LeftOuterClashes = Left.Clashes.Except(right.Clashes, _clashComparer).ToArray();
+        RightOuterClashes = Right.Clashes.Except(left.Clashes, _clashComparer).ToArray();
+        MergeClashes = GetMergeClashes(Left, Right);
     }
 
+    public ReportViewModel Left { get; }
+    public ReportViewModel Right { get; }
     public ICollection<ClashViewModel> LeftOuterClashes { get; }
     public ICollection<ClashViewModel> RightOuterClashes { get; }
-    public ICollection<ClashMergeViewModel> ManualMergeClashes { get; }
-    public ICollection<ClashMergeViewModel> AutoMergeClashes { get; }
+    public ICollection<ClashMergePair> MergeClashes { get; }
 
-    private ICollection<ClashMergeViewModel> GetManualMergeClashes() {
-        throw new NotImplementedException();
-    }
+    private ICollection<ClashMergePair> GetMergeClashes(ReportViewModel left, ReportViewModel right) {
+        var leftIntersection = left.Clashes.Intersect(right.Clashes, _clashComparer)
+            .OrderBy(x => x, _clashComparer)
+            .ToArray();
+        var rightIntersection = right.Clashes.Intersect(left.Clashes, _clashComparer)
+            .OrderBy(x => x, _clashComparer)
+            .ToArray();
+        List<ClashMergePair> mergeClashes = [];
+        for(int i = 0; i < leftIntersection.Length; i++) {
+            mergeClashes.Add(new ClashMergePair(leftIntersection[i], rightIntersection[i]));
+        }
 
-    private ICollection<ClashMergeViewModel> GetAutoMergeClashes() {
-        throw new NotImplementedException();
+        return mergeClashes;
     }
 }

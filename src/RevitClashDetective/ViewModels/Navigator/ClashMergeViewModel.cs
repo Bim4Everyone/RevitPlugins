@@ -14,6 +14,7 @@ namespace RevitClashDetective.ViewModels.Navigator;
 
 internal class ClashMergeViewModel : BaseViewModel {
     private static readonly ClashCommentContentComparer _comparer = new();
+    private readonly ClashMergePair _mergePair;
     private string _clashName;
     private ClashStatus _clashStatus;
     private bool _existingNameSelected;
@@ -26,9 +27,8 @@ internal class ClashMergeViewModel : BaseViewModel {
     private bool _importingClashSelected;
     private bool _existingClashSelected;
 
-    public ClashMergeViewModel(ClashViewModel existing, ClashViewModel importing) {
-        ExistingClash = existing ?? throw new ArgumentNullException(nameof(existing));
-        ImportingClash = importing ?? throw new ArgumentNullException(nameof(importing));
+    public ClashMergeViewModel(ClashMergePair mergePair) {
+        _mergePair = mergePair ?? throw new ArgumentNullException(nameof(mergePair));
 
         // по умолчанию комментарии всегда объединяются
         ExistingCommentsSelected = true;
@@ -38,8 +38,8 @@ internal class ClashMergeViewModel : BaseViewModel {
         SetMergedCommentsCommand = RelayCommand.Create(SetMergedComments);
     }
 
-    public ClashViewModel ExistingClash { get; }
-    public ClashViewModel ImportingClash { get; }
+    public ClashViewModel ExistingClash => _mergePair.ExistingClash;
+    public ClashViewModel ImportingClash => _mergePair.ImportingClash;
     public ICommand SetMergedCommentsCommand { get; }
 
     public string ClashName {

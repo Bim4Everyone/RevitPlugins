@@ -15,7 +15,6 @@ namespace RevitClashDetective.ViewModels.Navigator;
 internal class ReportsMergeViewModel : BaseViewModel {
     private readonly ILocalizationService _localization;
     private readonly ReportSetsIntersectionResult _reportsIntersection;
-    private readonly ReportsMergeServant _mergeServant = new();
     private string _errorText;
 
     public ReportsMergeViewModel(
@@ -25,7 +24,9 @@ internal class ReportsMergeViewModel : BaseViewModel {
         _localization = localization ?? throw new ArgumentNullException(nameof(localization));
         _reportsIntersection = reportsIntersection ?? throw new ArgumentNullException(nameof(reportsIntersection));
 
-        ReportsToMerge = [.._reportsIntersection.GetMergePairs()];
+        ReportsToMerge = [
+            .._reportsIntersection.GetMergePairs().Select(p => new ReportMergePairViewModel(_localization, p))
+        ];
         AcceptMergeCommand = RelayCommand.Create(() => { }, CanAcceptMerge);
     }
 
