@@ -1,4 +1,5 @@
 using System.Collections;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Windows.Input;
 
@@ -15,29 +16,35 @@ namespace RevitSuperfilter.ViewModels;
 /// Основная ViewModel главного окна плагина.
 /// </summary>
 internal class MainViewModel : BaseViewModel {
-    private readonly RevitRepository _revitRepository;
-    private readonly ISuperfilterService _superfilterService;
     private readonly ILocalizationService _localizationService;
-
-    private string _errorText;
     
+    private string _errorText;
+    private ISuperfilterService _superfilterService;
+    private ObservableCollection<ISuperfilterService> _superfilterServices;
+
     /// <summary>
     /// Создает экземпляр основной ViewModel главного окна.
     /// </summary>
     public MainViewModel(
-        PluginConfig pluginConfig,
-        RevitRepository revitRepository,
-        ISuperfilterService superfilterService,
-        ILocalizationService localizationService) {
-        _revitRepository = revitRepository;
-        _superfilterService = superfilterService;
+        ILocalizationService localizationService,
+        IReadOnlyCollection<ISuperfilterService> superfilterServices) {
         _localizationService = localizationService;
 
         LoadViewCommand = RelayCommand.Create(LoadView);
         AcceptViewCommand = RelayCommand.Create(AcceptView, CanAcceptView);
+        
+        SuperfilterServices = new ObservableCollection<ISuperfilterService>(superfilterServices);
     }
 
-    public ObservableCollection<object> Modes { get; } = [new { Name = "mode 1" }, new { Name = "mode 2" }, new { Name = "mode 3" }];
+    public ISuperfilterService SuperfilterService {
+        get => _superfilterService;
+        set => this.RaiseAndSetIfChanged(ref _superfilterService, value);
+    }
+
+    public ObservableCollection<ISuperfilterService> SuperfilterServices {
+        get => _superfilterServices;
+        set => this.RaiseAndSetIfChanged(ref _superfilterServices, value);
+    }
 
     /// <summary>
     /// Команда загрузки главного окна.

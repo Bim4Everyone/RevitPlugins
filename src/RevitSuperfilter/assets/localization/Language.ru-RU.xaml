@@ -9,4 +9,8 @@
     <system:String x:Key="MainWindow.ButtonShow">Показать</system:String>
     <system:String x:Key="MainWindow.ButtonSelect">Выделить</system:String>
     <system:String x:Key="MainWindow.ButtonIsolate">Изолировать</system:String>
+    
+    <system:String x:Key="Selection.DBSelection">Документ</system:String>
+    <system:String x:Key="Selection.DBViewSelection">Вид</system:String>
+    <system:String x:Key="Selection.SelectedOnViewSelection">Выделено</system:String>
 </ResourceDictionary>

@@ -3,5 +3,9 @@ using RevitSuperfilter.Models;
 namespace RevitSuperfilter.Services;
 
 internal interface ISuperfilterService : IElementIndex {
-    void Build(ISelectionElements selectionElements);
+    string Selection { get; }
+    Superfilter Superfilter { get; }
+    ElementsIndex ElementsIndex { get; }
+
+    void Build();
 }

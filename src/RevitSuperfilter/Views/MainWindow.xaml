@@ -58,7 +58,9 @@
 
         <views:ModeSwitcherControl
             Grid.Row="1"
-            ItemsSource="{Binding Modes}" />
+            DisplayMemberPath="Selection"
+            SelectedItem="{Binding SuperfilterService}"
+            ItemsSource="{Binding SuperfilterServices}" />
 
         <views:WideControl Grid.Row="2" Style="{StaticResource WideOnly}" />
         <views:NarrowControl Grid.Row="2" Style="{StaticResource NarrowOnly}" />

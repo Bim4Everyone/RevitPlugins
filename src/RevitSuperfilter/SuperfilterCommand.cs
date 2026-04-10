@@ -1,4 +1,6 @@
+using System.Collections.Generic;
 using System.Globalization;
+using System.Linq;
 using System.Reflection;
 
 using Autodesk.Revit.Attributes;
@@ -7,12 +9,16 @@ using Autodesk.Revit.UI;
 using dosymep.Bim4Everyone;
 using dosymep.Bim4Everyone.ProjectConfigs;
 using dosymep.Bim4Everyone.SimpleServices;
+using dosymep.SimpleServices;
 using dosymep.WpfCore.Ninject;
 using dosymep.WpfUI.Core.Ninject;
 
 using Ninject;
+using Ninject.Parameters;
 
 using RevitSuperfilter.Models;
+using RevitSuperfilter.Models.Selections;
+using RevitSuperfilter.Services;
 using RevitSuperfilter.ViewModels;
 using RevitSuperfilter.Views;
 
@@ -69,6 +75,27 @@ public class SuperfilterCommand : BasePluginCommand {
         kernel.UseWpfLocalization(
             $"/{assemblyName};component/assets/localization/Language.xaml",
             CultureInfo.GetCultureInfo("ru-RU"));
+
+        kernel.Bind<ISelectionElements>()
+            .To<DBSelection>()
+            .InSingletonScope();
+
+        kernel.Bind<ISelectionElements>()
+            .To<DBViewSelection>()
+            .InSingletonScope();
+
+        kernel.Bind<ISelectionElements>()
+            .To<SelectedOnViewSelection>()
+            .InSingletonScope();
+
+        kernel.Bind<IReadOnlyCollection<ISuperfilterService>>()
+            .ToMethod(c => c.Kernel.GetAll<ISelectionElements>()
+                .Select(item => new SuperfilterService(
+                    c.Kernel.Get<UIApplication>(),
+                    item,
+                    c.Kernel.Get<ILocalizationService>()))
+                .ToArray())
+            .InSingletonScope();
 
         // Вызывает стандартное уведомление
         Notification(kernel.Get<MainWindow>());

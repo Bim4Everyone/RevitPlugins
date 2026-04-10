@@ -5,6 +5,7 @@ using System.Linq;
 using Autodesk.Revit.DB;
 using Autodesk.Revit.UI;
 
+using dosymep.SimpleServices;
 using dosymep.WPF;
 
 using RevitSuperfilter.Models;
@@ -14,29 +15,28 @@ namespace RevitSuperfilter.Services;
 
 internal sealed class SuperfilterService : ObservableObject, ISuperfilterService {
     private readonly UIApplication _uiApplication;
+    private readonly ISelectionElements _selectionElements;
+    private readonly ILocalizationService _localizationService;
 
     private Document _document;
-    private ISelectionElements _selectionElements;
 
-    public SuperfilterService(UIApplication uiApplication) {
+    public SuperfilterService(UIApplication uiApplication, ISelectionElements selectionElements, ILocalizationService localizationService) {
         _uiApplication = uiApplication;
+        _selectionElements = selectionElements;
+        _localizationService = localizationService;
+        _selectionElements.OnSelectionChanged += SelectionElementsOnOnSelectionChanged;
     }
+    
+    public string Selection => _localizationService.GetLocalizedString($"{_selectionElements.Selection.GetType().Name}.{_selectionElements.Selection}");
 
     public Superfilter Superfilter { get; } = new();
     public ElementsIndex ElementsIndex { get; } = new();
 
-    public void Build(ISelectionElements selectionElements) {
-        _selectionElements = selectionElements;
-        _selectionElements.OnSelectionChanged += SelectionElementsOnOnSelectionChanged;
-
-        BuildImpl(selectionElements);
-    }
-
-    private void BuildImpl(ISelectionElements selectionElements) {
+    public void Build() {
         Clear();
         _document = GetActiveDocument();
-        
-        IReadOnlyCollection<Element> elements = selectionElements
+
+        IReadOnlyCollection<Element> elements = _selectionElements
             .GetElements()
             .ToArray();
 
@@ -89,7 +89,7 @@ internal sealed class SuperfilterService : ObservableObject, ISuperfilterService
     
     private void SelectionElementsOnOnSelectionChanged(object sender, SelectionChangeEventArgs e) {
         if(e.IsEmpty) {
-            BuildImpl(_selectionElements);
+            Build();
             return;
         }
         

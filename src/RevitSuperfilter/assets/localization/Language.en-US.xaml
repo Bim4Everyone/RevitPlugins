@@ -9,4 +9,8 @@
     <system:String x:Key="MainWindow.ButtonShow">Show</system:String>
     <system:String x:Key="MainWindow.ButtonSelect">Select</system:String>
     <system:String x:Key="MainWindow.ButtonIsolate">Isolate</system:String>
+    
+    <system:String x:Key="Selection.DBSelection">Document</system:String>
+    <system:String x:Key="Selection.DBViewSelection">View</system:String>
+    <system:String x:Key="Selection.SelectedOnViewSelection">Selected</system:String>
 </ResourceDictionary>
