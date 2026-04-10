@@ -13,6 +13,14 @@
     d:DesignHeight="400" d:DesignWidth="500"
     d:DataContext="{d:DesignInstance vms:MainViewModel, IsDesignTimeCreatable=False}">
 
+    <UserControl.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="../ViewTemplates/TreeViewItemTemplate.xaml" />
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
+    </UserControl.Resources>
+
     <Grid>
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="*" MinWidth="200" />
@@ -31,7 +39,11 @@
             Margin="8 4"
             CornerRadius="6"
             Background="{DynamicResource CardBackground}">
-
+            <ui:ListView
+                SelectedItem="{Binding Category}"
+                ItemsSource="{Binding SuperfilterService.Superfilter.Categories}"
+                ItemTemplate="{StaticResource TreeViewItem}">
+            </ui:ListView>
         </Border>
 
         <GridSplitter
@@ -49,7 +61,10 @@
             Margin="8 4"
             CornerRadius="6"
             Background="{DynamicResource CardBackground}">
-
+            <TreeView
+                ItemsSource="{Binding Category}"
+                ItemTemplate="{StaticResource CategoryTemplate}">
+            </TreeView>
         </Border>
 
         <DockPanel

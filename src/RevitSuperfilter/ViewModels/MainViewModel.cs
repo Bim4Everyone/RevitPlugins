@@ -22,6 +22,8 @@ internal class MainViewModel : BaseViewModel {
     private string _errorText;
     private ISuperfilterService _superfilterService;
     private ObservableCollection<ISuperfilterService> _superfilterServices;
+   
+    private CategoryViewModel _category;
 
     /// <summary>
     /// Создает экземпляр основной ViewModel главного окна.
@@ -35,6 +37,11 @@ internal class MainViewModel : BaseViewModel {
         AcceptViewCommand = RelayCommand.Create(AcceptView, CanAcceptView);
         
         SuperfilterServices = new ObservableCollection<ISuperfilterService>(superfilterServices);
+    }
+
+    public CategoryViewModel Category {
+        get => _category;
+        set => this.RaiseAndSetIfChanged(ref _category, value);
     }
 
     public ISuperfilterService SuperfilterService {

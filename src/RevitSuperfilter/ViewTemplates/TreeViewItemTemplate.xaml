@@ -1,0 +1,41 @@
+<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:vms="clr-namespace:RevitSuperfilter.ViewModels"
+                    xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml">
+
+    <DataTemplate
+        x:Key="TreeViewItem"
+        DataType="{x:Type vms:CategoryViewModel}">
+        <DockPanel LastChildFill="True">
+            <ui:TextBlock
+                DockPanel.Dock="Right"
+                Margin="12,0,12,0"
+                Opacity="0.6"
+                VerticalAlignment="Center"
+                Text="{Binding Count}" />
+
+            <CheckBox
+                DockPanel.Dock="Left"
+                Padding="0"
+                Margin="12,0,12,0"
+                VerticalAlignment="Center"
+                IsChecked="{Binding IsChecked}" />
+
+            <ui:TextBlock
+                VerticalAlignment="Center"
+                Text="{Binding Name}" />
+        </DockPanel>
+    </DataTemplate>
+
+    <HierarchicalDataTemplate
+        DataType="{x:Type vms:ParamViewModel}"
+        ItemsSource="{Binding ParamValues}">
+        <ContentPresenter ContentTemplate="{StaticResource TreeViewItem}" />
+    </HierarchicalDataTemplate>
+
+    <HierarchicalDataTemplate
+        DataType="{x:Type vms:CategoryViewModel}"
+        ItemsSource="{Binding Params}">
+        <ContentPresenter ContentTemplate="{StaticResource TreeViewItem}" />
+    </HierarchicalDataTemplate>
+</ResourceDictionary>
