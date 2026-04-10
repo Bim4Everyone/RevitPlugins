@@ -147,7 +147,7 @@ internal static class RevitConstants {
     public static ParamMap GetZoneParamMap() {
         var instance = SharedParamsConfig.Instance;
         return new ParamMap {
-            Type = ParamType.FloorDEParam,
+            Type = ParamType.ZoneParam,
             SourceParam = instance?.BuildingWorksZone,
             TargetParam = instance?.BuildingWorksZone
         };
