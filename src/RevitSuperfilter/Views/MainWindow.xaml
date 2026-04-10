@@ -12,8 +12,8 @@
     xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
     xmlns:vms="clr-namespace:RevitSuperfilter.ViewModels"
     xmlns:me="clr-namespace:dosymep.WpfCore.MarkupExtensions;assembly=dosymep.WpfCore"
-
-
+    xmlns:views="clr-namespace:RevitSuperfilter.Views"
+    
     mc:Ignorable="d"
     WindowStartupLocation="CenterOwner"
 
@@ -38,6 +38,7 @@
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
             <RowDefinition Height="*" />
             <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
@@ -46,8 +47,14 @@
             Grid.Row="0"
             Title="{me:LocalizationSource MainWindow.Title}" />
         
+        <views:ModeSwitcherControl
+            Grid.Row="1"
+            ItemsSource="{Binding Modes}"/>
+        
+        <views:NarrowControl Grid.Row="2"/>
+        
         <StackPanel
-            Grid.Row="2"
+            Grid.Row="3"
             Orientation="Horizontal"
             HorizontalAlignment="Right">
 
