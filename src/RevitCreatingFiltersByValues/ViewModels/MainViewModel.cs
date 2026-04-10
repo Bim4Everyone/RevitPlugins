@@ -268,7 +268,10 @@ internal class MainViewModel : BaseViewModel {
             SelectedCatIds.Add(cat.CategoryIdInView);
         }
 
-
+        // В случае, если ни одна категория не выбрана, то общие для категорий параметры искать нет смысла
+        if(SelectedCatIds.Count == 0) {
+            return;
+        }
         // Получаем параметры для фильтров на основе ID категорий
         List<ElementId> elementIds = ParameterFilterUtilities.GetFilterableParametersInCommon(_revitRepository.Document, SelectedCatIds).ToList();
 
