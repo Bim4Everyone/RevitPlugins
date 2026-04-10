@@ -1,9 +1,11 @@
 using System;
 using System.Collections.Generic;
 
-namespace RevitClashDetective.ViewModels.Navigator;
+using RevitClashDetective.ViewModels.Navigator;
 
-internal class ClashCommentViewModelInfoComparer : IEqualityComparer<ClashCommentViewModel> {
+namespace RevitClashDetective.Services.ReportsMerging;
+
+internal class ClashCommentContentComparer : IEqualityComparer<ClashCommentViewModel> {
     public bool Equals(ClashCommentViewModel x, ClashCommentViewModel y) {
         if(ReferenceEquals(x, y)) {
             return true;

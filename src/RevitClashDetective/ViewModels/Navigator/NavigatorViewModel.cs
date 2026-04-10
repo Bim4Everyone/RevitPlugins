@@ -39,7 +39,7 @@ internal class NavigatorViewModel : BaseViewModel, ISupportServices {
     private ReportViewModel _selectedFile;
     private ObservableCollection<ReportViewModel> _reports;
     private ReportsMergeViewModel _reportsMergeViewModel;
-    private bool _showReportsMergeView = false;
+    private bool _showReportsMergeView;
 
     public NavigatorViewModel(
         RevitRepository revitRepository,
@@ -49,7 +49,7 @@ internal class NavigatorViewModel : BaseViewModel, ISupportServices {
         ILocalizationService localizationService,
         IContentDialogService contentDialogService,
         SettingsConfig settingsConfig,
-        string selectedFile = null) {
+        string reportName = null) {
 
         _revitRepository = revitRepository ?? throw new ArgumentNullException(nameof(revitRepository));
         OpenFileDialogService = openFileDialogService ?? throw new ArgumentNullException(nameof(openFileDialogService));
@@ -60,10 +60,10 @@ internal class NavigatorViewModel : BaseViewModel, ISupportServices {
         _settingsConfig = settingsConfig ?? throw new ArgumentNullException(nameof(settingsConfig));
         Reports = [];
 
-        if(selectedFile == null) {
-            InitializeFiles();
+        if(reportName == null) {
+            InitializeReports();
         } else {
-            InitializeFiles(selectedFile);
+            InitializeReports(reportName);
         }
 
         ServiceContainer = new ServiceContainer(this);
@@ -121,39 +121,27 @@ internal class NavigatorViewModel : BaseViewModel, ISupportServices {
         set => RaiseAndSetIfChanged(ref _selectedFile, value);
     }
 
+    private void InitializeReports(string reportName = null) {
+        string reportsDir = Path.Combine(
+            RevitRepository.LocalProfilePath,
+            ModuleEnvironment.RevitVersion,
+            nameof(RevitClashDetective),
+            _revitRepository.GetObjectName());
 
-    private void InitializeFiles(string selectedFile) {
-        string profilePath = RevitRepository.LocalProfilePath;
-        Reports = new ObservableCollection<ReportViewModel>(Directory.GetFiles(Path.Combine(profilePath, ModuleEnvironment.RevitVersion, nameof(RevitClashDetective), _revitRepository.GetObjectName()))
-            .Select(path => new ReportViewModel(
-                _revitRepository,
-                Path.GetFileNameWithoutExtension(path),
-                _localizationService,
-                OpenFileDialogService,
-                SaveFileDialogService,
-                MessageBoxService,
-                _contentDialogService,
-                _settingsConfig))
-            .Where(item => item.Name.Equals(selectedFile, StringComparison.CurrentCultureIgnoreCase)));
-        SelectedReport = Reports.FirstOrDefault();
-    }
-
-    private void InitializeFiles() {
-        string profilePath = RevitRepository.LocalProfilePath;
-        string path = Path.Combine(profilePath, ModuleEnvironment.RevitVersion, nameof(RevitClashDetective), _revitRepository.GetObjectName());
-        if(Directory.Exists(path)) {
-            Reports = new ObservableCollection<ReportViewModel>(Directory.GetFiles(path)
-                .Select(item => new ReportViewModel(
-                    _revitRepository,
-                    Path.GetFileNameWithoutExtension(item),
-                    _localizationService,
-                    OpenFileDialogService,
-                    SaveFileDialogService,
-                    MessageBoxService,
-                    _contentDialogService,
-                    _settingsConfig)));
-            SelectedReport = Reports.FirstOrDefault();
+        if(!Directory.Exists(reportsDir)) {
+            return;
         }
+
+        ICollection<ReportViewModel> reports;
+        if(reportName != null) {
+            reports = GetReports(Path.Combine(reportsDir, reportName + ".json"));
+        } else {
+            reports = Directory.GetFiles(reportsDir, "*.json")
+                .SelectMany(GetReports)
+                .ToArray();
+        }
+
+        SetReports(reports);
     }
 
     private void OpenClashDetector() {
@@ -176,8 +164,13 @@ internal class NavigatorViewModel : BaseViewModel, ISupportServices {
         }
     }
 
-    private IList<ReportViewModel> GetReports(string path) {
-        return ReportLoader.GetReports(_revitRepository, path)
+    /// <summary>
+    /// Загружает отчеты из заданного файла.
+    /// </summary>
+    /// <param name="reportPath">Путь к файлу отчета. Например, xml из нэвиса или json из ревита.</param>
+    /// <returns>Коллекция отчетов из заданного файла.</returns>
+    private IList<ReportViewModel> GetReports(string reportPath) {
+        return ReportLoader.GetReports(_revitRepository, reportPath)
             .Select(r => new ReportViewModel(
                 _revitRepository,
                 r.Name,
@@ -197,24 +190,23 @@ internal class NavigatorViewModel : BaseViewModel, ISupportServices {
             throw new OperationCanceledException();
         }
 
+        var existingReportsSet = new ReportSet(Reports);
         var importingReports = GetReports(path);
-        string[] intersections = importingReports
-            .Intersect(Reports, new ReportsNamesIgnoreCaseComparer())
-            .Select(r => r.Name)
-            .ToArray();
-        var namesResolver = new ReportsNameResolver();
-        if(intersections.Length > 0) {
-            switch(GetResult(string.Join(", ", intersections))) {
+        var importingReportsSet = new ReportSet(importingReports);
+        var reportsIntersection = existingReportsSet.Intersect(importingReportsSet);
+        var namesResolver = new ReportsIntersectionResolver();
+        if(reportsIntersection.HasIntersection) {
+            switch(GetLoadMode(string.Join(", ", reportsIntersection.LeftInnerSet.Reports.Select(r => r.Name)))) {
                 case TaskDialogResult.CommandLink1: {
-                    SetReports(Merge(Reports, importingReports));
+                    StartReportsMerge(reportsIntersection);
                     break;
                 }
                 case TaskDialogResult.CommandLink2: {
-                    SetReports(namesResolver.Replace(Reports, importingReports));
+                    SetReports(namesResolver.Replace(reportsIntersection));
                     break;
                 }
                 case TaskDialogResult.CommandLink3: {
-                    SetReports(namesResolver.CopyAndRename(Reports, importingReports));
+                    SetReports(namesResolver.CopyAndRename(reportsIntersection));
                     break;
                 }
                 default: {
@@ -223,16 +215,15 @@ internal class NavigatorViewModel : BaseViewModel, ISupportServices {
                 }
             }
         } else {
-            SetReports(Reports.Union(importingReports).ToArray());
+            SetReports(Reports.Union(importingReports));
         }
 
         _revitRepository.CommonConfig.LastRunPath = OpenFileDialogService.File.DirectoryName;
         _revitRepository.CommonConfig.SaveProjectConfig();
     }
 
-    private void SetReports(ICollection<ReportViewModel> reports) {
+    private void SetReports(IEnumerable<ReportViewModel> reports) {
         Reports = new ObservableCollection<ReportViewModel>(reports);
-        SelectedReport = null;
         SelectedReport = Reports.FirstOrDefault();
     }
 
@@ -305,7 +296,7 @@ internal class NavigatorViewModel : BaseViewModel, ISupportServices {
         clash.CanEditComments = backup;
     }
 
-    private TaskDialogResult GetResult(string names) {
+    private TaskDialogResult GetLoadMode(string names) {
         var dialog = new TaskDialog(_localizationService.GetLocalizedString("ReportsResolver.Header")) {
             MainContent = _localizationService.GetLocalizedString("ReportsResolver.Body", names)
         };
@@ -322,13 +313,15 @@ internal class NavigatorViewModel : BaseViewModel, ISupportServices {
         return dialog.Show();
     }
 
-    private ICollection<ReportViewModel> Merge(
-        ICollection<ReportViewModel> existingReports,
-        ICollection<ReportViewModel> importingReports) {
-        throw new NotImplementedException();
+    private void StartReportsMerge(ReportSetsIntersectionResult reportsIntersection) {
+        ReportsMergeViewModel = new ReportsMergeViewModel(_localizationService, reportsIntersection);
+        ShowReportsMergeView = true;
     }
 
     private void AcceptReportsMerge(ReportsMergeViewModel vm) {
+        SetReports(vm.GetMergeResult());
+        ShowReportsMergeView = false;
+        ReportsMergeViewModel = null;
     }
 
     private bool CanAcceptReportsMerge(ReportsMergeViewModel vm) {
@@ -336,7 +329,7 @@ internal class NavigatorViewModel : BaseViewModel, ISupportServices {
             return false;
         }
 
-        return true;
+        return vm.AcceptMergeCommand.CanExecute(null);
     }
 
     private void CancelReportsMerge() {

@@ -18,7 +18,7 @@ internal class ReportLoader {
 
         var loader = loaders.FirstOrDefault(item => item.IsValid());
         if(loader == null) {
-            throw new ArgumentException("Неверный формат файла.");
+            throw new ArgumentException($"Неверный формат файла {path}");
         }
 
         var docNames = revitRepository.DocInfos.Select(item => RevitRepository.GetDocumentName(item.Doc)).ToList();

@@ -8,11 +8,12 @@ using dosymep.WPF.Commands;
 using dosymep.WPF.ViewModels;
 
 using RevitClashDetective.Models.Clashes;
+using RevitClashDetective.Services.ReportsMerging;
 
 namespace RevitClashDetective.ViewModels.Navigator;
 
 internal class ClashMergeViewModel : BaseViewModel {
-    private static readonly ClashCommentViewModelInfoComparer _comparer = new();
+    private static readonly ClashCommentContentComparer _comparer = new();
     private string _clashName;
     private ClashStatus _clashStatus;
     private bool _existingNameSelected;

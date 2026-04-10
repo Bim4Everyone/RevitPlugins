@@ -50,7 +50,7 @@ internal class ReportViewModel : BaseViewModel, INamedEntity, IEquatable<ReportV
         IMessageBoxService messageBoxService,
         IContentDialogService contentDialogService,
         SettingsConfig settingsConfig,
-        ICollection<ClashModel> clashes = null) {
+        ICollection<ClashModel> clashes) {
 
         _localization = localization ?? throw new ArgumentNullException(nameof(localization));
         OpenFileDialogService = openFileDialogService ?? throw new ArgumentNullException(nameof(openFileDialogService));
@@ -60,11 +60,11 @@ internal class ReportViewModel : BaseViewModel, INamedEntity, IEquatable<ReportV
         _settingsConfig = settingsConfig ?? throw new ArgumentNullException(nameof(settingsConfig));
 
         Initialize(revitRepository, name);
-        if(clashes is not null) {
-            InitializeClashes(clashes);
-        } else {
-            InitializeClashesFromPluginFile();
+        if(clashes is null) {
+            throw new ArgumentNullException(nameof(clashes));
         }
+
+        InitializeClashes(clashes);
     }
 
 
@@ -198,13 +198,6 @@ internal class ReportViewModel : BaseViewModel, INamedEntity, IEquatable<ReportV
         saver.Save(config);
         Message = _localization.GetLocalizedString("Navigator.SuccessSave");
         RefreshMessage();
-    }
-
-    private void InitializeClashesFromPluginFile() {
-        if(Name != null) {
-            var config = ClashesConfig.GetClashesConfig(_revitRepository.GetObjectName(), Name);
-            InitializeClashes(config.Clashes.Select(item => item.SetRevitRepository(_revitRepository)));
-        }
     }
 
     private void InitializeClashes(IEnumerable<ClashModel> clashModels) {
