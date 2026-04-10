@@ -56,18 +56,24 @@ namespace RevitMechanicalSpecification.Service {
             return result;
         }
 
+        public bool IsForcedSystemPattern(string forcedSystemValue) {
+            return TryGetForcedSystemSelector(forcedSystemValue, out _);
+        }
+
         /// <summary>
         /// Возвращает функцию системы
         /// </summary>
         /// <param name="element"></param>
         /// <returns></returns>
+        public string GetFunctionNameValue(SpecificationElement specificationElement) {
+            return GetFunctionNameValue(GetVisSystem(specificationElement));
+        }
+
         public string GetFunctionNameValue(Element element) {
-            if(element is FamilyInstance instance) {
-                element = GetSuperComponentIfExist(instance);
-            }
+            return GetFunctionNameValue(GetVisSystem(element, null));
+        }
 
-            VisSystem visSystem = GetVisSystem(element);
-
+        private string GetFunctionNameValue(VisSystem visSystem) {
             if(visSystem == null) {
                 return string.Empty;
             }
@@ -88,12 +94,15 @@ namespace RevitMechanicalSpecification.Service {
         /// </summary>
         /// <param name="element"></param>
         /// <returns></returns>
-        public string GetSystemNameValue(Element element) {
-            if(element is FamilyInstance instance) {
-                element = GetSuperComponentIfExist(instance);
-            }
+        public string GetSystemNameValue(SpecificationElement specificationElement) {
+            return GetSystemNameValue(GetVisSystem(specificationElement));
+        }
 
-            VisSystem visSystem = GetVisSystem(element);
+        public string GetSystemNameValue(Element element) {
+            return GetSystemNameValue(GetVisSystem(element, null));
+        }
+
+        private string GetSystemNameValue(VisSystem visSystem) {
             if(visSystem is null) {
                 return string.Empty;
             }
@@ -153,22 +162,86 @@ namespace RevitMechanicalSpecification.Service {
         /// </summary>
         /// <param name="element"></param>
         /// <returns></returns>
-        private VisSystem GetVisSystem(Element element) {
+        private VisSystem GetVisSystem(SpecificationElement specificationElement) {
+            if(specificationElement == null) {
+                return null;
+            }
+
+            string forcedSystemSelector = GetForcedSystemSelector(specificationElement)
+                ?? GetForcedSystemSelector(specificationElement.InsulationSpHost);
+
+            return GetVisSystem(specificationElement.Element, forcedSystemSelector);
+        }
+
+        private VisSystem GetVisSystem(Element element, string forcedSystemSelector) {
+            if(element == null) {
+                return null;
+            }
+
             if(element is FamilyInstance instance) {
                 element = instance.GetSuperComponentIfExist();
             }
 
-            string systemName = element.GetParamValueOrDefault(BuiltInParameter.RBS_SYSTEM_NAME_PARAM, _noneSystemValue);
-
-            systemName = systemName.Split(',').FirstOrDefault();
-
-            if(element.InAnyCategory(new HashSet<BuiltInCategory>() {
-                BuiltInCategory.OST_DuctInsulations,
-                BuiltInCategory.OST_PipeInsulations})) {
-                systemName = GetInsulationSystem(element as InsulationLiningBase);
+            List<string> systemNames = GetSystemNames(element);
+            if(!string.IsNullOrEmpty(forcedSystemSelector)) {
+                string selectedSystemName = systemNames.FirstOrDefault(systemName =>
+                    systemName.IndexOf(forcedSystemSelector, StringComparison.OrdinalIgnoreCase) >= 0);
+                VisSystem selectedSystem = GetVisSystemByName(selectedSystemName);
+                if(selectedSystem != null) {
+                    return selectedSystem;
+                }
             }
 
-            return _systems.Where(s => s.SystemSystemName == systemName).FirstOrDefault();
+            return systemNames.Select(GetVisSystemByName).FirstOrDefault(visSystem => visSystem != null);
+        }
+
+        private List<string> GetSystemNames(Element element) {
+            string systemNames = element.InAnyCategory(new HashSet<BuiltInCategory>() {
+                BuiltInCategory.OST_DuctInsulations,
+                BuiltInCategory.OST_PipeInsulations})
+                ? GetInsulationSystem(element as InsulationLiningBase)
+                : GetParamSystemValue(element);
+
+            return systemNames
+                .Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries)
+                .Select(item => item.Trim())
+                .Where(item => !string.IsNullOrEmpty(item))
+                .ToList();
+        }
+
+        private VisSystem GetVisSystemByName(string systemName) {
+            if(string.IsNullOrWhiteSpace(systemName)) {
+                return null;
+            }
+
+            return _systems.FirstOrDefault(s => string.Equals(s.SystemSystemName, systemName, StringComparison.Ordinal));
+        }
+
+        private string GetForcedSystemSelector(SpecificationElement specificationElement) {
+            if(specificationElement == null) {
+                return null;
+            }
+
+            string forcedSystemValue = GetForcedParamValue(specificationElement, _specConfiguration.ForcedSystemName);
+            return TryGetForcedSystemSelector(forcedSystemValue, out string forcedSystemSelector)
+                ? forcedSystemSelector
+                : null;
+        }
+
+        private bool TryGetForcedSystemSelector(string forcedSystemValue, out string forcedSystemSelector) {
+            forcedSystemSelector = null;
+
+            if(string.IsNullOrWhiteSpace(forcedSystemValue)) {
+                return false;
+            }
+
+            string trimmedValue = forcedSystemValue.Trim();
+            if(trimmedValue.Length < 3 || trimmedValue[0] != '{' || trimmedValue[trimmedValue.Length - 1] != '}') {
+                return false;
+            }
+
+            forcedSystemSelector = trimmedValue.Substring(1, trimmedValue.Length - 2).Trim();
+            return !string.IsNullOrEmpty(forcedSystemSelector);
 
         }
     }
