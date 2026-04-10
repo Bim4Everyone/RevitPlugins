@@ -6,6 +6,8 @@ using System.Linq;
 using Autodesk.Revit.DB;
 using Autodesk.Revit.UI;
 
+using RevitCreatingFiltersByValues.ViewModels;
+
 using Application = Autodesk.Revit.ApplicationServices.Application;
 
 namespace RevitCreatingFiltersByValues.Models;
@@ -125,9 +127,9 @@ internal class RevitRepository {
     /// <summary>
     /// Получает категории, представленные на виде + элементы в словаре по ним
     /// </summary>
-    public ObservableCollection<CategoryElements> GetCategoriesInView(bool checkFlag) {
+    public ObservableCollection<CategoryElementsVM> GetCategoriesInView(bool checkFlag) {
 
-        ObservableCollection<CategoryElements> categoryElements = [];
+        ObservableCollection<CategoryElementsVM> categoryElements = [];
         foreach(var elem in GetElementsInView()) {
             if(elem.Category is null) { continue; }
 
@@ -140,7 +142,7 @@ internal class RevitRepository {
 
             // Добавляем в словарь элементы, разбивая по группам по ключу
             bool flag = false;
-            foreach(CategoryElements categoryElement in categoryElements) {
+            foreach(CategoryElementsVM categoryElement in categoryElements) {
 
                 if(categoryElement.CategoryName.Equals(elemCategoryName)) {
                     categoryElement.ElementsInView.Add(elem);
@@ -149,7 +151,7 @@ internal class RevitRepository {
                 }
             }
             if(flag is false) {
-                categoryElements.Add(new CategoryElements(catOfElem, elemCategoryId, checkFlag, [elem]));
+                categoryElements.Add(new CategoryElementsVM(catOfElem, elemCategoryId, checkFlag, [elem]));
             }
         }
         return categoryElements;

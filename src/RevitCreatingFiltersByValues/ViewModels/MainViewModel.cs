@@ -125,7 +125,7 @@ internal class MainViewModel : BaseViewModel {
     public ObservableCollection<PatternsHelper> PatternsInPj { get; set; } = [];
     public List<ParameterFilterElement> AllFiltersInPj { get; set; } = [];
     public List<string> AllFilterNamesInPj { get; set; } = [];
-    public ObservableCollection<CategoryElements> CategoryElements { get; set; } = [];
+    public ObservableCollection<CategoryElementsVM> CategoryElements { get; set; } = [];
     public ObservableCollection<ParametersHelper> FilterableParameters { get; set; } = [];
     public ObservableCollection<PossibleValue> PossibleValues { get; set; } = [];
     public List<ElementId> SelectedCatIds { get; set; } = [];
@@ -253,9 +253,9 @@ internal class MainViewModel : BaseViewModel {
         PossibleValues.Clear();
         SelectedCatIds.Clear();
 
-        List<CategoryElements> selectedCategories = [];
+        List<CategoryElementsVM> selectedCategories = [];
 
-        foreach(CategoryElements cat in CategoryElements) {
+        foreach(CategoryElementsVM cat in CategoryElements) {
             if(cat.IsCheck) {
                 selectedCategories.Add(cat);
             }
@@ -263,7 +263,7 @@ internal class MainViewModel : BaseViewModel {
 
 
         // Получаем ID категорий для последующего получения параметров фильтрации
-        foreach(CategoryElements cat in selectedCategories) {
+        foreach(CategoryElementsVM cat in selectedCategories) {
 
             SelectedCatIds.Add(cat.CategoryIdInView);
         }
@@ -317,9 +317,9 @@ internal class MainViewModel : BaseViewModel {
         SelectedElements.Clear();
 
         // Получаем элементы, которые выбрал пользователь через категории
-        List<CategoryElements> selectedCategories = [];
+        List<CategoryElementsVM> selectedCategories = [];
 
-        foreach(CategoryElements cat in CategoryElements) {
+        foreach(CategoryElementsVM cat in CategoryElements) {
             if(cat.IsCheck) {
                 SelectedElements.AddRange(cat.ElementsInView);
             }
@@ -510,7 +510,7 @@ internal class MainViewModel : BaseViewModel {
     private bool CanCreate(object p) {
 
         bool catsChecked = false;
-        foreach(CategoryElements cat in CategoryElements) {
+        foreach(CategoryElementsVM cat in CategoryElements) {
             if(cat.IsCheck) {
                 catsChecked = true;
                 break;
@@ -542,7 +542,7 @@ internal class MainViewModel : BaseViewModel {
     private void SetCategoriesFilters() {
         // Организуем фильтрацию списка категорий
         _categoriesView = CollectionViewSource.GetDefaultView(CategoryElements);
-        _categoriesView.Filter = item => string.IsNullOrEmpty(CategoriesFilter) || ((CategoryElements) item).CategoryName.IndexOf(CategoriesFilter, StringComparison.OrdinalIgnoreCase) >= 0;
+        _categoriesView.Filter = item => string.IsNullOrEmpty(CategoriesFilter) || ((CategoryElementsVM) item).CategoryName.IndexOf(CategoriesFilter, StringComparison.OrdinalIgnoreCase) >= 0;
     }
 
     /// <summary>
@@ -582,7 +582,7 @@ internal class MainViewModel : BaseViewModel {
     /// </summary>
     /// <param name="p"></param>
     private void SelectAllCategoriesInGUI(object p) {
-        foreach(CategoryElements cat in CategoryElements) {
+        foreach(CategoryElementsVM cat in CategoryElements) {
             if(string.IsNullOrEmpty(CategoriesFilter) || (cat.CategoryName.IndexOf(CategoriesFilter, StringComparison.OrdinalIgnoreCase) >= 0)) {
                 cat.IsCheck = true;
             }
@@ -600,7 +600,7 @@ internal class MainViewModel : BaseViewModel {
     /// </summary>
     /// <param name="p"></param>
     private void UnselectAllCategoriesInGUI(object p) {
-        foreach(CategoryElements cat in CategoryElements) {
+        foreach(CategoryElementsVM cat in CategoryElements) {
             if(string.IsNullOrEmpty(CategoriesFilter) || (cat.CategoryName.IndexOf(CategoriesFilter, StringComparison.OrdinalIgnoreCase) >= 0)) {
                 cat.IsCheck = false;
             }

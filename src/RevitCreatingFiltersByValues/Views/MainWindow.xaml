@@ -120,7 +120,8 @@
                             <ui:TextBlock.ToolTip>
                                 <ToolTip>
                                     <ui:TextBlock
-                                        Text="{me:LocalizationSource MainWindow.SelectCategoryToolTip}"                                        TextWrapping="Wrap"
+                                        Text="{me:LocalizationSource MainWindow.SelectCategoryToolTip}"                                        
+                                        TextWrapping="Wrap"
                                         FontSize="12"
                                         TextAlignment="Justify"
                                         FlowDirection="LeftToRight"
@@ -177,7 +178,7 @@
                                 ItemContainerStyle="{StaticResource CustomListViewItem}">
                                 <ui:ListView.ItemTemplate>
                                     <DataTemplate
-                                        DataType="{x:Type models:CategoryElements}">
+                                        DataType="{x:Type vms:CategoryElementsVM}">
                                         <CheckBox
                                             Content="{Binding Path=CategoryName}"
                                             IsChecked="{Binding Path=IsCheck, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}">
@@ -225,7 +226,8 @@
                             <ui:TextBlock.ToolTip>
                                 <ToolTip>
                                     <TextBlock
-                                        Text="{me:LocalizationSource MainWindow.SelectParamToolTip}"                                        TextWrapping="Wrap"
+                                        Text="{me:LocalizationSource MainWindow.SelectParamToolTip}"                                        
+                                        TextWrapping="Wrap"
                                         FontSize="12"
                                         TextAlignment="Justify"
                                         FlowDirection="LeftToRight"
@@ -290,7 +292,8 @@
                             VerticalAlignment="Center">
                             <ui:TextBlock.ToolTip>
                                 <TextBlock
-                                    Text="{me:LocalizationSource MainWindow.SelectValuesToolTip}"                                    TextWrapping="Wrap"
+                                    Text="{me:LocalizationSource MainWindow.SelectValuesToolTip}"                                    
+                                    TextWrapping="Wrap"
                                     FontSize="12"
                                     TextAlignment="Justify"
                                     FlowDirection="LeftToRight"
