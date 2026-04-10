@@ -1,3 +1,5 @@
+using System.Collections;
+using System.Collections.ObjectModel;
 using System.Windows.Input;
 
 using dosymep.SimpleServices;
@@ -34,6 +36,8 @@ internal class MainViewModel : BaseViewModel {
         LoadViewCommand = RelayCommand.Create(LoadView);
         AcceptViewCommand = RelayCommand.Create(AcceptView, CanAcceptView);
     }
+
+    public ObservableCollection<object> Modes { get; } = [new { Name = "mode 1" }, new { Name = "mode 2" }, new { Name = "mode 3" }];
 
     /// <summary>
     /// Команда загрузки главного окна.
