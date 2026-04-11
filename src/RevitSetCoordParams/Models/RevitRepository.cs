@@ -424,9 +424,6 @@ internal class RevitRepository {
                 continue;
             }
             var revitElement = CreateRevitElement(depElement);
-            if(revitElement?.BoundingBoxXYZ == null) {
-                continue;
-            }
             result.Add(revitElement);
         }
         return result;
