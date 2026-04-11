@@ -75,7 +75,6 @@ internal class RevitRepository {
                 revitElement.DependentElements = GetDependentElements(e, categorySet);
                 return revitElement;
             })
-            .Where(e => e.BoundingBoxXYZ != null)
             .ToList();
 
         return result;
@@ -102,7 +101,6 @@ internal class RevitRepository {
                 revitElement.DependentElements = GetDependentElements(e, categorySet);
                 return revitElement;
             })
-            .Where(e => e.BoundingBoxXYZ != null)
             .ToList();
 
         return result;
@@ -129,9 +127,7 @@ internal class RevitRepository {
                 revitElement.DependentElements = GetDependentElements(element, categorySet);
                 return revitElement;
             })
-            .Where(revitElement => revitElement.BoundingBoxXYZ != null)
             .ToList();
-        ;
 
         return result;
     }
