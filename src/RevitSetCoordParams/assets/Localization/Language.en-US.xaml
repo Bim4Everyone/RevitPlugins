@@ -110,6 +110,8 @@
     <system:String x:Key="WarningsViewModel.OccupiedElementDescription">Synchronization with the central model is required to process these elements</system:String>
     <system:String x:Key="WarningsViewModel.DeletedInCentral">Elements deleted or updated from the central model</system:String>
     <system:String x:Key="WarningsViewModel.DeletedInCentralDescription">Synchronization with the central model is required in the current document</system:String>
+    <system:String x:Key="WarningsViewModel.DefectiveGeometryElement">Elements with damaged geometry</system:String>
+    <system:String x:Key="WarningsViewModel.DefectiveGeometryElementDescription">These elements cannot be processed. You must fill in the parameters manually</system:String>
 
     <system:String x:Key="WarningGroupViewModel.SelectAll">Select all elements</system:String>
 
