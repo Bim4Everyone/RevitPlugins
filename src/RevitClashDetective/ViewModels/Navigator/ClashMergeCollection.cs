@@ -6,7 +6,7 @@ using System.Linq;
 namespace RevitClashDetective.ViewModels.Navigator;
 
 internal class ClashMergeCollection {
-    public ClashMergeCollection(string name, IEnumerable<ClashMergeViewModel> items) {
+    public ClashMergeCollection(string name, IEnumerable<ClashMergePairViewModel> items) {
         if(items == null) {
             throw new ArgumentNullException(nameof(items));
         }
@@ -16,10 +16,10 @@ internal class ClashMergeCollection {
         }
 
         Name = name;
-        Items = new ReadOnlyCollection<ClashMergeViewModel>(items.ToArray());
+        Items = new ReadOnlyCollection<ClashMergePairViewModel>(items.ToArray());
     }
 
     public string Name { get; }
 
-    public ICollection<ClashMergeViewModel> Items { get; }
+    public ICollection<ClashMergePairViewModel> Items { get; }
 }

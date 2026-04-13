@@ -136,7 +136,7 @@ internal class ReportViewModel : BaseViewModel, INamedEntity, IEquatable<ReportV
 
     public IMessageBoxService MessageBoxService { get; }
 
-    public ObservableCollection<ClashViewModel> Clashes {
+    private ObservableCollection<ClashViewModel> Clashes {
         get => _clashes;
         set => RaiseAndSetIfChanged(ref _clashes, value);
     }
@@ -167,6 +167,21 @@ internal class ReportViewModel : BaseViewModel, INamedEntity, IEquatable<ReportV
     public bool Equals(ReportViewModel other) {
         return other != null
             && Name == other.Name;
+    }
+
+    public ICollection<ClashViewModel> GetClashes() {
+        return _allClashes ?? [];
+    }
+
+    public void ResetClashes(IEnumerable<ClashViewModel> clashes) {
+        ShowImaginaryClashes = false;
+        _allClashes = clashes.ToList();
+        var documentNames = _revitRepository.DocInfos.Select(item => item.Doc.Title).ToList();
+        Clashes = new ObservableCollection<ClashViewModel>(_allClashes.Where(item => IsValid(documentNames, item)));
+
+        GuiClashes = new ObservableCollection<IClashViewModel>(Clashes.OrderBy(c => c.ClashName));
+        SetAdditionalParamValues(GuiClashes);
+        SetIntersectionPercentage(GuiClashes);
     }
 
     private void Initialize(RevitRepository revitRepository, string name) {
@@ -201,14 +216,7 @@ internal class ReportViewModel : BaseViewModel, INamedEntity, IEquatable<ReportV
     }
 
     private void InitializeClashes(IEnumerable<ClashModel> clashModels) {
-        _allClashes = clashModels.Select(item => new ClashViewModel(_revitRepository, item))
-                                 .ToList();
-        var documentNames = _revitRepository.DocInfos.Select(item => item.Doc.Title).ToList();
-        Clashes = new ObservableCollection<ClashViewModel>(_allClashes.Where(item => IsValid(documentNames, item)));
-
-        GuiClashes = new ObservableCollection<IClashViewModel>(Clashes);
-        SetAdditionalParamValues(GuiClashes);
-        SetIntersectionPercentage(GuiClashes);
+        ResetClashes(clashModels.Select(item => new ClashViewModel(_revitRepository, item)));
     }
 
     private bool IsValid(List<string> documentNames, ClashViewModel clash) {

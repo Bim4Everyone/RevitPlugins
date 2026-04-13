@@ -8,6 +8,7 @@ namespace RevitClashDetective.Services.ReportsMerging;
 /// Результат пересечения 2-ч множеств отчетов о коллизиях 
 /// </summary>
 internal class ReportSetsIntersectionResult {
+    private static readonly ReportsNamesIgnoreCaseComparer _comparer = new();
     public ReportSetsIntersectionResult(
         ReportSet leftOuterSet,
         ReportSet leftInnerSet,
@@ -51,6 +52,13 @@ internal class ReportSetsIntersectionResult {
     public bool HasIntersection => LeftInnerSet.Count > 0;
 
     public ICollection<ReportsMergePair> GetMergePairs() {
-        throw new NotImplementedException();
+        var leftIntersection = LeftInnerSet.Reports.OrderBy(r => r, _comparer).ToArray();
+        var rightIntersection = RightInnerSet.Reports.OrderBy(r => r, _comparer).ToArray();
+        List<ReportsMergePair> intersection = [];
+        for(int i = 0; i < leftIntersection.Length; i++) {
+            intersection.Add(new ReportsMergePair(leftIntersection[i], rightIntersection[i]));
+        }
+
+        return intersection;
     }
 }

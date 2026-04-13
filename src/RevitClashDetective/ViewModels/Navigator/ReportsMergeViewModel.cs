@@ -44,7 +44,11 @@ internal class ReportsMergeViewModel : BaseViewModel {
             throw new InvalidOperationException();
         }
 
-        throw new NotImplementedException();
+        List<ReportViewModel> result = [
+            .._reportsIntersection.LeftOuterSet.Reports, .. _reportsIntersection.RightOuterSet.Reports
+        ];
+        result.AddRange(ReportsToMerge.Select(p => p.GetResultReport()));
+        return result;
     }
 
     private bool CanAcceptMerge() {

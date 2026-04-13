@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Linq;
 
 using dosymep.SimpleServices;
 using dosymep.WPF.ViewModels;
@@ -12,36 +13,40 @@ namespace RevitClashDetective.ViewModels.Navigator;
 internal class ReportMergePairViewModel : BaseViewModel {
     private readonly ILocalizationService _localization;
     private readonly ReportsMergePair _reportsMergePair;
-    private readonly ClashMergeCollection _mergeConflictClashes;
-    private readonly ClashMergeCollection _autoMergedClashes;
-    private readonly ClashViewModel[] _unchangedClashes;
-    private readonly ClashViewModel[] _newClashes;
-    private ClashMergeViewModel _selectedClashMergeItem;
+    private ClashMergePairViewModel _selectedClashMergePairItem;
 
     public ReportMergePairViewModel(
         ILocalizationService localization,
         ReportsMergePair reportsMergePair) {
         _localization = localization ?? throw new ArgumentNullException(nameof(localization));
         _reportsMergePair = reportsMergePair ?? throw new ArgumentNullException(nameof(reportsMergePair));
-        ExistingReport = _reportsMergePair.Left;
-        ImportingReport = _reportsMergePair.Right;
 
-        // TODO
-        _mergeConflictClashes = new(
-            _localization.GetLocalizedString("TODO"),
-            FindMergeConflicts(ExistingReport.Clashes, ImportingReport.Clashes));
-        _autoMergedClashes = new(_localization.GetLocalizedString("TODO"), []);
-
-        ClashesToMerge = [_mergeConflictClashes, _autoMergedClashes];
+        ClashCollections = [
+            new ClashMergeCollection(
+                _localization.GetLocalizedString("TODO"),
+                _reportsMergePair.IntersectionClashes.Conflicted),
+            new ClashMergeCollection(
+                _localization.GetLocalizedString("TODO"),
+                _reportsMergePair.IntersectionClashes.NonConflicted)
+        ];
     }
 
-    public ReportViewModel ExistingReport { get; }
-    public ReportViewModel ImportingReport { get; }
-    public ObservableCollection<ClashMergeCollection> ClashesToMerge { get; }
+    public ObservableCollection<ClashMergeCollection> ClashCollections { get; }
 
-    public ClashMergeViewModel SelectedClashMergeItem {
-        get => _selectedClashMergeItem;
-        set => RaiseAndSetIfChanged(ref _selectedClashMergeItem, value);
+    public ClashMergePairViewModel SelectedClashMergePairItem {
+        get => _selectedClashMergePairItem;
+        set => RaiseAndSetIfChanged(ref _selectedClashMergePairItem, value);
     }
 
+    public ReportViewModel GetResultReport() {
+        List<ClashViewModel> resultClashes = [
+            .._reportsMergePair.ExistingOuterClashes, .._reportsMergePair.ImportingOuterClashes
+        ];
+        resultClashes.AddRange(_reportsMergePair.IntersectionClashes.Unchanged.Select(c => c.GetResultClash()));
+        resultClashes.AddRange(ClashCollections.SelectMany(c => c.Items).Select(c => c.GetResultClash()));
+
+        var resultReport = _reportsMergePair.Existing;
+        resultReport.ResetClashes(resultClashes);
+        return resultReport;
+    }
 }

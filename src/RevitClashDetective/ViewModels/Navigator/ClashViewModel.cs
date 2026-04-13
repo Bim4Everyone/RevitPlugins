@@ -233,6 +233,27 @@ internal class ClashViewModel : BaseViewModel, IClashViewModel, IEquatable<Clash
         }
     }
 
+    public void ResetComments(IEnumerable<ClashCommentViewModel> comments) {
+        Comments.Clear();
+        foreach(var c in comments) {
+            AddComment(c.GetComment());
+        }
+    }
+
+    public void AddComment(ClashComment comment) {
+        int id;
+        if(Comments.Count == 0) {
+            id = 1;
+        } else {
+            id = Comments.Max(c => c.Id) + 1;
+        }
+
+        comment.Id = id;
+        var commentVm = new ClashCommentViewModel(_revitRepository, comment);
+        Comments.Add(commentVm);
+        SelectedComment = commentVm;
+    }
+
     private void SetElementParams(IDictionary<string, object> elementParams, Element element, string[] paramNames) {
         elementParams.Clear();
         for(int i = 0; i < paramNames.Length; i++) {
@@ -241,21 +262,7 @@ internal class ClashViewModel : BaseViewModel, IClashViewModel, IEquatable<Clash
     }
 
     private void AddComment() {
-        int id;
-        if(Comments.Count == 0) {
-            id = 1;
-        } else {
-            id = Comments.Max(c => c.Id) + 1;
-        }
-
-        var c = new ClashCommentViewModel(
-            _revitRepository,
-            new ClashComment() {
-                Id = id,
-                Author = _revitRepository.UiApplication.Application.Username
-            });
-        Comments.Add(c);
-        SelectedComment = c;
+        AddComment(new ClashComment() { Author = _revitRepository.UiApplication.Application.Username });
     }
 
     private void RemoveComment(ClashCommentViewModel comment) {

@@ -12,9 +12,9 @@ using RevitClashDetective.Services.ReportsMerging;
 
 namespace RevitClashDetective.ViewModels.Navigator;
 
-internal class ClashMergeViewModel : BaseViewModel {
-    private static readonly ClashCommentContentComparer _comparer = new();
-    private readonly ClashMergePair _mergePair;
+internal class ClashMergePairViewModel : BaseViewModel {
+    private static readonly ClashCommentContentComparer _commentsComparer = new();
+    private static readonly ClashIdDocComparer _clashComparer = new();
     private string _clashName;
     private ClashStatus _clashStatus;
     private bool _existingNameSelected;
@@ -27,19 +27,19 @@ internal class ClashMergeViewModel : BaseViewModel {
     private bool _importingClashSelected;
     private bool _existingClashSelected;
 
-    public ClashMergeViewModel(ClashMergePair mergePair) {
-        _mergePair = mergePair ?? throw new ArgumentNullException(nameof(mergePair));
+    public ClashMergePairViewModel(ClashViewModel existing, ClashViewModel importing) {
+        Existing = existing ?? throw new ArgumentNullException(nameof(existing));
+        Importing = importing ?? throw new ArgumentNullException(nameof(importing));
 
-        // по умолчанию комментарии всегда объединяются
-        ExistingCommentsSelected = true;
-        ImportingCommentsSelected = true;
-        SetMergedComments();
+        if(!_clashComparer.Equals(Existing, Importing)) {
+            throw new ArgumentException("Коллизии не соответствуют друг другу", nameof(importing));
+        }
 
         SetMergedCommentsCommand = RelayCommand.Create(SetMergedComments);
     }
 
-    public ClashViewModel ExistingClash => _mergePair.ExistingClash;
-    public ClashViewModel ImportingClash => _mergePair.ImportingClash;
+    public ClashViewModel Existing { get; }
+    public ClashViewModel Importing { get; }
     public ICommand SetMergedCommentsCommand { get; }
 
     public string ClashName {
@@ -56,7 +56,7 @@ internal class ClashMergeViewModel : BaseViewModel {
         get => _existingNameSelected;
         set {
             if(value) {
-                ClashName = ExistingClash.ClashName;
+                ClashName = Existing.ClashName;
                 ImportingNameSelected = false;
             }
 
@@ -68,7 +68,7 @@ internal class ClashMergeViewModel : BaseViewModel {
         get => _importingNameSelected;
         set {
             if(value) {
-                ClashName = ImportingClash.ClashName;
+                ClashName = Importing.ClashName;
                 ExistingNameSelected = false;
             }
 
@@ -80,7 +80,7 @@ internal class ClashMergeViewModel : BaseViewModel {
         get => _existingStatusSelected;
         set {
             if(value) {
-                ClashStatus = ExistingClash.ClashStatus;
+                ClashStatus = Existing.ClashStatus;
                 ImportingStatusSelected = false;
             }
 
@@ -92,7 +92,7 @@ internal class ClashMergeViewModel : BaseViewModel {
         get => _importingStatusSelected;
         set {
             if(value) {
-                ClashStatus = ImportingClash.ClashStatus;
+                ClashStatus = Importing.ClashStatus;
                 ExistingStatusSelected = false;
             }
 
@@ -139,18 +139,18 @@ internal class ClashMergeViewModel : BaseViewModel {
 
     private void SetMergedComments() {
         if(ExistingCommentsSelected && ImportingCommentsSelected) {
-            var comments = ExistingClash.Comments.Union(ImportingClash.Comments, _comparer).ToArray();
+            var comments = Existing.Comments.Union(Importing.Comments, _commentsComparer).ToArray();
             SetMergedComments(comments);
             return;
         }
 
         if(ExistingCommentsSelected) {
-            SetMergedComments(ExistingClash.Comments);
+            SetMergedComments(Existing.Comments);
             return;
         }
 
         if(ImportingCommentsSelected) {
-            SetMergedComments(ImportingClash.Comments);
+            SetMergedComments(Importing.Comments);
             return;
         }
     }
@@ -162,5 +162,13 @@ internal class ClashMergeViewModel : BaseViewModel {
         }
 
         MergedCommentsCount = comments.Count;
+    }
+
+    public ClashViewModel GetResultClash() {
+        Existing.ClashName = ClashName;
+        Existing.ClashStatus = ClashStatus;
+        Existing.ResetComments(Comments);
+
+        return Existing;
     }
 }

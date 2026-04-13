@@ -223,7 +223,7 @@ internal class NavigatorViewModel : BaseViewModel, ISupportServices {
     }
 
     private void SetReports(IEnumerable<ReportViewModel> reports) {
-        Reports = new ObservableCollection<ReportViewModel>(reports);
+        Reports = new ObservableCollection<ReportViewModel>(reports.OrderBy(r => r.Name));
         SelectedReport = Reports.FirstOrDefault();
     }
 
