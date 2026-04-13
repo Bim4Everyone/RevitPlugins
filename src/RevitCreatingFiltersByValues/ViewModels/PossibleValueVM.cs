@@ -4,10 +4,23 @@ using System.Linq;
 using Autodesk.Revit.DB;
 
 using dosymep.Revit;
+using dosymep.WPF.ViewModels;
 
-namespace RevitCreatingFiltersByValues.Models;
-internal class PossibleValue {
-    public PossibleValue(Element elem, ParametersHelper parameter) {
+using RevitCreatingFiltersByValues.Models;
+
+namespace RevitCreatingFiltersByValues.ViewModels;
+internal class PossibleValueVM : BaseViewModel{
+    private ParametersHelper _selectedFilterableParameter;
+    private StorageType _storageParamType;
+    
+    private List<Element> _elementsInPj = [];
+    private bool _isCheck = false;
+    private string _valueAsString;
+    private int _valueAsInteger;
+    private ElementId _valueAsElementId;
+    private double _valueAsDouble;
+
+    public PossibleValueVM(Element elem, ParametersHelper parameter) {
         ElementsInPj.Add(elem);
         SelectedFilterableParameter = parameter;
 
@@ -16,20 +29,46 @@ internal class PossibleValue {
             : SelectedFilterableParameter.ParamElement.GetStorageType();
     }
 
-
-    public List<Element> ElementsInPj { get; set; } = [];
-    public ParametersHelper SelectedFilterableParameter { get; set; }
-
-    public bool IsCheck { get; set; } = false;
-
-
-    public StorageType StorageParamType { get; set; }
-
-    public string ValueAsString { get; set; }
-    public int ValueAsInteger { get; set; }
-    public ElementId ValueAsElementId { get; set; }
-    public double ValueAsDouble { get; set; }
-
+    
+    public ParametersHelper SelectedFilterableParameter {
+        get => _selectedFilterableParameter;
+        set => RaiseAndSetIfChanged(ref _selectedFilterableParameter, value);
+    }        
+    
+    public StorageType StorageParamType {
+        get => _storageParamType;
+        set => RaiseAndSetIfChanged(ref _storageParamType, value);
+    }    
+    
+    public bool IsCheck {
+        get => _isCheck;
+        set => RaiseAndSetIfChanged(ref _isCheck, value);
+    }    
+    
+    public List<Element> ElementsInPj {
+        get => _elementsInPj;
+        set => RaiseAndSetIfChanged(ref _elementsInPj, value);
+    }    
+    
+    public string ValueAsString {
+        get => _valueAsString;
+        set => RaiseAndSetIfChanged(ref _valueAsString, value);
+    }    
+    
+    public int ValueAsInteger {
+        get => _valueAsInteger;
+        set => RaiseAndSetIfChanged(ref _valueAsInteger, value);
+    }       
+    
+    public ElementId ValueAsElementId {
+        get => _valueAsElementId;
+        set => RaiseAndSetIfChanged(ref _valueAsElementId, value);
+    }   
+    
+    public double ValueAsDouble {
+        get => _valueAsDouble;
+        set => RaiseAndSetIfChanged(ref _valueAsDouble, value);
+    }    
 
     /// <summary>
     /// Метод анализирует тип параметра и производит запись значения параметра как строки и в зависимости от типа

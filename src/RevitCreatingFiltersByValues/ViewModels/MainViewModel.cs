@@ -33,7 +33,7 @@ internal class MainViewModel : BaseViewModel {
     private ICollectionView _possibleValuesView;
     private string _possibleValuesFilter = string.Empty;
     private ParametersHelper _selectedFilterableParameter;
-    private List<PossibleValue> _selectedPossibleValues = [];
+    private List<PossibleValueVM> _selectedPossibleValues = [];
 
     private ColorHelper _selectedColor;
     private PatternsHelper _selectedPattern;
@@ -127,7 +127,7 @@ internal class MainViewModel : BaseViewModel {
     public List<string> AllFilterNamesInPj { get; set; } = [];
     public ObservableCollection<CategoryElementsVM> CategoryElements { get; set; } = [];
     public ObservableCollection<ParametersHelper> FilterableParameters { get; set; } = [];
-    public ObservableCollection<PossibleValue> PossibleValues { get; set; } = [];
+    public ObservableCollection<PossibleValueVM> PossibleValues { get; set; } = [];
     public List<ElementId> SelectedCatIds { get; set; } = [];
     public List<Element> SelectedElements { get; set; } = [];
 
@@ -138,7 +138,7 @@ internal class MainViewModel : BaseViewModel {
         set => RaiseAndSetIfChanged(ref _selectedFilterableParameter, value);
     }
 
-    public List<PossibleValue> SelectedPossibleValues {
+    public List<PossibleValueVM> SelectedPossibleValues {
         get => _selectedPossibleValues;
         set => RaiseAndSetIfChanged(ref _selectedPossibleValues, value);
     }
@@ -332,7 +332,7 @@ internal class MainViewModel : BaseViewModel {
         // Перебираем выбранные через категории элементы и получаем их значения по выбранному параметру
         foreach(var elem in SelectedElements) {
 
-            var possibleValue = new PossibleValue(elem, SelectedFilterableParameter);
+            var possibleValue = new PossibleValueVM(elem, SelectedFilterableParameter);
             possibleValue.GetValue();
 
             if(possibleValue.ValueAsString is null) {
@@ -352,7 +352,7 @@ internal class MainViewModel : BaseViewModel {
             }
         }
 
-        PossibleValues = new ObservableCollection<PossibleValue>(PossibleValues.OrderBy(i => i.ValueAsString));
+        PossibleValues = new ObservableCollection<PossibleValueVM>(PossibleValues.OrderBy(i => i.ValueAsString));
         OnPropertyChanged(nameof(PossibleValues));
 
         SetPossibleValuesFilters();
@@ -380,7 +380,7 @@ internal class MainViewModel : BaseViewModel {
             // Удаляем временные фильтры пользователя на виде
             _revitRepository.DeleteTempFiltersInView();
 
-            foreach(PossibleValue pos in PossibleValues) {
+            foreach(PossibleValueVM pos in PossibleValues) {
                 if(pos.IsCheck is false) { continue; }
 
                 // Либо создаем фильтры и переопределяем видимость через них
@@ -524,7 +524,7 @@ internal class MainViewModel : BaseViewModel {
         if(SelectedFilterableParameter is null) { ErrorText = "Не выбран параметр фильтрации"; return false; }
 
         bool valsChecked = false;
-        foreach(PossibleValue pos in PossibleValues) {
+        foreach(PossibleValueVM pos in PossibleValues) {
             if(pos.IsCheck) {
                 valsChecked = true;
                 break;
@@ -565,7 +565,7 @@ internal class MainViewModel : BaseViewModel {
     private void SetPossibleValuesFilters() {
         // Организуем фильтрацию списка возможных значений
         _possibleValuesView = CollectionViewSource.GetDefaultView(PossibleValues);
-        _possibleValuesView.Filter = item => string.IsNullOrEmpty(PossibleValuesFilter) || ((PossibleValue) item).ValueAsString.IndexOf(PossibleValuesFilter, StringComparison.OrdinalIgnoreCase) >= 0;
+        _possibleValuesView.Filter = item => string.IsNullOrEmpty(PossibleValuesFilter) || ((PossibleValueVM) item).ValueAsString.IndexOf(PossibleValuesFilter, StringComparison.OrdinalIgnoreCase) >= 0;
     }
 
 
@@ -620,7 +620,7 @@ internal class MainViewModel : BaseViewModel {
     /// </summary>
     /// <param name="p"></param>
     private void SelectAllValuesInGUI(object p) {
-        foreach(PossibleValue pos in PossibleValues) {
+        foreach(PossibleValueVM pos in PossibleValues) {
             if(string.IsNullOrEmpty(PossibleValuesFilter) || (pos.ValueAsString.IndexOf(PossibleValuesFilter, StringComparison.OrdinalIgnoreCase) >= 0)) {
                 pos.IsCheck = true;
             }
@@ -636,7 +636,7 @@ internal class MainViewModel : BaseViewModel {
     /// </summary>
     /// <param name="p"></param>
     private void UnselectAllValuesInGUI(object p) {
-        foreach(PossibleValue pos in PossibleValues) {
+        foreach(PossibleValueVM pos in PossibleValues) {
             if(string.IsNullOrEmpty(PossibleValuesFilter) || (pos.ValueAsString.IndexOf(PossibleValuesFilter, StringComparison.OrdinalIgnoreCase) >= 0)) {
                 pos.IsCheck = false;
             }
