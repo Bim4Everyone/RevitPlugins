@@ -110,6 +110,8 @@
     <system:String x:Key="WarningsViewModel.OccupiedElementDescription">Требуется синхронизация пользователя для обработки этих элементов</system:String>
     <system:String x:Key="WarningsViewModel.DeletedInCentral">Элементы удалены или обновлены в центральной модели хранилища</system:String>
     <system:String x:Key="WarningsViewModel.DeletedInCentralDescription">Требуется синхронизация в текущем документе</system:String>
+    <system:String x:Key="WarningsViewModel.DefectiveGeometryElement">Элементы с поврежденной геометрией</system:String>
+    <system:String x:Key="WarningsViewModel.DefectiveGeometryElementDescription">Данные элементы невозможно обработать, требуется вручную заполнить параметры</system:String>
 
     <system:String x:Key="WarningGroupViewModel.SelectAll">Выделить все элементы</system:String>
 

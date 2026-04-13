@@ -65,6 +65,12 @@ internal class IntersectCurveProcessor : IIntersectProcessor {
                 continue;
             }
 
+            if(targetElement.BoundingBoxXYZ is null) {
+                CollectDefectiveElementWarnings(targetElement, warnings);
+                progress?.Report(++counter);
+                continue;
+            }
+
             if(_settings.DependentProcess == DependentProcess.InheritanceParent) {
                 ProcessWithInheritance(targetElement, warnings);
             } else {
@@ -177,6 +183,21 @@ internal class IntersectCurveProcessor : IIntersectProcessor {
                 WarningType = WarningType.OccupiedElement,
                 RevitElement = dependentElement,
                 User = user
+            });
+        }
+    }
+
+    // Метод сбора предупреждений о поврежденных элементах
+    private void CollectDefectiveElementWarnings(RevitElement target, List<WarningElement> warnings) {
+        warnings.Add(new WarningDefectiveElement {
+            WarningType = WarningType.DefectiveGeometryElement,
+            RevitElement = target
+        });
+
+        foreach(var dependentElement in target.DependentElements ?? Enumerable.Empty<RevitElement>()) {
+            warnings.Add(new WarningDefectiveElement {
+                WarningType = WarningType.DefectiveGeometryElement,
+                RevitElement = dependentElement
             });
         }
     }

@@ -27,6 +27,8 @@ internal class RevitRepository {
     private readonly string _defaultTypeName;
     private readonly string _defaultLevelName;
     private readonly Options _geomOptions;
+    private readonly XYZ _basePointPosition;
+    private readonly Transform _localTransform;
 
     public RevitRepository(UIApplication uiApplication, ILocalizationService localizationService) {
         UIApplication = uiApplication;
@@ -44,6 +46,8 @@ internal class RevitRepository {
             IncludeNonVisibleObjects = false,
             DetailLevel = ViewDetailLevel.Fine
         };
+        _basePointPosition = GetBasePointPosition();
+        _localTransform = Transform.CreateTranslation(-_basePointPosition);
     }
 
     public UIApplication UIApplication { get; }
@@ -71,7 +75,6 @@ internal class RevitRepository {
                 revitElement.DependentElements = GetDependentElements(e, categorySet);
                 return revitElement;
             })
-            .Where(e => e.BoundingBoxXYZ != null)
             .ToList();
 
         return result;
@@ -98,7 +101,6 @@ internal class RevitRepository {
                 revitElement.DependentElements = GetDependentElements(e, categorySet);
                 return revitElement;
             })
-            .Where(e => e.BoundingBoxXYZ != null)
             .ToList();
 
         return result;
@@ -125,9 +127,7 @@ internal class RevitRepository {
                 revitElement.DependentElements = GetDependentElements(element, categorySet);
                 return revitElement;
             })
-            .Where(revitElement => revitElement.BoundingBoxXYZ != null)
             .ToList();
-        ;
 
         return result;
     }
@@ -151,23 +151,39 @@ internal class RevitRepository {
                 string value = instance.GetParamValueOrDefault<string>(RevitConstants.SourceVolumeParam);
                 return value != null && value.Equals(typeModel);
             })
-            .Select(instance => {
+            .Select(element => {
                 var transform = document.IsLinked
                     ? _documentsService.GetTransformByName(document.GetUniqId())
-                    : null;
-                var unitedSolid = GetUnitedSolid(instance);
-                var transSolid = transform != null
-                    ? SolidUtils.CreateTransformed(unitedSolid, transform)
-                    : unitedSolid;
-                var boundingBox = transSolid.GetBoundingBox();
-                var outline = new Outline(boundingBox.Transform.OfPoint(boundingBox.Min), boundingBox.Transform.OfPoint(boundingBox.Max));
+                    : _localTransform;
+
+                var unitedSolid = GetUnitedSolid(element);
+                if(unitedSolid is null) {
+                    return null;
+                }
+                var transformedSolid = SolidUtils.CreateTransformed(unitedSolid, transform);
+                if(transformedSolid is null) {
+                    return null;
+                }
+                var boundingBox = element.GetBoundingBox();
+                if(boundingBox == null) {
+                    return null;
+                }
+                var transformedBoundingBox = GetTransformedBoundingBox(
+                    boundingBox,
+                    transform.Multiply(boundingBox.Transform)
+                );
+                var transformedOutline = new Outline(
+                    transformedBoundingBox.Min,
+                    transformedBoundingBox.Max);
+
                 return new RevitElement {
-                    Element = instance,
-                    Solid = transSolid,
-                    BoundingBoxXYZ = boundingBox,
-                    Outline = outline
+                    Element = element,
+                    Solid = transformedSolid,
+                    BoundingBoxXYZ = transformedBoundingBox,
+                    Outline = transformedOutline
                 };
             })
+            .Where(element => element is not null)
             .ToList();
     }
 
@@ -242,71 +258,33 @@ internal class RevitRepository {
     private RevitElement CreateRevitElement(Element element) {
         return new RevitElement {
             Element = element,
-            BoundingBoxXYZ = GetGeometricalBoundingBoxXYZ(element),
+            BoundingBoxXYZ = GetBoundingBoxXYZ(element),
             FamilyName = GetFamilyName(element),
             TypeName = element.Name ?? _defaultTypeName,
             LevelName = GetLevelName(element)
         };
     }
 
-    // Метод получения GetBoundingBoxXYZ
-    private BoundingBoxXYZ GetGeometricalBoundingBoxXYZ(Element element) {
-        if(element is FlexPipe fp) {
-            return CreatePointsBBox([.. fp.Points]);
-        }
-        if(element is FlexDuct fd) {
-            return CreatePointsBBox([.. fd.Points]);
-        }
-        if(element is FamilyInstance fi) {
-            var tr = fi.GetTransform();
-            return GetGeomBoundingBox(fi, tr);
-        }
-        var geom = element.get_Geometry(_geomOptions);
-        if(geom != null) {
-            return geom.GetBoundingBox();
-        }
-        var bbox = element.GetBoundingBox();
-        return bbox ?? null;
+    // Метод получения BoundingBoxXYZ
+    private BoundingBoxXYZ GetBoundingBoxXYZ(Element element) {
+        return element is FlexPipe flexPipe
+            ? GetFlexElementBoundingBox(flexPipe.Points)
+            : element is FlexDuct flexDuct
+            ? GetFlexElementBoundingBox(flexDuct.Points)
+            : element is FamilyInstance familyInstance
+            ? GetFamilyInstanceBoundingBox(familyInstance)
+            : element is not FamilyInstance
+            ? GetElementBoundingBox(element)
+            : null;
     }
 
-    // Метод получения BoundingBoxXYZ геометрической части элемента
-    private BoundingBoxXYZ GetGeomBoundingBox(Element element, Transform transform) {
-        var geomElement = element.get_Geometry(_geomOptions);
-        if(geomElement == null) {
+    // Метод получения BoundingBoxXYZ для гибких систем
+    private BoundingBoxXYZ GetFlexElementBoundingBox(IList<XYZ> points) {
+        if(points == null || points.Count == 0) {
             return null;
         }
-        var minPoint = new XYZ(double.MaxValue, double.MaxValue, double.MaxValue);
-        var maxPoint = new XYZ(double.MinValue, double.MinValue, double.MinValue);
-
-        var minP = new XYZ(double.MaxValue, double.MaxValue, double.MaxValue);
-        var maxP = new XYZ(double.MinValue, double.MinValue, double.MinValue);
-
-        foreach(var geomObj in geomElement) {
-            if(geomObj is GeometryInstance instance) {
-                var instGeom = instance.GetInstanceGeometry();
-
-                foreach(var obj in instGeom) {
-                    if(obj is Solid solid && solid.Faces.Size > 0) {
-                        var bbox = solid.GetBoundingBox();
-
-                        var min = transform.OfPoint(bbox.Min);
-                        var max = transform.OfPoint(bbox.Max);
-
-                        minPoint = new XYZ(
-                            Math.Min(minPoint.X, min.X),
-                            Math.Min(minPoint.Y, min.Y),
-                            Math.Min(minPoint.Z, min.Z)
-                        );
-                        maxPoint = new XYZ(
-                            Math.Max(maxPoint.X, max.X),
-                            Math.Max(maxPoint.Y, max.Y),
-                            Math.Max(maxPoint.Z, max.Z)
-                        );
-                    }
-                }
-            }
-        }
-        return minPoint.X == double.MaxValue ? null : new BoundingBoxXYZ { Min = minPoint, Max = maxPoint };
+        var boundingBox = CreatePointsBBox([.. points]);
+        return GetTransformedBoundingBox(boundingBox, _localTransform.Multiply(boundingBox.Transform));
     }
 
     // Метод получения BoundingBoxXYZ из списка точек
@@ -316,6 +294,96 @@ internal class RevitRepository {
             Min = minPoint,
             Max = maxPoint
         };
+    }
+
+    // Метод получения BoundingBoxXYZ загружаемых семейств
+    private BoundingBoxXYZ GetFamilyInstanceBoundingBox(FamilyInstance familyInstance) {
+        var geomElement = familyInstance.get_Geometry(_geomOptions);
+        if(geomElement is null) {
+            return null;
+        }
+        var list = new List<XYZ>();
+        foreach(var geomObj in geomElement) {
+            if(geomObj is GeometryInstance instance) {
+                var instGeom = instance.GetInstanceGeometry();
+                foreach(var obj in instGeom) {
+                    if(obj is Solid solid && solid.Faces.Size > 0) {
+                        foreach(Edge e in solid.Edges) {
+                            var st = e.AsCurve().GetEndPoint(0);
+                            var fi = e.AsCurve().GetEndPoint(1);
+                            list.Add(st);
+                            list.Add(fi);
+                        }
+                    }
+                }
+            }
+        }
+        if(list.Count == 0) {
+            return null;
+        }
+        var boundingBox = CreatePointsBBox(list);
+        var transformedBoundingBox = GetTransformedBoundingBox(boundingBox, _localTransform.Multiply(boundingBox.Transform));
+
+        return transformedBoundingBox;
+    }
+
+    // Метод получения BoundingBoxXYZ системных семейств
+    private BoundingBoxXYZ GetElementBoundingBox(Element element) {
+        var geomElement = element.get_Geometry(_geomOptions);
+        if(geomElement is not null) {
+            var geomBoundingBox = geomElement.GetBoundingBox();
+            return GetTransformedBoundingBox(geomBoundingBox, _localTransform.Multiply(geomBoundingBox.Transform));
+        }
+        var boundingBox = element.GetBoundingBox();
+        return boundingBox is not null
+            ? GetTransformedBoundingBox(boundingBox, _localTransform.Multiply(boundingBox.Transform))
+            : null;
+    }
+
+    // Метод получения трансформированного BoundingBoxXYZ
+    private BoundingBoxXYZ GetTransformedBoundingBox(BoundingBoxXYZ bbox, Transform transform) {
+        var min = bbox.Min;
+        var max = bbox.Max;
+
+        double minX = double.MaxValue, minY = double.MaxValue, minZ = double.MaxValue;
+        double maxX = double.MinValue, maxY = double.MinValue, maxZ = double.MinValue;
+
+        for(int x = 0; x <= 1; x++) {
+            for(int y = 0; y <= 1; y++) {
+                for(int z = 0; z <= 1; z++) {
+                    var p = new XYZ(
+                        x == 0 ? min.X : max.X,
+                        y == 0 ? min.Y : max.Y,
+                        z == 0 ? min.Z : max.Z);
+
+                    var tp = transform.OfPoint(p);
+
+                    minX = Math.Min(minX, tp.X);
+                    minY = Math.Min(minY, tp.Y);
+                    minZ = Math.Min(minZ, tp.Z);
+
+                    maxX = Math.Max(maxX, tp.X);
+                    maxY = Math.Max(maxY, tp.Y);
+                    maxZ = Math.Max(maxZ, tp.Z);
+                }
+            }
+        }
+
+        return new BoundingBoxXYZ {
+            Min = new XYZ(minX, minY, minZ),
+            Max = new XYZ(maxX, maxY, maxZ)
+        };
+    }
+
+
+    // Метод получения смещения базовой точки    
+    private XYZ GetBasePointPosition() {
+        var basePoint = new FilteredElementCollector(Document)
+            .OfCategory(BuiltInCategory.OST_ProjectBasePoint)
+            .WhereElementIsNotElementType()
+            .Cast<BasePoint>()
+            .FirstOrDefault();
+        return basePoint?.Position;
     }
 
     // Метод получения минимальной и максимальной точек из списка точек
@@ -356,9 +424,6 @@ internal class RevitRepository {
                 continue;
             }
             var revitElement = CreateRevitElement(depElement);
-            if(revitElement?.BoundingBoxXYZ == null) {
-                continue;
-            }
             result.Add(revitElement);
         }
         return result;
@@ -378,9 +443,11 @@ internal class RevitRepository {
 
     // Метод получения объединенного солида
     private Solid GetUnitedSolid(Element element) {
-        var solids = element.GetSolids().ToList();
-        var unitedSolids = SolidExtensions.CreateUnitedSolids(solids);
-
+        var solids = element.GetSolids();
+        if(!solids.Any() || solids is null) {
+            return null;
+        }
+        var unitedSolids = SolidExtensions.CreateUnitedSolids([.. solids]);
         var validSolids = unitedSolids
             .Where(s => s != null && s.Faces.Size > 0 && s.Edges.Size > 0)
             .ToList();
