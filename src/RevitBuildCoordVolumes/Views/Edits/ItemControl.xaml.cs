@@ -2,26 +2,26 @@ using System.Windows;
 
 namespace RevitBuildCoordVolumes.Views.Edits;
 
-public partial class SlabControl {
+public partial class ItemControl {
 
     public static readonly DependencyProperty SlabNameProperty = DependencyProperty.Register(
-        nameof(SlabName), typeof(string), typeof(SlabControl), new PropertyMetadata(default(string)));
+        nameof(ItemName), typeof(string), typeof(ItemControl), new PropertyMetadata(default(string)));
 
     public static readonly DependencyProperty WarningDescriptionProperty = DependencyProperty.Register(
-        nameof(WarningDescription), typeof(string), typeof(SlabControl), new PropertyMetadata(default(string)));
+        nameof(WarningDescription), typeof(string), typeof(ItemControl), new PropertyMetadata(default(string)));
 
     public static readonly DependencyProperty IsCheckedProperty = DependencyProperty.Register(
-        nameof(IsChecked), typeof(bool), typeof(SlabControl), new PropertyMetadata(true));
+        nameof(IsChecked), typeof(bool), typeof(ItemControl), new PropertyMetadata(true));
 
     public static readonly DependencyProperty HasWarningProperty = DependencyProperty.Register(
-        nameof(HasWarning), typeof(bool), typeof(SlabControl), new PropertyMetadata(true));
+        nameof(HasWarning), typeof(bool), typeof(ItemControl), new PropertyMetadata(true));
 
 
-    public SlabControl() {
+    public ItemControl() {
         InitializeComponent();
     }
 
-    public string SlabName {
+    public string ItemName {
         get => (string) GetValue(SlabNameProperty);
         set => SetValue(SlabNameProperty, value);
     }

@@ -97,8 +97,7 @@ internal class MainViewModel : BaseViewModel {
             case nameof(CommonSettingViewModel.SelectedTypeAlgorithm):
                 UpdateVisibilitySettings();
                 break;
-            case nameof(CommonSettingViewModel.TypeZones):
-            case nameof(CommonSettingViewModel.SelectedTypeZone):
+            case nameof(CommonSettingViewModel.SelectedTypeZones):
                 UpdateRequiredCheckArea();
                 CanAcceptView();
                 break;
@@ -140,9 +139,9 @@ internal class MainViewModel : BaseViewModel {
 
     // Метод получения всех зон
     private List<SpatialObject> GetSpatialObjects() {
-        string areaType = _settings.TypeZone;
+        var areaTypes = _settings.TypeZones;
         var areaTypeParam = _settings.ParamMaps.First().SourceParam;
-        return _revitRepository.GetSpatialObjects(areaType, areaTypeParam).ToList();
+        return _revitRepository.GetSpatialObjects(areaTypes, areaTypeParam).ToList();
     }
 
     // Метод проверки зон
@@ -166,7 +165,7 @@ internal class MainViewModel : BaseViewModel {
     // Метод проверки возможности выполнения метода проверки зон
     private bool CanCheckArea() {
         return CommonSettingViewModel != null
-            && CommonSettingViewModel.SelectedTypeZone != null
+            && CommonSettingViewModel.FilteredTypeZones.Count != 0
             && RequiredCheckArea;
     }
 
@@ -232,7 +231,7 @@ internal class MainViewModel : BaseViewModel {
                 ErrorText = _services.LocalizationService.GetLocalizedString("MainViewModel.ErrorParams");
                 return false;
             }
-            if(CommonSettingViewModel.SelectedTypeZone == null) {
+            if(CommonSettingViewModel.SelectedTypeZones.Count == 0) {
                 ErrorText = _services.LocalizationService.GetLocalizedString("MainViewModel.NoTypeZone");
                 return false;
             }
@@ -312,7 +311,7 @@ internal class MainViewModel : BaseViewModel {
         _settings = new BuildCoordVolumeSettings {
             AlgorithmType = configSettings.AlgorithmType,
             BuilderMode = configSettings.BuilderMode,
-            TypeZone = configSettings.TypeZone,
+            TypeZones = configSettings.TypeZones,
             ParamMaps = configSettings.ParamMaps,
             Documents = documents,
             TypeSlabs = typeSlabs,
@@ -324,7 +323,7 @@ internal class MainViewModel : BaseViewModel {
     // Метод сохранения настроек
     private void SaveSettings() {
         var algorithmType = CommonSettingViewModel.SelectedTypeAlgorithm.AlgorithmType;
-        string typeZone = CommonSettingViewModel.SelectedTypeZone.Name;
+        var typeZones = CommonSettingViewModel.SelectedTypeZones.Select(typeZone => typeZone.Name).ToList();
         var paramMaps = CommonSettingViewModel.Params.Where(vm => vm.IsChecked).Select(vm => vm.ParamMap).ToList();
         var builderMode = SlabBasedSettingViewModel.SelectedBuilderMode.BuilderMode;
         var documents = SlabBasedSettingViewModel.FilteredDocuments.Where(vm => vm.IsChecked).Select(d => d.Document).ToList();
@@ -337,7 +336,7 @@ internal class MainViewModel : BaseViewModel {
         _settings.BuilderMode = builderMode;
         _settings.Documents = documents;
         _settings.TypeSlabs = typeSlabs;
-        _settings.TypeZone = typeZone;
+        _settings.TypeZones = typeZones;
         _settings.ParamMaps = paramMaps;
         _settings.Levels = levels;
         _settings.SquareSideMm = squareSide;
@@ -350,7 +349,7 @@ internal class MainViewModel : BaseViewModel {
             AlgorithmType = _settings.AlgorithmType,
             BuilderMode = _settings.BuilderMode,
             Documents = _settings.Documents.Select(doc => doc.GetUniqId()).ToList(),
-            TypeZone = _settings.TypeZone,
+            TypeZones = _settings.TypeZones,
             ParamMaps = _settings.ParamMaps,
             TypeSlabs = _settings.TypeSlabs,
             SquareSideMm = _settings.SquareSideMm,

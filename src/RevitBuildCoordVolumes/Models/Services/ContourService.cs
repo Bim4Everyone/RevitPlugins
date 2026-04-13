@@ -115,7 +115,7 @@ internal class ContourService : IContourService {
 
             return $"{qx1}_{qy1}_{qx2}_{qy2}";
         }
-        progressService?.BeginStage(ProgressType.BuildContour);
+        progressService?.BeginStage(ProgressType.BuildVolumes);
         int total = lines.Count;
         int processed = 0;
         int reported = 0;

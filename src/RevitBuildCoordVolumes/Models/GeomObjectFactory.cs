@@ -70,7 +70,7 @@ internal class GeomObjectFactory : IGeomObjectFactory {
         var solids = new List<GeometryObject>();
         var volumes = new List<double>();
         var firstElement = columns[0];
-        progressService?.BeginStage(ProgressType.BuildContour);
+        progressService?.BeginStage(ProgressType.BuildVolumes);
         int total = columns.Count;
         int processed = 0;
         int reported = 0;

@@ -54,8 +54,8 @@
                         <ItemsControl.ItemTemplate>
                             <DataTemplate
                                 DataType="{x:Type vms:DocumentViewModel}">
-                                <edits:SlabControl
-                                    SlabName="{Binding Name}"
+                                <edits:ItemControl
+                                    ItemName="{Binding Name}"
                                     IsChecked="{Binding IsChecked, Mode=TwoWay}"
                                     HasWarning="False" />
                             </DataTemplate>
@@ -98,8 +98,8 @@
                         <ItemsControl.ItemTemplate>
                             <DataTemplate
                                 DataType="{x:Type vms:SlabViewModel}">
-                                <edits:SlabControl
-                                    SlabName="{Binding Name}"
+                                <edits:ItemControl
+                                    ItemName="{Binding Name}"
                                     IsChecked="{Binding IsChecked, Mode=TwoWay}"
                                     HasWarning="False" />
                             </DataTemplate>
@@ -166,8 +166,8 @@
                         <ItemsControl.ItemTemplate>
                             <DataTemplate
                                 DataType="{x:Type vms:LevelViewModel}">
-                                <edits:SlabControl
-                                    SlabName="{Binding Name}"
+                                <edits:ItemControl
+                                    ItemName="{Binding Name}"
                                     IsChecked="{Binding IsChecked, Mode=TwoWay}"
                                     HasWarning="False" />
                             </DataTemplate>

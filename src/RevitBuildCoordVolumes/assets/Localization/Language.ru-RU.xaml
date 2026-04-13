@@ -16,6 +16,9 @@
     <system:String x:Key="CommonSettingsEditControl.Params">Параметры СМР</system:String>
     <system:String x:Key="CommonSettingsEditControl.ParamsDescription">Выбор параметров СМР для чтения и записи</system:String>
     <system:String x:Key="CommonSettingsEditControl.ParamWarningTooltip">В некоторых параметрах есть ошибки</system:String>
+    <system:String x:Key="CommonSettingsEditControl.CheckedAllTypeZones">Выбрать все типы зон</system:String>
+    <system:String x:Key="CommonSettingsEditControl.NotCheckedAllTypeZones">Сбросить выбор типов зон</system:String>
+    <system:String x:Key="CommonSettingsEditControl.SearchTextTypeZones">Поиск типа зоны по имени</system:String>
     
     <system:String x:Key="ParamControl.ParamsToggleSwitchOn">Использовать параметр</system:String>
     <system:String x:Key="ParamControl.ParamsToggleSwitchOff">Не использовать параметр</system:String>
