@@ -323,7 +323,7 @@ internal class MainViewModel : BaseViewModel {
     // Метод сохранения настроек
     private void SaveSettings() {
         var algorithmType = CommonSettingViewModel.SelectedTypeAlgorithm.AlgorithmType;
-        var typeZones = CommonSettingViewModel.FilteredTypeZones.Select(typeZone => typeZone.Name).ToList();
+        var typeZones = CommonSettingViewModel.SelectedTypeZones.Select(typeZone => typeZone.Name).ToList();
         var paramMaps = CommonSettingViewModel.Params.Where(vm => vm.IsChecked).Select(vm => vm.ParamMap).ToList();
         var builderMode = SlabBasedSettingViewModel.SelectedBuilderMode.BuilderMode;
         var documents = SlabBasedSettingViewModel.FilteredDocuments.Where(vm => vm.IsChecked).Select(d => d.Document).ToList();

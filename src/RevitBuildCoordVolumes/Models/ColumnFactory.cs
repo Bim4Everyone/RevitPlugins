@@ -31,7 +31,7 @@ internal class ColumnFactory : IColumnFactory {
         }
         var columns = new List<ColumnObject>();
 
-        progressService?.BeginStage(ProgressType.BuildVolumes);
+        progressService?.BeginStage(ProgressType.BuildContour);
         int total = polygons.Count;
         int processed = 0;
         int reported = 0;

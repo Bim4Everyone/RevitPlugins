@@ -16,7 +16,10 @@
     <system:String x:Key="CommonSettingsEditControl.Params">CMR parameters</system:String>
     <system:String x:Key="CommonSettingsEditControl.ParamsDescription">Select CMR parameters for reading and writing</system:String>
     <system:String x:Key="CommonSettingsEditControl.ParamWarningTooltip">Some parameters contain errors</system:String>
-
+    <system:String x:Key="CommonSettingsEditControl.CheckedAllTypeZones">Check all type zones</system:String>
+    <system:String x:Key="CommonSettingsEditControl.NotCheckedAllTypeZones">Uncheck all type zones</system:String>
+    <system:String x:Key="CommonSettingsEditControl.SearchTextTypeZones">Search type zone by name</system:String>
+    
     <system:String x:Key="ParamControl.ParamsToggleSwitchOn">Use parameter</system:String>
     <system:String x:Key="ParamControl.ParamsToggleSwitchOff">Do not use parameter</system:String>
     <system:String x:Key="ParamControl.SourceParamHeader">Zone parameter</system:String>
@@ -35,10 +38,9 @@
 
     <system:String x:Key="SlabBasedSettingEditControl.Levels">Slab levels</system:String>
     <system:String x:Key="SlabBasedSettingEditControl.LevelsDescription">Slab levels used to define the base</system:String>
-    <system:String x:Key="SlabBasedSettingEditControl.CheckedAllLevels">Select all levels</system:String>
-    <system:String x:Key="SlabBasedSettingEditControl.NotCheckedAllLevels">Clear level selection</system:String>
+    <system:String x:Key="SlabBasedSettingEditControl.CheckedAllLevels">Select all levels</system:String>    
     <system:String x:Key="SlabBasedSettingEditControl.SearchTextLevels">Search by level name</system:String>
-    
+    <system:String x:Key="SlabBasedSettingEditControl.NotCheckedAllLevels">Clear level selection</system:String>
 
     <system:String x:Key="SlabBasedSettingEditControl.SquareSide">Square side length (mm)</system:String>
     <system:String x:Key="SlabBasedSettingEditControl.SquareSideDescription">The zone is divided into a grid of squares with the specified side length</system:String>
@@ -95,6 +97,7 @@
     <system:String x:Key="DocumentViewModel.CurrentFile">Current file (open)</system:String>
 
     <system:String x:Key="BuildCoordVolumesProcessor.TransactionName">Build CMR volumes</system:String>
+    <system:String x:Key="BuildCoordVolumesProcessor.ZoneName">Zone {0}:</system:String>
 
     <system:String x:Key="Common.ParamErrorMessageBody">Parameter loading error</system:String>
     <system:String x:Key="Common.ConfigErrorMessageTitle">Plugin configuration error</system:String>
@@ -122,4 +125,5 @@
     <system:String x:Key="SlabNormalize.ProgressTitle">Processing slabs {0}%</system:String>
     <system:String x:Key="BuildContour.ProgressTitle">Generate contours {0}%</system:String>
     <system:String x:Key="BuildVolumes.ProgressTitle">Generate Volumes {0}%</system:String>
+    
 </ResourceDictionary>
