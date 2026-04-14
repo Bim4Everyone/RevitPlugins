@@ -30,7 +30,7 @@ internal class InclinedSizeValueGetter : RoundValueGetter, IValueGetter<DoublePa
 
         _clash = clash;
         _sizeValueGetter = sizeValueGetter;
-        _plane = plane;
+        _plane = plane; // плоскость стены
         _directionsGetter = directionsGetter;
         _mepCategory = mepCategory;
     }
