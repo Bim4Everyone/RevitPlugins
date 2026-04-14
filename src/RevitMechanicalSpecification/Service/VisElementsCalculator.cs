@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Security.Cryptography;
 using System.Text;
@@ -173,21 +174,21 @@ namespace RevitMechanicalSpecification.Service {
                 element.GetParamValue<double>(BuiltInParameter.RBS_PIPE_INNER_DIAM_PARAM)
                 );
 
-            string pipeThickness = UnitConverter.DoubleToString(((
-                Math.Round(externalSize - internalSize, 2) / 2)));
+            double pipeThicknessValue = Math.Round(externalSize - internalSize, 2) / 2;
+            string pipeThickness = pipeThicknessValue.ToString("0.0#", new CultureInfo("ru-RU"));
             string pipeDiameter = UnitConverter.DoubleToString(
                     UnitConverter.DoubleToMilimeters(
                     element.GetParamValue<double>(
                     BuiltInParameter.RBS_PIPE_DIAMETER_PARAM)));
 
             if(dy) {
-                return " ⌀" + pipeDiameter;
+                return $"⌀{pipeDiameter}";
             }
             if(dyWall) {
-                return " ⌀" + pipeDiameter + "x" + pipeThickness;
+                return $"⌀{pipeDiameter}x{pipeThickness}";
             }
             if(dExternalWall) {
-                return " ⌀" + UnitConverter.DoubleToString(externalSize) + "x" + pipeThickness;
+                return $"⌀{UnitConverter.DoubleToString(externalSize)}x{pipeThickness}";
             }
 
             return " НЕ ЗАДАН ТИП ДИАМЕТРА";
