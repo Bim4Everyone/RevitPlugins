@@ -223,7 +223,7 @@ internal class FiltrationPageViewModel : BaseViewModel {
                         })
                         .ToArray())
                 .OfType<FilterViewModel>();
-            string selectedName = SelectedFilter.Name;
+            string selectedName = SelectedFilter?.Name;
             Filters.Clear();
             foreach(var vm in vms) {
                 Filters.Add(vm);
