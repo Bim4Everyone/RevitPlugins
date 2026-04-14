@@ -22,7 +22,7 @@ internal class RoundMepWallPlacerInitializer : IMepCurvePlacerInitializer {
             LevelFinder = levelFinder,
             AngleFinder = new WallAngleFinder(clash.Element2, clash.Element2Transform)
         };
-        if(clash.Element1.IsPerpendicular(clash.Element2)) {
+        if(clash.Element1.IsPerpendicular(clash.Element2, clash.Element2Transform)) {
             var openingType = new RoundMepWallOpeningTaskTypeProvider(clash.Element1, categoryOption).GetOpeningTaskType();
             var pointFinder =
                 openingType == OpeningType.WallRound

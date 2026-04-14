@@ -25,17 +25,16 @@ internal static class MepCurveExtension {
         return curve.GetLine().IsVertical();
     }
 
-    public static bool IsPerpendicular(this MEPCurve curve, Wall wall) {
-        return curve.GetLine().IsPerpendicular(wall.GetLine())
-            && curve.GetLine().IsPerpendicular(XYZ.BasisZ);
-    }
-
-    public static bool IsParallel(this MEPCurve curve, Wall wall) {
-        return curve.GetLine().IsParallel(wall.GetLine());
-    }
-
-    public static bool RunAlongWall(this MEPCurve mepCurve, Wall wall) {
-        return mepCurve.GetLine().RunAlongWall(wall);
+    /// <summary>
+    /// Проверяет перпендикулярность осевой линии элемента ВИС из активного файла и осевой линии стены из связи
+    /// </summary>
+    /// <param name="curve">Линейный элемент ВИС</param>
+    /// <param name="wall">Стена из связи</param>
+    /// <param name="wallTransform">Трансформация связанного файла со стеной относительно активного файла с элементом ВИС</param>
+    /// <returns>True, если линии перпендикулярны, иначе - False</returns>
+    public static bool IsPerpendicular(this MEPCurve curve, Wall wall, Transform wallTransform) {
+        return curve.GetLine().IsPerpendicular(wall.GetLine(wallTransform))
+               && curve.GetLine().IsPerpendicular(XYZ.BasisZ);
     }
 
     public static double GetTopElevation(this MEPCurve curve) {
