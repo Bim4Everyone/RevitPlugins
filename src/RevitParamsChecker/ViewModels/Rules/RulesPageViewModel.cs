@@ -170,7 +170,7 @@ internal class RulesPageViewModel : BaseViewModel {
                         })
                         .ToArray())
                 .OfType<RuleViewModel>();
-            string selectedName = SelectedRule.Name;
+            string selectedName = SelectedRule?.Name;
             Rules.Clear();
             foreach(var vm in vms) {
                 Rules.Add(vm);

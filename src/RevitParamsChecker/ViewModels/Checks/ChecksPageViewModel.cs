@@ -261,7 +261,7 @@ internal class ChecksPageViewModel : BaseViewModel {
                         })
                         .ToArray())
                 .OfType<CheckViewModel>();
-            string selectedName = SelectedCheck.Name;
+            string selectedName = SelectedCheck?.Name;
             Checks.Clear();
             foreach(var vm in vms) {
                 Checks.Add(vm);
