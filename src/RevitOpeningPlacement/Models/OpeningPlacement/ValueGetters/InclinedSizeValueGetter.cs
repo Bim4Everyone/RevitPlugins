@@ -30,7 +30,7 @@ internal class InclinedSizeValueGetter : RoundValueGetter, IValueGetter<DoublePa
 
         _clash = clash;
         _sizeValueGetter = sizeValueGetter;
-        _plane = plane;
+        _plane = plane; // плоскость стены
         _directionsGetter = directionsGetter;
         _mepCategory = mepCategory;
     }
@@ -46,8 +46,8 @@ internal class InclinedSizeValueGetter : RoundValueGetter, IValueGetter<DoublePa
 
     private double GetSize() {
         //получение длины размера, спроецированного на плоскость
-        double size = _sizeValueGetter.GetValue().TValue / 2;
+        double offset = _sizeValueGetter.GetValue().TValue / 2;
         var directions = _directionsGetter.GetDirectionsOnPlane(_plane);
-        return new SizeGetter(_clash, _plane).GetSizeFromProjection(directions, size);
+        return new SizeGetter(_clash, _plane).GetSizeFromProjection(directions, offset);
     }
 }
