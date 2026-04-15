@@ -1,16 +1,20 @@
 using System;
 
+using Autodesk.Revit.DB;
+
+using RevitSuperfilter.Comparators;
+
 namespace RevitSuperfilter.Models;
 
 internal sealed class ElementIndex : IEquatable<ElementIndex> {
-    public ElementIndex(string categoryName, string paramName, string paramValue) {
-        CategoryName = categoryName;
-        ParamName = paramName;
+    public ElementIndex(Category category, Definition definition, string paramValue) {
+        Category = category;
+        Definition = definition;
         ParamValue = paramValue;
     }
 
-    public string CategoryName { get; }
-    public string ParamName { get; }
+    public Category Category { get; }
+    public Definition Definition { get; }
     public string ParamValue { get; }
 
     #region IEquatable<ElementIndex>
@@ -24,8 +28,8 @@ internal sealed class ElementIndex : IEquatable<ElementIndex> {
             return true;
         }
 
-        return CategoryName.Equals(other.CategoryName)
-               && ParamName.Equals(other.ParamName)
+        return CategoryNameComparer.Instance.Equals(Category, other.Category)
+               && DefinitionNameComparer.Instance.Equals(Definition, other.Definition)
                && ParamValue.Equals(other.ParamValue);
     }
 
@@ -35,9 +39,15 @@ internal sealed class ElementIndex : IEquatable<ElementIndex> {
 
     public override int GetHashCode() {
         unchecked {
-            int hashCode = (CategoryName != null ? CategoryName.GetHashCode() : 0);
-            hashCode = (hashCode * 397) ^ (ParamName != null ? ParamName.GetHashCode() : 0);
-            hashCode = (hashCode * 397) ^ (ParamValue != null ? ParamValue.GetHashCode() : 0);
+            int hashCode =
+                (Category != null ? CategoryNameComparer.Instance.GetHashCode(Category) : 0);
+
+            hashCode =
+                (hashCode * 397) ^ (Definition != null ? DefinitionNameComparer.Instance.GetHashCode(Definition) : 0);
+
+            hashCode =
+                (hashCode * 397) ^ (ParamValue != null ? ParamValue.GetHashCode() : 0);
+
             return hashCode;
         }
     }
