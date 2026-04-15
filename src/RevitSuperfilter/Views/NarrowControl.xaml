@@ -42,7 +42,7 @@
                 <TreeView
                     x:Name="_categories"
                     Margin="8 4"
-                    ItemsSource="{Binding SuperfilterService.Superfilter.Categories}">
+                    ItemsSource="{Binding SuperfilterService.CategoriesViewModel.Categories}">
 
                     <b:Interaction.Triggers>
                         <b:EventTrigger EventName="SelectedItemChanged">

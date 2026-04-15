@@ -4,7 +4,7 @@ using Autodesk.Revit.DB;
 
 namespace RevitSuperfilter.Models;
 
-internal interface IElementIndex {
+internal interface IElementIndexList {
     void Add(Element element);
     void Remove(ElementId elementId);
 }

@@ -50,7 +50,7 @@
                     x:Name="_categories"
                     Margin="8 0"
                     SelectedItem="{Binding Category}"
-                    ItemsSource="{Binding SuperfilterService.Superfilter.Categories}"
+                    ItemsSource="{Binding SuperfilterService.CategoriesViewModel.Categories}"
                     ItemTemplate="{StaticResource TreeViewItem}">
 
                     <b:Interaction.Triggers>
@@ -87,7 +87,7 @@
 
                 <TreeView
                     Margin="8 0"
-                    ItemsSource="{Binding Category.Params}" />
+                    ItemsSource="{Binding Category.Definitions}" />
             </StackPanel>
 
         </Border>

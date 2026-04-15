@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
@@ -49,7 +50,7 @@ public class SuperfilterCommand : BasePluginCommand {
     /// </remarks>
     protected override void Execute(UIApplication uiApplication) {
         // Создание контейнера зависимостей плагина с сервисами из платформы
-        using IKernel kernel = uiApplication.CreatePlatformServices();
+        IKernel kernel = uiApplication.CreatePlatformServices();
 
         // Настройка доступа к Revit
         kernel.Bind<RevitRepository>()
@@ -76,17 +77,17 @@ public class SuperfilterCommand : BasePluginCommand {
             $"/{assemblyName};component/assets/localization/Language.xaml",
             CultureInfo.GetCultureInfo("ru-RU"));
 
-        kernel.Bind<ISelectionElements>()
-            .To<DBSelection>()
-            .InSingletonScope();
+        // kernel.Bind<ISelectionElements>()
+        //     .To<DBSelection>()
+        //     .InSingletonScope();
 
         kernel.Bind<ISelectionElements>()
             .To<DBViewSelection>()
             .InSingletonScope();
 
-        kernel.Bind<ISelectionElements>()
-            .To<SelectedOnViewSelection>()
-            .InSingletonScope();
+        // kernel.Bind<ISelectionElements>()
+        //     .To<SelectedOnViewSelection>()
+        //     .InSingletonScope();
 
         kernel.Bind<IReadOnlyCollection<ISuperfilterService>>()
             .ToMethod(c => c.Kernel.GetAll<ISelectionElements>()
@@ -98,5 +99,11 @@ public class SuperfilterCommand : BasePluginCommand {
             .InSingletonScope();
 
         kernel.Get<MainWindow>().Show();
+
+        AppDomain.CurrentDomain.UnhandledException += CurrentDomainOnUnhandledException;
+    }
+
+    private void CurrentDomainOnUnhandledException(object sender, UnhandledExceptionEventArgs e) {
+        string sss = e.ExceptionObject.ToString();
     }
 }

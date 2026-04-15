@@ -4,35 +4,41 @@ using System.Linq;
 
 using Autodesk.Revit.DB;
 
+using dosymep.SimpleServices;
 using dosymep.WPF;
-using dosymep.WPF.ViewModels;
 
 using RevitSuperfilter.Comparators;
-using RevitSuperfilter.Services;
-using RevitSuperfilter.ViewModels;
+using RevitSuperfilter.Models;
 
-namespace RevitSuperfilter.Models;
+namespace RevitSuperfilter.ViewModels;
 
-internal sealed class Superfilter : ObservableObject, IElementIndex {
-    private readonly Dictionary<ElementId, Element> _elementsById = new();
+internal sealed class CategoriesViewModel : ObservableObject, IElementIndexList {
+    private readonly ILocalizationService _localizationService;
+    
+    private readonly Dictionary<ElementId, string> _categoryKeys = new();
     private readonly Dictionary<string, CategoryViewModel> _categories = new();
 
+    public CategoriesViewModel(ILocalizationService localizationService) {
+        _localizationService = localizationService;
+    }
+
+    public int Count => _categoryKeys.Keys.Count;
     public ObservableCollection<CategoryViewModel> Categories { get; } = [];
 
     public void Build(IEnumerable<Element> elements) {
         Clear();
-        
+
         var catsGroup = elements
             .GroupBy(item => item.Category, CategoryNameComparer.Instance)
             .OrderBy(item => item.Key, CategoryNameComparer.Instance);
 
         foreach(var catGroup in catsGroup) {
             var elementsInCat = catGroup.ToArray();
-            
+
             foreach(var element in elementsInCat) {
-                _elementsById.Add(element.Id, element);
+                _categoryKeys.Add(element.Id, GetKey(element));
             }
-            
+
             var category = new CategoryViewModel(catGroup.Key);
             category.Build(elementsInCat);
             Categories.Add(category);
@@ -42,43 +48,51 @@ internal sealed class Superfilter : ObservableObject, IElementIndex {
     public void Clear() {
         Categories.Clear();
         _categories.Clear();
-        _elementsById.Clear();
+        _categoryKeys.Clear();
     }
 
     public void Add(Element element) {
-        if(_elementsById.ContainsKey(element.Id)) {
+        if(_categoryKeys.ContainsKey(element.Id)) {
             Remove(element.Id);
         }
-
-        _elementsById.Add(element.Id, element);
+        
         var categoryViewModel = GetOrAdd(element);
         categoryViewModel.Add(element);
+        _categoryKeys.Add(element.Id, GetKey(element));
     }
 
     public void Remove(ElementId elementId) {
-        if(!_elementsById.TryGetValue(elementId, out Element element)) {
+        if(!_categoryKeys.TryGetValue(elementId, out string catKey)) {
             return;
         }
 
-        _elementsById.Remove(elementId);
-        if(!_categories.TryGetValue(element.Category?.Name ?? "", out var categoryViewModel)) {
+        _categoryKeys.Remove(elementId);
+        if(!_categories.TryGetValue(catKey, out var categoryViewModel)) {
             return;
+        }
+
+        categoryViewModel.Remove(elementId);
+        if(categoryViewModel.Count == 0) {
+            _categories.Remove(catKey);
+            Categories.Remove(categoryViewModel);
         }
         
-        categoryViewModel.Remove(elementId);
-
-        Categories.Remove(categoryViewModel);
-        _categories.Remove(element.Category?.Name ?? "");
+        OnPropertyChanged(nameof(Count));
     }
 
     private CategoryViewModel GetOrAdd(Element element) {
-        if(!_categories.TryGetValue(element.Category?.Name ?? "", out var categoryViewModel)) {
+        if(!_categories.TryGetValue(GetKey(element), out var categoryViewModel)) {
             categoryViewModel = new CategoryViewModel(element.Category);
 
             Categories.Add(categoryViewModel);
-            _categories[element.Category?.Name ?? ""] = categoryViewModel;
+            _categories.Add(GetKey(element), categoryViewModel);
         }
 
         return categoryViewModel;
+    }
+
+    private string GetKey(Element element) {
+        return element.Category?.Name
+               ?? _localizationService.GetLocalizedString("Categories.CategoryKey");
     }
 }

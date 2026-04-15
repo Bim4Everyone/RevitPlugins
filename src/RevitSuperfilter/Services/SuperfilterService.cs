@@ -10,6 +10,7 @@ using dosymep.WPF;
 
 using RevitSuperfilter.Models;
 using RevitSuperfilter.Models.Selections;
+using RevitSuperfilter.ViewModels;
 
 namespace RevitSuperfilter.Services;
 
@@ -20,19 +21,24 @@ internal sealed class SuperfilterService : ObservableObject, ISuperfilterService
 
     private Document _document;
 
-    public SuperfilterService(UIApplication uiApplication, ISelectionElements selectionElements, ILocalizationService localizationService) {
+    public SuperfilterService(
+        UIApplication uiApplication,
+        ISelectionElements selectionElements,
+        ILocalizationService localizationService) {
         _uiApplication = uiApplication;
         _selectionElements = selectionElements;
         _localizationService = localizationService;
         _selectionElements.OnSelectionChanged += SelectionElementsOnOnSelectionChanged;
+        
+        CategoriesViewModel = new(_localizationService);
     }
-   
+
     public Selection Selection => _selectionElements.Selection;
-    public string DisplaySelection => _localizationService.GetLocalizedString($"{Selection.GetType().Name}.{_selectionElements.Selection}");
 
+    public string DisplaySelection =>
+        _localizationService.GetLocalizedString($"{Selection.GetType().Name}.{_selectionElements.Selection}");
 
-    public Superfilter Superfilter { get; } = new();
-    public ElementsIndex ElementsIndex { get; } = new();
+    public CategoriesViewModel CategoriesViewModel { get; }
 
     public ISuperfilterService Build() {
         Clear();
@@ -42,25 +48,21 @@ internal sealed class SuperfilterService : ObservableObject, ISuperfilterService
             .GetElements()
             .ToArray();
 
-        Superfilter.Build(elements);
-        //ElementsIndex.Build(elements);
-        
+        CategoriesViewModel.Build(elements);
+
         return this;
     }
 
     public void Clear() {
-        Superfilter.Clear();
-        ElementsIndex.Clear();
+        CategoriesViewModel.Clear();
     }
 
     public void Add(Element element) {
-        Superfilter.Add(element);
-        ElementsIndex.Add(element);
+        CategoriesViewModel.Add(element);
     }
 
     public void Remove(ElementId elementId) {
-        Superfilter.Remove(elementId);
-        ElementsIndex.Remove(elementId);
+        CategoriesViewModel.Remove(elementId);
     }
 
     private Document GetActiveDocument() {
@@ -90,13 +92,13 @@ internal sealed class SuperfilterService : ObservableObject, ISuperfilterService
             Add(modifiedElement);
         }
     }
-    
+
     private void SelectionElementsOnOnSelectionChanged(object sender, SelectionChangeEventArgs e) {
         if(e.IsEmpty) {
             Build();
             return;
         }
-        
+
         AddElements(e);
         RemoveElements(e);
         ReplaceElements(e);

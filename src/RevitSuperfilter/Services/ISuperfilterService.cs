@@ -1,13 +1,13 @@
 using RevitSuperfilter.Models;
+using RevitSuperfilter.ViewModels;
 
 namespace RevitSuperfilter.Services;
 
-internal interface ISuperfilterService : IElementIndex {
+internal interface ISuperfilterService : IElementIndexList {
     Selection Selection { get; }
     string DisplaySelection { get; }
     
-    Superfilter Superfilter { get; }
-    ElementsIndex ElementsIndex { get; }
+    CategoriesViewModel CategoriesViewModel { get; }
 
     ISuperfilterService Build();
 }

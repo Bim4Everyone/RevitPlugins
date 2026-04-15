@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
@@ -14,9 +15,10 @@ using RevitSuperfilter.Models;
 
 namespace RevitSuperfilter.ViewModels;
 
-internal sealed class CategoryViewModel : BaseViewModel, IElementIndex {
+internal sealed class CategoryViewModel : BaseViewModel, IElementIndexList {
     private readonly Dictionary<ElementId, Element> _elementsById = new();
-    private readonly Dictionary<Definition, ParamViewModel> _params = new(DefinitionNameComparer.Instance);
+    private readonly Dictionary<ElementId, HashSet<Definition>> _definitionKeys = new();
+    private readonly Dictionary<Definition, DefinitionViewModel> _definitions = new(DefinitionNameComparer.Instance);
 
     private readonly Category _category;
 
@@ -29,53 +31,59 @@ internal sealed class CategoryViewModel : BaseViewModel, IElementIndex {
 
     public bool IsLoaded { get; private set; }
 
-    public int Count => _elementsById.Count;
+    public int Count => _elementsById.Keys.Count;
     public string DisplayValue => _category?.Name;
 
-    public ObservableCollection<ParamViewModel> Params { get; } = [];
+    public ObservableCollection<DefinitionViewModel> Definitions { get; } = [];
     
     #region IElementIndex
 
     public void Add(Element element) {
-        if(IsLoaded && _elementsById.ContainsKey(element.Id)) {
+        if(IsLoaded && _definitionKeys.ContainsKey(element.Id)) {
             Remove(element.Id);
         }
 
-        if(IsLoaded) {
+        if(!_elementsById.ContainsKey(element.Id)) {
             _elementsById.Add(element.Id, element);
         }
 
-        var elementParams = element.Parameters
-            .OfType<Parameter>()
-            .OrderBy(x => x.Definition, DefinitionNameComparer.Instance);
-
-        foreach(var elementParam in elementParams) {
-            var param = GetOrAdd(elementParam);
-            param.Add(element, elementParam.GetValueOrDefault());
+        if(!_definitionKeys.ContainsKey(element.Id)) {
+            _definitionKeys.Add(element.Id, new HashSet<Definition>(DefinitionNameComparer.Instance));
         }
         
-        OnPropertyChanged(nameof(Count));
+        if(IsLoaded) {
+            var elementParams = element.Parameters
+                .OfType<Parameter>()
+                .OrderBy(x => x.Definition, DefinitionNameComparer.Instance);
+
+            var definitions = _definitionKeys[element.Id];
+            foreach(var elementParam in elementParams) {
+                definitions.Add(elementParam.Definition);
+                var param = GetOrAdd(elementParam);
+                param.Add(element, elementParam.GetValueOrDefault());
+            }
+
+            OnPropertyChanged(nameof(Count));
+        }
     }
 
     public void Remove(ElementId elementId) {
-        if(!_elementsById.TryGetValue(elementId, out var element)) {
+        if(!_definitionKeys.TryGetValue(elementId, out var definitions)) {
             return;
         }
 
         _elementsById.Remove(elementId);
-
-        var elementParams = element.Parameters
-            .OfType<Parameter>()
-            .OrderBy(x => x.Definition, DefinitionNameComparer.Instance);
-
-        foreach(var elementParam in elementParams) {
-            if(_params.TryGetValue(elementParam.Definition, out var paramViewModel)) {
-                Params.Remove(paramViewModel);
-                _params.Remove(elementParam.Definition);
-                paramViewModel.Remove(elementId, elementParam.GetValueOrDefault());
+        _definitionKeys.Remove(elementId);
+        foreach(var definition in definitions) {
+            if(_definitions.TryGetValue(definition, out var definitionViewModel)) {
+                definitionViewModel.Remove(elementId);
+                if(definitionViewModel.Count == 0) {
+                    _definitions.Remove(definition);
+                    Definitions.Remove(definitionViewModel);
+                }
             }
         }
-        
+
         OnPropertyChanged(nameof(Count));
     }
 
@@ -84,17 +92,18 @@ internal sealed class CategoryViewModel : BaseViewModel, IElementIndex {
     public void Build(IEnumerable<Element> elements) {
         foreach(var element in elements) {
             _elementsById.Add(element.Id, element);
+            _definitionKeys.Add(element.Id, new HashSet<Definition>(DefinitionNameComparer.Instance));
         }
-        
+
         OnPropertyChanged(nameof(Count));
     }
-    
-    private ParamViewModel GetOrAdd(Parameter elementParam) {
-        if(!_params.TryGetValue(elementParam.Definition, out var paramViewModel)) {
-            paramViewModel = new ParamViewModel(elementParam.Definition);
 
-            Params.Add(paramViewModel);
-            _params.Add(elementParam.Definition, paramViewModel);
+    private DefinitionViewModel GetOrAdd(Parameter elementParam) {
+        if(!_definitions.TryGetValue(elementParam.Definition, out var paramViewModel)) {
+            paramViewModel = new DefinitionViewModel(elementParam.Definition);
+
+            Definitions.Add(paramViewModel);
+            _definitions.Add(elementParam.Definition, paramViewModel);
         }
 
         return paramViewModel;

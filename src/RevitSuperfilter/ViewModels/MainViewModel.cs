@@ -84,11 +84,11 @@ internal class MainViewModel : BaseViewModel {
 
         SuperfilterService =
             SuperfilterServices.FirstOrDefault(item =>
-                item.Selection == Selection.SelectedOnViewSelection && item.Superfilter.Categories.Count > 0)
+                item.Selection == Selection.SelectedOnViewSelection && item.CategoriesViewModel.Categories.Count > 0)
             ?? SuperfilterServices.FirstOrDefault(item =>
-                item.Selection == Selection.DBViewSelection && item.Superfilter.Categories.Count > 0)
+                item.Selection == Selection.DBViewSelection && item.CategoriesViewModel.Categories.Count > 0)
             ?? SuperfilterServices.FirstOrDefault(item =>
-                item.Selection == Selection.DBSelection && item.Superfilter.Categories.Count > 0);
+                item.Selection == Selection.DBSelection && item.CategoriesViewModel.Categories.Count > 0);
     }
 
     /// <summary>

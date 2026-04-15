@@ -29,12 +29,12 @@
 
     <HierarchicalDataTemplate
         DataType="{x:Type vms:CategoryViewModel}"
-        ItemsSource="{Binding Params}">
+        ItemsSource="{Binding Definitions}">
         <ContentPresenter ContentTemplate="{StaticResource TreeViewItem}" />
     </HierarchicalDataTemplate>
     
     <HierarchicalDataTemplate
-        DataType="{x:Type vms:ParamViewModel}"
+        DataType="{x:Type vms:DefinitionViewModel}"
         ItemsSource="{Binding ParamValues}">
         <ContentPresenter ContentTemplate="{StaticResource TreeViewItem}" />
     </HierarchicalDataTemplate>

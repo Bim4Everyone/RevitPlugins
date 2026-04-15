@@ -22,9 +22,11 @@ internal sealed class ParamValueViewModel : BaseViewModel {
         }
         
         _elementsById.Add(element.Id, element);
+        OnPropertyChanged(nameof(Count));
     }
 
-    private void Remove(ElementId elementId) {
+    public void Remove(ElementId elementId) {
         _elementsById.Remove(elementId);
+        OnPropertyChanged(nameof(Count));
     }
 }
