@@ -27,6 +27,27 @@
                 Height="Auto" />
         </Grid.RowDefinitions>
 
+        <Grid
+            Grid.Row="0">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition
+                    Width="300" />
+                <ColumnDefinition />
+            </Grid.ColumnDefinitions>
+
+            <dxg:TreeViewControl
+                Grid.Column="0"
+                ItemsSource="{Binding ReportsToMerge}"
+                ChildNodesPath="Items"
+                TreeViewFieldName="Name"
+                SelectedItem="{Binding SelectedClashMergePairItem}" />
+
+            <local:ClashMergePairUserControl
+                Grid.Column="1"
+                DataContext="{Binding SelectedClashMergePairItem}"
+                ShowCommentsCommand="{Binding ShowCommentsCommand, ElementName=_this}" />
+        </Grid>
+
         <DockPanel
             Grid.Row="1"
             Margin="0 10 0 0"

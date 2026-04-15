@@ -93,11 +93,7 @@
     <system:String
         x:Key="ReportsResolver.Merge">Объединить</system:String>
     <system:String
-        x:Key="ReportsResolver.ReplaceAndKeepStatuses">Заменить с сохранением статусов</system:String>
-    <system:String
-        x:Key="ReportsResolver.Replace">Заменить с перезаписью статусов и комментариев</system:String>
-    <system:String
-        x:Key="ReportsResolver.KeepOnlyOld">Не заменять</system:String>
+        x:Key="ReportsResolver.Replace">Заменить</system:String>
     <system:String
         x:Key="ReportsResolver.CopyAndRename">Загрузить с переименованием</system:String>
 
@@ -228,6 +224,11 @@
         x:Key="Navigator.SuccessLoad">Файл успешно загружен</system:String>
     <system:String
         x:Key="Navigator.ClashComments">Комментарии коллизии '{0}'</system:String>
+
+    <system:String
+        x:Key="ReportsMerge.ConflictedClashes">Конфликтующие коллизии</system:String>
+    <system:String
+        x:Key="ReportsMerge.AutoMergedClashes">Автообъединенные коллизии</system:String>
 
     <system:String
         x:Key="SelectableNamesDialog.NameHeader">Название</system:String>

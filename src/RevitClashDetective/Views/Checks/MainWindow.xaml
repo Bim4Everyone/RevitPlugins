@@ -172,7 +172,7 @@
                                         <CheckBox
                                             Padding="0"
                                             Margin="4 0 0 0"
-                                            IsChecked="{Binding IsSelected, UpdateSourceTrigger=PropertyChanged}" />
+                                            IsChecked="{Binding ItemIsSelected, UpdateSourceTrigger=PropertyChanged}" />
                                     </DockPanel>
                                 </DataTemplate>
                             </DataGridTemplateColumn.CellTemplate>

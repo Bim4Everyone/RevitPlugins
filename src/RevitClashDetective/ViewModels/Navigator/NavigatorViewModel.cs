@@ -71,7 +71,7 @@ internal class NavigatorViewModel : BaseViewModel, ISupportServices {
         LoadCommand = RelayCommand.Create(Load);
         DeleteCommand = RelayCommand.Create(Delete, CanDelete);
         SelectClashCommand = RelayCommand.Create<IClashViewModel>(SelectClash, CanSelectClash);
-        EditCommentsCommand = RelayCommand.Create<IClashViewModel>(EditComments, CanEditComments);
+        EditCommentsCommand = RelayCommand.Create<IClashViewModel>(ShowCommentsEditor, CanEditComments);
         ShowCommentsCommand = RelayCommand.Create<IClashViewModel>(ShowComments, CanEditComments);
         AcceptReportsMergeCommand =
             RelayCommand.Create<ReportsMergeViewModel>(AcceptReportsMerge, CanAcceptReportsMerge);
@@ -191,7 +191,7 @@ internal class NavigatorViewModel : BaseViewModel, ISupportServices {
         }
 
         var existingReportsSet = new ReportSet(Reports);
-        var importingReports = GetReports(path);
+        var importingReports = GetReports(OpenFileDialogService.File.FullName);
         var importingReportsSet = new ReportSet(importingReports);
         var reportsIntersection = existingReportsSet.Intersect(importingReportsSet);
         var namesResolver = new ReportsIntersectionResolver();
@@ -224,6 +224,7 @@ internal class NavigatorViewModel : BaseViewModel, ISupportServices {
 
     private void SetReports(IEnumerable<ReportViewModel> reports) {
         Reports = new ObservableCollection<ReportViewModel>(reports.OrderBy(r => r.Name));
+        SelectedReport = null;
         SelectedReport = Reports.FirstOrDefault();
     }
 
@@ -268,7 +269,7 @@ internal class NavigatorViewModel : BaseViewModel, ISupportServices {
         return Reports.Count > 0;
     }
 
-    private void EditComments(IClashViewModel clashVm) {
+    private void ShowCommentsEditor(IClashViewModel clashVm) {
         var clash = (ClashViewModel) clashVm;
         var dialogService = this.GetService<IDialogService>();
         dialogService.ShowDialog(
@@ -292,7 +293,7 @@ internal class NavigatorViewModel : BaseViewModel, ISupportServices {
         var clash = (ClashViewModel) clashVm;
         bool backup = clash.CanEditComments;
         clash.CanEditComments = false;
-        EditComments(clash);
+        ShowCommentsEditor(clash);
         clash.CanEditComments = backup;
     }
 

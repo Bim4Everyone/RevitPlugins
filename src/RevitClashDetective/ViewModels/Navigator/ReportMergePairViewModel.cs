@@ -13,7 +13,6 @@ namespace RevitClashDetective.ViewModels.Navigator;
 internal class ReportMergePairViewModel : BaseViewModel {
     private readonly ILocalizationService _localization;
     private readonly ReportsMergePair _reportsMergePair;
-    private ClashMergePairViewModel _selectedClashMergePairItem;
 
     public ReportMergePairViewModel(
         ILocalizationService localization,
@@ -21,29 +20,26 @@ internal class ReportMergePairViewModel : BaseViewModel {
         _localization = localization ?? throw new ArgumentNullException(nameof(localization));
         _reportsMergePair = reportsMergePair ?? throw new ArgumentNullException(nameof(reportsMergePair));
 
-        ClashCollections = [
+        Items = [
             new ClashMergeCollection(
-                _localization.GetLocalizedString("TODO"),
+                _localization.GetLocalizedString("ReportsMerge.ConflictedClashes"),
                 _reportsMergePair.IntersectionClashes.Conflicted),
             new ClashMergeCollection(
-                _localization.GetLocalizedString("TODO"),
+                _localization.GetLocalizedString("ReportsMerge.AutoMergedClashes"),
                 _reportsMergePair.IntersectionClashes.NonConflicted)
         ];
+        Name = _reportsMergePair.Existing.Name;
     }
 
-    public ObservableCollection<ClashMergeCollection> ClashCollections { get; }
-
-    public ClashMergePairViewModel SelectedClashMergePairItem {
-        get => _selectedClashMergePairItem;
-        set => RaiseAndSetIfChanged(ref _selectedClashMergePairItem, value);
-    }
+    public string Name { get; }
+    public ObservableCollection<ClashMergeCollection> Items { get; }
 
     public ReportViewModel GetResultReport() {
         List<ClashViewModel> resultClashes = [
             .._reportsMergePair.ExistingOuterClashes, .._reportsMergePair.ImportingOuterClashes
         ];
         resultClashes.AddRange(_reportsMergePair.IntersectionClashes.Unchanged.Select(c => c.GetResultClash()));
-        resultClashes.AddRange(ClashCollections.SelectMany(c => c.Items).Select(c => c.GetResultClash()));
+        resultClashes.AddRange(Items.SelectMany(c => c.Items).Select(c => c.GetResultClash()));
 
         var resultReport = _reportsMergePair.Existing;
         resultReport.ResetClashes(resultClashes);

@@ -43,7 +43,7 @@ public class GetClashesCommand : BasePluginCommand {
         kernel.Bind<NavigatorViewModel>()
             .ToSelf()
             .InSingletonScope()
-            .WithConstructorArgument("selectedFile", (string) null);
+            .WithConstructorArgument("reportName", (string) null);
         kernel.Bind<IContentDialogService>()
             .To<ContentDialogService>()
             .InSingletonScope();
@@ -63,6 +63,6 @@ public class GetClashesCommand : BasePluginCommand {
             $"/{assemblyName};component/assets/Localization/Language.xaml",
             CultureInfo.GetCultureInfo("ru-RU"));
 
-        kernel.Get<NavigatorWindow>().Show();
+        kernel.Get<NavigatorWindow>().ShowDialog(); // TODO
     }
 }

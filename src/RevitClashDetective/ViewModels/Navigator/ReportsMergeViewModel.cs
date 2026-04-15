@@ -16,6 +16,7 @@ internal class ReportsMergeViewModel : BaseViewModel {
     private readonly ILocalizationService _localization;
     private readonly ReportSetsIntersectionResult _reportsIntersection;
     private string _errorText;
+    private ClashMergePairViewModel _selectedClashMergePairItem;
 
     public ReportsMergeViewModel(
         ILocalizationService localization,
@@ -33,6 +34,11 @@ internal class ReportsMergeViewModel : BaseViewModel {
     public ICommand AcceptMergeCommand { get; }
 
     public ObservableCollection<ReportMergePairViewModel> ReportsToMerge { get; }
+
+    public ClashMergePairViewModel SelectedClashMergePairItem {
+        get => _selectedClashMergePairItem;
+        set => RaiseAndSetIfChanged(ref _selectedClashMergePairItem, value);
+    }
 
     public string ErrorText {
         get => _errorText;
@@ -53,6 +59,6 @@ internal class ReportsMergeViewModel : BaseViewModel {
 
     private bool CanAcceptMerge() {
         // TODO
-        return false;
+        return true;
     }
 }
