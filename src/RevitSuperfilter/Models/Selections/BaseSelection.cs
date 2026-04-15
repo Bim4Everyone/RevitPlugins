@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 using Autodesk.Revit.DB;
 using Autodesk.Revit.DB.Events;
@@ -10,6 +11,10 @@ namespace RevitSuperfilter.Models.Selections;
 
 internal abstract class BaseSelection : ISelectionElements, IDisposable {
     public event EventHandler<SelectionChangeEventArgs> OnSelectionChanged;
+
+    protected readonly HashSet<ElementId> _addedElements = [];
+    protected readonly HashSet<ElementId> _removedElements = [];
+    protected readonly HashSet<ElementId> _modifiedElements = [];
 
     protected readonly Document _document;
     protected readonly UIApplication _uiApplication;
@@ -31,7 +36,29 @@ internal abstract class BaseSelection : ISelectionElements, IDisposable {
         OnSelectionChanged?.Invoke(this, eventArgs);
     }
 
-    private void UiApplicationOnIdling(object sender, IdlingEventArgs e) {
+    protected virtual void OnDocumentChanged() {
+        if(_addedElements.Count == 0
+           && _removedElements.Count == 0
+           && _modifiedElements.Count == 0) {
+            return;
+        }
+
+        var addedElements = _addedElements.ToList();
+        var removedElements = _removedElements.ToList();
+        var modifiedElements = _modifiedElements.ToList();
+
+        _addedElements.Clear();
+        _removedElements.Clear();
+        _modifiedElements.Clear();
+
+        OnSelectionChange(
+            new SelectionChangeEventArgs(
+                addedElements,
+                removedElements,
+                modifiedElements));
+    }
+
+    protected virtual void OnNewDocumentOpened() {
         var newDocument = Document;
 
         var oldModelPath = _document.GetWorksharingCentralModelPath();
@@ -42,21 +69,25 @@ internal abstract class BaseSelection : ISelectionElements, IDisposable {
         }
     }
 
+    private void UiApplicationOnIdling(object sender, IdlingEventArgs e) {
+        OnDocumentChanged();
+        OnNewDocumentOpened();
+    }
+
     private void UiApplicationOnDocumentChanged(object sender, DocumentChangedEventArgs e) {
         if(e.Operation is UndoOperation.TransactionRolledBack or UndoOperation.TransactionGroupRolledBack) {
             return;
         }
 
-        OnSelectionChange(
-            new SelectionChangeEventArgs(
-                e.GetAddedElementIds(),
-                e.GetDeletedElementIds(),
-                e.GetModifiedElementIds()));
+        _addedElements.UnionWith(e.GetAddedElementIds());
+        _removedElements.UnionWith(e.GetDeletedElementIds());
+        _modifiedElements.UnionWith(e.GetModifiedElementIds());
     }
 
     protected virtual void Dispose(bool disposing) {
         if(disposing) {
             _uiApplication.Idling -= UiApplicationOnIdling;
+            _uiApplication.Application.DocumentChanged -= UiApplicationOnDocumentChanged;
         }
     }
 
