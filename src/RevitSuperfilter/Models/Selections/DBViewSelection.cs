@@ -57,6 +57,10 @@ internal sealed class DBViewSelection : BaseSelection, ISelectionElements {
     private IEnumerable<ElementId> GetElements(IEnumerable<ElementId> elementIds) {
         var document = Document;
         var elements = elementIds.ToList();
+        if(elements.Count == 0) {
+            return [];
+        }
+        
         return new FilteredElementCollector(document, document.ActiveView.Id)
             .WherePasses(new ElementIdSetFilter(elements))
             .ToElementIds();
