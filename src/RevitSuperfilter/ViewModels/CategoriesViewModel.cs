@@ -39,9 +39,11 @@ internal sealed class CategoriesViewModel : ObservableObject, IElementIndexList 
                 _categoryKeys.Add(element.Id, GetKey(element));
             }
 
-            var category = new CategoryViewModel(catGroup.Key);
-            category.Build(elementsInCat);
-            Categories.Add(category);
+            var categoryViewModel = new CategoryViewModel(catGroup.Key);
+            categoryViewModel.Build(elementsInCat);
+            
+            Categories.Add(categoryViewModel);
+            _categories.Add(GetKey(catGroup.Key), categoryViewModel);
         }
     }
 
@@ -66,7 +68,7 @@ internal sealed class CategoriesViewModel : ObservableObject, IElementIndexList 
             return;
         }
 
-        _categoryKeys.Remove(elementId);
+        _categoryKeys.Remove(elementId);        
         if(!_categories.TryGetValue(catKey, out var categoryViewModel)) {
             return;
         }
@@ -92,7 +94,11 @@ internal sealed class CategoriesViewModel : ObservableObject, IElementIndexList 
     }
 
     private string GetKey(Element element) {
-        return element.Category?.Name
+        return GetKey(element.Category);
+    }
+    
+    private string GetKey(Category category) {
+        return category?.Name
                ?? _localizationService.GetLocalizedString("Categories.CategoryKey");
     }
 }
