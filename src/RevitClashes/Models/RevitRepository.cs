@@ -94,7 +94,7 @@ internal class RevitRepository {
 
     public UIApplication UiApplication { get; }
 
-    public List<DocInfo> DocInfos { get; set; }
+    public List<DocInfo> DocInfos { get; private set; }
 
     public View3D GetClashView() {
         var view = new FilteredElementCollector(Doc)
@@ -185,7 +185,10 @@ internal class RevitRepository {
         return new FilteredElementCollector(Doc)
             .OfClass(typeof(RevitLinkInstance))
             .Cast<RevitLinkInstance>()
-            .Where(item => item.GetLinkDocument() != null)
+            .Where(item => {
+                var doc = item.GetLinkDocument();
+                return doc != null && doc.Title.EndsWith(".rvt");
+            })
             .ToList();
     }
 
