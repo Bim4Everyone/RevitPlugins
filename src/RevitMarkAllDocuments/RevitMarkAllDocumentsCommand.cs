@@ -42,14 +42,6 @@ public class RevitMarkAllDocumentsCommand : BasePluginCommand {
         PluginName = "Маркировать всё";
     }
 
-    /// <summary>
-    /// Метод выполнения основного кода плагина.
-    /// </summary>
-    /// <param name="uiApplication">Интерфейс взаимодействия с Revit.</param>
-    /// <remarks>
-    /// В случаях, когда не используется конфигурация
-    /// или локализация требуется удалять их использование полностью во всем проекте.
-    /// </remarks>
     protected override void Execute(UIApplication uiApplication) {
         // Создание контейнера зависимостей плагина с сервисами из платформы
         using IKernel kernel = uiApplication.CreatePlatformServices();
@@ -76,6 +68,10 @@ public class RevitMarkAllDocumentsCommand : BasePluginCommand {
             .InSingletonScope();
 
         kernel.Bind<CategoryContext>()
+            .ToSelf()
+            .InSingletonScope();
+
+        kernel.Bind<DocumentService>()
             .ToSelf()
             .InSingletonScope();
 
