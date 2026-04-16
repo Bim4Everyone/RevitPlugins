@@ -1,9 +1,12 @@
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Dynamic;
+using System.Windows.Input;
 
 using Autodesk.Revit.DB;
 
+using dosymep.WPF.Commands;
 using dosymep.WPF.ViewModels;
 
 using RevitClashDetective.Models;
@@ -33,7 +36,27 @@ internal class ImaginarySecondClashViewModel
         SecondLevel = _secondElement.Element.Level;
         FirstElementParams = new ExpandoObject();
         SecondElementParams = new ExpandoObject();
+
+        AddCommentCommand = RelayCommand.Create(() => { }, () => false);
+        RemoveCommentCommand = RelayCommand.Create(() => { }, () => false);
     }
+
+    public ICommand AddCommentCommand { get; }
+    public ICommand RemoveCommentCommand { get; }
+
+    public ClashCommentViewModel SelectedComment {
+        get => null;
+        set { return; }
+    }
+
+    public bool CanEditComments {
+        get => false;
+        set { return; }
+    }
+
+    public string CommentsTitle => ClashName;
+
+    public ObservableCollection<ClashCommentViewModel> Comments { get; } = [];
 
 
     public ClashStatus ClashStatus { get => ClashStatus.Imaginary; set { return; } }

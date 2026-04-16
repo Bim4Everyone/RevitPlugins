@@ -72,6 +72,8 @@ internal class ClashViewModel : BaseViewModel, IClashViewModel, IEquatable<Clash
         }
     }
 
+    public string CommentsTitle => ClashName;
+
     public string ClashName {
         get => _clashName;
         set => RaiseAndSetIfChanged(ref _clashName, value);
@@ -240,7 +242,7 @@ internal class ClashViewModel : BaseViewModel, IClashViewModel, IEquatable<Clash
         }
     }
 
-    public void AddComment(ClashComment comment) {
+    private void AddComment(ClashComment comment) {
         int id;
         if(Comments.Count == 0) {
             id = 1;

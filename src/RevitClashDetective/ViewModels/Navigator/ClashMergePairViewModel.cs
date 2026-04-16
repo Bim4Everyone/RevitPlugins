@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.ComponentModel;
 using System.Linq;
 using System.Windows.Input;
 
@@ -12,7 +13,7 @@ using RevitClashDetective.Services.ReportsMerging;
 
 namespace RevitClashDetective.ViewModels.Navigator;
 
-internal class ClashMergePairViewModel : BaseViewModel {
+internal class ClashMergePairViewModel : BaseViewModel, ICommentable {
     private static readonly ClashCommentContentComparer _commentsComparer = new();
     private static readonly ClashIdDocComparer _clashComparer = new();
     private string _clashName;
@@ -36,11 +37,21 @@ internal class ClashMergePairViewModel : BaseViewModel {
         }
 
         SetMergedCommentsCommand = RelayCommand.Create(SetMergedComments);
+        AddCommentCommand = RelayCommand.Create(() => { }, () => false);
+        RemoveCommentCommand = RelayCommand.Create(() => { }, () => false);
+
+        PropertyChanged += OnSelectedCommentsChanged;
     }
+
+    public string Name => Existing.ClashName;
 
     public ClashViewModel Existing { get; }
     public ClashViewModel Importing { get; }
     public ICommand SetMergedCommentsCommand { get; }
+    public ICommand AddCommentCommand { get; }
+    public ICommand RemoveCommentCommand { get; }
+
+    public string CommentsTitle => ClashName;
 
     public string ClashName {
         get => _clashName;
@@ -116,6 +127,9 @@ internal class ClashMergePairViewModel : BaseViewModel {
             ExistingNameSelected = value;
             ExistingStatusSelected = value;
             ExistingCommentsSelected = value;
+            if(value) {
+                ImportingClashSelected = false;
+            }
             RaiseAndSetIfChanged(ref _existingClashSelected, value);
         }
     }
@@ -126,15 +140,33 @@ internal class ClashMergePairViewModel : BaseViewModel {
             ImportingNameSelected = value;
             ImportingStatusSelected = value;
             ImportingCommentsSelected = value;
+            if(value) {
+                ExistingClashSelected = false;
+            }
             RaiseAndSetIfChanged(ref _importingClashSelected, value);
         }
     }
 
-    public ObservableCollection<ClashCommentViewModel> Comments { get; }
+    public ClashCommentViewModel SelectedComment { get; set; }
+
+    public bool CanEditComments {
+        get => false;
+        set { return; }
+    }
+
+    public ObservableCollection<ClashCommentViewModel> Comments { get; } = [];
 
     public int MergedCommentsCount {
         get => _mergedCommentsCount;
         private set => RaiseAndSetIfChanged(ref _mergedCommentsCount, value);
+    }
+
+    public ClashViewModel GetResultClash() {
+        Existing.ClashName = ClashName;
+        Existing.ClashStatus = ClashStatus;
+        Existing.ResetComments(Comments);
+
+        return Existing;
     }
 
     private void SetMergedComments() {
@@ -164,11 +196,10 @@ internal class ClashMergePairViewModel : BaseViewModel {
         MergedCommentsCount = comments.Count;
     }
 
-    public ClashViewModel GetResultClash() {
-        Existing.ClashName = ClashName;
-        Existing.ClashStatus = ClashStatus;
-        Existing.ResetComments(Comments);
-
-        return Existing;
+    private void OnSelectedCommentsChanged(object sender, PropertyChangedEventArgs e) {
+        if(e.PropertyName == nameof(ImportingCommentsSelected)
+           || e.PropertyName == nameof(ExistingCommentsSelected)) {
+            SetMergedCommentsCommand.Execute(null);
+        }
     }
 }

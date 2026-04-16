@@ -21,5 +21,8 @@ internal class ClashMergeCollection {
 
     public string Name { get; }
 
+    /// <summary>
+    /// Коллизии, которые будут видны пользователю
+    /// </summary>
     public ICollection<ClashMergePairViewModel> Items { get; }
 }

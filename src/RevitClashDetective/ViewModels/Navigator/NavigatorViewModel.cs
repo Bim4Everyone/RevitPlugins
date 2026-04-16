@@ -71,8 +71,8 @@ internal class NavigatorViewModel : BaseViewModel, ISupportServices {
         LoadCommand = RelayCommand.Create(Load);
         DeleteCommand = RelayCommand.Create(Delete, CanDelete);
         SelectClashCommand = RelayCommand.Create<IClashViewModel>(SelectClash, CanSelectClash);
-        EditCommentsCommand = RelayCommand.Create<IClashViewModel>(ShowCommentsEditor, CanEditComments);
-        ShowCommentsCommand = RelayCommand.Create<IClashViewModel>(ShowComments, CanEditComments);
+        EditCommentsCommand = RelayCommand.Create<ICommentable>(ShowCommentsEditor, CanEditComments);
+        ShowCommentsCommand = RelayCommand.Create<ICommentable>(ShowComments, CanEditComments);
         AcceptReportsMergeCommand =
             RelayCommand.Create<ReportsMergeViewModel>(AcceptReportsMerge, CanAcceptReportsMerge);
         CancelReportsMergeCommand = RelayCommand.Create(CancelReportsMerge);
@@ -269,8 +269,7 @@ internal class NavigatorViewModel : BaseViewModel, ISupportServices {
         return Reports.Count > 0;
     }
 
-    private void ShowCommentsEditor(IClashViewModel clashVm) {
-        var clash = (ClashViewModel) clashVm;
+    private void ShowCommentsEditor(ICommentable commentable) {
         var dialogService = this.GetService<IDialogService>();
         dialogService.ShowDialog(
             dialogCommands: [
@@ -281,20 +280,19 @@ internal class NavigatorViewModel : BaseViewModel, ISupportServices {
                     isDefault: true,
                     isCancel: false)
             ],
-            title: _localizationService.GetLocalizedString("Navigator.ClashComments", clash.ClashName),
-            viewModel: clash);
+            title: _localizationService.GetLocalizedString("Navigator.ClashComments", commentable.CommentsTitle),
+            viewModel: commentable);
     }
 
-    private bool CanEditComments(IClashViewModel clash) {
-        return clash is ClashViewModel;
+    private bool CanEditComments(ICommentable clash) {
+        return clash is not null;
     }
 
-    private void ShowComments(IClashViewModel clashVm) {
-        var clash = (ClashViewModel) clashVm;
-        bool backup = clash.CanEditComments;
-        clash.CanEditComments = false;
-        ShowCommentsEditor(clash);
-        clash.CanEditComments = backup;
+    private void ShowComments(ICommentable commentable) {
+        bool backup = commentable.CanEditComments;
+        commentable.CanEditComments = false;
+        ShowCommentsEditor(commentable);
+        commentable.CanEditComments = backup;
     }
 
     private TaskDialogResult GetLoadMode(string names) {
@@ -316,6 +314,10 @@ internal class NavigatorViewModel : BaseViewModel, ISupportServices {
 
     private void StartReportsMerge(ReportSetsIntersectionResult reportsIntersection) {
         ReportsMergeViewModel = new ReportsMergeViewModel(_localizationService, reportsIntersection);
+        if(ReportsMergeViewModel.ReportsToMerge.All(r => r.Items.Count == 0)) {
+            AcceptReportsMergeCommand.Execute(ReportsMergeViewModel);
+            return;
+        }
         ShowReportsMergeView = true;
     }
 

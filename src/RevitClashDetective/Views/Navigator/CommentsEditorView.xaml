@@ -15,7 +15,7 @@
     mc:Ignorable="d"
     d:DesignHeight="300"
     d:DesignWidth="300"
-    d:DataContext="{d:DesignInstance vms:ClashViewModel, IsDesignTimeCreatable=False}">
+    d:DataContext="{d:DesignInstance vms:ICommentable, IsDesignTimeCreatable=False}">
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition

@@ -10,11 +10,15 @@ using RevitClashDetective.ViewModels.Navigator;
 namespace RevitClashDetective.Services.ReportsMerging;
 
 /// <summary>
-/// Пары коллизий, разбитые по логическим группам
+/// Пары коллизий из одной пары отчетов для мержа
 /// </summary>
 internal class ClashesMergePairGroups {
     private static readonly ClashCommentContentComparer _commentsComparer = new();
 
+    /// <summary>
+    /// Создает экземпляр класса, разбивая пары коллизий по логическим группам
+    /// </summary>
+    /// <param name="clashPairs">Пары коллизий из одной пары отчетов для мержа</param>
     public ClashesMergePairGroups(ICollection<ClashMergePairViewModel> clashPairs) {
         if(clashPairs == null) {
             throw new ArgumentNullException(nameof(clashPairs));

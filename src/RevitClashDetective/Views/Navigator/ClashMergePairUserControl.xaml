@@ -99,7 +99,9 @@
                             Text="Комментарии" />
                         <!-- TODO -->
                         <Button
-                            Content="{Binding Comments.Count, StringFormat='{}{0} 💬'}" />
+                            Content="{Binding Comments.Count, StringFormat='{}{0} 💬'}"
+                            CommandParameter="{Binding}"
+                            Command="{Binding ShowCommentsCommand, ElementName=_this}" />
                     </DockPanel>
                 </DockPanel>
             </StackPanel>

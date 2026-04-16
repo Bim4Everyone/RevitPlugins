@@ -20,18 +20,28 @@ internal class ReportMergePairViewModel : BaseViewModel {
         _localization = localization ?? throw new ArgumentNullException(nameof(localization));
         _reportsMergePair = reportsMergePair ?? throw new ArgumentNullException(nameof(reportsMergePair));
 
-        Items = [
-            new ClashMergeCollection(
+        Items = [];
+        if(_reportsMergePair.IntersectionClashes.Conflicted.Any()) {
+            Items.Add(
+                new ClashMergeCollection(
                 _localization.GetLocalizedString("ReportsMerge.ConflictedClashes"),
-                _reportsMergePair.IntersectionClashes.Conflicted),
-            new ClashMergeCollection(
+                _reportsMergePair.IntersectionClashes.Conflicted));
+        }
+
+        if(_reportsMergePair.IntersectionClashes.NonConflicted.Any()) {
+            Items.Add(
+                new ClashMergeCollection(
                 _localization.GetLocalizedString("ReportsMerge.AutoMergedClashes"),
-                _reportsMergePair.IntersectionClashes.NonConflicted)
-        ];
+                _reportsMergePair.IntersectionClashes.NonConflicted));
+        }
         Name = _reportsMergePair.Existing.Name;
     }
 
     public string Name { get; }
+
+    /// <summary>
+    /// Коллекции коллизий, которые надо посмотреть пользователю: конфликты объединения и автообъединенные 
+    /// </summary>
     public ObservableCollection<ClashMergeCollection> Items { get; }
 
     public ReportViewModel GetResultReport() {

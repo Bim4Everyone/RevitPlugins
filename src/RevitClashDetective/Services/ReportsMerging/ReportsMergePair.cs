@@ -6,10 +6,18 @@ using RevitClashDetective.ViewModels.Navigator;
 
 namespace RevitClashDetective.Services.ReportsMerging;
 
+/// <summary>
+/// Модель пары отчетов для мержа.
+/// </summary>
 internal class ReportsMergePair {
     private static readonly ReportsNamesIgnoreCaseComparer _reportsComparer = new();
     private static readonly ClashIdDocComparer _clashComparer = new();
 
+    /// <summary>
+    /// Создает экземпляр пары отчетов для мержа, при этом коллизии отчетов разбиваются на логические группы
+    /// </summary>
+    /// <param name="existing">Существующий отчет</param>
+    /// <param name="importing">Импортируемый отчет</param>
     public ReportsMergePair(ReportViewModel existing, ReportViewModel importing) {
         Existing = existing ?? throw new ArgumentNullException(nameof(existing));
         Importing = importing ?? throw new ArgumentNullException(nameof(importing));
@@ -36,7 +44,7 @@ internal class ReportsMergePair {
     public ICollection<ClashViewModel> ImportingOuterClashes { get; }
 
     /// <summary>
-    /// Множество коллизий, которые есть в обоих отчетах
+    /// Множество пар коллизий, которые есть в обоих отчетах
     /// </summary>
     public ClashesMergePairGroups IntersectionClashes { get; }
 
