@@ -4,6 +4,7 @@ using System.Collections.ObjectModel;
 
 using Autodesk.Revit.DB;
 
+using dosymep.Revit;
 using dosymep.WPF.ViewModels;
 
 namespace RevitSuperfilter.ViewModels;
@@ -31,6 +32,7 @@ internal sealed class DefinitionViewModel : BaseViewModel {
 
         _values.Add(element.Id, paramValue);
         _elementsById.Add(element.Id, element);
+        
         var viewModel = GetOrAdd(element, paramValue);
         viewModel.Add(element);
         
@@ -44,11 +46,11 @@ internal sealed class DefinitionViewModel : BaseViewModel {
 
         if(_values.TryGetValue(elementId, out string value)) {
             _values.Remove(elementId);
-            if(_paramValues.TryGetValue(value, out var paramValueViewModel)) {
+            if(_paramValues.TryGetValue(GetKey(value), out var paramValueViewModel)) {
                 paramValueViewModel.Remove(elementId);
 
                 if(paramValueViewModel.Count == 0) {
-                    _paramValues.Remove(value);
+                    _paramValues.Remove(GetKey(value));
                     ParamValues.Remove(paramValueViewModel);
                 }
             }

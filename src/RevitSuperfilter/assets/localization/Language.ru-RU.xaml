@@ -17,4 +17,6 @@
     <system:String x:Key="WideControl.SearchCategory">Поиск категорий</system:String>
     <system:String x:Key="WideControl.SearchParams">Поиск параметров</system:String>
     <system:String x:Key="WideControl.SearchElements">Поиск элементов</system:String>
+    
+    <system:String x:Key="Categories.CategoryKey">Без имени</system:String>
 </ResourceDictionary>

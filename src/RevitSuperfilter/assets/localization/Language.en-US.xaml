@@ -17,4 +17,6 @@
     <system:String x:Key="WideControl.SearchCategory">Search categories</system:String>
     <system:String x:Key="WideControl.SearchParams">Search parameters</system:String>
     <system:String x:Key="WideControl.SearchElements">Search elements</system:String>
+    
+    <system:String x:Key="Categories.CategoryKey">Noname</system:String>
 </ResourceDictionary>

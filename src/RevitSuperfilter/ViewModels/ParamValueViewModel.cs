@@ -7,8 +7,8 @@ using dosymep.WPF.ViewModels;
 namespace RevitSuperfilter.ViewModels;
 
 internal sealed class ParamValueViewModel : BaseViewModel {
-    private readonly Dictionary<ElementId, Element> _elementsById = new();
-    
+    private readonly HashSet<ElementId> _elementsById = [];
+
     public int Count => _elementsById.Count;
     public string DisplayValue { get; }
 
@@ -17,11 +17,11 @@ internal sealed class ParamValueViewModel : BaseViewModel {
     }
 
     public void Add(Element element) {
-        if(_elementsById.ContainsKey(element.Id)) {
+        if(_elementsById.Contains(element.Id)) {
             Remove(element.Id);
         }
-        
-        _elementsById.Add(element.Id, element);
+
+        _elementsById.Add(element.Id);
         OnPropertyChanged(nameof(Count));
     }
 

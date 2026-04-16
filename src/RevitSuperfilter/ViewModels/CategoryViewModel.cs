@@ -39,7 +39,7 @@ internal sealed class CategoryViewModel : BaseViewModel, IElementIndexList {
     #region IElementIndex
 
     public void Add(Element element) {
-        if(IsLoaded && _definitionKeys.ContainsKey(element.Id)) {
+        if(_elementsById.ContainsKey(element.Id)) {
             Remove(element.Id);
         }
 
@@ -62,9 +62,9 @@ internal sealed class CategoryViewModel : BaseViewModel, IElementIndexList {
                 var param = GetOrAdd(elementParam);
                 param.Add(element, elementParam.GetValueOrDefault());
             }
-
-            OnPropertyChanged(nameof(Count));
         }
+        
+        OnPropertyChanged(nameof(Count));
     }
 
     public void Remove(ElementId elementId) {
@@ -74,14 +74,20 @@ internal sealed class CategoryViewModel : BaseViewModel, IElementIndexList {
 
         _elementsById.Remove(elementId);
         _definitionKeys.Remove(elementId);
-        foreach(var definition in definitions) {
-            if(_definitions.TryGetValue(definition, out var definitionViewModel)) {
-                definitionViewModel.Remove(elementId);
-                if(definitionViewModel.Count == 0) {
-                    _definitions.Remove(definition);
-                    Definitions.Remove(definitionViewModel);
+        try {
+
+
+            foreach(var definition in definitions) {
+                if(_definitions.TryGetValue(definition, out var definitionViewModel)) {
+                    definitionViewModel.Remove(elementId);
+                    if(definitionViewModel.Count == 0) {
+                        _definitions.Remove(definition);
+                        Definitions.Remove(definitionViewModel);
+                    }
                 }
             }
+        } catch(Exception ex) {
+            string sss = ex.Message;
         }
 
         OnPropertyChanged(nameof(Count));
@@ -113,7 +119,7 @@ internal sealed class CategoryViewModel : BaseViewModel, IElementIndexList {
 
     private void LoadParams() {
         try {
-            foreach(var element in _elementsById.Values) {
+            foreach(var element in _elementsById.Values.ToArray()) {
                 Add(element);
             }
         } finally {

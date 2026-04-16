@@ -68,7 +68,7 @@ internal sealed class CategoriesViewModel : ObservableObject, IElementIndexList 
             return;
         }
 
-        _categoryKeys.Remove(elementId);        
+        _categoryKeys.Remove(elementId);
         if(!_categories.TryGetValue(catKey, out var categoryViewModel)) {
             return;
         }
