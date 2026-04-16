@@ -2,6 +2,11 @@
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
                     xmlns:vms="clr-namespace:RevitSuperfilter.ViewModels"
                     xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml">
+    
+    <ResourceDictionary.MergedDictionaries>
+        <ResourceDictionary
+            Source="pack://application:,,,/Wpf.Ui;component/Controls/TreeView/TreeViewItem.xaml" />
+    </ResourceDictionary.MergedDictionaries>
 
     <DataTemplate
         x:Key="TreeViewItem"
@@ -26,6 +31,10 @@
                 Text="{Binding DisplayValue}" />
         </DockPanel>
     </DataTemplate>
+    
+    <Style TargetType="TreeViewItem" BasedOn="{StaticResource DefaultTreeViewItemStyle}">
+        <Setter Property="IsExpanded" Value="{Binding IsExpanded, Mode=TwoWay}" />
+    </Style>
 
     <HierarchicalDataTemplate
         DataType="{x:Type vms:CategoryViewModel}"

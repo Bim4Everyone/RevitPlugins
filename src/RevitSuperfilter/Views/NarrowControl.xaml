@@ -34,12 +34,20 @@
             Margin="8 4"
             CornerRadius="6"
             Background="{DynamicResource CardBackground}">
-            <StackPanel>
+            <Grid>
+                
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="*" />
+                </Grid.RowDefinitions>
+                
                 <ui:AutoSuggestBox
+                    Grid.Row="0"
                     Margin="8 4"
                     PlaceholderText="{me:LocalizationSource WideControl.SearchElements}" />
-              
+
                 <TreeView
+                    Grid.Row="1"
                     x:Name="_categories"
                     Margin="8 4"
                     ItemsSource="{Binding SuperfilterService.CategoriesViewModel.Categories}">
@@ -54,7 +62,8 @@
                     </b:Interaction.Triggers>
 
                 </TreeView>
-            </StackPanel>
+
+            </Grid>
         </Border>
 
         <DockPanel

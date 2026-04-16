@@ -21,9 +21,12 @@ internal sealed class CategoryViewModel : BaseViewModel, IElementIndexList {
     private readonly Dictionary<Definition, DefinitionViewModel> _definitions = new(DefinitionNameComparer.Instance);
 
     private readonly Category _category;
+    private bool _isExpanded;
 
     public CategoryViewModel(Category category) {
         _category = category;
+
+        IsExpanded = true;
         LoadParamsCommand = RelayCommand.Create(LoadParams, CanLoadParams);
     }
 
@@ -33,6 +36,11 @@ internal sealed class CategoryViewModel : BaseViewModel, IElementIndexList {
 
     public int Count => _elementsById.Keys.Count;
     public string DisplayValue => _category?.Name;
+
+    public bool IsExpanded {
+        get => _isExpanded;
+        set => this.RaiseAndSetIfChanged(ref _isExpanded, value);
+    }
 
     public ObservableCollection<DefinitionViewModel> Definitions { get; } = [];
     

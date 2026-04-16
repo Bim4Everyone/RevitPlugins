@@ -15,13 +15,21 @@ internal sealed class DefinitionViewModel : BaseViewModel {
     private readonly Dictionary<string, ParamValueViewModel> _paramValues = new(StringComparer.CurrentCulture);
 
     private readonly Definition _definition;
+    private bool _isExpanded;
 
     public DefinitionViewModel(Definition definition) {
         _definition = definition;
+        
+        IsExpanded = true;
     }
 
     public int Count => _elementsById.Count;
     public string DisplayValue => _definition.Name;
+    
+    public bool IsExpanded {
+        get => _isExpanded;
+        set => this.RaiseAndSetIfChanged(ref _isExpanded, value);
+    }
 
     public ObservableCollection<ParamValueViewModel> ParamValues { get; } = [];
 
