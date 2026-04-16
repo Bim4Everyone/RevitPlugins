@@ -3,6 +3,8 @@ using System.Linq;
 
 using Autodesk.Revit.DB;
 
+using dosymep.SimpleServices;
+
 using Ninject;
 using Ninject.Syntax;
 
@@ -19,9 +21,15 @@ internal class MarkListWindowService {
         _resolutionRoot = resolutionRoot;
     }
 
-    public bool ShowWindow(Document document, MarkDataByDocument markDataByDocument) {
+    public bool ShowWindow(MarkData markData, 
+                           RevitRepository revitRepository,
+                           DocumentService documentService,
+                           ILocalizationService localizationService) {
         var window = _resolutionRoot.Get<MarkListWindow>();
-        window.DataContext = new MarkListViewModel(document, markDataByDocument);
+        window.DataContext = new MarkListViewModel(markData, 
+                                                   revitRepository, 
+                                                   documentService,
+                                                   localizationService);
 
         window.ShowDialog();
         if((bool) window.DialogResult) {

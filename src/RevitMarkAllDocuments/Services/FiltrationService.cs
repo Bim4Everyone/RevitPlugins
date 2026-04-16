@@ -1,15 +1,10 @@
-using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 using Autodesk.Revit.DB;
 
 using Bim4Everyone.RevitFiltration.Controls;
 
 using RevitMarkAllDocuments.Models;
-using RevitMarkAllDocuments.ViewModels;
 
 namespace RevitMarkAllDocuments.Services;
 
@@ -19,9 +14,7 @@ internal class FiltrationService {
         _filterOptions = new FilterOptions() { Tolerance = 0 };
     }
 
-    public MarkData FilterElements(Document[] documents, ILogicalFilterProvider filterProvider) {
-        var markData = new MarkData();
-
+    public MarkData FilterElements(MarkData markData, Document[] documents, ILogicalFilterProvider filterProvider) {
         var docService = new DocumentService();
 
         foreach(var document in documents) {
