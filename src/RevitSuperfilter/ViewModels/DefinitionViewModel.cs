@@ -19,13 +19,11 @@ internal sealed class DefinitionViewModel : BaseViewModel {
 
     public DefinitionViewModel(Definition definition) {
         _definition = definition;
-        
-        IsExpanded = true;
     }
 
-    public int Count => _elementsById.Count;
+    public int Count => ParamValues.Count;
     public string DisplayValue => _definition.Name;
-    
+
     public bool IsExpanded {
         get => _isExpanded;
         set => this.RaiseAndSetIfChanged(ref _isExpanded, value);
@@ -40,10 +38,10 @@ internal sealed class DefinitionViewModel : BaseViewModel {
 
         _values.Add(element.Id, paramValue);
         _elementsById.Add(element.Id, element);
-        
+
         var viewModel = GetOrAdd(element, paramValue);
         viewModel.Add(element);
-        
+
         OnPropertyChanged(nameof(Count));
     }
 
@@ -78,7 +76,7 @@ internal sealed class DefinitionViewModel : BaseViewModel {
         return paramValueViewModel;
     }
 
-    private string GetKey(string value) {
+    private static string GetKey(string value) {
         if(value is null) {
             return "<null>";
         }

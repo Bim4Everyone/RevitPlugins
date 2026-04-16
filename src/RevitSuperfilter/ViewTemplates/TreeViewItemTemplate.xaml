@@ -1,11 +1,14 @@
 <ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
                     xmlns:vms="clr-namespace:RevitSuperfilter.ViewModels"
-                    xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml">
-    
+                    xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
+                    xmlns:behaviours="clr-namespace:RevitSuperfilter.Behaviours">
+
     <ResourceDictionary.MergedDictionaries>
         <ResourceDictionary
             Source="pack://application:,,,/Wpf.Ui;component/Controls/TreeView/TreeViewItem.xaml" />
+        <ResourceDictionary
+            Source="pack://application:,,,/Wpf.Ui;component/Controls/ListView/ListViewItem.xaml" />
     </ResourceDictionary.MergedDictionaries>
 
     <DataTemplate
@@ -31,9 +34,11 @@
                 Text="{Binding DisplayValue}" />
         </DockPanel>
     </DataTemplate>
-    
+
     <Style TargetType="TreeViewItem" BasedOn="{StaticResource DefaultTreeViewItemStyle}">
+        <Setter Property="IsSelected" Value="{Binding IsSelected, Mode=TwoWay}" />
         <Setter Property="IsExpanded" Value="{Binding IsExpanded, Mode=TwoWay}" />
+        <Setter Property="behaviours:FocusHelper.IsFocused" Value="{Binding IsSelected}" />
     </Style>
 
     <HierarchicalDataTemplate
@@ -41,15 +46,15 @@
         ItemsSource="{Binding Definitions}">
         <ContentPresenter ContentTemplate="{StaticResource TreeViewItem}" />
     </HierarchicalDataTemplate>
-    
+
     <HierarchicalDataTemplate
         DataType="{x:Type vms:DefinitionViewModel}"
         ItemsSource="{Binding ParamValues}">
         <ContentPresenter ContentTemplate="{StaticResource TreeViewItem}" />
     </HierarchicalDataTemplate>
-    
+
     <DataTemplate DataType="{x:Type vms:ParamValueViewModel}">
-        <ContentPresenter ContentTemplate="{StaticResource TreeViewItem}"/>
+        <ContentPresenter ContentTemplate="{StaticResource TreeViewItem}" />
     </DataTemplate>
-    
+
 </ResourceDictionary>

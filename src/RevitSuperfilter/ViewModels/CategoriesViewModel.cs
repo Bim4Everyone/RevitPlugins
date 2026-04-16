@@ -13,14 +13,8 @@ using RevitSuperfilter.Models;
 namespace RevitSuperfilter.ViewModels;
 
 internal sealed class CategoriesViewModel : ObservableObject, IElementIndexList {
-    private readonly ILocalizationService _localizationService;
-    
     private readonly Dictionary<ElementId, string> _categoryKeys = new();
     private readonly Dictionary<string, CategoryViewModel> _categories = new();
-
-    public CategoriesViewModel(ILocalizationService localizationService) {
-        _localizationService = localizationService;
-    }
 
     public int Count => _categoryKeys.Keys.Count;
     public ObservableCollection<CategoryViewModel> Categories { get; } = [];
@@ -93,12 +87,11 @@ internal sealed class CategoriesViewModel : ObservableObject, IElementIndexList 
         return categoryViewModel;
     }
 
-    private string GetKey(Element element) {
+    private static string GetKey(Element element) {
         return GetKey(element.Category);
     }
     
-    private string GetKey(Category category) {
-        return category?.Name
-               ?? _localizationService.GetLocalizedString("Categories.CategoryKey");
+    private static string GetKey(Category category) {
+        return category?.Name ?? "<null>";
     }
 }

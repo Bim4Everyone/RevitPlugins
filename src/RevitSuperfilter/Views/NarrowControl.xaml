@@ -9,6 +9,7 @@
     xmlns:me="clr-namespace:dosymep.WpfCore.MarkupExtensions;assembly=dosymep.WpfCore"
     xmlns:vms="clr-namespace:RevitSuperfilter.ViewModels"
     xmlns:b="http://schemas.microsoft.com/xaml/behaviors"
+    xmlns:behaviours="clr-namespace:RevitSuperfilter.Behaviours"
 
     mc:Ignorable="d"
     d:DesignHeight="500" d:DesignWidth="400"
@@ -35,12 +36,12 @@
             CornerRadius="6"
             Background="{DynamicResource CardBackground}">
             <Grid>
-                
+
                 <Grid.RowDefinitions>
                     <RowDefinition Height="Auto" />
                     <RowDefinition Height="*" />
                 </Grid.RowDefinitions>
-                
+
                 <ui:AutoSuggestBox
                     Grid.Row="0"
                     Margin="8 4"

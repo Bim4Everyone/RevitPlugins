@@ -22,6 +22,7 @@ internal sealed class CategoryViewModel : BaseViewModel, IElementIndexList {
 
     private readonly Category _category;
     private bool _isExpanded;
+    private bool _isSelected;
 
     public CategoryViewModel(Category category) {
         _category = category;
@@ -36,6 +37,11 @@ internal sealed class CategoryViewModel : BaseViewModel, IElementIndexList {
 
     public int Count => _elementsById.Keys.Count;
     public string DisplayValue => _category?.Name;
+
+    public bool IsSelected {
+        get => _isSelected;
+        set => this.RaiseAndSetIfChanged(ref _isSelected, value);
+    }
 
     public bool IsExpanded {
         get => _isExpanded;

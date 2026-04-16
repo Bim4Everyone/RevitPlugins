@@ -61,6 +61,12 @@
                     ItemsSource="{Binding SuperfilterService.CategoriesViewModel.Categories}"
                     ItemTemplate="{StaticResource TreeViewItem}">
 
+                    <ui:ListView.ItemContainerStyle>
+                        <Style TargetType="ui:ListViewItem" BasedOn="{StaticResource ListViewItemStyle}">
+                            <Setter Property="IsSelected" Value="{Binding IsSelected, Mode=TwoWay}" />
+                        </Style>
+                    </ui:ListView.ItemContainerStyle>
+
                     <b:Interaction.Triggers>
                         <b:EventTrigger EventName="SelectionChanged">
                             <b:InvokeCommandAction

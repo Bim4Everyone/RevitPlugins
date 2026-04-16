@@ -29,8 +29,6 @@ internal sealed class SuperfilterService : ObservableObject, ISuperfilterService
         _selectionElements = selectionElements;
         _localizationService = localizationService;
         _selectionElements.OnSelectionChanged += SelectionElementsOnOnSelectionChanged;
-        
-        CategoriesViewModel = new(_localizationService);
     }
 
     public Selection Selection => _selectionElements.Selection;
@@ -38,7 +36,7 @@ internal sealed class SuperfilterService : ObservableObject, ISuperfilterService
     public string DisplaySelection =>
         _localizationService.GetLocalizedString($"{Selection.GetType().Name}.{_selectionElements.Selection}");
 
-    public CategoriesViewModel CategoriesViewModel { get; }
+    public CategoriesViewModel CategoriesViewModel { get; } = new();
 
     public ISuperfilterService Build() {
         Clear();
