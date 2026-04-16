@@ -22,6 +22,7 @@ namespace RevitMarkAllDocuments.ViewModels;
 internal class MainViewModel : BaseViewModel {
     private readonly PluginConfig _pluginConfig;
     private readonly RevitRepository _revitRepository;
+    private readonly DocumentService _documentService;
     private readonly MarkListWindowService _markListWindowService;
     private readonly ILogicalFilterProviderFactory _filterFactory;
     private readonly ILocalizationService _localizationService;
@@ -38,11 +39,13 @@ internal class MainViewModel : BaseViewModel {
     public MainViewModel(PluginConfig pluginConfig,
                          RevitRepository revitRepository,
                          CategoryContext categoryContext,
+                         DocumentService documentService,
                          MarkListWindowService markListWindowService,
                          ILogicalFilterProviderFactory filterFactory,
                          ILocalizationService localizationService) {        
         _pluginConfig = pluginConfig;
         _revitRepository = revitRepository;
+        _documentService = documentService;
         _markListWindowService = markListWindowService;
         _filterFactory = filterFactory;
         _localizationService = localizationService;
@@ -107,30 +110,34 @@ internal class MainViewModel : BaseViewModel {
             .ToArray();
 
         // filter elements
-        var markData = filtrationService.FilterElements(checkedDocuments, FilterPageViewModel.FilterProvider);
-        markData.ParamName = MarkSettingsPageViewModel.SelectedParam.Name;
+        var selectedParam = MarkSettingsPageViewModel.SelectedParam;
+
+        var markData = new MarkData() {
+            RevitParam = selectedParam.RevitParam,
+        };
+
+        markData = filtrationService.FilterElements(markData, checkedDocuments, FilterPageViewModel.FilterProvider);
 
         // sort and mark elements
         var sortParams = SortPageViewModel.SelectedParams
             .Select(x => x.RevitParam)
             .ToList();
         var startValue = MarkSettingsPageViewModel.GetStartValue();
-        markData.SerMarkValues(sortParams, startValue);
+        markData.CreateMarkValues(sortParams, startValue);
 
-        var docService = new DocumentService();
-        string currentDocName = docService.GetDocumentFullName(_revitRepository.Document);
+        string currentDocName = _documentService.GetDocumentFullName(_revitRepository.Document);
 
         if(markData.HasLinksForExport(currentDocName)) {
             string path = SelectFolder();
             string fullPath = path + "\\" + $"{currentDocName}.json";
 
-            var exporter = new JsonExporter();
-            exporter.Export(fullPath, markData);
+            var jsonService = new JsonSerializerService();
+            jsonService.ExportMarkData(fullPath, markData);
         }
 
-        var markDataForCurrentDoc = markData.GetDataByDocument(currentDocName);        
+        var markDataForCurrentDoc = markData.GetDataByDocument(currentDocName);
         if(markDataForCurrentDoc != null) {
-            _markListWindowService.ShowWindow(_revitRepository.Document, markDataForCurrentDoc);
+            _markListWindowService.ShowWindow(markData, _revitRepository, _documentService, _localizationService);
         }
 
         SaveConfig();

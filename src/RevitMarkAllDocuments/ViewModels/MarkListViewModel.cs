@@ -8,20 +8,38 @@ using System.Windows.Input;
 
 using Autodesk.Revit.DB;
 
+using dosymep.Bim4Everyone;
+using dosymep.Revit;
+using dosymep.SimpleServices;
 using dosymep.WPF.Commands;
 using dosymep.WPF.ViewModels;
 
 using RevitMarkAllDocuments.Models;
+using RevitMarkAllDocuments.Services;
 
 namespace RevitMarkAllDocuments.ViewModels;
 
 internal class MarkListViewModel : BaseViewModel {
+    private readonly Document _document;
+    private readonly MarkData _markData;
+    private readonly ILocalizationService _localizationService;
+
     private ObservableCollection<MarkedElementViewModel> _markedElements;
 
-    public MarkListViewModel(Document document, MarkDataByDocument markDataByDocument) {
-        _markedElements = [..markDataByDocument
+    public MarkListViewModel(MarkData markData, 
+                             RevitRepository revitRepository,
+                             DocumentService documentService,
+                             ILocalizationService localizationService) {
+        _markData = markData;
+        _document = revitRepository.Document;
+        _localizationService = localizationService;
+
+        string currentDocName = documentService.GetDocumentFullName(_document);
+        var markDataForCurrentDoc = markData.GetDataByDocument(currentDocName);
+
+        _markedElements = [..markDataForCurrentDoc
             .Elements
-            .Select(x => new MarkedElementViewModel(x, document))
+            .Select(x => new MarkedElementViewModel(x, _document))
             .ToList()];
 
         MarkElementsCommand = RelayCommand.Create(MarkElements);
@@ -35,6 +53,16 @@ internal class MarkListViewModel : BaseViewModel {
     }
 
     private void MarkElements() {
-        
+        string transactionName = _localizationService.GetLocalizedString("MainWindow.TransactionName");
+
+        using(Transaction t = _document.StartTransaction(transactionName)) {
+            foreach(var element in MarkedElements) {
+                var mark = element.MarkedElement;
+                var revitElement = _document.GetElement(new ElementId(mark.Id));
+                revitElement.SetParamValue(_markData.RevitParam, mark.MarkValue);
+            }
+
+            t.Commit();
+        }
     }
 }

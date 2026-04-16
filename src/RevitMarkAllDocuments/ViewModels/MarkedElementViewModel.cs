@@ -14,6 +14,7 @@ using RevitMarkAllDocuments.Models;
 namespace RevitMarkAllDocuments.ViewModels;
 
 internal class MarkedElementViewModel : BaseViewModel{
+    private readonly MarkedElement _element;
     private readonly string _id;
     private readonly string _name;
     private readonly string _markValue;
@@ -25,6 +26,7 @@ internal class MarkedElementViewModel : BaseViewModel{
 #else
         _id = element.Id.ToString();
 #endif
+        _element = element;
         _markValue = element.MarkValue;
 
         var revitElement = document.GetElement(new ElementId(element.Id));
@@ -37,6 +39,7 @@ internal class MarkedElementViewModel : BaseViewModel{
         }
     }
 
+    public MarkedElement MarkedElement => _element;
     public string Id => _id;
     public string Name => _name;
     public string MarkValue => _markValue;
