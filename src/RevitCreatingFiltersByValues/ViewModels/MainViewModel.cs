@@ -56,7 +56,9 @@ internal class MainViewModel : BaseViewModel {
 
         LoadConfig();
 
-        CategoryElements = _revitRepository.GetCategoriesInView(false);
+        CategoryElements = new ObservableCollection<CategoryElementsVM>(_revitRepository.GetCategoriesInView()
+            .Select(c => new CategoryElementsVM(c))
+            .ToList());        
         SolidFillPattern = _revitRepository.SolidFillPattern;
 
 
@@ -90,7 +92,6 @@ internal class MainViewModel : BaseViewModel {
         MovePatternUpCommand = new RelayCommand(MovePatternUp, CanChangePattern);
         MovePatternDownCommand = new RelayCommand(MovePatternDown, CanChangePattern);
     }
-
 
 
     public ICommand GetFilterableParametersCommand { get; }

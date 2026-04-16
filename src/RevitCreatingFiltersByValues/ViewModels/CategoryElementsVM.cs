@@ -4,6 +4,8 @@ using Autodesk.Revit.DB;
 
 using dosymep.WPF.ViewModels;
 
+using RevitCreatingFiltersByValues.Models;
+
 namespace RevitCreatingFiltersByValues.ViewModels;
 
 internal class CategoryElementsVM : BaseViewModel {
@@ -13,13 +15,12 @@ internal class CategoryElementsVM : BaseViewModel {
     private bool _isCheck = false;
     private List<Element> _elementsInView;
 
-    public CategoryElementsVM(Category cat, ElementId id, bool check, List<Element> elements) {
-        CategoryName = cat.Name;
-        CategoryInView = cat;
-        CategoryIdInView = id;
-        IsCheck = check;
-        ElementsInView = elements;
-    }
+    public CategoryElementsVM(CategoryElements categoryElements) {
+        CategoryName = categoryElements.CategoryInView.Name;
+        CategoryInView = categoryElements.CategoryInView;
+        CategoryIdInView = categoryElements.CategoryIdInView;
+        ElementsInView = categoryElements.ElementsInView;
+    }    
 
     public string CategoryName {
         get => _categoryName;

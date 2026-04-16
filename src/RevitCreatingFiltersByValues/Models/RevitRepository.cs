@@ -127,14 +127,13 @@ internal class RevitRepository {
     /// <summary>
     /// Получает категории, представленные на виде + элементы в словаре по ним
     /// </summary>
-    public ObservableCollection<CategoryElementsVM> GetCategoriesInView(bool checkFlag) {
+    public List<CategoryElements> GetCategoriesInView() {
 
-        ObservableCollection<CategoryElementsVM> categoryElements = [];
+        List<CategoryElements> categoryElements = [];
         foreach(var elem in GetElementsInView()) {
             if(elem.Category is null) { continue; }
 
             var catOfElem = elem.Category;
-            string elemCategoryName = catOfElem.Name;
             var elemCategoryId = catOfElem.Id;
 
             // Отсеиваем категории, которые не имеют параметров фильтрации
@@ -142,16 +141,16 @@ internal class RevitRepository {
 
             // Добавляем в словарь элементы, разбивая по группам по ключу
             bool flag = false;
-            foreach(CategoryElementsVM categoryElement in categoryElements) {
+            foreach(CategoryElements categoryElement in categoryElements) {
 
-                if(categoryElement.CategoryName.Equals(elemCategoryName)) {
+                if(categoryElement.CategoryIdInView.Equals(elemCategoryId)) {
                     categoryElement.ElementsInView.Add(elem);
                     flag = true;
                     break;
                 }
             }
             if(flag is false) {
-                categoryElements.Add(new CategoryElementsVM(catOfElem, elemCategoryId, checkFlag, [elem]));
+                categoryElements.Add(new CategoryElements(catOfElem, elemCategoryId, [elem]));
             }
         }
         return categoryElements;
