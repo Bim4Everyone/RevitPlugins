@@ -18,7 +18,6 @@ internal class ReportsMergeViewModel : BaseViewModel {
     private readonly RevitRepository _revitRepository;
     private readonly ILocalizationService _localization;
     private readonly ReportSetsIntersectionResult _reportsIntersection;
-    private string _errorText;
     private ClashMergePairViewModel _selectedClashMergePairItem;
 
     public ReportsMergeViewModel(
@@ -48,11 +47,6 @@ internal class ReportsMergeViewModel : BaseViewModel {
         set => RaiseAndSetIfChanged(ref _selectedClashMergePairItem, value);
     }
 
-    public string ErrorText {
-        get => _errorText; // TODO
-        private set => RaiseAndSetIfChanged(ref _errorText, value);
-    }
-
     public ICollection<ReportViewModel> GetMergeResult() {
         if(!CanAcceptMerge()) {
             throw new InvalidOperationException();
@@ -66,7 +60,6 @@ internal class ReportsMergeViewModel : BaseViewModel {
     }
 
     private bool CanAcceptMerge() {
-        // TODO
         return true;
     }
 

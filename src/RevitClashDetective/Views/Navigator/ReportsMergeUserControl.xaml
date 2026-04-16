@@ -56,10 +56,6 @@
             Grid.Row="1"
             Margin="0 10 0 0"
             HorizontalAlignment="Right">
-            <TextBlock
-                Foreground="Orange"
-                VerticalAlignment="Center"
-                Text="{Binding ErrorText}" />
             <Button
                 Content="ОК"
                 Height="25"
