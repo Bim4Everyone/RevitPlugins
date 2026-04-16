@@ -4,10 +4,6 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-    xmlns:dxe="http://schemas.devexpress.com/winfx/2008/xaml/editors"
-    xmlns:mvvm="http://schemas.devexpress.com/winfx/2008/xaml/mvvm"
-    xmlns:dxg="http://schemas.devexpress.com/winfx/2008/xaml/grid"
-    xmlns:dx="http://schemas.devexpress.com/winfx/2008/xaml/core"
     xmlns:local="clr-namespace:RevitClashDetective.Views.Navigator"
     xmlns:vm="clr-namespace:RevitClashDetective.ViewModels.Navigator"
     mc:Ignorable="d"
@@ -35,16 +31,24 @@
                 <ColumnDefinition />
             </Grid.ColumnDefinitions>
 
-            <dxg:TreeViewControl
+            <TreeView
                 Grid.Column="0"
-                ItemsSource="{Binding ReportsToMerge}"
-                ChildNodesPath="Items"
-                TreeViewFieldName="Name"
-                SelectedItem="{Binding SelectedClashMergePairItem}" />
+                SelectedItemChanged="TreeView_OnSelectedItemChanged"
+                ItemsSource="{Binding ReportsToMerge}">
+                <TreeView.ItemTemplate>
+                    <HierarchicalDataTemplate
+                        ItemsSource="{Binding Items}">
+                        <TextBlock
+                            Text="{Binding Name}" />
+                    </HierarchicalDataTemplate>
+                </TreeView.ItemTemplate>
+            </TreeView>
 
             <local:ClashMergePairUserControl
                 Grid.Column="1"
                 DataContext="{Binding SelectedClashMergePairItem}"
+                PickElementCommand="{Binding DataContext.PickElementCommand, ElementName=_this}"
+                SelectClashCommand="{Binding SelectClashCommand, ElementName=_this}"
                 ShowCommentsCommand="{Binding ShowCommentsCommand, ElementName=_this}" />
         </Grid>
 
@@ -56,7 +60,7 @@
                 Foreground="Orange"
                 VerticalAlignment="Center"
                 Text="{Binding ErrorText}" />
-            <dx:SimpleButton
+            <Button
                 Content="ОК"
                 Height="25"
                 Width="80"
@@ -64,7 +68,7 @@
                 IsCancel="true"
                 CommandParameter="{Binding}"
                 Command="{Binding ElementName=_this, Path= AcceptMergeCommand}" />
-            <dx:SimpleButton
+            <Button
                 Content="Отмена"
                 Height="25"
                 Width="80"

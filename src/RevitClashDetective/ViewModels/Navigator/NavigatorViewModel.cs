@@ -313,7 +313,7 @@ internal class NavigatorViewModel : BaseViewModel, ISupportServices {
     }
 
     private void StartReportsMerge(ReportSetsIntersectionResult reportsIntersection) {
-        ReportsMergeViewModel = new ReportsMergeViewModel(_localizationService, reportsIntersection);
+        ReportsMergeViewModel = new ReportsMergeViewModel(_revitRepository, _localizationService, reportsIntersection);
         if(ReportsMergeViewModel.ReportsToMerge.All(r => r.Items.Count == 0)) {
             AcceptReportsMergeCommand.Execute(ReportsMergeViewModel);
             return;

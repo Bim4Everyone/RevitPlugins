@@ -1,9 +1,18 @@
 using System.Windows;
+using System.Windows.Controls;
 using System.Windows.Input;
+
+using RevitClashDetective.ViewModels.Navigator;
 
 namespace RevitClashDetective.Views.Navigator;
 
 internal partial class ReportsMergeUserControl {
+    public static readonly DependencyProperty SelectClashCommandProperty = DependencyProperty.Register(
+        nameof(SelectClashCommand),
+        typeof(ICommand),
+        typeof(ReportsMergeUserControl),
+        new PropertyMetadata(default(ICommand)));
+
     public ReportsMergeUserControl() {
         InitializeComponent();
     }
@@ -39,5 +48,19 @@ internal partial class ReportsMergeUserControl {
     public ICommand ShowCommentsCommand {
         get => (ICommand) GetValue(ShowCommentsCommandProperty);
         set => SetValue(ShowCommentsCommandProperty, value);
+    }
+
+    public ICommand SelectClashCommand {
+        get => (ICommand) GetValue(SelectClashCommandProperty);
+        set => SetValue(SelectClashCommandProperty, value);
+    }
+
+    private void TreeView_OnSelectedItemChanged(object sender, RoutedPropertyChangedEventArgs<object> e) {
+        if(sender is TreeView treeView
+           && treeView.DataContext is ReportsMergeViewModel viewModel) {
+            if(e.NewValue is ClashMergePairViewModel pairViewModel) {
+                viewModel.SelectedClashMergePairItem = pairViewModel;
+            }
+        }
     }
 }

@@ -22,6 +22,7 @@
                 <CheckBox
                     IsChecked="{Binding ItemIsSelected, ElementName=_this}" />
                 <TextBlock
+                    VerticalAlignment="Center"
                     Text="{Binding Title, ElementName=_this}" />
             </DockPanel>
             <DockPanel
@@ -30,11 +31,12 @@
                     DockPanel.Dock="Top"
                     Text="Название" />
                 <CheckBox
-                    IsChecked="{Binding ItemNameIsSelected, ElementName=_this}"
-                    DockPanel.Dock="Left" />
+                    DockPanel.Dock="Left"
+                    IsChecked="{Binding ItemNameIsSelected, ElementName=_this}" />
                 <TextBlock
-                    Text="{Binding ClashName}"
-                    DockPanel.Dock="Left" />
+                    DockPanel.Dock="Left"
+                    VerticalAlignment="Center"
+                    Text="{Binding ClashName}" />
             </DockPanel>
             <DockPanel
                 Margin="0 5">
@@ -42,25 +44,31 @@
                     DockPanel.Dock="Top"
                     Text="Статус" />
                 <CheckBox
-                    IsChecked="{Binding ItemStatusIsSelected, ElementName=_this}"
-                    DockPanel.Dock="Left" />
+                    DockPanel.Dock="Left"
+                    IsChecked="{Binding ItemStatusIsSelected, ElementName=_this}" />
                 <TextBlock
-                    Text="{Binding ClashStatus}"
-                    DockPanel.Dock="Left" />
+                    DockPanel.Dock="Left"
+                    VerticalAlignment="Center"
+                    Text="{Binding ClashStatus}" />
             </DockPanel>
             <DockPanel>
                 <TextBlock
                     DockPanel.Dock="Top"
                     Text="Комментарии" />
                 <CheckBox
-                    IsChecked="{Binding ItemCommentsIsSelected, ElementName=_this}"
-                    DockPanel.Dock="Left" />
+                    DockPanel.Dock="Left"
+                    IsChecked="{Binding ItemCommentsIsSelected, ElementName=_this}" />
                 <Button
+                    DockPanel.Dock="Left" 
                     HorizontalAlignment="Left"
-                    Content="{Binding Comments.Count, StringFormat='{}{0} 💬'}"
                     Command="{Binding ShowCommentsCommand, ElementName=_this}"
-                    CommandParameter="{Binding}"
-                    DockPanel.Dock="Left" />
+                    CommandParameter="{Binding}">
+                    <Button.Content>
+                        <TextBlock
+                            VerticalAlignment="Center"
+                            Text="{Binding Comments.Count, StringFormat='{}{0} 💬'}" />
+                    </Button.Content>
+                </Button>
             </DockPanel>
         </StackPanel>
     </Border>

@@ -6,7 +6,6 @@
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:local="clr-namespace:RevitClashDetective.Views.Navigator"
     xmlns:vm="clr-namespace:RevitClashDetective.ViewModels.Navigator"
-    xmlns:dxe="http://schemas.devexpress.com/winfx/2008/xaml/editors"
     xmlns:m="clr-namespace:RevitClashDetective.Models.Clashes"
     mc:Ignorable="d"
     d:DesignHeight="300"
@@ -86,22 +85,26 @@
                         <TextBlock
                             DockPanel.Dock="Top"
                             Text="Статус" />
-                        <dxe:ComboBoxEdit
+                        <ComboBox
                             Width="150"
-                            IsTextEditable="False"
-                            EditMode="InplaceActive"
-                            EditValue="{Binding ClashStatus, UpdateSourceTrigger=PropertyChanged}"
+                            IsEditable="False"
+                            SelectedValue="{Binding ClashStatus, UpdateSourceTrigger=PropertyChanged}"
                             ItemsSource="{StaticResource ClashStatuses}" />
                     </DockPanel>
                     <DockPanel>
                         <TextBlock
                             DockPanel.Dock="Top"
                             Text="Комментарии" />
-                        <!-- TODO -->
                         <Button
-                            Content="{Binding Comments.Count, StringFormat='{}{0} 💬'}"
+                            HorizontalAlignment="Left"
                             CommandParameter="{Binding}"
-                            Command="{Binding ShowCommentsCommand, ElementName=_this}" />
+                            Command="{Binding ShowCommentsCommand, ElementName=_this}">
+                            <Button.Content>
+                                <TextBlock
+                                    VerticalAlignment="Center"
+                                    Text="{Binding Comments.Count, StringFormat='{}{0} 💬'}" />
+                            </Button.Content>
+                        </Button>
                     </DockPanel>
                 </DockPanel>
             </StackPanel>
@@ -116,9 +119,89 @@
             CornerRadius="4"
             Padding="14 8">
             <StackPanel>
-                <TextBlock
-                    Text="Информация об элементах коллизии" />
-                <!-- TODO -->
+                <DockPanel
+                    Margin="0 0 0 5">
+                    <TextBlock
+                        Text="Информация о коллизии" />
+                    <Button
+                        Margin="5 0 0 0"
+                        HorizontalAlignment="Left"
+                        Content="Выбрать"
+                        CommandParameter="{Binding Existing}"
+                        Command="{Binding SelectClashCommand, ElementName=_this}" />
+                </DockPanel>
+                <DockPanel>
+                    <DockPanel.Resources>
+                        <Style
+                            TargetType="StackPanel">
+                            <Setter
+                                Property="Margin"
+                                Value="0 0 8 0" />
+                        </Style>
+                        <Style
+                            TargetType="TextBlock">
+                            <Setter
+                                Property="Margin"
+                                Value="0 0 0 5" />
+                        </Style>
+                    </DockPanel.Resources>
+                    <StackPanel>
+                        <TextBlock
+                            Text="Файл 1" />
+                        <TextBlock
+                            Text="{Binding Existing.Clash.MainElement.DocumentName}" />
+                    </StackPanel>
+                    <StackPanel>
+                        <TextBlock
+                            Text="Категория 1" />
+                        <TextBlock
+                            Text="{Binding Existing.Clash.MainElement.Category}" />
+                    </StackPanel>
+                    <StackPanel>
+                        <TextBlock
+                            Text="Семейство 1" />
+                        <TextBlock
+                            Text="{Binding Existing.Clash.MainElement.FamilyName}" />
+                    </StackPanel>
+                    <StackPanel>
+                        <TextBlock
+                            Text="Id 1" />
+                        <Button
+                            HorizontalAlignment="Left"
+                            CommandParameter="{Binding Existing.Clash.MainElement}"
+                            Command="{Binding PickElementCommand, ElementName=_this}"
+                            Content="{Binding Existing.Clash.MainElement.Id}" />
+                    </StackPanel>
+                    <StackPanel
+                        Margin="8 0 0 0" />
+                    <StackPanel>
+                        <TextBlock
+                            Text="Файл 2" />
+                        <TextBlock
+                            Text="{Binding Existing.Clash.OtherElement.DocumentName}" />
+                    </StackPanel>
+                    <StackPanel>
+                        <TextBlock
+                            Text="Категория 2" />
+                        <TextBlock
+                            Text="{Binding Existing.Clash.OtherElement.Category}" />
+                    </StackPanel>
+                    <StackPanel>
+                        <TextBlock
+                            Text="Семейство 2" />
+                        <TextBlock
+                            Text="{Binding Existing.Clash.OtherElement.FamilyName}" />
+                    </StackPanel>
+                    <StackPanel>
+                        <TextBlock
+                            Text="Id 2" />
+                        <Button
+                            HorizontalAlignment="Left"
+                            CommandParameter="{Binding Existing.Clash.OtherElement}"
+                            Command="{Binding PickElementCommand, ElementName=_this}"
+                            Content="{Binding Existing.Clash.OtherElement.Id}" />
+                    </StackPanel>
+                </DockPanel>
             </StackPanel>
         </Border>
     </Grid>

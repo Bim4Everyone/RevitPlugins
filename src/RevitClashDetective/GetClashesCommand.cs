@@ -63,6 +63,6 @@ public class GetClashesCommand : BasePluginCommand {
             $"/{assemblyName};component/assets/Localization/Language.xaml",
             CultureInfo.GetCultureInfo("ru-RU"));
 
-        kernel.Get<NavigatorWindow>().ShowDialog(); // TODO
+        kernel.Get<NavigatorWindow>().Show();
     }
 }

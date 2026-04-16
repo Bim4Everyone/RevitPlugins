@@ -159,6 +159,7 @@
             AcceptMergeCommand="{Binding ElementName=_this, Path=DataContext.AcceptReportsMergeCommand}"
             CancelMergeCommand="{Binding ElementName=_this, Path=DataContext.CancelReportsMergeCommand}"
             ShowCommentsCommand="{Binding ElementName=_this, Path=DataContext.ShowCommentsCommand}"
+            SelectClashCommand="{Binding ElementName=_this, Path=DataContext.SelectClashCommand}"
             Visibility="{Binding ElementName=_this,
                 Path=DataContext.ShowReportsMergeView, 
                 Converter={StaticResource ReportsMergeVisibilityConverter}}" />
