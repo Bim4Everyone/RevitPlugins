@@ -43,7 +43,7 @@ internal sealed class CategoryViewModel : BaseViewModel, IElementIndexList {
     }
 
     public ObservableCollection<DefinitionViewModel> Definitions { get; } = [];
-    
+
     #region IElementIndex
 
     public void Add(Element element) {
@@ -58,7 +58,7 @@ internal sealed class CategoryViewModel : BaseViewModel, IElementIndexList {
         if(!_definitionKeys.ContainsKey(element.Id)) {
             _definitionKeys.Add(element.Id, new HashSet<Definition>(DefinitionNameComparer.Instance));
         }
-        
+
         if(IsLoaded) {
             var elementParams = element.Parameters
                 .OfType<Parameter>()
@@ -71,7 +71,7 @@ internal sealed class CategoryViewModel : BaseViewModel, IElementIndexList {
                 param.Add(element, elementParam.GetValueOrDefault());
             }
         }
-        
+
         OnPropertyChanged(nameof(Count));
     }
 
@@ -83,8 +83,6 @@ internal sealed class CategoryViewModel : BaseViewModel, IElementIndexList {
         _elementsById.Remove(elementId);
         _definitionKeys.Remove(elementId);
         try {
-
-
             foreach(var definition in definitions) {
                 if(_definitions.TryGetValue(definition, out var definitionViewModel)) {
                     definitionViewModel.Remove(elementId);
@@ -126,12 +124,9 @@ internal sealed class CategoryViewModel : BaseViewModel, IElementIndexList {
     #region LoadParamsCommand
 
     private void LoadParams() {
-        try {
-            foreach(var element in _elementsById.Values.ToArray()) {
-                Add(element);
-            }
-        } finally {
-            IsLoaded = true;
+        IsLoaded = true;
+        foreach(var element in _elementsById.Values.ToArray()) {
+            Add(element);
         }
     }
 
