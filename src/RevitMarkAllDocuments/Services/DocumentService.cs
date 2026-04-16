@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -12,9 +13,22 @@ internal class DocumentService {
     public string GetDocumentFullName(Document document) {
         if(document.IsWorkshared) {
             var modelPath = document.GetWorksharingCentralModelPath();
-            return ModelPathUtils.ConvertModelPathToUserVisiblePath(modelPath);
+            string path = ModelPathUtils.ConvertModelPathToUserVisiblePath(modelPath);
+
+            return ExtractFileName(path);
         } else {
-            return document.Title;
+            return Path.GetFileNameWithoutExtension(document.Title);
         }
+    }
+
+    private string ExtractFileName(string path) {
+        if(string.IsNullOrEmpty(path))
+            return string.Empty;
+
+        path = path.Replace('\\', '/');
+
+        string lastSegment = path.Split('/').LastOrDefault();
+
+        return Path.GetFileNameWithoutExtension(lastSegment);
     }
 }
