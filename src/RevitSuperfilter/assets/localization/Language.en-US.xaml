@@ -18,5 +18,11 @@
     <system:String x:Key="WideControl.SearchParams">Search parameters</system:String>
     <system:String x:Key="WideControl.SearchElements">Search elements</system:String>
     
-    <system:String x:Key="Categories.CategoryKey">Noname</system:String>
+    <system:String x:Key="Category.DefaultName">Noname</system:String>
+    <system:String x:Key="Definition.DefaultName">Noname</system:String>
+    <system:String x:Key="ParamValue.DefaultName">&lt;None&gt;</system:String>
+    
+    <system:String x:Key="Category.EmptyName">Noname</system:String>
+    <system:String x:Key="Definition.EmptyName">Noname</system:String>
+    <system:String x:Key="ParamValue.EmptyName">&lt;Empty&gt;</system:String>
 </ResourceDictionary>

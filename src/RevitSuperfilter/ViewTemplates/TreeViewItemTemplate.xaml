@@ -2,13 +2,19 @@
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
                     xmlns:vms="clr-namespace:RevitSuperfilter.ViewModels"
                     xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
-                    xmlns:behaviours="clr-namespace:RevitSuperfilter.Behaviours">
+                    xmlns:behaviours="clr-namespace:RevitSuperfilter.Behaviours"
+                    xmlns:converters="clr-namespace:RevitSuperfilter.Converters">
 
     <ResourceDictionary.MergedDictionaries>
         <ResourceDictionary
             Source="pack://application:,,,/Wpf.Ui;component/Controls/TreeView/TreeViewItem.xaml" />
+       
         <ResourceDictionary
             Source="pack://application:,,,/Wpf.Ui;component/Controls/ListView/ListViewItem.xaml" />
+
+        <ResourceDictionary>
+            <converters:DisplayValueConverter x:Key="LocalizationValueConverter" />
+        </ResourceDictionary>
     </ResourceDictionary.MergedDictionaries>
 
     <DataTemplate
@@ -30,8 +36,14 @@
                 IsChecked="{Binding IsChecked}" />
 
             <ui:TextBlock
-                VerticalAlignment="Center"
-                Text="{Binding DisplayValue}" />
+                VerticalAlignment="Center">
+                <ui:TextBlock.Text>
+                    <MultiBinding Converter="{StaticResource LocalizationValueConverter}">
+                        <Binding />
+                        <Binding RelativeSource="{RelativeSource Self}" />
+                    </MultiBinding>
+                </ui:TextBlock.Text>
+            </ui:TextBlock>
         </DockPanel>
     </DataTemplate>
 

@@ -18,5 +18,11 @@
     <system:String x:Key="WideControl.SearchParams">Поиск параметров</system:String>
     <system:String x:Key="WideControl.SearchElements">Поиск элементов</system:String>
     
-    <system:String x:Key="Categories.CategoryKey">Без имени</system:String>
+    <system:String x:Key="Category.DefaultName">Без имени</system:String>
+    <system:String x:Key="Definition.DefaultName">Без имени</system:String>
+    <system:String x:Key="ParamValue.DefaultName">&lt;Отсутствует&gt;</system:String>
+    
+    <system:String x:Key="Category.EmptyValue">Без имени</system:String>
+    <system:String x:Key="Definition.EmptyValue">Без имени</system:String>
+    <system:String x:Key="ParamValue.EmptyValue">&lt;Пусто&gt;</system:String>
 </ResourceDictionary>
