@@ -17,55 +17,49 @@
     x:Name="_this"
     d:DataContext="{d:DesignInstance vm:ClashMergePairViewModel, IsDesignTimeCreatable=False}">
     <UserControl.Resources>
-        <x:Array
-            x:Key="ClashStatuses"
-            Type="{x:Type m:ClashStatus}">
-            <m:ClashStatus>Active</m:ClashStatus>
-            <m:ClashStatus>Analized</m:ClashStatus>
-            <m:ClashStatus>Solved</m:ClashStatus>
-        </x:Array>
-        <Style
-            TargetType="TextBlock">
-            <Setter
-                Property="VerticalAlignment"
-                Value="Center" />
-        </Style>
-        <Style
-            TargetType="Label">
-            <Setter
-                Property="Margin"
-                Value="0 0 0 4" />
-            <Setter
-                Property="VerticalAlignment"
-                Value="Center" />
-            <Setter
-                Property="VerticalContentAlignment"
-                Value="Center" />
-            <Setter
-                Property="FontWeight"
-                Value="SemiBold" />
-        </Style>
-        <Style
-            TargetType="Button">
-            <Setter
-                Property="HorizontalAlignment"
-                Value="Left" />
-            <Setter
-                Property="Height"
-                Value="25" />
-        </Style>
-        <converters:ObjectToObjectConverter
-            x:Key="ClashStatusToImageConverter">
-            <converters:CoupleItem
-                Source="{x:Static m:ClashStatus.Active}"
-                Target="pack://application:,,,/DevExpress.Images.v21.2;component/Images/XAF/State_Priority_High.png" />
-            <converters:CoupleItem
-                Source="{x:Static m:ClashStatus.Analized}"
-                Target="pack://application:,,,/DevExpress.Images.v21.2;component/Images/XAF/State_Priority_Low.png" />
-            <converters:CoupleItem
-                Source="{x:Static m:ClashStatus.Solved}"
-                Target="pack://application:,,,/DevExpress.Images.v21.2;component/Images/XAF/State_Priority_Normal.png" />
-        </converters:ObjectToObjectConverter>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary
+                    Source="../../Resources/ClashStatusResources.xaml" />
+            </ResourceDictionary.MergedDictionaries>
+            <x:Array
+                x:Key="ClashStatuses"
+                Type="{x:Type m:ClashStatus}">
+                <m:ClashStatus>Active</m:ClashStatus>
+                <m:ClashStatus>Analized</m:ClashStatus>
+                <m:ClashStatus>Solved</m:ClashStatus>
+            </x:Array>
+            <Style
+                TargetType="TextBlock">
+                <Setter
+                    Property="VerticalAlignment"
+                    Value="Center" />
+            </Style>
+            <Style
+                TargetType="Label">
+                <Setter
+                    Property="Margin"
+                    Value="0 0 0 4" />
+                <Setter
+                    Property="VerticalAlignment"
+                    Value="Center" />
+                <Setter
+                    Property="VerticalContentAlignment"
+                    Value="Center" />
+                <Setter
+                    Property="FontWeight"
+                    Value="SemiBold" />
+            </Style>
+            <Style
+                TargetType="Button">
+                <Setter
+                    Property="HorizontalAlignment"
+                    Value="Left" />
+                <Setter
+                    Property="Height"
+                    Value="25" />
+            </Style>
+        </ResourceDictionary>
     </UserControl.Resources>
     <Grid>
         <TextBlock

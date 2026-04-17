@@ -40,10 +40,10 @@
                 Value="Stretch" />
             <Setter
                 Property="ScrollViewer.HorizontalScrollBarVisibility"
-                Value="Auto" />
+                Value="Visible" />
             <Setter
                 Property="ScrollViewer.VerticalScrollBarVisibility"
-                Value="Disabled" />
+                Value="Visible" />
         </Style>
     </UserControl.Resources>
     <Grid>
@@ -77,7 +77,7 @@
                         Text="Отчеты, требующие внимания" />
                     <TreeView
                         SelectedItemChanged="TreeView_OnSelectedItemChanged"
-                        ItemsSource="{Binding ReportsToMerge}">
+                        ItemsSource="{Binding VisibleReports}">
                         <TreeView.ItemTemplate>
                             <HierarchicalDataTemplate
                                 ItemsSource="{Binding Items}">

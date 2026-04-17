@@ -45,6 +45,9 @@ internal class ReportMergePairViewModel : BaseViewModel {
     /// </summary>
     public ICollection<ClashMergeCollection> Items { get; }
 
+    /// <summary>
+    /// Суммарное количество коллизий, видимых пользователю
+    /// </summary>
     public int ClashesCount { get; }
 
     public ReportViewModel GetResultReport() {

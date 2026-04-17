@@ -17,21 +17,23 @@ namespace RevitClashDetective.ViewModels.Navigator;
 internal class ReportsMergeViewModel : BaseViewModel {
     private readonly RevitRepository _revitRepository;
     private readonly ILocalizationService _localization;
-    private readonly ReportSetsIntersectionResult _reportsIntersection;
+    private readonly ReportSetsIntersectionResult _reportsMerging;
+    private readonly ReportMergePairViewModel[] _allMergePairs;
     private ClashMergePairViewModel _selectedClashMergePairItem;
 
     public ReportsMergeViewModel(
         RevitRepository revitRepository,
         ILocalizationService localization,
-        ReportSetsIntersectionResult reportsIntersection
+        ReportSetsIntersectionResult reportsMerging
     ) {
         _revitRepository = revitRepository ?? throw new ArgumentNullException(nameof(revitRepository));
         _localization = localization ?? throw new ArgumentNullException(nameof(localization));
-        _reportsIntersection = reportsIntersection ?? throw new ArgumentNullException(nameof(reportsIntersection));
+        _reportsMerging = reportsMerging ?? throw new ArgumentNullException(nameof(reportsMerging));
 
-        ReportsToMerge = [
-            .._reportsIntersection.GetMergePairs().Select(p => new ReportMergePairViewModel(_localization, p))
+        _allMergePairs = [
+            .._reportsMerging.GetMergePairs().Select(p => new ReportMergePairViewModel(_localization, p))
         ];
+        VisibleReports = [.._allMergePairs.Where(p => p.ClashesCount > 0)];
         AcceptMergeCommand = RelayCommand.Create(() => { }, CanAcceptMerge);
         PickElementCommand = RelayCommand.Create<ElementModel>(PickElement, CanPickElement);
     }
@@ -40,7 +42,7 @@ internal class ReportsMergeViewModel : BaseViewModel {
 
     public ICommand PickElementCommand { get; }
 
-    public ObservableCollection<ReportMergePairViewModel> ReportsToMerge { get; }
+    public ICollection<ReportMergePairViewModel> VisibleReports { get; }
 
     public ClashMergePairViewModel SelectedClashMergePairItem {
         get => _selectedClashMergePairItem;
@@ -53,9 +55,9 @@ internal class ReportsMergeViewModel : BaseViewModel {
         }
 
         List<ReportViewModel> result = [
-            .._reportsIntersection.LeftOuterSet.Reports, .. _reportsIntersection.RightOuterSet.Reports
+            .._reportsMerging.LeftOuterSet.Reports, .. _reportsMerging.RightOuterSet.Reports
         ];
-        result.AddRange(ReportsToMerge.Select(p => p.GetResultReport()));
+        result.AddRange(_allMergePairs.Select(p => p.GetResultReport()));
         return result;
     }
 

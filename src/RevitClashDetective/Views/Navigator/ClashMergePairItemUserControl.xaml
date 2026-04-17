@@ -16,18 +16,12 @@
     d:DataContext="{d:DesignInstance vm:ClashViewModel, IsDesignTimeCreatable=False}">
     <!-- UserControl для отображения варианта коллизии (существующий/импортируемый) в окне мержа отчетов -->
     <UserControl.Resources>
-        <converters:ObjectToObjectConverter
-            x:Key="ClashStatusToImageConverter">
-            <converters:CoupleItem
-                Source="{x:Static m:ClashStatus.Active}"
-                Target="pack://application:,,,/DevExpress.Images.v21.2;component/Images/XAF/State_Priority_High.png" />
-            <converters:CoupleItem
-                Source="{x:Static m:ClashStatus.Analized}"
-                Target="pack://application:,,,/DevExpress.Images.v21.2;component/Images/XAF/State_Priority_Low.png" />
-            <converters:CoupleItem
-                Source="{x:Static m:ClashStatus.Solved}"
-                Target="pack://application:,,,/DevExpress.Images.v21.2;component/Images/XAF/State_Priority_Normal.png" />
-        </converters:ObjectToObjectConverter>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary
+                    Source="../../Resources/ClashStatusResources.xaml" />
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
     </UserControl.Resources>
     <StackPanel>
         <DockPanel>
