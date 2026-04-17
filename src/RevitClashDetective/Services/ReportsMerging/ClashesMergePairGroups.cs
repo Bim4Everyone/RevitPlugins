@@ -62,24 +62,15 @@ internal class ClashesMergePairGroups {
             }
 
             if(HasNoConflicts(pair.Existing, pair.Importing)) {
+                pair.ExistingClashSelected = true;
                 if(NameIsChanged(pair.Existing, pair.Importing)) {
-                    pair.ImportingClashSelected = true;
+                    pair.ImportingNameSelected = true;
                 }
-
-                if(NameIsChanged(pair.Importing, pair.Existing)) {
-                    pair.ExistingClashSelected = true;
-                }
-
                 if(StatusIsChanged(pair.Existing, pair.Importing)) {
-                    pair.ImportingClashSelected = true;
-                }
-
-                if(StatusIsChanged(pair.Importing, pair.Existing)) {
-                    pair.ExistingClashSelected = true;
+                    pair.ImportingStatusSelected = true;
                 }
 
                 // комментарии по умолчанию объединяются
-                pair.ExistingCommentsSelected = true;
                 pair.ImportingCommentsSelected = true;
                 NonConflicted.Add(pair);
                 continue;
@@ -115,8 +106,8 @@ internal class ClashesMergePairGroups {
     }
 
     private bool HasNoConflicts(ClashViewModel left, ClashViewModel right) {
-        return (HasDefaultName(left) ^ HasDefaultName(right))
-               && (HasDefaultStatus(left) ^ HasDefaultStatus(right));
+        return ((HasDefaultName(left) ^ HasDefaultName(right)) || (left.ClashName == right.ClashName))
+               && ((HasDefaultStatus(left) ^ HasDefaultStatus(right)) || (left.ClashStatus == right.ClashStatus));
     }
 
     private bool IsEqual(ClashViewModel left, ClashViewModel right) {
