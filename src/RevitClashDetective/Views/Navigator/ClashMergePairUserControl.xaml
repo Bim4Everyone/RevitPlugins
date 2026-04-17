@@ -7,6 +7,8 @@
     xmlns:local="clr-namespace:RevitClashDetective.Views.Navigator"
     xmlns:vm="clr-namespace:RevitClashDetective.ViewModels.Navigator"
     xmlns:m="clr-namespace:RevitClashDetective.Models.Clashes"
+    xmlns:dxi="http://schemas.devexpress.com/winfx/2008/xaml/core/internal"
+    xmlns:dxt="http://schemas.devexpress.com/winfx/2008/xaml/core/themekeys"
     mc:Ignorable="d"
     d:DesignHeight="300"
     d:DesignWidth="300"
@@ -20,8 +22,53 @@
             <m:ClashStatus>Analized</m:ClashStatus>
             <m:ClashStatus>Solved</m:ClashStatus>
         </x:Array>
+        <Style
+            TargetType="Border"
+            x:Key="DxBorder">
+            <Setter
+                Property="Background"
+                Value="{dxi:ThemeResource {dxt:PaletteBrushThemeKey ResourceKey=Backstage.Background}}" />
+            <Setter
+                Property="BorderBrush"
+                Value="{dxi:ThemeResource {dxt:PaletteBrushThemeKey ResourceKey=Border}}" />
+            <Setter
+                Property="BorderThickness"
+                Value="1" />
+            <Setter
+                Property="CornerRadius"
+                Value="4" />
+            <Setter
+                Property="Padding"
+                Value="14 8" />
+            <Setter
+                Property="VerticalAlignment"
+                Value="Stretch" />
+            <Setter
+                Property="HorizontalAlignment"
+                Value="Stretch" />
+            <Setter
+                Property="ScrollViewer.HorizontalScrollBarVisibility"
+                Value="Auto" />
+            <Setter
+                Property="ScrollViewer.VerticalScrollBarVisibility"
+                Value="Disabled" />
+        </Style>
     </UserControl.Resources>
     <Grid>
+        <Grid.Style>
+            <Style
+                TargetType="Grid">
+                <Style.Triggers>
+                    <DataTrigger
+                        Binding="{Binding}"
+                        Value="{x:Null}">
+                        <Setter
+                            Property="Visibility"
+                            Value="Collapsed" />
+                    </DataTrigger>
+                </Style.Triggers>
+            </Style>
+        </Grid.Style>
         <Grid.ColumnDefinitions>
             <ColumnDefinition />
             <ColumnDefinition />
@@ -35,42 +82,47 @@
                 Height="1*" />
         </Grid.RowDefinitions>
 
-        <local:ClashMergePairItemUserControl
+        <Border
             Grid.Row="0"
             Grid.Column="0"
-            Title="Существующая версия"
-            DataContext="{Binding Existing}"
-            ItemIsSelected="{Binding DataContext.ExistingClashSelected, ElementName=_this, UpdateSourceTrigger=PropertyChanged}"
-            ItemNameIsSelected="{Binding DataContext.ExistingNameSelected, ElementName=_this, UpdateSourceTrigger=PropertyChanged}"
-            ItemStatusIsSelected="{Binding DataContext.ExistingStatusSelected, ElementName=_this, UpdateSourceTrigger=PropertyChanged}"
-            ItemCommentsIsSelected="{Binding DataContext.ExistingCommentsSelected, ElementName=_this, UpdateSourceTrigger=PropertyChanged}"
-            ShowCommentsCommand="{Binding ShowCommentsCommand, ElementName=_this}" />
+            Margin="0 0 2 0"
+            Style="{StaticResource DxBorder}">
+            <local:ClashMergePairItemUserControl
+                Title="Существующая версия"
+                DataContext="{Binding Existing}"
+                ItemIsSelected="{Binding DataContext.ExistingClashSelected, ElementName=_this, UpdateSourceTrigger=PropertyChanged}"
+                ItemNameIsSelected="{Binding DataContext.ExistingNameSelected, ElementName=_this, UpdateSourceTrigger=PropertyChanged}"
+                ItemStatusIsSelected="{Binding DataContext.ExistingStatusSelected, ElementName=_this, UpdateSourceTrigger=PropertyChanged}"
+                ItemCommentsIsSelected="{Binding DataContext.ExistingCommentsSelected, ElementName=_this, UpdateSourceTrigger=PropertyChanged}"
+                ShowCommentsCommand="{Binding ShowCommentsCommand, ElementName=_this}" />
+        </Border>
 
-        <local:ClashMergePairItemUserControl
+        <Border
             Grid.Row="0"
             Grid.Column="1"
-            Title="Импортируемая версия"
-            DataContext="{Binding Importing}"
-            ItemIsSelected="{Binding DataContext.ImportingClashSelected, ElementName=_this, UpdateSourceTrigger=PropertyChanged}"
-            ItemNameIsSelected="{Binding DataContext.ImportingNameSelected, ElementName=_this, UpdateSourceTrigger=PropertyChanged}"
-            ItemStatusIsSelected="{Binding DataContext.ImportingStatusSelected, ElementName=_this, UpdateSourceTrigger=PropertyChanged}"
-            ItemCommentsIsSelected="{Binding DataContext.ImportingCommentsSelected, ElementName=_this, UpdateSourceTrigger=PropertyChanged}"
-            ShowCommentsCommand="{Binding ShowCommentsCommand, ElementName=_this}" />
+            Margin="2 0 0 0"
+            Style="{StaticResource DxBorder}">
+            <local:ClashMergePairItemUserControl
+                Title="Импортируемая версия"
+                DataContext="{Binding Importing}"
+                ItemIsSelected="{Binding DataContext.ImportingClashSelected, ElementName=_this, UpdateSourceTrigger=PropertyChanged}"
+                ItemNameIsSelected="{Binding DataContext.ImportingNameSelected, ElementName=_this, UpdateSourceTrigger=PropertyChanged}"
+                ItemStatusIsSelected="{Binding DataContext.ImportingStatusSelected, ElementName=_this, UpdateSourceTrigger=PropertyChanged}"
+                ItemCommentsIsSelected="{Binding DataContext.ImportingCommentsSelected, ElementName=_this, UpdateSourceTrigger=PropertyChanged}"
+                ShowCommentsCommand="{Binding ShowCommentsCommand, ElementName=_this}" />
+        </Border>
 
         <Border
             Grid.Row="1"
             Grid.Column="0"
             Grid.ColumnSpan="2"
-            Margin="0 5"
-            BorderBrush="Black"
-            BorderThickness="1"
-            CornerRadius="4"
-            Padding="14 8">
+            Margin="0 4"
+            Style="{StaticResource DxBorder}">
             <StackPanel>
                 <TextBlock
                     Text="Итоговый вариант" />
                 <DockPanel
-                    Margin="0 5 0 0">
+                    Margin="0 4 0 0">
                     <DockPanel>
                         <TextBlock
                             DockPanel.Dock="Top"
@@ -81,7 +133,7 @@
                             Text="{Binding ClashName, UpdateSourceTrigger=PropertyChanged}" />
                     </DockPanel>
                     <DockPanel
-                        Margin="5 0">
+                        Margin="4 0">
                         <TextBlock
                             DockPanel.Dock="Top"
                             Text="Статус" />
@@ -114,17 +166,14 @@
             Grid.Row="2"
             Grid.Column="0"
             Grid.ColumnSpan="2"
-            BorderBrush="Black"
-            BorderThickness="1"
-            CornerRadius="4"
-            Padding="14 8">
+            Style="{StaticResource DxBorder}">
             <StackPanel>
                 <DockPanel
-                    Margin="0 0 0 5">
+                    Margin="0 0 0 4">
                     <TextBlock
                         Text="Информация о коллизии" />
                     <Button
-                        Margin="5 0 0 0"
+                        Margin="4 0 0 0"
                         HorizontalAlignment="Left"
                         Content="Выбрать"
                         CommandParameter="{Binding Existing}"
@@ -141,33 +190,53 @@
                         <Style
                             TargetType="TextBlock">
                             <Setter
+                                Property="VerticalAlignment"
+                                Value="Center" />
+                        </Style>
+                        <Style
+                            TargetType="Label">
+                            <Setter
                                 Property="Margin"
-                                Value="0 0 0 5" />
+                                Value="0 0 0 4" />
+                            <Setter
+                                Property="VerticalAlignment"
+                                Value="Center" />
+                            <Setter
+                                Property="FontWeight"
+                                Value="SemiBold" />
+                        </Style>
+                        <Style
+                            TargetType="Button">
+                            <Setter
+                                Property="HorizontalAlignment"
+                                Value="Left" />
+                            <Setter
+                                Property="Height"
+                                Value="25" />
                         </Style>
                     </DockPanel.Resources>
                     <StackPanel>
-                        <TextBlock
-                            Text="Файл 1" />
+                        <Label
+                            Content="Файл 1" />
                         <TextBlock
                             Text="{Binding Existing.Clash.MainElement.DocumentName}" />
                     </StackPanel>
                     <StackPanel>
-                        <TextBlock
-                            Text="Категория 1" />
+                        <Label
+                            Content="Категория 1" />
                         <TextBlock
                             Text="{Binding Existing.Clash.MainElement.Category}" />
                     </StackPanel>
                     <StackPanel>
-                        <TextBlock
-                            Text="Семейство 1" />
+                        <Label
+                            Content="Семейство 1" />
                         <TextBlock
                             Text="{Binding Existing.Clash.MainElement.FamilyName}" />
                     </StackPanel>
                     <StackPanel>
-                        <TextBlock
-                            Text="Id 1" />
+                        <Label
+                            Content="Id 1" />
                         <Button
-                            HorizontalAlignment="Left"
                             CommandParameter="{Binding Existing.Clash.MainElement}"
                             Command="{Binding PickElementCommand, ElementName=_this}"
                             Content="{Binding Existing.Clash.MainElement.Id}" />
@@ -175,28 +244,27 @@
                     <StackPanel
                         Margin="8 0 0 0" />
                     <StackPanel>
-                        <TextBlock
-                            Text="Файл 2" />
+                        <Label
+                            Content="Файл 2" />
                         <TextBlock
                             Text="{Binding Existing.Clash.OtherElement.DocumentName}" />
                     </StackPanel>
                     <StackPanel>
-                        <TextBlock
-                            Text="Категория 2" />
+                        <Label
+                            Content="Категория 2" />
                         <TextBlock
                             Text="{Binding Existing.Clash.OtherElement.Category}" />
                     </StackPanel>
                     <StackPanel>
-                        <TextBlock
-                            Text="Семейство 2" />
+                        <Label
+                            Content="Семейство 2" />
                         <TextBlock
                             Text="{Binding Existing.Clash.OtherElement.FamilyName}" />
                     </StackPanel>
                     <StackPanel>
-                        <TextBlock
-                            Text="Id 2" />
+                        <Label
+                            Content="Id 2" />
                         <Button
-                            HorizontalAlignment="Left"
                             CommandParameter="{Binding Existing.Clash.OtherElement}"
                             Command="{Binding PickElementCommand, ElementName=_this}"
                             Content="{Binding Existing.Clash.OtherElement.Id}" />

@@ -17,6 +17,7 @@ internal class ClashMergeCollection {
 
         Name = name;
         Items = new ReadOnlyCollection<ClashMergePairViewModel>(items.ToArray());
+        ClashesCount = Items.Count;
     }
 
     public string Name { get; }
@@ -25,4 +26,6 @@ internal class ClashMergeCollection {
     /// Коллизии, которые будут видны пользователю
     /// </summary>
     public ICollection<ClashMergePairViewModel> Items { get; }
+
+    public int ClashesCount { get; }
 }

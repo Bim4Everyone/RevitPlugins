@@ -6,6 +6,8 @@
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:local="clr-namespace:RevitClashDetective.Views.Navigator"
     xmlns:vm="clr-namespace:RevitClashDetective.ViewModels.Navigator"
+    xmlns:dxi="http://schemas.devexpress.com/winfx/2008/xaml/core/internal"
+    xmlns:dxt="http://schemas.devexpress.com/winfx/2008/xaml/core/themekeys"
     mc:Ignorable="d"
     d:DesignHeight="300"
     d:DesignWidth="300"
@@ -13,7 +15,37 @@
     x:Name="_this"
     d:DataContext="{d:DesignInstance vm:ReportsMergeViewModel, IsDesignTimeCreatable=False}">
     <UserControl.Resources>
-
+        <Style
+            TargetType="Border"
+            x:Key="DxBorder">
+            <Setter
+                Property="Background"
+                Value="{dxi:ThemeResource {dxt:PaletteBrushThemeKey ResourceKey=Backstage.Background}}" />
+            <Setter
+                Property="BorderBrush"
+                Value="{dxi:ThemeResource {dxt:PaletteBrushThemeKey ResourceKey=Border}}" />
+            <Setter
+                Property="BorderThickness"
+                Value="1" />
+            <Setter
+                Property="CornerRadius"
+                Value="4" />
+            <Setter
+                Property="Padding"
+                Value="14 8" />
+            <Setter
+                Property="VerticalAlignment"
+                Value="Stretch" />
+            <Setter
+                Property="HorizontalAlignment"
+                Value="Stretch" />
+            <Setter
+                Property="ScrollViewer.HorizontalScrollBarVisibility"
+                Value="Auto" />
+            <Setter
+                Property="ScrollViewer.VerticalScrollBarVisibility"
+                Value="Disabled" />
+        </Style>
     </UserControl.Resources>
     <Grid>
         <Grid.RowDefinitions>
@@ -27,34 +59,64 @@
             Grid.Row="0">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition
-                    Width="300" />
-                <ColumnDefinition />
+                    Width="1*"
+                    MinWidth="300" />
+                <ColumnDefinition
+                    Width="Auto" />
+                <ColumnDefinition
+                    Width="2*"
+                    MinWidth="300" />
             </Grid.ColumnDefinitions>
 
-            <TreeView
+            <Border
                 Grid.Column="0"
-                SelectedItemChanged="TreeView_OnSelectedItemChanged"
-                ItemsSource="{Binding ReportsToMerge}">
-                <TreeView.ItemTemplate>
-                    <HierarchicalDataTemplate
-                        ItemsSource="{Binding Items}">
-                        <TextBlock
-                            Text="{Binding Name}" />
-                    </HierarchicalDataTemplate>
-                </TreeView.ItemTemplate>
-            </TreeView>
+                Style="{StaticResource DxBorder}">
+                <DockPanel
+                    LastChildFill="True">
+                    <TextBlock
+                        DockPanel.Dock="Top"
+                        Margin="0 0 0 4"
+                        Text="Отчеты, требующие внимания" />
+                    <TreeView
+                        SelectedItemChanged="TreeView_OnSelectedItemChanged"
+                        ItemsSource="{Binding ReportsToMerge}">
+                        <TreeView.ItemTemplate>
+                            <HierarchicalDataTemplate
+                                ItemsSource="{Binding Items}">
+                                <DockPanel>
+                                    <TextBlock
+                                        ToolTip="{Binding Name}"
+                                        Text="{Binding Name}" />
+                                    <TextBlock
+                                        Margin="4 0 0 0"
+                                        Text="{Binding ClashesCount, StringFormat='({0})'}" />
+                                </DockPanel>
+                            </HierarchicalDataTemplate>
+                        </TreeView.ItemTemplate>
+                    </TreeView>
+                </DockPanel>
+            </Border>
 
-            <local:ClashMergePairUserControl
+            <GridSplitter
                 Grid.Column="1"
-                DataContext="{Binding SelectedClashMergePairItem}"
-                PickElementCommand="{Binding DataContext.PickElementCommand, ElementName=_this}"
-                SelectClashCommand="{Binding SelectClashCommand, ElementName=_this}"
-                ShowCommentsCommand="{Binding ShowCommentsCommand, ElementName=_this}" />
+                Width="4"
+                HorizontalAlignment="Center"
+                VerticalAlignment="Stretch" />
+
+            <Border
+                Grid.Column="2"
+                Style="{StaticResource DxBorder}">
+                <local:ClashMergePairUserControl
+                    DataContext="{Binding SelectedClashMergePairItem}"
+                    PickElementCommand="{Binding DataContext.PickElementCommand, ElementName=_this}"
+                    SelectClashCommand="{Binding SelectClashCommand, ElementName=_this}"
+                    ShowCommentsCommand="{Binding ShowCommentsCommand, ElementName=_this}" />
+            </Border>
         </Grid>
 
         <DockPanel
             Grid.Row="1"
-            Margin="0 10 0 0"
+            Margin="0 8 0 0"
             HorizontalAlignment="Right">
             <Button
                 Content="ОК"

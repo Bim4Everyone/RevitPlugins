@@ -20,7 +20,7 @@ internal class ReportMergePairViewModel : BaseViewModel {
         _localization = localization ?? throw new ArgumentNullException(nameof(localization));
         _reportsMergePair = reportsMergePair ?? throw new ArgumentNullException(nameof(reportsMergePair));
 
-        Items = [];
+        Items = new ObservableCollection<ClashMergeCollection>();
         if(_reportsMergePair.IntersectionClashes.Conflicted.Any()) {
             Items.Add(
                 new ClashMergeCollection(
@@ -35,6 +35,7 @@ internal class ReportMergePairViewModel : BaseViewModel {
                 _reportsMergePair.IntersectionClashes.NonConflicted));
         }
         Name = _reportsMergePair.Existing.Name;
+        ClashesCount = Items.Sum(r => r.Items.Count);
     }
 
     public string Name { get; }
@@ -42,7 +43,9 @@ internal class ReportMergePairViewModel : BaseViewModel {
     /// <summary>
     /// Коллекции коллизий, которые надо посмотреть пользователю: конфликты объединения и автообъединенные 
     /// </summary>
-    public ObservableCollection<ClashMergeCollection> Items { get; }
+    public ICollection<ClashMergeCollection> Items { get; }
+
+    public int ClashesCount { get; }
 
     public ReportViewModel GetResultReport() {
         List<ClashViewModel> resultClashes = [
