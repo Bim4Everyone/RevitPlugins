@@ -38,12 +38,6 @@
             <Setter
                 Property="HorizontalAlignment"
                 Value="Stretch" />
-            <Setter
-                Property="ScrollViewer.HorizontalScrollBarVisibility"
-                Value="Visible" />
-            <Setter
-                Property="ScrollViewer.VerticalScrollBarVisibility"
-                Value="Visible" />
         </Style>
     </UserControl.Resources>
     <Grid>
