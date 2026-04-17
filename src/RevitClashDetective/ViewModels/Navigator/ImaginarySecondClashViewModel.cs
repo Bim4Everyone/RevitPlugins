@@ -6,6 +6,7 @@ using System.Windows.Input;
 
 using Autodesk.Revit.DB;
 
+using dosymep.SimpleServices;
 using dosymep.WPF.Commands;
 using dosymep.WPF.ViewModels;
 
@@ -23,9 +24,18 @@ internal class ImaginarySecondClashViewModel
     private readonly RevitRepository _revitRepository;
     private readonly ElementViewModel _secondElement;
 
-    public ImaginarySecondClashViewModel(RevitRepository revitRepository, ElementViewModel secondElement) {
+    public ImaginarySecondClashViewModel(
+        RevitRepository revitRepository,
+        ElementViewModel secondElement,
+        ILocalizationService localizationService) {
+        if(localizationService == null) {
+            throw new ArgumentNullException(nameof(localizationService));
+        }
+
         _revitRepository = revitRepository ?? throw new ArgumentNullException(nameof(revitRepository));
         _secondElement = secondElement ?? throw new ArgumentNullException(nameof(secondElement));
+        ClashStatusName = localizationService.GetLocalizedString(
+            $"{nameof(RevitClashDetective.Models.Clashes.ClashStatus)}.{ClashStatus}");
         SecondElementVolume = secondElement.ElementVolume;
 
         SecondId = _secondElement.Element.Id;
@@ -60,6 +70,8 @@ internal class ImaginarySecondClashViewModel
 
 
     public ClashStatus ClashStatus { get => ClashStatus.Imaginary; set { return; } }
+
+    public string ClashStatusName { get; }
 
     public string ClashName { get => string.Empty; set { return; } }
 

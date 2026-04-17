@@ -263,6 +263,14 @@
     <system:String
         x:Key="SetEvaluators.And">And</system:String>
     <system:String
+        x:Key="ClashStatus.Active">Active</system:String>
+    <system:String
+        x:Key="ClashStatus.Analized">Analyzed</system:String>
+    <system:String
+        x:Key="ClashStatus.Solved">Solved</system:String>
+    <system:String
+        x:Key="ClashStatus.Imaginary">No intersection</system:String>
+    <system:String
         x:Key="RuleEvaluators.FilterStringBeginsWith">Begins with</system:String>
     <system:String
         x:Key="RuleEvaluators.FilterStringNotBeginsWith">Not begins with</system:String>

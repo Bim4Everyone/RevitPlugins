@@ -11,6 +11,8 @@ namespace RevitClashDetective.ViewModels.Navigator;
 internal interface IClashViewModel : INotifyPropertyChanged, ICommentable {
     ClashStatus ClashStatus { get; set; }
 
+    string ClashStatusName { get; }
+
     string ClashName { get; set; }
 
     ElementId FirstId { get; }

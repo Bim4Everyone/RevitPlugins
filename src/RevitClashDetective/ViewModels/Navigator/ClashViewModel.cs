@@ -7,10 +7,9 @@ using System.Windows.Input;
 
 using Autodesk.Revit.DB;
 
-using DevExpress.XtraSpreadsheet.Model;
-
 using dosymep.WPF.Commands;
 using dosymep.WPF.ViewModels;
+using dosymep.SimpleServices;
 
 using RevitClashDetective.Models;
 using RevitClashDetective.Models.Clashes;
@@ -22,11 +21,13 @@ internal class ClashViewModel : BaseViewModel, IClashViewModel, IEquatable<Clash
     private ClashStatus _clashStatus;
     private string _clashName;
     private readonly RevitRepository _revitRepository;
+    private readonly ILocalizationService _localizationService;
     private bool _clashDataIsValid;
     private ClashCommentViewModel _selectedComment;
     private bool _canEditComments = true;
 
-    public ClashViewModel(RevitRepository revitRepository, ClashModel clash) {
+    public ClashViewModel(RevitRepository revitRepository, ClashModel clash, ILocalizationService localizationService) {
+        _localizationService = localizationService ?? throw new ArgumentNullException(nameof(localizationService));
         _revitRepository = revitRepository;
 
         ClashName = clash.Name;
@@ -68,9 +69,12 @@ internal class ClashViewModel : BaseViewModel, IClashViewModel, IEquatable<Clash
         set {
             if(value != ClashStatus.Imaginary) {
                 RaiseAndSetIfChanged(ref _clashStatus, value);
+                RaisePropertyChanged(nameof(ClashStatusName));
             }
         }
     }
+
+    public string ClashStatusName => _localizationService.GetLocalizedString($"{nameof(ClashStatus)}.{ClashStatus}");
 
     public string CommentsTitle => ClashName;
 

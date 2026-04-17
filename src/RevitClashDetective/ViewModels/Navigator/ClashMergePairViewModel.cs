@@ -5,6 +5,7 @@ using System.ComponentModel;
 using System.Linq;
 using System.Windows.Input;
 
+using dosymep.SimpleServices;
 using dosymep.WPF.Commands;
 using dosymep.WPF.ViewModels;
 
@@ -28,13 +29,23 @@ internal class ClashMergePairViewModel : BaseViewModel, ICommentable {
     private bool _importingClashSelected;
     private bool _existingClashSelected;
 
-    public ClashMergePairViewModel(ClashViewModel existing, ClashViewModel importing) {
+    public ClashMergePairViewModel(
+        ILocalizationService localizationService,
+        ClashViewModel existing,
+        ClashViewModel importing) {
         Existing = existing ?? throw new ArgumentNullException(nameof(existing));
         Importing = importing ?? throw new ArgumentNullException(nameof(importing));
 
         if(!_clashComparer.Equals(Existing, Importing)) {
             throw new ArgumentException("Коллизии не соответствуют друг другу", nameof(importing));
         }
+
+        ClashStatuses = new ReadOnlyCollection<ClashStatusViewModel>(
+        [
+            new ClashStatusViewModel(localizationService, ClashStatus.Active),
+            new ClashStatusViewModel(localizationService, ClashStatus.Analized),
+            new ClashStatusViewModel(localizationService, ClashStatus.Solved),
+        ]);
 
         SetMergedCommentsCommand = RelayCommand.Create(SetMergedComments);
         AddCommentCommand = RelayCommand.Create(() => { }, () => false);
@@ -44,6 +55,8 @@ internal class ClashMergePairViewModel : BaseViewModel, ICommentable {
     }
 
     public string Name => Existing.ClashName;
+
+    public IReadOnlyCollection<ClashStatusViewModel> ClashStatuses { get; }
 
     public ClashViewModel Existing { get; }
     public ClashViewModel Importing { get; }

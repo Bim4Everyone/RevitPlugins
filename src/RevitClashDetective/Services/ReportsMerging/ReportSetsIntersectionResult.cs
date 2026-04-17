@@ -2,6 +2,8 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 
+using dosymep.SimpleServices;
+
 namespace RevitClashDetective.Services.ReportsMerging;
 
 /// <summary>
@@ -51,12 +53,12 @@ internal class ReportSetsIntersectionResult {
 
     public bool HasIntersection => LeftInnerSet.Count > 0;
 
-    public ICollection<ReportsMergePair> GetMergePairs() {
+    public ICollection<ReportsMergePair> GetMergePairs(ILocalizationService localizationService) {
         var leftIntersection = LeftInnerSet.Reports.OrderBy(r => r, _comparer).ToArray();
         var rightIntersection = RightInnerSet.Reports.OrderBy(r => r, _comparer).ToArray();
         List<ReportsMergePair> intersection = [];
         for(int i = 0; i < leftIntersection.Length; i++) {
-            intersection.Add(new ReportsMergePair(leftIntersection[i], rightIntersection[i]));
+            intersection.Add(new ReportsMergePair(localizationService, leftIntersection[i], rightIntersection[i]));
         }
 
         return intersection;

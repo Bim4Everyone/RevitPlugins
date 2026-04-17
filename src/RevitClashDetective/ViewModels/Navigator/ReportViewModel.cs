@@ -59,6 +59,13 @@ internal class ReportViewModel : BaseViewModel, INamedEntity, IEquatable<ReportV
         _contentDialogService = contentDialogService ?? throw new ArgumentNullException(nameof(contentDialogService));
         _settingsConfig = settingsConfig ?? throw new ArgumentNullException(nameof(settingsConfig));
 
+        ClashStatuses = new ReadOnlyCollection<ClashStatusViewModel>([
+            new ClashStatusViewModel(_localization, ClashStatus.Active),
+            new ClashStatusViewModel(_localization, ClashStatus.Analized),
+            new ClashStatusViewModel(_localization, ClashStatus.Solved),
+            new ClashStatusViewModel(_localization, ClashStatus.Imaginary),
+        ]);
+
         Initialize(revitRepository, name);
         if(clashes is null) {
             throw new ArgumentNullException(nameof(clashes));
@@ -67,6 +74,8 @@ internal class ReportViewModel : BaseViewModel, INamedEntity, IEquatable<ReportV
         InitializeClashes(clashes);
     }
 
+
+    public IReadOnlyCollection<ClashStatusViewModel> ClashStatuses { get; }
 
     public string Name {
         get => _name;
@@ -216,7 +225,7 @@ internal class ReportViewModel : BaseViewModel, INamedEntity, IEquatable<ReportV
     }
 
     private void InitializeClashes(IEnumerable<ClashModel> clashModels) {
-        ResetClashes(clashModels.Select(item => new ClashViewModel(_revitRepository, item)));
+        ResetClashes(clashModels.Select(item => new ClashViewModel(_revitRepository, item, _localization)));
     }
 
     private bool IsValid(List<string> documentNames, ClashViewModel clash) {
@@ -300,10 +309,10 @@ internal class ReportViewModel : BaseViewModel, INamedEntity, IEquatable<ReportV
             if(checkViewModel is not null) {
                 (var firstProviders, var secondProviders) = checkViewModel.GetProviders();
                 _imaginaryFirstClashes = FilterElements(Clashes, GetElementViewModels(firstProviders))
-                    .Select(e => new ImaginaryFirstClashViewModel(_revitRepository, e))
+                    .Select(e => new ImaginaryFirstClashViewModel(_revitRepository, e, _localization))
                     .ToArray();
                 _imaginarySecondClashes = FilterElements(Clashes, GetElementViewModels(secondProviders))
-                    .Select(e => new ImaginarySecondClashViewModel(_revitRepository, e))
+                    .Select(e => new ImaginarySecondClashViewModel(_revitRepository, e, _localization))
                     .ToArray();
                 SetAdditionalParamValues(_imaginaryFirstClashes);
                 SetAdditionalParamValues(_imaginarySecondClashes);

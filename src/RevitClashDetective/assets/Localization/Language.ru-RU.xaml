@@ -263,6 +263,14 @@
     <system:String
         x:Key="SetEvaluators.And">И</system:String>
     <system:String
+        x:Key="ClashStatus.Active">Активно</system:String>
+    <system:String
+        x:Key="ClashStatus.Analized">Проанализировано</system:String>
+    <system:String
+        x:Key="ClashStatus.Solved">Исправлено</system:String>
+    <system:String
+        x:Key="ClashStatus.Imaginary">Нет пересечения</system:String>
+    <system:String
         x:Key="RuleEvaluators.FilterStringBeginsWith">Начинается с</system:String>
     <system:String
         x:Key="RuleEvaluators.FilterStringNotBeginsWith">Не начинается с</system:String>

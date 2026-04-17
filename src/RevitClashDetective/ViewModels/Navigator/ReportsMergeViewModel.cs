@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.Linq;
 using System.Windows.Input;
 
@@ -31,7 +30,7 @@ internal class ReportsMergeViewModel : BaseViewModel {
         _reportsMerging = reportsMerging ?? throw new ArgumentNullException(nameof(reportsMerging));
 
         _allMergePairs = [
-            .._reportsMerging.GetMergePairs().Select(p => new ReportMergePairViewModel(_localization, p))
+            .._reportsMerging.GetMergePairs(_localization).Select(p => new ReportMergePairViewModel(_localization, p))
         ];
         VisibleReports = [.._allMergePairs.Where(p => p.ClashesCount > 0)];
         AcceptMergeCommand = RelayCommand.Create(() => { }, CanAcceptMerge);

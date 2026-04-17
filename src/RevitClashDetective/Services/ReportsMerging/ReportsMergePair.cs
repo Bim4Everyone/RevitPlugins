@@ -2,6 +2,8 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 
+using dosymep.SimpleServices;
+
 using RevitClashDetective.ViewModels.Navigator;
 
 namespace RevitClashDetective.Services.ReportsMerging;
@@ -12,13 +14,19 @@ namespace RevitClashDetective.Services.ReportsMerging;
 internal class ReportsMergePair {
     private static readonly ReportsNamesIgnoreCaseComparer _reportsComparer = new();
     private static readonly ClashIdDocComparer _clashComparer = new();
+    private readonly ILocalizationService _localizationService;
 
     /// <summary>
     /// Создает экземпляр пары отчетов для мержа, при этом коллизии отчетов разбиваются на логические группы
     /// </summary>
+    /// <param name="localizationService">Сервис локализации</param>
     /// <param name="existing">Существующий отчет</param>
     /// <param name="importing">Импортируемый отчет</param>
-    public ReportsMergePair(ReportViewModel existing, ReportViewModel importing) {
+    public ReportsMergePair(
+        ILocalizationService localizationService,
+        ReportViewModel existing,
+        ReportViewModel importing) {
+        _localizationService = localizationService ?? throw new ArgumentNullException(nameof(localizationService));
         Existing = existing ?? throw new ArgumentNullException(nameof(existing));
         Importing = importing ?? throw new ArgumentNullException(nameof(importing));
         if(!_reportsComparer.Equals(Existing, Importing)) {
@@ -59,7 +67,8 @@ internal class ReportsMergePair {
             .ToArray();
         List<ClashMergePairViewModel> intersection = [];
         for(int i = 0; i < leftIntersection.Length; i++) {
-            intersection.Add(new ClashMergePairViewModel(leftIntersection[i], rightIntersection[i]));
+            intersection.Add(
+                new ClashMergePairViewModel(_localizationService, leftIntersection[i], rightIntersection[i]));
         }
 
         return intersection;

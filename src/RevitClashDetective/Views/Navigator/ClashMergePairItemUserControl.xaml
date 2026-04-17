@@ -61,7 +61,7 @@
             <TextBlock
                 DockPanel.Dock="Left"
                 VerticalAlignment="Center"
-                Text="{Binding ClashStatus}" />
+                Text="{Binding ClashStatusName}" />
         </DockPanel>
         <DockPanel>
             <Label
