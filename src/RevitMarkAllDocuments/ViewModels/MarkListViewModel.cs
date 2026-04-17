@@ -17,6 +17,8 @@ using dosymep.WPF.ViewModels;
 using RevitMarkAllDocuments.Models;
 using RevitMarkAllDocuments.Services;
 
+using static Autodesk.Revit.DB.SpecTypeId;
+
 namespace RevitMarkAllDocuments.ViewModels;
 
 internal class MarkListViewModel : BaseViewModel {
@@ -59,7 +61,22 @@ internal class MarkListViewModel : BaseViewModel {
             foreach(var element in MarkedElements) {
                 var mark = element.MarkedElement;
                 var revitElement = _document.GetElement(new ElementId(mark.Id));
-                revitElement.SetParamValue(_markData.RevitParam, mark.MarkValue);
+
+                var storageType = _markData.RevitParam.StorageType;
+                if(storageType == StorageType.String) {
+                    revitElement.SetParamValue(_markData.RevitParam, mark.MarkValue);
+                } else if(storageType == StorageType.Double) {
+                    bool result = double.TryParse(mark.MarkValue, out var number);
+                    if(result == true) {
+                        revitElement.SetParamValue(_markData.RevitParam, number);
+                    }                    
+                } else if(storageType == StorageType.Integer) {
+                    bool result = int.TryParse(mark.MarkValue, out var number);
+                    if(result == true) {
+                        revitElement.SetParamValue(_markData.RevitParam, number);
+                    }
+                }
+
             }
 
             t.Commit();

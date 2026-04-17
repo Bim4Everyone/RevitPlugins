@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using System.Linq;
 
 using Autodesk.Revit.DB;
+using Autodesk.Revit.UI;
 
 using dosymep.Bim4Everyone;
 
@@ -31,7 +32,7 @@ internal class MarkData {
         return false;
     }
 
-    public void CreateMarkValues(IList<RevitParam> sortParams, MarkStartValue startValue) {
+    public void CreateMarkValues(IList<RevitParam> sortParams, MarkStartValue startValue) {        
         var sortService = new SortElementService();
         var sortedMarkedElements = sortService.SortElements(GetAllElements(), sortParams);
         int startNumber = int.Parse(startValue.StartValue);
@@ -42,7 +43,7 @@ internal class MarkData {
         }
     }
 
-    private IList<MarkedElement> GetAllElements() {
+    public IList<MarkedElement> GetAllElements() {
         return MarkDataByDocument.SelectMany(x => x.Elements).ToList();
     }
 }

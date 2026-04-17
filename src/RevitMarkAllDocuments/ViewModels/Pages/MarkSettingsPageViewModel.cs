@@ -37,8 +37,7 @@ internal class MarkSettingsPageViewModel : BaseViewModel {
         set {
             RaiseAndSetIfChanged(ref _selectedParam, value);
 
-            _isSuffixEnable =
-                value?.RevitParam.StorageType == StorageType.String;
+            _isSuffixEnable = value?.RevitParam.StorageType == StorageType.String;
 
             RaisePropertyChanged(nameof(IsSuffixPrefixEnable));
         }
