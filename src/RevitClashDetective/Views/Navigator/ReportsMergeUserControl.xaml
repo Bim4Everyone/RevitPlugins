@@ -16,8 +16,7 @@
     d:DataContext="{d:DesignInstance vm:ReportsMergeViewModel, IsDesignTimeCreatable=False}">
     <UserControl.Resources>
         <Style
-            TargetType="Border"
-            x:Key="DxBorder">
+            TargetType="Border">
             <Setter
                 Property="Background"
                 Value="{dxi:ThemeResource {dxt:PaletteBrushThemeKey ResourceKey=Backstage.Background}}" />
@@ -69,8 +68,7 @@
             </Grid.ColumnDefinitions>
 
             <Border
-                Grid.Column="0"
-                Style="{StaticResource DxBorder}">
+                Grid.Column="0">
                 <DockPanel
                     LastChildFill="True">
                     <TextBlock
@@ -104,8 +102,7 @@
                 VerticalAlignment="Stretch" />
 
             <Border
-                Grid.Column="2"
-                Style="{StaticResource DxBorder}">
+                Grid.Column="2">
                 <local:ClashMergePairUserControl
                     DataContext="{Binding SelectedClashMergePairItem}"
                     PickElementCommand="{Binding DataContext.PickElementCommand, ElementName=_this}"
