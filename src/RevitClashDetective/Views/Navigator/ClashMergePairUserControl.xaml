@@ -9,6 +9,8 @@
     xmlns:m="clr-namespace:RevitClashDetective.Models.Clashes"
     xmlns:dxi="http://schemas.devexpress.com/winfx/2008/xaml/core/internal"
     xmlns:dxt="http://schemas.devexpress.com/winfx/2008/xaml/core/themekeys"
+    xmlns:dx="http://schemas.devexpress.com/winfx/2008/xaml/core"
+    xmlns:converters="clr-namespace:dosymep.WpfCore.Converters;assembly=dosymep.WpfCore"
     mc:Ignorable="d"
     d:DesignHeight="300"
     d:DesignWidth="300"
@@ -52,6 +54,18 @@
                 Property="Height"
                 Value="25" />
         </Style>
+        <converters:ObjectToObjectConverter
+            x:Key="ClashStatusToImageConverter">
+            <converters:CoupleItem
+                Source="{x:Static m:ClashStatus.Active}"
+                Target="pack://application:,,,/DevExpress.Images.v21.2;component/Images/XAF/State_Priority_High.png" />
+            <converters:CoupleItem
+                Source="{x:Static m:ClashStatus.Analized}"
+                Target="pack://application:,,,/DevExpress.Images.v21.2;component/Images/XAF/State_Priority_Low.png" />
+            <converters:CoupleItem
+                Source="{x:Static m:ClashStatus.Solved}"
+                Target="pack://application:,,,/DevExpress.Images.v21.2;component/Images/XAF/State_Priority_Normal.png" />
+        </converters:ObjectToObjectConverter>
     </UserControl.Resources>
     <Grid>
         <TextBlock
@@ -98,7 +112,7 @@
             </Grid.ColumnDefinitions>
             <Grid.RowDefinitions>
                 <RowDefinition
-                    Height="2*" />
+                    Height="1.5*" />
                 <RowDefinition
                     Height="1*" />
                 <RowDefinition
@@ -161,21 +175,33 @@
                                 Width="150"
                                 IsEditable="False"
                                 SelectedValue="{Binding ClashStatus, UpdateSourceTrigger=PropertyChanged}"
-                                ItemsSource="{StaticResource ClashStatuses}" />
+                                ItemsSource="{StaticResource ClashStatuses}">
+                                <ComboBox.ItemTemplate>
+                                    <DataTemplate>
+                                        <StackPanel
+                                            Orientation="Horizontal">
+                                            <Image
+                                                Width="16"
+                                                Height="16"
+                                                Source="{Binding ., Converter={StaticResource ClashStatusToImageConverter}}"
+                                                Margin="0 0 4 0" />
+                                            <TextBlock
+                                                Text="{Binding}" />
+                                        </StackPanel>
+                                    </DataTemplate>
+                                </ComboBox.ItemTemplate>
+                            </ComboBox>
                         </DockPanel>
                         <DockPanel>
                             <Label
                                 DockPanel.Dock="Top"
                                 Content="Комментарии" />
-                            <Button
+                            <dx:SimpleButton
+                                HorizontalAlignment="Left"
+                                Glyph="{dx:DXImage 'Images/Comments/ShowHideComment_16x16.png'}"
                                 CommandParameter="{Binding}"
-                                Command="{Binding ShowCommentsCommand, ElementName=_this}">
-                                <Button.Content>
-                                    <TextBlock
-                                        VerticalAlignment="Center"
-                                        Text="{Binding Comments.Count, StringFormat='{}{0} 💬'}" />
-                                </Button.Content>
-                            </Button>
+                                Content="{Binding Comments.Count}"
+                                Command="{Binding ShowCommentsCommand, ElementName=_this}" />
                         </DockPanel>
                     </DockPanel>
                 </StackPanel>
@@ -196,70 +222,133 @@
                             CommandParameter="{Binding Existing}"
                             Command="{Binding SelectClashCommand, ElementName=_this}" />
                     </DockPanel>
-                    <DockPanel>
-                        <DockPanel.Resources>
-                            <Style
-                                TargetType="StackPanel">
-                                <Setter
-                                    Property="Margin"
-                                    Value="0 0 8 0" />
-                            </Style>
-                        </DockPanel.Resources>
-                        <StackPanel>
+                    <Grid>
+                        <Grid.Resources>
+                            <GridLength
+                                x:Key="RowSpacing">4</GridLength>
+                            <GridLength
+                                x:Key="ColumnSpacing">8</GridLength>
+                        </Grid.Resources>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition
+                                Width="Auto" />
+                            <ColumnDefinition
+                                Width="{StaticResource ColumnSpacing}" />
+                            <ColumnDefinition
+                                Width="Auto" />
+                            <ColumnDefinition
+                                Width="{StaticResource ColumnSpacing}" />
+                            <ColumnDefinition
+                                Width="Auto" />
+                            <ColumnDefinition
+                                Width="{StaticResource ColumnSpacing}" />
+                            <ColumnDefinition
+                                Width="Auto" />
+                            <ColumnDefinition
+                                Width="{StaticResource ColumnSpacing}" />
+                            <ColumnDefinition
+                                Width="Auto" />
+                            <ColumnDefinition
+                                Width="*" />
+                        </Grid.ColumnDefinitions>
+                        <Grid.RowDefinitions>
+                            <RowDefinition
+                                Height="Auto" />
+                            <RowDefinition
+                                Height="{StaticResource RowSpacing}" />
+                            <RowDefinition
+                                Height="Auto" />
+                            <RowDefinition
+                                Height="{StaticResource RowSpacing}" />
+                            <RowDefinition
+                                Height="Auto" />
+                            <RowDefinition
+                                Height="*" />
+                        </Grid.RowDefinitions>
+
+                        <DockPanel
+                            Grid.Row="2"
+                            Grid.Column="0"
+                            HorizontalAlignment="Stretch">
                             <Label
-                                Content="Файл 1" />
-                            <TextBlock
-                                Text="{Binding Existing.Clash.MainElement.DocumentName}" />
-                        </StackPanel>
-                        <StackPanel>
-                            <Label
-                                Content="Категория 1" />
-                            <TextBlock
-                                Text="{Binding Existing.Clash.MainElement.Category}" />
-                        </StackPanel>
-                        <StackPanel>
-                            <Label
-                                Content="Семейство 1" />
-                            <TextBlock
-                                Text="{Binding Existing.Clash.MainElement.FamilyName}" />
-                        </StackPanel>
-                        <StackPanel>
-                            <Label
-                                Content="Id 1" />
-                            <Button
+                                Margin="0 0 4 0"
+                                Content="Элемент 1" />
+                            <dx:SimpleButton
+                                DockPanel.Dock="Right"
+                                Width="Auto"
+                                HorizontalAlignment="Right"
                                 CommandParameter="{Binding Existing.Clash.MainElement}"
                                 Command="{Binding PickElementCommand, ElementName=_this}"
-                                Content="{Binding Existing.Clash.MainElement.Id}" />
-                        </StackPanel>
-                        <StackPanel
-                            Margin="8 0 0 0" />
-                        <StackPanel>
+                                Glyph="{dx:DXImage 'Images/RichEdit/Select_16x16.png'}" />
+                        </DockPanel>
+                        <DockPanel
+                            Grid.Row="4"
+                            Grid.Column="0"
+                            HorizontalAlignment="Stretch">
                             <Label
-                                Content="Файл 2" />
-                            <TextBlock
-                                Text="{Binding Existing.Clash.OtherElement.DocumentName}" />
-                        </StackPanel>
-                        <StackPanel>
-                            <Label
-                                Content="Категория 2" />
-                            <TextBlock
-                                Text="{Binding Existing.Clash.OtherElement.Category}" />
-                        </StackPanel>
-                        <StackPanel>
-                            <Label
-                                Content="Семейство 2" />
-                            <TextBlock
-                                Text="{Binding Existing.Clash.OtherElement.FamilyName}" />
-                        </StackPanel>
-                        <StackPanel>
-                            <Label
-                                Content="Id 2" />
-                            <Button
+                                Margin="0 0 4 0"
+                                Content="Элемент 2" />
+                            <dx:SimpleButton
+                                DockPanel.Dock="Right"
+                                Width="Auto"
+                                HorizontalAlignment="Right"
                                 CommandParameter="{Binding Existing.Clash.OtherElement}"
                                 Command="{Binding PickElementCommand, ElementName=_this}"
-                                Content="{Binding Existing.Clash.OtherElement.Id}" />
-                        </StackPanel>
-                    </DockPanel>
+                                Glyph="{dx:DXImage 'Images/RichEdit/Select_16x16.png'}" />
+                        </DockPanel>
+
+                        <Label
+                            Grid.Row="0"
+                            Grid.Column="2"
+                            Content="Файл" />
+                        <TextBlock
+                            Grid.Row="2"
+                            Grid.Column="2"
+                            Text="{Binding Existing.Clash.MainElement.DocumentName}" />
+                        <TextBlock
+                            Grid.Row="4"
+                            Grid.Column="2"
+                            Text="{Binding Existing.Clash.OtherElement.DocumentName}" />
+
+                        <Label
+                            Grid.Row="0"
+                            Grid.Column="4"
+                            Content="Категория" />
+                        <TextBlock
+                            Grid.Row="2"
+                            Grid.Column="4"
+                            Text="{Binding Existing.Clash.MainElement.Category}" />
+                        <TextBlock
+                            Grid.Row="4"
+                            Grid.Column="4"
+                            Text="{Binding Existing.Clash.OtherElement.Category}" />
+
+                        <Label
+                            Grid.Row="0"
+                            Grid.Column="6"
+                            Content="Семейство" />
+                        <TextBlock
+                            Grid.Row="2"
+                            Grid.Column="6"
+                            Text="{Binding Existing.Clash.MainElement.FamilyName}" />
+                        <TextBlock
+                            Grid.Row="4"
+                            Grid.Column="6"
+                            Text="{Binding Existing.Clash.OtherElement.FamilyName}" />
+
+                        <Label
+                            Grid.Row="0"
+                            Grid.Column="8"
+                            Content="Id" />
+                        <TextBlock
+                            Grid.Row="2"
+                            Grid.Column="8"
+                            Text="{Binding Existing.Clash.MainElement.Id}" />
+                        <TextBlock
+                            Grid.Row="4"
+                            Grid.Column="8"
+                            Text="{Binding Existing.Clash.OtherElement.Id}" />
+                    </Grid>
                 </StackPanel>
             </Border>
         </Grid>
