@@ -14,14 +14,14 @@ using RevitMarkAllDocuments.Views;
 
 namespace RevitMarkAllDocuments.Services;
 
-internal class MarkListWindowService {
+internal class WindowsService {
     private readonly IResolutionRoot _resolutionRoot;
 
-    public MarkListWindowService(IResolutionRoot resolutionRoot) {
+    public WindowsService(IResolutionRoot resolutionRoot) {
         _resolutionRoot = resolutionRoot;
     }
 
-    public bool ShowWindow(MarkData markData, 
+    public bool ShowMarkListWindow(MarkData markData, 
                            RevitRepository revitRepository,
                            DocumentService documentService,
                            ILocalizationService localizationService) {
@@ -34,6 +34,20 @@ internal class MarkListWindowService {
         window.ShowDialog();
         if((bool) window.DialogResult) {
             return true;
+        }
+
+        return false;
+    }
+
+    public bool ShowWarningsWindow(WarningsViewModel warnings) {
+        if(warnings.Warnings.Any()) {
+            var window = _resolutionRoot.Get<WarningsWindow>();
+            window.DataContext = warnings;
+
+            window.ShowDialog();
+
+            return true;
+
         }
 
         return false;
