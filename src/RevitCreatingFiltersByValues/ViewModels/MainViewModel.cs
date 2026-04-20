@@ -33,7 +33,7 @@ internal class MainViewModel : BaseViewModel {
     private ICollectionView _possibleValuesView;
     private string _possibleValuesFilter = string.Empty;
     private ParametersHelper _selectedFilterableParameter;
-    private List<PossibleValue> _selectedPossibleValues = [];
+    private List<PossibleValueVM> _selectedPossibleValues = [];
 
     private ColorHelper _selectedColor;
     private PatternsHelper _selectedPattern;
@@ -56,7 +56,9 @@ internal class MainViewModel : BaseViewModel {
 
         LoadConfig();
 
-        CategoryElements = _revitRepository.GetCategoriesInView(false);
+        CategoryElements = new ObservableCollection<CategoryElementsVM>(_revitRepository.GetCategoriesInView()
+            .Select(c => new CategoryElementsVM(c))
+            .ToList());        
         SolidFillPattern = _revitRepository.SolidFillPattern;
 
 
@@ -92,7 +94,6 @@ internal class MainViewModel : BaseViewModel {
     }
 
 
-
     public ICommand GetFilterableParametersCommand { get; }
     public ICommand GetPossibleValuesCommand { get; }
     public ICommand CreateCommand { get; }
@@ -125,9 +126,9 @@ internal class MainViewModel : BaseViewModel {
     public ObservableCollection<PatternsHelper> PatternsInPj { get; set; } = [];
     public List<ParameterFilterElement> AllFiltersInPj { get; set; } = [];
     public List<string> AllFilterNamesInPj { get; set; } = [];
-    public ObservableCollection<CategoryElements> CategoryElements { get; set; } = [];
+    public ObservableCollection<CategoryElementsVM> CategoryElements { get; set; } = [];
     public ObservableCollection<ParametersHelper> FilterableParameters { get; set; } = [];
-    public ObservableCollection<PossibleValue> PossibleValues { get; set; } = [];
+    public ObservableCollection<PossibleValueVM> PossibleValues { get; set; } = [];
     public List<ElementId> SelectedCatIds { get; set; } = [];
     public List<Element> SelectedElements { get; set; } = [];
 
@@ -138,7 +139,7 @@ internal class MainViewModel : BaseViewModel {
         set => RaiseAndSetIfChanged(ref _selectedFilterableParameter, value);
     }
 
-    public List<PossibleValue> SelectedPossibleValues {
+    public List<PossibleValueVM> SelectedPossibleValues {
         get => _selectedPossibleValues;
         set => RaiseAndSetIfChanged(ref _selectedPossibleValues, value);
     }
@@ -253,9 +254,9 @@ internal class MainViewModel : BaseViewModel {
         PossibleValues.Clear();
         SelectedCatIds.Clear();
 
-        List<CategoryElements> selectedCategories = [];
+        List<CategoryElementsVM> selectedCategories = [];
 
-        foreach(CategoryElements cat in CategoryElements) {
+        foreach(CategoryElementsVM cat in CategoryElements) {
             if(cat.IsCheck) {
                 selectedCategories.Add(cat);
             }
@@ -263,12 +264,15 @@ internal class MainViewModel : BaseViewModel {
 
 
         // Получаем ID категорий для последующего получения параметров фильтрации
-        foreach(CategoryElements cat in selectedCategories) {
+        foreach(CategoryElementsVM cat in selectedCategories) {
 
             SelectedCatIds.Add(cat.CategoryIdInView);
         }
 
-
+        // В случае, если ни одна категория не выбрана, то общие для категорий параметры искать нет смысла
+        if(SelectedCatIds.Count == 0) {
+            return;
+        }
         // Получаем параметры для фильтров на основе ID категорий
         List<ElementId> elementIds = ParameterFilterUtilities.GetFilterableParametersInCommon(_revitRepository.Document, SelectedCatIds).ToList();
 
@@ -317,9 +321,9 @@ internal class MainViewModel : BaseViewModel {
         SelectedElements.Clear();
 
         // Получаем элементы, которые выбрал пользователь через категории
-        List<CategoryElements> selectedCategories = [];
+        List<CategoryElementsVM> selectedCategories = [];
 
-        foreach(CategoryElements cat in CategoryElements) {
+        foreach(CategoryElementsVM cat in CategoryElements) {
             if(cat.IsCheck) {
                 SelectedElements.AddRange(cat.ElementsInView);
             }
@@ -329,7 +333,7 @@ internal class MainViewModel : BaseViewModel {
         // Перебираем выбранные через категории элементы и получаем их значения по выбранному параметру
         foreach(var elem in SelectedElements) {
 
-            var possibleValue = new PossibleValue(elem, SelectedFilterableParameter);
+            var possibleValue = new PossibleValueVM(elem, SelectedFilterableParameter);
             possibleValue.GetValue();
 
             if(possibleValue.ValueAsString is null) {
@@ -349,7 +353,7 @@ internal class MainViewModel : BaseViewModel {
             }
         }
 
-        PossibleValues = new ObservableCollection<PossibleValue>(PossibleValues.OrderBy(i => i.ValueAsString));
+        PossibleValues = new ObservableCollection<PossibleValueVM>(PossibleValues.OrderBy(i => i.ValueAsString));
         OnPropertyChanged(nameof(PossibleValues));
 
         SetPossibleValuesFilters();
@@ -377,7 +381,7 @@ internal class MainViewModel : BaseViewModel {
             // Удаляем временные фильтры пользователя на виде
             _revitRepository.DeleteTempFiltersInView();
 
-            foreach(PossibleValue pos in PossibleValues) {
+            foreach(PossibleValueVM pos in PossibleValues) {
                 if(pos.IsCheck is false) { continue; }
 
                 // Либо создаем фильтры и переопределяем видимость через них
@@ -510,7 +514,7 @@ internal class MainViewModel : BaseViewModel {
     private bool CanCreate(object p) {
 
         bool catsChecked = false;
-        foreach(CategoryElements cat in CategoryElements) {
+        foreach(CategoryElementsVM cat in CategoryElements) {
             if(cat.IsCheck) {
                 catsChecked = true;
                 break;
@@ -521,7 +525,7 @@ internal class MainViewModel : BaseViewModel {
         if(SelectedFilterableParameter is null) { ErrorText = "Не выбран параметр фильтрации"; return false; }
 
         bool valsChecked = false;
-        foreach(PossibleValue pos in PossibleValues) {
+        foreach(PossibleValueVM pos in PossibleValues) {
             if(pos.IsCheck) {
                 valsChecked = true;
                 break;
@@ -542,7 +546,7 @@ internal class MainViewModel : BaseViewModel {
     private void SetCategoriesFilters() {
         // Организуем фильтрацию списка категорий
         _categoriesView = CollectionViewSource.GetDefaultView(CategoryElements);
-        _categoriesView.Filter = item => string.IsNullOrEmpty(CategoriesFilter) || ((CategoryElements) item).CategoryName.IndexOf(CategoriesFilter, StringComparison.OrdinalIgnoreCase) >= 0;
+        _categoriesView.Filter = item => string.IsNullOrEmpty(CategoriesFilter) || ((CategoryElementsVM) item).CategoryName.IndexOf(CategoriesFilter, StringComparison.OrdinalIgnoreCase) >= 0;
     }
 
     /// <summary>
@@ -562,7 +566,7 @@ internal class MainViewModel : BaseViewModel {
     private void SetPossibleValuesFilters() {
         // Организуем фильтрацию списка возможных значений
         _possibleValuesView = CollectionViewSource.GetDefaultView(PossibleValues);
-        _possibleValuesView.Filter = item => string.IsNullOrEmpty(PossibleValuesFilter) || ((PossibleValue) item).ValueAsString.IndexOf(PossibleValuesFilter, StringComparison.OrdinalIgnoreCase) >= 0;
+        _possibleValuesView.Filter = item => string.IsNullOrEmpty(PossibleValuesFilter) || ((PossibleValueVM) item).ValueAsString.IndexOf(PossibleValuesFilter, StringComparison.OrdinalIgnoreCase) >= 0;
     }
 
 
@@ -582,7 +586,7 @@ internal class MainViewModel : BaseViewModel {
     /// </summary>
     /// <param name="p"></param>
     private void SelectAllCategoriesInGUI(object p) {
-        foreach(CategoryElements cat in CategoryElements) {
+        foreach(CategoryElementsVM cat in CategoryElements) {
             if(string.IsNullOrEmpty(CategoriesFilter) || (cat.CategoryName.IndexOf(CategoriesFilter, StringComparison.OrdinalIgnoreCase) >= 0)) {
                 cat.IsCheck = true;
             }
@@ -600,7 +604,7 @@ internal class MainViewModel : BaseViewModel {
     /// </summary>
     /// <param name="p"></param>
     private void UnselectAllCategoriesInGUI(object p) {
-        foreach(CategoryElements cat in CategoryElements) {
+        foreach(CategoryElementsVM cat in CategoryElements) {
             if(string.IsNullOrEmpty(CategoriesFilter) || (cat.CategoryName.IndexOf(CategoriesFilter, StringComparison.OrdinalIgnoreCase) >= 0)) {
                 cat.IsCheck = false;
             }
@@ -617,7 +621,7 @@ internal class MainViewModel : BaseViewModel {
     /// </summary>
     /// <param name="p"></param>
     private void SelectAllValuesInGUI(object p) {
-        foreach(PossibleValue pos in PossibleValues) {
+        foreach(PossibleValueVM pos in PossibleValues) {
             if(string.IsNullOrEmpty(PossibleValuesFilter) || (pos.ValueAsString.IndexOf(PossibleValuesFilter, StringComparison.OrdinalIgnoreCase) >= 0)) {
                 pos.IsCheck = true;
             }
@@ -633,7 +637,7 @@ internal class MainViewModel : BaseViewModel {
     /// </summary>
     /// <param name="p"></param>
     private void UnselectAllValuesInGUI(object p) {
-        foreach(PossibleValue pos in PossibleValues) {
+        foreach(PossibleValueVM pos in PossibleValues) {
             if(string.IsNullOrEmpty(PossibleValuesFilter) || (pos.ValueAsString.IndexOf(PossibleValuesFilter, StringComparison.OrdinalIgnoreCase) >= 0)) {
                 pos.IsCheck = false;
             }

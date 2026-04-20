@@ -6,6 +6,8 @@ using System.Linq;
 using Autodesk.Revit.DB;
 using Autodesk.Revit.UI;
 
+using RevitCreatingFiltersByValues.ViewModels;
+
 using Application = Autodesk.Revit.ApplicationServices.Application;
 
 namespace RevitCreatingFiltersByValues.Models;
@@ -125,14 +127,13 @@ internal class RevitRepository {
     /// <summary>
     /// Получает категории, представленные на виде + элементы в словаре по ним
     /// </summary>
-    public ObservableCollection<CategoryElements> GetCategoriesInView(bool checkFlag) {
+    public List<CategoryElements> GetCategoriesInView() {
 
-        ObservableCollection<CategoryElements> categoryElements = [];
+        List<CategoryElements> categoryElements = [];
         foreach(var elem in GetElementsInView()) {
             if(elem.Category is null) { continue; }
 
             var catOfElem = elem.Category;
-            string elemCategoryName = catOfElem.Name;
             var elemCategoryId = catOfElem.Id;
 
             // Отсеиваем категории, которые не имеют параметров фильтрации
@@ -142,14 +143,14 @@ internal class RevitRepository {
             bool flag = false;
             foreach(CategoryElements categoryElement in categoryElements) {
 
-                if(categoryElement.CategoryName.Equals(elemCategoryName)) {
+                if(categoryElement.CategoryIdInView.Equals(elemCategoryId)) {
                     categoryElement.ElementsInView.Add(elem);
                     flag = true;
                     break;
                 }
             }
             if(flag is false) {
-                categoryElements.Add(new CategoryElements(catOfElem, elemCategoryId, checkFlag, [elem]));
+                categoryElements.Add(new CategoryElements(catOfElem, elemCategoryId, [elem]));
             }
         }
         return categoryElements;
