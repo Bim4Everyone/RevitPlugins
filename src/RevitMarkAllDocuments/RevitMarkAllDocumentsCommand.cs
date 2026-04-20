@@ -63,7 +63,7 @@ public class RevitMarkAllDocumentsCommand : BasePluginCommand {
             .To<NavigationViewPageProvider>()
             .InSingletonScope();
 
-        kernel.Bind<MarkListWindowService>()
+        kernel.Bind<WindowsService>()
             .ToSelf()
             .InSingletonScope();
 

@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 using System.Windows.Input;
 
@@ -23,7 +24,7 @@ internal class MainViewModel : BaseViewModel {
     private readonly PluginConfig _pluginConfig;
     private readonly RevitRepository _revitRepository;
     private readonly DocumentService _documentService;
-    private readonly MarkListWindowService _markListWindowService;
+    private readonly WindowsService _windowsService;
     private readonly ILogicalFilterProviderFactory _filterFactory;
     private readonly ILocalizationService _localizationService;
     private readonly Category _selectedCategory;
@@ -40,13 +41,13 @@ internal class MainViewModel : BaseViewModel {
                          RevitRepository revitRepository,
                          CategoryContext categoryContext,
                          DocumentService documentService,
-                         MarkListWindowService markListWindowService,
+                         WindowsService markListWindowService,
                          ILogicalFilterProviderFactory filterFactory,
                          ILocalizationService localizationService) {        
         _pluginConfig = pluginConfig;
         _revitRepository = revitRepository;
         _documentService = documentService;
-        _markListWindowService = markListWindowService;
+        _windowsService = markListWindowService;
         _filterFactory = filterFactory;
         _localizationService = localizationService;
 
@@ -79,8 +80,8 @@ internal class MainViewModel : BaseViewModel {
 
     private void LoadView() {
         _documentsPageViewModel = new DocumentsPageViewModel(_revitRepository);
-        _filterPageViewModel = new FilterPageViewModel(_filterFactory, _localizationService, 
-                new FilterDataProvider(_revitRepository, _selectedCategory));
+        var dataProvider = new FilterDataProvider(_revitRepository, _selectedCategory);
+        _filterPageViewModel = new FilterPageViewModel(_filterFactory, _localizationService, dataProvider);
         _sortPageViewModel = new SortPageViewModel(_revitRepository, _selectedCategory);
         _markSettingsPageViewModel = new MarkSettingsPageViewModel(_revitRepository, _selectedCategory);
 
@@ -109,19 +110,84 @@ internal class MainViewModel : BaseViewModel {
             .Select(d => d.Document)
             .ToArray();
 
-        // filter elements
+        // creating mark data and filter elements
         var selectedParam = MarkSettingsPageViewModel.SelectedParam;
-
         var markData = new MarkData() {
             RevitParam = selectedParam.RevitParam,
         };
-
         markData = filtrationService.FilterElements(markData, checkedDocuments, FilterPageViewModel.FilterProvider);
 
-        // sort and mark elements
+        // checking params
         var sortParams = SortPageViewModel.SelectedParams
             .Select(x => x.RevitParam)
             .ToList();
+
+        var validation = new ParamValidationService();
+        var filteredElements = markData.GetAllElements();
+        var warningsWithNoParams = new WarningsViewModel();
+
+        var warningElementsSortParams = validation.CheckAreExistParams(sortParams, filteredElements);
+
+        if(warningElementsSortParams.Any()) {
+            var warning = new WarningViewModel() {
+                Elements = [.. warningElementsSortParams.Select(x => new WarningElementViewModel() {
+                    Element = x.RevitElement,
+                })],
+                FullName = "В проектах отсутствует параметр для сортировки",
+                Description = "В указанных проектах отсутствует параметр для сортировки для некоторых элементов выбранной категории"
+            };
+
+            warningsWithNoParams.Warnings.Add(warning);
+        }
+
+        var warningElementsMarkParams = validation.CheckIsExistParam(selectedParam.RevitParam, filteredElements);
+        if(warningElementsMarkParams.Any()) {
+            var warning = new WarningViewModel() {
+                Elements = [.. warningElementsMarkParams.Select(x => new WarningElementViewModel() {
+                    Element = x.RevitElement,
+                }).Take(100)],
+                FullName = "В проектах отсутствует параметр для заполнения марки",
+                Description = "В проектах отсутствует параметр для заполнения марки доступен"
+            };
+
+            warningsWithNoParams.Warnings.Add(warning);
+        }
+
+        if(_windowsService.ShowWarningsWindow(warningsWithNoParams)) {
+            return;
+        }
+
+        var warningsWithReadonlyParams = new WarningsViewModel();
+
+        var warningElementsReadonlyParams = validation.CheckIsReadonlyParam(selectedParam.RevitParam, filteredElements);
+        if(warningElementsReadonlyParams.Any()) {
+            var elementsToShow = warningElementsReadonlyParams.Select(x => new WarningElementViewModel() {
+                    Element = x.RevitElement,
+                });
+
+            int elementsNumber = elementsToShow.Count();
+            int maxShownElements = 100;
+            string additionalMessage = string.Empty;
+            if(elementsNumber > maxShownElements) {
+                elementsToShow = elementsToShow.Take(maxShownElements);
+                additionalMessage = $"Отображены {maxShownElements} из {elementsNumber} элементов";
+            }
+
+            var warning = new WarningViewModel() {
+                Elements = [..elementsToShow],
+                FullName = "В проектах параметр для заполнения марки доступен только для чтения.",
+                Description = "В проектах параметр для заполнения марки доступен только для чтения." + additionalMessage
+            };
+
+            warningsWithReadonlyParams.Warnings.Add(warning);
+        }
+
+        if(_windowsService.ShowWarningsWindow(warningsWithReadonlyParams)) {
+            return;
+        }
+
+
+        // sort and mark elements
         var startValue = MarkSettingsPageViewModel.GetStartValue();
         markData.CreateMarkValues(sortParams, startValue);
 
@@ -137,7 +203,7 @@ internal class MainViewModel : BaseViewModel {
 
         var markDataForCurrentDoc = markData.GetDataByDocument(currentDocName);
         if(markDataForCurrentDoc != null) {
-            _markListWindowService.ShowWindow(markData, _revitRepository, _documentService, _localizationService);
+            _windowsService.ShowMarkListWindow(markData, _revitRepository, _documentService, _localizationService);
         }
 
         SaveConfig();
