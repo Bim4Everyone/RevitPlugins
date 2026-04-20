@@ -28,6 +28,7 @@ internal class ClashMergePairViewModel : BaseViewModel, ICommentable {
     private int _mergedCommentsCount;
     private bool _importingClashSelected;
     private bool _existingClashSelected;
+    private bool _visited;
 
     public ClashMergePairViewModel(
         ILocalizationService localizationService,
@@ -55,6 +56,11 @@ internal class ClashMergePairViewModel : BaseViewModel, ICommentable {
     }
 
     public string Name => Existing.ClashName;
+
+    public bool Visited {
+        get => _visited;
+        set => RaiseAndSetIfChanged(ref _visited, value);
+    }
 
     public IReadOnlyCollection<ClashStatusViewModel> ClashStatuses { get; }
 

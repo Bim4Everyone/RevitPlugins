@@ -40,6 +40,8 @@ internal class ReportMergePairViewModel : BaseViewModel {
 
     public string Name { get; }
 
+    public bool Visited => false;
+
     /// <summary>
     /// Коллекции коллизий, которые надо посмотреть пользователю: конфликты объединения и автообъединенные 
     /// </summary>

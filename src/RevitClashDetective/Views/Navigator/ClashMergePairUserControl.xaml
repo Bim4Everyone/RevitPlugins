@@ -35,9 +35,6 @@
                 <Setter
                     Property="VerticalContentAlignment"
                     Value="Center" />
-                <Setter
-                    Property="FontWeight"
-                    Value="SemiBold" />
             </Style>
             <Style
                 TargetType="Button">
@@ -148,6 +145,7 @@
                     VerticalScrollBarVisibility="Auto">
                     <StackPanel>
                         <Label
+                            FontWeight="SemiBold"
                             Content="Итоговый вариант" />
                         <DockPanel
                             Margin="0 4 0 0">

@@ -8,6 +8,7 @@
     xmlns:vm="clr-namespace:RevitClashDetective.ViewModels.Navigator"
     xmlns:dxi="http://schemas.devexpress.com/winfx/2008/xaml/core/internal"
     xmlns:dxt="http://schemas.devexpress.com/winfx/2008/xaml/core/themekeys"
+    xmlns:converters="clr-namespace:dosymep.WpfCore.Converters;assembly=dosymep.WpfCore"
     mc:Ignorable="d"
     d:DesignHeight="300"
     d:DesignWidth="300"
@@ -39,6 +40,11 @@
                 Property="HorizontalAlignment"
                 Value="Stretch" />
         </Style>
+        <converters:BoolToVisibilityConverter
+            x:Key="VisitedConverter"
+            DefaultValue="Collapsed"
+            TrueValue="Visible"
+            FalseValue="Collapsed" />
     </UserControl.Resources>
     <Grid>
         <Grid.RowDefinitions>
@@ -65,10 +71,10 @@
                 Grid.Column="0">
                 <DockPanel
                     LastChildFill="True">
-                    <TextBlock
+                    <Label
                         DockPanel.Dock="Top"
                         Margin="0 0 0 4"
-                        Text="Отчеты, требующие внимания" />
+                        Content="Отчеты, требующие внимания" />
                     <TreeView
                         SelectedItemChanged="TreeView_OnSelectedItemChanged"
                         ItemsSource="{Binding VisibleReports}">
@@ -76,6 +82,12 @@
                             <HierarchicalDataTemplate
                                 ItemsSource="{Binding Items}">
                                 <DockPanel>
+                                    <Image
+                                        Width="16"
+                                        Height="16"
+                                        Visibility="{Binding Visited, Converter={StaticResource VisitedConverter}}"
+                                        Source="pack://application:,,,/DevExpress.Images.v21.2;component/Office2013/Actions/Show_16x16.png"
+                                        Margin="0 0 4 0" />
                                     <TextBlock
                                         ToolTip="{Binding Name}"
                                         Text="{Binding Name}" />

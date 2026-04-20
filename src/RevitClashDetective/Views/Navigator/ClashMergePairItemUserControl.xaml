@@ -29,6 +29,7 @@
                 IsChecked="{Binding ItemIsSelected, ElementName=_this}" />
             <Label
                 VerticalAlignment="Center"
+                FontWeight="SemiBold"
                 Content="{Binding Title, ElementName=_this}" />
         </DockPanel>
         <DockPanel

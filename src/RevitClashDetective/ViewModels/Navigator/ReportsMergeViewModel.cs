@@ -45,7 +45,13 @@ internal class ReportsMergeViewModel : BaseViewModel {
 
     public ClashMergePairViewModel SelectedClashMergePairItem {
         get => _selectedClashMergePairItem;
-        set => RaiseAndSetIfChanged(ref _selectedClashMergePairItem, value);
+        set {
+            if(value is not null) {
+                value.Visited = true;
+            }
+
+            RaiseAndSetIfChanged(ref _selectedClashMergePairItem, value);
+        }
     }
 
     public ICollection<ReportViewModel> GetMergeResult() {

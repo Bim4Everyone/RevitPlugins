@@ -22,6 +22,8 @@ internal class ClashMergeCollection {
 
     public string Name { get; }
 
+    public bool Visited => false;
+
     /// <summary>
     /// Коллизии, которые будут видны пользователю
     /// </summary>
