@@ -18,6 +18,7 @@ using RevitMechanicalSpecification.Models;
 
 namespace RevitMechanicalSpecification.Service {
     internal class VisElementsCalculator {
+        private readonly CultureInfo _ruCulture = CultureInfo.GetCultureInfo("ru-RU");
 
         private readonly SpecConfiguration _specConfiguration;
 
@@ -175,7 +176,7 @@ namespace RevitMechanicalSpecification.Service {
                 );
 
             double pipeThicknessValue = Math.Round(externalSize - internalSize, 2) / 2;
-            string pipeThickness = pipeThicknessValue.ToString("0.0#", new CultureInfo("ru-RU"));
+            string pipeThickness = pipeThicknessValue.ToString("0.0#", _ruCulture);
             string pipeDiameter = UnitConverter.DoubleToString(
                     UnitConverter.DoubleToMilimeters(
                     element.GetParamValue<double>(
