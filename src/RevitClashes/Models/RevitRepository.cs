@@ -185,10 +185,7 @@ internal class RevitRepository {
         return new FilteredElementCollector(Doc)
             .OfClass(typeof(RevitLinkInstance))
             .Cast<RevitLinkInstance>()
-            .Where(item => {
-                var doc = item.GetLinkDocument();
-                return doc != null && doc.Title.EndsWith(".rvt");
-            })
+            .Where(IsRvtLink)
             .ToList();
     }
 
@@ -567,6 +564,27 @@ internal class RevitRepository {
             return providers;
         }
         return new[] { providers.First() };
+    }
+
+    private bool IsRvtLink(RevitLinkInstance link) {
+        if(link is null) {
+            return false;
+        }
+
+        if(!link.HasElementType()) {
+            return false;
+        }
+
+        var type = (RevitLinkType) Doc.GetElement(link.GetTypeId());
+        var extRef = type.GetExternalFileReference();
+        if(extRef == null) {
+            return false;
+        }
+
+        var doc = link.GetLinkDocument();
+        return doc != null
+               && extRef.ExternalFileReferenceType == ExternalFileReferenceType.RevitLink
+               && type.Name.EndsWith(".rvt", StringComparison.CurrentCultureIgnoreCase);
     }
 
     /// <summary>
