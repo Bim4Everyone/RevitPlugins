@@ -2,6 +2,8 @@ using System.Security.Cryptography;
 
 using Autodesk.Revit.DB;
 
+using dosymep.Revit;
+
 using pyRevitLabs.Json;
 
 namespace RevitMarkAllDocuments.Models;
@@ -29,4 +31,12 @@ internal class MarkedElement {
 #endif
 
     public string MarkValue { get; set; }
+
+    public Element GetElementWithParam(bool isForType, FilterableParam param) {
+        if(param.IsTypeParam && !isForType) { 
+            return RevitElement.GetElementType();        
+        }
+
+        return RevitElement;
+    }
 }

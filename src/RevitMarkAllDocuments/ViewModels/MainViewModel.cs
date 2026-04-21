@@ -27,6 +27,7 @@ internal class MainViewModel : BaseViewModel {
     private readonly WindowsService _windowsService;
     private readonly ILogicalFilterProviderFactory _filterFactory;
     private readonly ILocalizationService _localizationService;
+    private readonly bool _isMarkForTypes;
     private readonly Category _selectedCategory;
     private readonly string _selectedCategoryName;
 
@@ -51,6 +52,7 @@ internal class MainViewModel : BaseViewModel {
         _filterFactory = filterFactory;
         _localizationService = localizationService;
 
+        _isMarkForTypes = categoryContext.IsMarkForTypes;
         _selectedCategory = categoryContext.SelectedCategory;
         _selectedCategoryName = categoryContext.SelectedCategory.Name;
 
@@ -79,11 +81,19 @@ internal class MainViewModel : BaseViewModel {
     }
 
     private void LoadView() {
+        var filterableParameters = _revitRepository.GetFilterableParams(_selectedCategory).ToList();
+
+        var paramsForMarks = filterableParameters.Where(x => x.IsTypeParam == _isMarkForTypes).ToList();
+
+        if(_isMarkForTypes) {
+            filterableParameters = filterableParameters.Where(x => x.IsTypeParam).ToList();
+        }
+
         _documentsPageViewModel = new DocumentsPageViewModel(_revitRepository);
-        var dataProvider = new FilterDataProvider(_revitRepository, _selectedCategory);
+        var dataProvider = new FilterDataProvider(_revitRepository, filterableParameters, _selectedCategory);
         _filterPageViewModel = new FilterPageViewModel(_filterFactory, _localizationService, dataProvider);
-        _sortPageViewModel = new SortPageViewModel(_revitRepository, _selectedCategory);
-        _markSettingsPageViewModel = new MarkSettingsPageViewModel(_revitRepository, _selectedCategory);
+        _sortPageViewModel = new SortPageViewModel(filterableParameters);
+        _markSettingsPageViewModel = new MarkSettingsPageViewModel(paramsForMarks);
 
         LoadConfig();
     }
@@ -101,7 +111,7 @@ internal class MainViewModel : BaseViewModel {
     }
 
     private void AcceptView() {
-        var filtrationService = new FiltrationService();
+        var filtrationService = new FiltrationService(_isMarkForTypes);
         var markSetterService = new MarkSetterService();
 
         // get documents
@@ -119,14 +129,14 @@ internal class MainViewModel : BaseViewModel {
 
         // checking params
         var sortParams = SortPageViewModel.SelectedParams
-            .Select(x => x.RevitParam)
+            .Select(x => x.FilterableParam)
             .ToList();
 
         var validation = new ParamValidationService();
         var filteredElements = markData.GetAllElements();
         var warningsWithNoParams = new WarningsViewModel();
 
-        var warningElementsSortParams = validation.CheckAreExistParams(sortParams, filteredElements);
+        var warningElementsSortParams = validation.CheckAreExistParams(_isMarkForTypes, sortParams, filteredElements);
 
         if(warningElementsSortParams.Any()) {
             var warning = new WarningViewModel() {
@@ -140,7 +150,7 @@ internal class MainViewModel : BaseViewModel {
             warningsWithNoParams.Warnings.Add(warning);
         }
 
-        var warningElementsMarkParams = validation.CheckIsExistParam(selectedParam.RevitParam, filteredElements);
+        var warningElementsMarkParams = validation.CheckIsExistParam(_isMarkForTypes, selectedParam.FilterableParam, filteredElements);
         if(warningElementsMarkParams.Any()) {
             var warning = new WarningViewModel() {
                 Elements = [.. warningElementsMarkParams.Select(x => new WarningElementViewModel() {
@@ -159,7 +169,7 @@ internal class MainViewModel : BaseViewModel {
 
         var warningsWithReadonlyParams = new WarningsViewModel();
 
-        var warningElementsReadonlyParams = validation.CheckIsReadonlyParam(selectedParam.RevitParam, filteredElements);
+        var warningElementsReadonlyParams = validation.CheckIsReadonlyParam(selectedParam.FilterableParam, filteredElements);
         if(warningElementsReadonlyParams.Any()) {
             var elementsToShow = warningElementsReadonlyParams.Select(x => new WarningElementViewModel() {
                     Element = x.RevitElement,
@@ -189,7 +199,7 @@ internal class MainViewModel : BaseViewModel {
 
         // sort and mark elements
         var startValue = MarkSettingsPageViewModel.GetStartValue();
-        markData.CreateMarkValues(sortParams, startValue);
+        markData.CreateMarkValues(_isMarkForTypes, sortParams, startValue);
 
         string currentDocName = _documentService.GetDocumentFullName(_revitRepository.Document);
 
@@ -210,7 +220,7 @@ internal class MainViewModel : BaseViewModel {
     }
 
     private bool CanAcceptView() {
-        if(!DocumentsPageViewModel.Documents.Any(d => d.IsChecked)) {
+        if((bool) !DocumentsPageViewModel?.Documents.Any(d => d.IsChecked)) {
             ErrorText = "Не выбраны документы";
             return false;
         }

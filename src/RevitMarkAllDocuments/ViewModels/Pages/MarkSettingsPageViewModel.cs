@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 
@@ -18,13 +19,12 @@ internal class MarkSettingsPageViewModel : BaseViewModel {
     private string _suffix;
     private bool _isSuffixEnable;
 
-    public MarkSettingsPageViewModel(RevitRepository revitRepository, Category category) {
-        _paramsForMark = [.. revitRepository.GetFilterableParams(category)
-            .Where(x => x.StorageType == StorageType.String 
-                || x.StorageType == StorageType.Integer 
-                || x.StorageType == StorageType.Double)
+    public MarkSettingsPageViewModel(IList<FilterableParam> parameters) {
+        _paramsForMark = [.. parameters
+            .Where(x => x.Param.StorageType == StorageType.String 
+                || x.Param.StorageType == StorageType.Integer 
+                || x.Param.StorageType == StorageType.Double)
             .Select(x => new ParameterViewModel(x))];
-
     }
 
     public ObservableCollection<ParameterViewModel> ParamsForMark {

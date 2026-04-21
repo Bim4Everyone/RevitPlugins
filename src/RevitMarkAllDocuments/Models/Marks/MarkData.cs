@@ -32,9 +32,9 @@ internal class MarkData {
         return false;
     }
 
-    public void CreateMarkValues(IList<RevitParam> sortParams, MarkStartValue startValue) {        
+    public void CreateMarkValues(bool isForTypes, IList<FilterableParam> sortParams, MarkStartValue startValue) {        
         var sortService = new SortElementService();
-        var sortedMarkedElements = sortService.SortElements(GetAllElements(), sortParams);
+        var sortedMarkedElements = sortService.SortElements(isForTypes, GetAllElements(), sortParams);
         int startNumber = int.Parse(startValue.StartValue);
 
         foreach(var element in sortedMarkedElements) {

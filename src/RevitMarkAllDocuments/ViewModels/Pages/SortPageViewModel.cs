@@ -1,12 +1,15 @@
-using Autodesk.Revit.DB;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
-
-using dosymep.WPF.ViewModels;
-using RevitMarkAllDocuments.Models;
 using System.Linq;
 using System.Windows.Input;
-using dosymep.WPF.Commands;
+
+using Autodesk.Revit.DB;
+
 using dosymep.Bim4Everyone;
+using dosymep.WPF.Commands;
+using dosymep.WPF.ViewModels;
+
+using RevitMarkAllDocuments.Models;
 
 namespace RevitMarkAllDocuments.ViewModels;
 
@@ -17,11 +20,11 @@ internal class SortPageViewModel : BaseViewModel {
     private ParameterViewModel _selectedParamFromSelected;
 
 
-    public SortPageViewModel(RevitRepository revitRepository, Category category) {
-        SelectableParams = [..revitRepository
-            .GetFilterableParams(category)
+    public SortPageViewModel(IList<FilterableParam> parameters) {
+        SelectableParams = [..parameters
             .Select(x => new ParameterViewModel(x))
             .OrderBy(x => x.Name)];
+
         SelectedParams = [];
 
         AddParamCommand = RelayCommand.Create(AddParam, CanAddParam);

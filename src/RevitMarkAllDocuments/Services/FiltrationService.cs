@@ -10,7 +10,10 @@ namespace RevitMarkAllDocuments.Services;
 
 internal class FiltrationService {
     private readonly FilterOptions _filterOptions;
-    public FiltrationService() {
+    private readonly bool _isMarkForTypes;
+
+    public FiltrationService(bool isMarkForTypes) {
+        _isMarkForTypes = isMarkForTypes;
         _filterOptions = new FilterOptions() { Tolerance = 0 };
     }
 
@@ -22,15 +25,32 @@ internal class FiltrationService {
                 DocumentName = docService.GetDocumentFullName(document)
             };
 
-            var filter = filterProvider.GetFilter();
+            var filter = filterProvider.GetFilter().GetFilter().Build(document, _filterOptions);
 
-            marksByDocument.Elements = new FilteredElementCollector(document)
-                .OfCategory(BuiltInCategory.OST_Walls)
-                .WhereElementIsNotElementType()
-                .WherePasses(filter.GetFilter().Build(document, _filterOptions))
-                .ToElements()
-                .Select(x => new MarkedElement(x))
-                .ToList();
+            var collector = new FilteredElementCollector(document)
+                .OfCategory(BuiltInCategory.OST_Walls);
+
+            FilteredElementCollector collectorByTypes;
+            if(_isMarkForTypes) {
+                // Если в GUI не выбран ни один параметр для фильтрации, то Bim4Everyone.RevitFiltration
+                // возвращает фильтр ElementIsElementTypeFilter(true), а значит типоразмеры не отфильтруются.
+                // Для этого случая не надо использовать никакой фильтр.
+                if(filter is ElementIsElementTypeFilter) {
+                    collectorByTypes = collector
+                        .WhereElementIsElementType();
+                } else {
+                    collectorByTypes = collector
+                        .WhereElementIsElementType()
+                        .WherePasses(filter);
+                }                
+            } else {
+                collectorByTypes = collector
+                    .WhereElementIsNotElementType()
+                    .WherePasses(filter);
+            }
+
+            marksByDocument.Elements = [..collectorByTypes.ToElements()
+                    .Select(x => new MarkedElement(x))];
 
             markData.MarkDataByDocument.Add(marksByDocument);
         }

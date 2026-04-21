@@ -55,12 +55,37 @@ internal class RevitRepository {
         return docs;
     }
 
-    public ICollection<RevitParam> GetFilterableParams(Category category) {
-        return ParameterFilterUtilities
+    public ICollection<FilterableParam> GetFilterableParams(Category category) {
+        var elementTypes = GetElementTypes(category);
+        var parameters = GetParams(category);
+
+        List<FilterableParam> filterableParams = [];
+
+        foreach(var param in parameters) {
+            FilterableParam filterableParam = new FilterableParam() { Param = param };
+
+            if(elementTypes.Any(x => x.IsExistsParam(param))) {
+                filterableParam.IsTypeParam = true;
+            }
+
+            filterableParams.Add(filterableParam);
+        }
+
+        return filterableParams;
+    }
+
+    private ICollection<RevitParam> GetParams(Category category) {
+        return [.. ParameterFilterUtilities
             .GetFilterableParametersInCommon(Document, [category.Id])
             .Select(GetFilterableParam)
-            .Where(p => p != null)
-            .ToArray();
+            .Where(p => p != null)];
+    }
+
+    private ICollection<Element> GetElementTypes(Category category) {
+        return new FilteredElementCollector(Document)
+            .OfCategory(category.GetBuiltInCategory())
+            .WhereElementIsElementType()
+            .ToElements();
     }
 
     private RevitParam GetFilterableParam(ElementId paramId) {
