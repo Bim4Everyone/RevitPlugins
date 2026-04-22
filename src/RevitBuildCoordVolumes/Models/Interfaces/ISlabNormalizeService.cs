@@ -2,9 +2,23 @@ using System.Collections.Generic;
 
 using Autodesk.Revit.DB;
 
+using RevitBuildCoordVolumes.Models.Services;
+
 namespace RevitBuildCoordVolumes.Models.Interfaces;
 
 internal interface ISlabNormalizeService {
+    /// <summary>
+    /// Метод нормализованных плит перекрытий.
+    /// </summary>
+    /// <remarks>
+    /// В данном методе производится получение плит перекрытий без проемов и отверстий.
+    /// </remarks>
+    /// <param name="slabElements">Исходные перекрытия.</param>        
+    /// <param name="progressService">Сервис прогресса.</param>        
+    /// <returns>
+    /// Список верхних граней Face.
+    /// </returns>
+    List<SlabElement> GetNormalizeSlabs(List<SlabElement> slabElements, ProgressService progressService);
     /// <summary>
     /// Метод получения верхних граней перекрытия.
     /// </summary>

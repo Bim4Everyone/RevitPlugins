@@ -81,10 +81,9 @@ internal static class SolidUtility {
     /// <returns>
     /// Сумма объема всех солидов.
     /// </returns>
-    public static double? GetSolidsVolume(IList<Solid> solids) {
+    public static double GetSolidsVolume(IList<Solid> solids) {
         return solids
-            .Select(solid => SolidExtensions.GetVolumeOrDefault(solid))
-            .Where(volume => volume is not null)
+            .Select(solid => (double) SolidExtensions.GetVolumeOrDefault(solid, 0))
             .Sum();
     }
 

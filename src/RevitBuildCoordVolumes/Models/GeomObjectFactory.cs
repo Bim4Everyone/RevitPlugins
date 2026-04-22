@@ -7,28 +7,44 @@ using RevitBuildCoordVolumes.Models.Enums;
 using RevitBuildCoordVolumes.Models.Geometry;
 using RevitBuildCoordVolumes.Models.Interfaces;
 using RevitBuildCoordVolumes.Models.Services;
+using RevitBuildCoordVolumes.Models.Settings;
 using RevitBuildCoordVolumes.Models.Utilites;
 
 namespace RevitBuildCoordVolumes.Models;
 
 internal class GeomObjectFactory : IGeomObjectFactory {
     private readonly IContourService _contourService;
+    private readonly RevitRepository _revitRepository;
 
-    public GeomObjectFactory(IContourService contourService) {
+    public GeomObjectFactory(IContourService contourService, RevitRepository revitRepository) {
         _contourService = contourService;
+        _revitRepository = revitRepository;
     }
 
     public List<GeomObject> GetSimpleGeomObjects(
-        SpatialElement spatialElement,
-        double startExtrudePosition,
-        double finishExtrudePosition,
-        double basePointOffset,
+        BuildCoordVolumeSettings settings,
+        SpatialObject spatialObject,
         ProgressService progressService) {
 
         progressService?.BeginStage(ProgressType.BuildVolumes);
 
-        var listCurveLoops = _contourService.GetSimpleCurveLoops(spatialElement, startExtrudePosition, basePointOffset);
-        var solid = SolidUtility.ExtrudeSolid(listCurveLoops, startExtrudePosition, finishExtrudePosition);
+        var spatialElement = spatialObject.SpatialElement;
+
+        var topZoneParam = settings.ParamMaps
+            .Where(param => param.Type == ParamType.TopZoneParam)
+            .Select(param => param.SourceParam).First();
+
+        var bottomZoneParam = settings.ParamMaps
+            .Where(param => param.Type == ParamType.BottomZoneParam)
+            .Select(param => param.SourceParam).First();
+
+        double topPosition = _revitRepository.GetPositionInFeet(spatialElement, topZoneParam.Name);
+        double bottomPosition = _revitRepository.GetPositionInFeet(spatialElement, bottomZoneParam.Name);
+
+        double basePointOffset = _revitRepository.GetBasePointOffset();
+
+        var listCurveLoops = _contourService.GetSimpleCurveLoops(spatialElement, bottomPosition, basePointOffset);
+        var solid = SolidUtility.ExtrudeSolid(listCurveLoops, bottomPosition, topPosition);
 
         progressService?.ProgressCount?.Report(100);
 
@@ -38,17 +54,18 @@ internal class GeomObjectFactory : IGeomObjectFactory {
                 GeometryObjects = [solid],
                 Volume = solid.Volume
             }];
-
     }
 
     public List<GeomObject> GetUnitedGeomObjects(
-        List<ColumnObject> columns, double spatialElementPosition, ProgressService progressService) {
+        List<ColumnObject> columns, List<PolygonObject> polygons, ProgressService progressService) {
+        double spatialElementPosition = polygons[0].Sides[0].GetEndPoint(0).Z;
         var firstElement = columns[0];
         double startExtrudePosition = firstElement.StartPosition;
         double finishExtrudePosition = firstElement.FinishPosition;
 
         var listCurveLoops = _contourService.GetColumnsCurveLoops(
             columns, spatialElementPosition, startExtrudePosition, progressService);
+
         var solid = SolidUtility.ExtrudeSolid(listCurveLoops, startExtrudePosition, finishExtrudePosition);
 
         if(solid == null) {
@@ -66,7 +83,8 @@ internal class GeomObjectFactory : IGeomObjectFactory {
     }
 
     public List<GeomObject> GetSeparatedGeomObjects(
-        List<ColumnObject> columns, double spatialElementPosition, ProgressService progressService) {
+        List<ColumnObject> columns, List<PolygonObject> polygons, ProgressService progressService) {
+        double spatialElementPosition = polygons[0].Sides[0].GetEndPoint(0).Z;
         var solids = new List<GeometryObject>();
         var volumes = new List<double>();
         var firstElement = columns[0];
