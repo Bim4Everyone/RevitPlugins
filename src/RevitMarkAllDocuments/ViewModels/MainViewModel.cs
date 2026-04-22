@@ -256,12 +256,55 @@ internal class MainViewModel : BaseViewModel {
     }
 
     private void LoadConfig() {
-        RevitSettings setting = _pluginConfig.GetSettings(_revitRepository.Document);
+        RevitSettings settings = _pluginConfig.GetSettings(_revitRepository.Document);
+
+        if(settings is null) {
+            return;
+        }
+
+        if(settings.Category == _selectedCategoryName) {
+            var documents = DocumentsPageViewModel.Documents
+                .Where(x => settings.SelectedDocuments.Contains(x.Name));
+
+            foreach(var document in documents) {
+                document.IsChecked = true;
+            }
+
+            var sortParameters = SortPageViewModel.SelectableParams
+                .Where(x => settings.SelectedSortParams.Contains(x.Name))
+                .ToList();
+
+            foreach(var parameter in sortParameters) {
+                SortPageViewModel.SelectedParamFromSelectable = parameter;
+                SortPageViewModel.AddParam();
+            }
+
+            var selectedMarkParam = MarkSettingsPageViewModel.ParamsForMark
+                .FirstOrDefault(x => x.Name == settings.MarkParam);
+
+            MarkSettingsPageViewModel.SelectedParam = selectedMarkParam;
+            MarkSettingsPageViewModel.StartNumber = settings.StartValue;
+            MarkSettingsPageViewModel.Prefix = settings.Prefix;
+            MarkSettingsPageViewModel.Suffix = settings.Suffix;
+        }
     }
 
     private void SaveConfig() {
-        RevitSettings setting = _pluginConfig.GetSettings(_revitRepository.Document)
+        RevitSettings settings = _pluginConfig.GetSettings(_revitRepository.Document)
                                 ?? _pluginConfig.AddSettings(_revitRepository.Document);
+
+        settings.Category = _selectedCategoryName;
+        settings.SelectedDocuments = [.. DocumentsPageViewModel.Documents
+            .Where(x => x.IsChecked)
+            .Select(x => x.Name)];
+
+        settings.SelectedSortParams = [.. SortPageViewModel.SelectedParams
+            .Select(x => x.Name)];
+
+        settings.MarkParam = MarkSettingsPageViewModel.SelectedParam.Name;
+        settings.StartValue = MarkSettingsPageViewModel.StartNumber;
+        settings.Prefix = MarkSettingsPageViewModel.Prefix;
+        settings.Suffix = MarkSettingsPageViewModel.Suffix;
 
         _pluginConfig.SaveProjectConfig();
     }

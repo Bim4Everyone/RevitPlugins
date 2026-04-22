@@ -1,3 +1,5 @@
+using System.Collections.Generic;
+
 using dosymep.Bim4Everyone;
 using dosymep.Bim4Everyone.ProjectConfigs;
 using dosymep.Serializers;
@@ -58,9 +60,12 @@ internal class RevitSettings : ProjectSettings {
     /// Наименование проекта. Системное свойство. (Не трогать)
     /// </summary>
     public override string ProjectName { get; set; }
-    
-    /// <summary>
-    /// Сохраняемое свойство для примера, нужно его заменить своими настройками.
-    /// </summary>
-    public string SaveProperty { get; set; }
+
+    public string Category { get; set; }
+    public List<string> SelectedDocuments { get; set; }
+    public List<string> SelectedSortParams { get; set; }
+    public string MarkParam { get; set; }
+    public string StartValue { get; set; }
+    public string Prefix { get; set; }
+    public string Suffix { get; set; }
 }
