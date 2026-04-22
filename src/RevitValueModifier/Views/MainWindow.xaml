@@ -20,8 +20,8 @@
     
     x:Name="window"
     
-    Height="400" Width="700"
-    MinHeight="400" MinWidth="700"
+    Height="600" Width="870"
+    MinHeight="600" MinWidth="870"
 
     d:DataContext="{d:DesignInstance vms:MainViewModel, IsDesignTimeCreatable=False}">
 
@@ -57,8 +57,6 @@
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />
             <RowDefinition Height="Auto" />
-            <RowDefinition Height="Auto" />
-            <RowDefinition Height="Auto" />
             <RowDefinition Height="*" />
             <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
@@ -68,161 +66,184 @@
             Grid.ColumnSpan="2"
             Title="{me:LocalizationSource MainWindow.Title}" />
         
-        <Grid
-            Grid.Row="1">
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="Auto"/>
-                <ColumnDefinition Width="*"/>
-            </Grid.ColumnDefinitions>
+        <Border
+            Grid.Row="1"
+            Margin="10 0 10 5"
+            Style="{StaticResource CustomBorder}">
 
-            <ui:TextBlock
-                Grid.Column="0"
-                Margin="10 5 5 5"
-                VerticalAlignment="Center"
-                Text="{me:LocalizationSource ResourceKey=MainWindow.SelectParamToRecord}"/>
+            <StackPanel>
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
 
-            <ComboBox
-                Grid.Column="1"
-                Margin="5 5 10 5"
-                IsEditable="True"
-                StaysOpenOnEdit="True"
-                ItemsSource="{Binding Path=CommonParamsForWrite}"
-                SelectedItem="{Binding Path=SelectedCommonParam}">
-                <ComboBox.ItemTemplate>
-                    <DataTemplate>
-                        <ui:TextBlock>
-                            <ui:TextBlock Text="{Binding Path=ParamName}"/>
-                            <ui:TextBlock 
-                                Foreground="DarkGray"
-                                Text="{Binding
-                                    Path=ParamTypeName,
-                                    StringFormat=({0}),
-                                    Converter={StaticResource paramTypeConverter}}"/>
-                        </ui:TextBlock>
-                    </DataTemplate>
-                </ComboBox.ItemTemplate>
-            </ComboBox>
-        </Grid>
+                    <ui:TextBlock
+                        Grid.Column="0"
+                        Margin="10 5 5 5"
+                        VerticalAlignment="Center"
+                        Text="{me:LocalizationSource ResourceKey=MainWindow.SelectParamToRecord}"/>
 
-        <Grid
-            Grid.Row="2">
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="Auto"/>
-                <ColumnDefinition Width="152*"/>
-                <ColumnDefinition Width="73*"/>
-                <ColumnDefinition Width="280"/>
-            </Grid.ColumnDefinitions>
+                    <ComboBox
+                        Grid.Column="1"
+                        Margin="5 5 5 5"
+                        IsEditable="True"
+                        StaysOpenOnEdit="True"
+                        ItemsSource="{Binding Path=CommonParamsForWrite}"
+                        SelectedItem="{Binding Path=SelectedCommonParam}">
+                        <ComboBox.ItemTemplate>
+                            <DataTemplate>
+                                <ui:TextBlock>
+                                    <ui:TextBlock Text="{Binding Path=ParamName}"/>
+                                    <ui:TextBlock 
+                                        Foreground="DarkGray"
+                                        Text="{Binding
+                                            Path=ParamTypeName,
+                                            StringFormat=({0}),
+                                            Converter={StaticResource paramTypeConverter}}"/>
+                                </ui:TextBlock>
+                            </DataTemplate>
+                        </ComboBox.ItemTemplate>
+                    </ComboBox>
+                </Grid>
 
-            <ui:TextBlock
-                Grid.Column="0"
-                Margin="10,5,5,5"
-                VerticalAlignment="Center"
-                Text="{me:LocalizationSource ResourceKey=MainWindow.EnterParamValueMask}"/>
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="152*"/>
+                        <ColumnDefinition Width="73*"/>
+                        <ColumnDefinition Width="280"/>
+                    </Grid.ColumnDefinitions>
 
-            <ui:TextBox 
-                Grid.Column="1"
-                Grid.ColumnSpan="2"
-                Margin="5,5,5,5"
-                LostFocus="TextBox_LostFocus"
-                Text="{Binding Path=ParamValueMask, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" >
-                <i:Interaction.Triggers>
-                    <i:EventTrigger EventName="TextChanged">
-                        <i:InvokeCommandAction
-                            Command="{Binding Path=ParamUpdateCommand}"/>
-                    </i:EventTrigger>
-                </i:Interaction.Triggers>
-            </ui:TextBox>
+                    <ui:TextBlock
+                        Grid.Column="0"
+                        Margin="10,5,5,5"
+                        VerticalAlignment="Center"
+                        Text="{me:LocalizationSource ResourceKey=MainWindow.EnterParamValueMask}"/>
 
-            <ComboBox
-                Grid.Column="3"
-                Margin="5,5,5,5"
-                ItemsSource="{Binding Path=CommonParamsForRead}"
-                SelectedItem="{Binding Path=SelectedCommonParamForAdd}">
-                <ComboBox.ItemTemplate>
-                    <DataTemplate>
-                        <ui:TextBlock>
-                            <ui:TextBlock Text="{Binding Path=ParamName}"/>
-                            <ui:TextBlock 
-                                Foreground="DarkGray"
-                                Text="{Binding
-                                    Path=ParamTypeName,
-                                    StringFormat=({0}),
-                                    Converter={StaticResource paramTypeConverter}}"/>
-                        </ui:TextBlock>
-                    </DataTemplate>
-                </ComboBox.ItemTemplate>
+                    <ui:TextBox 
+                        Grid.Column="1"
+                        Grid.ColumnSpan="2"
+                        Margin="5,5,5,5"
+                        LostFocus="TextBox_LostFocus"
+                        Text="{Binding Path=ParamValueMask, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" >
+                        <i:Interaction.Triggers>
+                            <i:EventTrigger EventName="TextChanged">
+                                <i:InvokeCommandAction
+                                    Command="{Binding Path=ParamUpdateCommand}"/>
+                            </i:EventTrigger>
+                        </i:Interaction.Triggers>
+                    </ui:TextBox>
 
-                <i:Interaction.Triggers>
-                    <i:EventTrigger EventName="SelectionChanged">
-                        <i:InvokeCommandAction
-                            Command="{Binding AddParamInMaskCommand}"/>
-                    </i:EventTrigger>
-                </i:Interaction.Triggers>
-            </ComboBox>
+                    <ComboBox
+                        Grid.Column="3"
+                        Margin="5,5,5,5"
+                        ItemsSource="{Binding Path=CommonParamsForRead}"
+                        SelectedItem="{Binding Path=SelectedCommonParamForAdd}">
+                        <ComboBox.ItemTemplate>
+                            <DataTemplate>
+                                <ui:TextBlock>
+                                    <ui:TextBlock Text="{Binding Path=ParamName}"/>
+                                    <ui:TextBlock 
+                                        Foreground="DarkGray"
+                                        Text="{Binding
+                                            Path=ParamTypeName,
+                                            StringFormat=({0}),
+                                            Converter={StaticResource paramTypeConverter}}"/>
+                                </ui:TextBlock>
+                            </DataTemplate>
+                        </ComboBox.ItemTemplate>
 
-            <ui:TextBlock
-                Grid.Column="3"
-                Margin="10,0,10,0"
-                VerticalAlignment="Center"
-                IsHitTestVisible="False"
-                Text="{me:LocalizationSource ResourceKey=MainWindow.SelectedParamForAdd}"/>
-        </Grid>
+                        <i:Interaction.Triggers>
+                            <i:EventTrigger EventName="SelectionChanged">
+                                <i:InvokeCommandAction
+                                    Command="{Binding AddParamInMaskCommand}"/>
+                            </i:EventTrigger>
+                        </i:Interaction.Triggers>
+                    </ComboBox>
 
+                    <ui:TextBlock
+                        Grid.Column="3"
+                        Margin="10,0,10,0"
+                        VerticalAlignment="Center"
+                        IsHitTestVisible="False"
+                        Text="{me:LocalizationSource ResourceKey=MainWindow.SelectedParamForAdd}"/>
+                </Grid>
+            </StackPanel>
+        </Border>        
+        
+        
+        <Border
+            Grid.Row="2"
+            Margin="10 5 10 0"
+            Style="{StaticResource CustomBorder}">
 
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="*" />
+                </Grid.RowDefinitions>
+                
+                <StackPanel
+                    Grid.Row="0"
+                    Orientation="Horizontal"
+                    FlowDirection="RightToLeft">
+                    <ui:TextBox 
+                        Margin="5"
+                        FlowDirection="LeftToRight"
+                        MinWidth="200"
+                        Text="{Binding Path=RevitElementsFilter, UpdateSourceTrigger=PropertyChanged}"/>
+
+                    <ui:TextBlock
+                        Margin="5"
+                        VerticalAlignment="Center"
+                        Text="{me:LocalizationSource ResourceKey=MainWindow.Filtration}"/>
+                </StackPanel>
+                
+                <ui:TextBlock
+                    Grid.Row="0"
+                    Margin="10"
+                    VerticalAlignment="Center"
+                    Text="{me:LocalizationSource ResourceKey=MainWindow.Samples}"/>
+                
+                <ui:DataGrid
+                    Grid.Row="1"
+                    Margin="0 5 5 5"
+                    Style="{StaticResource CustomResizableDataGridStyle}"
+                    ItemsSource="{Binding Path=RevitElementVMs, UpdateSourceTrigger=PropertyChanged}">
+                    <DataGrid.Columns>
+                        <DataGridTemplateColumn 
+                            Width="400"
+                            Header="{StaticResource DataColumnRevitElementHeader}"
+                            IsReadOnly="True">
+                            <DataGridTemplateColumn.CellTemplate>
+                                <DataTemplate>
+                                    <StackPanel Orientation="Horizontal">
+                                        <TextBlock 
+                                            VerticalAlignment="Center"
+                                            Text="{Binding ElemName}"/>
+                                        <TextBlock 
+                                            Margin="5"
+                                            VerticalAlignment="Center"
+                                            Foreground="DarkGray"
+                                            Text="{Binding ElemId, StringFormat=(id: {0})}"/>
+                                    </StackPanel>
+                                </DataTemplate>
+                            </DataGridTemplateColumn.CellTemplate>
+                        </DataGridTemplateColumn>
+
+                        <DataGridTextColumn
+                            Width="400"
+                            Binding="{Binding ParamValue}"
+                            Header="{StaticResource DataColumnElementParamValueHeader}"
+                            IsReadOnly="True" />
+                    </DataGrid.Columns>
+                </ui:DataGrid>
+            </Grid>
+        </Border>
+        
         <StackPanel
             Grid.Row="3"
-            Orientation="Horizontal"
-            FlowDirection="RightToLeft">
-            <ui:TextBox 
-                Margin="5"
-                FlowDirection="LeftToRight"
-                MinWidth="200"
-                Text="{Binding Path=RevitElementsFilter, UpdateSourceTrigger=PropertyChanged}"/>
-
-            <ui:TextBlock
-                Margin="5"
-                VerticalAlignment="Center"
-                Text="{me:LocalizationSource ResourceKey=MainWindow.Filtration}"/>
-        </StackPanel>
-        
-        
-        <ui:DataGrid
-            Grid.Row="4"
-            Margin="5"
-            Style="{StaticResource CustomResizableDataGridStyle}"
-            ItemsSource="{Binding Path=RevitElementVMs, UpdateSourceTrigger=PropertyChanged}">
-            <DataGrid.Columns>
-                <DataGridTemplateColumn 
-                    Width="450"
-                    Header="{StaticResource DataColumnRevitElementHeader}"
-                    IsReadOnly="True">
-                    <DataGridTemplateColumn.CellTemplate>
-                        <DataTemplate>
-                            <StackPanel Orientation="Horizontal">
-                                <TextBlock 
-                                    VerticalAlignment="Center"
-                                    Text="{Binding ElemName}"/>
-                                <TextBlock 
-                                    Margin="5"
-                                    VerticalAlignment="Center"
-                                    Foreground="DarkGray"
-                                    Text="{Binding ElemId, StringFormat=(id: {0})}"/>
-                            </StackPanel>
-                        </DataTemplate>
-                    </DataGridTemplateColumn.CellTemplate>
-                </DataGridTemplateColumn>
-
-                <DataGridTextColumn
-                    Width="450"
-                    Binding="{Binding ParamValue}"
-                    Header="{StaticResource DataColumnElementParamValueHeader}"
-                    IsReadOnly="True" />
-            </DataGrid.Columns>
-        </ui:DataGrid>
-        
-        
-        <StackPanel
-            Grid.Row="5"
             Orientation="Horizontal"
             HorizontalAlignment="Right">
             <ui:TextBlock
