@@ -11,7 +11,7 @@ using RevitMarkAllDocuments.Services;
 namespace RevitMarkAllDocuments.Models;
 
 internal class MarkData {
-    public RevitParam RevitParam { get; set; }
+    public RevitParam MarkRevitParam { get; set; }
     public List<MarkDataByDocument> MarkDataByDocument { get; set; } = [];
 
     public MarkDataByDocument GetDataByDocument(string documentName) {

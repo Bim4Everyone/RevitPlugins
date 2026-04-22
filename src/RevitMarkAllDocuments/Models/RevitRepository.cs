@@ -62,7 +62,7 @@ internal class RevitRepository {
         List<FilterableParam> filterableParams = [];
 
         foreach(var param in parameters) {
-            FilterableParam filterableParam = new FilterableParam() { Param = param };
+            FilterableParam filterableParam = new FilterableParam() { RevitParam = param };
 
             if(elementTypes.Any(x => x.IsExistsParam(param))) {
                 filterableParam.IsTypeParam = true;

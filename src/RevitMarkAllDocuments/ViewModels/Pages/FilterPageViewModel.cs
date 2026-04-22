@@ -7,8 +7,8 @@ namespace RevitMarkAllDocuments.ViewModels;
 
 internal class FilterPageViewModel : BaseViewModel {
     public FilterPageViewModel(ILogicalFilterProviderFactory filterProviderFactory,
-                               ILocalizationService languageService,
-                               IDataProvider dataProvider) {
+                               IDataProvider dataProvider,
+                               ILocalizationService languageService) {
         FilterProvider = filterProviderFactory.Create(dataProvider);
         LanguageService = languageService;
     }

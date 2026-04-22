@@ -29,20 +29,20 @@ internal class ParamValidationService {
                                                   IList<MarkedElement> elementsToCheck) {
         if(isForTypes) {
             return elementsToCheck
-                .Where(x => !x.RevitElement.IsExistsParam(paramToCheck.Param))
+                .Where(x => !x.RevitElement.IsExistsParam(paramToCheck.RevitParam))
                 .ToList();
         }
 
         return elementsToCheck
-            .Where(x => !x.RevitElement.IsExistsParam(paramToCheck.Param) && 
-                !x.RevitElement.GetElementType().IsExistsParam(paramToCheck.Param))
+            .Where(x => !x.RevitElement.IsExistsParam(paramToCheck.RevitParam) && 
+                !x.RevitElement.GetElementType().IsExistsParam(paramToCheck.RevitParam))
             .ToList();
     }
 
     public IList<MarkedElement> CheckIsReadonlyParam(FilterableParam paramToCheck, 
                                                      IList<MarkedElement> elementsToCheck) {
         return elementsToCheck
-            .Where(x => x.RevitElement.IsReadOnlyParam(paramToCheck.Param))
+            .Where(x => x.RevitElement.IsReadOnlyParam(paramToCheck.RevitParam))
             .ToList();
     }
 }

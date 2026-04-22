@@ -13,8 +13,8 @@ internal class ParameterViewModel {
 
     public ParameterViewModel(FilterableParam param) {
         _filterableParam = param;
-        _revitParam = param.Param;
-        _name = param.Param.Name;
+        _revitParam = param.RevitParam;
+        _name = param.RevitParam.Name;
     }
 
     public string Name => _name;

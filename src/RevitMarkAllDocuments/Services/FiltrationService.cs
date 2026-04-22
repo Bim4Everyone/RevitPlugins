@@ -9,8 +9,8 @@ using RevitMarkAllDocuments.Models;
 namespace RevitMarkAllDocuments.Services;
 
 internal class FiltrationService {
-    private readonly FilterOptions _filterOptions;
     private readonly bool _isMarkForTypes;
+    private readonly FilterOptions _filterOptions;
 
     public FiltrationService(bool isMarkForTypes) {
         _isMarkForTypes = isMarkForTypes;

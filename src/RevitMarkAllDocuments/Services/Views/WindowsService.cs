@@ -47,7 +47,6 @@ internal class WindowsService {
             window.ShowDialog();
 
             return true;
-
         }
 
         return false;

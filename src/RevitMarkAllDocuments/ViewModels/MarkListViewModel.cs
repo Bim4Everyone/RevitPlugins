@@ -62,18 +62,18 @@ internal class MarkListViewModel : BaseViewModel {
                 var mark = element.MarkedElement;
                 var revitElement = _document.GetElement(new ElementId(mark.Id));
 
-                var storageType = _markData.RevitParam.StorageType;
+                var storageType = _markData.MarkRevitParam.StorageType;
                 if(storageType == StorageType.String) {
-                    revitElement.SetParamValue(_markData.RevitParam, mark.MarkValue);
+                    revitElement.SetParamValue(_markData.MarkRevitParam, mark.MarkValue);
                 } else if(storageType == StorageType.Double) {
                     bool result = double.TryParse(mark.MarkValue, out var number);
                     if(result == true) {
-                        revitElement.SetParamValue(_markData.RevitParam, number);
+                        revitElement.SetParamValue(_markData.MarkRevitParam, number);
                     }                    
                 } else if(storageType == StorageType.Integer) {
                     bool result = int.TryParse(mark.MarkValue, out var number);
                     if(result == true) {
-                        revitElement.SetParamValue(_markData.RevitParam, number);
+                        revitElement.SetParamValue(_markData.MarkRevitParam, number);
                     }
                 }
 

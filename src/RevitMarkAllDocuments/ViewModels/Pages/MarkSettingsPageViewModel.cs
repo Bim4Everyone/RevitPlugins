@@ -21,9 +21,9 @@ internal class MarkSettingsPageViewModel : BaseViewModel {
 
     public MarkSettingsPageViewModel(IList<FilterableParam> parameters) {
         _paramsForMark = [.. parameters
-            .Where(x => x.Param.StorageType == StorageType.String 
-                || x.Param.StorageType == StorageType.Integer 
-                || x.Param.StorageType == StorageType.Double)
+            .Where(x => x.RevitParam.StorageType == StorageType.String 
+                || x.RevitParam.StorageType == StorageType.Integer 
+                || x.RevitParam.StorageType == StorageType.Double)
             .Select(x => new ParameterViewModel(x))];
     }
 
