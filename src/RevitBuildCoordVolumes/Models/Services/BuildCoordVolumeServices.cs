@@ -25,6 +25,7 @@ internal sealed class BuildCoordVolumeServices {
         SpatialDivider = new SpatialElementDividerService(ContourService);
         SlabNormalizer = new SlabNormalizeService(systemPluginConfig);
         ColumnFactory = new ColumnFactory();
+        GeomObjectConnector = new GeomObjectConnector(revitRepository, systemPluginConfig);
     }
 
     public ISpatialElementDividerService SpatialDivider { get; }
@@ -40,4 +41,5 @@ internal sealed class BuildCoordVolumeServices {
     public IRevitParamFactory RevitParamFactory { get; }
     public IWindowService WindowService { get; }
     public ISpatialElementCheckService SpatialElementCheckService { get; }
+    public IGeomObjectConnector GeomObjectConnector { get; }
 }

@@ -1,6 +1,10 @@
+using System;
 using System.Collections.Generic;
+using System.Linq;
 
 using Autodesk.Revit.DB;
+
+using dosymep.Revit.Geometry;
 
 namespace RevitBuildCoordVolumes.Models.Utilites;
 
@@ -51,5 +55,50 @@ internal static class SolidUtility {
         } catch {
             return null;
         }
+    }
+
+    /// <summary>
+    /// Метод перемешивания солидов.
+    /// </summary>
+    /// <remarks>
+    /// В данном методе производится перемешивание солидов по случайному GUID.
+    /// </remarks>    
+    /// <param name="solids">Исходный список солидов</param>
+    /// <returns>
+    /// Перемешанный список солидов.
+    /// </returns>
+    public static List<Solid> ShuffleSolidsByGuid(IEnumerable<Solid> solids) {
+        return [.. solids.OrderBy(_ => Guid.NewGuid())];
+    }
+
+    /// <summary>
+    /// Метод безопасного получения общего объема солидов.
+    /// </summary>
+    /// <remarks>
+    /// В данном методе производится вычисление общего объема солидов.
+    /// </remarks>    
+    /// <param name="solids">Исходный список солидов</param>
+    /// <returns>
+    /// Сумма объема всех солидов.
+    /// </returns>
+    public static double? GetSolidsVolume(IList<Solid> solids) {
+        return solids
+            .Select(solid => SolidExtensions.GetVolumeOrDefault(solid))
+            .Where(volume => volume is not null)
+            .Sum();
+    }
+
+    /// <summary>
+    /// Метод безопасного объединения списка солидов.
+    /// </summary>
+    /// <remarks>
+    /// В данном методе производится безопасное объединение списка солидов в объединенный список солидов.
+    /// </remarks>    
+    /// <param name="solids">Исходный список солидов</param>
+    /// <returns>
+    /// Объединенный список солидов.
+    /// </returns>
+    public static IList<Solid> CreateUnitedSolids(IList<Solid> solids) {
+        return SolidExtensions.CreateUnitedSolids([.. solids]);
     }
 }
