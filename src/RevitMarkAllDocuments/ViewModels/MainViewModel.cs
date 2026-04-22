@@ -24,6 +24,7 @@ internal class MainViewModel : BaseViewModel {
     private readonly PluginConfig _pluginConfig;
     private readonly RevitRepository _revitRepository;
     private readonly DocumentService _documentService;
+    private readonly ParamValidationService _paramValidationService;
     private readonly WindowsService _windowsService;
     private readonly ILogicalFilterProviderFactory _filterFactory;
     private readonly ILocalizationService _localizationService;
@@ -42,12 +43,14 @@ internal class MainViewModel : BaseViewModel {
                          RevitRepository revitRepository,
                          CategoryContext categoryContext,
                          DocumentService documentService,
+                         ParamValidationService paramValidationService,
                          WindowsService markListWindowService,
                          ILogicalFilterProviderFactory filterFactory,
                          ILocalizationService localizationService) {        
         _pluginConfig = pluginConfig;
         _revitRepository = revitRepository;
         _documentService = documentService;
+        _paramValidationService = paramValidationService;
         _windowsService = markListWindowService;
         _filterFactory = filterFactory;
         _localizationService = localizationService;
@@ -62,10 +65,6 @@ internal class MainViewModel : BaseViewModel {
 
     public ICommand LoadViewCommand { get; }
     
-    /// <summary>
-    /// Команда применения настроек главного окна. (запуск плагина)
-    /// </summary>
-    /// <remarks>В случаях, когда используется немодальное окно, требуется данную команду удалять.</remarks>
     public ICommand AcceptViewCommand { get; }
 
     public DocumentsPageViewModel DocumentsPageViewModel => _documentsPageViewModel;
@@ -81,19 +80,15 @@ internal class MainViewModel : BaseViewModel {
     }
 
     private void LoadView() {
-        var filterableParameters = _revitRepository.GetFilterableParams(_selectedCategory).ToList();
-
-        var paramsForMarks = filterableParameters.Where(x => x.IsTypeParam == _isMarkForTypes).ToList();
-
-        if(_isMarkForTypes) {
-            filterableParameters = filterableParameters.Where(x => x.IsTypeParam).ToList();
-        }
+        var paramProvider = new ParamProvider(_revitRepository, _selectedCategory, _isMarkForTypes);
+        var paramsForFilterAndSort = paramProvider.GetParamsForFilterAndSort();
+        var paramsForMark = paramProvider.GetParamsForMarks();
 
         _documentsPageViewModel = new DocumentsPageViewModel(_revitRepository);
-        var dataProvider = new FilterDataProvider(_revitRepository, filterableParameters, _selectedCategory);
-        _filterPageViewModel = new FilterPageViewModel(_filterFactory, _localizationService, dataProvider);
-        _sortPageViewModel = new SortPageViewModel(filterableParameters);
-        _markSettingsPageViewModel = new MarkSettingsPageViewModel(paramsForMarks);
+        var dataProvider = new FilterDataProvider(_revitRepository.Document, _selectedCategory, paramsForFilterAndSort);
+        _filterPageViewModel = new FilterPageViewModel(_filterFactory, dataProvider, _localizationService);
+        _sortPageViewModel = new SortPageViewModel(paramsForFilterAndSort);
+        _markSettingsPageViewModel = new MarkSettingsPageViewModel(paramsForMark);
 
         LoadConfig();
     }
@@ -111,32 +106,66 @@ internal class MainViewModel : BaseViewModel {
     }
 
     private void AcceptView() {
-        var filtrationService = new FiltrationService(_isMarkForTypes);
-        var markSetterService = new MarkSetterService();
-
-        // get documents
+        // Получение документов
         var checkedDocuments = DocumentsPageViewModel.Documents
             .Where(d => d.IsChecked)
             .Select(d => d.Document)
             .ToArray();
 
-        // creating mark data and filter elements
-        var selectedParam = MarkSettingsPageViewModel.SelectedParam;
+        // Создание MarkData и фильтрация элементов
+        var selectedMarkParam = MarkSettingsPageViewModel.SelectedParam.FilterableParam;
         var markData = new MarkData() {
-            RevitParam = selectedParam.RevitParam,
+            MarkRevitParam = selectedMarkParam.RevitParam,
         };
+        var filtrationService = new FiltrationService(_isMarkForTypes);
         markData = filtrationService.FilterElements(markData, checkedDocuments, FilterPageViewModel.FilterProvider);
 
-        // checking params
         var sortParams = SortPageViewModel.SelectedParams
             .Select(x => x.FilterableParam)
             .ToList();
 
-        var validation = new ParamValidationService();
+        // Проверка на наличие параметров и возможности записать значения в параметры
+        if(CheckAreExistParameters(markData, sortParams, selectedMarkParam)) {
+            return;
+        } 
+        if(CheckReadOnlyParameters(markData, selectedMarkParam)) {
+            return;
+        }
+
+        // Создание значений для марок на основе отсортированного списка элементов.
+        var startValue = MarkSettingsPageViewModel.GetStartValue();
+        markData.CreateMarkValues(_isMarkForTypes, sortParams, startValue);
+
+        string currentDocName = _documentService.GetDocumentFullName(_revitRepository.Document);
+
+        // Если есть связанные документы, то экспортируем информацию про марки в json
+        if(markData.HasLinksForExport(currentDocName)) {
+            string path = SelectFolder();
+            string fullPath = path + "\\" + $"{currentDocName}.json";
+
+            var jsonService = new JsonSerializerService();
+            jsonService.ExportMarkData(fullPath, markData);
+        }
+
+        // Если выбран текущий документ, то заполняем значения марок в нём
+        var markDataForCurrentDoc = markData.GetDataByDocument(currentDocName);
+        if(markDataForCurrentDoc != null) {
+            _windowsService.ShowMarkListWindow(markData, _revitRepository, _documentService, _localizationService);
+        }
+
+        SaveConfig();
+    }
+
+    /// <summary>
+    /// Проверяет существуют ли выбранные параметры у всех элементов во всех документах.
+    /// </summary>
+    /// <returns> true если найдены ошибки</returns>
+    public bool CheckAreExistParameters(MarkData markData, List<FilterableParam> sortParams, FilterableParam markParam) {
         var filteredElements = markData.GetAllElements();
         var warningsWithNoParams = new WarningsViewModel();
 
-        var warningElementsSortParams = validation.CheckAreExistParams(_isMarkForTypes, sortParams, filteredElements);
+        var warningElementsSortParams = _paramValidationService
+            .CheckAreExistParams(_isMarkForTypes, sortParams, filteredElements);
 
         if(warningElementsSortParams.Any()) {
             var warning = new WarningViewModel() {
@@ -150,7 +179,9 @@ internal class MainViewModel : BaseViewModel {
             warningsWithNoParams.Warnings.Add(warning);
         }
 
-        var warningElementsMarkParams = validation.CheckIsExistParam(_isMarkForTypes, selectedParam.FilterableParam, filteredElements);
+        var warningElementsMarkParams = _paramValidationService
+            .CheckIsExistParam(_isMarkForTypes, markParam, filteredElements);
+
         if(warningElementsMarkParams.Any()) {
             var warning = new WarningViewModel() {
                 Elements = [.. warningElementsMarkParams.Select(x => new WarningElementViewModel() {
@@ -163,17 +194,24 @@ internal class MainViewModel : BaseViewModel {
             warningsWithNoParams.Warnings.Add(warning);
         }
 
-        if(_windowsService.ShowWarningsWindow(warningsWithNoParams)) {
-            return;
-        }
+        return _windowsService.ShowWarningsWindow(warningsWithNoParams);
+    }
 
+    /// <summary>
+    /// Проверяет доступен ли параметр для записи у всех элементов во всех документах.
+    /// </summary>
+    /// <returns> true если найдены ошибки</returns>
+    public bool CheckReadOnlyParameters(MarkData markData, FilterableParam markParam) {
         var warningsWithReadonlyParams = new WarningsViewModel();
+        var filteredElements = markData.GetAllElements();
 
-        var warningElementsReadonlyParams = validation.CheckIsReadonlyParam(selectedParam.FilterableParam, filteredElements);
+        var warningElementsReadonlyParams = _paramValidationService
+            .CheckIsReadonlyParam(markParam, filteredElements);
+
         if(warningElementsReadonlyParams.Any()) {
             var elementsToShow = warningElementsReadonlyParams.Select(x => new WarningElementViewModel() {
-                    Element = x.RevitElement,
-                });
+                Element = x.RevitElement,
+            });
 
             int elementsNumber = elementsToShow.Count();
             int maxShownElements = 100;
@@ -184,7 +222,7 @@ internal class MainViewModel : BaseViewModel {
             }
 
             var warning = new WarningViewModel() {
-                Elements = [..elementsToShow],
+                Elements = [.. elementsToShow],
                 FullName = "В проектах параметр для заполнения марки доступен только для чтения.",
                 Description = "В проектах параметр для заполнения марки доступен только для чтения." + additionalMessage
             };
@@ -192,31 +230,7 @@ internal class MainViewModel : BaseViewModel {
             warningsWithReadonlyParams.Warnings.Add(warning);
         }
 
-        if(_windowsService.ShowWarningsWindow(warningsWithReadonlyParams)) {
-            return;
-        }
-
-
-        // sort and mark elements
-        var startValue = MarkSettingsPageViewModel.GetStartValue();
-        markData.CreateMarkValues(_isMarkForTypes, sortParams, startValue);
-
-        string currentDocName = _documentService.GetDocumentFullName(_revitRepository.Document);
-
-        if(markData.HasLinksForExport(currentDocName)) {
-            string path = SelectFolder();
-            string fullPath = path + "\\" + $"{currentDocName}.json";
-
-            var jsonService = new JsonSerializerService();
-            jsonService.ExportMarkData(fullPath, markData);
-        }
-
-        var markDataForCurrentDoc = markData.GetDataByDocument(currentDocName);
-        if(markDataForCurrentDoc != null) {
-            _windowsService.ShowMarkListWindow(markData, _revitRepository, _documentService, _localizationService);
-        }
-
-        SaveConfig();
+        return _windowsService.ShowWarningsWindow(warningsWithReadonlyParams);
     }
 
     private bool CanAcceptView() {

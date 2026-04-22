@@ -75,6 +75,10 @@ public class RevitMarkAllDocumentsCommand : BasePluginCommand {
             .ToSelf()
             .InSingletonScope();
 
+        kernel.Bind<ParamValidationService>()
+            .ToSelf()
+            .InSingletonScope();
+
         // Используем сервис обновления тем для WinUI
         kernel.UseWpfUIThemeUpdater();
 
