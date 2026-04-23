@@ -50,7 +50,7 @@ internal class ReportViewModel : BaseViewModel, INamedEntity, IEquatable<ReportV
         IMessageBoxService messageBoxService,
         IContentDialogService contentDialogService,
         SettingsConfig settingsConfig,
-        ICollection<ClashModel> clashes = null) {
+        ICollection<ClashModel> clashes) {
 
         _localization = localization ?? throw new ArgumentNullException(nameof(localization));
         OpenFileDialogService = openFileDialogService ?? throw new ArgumentNullException(nameof(openFileDialogService));
@@ -59,14 +59,23 @@ internal class ReportViewModel : BaseViewModel, INamedEntity, IEquatable<ReportV
         _contentDialogService = contentDialogService ?? throw new ArgumentNullException(nameof(contentDialogService));
         _settingsConfig = settingsConfig ?? throw new ArgumentNullException(nameof(settingsConfig));
 
+        ClashStatuses = new ReadOnlyCollection<ClashStatusViewModel>([
+            new ClashStatusViewModel(_localization, ClashStatus.Active),
+            new ClashStatusViewModel(_localization, ClashStatus.Analized),
+            new ClashStatusViewModel(_localization, ClashStatus.Solved),
+            new ClashStatusViewModel(_localization, ClashStatus.Imaginary),
+        ]);
+
         Initialize(revitRepository, name);
-        if(clashes is not null) {
-            InitializeClashes(clashes);
-        } else {
-            InitializeClashesFromPluginFile();
+        if(clashes is null) {
+            throw new ArgumentNullException(nameof(clashes));
         }
+
+        InitializeClashes(clashes);
     }
 
+
+    public IReadOnlyCollection<ClashStatusViewModel> ClashStatuses { get; }
 
     public string Name {
         get => _name;
@@ -136,7 +145,6 @@ internal class ReportViewModel : BaseViewModel, INamedEntity, IEquatable<ReportV
 
     public IMessageBoxService MessageBoxService { get; }
 
-
     private ObservableCollection<ClashViewModel> Clashes {
         get => _clashes;
         set => RaiseAndSetIfChanged(ref _clashes, value);
@@ -170,6 +178,21 @@ internal class ReportViewModel : BaseViewModel, INamedEntity, IEquatable<ReportV
             && Name == other.Name;
     }
 
+    public ICollection<ClashViewModel> GetClashes() {
+        return _allClashes ?? [];
+    }
+
+    public void ResetClashes(IEnumerable<ClashViewModel> clashes) {
+        ShowImaginaryClashes = false;
+        _allClashes = clashes.ToList();
+        var documentNames = _revitRepository.DocInfos.Select(item => item.Doc.Title).ToList();
+        Clashes = new ObservableCollection<ClashViewModel>(_allClashes.Where(item => IsValid(documentNames, item)));
+
+        GuiClashes = new ObservableCollection<IClashViewModel>(Clashes.OrderBy(c => c.ClashName));
+        SetAdditionalParamValues(GuiClashes);
+        SetIntersectionPercentage(GuiClashes);
+    }
+
     private void Initialize(RevitRepository revitRepository, string name) {
         _revitRepository = revitRepository ?? throw new ArgumentNullException(nameof(revitRepository));
         Name = name ?? throw new ArgumentNullException(nameof(name));
@@ -201,22 +224,8 @@ internal class ReportViewModel : BaseViewModel, INamedEntity, IEquatable<ReportV
         RefreshMessage();
     }
 
-    private void InitializeClashesFromPluginFile() {
-        if(Name != null) {
-            var config = ClashesConfig.GetClashesConfig(_revitRepository.GetObjectName(), Name);
-            InitializeClashes(config.Clashes.Select(item => item.SetRevitRepository(_revitRepository)));
-        }
-    }
-
     private void InitializeClashes(IEnumerable<ClashModel> clashModels) {
-        _allClashes = clashModels.Select(item => new ClashViewModel(_revitRepository, item))
-                                 .ToList();
-        var documentNames = _revitRepository.DocInfos.Select(item => item.Doc.Title).ToList();
-        Clashes = new ObservableCollection<ClashViewModel>(_allClashes.Where(item => IsValid(documentNames, item)));
-
-        GuiClashes = new ObservableCollection<IClashViewModel>(Clashes);
-        SetAdditionalParamValues(GuiClashes);
-        SetIntersectionPercentage(GuiClashes);
+        ResetClashes(clashModels.Select(item => new ClashViewModel(_revitRepository, item, _localization)));
     }
 
     private bool IsValid(List<string> documentNames, ClashViewModel clash) {
@@ -300,10 +309,10 @@ internal class ReportViewModel : BaseViewModel, INamedEntity, IEquatable<ReportV
             if(checkViewModel is not null) {
                 (var firstProviders, var secondProviders) = checkViewModel.GetProviders();
                 _imaginaryFirstClashes = FilterElements(Clashes, GetElementViewModels(firstProviders))
-                    .Select(e => new ImaginaryFirstClashViewModel(_revitRepository, e))
+                    .Select(e => new ImaginaryFirstClashViewModel(_revitRepository, e, _localization))
                     .ToArray();
                 _imaginarySecondClashes = FilterElements(Clashes, GetElementViewModels(secondProviders))
-                    .Select(e => new ImaginarySecondClashViewModel(_revitRepository, e))
+                    .Select(e => new ImaginarySecondClashViewModel(_revitRepository, e, _localization))
                     .ToArray();
                 SetAdditionalParamValues(_imaginaryFirstClashes);
                 SetAdditionalParamValues(_imaginarySecondClashes);

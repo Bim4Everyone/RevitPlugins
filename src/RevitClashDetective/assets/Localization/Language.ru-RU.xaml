@@ -91,11 +91,9 @@
     <system:String
         x:Key="ReportsResolver.Body">В загружаемом файле содержатся проверки с совпадающими именами: {0}.</system:String>
     <system:String
-        x:Key="ReportsResolver.ReplaceAndKeepStatuses">Заменить с сохранением статусов</system:String>
+        x:Key="ReportsResolver.Merge">Объединить</system:String>
     <system:String
-        x:Key="ReportsResolver.Replace">Заменить с перезаписью статусов и комментариев</system:String>
-    <system:String
-        x:Key="ReportsResolver.KeepOnlyOld">Не заменять</system:String>
+        x:Key="ReportsResolver.Replace">Заменить</system:String>
     <system:String
         x:Key="ReportsResolver.CopyAndRename">Загрузить с переименованием</system:String>
 
@@ -228,6 +226,11 @@
         x:Key="Navigator.ClashComments">Комментарии коллизии '{0}'</system:String>
 
     <system:String
+        x:Key="ReportsMerge.ConflictedClashes">Конфликтующие коллизии</system:String>
+    <system:String
+        x:Key="ReportsMerge.AutoMergedClashes">Автообъединенные коллизии</system:String>
+
+    <system:String
         x:Key="SelectableNamesDialog.NameHeader">Название</system:String>
     <system:String
         x:Key="SelectableNamesDialog.SelectFiles">Выберите файлы</system:String>
@@ -259,6 +262,14 @@
         x:Key="SetEvaluators.Or">Или</system:String>
     <system:String
         x:Key="SetEvaluators.And">И</system:String>
+    <system:String
+        x:Key="ClashStatus.Active">Активно</system:String>
+    <system:String
+        x:Key="ClashStatus.Analized">Проанализировано</system:String>
+    <system:String
+        x:Key="ClashStatus.Solved">Исправлено</system:String>
+    <system:String
+        x:Key="ClashStatus.Imaginary">Нет пересечения</system:String>
     <system:String
         x:Key="RuleEvaluators.FilterStringBeginsWith">Начинается с</system:String>
     <system:String

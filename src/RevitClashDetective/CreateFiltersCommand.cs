@@ -21,6 +21,9 @@ using RevitClashDetective.Models.Handlers;
 using RevitClashDetective.ViewModels.FilterCreatorViewModels;
 using RevitClashDetective.Views;
 
+using FilterCreatorView = RevitClashDetective.Views.Filters.FilterCreatorView;
+using FilterNameView = RevitClashDetective.Views.Filters.FilterNameView;
+
 namespace RevitClashDetective;
 
 [Transaction(TransactionMode.Manual)]

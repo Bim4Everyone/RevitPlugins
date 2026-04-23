@@ -7,10 +7,9 @@ using System.Windows.Input;
 
 using Autodesk.Revit.DB;
 
-using DevExpress.XtraSpreadsheet.Model;
-
 using dosymep.WPF.Commands;
 using dosymep.WPF.ViewModels;
+using dosymep.SimpleServices;
 
 using RevitClashDetective.Models;
 using RevitClashDetective.Models.Clashes;
@@ -22,10 +21,13 @@ internal class ClashViewModel : BaseViewModel, IClashViewModel, IEquatable<Clash
     private ClashStatus _clashStatus;
     private string _clashName;
     private readonly RevitRepository _revitRepository;
+    private readonly ILocalizationService _localizationService;
     private bool _clashDataIsValid;
     private ClashCommentViewModel _selectedComment;
+    private bool _canEditComments = true;
 
-    public ClashViewModel(RevitRepository revitRepository, ClashModel clash) {
+    public ClashViewModel(RevitRepository revitRepository, ClashModel clash, ILocalizationService localizationService) {
+        _localizationService = localizationService ?? throw new ArgumentNullException(nameof(localizationService));
         _revitRepository = revitRepository;
 
         ClashName = clash.Name;
@@ -67,9 +69,14 @@ internal class ClashViewModel : BaseViewModel, IClashViewModel, IEquatable<Clash
         set {
             if(value != ClashStatus.Imaginary) {
                 RaiseAndSetIfChanged(ref _clashStatus, value);
+                RaisePropertyChanged(nameof(ClashStatusName));
             }
         }
     }
+
+    public string ClashStatusName => _localizationService.GetLocalizedString($"{nameof(ClashStatus)}.{ClashStatus}");
+
+    public string CommentsTitle => ClashName;
 
     public string ClashName {
         get => _clashName;
@@ -84,6 +91,11 @@ internal class ClashViewModel : BaseViewModel, IClashViewModel, IEquatable<Clash
     public ClashCommentViewModel SelectedComment {
         get => _selectedComment;
         set => RaiseAndSetIfChanged(ref _selectedComment, value);
+    }
+
+    public bool CanEditComments {
+        get => _canEditComments;
+        set => RaiseAndSetIfChanged(ref _canEditComments, value);
     }
 
     public ObservableCollection<ClashCommentViewModel> Comments { get; }
@@ -227,6 +239,27 @@ internal class ClashViewModel : BaseViewModel, IClashViewModel, IEquatable<Clash
         }
     }
 
+    public void ResetComments(IEnumerable<ClashCommentViewModel> comments) {
+        Comments.Clear();
+        foreach(var c in comments) {
+            AddComment(c.GetComment());
+        }
+    }
+
+    private void AddComment(ClashComment comment) {
+        int id;
+        if(Comments.Count == 0) {
+            id = 1;
+        } else {
+            id = Comments.Max(c => c.Id) + 1;
+        }
+
+        comment.Id = id;
+        var commentVm = new ClashCommentViewModel(_revitRepository, comment);
+        Comments.Add(commentVm);
+        SelectedComment = commentVm;
+    }
+
     private void SetElementParams(IDictionary<string, object> elementParams, Element element, string[] paramNames) {
         elementParams.Clear();
         for(int i = 0; i < paramNames.Length; i++) {
@@ -235,21 +268,7 @@ internal class ClashViewModel : BaseViewModel, IClashViewModel, IEquatable<Clash
     }
 
     private void AddComment() {
-        int id;
-        if(Comments.Count == 0) {
-            id = 1;
-        } else {
-            id = Comments.Max(c => c.Id) + 1;
-        }
-
-        var c = new ClashCommentViewModel(
-            _revitRepository,
-            new ClashComment() {
-                Id = id,
-                Author = _revitRepository.UiApplication.Application.Username
-            });
-        Comments.Add(c);
-        SelectedComment = c;
+        AddComment(new ClashComment() { Author = _revitRepository.UiApplication.Application.Username });
     }
 
     private void RemoveComment(ClashCommentViewModel comment) {

@@ -19,6 +19,7 @@ using RevitClashDetective.Models.GraphicView;
 using RevitClashDetective.Models.Handlers;
 using RevitClashDetective.ViewModels.ClashDetective;
 using RevitClashDetective.Views;
+using RevitClashDetective.Views.Checks;
 
 using Wpf.Ui;
 

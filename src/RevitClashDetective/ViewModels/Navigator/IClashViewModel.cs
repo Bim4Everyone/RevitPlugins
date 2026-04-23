@@ -7,8 +7,11 @@ using Autodesk.Revit.DB;
 using RevitClashDetective.Models.Clashes;
 
 namespace RevitClashDetective.ViewModels.Navigator;
-internal interface IClashViewModel : INotifyPropertyChanged {
+
+internal interface IClashViewModel : INotifyPropertyChanged, ICommentable {
     ClashStatus ClashStatus { get; set; }
+
+    string ClashStatusName { get; }
 
     string ClashName { get; set; }
 

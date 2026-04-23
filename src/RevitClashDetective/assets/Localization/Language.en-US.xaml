@@ -91,11 +91,9 @@
     <system:String
         x:Key="ReportsResolver.Body">The uploaded file contains checks with duplicate names: {0}.</system:String>
     <system:String
-        x:Key="ReportsResolver.ReplaceAndKeepStatuses">Replace while keeping statuses and comments</system:String>
+        x:Key="ReportsResolver.Merge">Merge</system:String>
     <system:String
-        x:Key="ReportsResolver.Replace">Replace and overwrite statuses</system:String>
-    <system:String
-        x:Key="ReportsResolver.KeepOnlyOld">Do not replace</system:String>
+        x:Key="ReportsResolver.Replace">Replace</system:String>
     <system:String
         x:Key="ReportsResolver.CopyAndRename">Load with renaming</system:String>
 
@@ -228,6 +226,11 @@
         x:Key="Navigator.ClashComments">Comments of clash '{0}'</system:String>
 
     <system:String
+        x:Key="ReportsMerge.ConflictedClashes">Conflicted clashes</system:String>
+    <system:String
+        x:Key="ReportsMerge.AutoMergedClashes">Automerged clashes</system:String>
+
+    <system:String
         x:Key="SelectableNamesDialog.NameHeader">Name</system:String>
     <system:String
         x:Key="SelectableNamesDialog.SelectFiles">Select files</system:String>
@@ -259,6 +262,14 @@
         x:Key="SetEvaluators.Or">Or</system:String>
     <system:String
         x:Key="SetEvaluators.And">And</system:String>
+    <system:String
+        x:Key="ClashStatus.Active">Active</system:String>
+    <system:String
+        x:Key="ClashStatus.Analized">Analyzed</system:String>
+    <system:String
+        x:Key="ClashStatus.Solved">Solved</system:String>
+    <system:String
+        x:Key="ClashStatus.Imaginary">No intersection</system:String>
     <system:String
         x:Key="RuleEvaluators.FilterStringBeginsWith">Begins with</system:String>
     <system:String
