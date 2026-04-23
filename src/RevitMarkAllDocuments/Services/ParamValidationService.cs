@@ -9,10 +9,10 @@ using RevitMarkAllDocuments.Models;
 namespace RevitMarkAllDocuments.Services;
 
 internal class ParamValidationService {
-    public IList<MarkedElement> CheckAreExistParams(bool isForTypes,
+    public IList<WarningElement> CheckAreExistParams(bool isForTypes,
                                                     IList<FilterableParam> paramsToCheck, 
                                                     IList<MarkedElement> elementsToCheck) {
-        var elementsWithError = new List<MarkedElement>();
+        var elementsWithError = new List<WarningElement>();
 
         foreach(var param in paramsToCheck) {
             var elements = CheckIsExistParam(isForTypes, param, elementsToCheck);
@@ -24,25 +24,37 @@ internal class ParamValidationService {
         return elementsWithError;
     }
 
-    public IList<MarkedElement> CheckIsExistParam(bool isForTypes, 
+    public IList<WarningElement> CheckIsExistParam(bool isForTypes, 
                                                   FilterableParam paramToCheck, 
                                                   IList<MarkedElement> elementsToCheck) {
         if(isForTypes) {
             return elementsToCheck
                 .Where(x => !x.RevitElement.IsExistsParam(paramToCheck.RevitParam))
+                .Select(x => new WarningElement {
+                    Element = x.RevitElement,
+                    ParameterName = paramToCheck.RevitParam.Name,
+                })
                 .ToList();
         }
 
         return elementsToCheck
             .Where(x => !x.RevitElement.IsExistsParam(paramToCheck.RevitParam) && 
                 !x.RevitElement.GetElementType().IsExistsParam(paramToCheck.RevitParam))
+            .Select(x => new WarningElement {
+                Element = x.RevitElement,
+                ParameterName = paramToCheck.RevitParam.Name,
+            })
             .ToList();
     }
 
-    public IList<MarkedElement> CheckIsReadonlyParam(FilterableParam paramToCheck, 
+    public IList<WarningElement> CheckIsReadonlyParam(FilterableParam paramToCheck, 
                                                      IList<MarkedElement> elementsToCheck) {
         return elementsToCheck
             .Where(x => x.RevitElement.IsReadOnlyParam(paramToCheck.RevitParam))
+            .Select(x => new WarningElement {
+                Element = x.RevitElement,
+                ParameterName = paramToCheck.RevitParam.Name,
+            })
             .ToList();
     }
 }

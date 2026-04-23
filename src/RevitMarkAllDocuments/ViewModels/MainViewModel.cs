@@ -174,9 +174,7 @@ internal class MainViewModel : BaseViewModel {
 
         if(warningElementsSortParams.Any()) {
             var warning = new WarningViewModel() {
-                Elements = [.. warningElementsSortParams.Select(x => new WarningElementViewModel() {
-                    Element = x.RevitElement,
-                })],
+                Elements = [.. warningElementsSortParams.Select(x => new WarningElementViewModel(x))],
                 FullName = "В проектах отсутствует параметр для сортировки",
                 Description = "В указанных проектах отсутствует параметр для сортировки для некоторых элементов выбранной категории"
             };
@@ -189,9 +187,7 @@ internal class MainViewModel : BaseViewModel {
 
         if(warningElementsMarkParams.Any()) {
             var warning = new WarningViewModel() {
-                Elements = [.. warningElementsMarkParams.Select(x => new WarningElementViewModel() {
-                    Element = x.RevitElement,
-                }).Take(100)],
+                Elements = [.. warningElementsMarkParams.Select(x => new WarningElementViewModel(x)).Take(100)],
                 FullName = "В проектах отсутствует параметр для заполнения марки",
                 Description = "В проектах отсутствует параметр для заполнения марки доступен"
             };
@@ -214,9 +210,7 @@ internal class MainViewModel : BaseViewModel {
             .CheckIsReadonlyParam(markParam, filteredElements);
 
         if(warningElementsReadonlyParams.Any()) {
-            var elementsToShow = warningElementsReadonlyParams.Select(x => new WarningElementViewModel() {
-                Element = x.RevitElement,
-            });
+            var elementsToShow = warningElementsReadonlyParams.Select(x => new WarningElementViewModel(x));
 
             int elementsNumber = elementsToShow.Count();
             int maxShownElements = 100;
