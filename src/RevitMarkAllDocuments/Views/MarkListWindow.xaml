@@ -34,6 +34,7 @@
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
             <RowDefinition Height="*" />
             <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
@@ -44,6 +45,26 @@
 
         <Border
             Grid.Row="1"
+            Margin="14,4"
+            Style="{StaticResource CustomBorder}">
+            <StackPanel
+                Orientation="Vertical">
+                <TextBlock
+                    Text="В данном файле найдены следующие элементы для заполнения марок. Для запуска маркировки нажмите ОК."/>
+
+                <StackPanel
+                    Orientation="Horizontal">                    
+                    <TextBlock
+                        Text="{me:LocalizationSource MarkList.ParameterName}" />                    
+                    <TextBlock
+                        Margin="5,0,0,0"
+                        Text="{Binding ParameterName}" />
+                </StackPanel>
+            </StackPanel>            
+        </Border>
+
+        <Border
+            Grid.Row="2"
             Margin="14,4"
             Style="{StaticResource CustomBorder}">
             <ui:DataGrid
@@ -95,7 +116,7 @@
         </Border>
 
         <StackPanel
-            Grid.Row="2"
+            Grid.Row="3"
             Orientation="Horizontal"
             HorizontalAlignment="Right">
 

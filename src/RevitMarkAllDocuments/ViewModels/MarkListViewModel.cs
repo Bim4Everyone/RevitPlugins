@@ -49,6 +49,8 @@ internal class MarkListViewModel : BaseViewModel {
 
     public ICommand MarkElementsCommand { get; }
 
+    public string ParameterName => _markData.MarkRevitParam.Name;
+
     public ObservableCollection<MarkedElementViewModel> MarkedElements {
         get => _markedElements;
         set => RaiseAndSetIfChanged(ref _markedElements, value);

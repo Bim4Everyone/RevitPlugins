@@ -30,6 +30,8 @@
     <system:String x:Key="MarkList.HeaderValue">Значение марки</system:String>
     <system:String x:Key="MarkList.HeaderStatus">Статус</system:String>
     
+    <system:String x:Key="MarkList.ParameterName">Имя параметра для марки: </system:String>
+    
     <system:String x:Key="WarningsWindow.HeaderDocument">Документ</system:String>
     <system:String x:Key="WarningsWindow.HeaderId">Id элемента</system:String>
     <system:String x:Key="WarningsWindow.HeaderName">Имя семейства</system:String>
