@@ -10,14 +10,13 @@ using Autodesk.Revit.DB;
 
 using dosymep.Bim4Everyone;
 using dosymep.Revit;
+using dosymep.Revit.Comparators;
 using dosymep.SimpleServices;
 using dosymep.WPF.Commands;
 using dosymep.WPF.ViewModels;
 
 using RevitMarkAllDocuments.Models;
 using RevitMarkAllDocuments.Services;
-
-using static Autodesk.Revit.DB.SpecTypeId;
 
 namespace RevitMarkAllDocuments.ViewModels;
 
@@ -42,6 +41,7 @@ internal class MarkListViewModel : BaseViewModel {
         _markedElements = [..markDataForCurrentDoc
             .Elements
             .Select(x => new MarkedElementViewModel(x, _document))
+            .OrderBy(x => x.MarkValue, new LogicalStringComparer())
             .ToList()];
 
         MarkElementsCommand = RelayCommand.Create(MarkElements);
