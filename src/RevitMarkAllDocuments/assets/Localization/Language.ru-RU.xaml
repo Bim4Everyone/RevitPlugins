@@ -24,6 +24,16 @@
     <system:String x:Key="MarkPage.StartNumber">Начальный номер:</system:String>
     <system:String x:Key="MarkPage.Prefix">Суффикс:</system:String>
     <system:String x:Key="MarkPage.Suffix">Префикс:</system:String>
+    
+    <system:String x:Key="MarkList.HeaderId">Id</system:String>
+    <system:String x:Key="MarkList.HeaderName">Имя семейства</system:String>
+    <system:String x:Key="MarkList.HeaderValue">Значение марки</system:String>
+    <system:String x:Key="MarkList.HeaderStatus">Статус</system:String>
+    
+    <system:String x:Key="WarningsWindow.HeaderDocument">Документ</system:String>
+    <system:String x:Key="WarningsWindow.HeaderId">Id элемента</system:String>
+    <system:String x:Key="WarningsWindow.HeaderName">Имя семейства</system:String>
+    <system:String x:Key="WarningsWindow.HeaderParameter">Имя параметра</system:String>
 
     <system:String x:Key="MainWindow.ButtonOk">ОК</system:String>
     <system:String x:Key="MainWindow.ButtonCancel">Отмена</system:String>

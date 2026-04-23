@@ -57,7 +57,7 @@
                         <DataGridTextColumn.Header>
                             <TextBlock
                                 TextAlignment="Center"
-                                Text="{me:LocalizationSource MainWindow.HeaderName}" />
+                                Text="{me:LocalizationSource MarkList.HeaderId}" />
                         </DataGridTextColumn.Header>
                     </DataGridTextColumn>
                     <DataGridTextColumn
@@ -67,7 +67,7 @@
                         <DataGridTextColumn.Header>
                             <TextBlock
                                 TextAlignment="Center"
-                                Text="{me:LocalizationSource MainWindow.HeaderStatus}" />
+                                Text="{me:LocalizationSource MarkList.HeaderName}" />
                         </DataGridTextColumn.Header>
                     </DataGridTextColumn>
                     <DataGridTextColumn
@@ -77,7 +77,7 @@
                         <DataGridTextColumn.Header>
                             <TextBlock
                                 TextAlignment="Center"
-                                Text="{me:LocalizationSource MainWindow.HeaderStatus}" />
+                                Text="{me:LocalizationSource MarkList.HeaderValue}" />
                         </DataGridTextColumn.Header>
                     </DataGridTextColumn>
                     <DataGridTextColumn
@@ -87,7 +87,7 @@
                         <DataGridTextColumn.Header>
                             <TextBlock
                                 TextAlignment="Center"
-                                Text="{me:LocalizationSource MainWindow.HeaderStatus}" />
+                                Text="{me:LocalizationSource MarkList.HeaderStatus}" />
                         </DataGridTextColumn.Header>
                     </DataGridTextColumn>
                 </DataGrid.Columns>

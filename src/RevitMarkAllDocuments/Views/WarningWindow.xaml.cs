@@ -31,10 +31,6 @@ public partial class WarningsWindow {
         InitializeComponent();
     }
 
-    private void ButtonOk_Click(object sender, RoutedEventArgs e) {
-        DialogResult = true;
-    }
-
     private void ButtonCancel_Click(object sender, RoutedEventArgs e) {
         DialogResult = false;
     }
