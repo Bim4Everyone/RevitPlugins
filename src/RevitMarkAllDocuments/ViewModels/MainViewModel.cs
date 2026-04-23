@@ -12,6 +12,8 @@ using dosymep.SimpleServices;
 using dosymep.WPF.Commands;
 using dosymep.WPF.ViewModels;
 
+using Bim4Everyone.RevitFiltration.Serialization;
+
 using Microsoft.WindowsAPICodePack.Dialogs;
 
 using RevitMarkAllDocuments.Models;
@@ -27,6 +29,7 @@ internal class MainViewModel : BaseViewModel {
     private readonly ParamValidationService _paramValidationService;
     private readonly WindowsService _windowsService;
     private readonly ILogicalFilterProviderFactory _filterFactory;
+    private readonly IFilterContextParser _filterParser;
     private readonly ILocalizationService _localizationService;
     private readonly bool _isMarkForTypes;
     private readonly Category _selectedCategory;
@@ -46,6 +49,7 @@ internal class MainViewModel : BaseViewModel {
                          ParamValidationService paramValidationService,
                          WindowsService markListWindowService,
                          ILogicalFilterProviderFactory filterFactory,
+                         IFilterContextParser filterParser,
                          ILocalizationService localizationService) {        
         _pluginConfig = pluginConfig;
         _revitRepository = revitRepository;
@@ -53,6 +57,7 @@ internal class MainViewModel : BaseViewModel {
         _paramValidationService = paramValidationService;
         _windowsService = markListWindowService;
         _filterFactory = filterFactory;
+        _filterParser = filterParser;
         _localizationService = localizationService;
 
         _isMarkForTypes = categoryContext.IsMarkForTypes;
@@ -90,7 +95,7 @@ internal class MainViewModel : BaseViewModel {
         _sortPageViewModel = new SortPageViewModel(paramsForFilterAndSort);
         _markSettingsPageViewModel = new MarkSettingsPageViewModel(paramsForMark);
 
-        LoadConfig();
+        LoadConfig(paramsForFilterAndSort);
     }
 
     public string SelectFolder() {
@@ -255,7 +260,7 @@ internal class MainViewModel : BaseViewModel {
         return true;
     }
 
-    private void LoadConfig() {
+    private void LoadConfig(List<FilterableParam> paramsForFilter) {
         RevitSettings settings = _pluginConfig.GetSettings(_revitRepository.Document);
 
         if(settings is null) {
@@ -279,6 +284,11 @@ internal class MainViewModel : BaseViewModel {
                 SortPageViewModel.AddParam();
             }
 
+            if(_filterParser.TryParse(settings.FilterSettings, out var filter)) {
+                var dataProvider = new FilterDataProvider(_revitRepository.Document, _selectedCategory, paramsForFilter);
+                _filterPageViewModel = new FilterPageViewModel(_filterFactory, dataProvider, filter, _localizationService);
+            }
+
             var selectedMarkParam = MarkSettingsPageViewModel.ParamsForMark
                 .FirstOrDefault(x => x.Name == settings.MarkParam);
 
@@ -300,6 +310,8 @@ internal class MainViewModel : BaseViewModel {
 
         settings.SelectedSortParams = [.. SortPageViewModel.SelectedParams
             .Select(x => x.Name)];
+
+        settings.FilterSettings = _filterParser.Serialize(FilterPageViewModel.FilterProvider.GetFilter());
 
         settings.MarkParam = MarkSettingsPageViewModel.SelectedParam.Name;
         settings.StartValue = MarkSettingsPageViewModel.StartNumber;

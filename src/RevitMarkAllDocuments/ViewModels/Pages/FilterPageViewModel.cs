@@ -13,6 +13,14 @@ internal class FilterPageViewModel : BaseViewModel {
         LanguageService = languageService;
     }
 
+    public FilterPageViewModel(ILogicalFilterProviderFactory filterProviderFactory,
+                               IDataProvider dataProvider,
+                               ILogicalFilterContext context,
+                               ILocalizationService languageService) {
+        FilterProvider = filterProviderFactory.Create(dataProvider, context);
+        LanguageService = languageService;
+    }
+
     public ILogicalFilterProvider FilterProvider { get; }
     public ILocalizationService LanguageService { get; }
 }
