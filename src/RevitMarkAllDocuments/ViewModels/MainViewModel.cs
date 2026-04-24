@@ -230,7 +230,7 @@ internal class MainViewModel : BaseViewModel {
     }
 
     private bool CanAcceptView() {
-        if((bool) !DocumentsPageViewModel?.Documents.Any(d => d.IsChecked)) {
+        if(DocumentsPageViewModel?.Documents?.Any(d => d.IsChecked) != true) {
             ErrorText = _localizationService.GetLocalizedString("MainWindow.ErrorNoDocs");
             return false;
         }
