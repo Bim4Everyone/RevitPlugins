@@ -1,6 +1,5 @@
 using System.Collections.Generic;
 using System.Linq;
-using System.Windows.Documents;
 using System.Windows.Input;
 
 using Autodesk.Revit.DB;
@@ -27,7 +26,6 @@ internal class MainViewModel : BaseViewModel {
     private readonly WindowsService _windowsService;
     private readonly ILogicalFilterProviderFactory _filterFactory;
     private readonly IFilterContextParser _filterParser;
-    private readonly IMessageBoxService _messageBoxService;
     private readonly ILocalizationService _localizationService;
     private readonly bool _isMarkForTypes;
     private readonly Category _selectedCategory;
@@ -48,7 +46,6 @@ internal class MainViewModel : BaseViewModel {
                          WindowsService markListWindowService,
                          ILogicalFilterProviderFactory filterFactory,
                          IFilterContextParser filterParser,
-                         IMessageBoxService messageBoxService,
                          ILocalizationService localizationService) {        
         _pluginConfig = pluginConfig;
         _revitRepository = revitRepository;
@@ -57,7 +54,6 @@ internal class MainViewModel : BaseViewModel {
         _windowsService = markListWindowService;
         _filterFactory = filterFactory;
         _filterParser = filterParser;
-        _messageBoxService = messageBoxService;
         _localizationService = localizationService;
 
         _isMarkForTypes = categoryContext.IsMarkForTypes;
@@ -146,6 +142,9 @@ internal class MainViewModel : BaseViewModel {
         // Если есть связанные документы, то экспортируем информацию про марки в json
         if(markData.HasLinksForExport(currentDocName)) {
             string path = SelectFolder();
+            if(string.IsNullOrEmpty(path)) {
+                return;
+            }
             string fullPath = path + "\\" + $"{currentDocName}.json";
 
             var jsonService = new JsonSerializerService();
