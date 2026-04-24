@@ -27,6 +27,7 @@ internal class MainViewModel : BaseViewModel {
     private readonly WindowsService _windowsService;
     private readonly ILogicalFilterProviderFactory _filterFactory;
     private readonly IFilterContextParser _filterParser;
+    private readonly IMessageBoxService _messageBoxService;
     private readonly ILocalizationService _localizationService;
     private readonly bool _isMarkForTypes;
     private readonly Category _selectedCategory;
@@ -47,6 +48,7 @@ internal class MainViewModel : BaseViewModel {
                          WindowsService markListWindowService,
                          ILogicalFilterProviderFactory filterFactory,
                          IFilterContextParser filterParser,
+                         IMessageBoxService messageBoxService,
                          ILocalizationService localizationService) {        
         _pluginConfig = pluginConfig;
         _revitRepository = revitRepository;
@@ -55,6 +57,7 @@ internal class MainViewModel : BaseViewModel {
         _windowsService = markListWindowService;
         _filterFactory = filterFactory;
         _filterParser = filterParser;
+        _messageBoxService = messageBoxService;
         _localizationService = localizationService;
 
         _isMarkForTypes = categoryContext.IsMarkForTypes;
@@ -152,7 +155,7 @@ internal class MainViewModel : BaseViewModel {
         // Если выбран текущий документ, то заполняем значения марок в нём
         var markDataForCurrentDoc = markData.GetDataByDocument(currentDocName);
         if(markDataForCurrentDoc != null) {
-            _windowsService.ShowMarkListWindow(markData, _revitRepository, _documentService, _localizationService);
+            _windowsService.ShowMarkListWindow(markData);
         }
 
         SaveConfig();

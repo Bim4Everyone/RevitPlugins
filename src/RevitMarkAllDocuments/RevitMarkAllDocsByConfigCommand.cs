@@ -1,6 +1,6 @@
 using System.Globalization;
+using System.Linq;
 using System.Reflection;
-using System.Windows;
 
 using Autodesk.Revit.Attributes;
 using Autodesk.Revit.UI;
@@ -8,13 +8,10 @@ using Autodesk.Revit.UI;
 using Bim4Everyone.RevitFiltration.Ninject;
 
 using dosymep.Bim4Everyone;
-using dosymep.Bim4Everyone.ProjectConfigs;
 using dosymep.Bim4Everyone.SimpleServices;
 using dosymep.SimpleServices;
-using dosymep.WPF.Views;
 using dosymep.WpfCore.Ninject;
 using dosymep.WpfUI.Core.Ninject;
-using dosymep.Xpf.Core.Ninject;
 
 using Microsoft.WindowsAPICodePack.Dialogs;
 
@@ -25,8 +22,6 @@ using RevitMarkAllDocuments.Models.Export;
 using RevitMarkAllDocuments.Services;
 using RevitMarkAllDocuments.ViewModels;
 using RevitMarkAllDocuments.Views;
-
-using Wpf.Ui.Abstractions;
 
 namespace RevitMarkAllDocuments;
 
@@ -59,6 +54,10 @@ public class RevitMarkAllDocsByConfigCommand : BasePluginCommand {
             .ToSelf()
             .InSingletonScope();
 
+        kernel.Bind<WindowsService>()
+            .ToSelf()
+            .InSingletonScope();
+
         // Используем сервис обновления тем для WinUI
         kernel.UseWpfUIThemeUpdater();
 
@@ -77,13 +76,12 @@ public class RevitMarkAllDocsByConfigCommand : BasePluginCommand {
 
         string filePath = SelectFile();
         if(!string.IsNullOrEmpty(filePath)) {
+            var windowService  = kernel.Get<WindowsService>();
+
             var jsonService = new JsonSerializerService();
-
             var markData = jsonService.ImportMarkData(filePath);
-            kernel.Bind<MarkData>()
-                .ToConstant(markData);
 
-            Notification(kernel.Get<MarkListWindow>());
+            Notification(windowService.ShowMarkListWindow(markData));
         } else {
             Notification(false);
         }

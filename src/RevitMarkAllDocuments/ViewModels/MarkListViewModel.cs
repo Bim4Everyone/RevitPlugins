@@ -25,7 +25,7 @@ internal class MarkListViewModel : BaseViewModel {
     private readonly MarkData _markData;
     private readonly ILocalizationService _localizationService;
 
-    private ObservableCollection<MarkedElementViewModel> _markedElements;
+    private ObservableCollection<MarkedElementViewModel> _markedElements = [];
 
     public MarkListViewModel(MarkData markData, 
                              RevitRepository revitRepository,
@@ -38,11 +38,13 @@ internal class MarkListViewModel : BaseViewModel {
         string currentDocName = documentService.GetDocumentFullName(_document);
         var markDataForCurrentDoc = markData.GetDataByDocument(currentDocName);
 
-        _markedElements = [..markDataForCurrentDoc
-            .Elements
-            .Select(x => new MarkedElementViewModel(x, _document, localizationService))
-            .OrderBy(x => x.MarkValue, new LogicalStringComparer())
-            .ToList()];
+        if(markDataForCurrentDoc != null) {
+            _markedElements = [..markDataForCurrentDoc
+                .Elements
+                .Select(x => new MarkedElementViewModel(x, _document, localizationService))
+                .OrderBy(x => x.MarkValue, new LogicalStringComparer())
+                .ToList()];
+        }
 
         MarkElementsCommand = RelayCommand.Create(MarkElements);
     }
