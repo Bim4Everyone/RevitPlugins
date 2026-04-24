@@ -2,6 +2,7 @@ using System.Windows.Controls;
 
 using Autodesk.Revit.DB;
 
+using dosymep.SimpleServices;
 using dosymep.WPF.ViewModels;
 
 namespace RevitMarkAllDocuments.ViewModels;
@@ -14,11 +15,13 @@ internal class DocumentViewModel : BaseViewModel {
 
     private bool _isChecked;
 
-    public DocumentViewModel(Document document) {
+    public DocumentViewModel(Document document, ILocalizationService localizationService) {
         _document = document;
         _name = document.Title;
         _isLink = document.IsLinked;
-        _documentType = _isLink ? "Связь" : "Текущий";
+        _documentType = _isLink 
+            ? localizationService.GetLocalizedString("WarningsWindow.DocActive")
+            : localizationService.GetLocalizedString("WarningsWindow.DocLink");
     }
 
     public string Name => _name;

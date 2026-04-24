@@ -16,6 +16,15 @@
     <system:String x:Key="MainWindow.MarkPage">Марка</system:String>
     <system:String x:Key="MainWindow.SelectedCategory">Категория:</system:String>
     
+    <system:String x:Key="MainWindow.DocActive">Связь</system:String>
+    <system:String x:Key="MainWindow.DocLink">Текущий</system:String>
+    
+    <system:String x:Key="MainWindow.ErrorNoDocs">Не выбраны документы</system:String>
+    <system:String x:Key="MainWindow.ErrorNoSortParams">Не выбраны параметры для сортировки</system:String>
+    <system:String x:Key="MainWindow.ErrorNoMarkParam">Не выбран параметр для заполнения марки</system:String>
+    <system:String x:Key="MainWindow.ErrorNoStartValue">Не заполнен начальный номер</system:String>
+    <system:String x:Key="MainWindow.ErrorStartValueIsNotInt">Начальный номер должен быть число</system:String>
+    
     <system:String x:Key="DocumentsPage.SelectDocs">Выберите проекты для маркировки</system:String>
     <system:String x:Key="FilterPage.SetFilters">Настройте критерии фильтрации</system:String>
     <system:String x:Key="SortPage.SelectParams">Выберите параметры для сортировки элементов</system:String>
@@ -31,6 +40,17 @@
     <system:String x:Key="MarkList.HeaderStatus">Статус</system:String>
     
     <system:String x:Key="MarkList.ParameterName">Имя параметра для марки: </system:String>
+    <system:String x:Key="MarkList.Description">В данном файле найдены следующие элементы для заполнения марок. Для запуска маркировки нажмите ОК.</system:String>
+    <system:String x:Key="MarkList.NoElementInDoc">элемент не найден в проекте </system:String>
+    
+    <system:String x:Key="WarningsWindow.NoSortParam">В проектах отсутствует параметр для сортировки</system:String>
+    <system:String x:Key="WarningsWindow.NoSortParamInfo">В указанных проектах отсутствует параметр для сортировки для некоторых элементов выбранной категории</system:String>
+    <system:String x:Key="WarningsWindow.NoMarkParam">В проектах отсутствует параметр для заполнения марки</system:String>
+    <system:String x:Key="WarningsWindow.NoMarkParamInfo">В указанных проектах отсутствует параметр для заполнения марки</system:String>
+    
+    <system:String x:Key="WarningsWindow.ReadOnlyParamShownElements">Отображены {0} из {1} элементов.</system:String>
+    <system:String x:Key="WarningsWindow.ReadOnlyParam">Параметр для заполнения марки доступен только для чтения</system:String>
+    <system:String x:Key="WarningsWindow.ReadOnlyParamInfo">В указанных проектах параметр для заполнения марки доступен только для чтения.</system:String>
     
     <system:String x:Key="WarningsWindow.HeaderDocument">Документ</system:String>
     <system:String x:Key="WarningsWindow.HeaderId">Id элемента</system:String>

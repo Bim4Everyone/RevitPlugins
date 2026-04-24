@@ -50,7 +50,7 @@
             <StackPanel
                 Orientation="Vertical">
                 <TextBlock
-                    Text="В данном файле найдены следующие элементы для заполнения марок. Для запуска маркировки нажмите ОК."/>
+                    Text="{me:LocalizationSource MarkList.Description}"/>
 
                 <StackPanel
                     Orientation="Horizontal">                    

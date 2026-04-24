@@ -40,7 +40,7 @@ internal class MarkListViewModel : BaseViewModel {
 
         _markedElements = [..markDataForCurrentDoc
             .Elements
-            .Select(x => new MarkedElementViewModel(x, _document))
+            .Select(x => new MarkedElementViewModel(x, _document, localizationService))
             .OrderBy(x => x.MarkValue, new LogicalStringComparer())
             .ToList()];
 

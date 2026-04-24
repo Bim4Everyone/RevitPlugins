@@ -1,18 +1,15 @@
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.Linq;
+using System.Windows.Documents;
 using System.Windows.Input;
 
 using Autodesk.Revit.DB;
 
-using Bim4Everyone.RevitFiltration;
 using Bim4Everyone.RevitFiltration.Controls;
 
 using dosymep.SimpleServices;
 using dosymep.WPF.Commands;
 using dosymep.WPF.ViewModels;
-
-using Bim4Everyone.RevitFiltration.Serialization;
 
 using Microsoft.WindowsAPICodePack.Dialogs;
 
@@ -89,7 +86,7 @@ internal class MainViewModel : BaseViewModel {
         var paramsForFilterAndSort = paramProvider.GetParamsForFilterAndSort();
         var paramsForMark = paramProvider.GetParamsForMarks();
 
-        _documentsPageViewModel = new DocumentsPageViewModel(_revitRepository);
+        _documentsPageViewModel = new DocumentsPageViewModel(_revitRepository, _localizationService);
         var dataProvider = new FilterDataProvider(_revitRepository.Document, _selectedCategory, paramsForFilterAndSort);
         _filterPageViewModel = new FilterPageViewModel(_filterFactory, dataProvider, _localizationService);
         _sortPageViewModel = new SortPageViewModel(paramsForFilterAndSort);
@@ -175,8 +172,8 @@ internal class MainViewModel : BaseViewModel {
         if(warningElementsSortParams.Any()) {
             var warning = new WarningViewModel() {
                 Elements = [.. warningElementsSortParams.Select(x => new WarningElementViewModel(x))],
-                FullName = "В проектах отсутствует параметр для сортировки",
-                Description = "В указанных проектах отсутствует параметр для сортировки для некоторых элементов выбранной категории"
+                FullName = _localizationService.GetLocalizedString("WarningsWindow.NoSortParam"),
+                Description = _localizationService.GetLocalizedString("WarningsWindow.NoSortParamInfo")
             };
 
             warningsWithNoParams.Warnings.Add(warning);
@@ -188,8 +185,8 @@ internal class MainViewModel : BaseViewModel {
         if(warningElementsMarkParams.Any()) {
             var warning = new WarningViewModel() {
                 Elements = [.. warningElementsMarkParams.Select(x => new WarningElementViewModel(x)).Take(100)],
-                FullName = "В проектах отсутствует параметр для заполнения марки",
-                Description = "В проектах отсутствует параметр для заполнения марки доступен"
+                FullName = _localizationService.GetLocalizedString("WarningsWindow.NoMarkParam"),
+                Description = _localizationService.GetLocalizedString("WarningsWindow.NoMarkParamInfo")
             };
 
             warningsWithNoParams.Warnings.Add(warning);
@@ -217,13 +214,13 @@ internal class MainViewModel : BaseViewModel {
             string additionalMessage = string.Empty;
             if(elementsNumber > maxShownElements) {
                 elementsToShow = elementsToShow.Take(maxShownElements);
-                additionalMessage = $"Отображены {maxShownElements} из {elementsNumber} элементов";
+                additionalMessage = _localizationService.GetLocalizedString("WarningsWindow.ReadOnlyParamShownElements", maxShownElements, elementsNumber);
             }
 
             var warning = new WarningViewModel() {
                 Elements = [.. elementsToShow],
-                FullName = "В проектах параметр для заполнения марки доступен только для чтения.",
-                Description = "В проектах параметр для заполнения марки доступен только для чтения." + additionalMessage
+                FullName = _localizationService.GetLocalizedString("WarningsWindow.ReadOnlyParam"),
+                Description = _localizationService.GetLocalizedString("WarningsWindow.ReadOnlyParamInfo") + additionalMessage
             };
 
             warningsWithReadonlyParams.Warnings.Add(warning);
@@ -234,19 +231,23 @@ internal class MainViewModel : BaseViewModel {
 
     private bool CanAcceptView() {
         if((bool) !DocumentsPageViewModel?.Documents.Any(d => d.IsChecked)) {
-            ErrorText = "Не выбраны документы";
+            ErrorText = _localizationService.GetLocalizedString("MainWindow.ErrorNoDocs");
             return false;
         }
         if(!SortPageViewModel.SelectedParams.Any()) {
-            ErrorText = "Не выбраны параметры для сортировки";
+            ErrorText = _localizationService.GetLocalizedString("MainWindow.ErrorNoSortParams");
             return false;
         }
         if(MarkSettingsPageViewModel.SelectedParam == null) {
-            ErrorText = "Не выбран параметр для заполнения марки";
+            ErrorText = _localizationService.GetLocalizedString("MainWindow.ErrorNoMarkParam");
             return false;
         }
         if(string.IsNullOrEmpty(MarkSettingsPageViewModel.StartNumber)) {
-            ErrorText = "Не заполнен начальный номер";
+            ErrorText = _localizationService.GetLocalizedString("MainWindow.ErrorNoStartValue");
+            return false;
+        }
+        if(!int.TryParse(MarkSettingsPageViewModel.StartNumber, out int number)) {
+            ErrorText = _localizationService.GetLocalizedString("MainWindow.ErrorStartValueIsNotInt");
             return false;
         }
 
