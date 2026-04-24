@@ -76,7 +76,8 @@ internal class GeomObjectConnector : IGeomObjectConnector {
         return unitedGeomObjects;
     }
 
-    public static IList<Solid> CreateUnitedSolids(IList<Solid> solids, ProgressService progressService) {
+    // Метод объединения солидов с прогрессом
+    private IList<Solid> CreateUnitedSolids(IList<Solid> solids, ProgressService progressService) {
         var solid = solids[0];
 
         progressService?.BeginStage(ProgressType.UnionVolumes);
