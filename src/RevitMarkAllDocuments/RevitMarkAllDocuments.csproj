@@ -20,19 +20,4 @@
 			<Private>False</Private>
 		</Reference>
 	</ItemGroup>
-
-	<ItemGroup>
-	  <Compile Update="Views\Controls\CustomGroupEditControl.xaml.cs">
-	    <SubType>Code</SubType>
-	  </Compile>
-	  <Compile Update="Views\Pages\SortPage.xaml.cs">
-	    <SubType>Code</SubType>
-	  </Compile>
-	  <Compile Update="Views\Pages\MarkSettingsPage.xaml.cs">
-	    <SubType>Code</SubType>
-	  </Compile>
-	  <Compile Update="Views\Pages\FilterPage.xaml.cs">
-	    <SubType>Code</SubType>
-	  </Compile>
-	</ItemGroup>
 </Project>
