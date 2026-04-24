@@ -56,7 +56,10 @@
     <system:String x:Key="WarningsWindow.HeaderId">Id</system:String>
     <system:String x:Key="WarningsWindow.HeaderName">Family name</system:String>
     <system:String x:Key="WarningsWindow.HeaderParameter">Parameter name</system:String>
+        
+    <system:String x:Key="MessageBox.NoElements">No marked elements in the current project!</system:String>
+    <system:String x:Key="MessageBox.Title">Marking</system:String>
 
     <system:String x:Key="MainWindow.ButtonOk">OK</system:String>
-    <system:String x:Key="MainWindow.ButtonCancel">Cancel</system:String>
+    <system:String x:Key="MainWindow.ButtonCancel">Cancel</system:String> 
 </ResourceDictionary>

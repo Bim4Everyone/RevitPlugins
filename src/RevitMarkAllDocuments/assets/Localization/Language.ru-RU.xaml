@@ -56,6 +56,9 @@
     <system:String x:Key="WarningsWindow.HeaderId">Id элемента</system:String>
     <system:String x:Key="WarningsWindow.HeaderName">Имя семейства</system:String>
     <system:String x:Key="WarningsWindow.HeaderParameter">Имя параметра</system:String>
+    
+    <system:String x:Key="MessageBox.NoElements">В текущем проекте элементы для маркировки не найдены!</system:String>
+    <system:String x:Key="MessageBox.Title">Маркировка</system:String>
 
     <system:String x:Key="MainWindow.ButtonOk">ОК</system:String>
     <system:String x:Key="MainWindow.ButtonCancel">Отмена</system:String>
