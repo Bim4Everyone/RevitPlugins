@@ -26,7 +26,7 @@ internal sealed class BuildCoordVolumeServices {
         SlabNormalizer = new SlabNormalizeService(systemPluginConfig);
         ColumnFactory = new ColumnFactory();
         GeomObjectConnector = new GeomObjectConnector(revitRepository, systemPluginConfig);
-        GeomObjectsBuildService = new GeomObjectsBuildService(GeomObjectFactory);
+        GeomObjectsBuildService = new GeomObjectsBuildService(GeomObjectFactory, GeomObjectConnector);
     }
 
     public ISpatialElementDividerService SpatialDivider { get; }

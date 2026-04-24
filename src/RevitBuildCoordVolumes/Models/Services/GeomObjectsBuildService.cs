@@ -9,9 +9,11 @@ using RevitBuildCoordVolumes.Models.Settings;
 namespace RevitBuildCoordVolumes.Models.Services;
 internal class GeomObjectsBuildService : IGeomObjectsBuildService {
     private readonly IGeomObjectFactory _geomObjectFactory;
+    private readonly IGeomObjectConnector _geomObjectConnector;
 
-    public GeomObjectsBuildService(IGeomObjectFactory geomObjectFactory) {
+    public GeomObjectsBuildService(IGeomObjectFactory geomObjectFactory, IGeomObjectConnector geomObjectConnector) {
         _geomObjectFactory = geomObjectFactory;
+        _geomObjectConnector = geomObjectConnector;
     }
 
     public List<GeomObject> GetGeomObjects(
@@ -22,6 +24,9 @@ internal class GeomObjectsBuildService : IGeomObjectsBuildService {
 
         // Получение режима работы билдера 
         var builderMode = settings.BuilderMode;
+
+        // Получение типа построения
+        var buildType = settings.BuildType;
 
         // Получение списка GeomObject в зависимости от настроек        
         var geomObjects = new List<GeomObject>();
@@ -41,6 +46,12 @@ internal class GeomObjectsBuildService : IGeomObjectsBuildService {
             geomObjects.AddRange(newObjects);
         }
 
-        return geomObjects;
+        bool useConnector = buildType == BuildType.Union;
+
+        var modifyObjects = useConnector
+            ? _geomObjectConnector.UnionGeomObjects(geomObjects)
+            : geomObjects;
+
+        return modifyObjects;
     }
 }

@@ -26,12 +26,21 @@ internal class GeomObjectConnector : IGeomObjectConnector {
         var groups = geomObjects
             .GroupBy(geomObject => geomObject.FloorName);
 
+        System.Windows.MessageBox.Show(groups.Count().ToString());
+
         var unitedGeomObjects = new List<GeomObject>();
 
         foreach(var group in groups) {
             var solids = group
-                .Select(geomObject => geomObject.GeometryObjects)
-                .Cast<Solid>();
+                .Where(g => g.GeometryObjects != null)
+                .SelectMany(g => g.GeometryObjects)
+                .OfType<Solid>();
+
+
+
+            if(solids.Count() == 0) {
+                continue;
+            }
 
             var unitedSolids = SolidUtility.CreateUnitedSolids([.. solids]);
 
