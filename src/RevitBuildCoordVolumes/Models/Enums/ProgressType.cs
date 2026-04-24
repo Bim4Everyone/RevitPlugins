@@ -3,5 +3,6 @@ internal enum ProgressType {
     DivideSpatial,
     BuildContour,
     SlabNormalize,
-    BuildVolumes
+    BuildVolumes,
+    UnionVolumes
 }

@@ -25,33 +25,35 @@ internal class GeomObjectsBuildService : IGeomObjectsBuildService {
         // Получение режима работы билдера 
         var builderMode = settings.BuilderMode;
 
-        // Получение типа построения
-        var buildType = settings.BuildType;
-
         // Получение списка GeomObject в зависимости от настроек        
         var geomObjects = new List<GeomObject>();
         foreach(var columnGroup in columnGroups) {
             var listColumns = columnGroup.ToList();
             var firstColumn = listColumns[0];
+            bool alongObgect = listColumns.Count == 1;
+            bool isSloped = firstColumn.IsSloped;
 
-            bool useSeparated =
-                builderMode == BuilderMode.ColumnBuilder ||
-                (builderMode == BuilderMode.AutomaticBuilder &&
-                (firstColumn.IsSloped || listColumns.Count == 1));
+            if(builderMode == BuilderMode.ColumnBuilder) {
+                var sepObjects = _geomObjectFactory.GetSeparatedGeomObjects(listColumns, polygons, progressService);
+                geomObjects.AddRange(sepObjects);
+            }
 
-            var newObjects = useSeparated
-                ? _geomObjectFactory.GetSeparatedGeomObjects(listColumns, polygons, progressService)
-                : _geomObjectFactory.GetUnitedGeomObjects(listColumns, polygons, progressService);
-
-            geomObjects.AddRange(newObjects);
+            if(builderMode is BuilderMode.ContourBuilder or BuilderMode.AutomaticBuilder) {
+                if(alongObgect || isSloped) {
+                    var sepObjects = _geomObjectFactory.GetSeparatedGeomObjects(listColumns, polygons, progressService);
+                    var uniObjects = _geomObjectConnector.UnionGeomObjects(sepObjects, progressService);
+                    geomObjects.AddRange(uniObjects);
+                } else {
+                    var uniObjects = _geomObjectFactory.GetUnitedGeomObjects(listColumns, polygons, progressService);
+                    geomObjects.AddRange(uniObjects);
+                }
+            }
         }
 
-        bool useConnector = buildType == BuildType.Union;
-
-        var modifyObjects = useConnector
-            ? _geomObjectConnector.UnionGeomObjects(geomObjects)
+        var finalObjects = builderMode == BuilderMode.AutomaticBuilder
+            ? _geomObjectConnector.UnionGeomObjects(geomObjects, progressService)
             : geomObjects;
 
-        return modifyObjects;
+        return finalObjects;
     }
 }

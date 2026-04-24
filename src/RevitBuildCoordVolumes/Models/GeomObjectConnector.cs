@@ -3,8 +3,10 @@ using System.Linq;
 
 using Autodesk.Revit.DB;
 
+using RevitBuildCoordVolumes.Models.Enums;
 using RevitBuildCoordVolumes.Models.Geometry;
 using RevitBuildCoordVolumes.Models.Interfaces;
+using RevitBuildCoordVolumes.Models.Services;
 using RevitBuildCoordVolumes.Models.Utilites;
 
 namespace RevitBuildCoordVolumes.Models;
@@ -18,7 +20,7 @@ internal class GeomObjectConnector : IGeomObjectConnector {
         _systemPluginConfig = systemPluginConfig;
     }
 
-    public List<GeomObject> UnionGeomObjects(List<GeomObject> geomObjects) {
+    public List<GeomObject> UnionGeomObjects(List<GeomObject> geomObjects, ProgressService progressService) {
         if(geomObjects.Count == 0) {
             return [];
         }
@@ -26,23 +28,21 @@ internal class GeomObjectConnector : IGeomObjectConnector {
         var groups = geomObjects
             .GroupBy(geomObject => geomObject.FloorName);
 
-        System.Windows.MessageBox.Show(groups.Count().ToString());
+
 
         var unitedGeomObjects = new List<GeomObject>();
-
         foreach(var group in groups) {
+
             var solids = group
                 .Where(g => g.GeometryObjects != null)
                 .SelectMany(g => g.GeometryObjects)
                 .OfType<Solid>();
 
-
-
             if(solids.Count() == 0) {
                 continue;
             }
 
-            var unitedSolids = SolidUtility.CreateUnitedSolids([.. solids]);
+            var unitedSolids = CreateUnitedSolids([.. solids], progressService);
 
             if(unitedSolids.Count == 0) {
                 continue;
@@ -74,6 +74,42 @@ internal class GeomObjectConnector : IGeomObjectConnector {
             }
         }
         return unitedGeomObjects;
+    }
+
+    public static IList<Solid> CreateUnitedSolids(IList<Solid> solids, ProgressService progressService) {
+        var solid = solids[0];
+
+        progressService?.BeginStage(ProgressType.UnionVolumes);
+
+        int total = solids.Count;
+        int processed = 0;
+        int reported = 0;
+
+        List<Solid> list = [];
+        for(int i = 1; i < solids.Count; i++) {
+            progressService?.CancellationToken.ThrowIfCancellationRequested();
+
+            var solid2 = solids[i];
+            try {
+                solid = BooleanOperationsUtils.ExecuteBooleanOperation(solid, solid2, BooleanOperationsType.Union);
+            } catch {
+                list.Add(solid);
+                solid = solid2;
+            }
+
+            processed++;
+            int current = processed * 100 / total;
+            if(current > 100) {
+                current = 100;
+            }
+            if(current > reported) {
+                reported = current;
+                progressService?.ProgressCount?.Report(reported);
+            }
+        }
+
+        list.Add(solid);
+        return list;
     }
 
     // Валидация солидов для DirectShape

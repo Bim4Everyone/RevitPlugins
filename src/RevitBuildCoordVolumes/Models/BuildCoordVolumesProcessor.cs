@@ -37,6 +37,7 @@ internal class BuildCoordVolumesProcessor {
         string transactionName = _services.LocalizationService.GetLocalizedString("BuildCoordVolumesProcessor.TransactionName");
         using var t = _revitRepository.Document.StartTransaction(transactionName);
         var spatialObjects = _settings.SpatialObjects;
+        progressService.ZoneCount = spatialObjects.Count.ToString();
 
         for(int i = 0; i < spatialObjects.Count; i++) {
             progressService?.CancellationToken.ThrowIfCancellationRequested();

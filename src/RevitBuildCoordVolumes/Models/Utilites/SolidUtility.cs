@@ -86,18 +86,4 @@ internal static class SolidUtility {
             .Select(solid => (double) SolidExtensions.GetVolumeOrDefault(solid, 0))
             .Sum();
     }
-
-    /// <summary>
-    /// Метод безопасного объединения списка солидов.
-    /// </summary>
-    /// <remarks>
-    /// В данном методе производится безопасное объединение списка солидов в объединенный список солидов.
-    /// </remarks>    
-    /// <param name="solids">Исходный список солидов</param>
-    /// <returns>
-    /// Объединенный список солидов.
-    /// </returns>
-    public static IList<Solid> CreateUnitedSolids(IList<Solid> solids) {
-        return SolidExtensions.CreateUnitedSolids([.. solids]);
-    }
 }
