@@ -16,8 +16,8 @@
     <system:String x:Key="MainWindow.MarkPage">Mark</system:String>
     <system:String x:Key="MainWindow.SelectedCategory">Category:</system:String>
     
-    <system:String x:Key="MainWindow.DocActive">Link</system:String>
-    <system:String x:Key="MainWindow.DocLink">Active</system:String>
+    <system:String x:Key="MainWindow.DocActive">Active</system:String>
+    <system:String x:Key="MainWindow.DocLink">Link</system:String>
     
     <system:String x:Key="MainWindow.ErrorNoDocs">Documents are not selected</system:String>
     <system:String x:Key="MainWindow.ErrorNoSortParams">Parameters for sorting are not selected</system:String>
@@ -41,7 +41,8 @@
 
     <system:String x:Key="MarkList.ParameterName">Parameter name: </system:String>
     <system:String x:Key="MarkList.Description">Current document has these parameters for marking. Press OK button for start marking.</system:String>
-    <system:String x:Key="MarkList.NoElementInDoc">Element is not found in the project </system:String>
+    <system:String x:Key="MarkList.NoElementInDoc">element is not found in the project </system:String>
+    <system:String x:Key="MarkList.ErrorText">Some elements did not found in this document. Marking is not available.</system:String>
     
     <system:String x:Key="WarningsWindow.NoSortParam">Documents do not have parameters for sorting</system:String>
     <system:String x:Key="WarningsWindow.NoSortParamInfo">Documents do not have parameters for sorting elements of selected category</system:String>

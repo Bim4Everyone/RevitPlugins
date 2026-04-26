@@ -42,6 +42,7 @@
     <system:String x:Key="MarkList.ParameterName">Имя параметра для марки: </system:String>
     <system:String x:Key="MarkList.Description">В данном файле найдены следующие элементы для заполнения марок. Для запуска маркировки нажмите ОК.</system:String>
     <system:String x:Key="MarkList.NoElementInDoc">элемент не найден в проекте </system:String>
+    <system:String x:Key="MarkList.ErrorText">Часть элементов отсутствует в проекте. Маркировка невозможна.</system:String>
     
     <system:String x:Key="WarningsWindow.NoSortParam">В проектах отсутствует параметр для сортировки</system:String>
     <system:String x:Key="WarningsWindow.NoSortParamInfo">В указанных проектах отсутствует параметр для сортировки для некоторых элементов выбранной категории</system:String>

@@ -21,6 +21,7 @@ internal class MarkListViewModel : BaseViewModel {
     private readonly ILocalizationService _localizationService;
 
     private ObservableCollection<MarkedElementViewModel> _markedElements = [];
+    private string _errorText;
 
     public MarkListViewModel(MarkDataByDocument markDataForCurrentDoc,
                              RevitParam markParam,
@@ -38,7 +39,7 @@ internal class MarkListViewModel : BaseViewModel {
                 .ToList()];
         }
 
-        MarkElementsCommand = RelayCommand.Create(MarkElements);
+        MarkElementsCommand = RelayCommand.Create(MarkElements, CanMarkElements);
     }
 
     public ICommand MarkElementsCommand { get; }
@@ -48,6 +49,11 @@ internal class MarkListViewModel : BaseViewModel {
     public ObservableCollection<MarkedElementViewModel> MarkedElements {
         get => _markedElements;
         set => RaiseAndSetIfChanged(ref _markedElements, value);
+    }
+
+    public string ErrorText {
+        get => _errorText;
+        set => RaiseAndSetIfChanged(ref _errorText, value);
     }
 
     private void MarkElements() {
@@ -76,5 +82,15 @@ internal class MarkListViewModel : BaseViewModel {
 
             t.Commit();
         }
+    }
+
+    private bool CanMarkElements() {
+        if(_markedElements.Any(x => x.HasError)) {
+            ErrorText = _localizationService.GetLocalizedString("MarkList.ErrorText");
+            return false;
+        }
+
+        ErrorText = null;
+        return true;
     }
 }

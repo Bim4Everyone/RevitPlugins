@@ -13,6 +13,7 @@ internal class MarkedElementViewModel : BaseViewModel{
     private readonly string _name;
     private readonly string _markValue;
     private readonly string _status;
+    private readonly bool _hasError;
 
     public MarkedElementViewModel(MarkedElement element, Document document, ILocalizationService localizationService) {
         _id = element.Id.ToString();
@@ -23,9 +24,11 @@ internal class MarkedElementViewModel : BaseViewModel{
         if(revitElement != null) {
             _name = revitElement.Name;
             _status = "";
+            _hasError = false;
         } else {
-            _name = "";
-            _status = localizationService.GetLocalizedString("WarningsWindow.NoElementInDoc");
+            _name = "???";
+            _status = localizationService.GetLocalizedString("MarkList.NoElementInDoc");
+            _hasError = true;
         }
     }
 
@@ -34,4 +37,5 @@ internal class MarkedElementViewModel : BaseViewModel{
     public string Name => _name;
     public string MarkValue => _markValue;
     public string Status => _status;
+    public bool HasError => _hasError;
 }
