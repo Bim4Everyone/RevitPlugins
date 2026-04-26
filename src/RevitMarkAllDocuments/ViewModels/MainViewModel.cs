@@ -147,7 +147,7 @@ internal class MainViewModel : BaseViewModel {
             if(string.IsNullOrEmpty(path)) {
                 return;
             }
-            string fullPath = Path.Combine(path, $"{currentDocName}.json");
+            string fullPath = Path.Combine(path, $"{currentDocName}_{_selectedCategoryName}.json");
 
             var jsonService = new JsonSerializerService();
             jsonService.ExportMarkData(fullPath, markData);
