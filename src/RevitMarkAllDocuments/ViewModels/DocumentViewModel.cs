@@ -20,8 +20,8 @@ internal class DocumentViewModel : BaseViewModel {
         _name = document.Title;
         _isLink = document.IsLinked;
         _documentType = _isLink 
-            ? localizationService.GetLocalizedString("WarningsWindow.DocActive")
-            : localizationService.GetLocalizedString("WarningsWindow.DocLink");
+            ? localizationService.GetLocalizedString("MainWindow.DocLink")
+            : localizationService.GetLocalizedString("MainWindow.DocActive");
     }
 
     public string Name => _name;
