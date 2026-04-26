@@ -59,7 +59,7 @@ public class RevitMarkAllDocsByConfigCommand : BasePluginCommand {
         // Используем сервис обновления тем для WinUI
         kernel.UseWpfUIThemeUpdater();
 
-        kernel.BindMainWindow<MarkListViewModel, MarkListWindow>();
+        kernel.Bind<MarkListWindow>().ToSelf();
 
         // Настройка локализации,
         // получение имени сборки откуда брать текст
