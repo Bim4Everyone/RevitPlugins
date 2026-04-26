@@ -20,7 +20,7 @@ internal class MarkData {
 
         if(documentsForExport == 0) {
             return false;
-        } else if(MarkDataByDocument.Count > 1) {
+        } else if(documentsForExport > 1) {
             return true;
         } else if(GetDataByDocument(documentName) == null) {
             return true;

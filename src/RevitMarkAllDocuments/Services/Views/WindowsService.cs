@@ -45,7 +45,7 @@ internal class WindowsService {
         window.DataContext = markListViewModel;
 
         window.ShowDialog();
-        return (bool) window.DialogResult;
+        return window.DialogResult == true;
     }
 
     public bool ShowWarningsWindow(WarningsViewModel warnings) {

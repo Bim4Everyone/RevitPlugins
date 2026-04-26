@@ -21,10 +21,9 @@ internal class FiltrationService {
 
     public MarkData FilterElements(MarkData markData, 
                                    Category category,
-                                   Document[] documents, 
+                                   Document[] documents,
+                                   DocumentService docService, 
                                    ILogicalFilterProvider filterProvider) {
-        var docService = new DocumentService();
-
         foreach(var document in documents) {
             var marksByDocument = new MarkDataByDocument() {
                 DocumentName = docService.GetDocumentFullName(document)
