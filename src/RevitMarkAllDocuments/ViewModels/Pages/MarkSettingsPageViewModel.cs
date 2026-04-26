@@ -38,6 +38,11 @@ internal class MarkSettingsPageViewModel : BaseViewModel {
 
             _isSuffixEnable = value?.RevitParam.StorageType == StorageType.String;
 
+            if(!_isSuffixEnable) {
+                Prefix = null;
+                Suffix = null;
+            }
+
             RaisePropertyChanged(nameof(IsSuffixPrefixEnable));
         }
     }

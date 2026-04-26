@@ -26,8 +26,8 @@ internal class SortPageViewModel : BaseViewModel {
 
         AddParamCommand = RelayCommand.Create(AddParam, CanAddParam);
         RemoveParamCommand = RelayCommand.Create(RemoveParam, CanRemoveParam);
-        MoveUpParamCommand = RelayCommand.Create(MoveUpParam, CanRemoveParam);
-        MoveDownParamCommand = RelayCommand.Create(MoveDownParam, CanRemoveParam);
+        MoveUpParamCommand = RelayCommand.Create(MoveUpParam, CanMoveUpParam);
+        MoveDownParamCommand = RelayCommand.Create(MoveDownParam, CanMoveDownParam);
     }
 
     public ICommand AddParamCommand { get; }
@@ -89,6 +89,16 @@ internal class SortPageViewModel : BaseViewModel {
 
     private bool CanRemoveParam() {
         return SelectedParamFromSelected != null;
+    }
+
+    private bool CanMoveUpParam() {
+        return SelectedParamFromSelected != null
+            && SelectedParams.IndexOf(SelectedParamFromSelected) > 0;
+    }
+
+    private bool CanMoveDownParam() {
+        return SelectedParamFromSelected != null
+            && SelectedParams.IndexOf(SelectedParamFromSelected) < SelectedParams.Count - 1;
     }
 
     private void MoveParams(ObservableCollection<ParameterViewModel> fromParams,
