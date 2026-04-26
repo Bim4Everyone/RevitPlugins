@@ -1,9 +1,5 @@
-using System;
-using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 using Autodesk.Revit.DB;
 
@@ -22,8 +18,9 @@ internal class DocumentService {
     }
 
     private string ExtractFileName(string path) {
-        if(string.IsNullOrEmpty(path))
+        if(string.IsNullOrEmpty(path)) {
             return string.Empty;
+        }
 
         path = path.Replace('\\', '/');
 

@@ -3,9 +3,6 @@ using System.Collections.ObjectModel;
 using System.Linq;
 using System.Windows.Input;
 
-using Autodesk.Revit.DB;
-
-using dosymep.Bim4Everyone;
 using dosymep.WPF.Commands;
 using dosymep.WPF.ViewModels;
 
@@ -63,14 +60,15 @@ internal class SortPageViewModel : BaseViewModel {
 
     public void RemoveParam() {
         MoveParams(SelectedParams, SelectableParams, SelectedParamFromSelected);
-        SelectableParams = [..SelectableParams.OrderBy(x => x.Name)];
+        SelectableParams = [.. SelectableParams.OrderBy(x => x.Name)];
     }
 
     public void MoveUpParam() {
         int index = SelectedParams.IndexOf(SelectedParamFromSelected);
 
-        if(index <= 0)
+        if(index <= 0) {
             return;
+        }
 
         SelectedParams.Move(index, index - 1);
     }
@@ -78,8 +76,9 @@ internal class SortPageViewModel : BaseViewModel {
     public void MoveDownParam() {
         int index = SelectedParams.IndexOf(SelectedParamFromSelected);
 
-        if(index < 0 || index >= SelectedParams.Count - 1)
+        if(index < 0 || index >= SelectedParams.Count - 1) {
             return;
+        }
 
         SelectedParams.Move(index, index + 1);
     }
