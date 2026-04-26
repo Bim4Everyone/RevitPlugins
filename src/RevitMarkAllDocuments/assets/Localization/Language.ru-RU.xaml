@@ -16,8 +16,8 @@
     <system:String x:Key="MainWindow.MarkPage">Марка</system:String>
     <system:String x:Key="MainWindow.SelectedCategory">Категория:</system:String>
     
-    <system:String x:Key="MainWindow.DocActive">Связь</system:String>
-    <system:String x:Key="MainWindow.DocLink">Текущий</system:String>
+    <system:String x:Key="MainWindow.DocActive">Текущий</system:String>
+    <system:String x:Key="MainWindow.DocLink">Связь</system:String>
     
     <system:String x:Key="MainWindow.ErrorNoDocs">Не выбраны документы</system:String>
     <system:String x:Key="MainWindow.ErrorNoSortParams">Не выбраны параметры для сортировки</system:String>
