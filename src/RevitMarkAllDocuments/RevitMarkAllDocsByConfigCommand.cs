@@ -85,7 +85,7 @@ public class RevitMarkAllDocsByConfigCommand : BasePluginCommand {
         }
     }
 
-    public string SelectFile() {
+    private string SelectFile() {
         var dialog = new CommonOpenFileDialog();
 
         return dialog.ShowDialog() == CommonFileDialogResult.Ok ? dialog.FileName : string.Empty;

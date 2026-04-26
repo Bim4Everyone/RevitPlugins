@@ -67,12 +67,12 @@ internal class MarkListViewModel : BaseViewModel {
                     revitElement.SetParamValue(_markData.MarkRevitParam, mark.MarkValue);
                 } else if(storageType == StorageType.Double) {
                     bool result = double.TryParse(mark.MarkValue, out double number);
-                    if(result == true) {
+                    if(result) {
                         revitElement.SetParamValue(_markData.MarkRevitParam, number);
                     }
                 } else if(storageType == StorageType.Integer) {
                     bool result = int.TryParse(mark.MarkValue, out int number);
-                    if(result == true) {
+                    if(result) {
                         revitElement.SetParamValue(_markData.MarkRevitParam, number);
                     }
                 }

@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Windows.Input;
 
@@ -94,7 +95,7 @@ internal class MainViewModel : BaseViewModel {
         LoadConfig(paramsForFilterAndSort);
     }
 
-    public string SelectFolder() {
+    private string SelectFolder() {
         var dialog = new CommonOpenFileDialog() {
             IsFolderPicker = true
         };
@@ -145,7 +146,7 @@ internal class MainViewModel : BaseViewModel {
             if(string.IsNullOrEmpty(path)) {
                 return;
             }
-            string fullPath = path + "\\" + $"{currentDocName}.json";
+            string fullPath = Path.Combine(path, $"{currentDocName}.json");
 
             var jsonService = new JsonSerializerService();
             jsonService.ExportMarkData(fullPath, markData);
