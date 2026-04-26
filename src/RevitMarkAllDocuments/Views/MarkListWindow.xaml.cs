@@ -1,5 +1,4 @@
 using System.Windows;
-using System.Windows.Threading;
 
 using dosymep.SimpleServices;
 
@@ -14,7 +13,7 @@ public partial class MarkListWindow {
                           ILanguageService languageService,
                           ILocalizationService localizationService,
                           IUIThemeService uiThemeService,
-                          IUIThemeUpdaterService themeUpdaterService) : 
+                          IUIThemeUpdaterService themeUpdaterService) :
         base(loggerService,
              serializationService,
              languageService, localizationService,

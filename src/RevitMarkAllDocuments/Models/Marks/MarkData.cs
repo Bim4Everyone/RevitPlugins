@@ -1,9 +1,6 @@
 using System.Collections.Generic;
 using System.Linq;
 
-using Autodesk.Revit.DB;
-using Autodesk.Revit.UI;
-
 using dosymep.Bim4Everyone;
 
 using RevitMarkAllDocuments.Services;
@@ -32,7 +29,7 @@ internal class MarkData {
         return false;
     }
 
-    public void CreateMarkValues(bool isForTypes, IList<FilterableParam> sortParams, MarkStartValue startValue) {        
+    public void CreateMarkValues(bool isForTypes, IList<FilterableParam> sortParams, MarkStartValue startValue) {
         var sortService = new SortElementService();
         var sortedMarkedElements = sortService.SortElements(isForTypes, GetAllElements(), sortParams);
         int startNumber = int.Parse(startValue.StartValue);

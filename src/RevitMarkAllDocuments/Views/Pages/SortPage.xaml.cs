@@ -1,18 +1,3 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
-
 using dosymep.SimpleServices;
 
 using RevitMarkAllDocuments.ViewModels;
@@ -20,11 +5,11 @@ using RevitMarkAllDocuments.ViewModels;
 namespace RevitMarkAllDocuments.Views;
 
 internal partial class SortPage {
-    public SortPage(MainViewModel viewModel, 
+    public SortPage(MainViewModel viewModel,
                     ILoggerService loggerService,
-                    ILanguageService languageService, 
+                    ILanguageService languageService,
                     ILocalizationService localizationService,
-                    IUIThemeService uiThemeService, 
+                    IUIThemeService uiThemeService,
                     IUIThemeUpdaterService themeUpdaterService)
         : base(loggerService,
                languageService, localizationService,

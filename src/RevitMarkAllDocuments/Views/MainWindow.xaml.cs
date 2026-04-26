@@ -3,8 +3,6 @@ using System.Windows.Threading;
 
 using dosymep.SimpleServices;
 
-using RevitMarkAllDocuments.Views;
-
 using Wpf.Ui.Abstractions;
 
 namespace RevitMarkAllDocuments.Views;
@@ -13,9 +11,9 @@ public partial class MainWindow {
     public MainWindow(INavigationViewPageProvider navigationViewPageProvider,
                       ILoggerService loggerService,
                       ISerializationService serializationService,
-                      ILanguageService languageService, 
+                      ILanguageService languageService,
                       ILocalizationService localizationService,
-                      IUIThemeService uiThemeService, 
+                      IUIThemeService uiThemeService,
                       IUIThemeUpdaterService themeUpdaterService)
         : base(loggerService,
             serializationService,
@@ -32,9 +30,9 @@ public partial class MainWindow {
     }
 
     public override string PluginName => nameof(RevitMarkAllDocuments);
-    
+
     public override string ProjectConfigName => nameof(MainWindow);
-    
+
     private void ButtonOk_Click(object sender, RoutedEventArgs e) {
         DialogResult = true;
     }
