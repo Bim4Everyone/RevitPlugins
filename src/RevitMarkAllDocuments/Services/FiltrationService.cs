@@ -31,29 +31,21 @@ internal class FiltrationService {
 
             var filter = filterProvider.GetFilter().GetFilter().Build(document, _filterOptions);
 
-            var collector = new FilteredElementCollector(document)
-                .OfCategory(category.GetBuiltInCategory());
+            var elements = new FilteredElementCollector(document)
+                .OfCategory(category.GetBuiltInCategory())
+                .WhereElementIsNotElementType()
+                .WherePasses(filter)
+                .ToElements();
 
-            FilteredElementCollector collectorByTypes;
             if(_isMarkForTypes) {
-                // Если в GUI не выбран ни один параметр для фильтрации, то Bim4Everyone.RevitFiltration
-                // возвращает фильтр ElementIsElementTypeFilter(true), а значит типоразмеры не отфильтруются.
-                // Для этого случая не надо использовать никакой фильтр.
-                if(filter is ElementIsElementTypeFilter) {
-                    collectorByTypes = collector
-                        .WhereElementIsElementType();
-                } else {
-                    collectorByTypes = collector
-                        .WhereElementIsElementType()
-                        .WherePasses(filter);
-                }                
-            } else {
-                collectorByTypes = collector
-                    .WhereElementIsNotElementType()
-                    .WherePasses(filter);
+                elements = [.. elements
+                    .Select(x => x.GetElementType())
+                    .GroupBy(x => x.Id)
+                    .Select(g => g.First())
+                    .Cast<Element>()];
             }
 
-            marksByDocument.Elements = [..collectorByTypes.ToElements()
+            marksByDocument.Elements = [..elements
                     .Select(x => new MarkedElement(x))];
 
             markData.MarkDataByDocument.Add(marksByDocument);
