@@ -3,7 +3,9 @@ using System.IO;
 using dosymep.Bim4Everyone.SimpleServices;
 using dosymep.SimpleServices;
 
-namespace RevitMarkAllDocuments.Models.Export;
+using RevitMarkAllDocuments.Models;
+
+namespace RevitMarkAllDocuments.Services.Export;
 
 internal class JsonSerializerService {
     private readonly ISerializationService _serializationService = ServicesProvider
