@@ -166,7 +166,7 @@ internal class MainViewModel : BaseViewModel {
     /// Проверяет существуют ли выбранные параметры у всех элементов во всех документах.
     /// </summary>
     /// <returns> true если найдены ошибки</returns>
-    public bool CheckAreExistParameters(MarkData markData, List<FilterableParam> sortParams, FilterableParam markParam) {
+    private bool CheckAreExistParameters(MarkData markData, List<FilterableParam> sortParams, FilterableParam markParam) {
         var filteredElements = markData.GetAllElements();
         var warningsWithNoParams = new WarningsViewModel();
 
@@ -203,7 +203,7 @@ internal class MainViewModel : BaseViewModel {
     /// Проверяет доступен ли параметр для записи у всех элементов во всех документах.
     /// </summary>
     /// <returns> true если найдены ошибки</returns>
-    public bool CheckReadOnlyParameters(MarkData markData, FilterableParam markParam) {
+    private bool CheckReadOnlyParameters(MarkData markData, FilterableParam markParam) {
         var warningsWithReadonlyParams = new WarningsViewModel();
         var filteredElements = markData.GetAllElements();
 
@@ -211,13 +211,15 @@ internal class MainViewModel : BaseViewModel {
             .CheckIsReadonlyParam(markParam, filteredElements);
 
         if(warningElementsReadonlyParams.Any()) {
-            var elementsToShow = warningElementsReadonlyParams.Select(x => new WarningElementViewModel(x));
+            var elementsToShow = warningElementsReadonlyParams
+                .Select(x => new WarningElementViewModel(x))
+                .ToList();
 
-            int elementsNumber = elementsToShow.Count();
+            int elementsNumber = elementsToShow.Count;
             int maxShownElements = 100;
             string additionalMessage = string.Empty;
             if(elementsNumber > maxShownElements) {
-                elementsToShow = elementsToShow.Take(maxShownElements);
+                elementsToShow = elementsToShow.Take(maxShownElements).ToList();
                 additionalMessage = _localizationService.GetLocalizedString("WarningsWindow.ReadOnlyParamShownElements", maxShownElements, elementsNumber);
             }
 

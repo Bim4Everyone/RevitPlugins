@@ -1,10 +1,3 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Security.Cryptography;
-using System.Text;
-using System.Threading.Tasks;
-
 using Autodesk.Revit.DB;
 
 using dosymep.SimpleServices;
@@ -22,11 +15,7 @@ internal class MarkedElementViewModel : BaseViewModel{
     private readonly string _status;
 
     public MarkedElementViewModel(MarkedElement element, Document document, ILocalizationService localizationService) {
-#if REVIT_2023_OR_LESS
         _id = element.Id.ToString();
-#else
-        _id = element.Id.ToString();
-#endif
         _element = element;
         _markValue = element.MarkValue;
 

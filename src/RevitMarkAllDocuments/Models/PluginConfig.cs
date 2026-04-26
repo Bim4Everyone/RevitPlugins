@@ -61,8 +61,8 @@ internal class RevitSettings : ProjectSettings {
     public override string ProjectName { get; set; }
 
     public string Category { get; set; }
-    public List<string> SelectedDocuments { get; set; }
-    public List<string> SelectedSortParams { get; set; }
+    public List<string> SelectedDocuments { get; set; } = [];
+    public List<string> SelectedSortParams { get; set; } = [];
     public string FilterSettings { get; set; }
     public string MarkParam { get; set; }
     public string StartValue { get; set; }

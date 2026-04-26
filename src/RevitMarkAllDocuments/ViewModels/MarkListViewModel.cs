@@ -52,14 +52,14 @@ internal class MarkListViewModel : BaseViewModel {
     }
 
     private void MarkElements() {
-        string transactionName = _localizationService.GetLocalizedString("MainWindow.TransactionName");
+        var storageType = _markParam.StorageType;
 
+        string transactionName = _localizationService.GetLocalizedString("MainWindow.TransactionName");
         using(Transaction t = _document.StartTransaction(transactionName)) {
             foreach(var element in MarkedElements) {
                 var mark = element.MarkedElement;
                 var revitElement = _document.GetElement(new ElementId(mark.Id));
 
-                var storageType = _markParam.StorageType;
                 if(storageType == StorageType.String) {
                     revitElement.SetParamValue(_markParam, mark.MarkValue);
                 } else if(storageType == StorageType.Double) {
