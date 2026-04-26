@@ -75,11 +75,15 @@ public class RevitMarkAllDocsByConfigCommand : BasePluginCommand {
         string filePath = SelectFile();
         if(!string.IsNullOrEmpty(filePath)) {
             var windowService = kernel.Get<WindowsService>();
+            var documentService = kernel.Get<DocumentService>();
+            var revitRepository = kernel.Get<RevitRepository>();
 
             var jsonService = new JsonSerializerService();
             var markData = jsonService.ImportMarkData(filePath);
+            string currentDocName = documentService.GetDocumentFullName(revitRepository.Document);
+            var markDataForCurrentDoc = markData.GetDataByDocument(currentDocName);
 
-            Notification(windowService.ShowMarkListWindow(markData));
+            Notification(windowService.ShowMarkListWindow(markDataForCurrentDoc, markData.MarkRevitParam));
         } else {
             Notification(false);
         }

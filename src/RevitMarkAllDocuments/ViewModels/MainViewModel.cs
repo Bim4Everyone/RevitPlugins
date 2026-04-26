@@ -155,7 +155,7 @@ internal class MainViewModel : BaseViewModel {
         // Если выбран текущий документ, то заполняем значения марок в нём
         var markDataForCurrentDoc = markData.GetDataByDocument(currentDocName);
         if(markDataForCurrentDoc != null) {
-            _windowsService.ShowMarkListWindow(markData);
+            _windowsService.ShowMarkListWindow(markDataForCurrentDoc, markData.MarkRevitParam);
         }
 
         SaveConfig();

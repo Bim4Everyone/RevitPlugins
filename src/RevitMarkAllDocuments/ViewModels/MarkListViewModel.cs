@@ -18,21 +18,18 @@ namespace RevitMarkAllDocuments.ViewModels;
 
 internal class MarkListViewModel : BaseViewModel {
     private readonly Document _document;
-    private readonly MarkData _markData;
+    private readonly RevitParam _markParam;
     private readonly ILocalizationService _localizationService;
 
     private ObservableCollection<MarkedElementViewModel> _markedElements = [];
 
-    public MarkListViewModel(MarkData markData,
+    public MarkListViewModel(MarkDataByDocument markDataForCurrentDoc,
+                             RevitParam markParam,
                              RevitRepository revitRepository,
-                             DocumentService documentService,
                              ILocalizationService localizationService) {
-        _markData = markData;
+        _markParam = markParam;
         _document = revitRepository.Document;
         _localizationService = localizationService;
-
-        string currentDocName = documentService.GetDocumentFullName(_document);
-        var markDataForCurrentDoc = markData.GetDataByDocument(currentDocName);
 
         if(markDataForCurrentDoc != null) {
             _markedElements = [..markDataForCurrentDoc
@@ -47,7 +44,7 @@ internal class MarkListViewModel : BaseViewModel {
 
     public ICommand MarkElementsCommand { get; }
 
-    public string ParameterName => _markData.MarkRevitParam.Name;
+    public string ParameterName => _markParam.Name;
 
     public ObservableCollection<MarkedElementViewModel> MarkedElements {
         get => _markedElements;
@@ -62,18 +59,18 @@ internal class MarkListViewModel : BaseViewModel {
                 var mark = element.MarkedElement;
                 var revitElement = _document.GetElement(new ElementId(mark.Id));
 
-                var storageType = _markData.MarkRevitParam.StorageType;
+                var storageType = _markParam.StorageType;
                 if(storageType == StorageType.String) {
-                    revitElement.SetParamValue(_markData.MarkRevitParam, mark.MarkValue);
+                    revitElement.SetParamValue(_markParam, mark.MarkValue);
                 } else if(storageType == StorageType.Double) {
                     bool result = double.TryParse(mark.MarkValue, out double number);
                     if(result) {
-                        revitElement.SetParamValue(_markData.MarkRevitParam, number);
+                        revitElement.SetParamValue(_markParam, number);
                     }
                 } else if(storageType == StorageType.Integer) {
                     bool result = int.TryParse(mark.MarkValue, out int number);
                     if(result) {
-                        revitElement.SetParamValue(_markData.MarkRevitParam, number);
+                        revitElement.SetParamValue(_markParam, number);
                     }
                 }
 

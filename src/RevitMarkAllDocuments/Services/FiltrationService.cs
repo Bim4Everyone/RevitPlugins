@@ -4,6 +4,8 @@ using Autodesk.Revit.DB;
 
 using Bim4Everyone.RevitFiltration.Controls;
 
+using dosymep.Revit;
+
 using RevitMarkAllDocuments.Models;
 
 namespace RevitMarkAllDocuments.Services;
@@ -31,7 +33,7 @@ internal class FiltrationService {
             var filter = filterProvider.GetFilter().GetFilter().Build(document, _filterOptions);
 
             var collector = new FilteredElementCollector(document)
-                .OfCategory(category.BuiltInCategory);
+                .OfCategory(category.GetBuiltInCategory());
 
             FilteredElementCollector collectorByTypes;
             if(_isMarkForTypes) {

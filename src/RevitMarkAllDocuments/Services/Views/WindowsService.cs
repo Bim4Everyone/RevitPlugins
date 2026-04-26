@@ -1,5 +1,6 @@
 using System.Linq;
 
+using dosymep.Bim4Everyone;
 using dosymep.SimpleServices;
 
 using Ninject;
@@ -30,10 +31,10 @@ internal class WindowsService {
         _localizationService = localizationService;
     }
 
-    public bool ShowMarkListWindow(MarkData markData) {
+    public bool ShowMarkListWindow(MarkDataByDocument markDataForCurrentDoc, RevitParam markParam) {
         var window = _resolutionRoot.Get<MarkListWindow>();
         var markListViewModel =
-            new MarkListViewModel(markData, _revitRepository, _documentService, _localizationService);
+            new MarkListViewModel(markDataForCurrentDoc, markParam, _revitRepository, _localizationService);
 
         if(!markListViewModel.MarkedElements.Any()) {
             _messageBoxService.Show(_localizationService.GetLocalizedString("MessageBox.NoElements"),
