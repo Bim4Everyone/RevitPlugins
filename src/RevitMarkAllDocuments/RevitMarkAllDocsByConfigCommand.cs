@@ -1,5 +1,4 @@
 using System.Globalization;
-using System.Linq;
 using System.Reflection;
 
 using Autodesk.Revit.Attributes;
@@ -9,7 +8,6 @@ using Bim4Everyone.RevitFiltration.Ninject;
 
 using dosymep.Bim4Everyone;
 using dosymep.Bim4Everyone.SimpleServices;
-using dosymep.SimpleServices;
 using dosymep.WpfCore.Ninject;
 using dosymep.WpfUI.Core.Ninject;
 
@@ -18,8 +16,8 @@ using Microsoft.WindowsAPICodePack.Dialogs;
 using Ninject;
 
 using RevitMarkAllDocuments.Models;
-using RevitMarkAllDocuments.Models.Export;
 using RevitMarkAllDocuments.Services;
+using RevitMarkAllDocuments.Services.Export;
 using RevitMarkAllDocuments.ViewModels;
 using RevitMarkAllDocuments.Views;
 
@@ -76,7 +74,7 @@ public class RevitMarkAllDocsByConfigCommand : BasePluginCommand {
 
         string filePath = SelectFile();
         if(!string.IsNullOrEmpty(filePath)) {
-            var windowService  = kernel.Get<WindowsService>();
+            var windowService = kernel.Get<WindowsService>();
 
             var jsonService = new JsonSerializerService();
             var markData = jsonService.ImportMarkData(filePath);
@@ -90,10 +88,6 @@ public class RevitMarkAllDocsByConfigCommand : BasePluginCommand {
     public string SelectFile() {
         var dialog = new CommonOpenFileDialog();
 
-        if(dialog.ShowDialog() == CommonFileDialogResult.Ok) {
-            return dialog.FileName;
-        }
-
-        return string.Empty;
+        return dialog.ShowDialog() == CommonFileDialogResult.Ok ? dialog.FileName : string.Empty;
     }
 }

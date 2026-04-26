@@ -1,6 +1,5 @@
 using System.Globalization;
 using System.Reflection;
-using System.Windows;
 
 using Autodesk.Revit.Attributes;
 using Autodesk.Revit.UI;
@@ -10,11 +9,8 @@ using Bim4Everyone.RevitFiltration.Ninject;
 using dosymep.Bim4Everyone;
 using dosymep.Bim4Everyone.ProjectConfigs;
 using dosymep.Bim4Everyone.SimpleServices;
-using dosymep.SimpleServices;
-using dosymep.WPF.Views;
 using dosymep.WpfCore.Ninject;
 using dosymep.WpfUI.Core.Ninject;
-using dosymep.Xpf.Core.Ninject;
 
 using Ninject;
 
@@ -47,7 +43,7 @@ public class RevitMarkAllDocumentsCommand : BasePluginCommand {
         using IKernel kernel = uiApplication.CreatePlatformServices();
 
         kernel.UseLogicalFilterFactory();
-        kernel.UseLogicalFilterProviderFactory(); 
+        kernel.UseLogicalFilterProviderFactory();
         kernel.UseFilterContextParser();
 
         // Настройка доступа к Revit
