@@ -1,9 +1,5 @@
-using System;
-using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Input;
 
 using Autodesk.Revit.DB;
@@ -27,7 +23,7 @@ internal class MarkListViewModel : BaseViewModel {
 
     private ObservableCollection<MarkedElementViewModel> _markedElements = [];
 
-    public MarkListViewModel(MarkData markData, 
+    public MarkListViewModel(MarkData markData,
                              RevitRepository revitRepository,
                              DocumentService documentService,
                              ILocalizationService localizationService) {
@@ -70,12 +66,12 @@ internal class MarkListViewModel : BaseViewModel {
                 if(storageType == StorageType.String) {
                     revitElement.SetParamValue(_markData.MarkRevitParam, mark.MarkValue);
                 } else if(storageType == StorageType.Double) {
-                    bool result = double.TryParse(mark.MarkValue, out var number);
+                    bool result = double.TryParse(mark.MarkValue, out double number);
                     if(result == true) {
                         revitElement.SetParamValue(_markData.MarkRevitParam, number);
-                    }                    
+                    }
                 } else if(storageType == StorageType.Integer) {
-                    bool result = int.TryParse(mark.MarkValue, out var number);
+                    bool result = int.TryParse(mark.MarkValue, out int number);
                     if(result == true) {
                         revitElement.SetParamValue(_markData.MarkRevitParam, number);
                     }
