@@ -12,7 +12,6 @@ using dosymep.WPF.Commands;
 using dosymep.WPF.ViewModels;
 
 using RevitMarkAllDocuments.Models;
-using RevitMarkAllDocuments.Services;
 
 namespace RevitMarkAllDocuments.ViewModels;
 
@@ -73,7 +72,6 @@ internal class MarkListViewModel : BaseViewModel {
                         revitElement.SetParamValue(_markParam, number);
                     }
                 }
-
             }
 
             t.Commit();
