@@ -4,7 +4,6 @@ using System.Linq;
 
 using Autodesk.Revit.DB;
 
-using dosymep.Bim4Everyone;
 using dosymep.WPF.ViewModels;
 
 using RevitMarkAllDocuments.Models;
@@ -21,9 +20,9 @@ internal class MarkSettingsPageViewModel : BaseViewModel {
 
     public MarkSettingsPageViewModel(IList<FilterableParam> parameters) {
         _paramsForMark = [.. parameters
-            .Where(x => x.RevitParam.StorageType == StorageType.String 
-                || x.RevitParam.StorageType == StorageType.Integer 
-                || x.RevitParam.StorageType == StorageType.Double)
+            .Where(x => x.RevitParam.StorageType is StorageType.String
+                or StorageType.Integer
+                or StorageType.Double)
             .Select(x => new ParameterViewModel(x))];
     }
 

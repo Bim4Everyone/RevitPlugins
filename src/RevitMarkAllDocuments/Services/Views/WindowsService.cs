@@ -1,5 +1,4 @@
 using System.Linq;
-using System.Windows;
 
 using dosymep.SimpleServices;
 
@@ -32,8 +31,8 @@ internal class WindowsService {
     }
 
     public bool ShowMarkListWindow(MarkData markData) {
-        var window = _resolutionRoot.Get<MarkListWindow>();        
-        var markListViewModel = 
+        var window = _resolutionRoot.Get<MarkListWindow>();
+        var markListViewModel =
             new MarkListViewModel(markData, _revitRepository, _documentService, _localizationService);
 
         if(!markListViewModel.MarkedElements.Any()) {
@@ -45,11 +44,7 @@ internal class WindowsService {
         window.DataContext = markListViewModel;
 
         window.ShowDialog();
-        if((bool) window.DialogResult) {
-            return true;
-        }
-
-        return false;
+        return (bool) window.DialogResult;
     }
 
     public bool ShowWarningsWindow(WarningsViewModel warnings) {

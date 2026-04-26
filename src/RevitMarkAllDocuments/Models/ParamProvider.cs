@@ -20,11 +20,7 @@ internal class ParamProvider {
     /// Для экземпляров это параметры экземпляра и парамтеры типоразмера.
     /// </summary>
     public List<FilterableParam> GetParamsForFilterAndSort() {
-        if(_isMarkForTypes) {
-            return [.. _params.Where(x => x.IsTypeParam)];
-        }
-
-        return _params;
+        return _isMarkForTypes ? [.. _params.Where(x => x.IsTypeParam)] : _params;
     }
 
     /// <summary>

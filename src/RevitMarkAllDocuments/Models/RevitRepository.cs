@@ -20,7 +20,7 @@ internal class RevitRepository {
     }
 
     public UIApplication UIApplication { get; }
-    public UIDocument ActiveUIDocument => UIApplication.ActiveUIDocument;    
+    public UIDocument ActiveUIDocument => UIApplication.ActiveUIDocument;
     public Application Application => UIApplication.Application;
     public Document Document => ActiveUIDocument.Document;
 
@@ -62,7 +62,7 @@ internal class RevitRepository {
         List<FilterableParam> filterableParams = [];
 
         foreach(var param in parameters) {
-            FilterableParam filterableParam = new FilterableParam() { RevitParam = param };
+            var filterableParam = new FilterableParam() { RevitParam = param };
 
             if(elementTypes.Any(x => x.IsExistsParam(param))) {
                 filterableParam.IsTypeParam = true;

@@ -1,5 +1,3 @@
-using System.Security.Cryptography;
-
 using Autodesk.Revit.DB;
 
 using dosymep.Revit;
@@ -33,10 +31,6 @@ internal class MarkedElement {
     public string MarkValue { get; set; }
 
     public Element GetElementWithParam(bool isForType, FilterableParam param) {
-        if(param.IsTypeParam && !isForType) { 
-            return RevitElement.GetElementType();        
-        }
-
-        return RevitElement;
+        return param.IsTypeParam && !isForType ? RevitElement.GetElementType() : RevitElement;
     }
 }
