@@ -119,7 +119,7 @@ internal class MainViewModel : BaseViewModel {
             MarkRevitParam = selectedMarkParam.RevitParam,
         };
         var filtrationService = new FiltrationService(_isMarkForTypes);
-        markData = filtrationService.FilterElements(markData, checkedDocuments, FilterPageViewModel.FilterProvider);
+        markData = filtrationService.FilterElements(markData, _selectedCategory, checkedDocuments, FilterPageViewModel.FilterProvider);
 
         var sortParams = SortPageViewModel.SelectedParams
             .Select(x => x.FilterableParam)

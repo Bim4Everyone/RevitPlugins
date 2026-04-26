@@ -17,7 +17,10 @@ internal class FiltrationService {
         _filterOptions = new FilterOptions() { Tolerance = 0 };
     }
 
-    public MarkData FilterElements(MarkData markData, Document[] documents, ILogicalFilterProvider filterProvider) {
+    public MarkData FilterElements(MarkData markData, 
+                                   Category category,
+                                   Document[] documents, 
+                                   ILogicalFilterProvider filterProvider) {
         var docService = new DocumentService();
 
         foreach(var document in documents) {
@@ -28,7 +31,7 @@ internal class FiltrationService {
             var filter = filterProvider.GetFilter().GetFilter().Build(document, _filterOptions);
 
             var collector = new FilteredElementCollector(document)
-                .OfCategory(BuiltInCategory.OST_Walls);
+                .OfCategory(category.BuiltInCategory);
 
             FilteredElementCollector collectorByTypes;
             if(_isMarkForTypes) {
