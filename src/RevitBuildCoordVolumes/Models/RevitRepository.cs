@@ -12,6 +12,7 @@ using dosymep.Revit;
 using RevitBuildCoordVolumes.Models.Geometry;
 using RevitBuildCoordVolumes.Models.Interfaces;
 using RevitBuildCoordVolumes.Models.Services;
+using RevitBuildCoordVolumes.Models.Settings;
 
 namespace RevitBuildCoordVolumes.Models;
 
@@ -65,9 +66,8 @@ internal class RevitRepository {
     /// <summary>
     /// Получение всех типов перекрытий и фундаментных плит по именам типов, документам и уровням
     /// </summary>
-    public IEnumerable<SlabElement> GetSlabsByTypesDocsAndLevels(
-        IEnumerable<string> typeSlabs, IEnumerable<Document> documents, List<Level> levels) {
-        return _slabsService.GetSlabsByTypesDocsAndLevels(typeSlabs, documents, levels);
+    public IEnumerable<SlabElement> GetSlabsByTypesDocsAndLevels(BuildCoordVolumeSettings settings) {
+        return _slabsService.GetSlabsByTypesDocsAndLevels(settings.TypeSlabs, settings.Documents, settings.Levels);
     }
 
 

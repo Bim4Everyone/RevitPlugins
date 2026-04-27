@@ -71,9 +71,9 @@
     <system:String x:Key="CommonSettingViewModel.VolumeParamDescription">CMR volume parameter</system:String>
     <system:String x:Key="CommonSettingViewModel.VolumeParamDetailDescription">Used to calculate volume</system:String>
 
-    <system:String x:Key="SlabBasedSettingViewModel.AutomaticBuilder">Automatic selection by slab</system:String>
-    <system:String x:Key="SlabBasedSettingViewModel.ContourBuilder">Square extrusion with merging</system:String>
-    <system:String x:Key="SlabBasedSettingViewModel.ColumnBuilder">Square extrusion without merging</system:String>
+    <system:String x:Key="SlabBasedSettingViewModel.AutomaticBuilder">Merged volumes by floor</system:String>
+    <system:String x:Key="SlabBasedSettingViewModel.ContourBuilder">Separate volumes (with contour merging)</system:String>
+    <system:String x:Key="SlabBasedSettingViewModel.ColumnBuilder">Separate volumes (without contour merging)</system:String>
 
     <system:String x:Key="MainViewModel.RequiredCheckArea">Zone check required</system:String>
     <system:String x:Key="MainViewModel.NoMainParam">Zone type parameter must be enabled</system:String>
@@ -124,6 +124,7 @@
     <system:String x:Key="DivideSpatial.ProgressTitle">Divide zone {0}%</system:String>
     <system:String x:Key="SlabNormalize.ProgressTitle">Processing slabs {0}%</system:String>
     <system:String x:Key="BuildContour.ProgressTitle">Generate contours {0}%</system:String>
-    <system:String x:Key="BuildVolumes.ProgressTitle">Generate Volumes {0}%</system:String>
-    
+    <system:String x:Key="BuildVolumes.ProgressTitle">Generate volumes {0}%</system:String>
+    <system:String x:Key="UnionVolumes.ProgressTitle">Union volumes {0}%</system:String>
+
 </ResourceDictionary>

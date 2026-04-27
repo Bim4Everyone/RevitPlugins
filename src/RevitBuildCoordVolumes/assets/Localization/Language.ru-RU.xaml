@@ -71,9 +71,9 @@
     <system:String x:Key="CommonSettingViewModel.VolumeParamDescription">Параметр объёма СМР</system:String>
     <system:String x:Key="CommonSettingViewModel.VolumeParamDetailDescription">Используется для вычисления объёма</system:String>
 
-    <system:String x:Key="SlabBasedSettingViewModel.AutomaticBuilder">Автоматический выбор по перекрытию</system:String>
-    <system:String x:Key="SlabBasedSettingViewModel.ContourBuilder">Экструзия квадратов с объединением</system:String>
-    <system:String x:Key="SlabBasedSettingViewModel.ColumnBuilder">Экструзия квадратов без объединения</system:String>
+    <system:String x:Key="SlabBasedSettingViewModel.AutomaticBuilder">Объединенные объемы по этажу</system:String>
+    <system:String x:Key="SlabBasedSettingViewModel.ContourBuilder">Отдельные объемы (с объединением контуров)</system:String>
+    <system:String x:Key="SlabBasedSettingViewModel.ColumnBuilder">Отдельные объемы (без объединения контуров)</system:String>
 
     <system:String x:Key="MainViewModel.RequiredCheckArea">Требуется проверить зоны</system:String>
     <system:String x:Key="MainViewModel.NoMainParam">Параметр типа зон обязателен к использованию</system:String>
@@ -97,7 +97,7 @@
     <system:String x:Key="DocumentViewModel.CurrentFile">Текущий файл (открытый)</system:String>
 
     <system:String x:Key="BuildCoordVolumesProcessor.TransactionName">Построение объемов СМР</system:String>
-    <system:String x:Key="BuildCoordVolumesProcessor.ZoneName">Зона {0}: </system:String>
+    <system:String x:Key="BuildCoordVolumesProcessor.ZoneName">Зона {0}/{1}: </system:String>
 
     <system:String x:Key="Common.ParamErrorMessageBody">Ошибка загрузки параметров</system:String>
     <system:String x:Key="Common.ConfigErrorMessageTitle">Ошибка настройки плагина</system:String>
@@ -124,6 +124,7 @@
     <system:String x:Key="DivideSpatial.ProgressTitle">Деление зоны {0}%</system:String>
     <system:String x:Key="SlabNormalize.ProgressTitle">Обработка плит {0}%</system:String>
     <system:String x:Key="BuildContour.ProgressTitle">Генерация контуров {0}%</system:String>
-    <system:String x:Key="BuildVolumes.ProgressTitle">Генерация объемов {0}%</system:String>   
+    <system:String x:Key="BuildVolumes.ProgressTitle">Генерация объемов {0}%</system:String>
+    <system:String x:Key="UnionVolumes.ProgressTitle">Объединение объемов {0}%</system:String>   
     
 </ResourceDictionary>

@@ -4,6 +4,7 @@ using Autodesk.Revit.DB;
 
 using RevitBuildCoordVolumes.Models.Geometry;
 using RevitBuildCoordVolumes.Models.Services;
+using RevitBuildCoordVolumes.Models.Settings;
 
 namespace RevitBuildCoordVolumes.Models.Interfaces;
 
@@ -16,10 +17,9 @@ internal interface ISpatialElementDividerService {
     /// с заданной длиной стороны и углом поворота.
     /// </remarks>
     /// <param name="spatialElement">Исходная зона.</param>
-    /// <param name="side">Длина стороны квадрата.</param>
-    /// <param name="angleDeg">Угол поворота в градусах.</param>
+    /// <param name="settings">Настройки проекта.</param>
     /// <returns>
     /// Коллекция полигонов, представляющих фрагменты исходной зоны после разбиения.
     /// </returns>
-    List<PolygonObject> DivideSpatialElement(SpatialElement spatialElement, double side, double angleDeg, ProgressService pro);
+    List<PolygonObject> DivideSpatialElement(SpatialElement spatialElement, BuildCoordVolumeSettings settings, ProgressService pro);
 }

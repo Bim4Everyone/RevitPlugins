@@ -8,6 +8,7 @@ using dosymep.Bim4Everyone;
 using dosymep.Revit;
 using dosymep.Revit.Geometry;
 
+using RevitBuildCoordVolumes.Models.Enums;
 using RevitBuildCoordVolumes.Models.Interfaces;
 using RevitBuildCoordVolumes.Models.Utilites;
 
@@ -18,6 +19,33 @@ internal class SlabNormalizeService : ISlabNormalizeService {
 
     public SlabNormalizeService(SystemPluginConfig systemPluginConfig) {
         _systemPluginConfig = systemPluginConfig;
+    }
+
+    // Метод получения всех перекрытий без отверстий и вырезов (для плоских)
+    public List<SlabElement> GetNormalizeSlabs(List<SlabElement> slabElements, ProgressService progressService) {
+        progressService?.BeginStage(ProgressType.SlabNormalize);
+        int total = slabElements.Count;
+        int processed = 0;
+        int reported = 0;
+        foreach(var slab in slabElements) {
+            progressService?.CancellationToken.ThrowIfCancellationRequested();
+            bool isSloped = IsSloped(slab);
+            var topFaces = GetTopFaces(slab);
+            slab.IsSloped = isSloped;
+            slab.TopFaces = slab.IsSloped
+                ? topFaces
+                : GetTopFacesClean(slab, topFaces);
+            processed++;
+            int current = processed * 100 / total;
+            if(current > 100) {
+                current = 100;
+            }
+            if(current > reported) {
+                reported = current;
+                progressService?.ProgressCount?.Report(reported);
+            }
+        }
+        return slabElements;
     }
 
     public List<Face> GetTopFaces(SlabElement slabElement) {

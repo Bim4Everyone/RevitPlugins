@@ -7,6 +7,7 @@ using Autodesk.Revit.DB;
 using RevitBuildCoordVolumes.Models.Enums;
 using RevitBuildCoordVolumes.Models.Geometry;
 using RevitBuildCoordVolumes.Models.Interfaces;
+using RevitBuildCoordVolumes.Models.Settings;
 using RevitBuildCoordVolumes.Models.Utilites;
 
 namespace RevitBuildCoordVolumes.Models.Services;
@@ -20,9 +21,10 @@ internal class SpatialElementDividerService : ISpatialElementDividerService {
 
     public List<PolygonObject> DivideSpatialElement(
         SpatialElement spatialElement,
-        double side,
-        double angleDeg,
+        BuildCoordVolumeSettings settings,
         ProgressService progressService) {
+        double angleDeg = UnitUtils.ConvertToInternalUnits(settings.SquareAngleDeg, UnitTypeId.Degrees);
+        double side = UnitUtils.ConvertToInternalUnits(settings.SquareSideMm, UnitTypeId.Millimeters);
         var contour = _contourService.GetOuterContour(spatialElement);
         if(contour.Count == 0) {
             return [];
