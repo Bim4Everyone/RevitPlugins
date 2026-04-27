@@ -10,8 +10,8 @@ namespace RevitMarkAllDocuments.Services;
 
 internal class ParamValidationService {
     public IList<WarningElement> CheckAreExistParams(bool isForTypes,
-                                                    IList<FilterableParam> paramsToCheck, 
-                                                    IList<MarkedElement> elementsToCheck) {
+                                                    IReadOnlyList<FilterableParam> paramsToCheck, 
+                                                    IReadOnlyList<MarkedElement> elementsToCheck) {
         var elementsWithError = new List<WarningElement>();
 
         foreach(var param in paramsToCheck) {
@@ -26,7 +26,7 @@ internal class ParamValidationService {
 
     public IList<WarningElement> CheckIsExistParam(bool isForTypes, 
                                                   FilterableParam paramToCheck, 
-                                                  IList<MarkedElement> elementsToCheck) {
+                                                  IReadOnlyList<MarkedElement> elementsToCheck) {
         if(isForTypes) {
             return elementsToCheck
                 .Where(x => !x.RevitElement.IsExistsParam(paramToCheck.RevitParam))
@@ -48,7 +48,7 @@ internal class ParamValidationService {
     }
 
     public IList<WarningElement> CheckIsReadonlyParam(FilterableParam paramToCheck, 
-                                                     IList<MarkedElement> elementsToCheck) {
+                                                      IReadOnlyList<MarkedElement> elementsToCheck) {
         return elementsToCheck
             .Where(x => x.RevitElement.IsReadOnlyParam(paramToCheck.RevitParam))
             .Select(x => new WarningElement {

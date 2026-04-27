@@ -29,7 +29,7 @@ internal class MarkData {
         return false;
     }
 
-    public void CreateMarkValues(bool isForTypes, IList<FilterableParam> sortParams, MarkStartValue startValue) {
+    public void CreateMarkValues(bool isForTypes, IReadOnlyList<FilterableParam> sortParams, MarkStartValue startValue) {
         var sortService = new SortElementService();
         var sortedMarkedElements = sortService.SortElements(isForTypes, GetAllElements(), sortParams);
         int startNumber = int.Parse(startValue.StartValue);
@@ -40,7 +40,7 @@ internal class MarkData {
         }
     }
 
-    public IList<MarkedElement> GetAllElements() {
+    public IReadOnlyList<MarkedElement> GetAllElements() {
         return MarkDataByDocument.SelectMany(x => x.Elements).ToList();
     }
 }

@@ -24,7 +24,7 @@ internal class RevitRepository {
     public Application Application => UIApplication.Application;
     public Document Document => ActiveUIDocument.Document;
 
-    public IEnumerable<Category> GetCategories() {
+    public IList<Category> GetCategories() {
         var allCategories = Document.Settings.Categories
             .Cast<Category>()
             .Select(x => x.Id)
@@ -34,10 +34,11 @@ internal class RevitRepository {
             .RemoveUnfilterableCategories(allCategories);
 
         return filterableCategories
-            .Select(x => Category.GetCategory(Document, x));
+            .Select(x => Category.GetCategory(Document, x))
+            .ToList();
     }
 
-    public IEnumerable<Document> GetAllDocuments() {
+    public IList<Document> GetAllDocuments() {
         var docs = new List<Document> { Document };
 
         // Получаем все связи (RevitLinkInstance)

@@ -12,8 +12,8 @@ namespace RevitMarkAllDocuments.Services;
 
 internal class SortElementService {
     public IOrderedEnumerable<MarkedElement> SortElements(bool isForType,
-                                                          IList<MarkedElement> elements, 
-                                                          IList<FilterableParam> sortParams) {
+                                                          IReadOnlyList<MarkedElement> elements,
+                                                          IReadOnlyList<FilterableParam> sortParams) {
         var sortedElements = elements.OrderBy(GetSortKey(isForType, sortParams[0]));
 
         foreach(var param in sortParams.Skip(1)) {
