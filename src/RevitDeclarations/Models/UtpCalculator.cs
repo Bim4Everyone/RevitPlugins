@@ -6,8 +6,10 @@ using Autodesk.Revit.DB;
 
 using dosymep.SimpleServices;
 using dosymep.WPF.Extensions;
+using dosymep.Revit;
 
 using RevitDeclarations.ViewModels;
+using dosymep.Bim4Everyone.ProjectParams;
 
 namespace RevitDeclarations.Models;
 internal class UtpCalculator {
@@ -216,6 +218,36 @@ internal class UtpCalculator {
             .Any();
 
         return hasLaundries ? _utpYes : _utpNo;
+    }
+
+    // Остекленная лоджия/балкон.
+    // В квартире есть минимум одно летнее помещение без галочки у параметра "КВГ_Без остекления".
+    public string CalculateBalconyWithGlazing(Apartment apartment) {
+        List<RoomElement> summerRooms =
+        [
+            .. apartment.GetRoomsByPrior(_priorities.Balcony),
+            .. apartment.GetRoomsByPrior(_priorities.Loggia),
+        ];
+
+        bool hasBalconyWithGlazing = summerRooms
+            .Any(x => x.RevitRoom.GetParamValueOrDefault<int>(ProjectParamsConfig.Instance.RoomNoGlazing.Name) == 0);
+
+        return hasBalconyWithGlazing ? _utpYes : _utpNo;
+    }
+
+    // Лоджия/балкон без остекления.
+    // В квартире есть минимум одно летнее помещение с галочкой у параметра "КВГ_Без остекления".
+    public string CalculateBalconyWithoutGlazing(Apartment apartment) {
+        List<RoomElement> summerRooms =
+        [
+            .. apartment.GetRoomsByPrior(_priorities.Balcony),
+            .. apartment.GetRoomsByPrior(_priorities.Loggia),
+        ];
+
+        bool hasBalconyWithoutGlazing = summerRooms
+            .Any(x => x.RevitRoom.GetParamValueOrDefault<int>(ProjectParamsConfig.Instance.RoomNoGlazing.Name) == 1);
+
+        return hasBalconyWithoutGlazing ? _utpYes : _utpNo;
     }
 
     private bool CheckUtpNullAreas() {

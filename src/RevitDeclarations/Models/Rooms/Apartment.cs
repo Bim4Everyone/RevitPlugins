@@ -80,6 +80,10 @@ internal class Apartment : RoomGroup {
     public string UtpLaundry { get; private set; }
     [JsonIgnore]
     public string UtpExtraBalconyArea { get; private set; }
+    [JsonIgnore]
+    public string UtpBalconyWithGlazing { get; private set; }
+    [JsonIgnore]
+    public string UtpBalconyWithoutGlazing { get; private set; }
 
     // Рассчитывает площади квартир на основе актуальных системных площадей помещений
     public void CalculateRevitAreas() {
@@ -183,5 +187,8 @@ internal class Apartment : RoomGroup {
 
         UtpPantry = calculator.CalculatePantry(this);
         UtpLaundry = calculator.CalculateLaundry(this);
+
+        UtpBalconyWithGlazing = calculator.CalculateBalconyWithGlazing(this);
+        UtpBalconyWithoutGlazing = calculator.CalculateBalconyWithoutGlazing(this);
     }
 }
