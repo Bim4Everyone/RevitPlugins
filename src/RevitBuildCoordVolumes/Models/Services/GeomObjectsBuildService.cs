@@ -30,7 +30,7 @@ internal class GeomObjectsBuildService : IGeomObjectsBuildService {
         foreach(var columnGroup in columnGroups) {
             var listColumns = columnGroup.ToList();
             var firstColumn = listColumns[0];
-            bool alongObgect = listColumns.Count == 1;
+            bool alongObject = listColumns.Count == 1;
             bool isSloped = firstColumn.IsSloped;
 
             if(builderMode == BuilderMode.ColumnBuilder) {
@@ -39,7 +39,7 @@ internal class GeomObjectsBuildService : IGeomObjectsBuildService {
             }
 
             if(builderMode is BuilderMode.ContourBuilder or BuilderMode.AutomaticBuilder) {
-                if(alongObgect || isSloped) {
+                if(alongObject || isSloped) {
                     var sepObjects = _geomObjectFactory.GetSeparatedGeomObjects(listColumns, polygons, progressService);
                     var uniObjects = _geomObjectConnector.UnionGeomObjects(sepObjects, progressService);
                     geomObjects.AddRange(uniObjects);
