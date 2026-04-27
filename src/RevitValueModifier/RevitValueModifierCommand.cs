@@ -43,10 +43,8 @@ public class RevitValueModifierCommand : BasePluginCommand {
         kernel.UseWpfUIThemeUpdater();
         
         // Настройка запуска окна
-        kernel.Bind<MainViewModel>().ToSelf().InSingletonScope();
-        kernel.Bind<IHasTheme, IHasLocalization, MainWindow>().To<MainWindow>()
-            .WithPropertyValue("DataContext", (IContext c) => c.Kernel.Get<MainViewModel>(Array.Empty<IParameter>()));
-
+        kernel.BindMainWindow<MainViewModel, MainWindow>();
+        
         // Настройка локализации,
         // получение имени сборки откуда брать текст
         string assemblyName = Assembly.GetExecutingAssembly().GetName().Name;
