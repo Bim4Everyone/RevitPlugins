@@ -84,7 +84,7 @@ internal class MainViewModel : BaseViewModel {
     private void LoadView() {
         var paramProvider = new ParamProvider(_revitRepository, _selectedCategory, _isMarkForTypes);
         var paramsForFilterAndSort = paramProvider.GetParamsForFilterAndSort().ToList();
-        var paramsForMark = paramProvider.GetParamsForMarks();
+        var paramsForMark = paramProvider.GetParamsForMarks().ToList();
 
         _documentsPageViewModel = new DocumentsPageViewModel(_revitRepository, _localizationService);
         var dataProvider = new FilterDataProvider(_revitRepository.Document, _selectedCategory, paramsForFilterAndSort);

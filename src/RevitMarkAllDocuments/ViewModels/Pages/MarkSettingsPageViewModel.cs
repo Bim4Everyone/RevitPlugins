@@ -18,7 +18,7 @@ internal class MarkSettingsPageViewModel : BaseViewModel {
     private string _suffix;
     private bool _isSuffixEnable;
 
-    public MarkSettingsPageViewModel(IList<FilterableParam> parameters) {
+    public MarkSettingsPageViewModel(IReadOnlyList<FilterableParam> parameters) {
         _paramsForMark = [.. parameters
             .Where(x => x.RevitParam.StorageType is StorageType.String
                 or StorageType.Integer

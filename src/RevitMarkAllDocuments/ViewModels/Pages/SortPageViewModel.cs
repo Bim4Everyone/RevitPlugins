@@ -17,7 +17,7 @@ internal class SortPageViewModel : BaseViewModel {
     private ParameterViewModel _selectedParamFromSelected;
 
 
-    public SortPageViewModel(IList<FilterableParam> parameters) {
+    public SortPageViewModel(IReadOnlyList<FilterableParam> parameters) {
         SelectableParams = [..parameters
             .Select(x => new ParameterViewModel(x))
             .OrderBy(x => x.Name)];

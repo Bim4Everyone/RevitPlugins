@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using System.Linq;
 
 using Autodesk.Revit.DB;
@@ -21,7 +22,7 @@ internal class FiltrationService {
 
     public MarkData FilterElements(MarkData markData, 
                                    Category category,
-                                   Document[] documents,
+                                   IReadOnlyList<Document> documents,
                                    DocumentService docService, 
                                    ILogicalFilterProvider filterProvider) {
         foreach(var document in documents) {

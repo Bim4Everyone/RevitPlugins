@@ -4,6 +4,6 @@ namespace RevitMarkAllDocuments.Models;
 
 internal class MarkDataByDocument {
     public string DocumentName { get; set; }
-    public List<MarkedElement> Elements { get; set; }
+    public IList<MarkedElement> Elements { get; set; }
 }
 
