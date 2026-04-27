@@ -71,9 +71,9 @@
     <system:String x:Key="CommonSettingViewModel.VolumeParamDescription">Параметр объёма СМР</system:String>
     <system:String x:Key="CommonSettingViewModel.VolumeParamDetailDescription">Используется для вычисления объёма</system:String>
 
-    <system:String x:Key="SlabBasedSettingViewModel.AutomaticBuilder">Автоматический режим построения (объединение по этажу)</system:String>
-    <system:String x:Key="SlabBasedSettingViewModel.ContourBuilder">Отдельные объемные элементы (объединенные контуры)</system:String>
-    <system:String x:Key="SlabBasedSettingViewModel.ColumnBuilder">Отдельные объемные элементы (экструдированные квадраты)</system:String>
+    <system:String x:Key="SlabBasedSettingViewModel.AutomaticBuilder">Объединенные объемы по этажу</system:String>
+    <system:String x:Key="SlabBasedSettingViewModel.ContourBuilder">Отдельные объемы (с объединением контуров)</system:String>
+    <system:String x:Key="SlabBasedSettingViewModel.ColumnBuilder">Отдельные объемы (без объединения контуров)</system:String>
 
     <system:String x:Key="MainViewModel.RequiredCheckArea">Требуется проверить зоны</system:String>
     <system:String x:Key="MainViewModel.NoMainParam">Параметр типа зон обязателен к использованию</system:String>

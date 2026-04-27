@@ -71,9 +71,9 @@
     <system:String x:Key="CommonSettingViewModel.VolumeParamDescription">CMR volume parameter</system:String>
     <system:String x:Key="CommonSettingViewModel.VolumeParamDetailDescription">Used to calculate volume</system:String>
 
-    <system:String x:Key="SlabBasedSettingViewModel.AutomaticBuilder">Automatic build mode (merge by floor)</system:String>
-    <system:String x:Key="SlabBasedSettingViewModel.ContourBuilder">Separate volumetric elements (merged contours)</system:String>
-    <system:String x:Key="SlabBasedSettingViewModel.ColumnBuilder">Separate volumetric elements (extruded squares)</system:String>
+    <system:String x:Key="SlabBasedSettingViewModel.AutomaticBuilder">Merged volumes by floor</system:String>
+    <system:String x:Key="SlabBasedSettingViewModel.ContourBuilder">Separate volumes (with contour merging)</system:String>
+    <system:String x:Key="SlabBasedSettingViewModel.ColumnBuilder">Separate volumes (without contour merging)</system:String>
 
     <system:String x:Key="MainViewModel.RequiredCheckArea">Zone check required</system:String>
     <system:String x:Key="MainViewModel.NoMainParam">Zone type parameter must be enabled</system:String>
