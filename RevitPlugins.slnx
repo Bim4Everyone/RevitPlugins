@@ -161,6 +161,9 @@
   <Project Path="src/RevitPlugins/RevitPlugins.csproj">
     <Platform Project="x64" />
   </Project>
+  <Project Path="src/RevitPunchingRebar/RevitPunchingRebar.csproj">
+    <Platform Project="x64" />
+  </Project>
   <Project Path="src/RevitPylonDocumentation/RevitPylonDocumentation.csproj">
     <Platform Project="x64" />
   </Project>
