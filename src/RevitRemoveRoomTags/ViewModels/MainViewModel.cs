@@ -4,15 +4,12 @@ using System.Linq;
 using System.Windows.Input;
 
 using Autodesk.Revit.DB;
-using Autodesk.Revit.DB.Architecture;
-using Autodesk.Revit.UI.Selection;
 
 using dosymep.Revit;
 using dosymep.WPF.Commands;
 using dosymep.WPF.ViewModels;
 
 using RevitRemoveRoomTags.Models;
-using RevitRemoveRoomTags.Views;
 
 namespace RevitRemoveRoomTags.ViewModels;
 internal class MainViewModel : BaseViewModel {
@@ -170,27 +167,27 @@ internal class MainViewModel : BaseViewModel {
     /// Метод команды по выбору марок помещений для конкретной задачи RoomTagTaskHelper, которая передается через CommandParameter
     /// </summary>
     private void SelectRoomTags(object obj) {
-        if(obj is RoomTagTaskHelper task) {
-            task.RoomTags.Clear();
+        //if(obj is RoomTagTaskHelper task) {
+        //    task.RoomTags.Clear();
 
-            ISelectionFilter selectFilter = new RoomTagSelectionFilter();
-            var references = _revitRepository.ActiveUIDocument.Selection
-                            .PickObjects(ObjectType.Element, selectFilter, "Выберите марки помещений на виде");
+        //    ISelectionFilter selectFilter = new RoomTagSelectionFilter();
+        //    var references = _revitRepository.ActiveUIDocument.Selection
+        //                    .PickObjects(ObjectType.Element, selectFilter, "Выберите марки помещений на виде");
 
-            foreach(var reference in references) {
-                if(_revitRepository.Document.GetElement(reference) is not RoomTag elem) {
-                    continue;
-                }
+        //    foreach(var reference in references) {
+        //        if(_revitRepository.Document.GetElement(reference) is not RoomTag elem) {
+        //            continue;
+        //        }
 
-                task.RoomTags.Add(elem);
-            }
-        }
+        //        task.RoomTags.Add(elem);
+        //    }
+        //}
 
-        // Переоткрываем окно плагина
-        var mainWindow = new MainWindow {
-            DataContext = this
-        };
-        _ = mainWindow.ShowDialog();
+        //// Переоткрываем окно плагина
+        //var mainWindow = new MainWindow {
+        //    DataContext = this
+        //};
+        //_ = mainWindow.ShowDialog();
     }
 
 
