@@ -6,67 +6,152 @@
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:vms="clr-namespace:RevitSplitMepCurve.ViewModels"
     xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
+    xmlns:wpfbehaviors="clr-namespace:dosymep.WpfCore.Behaviors;assembly=dosymep.WpfCore"
     xmlns:core="clr-namespace:dosymep.WpfUI.Core"
     xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
     xmlns:me="clr-namespace:dosymep.WpfCore.MarkupExtensions;assembly=dosymep.WpfCore"
     mc:Ignorable="d"
     Title="{me:LocalizationSource MainWindow.Title}"
-    Height="500"
-    Width="700"
+    Height="640"
+    Width="720"
     MinHeight="500"
-    MinWidth="700"
+    MinWidth="600"
     d:DataContext="{d:DesignInstance vms:MainViewModel, IsDesignTimeCreatable=False}">
 
+    <Window.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="Templates/ProvidersTemplates.xaml" />
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
+    </Window.Resources>
+
+    <i:Interaction.Behaviors>
+        <wpfbehaviors:WpfAttachServiceBehavior
+            AttachableService="{Binding MessageBoxService}" />
+    </i:Interaction.Behaviors>
+
     <i:Interaction.Triggers>
-        <i:EventTrigger
-            EventName="Loaded">
-            <i:InvokeCommandAction
-                Command="{Binding LoadViewCommand}" />
+        <i:EventTrigger EventName="Loaded">
+            <i:InvokeCommandAction Command="{Binding LoadViewCommand}" />
         </i:EventTrigger>
     </i:Interaction.Triggers>
 
     <Grid>
         <Grid.RowDefinitions>
-            <RowDefinition
-                Height="Auto" />
-            <RowDefinition
-                Height="*" />
-            <RowDefinition
-                Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
 
+        <!-- Row 0: TitleBar -->
         <ui:TitleBar
             Grid.Row="0"
             Title="{me:LocalizationSource MainWindow.Title}" />
 
-        <ui:TextBox
+        <!-- Row 1: Category + SelectionMode -->
+        <Grid
             Grid.Row="1"
-            Width="200"
-            VerticalAlignment="Center"
-            HorizontalAlignment="Center"
-            Text="{Binding SaveProperty, UpdateSourceTrigger=PropertyChanged}" />
-
-        <StackPanel
-            Grid.Row="2"
-            Orientation="Horizontal"
-            HorizontalAlignment="Right">
+            Margin="14,8">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+            </Grid.RowDefinitions>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="200" />
+                <ColumnDefinition Width="*" />
+            </Grid.ColumnDefinitions>
 
             <ui:TextBlock
-                Margin="10"
+                Grid.Row="0"
+                Grid.Column="0"
+                VerticalAlignment="Center"
+                Text="{me:LocalizationSource MainWindow.SelectionMode}" />
+            <ComboBox
+                Grid.Row="0"
+                Grid.Column="1"
+                ItemsSource="{Binding AvailableSelectionModes}"
+                DisplayMemberPath="Name"
+                SelectedItem="{Binding SelectionMode}" />
+
+            <ui:TextBlock
+                Grid.Row="1"
+                Grid.Column="0"
+                Margin="0,6,0,0"
+                VerticalAlignment="Center"
+                Text="{me:LocalizationSource MainWindow.MepClass}" />
+            <ComboBox
+                Grid.Row="1"
+                Grid.Column="1"
+                Margin="0,6,0,0"
+                ItemsSource="{Binding AvailableElementsProviders}"
+                DisplayMemberPath="Name"
+                SelectedItem="{Binding ElementsProvider}" />
+        </Grid>
+
+        <!-- Row 2: Connector selector (DataTemplate polymorphism) -->
+        <ContentControl
+            Grid.Row="2"
+            Margin="14,0"
+            Content="{Binding ElementsProvider}" />
+
+        <!-- Row 3: Levels list -->
+        <GroupBox
+            Grid.Row="3"
+            Margin="14,8"
+            Header="{me:LocalizationSource MainWindow.Levels}">
+            <DockPanel>
+                <CheckBox
+                    DockPanel.Dock="Top"
+                    Margin="4,4,4,4"
+                    Content="{me:LocalizationSource MainWindow.SelectAll}"
+                    IsChecked="{Binding SelectAllLevels}" />
+                <ui:ListView
+                    ItemsSource="{Binding Levels}">
+                    <ui:ListView.ItemTemplate>
+                        <DataTemplate>
+                            <CheckBox
+                                IsChecked="{Binding IsSelected, Mode=TwoWay}"
+                                Content="{Binding Name}" />
+                        </DataTemplate>
+                    </ui:ListView.ItemTemplate>
+                </ui:ListView>
+            </DockPanel>
+        </GroupBox>
+
+        <!-- Row 4: Show errors checkbox -->
+        <CheckBox
+            Grid.Row="4"
+            Margin="14,4"
+            Content="{me:LocalizationSource MainWindow.ShowSplitErrors}"
+            IsChecked="{Binding ShowPlacingErrors}" />
+
+        <!-- Row 5: Buttons -->
+        <StackPanel
+            Grid.Row="5"
+            Orientation="Horizontal"
+            HorizontalAlignment="Right"
+            Margin="14,8">
+
+            <ui:TextBlock
+                Margin="10,0"
                 Foreground="Orange"
                 VerticalAlignment="Center"
                 Text="{Binding ErrorText}" />
 
             <ui:Button
-                Margin="10"
-                Width="80"
+                Margin="4,0"
+                Width="100"
                 Appearance="Info"
                 Content="{me:LocalizationSource MainWindow.ButtonOk}"
                 Click="ButtonOk_Click"
                 Command="{Binding AcceptViewCommand}" />
 
             <ui:Button
-                Margin="10"
+                Margin="4,0"
                 Width="80"
                 Content="{me:LocalizationSource MainWindow.ButtonCancel}"
                 IsCancel="True"

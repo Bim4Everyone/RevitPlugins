@@ -1,7 +1,11 @@
+using System.Collections.Generic;
+
 using dosymep.Bim4Everyone;
 using dosymep.Bim4Everyone.ProjectConfigs;
 
 using pyRevitLabs.Json;
+
+using RevitSplitMepCurve.Models.Enums;
 
 namespace RevitSplitMepCurve.Models;
 
@@ -25,5 +29,18 @@ internal class PluginConfig : ProjectConfig<RevitSettings> {
 internal class RevitSettings : ProjectSettings {
     public override string ProjectName { get; set; }
 
-    public string SaveProperty { get; set; }
+    public MepClass SelectedMepClass { get; set; } = MepClass.Pipes;
+
+    public SelectionMode SelectedMode { get; set; } = SelectionMode.ActiveView;
+
+    /// <summary>Имя типоразмера круглого соединителя.</summary>
+    public string ConnectorRoundSymbolName { get; set; }
+
+    /// <summary>Имя типоразмера прямоугольного соединителя.</summary>
+    public string ConnectorRectangleSymbolName { get; set; }
+
+    /// <summary>Имена уровней, исключённых пользователем.</summary>
+    public List<string> UncheckedLevelNames { get; set; } = new();
+
+    public bool ShowSplitErrors { get; set; } = true;
 }

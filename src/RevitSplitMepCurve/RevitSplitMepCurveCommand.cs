@@ -13,6 +13,8 @@ using dosymep.WpfUI.Core.Ninject;
 using Ninject;
 
 using RevitSplitMepCurve.Models;
+using RevitSplitMepCurve.Services.Core;
+using RevitSplitMepCurve.Services.Providers;
 using RevitSplitMepCurve.ViewModels;
 using RevitSplitMepCurve.Views;
 
@@ -27,23 +29,40 @@ public class RevitSplitMepCurveCommand : BasePluginCommand {
     protected override void Execute(UIApplication uiApplication) {
         using var kernel = uiApplication.CreatePlatformServices();
 
-        kernel.Bind<RevitRepository>()
-            .ToSelf()
-            .InSingletonScope();
+        kernel.Bind<RevitRepository>().ToSelf().InSingletonScope();
 
         kernel.Bind<PluginConfig>()
             .ToMethod(c => PluginConfig.GetPluginConfig(c.Kernel.Get<IConfigSerializer>()));
 
-        kernel.UseWpfUIThemeUpdater();
+        BindCoreServices(kernel);
+        BindProviders(kernel);
+        BindWindows(kernel);
 
-        kernel.BindMainWindow<MainViewModel, MainWindow>();
+        kernel.UseWpfUIThemeUpdater();
+        kernel.UseWpfUIMessageBox<MainViewModel>();
 
         string assemblyName = Assembly.GetExecutingAssembly().GetName().Name;
-
         kernel.UseWpfLocalization(
             $"/{assemblyName};component/assets/localization/language.xaml",
             CultureInfo.GetCultureInfo("ru-RU"));
 
         Notification(kernel.Get<MainWindow>());
+    }
+
+    private void BindCoreServices(IKernel kernel) {
+        kernel.Bind<IErrorsService>().To<ErrorsService>().InSingletonScope();
+        kernel.Bind<ErrorsWindowService>().ToSelf().InSingletonScope();
+    }
+
+    private void BindProviders(IKernel kernel) {
+        kernel.Bind<PipesProvider>().ToSelf().InSingletonScope();
+        kernel.Bind<DuctsProvider>().ToSelf().InSingletonScope();
+        kernel.Bind<IElementsProvider>().To<PipesProvider>().InSingletonScope();
+        kernel.Bind<IElementsProvider>().To<DuctsProvider>().InSingletonScope();
+    }
+
+    private void BindWindows(IKernel kernel) {
+        kernel.BindMainWindow<MainViewModel, MainWindow>();
+        kernel.BindOtherWindow<ViewModels.Errors.ErrorsViewModel, ErrorsWindow>();
     }
 }
