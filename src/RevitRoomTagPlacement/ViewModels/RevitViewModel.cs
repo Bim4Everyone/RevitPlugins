@@ -4,6 +4,7 @@ using System.ComponentModel;
 using System.Linq;
 using System.Windows.Input;
 
+using dosymep.SimpleServices;
 using dosymep.WPF.Commands;
 using dosymep.WPF.ViewModels;
 
@@ -15,6 +16,7 @@ namespace RevitRoomTagPlacement.ViewModels;
 
 internal abstract class RevitViewModel : BaseViewModel {
     protected readonly RevitRepository _revitRepository;
+    protected readonly ILocalizationService _localizationService;
 
     private RoomTagTypeModel _selectedTagType;
     private string _selectedRoomName;
@@ -26,8 +28,9 @@ internal abstract class RevitViewModel : BaseViewModel {
 
     private string _errorText;
 
-    public RevitViewModel(RevitRepository revitRepository) {
+    public RevitViewModel(RevitRepository revitRepository, ILocalizationService localizationService) {
         _revitRepository = revitRepository;
+        _localizationService = localizationService;
         _placementWayByGroups = GroupPlacementWay.EveryRoom;
         _placementWayByPosition = PositionPlacementWay.CenterCenter;
         _indent = 7;
@@ -161,27 +164,27 @@ internal abstract class RevitViewModel : BaseViewModel {
 
     private bool CanPlaceTags() {
         if(RoomGroups.Count() == 0) {
-            ErrorText = "Помещения отсутствуют/не выбраны";
+            ErrorText = _localizationService.GetLocalizedString("MainWindow.ErrorNoRooms");
             return false;
         }
         if(TagFamilies.Count() == 0) {
-            ErrorText = "В проекте отсутствуют марки помещений";
+            ErrorText = _localizationService.GetLocalizedString("MainWindow.ErrorNoTags");
             return false;
         }
         if(!RoomGroups.Any(x => x.IsChecked)) {
-            ErrorText = "Группы не выбраны";
+            ErrorText = _localizationService.GetLocalizedString("MainWindow.ErrorNoSelectedGroups");
             return false;
         }
         if(SelectedTagType == null) {
-            ErrorText = "Марка не выбрана";
+            ErrorText = _localizationService.GetLocalizedString("MainWindow.ErrorNoSelectedTag");
             return false;
         }
         if(IsOneRoomPerGroupByName && RoomNames.Count == 0) {
-            ErrorText = "Для выбранных групп нет общих помещений";
+            ErrorText = _localizationService.GetLocalizedString("MainWindow.ErrorNoCommonRooms");
             return false;
         }
         if(IsOneRoomPerGroupByName && SelectedRoomName == null) {
-            ErrorText = "Имя помещения не выбрано";
+            ErrorText = _localizationService.GetLocalizedString("MainWindow.ErrorNoSelectedRoomName");
             return false;
         }
 

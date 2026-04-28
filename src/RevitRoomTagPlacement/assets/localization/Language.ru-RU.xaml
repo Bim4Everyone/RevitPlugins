@@ -13,4 +13,18 @@
     <system:String x:Key="MainWindow.Ok">ОК</system:String>
     <system:String x:Key="MainWindow.Cancel">Отмена</system:String>
     
+    <system:String x:Key="MainWindow.TransactionName">Маркировать помещения</system:String>
+    <system:String x:Key="MainWindow.RoomWithoutName">&lt;Без имени&gt;</system:String>
+    <system:String x:Key="MainWindow.RoomWithoutSection">&lt;Без секции&gt;</system:String>
+    <system:String x:Key="MainWindow.RoomWithoutGroup">&lt;Без группы&gt;</system:String>
+    <system:String x:Key="MainWindow.ByCurrentView">Выборка по текущему виду</system:String>
+    <system:String x:Key="MainWindow.BySelectedElements">Выборка по выделенным элементам</system:String>
+    
+    <system:String x:Key="MainWindow.ErrorNoRooms">Помещения отсутствуют/не выбраны</system:String>
+    <system:String x:Key="MainWindow.ErrorNoTags">В проекте отсутствуют марки помещений</system:String>
+    <system:String x:Key="MainWindow.ErrorNoSelectedGroups">Группы не выбраны</system:String>
+    <system:String x:Key="MainWindow.ErrorNoSelectedTag">Марка не выбрана</system:String>
+    <system:String x:Key="MainWindow.ErrorNoCommonRooms">Для выбранных групп нет общих помещений</system:String>
+    <system:String x:Key="MainWindow.ErrorNoSelectedRoomName">Имя помещения не выбрано</system:String>
+    
 </ResourceDictionary>
