@@ -1,5 +1,6 @@
 using System.Collections.ObjectModel;
 
+using dosymep.SimpleServices;
 using dosymep.WPF.ViewModels;
 
 using RevitRoomTagPlacement.Models;
@@ -10,12 +11,17 @@ internal class MainViewModel : BaseViewModel {
 
     private RevitViewModel _revitViewModel;
 
-    public MainViewModel(PluginConfig pluginConfig, RevitRepository revitRepository) {
+    public MainViewModel(RevitRepository revitRepository, 
+                         ILocalizationService localizationService) {
         _revitRepository = revitRepository;
 
         RevitViewModels = [
-            new ViewRevitViewModel(revitRepository) { Name = "Выборка по текущему виду" },
-            new SelectedRevitViewModel(revitRepository) { Name = "Выборка по выделенным элементам" }
+            new ViewRevitViewModel(revitRepository, localizationService) { 
+                Name = localizationService.GetLocalizedString("MainWindow.ByCurrentView")
+            },
+            new SelectedRevitViewModel(revitRepository, localizationService) { 
+                Name = localizationService.GetLocalizedString("MainWindow.BySelectedElements")
+            }
         ];
 
         RevitViewModel = _revitRepository.GetSelectedRooms().Count > 0 ? RevitViewModels[1] : RevitViewModels[0];
