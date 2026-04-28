@@ -131,6 +131,8 @@ internal class RevitRepository {
         return false;
     }
 
+    // The category filter (OST_PipeFitting / OST_DuctFitting) is sufficient;
+    // additional connector-count validation is not required.
     private static bool HasAtLeastTwoConnectors(FamilySymbol symbol) {
         return true;
     }

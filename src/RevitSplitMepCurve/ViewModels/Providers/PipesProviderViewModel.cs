@@ -1,4 +1,3 @@
-using System;
 using System.Linq;
 
 using Autodesk.Revit.DB;
@@ -12,7 +11,7 @@ using RevitSplitMepCurve.ViewModels.Symbols;
 
 namespace RevitSplitMepCurve.ViewModels.Providers;
 
-internal class PipesProviderViewModel : ElementsProviderViewModel, IEquatable<PipesProviderViewModel> {
+internal class PipesProviderViewModel : ElementsProviderViewModel {
     public PipesProviderViewModel(
         ILocalizationService localization,
         PipesProvider provider,
@@ -41,10 +40,4 @@ internal class PipesProviderViewModel : ElementsProviderViewModel, IEquatable<Pi
 
     public override (FamilySymbol Round, FamilySymbol Rectangle) GetSelectedSymbols() =>
         (RoundSymbol.SelectedItem?.Symbol, null);
-
-    public bool Equals(PipesProviderViewModel other) => other is not null;
-
-    public override bool Equals(object obj) => Equals(obj as PipesProviderViewModel);
-
-    public override int GetHashCode() => GetType().GetHashCode();
 }

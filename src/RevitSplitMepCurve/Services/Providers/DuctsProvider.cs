@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -11,7 +10,7 @@ using RevitSplitMepCurve.Models.Splittable;
 
 namespace RevitSplitMepCurve.Services.Providers;
 
-internal class DuctsProvider : ElementsProvider, IEquatable<DuctsProvider> {
+internal class DuctsProvider : ElementsProvider {
     public DuctsProvider(RevitRepository revitRepository) : base(revitRepository) {
     }
 
@@ -30,10 +29,4 @@ internal class DuctsProvider : ElementsProvider, IEquatable<DuctsProvider> {
         var filtered = FilterDisplacements(curve, all);
         return new SplittableDuct((Duct)curve, filtered);
     }
-
-    public bool Equals(DuctsProvider other) => other is not null;
-
-    public override bool Equals(object obj) => Equals(obj as DuctsProvider);
-
-    public override int GetHashCode() => GetType().GetHashCode();
 }

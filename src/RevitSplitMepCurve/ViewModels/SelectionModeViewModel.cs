@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 
 using dosymep.SimpleServices;
 using dosymep.WPF.ViewModels;
@@ -21,5 +22,6 @@ internal class SelectionModeViewModel : BaseViewModel, IEquatable<SelectionModeV
 
     public override bool Equals(object obj) => Equals(obj as SelectionModeViewModel);
 
-    public override int GetHashCode() => (int)Mode;
+    public override int GetHashCode() =>
+        EqualityComparer<SelectionMode>.Default.GetHashCode(Mode);
 }

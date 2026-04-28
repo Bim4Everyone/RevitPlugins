@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 
 using Autodesk.Revit.DB;
 
@@ -16,10 +17,14 @@ internal class FamilySymbolViewModel : BaseViewModel, IEquatable<FamilySymbolVie
 
     public FamilySymbol Symbol { get; }
 
-    public bool Equals(FamilySymbolViewModel other) =>
-        other is not null && Symbol.Id == other.Symbol.Id;
+    public bool Equals(FamilySymbolViewModel other) {
+        if(other is null) { return false; }
+        if(ReferenceEquals(this, other)) { return true; }
+        return Symbol.Id == other.Symbol.Id;
+    }
 
     public override bool Equals(object obj) => Equals(obj as FamilySymbolViewModel);
 
-    public override int GetHashCode() => (int)Symbol.Id.Value;
+    public override int GetHashCode() =>
+        EqualityComparer<ElementId>.Default.GetHashCode(Symbol.Id);
 }

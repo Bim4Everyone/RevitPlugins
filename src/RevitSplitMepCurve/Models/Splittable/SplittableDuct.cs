@@ -27,6 +27,7 @@ internal class SplittableDuct : SplittableElement {
 
         var shape = _duct.DuctType.Shape;
         if(shape == ConnectorProfileType.Oval) {
+            // Intentional signal: MainViewModel.AcceptView catches this by message key.
             throw new InvalidOperationException("Error.OvalNotSupported");
         }
 

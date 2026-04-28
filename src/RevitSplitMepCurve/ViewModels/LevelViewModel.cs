@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 
 using Autodesk.Revit.DB;
 
@@ -23,10 +24,14 @@ internal class LevelViewModel : BaseViewModel, IEquatable<LevelViewModel> {
         set => RaiseAndSetIfChanged(ref _isSelected, value);
     }
 
-    public bool Equals(LevelViewModel other) =>
-        other is not null && Level.Id.Value == other.Level.Id.Value;
+    public bool Equals(LevelViewModel other) {
+        if(other is null) { return false; }
+        if(ReferenceEquals(this, other)) { return true; }
+        return Level.Id == other.Level.Id;
+    }
 
     public override bool Equals(object obj) => Equals(obj as LevelViewModel);
 
-    public override int GetHashCode() => (int)Level.Id.Value;
+    public override int GetHashCode() =>
+        EqualityComparer<ElementId>.Default.GetHashCode(Level.Id);
 }
