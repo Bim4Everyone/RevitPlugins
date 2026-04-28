@@ -29,8 +29,7 @@
             </ResourceDictionary.MergedDictionaries>            
             <BooleanToVisibilityConverter x:Key="BoolToVis"/>
         </ResourceDictionary>
-    </Window.Resources>
-    
+    </Window.Resources>    
 
     <Grid>
         <Grid.RowDefinitions>
@@ -44,7 +43,7 @@
         <ui:TitleBar
             Grid.Row="0"
             VerticalAlignment="Center"
-            Title="Марки помещений" />
+            Title="{me:LocalizationSource MainWindow.Title}" />
 
         <Border
             Grid.Row="1"
@@ -93,7 +92,7 @@
                         DockPanel.Dock="Left"
                         Width="160"
                         VerticalAlignment="Center"
-                        Text="Семейство марки:"/>
+                        Text="{me:LocalizationSource MainWindow.TagFamily}"/>
                     <ComboBox
                         DataContext="{Binding RevitViewModel}"
                         ItemsSource="{Binding TagFamilies}"
@@ -107,20 +106,20 @@
                         Margin="0,4,0,0"
                         DockPanel.Dock="Left"
                         Width="160"
-                        Text="Способ размещения:"/>
+                        Text="{me:LocalizationSource MainWindow.WayOfPlacement}"/>
                     <StackPanel> 
                         <RadioButton
-                            GroupName="PlacementWays" 
-                            Content="Каждое помещения в группе" 
+                            GroupName="PlacementWays"
+                            Content="{me:LocalizationSource MainWindow.EveryRoom}" 
                             IsChecked="{Binding IsEveryRoom}"/>
                         <RadioButton
-                            GroupName="PlacementWays" 
-                            Content="Одно помещение в каждой группе (максимальная площадь)" 
+                            GroupName="PlacementWays"
+                            Content="{me:LocalizationSource MainWindow.OneRoomPerGroupMaxArea}" 
                             IsChecked="{Binding IsOneRoomPerGroupRandom}"/>
                         <RadioButton
                             x:Name="_placementWay"
-                            GroupName="PlacementWays" 
-                            Content="Одно помещение в каждой группе (выбрать по имени)" 
+                            GroupName="PlacementWays"
+                            Content="{me:LocalizationSource MainWindow.OneRoomPerGroup}" 
                             IsChecked="{Binding IsOneRoomPerGroupByName}"/>
                     </StackPanel>
                 </DockPanel>
@@ -136,7 +135,7 @@
                         DockPanel.Dock="Left"
                         Width="160"
                         VerticalAlignment="Center"
-                        Text="Имя помещения:"/>
+                        Text="{me:LocalizationSource MainWindow.RoomName}"/>
                     <ComboBox
                         ItemsSource="{Binding RoomNames}"
                         SelectedItem="{Binding SelectedRoomName}"/>
@@ -156,7 +155,7 @@
                     <TextBlock
                         VerticalAlignment="Top"
                         Width="160"
-                        Text="Позиция марки:" />
+                        Text="{me:LocalizationSource MainWindow.TagPosition}" />
                     <UniformGrid
                         Height="90"
                         Width="90"
@@ -203,7 +202,7 @@
                         DockPanel.Dock="Left"
                         Width="160"
                         VerticalAlignment="Center"
-                        Text="Отступ от края, мм:"/>
+                        Text="{me:LocalizationSource MainWindow.Indent}"/>
                     <TextBox
                         PreviewTextInput="IndentValidation"
                         PreviewKeyDown="TextBox_PreviewKeyDown"
@@ -228,14 +227,14 @@
                 Width="80"
                 Appearance="Info"
                 IsDefault="True"
-                Content="ОК"
+                Content="{me:LocalizationSource MainWindow.Ok}"
                 Click="ButtonOk_Click"
                 DataContext="{Binding RevitViewModel}"
                 Command="{Binding PlaceTagsCommand}" />
             <ui:Button
                 Margin="10"
                 Width="80"
-                Content="Отмена"
+                Content="{me:LocalizationSource MainWindow.Cancel}"
                 IsCancel="True"
                 Click="ButtonCancel_Click" />
         </StackPanel>
