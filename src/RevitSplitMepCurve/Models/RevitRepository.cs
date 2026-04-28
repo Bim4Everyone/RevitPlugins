@@ -4,10 +4,7 @@ using System.Linq;
 
 using Autodesk.Revit.ApplicationServices;
 using Autodesk.Revit.DB;
-using Autodesk.Revit.DB.Mechanical;
-using Autodesk.Revit.DB.Plumbing;
 using Autodesk.Revit.UI;
-using Autodesk.Revit.UI.Selection;
 
 using RevitSplitMepCurve.Models.Enums;
 using RevitSplitMepCurve.Models.Splittable;
@@ -27,13 +24,14 @@ internal class RevitRepository {
 
     public Document Document => ActiveUIDocument.Document;
 
-    /// <summary>Все уровни документа, отсортированы снизу вверх; notInclude — имена для исключения.</summary>
+    /// <summary>Все уровни документа, отсортированы сверху вниз; notInclude — имена для исключения.</summary>
     public IList<Level> GetLevels(string[] notInclude) {
         return new FilteredElementCollector(Document)
+            .WhereElementIsNotElementType()
             .OfClass(typeof(Level))
             .Cast<Level>()
             .Where(l => !notInclude.Contains(l.Name))
-            .OrderBy(l => l.Elevation)
+            .OrderByDescending(l => l.Elevation)
             .ToArray();
     }
 
@@ -43,6 +41,7 @@ internal class RevitRepository {
             return null;
         }
         return new FilteredElementCollector(Document)
+            .WhereElementIsElementType()
             .OfClass(typeof(FamilySymbol))
             .Cast<FamilySymbol>()
             .FirstOrDefault(s => s.Name == name);
@@ -58,6 +57,7 @@ internal class RevitRepository {
             : BuiltInCategory.OST_DuctFitting;
 
         return new FilteredElementCollector(Document)
+            .WhereElementIsElementType()
             .OfClass(typeof(FamilySymbol))
             .OfCategory(category)
             .Cast<FamilySymbol>()
@@ -69,6 +69,7 @@ internal class RevitRepository {
     /// <summary>Все элементы заданной категории во всём документе.</summary>
     public ICollection<T> GetElements<T>(BuiltInCategory category) where T : MEPCurve {
         return new FilteredElementCollector(Document)
+            .WhereElementIsNotElementType()
             .OfCategory(category)
             .OfClass(typeof(T))
             .Cast<T>()
@@ -78,6 +79,7 @@ internal class RevitRepository {
     /// <summary>Все элементы заданной категории на 3D-виде (зарезервировано для будущих сценариев).</summary>
     public ICollection<T> GetElements<T>(BuiltInCategory category, View3D view) where T : MEPCurve {
         return new FilteredElementCollector(Document, view.Id)
+            .WhereElementIsNotElementType()
             .OfCategory(category)
             .OfClass(typeof(T))
             .Cast<T>()
@@ -87,6 +89,7 @@ internal class RevitRepository {
     /// <summary>Все элементы заданной категории на активном виде.</summary>
     public ICollection<T> GetActiveViewElements<T>(BuiltInCategory category) where T : MEPCurve {
         return new FilteredElementCollector(Document, Document.ActiveView.Id)
+            .WhereElementIsNotElementType()
             .OfCategory(category)
             .OfClass(typeof(T))
             .Cast<T>()
@@ -104,9 +107,42 @@ internal class RevitRepository {
             .ToArray();
     }
 
+    /// <summary>true, если у пользователя выбран хотя бы один элемент.</summary>
+    public bool HasSelectedElements() {
+        return ActiveUIDocument.Selection.GetElementIds().Count > 0;
+    }
+
+    /// <summary>Базовая точка проекта.</summary>
+    public BasePoint GetProjectBasePoint() {
+#if REVIT_2020_OR_LESS
+        return new FilteredElementCollector(Document)
+            .WhereElementIsNotElementType()
+            .OfClass(typeof(BasePoint))
+            .OfType<BasePoint>()
+            .First(p => !p.IsShared);
+#else
+        return BasePoint.GetProjectBasePoint(Document);
+#endif
+    }
+
+    /// <summary>Группы уровней с одинаковой отметкой (с точностью до 4 знаков).</summary>
+    public IReadOnlyList<IReadOnlyList<Level>> GetDuplicateElevationLevels() {
+        var levels = new FilteredElementCollector(Document)
+            .WhereElementIsNotElementType()
+            .OfClass(typeof(Level))
+            .Cast<Level>()
+            .ToArray();
+        return levels
+            .GroupBy(l => Math.Round(l.Elevation, 4))
+            .Where(g => g.Count() > 1)
+            .Select(g => (IReadOnlyList<Level>)g.ToArray())
+            .ToArray();
+    }
+
     /// <summary>Все DisplacementElement в документе.</summary>
     public ICollection<DisplacementElement> GetDisplacementElements() {
         return new FilteredElementCollector(Document)
+            .WhereElementIsNotElementType()
             .OfClass(typeof(DisplacementElement))
             .Cast<DisplacementElement>()
             .ToArray();

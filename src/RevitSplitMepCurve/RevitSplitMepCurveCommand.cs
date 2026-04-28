@@ -1,5 +1,6 @@
 using System.Globalization;
 using System.Reflection;
+using System.Windows;
 
 using Autodesk.Revit.Attributes;
 using Autodesk.Revit.UI;
@@ -7,6 +8,7 @@ using Autodesk.Revit.UI;
 using dosymep.Bim4Everyone;
 using dosymep.Bim4Everyone.ProjectConfigs;
 using dosymep.Bim4Everyone.SimpleServices;
+using dosymep.SimpleServices;
 using dosymep.WpfCore.Ninject;
 using dosymep.WpfUI.Core.Ninject;
 
@@ -45,6 +47,19 @@ public class RevitSplitMepCurveCommand : BasePluginCommand {
         kernel.UseWpfLocalization(
             $"/{assemblyName};component/assets/localization/language.xaml",
             CultureInfo.GetCultureInfo("ru-RU"));
+
+        var localization = kernel.Get<ILocalizationService>();
+        var messageBox = kernel.Get<IMessageBoxService>();
+        var repository = kernel.Get<RevitRepository>();
+
+        if(repository.GetDuplicateElevationLevels().Count > 0) {
+            messageBox.Show(
+                localization.GetLocalizedString("Error.DuplicateLevels"),
+                localization.GetLocalizedString("MainWindow.Title"),
+                MessageBoxButton.OK,
+                MessageBoxImage.Warning);
+            return;
+        }
 
         Notification(kernel.Get<MainWindow>());
     }

@@ -4,6 +4,8 @@ using System.Linq;
 
 using Autodesk.Revit.DB;
 
+using dosymep.Revit;
+
 namespace RevitSplitMepCurve.Models.Splittable;
 
 internal class SplitResult {
@@ -58,8 +60,7 @@ internal class SplitResult {
             return;
         }
         try {
-            element.get_Parameter(BuiltInParameter.ELEM_PARTITION_PARAM)
-                   ?.Set(worksetId.IntegerValue);
+            element.SetParamValue(BuiltInParameter.ELEM_PARTITION_PARAM, worksetId.IntegerValue);
         } catch {
             // Non-fatal
         }

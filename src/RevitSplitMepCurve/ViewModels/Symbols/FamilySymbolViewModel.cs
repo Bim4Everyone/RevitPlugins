@@ -10,7 +10,7 @@ namespace RevitSplitMepCurve.ViewModels.Symbols;
 internal class FamilySymbolViewModel : BaseViewModel, IEquatable<FamilySymbolViewModel> {
     public FamilySymbolViewModel(FamilySymbol symbol) {
         Symbol = symbol ?? throw new ArgumentNullException(nameof(symbol));
-        Name = $"{symbol.FamilyName} / {symbol.Name}";
+        Name = $"{symbol.FamilyName} : {symbol.Name}";
     }
 
     public string Name { get; }

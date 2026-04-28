@@ -12,6 +12,8 @@
     <system:String x:Key="SelectionMode.ActiveView">Visible on view</system:String>
     <system:String x:Key="SelectionMode.ActiveDocument">Whole document</system:String>
     <system:String x:Key="MainWindow.Levels">Levels to split</system:String>
+    <system:String x:Key="MainWindow.Levels.DisplayFormat">{0} ({1:0} mm)</system:String>
+    <system:String x:Key="MainWindow.Levels.ElevationTooltip">Elevation relative to project base point</system:String>
     <system:String x:Key="MainWindow.SelectAll">Select all</system:String>
     <system:String x:Key="MainWindow.ConnectorRound">Round connector</system:String>
     <system:String x:Key="MainWindow.ConnectorRectangle">Rectangular connector</system:String>
@@ -27,7 +29,6 @@
     <system:String x:Key="Error.DuplicateLevels">Levels at the same elevation</system:String>
     <system:String x:Key="Error.InsufficientSpace">Not enough space for the connector</system:String>
     <system:String x:Key="Error.SplitFailed">Split failed</system:String>
-    <system:String x:Key="Error.OvalNotSupported">Oval ducts are not supported</system:String>
     <system:String x:Key="ErrorsWindow.Title">Split report</system:String>
     <system:String x:Key="ErrorsWindow.ElementHeader">Element</system:String>
 

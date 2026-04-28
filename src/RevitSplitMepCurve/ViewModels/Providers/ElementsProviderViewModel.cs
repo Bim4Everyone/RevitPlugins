@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 
 using Autodesk.Revit.DB;
 
@@ -6,6 +7,7 @@ using dosymep.SimpleServices;
 using dosymep.WPF.ViewModels;
 
 using RevitSplitMepCurve.Models.Enums;
+using RevitSplitMepCurve.Models.Settings;
 using RevitSplitMepCurve.Services.Providers;
 
 namespace RevitSplitMepCurve.ViewModels.Providers;
@@ -27,6 +29,6 @@ internal abstract class ElementsProviderViewModel : BaseViewModel {
     /// <summary>Текст ошибки валидации. Пусто если всё ок.</summary>
     public abstract string GetErrorText();
 
-    /// <summary>Выбранные символы соединителей (Round, Rectangle).</summary>
-    public abstract (FamilySymbol Round, FamilySymbol Rectangle) GetSelectedSymbols();
+    /// <summary>Настройки разделения для выбранных уровней и текущих соединителей.</summary>
+    public abstract ISplitSettings GetSplitSettings(ICollection<Level> levels);
 }

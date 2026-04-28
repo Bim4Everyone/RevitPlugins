@@ -18,13 +18,18 @@
                 Grid.Column="1"
                 ItemsSource="{Binding RoundSymbol.AvailableItems}"
                 DisplayMemberPath="Name"
-                SelectedItem="{Binding RoundSymbol.SelectedItem}" />
+                SelectedItem="{Binding RoundSymbol.SelectedItem}"
+                IsEditable="True"
+                IsTextSearchEnabled="True"
+                IsTextSearchCaseSensitive="False"
+                TextSearch.TextPath="Name"
+                ScrollViewer.VerticalScrollBarVisibility="Auto" />
         </Grid>
     </DataTemplate>
 
     <DataTemplate DataType="{x:Type vm:DuctsProviderViewModel}">
         <StackPanel Orientation="Vertical">
-            <Grid Margin="0,4">
+            <Grid Margin="0,4,0,0">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="200" />
                     <ColumnDefinition Width="*" />
@@ -37,7 +42,12 @@
                     Grid.Column="1"
                     ItemsSource="{Binding RoundSymbol.AvailableItems}"
                     DisplayMemberPath="Name"
-                    SelectedItem="{Binding RoundSymbol.SelectedItem}" />
+                    SelectedItem="{Binding RoundSymbol.SelectedItem}"
+                    IsEditable="True"
+                    IsTextSearchEnabled="True"
+                    IsTextSearchCaseSensitive="False"
+                    TextSearch.TextPath="Name"
+                    ScrollViewer.VerticalScrollBarVisibility="Auto" />
             </Grid>
             <Grid Margin="0,4">
                 <Grid.ColumnDefinitions>
@@ -52,7 +62,12 @@
                     Grid.Column="1"
                     ItemsSource="{Binding RectangleSymbol.AvailableItems}"
                     DisplayMemberPath="Name"
-                    SelectedItem="{Binding RectangleSymbol.SelectedItem}" />
+                    SelectedItem="{Binding RectangleSymbol.SelectedItem}"
+                    IsEditable="True"
+                    IsTextSearchEnabled="True"
+                    IsTextSearchCaseSensitive="False"
+                    TextSearch.TextPath="Name"
+                    ScrollViewer.VerticalScrollBarVisibility="Auto" />
             </Grid>
         </StackPanel>
     </DataTemplate>

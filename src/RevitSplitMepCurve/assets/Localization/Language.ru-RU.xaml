@@ -12,6 +12,8 @@
     <system:String x:Key="SelectionMode.ActiveView">Видимые на виде</system:String>
     <system:String x:Key="SelectionMode.ActiveDocument">Весь документ</system:String>
     <system:String x:Key="MainWindow.Levels">Уровни к делению</system:String>
+    <system:String x:Key="MainWindow.Levels.DisplayFormat">{0} ({1:0} мм)</system:String>
+    <system:String x:Key="MainWindow.Levels.ElevationTooltip">Отметка относительно базовой точки проекта</system:String>
     <system:String x:Key="MainWindow.SelectAll">Выбрать все</system:String>
     <system:String x:Key="MainWindow.ConnectorRound">Круглый соединитель</system:String>
     <system:String x:Key="MainWindow.ConnectorRectangle">Прямоугольный соединитель</system:String>
@@ -27,7 +29,6 @@
     <system:String x:Key="Error.DuplicateLevels">Уровни на одной отметке</system:String>
     <system:String x:Key="Error.InsufficientSpace">Недостаточно места для соединителя</system:String>
     <system:String x:Key="Error.SplitFailed">Ошибка деления элемента</system:String>
-    <system:String x:Key="Error.OvalNotSupported">Овальные воздуховоды не поддерживаются</system:String>
     <system:String x:Key="ErrorsWindow.Title">Отчёт о разделении</system:String>
     <system:String x:Key="ErrorsWindow.ElementHeader">Элемент</system:String>
 

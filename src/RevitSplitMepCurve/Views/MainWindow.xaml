@@ -75,7 +75,13 @@
                 Grid.Column="1"
                 ItemsSource="{Binding AvailableSelectionModes}"
                 DisplayMemberPath="Name"
-                SelectedItem="{Binding SelectionMode}" />
+                SelectedItem="{Binding SelectionMode}">
+                <ComboBox.ItemContainerStyle>
+                    <Style TargetType="ComboBoxItem" BasedOn="{StaticResource {x:Type ComboBoxItem}}">
+                        <Setter Property="IsEnabled" Value="{Binding IsEnabled}" />
+                    </Style>
+                </ComboBox.ItemContainerStyle>
+            </ComboBox>
 
             <ui:TextBlock
                 Grid.Row="1"
@@ -99,28 +105,30 @@
             Content="{Binding ElementsProvider}" />
 
         <!-- Row 3: Levels list -->
-        <GroupBox
+        <DockPanel
             Grid.Row="3"
-            Margin="14,8"
-            Header="{me:LocalizationSource MainWindow.Levels}">
-            <DockPanel>
-                <CheckBox
-                    DockPanel.Dock="Top"
-                    Margin="4,4,4,4"
-                    Content="{me:LocalizationSource MainWindow.SelectAll}"
-                    IsChecked="{Binding SelectAllLevels}" />
-                <ui:ListView
-                    ItemsSource="{Binding Levels}">
-                    <ui:ListView.ItemTemplate>
-                        <DataTemplate>
-                            <CheckBox
-                                IsChecked="{Binding IsSelected, Mode=TwoWay}"
-                                Content="{Binding Name}" />
-                        </DataTemplate>
-                    </ui:ListView.ItemTemplate>
-                </ui:ListView>
-            </DockPanel>
-        </GroupBox>
+            Margin="14,8">
+            <ui:TextBlock
+                DockPanel.Dock="Top"
+                Margin="0,0,0,4"
+                Text="{me:LocalizationSource MainWindow.Levels}" />
+            <CheckBox
+                DockPanel.Dock="Top"
+                Margin="0,0,0,4"
+                Content="{me:LocalizationSource MainWindow.SelectAll}"
+                IsChecked="{Binding SelectAllLevels}" />
+            <ui:ListView
+                ItemsSource="{Binding Levels}">
+                <ui:ListView.ItemTemplate>
+                    <DataTemplate>
+                        <CheckBox
+                            IsChecked="{Binding IsSelected, Mode=TwoWay}"
+                            Content="{Binding DisplayName}"
+                            ToolTip="{Binding ElevationTooltip}" />
+                    </DataTemplate>
+                </ui:ListView.ItemTemplate>
+            </ui:ListView>
+        </DockPanel>
 
         <!-- Row 4: Show errors checkbox -->
         <CheckBox

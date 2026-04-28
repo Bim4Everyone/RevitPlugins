@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using System.Linq;
 
 using Autodesk.Revit.DB;
@@ -6,6 +7,7 @@ using dosymep.SimpleServices;
 
 using RevitSplitMepCurve.Models;
 using RevitSplitMepCurve.Models.Enums;
+using RevitSplitMepCurve.Models.Settings;
 using RevitSplitMepCurve.Services.Providers;
 using RevitSplitMepCurve.ViewModels.Symbols;
 
@@ -42,6 +44,10 @@ internal class DuctsProviderViewModel : ElementsProviderViewModel {
         return null;
     }
 
-    public override (FamilySymbol Round, FamilySymbol Rectangle) GetSelectedSymbols() =>
-        (RoundSymbol.SelectedItem?.Symbol, RectangleSymbol.SelectedItem?.Symbol);
+    public override ISplitSettings GetSplitSettings(ICollection<Level> levels) {
+        return new SplitSettings(
+            RoundSymbol.SelectedItem?.Symbol,
+            RectangleSymbol.SelectedItem?.Symbol,
+            levels);
+    }
 }

@@ -26,10 +26,6 @@ internal class SplittableDuct : SplittableElement {
         var currentId = _duct.Id;
 
         var shape = _duct.DuctType.Shape;
-        if(shape == ConnectorProfileType.Oval) {
-            // Intentional signal: MainViewModel.AcceptView catches this by message key.
-            throw new InvalidOperationException("Error.OvalNotSupported");
-        }
 
         foreach(var (_, point) in intersections) {
             var newId = MechanicalUtils.BreakCurve(doc, currentId, point);

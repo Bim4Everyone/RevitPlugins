@@ -26,8 +26,10 @@ internal abstract class ElementsProvider : IElementsProvider {
             SelectionMode.ActiveDocument => GetActiveDocument(),
             _ => throw new ArgumentOutOfRangeException(nameof(selectionMode))
         };
+        double minLength = _revitRepository.Application.ShortCurveTolerance;
+        var filtered = raw.Where(c => IsLongEnough(c, minLength)).ToArray();
         var displacements = _revitRepository.GetDisplacementElements();
-        return [.. raw.Select(c => CreateSplittable(c, displacements))];
+        return [.. filtered.Select(c => CreateSplittable(c, displacements))];
     }
 
     protected abstract ICollection<MEPCurve> GetSelected();
@@ -42,5 +44,12 @@ internal abstract class ElementsProvider : IElementsProvider {
     protected static ICollection<DisplacementElement> FilterDisplacements(
         MEPCurve curve, ICollection<DisplacementElement> all) {
         return all.Where(de => de.GetDisplacedElementIds().Contains(curve.Id)).ToArray();
+    }
+
+    private static bool IsLongEnough(MEPCurve curve, double minLength) {
+        if(curve.Location is not LocationCurve locationCurve) {
+            return false;
+        }
+        return locationCurve.Curve.Length >= minLength;
     }
 }

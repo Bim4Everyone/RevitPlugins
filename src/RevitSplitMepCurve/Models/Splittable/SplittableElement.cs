@@ -4,6 +4,8 @@ using System.Linq;
 
 using Autodesk.Revit.DB;
 
+using dosymep.Revit;
+
 using RevitSplitMepCurve.Models.Settings;
 
 namespace RevitSplitMepCurve.Models.Splittable;
@@ -81,8 +83,7 @@ internal abstract class SplittableElement {
             return;
         }
         try {
-            target.get_Parameter(BuiltInParameter.ELEM_PARTITION_PARAM)
-                  ?.Set(sourceWorksetId.IntegerValue);
+            target.SetParamValue(BuiltInParameter.ELEM_PARTITION_PARAM, sourceWorksetId.IntegerValue);
         } catch {
             // Non-fatal: workset param may be read-only
         }

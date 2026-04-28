@@ -37,8 +37,8 @@
             <ui:DataGrid
                 RowHeight="26"
                 VerticalContentAlignment="Center"
-                CellStyle="{StaticResource CustomDataGridCell}"
-                Style="{StaticResource CustomReadonlyDataGrid}"
+                IsReadOnly="True"
+                Style="{StaticResource DefaultUiDataGridStyle}"
                 ItemsSource="{Binding Source={StaticResource groupedErrors}}">
                 <ui:DataGrid.GroupStyle>
                     <GroupStyle ContainerStyle="{StaticResource CustomGroupHeaderStyle}" />

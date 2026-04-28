@@ -6,8 +6,7 @@ using System.Linq;
 using System.Windows;
 using System.Windows.Input;
 
-using Autodesk.Revit.DB;
-
+using dosymep.Revit;
 using dosymep.SimpleServices;
 using dosymep.WPF.Commands;
 using dosymep.WPF.ViewModels;
@@ -15,7 +14,6 @@ using dosymep.WPF.ViewModels;
 using RevitSplitMepCurve.Models;
 using RevitSplitMepCurve.Models.Enums;
 using RevitSplitMepCurve.Models.Errors;
-using RevitSplitMepCurve.Models.Settings;
 using RevitSplitMepCurve.Services.Core;
 using RevitSplitMepCurve.Services.Providers;
 using RevitSplitMepCurve.ViewModels.Providers;
@@ -109,19 +107,27 @@ internal class MainViewModel : BaseViewModel {
     private void LoadView() {
         var config = _pluginConfig.GetSettings(_revitRepository.Document);
 
+        var basePoint = _revitRepository.GetProjectBasePoint();
+        double basePointZ = basePoint?.Position.Z ?? 0;
+
         var levels = _revitRepository.GetLevels(Array.Empty<string>());
         Levels.Clear();
         foreach(var level in levels) {
             bool isSelected = config is null
                 || !config.UncheckedLevelNames.Contains(level.Name);
-            var vm = new LevelViewModel(level, isSelected);
+            var vm = new LevelViewModel(level, isSelected, basePointZ, _localization);
             vm.PropertyChanged += OnLevelPropertyChanged;
             Levels.Add(vm);
         }
 
+        bool hasSelectedElements = _revitRepository.HasSelectedElements();
         AvailableSelectionModes.Clear();
         foreach(SelectionMode mode in (SelectionMode[])Enum.GetValues(typeof(SelectionMode))) {
-            AvailableSelectionModes.Add(new SelectionModeViewModel(_localization, mode));
+            var modeVm = new SelectionModeViewModel(_localization, mode);
+            if(mode == RevitSplitMepCurve.Models.Enums.SelectionMode.SelectedElements && !hasSelectedElements) {
+                modeVm.IsEnabled = false;
+            }
+            AvailableSelectionModes.Add(modeVm);
         }
 
         var providerVms = InitializeElementsProviders(_providers);
@@ -131,8 +137,8 @@ internal class MainViewModel : BaseViewModel {
         }
 
         SelectionMode = AvailableSelectionModes
-            .FirstOrDefault(m => config != null && m.Mode == config.SelectedMode)
-            ?? AvailableSelectionModes.FirstOrDefault();
+            .FirstOrDefault(m => config != null && m.Mode == config.SelectedMode && m.IsEnabled)
+            ?? AvailableSelectionModes.FirstOrDefault(m => m.IsEnabled);
 
         ElementsProvider = AvailableElementsProviders
             .FirstOrDefault(p => config != null && p.MepClass == config.SelectedMepClass)
@@ -171,7 +177,8 @@ internal class MainViewModel : BaseViewModel {
         SaveConfig();
         _errorsService.Clear();
 
-        var settings = GetSplitSettings();
+        var selectedLevels = Levels.Where(l => l.IsSelected).Select(l => l.Level).ToArray();
+        var settings = ElementsProvider.GetSplitSettings(selectedLevels);
         var elements = ElementsProvider.Provider.GetElements(SelectionMode.Mode);
 
         if(_revitRepository.AnyOwned(elements)) {
@@ -191,9 +198,8 @@ internal class MainViewModel : BaseViewModel {
                 _localization.GetLocalizedString("Error.NoElementsToSplit")));
         }
 
-        using(var t = new Transaction(_revitRepository.Document,
+        using(var t = _revitRepository.Document.StartTransaction(
             _localization.GetLocalizedString("MainWindow.TransactionName"))) {
-            t.Start();
 
             if(settings.ConnectorRoundSymbol is { IsActive: false } r) {
                 r.Activate();
@@ -209,8 +215,6 @@ internal class MainViewModel : BaseViewModel {
                     result.UpdateSegments();
                 } catch(Autodesk.Revit.Exceptions.ApplicationException) {
                     _errorsService.AddError(item.Element, "Error.InsufficientSpace");
-                } catch(InvalidOperationException ex) when(ex.Message == "Error.OvalNotSupported") {
-                    _errorsService.AddError(item.Element, "Error.OvalNotSupported");
                 } catch(InvalidOperationException) {
                     _errorsService.AddError(item.Element, "Error.SplitFailed");
                 }
@@ -242,12 +246,6 @@ internal class MainViewModel : BaseViewModel {
         }
         ErrorText = null;
         return true;
-    }
-
-    private ISplitSettings GetSplitSettings() {
-        var (round, rect) = ElementsProvider.GetSelectedSymbols();
-        var levels = Levels.Where(l => l.IsSelected).Select(l => l.Level).ToArray();
-        return new SplitSettings(round, rect, levels);
     }
 
     private void ShowErrors() {
