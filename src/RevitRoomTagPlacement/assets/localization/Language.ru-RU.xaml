@@ -25,6 +25,5 @@
     <system:String x:Key="MainWindow.ErrorNoSelectedGroups">Группы не выбраны</system:String>
     <system:String x:Key="MainWindow.ErrorNoSelectedTag">Марка не выбрана</system:String>
     <system:String x:Key="MainWindow.ErrorNoCommonRooms">Для выбранных групп нет общих помещений</system:String>
-    <system:String x:Key="MainWindow.ErrorNoSelectedRoomName">Имя помещения не выбрано</system:String>
-    
+    <system:String x:Key="MainWindow.ErrorNoSelectedRoomName">Имя помещения не выбрано</system:String>    
 </ResourceDictionary>
