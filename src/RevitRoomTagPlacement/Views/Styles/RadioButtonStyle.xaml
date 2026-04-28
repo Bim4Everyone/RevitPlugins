@@ -21,8 +21,7 @@
                                 <Border
                                     x:Name="Border"
                                     BorderThickness="1"
-                                    BorderBrush="White"
-                                    Background="#eaeaea"
+                                    Background="{DynamicResource CardBorderBrush}"
                                     CornerRadius="4" />
                                 <Border
                                     x:Name="CheckMark"
