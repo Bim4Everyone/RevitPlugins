@@ -48,6 +48,10 @@ public class RevitMarkAllDocsByConfigCommand : BasePluginCommand {
             .ToSelf()
             .InSingletonScope();
 
+        kernel.Bind<JsonSerializerService>()
+            .ToSelf()
+            .InSingletonScope();
+
         kernel.Bind<DocumentService>()
             .ToSelf()
             .InSingletonScope();
@@ -77,8 +81,8 @@ public class RevitMarkAllDocsByConfigCommand : BasePluginCommand {
             var windowService = kernel.Get<WindowsService>();
             var documentService = kernel.Get<DocumentService>();
             var revitRepository = kernel.Get<RevitRepository>();
+            var jsonService = kernel.Get<JsonSerializerService>();
 
-            var jsonService = new JsonSerializerService();
             var markData = jsonService.ImportMarkData(filePath);
             string currentDocName = documentService.GetDocumentFullName(revitRepository.Document);
             var markDataForCurrentDoc = markData.GetDataByDocument(currentDocName);

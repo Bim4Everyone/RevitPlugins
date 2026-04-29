@@ -16,6 +16,7 @@ using Ninject;
 
 using RevitMarkAllDocuments.Models;
 using RevitMarkAllDocuments.Services;
+using RevitMarkAllDocuments.Services.Export;
 using RevitMarkAllDocuments.ViewModels;
 using RevitMarkAllDocuments.Views;
 
@@ -57,6 +58,10 @@ public class RevitMarkAllDocumentsCommand : BasePluginCommand {
 
         kernel.Bind<INavigationViewPageProvider>()
             .To<NavigationViewPageProvider>()
+            .InSingletonScope();
+
+        kernel.Bind<JsonSerializerService>()
+            .ToSelf()
             .InSingletonScope();
 
         kernel.Bind<WindowsService>()

@@ -1,6 +1,5 @@
 using System.IO;
 
-using dosymep.Bim4Everyone.SimpleServices;
 using dosymep.SimpleServices;
 
 using RevitMarkAllDocuments.Models;
@@ -8,8 +7,11 @@ using RevitMarkAllDocuments.Models;
 namespace RevitMarkAllDocuments.Services.Export;
 
 internal class JsonSerializerService {
-    private readonly ISerializationService _serializationService = ServicesProvider
-        .GetPlatformService<ISerializationService>();
+    private readonly ISerializationService _serializationService;
+
+    public JsonSerializerService(ISerializationService serializationService) {
+        _serializationService = serializationService;
+    }
 
     public void ExportMarkData(string filePath, MarkData markData) {
         string serializedData = _serializationService.Serialize(markData);

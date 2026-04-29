@@ -27,6 +27,7 @@ internal class MainViewModel : BaseViewModel {
     private readonly WindowsService _windowsService;
     private readonly ILogicalFilterProviderFactory _filterFactory;
     private readonly IFilterContextParser _filterParser;
+    private readonly JsonSerializerService _jsonService;
     private readonly ILocalizationService _localizationService;
     private readonly bool _isMarkForTypes;
     private readonly Category _selectedCategory;
@@ -46,6 +47,7 @@ internal class MainViewModel : BaseViewModel {
                          ParamValidationService paramValidationService,
                          WindowsService markListWindowService,
                          ILogicalFilterProviderFactory filterFactory,
+                         JsonSerializerService jsonService,
                          IFilterContextParser filterParser,
                          ILocalizationService localizationService) {        
         _pluginConfig = pluginConfig;
@@ -54,6 +56,7 @@ internal class MainViewModel : BaseViewModel {
         _paramValidationService = paramValidationService;
         _windowsService = markListWindowService;
         _filterFactory = filterFactory;
+        _jsonService = jsonService;
         _filterParser = filterParser;
         _localizationService = localizationService;
 
@@ -149,8 +152,7 @@ internal class MainViewModel : BaseViewModel {
             }
             string fullPath = Path.Combine(path, $"{currentDocName}_{_selectedCategoryName}.json");
 
-            var jsonService = new JsonSerializerService();
-            jsonService.ExportMarkData(fullPath, markData);
+            _jsonService.ExportMarkData(fullPath, markData);
         }
 
         // Если выбран текущий документ, то заполняем значения марок в нём
