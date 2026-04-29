@@ -33,6 +33,7 @@
     <system:String x:Key="DeclarationPage.Phase">Phase:</system:String>
     <system:String x:Key="DeclarationPage.Accuracy">Accuracy:</system:String>
     <system:String x:Key="DeclarationPage.CalculateUtp">Calculate UTP:</system:String>
+    <system:String x:Key="DeclarationPage.CalculateExtraApartProps">Calculate extra properties:</system:String>
     <system:String x:Key="DeclarationPage.Projects">Projects with rooms for uploading:</system:String>
 
 

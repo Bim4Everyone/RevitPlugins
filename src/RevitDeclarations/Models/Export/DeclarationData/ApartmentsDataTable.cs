@@ -33,6 +33,13 @@ internal class ApartmentsDataTable : DeclarationDataTable {
             _headerTable.Rows[0][_tableInfo.UtpStart + 6] = "Гардеробная";
             _headerTable.Rows[0][_tableInfo.UtpStart + 7] = "Постирочная";
             _headerTable.Rows[0][_tableInfo.UtpStart + 8] = "Увеличенная площадь балкона/ лоджии";
+            _headerTable.Rows[0][_tableInfo.UtpStart + 9] = "Остекленная лоджия/балкон";
+            _headerTable.Rows[0][_tableInfo.UtpStart + 10] = "Лоджия/балкон без остекления";
+        }
+
+        if(_settings.LoadExtraApartProps) {
+            _headerTable.Rows[0][_tableInfo.ExtraApartPropsStart] = "Летние помещения";
+            _headerTable.Rows[0][_tableInfo.ExtraApartPropsStart + 1] = "Летнее помещение с перепадом, мм";
         }
     }
 
@@ -100,6 +107,9 @@ internal class ApartmentsDataTable : DeclarationDataTable {
         if(_settings.LoadUtp) {
             FillTableUtpInfo();
         }
+        if(_settings.LoadExtraApartProps) {
+            FillExtraApartProps();
+        }
     }
 
     private void FillTableUtpInfo() {
@@ -116,6 +126,20 @@ internal class ApartmentsDataTable : DeclarationDataTable {
             _mainTable.Rows[rowNumber][columnNumber + 6] = apartment.UtpPantry;
             _mainTable.Rows[rowNumber][columnNumber + 7] = apartment.UtpLaundry;
             _mainTable.Rows[rowNumber][columnNumber + 8] = apartment.UtpExtraBalconyArea;
+            _mainTable.Rows[rowNumber][columnNumber + 9] = apartment.UtpBalconyWithGlazing;
+            _mainTable.Rows[rowNumber][columnNumber + 10] = apartment.UtpBalconyWithoutGlazing;
+
+            rowNumber++;
+        }
+    }
+
+    private void FillExtraApartProps() {
+        int rowNumber = 0;
+        int columnNumber = _tableInfo.ExtraApartPropsStart;
+
+        foreach(Apartment apartment in _tableInfo.RoomGroups) {
+            _mainTable.Rows[rowNumber][columnNumber] = apartment.ExtraPropSummerRoomsList;
+            _mainTable.Rows[rowNumber][columnNumber + 1] = apartment.ExtraPropSummerRoomsFloorDiff;
 
             rowNumber++;
         }

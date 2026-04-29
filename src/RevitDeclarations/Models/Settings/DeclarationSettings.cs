@@ -16,6 +16,7 @@ internal abstract class DeclarationSettings {
     public int AccuracyForArea { get; set; }
     public int AccuracyForLength { get; set; }
     public bool LoadUtp { get; set; }
+    public bool LoadExtraApartProps { get; set; }
     public IReadOnlyCollection<string> MainRoomNames => PrioritiesConfig
             .Priorities
             .Select(x => x.Name)
