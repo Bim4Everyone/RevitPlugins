@@ -8,7 +8,7 @@ internal class SplitSettings : ISplitSettings {
     public SplitSettings(FamilySymbol round, FamilySymbol rectangle, ICollection<Level> levels) {
         ConnectorRoundSymbol = round;
         ConnectorRectangleSymbol = rectangle;
-        Levels = levels;
+        Levels = levels ?? [];
     }
 
     public FamilySymbol ConnectorRoundSymbol { get; }

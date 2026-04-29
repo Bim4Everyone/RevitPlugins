@@ -21,35 +21,54 @@ internal abstract class ElementsProvider : IElementsProvider {
 
     public ICollection<SplittableElement> GetElements(SelectionMode selectionMode) {
         ICollection<MEPCurve> raw = selectionMode switch {
-            SelectionMode.SelectedElements => GetSelected(),
-            SelectionMode.ActiveView => GetActiveView(),
-            SelectionMode.ActiveDocument => GetActiveDocument(),
+            SelectionMode.SelectedElements => GetSelectedElements(),
+            SelectionMode.ActiveView => GetElementsOnActiveView(),
+            SelectionMode.ActiveDocument => GetElementsInDocument(),
             _ => throw new ArgumentOutOfRangeException(nameof(selectionMode))
         };
-        double minLength = _revitRepository.Application.ShortCurveTolerance;
-        var filtered = raw.Where(c => IsLongEnough(c, minLength)).ToArray();
+
         var displacements = _revitRepository.GetDisplacementElements();
-        return [.. filtered.Select(c => CreateSplittable(c, displacements))];
+        return [.. raw.Where(IsValid).Select(c => CreateSplittable(c, displacements))];
     }
 
-    protected abstract ICollection<MEPCurve> GetSelected();
+    protected abstract ICollection<MEPCurve> GetSelectedElements();
 
-    protected abstract ICollection<MEPCurve> GetActiveView();
+    protected abstract ICollection<MEPCurve> GetElementsOnActiveView();
 
-    protected abstract ICollection<MEPCurve> GetActiveDocument();
+    protected abstract ICollection<MEPCurve> GetElementsInDocument();
 
-    protected abstract SplittableElement CreateSplittable(
-        MEPCurve curve, ICollection<DisplacementElement> all);
+    protected abstract SplittableElement CreateSplittable(MEPCurve curve, ICollection<DisplacementElement> all);
 
-    protected static ICollection<DisplacementElement> FilterDisplacements(
-        MEPCurve curve, ICollection<DisplacementElement> all) {
+    /// <summary>
+    /// Фильтрует наборы смещения, в которых есть заданный элемент ВИС
+    /// </summary>
+    /// <param name="curve">Элемент ВИС</param>
+    /// <param name="all">Все наборы смещения для проверки</param>
+    /// <returns>Наборы смещения, в которых есть заданный элемент ВИС</returns>
+    protected ICollection<DisplacementElement> FilterDisplacements(
+        MEPCurve curve,
+        ICollection<DisplacementElement> all) {
         return all.Where(de => de.GetDisplacedElementIds().Contains(curve.Id)).ToArray();
     }
 
-    private static bool IsLongEnough(MEPCurve curve, double minLength) {
-        if(curve.Location is not LocationCurve locationCurve) {
+    /// <summary>
+    /// Проверяет, что элемент не короткий и не горизонтальный
+    /// </summary>
+    private bool IsValid(MEPCurve mepCurve) {
+        double tolerance = _revitRepository.Application.ShortCurveTolerance;
+        if(mepCurve.Location is not LocationCurve locationCurve) {
             return false;
         }
-        return locationCurve.Curve.Length >= minLength;
+
+        if(locationCurve.Curve.Length <= tolerance) {
+            return false;
+        }
+
+        if(Math.Abs(locationCurve.Curve.GetEndPoint(0).Z - locationCurve.Curve.GetEndParameter(1))
+           <= tolerance) {
+            return false;
+        }
+
+        return true;
     }
 }

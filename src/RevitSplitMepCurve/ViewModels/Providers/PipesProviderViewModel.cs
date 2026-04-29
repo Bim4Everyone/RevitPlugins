@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -19,15 +20,16 @@ internal class PipesProviderViewModel : ElementsProviderViewModel {
         PipesProvider provider,
         RevitRepository revitRepository) : base(localization, provider) {
         var symbols = revitRepository
-            .GetConnectorSymbols(MepClass.Pipes)
+            .GetConnectorSymbols(BuiltInCategory.OST_PipeCurves)
             .Select(s => new FamilySymbolViewModel(s))
             .ToArray();
         RoundSymbol = new SelectableFamilySymbolViewModel(
             localization.GetLocalizedString("MainWindow.ConnectorRound"), symbols);
+        Name = _localization.GetLocalizedString(
+            $"{nameof(RevitSplitMepCurve.Models.Enums.MepClass)}.{provider.MepClass}");
     }
 
-    public override string Name =>
-        _localization.GetLocalizedString("MainWindow.MepClass.Pipes");
+    public override string Name { get; }
 
     public override MepClass MepClass => MepClass.Pipes;
 
@@ -41,6 +43,10 @@ internal class PipesProviderViewModel : ElementsProviderViewModel {
     }
 
     public override ISplitSettings GetSplitSettings(ICollection<Level> levels) {
-        return new SplitSettings(RoundSymbol.SelectedItem?.Symbol, null, levels);
+        if(RoundSymbol.SelectedItem is null) {
+            throw new InvalidOperationException();
+        }
+
+        return new SplitSettings(RoundSymbol.SelectedItem.Symbol, null, levels);
     }
 }

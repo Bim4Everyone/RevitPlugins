@@ -34,13 +34,13 @@ internal class RevitSettings : ProjectSettings {
     public SelectionMode SelectedMode { get; set; } = SelectionMode.ActiveView;
 
     /// <summary>Имя типоразмера круглого соединителя.</summary>
-    public string ConnectorRoundSymbolName { get; set; }
+    public string ConnectorRoundSymbolName { get; set; } = string.Empty;
 
     /// <summary>Имя типоразмера прямоугольного соединителя.</summary>
-    public string ConnectorRectangleSymbolName { get; set; }
+    public string ConnectorRectangleSymbolName { get; set; } = string.Empty;
 
     /// <summary>Имена уровней, исключённых пользователем.</summary>
-    public List<string> UncheckedLevelNames { get; set; } = new();
+    public List<string> UncheckedLevelNames { get; set; } = [];
 
     public bool ShowSplitErrors { get; set; } = true;
 }

@@ -1,22 +1,20 @@
 using System;
 
+using Ninject;
+using Ninject.Syntax;
+
 using RevitSplitMepCurve.Views;
 
 namespace RevitSplitMepCurve.Services.Core;
 
-/// <summary>Тонкая обёртка над ErrorsWindow для немодального показа.</summary>
 internal class ErrorsWindowService {
-    private readonly ErrorsWindow _errorsWindow;
-    private readonly IErrorsService _errorsService;
+    private readonly IResolutionRoot _root;
 
-    public ErrorsWindowService(ErrorsWindow errorsWindow, IErrorsService errorsService) {
-        _errorsWindow = errorsWindow ?? throw new ArgumentNullException(nameof(errorsWindow));
-        _errorsService = errorsService ?? throw new ArgumentNullException(nameof(errorsService));
+    public ErrorsWindowService(IResolutionRoot root) {
+        _root = root ?? throw new ArgumentNullException(nameof(root));
     }
 
     public void ShowErrorsWindow() {
-        if(_errorsService.ContainsErrors()) {
-            _errorsWindow.Show();
-        }
+        _root.Get<ErrorsWindow>().Show();
     }
 }

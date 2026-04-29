@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Linq;
 
 using dosymep.WPF.ViewModels;
 
@@ -11,7 +12,7 @@ internal class SelectableFamilySymbolViewModel : BaseViewModel {
 
     public SelectableFamilySymbolViewModel(string label, ICollection<FamilySymbolViewModel> availableItems) {
         Label = label ?? throw new ArgumentNullException(nameof(label));
-        AvailableItems = [.. availableItems];
+        AvailableItems = [.. availableItems.OrderBy(i => i.Name)];
     }
 
     public string Label { get; }

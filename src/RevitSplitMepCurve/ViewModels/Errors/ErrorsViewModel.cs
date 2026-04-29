@@ -16,28 +16,32 @@ namespace RevitSplitMepCurve.ViewModels.Errors;
 
 internal class ErrorsViewModel : BaseViewModel {
     private readonly RevitRepository _revitRepository;
+    private readonly IErrorsService _errorsService;
 
     public ErrorsViewModel(RevitRepository revitRepository, IErrorsService errorsService) {
         _revitRepository = revitRepository ?? throw new ArgumentNullException(nameof(revitRepository));
-        _ = errorsService ?? throw new ArgumentNullException(nameof(errorsService));
+        _errorsService = errorsService ?? throw new ArgumentNullException(nameof(errorsService));
 
-        Errors = [.. errorsService.GetErrors().Select(e => new ErrorViewModel(e))];
         ShowElementsCommand = RelayCommand.Create<ErrorViewModel>(ShowElements, CanShowElements);
+        LoadViewCommand = RelayCommand.Create(LoadView);
     }
 
     public ICommand ShowElementsCommand { get; }
 
-    public ObservableCollection<ErrorViewModel> Errors { get; }
+    public ICommand LoadViewCommand { get; }
+
+    public ObservableCollection<ErrorViewModel> Errors { get; } = [];
 
     private void ShowElements(ErrorViewModel error) {
-        var element = error?.Element;
-        if(element is null || element.Id == ElementId.InvalidElementId) {
-            return;
-        }
-        var uiDoc = _revitRepository.ActiveUIDocument;
-        uiDoc.Selection.SetElementIds(new[] { element.Id });
-        uiDoc.ShowElements(new[] { element.Id });
+        _revitRepository.ShowElements(error.Element);
     }
 
     private bool CanShowElements(ErrorViewModel error) => error is not null;
+
+    private void LoadView() {
+        Errors.Clear();
+        foreach(var error in _errorsService.GetErrors()) {
+            Errors.Add(new ErrorViewModel(error));
+        }
+    }
 }

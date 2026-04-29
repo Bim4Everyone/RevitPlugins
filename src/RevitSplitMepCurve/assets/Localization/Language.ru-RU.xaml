@@ -3,33 +3,72 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:system="clr-namespace:System;assembly=mscorlib">
 
-    <system:String x:Key="MainWindow.Title">Разделить по уровню СМР</system:String>
-    <system:String x:Key="MainWindow.MepClass">Категория</system:String>
-    <system:String x:Key="MainWindow.MepClass.Pipes">Трубопроводы</system:String>
-    <system:String x:Key="MainWindow.MepClass.Ducts">Воздуховоды</system:String>
-    <system:String x:Key="MainWindow.SelectionMode">Режим выбора</system:String>
-    <system:String x:Key="SelectionMode.SelectedElements">Выбранные элементы</system:String>
-    <system:String x:Key="SelectionMode.ActiveView">Видимые на виде</system:String>
-    <system:String x:Key="SelectionMode.ActiveDocument">Весь документ</system:String>
-    <system:String x:Key="MainWindow.Levels">Уровни к делению</system:String>
-    <system:String x:Key="MainWindow.Levels.DisplayFormat">{0} ({1:0} мм)</system:String>
-    <system:String x:Key="MainWindow.Levels.ElevationTooltip">Отметка относительно базовой точки проекта</system:String>
-    <system:String x:Key="MainWindow.SelectAll">Выбрать все</system:String>
-    <system:String x:Key="MainWindow.ConnectorRound">Круглый соединитель</system:String>
-    <system:String x:Key="MainWindow.ConnectorRectangle">Прямоугольный соединитель</system:String>
-    <system:String x:Key="MainWindow.ShowSplitErrors">Выводить ошибки разделения</system:String>
-    <system:String x:Key="MainWindow.ButtonOk">Разделить</system:String>
-    <system:String x:Key="MainWindow.ButtonCancel">Отмена</system:String>
-    <system:String x:Key="MainWindow.TransactionName">Разделение по уровням</system:String>
-    <system:String x:Key="MainWindow.SyncRequired">Некоторые элементы заняты или устарели. Синхронизируйтесь и повторите.</system:String>
-    <system:String x:Key="MainWindow.Validation.NoProvider">Выберите категорию</system:String>
-    <system:String x:Key="MainWindow.Validation.NoConnector">Выберите соединитель</system:String>
-    <system:String x:Key="MainWindow.Validation.NoLevels">Отметьте хотя бы один уровень</system:String>
-    <system:String x:Key="Error.NoElementsToSplit">Нет элементов для разделения</system:String>
-    <system:String x:Key="Error.DuplicateLevels">Уровни на одной отметке</system:String>
-    <system:String x:Key="Error.InsufficientSpace">Недостаточно места для соединителя</system:String>
-    <system:String x:Key="Error.SplitFailed">Ошибка деления элемента</system:String>
-    <system:String x:Key="ErrorsWindow.Title">Отчёт о разделении</system:String>
-    <system:String x:Key="ErrorsWindow.ElementHeader">Элемент</system:String>
+    <system:String
+        x:Key="SelectionMode.SelectedElements">Выбранные элементы</system:String>
+    <system:String
+        x:Key="SelectionMode.ActiveView">Видимые на виде</system:String>
+    <system:String
+        x:Key="SelectionMode.ActiveDocument">Весь документ</system:String>
 
+    <system:String
+        x:Key="MepClass.Pipes">Трубопроводы</system:String>
+    <system:String
+        x:Key="MepClass.Ducts">Воздуховоды</system:String>
+
+    <system:String
+        x:Key="MainWindow.Title">Разделить по уровню СМР</system:String>
+    <system:String
+        x:Key="MainWindow.MepClass">Категория</system:String>
+    <system:String
+        x:Key="MainWindow.SelectionMode">Режим выбора</system:String>
+    <system:String
+        x:Key="MainWindow.Levels">Уровни к делению</system:String>
+    <system:String
+        x:Key="MainWindow.Levels.DisplayFormat">{0} ({1:+0;-0;0} мм)</system:String>
+    <system:String
+        x:Key="MainWindow.Levels.ElevationTooltip">Отметки уровней относительно базовой точки проекта</system:String>
+    <system:String
+        x:Key="MainWindow.SelectAll">Выбрать все</system:String>
+    <system:String
+        x:Key="MainWindow.ConnectorRound">Круглый соединитель</system:String>
+    <system:String
+        x:Key="MainWindow.ConnectorRectangle">Прямоугольный соединитель</system:String>
+    <system:String
+        x:Key="MainWindow.ShowSplitErrors">Выводить ошибки разделения</system:String>
+    <system:String
+        x:Key="MainWindow.ButtonOk">ОК</system:String>
+    <system:String
+        x:Key="MainWindow.ButtonCancel">Отмена</system:String>
+    <system:String
+        x:Key="MainWindow.TransactionName">Разделение по уровням</system:String>
+    <system:String
+        x:Key="MainWindow.SyncRequired">Некоторые элементы заняты или устарели. Синхронизируйтесь и повторите.</system:String>
+    <system:String
+        x:Key="MainWindow.Validation.NoProvider">Выберите категорию</system:String>
+    <system:String
+        x:Key="MainWindow.Validation.NoSelectionMode">Выберите режим отбора элементов</system:String>
+    <system:String
+        x:Key="MainWindow.Validation.NoConnector">Выберите соединитель</system:String>
+    <system:String
+        x:Key="MainWindow.Validation.NoLevels">Отметьте хотя бы один уровень</system:String>
+
+    <system:String
+        x:Key="Error.DuplicateLevels"
+        xml:space="preserve">
+Уровни на одной отметке:
+{0}
+</system:String>
+    <system:String
+        x:Key="Error.InsufficientSpace">Недостаточно места для соединителя</system:String>
+    <system:String
+        x:Key="Error.SplitFailed">Ошибка деления элемента</system:String>
+    <system:String
+        x:Key="Error.CannotGetConnectorSymbol">Не удалось получить типоразмер соединителя</system:String>
+    <system:String
+        x:Key="Error.CannotCreateConnector">Не удалось создать один из соединителей</system:String>
+
+    <system:String
+        x:Key="ErrorsWindow.Title">Отчёт о разделении</system:String>
+    <system:String
+        x:Key="ErrorsWindow.ElementHeader">Элемент</system:String>
 </ResourceDictionary>

@@ -12,8 +12,12 @@ internal class SelectionModeViewModel : BaseViewModel, IEquatable<SelectionModeV
     private bool _isEnabled = true;
 
     public SelectionModeViewModel(ILocalizationService localization, SelectionMode mode) {
+        if(localization == null) {
+            throw new ArgumentNullException(nameof(localization));
+        }
+
         Mode = mode;
-        Name = localization.GetLocalizedString($"SelectionMode.{mode}");
+        Name = localization.GetLocalizedString($"{nameof(SelectionMode)}.{mode}");
     }
 
     public string Name { get; }
@@ -25,10 +29,15 @@ internal class SelectionModeViewModel : BaseViewModel, IEquatable<SelectionModeV
         set => RaiseAndSetIfChanged(ref _isEnabled, value);
     }
 
-    public bool Equals(SelectionModeViewModel other) => other is not null && Mode == other.Mode;
+    public bool Equals(SelectionModeViewModel other) {
+        return other is not null && Mode == other.Mode;
+    }
 
-    public override bool Equals(object obj) => Equals(obj as SelectionModeViewModel);
+    public override bool Equals(object obj) {
+        return Equals(obj as SelectionModeViewModel);
+    }
 
-    public override int GetHashCode() =>
-        EqualityComparer<SelectionMode>.Default.GetHashCode(Mode);
+    public override int GetHashCode() {
+        return EqualityComparer<SelectionMode>.Default.GetHashCode(Mode);
+    }
 }

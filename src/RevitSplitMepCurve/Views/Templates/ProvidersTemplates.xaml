@@ -3,6 +3,22 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:vm="clr-namespace:RevitSplitMepCurve.ViewModels.Providers"
     xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml">
+    <Style
+        TargetType="ComboBox"
+        x:Key="SymbolComboBox">
+        <Setter
+            Property="IsEditable"
+            Value="True" />
+        <Setter
+            Property="IsTextSearchEnabled"
+            Value="True" />
+        <Setter
+            Property="IsTextSearchCaseSensitive"
+            Value="False" />
+        <Setter
+            Property="TextSearch.TextPath"
+            Value="Name" />
+    </Style>
 
     <DataTemplate DataType="{x:Type vm:PipesProviderViewModel}">
         <Grid Margin="0,4">
@@ -16,13 +32,10 @@
                 Text="{Binding RoundSymbol.Label}" />
             <ComboBox
                 Grid.Column="1"
-                ItemsSource="{Binding RoundSymbol.AvailableItems}"
                 DisplayMemberPath="Name"
+                Style="{StaticResource SymbolComboBox}"
+                ItemsSource="{Binding RoundSymbol.AvailableItems}"
                 SelectedItem="{Binding RoundSymbol.SelectedItem}"
-                IsEditable="True"
-                IsTextSearchEnabled="True"
-                IsTextSearchCaseSensitive="False"
-                TextSearch.TextPath="Name"
                 ScrollViewer.VerticalScrollBarVisibility="Auto" />
         </Grid>
     </DataTemplate>
@@ -40,13 +53,10 @@
                     Text="{Binding RoundSymbol.Label}" />
                 <ComboBox
                     Grid.Column="1"
-                    ItemsSource="{Binding RoundSymbol.AvailableItems}"
                     DisplayMemberPath="Name"
+                    Style="{StaticResource SymbolComboBox}"
+                    ItemsSource="{Binding RoundSymbol.AvailableItems}"
                     SelectedItem="{Binding RoundSymbol.SelectedItem}"
-                    IsEditable="True"
-                    IsTextSearchEnabled="True"
-                    IsTextSearchCaseSensitive="False"
-                    TextSearch.TextPath="Name"
                     ScrollViewer.VerticalScrollBarVisibility="Auto" />
             </Grid>
             <Grid Margin="0,4">
@@ -60,13 +70,10 @@
                     Text="{Binding RectangleSymbol.Label}" />
                 <ComboBox
                     Grid.Column="1"
-                    ItemsSource="{Binding RectangleSymbol.AvailableItems}"
                     DisplayMemberPath="Name"
+                    Style="{StaticResource SymbolComboBox}"
+                    ItemsSource="{Binding RectangleSymbol.AvailableItems}"
                     SelectedItem="{Binding RectangleSymbol.SelectedItem}"
-                    IsEditable="True"
-                    IsTextSearchEnabled="True"
-                    IsTextSearchCaseSensitive="False"
-                    TextSearch.TextPath="Name"
                     ScrollViewer.VerticalScrollBarVisibility="Auto" />
             </Grid>
         </StackPanel>

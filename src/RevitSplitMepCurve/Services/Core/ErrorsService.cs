@@ -20,10 +20,18 @@ internal class ErrorsService : IErrorsService {
     }
 
     public void AddError(ErrorModel error) {
+        if(error == null) {
+            throw new ArgumentNullException(nameof(error));
+        }
+
         _errors.Add(error);
     }
 
-    public void AddError(MEPCurve element, string localizationKey) {
+    public void AddError(Element element, string localizationKey) {
+        if(element == null) {
+            throw new ArgumentNullException(nameof(element));
+        }
+
         if(string.IsNullOrWhiteSpace(localizationKey)) {
             throw new ArgumentException(nameof(localizationKey));
         }

@@ -24,45 +24,21 @@ internal class RevitRepository {
 
     public Document Document => ActiveUIDocument.Document;
 
-    /// <summary>Все уровни документа, отсортированы сверху вниз; notInclude — имена для исключения.</summary>
-    public IList<Level> GetLevels(string[] notInclude) {
+    public ICollection<Level> GetLevels(params string[] notIncludeNames) {
         return new FilteredElementCollector(Document)
             .WhereElementIsNotElementType()
             .OfClass(typeof(Level))
-            .Cast<Level>()
-            .Where(l => !notInclude.Contains(l.Name))
-            .OrderByDescending(l => l.Elevation)
+            .OfType<Level>()
+            .Where(l => !notIncludeNames.Contains(l.Name, StringComparer.CurrentCultureIgnoreCase))
             .ToArray();
     }
 
-    /// <summary>FamilySymbol по уникальному имени типоразмера; null если не найден.</summary>
-    public FamilySymbol GetFamilySymbol(string name) {
-        if(string.IsNullOrWhiteSpace(name)) {
-            return null;
-        }
-        return new FilteredElementCollector(Document)
-            .WhereElementIsElementType()
-            .OfClass(typeof(FamilySymbol))
-            .Cast<FamilySymbol>()
-            .FirstOrDefault(s => s.Name == name);
-    }
-
-    /// <summary>
-    /// Все ин-лайн соединители (≥2 connectors) подходящей категории:
-    /// Pipes → OST_PipeFitting, Ducts → OST_DuctFitting.
-    /// </summary>
-    public ICollection<FamilySymbol> GetConnectorSymbols(MepClass mepClass) {
-        var category = mepClass == MepClass.Pipes
-            ? BuiltInCategory.OST_PipeFitting
-            : BuiltInCategory.OST_DuctFitting;
-
+    public ICollection<FamilySymbol> GetConnectorSymbols(BuiltInCategory category) {
         return new FilteredElementCollector(Document)
             .WhereElementIsElementType()
             .OfClass(typeof(FamilySymbol))
             .OfCategory(category)
-            .Cast<FamilySymbol>()
-            .Where(s => s.Family.FamilyPlacementType == FamilyPlacementType.CurveDrivenStructural
-                        || HasAtLeastTwoConnectors(s))
+            .OfType<FamilySymbol>()
             .ToArray();
     }
 
@@ -72,17 +48,7 @@ internal class RevitRepository {
             .WhereElementIsNotElementType()
             .OfCategory(category)
             .OfClass(typeof(T))
-            .Cast<T>()
-            .ToArray();
-    }
-
-    /// <summary>Все элементы заданной категории на 3D-виде (зарезервировано для будущих сценариев).</summary>
-    public ICollection<T> GetElements<T>(BuiltInCategory category, View3D view) where T : MEPCurve {
-        return new FilteredElementCollector(Document, view.Id)
-            .WhereElementIsNotElementType()
-            .OfCategory(category)
-            .OfClass(typeof(T))
-            .Cast<T>()
+            .OfType<T>()
             .ToArray();
     }
 
@@ -92,18 +58,17 @@ internal class RevitRepository {
             .WhereElementIsNotElementType()
             .OfCategory(category)
             .OfClass(typeof(T))
-            .Cast<T>()
+            .OfType<T>()
             .ToArray();
     }
 
     /// <summary>Текущий выделенный набор пользователя, отфильтрованный по категории.</summary>
     public ICollection<T> GetSelectedElements<T>(BuiltInCategory category) where T : MEPCurve {
-        var categoryId = new ElementId(category);
-        return ActiveUIDocument.Selection
-            .GetElementIds()
-            .Select(id => Document.GetElement(id))
+        return new FilteredElementCollector(Document, ActiveUIDocument.Selection.GetElementIds())
+            .WhereElementIsNotElementType()
+            .OfCategory(category)
+            .OfClass(typeof(T))
             .OfType<T>()
-            .Where(e => e.Category?.Id == categoryId)
             .ToArray();
     }
 
@@ -114,42 +79,24 @@ internal class RevitRepository {
 
     /// <summary>Базовая точка проекта.</summary>
     public BasePoint GetProjectBasePoint() {
-#if REVIT_2020_OR_LESS
-        return new FilteredElementCollector(Document)
-            .WhereElementIsNotElementType()
-            .OfClass(typeof(BasePoint))
-            .OfType<BasePoint>()
-            .First(p => !p.IsShared);
-#else
         return BasePoint.GetProjectBasePoint(Document);
-#endif
     }
 
-    /// <summary>Группы уровней с одинаковой отметкой (с точностью до 4 знаков).</summary>
-    public IReadOnlyList<IReadOnlyList<Level>> GetDuplicateElevationLevels() {
-        var levels = new FilteredElementCollector(Document)
-            .WhereElementIsNotElementType()
-            .OfClass(typeof(Level))
-            .Cast<Level>()
-            .ToArray();
-        return levels
-            .GroupBy(l => Math.Round(l.Elevation, 4))
-            .Where(g => g.Count() > 1)
-            .Select(g => (IReadOnlyList<Level>)g.ToArray())
-            .ToArray();
+    /// <summary>Группы уровней с одинаковыми отметками</summary>
+    public ICollection<ICollection<Level>> GetDuplicateLevels() {
+        var levels = GetLevels([]);
+        return GroupIntersectingLevels(levels);
     }
 
-    /// <summary>Все DisplacementElement в документе.</summary>
     public ICollection<DisplacementElement> GetDisplacementElements() {
         return new FilteredElementCollector(Document)
             .WhereElementIsNotElementType()
             .OfClass(typeof(DisplacementElement))
-            .Cast<DisplacementElement>()
+            .OfType<DisplacementElement>()
             .ToArray();
     }
 
-    /// <summary>true, если хотя бы один из элементов занят другим пользователем или устарел.</summary>
-    public bool AnyOwned(ICollection<SplittableElement> elements) {
+    public bool IsSyncRequired(ICollection<SplittableElement> elements) {
         if(!Document.IsWorkshared) {
             return false;
         }
@@ -167,9 +114,52 @@ internal class RevitRepository {
         return false;
     }
 
-    // The category filter (OST_PipeFitting / OST_DuctFitting) is sufficient;
-    // additional connector-count validation is not required.
-    private static bool HasAtLeastTwoConnectors(FamilySymbol symbol) {
-        return true;
+    public void ShowElements(params Element[] elements) {
+        if(elements is null
+           || elements.Length == 0) {
+            return;
+        }
+
+        ElementId[] elementIds = elements
+            .Select(item => item.Id)
+            .ToArray();
+
+        ActiveUIDocument.ShowElements(elementIds);
+        ActiveUIDocument.Selection.SetElementIds(elementIds);
+    }
+
+    /// <summary>
+    /// Группирует уровни, которые пересекаются по высоте с учетом допуска ревита по длине линий
+    /// </summary>
+    private ICollection<ICollection<Level>> GroupIntersectingLevels(ICollection<Level> levels) {
+        if(levels == null
+           || !levels.Any()) {
+            return [];
+        }
+
+        double tolerance = Application.ShortCurveTolerance;
+
+        var sortedLevels = levels.OrderBy(l => l.Elevation).ToArray();
+        var groups = new List<ICollection<Level>>();
+        var currentGroup = new List<Level> { sortedLevels[0] };
+
+        for(int i = 1; i < sortedLevels.Length; i++) {
+            var prevLevel = sortedLevels[i - 1];
+            var currentLevel = sortedLevels[i];
+
+            double prevTop = prevLevel.Elevation + tolerance;
+            double currentBottom = currentLevel.Elevation - tolerance;
+
+            if(currentBottom <= prevTop) {
+                currentGroup.Add(currentLevel);
+            } else {
+                groups.Add(currentGroup);
+                currentGroup = [currentLevel];
+            }
+        }
+
+        groups.Add(currentGroup);
+
+        return groups;
     }
 }

@@ -3,33 +3,72 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:system="clr-namespace:System;assembly=mscorlib">
 
-    <system:String x:Key="MainWindow.Title">Split by construction level</system:String>
-    <system:String x:Key="MainWindow.MepClass">Category</system:String>
-    <system:String x:Key="MainWindow.MepClass.Pipes">Pipes</system:String>
-    <system:String x:Key="MainWindow.MepClass.Ducts">Ducts</system:String>
-    <system:String x:Key="MainWindow.SelectionMode">Selection mode</system:String>
-    <system:String x:Key="SelectionMode.SelectedElements">Selected elements</system:String>
-    <system:String x:Key="SelectionMode.ActiveView">Visible on view</system:String>
-    <system:String x:Key="SelectionMode.ActiveDocument">Whole document</system:String>
-    <system:String x:Key="MainWindow.Levels">Levels to split</system:String>
-    <system:String x:Key="MainWindow.Levels.DisplayFormat">{0} ({1:0} mm)</system:String>
-    <system:String x:Key="MainWindow.Levels.ElevationTooltip">Elevation relative to project base point</system:String>
-    <system:String x:Key="MainWindow.SelectAll">Select all</system:String>
-    <system:String x:Key="MainWindow.ConnectorRound">Round connector</system:String>
-    <system:String x:Key="MainWindow.ConnectorRectangle">Rectangular connector</system:String>
-    <system:String x:Key="MainWindow.ShowSplitErrors">Show split errors</system:String>
-    <system:String x:Key="MainWindow.ButtonOk">Split</system:String>
-    <system:String x:Key="MainWindow.ButtonCancel">Cancel</system:String>
-    <system:String x:Key="MainWindow.TransactionName">Split by levels</system:String>
-    <system:String x:Key="MainWindow.SyncRequired">Some elements are checked out or outdated. Synchronize and retry.</system:String>
-    <system:String x:Key="MainWindow.Validation.NoProvider">Select a category</system:String>
-    <system:String x:Key="MainWindow.Validation.NoConnector">Select a connector</system:String>
-    <system:String x:Key="MainWindow.Validation.NoLevels">Check at least one level</system:String>
-    <system:String x:Key="Error.NoElementsToSplit">No elements to split</system:String>
-    <system:String x:Key="Error.DuplicateLevels">Levels at the same elevation</system:String>
-    <system:String x:Key="Error.InsufficientSpace">Not enough space for the connector</system:String>
-    <system:String x:Key="Error.SplitFailed">Split failed</system:String>
-    <system:String x:Key="ErrorsWindow.Title">Split report</system:String>
-    <system:String x:Key="ErrorsWindow.ElementHeader">Element</system:String>
+    <system:String
+        x:Key="SelectionMode.SelectedElements">Selected elements</system:String>
+    <system:String
+        x:Key="SelectionMode.ActiveView">Visible in view</system:String>
+    <system:String
+        x:Key="SelectionMode.ActiveDocument">Entire document</system:String>
 
+    <system:String
+        x:Key="MepClass.Pipes">Pipes</system:String>
+    <system:String
+        x:Key="MepClass.Ducts">Ducts</system:String>
+
+    <system:String
+        x:Key="MainWindow.Title">Split by Construction Level</system:String>
+    <system:String
+        x:Key="MainWindow.MepClass">Category</system:String>
+    <system:String
+        x:Key="MainWindow.SelectionMode">Selection mode</system:String>
+    <system:String
+        x:Key="MainWindow.Levels">Levels to split</system:String>
+    <system:String
+        x:Key="MainWindow.Levels.DisplayFormat">{0} ({1:+0;-0;0} mm)</system:String>
+    <system:String
+        x:Key="MainWindow.Levels.ElevationTooltip">Level elevations relative to project base point</system:String>
+    <system:String
+        x:Key="MainWindow.SelectAll">Select all</system:String>
+    <system:String
+        x:Key="MainWindow.ConnectorRound">Round connector</system:String>
+    <system:String
+        x:Key="MainWindow.ConnectorRectangle">Rectangular connector</system:String>
+    <system:String
+        x:Key="MainWindow.ShowSplitErrors">Show split errors</system:String>
+    <system:String
+        x:Key="MainWindow.ButtonOk">OK</system:String>
+    <system:String
+        x:Key="MainWindow.ButtonCancel">Cancel</system:String>
+    <system:String
+        x:Key="MainWindow.TransactionName">Split by levels</system:String>
+    <system:String
+        x:Key="MainWindow.SyncRequired">Some elements are busy or outdated. Synchronize and try again.</system:String>
+    <system:String
+        x:Key="MainWindow.Validation.NoProvider">Select a category</system:String>
+    <system:String
+        x:Key="MainWindow.Validation.NoSelectionMode">Select a selection mode</system:String>
+    <system:String
+        x:Key="MainWindow.Validation.NoConnector">Select a connector</system:String>
+    <system:String
+        x:Key="MainWindow.Validation.NoLevels">Select at least one level</system:String>
+
+    <system:String
+        x:Key="Error.DuplicateLevels"
+        xml:space="preserve">
+Levels at the same elevation:
+{0}
+</system:String>
+    <system:String
+        x:Key="Error.InsufficientSpace">Insufficient space for connector</system:String>
+    <system:String
+        x:Key="Error.SplitFailed">Element split error</system:String>
+    <system:String
+        x:Key="Error.CannotGetConnectorSymbol">Failed to get connector type</system:String>
+    <system:String
+        x:Key="Error.CannotCreateConnector">Failed to create one of the connectors</system:String>
+
+    <system:String
+        x:Key="ErrorsWindow.Title">Split Report</system:String>
+    <system:String
+        x:Key="ErrorsWindow.ElementHeader">Element</system:String>
 </ResourceDictionary>

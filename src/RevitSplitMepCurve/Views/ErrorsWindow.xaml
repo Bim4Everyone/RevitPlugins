@@ -6,6 +6,7 @@
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:core="clr-namespace:dosymep.WpfUI.Core"
     xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
+    xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
     xmlns:me="clr-namespace:dosymep.WpfCore.MarkupExtensions;assembly=dosymep.WpfCore"
     xmlns:vm="clr-namespace:RevitSplitMepCurve.ViewModels.Errors"
     mc:Ignorable="d"
@@ -29,6 +30,14 @@
             </ResourceDictionary.MergedDictionaries>
         </ResourceDictionary>
     </Window.Resources>
+
+    <i:Interaction.Triggers>
+        <i:EventTrigger
+            EventName="Loaded">
+            <i:InvokeCommandAction
+                Command="{Binding LoadViewCommand}" />
+        </i:EventTrigger>
+    </i:Interaction.Triggers>
     <DockPanel LastChildFill="True">
         <ui:TitleBar
             DockPanel.Dock="Top"

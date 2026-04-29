@@ -16,17 +16,20 @@ internal class PipesProvider : ElementsProvider {
 
     public override MepClass MepClass => MepClass.Pipes;
 
-    protected override ICollection<MEPCurve> GetSelected() =>
-        _revitRepository.GetSelectedElements<Pipe>(BuiltInCategory.OST_PipeCurves).Cast<MEPCurve>().ToArray();
+    protected override ICollection<MEPCurve> GetSelectedElements() {
+        return _revitRepository.GetSelectedElements<Pipe>(BuiltInCategory.OST_PipeCurves).ToArray();
+    }
 
-    protected override ICollection<MEPCurve> GetActiveView() =>
-        _revitRepository.GetActiveViewElements<Pipe>(BuiltInCategory.OST_PipeCurves).Cast<MEPCurve>().ToArray();
+    protected override ICollection<MEPCurve> GetElementsOnActiveView() {
+        return _revitRepository.GetActiveViewElements<Pipe>(BuiltInCategory.OST_PipeCurves).ToArray();
+    }
 
-    protected override ICollection<MEPCurve> GetActiveDocument() =>
-        _revitRepository.GetElements<Pipe>(BuiltInCategory.OST_PipeCurves).Cast<MEPCurve>().ToArray();
+    protected override ICollection<MEPCurve> GetElementsInDocument() {
+        return _revitRepository.GetElements<Pipe>(BuiltInCategory.OST_PipeCurves).ToArray();
+    }
 
     protected override SplittableElement CreateSplittable(MEPCurve curve, ICollection<DisplacementElement> all) {
         var filtered = FilterDisplacements(curve, all);
-        return new SplittablePipe((Pipe)curve, filtered);
+        return new SplittablePipe((Pipe) curve, filtered);
     }
 }

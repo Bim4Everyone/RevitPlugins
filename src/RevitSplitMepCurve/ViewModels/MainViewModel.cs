@@ -14,9 +14,13 @@ using dosymep.WPF.ViewModels;
 using RevitSplitMepCurve.Models;
 using RevitSplitMepCurve.Models.Enums;
 using RevitSplitMepCurve.Models.Errors;
+using RevitSplitMepCurve.Models.Exceptions;
+using RevitSplitMepCurve.Models.Splittable;
 using RevitSplitMepCurve.Services.Core;
 using RevitSplitMepCurve.Services.Providers;
 using RevitSplitMepCurve.ViewModels.Providers;
+
+using Autodesk.Revit.DB;
 
 namespace RevitSplitMepCurve.ViewModels;
 
@@ -107,11 +111,9 @@ internal class MainViewModel : BaseViewModel {
     private void LoadView() {
         var config = _pluginConfig.GetSettings(_revitRepository.Document);
 
-        var basePoint = _revitRepository.GetProjectBasePoint();
-        double basePointZ = basePoint?.Position.Z ?? 0;
+        double basePointZ = _revitRepository.GetProjectBasePoint().Position.Z;
 
-        var levels = _revitRepository.GetLevels(Array.Empty<string>());
-        Levels.Clear();
+        var levels = _revitRepository.GetLevels([]).OrderByDescending(l => l.Elevation);
         foreach(var level in levels) {
             bool isSelected = config is null
                 || !config.UncheckedLevelNames.Contains(level.Name);
@@ -173,56 +175,61 @@ internal class MainViewModel : BaseViewModel {
         }
     }
 
-    private void AcceptView() {
-        SaveConfig();
-        _errorsService.Clear();
-
-        var selectedLevels = Levels.Where(l => l.IsSelected).Select(l => l.Level).ToArray();
-        var settings = ElementsProvider.GetSplitSettings(selectedLevels);
-        var elements = ElementsProvider.Provider.GetElements(SelectionMode.Mode);
-
-        if(_revitRepository.AnyOwned(elements)) {
+    private void CheckSyncNecessity(ICollection<SplittableElement> elements) {
+        if(_revitRepository.IsSyncRequired(elements)) {
             _messageBoxService.Show(
                 _localization.GetLocalizedString("MainWindow.SyncRequired"),
                 _localization.GetLocalizedString("MainWindow.Title"),
-                MessageBoxButton.OK, MessageBoxImage.Warning);
+                MessageBoxButton.OK,
+                MessageBoxImage.Warning);
+            throw new OperationCanceledException();
+        }
+    }
+
+    private ICollection<SplittableElement> GetSplittableElements(ICollection<Level> selectedLevels) {
+        return ElementsProvider.Provider.GetElements(SelectionMode.Mode)
+            .Where(e => e.CanBeSplitted(selectedLevels))
+            .ToArray();
+    }
+
+    private ICollection<Level> GetSelectedLevels() {
+        return Levels
+            .Where(l => l.IsSelected)
+            .Select(l => l.Level)
+            .ToArray();
+    }
+
+    private void AcceptView() {
+        SaveConfig();
+        var selectedLevels = GetSelectedLevels();
+        var settings = ElementsProvider.GetSplitSettings(selectedLevels);
+        var splittable = GetSplittableElements(selectedLevels);
+
+        CheckSyncNecessity(splittable);
+
+        if(splittable.Count == 0) {
             return;
         }
 
-        var splittable = elements
-            .Where(e => e.CanBeSplitted(settings.Levels))
-            .ToArray();
-
-        if(splittable.Length == 0) {
-            _errorsService.AddError(new ErrorModel(null,
-                _localization.GetLocalizedString("Error.NoElementsToSplit")));
-        }
-
-        using(var t = _revitRepository.Document.StartTransaction(
-            _localization.GetLocalizedString("MainWindow.TransactionName"))) {
-
-            if(settings.ConnectorRoundSymbol is { IsActive: false } r) {
-                r.Activate();
-            }
-            if(settings.ConnectorRectangleSymbol is { IsActive: false } rect) {
-                rect.Activate();
-            }
-            _revitRepository.Document.Regenerate();
-
+        using(var tGroup = _revitRepository.Document.StartTransactionGroup(
+                  _localization.GetLocalizedString("MainWindow.TransactionName"))) {
             foreach(var item in splittable) {
+                using var t = _revitRepository.Document.StartTransaction("item");
                 try {
                     var result = item.Split(settings);
                     result.UpdateSegments();
-                } catch(Autodesk.Revit.Exceptions.ApplicationException) {
+                    t.Commit();
+                } catch(CannotGetConnectorSymbolException) {
                     _errorsService.AddError(item.Element, "Error.InsufficientSpace");
-                } catch(InvalidOperationException) {
-                    _errorsService.AddError(item.Element, "Error.SplitFailed");
+                    t.RollBack();
+                } catch(CannotCreateConnectorException) {
+                    _errorsService.AddError(item.Element, "Error.CannotCreateConnector");
+                    t.RollBack();
                 }
             }
 
-            t.Commit();
+            tGroup.Assimilate();
         }
-
         ShowErrors();
     }
 
@@ -232,12 +239,13 @@ internal class MainViewModel : BaseViewModel {
             return false;
         }
         if(SelectionMode is null) {
-            ErrorText = _localization.GetLocalizedString("MainWindow.Validation.NoProvider");
+            ErrorText = _localization.GetLocalizedString("MainWindow.Validation.NoSelectionMode");
             return false;
         }
-        var connectorError = ElementsProvider.GetErrorText();
-        if(!string.IsNullOrEmpty(connectorError)) {
-            ErrorText = connectorError;
+
+        string providerError = ElementsProvider.GetErrorText();
+        if(!string.IsNullOrWhiteSpace(providerError)) {
+            ErrorText = providerError;
             return false;
         }
         if(!Levels.Any(l => l.IsSelected)) {
@@ -283,7 +291,7 @@ internal class MainViewModel : BaseViewModel {
             ElementsProviderViewModel vm = p switch {
                 PipesProvider pp => new PipesProviderViewModel(_localization, pp, _revitRepository),
                 DuctsProvider dp => new DuctsProviderViewModel(_localization, dp, _revitRepository),
-                _ => throw new InvalidOperationException($"Unknown provider type: {p.GetType()}")
+                _ => throw new InvalidOperationException()
             };
             vms.Add(vm);
         }

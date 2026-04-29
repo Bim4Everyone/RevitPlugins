@@ -21,7 +21,10 @@
     <Window.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
-                <ResourceDictionary Source="Templates/ProvidersTemplates.xaml" />
+                <ResourceDictionary
+                    Source="Templates/ProvidersTemplates.xaml" />
+                <ResourceDictionary
+                    Source="../assets/Styles/CustomStyles.xaml" />
             </ResourceDictionary.MergedDictionaries>
         </ResourceDictionary>
     </Window.Resources>
@@ -47,12 +50,10 @@
             <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
 
-        <!-- Row 0: TitleBar -->
         <ui:TitleBar
             Grid.Row="0"
             Title="{me:LocalizationSource MainWindow.Title}" />
 
-        <!-- Row 1: Category + SelectionMode -->
         <Grid
             Grid.Row="1"
             Margin="14,8">
@@ -98,13 +99,11 @@
                 SelectedItem="{Binding ElementsProvider}" />
         </Grid>
 
-        <!-- Row 2: Connector selector (DataTemplate polymorphism) -->
         <ContentControl
             Grid.Row="2"
             Margin="14,0"
             Content="{Binding ElementsProvider}" />
 
-        <!-- Row 3: Levels list -->
         <DockPanel
             Grid.Row="3"
             Margin="14,8">
@@ -118,26 +117,24 @@
                 Content="{me:LocalizationSource MainWindow.SelectAll}"
                 IsChecked="{Binding SelectAllLevels}" />
             <ui:ListView
+                ToolTip="{me:LocalizationSource MainWindow.Levels.ElevationTooltip}"
                 ItemsSource="{Binding Levels}">
                 <ui:ListView.ItemTemplate>
                     <DataTemplate>
                         <CheckBox
                             IsChecked="{Binding IsSelected, Mode=TwoWay}"
-                            Content="{Binding DisplayName}"
-                            ToolTip="{Binding ElevationTooltip}" />
+                            Content="{Binding DisplayName}" />
                     </DataTemplate>
                 </ui:ListView.ItemTemplate>
             </ui:ListView>
         </DockPanel>
 
-        <!-- Row 4: Show errors checkbox -->
         <CheckBox
             Grid.Row="4"
             Margin="14,4"
             Content="{me:LocalizationSource MainWindow.ShowSplitErrors}"
             IsChecked="{Binding ShowPlacingErrors}" />
 
-        <!-- Row 5: Buttons -->
         <StackPanel
             Grid.Row="5"
             Orientation="Horizontal"
@@ -146,13 +143,12 @@
 
             <ui:TextBlock
                 Margin="10,0"
-                Foreground="Orange"
-                VerticalAlignment="Center"
+                Style="{StaticResource CustomErrorText}"
                 Text="{Binding ErrorText}" />
 
             <ui:Button
                 Margin="4,0"
-                Width="100"
+                Width="80"
                 Appearance="Info"
                 Content="{me:LocalizationSource MainWindow.ButtonOk}"
                 Click="ButtonOk_Click"

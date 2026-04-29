@@ -13,12 +13,11 @@ internal class ErrorViewModel : BaseViewModel {
 
     public ErrorViewModel(ErrorModel error) {
         _error = error ?? throw new ArgumentNullException(nameof(error));
-        ElementName = _error.Element?.Name ?? "—";
     }
 
     public string Message => _error.Message;
 
-    public string ElementName { get; }
+    public string ElementName => _error.Element.Name;
 
-    public MEPCurve Element => _error.Element;
+    public Element Element => _error.Element;
 }

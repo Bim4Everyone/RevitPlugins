@@ -1,4 +1,5 @@
 using System.Globalization;
+using System.Linq;
 using System.Reflection;
 using System.Windows;
 
@@ -52,9 +53,12 @@ public class RevitSplitMepCurveCommand : BasePluginCommand {
         var messageBox = kernel.Get<IMessageBoxService>();
         var repository = kernel.Get<RevitRepository>();
 
-        if(repository.GetDuplicateElevationLevels().Count > 0) {
+        var levelDubles = repository.GetDuplicateLevels().FirstOrDefault(g => g.Count > 1);
+        if(levelDubles is not null) {
             messageBox.Show(
-                localization.GetLocalizedString("Error.DuplicateLevels"),
+                localization.GetLocalizedString(
+                    "Error.DuplicateLevels",
+                    string.Join("\n", levelDubles.Select(l => l.Name))),
                 localization.GetLocalizedString("MainWindow.Title"),
                 MessageBoxButton.OK,
                 MessageBoxImage.Warning);

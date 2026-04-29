@@ -11,20 +11,20 @@ namespace RevitSplitMepCurve.Models.Splittable;
 internal class SplitResult {
     public SplitResult(
         MEPCurve original,
-        IList<MEPCurve> newSegments,
-        IList<FamilyInstance> insertedConnectors,
+        ICollection<MEPCurve> newSegments,
+        ICollection<FamilyInstance> insertedConnectors,
         ICollection<DisplacementElement> displacementElements) {
         Original = original ?? throw new ArgumentNullException(nameof(original));
-        NewSegments = newSegments ?? Array.Empty<MEPCurve>();
-        InsertedConnectors = insertedConnectors ?? Array.Empty<FamilyInstance>();
-        DisplacementElements = displacementElements ?? Array.Empty<DisplacementElement>();
+        NewSegments = newSegments ?? [];
+        InsertedConnectors = insertedConnectors ?? [];
+        DisplacementElements = displacementElements ?? [];
     }
 
     public MEPCurve Original { get; }
 
-    public IList<MEPCurve> NewSegments { get; }
+    public ICollection<MEPCurve> NewSegments { get; }
 
-    public IList<FamilyInstance> InsertedConnectors { get; }
+    public ICollection<FamilyInstance> InsertedConnectors { get; }
 
     public ICollection<DisplacementElement> DisplacementElements { get; }
 
@@ -33,59 +33,35 @@ internal class SplitResult {
     /// добавляет их во все DisplacementElement, в которые входил Original.
     /// </summary>
     public void UpdateSegments() {
-        var doc = Original.Document;
         var sourceWorksetId = Original.WorksetId;
+        Element[] newEls = [..NewSegments, .. InsertedConnectors];
 
-        var allNew = NewSegments.Cast<Element>()
-            .Concat(InsertedConnectors.Cast<Element>())
-            .ToArray();
-
-        foreach(var element in allNew) {
-            SetWorksetId(doc, element, sourceWorksetId);
+        foreach(var element in newEls) {
+            SetWorksetId(element, sourceWorksetId);
         }
-
-        if(DisplacementElements.Count == 0) {
-            return;
-        }
-
-        var newIds = allNew.Select(e => e.Id).ToList();
 
         foreach(var de in DisplacementElements) {
-            UpdateDisplacementElement(doc, de, newIds);
+            UpdateDisplacementElement(de, newEls);
         }
     }
 
-    private static void SetWorksetId(Document doc, Element element, WorksetId worksetId) {
-        if(!doc.IsWorkshared) {
+    private void SetWorksetId(Element element, WorksetId worksetId) {
+        if(!element.Document.IsWorkshared) {
             return;
         }
-        try {
-            element.SetParamValue(BuiltInParameter.ELEM_PARTITION_PARAM, worksetId.IntegerValue);
-        } catch {
-            // Non-fatal
-        }
+
+        element.SetParamValue(BuiltInParameter.ELEM_PARTITION_PARAM, worksetId.IntegerValue);
     }
 
-    private static void UpdateDisplacementElement(
-        Document doc, DisplacementElement de, IList<ElementId> newIds) {
-        try {
-            var existingIds = de.GetDisplacedElementIds().ToList();
-            var mergedIds = existingIds.Concat(newIds).Distinct().ToList();
-            de.SetDisplacedElementIds(mergedIds);
-        } catch {
-            try {
-                var displacement = de.GetRelativeDisplacement();
-                var view = doc.GetElement(de.OwnerViewId) as View;
-                if(view is null) {
-                    return;
-                }
-                var existingIds = de.GetDisplacedElementIds().ToList();
-                var mergedIds = existingIds.Concat(newIds).Distinct().ToList();
-                DisplacementElement.Create(doc, mergedIds, displacement, view, null);
-                doc.Delete(de.Id);
-            } catch {
-                // Non-fatal
-            }
-        }
+    private void UpdateDisplacementElement(DisplacementElement de, ICollection<Element> newEls) {
+        var view = (View) de.Document.GetElement(de.OwnerViewId);
+        HashSet<ElementId> ids = [
+            ..de.GetDisplacedElementIds(),
+            ..newEls.Where(el => DisplacementElement.IsAllowedAsDisplacedElement(el)
+                                 && !DisplacementElement.IsElementDisplacedInView(view, el.Id))
+                .Select(el => el.Id)
+        ];
+
+        de.SetDisplacedElementIds(ids);
     }
 }

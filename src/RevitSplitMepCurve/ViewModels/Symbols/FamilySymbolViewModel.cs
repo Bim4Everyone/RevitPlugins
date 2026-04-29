@@ -18,13 +18,22 @@ internal class FamilySymbolViewModel : BaseViewModel, IEquatable<FamilySymbolVie
     public FamilySymbol Symbol { get; }
 
     public bool Equals(FamilySymbolViewModel other) {
-        if(other is null) { return false; }
-        if(ReferenceEquals(this, other)) { return true; }
+        if(other is null) {
+            return false;
+        }
+
+        if(ReferenceEquals(this, other)) {
+            return true;
+        }
+
         return Symbol.Id == other.Symbol.Id;
     }
 
-    public override bool Equals(object obj) => Equals(obj as FamilySymbolViewModel);
+    public override bool Equals(object obj) {
+        return Equals(obj as FamilySymbolViewModel);
+    }
 
-    public override int GetHashCode() =>
-        EqualityComparer<ElementId>.Default.GetHashCode(Symbol.Id);
+    public override int GetHashCode() {
+        return EqualityComparer<ElementId>.Default.GetHashCode(Symbol.Id);
+    }
 }

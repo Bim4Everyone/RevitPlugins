@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.Linq;
+using System;
 
 using Autodesk.Revit.DB;
 
@@ -19,17 +20,18 @@ internal class DuctsProviderViewModel : ElementsProviderViewModel {
         DuctsProvider provider,
         RevitRepository revitRepository) : base(localization, provider) {
         var symbols = revitRepository
-            .GetConnectorSymbols(MepClass.Ducts)
+            .GetConnectorSymbols(BuiltInCategory.OST_DuctCurves)
             .Select(s => new FamilySymbolViewModel(s))
             .ToArray();
         RoundSymbol = new SelectableFamilySymbolViewModel(
             localization.GetLocalizedString("MainWindow.ConnectorRound"), symbols);
         RectangleSymbol = new SelectableFamilySymbolViewModel(
             localization.GetLocalizedString("MainWindow.ConnectorRectangle"), symbols);
+        Name = _localization.GetLocalizedString(
+            $"{nameof(RevitSplitMepCurve.Models.Enums.MepClass)}.{provider.MepClass}");
     }
 
-    public override string Name =>
-        _localization.GetLocalizedString("MainWindow.MepClass.Ducts");
+    public override string Name { get; }
 
     public override MepClass MepClass => MepClass.Ducts;
 
@@ -45,9 +47,13 @@ internal class DuctsProviderViewModel : ElementsProviderViewModel {
     }
 
     public override ISplitSettings GetSplitSettings(ICollection<Level> levels) {
+        if(RoundSymbol.SelectedItem is null
+           || RectangleSymbol.SelectedItem is null) {
+            throw new InvalidOperationException();
+        }
         return new SplitSettings(
-            RoundSymbol.SelectedItem?.Symbol,
-            RectangleSymbol.SelectedItem?.Symbol,
+            RoundSymbol.SelectedItem.Symbol,
+            RectangleSymbol.SelectedItem.Symbol,
             levels);
     }
 }
