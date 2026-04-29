@@ -3,6 +3,7 @@ using System.Linq;
 
 using Autodesk.Revit.DB;
 
+using Bim4Everyone.RevitFiltration;
 using Bim4Everyone.RevitFiltration.Controls;
 
 using dosymep.Revit;
@@ -13,27 +14,32 @@ namespace RevitMarkAllDocuments.Services;
 
 internal class FiltrationService {
     private readonly bool _isMarkForTypes;
+    private readonly Category _category;
+    private readonly DocumentService _docService;
+    private readonly ILogicalFilter _logicalFilter;
     private readonly FilterOptions _filterOptions;
 
-    public FiltrationService(bool isMarkForTypes) {
+    public FiltrationService(bool isMarkForTypes, 
+                             Category category,
+                             DocumentService docService,
+                             ILogicalFilterContext logicalFilterContext) {
         _isMarkForTypes = isMarkForTypes;
+        _category = category;
         _filterOptions = new FilterOptions() { Tolerance = 0 };
+        _docService = docService;
+        _logicalFilter = logicalFilterContext.GetFilter();
     }
 
-    public MarkData FilterElements(MarkData markData, 
-                                   Category category,
-                                   IReadOnlyList<Document> documents,
-                                   DocumentService docService, 
-                                   ILogicalFilterProvider filterProvider) {
+    public MarkData FilterElements(MarkData markData, IReadOnlyList<Document> documents) {
         foreach(var document in documents) {
             var marksByDocument = new MarkDataByDocument() {
-                DocumentName = docService.GetDocumentFullName(document)
+                DocumentName = _docService.GetDocumentFullName(document)
             };
 
-            var filter = filterProvider.GetFilter().GetFilter().Build(document, _filterOptions);
+            var filter = _logicalFilter.Build(document, _filterOptions);
 
             var elements = new FilteredElementCollector(document)
-                .OfCategory(category.GetBuiltInCategory())
+                .OfCategory(_category.GetBuiltInCategory())
                 .WhereElementIsNotElementType()
                 .WherePasses(filter)
                 .ToElements();
