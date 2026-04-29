@@ -178,7 +178,7 @@
                         Grid.Row="4"
                         Grid.Column="0"
                         Style="{StaticResource PropertyName}"
-                        Text="{me:LocalizationSource DeclarationPage.CalculateUtp}"/>
+                        Text="{me:LocalizationSource DeclarationPage.CalculateExtraApartProps}"/>
                     <StackPanel
                         Grid.Row="4"
                         Grid.Column="1"
