@@ -4,18 +4,22 @@ using System.Linq;
 using System.Windows.Input;
 
 using Autodesk.Revit.DB;
+using Autodesk.Revit.DB.Architecture;
+using Autodesk.Revit.UI.Selection;
 
 using dosymep.Revit;
 using dosymep.WPF.Commands;
 using dosymep.WPF.ViewModels;
 
 using RevitRemoveRoomTags.Models;
+using RevitRemoveRoomTags.Views;
 
 namespace RevitRemoveRoomTags.ViewModels;
 internal class MainViewModel : BaseViewModel {
     private readonly PluginConfig _pluginConfig;
     private readonly RevitRepository _revitRepository;
 
+    private MainWindow _userWindow;
     private ObservableCollection<View> _selectedViews = [];
     private ObservableCollection<RoomTagTaskHelper> _roomTagTasks = [new RoomTagTaskHelper()];
     private RoomTagTaskHelper _selectedRoomTagTask;
@@ -29,13 +33,13 @@ internal class MainViewModel : BaseViewModel {
         _pluginConfig = pluginConfig;
         _revitRepository = revitRepository;
 
-        LoadViewCommand = RelayCommand.Create(LoadView);
+        LoadViewCommand = RelayCommand.Create<MainWindow>(LoadView);
         AcceptViewCommand = RelayCommand.Create(AcceptView, CanAcceptView);
 
         AddTaskCommand = RelayCommand.Create(AddTask);
         DeleteTaskCommand = RelayCommand.Create(DeleteTask, CanDeleteTask);
 
-        SelectRoomTagsCommand = new RelayCommand(SelectRoomTags);
+        SelectRoomTagsCommand = new RelayCommand<RoomTagTaskHelper>(SelectRoomTags);
     }
 
     public ICommand LoadViewCommand { get; }
@@ -45,6 +49,11 @@ internal class MainViewModel : BaseViewModel {
     public ICommand DeleteTaskCommand { get; }
     public ICommand SelectRoomTagsCommand { get; }
 
+
+    public MainWindow UserWindow {
+        get => _userWindow;
+        set => RaiseAndSetIfChanged(ref _userWindow, value);
+    }
 
     public ObservableCollection<View> SelectedViews {
         get => _selectedViews;
@@ -81,8 +90,8 @@ internal class MainViewModel : BaseViewModel {
     /// <summary>
     /// Метод, отрабатывающий при загрузке окна
     /// </summary>
-    private void LoadView() {
-
+    private void LoadView(MainWindow window) {
+        UserWindow = window;
         LoadConfig();
         GetSelectedViews();
     }
@@ -167,27 +176,25 @@ internal class MainViewModel : BaseViewModel {
     /// Метод команды по выбору марок помещений для конкретной задачи RoomTagTaskHelper, которая передается через CommandParameter
     /// </summary>
     private void SelectRoomTags(object obj) {
-        //if(obj is RoomTagTaskHelper task) {
-        //    task.RoomTags.Clear();
+        UserWindow.Hide();
 
-        //    ISelectionFilter selectFilter = new RoomTagSelectionFilter();
-        //    var references = _revitRepository.ActiveUIDocument.Selection
-        //                    .PickObjects(ObjectType.Element, selectFilter, "Выберите марки помещений на виде");
+        if(obj is RoomTagTaskHelper task) {
+            task.RoomTags.Clear();
 
-        //    foreach(var reference in references) {
-        //        if(_revitRepository.Document.GetElement(reference) is not RoomTag elem) {
-        //            continue;
-        //        }
+            ISelectionFilter selectFilter = new RoomTagSelectionFilter();
+            var references = _revitRepository.ActiveUIDocument.Selection
+                            .PickObjects(ObjectType.Element, selectFilter, "Выберите марки помещений на виде");
 
-        //        task.RoomTags.Add(elem);
-        //    }
-        //}
+            foreach(var reference in references) {
+                if(_revitRepository.Document.GetElement(reference) is not RoomTag elem) {
+                    continue;
+                }
 
-        //// Переоткрываем окно плагина
-        //var mainWindow = new MainWindow {
-        //    DataContext = this
-        //};
-        //_ = mainWindow.ShowDialog();
+                task.RoomTags.Add(elem);
+            }
+        }
+
+        UserWindow.ShowDialog();
     }
 
 

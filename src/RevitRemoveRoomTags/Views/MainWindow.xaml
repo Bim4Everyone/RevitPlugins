@@ -27,7 +27,8 @@
         <i:EventTrigger
             EventName="Loaded">
             <i:InvokeCommandAction
-                Command="{Binding LoadViewCommand}" />
+                Command="{Binding LoadViewCommand}"
+                CommandParameter="{Binding RelativeSource={RelativeSource AncestorType={x:Type Window}}}" />
         </i:EventTrigger>
     </i:Interaction.Triggers>
 
