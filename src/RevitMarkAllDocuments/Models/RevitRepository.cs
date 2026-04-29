@@ -9,14 +9,18 @@ using Autodesk.Revit.UI;
 using dosymep.Bim4Everyone;
 using dosymep.Bim4Everyone.ProjectParams;
 using dosymep.Bim4Everyone.SharedParams;
+using dosymep.Bim4Everyone.SimpleServices;
 using dosymep.Bim4Everyone.SystemParams;
 using dosymep.Revit;
 
 namespace RevitMarkAllDocuments.Models;
 
 internal class RevitRepository {
-    public RevitRepository(UIApplication uiApplication) {
+    private readonly IRevitParamFactory _revitParamFactory;
+    
+    public RevitRepository(UIApplication uiApplication, IRevitParamFactory revitParamFactory) {
         UIApplication = uiApplication;
+        _revitParamFactory = revitParamFactory;
     }
 
     public UIApplication UIApplication { get; }
@@ -78,7 +82,7 @@ internal class RevitRepository {
     private ICollection<RevitParam> GetParams(Category category) {
         return [.. ParameterFilterUtilities
             .GetFilterableParametersInCommon(Document, [category.Id])
-            .Select(GetFilterableParam)
+            .Select(x => _revitParamFactory.Create(Document, x))
             .Where(p => p != null)];
     }
 
@@ -87,29 +91,5 @@ internal class RevitRepository {
             .OfCategory(category.GetBuiltInCategory())
             .WhereElementIsElementType()
             .ToElements();
-    }
-
-    private RevitParam GetFilterableParam(ElementId paramId) {
-        try {
-            if(paramId.IsSystemId()) {
-                return SystemParamsConfig.Instance.CreateRevitParam(
-                        Document,
-                        (BuiltInParameter) paramId.GetIdValue());
-            }
-
-            var element = Document.GetElement(paramId);
-            if(element is SharedParameterElement sharedParameterElement) {
-                return SharedParamsConfig.Instance.CreateRevitParam(
-                        Document,
-                        sharedParameterElement.Name);
-            }
-
-            if(element is ParameterElement parameterElement) {
-                return ProjectParamsConfig.Instance.CreateRevitParam(Document, parameterElement.Name);
-            }
-            return null;
-        } catch(Exception) {
-            return null;
-        }
     }
 }
