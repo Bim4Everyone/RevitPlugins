@@ -9,6 +9,7 @@ internal interface ITableInfo {
     int SummerRoomsStart { get; }
     int OtherRoomsStart { get; }
     int UtpStart { get; }
+    int ExtraApartPropsStart { get; }
     int[] NumericColumnsIndexes { get; }
     int[] AreaTypeColumnsIndexes { get; }
     int[] LengthTypeColumnsIndexes { get; }

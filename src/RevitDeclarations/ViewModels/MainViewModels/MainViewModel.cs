@@ -137,6 +137,7 @@ internal abstract class MainViewModel : BaseViewModel {
         _settings.PrioritiesConfig = _prioritiesViewModel.PrioritiesConfig;
 
         _settings.LoadUtp = _declarationViewModel.LoadUtp;
+        _settings.LoadExtraApartProps = _declarationViewModel.LoadExtraApartProps;
 
         _settings.FilterRoomsParam = _parametersViewModel.SelectedFilterRoomsParam;
         _settings.FilterRoomsValues = _parametersViewModel.FilterRoomsValues.Select(x => x.Value).ToArray();

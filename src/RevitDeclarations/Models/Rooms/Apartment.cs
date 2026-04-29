@@ -84,6 +84,10 @@ internal class Apartment : RoomGroup {
     public string UtpBalconyWithGlazing { get; private set; }
     [JsonIgnore]
     public string UtpBalconyWithoutGlazing { get; private set; }
+    [JsonIgnore]
+    public string ExtraPropSummerRoomsList { get; private set; }
+    [JsonIgnore]
+    public string ExtraPropSummerRoomsFloorDiff { get; private set; }
 
     // Рассчитывает площади квартир на основе актуальных системных площадей помещений
     public void CalculateRevitAreas() {
@@ -190,5 +194,10 @@ internal class Apartment : RoomGroup {
 
         UtpBalconyWithGlazing = calculator.CalculateBalconyWithGlazing(this);
         UtpBalconyWithoutGlazing = calculator.CalculateBalconyWithoutGlazing(this);
+    }
+
+    public void CalculateExtraApartProps(ExtraApartPropsCalculator calculator) {
+        ExtraPropSummerRoomsList = calculator.CalculateSummerRoomsList(this);
+        ExtraPropSummerRoomsFloorDiff = calculator.CalculateSummerRoomsFloorDiff(this);
     }
 }
