@@ -17,8 +17,7 @@ internal class JsonSerializerService {
         string serializedData = _serializationService.Serialize(markData);
         filePath = Path.ChangeExtension(filePath, "json");
 
-        using var file = File.CreateText(filePath);
-        file.Write(serializedData);
+        File.WriteAllText(filePath, serializedData);
     }
 
     public MarkData ImportMarkData(string filePath) {
