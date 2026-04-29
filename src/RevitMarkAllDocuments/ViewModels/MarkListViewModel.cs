@@ -63,7 +63,7 @@ internal class MarkListViewModel : BaseViewModel {
         using(Transaction t = _document.StartTransaction(transactionName)) {
             foreach(var element in MarkedElements) {
                 var mark = element.MarkedElement;
-                var revitElement = _document.GetElement(new ElementId(mark.Id));
+                var revitElement = _document.GetElement(mark.Id);
 
                 if(storageType == StorageType.String) {
                     revitElement.SetParamValue(_markParam, mark.MarkValue);

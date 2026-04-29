@@ -20,7 +20,7 @@ internal class MarkedElementViewModel : BaseViewModel{
         _element = element;
         _markValue = element.MarkValue;
 
-        var revitElement = document.GetElement(new ElementId(element.Id));
+        var revitElement = document.GetElement(element.Id);
         if(revitElement != null) {
             _name = revitElement.Name;
             _status = "";
