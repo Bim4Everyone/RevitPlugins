@@ -4,8 +4,7 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-    xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
-
+    
     xmlns:base="clr-namespace:dosymep.WPF.Views"
     xmlns:local="clr-namespace:RevitRemoveRoomTags.Views"
     xmlns:vms="clr-namespace:RevitRemoveRoomTags.ViewModels"
@@ -13,20 +12,22 @@
     xmlns:core="clr-namespace:dosymep.WpfUI.Core"
     xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
     xmlns:me="clr-namespace:dosymep.WpfCore.MarkupExtensions;assembly=dosymep.WpfCore"
-
+    xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
+    
     mc:Ignorable="d"
     WindowStartupLocation="CenterOwner"
     
-    Title="MainWindow"
-    MinHeight="450" MinWidth="765"
-    Height="450" Width="765"
+    MinHeight="450"
+    MinWidth="765"
+    Height="450"
+    Width="765"
     
     Validation.Error="Window_Error"
-    
     d:DataContext="{d:DesignInstance vms:MainViewModel, IsDesignTimeCreatable=False}">
 
     <i:Interaction.Triggers>
-        <i:EventTrigger EventName="Loaded">
+        <i:EventTrigger
+            EventName="Loaded">
             <i:InvokeCommandAction
                 Command="{Binding LoadViewCommand}" />
         </i:EventTrigger>
@@ -35,21 +36,43 @@
     <Window.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
-                <ResourceDictionary Source="Resources/MainResources.xaml"/>
-                <ResourceDictionary Source="Resources/ToolTipResources.xaml"/>
-                <ResourceDictionary Source="CustomStyles.xaml" />
+                <ResourceDictionary
+                    Source="Resources/MainResources.xaml" />
+                <ResourceDictionary
+                    Source="Resources/ToolTipResources.xaml" />
+                <ResourceDictionary
+                    Source="CustomStyles.xaml" />
             </ResourceDictionary.MergedDictionaries>
+
+            <ui:TextBlock
+                x:Key="SelectButtonContent"
+                Text="{me:LocalizationSource MainWindow.SelectButton}" />
+            <ui:TextBlock
+                x:Key="SelectTagsColumnHeader"
+                Text="{me:LocalizationSource MainWindow.SelectTagsColumn}" />
+            <ui:TextBlock
+                x:Key="SelectedCountColumnHeader"
+                Text="{me:LocalizationSource MainWindow.SelectedCountColumn}" />
+            <ui:TextBlock
+                x:Key="XOffsetColumnHeader"
+                Text="{me:LocalizationSource MainWindow.XOffsetColumn}" />
+            <ui:TextBlock
+                x:Key="YOffsetColumnHeader"
+                Text="{me:LocalizationSource MainWindow.YOffsetColumn}" />
+            <ui:TextBlock
+                x:Key="DeleteColumnHeader"
+                Text="{me:LocalizationSource MainWindow.DeleteColumn}" />
         </ResourceDictionary>
     </Window.Resources>
 
     <Grid>
         <Grid.RowDefinitions>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="*"/>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
 
         <ui:TitleBar
@@ -62,7 +85,7 @@
                 DockPanel.Dock="Left"
                 Margin="10 5 5 5"
                 VerticalAlignment="Center"
-                Text="Выбрано видов до запуска плагина: " />
+                Text="{me:LocalizationSource MainWindow.SelectedViewsPrefix}" />
 
             <ui:TextBlock
                 DockPanel.Dock="Left"
@@ -74,11 +97,12 @@
                 DockPanel.Dock="Left"
                 Margin="100 5 5 5"
                 VerticalContentAlignment="Center"
-                Content="Открыть выбранные виды"
-                IsChecked="{Binding Path=NeedOpenSelectedViews}"/>
+                Content="{me:LocalizationSource MainWindow.OpenSelectedViews}"
+                IsChecked="{Binding Path=NeedOpenSelectedViews}" />
 
-            <Grid DockPanel.Dock="Right">
-                <Rectangle 
+            <Grid
+                DockPanel.Dock="Right">
+                <Rectangle
                     HorizontalAlignment="Right"
                     Margin="10"
                     Fill="WhiteSmoke"
@@ -86,15 +110,17 @@
                     Width="20"
                     Height="20"
                     RadiusX="8"
-                    RadiusY="8"/>
+                    RadiusY="8" />
                 <ui:TextBlock
                     HorizontalAlignment="Right"
                     Margin="10 10 18.5 10"
                     VerticalAlignment="Center"
                     FontSize="16"
-                    Text="i" FontFamily="Arial">
+                    Text="i"
+                    FontFamily="Arial">
                     <ui:TextBlock.ToolTip>
-                        <StaticResource ResourceKey="TextBlockToolTip" />
+                        <StaticResource
+                            ResourceKey="TextBlockToolTip" />
                     </ui:TextBlock.ToolTip>
                 </ui:TextBlock>
             </Grid>
@@ -104,7 +130,7 @@
             Grid.Row="2"
             Margin="10 5 5 5"
             VerticalAlignment="Center"
-            Text="Задачи для работы: " />
+            Text="{me:LocalizationSource MainWindow.TasksLabel}" />
 
         <ui:DataGrid
             Grid.Row="3"
@@ -122,12 +148,15 @@
                 <!-- Колонка с кнопкой выбора марок -->
                 <DataGridTemplateColumn
                     Width="180"
-                    Header="Выбор марок">
+                    MinWidth="180"
+                    Header="{StaticResource SelectTagsColumnHeader}">
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate>
                             <Button
-                                Width="155"
-                                Content="Выбрать"
+                                Margin="5"
+                                HorizontalAlignment="Stretch"
+                                VerticalContentAlignment="Center"
+                                Content="{StaticResource SelectButtonContent}"
                                 Command="{Binding 
                                     Path=DataContext.SelectRoomTagsCommand, 
                                     RelativeSource={RelativeSource AncestorType={x:Type Window}}}"
@@ -138,8 +167,9 @@
 
                 <!-- Колонка с количеством выбранных марок -->
                 <DataGridTemplateColumn
-                    Width="80"
-                    Header="Выбрано:">
+                    Width="90"
+                    MinWidth="90"
+                    Header="{StaticResource SelectedCountColumnHeader}">
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate>
                             <TextBlock
@@ -153,7 +183,8 @@
                 <!-- Колонка для смещения по X -->
                 <DataGridTemplateColumn
                     Width="180"
-                    Header="Смещение по X">
+                    MinWidth="180"
+                    Header="{StaticResource XOffsetColumnHeader}">
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate>
                             <TextBox
@@ -173,7 +204,8 @@
                 <!-- Колонка для смещения по Y -->
                 <DataGridTemplateColumn
                     Width="180"
-                    Header="Смещение по Y">
+                    MinWidth="180"
+                    Header="{StaticResource YOffsetColumnHeader}">
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate>
                             <TextBox
@@ -193,7 +225,8 @@
                 <!-- Колонка с чекбоксом удаления -->
                 <DataGridTemplateColumn
                     Width="80"
-                    Header="Удалять?">
+                    MinWidth="80"
+                    Header="{StaticResource DeleteColumnHeader}">
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate>
                             <CheckBox
@@ -214,18 +247,17 @@
             <ui:Button
                 Margin="10 0 10 20"
                 Width="150"
-                ToolTip="Добавить пустую задачу в список задач"
-                Content="Добавить задачу"
-                Command="{Binding Path=AddTaskCommand}"/>
+                ToolTip="{me:LocalizationSource MainWindow.AddTaskToolTip}"
+                Content="{me:LocalizationSource MainWindow.AddTaskButton}"
+                Command="{Binding Path=AddTaskCommand}" />
 
             <ui:Button
                 Margin="10 0 10 20"
                 Width="150"
-                ToolTip="Удалить выбранную задачу в списке задач"
-                Content="Удалить задачу"
-                Command="{Binding Path=DeleteTaskCommand}"/>
+                ToolTip="{me:LocalizationSource MainWindow.DeleteTaskToolTip}"
+                Content="{me:LocalizationSource MainWindow.DeleteTaskButton}"
+                Command="{Binding Path=DeleteTaskCommand}" />
         </StackPanel>
-
 
         <StackPanel
             Grid.Row="5"
@@ -235,20 +267,20 @@
                 Margin="10"
                 Foreground="Orange"
                 VerticalAlignment="Center"
-                Text="{Binding ErrorText}"/>
+                Text="{Binding ErrorText}" />
 
             <ui:Button
                 Margin="10"
                 Width="80"
-                Content="ОК"
+                Content="{me:LocalizationSource MainWindow.ButtonOk}"
                 Click="ButtonOk_Click"
                 Appearance="Info"
-                Command="{Binding Path=AcceptViewCommand}"/>
+                Command="{Binding Path=AcceptViewCommand}" />
 
             <ui:Button
                 Margin="10"
                 Width="80"
-                Content="Отмена"
+                Content="{me:LocalizationSource MainWindow.ButtonCancel}"
                 Click="ButtonCancel_Click">
             </ui:Button>
         </StackPanel>
