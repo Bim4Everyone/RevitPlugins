@@ -1,0 +1,107 @@
+﻿<core:WpfUIPlatformPage
+    x:Class="RevitMarkAllDocuments.Views.SortPage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:vms="clr-namespace:RevitMarkAllDocuments.ViewModels"
+    xmlns:me="clr-namespace:dosymep.WpfCore.MarkupExtensions;assembly=dosymep.WpfCore"
+    xmlns:core="clr-namespace:dosymep.WpfUI.Core"
+    xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
+    
+    ScrollViewer.CanContentScroll="False"
+    
+    x:ClassModifier="internal">
+
+    <core:WpfUIPlatformPage.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary
+                    Source="../Styles/Styles.xaml" />
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
+    </core:WpfUIPlatformPage.Resources>
+
+    <Grid Margin="14">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition />
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition />
+            <ColumnDefinition Width="Auto"/>
+            <ColumnDefinition />
+        </Grid.ColumnDefinitions>
+        
+        <TextBlock
+            Grid.Row="0"
+            Grid.Column="0"
+            Grid.ColumnSpan="3"
+            Margin="4,0,0,8"
+            Style="{StaticResource HeaderName}"
+            Text="{me:LocalizationSource SortPage.SelectParams}" />
+        
+        <Border
+            Grid.Row="1"
+            Grid.Column="0"
+            Style="{StaticResource CustomBorder}">
+            <ListBox
+                ItemsSource="{Binding SelectableParams}"
+                SelectedItem="{Binding SelectedParamFromSelectable}">
+                <ListBox.ItemTemplate>
+                    <DataTemplate>
+                        <TextBlock
+                            Text="{Binding Name}" />
+                    </DataTemplate>
+                </ListBox.ItemTemplate>
+            </ListBox>
+        </Border>
+
+        <Border
+            Grid.Row="1"
+            Grid.Column="2"
+            Style="{StaticResource CustomBorder}">
+            <ListBox
+                ItemsSource="{Binding SelectedParams}"
+                SelectedItem="{Binding SelectedParamFromSelected}">
+                <ListBox.ItemTemplate>
+                    <DataTemplate>
+                        <TextBlock
+                            Text="{Binding Name}" />
+                    </DataTemplate>
+                </ListBox.ItemTemplate>
+            </ListBox>
+        </Border>
+
+        <StackPanel
+            Grid.Row="1"
+            Grid.Column="1"
+            Margin="4,0">
+            <ui:Button 
+                Height="50"
+                Margin="0,0,0,8"
+                Content="⯈"
+                Command="{Binding AddParamCommand}"/>
+            <ui:Button 
+                Height="50"
+                Content="⯇"
+                Command="{Binding RemoveParamCommand}"/>
+        </StackPanel>
+
+        <UniformGrid
+            Grid.Row="2"
+            Grid.Column="2">
+            <ui:Button
+                Margin="4"
+                HorizontalAlignment="Stretch"
+                Content="▲"
+                Command="{Binding MoveUpParamCommand}" />
+            <ui:Button
+                Margin="4"
+                HorizontalAlignment="Stretch"
+                Content="▼"
+                Command="{Binding MoveDownParamCommand}" />
+        </UniformGrid>
+    </Grid>
+</core:WpfUIPlatformPage>

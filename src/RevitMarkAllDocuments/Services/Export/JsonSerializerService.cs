@@ -1,0 +1,27 @@
+using System.IO;
+
+using dosymep.SimpleServices;
+
+using RevitMarkAllDocuments.Models;
+
+namespace RevitMarkAllDocuments.Services.Export;
+
+internal class JsonSerializerService {
+    private readonly ISerializationService _serializationService;
+
+    public JsonSerializerService(ISerializationService serializationService) {
+        _serializationService = serializationService;
+    }
+
+    public void ExportMarkData(string filePath, MarkData markData) {
+        string serializedData = _serializationService.Serialize(markData);
+        filePath = Path.ChangeExtension(filePath, "json");
+
+        File.WriteAllText(filePath, serializedData);
+    }
+
+    public MarkData ImportMarkData(string filePath) {
+        string json = File.ReadAllText(filePath);
+        return _serializationService.Deserialize<MarkData>(json);
+    }
+}
