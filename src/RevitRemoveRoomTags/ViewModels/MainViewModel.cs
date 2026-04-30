@@ -8,6 +8,7 @@ using Autodesk.Revit.DB.Architecture;
 using Autodesk.Revit.UI.Selection;
 
 using dosymep.Revit;
+using dosymep.SimpleServices;
 using dosymep.WPF.Commands;
 using dosymep.WPF.ViewModels;
 
@@ -18,6 +19,7 @@ namespace RevitRemoveRoomTags.ViewModels;
 internal class MainViewModel : BaseViewModel {
     private readonly PluginConfig _pluginConfig;
     private readonly RevitRepository _revitRepository;
+    private readonly ILocalizationService _localizationService;
 
     private MainWindow _userWindow;
     private ObservableCollection<View> _selectedViews = [];
@@ -29,9 +31,13 @@ internal class MainViewModel : BaseViewModel {
     private string _errorTextFromGUI;
 
 
-    public MainViewModel(PluginConfig pluginConfig, RevitRepository revitRepository) {
+    public MainViewModel(
+        PluginConfig pluginConfig,
+        RevitRepository revitRepository,
+        ILocalizationService localizationService) {
         _pluginConfig = pluginConfig;
         _revitRepository = revitRepository;
+        _localizationService = localizationService;
 
         LoadViewCommand = RelayCommand.Create<MainWindow>(LoadView);
         AcceptViewCommand = RelayCommand.Create(AcceptView, CanAcceptView);
@@ -111,19 +117,19 @@ internal class MainViewModel : BaseViewModel {
     private bool CanAcceptView() {
 
         if(SelectedViews.Count == 0) {
-            ErrorText = "Не выбрано ни одного вида";
+            ErrorText = _localizationService.GetLocalizedString("MainWindow.ErrorNoViews");
             return false;
         }
 
         if(RoomTagTasks.Count == 0) {
-            ErrorText = "Не создано ни одной задачи";
+            ErrorText = _localizationService.GetLocalizedString("MainWindow.ErrorNoTasks");
             return false;
         }
 
         foreach(var roomTagTask in RoomTagTasks) {
 
             if(roomTagTask.RoomTags.Count == 0) {
-                ErrorText = "Не во всех задачах выбраны марки помещений";
+                ErrorText = _localizationService.GetLocalizedString("MainWindow.ErrorNoTagsInTasks");
                 return false;
             }
         }

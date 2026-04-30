@@ -29,4 +29,8 @@
     <system:String x:Key="MainWindow.DeleteTaskButton">Delete Task</system:String>
     <system:String x:Key="MainWindow.DeleteTaskToolTip">Delete selected task from the task list</system:String>
 
+    <!-- Ошибки из VM -->
+    <system:String x:Key="MainWindow.ErrorNoViews">No views selected</system:String>
+    <system:String x:Key="MainWindow.ErrorNoTasks">No tasks created</system:String>
+    <system:String x:Key="MainWindow.ErrorNoTagsInTasks">Not all tasks have room tags selected</system:String>
 </ResourceDictionary>

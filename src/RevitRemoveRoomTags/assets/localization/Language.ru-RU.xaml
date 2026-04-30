@@ -29,4 +29,8 @@
     <system:String x:Key="MainWindow.DeleteTaskButton">Удалить задачу</system:String>
     <system:String x:Key="MainWindow.DeleteTaskToolTip">Удалить выбранную задачу из списка задач</system:String>
 
+    <!-- Ошибки из VM -->
+    <system:String x:Key="MainWindow.ErrorNoViews">Не выбрано ни одного вида</system:String>
+    <system:String x:Key="MainWindow.ErrorNoTasks">Не создано ни одной задачи</system:String>
+    <system:String x:Key="MainWindow.ErrorNoTagsInTasks">Не во всех задачах выбраны марки помещений</system:String>
 </ResourceDictionary>
