@@ -77,11 +77,6 @@
                 ItemsSource="{Binding AvailableSelectionModes}"
                 DisplayMemberPath="Name"
                 SelectedItem="{Binding SelectionMode}">
-                <ComboBox.ItemContainerStyle>
-                    <Style TargetType="ComboBoxItem" BasedOn="{StaticResource {x:Type ComboBoxItem}}">
-                        <Setter Property="IsEnabled" Value="{Binding IsEnabled}" />
-                    </Style>
-                </ComboBox.ItemContainerStyle>
             </ComboBox>
 
             <ui:TextBlock

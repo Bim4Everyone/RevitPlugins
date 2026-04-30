@@ -17,19 +17,14 @@ internal class LevelViewModel : BaseViewModel, IEquatable<LevelViewModel> {
     /// Вью модель уровня
     /// </summary>
     /// <param name="level">Уровень</param>
-    /// <param name="isSelected">Флаг для чекбокса выбора</param>
-    /// <param name="basePointZFt">Отметка базовой точки в единицах ревита для отображения отметки уровня</param>
     /// <param name="localization">Сервис локализации</param>
     public LevelViewModel(
         Level level,
-        bool isSelected,
-        double basePointZFt,
         ILocalizationService localization) {
         Level = level ?? throw new ArgumentNullException(nameof(level));
         _localization = localization ?? throw new ArgumentNullException(nameof(localization));
-        _isSelected = isSelected;
 
-        double elevationFt = level.Elevation - basePointZFt;
+        double elevationFt = level.Elevation - BasePoint.GetProjectBasePoint(level.Document).Position.Z;
         double elevationMm = UnitUtils.ConvertFromInternalUnits(elevationFt, UnitTypeId.Millimeters);
         DisplayName = _localization.GetLocalizedString("MainWindow.Levels.DisplayFormat", level.Name, elevationMm);
     }

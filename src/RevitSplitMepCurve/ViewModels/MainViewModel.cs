@@ -109,70 +109,29 @@ internal class MainViewModel : BaseViewModel {
     }
 
     private void LoadView() {
-        var config = _pluginConfig.GetSettings(_revitRepository.Document);
-
-        double basePointZ = _revitRepository.GetProjectBasePoint().Position.Z;
-
-        var levels = _revitRepository.GetLevels([]).OrderByDescending(l => l.Elevation);
-        foreach(var level in levels) {
-            bool isSelected = config is null
-                || !config.UncheckedLevelNames.Contains(level.Name);
-            var vm = new LevelViewModel(level, isSelected, basePointZ, _localization);
-            vm.PropertyChanged += OnLevelPropertyChanged;
-            Levels.Add(vm);
-        }
-
-        bool hasSelectedElements = _revitRepository.HasSelectedElements();
-        AvailableSelectionModes.Clear();
-        foreach(SelectionMode mode in (SelectionMode[])Enum.GetValues(typeof(SelectionMode))) {
-            var modeVm = new SelectionModeViewModel(_localization, mode);
-            if(mode == RevitSplitMepCurve.Models.Enums.SelectionMode.SelectedElements && !hasSelectedElements) {
-                modeVm.IsEnabled = false;
-            }
-            AvailableSelectionModes.Add(modeVm);
-        }
-
-        var providerVms = InitializeElementsProviders(_providers);
-        AvailableElementsProviders.Clear();
-        foreach(var vm in providerVms) {
-            AvailableElementsProviders.Add(vm);
-        }
-
-        SelectionMode = AvailableSelectionModes
-            .FirstOrDefault(m => config != null && m.Mode == config.SelectedMode && m.IsEnabled)
-            ?? AvailableSelectionModes.FirstOrDefault(m => m.IsEnabled);
-
-        ElementsProvider = AvailableElementsProviders
-            .FirstOrDefault(p => config != null && p.MepClass == config.SelectedMepClass)
-            ?? AvailableElementsProviders.FirstOrDefault();
-
-        if(config is not null) {
-            RestoreSymbolSelections(config);
-        }
-
-        ShowPlacingErrors = config?.ShowSplitErrors ?? true;
-        _selectAllLevels = Levels.All(l => l.IsSelected);
-        OnPropertyChanged(nameof(SelectAllLevels));
+        LoadConfig();
     }
 
-    private void RestoreSymbolSelections(RevitSettings config) {
-        foreach(var vm in AvailableElementsProviders) {
-            if(vm is PipesProviderViewModel pipes) {
-                pipes.RoundSymbol.SelectedItem =
-                    pipes.RoundSymbol.AvailableItems
-                        .FirstOrDefault(s => s.Symbol.Name == config.ConnectorRoundSymbolName)
-                    ?? pipes.RoundSymbol.AvailableItems.FirstOrDefault();
-            } else if(vm is DuctsProviderViewModel ducts) {
-                ducts.RoundSymbol.SelectedItem =
-                    ducts.RoundSymbol.AvailableItems
-                        .FirstOrDefault(s => s.Symbol.Name == config.ConnectorRoundSymbolName)
-                    ?? ducts.RoundSymbol.AvailableItems.FirstOrDefault();
-                ducts.RectangleSymbol.SelectedItem =
-                    ducts.RectangleSymbol.AvailableItems
-                        .FirstOrDefault(s => s.Symbol.Name == config.ConnectorRectangleSymbolName)
-                    ?? ducts.RectangleSymbol.AvailableItems.FirstOrDefault();
-            }
-        }
+    private PipesProviderViewModel CreatePipesProvider(PipesProvider provider, RevitSettings config) {
+        var providerVm = new PipesProviderViewModel(_localization, provider, _revitRepository);
+        providerVm.RoundSymbol.SelectedItem =
+            providerVm.RoundSymbol.AvailableItems
+                .FirstOrDefault(s => s.Symbol.Name == config?.ConnectorRoundSymbolName)
+            ?? providerVm.RoundSymbol.AvailableItems.FirstOrDefault();
+        return providerVm;
+    }
+
+    private DuctsProviderViewModel CreateDuctsProvider(DuctsProvider provider, RevitSettings config) {
+        var providerVm = new DuctsProviderViewModel(_localization, provider, _revitRepository);
+        providerVm.RoundSymbol.SelectedItem =
+            providerVm.RoundSymbol.AvailableItems
+                .FirstOrDefault(s => s.Symbol.Name == config?.ConnectorRoundSymbolName)
+            ?? providerVm.RoundSymbol.AvailableItems.FirstOrDefault();
+        providerVm.RectangleSymbol.SelectedItem =
+            providerVm.RectangleSymbol.AvailableItems
+                .FirstOrDefault(s => s.Symbol.Name == config?.ConnectorRectangleSymbolName)
+            ?? providerVm.RectangleSymbol.AvailableItems.FirstOrDefault();
+        return providerVm;
     }
 
     private void CheckSyncNecessity(ICollection<SplittableElement> elements) {
@@ -266,8 +225,8 @@ internal class MainViewModel : BaseViewModel {
         var setting = _pluginConfig.GetSettings(_revitRepository.Document)
                       ?? _pluginConfig.AddSettings(_revitRepository.Document);
 
-        setting.SelectedMepClass = ElementsProvider?.MepClass ?? MepClass.Pipes;
-        setting.SelectedMode = _selectionMode?.Mode ?? RevitSplitMepCurve.Models.Enums.SelectionMode.ActiveView;
+        setting.SelectedMepClass = ElementsProvider?.MepClass ?? RevitSettings.DefaultMepClass;
+        setting.SelectedMode = _selectionMode?.Mode ?? RevitSettings.DefaultSelectionMode;
         setting.UncheckedLevelNames = Levels
             .Where(l => !l.IsSelected)
             .Select(l => l.Name)
@@ -276,6 +235,7 @@ internal class MainViewModel : BaseViewModel {
 
         if(ElementsProvider is PipesProviderViewModel pipes) {
             setting.ConnectorRoundSymbolName = pipes.RoundSymbol.SelectedItem?.Symbol.Name;
+            setting.ConnectorRectangleSymbolName = null;
         } else if(ElementsProvider is DuctsProviderViewModel ducts) {
             setting.ConnectorRoundSymbolName = ducts.RoundSymbol.SelectedItem?.Symbol.Name;
             setting.ConnectorRectangleSymbolName = ducts.RectangleSymbol.SelectedItem?.Symbol.Name;
@@ -284,18 +244,49 @@ internal class MainViewModel : BaseViewModel {
         _pluginConfig.SaveProjectConfig();
     }
 
-    private ObservableCollection<ElementsProviderViewModel> InitializeElementsProviders(
-        ICollection<IElementsProvider> providers) {
-        var vms = new ObservableCollection<ElementsProviderViewModel>();
-        foreach(var p in providers) {
+    private void InitializeElementsProviders(RevitSettings config) {
+        foreach(var p in _providers) {
             ElementsProviderViewModel vm = p switch {
-                PipesProvider pp => new PipesProviderViewModel(_localization, pp, _revitRepository),
-                DuctsProvider dp => new DuctsProviderViewModel(_localization, dp, _revitRepository),
+                PipesProvider pp => CreatePipesProvider(pp, config),
+                DuctsProvider dp => CreateDuctsProvider(dp, config),
                 _ => throw new InvalidOperationException()
             };
-            vms.Add(vm);
+            AvailableElementsProviders.Add(vm);
         }
-        return vms;
+
+        ElementsProvider = AvailableElementsProviders
+                               .FirstOrDefault(p => config != null && p.MepClass == config.SelectedMepClass)
+                           ?? AvailableElementsProviders.First();
+    }
+
+    private void InitializeLevels(RevitSettings config) {
+        var levels = _revitRepository.GetLevels().OrderByDescending(l => l.Elevation);
+        foreach(var level in levels) {
+            var vm = new LevelViewModel(level, _localization);
+            vm.IsSelected = config is null
+                            || !config.UncheckedLevelNames.Contains(level.Name, StringComparer.OrdinalIgnoreCase);
+            vm.PropertyChanged += OnLevelPropertyChanged;
+            Levels.Add(vm);
+        }
+
+        _selectAllLevels = Levels.All(l => l.IsSelected);
+        OnPropertyChanged(nameof(SelectAllLevels));
+    }
+
+    private void InitializeSelectionModes(RevitSettings config) {
+        bool hasSelectedElements = _revitRepository.HasSelectedElements();
+        foreach(var mode in Enum.GetValues(typeof(SelectionMode)).OfType<SelectionMode>()) {
+            var modeVm = new SelectionModeViewModel(_localization, mode);
+            if(mode == RevitSplitMepCurve.Models.Enums.SelectionMode.SelectedElements
+               && !hasSelectedElements) {
+                continue;
+            }
+
+            AvailableSelectionModes.Add(modeVm);
+        }
+
+        SelectionMode = AvailableSelectionModes.FirstOrDefault(m => config != null && m.Mode == config.SelectedMode)
+                        ?? AvailableSelectionModes.First();
     }
 
     private void OnLevelPropertyChanged(object sender, PropertyChangedEventArgs e) {
@@ -307,5 +298,15 @@ internal class MainViewModel : BaseViewModel {
             _selectAllLevels = allSelected;
             OnPropertyChanged(nameof(SelectAllLevels));
         }
+    }
+
+    private void LoadConfig() {
+        var config = _pluginConfig.GetSettings(_revitRepository.Document);
+
+        InitializeLevels(config);
+        InitializeSelectionModes(config);
+        InitializeElementsProviders(config);
+
+        ShowPlacingErrors = config?.ShowSplitErrors ?? true;
     }
 }

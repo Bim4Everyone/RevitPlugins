@@ -24,12 +24,11 @@ internal class RevitRepository {
 
     public Document Document => ActiveUIDocument.Document;
 
-    public ICollection<Level> GetLevels(params string[] notIncludeNames) {
+    public ICollection<Level> GetLevels() {
         return new FilteredElementCollector(Document)
             .WhereElementIsNotElementType()
             .OfClass(typeof(Level))
             .OfType<Level>()
-            .Where(l => !notIncludeNames.Contains(l.Name, StringComparer.CurrentCultureIgnoreCase))
             .ToArray();
     }
 
@@ -77,14 +76,9 @@ internal class RevitRepository {
         return ActiveUIDocument.Selection.GetElementIds().Count > 0;
     }
 
-    /// <summary>Базовая точка проекта.</summary>
-    public BasePoint GetProjectBasePoint() {
-        return BasePoint.GetProjectBasePoint(Document);
-    }
-
     /// <summary>Группы уровней с одинаковыми отметками</summary>
     public ICollection<ICollection<Level>> GetDuplicateLevels() {
-        var levels = GetLevels([]);
+        var levels = GetLevels();
         return GroupIntersectingLevels(levels);
     }
 

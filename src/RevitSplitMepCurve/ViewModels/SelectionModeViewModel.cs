@@ -9,8 +9,6 @@ using RevitSplitMepCurve.Models.Enums;
 namespace RevitSplitMepCurve.ViewModels;
 
 internal class SelectionModeViewModel : BaseViewModel, IEquatable<SelectionModeViewModel> {
-    private bool _isEnabled = true;
-
     public SelectionModeViewModel(ILocalizationService localization, SelectionMode mode) {
         if(localization == null) {
             throw new ArgumentNullException(nameof(localization));
@@ -23,11 +21,6 @@ internal class SelectionModeViewModel : BaseViewModel, IEquatable<SelectionModeV
     public string Name { get; }
 
     public SelectionMode Mode { get; }
-
-    public bool IsEnabled {
-        get => _isEnabled;
-        set => RaiseAndSetIfChanged(ref _isEnabled, value);
-    }
 
     public bool Equals(SelectionModeViewModel other) {
         return other is not null && Mode == other.Mode;

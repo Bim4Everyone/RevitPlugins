@@ -27,11 +27,14 @@ internal class PluginConfig : ProjectConfig<RevitSettings> {
 }
 
 internal class RevitSettings : ProjectSettings {
+    public const MepClass DefaultMepClass = MepClass.Pipes;
+    public const SelectionMode DefaultSelectionMode = SelectionMode.ActiveView;
+    
     public override string ProjectName { get; set; }
 
-    public MepClass SelectedMepClass { get; set; } = MepClass.Pipes;
+    public MepClass SelectedMepClass { get; set; } = DefaultMepClass;
 
-    public SelectionMode SelectedMode { get; set; } = SelectionMode.ActiveView;
+    public SelectionMode SelectedMode { get; set; } = DefaultSelectionMode;
 
     /// <summary>Имя типоразмера круглого соединителя.</summary>
     public string ConnectorRoundSymbolName { get; set; } = string.Empty;
