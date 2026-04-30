@@ -23,7 +23,7 @@ internal class MarkInstanceStrategy : IMarkStrategy {
             .ToList();
     }
 
-    public Element GetElementWithParam(Element element, FilterableParam param) {
-        return param.IsTypeParam ? element.GetElementType() : element;
-    }
+    //public Element GetElementWithParam(Element element, FilterableParam param) {
+    //    return param.IsTypeParam ? element.GetElementType() : element;
+    //}
 }

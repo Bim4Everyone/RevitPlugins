@@ -11,10 +11,10 @@ using RevitMarkAllDocuments.Models;
 namespace RevitMarkAllDocuments.Services;
 
 internal class SortElementService {
-    private readonly IMarkStrategy _markStrategy;
+    private readonly IParamProvider _paramProvider;
 
-    public SortElementService(CategoryContext categoryContext) {
-        _markStrategy = categoryContext.GetMarkStrategy();
+    public SortElementService(IParamProvider paramProvider) {
+        _paramProvider = paramProvider;
     }
 
     public IOrderedEnumerable<MarkedElement> SortElements(IReadOnlyList<MarkedElement> elements,
@@ -31,13 +31,13 @@ internal class SortElementService {
     private Func<MarkedElement, IComparable> GetSortKey(FilterableParam param) {
         return param.RevitParam.StorageType switch {
             StorageType.Integer => x =>
-                _markStrategy.GetElementWithParam(x.RevitElement, param).GetParamValue<int>(param.RevitParam),
+                _paramProvider.GetElementWithParam(x.RevitElement, param).GetParamValue<int>(param.RevitParam),
             StorageType.ElementId => x =>
-                _markStrategy.GetElementWithParam(x.RevitElement, param).GetParamValue<long>(param.RevitParam),
+                _paramProvider.GetElementWithParam(x.RevitElement, param).GetParamValue<long>(param.RevitParam),
             StorageType.Double => x =>
-                _markStrategy.GetElementWithParam(x.RevitElement, param).GetParamValue<double>(param.RevitParam),
+                _paramProvider.GetElementWithParam(x.RevitElement, param).GetParamValue<double>(param.RevitParam),
             _ => x => 
-                _markStrategy.GetElementWithParam(x.RevitElement, param).GetParamValue<string>(param.RevitParam),
+                _paramProvider.GetElementWithParam(x.RevitElement, param).GetParamValue<string>(param.RevitParam),
         };
     }
 }

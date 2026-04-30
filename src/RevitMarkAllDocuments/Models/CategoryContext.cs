@@ -1,5 +1,7 @@
 using Autodesk.Revit.DB;
 
+using dosymep.Revit;
+
 namespace RevitMarkAllDocuments.Models;
 
 internal class CategoryContext {
@@ -12,5 +14,13 @@ internal class CategoryContext {
         }
 
         return new MarkInstanceStrategy();
+    }
+
+    public IParamProvider GetParamProvider(RevitRepository revitRepository) {
+        if(IsMarkForTypes) {
+            return new TypeParamProvider(revitRepository, SelectedCategory);
+        }
+
+        return new InstanceParamProvider(revitRepository, SelectedCategory);
     }
 }
