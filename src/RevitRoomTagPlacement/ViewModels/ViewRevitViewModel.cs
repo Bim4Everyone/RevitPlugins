@@ -9,8 +9,10 @@ using RevitRoomTagPlacement.Models;
 
 namespace RevitRoomTagPlacement.ViewModels;
 internal class ViewRevitViewModel : RevitViewModel {
-    public ViewRevitViewModel(RevitRepository revitRepository, ILocalizationService localizationService)
-        : base(revitRepository, localizationService) {
+    public ViewRevitViewModel(PluginConfig pluginConfig, 
+                              RevitRepository revitRepository, 
+                              ILocalizationService localizationService)
+        : base(pluginConfig, revitRepository, localizationService) {
     }
 
     protected override BindingList<RoomGroupViewModel> GetGroupViewModels() {

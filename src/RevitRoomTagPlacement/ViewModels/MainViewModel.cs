@@ -11,15 +11,15 @@ internal class MainViewModel : BaseViewModel {
 
     private RevitViewModel _revitViewModel;
 
-    public MainViewModel(RevitRepository revitRepository, 
+    public MainViewModel(PluginConfig pluginConfig, RevitRepository revitRepository, 
                          ILocalizationService localizationService) {
         _revitRepository = revitRepository;
 
         RevitViewModels = [
-            new ViewRevitViewModel(revitRepository, localizationService) { 
+            new ViewRevitViewModel(pluginConfig, revitRepository, localizationService) { 
                 Name = localizationService.GetLocalizedString("MainWindow.ByCurrentView")
             },
-            new SelectedRevitViewModel(revitRepository, localizationService) { 
+            new SelectedRevitViewModel(pluginConfig, revitRepository, localizationService) { 
                 Name = localizationService.GetLocalizedString("MainWindow.BySelectedElements")
             }
         ];

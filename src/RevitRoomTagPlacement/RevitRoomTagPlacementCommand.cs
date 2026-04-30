@@ -6,6 +6,7 @@ using Autodesk.Revit.Attributes;
 using Autodesk.Revit.UI;
 
 using dosymep.Bim4Everyone;
+using dosymep.Bim4Everyone.ProjectConfigs;
 using dosymep.Bim4Everyone.SimpleServices;
 using dosymep.WpfCore.Ninject;
 using dosymep.WpfUI.Core.Ninject;
@@ -30,8 +31,9 @@ public class RevitRoomTagPlacementCommand : BasePluginCommand {
             .ToSelf()
             .InSingletonScope();
 
+        // Настройка конфигурации плагина
         kernel.Bind<PluginConfig>()
-            .ToMethod(c => PluginConfig.GetPluginConfig());
+            .ToMethod(c => PluginConfig.GetPluginConfig(c.Kernel.Get<IConfigSerializer>()));
 
         // Используем сервис обновления тем для WinUI
         kernel.UseWpfUIThemeUpdater();

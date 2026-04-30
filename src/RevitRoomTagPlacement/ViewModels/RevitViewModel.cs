@@ -18,6 +18,7 @@ internal abstract class RevitViewModel : BaseViewModel {
     protected readonly RevitRepository _revitRepository;
     protected readonly ILocalizationService _localizationService;
 
+    private readonly PluginConfig _pluginConfig;
     private RoomTagTypeModel _selectedTagType;
     private string _selectedRoomName;
 
@@ -28,7 +29,10 @@ internal abstract class RevitViewModel : BaseViewModel {
 
     private string _errorText;
 
-    public RevitViewModel(RevitRepository revitRepository, ILocalizationService localizationService) {
+    public RevitViewModel(PluginConfig pluginConfig, 
+                          RevitRepository revitRepository, 
+                          ILocalizationService localizationService) {
+        _pluginConfig = pluginConfig;
         _revitRepository = revitRepository;
         _localizationService = localizationService;
         _placementWayByGroups = GroupPlacementWay.EveryRoom;
@@ -193,10 +197,9 @@ internal abstract class RevitViewModel : BaseViewModel {
     }
 
     public void SavePluginConfig() {
-        var config = PluginConfig.GetPluginConfig();
-        var settings = config.GetSettings(_revitRepository.Document);
+        RevitSettings settings = _pluginConfig.GetSettings(_revitRepository.Document);
 
-        settings ??= config.AddSettings(_revitRepository.Document);
+        settings ??= _pluginConfig.AddSettings(_revitRepository.Document);
 
         settings.RoomGroups = RoomGroups
             .Where(x => x.IsChecked)
@@ -208,12 +211,11 @@ internal abstract class RevitViewModel : BaseViewModel {
         settings.RoomName = SelectedRoomName;
         settings.Indent = Indent;
 
-        config.SaveProjectConfig();
+        _pluginConfig.SaveProjectConfig();
     }
 
     public void SetPluginConfig() {
-        var config = PluginConfig.GetPluginConfig();
-        var settings = config.GetSettings(_revitRepository.Document);
+        var settings = _pluginConfig.GetSettings(_revitRepository.Document);
 
         if(settings == null) { return; }
 
@@ -226,6 +228,6 @@ internal abstract class RevitViewModel : BaseViewModel {
         SelectedRoomName = settings.RoomName;
         Indent = settings.Indent;
 
-        config.SaveProjectConfig();
+        _pluginConfig.SaveProjectConfig();
     }
 }
