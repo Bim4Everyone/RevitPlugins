@@ -26,6 +26,6 @@ internal class TypeParamProvider : IParamProvider {
     }
 
     public Element GetElementWithParam(Element element, FilterableParam param) {
-        return element.GetElementType();
+        return element;
     }
 }

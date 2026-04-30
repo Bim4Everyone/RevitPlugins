@@ -13,17 +13,17 @@ using RevitMarkAllDocuments.Models;
 namespace RevitMarkAllDocuments.Services;
 
 internal class FiltrationService {
-    private readonly bool _isMarkForTypes;
+    private readonly IMarkStrategy _markStrategy;
     private readonly Category _category;
     private readonly DocumentService _docService;
     private readonly ILogicalFilter _logicalFilter;
     private readonly FilterOptions _filterOptions;
 
-    public FiltrationService(bool isMarkForTypes, 
+    public FiltrationService(IMarkStrategy markStrategy, 
                              Category category,
                              DocumentService docService,
                              ILogicalFilterContext logicalFilterContext) {
-        _isMarkForTypes = isMarkForTypes;
+        _markStrategy = markStrategy;
         _category = category;
         _filterOptions = new FilterOptions() { Tolerance = 0 };
         _docService = docService;
@@ -37,20 +37,7 @@ internal class FiltrationService {
             };
 
             var filter = _logicalFilter.Build(document, _filterOptions);
-
-            var elements = new FilteredElementCollector(document)
-                .OfCategory(_category.GetBuiltInCategory())
-                .WhereElementIsNotElementType()
-                .WherePasses(filter)
-                .ToElements();
-
-            if(_isMarkForTypes) {
-                elements = [.. elements
-                    .Select(x => x.GetElementType())
-                    .GroupBy(x => x.Id)
-                    .Select(g => g.First())
-                    .Cast<Element>()];
-            }
+            var elements = _markStrategy.FilterElements(document, _category, filter);
 
             marksByDocument.Elements = [..elements
                     .Select(x => new MarkedElement(x))];

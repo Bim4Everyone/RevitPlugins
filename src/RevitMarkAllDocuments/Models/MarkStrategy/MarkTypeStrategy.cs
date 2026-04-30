@@ -23,7 +23,15 @@ internal class MarkTypeStrategy : IMarkStrategy {
             .ToList();
     }
 
-    //public Element GetElementWithParam(Element element, FilterableParam param) {
-    //    return element.GetElementType();
-    //}
+    public IList<Element> FilterElements(Document document, Category category, ElementFilter filter) {
+        return [.. new FilteredElementCollector(document)
+            .OfCategory(category.GetBuiltInCategory())
+            .WhereElementIsNotElementType()
+            .WherePasses(filter)
+            .ToElements()
+            .Select(x => x.GetElementType())
+            .GroupBy(x => x.Id)
+            .Select(g => g.First())
+            .Cast<Element>()];   
+    }
 }

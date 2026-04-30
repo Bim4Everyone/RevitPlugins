@@ -14,6 +14,7 @@ internal class ParamValidationService {
     public ParamValidationService(CategoryContext categoryContext) {
         _markStrategy = categoryContext.GetMarkStrategy();
     }
+
     public IList<WarningElement> CheckAreExistParams(IReadOnlyList<FilterableParam> paramsToCheck, 
                                                      IReadOnlyList<MarkedElement> elementsToCheck) {
         var elementsWithError = new List<WarningElement>();

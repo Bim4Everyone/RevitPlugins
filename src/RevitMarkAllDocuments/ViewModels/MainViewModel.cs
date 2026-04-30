@@ -29,11 +29,10 @@ internal class MainViewModel : BaseViewModel {
     private readonly IFilterContextParser _filterParser;
     private readonly JsonSerializerService _jsonService;
     private readonly ILocalizationService _localizationService;
-    private readonly bool _isMarkForTypes;
-    private readonly CategoryContext _categoryContext;
     private readonly Category _selectedCategory;
     private readonly string _selectedCategoryName;
     private readonly IParamProvider _paramProvider;
+    private readonly IMarkStrategy _markStrategy;
 
     private DocumentsPageViewModel _documentsPageViewModel;
     private FilterPageViewModel _filterPageViewModel;
@@ -62,9 +61,8 @@ internal class MainViewModel : BaseViewModel {
         _filterParser = filterParser;
         _localizationService = localizationService;
 
-        _categoryContext = categoryContext;
-        _isMarkForTypes = categoryContext.IsMarkForTypes;
-        _paramProvider = _categoryContext.GetParamProvider(_revitRepository);
+        _markStrategy = categoryContext.GetMarkStrategy();
+        _paramProvider = categoryContext.GetParamProvider(_revitRepository);
         _selectedCategory = categoryContext.SelectedCategory;
         _selectedCategoryName = categoryContext.SelectedCategory.Name;
 
@@ -126,7 +124,7 @@ internal class MainViewModel : BaseViewModel {
             MarkRevitParam = selectedMarkParam.RevitParam,
         };
         var logicalFilterContext = FilterPageViewModel.FilterProvider.GetFilter();
-        var filtrationService = new FiltrationService(_isMarkForTypes, 
+        var filtrationService = new FiltrationService(_markStrategy, 
                                                       _selectedCategory, 
                                                       _documentService,
                                                       logicalFilterContext);
