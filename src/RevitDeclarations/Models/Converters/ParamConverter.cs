@@ -21,6 +21,14 @@ public static class ParamConverter {
     }
 
     /// <summary>
+    /// Конвертирует значение длины из внутренних единиц Revit в метры.
+    /// </summary>
+    public static double ConvertLengthMm(double value, int accuracy) {
+        double convertedValue = UnitUtils.ConvertFromInternalUnits(value, UnitTypeId.Millimeters);
+        return Math.Round(convertedValue, accuracy);
+    }
+
+    /// <summary>
     /// Конвертирует значение длины из миллиметров во внутренние единицы Revit.
     /// </summary>
     public static double ConvertLengthToInternal(double value, int accuracy) {

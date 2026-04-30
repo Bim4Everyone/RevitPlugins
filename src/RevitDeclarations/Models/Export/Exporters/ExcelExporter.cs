@@ -16,6 +16,7 @@ internal class ExcelExporter : ITableExporter {
     private readonly Color _summerRoomsColor = Color.FromArgb(217, 235, 205);
     private readonly Color _nonConfigRoomsColor = Color.FromArgb(237, 237, 237);
     private readonly Color _utpColor = Color.FromArgb(226, 207, 245);
+    private readonly Color _extraApartPropsColor = Color.FromArgb(255, 230, 153);
 
     public void Export(string path, 
                        IDeclarationDataTable declarationDataTable,
@@ -160,7 +161,7 @@ internal class ExcelExporter : ITableExporter {
                     ((Range) workSheet.Columns[i - 2]).ColumnWidth = 17;
                 }
                 // Остальные (не из списка приоритетов) помещения квартир
-            } else if(i > tableInfo.OtherRoomsStart && i <= tableInfo.UtpStart) {
+            } else if(i > tableInfo.OtherRoomsStart && i <= tableInfo.ExtraApartPropsStart) {
                 ((Range) workSheet.Columns[i]).ColumnWidth = 10;
                 ((Range) workSheet.Cells[1, i]).Interior.Color = _nonConfigRoomsColor;
 
@@ -169,7 +170,11 @@ internal class ExcelExporter : ITableExporter {
                     //((Range) workSheet.Columns[i - 2]).NumberFormat = "@";
                     ((Range) workSheet.Columns[i - 1]).ColumnWidth = 17;
                 }
-                // УТП квартир
+            // Дополнительные характеристики квартир
+            } else if(i > tableInfo.ExtraApartPropsStart && i <= tableInfo.UtpStart) {
+                ((Range) workSheet.Columns[i]).ColumnWidth = 12;
+                ((Range) workSheet.Cells[1, i]).Interior.Color = _extraApartPropsColor;
+            // УТП квартир
             } else {
                 ((Range) workSheet.Columns[i]).ColumnWidth = 12;
                 ((Range) workSheet.Cells[1, i]).Interior.Color = _utpColor;

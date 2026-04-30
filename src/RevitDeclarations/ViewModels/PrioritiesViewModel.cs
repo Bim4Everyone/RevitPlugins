@@ -101,6 +101,7 @@ internal class PrioritiesViewModel : BaseViewModel {
                 .ToList();
 
             _mainViewModel.DeclarationViewModel.LoadUtp = false;
+            _mainViewModel.DeclarationViewModel.LoadExtraApartProps = false;
             _mainViewModel.DeclarationViewModel.CanLoadUtp = false;
             _mainViewModel.DeclarationViewModel.CanLoadUtpText = 
                 _localizationService.GetLocalizedString("MainWindow.ErrorNoCorpPriorities");

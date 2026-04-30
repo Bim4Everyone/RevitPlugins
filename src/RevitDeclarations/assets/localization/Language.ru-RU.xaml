@@ -33,6 +33,7 @@
     <system:String x:Key="DeclarationPage.Phase">Стадия:</system:String>
     <system:String x:Key="DeclarationPage.Accuracy">Количество знаков после запятой:</system:String>
     <system:String x:Key="DeclarationPage.CalculateUtp">Рассчитывать УТП:</system:String>
+    <system:String x:Key="DeclarationPage.CalculateExtraApartProps">Рассчитывать доп.характеристики:</system:String>
     <system:String x:Key="DeclarationPage.Projects">Проекты с помещениями, доступные для выгрузки:</system:String>
 
     

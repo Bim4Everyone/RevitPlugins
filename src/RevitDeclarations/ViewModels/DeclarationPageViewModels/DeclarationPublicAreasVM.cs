@@ -27,6 +27,7 @@ internal class DeclarationPublicAreasVM : DeclarationViewModel {
         _selectedFormat = _exportFormats[0];
 
         _loadUtp = false;
+        _loadExtraApartProps = false;
         _canLoadUtp = false;
     }
 

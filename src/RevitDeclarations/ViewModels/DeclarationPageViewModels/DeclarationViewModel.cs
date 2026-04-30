@@ -33,6 +33,7 @@ internal class DeclarationViewModel : BaseViewModel {
     protected string _accuracy;
 
     protected bool _loadUtp;
+    protected bool _loadExtraApartProps;
     protected bool _canLoadUtp;
     protected string _canLoadUtpText;    
 
@@ -100,6 +101,11 @@ internal class DeclarationViewModel : BaseViewModel {
     public bool LoadUtp {
         get => _loadUtp;
         set => RaiseAndSetIfChanged(ref _loadUtp, value);
+    }
+
+    public bool LoadExtraApartProps {
+        get => _loadExtraApartProps;
+        set => RaiseAndSetIfChanged(ref _loadExtraApartProps, value);
     }
 
     public bool CanLoadUtp {

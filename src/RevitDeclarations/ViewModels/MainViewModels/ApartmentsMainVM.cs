@@ -110,6 +110,12 @@ internal class ApartmentsMainVM : MainViewModel {
             }
         }
 
+        if(_declarationViewModel.LoadExtraApartProps) {
+            foreach(var project in projects) {
+                project.CalculateExtraApartProps();
+            }
+        }
+
         var apartments = projects
             .SelectMany(x => x.RoomGroups)
             .Cast<Apartment>()

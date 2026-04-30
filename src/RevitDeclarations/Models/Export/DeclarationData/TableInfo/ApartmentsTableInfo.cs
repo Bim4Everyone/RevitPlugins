@@ -5,7 +5,8 @@ namespace RevitDeclarations.Models;
 internal class ApartmentsTableInfo : ITableInfo {
     public const int MainRoomCells = 3;
     public const int SummerRoomCells = 4;
-    private readonly int _utpWidth = 9;
+    private readonly int _utpWidth = 11;
+    private readonly int _extraApartPropsWidth = 2;
     private readonly IReadOnlyCollection<Apartment> _apartments;
 
     public ApartmentsTableInfo(IReadOnlyCollection<Apartment> apartments, DeclarationSettings settings) {
@@ -15,6 +16,9 @@ internal class ApartmentsTableInfo : ITableInfo {
         GroupsInfoColumnsNumber = 15;
         if(!Settings.LoadUtp) {
             _utpWidth = 0;
+        }
+        if(!Settings.LoadExtraApartProps) {
+            _extraApartPropsWidth = 0;
         }
 
         RowsTotalNumber = RoomGroups.Count;
@@ -43,6 +47,7 @@ internal class ApartmentsTableInfo : ITableInfo {
     public int SummerRoomsStart { get; private set; }
     public int OtherRoomsStart { get; private set; }
     public int UtpStart { get; private set; }
+    public int ExtraApartPropsStart { get; private set; }
     public int[] NumericColumnsIndexes { get; }
     public int[] AreaTypeColumnsIndexes { get; }
     public int[] LengthTypeColumnsIndexes { get; }
@@ -93,11 +98,13 @@ internal class ApartmentsTableInfo : ITableInfo {
             + mainRoomsWidth
             + summerRoomsWidth
             + otherRoomsWidth
+            + _extraApartPropsWidth
             + _utpWidth;
 
         SummerRoomsStart = GroupsInfoColumnsNumber + mainRoomsWidth;
         OtherRoomsStart = GroupsInfoColumnsNumber + mainRoomsWidth + summerRoomsWidth;
-        UtpStart = GroupsInfoColumnsNumber + mainRoomsWidth + summerRoomsWidth + otherRoomsWidth;
+        ExtraApartPropsStart = GroupsInfoColumnsNumber + mainRoomsWidth + summerRoomsWidth + otherRoomsWidth;
+        UtpStart = GroupsInfoColumnsNumber + mainRoomsWidth + summerRoomsWidth + otherRoomsWidth + _extraApartPropsWidth;
     }
 
     private int[] FindNumericColumns() {

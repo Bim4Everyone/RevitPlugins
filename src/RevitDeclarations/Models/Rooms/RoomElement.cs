@@ -4,6 +4,8 @@ using System.Linq;
 using Autodesk.Revit.DB;
 using Autodesk.Revit.DB.Architecture;
 
+using dosymep.Bim4Everyone;
+using dosymep.Bim4Everyone.ProjectParams;
 using dosymep.Revit;
 
 using pyRevitLabs.Json;
@@ -71,6 +73,14 @@ internal class RoomElement {
         return ParamConverter.ConvertLength(value, accuracy);
     }
 
+    /// <summary>
+    /// Возвращает значение параметра длины в миллиметрах.
+    /// </summary>
+    public double GetLengthParamValueMm(RevitParam parameter, int accuracy) {
+        double value = RevitRoom.GetParamValueOrDefault<double>(parameter);
+        return ParamConverter.ConvertLengthMm(value, accuracy);
+    }
+
     public double GetIntAndCurrencyParamValue(Parameter parameter) {
         return parameter.StorageType == StorageType.Double
             ? RevitRoom.GetParamValueOrDefault<double>(parameter.Definition.Name)
@@ -82,5 +92,13 @@ internal class RoomElement {
             .SelectMany(item => item)
             .Select(item => item.ElementId)
             .ToList();
+    }
+
+    public string GetNameForSummerRoomWithGlazing() {
+        if(RevitRoom.GetParamValueOrDefault<int>(ProjectParamsConfig.Instance.RoomNoGlazing) == 1) {
+            return $"{Name} (без остекления)";
+        }
+
+        return Name;
     }
 }

@@ -83,6 +83,14 @@ internal class ApartmentsProject : DeclarationProject {
         }
     }
 
+    public void CalculateExtraApartProps() {
+        var extraPropsCalculator = new ExtraApartPropsCalculator(_settings);
+
+        foreach(Apartment apartment in _roomGroups) {
+            apartment.CalculateExtraApartProps(extraPropsCalculator);
+        }
+    }
+
     public IReadOnlyCollection<FamilyInstance> GetDoors() {
         return _revitRepository
             .GetDoorsOnPhase(_document.Document, _phase);
