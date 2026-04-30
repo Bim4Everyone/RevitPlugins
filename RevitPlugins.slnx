@@ -152,6 +152,9 @@
   <Project Path="src/RevitOverridingGraphicsInViews/RevitOverridingGraphicsInViews.csproj">
     <Platform Project="x64" />
   </Project>
+  <Project Path="src/RevitPackageDocumentation/RevitPackageDocumentation.csproj">
+    <Platform Project="x64" />
+  </Project>
   <Project Path="src/RevitParamsChecker/RevitParamsChecker.csproj">
     <Platform Project="x64" />
   </Project>
