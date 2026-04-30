@@ -13,6 +13,7 @@
     <system:String x:Key="MainWindow.SelectedParamForAdd">Select an option to add</system:String>
     <system:String x:Key="MainWindow.Filtration">Filtration</system:String>
     <system:String x:Key="MainWindow.TransactionName">Changing parameter values</system:String>
+    <system:String x:Key="MainWindow.Samples">Examples of filling using a mask</system:String>
 
     <system:String x:Key="MainWindow.SystemParameter">System parameter</system:String>
     <system:String x:Key="MainWindow.SharedParameter">Shared parameter</system:String>

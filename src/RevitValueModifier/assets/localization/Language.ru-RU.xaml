@@ -13,6 +13,7 @@
     <system:String x:Key="MainWindow.SelectedParamForAdd">Выберите параметр для добавления</system:String>
     <system:String x:Key="MainWindow.Filtration">Фильтрация</system:String>
     <system:String x:Key="MainWindow.TransactionName">Изменение значений параметров</system:String>
+    <system:String x:Key="MainWindow.Samples">Примеры заполнения по маске</system:String>
     
     <system:String x:Key="MainWindow.SystemParameter">Системный параметр</system:String>
     <system:String x:Key="MainWindow.SharedParameter">Общий параметр</system:String>
