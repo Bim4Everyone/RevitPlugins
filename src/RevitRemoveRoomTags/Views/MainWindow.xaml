@@ -16,6 +16,7 @@
     
     mc:Ignorable="d"
     WindowStartupLocation="CenterOwner"
+    KeyDown="Window_KeyDown"
     
     MinHeight="450" MinWidth="680"
     Height="450" Width="680"
@@ -248,12 +249,14 @@
             Orientation="Horizontal"
             HorizontalAlignment="Right">
             <ui:TextBlock
+                x:Name="ErrorsTextBlock"
                 Margin="10"
                 Foreground="Orange"
                 VerticalAlignment="Center"
                 Text="{Binding ErrorText}" />
 
             <ui:Button
+                x:Name="OkButton"
                 Margin="10"
                 Width="80"
                 Content="{me:LocalizationSource MainWindow.ButtonOk}"
