@@ -3,9 +3,14 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:vm="clr-namespace:RevitSplitMepCurve.ViewModels.Providers"
     xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml">
+    <ResourceDictionary.MergedDictionaries>
+        <ResourceDictionary
+            Source="../../assets/Styles/CustomStyles.xaml" />
+    </ResourceDictionary.MergedDictionaries>
     <Style
         TargetType="ComboBox"
-        x:Key="SymbolComboBox">
+        x:Key="SymbolComboBox"
+        BasedOn="{StaticResource DefaultComboBoxStyle}">
         <Setter
             Property="IsEditable"
             Value="True" />

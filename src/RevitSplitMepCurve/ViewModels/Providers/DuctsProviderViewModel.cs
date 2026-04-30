@@ -20,7 +20,7 @@ internal class DuctsProviderViewModel : ElementsProviderViewModel {
         DuctsProvider provider,
         RevitRepository revitRepository) : base(localization, provider) {
         var symbols = revitRepository
-            .GetConnectorSymbols(BuiltInCategory.OST_DuctCurves)
+            .GetConnectorSymbols(BuiltInCategory.OST_DuctFitting)
             .Select(s => new FamilySymbolViewModel(s))
             .ToArray();
         RoundSymbol = new SelectableFamilySymbolViewModel(

@@ -20,7 +20,7 @@ internal class PipesProviderViewModel : ElementsProviderViewModel {
         PipesProvider provider,
         RevitRepository revitRepository) : base(localization, provider) {
         var symbols = revitRepository
-            .GetConnectorSymbols(BuiltInCategory.OST_PipeCurves)
+            .GetConnectorSymbols(BuiltInCategory.OST_PipeFitting)
             .Select(s => new FamilySymbolViewModel(s))
             .ToArray();
         RoundSymbol = new SelectableFamilySymbolViewModel(
