@@ -33,4 +33,6 @@
     <system:String x:Key="MainWindow.ErrorNoViews">No views selected</system:String>
     <system:String x:Key="MainWindow.ErrorNoTasks">No tasks created</system:String>
     <system:String x:Key="MainWindow.ErrorNoTagsInTasks">Not all tasks have room tags selected</system:String>
+    <system:String x:Key="MainWindow.ErrorXOffsetAsStr">Error in filling X offset</system:String>
+    <system:String x:Key="MainWindow.ErrorYOffsetAsStr">Error in filling Y offset</system:String>
 </ResourceDictionary>

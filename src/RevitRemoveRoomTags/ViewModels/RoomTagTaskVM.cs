@@ -4,17 +4,22 @@ using System.ComponentModel;
 
 using Autodesk.Revit.DB.Architecture;
 
+using dosymep.SimpleServices;
 using dosymep.WPF.ViewModels;
 
 namespace RevitRemoveRoomTags.Models;
 internal class RoomTagTaskVM : BaseViewModel, IDataErrorInfo {
+    private readonly ILocalizationService _localizationService;
+
     private double _xOffset = 0;
     private string _xOffsetAsStr = "0";
     private double _yOffset = 0;
     private string _yOffsetAsStr = "0";
     private bool _removeTags = false;
 
-    public RoomTagTaskVM() { }
+    public RoomTagTaskVM(ILocalizationService localizationService) {
+        _localizationService = localizationService;
+    }
 
     public ObservableCollection<RoomTag> RoomTags { get; } = [];
 
@@ -50,13 +55,13 @@ internal class RoomTagTaskVM : BaseViewModel, IDataErrorInfo {
             switch(columnName) {
                 case "XOffsetAsStr":
                     if(!double.TryParse(XOffsetAsStr, out double tempX)) {
-                        error = "Ошибка в заполнении смещения по X";
+                        error = _localizationService.GetLocalizedString("MainWindow.ErrorXOffsetAsStr");
                     }
                     XOffset = tempX;
                     break;
                 case "YOffsetAsStr":
                     if(!double.TryParse(YOffsetAsStr, out double tempY)) {
-                        error = "Ошибка в заполнении смещения по Y";
+                        error = _localizationService.GetLocalizedString("MainWindow.ErrorYOffsetAsStr");
                     }
                     YOffset = tempY;
                     break;

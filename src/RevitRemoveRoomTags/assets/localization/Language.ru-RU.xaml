@@ -33,4 +33,6 @@
     <system:String x:Key="MainWindow.ErrorNoViews">Не выбрано ни одного вида</system:String>
     <system:String x:Key="MainWindow.ErrorNoTasks">Не создано ни одной задачи</system:String>
     <system:String x:Key="MainWindow.ErrorNoTagsInTasks">Не во всех задачах выбраны марки помещений</system:String>
+    <system:String x:Key="MainWindow.ErrorXOffsetAsStr">Ошибка в заполнении смещения по X</system:String>
+    <system:String x:Key="MainWindow.ErrorYOffsetAsStr">Ошибка в заполнении смещения по Y</system:String>
 </ResourceDictionary>

@@ -23,7 +23,7 @@ internal class MainViewModel : BaseViewModel {
 
     private MainWindow _userWindow;
     private ObservableCollection<View> _selectedViews = [];
-    private ObservableCollection<RoomTagTaskVM> _roomTagTasks = [new RoomTagTaskVM()];
+    private ObservableCollection<RoomTagTaskVM> _roomTagTasks = [];
     private RoomTagTaskVM _selectedRoomTagTask;
     private bool _needOpenSelectedViews = false;
 
@@ -38,6 +38,8 @@ internal class MainViewModel : BaseViewModel {
         _pluginConfig = pluginConfig;
         _revitRepository = revitRepository;
         _localizationService = localizationService;
+
+        RoomTagTasks.Add(new RoomTagTaskVM(_localizationService));
 
         LoadViewCommand = RelayCommand.Create<MainWindow>(LoadView);
         AcceptViewCommand = RelayCommand.Create(AcceptView, CanAcceptView);
@@ -305,7 +307,7 @@ internal class MainViewModel : BaseViewModel {
     /// </summary>
     private void AddTask() {
 
-        RoomTagTasks.Add(new RoomTagTaskVM());
+        RoomTagTasks.Add(new RoomTagTaskVM(_localizationService));
     }
 
     /// <summary>
