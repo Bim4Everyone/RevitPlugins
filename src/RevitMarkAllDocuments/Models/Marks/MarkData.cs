@@ -29,8 +29,8 @@ internal class MarkData {
         return false;
     }
 
-    public void CreateMarkValues(CategoryContext categoryContext, IReadOnlyList<FilterableParam> sortParams, MarkStartValue startValue) {
-        var sortService = new SortElementService(categoryContext);
+    public void CreateMarkValues(IParamProvider paramProvider, IReadOnlyList<FilterableParam> sortParams, MarkStartValue startValue) {
+        var sortService = new SortElementService(paramProvider);
         var sortedMarkedElements = sortService.SortElements(GetAllElements(), sortParams);
         int startNumber = int.Parse(startValue.StartValue);
 

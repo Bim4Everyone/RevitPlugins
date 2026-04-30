@@ -33,6 +33,7 @@ internal class MainViewModel : BaseViewModel {
     private readonly CategoryContext _categoryContext;
     private readonly Category _selectedCategory;
     private readonly string _selectedCategoryName;
+    private readonly IParamProvider _paramProvider;
 
     private DocumentsPageViewModel _documentsPageViewModel;
     private FilterPageViewModel _filterPageViewModel;
@@ -63,6 +64,7 @@ internal class MainViewModel : BaseViewModel {
 
         _categoryContext = categoryContext;
         _isMarkForTypes = categoryContext.IsMarkForTypes;
+        _paramProvider = _categoryContext.GetParamProvider(_revitRepository);
         _selectedCategory = categoryContext.SelectedCategory;
         _selectedCategoryName = categoryContext.SelectedCategory.Name;
 
@@ -87,9 +89,8 @@ internal class MainViewModel : BaseViewModel {
     }
 
     private void LoadView() {
-        var paramProvider = new ParamProvider(_revitRepository, _selectedCategory, _isMarkForTypes);
-        var paramsForFilterAndSort = paramProvider.GetParamsForFilterAndSort().ToList();
-        var paramsForMark = paramProvider.GetParamsForMarks().ToList();
+        var paramsForFilterAndSort = _paramProvider.GetParamsForFilterAndSort().ToList();
+        var paramsForMark = _paramProvider.GetParamsForMarks().ToList();
 
         _documentsPageViewModel = new DocumentsPageViewModel(_revitRepository, _localizationService);
         var dataProvider = new FilterDataProvider(_revitRepository.Document, _selectedCategory, paramsForFilterAndSort);
@@ -145,7 +146,7 @@ internal class MainViewModel : BaseViewModel {
 
         // Создание значений для марок на основе отсортированного списка элементов.
         var startValue = MarkSettingsPageViewModel.GetStartValue();
-        markData.CreateMarkValues(_categoryContext, sortParams, startValue);
+        markData.CreateMarkValues(_paramProvider, sortParams, startValue);
 
         string currentDocName = _documentService.GetDocumentFullName(_revitRepository.Document);
 

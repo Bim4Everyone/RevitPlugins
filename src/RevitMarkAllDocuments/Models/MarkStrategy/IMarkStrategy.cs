@@ -10,5 +10,5 @@ namespace RevitMarkAllDocuments.Models;
 
 internal interface IMarkStrategy {
     IList<WarningElement> CheckIsExistParam(FilterableParam paramToCheck, IReadOnlyList<MarkedElement> elementsToCheck);
-    Element GetElementWithParam(Element element, FilterableParam param);
+    //Element GetElementWithParam(Element element, FilterableParam param);
 }
