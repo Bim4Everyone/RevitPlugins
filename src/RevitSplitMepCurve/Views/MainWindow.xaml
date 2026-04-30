@@ -26,6 +26,24 @@
                 <ResourceDictionary
                     Source="../assets/Styles/CustomStyles.xaml" />
             </ResourceDictionary.MergedDictionaries>
+            <Style
+                TargetType="Label">
+                <Setter
+                    Property="Margin"
+                    Value="0" />
+                <Setter
+                    Property="VerticalAlignment"
+                    Value="Center" />
+                <Setter
+                    Property="Focusable"
+                    Value="False" />
+                <Setter
+                    Property="Foreground"
+                    Value="{DynamicResource LabelForeground}" />
+                <Setter
+                    Property="SnapsToDevicePixels"
+                    Value="True" />
+            </Style>
         </ResourceDictionary>
     </Window.Resources>
 
@@ -47,114 +65,139 @@
             <RowDefinition Height="Auto" />
             <RowDefinition Height="*" />
             <RowDefinition Height="Auto" />
-            <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
 
         <ui:TitleBar
             Grid.Row="0"
             Title="{me:LocalizationSource MainWindow.Title}" />
 
-        <Grid
+        <Border
             Grid.Row="1"
-            Margin="14,8">
-            <Grid.RowDefinitions>
-                <RowDefinition Height="Auto" />
-                <RowDefinition Height="Auto" />
-            </Grid.RowDefinitions>
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="200" />
-                <ColumnDefinition Width="*" />
-            </Grid.ColumnDefinitions>
+            Margin="8 0 8 0"
+            Style="{StaticResource CustomBorder}">
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition
+                        Height="Auto" />
+                </Grid.RowDefinitions>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition
+                        Width="200" />
+                    <ColumnDefinition
+                        Width="*" />
+                </Grid.ColumnDefinitions>
 
-            <ui:TextBlock
-                Grid.Row="0"
-                Grid.Column="0"
-                VerticalAlignment="Center"
-                Text="{me:LocalizationSource MainWindow.SelectionMode}" />
-            <ComboBox
-                Grid.Row="0"
-                Grid.Column="1"
-                ItemsSource="{Binding AvailableSelectionModes}"
-                DisplayMemberPath="Name"
-                SelectedItem="{Binding SelectionMode}">
-            </ComboBox>
+                <Label
+                    Grid.Row="0"
+                    Grid.Column="0"
+                    VerticalAlignment="Center"
+                    Content="{me:LocalizationSource MainWindow.SelectionMode}" />
+                <ComboBox
+                    Grid.Row="0"
+                    Grid.Column="1"
+                    ItemsSource="{Binding AvailableSelectionModes}"
+                    DisplayMemberPath="Name"
+                    SelectedItem="{Binding SelectionMode}">
+                </ComboBox>
+            </Grid>
+        </Border>
 
-            <ui:TextBlock
-                Grid.Row="1"
-                Grid.Column="0"
-                Margin="0,6,0,0"
-                VerticalAlignment="Center"
-                Text="{me:LocalizationSource MainWindow.MepClass}" />
-            <ComboBox
-                Grid.Row="1"
-                Grid.Column="1"
-                Margin="0,6,0,0"
-                ItemsSource="{Binding AvailableElementsProviders}"
-                DisplayMemberPath="Name"
-                SelectedItem="{Binding ElementsProvider}" />
-        </Grid>
-
-        <ContentControl
+        <Border
             Grid.Row="2"
-            Margin="14,0"
-            Content="{Binding ElementsProvider}" />
+            Margin="8"
+            Style="{StaticResource CustomBorder}">
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition
+                        Height="Auto" />
+                    <RowDefinition
+                        Height="*" />
+                </Grid.RowDefinitions>
+
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition
+                        Width="200" />
+                    <ColumnDefinition
+                        Width="*" />
+                </Grid.ColumnDefinitions>
+                <Label
+                    Grid.Row="0"
+                    Grid.Column="0"
+                    VerticalAlignment="Center"
+                    Content="{me:LocalizationSource MainWindow.MepClass}" />
+                <ComboBox
+                    Grid.Row="0"
+                    Grid.Column="1"
+                    ItemsSource="{Binding AvailableElementsProviders}"
+                    DisplayMemberPath="Name"
+                    SelectedItem="{Binding ElementsProvider}" />
+                <ContentControl
+                    Grid.Row="1"
+                    Grid.Column="0"
+                    Grid.ColumnSpan="2"
+                    Content="{Binding ElementsProvider}" />
+            </Grid>
+        </Border>
+
+        <Border
+            Grid.Row="3"
+            Margin="8 0 8 0"
+            Style="{StaticResource CustomBorder}">
+            <DockPanel>
+                <Label
+                    DockPanel.Dock="Top"
+                    Content="{me:LocalizationSource MainWindow.Levels}" />
+                <CheckBox
+                    DockPanel.Dock="Top"
+                    Margin="5 0 0 0"
+                    Content="{me:LocalizationSource MainWindow.SelectAll}"
+                    IsChecked="{Binding SelectAllLevels}" />
+                <ui:ListView
+                    ToolTip="{me:LocalizationSource MainWindow.Levels.ElevationTooltip}"
+                    ItemsSource="{Binding Levels}">
+                    <ui:ListView.ItemTemplate>
+                        <DataTemplate>
+                            <CheckBox
+                                IsChecked="{Binding IsSelected, Mode=TwoWay}"
+                                Content="{Binding DisplayName}" />
+                        </DataTemplate>
+                    </ui:ListView.ItemTemplate>
+                </ui:ListView>
+            </DockPanel>
+        </Border>
 
         <DockPanel
-            Grid.Row="3"
-            Margin="14,8">
-            <ui:TextBlock
-                DockPanel.Dock="Top"
-                Margin="0,0,0,4"
-                Text="{me:LocalizationSource MainWindow.Levels}" />
-            <CheckBox
-                DockPanel.Dock="Top"
-                Margin="0,0,0,4"
-                Content="{me:LocalizationSource MainWindow.SelectAll}"
-                IsChecked="{Binding SelectAllLevels}" />
-            <ui:ListView
-                ToolTip="{me:LocalizationSource MainWindow.Levels.ElevationTooltip}"
-                ItemsSource="{Binding Levels}">
-                <ui:ListView.ItemTemplate>
-                    <DataTemplate>
-                        <CheckBox
-                            IsChecked="{Binding IsSelected, Mode=TwoWay}"
-                            Content="{Binding DisplayName}" />
-                    </DataTemplate>
-                </ui:ListView.ItemTemplate>
-            </ui:ListView>
+            Grid.Row="4">
+            <ui:ToggleSwitch
+                Margin="8"
+                DockPanel.Dock="Left"
+                Content="{me:LocalizationSource MainWindow.ShowSplitErrors}"
+                IsChecked="{Binding ShowPlacingErrors}" />
+
+            <StackPanel
+                Orientation="Horizontal"
+                HorizontalAlignment="Right"
+                DockPanel.Dock="Right">
+                <ui:TextBlock
+                    Margin="8"
+                    Style="{StaticResource CustomErrorText}"
+                    Text="{Binding ErrorText}" />
+
+                <ui:Button
+                    Margin="8"
+                    Width="80"
+                    Appearance="Info"
+                    Content="{me:LocalizationSource MainWindow.ButtonOk}"
+                    Click="ButtonOk_Click"
+                    Command="{Binding AcceptViewCommand}" />
+
+                <ui:Button
+                    Margin="8"
+                    Width="80"
+                    Content="{me:LocalizationSource MainWindow.ButtonCancel}"
+                    IsCancel="True"
+                    Click="ButtonCancel_Click" />
+            </StackPanel>
         </DockPanel>
-
-        <CheckBox
-            Grid.Row="4"
-            Margin="14,4"
-            Content="{me:LocalizationSource MainWindow.ShowSplitErrors}"
-            IsChecked="{Binding ShowPlacingErrors}" />
-
-        <StackPanel
-            Grid.Row="5"
-            Orientation="Horizontal"
-            HorizontalAlignment="Right"
-            Margin="14,8">
-
-            <ui:TextBlock
-                Margin="10,0"
-                Style="{StaticResource CustomErrorText}"
-                Text="{Binding ErrorText}" />
-
-            <ui:Button
-                Margin="4,0"
-                Width="80"
-                Appearance="Info"
-                Content="{me:LocalizationSource MainWindow.ButtonOk}"
-                Click="ButtonOk_Click"
-                Command="{Binding AcceptViewCommand}" />
-
-            <ui:Button
-                Margin="4,0"
-                Width="80"
-                Content="{me:LocalizationSource MainWindow.ButtonCancel}"
-                IsCancel="True"
-                Click="ButtonCancel_Click" />
-        </StackPanel>
     </Grid>
 </core:WpfUIPlatformWindow>

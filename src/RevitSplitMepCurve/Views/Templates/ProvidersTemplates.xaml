@@ -26,17 +26,16 @@
     <DataTemplate
         DataType="{x:Type vm:PipesProviderViewModel}">
         <Grid
-            Margin="0,4">
+            Margin="0 8 0 0">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition
                     Width="200" />
                 <ColumnDefinition
                     Width="*" />
             </Grid.ColumnDefinitions>
-            <ui:TextBlock
+            <Label
                 Grid.Column="0"
-                VerticalAlignment="Center"
-                Text="{Binding RoundSymbol.Label}" />
+                Content="{Binding RoundSymbol.Label}" />
             <ComboBox
                 Grid.Column="1"
                 DisplayMemberPath="Name"
@@ -54,17 +53,16 @@
         <StackPanel
             Orientation="Vertical">
             <Grid
-                Margin="0,4,0,0">
+                Margin="0 8 0 8">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition
                         Width="200" />
                     <ColumnDefinition
                         Width="*" />
                 </Grid.ColumnDefinitions>
-                <ui:TextBlock
+                <Label
                     Grid.Column="0"
-                    VerticalAlignment="Center"
-                    Text="{Binding RoundSymbol.Label}" />
+                    Content="{Binding RoundSymbol.Label}" />
                 <ComboBox
                     Grid.Column="1"
                     DisplayMemberPath="Name"
@@ -75,18 +73,16 @@
                     SelectedItem="{Binding RoundSymbol.SelectedItem}"
                     ScrollViewer.VerticalScrollBarVisibility="Auto" />
             </Grid>
-            <Grid
-                Margin="0,4">
+            <Grid>
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition
                         Width="200" />
                     <ColumnDefinition
                         Width="*" />
                 </Grid.ColumnDefinitions>
-                <ui:TextBlock
+                <Label
                     Grid.Column="0"
-                    VerticalAlignment="Center"
-                    Text="{Binding RectangleSymbol.Label}" />
+                    Content="{Binding RectangleSymbol.Label}" />
                 <ComboBox
                     Grid.Column="1"
                     DisplayMemberPath="Name"

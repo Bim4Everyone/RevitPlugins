@@ -34,7 +34,7 @@
     <system:String
         x:Key="MainWindow.ConnectorRectangle">Rectangular connector</system:String>
     <system:String
-        x:Key="MainWindow.ShowSplitErrors">Show split errors</system:String>
+        x:Key="MainWindow.ShowSplitErrors">Show errors</system:String>
     <system:String
         x:Key="MainWindow.ButtonOk">OK</system:String>
     <system:String

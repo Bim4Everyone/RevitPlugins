@@ -34,7 +34,7 @@
     <system:String
         x:Key="MainWindow.ConnectorRectangle">Прямоугольный соединитель</system:String>
     <system:String
-        x:Key="MainWindow.ShowSplitErrors">Выводить ошибки разделения</system:String>
+        x:Key="MainWindow.ShowSplitErrors">Показывать ошибки</system:String>
     <system:String
         x:Key="MainWindow.ButtonOk">ОК</system:String>
     <system:String
