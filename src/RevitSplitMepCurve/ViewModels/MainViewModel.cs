@@ -25,6 +25,7 @@ using Autodesk.Revit.DB;
 namespace RevitSplitMepCurve.ViewModels;
 
 internal class MainViewModel : BaseViewModel {
+    public IProgressDialogFactory ProgressFactory { get; }
     private readonly PluginConfig _pluginConfig;
     private readonly RevitRepository _revitRepository;
     private readonly IErrorsService _errorsService;
@@ -46,7 +47,9 @@ internal class MainViewModel : BaseViewModel {
         ILocalizationService localization,
         ErrorsWindowService errorsWindowService,
         IMessageBoxService messageBoxService,
+        IProgressDialogFactory progressFactory,
         ICollection<IElementsProvider> providers) {
+        ProgressFactory = progressFactory ?? throw new ArgumentNullException(nameof(progressFactory));
         _pluginConfig = pluginConfig ?? throw new ArgumentNullException(nameof(pluginConfig));
         _revitRepository = revitRepository ?? throw new ArgumentNullException(nameof(revitRepository));
         _errorsService = errorsService ?? throw new ArgumentNullException(nameof(errorsService));
@@ -169,26 +172,98 @@ internal class MainViewModel : BaseViewModel {
         if(splittable.Count == 0) {
             return;
         }
+        // TODO транзакция с субтранзакциями работает также быстро как и одиночная транзакция, но добавляет возможность обрабатывать ошибки
+        // TransactionGroup с вложенными транзакциями работает очень медленно
 
-        using(var tGroup = _revitRepository.Document.StartTransactionGroup(
-                  _localization.GetLocalizedString("MainWindow.TransactionName"))) {
-            foreach(var item in splittable) {
-                using var t = _revitRepository.Document.StartTransaction("item");
-                try {
-                    var result = item.Split(settings);
-                    result.UpdateSegments();
-                    t.Commit();
-                } catch(CannotGetConnectorSymbolException) {
-                    _errorsService.AddError(item.Element, "Error.InsufficientSpace");
-                    t.RollBack();
-                } catch(CannotCreateConnectorException) {
-                    _errorsService.AddError(item.Element, "Error.CannotCreateConnector");
-                    t.RollBack();
+        // //// transaction group + inner transactions
+        // using(var dialogService = ProgressFactory.CreateDialog()) {
+        //     dialogService.MaxValue = splittable.Count;
+        //     var progress = dialogService.CreateProgress();
+        //     var ct = dialogService.CreateCancellationToken();
+        //     int i = 0;
+        //     dialogService.Show();
+        //     using(var tGroup = _revitRepository.Document.StartTransactionGroup(
+        //               _localization.GetLocalizedString("MainWindow.TransactionName"))) {
+        //         foreach(var item in splittable) {
+        //             ct.ThrowIfCancellationRequested();
+        //             progress.Report(++i);
+        //             using var t = _revitRepository.Document.StartTransaction("item");
+        //             try {
+        //                 var result = item.Split(settings);
+        //                 result.UpdateSegments();
+        //                 t.Commit();
+        //             } catch(CannotGetConnectorSymbolException) {
+        //                 _errorsService.AddError(item.Element, "Error.InsufficientSpace");
+        //                 t.RollBack();
+        //             } catch(CannotCreateConnectorException) {
+        //                 _errorsService.AddError(item.Element, "Error.CannotCreateConnector");
+        //                 t.RollBack();
+        //             }
+        //         }
+        // 
+        //         tGroup.Assimilate();
+        //     }
+        // }
+
+        // //// transaction + inner subtransactions
+        using(var dialogService = ProgressFactory.CreateDialog()) {
+            dialogService.MaxValue = splittable.Count;
+            var progress = dialogService.CreateProgress();
+            var ct = dialogService.CreateCancellationToken();
+            int i = 0;
+            dialogService.Show();
+            using(var t = _revitRepository.Document.StartTransaction(
+                      _localization.GetLocalizedString("MainWindow.TransactionName"))) {
+                foreach(var item in splittable) {
+                    ct.ThrowIfCancellationRequested();
+                    progress.Report(++i);
+                    using(var subT = new SubTransaction(_revitRepository.Document)) {
+                        subT.Start();
+                        try {
+                            var result = item.Split(settings);
+                            result.UpdateSegments();
+                        } catch(CannotGetConnectorSymbolException) {
+                            _errorsService.AddError(item.Element, "Error.InsufficientSpace");
+                            subT.RollBack();
+                        } catch(CannotCreateConnectorException) {
+                            _errorsService.AddError(item.Element, "Error.CannotCreateConnector");
+                            subT.RollBack();
+                        }
+
+                        subT.Commit();
+                    }
                 }
-            }
 
-            tGroup.Assimilate();
+                t.Commit();
+            }
         }
+
+        // //// transaction (only)
+        // using(var dialogService = ProgressFactory.CreateDialog()) {
+        //     dialogService.MaxValue = splittable.Count;
+        //     var progress = dialogService.CreateProgress();
+        //     var ct = dialogService.CreateCancellationToken();
+        //     int i = 0;
+        //     dialogService.Show();
+        //     using(var t = _revitRepository.Document.StartTransaction(
+        //               _localization.GetLocalizedString("MainWindow.TransactionName"))) {
+        //         foreach(var item in splittable) {
+        //             ct.ThrowIfCancellationRequested();
+        //             progress.Report(++i);
+        //             try {
+        //                 var result = item.Split(settings);
+        //                 result.UpdateSegments();
+        //             } catch(CannotGetConnectorSymbolException) {
+        //                 _errorsService.AddError(item.Element, "Error.InsufficientSpace");
+        //             } catch(CannotCreateConnectorException) {
+        //                 _errorsService.AddError(item.Element, "Error.CannotCreateConnector");
+        //             }
+        //         }
+        // 
+        //         t.Commit();
+        //     }
+        // }
+
         ShowErrors();
     }
 

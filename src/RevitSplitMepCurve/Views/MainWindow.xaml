@@ -50,6 +50,8 @@
     <i:Interaction.Behaviors>
         <wpfbehaviors:WpfAttachServiceBehavior
             AttachableService="{Binding MessageBoxService}" />
+        <wpfbehaviors:WpfAttachServiceBehavior
+            AttachableService="{Binding ProgressFactory}" />
     </i:Interaction.Behaviors>
 
     <i:Interaction.Triggers>

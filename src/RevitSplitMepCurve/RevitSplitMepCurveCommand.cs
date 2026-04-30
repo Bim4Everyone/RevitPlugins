@@ -43,6 +43,7 @@ public class RevitSplitMepCurveCommand : BasePluginCommand {
 
         kernel.UseWpfUIThemeUpdater();
         kernel.UseWpfUIMessageBox<MainViewModel>();
+        kernel.UseWpfUIProgressDialog<MainViewModel>();
 
         string assemblyName = Assembly.GetExecutingAssembly().GetName().Name;
         kernel.UseWpfLocalization(
