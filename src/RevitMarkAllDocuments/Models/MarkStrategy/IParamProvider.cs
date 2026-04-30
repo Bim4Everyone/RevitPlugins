@@ -23,7 +23,6 @@ internal interface IParamProvider {
     /// </summary>
     IList<FilterableParam> GetParamsForMarks();
 
-
     Element GetElementWithParam(Element element, FilterableParam param);
 }
 

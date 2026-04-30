@@ -12,10 +12,9 @@ using RevitMarkAllDocuments.Views;
 
 namespace RevitMarkAllDocuments.Services;
 
-internal class WindowsService {
+internal class WindowsService : IWindowsService {
     private readonly IResolutionRoot _resolutionRoot;
     private readonly RevitRepository _revitRepository;
-    private readonly DocumentService _documentService;
     private readonly IMessageBoxService _messageBoxService;
     private readonly ILocalizationService _localizationService;
 
@@ -26,7 +25,6 @@ internal class WindowsService {
                           ILocalizationService localizationService) {
         _resolutionRoot = resolutionRoot;
         _revitRepository = revitRepository;
-        _documentService = documentService;
         _messageBoxService = messageBoxService;
         _localizationService = localizationService;
     }

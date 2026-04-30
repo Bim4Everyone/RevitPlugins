@@ -6,7 +6,7 @@ using RevitMarkAllDocuments.Models;
 
 namespace RevitMarkAllDocuments.Services.Export;
 
-internal class JsonSerializerService {
+internal class JsonSerializerService : IMarkSerializerService {
     private readonly ISerializationService _serializationService;
 
     public JsonSerializerService(ISerializationService serializationService) {

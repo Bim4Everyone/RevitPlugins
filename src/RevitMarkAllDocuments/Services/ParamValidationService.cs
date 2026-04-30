@@ -8,7 +8,7 @@ using RevitMarkAllDocuments.Models;
 
 namespace RevitMarkAllDocuments.Services;
 
-internal class ParamValidationService {
+internal class ParamValidationService : IParamValidationService {
     private readonly IMarkStrategy _markStrategy;
 
     public ParamValidationService(CategoryContext categoryContext) {

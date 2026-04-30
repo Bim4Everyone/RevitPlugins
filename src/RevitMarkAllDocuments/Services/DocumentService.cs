@@ -5,7 +5,7 @@ using Autodesk.Revit.DB;
 
 namespace RevitMarkAllDocuments.Services;
 
-internal class DocumentService {
+internal class DocumentService : IDocumentInterface {
     public string GetDocumentFullName(Document document) {
         if(document.IsWorkshared) {
             var modelPath = document.GetWorksharingCentralModelPath();

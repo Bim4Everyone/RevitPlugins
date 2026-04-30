@@ -12,7 +12,7 @@ using RevitMarkAllDocuments.Models;
 
 namespace RevitMarkAllDocuments.Services;
 
-internal class FiltrationService {
+internal class FiltrationService : IFiltrationService {
     private readonly IMarkStrategy _markStrategy;
     private readonly Category _category;
     private readonly DocumentService _docService;

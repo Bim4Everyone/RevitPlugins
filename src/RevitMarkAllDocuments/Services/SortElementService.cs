@@ -10,7 +10,7 @@ using RevitMarkAllDocuments.Models;
 
 namespace RevitMarkAllDocuments.Services;
 
-internal class SortElementService {
+internal class SortElementService : ISortElementService {
     private readonly IParamProvider _paramProvider;
 
     public SortElementService(IParamProvider paramProvider) {
