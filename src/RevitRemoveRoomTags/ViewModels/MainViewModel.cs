@@ -21,8 +21,8 @@ internal class MainViewModel : BaseViewModel {
 
     private MainWindow _userWindow;
     private ObservableCollection<View> _selectedViews = [];
-    private ObservableCollection<RoomTagTaskHelper> _roomTagTasks = [new RoomTagTaskHelper()];
-    private RoomTagTaskHelper _selectedRoomTagTask;
+    private ObservableCollection<RoomTagTaskVM> _roomTagTasks = [new RoomTagTaskVM()];
+    private RoomTagTaskVM _selectedRoomTagTask;
     private bool _needOpenSelectedViews = false;
 
     private string _errorText;
@@ -39,7 +39,7 @@ internal class MainViewModel : BaseViewModel {
         AddTaskCommand = RelayCommand.Create(AddTask);
         DeleteTaskCommand = RelayCommand.Create(DeleteTask, CanDeleteTask);
 
-        SelectRoomTagsCommand = new RelayCommand<RoomTagTaskHelper>(SelectRoomTags);
+        SelectRoomTagsCommand = new RelayCommand<RoomTagTaskVM>(SelectRoomTags);
     }
 
     public ICommand LoadViewCommand { get; }
@@ -60,12 +60,12 @@ internal class MainViewModel : BaseViewModel {
         set => RaiseAndSetIfChanged(ref _selectedViews, value);
     }
 
-    public ObservableCollection<RoomTagTaskHelper> RoomTagTasks {
+    public ObservableCollection<RoomTagTaskVM> RoomTagTasks {
         get => _roomTagTasks;
         set => RaiseAndSetIfChanged(ref _roomTagTasks, value);
     }
 
-    public RoomTagTaskHelper SelectedRoomTagTask {
+    public RoomTagTaskVM SelectedRoomTagTask {
         get => _selectedRoomTagTask;
         set => RaiseAndSetIfChanged(ref _selectedRoomTagTask, value);
     }
@@ -178,7 +178,7 @@ internal class MainViewModel : BaseViewModel {
     private void SelectRoomTags(object obj) {
         UserWindow.Hide();
 
-        if(obj is RoomTagTaskHelper task) {
+        if(obj is RoomTagTaskVM task) {
             task.RoomTags.Clear();
 
             ISelectionFilter selectFilter = new RoomTagSelectionFilter();
@@ -230,7 +230,7 @@ internal class MainViewModel : BaseViewModel {
         HashSet<ElementId> tagsForDel = [];
 
         // Перебираем задачи, созданные пользователем
-        foreach(RoomTagTaskHelper roomTagTask in RoomTagTasks) {
+        foreach(RoomTagTaskVM roomTagTask in RoomTagTasks) {
 
             // Получаем значения смещения, если пользователь задал перемещение марок, а не удаление
             double xOffset;
@@ -299,7 +299,7 @@ internal class MainViewModel : BaseViewModel {
     /// </summary>
     private void AddTask() {
 
-        RoomTagTasks.Add(new RoomTagTaskHelper());
+        RoomTagTasks.Add(new RoomTagTaskVM());
     }
 
     /// <summary>

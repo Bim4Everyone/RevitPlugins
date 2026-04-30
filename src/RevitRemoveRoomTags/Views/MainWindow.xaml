@@ -212,19 +212,11 @@
                         </DataGridTemplateColumn>
 
                         <!-- Колонка с чекбоксом удаления -->
-                        <DataGridTemplateColumn
+                        <DataGridCheckBoxColumn
                             Width="90"
                             MinWidth="90"
-                            Header="{StaticResource DeleteColumnHeader}">
-                            <DataGridTemplateColumn.CellTemplate>
-                                <DataTemplate>
-                                    <CheckBox
-                                        HorizontalAlignment="Center"
-                                        VerticalContentAlignment="Center"
-                                        IsChecked="{Binding Path=RemoveTags}" />
-                                </DataTemplate>
-                            </DataGridTemplateColumn.CellTemplate>
-                        </DataGridTemplateColumn>
+                            Header="{StaticResource DeleteColumnHeader}"
+                            Binding="{Binding Path=RemoveTags, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
                     </DataGrid.Columns>
                 </ui:DataGrid>
 
