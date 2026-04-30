@@ -9,13 +9,17 @@ using RevitMarkAllDocuments.Models;
 namespace RevitMarkAllDocuments.Services;
 
 internal class ParamValidationService {
-    public IList<WarningElement> CheckAreExistParams(bool isForTypes,
-                                                     IReadOnlyList<FilterableParam> paramsToCheck, 
+    private readonly IMarkStrategy _markStrategy;
+
+    public ParamValidationService(CategoryContext categoryContext) {
+        _markStrategy = categoryContext.GetMarkStrategy();
+    }
+    public IList<WarningElement> CheckAreExistParams(IReadOnlyList<FilterableParam> paramsToCheck, 
                                                      IReadOnlyList<MarkedElement> elementsToCheck) {
         var elementsWithError = new List<WarningElement>();
 
         foreach(var param in paramsToCheck) {
-            var elements = CheckIsExistParam(isForTypes, param, elementsToCheck);
+            var elements = CheckIsExistParam(param, elementsToCheck);
             if(elements.Any()) {
                 elementsWithError.AddRange(elements);
             }
@@ -24,27 +28,9 @@ internal class ParamValidationService {
         return elementsWithError;
     }
 
-    public IList<WarningElement> CheckIsExistParam(bool isForTypes, 
-                                                   FilterableParam paramToCheck, 
+    public IList<WarningElement> CheckIsExistParam(FilterableParam paramToCheck, 
                                                    IReadOnlyList<MarkedElement> elementsToCheck) {
-        if(isForTypes) {
-            return elementsToCheck
-                .Where(x => !x.RevitElement.IsExistsParam(paramToCheck.RevitParam))
-                .Select(x => new WarningElement {
-                    Element = x.RevitElement,
-                    ParameterName = paramToCheck.RevitParam.Name,
-                })
-                .ToList();
-        }
-
-        return elementsToCheck
-            .Where(x => !x.RevitElement.IsExistsParam(paramToCheck.RevitParam) && 
-                !x.RevitElement.GetElementType().IsExistsParam(paramToCheck.RevitParam))
-            .Select(x => new WarningElement {
-                Element = x.RevitElement,
-                ParameterName = paramToCheck.RevitParam.Name,
-            })
-            .ToList();
+        return _markStrategy.CheckIsExistParam(paramToCheck, elementsToCheck);
     }
 
     public IList<WarningElement> CheckIsReadonlyParam(FilterableParam paramToCheck, 

@@ -11,28 +11,33 @@ using RevitMarkAllDocuments.Models;
 namespace RevitMarkAllDocuments.Services;
 
 internal class SortElementService {
-    public IOrderedEnumerable<MarkedElement> SortElements(bool isForType,
-                                                          IReadOnlyList<MarkedElement> elements,
+    private readonly IMarkStrategy _markStrategy;
+
+    public SortElementService(CategoryContext categoryContext) {
+        _markStrategy = categoryContext.GetMarkStrategy();
+    }
+
+    public IOrderedEnumerable<MarkedElement> SortElements(IReadOnlyList<MarkedElement> elements,
                                                           IReadOnlyList<FilterableParam> sortParams) {
-        var sortedElements = elements.OrderBy(GetSortKey(isForType, sortParams[0]));
+        var sortedElements = elements.OrderBy(GetSortKey(sortParams[0]));
 
         foreach(var param in sortParams.Skip(1)) {
-            sortedElements = sortedElements.ThenBy(GetSortKey(isForType, param));
+            sortedElements = sortedElements.ThenBy(GetSortKey(param));
         }
 
         return sortedElements;
     }
 
-    private Func<MarkedElement, IComparable> GetSortKey(bool isForType, FilterableParam param) {
+    private Func<MarkedElement, IComparable> GetSortKey(FilterableParam param) {
         return param.RevitParam.StorageType switch {
-            StorageType.Integer => x => 
-                x.GetElementWithParam(isForType, param).GetParamValue<int>(param.RevitParam),
-            StorageType.ElementId => x => 
-                x.GetElementWithParam(isForType, param).GetParamValue<long>(param.RevitParam),
-            StorageType.Double => x => 
-                x.GetElementWithParam(isForType, param).GetParamValue<double>(param.RevitParam),
+            StorageType.Integer => x =>
+                _markStrategy.GetElementWithParam(x.RevitElement, param).GetParamValue<int>(param.RevitParam),
+            StorageType.ElementId => x =>
+                _markStrategy.GetElementWithParam(x.RevitElement, param).GetParamValue<long>(param.RevitParam),
+            StorageType.Double => x =>
+                _markStrategy.GetElementWithParam(x.RevitElement, param).GetParamValue<double>(param.RevitParam),
             _ => x => 
-                x.GetElementWithParam(isForType, param).GetParamValue<string>(param.RevitParam),
+                _markStrategy.GetElementWithParam(x.RevitElement, param).GetParamValue<string>(param.RevitParam),
         };
     }
 }

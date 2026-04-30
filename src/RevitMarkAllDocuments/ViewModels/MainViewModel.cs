@@ -30,6 +30,7 @@ internal class MainViewModel : BaseViewModel {
     private readonly JsonSerializerService _jsonService;
     private readonly ILocalizationService _localizationService;
     private readonly bool _isMarkForTypes;
+    private readonly CategoryContext _categoryContext;
     private readonly Category _selectedCategory;
     private readonly string _selectedCategoryName;
 
@@ -60,6 +61,7 @@ internal class MainViewModel : BaseViewModel {
         _filterParser = filterParser;
         _localizationService = localizationService;
 
+        _categoryContext = categoryContext;
         _isMarkForTypes = categoryContext.IsMarkForTypes;
         _selectedCategory = categoryContext.SelectedCategory;
         _selectedCategoryName = categoryContext.SelectedCategory.Name;
@@ -143,7 +145,7 @@ internal class MainViewModel : BaseViewModel {
 
         // Создание значений для марок на основе отсортированного списка элементов.
         var startValue = MarkSettingsPageViewModel.GetStartValue();
-        markData.CreateMarkValues(_isMarkForTypes, sortParams, startValue);
+        markData.CreateMarkValues(_categoryContext, sortParams, startValue);
 
         string currentDocName = _documentService.GetDocumentFullName(_revitRepository.Document);
 
@@ -176,7 +178,7 @@ internal class MainViewModel : BaseViewModel {
         var warningsWithNoParams = new WarningsViewModel();
 
         var warningElementsSortParams = _paramValidationService
-            .CheckAreExistParams(_isMarkForTypes, sortParams, filteredElements);
+            .CheckAreExistParams(sortParams, filteredElements);
 
         if(warningElementsSortParams.Any()) {
             var warning = new WarningViewModel() {
@@ -189,7 +191,7 @@ internal class MainViewModel : BaseViewModel {
         }
 
         var warningElementsMarkParams = _paramValidationService
-            .CheckIsExistParam(_isMarkForTypes, markParam, filteredElements);
+            .CheckIsExistParam(markParam, filteredElements);
 
         if(warningElementsMarkParams.Any()) {
             var warning = new WarningViewModel() {
