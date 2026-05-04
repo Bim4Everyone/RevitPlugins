@@ -1,0 +1,29 @@
+<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:system="clr-namespace:System;assembly=mscorlib">
+    <system:String x:Key="MainWindow.Title">Марки помещений</system:String>
+    <system:String x:Key="MainWindow.TagFamily">Семейство марки:</system:String>
+    <system:String x:Key="MainWindow.WayOfPlacement">Способ размещения:</system:String>
+    <system:String x:Key="MainWindow.EveryRoom">Каждое помещения в группе</system:String>
+    <system:String x:Key="MainWindow.OneRoomPerGroupMaxArea">Одно помещение в каждой группе (максимальная площадь)</system:String>
+    <system:String x:Key="MainWindow.OneRoomPerGroup">Одно помещение в каждой группе (выбрать по имени)</system:String>
+    <system:String x:Key="MainWindow.RoomName">Имя помещения:</system:String>
+    <system:String x:Key="MainWindow.TagPosition">Позиция марки:</system:String>
+    <system:String x:Key="MainWindow.Indent">Отступ от края, мм:</system:String>
+    <system:String x:Key="MainWindow.Ok">ОК</system:String>
+    <system:String x:Key="MainWindow.Cancel">Отмена</system:String>
+    
+    <system:String x:Key="MainWindow.TransactionName">Маркировать помещения</system:String>
+    <system:String x:Key="MainWindow.RoomWithoutName">&lt;Без имени&gt;</system:String>
+    <system:String x:Key="MainWindow.RoomWithoutSection">&lt;Без секции&gt;</system:String>
+    <system:String x:Key="MainWindow.RoomWithoutGroup">&lt;Без группы&gt;</system:String>
+    <system:String x:Key="MainWindow.ByCurrentView">Выборка по текущему виду</system:String>
+    <system:String x:Key="MainWindow.BySelectedElements">Выборка по выделенным элементам</system:String>
+    
+    <system:String x:Key="MainWindow.ErrorNoRooms">Помещения отсутствуют/не выбраны</system:String>
+    <system:String x:Key="MainWindow.ErrorNoTags">В проекте отсутствуют марки помещений</system:String>
+    <system:String x:Key="MainWindow.ErrorNoSelectedGroups">Группы не выбраны</system:String>
+    <system:String x:Key="MainWindow.ErrorNoSelectedTag">Марка не выбрана</system:String>
+    <system:String x:Key="MainWindow.ErrorNoCommonRooms">Для выбранных групп нет общих помещений</system:String>
+    <system:String x:Key="MainWindow.ErrorNoSelectedRoomName">Имя помещения не выбрано</system:String>    
+</ResourceDictionary>
