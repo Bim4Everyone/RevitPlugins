@@ -26,15 +26,7 @@ internal abstract class SplittableElement {
             return false;
         }
 
-        double tolerance = Element.Document.Application.ShortCurveTolerance;
-
-        (var p0, var p1) = GetEndPoints();
-        double elMax = Math.Max(p0.Z, p1.Z);
-        double elMin = Math.Min(p0.Z, p1.Z);
-
-        double levelMax = levels.Max(l => l.Elevation) + tolerance;
-        double levelMin = levels.Min(l => l.Elevation) - tolerance;
-        return elMin < levelMin && levelMax < elMax;
+        return levels.Any(CanBeSplitted);
     }
 
     /// <summary>Делит элемент и возвращает результат.</summary>

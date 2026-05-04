@@ -44,10 +44,12 @@
             Title="{me:LocalizationSource ErrorsWindow.Title}" />
         <Border Style="{StaticResource CustomBorder}">
             <ui:DataGrid
-                RowHeight="26"
-                VerticalContentAlignment="Center"
                 IsReadOnly="True"
-                Style="{StaticResource DefaultUiDataGridStyle}"
+                VerticalContentAlignment="Center"
+                AutoGenerateColumns="False"
+                CanUserReorderColumns="False"
+                GridLinesVisibility="All"
+                HeadersVisibility="None"
                 ItemsSource="{Binding Source={StaticResource groupedErrors}}">
                 <ui:DataGrid.GroupStyle>
                     <GroupStyle ContainerStyle="{StaticResource CustomGroupHeaderStyle}" />

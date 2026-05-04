@@ -172,40 +172,7 @@ internal class MainViewModel : BaseViewModel {
         if(splittable.Count == 0) {
             return;
         }
-        // TODO транзакция с субтранзакциями работает также быстро как и одиночная транзакция, но добавляет возможность обрабатывать ошибки
-        // TransactionGroup с вложенными транзакциями работает очень медленно
 
-        // //// transaction group + inner transactions
-        // using(var dialogService = ProgressFactory.CreateDialog()) {
-        //     dialogService.MaxValue = splittable.Count;
-        //     var progress = dialogService.CreateProgress();
-        //     var ct = dialogService.CreateCancellationToken();
-        //     int i = 0;
-        //     dialogService.Show();
-        //     using(var tGroup = _revitRepository.Document.StartTransactionGroup(
-        //               _localization.GetLocalizedString("MainWindow.TransactionName"))) {
-        //         foreach(var item in splittable) {
-        //             ct.ThrowIfCancellationRequested();
-        //             progress.Report(++i);
-        //             using var t = _revitRepository.Document.StartTransaction("item");
-        //             try {
-        //                 var result = item.Split(settings);
-        //                 result.UpdateSegments();
-        //                 t.Commit();
-        //             } catch(CannotGetConnectorSymbolException) {
-        //                 _errorsService.AddError(item.Element, "Error.InsufficientSpace");
-        //                 t.RollBack();
-        //             } catch(CannotCreateConnectorException) {
-        //                 _errorsService.AddError(item.Element, "Error.CannotCreateConnector");
-        //                 t.RollBack();
-        //             }
-        //         }
-        // 
-        //         tGroup.Assimilate();
-        //     }
-        // }
-
-        // //// transaction + inner subtransactions
         using(var dialogService = ProgressFactory.CreateDialog()) {
             dialogService.MaxValue = splittable.Count;
             var progress = dialogService.CreateProgress();
@@ -222,6 +189,7 @@ internal class MainViewModel : BaseViewModel {
                         try {
                             var result = item.Split(settings);
                             result.UpdateSegments();
+                            subT.Commit();
                         } catch(CannotGetConnectorSymbolException) {
                             _errorsService.AddError(item.Element, "Error.InsufficientSpace");
                             subT.RollBack();
@@ -229,40 +197,12 @@ internal class MainViewModel : BaseViewModel {
                             _errorsService.AddError(item.Element, "Error.CannotCreateConnector");
                             subT.RollBack();
                         }
-
-                        subT.Commit();
                     }
                 }
 
                 t.Commit();
             }
         }
-
-        // //// transaction (only)
-        // using(var dialogService = ProgressFactory.CreateDialog()) {
-        //     dialogService.MaxValue = splittable.Count;
-        //     var progress = dialogService.CreateProgress();
-        //     var ct = dialogService.CreateCancellationToken();
-        //     int i = 0;
-        //     dialogService.Show();
-        //     using(var t = _revitRepository.Document.StartTransaction(
-        //               _localization.GetLocalizedString("MainWindow.TransactionName"))) {
-        //         foreach(var item in splittable) {
-        //             ct.ThrowIfCancellationRequested();
-        //             progress.Report(++i);
-        //             try {
-        //                 var result = item.Split(settings);
-        //                 result.UpdateSegments();
-        //             } catch(CannotGetConnectorSymbolException) {
-        //                 _errorsService.AddError(item.Element, "Error.InsufficientSpace");
-        //             } catch(CannotCreateConnectorException) {
-        //                 _errorsService.AddError(item.Element, "Error.CannotCreateConnector");
-        //             }
-        //         }
-        // 
-        //         t.Commit();
-        //     }
-        // }
 
         ShowErrors();
     }
@@ -360,8 +300,11 @@ internal class MainViewModel : BaseViewModel {
             AvailableSelectionModes.Add(modeVm);
         }
 
-        SelectionMode = AvailableSelectionModes.FirstOrDefault(m => config != null && m.Mode == config.SelectedMode)
-                        ?? AvailableSelectionModes.First();
+        SelectionMode = hasSelectedElements
+            ? AvailableSelectionModes.First(m =>
+                m.Mode == RevitSplitMepCurve.Models.Enums.SelectionMode.SelectedElements)
+            : (AvailableSelectionModes.FirstOrDefault(m => config != null && m.Mode == config.SelectedMode)
+               ?? AvailableSelectionModes.First());
     }
 
     private void OnLevelPropertyChanged(object sender, PropertyChangedEventArgs e) {
