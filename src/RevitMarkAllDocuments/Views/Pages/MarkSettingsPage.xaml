@@ -1,0 +1,89 @@
+﻿<core:WpfUIPlatformPage
+    x:Class="RevitMarkAllDocuments.Views.MarkSettingsPage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:vms="clr-namespace:RevitMarkAllDocuments.ViewModels"
+    xmlns:me="clr-namespace:dosymep.WpfCore.MarkupExtensions;assembly=dosymep.WpfCore"
+    xmlns:core="clr-namespace:dosymep.WpfUI.Core"
+    xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
+    
+    ScrollViewer.CanContentScroll="False"
+    
+    x:ClassModifier="internal">
+
+    <core:WpfUIPlatformPage.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary
+                    Source="../Styles/Styles.xaml" />
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
+    </core:WpfUIPlatformPage.Resources>
+
+    <Grid
+        Margin="14">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition />
+        </Grid.RowDefinitions>
+
+        <TextBlock
+            Grid.Row="0"
+            Grid.Column="0"
+            Grid.ColumnSpan="3"
+            Margin="4,0,0,8"
+            Style="{StaticResource HeaderName}"
+            Text="{me:LocalizationSource MarkPage.Settings}" />
+
+        <Border
+            Grid.Row="1"
+            Style="{StaticResource CustomBorder}">
+            <UniformGrid
+                Rows="4"
+                VerticalAlignment="Top"
+                Height="200">
+                <DockPanel>
+                    <TextBlock
+                        Width="140"
+                        VerticalAlignment="Center"
+                        Text="{me:LocalizationSource MarkPage.Param}" />
+                    <ComboBox
+                        ItemsSource="{Binding ParamsForMark}"
+                        DisplayMemberPath="Name"
+                        SelectedItem="{Binding SelectedParam}" />
+                </DockPanel>
+                <DockPanel>
+                    <TextBlock
+                        Width="140"
+                        VerticalAlignment="Center"
+                        Text="{me:LocalizationSource MarkPage.StartNumber}" />
+                    <TextBox
+                        Margin="0,7"
+                        Text="{Binding StartNumber, UpdateSourceTrigger=PropertyChanged}" />
+                </DockPanel>
+                <DockPanel>
+                    <TextBlock
+                        Width="140"
+                        VerticalAlignment="Center"
+                        Text="{me:LocalizationSource MarkPage.Prefix}" />
+                    <TextBox
+                        Margin="0,7"
+                        IsEnabled="{Binding IsSuffixPrefixEnable}"
+                        Text="{Binding Prefix, UpdateSourceTrigger=PropertyChanged}" />
+                </DockPanel>
+                <DockPanel>
+                    <TextBlock
+                        Width="140"
+                        VerticalAlignment="Center"
+                        Text="{me:LocalizationSource MarkPage.Suffix}" />
+                    <TextBox
+                        Margin="0,7"
+                        IsEnabled="{Binding IsSuffixPrefixEnable}"
+                        Text="{Binding Suffix, UpdateSourceTrigger=PropertyChanged}" />
+                </DockPanel>
+            </UniformGrid>
+        </Border>
+    </Grid>
+</core:WpfUIPlatformPage>
