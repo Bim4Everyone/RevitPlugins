@@ -18,7 +18,7 @@ internal class MainViewModel : BaseViewModel {
 
     private string _errorText;
     private string _saveProperty;
-    
+
     /// <summary>
     /// Создает экземпляр основной ViewModel главного окна.
     /// </summary>
@@ -29,7 +29,7 @@ internal class MainViewModel : BaseViewModel {
         PluginConfig pluginConfig,
         RevitRepository revitRepository,
         ILocalizationService localizationService) {
-        
+
         _pluginConfig = pluginConfig;
         _revitRepository = revitRepository;
         _localizationService = localizationService;
@@ -42,7 +42,7 @@ internal class MainViewModel : BaseViewModel {
     /// Команда загрузки главного окна.
     /// </summary>
     public ICommand LoadViewCommand { get; }
-    
+
     /// <summary>
     /// Команда применения настроек главного окна. (запуск плагина)
     /// </summary>
@@ -71,6 +71,11 @@ internal class MainViewModel : BaseViewModel {
     /// <remarks>В данном методе должна происходить загрузка настроек окна, а так же инициализация полей окна.</remarks>
     private void LoadView() {
         LoadConfig();
+
+
+
+
+
     }
 
     /// <summary>
