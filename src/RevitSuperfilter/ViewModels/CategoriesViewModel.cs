@@ -13,10 +13,10 @@ using RevitSuperfilter.Models;
 namespace RevitSuperfilter.ViewModels;
 
 internal sealed class CategoriesViewModel : ObservableObject, IElementIndexList {
-    private readonly Dictionary<ElementId, string> _categoryKeys = new();
-    private readonly Dictionary<string, CategoryViewModel> _categories = new();
+    private readonly Dictionary<ElementId, string> _categories = new();
+    private readonly Dictionary<string, CategoryViewModel> _categoryVms = new();
 
-    public int Count => _categoryKeys.Keys.Count;
+    public int Count => _categories.Keys.Count;
     public ObservableCollection<CategoryViewModel> Categories { get; } = [];
 
     public void Build(IEnumerable<Element> elements) {
@@ -30,46 +30,46 @@ internal sealed class CategoriesViewModel : ObservableObject, IElementIndexList 
             var elementsInCat = catGroup.ToArray();
 
             foreach(var element in elementsInCat) {
-                _categoryKeys.Add(element.Id, GetKey(element));
+                _categories.Add(element.Id, GetKey(element));
             }
 
             var categoryViewModel = new CategoryViewModel(catGroup.Key);
             categoryViewModel.Build(elementsInCat);
             
             Categories.Add(categoryViewModel);
-            _categories.Add(GetKey(catGroup.Key), categoryViewModel);
+            _categoryVms.Add(GetKey(catGroup.Key), categoryViewModel);
         }
     }
 
     public void Clear() {
         Categories.Clear();
+        _categoryVms.Clear();
         _categories.Clear();
-        _categoryKeys.Clear();
     }
 
     public void Add(Element element) {
-        if(_categoryKeys.ContainsKey(element.Id)) {
+        if(_categories.ContainsKey(element.Id)) {
             Remove(element.Id);
         }
         
         var categoryViewModel = GetOrAdd(element);
         categoryViewModel.Add(element);
-        _categoryKeys.Add(element.Id, GetKey(element));
+        _categories.Add(element.Id, GetKey(element));
     }
 
     public void Remove(ElementId elementId) {
-        if(!_categoryKeys.TryGetValue(elementId, out string catKey)) {
+        if(!_categories.TryGetValue(elementId, out string catKey)) {
             return;
         }
 
-        _categoryKeys.Remove(elementId);
-        if(!_categories.TryGetValue(catKey, out var categoryViewModel)) {
+        _categories.Remove(elementId);
+        if(!_categoryVms.TryGetValue(catKey, out var categoryViewModel)) {
             return;
         }
 
         categoryViewModel.Remove(elementId);
         if(categoryViewModel.Count == 0) {
-            _categories.Remove(catKey);
+            _categoryVms.Remove(catKey);
             Categories.Remove(categoryViewModel);
         }
         
@@ -77,11 +77,11 @@ internal sealed class CategoriesViewModel : ObservableObject, IElementIndexList 
     }
 
     private CategoryViewModel GetOrAdd(Element element) {
-        if(!_categories.TryGetValue(GetKey(element), out var categoryViewModel)) {
+        if(!_categoryVms.TryGetValue(GetKey(element), out var categoryViewModel)) {
             categoryViewModel = new CategoryViewModel(element.Category);
 
             Categories.Add(categoryViewModel);
-            _categories.Add(GetKey(element), categoryViewModel);
+            _categoryVms.Add(GetKey(element), categoryViewModel);
         }
 
         return categoryViewModel;

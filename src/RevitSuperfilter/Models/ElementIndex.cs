@@ -7,15 +7,18 @@ using RevitSuperfilter.Comparators;
 namespace RevitSuperfilter.Models;
 
 internal sealed class ElementIndex : IEquatable<ElementIndex> {
-    public ElementIndex(Category category, Definition definition, string paramValue) {
-        Category = category;
-        Definition = definition;
-        ParamValue = paramValue;
+    public ElementIndex(Element element) {
+        Id = element.Id;
+        TypeId = element.GetTypeId();
+        Category = element.Category?.Name ?? "<null>";
+        
+        Element = element;
     }
 
-    public Category Category { get; }
-    public Definition Definition { get; }
-    public string ParamValue { get; }
+    public ElementId Id { get; }
+    public ElementId TypeId { get; }
+    public string Category { get; }
+    public Element Element { get; }
 
     #region IEquatable<ElementIndex>
 
@@ -28,9 +31,7 @@ internal sealed class ElementIndex : IEquatable<ElementIndex> {
             return true;
         }
 
-        return CategoryNameComparer.Instance.Equals(Category, other.Category)
-               && DefinitionNameComparer.Instance.Equals(Definition, other.Definition)
-               && ParamValue.Equals(other.ParamValue);
+        return Equals(Id, other.Id) && Equals(TypeId, other.TypeId) && Category == other.Category;
     }
 
     public override bool Equals(object obj) {
@@ -39,15 +40,9 @@ internal sealed class ElementIndex : IEquatable<ElementIndex> {
 
     public override int GetHashCode() {
         unchecked {
-            int hashCode =
-                (Category != null ? CategoryNameComparer.Instance.GetHashCode(Category) : 0);
-
-            hashCode =
-                (hashCode * 397) ^ (Definition != null ? DefinitionNameComparer.Instance.GetHashCode(Definition) : 0);
-
-            hashCode =
-                (hashCode * 397) ^ (ParamValue != null ? ParamValue.GetHashCode() : 0);
-
+            int hashCode = (Id != null ? Id.GetHashCode() : 0);
+            hashCode = (hashCode * 397) ^ (TypeId != null ? TypeId.GetHashCode() : 0);
+            hashCode = (hashCode * 397) ^ (Category != null ? Category.GetHashCode() : 0);
             return hashCode;
         }
     }

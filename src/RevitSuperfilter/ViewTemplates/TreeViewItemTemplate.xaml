@@ -3,12 +3,13 @@
                     xmlns:vms="clr-namespace:RevitSuperfilter.ViewModels"
                     xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
                     xmlns:behaviours="clr-namespace:RevitSuperfilter.Behaviours"
-                    xmlns:converters="clr-namespace:RevitSuperfilter.Converters">
+                    xmlns:converters="clr-namespace:RevitSuperfilter.Converters"
+                    xmlns:dosymep.Conveters="clr-namespace:dosymep.WpfCore.Converters;assembly=dosymep.WpfCore">
 
     <ResourceDictionary.MergedDictionaries>
         <ResourceDictionary
             Source="pack://application:,,,/Wpf.Ui;component/Controls/TreeView/TreeViewItem.xaml" />
-       
+
         <ResourceDictionary
             Source="pack://application:,,,/Wpf.Ui;component/Controls/ListView/ListViewItem.xaml" />
 
@@ -16,6 +17,11 @@
             <converters:DisplayValueConverter x:Key="LocalizationValueConverter" />
         </ResourceDictionary>
     </ResourceDictionary.MergedDictionaries>
+
+    <dosymep.Conveters:BoolToObjectConverter
+        x:Key="TypeImageConverter"
+        FalseValue="{x:Null}"
+        TrueValue="{x:Static ui:SymbolRegular.ScanType20}" />
 
     <DataTemplate
         x:Key="TreeViewItem"
@@ -33,7 +39,12 @@
                 Padding="0"
                 Margin="12,0,12,0"
                 VerticalAlignment="Center"
-                IsChecked="{Binding IsChecked}" />
+                IsChecked="{Binding IsChecked, Mode=OneWay}" />
+            
+            <ui:SymbolIcon
+                Margin="3 0"
+                Symbol="{Binding IsType, 
+                    Converter={StaticResource TypeImageConverter}}" />
 
             <ui:TextBlock
                 VerticalAlignment="Center">

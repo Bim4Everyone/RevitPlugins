@@ -77,17 +77,17 @@ public class SuperfilterCommand : BasePluginCommand {
             $"/{assemblyName};component/assets/localization/Language.xaml",
             CultureInfo.GetCultureInfo("ru-RU"));
 
-        // kernel.Bind<ISelectionElements>()
-        //     .To<DBSelection>()
-        //     .InSingletonScope();
+        kernel.Bind<ISelectionElements>()
+            .To<DBSelection>()
+            .InSingletonScope();
 
         kernel.Bind<ISelectionElements>()
             .To<DBViewSelection>()
             .InSingletonScope();
 
-        // kernel.Bind<ISelectionElements>()
-        //     .To<SelectedOnViewSelection>()
-        //     .InSingletonScope();
+        kernel.Bind<ISelectionElements>()
+            .To<SelectedOnViewSelection>()
+            .InSingletonScope();
 
         kernel.Bind<IReadOnlyCollection<ISuperfilterService>>()
             .ToMethod(c => c.Kernel.GetAll<ISelectionElements>()

@@ -14,12 +14,15 @@ internal sealed class DefinitionViewModel : BaseViewModel {
     private readonly Dictionary<ElementId, string> _values = new();
     private readonly Dictionary<string, ParamValueViewModel> _paramValues = new(StringComparer.CurrentCulture);
 
-    private readonly Definition _definition;
     private bool _isExpanded;
+    private readonly Definition _definition;
 
-    public DefinitionViewModel(Definition definition) {
+    public DefinitionViewModel(Definition definition, bool isType) {
+        IsType = isType;
         _definition = definition;
     }
+    
+    public bool IsType { get; }
 
     public int Count => ParamValues.Count;
     public string DisplayValue => _definition.Name;

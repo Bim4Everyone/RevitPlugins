@@ -1,11 +1,14 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.ComponentModel;
 using System.Linq;
+using System.Windows.Data;
 using System.Windows.Input;
 
 using Autodesk.Revit.DB;
 
+using dosymep.Revit;
 using dosymep.WPF.Commands;
 using dosymep.WPF.ViewModels;
 
@@ -16,9 +19,9 @@ using RevitSuperfilter.Models;
 namespace RevitSuperfilter.ViewModels;
 
 internal sealed class CategoryViewModel : BaseViewModel, IElementIndexList {
-    private readonly Dictionary<ElementId, Element> _elementsById = new();
-    private readonly Dictionary<ElementId, HashSet<Definition>> _definitionKeys = new();
-    private readonly Dictionary<Definition, DefinitionViewModel> _definitions = new(DefinitionNameComparer.Instance);
+    private readonly Dictionary<ElementId, ElementIndex> _elementsById = new();
+    private readonly Dictionary<ElementId, HashSet<Definition>> _definitions = new();
+    private readonly Dictionary<Definition, DefinitionViewModel> _definitionVms = new(DefinitionNameComparer.Instance);
 
     private readonly Category _category;
     private bool _isExpanded;
@@ -53,91 +56,139 @@ internal sealed class CategoryViewModel : BaseViewModel, IElementIndexList {
     #region IElementIndex
 
     public void Add(Element element) {
+        if(!element.IsValidObject) {
+            return;
+        }
+        
         if(_elementsById.ContainsKey(element.Id)) {
             Remove(element.Id);
         }
 
-        if(!_elementsById.ContainsKey(element.Id)) {
-            _elementsById.Add(element.Id, element);
+        if(!_elementsById.TryGetValue(element.Id, out var elementIndex)) {
+            elementIndex = new ElementIndex(element);
+            _elementsById.Add(element.Id, elementIndex);
         }
 
-        if(!_definitionKeys.ContainsKey(element.Id)) {
-            _definitionKeys.Add(element.Id, new HashSet<Definition>(DefinitionNameComparer.Instance));
-        }
 
-        if(IsLoaded) {
-            var elementParams = element.Parameters
-                .OfType<Parameter>()
-                .OrderBy(x => x.Definition, DefinitionNameComparer.Instance);
 
-            var definitions = _definitionKeys[element.Id];
-            foreach(var elementParam in elementParams) {
-                definitions.Add(elementParam.Definition);
-                var param = GetOrAdd(elementParam);
-                param.Add(element, elementParam.GetValueOrDefault());
-            }
-        }
-
-        OnPropertyChanged(nameof(Count));
+        AddType(element);
+        FillDefinitions(element, null, false);
     }
 
-    public void Remove(ElementId elementId) {
-        if(!_definitionKeys.TryGetValue(elementId, out var definitions)) {
+    private void AddType(Element element) {
+        if(!element.IsValidObject) {
             return;
         }
 
-        _elementsById.Remove(elementId);
-        _definitionKeys.Remove(elementId);
-        try {
-            foreach(var definition in definitions) {
-                if(_definitions.TryGetValue(definition, out var definitionViewModel)) {
-                    definitionViewModel.Remove(elementId);
-                    if(definitionViewModel.Count == 0) {
-                        _definitions.Remove(definition);
-                        Definitions.Remove(definitionViewModel);
-                    }
-                }
-            }
-        } catch(Exception ex) {
-            string sss = ex.Message;
+        if(!element.HasElementType()) {
+            return;
         }
 
-        OnPropertyChanged(nameof(Count));
+        var elementType = element.GetElementType();
+        FillDefinitions(elementType, element, true);
+    }
+
+    public void Remove(ElementId elementId) {
+        RemoveType(elementId);
+        RemoveDefinitions(elementId);
+    }
+    
+    private void RemoveType(ElementId elementId) {
+        if(!_elementsById.TryGetValue(elementId, out var elementIndex)) {
+            return;
+        }
+
+        _elementsById.Remove(elementIndex.Id);
+        _elementsById.Remove(elementIndex.TypeId);
+
+        RemoveDefinitions(elementIndex.TypeId);
     }
 
     #endregion IElementIndex
 
     public void Build(IEnumerable<Element> elements) {
         foreach(var element in elements) {
-            _elementsById.Add(element.Id, element);
-            _definitionKeys.Add(element.Id, new HashSet<Definition>(DefinitionNameComparer.Instance));
+            _elementsById.Add(element.Id, new ElementIndex(element));
         }
 
         OnPropertyChanged(nameof(Count));
     }
 
-    private DefinitionViewModel GetOrAdd(Parameter elementParam) {
-        if(!_definitions.TryGetValue(elementParam.Definition, out var paramViewModel)) {
-            paramViewModel = new DefinitionViewModel(elementParam.Definition);
+    private DefinitionViewModel GetOrAdd(Parameter elementParam, bool isType) {
+        if(!_definitionVms.TryGetValue(elementParam.Definition, out var paramViewModel)) {
+            paramViewModel = new DefinitionViewModel(elementParam.Definition, isType);
 
             Definitions.Add(paramViewModel);
-            _definitions.Add(elementParam.Definition, paramViewModel);
+            _definitionVms.Add(elementParam.Definition, paramViewModel);
         }
 
         return paramViewModel;
+    }
+    
+    private void FillDefinitions(Element element, Element innerElement, bool isType) {
+        if(IsLoaded) {
+            if(!_definitions.TryGetValue(element.Id, out var definitions)) {
+                definitions = new HashSet<Definition>(DefinitionNameComparer.Instance);
+                _definitions.Add(element.Id, definitions);
+            }
+
+            var elementParams = element.Parameters
+                .OfType<Parameter>()
+                .OrderBy(x => x.Definition, DefinitionNameComparer.Instance);
+
+            foreach(var elementParam in elementParams) {
+                definitions.Add(elementParam.Definition);
+                var param = GetOrAdd(elementParam, isType);
+                param.Add(isType ? innerElement : element, elementParam.GetValueOrDefault());
+            }
+        }
+
+        OnPropertyChanged(nameof(Count));
+    }
+
+    private void RemoveDefinitions(ElementId elementId) {
+        if(!_elementsById.Remove(elementId)) {
+            return;
+        }
+
+        if(!_definitions.TryGetValue(elementId, out var definitions)) {
+            return;
+        }
+
+        if(IsLoaded) {
+            foreach(var definition in definitions) {
+                if(_definitionVms.TryGetValue(definition, out var definitionViewModel)) {
+                    definitionViewModel.Remove(elementId);
+                    if(definitionViewModel.Count == 0) {
+                        _definitionVms.Remove(definition);
+                        Definitions.Remove(definitionViewModel);
+                    }
+                }
+            }
+        }
+
+        OnPropertyChanged(nameof(Count));
     }
 
     #region LoadParamsCommand
 
     private void LoadParams() {
+        ApplySort();
+        
         IsLoaded = true;
-        foreach(var element in _elementsById.Values.ToArray()) {
-            Add(element);
+        foreach(var elementIndex in _elementsById.Values.ToArray()) {
+            Add(elementIndex.Element);
         }
     }
 
     private bool CanLoadParams() {
         return !IsLoaded;
+    }
+    
+    private void ApplySort() {
+        var view = CollectionViewSource.GetDefaultView(Definitions);
+        view.SortDescriptions.Clear();
+        view.SortDescriptions.Add(new SortDescription(nameof(DefinitionViewModel.DisplayValue), ListSortDirection.Ascending));
     }
 
     #endregion LoadParamsCommand
