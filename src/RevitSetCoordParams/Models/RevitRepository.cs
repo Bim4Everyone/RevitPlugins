@@ -152,9 +152,11 @@ internal class RevitRepository {
                 return value != null && value.Equals(typeModel);
             })
             .Select(element => {
-                var transform = document.IsLinked
+                var linkTransform = document.IsLinked
                     ? _documentsService.GetTransformByName(document.GetUniqId())
-                    : _localTransform;
+                    : Transform.Identity;
+
+                var transform = linkTransform.Multiply(_localTransform);
 
                 var unitedSolid = GetUnitedSolid(element);
                 if(unitedSolid is null) {
