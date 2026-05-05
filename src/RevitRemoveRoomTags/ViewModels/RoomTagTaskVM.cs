@@ -1,4 +1,3 @@
-using System;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 
@@ -69,5 +68,5 @@ internal class RoomTagTaskVM : BaseViewModel, IDataErrorInfo {
             return error;
         }
     }
-    public string Error => throw new NotImplementedException();
+    public string Error => null;
 }
