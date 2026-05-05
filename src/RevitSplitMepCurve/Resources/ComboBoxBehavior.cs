@@ -36,7 +36,9 @@ internal class ComboBoxBehavior {
     }
 
     private static void OnTextChanged(object sender, TextChangedEventArgs e) {
-        if(sender is ComboBox comboBox && comboBox.IsEditable) {
+        if(sender is ComboBox comboBox
+           && comboBox.IsEditable
+           && comboBox.IsKeyboardFocusWithin) {
             if(!string.IsNullOrEmpty(comboBox.Text)) {
                 comboBox.IsDropDownOpen = true;
             }

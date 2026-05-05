@@ -118,8 +118,8 @@ internal class MainViewModel : BaseViewModel {
     private PipesProviderViewModel CreatePipesProvider(PipesProvider provider, RevitSettings config) {
         var providerVm = new PipesProviderViewModel(_localization, provider, _revitRepository);
         providerVm.RoundSymbol.SelectedItem =
-            providerVm.RoundSymbol.AvailableItems.FirstOrDefault(s => config?.RoundConnector?.Equals(s.Symbol) ?? false)
-            ?? providerVm.RoundSymbol.AvailableItems.FirstOrDefault();
+            providerVm.RoundSymbol.AvailableItems.FirstOrDefault(s =>
+                config?.RoundConnector?.Equals(s.Symbol) ?? false);
         return providerVm;
     }
 
@@ -127,12 +127,10 @@ internal class MainViewModel : BaseViewModel {
         var providerVm = new DuctsProviderViewModel(_localization, provider, _revitRepository);
         providerVm.RoundSymbol.SelectedItem =
             providerVm.RoundSymbol.AvailableItems
-                .FirstOrDefault(s => config?.RoundConnector?.Equals(s.Symbol) ?? false)
-            ?? providerVm.RoundSymbol.AvailableItems.FirstOrDefault();
+                .FirstOrDefault(s => config?.RoundConnector?.Equals(s.Symbol) ?? false);
         providerVm.RectangleSymbol.SelectedItem =
             providerVm.RectangleSymbol.AvailableItems.FirstOrDefault(s =>
-                config?.RectangleConnector?.Equals(s.Symbol) ?? false)
-            ?? providerVm.RectangleSymbol.AvailableItems.FirstOrDefault();
+                config?.RectangleConnector?.Equals(s.Symbol) ?? false);
         return providerVm;
     }
 
