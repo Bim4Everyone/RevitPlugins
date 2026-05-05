@@ -36,11 +36,9 @@ internal class RevitSettings : ProjectSettings {
 
     public SelectionMode SelectedMode { get; set; } = DefaultSelectionMode;
 
-    /// <summary>Имя типоразмера круглого соединителя.</summary>
-    public string ConnectorRoundSymbolName { get; set; } = string.Empty;
+    public ConnectorConfig RoundConnector { get; set; } = new ConnectorConfig();
 
-    /// <summary>Имя типоразмера прямоугольного соединителя.</summary>
-    public string ConnectorRectangleSymbolName { get; set; } = string.Empty;
+    public ConnectorConfig RectangleConnector { get; set; } = new ConnectorConfig();
 
     /// <summary>Имена уровней, исключённых пользователем.</summary>
     public List<string> UncheckedLevelNames { get; set; } = [];

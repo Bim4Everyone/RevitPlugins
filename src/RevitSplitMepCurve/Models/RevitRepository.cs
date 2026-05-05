@@ -6,6 +6,8 @@ using Autodesk.Revit.ApplicationServices;
 using Autodesk.Revit.DB;
 using Autodesk.Revit.UI;
 
+using dosymep.Revit;
+
 using RevitSplitMepCurve.Models.Enums;
 using RevitSplitMepCurve.Models.Splittable;
 
@@ -38,6 +40,8 @@ internal class RevitRepository {
             .OfClass(typeof(FamilySymbol))
             .OfCategory(category)
             .OfType<FamilySymbol>()
+            .Where(s => s.Family.GetParamValueOrDefault<int>(BuiltInParameter.FAMILY_CONTENT_PART_TYPE)
+                        == (int) PartType.Union)
             .ToArray();
     }
 

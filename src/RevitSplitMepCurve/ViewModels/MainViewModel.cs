@@ -118,8 +118,7 @@ internal class MainViewModel : BaseViewModel {
     private PipesProviderViewModel CreatePipesProvider(PipesProvider provider, RevitSettings config) {
         var providerVm = new PipesProviderViewModel(_localization, provider, _revitRepository);
         providerVm.RoundSymbol.SelectedItem =
-            providerVm.RoundSymbol.AvailableItems
-                .FirstOrDefault(s => s.Symbol.Name == config?.ConnectorRoundSymbolName)
+            providerVm.RoundSymbol.AvailableItems.FirstOrDefault(s => config?.RoundConnector?.Equals(s.Symbol) ?? false)
             ?? providerVm.RoundSymbol.AvailableItems.FirstOrDefault();
         return providerVm;
     }
@@ -128,11 +127,11 @@ internal class MainViewModel : BaseViewModel {
         var providerVm = new DuctsProviderViewModel(_localization, provider, _revitRepository);
         providerVm.RoundSymbol.SelectedItem =
             providerVm.RoundSymbol.AvailableItems
-                .FirstOrDefault(s => s.Symbol.Name == config?.ConnectorRoundSymbolName)
+                .FirstOrDefault(s => config?.RoundConnector?.Equals(s.Symbol) ?? false)
             ?? providerVm.RoundSymbol.AvailableItems.FirstOrDefault();
         providerVm.RectangleSymbol.SelectedItem =
-            providerVm.RectangleSymbol.AvailableItems
-                .FirstOrDefault(s => s.Symbol.Name == config?.ConnectorRectangleSymbolName)
+            providerVm.RectangleSymbol.AvailableItems.FirstOrDefault(s =>
+                config?.RectangleConnector?.Equals(s.Symbol) ?? false)
             ?? providerVm.RectangleSymbol.AvailableItems.FirstOrDefault();
         return providerVm;
     }
@@ -249,11 +248,20 @@ internal class MainViewModel : BaseViewModel {
         setting.ShowSplitErrors = ShowPlacingErrors;
 
         if(ElementsProvider is PipesProviderViewModel pipes) {
-            setting.ConnectorRoundSymbolName = pipes.RoundSymbol.SelectedItem?.Symbol.Name;
-            setting.ConnectorRectangleSymbolName = null;
+            setting.RoundConnector = new ConnectorConfig() {
+                SymbolName = pipes.RoundSymbol.SelectedItem?.Symbol.Name,
+                FamilyName = pipes.RoundSymbol.SelectedItem?.Symbol.FamilyName
+            };
+            setting.RectangleConnector = null;
         } else if(ElementsProvider is DuctsProviderViewModel ducts) {
-            setting.ConnectorRoundSymbolName = ducts.RoundSymbol.SelectedItem?.Symbol.Name;
-            setting.ConnectorRectangleSymbolName = ducts.RectangleSymbol.SelectedItem?.Symbol.Name;
+            setting.RoundConnector = new ConnectorConfig() {
+                SymbolName = ducts.RoundSymbol.SelectedItem?.Symbol.Name,
+                FamilyName = ducts.RoundSymbol.SelectedItem?.Symbol.FamilyName
+            };
+            setting.RectangleConnector = new ConnectorConfig() {
+                SymbolName = ducts.RectangleSymbol.SelectedItem?.Symbol.Name,
+                FamilyName = ducts.RectangleSymbol.SelectedItem?.Symbol.FamilyName
+            };
         }
 
         _pluginConfig.SaveProjectConfig();
