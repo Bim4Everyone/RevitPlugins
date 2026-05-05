@@ -21,6 +21,9 @@
         <Setter
             Property="StaysOpenOnEdit"
             Value="True" />
+        <Setter
+            Property="IsSynchronizedWithCurrentItem"
+            Value="False" />
     </Style>
 
     <DataTemplate
