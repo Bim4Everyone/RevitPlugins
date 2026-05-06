@@ -34,6 +34,18 @@ internal class RevitRepository {
             .ToArray();
     }
 
+    public ICollection<FamilySymbol> GetConnectorSymbols(BuiltInCategory category, ConnectorProfileType shape) {
+        return GetConnectorSymbols(category)
+            .GroupBy(s => s.Family.Id)
+            .Where(g => IsConnectorFamilyWithShape(g.First().Family, shape))
+            .SelectMany(g => g)
+            .ToArray();
+    }
+
+    /// <summary>
+    /// Возвращает все типоразмеры семейств с типом детали "Соединение"
+    /// </summary>
+    /// <param name="category">Категория типоразмеров семейств</param>
     public ICollection<FamilySymbol> GetConnectorSymbols(BuiltInCategory category) {
         return new FilteredElementCollector(Document)
             .WhereElementIsElementType()
@@ -124,6 +136,28 @@ internal class RevitRepository {
 
         ActiveUIDocument.ShowElements(elementIds);
         ActiveUIDocument.Selection.SetElementIds(elementIds);
+    }
+
+    /// <summary>
+    /// Проверяет, что семейство - соединитель с заданной формой
+    /// </summary>
+    /// <param name="family">Семейство</param>
+    /// <param name="shape">Форма соединителя</param>
+    /// <returns>True, если в семействе ровно 2 соединителя заданной формы, иначе - False</returns>
+    private bool IsConnectorFamilyWithShape(Family family, ConnectorProfileType shape) {
+        using var fDoc = Document.EditFamily(family);
+        var connectors = GetConnectors(fDoc);
+        bool result = connectors.Count == 2 && connectors.All(c => c.Shape == shape);
+        fDoc.Close(false);
+        return result;
+    }
+
+    private ICollection<ConnectorElement> GetConnectors(Document familyDocument) {
+        return new FilteredElementCollector(familyDocument)
+            .WhereElementIsNotElementType()
+            .OfClass(typeof(ConnectorElement))
+            .OfType<ConnectorElement>()
+            .ToArray();
     }
 
     /// <summary>

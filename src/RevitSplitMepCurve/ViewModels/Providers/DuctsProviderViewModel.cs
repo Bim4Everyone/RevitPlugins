@@ -19,14 +19,20 @@ internal class DuctsProviderViewModel : ElementsProviderViewModel {
         ILocalizationService localization,
         DuctsProvider provider,
         RevitRepository revitRepository) : base(localization, provider) {
-        var symbols = revitRepository
-            .GetConnectorSymbols(BuiltInCategory.OST_DuctFitting)
+        var roundSymbols = revitRepository
+            .GetConnectorSymbols(BuiltInCategory.OST_DuctFitting, ConnectorProfileType.Round)
+            .Select(s => new FamilySymbolViewModel(s))
+            .ToArray();
+        var rectangleSymbols = revitRepository
+            .GetConnectorSymbols(BuiltInCategory.OST_DuctFitting, ConnectorProfileType.Rectangular)
             .Select(s => new FamilySymbolViewModel(s))
             .ToArray();
         RoundSymbol = new SelectableFamilySymbolViewModel(
-            localization.GetLocalizedString("MainWindow.ConnectorRound"), symbols);
+            localization.GetLocalizedString("MainWindow.ConnectorRound"),
+            roundSymbols);
         RectangleSymbol = new SelectableFamilySymbolViewModel(
-            localization.GetLocalizedString("MainWindow.ConnectorRectangle"), symbols);
+            localization.GetLocalizedString("MainWindow.ConnectorRectangle"),
+            rectangleSymbols);
         Name = _localization.GetLocalizedString(
             $"{nameof(RevitSplitMepCurve.Models.Enums.MepClass)}.{provider.MepClass}");
     }
