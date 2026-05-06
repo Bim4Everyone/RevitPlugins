@@ -1,0 +1,38 @@
+﻿<ResourceDictionary
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:system="clr-namespace:System;assembly=mscorlib">
+
+    <!-- Окно -->
+    <system:String x:Key="MainWindow.Title">Удаление марок помещений</system:String>
+    
+    <!-- Кнопки -->
+    <system:String x:Key="MainWindow.ButtonOk">ОК</system:String>
+    <system:String x:Key="MainWindow.ButtonCancel">Отмена</system:String>
+    
+    <!-- Основные элементы -->
+    <system:String x:Key="MainWindow.SelectedViewsPrefix">Выбрано видов до запуска плагина:</system:String>
+    <system:String x:Key="MainWindow.OpenSelectedViews">Открыть выбранные виды</system:String>
+    <system:String x:Key="MainWindow.TasksLabel">Задачи для работы:</system:String>
+    
+    <!-- Заголовки колонок таблицы -->
+    <system:String x:Key="MainWindow.SelectTagsColumn">Выбор марок</system:String>
+    <system:String x:Key="MainWindow.SelectButton">Выбрать</system:String>
+    <system:String x:Key="MainWindow.SelectedCountColumn">Выбрано:</system:String>
+    <system:String x:Key="MainWindow.XOffsetColumn">Смещение по X</system:String>
+    <system:String x:Key="MainWindow.YOffsetColumn">Смещение по Y</system:String>
+    <system:String x:Key="MainWindow.DeleteColumn">Удалять?</system:String>
+    
+    <!-- Кнопки задач -->
+    <system:String x:Key="MainWindow.AddTaskButton">Добавить задачу</system:String>
+    <system:String x:Key="MainWindow.AddTaskToolTip">Добавить пустую задачу в список задач</system:String>
+    <system:String x:Key="MainWindow.DeleteTaskButton">Удалить задачу</system:String>
+    <system:String x:Key="MainWindow.DeleteTaskToolTip">Удалить выбранную задачу из списка задач</system:String>
+
+    <!-- Ошибки из VM -->
+    <system:String x:Key="MainWindow.ErrorNoViews">Не выбрано ни одного вида</system:String>
+    <system:String x:Key="MainWindow.ErrorNoTasks">Не создано ни одной задачи</system:String>
+    <system:String x:Key="MainWindow.ErrorNoTagsInTasks">Не во всех задачах выбраны марки помещений</system:String>
+    <system:String x:Key="MainWindow.ErrorXOffsetAsStr">Ошибка в заполнении смещения по X</system:String>
+    <system:String x:Key="MainWindow.ErrorYOffsetAsStr">Ошибка в заполнении смещения по Y</system:String>
+</ResourceDictionary>

@@ -1,0 +1,38 @@
+﻿<ResourceDictionary
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:system="clr-namespace:System;assembly=mscorlib">
+
+    <!-- Window -->
+    <system:String x:Key="MainWindow.Title">Remove Room Tags</system:String>
+    
+    <!-- Buttons -->
+    <system:String x:Key="MainWindow.ButtonOk">OK</system:String>
+    <system:String x:Key="MainWindow.ButtonCancel">Cancel</system:String>
+    
+    <!-- Main elements -->
+    <system:String x:Key="MainWindow.SelectedViewsPrefix">Selected views before plugin start:</system:String>
+    <system:String x:Key="MainWindow.OpenSelectedViews">Open selected views</system:String>
+    <system:String x:Key="MainWindow.TasksLabel">Tasks:</system:String>
+    
+    <!-- Table column headers -->
+    <system:String x:Key="MainWindow.SelectTagsColumn">Select Tags</system:String>
+    <system:String x:Key="MainWindow.SelectButton">Select</system:String>
+    <system:String x:Key="MainWindow.SelectedCountColumn">Selected:</system:String>
+    <system:String x:Key="MainWindow.XOffsetColumn">X Offset</system:String>
+    <system:String x:Key="MainWindow.YOffsetColumn">Y Offset</system:String>
+    <system:String x:Key="MainWindow.DeleteColumn">Delete?</system:String>
+    
+    <!-- Task buttons -->
+    <system:String x:Key="MainWindow.AddTaskButton">Add Task</system:String>
+    <system:String x:Key="MainWindow.AddTaskToolTip">Add empty task to the task list</system:String>
+    <system:String x:Key="MainWindow.DeleteTaskButton">Delete Task</system:String>
+    <system:String x:Key="MainWindow.DeleteTaskToolTip">Delete selected task from the task list</system:String>
+
+    <!-- Ошибки из VM -->
+    <system:String x:Key="MainWindow.ErrorNoViews">No views selected</system:String>
+    <system:String x:Key="MainWindow.ErrorNoTasks">No tasks created</system:String>
+    <system:String x:Key="MainWindow.ErrorNoTagsInTasks">Not all tasks have room tags selected</system:String>
+    <system:String x:Key="MainWindow.ErrorXOffsetAsStr">Error in filling X offset</system:String>
+    <system:String x:Key="MainWindow.ErrorYOffsetAsStr">Error in filling Y offset</system:String>
+</ResourceDictionary>
