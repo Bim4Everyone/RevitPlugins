@@ -10,10 +10,10 @@ public interface ISheetSetSerializer {
 public class SheetSetSerializer : ISheetSetSerializer {
     private readonly JsonSerializerSettings _settings;
 
-    public SheetSetSerializer() {
+    public SheetSetSerializer(SheetComponentConverter converter) {
         _settings = new JsonSerializerSettings {
             Formatting = Formatting.Indented,
-            Converters = { new SheetComponentConverter() }
+            Converters = { converter }
         };
     }
 

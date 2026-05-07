@@ -56,19 +56,25 @@ public class RevitPackageDocumentationCommand : BasePluginCommand {
         kernel.Bind<PluginConfig>()
             .ToMethod(c => PluginConfig.GetPluginConfig(c.Kernel.Get<IConfigSerializer>()));
 
+        // Сервис открытия диалогового окна сохранения/открытия файла JSON
+        kernel.Bind<IFileDialogService>()
+            .To<JsonFileDialogService>()
+            .InSingletonScope();
+
         // JSON сериализатор
         kernel.Bind<ISheetSetSerializer>()
             .To<SheetSetSerializer>()
             .InSingletonScope();
 
-        // Настройка конфигурации комплекта листов
-        kernel.Bind<SheetSetConfig>()
+        // JSON конвертер объектов
+        kernel.Bind<SheetComponentConverter>()
             .ToSelf()
             .InSingletonScope();
 
-        // Сервис открытия диалогового окна сохранения/открытия файла JSON
-        kernel.Bind<IFileDialogService>()
-            .To<JsonFileDialogService>()
+
+        // Настройка конфигурации комплекта листов
+        kernel.Bind<SheetSetConfig>()
+            .ToSelf()
             .InSingletonScope();
 
         // Фабрика по созданию VM из JSON DTO

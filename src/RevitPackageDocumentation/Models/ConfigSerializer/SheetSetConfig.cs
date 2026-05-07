@@ -55,15 +55,15 @@ public class SheetSetConfig {
 /// DTO комплекта листов
 /// </summary>
 public class SheetSetData {
-    public string ConfigurationName { get; set; } = "Новая конфигурация";
-    public List<SheetData> SheetList { get; set; } = [];
+    public string Name { get; set; } = "Новая конфигурация";
+    public List<SheetData> Sheets { get; set; } = [];
 }
 
 /// <summary>
 /// DTO комплекта листа
 /// </summary>
 public class SheetData {
-    public string SheetName { get; set; }
+    public string Name { get; set; }
     public List<SheetComponentData> Views { get; set; } = [];
 }
 

@@ -19,10 +19,10 @@ internal class SheetSetVMFactory : ISheetSetVMFactory {
             throw new ArgumentNullException(nameof(data));
 
         var sheetSetVM = new SheetSetVM {
-            ConfigurationName = data.ConfigurationName
+            ConfigurationName = data.Name
         };
 
-        foreach(var sheetData in data.SheetList) {
+        foreach(var sheetData in data.Sheets) {
             var sheetVM = CreateSheetVM(sheetData);
             sheetSetVM.SheetList.Add(sheetVM);
         }
@@ -35,7 +35,7 @@ internal class SheetSetVMFactory : ISheetSetVMFactory {
             throw new ArgumentNullException(nameof(data));
 
         var sheetVM = new SheetVM {
-            SheetName = data.SheetName ?? string.Empty
+            SheetName = data.Name ?? string.Empty
         };
 
         foreach(var componentData in data.Views) {
