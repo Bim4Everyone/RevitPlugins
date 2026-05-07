@@ -1,3 +1,5 @@
+using System.Collections.Generic;
+
 using pyRevitLabs.Json;
 
 namespace RevitPackageDocumentation.Models.ConfigSerializer;
@@ -10,11 +12,13 @@ public interface ISheetSetSerializer {
 public class SheetSetSerializer : ISheetSetSerializer {
     private readonly JsonSerializerSettings _settings;
 
-    public SheetSetSerializer(SheetComponentConverter converter) {
+    public SheetSetSerializer(IEnumerable<JsonConverter> converters) {
         _settings = new JsonSerializerSettings {
             Formatting = Formatting.Indented,
-            Converters = { converter }
         };
+        foreach(var converter in converters) {
+            _settings.Converters.Add(converter);
+        }
     }
 
     public string Serialize<T>(T obj) {

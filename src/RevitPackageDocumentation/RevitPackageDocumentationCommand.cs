@@ -12,6 +12,8 @@ using dosymep.WpfUI.Core.Ninject;
 
 using Ninject;
 
+using pyRevitLabs.Json;
+
 using RevitPackageDocumentation.Models;
 using RevitPackageDocumentation.Models.ConfigSerializer;
 using RevitPackageDocumentation.ViewModels;
@@ -67,10 +69,9 @@ public class RevitPackageDocumentationCommand : BasePluginCommand {
             .InSingletonScope();
 
         // JSON конвертер объектов
-        kernel.Bind<SheetComponentConverter>()
-            .ToSelf()
+        kernel.Bind<JsonConverter>()
+            .To<SheetComponentConverter>()
             .InSingletonScope();
-
 
         // Настройка конфигурации комплекта листов
         kernel.Bind<SheetSetConfig>()
