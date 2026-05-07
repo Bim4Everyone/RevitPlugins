@@ -1,6 +1,5 @@
 using System.Globalization;
 using System.Reflection;
-using System.Windows;
 
 using Autodesk.Revit.Attributes;
 using Autodesk.Revit.UI;
@@ -8,16 +7,15 @@ using Autodesk.Revit.UI;
 using dosymep.Bim4Everyone;
 using dosymep.Bim4Everyone.ProjectConfigs;
 using dosymep.Bim4Everyone.SimpleServices;
-using dosymep.SimpleServices;
-using dosymep.WPF.Views;
 using dosymep.WpfCore.Ninject;
 using dosymep.WpfUI.Core.Ninject;
-using dosymep.Xpf.Core.Ninject;
 
 using Ninject;
 
 using RevitPackageDocumentation.Models;
+using RevitPackageDocumentation.Models.ConfigSerializer;
 using RevitPackageDocumentation.ViewModels;
+using RevitPackageDocumentation.ViewModels.Configuration;
 using RevitPackageDocumentation.Views;
 
 namespace RevitPackageDocumentation;
@@ -57,6 +55,29 @@ public class RevitPackageDocumentationCommand : BasePluginCommand {
         // Настройка конфигурации плагина
         kernel.Bind<PluginConfig>()
             .ToMethod(c => PluginConfig.GetPluginConfig(c.Kernel.Get<IConfigSerializer>()));
+
+        // JSON сериализатор
+        kernel.Bind<ISheetSetSerializer>()
+            .To<SheetSetSerializer>()
+            .InSingletonScope();
+
+        // Настройка конфигурации комплекта листов
+        kernel.Bind<SheetSetConfig>()
+            .ToSelf()
+            .InSingletonScope();
+
+        // Сервис открытия диалогового окна сохранения/открытия файла JSON
+        kernel.Bind<IFileDialogService>()
+            .To<JsonFileDialogService>()
+            .InSingletonScope();
+
+        // Фабрика по созданию VM из JSON DTO
+        kernel.Bind<ISheetSetVMFactory>()
+            .To<SheetSetVMFactory>()
+            .InSingletonScope();
+
+        // Настройка сервиса окошек сообщений
+        kernel.UseWpfUIMessageBox<MainViewModel>();
 
         // Используем сервис обновления тем для WinUI
         kernel.UseWpfUIThemeUpdater();

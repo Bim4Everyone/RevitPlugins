@@ -4,7 +4,7 @@ using RevitPackageDocumentation.ViewModels.Configuration.Sheet.SheetComponents;
 
 namespace RevitPackageDocumentation.ViewModels.Configuration.Sheet;
 internal class SheetVM {
-
+    public string SheetName { get; set; }
     public SheetPropsVM SheetProperties { get; set; }
     public List<SheetComponentVM> SheetComponents { get; set; }
 }

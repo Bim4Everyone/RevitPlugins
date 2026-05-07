@@ -5,6 +5,8 @@ using dosymep.WPF.Commands;
 using dosymep.WPF.ViewModels;
 
 using RevitPackageDocumentation.Models;
+using RevitPackageDocumentation.Models.ConfigSerializer;
+using RevitPackageDocumentation.ViewModels.Configuration;
 
 namespace RevitPackageDocumentation.ViewModels;
 
@@ -15,6 +17,10 @@ internal class MainViewModel : BaseViewModel {
     private readonly PluginConfig _pluginConfig;
     private readonly RevitRepository _revitRepository;
     private readonly ILocalizationService _localizationService;
+    private readonly IMessageBoxService _messageBoxService;
+    private readonly IFileDialogService _fileDialogService;
+    private readonly ISheetSetVMFactory _sheetSetVMFactory;
+    private readonly SheetSetConfig _sheetSetConfig;
 
     private string _errorText;
     private string _saveProperty;
@@ -28,11 +34,19 @@ internal class MainViewModel : BaseViewModel {
     public MainViewModel(
         PluginConfig pluginConfig,
         RevitRepository revitRepository,
-        ILocalizationService localizationService) {
+        ILocalizationService localizationService,
+        IMessageBoxService messageBoxService,
+        IFileDialogService fileDialogService,
+        ISheetSetVMFactory sheetSetVMFactory,
+        SheetSetConfig sheetSetConfig) {
 
         _pluginConfig = pluginConfig;
         _revitRepository = revitRepository;
         _localizationService = localizationService;
+        _messageBoxService = messageBoxService;
+        _fileDialogService = fileDialogService;
+        _sheetSetVMFactory = sheetSetVMFactory;
+        _sheetSetConfig = sheetSetConfig;
 
         LoadViewCommand = RelayCommand.Create(LoadView);
         AcceptViewCommand = RelayCommand.Create(AcceptView, CanAcceptView);
@@ -64,6 +78,8 @@ internal class MainViewModel : BaseViewModel {
         get => _saveProperty;
         set => RaiseAndSetIfChanged(ref _saveProperty, value);
     }
+    public SheetSetData SheetSetDataFromFile { get; set; }
+    public SheetSetVM CurrentSheetSet { get; set; }
 
     /// <summary>
     /// Метод загрузки главного окна.
@@ -72,11 +88,48 @@ internal class MainViewModel : BaseViewModel {
     private void LoadView() {
         LoadConfig();
 
-
-
-
-
+        ImportSheetSet();
+        ExportSheetSet();
     }
+
+    private void ImportSheetSet() {
+        _messageBoxService.Show("Import", "Title");
+
+        string path = _fileDialogService.OpenFileDialog();
+        SheetSetDataFromFile = _sheetSetConfig.Import(path);
+
+        //CurrentSheetSet = _sheetSetVMFactory.CreateSheetSetVM(SheetSetDataFromFile);
+    }
+
+    private void ExportSheetSet() {
+        _messageBoxService.Show("Export", "Title");
+
+        string path = _fileDialogService.SaveFileDialog();
+        _sheetSetConfig.Export(SheetSetDataFromFile, path);
+    }
+
+
+
+    /// <summary>
+    /// Загрузка настроек плагина.
+    /// </summary>
+    private void LoadConfig() {
+        RevitSettings setting = _pluginConfig.GetSettings(_revitRepository.Document);
+
+        SaveProperty = setting?.SaveProperty ?? _localizationService.GetLocalizedString("MainWindow.Hello");
+    }
+
+    /// <summary>
+    /// Сохранение настроек плагина.
+    /// </summary>
+    private void SaveConfig() {
+        RevitSettings setting = _pluginConfig.GetSettings(_revitRepository.Document)
+                                ?? _pluginConfig.AddSettings(_revitRepository.Document);
+
+        setting.SaveProperty = SaveProperty;
+        _pluginConfig.SaveProjectConfig();
+    }
+
 
     /// <summary>
     /// Метод применения настроек главного окна. (выполнение плагина)
@@ -106,23 +159,5 @@ internal class MainViewModel : BaseViewModel {
         return true;
     }
 
-    /// <summary>
-    /// Загрузка настроек плагина.
-    /// </summary>
-    private void LoadConfig() {
-        RevitSettings setting = _pluginConfig.GetSettings(_revitRepository.Document);
 
-        SaveProperty = setting?.SaveProperty ?? _localizationService.GetLocalizedString("MainWindow.Hello");
-    }
-
-    /// <summary>
-    /// Сохранение настроек плагина.
-    /// </summary>
-    private void SaveConfig() {
-        RevitSettings setting = _pluginConfig.GetSettings(_revitRepository.Document)
-                                ?? _pluginConfig.AddSettings(_revitRepository.Document);
-
-        setting.SaveProperty = SaveProperty;
-        _pluginConfig.SaveProjectConfig();
-    }
 }

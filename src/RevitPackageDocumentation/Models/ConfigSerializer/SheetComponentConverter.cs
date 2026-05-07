@@ -1,0 +1,44 @@
+using System;
+
+using pyRevitLabs.Json;
+using pyRevitLabs.Json.Linq;
+
+namespace RevitPackageDocumentation.Models.ConfigSerializer;
+
+/// <summary>
+/// Конвертер для полиморфной десериализации компонентов листа
+/// </summary>
+public class SheetComponentConverter : JsonConverter {
+    private const string _componentTypeProperty = "ComponentType";
+    private const string _planViewType = "PlanView";
+    private const string _scheduleViewType = "ScheduleView";
+
+    public override bool CanConvert(Type objectType) {
+        return objectType == typeof(SheetComponentData);
+    }
+
+    public override object ReadJson(JsonReader reader, Type objectType, object existingValue, JsonSerializer serializer) {
+        var jObject = JObject.Load(reader);
+        var componentType = jObject[_componentTypeProperty]?.Value<string>();
+
+        if(string.IsNullOrEmpty(componentType))
+            throw new JsonSerializationException($"Property '{_componentTypeProperty}' not found in JSON");
+
+        try {
+            return componentType switch {
+                _planViewType => jObject.ToObject<PlanViewData>(serializer),
+                _scheduleViewType => jObject.ToObject<ScheduleViewData>(serializer),
+                _ => throw new NotSupportedException($"Unknown component type: {componentType}")
+            };
+        } catch(Exception ex) {
+            throw new JsonSerializationException(
+                $"Error deserializing type '{componentType}'", ex);
+        }
+    }
+
+    public override void WriteJson(JsonWriter writer, object value, JsonSerializer serializer) {
+        serializer.Serialize(writer, value);
+    }
+
+    public override bool CanWrite => true;
+}
