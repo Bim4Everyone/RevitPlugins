@@ -70,6 +70,7 @@ public class SheetData {
 
 public abstract class SheetComponentData {
     public abstract string ComponentType { get; }
+    public string Name { get; set; }
 }
 
 /// <summary>
