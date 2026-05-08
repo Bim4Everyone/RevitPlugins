@@ -9,8 +9,6 @@ using dosymep.WPF.ViewModels;
 using RevitParamsChecker.Models;
 using RevitParamsChecker.Models.Checks;
 
-using ArgumentOutOfRangeException = Autodesk.Revit.Exceptions.ArgumentOutOfRangeException;
-
 namespace RevitParamsChecker.ViewModels.Checks;
 
 internal class CheckViewModel : BaseViewModel, IEquatable<CheckViewModel>, IName {
