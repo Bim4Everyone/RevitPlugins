@@ -34,31 +34,26 @@ internal class MaterialChecksEngine : ChecksEngine {
                 _localization.GetLocalizedString("Exceptions.NoMaterials"));
         }
 
-        StatusCode worst = StatusCode.Valid;
-        var errors = new HashSet<string>(StringComparer.Ordinal);
-
+        StatusCode status = StatusCode.Valid;
+        string error = string.Empty;
         foreach(var material in materials) {
             try {
                 bool success = rule.RootRule.Evaluate(material);
-                var status = success ? StatusCode.Valid : StatusCode.Invalid;
-                if((int) status < (int) worst) {
-                    worst = status;
+                if(!success) {
+                    status = StatusCode.Invalid;
+                    break;
                 }
             } catch(ParamNotFoundException exParam) {
-                if((int) StatusCode.ParamNotFound < (int) worst) {
-                    worst = StatusCode.ParamNotFound;
-                }
-
-                errors.Add(_localization.GetLocalizedString("Exceptions.ParamNotFound", exParam.Message));
+                status = StatusCode.ParamNotFound;
+                error = _localization.GetLocalizedString("Exceptions.MaterialParamNotFound", exParam.Message);
+                break;
             } catch(Autodesk.Revit.Exceptions.ApplicationException exRevit) {
-                worst = StatusCode.Error;
-                if(!string.IsNullOrEmpty(exRevit.Message)) {
-                    errors.Add(exRevit.Message);
-                }
+                status = StatusCode.Error;
+                error = exRevit.Message;
+                break;
             }
         }
 
-        string error = errors.Count > 0 ? string.Join("; ", errors) : string.Empty;
-        return new ElementResult(element, worst, rule.Name, error);
+        return new ElementResult(element, status, rule.Name, error);
     }
 }

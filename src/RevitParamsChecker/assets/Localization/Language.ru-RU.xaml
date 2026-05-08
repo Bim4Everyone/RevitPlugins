@@ -19,6 +19,8 @@
     <system:String
         x:Key="Exceptions.ParamNotFound">Параметр отсутствует: {0}</system:String>
     <system:String
+        x:Key="Exceptions.MaterialParamNotFound">Параметр материала отсутствует: {0}</system:String>
+    <system:String
         x:Key="Exceptions.NoMaterials">У элемента нет материалов</system:String>
 
     <system:String

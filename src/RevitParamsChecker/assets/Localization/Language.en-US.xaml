@@ -19,6 +19,8 @@
     <system:String
         x:Key="Exceptions.ParamNotFound">Parameter missing: {0}</system:String>
     <system:String
+        x:Key="Exceptions.MaterialParamNotFound">Material parameter missing: {0}</system:String>
+    <system:String
         x:Key="Exceptions.NoMaterials">Element has no materials</system:String>
 
     <system:String
