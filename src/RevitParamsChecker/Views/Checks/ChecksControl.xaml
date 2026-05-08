@@ -135,6 +135,24 @@
                     </DataGridTextColumn>
 
                     <DataGridTemplateColumn
+                        MinWidth="120"
+                        Width="Auto">
+                        <DataGridTemplateColumn.Header>
+                            <ui:TextBlock
+                                Text="{DynamicResource ChecksPage.TargetTypeHeader}" />
+                        </DataGridTemplateColumn.Header>
+                        <DataGridTemplateColumn.CellTemplate>
+                            <DataTemplate>
+                                <ComboBox
+                                    VerticalAlignment="Center"
+                                    ItemsSource="{Binding DataContext.AvailableEngines, RelativeSource={RelativeSource AncestorType=UserControl, Mode=FindAncestor}}"
+                                    SelectedItem="{Binding SelectedEngine, UpdateSourceTrigger=PropertyChanged}"
+                                    DisplayMemberPath="Name" />
+                            </DataTemplate>
+                        </DataGridTemplateColumn.CellTemplate>
+                    </DataGridTemplateColumn>
+
+                    <DataGridTemplateColumn
                         MinWidth="100"
                         Width="*">
                         <DataGridTemplateColumn.CellTemplate>

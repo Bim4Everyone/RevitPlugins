@@ -18,6 +18,8 @@
         x:Key="ResultsPage.Title">Анализ</system:String>
     <system:String
         x:Key="Exceptions.ParamNotFound">Параметр отсутствует: {0}</system:String>
+    <system:String
+        x:Key="Exceptions.NoMaterials">У элемента нет материалов</system:String>
 
     <system:String
         x:Key="NamesSelectionDialog.NamesHeader">Название</system:String>
@@ -49,6 +51,8 @@
         x:Key="ChecksPage.ExecuteChecksButton">Запустить выбранные</system:String>
     <system:String
         x:Key="ChecksPage.NameHeader">Название</system:String>
+    <system:String
+        x:Key="ChecksPage.TargetTypeHeader">Тип проверки</system:String>
     <system:String
         x:Key="ChecksPage.NothingSelectPrompt">Ничего не выбрано</system:String>
     <system:String
@@ -202,6 +206,11 @@
         x:Key="AndOperator">И</system:String>
     <system:String
         x:Key="OrOperator">Или</system:String>
+
+    <system:String
+        x:Key="CheckTargetType.Element">Элементы</system:String>
+    <system:String
+        x:Key="CheckTargetType.Material">Материалы</system:String>
 
     <system:String
         x:Key="StatusCode.Valid">Соответствует</system:String>

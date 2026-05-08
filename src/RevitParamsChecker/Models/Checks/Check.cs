@@ -8,6 +8,8 @@ internal class Check {
 
     public string Name { get; set; }
 
+    public CheckTargetType TargetType { get; set; } = CheckTargetType.Element;
+
     public HashSet<string> Filters { get; set; } = [];
 
     public HashSet<string> Files { get; set; } = [];
@@ -17,6 +19,7 @@ internal class Check {
     public Check Copy() {
         return new Check() {
             Name = Name,
+            TargetType = TargetType,
             Filters = [..Filters],
             Files = [..Files],
             Rules = [..Rules]

@@ -67,6 +67,31 @@ internal class RevitRepository {
             .ToArray();
     }
 
+    public ICollection<Material> GetElementMaterials(Element element) {
+        if(element is null) {
+            throw new ArgumentNullException(nameof(element));
+        }
+
+        var doc = element.Document;
+        var ids = new HashSet<ElementId>();
+        foreach(var id in element.GetMaterialIds(false)) {
+            ids.Add(id);
+        }
+
+        foreach(var id in element.GetMaterialIds(true)) {
+            ids.Add(id);
+        }
+
+        List<Material> materials = [];
+        foreach(var id in ids) {
+            if(doc.GetElement(id) is Material m) {
+                materials.Add(m);
+            }
+        }
+
+        return materials;
+    }
+
     public void SelectElements(ICollection<ElementModel> elements) {
 #if REVIT_2023_OR_GREATER
         ActiveUIDocument.Selection.SetReferences(elements.Select(e => e.Reference).ToArray());
