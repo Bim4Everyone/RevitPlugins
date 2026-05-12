@@ -46,6 +46,8 @@
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition
+                Height="Auto" />
+            <RowDefinition
                 Height="*" />
             <RowDefinition
                 Height="Auto" />
@@ -57,12 +59,12 @@
             Title="{me:LocalizationSource MainWindow.Title}" />
 
         <ui:NavigationView
-            Grid.Row="0"
+            Grid.Row="1"
             x:Name="_rootNavigationView"
             FrameMargin="0"
             OpenPaneLength="200"
             IsPaneOpen="True"
-            PaneDisplayMode="Left"
+            PaneDisplayMode="Top"
             IsBackButtonVisible="Visible"
             IsPaneVisible="True"
             IsPaneToggleVisible="True"
@@ -106,7 +108,7 @@
             x:Name="_rootContentDialog" />
 
         <StackPanel
-            Grid.Row="1"
+            Grid.Row="2"
             Orientation="Horizontal"
             HorizontalAlignment="Right">
 
