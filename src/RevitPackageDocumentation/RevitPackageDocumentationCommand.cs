@@ -83,6 +83,11 @@ public class RevitPackageDocumentationCommand : BasePluginCommand {
             .To<SheetSetVMFactory>()
             .InSingletonScope();
 
+        // Фабрика по созданию JSON DTO из VM 
+        kernel.Bind<ISheetSetDataFactory>()
+            .To<SheetSetDataFactory>()
+            .InSingletonScope();
+
         // Настройка сервиса окошек сообщений
         kernel.UseWpfUIMessageBox<MainViewModel>();
 

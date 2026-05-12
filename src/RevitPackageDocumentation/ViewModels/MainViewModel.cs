@@ -7,6 +7,7 @@ using dosymep.WPF.ViewModels;
 using RevitPackageDocumentation.Models;
 using RevitPackageDocumentation.Models.ConfigSerializer;
 using RevitPackageDocumentation.ViewModels.Configuration;
+using RevitPackageDocumentation.ViewModels.Configuration.Sheet;
 
 namespace RevitPackageDocumentation.ViewModels;
 
@@ -21,6 +22,10 @@ internal class MainViewModel : BaseViewModel {
     private readonly IFileDialogService _fileDialogService;
     private readonly ISheetSetVMFactory _sheetSetVMFactory;
     private readonly SheetSetConfig _sheetSetConfig;
+
+    private SheetSetData _currentSheetSetData;
+    private SheetSetVM _currentSheetSet;
+    private SheetVM _selectedSheet;
 
     private string _errorText;
     private string _saveProperty;
@@ -78,8 +83,23 @@ internal class MainViewModel : BaseViewModel {
         get => _saveProperty;
         set => RaiseAndSetIfChanged(ref _saveProperty, value);
     }
-    public SheetSetData SheetSetDataFromFile { get; set; }
-    public SheetSetVM CurrentSheetSet { get; set; }
+
+    public SheetSetData CurrentSheetSetData {
+        get => _currentSheetSetData;
+        set => RaiseAndSetIfChanged(ref _currentSheetSetData, value);
+    }
+
+    public SheetSetVM CurrentSheetSet {
+        get => _currentSheetSet;
+        set => RaiseAndSetIfChanged(ref _currentSheetSet, value);
+    }
+
+    public SheetVM SelectedSheet {
+        get => _selectedSheet;
+        set => RaiseAndSetIfChanged(ref _selectedSheet, value);
+    }
+
+
 
     /// <summary>
     /// Метод загрузки главного окна.
@@ -89,23 +109,23 @@ internal class MainViewModel : BaseViewModel {
         LoadConfig();
 
         ImportSheetSet();
-        ExportSheetSet();
+        //ExportSheetSet();
     }
 
     private void ImportSheetSet() {
         _messageBoxService.Show("Import", "Title");
 
         string path = _fileDialogService.OpenFileDialog();
-        SheetSetDataFromFile = _sheetSetConfig.Import(path);
+        CurrentSheetSetData = _sheetSetConfig.Import(path);
 
-        //CurrentSheetSet = _sheetSetVMFactory.CreateSheetSetVM(SheetSetDataFromFile);
+        CurrentSheetSet = _sheetSetVMFactory.CreateSheetSetVM(CurrentSheetSetData);
     }
 
     private void ExportSheetSet() {
         _messageBoxService.Show("Export", "Title");
 
         string path = _fileDialogService.SaveFileDialog();
-        _sheetSetConfig.Export(SheetSetDataFromFile, path);
+        _sheetSetConfig.Export(CurrentSheetSetData, path);
     }
 
 

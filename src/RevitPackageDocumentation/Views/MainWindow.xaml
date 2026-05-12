@@ -40,13 +40,34 @@
             Grid.Row="0"
             Title="{me:LocalizationSource MainWindow.Title}" />
 
-        <ui:TextBox
-            Grid.Row="1"
-            Width="200"
-            VerticalAlignment="Center"
-            HorizontalAlignment="Center"
-            Text="{Binding SaveProperty, UpdateSourceTrigger=PropertyChanged}" />
 
+        <Grid
+            Grid.Row="1">
+
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+            
+            <!--<Grid.RowDefinitions>
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="*" />
+                <RowDefinition Height="Auto" />
+            </Grid.RowDefinitions>-->
+
+
+            <ListBox
+                Grid.Column="0" 
+                ItemsSource="{Binding Path=CurrentSheetSet.SheetList, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
+                DisplayMemberPath="Name"
+                SelectedItem="{Binding Path=SelectedSheet}"/>
+
+            <ListView
+                Grid.Column="1"
+                ItemsSource="{Binding Path=SelectedSheet.SheetComponents, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
+                DisplayMemberPath="ModuleName"/>
+        </Grid>
+        
         <StackPanel
             Grid.Row="2"
             Orientation="Horizontal"

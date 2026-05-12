@@ -19,7 +19,7 @@ internal class SheetSetVMFactory : ISheetSetVMFactory {
             throw new ArgumentNullException(nameof(data));
 
         var sheetSetVM = new SheetSetVM {
-            ConfigurationName = data.Name
+            Name = data.Name
         };
 
         foreach(var sheetData in data.Sheets) {
@@ -35,7 +35,7 @@ internal class SheetSetVMFactory : ISheetSetVMFactory {
             throw new ArgumentNullException(nameof(data));
 
         var sheetVM = new SheetVM {
-            SheetName = data.Name ?? string.Empty
+            Name = data.Name ?? string.Empty
         };
 
         foreach(var componentData in data.Views) {
@@ -46,17 +46,19 @@ internal class SheetSetVMFactory : ISheetSetVMFactory {
         return sheetVM;
     }
 
-    public SheetComponentVM CreateComponentVM(SheetComponentData data) {
-        return data switch {
-            PlanViewData planData => new PlanViewVM {
-                ViewName = planData.PlanName ?? string.Empty,
-                ViewCount = planData.PlanNumber
+    public SheetComponentVM CreateComponentVM(SheetComponentData sheetComponentData) {
+        return sheetComponentData switch {
+            PlanViewData data => new PlanViewVM {
+                ModuleName = data.Name ?? string.Empty,
+                ViewName = data.PlanName ?? string.Empty,
+                ViewCount = data.PlanNumber
             },
-            ScheduleViewData scheduleData => new ScheduleViewVM {
-                ViewName = scheduleData.ScheduleName ?? string.Empty,
-                ViewCount = scheduleData.ScheduleNumber
+            ScheduleViewData data => new ScheduleViewVM {
+                ModuleName = data.Name ?? string.Empty,
+                ViewName = data.ScheduleName ?? string.Empty,
+                ViewCount = data.ScheduleNumber
             },
-            _ => throw new NotSupportedException($"Тип '{data?.GetType().Name}' не поддерживается")
+            _ => throw new NotSupportedException($"Тип '{sheetComponentData?.GetType().Name}' не поддерживается")
         };
     }
 }
