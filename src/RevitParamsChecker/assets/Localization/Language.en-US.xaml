@@ -18,6 +18,10 @@
         x:Key="ResultsPage.Title">Analysis</system:String>
     <system:String
         x:Key="Exceptions.ParamNotFound">Parameter missing: {0}</system:String>
+    <system:String
+        x:Key="Exceptions.MaterialParamNotFound">Material parameter missing: {0}</system:String>
+    <system:String
+        x:Key="Exceptions.NoMaterials">Element has no materials</system:String>
 
     <system:String
         x:Key="NamesSelectionDialog.NamesHeader">Name</system:String>
@@ -49,6 +53,8 @@
         x:Key="ChecksPage.ExecuteChecksButton">Run Selected</system:String>
     <system:String
         x:Key="ChecksPage.NameHeader">Name</system:String>
+    <system:String
+        x:Key="ChecksPage.TargetTypeHeader">Check Type</system:String>
     <system:String
         x:Key="ChecksPage.NothingSelectPrompt">Nothing Selected</system:String>
     <system:String
@@ -202,6 +208,11 @@ Previously selected checks are missing:
         x:Key="AndOperator">And</system:String>
     <system:String
         x:Key="OrOperator">Or</system:String>
+
+    <system:String
+        x:Key="CheckTargetType.Element">Elements</system:String>
+    <system:String
+        x:Key="CheckTargetType.Material">Materials</system:String>
 
     <system:String
         x:Key="StatusCode.Valid">Valid</system:String>

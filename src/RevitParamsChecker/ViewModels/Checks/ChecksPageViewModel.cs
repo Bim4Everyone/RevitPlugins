@@ -28,7 +28,7 @@ internal class ChecksPageViewModel : BaseViewModel {
     private readonly RevitRepository _revitRepo;
     private readonly ChecksConverter _checksConverter;
     private readonly NamesService _namesService;
-    private readonly ChecksEngine _checksEngine;
+    private readonly EngineViewModel[] _availableEngines;
     private string _errorText;
     private string _dirPath;
     private bool _allSelected;
@@ -50,7 +50,7 @@ internal class ChecksPageViewModel : BaseViewModel {
         RevitRepository revitRepo,
         ChecksConverter checksConverter,
         NamesService namesService,
-        ChecksEngine checksEngine) {
+        IEnumerable<ChecksEngine> checksEngines) {
         OpenFileDialogService = openFileDialogService ?? throw new ArgumentNullException(nameof(openFileDialogService));
         SaveFileDialogService = saveFileDialogService ?? throw new ArgumentNullException(nameof(saveFileDialogService));
         MessageBoxService = messageBoxService ?? throw new ArgumentNullException(nameof(messageBoxService));
@@ -62,14 +62,22 @@ internal class ChecksPageViewModel : BaseViewModel {
         _revitRepo = revitRepo ?? throw new ArgumentNullException(nameof(revitRepo));
         _checksConverter = checksConverter ?? throw new ArgumentNullException(nameof(checksConverter));
         _namesService = namesService ?? throw new ArgumentNullException(nameof(namesService));
-        _checksEngine = checksEngine ?? throw new ArgumentNullException(nameof(checksEngine));
+        if(checksEngines is null) {
+            throw new ArgumentNullException(nameof(checksEngines));
+        }
+
+        _availableEngines = [..checksEngines.Select(e => new EngineViewModel(e, _localization))];
+        if(_availableEngines.Length == 0) {
+            throw new ArgumentOutOfRangeException(nameof(checksEngines));
+        }
+
         _dirPath = Environment.GetFolderPath(Environment.SpecialFolder.Desktop);
 
         _availableFiles = [.._revitRepo.GetDocuments().Select(d => d.Name)];
         _availableFilters = [.._filtersRepo.GetFilters().Select(f => f.Name)];
         _availableRules = [.._rulesRepo.GetRules().Select(r => r.Name)];
 
-        Checks = [.._checksRepo.GetChecks().Select(c => new CheckViewModel(c) { Modified = false })];
+        Checks = [.._checksRepo.GetChecks().Select(c => new CheckViewModel(c, _availableEngines) { Modified = false })];
         SelectedCheck = Checks.FirstOrDefault();
         AddCheckCommand = RelayCommand.Create(AddCheck);
         RenameCheckCommand = RelayCommand.Create<CheckViewModel>(RenameCheck, CanRenameCheck);
@@ -109,6 +117,8 @@ internal class ChecksPageViewModel : BaseViewModel {
 
     public ObservableCollection<CheckViewModel> Checks { get; }
 
+    public IReadOnlyList<EngineViewModel> AvailableEngines => _availableEngines;
+
     public CheckViewModel SelectedCheck {
         get => _selectedCheck;
         set => RaiseAndSetIfChanged(ref _selectedCheck, value);
@@ -142,7 +152,7 @@ internal class ChecksPageViewModel : BaseViewModel {
             newCheck.Name = _namesService.CreateNewName(
                 _localization.GetLocalizedString("ChecksPage.NewCheckPrompt"),
                 Checks.Select(f => f.Name).ToArray());
-            var vm = new CheckViewModel(newCheck);
+            var vm = new CheckViewModel(newCheck, _availableEngines);
             vm.PropertyChanged += OnCheckChanged;
             Checks.Add(vm);
             SelectedCheck = vm;
@@ -168,7 +178,7 @@ internal class ChecksPageViewModel : BaseViewModel {
                 _localization.GetLocalizedString("ChecksPage.NewCheckPrompt"),
                 Checks.Select(f => f.Name).ToArray(),
                 check.Name);
-            var vm = new CheckViewModel(copyCheck);
+            var vm = new CheckViewModel(copyCheck, _availableEngines);
             vm.PropertyChanged += OnCheckChanged;
             Checks.Add(vm);
             SelectedCheck = vm;
@@ -207,9 +217,9 @@ internal class ChecksPageViewModel : BaseViewModel {
         var ct = progressDialogService.CreateCancellationToken();
         progressDialogService.Show();
 
-        var checks = Checks.Where(f => f.IsSelected).Select(c => c.GetCheck()).ToArray();
-        foreach(var check in checks) {
-            _checksEngine.Run(check, ct);
+        var checkVms = Checks.Where(f => f.IsSelected).ToArray();
+        foreach(var checkVm in checkVms) {
+            checkVm.SelectedEngine.Engine.Run(checkVm.GetCheck(), ct);
         }
 
         progressDialogService?.Close();
@@ -255,7 +265,7 @@ internal class ChecksPageViewModel : BaseViewModel {
             var vms = _namesService.GetResolvedCollection(
                     Checks.ToArray(),
                     checks.Select(c => {
-                            var check = new CheckViewModel(c);
+                            var check = new CheckViewModel(c, _availableEngines);
                             check.PropertyChanged += OnCheckChanged;
                             return check;
                         })

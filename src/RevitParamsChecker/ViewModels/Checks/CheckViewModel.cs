@@ -1,6 +1,8 @@
 using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
+using System.Linq;
 
 using dosymep.WPF.ViewModels;
 
@@ -21,10 +23,21 @@ internal class CheckViewModel : BaseViewModel, IEquatable<CheckViewModel>, IName
     private ObservableCollection<string> _selectedFilters;
     private ObservableCollection<string> _selectedRules;
     private bool _modified;
+    private EngineViewModel _selectedEngine;
 
-    public CheckViewModel(Check check) {
+    public CheckViewModel(Check check, IReadOnlyCollection<EngineViewModel> availableEngines) {
         _check = check ?? throw new ArgumentNullException(nameof(check));
+        if(availableEngines is null) {
+            throw new ArgumentNullException(nameof(availableEngines));
+        }
+
+        if(availableEngines.Count == 0) {
+            throw new System.ArgumentOutOfRangeException(nameof(availableEngines));
+        }
+
         Name = _check.Name;
+        SelectedEngine = availableEngines.FirstOrDefault(e => e.TargetType == _check.TargetType)
+            ?? availableEngines.First();
         Modified = true;
         SelectedFiles = [.._check.Files];
         SelectedFilters = [.._check.Filters];
@@ -36,6 +49,11 @@ internal class CheckViewModel : BaseViewModel, IEquatable<CheckViewModel>, IName
     public string Name {
         get => _name;
         set => RaiseAndSetIfChanged(ref _name, value);
+    }
+
+    public EngineViewModel SelectedEngine {
+        get => _selectedEngine;
+        set => RaiseAndSetIfChanged(ref _selectedEngine, value);
     }
 
     public string WarningFiles {
@@ -100,6 +118,7 @@ internal class CheckViewModel : BaseViewModel, IEquatable<CheckViewModel>, IName
 
     public Check GetCheck() {
         _check.Name = Name;
+        _check.TargetType = SelectedEngine.TargetType;
         _check.Files = [..SelectedFiles];
         _check.Filters = [..SelectedFilters];
         _check.Rules = [..SelectedRules];
@@ -110,7 +129,8 @@ internal class CheckViewModel : BaseViewModel, IEquatable<CheckViewModel>, IName
         if(e.PropertyName == nameof(Name)
            || e.PropertyName == nameof(SelectedFilters)
            || e.PropertyName == nameof(SelectedFiles)
-           || e.PropertyName == nameof(SelectedRules)) {
+           || e.PropertyName == nameof(SelectedRules)
+           || e.PropertyName == nameof(SelectedEngine)) {
             Modified = true;
         }
     }

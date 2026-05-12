@@ -197,5 +197,12 @@ public class RevitParamsCheckerCommand : BasePluginCommand {
         kernel.Bind<NamesService>()
             .ToSelf()
             .InSingletonScope();
+
+        kernel.Bind<ChecksEngine>()
+            .To<ElementChecksEngine>()
+            .InSingletonScope();
+        kernel.Bind<ChecksEngine>()
+            .To<MaterialChecksEngine>()
+            .InSingletonScope();
     }
 }

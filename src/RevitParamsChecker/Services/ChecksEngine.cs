@@ -5,7 +5,6 @@ using System.Threading;
 
 using dosymep.SimpleServices;
 
-using RevitParamsChecker.Exceptions;
 using RevitParamsChecker.Models.Checks;
 using RevitParamsChecker.Models.Filtration;
 using RevitParamsChecker.Models.Results;
@@ -14,14 +13,14 @@ using RevitParamsChecker.Models.Rules;
 
 namespace RevitParamsChecker.Services;
 
-internal class ChecksEngine {
-    private readonly RevitRepository _revitRepo;
-    private readonly FiltersRepository _filtersRepo;
-    private readonly RulesRepository _rulesRepo;
-    private readonly CheckResultsRepository _checkResultsRepo;
-    private readonly ILocalizationService _localization;
+internal abstract class ChecksEngine {
+    protected readonly RevitRepository _revitRepo;
+    protected readonly FiltersRepository _filtersRepo;
+    protected readonly RulesRepository _rulesRepo;
+    protected readonly CheckResultsRepository _checkResultsRepo;
+    protected readonly ILocalizationService _localization;
 
-    public ChecksEngine(
+    protected ChecksEngine(
         RevitRepository revitRepo,
         FiltersRepository filtersRepo,
         RulesRepository rulesRepo,
@@ -33,6 +32,8 @@ internal class ChecksEngine {
         _checkResultsRepo = checkResultsRepo ?? throw new ArgumentNullException(nameof(checkResultsRepo));
         _localization = localization ?? throw new ArgumentNullException(nameof(localization));
     }
+
+    public abstract CheckTargetType TargetType { get; }
 
     public void Run(Check check, CancellationToken ct = default) {
         if(check == null) {
@@ -46,20 +47,7 @@ internal class ChecksEngine {
             List<ElementResult> elementResults = [];
             foreach(var element in elements) {
                 ct.ThrowIfCancellationRequested();
-                try {
-                    bool success = rule.RootRule.Evaluate(element.Element);
-                    var status = success ? StatusCode.Valid : StatusCode.Invalid;
-                    elementResults.Add(new ElementResult(element, status, rule.Name));
-                } catch(ParamNotFoundException exParam) {
-                    elementResults.Add(
-                        new ElementResult(
-                            element,
-                            StatusCode.ParamNotFound,
-                            rule.Name,
-                            _localization.GetLocalizedString("Exceptions.ParamNotFound", exParam.Message)));
-                } catch(Autodesk.Revit.Exceptions.ApplicationException exRevit) {
-                    elementResults.Add(new ElementResult(element, StatusCode.Error, rule.Name, exRevit.Message));
-                }
+                elementResults.Add(EvaluateElement(element, rule));
             }
 
             ruleResults.Add(new RuleResult(elementResults, rule.Copy()));
@@ -68,6 +56,8 @@ internal class ChecksEngine {
         var result = new CheckResult(ruleResults, check.Copy());
         _checkResultsRepo.AddCheckResult(result);
     }
+
+    protected abstract ElementResult EvaluateElement(ElementModel element, Rule rule);
 
     private ICollection<ElementModel> GetElements(Check check) {
         var filters = check.Filters.Select(f => _filtersRepo.GetFilter(f)).ToArray();
