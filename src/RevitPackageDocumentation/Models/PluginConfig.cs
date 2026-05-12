@@ -62,5 +62,5 @@ internal class RevitSettings : ProjectSettings {
     /// <summary>
     /// Сохраняемое свойство для примера, нужно его заменить своими настройками.
     /// </summary>
-    public string SaveProperty { get; set; }
+    public string SheetSetDataPath { get; set; }
 }

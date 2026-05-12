@@ -1,3 +1,4 @@
+using System.IO;
 using System.Windows.Input;
 
 using dosymep.SimpleServices;
@@ -21,14 +22,14 @@ internal class MainViewModel : BaseViewModel {
     private readonly IMessageBoxService _messageBoxService;
     private readonly IFileDialogService _fileDialogService;
     private readonly ISheetSetVMFactory _sheetSetVMFactory;
+    private readonly ISheetSetDataFactory _sheetSetDataFactory;
     private readonly SheetSetConfig _sheetSetConfig;
 
-    private SheetSetData _currentSheetSetData;
     private SheetSetVM _currentSheetSet;
     private SheetVM _selectedSheet;
 
     private string _errorText;
-    private string _saveProperty;
+    private string _sheetSetDataPath;
 
     /// <summary>
     /// Создает экземпляр основной ViewModel главного окна.
@@ -43,6 +44,7 @@ internal class MainViewModel : BaseViewModel {
         IMessageBoxService messageBoxService,
         IFileDialogService fileDialogService,
         ISheetSetVMFactory sheetSetVMFactory,
+        ISheetSetDataFactory sheetSetDataFactory,
         SheetSetConfig sheetSetConfig) {
 
         _pluginConfig = pluginConfig;
@@ -51,16 +53,25 @@ internal class MainViewModel : BaseViewModel {
         _messageBoxService = messageBoxService;
         _fileDialogService = fileDialogService;
         _sheetSetVMFactory = sheetSetVMFactory;
+        _sheetSetDataFactory = sheetSetDataFactory;
         _sheetSetConfig = sheetSetConfig;
 
+        ImportCommand = RelayCommand.Create(ImportSheetSet);
+        ExportCommand = RelayCommand.Create(ExportSheetSet);
+
         AddSheetCommand = RelayCommand.Create(AddSheet);
+        RemoveSheetCommand = RelayCommand.Create<SheetVM>(RemoveSheet);
         AddComponentCommand = RelayCommand.Create(AddComponent);
 
         LoadViewCommand = RelayCommand.Create(LoadView);
         AcceptViewCommand = RelayCommand.Create(AcceptView, CanAcceptView);
     }
 
+    public ICommand ImportCommand { get; }
+    public ICommand ExportCommand { get; }
+
     public ICommand AddSheetCommand { get; }
+    public ICommand RemoveSheetCommand { get; }
     public ICommand AddComponentCommand { get; }
 
 
@@ -83,14 +94,6 @@ internal class MainViewModel : BaseViewModel {
         set => RaiseAndSetIfChanged(ref _errorText, value);
     }
 
-    /// <summary>
-    /// Свойство для примера. (требуется удалить)
-    /// </summary>
-    public string SaveProperty {
-        get => _saveProperty;
-        set => RaiseAndSetIfChanged(ref _saveProperty, value);
-    }
-
     public SheetSetVM CurrentSheetSet {
         get => _currentSheetSet;
         set => RaiseAndSetIfChanged(ref _currentSheetSet, value);
@@ -110,26 +113,30 @@ internal class MainViewModel : BaseViewModel {
     private void LoadView() {
         LoadConfig();
 
-        ImportSheetSet();
-        //ExportSheetSet();
+        if(string.IsNullOrEmpty(_sheetSetDataPath) || !File.Exists(_sheetSetDataPath)) {
+            ImportSheetSet();
+        } else {
+            ImportSheetSet(_sheetSetDataPath);
+        }
     }
 
     private void ImportSheetSet() {
-        _messageBoxService.Show("Import", "Title");
+        _sheetSetDataPath = _fileDialogService.OpenFileDialog();
+        ImportSheetSet(_sheetSetDataPath);
+    }
 
-        string path = _fileDialogService.OpenFileDialog();
-        _currentSheetSetData = _sheetSetConfig.Import(path);
-
-        CurrentSheetSet = _sheetSetVMFactory.CreateSheetSetVM(_currentSheetSetData);
+    private void ImportSheetSet(string sheetSetDataPath) {
+        var currentSheetSetData = _sheetSetConfig.Import(sheetSetDataPath);
+        CurrentSheetSet = _sheetSetVMFactory.CreateSheetSetVM(currentSheetSetData);
     }
 
     private void ExportSheetSet() {
-        _messageBoxService.Show("Export", "Title");
-
         string path = _fileDialogService.SaveFileDialog();
-        _sheetSetConfig.Export(_currentSheetSetData, path);
-    }
+        var currentSheetSetData = _sheetSetDataFactory.CreateSheetSetData(CurrentSheetSet);
+        _sheetSetConfig.Export(currentSheetSetData, path);
 
+        _messageBoxService.Show("Export is successful", "Export");
+    }
 
 
     /// <summary>
@@ -138,7 +145,7 @@ internal class MainViewModel : BaseViewModel {
     private void LoadConfig() {
         RevitSettings setting = _pluginConfig.GetSettings(_revitRepository.Document);
 
-        SaveProperty = setting?.SaveProperty ?? _localizationService.GetLocalizedString("MainWindow.Hello");
+        _sheetSetDataPath = setting?.SheetSetDataPath;
     }
 
     /// <summary>
@@ -148,7 +155,7 @@ internal class MainViewModel : BaseViewModel {
         RevitSettings setting = _pluginConfig.GetSettings(_revitRepository.Document)
                                 ?? _pluginConfig.AddSettings(_revitRepository.Document);
 
-        setting.SaveProperty = SaveProperty;
+        setting.SheetSetDataPath = _sheetSetDataPath;
         _pluginConfig.SaveProjectConfig();
     }
 
@@ -172,17 +179,24 @@ internal class MainViewModel : BaseViewModel {
     /// В методе проверяемые свойства окна должны быть отсортированы в таком же порядке как в окне (сверху-вниз)
     /// </remarks>
     private bool CanAcceptView() {
-        if(string.IsNullOrEmpty(SaveProperty)) {
-            ErrorText = _localizationService.GetLocalizedString("MainWindow.HelloCheck");
-            return false;
-        }
+        //if(string.IsNullOrEmpty(SaveProperty)) {
+        //    ErrorText = _localizationService.GetLocalizedString("MainWindow.HelloCheck");
+        //    return false;
+        //}
 
-        ErrorText = null;
+        //ErrorText = null;
         return true;
     }
 
     private void AddSheet() {
         CurrentSheetSet.AddSheet();
+    }
+
+    private void RemoveSheet(SheetVM sheet) {
+        if(sheet != null && CurrentSheetSet.SheetList.Contains(sheet)) {
+            CurrentSheetSet.SheetList.Remove(sheet);
+            SelectedSheet = null;
+        }
     }
 
     private void AddComponent() {
