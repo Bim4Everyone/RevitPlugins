@@ -57,7 +57,7 @@
                     <DataTemplate>
                         <DockPanel
                             Height="20"
-                            Margin="10 4"
+                            Margin="8 4"
                             VerticalAlignment="Center">
                             <ui:TextBlock
                                 VerticalAlignment="Center"
