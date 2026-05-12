@@ -4,9 +4,12 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    
     xmlns:base="clr-namespace:dosymep.WPF.Views"
     xmlns:local="clr-namespace:RevitPackageDocumentation.Views"
     xmlns:vms="clr-namespace:RevitPackageDocumentation.ViewModels"
+    xmlns:sc="clr-namespace:RevitPackageDocumentation.ViewModels.Configuration.Sheet.SheetComponents"
+    
     xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
     xmlns:core="clr-namespace:dosymep.WpfUI.Core"
     xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
@@ -18,6 +21,43 @@
     Width="1000" MinWidth="1000"
     
     d:DataContext="{d:DesignInstance vms:MainViewModel, IsDesignTimeCreatable=False}">
+    <Window.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary
+                    Source="CustomStyles.xaml" />
+            </ResourceDictionary.MergedDictionaries>
+
+            <DataTemplate
+                x:Key="PlanViewDerivedTemplate">
+                <StackPanel>
+                    <TextBlock
+                        Text="Тип: План" />
+                </StackPanel>
+            </DataTemplate>
+
+            <DataTemplate
+                DataType="{x:Type sc:PlanViewVM}">
+                <local:BaseSheetComponentView
+                    DerivedTemplate="{StaticResource PlanViewDerivedTemplate}" />
+            </DataTemplate>
+
+
+            <DataTemplate
+                x:Key="ScheduleViewDerivedTemplate">
+                <StackPanel>
+                    <TextBlock
+                        Text="Тип: Schedule" />
+                </StackPanel>
+            </DataTemplate>
+
+            <DataTemplate
+                DataType="{x:Type sc:ScheduleViewVM}">
+                <local:BaseSheetComponentView
+                    DerivedTemplate="{StaticResource ScheduleViewDerivedTemplate}" />
+            </DataTemplate>
+        </ResourceDictionary>
+    </Window.Resources>
 
     <i:Interaction.Triggers>
         <i:EventTrigger
@@ -126,8 +166,7 @@
             <ListView
                 Grid.Column="1"
                 Grid.Row="1"
-                ItemsSource="{Binding Path=SelectedSheet.SheetComponents, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
-                DisplayMemberPath="ModuleName" />
+                ItemsSource="{Binding Path=SelectedSheet.SheetComponents, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" />
 
             <ui:Button
                 Grid.Column="1"
