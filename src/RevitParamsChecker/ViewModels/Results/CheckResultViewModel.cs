@@ -121,7 +121,6 @@ internal class CheckResultViewModel : BaseViewModel {
                          || result.RuleName?.IndexOf(filter, StringComparison.CurrentCultureIgnoreCase) >= 0
                          || result.Status?.IndexOf(filter, StringComparison.CurrentCultureIgnoreCase) >= 0
                          || result.Error?.IndexOf(filter, StringComparison.CurrentCultureIgnoreCase) >= 0
-                         || result.UserMark?.IndexOf(filter, StringComparison.CurrentCultureIgnoreCase) >= 0
                          || result.CategoryName?.IndexOf(filter, StringComparison.CurrentCultureIgnoreCase) >= 0;
         }
     }
