@@ -53,9 +53,16 @@ internal class MainViewModel : BaseViewModel {
         _sheetSetVMFactory = sheetSetVMFactory;
         _sheetSetConfig = sheetSetConfig;
 
+        AddSheetCommand = RelayCommand.Create(AddSheet);
+        AddComponentCommand = RelayCommand.Create(AddComponent);
+
         LoadViewCommand = RelayCommand.Create(LoadView);
         AcceptViewCommand = RelayCommand.Create(AcceptView, CanAcceptView);
     }
+
+    public ICommand AddSheetCommand { get; }
+    public ICommand AddComponentCommand { get; }
+
 
     /// <summary>
     /// Команда загрузки главного окна.
@@ -82,11 +89,6 @@ internal class MainViewModel : BaseViewModel {
     public string SaveProperty {
         get => _saveProperty;
         set => RaiseAndSetIfChanged(ref _saveProperty, value);
-    }
-
-    public SheetSetData CurrentSheetSetData {
-        get => _currentSheetSetData;
-        set => RaiseAndSetIfChanged(ref _currentSheetSetData, value);
     }
 
     public SheetSetVM CurrentSheetSet {
@@ -116,16 +118,16 @@ internal class MainViewModel : BaseViewModel {
         _messageBoxService.Show("Import", "Title");
 
         string path = _fileDialogService.OpenFileDialog();
-        CurrentSheetSetData = _sheetSetConfig.Import(path);
+        _currentSheetSetData = _sheetSetConfig.Import(path);
 
-        CurrentSheetSet = _sheetSetVMFactory.CreateSheetSetVM(CurrentSheetSetData);
+        CurrentSheetSet = _sheetSetVMFactory.CreateSheetSetVM(_currentSheetSetData);
     }
 
     private void ExportSheetSet() {
         _messageBoxService.Show("Export", "Title");
 
         string path = _fileDialogService.SaveFileDialog();
-        _sheetSetConfig.Export(CurrentSheetSetData, path);
+        _sheetSetConfig.Export(_currentSheetSetData, path);
     }
 
 
@@ -179,5 +181,11 @@ internal class MainViewModel : BaseViewModel {
         return true;
     }
 
+    private void AddSheet() {
+        CurrentSheetSet.AddSheet();
+    }
 
+    private void AddComponent() {
+        SelectedSheet.AddComponent();
+    }
 }

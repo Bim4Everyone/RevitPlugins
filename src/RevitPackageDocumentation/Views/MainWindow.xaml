@@ -49,23 +49,38 @@
                 <ColumnDefinition Width="*"/>
             </Grid.ColumnDefinitions>
             
-            <!--<Grid.RowDefinitions>
-                <RowDefinition Height="Auto" />
+            <Grid.RowDefinitions>
                 <RowDefinition Height="*" />
                 <RowDefinition Height="Auto" />
-            </Grid.RowDefinitions>-->
+            </Grid.RowDefinitions>
 
 
             <ListBox
                 Grid.Column="0" 
+                Grid.Row="0"
                 ItemsSource="{Binding Path=CurrentSheetSet.SheetList, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
                 DisplayMemberPath="Name"
                 SelectedItem="{Binding Path=SelectedSheet}"/>
 
+            <ui:Button
+                Grid.Column="0"
+                Grid.Row="1"
+                Margin="10"
+                Content="Add sheet"
+                Command="{Binding AddSheetCommand}" />
+
             <ListView
                 Grid.Column="1"
+                Grid.Row="0"
                 ItemsSource="{Binding Path=SelectedSheet.SheetComponents, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
                 DisplayMemberPath="ModuleName"/>
+
+            <ui:Button
+                Grid.Column="1"
+                Grid.Row="1"
+                Margin="10"
+                Content="Add component"
+                Command="{Binding AddComponentCommand}" />
         </Grid>
         
         <StackPanel
