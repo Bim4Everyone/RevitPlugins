@@ -28,7 +28,7 @@ internal class CheckResultViewModel : BaseViewModel {
     private readonly DelayAction _refreshViewDelay;
     private readonly RevitRepository _revitRepo;
     private readonly ObservableCollection<ElementResultViewModel> _allElementResults;
-    private readonly PropertyGroupDescription _defaultGroupDescription;
+    private readonly PropertyGroupDescription _chunkGroupDescription;
     private string _elementsFilter;
     private ElementResultViewModel _selectedElementResult;
     private RuleViewModel _selectedRuleStamp;
@@ -47,13 +47,13 @@ internal class CheckResultViewModel : BaseViewModel {
         _refreshViewDelay = new DelayAction(300, () => ElementResults.View.Refresh());
         var availableProperties = GetEditableGroupProperties(_localization);
         GroupingProperties = new GroupDescriptionsViewModel(availableProperties, [availableProperties.First()]);
-        _defaultGroupDescription = new PropertyGroupDescription(nameof(ElementResultViewModel.ChunkName));
+        _chunkGroupDescription = new PropertyGroupDescription(nameof(ElementResultViewModel.ChunkName));
         if(_allElementResults.Count <= _chunkSize) {
             ResetGrouping(ElementResults, [availableProperties.First().PropertyGroupDescription]);
         } else {
             ResetGrouping(
                 ElementResults,
-                [_defaultGroupDescription, availableProperties.First().PropertyGroupDescription]);
+                [availableProperties.First().PropertyGroupDescription, _chunkGroupDescription]);
         }
 
         PropertyChanged += ElementsFilterPropertyChanged;
@@ -196,7 +196,7 @@ internal class CheckResultViewModel : BaseViewModel {
         if(_allElementResults.Count <= _chunkSize) {
             ResetGrouping(ElementResults, groups);
         } else {
-            ResetGrouping(ElementResults, [_defaultGroupDescription, .. groups]);
+            ResetGrouping(ElementResults, [.. groups, _chunkGroupDescription]);
         }
     }
 }
