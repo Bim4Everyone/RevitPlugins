@@ -1,4 +1,5 @@
 using System.IO;
+using System.Linq;
 using System.Windows.Input;
 
 using dosymep.SimpleServices;
@@ -128,12 +129,13 @@ internal class MainViewModel : BaseViewModel {
     private void ImportSheetSet(string sheetSetDataPath) {
         var currentSheetSetData = _sheetSetConfig.Import(sheetSetDataPath);
         CurrentSheetSet = _sheetSetVMFactory.CreateSheetSetVM(currentSheetSetData);
+        SelectedSheet = CurrentSheetSet.SheetList.FirstOrDefault();
     }
 
     private void ExportSheetSet() {
-        string path = _fileDialogService.SaveFileDialog();
+        _sheetSetDataPath = _fileDialogService.SaveFileDialog();
         var currentSheetSetData = _sheetSetDataFactory.CreateSheetSetData(CurrentSheetSet);
-        _sheetSetConfig.Export(currentSheetSetData, path);
+        _sheetSetConfig.Export(currentSheetSetData, _sheetSetDataPath);
 
         _messageBoxService.Show("Export is successful", "Export");
     }

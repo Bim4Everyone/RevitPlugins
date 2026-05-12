@@ -14,10 +14,9 @@
     mc:Ignorable="d"
     Title="{me:LocalizationSource MainWindow.Title}"
     
-    Height="500"
-    Width="700"
-    MinHeight="500"
-    MinWidth="700"
+    Height="700" MinHeight="700"
+    Width="1000" MinWidth="1000"
+    
     d:DataContext="{d:DesignInstance vms:MainViewModel, IsDesignTimeCreatable=False}">
 
     <i:Interaction.Triggers>
@@ -31,7 +30,6 @@
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />
-            <RowDefinition Height="Auto" />
             <RowDefinition Height="*" />
             <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
@@ -40,42 +38,52 @@
             Grid.Row="0"
             Title="{me:LocalizationSource MainWindow.Title}" />
 
-        <StackPanel
-            Grid.Row="1"
-            Orientation="Horizontal"
-            HorizontalAlignment="Left">
-
-            <ui:TextBlock
-                Margin="10"
-                VerticalAlignment="Center"
-                Text="{Binding ErrorText}" />
-
-            <ui:Button
-                Margin="10"
-                Content="Import"
-                Command="{Binding ImportCommand}" />
-
-            <ui:Button
-                Margin="10"
-                Content="Export"
-                Command="{Binding ExportCommand}" />
-        </StackPanel>
-
         <Grid
-            Grid.Row="2">
+            Grid.Row="1">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="*" />
-                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="2*" />
             </Grid.ColumnDefinitions>
 
             <Grid.RowDefinitions>
+                <RowDefinition Height="Auto" />
                 <RowDefinition Height="*" />
                 <RowDefinition Height="Auto" />
             </Grid.RowDefinitions>
 
+            <Grid
+                Grid.Column="0"
+                Grid.Row="0">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+
+                <ui:Button
+                    Grid.Column="0"
+                    Margin="10 10 5 10"
+                    Icon="{ui:SymbolIcon ArrowDownload20}"
+                    Command="{Binding ImportCommand}" />
+
+                <ui:Button
+                    Grid.Column="1"
+                    Margin="5 10 10 10"
+                    Icon="{ui:SymbolIcon ArrowExportUp20}"
+                    Command="{Binding ExportCommand}" />
+
+                <ui:TextBox
+                    Grid.Column="2"
+                    Margin="10"
+                    Text="{Binding CurrentSheetSet.Name, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
+                    VerticalContentAlignment="Center"
+                    HorizontalAlignment="Stretch" />
+            </Grid>
+            
+            
             <ListView
                 Grid.Column="0"
-                Grid.Row="0"
+                Grid.Row="1"
                 ItemsSource="{Binding Path=CurrentSheetSet.SheetList, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
                 SelectedItem="{Binding Path=SelectedSheet}">
 
@@ -89,10 +97,10 @@
 
                             <ui:TextBox
                                 Grid.Column="0"
+                                Margin="5"
                                 Text="{Binding Name, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
                                 VerticalContentAlignment="Center"
-                                HorizontalAlignment="Stretch"
-                                Margin="5" />
+                                HorizontalAlignment="Stretch" />
 
                             <ui:Button
                                 Grid.Column="1"
@@ -110,27 +118,27 @@
 
             <ui:Button
                 Grid.Column="0"
-                Grid.Row="1"
+                Grid.Row="2"
                 Margin="10"
                 Content="Add sheet"
                 Command="{Binding AddSheetCommand}" />
 
             <ListView
                 Grid.Column="1"
-                Grid.Row="0"
+                Grid.Row="1"
                 ItemsSource="{Binding Path=SelectedSheet.SheetComponents, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
                 DisplayMemberPath="ModuleName" />
 
             <ui:Button
                 Grid.Column="1"
-                Grid.Row="1"
+                Grid.Row="2"
                 Margin="10"
                 Content="Add component"
                 Command="{Binding AddComponentCommand}" />
         </Grid>
 
         <StackPanel
-            Grid.Row="3"
+            Grid.Row="2"
             Orientation="Horizontal"
             HorizontalAlignment="Right">
 
