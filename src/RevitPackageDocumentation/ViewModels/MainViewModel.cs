@@ -1,6 +1,9 @@
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Windows.Input;
+
+using Autodesk.Revit.DB;
 
 using dosymep.SimpleServices;
 using dosymep.WPF.Commands;
@@ -32,6 +35,11 @@ internal class MainViewModel : BaseViewModel {
 
     private string _errorText;
     private string _sheetSetDataPath;
+
+    private List<ViewFamilyType> _sectionViewFamilyTypes;
+    private List<ViewPlan> _planViewTemplates;
+    private List<ViewSection> _sectionViewTemplates;
+    private List<ViewFamilyType> _structuralPlanViewFamilyTypes;
 
     /// <summary>
     /// Создает экземпляр основной ViewModel главного окна.
@@ -109,6 +117,26 @@ internal class MainViewModel : BaseViewModel {
     }
 
 
+    public List<ViewFamilyType> StructuralPlanViewFamilyTypes {
+        get => _structuralPlanViewFamilyTypes;
+        set => RaiseAndSetIfChanged(ref _structuralPlanViewFamilyTypes, value);
+    }
+
+    public List<ViewFamilyType> SectionViewFamilyTypes {
+        get => _sectionViewFamilyTypes;
+        set => RaiseAndSetIfChanged(ref _sectionViewFamilyTypes, value);
+    }
+
+    public List<ViewPlan> PlanViewTemplates {
+        get => _planViewTemplates;
+        set => RaiseAndSetIfChanged(ref _planViewTemplates, value);
+    }
+
+    public List<ViewSection> SectionViewTemplates {
+        get => _sectionViewTemplates;
+        set => RaiseAndSetIfChanged(ref _sectionViewTemplates, value);
+    }
+
 
     /// <summary>
     /// Метод загрузки главного окна.
@@ -116,6 +144,11 @@ internal class MainViewModel : BaseViewModel {
     /// <remarks>В данном методе должна происходить загрузка настроек окна, а так же инициализация полей окна.</remarks>
     private void LoadView() {
         LoadConfig();
+
+        StructuralPlanViewFamilyTypes = _revitRepository.StructuralPlanViewFamilyTypes;
+        SectionViewFamilyTypes = _revitRepository.SectionViewFamilyTypes;
+        PlanViewTemplates = _revitRepository.PlanViewTemplates;
+        SectionViewTemplates = _revitRepository.SectionViewTemplates;
 
         if(string.IsNullOrEmpty(_sheetSetDataPath) || !File.Exists(_sheetSetDataPath)) {
             ImportSheetSet();

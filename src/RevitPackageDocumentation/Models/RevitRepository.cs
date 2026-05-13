@@ -20,6 +20,11 @@ internal class RevitRepository {
     /// <param name="uiApplication">Класс доступа к интерфейсу Revit.</param>
     public RevitRepository(UIApplication uiApplication) {
         UIApplication = uiApplication;
+
+        StructuralPlanViewFamilyTypes = GetStructuralPlanViewFamilyTypes();
+        SectionViewFamilyTypes = GetSectionViewFamilyTypes();
+        PlanViewTemplates = GetPlanViewTemplates();
+        SectionViewTemplates = GetSectionViewTemplates();
     }
 
     /// <summary>
@@ -42,19 +47,35 @@ internal class RevitRepository {
     /// </summary>
     public Document Document => ActiveUIDocument.Document;
 
+
+    public List<ViewFamilyType> StructuralPlanViewFamilyTypes { get; }
+    public List<ViewFamilyType> SectionViewFamilyTypes { get; }
+    public List<ViewPlan> PlanViewTemplates { get; }
+    public List<ViewSection> SectionViewTemplates { get; }
+
     /// <summary>
-    /// Возвращает список типоразмеров видов в проекте
+    /// Возвращает список типоразмеров видов в плане в проекте
     /// </summary>
-    public List<ViewFamilyType> ViewFamilyTypes => new FilteredElementCollector(Document)
+    private List<ViewFamilyType> GetStructuralPlanViewFamilyTypes() => new FilteredElementCollector(Document)
+        .OfClass(typeof(ViewFamilyType))
+        .OfType<ViewFamilyType>()
+        .Where(a => ViewFamily.StructuralPlan == a.ViewFamily)
+        .ToList();
+
+    /// <summary>
+    /// Возвращает список типоразмеров видов в разрезе в проекте
+    /// </summary>
+    private List<ViewFamilyType> GetSectionViewFamilyTypes() => new FilteredElementCollector(Document)
         .OfClass(typeof(ViewFamilyType))
         .OfType<ViewFamilyType>()
         .Where(a => ViewFamily.Section == a.ViewFamily)
         .ToList();
 
+
     /// <summary>
     /// Возвращает список всех шаблонов планов в проекте
     /// </summary>
-    public List<ViewPlan> ViewPlanTemplates => new FilteredElementCollector(Document)
+    public List<ViewPlan> GetPlanViewTemplates() => new FilteredElementCollector(Document)
         .OfClass(typeof(ViewPlan))
         .WhereElementIsNotElementType()
         .OfType<ViewPlan>()
@@ -62,10 +83,11 @@ internal class RevitRepository {
         .OrderBy(a => a.Name)
         .ToList();
 
+
     /// <summary>
     /// Возвращает список всех шаблонов сечений в проекте
     /// </summary>
-    public List<ViewSection> ViewSectionTemplates => new FilteredElementCollector(Document)
+    public List<ViewSection> GetSectionViewTemplates() => new FilteredElementCollector(Document)
         .OfClass(typeof(ViewSection))
         .WhereElementIsNotElementType()
         .OfType<ViewSection>()

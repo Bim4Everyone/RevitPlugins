@@ -1,6 +1,7 @@
 ﻿<ResourceDictionary
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
     xmlns:c="clr-namespace:Wpf.Ui.Controls;assembly=Wpf.Ui"
     xmlns:local="clr-namespace:RevitPackageDocumentation.Views"
@@ -13,11 +14,87 @@
     </ResourceDictionary.MergedDictionaries>
 
     <DataTemplate
-        x:Key="PlanViewDerivedTemplate">
-        <StackPanel>
+        x:Key="PlanViewDerivedTemplate" >
+        <Grid>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="*"/>
+                <RowDefinition Height="*"/>
+                <RowDefinition Height="*"/>
+                <RowDefinition Height="*"/>
+                <RowDefinition Height="*"/>
+            </Grid.RowDefinitions>
+
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+
             <TextBlock
-                Text="Тип: План" />
-        </StackPanel>
+                Grid.Column="0"
+                Grid.Row="0"
+                Text="Имя вида" />
+            
+            <TextBox
+                Grid.Column="1"
+                Grid.Row="0"
+                Text="{Binding Path=ViewName}" />
+
+            <TextBlock
+                Grid.Column="0"
+                Grid.Row="1"
+                Text="Типоразмер вида" />
+
+            <ComboBox
+                Grid.Column="1"
+                Grid.Row="1"
+                ItemsSource="{Binding DataContext.StructuralPlanViewFamilyTypes, RelativeSource={RelativeSource AncestorType=Window}}"
+                DisplayMemberPath="Name"
+                SelectedItem="{Binding ViewFamilyType, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" />
+
+            <TextBlock
+                Grid.Column="0"
+                Grid.Row="2"
+                Text="Типоразмер видового экрана" />
+
+            <ComboBox
+                Grid.Column="1"
+                Grid.Row="2"
+                ItemsSource="{Binding DataContext.SectionViewTemplates, RelativeSource={RelativeSource AncestorType=Window}}"
+                DisplayMemberPath="Name" />
+
+            <!--<TextBlock
+                Grid.Column="1"
+                Grid.Row="2"
+                Text="аааа" />-->
+
+            <TextBlock
+                Grid.Column="0"
+                Grid.Row="3"
+                Text="Шаблон вида" />
+
+            <ComboBox
+                Grid.Column="1"
+                Grid.Row="3"
+                ItemsSource="{Binding DataContext.PlanViewTemplates, RelativeSource={RelativeSource AncestorType=Window}}"
+                DisplayMemberPath="Name"
+                SelectedItem="{Binding ViewTemplate, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" />
+
+            <!--<TextBlock
+                Grid.Column="1"
+                Grid.Row="3"
+                Text="{Binding Path=ViewTemplate.Name}" />-->
+
+            <TextBlock
+                Grid.Column="0"
+                Grid.Row="4"
+                Text="Количество" />
+            
+            <TextBlock
+                Grid.Column="1"
+                Grid.Row="4"
+                Text="{Binding Path=ViewCount.Name}" />
+            
+        </Grid>
     </DataTemplate>
 
     <DataTemplate
