@@ -1,21 +1,21 @@
 using System.Windows;
 using System.Windows.Controls;
 
-namespace RevitPackageDocumentation.Views;
+namespace RevitPackageDocumentation.Views.Controls;
 /// <summary>
-/// Логика взаимодействия для BaseSheetComponentView.xaml
+/// Логика взаимодействия для SheetComponentItemControl.xaml
 /// </summary>
-public partial class BaseSheetComponentView : UserControl {
+public partial class SheetComponentItemControl : UserControl {
     public static readonly DependencyProperty DerivedTemplateProperty =
         DependencyProperty.Register(nameof(DerivedTemplate), typeof(DataTemplate),
-        typeof(BaseSheetComponentView));
+        typeof(SheetComponentItemControl));
 
     public DataTemplate DerivedTemplate {
         get => (DataTemplate) GetValue(DerivedTemplateProperty);
         set => SetValue(DerivedTemplateProperty, value);
     }
 
-    public BaseSheetComponentView() {
+    public SheetComponentItemControl() {
         InitializeComponent();
     }
 }

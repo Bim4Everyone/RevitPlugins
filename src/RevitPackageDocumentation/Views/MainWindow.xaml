@@ -106,41 +106,6 @@
             </ScrollViewer>
 
 
-            <!--<ListView
-                Grid.Column="0"
-                Grid.Row="1"
-                ItemsSource="{Binding Path=CurrentSheetSet.SheetList, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
-                SelectedItem="{Binding Path=SelectedSheet}">
-
-                <ListView.ItemTemplate>
-                    <DataTemplate>
-                        <Grid>
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="*" />
-                                <ColumnDefinition Width="Auto" />
-                            </Grid.ColumnDefinitions>
-
-                            <ui:TextBox
-                                Grid.Column="0"
-                                Margin="5"
-                                Text="{Binding Name, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
-                                VerticalContentAlignment="Center"
-                                HorizontalAlignment="Stretch" />
-
-                            <ui:Button
-                                Grid.Column="1"
-                                Appearance="Danger"
-                                Content="✕"
-                                Command="{Binding 
-                                    Path=DataContext.RemoveSheetCommand, 
-                                    RelativeSource={RelativeSource AncestorType=ListView}}"
-                                CommandParameter="{Binding}">
-                            </ui:Button>
-                        </Grid>
-                    </DataTemplate>
-                </ListView.ItemTemplate>
-            </ListView>-->
-
             <ui:Button
                 Grid.Column="0"
                 Grid.Row="2"
@@ -155,7 +120,7 @@
                 HorizontalScrollBarVisibility="Disabled">
 
                 <ItemsControl
-                    Margin="0 0 7 0"
+                    Margin="0 0 8 0"
                     HorizontalContentAlignment="Stretch"
                     ItemsSource="{Binding Path=SelectedSheet.SheetComponents, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" />
             </ScrollViewer>

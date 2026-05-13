@@ -360,7 +360,7 @@
 
     <DataTemplate
         DataType="{x:Type sc:PlanViewVM}">
-        <local:BaseSheetComponentView
+        <controls:SheetComponentItemControl
             DerivedTemplate="{StaticResource PlanViewDerivedTemplate}" />
     </DataTemplate>
 
@@ -374,7 +374,7 @@
 
     <DataTemplate
         DataType="{x:Type sc:ScheduleViewVM}">
-        <local:BaseSheetComponentView
+        <controls:SheetComponentItemControl
             DerivedTemplate="{StaticResource ScheduleViewDerivedTemplate}" />
     </DataTemplate>
     
