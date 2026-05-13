@@ -4,8 +4,6 @@ namespace RevitPackageDocumentation.ViewModels.Configuration.Sheet.SheetComponen
 internal class TextNoteVM : SheetComponentVM {
 
     public TextNoteType TextType { get; set; }
-    public string ModuleErrors { get; set; }
-
 
     public override void ValidateModule() { }
     public override void Process() { }

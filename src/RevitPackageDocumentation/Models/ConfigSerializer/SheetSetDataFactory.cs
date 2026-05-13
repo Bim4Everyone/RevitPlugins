@@ -37,14 +37,24 @@ internal class SheetSetDataFactory : ISheetSetDataFactory {
     public SheetComponentData CreateComponentData(SheetComponentVM sheetComponentVM) {
         return sheetComponentVM switch {
             PlanViewVM vm => new PlanViewData {
-                Name = vm.ModuleName,
-                PlanName = vm.ViewName,
-                PlanNumber = vm.ViewCount
+                IsModuleCheck = vm.IsModuleCheck,
+                ModuleName = vm.ModuleName,
+                ModuleComment = vm.ModuleComment,
+
+                ViewName = vm.ViewName,
+                ViewCount = vm.ViewCount,
+                ViewFamilyTypeName = vm.ViewFamilyType?.Name,
+                ViewTemplateName = vm.ViewTemplate?.Name,
             },
             ScheduleViewVM vm => new ScheduleViewData {
-                Name = vm.ModuleName,
-                ScheduleName = vm.ViewName,
-                ScheduleNumber = vm.ViewCount
+                IsModuleCheck = vm.IsModuleCheck,
+                ModuleName = vm.ModuleName,
+                ModuleComment = vm.ModuleComment,
+
+                ViewName = vm.ViewName,
+                ViewCount = vm.ViewCount,
+                ReferenceViewName = vm.ReferenceViewName,
+                ViewRow = vm.ViewRow,
             },
             _ => throw new NotSupportedException()
         };

@@ -70,7 +70,9 @@ public class SheetData {
 
 public abstract class SheetComponentData {
     public abstract string ComponentType { get; }
-    public string Name { get; set; }
+    public bool? IsModuleCheck { get; set; }
+    public string ModuleName { get; set; }
+    public string ModuleComment { get; set; }
 }
 
 /// <summary>
@@ -79,8 +81,10 @@ public abstract class SheetComponentData {
 public class PlanViewData : SheetComponentData {
     public override string ComponentType => "PlanView";
 
-    public string PlanName { get; set; }
-    public int PlanNumber { get; set; }
+    public string ViewName { get; set; }
+    public int ViewCount { get; set; }
+    public object ViewFamilyTypeName { get; set; }
+    public object ViewTemplateName { get; set; }
 }
 
 /// <summary>
@@ -89,6 +93,8 @@ public class PlanViewData : SheetComponentData {
 public class ScheduleViewData : SheetComponentData {
     public override string ComponentType => "ScheduleView";
 
-    public string ScheduleName { get; set; }
-    public int ScheduleNumber { get; set; }
+    public string ReferenceViewName { get; set; }
+    public string ViewName { get; set; }
+    public int ViewCount { get; set; }
+    public int? ViewRow { get; set; }
 }

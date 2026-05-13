@@ -2,10 +2,11 @@ using dosymep.WPF.ViewModels;
 
 namespace RevitPackageDocumentation.ViewModels.Configuration.Sheet.SheetComponents;
 internal abstract class SheetComponentVM : BaseViewModel {
-    private string _moduleName;
     private bool _isModuleCheck;
+    private string _moduleName;
     private string _moduleComment;
     private string _moduleCode;
+    private string _moduleErrors;
 
     public bool IsModuleCheck {
         get => _isModuleCheck;
@@ -26,6 +27,12 @@ internal abstract class SheetComponentVM : BaseViewModel {
         get => _moduleCode;
         set => RaiseAndSetIfChanged(ref _moduleCode, value);
     }
+
+    public string ModuleErrors {
+        get => _moduleErrors;
+        set => RaiseAndSetIfChanged(ref _moduleErrors, value);
+    }
+
 
     public T GetSettings<T>() where T : new() {
         var settings = new T();

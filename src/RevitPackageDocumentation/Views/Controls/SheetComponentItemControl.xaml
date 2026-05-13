@@ -61,6 +61,22 @@
                     Text="{Binding ModuleName}" />
             </StackPanel>
 
+            <StackPanel
+                Grid.Column="1"
+                Grid.Row="0"
+                Orientation="Horizontal"
+                HorizontalAlignment="Right">
+                <ui:TextBlock
+                    Margin="5"
+                    VerticalAlignment="Center"
+                    Text="Code: " />
+                
+                <ui:TextBlock
+                    Margin="5"
+                    VerticalAlignment="Center"
+                    Text="{Binding ModuleCode}" />
+            </StackPanel>
+
             <ContentControl
                 Grid.Column="0"
                 Grid.Row="1"

@@ -12,8 +12,6 @@ internal class CalloutViewVM : SheetComponentVM {
 
     //public IViewBase ViewBase { get; set; }
     //public ModulTools Tools { get; set; }
-    public string ModuleErrors { get; set; }
-
 
     public override void ValidateModule() { }
     public override void Process() { }

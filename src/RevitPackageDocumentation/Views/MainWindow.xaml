@@ -77,19 +77,19 @@
 
                     <ui:Button
                         Grid.Column="0"
-                        Margin="10 10 5 10"
+                        Margin="5"
                         Icon="{ui:SymbolIcon ArrowDownload20}"
                         Command="{Binding ImportCommand}" />
 
                     <ui:Button
                         Grid.Column="1"
-                        Margin="5 10 10 10"
+                        Margin="5"
                         Icon="{ui:SymbolIcon ArrowExportUp20}"
                         Command="{Binding ExportCommand}" />
 
                     <ui:TextBox
                         Grid.Column="2"
-                        Margin="10"
+                        Margin="5"
                         Text="{Binding CurrentSheetSet.Name, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
                         VerticalContentAlignment="Center"
                         HorizontalAlignment="Stretch" />
