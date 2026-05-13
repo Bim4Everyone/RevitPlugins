@@ -44,13 +44,14 @@
                 ToolTip="{me:LocalizationSource PageMenu.Tooltip.Export}"
                 Command="{Binding ExportButtonCommand, ElementName=_this}"
                 Content="{ui:SymbolIcon Symbol=ArrowExportUp20}" />
-            <Label
+            <ui:TextBlock
                 Margin="8 0 0 0"
                 VerticalAlignment="Center"
                 Padding="0"
+                FontWeight="Bold"
                 FontSize="{DynamicResource ControlContentThemeFontSize}"
                 Visibility="{Binding ShowSaveChangesPrompt, ElementName=_this, Converter={StaticResource BoolToVisibilityConverter}}"
-                Content="{me:LocalizationSource PageMenu.SaveChangesPrompt}" />
+                Text="{me:LocalizationSource PageMenu.SaveChangesPrompt}" />
             <ui:TextBlock
                 Margin="8 0 0 0"
                 HorizontalAlignment="Left"

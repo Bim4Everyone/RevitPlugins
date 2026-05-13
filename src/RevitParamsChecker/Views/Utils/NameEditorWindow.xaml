@@ -44,12 +44,12 @@
 
         <DockPanel
             Grid.Row="1"
-            Margin="10 0"
+            Margin="8 0"
             LastChildFill="True">
             <Label
                 DockPanel.Dock="Left"
                 VerticalAlignment="Center"
-                Margin="10 0"
+                Margin="8 0"
                 FontSize="{DynamicResource ControlContentThemeFontSize}"
                 Content="{me:LocalizationSource NameEditor.Label}" />
             <ui:TextBox
@@ -65,19 +65,19 @@
             Orientation="Horizontal"
             HorizontalAlignment="Right">
             <ui:TextBlock
-                Margin="10"
+                Margin="8"
                 Text="{Binding ErrorText}"
                 Style="{StaticResource CustomErrorText}" />
             <ui:Button
                 Width="80"
-                Margin="10"
+                Margin="8"
                 IsDefault="True"
                 Appearance="Info"
                 Click="ButtonOk_Click"
                 Content="{me:LocalizationSource Ok}"
                 Command="{Binding Create}" />
             <ui:Button
-                Margin="10"
+                Margin="8"
                 Width="80"
                 IsCancel="true"
                 Click="ButtonCancel_Click"

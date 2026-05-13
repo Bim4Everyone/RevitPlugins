@@ -161,16 +161,6 @@
                             MinWidth="50"
                             Width="150"
                             IsReadOnly="True"
-                            Binding="{Binding FileName}">
-                            <DataGridTextColumn.Header>
-                                <ui:TextBlock
-                                    Text="{DynamicResource ResultsPage.FileNameHeader}" />
-                            </DataGridTextColumn.Header>
-                        </DataGridTextColumn>
-                        <DataGridTextColumn
-                            MinWidth="50"
-                            Width="150"
-                            IsReadOnly="True"
                             Binding="{Binding CategoryName}">
                             <DataGridTextColumn.Header>
                                 <ui:TextBlock
@@ -191,17 +181,6 @@
 
                         <DataGridTextColumn
                             MinWidth="50"
-                            Width="150"
-                            IsReadOnly="True"
-                            Binding="{Binding RuleName}">
-                            <DataGridTextColumn.Header>
-                                <ui:TextBlock
-                                    Text="{DynamicResource ResultsPage.RuleNameHeader}" />
-                            </DataGridTextColumn.Header>
-                        </DataGridTextColumn>
-
-                        <DataGridTextColumn
-                            MinWidth="50"
                             Width="Auto"
                             IsReadOnly="True"
                             Binding="{Binding Status}">
@@ -210,14 +189,14 @@
                                     Text="{DynamicResource ResultsPage.StatusHeader}" />
                             </DataGridTextColumn.Header>
                         </DataGridTextColumn>
-
                         <DataGridTextColumn
                             MinWidth="50"
-                            Width="100"
-                            Binding="{Binding UserMark, UpdateSourceTrigger=PropertyChanged}">
+                            Width="150"
+                            IsReadOnly="True"
+                            Binding="{Binding FileName}">
                             <DataGridTextColumn.Header>
                                 <ui:TextBlock
-                                    Text="{DynamicResource ResultsPage.UserMarkHeader}" />
+                                    Text="{DynamicResource ResultsPage.FileNameHeader}" />
                             </DataGridTextColumn.Header>
                         </DataGridTextColumn>
                     </ui:DataGrid.Columns>

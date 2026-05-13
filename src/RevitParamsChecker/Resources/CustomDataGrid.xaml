@@ -110,6 +110,9 @@
         BasedOn="{StaticResource DefaultUiDataGridColumnHeaderStyle}"
         TargetType="DataGridColumnHeader">
         <Setter
+            Property="Foreground"
+            Value="{DynamicResource LabelForeground}" />
+        <Setter
             Property="Template">
             <Setter.Value>
                 <ControlTemplate
