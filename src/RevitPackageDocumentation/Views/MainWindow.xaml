@@ -27,35 +27,6 @@
                 <ResourceDictionary
                     Source="CustomStyles.xaml" />
             </ResourceDictionary.MergedDictionaries>
-
-            <DataTemplate
-                x:Key="PlanViewDerivedTemplate">
-                <StackPanel>
-                    <TextBlock
-                        Text="Тип: План" />
-                </StackPanel>
-            </DataTemplate>
-
-            <DataTemplate
-                DataType="{x:Type sc:PlanViewVM}">
-                <local:BaseSheetComponentView
-                    DerivedTemplate="{StaticResource PlanViewDerivedTemplate}" />
-            </DataTemplate>
-
-
-            <DataTemplate
-                x:Key="ScheduleViewDerivedTemplate">
-                <StackPanel>
-                    <TextBlock
-                        Text="Тип: Schedule" />
-                </StackPanel>
-            </DataTemplate>
-
-            <DataTemplate
-                DataType="{x:Type sc:ScheduleViewVM}">
-                <local:BaseSheetComponentView
-                    DerivedTemplate="{StaticResource ScheduleViewDerivedTemplate}" />
-            </DataTemplate>
         </ResourceDictionary>
     </Window.Resources>
 
@@ -119,9 +90,23 @@
                     VerticalContentAlignment="Center"
                     HorizontalAlignment="Stretch" />
             </Grid>
-            
-            
-            <ListView
+
+
+
+            <ScrollViewer
+                Grid.Column="0"
+                Grid.Row="1"
+                VerticalScrollBarVisibility="Auto"
+                HorizontalScrollBarVisibility="Disabled">
+
+                <ItemsControl
+                    Margin="0 0 7 0"
+                    HorizontalContentAlignment="Stretch"
+                    ItemsSource="{Binding Path=CurrentSheetSet.SheetList, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" />
+            </ScrollViewer>
+
+
+            <!--<ListView
                 Grid.Column="0"
                 Grid.Row="1"
                 ItemsSource="{Binding Path=CurrentSheetSet.SheetList, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
@@ -154,7 +139,7 @@
                         </Grid>
                     </DataTemplate>
                 </ListView.ItemTemplate>
-            </ListView>
+            </ListView>-->
 
             <ui:Button
                 Grid.Column="0"
@@ -163,10 +148,17 @@
                 Content="Add sheet"
                 Command="{Binding AddSheetCommand}" />
 
-            <ListView
+            <ScrollViewer
                 Grid.Column="1"
                 Grid.Row="1"
-                ItemsSource="{Binding Path=SelectedSheet.SheetComponents, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" />
+                VerticalScrollBarVisibility="Auto"
+                HorizontalScrollBarVisibility="Disabled">
+
+                <ItemsControl
+                    Margin="0 0 7 0"
+                    HorizontalContentAlignment="Stretch"
+                    ItemsSource="{Binding Path=SelectedSheet.SheetComponents, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" />
+            </ScrollViewer>
 
             <ui:Button
                 Grid.Column="1"
