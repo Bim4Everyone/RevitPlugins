@@ -10,6 +10,7 @@ using RevitPackageDocumentation.Models;
 using RevitPackageDocumentation.Models.ConfigSerializer;
 using RevitPackageDocumentation.ViewModels.Configuration;
 using RevitPackageDocumentation.ViewModels.Configuration.Sheet;
+using RevitPackageDocumentation.ViewModels.Configuration.Sheet.SheetComponents;
 
 namespace RevitPackageDocumentation.ViewModels;
 
@@ -63,6 +64,7 @@ internal class MainViewModel : BaseViewModel {
         AddSheetCommand = RelayCommand.Create(AddSheet);
         RemoveSheetCommand = RelayCommand.Create<SheetVM>(RemoveSheet);
         AddComponentCommand = RelayCommand.Create(AddComponent);
+        RemoveComponentCommand = RelayCommand.Create<SheetComponentVM>(RemoveComponent);
 
         LoadViewCommand = RelayCommand.Create(LoadView);
         AcceptViewCommand = RelayCommand.Create(AcceptView, CanAcceptView);
@@ -74,6 +76,7 @@ internal class MainViewModel : BaseViewModel {
     public ICommand AddSheetCommand { get; }
     public ICommand RemoveSheetCommand { get; }
     public ICommand AddComponentCommand { get; }
+    public ICommand RemoveComponentCommand { get; }
 
 
     /// <summary>
@@ -195,13 +198,15 @@ internal class MainViewModel : BaseViewModel {
     }
 
     private void RemoveSheet(SheetVM sheet) {
-        if(sheet != null && CurrentSheetSet.SheetList.Contains(sheet)) {
-            CurrentSheetSet.SheetList.Remove(sheet);
-            SelectedSheet = null;
-        }
+        CurrentSheetSet.RemoveSheet(sheet);
+        SelectedSheet = null;
     }
 
     private void AddComponent() {
         SelectedSheet.AddComponent();
+    }
+
+    private void RemoveComponent(SheetComponentVM sheetComponent) {
+        SelectedSheet.RemoveComponent(sheetComponent);
     }
 }

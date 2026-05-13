@@ -28,4 +28,10 @@ internal class SheetVM : BaseViewModel {
     internal void AddComponent() {
         SheetComponents.Add(new PlanViewVM() { ModuleName = "Новый модуль" });
     }
+
+    internal void RemoveComponent(SheetComponentVM sheetComponent) {
+        if(sheetComponent != null && SheetComponents.Contains(sheetComponent)) {
+            SheetComponents.Remove(sheetComponent);
+        }
+    }
 }

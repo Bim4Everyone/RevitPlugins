@@ -58,81 +58,121 @@
 
             <Grid.RowDefinitions>
                 <RowDefinition Height="Auto" />
-                <RowDefinition Height="*" />
                 <RowDefinition Height="Auto" />
+                <RowDefinition Height="*" />
             </Grid.RowDefinitions>
 
-            <Grid
+            <Border
                 Grid.Column="0"
-                Grid.Row="0">
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="Auto"/>
-                    <ColumnDefinition Width="Auto"/>
-                    <ColumnDefinition Width="*"/>
-                </Grid.ColumnDefinitions>
+                Grid.Row="0"
+                Margin="10 0 5 5"
+                Style="{StaticResource CustomBorder}">
 
-                <ui:Button
-                    Grid.Column="0"
-                    Margin="10 10 5 10"
-                    Icon="{ui:SymbolIcon ArrowDownload20}"
-                    Command="{Binding ImportCommand}" />
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="*" />
+                    </Grid.ColumnDefinitions>
 
-                <ui:Button
-                    Grid.Column="1"
-                    Margin="5 10 10 10"
-                    Icon="{ui:SymbolIcon ArrowExportUp20}"
-                    Command="{Binding ExportCommand}" />
+                    <ui:Button
+                        Grid.Column="0"
+                        Margin="10 10 5 10"
+                        Icon="{ui:SymbolIcon ArrowDownload20}"
+                        Command="{Binding ImportCommand}" />
 
-                <ui:TextBox
-                    Grid.Column="2"
-                    Margin="10"
-                    Text="{Binding CurrentSheetSet.Name, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
-                    VerticalContentAlignment="Center"
-                    HorizontalAlignment="Stretch" />
-            </Grid>
+                    <ui:Button
+                        Grid.Column="1"
+                        Margin="5 10 10 10"
+                        Icon="{ui:SymbolIcon ArrowExportUp20}"
+                        Command="{Binding ExportCommand}" />
 
+                    <ui:TextBox
+                        Grid.Column="2"
+                        Margin="10"
+                        Text="{Binding CurrentSheetSet.Name, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
+                        VerticalContentAlignment="Center"
+                        HorizontalAlignment="Stretch" />
+                </Grid>
+            </Border>
 
+            <Border
+                Grid.Column="1"
+                Grid.Row="0"
+                Margin="5 0 10 5"
+                Style="{StaticResource CustomBorder}">
+                <TextBlock
+                    Text="SheetSet props" />
+            </Border>
 
-            <ScrollViewer
+            <Border
                 Grid.Column="0"
                 Grid.Row="1"
-                VerticalScrollBarVisibility="Auto"
-                HorizontalScrollBarVisibility="Disabled">
+                Grid.RowSpan="2"
+                Margin="10 5 5 0"
+                Style="{StaticResource CustomBorder}">
 
-                <ItemsControl
-                    Margin="0 0 7 0"
-                    HorizontalContentAlignment="Stretch"
-                    ItemsSource="{Binding Path=CurrentSheetSet.SheetList, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" />
-            </ScrollViewer>
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="*"/>
+                        <RowDefinition Height="Auto"/>
+                    </Grid.RowDefinitions>
 
+                    <ListBox
+                        Grid.Row="0"
+                        ItemsSource="{Binding Path=CurrentSheetSet.SheetList, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
+                        SelectedItem="{Binding Path=SelectedSheet, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" />
 
-            <ui:Button
-                Grid.Column="0"
-                Grid.Row="2"
-                Margin="10"
-                Content="Add sheet"
-                Command="{Binding AddSheetCommand}" />
+                    <ui:Button
+                        Grid.Row="1"
+                        Margin="10"
+                        Content="Add sheet"
+                        Command="{Binding AddSheetCommand}" />
+                </Grid>
+            </Border>
 
-            <ScrollViewer
+            <Border
                 Grid.Column="1"
                 Grid.Row="1"
-                VerticalScrollBarVisibility="Auto"
-                HorizontalScrollBarVisibility="Disabled">
+                Margin="5 5 10 5"
+                Style="{StaticResource CustomBorder}">
 
-                <ItemsControl
-                    Margin="0 0 8 0"
-                    HorizontalContentAlignment="Stretch"
-                    ItemsSource="{Binding Path=SelectedSheet.SheetComponents, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" />
-            </ScrollViewer>
+                <TextBlock
+                    Text="Sheets props" />
+            </Border>
 
-            <ui:Button
+            <Border
                 Grid.Column="1"
                 Grid.Row="2"
-                Margin="10"
-                Content="Add component"
-                Command="{Binding AddComponentCommand}" />
+                Margin="5 5 10 0"
+                Style="{StaticResource CustomBorder}">
+
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="*" />
+                        <RowDefinition Height="Auto" />
+                    </Grid.RowDefinitions>
+
+                    <ScrollViewer
+                        Grid.Row="0"
+                        VerticalScrollBarVisibility="Auto"
+                        HorizontalScrollBarVisibility="Disabled">
+
+                        <ItemsControl
+                            HorizontalContentAlignment="Stretch"
+                            ItemsSource="{Binding Path=SelectedSheet.SheetComponents, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" />
+                    </ScrollViewer>
+
+                    <ui:Button
+                        Grid.Row="1"
+                        Margin="10"
+                        Content="Add component"
+                        Command="{Binding AddComponentCommand}" />
+                </Grid>
+            </Border>
         </Grid>
 
+        
         <StackPanel
             Grid.Row="2"
             Orientation="Horizontal"

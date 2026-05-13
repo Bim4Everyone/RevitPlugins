@@ -47,6 +47,15 @@
                     Margin="5"
                     IsChecked="{Binding IsModuleCheck}" />
 
+                <ui:Button
+                    Appearance="Danger"
+                    Content="✕"
+                    Command="{Binding 
+                        Path=DataContext.RemoveComponentCommand, 
+                        RelativeSource={RelativeSource AncestorType=ItemsControl}}"
+                    CommandParameter="{Binding}">
+                </ui:Button>
+
                 <ui:TextBox
                     Margin="5"
                     Text="{Binding ModuleName}" />

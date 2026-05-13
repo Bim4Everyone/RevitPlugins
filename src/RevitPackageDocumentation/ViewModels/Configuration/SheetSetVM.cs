@@ -28,4 +28,10 @@ internal class SheetSetVM : BaseViewModel {
     internal void AddSheet() {
         SheetList.Add(new SheetVM() { Name = "Новый лист" });
     }
+
+    internal void RemoveSheet(SheetVM sheet) {
+        if(sheet != null && SheetList.Contains(sheet)) {
+            SheetList.Remove(sheet);
+        }
+    }
 }
