@@ -55,24 +55,24 @@
                                             <Grid>
                                                 <Grid.ColumnDefinitions>
                                                     <ColumnDefinition
-                                                        Width="*" />
-                                                    <ColumnDefinition
                                                         Width="Auto" />
+                                                    <ColumnDefinition
+                                                        Width="*" />
                                                 </Grid.ColumnDefinitions>
-                                                <ContentPresenter
-                                                    x:Name="ContentPresenter"
-                                                    Grid.Column="0"
-                                                    HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
-                                                    VerticalAlignment="{TemplateBinding VerticalContentAlignment}"
-                                                    Content="{TemplateBinding Content}" />
                                                 <ui:SymbolIcon
                                                     x:Name="ControlChevronIcon"
-                                                    Grid.Column="1"
-                                                    Margin="0"
+                                                    Grid.Column="0"
+                                                    Margin="0 0 8 0"
                                                     VerticalAlignment="Center"
                                                     FontSize="16"
                                                     Foreground="{TemplateBinding Foreground}"
                                                     Symbol="ChevronDown24" />
+                                                <ContentPresenter
+                                                    x:Name="ContentPresenter"
+                                                    Grid.Column="1"
+                                                    HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
+                                                    VerticalAlignment="{TemplateBinding VerticalContentAlignment}"
+                                                    Content="{TemplateBinding Content}" />
                                             </Grid>
                                         </Border>
                                     </ControlTemplate>
