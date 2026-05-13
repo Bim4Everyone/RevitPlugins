@@ -378,13 +378,23 @@ internal class ChecksPageViewModel : BaseViewModel {
             string[] filesInCheck = check.SelectedFiles.ToArray();
             string[] missingFiles = filesInCheck.Except(availableFiles).ToArray();
             if(missingFiles.Length == 0) {
-                return;
+                continue;
             }
 
             check.SelectedFiles = [..filesInCheck.Intersect(availableFiles)];
             check.WarningFiles = localization.GetLocalizedString(
                 "ChecksPage.Warning.MissingFiles",
                 GetMissingStringsWarningMessage(missingFiles));
+        }
+
+        SelectActiveDocIfFilesEmpty(checks);
+    }
+
+    private void SelectActiveDocIfFilesEmpty(ICollection<CheckViewModel> checks) {
+        foreach(var check in checks) {
+            if(check.SelectedFiles.Count == 0) {
+                check.SelectedFiles = [_revitRepo.Document.Title];
+            }
         }
     }
 
@@ -396,7 +406,7 @@ internal class ChecksPageViewModel : BaseViewModel {
             string[] filtersInCheck = check.SelectedFilters.ToArray();
             string[] missingFilters = filtersInCheck.Except(availableFilters).ToArray();
             if(missingFilters.Length == 0) {
-                return;
+                continue;
             }
 
             check.SelectedFilters = [..filtersInCheck.Intersect(availableFilters)];
@@ -414,7 +424,7 @@ internal class ChecksPageViewModel : BaseViewModel {
             string[] rulesInCheck = check.SelectedRules.ToArray();
             string[] missingRules = rulesInCheck.Except(availableRules).ToArray();
             if(missingRules.Length == 0) {
-                return;
+                continue;
             }
 
             check.SelectedRules = [..rulesInCheck.Intersect(availableRules)];
