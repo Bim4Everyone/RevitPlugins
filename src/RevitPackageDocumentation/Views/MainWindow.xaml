@@ -26,6 +26,8 @@
             <ResourceDictionary.MergedDictionaries>
                 <ResourceDictionary
                     Source="CustomStyles.xaml" />
+                <ResourceDictionary
+                    Source="CustomDataTemplates.xaml" />
             </ResourceDictionary.MergedDictionaries>
         </ResourceDictionary>
     </Window.Resources>

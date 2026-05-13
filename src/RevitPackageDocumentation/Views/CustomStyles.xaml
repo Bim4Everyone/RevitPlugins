@@ -348,38 +348,4 @@
             Property="VerticalContentAlignment"
             Value="Center" />
     </Style>
-
-
-    <DataTemplate
-        x:Key="PlanViewDerivedTemplate">
-        <StackPanel>
-            <TextBlock
-                Text="Тип: План" />
-        </StackPanel>
-    </DataTemplate>
-
-    <DataTemplate
-        DataType="{x:Type sc:PlanViewVM}">
-        <controls:SheetComponentItemControl
-            DerivedTemplate="{StaticResource PlanViewDerivedTemplate}" />
-    </DataTemplate>
-
-    <DataTemplate
-        x:Key="ScheduleViewDerivedTemplate">
-        <StackPanel>
-            <TextBlock
-                Text="Тип: Schedule" />
-        </StackPanel>
-    </DataTemplate>
-
-    <DataTemplate
-        DataType="{x:Type sc:ScheduleViewVM}">
-        <controls:SheetComponentItemControl
-            DerivedTemplate="{StaticResource ScheduleViewDerivedTemplate}" />
-    </DataTemplate>
-    
-    <DataTemplate
-        DataType="{x:Type s:SheetVM}">
-            <controls:SheetItemControl />
-    </DataTemplate>
 </ResourceDictionary>
