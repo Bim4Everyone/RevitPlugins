@@ -38,7 +38,7 @@ internal class ParameterRule : ValidationRule {
         }
 
         var parameter = element.GetParam(ParameterName);
-        string actualValue = parameter.AsValueString()?.Split(' ').FirstOrDefault() ?? string.Empty;
+        string actualValue = GetParamActualValue(parameter);
 
         return Operator.Evaluate(actualValue, ExpectedValue);
     }
@@ -49,5 +49,15 @@ internal class ParameterRule : ValidationRule {
             ExpectedValue = ExpectedValue,
             Operator = Operator.Copy()
         };
+    }
+
+    private string GetParamActualValue(Parameter parameter) {
+        if(parameter.StorageType == StorageType.Double) {
+            // у double параметров в конце могут быть единицы измерения, например:
+            // Площадь = "84 м²"
+            return parameter.AsValueString()?.Split(' ').FirstOrDefault() ?? string.Empty;
+        } else {
+            return parameter.AsValueString() ?? string.Empty;
+        }
     }
 }
