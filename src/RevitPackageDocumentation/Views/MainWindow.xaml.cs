@@ -1,4 +1,5 @@
 using System.Windows;
+using System.Windows.Input;
 
 using dosymep.SimpleServices;
 
@@ -45,5 +46,12 @@ public partial class MainWindow {
 
     private void ButtonCancel_Click(object sender, RoutedEventArgs e) {
         DialogResult = false;
+    }
+
+    private void ComboBox_PreviewMouseDown(object sender, MouseButtonEventArgs e) {
+        if(!ComponentTypesComboBox.IsDropDownOpen) {
+            ComponentTypesComboBox.IsDropDownOpen = true;
+            e.Handled = true;
+        }
     }
 }

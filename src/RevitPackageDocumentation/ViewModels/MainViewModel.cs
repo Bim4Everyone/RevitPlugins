@@ -38,13 +38,15 @@ internal class MainViewModel : BaseViewModel {
     private string _errorText;
     private string _sheetSetDataPath;
 
+    private List<ComponentTypeItem> _componentTypes;
+    private ComponentTypeItem _selectedComponentType;
+
     private List<ViewFamilyType> _sectionViewFamilyTypes;
     private List<ViewPlan> _planViewTemplates;
     private List<ViewSection> _sectionViewTemplates;
     private List<ViewFamilyType> _structuralPlanViewFamilyTypes;
     private List<ElementType> _viewportTypes;
-    private List<ComponentTypeItem> _componentTypes;
-    private ComponentTypeItem _selectedComponentType;
+    private List<TextNoteType> _textNoteTypes;
 
     /// <summary>
     /// Создает экземпляр основной ViewModel главного окна.
@@ -147,6 +149,11 @@ internal class MainViewModel : BaseViewModel {
         set => RaiseAndSetIfChanged(ref _viewportTypes, value);
     }
 
+    public List<TextNoteType> TextNoteTypes {
+        get => _textNoteTypes;
+        set => RaiseAndSetIfChanged(ref _textNoteTypes, value);
+    }
+
 
     public List<ComponentTypeItem> ComponentTypes {
         get => _componentTypes;
@@ -161,6 +168,10 @@ internal class MainViewModel : BaseViewModel {
     private void LoadView() {
         LoadConfig();
         GetSettingsForUI();
+
+
+        //var t = _revitRepository.GetAnnotationFamily();
+
 
         if(string.IsNullOrEmpty(_sheetSetDataPath) || !File.Exists(_sheetSetDataPath)) {
             ImportSheetSet();
@@ -183,6 +194,7 @@ internal class MainViewModel : BaseViewModel {
         PlanViewTemplates = _revitRepository.PlanViewTemplates;
         SectionViewTemplates = _revitRepository.SectionViewTemplates;
         ViewportTypes = _revitRepository.ViewportTypes;
+        TextNoteTypes = _revitRepository.TextNoteTypes;
     }
 
     private void ImportSheetSet() {

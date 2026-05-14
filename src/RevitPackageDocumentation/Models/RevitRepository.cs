@@ -31,6 +31,7 @@ internal class RevitRepository {
         PlanViewTemplates = GetPlanViewTemplates();
         SectionViewTemplates = GetSectionViewTemplates();
         ViewportTypes = GetViewportTypes();
+        TextNoteTypes = GetTextNoteTypes();
     }
 
     /// <summary>
@@ -60,6 +61,7 @@ internal class RevitRepository {
     public List<ViewPlan> PlanViewTemplates { get; }
     public List<ViewSection> SectionViewTemplates { get; }
     public List<ElementType> ViewportTypes { get; }
+    public List<TextNoteType> TextNoteTypes { get; }
 
 
     /// <summary>
@@ -123,4 +125,23 @@ internal class RevitRepository {
                 .ToList();
         }
     }
+
+    /// <summary>
+    /// Возвращает список всех типов текста в проекте
+    /// </summary>
+    public List<TextNoteType> GetTextNoteTypes() => new FilteredElementCollector(Document)
+        .OfClass(typeof(TextNoteType))
+        .OfType<TextNoteType>()
+        .OrderBy(a => a.Name)
+        .ToList();
+
+    ///// <summary>
+    ///// Возвращает список типовых аннотаций в проекте
+    ///// </summary>
+    //public List<Family> GetAnnotationFamily() => new FilteredElementCollector(Document)
+    //    .OfClass(typeof(Family))
+    //    .OfType<Family>()
+    //    .Where(f => f.FamilyCategory.BuiltInCategory == BuiltInCategory.OST_GenericAnnotation)
+    //    .OrderBy(a => a.Name)
+    //    .ToList();
 }

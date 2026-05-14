@@ -2,13 +2,36 @@ using Autodesk.Revit.DB;
 
 namespace RevitPackageDocumentation.ViewModels.Configuration.Sheet.SheetComponents;
 internal class PlanViewVM : SheetComponentVM {
-    public string ViewName { get; set; }
-    public ViewFamilyType ViewFamilyType { get; set; }
-    public ElementType ViewportType { get; set; }
-    public ViewPlan ViewTemplate { get; set; }
-    public int ViewCount { get; set; }
-    //public IViewBase ViewBase { get; set; }
-    //public ModulTools Tools { get; set; }
+    private string _viewName;
+    private ViewFamilyType _viewFamilyType;
+    private ElementType _viewportType;
+    private ViewPlan _viewTemplate;
+    private int _viewCount;
+
+    public string ViewName {
+        get => _viewName;
+        set => RaiseAndSetIfChanged(ref _viewName, value);
+    }
+
+    public ViewFamilyType ViewFamilyType {
+        get => _viewFamilyType;
+        set => RaiseAndSetIfChanged(ref _viewFamilyType, value);
+    }
+
+    public ElementType ViewportType {
+        get => _viewportType;
+        set => RaiseAndSetIfChanged(ref _viewportType, value);
+    }
+
+    public ViewPlan ViewTemplate {
+        get => _viewTemplate;
+        set => RaiseAndSetIfChanged(ref _viewTemplate, value);
+    }
+
+    public int ViewCount {
+        get => _viewCount;
+        set => RaiseAndSetIfChanged(ref _viewCount, value);
+    }
 
     public override void ValidateModule() { }
     public override void Process() { }

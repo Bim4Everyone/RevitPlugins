@@ -95,6 +95,18 @@ internal class SheetSetVMFactory : ISheetSetVMFactory {
                 ViewColumn = data.ViewColumn ?? 1,
                 ViewCount = data.ViewCount ?? 1,
             },
+
+            TextNoteData data => new TextNoteVM {
+                IsModuleCheck = data.IsModuleCheck ?? false,
+                ModuleName = data.ModuleName ?? string.Empty,
+                ModuleComment = data.ModuleComment ?? string.Empty,
+                ModuleCode = "01",
+                ModuleErrors = "Ошибка TextNote",
+
+                Text = data.Text ?? string.Empty,
+                TextNoteType = _revitRepository.TextNoteTypes.FirstOrDefault(v => v.Name.Equals(data.TextNoteTypeName)),
+            },
+
             _ => throw new NotSupportedException($"Тип '{sheetComponentData?.GetType().Name}' не поддерживается")
         };
     }

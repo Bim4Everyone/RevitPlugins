@@ -112,3 +112,13 @@ public class ScheduleViewData : SheetComponentData {
     public int? ViewCount { get; set; }
     public int? ViewColumn { get; set; }
 }
+
+/// <summary>
+/// DTO модуля текста
+/// </summary>
+public class TextNoteData : SheetComponentData {
+    public override string ComponentType => "TextNote";
+
+    public string Text { get; set; }
+    public string TextNoteTypeName { get; set; }
+}

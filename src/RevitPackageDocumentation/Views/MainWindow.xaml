@@ -169,6 +169,7 @@
                     </ScrollViewer>
 
                     <ComboBox
+                        x:Name="ComponentTypesComboBox"
                         Grid.Row="1"
                         Margin="10"
                         MinWidth="220"
@@ -192,7 +193,8 @@
                         Margin="10 10 40 10"
                         VerticalAlignment="Center"
                         HorizontalAlignment="Right"
-                        Text="{me:LocalizationSource MainWindow.AddSheetComponent}" />
+                        Text="{me:LocalizationSource MainWindow.AddSheetComponent}"
+                        PreviewMouseDown="ComboBox_PreviewMouseDown" />
                 </Grid>
             </Border>
         </Grid>

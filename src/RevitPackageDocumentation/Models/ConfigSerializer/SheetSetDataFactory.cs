@@ -70,6 +70,16 @@ internal class SheetSetDataFactory : ISheetSetDataFactory {
                 ViewColumn = vm.ViewColumn,
                 ViewCount = vm.ViewCount,
             },
+
+            TextNoteVM vm => new TextNoteData {
+                IsModuleCheck = vm.IsModuleCheck,
+                ModuleName = vm.ModuleName,
+                ModuleComment = vm.ModuleComment,
+
+                Text = vm.Text,
+                TextNoteTypeName = vm.TextNoteType?.Name,
+            },
+
             _ => throw new NotSupportedException()
         };
     }
