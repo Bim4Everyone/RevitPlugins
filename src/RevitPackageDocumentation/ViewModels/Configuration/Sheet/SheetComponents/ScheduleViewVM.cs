@@ -3,7 +3,7 @@ internal class ScheduleViewVM : SheetComponentVM {
 
     public string ReferenceViewName { get; set; }
     public string ViewName { get; set; }
-    public int ViewRow { get; set; }
+    public int ViewColumn { get; set; }
     public int ViewCount { get; set; }
     //public List<Filter> Filters { get; set; }
     //public IViewBase ViewBase { get; set; }

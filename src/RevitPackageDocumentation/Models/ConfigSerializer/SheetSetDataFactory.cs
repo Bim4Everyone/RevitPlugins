@@ -42,20 +42,33 @@ internal class SheetSetDataFactory : ISheetSetDataFactory {
                 ModuleComment = vm.ModuleComment,
 
                 ViewName = vm.ViewName,
-                ViewCount = vm.ViewCount,
                 ViewFamilyTypeName = vm.ViewFamilyType?.Name,
                 ViewTemplateName = vm.ViewTemplate?.Name,
                 ViewportTypeName = vm.ViewportType?.Name,
+                ViewCount = vm.ViewCount,
             },
-            ScheduleViewVM vm => new ScheduleViewData {
+
+            SectionViewVM vm => new SectionViewData {
                 IsModuleCheck = vm.IsModuleCheck,
                 ModuleName = vm.ModuleName,
                 ModuleComment = vm.ModuleComment,
 
                 ViewName = vm.ViewName,
+                ViewFamilyTypeName = vm.ViewFamilyType?.Name,
+                ViewTemplateName = vm.ViewTemplate?.Name,
+                ViewportTypeName = vm.ViewportType?.Name,
                 ViewCount = vm.ViewCount,
+            },
+
+            ScheduleViewVM vm => new ScheduleViewData {
+                IsModuleCheck = vm.IsModuleCheck,
+                ModuleName = vm.ModuleName,
+                ModuleComment = vm.ModuleComment,
+
                 ReferenceViewName = vm.ReferenceViewName,
-                ViewRow = vm.ViewRow,
+                ViewName = vm.ViewName,
+                ViewColumn = vm.ViewColumn,
+                ViewCount = vm.ViewCount,
             },
             _ => throw new NotSupportedException()
         };

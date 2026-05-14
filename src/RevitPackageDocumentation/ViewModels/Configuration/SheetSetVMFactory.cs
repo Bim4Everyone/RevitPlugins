@@ -63,11 +63,26 @@ internal class SheetSetVMFactory : ISheetSetVMFactory {
                 ModuleErrors = "Ошибка PlanView",
 
                 ViewName = data.ViewName ?? string.Empty,
-                ViewCount = data.ViewCount,
                 ViewFamilyType = _revitRepository.StructuralPlanViewTypes.FirstOrDefault(v => v.Name.Equals(data.ViewFamilyTypeName)),
                 ViewTemplate = _revitRepository.PlanViewTemplates.FirstOrDefault(v => v.Name.Equals(data.ViewTemplateName)),
                 ViewportType = _revitRepository.ViewportTypes.FirstOrDefault(v => v.Name.Equals(data.ViewportTypeName)),
+                ViewCount = data.ViewCount ?? 1,
             },
+
+            SectionViewData data => new SectionViewVM {
+                IsModuleCheck = data.IsModuleCheck ?? false,
+                ModuleName = data.ModuleName ?? string.Empty,
+                ModuleComment = data.ModuleComment ?? string.Empty,
+                ModuleCode = "789",
+                ModuleErrors = "Ошибка SectionView",
+
+                ViewName = data.ViewName ?? string.Empty,
+                ViewFamilyType = _revitRepository.SectionViewTypes.FirstOrDefault(v => v.Name.Equals(data.ViewFamilyTypeName)),
+                ViewTemplate = _revitRepository.SectionViewTemplates.FirstOrDefault(v => v.Name.Equals(data.ViewTemplateName)),
+                ViewportType = _revitRepository.ViewportTypes.FirstOrDefault(v => v.Name.Equals(data.ViewportTypeName)),
+                ViewCount = data.ViewCount ?? 1,
+            },
+
             ScheduleViewData data => new ScheduleViewVM {
                 IsModuleCheck = data.IsModuleCheck ?? false,
                 ModuleName = data.ModuleName ?? string.Empty,
@@ -77,8 +92,8 @@ internal class SheetSetVMFactory : ISheetSetVMFactory {
 
                 ReferenceViewName = data.ReferenceViewName ?? string.Empty,
                 ViewName = data.ViewName ?? string.Empty,
-                ViewCount = data.ViewCount,
-                ViewRow = data.ViewRow ?? 1,
+                ViewColumn = data.ViewColumn ?? 1,
+                ViewCount = data.ViewCount ?? 1,
             },
             _ => throw new NotSupportedException($"Тип '{sheetComponentData?.GetType().Name}' не поддерживается")
         };

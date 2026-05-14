@@ -13,6 +13,7 @@
             Source="CustomStyles.xaml" />
     </ResourceDictionary.MergedDictionaries>
 
+    <!--PlanView-->
     <DataTemplate
         x:Key="PlanViewDerivedTemplate" >
         <Grid>
@@ -69,11 +70,6 @@
                 DisplayMemberPath="Name"
                 SelectedItem="{Binding ViewportType, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" />
 
-            <!--<TextBlock
-                Grid.Column="1"
-                Grid.Row="2"
-                Text="аааа" />-->
-
             <TextBlock
                 Grid.Column="0"
                 Grid.Row="3"
@@ -88,22 +84,18 @@
                 DisplayMemberPath="Name"
                 SelectedItem="{Binding ViewTemplate, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" />
 
-            <!--<TextBlock
-                Grid.Column="1"
-                Grid.Row="3"
-                Text="{Binding Path=ViewTemplate.Name}" />-->
-
             <TextBlock
                 Grid.Column="0"
                 Grid.Row="4"
                 Margin="5"
                 Text="Количество" />
-            
-            <TextBlock
+
+            <TextBox
                 Grid.Column="1"
                 Grid.Row="4"
                 Margin="5"
-                Text="{Binding Path=ViewCount.Name}" />
+                Text="{Binding Path=ViewCount}"
+                IsEnabled="False"/>
             
         </Grid>
     </DataTemplate>
@@ -114,12 +106,165 @@
             DerivedTemplate="{StaticResource PlanViewDerivedTemplate}" />
     </DataTemplate>
 
+    
+    <!--SectionView-->
+    <DataTemplate
+        x:Key="SectionViewDerivedTemplate" >
+        <Grid>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="*"/>
+                <RowDefinition Height="*"/>
+                <RowDefinition Height="*"/>
+                <RowDefinition Height="*"/>
+                <RowDefinition Height="*"/>
+            </Grid.RowDefinitions>
+
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+
+            <TextBlock
+                Grid.Column="0"
+                Grid.Row="0"
+                Margin="5"
+                Text="Имя вида" />
+            
+            <TextBox
+                Grid.Column="1"
+                Grid.Row="0"
+                Margin="5"
+                Text="{Binding Path=ViewName}" />
+
+            <TextBlock
+                Grid.Column="0"
+                Grid.Row="1"
+                Margin="5"
+                Text="Типоразмер вида" />
+
+            <ComboBox
+                Grid.Column="1"
+                Grid.Row="1"
+                Margin="5"
+                ItemsSource="{Binding DataContext.SectionViewFamilyTypes, RelativeSource={RelativeSource AncestorType=Window}}"
+                DisplayMemberPath="Name"
+                SelectedItem="{Binding ViewFamilyType, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" />
+
+            <TextBlock
+                Grid.Column="0"
+                Grid.Row="2"
+                Margin="5"
+                Text="Типоразмер видового экрана" />
+
+            <ComboBox
+                Grid.Column="1"
+                Grid.Row="2"
+                Margin="5"
+                ItemsSource="{Binding DataContext.ViewportTypes, RelativeSource={RelativeSource AncestorType=Window}}"
+                DisplayMemberPath="Name"
+                SelectedItem="{Binding ViewportType, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" />
+
+            <TextBlock
+                Grid.Column="0"
+                Grid.Row="3"
+                Margin="5"
+                Text="Шаблон вида" />
+
+            <ComboBox
+                Grid.Column="1"
+                Grid.Row="3"
+                Margin="5"
+                ItemsSource="{Binding DataContext.SectionViewTemplates, RelativeSource={RelativeSource AncestorType=Window}}"
+                DisplayMemberPath="Name"
+                SelectedItem="{Binding ViewTemplate, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" />
+
+            <TextBlock
+                Grid.Column="0"
+                Grid.Row="4"
+                Margin="5"
+                Text="Количество" />
+
+            <TextBox
+                Grid.Column="1"
+                Grid.Row="4"
+                Margin="5"
+                Text="{Binding Path=ViewCount}"
+                IsEnabled="False"/>
+        </Grid>
+    </DataTemplate>
+
+    <DataTemplate
+        DataType="{x:Type sc:SectionViewVM}">
+        <controls:SheetComponentItemControl
+            DerivedTemplate="{StaticResource SectionViewDerivedTemplate}" />
+    </DataTemplate>
+
+
+    <!--ScheduleView-->
     <DataTemplate
         x:Key="ScheduleViewDerivedTemplate">
-        <StackPanel>
+        <Grid>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="*"/>
+                <RowDefinition Height="*"/>
+                <RowDefinition Height="*"/>
+                <RowDefinition Height="*"/>
+            </Grid.RowDefinitions>
+            
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+
             <TextBlock
-                Text="Тип: Schedule" />
-        </StackPanel>
+                Grid.Column="0"
+                Grid.Row="0"
+                Margin="5"
+                Text="Имя исходной" />
+
+            <TextBox
+                Grid.Column="1"
+                Grid.Row="0"
+                Margin="5"
+                Text="{Binding Path=ReferenceViewName}" />
+
+            <TextBlock
+                Grid.Column="0"
+                Grid.Row="1"
+                Margin="5"
+                Text="Имя итоговой" />
+
+            <TextBox
+                Grid.Column="1"
+                Grid.Row="1"
+                Margin="5"
+                Text="{Binding Path=ViewName}" />
+
+            <TextBlock
+                Grid.Column="0"
+                Grid.Row="2"
+                Margin="5"
+                Text="Ряд размещения" />
+
+            <TextBox
+                Grid.Column="1"
+                Grid.Row="2"
+                Margin="5"
+                Text="{Binding Path=ViewColumn}" />
+
+            <TextBlock
+                Grid.Column="0"
+                Grid.Row="3"
+                Margin="5"
+                Text="Количество" />
+
+            <TextBox
+                Grid.Column="1"
+                Grid.Row="3"
+                Margin="5"
+                Text="{Binding Path=ViewCount}"
+                IsEnabled="False" />
+        </Grid>
     </DataTemplate>
 
     <DataTemplate
@@ -128,6 +273,7 @@
             DerivedTemplate="{StaticResource ScheduleViewDerivedTemplate}" />
     </DataTemplate>
 
+    
     <DataTemplate
         DataType="{x:Type s:SheetVM}">
         <controls:SheetItemControl />

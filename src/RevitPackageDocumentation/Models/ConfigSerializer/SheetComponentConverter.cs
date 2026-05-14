@@ -11,6 +11,7 @@ namespace RevitPackageDocumentation.Models.ConfigSerializer;
 public class SheetComponentConverter : JsonConverter {
     private const string _componentTypeProperty = "ComponentType";
     private const string _planViewType = "PlanView";
+    private const string _sectionViewType = "SectionView";
     private const string _scheduleViewType = "ScheduleView";
 
     public override bool CanConvert(Type objectType) {
@@ -27,6 +28,7 @@ public class SheetComponentConverter : JsonConverter {
         try {
             return componentType switch {
                 _planViewType => jObject.ToObject<PlanViewData>(serializer),
+                _sectionViewType => jObject.ToObject<SectionViewData>(serializer),
                 _scheduleViewType => jObject.ToObject<ScheduleViewData>(serializer),
                 _ => throw new NotSupportedException($"Unknown component type: {componentType}")
             };
