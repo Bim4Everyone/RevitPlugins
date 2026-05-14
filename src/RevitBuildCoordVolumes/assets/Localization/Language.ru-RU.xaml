@@ -26,7 +26,7 @@
     <system:String x:Key="ParamControl.TargetParamHeader">Параметр объемных элементов</system:String>
 
     <system:String x:Key="SlabBasedSettingEditControl.BuilderMode">Режим работы алгоритма</system:String>
-    <system:String x:Key="SlabBasedSettingEditControl.BuilderModeDescription">Выбор режима работы алгоритма на основе перекрытий</system:String>
+    <system:String x:Key="SlabBasedSettingEditControl.BuilderModeDescription">Выбор режима работы алгоритма в пределах этажа</system:String>
     
     <system:String x:Key="SlabBasedSettingEditControl.SourceFiles">Файлы с плитами перекрытий</system:String>
     <system:String x:Key="SlabBasedSettingEditControl.SourceFilesDescription">Файлы, где расположены плиты перекрытий</system:String>
@@ -71,9 +71,9 @@
     <system:String x:Key="CommonSettingViewModel.VolumeParamDescription">Параметр объёма СМР</system:String>
     <system:String x:Key="CommonSettingViewModel.VolumeParamDetailDescription">Используется для вычисления объёма</system:String>
 
-    <system:String x:Key="SlabBasedSettingViewModel.AutomaticBuilder">Объединенные объемы по этажу</system:String>
-    <system:String x:Key="SlabBasedSettingViewModel.ContourBuilder">Отдельные объемы (с объединением контуров)</system:String>
-    <system:String x:Key="SlabBasedSettingViewModel.ColumnBuilder">Отдельные объемы (без объединения контуров)</system:String>
+    <system:String x:Key="SlabBasedSettingViewModel.AutomaticBuilder">Общий объем</system:String>
+    <system:String x:Key="SlabBasedSettingViewModel.ContourBuilder">Отдельные объемы</system:String>
+    <system:String x:Key="SlabBasedSettingViewModel.ColumnBuilder">Отдельные объемы сеткой квадратов</system:String>
 
     <system:String x:Key="MainViewModel.RequiredCheckArea">Требуется проверить зоны</system:String>
     <system:String x:Key="MainViewModel.NoMainParam">Параметр типа зон обязателен к использованию</system:String>

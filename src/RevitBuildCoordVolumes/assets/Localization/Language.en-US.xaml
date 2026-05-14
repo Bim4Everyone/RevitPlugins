@@ -26,7 +26,7 @@
     <system:String x:Key="ParamControl.TargetParamHeader">Volume element parameter</system:String>
 
     <system:String x:Key="SlabBasedSettingEditControl.BuilderMode">Algorithm builder mode</system:String>
-    <system:String x:Key="SlabBasedSettingEditControl.BuilderModeDescription">Select the slab-based algorithm builder mode</system:String>
+    <system:String x:Key="SlabBasedSettingEditControl.BuilderModeDescription">Selecting the algorithm operating mode within a floor</system:String>
 
     <system:String x:Key="SlabBasedSettingEditControl.SourceFiles">Source files</system:String>
     <system:String x:Key="SlabBasedSettingEditControl.SourceFilesDescription">Files containing floor slabs</system:String>
@@ -71,9 +71,9 @@
     <system:String x:Key="CommonSettingViewModel.VolumeParamDescription">CMR volume parameter</system:String>
     <system:String x:Key="CommonSettingViewModel.VolumeParamDetailDescription">Used to calculate volume</system:String>
 
-    <system:String x:Key="SlabBasedSettingViewModel.AutomaticBuilder">Merged volumes by floor</system:String>
-    <system:String x:Key="SlabBasedSettingViewModel.ContourBuilder">Separate volumes (with contour merging)</system:String>
-    <system:String x:Key="SlabBasedSettingViewModel.ColumnBuilder">Separate volumes (without contour merging)</system:String>
+    <system:String x:Key="SlabBasedSettingViewModel.AutomaticBuilder">United volume</system:String>
+    <system:String x:Key="SlabBasedSettingViewModel.ContourBuilder">Separate volumes</system:String>
+    <system:String x:Key="SlabBasedSettingViewModel.ColumnBuilder">Separate volumes using a square grid</system:String>
 
     <system:String x:Key="MainViewModel.RequiredCheckArea">Zone check required</system:String>
     <system:String x:Key="MainViewModel.NoMainParam">Zone type parameter must be enabled</system:String>
