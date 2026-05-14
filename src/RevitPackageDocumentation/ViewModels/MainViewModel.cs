@@ -40,6 +40,7 @@ internal class MainViewModel : BaseViewModel {
     private List<ViewPlan> _planViewTemplates;
     private List<ViewSection> _sectionViewTemplates;
     private List<ViewFamilyType> _structuralPlanViewFamilyTypes;
+    private List<ElementType> _viewportTypes;
 
     /// <summary>
     /// Создает экземпляр основной ViewModel главного окна.
@@ -137,6 +138,11 @@ internal class MainViewModel : BaseViewModel {
         set => RaiseAndSetIfChanged(ref _sectionViewTemplates, value);
     }
 
+    public List<ElementType> ViewportTypes {
+        get => _viewportTypes;
+        set => RaiseAndSetIfChanged(ref _viewportTypes, value);
+    }
+
 
     /// <summary>
     /// Метод загрузки главного окна.
@@ -145,10 +151,11 @@ internal class MainViewModel : BaseViewModel {
     private void LoadView() {
         LoadConfig();
 
-        StructuralPlanViewFamilyTypes = _revitRepository.StructuralPlanViewFamilyTypes;
-        SectionViewFamilyTypes = _revitRepository.SectionViewFamilyTypes;
+        StructuralPlanViewFamilyTypes = _revitRepository.StructuralPlanViewTypes;
+        SectionViewFamilyTypes = _revitRepository.SectionViewTypes;
         PlanViewTemplates = _revitRepository.PlanViewTemplates;
         SectionViewTemplates = _revitRepository.SectionViewTemplates;
+        ViewportTypes = _revitRepository.ViewportTypes;
 
         if(string.IsNullOrEmpty(_sheetSetDataPath) || !File.Exists(_sheetSetDataPath)) {
             ImportSheetSet();

@@ -83,8 +83,9 @@ public class PlanViewData : SheetComponentData {
 
     public string ViewName { get; set; }
     public int ViewCount { get; set; }
-    public object ViewFamilyTypeName { get; set; }
-    public object ViewTemplateName { get; set; }
+    public string ViewFamilyTypeName { get; set; }
+    public string ViewTemplateName { get; set; }
+    public string ViewportTypeName { get; set; }
 }
 
 /// <summary>

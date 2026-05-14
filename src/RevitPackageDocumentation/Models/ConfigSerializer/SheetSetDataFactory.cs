@@ -45,6 +45,7 @@ internal class SheetSetDataFactory : ISheetSetDataFactory {
                 ViewCount = vm.ViewCount,
                 ViewFamilyTypeName = vm.ViewFamilyType?.Name,
                 ViewTemplateName = vm.ViewTemplate?.Name,
+                ViewportTypeName = vm.ViewportType?.Name,
             },
             ScheduleViewVM vm => new ScheduleViewData {
                 IsModuleCheck = vm.IsModuleCheck,

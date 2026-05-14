@@ -5,6 +5,8 @@ using Autodesk.Revit.ApplicationServices;
 using Autodesk.Revit.DB;
 using Autodesk.Revit.UI;
 
+using dosymep.SimpleServices;
+
 namespace RevitPackageDocumentation.Models;
 
 /// <summary>
@@ -14,23 +16,28 @@ namespace RevitPackageDocumentation.Models;
 /// В случае если данный класс разрастается, рекомендуется его разделить на несколько.
 /// </remarks>
 internal class RevitRepository {
+    private readonly IMessageBoxService _messageBoxService;
+
     /// <summary>
     /// Создает экземпляр репозитория.
     /// </summary>
     /// <param name="uiApplication">Класс доступа к интерфейсу Revit.</param>
-    public RevitRepository(UIApplication uiApplication) {
+    public RevitRepository(UIApplication uiApplication, IMessageBoxService messageBoxService) {
         UIApplication = uiApplication;
+        _messageBoxService = messageBoxService;
 
-        StructuralPlanViewFamilyTypes = GetStructuralPlanViewFamilyTypes();
-        SectionViewFamilyTypes = GetSectionViewFamilyTypes();
+        StructuralPlanViewTypes = GetStructuralPlanViewTypes();
+        SectionViewTypes = GetSectionViewTypes();
         PlanViewTemplates = GetPlanViewTemplates();
         SectionViewTemplates = GetSectionViewTemplates();
+        ViewportTypes = GetViewportTypes();
     }
 
     /// <summary>
     /// Класс доступа к интерфейсу Revit.
     /// </summary>
     public UIApplication UIApplication { get; }
+
 
     /// <summary>
     /// Класс доступа к интерфейсу документа Revit.
@@ -48,15 +55,17 @@ internal class RevitRepository {
     public Document Document => ActiveUIDocument.Document;
 
 
-    public List<ViewFamilyType> StructuralPlanViewFamilyTypes { get; }
-    public List<ViewFamilyType> SectionViewFamilyTypes { get; }
+    public List<ViewFamilyType> StructuralPlanViewTypes { get; }
+    public List<ViewFamilyType> SectionViewTypes { get; }
     public List<ViewPlan> PlanViewTemplates { get; }
     public List<ViewSection> SectionViewTemplates { get; }
+    public List<ElementType> ViewportTypes { get; }
+
 
     /// <summary>
     /// Возвращает список типоразмеров видов в плане в проекте
     /// </summary>
-    private List<ViewFamilyType> GetStructuralPlanViewFamilyTypes() => new FilteredElementCollector(Document)
+    private List<ViewFamilyType> GetStructuralPlanViewTypes() => new FilteredElementCollector(Document)
         .OfClass(typeof(ViewFamilyType))
         .OfType<ViewFamilyType>()
         .Where(a => ViewFamily.StructuralPlan == a.ViewFamily)
@@ -65,7 +74,7 @@ internal class RevitRepository {
     /// <summary>
     /// Возвращает список типоразмеров видов в разрезе в проекте
     /// </summary>
-    private List<ViewFamilyType> GetSectionViewFamilyTypes() => new FilteredElementCollector(Document)
+    private List<ViewFamilyType> GetSectionViewTypes() => new FilteredElementCollector(Document)
         .OfClass(typeof(ViewFamilyType))
         .OfType<ViewFamilyType>()
         .Where(a => ViewFamily.Section == a.ViewFamily)
@@ -94,4 +103,24 @@ internal class RevitRepository {
         .Where(v => v.IsTemplate == true)
         .OrderBy(a => a.Name)
         .ToList();
+
+    /// <summary>
+    /// Возвращает список всех типов видовых экранов в проекте
+    /// </summary>
+    public List<ElementType> GetViewportTypes() {
+        var viewport = new FilteredElementCollector(Document)
+            .OfClass(typeof(Viewport))
+            .OfType<Viewport>()
+            .FirstOrDefault();
+
+        if(viewport is null) {
+            _messageBoxService.Show("Для корректной работы плагина разместите любой один вид на любом листе!", "Ошибка!");
+            return [];
+        } else {
+            return viewport.GetValidTypes()
+                .Select(id => Document.GetElement(id) as ElementType)
+                .OrderBy(a => a.Name)
+                .ToList();
+        }
+    }
 }

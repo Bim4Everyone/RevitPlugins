@@ -64,9 +64,9 @@ internal class SheetSetVMFactory : ISheetSetVMFactory {
 
                 ViewName = data.ViewName ?? string.Empty,
                 ViewCount = data.ViewCount,
-                ViewFamilyType = _revitRepository.StructuralPlanViewFamilyTypes.FirstOrDefault(v => v.Name.Equals(data.ViewFamilyTypeName)),
+                ViewFamilyType = _revitRepository.StructuralPlanViewTypes.FirstOrDefault(v => v.Name.Equals(data.ViewFamilyTypeName)),
                 ViewTemplate = _revitRepository.PlanViewTemplates.FirstOrDefault(v => v.Name.Equals(data.ViewTemplateName)),
-                //ViewportType = 
+                ViewportType = _revitRepository.ViewportTypes.FirstOrDefault(v => v.Name.Equals(data.ViewportTypeName)),
             },
             ScheduleViewData data => new ScheduleViewVM {
                 IsModuleCheck = data.IsModuleCheck ?? false,

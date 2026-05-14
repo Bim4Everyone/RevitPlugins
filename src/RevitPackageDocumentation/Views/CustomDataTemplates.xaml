@@ -32,21 +32,25 @@
             <TextBlock
                 Grid.Column="0"
                 Grid.Row="0"
+                Margin="5"
                 Text="Имя вида" />
             
             <TextBox
                 Grid.Column="1"
                 Grid.Row="0"
+                Margin="5"
                 Text="{Binding Path=ViewName}" />
 
             <TextBlock
                 Grid.Column="0"
                 Grid.Row="1"
+                Margin="5"
                 Text="Типоразмер вида" />
 
             <ComboBox
                 Grid.Column="1"
                 Grid.Row="1"
+                Margin="5"
                 ItemsSource="{Binding DataContext.StructuralPlanViewFamilyTypes, RelativeSource={RelativeSource AncestorType=Window}}"
                 DisplayMemberPath="Name"
                 SelectedItem="{Binding ViewFamilyType, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" />
@@ -54,13 +58,16 @@
             <TextBlock
                 Grid.Column="0"
                 Grid.Row="2"
+                Margin="5"
                 Text="Типоразмер видового экрана" />
 
             <ComboBox
                 Grid.Column="1"
                 Grid.Row="2"
-                ItemsSource="{Binding DataContext.SectionViewTemplates, RelativeSource={RelativeSource AncestorType=Window}}"
-                DisplayMemberPath="Name" />
+                Margin="5"
+                ItemsSource="{Binding DataContext.ViewportTypes, RelativeSource={RelativeSource AncestorType=Window}}"
+                DisplayMemberPath="Name"
+                SelectedItem="{Binding ViewportType, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" />
 
             <!--<TextBlock
                 Grid.Column="1"
@@ -70,11 +77,13 @@
             <TextBlock
                 Grid.Column="0"
                 Grid.Row="3"
+                Margin="5"
                 Text="Шаблон вида" />
 
             <ComboBox
                 Grid.Column="1"
                 Grid.Row="3"
+                Margin="5"
                 ItemsSource="{Binding DataContext.PlanViewTemplates, RelativeSource={RelativeSource AncestorType=Window}}"
                 DisplayMemberPath="Name"
                 SelectedItem="{Binding ViewTemplate, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" />
@@ -87,11 +96,13 @@
             <TextBlock
                 Grid.Column="0"
                 Grid.Row="4"
+                Margin="5"
                 Text="Количество" />
             
             <TextBlock
                 Grid.Column="1"
                 Grid.Row="4"
+                Margin="5"
                 Text="{Binding Path=ViewCount.Name}" />
             
         </Grid>
