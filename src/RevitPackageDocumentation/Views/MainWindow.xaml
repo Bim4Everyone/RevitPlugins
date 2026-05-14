@@ -128,7 +128,10 @@
                     <ui:Button
                         Grid.Row="1"
                         Margin="10"
-                        Content="Add sheet"
+                        Padding="7"
+                        VerticalAlignment="Center"
+                        HorizontalAlignment="Right"
+                        Content="{me:LocalizationSource MainWindow.AddSheet}"
                         Command="{Binding AddSheetCommand}" />
                 </Grid>
             </Border>
@@ -168,11 +171,12 @@
                     <ComboBox
                         Grid.Row="1"
                         Margin="10"
+                        MinWidth="220"
                         HorizontalAlignment="Right"
                         ItemsSource="{Binding ComponentTypes}"
                         SelectedItem="{Binding SelectedComponentType}"
                         DisplayMemberPath="DisplayName"
-                        IsSynchronizedWithCurrentItem="True">
+                        IsSynchronizedWithCurrentItem="True" >
 
                         <i:Interaction.Triggers>
                             <i:EventTrigger
@@ -182,6 +186,13 @@
                             </i:EventTrigger>
                         </i:Interaction.Triggers>
                     </ComboBox>
+
+                    <TextBlock
+                        Grid.Row="1"
+                        Margin="10 10 40 10"
+                        VerticalAlignment="Center"
+                        HorizontalAlignment="Right"
+                        Text="{me:LocalizationSource MainWindow.AddSheetComponent}" />
                 </Grid>
             </Border>
         </Grid>

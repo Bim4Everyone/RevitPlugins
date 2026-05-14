@@ -9,6 +9,9 @@
     <system:String x:Key="MainWindow.ButtonOk">OK</system:String>
     <system:String x:Key="MainWindow.ButtonCancel">Cancel</system:String>
     
+    <system:String x:Key="MainWindow.AddSheet">Add sheet</system:String>
+    <system:String x:Key="MainWindow.AddSheetComponent">Add sheet component</system:String>
+    
     <system:String x:Key="Type.StructuralPlanView">Structural plan</system:String>
     <system:String x:Key="Type.SectionView">Section</system:String>
     <system:String x:Key="Type.ScheduleView">Schedule</system:String>
