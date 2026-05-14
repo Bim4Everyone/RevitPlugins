@@ -2,12 +2,18 @@
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
                     xmlns:system="clr-namespace:System;assembly=mscorlib">
 
-    <!-- Пример перевода на русский язык (google translate) -->
-
     <system:String x:Key="MainWindow.Title">Пример команды</system:String>
     <system:String x:Key="MainWindow.Hello">Привет, Revit!</system:String>
     <system:String x:Key="MainWindow.HelloCheck">Введите значение сохраняемого свойства.</system:String>
 
     <system:String x:Key="MainWindow.ButtonOk">ОК</system:String>
     <system:String x:Key="MainWindow.ButtonCancel">Отмена</system:String>
+    
+    <system:String x:Key="Type.PlanViewVM">Вид в плане</system:String>
+    <system:String x:Key="Type.CalloutViewVM">Фрагмент</system:String>
+    <system:String x:Key="Type.SectionViewVM">Сечение</system:String>
+    <system:String x:Key="Type.ScheduleViewVM">Спецификация</system:String>
+    <system:String x:Key="Type.TextNoteVM">Текст</system:String>
+    <system:String x:Key="Type.TypicalAnnotationVM">Типовая аннотация</system:String>
+    <system:String x:Key="Type.LegendViewVM">Легенда</system:String>
 </ResourceDictionary>

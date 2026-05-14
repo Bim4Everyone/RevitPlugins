@@ -1,6 +1,8 @@
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Reflection;
 using System.Windows.Input;
 
 using Autodesk.Revit.DB;
@@ -41,6 +43,8 @@ internal class MainViewModel : BaseViewModel {
     private List<ViewSection> _sectionViewTemplates;
     private List<ViewFamilyType> _structuralPlanViewFamilyTypes;
     private List<ElementType> _viewportTypes;
+    private List<ComponentTypeItem> _componentTypes;
+    private ComponentTypeItem _selectedComponentType;
 
     /// <summary>
     /// Создает экземпляр основной ViewModel главного окна.
@@ -144,24 +148,41 @@ internal class MainViewModel : BaseViewModel {
     }
 
 
-    /// <summary>
-    /// Метод загрузки главного окна.
-    /// </summary>
-    /// <remarks>В данном методе должна происходить загрузка настроек окна, а так же инициализация полей окна.</remarks>
+    public List<ComponentTypeItem> ComponentTypes {
+        get => _componentTypes;
+        set => RaiseAndSetIfChanged(ref _componentTypes, value);
+    }
+
+    public ComponentTypeItem SelectedComponentType {
+        get => _selectedComponentType;
+        set => RaiseAndSetIfChanged(ref _selectedComponentType, value);
+    }
+
     private void LoadView() {
         LoadConfig();
-
-        StructuralPlanViewFamilyTypes = _revitRepository.StructuralPlanViewTypes;
-        SectionViewFamilyTypes = _revitRepository.SectionViewTypes;
-        PlanViewTemplates = _revitRepository.PlanViewTemplates;
-        SectionViewTemplates = _revitRepository.SectionViewTemplates;
-        ViewportTypes = _revitRepository.ViewportTypes;
+        GetSettingsForUI();
 
         if(string.IsNullOrEmpty(_sheetSetDataPath) || !File.Exists(_sheetSetDataPath)) {
             ImportSheetSet();
         } else {
             ImportSheetSet(_sheetSetDataPath);
         }
+    }
+
+    private void GetSettingsForUI() {
+        ComponentTypes = Assembly.GetExecutingAssembly()
+            .GetTypes()
+            .Where(t => t.IsClass && !t.IsAbstract && t.IsSubclassOf(typeof(SheetComponentVM)))
+            .Select(t =>
+                new ComponentTypeItem(t, _localizationService.GetLocalizedString($"Type.{t.Name}") ?? string.Empty))
+            .ToList();
+        SelectedComponentType = null;
+
+        StructuralPlanViewFamilyTypes = _revitRepository.StructuralPlanViewTypes;
+        SectionViewFamilyTypes = _revitRepository.SectionViewTypes;
+        PlanViewTemplates = _revitRepository.PlanViewTemplates;
+        SectionViewTemplates = _revitRepository.SectionViewTemplates;
+        ViewportTypes = _revitRepository.ViewportTypes;
     }
 
     private void ImportSheetSet() {
@@ -243,7 +264,12 @@ internal class MainViewModel : BaseViewModel {
     }
 
     private void AddComponent() {
-        SelectedSheet.AddComponent();
+        if(SelectedComponentType != null && SelectedComponentType.ComponentType != null) {
+            if(Activator.CreateInstance(SelectedComponentType.ComponentType) is SheetComponentVM newComponent) {
+                SelectedSheet.SheetComponents.Add(newComponent);
+            }
+            SelectedComponentType = null;
+        }
     }
 
     private void RemoveComponent(SheetComponentVM sheetComponent) {

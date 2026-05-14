@@ -165,11 +165,23 @@
                             ItemsSource="{Binding Path=SelectedSheet.SheetComponents, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" />
                     </ScrollViewer>
 
-                    <ui:Button
+                    <ComboBox
                         Grid.Row="1"
                         Margin="10"
-                        Content="Add component"
-                        Command="{Binding AddComponentCommand}" />
+                        HorizontalAlignment="Right"
+                        ItemsSource="{Binding ComponentTypes}"
+                        SelectedItem="{Binding SelectedComponentType}"
+                        DisplayMemberPath="DisplayName"
+                        IsSynchronizedWithCurrentItem="True">
+
+                        <i:Interaction.Triggers>
+                            <i:EventTrigger
+                                EventName="DropDownClosed">
+                                <i:InvokeCommandAction
+                                    Command="{Binding AddComponentCommand}" />
+                            </i:EventTrigger>
+                        </i:Interaction.Triggers>
+                    </ComboBox>
                 </Grid>
             </Border>
         </Grid>
