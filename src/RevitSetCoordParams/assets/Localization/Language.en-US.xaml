@@ -90,7 +90,7 @@
 
     <system:String x:Key="MainViewModel.UpPositionProvider">At the up of the element</system:String>
     <system:String x:Key="MainViewModel.NoTypeModel">The required common elements are missing in the file</system:String>
-    <system:String x:Key="MainViewModel.NoSelection">Common elements is not selected</system:String>
+    <system:String x:Key="MainViewModel.NoSelection">Elements is not selected</system:String>
     <system:String x:Key="MainViewModel.ProgressTitle">Processing... [{0}]\[{1}]</system:String>
 
     <system:String x:Key="SourceFileViewModel.CurrentFile">Current file (opened)</system:String>

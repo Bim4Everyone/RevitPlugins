@@ -89,8 +89,8 @@
     <system:String x:Key="MainViewModel.InheritanceParent">Наследование от родительского семейства</system:String>
 
     <system:String x:Key="MainViewModel.UpPositionProvider">По верху элемента</system:String>
-    <system:String x:Key="MainViewModel.NoTypeModel">В файле отсутствуют необходимые объемные элементы</system:String>    
-    <system:String x:Key="MainViewModel.NoSelection">Объемные элементы не выбраны</system:String>
+    <system:String x:Key="MainViewModel.NoTypeModel">В файле отсутствуют необходимые объемные элементы</system:String>
+    <system:String x:Key="MainViewModel.NoSelection">Элементы не выбраны</system:String>
     <system:String x:Key="MainViewModel.ProgressTitle">Обработка... [{0}]\[{1}]  </system:String>
 
     <system:String x:Key="SourceFileViewModel.CurrentFile">Текущий файл (открытый)</system:String>
