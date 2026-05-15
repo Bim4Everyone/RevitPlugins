@@ -35,6 +35,7 @@ internal class RevitRepository {
         TextNoteTypes = GetTextNoteTypes();
         GenericAnnotationFamilies = GetGenericAnnotationFamilies();
         LegendsInProject = GetLegendsInProject();
+        TitleBlockFamilies = GetTitleBlockFamilies();
     }
 
     /// <summary>
@@ -67,6 +68,7 @@ internal class RevitRepository {
     public List<TextNoteType> TextNoteTypes { get; }
     public List<Family> GenericAnnotationFamilies { get; }
     public List<View> LegendsInProject { get; }
+    public List<Family> TitleBlockFamilies { get; }
 
 
     /// <summary>
@@ -158,5 +160,15 @@ internal class RevitRepository {
         .OfClass(typeof(View))
         .OfType<View>()
         .Where(view => view.ViewType == ViewType.Legend)
+        .ToList();
+
+    /// <summary>
+    /// Возвращает список семейств рамок листа
+    /// </summary>
+    public List<Family> GetTitleBlockFamilies() => new FilteredElementCollector(Document)
+        .OfClass(typeof(Family))
+        .OfType<Family>()
+        .Where(f => f.FamilyCategory.GetBuiltInCategory() == BuiltInCategory.OST_TitleBlocks)
+        .OrderBy(a => a.Name)
         .ToList();
 }

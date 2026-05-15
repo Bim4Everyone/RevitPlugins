@@ -142,8 +142,82 @@
                 Margin="5 5 10 5"
                 Style="{StaticResource CustomBorder}">
 
-                <TextBlock
-                    Text="Sheets props" />
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="*"/>
+                        <RowDefinition Height="*"/>
+                    </Grid.RowDefinitions>
+
+                    <ui:TextBlock
+                        Grid.Column="0"
+                        Grid.Row="0"
+                        Margin="5"
+                        VerticalAlignment="Center"
+                        Text="Размер листа" />
+
+                    <ui:TextBox
+                        Grid.Column="1"
+                        Grid.Row="0"
+                        Margin="5"
+                        Text="{Binding Path=SelectedSheet.SheetSize}"/>
+
+                    <ui:TextBlock
+                        Grid.Column="2"
+                        Grid.Row="0"
+                        Margin="5"
+                        VerticalAlignment="Center"
+                        Text="Коэффициент листа" />
+
+                    <ui:TextBox
+                        Grid.Column="3"
+                        Grid.Row="0"
+                        Margin="5"
+                        Text="{Binding Path=SelectedSheet.SheetCoefficient}"/>
+
+                    <ui:TextBlock
+                        Grid.Column="0"
+                        Grid.Row="1"
+                        Margin="5"
+                        VerticalAlignment="Center"
+                        Text="Семейство рамки" />
+
+                    <ComboBox
+                        Grid.Column="1"
+                        Grid.Row="1"
+                        Margin="5"
+                        ItemsSource="{Binding Path=TitleBlockFamilies, UpdateSourceTrigger=PropertyChanged}"
+                        DisplayMemberPath="Name"
+                        SelectedItem="{Binding Path=SelectedSheet.TitleBlockFamily, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}">
+                        <i:Interaction.Triggers>
+                            <i:EventTrigger
+                                EventName="SelectionChanged">
+                                <i:InvokeCommandAction
+                                    Command="{Binding SelectedSheet.SelectTitleBlockFamilyCommand}" />
+                            </i:EventTrigger>
+                        </i:Interaction.Triggers>
+                    </ComboBox>
+
+                    <ui:TextBlock
+                        Grid.Column="2"
+                        Grid.Row="1"
+                        Margin="5"
+                        VerticalAlignment="Center"
+                        Text="Семейство рамки" />
+
+                    <ComboBox
+                        Grid.Column="3"
+                        Grid.Row="1"
+                        Margin="5"
+                        ItemsSource="{Binding Path=SelectedSheet.TitleBlockTypes, UpdateSourceTrigger=PropertyChanged}"
+                        DisplayMemberPath="Name"
+                        SelectedItem="{Binding Path=SelectedSheet.TitleBlockType, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" />
+                </Grid>
             </Border>
 
             <Border

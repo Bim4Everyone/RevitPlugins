@@ -31,7 +31,7 @@ internal class SheetSetVMFactory : ISheetSetVMFactory {
         if(data == null)
             throw new ArgumentNullException(nameof(data));
 
-        var sheetSetVM = new SheetSetVM {
+        var sheetSetVM = new SheetSetVM(_revitRepository) {
             Name = data.Name
         };
 
@@ -47,8 +47,23 @@ internal class SheetSetVMFactory : ISheetSetVMFactory {
         if(data == null)
             throw new ArgumentNullException(nameof(data));
 
-        var sheetVM = new SheetVM {
-            Name = data.Name ?? string.Empty
+        var titleBlockFamily = _revitRepository.TitleBlockFamilies?.FirstOrDefault(v => v.Name.Equals(data.TitleBlockFamilyName));
+
+        var titleBlockTypes = titleBlockFamily
+            ?.GetFamilySymbolIds()
+            ?.Select(id => _revitRepository.Document.GetElement(id) as FamilySymbol)
+            ?.ToList();
+
+        var titleBlockType = titleBlockTypes?.FirstOrDefault(v => v.Name.Equals(data.TitleBlockTypeName));
+
+        var sheetVM = new SheetVM(_revitRepository) {
+            Name = data.Name ?? string.Empty,
+            SheetSize = data.SheetSize ?? string.Empty,
+            SheetCoefficient = data.SheetCoefficient ?? string.Empty,
+
+            TitleBlockFamily = titleBlockFamily,
+            TitleBlockTypes = titleBlockTypes,
+            TitleBlockType = titleBlockType,
         };
 
         foreach(var componentData in data.Views) {
@@ -66,7 +81,7 @@ internal class SheetSetVMFactory : ISheetSetVMFactory {
                 ModuleName = data.ModuleName ?? string.Empty,
                 ModuleComment = data.ModuleComment ?? string.Empty,
                 ModuleCode = "123",
-                ModuleErrors = "Ошибка PlanView",
+                ModuleErrors = string.Empty,
 
                 ViewName = data.ViewName ?? string.Empty,
                 ViewFamilyType = _revitRepository.StructuralPlanViewTypes.FirstOrDefault(v => v.Name.Equals(data.ViewFamilyTypeName)),
@@ -80,7 +95,7 @@ internal class SheetSetVMFactory : ISheetSetVMFactory {
                 ModuleName = data.ModuleName ?? string.Empty,
                 ModuleComment = data.ModuleComment ?? string.Empty,
                 ModuleCode = "05",
-                ModuleErrors = "Ошибка CalloutView",
+                ModuleErrors = string.Empty,
 
                 ViewName = data.ViewName ?? string.Empty,
                 ViewFamilyType = _revitRepository.StructuralPlanViewTypes.FirstOrDefault(v => v.Name.Equals(data.ViewFamilyTypeName)),
@@ -94,7 +109,7 @@ internal class SheetSetVMFactory : ISheetSetVMFactory {
                 ModuleName = data.ModuleName ?? string.Empty,
                 ModuleComment = data.ModuleComment ?? string.Empty,
                 ModuleCode = "789",
-                ModuleErrors = "Ошибка SectionView",
+                ModuleErrors = string.Empty,
 
                 ViewName = data.ViewName ?? string.Empty,
                 ViewFamilyType = _revitRepository.SectionViewTypes.FirstOrDefault(v => v.Name.Equals(data.ViewFamilyTypeName)),
@@ -108,7 +123,7 @@ internal class SheetSetVMFactory : ISheetSetVMFactory {
                 ModuleName = data.ModuleName ?? string.Empty,
                 ModuleComment = data.ModuleComment ?? string.Empty,
                 ModuleCode = "456",
-                ModuleErrors = "Ошибка ScheduleView",
+                ModuleErrors = string.Empty,
 
                 ReferenceViewName = data.ReferenceViewName ?? string.Empty,
                 ViewName = data.ViewName ?? string.Empty,
@@ -121,7 +136,7 @@ internal class SheetSetVMFactory : ISheetSetVMFactory {
                 ModuleName = data.ModuleName ?? string.Empty,
                 ModuleComment = data.ModuleComment ?? string.Empty,
                 ModuleCode = "01",
-                ModuleErrors = "Ошибка TextNote",
+                ModuleErrors = string.Empty,
 
                 Text = data.Text ?? string.Empty,
                 TextNoteType = _revitRepository.TextNoteTypes.FirstOrDefault(v => v.Name.Equals(data.TextNoteTypeName)),
@@ -134,7 +149,7 @@ internal class SheetSetVMFactory : ISheetSetVMFactory {
                 ModuleName = data.ModuleName ?? string.Empty,
                 ModuleComment = data.ModuleComment ?? string.Empty,
                 ModuleCode = "03",
-                ModuleErrors = "Ошибка LegendView",
+                ModuleErrors = string.Empty,
 
                 LegendView = _revitRepository.LegendsInProject.FirstOrDefault(v => v.Name.Equals(data.ViewName)),
             },
@@ -145,9 +160,7 @@ internal class SheetSetVMFactory : ISheetSetVMFactory {
 
     private TypicalAnnotationVM CreateTypicalAnnotationVM(TypicalAnnotationData data) {
 
-        var annotationFamilies = _revitRepository.GenericAnnotationFamilies;
-
-        var annotationFamily = annotationFamilies?.FirstOrDefault(v => v.Name.Equals(data.AnnotationFamilyName));
+        var annotationFamily = _revitRepository.GenericAnnotationFamilies?.FirstOrDefault(v => v.Name.Equals(data.AnnotationFamilyName));
 
         var annotationTypes = annotationFamily
                     ?.GetFamilySymbolIds()
@@ -162,7 +175,7 @@ internal class SheetSetVMFactory : ISheetSetVMFactory {
             ModuleName = data.ModuleName ?? string.Empty,
             ModuleComment = data.ModuleComment ?? string.Empty,
             ModuleCode = "02",
-            ModuleErrors = "Ошибка TypicalAnnotation",
+            ModuleErrors = string.Empty,
 
             AnnotationTypes = annotationTypes,
             AnnotationFamily = annotationFamily,

@@ -31,6 +31,10 @@ internal class SheetSetDataFactory : ISheetSetDataFactory {
 
         return new SheetData {
             Name = vm.Name,
+            SheetSize = vm.SheetSize,
+            SheetCoefficient = vm.SheetCoefficient,
+            TitleBlockFamilyName = vm.TitleBlockFamily?.Name,
+            TitleBlockTypeName = vm.TitleBlockType?.Name,
             Views = vm.SheetComponents?.Select(CreateComponentData).ToList()
         };
     }

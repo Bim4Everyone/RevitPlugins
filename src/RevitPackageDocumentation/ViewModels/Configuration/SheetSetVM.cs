@@ -2,13 +2,20 @@ using System.Collections.ObjectModel;
 
 using dosymep.WPF.ViewModels;
 
+using RevitPackageDocumentation.Models;
 using RevitPackageDocumentation.ViewModels.Configuration.Sheet;
 
 namespace RevitPackageDocumentation.ViewModels.Configuration;
 internal class SheetSetVM : BaseViewModel {
-    private ObservableCollection<SheetVM> _sheetList = [];
-    private SheetSetPropsVM _properties;
+    private readonly RevitRepository _revitRepository;
+
     private string _name;
+    private SheetSetPropsVM _properties;
+    private ObservableCollection<SheetVM> _sheetList = [];
+
+    public SheetSetVM(RevitRepository revitRepository) {
+        _revitRepository = revitRepository;
+    }
 
     public string Name {
         get => _name;
@@ -26,7 +33,7 @@ internal class SheetSetVM : BaseViewModel {
     }
 
     internal void AddSheet() {
-        SheetList.Add(new SheetVM() { Name = "Новый лист" });
+        SheetList.Add(new SheetVM(_revitRepository) { Name = "Новый лист" });
     }
 
     internal void RemoveSheet(SheetVM sheet) {

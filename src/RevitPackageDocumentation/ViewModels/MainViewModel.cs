@@ -48,6 +48,7 @@ internal class MainViewModel : BaseViewModel {
     private List<TextNoteType> _textNoteTypes;
     private List<Family> _genericAnnotationFamilies;
     private List<View> _legendsInProject;
+    private List<Family> _titleBlockFamilies;
 
     /// <summary>
     /// Создает экземпляр основной ViewModel главного окна.
@@ -168,6 +169,11 @@ internal class MainViewModel : BaseViewModel {
         set => RaiseAndSetIfChanged(ref _legendsInProject, value);
     }
 
+    public List<Family> TitleBlockFamilies {
+        get => _titleBlockFamilies;
+        set => RaiseAndSetIfChanged(ref _titleBlockFamilies, value);
+    }
+
 
     public List<ComponentTypeItem> ComponentTypes {
         get => _componentTypes;
@@ -208,6 +214,7 @@ internal class MainViewModel : BaseViewModel {
         TextNoteTypes = _revitRepository.TextNoteTypes;
         GenericAnnotationFamilies = _revitRepository.GenericAnnotationFamilies;
         LegendsInProject = _revitRepository.LegendsInProject;
+        TitleBlockFamilies = _revitRepository.TitleBlockFamilies;
     }
 
     private void ImportSheetSet() {

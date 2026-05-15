@@ -64,6 +64,10 @@ public class SheetSetData {
 /// </summary>
 public class SheetData {
     public string Name { get; set; }
+    public string SheetSize { get; set; }
+    public string SheetCoefficient { get; set; }
+    public string TitleBlockFamilyName { get; set; }
+    public string TitleBlockTypeName { get; set; }
     public List<SheetComponentData> Views { get; set; } = [];
 }
 
