@@ -112,6 +112,104 @@
             DerivedTemplate="{StaticResource PlanViewDerivedTemplate}" />
     </DataTemplate>
 
+
+    <!--CalloutView-->
+    <DataTemplate
+        x:Key="CalloutViewDerivedTemplate" >
+        <Grid>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="*"/>
+                <RowDefinition Height="*"/>
+                <RowDefinition Height="*"/>
+                <RowDefinition Height="*"/>
+                <RowDefinition Height="*"/>
+            </Grid.RowDefinitions>
+
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+
+            <TextBlock
+                Grid.Column="0"
+                Grid.Row="0"
+                Margin="5"
+                VerticalAlignment="Center"
+                Text="Имя вида" />
+            
+            <TextBox
+                Grid.Column="1"
+                Grid.Row="0"
+                Margin="5"
+                Text="{Binding Path=ViewName}" />
+
+            <TextBlock
+                Grid.Column="0"
+                Grid.Row="1"
+                Margin="5"
+                VerticalAlignment="Center"
+                Text="Типоразмер вида" />
+
+            <ComboBox
+                Grid.Column="1"
+                Grid.Row="1"
+                Margin="5"
+                ItemsSource="{Binding DataContext.StructuralPlanViewFamilyTypes, RelativeSource={RelativeSource AncestorType=Window}}"
+                DisplayMemberPath="Name"
+                SelectedItem="{Binding ViewFamilyType, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" />
+
+            <TextBlock
+                Grid.Column="0"
+                Grid.Row="2"
+                Margin="5"
+                VerticalAlignment="Center"
+                Text="Типоразмер видового экрана" />
+
+            <ComboBox
+                Grid.Column="1"
+                Grid.Row="2"
+                Margin="5"
+                ItemsSource="{Binding DataContext.ViewportTypes, RelativeSource={RelativeSource AncestorType=Window}}"
+                DisplayMemberPath="Name"
+                SelectedItem="{Binding ViewportType, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" />
+
+            <TextBlock
+                Grid.Column="0"
+                Grid.Row="3"
+                Margin="5"
+                VerticalAlignment="Center"
+                Text="Шаблон вида" />
+
+            <ComboBox
+                Grid.Column="1"
+                Grid.Row="3"
+                Margin="5"
+                ItemsSource="{Binding DataContext.PlanViewTemplates, RelativeSource={RelativeSource AncestorType=Window}}"
+                DisplayMemberPath="Name"
+                SelectedItem="{Binding ViewTemplate, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" />
+
+            <TextBlock
+                Grid.Column="0"
+                Grid.Row="4"
+                Margin="5"
+                VerticalAlignment="Center"
+                Text="Количество" />
+
+            <TextBox
+                Grid.Column="1"
+                Grid.Row="4"
+                Margin="5"
+                Text="{Binding Path=ViewCount}"/>
+            
+        </Grid>
+    </DataTemplate>
+
+    <DataTemplate
+        DataType="{x:Type sc:CalloutViewVM}">
+        <controls:SheetComponentItemControl
+            DerivedTemplate="{StaticResource CalloutViewDerivedTemplate}" />
+    </DataTemplate>
+
     
     <!--SectionView-->
     <DataTemplate
@@ -199,8 +297,7 @@
                 Grid.Column="1"
                 Grid.Row="4"
                 Margin="5"
-                Text="{Binding Path=ViewCount}"
-                IsEnabled="False"/>
+                Text="{Binding Path=ViewCount}"/>
         </Grid>
     </DataTemplate>
 

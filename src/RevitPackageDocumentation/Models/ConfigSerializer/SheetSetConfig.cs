@@ -76,7 +76,7 @@ public abstract class SheetComponentData {
 }
 
 /// <summary>
-/// DTO модуля вида в плане
+/// DTO модуля вида в плане несущих конструкций
 /// </summary>
 public class PlanViewData : SheetComponentData {
     public override string ComponentType => "PlanView";
@@ -89,7 +89,21 @@ public class PlanViewData : SheetComponentData {
 }
 
 /// <summary>
-/// DTO модуля вида в плане
+/// DTO модуля фрагмента плана несущих конструкций
+/// </summary>
+public class CalloutViewData : SheetComponentData {
+    public override string ComponentType => "CalloutView";
+
+    public string ViewName { get; set; }
+    public string ViewFamilyTypeName { get; set; }
+    public string ViewTemplateName { get; set; }
+    public string ViewportTypeName { get; set; }
+    public int? ViewCount { get; set; }
+}
+
+
+/// <summary>
+/// DTO модуля вида в сечения
 /// </summary>
 public class SectionViewData : SheetComponentData {
     public override string ComponentType => "SectionView";

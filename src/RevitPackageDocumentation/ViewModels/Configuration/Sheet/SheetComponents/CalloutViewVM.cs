@@ -3,7 +3,7 @@ using Autodesk.Revit.DB;
 namespace RevitPackageDocumentation.ViewModels.Configuration.Sheet.SheetComponents;
 internal class CalloutViewVM : SheetComponentVM {
     private string _viewName;
-    private ViewType _viewFamilyType;
+    private ViewFamilyType _viewFamilyType;
     private ElementType _viewportType;
     private ViewPlan _viewTemplate;
     private int _viewCount;
@@ -14,7 +14,7 @@ internal class CalloutViewVM : SheetComponentVM {
         set => RaiseAndSetIfChanged(ref _viewName, value);
     }
 
-    public ViewType ViewFamilyType {
+    public ViewFamilyType ViewFamilyType {
         get => _viewFamilyType;
         set => RaiseAndSetIfChanged(ref _viewFamilyType, value);
     }

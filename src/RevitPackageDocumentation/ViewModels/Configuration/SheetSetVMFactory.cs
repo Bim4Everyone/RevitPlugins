@@ -71,6 +71,20 @@ internal class SheetSetVMFactory : ISheetSetVMFactory {
                 ViewCount = data.ViewCount ?? 1,
             },
 
+            CalloutViewData data => new CalloutViewVM {
+                IsModuleCheck = data.IsModuleCheck ?? false,
+                ModuleName = data.ModuleName ?? string.Empty,
+                ModuleComment = data.ModuleComment ?? string.Empty,
+                ModuleCode = "05",
+                ModuleErrors = "Ошибка CalloutView",
+
+                ViewName = data.ViewName ?? string.Empty,
+                ViewFamilyType = _revitRepository.StructuralPlanViewTypes.FirstOrDefault(v => v.Name.Equals(data.ViewFamilyTypeName)),
+                ViewTemplate = _revitRepository.PlanViewTemplates.FirstOrDefault(v => v.Name.Equals(data.ViewTemplateName)),
+                ViewportType = _revitRepository.ViewportTypes.FirstOrDefault(v => v.Name.Equals(data.ViewportTypeName)),
+                ViewCount = data.ViewCount ?? 1,
+            },
+
             SectionViewData data => new SectionViewVM {
                 IsModuleCheck = data.IsModuleCheck ?? false,
                 ModuleName = data.ModuleName ?? string.Empty,

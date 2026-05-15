@@ -49,6 +49,18 @@ internal class SheetSetDataFactory : ISheetSetDataFactory {
                 ViewCount = vm.ViewCount,
             },
 
+            CalloutViewVM vm => new CalloutViewData {
+                IsModuleCheck = vm.IsModuleCheck,
+                ModuleName = vm.ModuleName,
+                ModuleComment = vm.ModuleComment,
+
+                ViewName = vm.ViewName,
+                ViewFamilyTypeName = vm.ViewFamilyType?.Name,
+                ViewTemplateName = vm.ViewTemplate?.Name,
+                ViewportTypeName = vm.ViewportType?.Name,
+                ViewCount = vm.ViewCount,
+            },
+
             SectionViewVM vm => new SectionViewData {
                 IsModuleCheck = vm.IsModuleCheck,
                 ModuleName = vm.ModuleName,
@@ -106,6 +118,7 @@ internal class SheetSetDataFactory : ISheetSetDataFactory {
     public SheetComponentData CreateComponentData(Type componentType) {
         return componentType switch {
             Type t when t == typeof(PlanViewVM) => new PlanViewData(),
+            Type t when t == typeof(CalloutViewVM) => new CalloutViewData(),
             Type t when t == typeof(SectionViewVM) => new SectionViewData(),
             Type t when t == typeof(ScheduleViewVM) => new ScheduleViewData(),
             Type t when t == typeof(TextNoteVM) => new TextNoteData(),
